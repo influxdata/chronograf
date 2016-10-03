@@ -108,9 +108,6 @@ const SearchBar = React.createClass({
   render() {
     return (
       <div className="users__search-widget input-group">
-        <div className="input-group-addon">
-          <span className="icon search" aria-hidden="true"></span>
-        </div>
         <input
           type="text"
           className="form-control"
@@ -118,6 +115,9 @@ const SearchBar = React.createClass({
           ref="searchInput"
           onChange={this.handleChange}
         />
+        <div className="input-group-addon">
+          <span className="icon search" aria-hidden="true"></span>
+        </div>
       </div>
     );
   },
