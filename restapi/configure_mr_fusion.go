@@ -2,7 +2,7 @@ package restapi
 
 import (
 	"crypto/tls"
-	"log"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -17,37 +17,31 @@ import (
 	"github.com/influxdata/mrfusion/dist"
 	"github.com/influxdata/mrfusion/handlers"
 	"github.com/influxdata/mrfusion/influx"
+	fusionlog "github.com/influxdata/mrfusion/log"
 	"github.com/influxdata/mrfusion/mock"
-	"github.com/influxdata/mrfusion/restapi/operations"
+	op "github.com/influxdata/mrfusion/restapi/operations"
 )
 
 // This file is safe to edit. Once it exists it will not be overwritten
 
 //go:generate swagger generate server --target .. --name  --spec ../swagger.yaml --with-context
 
+var logger = fusionlog.New()
+
 var devFlags = struct {
 	Develop bool `short:"d" long:"develop" description:"Run server in develop mode."`
 }{}
 
-var influxFlags = struct {
-	Server string `short:"s" long:"server" description:"Full URL of InfluxDB server (http://localhost:8086)" env:"INFLUX_HOST"`
-}{}
-
 var storeFlags = struct {
-	BoltPath string `short:"b" long:"bolt-path" description:"Full path to boltDB file (/Users/somebody/mrfusion.db)" env:"BOLT_PATH"`
+	BoltPath string `short:"b" long:"bolt-path" description:"Full path to boltDB file (/Users/somebody/mrfusion.db)" env:"BOLT_PATH" default:"chronograf.db"`
 }{}
 
-func configureFlags(api *operations.MrFusionAPI) {
+func configureFlags(api *op.MrFusionAPI) {
 	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
 		swag.CommandLineOptionsGroup{
 			ShortDescription: "Develop Mode server",
 			LongDescription:  "Server will use the ui/build directory directly.",
 			Options:          &devFlags,
-		},
-		swag.CommandLineOptionsGroup{
-			ShortDescription: "Default Time Series Backend",
-			LongDescription:  "Specify the url of an InfluxDB server",
-			Options:          &influxFlags,
 		},
 		swag.CommandLineOptionsGroup{
 			ShortDescription: "Default Store Backend",
@@ -70,7 +64,7 @@ func assets() mrfusion.Assets {
 	}
 }
 
-func configureAPI(api *operations.MrFusionAPI) http.Handler {
+func configureAPI(api *op.MrFusionAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -78,7 +72,11 @@ func configureAPI(api *operations.MrFusionAPI) http.Handler {
 	// Expected interface func(string, ...interface{})
 	//
 	// Example:
-	// s.api.Logger = log.Printf
+	api.Logger = func(msg string, args ...interface{}) {
+		logger.
+			WithField("component", "api").
+			Info(fmt.Sprintf(msg, args))
+	}
 
 	api.JSONConsumer = runtime.JSONConsumer()
 
@@ -86,7 +84,7 @@ func configureAPI(api *operations.MrFusionAPI) http.Handler {
 
 	mockHandler := mock.NewHandler()
 
-	api.GetHandler = operations.GetHandlerFunc(mockHandler.AllRoutes)
+	api.GetHandler = op.GetHandlerFunc(mockHandler.AllRoutes)
 
 	if len(storeFlags.BoltPath) > 0 {
 		c := bolt.NewClient()
@@ -94,102 +92,103 @@ func configureAPI(api *operations.MrFusionAPI) http.Handler {
 		if err := c.Open(); err != nil {
 			panic(err)
 		}
-		h := handlers.ExplorationStore{
+		h := handlers.Store{
 			ExplorationStore: c.ExplorationStore,
+			SourcesStore:     c.SourcesStore,
 		}
-		api.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandler = operations.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.DeleteExploration)
-		api.GetSourcesIDUsersUserIDExplorationsExplorationIDHandler = operations.GetSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.Exploration)
-		api.GetSourcesIDUsersUserIDExplorationsHandler = operations.GetSourcesIDUsersUserIDExplorationsHandlerFunc(h.Explorations)
-		api.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandler = operations.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.UpdateExploration)
-		api.PostSourcesIDUsersUserIDExplorationsHandler = operations.PostSourcesIDUsersUserIDExplorationsHandlerFunc(h.NewExploration)
+		api.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.DeleteExploration)
+		api.GetSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.GetSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.Exploration)
+		api.GetSourcesIDUsersUserIDExplorationsHandler = op.GetSourcesIDUsersUserIDExplorationsHandlerFunc(h.Explorations)
+		api.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.UpdateExploration)
+		api.PostSourcesIDUsersUserIDExplorationsHandler = op.PostSourcesIDUsersUserIDExplorationsHandlerFunc(h.NewExploration)
+
+		api.DeleteSourcesIDHandler = op.DeleteSourcesIDHandlerFunc(h.RemoveSource)
+		api.PatchSourcesIDHandler = op.PatchSourcesIDHandlerFunc(h.UpdateSource)
+
+		api.GetSourcesHandler = op.GetSourcesHandlerFunc(h.Sources)
+		api.GetSourcesIDHandler = op.GetSourcesIDHandlerFunc(h.SourcesID)
+		api.PostSourcesHandler = op.PostSourcesHandlerFunc(h.NewSource)
+
+		ts := influx.Client{}
+		p := handlers.InfluxProxy{
+			Srcs:       c.SourcesStore,
+			TimeSeries: &ts,
+		}
+		api.PostSourcesIDProxyHandler = op.PostSourcesIDProxyHandlerFunc(p.Proxy)
 	} else {
-		api.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandler = operations.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(mockHandler.DeleteExploration)
-		api.GetSourcesIDUsersUserIDExplorationsExplorationIDHandler = operations.GetSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(mockHandler.Exploration)
-		api.GetSourcesIDUsersUserIDExplorationsHandler = operations.GetSourcesIDUsersUserIDExplorationsHandlerFunc(mockHandler.Explorations)
-		api.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandler = operations.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(mockHandler.UpdateExploration)
-		api.PostSourcesIDUsersUserIDExplorationsHandler = operations.PostSourcesIDUsersUserIDExplorationsHandlerFunc(mockHandler.NewExploration)
+		api.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(mockHandler.DeleteExploration)
+		api.GetSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.GetSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(mockHandler.Exploration)
+		api.GetSourcesIDUsersUserIDExplorationsHandler = op.GetSourcesIDUsersUserIDExplorationsHandlerFunc(mockHandler.Explorations)
+		api.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.PatchSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(mockHandler.UpdateExploration)
+		api.PostSourcesIDUsersUserIDExplorationsHandler = op.PostSourcesIDUsersUserIDExplorationsHandlerFunc(mockHandler.NewExploration)
+
+		api.DeleteSourcesIDHandler = op.DeleteSourcesIDHandlerFunc(mockHandler.RemoveSource)
+		api.PatchSourcesIDHandler = op.PatchSourcesIDHandlerFunc(mockHandler.UpdateSource)
+
+		api.GetSourcesHandler = op.GetSourcesHandlerFunc(mockHandler.Sources)
+		api.GetSourcesIDHandler = op.GetSourcesIDHandlerFunc(mockHandler.SourcesID)
+		api.PostSourcesHandler = op.PostSourcesHandlerFunc(mockHandler.NewSource)
+		api.PostSourcesIDProxyHandler = op.PostSourcesIDProxyHandlerFunc(mockHandler.Proxy)
 	}
 
-	api.DeleteSourcesIDHandler = operations.DeleteSourcesIDHandlerFunc(mockHandler.RemoveSource)
-	api.PatchSourcesIDHandler = operations.PatchSourcesIDHandlerFunc(mockHandler.UpdateSource)
-
-	api.GetSourcesHandler = operations.GetSourcesHandlerFunc(mockHandler.Sources)
-	api.GetSourcesIDHandler = operations.GetSourcesIDHandlerFunc(mockHandler.SourcesID)
-	api.PostSourcesHandler = operations.PostSourcesHandlerFunc(mockHandler.NewSource)
-
-	if len(influxFlags.Server) > 0 {
-		c, err := influx.NewClient(influxFlags.Server)
-		if err != nil {
-			panic(err)
-		}
-		// TODO: Change to bolt when finished
-		h := handlers.InfluxProxy{
-			Srcs:       mock.DefaultSourcesStore,
-			TimeSeries: c,
-		}
-		api.PostSourcesIDProxyHandler = operations.PostSourcesIDProxyHandlerFunc(h.Proxy)
-	} else {
-		api.PostSourcesIDProxyHandler = operations.PostSourcesIDProxyHandlerFunc(mockHandler.Proxy)
-	}
-
-	api.DeleteSourcesIDRolesRoleIDHandler = operations.DeleteSourcesIDRolesRoleIDHandlerFunc(func(ctx context.Context, params operations.DeleteSourcesIDRolesRoleIDParams) middleware.Responder {
+	api.DeleteSourcesIDRolesRoleIDHandler = op.DeleteSourcesIDRolesRoleIDHandlerFunc(func(ctx context.Context, params op.DeleteSourcesIDRolesRoleIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .DeleteSourcesIDRolesRoleID has not yet been implemented")
 	})
 
-	api.DeleteSourcesIDUsersUserIDHandler = operations.DeleteSourcesIDUsersUserIDHandlerFunc(func(ctx context.Context, params operations.DeleteSourcesIDUsersUserIDParams) middleware.Responder {
+	api.DeleteSourcesIDUsersUserIDHandler = op.DeleteSourcesIDUsersUserIDHandlerFunc(func(ctx context.Context, params op.DeleteSourcesIDUsersUserIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .DeleteSourcesIDUsersUserID has not yet been implemented")
 	})
 
-	api.DeleteDashboardsIDHandler = operations.DeleteDashboardsIDHandlerFunc(func(ctx context.Context, params operations.DeleteDashboardsIDParams) middleware.Responder {
+	api.DeleteDashboardsIDHandler = op.DeleteDashboardsIDHandlerFunc(func(ctx context.Context, params op.DeleteDashboardsIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .DeleteDashboardsID has not yet been implemented")
 	})
-	api.GetDashboardsHandler = operations.GetDashboardsHandlerFunc(func(ctx context.Context, params operations.GetDashboardsParams) middleware.Responder {
+	api.GetDashboardsHandler = op.GetDashboardsHandlerFunc(func(ctx context.Context, params op.GetDashboardsParams) middleware.Responder {
 		return middleware.NotImplemented("operation .GetDashboards has not yet been implemented")
 	})
-	api.GetDashboardsIDHandler = operations.GetDashboardsIDHandlerFunc(func(ctx context.Context, params operations.GetDashboardsIDParams) middleware.Responder {
+	api.GetDashboardsIDHandler = op.GetDashboardsIDHandlerFunc(func(ctx context.Context, params op.GetDashboardsIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .GetDashboardsID has not yet been implemented")
 	})
 
-	api.GetSourcesIDPermissionsHandler = operations.GetSourcesIDPermissionsHandlerFunc(func(ctx context.Context, params operations.GetSourcesIDPermissionsParams) middleware.Responder {
+	api.GetSourcesIDPermissionsHandler = op.GetSourcesIDPermissionsHandlerFunc(func(ctx context.Context, params op.GetSourcesIDPermissionsParams) middleware.Responder {
 		return middleware.NotImplemented("operation .GetSourcesIDPermissions has not yet been implemented")
 	})
-	api.GetSourcesIDRolesHandler = operations.GetSourcesIDRolesHandlerFunc(func(ctx context.Context, params operations.GetSourcesIDRolesParams) middleware.Responder {
+	api.GetSourcesIDRolesHandler = op.GetSourcesIDRolesHandlerFunc(func(ctx context.Context, params op.GetSourcesIDRolesParams) middleware.Responder {
 		return middleware.NotImplemented("operation .GetSourcesIDRoles has not yet been implemented")
 	})
-	api.GetSourcesIDRolesRoleIDHandler = operations.GetSourcesIDRolesRoleIDHandlerFunc(func(ctx context.Context, params operations.GetSourcesIDRolesRoleIDParams) middleware.Responder {
+	api.GetSourcesIDRolesRoleIDHandler = op.GetSourcesIDRolesRoleIDHandlerFunc(func(ctx context.Context, params op.GetSourcesIDRolesRoleIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .GetSourcesIDRolesRoleID has not yet been implemented")
 	})
 
-	api.GetSourcesIDUsersHandler = operations.GetSourcesIDUsersHandlerFunc(func(ctx context.Context, params operations.GetSourcesIDUsersParams) middleware.Responder {
+	api.GetSourcesIDUsersHandler = op.GetSourcesIDUsersHandlerFunc(func(ctx context.Context, params op.GetSourcesIDUsersParams) middleware.Responder {
 		return middleware.NotImplemented("operation .GetSourcesIDUsers has not yet been implemented")
 	})
-	api.GetSourcesIDUsersUserIDHandler = operations.GetSourcesIDUsersUserIDHandlerFunc(func(ctx context.Context, params operations.GetSourcesIDUsersUserIDParams) middleware.Responder {
+	api.GetSourcesIDUsersUserIDHandler = op.GetSourcesIDUsersUserIDHandlerFunc(func(ctx context.Context, params op.GetSourcesIDUsersUserIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .GetSourcesIDUsersUserID has not yet been implemented")
 	})
 
-	api.PatchSourcesIDRolesRoleIDHandler = operations.PatchSourcesIDRolesRoleIDHandlerFunc(func(ctx context.Context, params operations.PatchSourcesIDRolesRoleIDParams) middleware.Responder {
+	api.PatchSourcesIDRolesRoleIDHandler = op.PatchSourcesIDRolesRoleIDHandlerFunc(func(ctx context.Context, params op.PatchSourcesIDRolesRoleIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .PatchSourcesIDRolesRoleID has not yet been implemented")
 	})
 
-	api.PatchSourcesIDUsersUserIDHandler = operations.PatchSourcesIDUsersUserIDHandlerFunc(func(ctx context.Context, params operations.PatchSourcesIDUsersUserIDParams) middleware.Responder {
+	api.PatchSourcesIDUsersUserIDHandler = op.PatchSourcesIDUsersUserIDHandlerFunc(func(ctx context.Context, params op.PatchSourcesIDUsersUserIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .PatchSourcesIDUsersUserID has not yet been implemented")
 	})
-	api.PostDashboardsHandler = operations.PostDashboardsHandlerFunc(func(ctx context.Context, params operations.PostDashboardsParams) middleware.Responder {
+	api.PostDashboardsHandler = op.PostDashboardsHandlerFunc(func(ctx context.Context, params op.PostDashboardsParams) middleware.Responder {
 		return middleware.NotImplemented("operation .PostDashboards has not yet been implemented")
 	})
 
-	api.PostSourcesIDRolesHandler = operations.PostSourcesIDRolesHandlerFunc(func(ctx context.Context, params operations.PostSourcesIDRolesParams) middleware.Responder {
+	api.PostSourcesIDRolesHandler = op.PostSourcesIDRolesHandlerFunc(func(ctx context.Context, params op.PostSourcesIDRolesParams) middleware.Responder {
 		return middleware.NotImplemented("operation .PostSourcesIDRoles has not yet been implemented")
 	})
-	api.PostSourcesIDUsersHandler = operations.PostSourcesIDUsersHandlerFunc(func(ctx context.Context, params operations.PostSourcesIDUsersParams) middleware.Responder {
+	api.PostSourcesIDUsersHandler = op.PostSourcesIDUsersHandlerFunc(func(ctx context.Context, params op.PostSourcesIDUsersParams) middleware.Responder {
 		return middleware.NotImplemented("operation .PostSourcesIDUsers has not yet been implemented")
 	})
 
-	api.PutDashboardsIDHandler = operations.PutDashboardsIDHandlerFunc(func(ctx context.Context, params operations.PutDashboardsIDParams) middleware.Responder {
+	api.PutDashboardsIDHandler = op.PutDashboardsIDHandlerFunc(func(ctx context.Context, params op.PutDashboardsIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation .PutDashboardsID has not yet been implemented")
 	})
 
-	api.GetSourcesIDMonitoredHandler = operations.GetSourcesIDMonitoredHandlerFunc(mockHandler.MonitoredServices)
+	api.GetSourcesIDMonitoredHandler = op.GetSourcesIDMonitoredHandlerFunc(mockHandler.MonitoredServices)
 
 	api.ServerShutdown = func() {}
 
@@ -212,7 +211,13 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+		logger.
+			WithField("component", "server").
+			WithField("remote_addr", r.RemoteAddr).
+			WithField("method", r.Method).
+			WithField("url", r.URL).
+			Info("Serving request")
+
 		if strings.Contains(r.URL.Path, "/chronograf/v1") {
 			handler.ServeHTTP(w, r)
 			return
