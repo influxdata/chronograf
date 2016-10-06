@@ -10,6 +10,7 @@ const HostsTable = React.createClass({
     })),
     source: PropTypes.shape({
       id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
     }).isRequired,
   },
 
@@ -56,7 +57,7 @@ const HostsTable = React.createClass({
     return (
       <div className="panel panel-minimal">
         <div className="panel-heading u-flex u-ai-center u-jc-space-between">
-          <h2 className="panel-title">{this.props.hosts.length} Hosts</h2>
+          <h2 className="panel-title">{this.props.hosts.length} Hosts found in source <strong>{source.name}</strong></h2>
           <SearchBar onSearch={_.wrap(this.props.hosts, this.filterHosts)} />
         </div>
         <div className="panel-body">
