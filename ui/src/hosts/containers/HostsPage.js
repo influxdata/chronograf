@@ -9,7 +9,8 @@ export const HostsPage = React.createClass({
     source: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
-      type: PropTypes.string, // 'influx-enterprise'
+      type: PropTypes.string.isRequired, // 'influx-enterprise'
+      username: PropTypes.string.isRequired,
       links: PropTypes.shape({
         proxy: PropTypes.string.isRequired,
       }).isRequired,
@@ -51,12 +52,12 @@ export const HostsPage = React.createClass({
 
   render() {
     return (
-      <div className="hosts">
+      <div className="hosts hosts-page">
         <div className="enterprise-header">
           <div className="enterprise-header__container">
             <div className="enterprise-header__left">
               <h1>
-                Hosts
+                Host List
               </h1>
             </div>
           </div>
@@ -65,11 +66,7 @@ export const HostsPage = React.createClass({
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
-              <div className="panel panel-minimal">
-                <div className="panel-body">
-                  <HostsTable source={this.props.source} hosts={this.state.hosts} />
-                </div>
-              </div>
+              <HostsTable source={this.props.source} hosts={this.state.hosts} />
             </div>
           </div>
         </div>

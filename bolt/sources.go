@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Ensure SourcesStore implements mrfusion.SourcesStore.
+// Ensure ExplorationStore implements mrfusion.ExplorationStore.
 var _ mrfusion.SourcesStore = &SourcesStore{}
 
 var SourcesBucket = []byte("Sources")

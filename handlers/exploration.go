@@ -120,18 +120,14 @@ func (h *Store) UpdateExploration(ctx context.Context, params op.PatchSourcesIDU
 		errMsg := &models.Error{Code: 404, Message: "Error: Unknown ExplorationID"}
 		return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDNotFound().WithPayload(errMsg)
 	}
-	if params.Exploration.Data != nil {
-		var ok bool
-		if e.Data, ok = params.Exploration.Data.(string); !ok {
-			log.Printf("Error: Exploration data is not a string")
-			errMsg := &models.Error{Code: 400, Message: "Error: Exploration data is not a string"}
-			return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDDefault(400).WithPayload(errMsg)
-		}
-	}
 
-	if params.Exploration.Name != "" {
-		e.Name = params.Exploration.Name
+	var ok bool
+	if e.Data, ok = params.Exploration.Data.(string); !ok {
+		log.Printf("Error: Exploration data is not a string")
+		errMsg := &models.Error{Code: 400, Message: "Error: Exploration data is not a string"}
+		return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDDefault(400).WithPayload(errMsg)
 	}
+	e.Name = params.Exploration.Name
 
 	if err := h.ExplorationStore.Update(ctx, e); err != nil {
 		log.Printf("Error: Failed to update Exploration: %v: %v", e, err)
@@ -139,22 +135,7 @@ func (h *Store) UpdateExploration(ctx context.Context, params op.PatchSourcesIDU
 		return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDDefault(500).WithPayload(errMsg)
 	}
 
-	return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDOK().WithPayload(explToModel(e))
-}
-
-func explToModel(e *mrfusion.Exploration) *models.Exploration {
-	rel := "self"
-	href := fmt.Sprintf("/chronograf/v1/sources/1/users/%d/explorations/%d", e.UserID, e.ID)
-	return &models.Exploration{
-		Name:      e.Name,
-		Data:      e.Data,
-		UpdatedAt: strfmt.DateTime(e.UpdatedAt),
-		CreatedAt: strfmt.DateTime(e.CreatedAt),
-		Link: &models.Link{
-			Rel:  &rel,
-			Href: &href,
-		},
-	}
+	return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDNoContent()
 }
 
 func (h *Store) NewExploration(ctx context.Context, params op.PostSourcesIDUsersUserIDExplorationsParams) middleware.Responder {
@@ -173,14 +154,10 @@ func (h *Store) NewExploration(ctx context.Context, params op.PostSourcesIDUsers
 
 	// TODO: Check user if user exists.
 
-	data := ""
-	if params.Exploration.Data != nil {
-		data, _ = params.Exploration.Data.(string)
-	}
 	e := &mrfusion.Exploration{
 		Name:   params.Exploration.Name,
 		UserID: mrfusion.UserID(uID),
-		Data:   data,
+		Data:   params.Exploration.Data.(string),
 	}
 
 	e, err = h.ExplorationStore.Add(ctx, e)
@@ -190,9 +167,20 @@ func (h *Store) NewExploration(ctx context.Context, params op.PostSourcesIDUsers
 		return op.NewPostSourcesIDUsersUserIDExplorationsDefault(500).WithPayload(errMsg)
 	}
 
-	m := explToModel(e)
-	res := op.NewPostSourcesIDUsersUserIDExplorationsCreated()
-	return res.WithLocation(*m.Link.Href).WithPayload(m)
+	rel := "self"
+	href := fmt.Sprintf("/chronograf/v1/sources/1/users/%d/explorations/%d", uID, e.ID)
+	res := &models.Exploration{
+		Name:      e.Name,
+		Data:      e.Data,
+		UpdatedAt: strfmt.DateTime(e.UpdatedAt),
+		CreatedAt: strfmt.DateTime(e.CreatedAt),
+		Link: &models.Link{
+			Rel:  &rel,
+			Href: &href,
+		},
+	}
+	return op.NewPostSourcesIDUsersUserIDExplorationsCreated().WithLocation(href).WithPayload(res)
+
 }
 
 func (h *Store) DeleteExploration(ctx context.Context, params op.DeleteSourcesIDUsersUserIDExplorationsExplorationIDParams) middleware.Responder {

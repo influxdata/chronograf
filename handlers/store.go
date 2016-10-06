@@ -6,5 +6,4 @@ import "github.com/influxdata/mrfusion"
 type Store struct {
 	ExplorationStore mrfusion.ExplorationStore
 	SourcesStore     mrfusion.SourcesStore
-	ServersStore     mrfusion.ServersStore
 }

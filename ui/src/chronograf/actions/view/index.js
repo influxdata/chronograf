@@ -162,43 +162,41 @@ export function createExploration(source, push) {
   };
 }
 
-export function deleteExplorer(source, explorerURI, push) {
+export function deleteExplorer(clusterID, explorerID, push) {
   return (dispatch, getState) => {
     AJAX({
-      url: explorerURI,
+      url: `/api/int/v1/explorers/${explorerID}`,
       method: 'DELETE',
     }).then(() => {
       const state = getState();
 
       // If the currently active explorer is being deleted, load another session;
-      if (state.activeExplorer.id === explorerURI) {
-        const explorerURIs = Object.keys(state.explorers);
-        const explorer = state.explorers[explorerURIs[0]];
+      if (state.activeExplorer.id === explorerID) {
+        const explorer = state.explorers[0];
 
-        // If there's only one exploration left, it means we're deleting the last
-        // exploration and should create a new one.  If not, navigate to the first
-        // exploration in state.
-        if (explorerURIs.length === 1) {
-          dispatch(createExploration(source, push));
-        } else {
+        // If we don't have an explorer to navigate to, it means we're deleting the last
+        // explorer and should create a new one.
+        if (explorer) {
           dispatch(loadExploration(explorer));
-          push(`/sources/${source.id}/chronograf/data_explorer/${btoa(explorer.id)}`);
+          push(`/chronograf/data_explorer/${explorer.id}`);
+        } else {
+          dispatch(createExploration(clusterID, push));
         }
       }
 
       dispatch({
         type: 'DELETE_EXPLORER',
-        payload: {id: explorerURI},
+        payload: {id: explorerID},
       });
     });
   };
 }
 
-export function editExplorer(explorerURI, params) {
+export function editExplorer(clusterID, explorerID, params) {
   return (dispatch) => {
     AJAX({
-      url: explorerURI,
-      method: 'PATCH',
+      url: `/api/int/v1/explorers/${explorerID}`,
+      method: 'PUT',
       data: JSON.stringify(params),
       headers: {
         'Content-Type': 'application/json',

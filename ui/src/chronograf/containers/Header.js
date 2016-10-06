@@ -76,11 +76,7 @@ const Header = React.createClass({
   },
 
   confirmDeleteExplorer() {
-    this.props.actions.deleteExplorer(
-      this.context.source,
-      this.state.explorerIDToDelete,
-      this.props.router.push
-    );
+    this.props.actions.deleteExplorer(this.state.explorerIDToDelete, this.props.router.push);
   },
 
   openEditExplorerModal({id}) {

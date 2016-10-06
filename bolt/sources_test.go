@@ -1,13 +1,16 @@
 package bolt_test
 
 import (
+
+	// "fmt"
+
 	"reflect"
 	"testing"
 
 	"github.com/influxdata/mrfusion"
 )
 
-// Ensure an SourceStore can store, retrieve, update, and delete sources.
+// Ensure an SourceStore can store, retrieve, update, and delete explorations.
 func TestSourceStore(t *testing.T) {
 	c, err := NewTestClient()
 	if err != nil {

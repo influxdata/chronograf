@@ -53,12 +53,10 @@ jsdep:
 gen: bolt/internal/internal.proto
 	go generate github.com/influxdata/mrfusion/bolt/internal
 
-test: jstest gotest gotestrace
+test: jstest gotest
 
 gotest:
 	go test ./...
-
-gotestrace:
 	go test -race ./...
 
 jstest:

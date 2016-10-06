@@ -50,7 +50,6 @@ func (s *ExplorationStore) Add(ctx context.Context, e *mrfusion.Exploration) (*m
 		}
 		e.ID = mrfusion.ExplorationID(seq)
 		e.CreatedAt = s.client.Now()
-		e.UpdatedAt = e.CreatedAt
 
 		if v, err := internal.MarshalExploration(e); err != nil {
 			return err

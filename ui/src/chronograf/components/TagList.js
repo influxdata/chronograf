@@ -23,11 +23,8 @@ const TagList = React.createClass({
   },
 
   contextTypes: {
-    source: PropTypes.shape({
-      links: PropTypes.shape({
-        proxy: PropTypes.string.isRequired,
-      }).isRequired,
-    }).isRequired,
+    dataNodes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    clusterID: PropTypes.string,
   },
 
   getInitialState() {
@@ -38,19 +35,18 @@ const TagList = React.createClass({
 
   componentDidMount() {
     const {database, measurement, retentionPolicy} = this.props.query;
-    const {source} = this.context;
+    const {dataNodes, clusterID} = this.context;
     if (!database || !measurement || !retentionPolicy) {
       return;
     }
 
-    const sourceProxy = source.links.proxy;
-    showTagKeys({source: sourceProxy, database, retentionPolicy, measurement}).then((resp) => {
+    showTagKeys(dataNodes, {database, retentionPolicy, measurement}, clusterID).then((resp) => {
       const {errors, tagKeys} = showTagKeysParser(resp.data);
       if (errors.length) {
         // do something
       }
 
-      return showTagValues({source: sourceProxy, database, retentionPolicy, measurement, tagKeys});
+      return showTagValues(dataNodes, {database, retentionPolicy, measurement, tagKeys, clusterID});
     }).then((resp) => {
       const {errors: errs, tags} = showTagValuesParser(resp.data);
       if (errs.length) {
