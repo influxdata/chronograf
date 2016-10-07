@@ -26,7 +26,7 @@ const Visualizations = React.createClass({
     });
 
     return (
-      <div className="panels" style={{width}}>
+      <div className="panels" data-graph-in-focus="1" style={{width}}>
         {visualizations}
       </div>
     );

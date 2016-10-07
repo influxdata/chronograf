@@ -58,10 +58,72 @@
   width: 100%;
 }
 
+// Variables to manage positions of .graph-panel children
+$graphFocusUp30: calc(-3000% - #{($explorer-page-padding * 30 * 0.5)});
+$graphFocusUp29: calc(-2900% - #{($explorer-page-padding * 29 * 0.5)});
+$graphFocusUp28: calc(-2800% - #{($explorer-page-padding * 28 * 0.5)});
+$graphFocusUp27: calc(-2700% - #{($explorer-page-padding * 27 * 0.5)});
+$graphFocusUp26: calc(-2600% - #{($explorer-page-padding * 26 * 0.5)});
+$graphFocusUp25: calc(-2500% - #{($explorer-page-padding * 25 * 0.5)});
+$graphFocusUp24: calc(-2400% - #{($explorer-page-padding * 24 * 0.5)});
+$graphFocusUp23: calc(-2300% - #{($explorer-page-padding * 23 * 0.5)});
+$graphFocusUp22: calc(-2200% - #{($explorer-page-padding * 22 * 0.5)});
+$graphFocusUp21: calc(-2100% - #{($explorer-page-padding * 21 * 0.5)});
+$graphFocusUp20: calc(-2000% - #{($explorer-page-padding * 20 * 0.5)});
+$graphFocusUp19: calc(-1900% - #{($explorer-page-padding * 19 * 0.5)});
+$graphFocusUp18: calc(-1800% - #{($explorer-page-padding * 18 * 0.5)});
+$graphFocusUp17: calc(-1700% - #{($explorer-page-padding * 17 * 0.5)});
+$graphFocusUp16: calc(-1600% - #{($explorer-page-padding * 16 * 0.5)});
+$graphFocusUp15: calc(-1500% - #{($explorer-page-padding * 15 * 0.5)});
+$graphFocusUp14: calc(-1400% - #{($explorer-page-padding * 14 * 0.5)});
+$graphFocusUp13: calc(-1300% - #{($explorer-page-padding * 13 * 0.5)});
+$graphFocusUp12: calc(-1200% - #{($explorer-page-padding * 12 * 0.5)});
+$graphFocusUp11: calc(-1100% - #{($explorer-page-padding * 11 * 0.5)});
+$graphFocusUp10: calc(-1000% - #{($explorer-page-padding * 10 * 0.5)});
+$graphFocusUp9: calc(-900% - #{($explorer-page-padding * 9 * 0.5)});
+$graphFocusUp8: calc(-800% - #{($explorer-page-padding * 8 * 0.5)});
+$graphFocusUp7: calc(-700% - #{($explorer-page-padding * 7 * 0.5)});
+$graphFocusUp6: calc(-600% - #{($explorer-page-padding * 6 * 0.5)});
+$graphFocusUp5: calc(-500% - #{($explorer-page-padding * 5 * 0.5)});
+$graphFocusUp4: calc(-400% - #{($explorer-page-padding * 4 * 0.5)});
+$graphFocusUp3: calc(-300% - #{($explorer-page-padding * 3 * 0.5)});
+$graphFocusUp2: calc(-200% - #{($explorer-page-padding * 2 * 0.5)});
+$graphFocusUp1: calc(-100% - #{($explorer-page-padding * 0.5)});
+$graphInFocus: 0;
+$graphFocusDown1: calc(100% + #{($explorer-page-padding * 0.5)});
+$graphFocusDown2: calc(200% + #{($explorer-page-padding * 2 * 0.5)});
+$graphFocusDown3: calc(300% + #{($explorer-page-padding * 3 * 0.5)});
+$graphFocusDown4: calc(400% + #{($explorer-page-padding * 4 * 0.5)});
+$graphFocusDown5: calc(500% + #{($explorer-page-padding * 5 * 0.5)});
+$graphFocusDown6: calc(600% + #{($explorer-page-padding * 6 * 0.5)});
+$graphFocusDown7: calc(700% + #{($explorer-page-padding * 7 * 0.5)});
+$graphFocusDown8: calc(800% + #{($explorer-page-padding * 8 * 0.5)});
+$graphFocusDown9: calc(900% + #{($explorer-page-padding * 9 * 0.5)});
+$graphFocusDown10: calc(1000% + #{($explorer-page-padding * 10 * 0.5)});
+$graphFocusDown11: calc(1100% + #{($explorer-page-padding * 11 * 0.5)});
+$graphFocusDown12: calc(1200% + #{($explorer-page-padding * 12 * 0.5)});
+$graphFocusDown13: calc(1300% + #{($explorer-page-padding * 13 * 0.5)});
+$graphFocusDown14: calc(1400% + #{($explorer-page-padding * 14 * 0.5)});
+$graphFocusDown15: calc(1500% + #{($explorer-page-padding * 15 * 0.5)});
+$graphFocusDown16: calc(1600% + #{($explorer-page-padding * 16 * 0.5)});
+$graphFocusDown17: calc(1700% + #{($explorer-page-padding * 17 * 0.5)});
+$graphFocusDown18: calc(1800% + #{($explorer-page-padding * 18 * 0.5)});
+$graphFocusDown19: calc(1900% + #{($explorer-page-padding * 19 * 0.5)});
+$graphFocusDown20: calc(2000% + #{($explorer-page-padding * 20 * 0.5)});
+$graphFocusDown21: calc(2100% + #{($explorer-page-padding * 21 * 0.5)});
+$graphFocusDown22: calc(2200% + #{($explorer-page-padding * 22 * 0.5)});
+$graphFocusDown23: calc(2300% + #{($explorer-page-padding * 23 * 0.5)});
+$graphFocusDown24: calc(2400% + #{($explorer-page-padding * 24 * 0.5)});
+$graphFocusDown25: calc(2500% + #{($explorer-page-padding * 25 * 0.5)});
+$graphFocusDown26: calc(2600% + #{($explorer-page-padding * 26 * 0.5)});
+$graphFocusDown27: calc(2700% + #{($explorer-page-padding * 27 * 0.5)});
+$graphFocusDown28: calc(2800% + #{($explorer-page-padding * 28 * 0.5)});
+$graphFocusDown29: calc(2900% + #{($explorer-page-padding * 29 * 0.5)});
+$graphFocusDown30: calc(3000% + #{($explorer-page-padding * 30 * 0.5)});
+
 .panels {
-  padding: $explorer-page-padding;
-  // overflow-x: hidden;
-  overflow: scroll;
+  position: relative;
+  overflow: hidden;
   user-select: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -76,31 +138,55 @@
   background: linear-gradient(to bottom,  $g2-kevlar 0%,$g0-obsidian 100%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$g2-kevlar', endColorstr='$g0-obsidian',GradientType=0 );
 
-  &::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
-    border-left: 2px solid $g2-kevlar;
-
-    &-button {
-      background-color: $g0-obsidian;
+  &[data-graph-in-focus="1"] .graph-panel {
+    &:nth-child(1) {
+      box-shadow:
+        0 0 ($explorer-page-padding * 0.75) 4px fade-out($c-planet, 0.4),
+        0 0 6px 1px $c-ocean;
+      transform: translate(0,$graphInFocus);
+      border-color: $c-pool;
+      .graph-panel--title {
+        color: $g20-white;
+      }
     }
-    &-track {
-      background-color: $g0-obsidian;
+    &:nth-child(2) { transform: translate(0,$graphFocusDown1); }
+    &:nth-child(3) { transform: translate(0,$graphFocusDown2); }
+    &:nth-child(4) { transform: translate(0,$graphFocusDown3); }
+    &:nth-child(5) { transform: translate(0,$graphFocusDown4); }
+    &:nth-child(6) { transform: translate(0,$graphFocusDown5); }
+    &:nth-child(7) { transform: translate(0,$graphFocusDown6); }
+    &:nth-child(8) { transform: translate(0,$graphFocusDown7); }
+  }
+  &[data-graph-in-focus="2"] .graph-panel {
+    &:nth-child(1) { transform: translate(0,$graphFocusUp1); }
+    &:nth-child(2) {
+      transform: translate(0,$graphInFocus);
+      border-color: $g7-graphite;
+      .graph-panel--title {
+        color: $g20-white;
+      }
     }
-    &-track-piece {
-      width: 10px;
-      background: $g0-obsidian;
+    &:nth-child(3) { transform: translate(0,$graphFocusDown1); }
+    &:nth-child(4) { transform: translate(0,$graphFocusDown2); }
+    &:nth-child(5) { transform: translate(0,$graphFocusDown3); }
+    &:nth-child(6) { transform: translate(0,$graphFocusDown4); }
+    &:nth-child(7) { transform: translate(0,$graphFocusDown5); }
+    &:nth-child(8) { transform: translate(0,$graphFocusDown6); }
+  }
+  &[data-graph-in-focus="3"] .graph-panel {
+    &:nth-child(1) { transform: translate(0,$graphFocusUp2); }
+    &:nth-child(2) { transform: translate(0,$graphFocusUp1); }
+    &:nth-child(3) {
+      transform: translate(0,$graphInFocus);
+      border-color: $g7-graphite;
+      .graph-panel--title {
+        color: $g20-white;
+      }
     }
-    &-thumb {
-      background-color: $c-pool;
-      border: 6px solid $g0-obsidian;
-      border-radius: 7px;
-    }
-    &-corner {
-      background-color: $g0-obsidian;
-    }
-    &-resizer {
-      background-color: #00f;
-    }
+    &:nth-child(4) { transform: translate(0,$graphFocusDown1); }
+    &:nth-child(5) { transform: translate(0,$graphFocusDown2); }
+    &:nth-child(6) { transform: translate(0,$graphFocusDown3); }
+    &:nth-child(7) { transform: translate(0,$graphFocusDown4); }
+    &:nth-child(8) { transform: translate(0,$graphFocusDown5); }
   }
 }
