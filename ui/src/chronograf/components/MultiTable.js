@@ -52,7 +52,7 @@ const MultiTable = React.createClass({
   renderTabs() {
     const {queries} = this.props;
     return (
-      <div className="multi-table__tabs">
+      <div className="multi-table--tabs">
         {queries.map((q) => {
           return (
             <TabItem
@@ -86,7 +86,7 @@ const TabItem = React.createClass({
   render() {
     const {isActive} = this.props;
     return (
-      <div className={classNames("multi-table__tab", {active: isActive})} onClick={this.handleSelect}>
+      <div className={classNames("multi-table--tab", {active: isActive})} onClick={this.handleSelect}>
         {"Query"}
       </div>
     );

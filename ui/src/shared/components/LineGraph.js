@@ -32,8 +32,8 @@ export default React.createClass({
     // If data for this graph is being fetched for the first time, show a graph-wide spinner.
     if (this.props.isFetchingInitially) {
       return (
-        <div className="graph-panel__graph-fetching">
-          <h3 className="graph-panel__spinner" />
+        <div className="graph-panel--graph-fetching">
+          <h3 className="graph-panel--spinner" />
         </div>
       );
     }
@@ -49,11 +49,13 @@ export default React.createClass({
       yRangePad: 10,
       drawAxesAtZero: true,
       fillGraph: true,
+      height: 300,
+
     };
 
     return (
       <div>
-        {this.props.isRefreshing ? <h3 className="graph-panel__spinner--small" /> : null}
+        {this.props.isRefreshing ? <h3 className="graph-panel--spinner--small" /> : null}
         <Dygraph containerStyle={{width: '100%'}} timeSeries={timeSeries} fields={fields} options={options} />
       </div>
     );

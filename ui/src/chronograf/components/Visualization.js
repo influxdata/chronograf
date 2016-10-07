@@ -61,18 +61,18 @@ const Visualization = React.createClass({
 
     return (
       <div ref={(p) => this.panel = p} className={classNames("graph-panel", {active: isActive})}>
-        <div className="graph-panel__bar">
-          <div className="graph-panel__title">
-            {/* <span className="icon caret-right"></span> */}{name || "Graph"}
+        <div className="graph-panel--heading">
+          <div className="graph-panel--heading-left">
+            <h3 className="graph-panel--title">{name || "Graph"}</h3>
           </div>
-          <div className="graph-panel__left">
-            <ul className="graph-panel__tabs">
-              <li onClick={this.handleToggleView} className={classNames("graph-panel__tab", {active: isGraphInView})}>Graph</li>
-              <li onClick={this.handleToggleView} className={classNames("graph-panel__tab", {active: !isGraphInView})}>Table</li>
+          <div className="graph-panel--heading-right">
+            <ul className="graph-panel--tabs">
+              <li onClick={this.handleToggleView} className={classNames("graph-panel--tab", {active: isGraphInView})}>Graph</li>
+              <li onClick={this.handleToggleView} className={classNames("graph-panel--tab", {active: !isGraphInView})}>Table</li>
             </ul>
           </div>
         </div>
-        <div className="graph-panel__graph-container">
+        <div className="graph-panel--graph-container">
           {isGraphInView ? (
             <RefreshingLineGraph
               clusterID={this.context.clusterID}

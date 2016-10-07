@@ -1,149 +1,142 @@
-$graph-panel__tab-height: 44px;
-$graph-panel__tab-offset: 8px;
+$graph-panel--heading-height: 44px;
+$graph-panel--tab-height: 25px;
+$graph-panel--graph-height: (300px + 22px);
+$graph-panel--tab-offset: 8px;
+$graph-panel--width: calc(100% - #{($explorer-page-padding * 2)});
+$graph-panel--focus-offset: 100px;
+$graph-panel--bg: $g3-castle;
 
 $dygraphs-legend-offset: 32px;
 
 .graph-panel {
-  position: relative;
-  margin-bottom: 18px;
-  transition: box-shadow 0.3s ease;
+  background-color: $graph-panel--bg;
+  border: 2px solid $graph-panel--bg;
+  border-radius: 5px;
+  position: absolute;
+  left: $explorer-page-padding;
+  top: $graph-panel--focus-offset;
+  width: $graph-panel--width;
+  height: ($graph-panel--heading-height + $graph-panel--graph-height + 4px);
+  margin: 0;
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  backface-visibility: hidden;
+  transform: translate(0,0);
+
+  &:hover {
+    border-color: $g5-pepper;
+  }
 
   &.active {
-    .graph-panel__title {
+    .graph-panel--title {
       color: $g20-white;
     }
   }
+}
+.graph-panel--heading {
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $graph-panel--heading-height;
+  padding: 0 16px;
 
-  &:last-child {
-    margin-bottom: 100%;
-  }
-
-  &__view-selector {
-    cursor: pointer;
-
-    &.active {
-      color: $g20-white;
-    }
-  }
-
-  &__bar {
-    background-color: $g5-pepper;
-    border-radius: 4px 4px 0 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: $graph-panel__tab-height;
-    padding: 0 16px;
-    transition:
-      background-color 0.25s ease;
-
-  }
-  &__left {
+  &-left,
+  &-right {
     display: flex;
     align-items: center;
   }
-  &__title {
-    font-size: 16px;
-    color: $g13-mist;
-    font-weight: 500;
-    margin-right: 16px;
-    transition:
-      color 0.25s ease;
+  &-left {
+    flex-direction: flex-start;
+  }
+  &-right {
+    flex-direction: flex-end;
+  }
+}
+.graph-panel--title {
+  font-size: 16px;
+  color: $g12-forge;
+  font-weight: 600;
+  margin: 0 16px 0 0;
+  transition:
+    color 0.25s ease;
 
-    .icon {
-      font-size: 12px;
-      margin-right: 8px;
-      position: relative;
-      top: -1px;
-    }
-  }
-  &__tabs {
-    padding: 0;
-    margin: $graph-panel__tab-offset 0 0 0;
-    list-style: none;
-    display: flex;
-  }
-  &__tab {
-    background-color: $g5-pepper;
-    color: $g10-wolf;
-    height: $graph-panel__tab-height - $graph-panel__tab-offset;
-    line-height: $graph-panel__tab-height - $graph-panel__tab-offset - 5px;
-    border-radius: 4px 4px 0 0;
-    margin-right: 2px;
-    padding: 0 14px;
-    font-weight: 500;
-    transition:
-      background-color 0.25s ease,
-      color 0.25s ease;
-
-    &:hover {
-      cursor: pointer;
-      color: $g13-mist;
-      background-color: $g4-onyx;
-    }
-    &.active {
-      background-color: $g3-castle;
-      color: $g20-white;
-    }
-  }
-  &__options {
-    width: $graph-panel__tab-height - 16px;
-    height: $graph-panel__tab-height - 16px;
-    border-radius: 3px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 9.5px;
-    transition:
-      background-color 0.25s ease,
-      color 0.25s ease;
-    &:hover {
-      cursor: pointer;
-      color: $g13-mist;
-      background-color: $g6-smoke;
-    }
-  }
-  &__graph-container {
-    background-color: $g3-castle;
-    border-radius: 0 0 4px 4px;
-    padding: 9.5px;
+  .icon {
+    font-size: 12px;
+    margin-right: 8px;
     position: relative;
+    top: -1px;
   }
-  &__graph-empty {
-    width: 100%;
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+.graph-panel--tabs {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  background-color: $g2-kevlar;
+  padding: 2px;
+  border-radius: 4px;
+}
+.graph-panel--tab {
+  background-color: $g2-kevlar;
+  color: $g10-wolf;
+  height: $graph-panel--tab-height;
+  line-height: $graph-panel--tab-height;
+  padding: 0 14px 1px 14px;
+  border-radius: 3px;
+  font-weight: 500;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 
-    > * {
-      margin: 0;
-    }
+  &:first-child {
+    margin-right: 2px;
   }
-  &__graph-fetching {
-    width: 100%;
-    height: 320px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &:hover {
+    cursor: pointer;
+    color: $g13-mist;
+    background-color: $g3-castle;
   }
-  &__spinner {
-    width: 121px;
-    height: 121px;
-    background-image: url(assets/images/laser-spinner.png);
-    background-size: 100% 100%;
-    background-position: center center;
-    background-repeat: no-repeat;
-    animation: graph-panel-spinner 1s infinite linear;
+  &.active {
+    background-color: $g5-pepper;
+    color: $g20-white;
   }
-  &__spinner--small {
+}
+.graph-panel--graph-container {
+  background-color: transparent;
+  border-radius: 0 0 4px 4px;
+  padding: 11px 16px;
+  position: relative;
+  height: $graph-panel--graph-height;
+}
+.graph-panel--graph-fetching,
+.graph-panel--graph-empty {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+
+  > * {
+    margin: 0;
+  }
+}
+.graph-panel--spinner {
+  width: 121px;
+  height: 121px;
+  background-image: url(assets/images/laser-spinner.png);
+  background-size: 100% 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  animation: graph-panel-spinner 1s infinite linear;
+
+  &--small {
     width: 38px;
     height: 38px;
-    background-image: url(assets/images/laser-spinner.png);
-    background-size: 100% 100%;
-    background-position: center center;
-    background-repeat: no-repeat;
-    animation: graph-panel-spinner 1s infinite linear;
     position: absolute;
     left: 0;
     bottom: 0;
@@ -152,6 +145,7 @@ $dygraphs-legend-offset: 32px;
     margin: auto;
   }
 }
+
 @keyframes graph-panel-spinner {
   0% {
     transform: rotate(0deg);
@@ -161,10 +155,10 @@ $dygraphs-legend-offset: 32px;
   }
 }
 
-.multi-table__tabs {
+.multi-table--tabs {
   display: flex;
 }
-.multi-table__tab {
+.multi-table--tab {
   white-space: nowrap;
   color: $g10-wolf;
   background: $g5-pepper;
@@ -207,7 +201,7 @@ $dygraphs-legend-offset: 32px;
 .container--dygraph-legend {
   background-color: $g1-raven;
   display: block;
-  position: fixed;
+  position: absolute;
   padding: 11px;
   z-index: 500;
   font-size: 13px;
