@@ -11,6 +11,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  background-color: $g1-raven;
 
   &__header {
     margin-bottom: 0;
@@ -131,7 +132,6 @@ $graphFocusDown30: calc(3000% + #{($explorer-page-padding * 30 * 0.5)});
   -moz-user-select: none;
   -ms-user-select: none;
   width: 100%;
-  min-width: 388px;
   background: $g2-kevlar;
   background: -moz-linear-gradient(top,  $g2-kevlar 0%, $g0-obsidian 100%);
   background: -webkit-linear-gradient(top,  $g2-kevlar 0%,$g0-obsidian 100%);

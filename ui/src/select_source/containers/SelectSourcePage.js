@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import {withRouter} from 'react-router';
 import FlashMessages from 'shared/components/FlashMessages';
-import {createSource, getSources} from 'shared/apis';
+import {createSource} from 'shared/apis';
 
 export const SelectSourcePage = React.createClass({
   propTypes: {
@@ -15,26 +15,6 @@ export const SelectSourcePage = React.createClass({
     }).isRequired,
   },
 
-  getInitialState() {
-    return {
-      sources: [],
-    };
-  },
-
-  componentDidMount() {
-    getSources().then(({data: {sources}}) => {
-      this.setState({
-        sources,
-      });
-    });
-  },
-
-  handleSelectSource(e) {
-    e.preventDefault();
-    const source = this.state.sources.find((s) => s.name === this.selectedSource.value);
-    this.redirectToApp(source);
-  },
-
   handleNewSource(e) {
     e.preventDefault();
     const source = {
@@ -44,6 +24,7 @@ export const SelectSourcePage = React.createClass({
       password: this.sourcePassword.value,
     };
     createSource(source).then(({data: sourceFromServer}) => {
+      localStorage.setItem('defaultSource', JSON.stringify(sourceFromServer));
       this.redirectToApp(sourceFromServer);
     });
   },
@@ -59,9 +40,8 @@ export const SelectSourcePage = React.createClass({
   },
 
   render() {
-    const error = !!this.props.location.query.redirectPath;
     return (
-      <div className="page-wrapper" id="select-source-page">
+      <div id="select-source-page">
         <div className="container">
           <div className="row">
             <div className="col-md-8 col-md-offset-2">
@@ -70,31 +50,7 @@ export const SelectSourcePage = React.createClass({
                   <h2 className="deluxe">Welcome to Chronograf</h2>
                 </div>
                 <div className="panel-body">
-                  <br/>
-                  <h4 className="text-center">Select an InfluxDB Server to connect to</h4>
-                  <br/>
-                  <form onSubmit={this.handleSelectSource}>
-                    <div className="form-group col-sm-8 col-sm-offset-2">
-                      {error ? <div className="alert alert-danger"><span className="icon alert-triangle"></span>Data source not found or unavailable</div> : null}
-                    </div>
-                    <div className="form-group col-xs-7 col-sm-5 col-sm-offset-2">
-                      <label htmlFor="source" className="sr-only">Detected InfluxDB Servers</label>
-                      <select className="form-control" id="source">
-                        {this.state.sources.map(({name}) => {
-                          return <option ref={(r) => this.selectedSource = r} key={name} value={name}>{name}</option>;
-                        })}
-                      </select>
-                    </div>
-
-                    <div className="form-group col-xs-5 col-sm-3">
-                      <button className="btn btn-block btn-primary" type="submit">Connect</button>
-                    </div>
-                  </form>
-
-                  <br/>
-                  <hr/>
-                  <br/>
-                  <h4 className="text-center">Or connect to a New Server</h4>
+                  <h4 className="text-center">Connect to a New Server</h4>
                   <br/>
 
                   <form onSubmit={this.handleNewSource}>
@@ -118,7 +74,7 @@ export const SelectSourcePage = React.createClass({
                     </div>
 
                     <div className="form-group col-xs-12 text-center">
-                      <button className="btn btn-success" type="submit">&nbsp;&nbsp;Create New Server&nbsp;&nbsp;</button>
+                      <button className="btn btn-success" type="submit">Create New Server</button>
                     </div>
                   </form>
                 </div>
