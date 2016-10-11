@@ -2,31 +2,93 @@ $graph-panel--heading-height: 44px;
 $graph-panel--tab-height: 25px;
 $graph-panel--graph-height: (300px + 22px);
 $graph-panel--tab-offset: 8px;
-$graph-panel--width: calc(100% - #{($explorer-page-padding * 2)});
-$graph-panel--focus-offset: 100px;
 $graph-panel--bg: $g3-castle;
 
+$panels-slider--width: calc(100% - #{($explorer-page-padding * 2)});
+$panels-slider--offset: 100px;
+$panels-slider--arrows: 24px;
+$panels-slider--increment: $graph-panel--graph-height + $graph-panel--heading-height + ($explorer-page-padding / 2) + 4px;
+
 $dygraphs-legend-offset: 32px;
+$max-number-of-graphs: 66;
+
+.panels-slider {
+  z-index: 2;
+  position: absolute;
+  top: $panels-slider--offset;
+  left: $explorer-page-padding;
+  width: $panels-slider--width;
+  transform: translate(0,0);
+  backface-visibility: hidden;
+  transition:
+    transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+}
+
+// Rules for positioning .panels-slider based on data-scroll-pos
+@for $i from 1 through $max-number-of-graphs {
+  $panelIncrement: $panels-slider--increment * ($i - 1) * -1;
+  .panels[data-scroll-pos="#{$i}"] .panels-slider {
+    transform: translate(0, #{$panelIncrement});
+  }
+}
+
+// Styles for highlighting active graph
+@for $l from 1 through $max-number-of-graphs {
+  .panels[data-graph-in-focus="#{$l}"] .graph-panel:nth-child(#{$l}) {
+    border-color: $c-pool;
+    box-shadow:
+      0 0 ($explorer-page-padding * 0.6) 2px fade-out($c-ocean, 0.5),
+      0 0 ($explorer-page-padding * 0.85) 2px fade-out($c-void, 0.5);
+    .graph-panel--title {
+      color: $g20-white;
+    }
+  }
+}
+.panels-arrows {
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  height: $panels-slider--arrows;
+  transform: translateY(-50%);
+  left: 0;
+  top: ($panels-slider--offset + ($panels-slider--increment / 2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panels-arrow {
+  width: $panels-slider--arrows;
+  height: $panels-slider--arrows;
+  border-width: ($panels-slider--arrows / 2);
+  border-style: solid;
+
+  &:first-child {
+    border-color: transparent transparent transparent $g5-pepper;
+  }
+  &:last-child {
+    border-color: transparent $g5-pepper transparent transparent;
+  }
+}
 
 .graph-panel {
   background-color: $graph-panel--bg;
   border: 2px solid $graph-panel--bg;
   border-radius: 5px;
-  position: absolute;
-  left: $explorer-page-padding;
-  top: $graph-panel--focus-offset;
-  width: $graph-panel--width;
   height: ($graph-panel--heading-height + $graph-panel--graph-height + 4px);
-  margin: 0;
+  margin: 0 0 ($explorer-page-padding / 2) 0;
   transition:
-    transform 0.3s ease,
     border-color 0.3s ease,
     background-color 0.3s ease,
     box-shadow 0.3s ease;
   backface-visibility: hidden;
   transform: translate(0,0);
 
+  &:last-child {
+    margin-bottom: 0;
+  }
   &:hover {
+    cursor: pointer;
+    background-color: $g4-onyx;
     border-color: $g5-pepper;
   }
 

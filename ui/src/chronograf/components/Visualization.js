@@ -6,7 +6,7 @@ import LineGraph from 'shared/components/LineGraph';
 import MultiTable from './MultiTable';
 const RefreshingLineGraph = AutoRefresh(LineGraph);
 
-const {bool, shape, string, arrayOf} = PropTypes;
+const {bool, shape, string, arrayOf, func} = PropTypes;
 const Visualization = React.createClass({
   propTypes: {
     timeRange: shape({
@@ -16,6 +16,8 @@ const Visualization = React.createClass({
     queryConfigs: arrayOf(shape({})).isRequired,
     isActive: bool.isRequired,
     name: string,
+    setActivePanel: func.isRequired,
+    panelID: string,
   },
 
   contextTypes: {
@@ -33,22 +35,26 @@ const Visualization = React.createClass({
   },
 
   componentDidUpdate() {
-    if (this.props.isActive) {
-      this.panel.scrollIntoView();
-      // scrollIntoView scrolls slightly *too* far, so this adds some top offset.
-      this.panel.parentNode.scrollTop -= 10;
-    }
+    // if (this.props.isActive) {
+    //   this.panel.scrollIntoView();
+    //   // scrollIntoView scrolls slightly *too* far, so this adds some top offset.
+    //   this.panel.parentNode.scrollTop -= 10;
+    // }
   },
 
   handleToggleView() {
     this.setState({isGraphInView: !this.state.isGraphInView});
   },
 
+  handleClick() {
+    const {panelID} = this.props;
+    this.props.setActivePanel(panelID);
+  },
+
   render() {
     const {queryConfigs, timeRange, isActive, name} = this.props;
     const {source} = this.context;
     const proxyLink = source.links.proxy;
-
     const {isGraphInView} = this.state;
     const statements = queryConfigs.map((query) => {
       const text = query.rawText || selectStatement(timeRange, query);
@@ -58,9 +64,8 @@ const Visualization = React.createClass({
       return {host: [proxyLink], text: s.text, id: s.id};
     });
     const autoRefreshMs = 10000;
-
     return (
-      <div ref={(p) => this.panel = p} className={classNames("graph-panel", {active: isActive})}>
+      <div ref={(p) => this.panel = p} className={classNames("graph-panel", {active: isActive})} onClick={this.handleClick}>
         <div className="graph-panel--heading">
           <div className="graph-panel--heading-left">
             <h3 className="graph-panel--title">{name || "Graph"}</h3>
