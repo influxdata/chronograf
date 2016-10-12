@@ -4,6 +4,7 @@ import {Provider} from 'react-redux';
 import {Router, Route, browserHistory} from 'react-router';
 
 import App from 'src/App';
+import AlertsApp from 'src/alerts';
 import CheckDataNodes from 'src/CheckDataNodes';
 import {HostsPage, HostPage} from 'src/hosts';
 import QueriesPage from 'src/queries';
@@ -139,6 +140,7 @@ const Root = React.createClass({
               <Route path="roles/:roleSlug" component={RolePageContainer} />
               <Route path="hosts" component={HostsPage} />
               <Route path="hosts/:hostID" component={HostPage} />
+              <Route path="alerts" component={AlertsApp} />
             </Route>
             <Route path="tasks" component={TasksPage} />
             <Route path="*" component={NotFound} />
