@@ -35,6 +35,11 @@ const SideNav = React.createClass({
           <NavListItem matcher="manager" link={`${sourcePrefix}/databases/manager/_internal`}>Database Manager</NavListItem>
           <NavListItem matcher="retentionpolicies" link={`${sourcePrefix}/databases/retentionpolicies/_internal`}>Retention Policies</NavListItem>
         </NavBlock>
+        <NavBlock matcher="alerts" icon="alert-triangle" link={`${sourcePrefix}/alerts`}>
+          <NavHeader link={`${sourcePrefix}/alerts`} title="Alerts" />
+          <NavListItem matcher="view" link={`${sourcePrefix}/alerts`}>View</NavListItem>
+          <NavListItem matcher="rules" link={`${sourcePrefix}/alert/rules`}>Rules</NavListItem>
+        </NavBlock>
       </NavBar>
     );
   },
