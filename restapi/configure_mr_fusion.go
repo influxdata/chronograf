@@ -15,7 +15,6 @@ import (
 	"github.com/influxdata/mrfusion"
 	"github.com/influxdata/mrfusion/bolt"
 	"github.com/influxdata/mrfusion/canned"
-	"github.com/influxdata/mrfusion/dist"
 	"github.com/influxdata/mrfusion/handlers"
 	"github.com/influxdata/mrfusion/influx"
 	"github.com/influxdata/mrfusion/kapacitor"
@@ -30,7 +29,7 @@ import (
 
 //go:generate swagger generate server --target .. --name  --spec ../swagger.yaml --with-context
 
-var logger = fusionlog.New()
+var logger mrfusion.Logger = fusionlog.New()
 
 var devFlags = struct {
 	Develop bool `short:"d" long:"develop" description:"Run server in develop mode."`
@@ -42,6 +41,10 @@ var storeFlags = struct {
 
 var cannedFlags = struct {
 	CannedPath string `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts" env:"CANNED_PATH" default:"canned"`
+}{}
+
+var useAuth = struct {
+	Auth bool `short:"a" long:"use-auth" description:"Enable authentication" env:"AUTHORIZATION"`
 }{}
 
 func configureFlags(api *op.MrFusionAPI) {
@@ -61,19 +64,11 @@ func configureFlags(api *op.MrFusionAPI) {
 			LongDescription:  "Specify the path to a directory of pre-canned application layout files.",
 			Options:          &cannedFlags,
 		},
-	}
-}
-
-func assets() mrfusion.Assets {
-	if devFlags.Develop {
-		return &dist.DebugAssets{
-			Dir:     "ui/build",
-			Default: "ui/build/index.html",
-		}
-	}
-	return &dist.BindataAssets{
-		Prefix:  "ui/build",
-		Default: "ui/build/index.html",
+		swag.CommandLineOptionsGroup{
+			ShortDescription: "Server Authentication",
+			LongDescription:  "Server will use authentication",
+			Options:          &useAuth,
+		},
 	}
 }
 
@@ -103,6 +98,7 @@ func configureAPI(api *op.MrFusionAPI) http.Handler {
 		c := bolt.NewClient()
 		c.Path = storeFlags.BoltPath
 		if err := c.Open(); err != nil {
+			logger.WithField("component", "boltstore").Panic("Unable to open boltdb; is there a mrfusion already running?", err)
 			panic(err)
 		}
 
@@ -238,7 +234,16 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	assets := handlers.Assets(handlers.AssetsOpts{
+		Develop: devFlags.Develop,
+		Logger:  logger,
+	})
+
+	if useAuth.Auth {
+		handler = handlers.AuthorizedToken(handlers.JWTOpts{}, handler)
+	}
+
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		l := logger.
 			WithField("component", "server").
 			WithField("remote_addr", r.RemoteAddr).
@@ -253,9 +258,8 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 			l.Info("Serving root redirect")
 			http.Redirect(w, r, "/index.html", http.StatusFound)
 		} else {
-			l.Info("Serving assets")
-			assets().Handler().ServeHTTP(w, r)
-			return
+			assets.ServeHTTP(w, r)
 		}
 	})
+	return h
 }
