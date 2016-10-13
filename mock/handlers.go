@@ -350,11 +350,13 @@ func (m *Handler) DeleteExploration(ctx context.Context, params op.DeleteSources
 }
 
 func (m *Handler) GetMappings(ctx context.Context, params op.GetMappingsParams) middleware.Responder {
+	cpu := "cpu"
+	system := "System"
 	mp := &models.Mappings{
 		Mappings: []*models.Mapping{
 			&models.Mapping{
-				Measurement: "cpu",
-				Name:        "System",
+				Measurement: &cpu,
+				Name:        &system,
 			},
 		},
 	}

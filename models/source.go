@@ -116,8 +116,8 @@ func (m *Source) validateName(formats strfmt.Registry) error {
 var sourceTypeTypePropEnum []interface{}
 
 const (
-	SourceTypeInflux           string = "influx"
-	SourceTypeInfluxEnterprise string = "influx-enterprise"
+	sourceTypeInflux           string = "influx"
+	sourceTypeInfluxEnterprise string = "influx-enterprise"
 )
 
 // prop value enum

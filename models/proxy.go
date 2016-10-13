@@ -61,7 +61,7 @@ func (m *Proxy) Validate(formats strfmt.Registry) error {
 var proxyTypeFormatPropEnum []interface{}
 
 const (
-	ProxyFormatRaw string = "raw"
+	proxyFormatRaw string = "raw"
 )
 
 // prop value enum

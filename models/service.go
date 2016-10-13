@@ -50,9 +50,9 @@ func (m *Service) Validate(formats strfmt.Registry) error {
 var serviceTypeTypePropEnum []interface{}
 
 const (
-	ServiceTypeContainers string = "containers"
-	ServiceTypeKubernetes string = "kubernetes"
-	ServiceTypeHost       string = "host"
+	serviceTypeContainers string = "containers"
+	serviceTypeKubernetes string = "kubernetes"
+	serviceTypeHost       string = "host"
 )
 
 // prop value enum
