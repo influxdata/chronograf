@@ -122,6 +122,7 @@ func configureAPI(api *op.MrFusionAPI) http.Handler {
 			LayoutStore:      allLayouts,
 		}
 
+		api.GetTokenHandler = op.GetTokenHandlerFunc(mockHandler.Token)
 		api.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.DeleteSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.DeleteExploration)
 		api.GetSourcesIDUsersUserIDExplorationsExplorationIDHandler = op.GetSourcesIDUsersUserIDExplorationsExplorationIDHandlerFunc(h.Exploration)
 		api.GetSourcesIDUsersUserIDExplorationsHandler = op.GetSourcesIDUsersUserIDExplorationsHandlerFunc(h.Explorations)
