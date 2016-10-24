@@ -2,10 +2,13 @@ package restapi
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"sync"
 	"time"
@@ -14,7 +17,10 @@ import (
 	flags "github.com/jessevdk/go-flags"
 	graceful "github.com/tylerb/graceful"
 
+	"github.com/influxdata/chronograf/bolt"
 	"github.com/influxdata/chronograf/restapi/operations"
+
+	client "github.com/influxdata/usage-client/v1"
 )
 
 const (
@@ -25,7 +31,10 @@ const (
 
 var defaultSchemes []string
 
+var startTime time.Time
+
 func init() {
+	startTime = time.Now().UTC()
 	defaultSchemes = []string{
 		schemeHTTP,
 	}
@@ -35,13 +44,23 @@ func init() {
 func NewServer(api *operations.ChronografAPI) *Server {
 	s := new(Server)
 	s.api = api
+	s.serverID = uint64(rand.Int63())
 	return s
 }
 
 // ConfigureAPI configures the API and handlers. Needs to be called before Serve
 func (s *Server) ConfigureAPI() {
+	if len(storeFlags.BoltPath) > 0 {
+		c := bolt.NewClient()
+		c.Path = storeFlags.BoltPath
+		if err := c.Open(); err != nil {
+			logger.WithField("component", "boltstore").Panic("Unable to open boltdb; is there a mrfusion already running?", err)
+			panic(err)
+		}
+		s.store = c
+	}
 	if s.api != nil {
-		s.handler = configureAPI(s.api)
+		s.handler = configureAPI(s.api, s.store)
 	}
 }
 
@@ -72,6 +91,10 @@ type Server struct {
 	api          *operations.ChronografAPI
 	handler      http.Handler
 	hasListeners bool
+
+	reportingDisabled bool `long:"reporting-diabled" description:"disable server reporting and registration" default:false env:"CHRONOGRAF_REPORTING_DISABLED"`
+	serverID          uint64
+	store             *bolt.Client
 }
 
 // Logf logs message either via defined user logger or via system one if no user logger is defined.
@@ -104,7 +127,7 @@ func (s *Server) SetAPI(api *operations.ChronografAPI) {
 
 	s.api = api
 	s.api.Logger = log.Printf
-	s.handler = configureAPI(api)
+	s.handler = configureAPI(api, s.store)
 }
 
 func (s *Server) hasScheme(scheme string) bool {
@@ -193,6 +216,10 @@ func (s *Server) Serve() (err error) {
 		}(tls.NewListener(s.httpsServerL, httpsServer.TLSConfig))
 	}
 
+	if !s.reportingDisabled {
+		go s.startServerReporting()
+	}
+
 	wg.Wait()
 	return nil
 }
@@ -276,4 +303,84 @@ func (s *Server) GetHandler() http.Handler {
 // SetHandler allows for setting a http handler on this server
 func (s *Server) SetHandler(handler http.Handler) {
 	s.handler = handler
+}
+
+// startServerReporting starts periodic server reporting.
+func (s *Server) startServerReporting() {
+	s.reportServer()
+
+	ticker := time.NewTicker(24 * time.Hour)
+	defer ticker.Stop()
+	for {
+		select {
+		// // TODO: Wire up a closing channel when autogen code is removed.
+		// case <-s.closing:
+		// 	return
+		case <-ticker.C:
+			s.reportServer()
+		}
+	}
+}
+
+// reportServer reports usage statistics about the system.
+func (s *Server) reportServer() {
+	// TODO: Add collection for the number of users.
+	var numSources, numLayouts, numExplorations, numServers int
+
+	if s.store != nil {
+		if n, err := s.store.SourcesStore.All(nil); err != nil {
+			s.Logf("Failed to collect sources statistic: %s", err)
+			return
+		} else {
+			numSources = len(n)
+		}
+		if n, err := s.store.LayoutStore.All(nil); err != nil {
+			s.Logf("Failed to collect usage statistics: %s", err)
+			return
+		} else {
+			numLayouts = len(n)
+		}
+		// TODO: Add the ExplorationStore.All to mrfusion.ExplorationStore interface.
+		if n, err := s.store.ExplorationStore.All(nil); err != nil {
+			s.Logf("Failed to collect usage statistics: %s", err)
+			return
+		} else {
+			numExplorations = len(n)
+		}
+		if n, err := s.store.ServersStore.All(nil); err != nil {
+			s.Logf("Failed to collect usage statistics: %s", err)
+			return
+		} else {
+			numServers = len(n)
+		}
+	} else {
+		s.Logf("Failed to collect usage statistics: Server not set", nil)
+	}
+
+	s.Logf("Reporting stats: Sources: %v, Layouts: %v, Explorations: %v, Servers: %v", numSources, numLayouts, numExplorations, numServers)
+
+	cl := client.New("")
+	usage := client.Usage{
+		Product: "chronograf",
+		Data: []client.UsageData{
+			{
+				Values: client.Values{
+					"os":   runtime.GOOS,
+					"arch": runtime.GOARCH,
+					// TODO: Fill in version when autogen code is removed.
+					// "version":          s.buildInfo.Version,
+					"cluster_id":       fmt.Sprintf("%v", s.serverID),
+					"num_sources":      numSources,
+					"num_layouts":      numLayouts,
+					"num_explorations": numExplorations,
+					"num_servers":      numServers,
+					"uptime":           time.Since(startTime).Seconds(),
+				},
+			},
+		},
+	}
+
+	s.Logf("Sending usage statistics to %s", cl.URL)
+
+	go cl.Save(usage)
 }

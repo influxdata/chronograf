@@ -75,7 +75,7 @@ func configureFlags(api *op.ChronografAPI) {
 	}
 }
 
-func configureAPI(api *op.ChronografAPI) http.Handler {
+func configureAPI(api *op.ChronografAPI, c *bolt.Client) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -97,14 +97,7 @@ func configureAPI(api *op.ChronografAPI) http.Handler {
 
 	api.GetHandler = op.GetHandlerFunc(mockHandler.AllRoutes)
 
-	if len(storeFlags.BoltPath) > 0 {
-		c := bolt.NewClient()
-		c.Path = storeFlags.BoltPath
-		if err := c.Open(); err != nil {
-			logger.WithField("component", "boltstore").Panic("Unable to open boltdb; is there a mrfusion already running?", err)
-			panic(err)
-		}
-
+	if c != nil {
 		apps := canned.NewApps(cannedFlags.CannedPath, &uuid.V4{})
 
 		// allLayouts acts as a front-end to both the bolt layouts and the filesystem layouts.
