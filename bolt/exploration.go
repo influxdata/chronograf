@@ -16,6 +16,28 @@ type ExplorationStore struct {
 	client *Client
 }
 
+// All returns all Explorations.
+func (e *ExplorationStore) All(ctx context.Context) ([]*chronograf.Exploration, error) {
+	var explorations []*chronograf.Exploration
+	if err := e.client.db.View(func(tx *bolt.Tx) error {
+		if err := tx.Bucket(ExplorationBucket).ForEach(func(k, v []byte) error {
+			var e chronograf.Exploration
+			if err := internal.UnmarshalExploration(v, &e); err != nil {
+				return err
+			}
+			explorations = append(explorations, &e)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return explorations, nil
+}
+
 // Search the ExplorationStore for all explorations owned by userID.
 func (s *ExplorationStore) Query(ctx context.Context, uid chronograf.UserID) ([]*chronograf.Exploration, error) {
 	var explorations []*chronograf.Exploration
