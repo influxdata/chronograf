@@ -6,18 +6,20 @@ import {Router, Route, browserHistory} from 'react-router';
 import App from 'src/App';
 import CheckDataNodes from 'src/CheckDataNodes';
 import {HostsPage, HostPage} from 'src/hosts';
+import {KapacitorPage, KapacitorTasksPage} from 'src/kapacitor';
 import QueriesPage from 'src/queries';
 import TasksPage from 'src/tasks';
 import RetentionPoliciesPage from 'src/retention_policies';
 import DataExplorer from 'src/chronograf';
 import DatabaseManager from 'src/database_manager';
 import SignUp from 'src/sign_up';
-import SelectSourcePage from 'src/select_source';
+import {CreateSource, ManageSources} from 'src/sources';
 import {ClusterAccountsPage, ClusterAccountPage} from 'src/cluster_accounts';
 import {RolesPageContainer, RolePageContainer} from 'src/access_control';
 import NotFound from 'src/shared/components/NotFound';
 import NoClusterError from 'src/shared/components/NoClusterError';
 import configureStore from 'src/store/configureStore';
+import {getSources} from 'shared/apis';
 
 import 'src/style/enterprise_style/application.scss';
 
@@ -38,7 +40,7 @@ const Root = React.createClass({
     return {
       me: {
         id: 1,
-        name: 'MrFusion',
+        name: 'Chronograf',
         email: 'foo@example.com',
         admin: true,
       },
@@ -46,47 +48,6 @@ const Root = React.createClass({
       hasReadPermission: false,
       clusterStatus: null,
     };
-  },
-
-  componentDidMount() {
-    // meShow().then(({data: me}) => {
-    //   const match = window.location.pathname.match(/\/clusters\/(\d*)/);
-    //   const clusterID = match && match[1];
-    //   const clusterLink = me.cluster_links.find(link => link.cluster_id === clusterID);
-    //   if (clusterLink) {
-    //     Promise.all([
-    //       getClusterAccount(clusterID, clusterLink.cluster_user),
-    //       getRoles(clusterID),
-    //     ]).then(([{data: {users}}, {data: {roles}}]) => {
-    //       const account = buildClusterAccounts(users, roles)[0];
-    //       const canViewChronograf = hasPermission(account, VIEW_CHRONOGRAF);
-    //       const hasReadPermission = hasPermission(account, READ);
-    //       this.setState({
-    //         me,
-    //         canViewChronograf,
-    //         isFetching: false,
-    //         hasReadPermission,
-    //       });
-    //     }).catch((err) => {
-    //       console.error(err); // eslint-disable-line no-console
-    //       this.setState({
-    //         canViewChronograf: false,
-    //         isFetching: false,
-    //         clusterStatus: err.response.status,
-    //       });
-    //     });
-    //   } else {
-    //     this.setState({
-    //       me,
-    //       isFetching: false,
-    //     });
-    //   }
-    // }).catch((err) => {
-    //   console.error(err); // eslint-disable-line no-console
-    //   this.setState({
-    //     isFetching: false,
-    //   });
-    // });
   },
 
   childContextTypes: {
@@ -104,11 +65,22 @@ const Root = React.createClass({
     };
   },
 
-  hasDefaultSource(_, replace) {
-    const defaultSource = JSON.parse(localStorage.getItem('defaultSource'));
-    if (!!defaultSource && defaultSource.id) {
-      return replace(`/sources/${defaultSource.id}/hosts`);
+  activeSource(sources) {
+    const defaultSource = sources.find((s) => s.default);
+    if (defaultSource && defaultSource.id) {
+      return defaultSource;
     }
+    return sources[0];
+  },
+
+  redirectToHosts(_, replace, callback) {
+    getSources().then(({data: {sources}}) => {
+      if (sources && sources.length) {
+        const path = `/sources/${this.activeSource(sources).id}/hosts`;
+        replace(path);
+      }
+      callback();
+    }).catch(callback);
   },
 
   render() {
@@ -124,10 +96,10 @@ const Root = React.createClass({
       <Provider store={store}>
         <Router history={browserHistory}>
           <Route path="/signup/admin/:step" component={SignUp} />
-          <Route path="/" component={SelectSourcePage} onEnter={this.hasDefaultSource} />
-          <Route path="/sources" component={SelectSourcePage} />
+          <Route path="/" component={CreateSource} onEnter={this.redirectToHosts} />
           <Route path="/sources/:sourceID" component={App}>
             <Route component={CheckDataNodes}>
+              <Route path="manage-sources" component={ManageSources} />
               <Route path="queries" component={QueriesPage} />
               <Route path="accounts" component={ClusterAccountsPage} />
               <Route path="accounts/:accountID" component={ClusterAccountPage} />
@@ -139,6 +111,8 @@ const Root = React.createClass({
               <Route path="roles/:roleSlug" component={RolePageContainer} />
               <Route path="hosts" component={HostsPage} />
               <Route path="hosts/:hostID" component={HostPage} />
+              <Route path="kapacitor" component={KapacitorPage} />
+              <Route path="kapacitor_tasks" component={KapacitorTasksPage} />
             </Route>
             <Route path="tasks" component={TasksPage} />
             <Route path="*" component={NotFound} />

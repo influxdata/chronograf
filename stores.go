@@ -1,4 +1,4 @@
-package mrfusion
+package chronograf
 
 import (
 	"time"
@@ -6,35 +6,17 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Permission is a specific allowance for `User` or `Role`.
-type Permission string
-type Permissions []Permission
-
 // UserID is a unique ID for a source user.
 type UserID int
 
 // Represents an authenticated user.
 type User struct {
-	ID          UserID
-	Name        string
-	Permissions Permissions
-	Roles       []Role
-}
-
-// Role is a set of permissions that may be associated with `User`s
-type Role struct {
-	ID          int
-	Name        string
-	Permissions Permissions
-	Users       []User
+	ID   UserID
+	Name string
 }
 
 // AuthStore is the Storage and retrieval of authentication information
 type AuthStore struct {
-	Permissions interface {
-		// Returns a list of all possible permissions support by the AuthStore.
-		All(context.Context) (Permissions, error)
-	}
 	// User management for the AuthStore
 	Users interface {
 		// Create a new User in the AuthStore
@@ -45,18 +27,6 @@ type AuthStore struct {
 		Get(ctx context.Context, ID int) error
 		// Update the user's permissions or roles
 		Update(context.Context, User) error
-	}
-
-	// Roles are sets of permissions.
-	Roles interface {
-		// Create a new role to encapsulate a set of permissions.
-		Add(context.Context, Role) error
-		// Delete the role
-		Delete(context.Context, Role) error
-		// Retrieve the role and the associated users if `ID` exists.
-		Get(ctx context.Context, ID int) error
-		// Update the role to change permissions or users.
-		Update(context.Context, Role) error
 	}
 }
 
@@ -90,31 +60,33 @@ type ExplorationStore interface {
 
 // Cell is a rectangle and multiple time series queries to visualize.
 type Cell struct {
-	X       int32
-	Y       int32
-	W       int32
-	H       int32
-	Queries []Query
+	X       int32   `json:"x"`
+	Y       int32   `json:"y"`
+	W       int32   `json:"w"`
+	H       int32   `json:"h"`
+	Queries []Query `json:"queries"`
 }
 
-// Dashboard is a collection of Cells for visualization
-type Dashboard struct {
-	ID    int
-	Cells []Cell
+// Layout is a collection of Cells for visualization
+type Layout struct {
+	ID          string `json:"id"`
+	Application string `json:"app"`
+	Measurement string `json:"measurement"`
+	Cells       []Cell `json:"cells"`
 }
 
-// DashboardStore stores dashboards and associated Cells
-type DashboardStore interface {
+// LayoutStore stores dashboards and associated Cells
+type LayoutStore interface {
 	// All returns all dashboards in the store
-	All(context.Context) ([]*Dashboard, error)
-	// Add creates a new dashboard in the DashboardStore
-	Add(context.Context, *Dashboard) error
+	All(context.Context) ([]Layout, error)
+	// Add creates a new dashboard in the LayoutStore
+	Add(context.Context, Layout) (Layout, error)
 	// Delete the dashboard from the store
-	Delete(context.Context, *Dashboard) error
-	// Get retrieves Dashboard if `ID` exists
-	Get(ctx context.Context, ID int) (*Dashboard, error)
+	Delete(context.Context, Layout) error
+	// Get retrieves Layout if `ID` exists
+	Get(ctx context.Context, ID string) (Layout, error)
 	// Update the dashboard in the store.
-	Update(context.Context, *Dashboard) error
+	Update(context.Context, Layout) error
 }
 
 type Source struct {

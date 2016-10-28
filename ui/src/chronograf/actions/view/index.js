@@ -1,6 +1,7 @@
 import uuid from 'node-uuid';
 import AJAX from 'utils/ajax';
 import getInitialState from 'src/store/getInitialState';
+import {publishNotification} from 'src/shared/actions/notifications';
 import _ from 'lodash';
 import * as api from '../../api/';
 
@@ -146,7 +147,7 @@ export function createExploration(source, push) {
   return (dispatch) => {
     const initialState = getInitialState();
     AJAX({
-      url: `${source.links.self}/users/1/explorations`, // TODO: change this to use actual user link once users are introduced
+      url: `/chronograf/v1/users/1/explorations`, // TODO: change this to use actual user link once users are introduced
       method: 'POST',
       data: JSON.stringify({
         data: JSON.stringify(initialState),
@@ -190,6 +191,9 @@ export function deleteExplorer(source, explorerURI, push) {
         type: 'DELETE_EXPLORER',
         payload: {id: explorerURI},
       });
+      dispatch(publishNotification('success', 'The exploration was successfully deleted'));
+    }).catch(() => {
+      dispatch(publishNotification('error', 'The exploration could not be deleted'));
     });
   };
 }
@@ -232,7 +236,7 @@ export function fetchExplorers({source, userID, explorerURI, push}) {
   return (dispatch) => {
     dispatch({type: 'FETCH_EXPLORERS'});
     AJAX({
-      url: `${source.links.self}/users/${userID}/explorations`,
+      url: `/chronograf/v1/users/${userID}/explorations`,
     }).then(({data: {explorations}}) => {
       const explorers = explorations.map(parseRawExplorer);
       dispatch(loadExplorers(explorers));

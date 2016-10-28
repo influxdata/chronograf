@@ -4,13 +4,13 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/influxdata/mrfusion"
+	"github.com/influxdata/chronograf"
 )
 
 //go:generate protoc --gogo_out=. internal.proto
 
 // MarshalExploration encodes an exploration to binary protobuf format.
-func MarshalExploration(e *mrfusion.Exploration) ([]byte, error) {
+func MarshalExploration(e *chronograf.Exploration) ([]byte, error) {
 	return proto.Marshal(&Exploration{
 		ID:        int64(e.ID),
 		Name:      e.Name,
@@ -23,15 +23,15 @@ func MarshalExploration(e *mrfusion.Exploration) ([]byte, error) {
 }
 
 // UnmarshalExploration decodes an exploration from binary protobuf data.
-func UnmarshalExploration(data []byte, e *mrfusion.Exploration) error {
+func UnmarshalExploration(data []byte, e *chronograf.Exploration) error {
 	var pb Exploration
 	if err := proto.Unmarshal(data, &pb); err != nil {
 		return err
 	}
 
-	e.ID = mrfusion.ExplorationID(pb.ID)
+	e.ID = chronograf.ExplorationID(pb.ID)
 	e.Name = pb.Name
-	e.UserID = mrfusion.UserID(pb.UserID)
+	e.UserID = chronograf.UserID(pb.UserID)
 	e.Data = pb.Data
 	e.CreatedAt = time.Unix(0, pb.CreatedAt).UTC()
 	e.UpdatedAt = time.Unix(0, pb.UpdatedAt).UTC()
@@ -40,8 +40,8 @@ func UnmarshalExploration(data []byte, e *mrfusion.Exploration) error {
 	return nil
 }
 
-// MarshalSource encodes an source to binary protobuf format.
-func MarshalSource(s mrfusion.Source) ([]byte, error) {
+// MarshalSource encodes a source to binary protobuf format.
+func MarshalSource(s chronograf.Source) ([]byte, error) {
 	return proto.Marshal(&Source{
 		ID:       int64(s.ID),
 		Name:     s.Name,
@@ -53,8 +53,8 @@ func MarshalSource(s mrfusion.Source) ([]byte, error) {
 	})
 }
 
-// UnmarshalSource decodes an source from binary protobuf data.
-func UnmarshalSource(data []byte, s *mrfusion.Source) error {
+// UnmarshalSource decodes a source from binary protobuf data.
+func UnmarshalSource(data []byte, s *chronograf.Source) error {
 	var pb Source
 	if err := proto.Unmarshal(data, &pb); err != nil {
 		return err
@@ -70,8 +70,8 @@ func UnmarshalSource(data []byte, s *mrfusion.Source) error {
 	return nil
 }
 
-// MarshalServer encodes an source to binary protobuf format.
-func MarshalServer(s mrfusion.Server) ([]byte, error) {
+// MarshalServer encodes a server to binary protobuf format.
+func MarshalServer(s chronograf.Server) ([]byte, error) {
 	return proto.Marshal(&Server{
 		ID:       int64(s.ID),
 		SrcID:    int64(s.SrcID),
@@ -82,8 +82,8 @@ func MarshalServer(s mrfusion.Server) ([]byte, error) {
 	})
 }
 
-// UnmarshalServer decodes an source from binary protobuf data.
-func UnmarshalServer(data []byte, s *mrfusion.Server) error {
+// UnmarshalServer decodes a server from binary protobuf data.
+func UnmarshalServer(data []byte, s *chronograf.Server) error {
 	var pb Server
 	if err := proto.Unmarshal(data, &pb); err != nil {
 		return err
@@ -95,5 +95,65 @@ func UnmarshalServer(data []byte, s *mrfusion.Server) error {
 	s.Username = pb.Username
 	s.Password = pb.Password
 	s.URL = pb.URL
+	return nil
+}
+
+// MarshalLayout encodes a layout to binary protobuf format.
+func MarshalLayout(l chronograf.Layout) ([]byte, error) {
+	cells := make([]*Cell, len(l.Cells))
+	for i, c := range l.Cells {
+		queries := make([]*Query, len(c.Queries))
+		for j, q := range c.Queries {
+			queries[j] = &Query{
+				Command: q.Command,
+				DB:      q.DB,
+				RP:      q.RP,
+			}
+		}
+		cells[i] = &Cell{
+			X:       c.X,
+			Y:       c.Y,
+			W:       c.W,
+			H:       c.H,
+			Queries: queries,
+		}
+	}
+	return proto.Marshal(&Layout{
+		ID:          l.ID,
+		Measurement: l.Measurement,
+		Application: l.Application,
+		Cells:       cells,
+	})
+}
+
+// UnmarshalLayout decodes a layout from binary protobuf data.
+func UnmarshalLayout(data []byte, l *chronograf.Layout) error {
+	var pb Layout
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+
+	l.ID = pb.ID
+	l.Measurement = pb.Measurement
+	l.Application = pb.Application
+	cells := make([]chronograf.Cell, len(pb.Cells))
+	for i, c := range pb.Cells {
+		queries := make([]chronograf.Query, len(c.Queries))
+		for j, q := range c.Queries {
+			queries[j] = chronograf.Query{
+				Command: q.Command,
+				DB:      q.DB,
+				RP:      q.RP,
+			}
+		}
+		cells[i] = chronograf.Cell{
+			X:       c.X,
+			Y:       c.Y,
+			W:       c.W,
+			H:       c.H,
+			Queries: queries,
+		}
+	}
+	l.Cells = cells
 	return nil
 }

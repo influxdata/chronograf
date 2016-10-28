@@ -6,18 +6,19 @@ import (
 	"strconv"
 	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
-	"github.com/influxdata/mrfusion"
-	"github.com/influxdata/mrfusion/models"
-	op "github.com/influxdata/mrfusion/restapi/operations"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/models"
+	op "github.com/influxdata/chronograf/restapi/operations"
 	"golang.org/x/net/context"
 )
 
 type Handler struct {
-	Store      mrfusion.ExplorationStore
-	Srcs       mrfusion.SourcesStore
-	TimeSeries mrfusion.TimeSeries
+	Store      chronograf.ExplorationStore
+	Srcs       chronograf.SourcesStore
+	TimeSeries chronograf.TimeSeries
 }
 
 func NewHandler() Handler {
@@ -31,16 +32,16 @@ func NewHandler() Handler {
 
 func (m *Handler) AllRoutes(ctx context.Context, params op.GetParams) middleware.Responder {
 	routes := &models.Routes{
-		Sources:    "/chronograf/v1/sources",
-		Dashboards: "/chronograf/v1/dashboards",
-		Apps:       "/chronograf/v1/apps",
-		Users:      "/chronograf/v1/users",
+		Sources:  "/chronograf/v1/sources",
+		Layouts:  "/chronograf/v1/layouts",
+		Users:    "/chronograf/v1/users",
+		Mappings: "/chronograf/v1/mappings",
 	}
 	return op.NewGetOK().WithPayload(routes)
 }
 
 func (m *Handler) NewSource(ctx context.Context, params op.PostSourcesParams) middleware.Responder {
-	src := mrfusion.Source{
+	src := chronograf.Source{
 		Name:     *params.Source.Name,
 		Type:     params.Source.Type,
 		Username: params.Source.Username,
@@ -67,7 +68,7 @@ func srcLinks(id int) *models.SourceLinks {
 	}
 }
 
-func mrToModel(src mrfusion.Source) *models.Source {
+func mrToModel(src chronograf.Source) *models.Source {
 	return &models.Source{
 		ID:       strconv.Itoa(src.ID),
 		Links:    srcLinks(src.ID),
@@ -121,7 +122,7 @@ func (m *Handler) RemoveSource(ctx context.Context, params op.DeleteSourcesIDPar
 		errMsg := &models.Error{Code: 500, Message: fmt.Sprintf("Error converting ID %s", params.ID)}
 		return op.NewDeleteSourcesIDDefault(500).WithPayload(errMsg)
 	}
-	src := mrfusion.Source{
+	src := chronograf.Source{
 		ID: id,
 	}
 	if err = m.Srcs.Delete(ctx, src); err != nil {
@@ -199,12 +200,12 @@ func (m *Handler) Proxy(ctx context.Context, params op.PostSourcesIDProxyParams)
 		errMsg := &models.Error{Code: 400, Message: fmt.Sprintf("Unable to connect to source %s", params.ID)}
 		return op.NewPostSourcesIDProxyNotFound().WithPayload(errMsg)
 	}
-	query := mrfusion.Query{
+	query := chronograf.Query{
 		Command: *params.Query.Query,
 		DB:      params.Query.Db,
 		RP:      params.Query.Rp,
 	}
-	response, err := m.TimeSeries.Query(ctx, mrfusion.Query(query))
+	response, err := m.TimeSeries.Query(ctx, chronograf.Query(query))
 	if err != nil {
 		return op.NewPostSourcesIDProxyDefault(500)
 	}
@@ -215,14 +216,14 @@ func (m *Handler) Proxy(ctx context.Context, params op.PostSourcesIDProxyParams)
 	return op.NewPostSourcesIDProxyOK().WithPayload(res)
 }
 
-func (m *Handler) Explorations(ctx context.Context, params op.GetSourcesIDUsersUserIDExplorationsParams) middleware.Responder {
+func (m *Handler) Explorations(ctx context.Context, params op.GetUsersUserIDExplorationsParams) middleware.Responder {
 	id, err := strconv.Atoi(params.UserID)
 	if err != nil {
-		return op.NewGetSourcesIDUsersUserIDExplorationsDefault(500)
+		return op.NewGetUsersUserIDExplorationsDefault(500)
 	}
-	exs, err := m.Store.Query(ctx, mrfusion.UserID(id))
+	exs, err := m.Store.Query(ctx, chronograf.UserID(id))
 	if err != nil {
-		return op.NewGetSourcesIDUsersUserIDExplorationsNotFound()
+		return op.NewGetUsersUserIDExplorationsNotFound()
 	}
 	res := &models.Explorations{}
 	for i, e := range exs {
@@ -240,27 +241,27 @@ func (m *Handler) Explorations(ctx context.Context, params op.GetSourcesIDUsersU
 		},
 		)
 	}
-	return op.NewGetSourcesIDUsersUserIDExplorationsOK().WithPayload(res)
+	return op.NewGetUsersUserIDExplorationsOK().WithPayload(res)
 }
 
-func (m *Handler) Exploration(ctx context.Context, params op.GetSourcesIDUsersUserIDExplorationsExplorationIDParams) middleware.Responder {
+func (m *Handler) Exploration(ctx context.Context, params op.GetUsersUserIDExplorationsExplorationIDParams) middleware.Responder {
 	id, err := strconv.Atoi(params.UserID)
 	if err != nil {
 		errMsg := &models.Error{Code: 500, Message: "Error converting user id"}
-		return op.NewGetSourcesIDUsersUserIDExplorationsDefault(500).WithPayload(errMsg)
+		return op.NewGetUsersUserIDExplorationsDefault(500).WithPayload(errMsg)
 	}
 
 	eID, err := strconv.Atoi(params.ExplorationID)
 	if err != nil {
 		errMsg := &models.Error{Code: 500, Message: "Error converting exploration id"}
-		return op.NewGetSourcesIDUsersUserIDExplorationsExplorationIDDefault(500).WithPayload(errMsg)
+		return op.NewGetUsersUserIDExplorationsExplorationIDDefault(500).WithPayload(errMsg)
 	}
 
-	e, err := m.Store.Get(ctx, mrfusion.ExplorationID(eID))
+	e, err := m.Store.Get(ctx, chronograf.ExplorationID(eID))
 	if err != nil {
 		log.Printf("Error unknown exploration id: %d: %v", eID, err)
 		errMsg := &models.Error{Code: 404, Message: "Error unknown exploration id"}
-		return op.NewGetSourcesIDUsersUserIDExplorationsExplorationIDNotFound().WithPayload(errMsg)
+		return op.NewGetUsersUserIDExplorationsExplorationIDNotFound().WithPayload(errMsg)
 	}
 
 	rel := "self"
@@ -275,49 +276,49 @@ func (m *Handler) Exploration(ctx context.Context, params op.GetSourcesIDUsersUs
 			Href: &href,
 		},
 	}
-	return op.NewGetSourcesIDUsersUserIDExplorationsExplorationIDOK().WithPayload(res)
+	return op.NewGetUsersUserIDExplorationsExplorationIDOK().WithPayload(res)
 }
 
-func (m *Handler) UpdateExploration(ctx context.Context, params op.PatchSourcesIDUsersUserIDExplorationsExplorationIDParams) middleware.Responder {
+func (m *Handler) UpdateExploration(ctx context.Context, params op.PatchUsersUserIDExplorationsExplorationIDParams) middleware.Responder {
 	eID, err := strconv.Atoi(params.ExplorationID)
 	if err != nil {
-		return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDDefault(500)
+		return op.NewPatchUsersUserIDExplorationsExplorationIDDefault(500)
 	}
 
-	e, err := m.Store.Get(ctx, mrfusion.ExplorationID(eID))
+	e, err := m.Store.Get(ctx, chronograf.ExplorationID(eID))
 	if err != nil {
 		log.Printf("Error unknown exploration id: %d: %v", eID, err)
 		errMsg := &models.Error{Code: 404, Message: "Error unknown exploration id"}
-		return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDNotFound().WithPayload(errMsg)
+		return op.NewPatchUsersUserIDExplorationsExplorationIDNotFound().WithPayload(errMsg)
 	}
 	if params.Exploration != nil {
-		e.ID = mrfusion.ExplorationID(eID)
+		e.ID = chronograf.ExplorationID(eID)
 		e.Data = params.Exploration.Data.(string)
 		e.Name = params.Exploration.Name
 		m.Store.Update(ctx, e)
 	}
-	return op.NewPatchSourcesIDUsersUserIDExplorationsExplorationIDOK()
+	return op.NewPatchUsersUserIDExplorationsExplorationIDOK()
 }
 
-func (m *Handler) NewExploration(ctx context.Context, params op.PostSourcesIDUsersUserIDExplorationsParams) middleware.Responder {
+func (m *Handler) NewExploration(ctx context.Context, params op.PostUsersUserIDExplorationsParams) middleware.Responder {
 	id, err := strconv.Atoi(params.UserID)
 	if err != nil {
-		return op.NewPostSourcesIDUsersUserIDExplorationsDefault(500)
+		return op.NewPostUsersUserIDExplorationsDefault(500)
 	}
 
-	exs, err := m.Store.Query(ctx, mrfusion.UserID(id))
+	exs, err := m.Store.Query(ctx, chronograf.UserID(id))
 	if err != nil {
 		log.Printf("Error unknown user id: %d: %v", id, err)
 		errMsg := &models.Error{Code: 404, Message: "Error unknown user id"}
-		return op.NewPostSourcesIDUsersUserIDExplorationsNotFound().WithPayload(errMsg)
+		return op.NewPostUsersUserIDExplorationsNotFound().WithPayload(errMsg)
 	}
 	eID := len(exs)
 
 	if params.Exploration != nil {
-		e := mrfusion.Exploration{
+		e := chronograf.Exploration{
 			Data: params.Exploration.Data.(string),
 			Name: params.Exploration.Name,
-			ID:   mrfusion.ExplorationID(eID),
+			ID:   chronograf.ExplorationID(eID),
 		}
 		m.Store.Add(ctx, &e)
 	}
@@ -332,20 +333,57 @@ func (m *Handler) NewExploration(ctx context.Context, params op.PostSourcesIDUse
 		Rel:  &rel,
 	}
 	params.Exploration.Link = link
-	return op.NewPostSourcesIDUsersUserIDExplorationsCreated().WithPayload(params.Exploration).WithLocation(loc)
+	return op.NewPostUsersUserIDExplorationsCreated().WithPayload(params.Exploration).WithLocation(loc)
 
 }
 
-func (m *Handler) DeleteExploration(ctx context.Context, params op.DeleteSourcesIDUsersUserIDExplorationsExplorationIDParams) middleware.Responder {
+func (m *Handler) DeleteExploration(ctx context.Context, params op.DeleteUsersUserIDExplorationsExplorationIDParams) middleware.Responder {
 	ID, err := strconv.Atoi(params.ExplorationID)
 	if err != nil {
-		return op.NewDeleteSourcesIDUsersUserIDExplorationsExplorationIDDefault(500)
+		return op.NewDeleteUsersUserIDExplorationsExplorationIDDefault(500)
 	}
 
-	if err := m.Store.Delete(ctx, &mrfusion.Exploration{ID: mrfusion.ExplorationID(ID)}); err != nil {
+	if err := m.Store.Delete(ctx, &chronograf.Exploration{ID: chronograf.ExplorationID(ID)}); err != nil {
 		log.Printf("Error unknown explorations id: %d: %v", ID, err)
 		errMsg := &models.Error{Code: 404, Message: "Error unknown user id"}
-		return op.NewDeleteSourcesIDUsersUserIDExplorationsExplorationIDNotFound().WithPayload(errMsg)
+		return op.NewDeleteUsersUserIDExplorationsExplorationIDNotFound().WithPayload(errMsg)
 	}
-	return op.NewDeleteSourcesIDUsersUserIDExplorationsExplorationIDNoContent()
+	return op.NewDeleteUsersUserIDExplorationsExplorationIDNoContent()
+}
+
+func (m *Handler) GetMappings(ctx context.Context, params op.GetMappingsParams) middleware.Responder {
+	cpu := "cpu"
+	system := "System"
+	mp := &models.Mappings{
+		Mappings: []*models.Mapping{
+			&models.Mapping{
+				Measurement: &cpu,
+				Name:        &system,
+			},
+		},
+	}
+	return op.NewGetMappingsOK().WithPayload(mp)
+}
+
+func (m *Handler) Token(ctx context.Context, params op.GetTokenParams) middleware.Responder {
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
+		"sub":      "bob",
+		"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(),
+		"username": "bob",
+		"email":    "bob@mail.com",
+		"nbf":      time.Now().Unix(),
+		"iat":      time.Now().Unix(),
+	})
+
+	// sign token with secret
+	ts, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		errMsg := &models.Error{Code: 500, Message: "Failed to sign token"}
+		return op.NewGetTokenDefault(500).WithPayload(errMsg)
+	}
+
+	t := models.Token(ts)
+
+	return op.NewGetTokenOK().WithPayload(t)
 }

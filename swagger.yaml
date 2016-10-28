@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
-    title: Mr Fusion
-    description: Fuel for Chronograf
+    title: Chronograf
+    description: API endpoints for Chronograf
     version: "1.1.0"
-host: Chronograf.influxdata.com
+host: chronograf.influxdata.com
 schemes:
     - http
 basePath: /chronograf/v1
@@ -15,7 +15,7 @@ paths:
     '/':
         get:
             summary: Lists all the endpoints
-            description: List of the endpoints. 
+            description: List of the endpoints.
             responses:
                 200:
                     description: Returns the links to the top level endpoints.
@@ -72,7 +72,7 @@ paths:
             description: These data sources store time series data.
             responses:
                 200:
-                    description: Data source used to supply time series to dashboards.
+                    description: Data source used to supply time series information.
                     schema:
                         $ref: '#/definitions/Source'
                 404:
@@ -207,14 +207,8 @@ paths:
                     description: Unexpected internal service error
                     schema:
                         $ref: '#/definitions/Error'
-    /sources/{id}/users:
+    /users:
         get:
-            parameters:
-                - name: id
-                  in: path
-                  type: string
-                  description: ID of the data source
-                  required: true
             summary: List of all users on this data source
             responses:
                 200:
@@ -228,11 +222,6 @@ paths:
         post:
             summary: Create new user for this data source
             parameters:
-                - name: id
-                  in: path
-                  type: string
-                  description: ID of the data source
-                  required: true
                 - name: user
                   in: body
                   description: Configuration options for new user
@@ -252,14 +241,9 @@ paths:
                     description: A processing or an unexpected error.
                     schema:
                         $ref: '#/definitions/Error'
-    /sources/{id}/users/{user_id}:
+    /users/{user_id}:
         get:
             parameters:
-                - name: id
-                  in: path
-                  type: string
-                  description: ID of the data source
-                  required: true
                 - name: user_id
                   in: path
                   type: string
@@ -274,7 +258,7 @@ paths:
                     schema:
                         $ref: '#/definitions/User'
                 404:
-                    description: Unknown source id
+                    description: Unknown user
                     schema:
                         $ref: '#/definitions/Error'
                 default:
@@ -284,11 +268,6 @@ paths:
         patch:
             summary: Update user configuration
             parameters:
-                - name: id
-                  in: path
-                  type: string
-                  description: ID of a data source
-                  required: true
                 - name: user_id
                   in: path
                   type: string
@@ -313,11 +292,6 @@ paths:
                         $ref: '#/definitions/Error'
         delete:
             parameters:
-                - name: id
-                  in: path
-                  type: string
-                  description: ID of the source
-                  required: true
                 - name: user_id
                   in: path
                   type: string
@@ -335,14 +309,9 @@ paths:
                     description: Unexpected internal service error
                     schema:
                         $ref: '#/definitions/Error'
-    /sources/{id}/users/{user_id}/explorations:
+    /users/{user_id}/explorations:
         get:
             parameters:
-              - name: id
-                in: path
-                type: string
-                description: ID of the data source
-                required: true
               - name: user_id
                 in: path
                 type: string
@@ -354,7 +323,7 @@ paths:
                     schema:
                         $ref: '#/definitions/Explorations'
                 404:
-                    description: Data source id or user does not exist.
+                    description: User does not exist.
                     schema:
                         $ref: '#/definitions/Error'
                 default:
@@ -364,17 +333,12 @@ paths:
         post:
             summary: Create new named exploration for this user
             parameters:
-                - name: id
-                  in: path
-                  type: string
-                  description: ID of the data source
-                  required: true
                 - name: user_id
                   in: path
                   type: string
                   description: ID of user to associate this exploration with.
                   required: true
-                - name: exploration 
+                - name: exploration
                   in: body
                   description: Exploration session to save
                   schema:
@@ -390,27 +354,22 @@ paths:
                     schema:
                         $ref: '#/definitions/Exploration'
                 404:
-                    description: Data source id or user does not exist.
+                    description: User does not exist.
                     schema:
                         $ref: '#/definitions/Error'
                 default:
                     description: A processing or an unexpected error.
                     schema:
                         $ref: '#/definitions/Error'
-    /sources/{id}/users/{user_id}/explorations/{exploration_id}:
+    /users/{user_id}/explorations/{exploration_id}:
         get:
             parameters:
-                - name: id
-                  in: path
-                  type: string
-                  description: ID of the data source
-                  required: true
                 - name: user_id
                   in: path
                   type: string
                   description: ID of user to associate this exploration with.
                   required: true
-                - name: exploration_id 
+                - name: exploration_id
                   in: path
                   type: string
                   description: ID of the specific exploration.
@@ -424,7 +383,7 @@ paths:
                     schema:
                         $ref: '#/definitions/Exploration'
                 404:
-                    description: Data source id, user, or exploration does not exist.
+                    description: User or exploration does not exist.
                     schema:
                         $ref: '#/definitions/Error'
                 default:
@@ -444,12 +403,12 @@ paths:
                   type: string
                   description: ID of user
                   required: true
-                - name: exploration_id 
+                - name: exploration_id
                   in: path
                   type: string
                   description: ID of the specific exploration.
                   required: true
-                - name: exploration 
+                - name: exploration
                   in: body
                   description: Update the exploration information to this.
                   required: true
@@ -480,7 +439,7 @@ paths:
                   type: string
                   description: ID of user to associate this exploration with.
                   required: true
-                - name: exploration_id 
+                - name: exploration_id
                   in: path
                   type: string
                   description: ID of the specific exploration.
@@ -882,60 +841,92 @@ paths:
                     description: Response directly from kapacitor
                     schema:
                         $ref: '#/definitions/KapacitorProxyResponse'
-    /dashboards:
+    /mappings:
+      get:
+        summary: Mappings between app names and measurements
+        description: |
+          Mappings provide a means to alias measurement names found within a telegraf database and application layouts found within Chronograf
+        responses:
+          200:
+            description: An array of mappings
+            schema:
+              $ref: '#/definitions/Mappings'
+          default:
+            description: Unexpected internal service error
+            schema:
+              $ref: '#/definitions/Error'
+
+    /layouts:
         get:
-            summary: Pre-configured dashboards
+            summary: Pre-configured layouts
+            parameters:
+                - name: measurements
+                  in: query
+                  description: Returns layouts with this measurement
+                  required: false
+                  type: array
+                  items:
+                      type: string
+                  collectionFormat: csv
+                - name: apps
+                  in: query
+                  description: Returns layouts with this app
+                  required: false
+                  type: array
+                  items:
+                      type: string
+                  collectionFormat: csv
             description: |
-                Dashboards are a collection of `Cells` that visualize time-series data.
+                Layouts are a collection of `Cells` that visualize time-series data.
             responses:
                 200:
-                    description: An array of dashboards 
+                    description: An array of layouts
                     schema:
-                        $ref: '#/definitions/Dashboards'
+                        $ref: '#/definitions/Layouts'
                 default:
                     description: Unexpected internal service error
                     schema:
                         $ref: '#/definitions/Error'
         post:
-            summary: Create new Dashboard
+            summary: Create new layout
             parameters:
-                - name: dashboard
+                - name: layout
                   in: body
-                  description: Defines the dashboard and queries of the cells within the dashboard.
+                  description: Defines the layout and queries of the cells within the layout.
                   schema:
-                      $ref: '#/definitions/Dashboard'
+                      $ref: '#/definitions/Layout'
             responses:
                 201:
-                    description: Successfully created new dashboard
+                    description: Successfully created new layout
                     headers:
                         Location:
                             type: string
                             format: url
-                            description: Location of the newly created dashboard
+                            description: Location of the newly created layout
                     schema:
-                        $ref: '#/definitions/Dashboard'
+                        $ref: '#/definitions/Layout'
                 default:
                     description: A processing or an unexpected error.
                     schema:
                         $ref: '#/definitions/Error'
-    /dashboards/{id}:
+    /layouts/{id}:
         get:
             parameters:
                 - name: id
                   in: path
                   type: string
-                  description: ID of the dashboard
+                  description: ID of the layout
                   required: true
-            summary: Specific pre-configured dashboard containing cells and queries.
+            summary: Specific pre-configured layout containing cells and queries.
             description: |
-                dashboards will hold information about how to layout the page of graphs.
+                layouts will hold information about how to layout the page of graphs.
             responses:
                 200:
-                    description: Returns the specified dashboard containing `cells`.
+                    description: Returns the specified layout containing `cells`.
                     schema:
-                        $ref: '#/definitions/Dashboard'
+                        $ref: '#/definitions/Layout'
                 404:
-                    description: Unknown dashboard id
+                    description: Unknown layout id
                     schema:
                         $ref: '#/definitions/Error'
                 default:
@@ -947,14 +938,14 @@ paths:
                 - name: id
                   in: path
                   type: string
-                  description: ID of the dashboard
+                  description: ID of the layout
                   required: true
-            summary: This specific dashboard will be removed from the data store
+            summary: This specific layout will be removed from the data store
             responses:
                 204:
-                    description: An array of dashboards
+                    description: Layout has been removed.
                 404:
-                    description: Unknown dashboard id
+                    description: Unknown layout id
                     schema:
                         $ref: '#/definitions/Error'
                 default:
@@ -962,40 +953,56 @@ paths:
                     schema:
                         $ref: '#/definitions/Error'
         put:
-            summary: Replace dashboard configuration.
+            summary: Replace layout configuration.
             parameters:
                 - name: id
                   in: path
                   type: string
-                  description: ID of a dashboard
+                  description: ID of a layout
                   required: true
                 - name: config
                   in: body
-                  description: dashboard configuration update parameters
+                  description: layout  configuration update parameters
                   schema:
-                      $ref: '#/definitions/Dashboard'
+                      $ref: '#/definitions/Layout'
                   required: true
             responses:
-                204:
-                    description: Dashboard's configuration was changed
+                200:
+                    description: Layout has been replaced and the new layout is returned.
+                    schema:
+                        $ref: '#/definitions/Layout'
                 404:
-                    description: Happens when trying to access a non-existent dashboard.
+                    description: Happens when trying to access a non-existent layout.
                     schema:
                         $ref: '#/definitions/Error'
                 default:
                     description: A processing or an unexpected error.
                     schema:
                         $ref: '#/definitions/Error'
+    /token:
+        get:
+            summary: Authentication token
+            description: |
+                Generates a JWT authentication token
+            responses:
+                200:
+                    description: A JWT authentication token
+                    schema:
+                        $ref: '#/definitions/Token'
+                default:
+                    description: Unexpected internal service error
+                    schema:
+                        $ref: '#/definitions/Error'
 definitions:
     Kapacitors:
         type: object
         required:
-            - kapacitors 
+            - kapacitors
         properties:
             kapacitors:
                 type: array
                 items:
-                    $ref: '#/definitions/Kapacitor'   
+                    $ref: '#/definitions/Kapacitor'
     Kapacitor:
         type: object
         required:
@@ -1019,7 +1026,7 @@ definitions:
                 type: string
                 format: url
                 description: URL for the kapacitor backend (e.g. http://localhost:9092)
-            links: 
+            links:
                 type: object
                 properties:
                     self:
@@ -1044,7 +1051,7 @@ definitions:
             sources:
                 type: array
                 items:
-                    $ref: '#/definitions/Source'   
+                    $ref: '#/definitions/Source'
     Source:
         type: object
         required:
@@ -1077,7 +1084,7 @@ definitions:
             default:
                 type: boolean
                 description: Indicates whether this source is the default source
-            links: 
+            links:
                 type: object
                 properties:
                     self:
@@ -1179,6 +1186,9 @@ definitions:
                 $ref: "#/definitions/Users"
             link:
                 $ref: "#/definitions/Link"
+    Token:
+        type: object
+        description: a stringified JWT token.
     Users:
         type: object
         properties:
@@ -1213,7 +1223,7 @@ definitions:
                     $ref: "#/definitions/Permission"
     Permission:
         type: string
-        description: Specific access 
+        description: Specific access
         enum:
             - ViewAdmin
             - ViewChronograf
@@ -1231,18 +1241,31 @@ definitions:
         type: array
         items:
             $ref: "#/definitions/Permission"
-    Dashboards:
+    Layouts:
+        required:
+            - layouts
         type: object
         properties:
-            dashboards:
+            layouts:
                 type: array
                 items:
-                    $ref: "#/definitions/Dashboard"
-    Dashboard:
+                    $ref: "#/definitions/Layout"
+    Layout:
         type: object
         required:
             - cells
+            - app
+            - measurement
         properties:
+            id:
+                type: string
+                description: ID is an opaque string that uniquely identifies this layout.
+            app:
+                type: string
+                description: App is the user facing name of this Layout
+            measurement:
+                type: string
+                description: Measurement is the descriptive name of the time series data.
             cells:
                 type: array
                 description: Cells are the individual visualization elements.
@@ -1250,30 +1273,58 @@ definitions:
                     $ref: "#/definitions/Cell"
             link:
                 $ref: "#/definitions/Link"
+    Mappings:
+      type: object
+      required:
+        - mappings
+      properties:
+        mappings:
+          type: array
+          items:
+            $ref: "#/definitions/Mapping"
+
+    Mapping:
+      type: object
+      required:
+        - measurement
+        - name
+      properties:
+        measurement:
+          description: The measurement where data for this mapping is found
+          type: string
+        name:
+          description: The application name which will be assigned to the corresponding measurement
+          type: string
+
     Cell:
         type: object
+        required:
+            - x
+            - 'y'
+            - w
+            - h
         properties:
             x:
-                description: X-coordinate of Cell in the Dashboard
+                description: X-coordinate of Cell in the Layout
                 type: integer
                 format: int32
             'y':
-                description: Y-coordinate of Cell in the Dashboard
+                description: Y-coordinate of Cell in the Layout
                 type: integer
                 format: int32
             w:
-                description: Width of Cell in the Dashboard
+                description: Width of Cell in the Layout
                 type: integer
                 format: int32
             h:
-                description: Height of Cell in the Dashboard
+                description: Height of Cell in the Layout
                 type: integer
                 format: int32
             queries:
                 description: Time-series data queries for Cell.
                 type: array
                 items:
-                    type: string
+                    $ref: "#/definitions/Proxy"
     Routes:
         type: object
         properties:
@@ -1281,16 +1332,16 @@ definitions:
                 description: Location of the users endpoint
                 type: string
                 format: url
-            dashboards:
-                description: Location of the dashboards endpoint
+            layouts:
+                description: Location of the layouts endpoint
                 type: string
                 format: url
             sources:
                 description: Location of the sources endpoint
                 type: string
                 format: url
-            apps:
-                description: Location of the apps endpoint
+            mappings:
+                description: Location of the application mappings endpoint
                 type: string
                 format: url
     Services:
