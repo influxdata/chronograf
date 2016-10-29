@@ -27,11 +27,12 @@ func (e Error) Error() string {
 // provides methods to trigger log messages at various alert levels and a
 // WithField method to set keys for a structured log message.
 type Logger interface {
+	Debug(...interface{})
 	Info(...interface{})
 	Warn(...interface{})
-	Debug(...interface{})
-	Panic(...interface{})
 	Error(...interface{})
+	Fatal(...interface{})
+	Panic(...interface{})
 
 	WithField(string, interface{}) Logger
 }
@@ -174,12 +175,14 @@ type Cell struct {
 	Y       int32   `json:"y"`
 	W       int32   `json:"w"`
 	H       int32   `json:"h"`
+	I       string  `json:"i"`
+	Name    string  `json:"name"`
 	Queries []Query `json:"queries"`
 }
 
 // Layout is a collection of Cells for visualization
 type Layout struct {
-	ID          string `json:"id,string"`
+	ID          string `json:"id"`
 	Application string `json:"app"`
 	Measurement string `json:"measurement"`
 	Cells       []Cell `json:"cells"`
