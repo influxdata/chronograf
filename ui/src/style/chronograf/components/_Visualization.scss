@@ -71,6 +71,8 @@ $max-number-of-graphs: 66;
 }
 
 .graph-panel {
+  z-index: 10;
+  position: relative;
   background-color: $graph-panel--bg;
   border: 2px solid $graph-panel--bg;
   border-radius: 5px;
@@ -90,6 +92,7 @@ $max-number-of-graphs: 66;
     cursor: pointer;
     background-color: $g4-onyx;
     border-color: $g5-pepper;
+    z-index: 20;
   }
 
   &.active {
