@@ -252,13 +252,13 @@ $max-number-of-graphs: 66;
 }
 .graph-vertical-marker {
   top: 0;
+  height: 100%;
   bottom: 0;
   width: 2px;
-  background-color: $g8-storm;
+  background-color: fade-out($g20-white, 0.68);
   position: absolute;
   pointer-events: none;
   display: none;
-  transform: translateX(9px);
 }
 .container--dygraph-legend {
   background-color: $g1-raven;

@@ -100,7 +100,8 @@ export default React.createClass({
     this.dygraph = new Dygraph(graphContainerNode, timeSeries, options);
 
     function setMarker(points) {
-      markerNode.style.left = `${points[0].canvasx}px`;
+      const markerOffset = points[0].canvasx + 15; // Not sure why 15 works here but it does
+      markerNode.style.left = `${markerOffset}px`;
       markerNode.style.display = 'block';
     }
 
