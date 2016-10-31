@@ -151,6 +151,8 @@
 .graph-panel__graph-container.hosts-graph {
   margin-bottom: 15px;
   padding: 9.5px 16px;
+  background-color: $g3-castle;
+  border-radius: 0 0 4px 4px;
 }
 .hosts-graph-heading {
   display: block;
