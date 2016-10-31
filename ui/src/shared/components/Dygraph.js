@@ -53,6 +53,7 @@ export default React.createClass({
     const graphContainerNode = refs.graphContainer;
     const legendContainerNode = refs.legendContainer;
     const markerNode = refs.graphVerticalMarker;
+    const mysteriousOffset = 15;
 
     const defaultOptions = {
       labelsSeparateLines: false,
@@ -74,18 +75,17 @@ export default React.createClass({
       },
       highlightCallback(e, x, points) {
         const graphRect = graphContainerNode.getBoundingClientRect();
-        const legendHeight = legendContainerNode.offsetHeight;
-        if (graphRect.bottom + legendHeight > document.documentElement.clientHeight) {
-          // The legend would be at least partially beyond the bottom of the viewport,
-          // so try to place it at the top of the graph, but don't let it go above the top of the viewport.
-          const newTop = Math.max(0, selfNode.getBoundingClientRect().top - legendHeight);
-          legendContainerNode.style.top = `${newTop}px`;
-        } else {
-          legendContainerNode.style.top = `${graphRect.bottom}px`;
-        }
+        const labelYWidth = 50;
+        const trueXPos = e.pageX - (document.documentElement.clientWidth - graphRect.width) + labelYWidth;
 
+        // console.log('pageX: '+e.pageX);
+        // console.log('graphX: '+trueXPos);
+
+        const verticalPadding = 32;
+        const verticalOffset = legendContainerNode.height - verticalPadding;
+        legendContainerNode.style.top = `${verticalOffset}px`;
         const legendWidth = legendContainerNode.offsetWidth;
-        const leftOffset = Math.min(e.pageX, graphRect.right - legendWidth);
+        const leftOffset = Math.min(trueXPos, (graphRect.width - legendWidth + mysteriousOffset));
         legendContainerNode.style.left = `${leftOffset}px`;
 
         setMarker(points);
@@ -100,7 +100,7 @@ export default React.createClass({
     this.dygraph = new Dygraph(graphContainerNode, timeSeries, options);
 
     function setMarker(points) {
-      const markerOffset = points[0].canvasx + 15; // Not sure why 15 works here but it does
+      const markerOffset = points[0].canvasx + mysteriousOffset; // Not sure why 15 works here but it does
       markerNode.style.left = `${markerOffset}px`;
       markerNode.style.display = 'block';
     }
