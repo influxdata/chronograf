@@ -262,6 +262,12 @@ $max-number-of-graphs: 66;
   position: absolute;
   pointer-events: none;
   display: none;
+  background: fade-out($g20-white, 0.68);
+  background: -moz-linear-gradient(top,  transparent 0%, fade-out($g20-white, 0.68) 5%, fade-out($g20-white, 0.68) 88%, transparent 100%);
+  background: -webkit-linear-gradient(top,  transparent 0%,fade-out($g20-white, 0.68) 5%,fade-out($g20-white, 0.68) 88%,transparent 100%);
+  background: linear-gradient(to bottom,  transparent 0%,fade-out($g20-white, 0.68) 5%,fade-out($g20-white, 0.68) 88%,transparent 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='transparent',GradientType=0 );
+
 }
 .container--dygraph-legend {
   background-color: $g1-raven;
