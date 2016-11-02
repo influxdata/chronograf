@@ -49,7 +49,6 @@ export default React.createClass({
     const {yRange} = this.props;
 
     const refs = this.refs;
-    const selfNode = refs.self;
     const graphContainerNode = refs.graphContainer;
     const legendContainerNode = refs.legendContainer;
     const markerNode = refs.graphVerticalMarker;
@@ -77,10 +76,6 @@ export default React.createClass({
         const graphRect = graphContainerNode.getBoundingClientRect();
         const labelYWidth = 50;
         const trueXPos = Math.abs(e.pageX - (document.documentElement.clientWidth - graphRect.width));
-
-        console.log('pageX: '+e.pageX);
-        console.log('graphX: '+trueXPos);
-
         const verticalPadding = 32;
         const verticalOffset = legendContainerNode.height - verticalPadding;
         legendContainerNode.style.top = `${verticalOffset}px`;

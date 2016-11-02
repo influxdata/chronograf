@@ -100,7 +100,6 @@ const DataExplorer = React.createClass({
       this.setState({scrollPos: scrollPos + 1 > Object.keys(this.props.panels).length ? scrollPos : scrollPos + 1});
       return;
     }
-
     // scroll pos cannot be 0 or less
     this.setState({scrollPos: scrollPos - 1 < 1 ? scrollPos : scrollPos - 1});
   },

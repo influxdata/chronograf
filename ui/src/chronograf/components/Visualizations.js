@@ -19,10 +19,6 @@ const Visualizations = React.createClass({
     scrollHandler: func.isRequired,
   },
 
-  handleClick() {
-    console.log('tee hee that tickles');
-  },
-
   render() {
     const {panels, queryConfigs, timeRange, width, activePanelID} = this.props;
 
@@ -36,7 +32,7 @@ const Visualizations = React.createClass({
     const activePanelIndex = panelIDs.indexOf(activePanelID);
 
     return (
-      <div className="panels" data-scroll-pos={this.props.scrollPos} data-graph-in-focus={activePanelIndex + 1} style={{width: width}} onWheel={this.props.scrollHandler}>
+      <div className="panels" data-scroll-pos={this.props.scrollPos} data-graph-in-focus={activePanelIndex + 1} style={{width}} onWheel={this.props.scrollHandler}>
         <div className="panels-arrows">
           <div className="panels-arrow"></div>
           <div className="panels-arrow"></div>
