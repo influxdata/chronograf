@@ -76,16 +76,16 @@ export default React.createClass({
       highlightCallback(e, x, points) {
         const graphRect = graphContainerNode.getBoundingClientRect();
         const labelYWidth = 50;
-        const trueXPos = e.pageX - (document.documentElement.clientWidth - graphRect.width) + labelYWidth;
+        const trueXPos = Math.abs(e.pageX - (document.documentElement.clientWidth - graphRect.width));
 
-        // console.log('pageX: '+e.pageX);
-        // console.log('graphX: '+trueXPos);
+        console.log('pageX: '+e.pageX);
+        console.log('graphX: '+trueXPos);
 
         const verticalPadding = 32;
         const verticalOffset = legendContainerNode.height - verticalPadding;
         legendContainerNode.style.top = `${verticalOffset}px`;
         const legendWidth = legendContainerNode.offsetWidth;
-        const leftOffset = Math.min(trueXPos, (graphRect.width - legendWidth + mysteriousOffset));
+        const leftOffset = Math.min((trueXPos + labelYWidth), (graphRect.width - legendWidth + mysteriousOffset));
         legendContainerNode.style.left = `${leftOffset}px`;
 
         setMarker(points);
