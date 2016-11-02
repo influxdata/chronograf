@@ -34,14 +34,6 @@ const Visualization = React.createClass({
     };
   },
 
-  componentDidUpdate() {
-    // if (this.props.isActive) {
-    //   this.panel.scrollIntoView();
-    //   // scrollIntoView scrolls slightly *too* far, so this adds some top offset.
-    //   this.panel.parentNode.scrollTop -= 10;
-    // }
-  },
-
   handleToggleView() {
     this.setState({isGraphInView: !this.state.isGraphInView});
   },
