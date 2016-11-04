@@ -42,9 +42,10 @@ func TestMarshalSource(t *testing.T) {
 	}
 
 	var vv chronograf.Source
-	if buf, err := internal.MarshalSource(v); err != nil {
+	key := "testkey"
+	if buf, err := internal.MarshalSource(v, key); err != nil {
 		t.Fatal(err)
-	} else if err := internal.UnmarshalSource(buf, &vv); err != nil {
+	} else if err := internal.UnmarshalSource(buf, &vv, key); err != nil {
 		t.Fatal(err)
 	} else if !reflect.DeepEqual(v, vv) {
 		t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)
@@ -62,9 +63,10 @@ func TestMarshalServer(t *testing.T) {
 	}
 
 	var vv chronograf.Server
-	if buf, err := internal.MarshalServer(v); err != nil {
+	key := "testkey"
+	if buf, err := internal.MarshalServer(v, key); err != nil {
 		t.Fatal(err)
-	} else if err := internal.UnmarshalServer(buf, &vv); err != nil {
+	} else if err := internal.UnmarshalServer(buf, &vv, key); err != nil {
 		t.Fatal(err)
 	} else if !reflect.DeepEqual(v, vv) {
 		t.Fatalf("source protobuf copy error: got %#v, expected %#v", vv, v)

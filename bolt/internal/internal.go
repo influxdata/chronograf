@@ -6,6 +6,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/nacl"
 )
 
 //go:generate protoc --gogo_out=. internal.proto
@@ -42,22 +43,30 @@ func UnmarshalExploration(data []byte, e *chronograf.Exploration) error {
 }
 
 // MarshalSource encodes a source to binary protobuf format.
-func MarshalSource(s chronograf.Source) ([]byte, error) {
+func MarshalSource(s chronograf.Source, key string) ([]byte, error) {
+	pw, err := nacl.Encrypt(key, s.Password)
+	if err != nil {
+		return nil, err
+	}
 	return proto.Marshal(&Source{
 		ID:       int64(s.ID),
 		Name:     s.Name,
 		Type:     s.Type,
 		Username: s.Username,
-		Password: s.Password,
+		Password: pw,
 		URL:      s.URL,
 		Default:  s.Default,
 	})
 }
 
 // UnmarshalSource decodes a source from binary protobuf data.
-func UnmarshalSource(data []byte, s *chronograf.Source) error {
+func UnmarshalSource(data []byte, s *chronograf.Source, key string) error {
 	var pb Source
 	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+	pw, err := nacl.Decrypt(key, pb.Password)
+	if err != nil {
 		return err
 	}
 
@@ -65,28 +74,36 @@ func UnmarshalSource(data []byte, s *chronograf.Source) error {
 	s.Name = pb.Name
 	s.Type = pb.Type
 	s.Username = pb.Username
-	s.Password = pb.Password
+	s.Password = pw
 	s.URL = pb.URL
 	s.Default = pb.Default
 	return nil
 }
 
 // MarshalServer encodes a server to binary protobuf format.
-func MarshalServer(s chronograf.Server) ([]byte, error) {
+func MarshalServer(s chronograf.Server, key string) ([]byte, error) {
+	pw, err := nacl.Encrypt(key, s.Password)
+	if err != nil {
+		return nil, err
+	}
 	return proto.Marshal(&Server{
 		ID:       int64(s.ID),
 		SrcID:    int64(s.SrcID),
 		Name:     s.Name,
 		Username: s.Username,
-		Password: s.Password,
+		Password: pw,
 		URL:      s.URL,
 	})
 }
 
 // UnmarshalServer decodes a server from binary protobuf data.
-func UnmarshalServer(data []byte, s *chronograf.Server) error {
+func UnmarshalServer(data []byte, s *chronograf.Server, key string) error {
 	var pb Server
 	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+	pw, err := nacl.Decrypt(key, pb.Password)
+	if err != nil {
 		return err
 	}
 
@@ -94,7 +111,7 @@ func UnmarshalServer(data []byte, s *chronograf.Server) error {
 	s.SrcID = int(pb.SrcID)
 	s.Name = pb.Name
 	s.Username = pb.Username
-	s.Password = pb.Password
+	s.Password = pw
 	s.URL = pb.URL
 	return nil
 }

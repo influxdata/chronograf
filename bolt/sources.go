@@ -15,6 +15,7 @@ var SourcesBucket = []byte("Sources")
 
 type SourcesStore struct {
 	client *Client
+	key    string
 }
 
 // All returns all known sources
@@ -23,7 +24,7 @@ func (s *SourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
 	if err := s.client.db.View(func(tx *bolt.Tx) error {
 		if err := tx.Bucket(SourcesBucket).ForEach(func(k, v []byte) error {
 			var src chronograf.Source
-			if err := internal.UnmarshalSource(v, &src); err != nil {
+			if err := internal.UnmarshalSource(v, &src, s.key); err != nil {
 				return err
 			}
 			srcs = append(srcs, src)
@@ -50,7 +51,7 @@ func (s *SourcesStore) Add(ctx context.Context, src chronograf.Source) (chronogr
 		}
 		src.ID = int(seq)
 
-		if v, err := internal.MarshalSource(src); err != nil {
+		if v, err := internal.MarshalSource(src, s.key); err != nil {
 			return err
 		} else if err := b.Put(itob(src.ID), v); err != nil {
 			return err
@@ -83,7 +84,7 @@ func (s *SourcesStore) Get(ctx context.Context, id int) (chronograf.Source, erro
 	if err := s.client.db.View(func(tx *bolt.Tx) error {
 		if v := tx.Bucket(SourcesBucket).Get(itob(id)); v == nil {
 			return chronograf.ErrSourceNotFound
-		} else if err := internal.UnmarshalSource(v, &src); err != nil {
+		} else if err := internal.UnmarshalSource(v, &src, s.key); err != nil {
 			return err
 		}
 		return nil
@@ -103,7 +104,7 @@ func (s *SourcesStore) Update(ctx context.Context, src chronograf.Source) error 
 			return chronograf.ErrSourceNotFound
 		}
 
-		if v, err := internal.MarshalSource(src); err != nil {
+		if v, err := internal.MarshalSource(src, s.key); err != nil {
 			return err
 		} else if err := b.Put(itob(src.ID), v); err != nil {
 			return err

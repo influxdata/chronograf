@@ -15,6 +15,8 @@ const (
 	ErrLayoutNotFound      = Error("layout not found")
 	ErrAlertNotFound       = Error("alert not found")
 	ErrAuthentication      = Error("user not authenticated")
+	ErrEncryption          = Error("encryption failed")
+	ErrDecryption          = Error("decryption failed")
 )
 
 // Error is a domain error encountered while processing chronograf requests

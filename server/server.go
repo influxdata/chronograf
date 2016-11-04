@@ -38,6 +38,7 @@ type Server struct {
 	GithubClientSecret string `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
 	ReportingDisabled  bool   `short:"r" long:"reporting-disabled" description:"Disable reporting of usage stats (os,arch,version,cluster_id) once every 24hr" env:"REPORTING_DISABLED"`
 	LogLevel           string `short:"l" long:"log-level" value-name:"choice" choice:"debug" choice:"info" choice:"warn" choice:"error" choice:"fatal" choice:"panic" default:"info" description:"Set the logging level" env:"LOG_LEVEL"`
+	EncryptionKey      string `short:"k" long:"encryption-key" description:"Encryption key used for storing source and server passwords" env:"ENCRYPTION_KEY"`
 
 	BuildInfo BuildInfo
 
@@ -57,7 +58,7 @@ func (s *Server) useAuth() bool {
 // Serve starts and runs the chronograf server
 func (s *Server) Serve() error {
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
-	service := openService(s.BoltPath, s.CannedPath, logger)
+	service := openService(s.BoltPath, s.CannedPath, s.EncryptionKey, logger)
 	s.handler = NewMux(MuxOpts{
 		Develop:            s.Develop,
 		TokenSecret:        s.TokenSecret,
@@ -103,8 +104,8 @@ func (s *Server) Serve() error {
 	return nil
 }
 
-func openService(boltPath, cannedPath string, logger chronograf.Logger) Service {
-	db := bolt.NewClient()
+func openService(boltPath, cannedPath string, key string, logger chronograf.Logger) Service {
+	db := bolt.NewClient(key)
 	db.Path = boltPath
 	if err := db.Open(); err != nil {
 		logger.
