@@ -22,11 +22,11 @@ type Client struct {
 	AlertsStore      *AlertsStore
 }
 
-func NewClient() *Client {
+func NewClient(key string) *Client {
 	c := &Client{Now: time.Now}
 	c.ExplorationStore = &ExplorationStore{client: c}
-	c.SourcesStore = &SourcesStore{client: c}
-	c.ServersStore = &ServersStore{client: c}
+	c.SourcesStore = &SourcesStore{client: c, key: key}
+	c.ServersStore = &ServersStore{client: c, key: key}
 	c.AlertsStore = &AlertsStore{client: c}
 	c.LayoutStore = &LayoutStore{
 		client: c,

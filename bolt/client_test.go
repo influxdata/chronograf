@@ -26,7 +26,7 @@ func NewTestClient() (*TestClient, error) {
 	f.Close()
 
 	c := &TestClient{
-		Client: bolt.NewClient(),
+		Client: bolt.NewClient("testkey"),
 	}
 	c.Path = f.Name()
 	c.Now = func() time.Time { return TestNow }

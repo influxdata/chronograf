@@ -15,6 +15,7 @@ var ServersBucket = []byte("Servers")
 
 type ServersStore struct {
 	client *Client
+	key    string
 }
 
 // All returns all known servers
@@ -23,7 +24,7 @@ func (s *ServersStore) All(ctx context.Context) ([]chronograf.Server, error) {
 	if err := s.client.db.View(func(tx *bolt.Tx) error {
 		if err := tx.Bucket(ServersBucket).ForEach(func(k, v []byte) error {
 			var src chronograf.Server
-			if err := internal.UnmarshalServer(v, &src); err != nil {
+			if err := internal.UnmarshalServer(v, &src, s.key); err != nil {
 				return err
 			}
 			srcs = append(srcs, src)
@@ -50,7 +51,7 @@ func (s *ServersStore) Add(ctx context.Context, src chronograf.Server) (chronogr
 		}
 		src.ID = int(seq)
 
-		if v, err := internal.MarshalServer(src); err != nil {
+		if v, err := internal.MarshalServer(src, s.key); err != nil {
 			return err
 		} else if err := b.Put(itob(src.ID), v); err != nil {
 			return err
@@ -83,7 +84,7 @@ func (s *ServersStore) Get(ctx context.Context, id int) (chronograf.Server, erro
 	if err := s.client.db.View(func(tx *bolt.Tx) error {
 		if v := tx.Bucket(ServersBucket).Get(itob(id)); v == nil {
 			return chronograf.ErrServerNotFound
-		} else if err := internal.UnmarshalServer(v, &src); err != nil {
+		} else if err := internal.UnmarshalServer(v, &src, s.key); err != nil {
 			return err
 		}
 		return nil
@@ -103,7 +104,7 @@ func (s *ServersStore) Update(ctx context.Context, src chronograf.Server) error 
 			return chronograf.ErrServerNotFound
 		}
 
-		if v, err := internal.MarshalServer(src); err != nil {
+		if v, err := internal.MarshalServer(src, s.key); err != nil {
 			return err
 		} else if err := b.Put(itob(src.ID), v); err != nil {
 			return err
