@@ -21,7 +21,7 @@ const AlertsTable = React.createClass({
     return {
       searchTerm: '',
       filteredAlerts: this.props.alerts,
-        sortDirection: null,
+      sortDirection: null,
       sortKey: null,
     };
   },
