@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
@@ -159,5 +160,42 @@ func UnmarshalLayout(data []byte, l *chronograf.Layout) error {
 		}
 	}
 	l.Cells = cells
+	return nil
+}
+
+// ScopedAlert contains the source and the kapacitor id
+type ScopedAlert struct {
+	chronograf.AlertRule
+	SrcID  int
+	KapaID int
+}
+
+// MarshalAlertRule encodes an alert rule to binary protobuf format.
+func MarshalAlertRule(r *ScopedAlert) ([]byte, error) {
+	j, err := json.Marshal(r.AlertRule)
+	if err != nil {
+		return nil, err
+	}
+	return proto.Marshal(&AlertRule{
+		ID:     r.ID,
+		SrcID:  int64(r.SrcID),
+		KapaID: int64(r.KapaID),
+		JSON:   string(j),
+	})
+}
+
+// UnmarshalAlertRule decodes an alert rule from binary protobuf data.
+func UnmarshalAlertRule(data []byte, r *ScopedAlert) error {
+	var pb AlertRule
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+
+	err := json.Unmarshal([]byte(pb.JSON), &r.AlertRule)
+	if err != nil {
+		return err
+	}
+	r.SrcID = int(pb.SrcID)
+	r.KapaID = int(pb.KapaID)
 	return nil
 }

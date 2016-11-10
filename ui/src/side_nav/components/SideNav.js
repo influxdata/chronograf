@@ -28,20 +28,15 @@ const SideNav = React.createClass({
           <NavHeader link={dataExplorerLink} title={'Chronograf'} />
           <NavListItem link={dataExplorerLink}>Data Explorer</NavListItem>
         </NavBlock>
+        <NavBlock matcher="alerts" icon="alert-triangle" link={`${sourcePrefix}/alerts`}>
+          <NavHeader link={`${sourcePrefix}/alerts`} title="Alerting" />
+          <NavListItem link={`${sourcePrefix}/alerts`}>View</NavListItem>
+          <NavListItem link={`${sourcePrefix}/alert-rules`}>Rules</NavListItem>
+        </NavBlock>
         <NavBlock icon="crown" link={`${sourcePrefix}/manage-sources`}>
           <NavHeader link={`${sourcePrefix}/manage-sources`} title="Sources" />
           <NavListItem link={`${sourcePrefix}/manage-sources`}>InfluxDB</NavListItem>
           <NavListItem link={`${sourcePrefix}/kapacitor-config`}>Kapacitor</NavListItem>
-          <NavListItem link={`${sourcePrefix}/queries`}>Queries</NavListItem>
-          <NavListItem link={`${sourcePrefix}/tasks`}>Tasks</NavListItem>
-          <NavListItem link={`${sourcePrefix}/roles`}>Roles</NavListItem>
-          <NavListItem link={`${sourcePrefix}/accounts`}>Cluster Accounts</NavListItem>
-          <NavListItem link={`${sourcePrefix}/databases/manager/_internal`}>Database Manager</NavListItem>
-          <NavListItem link={`${sourcePrefix}/databases/retentionpolicies/_internal`}>Retention Policies</NavListItem>
-        </NavBlock>
-        <NavBlock icon="cubo-uniform" link={`${sourcePrefix}/kapacitor-tasks`}>
-          <NavHeader link={`${sourcePrefix}/kapacitor-tasks`} title="Alerting" />
-          <NavListItem link={`${sourcePrefix}/kapacitor-tasks`}>Kapacitor Tasks</NavListItem>
         </NavBlock>
       </NavBar>
     );

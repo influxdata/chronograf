@@ -4,16 +4,17 @@ import {Provider} from 'react-redux';
 import {Router, Route, browserHistory} from 'react-router';
 
 import App from 'src/App';
+import AlertsApp from 'src/alerts';
 import CheckDataNodes from 'src/CheckDataNodes';
 import {HostsPage, HostPage} from 'src/hosts';
-import {KapacitorPage, KapacitorTasksPage} from 'src/kapacitor';
+import {KapacitorPage, KapacitorRulePage, KapacitorRulesPage, KapacitorTasksPage} from 'src/kapacitor';
 import QueriesPage from 'src/queries';
 import TasksPage from 'src/tasks';
 import RetentionPoliciesPage from 'src/retention_policies';
 import DataExplorer from 'src/chronograf';
 import DatabaseManager from 'src/database_manager';
 import SignUp from 'src/sign_up';
-import {CreateSource, ManageSources} from 'src/sources';
+import {CreateSource, SourceForm, ManageSources} from 'src/sources';
 import {ClusterAccountsPage, ClusterAccountPage} from 'src/cluster_accounts';
 import {RolesPageContainer, RolePageContainer} from 'src/access_control';
 import NotFound from 'src/shared/components/NotFound';
@@ -100,6 +101,8 @@ const Root = React.createClass({
           <Route path="/sources/:sourceID" component={App}>
             <Route component={CheckDataNodes}>
               <Route path="manage-sources" component={ManageSources} />
+              <Route path="manage-sources/new" component={SourceForm} />
+              <Route path="manage-sources/:id/edit" component={SourceForm} />
               <Route path="queries" component={QueriesPage} />
               <Route path="accounts" component={ClusterAccountsPage} />
               <Route path="accounts/:accountID" component={ClusterAccountPage} />
@@ -113,6 +116,9 @@ const Root = React.createClass({
               <Route path="hosts/:hostID" component={HostPage} />
               <Route path="kapacitor-config" component={KapacitorPage} />
               <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
+              <Route path="alerts" component={AlertsApp} />
+              <Route path="alert-rules" component={KapacitorRulesPage} />
+              <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
             </Route>
             <Route path="tasks" component={TasksPage} />
             <Route path="*" component={NotFound} />

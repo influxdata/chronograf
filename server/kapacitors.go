@@ -7,7 +7,10 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
+	kapa "github.com/influxdata/chronograf/kapacitor"
+	"github.com/influxdata/chronograf/uuid"
 )
 
 type postKapacitorRequest struct {
@@ -36,6 +39,7 @@ func (p *postKapacitorRequest) Valid() error {
 type kapaLinks struct {
 	Proxy string `json:"proxy"` // URL location of proxy endpoint for this source
 	Self  string `json:"self"`  // Self link mapping to this resource
+	Rules string `json:"rules"` // Riles link for defining roles alerts for kapacitor
 }
 
 type kapacitor struct {
@@ -67,7 +71,7 @@ func (h *Service) NewKapacitor(w http.ResponseWriter, r *http.Request) {
 		invalidJSON(w)
 		return
 	}
-	if req.Valid() != nil {
+	if err := req.Valid(); err != nil {
 		invalidData(w, err)
 		return
 	}
@@ -102,6 +106,7 @@ func newKapacitor(srv chronograf.Server) kapacitor {
 		Links: kapaLinks{
 			Self:  fmt.Sprintf("%s/%d/kapacitors/%d", httpAPISrcs, srv.SrcID, srv.ID),
 			Proxy: fmt.Sprintf("%s/%d/kapacitors/%d/proxy", httpAPISrcs, srv.SrcID, srv.ID),
+			Rules: fmt.Sprintf("%s/%d/kapacitors/%d/rules", httpAPISrcs, srv.SrcID, srv.ID),
 		},
 	}
 }
@@ -257,4 +262,314 @@ func (h *Service) UpdateKapacitor(w http.ResponseWriter, r *http.Request) {
 
 	res := newKapacitor(srv)
 	encodeJSON(w, http.StatusOK, res, h.Logger)
+}
+
+// KapacitorRulesPost proxies POST to kapacitor
+func (h *Service) KapacitorRulesPost(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("kid", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	srcID, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	srv, err := h.ServersStore.Get(ctx, id)
+	if err != nil || srv.SrcID != srcID {
+		notFound(w, id)
+		return
+	}
+
+	c := kapa.Client{
+		URL:      srv.URL,
+		Username: srv.Username,
+		Password: srv.Password,
+		Ticker:   &kapa.Alert{},
+		ID:       &uuid.V4{},
+	}
+
+	var req chronograf.AlertRule
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		invalidJSON(w)
+		return
+	}
+	// TODO: validate this data
+	/*
+		if err := req.Valid(); err != nil {
+			invalidData(w, err)
+			return
+		}
+	*/
+
+	task, err := c.Create(ctx, req)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	req.ID = task.ID
+	rule, err := h.AlertRulesStore.Add(ctx, srcID, id, req)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	res := alertResponse{
+		AlertRule: rule,
+		Links: alertLinks{
+			Self:      fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/rules/%s", srv.SrcID, srv.ID, req.ID),
+			Kapacitor: fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/proxy?path=%s", srv.SrcID, srv.ID, url.QueryEscape(task.Href)),
+		},
+		TICKScript: string(task.TICKScript),
+	}
+
+	w.Header().Add("Location", res.Links.Self)
+	encodeJSON(w, http.StatusCreated, res, h.Logger)
+}
+
+type alertLinks struct {
+	Self      string `json:"self"`
+	Kapacitor string `json:"kapacitor"`
+}
+
+type alertResponse struct {
+	chronograf.AlertRule
+	TICKScript string     `json:"tickscript"`
+	Links      alertLinks `json:"links"`
+}
+
+// KapacitorRulesPut proxies PATCH to kapacitor
+func (h *Service) KapacitorRulesPut(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("kid", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	srcID, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	srv, err := h.ServersStore.Get(ctx, id)
+	if err != nil || srv.SrcID != srcID {
+		notFound(w, id)
+		return
+	}
+
+	tid := httprouter.GetParamFromContext(ctx, "tid")
+	c := kapa.Client{
+		URL:      srv.URL,
+		Username: srv.Username,
+		Password: srv.Password,
+		Ticker:   &kapa.Alert{},
+	}
+	var req chronograf.AlertRule
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		invalidJSON(w)
+		return
+	}
+	// TODO: validate this data
+	/*
+		if err := req.Valid(); err != nil {
+			invalidData(w, err)
+			return
+		}
+	*/
+
+	// Check if the rule exists and is scoped correctly
+	if _, err := h.AlertRulesStore.Get(ctx, srcID, id, tid); err != nil {
+		if err == chronograf.ErrAlertNotFound {
+			notFound(w, id)
+			return
+		}
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	req.ID = tid
+	task, err := c.Update(ctx, c.Href(tid), req)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.AlertRulesStore.Update(ctx, srcID, id, req); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	res := alertResponse{
+		AlertRule: req,
+		Links: alertLinks{
+			Self:      fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/rules/%s", srv.SrcID, srv.ID, req.ID),
+			Kapacitor: fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/proxy?path=%s", srv.SrcID, srv.ID, url.QueryEscape(task.Href)),
+		},
+		TICKScript: string(task.TICKScript),
+	}
+	encodeJSON(w, http.StatusOK, res, h.Logger)
+}
+
+// KapacitorRulesGet retrieves all rules
+func (h *Service) KapacitorRulesGet(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("kid", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	srcID, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	srv, err := h.ServersStore.Get(ctx, id)
+	if err != nil || srv.SrcID != srcID {
+		notFound(w, id)
+		return
+	}
+
+	rules, err := h.AlertRulesStore.All(ctx, srcID, id)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ticker := &kapa.Alert{}
+	c := kapa.Client{}
+	res := allAlertsResponse{
+		Rules: []alertResponse{},
+	}
+	for _, rule := range rules {
+		tickscript, err := ticker.Generate(rule)
+		if err != nil {
+			Error(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		ar := alertResponse{
+			AlertRule: rule,
+			Links: alertLinks{
+				Self:      fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/rules/%s", srv.SrcID, srv.ID, rule.ID),
+				Kapacitor: fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/proxy?path=%s", srv.SrcID, srv.ID, url.QueryEscape(c.Href(rule.ID))),
+			},
+			TICKScript: string(tickscript),
+		}
+		res.Rules = append(res.Rules, ar)
+	}
+	encodeJSON(w, http.StatusOK, res, h.Logger)
+}
+
+type allAlertsResponse struct {
+	Rules []alertResponse `json:"rules"`
+}
+
+// KapacitorRulesGet retrieves specific task
+func (h *Service) KapacitorRulesID(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("kid", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	srcID, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	srv, err := h.ServersStore.Get(ctx, id)
+	if err != nil || srv.SrcID != srcID {
+		notFound(w, id)
+		return
+	}
+	tid := httprouter.GetParamFromContext(ctx, "tid")
+	// Check if the rule exists within scope
+	rule, err := h.AlertRulesStore.Get(ctx, srcID, id, tid)
+	if err != nil {
+		if err == chronograf.ErrAlertNotFound {
+			notFound(w, id)
+			return
+		}
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ticker := &kapa.Alert{}
+	c := kapa.Client{}
+	tickscript, err := ticker.Generate(rule)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	res := alertResponse{
+		AlertRule: rule,
+		Links: alertLinks{
+			Self:      fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/rules/%s", srv.SrcID, srv.ID, rule.ID),
+			Kapacitor: fmt.Sprintf("/chronograf/v1/sources/%d/kapacitors/%d/proxy?path=%s", srv.SrcID, srv.ID, url.QueryEscape(c.Href(rule.ID))),
+		},
+		TICKScript: string(tickscript),
+	}
+	encodeJSON(w, http.StatusOK, res, h.Logger)
+}
+
+// KapacitosRulesDelete proxies DELETE to kapacitor
+func (h *Service) KapacitorRulesDelete(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("kid", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	srcID, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	srv, err := h.ServersStore.Get(ctx, id)
+	if err != nil || srv.SrcID != srcID {
+		notFound(w, id)
+		return
+	}
+
+	tid := httprouter.GetParamFromContext(ctx, "tid")
+
+	// Check if the rule is linked to this server and kapacitor
+	if _, err := h.AlertRulesStore.Get(ctx, srcID, id, tid); err != nil {
+		if err == chronograf.ErrAlertNotFound {
+			notFound(w, id)
+			return
+		}
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c := kapa.Client{
+		URL:      srv.URL,
+		Username: srv.Username,
+		Password: srv.Password,
+	}
+	if err := c.Delete(ctx, c.Href(tid)); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.AlertRulesStore.Delete(ctx, srcID, id, chronograf.AlertRule{ID: tid}); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

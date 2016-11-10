@@ -122,6 +122,7 @@ export default React.createClass({
       labels: fields,
       file: timeSeries,
       valueRange: getRange(timeSeries, yRange),
+      underlayCallback: this.props.options.underlayCallback,
     });
 
     dygraph.resize();

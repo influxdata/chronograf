@@ -17,7 +17,7 @@ export const CreateSource = React.createClass({
   handleNewSource(e) {
     e.preventDefault();
     const source = {
-      url: this.sourceURL.value,
+      url: this.sourceURL.value.trim(),
       name: this.sourceName.value,
       username: this.sourceUser.value,
       password: this.sourcePassword.value,
@@ -41,7 +41,7 @@ export const CreateSource = React.createClass({
   render() {
     return (
       <div id="select-source-page">
-        <div className="container">
+        <div className="container-fluid">
           <div className="row">
             <div className="col-md-8 col-md-offset-2">
               <div className="panel panel-summer">
