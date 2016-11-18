@@ -12,4 +12,5 @@ type Service struct {
 	UsersStore       chronograf.UsersStore
 	TimeSeries       chronograf.TimeSeries
 	Logger           chronograf.Logger
+	UseAuth          bool
 }
