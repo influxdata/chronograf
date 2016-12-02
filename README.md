@@ -42,6 +42,8 @@ Currently, Chronograf offers dashboard templates for the following Telegraf inpu
 * Elastic
 * Varnish
 
+> NOTE: You need to be running the `cpu` and `system` plugins for the canned dashboards from a given telegraf instance to appear in the Host List.
+
 ### Data Explorer
 
 Chronograf's graphing tool that allows you to dig in and create personalized visualizations of your data.
