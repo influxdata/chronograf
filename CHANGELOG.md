@@ -1,6 +1,6 @@
 ## v1.1.0 [unreleased]
 
-## v1.1.0 [2016-12-06]
+## v1.1.0-beta1 [2016-12-06]
 - Layouts
   1. [#575](https://github.com/influxdata/chronograf/issues/556): Varnish Layout
   2. [#535](https://github.com/influxdata/chronograf/issues/535): Elasticsearch Layout
