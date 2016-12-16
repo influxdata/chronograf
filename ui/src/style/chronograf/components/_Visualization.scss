@@ -91,7 +91,7 @@ $dygraphs-legend-offset: 32px;
   background-size: 100% 100%;
   background-position: center center;
   background-repeat: no-repeat;
-  animation: graph-panel-spinner 1s infinite linear;
+  animation: basic-spinner 1s infinite linear;
 }
 .graph-spinner--small {
   width: 58px;
@@ -100,22 +100,13 @@ $dygraphs-legend-offset: 32px;
   background-size: 100% 100%;
   background-position: center center;
   background-repeat: no-repeat;
-  animation: graph-panel-spinner 1s infinite linear;
+  animation: basic-spinner 1s infinite linear;
   position: absolute;
   left: 0;
   bottom: 0;
   right: 0;
   top: 0;
   margin: auto;
-}
-
-@keyframes graph-panel-spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 .multi-table__tabs {
