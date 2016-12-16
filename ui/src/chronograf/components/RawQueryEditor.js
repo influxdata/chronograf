@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import classNames from 'classnames';
 
 const ENTER = 13;
 const ESCAPE = 27;
@@ -14,6 +15,10 @@ const RawQueryEditor = React.createClass({
   getInitialState() {
     return {
       value: this.props.query.rawText,
+      queryOk: false,
+      queryProcessing: true,
+      queryError: false,
+      queryValid: false,
     };
   },
 
@@ -42,6 +47,23 @@ const RawQueryEditor = React.createClass({
 
   handleUpdate() {
     this.props.onUpdate(this.state.value);
+    // Update error status here
+  },
+
+  renderQueryErrorStatus() {
+    const {queryOk, queryProcessing, queryError, queryValid} = this.state;
+
+    return (
+      <div className={classNames("raw-text--status", {"status-waiting": queryOk}, {"status-processing": queryProcessing}, {"status-error": queryError}, {"status-valid": queryValid})}>
+        <div className="raw-text--waiting">Waiting on Query</div>
+        <div className="raw-text--processing">
+          <span className="icon cubo-uniform"></span>
+          Processing...
+        </div>
+        <div className="raw-text--error">Query has errors</div>
+        <div className="raw-text--valid">Query OK</div>
+      </div>
+    );
   },
 
   render() {
@@ -58,6 +80,7 @@ const RawQueryEditor = React.createClass({
           value={value}
           placeholder="Blank query"
         />
+        {this.renderQueryErrorStatus()}
       </div>
     );
   },
