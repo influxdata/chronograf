@@ -59,3 +59,17 @@ $scrollbar-width: 16px;
 		background-color: $trackColor;
 	}
 }
+
+
+/* Basic Spinner */
+@keyframes basic-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Code Font */
+$code-font: 'RobotoMono', monospace !important;
