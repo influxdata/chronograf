@@ -90,7 +90,7 @@ $raw-text--status-height: 30px;
     width: 100%;
     height: 100%;
     padding: 0 9px;
-    line-height: ($raw-text--status-height - 4px);
+    line-height: ($raw-text--status-height - 2px);
     opacity: 0;
     transition:
       opacity 0.25s ease;
@@ -109,11 +109,6 @@ $raw-text--status-height: 30px;
 .raw-text--waiting {
   color: $g8-storm;
 }
-.raw-text--status.status-waiting {
-  .raw-text--waiting {
-    opacity: 1;
-  }
-}
 /* Processing status */
 .raw-text--processing {
   > .icon {
@@ -125,26 +120,41 @@ $raw-text--status-height: 30px;
   }
   color: $c-pool;
 }
-.raw-text--status.status-processing {
-  .raw-text--processing {
-    opacity: 1;
-  }
-}
 /* Error Status */
 .raw-text--error {
   color: $c-dreamsicle;
-}
-.raw-text--status.status-error {
-  .raw-text--error {
-    opacity: 1;
-  }
 }
 /* Valid Status */
 .raw-text--valid {
   color: $c-rainforest;
 }
-.raw-text--status.status-valid {
+
+
+
+/* Display Statuses */
+.raw-text.status-waiting .raw-text--waiting,
+.raw-text.status-processing .raw-text--processing {
+  opacity: 1;
+}
+.raw-text.status-error {
+  .raw-text--error {
+    opacity: 1;
+  }
+  .raw-text--field:focus {
+    border-color: $c-dreamsicle;
+  }
+  .raw-text--field:focus + .raw-text--status {
+    border-color: $g3-castle $c-dreamsicle $c-dreamsicle $c-dreamsicle;
+  }
+}
+.raw-text.status-valid {
   .raw-text--valid {
     opacity: 1;
+  }
+  .raw-text--field:focus {
+    border-color: $c-rainforest;
+  }
+  .raw-text--field:focus + .raw-text--status {
+    border-color: $g3-castle $c-rainforest $c-rainforest $c-rainforest;
   }
 }

@@ -1,5 +1,4 @@
 import React, {PropTypes} from 'react';
-import classNames from 'classnames';
 
 const ENTER = 13;
 const ESCAPE = 27;
@@ -15,10 +14,7 @@ const RawQueryEditor = React.createClass({
   getInitialState() {
     return {
       value: this.props.query.rawText,
-      queryOk: false,
-      queryProcessing: true,
-      queryError: false,
-      queryValid: false,
+      queryStatus: 'waiting',
     };
   },
 
@@ -48,13 +44,13 @@ const RawQueryEditor = React.createClass({
   handleUpdate() {
     this.props.onUpdate(this.state.value);
     // Update error status here
+    // 4 Different statuses:
+    // waiting, processing, error, valid
   },
 
   renderQueryErrorStatus() {
-    const {queryOk, queryProcessing, queryError, queryValid} = this.state;
-
     return (
-      <div className={classNames("raw-text--status", {"status-waiting": queryOk}, {"status-processing": queryProcessing}, {"status-error": queryError}, {"status-valid": queryValid})}>
+      <div className="raw-text--status">
         <div className="raw-text--waiting">Waiting on Query</div>
         <div className="raw-text--processing">
           <span className="icon cubo-uniform"></span>
@@ -68,9 +64,10 @@ const RawQueryEditor = React.createClass({
 
   render() {
     const {value} = this.state;
+    const queryStatus = this.state.queryStatus.toString();
 
     return (
-      <div className="raw-text">
+      <div className={`raw-text status-${queryStatus}`}>
         <textarea
           className="raw-text--field"
           onChange={this.handleChange}
