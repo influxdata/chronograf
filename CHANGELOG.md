@@ -8,6 +8,7 @@
 
 ### Bug Fixes
   1. [#714](https://github.com/influxdata/chronograf/issues/714): Relative rules check data in the wrong direction
+  2. [#718](https://github.com/influxdata/chronograf/issues/718): Fix bug that stopped apps from displaying
 
 ### Features
   1. [#691](https://github.com/influxdata/chronograf/issues/691): Add server-side dashboard API
