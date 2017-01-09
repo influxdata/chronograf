@@ -207,7 +207,7 @@ sudo systemctl start chronograf
 
 #### 3. Connect to Chronograf
 Assuming everything is up and running we should be able to connect to and configure Chronograf.
-Point your web browser to `http://localhost:8888` (replace `localhost` with your server's IP if you're not running on `localhost`).
+Point your web browser to `http://localhost:10000` (replace `localhost` with your server's IP if you're not running on `localhost`).
 
 You should see a welcome page:
 
