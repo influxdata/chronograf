@@ -1,0 +1,160 @@
+/*
+  Dropping the metaphorical CSS nuke here,
+  was experiencing some weird typographic jank
+  between builder / raw tabs
+*/
+.raw-text--field,
+.qeditor--query-preview pre,
+.qeditor--query-preview pre code {
+  font-style: normal !important;
+  letter-spacing: 0.02em !important;
+  font-size: 12px !important;
+  font-family: $code-font !important;
+  font-weight: 600 !important;
+  word-wrap: break-word !important;
+  word-break: break-all !important;
+  white-space: pre-wrap !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+$raw-text-color: $c-comet;
+
+.raw-text {
+  border-bottom: 2px solid $g4-onyx;
+}
+.raw-text--field {
+  @include custom-scrollbar($g2-kevlar, $raw-text-color);
+  display: block;
+  width: 100%;
+  height: 100px;
+  background-color: $g2-kevlar;
+  border: 2px solid $g2-kevlar;
+  color: $raw-text-color;
+  padding: (9px - 2px);
+  border-radius: 3px 3px 0 0;
+  line-height: 1.5em;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  resize: none;
+  margin: 0;
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+
+  &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: $g8-storm;
+  }
+  &::-moz-placeholder { /* Firefox 19+ */
+    color: $g8-storm;
+  }
+  &:-ms-input-placeholder { /* IE 10+ */
+    color: $g8-storm;
+  }
+  &:-moz-placeholder { /* Firefox 18- */
+    color: $g8-storm;
+  }
+  &:hover {
+    background-color: $g3-castle;
+    border-color: $g3-castle;
+  }
+  &:focus {
+    outline: none;
+    background-color: $g3-castle;
+    color: $raw-text-color !important;
+    border-color: $c-pool;
+  }
+}
+
+
+$raw-text--status-height: 30px;
+
+.raw-text--status {
+  background-color: $g2-kevlar;
+  position: relative;
+  height: $raw-text--status-height;
+  border: 2px solid $g2-kevlar;
+  border-top: 0;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+
+  > div {
+    white-space: nowrap;
+    overflow: hidden;
+    position: absolute;
+    /* font-family: $code-font; */
+    font-weight: 600;
+    font-size: 12px;
+    width: 100%;
+    height: 100%;
+    padding: 0 9px;
+    line-height: ($raw-text--status-height - 2px);
+    opacity: 0;
+    transition:
+      opacity 0.25s ease;
+  }
+}
+.raw-text--field:hover + .raw-text--status {
+  background-color: $g3-castle;
+  border-color: $g3-castle;
+}
+.raw-text--field:focus + .raw-text--status {
+  background-color: $g3-castle;
+  border-color: $g3-castle $c-pool $c-pool $c-pool;
+}
+
+/* Waiting status */
+.raw-text--waiting {
+  color: $g8-storm;
+}
+/* Processing status */
+.raw-text--processing {
+  > .icon {
+    position: relative;
+    top: -1px;
+    display: inline-block;
+    margin-right: 5px;
+    animation: basic-spinner 1.1s infinite linear;
+  }
+  color: $c-pool;
+}
+/* Error Status */
+.raw-text--error {
+  color: $c-dreamsicle;
+}
+/* Valid Status */
+.raw-text--valid {
+  color: $c-rainforest;
+}
+
+
+
+/* Display Statuses */
+.raw-text.status-waiting .raw-text--waiting,
+.raw-text.status-processing .raw-text--processing {
+  opacity: 1;
+}
+.raw-text.status-error {
+  .raw-text--error {
+    opacity: 1;
+  }
+  .raw-text--field:focus {
+    border-color: $c-dreamsicle;
+  }
+  .raw-text--field:focus + .raw-text--status {
+    border-color: $g3-castle $c-dreamsicle $c-dreamsicle $c-dreamsicle;
+  }
+}
+.raw-text.status-valid {
+  .raw-text--valid {
+    opacity: 1;
+  }
+  .raw-text--field:focus {
+    border-color: $c-rainforest;
+  }
+  .raw-text--field:focus + .raw-text--status {
+    border-color: $g3-castle $c-rainforest $c-rainforest $c-rainforest;
+  }
+}

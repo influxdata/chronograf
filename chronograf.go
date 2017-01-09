@@ -78,14 +78,15 @@ type Response interface {
 
 // Source is connection information to a time-series data store.
 type Source struct {
-	ID       int    `json:"id,omitempty,string"` // ID is the unique ID of the source
-	Name     string `json:"name"`                // Name is the user-defined name for the source
-	Type     string `json:"type,omitempty"`      // Type specifies which kinds of source (enterprise vs oss)
-	Username string `json:"username,omitempty"`  // Username is the username to connect to the source
-	Password string `json:"password,omitempty"`  // Password is in CLEARTEXT
-	URL      string `json:"url"`                 // URL are the connections to the source
-	Default  bool   `json:"default"`             // Default specifies the default source for the application
-	Telegraf string `json:"telegraf"`            // Telegraf is the db telegraf is written to.  By default it is "telegraf"
+	ID                 int    `json:"id,omitempty,string"`          // ID is the unique ID of the source
+	Name               string `json:"name"`                         // Name is the user-defined name for the source
+	Type               string `json:"type,omitempty"`               // Type specifies which kinds of source (enterprise vs oss)
+	Username           string `json:"username,omitempty"`           // Username is the username to connect to the source
+	Password           string `json:"password,omitempty"`           // Password is in CLEARTEXT
+	URL                string `json:"url"`                          // URL are the connections to the source
+	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"` // InsecureSkipVerify as true means any certificate presented by the source is accepted.
+	Default            bool   `json:"default"`                      // Default specifies the default source for the application
+	Telegraf           string `json:"telegraf"`                     // Telegraf is the db telegraf is written to.  By default it is "telegraf"
 }
 
 // SourcesStore stores connection information for a `TimeSeries`
@@ -139,11 +140,12 @@ type Ticker interface {
 
 // TriggerValues specifies the alerting logic for a specific trigger type
 type TriggerValues struct {
-	Change   string `json:"change,omitempty"`   // Change specifies if the change is a percent or absolute
-	Period   string `json:"period,omitempty"`   // Period length of time before deadman is alerted
-	Shift    string `json:"shift,omitempty"`    // Shift is the amount of time to look into the past for the alert to compare to the present
-	Operator string `json:"operator,omitempty"` // Operator for alert comparison
-	Value    string `json:"value,omitempty"`    // Value is the boundary value when alert goes critical
+	Change     string `json:"change,omitempty"`     // Change specifies if the change is a percent or absolute
+	Period     string `json:"period,omitempty"`     // Period length of time before deadman is alerted
+	Shift      string `json:"shift,omitempty"`      // Shift is the amount of time to look into the past for the alert to compare to the present
+	Operator   string `json:"operator,omitempty"`   // Operator for alert comparison
+	Value      string `json:"value,omitempty"`      // Value is the boundary value when alert goes critical
+	RangeValue string `json:"rangeValue,omitempty"` // RangeValue is an optional value for range comparisons
 }
 
 // Field represent influxql fields and functions from the UI
@@ -247,7 +249,7 @@ type DashboardCell struct {
 
 // DashboardsStore is the storage and retrieval of dashboards
 type DashboardsStore interface {
-  // All lists all dashboards from the DashboardStore
+	// All lists all dashboards from the DashboardStore
 	All(context.Context) ([]Dashboard, error)
 	// Create a new Dashboard in the DashboardStore
 	Add(context.Context, Dashboard) (Dashboard, error)

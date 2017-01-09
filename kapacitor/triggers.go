@@ -34,6 +34,12 @@ var ThresholdTrigger = `
     .crit(lambda: "value" %s crit)
 `
 
+var ThresholdRangeTrigger = `
+	var trigger = data
+	|alert()
+		.crit(lambda: "value" %s lower %s "value" %s upper)
+`
+
 // RelativeAbsoluteTrigger compares one window of data versus another (current - past)
 var RelativeAbsoluteTrigger = `
 var past = data
@@ -83,7 +89,11 @@ func Trigger(rule chronograf.AlertRule) (string, error) {
 	case Relative:
 		trigger, err = relativeTrigger(rule)
 	case Threshold:
-		trigger, err = thresholdTrigger(rule)
+		if rule.TriggerValues.RangeValue == "" {
+			trigger, err = thresholdTrigger(rule)
+		} else {
+			trigger, err = thresholdRangeTrigger(rule)
+		}
 	default:
 		trigger, err = "", fmt.Errorf("Unknown trigger type: %s", rule.Trigger)
 	}
@@ -115,4 +125,16 @@ func thresholdTrigger(rule chronograf.AlertRule) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf(ThresholdTrigger, op), nil
+}
+
+func thresholdRangeTrigger(rule chronograf.AlertRule) (string, error) {
+	ops, err := rangeOperators(rule.TriggerValues.Operator)
+	if err != nil {
+		return "", err
+	}
+	var iops []interface{} = make([]interface{}, len(ops))
+	for i, o := range ops {
+		iops[i] = o
+	}
+	return fmt.Sprintf(ThresholdRangeTrigger, iops...), nil
 }
