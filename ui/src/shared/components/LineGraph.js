@@ -5,6 +5,7 @@ import shallowCompare from 'react-addons-shallow-compare';
 import _ from 'lodash';
 
 import timeSeriesToDygraph from 'utils/timeSeriesToDygraph';
+import {dygraphHighlighter} from 'utils/dygraphFormatter';
 import lastValues from 'src/shared/parsing/lastValues';
 
 const {
@@ -33,7 +34,7 @@ export default React.createClass({
     overrideLineColors: array,
     queries: arrayOf(shape({}).isRequired).isRequired,
     showSingleStat: bool,
-    activeQueryIndex: number,
+    activeQueryID: string,
     ruleValues: shape({}),
     isInDataExplorer: bool,
   },
@@ -51,14 +52,16 @@ export default React.createClass({
   },
 
   componentWillMount() {
-    const {data, activeQueryIndex, isInDataExplorer} = this.props;
-    this._timeSeries = timeSeriesToDygraph(data, activeQueryIndex, isInDataExplorer);
+    const {data, activeQueryID} = this.props;
+    this._timeSeries = timeSeriesToDygraph(data);
+    this._timeSeries.dygraphSeries = dygraphHighlighter(this._timeSeries.sortedLabels, activeQueryID);
   },
 
   componentWillUpdate(nextProps) {
-    const {data, activeQueryIndex} = this.props;
-    if (data !== nextProps.data || activeQueryIndex !== nextProps.activeQueryIndex) {
-      this._timeSeries = timeSeriesToDygraph(nextProps.data, nextProps.activeQueryIndex, nextProps.isInDataExplorer);
+    const {data, activeQueryID} = this.props;
+    if (data !== nextProps.data || activeQueryID !== nextProps.activeQueryID) {
+      this._timeSeries = timeSeriesToDygraph(nextProps.data);
+      this._timeSeries.dygraphSeries = dygraphHighlighter(this._timeSeries.sortedLabels, nextProps.activeQueryID);
     }
   },
 

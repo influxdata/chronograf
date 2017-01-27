@@ -58,9 +58,9 @@ export default function AutoRefresh(ComposedComponent) {
       this.setState({isFetching: true});
       let count = 0;
       const newSeries = [];
-      queries.forEach(({host, database, rp, text}) => {
+      queries.forEach(({host, database, rp, text, id: queryID}) => {
         _fetchTimeSeries(host, database, rp, text).then((resp) => {
-          newSeries.push({response: resp.data});
+          newSeries.push({response: resp.data, queryID});
           count += 1;
           if (count === queries.length) {
             this.setState({

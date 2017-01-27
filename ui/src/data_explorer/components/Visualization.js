@@ -15,7 +15,7 @@ const Visualization = React.createClass({
     queryConfigs: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     isActive: PropTypes.bool.isRequired,
     name: PropTypes.string,
-    activeQueryIndex: PropTypes.number,
+    activeQueryID: PropTypes.string,
   },
 
   contextTypes: {
@@ -45,7 +45,7 @@ const Visualization = React.createClass({
   },
 
   render() {
-    const {queryConfigs, timeRange, isActive, name, activeQueryIndex} = this.props;
+    const {queryConfigs, timeRange, isActive, name, activeQueryID} = this.props;
     const {source} = this.context;
     const proxyLink = source.links.proxy;
 
@@ -78,7 +78,7 @@ const Visualization = React.createClass({
             <RefreshingLineGraph
               queries={queries}
               autoRefresh={autoRefreshMs}
-              activeQueryIndex={activeQueryIndex}
+              activeQueryID={activeQueryID}
               isInDataExplorer={isInDataExplorer}
               />
           ) : <MultiTable queries={queries} />}

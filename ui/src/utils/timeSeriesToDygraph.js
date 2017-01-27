@@ -1,26 +1,26 @@
 import _ from 'lodash';
-import {STROKE_WIDTH} from 'src/shared/constants';
+
 /**
  * Accepts an array of raw influxdb responses and returns a format
  * that Dygraph understands.
  */
 
-// activeQueryIndex is an optional argument that indicated which query's series we want highlighted.
-export default function timeSeriesToDygraph(raw = [], activeQueryIndex, isInDataExplorer) {
+export default function timeSeriesToDygraph(raw = []) {
   // collect results from each influx response
   const results = raw.reduce((acc, rawResponse, responseIndex) => {
     const responses = _.get(rawResponse, 'response.results', []);
-    const indexedResponses = responses.map((response) => ({...response, responseIndex}));
+    const {queryID} = rawResponse;
+    const indexedResponses = responses.map((response) => ({...response, responseIndex, queryID}));
     return [...acc, ...indexedResponses];
   }, []);
 
   // collect each series
-  const serieses = results.reduce((acc, {series = [], responseIndex}, index) => {
-    return [...acc, ...series.map((item) => ({...item, responseIndex, index}))];
+  const serieses = results.reduce((acc, {series = [], responseIndex, queryID}, index) => {
+    return [...acc, ...series.map((item) => ({...item, responseIndex, queryID, index}))];
   }, []);
 
   // convert series into cells with rows and columns
-  const cells = serieses.reduce((acc, {name, columns, values, index, responseIndex, tags = {}}) => {
+  const cells = serieses.reduce((acc, {name, columns, values, index, responseIndex, queryID, tags = {}}) => {
     const rows = values.map((vals) => ({
       name,
       columns,
@@ -42,6 +42,7 @@ export default function timeSeriesToDygraph(raw = [], activeQueryIndex, isInData
           time,
           seriesIndex,
           responseIndex,
+          queryID,
         });
       });
     });
@@ -50,7 +51,7 @@ export default function timeSeriesToDygraph(raw = [], activeQueryIndex, isInData
   }, []);
 
   // labels are a unique combination of measurement, fields, and tags that indicate a specific series on the graph legend
-  const labels = cells.reduce((acc, {label, seriesIndex, responseIndex}) => {
+  const labels = cells.reduce((acc, {label, seriesIndex, responseIndex, queryID}) => {
     const existingLabel = acc.find(({
       label: findLabel,
       seriesIndex: findSeriesIndex,
@@ -61,6 +62,7 @@ export default function timeSeriesToDygraph(raw = [], activeQueryIndex, isInData
         label,
         seriesIndex,
         responseIndex,
+        queryID,
       });
     }
 
@@ -91,23 +93,9 @@ export default function timeSeriesToDygraph(raw = [], activeQueryIndex, isInData
 
   const sortedTimeSeries = _.sortBy(timeSeries, 'time');
 
-  const {light, heavy} = STROKE_WIDTH;
-
-  const dygraphSeries = sortedLabels.reduce((acc, {label, responseIndex}) => {
-    acc[label] = {
-      strokeWidth: responseIndex === activeQueryIndex ? heavy : light,
-    };
-
-    if (!isInDataExplorer) {
-      acc[label].axis = responseIndex === 0 ? 'y' : 'y2';
-    }
-
-    return acc;
-  }, {});
-
   return {
     timeSeries: sortedTimeSeries.map(({time, values}) => ([new Date(time), ...values])),
     labels: ["time", ...sortedLabels.map(({label}) => label)],
-    dygraphSeries,
+    sortedLabels,
   };
 }

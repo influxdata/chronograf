@@ -27,8 +27,9 @@ const PanelList = React.createClass({
       null : panel.id;
 
     this.props.setActivePanel(activePanelID);
+    const activeQueryID = this.props.panels[activePanelID].queryIds[0];
     // Reset the activeQueryID when toggling Exporations
-    this.props.setActiveQuery(null);
+    this.props.setActiveQuery(activeQueryID);
   },
 
   render() {
