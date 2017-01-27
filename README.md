@@ -52,6 +52,8 @@ Currently, Chronograf offers dashboard templates for the following Telegraf inpu
 
 > Note: If a `telegraf` instance isn't running the `system` and `cpu` plugins the canned dashboards from that instance won't be generated.
 
+> NOTE: You need to be running the `cpu` and `system` plugins for the canned dashboards from a given telegraf instance to appear in the Host List.
+
 ### Data Explorer
 
 Chronograf's graphing tool that allows you to dig in and create personalized visualizations of your data.
