@@ -8,6 +8,7 @@ import TimeRangeDropdown from '../../shared/components/TimeRangeDropdown';
 import timeRanges from 'hson!../../shared/data/timeRanges.hson';
 import {getMappings, getAppsForHosts, getMeasurementsForHost, getAllHosts} from 'src/hosts/apis';
 import {fetchLayouts} from 'shared/apis';
+import {autoflow} from 'src/hosts/utils/autoflow';
 
 export const HostPage = React.createClass({
   propTypes: {
@@ -78,28 +79,12 @@ export const HostPage = React.createClass({
   renderLayouts(layouts) {
     const autoRefreshMs = 15000;
     const {timeRange} = this.state;
-    const {source} = this.props;
+    const {source, autoflowLayoutsStub} = this.props;
 
-    const autoflowLayouts = layouts.filter((layout) => !!layout.autoflow);
+    const autoflowLayouts = autoflowLayoutsStub || layouts.filter((layout) => !!layout.autoflow);
+    console.log(JSON.stringify(autoflowLayouts, null, 2))
 
-    const cellWidth = 4;
-    const cellHeight = 4;
-    const pageWidth = 12;
-
-    let cellCount = 0;
-    const autoflowCells = autoflowLayouts.reduce((allCells, layout) => {
-      return allCells.concat(layout.cells.map((cell) => {
-        const x = (cellCount * cellWidth % pageWidth);
-        const y = Math.floor(cellCount * cellWidth / pageWidth) * cellHeight;
-        cellCount += 1;
-        return Object.assign(cell, {
-          w: cellWidth,
-          h: cellHeight,
-          x,
-          y,
-        });
-      }));
-    }, []);
+    const autoflowCells = autoflow(autoflowLayouts);
 
     const staticLayouts = layouts.filter((layout) => !layout.autoflow);
     staticLayouts.unshift({cells: autoflowCells});

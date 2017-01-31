@@ -1,28 +1,20 @@
 const express = require('express');
 const request = require('request');
+const {default: storybook} = require('@kadira/storybook/dist/server/middleware');
 
 const app = express();
 
-app.use('/', (req, res) => {
-  console.log(`${req.method} ${req.url}`);
+const handler = (req, res) => {
+  console.log(req.url)
+  const url = 'http://localhost:8888' + req.url;
+  req.pipe(request(url)).pipe(res);
+}
 
-  const headers = {};
-  headers['Access-Control-Allow-Origin'] = '*';
-  headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE, OPTIONS';
-  headers['Access-Control-Allow-Credentials'] = false;
-  headers['Access-Control-Max-Age'] = '86400'; // 24 hours
-  headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept';
-  res.writeHead(200, headers);
+app.use(storybook('./.storybook'));
 
-  if (req.method === 'OPTIONS') {
-    res.end();
-  }
-  else {
-    const url = 'http://localhost:8888' + req.url;
-    req.pipe(request(url)).pipe(res);
-  }
-});
+app.get('/chronograf/v1/*', handler);
+app.post('/chronograf/v1/*', handler);
 
-app.listen(3888, () => {
+app.listen(6006, () => {
   console.log('corsless proxy server now running')
 });

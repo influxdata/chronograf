@@ -1,18 +1,7 @@
+// To run stories, CHRONOGRAF_SOURCES env variable must be set to a sources object. See Hunter for one.
 const source = () => {
-  return ({
-    "id": "2",
-    "name": "test-user",
-    "username": "test-user",
-    "password": "hunter2",
-    "url": "http://chronograf.influxcloud.net:8086",
-    "default": true,
-    "telegraf": "telegraf",
-    "links": {
-      "self": "http://localhost:3888/chronograf/v1/sources/2",
-      "kapacitors": "http://localhost:3888/chronograf/v1/sources/2/kapacitors",
-      "proxy": "http://localhost:3888/chronograf/v1/sources/2/proxy"
-    }
-  })
+  console.log(process.env)
+  return JSON.parse(process.env.STORYBOOK_CHRONOGRAF_SOURCE);
 }
 
 export default source;

@@ -1,7 +1,7 @@
 import React from 'react';
 import {storiesOf, action, linkTo} from '@kadira/storybook';
 
-import {spyActions} from './shared'
+import {spyActions} from './shared';
 
 // Stubs
 import kapacitor from './stubs/kapacitor';
@@ -12,7 +12,7 @@ import queryConfigs from './stubs/queryConfigs';
 
 // Actions for Spies
 import * as kapacitorActions from 'src/kapacitor/actions/view'
-import * as queryActions from 'src/chronograf/actions/view';
+import * as queryActions from 'src/data_explorer/actions/view';
 
 // Components
 import KapacitorRule from 'src/kapacitor/components/KapacitorRule';
