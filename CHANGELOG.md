@@ -3,6 +3,7 @@
 ### Upcoming Bug Fixes
 
 ### Upcoming Features
+  1. [#835](https://github.com/influxdata/chronograf/pull/835): Kapacitor detail field gets same message string as message
 
 ### Upcoming UI Improvements
 
