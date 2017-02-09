@@ -20,6 +20,7 @@ const (
 var AllAlerts = `
     .stateChangesOnly()
     .message(message)
+	.details(message)
 	.id(idVar)
 	.idTag(idTag)
 	.levelTag(levelTag)
