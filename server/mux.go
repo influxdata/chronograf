@@ -119,6 +119,8 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.DELETE("/chronograf/v1/dashboards/:id", service.RemoveDashboard)
 	router.PUT("/chronograf/v1/dashboards/:id", service.UpdateDashboard)
 
+	router.GET("/chronograf/v1/sources/:id/shardgroups", ShardGroups)
+
 	/* Authentication */
 	if opts.UseAuth {
 		auth := AuthAPI(opts, router)
@@ -127,6 +129,43 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 	logged := Logger(opts.Logger, router)
 	return logged
+}
+
+func ShardGroups(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	sgroups := map[string]interface{}{
+		"groups": []interface{}{
+			map[string]interface{}{
+				"id": 1,
+				"shards": []interface{}{
+					map[string]interface{}{
+						"id": 238,
+						"times": map[string]interface{}{
+							"start":  "",
+							"end":    "",
+							"expire": "",
+						},
+						"nodes": []interface{}{
+							map[string]interface{}{
+								"name": "host1",
+								"size": 655535,
+							},
+							map[string]interface{}{
+								"name": "host2",
+								"size": 655535,
+							},
+						},
+						"dbrp": "/chrongoraf/v1/sources/1/dbrps/telgraf.my%20rp",
+						"self": "/chronograf/v1/sources/1/shardgroup/1/shards/238",
+					},
+				},
+			},
+		},
+	}
+
+	out, _ := json.Marshal(sgroups)
+	w.Write(out)
 }
 
 // AuthAPI adds the OAuth routes if auth is enabled.
