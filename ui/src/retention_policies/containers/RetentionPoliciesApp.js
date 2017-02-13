@@ -6,24 +6,20 @@ import RetentionPoliciesList from '../components/RetentionPoliciesList';
 import CreateRetentionPolicyModal from '../components/CreateRetentionPolicyModal';
 import FlashMessages from 'shared/components/FlashMessages';
 
+import {fetchShardGroups} from '../apis/metaQuery';
+
 import {
-  showDatabases,
-  showRetentionPolicies,
-  showShards,
   createRetentionPolicy,
   dropShard,
 } from 'shared/apis/metaQuery';
-import {fetchShardDiskBytesForDatabase} from 'shared/apis/stats';
-import parseShowDatabases from 'shared/parsing/showDatabases';
-import parseShowRetentionPolicies from 'shared/parsing/showRetentionPolicies';
-import parseShowShards from 'shared/parsing/showShards';
-import {diskBytesFromShardForDatabase} from 'shared/parsing/diskBytes';
 
 const RetentionPoliciesApp = React.createClass({
   propTypes: {
-    dataNodes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-    params: PropTypes.shape({
-      clusterID: PropTypes.string.isRequired,
+    source: PropTypes.shape({
+      links: PropTypes.shape({
+        proxy: PropTypes.string.isRequired,
+        self: PropTypes.string.isRequired,
+      }),
     }).isRequired,
     addFlashMessage: PropTypes.func.isRequired,
   },
@@ -62,10 +58,20 @@ const RetentionPoliciesApp = React.createClass({
   },
 
   componentDidMount() {
-    showDatabases(this.props.dataNodes, this.props.params.clusterID).then((resp) => {
-      const result = parseShowDatabases(resp.data);
+    // fetchShardGroups(this.props.source.links.proxy).then((resp) => {
+    fetchShardGroups(this.props.source).then((resp) => {
+      const { groups } = resp.data;
 
-      if (!result.databases.length) {
+      debugger;
+      const databases = Object.keys(groups.reduce((acc, group) => {
+        group.shards.forEach((shard) => {
+          const { dbrp } = shard;
+          const dbName = dbrp.slice(dbrp.lastIndexOf("/"), dbrp.length);
+          acc[dbName] = true; // dummy value since we're using this object as a poor man's set
+        });
+      }));
+
+      if (!groups.length) {
         this.props.addFlashMessage({
           text: 'No databases found',
           type: 'error',
@@ -74,37 +80,27 @@ const RetentionPoliciesApp = React.createClass({
         return;
       }
 
-      const selectedDatabase = result.databases[0];
+      const selectedDatabase = databases[0];
 
       this.setState({
-        databases: result.databases,
+        databases: databases,
         selectedDatabase,
       });
 
-      this.fetchInfoForDatabase(selectedDatabase);
+      this.fetchInfoForDatabase(groups, selectedDatabase);
     }).catch((err) => {
       console.error(err); // eslint-disable-line no-console
       this.addGenericErrorMessage(err.toString());
     });
   },
 
-  fetchInfoForDatabase(database) {
-    this.setState({isFetching: true});
-    Promise.all([
-      this.fetchRetentionPoliciesAndShards(database),
-      this.fetchDiskUsage(database),
-    ]).then(([rps, shardDiskUsage]) => {
-      const {retentionPolicies, shards} = rps;
-      this.setState({
-        shardDiskUsage,
-        retentionPolicies,
-        shards,
-      });
-    }).catch((err) => {
-      console.error(err); // eslint-disable-line no-console
-      this.addGenericErrorMessage(err.toString());
-    }).then(() => {
-      this.setState({isFetching: false});
+  fetchInfoForDatabase(shardGroups, database) {
+    debugger;
+    const {retentionPolicies, shards} = rps;
+    this.setState({
+      shardDiskUsage,
+      retentionPolicies,
+      shards,
     });
   },
 
@@ -116,24 +112,6 @@ const RetentionPoliciesApp = React.createClass({
     });
   },
 
-  fetchRetentionPoliciesAndShards(database) {
-    const shared = {};
-    return showRetentionPolicies(this.props.dataNodes, database, this.props.params.clusterID).then((resp) => {
-      shared.retentionPolicies = resp.data.results.map(parseShowRetentionPolicies);
-      return showShards(this.props.params.clusterID);
-    }).then((resp) => {
-      const shards = parseShowShards(resp.data);
-      return {shards, retentionPolicies: shared.retentionPolicies[0].retentionPolicies};
-    });
-  },
-
-  fetchDiskUsage(database) {
-    const {dataNodes, params: {clusterID}} = this.props;
-    return fetchShardDiskBytesForDatabase(dataNodes, database, clusterID).then((resp) => {
-      return diskBytesFromShardForDatabase(resp.data).shardData;
-    });
-  },
-
   handleChooseDatabase(database) {
     this.setState({selectedDatabase: database, retentionPolicies: []});
     this.fetchInfoForDatabase(database);
@@ -142,11 +120,10 @@ const RetentionPoliciesApp = React.createClass({
   handleCreateRetentionPolicy({rpName, duration, replicationFactor}) {
     const params = {
       database: this.state.selectedDatabase,
-      host: this.props.dataNodes,
+      host: this.props.source.links.proxy,
       rpName,
       duration,
       replicationFactor,
-      clusterID: this.props.params.clusterID,
     };
 
     createRetentionPolicy(params).then(() => {
@@ -183,14 +160,14 @@ const RetentionPoliciesApp = React.createClass({
             onDropShard={this.handleDropShard}
           />
         </div>
-        <CreateRetentionPolicyModal onCreate={this.handleCreateRetentionPolicy} dataNodes={this.props.dataNodes} />
+        <CreateRetentionPolicyModal onCreate={this.handleCreateRetentionPolicy} dataNodes={this.props.source.links.proxy} />
       </div>
     );
   },
 
   handleDropShard(shard) {
-    const {dataNodes, params} = this.props;
-    dropShard(dataNodes, shard, params.clusterID).then(() => {
+      const {source} = this.props;
+      dropShard(source.links.proxy, shard).then(() => {
       const key = `${this.state.selectedDatabase}..${shard.retentionPolicy}`;
 
       const shardsForRP = this.state.shards[key];
