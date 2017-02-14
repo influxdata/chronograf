@@ -72,8 +72,8 @@ export const KapacitorPage = React.createClass({
     const {addFlashMessage, source} = this.props;
     const {newURL, newName, newUsername} = this.state;
     createKapacitor(source, {
-      url: newURL.trim(),
-      name: newName.trim(),
+      url: (newURL || defaultKapacitorUrl).trim(),
+      name: (newName || defaultKapacitorName).trim(),
       username: newUsername,
       password: this.kapacitorPassword.value,
     }).then(({data: createdKapacitor}) => {
@@ -157,11 +157,11 @@ export const KapacitorPage = React.createClass({
                       <div>
                         <div className="form-group col-xs-12 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-2">
                           <label htmlFor="connect-string">Connection String</label>
-                          <input ref={(r) => this.kapacitorURL = r} className="form-control" id="connect-string" placeholder={defaultKapacitorUrl} value={url} onChange={this.updateURL}></input>
+                          <input ref={(r) => this.kapacitorURL = r} className="form-control" id="connect-string" defaultValue={defaultKapacitorUrl} value={url} onChange={this.updateURL}></input>
                         </div>
                         <div className="form-group col-xs-12 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-0">
                           <label htmlFor="name">Name</label>
-                          <input ref={(r) => this.kapacitorName = r} className="form-control" id="name" placeholder={defaultKapacitorName} value={name} onChange={this.updateName}></input>
+                          <input ref={(r) => this.kapacitorName = r} className="form-control" id="name" defaultValue={defaultKapacitorName} value={name} onChange={this.updateName}></input>
                         </div>
                         <div className="form-group col-xs-12 col-sm-4 col-sm-offset-2 col-md-4 col-md-offset-2">
                           <label htmlFor="username">Username</label>
