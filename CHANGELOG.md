@@ -1,6 +1,8 @@
 ## v1.2.0 [unreleased]
 
 ### Bug Fixes
+  1. [#875](https://github.com/influxdata/chronograf/issues/875): Connecting to new kapacitor with defalt values fails
+
 ### Features
 ### UI Improvements
 
