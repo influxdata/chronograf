@@ -4,6 +4,7 @@ import Center from './components/Center'
 
 import MultiSelectDropdown from 'shared/components/MultiSelectDropdown'
 import Tooltip from 'shared/components/Tooltip'
+import TooltipDelete from 'src/admin/components/TooltipDelete'
 
 storiesOf('MultiSelectDropdown', module)
   .add('Select Roles', () => (
@@ -34,5 +35,12 @@ storiesOf('Tooltip', module)
           Delete
         </div>
       </Tooltip>
+    </Center>
+  ))
+
+storiesOf('TooltipDelete', module)
+  .add('Delete', () => (
+    <Center>
+      <TooltipDelete onDelete={action('onDelete')} />
     </Center>
   ))
