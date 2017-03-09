@@ -2,11 +2,12 @@ import React, {PropTypes} from 'react';
 import AutoRefresh from 'shared/components/AutoRefresh';
 import LineGraph from 'shared/components/LineGraph';
 import SingleStat from 'shared/components/SingleStat';
+import NameableGraph from 'shared/components/NameableGraph';
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
 const GridLayout = WidthProvider(ReactGridLayout);
 
-const RefreshingLineGraph = AutoRefresh(LineGraph);
-const RefreshingSingleStat = AutoRefresh(SingleStat);
+const RefreshingLineGraph = NameableGraph(AutoRefresh(LineGraph));
+const RefreshingSingleStat = NameableGraph(AutoRefresh(SingleStat));
 
 const {
   arrayOf,
@@ -97,12 +98,7 @@ export const LayoutRenderer = React.createClass({
 
       if (cell.type === 'single-stat') {
         return (
-          <div key={cell.i}>
-            <h2 className="dash-graph--heading">{cell.name || `Graph`}</h2>
-            <div className="dash-graph--container">
-              <RefreshingSingleStat queries={[qs[0]]} autoRefresh={autoRefresh} />
-            </div>
-          </div>
+          <RefreshingSingleStat name={cell.name || `Graph`} id={cell.id} queries={[qs[0]]} autoRefresh={autoRefresh} />
         );
       }
 
@@ -112,17 +108,15 @@ export const LayoutRenderer = React.createClass({
       }
 
       return (
-        <div key={cell.i}>
-          <h2 className="dash-graph--heading">{cell.name || `Graph`}</h2>
-          <div className="dash-graph--container">
-            <RefreshingLineGraph
-              queries={qs}
-              autoRefresh={autoRefresh}
-              showSingleStat={cell.type === "line-plus-single-stat"}
-              displayOptions={displayOptions}
-            />
-          </div>
-        </div>
+        <RefreshingLineGraph
+          key={cell.id}
+          name={cell.name || `Graph`}
+          id={cell.id}
+          queries={qs}
+          autoRefresh={autoRefresh}
+          showSingleStat={cell.type === "line-plus-single-stat"}
+          displayOptions={displayOptions}
+        />
       );
     });
   },
