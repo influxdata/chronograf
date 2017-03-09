@@ -95,12 +95,13 @@ export const LayoutRenderer = React.createClass({
         });
       });
 
-
       if (cell.type === 'single-stat') {
         return (
-          <NameableGraph name={cell.name} key={cell.id}>
-            <RefreshingSingleStat id={cell.id} queries={[qs[0]]} autoRefresh={autoRefresh} />
-          </NameableGraph>
+          <div key={cell.i}>
+            <NameableGraph name={cell.name || `Graph`}>
+              <RefreshingSingleStat queries={[qs[0]]} autoRefresh={autoRefresh} />
+            </NameableGraph>
+          </div>
         );
       }
 
@@ -110,15 +111,16 @@ export const LayoutRenderer = React.createClass({
       }
 
       return (
-        <NameableGraph name={cell.name} key={cell.id}>
-          <RefreshingLineGraph
-            id={cell.id}
-            queries={qs}
-            autoRefresh={autoRefresh}
-            showSingleStat={cell.type === "line-plus-single-stat"}
-            displayOptions={displayOptions}
-          />
-        </NameableGraph>
+        <div key={cell.i}>
+          <NameableGraph name={cell.name || `Graph`}>
+            <RefreshingLineGraph
+              queries={qs}
+              autoRefresh={autoRefresh}
+              showSingleStat={cell.type === "line-plus-single-stat"}
+              displayOptions={displayOptions}
+            />
+          </NameableGraph>
+        </div>
       );
     });
   },
