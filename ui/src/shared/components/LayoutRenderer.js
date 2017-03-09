@@ -6,8 +6,8 @@ import NameableGraph from 'shared/components/NameableGraph';
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
 const GridLayout = WidthProvider(ReactGridLayout);
 
-const RefreshingLineGraph = NameableGraph(AutoRefresh(LineGraph));
-const RefreshingSingleStat = NameableGraph(AutoRefresh(SingleStat));
+const RefreshingLineGraph = AutoRefresh(LineGraph);
+const RefreshingSingleStat = AutoRefresh(SingleStat);
 
 const {
   arrayOf,
@@ -98,7 +98,9 @@ export const LayoutRenderer = React.createClass({
 
       if (cell.type === 'single-stat') {
         return (
-          <RefreshingSingleStat name={cell.name || `Graph`} id={cell.id} queries={[qs[0]]} autoRefresh={autoRefresh} />
+          <NameableGraph name={cell.name} key={cell.id}>
+            <RefreshingSingleStat id={cell.id} queries={[qs[0]]} autoRefresh={autoRefresh} />
+          </NameableGraph>
         );
       }
 
@@ -108,15 +110,15 @@ export const LayoutRenderer = React.createClass({
       }
 
       return (
-        <RefreshingLineGraph
-          key={cell.id}
-          name={cell.name || `Graph`}
-          id={cell.id}
-          queries={qs}
-          autoRefresh={autoRefresh}
-          showSingleStat={cell.type === "line-plus-single-stat"}
-          displayOptions={displayOptions}
-        />
+        <NameableGraph name={cell.name} key={cell.id}>
+          <RefreshingLineGraph
+            id={cell.id}
+            queries={qs}
+            autoRefresh={autoRefresh}
+            showSingleStat={cell.type === "line-plus-single-stat"}
+            displayOptions={displayOptions}
+          />
+        </NameableGraph>
       );
     });
   },

@@ -1,14 +1,24 @@
-import React from 'react'
+import React, {PropTypes} from 'react'
 
-export default function NameableGraph(ComposedGraph) {
-  return ({name, key, ...props}) => {
-    return (
-      <div key={key}>
-        <h2 className="dash-graph--heading">{name}</h2>
-        <div className="dash-graph--container">
-          <ComposedGraph {...props} />
-        </div>
+const NameableGraph = ({name, key, children}) => {
+  return (
+    <div key={key}>
+      <h2 className="dash-graph--heading">{name}</h2>
+      <div className="dash-graph--container">
+        {children}
       </div>
-    );
-  }
+    </div>
+  );
 }
+
+NameableGraph.propTypes = {
+  name: PropTypes.string.isRequired,
+  key: PropTypes.string.isRequired,
+  children: PropTypes.element.isRequired,
+}
+
+NameableGraph.defaultProps = {
+  name: "Graph",
+}
+
+export default NameableGraph;
