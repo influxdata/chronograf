@@ -98,7 +98,7 @@ export const LayoutRenderer = React.createClass({
       if (cell.type === 'single-stat') {
         return (
           <div key={cell.i}>
-            <NameableGraph name={cell.name || `Graph`}>
+            <NameableGraph name={cell.name || `Graph`} layout={cells} onRename={this.handleLayoutChange} id={cell.i}>
               <RefreshingSingleStat queries={[qs[0]]} autoRefresh={autoRefresh} />
             </NameableGraph>
           </div>
@@ -112,7 +112,7 @@ export const LayoutRenderer = React.createClass({
 
       return (
         <div key={cell.i}>
-          <NameableGraph name={cell.name || `Graph`}>
+          <NameableGraph name={cell.name || `Graph`} layout={cells} onRename={this.handleLayoutChange} id={cell.i}>
             <RefreshingLineGraph
               queries={qs}
               autoRefresh={autoRefresh}
@@ -134,7 +134,7 @@ export const LayoutRenderer = React.createClass({
 
     const newCells = this.props.cells.map((cell) => {
       const l = layout.find((ly) => ly.i === cell.i)
-      const newLayout = {x: l.x, y: l.y, h: l.h, w: l.w}
+      const newLayout = {x: l.x, y: l.y, h: l.h, w: l.w, name: l.name}
       return {...cell, ...newLayout}
     })
 
