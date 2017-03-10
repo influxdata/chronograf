@@ -101,7 +101,6 @@ const DashboardPage = React.createClass({
       cell,
       ...cells.slice(targetIdx+1)
     ]
-    debugger
     this.props.dashboardActions.putDashboard({...this.props.dashboard, cells: newCells})
   },
 
