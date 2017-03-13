@@ -94,12 +94,12 @@ const DashboardPage = React.createClass({
 
   handleEditCell(cell) {
     const {cells} = this.props.dashboard
-    const targetIdx = cells.findIndex((c) => { return cell.x === c.x && cell.y === c.y && cell.h === c.h && cell.w === c.w })
+    const targetIdx = cells.findIndex((c) => cell.x === c.x && cell.y === c.y && cell.h === c.h && cell.w === c.w)
 
     const newCells = [
       ...cells.slice(0, targetIdx),
       cell,
-      ...cells.slice(targetIdx+1)
+      ...cells.slice(targetIdx + 1),
     ]
     this.props.dashboardActions.putDashboard({...this.props.dashboard, cells: newCells})
   },

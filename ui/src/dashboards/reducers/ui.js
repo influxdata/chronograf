@@ -50,6 +50,35 @@ export default function ui(state = initialState, action) {
 
       return {...state, ...newState}
     }
+
+    case 'EDIT_CELL': {
+      const {id, x, y, isEditing} = action.payload
+      const {dashboards} = state
+
+      const dashboard = _.find(dashboards, (d) => d.id === +id)
+      const cellIdx = dashboard.cells.findIndex((cell) => cell.x === x && cell.y === y)
+
+      const newCell = {
+        ...dashboard.cells[cellIdx],
+        isEditing,
+      }
+
+      const newDashboard = {
+        ...dashboard,
+        cells: [
+          ...dashboard.cells.slice(0, cellIdx),
+          newCell,
+          ...dashboard.cells.slice(cellIdx + 1),
+        ],
+      }
+
+      const newState = {
+        newDashboard,
+        dashboards: state.dashboards.map((d) => d.id === dashboard.id ? newDashboard : d),
+      }
+
+      return {...state, ...newState}
+    }
   }
 
   return state;

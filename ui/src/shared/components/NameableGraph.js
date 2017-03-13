@@ -8,13 +8,7 @@ const NameableGraph = React.createClass({
     }).isRequired,
     children: PropTypes.node.isRequired,
     onRename: PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
-      editing: false,
-      name: this.props.cell.name,
-    }
+    renameHandler: PropTypes.func.isRequired,
   },
 
   handleClick() {
@@ -30,25 +24,28 @@ const NameableGraph = React.createClass({
     })
   },
 
-  handleChange(evt) {
-    this.setState({
-      name: evt.target.value,
-    })
+  onHandleChange(id) {
+    return (evt) => {
+      this.props.renameHandler(id, evt.target.value)
+    }
   },
 
   render() {
     let nameOrField
-    if (!this.state.editing) {
-      nameOrField = this.props.cell.name
+
+    const {cell: {name, id, editing}, children} = this.props
+
+    if (!editing) {
+      nameOrField = name
     } else {
-      nameOrField = <input type="text" value={this.state.name} autoFocus={true} onChange={this.handleChange} onBlur={this.handleChangeName}></input>
+      nameOrField = <input type="text" value={name} autoFocus={true} onChange={this.onHandleChange(id)} onBlur={this.handleChangeName}></input>
     }
 
     return (
       <div>
         <h2 className="dash-graph--heading" onClick={this.handleClick}>{nameOrField}</h2>
         <div className="dash-graph--container">
-          {this.props.children}
+          {children}
         </div>
       </div>
     );

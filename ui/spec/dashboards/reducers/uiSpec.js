@@ -6,6 +6,7 @@ import {
   setDashboard,
   setTimeRange,
   setEditMode,
+  editCell,
 } from 'src/dashboards/actions'
 
 const noopAction = () => {
@@ -48,5 +49,27 @@ describe('DataExplorer.Reducers.UI', () => {
     const isEditMode = true
     const actual = reducer(state, setEditMode(isEditMode))
     expect(actual.isEditMode).to.equal(isEditMode)
+  })
+
+  it('can edit cell', () => {
+    state = {
+      dashboards: [{
+        id: 1,
+        cells: [{
+          x: 0,
+          y: 0,
+          w: 4,
+          h: 4,
+          id: 1,
+          isEditing: false,
+        }]
+      }]
+    }
+
+    const actual = reducer(state, editCell(1, 0, 0, true))
+    expect(actual.dashboards[0].cells[0].isEditing).to.equal(true)
+  })
+
+  it('can rename cells', () => {
   })
 })
