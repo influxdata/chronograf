@@ -149,6 +149,7 @@ const DashboardPage = React.createClass({
               handleClickPresentationButton={handleClickPresentationButton}
               dashboard={dashboard}
               sourceID={sourceID}
+              source={source}
             >
               {(dashboards).map((d, i) => {
                 return (

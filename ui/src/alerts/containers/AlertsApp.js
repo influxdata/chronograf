@@ -1,14 +1,11 @@
 import React, {PropTypes} from 'react';
 import AlertsTable from '../components/AlertsTable';
+import SourceIndicator from '../../shared/components/SourceIndicator';
 import {getAlerts} from '../apis';
 import AJAX from 'utils/ajax';
 import _ from 'lodash';
 import NoKapacitorError from '../../shared/components/NoKapacitorError';
 
-// Kevin: because we were getting strange errors saying
-// "Failed prop type: Required prop `source` was not specified in `AlertsApp`."
-// Tim and I decided to make the source and addFlashMessage props not required.
-// FIXME: figure out why that wasn't working
 const AlertsApp = React.createClass({
   propTypes: {
     source: PropTypes.shape({
@@ -93,6 +90,7 @@ const AlertsApp = React.createClass({
   },
 
   render() {
+    const {source} = this.props;
     return (
       // I stole this from the Hosts page.
       // Perhaps we should create an abstraction?
@@ -103,6 +101,9 @@ const AlertsApp = React.createClass({
               <h1>
                 Alert History
               </h1>
+            </div>
+            <div className="page-header__right">
+              <SourceIndicator sourceName={source.name} />
             </div>
           </div>
         </div>
