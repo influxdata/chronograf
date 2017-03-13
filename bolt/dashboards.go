@@ -85,7 +85,8 @@ func (d *DashboardsStore) Get(ctx context.Context, id chronograf.DashboardID) (c
 // Delete the dashboard from DashboardsStore
 func (d *DashboardsStore) Delete(ctx context.Context, dash chronograf.Dashboard) error {
 	if err := d.client.db.Update(func(tx *bolt.Tx) error {
-		if err := tx.Bucket(DashboardBucket).Delete(itob(int(dash.ID))); err != nil {
+		strID := strconv.Itoa(int(dash.ID))
+		if err := tx.Bucket(DashboardBucket).Delete([]byte(strID)); err != nil {
 			return err
 		}
 		return nil
