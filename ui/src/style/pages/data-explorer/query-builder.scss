@@ -1,9 +1,8 @@
 .query-builder {
-  position: absolute;
+  position: relative;
+  height: 100%;
   width: calc(100% - #{($explorer-page-padding * 2)});
   left: $explorer-page-padding;
-  height: 40%;
-  top: 60%;
   border: 0;
   display: flex;
   align-items: stretch;

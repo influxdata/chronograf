@@ -58,20 +58,40 @@ const ResizeContainer = React.createClass({
     this.setState({topHeight: `${(newTopPanelPercent)}%`, bottomHeight: `${(newBottomPanelPercent)}%`, topHeightPixels});
   },
 
-  render() {
-    const {topHeight, bottomHeight, isDragging, topHeightPixels} = this.state;
-    const top = React.cloneElement(this.props.children[0], {height: topHeight, heightPixels: topHeightPixels});
-    const bottom = React.cloneElement(this.props.children[1], {height: bottomHeight, top: topHeight});
-    const handle = <ResizeHandle isDragging={isDragging} onHandleStartDrag={this.handleStartDrag} top={topHeight} />;
+  renderTop() {
+    const {topHeight, topHeightPixels} = this.state
+    return (
+      <div className="resize-top" style={{height: topHeight}}>
+        {React.cloneElement(this.props.children[0], {heightPixels: topHeightPixels})}
+      </div>
+    )
+  },
 
+  renderHandle() {
+    const {isDragging, topHeight} = this.state
+    return (
+      <ResizeHandle isDragging={isDragging} onHandleStartDrag={this.handleStartDrag} top={topHeight} />
+    )
+  },
+
+  renderBottom() {
+    const {topHeight, bottomHeight} = this.state
+    return (
+      <div className="resize-bottom" style={{height: bottomHeight, top: topHeight}}>
+        {this.props.children[1]}
+      </div>
+    )
+  },
+
+  render() {
     return (
       <div className="resize-container page-contents" onMouseLeave={this.handleMouseLeave} onMouseUp={this.handleStopDrag} onMouseMove={this.handleDrag} ref="resizeContainer" >
-        {top}
-        {handle}
-        {bottom}
+        {this.renderTop()}
+        {this.renderHandle()}
+        {this.renderBottom()}
       </div>
-    );
+    )
   },
-});
+})
 
-export default ResizeContainer;
+export default ResizeContainer
