@@ -227,3 +227,16 @@ $dash-graph-heading: 30px;
     }
   }
 }
+
+/*
+  Cell Edit Mode
+  ------------------------------------------------------
+*/
+.overlay_technology {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}

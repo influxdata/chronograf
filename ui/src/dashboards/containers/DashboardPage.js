@@ -3,13 +3,16 @@ import {Link} from 'react-router'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
+import CellEditorOverlay from 'src/dashboards/components/CellEditorOverlay'
 import Header from 'src/dashboards/components/DashboardHeader'
 import EditHeader from 'src/dashboards/components/DashboardHeaderEdit'
 import Dashboard from 'src/dashboards/components/Dashboard'
+
 import timeRanges from 'hson!../../shared/data/timeRanges.hson'
 
 import * as dashboardActionCreators from 'src/dashboards/actions'
 
+import {setAutoRefresh} from 'shared/actions/app'
 import {presentationButtonDispatcher} from 'shared/dispatchers'
 
 const {
@@ -51,11 +54,25 @@ const DashboardPage = React.createClass({
       id: number.isRequired,
       cells: arrayOf(shape({})).isRequired,
     }).isRequired,
+    handleChooseAutoRefresh: func.isRequired,
     autoRefresh: number.isRequired,
     timeRange: shape({}).isRequired,
     inPresentationMode: bool.isRequired,
     isEditMode: bool.isRequired,
     handleClickPresentationButton: func,
+  },
+
+  childContextTypes: {
+    source: shape({
+      links: shape({
+        proxy: string.isRequired,
+        self: string.isRequired,
+      }).isRequired,
+    }).isRequired,
+  },
+
+  getChildContext() {
+    return {source: this.props.source};
   },
 
   componentDidMount() {
@@ -101,17 +118,20 @@ const DashboardPage = React.createClass({
       isEditMode,
       handleClickPresentationButton,
       source,
+      handleChooseAutoRefresh,
       autoRefresh,
       timeRange,
     } = this.props
 
     return (
       <div className="page">
+        <CellEditorOverlay />
         {
           isEditMode ?
             <EditHeader dashboard={dashboard} onSave={() => {}} /> :
             <Header
               buttonText={dashboard ? dashboard.name : ''}
+              handleChooseAutoRefresh={handleChooseAutoRefresh}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
               handleChooseTimeRange={this.handleChooseTimeRange}
@@ -171,6 +191,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => ({
+  handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
   handleClickPresentationButton: presentationButtonDispatcher(dispatch),
   dashboardActions: bindActionCreators(dashboardActionCreators, dispatch),
 })
