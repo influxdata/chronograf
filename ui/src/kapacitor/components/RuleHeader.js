@@ -62,6 +62,7 @@ export const RuleHeader = React.createClass({
     const saveButton = validationError ?
       <button className="btn btn-success btn-sm disabled" data-for="save-kapacitor-tooltip" data-tip={validationError}>
         Save Rule
+        <ReactTooltip id="save-kapacitor-tooltip" effect="solid" html={true} offset={{top: 2}} place="bottom" class="influx-tooltip kapacitor-tooltip place-bottom" />
       </button> :
       <button className="btn btn-success btn-sm" onClick={onSave}>Save Rule</button>;
 
@@ -70,7 +71,6 @@ export const RuleHeader = React.createClass({
         <SourceIndicator sourceName={source.name} />
         <TimeRangeDropdown onChooseTimeRange={onChooseTimeRange} selected={timeRange.inputValue} />
         {saveButton}
-        <ReactTooltip id="save-kapacitor-tooltip" effect="solid" html={true} offset={{top: 2}} place="bottom" class="influx-tooltip kapacitor-tooltip place-bottom" />
       </div>
     );
   },
