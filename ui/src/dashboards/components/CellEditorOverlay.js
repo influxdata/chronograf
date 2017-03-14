@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react'
+import React from 'react'
 
 import ResizeContainer from 'src/shared/components/ResizeContainer';
 import QueryBuilder from 'src/data_explorer/components/QueryBuilder';
@@ -12,28 +12,26 @@ const timeRange = {
 }
 
 const queries = []
-/*
-  <ResizeContainer>
-    <Visualization
-      autoRefresh={autoRefresh}
-      timeRange={timeRange}
-      queryConfigs={queries}
-      activeQueryID={activeQueryID}
-      activeQueryIndex={0}
-    />
-  </ResizeContainer>
-*/
 const activeQueryID = null
 
 const CellEditorOverlay = () => (
-  <div className="overlay_technology">
-    <QueryBuilder
-      queries={queries}
-      autoRefresh={autoRefresh}
-      timeRange={timeRange}
-      setActiveQuery={(x) => console.log(x)}
-      activeQueryID={activeQueryID}
-    />
+  <div className="data-explorer overlay_technology">
+    <ResizeContainer>
+      <Visualization
+        autoRefresh={autoRefresh}
+        timeRange={timeRange}
+        queryConfigs={queries}
+        activeQueryID={activeQueryID}
+        activeQueryIndex={0}
+      />
+      <QueryBuilder
+        queries={queries}
+        autoRefresh={autoRefresh}
+        timeRange={timeRange}
+        setActiveQuery={() => {}}
+        activeQueryID={activeQueryID}
+      />
+    </ResizeContainer>
   </div>
 )
 
