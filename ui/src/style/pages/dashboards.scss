@@ -232,7 +232,7 @@ $dash-graph-heading: 30px;
   Cell Edit Mode
   ------------------------------------------------------
 */
-.overlay_technology {
+.overlay-technology {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -240,4 +240,11 @@ $dash-graph-heading: 30px;
   right: 0;
   z-index: 100;
   background: rgba($g1-raven, .7);
+  .confirm-buttons {
+    right: 20px;
+    top: 25px;
+    position: absolute;
+  }
 }
+
+

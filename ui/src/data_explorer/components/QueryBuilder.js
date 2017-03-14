@@ -10,6 +10,7 @@ import * as viewActions from '../actions/view';
 const {
   arrayOf,
   func,
+  node,
   shape,
   string,
 } = PropTypes;
@@ -37,6 +38,7 @@ const QueryBuilder = React.createClass({
     top: string,
     setActiveQuery: func.isRequired,
     activeQueryID: string,
+    children: node,
   },
 
   handleSetActiveQuery(query) {
@@ -123,6 +125,7 @@ const QueryBuilder = React.createClass({
             />
           );
         })}
+        {this.props.children}
       </div>
     );
   },

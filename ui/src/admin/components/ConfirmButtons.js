@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react'
 
 const ConfirmButtons = ({onConfirm, item, onCancel}) => (
-  <div>
+  <div className="confirm-buttons">
     <button
       className="btn btn-xs btn-info"
       onClick={() => onCancel(item)}
