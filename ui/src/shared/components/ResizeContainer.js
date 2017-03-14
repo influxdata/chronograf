@@ -1,7 +1,11 @@
 import React, {PropTypes} from 'react';
 import ResizeHandle from 'shared/components/ResizeHandle';
 
-const {node} = PropTypes;
+const {
+  node,
+  number,
+} = PropTypes;
+
 const ResizeContainer = React.createClass({
   propTypes: {
     children: node.isRequired,
@@ -58,15 +62,6 @@ const ResizeContainer = React.createClass({
     this.setState({topHeight: `${(newTopPanelPercent)}%`, bottomHeight: `${(newBottomPanelPercent)}%`, topHeightPixels});
   },
 
-  renderTop() {
-    const {topHeight, topHeightPixels} = this.state
-    return (
-      <div className="resize-top" style={{height: topHeight}}>
-        {React.cloneElement(this.props.children[0], {heightPixels: topHeightPixels})}
-      </div>
-    )
-  },
-
   renderHandle() {
     const {isDragging, topHeight} = this.state
     return (
@@ -74,24 +69,42 @@ const ResizeContainer = React.createClass({
     )
   },
 
-  renderBottom() {
-    const {topHeight, bottomHeight} = this.state
-    return (
-      <div className="resize-bottom" style={{height: bottomHeight, top: topHeight}}>
-        {this.props.children[1]}
-      </div>
-    )
-  },
-
   render() {
+    const {topHeight, bottomHeight} = this.state
+    const top = React.cloneElement(this.props.children[0], {height: topHeight})
+    const bottom = React.cloneElement(this.props.children[1], {height: bottomHeight})
     return (
       <div className="resize-container page-contents" onMouseLeave={this.handleMouseLeave} onMouseUp={this.handleStopDrag} onMouseMove={this.handleDrag} ref="resizeContainer" >
-        {this.renderTop()}
+        {top}
         {this.renderHandle()}
-        {this.renderBottom()}
+        {bottom}
       </div>
     )
   },
 })
+
+const ResizeTop = (props) => (
+  <div className="resize-top" style={{height: props.height}}>
+    {props.children}
+  </div>
+)
+
+ResizeTop.propTypes = {
+  children: node.isRequired,
+  height: number.isRequired,
+}
+
+const ResizeBottom = (props) => (
+  <div className="resize-bottom" style={{height: props.height}}>
+    {props.children}
+  </div>
+)
+
+ResizeBottom.propTypes = {
+  children: node.isRequired,
+  height: number.isRequired,
+}
+
+export {ResizeTop, ResizeBottom}
 
 export default ResizeContainer

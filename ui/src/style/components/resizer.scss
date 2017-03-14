@@ -97,7 +97,7 @@ $resizer-color-active: $c-pool;
   .resize-bottom {
     position: absolute;
     height: 40%;
-    top: 60%;
+    bottom: 0;
     width: 100%;
   }
 }

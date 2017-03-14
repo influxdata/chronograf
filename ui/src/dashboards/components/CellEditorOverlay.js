@@ -1,9 +1,9 @@
 import React from 'react'
 
-import ResizeContainer from 'src/shared/components/ResizeContainer'
+import ResizeContainer, {ResizeTop, ResizeBottom} from 'src/shared/components/ResizeContainer'
 import QueryBuilder from 'src/data_explorer/components/QueryBuilder'
 import Visualization from 'src/data_explorer/components/Visualization'
-import ConfirmButtons from 'src/admin/components/ConfirmButtons'
+import OverlayControls from 'src/dashboards/components/OverlayControls'
 
 const autoRefresh = 60000
 
@@ -18,22 +18,25 @@ const activeQueryID = null
 const CellEditorOverlay = () => (
   <div className="data-explorer overlay-technology">
     <ResizeContainer>
-      <Visualization
-        autoRefresh={autoRefresh}
-        timeRange={timeRange}
-        queryConfigs={queries}
-        activeQueryID={activeQueryID}
-        activeQueryIndex={0}
-      />
-      <QueryBuilder
-        queries={queries}
-        autoRefresh={autoRefresh}
-        timeRange={timeRange}
-        setActiveQuery={() => {}}
-        activeQueryID={activeQueryID}
-      >
-        <ConfirmButtons />
-      </QueryBuilder>
+      <ResizeTop>
+        <Visualization
+          autoRefresh={autoRefresh}
+          timeRange={timeRange}
+          queryConfigs={queries}
+          activeQueryID={activeQueryID}
+          activeQueryIndex={0}
+        />
+      </ResizeTop>
+      <ResizeBottom>
+        <OverlayControls />
+        <QueryBuilder
+          queries={queries}
+          autoRefresh={autoRefresh}
+          timeRange={timeRange}
+          setActiveQuery={() => {}}
+          activeQueryID={activeQueryID}
+        />
+      </ResizeBottom>
     </ResizeContainer>
   </div>
 )
