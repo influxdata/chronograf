@@ -240,9 +240,35 @@ $dash-graph-heading: 30px;
   right: 0;
   z-index: 100;
   background: rgba($g1-raven, .7);
-  .confirm-buttons {
-    right: 20px;
-    top: 25px;
-    position: absolute;
+  .overlay-controls {
+    position: relative;
+    display: flex;
+    flex: 0 0 40px;
+    width: calc(100% - #{($explorer-page-padding * 2)});
+    left: $explorer-page-padding;
+    margin-top: $de-vertical-margin;
+    border: 0;
+    border-radius: $radius;
+    background-color: $g4-onyx;
+    h3 {
+      flex: 1 0 0;
+    }
+    div {
+      flex: 0 0 500px;
+      h4 {
+        display: inline-block;
+      }
+      ul {
+        display: inline;
+      }
+      li {
+        display: inline-block;
+        width: 100px;
+        list-style: none;
+      }
+    }
+    .confirm-buttons {
+      flex: 0 0 40px;
+    }
   }
 }
