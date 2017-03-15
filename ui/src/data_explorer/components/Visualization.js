@@ -81,7 +81,7 @@ const Visualization = React.createClass({
               activeQueryIndex={activeQueryIndex}
               isInDataExplorer={isInDataExplorer}
               />
-          ) : <MultiTable queries={queries} height={heightPixels/* TODO refactor heightPixels to flex-box, if possible */} />}
+          ) : <MultiTable queries={queries} height={heightPixels} />}
         </div>
       </div>
     );
