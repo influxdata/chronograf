@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import QueryBuilder from '../components/QueryBuilder';
 import Visualization from '../components/Visualization';
 import Header from '../containers/Header';
-import ResizeContainer, {ResizeTop, ResizeBottom} from 'src/shared/components/ResizeContainer'
+import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContainer'
 
 import {setAutoRefresh} from 'shared/actions/app'
 import {setTimeRange as setTimeRangeAction} from '../actions/view';
@@ -74,15 +74,13 @@ const DataExplorer = React.createClass({
           timeRange={timeRange}
         />
         <ResizeContainer>
-          <ResizeTop>
-            <Visualization
-              autoRefresh={autoRefresh}
-              timeRange={timeRange}
-              queryConfigs={queries}
-              activeQueryID={this.state.activeQueryID}
-              activeQueryIndex={0}
-            />
-          </ResizeTop>
+          <Visualization
+            autoRefresh={autoRefresh}
+            timeRange={timeRange}
+            queryConfigs={queries}
+            activeQueryID={this.state.activeQueryID}
+            activeQueryIndex={0}
+          />
           <ResizeBottom>
             <QueryBuilder
               queries={queries}

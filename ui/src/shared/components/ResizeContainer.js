@@ -3,7 +3,7 @@ import ResizeHandle from 'shared/components/ResizeHandle';
 
 const {
   node,
-  number,
+  string,
 } = PropTypes;
 
 const ResizeContainer = React.createClass({
@@ -70,8 +70,8 @@ const ResizeContainer = React.createClass({
   },
 
   render() {
-    const {topHeight, bottomHeight} = this.state
-    const top = React.cloneElement(this.props.children[0], {height: topHeight})
+    const {topHeight, topHeightPixels, bottomHeight} = this.state
+    const top = React.cloneElement(this.props.children[0], {height: topHeight, heightPixels: topHeightPixels})
     const bottom = React.cloneElement(this.props.children[1], {height: bottomHeight})
     return (
       <div className="resize-container page-contents" onMouseLeave={this.handleMouseLeave} onMouseUp={this.handleStopDrag} onMouseMove={this.handleDrag} ref="resizeContainer" >
@@ -83,17 +83,6 @@ const ResizeContainer = React.createClass({
   },
 })
 
-const ResizeTop = (props) => (
-  <div className="resize-top" style={{height: props.height}}>
-    {props.children}
-  </div>
-)
-
-ResizeTop.propTypes = {
-  children: node.isRequired,
-  height: number.isRequired,
-}
-
 const ResizeBottom = (props) => (
   <div className="resize-bottom" style={{height: props.height}}>
     {props.children}
@@ -102,9 +91,9 @@ const ResizeBottom = (props) => (
 
 ResizeBottom.propTypes = {
   children: node.isRequired,
-  height: number.isRequired,
+  height: string,
 }
 
-export {ResizeTop, ResizeBottom}
+export {ResizeBottom}
 
 export default ResizeContainer

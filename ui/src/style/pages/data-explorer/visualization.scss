@@ -1,6 +1,6 @@
 .graph {
-  position: relative;
-  flex: 1 0 0;
+  position: absolute;
+  top: 0;
   width: calc(100% - #{($explorer-page-padding * 2)});
   left: $explorer-page-padding;
 }

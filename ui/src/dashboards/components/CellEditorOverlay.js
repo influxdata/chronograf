@@ -1,6 +1,6 @@
 import React from 'react'
 
-import ResizeContainer, {ResizeTop, ResizeBottom} from 'src/shared/components/ResizeContainer'
+import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContainer'
 import QueryBuilder from 'src/data_explorer/components/QueryBuilder'
 import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
@@ -18,15 +18,13 @@ const activeQueryID = null
 const CellEditorOverlay = () => (
   <div className="data-explorer overlay-technology">
     <ResizeContainer>
-      <ResizeTop>
-        <Visualization
-          autoRefresh={autoRefresh}
-          timeRange={timeRange}
-          queryConfigs={queries}
-          activeQueryID={activeQueryID}
-          activeQueryIndex={0}
-        />
-      </ResizeTop>
+      <Visualization
+        autoRefresh={autoRefresh}
+        timeRange={timeRange}
+        queryConfigs={queries}
+        activeQueryID={activeQueryID}
+        activeQueryIndex={0}
+      />
       <ResizeBottom>
         <OverlayControls />
         <QueryBuilder
