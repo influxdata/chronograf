@@ -265,6 +265,9 @@ $dash-graph-heading: 30px;
         display: inline-block;
         width: 100px;
         list-style: none;
+        &.selected {
+          background-color: red;
+        }
       }
     }
     .confirm-buttons {
