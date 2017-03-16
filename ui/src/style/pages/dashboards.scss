@@ -279,6 +279,7 @@ $overlay-bg: rgba($g0-obsidian, 0.7);
       font-weight: 600;
       color: $g13-mist;
       margin: 0;
+      @include no-user-select;
     }
   }
   .overlay--graph-name {
@@ -286,6 +287,7 @@ $overlay-bg: rgba($g0-obsidian, 0.7);
     font-size: 17px;
     font-weight: 400;
     text-transform: uppercase;
+    @include no-user-select;
   }
   .confirm-buttons {
     margin-left: 32px;

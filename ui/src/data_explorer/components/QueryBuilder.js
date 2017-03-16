@@ -82,7 +82,7 @@ const QueryBuilder = React.createClass({
     if (!query) {
       return (
         <div className="qeditor--empty">
-          <h5>This Graph has no Queries</h5>
+          <h5 className="no-user-select">This Graph has no Queries</h5>
           <br/>
           <div className="btn btn-primary" role="button" onClick={this.handleAddQuery}>Add a Query</div>
         </div>
