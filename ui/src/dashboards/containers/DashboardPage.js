@@ -123,9 +123,11 @@ const DashboardPage = React.createClass({
       timeRange,
     } = this.props
 
+    const selectedCell = this.props.dashboard.cells[0]
+
     return (
       <div className="page">
-        <CellEditorOverlay />
+        <CellEditorOverlay cell={selectedCell} />
         {
           isEditMode ?
             <EditHeader dashboard={dashboard} onSave={() => {}} /> :

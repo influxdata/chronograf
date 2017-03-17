@@ -27,7 +27,7 @@ export const LayoutRenderer = React.createClass({
       shape({
         queries: arrayOf(
           shape({
-            queryString: string.isRequired,
+            queryString: shape({}).isRequired,
             queryConfig: shape({
               label: string,
               range: shape({
@@ -90,13 +90,12 @@ export const LayoutRenderer = React.createClass({
     const {autoRefresh, source, cells} = this.props;
 
     return cells.map((cell) => {
-      const qs = cell.queries.map((q) => {
-        return Object.assign({}, q, {
+      const qs = cell.queries.map(({queryString}) => {
+        return Object.assign({}, queryString, {
           host: source,
-          text: this.buildQuery(q),
+          text: this.buildQuery(queryString),
         });
       });
-
 
       if (cell.type === 'single-stat') {
         return (

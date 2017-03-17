@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, PropTypes} from 'react'
 
 import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContainer'
 import QueryBuilder from 'src/data_explorer/components/QueryBuilder'
@@ -19,7 +19,6 @@ const timeRange = {
   lower: '5m',
 }
 
-const queries = []
 const activeQueryID = null
 
 class CellEditorOverlay extends Component {
@@ -38,13 +37,16 @@ class CellEditorOverlay extends Component {
   }
 
   render() {
+    const {cell: {queries}} = this.props
+    const queryConfigs = queries.map(({queryConfig}) => queryConfig)
+
     return (
       <div className="data-explorer overlay-technology">
         <ResizeContainer>
           <Visualization
             autoRefresh={autoRefresh}
             timeRange={timeRange}
-            queryConfigs={queries}
+            queryConfigs={queryConfigs}
             activeQueryID={activeQueryID}
             activeQueryIndex={0}
           />
@@ -55,7 +57,7 @@ class CellEditorOverlay extends Component {
               onSelectGraphType={this.handleSelectGraphType}
             />
             <QueryBuilder
-              queries={queries}
+              queries={queryConfigs}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
               setActiveQuery={() => {}}
@@ -66,6 +68,14 @@ class CellEditorOverlay extends Component {
       </div>
     )
   }
+}
+
+const {
+  shape,
+} = PropTypes
+
+CellEditorOverlay.propTypes = {
+  cell: shape({}).isRequired,
 }
 
 export default CellEditorOverlay
