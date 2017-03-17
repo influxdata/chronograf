@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash'
 import {EMPTY_DASHBOARD} from 'src/dashboards/constants'
 import timeRanges from 'hson!../../shared/data/timeRanges.hson';
 import cellQueries from 'src/shared/fixtures/cellQueries.js'

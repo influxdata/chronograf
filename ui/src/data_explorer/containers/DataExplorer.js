@@ -7,7 +7,7 @@ import Header from '../containers/Header';
 import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContainer'
 
 import {setAutoRefresh} from 'shared/actions/app'
-import {setTimeRange as setTimeRangeAction} from '../actions/view';
+import * as viewActions from 'src/data_explorer/actions/view'
 
 const {
   arrayOf,
@@ -25,7 +25,8 @@ const DataExplorer = React.createClass({
         self: string.isRequired,
       }).isRequired,
     }).isRequired,
-    queryConfigs: PropTypes.shape({}),
+    queryConfigs: shape({}),
+    queryConfigActions: shape({}).isRequired,
     autoRefresh: number.isRequired,
     handleChooseAutoRefresh: func.isRequired,
     timeRange: shape({
@@ -62,9 +63,9 @@ const DataExplorer = React.createClass({
   },
 
   render() {
-    const {autoRefresh, handleChooseAutoRefresh, timeRange, setTimeRange, queryConfigs, dataExplorer} = this.props;
-    const {activeQueryID} = this.state;
-    const queries = dataExplorer.queryIDs.map((qid) => queryConfigs[qid]);
+    const {autoRefresh, handleChooseAutoRefresh, timeRange, setTimeRange, queryConfigs, queryConfigActions, dataExplorer} = this.props
+    const {activeQueryID} = this.state
+    const queries = dataExplorer.queryIDs.map((qid) => queryConfigs[qid])
 
     return (
       <div className="data-explorer">
@@ -83,6 +84,7 @@ const DataExplorer = React.createClass({
           <ResizeBottom>
             <QueryBuilder
               queries={queries}
+              actions={queryConfigActions}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
               setActiveQuery={this.handleSetActiveQuery}
@@ -109,7 +111,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
-    setTimeRange: bindActionCreators(setTimeRangeAction, dispatch),
+    setTimeRange: bindActionCreators(viewActions.setTimeRange, dispatch),
+    queryConfigActions: bindActionCreators(viewActions, dispatch),
   }
 }
 

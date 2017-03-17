@@ -1,12 +1,9 @@
 import React, {PropTypes} from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 
 import QueryEditor from './QueryEditor';
 import QueryTabItem from './QueryTabItem';
 import SimpleDropdown from 'src/shared/components/SimpleDropdown';
 
-import * as viewActions from '../actions/view';
 const {
   arrayOf,
   func,
@@ -150,14 +147,4 @@ const QueryBuilder = React.createClass({
   },
 });
 
-function mapStateToProps() {
-  return {};
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators(viewActions, dispatch),
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(QueryBuilder);
+export default QueryBuilder

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React, {Component, PropTypes} from 'react'
 
 import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContainer'
@@ -5,6 +6,7 @@ import QueryBuilder from 'src/data_explorer/components/QueryBuilder'
 import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
 import graphTypes from 'hson!shared/data/graphTypes.hson'
+import * as queryModifiers from 'src/utils/queryTransitions'
 
 const autoRefresh = 60000
 
@@ -21,16 +23,30 @@ class CellEditorOverlay extends Component {
     this.handleSetActiveQuery = ::this.handleSetActiveQuery
     this.findGraphType = ::this.findGraphType
 
+    this.stateReducerChooseMeasurement = ::this.stateReducerChooseMeasurement
+
     const {cell: {queries, type}} = props
+    const queriesWorkingDraft = _.cloneDeep(queries.map(({queryConfig}) => queryConfig))
     const selectedGraphType = this.findGraphType(type)
     const activeQueryID = queries.length ?
       queries.map(({queryConfig}) => queryConfig.id)[0] :
       null
 
     this.state = {
+      queriesWorkingDraft,
       selectedGraphType,
       activeQueryID,
     }
+  }
+
+  stateReducerChooseMeasurement(queryID, measurement) {
+    const {queriesWorkingDraft} = this.state
+
+    const query = queriesWorkingDraft.find((q) => q.id === queryID)
+    const nextQuery = queryModifiers.chooseMeasurement(query, measurement)
+    const nextQueries = queriesWorkingDraft.map((q) => q.id === query.id ? nextQuery : q)
+
+    this.setState({queriesWorkingDraft: nextQueries})
   }
 
   findGraphType(type) {
@@ -46,9 +62,10 @@ class CellEditorOverlay extends Component {
   }
 
   render() {
-    const {cell: {queries}} = this.props
-    const {selectedGraphType, activeQueryID} = this.state
-    const queryConfigs = queries.map(({queryConfig}) => queryConfig)
+    const {selectedGraphType, activeQueryID, queriesWorkingDraft} = this.state
+    const queryActions = {
+      chooseMeasurement: this.stateReducerChooseMeasurement,
+    }
 
     return (
       <div className="data-explorer overlay-technology">
@@ -56,7 +73,7 @@ class CellEditorOverlay extends Component {
           <Visualization
             autoRefresh={autoRefresh}
             timeRange={timeRange}
-            queryConfigs={queryConfigs}
+            queryConfigs={queriesWorkingDraft}
             activeQueryID={activeQueryID}
             activeQueryIndex={0}
           />
@@ -67,7 +84,8 @@ class CellEditorOverlay extends Component {
               onSelectGraphType={this.handleSelectGraphType}
             />
             <QueryBuilder
-              queries={queryConfigs}
+              queries={queriesWorkingDraft}
+              actions={queryActions}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
               setActiveQuery={this.handleSetActiveQuery}

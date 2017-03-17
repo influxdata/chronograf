@@ -127,7 +127,11 @@ const DashboardPage = React.createClass({
 
     return (
       <div className="page">
-        <CellEditorOverlay cell={selectedCell} />
+        {
+          selectedCell && selectedCell.queries.length ?
+            <CellEditorOverlay cell={selectedCell} /> :
+            null
+        }
         {
           isEditMode ?
             <EditHeader dashboard={dashboard} onSave={() => {}} /> :
