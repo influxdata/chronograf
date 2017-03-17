@@ -11,11 +11,13 @@ const OverlayControls = (props) => {
       <div className="overlay-controls--right">
         <p>Visualization Type:</p>
         <ul className="toggle toggle-sm">
-          {graphTypes.map(type =>
+          {graphTypes.map(graphType =>
             <li
-              key={type}
-              className={classnames('toggle-btn', {active: type === selectedGraphType})}
-              onClick={() => onSelectGraphType(type)}>{type}
+              key={graphType.type}
+              className={classnames('toggle-btn', {active: graphType.type === selectedGraphType.type})}
+              onClick={() => onSelectGraphType(graphType)}
+            >
+              {graphType.menuOption}
             </li>
           )}
         </ul>
@@ -28,11 +30,15 @@ const OverlayControls = (props) => {
 const {
   arrayOf,
   func,
+  shape,
   string,
 } = PropTypes
 
 OverlayControls.propTypes = {
-  graphTypes: arrayOf(string).isRequired,
+  graphTypes: arrayOf(shape({
+    type: string.isRequired,
+    menuOption: string.isRequired,
+  })).isRequired,
   selectedGraphType: string.isRequired,
   onSelectGraphType: func.isRequired,
 }

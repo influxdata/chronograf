@@ -4,13 +4,7 @@ import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContain
 import QueryBuilder from 'src/data_explorer/components/QueryBuilder'
 import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
-
-const graphTypes = [
-  'Line',
-  'Stacked',
-  'Step-Plot',
-  'SingleStat',
-]
+import graphTypes from 'hson!shared/data/graphTypes.hson'
 
 const autoRefresh = 60000
 
@@ -19,25 +13,41 @@ const timeRange = {
   lower: '5m',
 }
 
-const activeQueryID = null
-
 class CellEditorOverlay extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      selectedGraphType: 'Line', // TODO inherit from props
-    }
-
     this.handleSelectGraphType = ::this.handleSelectGraphType
+    this.handleSetActiveQuery = ::this.handleSetActiveQuery
+    this.findGraphType = ::this.findGraphType
+
+    const {cell: {queries, type}} = props
+    const selectedGraphType = this.findGraphType(type)
+    const activeQueryID = queries.length ?
+      queries.map(({queryConfig}) => queryConfig.id)[0] :
+      null
+
+    this.state = {
+      selectedGraphType,
+      activeQueryID,
+    }
   }
 
-  handleSelectGraphType(type) {
-    this.setState({selectedGraphType: type})
+  findGraphType(type) {
+    return graphTypes.find((graphType) => graphType.type === type)
+  }
+
+  handleSelectGraphType(graphType) {
+    this.setState({selectedGraphType: graphType})
+  }
+
+  handleSetActiveQuery(activeQueryID) {
+    this.setState({activeQueryID})
   }
 
   render() {
     const {cell: {queries}} = this.props
+    const {selectedGraphType, activeQueryID} = this.state
     const queryConfigs = queries.map(({queryConfig}) => queryConfig)
 
     return (
@@ -53,14 +63,14 @@ class CellEditorOverlay extends Component {
           <ResizeBottom>
             <OverlayControls
               graphTypes={graphTypes}
-              selectedGraphType={this.state.selectedGraphType}
+              selectedGraphType={selectedGraphType}
               onSelectGraphType={this.handleSelectGraphType}
             />
             <QueryBuilder
               queries={queryConfigs}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
-              setActiveQuery={() => {}}
+              setActiveQuery={this.handleSetActiveQuery}
               activeQueryID={activeQueryID}
             />
           </ResizeBottom>
