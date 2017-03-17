@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {EMPTY_DASHBOARD} from 'src/dashboards/constants'
 import timeRanges from 'hson!../../shared/data/timeRanges.hson';
+import cellQueries from 'src/shared/fixtures/cellQueries.js'
 
 const initialState = {
   dashboards: [],
@@ -17,6 +18,9 @@ export default function ui(state = initialState, action) {
         dashboards,
         dashboard: _.find(dashboards, (d) => d.id === +dashboardID),
       };
+
+      const fixture = _.cloneDeep(cellQueries)
+      newState.dashboard.cells[0].queries = fixture
 
       return {...state, ...newState};
     }
@@ -47,6 +51,9 @@ export default function ui(state = initialState, action) {
         dashboard,
         dashboards: state.dashboards.map((d) => d.id === dashboard.id ? dashboard : d),
       }
+
+      const fixture = _.cloneDeep(cellQueries)
+      newState.dashboard.cells[0].queries = fixture
 
       return {...state, ...newState}
     }

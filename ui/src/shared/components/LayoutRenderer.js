@@ -27,16 +27,19 @@ export const LayoutRenderer = React.createClass({
       shape({
         queries: arrayOf(
           shape({
-            label: string,
-            range: shape({
-              upper: number,
-              lower: number,
-            }),
-            rp: string,
-            text: string.isRequired,
-            database: string.isRequired,
-            groupbys: arrayOf(string),
-            wheres: arrayOf(string),
+            queryString: string.isRequired,
+            queryConfig: shape({
+              label: string,
+              range: shape({
+                upper: number,
+                lower: number,
+              }),
+              rp: string,
+              text: string.isRequired,
+              database: string.isRequired,
+              groupbys: arrayOf(string),
+              wheres: arrayOf(string),
+            }).isRequired,
           }).isRequired
         ).isRequired,
         x: number.isRequired,

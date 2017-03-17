@@ -31,9 +31,9 @@ Dashboard.renderDashboard = (dashboard, autoRefresh, timeRange, source, onPositi
   const cells = dashboard.cells.map((cell, i) => {
     i = `${i}`
     const dashboardCell = {...cell, i}
-    dashboardCell.queries.forEach((q) => {
-      q.text = q.query;
-      q.database = q.db;
+    dashboardCell.queries.forEach(({queryConfig}) => {
+      queryConfig.text = queryConfig.query
+      queryConfig.database = queryConfig.db
     });
     return dashboardCell;
   })
