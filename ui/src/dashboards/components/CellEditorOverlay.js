@@ -30,7 +30,7 @@ class CellEditorOverlay extends Component {
       selectedGraphType: 'Line', // TODO inherit from props
     }
 
-    this.handleSelectGraphType = :: this.handleSelectGraphType
+    this.handleSelectGraphType = ::this.handleSelectGraphType
   }
 
   handleSelectGraphType(type) {

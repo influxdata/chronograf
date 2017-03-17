@@ -78,7 +78,6 @@ const DataExplorer = React.createClass({
             autoRefresh={autoRefresh}
             timeRange={timeRange}
             queryConfigs={queries}
-            activeQueryID={this.state.activeQueryID}
             activeQueryIndex={0}
           />
           <ResizeBottom>
