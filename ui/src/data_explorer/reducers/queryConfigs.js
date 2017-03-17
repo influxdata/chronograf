@@ -20,12 +20,12 @@ export default function queryConfigs(state = {}, action) {
     }
 
     case 'CHOOSE_NAMESPACE': {
-      const {queryId, database, retentionPolicy} = action.payload;
-      const nextQueryConfig = chooseNamespace(state[queryId], {database, retentionPolicy});
+      const {queryId, database, retentionPolicy} = action.payload
+      const nextQueryConfig = chooseNamespace(state[queryId], {database, retentionPolicy})
 
       return Object.assign({}, state, {
         [queryId]: Object.assign(nextQueryConfig, {rawText: state[queryId].rawText}),
-      });
+      })
     }
 
     case 'CHOOSE_MEASUREMENT': {
