@@ -23,7 +23,7 @@ class CellEditorOverlay extends Component {
   constructor(props) {
     super(props)
 
-    this.stateReducer = ::this.stateReducer
+    this.queryStateReducer = ::this.queryStateReducer
 
     this.addQuery = ::this.addQuery
     this.deleteQuery = ::this.deleteQuery
@@ -46,7 +46,7 @@ class CellEditorOverlay extends Component {
     }
   }
 
-  stateReducer(queryModifier) {
+  queryStateReducer(queryModifier) {
     return (queryID, payload) => {
       const {queriesWorkingDraft} = this.state
       const query = queriesWorkingDraft.find((q) => q.id === queryID)
@@ -87,7 +87,7 @@ class CellEditorOverlay extends Component {
     const queryActions = {
       addQuery,
       deleteQuery,
-      ..._.mapValues(queryModifiers, (qm) => this.stateReducer(qm)),
+      ..._.mapValues(queryModifiers, (qm) => this.queryStateReducer(qm)),
     }
 
     return (
