@@ -19,11 +19,11 @@ class CellEditorOverlay extends Component {
   constructor(props) {
     super(props)
 
+    this.stateReducer = ::this.stateReducer
+
     this.handleSelectGraphType = ::this.handleSelectGraphType
     this.handleSetActiveQuery = ::this.handleSetActiveQuery
     this.findGraphType = ::this.findGraphType
-
-    this.stateReducerChooseMeasurement = ::this.stateReducerChooseMeasurement
 
     const {cell: {queries, type}} = props
     const queriesWorkingDraft = _.cloneDeep(queries.map(({queryConfig}) => queryConfig))
@@ -39,14 +39,16 @@ class CellEditorOverlay extends Component {
     }
   }
 
-  stateReducerChooseMeasurement(queryID, measurement) {
-    const {queriesWorkingDraft} = this.state
+  stateReducer(queryModifier) {
+    return (queryID, payload) => {
+      const {queriesWorkingDraft} = this.state
+      const query = queriesWorkingDraft.find((q) => q.id === queryID)
 
-    const query = queriesWorkingDraft.find((q) => q.id === queryID)
-    const nextQuery = queryModifiers.chooseMeasurement(query, measurement)
-    const nextQueries = queriesWorkingDraft.map((q) => q.id === query.id ? nextQuery : q)
+      const nextQuery = queryModifier(query, payload)
 
-    this.setState({queriesWorkingDraft: nextQueries})
+      const nextQueries = queriesWorkingDraft.map((q) => q.id === query.id ? nextQuery : q)
+      this.setState({queriesWorkingDraft: nextQueries})
+    }
   }
 
   findGraphType(type) {
@@ -63,9 +65,7 @@ class CellEditorOverlay extends Component {
 
   render() {
     const {selectedGraphType, activeQueryID, queriesWorkingDraft} = this.state
-    const queryActions = {
-      chooseMeasurement: this.stateReducerChooseMeasurement,
-    }
+    const queryActions = _.mapValues(queryModifiers, (qm) => this.stateReducer(qm))
 
     return (
       <div className="data-explorer overlay-technology">
