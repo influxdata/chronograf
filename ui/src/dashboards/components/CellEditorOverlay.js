@@ -1,5 +1,7 @@
-import _ from 'lodash'
 import React, {Component, PropTypes} from 'react'
+
+import _ from 'lodash'
+import uuid from 'node-uuid'
 
 import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContainer'
 import QueryBuilder from 'src/data_explorer/components/QueryBuilder'
@@ -7,6 +9,8 @@ import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
 import graphTypes from 'hson!shared/data/graphTypes.hson'
 import * as queryModifiers from 'src/utils/queryTransitions'
+
+import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
 const autoRefresh = 60000
 
@@ -20,6 +24,9 @@ class CellEditorOverlay extends Component {
     super(props)
 
     this.stateReducer = ::this.stateReducer
+
+    this.addQuery = ::this.addQuery
+    this.deleteQuery = ::this.deleteQuery
 
     this.handleSelectGraphType = ::this.handleSelectGraphType
     this.handleSetActiveQuery = ::this.handleSetActiveQuery
@@ -51,6 +58,17 @@ class CellEditorOverlay extends Component {
     }
   }
 
+  addQuery(options) {
+    const newQuery = Object.assign({}, defaultQueryConfig(uuid.v4()), options)
+    const nextQueries = this.state.queriesWorkingDraft.concat(newQuery)
+    this.setState({queriesWorkingDraft: nextQueries})
+  }
+
+  deleteQuery(queryID) {
+    const nextQueries = this.state.queriesWorkingDraft.filter((q) => q.id !== queryID)
+    this.setState({queriesWorkingDraft: nextQueries})
+  }
+
   findGraphType(type) {
     return graphTypes.find((graphType) => graphType.type === type)
   }
@@ -65,7 +83,12 @@ class CellEditorOverlay extends Component {
 
   render() {
     const {selectedGraphType, activeQueryID, queriesWorkingDraft} = this.state
-    const queryActions = _.mapValues(queryModifiers, (qm) => this.stateReducer(qm))
+    const {addQuery, deleteQuery} = this
+    const queryActions = {
+      addQuery,
+      deleteQuery,
+      ..._.mapValues(queryModifiers, (qm) => this.stateReducer(qm)),
+    }
 
     return (
       <div className="data-explorer overlay-technology">
