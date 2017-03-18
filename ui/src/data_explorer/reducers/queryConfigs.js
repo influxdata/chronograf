@@ -84,20 +84,20 @@ export default function queryConfigs(state = {}, action) {
     }
 
     case 'TOGGLE_TAG_ACCEPTANCE': {
-      const {queryId} = action.payload;
-      const nextQueryConfig = toggleTagAcceptance(state[queryId]);
+      const {queryId} = action.payload
+      const nextQueryConfig = toggleTagAcceptance(state[queryId])
 
       return Object.assign({}, state, {
         [queryId]: nextQueryConfig,
-      });
+      })
     }
 
     case 'DELETE_QUERY': {
       const {queryID} = action.payload;
       const nextState = update(state, {$apply: (configs) => {
-        delete configs[queryID];
+        delete configs[queryID]
         return configs;
-      }});
+      }})
 
       return nextState;
     }
