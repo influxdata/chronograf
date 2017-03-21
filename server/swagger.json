@@ -3117,6 +3117,86 @@
 				]
 			}
 		},
+		"DashboardQuery": {
+			"type": "object",
+			"required": [
+				"query"
+			],
+			"properties": {
+				"label": {
+					"description": "Optional Y-axis user-facing label for this query",
+					"type": "string"
+				},
+				"range": {
+					"description": "Optional default range of the Y-axis",
+					"type": "object",
+					"required": [
+						"upper",
+						"lower"
+					],
+					"properties": {
+						"upper": {
+							"description": "Upper bound of the display range of the Y-axis",
+							"type": "integer",
+							"format": "int64"
+						},
+						"lower": {
+							"description": "Lower bound of the display range of the Y-axis",
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				},
+				"query": {
+					"type": "string"
+				},
+				"queryConfig": {
+					"$ref": "#/definitions/QueryConfig"
+				}
+			},
+			"example": {
+				"id": 4,
+				"cells": [
+					{
+						"x": 0,
+						"y": 0,
+						"w": 4,
+						"h": 4,
+						"name": "",
+						"queries": [
+							{
+								"query": "SELECT mean(\"usage_user\") AS \"usage_user\" FROM \"cpu\"",
+								"label": "%",
+								"queryConfig": {
+									"database": "",
+									"measurement": "cpu",
+									"retentionPolicy": "",
+									"fields": [
+										{
+											"field": "usage_user",
+											"funcs": [
+												"mean"
+											]
+										}
+									],
+									"tags": {},
+									"groupBy": {
+										"time": "",
+										"tags": []
+									},
+									"areTagsAccepted": false
+								}
+							}
+						],
+						"type": "line"
+					}
+				],
+				"name": "dashboard name",
+				"links": {
+					"self": "/chronograf/v1/dashboards/4"
+				}
+			}
+		},
 		"Dashboards": {
 			"description": "a list of dashboards",
 			"type": "object",
@@ -3175,7 +3255,7 @@
 								"description": "Time-series data queries for Cell.",
 								"type": "array",
 								"items": {
-									"$ref": "#/definitions/LayoutQuery"
+									"$ref": "#/definitions/DashboardQuery"
 								}
 							},
 							"type": {

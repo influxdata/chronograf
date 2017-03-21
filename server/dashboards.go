@@ -260,6 +260,8 @@ func AddQueryConfigs(d *chronograf.Dashboard) {
 }
 
 // AddQueryConfig updates a cell by converting InfluxQL into queryconfigs
+// If influxql cannot be represented by a full query config, then, the
+// query config's raw text is set to the command.
 func AddQueryConfig(c *chronograf.DashboardCell) {
 	for i, q := range c.Queries {
 		qc, err := influx.Convert(q.Command)
