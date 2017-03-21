@@ -9,6 +9,7 @@ import (
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/uuid"
 )
 
 const (
@@ -248,6 +249,15 @@ func ValidDashboardRequest(d *chronograf.Dashboard) error {
 	return nil
 }
 
+// ValidDashboardCellRequest verifies that the dashboard cells have a query
+func ValidDashboardCellRequest(c *chronograf.DashboardCell) error {
+	if len(c.Queries) == 0 {
+		return fmt.Errorf("query required")
+	}
+	CorrectWidthHeight(c)
+	return nil
+}
+
 // DashboardDefaults updates the dashboard with the default values
 // if none are specified
 func DashboardDefaults(d *chronograf.Dashboard) {
@@ -298,4 +308,187 @@ func AddQueryConfig(c *chronograf.DashboardCell) {
 			c.Queries[i] = q
 		}
 	}
+}
+
+// DashboardCells returns all cells from a dashboard within the store
+func (s *Service) DashboardCells(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
+		return
+	}
+
+	ctx := r.Context()
+	e, err := s.DashboardsStore.Get(ctx, chronograf.DashboardID(id))
+	if err != nil {
+		notFound(w, id, s.Logger)
+		return
+	}
+
+	boards := newDashboardResponse(e)
+	cells := boards.Cells
+	encodeJSON(w, http.StatusOK, cells, s.Logger)
+}
+
+// NewDashboardCell adds a cell to an existing dashboard
+func (s *Service) NewDashboardCell(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
+		return
+	}
+
+	ctx := r.Context()
+	dash, err := s.DashboardsStore.Get(ctx, chronograf.DashboardID(id))
+	if err != nil {
+		notFound(w, id, s.Logger)
+		return
+	}
+	var cell chronograf.DashboardCell
+	if err := json.NewDecoder(r.Body).Decode(&cell); err != nil {
+		invalidJSON(w, s.Logger)
+		return
+	}
+
+	if err := ValidDashboardCellRequest(&cell); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
+
+	ids := uuid.V4{}
+	cid, err := ids.Generate()
+	if err != nil {
+		msg := fmt.Sprintf("Error creating cell ID of dashboard %d: %v", id, err)
+		Error(w, http.StatusInternalServerError, msg, s.Logger)
+		return
+	}
+	cell.ID = cid
+
+	dash.Cells = append(dash.Cells, cell)
+	if err := s.DashboardsStore.Update(ctx, dash); err != nil {
+		msg := fmt.Sprintf("Error updating dashboard ID %d: %v", id, err)
+		Error(w, http.StatusInternalServerError, msg, s.Logger)
+		return
+	}
+
+	boards := newDashboardResponse(dash)
+	for _, cell := range boards.Cells {
+		if cell.ID == cid {
+			encodeJSON(w, http.StatusOK, cell, s.Logger)
+			return
+		}
+	}
+}
+
+// DashboardCellID adds a cell to an existing dashboard
+func (s *Service) DashboardCellID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
+		return
+	}
+
+	dash, err := s.DashboardsStore.Get(ctx, chronograf.DashboardID(id))
+	if err != nil {
+		notFound(w, id, s.Logger)
+		return
+	}
+
+	boards := newDashboardResponse(dash)
+	cid := httprouter.GetParamFromContext(ctx, "cid")
+	for _, cell := range boards.Cells {
+		if cell.ID == cid {
+			encodeJSON(w, http.StatusOK, cell, s.Logger)
+			return
+		}
+	}
+	notFound(w, id, s.Logger)
+}
+
+// RemoveDashboardCell adds a cell to an existing dashboard
+func (s *Service) RemoveDashboardCell(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
+		return
+	}
+
+	ctx := r.Context()
+	dash, err := s.DashboardsStore.Get(ctx, chronograf.DashboardID(id))
+	if err != nil {
+		notFound(w, id, s.Logger)
+		return
+	}
+
+	cid := httprouter.GetParamFromContext(ctx, "cid")
+	cellid := -1
+	for i, cell := range dash.Cells {
+		if cell.ID == cid {
+			cellid = i
+			break
+		}
+	}
+	if cellid == -1 {
+		notFound(w, id, s.Logger)
+		return
+	}
+
+	dash.Cells = append(dash.Cells[:cellid], dash.Cells[cellid+1:]...)
+	if err := s.DashboardsStore.Update(ctx, dash); err != nil {
+		msg := fmt.Sprintf("Error updating dashboard ID %d: %v", id, err)
+		Error(w, http.StatusInternalServerError, msg, s.Logger)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// ReplaceDashboardCell adds a cell to an existing dashboard
+func (s *Service) ReplaceDashboardCell(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
+		return
+	}
+
+	ctx := r.Context()
+	dash, err := s.DashboardsStore.Get(ctx, chronograf.DashboardID(id))
+	if err != nil {
+		notFound(w, id, s.Logger)
+		return
+	}
+
+	cid := httprouter.GetParamFromContext(ctx, "cid")
+	cellid := -1
+	for i, cell := range dash.Cells {
+		if cell.ID == cid {
+			cellid = i
+			break
+		}
+	}
+	if cellid == -1 {
+		notFound(w, id, s.Logger)
+		return
+	}
+
+	var cell chronograf.DashboardCell
+	if err := json.NewDecoder(r.Body).Decode(&cell); err != nil {
+		invalidJSON(w, s.Logger)
+		return
+	}
+
+	if err := ValidDashboardCellRequest(&cell); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
+	cell.ID = cid
+
+	dash.Cells[cellid] = cell
+	if err := s.DashboardsStore.Update(ctx, dash); err != nil {
+		msg := fmt.Sprintf("Error updating dashboard ID %d: %v", id, err)
+		Error(w, http.StatusInternalServerError, msg, s.Logger)
+		return
+	}
+
+	encodeJSON(w, http.StatusOK, cell, s.Logger)
 }
