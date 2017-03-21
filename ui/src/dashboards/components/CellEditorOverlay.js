@@ -7,7 +7,6 @@ import ResizeContainer, {ResizeBottom} from 'src/shared/components/ResizeContain
 import QueryBuilder from 'src/data_explorer/components/QueryBuilder'
 import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
-import graphTypes from 'hson!shared/data/graphTypes.hson'
 import * as queryModifiers from 'src/utils/queryTransitions'
 
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
@@ -30,18 +29,17 @@ class CellEditorOverlay extends Component {
 
     this.handleSelectGraphType = ::this.handleSelectGraphType
     this.handleSetActiveQuery = ::this.handleSetActiveQuery
-    this.findGraphType = ::this.findGraphType
 
-    const {cell: {queries, type}} = props
+    const {cell: {name, type, queries}} = props
     const queriesWorkingDraft = _.cloneDeep(queries.map(({queryConfig}) => queryConfig))
-    const selectedGraphType = this.findGraphType(type)
     const activeQueryID = queries.length ?
       queries.map(({queryConfig}) => queryConfig.id)[0] :
       null
 
     this.state = {
+      cellWorkingName: name,
+      cellWorkingType: type,
       queriesWorkingDraft,
-      selectedGraphType,
       activeQueryID,
     }
   }
@@ -69,12 +67,8 @@ class CellEditorOverlay extends Component {
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
-  findGraphType(type) {
-    return graphTypes.find((graphType) => graphType.type === type)
-  }
-
   handleSelectGraphType(graphType) {
-    this.setState({selectedGraphType: graphType})
+    this.setState({cellWorkingType: graphType})
   }
 
   handleSetActiveQuery(activeQueryID) {
@@ -82,7 +76,7 @@ class CellEditorOverlay extends Component {
   }
 
   render() {
-    const {selectedGraphType, activeQueryID, queriesWorkingDraft} = this.state
+    const {activeQueryID, cellWorkingType, queriesWorkingDraft} = this.state
     const {addQuery, deleteQuery} = this
     const queryActions = {
       addQuery,
@@ -102,8 +96,7 @@ class CellEditorOverlay extends Component {
           />
           <ResizeBottom>
             <OverlayControls
-              graphTypes={graphTypes}
-              selectedGraphType={selectedGraphType}
+              selectedGraphType={cellWorkingType}
               onSelectGraphType={this.handleSelectGraphType}
             />
             <QueryBuilder

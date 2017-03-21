@@ -3,8 +3,10 @@ import classnames from 'classnames'
 
 import ConfirmButtons from 'src/admin/components/ConfirmButtons'
 
+import graphTypes from 'hson!shared/data/graphTypes.hson'
+
 const OverlayControls = (props) => {
-  const {graphTypes, selectedGraphType, onSelectGraphType} = props
+  const {selectedGraphType, onSelectGraphType} = props
   return (
     <div className="overlay-controls">
       <h3 className="overlay--graph-name">Graph Editor</h3>
@@ -14,8 +16,8 @@ const OverlayControls = (props) => {
           {graphTypes.map(graphType =>
             <li
               key={graphType.type}
-              className={classnames('toggle-btn', {active: graphType.type === selectedGraphType.type})}
-              onClick={() => onSelectGraphType(graphType)}
+              className={classnames('toggle-btn', {active: graphType.type === selectedGraphType})}
+              onClick={() => onSelectGraphType(graphType.type)}
             >
               {graphType.menuOption}
             </li>
