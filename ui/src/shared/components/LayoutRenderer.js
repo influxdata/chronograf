@@ -22,7 +22,7 @@ export const LayoutRenderer = React.createClass({
     autoRefresh: number.isRequired,
     timeRange: shape({
       defaultGroupBy: string.isRequired,
-      queryValue: string.isRequired,
+      lower: string.isRequired,
     }).isRequired,
     cells: arrayOf(
       shape({
@@ -60,12 +60,12 @@ export const LayoutRenderer = React.createClass({
   },
 
   buildQuery(q) {
-    const {timeRange, host} = this.props;
+    const {timeRange: {lower, defaultGroupBy}, host} = this.props;
     const {wheres, groupbys} = q;
 
     let text = q.text;
 
-    text += ` where time > ${timeRange.queryValue}`;
+    text += ` where time > ${lower}`;
 
     if (host) {
       text += ` and \"host\" = '${host}'`;
@@ -79,12 +79,12 @@ export const LayoutRenderer = React.createClass({
       if (groupbys.find((g) => g.includes("time"))) {
         text += ` group by ${groupbys.join(',')}`;
       } else if (groupbys.length > 0) {
-        text += ` group by time(${timeRange.defaultGroupBy}),${groupbys.join(',')}`;
+        text += ` group by time(${defaultGroupBy}),${groupbys.join(',')}`;
       } else {
-        text += ` group by time(${timeRange.defaultGroupBy})`;
+        text += ` group by time(${defaultGroupBy})`;
       }
     } else {
-      text += ` group by time(${timeRange.defaultGroupBy})`;
+      text += ` group by time(${defaultGroupBy})`;
     }
 
     return text;

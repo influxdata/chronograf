@@ -8,8 +8,6 @@ import Header from 'src/dashboards/components/DashboardHeader'
 import EditHeader from 'src/dashboards/components/DashboardHeaderEdit'
 import Dashboard from 'src/dashboards/components/Dashboard'
 
-import timeRanges from 'hson!../../shared/data/timeRanges.hson'
-
 import * as dashboardActionCreators from 'src/dashboards/actions'
 
 import {setAutoRefresh} from 'shared/actions/app'
@@ -103,8 +101,7 @@ const DashboardPage = React.createClass({
   },
 
   handleChooseTimeRange({lower}) {
-    const timeRange = timeRanges.find((range) => range.queryValue === lower);
-    this.props.dashboardActions.setTimeRange(timeRange)
+    this.props.dashboardActions.setTimeRange({lower, upper: null})
   },
 
   handleUpdatePosition(cells) {
@@ -152,7 +149,11 @@ const DashboardPage = React.createClass({
       <div className="page">
         {
           selectedCell && selectedCell.queries.length ?
-            <CellEditorOverlay cell={selectedCell} /> :
+            <CellEditorOverlay
+              cell={selectedCell}
+              autoRefresh={autoRefresh}
+              timeRange={timeRange}
+            /> :
             null
         }
         {

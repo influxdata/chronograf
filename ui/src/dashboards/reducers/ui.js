@@ -3,10 +3,12 @@ import {EMPTY_DASHBOARD} from 'src/dashboards/constants'
 import timeRanges from 'hson!../../shared/data/timeRanges.hson';
 import cellQueries from 'src/shared/fixtures/cellQueries.js'
 
+const {lower, upper} = timeRanges[1]
+
 const initialState = {
   dashboards: [],
   dashboard: EMPTY_DASHBOARD,
-  timeRange: timeRanges[1],
+  timeRange: {lower, upper},
   isEditMode: false,
 };
 

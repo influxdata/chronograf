@@ -11,13 +11,6 @@ import * as queryModifiers from 'src/utils/queryTransitions'
 
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
-const autoRefresh = 60000
-
-const timeRange = {
-  upper: 'now()',
-  lower: '5m',
-}
-
 class CellEditorOverlay extends Component {
   constructor(props) {
     super(props)
@@ -76,6 +69,7 @@ class CellEditorOverlay extends Component {
   }
 
   render() {
+    const {autoRefresh, timeRange} = this.props
     const {activeQueryID, cellWorkingType, queriesWorkingDraft} = this.state
     const {addQuery, deleteQuery} = this
     const queryActions = {
@@ -115,11 +109,18 @@ class CellEditorOverlay extends Component {
 }
 
 const {
+  number,
   shape,
+  string,
 } = PropTypes
 
 CellEditorOverlay.propTypes = {
   cell: shape({}).isRequired,
+  timeRange: shape({
+    upper: string,
+    lower: string,
+  }).isRequired,
+  autoRefresh: number.isRequired,
 }
 
 export default CellEditorOverlay

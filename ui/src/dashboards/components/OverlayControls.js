@@ -30,17 +30,11 @@ const OverlayControls = (props) => {
 }
 
 const {
-  arrayOf,
   func,
-  shape,
   string,
 } = PropTypes
 
 OverlayControls.propTypes = {
-  graphTypes: arrayOf(shape({
-    type: string.isRequired,
-    menuOption: string.isRequired,
-  })).isRequired,
   selectedGraphType: string.isRequired,
   onSelectGraphType: func.isRequired,
 }
