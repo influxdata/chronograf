@@ -47,6 +47,28 @@ type Assets interface {
 	Handler() http.Handler
 }
 
+// Supported time-series databases
+const (
+	// InfluxDB is the open-source time-series database
+	InfluxDB = "influx"
+	// InfluxEnteprise is the clustered HA time-series database
+	InfluxEnterprise = "influx-enterprise"
+	// InfluxRelay is the basic HA layer over InfluxDB
+	InfluxRelay = "influx-relay"
+)
+
+// TSDBStatus represents the current status of a time series database
+type TSDBStatus interface {
+	// Connect will connect to the time series using the information in `Source`.
+	Connect(ctx context.Context, src *Source) error
+	// Ping returns version and TSDB type of time series database if reachable.
+	Ping(context.Context) error
+	// Version returns the version of the TSDB database
+	Version(context.Context) (string, error)
+	// Type returns the type of the TSDB database
+	Type(context.Context) (string, error)
+}
+
 // TimeSeries represents a queryable time series database.
 type TimeSeries interface {
 	// Query retrieves time series data from the database.
@@ -97,6 +119,17 @@ type Query struct {
 	GroupBys []string `json:"groupbys,omitempty"` // GroupBys collate the query by these tags
 	Label    string   `json:"label,omitempty"`    // Label is the Y-Axis label for the data
 	Range    *Range   `json:"range,omitempty"`    // Range is the default Y-Axis range for the data
+}
+
+// DashboardQuery includes state for the query builder.  This is a transition
+// struct while we move to the full InfluxQL AST
+type DashboardQuery struct {
+	Command     string      `json:"query"`                 // Command is the query itself
+	DB          string      `json:"db,omitempty"`          // DB is optional and if empty will not be used.
+	RP          string      `json:"rp,omitempty"`          // RP is a retention policy and optional; if empty will not be used.
+	Label       string      `json:"label,omitempty"`       // Label is the Y-Axis label for the data
+	Range       *Range      `json:"range,omitempty"`       // Range is the default Y-Axis range for the data
+	QueryConfig QueryConfig `json:"queryConfig,omitempty"` // QueryConfig represents the query state that is understood by the data explorer
 }
 
 // Response is the result of a query against a TimeSeries
@@ -306,13 +339,13 @@ type Dashboard struct {
 
 // DashboardCell holds visual and query information for a cell
 type DashboardCell struct {
-	X       int32   `json:"x"`
-	Y       int32   `json:"y"`
-	W       int32   `json:"w"`
-	H       int32   `json:"h"`
-	Name    string  `json:"name"`
-	Queries []Query `json:"queries"`
-	Type    string  `json:"type"`
+	X       int32            `json:"x"`
+	Y       int32            `json:"y"`
+	W       int32            `json:"w"`
+	H       int32            `json:"h"`
+	Name    string           `json:"name"`
+	Queries []DashboardQuery `json:"queries"`
+	Type    string           `json:"type"`
 }
 
 // DashboardsStore is the storage and retrieval of dashboards

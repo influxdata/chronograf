@@ -3,6 +3,8 @@
 ### Bug Fixes
 
 ### Features
+  1. [#1020](https://github.com/influxdata/chronograf/pull/1020): Users can now edit cell names on dashboards
+  2. [#1035](https://github.com/influxdata/chronograf/pull/1035): Convert many InfluxQL statements to query builder
 
 ### UI Improvements
 
