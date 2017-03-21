@@ -3030,6 +3030,10 @@
 					"type": "integer",
 					"format": "int32"
 				},
+				"name": {
+					"description": "Cell name",
+					"type": "string"
+				},
 				"queries": {
 					"description": "Time-series data queries for Cell.",
 					"type": "array",
@@ -3039,8 +3043,7 @@
 				},
 				"type": {
 					"description": "Cell visualization type",
-					"type": "string",
-					"format": "uuid4"
+					"type": "string"
 				}
 			},
 			"example": {
@@ -3251,6 +3254,10 @@
 								"minimum": 1,
 								"default": 4
 							},
+							"name": {
+								"description": "Name of Cell in the Dashboard",
+								"type": "string"
+							},
 							"queries": {
 								"description": "Time-series data queries for Cell.",
 								"type": "array",
@@ -3269,6 +3276,16 @@
 									"line-stepplot"
 								],
 								"default": "line"
+							},
+							"links": {
+								"type": "object",
+								"properties": {
+									"self": {
+										"type": "string",
+										"description": "Self link mapping to this resource",
+										"format": "url"
+									}
+								}
 							}
 						}
 					}
