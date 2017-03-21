@@ -77,7 +77,7 @@ export const RuleMessage = React.createClass({
             <div className="alert-message--email-body">
               <textarea
                 className="alert-text details"
-                placeholder="Email body text goes here"
+                placeholder="Subject Line"
                 ref={(r) => this.details = r}
                 onChange={() => actions.updateDetails(rule.id, this.details.value)}
                 value={rule.details}

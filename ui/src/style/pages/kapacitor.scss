@@ -419,6 +419,10 @@ div.qeditor.kapacitor-metric-selector {
   &::-moz-placeholder { color: $g9-mountain; }
   &:-ms-input-placeholder { color: $g9-mountain; }
   &:-moz-placeholder { color: $g9-mountain; }
+
+  &.details {
+    height: 48px;
+  }
 }
 
 .alert-message--endpoint {
