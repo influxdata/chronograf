@@ -171,13 +171,11 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 				r.Upper, r.Lower = q.Range.Upper, q.Range.Lower
 			}
 			queries[j] = &Query{
-				Command:  q.Command,
-				DB:       q.DB,
-				RP:       q.RP,
-				GroupBys: q.GroupBys,
-				Wheres:   q.Wheres,
-				Label:    q.Label,
-				Range:    r,
+				Command: q.Command,
+				DB:      q.DB,
+				RP:      q.RP,
+				Label:   q.Label,
+				Range:   r,
 			}
 		}
 
@@ -208,15 +206,13 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 
 	cells := make([]chronograf.DashboardCell, len(pb.Cells))
 	for i, c := range pb.Cells {
-		queries := make([]chronograf.Query, len(c.Queries))
+		queries := make([]chronograf.DashboardQuery, len(c.Queries))
 		for j, q := range c.Queries {
-			queries[j] = chronograf.Query{
-				Command:  q.Command,
-				DB:       q.DB,
-				RP:       q.RP,
-				GroupBys: q.GroupBys,
-				Wheres:   q.Wheres,
-				Label:    q.Label,
+			queries[j] = chronograf.DashboardQuery{
+				Command: q.Command,
+				DB:      q.DB,
+				RP:      q.RP,
+				Label:   q.Label,
 			}
 			if q.Range.Upper != q.Range.Lower {
 				queries[j].Range = &chronograf.Range{

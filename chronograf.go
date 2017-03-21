@@ -121,6 +121,17 @@ type Query struct {
 	Range    *Range   `json:"range,omitempty"`    // Range is the default Y-Axis range for the data
 }
 
+// DashboardQuery includes state for the query builder.  This is a transition
+// struct while we move to the full InfluxQL AST
+type DashboardQuery struct {
+	Command     string      `json:"query"`                 // Command is the query itself
+	DB          string      `json:"db,omitempty"`          // DB is optional and if empty will not be used.
+	RP          string      `json:"rp,omitempty"`          // RP is a retention policy and optional; if empty will not be used.
+	Label       string      `json:"label,omitempty"`       // Label is the Y-Axis label for the data
+	Range       *Range      `json:"range,omitempty"`       // Range is the default Y-Axis range for the data
+	QueryConfig QueryConfig `json:"queryConfig,omitempty"` // QueryConfig represents the query state that is understood by the data explorer
+}
+
 // Response is the result of a query against a TimeSeries
 type Response interface {
 	MarshalJSON() ([]byte, error)
@@ -328,13 +339,13 @@ type Dashboard struct {
 
 // DashboardCell holds visual and query information for a cell
 type DashboardCell struct {
-	X       int32   `json:"x"`
-	Y       int32   `json:"y"`
-	W       int32   `json:"w"`
-	H       int32   `json:"h"`
-	Name    string  `json:"name"`
-	Queries []Query `json:"queries"`
-	Type    string  `json:"type"`
+	X       int32            `json:"x"`
+	Y       int32            `json:"y"`
+	W       int32            `json:"w"`
+	H       int32            `json:"h"`
+	Name    string           `json:"name"`
+	Queries []DashboardQuery `json:"queries"`
+	Type    string           `json:"type"`
 }
 
 // DashboardsStore is the storage and retrieval of dashboards

@@ -147,7 +147,7 @@ func TestValidDashboardRequest(t *testing.T) {
 					{
 						W: 0,
 						H: 0,
-						Queries: []chronograf.Query{
+						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
 							},
@@ -156,7 +156,7 @@ func TestValidDashboardRequest(t *testing.T) {
 					{
 						W: 2,
 						H: 2,
-						Queries: []chronograf.Query{
+						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
 							},
@@ -169,7 +169,7 @@ func TestValidDashboardRequest(t *testing.T) {
 					{
 						W: 4,
 						H: 4,
-						Queries: []chronograf.Query{
+						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
 							},
@@ -178,7 +178,7 @@ func TestValidDashboardRequest(t *testing.T) {
 					{
 						W: 2,
 						H: 2,
-						Queries: []chronograf.Query{
+						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
 							},
@@ -194,7 +194,7 @@ func TestValidDashboardRequest(t *testing.T) {
 					{
 						W:       2,
 						H:       2,
-						Queries: []chronograf.Query{},
+						Queries: []chronograf.DashboardQuery{},
 					},
 				},
 			},
@@ -203,7 +203,7 @@ func TestValidDashboardRequest(t *testing.T) {
 					{
 						W:       2,
 						H:       2,
-						Queries: []chronograf.Query{},
+						Queries: []chronograf.DashboardQuery{},
 					},
 				},
 			},
@@ -236,50 +236,73 @@ func Test_newDashboardResponse(t *testing.T) {
 	tests := []struct {
 		name string
 		d    chronograf.Dashboard
-		want dashboardResponse
+		want *dashboardResponse
 	}{
 		{
-			name: "Updates all cell widths/heights",
+			name: "creates a dashboard response",
 			d: chronograf.Dashboard{
 				Cells: []chronograf.DashboardCell{
 					{
 						W: 0,
 						H: 0,
-						Queries: []chronograf.Query{
+						Queries: []chronograf.DashboardQuery{
 							{
-								Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
+								Command: "SELECT donors from hill_valley_preservation_society where time > '1985-10-25 08:00:00'",
 							},
 						},
 					},
 					{
 						W: 0,
 						H: 0,
-						Queries: []chronograf.Query{
+						Queries: []chronograf.DashboardQuery{
 							{
-								Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
+								Command: "SELECT winning_horses from grays_sports_alamanc where time > now() - 15m",
 							},
 						},
 					},
 				},
 			},
-			want: dashboardResponse{
+			want: &dashboardResponse{
 				Dashboard: chronograf.Dashboard{
 					Cells: []chronograf.DashboardCell{
 						{
 							W: 4,
 							H: 4,
-							Queries: []chronograf.Query{
+							Queries: []chronograf.DashboardQuery{
 								{
-									Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
+									Command: "SELECT donors from hill_valley_preservation_society where time > '1985-10-25 08:00:00'",
+									QueryConfig: chronograf.QueryConfig{
+										RawText: "SELECT donors FROM hill_valley_preservation_society WHERE time > '1985-10-25 08:00:00'",
+										Fields:  []chronograf.Field{},
+										GroupBy: chronograf.GroupBy{
+											Tags: []string{},
+										},
+										Tags:            make(map[string][]string, 0),
+										AreTagsAccepted: false,
+									},
 								},
 							},
 						},
 						{
 							W: 4,
 							H: 4,
-							Queries: []chronograf.Query{
+							Queries: []chronograf.DashboardQuery{
 								{
-									Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
+									Command: "SELECT winning_horses from grays_sports_alamanc where time > now() - 15m",
+									QueryConfig: chronograf.QueryConfig{
+										Measurement: "grays_sports_alamanc",
+										Fields: []chronograf.Field{
+											{
+												Field: "winning_horses",
+												Funcs: []string{},
+											},
+										},
+										GroupBy: chronograf.GroupBy{
+											Tags: []string{},
+										},
+										Tags:            make(map[string][]string, 0),
+										AreTagsAccepted: false,
+									},
 								},
 							},
 						},
@@ -293,7 +316,7 @@ func Test_newDashboardResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		if got := newDashboardResponse(tt.d); !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("%q. newDashboardResponse() = %v, want %v", tt.name, got, tt.want)
+			t.Errorf("%q. newDashboardResponse() = \n%+v\n\n, want\n\n%+v", tt.name, *got, tt.want)
 		}
 	}
 }

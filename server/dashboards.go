@@ -8,6 +8,7 @@ import (
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/influx"
 )
 
 const (
@@ -27,13 +28,14 @@ type dashboardResponse struct {
 }
 
 type getDashboardsResponse struct {
-	Dashboards []dashboardResponse `json:"dashboards"`
+	Dashboards []*dashboardResponse `json:"dashboards"`
 }
 
-func newDashboardResponse(d chronograf.Dashboard) dashboardResponse {
+func newDashboardResponse(d chronograf.Dashboard) *dashboardResponse {
 	base := "/chronograf/v1/dashboards"
 	DashboardDefaults(&d)
-	return dashboardResponse{
+	AddQueryConfigs(&d)
+	return &dashboardResponse{
 		Dashboard: d,
 		Links: dashboardLinks{
 			Self: fmt.Sprintf("%s/%d", base, d.ID),
@@ -51,7 +53,7 @@ func (s *Service) Dashboards(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res := getDashboardsResponse{
-		Dashboards: []dashboardResponse{},
+		Dashboards: []*dashboardResponse{},
 	}
 
 	for _, dashboard := range dashboards {
@@ -245,5 +247,35 @@ func CorrectWidthHeight(c *chronograf.DashboardCell) {
 	}
 	if c.H < 1 {
 		c.H = DefaultHeight
+	}
+}
+
+// AddQueryConfigs updates all the celsl in the dashboard to have query config
+// objects corresponding to their influxql queries.
+func AddQueryConfigs(d *chronograf.Dashboard) {
+	for i, c := range d.Cells {
+		AddQueryConfig(&c)
+		d.Cells[i] = c
+	}
+}
+
+// AddQueryConfig updates a cell by converting InfluxQL into queryconfigs
+func AddQueryConfig(c *chronograf.DashboardCell) {
+	for i, q := range c.Queries {
+		qc, err := influx.Convert(q.Command)
+		if err == nil {
+			q.QueryConfig = qc
+			c.Queries[i] = q
+		} else {
+			q.QueryConfig = chronograf.QueryConfig{
+				RawText: q.Command,
+				Fields:  []chronograf.Field{},
+				GroupBy: chronograf.GroupBy{
+					Tags: []string{},
+				},
+				Tags: make(map[string][]string, 0),
+			}
+			c.Queries[i] = q
+		}
 	}
 }
