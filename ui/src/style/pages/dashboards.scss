@@ -119,7 +119,6 @@ $dash-graph-heading: 30px;
   position: relative;
   left: -6px;
   border-radius: $radius;
-  width: 44%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -150,8 +149,6 @@ $dash-graph-heading: 30px;
   &:hover {
     cursor: text;
     color: $g20-white;
-    // background-color: $g2-kevlar;
-    // border-color: $g2-kevlar;
 
     &:after {
       opacity: 1;
@@ -160,8 +157,7 @@ $dash-graph-heading: 30px;
 }
 .dash-graph--name-edit {
   top: -1px;
-
-
+  width: 44%;
 }
 .graph-panel__refreshing {
   position: absolute;
