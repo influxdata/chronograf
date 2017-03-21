@@ -243,8 +243,9 @@ func Test_newDashboardResponse(t *testing.T) {
 			d: chronograf.Dashboard{
 				Cells: []chronograf.DashboardCell{
 					{
-						W: 0,
-						H: 0,
+						ID: "a",
+						W:  0,
+						H:  0,
 						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT donors from hill_valley_preservation_society where time > '1985-10-25 08:00:00'",
@@ -252,8 +253,9 @@ func Test_newDashboardResponse(t *testing.T) {
 						},
 					},
 					{
-						W: 0,
-						H: 0,
+						ID: "b",
+						W:  0,
+						H:  0,
 						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT winning_horses from grays_sports_alamanc where time > now() - 15m",
@@ -263,11 +265,15 @@ func Test_newDashboardResponse(t *testing.T) {
 				},
 			},
 			want: &dashboardResponse{
-				Dashboard: chronograf.Dashboard{
-					Cells: []chronograf.DashboardCell{
-						{
-							W: 4,
-							H: 4,
+				Cells: []dashboardCellResponse{
+					dashboardCellResponse{
+						Links: dashboardLinks{
+							Self: "/chronograf/v1/dashboards/0/cells/a",
+						},
+						DashboardCell: chronograf.DashboardCell{
+							ID: "a",
+							W:  4,
+							H:  4,
 							Queries: []chronograf.DashboardQuery{
 								{
 									Command: "SELECT donors from hill_valley_preservation_society where time > '1985-10-25 08:00:00'",
@@ -283,9 +289,15 @@ func Test_newDashboardResponse(t *testing.T) {
 								},
 							},
 						},
-						{
-							W: 4,
-							H: 4,
+					},
+					dashboardCellResponse{
+						Links: dashboardLinks{
+							Self: "/chronograf/v1/dashboards/0/cells/b",
+						},
+						DashboardCell: chronograf.DashboardCell{
+							ID: "b",
+							W:  4,
+							H:  4,
 							Queries: []chronograf.DashboardQuery{
 								{
 									Command: "SELECT winning_horses from grays_sports_alamanc where time > now() - 15m",
@@ -316,7 +328,7 @@ func Test_newDashboardResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		if got := newDashboardResponse(tt.d); !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("%q. newDashboardResponse() = \n%+v\n\n, want\n\n%+v", tt.name, *got, tt.want)
+			t.Errorf("%q. newDashboardResponse() = \n%+v\n\n, want\n\n%+v", tt.name, got, tt.want)
 		}
 	}
 }

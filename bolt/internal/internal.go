@@ -180,6 +180,7 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 		}
 
 		cells[i] = &DashboardCell{
+			ID:      c.ID,
 			X:       c.X,
 			Y:       c.Y,
 			W:       c.W,
@@ -223,6 +224,7 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 		}
 
 		cells[i] = chronograf.DashboardCell{
+			ID:      c.ID,
 			X:       c.X,
 			Y:       c.Y,
 			W:       c.W,

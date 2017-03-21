@@ -22,9 +22,16 @@ type dashboardLinks struct {
 	Self string `json:"self"` // Self link mapping to this resource
 }
 
-type dashboardResponse struct {
-	chronograf.Dashboard
+type dashboardCellResponse struct {
+	chronograf.DashboardCell
 	Links dashboardLinks `json:"links"`
+}
+
+type dashboardResponse struct {
+	ID    chronograf.DashboardID  `json:"id"`
+	Cells []dashboardCellResponse `json:"cells"`
+	Name  string                  `json:"name"`
+	Links dashboardLinks          `json:"links"`
 }
 
 type getDashboardsResponse struct {
@@ -35,8 +42,19 @@ func newDashboardResponse(d chronograf.Dashboard) *dashboardResponse {
 	base := "/chronograf/v1/dashboards"
 	DashboardDefaults(&d)
 	AddQueryConfigs(&d)
+	cells := make([]dashboardCellResponse, len(d.Cells))
+	for i, cell := range d.Cells {
+		cells[i] = dashboardCellResponse{
+			DashboardCell: cell,
+			Links: dashboardLinks{
+				Self: fmt.Sprintf("%s/%d/cells/%s", base, d.ID, cell.ID),
+			},
+		}
+	}
 	return &dashboardResponse{
-		Dashboard: d,
+		ID:    d.ID,
+		Name:  d.Name,
+		Cells: cells,
 		Links: dashboardLinks{
 			Self: fmt.Sprintf("%s/%d", base, d.ID),
 		},
