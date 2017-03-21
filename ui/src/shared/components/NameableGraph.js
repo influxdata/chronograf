@@ -19,6 +19,7 @@ const NameableGraph = ({
   if (isEditing && isEditable) {
     nameOrField = (
       <input
+        className="form-control input-sm dash-graph--name-edit"
         type="text"
         value={name}
         autoFocus={true}
@@ -32,7 +33,7 @@ const NameableGraph = ({
       />
     )
   } else {
-    nameOrField = name
+    nameOrField = (<span className="dash-graph--name">{name}</span>)
   }
 
   let onClickHandler

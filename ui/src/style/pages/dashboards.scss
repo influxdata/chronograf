@@ -108,6 +108,61 @@ $dash-graph-heading: 30px;
     cursor: default;
   }
 }
+.dash-graph--name-edit,
+.dash-graph--name {
+  display: inline-block;
+  padding: 0 6px;
+  height: 26px !important;
+  line-height: (26px - 4px) !important;
+  font-size: 13px;
+  font-weight: 600;
+  position: relative;
+  left: -6px;
+  border-radius: $radius;
+  width: 44%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-graph--name {
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+  border: 2px solid $g3-castle;
+
+  &:after {
+    display: inline-block;
+    content: "\f058";
+    font-family: 'icomoon' !important;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-transform: none;
+    color: $g11-sidewalk;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    margin-left: 5px;
+  }
+
+  &:hover {
+    cursor: text;
+    color: $g20-white;
+    // background-color: $g2-kevlar;
+    // border-color: $g2-kevlar;
+
+    &:after {
+      opacity: 1;
+    }
+  }
+}
+.dash-graph--name-edit {
+  top: -1px;
+
+
+}
 .graph-panel__refreshing {
   position: absolute;
   top: -18px !important;
