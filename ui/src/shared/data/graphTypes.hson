@@ -2,6 +2,5 @@
   {type: "line", menuOption: "Line"},
   {type: "stacked", menuOption: "Stacked"},
   {type: "step-plot", menuOption: "Step-Plot"},
-  {type: "singlestat", menuOption: "SingleStat"},
-  {type: "table", menuOption: "Table"}
+  {type: "singlestat", menuOption: "SingleStat"}
 ]
