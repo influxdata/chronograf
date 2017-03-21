@@ -87,6 +87,7 @@ class CellEditorOverlay extends Component {
             queryConfigs={queriesWorkingDraft}
             activeQueryID={activeQueryID}
             activeQueryIndex={0}
+            cellType={cellWorkingType}
           />
           <ResizeBottom>
             <OverlayControls

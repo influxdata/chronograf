@@ -49,6 +49,7 @@ export const LayoutRenderer = React.createClass({
         h: number.isRequired,
         i: string.isRequired,
         name: string.isRequired,
+        type: string.isRequired,
       }).isRequired
     ),
     host: string,
@@ -132,7 +133,7 @@ export const LayoutRenderer = React.createClass({
             <RefreshingLineGraph
               queries={qs}
               autoRefresh={autoRefresh}
-              showSingleStat={cell.type === "line-plus-single-stat"}
+              showSingleStat={cell.type === 'line-plus-single-stat'}
               displayOptions={displayOptions}
             />
           </NameableGraph>
