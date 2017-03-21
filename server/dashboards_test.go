@@ -267,7 +267,7 @@ func Test_newDashboardResponse(t *testing.T) {
 			want: &dashboardResponse{
 				Cells: []dashboardCellResponse{
 					dashboardCellResponse{
-						Links: dashboardLinks{
+						Links: dashboardCellLinks{
 							Self: "/chronograf/v1/dashboards/0/cells/a",
 						},
 						DashboardCell: chronograf.DashboardCell{
@@ -291,7 +291,7 @@ func Test_newDashboardResponse(t *testing.T) {
 						},
 					},
 					dashboardCellResponse{
-						Links: dashboardLinks{
+						Links: dashboardCellLinks{
 							Self: "/chronograf/v1/dashboards/0/cells/b",
 						},
 						DashboardCell: chronograf.DashboardCell{
@@ -321,7 +321,8 @@ func Test_newDashboardResponse(t *testing.T) {
 					},
 				},
 				Links: dashboardLinks{
-					Self: "/chronograf/v1/dashboards/0",
+					Self:  "/chronograf/v1/dashboards/0",
+					Cells: "/chronograf/v1/dashboards/0/cells",
 				},
 			},
 		},
