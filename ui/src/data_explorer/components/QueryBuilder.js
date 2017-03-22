@@ -8,6 +8,7 @@ const {
   arrayOf,
   func,
   node,
+  number,
   shape,
   string,
 } = PropTypes;
@@ -33,13 +34,14 @@ const QueryBuilder = React.createClass({
     }).isRequired,
     height: string,
     top: string,
-    setActiveQuery: func.isRequired,
-    activeQueryID: string,
+    setActiveQueryIndex: func.isRequired,
+    handleDeleteQuery: func.isRequired,
+    activeQueryIndex: number,
     children: node,
   },
 
-  handleSetActiveQuery(query) {
-    this.props.setActiveQuery(query.id);
+  handleSetActiveQueryIndex(index) {
+    this.props.setActiveQueryIndex(index);
   },
 
   handleAddQuery() {
@@ -50,16 +52,12 @@ const QueryBuilder = React.createClass({
     this.props.actions.addQuery({rawText: `SELECT "fields" from "db"."rp"."measurement"`});
   },
 
-  handleDeleteQuery(query) {
-    this.props.actions.deleteQuery(query.id);
-  },
-
   getActiveQuery() {
-    const {queries, activeQueryID} = this.props;
-    const activeQuery = queries.find((query) => query.id === activeQueryID);
-    const defaultQuery = queries[0];
+    const {queries, activeQueryIndex} = this.props
+    const activeQuery = queries[activeQueryIndex]
+    const defaultQuery = queries[0]
 
-    return activeQuery || defaultQuery;
+    return activeQuery || defaultQuery
   },
 
   render() {
@@ -89,7 +87,7 @@ const QueryBuilder = React.createClass({
     return (
       <QueryEditor
         timeRange={timeRange}
-        query={this.getActiveQuery()}
+        query={query}
         actions={actions}
         onAddQuery={this.handleAddQuery}
       />
@@ -97,7 +95,7 @@ const QueryBuilder = React.createClass({
   },
 
   renderQueryTabList() {
-    const {queries} = this.props;
+    const {queries, activeQueryIndex, handleDeleteQuery} = this.props;
     return (
       <div className="query-builder--tabs">
         <div className="query-builder--tabs-heading">
@@ -113,11 +111,12 @@ const QueryBuilder = React.createClass({
           }
           return (
             <QueryTabItem
-              isActive={this.getActiveQuery().id === q.id}
-              key={q.id + i}
+              isActive={i === activeQueryIndex}
+              key={i}
+              queryIndex={i}
               query={q}
-              onSelect={this.handleSetActiveQuery}
-              onDelete={this.handleDeleteQuery}
+              onSelect={this.handleSetActiveQueryIndex}
+              onDelete={handleDeleteQuery}
               queryTabText={queryTabText}
             />
           );
