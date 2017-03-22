@@ -92,10 +92,8 @@ export const putDashboard = () => (dispatch, getState) => {
 }
 
 export const updateDashboardCell = (cell) => (dispatch) => {
-  console.log("Submitting request")
   return updateDashboardCellAJAX(cell)
   .then(({data}) => {
-    console.log("Request complete:", data)
     dispatch(syncDashboardCell(data))
   })
 }
