@@ -110,7 +110,6 @@ class CellEditorOverlay extends Component {
             autoRefresh={autoRefresh}
             timeRange={timeRange}
             queryConfigs={queriesWorkingDraft}
-            activeQueryID={activeQueryID}
             activeQueryIndex={0}
             cellType={cellWorkingType}
           />
