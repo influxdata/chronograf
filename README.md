@@ -74,9 +74,8 @@ curl -X POST -H "Content-Type: application/json" -d '{
         {
             "queries": [
                 {
-                    "db": "telegraf",
                     "label": "%",
-                    "query": "SELECT mean(\"usage_user\") AS \"usage_user\" FROM \"cpu\""
+                    "query": "SELECT mean(\"usage_user\") AS \"usage_user\" FROM \"telegraf\".\"autogen\".\"cpu\""
                 }
             ],
             "type": "line"
