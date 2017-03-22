@@ -81,6 +81,8 @@ type TimeSeries interface {
 	Permissions(context.Context) Permissions
 	// Roles represents the roles associated with this TimesSeriesDatabase
 	Roles(context.Context) (RolesStore, error)
+	// Databases represents the named databases within an InfluxDB instance
+	Databases(context.Context) Databases
 }
 
 // Role is a restricted set of permissions assigned to a set of users.
@@ -314,6 +316,18 @@ type UsersStore interface {
 	Get(ctx context.Context, name string) (*User, error)
 	// Update the user's permissions or roles
 	Update(context.Context, *User) error
+}
+
+type Database struct {
+	Name          string  `json:"name"`                  // a unique string identifier for the database
+	Duration      string  `json:"duration,omitempty"`    // the duration (when creating a default retention policy)
+	Replication   int32   `json:"replication,omitempty"` // the replication factor (when creating a default retention policy)
+	ShardDuration string  `json:shardDuration,omitempty` // the shard duration (when creating a default retention policy)
+}
+
+type Databases interface {
+  // All lists all databases
+  AllDB(context.Context) ([]Database, error)
 }
 
 // DashboardID is the dashboard ID
