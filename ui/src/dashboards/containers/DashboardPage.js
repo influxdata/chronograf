@@ -106,12 +106,13 @@ const DashboardPage = React.createClass({
     setEditMode(nextPathname.includes('/edit'))
   },
 
-  handleCancelEditCell() {
+  handleDismissOverlay() {
     this.setState({selectedCell: null})
   },
 
-  handleSaveEditedCell() {
-    console.log('save')
+  handleSaveEditedCell(newCell) {
+    this.props.dashboardActions.updateDashboardCell(newCell)
+    .then(this.handleDismissOverlay)
   },
 
   handleSummonOverlayTechnologies() {
@@ -177,7 +178,7 @@ const DashboardPage = React.createClass({
               cell={selectedCell}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
-              onCancel={this.handleCancelEditCell}
+              onCancel={this.handleDismissOverlay}
               onSave={this.handleSaveEditedCell}
             /> :
             null

@@ -101,6 +101,23 @@ export default function ui(state = initialState, action) {
       return {...state, ...newState}
     }
 
+    case 'SYNC_DASHBOARD_CELL': {
+      const {cell} = action.payload
+      const {dashboard} = state
+
+      const newDashboard = {
+        ...dashboard,
+        cells: dashboard.cells.map((c) => c.x === cell.x && c.y === cell.y ? cell : c),
+      }
+
+      const newState = {
+        dashboard: newDashboard,
+        dashboards: state.dashboards.map((d) => d.id === dashboard.id ? newDashboard : d),
+      }
+
+      return {...state, ...newState}
+    }
+
     case 'RENAME_CELL': {
       const {x, y, name} = action.payload
       const {dashboard} = state

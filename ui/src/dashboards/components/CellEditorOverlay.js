@@ -9,6 +9,8 @@ import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
 import * as queryModifiers from 'src/utils/queryTransitions'
 
+import selectStatement from 'src/data_explorer/utils/influxql/select'
+
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
 class CellEditorOverlay extends Component {
@@ -19,6 +21,8 @@ class CellEditorOverlay extends Component {
 
     this.addQuery = ::this.addQuery
     this.deleteQuery = ::this.deleteQuery
+
+    this.handleSaveCell = ::this.handleSaveCell
 
     this.handleSelectGraphType = ::this.handleSelectGraphType
     this.handleSetActiveQuery = ::this.handleSetActiveQuery
@@ -60,6 +64,27 @@ class CellEditorOverlay extends Component {
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
+  handleSaveCell() {
+    const {queriesWorkingDraft, cellWorkingType, cellWorkingName} = this.state
+    const {cell, timeRange} = this.props
+
+    const newCell = _.cloneDeep(cell)
+    newCell.name = cellWorkingName
+    newCell.type = cellWorkingType
+    newCell.queries = queriesWorkingDraft.map((q) => {
+      const queryString = q.rawText || selectStatement(timeRange, q)
+      const label = `${q.measurement}.${q.fields[0].field}`
+
+      return {
+        queryConfig: q,
+        query: queryString,
+        label,
+      }
+    })
+
+    this.props.onSave(newCell)
+  }
+
   handleSelectGraphType(graphType) {
     this.setState({cellWorkingType: graphType})
   }
@@ -69,7 +94,7 @@ class CellEditorOverlay extends Component {
   }
 
   render() {
-    const {onCancel, onSave, autoRefresh, timeRange} = this.props
+    const {onCancel, autoRefresh, timeRange} = this.props
     const {activeQueryID, cellWorkingType, queriesWorkingDraft} = this.state
     const {addQuery, deleteQuery} = this
     const queryActions = {
@@ -94,7 +119,7 @@ class CellEditorOverlay extends Component {
               selectedGraphType={cellWorkingType}
               onSelectGraphType={this.handleSelectGraphType}
               onCancel={onCancel}
-              onSave={onSave}
+              onSave={this.handleSaveCell}
             />
             <QueryBuilder
               queries={queriesWorkingDraft}
