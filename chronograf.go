@@ -125,8 +125,6 @@ type Query struct {
 // struct while we move to the full InfluxQL AST
 type DashboardQuery struct {
 	Command     string      `json:"query"`                 // Command is the query itself
-	DB          string      `json:"db,omitempty"`          // DB is optional and if empty will not be used.
-	RP          string      `json:"rp,omitempty"`          // RP is a retention policy and optional; if empty will not be used.
 	Label       string      `json:"label,omitempty"`       // Label is the Y-Axis label for the data
 	Range       *Range      `json:"range,omitempty"`       // Range is the default Y-Axis range for the data
 	QueryConfig QueryConfig `json:"queryConfig,omitempty"` // QueryConfig represents the query state that is understood by the data explorer

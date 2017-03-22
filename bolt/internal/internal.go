@@ -172,8 +172,6 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			}
 			queries[j] = &Query{
 				Command: q.Command,
-				DB:      q.DB,
-				RP:      q.RP,
 				Label:   q.Label,
 				Range:   r,
 			}
@@ -211,8 +209,6 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 		for j, q := range c.Queries {
 			queries[j] = chronograf.DashboardQuery{
 				Command: q.Command,
-				DB:      q.DB,
-				RP:      q.RP,
 				Label:   q.Label,
 			}
 			if q.Range.Upper != q.Range.Lower {
