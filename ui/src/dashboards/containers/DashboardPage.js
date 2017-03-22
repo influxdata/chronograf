@@ -75,6 +75,12 @@ const DashboardPage = React.createClass({
     return {source: this.props.source};
   },
 
+  getInitialState() {
+    return {
+      selectedCell: null,
+    }
+  },
+
   componentDidMount() {
     const {
       params: {dashboardID},
@@ -98,6 +104,18 @@ const DashboardPage = React.createClass({
 
     setDashboard(nextID)
     setEditMode(nextPathname.includes('/edit'))
+  },
+
+  handleCancelEditCell() {
+    this.setState({selectedCell: null})
+  },
+
+  handleSaveEditedCell() {
+    console.log('save')
+  },
+
+  handleSummonOverlayTechnologies() {
+    this.setState({selectedCell: this.props.dashboard.cells[0]})
   },
 
   handleChooseTimeRange({lower}) {
@@ -143,16 +161,24 @@ const DashboardPage = React.createClass({
       timeRange,
     } = this.props
 
-    const selectedCell = this.props.dashboard.cells[0]
+    const {
+      selectedCell,
+    } = this.state
 
     return (
       <div className="page">
+        <button
+          onClick={this.handleSummonOverlayTechnologies}
+          style={{zIndex: 1000, position: 'absolute', background: 'red', height: '200px', width: '200px'}}
+        >WE HAVE OVERLAY TECHNOLOGIES</button>
         {
           selectedCell && selectedCell.queries.length ?
             <CellEditorOverlay
               cell={selectedCell}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
+              onCancel={this.handleCancelEditCell}
+              onSave={this.handleSaveEditedCell}
             /> :
             null
         }

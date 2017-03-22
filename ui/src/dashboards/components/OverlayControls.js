@@ -6,7 +6,7 @@ import ConfirmButtons from 'src/admin/components/ConfirmButtons'
 import graphTypes from 'hson!shared/data/graphTypes.hson'
 
 const OverlayControls = (props) => {
-  const {selectedGraphType, onSelectGraphType} = props
+  const {onCancel, onSave, selectedGraphType, onSelectGraphType} = props
   return (
     <div className="overlay-controls">
       <h3 className="overlay--graph-name">Graph Editor</h3>
@@ -23,7 +23,7 @@ const OverlayControls = (props) => {
             </li>
           )}
         </ul>
-        <ConfirmButtons />
+        <ConfirmButtons onCancel={onCancel} onConfirm={onSave} />
       </div>
     </div>
   )
@@ -35,6 +35,8 @@ const {
 } = PropTypes
 
 OverlayControls.propTypes = {
+  onCancel: func.isRequired,
+  onSave: func.isRequired,
   selectedGraphType: string.isRequired,
   onSelectGraphType: func.isRequired,
 }

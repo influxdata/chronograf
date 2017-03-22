@@ -69,7 +69,7 @@ class CellEditorOverlay extends Component {
   }
 
   render() {
-    const {autoRefresh, timeRange} = this.props
+    const {onCancel, onSave, autoRefresh, timeRange} = this.props
     const {activeQueryID, cellWorkingType, queriesWorkingDraft} = this.state
     const {addQuery, deleteQuery} = this
     const queryActions = {
@@ -93,6 +93,8 @@ class CellEditorOverlay extends Component {
             <OverlayControls
               selectedGraphType={cellWorkingType}
               onSelectGraphType={this.handleSelectGraphType}
+              onCancel={onCancel}
+              onSave={onSave}
             />
             <QueryBuilder
               queries={queriesWorkingDraft}
@@ -110,12 +112,15 @@ class CellEditorOverlay extends Component {
 }
 
 const {
+  func,
   number,
   shape,
   string,
 } = PropTypes
 
 CellEditorOverlay.propTypes = {
+  onCancel: func.isRequired,
+  onSave: func.isRequired,
   cell: shape({}).isRequired,
   timeRange: shape({
     upper: string,
