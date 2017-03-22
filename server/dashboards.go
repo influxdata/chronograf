@@ -496,5 +496,11 @@ func (s *Service) ReplaceDashboardCell(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encodeJSON(w, http.StatusOK, cell, s.Logger)
+	boards := newDashboardResponse(dash)
+	for _, cell := range boards.Cells {
+		if cell.ID == cid {
+			encodeJSON(w, http.StatusOK, cell, s.Logger)
+			return
+		}
+	}
 }
