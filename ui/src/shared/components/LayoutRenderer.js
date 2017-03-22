@@ -4,6 +4,9 @@ import LineGraph from 'shared/components/LineGraph';
 import SingleStat from 'shared/components/SingleStat';
 import NameableGraph from 'shared/components/NameableGraph';
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
+
+import timeRanges from 'hson!../data/timeRanges.hson';
+
 const GridLayout = WidthProvider(ReactGridLayout);
 
 const RefreshingLineGraph = AutoRefresh(LineGraph);
@@ -21,26 +24,15 @@ export const LayoutRenderer = React.createClass({
   propTypes: {
     autoRefresh: number.isRequired,
     timeRange: shape({
-      defaultGroupBy: string.isRequired,
       lower: string.isRequired,
     }).isRequired,
     cells: arrayOf(
       shape({
         queries: arrayOf(
           shape({
-            queryString: shape({}).isRequired,
-            queryConfig: shape({
-              label: string,
-              range: shape({
-                upper: number,
-                lower: number,
-              }),
-              rp: string,
-              text: string.isRequired,
-              database: string.isRequired,
-              groupbys: arrayOf(string),
-              wheres: arrayOf(string),
-            }).isRequired,
+            label: string,
+            text: string,
+            query: string,
           }).isRequired
         ).isRequired,
         x: number.isRequired,
@@ -61,8 +53,9 @@ export const LayoutRenderer = React.createClass({
   },
 
   buildQuery(q) {
-    const {timeRange: {lower, defaultGroupBy}, host} = this.props;
-    const {wheres, groupbys} = q;
+    const {timeRange: {lower}, host} = this.props
+    const {defaultGroupBy} = timeRanges.find((range) => range.lower === lower)
+    const {wheres, groupbys} = q
 
     let text = q.text;
 
@@ -95,10 +88,10 @@ export const LayoutRenderer = React.createClass({
     const {autoRefresh, source, cells, onEditCell, onRenameCell, onUpdateCell} = this.props;
 
     return cells.map((cell) => {
-      const qs = cell.queries.map(({queryString}) => {
-        return Object.assign({}, queryString, {
+      const qs = cell.queries.map((query) => {
+        return Object.assign({}, query, {
           host: source,
-          text: this.buildQuery(queryString),
+          text: this.buildQuery(query),
         });
       });
 
