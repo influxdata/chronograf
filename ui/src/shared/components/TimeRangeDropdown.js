@@ -10,7 +10,7 @@ const TimeRangeDropdown = React.createClass({
   autobind: false,
 
   propTypes: {
-    selected: React.PropTypes.string.isRequired,
+    selected: React.PropTypes.shape().isRequired,
     onChooseTimeRange: React.PropTypes.func.isRequired,
   },
 
