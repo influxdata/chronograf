@@ -9,7 +9,7 @@ import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
 import * as queryModifiers from 'src/utils/queryTransitions'
 
-import selectStatement from 'src/data_explorer/utils/influxql/select'
+import {buildSelectStatement} from 'src/data_explorer/utils/influxql/select'
 
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
@@ -63,18 +63,18 @@ class CellEditorOverlay extends Component {
 
   handleSaveCell() {
     const {queriesWorkingDraft, cellWorkingType, cellWorkingName} = this.state
-    const {cell, timeRange} = this.props
+    const {cell} = this.props
 
     const newCell = _.cloneDeep(cell)
     newCell.name = cellWorkingName
     newCell.type = cellWorkingType
     newCell.queries = queriesWorkingDraft.map((q) => {
-      const queryString = q.rawText || selectStatement(timeRange, q)
+      const query = q.rawText || buildSelectStatement(q)
       const label = `${q.measurement}.${q.fields[0].field}`
 
       return {
         queryConfig: q,
-        query: queryString,
+        query,
         label,
       }
     })
