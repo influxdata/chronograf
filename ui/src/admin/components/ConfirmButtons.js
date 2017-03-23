@@ -24,7 +24,7 @@ const {
 
 ConfirmButtons.propTypes = {
   onConfirm: func.isRequired,
-  item: shape({}).isRequired,
+  item: shape({}),
   onCancel: func.isRequired,
 }
 
