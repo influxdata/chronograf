@@ -106,11 +106,16 @@ export const updateDashboardCell = (cell) => (dispatch) => {
   })
 }
 
-export const addDashboardCellAsync = (dashboard) => (dispatch) => {
+export const addDashboardCellAsync = (dashboard) => async (dispatch) => {
   const defaultNewCell = {
     query: [],
     type: 'line',
   }
-  addDashboardCellAJAX(dashboard, defaultNewCell)
-  .then(({data}) => dispatch(addDashboardCell(data)))
+  try {
+    const {data} = await addDashboardCellAJAX(dashboard, defaultNewCell)
+    dispatch(addDashboardCell(data))
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
 }

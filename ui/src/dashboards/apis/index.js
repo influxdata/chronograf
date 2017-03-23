@@ -36,9 +36,15 @@ export const createDashboard = async (dashboard) => {
   }
 }
 
-export const addDashboardCell = (dashboard, cell) =>
-  AJAX({
-    method: 'POST',
-    url: dashboard.links.cells,
-    data: cell,
-  })
+export const addDashboardCell = async (dashboard, cell) => {
+  try {
+    return await AJAX({
+      method: 'POST',
+      url: dashboard.links.cells,
+      data: cell,
+    })
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
