@@ -44,11 +44,15 @@ const QueryBuilder = React.createClass({
   },
 
   handleAddQuery() {
-    this.props.actions.addQuery();
+    const newIndex = this.props.queries.length
+    this.props.actions.addQuery()
+    this.handleSetActiveQueryIndex(newIndex)
   },
 
   handleAddRawQuery() {
-    this.props.actions.addQuery({rawText: `SELECT "fields" from "db"."rp"."measurement"`});
+    const newIndex = this.props.queries.length
+    this.props.actions.addQuery({rawText: `SELECT "fields" from "db"."rp"."measurement"`})
+    this.handleSetActiveQueryIndex(newIndex)
   },
 
   getActiveQuery() {
