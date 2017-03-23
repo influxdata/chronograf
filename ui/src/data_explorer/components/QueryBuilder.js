@@ -34,7 +34,7 @@ const QueryBuilder = React.createClass({
     height: string,
     top: string,
     setActiveQueryIndex: func.isRequired,
-    handleDeleteQuery: func.isRequired,
+    onDeleteQuery: func.isRequired,
     activeQueryIndex: number,
     children: node,
   },
@@ -94,7 +94,7 @@ const QueryBuilder = React.createClass({
   },
 
   renderQueryTabList() {
-    const {queries, activeQueryIndex, handleDeleteQuery} = this.props;
+    const {queries, activeQueryIndex, onDeleteQuery} = this.props;
     return (
       <div className="query-builder--tabs">
         <div className="query-builder--tabs-heading">
@@ -115,7 +115,7 @@ const QueryBuilder = React.createClass({
               queryIndex={i}
               query={q}
               onSelect={this.handleSetActiveQueryIndex}
-              onDelete={handleDeleteQuery}
+              onDelete={onDeleteQuery}
               queryTabText={queryTabText}
             />
           );

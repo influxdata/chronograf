@@ -19,8 +19,8 @@ class CellEditorOverlay extends Component {
 
     this.queryStateReducer = ::this.queryStateReducer
 
-    this.addQuery = ::this.addQuery
-    this.deleteQuery = ::this.deleteQuery
+    this.handleAddQuery = ::this.handleAddQuery
+    this.handleDeleteQuery = ::this.handleDeleteQuery
 
     this.handleSaveCell = ::this.handleSaveCell
 
@@ -50,13 +50,13 @@ class CellEditorOverlay extends Component {
     }
   }
 
-  addQuery(options) {
+  handleAddQuery(options) {
     const newQuery = Object.assign({}, defaultQueryConfig(uuid.v4()), options)
     const nextQueries = this.state.queriesWorkingDraft.concat(newQuery)
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
-  deleteQuery(index) {
+  handleDeleteQuery(index) {
     const nextQueries = this.state.queriesWorkingDraft.filter((__, i) => i !== index)
     this.setState({queriesWorkingDraft: nextQueries})
   }
@@ -93,9 +93,8 @@ class CellEditorOverlay extends Component {
   render() {
     const {onCancel, autoRefresh, timeRange} = this.props
     const {activeQueryIndex, cellWorkingType, queriesWorkingDraft} = this.state
-    const {addQuery, deleteQuery} = this
     const queryActions = {
-      addQuery,
+      addQuery: this.handleAddQuery,
       ..._.mapValues(queryModifiers, (qm) => this.queryStateReducer(qm)),
     }
 
@@ -122,7 +121,7 @@ class CellEditorOverlay extends Component {
               autoRefresh={autoRefresh}
               timeRange={timeRange}
               setActiveQueryIndex={this.handleSetActiveQueryIndex}
-              handleDeleteQuery={deleteQuery}
+              onDeleteQuery={this.handleDeleteQuery}
               activeQueryIndex={activeQueryIndex}
             />
           </ResizeBottom>

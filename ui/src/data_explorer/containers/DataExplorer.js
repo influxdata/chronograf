@@ -96,7 +96,7 @@ const DataExplorer = React.createClass({
               autoRefresh={autoRefresh}
               timeRange={timeRange}
               setActiveQueryIndex={this.handleSetActiveQueryIndex}
-              handleDeleteQuery={this.handleDeleteQuery}
+              onDeleteQuery={this.handleDeleteQuery}
               activeQueryIndex={activeQueryIndex}
             />
           </ResizeBottom>
