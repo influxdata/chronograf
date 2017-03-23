@@ -26,7 +26,6 @@ const QueryBuilder = React.createClass({
       chooseTag: func.isRequired,
       groupByTag: func.isRequired,
       addQuery: func.isRequired,
-      deleteQuery: func.isRequired,
       toggleField: func.isRequired,
       groupByTime: func.isRequired,
       toggleTagAcceptance: func.isRequired,

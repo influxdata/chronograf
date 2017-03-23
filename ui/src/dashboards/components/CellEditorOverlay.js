@@ -25,19 +25,16 @@ class CellEditorOverlay extends Component {
     this.handleSaveCell = ::this.handleSaveCell
 
     this.handleSelectGraphType = ::this.handleSelectGraphType
-    this.handleSetActiveQuery = ::this.handleSetActiveQuery
+    this.handleSetActiveQueryIndex = ::this.handleSetActiveQueryIndex
 
     const {cell: {name, type, queries}} = props
     const queriesWorkingDraft = _.cloneDeep(queries.map(({queryConfig}) => queryConfig))
-    const activeQueryID = queries.length ?
-      queries.map(({queryConfig}) => queryConfig.id)[0] :
-      null
 
     this.state = {
       cellWorkingName: name,
       cellWorkingType: type,
       queriesWorkingDraft,
-      activeQueryID,
+      activeQueryIndex: 0,
     }
   }
 
@@ -59,8 +56,8 @@ class CellEditorOverlay extends Component {
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
-  deleteQuery(queryID) {
-    const nextQueries = this.state.queriesWorkingDraft.filter((q) => q.id !== queryID)
+  deleteQuery(index) {
+    const nextQueries = this.state.queriesWorkingDraft.filter((__, i) => i !== index)
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
@@ -89,17 +86,16 @@ class CellEditorOverlay extends Component {
     this.setState({cellWorkingType: graphType})
   }
 
-  handleSetActiveQuery(activeQueryID) {
-    this.setState({activeQueryID})
+  handleSetActiveQueryIndex(activeQueryIndex) {
+    this.setState({activeQueryIndex})
   }
 
   render() {
     const {onCancel, autoRefresh, timeRange} = this.props
-    const {activeQueryID, cellWorkingType, queriesWorkingDraft} = this.state
+    const {activeQueryIndex, cellWorkingType, queriesWorkingDraft} = this.state
     const {addQuery, deleteQuery} = this
     const queryActions = {
       addQuery,
-      deleteQuery,
       ..._.mapValues(queryModifiers, (qm) => this.queryStateReducer(qm)),
     }
 
@@ -125,8 +121,9 @@ class CellEditorOverlay extends Component {
               actions={queryActions}
               autoRefresh={autoRefresh}
               timeRange={timeRange}
-              setActiveQuery={this.handleSetActiveQuery}
-              activeQueryID={activeQueryID}
+              setActiveQueryIndex={this.handleSetActiveQueryIndex}
+              handleDeleteQuery={deleteQuery}
+              activeQueryIndex={activeQueryIndex}
             />
           </ResizeBottom>
         </ResizeContainer>
