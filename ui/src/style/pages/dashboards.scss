@@ -384,3 +384,91 @@ $dash-graph-options-arrow: 8px;
     }
   }
 }
+
+/*
+  Cell Edit Mode
+  ------------------------------------------------------
+*/
+$overlay-controls-height: 50px;
+$overlay-controls-bg: $g2-kevlar;
+$overlay-bg: rgba($g0-obsidian, 0.7);
+
+.overlay-technology {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: $overlay-bg;
+
+  .overlay-controls {
+    padding: 0 16px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 $overlay-controls-height;
+    width: calc(100% - #{($explorer-page-padding * 2)});
+    left: $explorer-page-padding;
+    margin-top: $de-vertical-margin;
+    border: 0;
+    border-radius: $radius;
+    @include gradient-h($g3-castle,$overlay-controls-bg);
+
+    /* Hack for making the adjacent query builder have less margin on top */
+    & + .query-builder .query-builder--tabs,
+    & + .query-builder .query-builder--tab-contents,
+    & + .query-builder .qeditor--empty {
+      margin-top: 2px;
+      height: calc(100% - 18px);
+    }
+  }
+  .overlay-controls--right {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    .toggle {
+      margin: 0 0 0 5px;
+    }
+    p {
+      font-weight: 600;
+      color: $g13-mist;
+      margin: 0;
+      @include no-user-select;
+    }
+  }
+  .overlay--graph-name {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 400;
+    text-transform: uppercase;
+    @include no-user-select;
+  }
+  .confirm-buttons {
+    margin-left: 32px;
+  }
+  .confirm-buttons .btn {
+    height: 30px;
+    line-height: 30px;
+    padding: 0 9px;
+
+    & > span.icon {
+      font-size: 16px;
+    }
+  }
+  .overlay-controls .toggle {
+
+    .toggle-btn {
+      background-color: $overlay-controls-bg;
+
+      &:hover {
+        background-color: $g4-onyx;
+      }
+      &.active {
+        background-color: $g5-pepper;
+      }
+    }
+  }
+}

@@ -14,3 +14,11 @@ export function updateDashboard(dashboard) {
     data: dashboard,
   });
 }
+
+export function updateDashboardCell(cell) {
+  return AJAX({
+    method: 'PUT',
+    url: cell.links.self,
+    data: cell,
+  })
+}

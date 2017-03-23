@@ -34,10 +34,15 @@ Dashboard.renderDashboard = (dashboard, autoRefresh, timeRange, source, onPositi
   const cells = dashboard.cells.map((cell, i) => {
     i = `${i}`
     const dashboardCell = {...cell, i}
-    dashboardCell.queries.forEach((q) => {
-      q.text = q.query;
-      q.database = q.db;
-    });
+    dashboardCell.queries = dashboardCell.queries.map(({label, query, db}) =>
+      ({
+        label,
+        query,
+        db,
+        database: db,
+        text: query,
+      })
+    )
     return dashboardCell;
   })
 
