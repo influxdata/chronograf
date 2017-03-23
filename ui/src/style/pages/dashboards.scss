@@ -195,6 +195,10 @@ $dash-graph-heading: 30px;
 }
 $dash-graph-options-arrow: 8px;
 
+.presentation-mode .dash-graph--options {
+  display: none;
+  visibility: hidden;
+}
 .dash-graph--options-menu {
   position: absolute;
   top: ($dash-graph-heading + $dash-graph-options-arrow);
