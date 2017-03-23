@@ -85,7 +85,7 @@ export default function ui(state = initialState, action) {
       return {...state, ...newState}
     }
 
-    case 'EDIT_CELL': {
+    case 'EDIT_DASHBOARD_CELL': {
       const {x, y, isEditing} = action.payload
       const {dashboard} = state
 
@@ -126,7 +126,7 @@ export default function ui(state = initialState, action) {
       return {...state, ...newState}
     }
 
-    case 'RENAME_CELL': {
+    case 'RENAME_DASHBOARD_CELL': {
       const {x, y, name} = action.payload
       const {dashboard} = state
 

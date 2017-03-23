@@ -32,3 +32,8 @@ export const NEW_DASHBOARD = {
     },
   ],
 }
+
+export const NEW_DEFAULT_DASHBOARD_CELL = {
+  query: [],
+  type: 'line',
+}

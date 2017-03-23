@@ -43,8 +43,9 @@ const DashboardPage = React.createClass({
       setDashboard: func.isRequired,
       setTimeRange: func.isRequired,
       setEditMode: func.isRequired,
-      editCell: func.isRequired,
-      renameCell: func.isRequired,
+      addDashboardCellAsync: func.isRequired,
+      editDashboardCell: func.isRequired,
+      renameDashboardCell: func.isRequired,
     }).isRequired,
     dashboards: arrayOf(shape({
       id: number.isRequired,
@@ -134,21 +135,21 @@ const DashboardPage = React.createClass({
   },
 
   // Places cell into editing mode.
-  handleEditCell(x, y, isEditing) {
+  handleEditDashboardCell(x, y, isEditing) {
     return () => {
-      this.props.dashboardActions.editCell(x, y, !isEditing) /* eslint-disable no-negated-condition */
+      this.props.dashboardActions.editDashboardCell(x, y, !isEditing) /* eslint-disable no-negated-condition */
     }
   },
 
-  handleChangeCellName(x, y) {
+  handleRenameDashboardCell(x, y) {
     return (evt) => {
-      this.props.dashboardActions.renameCell(x, y, evt.target.value)
+      this.props.dashboardActions.renameDashboardCell(x, y, evt.target.value)
     }
   },
 
-  handleUpdateCell(newCell) {
+  handleUpdateDashboardCell(newCell) {
     return () => {
-      this.props.dashboardActions.editCell(newCell.x, newCell.y, false)
+      this.props.dashboardActions.editDashboardCell(newCell.x, newCell.y, false)
       this.props.dashboardActions.putDashboard()
     }
   },
@@ -219,9 +220,9 @@ const DashboardPage = React.createClass({
           autoRefresh={autoRefresh}
           timeRange={timeRange}
           onPositionChange={this.handleUpdatePosition}
-          onEditCell={this.handleEditCell}
-          onRenameCell={this.handleChangeCellName}
-          onUpdateCell={this.handleUpdateCell}
+          onEditCell={this.handleEditDashboardCell}
+          onRenameCell={this.handleRenameDashboardCell}
+          onUpdateCell={this.handleUpdateDashboardCell}
           onSummonOverlayTechnologies={this.handleSummonOverlayTechnologies}
         />
       </div>
