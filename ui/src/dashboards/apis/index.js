@@ -35,3 +35,10 @@ export const createDashboard = async (dashboard) => {
     throw error
   }
 }
+
+export const addDashboardCell = (dashboard, cell) =>
+  AJAX({
+    method: 'POST',
+    url: dashboard.links.cells,
+    data: cell,
+  })

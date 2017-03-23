@@ -128,6 +128,11 @@ const DashboardPage = React.createClass({
     this.props.dashboardActions.putDashboard()
   },
 
+  handleAddCell() {
+    const {dashboard} = this.props
+    this.props.dashboardActions.addDashboardCellAsync(dashboard)
+  },
+
   // Places cell into editing mode.
   handleEditCell(x, y, isEditing) {
     return () => {
@@ -193,6 +198,7 @@ const DashboardPage = React.createClass({
               dashboard={dashboard}
               sourceID={sourceID}
               source={source}
+              onAddCell={this.handleAddCell}
             >
               {(dashboards).map((d, i) => {
                 return (
