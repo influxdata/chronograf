@@ -419,6 +419,10 @@ div.qeditor.kapacitor-metric-selector {
   &::-moz-placeholder { color: $g9-mountain; }
   &:-ms-input-placeholder { color: $g9-mountain; }
   &:-moz-placeholder { color: $g9-mountain; }
+
+  &.details {
+    height: 48px;
+  }
 }
 
 .alert-message--endpoint {
@@ -479,7 +483,7 @@ div.qeditor.kapacitor-metric-selector {
   border-bottom: 2px solid $kapacitor-divider-color;
 
   & > p {
-    margin-right: ($kap-padding-sm - 2px);
+    margin-right: ($kap-padding-sm - 2px) !important;
   }
 }
 .alert-message--email-body {
@@ -593,9 +597,9 @@ div.qeditor.kapacitor-metric-selector {
     height: $kap-input-height;
 
     &:focus {
-      border-color: $kapacitor-accent;
+      border-color: $kapacitor-accent !important;
       outline: none;
-      box-shadow: none;
+      box-shadow: 0 0 6px 0px $kapacitor-accent !important;
       color: $g20-white !important;
     }
   }
