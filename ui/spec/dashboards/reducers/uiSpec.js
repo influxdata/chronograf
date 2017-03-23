@@ -20,6 +20,16 @@ const timeRange = timeRanges[1];
 const d1 = {id: 1, cells: [], name: "d1"}
 const d2 = {id: 2, cells: [], name: "d2"}
 const dashboards = [d1, d2]
+const c1 = {
+  x: 0,
+  y: 0,
+  w: 4,
+  h: 4,
+  id: 1,
+  isEditing: false,
+  name: "Gigawatts",
+}
+const cells = [c1]
 
 describe('DataExplorer.Reducers.UI', () => {
   it('can load the dashboards', () => {
@@ -74,19 +84,7 @@ describe('DataExplorer.Reducers.UI', () => {
   })
 
   it('can edit cell', () => {
-    const dash = {
-      id: 1,
-      cells: [{
-        x: 0,
-        y: 0,
-        w: 4,
-        h: 4,
-        id: 1,
-        isEditing: false,
-        name: "Gigawatts",
-      }],
-    }
-
+    const dash = {...d1, cells}
     state = {
       dashboard: dash,
       dashboards: [dash],
@@ -98,19 +96,8 @@ describe('DataExplorer.Reducers.UI', () => {
   })
 
   it('can rename cells', () => {
-    const dash = {
-      id: 1,
-      cells: [{
-        x: 0,
-        y: 0,
-        w: 4,
-        h: 4,
-        id: 1,
-        isEditing: true,
-        name: "Gigawatts",
-      }],
-    }
-
+    const c2 = {...c1, isEditing: true}
+    const dash = {...d1, cells: [c2]}
     state = {
       dashboard: dash,
       dashboards: [dash],
