@@ -240,14 +240,7 @@ func (s *Service) UpdateDashboard(w http.ResponseWriter, r *http.Request) {
 
 // ValidDashboardRequest verifies that the dashboard cells have a query
 func ValidDashboardRequest(d *chronograf.Dashboard) error {
-	if len(d.Cells) == 0 {
-		return fmt.Errorf("cells are required")
-	}
-
 	for i, c := range d.Cells {
-		if len(c.Queries) == 0 {
-			return fmt.Errorf("query required")
-		}
 		CorrectWidthHeight(&c)
 		d.Cells[i] = c
 	}
