@@ -1,4 +1,6 @@
 import React, {PropTypes} from 'react'
+import classnames from 'classnames'
+import OnClickOutside from 'react-onclickoutside'
 
 const {
   bool,
@@ -25,32 +27,20 @@ const NameableGraph = React.createClass({
 
   getInitialState() {
     return {
-      buttonsOpen: false,
+      isMenuOpen: false,
     }
   },
 
-  toggleButtons() {
-    const {buttonsOpen} = this.state
+  toggleMenu() {
     this.setState({
-      buttonsOpen: !buttonsOpen,
+      isMenuOpen: !this.state.isMenuOpen,
     })
   },
 
-  renderButtons() {
-    if (this.state.buttonsOpen) {
-      return (
-        <div style={{width: "50%", float: "right"}}>
-          <button>foo</button>
-          <button>bar</button>
-          <button onClick={this.toggleButtons}>&middot;&middot;&middot;</button>
-        </div>
-      )
-    }
-    return (
-      <div style={{width: "50%", float: "right"}}>
-        <button onClick={this.toggleButtons}>&middot;&middot;&middot;</button>
-      </div>
-    )
+  closeMenu() {
+    this.setState({
+      isMenuOpen: false,
+    })  
   },
 
   render() {
@@ -101,10 +91,10 @@ const NameableGraph = React.createClass({
     }
 
     return (
-      <div>
-        <div>
-          <h2 style={{width: "50%"}} className="dash-graph--heading" onClick={onClickHandler(x, y, isEditing)}>{nameOrField}</h2>
-          {this.renderButtons()}
+      <div className="dash-graph">
+        <div className="dash-graph--heading">
+          <div onClick={onClickHandler(x, y, isEditing)}>{nameOrField}</div>
+          <ContextMenu isOpen={this.state.isMenuOpen} toggleMenu={this.toggleMenu} handleClickOutside={this.closeMenu}/>
         </div>
         <div className="dash-graph--container">
           {children}
@@ -114,4 +104,13 @@ const NameableGraph = React.createClass({
   },
 })
 
+const ContextMenu = OnClickOutside(({isOpen, toggleMenu}) => (
+  <div className={classnames("dash-graph--options", {"dash-graph--options-show": isOpen})} onClick={toggleMenu}>
+    <button className="btn btn-info btn-xs">&middot;&middot;&middot;</button>
+    <ul className="dash-graph--options-menu">
+      <li>foo</li>
+      <li>bar</li>
+    </ul>
+  </div>
+))
 export default NameableGraph;
