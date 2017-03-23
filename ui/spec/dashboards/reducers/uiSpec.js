@@ -9,6 +9,7 @@ import {
   updateDashboardCells,
   editCell,
   renameCell,
+  syncDashboardCell,
 } from 'src/dashboards/actions'
 
 const noopAction = () => {
@@ -93,6 +94,24 @@ describe('DataExplorer.Reducers.UI', () => {
     const actual = reducer(state, editCell(0, 0, true))
     expect(actual.dashboards[0].cells[0].isEditing).to.equal(true)
     expect(actual.dashboard.cells[0].isEditing).to.equal(true)
+  })
+
+  it('can sync a cell', () => {
+    const newCellName = 'watts is kinda cool'
+    const newCell = {
+      x: c1.x,
+      y: c1.y,
+      name: newCellName
+    }
+    const dash = {...d1, cells: [c1]}
+    state = {
+      dashboard: dash,
+      dashboards: [dash],
+    }
+
+    const actual = reducer(state, syncDashboardCell(newCell))
+    expect(actual.dashboards[0].cells[0].name).to.equal(newCellName)
+    expect(actual.dashboard.cells[0].name).to.equal(newCellName)
   })
 
   it('can rename cells', () => {
