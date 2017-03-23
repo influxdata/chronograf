@@ -115,8 +115,8 @@ const DashboardPage = React.createClass({
     .then(this.handleDismissOverlay)
   },
 
-  handleSummonOverlayTechnologies() {
-    this.setState({selectedCell: this.props.dashboard.cells[0]})
+  handleSummonOverlayTechnologies(cell) {
+    this.setState({selectedCell: cell})
   },
 
   handleChooseTimeRange({lower}) {
@@ -168,10 +168,6 @@ const DashboardPage = React.createClass({
 
     return (
       <div className="page">
-        <button
-          onClick={this.handleSummonOverlayTechnologies}
-          style={{zIndex: 1000, position: 'absolute', background: 'red', height: '200px', width: '200px'}}
-        >WE HAVE OVERLAY TECHNOLOGIES</button>
         {
           selectedCell && selectedCell.queries.length ?
             <CellEditorOverlay
@@ -220,6 +216,7 @@ const DashboardPage = React.createClass({
           onEditCell={this.handleEditCell}
           onRenameCell={this.handleChangeCellName}
           onUpdateCell={this.handleUpdateCell}
+          onSummonOverlayTechnologies={this.handleSummonOverlayTechnologies}
         />
       </div>
     );

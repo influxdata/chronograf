@@ -50,6 +50,7 @@ export const LayoutRenderer = React.createClass({
     onEditCell: func,
     onRenameCell: func,
     onUpdateCell: func,
+    onSummonOverlayTechnologies: func,
   },
 
   buildQuery(q) {
@@ -85,7 +86,7 @@ export const LayoutRenderer = React.createClass({
   },
 
   generateVisualizations() {
-    const {autoRefresh, source, cells, onEditCell, onRenameCell, onUpdateCell} = this.props;
+    const {autoRefresh, source, cells, onEditCell, onRenameCell, onUpdateCell, onSummonOverlayTechnologies} = this.props;
 
     return cells.map((cell) => {
       const qs = cell.queries.map((query) => {
@@ -102,6 +103,7 @@ export const LayoutRenderer = React.createClass({
               onEditCell={onEditCell}
               onRenameCell={onRenameCell}
               onUpdateCell={onUpdateCell}
+              onSummonOverlayTechnologies={onSummonOverlayTechnologies}
               cell={cell}
             >
               <RefreshingSingleStat queries={[qs[0]]} autoRefresh={autoRefresh} />
@@ -121,6 +123,7 @@ export const LayoutRenderer = React.createClass({
             onEditCell={onEditCell}
             onRenameCell={onRenameCell}
             onUpdateCell={onUpdateCell}
+            onSummonOverlayTechnologies={onSummonOverlayTechnologies}
             cell={cell}
           >
             <RefreshingLineGraph
