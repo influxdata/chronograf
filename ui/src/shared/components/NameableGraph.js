@@ -113,7 +113,6 @@ const ContextMenu = OnClickOutside(({isOpen, toggleMenu, onSummonOverlayTechnolo
     </button>
     <ul className="dash-graph--options-menu">
       <li onClick={() => onSummonOverlayTechnologies(cell)}>Edit</li>
-      <li>Delete</li>
     </ul>
   </div>
 ))
