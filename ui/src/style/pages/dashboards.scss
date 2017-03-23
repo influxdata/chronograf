@@ -173,21 +173,24 @@ $dash-graph-heading: 30px;
 .dash-graph--options {
   height: $dash-graph-heading;
   position: relative;
-  width: $dash-graph-heading;
+  width: ($dash-graph-heading - 8px);
   right: -6px;
 
   > .btn {
     background-color: transparent !important;
     padding: 0;
-    height: $dash-graph-heading;
-    width: $dash-graph-heading;
-    line-height: $dash-graph-heading;
-    font-size: 24px;
-    letter-spacing: -1px;
+    margin: 4px 0;
+    height: ($dash-graph-heading - 8px);
+    width: ($dash-graph-heading - 8px);
+    line-height: ($dash-graph-heading - 8px);
     transition:
-      transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+      background-color 0.25s ease,
       color 0.25s ease !important;
-    transform: rotate(0deg);
+
+    &:hover {
+      background-color: $g5-pepper !important;
+      color: $g20-white;
+    }
   }
 }
 $dash-graph-options-arrow: 8px;
@@ -250,7 +253,7 @@ $dash-graph-options-arrow: 8px;
 .dash-graph--options.dash-graph--options-show {
   > .btn {
     color: $g20-white;
-    transform: rotate(90deg);
+    background-color: $g5-pepper !important;
   }
   .dash-graph--options-menu { visibility: visible; }
   .dash-graph--options-menu > li { opacity: 1; }

@@ -40,7 +40,7 @@ const NameableGraph = React.createClass({
   closeMenu() {
     this.setState({
       isMenuOpen: false,
-    })  
+    })
   },
 
   render() {
@@ -106,7 +106,9 @@ const NameableGraph = React.createClass({
 
 const ContextMenu = OnClickOutside(({isOpen, toggleMenu}) => (
   <div className={classnames("dash-graph--options", {"dash-graph--options-show": isOpen})} onClick={toggleMenu}>
-    <button className="btn btn-info btn-xs">&middot;&middot;&middot;</button>
+    <button className="btn btn-info btn-xs">
+      <span className="icon caret-down"></span>
+    </button>
     <ul className="dash-graph--options-menu">
       <li>foo</li>
       <li>bar</li>
