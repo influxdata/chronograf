@@ -22,3 +22,16 @@ export function updateDashboardCell(cell) {
     data: cell,
   })
 }
+
+export const createDashboard = async (dashboard) => {
+  try {
+    return await AJAX({
+      method: 'POST',
+      resource: 'dashboards',
+      data: dashboard,
+    })
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
