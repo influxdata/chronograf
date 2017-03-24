@@ -1,8 +1,8 @@
 import React, {PropTypes} from 'react'
+import ConfirmButtons from 'src/admin/components/ConfirmButtons'
 
 const DashboardEditHeader = ({
   dashboard,
-  onSave,
 }) => (
   <div className="page-header full-width">
     <div className="page-header__container">
@@ -14,11 +14,7 @@ const DashboardEditHeader = ({
           placeholder="Dashboard name"
         />
       </div>
-      <div className="page-header__right">
-        <div className="btn btn-sm btn-success" onClick={onSave}>
-          Save
-        </div>
-      </div>
+      <ConfirmButtons onConfirm={() => {}} onCancel={() => {}} />
     </div>
   </div>
 )
@@ -30,7 +26,6 @@ const {
 
 DashboardEditHeader.propTypes = {
   dashboard: shape({}),
-  onSave: func.isRequired,
 }
 
 export default DashboardEditHeader
