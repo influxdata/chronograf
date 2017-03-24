@@ -113,11 +113,7 @@ export default function ui(state = initialState, action) {
       const {cell} = action.payload
       const {dashboard} = state
 
-      const index = dashboard.cells.findIndex((c) => c.x === cell.x && c.y === cell.y)
-      const newCells = [
-        ...dashboard.cells.slice(0, index),
-        ...dashboard.cells.slice(index + 1),
-      ]
+      const newCells = dashboard.cells.filter((c) => !(c.x === cell.x && c.y === cell.y))
       const newDashboard = {
         ...dashboard,
         cells: newCells,
