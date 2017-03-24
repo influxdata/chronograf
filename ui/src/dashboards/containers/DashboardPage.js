@@ -175,7 +175,7 @@ const DashboardPage = React.createClass({
     return (
       <div className="page">
         {
-          selectedCell && selectedCell.queries.length ?
+          selectedCell ?
             <CellEditorOverlay
               cell={selectedCell}
               autoRefresh={autoRefresh}
