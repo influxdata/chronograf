@@ -10,8 +10,8 @@ class DashboardEditHeader extends Component {
     this.handleChange = ::this.handleChange
   }
 
-  handleChange(e) {
-    this.setState({name: e.target.value})
+  handleChange(name) {
+    this.setState({name})
   }
 
   render() {
@@ -27,7 +27,7 @@ class DashboardEditHeader extends Component {
               autoFocus={true}
               value={name}
               placeholder="Dashboard name"
-              onChange={this.handleChange}
+              onChange={(e) => this.handleChange(e.target.value)}
             />
           </div>
           <ConfirmButtons item={name} onConfirm={onSave} onCancel={onCancel} />
