@@ -1,6 +1,7 @@
 ## v1.2.0 [unreleased]
 
 ### Bug Fixes
+  1. [#1065](https://github.com/influxdata/chronograf/pull/1065): Save and Cancel edits to a Dashboard name
 
 ### Features
   1. [#1020](https://github.com/influxdata/chronograf/pull/1020): Users can now edit cell names on dashboards
