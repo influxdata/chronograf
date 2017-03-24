@@ -136,6 +136,18 @@ const DashboardPage = React.createClass({
     this.setState({isEditMode: true})
   },
 
+  handleCancelEditDashboard() {
+    this.setState({isEditMode: false})
+  },
+
+  handleRenameDashboard(name) {
+    this.setState({isEditMode: false})
+    const {dashboard} = this.props
+    const newDashboard = {...dashboard, name}
+    this.props.dashboardActions.updateDashboard(newDashboard)
+    this.props.dashboardActions.putDashboard()
+  },
+
   // Places cell into editing mode.
   handleEditDashboardCell(x, y, isEditing) {
     return () => {
@@ -195,7 +207,8 @@ const DashboardPage = React.createClass({
           isEditMode ?
             <EditHeader
               dashboard={dashboard}
-              onSave={() => {}}
+              onCancel={this.handleCancelEditDashboard}
+              onSave={this.handleRenameDashboard}
             /> :
             <Header
               buttonText={dashboard ? dashboard.name : ''}
