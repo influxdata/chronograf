@@ -16,6 +16,7 @@ const DatabaseTable = ({
   onKeyDownDatabase,
   onCancelDatabase,
   onConfirmDatabase,
+  onDeleteDatabase,
   onStartDeleteDatabase,
   onDatabaseDeleteConfirm,
   onAddRetentionPolicy,
@@ -34,6 +35,7 @@ const DatabaseTable = ({
         onCancel={onCancelDatabase}
         onConfirm={onConfirmDatabase}
         onStartDelete={onStartDeleteDatabase}
+        onDelete={onDeleteDatabase}
         onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
         onAddRetentionPolicy={onAddRetentionPolicy}
         onDeleteRetentionPolicy={onDeleteRetentionPolicy}
@@ -81,6 +83,7 @@ DatabaseTable.propTypes = {
   isRFDisplayed: bool,
   isAddRPDisabled: bool,
   onKeyDownDatabase: func,
+  onDeleteDatabase: func,
   onCancelDatabase: func,
   onConfirmDatabase: func,
   onStartDeleteDatabase: func,
@@ -99,6 +102,7 @@ const DatabaseTableHeader = ({
   onKeyDown,
   onConfirm,
   onCancel,
+  onDelete,
   onStartDelete,
   onDatabaseDeleteConfirm,
   onAddRetentionPolicy,
@@ -119,12 +123,13 @@ const DatabaseTableHeader = ({
   return (
     <Header
       database={database}
-      onStartDelete={onStartDelete}
-      onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
-      onAddRetentionPolicy={onAddRetentionPolicy}
-      onConfirm={onConfirm}
       onCancel={onCancel}
+      onConfirm={onConfirm}
+      onDelete={onDelete}
+      onStartDelete={onStartDelete}
       isAddRPDisabled={isAddRPDisabled}
+      onAddRetentionPolicy={onAddRetentionPolicy}
+      onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
     />
   )
 }
@@ -135,6 +140,7 @@ DatabaseTableHeader.propTypes = {
   onKeyDown: func,
   onCancel: func,
   onConfirm: func,
+  onDelete: func,
   onStartDelete: func,
   onDatabaseDeleteConfirm: func,
   onAddRetentionPolicy: func,
@@ -143,12 +149,12 @@ DatabaseTableHeader.propTypes = {
 
 const Header = ({
   database,
-  onStartDelete,
-  onDatabaseDeleteConfirm,
-  onAddRetentionPolicy,
-  isAddRPDisabled,
   onCancel,
-  onConfirm,
+  onDelete,
+  onStartDelete,
+  isAddRPDisabled,
+  onAddRetentionPolicy,
+  onDatabaseDeleteConfirm,
 }) => {
   const confirmStyle = {
     display: 'flex',
@@ -184,7 +190,7 @@ const Header = ({
           autoFocus={true}
         />
       </div>
-      <ConfirmButtons item={database} onConfirm={onConfirm} onCancel={onCancel} />
+      <ConfirmButtons item={database} onConfirm={onDelete} onCancel={onCancel} />
     </div>
   )
 
@@ -197,13 +203,14 @@ const Header = ({
 }
 
 Header.propTypes = {
-  database: shape(),
-  onStartDelete: func,
-  onDatabaseDeleteConfirm: func,
-  onAddRetentionPolicy: func,
-  isAddRPDisabled: bool,
   onConfirm: func,
   onCancel: func,
+  onDelete: func,
+  database: shape(),
+  onStartDelete: func,
+  isAddRPDisabled: bool,
+  onAddRetentionPolicy: func,
+  onDatabaseDeleteConfirm: func,
 }
 
 const EditHeader = ({database, onEdit, onKeyDown, onConfirm, onCancel}) => (
