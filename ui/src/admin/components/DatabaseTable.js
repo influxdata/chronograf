@@ -17,6 +17,7 @@ const DatabaseTable = ({
   onCancelDatabase,
   onConfirmDatabase,
   onDeleteDatabase,
+  onRemoveDeleteCode,
   onStartDeleteDatabase,
   onDatabaseDeleteConfirm,
   onAddRetentionPolicy,
@@ -29,16 +30,17 @@ const DatabaseTable = ({
     <div className="db-manager">
       <DatabaseTableHeader
         database={database}
-        isAddRPDisabled={!!database.retentionPolicies.some(rp => rp.isNew)}
         onEdit={onEditDatabase}
-        onKeyDown={onKeyDownDatabase}
         onCancel={onCancelDatabase}
-        onConfirm={onConfirmDatabase}
-        onStartDelete={onStartDeleteDatabase}
         onDelete={onDeleteDatabase}
-        onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
+        onConfirm={onConfirmDatabase}
+        onKeyDown={onKeyDownDatabase}
+        onStartDelete={onStartDeleteDatabase}
+        onRemoveDeleteCode={onRemoveDeleteCode}
         onAddRetentionPolicy={onAddRetentionPolicy}
         onDeleteRetentionPolicy={onDeleteRetentionPolicy}
+        onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
+        isAddRPDisabled={!!database.retentionPolicies.some(rp => rp.isNew)}
       />
       <div className="db-manager-table">
         <table className="table v-center admin-table">
@@ -86,6 +88,7 @@ DatabaseTable.propTypes = {
   onDeleteDatabase: func,
   onCancelDatabase: func,
   onConfirmDatabase: func,
+  onRemoveDeleteCode: func,
   onStartDeleteDatabase: func,
   onDatabaseDeleteConfirm: func,
   onAddRetentionPolicy: func,
@@ -104,6 +107,7 @@ const DatabaseTableHeader = ({
   onCancel,
   onDelete,
   onStartDelete,
+  onRemoveDeleteCode,
   onDatabaseDeleteConfirm,
   onAddRetentionPolicy,
   isAddRPDisabled,
@@ -123,7 +127,7 @@ const DatabaseTableHeader = ({
   return (
     <Header
       database={database}
-      onCancel={onCancel}
+      onCancel={onRemoveDeleteCode}
       onConfirm={onConfirm}
       onDelete={onDelete}
       onStartDelete={onStartDelete}
@@ -143,6 +147,7 @@ DatabaseTableHeader.propTypes = {
   onDelete: func,
   onStartDelete: func,
   onDatabaseDeleteConfirm: func,
+  onRemoveDeleteCode: func,
   onAddRetentionPolicy: func,
   isAddRPDisabled: bool,
 }
