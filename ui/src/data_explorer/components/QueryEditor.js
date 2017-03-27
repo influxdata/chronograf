@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import buildInfluxQLQuery from '../utils/influxql/select';
+import buildInfluxQLQuery from 'utils/influxql';
 
 import DatabaseList from './DatabaseList';
 import MeasurementList from './MeasurementList';

@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
-import buildInfluxQLQuery from '../../data_explorer/utils/influxql/select';
+import buildInfluxQLQuery from 'utils/influxql';
 
 import DatabaseList from '../../data_explorer/components/DatabaseList';
 import MeasurementList from '../../data_explorer/components/MeasurementList';

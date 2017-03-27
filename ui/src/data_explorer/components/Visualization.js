@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import buildInfluxQLQuery from '../utils/influxql/select';
+import buildInfluxQLQuery from 'utils/influxql';
 import classNames from 'classnames';
 import AutoRefresh from 'shared/components/AutoRefresh';
 import LineGraph from 'shared/components/LineGraph';

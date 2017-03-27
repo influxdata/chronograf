@@ -1,4 +1,4 @@
-import buildInfluxQLQuery from 'src/data_explorer/utils/influxql/select';
+import buildInfluxQLQuery from 'utils/influxql';
 import defaultQueryConfig from 'src/utils/defaultQueryConfig';
 
 function mergeConfig(options) {

@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import buildInfluxQLQuery from 'src/data_explorer/utils/influxql/select';
+import buildInfluxQLQuery from 'utils/influxql';
 import AutoRefresh from 'shared/components/AutoRefresh';
 import LineGraph from 'shared/components/LineGraph';
 const RefreshingLineGraph = AutoRefresh(LineGraph);
