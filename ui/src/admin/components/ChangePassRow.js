@@ -68,7 +68,7 @@ class ChangePassRow extends Component {
 
     return (
       <button
-        className="btn btn-xs btn-info admin-table--delete"
+        className="btn btn-xs btn-info admin-table--hidden"
         onClick={this.showForm}
       >
         Change Password
