@@ -25,11 +25,6 @@ export const addSource = (source) => ({
 // Async action creators
 
 export const removeAndLoadSources = (source, sources) => async (dispatch) => {
-  // Assert that the caller is sane by ensuring that source is among the provided sources
-  if (!sources.find(({id}) => source.id === id)) {
-    throw new Error("Assertion failed: provided source not in sources")
-  }
-
   try {
     try {
       await deleteSource(source)
