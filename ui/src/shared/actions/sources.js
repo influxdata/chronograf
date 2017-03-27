@@ -14,13 +14,6 @@ export const updateSource = (source) => ({
   },
 })
 
-export const removeSource = (source) => ({
-  type: 'SOURCE_REMOVED',
-  payload: {
-    source,
-  },
-})
-
 export const addSource = (source) => ({
   type: 'SOURCE_ADDED',
   payload: {
