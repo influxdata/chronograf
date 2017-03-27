@@ -5,7 +5,7 @@ import SingleStat from 'shared/components/SingleStat';
 import NameableGraph from 'shared/components/NameableGraph';
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
 
-import timeRanges from 'hson!../data/timeRanges.hson';
+import buildInfluxQLQuery from 'utils/influxql'
 
 const GridLayout = WidthProvider(ReactGridLayout);
 
@@ -56,46 +56,14 @@ export const LayoutRenderer = React.createClass({
     shouldNotBeEditable: bool,
   },
 
-  buildQuery(q) {
-    const {timeRange: {lower}, host} = this.props
-    const {defaultGroupBy} = timeRanges.find((range) => range.lower === lower)
-    const {wheres, groupbys} = q
-
-    let text = q.text;
-
-    text += ` where time > ${lower}`;
-
-    if (host) {
-      text += ` and \"host\" = '${host}'`;
-    }
-
-    if (wheres && wheres.length > 0) {
-      text += ` and ${wheres.join(' and ')}`;
-    }
-
-    if (groupbys) {
-      if (groupbys.find((g) => g.includes("time"))) {
-        text += ` group by ${groupbys.join(',')}`;
-      } else if (groupbys.length > 0) {
-        text += ` group by time(${defaultGroupBy}),${groupbys.join(',')}`;
-      } else {
-        text += ` group by time(${defaultGroupBy})`;
-      }
-    } else {
-      text += ` group by time(${defaultGroupBy})`;
-    }
-
-    return text;
-  },
-
   generateVisualizations() {
-    const {autoRefresh, source, cells, onEditCell, onRenameCell, onUpdateCell, onDeleteCell, onSummonOverlayTechnologies, shouldNotBeEditable} = this.props;
+    const {autoRefresh, timeRange, source, cells, onEditCell, onRenameCell, onUpdateCell, onDeleteCell, onSummonOverlayTechnologies, shouldNotBeEditable} = this.props
 
     return cells.map((cell) => {
       const qs = cell.queries.map((query) => {
         return Object.assign({}, query, {
           host: source,
-          text: this.buildQuery(query),
+          text: buildInfluxQLQuery(timeRange, query.queryConfig),
         });
       });
 
