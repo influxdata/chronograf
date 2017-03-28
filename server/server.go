@@ -16,6 +16,7 @@ import (
 	"github.com/influxdata/chronograf/bolt"
 	"github.com/influxdata/chronograf/canned"
 	"github.com/influxdata/chronograf/layouts"
+	"github.com/influxdata/chronograf/configuration"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/uuid"
@@ -287,9 +288,21 @@ func openService(ctx context.Context, boltPath, cannedPath string, logger chrono
 		},
 	}
 
+	// If s.Kapacitor or s.InfluxDB are provided via CLI, insert them into the
+	// configuration.SourcesStore.
+
+	// Compose a configuration.MultiSourcesStore containing a configuration.SourcesStore
+	// and a bolt.SourcesStore. CLI values should take precedence over values stored in
+	// db.
+	sources := &configuration.MultiSourcesStore{
+		Stores: []chronograf.SourcesStore{
+			db.SourcesStore,
+		},
+	}
+
 	return Service{
 		TimeSeriesClient: &InfluxClient{},
-		SourcesStore:     db.SourcesStore,
+		SourcesStore:     sources,
 		ServersStore:     db.ServersStore,
 		UsersStore:       db.UsersStore,
 		LayoutStore:      layouts,
