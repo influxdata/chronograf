@@ -42,6 +42,9 @@ type Server struct {
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
 
+	Kapacitor   string  `long:"kapacitor" description:"Location of your Kapacitor instance" env:"KAPACITOR"`
+	InfluxDB    string  `long:"influxdb" description:"Location of your InfluxDB instance" env:"INFLUXDB"`
+
 	Develop     bool   `short:"d" long:"develop" description:"Run server in develop mode."`
 	BoltPath    string `short:"b" long:"bolt-path" description:"Full path to boltDB file (/var/lib/chronograf/chronograf-v1.db)" env:"BOLT_PATH" default:"chronograf-v1.db"`
 	CannedPath  string `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
