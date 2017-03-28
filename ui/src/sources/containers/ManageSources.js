@@ -49,10 +49,10 @@ export const ManageSources = React.createClass({
   },
 
   handleDeleteSource(source) {
-    const {addFlashMessage, sources} = this.props;
+    const {addFlashMessage} = this.props;
 
     try {
-      this.props.removeAndLoadSources(source, sources)
+      this.props.removeAndLoadSources(source)
     } catch (e) {
       addFlashMessage({type: 'error', text: 'Could not remove source from Chronograf'});
     }

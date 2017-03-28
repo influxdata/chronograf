@@ -24,14 +24,13 @@ export const addSource = (source) => ({
 
 // Async action creators
 
-export const removeAndLoadSources = (source, sources) => async (dispatch) => {
+export const removeAndLoadSources = (source) => async (dispatch) => {
   try {
     try {
       await deleteSource(source)
     } catch (err) {
-      // A 404 means that a concurrent write occurred, since the above
-      // assertion was successful. It's safe to pretend the delete was
-      // successful and reload sources.
+      // A 404 means that either a concurrent write occurred or the source
+      // passed to this action creator doesn't exist (or is undefined)
       if (err.status !== 404) { // eslint-disable-line no-magic-numbers
         throw (err)
       }
