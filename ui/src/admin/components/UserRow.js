@@ -70,7 +70,7 @@ const UserRow = ({
             /> : null
         }
       </td>
-      <td className="text-right" style={{width: "200px"}}>
+      <td className="text-right" style={{width: "300px"}}>
         <ChangePassRow onEdit={onEdit} onSave={onSave} user={user} />
       </td>
       <DeleteConfirmTableCell onDelete={onDelete} item={user} />

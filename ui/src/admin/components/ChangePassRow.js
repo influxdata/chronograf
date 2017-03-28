@@ -56,9 +56,10 @@ class ChangePassRow extends Component {
           placeholder="Password"
           onChange={this.handleEdit(user)}
           onKeyPress={this.handleKeyPress(user)}
-        /> :
+          autoFocus={true}
+        />
         <ConfirmButtons
-          onConfirm={onSave}
+          onConfirm={onSave(user)}
           item={user}
           onCancel={this.handleCancel}
         />
