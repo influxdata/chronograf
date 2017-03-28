@@ -7,6 +7,22 @@ OAuth 2.0 Style Authentication
 
 To use authentication in Chronograf, both Github OAuth and JWT signature need to be configured.
 
+### Configuring Session Duration
+
+The default session duration is 30 days. The session duration can be overwritten with the environmental variable `SESSION_DURATION`. For example, to change it to 1 hour, use:
+
+```sh
+export SESSION_DURATION=1h
+```
+
+The session duration uses the golang [time duration format](https://golang.org/pkg/time/#ParseDuration), so the largest time unit is `h` (hours). So to change it to 45 days, use:
+
+```sh
+export SESSION_DURATION=1080h
+```
+
+If you want cookies to be immediately removed when you close your browser, set your `SESSION_DURATION` to `0`.
+
 #### Configuring JWT signature
 
 Set a [JWT](https://tools.ietf.org/html/rfc7519) signature to a random string. This is needed for all OAuth2 providers that you choose to configure. *Keep this random string around!*
@@ -26,13 +42,13 @@ Essentially, you'll register your application [here](https://github.com/settings
 
 The `Homepage URL` should be Chronograf's full server name and port.  If you are running it locally for example, make it `http://localhost:8888`
 
-The `Authorization callback URL` must be the location of the `Homepage URL` plus `/oauth/github/callback`.  For example, if `Homepage URL` was 
+The `Authorization callback URL` must be the location of the `Homepage URL` plus `/oauth/github/callback`.  For example, if `Homepage URL` was
 `http://localhost:8888` then the `Authorization callback URL` should be `http://localhost:8888/oauth/github/callback`.
 
 Github will provide a `Client ID` and `Client Secret`.  To register these values with chronograf set the following environment variables:
 
-* `GH_CLIENT_ID` 
-* `GH_CLIENT_SECRET` 
+* `GH_CLIENT_ID`
+* `GH_CLIENT_SECRET`
 
 For example:
 

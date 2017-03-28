@@ -11,8 +11,6 @@ import (
 const (
 	// DefaultCookieName is the name of the stored cookie
 	DefaultCookieName = "session"
-	// DefaultCookieDuration is the length of time the cookie is valid
-	DefaultCookieDuration = time.Hour * 24 * 30
 )
 
 // Cookie represents the location and expiration time of new cookies.
@@ -25,7 +23,7 @@ type cookie struct {
 var _ Mux = &CookieMux{}
 
 // NewCookieMux constructs a Mux handler that checks a cookie against the authenticator
-func NewCookieMux(p Provider, a Authenticator, l chronograf.Logger) *CookieMux {
+func NewCookieMux(p Provider, a Authenticator, duration time.Duration, l chronograf.Logger) *CookieMux {
 	return &CookieMux{
 		Provider:   p,
 		Auth:       a,
@@ -36,7 +34,7 @@ func NewCookieMux(p Provider, a Authenticator, l chronograf.Logger) *CookieMux {
 
 		cookie: cookie{
 			Name:     DefaultCookieName,
-			Duration: DefaultCookieDuration,
+			Duration: duration,
 		},
 	}
 }
@@ -144,9 +142,11 @@ func (j *CookieMux) Callback() http.Handler {
 		cookie := http.Cookie{
 			Name:     j.cookie.Name,
 			Value:    authToken,
-			Expires:  expireCookie,
 			HttpOnly: true,
 			Path:     "/",
+		}
+		if j.cookie.Duration > 0 {
+			cookie.Expires = expireCookie
 		}
 		log.Info("User ", id, " is authenticated")
 		http.SetCookie(w, &cookie)

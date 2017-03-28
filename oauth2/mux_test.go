@@ -27,7 +27,7 @@ func setupMuxTest(selector func(*oauth2.CookieMux) http.Handler) (*http.Client, 
 
 	mp := &MockProvider{"biff@example.com", provider.URL}
 
-	jm := oauth2.NewCookieMux(mp, &YesManAuthenticator{}, clog.New(clog.ParseLevel("debug")))
+	jm := oauth2.NewCookieMux(mp, &YesManAuthenticator{}, time.Second, clog.New(clog.ParseLevel("debug")))
 
 	jm.Now = func() time.Time {
 		return testTime
