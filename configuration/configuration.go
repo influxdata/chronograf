@@ -17,21 +17,21 @@ type MultiSourcesStore struct {
 }
 
 func (s *MultiSourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
-  return make([]chronograf.Source, 0), nil
+  return s.Stores[0].All(ctx)
 }
 
 func (s *MultiSourcesStore) Add(ctx context.Context, src chronograf.Source) (chronograf.Source, error) {
-  return chronograf.Source{}, nil
+  return s.Stores[0].Add(ctx, src)
 }
 
 func (s *MultiSourcesStore) Delete(ctx context.Context, src chronograf.Source) error {
-  return nil
+  return s.Stores[0].Delete(ctx, src)
 }
 
 func (s *MultiSourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
-  return chronograf.Source{}, nil
+  return s.Stores[0].Get(ctx, id)
 }
 
 func (s *MultiSourcesStore) Update(ctx context.Context, src chronograf.Source) error {
-  return nil
+  return s.Stores[0].Update(ctx, src)
 }
