@@ -1,5 +1,12 @@
 ## v1.2.0 [unreleased]
 
+### Bug Fixes
+
+### Features
+  1. [#1092](https://github.com/influxdata/chronograf/pull/1092): Persist and render Dashboard Cell groupby queries
+
+### UI Improvements
+
 ## v1.2.0-beta6 [2017-03-24]
 
 ### Bug Fixes
