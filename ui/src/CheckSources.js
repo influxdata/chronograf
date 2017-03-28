@@ -45,7 +45,11 @@ const CheckSources = React.createClass({
     const {router, location, params, addFlashMessage, sources} = nextProps;
     const {isFetching} = nextState;
     const source = sources.find((s) => s.id === params.sourceID);
+    const defaultSource = sources.find((s) => s.default === true)
     if (!isFetching && !source) {
+      if (defaultSource) {
+        return router.push(location.pathname.replace(/\/sources\/\d+\//, defaultSource.id));
+      }
       return router.push(`/sources/new?redirectPath=${location.pathname}`);
     }
 
