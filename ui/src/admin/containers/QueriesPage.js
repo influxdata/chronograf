@@ -64,7 +64,7 @@ class QueriesPage extends Component {
         queryResponses.forEach((queryResponse) => {
           const result = showQueriesParser(queryResponse.data);
           if (result.errors.length) {
-            result.errors.forEach((message) => notify('error', message));
+            result.errors.forEach((message) => notify('error', message))
           }
 
           allQueries.push(...result.queries);

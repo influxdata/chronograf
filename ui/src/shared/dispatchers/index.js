@@ -1,4 +1,4 @@
-import {publishNotification, dismissNotification} from 'shared/actions/notifications';
+import {publishNotification, dismissNotification} from 'shared/actions/notifications'
 import {delayEnablePresentationMode} from 'shared/actions/app'
 
 import {PRESENTATION_MODE_NOTIFICATION_DELAY} from 'shared/constants'

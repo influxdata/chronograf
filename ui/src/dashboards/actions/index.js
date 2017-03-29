@@ -7,7 +7,7 @@ import {
   deleteDashboardCell as deleteDashboardCellAJAX,
 } from 'src/dashboards/apis'
 
-import {publishNotification} from 'shared/actions/notifications';
+import {publishNotification} from 'shared/actions/notifications'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
 import {NEW_DEFAULT_DASHBOARD_CELL} from 'src/dashboards/constants'
