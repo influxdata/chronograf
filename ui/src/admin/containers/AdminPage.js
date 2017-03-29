@@ -239,11 +239,8 @@ AdminPage.propTypes = {
   updateRolePermissions: func,
   updateUserPermissions: func,
   updateUserRoles: func,
-<<<<<<< HEAD
-  notify: func,
-=======
   updateUserPassword: func,
->>>>>>> add update action for user password
+  notify: func,
 }
 
 const mapStateToProps = ({admin: {users, roles, permissions}}) => ({
