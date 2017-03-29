@@ -93,7 +93,6 @@ class AdminPage extends Component {
     if (user.isNew) {
       this.props.createUser(this.props.source.links.users, user)
     } else {
-      this.props.editUser(this.props.source.links.users, user)
       // TODO update user
     }
   }
