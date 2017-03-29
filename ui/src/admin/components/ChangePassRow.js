@@ -13,6 +13,7 @@ class ChangePassRow extends Component {
     this.handleCancel = ::this.handleCancel
     this.handleKeyPress = ::this.handleKeyPress
     this.handleEdit = ::this.handleEdit
+    this.handleSubmit = ::this.handleSubmit
   }
 
   showForm() {
@@ -27,13 +28,15 @@ class ChangePassRow extends Component {
     this.setState({showForm: false})
   }
 
+  handleSubmit(user) {
+    this.props.onApply(user)
+    this.setState({showForm: false})
+  }
+
   handleKeyPress(user) {
     return (e) => {
       if (e.key === 'Enter') {
-        console.log("keypress: ", user)
-        // console.log(this.props.onSave)
-        // this.props.onSave(user)
-        // this.setState({showForm: false})
+        this.handleSubmit(user)
       }
     }
   }
@@ -45,7 +48,7 @@ class ChangePassRow extends Component {
   }
 
   render() {
-    const {user, onUpdatePassword} = this.props
+    const {user} = this.props
 
     if (this.state.showForm) {
       return (
@@ -61,7 +64,7 @@ class ChangePassRow extends Component {
           autoFocus={true}
         />
         <ConfirmButtons
-          onConfirm={onUpdatePassword}
+          onConfirm={this.handleSubmit}
           item={user}
           onCancel={this.handleCancel}
         />
@@ -84,7 +87,7 @@ const {shape, func} = PropTypes
 
 ChangePassRow.propTypes = {
   user: shape().isRequired,
-  onUpdatePassword: func.isRequired,
+  onApply: func.isRequired,
   onEdit: func.isRequired,
 }
 
