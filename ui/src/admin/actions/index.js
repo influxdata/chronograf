@@ -364,7 +364,7 @@ export const updateRolePermissionsAsync = (role, permissions) => async (dispatch
     dispatch(publishAutoDismissingNotification('success', 'Role permissions updated'))
     dispatch(syncRole(role, data))
   } catch (error) {
-    dispatch(publishNotification('error', `Failed to updated role:  ${error.data.message}`))
+    dispatch(publishNotification('error', `Failed to update role:  ${error.data.message}`))
   }
 }
 
@@ -374,7 +374,7 @@ export const updateUserPermissionsAsync = (user, permissions) => async (dispatch
     dispatch(publishAutoDismissingNotification('success', 'User permissions updated'))
     dispatch(syncUser(user, data))
   } catch (error) {
-    dispatch(publishNotification('error', `Failed to updated user:  ${error.data.message}`))
+    dispatch(publishNotification('error', `Failed to update user:  ${error.data.message}`))
   }
 }
 
@@ -384,6 +384,6 @@ export const updateUserRolesAsync = (user, roles) => async (dispatch) => {
     dispatch(publishAutoDismissingNotification('success', 'User roles updated'))
     dispatch(syncUser(user, data))
   } catch (error) {
-    dispatch(publishNotification('error', `Failed to updated user:  ${error.data.message}`))
+    dispatch(publishNotification('error', `Failed to update user:  ${error.data.message}`))
   }
 }
