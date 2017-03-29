@@ -22,6 +22,7 @@ const UserRow = ({
   onDelete,
   onUpdatePermissions,
   onUpdateRoles,
+  onUpdatePassword,
 }) => {
   const handleUpdatePermissions = (allowed) => {
     onUpdatePermissions(user, [{scope: 'all', allowed}])
@@ -71,7 +72,7 @@ const UserRow = ({
         }
       </td>
       <td className="text-right" style={{width: "300px"}}>
-        <ChangePassRow onEdit={onEdit} onSave={onSave} user={user} />
+        <ChangePassRow onEdit={onEdit} onUpdatePassword={onUpdatePassword} user={user} />
       </td>
       <DeleteConfirmTableCell onDelete={onDelete} item={user} />
     </tr>
@@ -107,6 +108,7 @@ UserRow.propTypes = {
   onDelete: func.isRequired,
   onUpdatePermissions: func,
   onUpdateRoles: func,
+  onUpdatePassword: func,
 }
 
 export default UserRow

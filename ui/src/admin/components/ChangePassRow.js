@@ -30,8 +30,10 @@ class ChangePassRow extends Component {
   handleKeyPress(user) {
     return (e) => {
       if (e.key === 'Enter') {
-        this.props.onSave(user)
-        this.setState({showForm: false})
+        console.log("keypress: ", user)
+        // console.log(this.props.onSave)
+        // this.props.onSave(user)
+        // this.setState({showForm: false})
       }
     }
   }
@@ -43,7 +45,7 @@ class ChangePassRow extends Component {
   }
 
   render() {
-    const {user, onSave} = this.props
+    const {user, onUpdatePassword} = this.props
 
     if (this.state.showForm) {
       return (
@@ -59,7 +61,7 @@ class ChangePassRow extends Component {
           autoFocus={true}
         />
         <ConfirmButtons
-          onConfirm={onSave}
+          onConfirm={onUpdatePassword}
           item={user}
           onCancel={this.handleCancel}
         />
@@ -82,7 +84,7 @@ const {shape, func} = PropTypes
 
 ChangePassRow.propTypes = {
   user: shape().isRequired,
-  onSave: func.isRequired,
+  onUpdatePassword: func.isRequired,
   onEdit: func.isRequired,
 }
 

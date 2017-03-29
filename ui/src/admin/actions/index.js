@@ -370,7 +370,7 @@ export const updateRolePermissionsAsync = (role, permissions) => async (dispatch
 
 export const updateUserPermissionsAsync = (user, permissions) => async (dispatch) => {
   try {
-    const {data} = await updateUserAJAX(user.links.self, user.roles, permissions)
+    const {data} = await updateUserAJAX(user.links.self, {permissions})
     dispatch(publishAutoDismissingNotification('success', 'User permissions updated'))
     dispatch(syncUser(user, data))
   } catch (error) {
@@ -380,8 +380,18 @@ export const updateUserPermissionsAsync = (user, permissions) => async (dispatch
 
 export const updateUserRolesAsync = (user, roles) => async (dispatch) => {
   try {
-    const {data} = await updateUserAJAX(user.links.self, roles, user.permissions)
+    const {data} = await updateUserAJAX(user.links.self, {roles})
     dispatch(publishAutoDismissingNotification('success', 'User roles updated'))
+    dispatch(syncUser(user, data))
+  } catch (error) {
+    dispatch(publishNotification('error', `Failed to update user:  ${error.data.message}`))
+  }
+}
+
+export const updateUserPasswordAsync = (user, password) => async (dispatch) => {
+  try {
+    const {data} = await updateUserAJAX(user.links.self, {password})
+    dispatch(publishNotification('success', 'User password updated'))
     dispatch(syncUser(user, data))
   } catch (error) {
     dispatch(publishNotification('error', `Failed to update user:  ${error.data.message}`))
