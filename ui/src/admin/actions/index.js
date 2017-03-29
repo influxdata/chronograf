@@ -310,9 +310,9 @@ export const killQueryAsync = (source, queryID) => (dispatch) => {
 
 export const deleteRoleAsync = (role) => async (dispatch) => {
   dispatch(deleteRole(role))
-  dispatch(publishAutoDismissingNotification('success', 'Role deleted'))
   try {
     await deleteRoleAJAX(role.links.self)
+    dispatch(publishAutoDismissingNotification('success', 'Role deleted'))
   } catch (error) {
     dispatch(publishNotification('error', `Failed to delete role: ${error.data.message}`))
   }
@@ -320,9 +320,9 @@ export const deleteRoleAsync = (role) => async (dispatch) => {
 
 export const deleteUserAsync = (user) => async (dispatch) => {
   dispatch(deleteUser(user))
-  dispatch(publishAutoDismissingNotification('success', 'User deleted'))
   try {
     await deleteUserAJAX(user.links.self)
+    dispatch(publishAutoDismissingNotification('success', 'User deleted'))
   } catch (error) {
     dispatch(publishNotification('error', `Failed to delete user: ${error.data.message}`))
   }
@@ -330,9 +330,9 @@ export const deleteUserAsync = (user) => async (dispatch) => {
 
 export const deleteDatabaseAsync = (database) => async (dispatch) => {
   dispatch(removeDatabase(database))
-  dispatch(publishAutoDismissingNotification('success', 'Database deleted'))
   try {
     await deleteDatabaseAJAX(database.links.self)
+    dispatch(publishAutoDismissingNotification('success', 'Database deleted'))
   } catch (error) {
     dispatch(publishNotification('error', `Failed to delete database: ${error.data.message}`))
   }
@@ -340,9 +340,9 @@ export const deleteDatabaseAsync = (database) => async (dispatch) => {
 
 export const deleteRetentionPolicyAsync = (database, retentionPolicy) => async (dispatch) => {
   dispatch(removeRetentionPolicy(database, retentionPolicy))
-  dispatch(publishAutoDismissingNotification('success', `Retention policy ${retentionPolicy.name} deleted`))
   try {
     await deleteRetentionPolicyAJAX(retentionPolicy.links.self)
+    dispatch(publishAutoDismissingNotification('success', `Retention policy ${retentionPolicy.name} deleted`))
   } catch (error) {
     dispatch(publishNotification('error', `Failed to delete retentionPolicy: ${error.data.message}`))
   }
