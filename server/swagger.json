@@ -3178,6 +3178,9 @@
 				"permissions": {
 					"$ref": "#/definitions/Permissions"
 				},
+				"roles": {
+					"$ref": "#/definitions/Roles"
+				},
 				"links": {
 					"type": "object",
 					"description": "URL relations of this user",
