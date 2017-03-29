@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux'
 
 import * as adminActionCreators from 'src/admin/actions'
 import DatabaseManager from 'src/admin/components/DatabaseManager'
-import {publishNotification} from 'src/shared/actions/notifications';
+import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
 class DatabaseManagerPage extends Component {
   constructor(props) {
@@ -141,7 +141,7 @@ const mapStateToProps = ({admin: {databases, retentionPolicies}}) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(adminActionCreators, dispatch),
-  notify: bindActionCreators(publishNotification, dispatch),
+  notify: bindActionCreators(publishAutoDismissingNotification, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DatabaseManagerPage)

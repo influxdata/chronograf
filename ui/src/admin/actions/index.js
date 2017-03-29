@@ -308,20 +308,24 @@ export const killQueryAsync = (source, queryID) => (dispatch) => {
   killQueryProxy(source, queryID)
 }
 
-export const deleteRoleAsync = (role, addFlashMessage) => (dispatch) => {
-  // optimistic update
+export const deleteRoleAsync = (role) => async (dispatch) => {
   dispatch(deleteRole(role))
-
-  // delete role on server
-  deleteRoleAJAX(role.links.self, addFlashMessage, role.name)
+  dispatch(publishAutoDismissingNotification('success', 'Role deleted'))
+  try {
+    await deleteRoleAJAX(role.links.self)
+  } catch (error) {
+    dispatch(publishNotification('error', `Failed to delete role: ${error.data.message}`))
+  }
 }
 
-export const deleteUserAsync = (user, addFlashMessage) => (dispatch) => {
-  // optimistic update
+export const deleteUserAsync = (user) => async (dispatch) => {
   dispatch(deleteUser(user))
-
-  // delete user on server
-  deleteUserAJAX(user.links.self, addFlashMessage, user.name)
+  dispatch(publishAutoDismissingNotification('success', 'User deleted'))
+  try {
+    await deleteUserAJAX(user.links.self)
+  } catch (error) {
+    dispatch(publishNotification('error', `Failed to delete user: ${error.data.message}`))
+  }
 }
 
 export const deleteDatabaseAsync = (database) => async (dispatch) => {
