@@ -2,8 +2,9 @@ import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import * as adminActionCreators from 'src/admin/actions'
 import DatabaseManager from 'src/admin/components/DatabaseManager'
+
+import * as adminActionCreators from 'src/admin/actions'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
 class DatabaseManagerPage extends Component {

@@ -6,7 +6,7 @@ export const TIMES = [
   {test: /^\d*s/, magnitude: 3},
   {test: /^\d*m\d*s/, magnitude: 4},
   {test: /^\d*h\d*m\d*s/, magnitude: 5},
-];
+]
 
 export const NEW_DEFAULT_USER = {
   name: '',

@@ -20,7 +20,7 @@ import {
   killQuery as killQueryProxy,
 } from 'shared/apis/metaQuery'
 
-import {publishNotification} from 'shared/actions/notifications';
+import {publishNotification} from 'shared/actions/notifications'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
 import {REVERT_STATE_DELAY} from 'shared/constants'
