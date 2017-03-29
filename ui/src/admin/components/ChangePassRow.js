@@ -59,7 +59,7 @@ class ChangePassRow extends Component {
           autoFocus={true}
         />
         <ConfirmButtons
-          onConfirm={onSave(user)}
+          onConfirm={onSave}
           item={user}
           onCancel={this.handleCancel}
         />
