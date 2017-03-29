@@ -391,7 +391,7 @@ export const updateUserRolesAsync = (user, roles) => async (dispatch) => {
 export const updateUserPasswordAsync = (user, password) => async (dispatch) => {
   try {
     const {data} = await updateUserAJAX(user.links.self, {password})
-    dispatch(publishNotification('success', 'User password updated'))
+    dispatch(publishAutoDismissingNotification('success', 'User password updated'))
     dispatch(syncUser(user, data))
   } catch (error) {
     dispatch(publishNotification('error', `Failed to update user:  ${error.data.message}`))
