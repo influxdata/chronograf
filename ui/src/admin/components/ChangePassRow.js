@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 
 import OnClickOutside from 'shared/components/OnClickOutside'
-import ConfirmButtons from 'src/admin/components/ConfirmButtons'
+import ConfirmButtons from 'src/shared/components/ConfirmButtons'
 
 class ChangePassRow extends Component {
   constructor(props) {
@@ -91,4 +91,4 @@ ChangePassRow.propTypes = {
   onEdit: func.isRequired,
 }
 
-export default OnClickOutside(ChangePassRow);
+export default OnClickOutside(ChangePassRow)
