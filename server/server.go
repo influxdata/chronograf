@@ -15,15 +15,15 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/bolt"
 	"github.com/influxdata/chronograf/canned"
-	"github.com/influxdata/chronograf/layouts"
 	"github.com/influxdata/chronograf/configuration"
+	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/layouts"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/uuid"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
 	"github.com/tylerb/graceful"
-	"github.com/influxdata/chronograf/influx"
 )
 
 var (
@@ -76,6 +76,80 @@ type Server struct {
 	BuildInfo         BuildInfo
 	Listener          net.Listener
 	handler           http.Handler
+}
+
+// LayoutBuilder is responsible for building Layouts
+type LayoutBuilder interface {
+	Build(chronograf.LayoutStore) (*layouts.MultiLayoutStore, error)
+}
+
+// MultiLayoutBuilder implements LayoutBuilder and will return a MultiLayoutStore
+type MultiLayoutBuilder struct {
+	Logger     chronograf.Logger
+	UUID       chronograf.ID
+	CannedPath string
+}
+
+// Build will construct a MultiLayoutStore of canned and db-backed personalized
+// layouts
+func (builder *MultiLayoutBuilder) Build(db chronograf.LayoutStore) (*layouts.MultiLayoutStore, error) {
+	// These apps are those handled from a directory
+	apps := canned.NewApps(builder.CannedPath, builder.UUID, builder.Logger)
+	// These apps are statically compiled into chronograf
+	binApps := &canned.BinLayoutStore{
+		Logger: builder.Logger,
+	}
+	// Acts as a front-end to both the bolt layouts, filesystem layouts and binary statically compiled layouts.
+	// The idea here is that these stores form a hierarchy in which each is tried sequentially until
+	// the operation has success.  So, the database is preferred over filesystem over binary data.
+	layouts := &layouts.MultiLayoutStore{
+		Stores: []chronograf.LayoutStore{
+			db,
+			apps,
+			binApps,
+		},
+	}
+
+	return layouts, nil
+}
+
+// SourcesBuilder builds a MultiSourceStore
+type SourcesBuilder interface {
+	Build(chronograf.SourcesStore) (*configuration.MultiSourcesStore, error)
+}
+
+// MultiSourceBuilder implements SourcesBuilder
+type MultiSourceBuilder struct {
+	InfluxDB         string
+	InfluxDBUsername string
+	InfluxDBPassword string
+
+	Kapacitor         string
+	KapacitorUsername string
+	KapacitorPassword string
+}
+
+// Build will return a MultiSourceStore
+func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*configuration.MultiSourcesStore, error) {
+	stores := []chronograf.SourcesStore{db}
+
+	if fs.InfluxDB != "" {
+		influxStore := &configuration.SourcesStore{
+			Source: chronograf.Source{
+				Name:     fs.InfluxDB,
+				Type:     "influxdb",
+				Username: fs.InfluxDBUsername,
+				Password: fs.InfluxDBPassword,
+				URL:      fs.InfluxDB,
+				Default:  true,
+			}}
+		stores = append([]chronograf.SourcesStore{influxStore}, stores...)
+	}
+	sources := &configuration.MultiSourcesStore{
+		Stores: stores,
+	}
+
+	return sources, nil
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() bool) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -189,7 +263,21 @@ func (s *Server) NewListener() (net.Listener, error) {
 // Serve starts and runs the chronograf server
 func (s *Server) Serve(ctx context.Context) error {
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
-	service := openService(ctx, s.BoltPath, s.CannedPath, logger, s.useAuth())
+	layoutBuilder := &MultiLayoutBuilder{
+		Logger:     logger,
+		UUID:       &uuid.V4{},
+		CannedPath: s.CannedPath,
+	}
+	sourcesBuilder := &MultiSourceBuilder{
+		InfluxDB:         s.InfluxDB,
+		InfluxDBUsername: s.InfluxDBUsername,
+		InfluxDBPassword: s.InfluxDBPassword,
+
+		Kapacitor:         s.Kapacitor,
+		KapacitorUsername: s.KapacitorUsername,
+		KapacitorPassword: s.KapacitorPassword,
+	}
+	service := openService(ctx, s.BoltPath, layoutBuilder, sourcesBuilder, logger, s.useAuth())
 	basepath = s.Basepath
 
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){}
@@ -265,7 +353,7 @@ func (s *Server) Serve(ctx context.Context) error {
 	return nil
 }
 
-func openService(ctx context.Context, boltPath, cannedPath string, logger chronograf.Logger, useAuth bool) Service {
+func openService(ctx context.Context, boltPath string, lBuilder LayoutBuilder, sBuilder SourcesBuilder, logger chronograf.Logger, useAuth bool) Service {
 	db := bolt.NewClient()
 	db.Path = boltPath
 	if err := db.Open(ctx); err != nil {
@@ -275,34 +363,20 @@ func openService(ctx context.Context, boltPath, cannedPath string, logger chrono
 		os.Exit(1)
 	}
 
-	// These apps are those handled from a directory
-	apps := canned.NewApps(cannedPath, &uuid.V4{}, logger)
-	// These apps are statically compiled into chronograf
-	binApps := &canned.BinLayoutStore{
-		Logger: logger,
+	layouts, err := lBuilder.Build(db.LayoutStore)
+	if err != nil {
+		logger.
+			WithField("component", "LayoutStore").
+			Error("Unable to construct a MultiLayoutStore", err)
+		os.Exit(1)
 	}
 
-	// Acts as a front-end to both the bolt layouts, filesystem layouts and binary statically compiled layouts.
-	// The idea here is that these stores form a hierarchy in which each is tried sequentially until
-	// the operation has success.  So, the database is preferred over filesystem over binary data.
-	layouts := &layouts.MultiLayoutStore{
-		Stores: []chronograf.LayoutStore{
-			db.LayoutStore,
-			apps,
-			binApps,
-		},
-	}
-
-	// If s.Kapacitor or s.InfluxDB are provided via CLI, insert them into the
-	// configuration.SourcesStore.
-
-	// Compose a configuration.MultiSourcesStore containing a configuration.SourcesStore
-	// and a bolt.SourcesStore. CLI values should take precedence over values stored in
-	// db.
-	sources := &configuration.MultiSourcesStore{
-		Stores: []chronograf.SourcesStore{
-			db.SourcesStore,
-		},
+	sources, err := sBuilder.Build(db.SourcesStore)
+	if err != nil {
+		logger.
+			WithField("component", "SourcesStore").
+			Error("Unable to construct a MultiSourcesStore", err)
+		os.Exit(1)
 	}
 
 	return Service{

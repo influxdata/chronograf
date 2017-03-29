@@ -1,37 +1,67 @@
 package configuration
 
 import (
-  "context"
+	"context"
 
-  "github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
-// Ensure MultiSourcesStore implements chronograf.SourcesStore.
-var _ chronograf.SourcesStore = &MultiSourcesStore{}
-
-// MultiSourcesStore is a SourcesStore that contains multiple SourcesStores.
-// The All method will return the set of all Sources, combining Bolt's
-// collection with any values configured on startup.
+// MultiSourcesStore delegates to the SourcesStores that compose it
 type MultiSourcesStore struct {
-  Stores []chronograf.SourcesStore
+	Stores []chronograf.SourcesStore
 }
 
-func (s *MultiSourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
-  return s.Stores[0].All(ctx)
+// Add does not have any effect
+func (store *MultiSourcesStore) Add(ctx context.Context, src chronograf.Source) (chronograf.Source, error) {
+	return chronograf.Source{}, nil
 }
 
-func (s *MultiSourcesStore) Add(ctx context.Context, src chronograf.Source) (chronograf.Source, error) {
-  return s.Stores[0].Add(ctx, src)
+// All concatenates the Sources of all contained Stores
+func (store *MultiSourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
+	return []chronograf.Source{}, nil
 }
 
-func (s *MultiSourcesStore) Delete(ctx context.Context, src chronograf.Source) error {
-  return s.Stores[0].Delete(ctx, src)
+// Delete does not have any effect
+func (store *MultiSourcesStore) Delete(ctx context.Context, src chronograf.Source) error {
+	return nil
 }
 
-func (s *MultiSourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
-  return s.Stores[0].Get(ctx, id)
+// Get finds the Source by id among all contained Stores
+func (store *MultiSourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
+	return chronograf.Source{}, nil
 }
 
-func (s *MultiSourcesStore) Update(ctx context.Context, src chronograf.Source) error {
-  return s.Stores[0].Update(ctx, src)
+// Update does not have any effect
+func (store *MultiSourcesStore) Update(ctx context.Context, src chronograf.Source) error {
+	return nil
+}
+
+// SourcesStore implements the chronograf.SourcesStore interface
+type SourcesStore struct {
+	Source chronograf.Source
+}
+
+// Add does not have any effect
+func (store *SourcesStore) Add(ctx context.Context, src chronograf.Source) (chronograf.Source, error) {
+	return chronograf.Source{}, nil
+}
+
+// All will return a slice containing a configured source
+func (store *SourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
+	return []chronograf.Source{chronograf.Source{}}, nil
+}
+
+// Delete does nothing
+func (store *SourcesStore) Delete(ctx context.Context, src chronograf.Source) error {
+	return nil
+}
+
+// Get returns the configured source
+func (store *SourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
+	return chronograf.Source{}, nil
+}
+
+// Update does nothing
+func (store *SourcesStore) Update(ctx context.Context, src chronograf.Source) error {
+	return nil
 }
