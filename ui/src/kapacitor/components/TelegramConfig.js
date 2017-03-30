@@ -16,7 +16,6 @@ const TelegramConfig = React.createClass({
         'disable-web-page-preview': bool.isRequired,
         'parse-mode': string.isRequired,
         token: bool.isRequired,
-        url: string.isRequired,
       }).isRequired,
     }).isRequired,
     onSave: func.isRequired,
@@ -39,7 +38,6 @@ const TelegramConfig = React.createClass({
       'disable-web-page-preview': this.disableWebPagePreview.checked,
       'parse-mode': parseMode,
       token: this.token.value,
-      url: this.url.value,
     }
 
     this.props.onSave(properties)
@@ -47,7 +45,7 @@ const TelegramConfig = React.createClass({
 
   render() {
     const {options} = this.props.config
-    const {url, token} = options
+    const {token} = options
     const chatID = options['chat-id']
     const disableNotification = options['chat-id']
     const disableWebPagePreview = options['disable-web-page-preview']
@@ -61,11 +59,6 @@ const TelegramConfig = React.createClass({
           Send alert messages to a <a href="https://docs.influxdata.com/kapacitor/v1.2/guides/event-handler-setup/#telegram-bot" target="_blank">Telegram bot</a>.
         </p>
         <form onSubmit={this.handleSaveAlert}>
-          <div className="form-group col-xs-12">
-            <label htmlFor="url">Telegram URL</label>
-            <input className="form-control" id="url" type="text" ref={(r) => this.url = r} defaultValue={url || ''}></input>
-          </div>
-
           <div className="form-group col-xs-12">
             <label htmlFor="token">
               Token
