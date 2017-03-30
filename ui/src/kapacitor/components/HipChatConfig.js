@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react'
+import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
 
 const {
   bool,
@@ -39,21 +40,48 @@ const HipchatConfig = React.createClass({
       <div>
         <h4 className="text-center no-user-select">HipChat Alert</h4>
         <br/>
-        <p className="no-user-select">Have alerts sent to HipChat.</p>
+        <p className="no-user-select">Send alert messages to HipChat.</p>
         <form onSubmit={this.handleSaveAlert}>
           <div className="form-group col-xs-12">
             <label htmlFor="url">HipChat URL</label>
-            <input className="form-control" id="url" type="text" ref={(r) => this.url = r} defaultValue={url || ''}></input>
+            <input
+              className="form-control"
+              id="url"
+              type="text"
+              placeholder="https://your-subdomain.hipchat.com/v2/your-room"
+              ref={(r) => this.url = r}
+              defaultValue={url || ''}
+            />
           </div>
 
           <div className="form-group col-xs-12">
             <label htmlFor="room">Room</label>
-            <input className="form-control" id="room" type="text" ref={(r) => this.room = r} defaultValue={room || ''}></input>
+            <input
+              className="form-control"
+              id="room"
+              type="text"
+              placeholder="your-hipchat-token"
+              ref={(r) => this.room = r}
+              defaultValue={room || ''}
+            />
           </div>
 
           <div className="form-group col-xs-12">
-            <label htmlFor="token">Token</label>
-            <input className="form-control" id="token" type="text" ref={(r) => this.token = r} defaultValue={token || ''}></input>
+            <label htmlFor="token">
+              Token
+              <QuestionMarkTooltip
+                tipID="token"
+                tipContent="<p>Need help creating a token? Check out <a href='https://docs.influxdata.com/kapacitor/latest/guides/event-handler-setup/#hipchat-api-access-token' target='_blank'>these steps</a>.</p>"
+              />
+            </label>
+            <input
+              className="form-control"
+              id="token"
+              type="text"
+              placeholder="your-hipchat-token"
+              ref={(r) => this.token = r}
+              defaultValue={token || ''}
+            />
             <label className="form-helper">Note: a value of <code>true</code> indicates the HipChat token has been set</label>
           </div>
 
