@@ -42,7 +42,7 @@ const TelegramConfig = React.createClass({
     const {options} = this.props.config
     const {url, token} = options
     const chatID = options['chat-id']
-    const disableNotification = options['chat-id']
+    const disableNotification = options['disable-notification']
     const disableWebPagePreview = options['disable-web-page-preview']
     const parseMode = options['parse-mode']
 
