@@ -10,6 +10,7 @@
 
 ### UI Improvements
   1. [#1101](https://github.com/influxdata/chronograf/pull/1101): Compress InfluxQL responses with gzip
+  2. [#1132](https://github.com/influxdata/chronograf/pull/1132): All sidebar items show activity with a blue strip
 
 ## v1.2.0-beta7 [2017-03-28]
 ### Bug Fixes
