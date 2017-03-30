@@ -49,7 +49,7 @@ func TestKapacitorStoreDelete(t *testing.T) {
 
 	store := KapacitorStore{}
 	err := store.Delete(ctx, chronograf.Server{})
-	if err != nil {
+	if err == nil {
 		t.Fatal("Delete should not operate on an empty Store")
 	}
 
@@ -59,14 +59,14 @@ func TestKapacitorStoreDelete(t *testing.T) {
 	err = store.Delete(ctx, chronograf.Server{
 		ID: 8,
 	})
-	if err != nil {
+	if err == nil {
 		t.Fatal("Delete should not remove elements with the wrong ID")
 	}
 
 	err = store.Delete(ctx, chronograf.Server{
 		ID: 9,
 	})
-	if err == nil {
+	if err != nil {
 		t.Fatal("Delete should remove an element with a matching ID")
 	}
 }
