@@ -77,5 +77,5 @@ type TokenExtractor interface {
 // CookieGenerator takes a token string and returns a cookie to be used in an
 // http response.
 type CookieGenerator interface {
-	Generate(ctx context.Context, token string, expires time.Duration) http.Cookie
+	Generate(ctx context.Context, name, token string, expires time.Duration) http.Cookie
 }

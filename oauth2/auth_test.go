@@ -134,6 +134,17 @@ func (m *MockAuthenticator) Token(context.Context, oauth2.Principal, time.Durati
 	return "", m.Err
 }
 
+type MockCookie struct {
+	Expires time.Time
+}
+
+func (m *MockCookie) Generate(ctx context.Context, token string) http.Cookie {
+	return http.Cookie{
+		Value:   token,
+		Expires: m.Expires,
+	}
+}
+
 func TestAuthorizedToken(t *testing.T) {
 	var tests = []struct {
 		Desc         string
@@ -180,9 +191,12 @@ func TestAuthorizedToken(t *testing.T) {
 			Err:       test.AuthErr,
 			Principal: test.Principal,
 		}
+		c := &MockCookie{
+			Expires: MartyJRReleaseDate,
+		}
 
 		logger := clog.New(clog.DebugLevel)
-		handler := oauth2.AuthorizedToken(a, e, logger, next)
+		handler := oauth2.AuthorizedToken(a, e, c, logger, next)
 		handler.ServeHTTP(w, req)
 		if w.Code != test.Code {
 			t.Errorf("Status code expected: %d actual %d", test.Code, w.Code)

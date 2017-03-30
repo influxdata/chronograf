@@ -24,10 +24,11 @@ type cookie struct {
 var _ Mux = &CookieMux{}
 
 // NewCookieMux constructs a Mux handler that checks a cookie against the authenticator
-func NewCookieMux(p Provider, a Authenticator, duration time.Duration, l chronograf.Logger) *CookieMux {
+func NewCookieMux(p Provider, a Authenticator, cook CookieGenerator, duration time.Duration, l chronograf.Logger) *CookieMux {
 	return &CookieMux{
 		Provider:   p,
 		Auth:       a,
+		Cookie:     cook,
 		Logger:     l,
 		SuccessURL: "/",
 		FailureURL: "/login",
@@ -48,6 +49,7 @@ func NewCookieMux(p Provider, a Authenticator, duration time.Duration, l chronog
 type CookieMux struct {
 	Provider   Provider
 	Auth       Authenticator
+	Cookie     CookieGenerator
 	cookie     cookie
 	Logger     chronograf.Logger
 	SuccessURL string           // SuccessURL is redirect location after successful authorization
@@ -133,14 +135,16 @@ func (j *CookieMux) Callback() http.Handler {
 		}
 		ctx := r.Context()
 		// We create an auth token that will be used by all other endpoints to validate the principal has a claim
-		authToken, err := j.Auth.Token(ctx, p, j.cookie.Duration)
+		// TODO: change this to the right time for the token
+		Delay४ := j.cookie.Duration
+		authToken, err := j.Auth.Token(ctx, p, Delay४)
 		if err != nil {
 			log.Error("Unable to create cookie auth token ", err.Error())
 			http.Redirect(w, r, j.FailureURL, http.StatusTemporaryRedirect)
 			return
 		}
 
-		cookie := j.Generate(ctx, authToken, j.cookie.Duration)
+		cookie := j.MakeCookie(ctx, authToken, j.cookie.Duration)
 		log.Info("User ", id, " is authenticated")
 		http.SetCookie(w, &cookie)
 		http.Redirect(w, r, j.SuccessURL, http.StatusTemporaryRedirect)
@@ -151,25 +155,13 @@ func (j *CookieMux) Callback() http.Handler {
 func (j *CookieMux) Logout() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// To expire a cookie in a browser, you set the expire time to the past.
-		deleteCookie := j.Generate(context.TODO(), "none", -1*time.Hour)
+		deleteCookie := j.MakeCookie(context.TODO(), "none", -1*time.Hour)
 		http.SetCookie(w, &deleteCookie)
 		http.Redirect(w, r, j.SuccessURL, http.StatusTemporaryRedirect)
 	})
 }
 
-// Generate will create cookies containing token information
-func (j *CookieMux) Generate(ctx context.Context, token string, expires time.Duration) http.Cookie {
-	cookie := http.Cookie{
-		Name:     j.cookie.Name,
-		Value:    token,
-		HttpOnly: true,
-		Path:     "/",
-	}
-	if expires == 0 {
-		// Sometime in the far future when marty jr gets out of prison.
-		cookie.Expires = time.Date(2030, time.October, 22, 12, 0, 0, 0, time.UTC)
-	} else {
-		cookie.Expires = j.Now().UTC().Add(expires)
-	}
-	return cookie
+// MakeCookie will create cookies containing token information
+func (j *CookieMux) MakeCookie(ctx context.Context, token string, expires time.Duration) http.Cookie {
+	return j.Cookie.Generate(ctx, j.cookie.Name, token, expires)
 }

@@ -46,7 +46,7 @@ func (b *BearerExtractor) Extract(r *http.Request) (string, error) {
 // will be run.  The principal will be sent to the next handler via the request's
 // Context.  It is up to the next handler to determine if the principal has access.
 // On failure, will return http.StatusUnauthorized.
-func AuthorizedToken(auth Authenticator, te TokenExtractor, logger chronograf.Logger, next http.Handler) http.HandlerFunc {
+func AuthorizedToken(auth Authenticator, te TokenExtractor, cook CookieGenerator, logger chronograf.Logger, next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log := logger.
 			WithField("component", "auth").
@@ -71,6 +71,7 @@ func AuthorizedToken(auth Authenticator, te TokenExtractor, logger chronograf.Lo
 			return
 		}
 
+		// TODO: use some amount in the future from the CLI
 		token, err = auth.Token(ctx, principal, 10*time.Second)
 		if err != nil {
 			log.Error("Unable to create new token")
@@ -78,6 +79,8 @@ func AuthorizedToken(auth Authenticator, te TokenExtractor, logger chronograf.Lo
 			return
 		}
 
+		cookie := cook.Generate(ctx, token)
+		http.SetCookie(w, &cookie)
 		// Send the principal to the next handler
 		ctx = context.WithValue(ctx, PrincipalKey, principal)
 		next.ServeHTTP(w, r.WithContext(ctx))
