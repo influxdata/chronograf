@@ -1,15 +1,22 @@
 import React, {PropTypes} from 'react'
 
+const {
+  bool,
+  func,
+  shape,
+  string,
+} = PropTypes
+
 const HipchatConfig = React.createClass({
   propTypes: {
-    config: PropTypes.shape({
-      options: PropTypes.shape({
-        room: PropTypes.string.isRequired,
-        token: PropTypes.bool.isRequired,
-        url: PropTypes.string.isRequired,
+    config: shape({
+      options: shape({
+        room: string.isRequired,
+        token: bool.isRequired,
+        url: string.isRequired,
       }).isRequired,
     }).isRequired,
-    onSave: PropTypes.func.isRequired,
+    onSave: func.isRequired,
   },
 
   handleSaveAlert(e) {
