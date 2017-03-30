@@ -2,10 +2,12 @@
 
 ### Bug Fixes
   1. [#1104](https://github.com/influxdata/chronograf/pull/1104): Fix windows hosts on host list
+  2. [#1125](https://github.com/influxdata/chronograf/pull/1125): Fix visualizations not showing graph name
 
 ### Features
   1. [#1112](https://github.com/influxdata/chronograf/pull/1112): Add ability to delete a dashboard
-  2. [#1129](https://github.com/influxdata/chronograf/pull/1129): Allow InfluxDB and Kapacitor configuration via ENV vars or CLI options
+  2. [#1120](https://github.com/influxdata/chronograf/pull/1120): Allow users to update user passwords.
+  3. [#1129](https://github.com/influxdata/chronograf/pull/1129): Allow InfluxDB and Kapacitor configuration via ENV vars or CLI options
 
 ### UI Improvements
   1. [#1101](https://github.com/influxdata/chronograf/pull/1101): Compress InfluxQL responses with gzip
