@@ -1,18 +1,25 @@
 import React, {PropTypes} from 'react'
 
+const {
+  bool,
+  func,
+  shape,
+  string,
+} = PropTypes
+
 const TelegramConfig = React.createClass({
   propTypes: {
-    config: PropTypes.shape({
-      options: PropTypes.shape({
-        'chat-id': PropTypes.string.isRequired,
-        'disable-notification': PropTypes.bool.isRequired,
-        'disable-web-page-preview': PropTypes.bool.isRequired,
-        'parse-mode': PropTypes.string.isRequired,
-        token: PropTypes.bool.isRequired,
-        url: PropTypes.string.isRequired,
+    config: shape({
+      options: shape({
+        'chat-id': string.isRequired,
+        'disable-notification': bool.isRequired,
+        'disable-web-page-preview': bool.isRequired,
+        'parse-mode': string.isRequired,
+        token: bool.isRequired,
+        url: string.isRequired,
       }).isRequired,
     }).isRequired,
-    onSave: PropTypes.func.isRequired,
+    onSave: func.isRequired,
   },
 
   handleSaveAlert(e) {
