@@ -50,7 +50,9 @@ const TelegramConfig = React.createClass({
       <div>
         <h4 className="text-center no-user-select">Telegram Alert</h4>
         <br/>
-        <p className="no-user-select">You can have alerts sent to Telegram by entering info below.</p>
+        <p className="no-user-select">
+          Send alert messages to a <a href="https://docs.influxdata.com/kapacitor/v1.2/guides/event-handler-setup/#telegram-bot" target="_blank">Telegram bot</a>.
+        </p>
         <form onSubmit={this.handleSaveAlert}>
           <div className="form-group col-xs-12">
             <label htmlFor="url">Telegram URL</label>
@@ -59,17 +61,31 @@ const TelegramConfig = React.createClass({
 
           <div className="form-group col-xs-12">
             <label htmlFor="token">Token</label>
-            <input className="form-control" id="token" type="text" ref={(r) => this.token = r} defaultValue={token || ''}></input>
+            <input
+              className="form-control"
+              id="token"
+              type="text"
+              placeholder="your-telegram-token"
+              ref={(r) => this.token = r}
+              defaultValue={token || ''}>
+            </input>
             <label className="form-helper">Note: a value of <code>true</code> indicates the Telegram token has been set</label>
           </div>
 
           <div className="form-group col-xs-12">
             <label htmlFor="chat-id">Chat ID</label>
-            <input className="form-control" id="chat-id" type="text" ref={(r) => this.chatID = r} defaultValue={chatID || ''}></input>
+            <input
+              className="form-control"
+              id="chat-id"
+              type="text"
+              placeholder="your-telegram-chat-id"
+              ref={(r) => this.chatID = r}
+              defaultValue={chatID || ''}>
+            </input>
           </div>
 
           <div className="form-group col-xs-12">
-            <label htmlFor="parseMode">Parse Mode</label>
+            <label htmlFor="parseMode">Select the alert message format</label>
             <div className="form-control-static">
               <div className="radio">
                 <input id="parseModeHTML" type="radio" name="parseMode" value="html" defaultChecked={parseMode === 'HTML'} ref={(r) => this.parseModeHTML = r} />
