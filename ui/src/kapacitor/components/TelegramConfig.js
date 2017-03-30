@@ -108,14 +108,18 @@ const TelegramConfig = React.createClass({
           <div className="form-group col-xs-12">
             <div className="form-control-static">
               <input id="disableWebPagePreview" type="checkbox" defaultChecked={disableWebPagePreview} ref={(r) => this.disableWebPagePreview = r} />
-              <label htmlFor="disableWebPagePreview">Disable Web Page Preview</label>
+              <label htmlFor="disableWebPagePreview">
+                Disable <a href="https://telegram.org/blog/link-preview" target="_blank">link previews</a> in alert messages.
+              </label>
             </div>
           </div>
 
           <div className="form-group col-xs-12">
             <div className="form-control-static">
               <input id="disableNotification" type="checkbox" defaultChecked={disableNotification} ref={(r) => this.disableNotification = r} />
-              <label htmlFor="disableNotification">Disable Notification</label>
+              <label htmlFor="disableNotification">
+                Disable notifications on iOS devices and disable sounds on Android devices. Android users continue to receive notifications.
+              </label>
             </div>
           </div>
 
