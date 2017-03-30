@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react'
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
+import {HIPCHAT_TOKEN_TIP} from 'src/kapacitor/copy'
 
 const {
   bool,
@@ -71,7 +72,7 @@ const HipchatConfig = React.createClass({
               Token
               <QuestionMarkTooltip
                 tipID="token"
-                tipContent="<p>Need help creating a token? Check out <a href='https://docs.influxdata.com/kapacitor/latest/guides/event-handler-setup/#hipchat-api-access-token' target='_blank'>these steps</a>.</p>"
+                tipContent={HIPCHAT_TOKEN_TIP}
               />
             </label>
             <input
