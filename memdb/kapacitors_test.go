@@ -97,7 +97,7 @@ func TestKapacitorStoreGet(t *testing.T) {
 	}
 }
 
-func TestSourcesStoreUpdate(t *testing.T) {
+func TestKapacitorStoreUpdate(t *testing.T) {
 	ctx := context.Background()
 
 	store := KapacitorStore{}
