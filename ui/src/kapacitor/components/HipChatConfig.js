@@ -48,7 +48,7 @@ const HipchatConfig = React.createClass({
               className="form-control"
               id="url"
               type="text"
-              placeholder="https://your-subdomain.hipchat.com/v2/your-room"
+              placeholder="https://your-subdomain.hipchat.com/v2/room"
               ref={(r) => this.url = r}
               defaultValue={url || ''}
             />
