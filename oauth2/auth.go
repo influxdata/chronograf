@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/influxdata/chronograf"
 )
@@ -60,17 +61,25 @@ func AuthorizedToken(auth Authenticator, te TokenExtractor, logger chronograf.Lo
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+		ctx := r.Context()
 		// We do not check the validity of the principal.  Those
 		// served further down the chain should do so.
-		principal, err := auth.Authenticate(r.Context(), token)
+		principal, err := auth.Authenticate(ctx, token)
 		if err != nil {
 			log.Error("Invalid token")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
+		token, err = auth.Token(ctx, principal, 10*time.Second)
+		if err != nil {
+			log.Error("Unable to create new token")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		// Send the principal to the next handler
-		ctx := context.WithValue(r.Context(), PrincipalKey, principal)
+		ctx = context.WithValue(ctx, PrincipalKey, principal)
 		next.ServeHTTP(w, r.WithContext(ctx))
 		return
 	})
