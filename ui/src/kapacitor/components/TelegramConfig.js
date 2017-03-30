@@ -1,5 +1,7 @@
 import React, {PropTypes} from 'react'
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
+import {TELEGRAM_CHAT_ID_TIP, TELEGRAM_TOKEN_TIP} from 'src/kapacitor/copy'
+
 const {
   bool,
   func,
@@ -64,7 +66,7 @@ const TelegramConfig = React.createClass({
               Token
               <QuestionMarkTooltip
                 tipID="token"
-                tipContent="<p>Need help finding your token? Check out <a href='https://docs.influxdata.com/kapacitor/latest/guides/event-handler-setup/#telegram-api-access-token' target='_blank'>these steps</a>.</p>"
+                tipContent={TELEGRAM_TOKEN_TIP}
               />
             </label>
             <input
@@ -83,7 +85,7 @@ const TelegramConfig = React.createClass({
               Chat ID
               <QuestionMarkTooltip
                 tipID="chat-id"
-                tipContent="<p>Need help finding your chat id? Check out <a href='https://docs.influxdata.com/kapacitor/latest/guides/event-handler-setup/#telegram-chat-id' target='_blank'>these steps</a>.</p>"
+                tipContent={TELEGRAM_CHAT_ID_TIP}
               />
             </label>
             <input
