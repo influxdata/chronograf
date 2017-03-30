@@ -40,11 +40,11 @@ type Server struct {
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
 
-	InfluxDB         string `long:"influxdb" description:"Location of your InfluxDB instance" env:"INFLUXDB"`
+	InfluxDBURL      string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
 	InfluxDBUsername string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
 	InfluxDBPassword string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
 
-	Kapacitor         string `long:"kapacitor" description:"Location of your Kapacitor instance" env:"KAPACITOR"`
+	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
 	KapacitorPassword string `long:"kapacitor-password" description:"Password of your Kapacitor instance" env:"KAPACITOR_PASSWORD"`
 
@@ -192,12 +192,12 @@ func (s *Server) Serve(ctx context.Context) error {
 		CannedPath: s.CannedPath,
 	}
 	sourcesBuilder := &MultiSourceBuilder{
-		InfluxDB:         s.InfluxDB,
+		InfluxDBURL:      s.InfluxDBURL,
 		InfluxDBUsername: s.InfluxDBUsername,
 		InfluxDBPassword: s.InfluxDBPassword,
 	}
 	kapacitorBuilder := &MultiKapacitorBuilder{
-		Kapacitor:         s.Kapacitor,
+		KapacitorURL:      s.KapacitorURL,
 		KapacitorUsername: s.KapacitorUsername,
 		KapacitorPassword: s.KapacitorPassword,
 	}

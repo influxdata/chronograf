@@ -49,28 +49,24 @@ type SourcesBuilder interface {
 
 // MultiSourceBuilder implements SourcesBuilder
 type MultiSourceBuilder struct {
-	InfluxDB         string
+	InfluxDBURL      string
 	InfluxDBUsername string
 	InfluxDBPassword string
-
-	Kapacitor         string
-	KapacitorUsername string
-	KapacitorPassword string
 }
 
 // Build will return a MultiSourceStore
 func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*memdb.MultiSourcesStore, error) {
 	stores := []chronograf.SourcesStore{db}
 
-	if fs.InfluxDB != "" {
+	if fs.InfluxDBURL != "" {
 		influxStore := &memdb.SourcesStore{
 			Source: &chronograf.Source{
 				ID:       0,
-				Name:     fs.InfluxDB,
+				Name:     fs.InfluxDBURL,
 				Type:     chronograf.InfluxDB,
 				Username: fs.InfluxDBUsername,
 				Password: fs.InfluxDBPassword,
-				URL:      fs.InfluxDB,
+				URL:      fs.InfluxDBURL,
 				Default:  true,
 			}}
 		stores = append([]chronograf.SourcesStore{influxStore}, stores...)
@@ -89,7 +85,7 @@ type KapacitorBuilder interface {
 
 // MultiKapacitorBuilder implements KapacitorBuilder
 type MultiKapacitorBuilder struct {
-	Kapacitor         string
+	KapacitorURL      string
 	KapacitorUsername string
 	KapacitorPassword string
 }
@@ -97,13 +93,13 @@ type MultiKapacitorBuilder struct {
 // Build will return a MultiKapacitorStore
 func (builder *MultiKapacitorBuilder) Build(db chronograf.ServersStore) (*memdb.MultiKapacitorStore, error) {
 	stores := []chronograf.ServersStore{db}
-	if builder.Kapacitor != "" {
+	if builder.KapacitorURL != "" {
 		memStore := &memdb.KapacitorStore{
 			Kapacitor: &chronograf.Server{
 				ID:       0,
 				SrcID:    0,
-				Name:     builder.Kapacitor,
-				URL:      builder.Kapacitor,
+				Name:     builder.KapacitorURL,
+				URL:      builder.KapacitorURL,
 				Username: builder.KapacitorUsername,
 				Password: builder.KapacitorPassword,
 			},
