@@ -13,6 +13,7 @@
 ### UI Improvements
   1. [#1101](https://github.com/influxdata/chronograf/pull/1101): Compress InfluxQL responses with gzip
   1. [#1132](https://github.com/influxdata/chronograf/pull/1132): All sidebar items show activity with a blue strip
+  1. [#1135](https://github.com/influxdata/chronograf/pull/1135): Clarify Kapacitor Alert configuration for Telegram
 
 ## v1.2.0-beta7 [2017-03-28]
 ### Bug Fixes
