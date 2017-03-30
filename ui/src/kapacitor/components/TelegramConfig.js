@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react'
+import ReactTooltip from 'react-tooltip'
 
 const {
   bool,
@@ -67,7 +68,13 @@ const TelegramConfig = React.createClass({
           </div>
 
           <div className="form-group col-xs-12">
-            <label htmlFor="token">Token</label>
+            <label htmlFor="token">
+              Token
+              <QuestionMarkTooltip
+                tipID="token"
+                tipContent="<p>Need help finding your token? Check out <a href='https://docs.influxdata.com/kapacitor/latest/guides/event-handler-setup/#telegram-api-access-token' target='_blank'>these steps</a>.</p>"
+              />
+            </label>
             <input
               className="form-control"
               id="token"
@@ -80,7 +87,13 @@ const TelegramConfig = React.createClass({
           </div>
 
           <div className="form-group col-xs-12">
-            <label htmlFor="chat-id">Chat ID</label>
+            <label htmlFor="chat-id">
+              Chat ID
+              <QuestionMarkTooltip
+                tipID="chat-id"
+                tipContent="<p>Need help finding your chat id? Check out <a href='https://docs.influxdata.com/kapacitor/latest/guides/event-handler-setup/#telegram-chat-id' target='_blank'>these steps</a>.</p>"
+              />
+            </label>
             <input
               className="form-control"
               id="chat-id"
@@ -131,5 +144,17 @@ const TelegramConfig = React.createClass({
     )
   },
 })
+
+const QuestionMarkTooltip = ({tipID, tipContent}) => (
+  <div style={{display: "inline-block", marginLeft: "5px"}}>
+    <div data-for={`${tipID}-tooltip`} data-tip={tipContent}>?</div>
+    <ReactTooltip id={`${tipID}-tooltip`} effect="solid" html={true} offset={{top: 2}} place="bottom" class="influx-tooltip place-bottom" />
+  </div>
+)
+
+QuestionMarkTooltip.propTypes = {
+  tipID: string.isRequired,
+  tipContent: string.isRequired,
+}
 
 export default TelegramConfig
