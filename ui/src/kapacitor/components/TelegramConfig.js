@@ -146,9 +146,16 @@ const TelegramConfig = React.createClass({
 })
 
 const QuestionMarkTooltip = ({tipID, tipContent}) => (
-  <div style={{display: "inline-block", marginLeft: "5px"}}>
-    <div data-for={`${tipID}-tooltip`} data-tip={tipContent}>?</div>
-    <ReactTooltip id={`${tipID}-tooltip`} effect="solid" html={true} offset={{top: 2}} place="bottom" class="influx-tooltip place-bottom" />
+  <div style={{display: "inline-block"}}>
+    <div data-for={`${tipID}-tooltip`} data-tip={tipContent} style={{margin: "0 5px"}}>?</div>
+    <ReactTooltip
+      id={`${tipID}-tooltip`}
+      effect="solid"
+      html={true}
+      offset={{top: 2}}
+      place="bottom"
+      class="influx-tooltip__hover place-bottom"
+    />
   </div>
 )
 
