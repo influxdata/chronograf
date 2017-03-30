@@ -15,10 +15,10 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/bolt"
 	"github.com/influxdata/chronograf/canned"
-	"github.com/influxdata/chronograf/configuration"
 	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/chronograf/layouts"
 	clog "github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/memdb"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/uuid"
 	client "github.com/influxdata/usage-client/v1"
@@ -115,7 +115,7 @@ func (builder *MultiLayoutBuilder) Build(db chronograf.LayoutStore) (*layouts.Mu
 
 // SourcesBuilder builds a MultiSourceStore
 type SourcesBuilder interface {
-	Build(chronograf.SourcesStore) (*configuration.MultiSourcesStore, error)
+	Build(chronograf.SourcesStore) (*memdb.MultiSourcesStore, error)
 }
 
 // MultiSourceBuilder implements SourcesBuilder
@@ -130,14 +130,15 @@ type MultiSourceBuilder struct {
 }
 
 // Build will return a MultiSourceStore
-func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*configuration.MultiSourcesStore, error) {
+func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*memdb.MultiSourcesStore, error) {
 	stores := []chronograf.SourcesStore{db}
 
 	if fs.InfluxDB != "" {
-		influxStore := &configuration.SourcesStore{
-			Source: chronograf.Source{
+		influxStore := &memdb.SourcesStore{
+			Source: &chronograf.Source{
+				ID:       0,
 				Name:     fs.InfluxDB,
-				Type:     "influxdb",
+				Type:     chronograf.InfluxDB,
 				Username: fs.InfluxDBUsername,
 				Password: fs.InfluxDBPassword,
 				URL:      fs.InfluxDB,
@@ -145,11 +146,45 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*configuration.
 			}}
 		stores = append([]chronograf.SourcesStore{influxStore}, stores...)
 	}
-	sources := &configuration.MultiSourcesStore{
+	sources := &memdb.MultiSourcesStore{
 		Stores: stores,
 	}
 
 	return sources, nil
+}
+
+// KapacitorBuilder builds a KapacitorStore
+type KapacitorBuilder interface {
+	Build(chronograf.ServersStore) (*memdb.MultiKapacitorStore, error)
+}
+
+// MultiKapacitorBuilder implements KapacitorBuilder
+type MultiKapacitorBuilder struct {
+	Kapacitor         string
+	KapacitorUsername string
+	KapacitorPassword string
+}
+
+// Build will return a MultiKapacitorStore
+func (builder *MultiKapacitorBuilder) Build(db chronograf.ServersStore) (*memdb.MultiKapacitorStore, error) {
+	stores := []chronograf.ServersStore{db}
+	if builder.Kapacitor != "" {
+		memStore := &memdb.KapacitorStore{
+			Kapacitor: &chronograf.Server{
+				ID:       0,
+				SrcID:    0,
+				Name:     builder.Kapacitor,
+				URL:      builder.Kapacitor,
+				Username: builder.KapacitorUsername,
+				Password: builder.KapacitorPassword,
+			},
+		}
+		stores = append([]chronograf.ServersStore{memStore}, stores...)
+	}
+	kapacitors := &memdb.MultiKapacitorStore{
+		Stores: stores,
+	}
+	return kapacitors, nil
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() bool) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -272,12 +307,13 @@ func (s *Server) Serve(ctx context.Context) error {
 		InfluxDB:         s.InfluxDB,
 		InfluxDBUsername: s.InfluxDBUsername,
 		InfluxDBPassword: s.InfluxDBPassword,
-
+	}
+	kapacitorBuilder := &MultiKapacitorBuilder{
 		Kapacitor:         s.Kapacitor,
 		KapacitorUsername: s.KapacitorUsername,
 		KapacitorPassword: s.KapacitorPassword,
 	}
-	service := openService(ctx, s.BoltPath, layoutBuilder, sourcesBuilder, logger, s.useAuth())
+	service := openService(ctx, s.BoltPath, layoutBuilder, sourcesBuilder, kapacitorBuilder, logger, s.useAuth())
 	basepath = s.Basepath
 
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){}
@@ -353,7 +389,7 @@ func (s *Server) Serve(ctx context.Context) error {
 	return nil
 }
 
-func openService(ctx context.Context, boltPath string, lBuilder LayoutBuilder, sBuilder SourcesBuilder, logger chronograf.Logger, useAuth bool) Service {
+func openService(ctx context.Context, boltPath string, lBuilder LayoutBuilder, sBuilder SourcesBuilder, kapBuilder KapacitorBuilder, logger chronograf.Logger, useAuth bool) Service {
 	db := bolt.NewClient()
 	db.Path = boltPath
 	if err := db.Open(ctx); err != nil {
@@ -379,10 +415,18 @@ func openService(ctx context.Context, boltPath string, lBuilder LayoutBuilder, s
 		os.Exit(1)
 	}
 
+	kapacitors, err := kapBuilder.Build(db.ServersStore)
+	if err != nil {
+		logger.
+			WithField("component", "KapacitorStore").
+			Error("Unable to construct a MultiKapacitorStore", err)
+		os.Exit(1)
+	}
+
 	return Service{
 		TimeSeriesClient: &InfluxClient{},
 		SourcesStore:     sources,
-		ServersStore:     db.ServersStore,
+		ServersStore:     kapacitors,
 		UsersStore:       db.UsersStore,
 		LayoutStore:      layouts,
 		DashboardsStore:  db.DashboardsStore,
