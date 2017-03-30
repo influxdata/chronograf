@@ -31,7 +31,8 @@ type MuxOpts struct {
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
 func NewMux(opts MuxOpts, service Service) http.Handler {
-	router := httprouter.New()
+	hr := httprouter.New()
+	var router chronograf.Router = hr
 
 	/* React Application */
 	assets := Assets(AssetsOpts{
@@ -48,7 +49,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	// The react application handles all the routing if the server does not
 	// know about the route.  This means that we never have unknown
 	// routes on the server.
-	router.NotFound = compressed
+	hr.NotFound = compressed
 
 	/* Documentation */
 	router.GET("/swagger.json", Spec())
@@ -178,7 +179,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 // AuthAPI adds the OAuth routes if auth is enabled.
 // TODO: this function is not great.  Would be good if providers added their routes.
-func AuthAPI(opts MuxOpts, router *httprouter.Router) (http.Handler, AuthRoutes) {
+func AuthAPI(opts MuxOpts, router chronograf.Router) (http.Handler, AuthRoutes) {
 	auth := oauth2.NewJWT(opts.TokenSecret)
 	routes := AuthRoutes{}
 	for _, pf := range opts.ProviderFuncs {

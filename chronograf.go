@@ -42,6 +42,17 @@ type Logger interface {
 	Writer() *io.PipeWriter
 }
 
+type Router interface {
+	http.Handler
+	GET(string, http.HandlerFunc)
+	PATCH(string, http.HandlerFunc)
+	POST(string, http.HandlerFunc)
+	DELETE(string, http.HandlerFunc)
+	PUT(string, http.HandlerFunc)
+
+	Handler(string, string, http.Handler)
+}
+
 // Assets returns a handler to serve the website.
 type Assets interface {
 	Handler() http.Handler
