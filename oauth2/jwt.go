@@ -8,9 +8,6 @@ import (
 	gojwt "github.com/dgrijalva/jwt-go"
 )
 
-// Test if JWT implements Authenticator
-var _ Authenticator = &JWT{}
-
 // JWT represents a javascript web token that can be validated or marshaled into string.
 type JWT struct {
 	Secret string
@@ -43,8 +40,8 @@ func (c *Claims) Valid() error {
 	return nil
 }
 
-// Authenticate checks if the jwtToken is signed correctly and validates with Claims.
-func (j *JWT) Authenticate(ctx context.Context, jwtToken string) (Principal, error) {
+// Validate checks if the jwtToken is signed correctly and validates with Claims.
+func (j *JWT) Validate(ctx context.Context, jwtToken string) (Principal, error) {
 	gojwt.TimeFunc = j.Now
 
 	// Check for expected signing method.
@@ -77,8 +74,8 @@ func (j *JWT) Authenticate(ctx context.Context, jwtToken string) (Principal, err
 	}, nil
 }
 
-// Token creates a signed JWT token from user that expires at Now + duration
-func (j *JWT) Token(ctx context.Context, user Principal, duration time.Duration) (string, error) {
+// Create creates a signed JWT token from user that expires at Now + duration
+func (j *JWT) Create(ctx context.Context, user Principal, duration time.Duration) (string, error) {
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
 	now := j.Now().UTC()

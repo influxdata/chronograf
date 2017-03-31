@@ -1,43 +1,23 @@
 package oauth2
 
 import (
-	"context"
 	"net/http"
-	"time"
 
 	"github.com/influxdata/chronograf"
 	"golang.org/x/oauth2"
 )
 
-const (
-	// DefaultCookieName is the name of the stored cookie
-	DefaultCookieName = "session"
-)
-
-// Cookie represents the location and expiration time of new cookies.
-type cookie struct {
-	Name     string
-	Duration time.Duration
-}
-
 // Check to ensure CookieMux is an oauth2.Mux
 var _ Mux = &CookieMux{}
 
 // NewCookieMux constructs a Mux handler that checks a cookie against the authenticator
-func NewCookieMux(p Provider, a Authenticator, cook CookieGenerator, duration time.Duration, l chronograf.Logger) *CookieMux {
+func NewCookieMux(p Provider, a Authenticator, l chronograf.Logger) *CookieMux {
 	return &CookieMux{
 		Provider:   p,
 		Auth:       a,
-		Cookie:     cook,
 		Logger:     l,
 		SuccessURL: "/",
 		FailureURL: "/login",
-		Now:        time.Now,
-
-		cookie: cookie{
-			Name:     DefaultCookieName,
-			Duration: duration,
-		},
 	}
 }
 
@@ -49,17 +29,14 @@ func NewCookieMux(p Provider, a Authenticator, cook CookieGenerator, duration ti
 type CookieMux struct {
 	Provider   Provider
 	Auth       Authenticator
-	Cookie     CookieGenerator
-	cookie     cookie
 	Logger     chronograf.Logger
-	SuccessURL string           // SuccessURL is redirect location after successful authorization
-	FailureURL string           // FailureURL is redirect location after authorization failure
-	Now        func() time.Time // Now returns the current time
+	SuccessURL string // SuccessURL is redirect location after successful authorization
+	FailureURL string // FailureURL is redirect location after authorization failure
 }
 
 // Login uses a Cookie with a random string as the state validation method.  JWTs are
 // a good choice here for encoding because they can be validated without
-// storing state.
+// storing state. Login returns a handler that redirects to the providers OAuth login.
 func (j *CookieMux) Login() http.Handler {
 	conf := j.Provider.Config()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +48,8 @@ func (j *CookieMux) Login() http.Handler {
 		p := Principal{
 			Subject: csrf,
 		}
-		state, err := j.Auth.Token(r.Context(), p, 10*time.Minute)
+		// TODO: use jwt directly
+		state, err := j.Auth.Serialize(r.Context(), p)
 		// This is likely an internal server error
 		if err != nil {
 			j.Logger.
@@ -102,8 +80,9 @@ func (j *CookieMux) Callback() http.Handler {
 			WithField("url", r.URL)
 
 		state := r.FormValue("state")
+		// TODO: use jwt directly
 		// Check if the OAuth state token is valid to prevent CSRF
-		_, err := j.Auth.Authenticate(r.Context(), state)
+		_, err := j.Auth.ValidAuthorization(r.Context(), state)
 		if err != nil {
 			log.Error("Invalid OAuth state received: ", err.Error())
 			http.Redirect(w, r, j.FailureURL, http.StatusTemporaryRedirect)
@@ -134,34 +113,21 @@ func (j *CookieMux) Callback() http.Handler {
 			Issuer:  j.Provider.Name(),
 		}
 		ctx := r.Context()
-		// We create an auth token that will be used by all other endpoints to validate the principal has a claim
-		// TODO: change this to the right time for the token
-		Delay४ := j.cookie.Duration
-		authToken, err := j.Auth.Token(ctx, p, Delay४)
+		err = j.Auth.Authorize(ctx, w, p)
 		if err != nil {
-			log.Error("Unable to create cookie auth token ", err.Error())
+			log.Error("Unable to get add session to response ", err.Error())
 			http.Redirect(w, r, j.FailureURL, http.StatusTemporaryRedirect)
 			return
 		}
-
-		cookie := j.MakeCookie(ctx, authToken, j.cookie.Duration)
 		log.Info("User ", id, " is authenticated")
-		http.SetCookie(w, &cookie)
-		http.Redirect(w, r, j.SuccessURL, http.StatusTemporaryRedirect)
-	})
-} // Login returns a handler that redirects to the providers OAuth login.
-
-// Logout handler will expire our authentication cookie and redirect to the successURL
-func (j *CookieMux) Logout() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// To expire a cookie in a browser, you set the expire time to the past.
-		deleteCookie := j.MakeCookie(context.TODO(), "none", -1*time.Hour)
-		http.SetCookie(w, &deleteCookie)
 		http.Redirect(w, r, j.SuccessURL, http.StatusTemporaryRedirect)
 	})
 }
 
-// MakeCookie will create cookies containing token information
-func (j *CookieMux) MakeCookie(ctx context.Context, token string, expires time.Duration) http.Cookie {
-	return j.Cookie.Generate(ctx, j.cookie.Name, token, expires)
+// Logout handler will expire our authentication cookie and redirect to the successURL
+func (j *CookieMux) Logout() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		j.Auth.Expire(w)
+		http.Redirect(w, r, j.SuccessURL, http.StatusTemporaryRedirect)
+	})
 }

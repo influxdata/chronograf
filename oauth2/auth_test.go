@@ -59,60 +59,6 @@ func TestCookieExtractor(t *testing.T) {
 	}
 }
 
-func TestBearerExtractor(t *testing.T) {
-	var test = []struct {
-		Desc     string
-		Header   string
-		Value    string
-		Lookup   string
-		Expected string
-		Err      error
-	}{
-		{
-			Desc:     "No header of this name",
-			Header:   "Doesntexist",
-			Value:    "reallyimportant",
-			Expected: "",
-			Err:      oauth2.ErrAuthentication,
-		},
-		{
-			Desc:     "Auth header doesn't have Bearer",
-			Header:   "Authorization",
-			Value:    "Bad Value",
-			Expected: "",
-			Err:      oauth2.ErrAuthentication,
-		},
-		{
-			Desc:     "Auth header doesn't have Bearer token",
-			Header:   "Authorization",
-			Value:    "Bearer",
-			Expected: "",
-			Err:      oauth2.ErrAuthentication,
-		},
-		{
-			Desc:     "Authorization Bearer token success",
-			Header:   "Authorization",
-			Value:    "Bearer howdy",
-			Expected: "howdy",
-			Err:      nil,
-		},
-	}
-	for _, test := range test {
-		req, _ := http.NewRequest("", "http://howdy.com", nil)
-		req.Header.Add(test.Header, test.Value)
-
-		var e oauth2.TokenExtractor = &oauth2.BearerExtractor{}
-		actual, err := e.Extract(req)
-		if err != test.Err {
-			t.Errorf("Bearer extract error; expected %v  actual %v", test.Err, err)
-		}
-
-		if actual != test.Expected {
-			t.Errorf("Token extract error; expected %v  actual %v", test.Expected, actual)
-		}
-	}
-}
-
 type MockExtractor struct {
 	Err error
 }

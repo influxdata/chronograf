@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"time"
 
 	"golang.org/x/oauth2"
 )
@@ -62,20 +61,19 @@ type Mux interface {
 
 // Authenticator represents a service for authenticating users.
 type Authenticator interface {
-	// Authenticate returns User associated with token if successful.
-	Authenticate(ctx context.Context, token string) (Principal, error)
-	// Token generates a valid token for Principal lasting a duration
-	Token(context.Context, Principal, time.Duration) (string, error)
-}
+	// Validate returns Principal associated with authenticated and authorized
+	// entity if successful.
+	Validate(context.Context, *http.Request) (Principal, error)
+	// Authorize will grant privileges to a Principal
+	Authorize(context.Context, http.ResponseWriter, Principal) error
+	// Expire revokes privileges from a Principal
+	Expire(http.ResponseWriter)
+	// RenewAuthorization will renew authorization for the current Principal
+	RenewAuthorization(context.Context, http.ResponseWriter, *http.Request) error
 
-// TokenExtractor extracts tokens from http requests
-type TokenExtractor interface {
-	// Extract will return the token or an error.
-	Extract(r *http.Request) (string, error)
-}
-
-// CookieGenerator takes a token string and returns a cookie to be used in an
-// http response.
-type CookieGenerator interface {
-	Generate(ctx context.Context, name, token string, expires time.Duration) http.Cookie
+	// ValidAuthorization is an auxiliary function to check if the serialized
+	// authorization is valid
+	ValidAuthorization(ctx context.Context, serializedAuthorization string) (Principal, error)
+	// Serialize is an auxiliary function to serialize a Principal to string
+	Serialize(context.Context, Principal) (string, error)
 }
