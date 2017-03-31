@@ -42,12 +42,11 @@ type Server struct {
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
 
-	Develop                bool          `short:"d" long:"develop" description:"Run server in develop mode."`
-	BoltPath               string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (/var/lib/chronograf/chronograf-v1.db)" env:"BOLT_PATH" default:"chronograf-v1.db"`
-	CannedPath             string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
-	TokenSecret            string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
-	AuthenticationDuration time.Duration `long:"authentication-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours)" env:"AUTHENTICATION_DURATION"`
-	AuthorizationDuration  time.Duration `long:"authorization-duration" description:"" env:"AUTHORIZATION_DURATION"`
+	Develop      bool          `short:"d" long:"develop" description:"Run server in develop mode."`
+	BoltPath     string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (/var/lib/chronograf/chronograf-v1.db)" env:"BOLT_PATH" default:"chronograf-v1.db"`
+	CannedPath   string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
+	TokenSecret  string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
+	AuthDuration time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
 
 	GithubClientID     string   `short:"i" long:"github-client-id" description:"Github Client ID for OAuth 2 support" env:"GH_CLIENT_ID"`
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
@@ -101,7 +100,7 @@ func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Orgs:         s.GithubOrgs,
 		Logger:       logger,
 	}
-	ghMux := oauth2.NewCookieMux(&gh, auth, s.SessionDuration, logger)
+	ghMux := oauth2.NewCookieMux(&gh, auth, logger)
 	return &gh, ghMux, s.UseGithub
 }
 
@@ -115,7 +114,7 @@ func (s *Server) googleOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Logger:       logger,
 	}
 
-	goMux := oauth2.NewCookieMux(&google, auth, s.SessionDuration, logger)
+	goMux := oauth2.NewCookieMux(&google, auth, logger)
 	return &google, goMux, s.UseGoogle
 }
 
@@ -127,7 +126,7 @@ func (s *Server) herokuOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Logger:        logger,
 	}
 
-	hMux := oauth2.NewCookieMux(&heroku, auth, s.SessionDuration, logger)
+	hMux := oauth2.NewCookieMux(&heroku, auth, logger)
 	return &heroku, hMux, s.UseHeroku
 }
 
@@ -187,14 +186,14 @@ func (s *Server) Serve(ctx context.Context) error {
 
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){}
 
-	auth := oauth2.NewJWT(s.TokenSecret)
-	providerFuncs = append(providerFuncs, provide(s.githubOAuth(logger, &auth)))
-	providerFuncs = append(providerFuncs, provide(s.googleOAuth(logger, &auth)))
-	providerFuncs = append(providerFuncs, provide(s.herokuOAuth(logger, &auth)))
+	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration)
+	providerFuncs = append(providerFuncs, provide(s.githubOAuth(logger, auth)))
+	providerFuncs = append(providerFuncs, provide(s.googleOAuth(logger, auth)))
+	providerFuncs = append(providerFuncs, provide(s.herokuOAuth(logger, auth)))
 
 	s.handler = NewMux(MuxOpts{
 		Develop:       s.Develop,
-		TokenSecret:   s.TokenSecret,
+		Auth:          auth,
 		Logger:        logger,
 		UseAuth:       s.useAuth(),
 		ProviderFuncs: providerFuncs,

@@ -11,7 +11,7 @@ import (
 // will be run.  The principal will be sent to the next handler via the request's
 // Context.  It is up to the next handler to determine if the principal has access.
 // On failure, will return http.StatusUnauthorized.
-func AuthorizedToken(auth Authenticator, hasLogoutDelay bool, logger chronograf.Logger, next http.Handler) http.HandlerFunc {
+func AuthorizedToken(auth Authenticator, logger chronograf.Logger, next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log := logger.
 			WithField("component", "auth").
@@ -29,14 +29,6 @@ func AuthorizedToken(auth Authenticator, hasLogoutDelay bool, logger chronograf.
 			return
 		}
 
-		if hasLogoutDelay {
-			err := auth.RenewAuthorization(ctx, w, r)
-			if err != nil {
-				log.Error("Unable to renew authorization")
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		}
 		// Send the principal to the next handler
 		ctx = context.WithValue(ctx, PrincipalKey, principal)
 		next.ServeHTTP(w, r.WithContext(ctx))

@@ -68,8 +68,6 @@ type Authenticator interface {
 	Authorize(context.Context, http.ResponseWriter, Principal) error
 	// Expire revokes privileges from a Principal
 	Expire(http.ResponseWriter)
-	// RenewAuthorization will renew authorization for the current Principal
-	RenewAuthorization(context.Context, http.ResponseWriter, *http.Request) error
 
 	// ValidAuthorization is an auxiliary function to check if the serialized
 	// authorization is valid
