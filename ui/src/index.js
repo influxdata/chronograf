@@ -93,6 +93,7 @@ const Root = React.createClass({
         this.setState({loggedIn: true})
       }
     } catch (error) {
+      // TODO: verify that this is handling 403 and/or 401
       if (error.auth) {
         store.dispatch(receiveAuth(error.auth))
       }
