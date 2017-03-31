@@ -1,11 +1,9 @@
 package oauth2_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"time"
 
 	goauth "golang.org/x/oauth2"
 
@@ -53,20 +51,20 @@ func (mp *MockProvider) Secret() string {
 	return "4815162342"
 }
 
-var _ oauth2.Authenticator = &YesManAuthenticator{}
-
-type YesManAuthenticator struct{}
-
-func (y *YesManAuthenticator) Authenticate(ctx context.Context, token string) (oauth2.Principal, error) {
-	return oauth2.Principal{
-		Subject: "biff@example.com",
-		Issuer:  "Biff Tannen's Pleasure Paradise",
-	}, nil
-}
-
-func (y *YesManAuthenticator) Token(ctx context.Context, p oauth2.Principal, t time.Duration) (string, error) {
-	return "HELLO?!MCFLY?!ANYONEINTHERE?!", nil
-}
+// var _ oauth2.Authenticator = &YesManAuthenticator{}
+//
+// type YesManAuthenticator struct{}
+//
+// func (y *YesManAuthenticator) Authenticate(ctx context.Context, token string) (oauth2.Principal, error) {
+// 	return oauth2.Principal{
+// 		Subject: "biff@example.com",
+// 		Issuer:  "Biff Tannen's Pleasure Paradise",
+// 	}, nil
+// }
+//
+// func (y *YesManAuthenticator) Token(ctx context.Context, p oauth2.Principal, t time.Duration) (string, error) {
+// 	return "HELLO?!MCFLY?!ANYONEINTHERE?!", nil
+// }
 
 func NewTestTripper(log chronograf.Logger, ts *httptest.Server, rt http.RoundTripper) (*TestTripper, error) {
 	url, err := url.Parse(ts.URL)

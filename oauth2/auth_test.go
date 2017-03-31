@@ -6,109 +6,46 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 )
 
-func TestCookieExtractor(t *testing.T) {
-	var test = []struct {
-		Desc     string
-		Name     string
-		Value    string
-		Lookup   string
-		Expected string
-		Err      error
-	}{
-		{
-			Desc:     "No cookie of this name",
-			Name:     "Auth",
-			Value:    "reallyimportant",
-			Lookup:   "Doesntexist",
-			Expected: "",
-			Err:      oauth2.ErrAuthentication,
-		},
-		{
-			Desc:     "Cookie token extracted",
-			Name:     "Auth",
-			Value:    "reallyimportant",
-			Lookup:   "Auth",
-			Expected: "reallyimportant",
-			Err:      nil,
-		},
-	}
-	for _, test := range test {
-		req, _ := http.NewRequest("", "http://howdy.com", nil)
-		req.AddCookie(&http.Cookie{
-			Name:  test.Name,
-			Value: test.Value,
-		})
-
-		var e oauth2.TokenExtractor = &oauth2.CookieExtractor{
-			Name: test.Lookup,
-		}
-		actual, err := e.Extract(req)
-		if err != test.Err {
-			t.Errorf("Cookie extract error; expected %v  actual %v", test.Err, err)
-		}
-
-		if actual != test.Expected {
-			t.Errorf("Token extract error; expected %v  actual %v", test.Expected, actual)
-		}
-	}
-}
-
-type MockExtractor struct {
-	Err error
-}
-
-func (m *MockExtractor) Extract(*http.Request) (string, error) {
-	return "", m.Err
-}
-
 type MockAuthenticator struct {
-	Principal oauth2.Principal
-	Err       error
+	Principal   oauth2.Principal
+	ValidateErr error
+	Serialized  string
 }
 
-func (m *MockAuthenticator) Authenticate(context.Context, string) (oauth2.Principal, error) {
-	return m.Principal, m.Err
+func (m *MockAuthenticator) Validate(context.Context, *http.Request) (oauth2.Principal, error) {
+	return m.Principal, m.ValidateErr
 }
+func (m *MockAuthenticator) Authorize(ctx context.Context, w http.ResponseWriter, p oauth2.Principal) error {
+	cookie := http.Cookie{}
 
-func (m *MockAuthenticator) Token(context.Context, oauth2.Principal, time.Duration) (string, error) {
-	return "", m.Err
+	http.SetCookie(w, &cookie)
+	return nil
 }
-
-type MockCookie struct {
-	Expires time.Time
+func (m *MockAuthenticator) Expire(http.ResponseWriter) {}
+func (m *MockAuthenticator) ValidAuthorization(ctx context.Context, serializedAuthorization string) (oauth2.Principal, error) {
+	return oauth2.Principal{}, nil
 }
-
-func (m *MockCookie) Generate(ctx context.Context, token string) http.Cookie {
-	return http.Cookie{
-		Value:   token,
-		Expires: m.Expires,
-	}
+func (m *MockAuthenticator) Serialize(context.Context, oauth2.Principal) (string, error) {
+	return m.Serialized, nil
 }
 
 func TestAuthorizedToken(t *testing.T) {
 	var tests = []struct {
-		Desc         string
-		Code         int
-		Principal    oauth2.Principal
-		ExtractorErr error
-		AuthErr      error
-		Expected     string
+		Desc        string
+		Code        int
+		Principal   oauth2.Principal
+		ValidateErr error
+		Expected    string
 	}{
 		{
-			Desc:         "Error in extractor",
-			Code:         http.StatusUnauthorized,
-			ExtractorErr: errors.New("error"),
-		},
-		{
-			Desc:    "Error in extractor",
-			Code:    http.StatusUnauthorized,
-			AuthErr: errors.New("error"),
+			Desc:        "Error in validate",
+			Code:        http.StatusForbidden,
+			ValidateErr: errors.New("error"),
 		},
 		{
 			Desc: "Authorized ok",
@@ -130,19 +67,13 @@ func TestAuthorizedToken(t *testing.T) {
 		req, _ := http.NewRequest("GET", "", nil)
 		w := httptest.NewRecorder()
 
-		e := &MockExtractor{
-			Err: test.ExtractorErr,
-		}
 		a := &MockAuthenticator{
-			Err:       test.AuthErr,
-			Principal: test.Principal,
-		}
-		c := &MockCookie{
-			Expires: MartyJRReleaseDate,
+			Principal:   test.Principal,
+			ValidateErr: test.ValidateErr,
 		}
 
 		logger := clog.New(clog.DebugLevel)
-		handler := oauth2.AuthorizedToken(a, e, c, logger, next)
+		handler := oauth2.AuthorizedToken(a, logger, next)
 		handler.ServeHTTP(w, req)
 		if w.Code != test.Code {
 			t.Errorf("Status code expected: %d actual %d", test.Code, w.Code)
