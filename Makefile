@@ -35,7 +35,7 @@ define CHRONOGIRAFFE
 endef
 export CHRONOGIRAFFE
 chronogiraffe: ${BINARY}
-	echo "$$CHRONOGIRAFFE"
+	@echo "$$CHRONOGIRAFFE"
 
 docker-${BINARY}: $(SOURCES)
 	CGO_ENABLED=0 GOOS=linux go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
