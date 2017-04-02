@@ -51,7 +51,7 @@ class DatabaseRow extends Component {
                   className="form-control"
                   type="text"
                   defaultValue={name}
-                  placeholder="give it a name"
+                  placeholder="Name this RP"
                   onKeyDown={(e) => this.handleKeyDown(e, database)}
                   ref={(r) => this.name = r}
                   autoFocus={true}
@@ -69,7 +69,7 @@ class DatabaseRow extends Component {
                 name="name"
                 type="text"
                 defaultValue={formattedDuration}
-                placeholder="how long should data last"
+                placeholder="How long should Data last"
                 onKeyDown={(e) => this.handleKeyDown(e, database)}
                 ref={(r) => this.duration = r}
                 autoFocus={!isNew}
@@ -84,7 +84,7 @@ class DatabaseRow extends Component {
                 type="number"
                 min="1"
                 defaultValue={replication || 1}
-                placeholder="how many nodes do you have"
+                placeholder="# of Nodes"
                 onKeyDown={(e) => this.handleKeyDown(e, database)}
                 ref={(r) => this.replication = r}
               />
@@ -112,7 +112,7 @@ class DatabaseRow extends Component {
                 onConfirm={() => onDelete(database, retentionPolicy)}
                 onCancel={this.handleEndDelete} /> :
               <button
-                className="btn btn-xs btn-danger admin-table--delete"
+                className="btn btn-xs btn-danger admin-table--hidden"
                 style={isDeletable ? {} : {visibility: 'hidden'}}
                 onClick={this.handleStartDelete}>{`Delete ${name}`}
               </button>

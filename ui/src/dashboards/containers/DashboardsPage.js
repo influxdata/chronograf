@@ -32,7 +32,6 @@ const DashboardsPage = React.createClass({
     router: shape({
       push: func.isRequired,
     }).isRequired,
-    addFlashMessage: func,
     handleGetDashboards: func.isRequired,
     handleDeleteDashboard: func.isRequired,
     dashboards: arrayOf(shape()),
@@ -88,10 +87,11 @@ const DashboardsPage = React.createClass({
                     <button className="btn btn-sm btn-primary" onClick={this.handleCreateDashbord}>Create Dashboard</button>
                   </div>
                   <div className="panel-body">
-                    <table className="table v-center">
+                    <table className="table v-center admin-table">
                       <thead>
                         <tr>
                           <th>Name</th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -117,6 +117,7 @@ const DashboardsPage = React.createClass({
                                 {'Kubernetes'}
                               </Link>
                             </td>
+                            <td></td>
                           </tr>
                       </tbody>
                     </table>
