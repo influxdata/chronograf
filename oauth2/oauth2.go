@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"golang.org/x/oauth2"
 )
@@ -47,7 +48,6 @@ type Provider interface {
 	Config() *oauth2.Config
 	// PrincipalID with fetch the identifier to be associated with the principal.
 	PrincipalID(provider *http.Client) (string, error)
-
 	// Name is the name of the Provider
 	Name() string
 }
@@ -68,10 +68,18 @@ type Authenticator interface {
 	Authorize(context.Context, http.ResponseWriter, Principal) error
 	// Expire revokes privileges from a Principal
 	Expire(http.ResponseWriter)
+}
 
-	// ValidAuthorization is an auxiliary function to check if the serialized
-	// authorization is valid
-	ValidAuthorization(ctx context.Context, serializedAuthorization string) (Principal, error)
-	// Serialize is an auxiliary function to serialize a Principal to string
-	Serialize(context.Context, Principal) (string, error)
+// Token represents a time-dependent reference (i.e. identifier) that maps back
+// to the sensitive data through a tokenization system
+type Token string
+
+// Tokenizer substitutes a ensitive data element (Principal) with a
+// non-sensitive equivalent, referred to as a token, that has no extrinsic
+// or exploitable meaning or value.
+type Tokenizer interface {
+	// Create uses a token lasting duration with Principal data
+	Create(context.Context, Principal, time.Duration) (Token, error)
+	// ValidPrincipal check if the token has a valid Principal
+	ValidPrincipal(context.Context, Token) (Principal, error)
 }

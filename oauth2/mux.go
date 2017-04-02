@@ -2,6 +2,7 @@ package oauth2
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/influxdata/chronograf"
 	"golang.org/x/oauth2"
@@ -11,10 +12,11 @@ import (
 var _ Mux = &CookieMux{}
 
 // NewCookieMux constructs a Mux handler that checks a cookie against the authenticator
-func NewCookieMux(p Provider, a Authenticator, l chronograf.Logger) *CookieMux {
+func NewCookieMux(p Provider, a Authenticator, t Tokenizer, l chronograf.Logger) *CookieMux {
 	return &CookieMux{
 		Provider:   p,
 		Auth:       a,
+		Tokens:     t,
 		Logger:     l,
 		SuccessURL: "/",
 		FailureURL: "/login",
@@ -27,11 +29,12 @@ func NewCookieMux(p Provider, a Authenticator, l chronograf.Logger) *CookieMux {
 // Chronograf instance as long as the Authenticator has no external
 // dependencies (e.g. on a Database).
 type CookieMux struct {
-	Provider   Provider
-	Auth       Authenticator
-	Logger     chronograf.Logger
-	SuccessURL string // SuccessURL is redirect location after successful authorization
-	FailureURL string // FailureURL is redirect location after authorization failure
+	Provider   Provider          // Provider is the OAuth2 service
+	Auth       Authenticator     // Auth is used to Authorize after successful OAuth2 callback and Expire on Logout
+	Tokens     Tokenizer         // Tokens is used to create and validate OAuth2 "state"
+	Logger     chronograf.Logger // Logger is used to give some more information about the OAuth2 process
+	SuccessURL string            // SuccessURL is redirect location after successful authorization
+	FailureURL string            // FailureURL is redirect location after authorization failure
 }
 
 // Login uses a Cookie with a random string as the state validation method.  JWTs are
@@ -42,14 +45,16 @@ func (j *CookieMux) Login() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// We are creating a token with an encoded random string to prevent CSRF attacks
 		// This token will be validated during the OAuth callback.
-		// We'll give our users 10 minutes from this point to type in their github password.
+		// We'll give our users 10 minutes from this point to type in their
+		// oauth2 provider's password.
 		// If the callback is not received within 10 minutes, then authorization will fail.
 		csrf := randomString(32) // 32 is not important... just long
 		p := Principal{
 			Subject: csrf,
 		}
-		// TODO: use jwt directly
-		state, err := j.Auth.Serialize(r.Context(), p)
+		// This token will be valid for 10 minutes.  Any chronograf server will
+		// be able to validate this token.
+		token, err := j.Tokens.Create(r.Context(), p, 10*time.Minute)
 		// This is likely an internal server error
 		if err != nil {
 			j.Logger.
@@ -61,7 +66,7 @@ func (j *CookieMux) Login() http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		url := conf.AuthCodeURL(state, oauth2.AccessTypeOnline)
+		url := conf.AuthCodeURL(string(token), oauth2.AccessTypeOnline)
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	})
 }
@@ -80,10 +85,11 @@ func (j *CookieMux) Callback() http.Handler {
 			WithField("url", r.URL)
 
 		state := r.FormValue("state")
-		// TODO: use jwt directly
 		// Check if the OAuth state token is valid to prevent CSRF
-		_, err := j.Auth.ValidAuthorization(r.Context(), state)
-		if err != nil {
+		// The state variable we set is actually a token.  We'll check
+		// if the token is valid.  We don't need to know anything
+		// about the contents of the principal only that it hasn't expired.
+		if _, err := j.Tokens.ValidPrincipal(r.Context(), Token(state)); err != nil {
 			log.Error("Invalid OAuth state received: ", err.Error())
 			http.Redirect(w, r, j.FailureURL, http.StatusTemporaryRedirect)
 			return

@@ -100,7 +100,8 @@ func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Orgs:         s.GithubOrgs,
 		Logger:       logger,
 	}
-	ghMux := oauth2.NewCookieMux(&gh, auth, logger)
+	jwt := oauth2.NewJWT(s.TokenSecret)
+	ghMux := oauth2.NewCookieMux(&gh, auth, jwt, logger)
 	return &gh, ghMux, s.UseGithub
 }
 
@@ -113,8 +114,8 @@ func (s *Server) googleOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		RedirectURL:  redirectURL,
 		Logger:       logger,
 	}
-
-	goMux := oauth2.NewCookieMux(&google, auth, logger)
+	jwt := oauth2.NewJWT(s.TokenSecret)
+	goMux := oauth2.NewCookieMux(&google, auth, jwt, logger)
 	return &google, goMux, s.UseGoogle
 }
 
@@ -125,8 +126,8 @@ func (s *Server) herokuOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Organizations: s.HerokuOrganizations,
 		Logger:        logger,
 	}
-
-	hMux := oauth2.NewCookieMux(&heroku, auth, logger)
+	jwt := oauth2.NewJWT(s.TokenSecret)
+	hMux := oauth2.NewCookieMux(&heroku, auth, jwt, logger)
 	return &heroku, hMux, s.UseHeroku
 }
 

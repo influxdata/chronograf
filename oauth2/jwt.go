@@ -15,8 +15,8 @@ type JWT struct {
 }
 
 // NewJWT creates a new JWT using time.Now; secret is used for signing and validating.
-func NewJWT(secret string) JWT {
-	return JWT{
+func NewJWT(secret string) *JWT {
+	return &JWT{
 		Secret: secret,
 		Now:    time.Now,
 	}
@@ -40,8 +40,8 @@ func (c *Claims) Valid() error {
 	return nil
 }
 
-// Validate checks if the jwtToken is signed correctly and validates with Claims.
-func (j *JWT) Validate(ctx context.Context, jwtToken string) (Principal, error) {
+// ValidPrincipal checks if the jwtToken is signed correctly and validates with Claims.
+func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token) (Principal, error) {
 	gojwt.TimeFunc = j.Now
 
 	// Check for expected signing method.
@@ -56,7 +56,7 @@ func (j *JWT) Validate(ctx context.Context, jwtToken string) (Principal, error) 
 	// 2. Checks if time is after the issued at
 	// 3. Check if time is after not before (nbf)
 	// 4. Check if subject is not empty
-	token, err := gojwt.ParseWithClaims(jwtToken, &Claims{}, alg)
+	token, err := gojwt.ParseWithClaims(string(jwtToken), &Claims{}, alg)
 	if err != nil {
 		return Principal{}, err
 	} else if !token.Valid {
@@ -75,7 +75,8 @@ func (j *JWT) Validate(ctx context.Context, jwtToken string) (Principal, error) 
 }
 
 // Create creates a signed JWT token from user that expires at Now + duration
-func (j *JWT) Create(ctx context.Context, user Principal, duration time.Duration) (string, error) {
+func (j *JWT) Create(ctx context.Context, user Principal, duration time.Duration) (Token, error) {
+	gojwt.TimeFunc = j.Now
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
 	now := j.Now().UTC()
@@ -89,7 +90,10 @@ func (j *JWT) Create(ctx context.Context, user Principal, duration time.Duration
 		},
 	}
 	token := gojwt.NewWithClaims(gojwt.SigningMethodHS256, claims)
-
 	// Sign and get the complete encoded token as a string using the secret
-	return token.SignedString([]byte(j.Secret))
+	t, err := token.SignedString([]byte(j.Secret))
+	if err != nil {
+		return "", err
+	}
+	return Token(t), nil
 }
