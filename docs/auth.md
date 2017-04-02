@@ -2,26 +2,21 @@
 
 OAuth 2.0 Style Authentication
 
+### TL;DR
+#### Github
+
+```sh
+export AUTH_DURATION=1h                                           # force login every hour
+export TOKEN_SECRET=supersupersecret                              # Signing secret
+export GH_CLIENT_ID=b339dd4fddd95abec9aa                          # Github client id
+export GH_CLIENT_SECRET=260041897d3252c146ece6b46ba39bc1e54416dc  # Github client secret
+export GH_ORGS=biffs-gang                                         # Restrict to GH orgs
+```
 
 ### Configuration
 
-To use authentication in Chronograf, both Github OAuth and JWT signature need to be configured.
-
-### Configuring Session Duration
-
-The default session duration is 30 days. The session duration can be overwritten with the environmental variable `SESSION_DURATION`. For example, to change it to 1 hour, use:
-
-```sh
-export SESSION_DURATION=1h
-```
-
-The session duration uses the golang [time duration format](https://golang.org/pkg/time/#ParseDuration), so the largest time unit is `h` (hours). So to change it to 45 days, use:
-
-```sh
-export SESSION_DURATION=1080h
-```
-
-If you want cookies to be immediately removed when you close your browser, set your `SESSION_DURATION` to `0`.
+To use authentication in Chronograf, both the OAuth provider and JWT signature
+need to be configured.
 
 #### Configuring JWT signature
 
@@ -33,8 +28,7 @@ You'll need it each time you start a chronograf server because it is used to ver
 export TOKEN_SECRET=supersupersecret
 ```
 
-# Github
-
+### Github
 #### Creating Github OAuth Application
 
 To create a Github OAuth Application follow the [Register your app](https://developer.github.com/guides/basics-of-authentication/#registering-your-app) instructions.
@@ -72,7 +66,7 @@ To support multiple organizations use a comma delimted list like so:
 export GH_ORGS=hill-valley-preservation-sociey,the-pinheads
 ```
 
-# Google
+### Google
 
 #### Creating Google OAuth Application
 
@@ -98,7 +92,7 @@ Similar to Github's organization restriction, Google authentication can be restr
 export GOOGLE_DOMAINS=biffspleasurepalance.com,savetheclocktower.com
 ```
 
-# Heroku
+### Heroku
 
 #### Creating Heroku Application
 
@@ -119,3 +113,22 @@ Like the other OAuth2 providers, access to Chronograf via Heroku can be restrict
 ```sh
 export HEROKU_ORGS=hill-valley-preservation-sociey,the-pinheads
 ```
+
+### Optional: Configuring Session Duration
+
+The default authentication duration is 30 days. The session duration can be overwritten with the environmental variable `AUTH_DURATION`. For example, to change it to 1 hour, use:
+
+```sh
+export AUTH_DURATION=1h
+```
+
+The duration uses the golang [time duration format](https://golang.org/pkg/time/#ParseDuration), so the largest time unit is `h` (hours). So to change it to 45 days, use:
+
+```sh
+export AUTH_DURATION=1080h
+```
+
+For additional security if you want cookies to be immediately removed when you close your browser, set your `AUTH_DURATION` to `0`.  Doing so signals the browser that the cookie is only
+valid for the lifetime of the "session." In practice, this means the cookies will be removed
+when the browser window is closed.
+
