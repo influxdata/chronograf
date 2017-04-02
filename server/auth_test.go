@@ -1,4 +1,4 @@
-package oauth2_test
+package server_test
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
+	"github.com/influxdata/chronograf/server"
 )
 
 type MockAuthenticator struct {
@@ -73,7 +74,7 @@ func TestAuthorizedToken(t *testing.T) {
 		}
 
 		logger := clog.New(clog.DebugLevel)
-		handler := oauth2.AuthorizedToken(a, logger, next)
+		handler := server.AuthorizedToken(a, logger, next)
 		handler.ServeHTTP(w, req)
 		if w.Code != test.Code {
 			t.Errorf("Status code expected: %d actual %d", test.Code, w.Code)

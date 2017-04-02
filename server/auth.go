@@ -1,17 +1,18 @@
-package oauth2
+package server
 
 import (
 	"context"
 	"net/http"
 
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/oauth2"
 )
 
 // AuthorizedToken extracts the token and validates; if valid the next handler
 // will be run.  The principal will be sent to the next handler via the request's
 // Context.  It is up to the next handler to determine if the principal has access.
 // On failure, will return http.StatusUnauthorized.
-func AuthorizedToken(auth Authenticator, logger chronograf.Logger, next http.Handler) http.HandlerFunc {
+func AuthorizedToken(auth oauth2.Authenticator, logger chronograf.Logger, next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log := logger.
 			WithField("component", "auth").
@@ -30,7 +31,7 @@ func AuthorizedToken(auth Authenticator, logger chronograf.Logger, next http.Han
 		}
 
 		// Send the principal to the next handler
-		ctx = context.WithValue(ctx, PrincipalKey, principal)
+		ctx = context.WithValue(ctx, oauth2.PrincipalKey, principal)
 		next.ServeHTTP(w, r.WithContext(ctx))
 		return
 	})

@@ -179,7 +179,6 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 }
 
 // AuthAPI adds the OAuth routes if auth is enabled.
-// TODO: this function is not great.  Would be good if providers added their routes.
 func AuthAPI(opts MuxOpts, router *httprouter.Router) (http.Handler, AuthRoutes) {
 	routes := AuthRoutes{}
 	for _, pf := range opts.ProviderFuncs {
@@ -200,10 +199,10 @@ func AuthAPI(opts MuxOpts, router *httprouter.Router) (http.Handler, AuthRoutes)
 		})
 	}
 
-	tokenMiddleware := oauth2.AuthorizedToken(opts.Auth, opts.Logger, router)
+	tokenMiddleware := AuthorizedToken(opts.Auth, opts.Logger, router)
 	// Wrap the API with token validation middleware.
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/chronograf/v1/") || r.URL.Path == "/oauth/logout" {
+		if strings.HasPrefix(r.URL.Path, "/chronograf/v1/") {
 			tokenMiddleware.ServeHTTP(w, r)
 			return
 		}
