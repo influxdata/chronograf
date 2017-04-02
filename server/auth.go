@@ -11,7 +11,7 @@ import (
 // AuthorizedToken extracts the token and validates; if valid the next handler
 // will be run.  The principal will be sent to the next handler via the request's
 // Context.  It is up to the next handler to determine if the principal has access.
-// On failure, will return http.StatusUnauthorized.
+// On failure, will return http.StatusForbidden.
 func AuthorizedToken(auth oauth2.Authenticator, logger chronograf.Logger, next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log := logger.
