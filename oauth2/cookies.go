@@ -54,9 +54,14 @@ func (c *cookie) Authorize(ctx context.Context, w http.ResponseWriter, p Princip
 	cookie := http.Cookie{
 		Name:     DefaultCookieName,
 		Value:    string(token),
-		Expires:  c.Now().UTC().Add(c.Duration),
 		HttpOnly: true,
 		Path:     "/",
+	}
+
+	// Only set a cookie to be persistent (endure beyond the browser session)
+	// if auth duration is greater than zero
+	if c.Duration > 0 {
+		cookie.Expires = c.Now().UTC().Add(c.Duration)
 	}
 
 	http.SetCookie(w, &cookie)

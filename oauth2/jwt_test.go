@@ -26,52 +26,64 @@ func TestAuthenticate(t *testing.T) {
 			Err: errors.New("token contains an invalid number of segments"),
 		},
 		{
-			Desc:   "Test valid jwt token",
-			Secret: "secret",
-			Token:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAwLCJuYmYiOi00NDY3NzQ0MDB9._rZ4gOIei9PizHOABH6kLcJTA3jm8ls0YnDxtz1qeUI",
+			Desc:     "Test valid jwt token",
+			Secret:   "secret",
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0Mzk5LCJuYmYiOi00NDY3NzQ0MDB9.Ga0zGXWTT2CBVnnIhIO5tUAuBEVk4bKPaT4t4MU1ngo",
+			Duration: time.Second,
 			Principal: Principal{
 				Subject: "/chronograf/v1/users/1",
 			},
 		},
 		{
-			Desc:   "Test expired jwt token",
-			Secret: "secret",
-			Token:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAxLCJuYmYiOi00NDY3NzQ0MDB9.vWXdm0-XQ_pW62yBpSISFFJN_yz0vqT9_INcUKTp5Q8",
+			Desc:     "Test expired jwt token",
+			Secret:   "secret",
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAxLCJuYmYiOi00NDY3NzQ0MDB9.vWXdm0-XQ_pW62yBpSISFFJN_yz0vqT9_INcUKTp5Q8",
+			Duration: time.Second,
 			Principal: Principal{
 				Subject: "",
 			},
 			Err: errors.New("token is expired by 1s"),
 		},
 		{
-			Desc:   "Test jwt token not before time",
-			Secret: "secret",
-			Token:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAwLCJuYmYiOi00NDY3NzQzOTl9.TMGAhv57u1aosjc4ywKC7cElP1tKyQH7GmRF2ToAxlE",
+			Desc:     "Test jwt token not before time",
+			Secret:   "secret",
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAwLCJuYmYiOi00NDY3NzQzOTl9.TMGAhv57u1aosjc4ywKC7cElP1tKyQH7GmRF2ToAxlE",
+			Duration: time.Second,
 			Principal: Principal{
 				Subject: "",
 			},
 			Err: errors.New("token is not valid yet"),
 		},
 		{
-			Desc:   "Test jwt with empty subject is invalid",
-			Secret: "secret",
-			Token:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi00NDY3NzQ0MDAsImV4cCI6LTQ0Njc3NDQwMCwibmJmIjotNDQ2Nzc0NDAwfQ.gxsA6_Ei3s0f2I1TAtrrb8FmGiO25OqVlktlF_ylhX4",
+			Desc:     "Test jwt with empty subject is invalid",
+			Secret:   "secret",
+			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi00NDY3NzQ0MDAsImV4cCI6LTQ0Njc3NDQwMCwibmJmIjotNDQ2Nzc0NDAwfQ.gxsA6_Ei3s0f2I1TAtrrb8FmGiO25OqVlktlF_ylhX4",
+			Duration: time.Second,
 			Principal: Principal{
 				Subject: "",
 			},
 			Err: errors.New("claim has no subject"),
 		},
 		{
-			Desc:     "Test jwt duration matches server auth duration",
+			Desc:     "Test jwt duration matches auth duration",
 			Secret:   "secret",
 			Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0NDAwLCJuYmYiOi00NDY3NzQ0MDB9._rZ4gOIei9PizHOABH6kLcJTA3jm8ls0YnDxtz1qeUI",
 			Duration: 500 * time.Hour,
 			Principal: Principal{
 				Subject: "/chronograf/v1/users/1",
 			},
-			Err: errors.New("claims duration is different from server duration"),
+			Err: errors.New("claims duration is different from auth duration"),
+		},
+		{
+			Desc:   "Test valid EverlastingClaim",
+			Secret: "secret",
+			Token:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIvY2hyb25vZ3JhZi92MS91c2Vycy8xIiwibmFtZSI6IkRvYyBCcm93biIsImlhdCI6LTQ0Njc3NDQwMCwiZXhwIjotNDQ2Nzc0Mzk5LCJuYmYiOi00NDY3NzQ0MDB9.Ga0zGXWTT2CBVnnIhIO5tUAuBEVk4bKPaT4t4MU1ngo",
+			Principal: Principal{
+				Subject: "/chronograf/v1/users/1",
+			},
 		},
 	}
-	for i, test := range tests {
+	for _, test := range tests {
 		j := JWT{
 			Secret: test.Secret,
 			Now: func() time.Time {
@@ -81,12 +93,12 @@ func TestAuthenticate(t *testing.T) {
 		principal, err := j.ValidPrincipal(context.Background(), test.Token, test.Duration)
 		if err != nil {
 			if test.Err == nil {
-				t.Errorf("Error in test %d authenticating with bad token: %v", i, err)
+				t.Errorf("Error in test %s authenticating with bad token: %v", test.Desc, err)
 			} else if err.Error() != test.Err.Error() {
-				t.Errorf("Error in test %d expected error: %v actual: %v", i, err, test.Err)
+				t.Errorf("Error in test %s expected error: %v actual: %v", test.Desc, test.Err, err)
 			}
 		} else if test.Principal != principal {
-			t.Errorf("Error in test %d; principals different; expected: %v  actual: %v", i, test.Principal, principal)
+			t.Errorf("Error in test %s; principals different; expected: %v  actual: %v", test.Desc, test.Principal, principal)
 		}
 	}
 
