@@ -22,7 +22,7 @@ need to be configured.
 
 Set a [JWT](https://tools.ietf.org/html/rfc7519) signature to a random string. This is needed for all OAuth2 providers that you choose to configure. *Keep this random string around!*
 
-You'll need it each time you start a chronograf server because it is used to verify user authorization. If you are running multiple chronograf servers in an HA configuration set the `TOKEN_SECRET` on each to allow users to stay logged in.
+You'll need it each time you start a chronograf server because it is used to verify user authorization. If you are running multiple chronograf servers in an HA configuration set the `TOKEN_SECRET` on each to allow users to stay logged in. If you want to log all users out every time the server restarts, change the value of `TOKEN_SECRET` to a different value on each restart.
 
 ```sh
 export TOKEN_SECRET=supersupersecret
