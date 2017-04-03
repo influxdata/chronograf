@@ -59,10 +59,12 @@ func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token) (Principal, er
 	token, err := gojwt.ParseWithClaims(string(jwtToken), &Claims{}, alg)
 	if err != nil {
 		return Principal{}, err
+		// at time of this writing and researching the docs, token.Valid seems to be always true
 	} else if !token.Valid {
 		return Principal{}, err
 	}
 
+	// at time of this writing and researching the docs, there will always be claims
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
 		return Principal{}, fmt.Errorf("unable to convert claims to standard claims")
@@ -92,6 +94,7 @@ func (j *JWT) Create(ctx context.Context, user Principal, duration time.Duration
 	token := gojwt.NewWithClaims(gojwt.SigningMethodHS256, claims)
 	// Sign and get the complete encoded token as a string using the secret
 	t, err := token.SignedString([]byte(j.Secret))
+	// this will only fail if the JSON can't be encoded correctly
 	if err != nil {
 		return "", err
 	}
