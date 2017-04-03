@@ -477,6 +477,7 @@ export const SHORT_NOTIFICATION_DISMISS_DELAY = 1500 // in milliseconds
 
 export const REVERT_STATE_DELAY = 1500 // ms
 
-export const RES_UNAUTHORIZED = 401
+export const HTTP_UNAUTHORIZED = 401
+export const HTTP_FORBIDDEN = 403
 
 export const AUTOREFRESH_DEFAULT = 15000 // in milliseconds
