@@ -114,9 +114,9 @@ Like the other OAuth2 providers, access to Chronograf via Heroku can be restrict
 export HEROKU_ORGS=hill-valley-preservation-sociey,the-pinheads
 ```
 
-### Optional: Configuring Session Duration
+### Optional: Configuring Authentication Duration
 
-The default authentication duration is 30 days. The session duration can be overwritten with the environmental variable `AUTH_DURATION`. For example, to change it to 1 hour, use:
+By default, auth will remain valid for 30 days via a cookie stored in the browser. This duration can be changed with the environmental variable `AUTH_DURATION`. For example, to change it to 1 hour, use:
 
 ```sh
 export AUTH_DURATION=1h
@@ -128,7 +128,4 @@ The duration uses the golang [time duration format](https://golang.org/pkg/time/
 export AUTH_DURATION=1080h
 ```
 
-For additional security if you want cookies to be immediately removed when you close your browser, set your `AUTH_DURATION` to `0`.  Doing so signals the browser that the cookie is only
-valid for the lifetime of the "session." In practice, this means the cookies will be removed
-when the browser window is closed.
-
+Additionally, for greater security, if you want to require re-authentication every time the browser is closed, set `AUTH_DURATION` to `0`. This will make the cookie transient (aka "in-memory").
