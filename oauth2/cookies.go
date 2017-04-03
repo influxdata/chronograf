@@ -40,7 +40,7 @@ func (c *cookie) Validate(ctx context.Context, r *http.Request) (Principal, erro
 	if err != nil {
 		return Principal{}, ErrAuthentication
 	}
-	return c.Tokens.ValidPrincipal(ctx, Token(cookie.Value))
+	return c.Tokens.ValidPrincipal(ctx, Token(cookie.Value), c.Duration)
 }
 
 // Authorize will create cookies containing token information.  It'll create

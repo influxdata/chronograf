@@ -63,9 +63,9 @@ func Test_CookieMux_Logout_DeletesSessionCookie(t *testing.T) {
 	})
 	defer teardownMuxTest(hc, ts, prov)
 
-	tsUrl, _ := url.Parse(ts.URL)
+	tsURL, _ := url.Parse(ts.URL)
 
-	hc.Jar.SetCookies(tsUrl, []*http.Cookie{
+	hc.Jar.SetCookies(tsURL, []*http.Cookie{
 		&http.Cookie{
 			Name:  DefaultCookieName,
 			Value: "",

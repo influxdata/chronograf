@@ -74,12 +74,13 @@ type Authenticator interface {
 // to the sensitive data through a tokenization system
 type Token string
 
-// Tokenizer substitutes a ensitive data element (Principal) with a
+// Tokenizer substitutes a sensitive data element (Principal) with a
 // non-sensitive equivalent, referred to as a token, that has no extrinsic
 // or exploitable meaning or value.
 type Tokenizer interface {
 	// Create uses a token lasting duration with Principal data
 	Create(context.Context, Principal, time.Duration) (Token, error)
-	// ValidPrincipal check if the token has a valid Principal
-	ValidPrincipal(context.Context, Token) (Principal, error)
+	// ValidPrincipal checks if the token has a valid Principal and requires
+	// a duration to ensure it complies with possible server runtime arguments.
+	ValidPrincipal(context.Context, Token, time.Duration) (Principal, error)
 }

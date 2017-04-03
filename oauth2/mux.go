@@ -11,6 +11,9 @@ import (
 // Check to ensure CookieMux is an oauth2.Mux
 var _ Mux = &CookieMux{}
 
+// TenMinutes is the default length of time to get a response back from the OAuth provider
+const TenMinutes = 10 * time.Minute
+
 // NewCookieMux constructs a Mux handler that checks a cookie against the authenticator
 func NewCookieMux(p Provider, a Authenticator, t Tokenizer, l chronograf.Logger) *CookieMux {
 	return &CookieMux{
@@ -54,7 +57,7 @@ func (j *CookieMux) Login() http.Handler {
 		}
 		// This token will be valid for 10 minutes.  Any chronograf server will
 		// be able to validate this token.
-		token, err := j.Tokens.Create(r.Context(), p, 10*time.Minute)
+		token, err := j.Tokens.Create(r.Context(), p, TenMinutes)
 		// This is likely an internal server error
 		if err != nil {
 			j.Logger.
@@ -89,7 +92,7 @@ func (j *CookieMux) Callback() http.Handler {
 		// The state variable we set is actually a token.  We'll check
 		// if the token is valid.  We don't need to know anything
 		// about the contents of the principal only that it hasn't expired.
-		if _, err := j.Tokens.ValidPrincipal(r.Context(), Token(state)); err != nil {
+		if _, err := j.Tokens.ValidPrincipal(r.Context(), Token(state), TenMinutes); err != nil {
 			log.Error("Invalid OAuth state received: ", err.Error())
 			http.Redirect(w, r, j.FailureURL, http.StatusTemporaryRedirect)
 			return

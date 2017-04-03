@@ -37,11 +37,12 @@ func (c *Claims) Valid() error {
 	} else if c.StandardClaims.Subject == "" {
 		return fmt.Errorf("claim has no subject")
 	}
+
 	return nil
 }
 
 // ValidPrincipal checks if the jwtToken is signed correctly and validates with Claims.
-func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token) (Principal, error) {
+func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token, duration time.Duration) (Principal, error) {
 	gojwt.TimeFunc = j.Now
 
 	// Check for expected signing method.
@@ -68,6 +69,10 @@ func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token) (Principal, er
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
 		return Principal{}, fmt.Errorf("unable to convert claims to standard claims")
+	}
+
+	if time.Duration(claims.ExpiresAt-claims.IssuedAt)*time.Second != duration {
+		return Principal{}, fmt.Errorf("claims duration is different from server duration")
 	}
 
 	return Principal{

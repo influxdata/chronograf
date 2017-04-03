@@ -56,7 +56,7 @@ var _ Tokenizer = &YesManTokenizer{}
 
 type YesManTokenizer struct{}
 
-func (y *YesManTokenizer) ValidPrincipal(ctx context.Context, token Token) (Principal, error) {
+func (y *YesManTokenizer) ValidPrincipal(ctx context.Context, token Token, duration time.Duration) (Principal, error) {
 	return Principal{
 		Subject: "biff@example.com",
 		Issuer:  "Biff Tannen's Pleasure Paradise",

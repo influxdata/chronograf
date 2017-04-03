@@ -18,7 +18,7 @@ type MockTokenizer struct {
 	CreateErr error
 }
 
-func (m *MockTokenizer) ValidPrincipal(ctx context.Context, token Token) (Principal, error) {
+func (m *MockTokenizer) ValidPrincipal(ctx context.Context, token Token, duration time.Duration) (Principal, error) {
 	return m.Principal, m.ValidErr
 }
 
