@@ -33,7 +33,6 @@ type getRoutesResponse struct {
 	Mappings   string      `json:"mappings"`   // Location of the application mappings endpoint
 	Sources    string      `json:"sources"`    // Location of the sources endpoint
 	Me         string      `json:"me"`         // Location of the me endpoint
-	Ping       string      `json:"ping"`       // Location of the ping endpoint
 	Dashboards string      `json:"dashboards"` // Location of the dashboards endpoint
 	Auth       []AuthRoute `json:"auth"`       // Location of all auth routes.
 }
@@ -46,7 +45,6 @@ func AllRoutes(authRoutes []AuthRoute, logger chronograf.Logger) http.HandlerFun
 		Me:         "/chronograf/v1/me",
 		Mappings:   "/chronograf/v1/mappings",
 		Dashboards: "/chronograf/v1/dashboards",
-		Ping:       "/chronograf/v1/ping",
 		Auth:       make([]AuthRoute, len(authRoutes)),
 	}
 

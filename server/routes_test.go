@@ -27,8 +27,4 @@ func TestAllRoutes(t *testing.T) {
 	if err := json.Unmarshal(body, &routes); err != nil {
 		t.Error("TestAllRoutes not able to unmarshal JSON response")
 	}
-	if routes.Ping != "/chronograf/v1/ping" {
-		t.Errorf("TestAllRoutes ping got %s want %s", routes.Ping, "/chronograf/v1/ping")
-	}
-
 }

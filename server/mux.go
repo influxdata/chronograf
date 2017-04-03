@@ -55,8 +55,6 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/docs", Redoc("/swagger.json"))
 
 	/* API */
-	router.GET("/chronograf/v1/ping", service.Ping)
-
 	// Sources
 	router.GET("/chronograf/v1/sources", service.Sources)
 	router.POST("/chronograf/v1/sources", service.NewSource)
