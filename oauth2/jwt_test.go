@@ -99,3 +99,13 @@ func TestToken(t *testing.T) {
 		t.Errorf("Error creating token; expected: %s  actual: %s", "", token)
 	}
 }
+
+func TestSigningMethod(t *testing.T) {
+	token := Token("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.EkN-DOsnsuRjRO6BxXemmJDm3HbxrbRzXglbN2S4sOkopdU4IsDxTI8jO19W_A4K8ZPJijNLis4EZsHeY559a4DFOd50_OqgHGuERTqYZyuhtF39yxJPAjUESwxk2J5k_4zM3O-vtd1Ghyo4IbqKKSy6J9mTniYJPenn5-HIirE")
+	j := JWT{}
+	if _, err := j.ValidPrincipal(context.Background(), token); err == nil {
+		t.Error("Error was expected while validating incorrectly signed token")
+	} else if err.Error() != "unexpected signing method: RS256" {
+		t.Errorf("Error wanted 'unexpected signing method', got %s", err.Error())
+	}
+}
