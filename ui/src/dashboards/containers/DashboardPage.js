@@ -103,14 +103,13 @@ const DashboardPage = React.createClass({
   },
 
   handleUpdatePosition(cells) {
-    this.props.dashboardActions.updateDashboardCells(cells)
-    this.props.dashboardActions.putDashboard()
+    const dashboard = this.getActiveDashboard()
+    this.props.dashboardActions.updateDashboardCells(dashboard, cells)
+    this.props.dashboardActions.putDashboard(dashboard)
   },
 
   handleAddCell() {
-    const {params: {dashboardID}, dashboards} = this.props
-    const dashboard = dashboards.find(d => d.id === +dashboardID)
-    this.props.dashboardActions.addDashboardCellAsync(dashboard)
+    this.props.dashboardActions.addDashboardCellAsync(this.getActiveDashboard())
   },
 
   handleEditDashboard() {
@@ -123,11 +122,9 @@ const DashboardPage = React.createClass({
 
   handleRenameDashboard(name) {
     this.setState({isEditMode: false})
-    const {params: {dashboardID}, dashboards} = this.props
-    const dashboard = dashboards.find(d => d.id === +dashboardID)
-    const newDashboard = {...dashboard, name}
+    const newDashboard = {...this.getActiveDashboard(), name}
     this.props.dashboardActions.updateDashboard(newDashboard)
-    this.props.dashboardActions.putDashboard()
+    this.props.dashboardActions.putDashboard(newDashboard)
   },
 
   // Places cell into editing mode.
@@ -146,12 +143,17 @@ const DashboardPage = React.createClass({
   handleUpdateDashboardCell(newCell) {
     return () => {
       this.props.dashboardActions.editDashboardCell(newCell.x, newCell.y, false)
-      this.props.dashboardActions.putDashboard()
+      this.props.dashboardActions.putDashboard(this.getActiveDashboard())
     }
   },
 
   handleDeleteDashboardCell(cell) {
     this.props.dashboardActions.deleteDashboardCellAsync(cell)
+  },
+
+  getActiveDashboard() {
+    const {params: {dashboardID}, dashboards} = this.props
+    return dashboards.find(d => d.id === +dashboardID)
   },
 
   render() {

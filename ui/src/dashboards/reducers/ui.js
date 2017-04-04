@@ -1,12 +1,10 @@
 import _ from 'lodash'
-import {EMPTY_DASHBOARD} from 'src/dashboards/constants'
 import timeRanges from 'hson!../../shared/data/timeRanges.hson'
 
 const {lower, upper} = timeRanges[1]
 
 const initialState = {
   dashboards: [],
-  dashboard: EMPTY_DASHBOARD,
   timeRange: {lower, upper},
   isEditMode: false,
 }
@@ -14,19 +12,9 @@ const initialState = {
 export default function ui(state = initialState, action) {
   switch (action.type) {
     case 'LOAD_DASHBOARDS': {
-      const {dashboards, dashboardID} = action.payload
+      const {dashboards} = action.payload
       const newState = {
         dashboards,
-        dashboard: _.find(dashboards, (d) => d.id === +dashboardID),
-      }
-
-      return {...state, ...newState}
-    }
-
-    case 'SET_DASHBOARD': {
-      const {dashboardID} = action.payload
-      const newState = {
-        dashboard: _.find(state.dashboards, (d) => d.id === +dashboardID),
       }
 
       return {...state, ...newState}
@@ -69,8 +57,7 @@ export default function ui(state = initialState, action) {
     }
 
     case 'UPDATE_DASHBOARD_CELLS': {
-      const {cells} = action.payload
-      const {dashboard} = state
+      const {cells, dashboard} = action.payload
 
       const newDashboard = {
         ...dashboard,
@@ -78,7 +65,6 @@ export default function ui(state = initialState, action) {
       }
 
       const newState = {
-        dashboard: newDashboard,
         dashboards: state.dashboards.map((d) => d.id === dashboard.id ? newDashboard : d),
       }
 
@@ -93,7 +79,6 @@ export default function ui(state = initialState, action) {
       const newDashboard = {...dashboard, cells: newCells}
       const newDashboards = dashboards.map((d) => d.id === dashboard.id ? newDashboard : d)
       const newState = {
-        dashboard: newDashboard,
         dashboards: newDashboards,
       }
 
@@ -117,7 +102,6 @@ export default function ui(state = initialState, action) {
       }
 
       const newState = {
-        dashboard: newDashboard,
         dashboards: state.dashboards.map((d) => d.id === dashboard.id ? newDashboard : d),
       }
 
@@ -134,7 +118,6 @@ export default function ui(state = initialState, action) {
         cells: newCells,
       }
       const newState = {
-        dashboard: newDashboard,
         dashboards: state.dashboards.map((d) => d.id === dashboard.id ? newDashboard : d),
       }
 
@@ -151,7 +134,6 @@ export default function ui(state = initialState, action) {
       }
 
       const newState = {
-        dashboard: newDashboard,
         dashboards: state.dashboards.map((d) => d.id === dashboard.id ? newDashboard : d),
       }
 
@@ -175,7 +157,6 @@ export default function ui(state = initialState, action) {
       }
 
       const newState = {
-        dashboard: newDashboard,
         dashboards: state.dashboards.map((d) => d.id === dashboard.id ? newDashboard : d),
       }
 

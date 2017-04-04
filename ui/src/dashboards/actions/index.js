@@ -20,13 +20,6 @@ export const loadDashboards = (dashboards, dashboardID) => ({
   },
 })
 
-export const setDashboard = (dashboardID) => ({
-  type: 'SET_DASHBOARD',
-  payload: {
-    dashboardID,
-  },
-})
-
 export const setTimeRange = (timeRange) => ({
   type: 'SET_DASHBOARD_TIME_RANGE',
   payload: {
@@ -55,9 +48,10 @@ export const deleteDashboardFailed = (dashboard) => ({
   },
 })
 
-export const updateDashboardCells = (cells) => ({
+export const updateDashboardCells = (dashboard, cells) => ({
   type: 'UPDATE_DASHBOARD_CELLS',
   payload: {
+    dashboard,
     cells,
   },
 })
@@ -117,8 +111,7 @@ export const getDashboardsAsync = (dashboardID) => async (dispatch) => {
   }
 }
 
-export const putDashboard = () => (dispatch, getState) => {
-  const {dashboardUI: {dashboard}} = getState()
+export const putDashboard = (dashboard) => (dispatch) => {
   updateDashboardAJAX(dashboard).then(({data}) => {
     dispatch(updateDashboard(data))
   })
