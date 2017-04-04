@@ -15,6 +15,7 @@
   1. [#1120](https://github.com/influxdata/chronograf/pull/1120): Allow users to update user passwords.
   1. [#1129](https://github.com/influxdata/chronograf/pull/1129): Allow InfluxDB and Kapacitor configuration via ENV vars or CLI options
   1. [#1130](https://github.com/influxdata/chronograf/pull/1130): Add loading spinner to Alert History page.
+  1. [#1095](https://github.com/influxdata/chronograf/pull/1095): Refactor server auth to accommodate new auth duration CLI option; add client heartbeat
 
 ### UI Improvements
   1. [#1101](https://github.com/influxdata/chronograf/pull/1101): Compress InfluxQL responses with gzip
