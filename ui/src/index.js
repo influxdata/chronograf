@@ -21,11 +21,12 @@ import {getMe, getSources} from 'shared/apis'
 import {receiveMe} from 'shared/actions/me'
 import {receiveAuth} from 'shared/actions/auth'
 import {disablePresentationMode} from 'shared/actions/app'
+import {publishNotification} from 'shared/actions/notifications'
 import {loadLocalStorage} from './localStorage'
 
 import 'src/style/chronograf.scss'
 
-import {HEARTBEAT_INTERVAL} from 'shared/constants'
+import {HTTP_FORBIDDEN, HEARTBEAT_INTERVAL} from 'shared/constants'
 
 const store = configureStore(loadLocalStorage())
 const rootNode = document.getElementById('react-root')
@@ -95,16 +96,20 @@ const Root = React.createClass({
         store.dispatch(receiveAuth(auth))
         this.setState({loggedIn: true})
       }
+
+      setTimeout(this.heartbeat.bind(null, {shouldDispatchResponse: false}), HEARTBEAT_INTERVAL)
     } catch (error) {
-      // TODO: verify that this is handling 403 and/or 401
       if (error.auth) {
         store.dispatch(receiveAuth(error.auth))
+      }
+      if (error.status === HTTP_FORBIDDEN) {
+        store.dispatch(publishNotification('error', 'Session timed out. Please login again.'))
+      } else {
+        store.dispatch(publishNotification('error', 'Cannot communicate with server.'))
       }
 
       this.setState({loggedIn: false})
     }
-
-    setTimeout(this.heartbeat.bind(null, {shouldDispatchResponse: false}), HEARTBEAT_INTERVAL)
   },
 
   render() {
