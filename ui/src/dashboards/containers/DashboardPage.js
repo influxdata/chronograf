@@ -90,7 +90,7 @@ const DashboardPage = React.createClass({
   },
 
   handleSaveEditedCell(newCell) {
-    this.props.dashboardActions.updateDashboardCell(newCell)
+    this.props.dashboardActions.updateDashboardCell(this.getActiveDashboard(), newCell)
     .then(this.handleDismissOverlay)
   },
 
@@ -130,13 +130,13 @@ const DashboardPage = React.createClass({
   // Places cell into editing mode.
   handleEditDashboardCell(x, y, isEditing) {
     return () => {
-      this.props.dashboardActions.editDashboardCell(x, y, !isEditing) /* eslint-disable no-negated-condition */
+      this.props.dashboardActions.editDashboardCell(this.getActiveDashboard(), x, y, !isEditing) /* eslint-disable no-negated-condition */
     }
   },
 
   handleRenameDashboardCell(x, y) {
     return (evt) => {
-      this.props.dashboardActions.renameDashboardCell(x, y, evt.target.value)
+      this.props.dashboardActions.renameDashboardCell(this.getActiveDashboard(), x, y, evt.target.value)
     }
   },
 

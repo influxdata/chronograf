@@ -86,8 +86,7 @@ export default function ui(state = initialState, action) {
     }
 
     case 'EDIT_DASHBOARD_CELL': {
-      const {x, y, isEditing} = action.payload
-      const {dashboard} = state
+      const {x, y, isEditing, dashboard} = action.payload
 
       const cell = dashboard.cells.find((c) => c.x === x && c.y === y)
 
@@ -125,8 +124,7 @@ export default function ui(state = initialState, action) {
     }
 
     case 'SYNC_DASHBOARD_CELL': {
-      const {cell} = action.payload
-      const {dashboard} = state
+      const {cell, dashboard} = action.payload
 
       const newDashboard = {
         ...dashboard,
@@ -141,8 +139,7 @@ export default function ui(state = initialState, action) {
     }
 
     case 'RENAME_DASHBOARD_CELL': {
-      const {x, y, name} = action.payload
-      const {dashboard} = state
+      const {x, y, name, dashboard} = action.payload
 
       const cell = dashboard.cells.find((c) => c.x === x && c.y === y)
 

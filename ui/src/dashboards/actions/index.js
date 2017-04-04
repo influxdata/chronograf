@@ -56,9 +56,10 @@ export const updateDashboardCells = (dashboard, cells) => ({
   },
 })
 
-export const syncDashboardCell = (cell) => ({
+export const syncDashboardCell = (dashboard, cell) => ({
   type: 'SYNC_DASHBOARD_CELL',
   payload: {
+    dashboard,
     cell,
   },
 })
@@ -70,22 +71,24 @@ export const addDashboardCell = (cell) => ({
   },
 })
 
-export const editDashboardCell = (x, y, isEditing) => ({
+export const editDashboardCell = (dashboard, x, y, isEditing) => ({
   type: 'EDIT_DASHBOARD_CELL',
   // x and y coords are used as a alternative to cell ids, which are not
   // universally unique, and cannot be because React depends on a
   // quasi-predictable ID for keys. Since cells cannot overlap, coordinates act
   // as a suitable id
   payload: {
+    dashboard,
     x,  // x-coord of the cell to be edited
     y,  // y-coord of the cell to be edited
     isEditing,
   },
 })
 
-export const renameDashboardCell = (x, y, name) => ({
+export const renameDashboardCell = (dashboard, x, y, name) => ({
   type: 'RENAME_DASHBOARD_CELL',
   payload: {
+    dashboard,
     x,  // x-coord of the cell to be renamed
     y,  // y-coord of the cell to be renamed
     name,
@@ -117,10 +120,10 @@ export const putDashboard = (dashboard) => (dispatch) => {
   })
 }
 
-export const updateDashboardCell = (cell) => (dispatch) => {
+export const updateDashboardCell = (dashboard, cell) => (dispatch) => {
   return updateDashboardCellAJAX(cell)
   .then(({data}) => {
-    dispatch(syncDashboardCell(data))
+    dispatch(syncDashboardCell(dashboard, data))
   })
 }
 
