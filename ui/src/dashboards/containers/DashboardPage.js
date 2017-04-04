@@ -40,7 +40,6 @@ const DashboardPage = React.createClass({
     dashboardActions: shape({
       putDashboard: func.isRequired,
       getDashboardsAsync: func.isRequired,
-      setDashboard: func.isRequired,
       setTimeRange: func.isRequired,
       addDashboardCellAsync: func.isRequired,
       editDashboardCell: func.isRequired,
@@ -50,10 +49,6 @@ const DashboardPage = React.createClass({
       id: number.isRequired,
       cells: arrayOf(shape({})).isRequired,
     })),
-    dashboard: shape({
-      id: number.isRequired,
-      cells: arrayOf(shape({})).isRequired,
-    }),
     handleChooseAutoRefresh: func.isRequired,
     autoRefresh: number.isRequired,
     timeRange: shape({}).isRequired,
@@ -90,21 +85,6 @@ const DashboardPage = React.createClass({
     getDashboardsAsync(dashboardID)
   },
 
-  componentWillReceiveProps(nextProps) {
-    const {location: {pathname}} = this.props
-    const {
-      location: {pathname: nextPathname},
-      params: {dashboardID: nextID},
-      dashboardActions: {setDashboard},
-    } = nextProps
-
-    if (nextPathname.pathname === pathname) {
-      return
-    }
-
-    setDashboard(nextID)
-  },
-
   handleDismissOverlay() {
     this.setState({selectedCell: null})
   },
@@ -128,7 +108,8 @@ const DashboardPage = React.createClass({
   },
 
   handleAddCell() {
-    const {dashboard} = this.props
+    const {params: {dashboardID}, dashboards} = this.props
+    const dashboard = dashboards.find(d => d.id === +dashboardID)
     this.props.dashboardActions.addDashboardCellAsync(dashboard)
   },
 
@@ -142,7 +123,8 @@ const DashboardPage = React.createClass({
 
   handleRenameDashboard(name) {
     this.setState({isEditMode: false})
-    const {dashboard} = this.props
+    const {params: {dashboardID}, dashboards} = this.props
+    const dashboard = dashboards.find(d => d.id === +dashboardID)
     const newDashboard = {...dashboard, name}
     this.props.dashboardActions.updateDashboard(newDashboard)
     this.props.dashboardActions.putDashboard()
@@ -175,8 +157,7 @@ const DashboardPage = React.createClass({
   render() {
     const {
       dashboards,
-      dashboard,
-      params: {sourceID},
+      params: {sourceID, dashboardID},
       inPresentationMode,
       handleClickPresentationButton,
       source,
@@ -184,6 +165,8 @@ const DashboardPage = React.createClass({
       autoRefresh,
       timeRange,
     } = this.props
+
+    const dashboard = dashboards.find(d => d.id === +dashboardID)
 
     const {
       selectedCell,
@@ -269,14 +252,12 @@ const mapStateToProps = (state) => {
     },
     dashboardUI: {
       dashboards,
-      dashboard,
       timeRange,
     },
   } = state
 
   return {
     dashboards,
-    dashboard,
     autoRefresh,
     timeRange,
     inPresentationMode,
