@@ -15,6 +15,7 @@
   1. [#1178](https://github.com/influxdata/chronograf/pull/1178): Repair DataExplorer+CellEditorOverlay's QueryBuilder in Safari
   1. [#979](https://github.com/influxdata/chronograf/issues/979): Fix empty tags for non-default retention policies
   1. [#1179](https://github.com/influxdata/chronograf/pull/1179): Admin Databases Page will render a database without retention policies
+  1. [#1095](https://github.com/influxdata/chronograf/pull/1095): Make logout button display again
 
 ### Features
   1. [#1112](https://github.com/influxdata/chronograf/pull/1112): Add ability to delete a dashboard
