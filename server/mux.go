@@ -20,18 +20,18 @@ const (
 
 // MuxOpts are the options for the router.  Mostly related to auth.
 type MuxOpts struct {
-	Logger   chronograf.Logger
-	Develop  bool                 // Develop loads assets from filesystem instead of bindata
-	Basepath string               // URL path prefix under which all chronograf routes will be mounted
-	UseAuth  bool                 // UseAuth turns on Github OAuth and JWT
-	Auth     oauth2.Authenticator // Auth is used to authenticate and authorize
-
+	Logger        chronograf.Logger
+	Develop       bool                 // Develop loads assets from filesystem instead of bindata
+	Basepath      string               // URL path prefix under which all chronograf routes will be mounted
+	PrefixRoutes  bool                 // Mounts all backend routes under route specified by the Basepath
+	UseAuth       bool                 // UseAuth turns on Github OAuth and JWT
+	Auth          oauth2.Authenticator // Auth is used to authenticate and authorize
 	ProviderFuncs []func(func(oauth2.Provider, oauth2.Mux))
 }
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
 func NewMux(opts MuxOpts, service Service) http.Handler {
-	router := httprouter.New()
+	hr := httprouter.New()
 
 	/* React Application */
 	assets := Assets(AssetsOpts{
@@ -46,9 +46,23 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	compressed := gziphandler.GzipHandler(prefixedAssets)
 
 	// The react application handles all the routing if the server does not
-	// know about the route.  This means that we never have unknown
-	// routes on the server.
-	router.NotFound = compressed
+	// know about the route.  This means that we never have unknown routes on
+	// the server.
+	hr.NotFound = compressed
+
+	var router chronograf.Router = hr
+
+	// Set route prefix for all routes if basepath is present
+	if opts.PrefixRoutes {
+		router = &MountableRouter{
+			Prefix:   opts.Basepath,
+			Delegate: hr,
+		}
+
+		//The assets handler is always unaware of basepaths, so the
+		// basepath needs to always be removed before sending requests to it
+		hr.NotFound = http.StripPrefix(opts.Basepath, hr.NotFound)
+	}
 
 	/* Documentation */
 	router.GET("/swagger.json", Spec())
@@ -177,7 +191,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 }
 
 // AuthAPI adds the OAuth routes if auth is enabled.
-func AuthAPI(opts MuxOpts, router *httprouter.Router) (http.Handler, AuthRoutes) {
+func AuthAPI(opts MuxOpts, router chronograf.Router) (http.Handler, AuthRoutes) {
 	routes := AuthRoutes{}
 	for _, pf := range opts.ProviderFuncs {
 		pf(func(p oauth2.Provider, m oauth2.Mux) {
