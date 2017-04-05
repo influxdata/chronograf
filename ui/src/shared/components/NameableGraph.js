@@ -87,11 +87,11 @@ const NameableGraph = React.createClass({
       nameOrField = (<span className={classnames("dash-graph--name", {editable: !shouldNotBeEditable})}>{name}</span>)
     }
 
-    let onClickHandler
+    let onStartRenaming
     if (isEditable) {
-      onClickHandler = onEditCell
+      onStartRenaming = onEditCell
     } else {
-      onClickHandler = () => {
+      onStartRenaming = () => {
         // no-op
       }
     }
@@ -99,7 +99,9 @@ const NameableGraph = React.createClass({
     return (
       <div className="dash-graph">
         <div className="dash-graph--heading">
-          <div className="dash-graph--name-container" onClick={onClickHandler(x, y, isEditing)}>{nameOrField}</div>
+          <div className="dash-graph--name-container">
+            {nameOrField}
+          </div>
           {shouldNotBeEditable ? null : <div className="dash-graph--drag-handle"></div>}
           {
             shouldNotBeEditable ?
@@ -108,6 +110,7 @@ const NameableGraph = React.createClass({
                 isOpen={this.state.isMenuOpen}
                 toggleMenu={this.toggleMenu}
                 onEdit={onSummonOverlayTechnologies}
+                onRename={onStartRenaming}
                 onDelete={onDeleteCell}
                 cell={cell}
                 handleClickOutside={this.closeMenu}
@@ -122,13 +125,14 @@ const NameableGraph = React.createClass({
   },
 })
 
-const ContextMenu = OnClickOutside(({isOpen, toggleMenu, onEdit, onDelete, cell}) => (
+const ContextMenu = OnClickOutside(({isOpen, toggleMenu, onEdit, onRename, onDelete, cell}) => (
   <div className={classnames("dash-graph--options", {"dash-graph--options-show": isOpen})} onClick={toggleMenu}>
     <button className="btn btn-info btn-xs">
       <span className="icon caret-down"></span>
     </button>
     <ul className="dash-graph--options-menu">
       <li onClick={() => onEdit(cell)}>Edit</li>
+      <li onClick={onRename(cell.x, cell.y, cell.isEditing)}>Rename</li>
       <li onClick={() => onDelete(cell)}>Delete</li>
     </ul>
   </div>
