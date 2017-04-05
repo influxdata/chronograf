@@ -99,7 +99,7 @@ const NameableGraph = React.createClass({
     return (
       <div className="dash-graph">
         <div className="dash-graph--heading">
-          <div onClick={onClickHandler(x, y, isEditing)}>{nameOrField}</div>
+          <div className="dash-graph--name-container" onClick={onClickHandler(x, y, isEditing)}>{nameOrField}</div>
           {shouldNotBeEditable ? null : <div className="dash-graph--drag-handle"></div>}
           {
             shouldNotBeEditable ?

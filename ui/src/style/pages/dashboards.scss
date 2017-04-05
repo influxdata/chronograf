@@ -116,7 +116,7 @@ $dash-graph-heading: 30px;
 }
 .dash-graph--drag-handle {
   height: $dash-graph-heading;
-  width: 100%;
+  flex: 1 0 0;
 
   &:before {
     content: '';
@@ -137,6 +137,10 @@ $dash-graph-heading: 30px;
     opacity: 1;
   }
 }
+.dash-graph--name-container {
+  flex: 0 0 70%;
+  overflow: hidden;
+}
 .dash-graph--name-edit,
 .dash-graph--name {
   display: inline-block;
@@ -151,6 +155,7 @@ $dash-graph-heading: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  width: 100%;
 }
 .dash-graph--name {
   transition:
@@ -189,12 +194,10 @@ $dash-graph-heading: 30px;
 }
 .dash-graph--name-edit {
   top: -1px;
-  width: 190px;
 }
 .dash-graph--options {
-  height: $dash-graph-heading;
+  flex: 0 0 22px;
   position: relative;
-  width: ($dash-graph-heading - 8px);
   right: -6px;
 
   > .btn {
