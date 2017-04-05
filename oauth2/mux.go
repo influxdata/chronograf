@@ -8,15 +8,15 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Check to ensure CookieMux is an oauth2.Mux
-var _ Mux = &CookieMux{}
+// Check to ensure AuthMux is an oauth2.Mux
+var _ Mux = &AuthMux{}
 
 // TenMinutes is the default length of time to get a response back from the OAuth provider
 const TenMinutes = 10 * time.Minute
 
-// NewCookieMux constructs a Mux handler that checks a cookie against the authenticator
-func NewCookieMux(p Provider, a Authenticator, t Tokenizer, l chronograf.Logger) *CookieMux {
-	return &CookieMux{
+// NewAuthMux constructs a Mux handler that checks a cookie against the authenticator
+func NewAuthMux(p Provider, a Authenticator, t Tokenizer, l chronograf.Logger) *AuthMux {
+	return &AuthMux{
 		Provider:   p,
 		Auth:       a,
 		Tokens:     t,
@@ -26,12 +26,12 @@ func NewCookieMux(p Provider, a Authenticator, t Tokenizer, l chronograf.Logger)
 	}
 }
 
-// CookieMux services an Oauth2 interaction with a provider and browser and
+// AuthMux services an Oauth2 interaction with a provider and browser and
 // stores the resultant token in the user's browser as a cookie. The benefit of
 // this is that the cookie's authenticity can be verified independently by any
 // Chronograf instance as long as the Authenticator has no external
 // dependencies (e.g. on a Database).
-type CookieMux struct {
+type AuthMux struct {
 	Provider   Provider          // Provider is the OAuth2 service
 	Auth       Authenticator     // Auth is used to Authorize after successful OAuth2 callback and Expire on Logout
 	Tokens     Tokenizer         // Tokens is used to create and validate OAuth2 "state"
@@ -43,7 +43,7 @@ type CookieMux struct {
 // Login uses a Cookie with a random string as the state validation method.  JWTs are
 // a good choice here for encoding because they can be validated without
 // storing state. Login returns a handler that redirects to the providers OAuth login.
-func (j *CookieMux) Login() http.Handler {
+func (j *AuthMux) Login() http.Handler {
 	conf := j.Provider.Config()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// We are creating a token with an encoded random string to prevent CSRF attacks
@@ -79,7 +79,7 @@ func (j *CookieMux) Login() http.Handler {
 // recommended that the value of the cookie be encoded as a JWT because the JWT
 // can be validated without the need for saving state. The JWT contains the
 // principal's identifier (e.g.  email address).
-func (j *CookieMux) Callback() http.Handler {
+func (j *AuthMux) Callback() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log := j.Logger.
 			WithField("component", "auth").
@@ -134,7 +134,7 @@ func (j *CookieMux) Callback() http.Handler {
 }
 
 // Logout handler will expire our authentication cookie and redirect to the successURL
-func (j *CookieMux) Logout() http.Handler {
+func (j *AuthMux) Logout() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		j.Auth.Expire(w)
 		http.Redirect(w, r, j.SuccessURL, http.StatusTemporaryRedirect)
