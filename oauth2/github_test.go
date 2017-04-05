@@ -1,4 +1,4 @@
-package oauth2
+package oauth2_test
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	clog "github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/oauth2"
 )
 
 func TestGithubPrincipalID(t *testing.T) {
@@ -32,10 +33,10 @@ func TestGithubPrincipalID(t *testing.T) {
 	defer mockAPI.Close()
 
 	logger := clog.New(clog.ParseLevel("debug"))
-	prov := Github{
+	prov := oauth2.Github{
 		Logger: logger,
 	}
-	tt, err := NewTestTripper(logger, mockAPI, http.DefaultTransport)
+	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
 	if err != nil {
 		t.Fatal("Error initializing TestTripper: err:", err)
 	}
@@ -88,11 +89,11 @@ func TestGithubPrincipalIDOrganization(t *testing.T) {
 	defer mockAPI.Close()
 
 	logger := clog.New(clog.ParseLevel("debug"))
-	prov := Github{
+	prov := oauth2.Github{
 		Logger: logger,
 		Orgs:   []string{"Hill Valley Preservation Society"},
 	}
-	tt, err := NewTestTripper(logger, mockAPI, http.DefaultTransport)
+	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
 	if err != nil {
 		t.Fatal("Error initializing TestTripper: err:", err)
 	}

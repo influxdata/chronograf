@@ -1,4 +1,4 @@
-package oauth2
+package oauth2_test
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	clog "github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/oauth2"
 )
 
 func Test_Heroku_PrincipalID_ExtractsEmailAddress(t *testing.T) {
@@ -31,10 +32,10 @@ func Test_Heroku_PrincipalID_ExtractsEmailAddress(t *testing.T) {
 	defer mockAPI.Close()
 
 	logger := clog.New(clog.ParseLevel("debug"))
-	prov := Heroku{
+	prov := oauth2.Heroku{
 		Logger: logger,
 	}
-	tt, err := NewTestTripper(logger, mockAPI, http.DefaultTransport)
+	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
 	if err != nil {
 		t.Fatal("Error initializing TestTripper: err:", err)
 	}
@@ -80,12 +81,12 @@ func Test_Heroku_PrincipalID_RestrictsByOrganization(t *testing.T) {
 	defer mockAPI.Close()
 
 	logger := clog.New(clog.ParseLevel("debug"))
-	prov := Heroku{
+	prov := oauth2.Heroku{
 		Logger:        logger,
 		Organizations: []string{"enchantment-under-the-sea-dance-committee"},
 	}
 
-	tt, err := NewTestTripper(logger, mockAPI, http.DefaultTransport)
+	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
 	if err != nil {
 		t.Fatal("Error initializing TestTripper: err:", err)
 	}

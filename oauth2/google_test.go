@@ -1,4 +1,4 @@
-package oauth2
+package oauth2_test
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	clog "github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/oauth2"
 )
 
 func TestGooglePrincipalID(t *testing.T) {
@@ -30,10 +31,10 @@ func TestGooglePrincipalID(t *testing.T) {
 	defer mockAPI.Close()
 
 	logger := clog.New(clog.ParseLevel("debug"))
-	prov := Google{
+	prov := oauth2.Google{
 		Logger: logger,
 	}
-	tt, err := NewTestTripper(logger, mockAPI, http.DefaultTransport)
+	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
 	if err != nil {
 		t.Fatal("Error initializing TestTripper: err:", err)
 	}
@@ -75,11 +76,11 @@ func TestGooglePrincipalIDDomain(t *testing.T) {
 	defer mockAPI.Close()
 
 	logger := clog.New(clog.ParseLevel("debug"))
-	prov := Google{
+	prov := oauth2.Google{
 		Logger:  logger,
 		Domains: []string{"Hill Valley Preservation Society"},
 	}
-	tt, err := NewTestTripper(logger, mockAPI, http.DefaultTransport)
+	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
 	if err != nil {
 		t.Fatal("Error initializing TestTripper: err:", err)
 	}
