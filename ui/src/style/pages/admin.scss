@@ -75,6 +75,9 @@
     width: 100%;
     min-width: 150px;
   }
+	.admin-table--kill-button {
+		width: 70px;
+	}
   .admin-table--hidden {
     visibility: hidden;
   }
@@ -188,7 +191,7 @@
 }
 .db-manager-header--edit {
   justify-content: flex-start;
-  
+
   .form-control {
     height: 22px;
     padding: 0 6px;
