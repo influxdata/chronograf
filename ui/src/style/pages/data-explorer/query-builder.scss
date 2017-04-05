@@ -43,7 +43,7 @@
   color: $g11-sidewalk;
   background: transparent;
   height: 30px;
-  cursor: $cc-pointer;
+  cursor: pointer;
   padding: 0 8px 0 16px;
   transition:
       color 0.25s ease,
@@ -114,9 +114,9 @@
     }
   }
   > .dropdown-menu {
-    width: 108px !important;
+    width: 145px !important;
     min-width: 108px !important;
-    max-width: 108px !important;
+    max-width: 145px !important;
   }
 }
 .panel--tab-new.open {
@@ -132,7 +132,7 @@
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 177px;
+  width: 90%;
   text-overflow: ellipsis;
   @include no-user-select();
 }
@@ -162,7 +162,8 @@ $query-builder--column-heading-height: 50px;
   position: relative;
 
   pre {
-    display: block;
+    display: flex;
+    align-items: center;
     padding: 7px;
     border: 2px solid $query-editor-tab-inactive;
     background-color: $query-editor-tab-inactive;
