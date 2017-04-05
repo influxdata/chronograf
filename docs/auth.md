@@ -116,7 +116,7 @@ export HEROKU_ORGS=hill-valley-preservation-sociey,the-pinheads
 
 ### Optional: Configuring Authentication Duration
 
-By default, auth will remain valid for 30 days via a cookie stored in the browser. This duration can be changed with the environmental variable `AUTH_DURATION`. For example, to change it to 1 hour, use:
+By default, auth will remain valid for 30 days via a cookie stored in the browser. This duration can be changed with the environment variable `AUTH_DURATION`. For example, to change it to 1 hour, use:
 
 ```sh
 export AUTH_DURATION=1h
