@@ -8,6 +8,9 @@ import (
 	gojwt "github.com/dgrijalva/jwt-go"
 )
 
+// Ensure JWT conforms to the Tokenizer interface
+var _ Tokenizer = &JWT{}
+
 // JWT represents a javascript web token that can be validated or marshaled into string.
 type JWT struct {
 	Secret string
