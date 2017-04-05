@@ -214,7 +214,7 @@ func AuthAPI(opts MuxOpts, router chronograf.Router) (http.Handler, AuthRoutes) 
 	tokenMiddleware := AuthorizedToken(opts.Auth, opts.Logger, router)
 	// Wrap the API with token validation middleware.
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/chronograf/v1/") {
+		if strings.HasPrefix(r.URL.Path, "/chronograf/v1/") || r.URL.Path == "/oauth/logout" {
 			tokenMiddleware.ServeHTTP(w, r)
 			return
 		}
