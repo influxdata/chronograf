@@ -11,7 +11,7 @@ const SideNav = React.createClass({
     location: string.isRequired,
     sourceID: string.isRequired,
     me: shape({
-      email: string,
+      name: string,
     }),
     isHidden: bool.isRequired,
   },
