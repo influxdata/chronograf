@@ -80,6 +80,9 @@ const NameableGraph = React.createClass({
             if (evt.key === 'Enter') {
               onUpdateCell(cell)()
             }
+            if (evt.key === 'Escape') {
+              onEditCell(x, y, true)()
+            }
           }}
         />
       )
@@ -88,7 +91,7 @@ const NameableGraph = React.createClass({
     }
 
     let onStartRenaming
-    if (isEditable) {
+    if (!isEditing && isEditable) {
       onStartRenaming = onEditCell
     } else {
       onStartRenaming = () => {
