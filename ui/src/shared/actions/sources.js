@@ -1,4 +1,4 @@
-import {deleteSource, getSources} from 'src/shared/apis'
+import {deleteSource, getSources as getSourcesAJAX} from 'src/shared/apis'
 import {publishNotification} from './notifications'
 
 export const loadSources = (sources) => ({
@@ -40,5 +40,17 @@ export const removeAndLoadSources = (source) => async (dispatch) => {
     dispatch(loadSources(newSources))
   } catch (err) {
     dispatch(publishNotification("error", "Internal Server Error. Check API Logs"))
+  }
+}
+
+export const getSources = () => async (dispatch) => {
+  dispatch(sourcesRequested())
+
+  try {
+    const sources = getSourcesAJAX()
+
+    console(source)
+
+    dispatch(sourcesReceived(sources))
   }
 }

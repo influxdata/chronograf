@@ -1,8 +1,9 @@
 import React from 'react'
 import {render} from 'react-dom'
 import {Provider} from 'react-redux'
-import {Router, Route, Redirect, useRouterHistory} from 'react-router'
-import {createHistory} from 'history'
+import {Route} from 'react-router'
+import createHistory from 'history/createBrowserHistory'
+import {ConnectedRouter} from 'react-router-redux'
 
 import App from 'src/App'
 import AlertsApp from 'src/alerts'
@@ -17,7 +18,7 @@ import {CreateSource, SourcePage, ManageSources} from 'src/sources'
 import {AdminPage} from 'src/admin'
 import NotFound from 'src/shared/components/NotFound'
 import configureStore from 'src/store/configureStore'
-import {getMe, getSources} from 'shared/apis'
+import {getMe} from 'shared/apis'
 import {receiveMe} from 'shared/actions/me'
 import {receiveAuth} from 'shared/actions/auth'
 import {disablePresentationMode} from 'shared/actions/app'
@@ -28,22 +29,24 @@ import 'src/style/chronograf.scss'
 
 import {HTTP_FORBIDDEN, HEARTBEAT_INTERVAL} from 'shared/constants'
 
-const store = configureStore(loadLocalStorage())
 const rootNode = document.getElementById('react-root')
 
-let browserHistory
+let history
 const basepath = rootNode.dataset.basepath
 window.basepath = basepath
 if (basepath) {
-  browserHistory = useRouterHistory(createHistory)({
+  history = createHistory({
     basename: basepath, // this is written in when available by the URL prefixer middleware
   })
 } else {
-  browserHistory = useRouterHistory(createHistory)({
+  history = createHistory({
     basename: "",
   })
 }
-browserHistory.listen(() => {
+
+const store = configureStore(loadLocalStorage(), history)
+
+history.listen(() => {
   store.dispatch(disablePresentationMode())
 })
 
@@ -62,22 +65,13 @@ const Root = React.createClass({
   componentDidMount() {
     this.checkAuth()
   },
+
   activeSource(sources) {
     const defaultSource = sources.find((s) => s.default)
     if (defaultSource && defaultSource.id) {
       return defaultSource
     }
     return sources[0]
-  },
-
-  redirectFromRoot(_, replace, callback) {
-    getSources().then(({data: {sources}}) => {
-      if (sources && sources.length) {
-        const path = `/sources/${this.activeSource(sources).id}/hosts`
-        replace(path)
-      }
-      callback()
-    })
   },
 
   checkAuth() {
@@ -113,46 +107,56 @@ const Root = React.createClass({
   },
 
   render() {
-    if (this.state.loggedIn === null) {
+    /*if (this.state.loggedIn === null) {
       return <div className="page-spinner"></div>
     }
-    if (this.state.loggedIn === false) {
+    if (this.state.loggedIn === false) { // TODO use redux state instead
       return (
         <Provider store={store}>
-          <Router history={browserHistory}>
+          <ConnectedRouter history={history}>
             <Route path="/login" component={Login} />
             <Redirect from="*" to="/login" />
-          </Router>
+          </ConnectedRouter>
         </Provider>
       )
-    }
+    }*/
+
+
+
+
+
     return (
       <Provider store={store}>
-        <Router history={browserHistory}>
-          <Route path="/" component={CreateSource} onEnter={this.redirectFromRoot} />
-          <Route path="/sources/new" component={CreateSource} />
-          <Route path="/sources/:sourceID" component={App}>
-            <Route component={CheckSources}>
-              <Route path="manage-sources" component={ManageSources} />
-              <Route path="manage-sources/new" component={SourcePage} />
-              <Route path="manage-sources/:id/edit" component={SourcePage} />
-              <Route path="chronograf/data-explorer" component={DataExplorer} />
-              <Route path="hosts" component={HostsPage} />
-              <Route path="hosts/:hostID" component={HostPage} />
-              <Route path="kubernetes" component={KubernetesPage} />
-              <Route path="kapacitor-config" component={KapacitorPage} />
-              <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
-              <Route path="alerts" component={AlertsApp} />
-              <Route path="dashboards" component={DashboardsPage} />
-              <Route path="dashboards/:dashboardID" component={DashboardPage} />
-              <Route path="alert-rules" component={KapacitorRulesPage} />
-              <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
-              <Route path="alert-rules/new" component={KapacitorRulePage} />
-              <Route path="admin" component={AdminPage} />
+        <ConnectedRouter history={history}>
+          <Authenticator>
+            { sources && sources.length ?
+                <Route path="/" component={CreateSource} /> :
+                <Route path={`/sources/${this.activeSource(store.getState().sources).id}/hosts`} component={CreateSource} />
+            }
+            <Route path="/sources/new" component={CreateSource} />
+            <Route path="/sources/:sourceID" component={App}>
+              <Route component={CheckSources}>
+                <Route path="manage-sources" component={ManageSources} />
+                <Route path="manage-sources/new" component={SourcePage} />
+                <Route path="manage-sources/:id/edit" component={SourcePage} />
+                <Route path="chronograf/data-explorer" component={DataExplorer} />
+                <Route path="hosts" component={HostsPage} />
+                <Route path="hosts/:hostID" component={HostPage} />
+                <Route path="kubernetes" component={KubernetesPage} />
+                <Route path="kapacitor-config" component={KapacitorPage} />
+                <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
+                <Route path="alerts" component={AlertsApp} />
+                <Route path="dashboards" component={DashboardsPage} />
+                <Route path="dashboards/:dashboardID" component={DashboardPage} />
+                <Route path="alert-rules" component={KapacitorRulesPage} />
+                <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
+                <Route path="alert-rules/new" component={KapacitorRulePage} />
+                <Route path="admin" component={AdminPage} />
+              </Route>
             </Route>
-          </Route>
-          <Route path="*" component={NotFound} />
-        </Router>
+            <Route path="*" component={NotFound} />
+          </Authenticator>
+        </ConnectedRouter>
       </Provider>
     )
   },

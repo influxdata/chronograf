@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react'
 import {withRouter} from 'react-router'
 import {connect} from 'react-redux'
-import {getSources} from 'src/shared/apis'
+import {getSources as getSourcesAJAX} from 'src/shared/apis'
 import {loadSources as loadSourcesAction} from 'src/shared/actions/sources'
 import {showDatabases} from 'src/shared/apis/metaQuery'
 
@@ -32,7 +32,7 @@ const CheckSources = React.createClass({
   },
 
   componentDidMount() {
-    getSources().then(({data: {sources}}) => {
+    getSourcesAJAX().then(({data: {sources}}) => {
       this.props.loadSourcesAction(sources)
       this.setState({isFetching: false})
     }).catch(() => {
