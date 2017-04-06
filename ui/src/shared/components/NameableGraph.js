@@ -84,7 +84,7 @@ const NameableGraph = React.createClass({
         />
       )
     } else {
-      nameOrField = (<span className={classnames("dash-graph--name", {editable: !shouldNotBeEditable})}>{name}</span>)
+      nameOrField = (<span className="dash-graph--name">{name}</span>)
     }
 
     let onStartRenaming
@@ -98,25 +98,20 @@ const NameableGraph = React.createClass({
 
     return (
       <div className="dash-graph">
-        <div className="dash-graph--heading">
-          <div className="dash-graph--name-container">
-            {nameOrField}
-          </div>
-          {shouldNotBeEditable ? null : <div className="dash-graph--drag-handle"></div>}
-          {
-            shouldNotBeEditable ?
-              null :
-              <ContextMenu
-                isOpen={this.state.isMenuOpen}
-                toggleMenu={this.toggleMenu}
-                onEdit={onSummonOverlayTechnologies}
-                onRename={onStartRenaming}
-                onDelete={onDeleteCell}
-                cell={cell}
-                handleClickOutside={this.closeMenu}
-              />
-          }
-        </div>
+        <div className={classnames("dash-graph--heading", {"dash-graph--heading-draggable": !shouldNotBeEditable})}>{nameOrField}</div>
+        {
+          shouldNotBeEditable ?
+          null :
+          <ContextMenu
+            isOpen={this.state.isMenuOpen}
+            toggleMenu={this.toggleMenu}
+            onEdit={onSummonOverlayTechnologies}
+            onRename={onStartRenaming}
+            onDelete={onDeleteCell}
+            cell={cell}
+            handleClickOutside={this.closeMenu}
+          />
+        }
         <div className="dash-graph--container">
           {children}
         </div>
