@@ -21,9 +21,9 @@ const App = React.createClass({
     location: shape({
       pathname: string,
     }),
-    params: shape({
-      sourceID: string.isRequired,
-    }).isRequired,
+    // params: shape({
+    //   sourceID: string.isRequired,
+    // }).isRequired,
     publishNotification: func.isRequired,
     dismissNotification: func.isRequired,
     dismissAllNotifications: func.isRequired,
@@ -53,7 +53,14 @@ const App = React.createClass({
   },
 
   render() {
-    const {params: {sourceID}} = this.props
+    console.log("sally", this.props)
+    const {match} = this.props
+
+    if (!match) {
+      return null
+    }
+
+    const {params: {sourceID}} = match
 
     return (
       <div className="chronograf-root">

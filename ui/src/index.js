@@ -5,9 +5,12 @@ import {Route} from 'react-router'
 import createHistory from 'history/createBrowserHistory'
 import {ConnectedRouter} from 'react-router-redux'
 
+import configureStore from 'src/store/configureStore'
+
+import Authenticator from 'shared/components/Authenticator'
+
 import App from 'src/App'
 import AlertsApp from 'src/alerts'
-import CheckSources from 'src/CheckSources'
 import {HostsPage, HostPage} from 'src/hosts'
 import {KubernetesPage} from 'src/kubernetes'
 import {Login} from 'src/auth'
@@ -17,7 +20,7 @@ import {DashboardsPage, DashboardPage} from 'src/dashboards'
 import {CreateSource, SourcePage, ManageSources} from 'src/sources'
 import {AdminPage} from 'src/admin'
 import NotFound from 'src/shared/components/NotFound'
-import configureStore from 'src/store/configureStore'
+
 import {getMe} from 'shared/apis'
 import {receiveMe} from 'shared/actions/me'
 import {receiveAuth} from 'shared/actions/auth'
@@ -121,40 +124,32 @@ const Root = React.createClass({
       )
     }*/
 
-
-
-
+    /*
+      <Route path="/sources/new" component={CreateSource} />
+    */
 
     return (
       <Provider store={store}>
         <ConnectedRouter history={history}>
-          <Authenticator>
-            { sources && sources.length ?
-                <Route path="/" component={CreateSource} /> :
-                <Route path={`/sources/${this.activeSource(store.getState().sources).id}/hosts`} component={CreateSource} />
-            }
-            <Route path="/sources/new" component={CreateSource} />
-            <Route path="/sources/:sourceID" component={App}>
-              <Route component={CheckSources}>
-                <Route path="manage-sources" component={ManageSources} />
-                <Route path="manage-sources/new" component={SourcePage} />
-                <Route path="manage-sources/:id/edit" component={SourcePage} />
-                <Route path="chronograf/data-explorer" component={DataExplorer} />
-                <Route path="hosts" component={HostsPage} />
-                <Route path="hosts/:hostID" component={HostPage} />
-                <Route path="kubernetes" component={KubernetesPage} />
-                <Route path="kapacitor-config" component={KapacitorPage} />
-                <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
-                <Route path="alerts" component={AlertsApp} />
-                <Route path="dashboards" component={DashboardsPage} />
-                <Route path="dashboards/:dashboardID" component={DashboardPage} />
-                <Route path="alert-rules" component={KapacitorRulesPage} />
-                <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
-                <Route path="alert-rules/new" component={KapacitorRulePage} />
-                <Route path="admin" component={AdminPage} />
-              </Route>
-            </Route>
-            <Route path="*" component={NotFound} />
+          <Authenticator component={App}>
+            <div>
+              <Route path="manage-sources" component={ManageSources} />
+              <Route path="manage-sources/new" component={SourcePage} />
+              <Route path="manage-sources/:id/edit" component={SourcePage} />
+              <Route path="chronograf/data-explorer" component={DataExplorer} />
+              <Route path="hosts" component={HostsPage} />
+              <Route path="hosts/:hostID" component={HostPage} />
+              <Route path="kubernetes" component={KubernetesPage} />
+              <Route path="kapacitor-config" component={KapacitorPage} />
+              <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
+              <Route path="alerts" component={AlertsApp} />
+              <Route path="dashboards" component={DashboardsPage} />
+              <Route path="dashboards/:dashboardID" component={DashboardPage} />
+              <Route path="alert-rules" component={KapacitorRulesPage} />
+              <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
+              <Route path="alert-rules/new" component={KapacitorRulePage} />
+              <Route path="admin" component={AdminPage} />
+            </div>
           </Authenticator>
         </ConnectedRouter>
       </Provider>

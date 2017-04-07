@@ -1,26 +1,41 @@
 import {deleteSource, getSources as getSourcesAJAX} from 'src/shared/apis'
 import {publishNotification} from './notifications'
 
-export const loadSources = (sources) => ({
-  type: 'LOAD_SOURCES',
+export const loadSourcesRequested = () => ({
+  type: 'LOAD_SOURCES_REQUESTED',
+})
+
+export const loadSourcesSucceeded = (sources) => ({
+  type: 'LOAD_SOURCES_SUCCEEDED',
   payload: {
     sources,
+  }
+})
+
+export const loadSourcesFailed = (error) => ({
+  type: 'LOAD_SOURCES_FAILED',
+  payload: {
+    error,
   },
 })
 
 export const updateSource = (source) => ({
-  type: 'SOURCE_UPDATED',
+  type: 'UPDATE_SOURCE_SUCCEEDED',
   payload: {
     source,
   },
 })
 
+// TODO handle requested and failure cases
+
 export const addSource = (source) => ({
-  type: 'SOURCE_ADDED',
+  type: 'ADD_SOURCE_SUCCEEDED',
   payload: {
     source,
   },
 })
+
+// TODO handle requested and failure cases
 
 // Async action creators
 
@@ -36,21 +51,22 @@ export const removeAndLoadSources = (source) => async (dispatch) => {
       }
     }
 
-    const {data: {sources: newSources}} = await getSources()
-    dispatch(loadSources(newSources))
+    const {data: {sources: newSources}} = await getSourcesAJAX()
+    dispatch(loadSourcesSucceeded(newSources))
   } catch (err) {
     dispatch(publishNotification("error", "Internal Server Error. Check API Logs"))
   }
 }
 
 export const getSources = () => async (dispatch) => {
-  dispatch(sourcesRequested())
+  dispatch(loadSourcesRequested())
 
   try {
-    const sources = getSourcesAJAX()
+    const {data: {sources}} = await getSourcesAJAX()
 
-    console(source)
-
-    dispatch(sourcesReceived(sources))
+    dispatch(loadSourcesSucceeded(sources))
+  } catch (error) {
+    console.error(error)
+    dispatch(loadSourcesFailed(error))
   }
 }
