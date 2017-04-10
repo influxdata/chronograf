@@ -55,11 +55,19 @@ browserHistory.listen(() => {
   dispatch(disablePresentationMode())
 })
 
+let kIndex = 0
+const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] // eslint-disable-line no-magic-numbers
+const escapeKeyCode = 27
 window.addEventListener('keyup', event => {
-  const escapeKeyCode = 27
   // fallback for browsers that don't support event.key
   if (event.key === 'Escape' || event.keyCode === escapeKeyCode) {
-    dispatch(disablePresentationMode())
+    store.dispatch(disablePresentationMode())
+  } else if (event.keyCode === konami[kIndex]) {
+    if ((kIndex += 1) >= konami.length) {
+      console.log('konami!')
+    }
+  } else {
+    kIndex = 0
   }
 })
 
