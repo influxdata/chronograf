@@ -34,8 +34,16 @@ func init() {
 
 // Server for the chronograf API
 type Server struct {
-	Host string `long:"host" description:"The IP to listen on" default:"0.0.0.0" env:"HOST"`
-	Port int    `long:"port" description:"The port to listen on for insecure connections, defaults to a random value" default:"8888" env:"PORT"`
+	ShowVersion bool   `short:"v" long:"version" description:"Show Chronograf version info"`
+	LogLevel    string `short:"l" long:"log-level" value-name:"choice" choice:"debug" choice:"info" choice:"error" default:"info" description:"Set the logging level" env:"LOG_LEVEL"`
+
+	Host             string `long:"host" description:"The IP to listen on" default:"0.0.0.0" env:"HOST"`
+	Port             int    `long:"port" description:"The port to listen on for insecure connections, defaults to a random value" default:"8888" env:"PORT"`
+	Basepath         string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted" env:"BASE_PATH"`
+	PrefixRoutes     bool   `long:"prefix-routes" description:"Force chronograf server to require that all requests to it are prefixed with the value set in --basepath" env:"PREFIX_ROUTES"`
+	BoltPath         string `short:"b" long:"bolt-path" description:"Full path to boltDB file (/var/lib/chronograf/chronograf-v1.db)" env:"BOLT_PATH" default:"chronograf-v1.db"`
+	CannedPath       string `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
+	DashboarddServer string `long:"dashboardd-url" description:"URL to dashboardd dashboard gallery server" env:"DASHBOARDD_SERVER" default:"http://localhost:8080"`
 
 	Cert flags.Filename `long:"cert" description:"Path to PEM encoded public key certificate. " env:"TLS_CERTIFICATE"`
 	Key  flags.Filename `long:"key" description:"Path to private key associated with given certificate. " env:"TLS_PRIVATE_KEY"`
@@ -48,9 +56,6 @@ type Server struct {
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
 	KapacitorPassword string `long:"kapacitor-password" description:"Password of your Kapacitor instance" env:"KAPACITOR_PASSWORD"`
 
-	Develop      bool          `short:"d" long:"develop" description:"Run server in develop mode."`
-	BoltPath     string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (/var/lib/chronograf/chronograf-v1.db)" env:"BOLT_PATH" default:"chronograf-v1.db"`
-	CannedPath   string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
 	TokenSecret  string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
 	AuthDuration time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
 
@@ -76,14 +81,12 @@ type Server struct {
 	GenericTokenURL     string   `long:"generic-token-url" description:"OAuth 2.0 provider's token endpoint URL" env:"GENERIC_TOKEN_URL"`
 	GenericAPIURL       string   `long:"generic-api-url" description:"URL that returns OpenID UserInfo compatible information." env:"GENERIC_API_URL"`
 
-	ReportingDisabled bool   `short:"r" long:"reporting-disabled" description:"Disable reporting of usage stats (os,arch,version,cluster_id,uptime) once every 24hr" env:"REPORTING_DISABLED"`
-	LogLevel          string `short:"l" long:"log-level" value-name:"choice" choice:"debug" choice:"info" choice:"error" default:"info" description:"Set the logging level" env:"LOG_LEVEL"`
-	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted" env:"BASE_PATH"`
-	PrefixRoutes      bool   `long:"prefix-routes" description:"Force chronograf server to require that all requests to it are prefixed with the value set in --basepath" env:"PREFIX_ROUTES"`
-	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
-	BuildInfo         BuildInfo
-	Listener          net.Listener
-	handler           http.Handler
+	ReportingDisabled bool `short:"r" long:"reporting-disabled" description:"Disable reporting of usage stats (os,arch,version,cluster_id,uptime) once every 24hr" env:"REPORTING_DISABLED"`
+	Develop           bool `short:"d" long:"develop" description:"Run server in develop mode."`
+
+	BuildInfo BuildInfo
+	Listener  net.Listener
+	handler   http.Handler
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() bool) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -246,13 +249,14 @@ func (s *Server) Serve(ctx context.Context) error {
 	providerFuncs = append(providerFuncs, provide(s.genericOAuth(logger, auth)))
 
 	s.handler = NewMux(MuxOpts{
-		Develop:       s.Develop,
-		Auth:          auth,
-		Logger:        logger,
-		UseAuth:       s.useAuth(),
-		ProviderFuncs: providerFuncs,
-		Basepath:      basepath,
-		PrefixRoutes:  s.PrefixRoutes,
+		Develop:         s.Develop,
+		Auth:            auth,
+		Logger:          logger,
+		UseAuth:         s.useAuth(),
+		ProviderFuncs:   providerFuncs,
+		DashboardServer: s.DashboarddServer,
+		Basepath:        basepath,
+		PrefixRoutes:    s.PrefixRoutes,
 	}, service)
 
 	// Add chronograf's version header to all requests

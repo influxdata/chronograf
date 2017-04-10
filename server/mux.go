@@ -20,13 +20,14 @@ const (
 
 // MuxOpts are the options for the router.  Mostly related to auth.
 type MuxOpts struct {
-	Logger        chronograf.Logger
-	Develop       bool                 // Develop loads assets from filesystem instead of bindata
-	Basepath      string               // URL path prefix under which all chronograf routes will be mounted
-	PrefixRoutes  bool                 // Mounts all backend routes under route specified by the Basepath
-	UseAuth       bool                 // UseAuth turns on Github OAuth and JWT
-	Auth          oauth2.Authenticator // Auth is used to authenticate and authorize
-	ProviderFuncs []func(func(oauth2.Provider, oauth2.Mux))
+	Logger          chronograf.Logger
+	Develop         bool                 // Develop loads assets from filesystem instead of bindata
+	Basepath        string               // URL path prefix under which all chronograf routes will be mounted
+	PrefixRoutes    bool                 // Mounts all backend routes under route specified by the Basepath
+	DashboardServer string               // URL of the dashboard gallery server
+	UseAuth         bool                 // UseAuth turns on Github OAuth and JWT
+	Auth            oauth2.Authenticator // Auth is used to authenticate and authorize
+	ProviderFuncs   []func(func(oauth2.Provider, oauth2.Mux))
 }
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
@@ -184,8 +185,8 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 		out = Logger(opts.Logger, router)
 	}
 
-	router.GET("/chronograf/v1/", AllRoutes(authRoutes, opts.Logger))
-	router.GET("/chronograf/v1", AllRoutes(authRoutes, opts.Logger))
+	router.GET("/chronograf/v1/", AllRoutes(authRoutes, opts.DashboardServer, opts.Logger))
+	router.GET("/chronograf/v1", AllRoutes(authRoutes, opts.DashboardServer, opts.Logger))
 
 	return out
 }
