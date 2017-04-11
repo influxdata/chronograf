@@ -34,9 +34,7 @@ const DashboardHeader = ({
             </ul>
           </div>
         }
-        {headerText &&
-          <h1>Kubernetes Dashboard</h1>
-        }
+        <h1>{headerText}</h1>
       </div>
       <div className="page-header__right">
         <GraphTips />
