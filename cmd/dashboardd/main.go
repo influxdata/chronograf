@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+	"strings"
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/canned"
@@ -11,6 +11,36 @@ import (
 )
 
 var layoutStore chronograf.LayoutStore
+
+// cors is a middleware allowing CORS based on the sent origin
+func cors(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if origin := r.Header.Get("Origin"); origin != "" {
+			w.Header().Set(`Access-Control-Allow-Origin`, origin)
+			w.Header().Set(`Access-Control-Allow-Methods`, strings.Join([]string{
+				`GET`,
+				`OPTIONS`,
+			}, ", "))
+
+			w.Header().Set(`Access-Control-Allow-Headers`, strings.Join([]string{
+				`Accept`,
+				`Accept-Encoding`,
+				`Content-Length`,
+				`Content-Type`,
+			}, ", "))
+
+			w.Header().Set(`Access-Control-Expose-Headers`, strings.Join([]string{
+				`Date`,
+			}, ", "))
+		}
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
 
 func dashboardsHandler(w http.ResponseWriter, r *http.Request) {
 	// Construct a filter sieve for both applications and measurements
@@ -58,6 +88,7 @@ func main() {
 		Logger: logger,
 	}
 
-	http.HandleFunc("/dashboards/v1", dashboardsHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/", cors(dashboardsHandler))
+	logger.Info("Starting dashboardd...")
+	logger.Error(http.ListenAndServe(":8080", nil))
 }
