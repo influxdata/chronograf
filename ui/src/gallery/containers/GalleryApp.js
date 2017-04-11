@@ -1,99 +1,79 @@
 import React, {Component, PropTypes} from 'react'
-import {Link} from 'react-router'
-import {getMeasurements, getGallery} from 'src/gallery/apis'
-import {Links} from 'src/utils/ajax'
-import _ from 'lodash'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
+
+import {fetchLayouts} from 'shared/apis'
+import GalleryDashboard from '../components/GalleryDashboard'
+
+import {setAutoRefresh} from 'shared/actions/app'
+import {presentationButtonDispatcher} from 'shared/dispatchers'
 
 class GalleryApp extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      apps: {},
+      layouts: [],
     }
   }
 
   componentDidMount() {
-    const source = this.props.source
-    getMeasurements(source.links.proxy, source.telegraf).then((measurements) => {
-      Links().then(({data}) => {
-        getGallery(data.dashboardd, measurements).then((resp) => {
-          const apps = _.groupBy(_.get(resp, 'data.layouts', []), 'app')
-          this.setState({apps})
-        })
-      })
+    const {params: {app}} = this.props
+
+    fetchLayouts().then(({data: {layouts}}) => {
+      const appLayouts = layouts.filter((l) => l.app === app)
+      this.setState({layouts: appLayouts})
     })
   }
 
   render() {
-    const apps = _.keys(this.state.apps)
-    const {source} = this.props
+    const {layouts} = this.state
+    const {autoRefresh, handleChooseAutoRefresh, handleClickPresentationButton, inPresentationMode, params: {app}, source} = this.props
 
     return (
-      <div className="page">
-        <div className="page-header">
-          <div className="page-header__container">
-            <div className="page-header__left">
-              <h1>
-                Dashboard Gallery
-              </h1>
-            </div>
-          </div>
-        </div>
-        <div className="page-contents">
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-md-12">
-                <div className="panel panel-minimal">
-                  <div className="panel-body">
-                    <table className="table v-center admin-table">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      {
-                        apps.map((app) => {
-                          const id = _.head(this.state.apps[app]).id
-                          return (
-                            <tr key={id} className="">
-                              <td className="monotype">
-                                <Link
-                                  to={{pathname: `/sources/${source.id}/gallery/${app}`}}>
-                                  {app}
-                                </Link>
-                              </td>
-                            </tr>
-                          )
-                        })
-                      }
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <GalleryDashboard
+        app={app}
+        layouts={layouts}
+        source={source}
+        autoRefresh={autoRefresh}
+        handleChooseAutoRefresh={handleChooseAutoRefresh}
+        inPresentationMode={inPresentationMode}
+        handleClickPresentationButton={handleClickPresentationButton}
+      />
     )
   }
 }
 
 const {
+  bool,
+  func,
+  number,
   shape,
   string,
 } = PropTypes
 
 GalleryApp.propTypes = {
+  autoRefresh: number.isRequired,
   source: shape({
-    id: string.isRequired,
     links: shape({
       proxy: string.isRequired,
     }).isRequired,
-    telegraf: string.isRequired,
   }),
+  handleChooseAutoRefresh: func.isRequired,
+  handleClickPresentationButton: func,
+  inPresentationMode: bool.isRequired,
+  params: shape({
+    app: string.isRequired,
+  }).isRequired,
 }
 
-export default GalleryApp
+const mapStateToProps = ({app: {ephemeral: {inPresentationMode}, persisted: {autoRefresh}}}) => ({
+  inPresentationMode,
+  autoRefresh,
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
+  handleClickPresentationButton: presentationButtonDispatcher(dispatch),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(GalleryApp)

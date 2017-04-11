@@ -8,8 +8,7 @@ import App from 'src/App'
 import AlertsApp from 'src/alerts'
 import CheckSources from 'src/CheckSources'
 import {HostsPage, HostPage} from 'src/hosts'
-import {KubernetesPage} from 'src/kubernetes'
-import GalleryApp from 'src/gallery/containers/GalleryApp'
+import {GalleriesApp, GalleryApp} from 'src/gallery'
 import {Login} from 'src/auth'
 import {KapacitorPage, KapacitorRulePage, KapacitorRulesPage, KapacitorTasksPage} from 'src/kapacitor'
 import DataExplorer from 'src/data_explorer'
@@ -140,13 +139,14 @@ const Root = React.createClass({
               <Route path="chronograf/data-explorer" component={DataExplorer} />
               <Route path="hosts" component={HostsPage} />
               <Route path="hosts/:hostID" component={HostPage} />
-              <Route path="kubernetes" component={KubernetesPage} />
               <Route path="kapacitor-config" component={KapacitorPage} />
               <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
               <Route path="alerts" component={AlertsApp} />
               <Route path="dashboards" component={DashboardsPage} />
               <Route path="dashboards/:dashboardID" component={DashboardPage} />
-              <Route path="gallery" component={GalleryApp} />
+              <Route path="gallery" component={GalleriesApp} />
+              <Route path="gallery/:app" component={GalleryApp} />
+              <Redirect from="kubernetes" to="gallery/kubernetes" />
               <Route path="alert-rules" component={KapacitorRulesPage} />
               <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
               <Route path="alert-rules/new" component={KapacitorRulePage} />
