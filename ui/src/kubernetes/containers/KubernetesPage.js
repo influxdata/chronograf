@@ -37,7 +37,6 @@ export const KubernetesPage = React.createClass({
 
   componentDidMount() {
     fetchLayouts().then(({data: {layouts}}) => {
-      console.log(layouts)
       const kubernetesLayouts = layouts.filter((l) => l.app === 'kubernetes')
       this.setState({layouts: kubernetesLayouts})
     })
