@@ -37,6 +37,9 @@ const SideNav = React.createClass({
         <NavBlock icon="dash-h" link={`${sourcePrefix}/dashboards`}>
           <NavHeader link={`${sourcePrefix}/dashboards`} title={'Dashboards'} />
         </NavBlock>
+        <NavBlock icon="dash-h" link={`${sourcePrefix}/gallery`}>
+          <NavHeader link={`${sourcePrefix}/gallery`} title={'Gallery'} />
+        </NavBlock>
         <NavBlock matcher="alerts" icon="alert-triangle" link={`${sourcePrefix}/alerts`}>
           <NavHeader link={`${sourcePrefix}/alerts`} title="Alerting" />
           <NavListItem link={`${sourcePrefix}/alerts`}>Alert History</NavListItem>

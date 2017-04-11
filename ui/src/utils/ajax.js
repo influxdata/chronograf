@@ -4,6 +4,14 @@ let links
 
 import {HTTP_UNAUTHORIZED} from 'shared/constants'
 
+export async function Links() {
+  const basepath = window.basepath || ''
+  await axios({
+    url: `${basepath}/chronograf/v1`,
+    method: 'GET',
+  })
+}
+
 export default async function AJAX({
   url,
   resource,
@@ -21,8 +29,8 @@ export default async function AJAX({
 
     if (!links) {
       const linksRes = response = await axios({
-        url: `${basepath}/chronograf/v1`,
-        method: 'GET',
+          url: `${basepath}/chronograf/v1`,
+          method: 'GET',
       })
       links = linksRes.data
     }

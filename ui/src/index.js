@@ -9,6 +9,7 @@ import AlertsApp from 'src/alerts'
 import CheckSources from 'src/CheckSources'
 import {HostsPage, HostPage} from 'src/hosts'
 import {KubernetesPage} from 'src/kubernetes'
+import GalleryApp from 'src/gallery/containers/GalleryApp'
 import {Login} from 'src/auth'
 import {KapacitorPage, KapacitorRulePage, KapacitorRulesPage, KapacitorTasksPage} from 'src/kapacitor'
 import DataExplorer from 'src/data_explorer'
@@ -145,6 +146,7 @@ const Root = React.createClass({
               <Route path="alerts" component={AlertsApp} />
               <Route path="dashboards" component={DashboardsPage} />
               <Route path="dashboards/:dashboardID" component={DashboardPage} />
+              <Route path="gallery" component={GalleryApp} />
               <Route path="alert-rules" component={KapacitorRulesPage} />
               <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
               <Route path="alert-rules/new" component={KapacitorRulePage} />
