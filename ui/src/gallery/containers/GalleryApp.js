@@ -26,6 +26,7 @@ class GalleryApp extends Component {
 
   render() {
     const apps = _.keys(this.state.apps)
+    const {source} = this.props
 
     return (
       <div className="page">
@@ -53,18 +54,19 @@ class GalleryApp extends Component {
                       </thead>
                       <tbody>
                       {
-                          _.forEach(apps, (app) => {
-                            console.log(app)
-                            const id = _.head(this.state.apps[app]).id
-                            return (
-                              <tr key={id} className="">
+                        apps.map((app) => {
+                          const id = _.head(this.state.apps[app]).id
+                          return (
+                            <tr key={id} className="">
                               <td className="monotype">
+                                <Link
+                                  to={{pathname: `/sources/${source.id}/gallery/${app}`}}>
                                   {app}
+                                </Link>
                               </td>
-                              </tr>
-                            )
-                          }
-                        )
+                            </tr>
+                          )
+                        })
                       }
                       </tbody>
                     </table>
@@ -86,6 +88,7 @@ const {
 
 GalleryApp.propTypes = {
   source: shape({
+    id: string.isRequired,
     links: shape({
       proxy: string.isRequired,
     }).isRequired,
