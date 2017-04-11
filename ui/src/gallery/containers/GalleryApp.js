@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {getMeasurements, getGallery} from 'src/gallery/apis'
 import {Links} from 'src/utils/ajax'
+import _ from 'lodash'
 
 class GalleryApp extends Component {
   constructor(props) {
@@ -8,10 +9,12 @@ class GalleryApp extends Component {
   }
 
   componentDidMount() {
-    const measurements = getMeasurements(this.props.source.links.proxy, this.props.source.telegraf)
-    Links().then(({data}) => {
-      getGallery(data.dashboardd, measurements).then((resp) => {
-        console.log(resp.data)
+    const source = this.props.source
+    getMeasurements(source.links.proxy, source.telegraf).then((measurements) => {
+      Links().then(({data}) => {
+        getGallery(data.dashboardd, measurements).then((resp) => {
+          const apps = _.groupBy(_.get(resp, 'data.layouts', []), 'app')
+        })
       })
     })
   }

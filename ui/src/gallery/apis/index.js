@@ -1,7 +1,7 @@
 import {proxy} from 'utils/queryUrlGenerator'
 import axios from 'axios'
 
-export function getMeasurements(proxyLink, db) {
+export async function getMeasurements(proxyLink, db) {
   return proxy({
     source: proxyLink,
     query: "SHOW MEASUREMENTS",
@@ -28,9 +28,8 @@ function _hasError(resp) {
 
 export async function getGallery(galleryLink, measurements) {
   const serializer = (params) => {
-    params.map((m) => `measurement=${m}`).join('&')
+    return params.map((m) => `measurement=${m}`).join('&')
   }
-
   const response = await axios({
     url: galleryLink,
     method: 'GET',
