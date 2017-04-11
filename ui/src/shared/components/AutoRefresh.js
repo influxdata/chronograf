@@ -59,7 +59,8 @@ export default function AutoRefresh(ComposedComponent) {
       return _.difference(_.union(leftStrs, rightStrs), _.intersection(leftStrs, rightStrs))
     },
     executeQueries(queries) {
-      if (!queries.length) {
+      const validQueries = queries.filter((q) => q.text)
+      if (!validQueries.length) {
         this.setState({
           timeSeries: [],
         })
@@ -69,11 +70,11 @@ export default function AutoRefresh(ComposedComponent) {
       this.setState({isFetching: true})
       let count = 0
       const newSeries = []
-      queries.forEach(({host, database, rp, text}) => {
+      validQueries.forEach(({host, database, rp, text}) => {
         _fetchTimeSeries(host, database, rp, text).then((resp) => {
           newSeries.push({response: resp.data})
           count += 1
-          if (count === queries.length) {
+          if (count === validQueries.length) {
             const querySuccessful = !this._noResultsForQuery(newSeries)
             this.setState({
               lastQuerySuccessful: querySuccessful,
