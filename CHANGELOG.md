@@ -1,14 +1,9 @@
 ## v1.2.0 [unreleased]
+
 ### Bug Fixes
 ### Features
 ### UI Improvements
   1. [#1258](https://github.com/influxdata/chronograf/pull/1258): Display Kapacitor alert endpoint options as radio button group
-
-## v1.2.0 [unreleased]
-
-### Bug Fixes
-### Features
-### UI Improvements
 
 ## v1.2.0-beta8 [2017-04-07]
 
