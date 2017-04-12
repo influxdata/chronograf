@@ -3,6 +3,7 @@
 ### Bug Fixes
 ### Features
 ### UI Improvements
+  1. [#1259](https://github.com/influxdata/chronograf/pull/1259): Display helper text in an empty dashboard
 
 ## v1.2.0-beta8 [2017-04-07]
 
