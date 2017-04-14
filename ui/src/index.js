@@ -57,7 +57,7 @@ window.addEventListener('keyup', (event) => {
 console.error = (error) => {
   console.warn(error)
   localStorage.removeItem('state')
-};
+}
 
 const Root = React.createClass({
   getInitialState() {
