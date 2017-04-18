@@ -3,6 +3,7 @@ package oauth2
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	gojwt "github.com/dgrijalva/jwt-go"
@@ -88,6 +89,7 @@ func (j *JWT) ValidClaims(jwtToken Token, lifespan time.Duration, alg gojwt.Keyf
 	// an invalid claim because server assumes that lifespan is the maximum possible
 	// duration
 	if exp.Sub(iat) > lifespan {
+		log.Printf("IAT %s LIFESPAN %s", iat, lifespan)
 		return Principal{}, fmt.Errorf("claims duration is different from auth lifespan")
 	}
 

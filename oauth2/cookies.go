@@ -2,6 +2,7 @@ package oauth2
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 )
@@ -26,10 +27,19 @@ type cookie struct {
 
 // NewCookieJWT creates an Authenticator that uses cookies for auth
 func NewCookieJWT(secret string, lifespan time.Duration) Authenticator {
+	inactivity := DefaultInactivityDuration
+	// Server interprets a token duration longer than the cookie lifespan as
+	// a token that was issued by a server with a longer auth-duration and is
+	// thus invalid, as a security precaution. So, inactivity must be set to
+	// be less than lifespan.
+	if lifespan > 0 && inactivity > lifespan {
+		inactivity = lifespan / 2 //
+	}
+	log.Printf("LIFESPAN HERE %s\tINACTIVITY %s", lifespan, inactivity)
 	return &cookie{
 		Name:       DefaultCookieName,
 		Lifespan:   lifespan,
-		Inactivity: DefaultInactivityDuration,
+		Inactivity: inactivity,
 		Now:        DefaultNowTime,
 		Tokens: &JWT{
 			Secret: secret,
@@ -42,9 +52,16 @@ func NewCookieJWT(secret string, lifespan time.Duration) Authenticator {
 func (c *cookie) Validate(ctx context.Context, r *http.Request) (Principal, error) {
 	cookie, err := r.Cookie(c.Name)
 	if err != nil {
+
+		log.Printf("COOKIE ERR %v", err)
 		return Principal{}, ErrAuthentication
 	}
-	return c.Tokens.ValidPrincipal(ctx, Token(cookie.Value), c.Lifespan)
+
+	tokenDuration := c.Lifespan
+	if c.Lifespan == 0 {
+		tokenDuration = c.Inactivity
+	}
+	return c.Tokens.ValidPrincipal(ctx, Token(cookie.Value), tokenDuration)
 }
 
 // Extend will extend the lifetime of the Token by the Inactivity time.  Assumes
@@ -53,12 +70,14 @@ func (c *cookie) Extend(ctx context.Context, w http.ResponseWriter, p Principal)
 	// Refresh the token by extending its life another Inactivity duration
 	p, err := c.Tokens.ExtendedPrincipal(ctx, p, c.Inactivity)
 	if err != nil {
+		log.Printf("Extend ERR %v", err)
 		return Principal{}, ErrAuthentication
 	}
 
 	// Creating a new token with the extended principal
 	token, err := c.Tokens.Create(ctx, p)
 	if err != nil {
+		log.Printf("create ERR %v", err)
 		return Principal{}, ErrAuthentication
 	}
 
@@ -105,15 +124,22 @@ func (c *cookie) setCookie(w http.ResponseWriter, value string, exp time.Time) {
 
 	// Only set a cookie to be persistent (endure beyond the browser session)
 	// if auth duration is greater than zero
-	if c.Lifespan > 0 || exp.Before(c.Now()) {
+	if c.Lifespan > 0 {
 		cookie.Expires = exp
 	}
-
 	http.SetCookie(w, &cookie)
 }
 
 // Expire returns a cookie that will expire an existing cookie
 func (c *cookie) Expire(w http.ResponseWriter) {
 	// to expire cookie set the time in the past
-	c.setCookie(w, "none", c.Now().Add(-1*time.Hour))
+	cookie := http.Cookie{
+		Name:     DefaultCookieName,
+		Value:    "none",
+		HttpOnly: true,
+		Path:     "/",
+		Expires:  c.Now().Add(-1 * time.Hour),
+	}
+
+	http.SetCookie(w, &cookie)
 }

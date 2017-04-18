@@ -26,6 +26,7 @@ func AuthorizedToken(auth oauth2.Authenticator, logger chronograf.Logger, next h
 		principal, err := auth.Validate(ctx, r)
 		if err != nil {
 			log.Error("Invalid principal")
+			log.Debug("Invalid principal error %v", err)
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
@@ -35,6 +36,7 @@ func AuthorizedToken(auth oauth2.Authenticator, logger chronograf.Logger, next h
 		principal, err = auth.Extend(ctx, w, principal)
 		if err != nil {
 			log.Error("Unable to extend principal")
+			log.Debug("Extension error principal error %v", err)
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
