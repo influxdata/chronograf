@@ -3,7 +3,6 @@ package oauth2
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	gojwt "github.com/dgrijalva/jwt-go"
@@ -46,7 +45,7 @@ func (c *Claims) Valid() error {
 }
 
 // ValidPrincipal checks if the jwtToken is signed correctly and validates with Claims.  lifespan is the
-// maximum valid lifetime of a token.
+// maximum valid lifetime of a token.  If the lifespan is 0 then the auth lifespan duration is not checked.
 func (j *JWT) ValidPrincipal(ctx context.Context, jwtToken Token, lifespan time.Duration) (Principal, error) {
 	gojwt.TimeFunc = j.Now
 
@@ -87,9 +86,9 @@ func (j *JWT) ValidClaims(jwtToken Token, lifespan time.Duration, alg gojwt.Keyf
 
 	// If the duration of the claim is longer than the auth lifespan then this is
 	// an invalid claim because server assumes that lifespan is the maximum possible
-	// duration
-	if exp.Sub(iat) > lifespan {
-		log.Printf("IAT %s LIFESPAN %s", iat, lifespan)
+	// duration.  However, a lifespan of zero means that the duration comparison
+	// against the auth duration is not needed.
+	if lifespan > 0 && exp.Sub(iat) > lifespan {
 		return Principal{}, fmt.Errorf("claims duration is different from auth lifespan")
 	}
 

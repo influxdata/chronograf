@@ -2,7 +2,6 @@ package oauth2
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 )
@@ -33,9 +32,8 @@ func NewCookieJWT(secret string, lifespan time.Duration) Authenticator {
 	// thus invalid, as a security precaution. So, inactivity must be set to
 	// be less than lifespan.
 	if lifespan > 0 && inactivity > lifespan {
-		inactivity = lifespan / 2 //
+		inactivity = lifespan / 2 // half of the lifespan ensures tokens can be refreshed once.
 	}
-	log.Printf("LIFESPAN HERE %s\tINACTIVITY %s", lifespan, inactivity)
 	return &cookie{
 		Name:       DefaultCookieName,
 		Lifespan:   lifespan,
@@ -52,16 +50,10 @@ func NewCookieJWT(secret string, lifespan time.Duration) Authenticator {
 func (c *cookie) Validate(ctx context.Context, r *http.Request) (Principal, error) {
 	cookie, err := r.Cookie(c.Name)
 	if err != nil {
-
-		log.Printf("COOKIE ERR %v", err)
 		return Principal{}, ErrAuthentication
 	}
 
-	tokenDuration := c.Lifespan
-	if c.Lifespan == 0 {
-		tokenDuration = c.Inactivity
-	}
-	return c.Tokens.ValidPrincipal(ctx, Token(cookie.Value), tokenDuration)
+	return c.Tokens.ValidPrincipal(ctx, Token(cookie.Value), c.Lifespan)
 }
 
 // Extend will extend the lifetime of the Token by the Inactivity time.  Assumes
@@ -70,14 +62,12 @@ func (c *cookie) Extend(ctx context.Context, w http.ResponseWriter, p Principal)
 	// Refresh the token by extending its life another Inactivity duration
 	p, err := c.Tokens.ExtendedPrincipal(ctx, p, c.Inactivity)
 	if err != nil {
-		log.Printf("Extend ERR %v", err)
 		return Principal{}, ErrAuthentication
 	}
 
 	// Creating a new token with the extended principal
 	token, err := c.Tokens.Create(ctx, p)
 	if err != nil {
-		log.Printf("create ERR %v", err)
 		return Principal{}, ErrAuthentication
 	}
 
