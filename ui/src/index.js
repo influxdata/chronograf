@@ -53,6 +53,12 @@ window.addEventListener('keyup', (event) => {
   }
 })
 
+// Dump localStorage state on any error
+console.error = (error) => {
+  console.warn(error) // eslint-disable-line no-console
+  localStorage.removeItem('state')
+}
+
 const Root = React.createClass({
   getInitialState() {
     return {
