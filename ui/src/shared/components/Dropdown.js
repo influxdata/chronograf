@@ -11,6 +11,7 @@ class Dropdown extends Component {
     }
 
     this.handleClickOutside = ::this.handleClickOutside
+    this.handleClick = ::this.handleClick
     this.handleSelection = ::this.handleSelection
     this.toggleMenu = ::this.toggleMenu
     this.handleAction = ::this.handleAction
