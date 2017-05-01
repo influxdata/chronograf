@@ -1,13 +1,25 @@
+rwildcard := $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
 .PHONY: assets dep clean test gotest gotestrace jstest run run-dev ctags continuous
+
+GO_SOURCES := $(call rwildcard,./,*.go)
+GO_GENSOURCES := $(call rwildcard,./,*_gen.go)
+SOURCES := $(filter-out $(GO_GENSOURCES),$(GO_SOURCES))
+
+UI_FILES := $(call rwildcard,./ui,*)
+BUILD_FILES := $(call rwildcard,./ui/build,*)
+PACKAGE_FILES := $(call rwildcard,./ui/node_modules,*)
+
+UISOURCES := $(filter-out $(PACKAGE_FILES), $(filter-out $(UI_FILES),$(PACKAGE_FILES)))
 
 VERSION ?= $(shell git describe --always --tags)
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
 GDM := $(shell command -v gdm 2> /dev/null)
 GOBINDATA := $(shell go list -f {{.Root}}  github.com/jteeuwen/go-bindata 2> /dev/null)
-YARN := $(shell command -v yarn 2> /dev/null)
+YARN := $(shell yarn --version)
 
-SOURCES := $(shell find . -name '*.go' ! -name '*_gen.go')
-UISOURCES := $(shell find ui -type f -not \( -path ui/build/\* -o -path ui/node_modules/\* -prune \) )
+# SOURCES := $(shell find . -name '*.go' ! -name '*_gen.go')
+# UISOURCES := $(shell find ui -type f -not \( -path ui/build/\* -o -path ui/node_modules/\* -prune \) )
 
 LDFLAGS=-ldflags "-s -X main.version=${VERSION} -X main.commit=${COMMIT}"
 BINARY=chronograf
@@ -49,7 +61,7 @@ assets: .jssrc .bindata
 dev-assets: .dev-jssrc .bindata
 
 .bindata: server/swagger_gen.go canned/bin_gen.go dist/dist_gen.go
-	@touch .bindata
+	@echo $null >> .bindata
 
 dist/dist_gen.go: $(UISOURCES)
 	go generate -x ./dist
@@ -62,11 +74,11 @@ canned/bin_gen.go: canned/*.json
 
 .jssrc: $(UISOURCES)
 	cd ui && npm run build
-	@touch .jssrc
+	@echo $null >> .jssrc
 
 .dev-jssrc: $(UISOURCES)
 	cd ui && npm run build:dev
-	@touch .dev-jssrc
+	@echo $null >> .dev-jssrc
 
 dep: .jsdep .godep
 
@@ -80,14 +92,14 @@ ifndef GOBINDATA
 	go get -u github.com/jteeuwen/go-bindata/...
 endif
 	gdm restore
-	@touch .godep
+	@echo $null >> .godep
 
 .jsdep: ui/yarn.lock
 ifndef YARN
 	$(error Please install yarn 0.19.1+)
 else
 	cd ui && yarn --no-progress --no-emoji
-	@touch .jsdep
+	@echo $null >> .jsdep
 endif
 
 gen: bolt/internal/internal.proto

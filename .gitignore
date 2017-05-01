@@ -17,3 +17,5 @@ npm-debug.log
 .jssrc
 .dev-jssrc
 .bindata
+chronograf-v1.db.lock
+chronograf.exe

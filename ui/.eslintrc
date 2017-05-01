@@ -151,7 +151,7 @@
     'id-match': 0,
     'indent': [0, 2, {SwitchCase: 1}],
     'key-spacing': [2, {beforeColon: false, afterColon: true}],
-    'linebreak-style': [2, 'unix'],
+    'linebreak-style': [0, 'unix'],
     'lines-around-comment': 0,
     'max-depth': 0,
     'max-len': 0,
