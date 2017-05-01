@@ -145,7 +145,7 @@ To get started right away with Docker, you can pull down our latest alpha:
 docker pull quay.io/influxdb/chronograf:latest
 ```
 
-### From Source
+### From Source on Linux and MacOS
 
 * Chronograf works with go 1.7.x, node 6.x/7.x, and yarn 0.18+.
 * Chronograf requires [Kapacitor](https://github.com/influxdata/kapacitor) 1.1.x+ to create and store alerts.
@@ -158,6 +158,23 @@ docker pull quay.io/influxdb/chronograf:latest
 1. Run `cd $GOPATH/src/github.com/influxdata/chronograf`
 1. Run `make`
 1. To install run `go install github.com/influxdata/chronograf/cmd/chronograf`
+
+### From Source on Windows
+
+* These instructions are similar to those listed above, but there are some minor differences.
+* Chronograf is best built on Windows 10 using a PowerShell with admin privileges.
+
+1. [Install Go](https://golang.org/doc/install)
+1. [Install Node and NPM](https://nodejs.org/en/download/)
+1. [Install yarn](https://yarnpkg.com/docs/install)
+1. [Install Chocolatey](https://chocolatey.org/install)
+1. Install make `chocolatey install make`
+1. (Optionally) Install git `chocolatey install git`
+1. [Setup your GOPATH](https://golang.org/doc/code.html#GOPATH)
+1. Run `go get github.com/influxdata/chronograf`
+1. Run `cd $Env:GOPATH/src/github.com/influxdata/chronograf`
+1. Run `make`
+1. Rename the chronograf binary `mv chronograf chronograf.exe`
 
 ## Documentation
 
