@@ -188,10 +188,10 @@ const HostRow = React.createClass({
     const {name, cpu, load, apps = []} = host
 
     let stateStr = ''
-    if (host.deltaUptime < 0) {
-      stateStr = 'table-dot dot-critical'
-    } else if (host.deltaUptime > 0) {
+    if (host.deltaUptime > 0) {
       stateStr = 'table-dot dot-success'
+    } else {
+      stateStr = 'table-dot dot-critical'
     }
 
     return (
