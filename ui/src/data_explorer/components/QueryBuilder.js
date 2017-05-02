@@ -79,7 +79,8 @@ const QueryBuilder = React.createClass({
   },
 
   render() {
-    const {query, timeRange, templates} = this.props
+    const {query, templates} = this.props
+    const timeRange = query.range || {upper: null, lower: null}
     const q = query.rawText || buildInfluxQLQuery(timeRange, query) || ''
 
     return (
