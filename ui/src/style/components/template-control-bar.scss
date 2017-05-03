@@ -15,6 +15,7 @@ $template-control--margin: 2px;
   padding: $template-control--margin;
   @extend .cell-shell;
   background-color: $g0-obsidian;
+  min-height: 55px;
 }
 .template-control--heading {
   font-size: 16px;
@@ -60,7 +61,7 @@ $template-control--margin: 2px;
       &:hover {@include gradient-h($c-comet,$c-pool);}
     }
   }
-} 
+}
 .template-control--label {
   @include no-user-select();
   order: 1;
