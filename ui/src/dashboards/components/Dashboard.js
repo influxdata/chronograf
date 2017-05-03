@@ -8,7 +8,6 @@ import Dropdown from 'shared/components/Dropdown'
 
 const Dashboard = ({
   source,
-  timeRange,
   dashboard,
   onAddCell,
   onEditCell,
@@ -19,14 +18,13 @@ const Dashboard = ({
   onPositionChange,
   inPresentationMode,
   onOpenTemplateManager,
+  templatesIncludingDashTime,
   onSummonOverlayTechnologies,
   onSelectTemplate,
 }) => {
   if (dashboard.id === 0) {
     return null
   }
-
-  const {templates} = dashboard
 
   const cells = dashboard.cells.map(cell => {
     const dashboardCell = {...cell}
@@ -52,7 +50,7 @@ const Dashboard = ({
     >
       <div className="template-control-bar">
         <h1 className="template-control--heading">Template Variables</h1>
-        {templates.map(({id, values, tempVar}) => {
+        {dashboard.templates.map(({id, values, tempVar}) => {
           const items = values.map(value => ({...value, text: value.value}))
           const selectedItem = items.find(item => item.selected) || items[0]
           const selectedText = selectedItem && selectedItem.text
@@ -80,13 +78,12 @@ const Dashboard = ({
           onClick={onOpenTemplateManager}
         >
           <span className="icon cog-thick" />
-           Manage
+          Manage
         </button>
       </div>
       {cells.length
         ? <LayoutRenderer
-            timeRange={timeRange}
-            templates={templates}
+            templates={templatesIncludingDashTime}
             cells={cells}
             autoRefresh={autoRefresh}
             source={source.links.proxy}
@@ -110,7 +107,27 @@ const Dashboard = ({
 const {arrayOf, bool, func, shape, string, number} = PropTypes
 
 Dashboard.propTypes = {
-  dashboard: shape({}).isRequired,
+  dashboard: shape({
+    templates: arrayOf(
+      shape({
+        type: string.isRequired,
+        tempVar: string.isRequired,
+        query: shape({
+          db: string,
+          rp: string,
+          influxql: string,
+        }),
+        values: arrayOf(
+          shape({
+            type: string.isRequired,
+            value: string.isRequired,
+            selected: bool,
+          })
+        ).isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  templatesIncludingDashTime: arrayOf(shape()).isRequired,
   inPresentationMode: bool,
   onAddCell: func,
   onPositionChange: func,
@@ -128,24 +145,6 @@ Dashboard.propTypes = {
   timeRange: shape({}).isRequired,
   onOpenTemplateManager: func.isRequired,
   onSelectTemplate: func.isRequired,
-  templates: arrayOf(
-    shape({
-      type: string.isRequired,
-      tempVar: string.isRequired,
-      query: shape({
-        db: string,
-        rp: string,
-        influxql: string,
-      }),
-      values: arrayOf(
-        shape({
-          type: string.isRequired,
-          value: string.isRequired,
-          selected: bool,
-        })
-      ).isRequired,
-    })
-  ),
 }
 
 export default Dashboard
