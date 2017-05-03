@@ -7,7 +7,7 @@ import TagList from './TagList'
 import QueryEditor from './QueryEditor'
 import buildInfluxQLQuery from 'utils/influxql'
 
-const {arrayOf, func, shape, string} = PropTypes
+const {arrayOf, bool, func, shape, string} = PropTypes
 
 const QueryBuilder = React.createClass({
   propTypes: {
@@ -28,6 +28,7 @@ const QueryBuilder = React.createClass({
         tempVar: string.isRequired,
       })
     ),
+    isInDataExplorer: bool,
     actions: shape({
       chooseNamespace: func.isRequired,
       chooseMeasurement: func.isRequired,
@@ -79,8 +80,16 @@ const QueryBuilder = React.createClass({
   },
 
   render() {
-    const {query, templates} = this.props
-    const timeRange = query.range || {upper: null, lower: ':dashTime:'}
+    const {query, templates, isInDataExplorer} = this.props
+
+    let timeRange
+
+    if (isInDataExplorer) {
+      timeRange = this.props.timeRange
+    } else {
+      timeRange = query.range || {upper: null, lower: ':dashTime:'}
+    }
+
     const q = query.rawText || buildInfluxQLQuery(timeRange, query) || ''
 
     return (
