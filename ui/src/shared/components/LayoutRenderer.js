@@ -133,7 +133,7 @@ export const LayoutRenderer = React.createClass({
         let queryText
         if (query.queryConfig) {
           const {queryConfig: {rawText, range}} = query
-          const timeRange = range || {upper: null, lower: ':dashTime:'}
+          const timeRange = range || {upper: null, lower: ':dashboardTime:'}
           queryText =
             rawText || buildInfluxQLQuery(timeRange, query.queryConfig)
         } else {

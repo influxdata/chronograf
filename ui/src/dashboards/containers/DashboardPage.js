@@ -226,9 +226,9 @@ class DashboardPage extends Component {
     } = this.props
 
     const dashboard = dashboards.find(d => d.id === +dashboardID)
-    const dashTime = {
+    const dashboardTime = {
       id: 'dashtime',
-      tempVar: ':dashTime:',
+      tempVar: ':dashboardTime:',
       type: 'constant',
       values: [
         {
@@ -240,7 +240,7 @@ class DashboardPage extends Component {
     }
 
     const templatesIncludingDashTime = (dashboard &&
-      dashboard.templates.concat(dashTime)) || []
+      dashboard.templates.concat(dashboardTime)) || []
 
     const {selectedCell, isEditMode, isTemplating} = this.state
 

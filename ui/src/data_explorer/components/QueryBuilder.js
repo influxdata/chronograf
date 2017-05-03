@@ -82,13 +82,13 @@ const QueryBuilder = React.createClass({
   render() {
     const {query, templates, isInDataExplorer} = this.props
 
-    // DE does not understand templating. :dashTime: is specific to dashboards
+    // DE does not understand templating. :dashboardTime: is specific to dashboards
     let timeRange
 
     if (isInDataExplorer) {
       timeRange = this.props.timeRange
     } else {
-      timeRange = query.range || {upper: null, lower: ':dashTime:'}
+      timeRange = query.range || {upper: null, lower: ':dashboardTime:'}
     }
 
     const q = query.rawText || buildInfluxQLQuery(timeRange, query) || ''
