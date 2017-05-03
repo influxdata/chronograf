@@ -82,6 +82,7 @@ const QueryBuilder = React.createClass({
   render() {
     const {query, templates, isInDataExplorer} = this.props
 
+    // DE does not understand templating. :dashTime: is specific to dashboards
     let timeRange
 
     if (isInDataExplorer) {
