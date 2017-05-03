@@ -6,6 +6,8 @@
   1. [#1376](https://github.com/influxdata/chronograf/pull/1376): Fix queries built in query builder with math functions in fields
 
 ### Features
+  1. [#1391](https://github.com/influxdata/chronograf/pull/1391): :dashboardTime: - Support cell-specific time ranges
+
 ### UI Improvements
   1. [#1378](https://github.com/influxdata/chronograf/pull/1378): Save query time range for dashboards
   1. [#1365](https://github.com/influxdata/chronograf/pull/1365): Show red indicator on Hosts Page for an offline host
