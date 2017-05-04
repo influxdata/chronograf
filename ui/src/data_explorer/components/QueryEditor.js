@@ -6,7 +6,7 @@ import Dropdown from 'src/shared/components/Dropdown'
 import LoadingDots from 'src/shared/components/LoadingDots'
 import TemplateDrawer from 'src/shared/components/TemplateDrawer'
 import {QUERY_TEMPLATES} from 'src/data_explorer/constants'
-import {TEMPLATE_MATCHER} from 'src/dashboards/constants'
+import {DECOY_MATCHER, TEMPLATE_MATCHER} from 'src/dashboards/constants'
 
 class QueryEditor extends Component {
   constructor(props) {
@@ -97,13 +97,20 @@ class QueryEditor extends Component {
     const isEnter = key === 'Enter'
     const {tempVar} = selectedTemplate
 
+    const obviousDecoy = '😸$1😸'
+
+    // replace decoys with bogeys
+    const bogeyValue = value.replace(DECOY_MATCHER, obviousDecoy)
+    // match targets (now that we have no decoys this is much easier)
+    const matched = bogeyValue.match(TEMPLATE_MATCHER)
+
     let templatedValue
-    const matched = value.match(TEMPLATE_MATCHER)
     if (matched) {
       const newTempVar = isEnter
         ? tempVar
         : tempVar.substring(0, tempVar.length - 1)
-      templatedValue = value.replace(TEMPLATE_MATCHER, newTempVar)
+      templatedValue = bogeyValue.replace(TEMPLATE_MATCHER, newTempVar)
+      templatedValue = templatedValue.replace(/😸([\w-]*)😸/g, ':$1:')
     }
 
     const enterModifier = isEnter ? 0 : -1
@@ -145,7 +152,15 @@ class QueryEditor extends Component {
     const {templates} = this.props
     const {selectedTemplate} = this.state
     const value = this.editor.value
-    const matches = value.match(TEMPLATE_MATCHER)
+
+    const obviousDecoy = '😸$1😸'
+
+    // replace decoys with bogeys
+    const bogeyValue = value.replace(DECOY_MATCHER, obviousDecoy)
+    // match targets
+    const matches = bogeyValue.match(TEMPLATE_MATCHER)
+    // replace bogeys with decoys
+
     if (matches) {
       // maintain cursor poition
       const start = this.editor.selectionStart
