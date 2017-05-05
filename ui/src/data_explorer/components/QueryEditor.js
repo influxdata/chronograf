@@ -1,6 +1,6 @@
 import React, {PropTypes, Component} from 'react'
 import _ from 'lodash'
-import classNames from 'classnames'
+import classnames from 'classnames'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import LoadingDots from 'src/shared/components/LoadingDots'
@@ -159,7 +159,7 @@ class QueryEditor extends Component {
     const masked = applyMasks(value)
     const matched = masked.match(MATCH_INCOMPLETE_TEMPLATES)
 
-    if (matched) {
+    if (matched && !_.isEmpty(templates)) {
       // maintain cursor poition
       const start = this.editor.selectionStart
       const end = this.editor.selectionEnd
@@ -219,7 +219,7 @@ class QueryEditor extends Component {
           spellCheck="false"
         />
         <div
-          className={classNames('varmoji', {'varmoji-rotated': isTemplating})}
+          className={classnames('varmoji', {'varmoji-rotated': isTemplating})}
         >
           <div className="varmoji-container">
             <div className="varmoji-front">{this.renderStatus(status)}</div>
@@ -271,14 +271,14 @@ class QueryEditor extends Component {
     return (
       <div className="query-editor--status">
         <span
-          className={classNames('query-status-output', {
+          className={classnames('query-status-output', {
             'query-status-output--error': status.error,
             'query-status-output--success': status.success,
             'query-status-output--warning': status.warn,
           })}
         >
           <span
-            className={classNames('icon', {
+            className={classnames('icon', {
               stop: status.error,
               checkmark: status.success,
               'alert-triangle': status.warn,

@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react'
 import rome from 'rome'
 import moment from 'moment'
-import classNames from 'classnames'
+import classnames from 'classnames'
 import OnClickOutside from 'react-onclickoutside'
 
 class CustomTimeRangeDropdown extends Component {
@@ -46,7 +46,7 @@ class CustomTimeRangeDropdown extends Component {
 
     return (
       <div
-        className={classNames('custom-time-range', {show: isVisible})}
+        className={classnames('custom-time-range', {show: isVisible})}
         style={{display: 'flex'}}
       >
         <button
