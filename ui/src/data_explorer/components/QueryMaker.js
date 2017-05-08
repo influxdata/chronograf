@@ -37,13 +37,11 @@ const QueryMaker = React.createClass({
       applyFuncsToField: func.isRequired,
       editRawTextAsync: func.isRequired,
     }).isRequired,
-    height: string,
-    top: string,
     setActiveQueryIndex: func.isRequired,
     onDeleteQuery: func.isRequired,
     activeQueryIndex: number,
     children: node,
-    layout: string,
+    isVertical: bool,
   },
 
   handleAddQuery() {
@@ -67,9 +65,9 @@ const QueryMaker = React.createClass({
   },
 
   render() {
-    const {height, top, layout} = this.props
+    const {isVertical} = this.props
     return (
-      <div className={classnames('query-maker', {'query-maker--panel': layout === 'panel'})} style={{height, top}}>
+      <div className={classnames('query-maker', {'query-maker--vertical': isVertical})}>
         {this.renderQueryTabList()}
         {this.renderQueryBuilder()}
       </div>
@@ -77,13 +75,13 @@ const QueryMaker = React.createClass({
   },
 
   renderQueryBuilder() {
-    const {timeRange, actions, source, templates, layout, isInDataExplorer} = this.props
+    const {timeRange, actions, source, templates, isVertical, isInDataExplorer} = this.props
     const query = this.getActiveQuery()
 
     if (!query) {
       return (
         <div className="query-maker--empty">
-          <h5>This Graph has no Queries</h5>
+          <h4>This {isInDataExplorer ? 'Graph' : 'Cell'} has no Queries</h4>
           <br />
           <div
             className="btn btn-primary"
@@ -117,7 +115,7 @@ const QueryMaker = React.createClass({
         query={query}
         actions={actions}
         onAddQuery={this.handleAddQuery}
-        layout={layout}
+        isVertical={isVertical}
         isInDataExplorer={isInDataExplorer}
       />
     )
@@ -152,18 +150,21 @@ const QueryMaker = React.createClass({
           )
         })}
         {this.props.children}
-        <div
-          className="query-maker--new btn btn-sm btn-primary"
-          onClick={this.handleAddQuery}
-        >
-          <span className="icon plus" />
-        </div>
+        {queries.length > 0
+          ? <div
+              className="query-maker--new btn btn-sm btn-primary"
+              onClick={this.handleAddQuery}
+            >
+              <span className="icon plus" />
+            </div>
+          : null
+        }
       </div>
     )
   },
 })
 
 QueryMaker.defaultProps = {
-  layout: 'default',
+  isVertical: false,
 }
 export default QueryMaker

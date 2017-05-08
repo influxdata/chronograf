@@ -164,6 +164,18 @@ button.btn.btn-sm > span.icon {
     color: $g2-kevlar !important;
   }
 }
+/* Square Buttons */
+
+.btn.btn-square {
+  padding: 0 !important;
+  text-align: center;
+  width: 36px;
+
+  & > span.icon {margin-right: 0 !important;}
+
+  &.btn-sm {width: 30px;}
+  &.btn-xs {width: 22px;}
+}
 
 
 

@@ -1,0 +1,169 @@
+/*
+  Styles for Cell Editor
+  ------------------------------------------------------
+*/
+
+$cell-editor--panel-width: 640px;
+$cell-editor--gutter: 30px;
+$overlay-controls-height: 50px;
+$overlay-controls-bg: $g2-kevlar;
+
+.cell-editor {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: stretch;
+}
+.cell-editor--visualization {
+  flex: 1 0 0;
+
+  .graph {
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 72px;
+    height: 432px;
+  }
+}
+.cell-editor--heading {
+  flex: 0 0 60px;
+  background-color: $g0-obsidian;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $cell-editor--gutter;
+}
+.cell-editor--heading-buttons {
+  > .btn {margin-left: 4px;}
+}
+.cell-editor--heading-toggle {
+  .toggle-btn {
+    background-color: $g0-obsidian;
+  }
+  .toggle-btn:hover {
+    background-color: $g2-kevlar;
+  }
+  .toggle-btn.active {
+    background-color: $g5-pepper;
+  }
+}
+.cell-editor--title {
+  font-size: 17px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: $g18-cloud;
+  margin: 0;
+}
+.cell-editor--panel {
+  flex: 0 0 $cell-editor--panel-width;
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+}
+.cell-editor--panel-contents {
+  padding: 18px $cell-editor--gutter;
+  flex: 1 0 0;
+  @include gradient-v($g2-kevlar,$g0-obsidian);
+}
+
+/* Restyle QueryMaker Tabs in Cell Editor */
+$cell-edit-query-tabs-height: 30px;
+.cell-editor {
+  .query-maker--tabs {
+    height: $cell-edit-query-tabs-height;
+  }
+  .query-maker--tabs > div.btn.query-maker--new {
+    margin-left: 0;
+    border-radius: $radius-small $radius-small 0 0;
+  }
+  .query-maker--tab { 
+    height: $cell-edit-query-tabs-height;
+    max-width: 90px;
+
+    > label {font-size: 14px;}
+  }
+}
+
+/* Restyle QueryBuilder List Headings in Cell Editor */
+.cell-editor .query-builder--heading {
+  margin-top: 2px;
+  background-color: $g3-castle;
+  border-radius: $radius-small $radius-small 0 0;
+
+  > .dropdown,
+  > .query-builder--filter {flex: 0 0 50%;}
+  .dropdown-toggle {width: 100%;}
+}
+.cell-editor .query-builder--vertical > .query-builder--heading {
+  border-radius: $radius-small;
+}
+.cell-editor .query-builder--list,
+.cell-editor .query-builder--list-empty {
+  border-radius: 0 0 $radius-small $radius-small;
+}
+
+/* Restyle QueryEditor in Cell Editor */
+.cell-editor .query-editor {
+  padding: 16px;
+  border-radius: $radius-small;
+  border-top-left-radius: 0;
+}
+
+
+/*
+  Styles for Display Options within Cell Editor
+  ------------------------------------------------------
+*/
+$overlay-controls-gutter: 2px;
+$overlay-controls-group-padding: 16px;
+
+.overlay-controls {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.overlay-control-group {
+  border-radius: $radius-small;
+  background-color: $g3-castle;
+  padding: $overlay-controls-group-padding;
+
+  > h2 {
+    margin: 0 0 $overlay-controls-group-padding 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: $g13-mist;
+  }
+
+  &.full-width {
+    margin-bottom: $overlay-controls-gutter;
+    flex: 1 0 100%;
+  }
+  &.half-width {
+    margin-bottom: $overlay-controls-gutter;
+    flex: 0 0 calc(50% - #{$overlay-controls-gutter / 2});
+
+    & + .half-width {
+      margin-left: $overlay-controls-gutter;
+    }
+  }
+  // Grid fix
+  form {
+    margin: 0 -6px;
+  }
+}
+
+.cell-editor--viz-type {
+  display: flex;
+  width: 100%;
+
+  > .toggle-btn {
+    text-align: center;
+    flex: 1 0 0;
+    background-color: $g2-kevlar;
+
+    &:hover {background-color: $g4-onyx;}
+    &.active {background-color: $g5-pepper;}
+  }
+}

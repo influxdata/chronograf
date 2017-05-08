@@ -1,9 +1,9 @@
 import React, {Component, PropTypes} from 'react'
+import classnames from 'classnames'
 
 import _ from 'lodash'
 import uuid from 'node-uuid'
 
-import ResizeContainer from 'src/shared/components/ResizeContainer'
 import QueryMaker from 'src/data_explorer/components/QueryMaker'
 import Visualization from 'src/data_explorer/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
@@ -12,7 +12,6 @@ import * as queryModifiers from 'src/utils/queryTransitions'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import buildInfluxQLQuery from 'utils/influxql'
 import {getQueryConfig} from 'shared/apis'
-import {MINIMUM_HEIGHTS} from 'src/data_explorer/constants'
 
 class CellEditorOverlay extends Component {
   constructor(props) {
@@ -28,6 +27,7 @@ class CellEditorOverlay extends Component {
     this.handleSelectGraphType = ::this.handleSelectGraphType
     this.handleSetActiveQueryIndex = ::this.handleSetActiveQueryIndex
     this.handleEditRawText = ::this.handleEditRawText
+    this.handleSetEditorTab = ::this.handleSetEditorTab
 
     const {cell: {name, type, queries}} = props
 
@@ -40,6 +40,7 @@ class CellEditorOverlay extends Component {
       cellWorkingType: type,
       queriesWorkingDraft,
       activeQueryIndex: 0,
+      tabSelected: 'data',
     }
   }
 
@@ -113,6 +114,21 @@ class CellEditorOverlay extends Component {
     this.setState({activeQueryIndex})
   }
 
+  handleSetEditorTab(activeTab) {
+    this.setState({tabSelected: activeTab})
+  }
+
+  renderEditorTabs() {
+    const {tabSelected} = this.state
+
+    return (
+      <ul className="toggle toggle-sm cell-editor--heading-toggle">
+        <li onClick={_.wrap('data', this.handleSetEditorTab)} className={classnames('toggle-btn', {active: tabSelected === 'data'})}>Data</li>
+        <li onClick={_.wrap('display', this.handleSetEditorTab)} className={classnames('toggle-btn', {active: tabSelected === 'display'})}>Display</li>
+      </ul>
+    )
+  }
+
   async handleEditRawText(url, id, text) {
     // use this as the handler passed into fetchTimeSeries to update a query status
     try {
@@ -142,6 +158,7 @@ class CellEditorOverlay extends Component {
       cellWorkingName,
       cellWorkingType,
       queriesWorkingDraft,
+      tabSelected,
     } = this.state
 
     const queryActions = {
@@ -152,42 +169,55 @@ class CellEditorOverlay extends Component {
 
     return (
       <div className="overlay-technology">
-        <ResizeContainer
-          containerClass="resizer--full-size"
-          minTopHeight={MINIMUM_HEIGHTS.visualization}
-          minBottomHeight={MINIMUM_HEIGHTS.queryMaker}
-        >
-          <Visualization
-            autoRefresh={autoRefresh}
-            timeRange={timeRange}
-            templates={templates}
-            queryConfigs={queriesWorkingDraft}
-            activeQueryIndex={0}
-            cellType={cellWorkingType}
-            cellName={cellWorkingName}
-            editQueryStatus={editQueryStatus}
-            views={[]}
-          />
-          <div className="overlay-technology--editor">
-            <OverlayControls
-              selectedGraphType={cellWorkingType}
-              onSelectGraphType={this.handleSelectGraphType}
-              onCancel={onCancel}
-              onSave={this.handleSaveCell}
-            />
-            <QueryMaker
-              source={source}
-              templates={templates}
-              queries={queriesWorkingDraft}
-              actions={queryActions}
+        <div className="cell-editor">
+          <div className="cell-editor--panel">
+            <div className="cell-editor--heading">
+              <h1 className="cell-editor--title">Cell Editor</h1>
+              {this.renderEditorTabs()}
+              <div className="cell-editor--heading-buttons">
+                <div className="btn btn-sm btn-square btn-info" onClick={onCancel}>
+                  <span className="icon remove"/>
+                </div>
+                <div className="btn btn-sm btn-square btn-success" onClick={this.handleSaveCell}>
+                  <span className="icon checkmark"/>
+                </div>
+              </div>
+            </div>
+            <div className="cell-editor--panel-contents" style={{display: tabSelected === 'data' ? 'block' : 'none'}}>
+              <QueryMaker
+                source={source}
+                templates={templates}
+                queries={queriesWorkingDraft}
+                actions={queryActions}
+                autoRefresh={autoRefresh}
+                timeRange={timeRange}
+                setActiveQueryIndex={this.handleSetActiveQueryIndex}
+                onDeleteQuery={this.handleDeleteQuery}
+                activeQueryIndex={activeQueryIndex}
+                isVertical={true}
+              />
+            </div>
+            <div className="cell-editor--panel-contents" style={{display: tabSelected === 'display' ? 'block' : 'none'}}>
+              <OverlayControls
+                selectedGraphType={cellWorkingType}
+                onSelectGraphType={this.handleSelectGraphType}
+              />
+            </div>
+          </div>
+          <div className="cell-editor--visualization">
+            <Visualization
               autoRefresh={autoRefresh}
               timeRange={timeRange}
-              setActiveQueryIndex={this.handleSetActiveQueryIndex}
-              onDeleteQuery={this.handleDeleteQuery}
-              activeQueryIndex={activeQueryIndex}
+              templates={templates}
+              queryConfigs={queriesWorkingDraft}
+              activeQueryIndex={0}
+              cellType={cellWorkingType}
+              cellName={cellWorkingName}
+              editQueryStatus={editQueryStatus}
+              views={[]}
             />
           </div>
-        </ResizeContainer>
+        </div>
       </div>
     )
   }

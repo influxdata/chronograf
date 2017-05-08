@@ -40,7 +40,7 @@ const QueryBuilder = React.createClass({
       toggleTagAcceptance: func.isRequired,
       editRawTextAsync: func.isRequired,
     }).isRequired,
-    layout: string,
+    isVertical: bool,
   },
 
   handleChooseNamespace(namespace) {
@@ -108,19 +108,22 @@ const QueryBuilder = React.createClass({
   },
 
   renderLists() {
-    const {query, layout} = this.props
+    const {query, isVertical} = this.props
 
     // Panel layout uses a dropdown instead of a list for database selection
     // Also groups measurements & fields into their own container so they
     // can be stacked vertically.
     // TODO: Styles to make all this look proper
-    if (layout === 'panel') {
+    if (isVertical) {
       return (
-        <div className="query-builder--panel">
-          <DatabaseDropdown
-            query={query}
-            onChooseNamespace={this.handleChooseNamespace}
-          />
+        <div className="query-builder--vertical">
+          <div className="query-builder--heading">
+            <span>Database</span>
+            <DatabaseDropdown
+              query={query}
+              onChooseNamespace={this.handleChooseNamespace}
+            />
+          </div>
           <div className="query-builder">
             <MeasurementList
               query={query}
