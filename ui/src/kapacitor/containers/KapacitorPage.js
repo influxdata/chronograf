@@ -1,4 +1,6 @@
 import React, {Component, PropTypes} from 'react'
+import {withRouter} from 'react-router'
+
 import {
   getKapacitor,
   createKapacitor,
@@ -58,10 +60,10 @@ class KapacitorPage extends Component {
 
   handleSubmit(e) {
     e.preventDefault()
-    const {addFlashMessage, source} = this.props
-    const {kapacitor, exists} = this.state
+    const {addFlashMessage, source, params, router} = this.props
+    const {kapacitor} = this.state
 
-    if (exists) {
+    if (params.id) {
       updateKapacitor(kapacitor)
         .then(() => {
           addFlashMessage({type: 'success', text: 'Kapacitor Updated!'})
@@ -76,6 +78,7 @@ class KapacitorPage extends Component {
       createKapacitor(source, kapacitor)
         .then(({data}) => {
           // need up update kapacitor with info from server to AlertOutputs
+          router.push(`/sources/${source.id}/kapacitors/${data.id}/edit`)
           this.setState({kapacitor: data, exists: true})
           addFlashMessage({type: 'success', text: 'Kapacitor Created!'})
         })
@@ -132,10 +135,13 @@ KapacitorPage.propTypes = {
   params: shape({
     id: string,
   }).isRequired,
+  router: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
   source: shape({
     id: string.isRequired,
     url: string.isRequired,
   }),
 }
 
-export default KapacitorPage
+export default withRouter(KapacitorPage)
