@@ -61,7 +61,7 @@ const escapeKeyCode = 27
 window.addEventListener('keyup', event => {
   // fallback for browsers that don't support event.key
   if (event.key === 'Escape' || event.keyCode === escapeKeyCode) {
-    store.dispatch(disablePresentationMode())
+    dispatch(disablePresentationMode())
   } else if (event.keyCode === konami[kIndex]) {
     if ((kIndex += 1) >= konami.length) {
       console.log('konami!')
