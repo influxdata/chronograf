@@ -6,6 +6,7 @@ import _ from 'lodash'
 
 import timeSeriesToDygraph from 'utils/timeSeriesToDygraph'
 import lastValues from 'src/shared/parsing/lastValues'
+import {NineteenEightyFour} from 'shared/constants/lineGraphColorSets'
 
 const {array, arrayOf, bool, func, number, shape, string} = PropTypes
 
@@ -37,7 +38,7 @@ export default React.createClass({
   getDefaultProps() {
     return {
       underlayCallback: () => {},
-      isGraphFilled: true,
+      isGraphFilled: false,
       overrideLineColors: null,
     }
   },
@@ -87,6 +88,13 @@ export default React.createClass({
     } = this.props
     const {labels, timeSeries, dygraphSeries} = this._timeSeries
 
+    // Determine which set of colors to use
+    const numGraphLines = timeSeries.length ? timeSeries[0].length - 1 : 0
+    // const prettyColorSet = numGraphLines > 1
+    //   ? NineteenEightyFour[numGraphLines - 1]
+    //   : null
+    // console.log(prettyColorSet)
+
     // If data for this graph is being fetched for the first time, show a graph-wide spinner.
     if (isFetchingInitially) {
       return (
@@ -134,7 +142,11 @@ export default React.createClass({
         {isRefreshing ? this.renderSpinner() : null}
         <Dygraph
           containerStyle={{width: '100%', height: '100%'}}
-          overrideLineColors={overrideLineColors}
+          overrideLineColors={
+            !overrideLineColors && numGraphLines
+              ? NineteenEightyFour[numGraphLines - 1]
+              : overrideLineColors
+          }
           isGraphFilled={isGraphFilled}
           timeSeries={timeSeries}
           labels={labels}

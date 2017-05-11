@@ -5,22 +5,6 @@ import getRange from 'src/shared/parsing/getRangeForDygraph'
 
 const {array, arrayOf, number, bool, shape, string} = PropTypes
 
-const LINE_COLORS = [
-  '#00C9FF',
-  '#9394FF',
-  '#4ED8A0',
-  '#ff0054',
-  '#ffcc00',
-  '#33aa99',
-  '#9dfc5d',
-  '#92bcc3',
-  '#ca96fb',
-  '#ff00f0',
-  '#38b94a',
-  '#3844b9',
-  '#a0725b',
-]
-
 export default React.createClass({
   displayName: 'Dygraph',
 
@@ -47,7 +31,7 @@ export default React.createClass({
   getDefaultProps() {
     return {
       containerStyle: {},
-      isGraphFilled: true,
+      isGraphFilled: false,
       overrideLineColors: null,
       legendOnBottom: false,
     }
@@ -62,17 +46,18 @@ export default React.createClass({
   componentDidMount() {
     const timeSeries = this.getTimeSeries()
     // dygraphSeries is a legend label and its corresponding y-axis e.g. {legendLabel1: 'y', legendLabel2: 'y2'};
-    const {ranges, dygraphSeries, ruleValues, legendOnBottom} = this.props
+    const {
+      ranges,
+      dygraphSeries,
+      ruleValues,
+      legendOnBottom,
+      overrideLineColors,
+    } = this.props
 
     const refs = this.refs
     const graphContainerNode = refs.graphContainer
     const legendContainerNode = refs.legendContainer
     const markerNode = refs.graphVerticalMarker
-    let finalLineColors = this.props.overrideLineColors
-
-    if (finalLineColors === null) {
-      finalLineColors = LINE_COLORS
-    }
 
     const defaultOptions = {
       labelsSeparateLines: false,
@@ -85,7 +70,7 @@ export default React.createClass({
       axisLineWidth: 2,
       gridLineWidth: 1,
       highlightCircleSize: 3,
-      colors: finalLineColors,
+      colors: overrideLineColors,
       series: dygraphSeries,
       axes: {
         y: {
