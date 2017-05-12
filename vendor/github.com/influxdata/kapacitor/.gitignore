@@ -1,0 +1,23 @@
+.*.swp
+dist/*
+/build/*
+/*.conf
+kapacitor_linux*
+kapacitord_linux*
+/*.tick
+*~
+*#
+kapacitor*.rpm
+kapacitor*.deb
+kapacitor*.tar
+kapacitor*.zip
+*.pyc
+*.test
+/test-logs
+*.prof
+
+# Ignore any built binaries
+/kapacitor
+/kapacitord
+/tickfmt
+/tickdoc
