@@ -163,8 +163,8 @@ class QueryEditor extends Component {
       // maintain cursor poition
       const start = this.editor.selectionStart
       const end = this.editor.selectionEnd
-      const filteredTemplates = templates.filter(
-        t => t.tempVar.indexOf(matched[0]) === 0
+      const filteredTemplates = templates.filter(t =>
+        t.tempVar.startsWith(matched[0])
       )
 
       const found = filteredTemplates.find(
