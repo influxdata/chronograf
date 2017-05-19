@@ -41,7 +41,6 @@ export default React.createClass({
       value: string,
       rangeValue: string,
     }),
-    legendOnBottom: bool,
   },
 
   getDefaultProps() {
@@ -49,7 +48,6 @@ export default React.createClass({
       containerStyle: {},
       isGraphFilled: true,
       overrideLineColors: null,
-      legendOnBottom: false,
     }
   },
 
@@ -62,7 +60,7 @@ export default React.createClass({
   componentDidMount() {
     const timeSeries = this.getTimeSeries()
     // dygraphSeries is a legend label and its corresponding y-axis e.g. {legendLabel1: 'y', legendLabel2: 'y2'};
-    const {ranges, dygraphSeries, ruleValues, legendOnBottom} = this.props
+    const {ranges, dygraphSeries, ruleValues} = this.props
 
     const refs = this.refs
     const graphContainerNode = refs.graphContainer
@@ -104,12 +102,14 @@ export default React.createClass({
         const graphRect = graphContainerNode.getBoundingClientRect()
         const legendRect = legendContainerNode.getBoundingClientRect()
         const graphWidth = graphRect.width + 32 // Factoring in padding from parent
+        const graphHeight = graphRect.height
+        const graphBottom = graphRect.bottom
         const legendWidth = legendRect.width
         const legendHeight = legendRect.height
         const screenHeight = window.innerHeight
         const legendMaxLeft = graphWidth - legendWidth / 2
         const trueGraphX = e.pageX - graphRect.left
-        let legendTop = graphRect.height + 0
+
         let legendLeft = trueGraphX
 
         // Enforcing max & min legend offsets
@@ -119,17 +119,16 @@ export default React.createClass({
           legendLeft = legendMaxLeft
         }
 
-        // Enforcing overflow of legend contents
-        if (graphRect.bottom + legendHeight > screenHeight) {
-          legendTop = graphRect.top - legendHeight
-        }
+        // Disallow screen overflow of legend
+        const legendBottomExceedsScreen =
+          graphBottom + legendHeight > screenHeight
+
+        const legendTop = legendBottomExceedsScreen
+          ? graphHeight + 8 - legendHeight
+          : graphHeight + 8
 
         legendContainerNode.style.left = `${legendLeft}px`
-        if (legendOnBottom) {
-          legendContainerNode.style.bottom = '4px'
-        } else {
-          legendContainerNode.style.top = `${legendTop}px`
-        }
+        legendContainerNode.style.top = `${legendTop}px`
 
         setMarker(points)
       },

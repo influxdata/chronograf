@@ -83,7 +83,6 @@ export default React.createClass({
       showSingleStat,
       displayOptions,
       ruleValues,
-      isInDataExplorer,
     } = this.props
     const {labels, timeSeries, dygraphSeries} = this._timeSeries
 
@@ -142,7 +141,6 @@ export default React.createClass({
           dygraphSeries={dygraphSeries}
           ranges={ranges || this.getRanges()}
           ruleValues={ruleValues}
-          legendOnBottom={isInDataExplorer}
         />
         {showSingleStat
           ? <div className="graph-single-stat single-stat">{roundedValue}</div>
