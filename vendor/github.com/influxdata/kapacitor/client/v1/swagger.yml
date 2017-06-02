@@ -1,0 +1,909 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Kapacitor
+  description: >
+    Kapacitor, open source data processing engine.
+    Part of the TICK stack http://influxdata.com
+basePath: /kapacitor/v1
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /tasks:
+    get:
+      summary: Get information on all tasks
+      tags: [tasks]
+      operationId: listTasks
+      parameters:
+        - name: pattern
+          in: query
+          description: Glob style pattern to match task IDs
+          required: false
+          type: string
+        - name: fields
+          in: query
+          description: List of fields to return
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: dot-view
+          in: query
+          description: One of `labels` or `attributes`. Labels is less readable but will correctly render with all the information contained in labels.
+          required: true
+          type: string
+          pattern: (attributes|labels)
+        - name: script-format
+          in: query
+          description: One of `formatted` or `raw`. Raw will return the script identical to how it was defined. Formatted will first format the script.
+          required: true
+          type: string
+          pattern: (formatted|raw)
+        - name: offset
+          in: query
+          description: Offset count for paginating through tasks.
+          type: integer
+          format: int32
+          required: false
+          default: 0
+        - name: limit
+          in: query
+          description: Maximum number of tasks to return.
+          type: integer
+          format: int32
+          required: false
+          default: 20
+      responses:
+        '200':
+          description: List of tasks
+          schema:
+            $ref: '#/definitions/Tasks'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new task
+      tags: [tasks]
+      operationId: createTask
+      parameters:
+        - name: task
+          in: body
+          schema:
+            $ref: '#/definitions/Task'
+      responses:
+        '200':
+          description: Task ID
+          schema:
+            $ref: '#/definitions/Task'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /tasks/{id}:
+    patch:
+      summary: Update an existing task
+      tags: [tasks]
+      operationId: updateTask
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: task
+          in: body
+          schema:
+            $ref: '#/definitions/Task'
+      responses:
+        '200':
+          description: Update succeeded
+          schema:
+            $ref: '#/definitions/Task'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete an existing task
+      tags: [tasks]
+      operationId: deleteTask
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '204':
+          description: Task deleted
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get an existing task
+      tags: [tasks]
+      operationId: task
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: dot-view
+          in: query
+          description: One of `labels` or `attributes`. Labels is less readable but will correctly render with all the information contained in labels.
+          required: true
+          type: string
+          pattern: (attributes|labels)
+        - name: script-format
+          in: query
+          description: One of `formatted` or `raw`. Raw will return the script identical to how it was defined. Formatted will first format the script.
+          required: true
+          type: string
+          pattern: (formatted|raw)
+        - name: replay-id
+          in: query
+          description: Optional ID of a running replay. The returned task information will be in the context of the task for the running replay.
+          type: string
+      responses:
+        '200':
+          description: Task information
+          schema:
+            $ref: '#/definitions/Task'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /templates:
+    get:
+      summary: Get information on all templates
+      tags: [templates]
+      operationId: listTemplates
+      parameters:
+        - name: pattern
+          in: query
+          description: Glob style pattern to match template IDs
+          required: false
+          type: string
+        - name: fields
+          in: query
+          description: List of fields to return
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: script-format
+          in: query
+          description: One of `formatted` or `raw`. Raw will return the script identical to how it was defined. Formatted will first format the script.
+          required: true
+          type: string
+          pattern: (formatted|raw)
+        - name: offset
+          in: query
+          description: Offset count for paginating through templates.
+          type: integer
+          format: int32
+          required: false
+          default: 0
+        - name: limit
+          in: query
+          description: Maximum number of templates to return.
+          type: integer
+          format: int32
+          required: false
+          default: 20
+      responses:
+        '200':
+          description: List of templates
+          schema:
+            $ref: '#/definitions/Templates'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new template
+      tags: [templates]
+      operationId: createTemplate
+      parameters:
+        - name: template
+          in: body
+          schema:
+            $ref: '#/definitions/Template'
+      responses:
+        '200':
+          description: Template ID
+          schema:
+            $ref: '#/definitions/Template'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /templates/{id}:
+    patch:
+      summary: Update an existing template
+      tags: [templates]
+      operationId: updateTemplate
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: template
+          in: body
+          schema:
+            $ref: '#/definitions/Template'
+      responses:
+        '200':
+          description: Update succeeded
+          schema:
+            $ref: '#/definitions/Template'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete an existing template
+      tags: [templates]
+      operationId: deleteTemplate
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '204':
+          description: Template deleted
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get an existing template
+      tags: [templates]
+      operationId: template
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: script-format
+          in: query
+          description: One of `formatted` or `raw`. Raw will return the script identical to how it was defined. Formatted will first format the script.
+          required: true
+          type: string
+          pattern: (formatted|raw)
+      responses:
+        '200':
+          description: Template information
+          schema:
+            $ref: '#/definitions/Template'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /recordings:
+    get:
+      summary: Get information on all recordings
+      tags: [recordings]
+      operationId: listRecordings
+      parameters:
+        - name: pattern
+          in: query
+          description: Glob style pattern to match recording IDs
+          required: false
+          type: string
+        - name: fields
+          in: query
+          description: List of fields to return
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: offset
+          in: query
+          description: Offset count for paginating through recordings.
+          type: integer
+          format: int32
+          required: false
+          default: 0
+        - name: limit
+          in: query
+          description: Maximum number of recordings to return.
+          type: integer
+          format: int32
+          required: false
+          default: 20
+      responses:
+        '200':
+          description: List of recordings
+          schema:
+            $ref: '#/definitions/Recordings'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /recordings/stream:
+    post:
+      summary: Create a new stream recording
+      tags: [recordings]
+      operationId: recordStream
+      parameters:
+        - name: id
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Recording ID
+              task:
+                type: string
+                description: ID of task
+              stop:
+                type: string
+                format: dateTime
+            required:
+              - task
+              - stop
+      responses:
+        '201':
+          description: Recording Started
+          schema:
+            $ref: '#/definitions/Recording'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /recordings/batch:
+    post:
+      summary: Create a new batch recording
+      tags: [recordings]
+      operationId: recordBatch
+      parameters:
+        - name: id
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Recording ID
+              task:
+                type: string
+                description: ID of task
+              start:
+                type: string
+                format: dateTime
+              stop:
+                type: string
+                format: dateTime
+            required:
+              - task
+              - start
+      responses:
+        '201':
+          description: Recording Started
+          schema:
+            $ref: '#/definitions/Recording'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /recordings/query:
+    post:
+      summary: Create a new recording from an arbitrary InfluxQL query
+      tags: [recordings]
+      operationId: recordQuery
+      parameters:
+        - name: id
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Recording ID
+              type:
+                type: string
+                description: Type of recording to save
+                pattern: (stream|batch)
+              query:
+                type: string
+              cluster:
+                type: string
+            required:
+              - type
+              - query
+      responses:
+        '201':
+          description: Recording Started
+          schema:
+            $ref: '#/definitions/Recording'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /recordings/{id}:
+    delete:
+      summary: Delete an existing recording
+      tags: [recordings]
+      operationId: deleteRecording
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '204':
+          description: Recording deleted
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get an existing recording
+      tags: [recordings]
+      operationId: recording
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Recording finished
+          schema:
+            $ref: '#/definitions/Recording'
+        '202':
+          description: Recording running
+          schema:
+            $ref: '#/definitions/Recording'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /replays:
+    get:
+      summary: Get information on all replays
+      tags: [replays]
+      operationId: listReplays
+      parameters:
+        - name: pattern
+          in: query
+          description: Glob style pattern to match replay IDs
+          required: false
+          type: string
+        - name: fields
+          in: query
+          description: List of fields to return
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: offset
+          in: query
+          description: Offset count for paginating through replays.
+          type: integer
+          format: int32
+          required: false
+          default: 0
+        - name: limit
+          in: query
+          description: Maximum number of replays to return.
+          type: integer
+          format: int32
+          required: false
+          default: 20
+      responses:
+        '200':
+          description: List of replays
+          schema:
+            $ref: '#/definitions/Replays'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new replay
+      tags: [replays]
+      operationId: createReplay
+      parameters:
+        - name: id
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Replay ID
+              task:
+                type: string
+                description: ID of task
+              recording:
+                type: string
+                description: ID of recording
+              recording-time:
+                type: boolean
+                default: false
+              clock:
+                type: string
+                pattern: (fast|real)
+                default: fast
+            required:
+              - task
+              - recording
+      responses:
+        '201':
+          description: Replay Started
+          schema:
+            $ref: '#/definitions/Replay'
+        '202':
+          description: Replay running
+          schema:
+            $ref: '#/definitions/Replay'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /replays/{id}:
+    delete:
+      summary: Delete an existing replay
+      tags: [replays]
+      operationId: deleteReplay
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '204':
+          description: Replay deleted
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get an existing replay
+      tags: [replays]
+      operationId: replay
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Replay information
+          schema:
+            $ref: '#/definitions/Replay'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /replays/batch:
+    post:
+      summary: Replay a batch directly without creating a recording.
+      tags: [replays]
+      operationId: replayBatch
+      parameters:
+        - name: id
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Replay ID
+              task:
+                type: string
+                description: ID of task
+              start:
+                type: string
+                format: dateTime
+              stop:
+                type: string
+                format: dateTime
+              recording-time:
+                type: boolean
+                default: false
+              clock:
+                type: string
+                pattern: (fast|real)
+                default: fast
+            required:
+              - task
+              - start
+      responses:
+        '201':
+          description: Replay Started
+          schema:
+            $ref: '#/definitions/Replay'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  /replays/query:
+    post:
+      summary: Replay data from a query directly without creating a recording.
+      tags: [recordings]
+      operationId: replayQuery
+      parameters:
+        - name: id
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Replay ID
+              task:
+                type: string
+                description: ID of task
+              query:
+                type: string
+              cluster:
+                type: string
+              recording-time:
+                type: boolean
+                default: false
+              clock:
+                type: string
+                pattern: (fast|real)
+                default: fast
+            required:
+              - task
+              - query
+      responses:
+        '201':
+          description: Replay Started
+          schema:
+            $ref: '#/definitions/Replay'
+        default:
+          description: A processing or an unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+
+definitions:
+  DBRP:
+    type: object
+    description: Database retention policy pair
+    properties:
+      db:
+        description: Database name
+        type: string
+      rp:
+        description: Retention policy
+        type: string
+    required: [db, rp]
+  Task:
+    type: object
+    description: A task
+    properties:
+      link:
+        $ref: '#/definitions/Link'
+      id:
+        description: Task ID
+        type: string
+      type:
+        description: Task type, one of 'stream' or 'batch'
+        type: string
+      dbrps:
+        description: List of database retention policy pairs
+        type: array
+        items:
+          $ref: '#/definitions/DBRP'
+      script:
+        description: TICKscript content
+        type: string
+      status:
+        description: Enabled/Disabled status of the task
+        type: string
+        pattern: (enabled|disabled)
+      dot:
+        description: Graphviz DOT syntax representation of the task DAG
+        type: string
+        readOnly: true
+      executing:
+        description: Whether the task is currently executing
+        type: boolean
+        readOnly: true
+      error:
+        description: Any error the task may have encountered while executing
+        readOnly: true
+      created:
+        type: string
+        format: dateTime
+        description: Date task was first created
+        readOnly: true
+      modified:
+        type: string
+        format: dateTime
+        description: Date task was last modified
+        readOnly: true
+      last-enabled:
+        type: string
+        format: dateTime
+        description: Date task was last enabled
+        readOnly: true
+      vars:
+        type: object
+        description: Set of vars to overwrite any TICKscript vars.
+        additionalProperties:
+          $ref: "#/definitions/Var"
+      stats:
+        type: object
+        description: Statisitcs about the task execution
+        readOnly: true
+        properties:
+          task-stats:
+            type: object
+            description: Map of stat name to value
+            additionalProperties:
+              type: number
+          node-stats:
+            type: object
+            description: Map of node name to node stat map
+            additionalProperties:
+              type: object
+              description: Map of stat name to value
+              additionalProperties:
+                type: number
+  Tasks:
+    type: object
+    description: List of tasks
+    properties:
+      tasks:
+        type: array
+        items:
+          $ref: "#/definitions/Task"
+  Template:
+    type: object
+    description: A template
+    properties:
+      link:
+        $ref: '#/definitions/Link'
+      id:
+        description: Template ID
+        type: string
+      type:
+        description: Template type, one of 'stream' or 'batch'
+        type: string
+      script:
+        description: TICKscript content
+        type: string
+      vars:
+        description: Set of variables from the TICKscript with their type and default value.
+        type: object
+        additionalProperties:
+          $ref: "#/definitions/Var"
+      dot:
+        description: Graphviz DOT syntax representation of the template DAG
+        type: string
+        readOnly: true
+      error:
+        description: Any error the template may have encountered while executing
+        readOnly: true
+      created:
+        type: string
+        format: dateTime
+        description: Date template was first created
+        readOnly: true
+      modified:
+        type: string
+        format: dateTime
+        description: Date template was last modified
+        readOnly: true
+  Templates:
+    type: object
+    description: List of templates
+    properties:
+      templates:
+        type: array
+        items:
+          $ref: "#/definitions/Template"
+  Var:
+    type: object
+    description: A variable to be set on a task
+    properties:
+      value:
+        type: any
+        description: Must be either a string, bool, numeric or a list of Var objects.
+      type:
+        type: string
+      description:
+        type: string
+  Recording:
+    type: object
+    properties:
+      link:
+        $ref: '#/definitions/Link'
+      id:
+        type: string
+      type:
+        type: string
+      size:
+        type: integer
+        format: int64
+      date:
+        type: string
+        format: dateTime
+      error:
+        type: string
+      status:
+        type: string
+        pattern: (recording|finished)
+      progress:
+        type: number
+        minimum: 0.0
+        maximum: 1.0
+  Recordings:
+    type: object
+    description: List of recordings
+    properties:
+      tasks:
+        type: array
+        items:
+          $ref: "#/definitions/Recordings"
+  Replay:
+    type: object
+    properties:
+      link:
+        $ref: '#/definitions/Link'
+      id:
+        type: string
+      task:
+        type: string
+      recording:
+        type: string
+      recording-time:
+        type: boolean
+      clock:
+        type: string
+      error:
+        type: string
+      status:
+        type: string
+        pattern: (replaying|finished)
+      progress:
+        type: number
+        minimum: 0.0
+        maximum: 1.0
+  Replays:
+    type: object
+    description: List of replays
+    properties:
+      tasks:
+        type: array
+        items:
+          $ref: "#/definitions/Replay"
+  Error:
+    type: object
+    description: Generic error object
+    readOnly: true
+    properties:
+      error:
+        type: string
+        description: Detailed description of an error
+    required: [error]
+  Link:
+    type: object
+    readOnly: true
+    description: URI of resource.
+    properties:
+      rel:
+        type: string
+      href:
+        type: string
+        format: url
+    required: [rel, href]
+
