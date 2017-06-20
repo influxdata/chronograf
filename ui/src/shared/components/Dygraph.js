@@ -64,9 +64,15 @@ const multiColumnBarPlotter = e => {
     fillColors.push(darkenColor(strokeColors[i]))
   }
 
+  const graphAreaBottom = g.plotter_.height
+  const graphAreaTop = g.plotter_.height - g.plotter_.area.h
+  const gradient = ctx.createLinearGradient(0, graphAreaBottom, 0, graphAreaTop)
+  gradient.addColorStop(0, '#22ADF6')
+  gradient.addColorStop(0.6, '#7A65F2')
+  gradient.addColorStop(1, '#FF8564')
+  ctx.fillStyle = gradient
+
   for (let j = 0; j < sets.length; j++) {
-    ctx.fillStyle = fillColors[j]
-    ctx.strokeStyle = strokeColors[j]
     for (let i = 0; i < sets[j].length; i++) {
       const p = sets[j][i]
       const centerX = p.canvasx
@@ -75,13 +81,6 @@ const multiColumnBarPlotter = e => {
         : centerX - barWidth / 2 * (1 - j / (sets.length - 1))
 
       ctx.fillRect(
-        xLeft,
-        p.canvasy,
-        barWidth / sets.length,
-        yBottom - p.canvasy
-      )
-
-      ctx.strokeRect(
         xLeft,
         p.canvasy,
         barWidth / sets.length,
