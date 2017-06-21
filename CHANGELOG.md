@@ -1,4 +1,4 @@
-## v1.3.3.1 [2017-06-20]
+## v1.3.3.1 [2017-06-21]
 ### Bug Fixes
 1. [#1642](https://github.com/influxdata/chronograf/pull/1642): Do not prefix basepath to external link for news feed
 
