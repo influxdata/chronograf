@@ -1,9 +1,3 @@
-## v1.3.3.2 [2017-06-21]
-### Bug Fixes
-1. [1650](https://github.com/influxdata/chronograf/pull/1650): Fixed the broken cpu reporting on hosts page and normalize InfluxQL
-### Features
-### UI Improvements
-
 ## v1.3.3.3 [2017-06-21]
 ### Bug Fixes
 1. [1651](https://github.com/influxdata/chronograf/pull/1651): Add back in x and y axes on Line + Single Stat graphs
