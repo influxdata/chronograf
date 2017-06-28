@@ -1,11 +1,11 @@
 #!/bin/sh
-BINARY=chronograf-windows-amd64 GOOS=windows GOARCH=amd64 sh etc/build2.sh
-BINARY=chronograf-darwin-amd64 GOOS=darwin GOARCH=amd64 sh etc/build2.sh
-BINARY=chronograf-linux-amd64 GOOS=linux GOARCH=amd64 sh etc/build2.sh
-BINARY=chronograf-linux-386   GOOS=linux GOARCH=386 sh etc/build2.sh
-BINARY=chronograf-linux-arm64 GOOS=linux GOARCH=arm64 sh etc/build2.sh
-BINARY=chronograf-linux-arm6 GOOS=linux GOARCH=arm GOARM=6 sh etc/build2.sh
-BINARY=chronograf-linux-arm7 GOOS=linux GOARCH=arm GOARM=7 sh etc/build2.sh
+BINARY=chronograf-windows-amd64 GOOS=windows GOARCH=amd64 sh etc/build.sh
+BINARY=chronograf-darwin-amd64 GOOS=darwin GOARCH=amd64 sh etc/build.sh
+BINARY=chronograf-linux-amd64 GOOS=linux GOARCH=amd64 sh etc/build.sh
+BINARY=chronograf-linux-386   GOOS=linux GOARCH=386 sh etc/build.sh
+BINARY=chronograf-linux-arm64 GOOS=linux GOARCH=arm64 sh etc/build.sh
+BINARY=chronograf-linux-arm6 GOOS=linux GOARCH=arm GOARM=6 sh etc/build.sh
+BINARY=chronograf-linux-arm7 GOOS=linux GOARCH=arm GOARM=7 sh etc/build.sh
 
 GOOS=windows GOARCH=amd64 sh etc/package.sh zip build/chronograf-windows-amd64.exe
 
