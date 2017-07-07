@@ -361,10 +361,16 @@ type SourcesStore interface {
 	Add(context.Context, Source) (Source, error)
 	// Delete the Source from the store
 	Delete(context.Context, Source) error
-	// Get retrieves Source if `ID` exists
-	Get(ctx context.Context, ID int) (Source, error)
+	// Get retrieves Source if `ID` or `Name` exists
+	Get(context.Context, QueryParams) (Source, error)
 	// Update the Source in the store.
 	Update(context.Context, Source) error
+}
+
+// QueryParams are query parameters passed to SourcesStore.Get to get existing sources by ID or Name
+type QueryParams struct {
+	ID   *int
+	Name *string
 }
 
 // AlertRule represents rules for building a tickscript alerting task
