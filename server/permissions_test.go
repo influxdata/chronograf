@@ -48,7 +48,7 @@ func TestService_Permissions(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",

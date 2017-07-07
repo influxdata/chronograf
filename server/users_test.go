@@ -50,7 +50,7 @@ func TestService_NewSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -96,7 +96,7 @@ func TestService_NewSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -142,7 +142,7 @@ func TestService_NewSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -184,7 +184,7 @@ func TestService_NewSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -219,7 +219,7 @@ func TestService_NewSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{}, fmt.Errorf("No McFly ever amounted to anything in the history of Hill Valley")
 					},
 				},
@@ -355,7 +355,7 @@ func TestService_SourceUsers(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -411,7 +411,7 @@ func TestService_SourceUsers(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -522,7 +522,7 @@ func TestService_SourceUserID(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -577,7 +577,7 @@ func TestService_SourceUserID(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -687,7 +687,7 @@ func TestService_RemoveSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -782,7 +782,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -834,7 +834,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",

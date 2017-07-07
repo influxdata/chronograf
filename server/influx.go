@@ -41,7 +41,9 @@ func (h *Service) Influx(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	src, err := h.SourcesStore.Get(ctx, id)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &id,
+	})
 	if err != nil {
 		notFound(w, id, h.Logger)
 		return
@@ -86,7 +88,9 @@ func (h *Service) Write(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	src, err := h.SourcesStore.Get(ctx, id)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &id,
+	})
 	if err != nil {
 		notFound(w, id, h.Logger)
 		return

@@ -56,7 +56,9 @@ func TestSourceStore(t *testing.T) {
 			t.Fatal(err)
 		}
 		// Confirm first src in the store is the same as the original.
-		if actual, err := s.Get(ctx, srcs[i].ID); err != nil {
+		if actual, err := s.Get(ctx, chronograf.QueryParams{
+			ID: &srcs[i].ID,
+		}); err != nil {
 			t.Fatal(err)
 		} else if !reflect.DeepEqual(actual, srcs[i]) {
 			t.Fatalf("source loaded is different then source saved; actual: %v, expected %v", actual, srcs[i])
@@ -70,12 +72,16 @@ func TestSourceStore(t *testing.T) {
 	mustUpdateSource(t, s, srcs[1])
 
 	// Confirm sources have updated.
-	if src, err := s.Get(ctx, srcs[0].ID); err != nil {
+	if src, err := s.Get(ctx, chronograf.QueryParams{
+		ID: &srcs[0].ID,
+	}); err != nil {
 		t.Fatal(err)
 	} else if src.Username != "calvinklein" {
 		t.Fatalf("source 0 update error: got %v, expected %v", src.Username, "calvinklein")
 	}
-	if src, err := s.Get(ctx, srcs[1].ID); err != nil {
+	if src, err := s.Get(ctx, chronograf.QueryParams{
+		ID: &srcs[1].ID,
+	}); err != nil {
 		t.Fatal(err)
 	} else if src.Name != "Enchantment Under the Sea Dance" {
 		t.Fatalf("source 1 update error: got %v, expected %v", src.Name, "Enchantment Under the Sea Dance")
@@ -87,7 +93,9 @@ func TestSourceStore(t *testing.T) {
 	mustUpdateSource(t, s, srcs[0])
 	mustUpdateSource(t, s, srcs[1])
 
-	if actual, err := s.Get(ctx, srcs[0].ID); err != nil {
+	if actual, err := s.Get(ctx, chronograf.QueryParams{
+		ID: &srcs[0].ID,
+	}); err != nil {
 		t.Fatal(err)
 	} else if actual.Default == true {
 		t.Fatal("Able to set two default sources when only one should be permitted")
@@ -125,7 +133,9 @@ func TestSourceStore(t *testing.T) {
 	}
 
 	// Confirm source has been deleted.
-	if _, err := s.Get(ctx, srcs[0].ID); err != chronograf.ErrSourceNotFound {
+	if _, err := s.Get(ctx, chronograf.QueryParams{
+		ID: &srcs[0].ID,
+	}); err != chronograf.ErrSourceNotFound {
 		t.Fatalf("source delete error: got %v, expected %v", err, chronograf.ErrSourceNotFound)
 	}
 
@@ -161,7 +171,9 @@ func TestSourceStore(t *testing.T) {
 		Default:  false,
 	})
 
-	if actual, err := s.Get(ctx, src.ID); err != nil {
+	if actual, err := s.Get(ctx, chronograf.QueryParams{
+		ID: &src.ID,
+	}); err != nil {
 		t.Fatal(err)
 	} else if !actual.Default {
 		t.Fatal("Expected first source added to be default but wasn't")

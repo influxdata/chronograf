@@ -16,7 +16,9 @@ func (h *Service) Permissions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return

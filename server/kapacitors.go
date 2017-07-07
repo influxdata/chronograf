@@ -60,7 +60,9 @@ func (h *Service) NewKapacitor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	_, err = h.SourcesStore.Get(ctx, srcID)
+	_, err = h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return

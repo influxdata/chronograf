@@ -100,7 +100,7 @@ func TestService_NewSourceRole(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -137,7 +137,7 @@ func TestService_NewSourceRole(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -181,7 +181,7 @@ func TestService_NewSourceRole(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -280,7 +280,7 @@ func TestService_UpdateRole(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -397,7 +397,7 @@ func TestService_RoleID(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -518,7 +518,7 @@ func TestService_RemoveRole(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID:       1,
 							Name:     "muh source",
@@ -607,7 +607,7 @@ func TestService_Roles(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				SourcesStore: &mocks.SourcesStore{
-					GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					GetF: func(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 						return chronograf.Source{
 							ID: 1,
 						}, nil

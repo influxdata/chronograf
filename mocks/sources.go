@@ -13,7 +13,7 @@ type SourcesStore struct {
 	AllF    func(context.Context) ([]chronograf.Source, error)
 	AddF    func(context.Context, chronograf.Source) (chronograf.Source, error)
 	DeleteF func(context.Context, chronograf.Source) error
-	GetF    func(ctx context.Context, ID int) (chronograf.Source, error)
+	GetF    func(context.Context, chronograf.QueryParams) (chronograf.Source, error)
 	UpdateF func(context.Context, chronograf.Source) error
 }
 
@@ -33,8 +33,8 @@ func (s *SourcesStore) Delete(ctx context.Context, src chronograf.Source) error 
 }
 
 // Get retrieves Source if `ID` exists
-func (s *SourcesStore) Get(ctx context.Context, ID int) (chronograf.Source, error) {
-	return s.GetF(ctx, ID)
+func (s *SourcesStore) Get(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
+	return s.GetF(ctx, qp)
 }
 
 // Update the Source in the store.

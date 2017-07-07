@@ -76,7 +76,9 @@ func (h *Service) GetDatabases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return
@@ -122,7 +124,9 @@ func (h *Service) NewDatabase(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return
@@ -172,7 +176,9 @@ func (h *Service) DropDatabase(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return
@@ -207,7 +213,9 @@ func (h *Service) RetentionPolicies(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return
@@ -261,7 +269,9 @@ func (h *Service) NewRetentionPolicy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return
@@ -311,7 +321,9 @@ func (h *Service) UpdateRetentionPolicy(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return
@@ -364,7 +376,9 @@ func (h *Service) DropRetentionPolicy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return

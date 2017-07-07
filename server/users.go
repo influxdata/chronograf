@@ -183,7 +183,9 @@ func (h *Service) sourcesSeries(ctx context.Context, w http.ResponseWriter, r *h
 		return 0, nil, err
 	}
 
-	src, err := h.SourcesStore.Get(ctx, srcID)
+	src, err := h.SourcesStore.Get(ctx, chronograf.QueryParams{
+		ID: &srcID,
+	})
 	if err != nil {
 		notFound(w, srcID, h.Logger)
 		return 0, nil, err

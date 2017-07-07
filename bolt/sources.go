@@ -70,12 +70,12 @@ func (s *SourcesStore) Delete(ctx context.Context, src chronograf.Source) error 
 	return nil
 }
 
-// Get returns a Source if the id exists.
-func (s *SourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
+// Get returns a Source if the ID or Name exists.
+func (s *SourcesStore) Get(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 	var src chronograf.Source
 	if err := s.client.db.View(func(tx *bolt.Tx) error {
 		var err error
-		src, err = s.get(ctx, id, tx)
+		src, err = s.get(ctx, *qp.ID, tx)
 		if err != nil {
 			return err
 		}
