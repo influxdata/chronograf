@@ -73,11 +73,11 @@ func (multi *MultiSourcesStore) Delete(ctx context.Context, src chronograf.Sourc
 }
 
 // Get finds the Source by id among all contained Stores
-func (multi *MultiSourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
+func (multi *MultiSourcesStore) Get(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
 	var err error
 	for _, store := range multi.Stores {
 		var s chronograf.Source
-		s, err = store.Get(ctx, id)
+		s, err = store.Get(ctx, qp)
 		if err == nil {
 			return s, nil
 		}
@@ -125,9 +125,18 @@ func (store *SourcesStore) Delete(ctx context.Context, src chronograf.Source) er
 }
 
 // Get returns the configured source if the id matches
-func (store *SourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
-	if store.Source == nil || store.Source.ID != id {
-		return chronograf.Source{}, fmt.Errorf("Unable to find Source with id %d", id)
+func (store *SourcesStore) Get(ctx context.Context, qp chronograf.QueryParams) (chronograf.Source, error) {
+	if store.Source == nil {
+		return chronograf.Source{}, fmt.Errorf("Unable to find Source")
+	}
+	if qp.ID == nil && qp.Name == nil {
+		return chronograf.Source{}, fmt.Errorf("Must pass in QueryParams to SourcesStore.Get")
+	}
+	if qp.ID != nil && store.Source.ID != *qp.ID {
+		return chronograf.Source{}, fmt.Errorf("Unable to find Source with id %d", *qp.ID)
+	}
+	if qp.Name != nil && store.Source.Name != *qp.Name {
+		return chronograf.Source{}, fmt.Errorf("Unable to find Source with name %s", *qp.Name)
 	}
 	return *store.Source, nil
 }
