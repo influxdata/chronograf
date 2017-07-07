@@ -72,17 +72,30 @@ func TestSourcesStoreDelete(t *testing.T) {
 
 func TestSourcesStoreGet(t *testing.T) {
 	ctx := context.Background()
-
 	store := SourcesStore{}
-	_, err := store.Get(ctx, 9)
+
+	_, err := store.Get(ctx, chronograf.QueryParams{})
+	if err == nil {
+		t.Fatal("Get should return an error for nil QueryParams")
+	}
+
+	nineId := 9
+	qpNineId := chronograf.QueryParams{
+		ID: &nineId,
+	}
+	_, err = store.Get(ctx, qpNineId)
 	if err == nil {
 		t.Fatal("Get should return an error for an empty Store")
 	}
 
+	eightId := 8
+	qpEightId := chronograf.QueryParams{
+		ID: &eightId,
+	}
 	store.Source = &chronograf.Source{
 		ID: 9,
 	}
-	_, err = store.Get(ctx, 8)
+	_, err = store.Get(ctx, qpEightId)
 	if err == nil {
 		t.Fatal("Get should return an error if it finds no matches")
 	}
@@ -90,9 +103,21 @@ func TestSourcesStoreGet(t *testing.T) {
 	store.Source = &chronograf.Source{
 		ID: 9,
 	}
-	src, err := store.Get(ctx, 9)
+	src, err := store.Get(ctx, qpNineId)
 	if err != nil || src.ID != 9 {
 		t.Fatal("Get should find the element with a matching ID")
+	}
+
+	bobName := "bob"
+	qpBobName := chronograf.QueryParams{
+		Name: &bobName,
+	}
+	store.Source = &chronograf.Source{
+		Name: "bob",
+	}
+	src, err = store.Get(ctx, qpBobName)
+	if err != nil || src.Name != "bob" {
+		t.Fatal("Get should find the element with a matching Name")
 	}
 }
 
