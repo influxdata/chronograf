@@ -326,11 +326,27 @@ func (n *chainnode) HttpOut(endpoint string) *HTTPOutNode {
 	return h
 }
 
+// Creates an HTTP Post node that POSTS received data to the provided HTTP endpoint.
+// HttpPost expects 0 or 1 arguments. If 0 arguments are provided, you must specify an
+// endpoint property method.
+func (n *chainnode) HttpPost(url ...string) *HTTPPostNode {
+	h := newHTTPPostNode(n.provides, url...)
+	n.linkChild(h)
+	return h
+}
+
 // Create an influxdb output node that will store the incoming data into InfluxDB.
 func (n *chainnode) InfluxDBOut() *InfluxDBOutNode {
 	i := newInfluxDBOutNode(n.provides)
 	n.linkChild(i)
 	return i
+}
+
+// Create an kapacitor loopback node that will send data back into Kapacitor as a stream.
+func (n *chainnode) KapacitorLoopback() *KapacitorLoopbackNode {
+	k := newKapacitorLoopbackNode(n.provides)
+	n.linkChild(k)
+	return k
 }
 
 // Create an alert node, which can trigger alerts.
@@ -450,4 +466,18 @@ func (n *chainnode) K8sAutoscale() *K8sAutoscaleNode {
 	k := newK8sAutoscaleNode(n.Provides())
 	n.linkChild(k)
 	return k
+}
+
+// Create a node that tracks duration in a given state.
+func (n *chainnode) StateDuration(expression *ast.LambdaNode) *StateDurationNode {
+	sd := newStateDurationNode(n.provides, expression)
+	n.linkChild(sd)
+	return sd
+}
+
+// Create a node that tracks number of consecutive points in a given state.
+func (n *chainnode) StateCount(expression *ast.LambdaNode) *StateCountNode {
+	sc := newStateCountNode(n.provides, expression)
+	n.linkChild(sc)
+	return sc
 }

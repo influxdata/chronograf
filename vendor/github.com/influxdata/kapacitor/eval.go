@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/influxdata/kapacitor/expvar"
@@ -11,10 +12,6 @@ import (
 	"github.com/influxdata/kapacitor/pipeline"
 	"github.com/influxdata/kapacitor/tick/ast"
 	"github.com/influxdata/kapacitor/tick/stateful"
-)
-
-const (
-	statsEvalErrors = "eval_errors"
 )
 
 type EvalNode struct {
@@ -25,6 +22,8 @@ type EvalNode struct {
 	refVarList         [][]string
 	scopePool          stateful.ScopePool
 	tags               map[string]bool
+
+	expressionsByGroupMu sync.RWMutex
 
 	evalErrors *expvar.Int
 }
@@ -39,6 +38,7 @@ func newEvalNode(et *ExecutingTask, n *pipeline.EvalNode, l *log.Logger) (*EvalN
 		e:                  n,
 		expressionsByGroup: make(map[models.GroupID][]stateful.Expression),
 	}
+
 	// Create stateful expressions
 	en.expressions = make([]stateful.Expression, len(n.Lambdas))
 	en.refVarList = make([][]string, len(n.Lambdas))
@@ -50,11 +50,11 @@ func newEvalNode(et *ExecutingTask, n *pipeline.EvalNode, l *log.Logger) (*EvalN
 			return nil, fmt.Errorf("Failed to compile %v expression: %v", i, err)
 		}
 		en.expressions[i] = statefulExpr
-		refVars := stateful.FindReferenceVariables(lambda.Expression)
+		refVars := ast.FindReferenceVariables(lambda.Expression)
 		en.refVarList[i] = refVars
 	}
 	// Create a single pool for the combination of all expressions
-	en.scopePool = stateful.NewScopePool(stateful.FindReferenceVariables(expressions...))
+	en.scopePool = stateful.NewScopePool(ast.FindReferenceVariables(expressions...))
 
 	// Create map of tags
 	if l := len(n.TagsList); l > 0 {
@@ -69,8 +69,14 @@ func newEvalNode(et *ExecutingTask, n *pipeline.EvalNode, l *log.Logger) (*EvalN
 }
 
 func (e *EvalNode) runEval(snapshot []byte) error {
-	e.evalErrors = &expvar.Int{}
-	e.statMap.Set(statsEvalErrors, e.evalErrors)
+	valueF := func() int64 {
+		e.expressionsByGroupMu.RLock()
+		l := len(e.expressionsByGroup)
+		e.expressionsByGroupMu.RUnlock()
+		return int64(l)
+	}
+	e.statMap.Set(statCardinalityGauge, expvar.NewIntFuncGauge(valueF))
+
 	switch e.Provides() {
 	case pipeline.StreamEdge:
 		var err error
@@ -78,8 +84,8 @@ func (e *EvalNode) runEval(snapshot []byte) error {
 			e.timer.Start()
 			p.Fields, p.Tags, err = e.eval(p.Time, p.Group, p.Fields, p.Tags)
 			if err != nil {
-				e.evalErrors.Add(1)
-				if !e.e.QuiteFlag {
+				e.incrementErrorCount()
+				if !e.e.QuietFlag {
 					e.logger.Println("E!", err)
 				}
 				e.timer.Stop()
@@ -98,12 +104,13 @@ func (e *EvalNode) runEval(snapshot []byte) error {
 		var err error
 		for b, ok := e.ins[0].NextBatch(); ok; b, ok = e.ins[0].NextBatch() {
 			e.timer.Start()
+			b.Points = b.ShallowCopyPoints()
 			for i := 0; i < len(b.Points); {
 				p := b.Points[i]
 				b.Points[i].Fields, b.Points[i].Tags, err = e.eval(p.Time, b.Group, p.Fields, p.Tags)
 				if err != nil {
-					e.evalErrors.Add(1)
-					if !e.e.QuiteFlag {
+					e.incrementErrorCount()
+					if !e.e.QuietFlag {
 						e.logger.Println("E!", err)
 					}
 					// Remove bad point
@@ -127,13 +134,17 @@ func (e *EvalNode) runEval(snapshot []byte) error {
 func (e *EvalNode) eval(now time.Time, group models.GroupID, fields models.Fields, tags models.Tags) (models.Fields, models.Tags, error) {
 	vars := e.scopePool.Get()
 	defer e.scopePool.Put(vars)
+	e.expressionsByGroupMu.RLock()
 	expressions, ok := e.expressionsByGroup[group]
+	e.expressionsByGroupMu.RUnlock()
 	if !ok {
 		expressions = make([]stateful.Expression, len(e.expressions))
 		for i, exp := range e.expressions {
 			expressions[i] = exp.CopyReset()
 		}
+		e.expressionsByGroupMu.Lock()
 		e.expressionsByGroup[group] = expressions
+		e.expressionsByGroupMu.Unlock()
 	}
 	for i, expr := range expressions {
 		err := fillScope(vars, e.refVarList[i], now, fields, tags)

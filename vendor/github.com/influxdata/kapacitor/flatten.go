@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/influxdata/kapacitor/expvar"
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
 )
@@ -49,13 +50,24 @@ type flattenBatchBuffer struct {
 }
 
 func (n *FlattenNode) runFlatten([]byte) error {
+	var mu sync.RWMutex
 	switch n.Wants() {
 	case pipeline.StreamEdge:
 		flattenBuffers := make(map[models.GroupID]*flattenStreamBuffer)
+		valueF := func() int64 {
+			mu.RLock()
+			l := len(flattenBuffers)
+			mu.RUnlock()
+			return int64(l)
+		}
+		n.statMap.Set(statCardinalityGauge, expvar.NewIntFuncGauge(valueF))
+
 		for p, ok := n.ins[0].NextPoint(); ok; p, ok = n.ins[0].NextPoint() {
 			n.timer.Start()
 			t := p.Time.Round(n.f.Tolerance)
+			mu.RLock()
 			currentBuf, ok := flattenBuffers[p.Group]
+			mu.RUnlock()
 			if !ok {
 				currentBuf = &flattenStreamBuffer{
 					Time:       t,
@@ -64,7 +76,9 @@ func (n *FlattenNode) runFlatten([]byte) error {
 					Dimensions: p.Dimensions,
 					Tags:       p.PointTags(),
 				}
+				mu.Lock()
 				flattenBuffers[p.Group] = currentBuf
+				mu.Unlock()
 			}
 			rp := models.RawPoint{
 				Time:   t,
@@ -104,10 +118,20 @@ func (n *FlattenNode) runFlatten([]byte) error {
 		}
 	case pipeline.BatchEdge:
 		allBuffers := make(map[models.GroupID]*flattenBatchBuffer)
+		valueF := func() int64 {
+			mu.RLock()
+			l := len(allBuffers)
+			mu.RUnlock()
+			return int64(l)
+		}
+		n.statMap.Set(statCardinalityGauge, expvar.NewIntFuncGauge(valueF))
+
 		for b, ok := n.ins[0].NextBatch(); ok; b, ok = n.ins[0].NextBatch() {
 			n.timer.Start()
 			t := b.TMax.Round(n.f.Tolerance)
+			mu.RLock()
 			currentBuf, ok := allBuffers[b.Group]
+			mu.RUnlock()
 			if !ok {
 				currentBuf = &flattenBatchBuffer{
 					Time:   t,
@@ -116,7 +140,9 @@ func (n *FlattenNode) runFlatten([]byte) error {
 					Tags:   b.Tags,
 					Points: make(map[time.Time][]models.RawPoint),
 				}
+				mu.Lock()
 				allBuffers[b.Group] = currentBuf
+				mu.Unlock()
 			}
 			if !t.Equal(currentBuf.Time) {
 				// Flatten/Emit old buffer
@@ -179,18 +205,26 @@ func (n *FlattenNode) flatten(points []models.RawPoint) (models.Fields, error) {
 	defer n.bufPool.Put(fieldPrefix)
 POINTS:
 	for _, p := range points {
-		for _, tag := range n.f.Dimensions {
+		for i, tag := range n.f.Dimensions {
 			if v, ok := p.Tags[tag]; ok {
+				if i > 0 {
+					fieldPrefix.WriteString(n.f.Delimiter)
+				}
 				fieldPrefix.WriteString(v)
-				fieldPrefix.WriteString(n.f.Delimiter)
 			} else {
+				n.incrementErrorCount()
 				n.logger.Printf("E! point missing tag %q for flatten operation", tag)
 				continue POINTS
 			}
 		}
 		l := fieldPrefix.Len()
 		for fname, value := range p.Fields {
-			fieldPrefix.WriteString(fname)
+			if !n.f.DropOriginalFieldNameFlag {
+				if l > 0 {
+					fieldPrefix.WriteString(n.f.Delimiter)
+				}
+				fieldPrefix.WriteString(fname)
+			}
 			fields[fieldPrefix.String()] = value
 			fieldPrefix.Truncate(l)
 		}

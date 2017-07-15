@@ -14,12 +14,16 @@ import (
 	"github.com/influxdata/kapacitor/influxdb"
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
+	alertservice "github.com/influxdata/kapacitor/services/alert"
 	"github.com/influxdata/kapacitor/services/alerta"
 	"github.com/influxdata/kapacitor/services/hipchat"
 	"github.com/influxdata/kapacitor/services/httpd"
+	"github.com/influxdata/kapacitor/services/httppost"
 	k8s "github.com/influxdata/kapacitor/services/k8s/client"
 	"github.com/influxdata/kapacitor/services/opsgenie"
 	"github.com/influxdata/kapacitor/services/pagerduty"
+	"github.com/influxdata/kapacitor/services/pushover"
+	"github.com/influxdata/kapacitor/services/sensu"
 	"github.com/influxdata/kapacitor/services/slack"
 	"github.com/influxdata/kapacitor/services/smtp"
 	"github.com/influxdata/kapacitor/services/snmptrap"
@@ -72,14 +76,9 @@ type TaskMaster struct {
 	UDFService UDFService
 
 	AlertService interface {
-		EventState(topic, event string) (alert.EventState, bool)
-		UpdateEvent(topic string, event alert.EventState) error
-		Collect(event alert.Event) error
-		RegisterHandler(topics []string, h alert.Handler)
-		DeregisterHandler(topics []string, h alert.Handler)
-		RestoreTopic(topic string) error
-		CloseTopic(topic string) error
-		DeleteTopic(topic string) error
+		alertservice.AnonHandlerRegistrar
+		alertservice.Events
+		alertservice.TopicPersister
 	}
 	InfluxDBService interface {
 		NewNamedClient(name string) (influxdb.Client, error)
@@ -100,6 +99,13 @@ type TaskMaster struct {
 	PagerDutyService interface {
 		Global() bool
 		Handler(pagerduty.HandlerConfig, *log.Logger) alert.Handler
+	}
+	PushoverService interface {
+		Handler(pushover.HandlerConfig, *log.Logger) alert.Handler
+	}
+	HTTPPostService interface {
+		Handler(httppost.HandlerConfig, *log.Logger) alert.Handler
+		Endpoint(string) (*httppost.Endpoint, bool)
 	}
 	SlackService interface {
 		Global() bool
@@ -124,7 +130,7 @@ type TaskMaster struct {
 		Handler(alerta.HandlerConfig, *log.Logger) (alert.Handler, error)
 	}
 	SensuService interface {
-		Handler(*log.Logger) alert.Handler
+		Handler(sensu.HandlerConfig, *log.Logger) (alert.Handler, error)
 	}
 	TalkService interface {
 		Handler(*log.Logger) alert.Handler
@@ -133,7 +139,7 @@ type TaskMaster struct {
 		NewTimer(timer.Setter) timer.Timer
 	}
 	K8sService interface {
-		Client() (k8s.Client, error)
+		Client(string) (k8s.Client, error)
 	}
 	LogService LogService
 
@@ -143,6 +149,8 @@ type TaskMaster struct {
 
 	// Incoming streams
 	writePointsIn StreamCollector
+	writesClosed  bool
+	writesMu      sync.RWMutex
 
 	// Forks of incoming streams
 	// We are mapping from (db, rp, measurement) to map of task ids to their edges
@@ -211,6 +219,7 @@ func (tm *TaskMaster) New(id string) *TaskMaster {
 	n.OpsGenieService = tm.OpsGenieService
 	n.VictorOpsService = tm.VictorOpsService
 	n.PagerDutyService = tm.PagerDutyService
+	n.PushoverService = tm.PushoverService
 	n.SlackService = tm.SlackService
 	n.TelegramService = tm.TelegramService
 	n.SNMPTrapService = tm.SNMPTrapService
@@ -254,12 +263,18 @@ func (tm *TaskMaster) StopTasks() {
 }
 
 func (tm *TaskMaster) Close() error {
-	tm.Drain()
 	tm.mu.Lock()
-	defer tm.mu.Unlock()
-	if tm.closed {
+	closed := tm.closed
+	tm.mu.Unlock()
+
+	if closed {
 		return ErrTaskMasterClosed
 	}
+
+	tm.Drain()
+
+	tm.mu.Lock()
+	defer tm.mu.Unlock()
 	tm.closed = true
 	for _, et := range tm.tasks {
 		_ = tm.stopTask(et.Task.ID)
@@ -356,6 +371,10 @@ func (tm *TaskMaster) waitForForks() {
 	tm.drained = true
 	tm.mu.Unlock()
 
+	tm.writesMu.Lock()
+	tm.writesClosed = true
+	tm.writesMu.Unlock()
+
 	// Close the write points in stream
 	tm.writePointsIn.Close()
 
@@ -373,7 +392,7 @@ func (tm *TaskMaster) CreateTICKScope() *stateful.Scope {
 			info, _ := tm.UDFService.Info(f)
 			scope.SetDynamicMethod(
 				f,
-				stateful.DynamicMethod(func(self interface{}, args ...interface{}) (interface{}, error) {
+				func(self interface{}, args ...interface{}) (interface{}, error) {
 					parent, ok := self.(pipeline.Node)
 					if !ok {
 						return nil, fmt.Errorf("cannot call %s on %T", f, self)
@@ -386,7 +405,7 @@ func (tm *TaskMaster) CreateTICKScope() *stateful.Scope {
 						info.Options,
 					)
 					return udf, nil
-				}),
+				},
 			)
 		}
 	}
@@ -621,7 +640,9 @@ func (tm *TaskMaster) forkPoint(p models.Point) {
 }
 
 func (tm *TaskMaster) WritePoints(database, retentionPolicy string, consistencyLevel imodels.ConsistencyLevel, points []imodels.Point) error {
-	if tm.closed {
+	tm.writesMu.RLock()
+	defer tm.writesMu.RUnlock()
+	if tm.writesClosed {
 		return ErrTaskMasterClosed
 	}
 	if retentionPolicy == "" {
@@ -643,6 +664,18 @@ func (tm *TaskMaster) WritePoints(database, retentionPolicy string, consistencyL
 		}
 	}
 	return nil
+}
+
+func (tm *TaskMaster) WriteKapacitorPoint(p models.Point) error {
+	tm.writesMu.RLock()
+	defer tm.writesMu.RUnlock()
+	if tm.writesClosed {
+		return ErrTaskMasterClosed
+	}
+
+	p.Group = models.NilGroup
+	p.Dimensions = models.Dimensions{}
+	return tm.writePointsIn.CollectPoint(p)
 }
 
 func (tm *TaskMaster) NewFork(taskName string, dbrps []DBRP, measurements []string) (*Edge, error) {
