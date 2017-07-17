@@ -19,7 +19,9 @@ import (
 )
 
 const (
-	statAverageExecTime = "avg_exec_time_ns"
+	statErrorCount       = "errors"
+	statCardinalityGauge = "working_cardinality"
+	statAverageExecTime  = "avg_exec_time_ns"
 )
 
 // A node that can be  in an executor.
@@ -59,6 +61,8 @@ type Node interface {
 
 	emittedCount() int64
 
+	incrementErrorCount()
+
 	stats() map[string]interface{}
 }
 
@@ -80,6 +84,8 @@ type node struct {
 	timer      timer.Timer
 	statsKey   string
 	statMap    *kexpvar.Map
+
+	nodeErrors *kexpvar.Int
 }
 
 func (n *node) addParentEdge(e *Edge) {
@@ -102,6 +108,9 @@ func (n *node) init() {
 	n.statsKey, n.statMap = vars.NewStatistic("nodes", tags)
 	avgExecVar := &MaxDuration{}
 	n.statMap.Set(statAverageExecTime, avgExecVar)
+	n.nodeErrors = &kexpvar.Int{}
+	n.statMap.Set(statErrorCount, n.nodeErrors)
+	n.statMap.Set(statCardinalityGauge, kexpvar.NewIntFuncGauge(nil))
 	n.timer = n.et.tm.TimingService.NewTimer(avgExecVar)
 	n.errCh = make(chan error, 1)
 }
@@ -200,25 +209,36 @@ func (n *node) closeChildEdges() {
 func (n *node) edot(buf *bytes.Buffer, labels bool) {
 	if labels {
 		// Print all stats on node.
-		buf.Write([]byte(
-			fmt.Sprintf("\n%s [label=\"%s ",
-				n.Name(),
+		buf.WriteString(
+			fmt.Sprintf("\n%s [xlabel=\"",
 				n.Name(),
 			),
-		))
+		)
+		i := 0
 		n.statMap.DoSorted(func(kv expvar.KeyValue) {
-			buf.Write([]byte(
-				fmt.Sprintf("%s=%s ",
+			if i != 0 {
+				// NOTE: A literal \r, indicates a newline right justified in graphviz syntax.
+				buf.WriteString(`\r`)
+			}
+			i++
+			var s string
+			if sv, ok := kv.Value.(kexpvar.StringVar); ok {
+				s = sv.StringValue()
+			} else {
+				s = kv.Value.String()
+			}
+			buf.WriteString(
+				fmt.Sprintf("%s=%s",
 					kv.Key,
-					kv.Value.String(),
+					s,
 				),
-			))
+			)
 		})
 		buf.Write([]byte("\"];\n"))
 
 		for i, c := range n.children {
 			buf.Write([]byte(
-				fmt.Sprintf("%s -> %s [label=\"%d\"];\n",
+				fmt.Sprintf("%s -> %s [label=\"processed=%d\"];\n",
 					n.Name(),
 					c.Name(),
 					n.outs[i].collectedCount(),
@@ -274,6 +294,11 @@ func (n *node) emittedCount() (count int64) {
 		count += out.collectedCount()
 	}
 	return
+}
+
+// node increment error count increments a nodes error_count stat
+func (n *node) incrementErrorCount() {
+	n.nodeErrors.Add(1)
 }
 
 func (n *node) stats() map[string]interface{} {
