@@ -371,29 +371,31 @@ func (et *ExecutingTask) EDot(labels bool) []byte {
 
 	var buf bytes.Buffer
 
-	buf.Write([]byte("digraph "))
-	buf.Write([]byte(et.Task.ID))
-	buf.Write([]byte(" {\n"))
+	buf.WriteString("digraph ")
+	buf.WriteString(et.Task.ID)
+	buf.WriteString(" {\n")
 	// Write graph attributes
 	unit := "points"
 	if et.Task.Type == BatchTask {
 		unit = "batches"
 	}
+	buf.WriteString("graph [")
 	if labels {
-		buf.Write([]byte(
-			fmt.Sprintf("graph [label=\"Throughput: %0.2f %s/s\"];\n",
+		buf.WriteString(
+			fmt.Sprintf("label=\"Throughput: %0.2f %s/s\" forcelabels=true pad=\"0.8,0.5\"",
 				et.getThroughput(),
 				unit,
 			),
-		))
+		)
 	} else {
-		buf.Write([]byte(
-			fmt.Sprintf("graph [throughput=\"%0.2f %s/s\"];\n",
+		buf.WriteString(
+			fmt.Sprintf("throughput=\"%0.2f %s/s\"",
 				et.getThroughput(),
 				unit,
 			),
-		))
+		)
 	}
+	buf.WriteString("];\n")
 
 	_ = et.walk(func(n Node) error {
 		n.edot(&buf, labels)
@@ -452,8 +454,12 @@ func (et *ExecutingTask) createNode(p pipeline.Node, l *log.Logger) (n Node, err
 		n, err = newWindowNode(et, t, l)
 	case *pipeline.HTTPOutNode:
 		n, err = newHTTPOutNode(et, t, l)
+	case *pipeline.HTTPPostNode:
+		n, err = newHTTPPostNode(et, t, l)
 	case *pipeline.InfluxDBOutNode:
 		n, err = newInfluxDBOutNode(et, t, l)
+	case *pipeline.KapacitorLoopbackNode:
+		n, err = newKapacitorLoopbackNode(et, t, l)
 	case *pipeline.AlertNode:
 		n, err = newAlertNode(et, t, l)
 	case *pipeline.GroupByNode:
@@ -492,6 +498,10 @@ func (et *ExecutingTask) createNode(p pipeline.Node, l *log.Logger) (n Node, err
 		n, err = newCombineNode(et, t, l)
 	case *pipeline.K8sAutoscaleNode:
 		n, err = newK8sAutoscaleNode(et, t, l)
+	case *pipeline.StateDurationNode:
+		n, err = newStateDurationNode(et, t, l)
+	case *pipeline.StateCountNode:
+		n, err = newStateCountNode(et, t, l)
 	default:
 		return nil, fmt.Errorf("unknown pipeline node type %T", p)
 	}

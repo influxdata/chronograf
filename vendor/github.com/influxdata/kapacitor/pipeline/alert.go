@@ -3,6 +3,7 @@ package pipeline
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/influxdata/kapacitor/tick/ast"
@@ -45,6 +46,7 @@ const defaultDetailsTmpl = "{{ json . }}"
 //    * OpsGenie -- Send alert to OpsGenie.
 //    * VictorOps -- Send alert to VictorOps.
 //    * PagerDuty -- Send alert to PagerDuty.
+//    * Pushover -- Send alert to Pushover.
 //    * Talk -- Post alert message to Talk client.
 //    * Telegram -- Post alert message to Telegram client.
 //
@@ -134,6 +136,8 @@ type AlertNode struct {
 	//    * Group -- Concatenation of all group-by tags of the form [key=value,]+.
 	//        If no groupBy is performed equal to literal 'nil'.
 	//    * Tags -- Map of tags. Use '{{ index .Tags "key" }}' to get a specific tag value.
+	//    * ServerInfo -- Information about the running server. Available nested fields are:
+	//        Hostname, ClusterID and ServerID.
 	//
 	// Example:
 	//   stream
@@ -289,7 +293,7 @@ type AlertNode struct {
 
 	// Post the JSON alert data to the specified URL.
 	// tick:ignore
-	PostHandlers []*PostHandler `tick:"Post"`
+	HTTPPostHandlers []*AlertHTTPPostHandler `tick:"Post"`
 
 	// Send the JSON alert data to the specified endpoint via TCP.
 	// tick:ignore
@@ -314,6 +318,10 @@ type AlertNode struct {
 	// Send alert to PagerDuty.
 	// tick:ignore
 	PagerDutyHandlers []*PagerDutyHandler `tick:"PagerDuty"`
+
+	// Send alert to Pushover.
+	// tick:ignore
+	PushoverHandlers []*PushoverHandler `tick:"Pushover"`
 
 	// Send alert to Sensu.
 	// tick:ignore
@@ -370,6 +378,12 @@ func (n *AlertNode) validate() error {
 	for _, snmp := range n.SNMPTrapHandlers {
 		if err := snmp.validate(); err != nil {
 			return errors.Wrapf(err, "invalid SNMP trap %q", snmp.TrapOid)
+		}
+	}
+
+	for _, post := range n.HTTPPostHandlers {
+		if err := post.validate(); err != nil {
+			return errors.Wrap(err, "invalid post")
 		}
 	}
 	return nil
@@ -461,23 +475,75 @@ func (a *AlertNode) Flapping(low, high float64) *AlertNode {
 }
 
 // HTTP POST JSON alert data to a specified URL.
+//
+// Example:
+//    stream
+//         |alert()
+//             .post()
+//                 .endpoint('example')
+//
+// Example:
+//    stream
+//         |alert()
+//             .post('http://example.com')
+//
 // tick:property
-func (a *AlertNode) Post(url string) *PostHandler {
-	post := &PostHandler{
+func (a *AlertNode) Post(urls ...string) *AlertHTTPPostHandler {
+	post := &AlertHTTPPostHandler{
 		AlertNode: a,
-		URL:       url,
 	}
-	a.PostHandlers = append(a.PostHandlers, post)
+	a.HTTPPostHandlers = append(a.HTTPPostHandlers, post)
+
+	if len(urls) == 0 {
+		return post
+	}
+
+	post.URL = urls[0]
 	return post
 }
 
+// Set a header key and value on the post request.
+// Setting the Authenticate header is not allowed from within TICKscript,
+// please use the configuration file to specify sensitive headers.
+//
+// Example:
+//    stream
+//         |alert()
+//             .post()
+//                 .endpoint('example')
+//                 .header('a','b')
+// tick:property
+func (a *AlertHTTPPostHandler) Header(k, v string) *AlertHTTPPostHandler {
+	if a.Headers == nil {
+		a.Headers = map[string]string{}
+	}
+
+	a.Headers[k] = v
+	return a
+}
+
 // tick:embedded:AlertNode.Post
-type PostHandler struct {
+type AlertHTTPPostHandler struct {
 	*AlertNode
 
 	// The POST URL.
 	// tick:ignore
 	URL string
+
+	// Name of the endpoint to be used, as is defined in the configuration file
+	Endpoint string
+
+	// tick:ignore
+	Headers map[string]string `tick:"Header"`
+}
+
+func (a *AlertHTTPPostHandler) validate() error {
+	for k := range a.Headers {
+		if strings.ToUpper(k) == "AUTHENTICATE" {
+			return errors.New("cannot set 'authenticate' header")
+		}
+	}
+	return nil
 }
 
 // Send JSON alert data to a specified address over TCP.
@@ -769,6 +835,7 @@ type PagerDutyHandler struct {
 }
 
 // Send the alert to HipChat.
+// For step-by-step instructions on setting up Kapacitor with HipChat, see the Event Handler Setup Guide (https://docs.influxdata.com//kapacitor/latest/guides/event-handler-setup/#hipchat-setup).
 // To allow Kapacitor to post to HipChat,
 // go to the URL https://www.hipchat.com/docs/apiv2 for
 // information on how to get your room id and tokens.
@@ -941,6 +1008,7 @@ func (a *AlertaHandler) Services(service ...string) *AlertaHandler {
 //      enabled = true
 //      url = "http://sensu:3030"
 //      source = "Kapacitor"
+//      handlers = ["sns","slack"]
 //
 // Example:
 //    stream
@@ -948,6 +1016,14 @@ func (a *AlertaHandler) Services(service ...string) *AlertaHandler {
 //             .sensu()
 //
 // Send alerts to Sensu client.
+//
+// Example:
+//    stream
+//         |alert()
+//             .sensu()
+//             .handlers('sns','slack')
+//
+// Send alerts to Sensu specifying the handlers
 //
 // tick:property
 func (a *AlertNode) Sensu() *SensuHandler {
@@ -961,6 +1037,91 @@ func (a *AlertNode) Sensu() *SensuHandler {
 // tick:embedded:AlertNode.Sensu
 type SensuHandler struct {
 	*AlertNode
+
+	// Sensu source in which to post messages.
+	// If empty uses the Source from the configuration.
+	Source string
+
+	// Sensu handler list
+	// If empty uses the handler list from the configuration
+	// tick:ignore
+	HandlersList []string `tick:"Handlers"`
+}
+
+// List of effected services.
+// If not specified defaults to the Name of the stream.
+// tick:property
+func (s *SensuHandler) Handlers(handlers ...string) *SensuHandler {
+	s.HandlersList = handlers
+	return s
+}
+
+// Send the alert to Pushover.
+// Register your application with Pushover at
+// https://pushover.net/apps/build to get a
+// Pushover token.
+//
+// Alert Level Mapping:
+// OK - Sends a -2 priority level.
+// Info - Sends a -1 priority level.
+// Warning - Sends a 0 priority level.
+// Critical - Sends a 1 priority level.
+//
+// Example:
+//    [pushover]
+//      enabled = true
+//      token = "9hiWoDOZ9IbmHsOTeST123ABciWTIqXQVFDo63h9"
+//      user_key = "Pushover"
+//
+// Example:
+//    stream
+//         |alert()
+//             .pushover()
+//              .sound('siren')
+//              .user_key('other user')
+//              .device('mydev')
+//              .title('mytitle')
+//              .URL('myurl')
+//              .URLTitle('mytitle')
+//
+// Send alerts to Pushover.
+//
+// tick:property
+func (a *AlertNode) Pushover() *PushoverHandler {
+	pushover := &PushoverHandler{
+		AlertNode: a,
+	}
+	a.PushoverHandlers = append(a.PushoverHandlers, pushover)
+	return pushover
+}
+
+// tick:embedded:AlertNode.Pushover
+type PushoverHandler struct {
+	*AlertNode
+
+	// User/Group key of your user (or you), viewable when logged
+	// into the Pushover dashboard. Often referred to as USER_KEY
+	// in the Pushover documentation.
+	// If empty uses the user from the configuration.
+	UserKey string
+
+	// Users device name to send message directly to that device,
+	// rather than all of a user's devices (multiple device names may
+	// be separated by a comma)
+	Device string
+
+	// Your message's title, otherwise your apps name is used
+	Title string
+
+	// A supplementary URL to show with your message
+	URL string
+
+	// A title for your supplementary URL, otherwise just URL is shown
+	URLTitle string
+
+	// The name of one of the sounds supported by the device clients to override
+	// the user's default sound choice
+	Sound string
 }
 
 // Send the alert to Slack.
@@ -1046,6 +1207,7 @@ type SlackHandler struct {
 }
 
 // Send the alert to Telegram.
+// For step-by-step instructions on setting up Kapacitor with Telegram, see the Event Handler Setup Guide (https://docs.influxdata.com//kapacitor/latest/guides/event-handler-setup/#telegram-setup).
 // To allow Kapacitor to post to Telegram,
 //
 // Example:

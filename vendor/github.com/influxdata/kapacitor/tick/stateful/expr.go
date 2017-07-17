@@ -12,6 +12,8 @@ import (
 type Expression interface {
 	Reset()
 
+	Type(scope ReadOnlyScope) (ast.ValueType, error)
+
 	EvalFloat(scope *Scope) (float64, error)
 	EvalInt(scope *Scope) (int64, error)
 	EvalString(scope *Scope) (string, error)
@@ -58,6 +60,10 @@ func (se *expression) Reset() {
 	se.executionState.ResetAll()
 }
 
+func (se *expression) Type(scope ReadOnlyScope) (ast.ValueType, error) {
+	return se.nodeEvaluator.Type(scope)
+}
+
 func (se *expression) EvalBool(scope *Scope) (bool, error) {
 	return se.nodeEvaluator.EvalBool(scope, se.executionState)
 }
@@ -78,8 +84,12 @@ func (se *expression) EvalDuration(scope *Scope) (time.Duration, error) {
 	return se.nodeEvaluator.EvalDuration(scope, se.executionState)
 }
 
+func (se *expression) EvalMissing(scope *Scope) (*ast.Missing, error) {
+	return se.nodeEvaluator.EvalMissing(scope, se.executionState)
+}
+
 func (se *expression) Eval(scope *Scope) (interface{}, error) {
-	typ, err := se.nodeEvaluator.Type(scope, CreateExecutionState())
+	typ, err := se.nodeEvaluator.Type(scope)
 	if err != nil {
 		return nil, err
 	}
@@ -115,41 +125,13 @@ func (se *expression) Eval(scope *Scope) (interface{}, error) {
 			return nil, err
 		}
 		return result, err
+	case ast.TMissing:
+		result, err := se.EvalMissing(scope)
+		if err != nil {
+			return nil, err
+		}
+		return result, err
 	default:
 		return nil, fmt.Errorf("expression returned unexpected type %s", typ)
-	}
-}
-
-func FindReferenceVariables(nodes ...ast.Node) []string {
-	variablesSet := make(map[string]bool, 0)
-
-	for _, node := range nodes {
-		buildReferenceVariablesSet(node, variablesSet)
-	}
-
-	variables := make([]string, 0, len(variablesSet))
-
-	for variable := range variablesSet {
-		variables = append(variables, variable)
-	}
-
-	return variables
-}
-
-// util method for findReferenceVariables, we are passing the itemsSet and not returning it
-// so we will won't to merge the maps
-func buildReferenceVariablesSet(n ast.Node, itemsSet map[string]bool) {
-	switch node := n.(type) {
-	case *ast.ReferenceNode:
-		itemsSet[node.Reference] = true
-	case *ast.UnaryNode:
-		buildReferenceVariablesSet(node.Node, itemsSet)
-	case *ast.BinaryNode:
-		buildReferenceVariablesSet(node.Left, itemsSet)
-		buildReferenceVariablesSet(node.Right, itemsSet)
-	case *ast.FunctionNode:
-		for _, arg := range node.Args {
-			buildReferenceVariablesSet(arg, itemsSet)
-		}
 	}
 }
