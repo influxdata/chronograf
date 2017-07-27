@@ -3,80 +3,150 @@ package k8s
 import (
 	"fmt"
 	"log"
-	"sync/atomic"
+	"sync"
 
 	"github.com/influxdata/kapacitor/services/k8s/client"
-	"github.com/pkg/errors"
+	"github.com/influxdata/kapacitor/services/scraper"
 )
 
+// Service is the kubernetes discovery and autoscale service
 type Service struct {
-	configValue atomic.Value // Config
-	client      client.Client
-	logger      *log.Logger
+	mu       sync.Mutex
+	configs  []Config
+	clusters map[string]*Cluster
+	registry scraper.Registry
+	logger   *log.Logger
 }
 
-func NewService(c Config, l *log.Logger) (*Service, error) {
-	clientConfig, err := c.ClientConfig()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create k8s client config")
-	}
-	cli, err := client.New(clientConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create k8s client")
+// NewService creates a new unopened k8s service
+func NewService(c []Config, r scraper.Registry, l *log.Logger) (*Service, error) {
+	clusters := make(map[string]*Cluster, len(c))
+	for i := range c {
+		cluster, err := NewCluster(c[i], l)
+		if err != nil {
+			return nil, err
+		}
+		clusters[c[i].ID] = cluster
 	}
 
-	s := &Service{
-		client: cli,
-		logger: l,
-	}
-	s.configValue.Store(c)
-	return s, nil
+	return &Service{
+		clusters: clusters,
+		configs:  c,
+		logger:   l,
+		registry: r,
+	}, nil
 }
 
+// Open starts the kubernetes service
 func (s *Service) Open() error {
-	return nil
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, c := range s.clusters {
+		if err := c.Open(); err != nil {
+			return err
+		}
+	}
+	s.register()
+	return s.registry.Commit()
 }
+
 func (s *Service) Close() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, c := range s.clusters {
+		c.Close()
+	}
+	s.deregister()
+	return s.registry.Commit()
+}
+
+func (s *Service) deregister() {
+	// Remove all the configurations in the registry
+	for _, d := range s.configs {
+		s.registry.RemoveDiscoverer(&d)
+	}
+}
+
+func (s *Service) register() {
+	// Add all configurations to registry
+	for _, d := range s.configs {
+		if d.Enabled {
+			s.registry.AddDiscoverer(&d)
+		}
+	}
+}
+
+func (s *Service) Update(newConfigs []interface{}) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	configs := make([]Config, len(newConfigs))
+	existingClusters := make(map[string]bool, len(newConfigs))
+	for i := range newConfigs {
+		c, ok := newConfigs[i].(Config)
+		if !ok {
+			return fmt.Errorf("expected config object to be of type %T, got %T", c, newConfigs[i])
+		}
+		configs[i] = c
+		cluster, ok := s.clusters[c.ID]
+		if !ok {
+			var err error
+			cluster, err = NewCluster(c, s.logger)
+			if err != nil {
+				return err
+			}
+			if err := cluster.Open(); err != nil {
+				return err
+			}
+			s.clusters[c.ID] = cluster
+		} else {
+			if err := cluster.Update(c); err != nil {
+				return err
+			}
+		}
+		existingClusters[c.ID] = true
+	}
+
+	// Close and delete any removed clusters
+	for id := range s.clusters {
+		if !existingClusters[id] {
+			s.clusters[id].Close()
+			delete(s.clusters, id)
+		}
+	}
+	s.deregister()
+	s.configs = configs
+	s.register()
 	return nil
 }
 
-func (s *Service) Update(newConfig []interface{}) error {
-	if l := len(newConfig); l != 1 {
-		return fmt.Errorf("expected only one new config object, got %d", l)
-	}
-	c, ok := newConfig[0].(Config)
-	if !ok {
-		return fmt.Errorf("expected config object to be of type %T, got %T", c, newConfig[0])
-	}
-
-	s.configValue.Store(c)
-	clientConfig, err := c.ClientConfig()
-	if err != nil {
-		return errors.Wrap(err, "failed to create k8s client config")
-	}
-	return s.client.Update(clientConfig)
+type testOptions struct {
+	ID string `json:"id"`
 }
 
 func (s *Service) TestOptions() interface{} {
-	return nil
+	return new(testOptions)
 }
 
 func (s *Service) Test(options interface{}) error {
-	cli, err := s.Client()
-	if err != nil {
-		return errors.Wrap(err, "failed to get client")
+	o, ok := options.(*testOptions)
+	if !ok {
+		return fmt.Errorf("unexpected options type %T", options)
 	}
-	_, err = cli.Versions()
-	if err != nil {
-		return errors.Wrap(err, "failed to query server versions")
+	s.mu.Lock()
+	cluster, ok := s.clusters[o.ID]
+	s.mu.Unlock()
+	if !ok {
+		return fmt.Errorf("unknown kubernetes cluster %q", o.ID)
 	}
-	return nil
+	return cluster.Test()
 }
 
-func (s *Service) Client() (client.Client, error) {
-	config := s.configValue.Load().(Config)
-	if !config.Enabled {
-		return nil, errors.New("service is not enabled")
+func (s *Service) Client(id string) (client.Client, error) {
+	s.mu.Lock()
+	cluster, ok := s.clusters[id]
+	s.mu.Unlock()
+	if !ok {
+		return nil, fmt.Errorf("unknown kubernetes cluster %q, cannot get client", id)
 	}
-	return s.client, nil
+	return cluster.Client()
 }

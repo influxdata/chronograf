@@ -6,6 +6,7 @@ import (
 
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
+	"github.com/influxdata/kapacitor/tick/ast"
 	"github.com/influxdata/kapacitor/tick/stateful"
 )
 
@@ -67,7 +68,7 @@ func newFromNode(et *ExecutingTask, n *pipeline.FromNode, l *log.Logger) (*FromN
 		}
 
 		sn.expression = expr
-		sn.scopePool = stateful.NewScopePool(stateful.FindReferenceVariables(n.Lambda.Expression))
+		sn.scopePool = stateful.NewScopePool(ast.FindReferenceVariables(n.Lambda.Expression))
 	}
 
 	return sn, nil
@@ -87,7 +88,7 @@ func (s *FromNode) runStream([]byte) error {
 				pt.Time = pt.Time.Round(s.s.Round)
 			}
 			dims.TagNames = s.dimensions
-			pt = setGroupOnPoint(pt, s.allDimensions, dims)
+			pt = setGroupOnPoint(pt, s.allDimensions, dims, nil)
 			s.timer.Pause()
 			for _, child := range s.outs {
 				err := child.CollectPoint(pt)
@@ -114,6 +115,7 @@ func (s *FromNode) matches(p models.Point) bool {
 	}
 	if s.expression != nil {
 		if pass, err := EvalPredicate(s.expression, s.scopePool, p.Time, p.Fields, p.Tags); err != nil {
+			s.incrementErrorCount()
 			s.logger.Println("E! error while evaluating WHERE expression:", err)
 			return false
 		} else {

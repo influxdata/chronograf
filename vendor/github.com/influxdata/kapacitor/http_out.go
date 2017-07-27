@@ -7,8 +7,7 @@ import (
 	"path"
 	"sync"
 
-	"github.com/influxdata/influxdb/influxql"
-	imodels "github.com/influxdata/influxdb/models"
+	"github.com/influxdata/kapacitor/expvar"
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
 	"github.com/influxdata/kapacitor/services/httpd"
@@ -17,7 +16,7 @@ import (
 type HTTPOutNode struct {
 	node
 	c              *pipeline.HTTPOutNode
-	result         *influxql.Result
+	result         *models.Result
 	groupSeriesIdx map[models.GroupID]int
 	endpoint       string
 	routes         []httpd.Route
@@ -30,7 +29,7 @@ func newHTTPOutNode(et *ExecutingTask, n *pipeline.HTTPOutNode, l *log.Logger) (
 		node:           node{Node: n, et: et, logger: l},
 		c:              n,
 		groupSeriesIdx: make(map[models.GroupID]int),
-		result:         new(influxql.Result),
+		result:         new(models.Result),
 	}
 	et.registerOutput(hn.c.Endpoint, hn)
 	hn.node.runF = hn.runOut
@@ -43,6 +42,13 @@ func (h *HTTPOutNode) Endpoint() string {
 }
 
 func (h *HTTPOutNode) runOut([]byte) error {
+	valueF := func() int64 {
+		h.mu.RLock()
+		l := len(h.groupSeriesIdx)
+		h.mu.RUnlock()
+		return int64(l)
+	}
+	h.statMap.Set(statCardinalityGauge, expvar.NewIntFuncGauge(valueF))
 
 	hndl := func(w http.ResponseWriter, req *http.Request) {
 		h.mu.RLock()
@@ -112,7 +118,7 @@ func (h *HTTPOutNode) runOut([]byte) error {
 }
 
 // Update the result structure with a row.
-func (h *HTTPOutNode) updateResultWithRow(group models.GroupID, row *imodels.Row) {
+func (h *HTTPOutNode) updateResultWithRow(group models.GroupID, row *models.Row) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	idx, ok := h.groupSeriesIdx[group]

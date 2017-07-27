@@ -79,6 +79,9 @@ const (
 type K8sAutoscaleNode struct {
 	chainnode
 
+	// Cluster is the name of the Kubernetes cluster to use.
+	Cluster string
+
 	// Namespace is the namespace of the resource, if empty the default namespace will be used.
 	Namespace string
 

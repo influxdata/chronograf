@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -43,10 +44,12 @@ const (
 	configPath        = basePath + "/config"
 	serviceTestsPath  = basePath + "/service-tests"
 	alertsPath        = basePreviewPath + "/alerts"
-	handlersPath      = alertsPath + "/handlers"
 	topicsPath        = alertsPath + "/topics"
 	topicEventsPath   = "events"
 	topicHandlersPath = "handlers"
+	storagePath       = basePath + "/storage"
+	storesPath        = storagePath + "/stores"
+	backupPath        = storagePath + "/backup"
 )
 
 // HTTP configuration for connecting to Kapacitor
@@ -146,6 +149,7 @@ func New(conf Config) (*Client, error) {
 	}
 
 	tr := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: conf.InsecureSkipVerify,
 		},
@@ -589,10 +593,7 @@ func (c *Client) BaseURL() url.URL {
 	return *c.url
 }
 
-// Perform the request.
-// If result is not nil the response body is JSON decoded into result.
-// Codes is a list of valid response codes.
-func (c *Client) Do(req *http.Request, result interface{}, codes ...int) (*http.Response, error) {
+func (c *Client) prepRequest(req *http.Request) error {
 	req.Header.Set("User-Agent", c.userAgent)
 	if c.credentials != nil {
 		switch c.credentials.Method {
@@ -601,8 +602,36 @@ func (c *Client) Do(req *http.Request, result interface{}, codes ...int) (*http.
 		case BearerAuthentication:
 			req.Header.Set("Authorization", "Bearer "+c.credentials.Token)
 		default:
-			return nil, errors.New("unknown authentication method set")
+			return errors.New("unknown authentication method set")
 		}
+	}
+	return nil
+}
+
+func (c *Client) decodeError(resp *http.Response) error {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	type errResp struct {
+		Error string `json:"error"`
+	}
+	d := json.NewDecoder(bytes.NewReader(body))
+	rp := errResp{}
+	d.Decode(&rp)
+	if rp.Error != "" {
+		return errors.New(rp.Error)
+	}
+	return fmt.Errorf("invalid response: code %d: body: %s", resp.StatusCode, string(body))
+}
+
+// Perform the request.
+// If result is not nil the response body is JSON decoded into result.
+// Codes is a list of valid response codes.
+func (c *Client) Do(req *http.Request, result interface{}, codes ...int) (*http.Response, error) {
+	err := c.prepRequest(req)
+	if err != nil {
+		return nil, err
 	}
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -618,20 +647,7 @@ func (c *Client) Do(req *http.Request, result interface{}, codes ...int) (*http.
 		}
 	}
 	if !valid {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-		type errResp struct {
-			Error string `json:"error"`
-		}
-		d := json.NewDecoder(bytes.NewReader(body))
-		rp := errResp{}
-		d.Decode(&rp)
-		if rp.Error != "" {
-			return nil, errors.New(rp.Error)
-		}
-		return nil, fmt.Errorf("invalid response: code %d: body: %s", resp.StatusCode, string(body))
+		return nil, c.decodeError(resp)
 	}
 	if result != nil {
 		d := json.NewDecoder(resp.Body)
@@ -687,6 +703,10 @@ func (c *Client) ServiceTestLink(service string) Link {
 	return Link{Relation: Self, Href: path.Join(serviceTestsPath, service)}
 }
 
+func (c *Client) TopicLink(id string) Link {
+	return Link{Relation: Self, Href: path.Join(topicsPath, id)}
+}
+
 func (c *Client) TopicEventsLink(topic string) Link {
 	return Link{Relation: Self, Href: path.Join(topicsPath, topic, topicEventsPath)}
 }
@@ -697,12 +717,11 @@ func (c *Client) TopicEventLink(topic, event string) Link {
 func (c *Client) TopicHandlersLink(topic string) Link {
 	return Link{Relation: Self, Href: path.Join(topicsPath, topic, topicHandlersPath)}
 }
-
-func (c *Client) HandlerLink(id string) Link {
-	return Link{Relation: Self, Href: path.Join(handlersPath, id)}
+func (c *Client) TopicHandlerLink(topic, id string) Link {
+	return Link{Relation: Self, Href: path.Join(topicsPath, topic, topicHandlersPath, id)}
 }
-func (c *Client) TopicLink(id string) Link {
-	return Link{Relation: Self, Href: path.Join(topicsPath, id)}
+func (c *Client) StorageLink(name string) Link {
+	return Link{Relation: Self, Href: path.Join(storesPath, name)}
 }
 
 type CreateTaskOptions struct {
@@ -1910,51 +1929,23 @@ func (c *Client) ListTopicEvents(link Link, opt *ListTopicEventsOptions) (TopicE
 }
 
 type TopicHandlers struct {
-	Link     Link      `json:"link"`
-	Topic    string    `json:"topic"`
-	Handlers []Handler `json:"handlers"`
+	Link     Link           `json:"link"`
+	Topic    string         `json:"topic"`
+	Handlers []TopicHandler `json:"handlers"`
 }
 
-// TopicHandlers returns the current state for events within a topic.
-func (c *Client) ListTopicHandlers(link Link) (TopicHandlers, error) {
-	t := TopicHandlers{}
-	if link.Href == "" {
-		return t, fmt.Errorf("invalid link %v", link)
-	}
-
-	u := *c.url
-	u.Path = link.Href
-
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return t, err
-	}
-
-	_, err = c.Do(req, &t, http.StatusOK)
-	return t, err
+type TopicHandler struct {
+	Link    Link                   `json:"link"`
+	ID      string                 `json:"id"`
+	Kind    string                 `json:"kind"`
+	Options map[string]interface{} `json:"options"`
+	Match   string                 `json:"match"`
 }
 
-type Handlers struct {
-	Link     Link      `json:"link"`
-	Handlers []Handler `json:"handlers"`
-}
-
-type Handler struct {
-	Link    Link            `json:"link"`
-	ID      string          `json:"id"`
-	Topics  []string        `json:"topics"`
-	Actions []HandlerAction `json:"actions"`
-}
-
-type HandlerAction struct {
-	Kind    string                 `json:"kind" yaml:"kind"`
-	Options map[string]interface{} `json:"options" yaml:"options"`
-}
-
-// Handler retrieves an alert handler.
+// TopicHandler retrieves an alert handler.
 // Errors if no handler exists.
-func (c *Client) Handler(link Link) (Handler, error) {
-	h := Handler{}
+func (c *Client) TopicHandler(link Link) (TopicHandler, error) {
+	h := TopicHandler{}
 	if link.Href == "" {
 		return h, fmt.Errorf("invalid link %v", link)
 	}
@@ -1971,39 +1962,40 @@ func (c *Client) Handler(link Link) (Handler, error) {
 	return h, err
 }
 
-type HandlerOptions struct {
-	ID      string          `json:"id" yaml:"id"`
-	Topics  []string        `json:"topics" yaml:"topics"`
-	Actions []HandlerAction `json:"actions" yaml:"actions"`
+type TopicHandlerOptions struct {
+	ID      string                 `json:"id" yaml:"id"`
+	Kind    string                 `json:"kind" yaml:"kind"`
+	Options map[string]interface{} `json:"options" yaml:"options"`
+	Match   string                 `json:"match" yaml:"match"`
 }
 
-// CreateHandler creates a new alert handler.
+// CreateTopicHandler creates a new alert handler.
 // Errors if the handler already exists.
-func (c *Client) CreateHandler(opt HandlerOptions) (Handler, error) {
+func (c *Client) CreateTopicHandler(link Link, opt TopicHandlerOptions) (TopicHandler, error) {
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
 	err := enc.Encode(opt)
 	if err != nil {
-		return Handler{}, err
+		return TopicHandler{}, err
 	}
 
 	u := *c.url
-	u.Path = handlersPath
+	u.Path = link.Href
 
 	req, err := http.NewRequest("POST", u.String(), &buf)
 	if err != nil {
-		return Handler{}, err
+		return TopicHandler{}, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	h := Handler{}
+	h := TopicHandler{}
 	_, err = c.Do(req, &h, http.StatusOK)
 	return h, err
 }
 
-// PatchHandler applies a patch operation to an existing handler.
-func (c *Client) PatchHandler(link Link, patch JSONPatch) (Handler, error) {
-	h := Handler{}
+// PatchTopicHandler applies a patch operation to an existing handler.
+func (c *Client) PatchTopicHandler(link Link, patch JSONPatch) (TopicHandler, error) {
+	h := TopicHandler{}
 	if link.Href == "" {
 		return h, fmt.Errorf("invalid link %v", link)
 	}
@@ -2027,9 +2019,9 @@ func (c *Client) PatchHandler(link Link, patch JSONPatch) (Handler, error) {
 	return h, err
 }
 
-// ReplaceHandler replaces an existing handler, with the new definition.
-func (c *Client) ReplaceHandler(link Link, opt HandlerOptions) (Handler, error) {
-	h := Handler{}
+// ReplaceTopicHandler replaces an existing handler, with the new definition.
+func (c *Client) ReplaceTopicHandler(link Link, opt TopicHandlerOptions) (TopicHandler, error) {
+	h := TopicHandler{}
 	if link.Href == "" {
 		return h, fmt.Errorf("invalid link %v", link)
 	}
@@ -2053,8 +2045,8 @@ func (c *Client) ReplaceHandler(link Link, opt HandlerOptions) (Handler, error) 
 	return h, err
 }
 
-// DeleteHandler deletes a handler.
-func (c *Client) DeleteHandler(link Link) error {
+// DeleteTopicHandler deletes a handler.
+func (c *Client) DeleteTopicHandler(link Link) error {
 	if link.Href == "" {
 		return fmt.Errorf("invalid link %v", link)
 	}
@@ -2070,27 +2062,27 @@ func (c *Client) DeleteHandler(link Link) error {
 	return err
 }
 
-type ListHandlersOptions struct {
+type ListTopicHandlersOptions struct {
 	Pattern string
 }
 
-func (o *ListHandlersOptions) Default() {}
+func (o *ListTopicHandlersOptions) Default() {}
 
-func (o *ListHandlersOptions) Values() *url.Values {
+func (o *ListTopicHandlersOptions) Values() *url.Values {
 	v := &url.Values{}
 	v.Set("pattern", o.Pattern)
 	return v
 }
 
-func (c *Client) ListHandlers(opt *ListHandlersOptions) (Handlers, error) {
-	handlers := Handlers{}
+func (c *Client) ListTopicHandlers(link Link, opt *ListTopicHandlersOptions) (TopicHandlers, error) {
+	handlers := TopicHandlers{}
 	if opt == nil {
-		opt = new(ListHandlersOptions)
+		opt = new(ListTopicHandlersOptions)
 	}
 	opt.Default()
 
 	u := *c.url
-	u.Path = handlersPath
+	u.Path = link.Href
 	u.RawQuery = opt.Values().Encode()
 
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -2103,6 +2095,116 @@ func (c *Client) ListHandlers(opt *ListHandlersOptions) (Handlers, error) {
 		return handlers, err
 	}
 	return handlers, nil
+}
+
+type StorageList struct {
+	Link    Link      `json:"link"`
+	Storage []Storage `json:"storage"`
+}
+
+type Storage struct {
+	Link Link   `json:"link"`
+	Name string `json:"name"`
+}
+
+type StorageAction int
+
+const (
+	_ StorageAction = iota
+	StorageRebuild
+)
+
+func (sa StorageAction) MarshalText() ([]byte, error) {
+	switch sa {
+	case StorageRebuild:
+		return []byte("rebuild"), nil
+	default:
+		return nil, fmt.Errorf("unknown StorageAction %d", sa)
+	}
+}
+
+func (sa *StorageAction) UnmarshalText(text []byte) error {
+	switch s := string(text); s {
+	case "rebuild":
+		*sa = StorageRebuild
+	default:
+		return fmt.Errorf("unknown StorageAction %s", s)
+	}
+	return nil
+}
+
+func (sa StorageAction) String() string {
+	s, err := sa.MarshalText()
+	if err != nil {
+		return err.Error()
+	}
+	return string(s)
+}
+
+type StorageActionOptions struct {
+	Action StorageAction `json:"action"`
+}
+
+func (c *Client) ListStorage() (StorageList, error) {
+	list := StorageList{}
+	u := *c.url
+	u.Path = storesPath
+
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return list, err
+	}
+
+	_, err = c.Do(req, &list, http.StatusOK)
+	if err != nil {
+		return list, err
+	}
+	return list, nil
+}
+
+func (c *Client) DoStorageAction(l Link, opt StorageActionOptions) error {
+	u := *c.url
+	u.Path = l.Href
+
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	err := enc.Encode(opt)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("POST", u.String(), &buf)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	_, err = c.Do(req, nil, http.StatusNoContent)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Backup requests a backup of all storage from Kapacitor.
+// A short read is possible, to verify that the backup was successful
+// check that the number of bytes read matches the returned size.
+func (c *Client) Backup() (int64, io.ReadCloser, error) {
+	u := *c.url
+	u.Path = backupPath
+
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return 0, nil, err
+	}
+	err = c.prepRequest(req)
+	if err != nil {
+		return 0, nil, err
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return 0, nil, err
+	}
+	return resp.ContentLength, resp.Body, nil
 }
 
 type LogLevelOptions struct {
