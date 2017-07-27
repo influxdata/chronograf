@@ -11,22 +11,25 @@ import (
 	text "text/template"
 	"time"
 
-	"github.com/influxdata/influxdb/influxql"
-	imodels "github.com/influxdata/influxdb/models"
 	"github.com/influxdata/kapacitor/alert"
 	"github.com/influxdata/kapacitor/expvar"
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
 	alertservice "github.com/influxdata/kapacitor/services/alert"
 	"github.com/influxdata/kapacitor/services/hipchat"
+	"github.com/influxdata/kapacitor/services/httppost"
 	"github.com/influxdata/kapacitor/services/opsgenie"
 	"github.com/influxdata/kapacitor/services/pagerduty"
+	"github.com/influxdata/kapacitor/services/pushover"
+	"github.com/influxdata/kapacitor/services/sensu"
 	"github.com/influxdata/kapacitor/services/slack"
 	"github.com/influxdata/kapacitor/services/smtp"
 	"github.com/influxdata/kapacitor/services/snmptrap"
 	"github.com/influxdata/kapacitor/services/telegram"
 	"github.com/influxdata/kapacitor/services/victorops"
+	"github.com/influxdata/kapacitor/tick/ast"
 	"github.com/influxdata/kapacitor/tick/stateful"
+	"github.com/influxdata/kapacitor/vars"
 	"github.com/pkg/errors"
 )
 
@@ -58,6 +61,8 @@ type AlertNode struct {
 	messageTmpl *text.Template
 	detailsTmpl *html.Template
 
+	statesMu sync.RWMutex
+
 	alertsTriggered *expvar.Int
 	oksTriggered    *expvar.Int
 	infosTriggered  *expvar.Int
@@ -69,6 +74,8 @@ type AlertNode struct {
 
 	levelResets  []stateful.Expression
 	lrScopePools []stateful.ScopePool
+
+	serverInfo serverInfo
 }
 
 // Create a new  AlertNode which caches the most recent item and exposes it over the HTTP API.
@@ -76,6 +83,11 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 	an = &AlertNode{
 		node: node{Node: n, et: et, logger: l},
 		a:    n,
+		serverInfo: serverInfo{
+			Hostname:  vars.HostVar.StringValue(),
+			ClusterID: vars.ClusterIDVar.StringValue(),
+			ServerID:  vars.ServerIDVar.StringValue(),
+		},
 	}
 	an.node.runF = an.runAlert
 
@@ -117,15 +129,6 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 	}).Parse(n.Details)
 	if err != nil {
 		return nil, err
-	}
-
-	// Construct alert handlers
-	for _, post := range n.PostHandlers {
-		c := alertservice.PostHandlerConfig{
-			URL: post.URL,
-		}
-		h := alertservice.NewPostHandler(c, l)
-		an.handlers = append(an.handlers, h)
 	}
 
 	for _, tcp := range n.TcpHandlers {
@@ -204,8 +207,15 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 		an.handlers = append(an.handlers, h)
 	}
 
-	for range n.SensuHandlers {
-		h := et.tm.SensuService.Handler(l)
+	for _, s := range n.SensuHandlers {
+		c := sensu.HandlerConfig{
+			Source:   s.Source,
+			Handlers: s.HandlersList,
+		}
+		h, err := et.tm.SensuService.Handler(c, l)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create sensu alert handler")
+		}
 		an.handlers = append(an.handlers, h)
 	}
 
@@ -325,6 +335,37 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 		an.handlers = append(an.handlers, h)
 	}
 
+	for _, p := range n.PushoverHandlers {
+		c := pushover.HandlerConfig{}
+		if p.Device != "" {
+			c.Device = p.Device
+		}
+		if p.Title != "" {
+			c.Title = p.Title
+		}
+		if p.URL != "" {
+			c.URL = p.URL
+		}
+		if p.URLTitle != "" {
+			c.URLTitle = p.URLTitle
+		}
+		if p.Sound != "" {
+			c.Sound = p.Sound
+		}
+		h := et.tm.PushoverService.Handler(c, l)
+		an.handlers = append(an.handlers, h)
+	}
+
+	for _, p := range n.HTTPPostHandlers {
+		c := httppost.HandlerConfig{
+			URL:      p.URL,
+			Endpoint: p.Endpoint,
+			Headers:  p.Headers,
+		}
+		h := et.tm.HTTPPostService.Handler(c, l)
+		an.handlers = append(an.handlers, h)
+	}
+
 	for _, og := range n.OpsGenieHandlers {
 		c := opsgenie.HandlerConfig{
 			TeamsList:      og.TeamsList,
@@ -358,14 +399,14 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 		}
 
 		an.levels[alert.Info] = statefulExpression
-		an.scopePools[alert.Info] = stateful.NewScopePool(stateful.FindReferenceVariables(n.Info.Expression))
+		an.scopePools[alert.Info] = stateful.NewScopePool(ast.FindReferenceVariables(n.Info.Expression))
 		if n.InfoReset != nil {
 			lstatefulExpression, lexpressionCompileError := stateful.NewExpression(n.InfoReset.Expression)
 			if lexpressionCompileError != nil {
 				return nil, fmt.Errorf("Failed to compile stateful expression for infoReset: %s", lexpressionCompileError)
 			}
 			an.levelResets[alert.Info] = lstatefulExpression
-			an.lrScopePools[alert.Info] = stateful.NewScopePool(stateful.FindReferenceVariables(n.InfoReset.Expression))
+			an.lrScopePools[alert.Info] = stateful.NewScopePool(ast.FindReferenceVariables(n.InfoReset.Expression))
 		}
 	}
 
@@ -375,14 +416,14 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 			return nil, fmt.Errorf("Failed to compile stateful expression for warn: %s", expressionCompileError)
 		}
 		an.levels[alert.Warning] = statefulExpression
-		an.scopePools[alert.Warning] = stateful.NewScopePool(stateful.FindReferenceVariables(n.Warn.Expression))
+		an.scopePools[alert.Warning] = stateful.NewScopePool(ast.FindReferenceVariables(n.Warn.Expression))
 		if n.WarnReset != nil {
 			lstatefulExpression, lexpressionCompileError := stateful.NewExpression(n.WarnReset.Expression)
 			if lexpressionCompileError != nil {
 				return nil, fmt.Errorf("Failed to compile stateful expression for warnReset: %s", lexpressionCompileError)
 			}
 			an.levelResets[alert.Warning] = lstatefulExpression
-			an.lrScopePools[alert.Warning] = stateful.NewScopePool(stateful.FindReferenceVariables(n.WarnReset.Expression))
+			an.lrScopePools[alert.Warning] = stateful.NewScopePool(ast.FindReferenceVariables(n.WarnReset.Expression))
 		}
 	}
 
@@ -392,14 +433,14 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 			return nil, fmt.Errorf("Failed to compile stateful expression for crit: %s", expressionCompileError)
 		}
 		an.levels[alert.Critical] = statefulExpression
-		an.scopePools[alert.Critical] = stateful.NewScopePool(stateful.FindReferenceVariables(n.Crit.Expression))
+		an.scopePools[alert.Critical] = stateful.NewScopePool(ast.FindReferenceVariables(n.Crit.Expression))
 		if n.CritReset != nil {
 			lstatefulExpression, lexpressionCompileError := stateful.NewExpression(n.CritReset.Expression)
 			if lexpressionCompileError != nil {
 				return nil, fmt.Errorf("Failed to compile stateful expression for critReset: %s", lexpressionCompileError)
 			}
 			an.levelResets[alert.Critical] = lstatefulExpression
-			an.lrScopePools[alert.Critical] = stateful.NewScopePool(stateful.FindReferenceVariables(n.CritReset.Expression))
+			an.lrScopePools[alert.Critical] = stateful.NewScopePool(ast.FindReferenceVariables(n.CritReset.Expression))
 		}
 	}
 
@@ -420,13 +461,21 @@ func newAlertNode(et *ExecutingTask, n *pipeline.AlertNode, l *log.Logger) (an *
 }
 
 func (a *AlertNode) runAlert([]byte) error {
+	valueF := func() int64 {
+		a.statesMu.RLock()
+		l := len(a.states)
+		a.statesMu.RUnlock()
+		return int64(l)
+	}
+	a.statMap.Set(statCardinalityGauge, expvar.NewIntFuncGauge(valueF))
+
 	// Register delete hook
 	if a.hasAnonTopic() {
 		a.et.tm.registerDeleteHookForTask(a.et.Task.ID, deleteAlertHook(a.anonTopic))
 
 		// Register Handlers on topic
 		for _, h := range a.handlers {
-			a.et.tm.AlertService.RegisterHandler([]string{a.anonTopic}, h)
+			a.et.tm.AlertService.RegisterAnonHandler(a.anonTopic, h)
 		}
 		// Restore anonTopic
 		a.et.tm.AlertService.RestoreTopic(a.anonTopic)
@@ -460,14 +509,16 @@ func (a *AlertNode) runAlert([]byte) error {
 				return err
 			}
 			var currentLevel alert.Level
-			if state, ok := a.states[p.Group]; ok {
+			if state, ok := a.getAlertState(p.Group); ok {
 				currentLevel = state.currentLevel()
 			} else {
 				// Check for previous state
-				currentLevel = a.restoreEventState(id)
+				var triggered time.Time
+				currentLevel, triggered = a.restoreEventState(id)
 				if currentLevel != alert.OK {
 					// Update the state with the restored state
-					a.updateState(p.Time, currentLevel, p.Group)
+					state = a.updateState(p.Time, currentLevel, p.Group)
+					state.triggered(triggered)
 				}
 			}
 			l := a.determineLevel(p.Time, p.Fields, p.Tags, currentLevel)
@@ -550,14 +601,16 @@ func (a *AlertNode) runAlert([]byte) error {
 			var highestPoint *models.BatchPoint
 
 			var currentLevel alert.Level
-			if state, ok := a.states[b.Group]; ok {
+			if state, ok := a.getAlertState(b.Group); ok {
 				currentLevel = state.currentLevel()
 			} else {
 				// Check for previous state
-				currentLevel = a.restoreEventState(id)
+				var triggered time.Time
+				currentLevel, triggered = a.restoreEventState(id)
 				if currentLevel != alert.OK {
 					// Update the state with the restored state
-					a.updateState(b.TMax, currentLevel, b.Group)
+					state = a.updateState(b.TMax, currentLevel, b.Group)
+					state.triggered(triggered)
 				}
 			}
 			for i, p := range b.Points {
@@ -613,6 +666,7 @@ func (a *AlertNode) runAlert([]byte) error {
 					a.a.IdField != "" ||
 					a.a.DurationField != "" ||
 					a.a.MessageField != "" {
+					b.Points = b.ShallowCopyPoints()
 					for i := range b.Points {
 						if a.a.LevelTag != "" || a.a.IdTag != "" {
 							b.Points[i].Tags = b.Points[i].Tags.Copy()
@@ -665,7 +719,7 @@ func (a *AlertNode) runAlert([]byte) error {
 	a.et.tm.AlertService.CloseTopic(a.anonTopic)
 	// Deregister Handlers on topic
 	for _, h := range a.handlers {
-		a.et.tm.AlertService.DeregisterHandler([]string{a.anonTopic}, h)
+		a.et.tm.AlertService.DeregisterAnonHandler(a.anonTopic, h)
 	}
 	return nil
 }
@@ -683,19 +737,25 @@ func (a *AlertNode) hasTopic() bool {
 	return a.topic != ""
 }
 
-func (a *AlertNode) restoreEventState(id string) alert.Level {
+func (a *AlertNode) restoreEventState(id string) (alert.Level, time.Time) {
 	var topicState, anonTopicState alert.EventState
 	var anonFound, topicFound bool
 	// Check for previous state on anonTopic
 	if a.hasAnonTopic() {
-		if state, ok := a.et.tm.AlertService.EventState(a.anonTopic, id); ok {
+		if state, ok, err := a.et.tm.AlertService.EventState(a.anonTopic, id); err != nil {
+			a.incrementErrorCount()
+			a.logger.Printf("E! failed to get event state for anonymous topic %s, event %s: %v", a.anonTopic, id, err)
+		} else if ok {
 			anonTopicState = state
 			anonFound = true
 		}
 	}
 	// Check for previous state on topic.
 	if a.hasTopic() {
-		if state, ok := a.et.tm.AlertService.EventState(a.topic, id); ok {
+		if state, ok, err := a.et.tm.AlertService.EventState(a.topic, id); err != nil {
+			a.incrementErrorCount()
+			a.logger.Printf("E! failed to get event state for topic %s, event %s: %v", a.topic, id, err)
+		} else if ok {
 			topicState = state
 			topicFound = true
 		}
@@ -704,19 +764,21 @@ func (a *AlertNode) restoreEventState(id string) alert.Level {
 		if anonFound && topicFound {
 			// Anon topic takes precedence
 			if err := a.et.tm.AlertService.UpdateEvent(a.topic, anonTopicState); err != nil {
+				a.incrementErrorCount()
 				a.logger.Printf("E! failed to update topic %q event state for event %q", a.topic, id)
 			}
 		} else if topicFound && a.hasAnonTopic() {
 			// Update event state for topic
 			if err := a.et.tm.AlertService.UpdateEvent(a.anonTopic, topicState); err != nil {
+				a.incrementErrorCount()
 				a.logger.Printf("E! failed to update topic %q event state for event %q", a.topic, id)
 			}
 		} // else nothing was found, nothing to do
 	}
 	if anonFound {
-		return anonTopicState.Level
+		return anonTopicState.Level, anonTopicState.Time
 	}
-	return topicState.Level
+	return topicState.Level, topicState.Time
 }
 
 func (a *AlertNode) handleEvent(event alert.Event) {
@@ -739,6 +801,7 @@ func (a *AlertNode) handleEvent(event alert.Event) {
 		err := a.et.tm.AlertService.Collect(event)
 		if err != nil {
 			a.eventsDropped.Add(1)
+			a.incrementErrorCount()
 			a.logger.Println("E!", err)
 		}
 	}
@@ -749,6 +812,7 @@ func (a *AlertNode) handleEvent(event alert.Event) {
 		err := a.et.tm.AlertService.Collect(event)
 		if err != nil {
 			a.eventsDropped.Add(1)
+			a.incrementErrorCount()
 			a.logger.Println("E!", err)
 		}
 	}
@@ -760,6 +824,7 @@ func (a *AlertNode) determineLevel(now time.Time, fields models.Fields, tags map
 	}
 	if rse := a.levelResets[currentLevel]; rse != nil {
 		if pass, err := EvalPredicate(rse, a.lrScopePools[currentLevel], now, fields, tags); err != nil {
+			a.incrementErrorCount()
 			a.logger.Printf("E! error evaluating reset expression for current level %v: %s", currentLevel, err)
 		} else if !pass {
 			return currentLevel
@@ -781,6 +846,7 @@ func (a *AlertNode) findFirstMatchLevel(start alert.Level, stop alert.Level, now
 			continue
 		}
 		if pass, err := EvalPredicate(se, a.scopePools[l], now, fields, tags); err != nil {
+			a.incrementErrorCount()
 			a.logger.Printf("E! error evaluating expression for level %v: %s", alert.Level(l), err)
 			continue
 		} else if pass {
@@ -788,14 +854,6 @@ func (a *AlertNode) findFirstMatchLevel(start alert.Level, stop alert.Level, now
 		}
 	}
 	return alert.OK, false
-}
-
-func (a *AlertNode) batchToResult(b models.Batch) influxql.Result {
-	row := models.BatchToRow(b)
-	r := influxql.Result{
-		Series: imodels.Rows{row},
-	}
-	return r
 }
 
 func (a *AlertNode) event(
@@ -828,7 +886,7 @@ func (a *AlertNode) event(
 			Group:    string(group),
 			Tags:     tags,
 			Fields:   fields,
-			Result:   a.batchToResult(b),
+			Result:   models.BatchToResult(b),
 		},
 	}
 	return event, nil
@@ -904,12 +962,14 @@ func (a *alertState) percentChange() float64 {
 }
 
 func (a *AlertNode) updateState(t time.Time, level alert.Level, group models.GroupID) *alertState {
-	state, ok := a.states[group]
+	state, ok := a.getAlertState(group)
 	if !ok {
 		state = &alertState{
 			history: make([]alert.Level, a.a.History),
 		}
+		a.statesMu.Lock()
 		a.states[group] = state
+		a.statesMu.Unlock()
 	}
 	state.addEvent(level)
 
@@ -923,6 +983,12 @@ func (a *AlertNode) updateState(t time.Time, level alert.Level, group models.Gro
 	}
 	state.expired = !state.changed && a.a.StateChangesOnlyDuration != 0 && t.Sub(state.lastTriggered) >= a.a.StateChangesOnlyDuration
 	return state
+}
+
+type serverInfo struct {
+	Hostname  string
+	ClusterID string
+	ServerID  string
 }
 
 // Type containing information available to ID template.
@@ -939,6 +1005,8 @@ type idInfo struct {
 
 	// Map of tags
 	Tags map[string]string
+
+	ServerInfo serverInfo
 }
 
 type messageInfo struct {
@@ -969,10 +1037,11 @@ func (a *AlertNode) renderID(name string, group models.GroupID, tags models.Tags
 		g = "nil"
 	}
 	info := idInfo{
-		Name:     name,
-		TaskName: a.et.Task.ID,
-		Group:    g,
-		Tags:     tags,
+		Name:       name,
+		TaskName:   a.et.Task.ID,
+		Group:      g,
+		Tags:       tags,
+		ServerInfo: a.serverInfo,
 	}
 	id := a.bufPool.Get().(*bytes.Buffer)
 	defer func() {
@@ -994,10 +1063,11 @@ func (a *AlertNode) renderMessageAndDetails(id, name string, t time.Time, group 
 	}
 	minfo := messageInfo{
 		idInfo: idInfo{
-			Name:     name,
-			TaskName: a.et.Task.ID,
-			Group:    g,
-			Tags:     tags,
+			Name:       name,
+			TaskName:   a.et.Task.ID,
+			Group:      g,
+			Tags:       tags,
+			ServerInfo: a.serverInfo,
 		},
 		ID:     id,
 		Fields: fields,
@@ -1033,4 +1103,11 @@ func (a *AlertNode) renderMessageAndDetails(id, name string, t time.Time, group 
 
 	details := tmpBuffer.String()
 	return msg, details, nil
+}
+
+func (a *AlertNode) getAlertState(id models.GroupID) (state *alertState, ok bool) {
+	a.statesMu.RLock()
+	state, ok = a.states[id]
+	a.statesMu.RUnlock()
+	return state, ok
 }

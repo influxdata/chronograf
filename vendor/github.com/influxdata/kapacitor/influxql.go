@@ -3,15 +3,18 @@ package kapacitor
 import (
 	"fmt"
 	"log"
+	"reflect"
+	"sync"
 	"time"
 
+	"github.com/influxdata/kapacitor/expvar"
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
 	"github.com/pkg/errors"
 )
 
 // tmpl -- go get github.com/benbjohnson/tmpl
-//go:generate tmpl -data=@tmpldata influxql.gen.go.tmpl
+//go:generate tmpl -data=@tmpldata.json influxql.gen.go.tmpl
 
 type createReduceContextFunc func(c baseReduceContext) reduceContext
 
@@ -70,11 +73,23 @@ func (c *baseReduceContext) Time() time.Time {
 }
 
 func (n *InfluxQLNode) runStreamInfluxQL() error {
+	var mu sync.RWMutex
 	contexts := make(map[models.GroupID]reduceContext)
+	valueF := func() int64 {
+		mu.RLock()
+		l := len(contexts)
+		mu.RUnlock()
+		return int64(l)
+	}
+	n.statMap.Set(statCardinalityGauge, expvar.NewIntFuncGauge(valueF))
+
+	var kind reflect.Kind
 	for p, ok := n.ins[0].NextPoint(); ok; {
 		n.timer.Start()
+		mu.RLock()
 		context := contexts[p.Group]
-		// Fisrt point in window
+		mu.RUnlock()
+		// First point in window
 		if context == nil {
 			// Create new context
 			c := baseReduceContext{
@@ -88,30 +103,48 @@ func (n *InfluxQLNode) runStreamInfluxQL() error {
 				pointTimes: n.n.PointTimes || n.isStreamTransformation,
 			}
 
-			createFn, err := n.getCreateFn(p.Fields[c.field])
+			f, exists := p.Fields[c.field]
+			if !exists {
+				n.incrementErrorCount()
+				n.logger.Printf("E! field %s missing from point, skipping point", c.field)
+				p, ok = n.ins[0].NextPoint()
+				n.timer.Stop()
+				continue
+			}
+
+			k := reflect.TypeOf(f).Kind()
+			kindChanged := k != kind
+			kind = k
+
+			createFn, err := n.getCreateFn(kindChanged, kind)
 			if err != nil {
 				return err
 			}
 
 			context = createFn(c)
+			mu.Lock()
 			contexts[p.Group] = context
+			mu.Unlock()
 
 		}
 		if n.isStreamTransformation {
 			err := context.AggregatePoint(&p)
 			if err != nil {
+				n.incrementErrorCount()
 				n.logger.Println("E! failed to aggregate point:", err)
 			}
 			p, ok = n.ins[0].NextPoint()
 
 			err = n.emit(context)
 			if err != nil && err != ErrEmptyEmit {
+				n.incrementErrorCount()
 				n.logger.Println("E! failed to emit stream:", err)
 			}
 		} else {
 			if p.Time.Equal(context.Time()) {
 				err := context.AggregatePoint(&p)
 				if err != nil {
+					n.incrementErrorCount()
 					n.logger.Println("E! failed to aggregate point:", err)
 				}
 				// advance to next point
@@ -119,11 +152,14 @@ func (n *InfluxQLNode) runStreamInfluxQL() error {
 			} else {
 				err := n.emit(context)
 				if err != nil {
+					n.incrementErrorCount()
 					n.logger.Println("E! failed to emit stream:", err)
 				}
 
 				// Nil out reduced point
+				mu.Lock()
 				contexts[p.Group] = nil
+				mu.Unlock()
 				// do not advance,
 				// go through loop again to initialize new iterator.
 			}
@@ -134,7 +170,8 @@ func (n *InfluxQLNode) runStreamInfluxQL() error {
 }
 
 func (n *InfluxQLNode) runBatchInfluxQL() error {
-	var exampleValue interface{}
+	var kind reflect.Kind
+	kindChanged := true
 	for b, ok := n.ins[0].NextBatch(); ok; b, ok = n.ins[0].NextBatch() {
 		n.timer.Start()
 		// Create new base context
@@ -154,14 +191,23 @@ func (n *InfluxQLNode) runBatchInfluxQL() error {
 				n.timer.Stop()
 				continue
 			}
-			if exampleValue == nil {
+			if kind == reflect.Invalid {
 				// If we have no points and have never seen a point assume float64
-				exampleValue = float64(0)
+				kind = reflect.Float64
 			}
 		} else {
-			exampleValue = b.Points[0].Fields[c.field]
+			f, ok := b.Points[0].Fields[c.field]
+			if !ok {
+				n.incrementErrorCount()
+				n.logger.Printf("E! field %s missing from point, skipping batch", c.field)
+				n.timer.Stop()
+				continue
+			}
+			k := reflect.TypeOf(f).Kind()
+			kindChanged = k != kind
+			kind = k
 		}
-		createFn, err := n.getCreateFn(exampleValue)
+		createFn, err := n.getCreateFn(kindChanged, kind)
 		if err != nil {
 			return err
 		}
@@ -180,9 +226,11 @@ func (n *InfluxQLNode) runBatchInfluxQL() error {
 					Tags:   bp.Tags,
 				}
 				if err := context.AggregatePoint(&p); err != nil {
+					n.incrementErrorCount()
 					n.logger.Println("E! failed to aggregate batch point:", err)
 				}
 				if ep, err := context.EmitPoint(); err != nil && err != ErrEmptyEmit {
+					n.incrementErrorCount()
 					n.logger.Println("E! failed to emit batch point:", err)
 				} else if err != ErrEmptyEmit {
 					eb.Points = append(eb.Points, models.BatchPoint{
@@ -196,6 +244,7 @@ func (n *InfluxQLNode) runBatchInfluxQL() error {
 			n.timer.Pause()
 			for _, out := range n.outs {
 				if err := out.CollectBatch(eb); err != nil {
+					n.incrementErrorCount()
 					n.logger.Println("E! failed to emit batch points:", err)
 				}
 			}
@@ -204,9 +253,11 @@ func (n *InfluxQLNode) runBatchInfluxQL() error {
 			err := context.AggregateBatch(&b)
 			if err == nil {
 				if err := n.emit(context); err != nil {
+					n.incrementErrorCount()
 					n.logger.Println("E! failed to emit batch:", err)
 				}
 			} else {
+				n.incrementErrorCount()
 				n.logger.Println("E! failed to aggregate batch:", err)
 			}
 		}
@@ -215,11 +266,11 @@ func (n *InfluxQLNode) runBatchInfluxQL() error {
 	return nil
 }
 
-func (n *InfluxQLNode) getCreateFn(value interface{}) (createReduceContextFunc, error) {
-	if n.createFn != nil {
+func (n *InfluxQLNode) getCreateFn(changed bool, kind reflect.Kind) (createReduceContextFunc, error) {
+	if !changed && n.createFn != nil {
 		return n.createFn, nil
 	}
-	createFn, err := determineReduceContextCreateFn(n.n.Method, value, n.n.ReduceCreater)
+	createFn, err := determineReduceContextCreateFn(n.n.Method, kind, n.n.ReduceCreater)
 	if err != nil {
 		return nil, errors.Wrapf(err, "invalid influxql func %s with field %s", n.n.Method, n.n.Field)
 	}

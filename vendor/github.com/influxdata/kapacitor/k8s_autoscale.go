@@ -3,6 +3,7 @@ package kapacitor
 import (
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/influxdata/kapacitor/expvar"
@@ -17,7 +18,6 @@ import (
 const (
 	statsK8sIncreaseEventsCount = "increase_events"
 	statsK8sDecreaseEventsCount = "decrease_events"
-	statsK8sErrorsCount         = "errors"
 	statsK8sCooldownDropsCount  = "cooldown_drops"
 )
 
@@ -36,13 +36,15 @@ type K8sAutoscaleNode struct {
 	decreaseCount      *expvar.Int
 	cooldownDropsCount *expvar.Int
 
+	replicasExprsMu sync.RWMutex
+
 	min int
 	max int
 }
 
 // Create a new K8sAutoscaleNode which can trigger autoscale event for a Kubernetes cluster.
 func newK8sAutoscaleNode(et *ExecutingTask, n *pipeline.K8sAutoscaleNode, l *log.Logger) (*K8sAutoscaleNode, error) {
-	client, err := et.tm.K8sService.Client()
+	client, err := et.tm.K8sService.Client(n.Cluster)
 	if err != nil {
 		return nil, fmt.Errorf("cannot use the k8sAutoscale node, could not create kubernetes client: %v", err)
 	}
@@ -61,20 +63,26 @@ func newK8sAutoscaleNode(et *ExecutingTask, n *pipeline.K8sAutoscaleNode, l *log
 	// Initialize the replicas lambda expression scope pool
 	if n.Replicas != nil {
 		kn.replicasExprs = make(map[models.GroupID]stateful.Expression)
-		kn.replicasScopePool = stateful.NewScopePool(stateful.FindReferenceVariables(n.Replicas.Expression))
+		kn.replicasScopePool = stateful.NewScopePool(ast.FindReferenceVariables(n.Replicas.Expression))
 	}
 	return kn, nil
 }
 
 func (k *K8sAutoscaleNode) runAutoscale([]byte) error {
+	valueF := func() int64 {
+		k.replicasExprsMu.RLock()
+		l := len(k.replicasExprs)
+		k.replicasExprsMu.RUnlock()
+		return int64(l)
+	}
+	k.statMap.Set(statCardinalityGauge, expvar.NewIntFuncGauge(valueF))
+
 	k.increaseCount = &expvar.Int{}
 	k.decreaseCount = &expvar.Int{}
-	errorsCount := &expvar.Int{}
 	k.cooldownDropsCount = &expvar.Int{}
 
 	k.statMap.Set(statsK8sIncreaseEventsCount, k.increaseCount)
 	k.statMap.Set(statsK8sDecreaseEventsCount, k.decreaseCount)
-	k.statMap.Set(statsK8sErrorsCount, errorsCount)
 	k.statMap.Set(statsK8sCooldownDropsCount, k.cooldownDropsCount)
 
 	switch k.Wants() {
@@ -82,7 +90,7 @@ func (k *K8sAutoscaleNode) runAutoscale([]byte) error {
 		for p, ok := k.ins[0].NextPoint(); ok; p, ok = k.ins[0].NextPoint() {
 			k.timer.Start()
 			if np, err := k.handlePoint(p.Name, p.Group, p.Dimensions, p.Time, p.Fields, p.Tags); err != nil {
-				errorsCount.Add(1)
+				k.incrementErrorCount()
 				k.logger.Println("E!", err)
 			} else if np.Name != "" {
 				k.timer.Pause()
@@ -101,7 +109,7 @@ func (k *K8sAutoscaleNode) runAutoscale([]byte) error {
 			k.timer.Start()
 			for _, p := range b.Points {
 				if np, err := k.handlePoint(b.Name, b.Group, b.PointDimensions(), p.Time, p.Fields, p.Tags); err != nil {
-					errorsCount.Add(1)
+					k.incrementErrorCount()
 					k.logger.Println("E!", err)
 				} else if np.Name != "" {
 					k.timer.Pause()
@@ -151,7 +159,9 @@ func (k *K8sAutoscaleNode) handlePoint(streamName string, group models.GroupID, 
 	}
 
 	// Eval the replicas expression
+	k.replicasExprsMu.Lock()
 	newReplicas, err := k.evalExpr(state.current, group, k.k.Replicas, k.replicasExprs, k.replicasScopePool, t, fields, tags)
+	k.replicasExprsMu.Unlock()
 	if err != nil {
 		return models.Point{}, errors.Wrap(err, "failed to evaluate the replicas expression")
 	}
