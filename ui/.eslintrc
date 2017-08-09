@@ -12,6 +12,7 @@
   },
   globals: {
     expect: true,
+    define: true,
   },
   "parserOptions": {
     ecmaFeatures: {
