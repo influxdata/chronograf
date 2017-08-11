@@ -42,6 +42,21 @@ class DataExplorer extends Component {
     queryConfigActions.deleteQuery(query.id)
   }
 
+  handleAddQuery() {
+    const newIndex = this.props.queryConfigs.length
+    this.props.queryConfigActions.addQuery()
+    this.handleSetActiveQueryIndex(newIndex)
+  }
+
+  getActiveQuery() {
+    const {activeQueryIndex} = this.state
+    const {queryConfigs} = this.props
+    const activeQuery = queryConfigs[activeQueryIndex]
+    const defaultQuery = queryConfigs[0]
+
+    return activeQuery || defaultQuery
+  }
+
   render() {
     const {
       autoRefresh,
@@ -94,10 +109,11 @@ class DataExplorer extends Component {
             actions={queryConfigActions}
             autoRefresh={autoRefresh}
             timeRange={timeRange}
-            isInDataExplorer={true}
             setActiveQueryIndex={::this.handleSetActiveQueryIndex}
             onDeleteQuery={::this.handleDeleteQuery}
+            onAddQuery={::this.handleAddQuery}
             activeQueryIndex={activeQueryIndex}
+            activeQuery={::this.getActiveQuery()}
           />
           <Visualization
             isInDataExplorer={true}
