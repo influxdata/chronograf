@@ -1,6 +1,7 @@
 const src = process.argv.find(s => s.includes('--src=')).replace('--src=', '')
 const dataExplorerUrl = `http://localhost:8888/sources/${src}/chronograf/data-explorer`
 const dataTest = s => `[data-test="${s}"]`
+// const dataTestQuery = s => document.querySelector(`[data-test="${s}"]`)
 
 module.exports = {
   'Data Explorer (functional) - SHOW DATABASES'(browser) {
@@ -102,11 +103,18 @@ module.exports = {
         dataTest('query-editor-field'),
         'SELECT mean("value") AS "mean_value", mean("value2") AS "mean_value2" FROM "testing"."autogen"."testing" WHERE time > now() - 1h AND "test_measurement"=\'1\' AND "test_measurement2"=\'2\' GROUP BY time(10s)'
       )
+      // Change the graph to Table mode
       .click(dataTest('data-table'))
+      // Uncheck the mean default function settings for both fields
       .click(dataTest('query-builder-list-item-function-value'))
       .waitForElementVisible(dataTest('function-selector-item-mean'), 1000)
       .click(dataTest('function-selector-item-mean'))
+      // Apply settings
       .click(dataTest('function-selector-apply'))
+      .assert.containsText(
+        dataTest('query-editor-field'),
+        'SELECT "value", "value2" FROM "testing"."autogen"."testing" WHERE time > now() - 1h AND "test_measurement"=\'1\' AND "test_measurement2"=\'2\''
+      )
       .end()
   },
 }

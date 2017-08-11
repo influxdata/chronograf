@@ -25,12 +25,11 @@
       },
       "desiredCapabilities": {
         "browser": "chrome",
-        "build": "nightwatch-browserstack",
         "browserstack.user": "${BROWSERSTACK_USER}",
         "browserstack.key": "${BROWSERSTACK_KEY}",
         "browserstack.debug": true,
         "browserstack.local": true,
-        "resolution": "1280x1024"
+        "resolution": "1920x1080"
       }
     }
   }

@@ -9,7 +9,7 @@ const QueryStatus = ({status}) => {
 
   if (status.loading) {
     return (
-      <div className="query-editor--status">
+      <div className="query-editor--status" data-test="query-status">
         <LoadingDots />
       </div>
     )

@@ -139,12 +139,12 @@ const MeasurementList = React.createClass({
                     ? () => {}
                     : () => this.props.onChooseMeasurement(measurement)
                 }
+                data-test={`query-builder-list-item-measurement-${measurement}`}
               >
                 <div
                   className={classnames('query-builder--list-item', {
                     active: isActive,
                   })}
-                  data-test={`query-builder-list-item-measurement-${measurement}`}
                 >
                   <span>
                     <div className="query-builder--caret icon caret-right" />
