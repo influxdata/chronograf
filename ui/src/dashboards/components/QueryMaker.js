@@ -3,7 +3,7 @@ import React, {PropTypes} from 'react'
 import EmptyQuery from 'src/shared/components/EmptyQuery'
 import QueryTabList from 'src/shared/components/QueryTabList'
 import QueryTextArea from 'src/dashboards/components/QueryTextArea'
-import SchemaExplorer from 'src/dashboards/components/SchemaExplorer'
+import SchemaExplorer from 'src/shared/components/SchemaExplorer'
 import buildInfluxQLQuery from 'utils/influxql'
 
 const TEMPLATE_RANGE = {upper: null, lower: ':dashboardTime:'}
@@ -23,40 +23,36 @@ const QueryMaker = ({
   onDeleteQuery,
   activeQueryIndex,
   setActiveQueryIndex,
-}) => {
-  return (
-    <div className="query-maker query-maker--panel">
-      <QueryTabList
-        queries={queries}
-        timeRange={timeRange}
-        onAddQuery={onAddQuery}
-        onDeleteQuery={onDeleteQuery}
-        activeQueryIndex={activeQueryIndex}
-        setActiveQueryIndex={setActiveQueryIndex}
-      />
-      {activeQuery && activeQuery.id
-        ? <div className="query-maker--tab-contents">
-            <QueryTextArea
-              query={buildText(activeQuery)}
-              config={activeQuery}
-              onUpdate={rawTextBinder(
-                links,
-                activeQuery.id,
-                actions.editRawTextAsync
-              )}
-              templates={templates}
-            />
-            <SchemaExplorer
-              query={activeQuery}
-              actions={actions}
-              templates={templates}
-              onAddQuery={onAddQuery}
-            />
-          </div>
-        : <EmptyQuery onAddQuery={onAddQuery} />}
-    </div>
-  )
-}
+}) =>
+  <div className="query-maker query-maker--panel">
+    <QueryTabList
+      queries={queries}
+      timeRange={timeRange}
+      onAddQuery={onAddQuery}
+      onDeleteQuery={onDeleteQuery}
+      activeQueryIndex={activeQueryIndex}
+      setActiveQueryIndex={setActiveQueryIndex}
+    />
+    {activeQuery && activeQuery.id
+      ? <div className="query-maker--tab-contents">
+          <QueryTextArea
+            query={buildText(activeQuery)}
+            config={activeQuery}
+            onUpdate={rawTextBinder(
+              links,
+              activeQuery.id,
+              actions.editRawTextAsync
+            )}
+            templates={templates}
+          />
+          <SchemaExplorer
+            query={activeQuery}
+            actions={actions}
+            onAddQuery={onAddQuery}
+          />
+        </div>
+      : <EmptyQuery onAddQuery={onAddQuery} />}
+  </div>
 
 const {arrayOf, bool, func, number, shape, string} = PropTypes
 
@@ -71,11 +67,6 @@ QueryMaker.propTypes = {
     upper: string,
     lower: string,
   }).isRequired,
-  templates: arrayOf(
-    shape({
-      tempVar: string.isRequired,
-    })
-  ),
   isInDataExplorer: bool,
   actions: shape({
     chooseNamespace: func.isRequired,
@@ -93,6 +84,11 @@ QueryMaker.propTypes = {
   activeQueryIndex: number,
   activeQuery: shape({}),
   onAddQuery: func.isRequired,
+  templates: arrayOf(
+    shape({
+      tempVar: string.isRequired,
+    })
+  ).isRequired,
 }
 
 export default QueryMaker
