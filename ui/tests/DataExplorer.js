@@ -45,8 +45,8 @@ module.exports = {
       .waitForElementVisible(dataTest('data-explorer-no-results'), 5000)
       .assert.containsText(dataTest('data-explorer-no-results'), 'No Results')
       // Open a new query tab
-      .waitForElementVisible(dataTest('new-query-button'), 1000)
-      .click(dataTest('new-query-button'))
+      .waitForElementVisible(dataTest('add-query-button'), 1000)
+      .click(dataTest('add-query-button'))
       // Select the testing database
       .waitForElementVisible(
         dataTest('query-builder-list-item-database-testing'),
@@ -115,6 +115,9 @@ module.exports = {
         dataTest('query-editor-field'),
         'SELECT "value", "value2" FROM "testing"."autogen"."testing" WHERE time > now() - 1h AND "test_measurement"=\'1\' AND "test_measurement2"=\'2\''
       )
+      // GROUP BY
+      // Time Range
+      // Query Templates
       .end()
   },
 }
