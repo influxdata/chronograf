@@ -236,7 +236,7 @@ const Deadman = React.createClass({
     })
 
     return (
-      <div className="rule-section--row">
+      <div className="rule-section--row rule-section--border-bottom">
         <p>Send Alert if Data is missing for</p>
         <Dropdown
           className="dropdown-80"
