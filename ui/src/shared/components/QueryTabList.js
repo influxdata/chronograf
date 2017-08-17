@@ -27,6 +27,7 @@ const QueryTabList = ({
     <div
       className="query-maker--new btn btn-sm btn-primary"
       onClick={onAddQuery}
+      data-test="add-query-button"
     >
       <span className="icon plus" />
     </div>
