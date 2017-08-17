@@ -91,6 +91,7 @@ class TimeRangeDropdown extends Component {
           <div
             className="btn btn-sm btn-default dropdown-toggle"
             onClick={this.toggleMenu}
+            data-test="time-range-dropdown"
           >
             <span className="icon clock" />
             <span className="dropdown-selected">
@@ -126,7 +127,11 @@ class TimeRangeDropdown extends Component {
               {timeRanges.map(item => {
                 return (
                   <li className="dropdown-item" key={item.menuOption}>
-                    <a href="#" onClick={this.handleSelection(item)}>
+                    <a
+                      href="#"
+                      onClick={this.handleSelection(item)}
+                      data-test={`time-range-dropdown-item-'${item.menuOption}'`}
+                    >
                       {item.menuOption}
                     </a>
                   </li>

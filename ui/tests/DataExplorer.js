@@ -116,7 +116,17 @@ module.exports = {
         'SELECT "value", "value2" FROM "testing"."autogen"."testing" WHERE time > now() - 1h AND "test_measurement"=\'1\' AND "test_measurement2"=\'2\''
       )
       // GROUP BY
+      .click(dataTest('group-by-tag-test_measurement'))
+      .click(dataTest('group-by-tag-test_measurement2'))
+      .assert.containsText(
+        dataTest('query-editor-field'),
+        'SELECT "value", "value2" FROM "testing"."autogen"."testing" WHERE time > now() - 1h AND "test_measurement"=\'1\' AND "test_measurement2"=\'2\' GROUP BY "test_measurement", "test_measurement2"'
+      )
       // Time Range
+      .click(dataTest('time-range-dropdown'))
+      .click(dataTest('time-range-dropdown-item-Past 15 minutes'))
+      // Date Picker
+
       // Query Templates
       .end()
   },

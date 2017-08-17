@@ -119,6 +119,7 @@ const TagListItem = React.createClass({
               active: this.props.isUsingGroupBy,
             })}
             onClick={this.handleGroupBy}
+            data-test={`group-by-tag-${tagKey}`}
           >
             Group By {tagKey}
           </div>
