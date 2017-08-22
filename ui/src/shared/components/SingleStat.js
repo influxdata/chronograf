@@ -30,10 +30,10 @@ export default React.createClass({
       )
     }
 
-    const lastValue = lastValues(data)[1]
+    const meanValue = lastValues(data)
 
     const precision = 100.0
-    const roundedValue = Math.round(+lastValue * precision) / precision
+    const roundedValue = Math.round(meanValue * precision) / precision
 
     return (
       <div className="single-stat">
