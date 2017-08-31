@@ -32,8 +32,41 @@ describe('parsing', () => {
       expect(actual.clause.type).to.equal("BinaryExpr")
       //expect(actual.clause.operands.length).to.equal(1, JSON.stringify(actual.clause.operands))
     })
+
     it('works with conjunctions', () => {
       const stmt = "SELECT usage_idle FROM cpu WHERE \"host\" = \"host\" AND \"cpu\" = \"cpu\""
+      const tracer = new Tracer(stmt, {
+        showTrace: false, // suppress noisy log output
+      })
+      let actual
+      try {
+        actual = parse.parse(stmt, {tracer})
+      } catch (e) {
+        console.log(e)
+        console.log(tracer.getBacktraceString())
+      }
+      expect(actual.clause.type).to.equal("BinaryExpr")
+      //expect(actual.clause.operands.length).to.equal(2, JSON.stringify(actual.clause.operands))
+    })
+
+    it('works with time expressions', () => {
+      const stmt = "SELECT usage_idle FROM cpu WHERE time > now() - 15m"
+      const tracer = new Tracer(stmt, {
+        showTrace: false, // suppress noisy log output
+      })
+      let actual
+      try {
+        actual = parse.parse(stmt, {tracer})
+      } catch (e) {
+        console.log(e)
+        console.log(tracer.getBacktraceString())
+      }
+      expect(actual.clause.type).to.equal("BinaryExpr")
+      //expect(actual.clause.operands.length).to.equal(2, JSON.stringify(actual.clause.operands))
+    })
+
+    it('works with absolute time expressions', () => {
+      const stmt = "SELECT usage_idle FROM cpu WHERE time > '2015-01-01T00:00:00.000Z' AND time < '2016-01-01T00:00:00.000Z'"
       const tracer = new Tracer(stmt, {
         showTrace: false, // suppress noisy log output
       })

@@ -78,11 +78,13 @@ SubExpr = '(' expr:Expr ')' {
   return expr
 }
 
-Unary = VarRef
+Unary = "now()" / VarRef / DurLit / "'" DateTime "'"
 
-Operator = "="
+Operator = "=" / ">" / "<" / "-"
 
-VarRef = ref:DoubleQuotedName {
+DurLit = Digit+ ("m")
+
+VarRef = ref:( DoubleQuotedName / Chars+ ) {
   return {
     type: "primitive",
     primitiveType: "varRef",
@@ -94,8 +96,31 @@ VarRef = ref:DoubleQuotedName {
 // Primitives //
 ////////////////
 
+// Character Sets
+
 Chars = [A-Za-z_]
 CharSpace = [A-Za-z ]
+Digit = [0-9]
+
+// Date Literals
+
+DateTime = FullDate "T" FullTime
+FullDate = DateFullYear "-" DateMonth "-" DateMDay
+FullTime = PartialTime TimeOffset
+
+TimeOffset = ("Z" / TimeNumOffset)
+TimeNumOffset = ("+" / "-") TimeHour ":" TimeMinute
+
+PartialTime = TimeHour ":" TimeMinute ":" TimeSecond TimeSecFrac?
+
+DateFullYear = Digit Digit Digit Digit
+DateMonth = Digit Digit
+DateMDay = Digit Digit
+
+TimeHour = Digit Digit
+TimeMinute = Digit Digit
+TimeSecond = Digit Digit
+TimeSecFrac = "." Digit+
 
 DoubleQuotedName = "\"" chars:( CharSpace+ ) "\"" {
   return chars;
