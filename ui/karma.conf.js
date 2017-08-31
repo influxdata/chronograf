@@ -43,6 +43,10 @@ module.exports = function(config) {
             loader: 'imports?define=>false,require=>false',
           },
           {
+            test: /\.pegjs$/,
+            loader: 'pegjs-loader?allowedStartRules[]=SelectStmt&trace=true'
+          },
+          {
             test: /\.json$/,
             loader: 'json',
           },

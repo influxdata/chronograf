@@ -50,6 +50,10 @@ module.exports = {
         loader : 'file',
       },
       {
+        test: /\.pegjs$/,
+        loader: 'pegjs-loader?allowedStartRules[]=SelectStmt'
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel',
