@@ -191,7 +191,7 @@ export default class Dygraph extends Component {
     const colors = this.getLineColors()
     const hashColorDygraphSeries = {}
 
-    for (const seriesName in dygraphSeries) {
+    for (let seriesName in dygraphSeries) {
       const series = dygraphSeries[seriesName]
       const hashIndex = hasherino(seriesName, colors.length)
       const color = colors[hashIndex]
