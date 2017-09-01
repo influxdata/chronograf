@@ -47,7 +47,7 @@ export const toString = ast => {
 
   // SELECT
   const flds = []
-  for (const field of fields) {
+  for (let field of fields) {
     const {column, alias} = field
     const result = recurse(column)
     flds.push(alias ? `${result} AS "${alias}"` : result)
@@ -58,7 +58,7 @@ export const toString = ast => {
   if (sources.length) {
     strs.push('FROM')
     const srcs = []
-    for (const source of sources) {
+    for (let source of sources) {
       // TODO subquery (type)
       const {database, retentionPolicy, name} = source
       srcs.push(`"${_.compact([database, retentionPolicy, name]).join('"."')}"`)
