@@ -1,3 +1,8 @@
+{
+  var Moment = require('moment');
+  var _ = require('lodash');
+}
+
 SelectStmt
   = "SELECT" _ fields:Fields _ from:FromClause _ clause:WhereClause? {
     return {
@@ -78,11 +83,11 @@ SubExpr = '(' expr:Expr ')' {
   return expr
 }
 
-Unary = "now()" / VarRef / DurLit / "'" DateTime "'"
+Unary = "now()" / VarRef / DurLit / DateStr
 
 Operator = "=" / ">" / "<" / "-"
 
-DurLit = Digit+ ("m")
+DurLit = Digit+ ("m" / "y")
 
 VarRef = ref:( DoubleQuotedName / Chars+ ) {
   return {
@@ -103,6 +108,11 @@ CharSpace = [A-Za-z ]
 Digit = [0-9]
 
 // Date Literals
+
+DateStr = "'" date:DateTime "'" {
+  var dateStr = _.flatten(date).join("")
+  return Moment(dateStr, 'YYYY-MM-DD HH:mm:ss.SSSSSSSSS');
+}
 
 DateTime = FullDate "T" FullTime
 FullDate = DateFullYear "-" DateMonth "-" DateMDay
