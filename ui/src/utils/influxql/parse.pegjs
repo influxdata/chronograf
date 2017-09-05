@@ -4,33 +4,130 @@
 }
 
 SelectStmt
-  = "SELECT" _ fields:Fields _ from:FromClause _ clause:WhereClause? {
+  = "SELECT"i _ fields:Fields _ from:FromClause _ clause:WhereClause? {
     return {
-      "fields": fields.map(function(field) {
-         return {
-            "name": field,
-            "location": location(),
-         }
-      }),
+      "fields": fields,
       "measurement": from.measurement,
       "clause": clause,
     }
 }
     
+////////////
+// Fields //
+////////////
+
 Fields
-  = Field ( "," _ Field)*
+  = head:FieldExpr tail:( "," _ FieldExpr)* {
+  return tail.reduce(function(fields, field) {
+    return fields.push(field)
+  }, [head])
+}
     
-Field = chars:Chars+ {
+FieldExpr
+  = field:AdditiveField _ alias:Alias? {
+  return {
+    "field": field,
+    "alias": alias
+  }
+}
+
+Alias
+  = "as"i _ alias:Identifier {
+  return alias
+}
+
+AdditiveField
+  = head:MultiplicativeField tail:(_ ("+" / "-") _ MultiplicativeField)* {
+  if (tail.length === 0) {
+    return head
+  } else {
+    return {
+      "type": "BinaryExpr",
+      "values": tail.reduce(function(terms, term) {
+        return terms.concat({
+          "op": term[1],
+          "term": term[3]
+        })
+      }, [head])
+    }
+  }
+}
+
+MultiplicativeField
+  = head:FunctionOrValue tail:(_ ("*" / "/") _ FunctionOrValue)* {
+  if (tail.length === 0) {
+    return head
+  } else {
+    return {
+      "type": "BinaryExpr",
+      "values": tail.reduce(function(terms, term) {
+        return terms.concat({
+          "op": term[1],
+          "term": term[3]
+        })
+      }, [head])
+    }
+  }
+}
+
+FunctionOrValue
+  = Function / FieldValue
+
+Function
+  = funcName:(Aggregate / Selector) "(" operand:FieldOrTag ")" {
+  return {
+    "type": "Function",
+    "function": funcName,
+    "operand": operand
+  }
+}
+
+Aggregate
+  = ("count" / "distinct" / "integral" / "mean" / "median" / "mode" / "spread" / "stddev" / "sum")
+
+Selector
+  = ("bottom" / "first") 
+
+FieldValue
+  = FieldOrTag / NumLit / "(" FieldExpr ")"
+
+FieldOrTag
+  = ident:Identifier type:TypeCast? {
+  if (type !== "") {
+    return {
+      "type": "Identifier",
+      "identType": "field",
+      "identifier": ident
+    }
+  } else {
+    return {
+      "type": "Identifier",
+      "identType": type,
+      "identifier": ident
+    }
+  }
+}
+
+TypeCast
+  = "::" type:("field" / "tag") {
+  return type
+}
+
+Identifier = chars:Chars+ {
   return chars.join("");
 }
 
 FromClause
-  = "FROM" _ measurement:Measurement {
+  = "FROM"i _ measurement:Measurement {
     return {
       "measurement": measurement,
     }
 }
     
+//////////////////
+// Measurements //
+//////////////////
+
 Measurement = chars:( DoubleQuotedName / Chars+) {
   return chars.join("");
 }
@@ -83,11 +180,13 @@ SubExpr = '(' expr:Expr ')' {
   return expr
 }
 
-Unary = "now()" / VarRef / DurLit / DateStr
+Unary = NowFunc / VarRef / DurLit / DateStr
 
 Operator = "=" / ">" / "<" / "-"
 
 DurLit = Digit+ ("m" / "y")
+
+NowFunc = "now()"
 
 VarRef = ref:( DoubleQuotedName / Chars+ ) {
   return {
@@ -106,6 +205,12 @@ VarRef = ref:( DoubleQuotedName / Chars+ ) {
 Chars = [A-Za-z_]
 CharSpace = [A-Za-z ]
 Digit = [0-9]
+
+// Number Literals
+
+NumLit = numeral:Digit+ ("." Digit+)? {
+  return +numeral.join("")
+}
 
 // Date Literals
 

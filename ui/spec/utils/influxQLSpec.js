@@ -98,4 +98,90 @@ describe('parsing', () => {
       //expect(actual.clause.operands.length).to.equal(2, JSON.stringify(actual.clause.operands))
     })
   })
+
+  describe('fields', () => {
+    describe('math', () => {
+      it('extracts fields with math', () => {
+        const stmt = "select usage_idle + 30 from cpu"
+        const tracer = new Tracer(stmt, {
+          showTrace: false, // suppress noisy log output
+        })
+        let actual
+        try {
+          actual = parse.parse(stmt, {tracer})
+        } catch (e) {
+          console.log(e)
+          console.log(tracer.getBacktraceString())
+        }
+        expect(actual).to.exist
+      }) 
+    })
+
+    describe('aggregates', () => {
+      it('extracts fields with aggregates', () => {
+        const stmt = "select mean(usage_idle) from cpu"
+        const tracer = new Tracer(stmt, {
+          showTrace: false, // suppress noisy log output
+        })
+        let actual
+        try {
+          actual = parse.parse(stmt, {tracer})
+        } catch (e) {
+          console.log(e)
+          console.log(tracer.getBacktraceString())
+        }
+        expect(actual).to.exist
+      }) 
+    })
+
+    describe('type casts', () => {
+      it('works with type casts', () => {
+        const stmt = "select mean(usage_idle::field) as avg from cpu"
+        const tracer = new Tracer(stmt, {
+          showTrace: false, // suppress noisy log output
+        })
+        let actual
+        try {
+          actual = parse.parse(stmt, {tracer})
+        } catch (e) {
+          console.log(e)
+          console.log(tracer.getBacktraceString())
+        }
+        expect(actual).to.exist
+      }) 
+    })
+
+    describe('aliases', () => {
+      it('supports field aliasing with aggregates', () => {
+        const stmt = "select mean(usage_idle) as mean from cpu"
+        const tracer = new Tracer(stmt, {
+          showTrace: false, // suppress noisy log output
+        })
+        let actual
+        try {
+          actual = parse.parse(stmt, {tracer})
+        } catch (e) {
+          console.log(e)
+          console.log(tracer.getBacktraceString())
+        }
+        expect(actual).to.exist
+      }) 
+
+      it('supports field aliasing with math', () => {
+        const stmt = "select usage_idle * 30 + 5 as avg from cpu"
+        const tracer = new Tracer(stmt, {
+          showTrace: false, // suppress noisy log output
+        })
+        let actual
+        try {
+          actual = parse.parse(stmt, {tracer})
+        } catch (e) {
+          console.log(e)
+          console.log(tracer.getBacktraceString())
+        }
+        console.log(JSON.stringify(actual))
+        expect(actual).to.exist
+      }) 
+    })
+  })
 })
