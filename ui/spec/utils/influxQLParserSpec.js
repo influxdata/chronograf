@@ -49,7 +49,7 @@ describe('parsing', () => {
       expect(actual).to.exist
     })
 
-    it('works with multiples tags', () => {
+    it('works with multiple tags', () => {
       const stmt = "select usage_idle from cpu group by host,\"cpu\", az"
       const actual = parse.parse(stmt)
       console.log(JSON.stringify(actual))
@@ -154,7 +154,7 @@ describe('parsing', () => {
           console.log(tracer.getBacktraceString())
         }
         expect(actual).to.exist
-      }) 
+      })
     })
 
     describe('aggregates', () => {
@@ -171,7 +171,7 @@ describe('parsing', () => {
           console.log(tracer.getBacktraceString())
         }
         expect(actual).to.exist
-      }) 
+      })
     })
 
     describe('type casts', () => {
@@ -188,7 +188,7 @@ describe('parsing', () => {
           console.log(tracer.getBacktraceString())
         }
         expect(actual).to.exist
-      }) 
+      })
     })
 
     describe('aliases', () => {
@@ -205,7 +205,7 @@ describe('parsing', () => {
           console.log(tracer.getBacktraceString())
         }
         expect(actual).to.exist
-      }) 
+      })
 
       it('supports field aliasing with math', () => {
         const stmt = "select usage_idle::tag * 30 + 5 as avg from cpu"
@@ -220,7 +220,7 @@ describe('parsing', () => {
           console.log(tracer.getBacktraceString())
         }
         expect(actual).to.exist
-      }) 
+      })
     })
   })
 })
