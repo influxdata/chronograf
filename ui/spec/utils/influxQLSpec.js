@@ -18,6 +18,24 @@ describe('parsing', () => {
     it('works with subqueries', () => {
       const stmt = "SELECT mean(usage) as avg, median(usage) as median FROM ( select 100 - usage_idle as usage from cpu )"
       const actual = parse.parse(stmt)
+      expect(actual).to.exist
+    })
+
+    it('works with fully-qualified measurement names', () => {
+      const stmt = "select mean(usage_idle) from \"telegraf\".\"autogen\".\"cpu\""
+      const actual = parse.parse(stmt)
+      expect(actual).to.exist
+    })
+
+    it('works with implicit rp', () => {
+      const stmt = "select mean(usage_idle) from \"telegraf\"..\"cpu\""
+      const actual = parse.parse(stmt)
+      expect(actual).to.exist
+    })
+
+    it('works with implicit db', () => {
+      const stmt = "select mean(usage_idle) from \"autogen\".\"cpu\""
+      const actual = parse.parse(stmt)
       console.log(JSON.stringify(actual))
       expect(actual).to.exist
     })
@@ -85,7 +103,6 @@ describe('parsing', () => {
         console.log(tracer.getBacktraceString())
       }
       expect(actual.clause.type).to.equal("BinaryExpr")
-      console.log(JSON.stringify(actual))
       //expect(actual.clause.operands.length).to.equal(2, JSON.stringify(actual.clause.operands))
     })
 
@@ -186,7 +203,6 @@ describe('parsing', () => {
           console.log(e)
           console.log(tracer.getBacktraceString())
         }
-        console.log(JSON.stringify(actual))
         expect(actual).to.exist
       }) 
     })

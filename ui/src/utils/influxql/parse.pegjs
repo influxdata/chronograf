@@ -120,11 +120,11 @@ Identifier = chars:Chars+ {
 }
 
 FromClause
-  = "FROM"i _ from:MeasurementOrSubquery {
+  = "FROM"i _ from:DBRPOrSubquery {
     return from
 }
 
-MeasurementOrSubquery = Measurement / Subquery
+DBRPOrSubquery = DBRP / Subquery
 
 Subquery
   = "(" _ subquery:SelectStmt _ ")" {
@@ -135,7 +135,33 @@ Subquery
 // Measurements //
 //////////////////
 
-Measurement = chars:( DoubleQuotedName / Chars+) {
+DBRP
+  = QualifiedMeasurement / Measurement
+
+QualifiedMeasurement
+  = FQMeasurement / RPMeasurement
+
+RPMeasurement
+  = rp:QuotedIdentifier "." measurement:Measurement {
+  return {
+    db: null,
+    rp: rp,
+    measurement: measurement,
+  }
+}
+
+FQMeasurement
+  = db:QuotedIdentifier "." rp:QuotedIdentifier? "." measurement:Measurement {
+  return {
+    db: db,
+    rp: rp,
+    measurement: measurement,
+  }
+}
+
+Measurement = QuotedIdentifier
+
+QuotedIdentifier = chars:( DoubleQuotedName / Chars+) {
   return chars.join("");
 }
 
