@@ -271,7 +271,9 @@ Unary = NowFunc / VarRef / DurLit / DateStr
 
 Operator = "=" / ">" / "<" / "-"
 
-DurLit = Digit+ ("s" / "m" / "h" / "d" / "w" / "ns" / "u" / "µ" / "ms")
+DurLit = ordinal:Digit+ unit:("s" / "m" / "h" / "d" / "w" / "ns" / "u" / "µ" / "ms") {
+  return ordinal.join('') + unit
+}
 
 NowFunc = "now()"
 
