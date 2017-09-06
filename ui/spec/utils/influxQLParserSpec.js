@@ -56,17 +56,7 @@ describe('parsing', () => {
 
     it('works with time', () => {
       const stmt = "select usage_idle from cpu group by time(10µ)"
-      const tracer = new Tracer(stmt, {
-        showTrace: false, // suppress noisy log output
-      })
-      let actual
-      try {
-        actual = parse.parse(stmt, {tracer})
-      } catch (e) {
-        console.log(e)
-        console.log(tracer.getBacktraceString())
-      }
-      console.log(JSON.stringify(actual))
+      const actual = parse.parse(stmt)
       expect(actual).to.exist
     })
 
