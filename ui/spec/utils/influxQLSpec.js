@@ -6,13 +6,20 @@ describe('parsing', () => {
     it('works with the simplest select statement evar', () => {
       const stmt = "SELECT foo FROM bar"
       const actual = parse.parse(stmt)
-      expect(actual.measurement).to.equal("bar")
+      expect(actual.from).to.equal("bar")
     })
 
     it('works with quoted measurement names', () => {
       const stmt = "SELECT foo FROM \"bar quux\""
       const actual = parse.parse(stmt)
-      expect(actual.measurement).to.equal("bar quux")
+      expect(actual.from).to.equal("bar quux")
+    })
+
+    it('works with subqueries', () => {
+      const stmt = "SELECT mean(usage) as avg, median(usage) as median FROM ( select 100 - usage_idle as usage from cpu )"
+      const actual = parse.parse(stmt)
+      console.log(JSON.stringify(actual))
+      expect(actual).to.exist
     })
   })
 
@@ -153,7 +160,7 @@ describe('parsing', () => {
 
     describe('aliases', () => {
       it('supports field aliasing with aggregates', () => {
-        const stmt = "select mean(usage_idle) as mean from cpu"
+        const stmt = "select mean(usage_idle) as avg from cpu"
         const tracer = new Tracer(stmt, {
           showTrace: false, // suppress noisy log output
         })
@@ -168,7 +175,7 @@ describe('parsing', () => {
       }) 
 
       it('supports field aliasing with math', () => {
-        const stmt = "select usage_idle * 30 + 5 as avg from cpu"
+        const stmt = "select usage_idle::tag * 30 + 5 as avg from cpu"
         const tracer = new Tracer(stmt, {
           showTrace: false, // suppress noisy log output
         })

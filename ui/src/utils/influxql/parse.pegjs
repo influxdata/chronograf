@@ -7,7 +7,7 @@ SelectStmt
   = "SELECT"i _ fields:Fields _ from:FromClause _ clause:WhereClause? {
     return {
       "fields": fields,
-      "measurement": from.measurement,
+      "from": from,
       "clause": clause,
     }
 }
@@ -19,7 +19,7 @@ SelectStmt
 Fields
   = head:FieldExpr tail:( "," _ FieldExpr)* {
   return tail.reduce(function(fields, field) {
-    return fields.push(field)
+    return fields.concat(field[2])
   }, [head])
 }
     
@@ -44,10 +44,11 @@ AdditiveField
     return {
       "type": "BinaryExpr",
       "values": tail.reduce(function(terms, term) {
-        return terms.concat({
+        return [{
           "op": term[1],
-          "term": term[3]
-        })
+          "lhs": terms[terms.length - 1],
+          "rhs": term[3]
+        }]
       }, [head])
     }
   }
@@ -61,10 +62,11 @@ MultiplicativeField
     return {
       "type": "BinaryExpr",
       "values": tail.reduce(function(terms, term) {
-        return terms.concat({
+        return [{
           "op": term[1],
-          "term": term[3]
-        })
+          "lhs": terms[terms.length - 1],
+          "rhs": term[3]
+        }]
       }, [head])
     }
   }
@@ -93,7 +95,7 @@ FieldValue
 
 FieldOrTag
   = ident:Identifier type:TypeCast? {
-  if (type !== "") {
+  if (type === "") {
     return {
       "type": "Identifier",
       "identType": "field",
@@ -118,12 +120,17 @@ Identifier = chars:Chars+ {
 }
 
 FromClause
-  = "FROM"i _ measurement:Measurement {
-    return {
-      "measurement": measurement,
-    }
+  = "FROM"i _ from:MeasurementOrSubquery {
+    return from
 }
-    
+
+MeasurementOrSubquery = Measurement / Subquery
+
+Subquery
+  = "(" _ subquery:SelectStmt _ ")" {
+  return subquery
+}
+
 //////////////////
 // Measurements //
 //////////////////
@@ -137,34 +144,38 @@ Measurement = chars:( DoubleQuotedName / Chars+) {
 ///////////////////
 
 
-WhereClause = "WHERE" _ clauses:Expr {
+WhereClause = "WHERE"i _ clauses:Expr {
   return clauses
 }
 
 Expr = Disjunction
 
-Disjunction = lhs:Conjunction rhs:( _ "OR"i _ rhs:Conjunction)* {
+Disjunction = head:Conjunction tail:( _ "OR"i _ rhs:Conjunction)* {
   return {
     "type": "BinaryExpr",
     "operator": "OR",
-    "operands": rhs ? [lhs, rhs] : [lhs]
+    "operands": tail.reduce(function(terms, term) {
+      return terms.concat(term)
+    }, [head])
   }
 }
 
-Conjunction = lhs:Comparator rhs:( _ "AND"i _ Comparator)* {
+Conjunction = head:Comparator tail:( _ "AND"i _ Comparator)* {
   return {
     "type": "BinaryExpr",
     "operator": "AND",
-    "operands": rhs ? [lhs, rhs] : [lhs]
+    "operands": tail.reduce(function(terms, term) {
+      return terms.concat(term)
+    }, [head])
   }
 }
 
 Comparator = lhs:Value rhs:( _ Operator _ Value)* {
-  if (rhs) {
+  if (rhs.length !== 0) {
     return {
       "type": "BinaryExpr",
-      "operator": rhs[0][1],
-      "operands": [lhs, rhs[1]]
+      "operator": rhs[1],
+      "operands": [lhs, rhs[3]]
     }
   } else {
     return {
