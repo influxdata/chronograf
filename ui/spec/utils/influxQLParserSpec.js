@@ -69,6 +69,11 @@ describe('parsing', () => {
       console.log(JSON.stringify(actual))
       expect(actual).to.exist
     })
+
+    it('errors with multiple time funcs', () => {
+      const stmt = "select usage_idle from cpu group by cpu, \"host\", time(10µ),time(1ns)"
+      expect(parse.parse.bind(null, stmt)).to.throw()
+    })
   })
 
   describe('where clauses', () => {
