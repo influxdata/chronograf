@@ -4,14 +4,27 @@
 }
 
 SelectStmt
-  = "SELECT"i _ fields:Fields _ from:FromClause _ clause:WhereClause? {
+  = "SELECT"i _ fields:Fields _ from:FromClause _ clause:WhereClause? _ groupBy:GroupByClause? {
     return {
       "fields": fields,
       "from": from,
+      "groupBy": groupBy,
       "clause": clause,
     }
 }
-    
+
+//////////////
+// Group By //
+//////////////
+
+GroupByClause
+  = "GROUP BY"i _ dimension:QuotedIdentifier {
+  return {
+    tags: [dimension],
+    time: null,
+  }
+}
+
 ////////////
 // Fields //
 ////////////

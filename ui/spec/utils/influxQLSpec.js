@@ -41,6 +41,15 @@ describe('parsing', () => {
     })
   })
 
+  describe('group by', () => {
+    it('works with one tag', () => {
+      const stmt = "select usage_idle from cpu group by host"
+      const actual = parse.parse(stmt)
+      console.log(JSON.stringify(actual))
+      expect(actual).to.exist
+    })
+  })
+
   describe('where clauses', () => {
     it('works with simple clauses', () => {
       const stmt = "SELECT usage_idle FROM cpu WHERE \"host\" = \"host\""
