@@ -18,11 +18,18 @@ SelectStmt
 //////////////
 
 GroupByClause
-  = "GROUP BY"i _ dimension:QuotedIdentifier {
+  = "GROUP BY"i _ dimensions:Dimensions {
   return {
-    tags: [dimension],
+    tags: dimensions,
     time: null,
   }
+}
+
+Dimensions
+  = head:QuotedIdentifier tail:( "," _ QuotedIdentifier)* {
+  return tail.reduce(function(dimensions, dimension) {
+    return dimensions.concat(dimension[2])
+  }, [head])
 }
 
 ////////////

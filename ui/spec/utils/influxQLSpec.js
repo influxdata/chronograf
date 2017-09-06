@@ -48,6 +48,13 @@ describe('parsing', () => {
       console.log(JSON.stringify(actual))
       expect(actual).to.exist
     })
+
+    it('works with multiples tags', () => {
+      const stmt = "select usage_idle from cpu group by host,\"cpu\", az"
+      const actual = parse.parse(stmt)
+      console.log(JSON.stringify(actual))
+      expect(actual).to.exist
+    })
   })
 
   describe('where clauses', () => {
