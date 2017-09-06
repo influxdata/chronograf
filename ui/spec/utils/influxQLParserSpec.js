@@ -55,7 +55,7 @@ describe('parsing', () => {
     })
 
     it('works with time', () => {
-      const stmt = "select usage_idle from cpu group by time(10m)"
+      const stmt = "select usage_idle from cpu group by time(10µ)"
       const tracer = new Tracer(stmt, {
         showTrace: false, // suppress noisy log output
       })
@@ -137,7 +137,7 @@ describe('parsing', () => {
     })
 
     it('works with hybrid time clauses', () => {
-      const stmt = "SELECT usage_idle FROM cpu WHERE time > now() - 2y AND time < '2016-01-01T00:00:00.000Z'"
+      const stmt = "SELECT usage_idle FROM cpu WHERE time > now() - 730d AND time < '2016-01-01T00:00:00.000Z'"
       const tracer = new Tracer(stmt, {
         showTrace: false, // suppress noisy log output
       })

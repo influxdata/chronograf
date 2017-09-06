@@ -271,7 +271,7 @@ Unary = NowFunc / VarRef / DurLit / DateStr
 
 Operator = "=" / ">" / "<" / "-"
 
-DurLit = Digit+ ("m" / "y")
+DurLit = Digit+ ("s" / "m" / "h" / "d" / "w" / "ns" / "u" / "µ" / "ms")
 
 NowFunc = "now()"
 
