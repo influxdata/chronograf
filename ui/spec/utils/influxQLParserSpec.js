@@ -66,6 +66,26 @@ describe('parsing', () => {
     })
   })
 
+  describe('fill clauses', () => {
+    it('works with non-number option', () => {
+      const stmt = "select mean(usage_idle) from cpu group by time(1d) fill(previous)"
+      const actual = parse.parse(stmt)
+      expect(actual).to.exist
+    })
+
+    it('works with int number', () => {
+      const stmt = "select mean(usage_idle) from cpu group by time(1d) fill(1337)"
+      const actual = parse.parse(stmt)
+      expect(actual).to.exist
+    })
+
+    it('works with float number', () => {
+      const stmt = "select mean(usage_idle) from cpu group by time(1d) fill(1.337)"
+      const actual = parse.parse(stmt)
+      expect(actual).to.exist
+    })
+  })
+
   describe('where clauses', () => {
     it('works with simple clauses', () => {
       const stmt = "SELECT usage_idle FROM cpu WHERE \"host\" = \"host\""

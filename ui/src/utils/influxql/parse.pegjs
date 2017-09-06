@@ -18,7 +18,7 @@ SelectStmt
 //////////////
 
 GroupByClause
-  = "GROUP BY"i _ dimensions:Dimensions {
+  = "GROUP BY"i _ dimensions:Dimensions _ fill:Fill? {
   var tags = []
   var times = []
   dimensions.forEach(function(dimension) {
@@ -34,6 +34,7 @@ GroupByClause
   return {
     tags: tags.length ? tags : null,
     time: times.length ? times[0] : null,
+    fill: fill ? fill : null,
   }
 }
 
@@ -60,6 +61,11 @@ TimeFunc
       value: dur,
       type: 'TimeFunc',
     }
+  }
+
+Fill
+  = "FILL"i "(" _ fill:("null" / "none" / FloatLit / "linear" / "previous") _ ")" {
+    return fill
   }
 
 ////////////
@@ -298,7 +304,11 @@ Digit = [0-9]
 // Number Literals
 
 NumLit = numeral:Digit+ ("." Digit+)? {
-  return +numeral.join("")
+  return +numeral.join('')
+}
+
+FloatLit = numeral:Digit+ fraction:("." Digit+)? {
+  return Number(+numeral.join('') + _.flatten(fraction).join(''))
 }
 
 // Date Literals
