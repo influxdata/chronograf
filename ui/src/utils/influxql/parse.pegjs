@@ -19,18 +19,48 @@ SelectStmt
 
 GroupByClause
   = "GROUP BY"i _ dimensions:Dimensions {
+  var tags = []
+  var times = []
+  dimensions.forEach(function(dimension) {
+    if (dimension.type === 'GroupByTag') {
+      tags.push(dimension.value)
+    } else if (dimension.type === 'TimeFunc') {
+      times.push(dimension.value)
+    }
+  })
+  if (times.length > 1) {
+    error('`time()` can only appear once in a GROUP BY')
+  }
   return {
-    tags: dimensions,
-    time: null,
+    tags: tags.length ? tags : null,
+    time: times.length ? times[0] : null,
   }
 }
 
 Dimensions
-  = head:QuotedIdentifier tail:( "," _ QuotedIdentifier)* {
+  = head:TagOrTime tail:( "," _ TagOrTime)* {
   return tail.reduce(function(dimensions, dimension) {
     return dimensions.concat(dimension[2])
   }, [head])
 }
+
+TagOrTime
+  = TimeFunc / GroupByTag
+
+GroupByTag = tag:QuotedIdentifier {
+  return {
+    value: tag,
+    type: 'GroupByTag',
+  }
+}
+
+TimeFunc
+  = "time(" _ dur:DurLit _ ")" {
+    return {
+      value: dur,
+      type: 'TimeFunc',
+    }
+  }
 
 ////////////
 // Fields //
@@ -42,7 +72,7 @@ Fields
     return fields.concat(field[2])
   }, [head])
 }
-    
+
 FieldExpr
   = field:AdditiveField _ alias:Alias? {
   return {
@@ -108,7 +138,7 @@ Aggregate
   = ("count" / "distinct" / "integral" / "mean" / "median" / "mode" / "spread" / "stddev" / "sum")
 
 Selector
-  = ("bottom" / "first") 
+  = ("bottom" / "first")
 
 FieldValue
   = FieldOrTag / NumLit / "(" FieldExpr ")"

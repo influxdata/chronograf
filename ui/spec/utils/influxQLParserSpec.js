@@ -45,13 +45,27 @@ describe('parsing', () => {
     it('works with one tag', () => {
       const stmt = "select usage_idle from cpu group by host"
       const actual = parse.parse(stmt)
-      console.log(JSON.stringify(actual))
       expect(actual).to.exist
     })
 
     it('works with multiple tags', () => {
       const stmt = "select usage_idle from cpu group by host,\"cpu\", az"
       const actual = parse.parse(stmt)
+      expect(actual).to.exist
+    })
+
+    it('works with time', () => {
+      const stmt = "select usage_idle from cpu group by time(10m)"
+      const tracer = new Tracer(stmt, {
+        showTrace: false, // suppress noisy log output
+      })
+      let actual
+      try {
+        actual = parse.parse(stmt, {tracer})
+      } catch (e) {
+        console.log(e)
+        console.log(tracer.getBacktraceString())
+      }
       console.log(JSON.stringify(actual))
       expect(actual).to.exist
     })
