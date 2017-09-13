@@ -44,8 +44,8 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
-						return &chronograf.User{
+					GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
+						return &chronograf.DBUser{
 							Name:   "me",
 							Passwd: "hunter2",
 						}, nil
@@ -69,10 +69,10 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
+					GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
 						return nil, fmt.Errorf("Unknown User")
 					},
-					AddF: func(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
+					AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 						return u, nil
 					},
 				},
@@ -94,10 +94,10 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
+					GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
 						return nil, fmt.Errorf("Unknown User")
 					},
-					AddF: func(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
+					AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 						return nil, fmt.Errorf("Why Heavy?")
 					},
 				},

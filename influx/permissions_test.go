@@ -307,12 +307,12 @@ func Test_showResults_Users(t *testing.T) {
 	tests := []struct {
 		name   string
 		octets []byte
-		want   []chronograf.User
+		want   []chronograf.DBUser
 	}{
 		{
 			name:   "admin and non-admin",
 			octets: []byte(`[{"series":[{"columns":["user","admin"],"values":[["admin",true],["reader",false]]}]}]`),
-			want: []chronograf.User{
+			want: []chronograf.DBUser{
 				{
 					Name: "admin",
 					Permissions: chronograf.Permissions{
@@ -331,7 +331,7 @@ func Test_showResults_Users(t *testing.T) {
 		{
 			name:   "bad JSON",
 			octets: []byte(`[{"series":[{"columns":["user","admin"],"values":[[1,true],["reader","false"]]}]}]`),
-			want:   []chronograf.User{},
+			want:   []chronograf.DBUser{},
 		},
 	}
 

@@ -46,13 +46,13 @@ func (c *RolesStore) Get(ctx context.Context, name string) (*chronograf.Role, er
 	}
 
 	// Hydrate all the users to gather their permissions and their roles.
-	users := make([]chronograf.User, len(role.Users))
+	users := make([]chronograf.DBUser, len(role.Users))
 	for i, u := range role.Users {
 		user, err := c.Ctrl.User(ctx, u)
 		if err != nil {
 			return nil, err
 		}
-		users[i] = chronograf.User{
+		users[i] = chronograf.DBUser{
 			Name:        user.Name,
 			Permissions: ToChronograf(user.Permissions),
 		}
@@ -96,9 +96,9 @@ func (c *RolesStore) All(ctx context.Context) ([]chronograf.Role, error) {
 func (r *Roles) ToChronograf() []chronograf.Role {
 	res := make([]chronograf.Role, len(r.Roles))
 	for i, role := range r.Roles {
-		users := make([]chronograf.User, len(role.Users))
+		users := make([]chronograf.DBUser, len(role.Users))
 		for i, user := range role.Users {
-			users[i] = chronograf.User{
+			users[i] = chronograf.DBUser{
 				Name: user,
 			}
 		}

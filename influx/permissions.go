@@ -50,8 +50,8 @@ type showResults []struct {
 }
 
 // Users converts SHOW USERS to chronograf Users
-func (r *showResults) Users() []chronograf.User {
-	res := []chronograf.User{}
+func (r *showResults) Users() []chronograf.DBUser {
+	res := []chronograf.DBUser{}
 	for _, u := range *r {
 		for _, s := range u.Series {
 			for _, v := range s.Values {
@@ -60,7 +60,7 @@ func (r *showResults) Users() []chronograf.User {
 				} else if admin, ok := v[1].(bool); !ok {
 					continue
 				} else {
-					c := chronograf.User{
+					c := chronograf.DBUser{
 						Name:        name,
 						Permissions: chronograf.Permissions{},
 					}
@@ -110,11 +110,11 @@ func (r *showResults) RetentionPolicies() []chronograf.RetentionPolicy {
 					continue
 				} else {
 					d := chronograf.RetentionPolicy{
-						Name: name,
-						Duration: duration,
+						Name:          name,
+						Duration:      duration,
 						ShardDuration: sduration,
-						Replication: int32(replication),
-						Default: def,
+						Replication:   int32(replication),
+						Default:       def,
 					}
 					res = append(res, d)
 				}

@@ -16,7 +16,7 @@ func TestUsersStore_Get(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *chronograf.User
+		want    *chronograf.DBUser
 		wantErr bool
 	}{
 		{
@@ -53,23 +53,23 @@ func TestUsersStore_Get(t *testing.T) {
 func TestUsersStore_Add(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		u   *chronograf.User
+		u   *chronograf.DBUser
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *chronograf.User
+		want    *chronograf.DBUser
 		wantErr bool
 	}{
 		{
 			name: "Add new user",
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 				},
 			},
-			want: &chronograf.User{
+			want: &chronograf.DBUser{
 				Name: "docbrown",
 			},
 		},
@@ -103,7 +103,7 @@ func TestUsersStore_Add(t *testing.T) {
 func TestUsersStore_Delete(t *testing.T) {
 	type args struct {
 		ctx  context.Context
-		user *chronograf.User
+		user *chronograf.DBUser
 	}
 	tests := []struct {
 		name     string
@@ -115,7 +115,7 @@ func TestUsersStore_Delete(t *testing.T) {
 			name: "No such user",
 			args: args{
 				ctx: context.Background(),
-				user: &chronograf.User{
+				user: &chronograf.DBUser{
 					Name: "noone",
 				},
 			},
@@ -125,7 +125,7 @@ func TestUsersStore_Delete(t *testing.T) {
 			name: "Delete new user",
 			args: args{
 				ctx: context.Background(),
-				user: &chronograf.User{
+				user: &chronograf.DBUser{
 					Name: "noone",
 				},
 			},
@@ -155,7 +155,7 @@ func TestUsersStore_Delete(t *testing.T) {
 func TestUsersStore_Update(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		usr *chronograf.User
+		usr *chronograf.DBUser
 	}
 	tests := []struct {
 		name     string
@@ -167,7 +167,7 @@ func TestUsersStore_Update(t *testing.T) {
 			name: "No such user",
 			args: args{
 				ctx: context.Background(),
-				usr: &chronograf.User{
+				usr: &chronograf.DBUser{
 					Name: "noone",
 				},
 			},
@@ -177,7 +177,7 @@ func TestUsersStore_Update(t *testing.T) {
 			name: "Update new user",
 			args: args{
 				ctx: context.Background(),
-				usr: &chronograf.User{
+				usr: &chronograf.DBUser{
 					Name: "noone",
 				},
 			},
@@ -209,7 +209,7 @@ func TestUsersStore_All(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      context.Context
-		want     []chronograf.User
+		want     []chronograf.DBUser
 		addFirst bool
 		wantErr  bool
 	}{
@@ -218,7 +218,7 @@ func TestUsersStore_All(t *testing.T) {
 		},
 		{
 			name: "Update new user",
-			want: []chronograf.User{
+			want: []chronograf.DBUser{
 				{
 					Name: "howdy",
 				},

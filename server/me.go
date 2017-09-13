@@ -15,13 +15,13 @@ type meLinks struct {
 }
 
 type meResponse struct {
-	*chronograf.User
+	*chronograf.DBUser
 	Links meLinks `json:"links"`
 }
 
 // If new user response is nil, return an empty meResponse because it
 // indicates authentication is not needed
-func newMeResponse(usr *chronograf.User) meResponse {
+func newMeResponse(usr *chronograf.DBUser) meResponse {
 	base := "/chronograf/v1/users"
 	name := "me"
 	if usr != nil {
@@ -29,7 +29,7 @@ func newMeResponse(usr *chronograf.User) meResponse {
 	}
 
 	return meResponse{
-		User: usr,
+		DBUser: usr,
 		Links: meLinks{
 			Self: fmt.Sprintf("%s/%s", base, name),
 		},
@@ -80,7 +80,7 @@ func (h *Service) Me(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Because we didnt find a user, making a new one
-	user := &chronograf.User{
+	user := &chronograf.DBUser{
 		Name: email,
 	}
 

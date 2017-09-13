@@ -31,7 +31,7 @@ func (h *Service) NewSourceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	store := ts.Users(ctx)
-	user := &chronograf.User{
+	user := &chronograf.DBUser{
 		Name:        req.Username,
 		Passwd:      req.Password,
 		Permissions: req.Permissions,
@@ -122,7 +122,7 @@ func (h *Service) RemoveSourceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := store.Delete(ctx, &chronograf.User{Name: uid}); err != nil {
+	if err := store.Delete(ctx, &chronograf.DBUser{Name: uid}); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -149,7 +149,7 @@ func (h *Service) UpdateSourceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := &chronograf.User{
+	user := &chronograf.DBUser{
 		Name:        uid,
 		Passwd:      req.Password,
 		Permissions: req.Permissions,

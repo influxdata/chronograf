@@ -94,13 +94,13 @@ func TestClient_Add(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		ctx context.Context
-		u   *chronograf.User
+		u   *chronograf.DBUser
 	}
 	tests := []struct {
 		name        string
 		args        args
 		status      int
-		want        *chronograf.User
+		want        *chronograf.DBUser
 		wantQueries []string
 		wantErr     bool
 	}{
@@ -109,7 +109,7 @@ func TestClient_Add(t *testing.T) {
 			status: http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name:   "docbrown",
 					Passwd: "Dont Need Roads",
 				},
@@ -119,7 +119,7 @@ func TestClient_Add(t *testing.T) {
 				`SHOW USERS`,
 				`SHOW GRANTS FOR "docbrown"`,
 			},
-			want: &chronograf.User{
+			want: &chronograf.DBUser{
 				Name: "docbrown",
 				Permissions: chronograf.Permissions{
 					chronograf.Permission{
@@ -136,7 +136,7 @@ func TestClient_Add(t *testing.T) {
 			status: http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name:   "docbrown",
 					Passwd: "Dont Need Roads",
 					Permissions: chronograf.Permissions{
@@ -155,7 +155,7 @@ func TestClient_Add(t *testing.T) {
 				`SHOW USERS`,
 				`SHOW GRANTS FOR "docbrown"`,
 			},
-			want: &chronograf.User{
+			want: &chronograf.DBUser{
 				Name: "docbrown",
 				Permissions: chronograf.Permissions{
 					chronograf.Permission{
@@ -172,7 +172,7 @@ func TestClient_Add(t *testing.T) {
 			status: http.StatusUnauthorized,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name:   "docbrown",
 					Passwd: "Dont Need Roads",
 				},
@@ -221,7 +221,7 @@ func TestClient_Add(t *testing.T) {
 func TestClient_Delete(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		u   *chronograf.User
+		u   *chronograf.DBUser
 	}
 	tests := []struct {
 		name     string
@@ -236,7 +236,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 				},
 			},
@@ -247,7 +247,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 				},
 			},
@@ -259,7 +259,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusBadRequest,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 				},
 			},
@@ -271,7 +271,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 				},
 			},
@@ -311,7 +311,7 @@ func TestClient_Get(t *testing.T) {
 		showUsers    []byte
 		statusGrants int
 		showGrants   []byte
-		want         *chronograf.User
+		want         *chronograf.DBUser
 		wantErr      bool
 	}{
 		{
@@ -324,7 +324,7 @@ func TestClient_Get(t *testing.T) {
 				ctx:  context.Background(),
 				name: "docbrown",
 			},
-			want: &chronograf.User{
+			want: &chronograf.DBUser{
 				Name: "docbrown",
 				Permissions: chronograf.Permissions{
 					chronograf.Permission{
@@ -584,7 +584,7 @@ func TestClient_All(t *testing.T) {
 		showUsers    []byte
 		statusGrants int
 		showGrants   []byte
-		want         []chronograf.User
+		want         []chronograf.DBUser
 		wantErr      bool
 	}{
 		{
@@ -596,7 +596,7 @@ func TestClient_All(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: []chronograf.User{
+			want: []chronograf.DBUser{
 				{
 					Name: "admin",
 					Permissions: chronograf.Permissions{
@@ -692,7 +692,7 @@ func TestClient_All(t *testing.T) {
 func TestClient_Update(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		u   *chronograf.User
+		u   *chronograf.DBUser
 	}
 	tests := []struct {
 		name           string
@@ -716,7 +716,7 @@ func TestClient_Update(t *testing.T) {
 			password:       []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name:   "docbrown",
 					Passwd: "hunter2",
 				},
@@ -737,7 +737,7 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 					Permissions: chronograf.Permissions{
 						{
@@ -769,7 +769,7 @@ func TestClient_Update(t *testing.T) {
 			revoke:       []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 				},
 			},
@@ -792,7 +792,7 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 					Permissions: chronograf.Permissions{
 						{
@@ -826,7 +826,7 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 					Permissions: chronograf.Permissions{
 						{
@@ -866,7 +866,7 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 					Permissions: chronograf.Permissions{
 						{
@@ -894,7 +894,7 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 				},
 			},
@@ -916,7 +916,7 @@ func TestClient_Update(t *testing.T) {
 			wantErr:      true,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 					Permissions: chronograf.Permissions{
 						{
@@ -955,7 +955,7 @@ func TestClient_Update(t *testing.T) {
 			wantErr:      true,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.DBUser{
 					Name: "docbrown",
 					Permissions: chronograf.Permissions{
 						{

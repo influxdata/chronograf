@@ -113,7 +113,7 @@ type TimeSeries interface {
 type Role struct {
 	Name        string      `json:"name"`
 	Permissions Permissions `json:"permissions,omitempty"`
-	Users       []User      `json:"users,omitempty"`
+	Users       []DBUser    `json:"users,omitempty"`
 }
 
 // RolesStore is the Storage and retrieval of authentication information
@@ -576,8 +576,8 @@ type Allowances []string
 // Scope defines the location of access of a permission
 type Scope string
 
-// User represents an authenticated user.
-type User struct {
+// DBUser represents an authenticated user.
+type DBUser struct {
 	Name        string      `json:"name"`
 	Passwd      string      `json:"password"`
 	Permissions Permissions `json:"permissions,omitempty"`
@@ -587,15 +587,15 @@ type User struct {
 // UsersStore is the Storage and retrieval of authentication information
 type UsersStore interface {
 	// All lists all users from the UsersStore
-	All(context.Context) ([]User, error)
+	All(context.Context) ([]DBUser, error)
 	// Create a new User in the UsersStore
-	Add(context.Context, *User) (*User, error)
+	Add(context.Context, *DBUser) (*DBUser, error)
 	// Delete the User from the UsersStore
-	Delete(context.Context, *User) error
+	Delete(context.Context, *DBUser) error
 	// Get retrieves a user if name exists.
-	Get(ctx context.Context, name string) (*User, error)
+	Get(ctx context.Context, name string) (*DBUser, error)
 	// Update the user's permissions or roles
-	Update(context.Context, *User) error
+	Update(context.Context, *DBUser) error
 }
 
 // Database represents a database in a time series source

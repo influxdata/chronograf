@@ -302,7 +302,7 @@ func TestService_UpdateRole(t *testing.T) {
 							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
 								return &chronograf.Role{
 									Name: "biffsgang",
-									Users: []chronograf.User{
+									Users: []chronograf.DBUser{
 										{
 											Name: "match",
 										},
@@ -425,7 +425,7 @@ func TestService_RoleID(t *testing.T) {
 											},
 										},
 									},
-									Users: []chronograf.User{
+									Users: []chronograf.DBUser{
 										{
 											Name: "match",
 										},
@@ -632,7 +632,7 @@ func TestService_Roles(t *testing.T) {
 												},
 											},
 										},
-										Users: []chronograf.User{
+										Users: []chronograf.DBUser{
 											{
 												Name: "match",
 											},
