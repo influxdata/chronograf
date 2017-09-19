@@ -165,7 +165,7 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 }
 
 // Users transforms InfluxDB into a user store
-func (c *Client) Users(ctx context.Context) chronograf.UsersStore {
+func (c *Client) Users(ctx context.Context) chronograf.DBUsersStore {
 	return c
 }
 

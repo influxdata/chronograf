@@ -102,7 +102,7 @@ type TimeSeries interface {
 	// Connect will connect to the time series using the information in `Source`.
 	Connect(context.Context, *Source) error
 	// UsersStore represents the user accounts within the TimeSeries database
-	Users(context.Context) UsersStore
+	Users(context.Context) DBUsersStore
 	// Permissions returns all valid names permissions in this database
 	Permissions(context.Context) Permissions
 	// Roles represents the roles associated with this TimesSeriesDatabase
@@ -584,8 +584,8 @@ type DBUser struct {
 	Roles       []Role      `json:"roles,omitempty"`
 }
 
-// UsersStore is the Storage and retrieval of authentication information
-type UsersStore interface {
+// DBUsersStore is the Storage and retrieval of authentication information
+type DBUsersStore interface {
 	// All lists all users from the UsersStore
 	All(context.Context) ([]DBUser, error)
 	// Create a new User in the UsersStore

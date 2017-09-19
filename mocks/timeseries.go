@@ -15,7 +15,7 @@ type TimeSeries struct {
 	// Connect will connect to the time series using the information in `Source`.
 	ConnectF func(context.Context, *chronograf.Source) error
 	// UsersStore represents the user accounts within the TimeSeries database
-	UsersF func(context.Context) chronograf.UsersStore
+	UsersF func(context.Context) chronograf.DBUsersStore
 	// Permissions returns all valid names permissions in this database
 	PermissionsF func(context.Context) chronograf.Permissions
 	// RolesF represents the roles. Roles group permissions and Users
@@ -38,7 +38,7 @@ func (t *TimeSeries) Connect(ctx context.Context, src *chronograf.Source) error 
 }
 
 // Users represents the user accounts within the TimeSeries database
-func (t *TimeSeries) Users(ctx context.Context) chronograf.UsersStore {
+func (t *TimeSeries) Users(ctx context.Context) chronograf.DBUsersStore {
 	return t.UsersF(ctx)
 }
 

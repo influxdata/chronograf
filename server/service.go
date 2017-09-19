@@ -14,7 +14,7 @@ type Service struct {
 	SourcesStore     chronograf.SourcesStore
 	ServersStore     chronograf.ServersStore
 	LayoutStore      chronograf.LayoutStore
-	UsersStore       chronograf.UsersStore
+	UsersStore       chronograf.DBUsersStore
 	DashboardsStore  chronograf.DashboardsStore
 	TimeSeriesClient TimeSeriesClient
 	Logger           chronograf.Logger

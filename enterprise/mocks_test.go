@@ -118,7 +118,7 @@ func (ts *TimeSeries) Connect(ctx context.Context, src *chronograf.Source) error
 	return nil
 }
 
-func (ts *TimeSeries) Users(ctx context.Context) chronograf.UsersStore {
+func (ts *TimeSeries) Users(ctx context.Context) chronograf.DBUsersStore {
 	return nil
 }
 

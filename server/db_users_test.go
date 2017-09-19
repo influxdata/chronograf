@@ -64,7 +64,7 @@ func TestService_NewSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 								return u, nil
@@ -110,7 +110,7 @@ func TestService_NewSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 								return u, nil
@@ -156,7 +156,7 @@ func TestService_NewSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 								return nil, fmt.Errorf("Weight Has Nothing to Do With It")
@@ -372,7 +372,7 @@ func TestService_SourceUsers(t *testing.T) {
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							AllF: func(ctx context.Context) ([]chronograf.DBUser, error) {
 								return []chronograf.DBUser{
@@ -428,7 +428,7 @@ func TestService_SourceUsers(t *testing.T) {
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return nil, nil
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							AllF: func(ctx context.Context) ([]chronograf.DBUser, error) {
 								return []chronograf.DBUser{
@@ -539,7 +539,7 @@ func TestService_SourceUserID(t *testing.T) {
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							GetF: func(ctx context.Context, uid string) (*chronograf.DBUser, error) {
 								return &chronograf.DBUser{
@@ -594,7 +594,7 @@ func TestService_SourceUserID(t *testing.T) {
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return nil, nil
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							GetF: func(ctx context.Context, uid string) (*chronograf.DBUser, error) {
 								return &chronograf.DBUser{
@@ -701,7 +701,7 @@ func TestService_RemoveSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							DeleteF: func(ctx context.Context, u *chronograf.DBUser) error {
 								return nil
@@ -799,7 +799,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							UpdateF: func(ctx context.Context, u *chronograf.DBUser) error {
 								return nil
@@ -851,7 +851,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return nil, nil
 					},
-					UsersF: func(ctx context.Context) chronograf.UsersStore {
+					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
 						return &mocks.UsersStore{
 							UpdateF: func(ctx context.Context, u *chronograf.DBUser) error {
 								return nil

@@ -42,7 +42,7 @@ type Ctrl interface {
 // are appropriately load balanced across the cluster.
 type Client struct {
 	Ctrl
-	UsersStore chronograf.UsersStore
+	UsersStore chronograf.DBUsersStore
 	RolesStore chronograf.RolesStore
 	Logger     chronograf.Logger
 
@@ -145,7 +145,7 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 }
 
 // Users is the interface to the users within Influx Enterprise
-func (c *Client) Users(context.Context) chronograf.UsersStore {
+func (c *Client) Users(context.Context) chronograf.DBUsersStore {
 	return c.UsersStore
 }
 

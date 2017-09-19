@@ -18,7 +18,7 @@ type MockUsers struct{}
 
 func TestService_Me(t *testing.T) {
 	type fields struct {
-		UsersStore chronograf.UsersStore
+		UsersStore chronograf.DBUsersStore
 		Logger     chronograf.Logger
 		UseAuth    bool
 	}

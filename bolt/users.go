@@ -9,7 +9,7 @@ import (
 )
 
 // Ensure UsersStore implements chronograf.UsersStore.
-var _ chronograf.UsersStore = &UsersStore{}
+var _ chronograf.DBUsersStore = &UsersStore{}
 
 // UsersBucket is used to store users local to chronograf
 var UsersBucket = []byte("UsersV1")

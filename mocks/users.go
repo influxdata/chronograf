@@ -6,7 +6,7 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-var _ chronograf.UsersStore = &UsersStore{}
+var _ chronograf.DBUsersStore = &UsersStore{}
 
 // UsersStore mock allows all functions to be set for testing
 type UsersStore struct {

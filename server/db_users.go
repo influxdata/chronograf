@@ -204,7 +204,7 @@ func (h *Service) sourcesSeries(ctx context.Context, w http.ResponseWriter, r *h
 	return srcID, ts, nil
 }
 
-func (h *Service) sourceUsersStore(ctx context.Context, w http.ResponseWriter, r *http.Request) (int, chronograf.UsersStore, error) {
+func (h *Service) sourceUsersStore(ctx context.Context, w http.ResponseWriter, r *http.Request) (int, chronograf.DBUsersStore, error) {
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
 		return 0, nil, err
