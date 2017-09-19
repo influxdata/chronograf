@@ -340,3 +340,30 @@ func Test_MarshalDashboard_WithEmptyLegacyBounds(t *testing.T) {
 		t.Fatalf("Dashboard protobuf copy error: diff follows:\n%s", cmp.Diff(expected, actual))
 	}
 }
+
+func Test_MarshalUser(t *testing.T) {
+	user := chronograf.User{
+		AuthScheme:   "OAuth2",
+		Provider:     "GitHub",
+		Organization: "InfluxData",
+		Email:        "doc@mcfly.time",
+		Name:         "Marty McFly",
+	}
+
+	expected := chronograf.User{
+		AuthScheme:   "OAuth2",
+		Provider:     "GitHub",
+		Organization: "InfluxData",
+		Email:        "doc@mcfly.time",
+		Name:         "Marty McFly",
+	}
+
+	var actual chronograf.User
+	if buf, err := internal.MarshalUser(&user); err != nil {
+		t.Fatal("Error marshaling user: err", err)
+	} else if err := internal.UnmarshalUser(buf, &actual); err != nil {
+		t.Fatal("Error unmarshaling user: err:", err)
+	} else if !cmp.Equal(expected, actual) {
+		t.Fatalf("User protobuf copy error: diff follows:\n%s", cmp.Diff(expected, actual))
+	}
+}
