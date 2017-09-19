@@ -153,10 +153,10 @@ func TestService_NewSourceRole(t *testing.T) {
 					},
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return &mocks.RolesStore{
-							AddF: func(ctx context.Context, u *chronograf.Role) (*chronograf.Role, error) {
+							AddF: func(ctx context.Context, u *chronograf.DBRole) (*chronograf.DBRole, error) {
 								return nil, fmt.Errorf("server had and issue")
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
+							GetF: func(ctx context.Context, name string) (*chronograf.DBRole, error) {
 								return nil, fmt.Errorf("No such role")
 							},
 						}, nil
@@ -197,10 +197,10 @@ func TestService_NewSourceRole(t *testing.T) {
 					},
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return &mocks.RolesStore{
-							AddF: func(ctx context.Context, u *chronograf.Role) (*chronograf.Role, error) {
+							AddF: func(ctx context.Context, u *chronograf.DBRole) (*chronograf.DBRole, error) {
 								return u, nil
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
+							GetF: func(ctx context.Context, name string) (*chronograf.DBRole, error) {
 								return nil, fmt.Errorf("no such role")
 							},
 						}, nil
@@ -296,11 +296,11 @@ func TestService_UpdateRole(t *testing.T) {
 					},
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return &mocks.RolesStore{
-							UpdateF: func(ctx context.Context, u *chronograf.Role) error {
+							UpdateF: func(ctx context.Context, u *chronograf.DBRole) error {
 								return nil
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
-								return &chronograf.Role{
+							GetF: func(ctx context.Context, name string) (*chronograf.DBRole, error) {
+								return &chronograf.DBRole{
 									Name: "biffsgang",
 									Users: []chronograf.DBUser{
 										{
@@ -413,8 +413,8 @@ func TestService_RoleID(t *testing.T) {
 					},
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return &mocks.RolesStore{
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
-								return &chronograf.Role{
+							GetF: func(ctx context.Context, name string) (*chronograf.DBRole, error) {
+								return &chronograf.DBRole{
 									Name: "biffsgang",
 									Permissions: chronograf.Permissions{
 										{
@@ -534,7 +534,7 @@ func TestService_RemoveRole(t *testing.T) {
 					},
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return &mocks.RolesStore{
-							DeleteF: func(context.Context, *chronograf.Role) error {
+							DeleteF: func(context.Context, *chronograf.DBRole) error {
 								return nil
 							},
 						}, nil
@@ -619,9 +619,9 @@ func TestService_Roles(t *testing.T) {
 					},
 					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
 						return &mocks.RolesStore{
-							AllF: func(ctx context.Context) ([]chronograf.Role, error) {
-								return []chronograf.Role{
-									chronograf.Role{
+							AllF: func(ctx context.Context) ([]chronograf.DBRole, error) {
+								return []chronograf.DBRole{
+									chronograf.DBRole{
 										Name: "biffsgang",
 										Permissions: chronograf.Permissions{
 											{

@@ -69,7 +69,7 @@ func TestClient_Add(t *testing.T) {
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{},
+				Roles: []chronograf.DBRole{},
 			},
 		},
 		{
@@ -116,7 +116,7 @@ func TestClient_Add(t *testing.T) {
 				u: &chronograf.DBUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
-					Roles: []chronograf.Role{
+					Roles: []chronograf.DBRole{
 						{
 							Name: "admin",
 						},
@@ -131,7 +131,7 @@ func TestClient_Add(t *testing.T) {
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{
+				Roles: []chronograf.DBRole{
 					{
 						Name:        "admin",
 						Users:       []chronograf.DBUser{},
@@ -287,7 +287,7 @@ func TestClient_Get(t *testing.T) {
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{},
+				Roles: []chronograf.DBRole{},
 			},
 		},
 		{
@@ -340,7 +340,7 @@ func TestClient_Get(t *testing.T) {
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{
+				Roles: []chronograf.DBRole{
 					{
 						Name: "timetravels",
 						Permissions: chronograf.Permissions{
@@ -487,7 +487,7 @@ func TestClient_Update(t *testing.T) {
 							Allowed: chronograf.Allowances{"ViewChronograf", "KapacitorAPI"},
 						},
 					},
-					Roles: []chronograf.Role{
+					Roles: []chronograf.DBRole{
 						{
 							Name: "adminrole",
 						},
@@ -587,7 +587,7 @@ func TestClient_All(t *testing.T) {
 							Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 						},
 					},
-					Roles: []chronograf.Role{},
+					Roles: []chronograf.DBRole{},
 				},
 			},
 		},

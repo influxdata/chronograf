@@ -109,8 +109,8 @@ type TimeSeries interface {
 	Roles(context.Context) (RolesStore, error)
 }
 
-// Role is a restricted set of permissions assigned to a set of users.
-type Role struct {
+// DBRole is a restricted set of permissions assigned to a set of users.
+type DBRole struct {
 	Name        string      `json:"name"`
 	Permissions Permissions `json:"permissions,omitempty"`
 	Users       []DBUser    `json:"users,omitempty"`
@@ -119,15 +119,15 @@ type Role struct {
 // RolesStore is the Storage and retrieval of authentication information
 type RolesStore interface {
 	// All lists all roles from the RolesStore
-	All(context.Context) ([]Role, error)
+	All(context.Context) ([]DBRole, error)
 	// Create a new Role in the RolesStore
-	Add(context.Context, *Role) (*Role, error)
+	Add(context.Context, *DBRole) (*DBRole, error)
 	// Delete the Role from the RolesStore
-	Delete(context.Context, *Role) error
+	Delete(context.Context, *DBRole) error
 	// Get retrieves a role if name exists.
-	Get(ctx context.Context, name string) (*Role, error)
+	Get(ctx context.Context, name string) (*DBRole, error)
 	// Update the roles' users or permissions
-	Update(context.Context, *Role) error
+	Update(context.Context, *DBRole) error
 }
 
 // Range represents an upper and lower bound for data
@@ -581,7 +581,7 @@ type DBUser struct {
 	Name        string      `json:"name"`
 	Passwd      string      `json:"password"`
 	Permissions Permissions `json:"permissions,omitempty"`
-	Roles       []Role      `json:"roles,omitempty"`
+	Roles       []DBRole    `json:"roles,omitempty"`
 }
 
 // DBUsersStore is the Storage and retrieval of authentication information

@@ -227,7 +227,7 @@ type userRequest struct {
 	Username    string                 `json:"name,omitempty"`        // Username for new account
 	Password    string                 `json:"password,omitempty"`    // Password for new account
 	Permissions chronograf.Permissions `json:"permissions,omitempty"` // Optional permissions
-	Roles       []chronograf.Role      `json:"roles,omitempty"`       // Optional roles
+	Roles       []chronograf.DBRole    `json:"roles,omitempty"`       // Optional roles
 }
 
 func (r *userRequest) ValidCreate() error {
@@ -293,7 +293,7 @@ func (u *userResponse) WithPermissions(perms chronograf.Permissions) *userRespon
 }
 
 // WithRoles adds roles to the HTTP JSON response for a user
-func (u *userResponse) WithRoles(srcID int, roles []chronograf.Role) *userResponse {
+func (u *userResponse) WithRoles(srcID int, roles []chronograf.DBRole) *userResponse {
 	u.hasRoles = true
 	rr := make([]roleResponse, len(roles))
 	for i, role := range roles {

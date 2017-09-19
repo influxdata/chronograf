@@ -39,7 +39,7 @@ func (h *Service) NewRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := roles.Add(ctx, &req.Role)
+	res, err := roles.Add(ctx, &req.DBRole)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
@@ -77,7 +77,7 @@ func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
 	rid := httprouter.GetParamFromContext(ctx, "rid")
 	req.Name = rid
 
-	if err := roles.Update(ctx, &req.Role); err != nil {
+	if err := roles.Update(ctx, &req.DBRole); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -162,7 +162,7 @@ func (h *Service) RemoveRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rid := httprouter.GetParamFromContext(ctx, "rid")
-	if err := roles.Delete(ctx, &chronograf.Role{Name: rid}); err != nil {
+	if err := roles.Delete(ctx, &chronograf.DBRole{Name: rid}); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -171,7 +171,7 @@ func (h *Service) RemoveRole(w http.ResponseWriter, r *http.Request) {
 
 // sourceRoleRequest is the format used for both creating and updating roles
 type sourceRoleRequest struct {
-	chronograf.Role
+	chronograf.DBRole
 }
 
 func (r *sourceRoleRequest) ValidCreate() error {
@@ -205,7 +205,7 @@ type roleResponse struct {
 	Links       selfLinks              `json:"links"`
 }
 
-func newRoleResponse(srcID int, res *chronograf.Role) roleResponse {
+func newRoleResponse(srcID int, res *chronograf.DBRole) roleResponse {
 	su := make([]*userResponse, len(res.Users))
 	for i := range res.Users {
 		name := res.Users[i].Name
