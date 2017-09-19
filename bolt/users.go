@@ -9,7 +9,7 @@ import (
 )
 
 // Ensure UsersStore implements chronograf.UsersStore.
-var _ chronograf.DBUsersStore = &UsersStore{}
+var _ chronograf.UsersStore = &UsersStore{}
 
 // UsersBucket is used to store users local to chronograf
 var UsersBucket = []byte("UsersV1")
@@ -25,7 +25,7 @@ func (s *UsersStore) get(ctx context.Context, name string) (*internal.User, erro
 	var user internal.User
 	err := s.client.db.View(func(tx *bolt.Tx) error {
 		err := tx.Bucket(UsersBucket).ForEach(func(k, v []byte) error {
-			var u chronograf.DBUser
+			var u chronograf.User
 			if err := internal.UnmarshalUser(v, &u); err != nil {
 				return err
 			} else if u.Name != name {
@@ -53,18 +53,18 @@ func (s *UsersStore) get(ctx context.Context, name string) (*internal.User, erro
 }
 
 // Get searches the UsersStore for user with name
-func (s *UsersStore) Get(ctx context.Context, name string) (*chronograf.DBUser, error) {
+func (s *UsersStore) Get(ctx context.Context, name string) (*chronograf.User, error) {
 	u, err := s.get(ctx, name)
 	if err != nil {
 		return nil, err
 	}
-	return &chronograf.DBUser{
+	return &chronograf.User{
 		Name: u.Name,
 	}, nil
 }
 
 // Add a new Users in the UsersStore.
-func (s *UsersStore) Add(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
+func (s *UsersStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
 	if err := s.client.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(UsersBucket)
 		seq, err := b.NextSequence()
@@ -85,7 +85,7 @@ func (s *UsersStore) Add(ctx context.Context, u *chronograf.DBUser) (*chronograf
 }
 
 // Delete the users from the UsersStore
-func (s *UsersStore) Delete(ctx context.Context, user *chronograf.DBUser) error {
+func (s *UsersStore) Delete(ctx context.Context, user *chronograf.User) error {
 	u, err := s.get(ctx, user.Name)
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func (s *UsersStore) Delete(ctx context.Context, user *chronograf.DBUser) error 
 }
 
 // Update a user
-func (s *UsersStore) Update(ctx context.Context, usr *chronograf.DBUser) error {
+func (s *UsersStore) Update(ctx context.Context, usr *chronograf.User) error {
 	u, err := s.get(ctx, usr.Name)
 	if err != nil {
 		return err
@@ -124,11 +124,11 @@ func (s *UsersStore) Update(ctx context.Context, usr *chronograf.DBUser) error {
 }
 
 // All returns all users
-func (s *UsersStore) All(ctx context.Context) ([]chronograf.DBUser, error) {
-	var users []chronograf.DBUser
+func (s *UsersStore) All(ctx context.Context) ([]chronograf.User, error) {
+	var users []chronograf.User
 	if err := s.client.db.View(func(tx *bolt.Tx) error {
 		if err := tx.Bucket(UsersBucket).ForEach(func(k, v []byte) error {
-			var user chronograf.DBUser
+			var user chronograf.User
 			if err := internal.UnmarshalUser(v, &user); err != nil {
 				return err
 			}

@@ -576,7 +576,26 @@ type Allowances []string
 // Scope defines the location of access of a permission
 type Scope string
 
-// DBUser represents an authenticated user.
+// User represents an authenticated Chronograf user.
+type User struct {
+	Name string `json:"name"`
+}
+
+// UsersStore is the Storage and retrieval of Chronograf user authentication information
+type UsersStore interface {
+	// All lists all users from the UsersStore
+	All(context.Context) ([]User, error)
+	// Create a new User in the UsersStore
+	Add(context.Context, *User) (*User, error)
+	// Delete the User from the UsersStore
+	Delete(context.Context, *User) error
+	// Get retrieves a user if name exists.
+	Get(ctx context.Context, name string) (*User, error)
+	// Update the user's permissions or roles
+	Update(context.Context, *User) error
+}
+
+// DBUser represents an authenticated InfluxDB user.
 type DBUser struct {
 	Name        string      `json:"name"`
 	Passwd      string      `json:"password"`
@@ -584,13 +603,13 @@ type DBUser struct {
 	Roles       []DBRole    `json:"roles,omitempty"`
 }
 
-// DBUsersStore is the Storage and retrieval of authentication information
+// DBUsersStore is the Storage and retrieval of InfluxDB user authentication information
 type DBUsersStore interface {
-	// All lists all users from the UsersStore
+	// All lists all users from the DBUsersStore
 	All(context.Context) ([]DBUser, error)
-	// Create a new User in the UsersStore
+	// Create a new DBUser in the DBUsersStore
 	Add(context.Context, *DBUser) (*DBUser, error)
-	// Delete the User from the UsersStore
+	// Delete the DBUser from the DBUsersStore
 	Delete(context.Context, *DBUser) error
 	// Get retrieves a user if name exists.
 	Get(ctx context.Context, name string) (*DBUser, error)

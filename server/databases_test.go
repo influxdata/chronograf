@@ -12,7 +12,7 @@ func TestService_GetDatabases(t *testing.T) {
 		SourcesStore     chronograf.SourcesStore
 		ServersStore     chronograf.ServersStore
 		LayoutStore      chronograf.LayoutStore
-		UsersStore       chronograf.DBUsersStore
+		UsersStore       chronograf.UsersStore
 		DashboardsStore  chronograf.DashboardsStore
 		TimeSeriesClient TimeSeriesClient
 		Logger           chronograf.Logger
@@ -53,7 +53,7 @@ func TestService_NewDatabase(t *testing.T) {
 		SourcesStore     chronograf.SourcesStore
 		ServersStore     chronograf.ServersStore
 		LayoutStore      chronograf.LayoutStore
-		UsersStore       chronograf.DBUsersStore
+		UsersStore       chronograf.UsersStore
 		DashboardsStore  chronograf.DashboardsStore
 		TimeSeriesClient TimeSeriesClient
 		Logger           chronograf.Logger
@@ -94,7 +94,7 @@ func TestService_DropDatabase(t *testing.T) {
 		SourcesStore     chronograf.SourcesStore
 		ServersStore     chronograf.ServersStore
 		LayoutStore      chronograf.LayoutStore
-		UsersStore       chronograf.DBUsersStore
+		UsersStore       chronograf.UsersStore
 		DashboardsStore  chronograf.DashboardsStore
 		TimeSeriesClient TimeSeriesClient
 		Logger           chronograf.Logger
@@ -135,7 +135,7 @@ func TestService_RetentionPolicies(t *testing.T) {
 		SourcesStore     chronograf.SourcesStore
 		ServersStore     chronograf.ServersStore
 		LayoutStore      chronograf.LayoutStore
-		UsersStore       chronograf.DBUsersStore
+		UsersStore       chronograf.UsersStore
 		DashboardsStore  chronograf.DashboardsStore
 		TimeSeriesClient TimeSeriesClient
 		Logger           chronograf.Logger
@@ -176,7 +176,7 @@ func TestService_NewRetentionPolicy(t *testing.T) {
 		SourcesStore     chronograf.SourcesStore
 		ServersStore     chronograf.ServersStore
 		LayoutStore      chronograf.LayoutStore
-		UsersStore       chronograf.DBUsersStore
+		UsersStore       chronograf.UsersStore
 		DashboardsStore  chronograf.DashboardsStore
 		TimeSeriesClient TimeSeriesClient
 		Logger           chronograf.Logger
@@ -217,7 +217,7 @@ func TestService_UpdateRetentionPolicy(t *testing.T) {
 		SourcesStore     chronograf.SourcesStore
 		ServersStore     chronograf.ServersStore
 		LayoutStore      chronograf.LayoutStore
-		UsersStore       chronograf.DBUsersStore
+		UsersStore       chronograf.UsersStore
 		DashboardsStore  chronograf.DashboardsStore
 		TimeSeriesClient TimeSeriesClient
 		Logger           chronograf.Logger
@@ -258,7 +258,7 @@ func TestService_DropRetentionPolicy(t *testing.T) {
 		SourcesStore     chronograf.SourcesStore
 		ServersStore     chronograf.ServersStore
 		LayoutStore      chronograf.LayoutStore
-		UsersStore       chronograf.DBUsersStore
+		UsersStore       chronograf.UsersStore
 		DashboardsStore  chronograf.DashboardsStore
 		TimeSeriesClient TimeSeriesClient
 		Logger           chronograf.Logger

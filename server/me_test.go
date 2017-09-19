@@ -18,7 +18,7 @@ type MockUsers struct{}
 
 func TestService_Me(t *testing.T) {
 	type fields struct {
-		UsersStore chronograf.DBUsersStore
+		UsersStore chronograf.UsersStore
 		Logger     chronograf.Logger
 		UseAuth    bool
 	}
@@ -44,10 +44,9 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
-						return &chronograf.DBUser{
-							Name:   "me",
-							Passwd: "hunter2",
+					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
+						return &chronograf.User{
+							Name: "me",
 						}, nil
 					},
 				},
@@ -57,7 +56,7 @@ func TestService_Me(t *testing.T) {
 			},
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
-			wantBody: `{"name":"me","password":"hunter2","links":{"self":"/chronograf/v1/users/me"}}
+			wantBody: `{"name":"me","links":{"self":"/chronograf/v1/users/me"}}
 `,
 		},
 		{
@@ -69,10 +68,10 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
+					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
 						return nil, fmt.Errorf("Unknown User")
 					},
-					AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
+					AddF: func(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
 						return u, nil
 					},
 				},
@@ -82,7 +81,7 @@ func TestService_Me(t *testing.T) {
 			},
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
-			wantBody: `{"name":"secret","password":"","links":{"self":"/chronograf/v1/users/secret"}}
+			wantBody: `{"name":"secret","links":{"self":"/chronograf/v1/users/secret"}}
 `,
 		},
 		{
@@ -94,10 +93,10 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
+					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
 						return nil, fmt.Errorf("Unknown User")
 					},
-					AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
+					AddF: func(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
 						return nil, fmt.Errorf("Why Heavy?")
 					},
 				},

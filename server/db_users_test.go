@@ -65,7 +65,7 @@ func TestService_NewSourceUser(t *testing.T) {
 						return nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 								return u, nil
 							},
@@ -111,7 +111,7 @@ func TestService_NewSourceUser(t *testing.T) {
 						return nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 								return u, nil
 							},
@@ -157,7 +157,7 @@ func TestService_NewSourceUser(t *testing.T) {
 						return nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
 								return nil, fmt.Errorf("Weight Has Nothing to Do With It")
 							},
@@ -373,7 +373,7 @@ func TestService_SourceUsers(t *testing.T) {
 						return nil, fmt.Errorf("no roles")
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							AllF: func(ctx context.Context) ([]chronograf.DBUser, error) {
 								return []chronograf.DBUser{
 									{
@@ -429,7 +429,7 @@ func TestService_SourceUsers(t *testing.T) {
 						return nil, nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							AllF: func(ctx context.Context) ([]chronograf.DBUser, error) {
 								return []chronograf.DBUser{
 									{
@@ -540,7 +540,7 @@ func TestService_SourceUserID(t *testing.T) {
 						return nil, fmt.Errorf("no roles")
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							GetF: func(ctx context.Context, uid string) (*chronograf.DBUser, error) {
 								return &chronograf.DBUser{
 									Name:   "strickland",
@@ -595,7 +595,7 @@ func TestService_SourceUserID(t *testing.T) {
 						return nil, nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							GetF: func(ctx context.Context, uid string) (*chronograf.DBUser, error) {
 								return &chronograf.DBUser{
 									Name:   "strickland",
@@ -702,7 +702,7 @@ func TestService_RemoveSourceUser(t *testing.T) {
 						return nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							DeleteF: func(ctx context.Context, u *chronograf.DBUser) error {
 								return nil
 							},
@@ -800,7 +800,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 						return nil, fmt.Errorf("no roles")
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							UpdateF: func(ctx context.Context, u *chronograf.DBUser) error {
 								return nil
 							},
@@ -852,7 +852,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 						return nil, nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
-						return &mocks.UsersStore{
+						return &mocks.DBUsersStore{
 							UpdateF: func(ctx context.Context, u *chronograf.DBUser) error {
 								return nil
 							},
