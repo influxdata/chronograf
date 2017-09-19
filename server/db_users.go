@@ -215,7 +215,7 @@ func (h *Service) sourceUsersStore(ctx context.Context, w http.ResponseWriter, r
 }
 
 // hasRoles checks if the influx source has roles or not
-func (h *Service) hasRoles(ctx context.Context, ts chronograf.TimeSeries) (chronograf.RolesStore, bool) {
+func (h *Service) hasRoles(ctx context.Context, ts chronograf.TimeSeries) (chronograf.DBRolesStore, bool) {
 	store, err := ts.Roles(ctx)
 	if err != nil {
 		return nil, false

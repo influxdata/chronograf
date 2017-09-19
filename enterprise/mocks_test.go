@@ -122,7 +122,7 @@ func (ts *TimeSeries) Users(ctx context.Context) chronograf.DBUsersStore {
 	return nil
 }
 
-func (ts *TimeSeries) Roles(ctx context.Context) (chronograf.RolesStore, error) {
+func (ts *TimeSeries) Roles(ctx context.Context) (chronograf.DBRolesStore, error) {
 	return nil, nil
 }
 

@@ -114,7 +114,7 @@ func TestService_NewSourceRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, fmt.Errorf("roles not supported")
 					},
 				},
@@ -151,7 +151,7 @@ func TestService_NewSourceRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return &mocks.RolesStore{
 							AddF: func(ctx context.Context, u *chronograf.DBRole) (*chronograf.DBRole, error) {
 								return nil, fmt.Errorf("server had and issue")
@@ -195,7 +195,7 @@ func TestService_NewSourceRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return &mocks.RolesStore{
 							AddF: func(ctx context.Context, u *chronograf.DBRole) (*chronograf.DBRole, error) {
 								return u, nil
@@ -294,7 +294,7 @@ func TestService_UpdateRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return &mocks.RolesStore{
 							UpdateF: func(ctx context.Context, u *chronograf.DBRole) error {
 								return nil
@@ -411,7 +411,7 @@ func TestService_RoleID(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return &mocks.RolesStore{
 							GetF: func(ctx context.Context, name string) (*chronograf.DBRole, error) {
 								return &chronograf.DBRole{
@@ -532,7 +532,7 @@ func TestService_RemoveRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return &mocks.RolesStore{
 							DeleteF: func(context.Context, *chronograf.DBRole) error {
 								return nil
@@ -617,7 +617,7 @@ func TestService_Roles(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return &mocks.RolesStore{
 							AllF: func(ctx context.Context) ([]chronograf.DBRole, error) {
 								return []chronograf.DBRole{

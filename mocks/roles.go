@@ -6,7 +6,7 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-var _ chronograf.RolesStore = &RolesStore{}
+var _ chronograf.DBRolesStore = &RolesStore{}
 
 // RolesStore mock allows all functions to be set for testing
 type RolesStore struct {

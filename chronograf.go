@@ -106,7 +106,7 @@ type TimeSeries interface {
 	// Permissions returns all valid names permissions in this database
 	Permissions(context.Context) Permissions
 	// Roles represents the roles associated with this TimesSeriesDatabase
-	Roles(context.Context) (RolesStore, error)
+	Roles(context.Context) (DBRolesStore, error)
 }
 
 // DBRole is a restricted set of permissions assigned to a set of users.
@@ -116,8 +116,8 @@ type DBRole struct {
 	Users       []DBUser    `json:"users,omitempty"`
 }
 
-// RolesStore is the Storage and retrieval of authentication information
-type RolesStore interface {
+// DBRolesStore is the Storage and retrieval of authentication information
+type DBRolesStore interface {
 	// All lists all roles from the RolesStore
 	All(context.Context) ([]DBRole, error)
 	// Create a new Role in the RolesStore

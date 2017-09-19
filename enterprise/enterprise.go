@@ -43,7 +43,7 @@ type Ctrl interface {
 type Client struct {
 	Ctrl
 	UsersStore chronograf.DBUsersStore
-	RolesStore chronograf.RolesStore
+	RolesStore chronograf.DBRolesStore
 	Logger     chronograf.Logger
 
 	dataNodes *ring.Ring
@@ -150,7 +150,7 @@ func (c *Client) Users(context.Context) chronograf.DBUsersStore {
 }
 
 // Roles provide a grouping of permissions given to a grouping of users
-func (c *Client) Roles(ctx context.Context) (chronograf.RolesStore, error) {
+func (c *Client) Roles(ctx context.Context) (chronograf.DBRolesStore, error) {
 	return c.RolesStore, nil
 }
 

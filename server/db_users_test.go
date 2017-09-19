@@ -71,7 +71,7 @@ func TestService_NewSourceUser(t *testing.T) {
 							},
 						}
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
 				},
@@ -117,7 +117,7 @@ func TestService_NewSourceUser(t *testing.T) {
 							},
 						}
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, nil
 					},
 				},
@@ -369,7 +369,7 @@ func TestService_SourceUsers(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
@@ -425,7 +425,7 @@ func TestService_SourceUsers(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
@@ -536,7 +536,7 @@ func TestService_SourceUserID(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
@@ -591,7 +591,7 @@ func TestService_SourceUserID(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
@@ -796,7 +796,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
@@ -848,7 +848,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
 						return nil, nil
 					},
 					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
