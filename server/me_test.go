@@ -44,9 +44,9 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
+					GetF: func(ctx context.Context, username string) (*chronograf.User, error) {
 						return &chronograf.User{
-							Name: "me",
+							Username: "me",
 						}, nil
 					},
 				},
@@ -56,7 +56,7 @@ func TestService_Me(t *testing.T) {
 			},
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
-			wantBody: `{"name":"me","links":{"self":"/chronograf/v1/users/me"}}
+			wantBody: `{"username":"me","links":{"self":"/chronograf/v1/users/me"}}
 `,
 		},
 		{
@@ -68,7 +68,7 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
+					GetF: func(ctx context.Context, username string) (*chronograf.User, error) {
 						return nil, fmt.Errorf("Unknown User")
 					},
 					AddF: func(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
@@ -81,7 +81,7 @@ func TestService_Me(t *testing.T) {
 			},
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
-			wantBody: `{"name":"secret","links":{"self":"/chronograf/v1/users/secret"}}
+			wantBody: `{"username":"secret","links":{"self":"/chronograf/v1/users/secret"}}
 `,
 		},
 		{
@@ -93,7 +93,7 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				UsersStore: &mocks.UsersStore{
-					GetF: func(ctx context.Context, name string) (*chronograf.User, error) {
+					GetF: func(ctx context.Context, username string) (*chronograf.User, error) {
 						return nil, fmt.Errorf("Unknown User")
 					},
 					AddF: func(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {

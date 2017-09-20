@@ -346,14 +346,14 @@ func Test_MarshalUser(t *testing.T) {
 		Scheme:       "OAuth2",
 		Provider:     "GitHub",
 		Organization: "InfluxData",
-		Name:         "doc@mcfly.time",
+		Username:     "doc@mcfly.time",
 	}
 
 	expected := chronograf.User{
 		Scheme:       "OAuth2",
 		Provider:     "GitHub",
 		Organization: "InfluxData",
-		Name:         "doc@mcfly.time",
+		Username:     "doc@mcfly.time",
 	}
 
 	var actual chronograf.User

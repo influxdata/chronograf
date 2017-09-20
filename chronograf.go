@@ -581,7 +581,7 @@ type User struct {
 	Scheme       string `json:"scheme,omitempty"`
 	Provider     string `json:"provider,omitempty"`
 	Organization string `json:"organization,omitempty"`
-	Name         string `json:"name"`
+	Username     string `json:"username"`
 }
 
 // UsersStore is the Storage and retrieval of Chronograf user authentication information

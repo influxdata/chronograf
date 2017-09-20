@@ -23,15 +23,15 @@ type meResponse struct {
 // indicates authentication is not needed
 func newMeResponse(usr *chronograf.User) meResponse {
 	base := "/chronograf/v1/users"
-	name := "me"
+	username := "me"
 	if usr != nil {
-		name = PathEscape(usr.Name)
+		username = PathEscape(usr.Username)
 	}
 
 	return meResponse{
 		User: usr,
 		Links: meLinks{
-			Self: fmt.Sprintf("%s/%s", base, name),
+			Self: fmt.Sprintf("%s/%s", base, username),
 		},
 	}
 }
@@ -81,12 +81,12 @@ func (h *Service) Me(w http.ResponseWriter, r *http.Request) {
 
 	// Because we didnt find a user, making a new one
 	user := &chronograf.User{
-		Name: email,
+		Username: email,
 	}
 
 	newUser, err := h.UsersStore.Add(ctx, user)
 	if err != nil {
-		msg := fmt.Errorf("error storing user %s: %v", user.Name, err)
+		msg := fmt.Errorf("error storing user %s: %v", user.Username, err)
 		unknownErrorWithMessage(w, msg, h.Logger)
 		return
 	}

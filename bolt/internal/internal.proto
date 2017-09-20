@@ -124,7 +124,7 @@ message AlertRule {
 
 message User {
 	uint64 ID               = 1; // ID is the unique ID of this user
-	string Name             = 2; // Name is the user's login name
+	string Username         = 2; // Username is the user's login username
 	string Organization     = 3; // Organization is the organization that had required and configured user authentication, e.g. InfluxData
 	string Provider         = 4; // Provider is the provider that certifies and issues this user's authentication, e.g. GitHub
 	string Scheme           = 5; // Scheme is the scheme used to perform this user's authentication, e.g. OAuth2

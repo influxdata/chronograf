@@ -66,11 +66,11 @@ func TestUsersStore_Add(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				u: &chronograf.User{
-					Name: "docbrown",
+					Username: "docbrown",
 				},
 			},
 			want: &chronograf.User{
-				Name: "docbrown",
+				Username: "docbrown",
 			},
 		},
 	}
@@ -93,7 +93,7 @@ func TestUsersStore_Add(t *testing.T) {
 			t.Errorf("%q. UsersStore.Add() = %v, want %v", tt.name, got, tt.want)
 		}
 
-		got, _ = s.Get(tt.args.ctx, got.Name)
+		got, _ = s.Get(tt.args.ctx, got.Username)
 		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("%q. UsersStore.Add() = %v, want %v", tt.name, got, tt.want)
 		}
@@ -116,7 +116,7 @@ func TestUsersStore_Delete(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				user: &chronograf.User{
-					Name: "noone",
+					Username: "noone",
 				},
 			},
 			wantErr: true,
@@ -126,7 +126,7 @@ func TestUsersStore_Delete(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				user: &chronograf.User{
-					Name: "noone",
+					Username: "noone",
 				},
 			},
 			addFirst: true,
@@ -168,7 +168,7 @@ func TestUsersStore_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				usr: &chronograf.User{
-					Name: "noone",
+					Username: "noone",
 				},
 			},
 			wantErr: true,
@@ -178,7 +178,7 @@ func TestUsersStore_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				usr: &chronograf.User{
-					Name: "noone",
+					Username: "noone",
 				},
 			},
 			addFirst: true,
@@ -220,10 +220,10 @@ func TestUsersStore_All(t *testing.T) {
 			name: "Update new user",
 			want: []chronograf.User{
 				{
-					Name: "howdy",
+					Username: "howdy",
 				},
 				{
-					Name: "doody",
+					Username: "doody",
 				},
 			},
 			addFirst: true,
