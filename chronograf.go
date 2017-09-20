@@ -578,7 +578,10 @@ type Scope string
 
 // User represents an authenticated Chronograf user.
 type User struct {
-	Name string `json:"name"`
+	Scheme       string `json:"scheme,omitempty"`
+	Provider     string `json:"provider,omitempty"`
+	Organization string `json:"organization,omitempty"`
+	Name         string `json:"name"`
 }
 
 // UsersStore is the Storage and retrieval of Chronograf user authentication information
