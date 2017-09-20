@@ -426,6 +426,9 @@ func UnmarshalUser(data []byte, u *chronograf.User) error {
 		return err
 	}
 	u.Name = pb.Name
+	u.Organization = pb.Organization
+	u.Provider = pb.Provider
+	u.Scheme = pb.Scheme
 	return nil
 }
 
