@@ -16,6 +16,7 @@
 
 ### UI Improvements
 ## v1.3.8.2 [2017-09-25]
+## v1.3.8.2 [2017-09-22]
 ### Bug Fixes
 1. [#2020](https://github.com/influxdata/chronograf/pull/2020): Fix duration for single value custom time ranges
 
