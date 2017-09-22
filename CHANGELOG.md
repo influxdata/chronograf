@@ -1,3 +1,7 @@
+## v1.3.8.2 [2017-09-25]
+### Bug Fixes
+1. [#2020](https://github.com/influxdata/chronograf/pull/2020): Fix duration for single value custom time ranges
+
 ## v1.3.8.1 [2017-09-08]
 ### Bug Fixes
 1. [#1982](https://github.com/influxdata/chronograf/pull/1982): Fix return code on meta nodes when raft redirects to leader
