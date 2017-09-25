@@ -24,7 +24,7 @@ func TestClient_userPermissions(t *testing.T) {
 		showGrants []byte
 		status     int
 		args       args
-		want       chronograf.Permissions
+		want       chronograf.SourcePermissions
 		wantErr    bool
 	}{
 		{
@@ -35,8 +35,8 @@ func TestClient_userPermissions(t *testing.T) {
 				ctx:  context.Background(),
 				name: "docbrown",
 			},
-			want: chronograf.Permissions{
-				chronograf.Permission{
+			want: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "mydb",
 					Allowed: []string{"WRITE", "READ"},
@@ -94,13 +94,13 @@ func TestClient_Add(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		ctx context.Context
-		u   *chronograf.DBUser
+		u   *chronograf.SourceUser
 	}
 	tests := []struct {
 		name        string
 		args        args
 		status      int
-		want        *chronograf.DBUser
+		want        *chronograf.SourceUser
 		wantQueries []string
 		wantErr     bool
 	}{
@@ -109,7 +109,7 @@ func TestClient_Add(t *testing.T) {
 			status: http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name:   "docbrown",
 					Passwd: "Dont Need Roads",
 				},
@@ -119,10 +119,10 @@ func TestClient_Add(t *testing.T) {
 				`SHOW USERS`,
 				`SHOW GRANTS FOR "docbrown"`,
 			},
-			want: &chronograf.DBUser{
+			want: &chronograf.SourceUser{
 				Name: "docbrown",
-				Permissions: chronograf.Permissions{
-					chronograf.Permission{
+				Permissions: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope: chronograf.AllScope,
 						Allowed: chronograf.Allowances{
 							"ALL",
@@ -136,11 +136,11 @@ func TestClient_Add(t *testing.T) {
 			status: http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name:   "docbrown",
 					Passwd: "Dont Need Roads",
-					Permissions: chronograf.Permissions{
-						chronograf.Permission{
+					Permissions: chronograf.SourcePermissions{
+						chronograf.SourcePermission{
 							Scope: chronograf.AllScope,
 							Allowed: chronograf.Allowances{
 								"ALL",
@@ -155,10 +155,10 @@ func TestClient_Add(t *testing.T) {
 				`SHOW USERS`,
 				`SHOW GRANTS FOR "docbrown"`,
 			},
-			want: &chronograf.DBUser{
+			want: &chronograf.SourceUser{
 				Name: "docbrown",
-				Permissions: chronograf.Permissions{
-					chronograf.Permission{
+				Permissions: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope: chronograf.AllScope,
 						Allowed: chronograf.Allowances{
 							"ALL",
@@ -172,7 +172,7 @@ func TestClient_Add(t *testing.T) {
 			status: http.StatusUnauthorized,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name:   "docbrown",
 					Passwd: "Dont Need Roads",
 				},
@@ -221,7 +221,7 @@ func TestClient_Add(t *testing.T) {
 func TestClient_Delete(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		u   *chronograf.DBUser
+		u   *chronograf.SourceUser
 	}
 	tests := []struct {
 		name     string
@@ -236,7 +236,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
 				},
 			},
@@ -247,7 +247,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
 				},
 			},
@@ -259,7 +259,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusBadRequest,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
 				},
 			},
@@ -271,7 +271,7 @@ func TestClient_Delete(t *testing.T) {
 			status:   http.StatusOK,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
 				},
 			},
@@ -311,7 +311,7 @@ func TestClient_Get(t *testing.T) {
 		showUsers    []byte
 		statusGrants int
 		showGrants   []byte
-		want         *chronograf.DBUser
+		want         *chronograf.SourceUser
 		wantErr      bool
 	}{
 		{
@@ -324,14 +324,14 @@ func TestClient_Get(t *testing.T) {
 				ctx:  context.Background(),
 				name: "docbrown",
 			},
-			want: &chronograf.DBUser{
+			want: &chronograf.SourceUser{
 				Name: "docbrown",
-				Permissions: chronograf.Permissions{
-					chronograf.Permission{
+				Permissions: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "all",
 						Allowed: []string{"ALL"},
 					},
-					chronograf.Permission{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "mydb",
 						Allowed: []string{"WRITE", "READ"},
@@ -407,7 +407,7 @@ func TestClient_grantPermission(t *testing.T) {
 	type args struct {
 		ctx      context.Context
 		username string
-		perm     chronograf.Permission
+		perm     chronograf.SourcePermission
 	}
 	tests := []struct {
 		name      string
@@ -424,7 +424,7 @@ func TestClient_grantPermission(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				username: "docbrown",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "mydb",
 					Allowed: []string{"WRITE", "READ"},
@@ -439,7 +439,7 @@ func TestClient_grantPermission(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				username: "docbrown",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "mydb",
 					Allowed: []string{"howdy"},
@@ -454,7 +454,7 @@ func TestClient_grantPermission(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				username: "docbrown",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "mydb",
 					Allowed: []string{},
@@ -492,7 +492,7 @@ func TestClient_revokePermission(t *testing.T) {
 	type args struct {
 		ctx      context.Context
 		username string
-		perm     chronograf.Permission
+		perm     chronograf.SourcePermission
 	}
 	tests := []struct {
 		name      string
@@ -509,7 +509,7 @@ func TestClient_revokePermission(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				username: "docbrown",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "mydb",
 					Allowed: []string{"WRITE", "READ"},
@@ -524,7 +524,7 @@ func TestClient_revokePermission(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				username: "docbrown",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "mydb",
 					Allowed: []string{"howdy"},
@@ -539,7 +539,7 @@ func TestClient_revokePermission(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				username: "docbrown",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "mydb",
 					Allowed: []string{},
@@ -584,7 +584,7 @@ func TestClient_All(t *testing.T) {
 		showUsers    []byte
 		statusGrants int
 		showGrants   []byte
-		want         []chronograf.DBUser
+		want         []chronograf.SourceUser
 		wantErr      bool
 	}{
 		{
@@ -596,15 +596,15 @@ func TestClient_All(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: []chronograf.DBUser{
+			want: []chronograf.SourceUser{
 				{
 					Name: "admin",
-					Permissions: chronograf.Permissions{
-						chronograf.Permission{
+					Permissions: chronograf.SourcePermissions{
+						chronograf.SourcePermission{
 							Scope:   "all",
 							Allowed: []string{"ALL"},
 						},
-						chronograf.Permission{
+						chronograf.SourcePermission{
 							Scope:   "database",
 							Name:    "mydb",
 							Allowed: []string{"WRITE", "READ"},
@@ -613,12 +613,12 @@ func TestClient_All(t *testing.T) {
 				},
 				{
 					Name: "docbrown",
-					Permissions: chronograf.Permissions{
-						chronograf.Permission{
+					Permissions: chronograf.SourcePermissions{
+						chronograf.SourcePermission{
 							Scope:   "all",
 							Allowed: []string{"ALL"},
 						},
-						chronograf.Permission{
+						chronograf.SourcePermission{
 							Scope:   "database",
 							Name:    "mydb",
 							Allowed: []string{"WRITE", "READ"},
@@ -627,8 +627,8 @@ func TestClient_All(t *testing.T) {
 				},
 				{
 					Name: "reader",
-					Permissions: chronograf.Permissions{
-						chronograf.Permission{
+					Permissions: chronograf.SourcePermissions{
+						chronograf.SourcePermission{
 							Scope:   "database",
 							Name:    "mydb",
 							Allowed: []string{"WRITE", "READ"},
@@ -692,7 +692,7 @@ func TestClient_All(t *testing.T) {
 func TestClient_Update(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		u   *chronograf.DBUser
+		u   *chronograf.SourceUser
 	}
 	tests := []struct {
 		name           string
@@ -716,7 +716,7 @@ func TestClient_Update(t *testing.T) {
 			password:       []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name:   "docbrown",
 					Passwd: "hunter2",
 				},
@@ -737,9 +737,9 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   "all",
 							Allowed: []string{"all"},
@@ -769,7 +769,7 @@ func TestClient_Update(t *testing.T) {
 			revoke:       []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
 				},
 			},
@@ -792,9 +792,9 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   "all",
 							Allowed: []string{"all"},
@@ -826,9 +826,9 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   "all",
 							Allowed: []string{},
@@ -866,9 +866,9 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   "all",
 							Allowed: []string{"ALL"},
@@ -894,7 +894,7 @@ func TestClient_Update(t *testing.T) {
 			grant:        []byte(`{"results":[]}`),
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
 				},
 			},
@@ -916,9 +916,9 @@ func TestClient_Update(t *testing.T) {
 			wantErr:      true,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   "all",
 							Allowed: []string{},
@@ -955,9 +955,9 @@ func TestClient_Update(t *testing.T) {
 			wantErr:      true,
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.DBUser{
+				u: &chronograf.SourceUser{
 					Name: "docbrown",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   "all",
 							Allowed: []string{},

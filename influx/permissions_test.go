@@ -11,27 +11,27 @@ import (
 func TestDifference(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		wants chronograf.Permissions
-		haves chronograf.Permissions
+		wants chronograf.SourcePermissions
+		haves chronograf.SourcePermissions
 	}
 	tests := []struct {
 		name       string
 		args       args
-		wantRevoke chronograf.Permissions
-		wantAdd    chronograf.Permissions
+		wantRevoke chronograf.SourcePermissions
+		wantAdd    chronograf.SourcePermissions
 	}{
 		{
 			name: "add write to permissions",
 			args: args{
-				wants: chronograf.Permissions{
-					chronograf.Permission{
+				wants: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "tensorflowdb",
 						Allowed: []string{"READ", "WRITE"},
 					},
 				},
-				haves: chronograf.Permissions{
-					chronograf.Permission{
+				haves: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "tensorflowdb",
 						Allowed: []string{"READ"},
@@ -39,8 +39,8 @@ func TestDifference(t *testing.T) {
 				},
 			},
 			wantRevoke: nil,
-			wantAdd: chronograf.Permissions{
-				chronograf.Permission{
+			wantAdd: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "tensorflowdb",
 					Allowed: []string{"READ", "WRITE"},
@@ -50,15 +50,15 @@ func TestDifference(t *testing.T) {
 		{
 			name: "revoke write to permissions",
 			args: args{
-				wants: chronograf.Permissions{
-					chronograf.Permission{
+				wants: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "tensorflowdb",
 						Allowed: []string{"READ"},
 					},
 				},
-				haves: chronograf.Permissions{
-					chronograf.Permission{
+				haves: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "tensorflowdb",
 						Allowed: []string{"READ", "WRITE"},
@@ -66,8 +66,8 @@ func TestDifference(t *testing.T) {
 				},
 			},
 			wantRevoke: nil,
-			wantAdd: chronograf.Permissions{
-				chronograf.Permission{
+			wantAdd: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "tensorflowdb",
 					Allowed: []string{"READ"},
@@ -77,23 +77,23 @@ func TestDifference(t *testing.T) {
 		{
 			name: "revoke all permissions",
 			args: args{
-				wants: chronograf.Permissions{
-					chronograf.Permission{
+				wants: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "tensorflowdb",
 						Allowed: []string{},
 					},
 				},
-				haves: chronograf.Permissions{
-					chronograf.Permission{
+				haves: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "tensorflowdb",
 						Allowed: []string{"READ", "WRITE"},
 					},
 				},
 			},
-			wantRevoke: chronograf.Permissions{
-				chronograf.Permission{
+			wantRevoke: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "tensorflowdb",
 					Allowed: []string{},
@@ -104,30 +104,30 @@ func TestDifference(t *testing.T) {
 		{
 			name: "add permissions different db",
 			args: args{
-				wants: chronograf.Permissions{
-					chronograf.Permission{
+				wants: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "new",
 						Allowed: []string{"READ"},
 					},
 				},
-				haves: chronograf.Permissions{
-					chronograf.Permission{
+				haves: chronograf.SourcePermissions{
+					chronograf.SourcePermission{
 						Scope:   "database",
 						Name:    "old",
 						Allowed: []string{"READ", "WRITE"},
 					},
 				},
 			},
-			wantRevoke: chronograf.Permissions{
-				chronograf.Permission{
+			wantRevoke: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "old",
 					Allowed: []string{"READ", "WRITE"},
 				},
 			},
-			wantAdd: chronograf.Permissions{
-				chronograf.Permission{
+			wantAdd: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "new",
 					Allowed: []string{"READ"},
@@ -210,7 +210,7 @@ func TestToGrant(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		username string
-		perm     chronograf.Permission
+		perm     chronograf.SourcePermission
 	}
 	tests := []struct {
 		name string
@@ -221,7 +221,7 @@ func TestToGrant(t *testing.T) {
 			name: "grant all for all dbs",
 			args: args{
 				username: "biff",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   chronograf.AllScope,
 					Allowed: chronograf.Allowances{"ALL"},
 				},
@@ -232,7 +232,7 @@ func TestToGrant(t *testing.T) {
 			name: "grant all for one db",
 			args: args{
 				username: "biff",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   chronograf.DBScope,
 					Name:    "gray_sports_almanac",
 					Allowed: chronograf.Allowances{"ALL"},
@@ -244,7 +244,7 @@ func TestToGrant(t *testing.T) {
 			name: "bad allowance",
 			args: args{
 				username: "biff",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   chronograf.DBScope,
 					Name:    "gray_sports_almanac",
 					Allowed: chronograf.Allowances{"bad"},
@@ -264,7 +264,7 @@ func TestToRevoke(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		username string
-		perm     chronograf.Permission
+		perm     chronograf.SourcePermission
 	}
 	tests := []struct {
 		name string
@@ -275,7 +275,7 @@ func TestToRevoke(t *testing.T) {
 			name: "revoke all for all dbs",
 			args: args{
 				username: "biff",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   chronograf.AllScope,
 					Allowed: chronograf.Allowances{"ALL"},
 				},
@@ -286,7 +286,7 @@ func TestToRevoke(t *testing.T) {
 			name: "revoke all for one db",
 			args: args{
 				username: "biff",
-				perm: chronograf.Permission{
+				perm: chronograf.SourcePermission{
 					Scope:   chronograf.DBScope,
 					Name:    "pleasure_paradice",
 					Allowed: chronograf.Allowances{},
@@ -307,15 +307,15 @@ func Test_showResults_Users(t *testing.T) {
 	tests := []struct {
 		name   string
 		octets []byte
-		want   []chronograf.DBUser
+		want   []chronograf.SourceUser
 	}{
 		{
 			name:   "admin and non-admin",
 			octets: []byte(`[{"series":[{"columns":["user","admin"],"values":[["admin",true],["reader",false]]}]}]`),
-			want: []chronograf.DBUser{
+			want: []chronograf.SourceUser{
 				{
 					Name: "admin",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   chronograf.AllScope,
 							Allowed: chronograf.Allowances{"ALL"},
@@ -324,14 +324,14 @@ func Test_showResults_Users(t *testing.T) {
 				},
 				{
 					Name:        "reader",
-					Permissions: chronograf.Permissions{},
+					Permissions: chronograf.SourcePermissions{},
 				},
 			},
 		},
 		{
 			name:   "bad JSON",
 			octets: []byte(`[{"series":[{"columns":["user","admin"],"values":[[1,true],["reader","false"]]}]}]`),
-			want:   []chronograf.DBUser{},
+			want:   []chronograf.SourceUser{},
 		},
 	}
 
@@ -349,13 +349,13 @@ func Test_showResults_Permissions(t *testing.T) {
 	tests := []struct {
 		name   string
 		octets []byte
-		want   chronograf.Permissions
+		want   chronograf.SourcePermissions
 	}{
 		{
 			name:   "write for one db",
 			octets: []byte(`[{"series":[{"columns":["database","privilege"],"values":[["tensorflowdb","WRITE"]]}]}]`),
-			want: chronograf.Permissions{
-				chronograf.Permission{
+			want: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "tensorflowdb",
 					Allowed: []string{"WRITE"},
@@ -365,8 +365,8 @@ func Test_showResults_Permissions(t *testing.T) {
 		{
 			name:   "all for one db",
 			octets: []byte(`[{"series":[{"columns":["database","privilege"],"values":[["tensorflowdb","ALL PRIVILEGES"]]}]}]`),
-			want: chronograf.Permissions{
-				chronograf.Permission{
+			want: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "tensorflowdb",
 					Allowed: []string{"WRITE", "READ"},
@@ -376,8 +376,8 @@ func Test_showResults_Permissions(t *testing.T) {
 		{
 			name:   "read for one db",
 			octets: []byte(`[{"series":[{"columns":["database","privilege"],"values":[["tensorflowdb","READ"]]}]}]`),
-			want: chronograf.Permissions{
-				chronograf.Permission{
+			want: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "tensorflowdb",
 					Allowed: []string{"READ"},
@@ -387,8 +387,8 @@ func Test_showResults_Permissions(t *testing.T) {
 		{
 			name:   "other all for one db",
 			octets: []byte(`[{"series":[{"columns":["database","privilege"],"values":[["tensorflowdb","ALL"]]}]}]`),
-			want: chronograf.Permissions{
-				chronograf.Permission{
+			want: chronograf.SourcePermissions{
+				chronograf.SourcePermission{
 					Scope:   "database",
 					Name:    "tensorflowdb",
 					Allowed: []string{"WRITE", "READ"},
@@ -398,17 +398,17 @@ func Test_showResults_Permissions(t *testing.T) {
 		{
 			name:   "other all for one db",
 			octets: []byte(`[{"series":[{"columns":["database","privilege"],"values":[["tensorflowdb","NO PRIVILEGES"]]}]}]`),
-			want:   chronograf.Permissions{},
+			want:   chronograf.SourcePermissions{},
 		},
 		{
 			name:   "bad JSON",
 			octets: []byte(`[{"series":[{"columns":["database","privilege"],"values":[[1,"WRITE"]]}]}]`),
-			want:   chronograf.Permissions{},
+			want:   chronograf.SourcePermissions{},
 		},
 		{
 			name:   "bad JSON",
 			octets: []byte(`[{"series":[{"columns":["database","privilege"],"values":[["tensorflowdb",1]]}]}]`),
-			want:   chronograf.Permissions{},
+			want:   chronograf.SourcePermissions{},
 		},
 	}
 

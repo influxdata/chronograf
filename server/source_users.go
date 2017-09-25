@@ -31,7 +31,7 @@ func (h *Service) NewSourceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	store := ts.Users(ctx)
-	user := &chronograf.DBUser{
+	user := &chronograf.SourceUser{
 		Name:        req.Username,
 		Passwd:      req.Password,
 		Permissions: req.Permissions,
@@ -122,7 +122,7 @@ func (h *Service) RemoveSourceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := store.Delete(ctx, &chronograf.DBUser{Name: uid}); err != nil {
+	if err := store.Delete(ctx, &chronograf.SourceUser{Name: uid}); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -149,7 +149,7 @@ func (h *Service) UpdateSourceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := &chronograf.DBUser{
+	user := &chronograf.SourceUser{
 		Name:        uid,
 		Passwd:      req.Password,
 		Permissions: req.Permissions,
@@ -204,7 +204,7 @@ func (h *Service) sourcesSeries(ctx context.Context, w http.ResponseWriter, r *h
 	return srcID, ts, nil
 }
 
-func (h *Service) sourceUsersStore(ctx context.Context, w http.ResponseWriter, r *http.Request) (int, chronograf.DBUsersStore, error) {
+func (h *Service) sourceUsersStore(ctx context.Context, w http.ResponseWriter, r *http.Request) (int, chronograf.SourceUsersStore, error) {
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
 		return 0, nil, err
@@ -215,7 +215,7 @@ func (h *Service) sourceUsersStore(ctx context.Context, w http.ResponseWriter, r
 }
 
 // hasRoles checks if the influx source has roles or not
-func (h *Service) hasRoles(ctx context.Context, ts chronograf.TimeSeries) (chronograf.DBRolesStore, bool) {
+func (h *Service) hasRoles(ctx context.Context, ts chronograf.TimeSeries) (chronograf.SourceRolesStore, bool) {
 	store, err := ts.Roles(ctx)
 	if err != nil {
 		return nil, false
@@ -224,10 +224,10 @@ func (h *Service) hasRoles(ctx context.Context, ts chronograf.TimeSeries) (chron
 }
 
 type userRequest struct {
-	Username    string                 `json:"name,omitempty"`        // Username for new account
-	Password    string                 `json:"password,omitempty"`    // Password for new account
-	Permissions chronograf.Permissions `json:"permissions,omitempty"` // Optional permissions
-	Roles       []chronograf.DBRole    `json:"roles,omitempty"`       // Optional roles
+	Username    string                       `json:"name,omitempty"`        // Username for new account
+	Password    string                       `json:"password,omitempty"`    // Password for new account
+	Permissions chronograf.SourcePermissions `json:"permissions,omitempty"` // Optional permissions
+	Roles       []chronograf.SourceRole      `json:"roles,omitempty"`       // Optional roles
 }
 
 func (r *userRequest) ValidCreate() error {
@@ -252,10 +252,10 @@ func (r *userRequest) ValidUpdate() error {
 }
 
 type userResponse struct {
-	Name           string                 // Username for new account
-	Permissions    chronograf.Permissions // Account's permissions
-	Roles          []roleResponse         // Roles if source uses them
-	Links          selfLinks              // Links are URI locations related to user
+	Name           string                       // Username for new account
+	Permissions    chronograf.SourcePermissions // Account's permissions
+	Roles          []roleResponse               // Roles if source uses them
+	Links          selfLinks                    // Links are URI locations related to user
 	hasPermissions bool
 	hasRoles       bool
 }
@@ -283,17 +283,17 @@ func newUserResponse(srcID int, name string) *userResponse {
 	}
 }
 
-func (u *userResponse) WithPermissions(perms chronograf.Permissions) *userResponse {
+func (u *userResponse) WithPermissions(perms chronograf.SourcePermissions) *userResponse {
 	u.hasPermissions = true
 	if perms == nil {
-		perms = make(chronograf.Permissions, 0)
+		perms = make(chronograf.SourcePermissions, 0)
 	}
 	u.Permissions = perms
 	return u
 }
 
 // WithRoles adds roles to the HTTP JSON response for a user
-func (u *userResponse) WithRoles(srcID int, roles []chronograf.DBRole) *userResponse {
+func (u *userResponse) WithRoles(srcID int, roles []chronograf.SourceRole) *userResponse {
 	u.hasRoles = true
 	rr := make([]roleResponse, len(roles))
 	for i, role := range roles {

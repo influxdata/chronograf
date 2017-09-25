@@ -102,32 +102,32 @@ type TimeSeries interface {
 	// Connect will connect to the time series using the information in `Source`.
 	Connect(context.Context, *Source) error
 	// UsersStore represents the user accounts within the TimeSeries database
-	Users(context.Context) DBUsersStore
+	Users(context.Context) SourceUsersStore
 	// Permissions returns all valid names permissions in this database
-	Permissions(context.Context) Permissions
+	Permissions(context.Context) SourcePermissions
 	// Roles represents the roles associated with this TimesSeriesDatabase
-	Roles(context.Context) (DBRolesStore, error)
+	Roles(context.Context) (SourceRolesStore, error)
 }
 
-// DBRole is a restricted set of permissions assigned to a set of users.
-type DBRole struct {
-	Name        string      `json:"name"`
-	Permissions Permissions `json:"permissions,omitempty"`
-	Users       []DBUser    `json:"users,omitempty"`
+// SourceRole is a restricted set of permissions assigned to a set of users.
+type SourceRole struct {
+	Name        string            `json:"name"`
+	Permissions SourcePermissions `json:"permissions,omitempty"`
+	Users       []SourceUser      `json:"users,omitempty"`
 }
 
-// DBRolesStore is the Storage and retrieval of authentication information
-type DBRolesStore interface {
+// SourceRolesStore is the Storage and retrieval of authentication information
+type SourceRolesStore interface {
 	// All lists all roles from the RolesStore
-	All(context.Context) ([]DBRole, error)
+	All(context.Context) ([]SourceRole, error)
 	// Create a new Role in the RolesStore
-	Add(context.Context, *DBRole) (*DBRole, error)
+	Add(context.Context, *SourceRole) (*SourceRole, error)
 	// Delete the Role from the RolesStore
-	Delete(context.Context, *DBRole) error
+	Delete(context.Context, *SourceRole) error
 	// Get retrieves a role if name exists.
-	Get(ctx context.Context, name string) (*DBRole, error)
+	Get(ctx context.Context, name string) (*SourceRole, error)
 	// Update the roles' users or permissions
-	Update(context.Context, *DBRole) error
+	Update(context.Context, *SourceRole) error
 }
 
 // Range represents an upper and lower bound for data
@@ -559,16 +559,16 @@ const (
 	DBScope Scope = "database"
 )
 
-// Permission is a specific allowance for User or Role bound to a
+// SourcePermission is a specific allowance for SourceUser or SourceRole bound to a
 // scope of the data source
-type Permission struct {
+type SourcePermission struct {
 	Scope   Scope      `json:"scope"`
 	Name    string     `json:"name,omitempty"`
 	Allowed Allowances `json:"allowed"`
 }
 
-// Permissions represent the entire set of permissions a User or Role may have
-type Permissions []Permission
+// SourcePermissions represent the entire set of permissions a SourceUser or SourceRole may have
+type SourcePermissions []SourcePermission
 
 // Allowances defines what actions a user can have on a scoped permission
 type Allowances []string
@@ -598,26 +598,26 @@ type UsersStore interface {
 	Update(context.Context, *User) error
 }
 
-// DBUser represents an authenticated InfluxDB user.
-type DBUser struct {
-	Name        string      `json:"name"`
-	Passwd      string      `json:"password"`
-	Permissions Permissions `json:"permissions,omitempty"`
-	Roles       []DBRole    `json:"roles,omitempty"`
+// SourceUser represents an authenticated InfluxDB user.
+type SourceUser struct {
+	Name        string            `json:"name"`
+	Passwd      string            `json:"password"`
+	Permissions SourcePermissions `json:"permissions,omitempty"`
+	Roles       []SourceRole      `json:"roles,omitempty"`
 }
 
-// DBUsersStore is the Storage and retrieval of InfluxDB user authentication information
-type DBUsersStore interface {
+// SourceUsersStore is the Storage and retrieval of InfluxDB user authentication information
+type SourceUsersStore interface {
 	// All lists all users from the DBUsersStore
-	All(context.Context) ([]DBUser, error)
+	All(context.Context) ([]SourceUser, error)
 	// Create a new DBUser in the DBUsersStore
-	Add(context.Context, *DBUser) (*DBUser, error)
+	Add(context.Context, *SourceUser) (*SourceUser, error)
 	// Delete the DBUser from the DBUsersStore
-	Delete(context.Context, *DBUser) error
+	Delete(context.Context, *SourceUser) error
 	// Get retrieves a user if name exists.
-	Get(ctx context.Context, name string) (*DBUser, error)
+	Get(ctx context.Context, name string) (*SourceUser, error)
 	// Update the user's permissions or roles
-	Update(context.Context, *DBUser) error
+	Update(context.Context, *SourceUser) error
 }
 
 // Database represents a database in a time series source

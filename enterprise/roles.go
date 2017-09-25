@@ -15,7 +15,7 @@ type RolesStore struct {
 
 // Add creates a new Role in Influx Enterprise
 // This must be done in three smaller steps: creating, setting permissions, setting users.
-func (c *RolesStore) Add(ctx context.Context, u *chronograf.DBRole) (*chronograf.DBRole, error) {
+func (c *RolesStore) Add(ctx context.Context, u *chronograf.SourceRole) (*chronograf.SourceRole, error) {
 	if err := c.Ctrl.CreateRole(ctx, u.Name); err != nil {
 		return nil, err
 	}
@@ -34,30 +34,30 @@ func (c *RolesStore) Add(ctx context.Context, u *chronograf.DBRole) (*chronograf
 }
 
 // Delete the Role from Influx Enterprise
-func (c *RolesStore) Delete(ctx context.Context, u *chronograf.DBRole) error {
+func (c *RolesStore) Delete(ctx context.Context, u *chronograf.SourceRole) error {
 	return c.Ctrl.DeleteRole(ctx, u.Name)
 }
 
 // Get retrieves a Role if name exists.
-func (c *RolesStore) Get(ctx context.Context, name string) (*chronograf.DBRole, error) {
+func (c *RolesStore) Get(ctx context.Context, name string) (*chronograf.SourceRole, error) {
 	role, err := c.Ctrl.Role(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
 	// Hydrate all the users to gather their permissions and their roles.
-	users := make([]chronograf.DBUser, len(role.Users))
+	users := make([]chronograf.SourceUser, len(role.Users))
 	for i, u := range role.Users {
 		user, err := c.Ctrl.User(ctx, u)
 		if err != nil {
 			return nil, err
 		}
-		users[i] = chronograf.DBUser{
+		users[i] = chronograf.SourceUser{
 			Name:        user.Name,
 			Permissions: ToChronograf(user.Permissions),
 		}
 	}
-	return &chronograf.DBRole{
+	return &chronograf.SourceRole{
 		Name:        role.Name,
 		Permissions: ToChronograf(role.Permissions),
 		Users:       users,
@@ -65,7 +65,7 @@ func (c *RolesStore) Get(ctx context.Context, name string) (*chronograf.DBRole, 
 }
 
 // Update the Role's permissions and roles
-func (c *RolesStore) Update(ctx context.Context, u *chronograf.DBRole) error {
+func (c *RolesStore) Update(ctx context.Context, u *chronograf.SourceRole) error {
 	if u.Permissions != nil {
 		perms := ToEnterprise(u.Permissions)
 		if err := c.Ctrl.SetRolePerms(ctx, u.Name, perms); err != nil {
@@ -83,7 +83,7 @@ func (c *RolesStore) Update(ctx context.Context, u *chronograf.DBRole) error {
 }
 
 // All is all Roles in influx
-func (c *RolesStore) All(ctx context.Context) ([]chronograf.DBRole, error) {
+func (c *RolesStore) All(ctx context.Context) ([]chronograf.SourceRole, error) {
 	all, err := c.Ctrl.Roles(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -93,17 +93,17 @@ func (c *RolesStore) All(ctx context.Context) ([]chronograf.DBRole, error) {
 }
 
 // ToChronograf converts enterprise roles to chronograf
-func (r *Roles) ToChronograf() []chronograf.DBRole {
-	res := make([]chronograf.DBRole, len(r.Roles))
+func (r *Roles) ToChronograf() []chronograf.SourceRole {
+	res := make([]chronograf.SourceRole, len(r.Roles))
 	for i, role := range r.Roles {
-		users := make([]chronograf.DBUser, len(role.Users))
+		users := make([]chronograf.SourceUser, len(role.Users))
 		for i, user := range role.Users {
-			users[i] = chronograf.DBUser{
+			users[i] = chronograf.SourceUser{
 				Name: user,
 			}
 		}
 
-		res[i] = chronograf.DBRole{
+		res[i] = chronograf.SourceRole{
 			Name:        role.Name,
 			Permissions: ToChronograf(role.Permissions),
 			Users:       users,

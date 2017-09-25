@@ -62,8 +62,8 @@ func TestService_Permissions(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					PermissionsF: func(ctx context.Context) chronograf.Permissions {
-						return chronograf.Permissions{
+					PermissionsF: func(ctx context.Context) chronograf.SourcePermissions {
+						return chronograf.SourcePermissions{
 							{
 								Scope:   chronograf.AllScope,
 								Allowed: chronograf.Allowances{"READ", "WRITE"},

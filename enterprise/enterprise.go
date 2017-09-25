@@ -42,8 +42,8 @@ type Ctrl interface {
 // are appropriately load balanced across the cluster.
 type Client struct {
 	Ctrl
-	UsersStore chronograf.DBUsersStore
-	RolesStore chronograf.DBRolesStore
+	UsersStore chronograf.SourceUsersStore
+	RolesStore chronograf.SourceRolesStore
 	Logger     chronograf.Logger
 
 	dataNodes *ring.Ring
@@ -145,17 +145,17 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 }
 
 // Users is the interface to the users within Influx Enterprise
-func (c *Client) Users(context.Context) chronograf.DBUsersStore {
+func (c *Client) Users(context.Context) chronograf.SourceUsersStore {
 	return c.UsersStore
 }
 
 // Roles provide a grouping of permissions given to a grouping of users
-func (c *Client) Roles(ctx context.Context) (chronograf.DBRolesStore, error) {
+func (c *Client) Roles(ctx context.Context) (chronograf.SourceRolesStore, error) {
 	return c.RolesStore, nil
 }
 
 // Permissions returns all Influx Enterprise permission strings
-func (c *Client) Permissions(context.Context) chronograf.Permissions {
+func (c *Client) Permissions(context.Context) chronograf.SourcePermissions {
 	all := chronograf.Allowances{
 		"NoPermissions",
 		"ViewAdmin",
@@ -178,7 +178,7 @@ func (c *Client) Permissions(context.Context) chronograf.Permissions {
 		"KapacitorConfigAPI",
 	}
 
-	return chronograf.Permissions{
+	return chronograf.SourcePermissions{
 		{
 			Scope:   chronograf.AllScope,
 			Allowed: all,

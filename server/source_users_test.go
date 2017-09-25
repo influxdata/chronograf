@@ -64,14 +64,14 @@ func TestService_NewSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
+							AddF: func(ctx context.Context, u *chronograf.SourceUser) (*chronograf.SourceUser, error) {
 								return u, nil
 							},
 						}
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
 				},
@@ -110,14 +110,14 @@ func TestService_NewSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
+							AddF: func(ctx context.Context, u *chronograf.SourceUser) (*chronograf.SourceUser, error) {
 								return u, nil
 							},
 						}
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, nil
 					},
 				},
@@ -156,9 +156,9 @@ func TestService_NewSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							AddF: func(ctx context.Context, u *chronograf.DBUser) (*chronograf.DBUser, error) {
+							AddF: func(ctx context.Context, u *chronograf.SourceUser) (*chronograf.SourceUser, error) {
 								return nil, fmt.Errorf("Weight Has Nothing to Do With It")
 							},
 						}
@@ -369,17 +369,17 @@ func TestService_SourceUsers(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							AllF: func(ctx context.Context) ([]chronograf.DBUser, error) {
-								return []chronograf.DBUser{
+							AllF: func(ctx context.Context) ([]chronograf.SourceUser, error) {
+								return []chronograf.SourceUser{
 									{
 										Name:   "strickland",
 										Passwd: "discipline",
-										Permissions: chronograf.Permissions{
+										Permissions: chronograf.SourcePermissions{
 											{
 												Scope:   chronograf.AllScope,
 												Allowed: chronograf.Allowances{"READ"},
@@ -425,17 +425,17 @@ func TestService_SourceUsers(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, nil
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							AllF: func(ctx context.Context) ([]chronograf.DBUser, error) {
-								return []chronograf.DBUser{
+							AllF: func(ctx context.Context) ([]chronograf.SourceUser, error) {
+								return []chronograf.SourceUser{
 									{
 										Name:   "strickland",
 										Passwd: "discipline",
-										Permissions: chronograf.Permissions{
+										Permissions: chronograf.SourcePermissions{
 											{
 												Scope:   chronograf.AllScope,
 												Allowed: chronograf.Allowances{"READ"},
@@ -536,16 +536,16 @@ func TestService_SourceUserID(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							GetF: func(ctx context.Context, uid string) (*chronograf.DBUser, error) {
-								return &chronograf.DBUser{
+							GetF: func(ctx context.Context, uid string) (*chronograf.SourceUser, error) {
+								return &chronograf.SourceUser{
 									Name:   "strickland",
 									Passwd: "discipline",
-									Permissions: chronograf.Permissions{
+									Permissions: chronograf.SourcePermissions{
 										{
 											Scope:   chronograf.AllScope,
 											Allowed: chronograf.Allowances{"READ"},
@@ -591,16 +591,16 @@ func TestService_SourceUserID(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, nil
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							GetF: func(ctx context.Context, uid string) (*chronograf.DBUser, error) {
-								return &chronograf.DBUser{
+							GetF: func(ctx context.Context, uid string) (*chronograf.SourceUser, error) {
+								return &chronograf.SourceUser{
 									Name:   "strickland",
 									Passwd: "discipline",
-									Permissions: chronograf.Permissions{
+									Permissions: chronograf.SourcePermissions{
 										{
 											Scope:   chronograf.AllScope,
 											Allowed: chronograf.Allowances{"READ"},
@@ -701,9 +701,9 @@ func TestService_RemoveSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							DeleteF: func(ctx context.Context, u *chronograf.DBUser) error {
+							DeleteF: func(ctx context.Context, u *chronograf.SourceUser) error {
 								return nil
 							},
 						}
@@ -796,16 +796,16 @@ func TestService_UpdateSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, fmt.Errorf("no roles")
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							UpdateF: func(ctx context.Context, u *chronograf.DBUser) error {
+							UpdateF: func(ctx context.Context, u *chronograf.SourceUser) error {
 								return nil
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
-								return &chronograf.DBUser{
+							GetF: func(ctx context.Context, name string) (*chronograf.SourceUser, error) {
+								return &chronograf.SourceUser{
 									Name: "marty",
 								}, nil
 							},
@@ -848,16 +848,16 @@ func TestService_UpdateSourceUser(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.DBRolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, nil
 					},
-					UsersF: func(ctx context.Context) chronograf.DBUsersStore {
+					UsersF: func(ctx context.Context) chronograf.SourceUsersStore {
 						return &mocks.DBUsersStore{
-							UpdateF: func(ctx context.Context, u *chronograf.DBUser) error {
+							UpdateF: func(ctx context.Context, u *chronograf.SourceUser) error {
 								return nil
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.DBUser, error) {
-								return &chronograf.DBUser{
+							GetF: func(ctx context.Context, name string) (*chronograf.SourceUser, error) {
+								return &chronograf.SourceUser{
 									Name: "marty",
 								}, nil
 							},

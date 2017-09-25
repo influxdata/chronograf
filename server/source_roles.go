@@ -39,7 +39,7 @@ func (h *Service) NewRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := roles.Add(ctx, &req.DBRole)
+	res, err := roles.Add(ctx, &req.SourceRole)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
@@ -77,7 +77,7 @@ func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
 	rid := httprouter.GetParamFromContext(ctx, "rid")
 	req.Name = rid
 
-	if err := roles.Update(ctx, &req.DBRole); err != nil {
+	if err := roles.Update(ctx, &req.SourceRole); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -162,7 +162,7 @@ func (h *Service) RemoveRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rid := httprouter.GetParamFromContext(ctx, "rid")
-	if err := roles.Delete(ctx, &chronograf.DBRole{Name: rid}); err != nil {
+	if err := roles.Delete(ctx, &chronograf.SourceRole{Name: rid}); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -171,7 +171,7 @@ func (h *Service) RemoveRole(w http.ResponseWriter, r *http.Request) {
 
 // sourceRoleRequest is the format used for both creating and updating roles
 type sourceRoleRequest struct {
-	chronograf.DBRole
+	chronograf.SourceRole
 }
 
 func (r *sourceRoleRequest) ValidCreate() error {
@@ -199,13 +199,13 @@ func (r *sourceRoleRequest) ValidUpdate() error {
 }
 
 type roleResponse struct {
-	Users       []*userResponse        `json:"users"`
-	Name        string                 `json:"name"`
-	Permissions chronograf.Permissions `json:"permissions"`
-	Links       selfLinks              `json:"links"`
+	Users       []*userResponse              `json:"users"`
+	Name        string                       `json:"name"`
+	Permissions chronograf.SourcePermissions `json:"permissions"`
+	Links       selfLinks                    `json:"links"`
 }
 
-func newRoleResponse(srcID int, res *chronograf.DBRole) roleResponse {
+func newRoleResponse(srcID int, res *chronograf.SourceRole) roleResponse {
 	su := make([]*userResponse, len(res.Users))
 	for i := range res.Users {
 		name := res.Users[i].Name
@@ -213,7 +213,7 @@ func newRoleResponse(srcID int, res *chronograf.DBRole) roleResponse {
 	}
 
 	if res.Permissions == nil {
-		res.Permissions = make(chronograf.Permissions, 0)
+		res.Permissions = make(chronograf.SourcePermissions, 0)
 	}
 	return roleResponse{
 		Name:        res.Name,

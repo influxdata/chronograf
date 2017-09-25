@@ -118,16 +118,16 @@ func (ts *TimeSeries) Connect(ctx context.Context, src *chronograf.Source) error
 	return nil
 }
 
-func (ts *TimeSeries) Users(ctx context.Context) chronograf.DBUsersStore {
+func (ts *TimeSeries) Users(ctx context.Context) chronograf.SourceUsersStore {
 	return nil
 }
 
-func (ts *TimeSeries) Roles(ctx context.Context) (chronograf.DBRolesStore, error) {
+func (ts *TimeSeries) Roles(ctx context.Context) (chronograf.SourceRolesStore, error) {
 	return nil, nil
 }
 
-func (ts *TimeSeries) Permissions(ctx context.Context) chronograf.Permissions {
-	return chronograf.Permissions{}
+func (ts *TimeSeries) Permissions(ctx context.Context) chronograf.SourcePermissions {
+	return chronograf.SourcePermissions{}
 }
 
 func NewMockTimeSeries(urls ...string) *TimeSeries {

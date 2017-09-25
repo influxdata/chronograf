@@ -42,8 +42,8 @@ func (h *Service) Permissions(w http.ResponseWriter, r *http.Request) {
 	}
 	httpAPISrcs := "/chronograf/v1/sources"
 	res := struct {
-		Permissions chronograf.Permissions `json:"permissions"`
-		Links       map[string]string      `json:"links"` // Links are URI locations related to user
+		Permissions chronograf.SourcePermissions `json:"permissions"`
+		Links       map[string]string            `json:"links"` // Links are URI locations related to user
 	}{
 		Permissions: perms,
 		Links: map[string]string{
@@ -54,7 +54,7 @@ func (h *Service) Permissions(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusOK, res, h.Logger)
 }
 
-func validPermissions(perms *chronograf.Permissions) error {
+func validPermissions(perms *chronograf.SourcePermissions) error {
 	if perms == nil {
 		return nil
 	}
