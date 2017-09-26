@@ -7,8 +7,8 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-// Permissions returns all possible permissions for this source.
-func (h *Service) Permissions(w http.ResponseWriter, r *http.Request) {
+// SourcePermissions returns all possible permissions for this source.
+func (h *Service) SourcePermissions(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	srcID, err := paramID("id", r)
 	if err != nil {

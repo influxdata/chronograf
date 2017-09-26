@@ -229,7 +229,7 @@ func TestService_NewSourceRole(t *testing.T) {
 				},
 			}))
 
-		h.NewRole(tt.args.w, tt.args.r)
+		h.NewSourceRole(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")
@@ -347,7 +347,7 @@ func TestService_UpdateRole(t *testing.T) {
 				},
 			}))
 
-		h.UpdateRole(tt.args.w, tt.args.r)
+		h.UpdateSourceRole(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")
@@ -470,7 +470,7 @@ func TestService_RoleID(t *testing.T) {
 				},
 			}))
 
-		h.RoleID(tt.args.w, tt.args.r)
+		h.SourceRoleID(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")
@@ -566,7 +566,7 @@ func TestService_RemoveRole(t *testing.T) {
 				},
 			}))
 
-		h.RemoveRole(tt.args.w, tt.args.r)
+		h.RemoveSourceRole(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		if resp.StatusCode != tt.wantStatus {
@@ -678,7 +678,7 @@ func TestService_Roles(t *testing.T) {
 				},
 			}))
 
-		h.Roles(tt.args.w, tt.args.r)
+		h.SourceRoles(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")

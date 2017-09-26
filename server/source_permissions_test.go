@@ -94,7 +94,7 @@ func TestService_Permissions(t *testing.T) {
 			Logger:           tt.fields.Logger,
 			UseAuth:          tt.fields.UseAuth,
 		}
-		h.Permissions(tt.args.w, tt.args.r)
+		h.SourcePermissions(tt.args.w, tt.args.r)
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")
 		body, _ := ioutil.ReadAll(resp.Body)

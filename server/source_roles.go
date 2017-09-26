@@ -9,8 +9,8 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-// NewRole adds role to source
-func (h *Service) NewRole(w http.ResponseWriter, r *http.Request) {
+// NewSourceRole adds role to source
+func (h *Service) NewSourceRole(w http.ResponseWriter, r *http.Request) {
 	var req sourceRoleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		invalidJSON(w, h.Logger)
@@ -50,8 +50,8 @@ func (h *Service) NewRole(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusCreated, rr, h.Logger)
 }
 
-// UpdateRole changes the permissions or users of a role
-func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
+// UpdateSourceRole changes the permissions or users of a role
+func (h *Service) UpdateSourceRole(w http.ResponseWriter, r *http.Request) {
 	var req sourceRoleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		invalidJSON(w, h.Logger)
@@ -92,8 +92,8 @@ func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusOK, rr, h.Logger)
 }
 
-// RoleID retrieves a role with ID from store.
-func (h *Service) RoleID(w http.ResponseWriter, r *http.Request) {
+// SourceRoleID retrieves a role with ID from store.
+func (h *Service) SourceRoleID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
@@ -116,8 +116,8 @@ func (h *Service) RoleID(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusOK, rr, h.Logger)
 }
 
-// Roles retrieves all roles from the store
-func (h *Service) Roles(w http.ResponseWriter, r *http.Request) {
+// SourceRoles retrieves all roles from the store
+func (h *Service) SourceRoles(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
@@ -147,8 +147,8 @@ func (h *Service) Roles(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusOK, res, h.Logger)
 }
 
-// RemoveRole removes role from data source.
-func (h *Service) RemoveRole(w http.ResponseWriter, r *http.Request) {
+// RemoveSourceRole removes role from data source.
+func (h *Service) RemoveSourceRole(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
