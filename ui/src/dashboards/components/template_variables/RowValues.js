@@ -8,7 +8,10 @@ const RowValues = ({
   onStartEdit,
   autoFocusTarget,
 }) => {
-  const _values = values.map(v => v.value).join(', ')
+  const quoteRegex = /^['"].+?['"]$/
+  const _values = values
+    .map(({value}) => (quoteRegex.test(value) ? value : `'${value}'`))
+    .join(', ')
 
   if (selectedType === 'csv') {
     return (
