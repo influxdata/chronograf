@@ -343,17 +343,15 @@ func Test_MarshalDashboard_WithEmptyLegacyBounds(t *testing.T) {
 
 func Test_MarshalUser(t *testing.T) {
 	user := chronograf.User{
-		Username:     "doc@mcfly.time",
-		Organization: "InfluxData",
-		Provider:     "GitHub",
-		Scheme:       "OAuth2",
+		Username: "doc@mcfly.time",
+		Provider: "GitHub",
+		Scheme:   "OAuth2",
 	}
 
 	expected := chronograf.User{
-		Username:     "doc@mcfly.time",
-		Organization: "InfluxData",
-		Provider:     "GitHub",
-		Scheme:       "OAuth2",
+		Username: "doc@mcfly.time",
+		Provider: "GitHub",
+		Scheme:   "OAuth2",
 	}
 
 	var actual chronograf.User

@@ -407,10 +407,9 @@ func UnmarshalAlertRule(data []byte, r *ScopedAlert) error {
 // MarshalUser encodes a user to binary protobuf format.
 func MarshalUser(u *chronograf.User) ([]byte, error) {
 	return MarshalUserPB(&User{
-		Username:     u.Username,
-		Organization: u.Organization,
-		Provider:     u.Provider,
-		Scheme:       u.Scheme,
+		Username: u.Username,
+		Provider: u.Provider,
+		Scheme:   u.Scheme,
 	})
 }
 
@@ -426,7 +425,6 @@ func UnmarshalUser(data []byte, u *chronograf.User) error {
 		return err
 	}
 	u.Username = pb.Username
-	u.Organization = pb.Organization
 	u.Provider = pb.Provider
 	u.Scheme = pb.Scheme
 	return nil

@@ -91,7 +91,7 @@ func (s *UsersStore) Delete(ctx context.Context, user *chronograf.User) error {
 		return err
 	}
 	if err := s.client.db.Update(func(tx *bolt.Tx) error {
-		if err := tx.Bucket(UsersBucket).Delete(u64tob(u.ID)); err != nil {
+		if err := tx.Bucket(UsersBucket).Delete([]byte(u.ID)); err != nil {
 			return err
 		}
 		return nil
@@ -112,7 +112,7 @@ func (s *UsersStore) Update(ctx context.Context, usr *chronograf.User) error {
 		u.Username = usr.Username
 		if v, err := internal.MarshalUserPB(u); err != nil {
 			return err
-		} else if err := tx.Bucket(UsersBucket).Put(u64tob(u.ID), v); err != nil {
+		} else if err := tx.Bucket(UsersBucket).Put([]byte(u.ID), v); err != nil {
 			return err
 		}
 		return nil
