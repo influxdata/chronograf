@@ -10,7 +10,7 @@ const RowValues = ({
 }) => {
   const quoteRegex = /^['"].+?['"]$/
   const _values = values
-    .map(({value}) => (quoteRegex.test(value) ? value : `'${value}'`))
+    .map(({value}) => (quoteRegex.test(value) ? value : `"${value}"`))
     .join(', ')
 
   if (selectedType === 'csv') {
