@@ -14,8 +14,8 @@ type chronografUserLinks struct {
 type chronografUserResponse struct {
 	Links    chronografUserLinks `json:"links"`
 	ID       string              `json:"id"`
-	Provider string              `json:"provider"`
-	Scheme   string              `json:"scheme"`
+	Provider string              `json:"provider,omitempty"`
+	Scheme   string              `json:"scheme,omitempty"`
 }
 
 func newChronografUserResponse(u *chronograf.User) *chronografUserResponse {
