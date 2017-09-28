@@ -578,6 +578,7 @@ type Scope string
 
 // User represents an authenticated Chronograf user.
 type User struct {
+	ID       string `json:"id"`
 	Username string `json:"username"`
 	Provider string `json:"provider,omitempty"`
 	Scheme   string `json:"scheme,omitempty"`

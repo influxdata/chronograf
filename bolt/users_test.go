@@ -66,11 +66,11 @@ func TestUsersStore_Add(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				u: &chronograf.User{
-					Username: "docbrown",
+					ID: "docbrown",
 				},
 			},
 			want: &chronograf.User{
-				Username: "docbrown",
+				ID: "docbrown",
 			},
 		},
 	}
@@ -93,7 +93,7 @@ func TestUsersStore_Add(t *testing.T) {
 			t.Errorf("%q. UsersStore.Add() = %v, want %v", tt.name, got, tt.want)
 		}
 
-		got, _ = s.Get(tt.args.ctx, got.Username)
+		got, _ = s.Get(tt.args.ctx, got.ID)
 		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("%q. UsersStore.Add() = %v, want %v", tt.name, got, tt.want)
 		}
@@ -116,7 +116,7 @@ func TestUsersStore_Delete(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				user: &chronograf.User{
-					Username: "noone",
+					ID: "noone",
 				},
 			},
 			wantErr: true,
@@ -126,7 +126,7 @@ func TestUsersStore_Delete(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				user: &chronograf.User{
-					Username: "noone",
+					ID: "noone",
 				},
 			},
 			addFirst: true,
@@ -168,7 +168,7 @@ func TestUsersStore_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				usr: &chronograf.User{
-					Username: "noone",
+					ID: "noone",
 				},
 			},
 			wantErr: true,
@@ -178,7 +178,7 @@ func TestUsersStore_Update(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				usr: &chronograf.User{
-					Username: "noone",
+					ID: "noone",
 				},
 			},
 			addFirst: true,
@@ -219,11 +219,12 @@ func TestUsersStore_All(t *testing.T) {
 		{
 			name: "Update new user",
 			want: []chronograf.User{
+				// Order here matters. Users are indexed by the byte ordering of their ID string.
 				{
-					Username: "howdy",
+					ID: "doody",
 				},
 				{
-					Username: "doody",
+					ID: "howdy",
 				},
 			},
 			addFirst: true,
