@@ -7,15 +7,15 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-type chronografUserResponse struct {
+type userResponse struct {
 	Links    selfLinks `json:"links"`
 	ID       string    `json:"id"`
 	Provider string    `json:"provider,omitempty"`
 	Scheme   string    `json:"scheme,omitempty"`
 }
 
-func newChronografUserResponse(u *chronograf.User) *chronografUserResponse {
-	return &chronografUserResponse{
+func newUserResponse(u *chronograf.User) *userResponse {
+	return &userResponse{
 		ID:       u.ID,
 		Provider: u.Provider,
 		Scheme:   u.Scheme,
@@ -35,6 +35,6 @@ func (s *Service) UserID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := newChronografUserResponse(user)
+	res := newUserResponse(user)
 	encodeJSON(w, http.StatusOK, res, s.Logger)
 }
