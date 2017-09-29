@@ -7,7 +7,6 @@ const VisView = ({
   axes,
   view,
   query,
-  queries,
   cellType,
   templates,
   autoRefresh,
@@ -36,8 +35,8 @@ const VisView = ({
   return (
     <RefreshingGraph
       axes={axes}
+      query={query}
       type={cellType}
-      queries={queries}
       templates={templates}
       cellHeight={heightPixels}
       autoRefresh={autoRefresh}
@@ -52,7 +51,6 @@ VisView.propTypes = {
   view: string.isRequired,
   axes: shape(),
   query: shape().isRequired,
-  queries: arrayOf(shape()).isRequired,
   cellType: string,
   templates: arrayOf(shape()),
   autoRefresh: number.isRequired,

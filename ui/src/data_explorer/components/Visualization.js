@@ -1,10 +1,9 @@
 import React, {PropTypes, Component} from 'react'
-import buildInfluxQLQuery from 'utils/influxql'
 import classnames from 'classnames'
 import VisHeader from 'src/data_explorer/components/VisHeader'
 import VisView from 'src/data_explorer/components/VisView'
+import buildQuery from 'src/utils/buildQuery'
 import {GRAPH, TABLE} from 'shared/constants'
-import _ from 'lodash'
 
 const META_QUERY_REGEX = /^show/i
 
@@ -12,21 +11,18 @@ class Visualization extends Component {
   constructor(props) {
     super(props)
 
-    const {activeQueryIndex, queryConfigs} = this.props
-    const activeQueryText = this.getQueryText(queryConfigs, activeQueryIndex)
+    const {queryConfig} = this.props
+    const queryText = queryConfig.rawText || ''
 
-    this.state = activeQueryText.match(META_QUERY_REGEX)
+    this.state = queryText.match(META_QUERY_REGEX)
       ? {view: TABLE}
       : {view: GRAPH}
   }
 
   componentWillReceiveProps(nextProps) {
-    const {activeQueryIndex, queryConfigs} = nextProps
-    const nextQueryText = this.getQueryText(queryConfigs, activeQueryIndex)
-    const queryText = this.getQueryText(
-      this.props.queryConfigs,
-      this.props.activeQueryIndex
-    )
+    const {queryConfig} = nextProps
+    const nextQueryText = queryConfig.rawText || ''
+    const queryText = this.props.queryConfig.rawText || ''
 
     if (queryText === nextQueryText) {
       return
@@ -54,9 +50,8 @@ class Visualization extends Component {
       templates,
       autoRefresh,
       heightPixels,
-      queryConfigs,
+      queryConfig,
       editQueryStatus,
-      activeQueryIndex,
       isInDataExplorer,
       resizerBottomHeight,
       errorThrown,
@@ -64,19 +59,7 @@ class Visualization extends Component {
     const {source: {links: {proxy}}} = this.context
     const {view} = this.state
 
-    const statements = queryConfigs.map(query => {
-      const text =
-        query.rawText || buildInfluxQLQuery(query.range || timeRange, query)
-      return {text, id: query.id, queryConfig: query}
-    })
-
-    const queries = statements.filter(s => s.text !== null).map(s => {
-      return {host: [proxy], text: s.text, id: s.id, queryConfig: s.queryConfig}
-    })
-
-    const activeQuery = queries[activeQueryIndex]
-    const defaultQuery = queries[0]
-    const query = activeQuery || defaultQuery
+    const query = buildQuery(proxy, queryConfig, timeRange)
 
     return (
       <div className="graph" style={{height}}>
@@ -98,7 +81,6 @@ class Visualization extends Component {
             view={view}
             axes={axes}
             query={query}
-            queries={queries}
             templates={templates}
             cellType={cellType}
             autoRefresh={autoRefresh}
@@ -110,11 +92,6 @@ class Visualization extends Component {
         </div>
       </div>
     )
-  }
-
-  getQueryText(queryConfigs, index) {
-    // rawText can be null
-    return _.get(queryConfigs, [`${index}`, 'rawText'], '') || ''
   }
 }
 
@@ -143,7 +120,7 @@ Visualization.propTypes = {
     upper: string,
     lower: string,
   }).isRequired,
-  queryConfigs: arrayOf(shape({})).isRequired,
+  queryConfig: shape({}).isRequired,
   activeQueryIndex: number,
   height: string,
   heightPixels: number,

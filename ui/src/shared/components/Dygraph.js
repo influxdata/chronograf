@@ -282,9 +282,9 @@ export default class Dygraph extends Component {
   }
 
   getLabel = axis => {
-    const {axes, queries} = this.props
+    const {axes, query} = this.props
     const label = _.get(axes, [axis, 'label'], '')
-    const queryConfig = _.get(queries, ['0', 'queryConfig'], false)
+    const queryConfig = query.queryConfig || false
 
     if (label || !queryConfig) {
       return label
@@ -442,7 +442,7 @@ export default class Dygraph extends Component {
   }
 }
 
-const {array, arrayOf, bool, func, shape, string} = PropTypes
+const {array, bool, func, shape, string} = PropTypes
 
 Dygraph.defaultProps = {
   axes: {
@@ -475,7 +475,7 @@ Dygraph.propTypes = {
       bounds: array,
     }),
   }),
-  queries: arrayOf(shape),
+  query: shape({}),
   timeSeries: array.isRequired,
   labels: array.isRequired,
   options: shape({}),

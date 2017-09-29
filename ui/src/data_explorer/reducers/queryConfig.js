@@ -1,6 +1,3 @@
-import _ from 'lodash'
-
-import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import {
   editRawText,
   applyFuncsToField,
@@ -15,7 +12,7 @@ import {
   updateRawQuery,
 } from 'src/utils/queryTransitions'
 
-const queryConfigs = (state = {}, action) => {
+const queryConfig = (state = {}, action) => {
   switch (action.type) {
     case 'DE_CHOOSE_NAMESPACE': {
       const {queryId, database, retentionPolicy} = action.payload
@@ -24,36 +21,23 @@ const queryConfigs = (state = {}, action) => {
         retentionPolicy,
       })
 
-      return Object.assign({}, state, {
-        [queryId]: Object.assign(nextQueryConfig, {rawText: null}),
-      })
+      return {
+        ...state,
+        [queryId]: {...nextQueryConfig, rawText: null},
+      }
     }
 
     case 'DE_CHOOSE_MEASUREMENT': {
       const {queryId, measurement} = action.payload
       const nextQueryConfig = chooseMeasurement(state[queryId], measurement)
 
-      return Object.assign({}, state, {
-        [queryId]: Object.assign(nextQueryConfig, {
-          rawText: state[queryId].rawText,
-        }),
-      })
-    }
-
-    // there is an additional reducer for this same action in the ui reducer
-    case 'DE_ADD_QUERY': {
-      const {queryID} = action.payload
-
       return {
         ...state,
-        [queryID]: defaultQueryConfig({id: queryID}),
+        [queryId]: {
+          ...nextQueryConfig,
+          rawText: state[queryId].rawText,
+        },
       }
-    }
-
-    // there is an additional reducer for this same action in the ui reducer
-    case 'DE_DELETE_QUERY': {
-      const {queryID} = action.payload
-      return _.omit(state, queryID)
     }
 
     case 'DE_UPDATE_QUERY_CONFIG': {
@@ -65,36 +49,40 @@ const queryConfigs = (state = {}, action) => {
       const {queryId, rawText} = action.payload
       const nextQueryConfig = editRawText(state[queryId], rawText)
 
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryId]: nextQueryConfig,
-      })
+      }
     }
 
     case 'DE_GROUP_BY_TIME': {
       const {queryId, time} = action.payload
       const nextQueryConfig = groupByTime(state[queryId], time)
 
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryId]: nextQueryConfig,
-      })
+      }
     }
 
     case 'DE_TOGGLE_TAG_ACCEPTANCE': {
       const {queryId} = action.payload
       const nextQueryConfig = toggleTagAcceptance(state[queryId])
 
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryId]: nextQueryConfig,
-      })
+      }
     }
 
     case 'DE_TOGGLE_FIELD': {
       const {queryId, fieldFunc} = action.payload
       const nextQueryConfig = toggleField(state[queryId], fieldFunc)
 
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryId]: {...nextQueryConfig, rawText: null},
-      })
+      }
     }
 
     case 'DE_APPLY_FUNCS_TO_FIELD': {
@@ -103,26 +91,29 @@ const queryConfigs = (state = {}, action) => {
         preventAutoGroupBy: true,
       })
 
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryId]: nextQueryConfig,
-      })
+      }
     }
 
     case 'DE_CHOOSE_TAG': {
       const {queryId, tag} = action.payload
       const nextQueryConfig = chooseTag(state[queryId], tag)
 
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryId]: nextQueryConfig,
-      })
+      }
     }
 
     case 'DE_GROUP_BY_TAG': {
       const {queryId, tagKey} = action.payload
       const nextQueryConfig = groupByTag(state[queryId], tagKey)
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryId]: nextQueryConfig,
-      })
+      }
     }
 
     case 'DE_FILL': {
@@ -138,9 +129,10 @@ const queryConfigs = (state = {}, action) => {
     case 'DE_UPDATE_RAW_QUERY': {
       const {queryID, text} = action.payload
       const nextQueryConfig = updateRawQuery(state[queryID], text)
-      return Object.assign({}, state, {
+      return {
+        ...state,
         [queryID]: nextQueryConfig,
-      })
+      }
     }
 
     case 'DE_EDIT_QUERY_STATUS': {
@@ -155,4 +147,4 @@ const queryConfigs = (state = {}, action) => {
   return state
 }
 
-export default queryConfigs
+export default queryConfig

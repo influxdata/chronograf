@@ -1,9 +1,7 @@
-import dataExplorerQueryConfigs from './queryConfigs'
+import dataExplorerQueryConfig from './queryConfig'
 import timeRange from './timeRange'
-import dataExplorer from './ui'
 
 export default {
-  dataExplorerQueryConfigs,
+  dataExplorerQueryConfig,
   timeRange,
-  dataExplorer,
 }

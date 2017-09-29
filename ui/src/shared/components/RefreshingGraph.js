@@ -12,8 +12,8 @@ const RefreshingSingleStat = AutoRefresh(SingleStat)
 const RefreshingGraph = ({
   axes,
   type,
+  query,
   onZoom,
-  queries,
   templates,
   timeRange,
   cellHeight,
@@ -21,7 +21,7 @@ const RefreshingGraph = ({
   synchronizer,
   editQueryStatus,
 }) => {
-  if (!queries.length) {
+  if (!query) {
     return (
       <div className="graph-empty">
         <p data-test="data-explorer-no-results">
@@ -34,7 +34,7 @@ const RefreshingGraph = ({
   if (type === 'single-stat') {
     return (
       <RefreshingSingleStat
-        queries={[queries[0]]}
+        queries={query}
         templates={templates}
         autoRefresh={autoRefresh}
         cellHeight={cellHeight}
@@ -49,7 +49,7 @@ const RefreshingGraph = ({
 
   return (
     <RefreshingLineGraph
-      queries={queries}
+      query={query}
       templates={templates}
       timeRange={timeRange}
       autoRefresh={autoRefresh}
@@ -76,7 +76,7 @@ RefreshingGraph.propTypes = {
   type: string.isRequired,
   cellHeight: number,
   axes: shape(),
-  queries: arrayOf(shape()).isRequired,
+  query: shape().isRequired,
   editQueryStatus: func,
   onZoom: func,
 }

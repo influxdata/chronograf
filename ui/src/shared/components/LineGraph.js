@@ -31,7 +31,7 @@ export default React.createClass({
     isGraphFilled: bool,
     isBarGraph: bool,
     overrideLineColors: array,
-    queries: arrayOf(shape({}).isRequired).isRequired,
+    query: shape({}).isRequired,
     showSingleStat: bool,
     displayOptions: shape({
       stepPlot: bool,
@@ -94,7 +94,7 @@ export default React.createClass({
       isBarGraph,
       overrideLineColors,
       title,
-      queries,
+      query,
       underlayCallback,
       showSingleStat,
       displayOptions,
@@ -165,7 +165,7 @@ export default React.createClass({
         {isRefreshing ? this.renderSpinner() : null}
         <Dygraph
           axes={axes}
-          queries={queries}
+          query={query}
           containerStyle={{width: '100%', height: '100%'}}
           overrideLineColors={lineColors}
           isGraphFilled={showSingleStat ? false : isGraphFilled}

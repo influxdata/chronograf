@@ -2,8 +2,6 @@ import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import _ from 'lodash'
-
 import QueryMaker from '../components/QueryMaker'
 import Visualization from '../components/Visualization'
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
@@ -23,34 +21,8 @@ class DataExplorer extends Component {
     super(props)
 
     this.state = {
-      activeQueryIndex: 0,
       showWriteForm: false,
     }
-  }
-
-  handleSetActiveQueryIndex = index => {
-    this.setState({activeQueryIndex: index})
-  }
-
-  handleDeleteQuery = index => {
-    const {queryConfigs, queryConfigActions} = this.props
-    const query = queryConfigs[index]
-    queryConfigActions.deleteQuery(query.id)
-  }
-
-  handleAddQuery = () => {
-    const newIndex = this.props.queryConfigs.length
-    this.props.queryConfigActions.addQuery()
-    this.handleSetActiveQueryIndex(newIndex)
-  }
-
-  getActiveQuery = () => {
-    const {activeQueryIndex} = this.state
-    const {queryConfigs} = this.props
-    const activeQuery = queryConfigs[activeQueryIndex]
-    const defaultQuery = queryConfigs[0]
-
-    return activeQuery || defaultQuery
   }
 
   handleCloseWriteData = () => {
@@ -68,18 +40,14 @@ class DataExplorer extends Component {
       handleChooseAutoRefresh,
       timeRange,
       setTimeRange,
-      queryConfigs,
+      queryConfig,
       queryConfigActions,
       source,
       writeLineProtocol,
     } = this.props
 
-    const {activeQueryIndex, showWriteForm} = this.state
-    const selectedDatabase = _.get(
-      queryConfigs,
-      [`${activeQueryIndex}`, 'database'],
-      null
-    )
+    const {showWriteForm} = this.state
+    const selectedDatabase = queryConfig.database || null
 
     return (
       <div className="data-explorer">
@@ -109,23 +77,21 @@ class DataExplorer extends Component {
         >
           <QueryMaker
             source={source}
-            queries={queryConfigs}
+            queries={queryConfig}
             actions={queryConfigActions}
             autoRefresh={autoRefresh}
             timeRange={timeRange}
             setActiveQueryIndex={this.handleSetActiveQueryIndex}
             onDeleteQuery={this.handleDeleteQuery}
             onAddQuery={this.handleAddQuery}
-            activeQueryIndex={activeQueryIndex}
             activeQuery={this.getActiveQuery()}
           />
           <Visualization
             isInDataExplorer={true}
             autoRefresh={autoRefresh}
             timeRange={timeRange}
-            queryConfigs={queryConfigs}
+            queryConfigs={queryConfig}
             errorThrown={errorThrownAction}
-            activeQueryIndex={activeQueryIndex}
             editQueryStatus={queryConfigActions.editQueryStatus}
             views={VIS_VIEWS}
           />
@@ -135,7 +101,7 @@ class DataExplorer extends Component {
   }
 }
 
-const {arrayOf, func, number, shape, string} = PropTypes
+const {func, number, shape, string} = PropTypes
 
 DataExplorer.propTypes = {
   source: shape({
@@ -145,7 +111,7 @@ DataExplorer.propTypes = {
       queries: string.isRequired,
     }).isRequired,
   }).isRequired,
-  queryConfigs: arrayOf(shape({})).isRequired,
+  queryConfig: shape({}).isRequired,
   queryConfigActions: shape({
     editQueryStatus: func.isRequired,
   }).isRequired,
@@ -156,9 +122,6 @@ DataExplorer.propTypes = {
     lower: string,
   }).isRequired,
   setTimeRange: func.isRequired,
-  dataExplorer: shape({
-    queryIDs: arrayOf(string).isRequired,
-  }).isRequired,
   writeLineProtocol: func.isRequired,
   errorThrownAction: func.isRequired,
 }
@@ -172,37 +135,27 @@ DataExplorer.childContextTypes = {
   }).isRequired,
 }
 
-const mapStateToProps = state => {
-  const {
-    app: {persisted: {autoRefresh}},
-    dataExplorer,
-    dataExplorerQueryConfigs: queryConfigs,
-    timeRange,
-  } = state
-  const queryConfigValues = _.values(queryConfigs)
+const mapStateToProps = ({
+  app: {persisted: {autoRefresh}},
+  dataExplorer,
+  dataExplorerQueryConfig: queryConfig,
+  timeRange,
+}) => ({
+  autoRefresh,
+  dataExplorer,
+  queryConfig,
+  timeRange,
+})
 
-  return {
-    autoRefresh,
-    dataExplorer,
-    queryConfigs: queryConfigValues,
-    timeRange,
-  }
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
-    errorThrownAction: bindActionCreators(errorThrown, dispatch),
-    setTimeRange: bindActionCreators(
-      dataExplorerActionCreators.setTimeRange,
-      dispatch
-    ),
-    writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
-    queryConfigActions: bindActionCreators(
-      dataExplorerActionCreators,
-      dispatch
-    ),
-  }
-}
+const mapDispatchToProps = dispatch => ({
+  handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
+  errorThrownAction: bindActionCreators(errorThrown, dispatch),
+  setTimeRange: bindActionCreators(
+    dataExplorerActionCreators.setTimeRange,
+    dispatch
+  ),
+  writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
+  queryConfigActions: bindActionCreators(dataExplorerActionCreators, dispatch),
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(DataExplorer)

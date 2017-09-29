@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react'
 import RefreshingGraph from 'shared/components/RefreshingGraph'
-import buildQueries from 'utils/buildQueriesForGraphs'
+import buildQuery from 'utils/buildQuery'
 import VisualizationName from 'src/dashboards/components/VisualizationName'
 
 const DashVisualization = (
@@ -12,7 +12,7 @@ const DashVisualization = (
     timeRange,
     autoRefresh,
     onCellRename,
-    queryConfigs,
+    queryConfig,
     editQueryStatus,
   },
   {source: {links: {proxy}}}
@@ -23,7 +23,7 @@ const DashVisualization = (
       <RefreshingGraph
         axes={axes}
         type={type}
-        queries={buildQueries(proxy, queryConfigs, timeRange)}
+        query={buildQuery(proxy, queryConfig, timeRange)}
         templates={templates}
         autoRefresh={autoRefresh}
         editQueryStatus={editQueryStatus}
@@ -47,7 +47,7 @@ DashVisualization.propTypes = {
     upper: string,
     lower: string,
   }).isRequired,
-  queryConfigs: arrayOf(shape({})).isRequired,
+  queryConfig: shape({}).isRequired,
   editQueryStatus: func.isRequired,
   axes: shape({
     y: shape({

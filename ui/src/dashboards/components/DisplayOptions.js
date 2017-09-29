@@ -9,24 +9,24 @@ class DisplayOptions extends Component {
   constructor(props) {
     super(props)
 
-    const {axes, queryConfigs} = props
+    const {axes, queryConfig} = props
 
     this.state = {
-      axes: this.setDefaultLabels(axes, queryConfigs),
+      axes: this.setDefaultLabels(axes, queryConfig),
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const {axes, queryConfigs} = nextProps
+    const {axes, queryConfig} = nextProps
 
-    this.setState({axes: this.setDefaultLabels(axes, queryConfigs)})
+    this.setState({axes: this.setDefaultLabels(axes, queryConfig)})
   }
 
-  setDefaultLabels(axes, queryConfigs) {
-    return queryConfigs.length
+  setDefaultLabels(axes, queryConfig) {
+    return queryConfig
       ? {
           ...axes,
-          y: {...axes.y, defaultYLabel: buildDefaultYLabel(queryConfigs[0])},
+          y: {...axes.y, defaultYLabel: buildDefaultYLabel(queryConfig)},
         }
       : axes
   }
@@ -63,7 +63,7 @@ class DisplayOptions extends Component {
     )
   }
 }
-const {arrayOf, func, shape, string} = PropTypes
+const {func, shape, string} = PropTypes
 
 DisplayOptions.propTypes = {
   selectedGraphType: string.isRequired,
@@ -75,7 +75,7 @@ DisplayOptions.propTypes = {
   onSetLabel: func.isRequired,
   onSetBase: func.isRequired,
   axes: shape({}).isRequired,
-  queryConfigs: arrayOf(shape()).isRequired,
+  queryConfig: shape().isRequired,
 }
 
 export default DisplayOptions

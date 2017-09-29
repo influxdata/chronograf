@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react'
-
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
+import _ from 'lodash'
 
 import LayoutCell from 'shared/components/LayoutCell'
 import RefreshingGraph from 'shared/components/RefreshingGraph'
@@ -80,28 +80,33 @@ class LayoutRenderer extends Component {
   }
 
   standardizeQueries(cell, source) {
-    return cell.queries.map(query => {
-      // TODO: Canned dashboards (and possibly Kubernetes dashboard) use an old query schema,
-      // which does not have enough information for the new `buildInfluxQLQuery` function
-      // to operate on. We will use `buildQueryForOldQuerySchema` until we conform
-      // on a stable query representation.
-      let queryText
-      if (query.queryConfig) {
-        const {queryConfig: {rawText, range}} = query
-        const timeRange = range || {
-          upper: ':upperDashboardTime:',
-          lower: ':dashboardTime:',
+    return _.get(
+      cell.queries.map(query => {
+        // TODO: Canned dashboards (and possibly Kubernetes dashboard) use an old query schema,
+        // which does not have enough information for the new `buildInfluxQLQuery` function
+        // to operate on. We will use `buildQueryForOldQuerySchema` until we conform
+        // on a stable query representation.
+        let queryText
+        if (query.queryConfig) {
+          const {queryConfig: {rawText, range}} = query
+          const timeRange = range || {
+            upper: ':upperDashboardTime:',
+            lower: ':dashboardTime:',
+          }
+          queryText =
+            rawText || buildInfluxQLQuery(timeRange, query.queryConfig)
+        } else {
+          queryText = this.buildQueryForOldQuerySchema(query)
         }
-        queryText = rawText || buildInfluxQLQuery(timeRange, query.queryConfig)
-      } else {
-        queryText = this.buildQueryForOldQuerySchema(query)
-      }
 
-      return Object.assign({}, query, {
-        host: source.links.proxy,
-        text: queryText,
-      })
-    })
+        return Object.assign({}, query, {
+          host: source.links.proxy,
+          text: queryText,
+        })
+      }),
+      [0],
+      []
+    )
   }
 
   generateWidgetCell(cell) {
@@ -170,7 +175,7 @@ class LayoutRenderer extends Component {
                   templates={templates}
                   synchronizer={synchronizer}
                   type={type}
-                  queries={this.standardizeQueries(cell, source)}
+                  query={this.standardizeQueries(cell, source)}
                   cellHeight={h}
                   axes={axes}
                   onZoom={onZoom}

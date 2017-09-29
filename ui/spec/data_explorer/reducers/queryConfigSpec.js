@@ -1,4 +1,4 @@
-import reducer from 'src/data_explorer/reducers/queryConfigs'
+import reducer from 'src/data_explorer/reducers/queryConfig'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import {
   chooseNamespace,
@@ -28,7 +28,7 @@ function buildInitialState(queryId, params) {
   return Object.assign({}, defaultQueryConfig({id: queryId}), params)
 }
 
-describe('Chronograf.Reducers.DataExplorer.queryConfigs', () => {
+describe('Chronograf.Reducers.DataExplorer.queryConfig', () => {
   const queryId = 123
 
   it('can add a query', () => {

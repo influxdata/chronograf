@@ -1,45 +1,24 @@
-import uuid from 'node-uuid'
-
 import {getQueryConfig} from 'shared/apis'
-
 import {errorThrown} from 'shared/actions/errors'
-
 import {DEFAULT_DATA_EXPLORER_GROUP_BY_INTERVAL} from 'src/data_explorer/constants'
 
-export const addQuery = () => ({
-  type: 'DE_ADD_QUERY',
-  payload: {
-    queryID: uuid.v4(),
-  },
-})
-
-export const deleteQuery = queryID => ({
-  type: 'DE_DELETE_QUERY',
-  payload: {
-    queryID,
-  },
-})
-
-export const toggleField = (queryId, fieldFunc) => ({
+export const toggleField = fieldFunc => ({
   type: 'DE_TOGGLE_FIELD',
   payload: {
-    queryId,
     fieldFunc,
   },
 })
 
-export const groupByTime = (queryId, time) => ({
+export const groupByTime = time => ({
   type: 'DE_GROUP_BY_TIME',
   payload: {
-    queryId,
     time,
   },
 })
 
-export const fill = (queryId, value) => ({
+export const fill = value => ({
   type: 'DE_FILL',
   payload: {
-    queryId,
     value,
   },
 })
@@ -47,59 +26,54 @@ export const fill = (queryId, value) => ({
 // all fields implicitly have a function applied to them by default, unless
 // it was explicitly removed previously, so set the auto group by time except
 // under that removal condition
-export const toggleFieldWithGroupByInterval = (queryID, fieldFunc) => (
+export const toggleFieldWithGroupByInterval = fieldFunc => (
   dispatch,
   getState
 ) => {
-  dispatch(toggleField(queryID, fieldFunc))
+  dispatch(toggleField(fieldFunc))
   // toggleField determines whether to add a func, so now check state for funcs
   // presence, and if present then apply default group by time
-  const updatedFieldFunc = getState().dataExplorerQueryConfigs[
-    queryID
-  ].fields.find(({field}) => field === fieldFunc.field)
+  const updatedFieldFunc = getState().dataExplorerQueryConfig.fields.find(
+    ({field}) => field === fieldFunc.field
+  )
   // updatedFieldFunc could be undefined if it was toggled for removal
   if (updatedFieldFunc && updatedFieldFunc.funcs.length) {
-    dispatch(groupByTime(queryID, DEFAULT_DATA_EXPLORER_GROUP_BY_INTERVAL))
+    dispatch(groupByTime(DEFAULT_DATA_EXPLORER_GROUP_BY_INTERVAL))
   }
 }
 
-export const applyFuncsToField = (queryId, fieldFunc) => ({
+export const applyFuncsToField = fieldFunc => ({
   type: 'DE_APPLY_FUNCS_TO_FIELD',
   payload: {
-    queryId,
     fieldFunc,
   },
 })
 
-export const chooseTag = (queryId, tag) => ({
+export const chooseTag = tag => ({
   type: 'DE_CHOOSE_TAG',
   payload: {
-    queryId,
     tag,
   },
 })
 
-export const chooseNamespace = (queryId, {database, retentionPolicy}) => ({
+export const chooseNamespace = ({database, retentionPolicy}) => ({
   type: 'DE_CHOOSE_NAMESPACE',
   payload: {
-    queryId,
     database,
     retentionPolicy,
   },
 })
 
-export const chooseMeasurement = (queryId, measurement) => ({
+export const chooseMeasurement = measurement => ({
   type: 'DE_CHOOSE_MEASUREMENT',
   payload: {
-    queryId,
     measurement,
   },
 })
 
-export const editRawText = (queryId, rawText) => ({
+export const editRawText = rawText => ({
   type: 'DE_EDIT_RAW_TEXT',
   payload: {
-    queryId,
     rawText,
   },
 })
@@ -111,25 +85,20 @@ export const setTimeRange = bounds => ({
   },
 })
 
-export const groupByTag = (queryId, tagKey) => ({
+export const groupByTag = tagKey => ({
   type: 'DE_GROUP_BY_TAG',
   payload: {
-    queryId,
     tagKey,
   },
 })
 
-export const toggleTagAcceptance = queryId => ({
+export const toggleTagAcceptance = () => ({
   type: 'DE_TOGGLE_TAG_ACCEPTANCE',
-  payload: {
-    queryId,
-  },
 })
 
-export const updateRawQuery = (queryID, text) => ({
+export const updateRawQuery = text => ({
   type: 'DE_UPDATE_RAW_QUERY',
   payload: {
-    queryID,
     text,
   },
 })
@@ -141,10 +110,9 @@ export const updateQueryConfig = config => ({
   },
 })
 
-export const editQueryStatus = (queryID, status) => ({
+export const editQueryStatus = status => ({
   type: 'DE_EDIT_QUERY_STATUS',
   payload: {
-    queryID,
     status,
   },
 })
