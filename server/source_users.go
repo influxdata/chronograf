@@ -276,7 +276,7 @@ func (u *sourceUserResponse) MarshalJSON() ([]byte, error) {
 
 // newSourceUserResponse creates an HTTP JSON response for a user w/o roles
 func newSourceUserResponse(srcID int, name string) *sourceUserResponse {
-	self := newSelfLinks(srcID, "users", name)
+	self := newSourceSelfLinks(srcID, "users", name)
 	return &sourceUserResponse{
 		Name:  name,
 		Links: self,
@@ -303,11 +303,7 @@ func (u *sourceUserResponse) WithRoles(srcID int, roles []chronograf.SourceRole)
 	return u
 }
 
-type selfLinks struct {
-	Self string `json:"self"` // Self link mapping to this resource
-}
-
-func newSelfLinks(id int, parent, resource string) selfLinks {
+func newSourceSelfLinks(id int, parent, resource string) selfLinks {
 	httpAPISrcs := "/chronograf/v1/sources"
 	u := &url.URL{Path: resource}
 	encodedResource := u.String()

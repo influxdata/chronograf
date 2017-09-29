@@ -219,6 +219,6 @@ func newSourceRoleResponse(srcID int, res *chronograf.SourceRole) sourceRoleResp
 		Name:        res.Name,
 		Permissions: res.Permissions,
 		Users:       su,
-		Links:       newSelfLinks(srcID, "roles", res.Name),
+		Links:       newSourceSelfLinks(srcID, "roles", res.Name),
 	}
 }

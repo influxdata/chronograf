@@ -7,15 +7,11 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-type chronografUserLinks struct {
-	Self string `json:"self"` // Self link mapping to this resource
-}
-
 type chronografUserResponse struct {
-	Links    chronografUserLinks `json:"links"`
-	ID       string              `json:"id"`
-	Provider string              `json:"provider,omitempty"`
-	Scheme   string              `json:"scheme,omitempty"`
+	Links    selfLinks `json:"links"`
+	ID       string    `json:"id"`
+	Provider string    `json:"provider,omitempty"`
+	Scheme   string    `json:"scheme,omitempty"`
 }
 
 func newChronografUserResponse(u *chronograf.User) *chronografUserResponse {
@@ -23,7 +19,7 @@ func newChronografUserResponse(u *chronograf.User) *chronografUserResponse {
 		ID:       u.ID,
 		Provider: u.Provider,
 		Scheme:   u.Scheme,
-		Links: chronografUserLinks{
+		Links: selfLinks{
 			Self: "/chronograf/v1/users/" + u.ID,
 		},
 	}

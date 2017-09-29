@@ -5,6 +5,10 @@ import (
 	"net/url"
 )
 
+type selfLinks struct {
+	Self string `json:"self"` // Self link mapping to this resource
+}
+
 type getExternalLinksResponse struct {
 	StatusFeed  *string      `json:"statusFeed,omitempty"` // Location of the a JSON Feed for client's Status page News Feed
 	CustomLinks []CustomLink `json:"custom,omitempty"`     // Any custom external links for client's User menu
