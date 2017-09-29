@@ -1,27 +1,22 @@
-import defaultQueryConfig from 'utils/defaultQueryConfig'
+import defaultQueryConfig from './defaultQueryConfig'
 import {DEFAULT_DASHBOARD_GROUP_BY_INTERVAL} from 'shared/constants'
 import {DEFAULT_DATA_EXPLORER_GROUP_BY_INTERVAL} from 'src/data_explorer/constants'
-import {NULL_STRING} from 'shared/constants/queryFillOptions'
 
 export function editRawText(query, rawText) {
   return Object.assign({}, query, {rawText})
 }
 
-export const chooseNamespace = (query, namespace, isKapacitorRule = false) => ({
-  ...defaultQueryConfig({id: query.id, isKapacitorRule}),
-  ...namespace,
-})
+export function chooseNamespace(query, namespace) {
+  return Object.assign({}, defaultQueryConfig(query.id), namespace)
+}
 
-export const chooseMeasurement = (
-  query,
-  measurement,
-  isKapacitorRule = false
-) => ({
-  ...defaultQueryConfig({id: query.id, isKapacitorRule}),
-  database: query.database,
-  retentionPolicy: query.retentionPolicy,
-  measurement,
-})
+export function chooseMeasurement(query, measurement) {
+  return Object.assign({}, defaultQueryConfig(query.id), {
+    database: query.database,
+    retentionPolicy: query.retentionPolicy,
+    measurement,
+  })
+}
 
 export const toggleField = (query, {field, funcs}, isKapacitorRule = false) => {
   const {fields, groupBy} = query
@@ -90,8 +85,6 @@ export function groupByTime(query, time) {
   })
 }
 
-export const fill = (query, value) => ({...query, fill: value})
-
 export function toggleTagAcceptance(query) {
   return Object.assign({}, query, {
     areTagsAccepted: !query.areTagsAccepted,
@@ -101,7 +94,7 @@ export function toggleTagAcceptance(query) {
 export function applyFuncsToField(
   query,
   {field, funcs},
-  {preventAutoGroupBy = false, isKapacitorRule = false} = {}
+  preventAutoGroupBy = false
 ) {
   const shouldRemoveFuncs = funcs.length === 0
   const nextFields = query.fields.map(f => {
@@ -126,11 +119,10 @@ export function applyFuncsToField(
     time: shouldRemoveFuncs ? null : defaultGroupBy,
   })
 
-  const nextQuery = {...query, fields: nextFields, groupBy: nextGroupBy}
-
-  // fill is not valid for kapacitor query configs since there is no actual
-  // query and all alert rules create stream-based tasks currently
-  return isKapacitorRule ? nextQuery : {...nextQuery, fill: NULL_STRING}
+  return Object.assign({}, query, {
+    fields: nextFields,
+    groupBy: nextGroupBy,
+  })
 }
 
 export function updateRawQuery(query, rawText) {

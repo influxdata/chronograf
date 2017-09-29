@@ -4,11 +4,7 @@ import classnames from 'classnames'
 
 const QueryStatus = ({status, children}) => {
   if (!status) {
-    return (
-      <div className="query-editor--status">
-        {children}
-      </div>
-    )
+    return <div className="query-editor--status" />
   }
 
   if (status.loading) {

@@ -124,7 +124,6 @@ class DataExplorer extends Component {
             autoRefresh={autoRefresh}
             timeRange={timeRange}
             queryConfigs={queryConfigs}
-            errorThrown={errorThrownAction}
             activeQueryIndex={activeQueryIndex}
             editQueryStatus={queryConfigActions.editQueryStatus}
             views={VIS_VIEWS}

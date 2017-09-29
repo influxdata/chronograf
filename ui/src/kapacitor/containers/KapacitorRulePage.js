@@ -18,6 +18,8 @@ class KapacitorRulePage extends Component {
       enabledAlerts: [],
       kapacitor: {},
     }
+
+    this.isEditing = ::this.isEditing
   }
 
   async componentDidMount() {
@@ -95,7 +97,7 @@ class KapacitorRulePage extends Component {
     )
   }
 
-  isEditing = () => {
+  isEditing() {
     const {params} = this.props
     return params.ruleID && params.ruleID !== 'new'
   }

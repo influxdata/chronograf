@@ -10,8 +10,6 @@ import {
   toggleTagAcceptance,
 } from 'src/utils/queryTransitions'
 
-const IS_KAPACITOR_RULE = true
-
 const queryConfigs = (state = {}, action) => {
   switch (action.type) {
     case 'KAPA_LOAD_QUERY': {
@@ -24,24 +22,20 @@ const queryConfigs = (state = {}, action) => {
     }
 
     case 'KAPA_ADD_QUERY': {
-      const {queryID} = action.payload
+      const {queryID, options} = action.payload
+      const nextState = Object.assign({}, state, {
+        [queryID]: Object.assign({}, defaultQueryConfig(queryID), options),
+      })
 
-      return {
-        ...state,
-        [queryID]: defaultQueryConfig({id: queryID, isKapacitorRule: true}),
-      }
+      return nextState
     }
 
     case 'KAPA_CHOOSE_NAMESPACE': {
       const {queryId, database, retentionPolicy} = action.payload
-      const nextQueryConfig = chooseNamespace(
-        state[queryId],
-        {
-          database,
-          retentionPolicy,
-        },
-        IS_KAPACITOR_RULE
-      )
+      const nextQueryConfig = chooseNamespace(state[queryId], {
+        database,
+        retentionPolicy,
+      })
 
       return Object.assign({}, state, {
         [queryId]: Object.assign(nextQueryConfig, {rawText: null}),
@@ -50,11 +44,7 @@ const queryConfigs = (state = {}, action) => {
 
     case 'KAPA_CHOOSE_MEASUREMENT': {
       const {queryId, measurement} = action.payload
-      const nextQueryConfig = chooseMeasurement(
-        state[queryId],
-        measurement,
-        IS_KAPACITOR_RULE
-      )
+      const nextQueryConfig = chooseMeasurement(state[queryId], measurement)
 
       return Object.assign({}, state, {
         [queryId]: Object.assign(nextQueryConfig, {
@@ -101,10 +91,9 @@ const queryConfigs = (state = {}, action) => {
 
     case 'KAPA_APPLY_FUNCS_TO_FIELD': {
       const {queryId, fieldFunc} = action.payload
-      const nextQueryConfig = applyFuncsToField(state[queryId], fieldFunc, {
-        preventAutoGroupBy: true,
-        isKapacitorRule: true,
-      })
+      // this 3rd arg (isKapacitorRule) makes sure 'auto' is not added as
+      // default group by in Kapacitor rule
+      const nextQueryConfig = applyFuncsToField(state[queryId], fieldFunc, true)
 
       return Object.assign({}, state, {
         [queryId]: nextQueryConfig,

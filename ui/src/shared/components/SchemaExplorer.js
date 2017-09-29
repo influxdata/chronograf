@@ -13,7 +13,6 @@ const SchemaExplorer = ({
     chooseTag,
     groupByTag,
     groupByTime,
-    fill,
     chooseNamespace,
     chooseMeasurement,
     applyFuncsToField,
@@ -36,7 +35,6 @@ const SchemaExplorer = ({
     <FieldList
       query={query}
       onToggleField={actionBinder(id, toggleFieldWithGroupByInterval)}
-      onFill={actionBinder(id, fill)}
       onGroupByTime={actionBinder(id, groupByTime)}
       applyFuncsToField={actionBinder(id, applyFuncsToField)}
     />
@@ -57,7 +55,6 @@ SchemaExplorer.propTypes = {
     toggleField: func.isRequired,
     groupByTime: func.isRequired,
     toggleTagAcceptance: func.isRequired,
-    fill: func.isRequired,
     editRawTextAsync: func.isRequired,
   }).isRequired,
 }

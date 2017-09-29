@@ -145,12 +145,8 @@ describe('Admin.Reducers', () => {
     it('can add a database', () => {
       const actual = reducer(state, addDatabase())
       const expected = [{...NEW_DEFAULT_DATABASE, isEditing: true}, db1, db2]
-      expect(actual.databases.length).to.equal(expected.length)
-      expect(actual.databases[0].name).to.equal(expected[0].name)
-      expect(actual.databases[0].isNew).to.equal(expected[0].isNew)
-      expect(actual.databases[0].retentionPolicies).to.equal(
-        expected[0].retentionPolicies
-      )
+
+      expect(actual.databases).to.deep.equal(expected)
     })
 
     it('can edit a database', () => {

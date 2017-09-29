@@ -1,7 +1,5 @@
 import React, {PropTypes} from 'react'
 
-import {emptyGraphCopy} from 'src/shared/copy/cell'
-
 import AutoRefresh from 'shared/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import SingleStat from 'shared/components/SingleStat'
@@ -21,16 +19,6 @@ const RefreshingGraph = ({
   synchronizer,
   editQueryStatus,
 }) => {
-  if (!queries.length) {
-    return (
-      <div className="graph-empty">
-        <p data-test="data-explorer-no-results">
-          {emptyGraphCopy}
-        </p>
-      </div>
-    )
-  }
-
   if (type === 'single-stat') {
     return (
       <RefreshingSingleStat

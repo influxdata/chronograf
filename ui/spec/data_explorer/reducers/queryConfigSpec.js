@@ -9,13 +9,10 @@ import {
   groupByTag,
   groupByTime,
   toggleTagAcceptance,
-  fill,
   updateQueryConfig,
   updateRawQuery,
   editQueryStatus,
 } from 'src/data_explorer/actions/view'
-
-import {LINEAR, NULL_STRING} from 'shared/constants/queryFillOptions'
 
 const fakeAddQueryAction = (panelID, queryID) => {
   return {
@@ -25,7 +22,7 @@ const fakeAddQueryAction = (panelID, queryID) => {
 }
 
 function buildInitialState(queryId, params) {
-  return Object.assign({}, defaultQueryConfig({id: queryId}), params)
+  return Object.assign({}, defaultQueryConfig(queryId), params)
 }
 
 describe('Chronograf.Reducers.DataExplorer.queryConfigs', () => {
@@ -35,7 +32,7 @@ describe('Chronograf.Reducers.DataExplorer.queryConfigs', () => {
     const state = reducer({}, fakeAddQueryAction('blah', queryId))
 
     const actual = state[queryId]
-    const expected = defaultQueryConfig({id: queryId})
+    const expected = defaultQueryConfig(queryId)
     expect(actual).to.deep.equal(expected)
   })
 
@@ -363,7 +360,7 @@ describe('Chronograf.Reducers.DataExplorer.queryConfigs', () => {
     const initialState = {
       [queryId]: buildInitialState(queryId),
     }
-    const expected = defaultQueryConfig({id: queryId}, {rawText: 'hello'})
+    const expected = defaultQueryConfig(queryId, {rawText: 'hello'})
     const action = updateQueryConfig(expected)
 
     const nextState = reducer(initialState, action)
@@ -393,54 +390,5 @@ describe('Chronograf.Reducers.DataExplorer.queryConfigs', () => {
     const nextState = reducer(initialState, action)
 
     expect(nextState[queryId].status).to.equal(status)
-  })
-
-  describe('DE_FILL', () => {
-    it('applies an explicit fill when group by time is used', () => {
-      const initialState = {
-        [queryId]: buildInitialState(queryId),
-      }
-      const time = '10s'
-      const action = groupByTime(queryId, time)
-
-      const nextState = reducer(initialState, action)
-
-      expect(nextState[queryId].fill).to.equal(NULL_STRING)
-    })
-
-    it('updates fill to non-null-string non-number string value', () => {
-      const initialState = {
-        [queryId]: buildInitialState(queryId),
-      }
-      const action = fill(queryId, LINEAR)
-
-      const nextState = reducer(initialState, action)
-
-      expect(nextState[queryId].fill).to.equal(LINEAR)
-    })
-
-    it('updates fill to string integer value', () => {
-      const initialState = {
-        [queryId]: buildInitialState(queryId),
-      }
-      const INT_STRING = '1337'
-      const action = fill(queryId, INT_STRING)
-
-      const nextState = reducer(initialState, action)
-
-      expect(nextState[queryId].fill).to.equal(INT_STRING)
-    })
-
-    it('updates fill to string float value', () => {
-      const initialState = {
-        [queryId]: buildInitialState(queryId),
-      }
-      const FLOAT_STRING = '1.337'
-      const action = fill(queryId, FLOAT_STRING)
-
-      const nextState = reducer(initialState, action)
-
-      expect(nextState[queryId].fill).to.equal(FLOAT_STRING)
-    })
   })
 })

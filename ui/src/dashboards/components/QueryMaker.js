@@ -76,7 +76,6 @@ QueryMaker.propTypes = {
     toggleField: func.isRequired,
     groupByTime: func.isRequired,
     toggleTagAcceptance: func.isRequired,
-    fill: func,
     applyFuncsToField: func.isRequired,
     editRawTextAsync: func.isRequired,
   }).isRequired,

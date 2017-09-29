@@ -45,4 +45,5 @@ export const NEW_DEFAULT_DATABASE = {
   name: '',
   isNew: true,
   retentionPolicies: [NEW_DEFAULT_RP],
+  links: {self: ''},
 }

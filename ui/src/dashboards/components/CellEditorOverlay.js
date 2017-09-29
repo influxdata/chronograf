@@ -111,7 +111,7 @@ class CellEditorOverlay extends Component {
     this.setState({
       queriesWorkingDraft: [
         ...queriesWorkingDraft,
-        defaultQueryConfig({id: uuid.v4()}),
+        defaultQueryConfig(uuid.v4()),
       ],
     })
     this.handleSetActiveQueryIndex(newIndex)

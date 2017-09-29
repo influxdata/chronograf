@@ -11,7 +11,6 @@ import {
   groupByTime,
   toggleField,
   toggleTagAcceptance,
-  fill,
   updateRawQuery,
 } from 'src/utils/queryTransitions'
 
@@ -40,20 +39,13 @@ const queryConfigs = (state = {}, action) => {
       })
     }
 
-    // there is an additional reducer for this same action in the ui reducer
     case 'DE_ADD_QUERY': {
-      const {queryID} = action.payload
+      const {queryID, options} = action.payload
+      const nextState = Object.assign({}, state, {
+        [queryID]: Object.assign({}, defaultQueryConfig(queryID), options),
+      })
 
-      return {
-        ...state,
-        [queryID]: defaultQueryConfig({id: queryID}),
-      }
-    }
-
-    // there is an additional reducer for this same action in the ui reducer
-    case 'DE_DELETE_QUERY': {
-      const {queryID} = action.payload
-      return _.omit(state, queryID)
+      return nextState
     }
 
     case 'DE_UPDATE_QUERY_CONFIG': {
@@ -88,6 +80,11 @@ const queryConfigs = (state = {}, action) => {
       })
     }
 
+    case 'DE_DELETE_QUERY': {
+      const {queryID} = action.payload
+      return _.omit(state, queryID)
+    }
+
     case 'DE_TOGGLE_FIELD': {
       const {queryId, fieldFunc} = action.payload
       const nextQueryConfig = toggleField(state[queryId], fieldFunc)
@@ -99,9 +96,7 @@ const queryConfigs = (state = {}, action) => {
 
     case 'DE_APPLY_FUNCS_TO_FIELD': {
       const {queryId, fieldFunc} = action.payload
-      const nextQueryConfig = applyFuncsToField(state[queryId], fieldFunc, {
-        preventAutoGroupBy: true,
-      })
+      const nextQueryConfig = applyFuncsToField(state[queryId], fieldFunc, true)
 
       return Object.assign({}, state, {
         [queryId]: nextQueryConfig,
@@ -123,16 +118,6 @@ const queryConfigs = (state = {}, action) => {
       return Object.assign({}, state, {
         [queryId]: nextQueryConfig,
       })
-    }
-
-    case 'DE_FILL': {
-      const {queryId, value} = action.payload
-      const nextQueryConfig = fill(state[queryId], value)
-
-      return {
-        ...state,
-        [queryId]: nextQueryConfig,
-      }
     }
 
     case 'DE_UPDATE_RAW_QUERY': {

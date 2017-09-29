@@ -59,7 +59,7 @@ export const TabList = React.createClass({
     if (this.props.isKapacitorTabs === 'true') {
       return (
         <div className="rule-section--row rule-section--row-first rule-section--border-bottom">
-          <p>Choose One:</p>
+          <p>Alert Type</p>
           <div className="nav nav-tablist nav-tablist-sm nav-tablist-malachite">
             {children}
           </div>
@@ -147,13 +147,11 @@ export const Tabs = React.createClass({
 
   render() {
     const children = React.Children.map(this.props.children, child => {
-      if (child && child.type === TabPanels) {
+      if (child.type === TabPanels) {
         return React.cloneElement(child, {
           activeIndex: this.state.activeIndex,
         })
-      }
-
-      if (child && child.type === TabList) {
+      } else if (child.type === TabList) {
         return React.cloneElement(child, {
           activeIndex: this.state.activeIndex,
           onActivate: this.handleActivateTab,
