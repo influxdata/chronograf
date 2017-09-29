@@ -28,7 +28,7 @@ func (h *Service) NewSourceRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -45,7 +45,7 @@ func (h *Service) NewSourceRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rr := newRoleResponse(srcID, res)
+	rr := newSourceRoleResponse(srcID, res)
 	w.Header().Add("Location", rr.Links.Self)
 	encodeJSON(w, http.StatusCreated, rr, h.Logger)
 }
@@ -68,7 +68,7 @@ func (h *Service) UpdateSourceRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -87,7 +87,7 @@ func (h *Service) UpdateSourceRole(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
-	rr := newRoleResponse(srcID, role)
+	rr := newSourceRoleResponse(srcID, role)
 	w.Header().Add("Location", rr.Links.Self)
 	encodeJSON(w, http.StatusOK, rr, h.Logger)
 }
@@ -100,7 +100,7 @@ func (h *Service) SourceRoleID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -112,7 +112,7 @@ func (h *Service) SourceRoleID(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
-	rr := newRoleResponse(srcID, role)
+	rr := newSourceRoleResponse(srcID, role)
 	encodeJSON(w, http.StatusOK, rr, h.Logger)
 }
 
@@ -124,7 +124,7 @@ func (h *Service) SourceRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	store, ok := h.hasRoles(ctx, ts)
+	store, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -136,13 +136,13 @@ func (h *Service) SourceRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rr := make([]roleResponse, len(roles))
+	rr := make([]sourceRoleResponse, len(roles))
 	for i, role := range roles {
-		rr[i] = newRoleResponse(srcID, &role)
+		rr[i] = newSourceRoleResponse(srcID, &role)
 	}
 
 	res := struct {
-		Roles []roleResponse `json:"roles"`
+		Roles []sourceRoleResponse `json:"roles"`
 	}{rr}
 	encodeJSON(w, http.StatusOK, res, h.Logger)
 }
@@ -155,7 +155,7 @@ func (h *Service) RemoveSourceRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -183,7 +183,7 @@ func (r *sourceRoleRequest) ValidCreate() error {
 			return fmt.Errorf("Username required")
 		}
 	}
-	return validPermissions(&r.Permissions)
+	return validSourcePermissions(&r.Permissions)
 }
 
 func (r *sourceRoleRequest) ValidUpdate() error {
@@ -195,27 +195,27 @@ func (r *sourceRoleRequest) ValidUpdate() error {
 			return fmt.Errorf("Username required")
 		}
 	}
-	return validPermissions(&r.Permissions)
+	return validSourcePermissions(&r.Permissions)
 }
 
-type roleResponse struct {
-	Users       []*userResponse              `json:"users"`
+type sourceRoleResponse struct {
+	Users       []*sourceUserResponse        `json:"users"`
 	Name        string                       `json:"name"`
 	Permissions chronograf.SourcePermissions `json:"permissions"`
 	Links       selfLinks                    `json:"links"`
 }
 
-func newRoleResponse(srcID int, res *chronograf.SourceRole) roleResponse {
-	su := make([]*userResponse, len(res.Users))
+func newSourceRoleResponse(srcID int, res *chronograf.SourceRole) sourceRoleResponse {
+	su := make([]*sourceUserResponse, len(res.Users))
 	for i := range res.Users {
 		name := res.Users[i].Name
-		su[i] = newUserResponse(srcID, name)
+		su[i] = newSourceUserResponse(srcID, name)
 	}
 
 	if res.Permissions == nil {
 		res.Permissions = make(chronograf.SourcePermissions, 0)
 	}
-	return roleResponse{
+	return sourceRoleResponse{
 		Name:        res.Name,
 		Permissions: res.Permissions,
 		Users:       su,

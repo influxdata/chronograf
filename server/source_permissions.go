@@ -54,7 +54,7 @@ func (h *Service) SourcePermissions(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusOK, res, h.Logger)
 }
 
-func validPermissions(perms *chronograf.SourcePermissions) error {
+func validSourcePermissions(perms *chronograf.SourcePermissions) error {
 	if perms == nil {
 		return nil
 	}

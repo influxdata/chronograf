@@ -13,7 +13,7 @@ import (
 
 // NewSourceUser adds user to source
 func (h *Service) NewSourceUser(w http.ResponseWriter, r *http.Request) {
-	var req userRequest
+	var req sourceUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		invalidJSON(w, h.Logger)
 		return
@@ -49,8 +49,8 @@ func (h *Service) NewSourceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	su := newUserResponse(srcID, res.Name).WithPermissions(res.Permissions)
-	if _, hasRoles := h.hasRoles(ctx, ts); hasRoles {
+	su := newSourceUserResponse(srcID, res.Name).WithPermissions(res.Permissions)
+	if _, hasRoles := h.hasSourceRoles(ctx, ts); hasRoles {
 		su.WithRoles(srcID, res.Roles)
 	}
 	w.Header().Add("Location", su.Links.Self)
@@ -72,17 +72,17 @@ func (h *Service) SourceUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, hasRoles := h.hasRoles(ctx, ts)
-	ur := make([]userResponse, len(users))
+	_, hasRoles := h.hasSourceRoles(ctx, ts)
+	ur := make([]sourceUserResponse, len(users))
 	for i, u := range users {
-		usr := newUserResponse(srcID, u.Name).WithPermissions(u.Permissions)
+		usr := newSourceUserResponse(srcID, u.Name).WithPermissions(u.Permissions)
 		if hasRoles {
 			usr.WithRoles(srcID, u.Roles)
 		}
 		ur[i] = *usr
 	}
 
-	res := usersResponse{
+	res := sourceUsersResponse{
 		Users: ur,
 	}
 
@@ -105,8 +105,8 @@ func (h *Service) SourceUserID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := newUserResponse(srcID, u.Name).WithPermissions(u.Permissions)
-	if _, hasRoles := h.hasRoles(ctx, ts); hasRoles {
+	res := newSourceUserResponse(srcID, u.Name).WithPermissions(u.Permissions)
+	if _, hasRoles := h.hasSourceRoles(ctx, ts); hasRoles {
 		res.WithRoles(srcID, u.Roles)
 	}
 	encodeJSON(w, http.StatusOK, res, h.Logger)
@@ -132,7 +132,7 @@ func (h *Service) RemoveSourceUser(w http.ResponseWriter, r *http.Request) {
 
 // UpdateSourceUser changes the password or permissions of a source user
 func (h *Service) UpdateSourceUser(w http.ResponseWriter, r *http.Request) {
-	var req userRequest
+	var req sourceUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		invalidJSON(w, h.Logger)
 		return
@@ -168,8 +168,8 @@ func (h *Service) UpdateSourceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := newUserResponse(srcID, u.Name).WithPermissions(u.Permissions)
-	if _, hasRoles := h.hasRoles(ctx, ts); hasRoles {
+	res := newSourceUserResponse(srcID, u.Name).WithPermissions(u.Permissions)
+	if _, hasRoles := h.hasSourceRoles(ctx, ts); hasRoles {
 		res.WithRoles(srcID, u.Roles)
 	}
 	w.Header().Add("Location", res.Links.Self)
@@ -214,8 +214,8 @@ func (h *Service) sourceUsersStore(ctx context.Context, w http.ResponseWriter, r
 	return srcID, store, nil
 }
 
-// hasRoles checks if the influx source has roles or not
-func (h *Service) hasRoles(ctx context.Context, ts chronograf.TimeSeries) (chronograf.SourceRolesStore, bool) {
+// hasSourceRoles checks if the influx source has roles or not
+func (h *Service) hasSourceRoles(ctx context.Context, ts chronograf.TimeSeries) (chronograf.SourceRolesStore, bool) {
 	store, err := ts.Roles(ctx)
 	if err != nil {
 		return nil, false
@@ -223,44 +223,44 @@ func (h *Service) hasRoles(ctx context.Context, ts chronograf.TimeSeries) (chron
 	return store, true
 }
 
-type userRequest struct {
+type sourceUserRequest struct {
 	Username    string                       `json:"name,omitempty"`        // Username for new account
 	Password    string                       `json:"password,omitempty"`    // Password for new account
 	Permissions chronograf.SourcePermissions `json:"permissions,omitempty"` // Optional permissions
 	Roles       []chronograf.SourceRole      `json:"roles,omitempty"`       // Optional roles
 }
 
-func (r *userRequest) ValidCreate() error {
+func (r *sourceUserRequest) ValidCreate() error {
 	if r.Username == "" {
 		return fmt.Errorf("Username required")
 	}
 	if r.Password == "" {
 		return fmt.Errorf("Password required")
 	}
-	return validPermissions(&r.Permissions)
+	return validSourcePermissions(&r.Permissions)
 }
 
-type usersResponse struct {
-	Users []userResponse `json:"users"`
+type sourceUsersResponse struct {
+	Users []sourceUserResponse `json:"users"`
 }
 
-func (r *userRequest) ValidUpdate() error {
+func (r *sourceUserRequest) ValidUpdate() error {
 	if r.Password == "" && len(r.Permissions) == 0 && len(r.Roles) == 0 {
 		return fmt.Errorf("No fields to update")
 	}
-	return validPermissions(&r.Permissions)
+	return validSourcePermissions(&r.Permissions)
 }
 
-type userResponse struct {
+type sourceUserResponse struct {
 	Name           string                       // Username for new account
 	Permissions    chronograf.SourcePermissions // Account's permissions
-	Roles          []roleResponse               // Roles if source uses them
+	Roles          []sourceRoleResponse         // Roles if source uses them
 	Links          selfLinks                    // Links are URI locations related to user
 	hasPermissions bool
 	hasRoles       bool
 }
 
-func (u *userResponse) MarshalJSON() ([]byte, error) {
+func (u *sourceUserResponse) MarshalJSON() ([]byte, error) {
 	res := map[string]interface{}{
 		"name":  u.Name,
 		"links": u.Links,
@@ -274,16 +274,16 @@ func (u *userResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(res)
 }
 
-// newUserResponse creates an HTTP JSON response for a user w/o roles
-func newUserResponse(srcID int, name string) *userResponse {
+// newSourceUserResponse creates an HTTP JSON response for a user w/o roles
+func newSourceUserResponse(srcID int, name string) *sourceUserResponse {
 	self := newSelfLinks(srcID, "users", name)
-	return &userResponse{
+	return &sourceUserResponse{
 		Name:  name,
 		Links: self,
 	}
 }
 
-func (u *userResponse) WithPermissions(perms chronograf.SourcePermissions) *userResponse {
+func (u *sourceUserResponse) WithPermissions(perms chronograf.SourcePermissions) *sourceUserResponse {
 	u.hasPermissions = true
 	if perms == nil {
 		perms = make(chronograf.SourcePermissions, 0)
@@ -293,11 +293,11 @@ func (u *userResponse) WithPermissions(perms chronograf.SourcePermissions) *user
 }
 
 // WithRoles adds roles to the HTTP JSON response for a user
-func (u *userResponse) WithRoles(srcID int, roles []chronograf.SourceRole) *userResponse {
+func (u *sourceUserResponse) WithRoles(srcID int, roles []chronograf.SourceRole) *sourceUserResponse {
 	u.hasRoles = true
-	rr := make([]roleResponse, len(roles))
+	rr := make([]sourceRoleResponse, len(roles))
 	for i, role := range roles {
-		rr[i] = newRoleResponse(srcID, &role)
+		rr[i] = newSourceRoleResponse(srcID, &role)
 	}
 	u.Roles = rr
 	return u
