@@ -1,15 +1,11 @@
-## v1.3.8.2 [2017-09-22]
+## v1.3.8.3 [2017-09-29]
 ### Bug Fixes
 1. [#2020](https://github.com/influxdata/chronograf/pull/2020): Fix duration for single value custom time ranges
-1.[#2004](https://github.com/influxdata/chronograf/pull/2004): Fix DE query templates dropdown disappearance.
-1.[#2006](https://github.com/influxdata/chronograf/pull/2006): Fix no alert for duplicate db name
-1.[#2018](https://github.com/influxdata/chronograf/pull/2018): Fix unresponsive display options and query builder in dashboards
-### Features
-1. [#1885](https://github.com/influxdata/chronograf/pull/1885): Add `fill` options to data explorer and dashboard queries
-1. [#1978](https://github.com/influxdata/chronograf/pull/1978): Support editing kapacitor TICKScript
-1. [#1992](https://github.com/influxdata/chronograf/pull/1992): Add .csv download button to data explorer
+1. [#2004](https://github.com/influxdata/chronograf/pull/2004): Fix DE query templates dropdown disappearance.
+1. [#2006](https://github.com/influxdata/chronograf/pull/2006): Fix no alert for duplicate db name
+1. [#2018](https://github.com/influxdata/chronograf/pull/2018): Fix unresponsive display options and query builder in dashboards
 
-### UI Improvements
+## v1.3.8.2 [2017-09-22]
 
 ## v1.3.8.1 [2017-09-08]
 ### Bug Fixes
