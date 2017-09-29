@@ -14,7 +14,7 @@ import (
 	"github.com/influxdata/chronograf/mocks"
 )
 
-func TestService_Users(t *testing.T) {
+func TestService_UserID(t *testing.T) {
 	type fields struct {
 		UsersStore chronograf.UsersStore
 		Logger     chronograf.Logger
