@@ -53,7 +53,7 @@ func TestService_UserID(t *testing.T) {
 					},
 				},
 			},
-			ID:              "bob",
+			ID:              "1",
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
 			wantBody:        `{"id":"bob","links":{"self":"/chronograf/v1/users/bob"}}`,
