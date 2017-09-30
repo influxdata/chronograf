@@ -74,6 +74,7 @@ func TestService_UserID(t *testing.T) {
 			resp := tt.args.w.Result()
 			content := resp.Header.Get("Content-Type")
 			body, _ := ioutil.ReadAll(resp.Body)
+
 			if resp.StatusCode != tt.wantStatus {
 				t.Errorf("%q. UserID() = %v, want %v", tt.name, resp.StatusCode, tt.wantStatus)
 			}
