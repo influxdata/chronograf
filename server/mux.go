@@ -145,6 +145,9 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 	// Users associated with Chronograf
 	router.GET("/chronograf/v1/me", service.Me)
+
+	router.POST("/chronograf/v1/users", service.NewUser)
+
 	router.GET("/chronograf/v1/users/:id", service.UserID)
 
 	// Dashboards
