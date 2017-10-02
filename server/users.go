@@ -71,12 +71,7 @@ func (s *Service) NewUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cu := newUserResponse(&chronograf.User{
-		ID:       res.ID,
-		Username: res.Username,
-		Provider: res.Provider,
-		Scheme:   res.Scheme,
-	})
+	cu := newUserResponse(res)
 	w.Header().Add("Location", cu.Links.Self)
 	encodeJSON(w, http.StatusCreated, cu, s.Logger)
 }
