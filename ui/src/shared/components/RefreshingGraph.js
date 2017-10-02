@@ -19,6 +19,7 @@ const RefreshingGraph = ({
   cellHeight,
   autoRefresh,
   synchronizer,
+  resizeCoords,
   editQueryStatus,
 }) => {
   if (!query) {
@@ -49,17 +50,18 @@ const RefreshingGraph = ({
 
   return (
     <RefreshingLineGraph
+      axes={axes}
       query={query}
+      onZoom={onZoom}
       templates={templates}
       timeRange={timeRange}
       autoRefresh={autoRefresh}
-      showSingleStat={type === 'line-plus-single-stat'}
       isBarGraph={type === 'bar'}
-      displayOptions={displayOptions}
       synchronizer={synchronizer}
+      resizeCoords={resizeCoords}
+      displayOptions={displayOptions}
       editQueryStatus={editQueryStatus}
-      axes={axes}
-      onZoom={onZoom}
+      showSingleStat={type === 'line-plus-single-stat'}
     />
   )
 }
@@ -79,6 +81,7 @@ RefreshingGraph.propTypes = {
   query: shape().isRequired,
   editQueryStatus: func,
   onZoom: func,
+  resizeCoords: shape(),
 }
 
 export default RefreshingGraph
