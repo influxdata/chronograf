@@ -114,8 +114,13 @@ func TestService_NewUser(t *testing.T) {
 				r: httptest.NewRequest(
 					"POST",
 					"http://server.local/chronograf/v1/users",
-					ioutil.NopCloser(
-						bytes.NewReader([]byte(`{"username": "bob", "provider": "GitHub", "scheme": "OAuth2"}`)))),
+					nil,
+				),
+				user: chronograf.User{
+					Username: "bob",
+					Provider: "GitHub",
+					Scheme:   "OAuth2",
+				},
 			},
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
@@ -145,6 +150,9 @@ func TestService_NewUser(t *testing.T) {
 			}
 
 			tt.args.r = tt.args.r.WithContext(context.WithValue(context.Background(), "id", tt.ID))
+
+			buf, _ := json.Marshal(tt.args.user)
+			tt.args.r.Body = ioutil.NopCloser(bytes.NewReader(buf))
 
 			h.NewUser(tt.args.w, tt.args.r)
 
