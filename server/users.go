@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/bouk/httprouter"
@@ -13,6 +14,19 @@ type userRequest struct {
 	Username string `json:"username"`
 	Provider string `json:"provider,omitempty"`
 	Scheme   string `json:"scheme,omitempty"`
+}
+
+func (r *userRequest) ValidCreate() error {
+	if r.Username == "" {
+		return fmt.Errorf("Username required on Chronograf User request body")
+	}
+	if r.Provider == "" {
+		return fmt.Errorf("Provider required on Chronograf User request body")
+	}
+	if r.Scheme == "" {
+		return fmt.Errorf("Scheme required on Chronograf User request body")
+	}
+	return nil
 }
 
 type userResponse struct {
@@ -56,7 +70,10 @@ func (s *Service) NewUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: add request body validation via ValidCreate
+	if err := req.ValidCreate(); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
 
 	ctx := r.Context()
 	user := &chronograf.User{
