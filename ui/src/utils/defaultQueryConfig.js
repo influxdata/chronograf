@@ -1,6 +1,7 @@
+import uuid from 'node-uuid'
 import {NULL_STRING} from 'shared/constants/queryFillOptions'
 
-const defaultQueryConfig = ({id, isKapacitorRule = false}) => {
+const defaultQueryConfig = ({id = uuid.v4(), isKapacitorRule = false} = {}) => {
   const queryConfig = {
     id,
     database: null,

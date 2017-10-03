@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react'
 
 import Table from './Table'
-import RefreshingGraph from 'shared/components/RefreshingGraph'
+import RefreshingGraph from 'src/data_explorer/components/RefreshingGraph'
 
 const VisView = ({
   axes,

@@ -1,19 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import _ from 'lodash'
 import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
-import {removeUnselectedTemplateValues} from 'src/dashboards/constants'
 
-const {
-  array,
-  arrayOf,
-  bool,
-  element,
-  func,
-  number,
-  oneOfType,
-  shape,
-  string,
-} = PropTypes
+const {arrayOf, element, func, number, oneOfType, shape, string} = PropTypes
 
 const AutoRefresh = ComposedComponent =>
   class wrapper extends Component {
@@ -22,72 +11,40 @@ const AutoRefresh = ComposedComponent =>
       this.state = {
         lastQuerySuccessful: false,
         timeSeries: [],
-        resolution: null,
       }
     }
 
     static propTypes = {
       children: element,
       autoRefresh: number.isRequired,
-      templates: arrayOf(
-        shape({
-          type: string.isRequired,
-          tempVar: string.isRequired,
-          query: shape({
-            db: string,
-            rp: string,
-            influxql: string,
-          }),
-          values: arrayOf(
-            shape({
-              type: string.isRequired,
-              value: string.isRequired,
-              selected: bool,
-            })
-          ).isRequired,
-        })
-      ),
-      queries: arrayOf(
-        shape({
-          host: oneOfType([string, arrayOf(string)]),
-          text: string,
-        }).isRequired
-      ).isRequired,
-      axes: shape({
-        bounds: shape({
-          y: array,
-          y2: array,
-        }),
-      }),
+      query: shape({
+        host: oneOfType([string, arrayOf(string)]),
+        text: string,
+      }).isRequired,
       editQueryStatus: func,
     }
 
     componentDidMount() {
-      const {queries, templates, autoRefresh} = this.props
-      this.executeQueries(queries, templates)
+      const {query, autoRefresh} = this.props
+      this.executeQuery(query)
       if (autoRefresh) {
         this.intervalID = setInterval(
-          () => this.executeQueries(queries, templates),
+          () => this.executeQuery(query),
           autoRefresh
         )
       }
     }
 
     componentWillReceiveProps(nextProps) {
-      const queriesDidUpdate = this.queryDifference(
-        this.props.queries,
-        nextProps.queries
+      const queryDidUpdate = this.queryDifference(
+        this.props.query,
+        nextProps.query
       ).length
 
-      const tempVarsDidUpdate = !_.isEqual(
-        this.props.templates,
-        nextProps.templates
-      )
-
-      const shouldRefetch = queriesDidUpdate || tempVarsDidUpdate
+      const shouldRefetch = queryDidUpdate
 
       if (shouldRefetch) {
-        this.executeQueries(nextProps.queries, nextProps.templates)
+        this.executeQuery(nextProps.query)
       }
 
       if (this.props.autoRefresh !== nextProps.autoRefresh || shouldRefetch) {
@@ -95,7 +52,7 @@ const AutoRefresh = ComposedComponent =>
 
         if (nextProps.autoRefresh) {
           this.intervalID = setInterval(
-            () => this.executeQueries(nextProps.queries, nextProps.templates),
+            () => this.executeQuery(nextProps.queries),
             nextProps.autoRefresh
           )
         }
@@ -103,52 +60,38 @@ const AutoRefresh = ComposedComponent =>
     }
 
     queryDifference = (left, right) => {
-      const leftStrs = left.map(q => `${q.host}${q.text}`)
-      const rightStrs = right.map(q => `${q.host}${q.text}`)
+      const leftStr = `${left.host}${left.text}`
+      const rightStr = `${right.host}${right.text}`
       return _.difference(
-        _.union(leftStrs, rightStrs),
-        _.intersection(leftStrs, rightStrs)
+        _.union(leftStr, rightStr),
+        _.intersection(leftStr, rightStr)
       )
     }
 
-    executeQueries = (queries, templates = []) => {
-      const {editQueryStatus} = this.props
-      const {resolution} = this.state
+    executeQuery = async query => {
+      try {
+        const {editQueryStatus} = this.props
 
-      if (!queries.length) {
-        this.setState({timeSeries: []})
-        return
-      }
+        console.log(query)
 
-      this.setState({isFetching: true})
+        if (!query) {
+          this.setState({timeSeries: []})
+          return
+        }
 
-      const timeSeriesPromises = queries.map(query => {
+        this.setState({isFetching: true})
+
         const {host, database, rp} = query
 
-        const templatesWithResolution = templates.map(temp => {
-          if (temp.tempVar === ':interval:') {
-            if (resolution) {
-              return {...temp, resolution}
-            }
-            return {...temp, resolution: 1000}
-          }
-          return {...temp}
-        })
-
-        return fetchTimeSeriesAsync(
+        const timeSeries = await fetchTimeSeriesAsync(
           {
             source: host,
             db: database,
             rp,
             query,
-            tempVars: removeUnselectedTemplateValues(templatesWithResolution),
-            resolution,
           },
           editQueryStatus
         )
-      })
-
-      Promise.all(timeSeriesPromises).then(timeSeries => {
         const newSeries = timeSeries.map(response => ({response}))
         const lastQuerySuccessful = !this._noResultsForQuery(newSeries)
 
@@ -157,16 +100,14 @@ const AutoRefresh = ComposedComponent =>
           lastQuerySuccessful,
           isFetching: false,
         })
-      })
+      } catch (error) {
+        console.error(error)
+      }
     }
 
     componentWillUnmount() {
       clearInterval(this.intervalID)
       this.intervalID = false
-    }
-
-    setResolution = resolution => {
-      this.setState({resolution})
     }
 
     render() {
@@ -183,13 +124,7 @@ const AutoRefresh = ComposedComponent =>
         return this.renderNoResults()
       }
 
-      return (
-        <ComposedComponent
-          {...this.props}
-          data={timeSeries}
-          setResolution={this.setResolution}
-        />
-      )
+      return <ComposedComponent {...this.props} data={timeSeries} />
     }
 
     /**
@@ -202,7 +137,6 @@ const AutoRefresh = ComposedComponent =>
         <ComposedComponent
           {...this.props}
           data={data}
-          setResolution={this.setResolution}
           isFetchingInitially={isFirstFetch}
           isRefreshing={!isFirstFetch}
         />

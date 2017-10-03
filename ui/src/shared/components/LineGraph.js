@@ -31,7 +31,8 @@ export default React.createClass({
     isGraphFilled: bool,
     isBarGraph: bool,
     overrideLineColors: array,
-    query: shape({}).isRequired,
+    query: shape({}),
+    queries: arrayOf(shape({})),
     showSingleStat: bool,
     displayOptions: shape({
       stepPlot: bool,
@@ -98,6 +99,7 @@ export default React.createClass({
       overrideLineColors,
       title,
       query,
+      queries,
       underlayCallback,
       showSingleStat,
       displayOptions,
@@ -172,6 +174,7 @@ export default React.createClass({
           resizeCoords={resizeCoords}
           axes={axes}
           query={query}
+          queries={queries}
           containerStyle={{width: '100%', height: '100%'}}
           overrideLineColors={lineColors}
           isGraphFilled={showSingleStat ? false : isGraphFilled}

@@ -265,7 +265,7 @@ class CellEditorOverlay extends Component {
             timeRange={timeRange}
             templates={templates}
             autoRefresh={autoRefresh}
-            queryConfig={queriesWorkingDraft}
+            queryConfigs={queriesWorkingDraft}
             editQueryStatus={editQueryStatus}
             onCellRename={this.handleCellRename}
           />
@@ -283,7 +283,7 @@ class CellEditorOverlay extends Component {
                   onSetBase={this.handleSetBase}
                   onSetLabel={this.handleSetLabel}
                   onSetScale={this.handleSetScale}
-                  queryConfig={queriesWorkingDraft}
+                  queryConfigs={queriesWorkingDraft}
                   selectedGraphType={cellWorkingType}
                   onSetPrefixSuffix={this.handleSetPrefixSuffix}
                   onSelectGraphType={this.handleSelectGraphType}

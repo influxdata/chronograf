@@ -10,14 +10,14 @@ const rawTextBinder = (links, id, action) => text =>
 const buildText = (q, timeRange) =>
   q.rawText || buildInfluxQLQuery(timeRange, q) || ''
 
-const QueryMaker = ({query, source, actions, timeRange, onAddQuery}) =>
+const QueryMaker = ({query, source, actions, timeRange}) =>
   <div className="query-maker--tab-contents">
     <QueryEditor
       query={buildText(query, timeRange)}
       config={query}
       onUpdate={rawTextBinder(source.links, query.id, actions.editRawTextAsync)}
     />
-    <SchemaExplorer query={query} actions={actions} onAddQuery={onAddQuery} />
+    <SchemaExplorer query={query} actions={actions} />
   </div>
 
 const {func, number, shape, string} = PropTypes
@@ -38,16 +38,12 @@ QueryMaker.propTypes = {
     chooseMeasurement: func.isRequired,
     chooseTag: func.isRequired,
     groupByTag: func.isRequired,
-    addQuery: func.isRequired,
     toggleField: func.isRequired,
     groupByTime: func.isRequired,
     toggleTagAcceptance: func.isRequired,
     applyFuncsToField: func.isRequired,
     editRawTextAsync: func.isRequired,
   }).isRequired,
-  setActiveQueryIndex: func.isRequired,
-  onDeleteQuery: func.isRequired,
-  onAddQuery: func.isRequired,
   activeQuery: shape({}),
   activeQueryIndex: number,
 }

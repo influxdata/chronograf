@@ -164,6 +164,7 @@ FieldList.propTypes = {
     database: string,
     retentionPolicy: string,
     measurement: string,
+    groupBy: shape().isRequired,
   }).isRequired,
   onToggleField: func.isRequired,
   onGroupByTime: func.isRequired,

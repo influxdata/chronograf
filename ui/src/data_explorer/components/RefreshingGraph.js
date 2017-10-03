@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react'
 
 import {emptyGraphCopy} from 'src/shared/copy/cell'
 
-import AutoRefresh from 'shared/components/AutoRefresh'
+import AutoRefresh from 'src/data_explorer/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import SingleStat from 'shared/components/SingleStat'
 
@@ -13,7 +13,6 @@ const RefreshingGraph = ({
   axes,
   type,
   query,
-  queries,
   onZoom,
   templates,
   timeRange,
@@ -36,7 +35,7 @@ const RefreshingGraph = ({
   if (type === 'single-stat') {
     return (
       <RefreshingSingleStat
-        queries={query || queries}
+        queries={query}
         templates={templates}
         autoRefresh={autoRefresh}
         cellHeight={cellHeight}
@@ -53,7 +52,6 @@ const RefreshingGraph = ({
     <RefreshingLineGraph
       axes={axes}
       query={query}
-      queries={queries}
       onZoom={onZoom}
       templates={templates}
       timeRange={timeRange}
@@ -81,7 +79,6 @@ RefreshingGraph.propTypes = {
   cellHeight: number,
   axes: shape(),
   query: shape(),
-  queries: arrayOf(shape()),
   editQueryStatus: func,
   onZoom: func,
   resizeCoords: shape(),

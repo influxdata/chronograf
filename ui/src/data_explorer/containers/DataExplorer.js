@@ -2,10 +2,10 @@ import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import QueryMaker from '../components/QueryMaker'
-import Visualization from '../components/Visualization'
+import QueryMaker from 'src/data_explorer/components/QueryMaker'
+import Visualization from 'src/data_explorer/components/Visualization'
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
-import Header from '../containers/Header'
+import Header from 'src/data_explorer/containers/Header'
 import ResizeContainer from 'shared/components/ResizeContainer'
 import OverlayTechnologies from 'shared/components/OverlayTechnologies'
 
@@ -77,20 +77,17 @@ class DataExplorer extends Component {
         >
           <QueryMaker
             source={source}
-            queries={queryConfig}
+            query={queryConfig}
             actions={queryConfigActions}
             autoRefresh={autoRefresh}
             timeRange={timeRange}
-            setActiveQueryIndex={this.handleSetActiveQueryIndex}
             onDeleteQuery={this.handleDeleteQuery}
-            onAddQuery={this.handleAddQuery}
-            activeQuery={this.getActiveQuery()}
           />
           <Visualization
             isInDataExplorer={true}
             autoRefresh={autoRefresh}
             timeRange={timeRange}
-            queryConfigs={queryConfig}
+            queryConfig={queryConfig}
             errorThrown={errorThrownAction}
             editQueryStatus={queryConfigActions.editQueryStatus}
             views={VIS_VIEWS}

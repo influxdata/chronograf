@@ -1,3 +1,4 @@
+import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import {
   editRawText,
   applyFuncsToField,
@@ -12,7 +13,7 @@ import {
   updateRawQuery,
 } from 'src/utils/queryTransitions'
 
-const queryConfig = (state = {}, action) => {
+const queryConfig = (state = defaultQueryConfig(), action) => {
   switch (action.type) {
     case 'DE_CHOOSE_NAMESPACE': {
       const {queryId, database, retentionPolicy} = action.payload
