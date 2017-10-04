@@ -48,7 +48,10 @@ func TestService_UserID(t *testing.T) {
 				UsersStore: &mocks.UsersStore{
 					GetF: func(ctx context.Context, ID string) (*chronograf.User, error) {
 						return &chronograf.User{
-							ID: "bob",
+							ID:       "OAuth2-Google-billysteve",
+							Username: "billysteve",
+							Provider: "Google",
+							Scheme:   "OAuth2",
 						}, nil
 					},
 				},
@@ -56,7 +59,7 @@ func TestService_UserID(t *testing.T) {
 			ID:              "1",
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
-			wantBody:        `{"id":"bob","links":{"self":"/chronograf/v1/users/bob"}}`,
+			wantBody:        `{"id":"OAuth2-Google-billysteve","username":"billysteve","provider":"Google","scheme":"OAuth2","links":{"self":"/chronograf/v1/users/OAuth2-Google-billysteve"}}`,
 		},
 	}
 
