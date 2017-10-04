@@ -679,7 +679,7 @@ func TestService_RemoveSourceUser(t *testing.T) {
 			args: args{
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
-					"GET",
+					"DELETE",
 					"http://server.local/chronograf/v1/sources/1",
 					nil),
 			},
@@ -773,7 +773,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 			args: args{
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
-					"POST",
+					"PATCH",
 					"http://server.local/chronograf/v1/sources/1",
 					ioutil.NopCloser(
 						bytes.NewReader([]byte(`{"name": "marty", "password": "the_lake"}`)))),
@@ -825,7 +825,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 			args: args{
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
-					"POST",
+					"PATCH",
 					"http://server.local/chronograf/v1/sources/1",
 					ioutil.NopCloser(
 						bytes.NewReader([]byte(`{"name": "marty", "password": "the_lake"}`)))),
@@ -877,7 +877,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 			args: args{
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
-					"POST",
+					"PATCH",
 					"http://server.local/chronograf/v1/sources/1",
 					ioutil.NopCloser(
 						bytes.NewReader([]byte(`{"name": "marty"}`)))),
