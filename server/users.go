@@ -92,3 +92,14 @@ func (s *Service) NewUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Location", cu.Links.Self)
 	encodeJSON(w, http.StatusCreated, cu, s.Logger)
 }
+
+func (s *Service) RemoveUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := httprouter.GetParamFromContext(ctx, "id")
+
+	if err := s.UsersStore.Delete(ctx, id); err != nil {
+		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

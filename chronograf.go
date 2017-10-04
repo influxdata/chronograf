@@ -591,7 +591,7 @@ type UsersStore interface {
 	// Create a new User in the UsersStore
 	Add(context.Context, *User) (*User, error)
 	// Delete the User from the UsersStore
-	Delete(context.Context, *User) error
+	Delete(ctx context.Context, ID string) error
 	// Get retrieves a user if ID exists.
 	Get(ctx context.Context, ID string) (*User, error)
 	// Update the user's permissions or roles
