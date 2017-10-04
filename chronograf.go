@@ -608,11 +608,11 @@ type SourceUser struct {
 
 // SourceUsersStore is the Storage and retrieval of InfluxDB user authentication information
 type SourceUsersStore interface {
-	// All lists all users from the DBUsersStore
+	// All lists all users from the SourceUsersStore
 	All(context.Context) ([]SourceUser, error)
-	// Create a new DBUser in the DBUsersStore
+	// Create a new user in the SourceUsersStore
 	Add(context.Context, *SourceUser) (*SourceUser, error)
-	// Delete the DBUser from the DBUsersStore
+	// Delete the user from the SourceUsersStore
 	Delete(context.Context, *SourceUser) error
 	// Get retrieves a user if name exists.
 	Get(ctx context.Context, name string) (*SourceUser, error)
