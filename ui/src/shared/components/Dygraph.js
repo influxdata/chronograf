@@ -6,7 +6,7 @@ import _ from 'lodash'
 import moment from 'moment'
 
 import Dygraphs from 'src/external/dygraph'
-import getRange from 'shared/parsing/getRangeForDygraph'
+import getRange, {getStackedRange} from 'shared/parsing/getRangeForDygraph'
 import DygraphLegend from 'src/shared/components/DygraphLegend'
 import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
 import {buildDefaultYLabel} from 'shared/presenters'
@@ -37,6 +37,7 @@ export default class Dygraph extends Component {
       isAscending: true,
       isSnipped: false,
       isFilterVisible: false,
+      legendArrowPosition: 'top',
     }
   }
 
@@ -63,7 +64,9 @@ export default class Dygraph extends Component {
       plugins: [new Dygraphs.Plugins.Crosshair({direction: 'vertical'})],
       axes: {
         y: {
-          valueRange: getRange(timeSeries, y.bounds, ruleValues),
+          valueRange: options.stackedGraph
+            ? getStackedRange(y.bounds)
+            : getRange(timeSeries, y.bounds, ruleValues),
           axisLabelFormatter: (yval, __, opts) =>
             numberValueFormatter(yval, opts, y.prefix, y.suffix),
           axisLabelWidth: this.getLabelWidth(),
@@ -142,12 +145,14 @@ export default class Dygraph extends Component {
     const updateOptions = {
       ...options,
       labels,
-      ylabel: this.getLabel('y'),
       file: timeSeries,
       logscale: y.scale === LOG,
+      ylabel: this.getLabel('y'),
       axes: {
         y: {
-          valueRange: getRange(timeSeries, y.bounds, ruleValues),
+          valueRange: options.stackedGraph
+            ? getStackedRange(y.bounds)
+            : getRange(timeSeries, y.bounds, ruleValues),
           axisLabelFormatter: (yval, __, opts) =>
             numberValueFormatter(yval, opts, y.prefix, y.suffix),
           axisLabelWidth: this.getLabelWidth(),
@@ -338,6 +343,8 @@ export default class Dygraph extends Component {
   }
 
   highlightCallback = e => {
+    const chronografChromeSize = 60 // Width & Height of navigation page elements
+
     // Move the Legend on hover
     const graphRect = this.graphRef.getBoundingClientRect()
     const legendRect = this.legendRef.getBoundingClientRect()
@@ -362,10 +369,32 @@ export default class Dygraph extends Component {
 
     // Disallow screen overflow of legend
     const isLegendBottomClipped = graphBottom + legendHeight > screenHeight
+    const isLegendTopClipped =
+      legendHeight > graphRect.top - chronografChromeSize
+    const willLegendFitLeft = e.pageX - chronografChromeSize > legendWidth
 
-    const legendTop = isLegendBottomClipped
-      ? graphHeight + 8 - legendHeight
-      : graphHeight + 8
+    let legendTop = graphHeight + 8
+    this.setState({legendArrowPosition: 'top'})
+
+    // If legend is only clipped on the bottom, position above graph
+    if (isLegendBottomClipped && !isLegendTopClipped) {
+      this.setState({legendArrowPosition: 'bottom'})
+      legendTop = -legendHeight
+    }
+    // If legend is clipped on top and bottom, posiition on either side of crosshair
+    if (isLegendBottomClipped && isLegendTopClipped) {
+      legendTop = 0
+
+      if (willLegendFitLeft) {
+        this.setState({legendArrowPosition: 'right'})
+        legendLeft = trueGraphX - legendWidth / 2
+        legendLeft -= 8
+      } else {
+        this.setState({legendArrowPosition: 'left'})
+        legendLeft = trueGraphX + legendWidth / 2
+        legendLeft += 32
+      }
+    }
 
     this.legendRef.style.left = `${legendLeft}px`
     this.legendRef.style.top = `${legendTop}px`
@@ -396,11 +425,12 @@ export default class Dygraph extends Component {
   render() {
     const {
       legend,
-      filterText,
-      isAscending,
       sortType,
       isHidden,
       isSnipped,
+      filterText,
+      isAscending,
+      legendArrowPosition,
       isFilterVisible,
     } = this.state
 
@@ -420,6 +450,7 @@ export default class Dygraph extends Component {
           legendRef={this.handleLegendRef}
           onToggleFilter={this.handleToggleFilter}
           onInputChange={this.handleLegendInputChange}
+          arrowPosition={legendArrowPosition}
         />
         <div
           ref={r => {

@@ -17,7 +17,7 @@ export const NEW_DEFAULT_DASHBOARD_CELL = {
   y: 0,
   w: 4,
   h: 4,
-  name: 'Name This Graph',
+  name: 'Untitled Cell',
   type: 'line',
   queries: [],
 }
@@ -104,5 +104,5 @@ export const DISPLAY_OPTIONS = {
 
 export const TOOLTIP_CONTENT = {
   FORMAT:
-    '<p>K/M/B = Thousand / Million / Billion</p><p>K/M/G = Kilo / Mega / Giga </p>',
+    '<p><strong>K/M/B</strong> = Thousand / Million / Billion<br/><strong>K/M/G</strong> = Kilo / Mega / Giga </p>',
 }

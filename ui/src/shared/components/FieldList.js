@@ -1,7 +1,9 @@
 import React, {PropTypes, Component} from 'react'
+import _ from 'lodash'
 
 import FieldListItem from 'src/data_explorer/components/FieldListItem'
 import GroupByTimeDropdown from 'src/data_explorer/components/GroupByTimeDropdown'
+import FillQuery from 'shared/components/FillQuery'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 import {showFieldKeys} from 'shared/apis/metaQuery'
@@ -25,7 +27,8 @@ class FieldList extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const {database, measurement, retentionPolicy} = this.props.query
+    const {querySource, query} = this.props
+    const {database, measurement, retentionPolicy} = query
     const {
       database: prevDB,
       measurement: prevMeas,
@@ -38,7 +41,8 @@ class FieldList extends Component {
     if (
       database === prevDB &&
       measurement === prevMeas &&
-      retentionPolicy === prevRP
+      retentionPolicy === prevRP &&
+      _.isEqual(prevProps.querySource, querySource)
     ) {
       return
     }
@@ -50,17 +54,19 @@ class FieldList extends Component {
     this.props.onGroupByTime(groupBy.menuOption)
   }
 
+  handleFill = fill => {
+    this.props.onFill(fill)
+  }
+
   _getFields = () => {
     const {database, measurement, retentionPolicy} = this.props.query
     const {source} = this.context
-    const proxySource = source.links.proxy
+    const {querySource} = this.props
 
-    showFieldKeys(
-      proxySource,
-      database,
-      measurement,
-      retentionPolicy
-    ).then(resp => {
+    const proxy =
+      _.get(querySource, ['links', 'proxy'], null) || source.links.proxy
+
+    showFieldKeys(proxy, database, measurement, retentionPolicy).then(resp => {
       const {errors, fieldSets} = showFieldKeysParser(resp.data)
       if (errors.length) {
         console.error('Error parsing fields keys: ', errors)
@@ -74,7 +80,7 @@ class FieldList extends Component {
 
   render() {
     const {
-      query: {fields = [], groupBy},
+      query: {fields = [], groupBy, fill},
       isKapacitorRule,
       isInDataExplorer,
     } = this.props
@@ -87,13 +93,18 @@ class FieldList extends Component {
         <div className="query-builder--heading">
           <span>Fields</span>
           {hasAggregates
-            ? <GroupByTimeDropdown
-                isOpen={!hasGroupByTime}
-                selected={groupBy.time}
-                onChooseGroupByTime={this.handleGroupByTime}
-                isInRuleBuilder={isKapacitorRule}
-                isInDataExplorer={isInDataExplorer}
-              />
+            ? <div className="query-builder--groupby-fill-container">
+                <GroupByTimeDropdown
+                  isOpen={!hasGroupByTime}
+                  selected={groupBy.time}
+                  onChooseGroupByTime={this.handleGroupByTime}
+                  isInRuleBuilder={isKapacitorRule}
+                  isInDataExplorer={isInDataExplorer}
+                />
+                {isKapacitorRule
+                  ? null
+                  : <FillQuery value={fill} onChooseFill={this.handleFill} />}
+              </div>
             : null}
         </div>
         {this.renderList()}
@@ -157,9 +168,15 @@ FieldList.propTypes = {
   }).isRequired,
   onToggleField: func.isRequired,
   onGroupByTime: func.isRequired,
+  onFill: func,
   applyFuncsToField: func.isRequired,
   isKapacitorRule: bool,
   isInDataExplorer: bool,
+  querySource: shape({
+    links: shape({
+      proxy: string.isRequired,
+    }).isRequired,
+  }),
 }
 
 export default FieldList

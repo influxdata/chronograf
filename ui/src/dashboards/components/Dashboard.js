@@ -7,14 +7,12 @@ import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 const Dashboard = ({
   source,
+  sources,
   onZoom,
   dashboard,
   onAddCell,
-  onEditCell,
   timeRange,
   autoRefresh,
-  onRenameCell,
-  onUpdateCell,
   onDeleteCell,
   synchronizer,
   onPositionChange,
@@ -24,20 +22,14 @@ const Dashboard = ({
   onSummonOverlayTechnologies,
   onSelectTemplate,
   showTemplateControlBar,
-  onCancelEditCell,
 }) => {
   const cells = dashboard.cells.map(cell => {
     const dashboardCell = {...cell}
-    dashboardCell.queries = dashboardCell.queries.map(
-      ({label, query, queryConfig, db}) => ({
-        label,
-        query,
-        queryConfig,
-        db,
-        database: db,
-        text: query,
-      })
-    )
+    dashboardCell.queries = dashboardCell.queries.map(q => ({
+      ...q,
+      database: q.db,
+      text: q.query,
+    }))
     return dashboardCell
   })
 
@@ -58,21 +50,18 @@ const Dashboard = ({
             />}
         {cells.length
           ? <LayoutRenderer
-              onCancelEditCell={onCancelEditCell}
-              templates={templatesIncludingDashTime}
-              isEditable={true}
               cells={cells}
+              onZoom={onZoom}
+              source={source}
+              sources={sources}
+              isEditable={true}
               timeRange={timeRange}
               autoRefresh={autoRefresh}
-              source={source}
-              onPositionChange={onPositionChange}
-              onEditCell={onEditCell}
-              onRenameCell={onRenameCell}
-              onUpdateCell={onUpdateCell}
-              onDeleteCell={onDeleteCell}
-              onSummonOverlayTechnologies={onSummonOverlayTechnologies}
               synchronizer={synchronizer}
-              onZoom={onZoom}
+              onDeleteCell={onDeleteCell}
+              onPositionChange={onPositionChange}
+              templates={templatesIncludingDashTime}
+              onSummonOverlayTechnologies={onSummonOverlayTechnologies}
             />
           : <div className="dashboard__empty">
               <p>This Dashboard has no Cells</p>
@@ -112,9 +101,6 @@ Dashboard.propTypes = {
   inPresentationMode: bool,
   onAddCell: func,
   onPositionChange: func,
-  onEditCell: func,
-  onRenameCell: func,
-  onUpdateCell: func,
   onDeleteCell: func,
   onSummonOverlayTechnologies: func,
   synchronizer: func,
@@ -123,12 +109,12 @@ Dashboard.propTypes = {
       proxy: string,
     }).isRequired,
   }).isRequired,
+  sources: arrayOf(shape({})).isRequired,
   autoRefresh: number.isRequired,
   timeRange: shape({}).isRequired,
   onOpenTemplateManager: func.isRequired,
   onSelectTemplate: func.isRequired,
   showTemplateControlBar: bool,
-  onCancelEditCell: func,
   onZoom: func,
 }
 

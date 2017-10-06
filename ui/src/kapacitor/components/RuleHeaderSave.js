@@ -4,14 +4,13 @@ import TimeRangeDropdown from 'shared/components/TimeRangeDropdown'
 import SourceIndicator from 'shared/components/SourceIndicator'
 
 const RuleHeaderSave = ({
-  source,
   onSave,
   timeRange,
   validationError,
   onChooseTimeRange,
 }) =>
   <div className="page-header__right">
-    <SourceIndicator sourceName={source.name} />
+    <SourceIndicator />
     <TimeRangeDropdown
       onChooseTimeRange={onChooseTimeRange}
       selected={timeRange}
@@ -32,16 +31,14 @@ const RuleHeaderSave = ({
       id="save-kapacitor-tooltip"
       effect="solid"
       html={true}
-      offset={{bottom: 4}}
       place="bottom"
-      class="influx-tooltip kapacitor-tooltip place-bottom"
+      class="influx-tooltip kapacitor-tooltip"
     />
   </div>
 
 const {func, shape, string} = PropTypes
 
 RuleHeaderSave.propTypes = {
-  source: shape({}).isRequired,
   onSave: func.isRequired,
   validationError: string.isRequired,
   onChooseTimeRange: func.isRequired,

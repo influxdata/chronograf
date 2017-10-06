@@ -47,14 +47,14 @@ const DashboardsTable = ({
       </table>
     : <div className="generic-empty-state">
         <h4 style={{marginTop: '90px'}}>
-          Looks like you dont have any dashboards
+          Looks like you don’t have any dashboards
         </h4>
         <button
           className="btn btn-sm btn-primary"
           onClick={onCreateDashboard}
           style={{marginBottom: '90px'}}
         >
-          Create Dashboard
+          <span className="icon plus" /> Create Dashboard
         </button>
       </div>
 }

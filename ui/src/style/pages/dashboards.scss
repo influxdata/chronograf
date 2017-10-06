@@ -11,22 +11,49 @@ $dash-graph-options-arrow: 8px;
   ------------------------------------------------------
 */
 @keyframes refreshingSpinnerA {
-  0% { transform: translate(-50%,-50%) scale(1.75); background-color: $g7-graphite; }
-  33% { transform: translate(-50%,-50%) scale(1,1); }
-  66% { transform: translate(-50%,-50%) scale(1,1); }
-  100% { transform: translate(-50%,-50%) scale(1,1); }
+  0% {
+    transform: translate(-50%, -50%) scale(1.75);
+    background-color: $g7-graphite;
+  }
+  33% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
+  66% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
 }
 @keyframes refreshingSpinnerB {
-  0% { transform: translate(-50%,-50%) scale(1,1); }
-  33% { transform: translate(-50%,-50%) scale(1.75); background-color: $g7-graphite; }
-  66% { transform: translate(-50%,-50%) scale(1,1); }
-  100% { transform: translate(-50%,-50%) scale(1,1); }
+  0% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
+  33% {
+    transform: translate(-50%, -50%) scale(1.75);
+    background-color: $g7-graphite;
+  }
+  66% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
 }
 @keyframes refreshingSpinnerC {
-  0% { transform: translate(-50%,-50%) scale(1,1); }
-  33% { transform: translate(-50%,-50%) scale(1,1); }
-  66% { transform: translate(-50%,-50%) scale(1.75); background-color: $g7-graphite; }
-  100% { transform: translate(-50%,-50%) scale(1,1); }
+  0% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
+  33% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
+  66% {
+    transform: translate(-50%, -50%) scale(1.75);
+    background-color: $g7-graphite;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1, 1);
+  }
 }
 
 /*
@@ -87,15 +114,14 @@ $dash-graph-options-arrow: 8px;
   left: 0;
   padding: 0;
 
-  & > .dygraph {
+  .dygraph {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-
   }
-  & > .dygraph > .dygraph-child {
+  .dygraph .dygraph-child {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -124,15 +150,12 @@ $dash-graph-options-arrow: 8px;
   font-weight: 600;
   font-size: 13px;
   color: $g14-chromium;
-  transition:
-    color 0.25s ease,
-    background-color 0.25s ease;
+  transition: color 0.25s ease, background-color 0.25s ease;
   &.dash-graph--heading-draggable:hover {
     cursor: move;
     background-color: $g5-pepper;
   }
 }
-.dash-graph--name-edit,
 .dash-graph--name {
   font-size: 13px;
   font-weight: 600;
@@ -142,144 +165,133 @@ $dash-graph-options-arrow: 8px;
   white-space: nowrap;
 }
 .dash-graph--name {
+  position: relative;
   height: $dash-graph-heading;
   line-height: $dash-graph-heading;
-  width: calc(100% - 30px);
-  padding-left: 16px;
-  transition:
-    color 0.25s ease,
-    background-color 0.25s ease,
+  width: calc(100% - 53px);
+  padding-left: 10px;
+  transition: color 0.25s ease, background-color 0.25s ease,
     border-color 0.25s ease;
 }
-input.form-control.dash-graph--name-edit {
-  margin-left: 8px;
-  padding: 0 6px;
-  width: calc(100% - 42px);
-  height: 26px !important;
-  line-height: (26px - 4px) !important;
-  position: relative;
-  top: -1px; // Fix for slight offset
+.dash-graph--name.dash-graph--name__default {
+  font-style: italic;
 }
-.dash-graph--custom-time {
-  font-family: $code-font;
-  color: $c-pool;
-  background-color: $g2-kevlar;
+.dash-graph--custom-indicators {
   height: 24px;
-  font-size: 10px;
-  line-height: 24px;
   border-radius: 3px;
-  padding: 0 7px;
   position: absolute;
   top: 3px;
-  right: 30px;
-}
-.presentation-mode .dash-graph--custom-time {
-  right: 2px;
-}
-.dash-graph--options {
-  width: $dash-graph-heading;
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  text-align: center;
+  right: 0;
+  display: flex;
 
-  > .btn {
-    background-color: transparent !important;
-    padding: 0;
-    margin: 4px 0;
-    height: $dash-graph-heading-context;
-    width: $dash-graph-heading-context;
-    line-height: $dash-graph-heading-context;
-    transition:
-      background-color 0.25s ease,
-      color 0.25s ease !important;
+  > .custom-indicator,
+  > .source-indicator {
+    font-size: 10px;
+    line-height: 24px;
+    padding: 0 7px;
+    font-style: normal;
+    font-family: $code-font;
+    color: $c-pool;
+    background-color: $g2-kevlar;
+    margin-right: 2px;
+    border-radius: 3px;
+  }
+  > .source-indicator {
+    height: 24px;
 
-    &:hover {
-      background-color: $g5-pepper !important;
-      color: $g20-white;
+    > .icon {
+      font-size: 12px;
+      margin: 0;
     }
   }
 }
-
-.presentation-mode .dash-graph--options {
-  display: none;
-  visibility: hidden;
-}
-.dash-graph--options-menu {
+.dash-graph-context {
+  z-index: 2;
   position: absolute;
-  top: ($dash-graph-heading + $dash-graph-options-arrow);
+  top: 0;
+  right: 3px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.dash-graph-context--button {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  font-size: 12px;
+  position: relative;
+  color: $g11-sidewalk;
+  transition: color 0.25s ease, background-color 0.25s ease;
+
+  &:hover,
+  &.active {
+    cursor: pointer;
+    color: $g20-white;
+    background-color: $g5-pepper;
+  }
+  &:first-child {
+    margin-right: 2px;
+  }
+
+  > .icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+.dash-graph-context--confirm {
+  z-index: 3;
+  position: absolute;
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  display: block;
-  z-index: 11;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 90px;
-  visibility: hidden;
-  transition-property: all;
+  width: 58px;
+  height: 24px;
+  border-radius: 3px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 24px;
+  background-color: $c-curacao;
+  color: $g20-white;
+  transition: background-color 0.25s ease;
 
-  > li {
-    @include no-user-select;
-    position: relative;
+  &:before {
+    position: absolute;
+    content: '';
+    border: 6px solid transparent;
+    border-bottom-color: $c-curacao;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -100%);
+    transition: border-color 0.25s ease;
+  }
+
+  &:hover {
+    background-color: $c-dreamsicle;
+    cursor: pointer;
+  }
+  &:hover:before {
+    border-bottom-color: $c-dreamsicle;
+  }
+}
+
+/* Presentation Mode */
+.presentation-mode {
+  .dash-graph-context {
+    display: none;
+  }
+  .dash-graph--name {
     width: 100%;
-    height: 28px;
-    line-height: 28px;
-    background-color: $g5-pepper;
-    padding: 0 11px;
-    margin: 0;
-    text-align: left;
-    color: $g15-platinum;
-    opacity: 0;
-    transition:
-      opacity 0.25s ease,
-      color 0.25s ease,
-      background-color 0.25s ease;
-
-    &:first-child {
-      border-radius: $radius $radius 0 0;
-
-      &:before {
-        content: '';
-        width: 0;
-        height: 0;
-        border-width: $dash-graph-options-arrow;
-        border-style: solid;
-        border-color: transparent transparent $g5-pepper transparent;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        top: -($dash-graph-options-arrow * 2);
-      }
-    }
-    &:last-child {
-      border-radius: 0 0 $radius $radius;
-    }
-
-    &:hover {
-      cursor: pointer;
-      background-color: $g7-graphite;
-      color: $g20-white;
-    }
   }
 }
-
-/* Menu Open State */
-.dash-graph--options.dash-graph--options-show {
-  > .btn {
-    color: $g20-white;
-    background-color: $g5-pepper !important;
-  }
-  .dash-graph--options-menu { visibility: visible; }
-  .dash-graph--options-menu > li { opacity: 1; }
-}
-
-
 
 .graph-panel__refreshing {
   position: absolute;
   top: -18px !important;
-  transform: translate(0,0);
+  transform: translate(0, 0);
   right: 50%;
   transform: translateX(50%);
   width: 16px;
@@ -292,12 +304,24 @@ input.form-control.dash-graph--name-edit {
     border-radius: 50%;
     position: absolute;
     top: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
   }
 
-  div:nth-child(1) {left: 0; animation: refreshingSpinnerA 0.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite; }
-  div:nth-child(2) {left: 50%; animation: refreshingSpinnerB 0.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite; }
-  div:nth-child(3) {left: 100%; animation: refreshingSpinnerC 0.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;}
+  div:nth-child(1) {
+    left: 0;
+    animation: refreshingSpinnerA 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
+      infinite;
+  }
+  div:nth-child(2) {
+    left: 50%;
+    animation: refreshingSpinnerB 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
+      infinite;
+  }
+  div:nth-child(3) {
+    left: 100%;
+    animation: refreshingSpinnerC 0.8s cubic-bezier(0.645, 0.045, 0.355, 1)
+      infinite;
+  }
 }
 
 /*
@@ -313,7 +337,7 @@ input.form-control.dash-graph--name-edit {
 }
 .react-grid-item {
   &.resizing {
-    background-color: fade-out($g3-castle,0.09);
+    background-color: fade-out($g3-castle, 0.09);
     border-color: $c-pool;
     border-image-slice: 3%;
     border-image-repeat: initial;
@@ -323,13 +347,14 @@ input.form-control.dash-graph--name-edit {
     z-index: 3;
 
     & > .react-resizable-handle {
-      &:before, &:after {
+      &:before,
+      &:after {
         background-color: $c-comet;
       }
     }
   }
   &.react-draggable-dragging {
-    background-color: fade-out($g3-castle,0.09);
+    background-color: fade-out($g3-castle, 0.09);
     border-color: $c-pool;
     border-image-slice: 3%;
     border-image-repeat: initial;
@@ -363,14 +388,15 @@ input.form-control.dash-graph--name-edit {
     }
     &:before {
       width: 20px;
-      transform: translate(-50%,-50%) rotate(-45deg);
+      transform: translate(-50%, -50%) rotate(-45deg);
     }
     &:after {
       width: 12px;
-      transform: translate(-3px,2px) rotate(-45deg);
+      transform: translate(-3px, 2px) rotate(-45deg);
     }
     &:hover {
-      &:before, &:after {
+      &:before,
+      &:after {
         background-color: $c-comet;
       }
     }

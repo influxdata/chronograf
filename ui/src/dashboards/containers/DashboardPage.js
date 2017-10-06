@@ -41,11 +41,9 @@ class DashboardPage extends Component {
       dashboardActions: {
         getDashboardsAsync,
         updateTempVarValues,
-        selectTempVarsFromUrl,
         putDashboardByID,
       },
       source,
-      location: {query},
     } = this.props
 
     const dashboards = await getDashboardsAsync()
@@ -53,7 +51,6 @@ class DashboardPage extends Component {
 
     // Refresh and persists influxql generated template variable values
     await updateTempVarValues(source, dashboard)
-    selectTempVarsFromUrl(+dashboardID, query)
     await putDashboardByID(dashboardID)
   }
 
@@ -111,18 +108,6 @@ class DashboardPage extends Component {
     const newDashboard = {...this.getActiveDashboard(), name}
     this.props.dashboardActions.updateDashboard(newDashboard)
     this.props.dashboardActions.putDashboard(newDashboard)
-  }
-
-  // Places cell into editing mode.
-  handleEditDashboardCell = (x, y, isEditing) => {
-    return () => {
-      this.props.dashboardActions.editDashboardCell(
-        this.getActiveDashboard(),
-        x,
-        y,
-        !isEditing
-      ) /* eslint-disable no-negated-condition */
-    }
   }
 
   handleUpdateDashboardCell = newCell => {
@@ -190,13 +175,6 @@ class DashboardPage extends Component {
     this.props.templateControlBarVisibilityToggled()
   }
 
-  handleCancelEditCell = cellID => {
-    this.props.dashboardActions.cancelEditCell(
-      this.getActiveDashboard().id,
-      cellID
-    )
-  }
-
   handleZoomedTimeRange = (zoomedLower, zoomedUpper) => {
     this.setState({zoomedTimeRange: {zoomedLower, zoomedUpper}})
   }
@@ -212,6 +190,7 @@ class DashboardPage extends Component {
 
     const {
       source,
+      sources,
       timeRange,
       timeRange: {lower, upper},
       showTemplateControlBar,
@@ -299,6 +278,7 @@ class DashboardPage extends Component {
         {selectedCell
           ? <CellEditorOverlay
               source={source}
+              sources={sources}
               cell={selectedCell}
               timeRange={timeRange}
               autoRefresh={autoRefresh}
@@ -346,6 +326,7 @@ class DashboardPage extends Component {
         {dashboard
           ? <Dashboard
               source={source}
+              sources={sources}
               dashboard={dashboard}
               timeRange={timeRange}
               autoRefresh={autoRefresh}
@@ -353,12 +334,9 @@ class DashboardPage extends Component {
               onAddCell={this.handleAddCell}
               synchronizer={this.synchronizer}
               inPresentationMode={inPresentationMode}
-              onEditCell={this.handleEditDashboardCell}
               onPositionChange={this.handleUpdatePosition}
               onSelectTemplate={this.handleSelectTemplate}
-              onCancelEditCell={this.handleCancelEditCell}
               onDeleteCell={this.handleDeleteDashboardCell}
-              onUpdateCell={this.handleUpdateDashboardCell}
               showTemplateControlBar={showTemplateControlBar}
               onOpenTemplateManager={this.handleOpenTemplateManager}
               templatesIncludingDashTime={templatesIncludingDashTime}
@@ -379,6 +357,7 @@ DashboardPage.propTypes = {
       self: string,
     }),
   }).isRequired,
+  sources: arrayOf(shape({})).isRequired,
   params: shape({
     sourceID: string.isRequired,
     dashboardID: string.isRequired,
@@ -440,6 +419,7 @@ const mapStateToProps = state => {
       persisted: {autoRefresh, showTemplateControlBar},
     },
     dashboardUI: {dashboards, timeRange, cellQueryStatus},
+    sources,
   } = state
 
   return {
@@ -449,6 +429,7 @@ const mapStateToProps = state => {
     showTemplateControlBar,
     inPresentationMode,
     cellQueryStatus,
+    sources,
   }
 }
 

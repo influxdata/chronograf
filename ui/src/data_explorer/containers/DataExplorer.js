@@ -1,6 +1,8 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
+import {withRouter} from 'react-router'
+import queryString from 'query-string'
 
 import _ from 'lodash'
 
@@ -17,40 +19,43 @@ import {errorThrown} from 'shared/actions/errors'
 import {setAutoRefresh} from 'shared/actions/app'
 import * as dataExplorerActionCreators from 'src/data_explorer/actions/view'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
+import {buildRawText} from 'src/utils/influxql'
 
 class DataExplorer extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      activeQueryIndex: 0,
       showWriteForm: false,
     }
   }
 
-  handleSetActiveQueryIndex = index => {
-    this.setState({activeQueryIndex: index})
-  }
-
-  handleDeleteQuery = index => {
-    const {queryConfigs, queryConfigActions} = this.props
-    const query = queryConfigs[index]
-    queryConfigActions.deleteQuery(query.id)
-  }
-
-  handleAddQuery = () => {
-    const newIndex = this.props.queryConfigs.length
-    this.props.queryConfigActions.addQuery()
-    this.handleSetActiveQueryIndex(newIndex)
-  }
-
   getActiveQuery = () => {
-    const {activeQueryIndex} = this.state
     const {queryConfigs} = this.props
-    const activeQuery = queryConfigs[activeQueryIndex]
-    const defaultQuery = queryConfigs[0]
+    if (queryConfigs.length === 0) {
+      this.props.queryConfigActions.addQuery()
+    }
+    return queryConfigs[0]
+  }
 
-    return activeQuery || defaultQuery
+  componentDidMount() {
+    const {router} = this.props
+    const {query} = queryString.parse(router.location.search)
+    if (query && query.length) {
+      const qc = this.props.queryConfigs[0]
+      this.props.queryConfigActions.editRawText(qc.id, query)
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {router} = this.props
+    const {queryConfigs, timeRange} = nextProps
+    const query = buildRawText(_.get(queryConfigs, ['0'], ''), timeRange)
+    const qsCurrent = queryString.parse(router.location.search)
+    if (query.length && qsCurrent.query !== query) {
+      const qsNew = queryString.stringify({query})
+      router.push(`${router.location.pathname}?${qsNew}`)
+    }
   }
 
   handleCloseWriteData = () => {
@@ -74,12 +79,8 @@ class DataExplorer extends Component {
       writeLineProtocol,
     } = this.props
 
-    const {activeQueryIndex, showWriteForm} = this.state
-    const selectedDatabase = _.get(
-      queryConfigs,
-      [`${activeQueryIndex}`, 'database'],
-      null
-    )
+    const {showWriteForm} = this.state
+    const selectedDatabase = _.get(queryConfigs, ['0', 'database'], null)
 
     return (
       <div className="data-explorer">
@@ -109,14 +110,8 @@ class DataExplorer extends Component {
         >
           <QueryMaker
             source={source}
-            queries={queryConfigs}
             actions={queryConfigActions}
-            autoRefresh={autoRefresh}
             timeRange={timeRange}
-            setActiveQueryIndex={this.handleSetActiveQueryIndex}
-            onDeleteQuery={this.handleDeleteQuery}
-            onAddQuery={this.handleAddQuery}
-            activeQueryIndex={activeQueryIndex}
             activeQuery={this.getActiveQuery()}
           />
           <Visualization
@@ -124,7 +119,8 @@ class DataExplorer extends Component {
             autoRefresh={autoRefresh}
             timeRange={timeRange}
             queryConfigs={queryConfigs}
-            activeQueryIndex={activeQueryIndex}
+            errorThrown={errorThrownAction}
+            activeQueryIndex={0}
             editQueryStatus={queryConfigActions.editQueryStatus}
             views={VIS_VIEWS}
           />
@@ -144,6 +140,12 @@ DataExplorer.propTypes = {
       queries: string.isRequired,
     }).isRequired,
   }).isRequired,
+  router: shape({
+    location: shape({
+      search: string,
+      pathanme: string,
+    }),
+  }),
   queryConfigs: arrayOf(shape({})).isRequired,
   queryConfigActions: shape({
     editQueryStatus: func.isRequired,
@@ -204,4 +206,6 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DataExplorer)
+export default connect(mapStateToProps, mapDispatchToProps)(
+  withRouter(DataExplorer)
+)

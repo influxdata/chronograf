@@ -283,6 +283,10 @@ func (g *GroupByVar) parseAbsolute(fragment string) (time.Duration, error) {
 		}
 	}
 
+	if len(durs) == 1 {
+		durs = append(durs, time.Now())
+	}
+
 	// reject more than 2 times found
 	if len(durs) != 2 {
 		return time.Duration(0), errors.New("must provide exactly two absolute times")
@@ -294,7 +298,7 @@ func (g *GroupByVar) parseAbsolute(fragment string) (time.Duration, error) {
 }
 
 func (g *GroupByVar) String() string {
-	duration := g.Duration.Nanoseconds() / (g.ReportingInterval.Nanoseconds() * int64(g.Resolution))
+	duration := int64(g.Duration/time.Second) / int64(g.Resolution) * 3
 	if duration == 0 {
 		duration = 1
 	}
@@ -395,6 +399,7 @@ type DashboardQuery struct {
 	Label       string      `json:"label,omitempty"`       // Label is the Y-Axis label for the data
 	Range       *Range      `json:"range,omitempty"`       // Range is the default Y-Axis range for the data
 	QueryConfig QueryConfig `json:"queryConfig,omitempty"` // QueryConfig represents the query state that is understood by the data explorer
+	Source      string      `json:"source"`                // Source is the optional URI to the data source for this queryConfig
 }
 
 // TemplateQuery is used to retrieve choices for template replacement
@@ -441,19 +446,32 @@ type SourcesStore interface {
 	Update(context.Context, Source) error
 }
 
+type DBRP struct {
+	DB string `json:"db"`
+	RP string `json:"rp"`
+}
+
 // AlertRule represents rules for building a tickscript alerting task
 type AlertRule struct {
-	ID            string          `json:"id,omitempty"`         // ID is the unique ID of the alert
-	TICKScript    TICKScript      `json:"tickscript"`           // TICKScript is the raw tickscript associated with this Alert
-	Query         *QueryConfig    `json:"query"`                // Query is the filter of data for the alert.
-	Every         string          `json:"every"`                // Every how often to check for the alerting criteria
-	Alerts        []string        `json:"alerts"`               // Alerts name all the services to notify (e.g. pagerduty)
-	AlertNodes    []KapacitorNode `json:"alertNodes,omitempty"` // AlertNodes define additional arguments to alerts
-	Message       string          `json:"message"`              // Message included with alert
-	Details       string          `json:"details"`              // Details is generally used for the Email alert.  If empty will not be added.
-	Trigger       string          `json:"trigger"`              // Trigger is a type that defines when to trigger the alert
-	TriggerValues TriggerValues   `json:"values"`               // Defines the values that cause the alert to trigger
-	Name          string          `json:"name"`                 // Name is the user-defined name for the alert
+	ID            string          `json:"id,omitempty"`           // ID is the unique ID of the alert
+	TICKScript    TICKScript      `json:"tickscript"`             // TICKScript is the raw tickscript associated with this Alert
+	Query         *QueryConfig    `json:"query"`                  // Query is the filter of data for the alert.
+	Every         string          `json:"every"`                  // Every how often to check for the alerting criteria
+	Alerts        []string        `json:"alerts"`                 // Alerts name all the services to notify (e.g. pagerduty)
+	AlertNodes    []KapacitorNode `json:"alertNodes,omitempty"`   // AlertNodes define additional arguments to alerts
+	Message       string          `json:"message"`                // Message included with alert
+	Details       string          `json:"details"`                // Details is generally used for the Email alert.  If empty will not be added.
+	Trigger       string          `json:"trigger"`                // Trigger is a type that defines when to trigger the alert
+	TriggerValues TriggerValues   `json:"values"`                 // Defines the values that cause the alert to trigger
+	Name          string          `json:"name"`                   // Name is the user-defined name for the alert
+	Type          string          `json:"type"`                   // Represents the task type where stream is data streamed to kapacitor and batch is queried by kapacitor
+	DBRPs         []DBRP          `json:"dbrps"`                  // List of database retention policy pairs the task is allowed to access
+	Status        string          `json:"status"`                 // Represents if this rule is enabled or disabled in kapacitor
+	Executing     bool            `json:"executing"`              // Whether the task is currently executing
+	Error         string          `json:"error"`                  // Any error encountered when kapacitor executes the task
+	Created       time.Time       `json:"created"`                // Date the task was first created
+	Modified      time.Time       `json:"modified"`               // Date the task was last modified
+	LastEnabled   time.Time       `json:"last-enabled,omitempty"` // Date the task was last set to status enabled
 }
 
 // TICKScript task to be used by kapacitor
@@ -503,6 +521,7 @@ type QueryConfig struct {
 	Tags            map[string][]string `json:"tags"`
 	GroupBy         GroupBy             `json:"groupBy"`
 	AreTagsAccepted bool                `json:"areTagsAccepted"`
+	Fill            string              `json:"fill,omitempty"`
 	RawText         *string             `json:"rawText"`
 	Range           *DurationRange      `json:"range"`
 }

@@ -23,7 +23,7 @@ const getRange = (
   const subPad = bigNum => bigNum.times(SUB_FACTOR).toNumber()
 
   const pad = v => {
-    if (v === null || v === '') {
+    if (v === null || v === '' || v === undefined) {
       return null
     }
 
@@ -78,5 +78,11 @@ const getRange = (
 
   return [min, max]
 }
+
+const coerceToNum = str => (str ? +str : null)
+export const getStackedRange = (bounds = [null, null]) => [
+  coerceToNum(bounds[0]),
+  coerceToNum(bounds[1]),
+]
 
 export default getRange

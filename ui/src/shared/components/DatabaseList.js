@@ -14,6 +14,17 @@ const DatabaseList = React.createClass({
   propTypes: {
     query: shape({}).isRequired,
     onChooseNamespace: func.isRequired,
+    querySource: shape({
+      links: shape({
+        proxy: string.isRequired,
+      }).isRequired,
+    }),
+  },
+
+  getDefaultProps() {
+    return {
+      source: null,
+    }
   },
 
   contextTypes: {
@@ -31,8 +42,23 @@ const DatabaseList = React.createClass({
   },
 
   componentDidMount() {
+    this.getDbRp()
+  },
+
+  componentDidUpdate(prevProps) {
+    if (_.isEqual(prevProps.querySource, this.props.querySource)) {
+      return
+    }
+
+    this.getDbRp()
+  },
+
+  getDbRp() {
     const {source} = this.context
-    const proxy = source.links.proxy
+    const {querySource} = this.props
+    const proxy =
+      _.get(querySource, ['links', 'proxy'], null) || source.links.proxy
+
     showDatabases(proxy).then(resp => {
       const {errors, databases} = showDatabasesParser(resp.data)
       if (errors.length) {
@@ -64,13 +90,17 @@ const DatabaseList = React.createClass({
 
   render() {
     const {query, onChooseNamespace} = this.props
+    const {namespaces} = this.state
+    const sortedNamespaces = namespaces.length
+      ? _.sortBy(namespaces, n => n.database.toLowerCase())
+      : namespaces
 
     return (
       <div className="query-builder--column query-builder--column-db">
         <div className="query-builder--heading">Databases</div>
         <div className="query-builder--list">
           <FancyScrollbar>
-            {this.state.namespaces.map(namespace => {
+            {sortedNamespaces.map(namespace => {
               const {database, retentionPolicy} = namespace
               const isActive =
                 database === query.database &&

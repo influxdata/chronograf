@@ -2,16 +2,26 @@ import React, {PropTypes} from 'react'
 import classnames from 'classnames'
 
 import ConfirmButtons from 'shared/components/ConfirmButtons'
+import SourceSelector from 'src/dashboards/components/SourceSelector'
 
 const OverlayControls = ({
-  onCancel,
   onSave,
+  sources,
+  queries,
+  selected,
+  onCancel,
+  isSavable,
+  onSetQuerySource,
   isDisplayOptionsTabActive,
   onClickDisplayOptions,
-  isSavable,
 }) =>
   <div className="overlay-controls">
-    <h3 className="overlay--graph-name">Cell Editor</h3>
+    <SourceSelector
+      sources={sources}
+      selected={selected}
+      onSetQuerySource={onSetQuerySource}
+      queries={queries}
+    />
     <ul className="nav nav-tablist nav-tablist-sm">
       <li
         key="queries"
@@ -29,7 +39,7 @@ const OverlayControls = ({
         })}
         onClick={onClickDisplayOptions(true)}
       >
-        Display Options
+        Options
       </li>
     </ul>
     <div className="overlay-controls--right">
@@ -41,7 +51,7 @@ const OverlayControls = ({
     </div>
   </div>
 
-const {func, bool} = PropTypes
+const {arrayOf, bool, func, shape, string} = PropTypes
 
 OverlayControls.propTypes = {
   onCancel: func.isRequired,
@@ -49,6 +59,10 @@ OverlayControls.propTypes = {
   isDisplayOptionsTabActive: bool.isRequired,
   onClickDisplayOptions: func.isRequired,
   isSavable: bool,
+  sources: arrayOf(shape()),
+  onSetQuerySource: func,
+  selected: string,
+  queries: arrayOf(shape()),
 }
 
 export default OverlayControls

@@ -1,5 +1,7 @@
 import React, {PropTypes} from 'react'
 
+import {emptyGraphCopy} from 'src/shared/copy/cell'
+
 import AutoRefresh from 'shared/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import SingleStat from 'shared/components/SingleStat'
@@ -17,8 +19,19 @@ const RefreshingGraph = ({
   cellHeight,
   autoRefresh,
   synchronizer,
+  resizeCoords,
   editQueryStatus,
 }) => {
+  if (!queries.length) {
+    return (
+      <div className="graph-empty">
+        <p data-test="data-explorer-no-results">
+          {emptyGraphCopy}
+        </p>
+      </div>
+    )
+  }
+
   if (type === 'single-stat') {
     return (
       <RefreshingSingleStat
@@ -37,17 +50,18 @@ const RefreshingGraph = ({
 
   return (
     <RefreshingLineGraph
+      axes={axes}
+      onZoom={onZoom}
       queries={queries}
       templates={templates}
       timeRange={timeRange}
       autoRefresh={autoRefresh}
-      showSingleStat={type === 'line-plus-single-stat'}
       isBarGraph={type === 'bar'}
-      displayOptions={displayOptions}
       synchronizer={synchronizer}
+      resizeCoords={resizeCoords}
+      displayOptions={displayOptions}
       editQueryStatus={editQueryStatus}
-      axes={axes}
-      onZoom={onZoom}
+      showSingleStat={type === 'line-plus-single-stat'}
     />
   )
 }
@@ -67,6 +81,7 @@ RefreshingGraph.propTypes = {
   queries: arrayOf(shape()).isRequired,
   editQueryStatus: func,
   onZoom: func,
+  resizeCoords: shape(),
 }
 
 export default RefreshingGraph

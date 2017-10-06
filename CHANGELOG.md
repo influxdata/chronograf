@@ -1,15 +1,55 @@
-## v1.3.8.0 [unreleased]
+## v1.3.9.0 [2017-10-06]
 ### Bug Fixes
-1. [#1886](https://github.com/influxdata/chronograf/pull/1886): Fix limit of 100 alert rules on alert rules page
+1. [#2004](https://github.com/influxdata/chronograf/pull/2004): Fix Data Explorer disappearing query templates in dropdown
+1. [#2006](https://github.com/influxdata/chronograf/pull/2006): Fix missing alert for duplicate db name
+1. [#2015](https://github.com/influxdata/chronograf/pull/2015): Chronograf shows real status for windows hosts when metrics are saved in non-default db - thank you, @ar7z1!
+1. [#2019](https://github.com/influxdata/chronograf/pull/2006): Fix false error warning for duplicate kapacitor name
+1. [#2018](https://github.com/influxdata/chronograf/pull/2018): Fix unresponsive display options and query builder in dashboards
+
+### Features
+1. [#1885](https://github.com/influxdata/chronograf/pull/1885): Add `fill` options to data explorer and dashboard queries
+1. [#1978](https://github.com/influxdata/chronograf/pull/1978): Support editing kapacitor TICKScript
+1. [#1721](https://github.com/influxdata/chronograf/pull/1721): Introduce the TICKscript editor UI
+1. [#1992](https://github.com/influxdata/chronograf/pull/1992): Add .csv download button to data explorer
+1. [#2082](https://github.com/influxdata/chronograf/pull/2082): Add Data Explorer InfluxQL query and location query synchronization, so queries can be shared via a a URL
+1. [#1996](https://github.com/influxdata/chronograf/pull/1996): Able to switch InfluxDB sources on a per graph basis
+
+### UI Improvements
+1. [#2002](https://github.com/influxdata/chronograf/pull/2002): Require a second click when deleting a dashboard cell
+1. [#2002](https://github.com/influxdata/chronograf/pull/2002): Sort database list in Schema Explorer alphabetically
+1. [#2002](https://github.com/influxdata/chronograf/pull/2002): Improve usability of dashboard cell context menus
+1. [#2002](https://github.com/influxdata/chronograf/pull/2002): Move dashboard cell renaming UI into Cell Editor Overlay
+1. [#2040](https://github.com/influxdata/chronograf/pull/2040): Prevent the legend from overlapping graphs at the bottom of the screen
+1. [#2054](https://github.com/influxdata/chronograf/pull/2054): Add a "Plus" icon to every button with an Add or Create action for clarity and consistency
+1. [#2052](https://github.com/influxdata/chronograf/pull/2052): Make hovering over series smoother
+1. [#2071](https://github.com/influxdata/chronograf/pull/2071): Reduce the number of pixels per cell to one point per 3 pixels
+1. [#2072](https://github.com/influxdata/chronograf/pull/2072): Remove tabs from Data Explorer
+1. [#2057](https://github.com/influxdata/chronograf/pull/2057): Improve appearance of placeholder text in inputs
+1. [#2057](https://github.com/influxdata/chronograf/pull/2057): Add ability to use "Default" values in Source Connection form
+1. [#2069](https://github.com/influxdata/chronograf/pull/2069): Display name & port in SourceIndicator tooltip
+
+## v1.3.8.1 [unreleased]
+### Bug Fixes
+### Features
+
+### UI Improvements
+
+## v1.3.8.0 [2017-09-07]
+### Bug Fixes
+1. [#1886](https://github.com/influxdata/chronograf/pull/1886): Fix the limit of 100 alert rules on alert rules page
 1. [#1930](https://github.com/influxdata/chronograf/pull/1930): Fix graphs when y-values are constant
 1. [#1951](https://github.com/influxdata/chronograf/pull/1951): Fix crosshair not being removed when user leaves graph
 1. [#1943](https://github.com/influxdata/chronograf/pull/1943): Fix inability to add kapacitor from source page on fresh install
-1. [#1947](https://github.com/influxdata/chronograf/pull/1947): Fix DataExplorer crash if field property not present on queryConfig
+1. [#1947](https://github.com/influxdata/chronograf/pull/1947): Fix DataExplorer crashing if a field property is not present in the queryConfig
+1. [#1957](https://github.com/influxdata/chronograf/pull/1957): Fix the max y value of stacked graphs preventing display of the upper bounds of the chart
+1. [#1969](https://github.com/influxdata/chronograf/pull/1969): Fix for delayed selection of template variables using URL query params
+1. [#1982](https://github.com/influxdata/chronograf/pull/1982): Fix return code on meta nodes when raft redirects to leader
 
 ### Features
-1. [#1928](https://github.com/influxdata/chronograf/pull/1928): Add prefix, suffix, scale, and other y-axis formatting
-1. [#1886](https://github.com/influxdata/chronograf/pull/1886): Fix limit of 100 alert rules on alert rules page
-1. [#1934](https://github.com/influxdata/chronograf/pull/1943): Zoom syncronization and enhancement
+1. [#1928](https://github.com/influxdata/chronograf/pull/1928): Add prefix, suffix, scale, and other y-axis formatting for cells in dashboards
+1. [#1934](https://github.com/influxdata/chronograf/pull/1934): Update the group by time when zooming in graphs
+1. [#1945](https://github.com/influxdata/chronograf/pull/1945): Add the ability to link directly to presentation mode in dashboards with the `present` boolean query parameter in the URL
+1. [#1969](https://github.com/influxdata/chronograf/pull/1969): Add the ability to select a template variable via a URL parameter
 
 ### UI Improvements
 1. [#1933](https://github.com/influxdata/chronograf/pull/1933): Use line-stacked graph type for memory information - thank you, @Joxit!
@@ -17,9 +57,9 @@
 1. [#1942](https://github.com/influxdata/chronograf/pull/1942): Polish appearance of optional alert parameters in Kapacitor rule builder
 1. [#1944](https://github.com/influxdata/chronograf/pull/1944): Add active state for Status page navbar icon
 1. [#1944](https://github.com/influxdata/chronograf/pull/1944): Improve UX of navigation to a sub-nav item in the navbar
+1. [#1971](https://github.com/influxdata/chronograf/pull/1971): Resolve confusing deadman trigger alert rule UI
 
 ## v1.3.7.0 [2017-08-23]
-## v1.3.7.0 [unreleased]
 ### Features
 1. [#1928](https://github.com/influxdata/chronograf/pull/1928): Add prefix, suffix, scale, and other y-axis formatting
 
@@ -43,7 +83,7 @@
 ## v1.3.6.1 [2017-08-14]
 **Upgrade Note** This release (1.3.6.1) fixes a possibly data corruption issue with dashboard cells' graph types. If you upgraded to 1.3.6.0 and visited any dashboard, once you have then upgraded to this release (1.3.6.1) you will need to manually reset the graph type for every cell via the cell's caret --> Edit --> Display Options. If you upgraded directly to 1.3.6.1, you should not experience this issue.
 
-### Bug Fixes
+## Bug Fixes
 1. [#1795](https://github.com/influxdata/chronograf/pull/1795): Fix uptime status on Windows hosts running Telegraf
 1. [#1715](https://github.com/influxdata/chronograf/pull/1715): Chronograf now renders on IE11.
 1. [#1870](https://github.com/influxdata/chronograf/pull/1870): Fix console error for placing prop on div
@@ -127,6 +167,8 @@
 1. [#1738](https://github.com/influxdata/chronograf/pull/1738): Add shared secret JWT authorization to InfluxDB
 1. [#1724](https://github.com/influxdata/chronograf/pull/1724): Add Pushover alert support
 1. [#1762](https://github.com/influxdata/chronograf/pull/1762): Restore all supported Kapacitor services when creating rules, and add most optional message parameters
+1. [#1681](https://github.com/influxdata/chronograf/pull/1681): Add the ability to select Custom Time Ranges in the Hostpages, Data Explorer, and Dashboards.
+1. [#1717](https://github.com/influxdata/chronograf/pull/1717): View server generated TICKscripts
 
 ### UI Improvements
 1. [#1707](https://github.com/influxdata/chronograf/pull/1707): Polish alerts table in status page to wrap text less
