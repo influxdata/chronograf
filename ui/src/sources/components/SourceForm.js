@@ -64,7 +64,7 @@ class SourceForm extends Component {
               ref={r => (this.sourceURL = r)}
               className="form-control"
               id="connect-string"
-              placeholder="Address of InfluxDB"
+              placeholder="Address of InfluxDB (e.g. http://localhost:8086)"
               onChange={onInputChange}
               value={source.url || ''}
               onBlur={this.handleBlurSourceURL}
