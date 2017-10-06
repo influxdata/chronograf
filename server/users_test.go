@@ -41,7 +41,7 @@ func TestService_UserID(t *testing.T) {
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
 					"GET",
-					"http://server.local", // can be any valid URL as we are bypassing mux
+					"http://any.url", // can be any valid URL as we are bypassing mux
 					nil,
 				),
 			},
@@ -130,7 +130,7 @@ func TestService_NewUser(t *testing.T) {
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
 					"POST",
-					"http://server.local/chronograf/v1/users",
+					"http://any.url",
 					nil,
 				),
 				user: chronograf.User{
@@ -222,7 +222,7 @@ func TestService_RemoveUser(t *testing.T) {
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
 					"DELETE",
-					"http://server.local/chronograf/v1/users/LDAP-Heroku-helena",
+					"http://any.url",
 					nil,
 				),
 				user: chronograf.User{
@@ -305,7 +305,7 @@ func TestService_UpdateUser(t *testing.T) {
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
 					"PATCH",
-					"http://server.local/chronograf/v1/users/OAuth2-GitHub-bobbetta",
+					"http://any.url",
 					nil,
 				),
 				user: &chronograf.User{
