@@ -30,7 +30,7 @@ func TestService_UserID(t *testing.T) {
 		name            string
 		fields          fields
 		args            args
-		ID              string
+		id              string
 		wantStatus      int
 		wantContentType string
 		wantBody        string
@@ -63,7 +63,7 @@ func TestService_UserID(t *testing.T) {
 					},
 				},
 			},
-			ID:              "OAuth2-Google-billysteve",
+			id:              "OAuth2-Google-billysteve",
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
 			wantBody:        `{"id":"OAuth2-Google-billysteve","username":"billysteve","provider":"Google","scheme":"OAuth2","links":{"self":"/chronograf/v1/users/OAuth2-Google-billysteve"}}`,
@@ -82,7 +82,7 @@ func TestService_UserID(t *testing.T) {
 				httprouter.Params{
 					{
 						Key:   "id",
-						Value: tt.ID,
+						Value: tt.id,
 					},
 				}))
 
