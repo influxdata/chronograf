@@ -129,20 +129,18 @@ func (s *Service) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	id := httprouter.GetParamFromContext(ctx, "id")
-	user := &chronograf.User{
-		ID:       id,
-		Username: req.Username,
-		Provider: req.Provider,
-		Scheme:   req.Scheme,
-	}
-
-	err := s.UsersStore.Update(ctx, user)
-	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
-		return
-	}
 
 	u, err := s.UsersStore.Get(ctx, id)
+	if err != nil {
+		Error(w, http.StatusNotFound, err.Error(), s.Logger)
+	}
+
+	// TODO: should we diff and only set non-nil fields?
+	u.Username = req.Username
+	u.Provider = req.Provider
+	u.Scheme = req.Scheme
+
+	err = s.UsersStore.Update(ctx, u)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return

@@ -287,7 +287,7 @@ func TestService_UpdateUser(t *testing.T) {
 		name            string
 		fields          fields
 		args            args
-		userID          string
+		id              string
 		wantStatus      int
 		wantContentType string
 		wantBody        string
@@ -301,12 +301,17 @@ func TestService_UpdateUser(t *testing.T) {
 						return nil
 					},
 					GetF: func(ctx context.Context, ID string) (*chronograf.User, error) {
-						return &chronograf.User{
-							ID:       "OAuth2-GitHub-bobbetta",
-							Username: "bobbetta2",
-							Provider: "GitHub",
-							Scheme:   "OAuth2",
-						}, nil
+						switch ID {
+						case "OAuth2-GitHub-bobbetta":
+							return &chronograf.User{
+								ID:       "OAuth2-GitHub-bobbetta",
+								Username: "bobbetta2",
+								Provider: "GitHub",
+								Scheme:   "OAuth2",
+							}, nil
+						default:
+							return nil, fmt.Errorf("User with ID %v not found", ID)
+						}
 					},
 				},
 			},
@@ -324,7 +329,7 @@ func TestService_UpdateUser(t *testing.T) {
 					Scheme:   "OAuth2",
 				},
 			},
-			userID:          "OAuth2-GitHub-bobbetta",
+			id:              "OAuth2-GitHub-bobbetta",
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
 			wantBody:        `{"id":"OAuth2-GitHub-bobbetta","username":"bobbetta2","provider":"GitHub","scheme":"OAuth2","links":{"self":"/chronograf/v1/users/OAuth2-GitHub-bobbetta"}}`,
@@ -337,6 +342,13 @@ func TestService_UpdateUser(t *testing.T) {
 				Logger:     tt.fields.Logger,
 			}
 
+			tt.args.r = tt.args.r.WithContext(httprouter.WithParams(context.Background(),
+				httprouter.Params{
+					{
+						Key:   "id",
+						Value: tt.id,
+					},
+				}))
 			buf, _ := json.Marshal(tt.args.user)
 			tt.args.r.Body = ioutil.NopCloser(bytes.NewReader(buf))
 
