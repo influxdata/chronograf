@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -40,7 +41,7 @@ func TestService_UserID(t *testing.T) {
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
 					"GET",
-					"http://server.local/chronograf/v1/users",
+					"http://server.local", // can be any valid URL as we are bypassing mux
 					nil,
 				),
 			},
@@ -48,16 +49,21 @@ func TestService_UserID(t *testing.T) {
 				Logger: log.New(log.DebugLevel),
 				UsersStore: &mocks.UsersStore{
 					GetF: func(ctx context.Context, ID string) (*chronograf.User, error) {
-						return &chronograf.User{
-							ID:       "OAuth2-Google-billysteve",
-							Username: "billysteve",
-							Provider: "Google",
-							Scheme:   "OAuth2",
-						}, nil
+						switch ID {
+						case "OAuth2-Google-billysteve":
+							return &chronograf.User{
+								ID:       "OAuth2-Google-billysteve",
+								Username: "billysteve",
+								Provider: "Google",
+								Scheme:   "OAuth2",
+							}, nil
+						default:
+							return nil, fmt.Errorf("User with ID %v not found", ID)
+						}
 					},
 				},
 			},
-			ID:              "1",
+			ID:              "OAuth2-Google-billysteve",
 			wantStatus:      http.StatusOK,
 			wantContentType: "application/json",
 			wantBody:        `{"id":"OAuth2-Google-billysteve","username":"billysteve","provider":"Google","scheme":"OAuth2","links":{"self":"/chronograf/v1/users/OAuth2-Google-billysteve"}}`,
@@ -71,7 +77,14 @@ func TestService_UserID(t *testing.T) {
 				Logger:     tt.fields.Logger,
 			}
 
-			tt.args.r = tt.args.r.WithContext(context.WithValue(context.Background(), "id", tt.ID))
+			tt.args.r = tt.args.r.WithContext(httprouter.WithParams(
+				context.Background(),
+				httprouter.Params{
+					{
+						Key:   "id",
+						Value: tt.ID,
+					},
+				}))
 
 			h.UserID(tt.args.w, tt.args.r)
 
