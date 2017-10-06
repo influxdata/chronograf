@@ -244,7 +244,7 @@ func TestService_RemoveUser(t *testing.T) {
 				httprouter.Params{
 					{
 						Key:   "id",
-						Value: tt.args.user.ID,
+						Value: tt.id,
 					},
 				},
 			))
