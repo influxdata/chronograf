@@ -72,7 +72,7 @@ func TestService_UserID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Service{
+			s := &Service{
 				UsersStore: tt.fields.UsersStore,
 				Logger:     tt.fields.Logger,
 			}
@@ -86,7 +86,7 @@ func TestService_UserID(t *testing.T) {
 					},
 				}))
 
-			h.UserID(tt.args.w, tt.args.r)
+			s.UserID(tt.args.w, tt.args.r)
 
 			resp := tt.args.w.Result()
 			content := resp.Header.Get("Content-Type")
@@ -159,7 +159,7 @@ func TestService_NewUser(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &Service{
+			s := &Service{
 				UsersStore: tt.fields.UsersStore,
 				Logger:     tt.fields.Logger,
 			}
@@ -167,7 +167,7 @@ func TestService_NewUser(t *testing.T) {
 			buf, _ := json.Marshal(tt.args.user)
 			tt.args.r.Body = ioutil.NopCloser(bytes.NewReader(buf))
 
-			h.NewUser(tt.args.w, tt.args.r)
+			s.NewUser(tt.args.w, tt.args.r)
 
 			resp := tt.args.w.Result()
 			content := resp.Header.Get("Content-Type")
