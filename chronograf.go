@@ -594,7 +594,7 @@ type UsersStore interface {
 	Delete(ctx context.Context, ID string) error
 	// Get retrieves a user if ID exists.
 	Get(ctx context.Context, ID string) (*User, error)
-	// Update the user's permissions or roles
+	// Update the user
 	Update(context.Context, *User) error
 }
 

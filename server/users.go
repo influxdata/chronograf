@@ -2,7 +2,7 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/bouk/httprouter"
@@ -18,13 +18,20 @@ type userRequest struct {
 
 func (r *userRequest) ValidCreate() error {
 	if r.Username == "" {
-		return fmt.Errorf("Username required on Chronograf User request body")
+		return errors.New("Username required on Chronograf User request body")
 	}
 	if r.Provider == "" {
-		return fmt.Errorf("Provider required on Chronograf User request body")
+		return errors.New("Provider required on Chronograf User request body")
 	}
 	if r.Scheme == "" {
-		return fmt.Errorf("Scheme required on Chronograf User request body")
+		return errors.New("Scheme required on Chronograf User request body")
+	}
+	return nil
+}
+
+func (r *userRequest) ValidUpdate() error {
+	if r.Username == "" && r.Provider == "" && r.Scheme == "" {
+		return errors.New("No fields to update")
 	}
 	return nil
 }
@@ -102,4 +109,42 @@ func (s *Service) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (s *Service) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var req userRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		invalidJSON(w, s.Logger)
+		return
+	}
+
+	if err := req.ValidUpdate(); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
+
+	ctx := r.Context()
+	id := httprouter.GetParamFromContext(ctx, "id")
+	user := &chronograf.User{
+		ID:       id,
+		Username: req.Username,
+		Provider: req.Provider,
+		Scheme:   req.Scheme,
+	}
+
+	err := s.UsersStore.Update(ctx, user)
+	if err != nil {
+		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+		return
+	}
+
+	u, err := s.UsersStore.Get(ctx, id)
+	if err != nil {
+		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+		return
+	}
+
+	cu := newUserResponse(u)
+	w.Header().Add("Location", cu.Links.Self)
+	encodeJSON(w, http.StatusOK, cu, s.Logger)
 }

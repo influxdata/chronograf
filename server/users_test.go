@@ -188,13 +188,11 @@ func TestService_RemoveUser(t *testing.T) {
 		id string
 	}
 	tests := []struct {
-		name            string
-		fields          fields
-		args            args
-		ID              string
-		wantStatus      int
-		wantContentType string
-		wantBody        string
+		name       string
+		fields     fields
+		args       args
+		ID         string
+		wantStatus int
 	}{
 		{
 			name: "Delete a Chronograf User",
@@ -239,17 +237,95 @@ func TestService_RemoveUser(t *testing.T) {
 			s.RemoveUser(tt.args.w, tt.args.r)
 
 			resp := tt.args.w.Result()
-			content := resp.Header.Get("content-type")
-			body, _ := ioutil.ReadAll(resp.Body)
 
 			if resp.StatusCode != tt.wantStatus {
 				t.Errorf("%q. RemoveUser() = %v, want %v", tt.name, resp.StatusCode, tt.wantStatus)
 			}
-			if tt.wantContentType != "" && content != tt.wantContentType {
-				t.Errorf("%q. RemoveUser() = %v, want %v", tt.name, content, tt.wantContentType)
+		})
+	}
+}
+
+func TestService_UpdateUser(t *testing.T) {
+	type fields struct {
+		UsersStore chronograf.UsersStore
+		Logger     chronograf.Logger
+	}
+	type args struct {
+		w    *httptest.ResponseRecorder
+		r    *http.Request
+		user *chronograf.User
+	}
+	tests := []struct {
+		name            string
+		fields          fields
+		args            args
+		userID          string
+		wantStatus      int
+		wantContentType string
+		wantBody        string
+	}{
+		{
+			name: "Update a Chronograf user",
+			fields: fields{
+				Logger: log.New(log.DebugLevel),
+				UsersStore: &mocks.UsersStore{
+					UpdateF: func(ctx context.Context, user *chronograf.User) error {
+						return nil
+					},
+					GetF: func(ctx context.Context, ID string) (*chronograf.User, error) {
+						return &chronograf.User{
+							ID:       "OAuth2-GitHub-bobbetta",
+							Username: "bobbetta2",
+							Provider: "GitHub",
+							Scheme:   "OAuth2",
+						}, nil
+					},
+				},
+			},
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"PATCH",
+					"http://server.local/chronograf/v1/users/OAuth2-GitHub-bobbetta",
+					nil,
+				),
+				user: &chronograf.User{
+					ID:       "OAuth2-GitHub-bobbetta",
+					Username: "bobbetta2",
+					Provider: "GitHub",
+					Scheme:   "OAuth2",
+				},
+			},
+			userID:          "OAuth2-GitHub-bobbetta",
+			wantStatus:      http.StatusOK,
+			wantContentType: "application/json",
+			wantBody:        `{"id":"OAuth2-GitHub-bobbetta","username":"bobbetta2","provider":"GitHub","scheme":"OAuth2","links":{"self":"/chronograf/v1/users/OAuth2-GitHub-bobbetta"}}`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Service{
+				UsersStore: tt.fields.UsersStore,
+				Logger:     tt.fields.Logger,
 			}
-			if tt.wantBody != "" && string(body) != tt.wantBody {
-				t.Errorf("%q. RemoveUser() = \n***%v***\n,\nwant\n***%v***", tt.name, string(body), tt.wantBody)
+
+			buf, _ := json.Marshal(tt.args.user)
+			tt.args.r.Body = ioutil.NopCloser(bytes.NewReader(buf))
+
+			s.UpdateUser(tt.args.w, tt.args.r)
+
+			resp := tt.args.w.Result()
+			content := resp.Header.Get("Content-Type")
+			body, _ := ioutil.ReadAll(resp.Body)
+
+			if resp.StatusCode != tt.wantStatus {
+				t.Errorf("%q. UpdateUser() = %v, want %v", tt.name, resp.StatusCode, tt.wantStatus)
+			}
+			if tt.wantContentType != "" && content != tt.wantContentType {
+				t.Errorf("%q. UpdateUser() = %v, want %v", tt.name, content, tt.wantContentType)
+			}
+			if eq, _ := jsonEqual(string(body), tt.wantBody); tt.wantBody != "" && !eq {
+				t.Errorf("%q. UpdateUser() = \n***%v***\n,\nwant\n***%v***", tt.name, string(body), tt.wantBody)
 			}
 		})
 	}
