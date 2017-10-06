@@ -102,32 +102,32 @@ type TimeSeries interface {
 	// Connect will connect to the time series using the information in `Source`.
 	Connect(context.Context, *Source) error
 	// UsersStore represents the user accounts within the TimeSeries database
-	Users(context.Context) UsersStore
+	Users(context.Context) SourceUsersStore
 	// Permissions returns all valid names permissions in this database
-	Permissions(context.Context) Permissions
+	Permissions(context.Context) SourcePermissions
 	// Roles represents the roles associated with this TimesSeriesDatabase
-	Roles(context.Context) (RolesStore, error)
+	Roles(context.Context) (SourceRolesStore, error)
 }
 
-// Role is a restricted set of permissions assigned to a set of users.
-type Role struct {
-	Name        string      `json:"name"`
-	Permissions Permissions `json:"permissions,omitempty"`
-	Users       []User      `json:"users,omitempty"`
+// SourceRole is a restricted set of permissions assigned to a set of users.
+type SourceRole struct {
+	Name        string            `json:"name"`
+	Permissions SourcePermissions `json:"permissions,omitempty"`
+	Users       []SourceUser      `json:"users,omitempty"`
 }
 
-// RolesStore is the Storage and retrieval of authentication information
-type RolesStore interface {
+// SourceRolesStore is the Storage and retrieval of authentication information
+type SourceRolesStore interface {
 	// All lists all roles from the RolesStore
-	All(context.Context) ([]Role, error)
+	All(context.Context) ([]SourceRole, error)
 	// Create a new Role in the RolesStore
-	Add(context.Context, *Role) (*Role, error)
+	Add(context.Context, *SourceRole) (*SourceRole, error)
 	// Delete the Role from the RolesStore
-	Delete(context.Context, *Role) error
+	Delete(context.Context, *SourceRole) error
 	// Get retrieves a role if name exists.
-	Get(ctx context.Context, name string) (*Role, error)
+	Get(ctx context.Context, name string) (*SourceRole, error)
 	// Update the roles' users or permissions
-	Update(context.Context, *Role) error
+	Update(context.Context, *SourceRole) error
 }
 
 // Range represents an upper and lower bound for data
@@ -578,16 +578,16 @@ const (
 	DBScope Scope = "database"
 )
 
-// Permission is a specific allowance for User or Role bound to a
+// SourcePermission is a specific allowance for SourceUser or SourceRole bound to a
 // scope of the data source
-type Permission struct {
+type SourcePermission struct {
 	Scope   Scope      `json:"scope"`
 	Name    string     `json:"name,omitempty"`
 	Allowed Allowances `json:"allowed"`
 }
 
-// Permissions represent the entire set of permissions a User or Role may have
-type Permissions []Permission
+// SourcePermissions represent the entire set of permissions a SourceUser or SourceRole may have
+type SourcePermissions []SourcePermission
 
 // Allowances defines what actions a user can have on a scoped permission
 type Allowances []string
@@ -595,15 +595,15 @@ type Allowances []string
 // Scope defines the location of access of a permission
 type Scope string
 
-// User represents an authenticated user.
+// User represents an authenticated Chronograf user.
 type User struct {
-	Name        string      `json:"name"`
-	Passwd      string      `json:"password"`
-	Permissions Permissions `json:"permissions,omitempty"`
-	Roles       []Role      `json:"roles,omitempty"`
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Provider string `json:"provider,omitempty"`
+	Scheme   string `json:"scheme,omitempty"`
 }
 
-// UsersStore is the Storage and retrieval of authentication information
+// UsersStore is the Storage and retrieval of Chronograf user authentication information
 type UsersStore interface {
 	// All lists all users from the UsersStore
 	All(context.Context) ([]User, error)
@@ -611,10 +611,32 @@ type UsersStore interface {
 	Add(context.Context, *User) (*User, error)
 	// Delete the User from the UsersStore
 	Delete(context.Context, *User) error
-	// Get retrieves a user if name exists.
-	Get(ctx context.Context, name string) (*User, error)
-	// Update the user's permissions or roles
+	// Get retrieves a user if ID exists.
+	Get(ctx context.Context, ID string) (*User, error)
+	// Update the user
 	Update(context.Context, *User) error
+}
+
+// SourceUser represents an authenticated InfluxDB user.
+type SourceUser struct {
+	Name        string            `json:"name"`
+	Passwd      string            `json:"password"`
+	Permissions SourcePermissions `json:"permissions,omitempty"`
+	Roles       []SourceRole      `json:"roles,omitempty"`
+}
+
+// SourceUsersStore is the Storage and retrieval of InfluxDB user authentication information
+type SourceUsersStore interface {
+	// All lists all users from the SourceUsersStore
+	All(context.Context) ([]SourceUser, error)
+	// Create a new user in the SourceUsersStore
+	Add(context.Context, *SourceUser) (*SourceUser, error)
+	// Delete the user from the SourceUsersStore
+	Delete(context.Context, *SourceUser) error
+	// Get retrieves a user if name exists.
+	Get(ctx context.Context, name string) (*SourceUser, error)
+	// Update the user's permissions or roles
+	Update(context.Context, *SourceUser) error
 }
 
 // Database represents a database in a time series source

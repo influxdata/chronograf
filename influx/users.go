@@ -9,7 +9,7 @@ import (
 )
 
 // Add a new User in InfluxDB
-func (c *Client) Add(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
+func (c *Client) Add(ctx context.Context, u *chronograf.SourceUser) (*chronograf.SourceUser, error) {
 	_, err := c.Query(ctx, chronograf.Query{
 		Command: fmt.Sprintf(`CREATE USER "%s" WITH PASSWORD '%s'`, u.Name, u.Passwd),
 	})
@@ -25,7 +25,7 @@ func (c *Client) Add(ctx context.Context, u *chronograf.User) (*chronograf.User,
 }
 
 // Delete the User from InfluxDB
-func (c *Client) Delete(ctx context.Context, u *chronograf.User) error {
+func (c *Client) Delete(ctx context.Context, u *chronograf.SourceUser) error {
 	res, err := c.Query(ctx, chronograf.Query{
 		Command: fmt.Sprintf(`DROP USER "%s"`, u.Name),
 	})
@@ -54,7 +54,7 @@ func (c *Client) Delete(ctx context.Context, u *chronograf.User) error {
 }
 
 // Get retrieves a user if name exists.
-func (c *Client) Get(ctx context.Context, name string) (*chronograf.User, error) {
+func (c *Client) Get(ctx context.Context, name string) (*chronograf.SourceUser, error) {
 	users, err := c.showUsers(ctx)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (c *Client) Get(ctx context.Context, name string) (*chronograf.User, error)
 }
 
 // Update the user's permissions or roles
-func (c *Client) Update(ctx context.Context, u *chronograf.User) error {
+func (c *Client) Update(ctx context.Context, u *chronograf.SourceUser) error {
 	// Only allow one type of change at a time. If it is a password
 	// change then do it and return without any changes to permissions
 	if u.Passwd != "" {
@@ -103,7 +103,7 @@ func (c *Client) Update(ctx context.Context, u *chronograf.User) error {
 }
 
 // All users in influx
-func (c *Client) All(ctx context.Context) ([]chronograf.User, error) {
+func (c *Client) All(ctx context.Context) ([]chronograf.SourceUser, error) {
 	users, err := c.showUsers(ctx)
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func (c *Client) All(ctx context.Context) ([]chronograf.User, error) {
 }
 
 // showUsers runs SHOW USERS InfluxQL command and returns chronograf users.
-func (c *Client) showUsers(ctx context.Context) ([]chronograf.User, error) {
+func (c *Client) showUsers(ctx context.Context) ([]chronograf.SourceUser, error) {
 	res, err := c.Query(ctx, chronograf.Query{
 		Command: `SHOW USERS`,
 	})
@@ -143,7 +143,7 @@ func (c *Client) showUsers(ctx context.Context) ([]chronograf.User, error) {
 	return results.Users(), nil
 }
 
-func (c *Client) grantPermission(ctx context.Context, username string, perm chronograf.Permission) error {
+func (c *Client) grantPermission(ctx context.Context, username string, perm chronograf.SourcePermission) error {
 	query := ToGrant(username, perm)
 	if query == "" {
 		return nil
@@ -155,7 +155,7 @@ func (c *Client) grantPermission(ctx context.Context, username string, perm chro
 	return err
 }
 
-func (c *Client) revokePermission(ctx context.Context, username string, perm chronograf.Permission) error {
+func (c *Client) revokePermission(ctx context.Context, username string, perm chronograf.SourcePermission) error {
 	query := ToRevoke(username, perm)
 	if query == "" {
 		return nil
@@ -167,7 +167,7 @@ func (c *Client) revokePermission(ctx context.Context, username string, perm chr
 	return err
 }
 
-func (c *Client) userPermissions(ctx context.Context, name string) (chronograf.Permissions, error) {
+func (c *Client) userPermissions(ctx context.Context, name string) (chronograf.SourcePermissions, error) {
 	res, err := c.Query(ctx, chronograf.Query{
 		Command: fmt.Sprintf(`SHOW GRANTS FOR "%s"`, name),
 	})

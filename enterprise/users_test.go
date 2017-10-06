@@ -17,13 +17,13 @@ func TestClient_Add(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		u   *chronograf.User
+		u   *chronograf.SourceUser
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    *chronograf.User
+		want    *chronograf.SourceUser
 		wantErr bool
 	}{
 		{
@@ -56,20 +56,20 @@ func TestClient_Add(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
 				},
 			},
-			want: &chronograf.User{
+			want: &chronograf.SourceUser{
 				Name: "marty",
-				Permissions: chronograf.Permissions{
+				Permissions: chronograf.SourcePermissions{
 					{
 						Scope:   chronograf.AllScope,
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{},
+				Roles: []chronograf.SourceRole{},
 			},
 		},
 		{
@@ -113,29 +113,29 @@ func TestClient_Add(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
-					Roles: []chronograf.Role{
+					Roles: []chronograf.SourceRole{
 						{
 							Name: "admin",
 						},
 					},
 				},
 			},
-			want: &chronograf.User{
+			want: &chronograf.SourceUser{
 				Name: "marty",
-				Permissions: chronograf.Permissions{
+				Permissions: chronograf.SourcePermissions{
 					{
 						Scope:   chronograf.AllScope,
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{
+				Roles: []chronograf.SourceRole{
 					{
 						Name:        "admin",
-						Users:       []chronograf.User{},
-						Permissions: chronograf.Permissions{},
+						Users:       []chronograf.SourceUser{},
+						Permissions: chronograf.SourcePermissions{},
 					},
 				},
 			},
@@ -151,7 +151,7 @@ func TestClient_Add(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
 				},
@@ -182,7 +182,7 @@ func TestClient_Delete(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		u   *chronograf.User
+		u   *chronograf.SourceUser
 	}
 	tests := []struct {
 		name    string
@@ -201,7 +201,7 @@ func TestClient_Delete(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
 				},
@@ -218,7 +218,7 @@ func TestClient_Delete(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
 				},
@@ -250,7 +250,7 @@ func TestClient_Get(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *chronograf.User
+		want    *chronograf.SourceUser
 		wantErr bool
 	}{
 		{
@@ -279,15 +279,15 @@ func TestClient_Get(t *testing.T) {
 				ctx:  context.Background(),
 				name: "marty",
 			},
-			want: &chronograf.User{
+			want: &chronograf.SourceUser{
 				Name: "marty",
-				Permissions: chronograf.Permissions{
+				Permissions: chronograf.SourcePermissions{
 					{
 						Scope:   chronograf.AllScope,
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{},
+				Roles: []chronograf.SourceRole{},
 			},
 		},
 		{
@@ -332,24 +332,24 @@ func TestClient_Get(t *testing.T) {
 				ctx:  context.Background(),
 				name: "marty",
 			},
-			want: &chronograf.User{
+			want: &chronograf.SourceUser{
 				Name: "marty",
-				Permissions: chronograf.Permissions{
+				Permissions: chronograf.SourcePermissions{
 					{
 						Scope:   chronograf.AllScope,
 						Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 					},
 				},
-				Roles: []chronograf.Role{
+				Roles: []chronograf.SourceRole{
 					{
 						Name: "timetravels",
-						Permissions: chronograf.Permissions{
+						Permissions: chronograf.SourcePermissions{
 							{
 								Scope:   chronograf.AllScope,
 								Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 							},
 						},
-						Users: []chronograf.User{},
+						Users: []chronograf.SourceUser{},
 					},
 				},
 			},
@@ -393,7 +393,7 @@ func TestClient_Update(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		u   *chronograf.User
+		u   *chronograf.SourceUser
 	}
 	tests := []struct {
 		name    string
@@ -412,7 +412,7 @@ func TestClient_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
 				},
@@ -429,7 +429,7 @@ func TestClient_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name:   "marty",
 					Passwd: "johnny be good",
 				},
@@ -450,9 +450,9 @@ func TestClient_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name: "marty",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   chronograf.AllScope,
 							Allowed: chronograf.Allowances{"ViewChronograf", "KapacitorAPI"},
@@ -479,15 +479,15 @@ func TestClient_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name: "marty",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   chronograf.AllScope,
 							Allowed: chronograf.Allowances{"ViewChronograf", "KapacitorAPI"},
 						},
 					},
-					Roles: []chronograf.Role{
+					Roles: []chronograf.SourceRole{
 						{
 							Name: "adminrole",
 						},
@@ -510,9 +510,9 @@ func TestClient_Update(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				u: &chronograf.User{
+				u: &chronograf.SourceUser{
 					Name: "marty",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   chronograf.AllScope,
 							Allowed: chronograf.Allowances{"ViewChronograf", "KapacitorAPI"},
@@ -546,7 +546,7 @@ func TestClient_All(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    []chronograf.User
+		want    []chronograf.SourceUser
 		wantErr bool
 	}{
 		{
@@ -578,16 +578,16 @@ func TestClient_All(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: []chronograf.User{
+			want: []chronograf.SourceUser{
 				{
 					Name: "marty",
-					Permissions: chronograf.Permissions{
+					Permissions: chronograf.SourcePermissions{
 						{
 							Scope:   chronograf.AllScope,
 							Allowed: chronograf.Allowances{"ViewChronograf", "ReadData", "WriteData"},
 						},
 					},
-					Roles: []chronograf.Role{},
+					Roles: []chronograf.SourceRole{},
 				},
 			},
 		},
@@ -625,13 +625,13 @@ func TestClient_All(t *testing.T) {
 func Test_ToEnterprise(t *testing.T) {
 	tests := []struct {
 		name  string
-		perms chronograf.Permissions
+		perms chronograf.SourcePermissions
 		want  enterprise.Permissions
 	}{
 		{
 			name: "All Scopes",
 			want: enterprise.Permissions{"": []string{"ViewChronograf", "KapacitorAPI"}},
-			perms: chronograf.Permissions{
+			perms: chronograf.SourcePermissions{
 				{
 					Scope:   chronograf.AllScope,
 					Allowed: chronograf.Allowances{"ViewChronograf", "KapacitorAPI"},
@@ -641,7 +641,7 @@ func Test_ToEnterprise(t *testing.T) {
 		{
 			name: "DB Scope",
 			want: enterprise.Permissions{"telegraf": []string{"ReadData", "WriteData"}},
-			perms: chronograf.Permissions{
+			perms: chronograf.SourcePermissions{
 				{
 					Scope:   chronograf.DBScope,
 					Name:    "telegraf",
@@ -661,12 +661,12 @@ func Test_ToChronograf(t *testing.T) {
 	tests := []struct {
 		name  string
 		perms enterprise.Permissions
-		want  chronograf.Permissions
+		want  chronograf.SourcePermissions
 	}{
 		{
 			name:  "All Scopes",
 			perms: enterprise.Permissions{"": []string{"ViewChronograf", "KapacitorAPI"}},
-			want: chronograf.Permissions{
+			want: chronograf.SourcePermissions{
 				{
 					Scope:   chronograf.AllScope,
 					Allowed: chronograf.Allowances{"ViewChronograf", "KapacitorAPI"},
@@ -676,7 +676,7 @@ func Test_ToChronograf(t *testing.T) {
 		{
 			name:  "DB Scope",
 			perms: enterprise.Permissions{"telegraf": []string{"ReadData", "WriteData"}},
-			want: chronograf.Permissions{
+			want: chronograf.SourcePermissions{
 				{
 					Scope:   chronograf.DBScope,
 					Name:    "telegraf",

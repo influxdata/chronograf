@@ -13,7 +13,7 @@ type UsersStore struct {
 	AllF    func(context.Context) ([]chronograf.User, error)
 	AddF    func(context.Context, *chronograf.User) (*chronograf.User, error)
 	DeleteF func(context.Context, *chronograf.User) error
-	GetF    func(ctx context.Context, name string) (*chronograf.User, error)
+	GetF    func(ctx context.Context, ID string) (*chronograf.User, error)
 	UpdateF func(context.Context, *chronograf.User) error
 }
 
@@ -32,9 +32,9 @@ func (s *UsersStore) Delete(ctx context.Context, u *chronograf.User) error {
 	return s.DeleteF(ctx, u)
 }
 
-// Get retrieves a user if name exists.
-func (s *UsersStore) Get(ctx context.Context, name string) (*chronograf.User, error) {
-	return s.GetF(ctx, name)
+// Get retrieves a user if ID exists.
+func (s *UsersStore) Get(ctx context.Context, ID string) (*chronograf.User, error) {
+	return s.GetF(ctx, ID)
 }
 
 // Update the user's permissions or roles

@@ -9,8 +9,8 @@ import (
 	"github.com/influxdata/chronograf"
 )
 
-// NewRole adds role to source
-func (h *Service) NewRole(w http.ResponseWriter, r *http.Request) {
+// NewSourceRole adds role to source
+func (h *Service) NewSourceRole(w http.ResponseWriter, r *http.Request) {
 	var req sourceRoleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		invalidJSON(w, h.Logger)
@@ -28,7 +28,7 @@ func (h *Service) NewRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -39,19 +39,19 @@ func (h *Service) NewRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := roles.Add(ctx, &req.Role)
+	res, err := roles.Add(ctx, &req.SourceRole)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
 
-	rr := newRoleResponse(srcID, res)
+	rr := newSourceRoleResponse(srcID, res)
 	w.Header().Add("Location", rr.Links.Self)
 	encodeJSON(w, http.StatusCreated, rr, h.Logger)
 }
 
-// UpdateRole changes the permissions or users of a role
-func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
+// UpdateSourceRole changes the permissions or users of a role
+func (h *Service) UpdateSourceRole(w http.ResponseWriter, r *http.Request) {
 	var req sourceRoleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		invalidJSON(w, h.Logger)
@@ -68,7 +68,7 @@ func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -77,7 +77,7 @@ func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
 	rid := httprouter.GetParamFromContext(ctx, "rid")
 	req.Name = rid
 
-	if err := roles.Update(ctx, &req.Role); err != nil {
+	if err := roles.Update(ctx, &req.SourceRole); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -87,20 +87,20 @@ func (h *Service) UpdateRole(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
-	rr := newRoleResponse(srcID, role)
+	rr := newSourceRoleResponse(srcID, role)
 	w.Header().Add("Location", rr.Links.Self)
 	encodeJSON(w, http.StatusOK, rr, h.Logger)
 }
 
-// RoleID retrieves a role with ID from store.
-func (h *Service) RoleID(w http.ResponseWriter, r *http.Request) {
+// SourceRoleID retrieves a role with ID from store.
+func (h *Service) SourceRoleID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -112,19 +112,19 @@ func (h *Service) RoleID(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
-	rr := newRoleResponse(srcID, role)
+	rr := newSourceRoleResponse(srcID, role)
 	encodeJSON(w, http.StatusOK, rr, h.Logger)
 }
 
-// Roles retrieves all roles from the store
-func (h *Service) Roles(w http.ResponseWriter, r *http.Request) {
+// SourceRoles retrieves all roles from the store
+func (h *Service) SourceRoles(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
 		return
 	}
 
-	store, ok := h.hasRoles(ctx, ts)
+	store, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
@@ -136,33 +136,33 @@ func (h *Service) Roles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rr := make([]roleResponse, len(roles))
+	rr := make([]sourceRoleResponse, len(roles))
 	for i, role := range roles {
-		rr[i] = newRoleResponse(srcID, &role)
+		rr[i] = newSourceRoleResponse(srcID, &role)
 	}
 
 	res := struct {
-		Roles []roleResponse `json:"roles"`
+		Roles []sourceRoleResponse `json:"roles"`
 	}{rr}
 	encodeJSON(w, http.StatusOK, res, h.Logger)
 }
 
-// RemoveRole removes role from data source.
-func (h *Service) RemoveRole(w http.ResponseWriter, r *http.Request) {
+// RemoveSourceRole removes role from data source.
+func (h *Service) RemoveSourceRole(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	srcID, ts, err := h.sourcesSeries(ctx, w, r)
 	if err != nil {
 		return
 	}
 
-	roles, ok := h.hasRoles(ctx, ts)
+	roles, ok := h.hasSourceRoles(ctx, ts)
 	if !ok {
 		Error(w, http.StatusNotFound, fmt.Sprintf("Source %d does not have role capability", srcID), h.Logger)
 		return
 	}
 
 	rid := httprouter.GetParamFromContext(ctx, "rid")
-	if err := roles.Delete(ctx, &chronograf.Role{Name: rid}); err != nil {
+	if err := roles.Delete(ctx, &chronograf.SourceRole{Name: rid}); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), h.Logger)
 		return
 	}
@@ -171,7 +171,7 @@ func (h *Service) RemoveRole(w http.ResponseWriter, r *http.Request) {
 
 // sourceRoleRequest is the format used for both creating and updating roles
 type sourceRoleRequest struct {
-	chronograf.Role
+	chronograf.SourceRole
 }
 
 func (r *sourceRoleRequest) ValidCreate() error {
@@ -183,7 +183,7 @@ func (r *sourceRoleRequest) ValidCreate() error {
 			return fmt.Errorf("Username required")
 		}
 	}
-	return validPermissions(&r.Permissions)
+	return validSourcePermissions(&r.Permissions)
 }
 
 func (r *sourceRoleRequest) ValidUpdate() error {
@@ -195,30 +195,30 @@ func (r *sourceRoleRequest) ValidUpdate() error {
 			return fmt.Errorf("Username required")
 		}
 	}
-	return validPermissions(&r.Permissions)
+	return validSourcePermissions(&r.Permissions)
 }
 
-type roleResponse struct {
-	Users       []*userResponse        `json:"users"`
-	Name        string                 `json:"name"`
-	Permissions chronograf.Permissions `json:"permissions"`
-	Links       selfLinks              `json:"links"`
+type sourceRoleResponse struct {
+	Users       []*sourceUserResponse        `json:"users"`
+	Name        string                       `json:"name"`
+	Permissions chronograf.SourcePermissions `json:"permissions"`
+	Links       selfLinks                    `json:"links"`
 }
 
-func newRoleResponse(srcID int, res *chronograf.Role) roleResponse {
-	su := make([]*userResponse, len(res.Users))
+func newSourceRoleResponse(srcID int, res *chronograf.SourceRole) sourceRoleResponse {
+	su := make([]*sourceUserResponse, len(res.Users))
 	for i := range res.Users {
 		name := res.Users[i].Name
-		su[i] = newUserResponse(srcID, name)
+		su[i] = newSourceUserResponse(srcID, name)
 	}
 
 	if res.Permissions == nil {
-		res.Permissions = make(chronograf.Permissions, 0)
+		res.Permissions = make(chronograf.SourcePermissions, 0)
 	}
-	return roleResponse{
+	return sourceRoleResponse{
 		Name:        res.Name,
 		Permissions: res.Permissions,
 		Users:       su,
-		Links:       newSelfLinks(srcID, "roles", res.Name),
+		Links:       newSourceSelfLinks(srcID, "roles", res.Name),
 	}
 }

@@ -149,11 +149,11 @@ func TestClient_Permissions(t *testing.T) {
 	tests := []struct {
 		name string
 
-		want chronograf.Permissions
+		want chronograf.SourcePermissions
 	}{
 		{
 			name: "All possible enterprise permissions",
-			want: chronograf.Permissions{
+			want: chronograf.SourcePermissions{
 				{
 					Scope: chronograf.AllScope,
 					Allowed: chronograf.Allowances{

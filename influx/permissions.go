@@ -29,8 +29,8 @@ var (
 )
 
 // Permissions return just READ and WRITE for OSS Influx
-func (c *Client) Permissions(context.Context) chronograf.Permissions {
-	return chronograf.Permissions{
+func (c *Client) Permissions(context.Context) chronograf.SourcePermissions {
+	return chronograf.SourcePermissions{
 		{
 			Scope:   chronograf.AllScope,
 			Allowed: AllowAllAdmin,
@@ -50,8 +50,8 @@ type showResults []struct {
 }
 
 // Users converts SHOW USERS to chronograf Users
-func (r *showResults) Users() []chronograf.User {
-	res := []chronograf.User{}
+func (r *showResults) Users() []chronograf.SourceUser {
+	res := []chronograf.SourceUser{}
 	for _, u := range *r {
 		for _, s := range u.Series {
 			for _, v := range s.Values {
@@ -60,9 +60,9 @@ func (r *showResults) Users() []chronograf.User {
 				} else if admin, ok := v[1].(bool); !ok {
 					continue
 				} else {
-					c := chronograf.User{
+					c := chronograf.SourceUser{
 						Name:        name,
-						Permissions: chronograf.Permissions{},
+						Permissions: chronograf.SourcePermissions{},
 					}
 					if admin {
 						c.Permissions = adminPerms()
@@ -110,11 +110,11 @@ func (r *showResults) RetentionPolicies() []chronograf.RetentionPolicy {
 					continue
 				} else {
 					d := chronograf.RetentionPolicy{
-						Name: name,
-						Duration: duration,
+						Name:          name,
+						Duration:      duration,
 						ShardDuration: sduration,
-						Replication: int32(replication),
-						Default: def,
+						Replication:   int32(replication),
+						Default:       def,
 					}
 					res = append(res, d)
 				}
@@ -125,8 +125,8 @@ func (r *showResults) RetentionPolicies() []chronograf.RetentionPolicy {
 }
 
 // Permissions converts SHOW GRANTS to chronograf.Permissions
-func (r *showResults) Permissions() chronograf.Permissions {
-	res := []chronograf.Permission{}
+func (r *showResults) Permissions() chronograf.SourcePermissions {
+	res := []chronograf.SourcePermission{}
 	for _, u := range *r {
 		for _, s := range u.Series {
 			for _, v := range s.Values {
@@ -135,7 +135,7 @@ func (r *showResults) Permissions() chronograf.Permissions {
 				} else if priv, ok := v[1].(string); !ok {
 					continue
 				} else {
-					c := chronograf.Permission{
+					c := chronograf.SourcePermission{
 						Name:  db,
 						Scope: chronograf.DBScope,
 					}
@@ -158,8 +158,8 @@ func (r *showResults) Permissions() chronograf.Permissions {
 	return res
 }
 
-func adminPerms() chronograf.Permissions {
-	return []chronograf.Permission{
+func adminPerms() chronograf.SourcePermissions {
+	return []chronograf.SourcePermission{
 		{
 			Scope:   chronograf.AllScope,
 			Allowed: AllowAllAdmin,
@@ -168,7 +168,7 @@ func adminPerms() chronograf.Permissions {
 }
 
 // ToInfluxQL converts the permission into InfluxQL
-func ToInfluxQL(action, preposition, username string, perm chronograf.Permission) string {
+func ToInfluxQL(action, preposition, username string, perm chronograf.SourcePermission) string {
 	if perm.Scope == chronograf.AllScope {
 		return fmt.Sprintf(`%s ALL PRIVILEGES %s "%s"`, action, preposition, username)
 	} else if len(perm.Allowed) == 0 {
@@ -183,12 +183,12 @@ func ToInfluxQL(action, preposition, username string, perm chronograf.Permission
 }
 
 // ToRevoke converts the permission into InfluxQL revokes
-func ToRevoke(username string, perm chronograf.Permission) string {
+func ToRevoke(username string, perm chronograf.SourcePermission) string {
 	return ToInfluxQL("REVOKE", "FROM", username, perm)
 }
 
 // ToGrant converts the permission into InfluxQL grants
-func ToGrant(username string, perm chronograf.Permission) string {
+func ToGrant(username string, perm chronograf.SourcePermission) string {
 	if len(perm.Allowed) == 0 {
 		return ""
 	}
@@ -223,7 +223,7 @@ func ToPriv(a chronograf.Allowances) string {
 }
 
 // Difference compares two permission sets and returns a set to be revoked and a set to be added
-func Difference(wants chronograf.Permissions, haves chronograf.Permissions) (revoke chronograf.Permissions, add chronograf.Permissions) {
+func Difference(wants chronograf.SourcePermissions, haves chronograf.SourcePermissions) (revoke chronograf.SourcePermissions, add chronograf.SourcePermissions) {
 	for _, want := range wants {
 		found := false
 		for _, got := range haves {

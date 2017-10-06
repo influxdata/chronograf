@@ -165,12 +165,12 @@ func (c *Client) Connect(ctx context.Context, src *chronograf.Source) error {
 }
 
 // Users transforms InfluxDB into a user store
-func (c *Client) Users(ctx context.Context) chronograf.UsersStore {
+func (c *Client) Users(ctx context.Context) chronograf.SourceUsersStore {
 	return c
 }
 
 // Roles aren't support in OSS
-func (c *Client) Roles(ctx context.Context) (chronograf.RolesStore, error) {
+func (c *Client) Roles(ctx context.Context) (chronograf.SourceRolesStore, error) {
 	return nil, fmt.Errorf("Roles not support in open-source InfluxDB.  Roles are support in Influx Enterprise")
 }
 

@@ -11,12 +11,12 @@ func TestRoles_ToChronograf(t *testing.T) {
 	tests := []struct {
 		name  string
 		roles []Role
-		want  []chronograf.Role
+		want  []chronograf.SourceRole
 	}{
 		{
 			name:  "empty roles",
 			roles: []Role{},
-			want:  []chronograf.Role{},
+			want:  []chronograf.SourceRole{},
 		},
 	}
 	for _, tt := range tests {

@@ -114,7 +114,7 @@ func TestService_NewSourceRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return nil, fmt.Errorf("roles not supported")
 					},
 				},
@@ -151,12 +151,12 @@ func TestService_NewSourceRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return &mocks.RolesStore{
-							AddF: func(ctx context.Context, u *chronograf.Role) (*chronograf.Role, error) {
+							AddF: func(ctx context.Context, u *chronograf.SourceRole) (*chronograf.SourceRole, error) {
 								return nil, fmt.Errorf("server had and issue")
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
+							GetF: func(ctx context.Context, name string) (*chronograf.SourceRole, error) {
 								return nil, fmt.Errorf("No such role")
 							},
 						}, nil
@@ -195,12 +195,12 @@ func TestService_NewSourceRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return &mocks.RolesStore{
-							AddF: func(ctx context.Context, u *chronograf.Role) (*chronograf.Role, error) {
+							AddF: func(ctx context.Context, u *chronograf.SourceRole) (*chronograf.SourceRole, error) {
 								return u, nil
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
+							GetF: func(ctx context.Context, name string) (*chronograf.SourceRole, error) {
 								return nil, fmt.Errorf("no such role")
 							},
 						}, nil
@@ -229,7 +229,7 @@ func TestService_NewSourceRole(t *testing.T) {
 				},
 			}))
 
-		h.NewRole(tt.args.w, tt.args.r)
+		h.NewSourceRole(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")
@@ -294,15 +294,15 @@ func TestService_UpdateRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return &mocks.RolesStore{
-							UpdateF: func(ctx context.Context, u *chronograf.Role) error {
+							UpdateF: func(ctx context.Context, u *chronograf.SourceRole) error {
 								return nil
 							},
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
-								return &chronograf.Role{
+							GetF: func(ctx context.Context, name string) (*chronograf.SourceRole, error) {
+								return &chronograf.SourceRole{
 									Name: "biffsgang",
-									Users: []chronograf.User{
+									Users: []chronograf.SourceUser{
 										{
 											Name: "match",
 										},
@@ -347,7 +347,7 @@ func TestService_UpdateRole(t *testing.T) {
 				},
 			}))
 
-		h.UpdateRole(tt.args.w, tt.args.r)
+		h.UpdateSourceRole(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")
@@ -411,12 +411,12 @@ func TestService_RoleID(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return &mocks.RolesStore{
-							GetF: func(ctx context.Context, name string) (*chronograf.Role, error) {
-								return &chronograf.Role{
+							GetF: func(ctx context.Context, name string) (*chronograf.SourceRole, error) {
+								return &chronograf.SourceRole{
 									Name: "biffsgang",
-									Permissions: chronograf.Permissions{
+									Permissions: chronograf.SourcePermissions{
 										{
 											Name:  "grays_sports_almanac",
 											Scope: "DBScope",
@@ -425,7 +425,7 @@ func TestService_RoleID(t *testing.T) {
 											},
 										},
 									},
-									Users: []chronograf.User{
+									Users: []chronograf.SourceUser{
 										{
 											Name: "match",
 										},
@@ -470,7 +470,7 @@ func TestService_RoleID(t *testing.T) {
 				},
 			}))
 
-		h.RoleID(tt.args.w, tt.args.r)
+		h.SourceRoleID(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")
@@ -532,9 +532,9 @@ func TestService_RemoveRole(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return &mocks.RolesStore{
-							DeleteF: func(context.Context, *chronograf.Role) error {
+							DeleteF: func(context.Context, *chronograf.SourceRole) error {
 								return nil
 							},
 						}, nil
@@ -566,7 +566,7 @@ func TestService_RemoveRole(t *testing.T) {
 				},
 			}))
 
-		h.RemoveRole(tt.args.w, tt.args.r)
+		h.RemoveSourceRole(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		if resp.StatusCode != tt.wantStatus {
@@ -617,13 +617,13 @@ func TestService_Roles(t *testing.T) {
 					ConnectF: func(ctx context.Context, src *chronograf.Source) error {
 						return nil
 					},
-					RolesF: func(ctx context.Context) (chronograf.RolesStore, error) {
+					RolesF: func(ctx context.Context) (chronograf.SourceRolesStore, error) {
 						return &mocks.RolesStore{
-							AllF: func(ctx context.Context) ([]chronograf.Role, error) {
-								return []chronograf.Role{
-									chronograf.Role{
+							AllF: func(ctx context.Context) ([]chronograf.SourceRole, error) {
+								return []chronograf.SourceRole{
+									chronograf.SourceRole{
 										Name: "biffsgang",
-										Permissions: chronograf.Permissions{
+										Permissions: chronograf.SourcePermissions{
 											{
 												Name:  "grays_sports_almanac",
 												Scope: "DBScope",
@@ -632,7 +632,7 @@ func TestService_Roles(t *testing.T) {
 												},
 											},
 										},
-										Users: []chronograf.User{
+										Users: []chronograf.SourceUser{
 											{
 												Name: "match",
 											},
@@ -678,7 +678,7 @@ func TestService_Roles(t *testing.T) {
 				},
 			}))
 
-		h.Roles(tt.args.w, tt.args.r)
+		h.SourceRoles(tt.args.w, tt.args.r)
 
 		resp := tt.args.w.Result()
 		content := resp.Header.Get("Content-Type")

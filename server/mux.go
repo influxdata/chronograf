@@ -91,7 +91,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.POST("/chronograf/v1/sources/:id/queries", service.Queries)
 
 	// All possible permissions for users in this source
-	router.GET("/chronograf/v1/sources/:id/permissions", service.Permissions)
+	router.GET("/chronograf/v1/sources/:id/permissions", service.SourcePermissions)
 
 	// Users associated with the data source
 	router.GET("/chronograf/v1/sources/:id/users", service.SourceUsers)
@@ -102,12 +102,12 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.PATCH("/chronograf/v1/sources/:id/users/:uid", service.UpdateSourceUser)
 
 	// Roles associated with the data source
-	router.GET("/chronograf/v1/sources/:id/roles", service.Roles)
-	router.POST("/chronograf/v1/sources/:id/roles", service.NewRole)
+	router.GET("/chronograf/v1/sources/:id/roles", service.SourceRoles)
+	router.POST("/chronograf/v1/sources/:id/roles", service.NewSourceRole)
 
-	router.GET("/chronograf/v1/sources/:id/roles/:rid", service.RoleID)
-	router.DELETE("/chronograf/v1/sources/:id/roles/:rid", service.RemoveRole)
-	router.PATCH("/chronograf/v1/sources/:id/roles/:rid", service.UpdateRole)
+	router.GET("/chronograf/v1/sources/:id/roles/:rid", service.SourceRoleID)
+	router.DELETE("/chronograf/v1/sources/:id/roles/:rid", service.RemoveSourceRole)
+	router.PATCH("/chronograf/v1/sources/:id/roles/:rid", service.UpdateSourceRole)
 
 	// Kapacitor
 	router.GET("/chronograf/v1/sources/:id/kapacitors", service.Kapacitors)
@@ -143,8 +143,14 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.PUT("/chronograf/v1/layouts/:id", service.UpdateLayout)
 	router.DELETE("/chronograf/v1/layouts/:id", service.RemoveLayout)
 
-	// Users
+	// Users associated with Chronograf
 	router.GET("/chronograf/v1/me", service.Me)
+
+	router.POST("/chronograf/v1/users", service.NewUser)
+
+	router.GET("/chronograf/v1/users/:id", service.UserID)
+	router.DELETE("/chronograf/v1/users/:id", service.RemoveUser)
+	router.PATCH("/chronograf/v1/users/:id", service.UpdateUser)
 
 	// Dashboards
 	router.GET("/chronograf/v1/dashboards", service.Dashboards)

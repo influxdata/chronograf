@@ -19,8 +19,8 @@ type UsersStore struct {
 	client *Client
 }
 
-// get searches the UsersStore for user with name and returns the bolt representation
-func (s *UsersStore) get(ctx context.Context, name string) (*internal.User, error) {
+// get searches the UsersStore for user with username and returns the bolt representation
+func (s *UsersStore) get(ctx context.Context, id string) (*internal.User, error) {
 	found := false
 	var user internal.User
 	err := s.client.db.View(func(tx *bolt.Tx) error {
@@ -28,7 +28,7 @@ func (s *UsersStore) get(ctx context.Context, name string) (*internal.User, erro
 			var u chronograf.User
 			if err := internal.UnmarshalUser(v, &u); err != nil {
 				return err
-			} else if u.Name != name {
+			} else if u.ID != id {
 				return nil
 			}
 			found = true
@@ -52,14 +52,14 @@ func (s *UsersStore) get(ctx context.Context, name string) (*internal.User, erro
 	return &user, nil
 }
 
-// Get searches the UsersStore for user with name
-func (s *UsersStore) Get(ctx context.Context, name string) (*chronograf.User, error) {
-	u, err := s.get(ctx, name)
+// Get searches the UsersStore for user with ID
+func (s *UsersStore) Get(ctx context.Context, id string) (*chronograf.User, error) {
+	u, err := s.get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	return &chronograf.User{
-		Name: u.Name,
+		ID: u.ID,
 	}, nil
 }
 
@@ -67,13 +67,9 @@ func (s *UsersStore) Get(ctx context.Context, name string) (*chronograf.User, er
 func (s *UsersStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
 	if err := s.client.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(UsersBucket)
-		seq, err := b.NextSequence()
-		if err != nil {
-			return err
-		}
 		if v, err := internal.MarshalUser(u); err != nil {
 			return err
-		} else if err := b.Put(u64tob(seq), v); err != nil {
+		} else if err := b.Put([]byte(u.ID), v); err != nil {
 			return err
 		}
 		return nil
@@ -85,13 +81,13 @@ func (s *UsersStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.U
 }
 
 // Delete the users from the UsersStore
-func (s *UsersStore) Delete(ctx context.Context, user *chronograf.User) error {
-	u, err := s.get(ctx, user.Name)
+func (s *UsersStore) Delete(ctx context.Context, usr *chronograf.User) error {
+	u, err := s.get(ctx, usr.ID)
 	if err != nil {
 		return err
 	}
 	if err := s.client.db.Update(func(tx *bolt.Tx) error {
-		if err := tx.Bucket(UsersBucket).Delete(u64tob(u.ID)); err != nil {
+		if err := tx.Bucket(UsersBucket).Delete([]byte(u.ID)); err != nil {
 			return err
 		}
 		return nil
@@ -104,15 +100,15 @@ func (s *UsersStore) Delete(ctx context.Context, user *chronograf.User) error {
 
 // Update a user
 func (s *UsersStore) Update(ctx context.Context, usr *chronograf.User) error {
-	u, err := s.get(ctx, usr.Name)
+	u, err := s.get(ctx, usr.ID)
 	if err != nil {
 		return err
 	}
 	if err := s.client.db.Update(func(tx *bolt.Tx) error {
-		u.Name = usr.Name
+		u.ID = usr.ID
 		if v, err := internal.MarshalUserPB(u); err != nil {
 			return err
-		} else if err := tx.Bucket(UsersBucket).Put(u64tob(u.ID), v); err != nil {
+		} else if err := tx.Bucket(UsersBucket).Put([]byte(u.ID), v); err != nil {
 			return err
 		}
 		return nil

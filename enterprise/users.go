@@ -13,7 +13,7 @@ type UserStore struct {
 }
 
 // Add creates a new User in Influx Enterprise
-func (c *UserStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
+func (c *UserStore) Add(ctx context.Context, u *chronograf.SourceUser) (*chronograf.SourceUser, error) {
 	if err := c.Ctrl.CreateUser(ctx, u.Name, u.Passwd); err != nil {
 		return nil, err
 	}
@@ -32,12 +32,12 @@ func (c *UserStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.Us
 }
 
 // Delete the User from Influx Enterprise
-func (c *UserStore) Delete(ctx context.Context, u *chronograf.User) error {
+func (c *UserStore) Delete(ctx context.Context, u *chronograf.SourceUser) error {
 	return c.Ctrl.DeleteUser(ctx, u.Name)
 }
 
 // Get retrieves a user if name exists.
-func (c *UserStore) Get(ctx context.Context, name string) (*chronograf.User, error) {
+func (c *UserStore) Get(ctx context.Context, name string) (*chronograf.SourceUser, error) {
 	u, err := c.Ctrl.User(ctx, name)
 	if err != nil {
 		return nil, err
@@ -52,10 +52,10 @@ func (c *UserStore) Get(ctx context.Context, name string) (*chronograf.User, err
 	cr := role.ToChronograf()
 	// For now we are removing all users from a role being returned.
 	for i, r := range cr {
-		r.Users = []chronograf.User{}
+		r.Users = []chronograf.SourceUser{}
 		cr[i] = r
 	}
-	return &chronograf.User{
+	return &chronograf.SourceUser{
 		Name:        u.Name,
 		Permissions: ToChronograf(u.Permissions),
 		Roles:       cr,
@@ -63,7 +63,7 @@ func (c *UserStore) Get(ctx context.Context, name string) (*chronograf.User, err
 }
 
 // Update the user's permissions or roles
-func (c *UserStore) Update(ctx context.Context, u *chronograf.User) error {
+func (c *UserStore) Update(ctx context.Context, u *chronograf.SourceUser) error {
 	// Only allow one type of change at a time. If it is a password
 	// change then do it and return without any changes to permissions
 	if u.Passwd != "" {
@@ -111,7 +111,7 @@ func (c *UserStore) Update(ctx context.Context, u *chronograf.User) error {
 }
 
 // All is all users in influx
-func (c *UserStore) All(ctx context.Context) ([]chronograf.User, error) {
+func (c *UserStore) All(ctx context.Context) ([]chronograf.SourceUser, error) {
 	all, err := c.Ctrl.Users(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -122,17 +122,17 @@ func (c *UserStore) All(ctx context.Context) ([]chronograf.User, error) {
 		return nil, err
 	}
 
-	res := make([]chronograf.User, len(all.Users))
+	res := make([]chronograf.SourceUser, len(all.Users))
 	for i, user := range all.Users {
 		role := ur[user.Name]
 		cr := role.ToChronograf()
 		// For now we are removing all users from a role being returned.
 		for i, r := range cr {
-			r.Users = []chronograf.User{}
+			r.Users = []chronograf.SourceUser{}
 			cr[i] = r
 		}
 
-		res[i] = chronograf.User{
+		res[i] = chronograf.SourceUser{
 			Name:        user.Name,
 			Permissions: ToChronograf(user.Permissions),
 			Roles:       cr,
@@ -142,7 +142,7 @@ func (c *UserStore) All(ctx context.Context) ([]chronograf.User, error) {
 }
 
 // ToEnterprise converts chronograf permission shape to enterprise
-func ToEnterprise(perms chronograf.Permissions) Permissions {
+func ToEnterprise(perms chronograf.SourcePermissions) Permissions {
 	res := Permissions{}
 	for _, perm := range perms {
 		if perm.Scope == chronograf.AllScope {
@@ -156,17 +156,17 @@ func ToEnterprise(perms chronograf.Permissions) Permissions {
 }
 
 // ToChronograf converts enterprise permissions shape to chronograf shape
-func ToChronograf(perms Permissions) chronograf.Permissions {
-	res := chronograf.Permissions{}
+func ToChronograf(perms Permissions) chronograf.SourcePermissions {
+	res := chronograf.SourcePermissions{}
 	for db, perm := range perms {
 		// Enterprise uses empty string as the key for all databases
 		if db == "" {
-			res = append(res, chronograf.Permission{
+			res = append(res, chronograf.SourcePermission{
 				Scope:   chronograf.AllScope,
 				Allowed: perm,
 			})
 		} else {
-			res = append(res, chronograf.Permission{
+			res = append(res, chronograf.SourcePermission{
 				Scope:   chronograf.DBScope,
 				Name:    db,
 				Allowed: perm,
