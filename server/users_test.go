@@ -119,7 +119,6 @@ func TestService_NewUser(t *testing.T) {
 		name            string
 		fields          fields
 		args            args
-		ID              string
 		wantStatus      int
 		wantContentType string
 		wantBody        string
@@ -152,7 +151,6 @@ func TestService_NewUser(t *testing.T) {
 					},
 				},
 			},
-			ID:              "2",
 			wantStatus:      http.StatusCreated,
 			wantContentType: "application/json",
 			wantBody:        `{"id":"OAuth2-GitHub-bob","username":"bob","provider":"GitHub","scheme":"OAuth2","links":{"self":"/chronograf/v1/users/OAuth2-GitHub-bob"}}`,
@@ -165,8 +163,6 @@ func TestService_NewUser(t *testing.T) {
 				UsersStore: tt.fields.UsersStore,
 				Logger:     tt.fields.Logger,
 			}
-
-			tt.args.r = tt.args.r.WithContext(context.WithValue(context.Background(), "id", tt.ID))
 
 			buf, _ := json.Marshal(tt.args.user)
 			tt.args.r.Body = ioutil.NopCloser(bytes.NewReader(buf))
