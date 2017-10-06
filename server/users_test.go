@@ -209,6 +209,19 @@ func TestService_RemoveUser(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				UsersStore: &mocks.UsersStore{
+					GetF: func(ctx context.Context, ID string) (*chronograf.User, error) {
+						switch ID {
+						case "LDAP-Heroku-helena":
+							return &chronograf.User{
+								ID:       "LDAP-Heroku-helena",
+								Username: "helena",
+								Provider: "Heroku",
+								Scheme:   "LDAP",
+							}, nil
+						default:
+							return nil, fmt.Errorf("User with ID %v not found", ID)
+						}
+					},
 					DeleteF: func(ctx context.Context, user *chronograf.User) error {
 						return nil
 					},
@@ -228,7 +241,7 @@ func TestService_RemoveUser(t *testing.T) {
 					Scheme:   "LDAP",
 				},
 			},
-			id:         "LDAP-Heroku-Helena",
+			id:         "LDAP-Heroku-helena",
 			wantStatus: http.StatusNoContent,
 		},
 	}
