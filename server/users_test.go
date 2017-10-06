@@ -183,15 +183,16 @@ func TestService_RemoveUser(t *testing.T) {
 		Logger     chronograf.Logger
 	}
 	type args struct {
-		w  *httptest.ResponseRecorder
-		r  *http.Request
-		id string
+		w    *httptest.ResponseRecorder
+		r    *http.Request
+		user chronograf.User
 	}
 	tests := []struct {
 		name       string
 		fields     fields
 		args       args
-		ID         string
+		user       *chronograf.User
+		id         string
 		wantStatus int
 	}{
 		{
@@ -199,7 +200,7 @@ func TestService_RemoveUser(t *testing.T) {
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
 				UsersStore: &mocks.UsersStore{
-					DeleteF: func(ctx context.Context, ID string) error {
+					DeleteF: func(ctx context.Context, user *chronograf.User) error {
 						return nil
 					},
 				},
@@ -208,12 +209,17 @@ func TestService_RemoveUser(t *testing.T) {
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(
 					"DELETE",
-					"http://server.local/chronograf/v1/users",
+					"http://server.local/chronograf/v1/users/LDAP-Heroku-helena",
 					nil,
 				),
-				id: "LDAP-Heroku-helena",
+				user: chronograf.User{
+					ID:       "LDAP-Heroku-helena",
+					Username: "helena",
+					Provider: "Heroku",
+					Scheme:   "LDAP",
+				},
 			},
-			ID:         "1",
+			id:         "LDAP-Heroku-Helena",
 			wantStatus: http.StatusNoContent,
 		},
 	}
@@ -229,7 +235,7 @@ func TestService_RemoveUser(t *testing.T) {
 				httprouter.Params{
 					{
 						Key:   "id",
-						Value: tt.args.id,
+						Value: tt.args.user.ID,
 					},
 				},
 			))

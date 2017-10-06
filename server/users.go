@@ -104,7 +104,7 @@ func (s *Service) RemoveUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := httprouter.GetParamFromContext(ctx, "id")
 
-	if err := s.UsersStore.Delete(ctx, id); err != nil {
+	if err := s.UsersStore.Delete(ctx, &chronograf.User{ID: id}); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 	}
 

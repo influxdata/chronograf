@@ -146,7 +146,7 @@ func TestUsersStore_Delete(t *testing.T) {
 		if tt.addFirst {
 			s.Add(tt.args.ctx, tt.args.user)
 		}
-		if err := s.Delete(tt.args.ctx, tt.args.user.ID); (err != nil) != tt.wantErr {
+		if err := s.Delete(tt.args.ctx, tt.args.user); (err != nil) != tt.wantErr {
 			t.Errorf("%q. UsersStore.Delete() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 	}

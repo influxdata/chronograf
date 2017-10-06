@@ -12,7 +12,7 @@ var _ chronograf.UsersStore = &UsersStore{}
 type UsersStore struct {
 	AllF    func(context.Context) ([]chronograf.User, error)
 	AddF    func(context.Context, *chronograf.User) (*chronograf.User, error)
-	DeleteF func(ctx context.Context, ID string) error
+	DeleteF func(context.Context, *chronograf.User) error
 	GetF    func(ctx context.Context, ID string) (*chronograf.User, error)
 	UpdateF func(context.Context, *chronograf.User) error
 }
@@ -28,8 +28,8 @@ func (s *UsersStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.U
 }
 
 // Delete the User from the UsersStore
-func (s *UsersStore) Delete(ctx context.Context, ID string) error {
-	return s.DeleteF(ctx, ID)
+func (s *UsersStore) Delete(ctx context.Context, u *chronograf.User) error {
+	return s.DeleteF(ctx, u)
 }
 
 // Get retrieves a user if ID exists.

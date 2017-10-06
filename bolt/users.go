@@ -81,8 +81,8 @@ func (s *UsersStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.U
 }
 
 // Delete the users from the UsersStore
-func (s *UsersStore) Delete(ctx context.Context, ID string) error {
-	u, err := s.get(ctx, ID)
+func (s *UsersStore) Delete(ctx context.Context, usr *chronograf.User) error {
+	u, err := s.get(ctx, usr.ID)
 	if err != nil {
 		return err
 	}
