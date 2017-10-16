@@ -17,6 +17,11 @@ const {
 
 const AutoRefresh = ComposedComponent => {
   const wrapper = React.createClass({
+    getDefaultProps() {
+      return {
+        grabDataForDownload() {},
+      }
+    },
     propTypes: {
       children: element,
       autoRefresh: number.isRequired,
@@ -156,9 +161,8 @@ const AutoRefresh = ComposedComponent => {
           lastQuerySuccessful,
           isFetching: false,
         })
-        if (grabDataForDownload) {
-          grabDataForDownload(timeSeries)
-        }
+
+        grabDataForDownload(timeSeries)
       })
     },
 
