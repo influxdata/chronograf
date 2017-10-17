@@ -121,16 +121,12 @@ func Convert(influxQL string) (chronograf.QueryConfig, error) {
 				return raw, nil
 			case influxql.NullFill:
 				qc.Fill = "null"
-
 			case influxql.NoFill:
 				qc.Fill = "none"
-
 			case influxql.NumberFill:
 				qc.Fill = fmt.Sprint(stmt.FillValue)
-
 			case influxql.PreviousFill:
 				qc.Fill = "previous"
-
 			case influxql.LinearFill:
 				qc.Fill = "linear"
 
@@ -140,8 +136,7 @@ func Convert(influxQL string) (chronograf.QueryConfig, error) {
 		}
 	}
 
-	fields := make(map[string][]string)
-	order := make(map[string]int)
+	qc.Fields = []chronograf.Field{}
 	for _, fld := range stmt.Fields {
 		switch f := fld.Expr.(type) {
 		default:
@@ -164,29 +159,26 @@ func Convert(influxQL string) (chronograf.QueryConfig, error) {
 			if ref.Type != influxql.Unknown {
 				return raw, nil
 			}
-			if call, ok := fields[ref.Val]; !ok {
-				order[ref.Val] = len(fields)
-				fields[ref.Val] = []string{f.Name}
-			} else {
-				fields[ref.Val] = append(call, f.Name)
-			}
+			qc.Fields = append(qc.Fields, chronograf.Field{
+				Name:  f.Name,
+				Type:  "func",
+				Alias: fld.Alias,
+				Args: []chronograf.Field{
+					{
+						Name: ref.Val,
+						Type: "field",
+					},
+				},
+			})
 		case *influxql.VarRef:
 			if f.Type != influxql.Unknown {
 				return raw, nil
 			}
-			if _, ok := fields[f.Val]; !ok {
-				order[f.Val] = len(fields)
-				fields[f.Val] = []string{}
-			}
-		}
-	}
-
-	qc.Fields = make([]chronograf.Field, len(fields))
-	for fld, funcs := range fields {
-		i := order[fld]
-		qc.Fields[i] = chronograf.Field{
-			Field: fld,
-			Funcs: funcs,
+			qc.Fields = append(qc.Fields, chronograf.Field{
+				Name:  f.Val,
+				Type:  "field",
+				Alias: fld.Alias,
+			})
 		}
 	}
 

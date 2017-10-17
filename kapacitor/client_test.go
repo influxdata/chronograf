@@ -322,8 +322,8 @@ trigger
 							Measurement:     "cq",
 							Fields: []chronograf.Field{
 								{
-									Field: "queryOk",
-									Funcs: []string{},
+									Name: "queryOk",
+									Type: "field",
 								},
 							},
 							GroupBy: chronograf.GroupBy{
@@ -645,8 +645,8 @@ trigger
 						Measurement:     "cq",
 						Fields: []chronograf.Field{
 							{
-								Field: "queryOk",
-								Funcs: []string{},
+								Name: "queryOk",
+								Type: "field",
 							},
 						},
 						GroupBy: chronograf.GroupBy{

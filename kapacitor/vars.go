@@ -133,7 +133,7 @@ func window(rule chronograf.AlertRule) string {
 	}
 	// Period only makes sense if the field has a been grouped via a time duration.
 	for _, field := range rule.Query.Fields {
-		if len(field.Funcs) > 0 {
+		if field.Type == "func" {
 			return fmt.Sprintf("var period = %s\nvar every = %s", rule.Query.GroupBy.Time, rule.Every)
 		}
 	}
@@ -153,7 +153,15 @@ func groupBy(q *chronograf.QueryConfig) string {
 func field(q *chronograf.QueryConfig) (string, error) {
 	if q != nil {
 		for _, field := range q.Fields {
-			return field.Field, nil
+			if field.Type == "func" && len(field.Args) > 0 {
+				for _, arg := range field.Args {
+					if arg.Type == "field" {
+						return arg.Name, nil
+					}
+				}
+				return "", fmt.Errorf("No fields set in query")
+			}
+			return field.Name, nil
 		}
 	}
 	return "", fmt.Errorf("No fields set in query")
