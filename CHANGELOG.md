@@ -1,8 +1,3 @@
-## v1.3.11.0 [unreleased]
-### Bug Fixes
-### Features
-### UI Improvements
-
 ## v1.3.10.0 [2017-10-24]
 ### Bug Fixes
 1. [#2095](https://github.com/influxdata/chronograf/pull/2095): Improve the copy in the retention policy edit page
