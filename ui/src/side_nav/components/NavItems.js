@@ -3,6 +3,7 @@ import {Link} from 'react-router'
 import classnames from 'classnames'
 
 import Authorized from 'src/auth/Authorized'
+import UserNavBlock from 'src/side_nav/components/UserNavBlock'
 
 const {bool, node, string} = PropTypes
 
@@ -120,7 +121,12 @@ const NavBar = React.createClass({
 
   render() {
     const children = React.Children.map(this.props.children, child => {
-      if (child && (child.type === NavBlock || child.type === Authorized)) {
+      if (
+        child &&
+        (child.type === NavBlock ||
+          child.type === Authorized ||
+          child.type === UserNavBlock)
+      ) {
         return React.cloneElement(child, {
           location: this.props.location,
         })
