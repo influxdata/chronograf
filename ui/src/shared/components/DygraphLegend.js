@@ -77,9 +77,7 @@ const DygraphLegend = ({
       style={style}
     >
       <div className="dygraph-legend--header">
-        <div className="dygraph-legend--timestamp">
-          {xHTML}
-        </div>
+        <div className="dygraph-legend--timestamp">{xHTML}</div>
         {renderSortAlpha}
         {renderSortNum}
         <button
@@ -122,9 +120,7 @@ const DygraphLegend = ({
               <span style={{color}}>
                 {isSnipped ? removeMeasurement(label) : label}
               </span>
-              <figure>
-                {yHTML || 'no value'}
-              </figure>
+              <figure>{yHTML || 'no value'}</figure>
             </div>
           )
         })}
