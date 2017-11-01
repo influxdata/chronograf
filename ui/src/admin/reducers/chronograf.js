@@ -3,10 +3,12 @@ const initialState = {
   organizations: [],
 }
 
+import {DUMMY_USERS} from 'src/admin/constants/dummyUsers'
+
 const adminChronograf = (state = initialState, action) => {
   switch (action.type) {
     case 'CHRONOGRAF_LOAD_USERS': {
-      return {...state, ...action.payload}
+      return {...state, users: [...DUMMY_USERS]}
     }
   }
 
