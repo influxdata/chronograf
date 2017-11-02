@@ -48,6 +48,12 @@ func TestService_Me(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   0,
+							Name: "The Bad Place",
+						}, nil
+					},
 					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
 						return &chronograf.Organization{
 							ID:   0,
@@ -91,6 +97,12 @@ func TestService_Me(t *testing.T) {
 				UseAuth: true,
 				Logger:  log.New(log.DebugLevel),
 				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   0,
+							Name: "The Bad Place",
+						}, nil
+					},
 					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
 						return &chronograf.Organization{
 							ID:   0,
@@ -132,6 +144,12 @@ func TestService_Me(t *testing.T) {
 			fields: fields{
 				UseAuth: true,
 				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   0,
+							Name: "The Bad Place",
+						}, nil
+					},
 					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
 						return &chronograf.Organization{
 							ID:   0,
@@ -276,6 +294,12 @@ func TestService_MeOrganizations(t *testing.T) {
 					},
 				},
 				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   0,
+							Name: "The Bad Place",
+						}, nil
+					},
 					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
 						if q.ID == nil {
 							return nil, fmt.Errorf("Invalid organization query: missing ID")
@@ -327,6 +351,12 @@ func TestService_MeOrganizations(t *testing.T) {
 					},
 				},
 				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   0,
+							Name: "The Bad Place",
+						}, nil
+					},
 					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
 						if q.ID == nil {
 							return nil, fmt.Errorf("Invalid organization query: missing ID")
@@ -370,6 +400,12 @@ func TestService_MeOrganizations(t *testing.T) {
 					},
 				},
 				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   0,
+							Name: "The Bad Place",
+						}, nil
+					},
 					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
 						if q.ID == nil {
 							return nil, fmt.Errorf("Invalid organization query: missing ID")
@@ -422,6 +458,12 @@ func TestService_MeOrganizations(t *testing.T) {
 					},
 				},
 				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID:   0,
+							Name: "The Bad Place",
+						}, nil
+					},
 					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
 						return nil, chronograf.ErrOrganizationNotFound
 					},
@@ -444,8 +486,6 @@ func TestService_MeOrganizations(t *testing.T) {
 				UsersStore:         tt.fields.UsersStore,
 				OrganizationsStore: tt.fields.OrganizationsStore,
 			},
-			//UsersStore:             tt.fields.UsersStore,
-			//OrganizationUsersStore: tt.fields.OrganizationUsersStore,
 			Logger:  tt.fields.Logger,
 			UseAuth: tt.fields.UseAuth,
 		}
