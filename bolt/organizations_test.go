@@ -184,7 +184,7 @@ func TestOrganizationsStore_All(t *testing.T) {
 			},
 			want: []chronograf.Organization{
 				{
-					Name: "__default",
+					Name: bolt.DefaultOrganizationName,
 				},
 				{
 					Name: "EE - Evil Empire",
