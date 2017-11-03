@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
-import Resizeable from 'react-component-resizable'
+import Resizeable from 'react-resizable'
 
 import * as _ from 'lodash'
 

@@ -1,23 +1,24 @@
 import * as React from 'react'
 import {replace} from 'react-router-redux'
-import {UserAuthWrapper} from 'redux-auth-wrapper'
+import {connectedReduxRedirect} from 'redux-auth-wrapper/history4/redirect'
 
-export const UserIsAuthenticated = UserAuthWrapper({
-  authSelector: ({auth}) => ({auth}),
+export const UserIsAuthenticated = connectedReduxRedirect({
   authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
-  LoadingComponent: () => <div className="page-spinner" />,
+  AuthenticatingComponent: () => <div className="page-spinner" />,
   redirectAction: replace,
   wrapperDisplayName: 'UserIsAuthenticated',
-  predicate: ({auth: {me, isMeLoading}}) => !isMeLoading && me !== null,
+  redirectPath: '/',
+  authenticatedSelector: ({auth: {me, isMeLoading}}) =>
+    !isMeLoading && me !== null,
 })
 
-export const UserIsNotAuthenticated = UserAuthWrapper({
-  authSelector: ({auth}) => ({auth}),
+export const UserIsNotAuthenticated = connectedReduxRedirect({
   authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
-  LoadingComponent: () => <div className="page-spinner" />,
+  AuthenticatingComponent: () => <div className="page-spinner" />,
   redirectAction: replace,
   wrapperDisplayName: 'UserIsNotAuthenticated',
-  predicate: ({auth: {me, isMeLoading}}) => !isMeLoading && me === null,
-  failureRedirectPath: () => '/',
+  authenticatedSelector: ({auth: {me, isMeLoading}}) =>
+    !isMeLoading && me === null,
+  redirectPath: '/',
   allowRedirectBack: false,
 })

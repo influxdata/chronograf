@@ -4,7 +4,7 @@ import * as PropTypes from 'prop-types'
 import * as Dimensions from 'react-dimensions'
 import * as _ from 'lodash'
 
-import {Table, Column, Cell} from 'fixed-data-table'
+import {Table, Column, Cell} from 'fixed-data-table-2'
 import Dropdown from 'shared/components/Dropdown'
 import CustomCell from 'data_explorer/components/CustomCell'
 import TabItem from 'data_explorer/components/TableTabItem'
