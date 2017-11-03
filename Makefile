@@ -84,6 +84,12 @@ else
 	@touch .jsdep
 endif
 
+.remove-files:
+	rm -rf ui/build && mkdir ui/build
+
+.build-go:
+	go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
+
 gen: internal.pb.go
 
 internal.pb.go: bolt/internal/internal.proto
@@ -105,6 +111,8 @@ run: ${BINARY}
 
 run-dev: chronogiraffe
 	./chronograf -d --log-level=debug
+
+run-dev-clean: .remove-files .build-go run-dev
 
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
