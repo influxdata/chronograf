@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -13,9 +14,9 @@ import FancyScrollbar from 'shared/components/FancyScrollbar'
 import SourceIndicator from 'shared/components/SourceIndicator'
 import InfluxTable from 'sources/components/InfluxTable'
 
-const V_NUMBER = window.VERSION // eslint-disable-line no-undef
+const V_NUMBER = process.env.VERSION // eslint-disable-line no-undef
 
-class ManageSources extends Component {
+class ManageSources extends React.Component {
   constructor(props) {
     super(props)
   }

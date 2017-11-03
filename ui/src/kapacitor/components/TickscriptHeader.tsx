@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import {Link} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
 
 import SourceIndicator from 'shared/components/SourceIndicator'
 import TickscriptType from 'kapacitor/components/TickscriptType'

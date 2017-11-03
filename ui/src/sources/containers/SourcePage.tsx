@@ -1,6 +1,7 @@
-import React, {PropTypes, Component} from 'react'
-import {withRouter} from 'react-router'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {withRouter} from 'react-router-dom'
+import * as _ from 'lodash'
 import {getSource} from 'shared/apis'
 import {createSource, updateSource} from 'shared/apis'
 import {
@@ -16,7 +17,7 @@ import SourceIndicator from 'shared/components/SourceIndicator'
 import {DEFAULT_SOURCE} from 'shared/constants'
 const initialPath = '/sources/new'
 
-class SourcePage extends Component {
+class SourcePage extends React.Component {
   constructor(props) {
     super(props)
 

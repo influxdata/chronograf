@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import {withRouter} from 'react-router'
+import {withRouter} from 'react-router-dom'
 import queryString from 'query-string'
 
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import QueryMaker from '../components/QueryMaker'
 import Visualization from '../components/Visualization'
@@ -22,7 +23,7 @@ import * as dataExplorerActionCreators from 'data_explorer/actions/view'
 import {writeLineProtocolAsync} from 'data_explorer/actions/view/write'
 import {buildRawText} from 'utils/influxql'
 
-class DataExplorer extends Component {
+class DataExplorer extends React.Component {
   constructor(props) {
     super(props)
 

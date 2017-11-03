@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import GraphTypeSelector from 'dashboards/components/GraphTypeSelector'
 import AxesOptions from 'dashboards/components/AxesOptions'
 
 import {buildDefaultYLabel} from 'shared/presenters'
 
-class DisplayOptions extends Component {
+class DisplayOptions extends React.Component {
   constructor(props) {
     super(props)
 

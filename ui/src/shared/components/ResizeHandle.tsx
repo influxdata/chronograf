@@ -1,25 +1,20 @@
-import React from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-const {func, bool, string} = React.PropTypes
-const ResizeHandle = React.createClass({
-  propTypes: {
-    onHandleStartDrag: func.isRequired,
-    isDragging: bool.isRequired,
-    top: string,
-  },
+const ResizeHandle = ({isDragging, onHandleStartDrag, top}) =>
+  <div
+    className={classnames('resizer--handle', {dragging: isDragging})}
+    onMouseDown={onHandleStartDrag}
+    style={{top}}
+  />
 
-  render() {
-    const {isDragging, onHandleStartDrag, top} = this.props
+const {func, bool, string} = PropTypes
 
-    return (
-      <div
-        className={classnames('resizer--handle', {dragging: isDragging})}
-        onMouseDown={onHandleStartDrag}
-        style={{top}}
-      />
-    )
-  },
-})
+ResizeHandle.propTypes = {
+  onHandleStartDrag: func.isRequired,
+  isDragging: bool.isRequired,
+  top: string,
+}
 
 export default ResizeHandle

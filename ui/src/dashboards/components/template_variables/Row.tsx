@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
 import uniq from 'lodash/uniq'
 
-import OnClickOutside from 'react-onclickoutside'
+import onClickOutside from 'react-onClickOutside'
 import classnames from 'classnames'
 
 import Dropdown from 'shared/components/Dropdown'
@@ -104,7 +105,7 @@ const TemplateVariableRow = ({
     </div>
   </form>
 
-class RowWrapper extends Component {
+class RowWrapper extends React.Component {
   constructor(props) {
     super(props)
     const {template: {type, query, isNew}} = this.props
@@ -350,4 +351,4 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(publishAutoDismissingNotification, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(OnClickOutside(RowWrapper))
+export default connect(null, mapDispatchToProps)(onClickOutside(RowWrapper))

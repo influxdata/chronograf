@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 const DisplayOptionsInput = ({id, name, value, onChange, labelText}) =>
   <div className="form-group col-sm-6">

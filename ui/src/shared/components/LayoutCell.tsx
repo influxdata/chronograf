@@ -1,5 +1,6 @@
-import React, {Component, PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import LayoutCellMenu from 'shared/components/LayoutCellMenu'
 import LayoutCellHeader from 'shared/components/LayoutCellHeader'
@@ -7,7 +8,7 @@ import {errorThrown} from 'shared/actions/errors'
 import {dashboardtoCSV} from 'shared/parsing/resultsToCSV'
 import download from 'external/download'
 
-class LayoutCell extends Component {
+class LayoutCell extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

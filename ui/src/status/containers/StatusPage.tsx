@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
 import SourceIndicator from 'shared/components/SourceIndicator'
@@ -7,7 +8,7 @@ import LayoutRenderer from 'shared/components/LayoutRenderer'
 
 import {fixtureStatusPageCells} from 'status/fixtures'
 
-class StatusPage extends Component {
+class StatusPage extends React.Component {
   constructor(props) {
     super(props)
 

@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import Dropdown from 'shared/components/Dropdown'
 import {QUERY_TEMPLATES} from 'data_explorer/constants'
 import QueryStatus from 'shared/components/QueryStatus'
 
-class QueryEditor extends Component {
+class QueryEditor extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

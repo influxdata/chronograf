@@ -1,15 +1,17 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 const {node, func, bool, number, string} = PropTypes
-export const Tab = React.createClass({
-  propTypes: {
+
+export class Tab extends React.Component {
+  propTypes = {
     children: node.isRequired,
     onClick: func,
     isDisabled: bool,
     isActive: bool,
     isKapacitorTab: bool,
-  },
+  }
 
   render() {
     if (this.props.isKapacitorTab) {
@@ -30,23 +32,23 @@ export const Tab = React.createClass({
         {this.props.children}
       </div>
     )
-  },
-})
+  }
+}
 
-export const TabList = React.createClass({
-  propTypes: {
+export class TabList extends React.Component {
+  propTypes = {
     children: node.isRequired,
     activeIndex: number,
     onActivate: func,
     isKapacitorTabs: string,
     customClass: string,
-  },
+  }
 
   getDefaultProps() {
     return {
       isKapacitorTabs: '',
     }
-  },
+  }
 
   render() {
     const children = React.Children.map(this.props.children, (child, index) => {
@@ -82,15 +84,15 @@ export const TabList = React.createClass({
         {children}
       </div>
     )
-  },
-})
+  }
+}
 
-export const TabPanels = React.createClass({
-  propTypes: {
+export class TabPanels extends React.Component {
+  propTypes = {
     children: node.isRequired,
     activeIndex: number,
     customClass: string,
-  },
+  }
 
   // if only 1 child, children array index lookup will fail
   render() {
@@ -99,13 +101,13 @@ export const TabPanels = React.createClass({
         {this.props.children[this.props.activeIndex]}
       </div>
     )
-  },
-})
+  }
+}
 
-export const TabPanel = React.createClass({
-  propTypes: {
+export class TabPanel extends React.Component {
+  propTypes = {
     children: node.isRequired,
-  },
+  }
 
   render() {
     return (
@@ -113,37 +115,33 @@ export const TabPanel = React.createClass({
         {this.props.children}
       </div>
     )
-  },
-})
+  }
+}
 
-export const Tabs = React.createClass({
-  propTypes: {
+export class Tabs extends React.Component {
+  propTypes = {
     children: node.isRequired,
     onSelect: func,
     tabContentsClass: string,
     tabsClass: string,
     initialIndex: number,
-  },
+  }
 
   getDefaultProps() {
     return {
       onSelect() {},
       tabContentsClass: '',
     }
-  },
+  }
 
-  getInitialState() {
-    // initialIndex allows the user to enable a Tab and TabPanel
-    // other than 0 on initial render.
-    return {
-      activeIndex: this.props.initialIndex || 0,
-    }
-  },
+  state = {
+    activeIndex: this.props.initialIndex || 0,
+  }
 
-  handleActivateTab(activeIndex) {
+  handleActivateTab = activeIndex => {
     this.setState({activeIndex})
     this.props.onSelect(activeIndex)
-  },
+  }
 
   render() {
     const children = React.Children.map(this.props.children, child => {
@@ -168,5 +166,5 @@ export const Tabs = React.createClass({
         {children}
       </div>
     )
-  },
-})
+  }
+}

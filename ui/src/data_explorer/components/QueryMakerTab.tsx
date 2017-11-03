@@ -1,8 +1,9 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-const QueryMakerTab = React.createClass({
-  propTypes: {
+class QueryMakerTab extends React.Component {
+  propTypes = {
     isActive: PropTypes.bool,
     query: PropTypes.shape({
       rawText: PropTypes.string,
@@ -11,16 +12,16 @@ const QueryMakerTab = React.createClass({
     onDelete: PropTypes.func.isRequired,
     queryTabText: PropTypes.string,
     queryIndex: PropTypes.number,
-  },
+  }
 
-  handleSelect() {
+  handleSelect = () => {
     this.props.onSelect(this.props.queryIndex)
-  },
+  }
 
-  handleDelete(e) {
+  handleDelete = (e) => {
     e.stopPropagation()
     this.props.onDelete(this.props.queryIndex)
-  },
+  }
 
   render() {
     return (
@@ -40,7 +41,7 @@ const QueryMakerTab = React.createClass({
         />
       </div>
     )
-  },
-})
+  }
+}
 
 export default QueryMakerTab

@@ -1,19 +1,15 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import Dygraph from 'shared/components/Dygraph'
-import shallowCompare from 'react-addons-shallow-compare'
 
 import SingleStat from 'shared/components/SingleStat'
 import timeSeriesToDygraph from 'utils/timeSeriesToDygraph'
 
 import {SINGLE_STAT_LINE_COLORS} from 'shared/graphs/helpers'
 
-class LineGraph extends Component {
+class LineGraph extends React.PureComponent {
   constructor(props) {
     super(props)
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState)
   }
 
   componentWillMount() {

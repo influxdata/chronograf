@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {map, reduce, forEach, concat, clone} from 'fast.js'
 
 /**

@@ -1,28 +1,26 @@
-import React, {PropTypes} from 'react'
-import {Link} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
 
-const NoKapacitorError = React.createClass({
-  propTypes: {
-    source: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  },
+const NoKapacitorError = ({source}) =>
+  <div className="graph-empty">
+    <p>
+      The current source does not have an associated Kapacitor instance
+      <br />
+      <br />
+      <Link
+        to={`/sources/${source.id}/kapacitors/new`}
+        className="btn btn-sm btn-primary"
+      >
+        Configure Kapacitor
+      </Link>
+    </p>
+  </div>
 
-  render() {
-    const path = `/sources/${this.props.source.id}/kapacitors/new`
-    return (
-      <div className="graph-empty">
-        <p>
-          The current source does not have an associated Kapacitor instance
-          <br />
-          <br />
-          <Link to={path} className="btn btn-sm btn-primary">
-            Configure Kapacitor
-          </Link>
-        </p>
-      </div>
-    )
-  },
-})
+NoKapacitorError.propTypes = {
+  source: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+}
 
 export default NoKapacitorError

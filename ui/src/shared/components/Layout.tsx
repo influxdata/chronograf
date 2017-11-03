@@ -1,10 +1,11 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import WidgetCell from 'shared/components/WidgetCell'
 import LayoutCell from 'shared/components/LayoutCell'
 import RefreshingGraph from 'shared/components/RefreshingGraph'
 import {buildQueriesForLayouts} from 'utils/influxql'
 
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 const getSource = (cell, source, sources, defaultSource) => {
   const s = _.get(cell, ['queries', '0', 'source'], null)
@@ -15,7 +16,7 @@ const getSource = (cell, source, sources, defaultSource) => {
   return sources.find(src => src.links.self === s) || defaultSource
 }
 
-class LayoutState extends Component {
+class LayoutState extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

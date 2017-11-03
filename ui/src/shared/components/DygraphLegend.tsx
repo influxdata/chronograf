@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 import classnames from 'classnames'
 
 import {makeLegendStyles} from 'shared/graphs/helpers'

@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 const CustomTimeIndicator = ({queries}) => {
   const q = queries.find(({query}) => !query.includes(':dashboardTime:'))

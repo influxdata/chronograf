@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 
 import DeleteConfirmButtons from 'shared/components/DeleteConfirmButtons'
 import {ADMIN_TABLE} from 'admin/constants/tableSizing'

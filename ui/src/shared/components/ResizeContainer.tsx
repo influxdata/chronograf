@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import ResizeHandle from 'shared/components/ResizeHandle'
@@ -9,7 +10,7 @@ const defaultMinBottomHeight = 200
 const defaultInitialTopHeight = '50%'
 const defaultInitialBottomHeight = '50%'
 
-class ResizeContainer extends Component {
+class ResizeContainer extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

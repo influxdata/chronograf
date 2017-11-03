@@ -1,6 +1,6 @@
 import {proxy} from 'utils/queryUrlGenerator'
 import {noop} from 'shared/actions/app'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import {errorThrown} from 'shared/actions/errors'
 

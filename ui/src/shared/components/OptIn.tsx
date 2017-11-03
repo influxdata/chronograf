@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import uuid from 'node-uuid'
 
 import ClickOutsideInput from 'shared/components/ClickOutsideInput'
 
-class OptIn extends Component {
+class OptIn extends React.Component {
   constructor(props) {
     super(props)
 

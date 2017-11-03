@@ -1,7 +1,8 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {insecureSkipVerifyText} from 'shared/copy/tooltipText'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 const SourceForm = ({
   source,

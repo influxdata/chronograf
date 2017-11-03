@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react'
-import {Link} from 'react-router'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
+import * as _ from 'lodash'
 
 import {TASKS_TABLE} from 'kapacitor/constants/tableSizing'
 

@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import {showDatabases, showRetentionPolicies} from 'shared/apis/metaQuery'
 import showDatabasesParser from 'shared/parsing/showDatabases'
 import showRetentionPoliciesParser from 'shared/parsing/showRetentionPolicies'
 import MultiSelectDropdown from 'shared/components/MultiSelectDropdown'
 
-class MultiSelectDBDropdown extends Component {
+class MultiSelectDBDropdown extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

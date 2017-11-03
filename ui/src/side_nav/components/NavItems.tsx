@@ -1,17 +1,18 @@
-import React, {PropTypes} from 'react'
-import {Link} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
 import classnames from 'classnames'
 
 const {bool, node, string} = PropTypes
 
-const NavListItem = React.createClass({
-  propTypes: {
+class NavListItem extends React.Component {
+  propTypes = {
     link: string.isRequired,
     children: node,
     location: string,
     useAnchor: bool,
     isExternal: bool,
-  },
+  }
 
   render() {
     const {link, children, location, useAnchor, isExternal} = this.props
@@ -31,15 +32,16 @@ const NavListItem = React.createClass({
         >
           {children}
         </Link>
-  },
-})
+  }
+}
 
-const NavHeader = React.createClass({
-  propTypes: {
+class NavHeader extends React.Component {
+  propTypes = {
     link: string,
     title: string,
     useAnchor: bool,
-  },
+  }
+
   render() {
     const {link, title, useAnchor} = this.props
 
@@ -52,17 +54,17 @@ const NavHeader = React.createClass({
       : <Link className="sidebar-menu--heading" to={link}>
           {title}
         </Link>
-  },
-})
+  }
+}
 
-const NavBlock = React.createClass({
-  propTypes: {
+class NavBlock extends React.Component {
+  propTypes = {
     children: node,
     link: string,
     icon: string.isRequired,
     location: string,
     className: string,
-  },
+  }
 
   render() {
     const {location, className} = this.props
@@ -90,9 +92,9 @@ const NavBlock = React.createClass({
         </div>
       </div>
     )
-  },
+  }
 
-  renderSquare() {
+  renderSquare = () => {
     const {link, icon} = this.props
 
     if (!link) {
@@ -108,14 +110,14 @@ const NavBlock = React.createClass({
         <div className={`sidebar--icon icon ${icon}`} />
       </Link>
     )
-  },
-})
+  }
+}
 
-const NavBar = React.createClass({
-  propTypes: {
+class NavBar extends React.Component {
+  propTypes = {
     children: node,
     location: string.isRequired,
-  },
+  }
 
   render() {
     const children = React.Children.map(this.props.children, child => {
@@ -132,7 +134,7 @@ const NavBar = React.createClass({
         {children}
       </nav>
     )
-  },
-})
+  }
+}
 
 export {NavBar, NavBlock, NavHeader, NavListItem}

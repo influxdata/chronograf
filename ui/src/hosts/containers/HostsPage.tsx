@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import HostsTable from 'hosts/components/HostsTable'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
@@ -7,8 +8,8 @@ import SourceIndicator from 'shared/components/SourceIndicator'
 
 import {getCpuAndLoadForHosts, getMappings, getAppsForHosts} from '../apis'
 
-export const HostsPage = React.createClass({
-  propTypes: {
+export class HostsPage extends React.Component {
+  propTypes = {
     source: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -19,15 +20,13 @@ export const HostsPage = React.createClass({
       telegraf: PropTypes.string.isRequired,
     }),
     addFlashMessage: PropTypes.func,
-  },
+  }
 
-  getInitialState() {
-    return {
-      hosts: {},
-      hostsLoading: true,
-      hostsError: '',
-    }
-  },
+  state = {
+    hosts: {},
+    hostsLoading: true,
+    hostsError: '',
+  }
 
   componentDidMount() {
     const {source, addFlashMessage} = this.props
@@ -71,7 +70,7 @@ export const HostsPage = React.createClass({
         // (like with a bogus proxy link). We should provide better messaging to the user in this catch after that's fixed.
         console.error(reason) // eslint-disable-line no-console
       })
-  },
+  }
 
   render() {
     const {source} = this.props
@@ -104,7 +103,7 @@ export const HostsPage = React.createClass({
         </FancyScrollbar>
       </div>
     )
-  },
-})
+  }
+}
 
 export default HostsPage

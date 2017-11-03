@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-import moment from 'moment'
+import * as moment from 'moment'
 
 const JSONFeedReader = ({data}) =>
   data && data.items

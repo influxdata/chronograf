@@ -23,12 +23,10 @@ Sparky.task('config', () => {
     output: 'build/$name.js',
     useTypescriptCompiler: true,
     experimentalFeatures: true,
-    globals: {
-      VERSION: JSON.stringify(version),
-    },
     plugins: [
       EnvPlugin({
         NODE_ENV: isProduction ? 'production' : 'development',
+        VERSION: JSON.stringify(version),
       }),
       SVGPlugin(),
       SassPlugin({
@@ -42,14 +40,18 @@ Sparky.task('config', () => {
       isProduction &&
         QuantumPlugin({
           treeshake: true,
-          uglify: true,
+          uglify: false,
         }),
     ],
     cache: true,
     log: true,
     debug: true,
     tsConfig: 'tsconfig.json',
-    polyfillNonStandardDefaultUsage: true,
+    // useJsNext: true,
+    // polyfillNonStandardDefaultUsage: true,
+    // polyfillNonStandardDefaultUsage: ['react-router'],
+    // useJsNext: ['redux'],
+    // useJsNext: ['memoizerific'],
     alias: {
       admin: '~/admin',
       alerts: '~/alerts',

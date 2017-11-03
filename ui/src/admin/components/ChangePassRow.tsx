@@ -1,9 +1,10 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 import ConfirmButtons from 'shared/components/ConfirmButtons'
 
-class ChangePassRow extends Component {
+class ChangePassRow extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -87,4 +88,4 @@ ChangePassRow.propTypes = {
   buttonSize: string,
 }
 
-export default OnClickOutside(ChangePassRow)
+export default onClickOutside(ChangePassRow)

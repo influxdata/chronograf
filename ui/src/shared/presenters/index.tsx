@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {PERMISSIONS} from 'shared/constants'
 
 export function buildRoles(roles) {

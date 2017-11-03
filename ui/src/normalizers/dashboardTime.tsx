@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 const dashtime = ranges => {
   if (!Array.isArray(ranges)) {

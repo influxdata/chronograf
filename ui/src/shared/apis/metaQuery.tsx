@@ -1,5 +1,5 @@
 import AJAX from 'utils/ajax'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {buildInfluxUrl, proxy} from 'utils/queryUrlGenerator'
 
 export const showDatabases = async source => {

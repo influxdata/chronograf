@@ -1,5 +1,6 @@
-import React, {PropTypes, Component} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import FieldListItem from 'data_explorer/components/FieldListItem'
 import GroupByTimeDropdown from 'data_explorer/components/GroupByTimeDropdown'
@@ -15,7 +16,7 @@ import {
   getFuncsByFieldName,
 } from 'shared/reducers/helpers/fields'
 
-class FieldList extends Component {
+class FieldList extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

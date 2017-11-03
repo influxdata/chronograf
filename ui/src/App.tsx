@@ -11,17 +11,17 @@ import {publishNotification} from './shared/actions/notifications'
 
 const {func, node} = PropTypes
 
-const App = React.createClass({
-  propTypes: {
+class App extends React.Component {
+  propTypes = {
     children: node.isRequired,
     notify: func.isRequired,
-  },
+  }
 
-  handleAddFlashMessage({type, text}) {
+  handleAddFlashMessage = ({type, text}) => {
     const {notify} = this.props
 
     notify(type, text)
-  },
+  }
 
   render() {
     return (
@@ -34,8 +34,8 @@ const App = React.createClass({
           })}
       </div>
     )
-  },
-})
+  }
+}
 
 const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(publishNotification, dispatch),

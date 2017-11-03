@@ -1,7 +1,7 @@
-import React, {Component} from 'react'
+import * as React from 'react'
 
 const ManualRefresh = WrappedComponent =>
-  class extends Component {
+  class extends React.Component {
     constructor(props) {
       super(props)
       this.state = {

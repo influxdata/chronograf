@@ -1,4 +1,5 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import NameSection from 'kapacitor/components/NameSection'
 import ValuesSection from 'kapacitor/components/ValuesSection'
@@ -10,7 +11,7 @@ import {createRule, editRule} from 'kapacitor/apis'
 import buildInfluxQLQuery from 'utils/influxql'
 import timeRanges from 'shared/data/timeRanges'
 
-class KapacitorRule extends Component {
+class KapacitorRule extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

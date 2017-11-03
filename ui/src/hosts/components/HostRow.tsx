@@ -1,17 +1,13 @@
-import React, {PropTypes, Component} from 'react'
-import shallowCompare from 'react-addons-shallow-compare'
-import {Link} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
 import classnames from 'classnames'
 
 import {HOSTS_TABLE} from 'hosts/constants/tableSizing'
 
-class HostRow extends Component {
+class HostRow extends React.PureComponent {
   constructor(props) {
     super(props)
-  }
-
-  shouldComponentUpdate(nextProps) {
-    return shallowCompare(this, nextProps)
   }
 
   render() {

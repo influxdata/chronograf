@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
 import Resizeable from 'react-component-resizable'
 
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import Layout from 'shared/components/Layout'
 
@@ -17,7 +18,7 @@ import {
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
-class LayoutRenderer extends Component {
+class LayoutRenderer extends React.Component {
   constructor(props) {
     super(props)
 

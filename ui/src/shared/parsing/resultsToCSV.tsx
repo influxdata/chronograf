@@ -1,5 +1,5 @@
-import _ from 'lodash'
-import moment from 'moment'
+import * as _ from 'lodash'
+import * as moment from 'moment'
 
 export const formatDate = timestamp =>
   moment(timestamp).format('M/D/YYYY h:mm:ss.SSSSSSSSS A')

@@ -1,6 +1,7 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import * as kapacitorRuleActionCreators from 'kapacitor/actions/view'
 import * as kapacitorQueryConfigActionCreators from 'kapacitor/actions/queryConfigs'
@@ -10,7 +11,7 @@ import {getActiveKapacitor, getKapacitorConfig} from 'shared/apis/index'
 import {RULE_ALERT_OPTIONS, DEFAULT_RULE_ID} from 'kapacitor/constants'
 import KapacitorRule from 'kapacitor/components/KapacitorRule'
 
-class KapacitorRulePage extends Component {
+class KapacitorRulePage extends React.Component {
   constructor(props) {
     super(props)
 

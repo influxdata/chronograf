@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 const emptyFunny = [
   'Looks like you don’t have any queries. Be a lot cooler if you did.',

@@ -1,14 +1,15 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import buildInfluxQLQuery from 'utils/influxql'
 import classnames from 'classnames'
 import VisHeader from 'data_explorer/components/VisHeader'
 import VisView from 'data_explorer/components/VisView'
 import {GRAPH, TABLE} from 'shared/constants'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 const META_QUERY_REGEX = /^show/i
 
-class Visualization extends Component {
+class Visualization extends React.Component {
   constructor(props) {
     super(props)
 

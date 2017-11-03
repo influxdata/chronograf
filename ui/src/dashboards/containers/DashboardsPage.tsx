@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import {withRouter} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -13,8 +14,8 @@ import {NEW_DASHBOARD} from 'dashboards/constants'
 
 const {arrayOf, func, string, shape} = PropTypes
 
-const DashboardsPage = React.createClass({
-  propTypes: {
+class DashboardsPage extends React.Component {
+  propTypes = {
     source: shape({
       id: string.isRequired,
       name: string.isRequired,
@@ -30,21 +31,21 @@ const DashboardsPage = React.createClass({
     handleGetDashboards: func.isRequired,
     handleDeleteDashboard: func.isRequired,
     dashboards: arrayOf(shape()),
-  },
+  }
 
   componentDidMount() {
     this.props.handleGetDashboards()
-  },
+  }
 
-  async handleCreateDashbord() {
+  handleCreateDashbord = async () => {
     const {source: {id}, router: {push}} = this.props
     const {data} = await createDashboard(NEW_DASHBOARD)
     push(`/sources/${id}/dashboards/${data.id}`)
-  },
+  }
 
-  handleDeleteDashboard(dashboard) {
+  handleDeleteDashboard = (dashboard) => {
     this.props.handleDeleteDashboard(dashboard)
-  },
+  }
 
   render() {
     const {dashboards} = this.props
@@ -61,8 +62,8 @@ const DashboardsPage = React.createClass({
         />
       </div>
     )
-  },
-})
+  }
+}
 
 const mapStateToProps = ({dashboardUI: {dashboards, dashboard}}) => ({
   dashboards,

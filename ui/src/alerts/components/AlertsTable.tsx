@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types'
 
 import * as _ from 'lodash'
 import classnames from 'classnames'
-import {Link} from 'react-router'
+import {Link} from 'react-router-dom'
 import uuid from 'node-uuid'
 
 import FancyScrollbar from 'shared/components/FancyScrollbar'

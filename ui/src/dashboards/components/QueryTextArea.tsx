@@ -1,5 +1,6 @@
-import React, {PropTypes, Component} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 import classnames from 'classnames'
 
 import TemplateDrawer from 'shared/components/TemplateDrawer'
@@ -12,7 +13,7 @@ import {
   unMask,
 } from 'dashboards/constants'
 
-class QueryTextArea extends Component {
+class QueryTextArea extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

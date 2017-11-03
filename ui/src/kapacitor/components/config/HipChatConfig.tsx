@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import QuestionMarkTooltip from 'shared/components/QuestionMarkTooltip'
 import {HIPCHAT_TOKEN_TIP} from 'kapacitor/copy'
 import RedactedInput from './RedactedInput'
 
-class HipchatConfig extends Component {
+class HipchatConfig extends React.Component {
   constructor(props) {
     super(props)
   }

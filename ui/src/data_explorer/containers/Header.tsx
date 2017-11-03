@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import {withRouter} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {withRouter} from 'react-router-dom'
 
 import AutoRefreshDropdown from 'shared/components/AutoRefreshDropdown'
 import TimeRangeDropdown from 'shared/components/TimeRangeDropdown'

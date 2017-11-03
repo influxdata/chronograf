@@ -1,5 +1,6 @@
-import React, {Component, PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 import ReactTooltip from 'react-tooltip'
 
 import CodeData from 'kapacitor/components/CodeData'
@@ -7,7 +8,7 @@ import CodeData from 'kapacitor/components/CodeData'
 import {RULE_MESSAGE_TEMPLATES} from 'kapacitor/constants'
 
 // needs to be React Component for CodeData click handler to work
-class RuleMessageTemplates extends Component {
+class RuleMessageTemplates extends React.Component {
   constructor(props) {
     super(props)
   }

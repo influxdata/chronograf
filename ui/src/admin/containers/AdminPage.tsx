@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {
@@ -40,7 +41,7 @@ const isValidRole = role => {
   return role.name.length >= minLen
 }
 
-class AdminPage extends Component {
+class AdminPage extends React.Component {
   constructor(props) {
     super(props)
   }

@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import QuestionMarkTooltip from 'shared/components/QuestionMarkTooltip'
 import RedactedInput from './RedactedInput'
 
 import {PUSHOVER_DOCS_LINK} from 'kapacitor/copy'
 
-class PushoverConfig extends Component {
+class PushoverConfig extends React.Component {
   constructor(props) {
     super(props)
   }

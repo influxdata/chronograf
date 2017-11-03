@@ -1,6 +1,7 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import {withRouter} from 'react-router'
+import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -10,7 +11,7 @@ import {
   dismissAllNotifications as dismissAllNotificationsAction,
 } from 'shared/actions/notifications'
 
-class Notifications extends Component {
+class Notifications extends React.Component {
   constructor(props) {
     super(props)
   }

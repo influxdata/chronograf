@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import Dropdown from 'shared/components/Dropdown'
 
 import {NULL_STRING, NUMBER} from 'shared/constants/queryFillOptions'
 
 import queryFills from 'shared/data/queryFills'
 
-class FillQuery extends Component {
+class FillQuery extends React.Component {
   constructor(props) {
     super(props)
 

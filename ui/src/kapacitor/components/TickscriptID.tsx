@@ -1,6 +1,7 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-class TickscriptID extends Component {
+class TickscriptID extends React.Component {
   constructor(props) {
     super(props)
   }

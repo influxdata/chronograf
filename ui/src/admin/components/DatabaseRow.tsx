@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
-import onClickOutside from 'react-onclickoutside'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import onClickOutside from 'react-onClickOutside'
 
 import {formatRPDuration} from 'utils/formatting'
 import YesNoButtons from 'shared/components/YesNoButtons'
 import {DATABASE_TABLE} from 'admin/constants/tableSizing'
 
-class DatabaseRow extends Component {
+class DatabaseRow extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -255,7 +256,7 @@ DatabaseRow.propTypes = {
     isEditing: bool,
   }),
   isDeletable: bool,
-  database: shape(),
+  database: shape({}),
   onRemove: func,
   onCreate: func,
   onUpdate: func,

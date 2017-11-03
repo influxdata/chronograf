@@ -1,7 +1,8 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 import ConfirmButtons from 'shared/components/ConfirmButtons'
 
 const DeleteButton = ({onClickDelete, buttonSize}) =>
@@ -14,7 +15,7 @@ const DeleteButton = ({onClickDelete, buttonSize}) =>
     Delete
   </button>
 
-class DeleteConfirmButtons extends Component {
+class DeleteConfirmButtons extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -69,4 +70,4 @@ DeleteConfirmButtons.defaultProps = {
   buttonSize: 'btn-sm',
 }
 
-export default OnClickOutside(DeleteConfirmButtons)
+export default onClickOutside(DeleteConfirmButtons)

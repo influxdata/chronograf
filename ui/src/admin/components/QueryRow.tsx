@@ -1,9 +1,10 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import ConfirmButtons from 'shared/components/ConfirmButtons'
 import {QUERIES_TABLE} from 'admin/constants/tableSizing'
 
-class QueryRow extends Component {
+class QueryRow extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import {showDatabases, showRetentionPolicies} from 'shared/apis/metaQuery'
 import showDatabasesParser from 'shared/parsing/showDatabases'
@@ -10,8 +11,8 @@ import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 const {func, shape, string} = PropTypes
 
-const DatabaseList = React.createClass({
-  propTypes: {
+class DatabaseList extends React.Component {
+  propTypes = {
     query: shape({}).isRequired,
     onChooseNamespace: func.isRequired,
     querySource: shape({
@@ -19,31 +20,23 @@ const DatabaseList = React.createClass({
         proxy: string.isRequired,
       }).isRequired,
     }),
-  },
+  }
 
-  getDefaultProps() {
-    return {
-      source: null,
-    }
-  },
-
-  contextTypes: {
+  contextTypes = {
     source: shape({
       links: shape({
         proxy: string.isRequired,
       }).isRequired,
     }).isRequired,
-  },
+  }
 
-  getInitialState() {
-    return {
-      namespaces: [],
-    }
-  },
+  state = {
+    namespaces: [],
+  }
 
   componentDidMount() {
     this.getDbRp()
-  },
+  }
 
   componentDidUpdate(prevProps) {
     if (_.isEqual(prevProps.querySource, this.props.querySource)) {
@@ -51,9 +44,9 @@ const DatabaseList = React.createClass({
     }
 
     this.getDbRp()
-  },
+  }
 
-  getDbRp() {
+  getDbRp = () => {
     const {source} = this.context
     const {querySource} = this.props
     const proxy =
@@ -86,7 +79,7 @@ const DatabaseList = React.createClass({
         this.setState({namespaces})
       })
     })
-  },
+  }
 
   render() {
     const {query, onChooseNamespace} = this.props
@@ -123,7 +116,7 @@ const DatabaseList = React.createClass({
         </div>
       </div>
     )
-  },
-})
+  }
+}
 
 export default DatabaseList

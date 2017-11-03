@@ -1,19 +1,21 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 const {func} = PropTypes
-const RenameCluster = React.createClass({
-  propTypes: {
-    onRenameCluster: func.isRequired,
-  },
 
-  handleRenameCluster(e) {
+class RenameCluster extends React.Component {
+  propTypes = {
+    onRenameCluster: func.isRequired,
+  }
+
+  handleRenameCluster = e => {
     e.preventDefault()
     this.props.onRenameCluster(this._displayName.value)
     this._displayName.value = ''
 
     $('.modal').hide() // eslint-disable-line no-undef
     $('.modal-backdrop').hide() // eslint-disable-line no-undef
-  },
+  }
 
   render() {
     return (
@@ -84,7 +86,7 @@ const RenameCluster = React.createClass({
         </div>
       </div>
     )
-  },
-})
+  }
+}
 
 export default RenameCluster

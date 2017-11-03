@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
 import {resultsToCSV} from 'shared/parsing/resultsToCSV'

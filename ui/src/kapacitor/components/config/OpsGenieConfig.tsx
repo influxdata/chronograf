@@ -1,9 +1,10 @@
-import React, {PropTypes, Component} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import RedactedInput from './RedactedInput'
 
-class OpsGenieConfig extends Component {
+class OpsGenieConfig extends React.Component {
   constructor(props) {
     super(props)
 
@@ -109,7 +110,7 @@ OpsGenieConfig.propTypes = {
   onSave: func.isRequired,
 }
 
-class TagInput extends Component {
+class TagInput extends React.Component {
   constructor(props) {
     super(props)
   }

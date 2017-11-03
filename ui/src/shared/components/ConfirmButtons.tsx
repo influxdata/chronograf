@@ -1,7 +1,8 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-class ConfirmButtons extends Component {
+class ConfirmButtons extends React.Component {
   constructor(props) {
     super(props)
   }

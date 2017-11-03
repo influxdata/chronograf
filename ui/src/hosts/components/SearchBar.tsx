@@ -1,7 +1,8 @@
-import React, {PropTypes, Component} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
-class SearchBar extends Component {
+class SearchBar extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

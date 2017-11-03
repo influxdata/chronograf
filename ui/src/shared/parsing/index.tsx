@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import databases from 'shared/parsing/showDatabases'
 import measurements from 'shared/parsing/showMeasurements'
 import fieldKeys from 'shared/parsing/showFieldKeys'

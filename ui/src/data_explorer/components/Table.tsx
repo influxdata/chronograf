@@ -1,7 +1,8 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-import Dimensions from 'react-dimensions'
-import _ from 'lodash'
+import * as Dimensions from 'react-dimensions'
+import * as _ from 'lodash'
 
 import {Table, Column, Cell} from 'fixed-data-table'
 import Dropdown from 'shared/components/Dropdown'
@@ -12,7 +13,7 @@ import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
 
 const emptySeries = {columns: [], values: []}
 
-class ChronoTable extends Component {
+class ChronoTable extends React.Component {
   constructor(props) {
     super(props)
 

@@ -22,7 +22,7 @@ import {publishAutoDismissingNotification} from 'shared/dispatchers'
 import {errorThrown} from 'shared/actions/errors'
 
 import {REVERT_STATE_DELAY} from 'shared/constants'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 export const loadUsers = ({users}) => ({
   type: 'LOAD_USERS',

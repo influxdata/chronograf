@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 const STREAM = 'stream'
 const BATCH = 'batch'
 

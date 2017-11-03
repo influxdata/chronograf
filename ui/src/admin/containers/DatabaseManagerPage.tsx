@@ -1,14 +1,15 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import DatabaseManager from 'admin/components/DatabaseManager'
 
 import * as adminActionCreators from 'admin/actions'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
-class DatabaseManagerPage extends Component {
+class DatabaseManagerPage extends React.Component {
   constructor(props) {
     super(props)
   }

@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import {Link, withRouter} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link, withRouter} from 'react-router-dom'
 
 import Dropdown from 'shared/components/Dropdown'
 import QuestionMarkTooltip from 'shared/components/QuestionMarkTooltip'

@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import WriteDataFooter from 'data_explorer/components/WriteDataFooter'
 
 const WriteDataBody = ({

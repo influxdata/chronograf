@@ -1,8 +1,8 @@
 /* eslint-disable no-magic-numbers */
-import React, {Component, PropTypes} from 'react'
-import shallowCompare from 'react-addons-shallow-compare'
-import _ from 'lodash'
-import NanoDate from 'nano-date'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
+import * as moment from 'moment'
 
 import Dygraphs from 'external/dygraph'
 import getRange, {getStackedRange} from 'shared/parsing/getRangeForDygraph'
@@ -21,7 +21,7 @@ import {
 } from 'shared/graphs/helpers'
 const {LINEAR, LOG, BASE_10, BASE_2} = DISPLAY_OPTIONS
 
-export default class Dygraph extends Component {
+export default class Dygraph extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -107,23 +107,6 @@ export default class Dygraph extends Component {
   componentWillUnmount() {
     this.dygraph.destroy()
     delete this.dygraph
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    const timeRangeChanged = !_.isEqual(
-      nextProps.timeRange,
-      this.props.timeRange
-    )
-
-    if (this.dygraph.isZoomed() && timeRangeChanged) {
-      this.dygraph.resetZoom()
-    }
-
-    // Will cause componentDidUpdate to fire twice, currently. This could
-    // be reduced by returning false from within the reset conditional above,
-    // though that would be based on the assumption that props for timeRange
-    // will always change before those for data.
-    return shallowCompare(this, nextProps, nextState)
   }
 
   componentDidUpdate() {
@@ -317,8 +300,7 @@ export default class Dygraph extends Component {
     if (!timeRange) {
       return ''
     }
-    const date = new NanoDate(timeRange)
-    return date.toISOString()
+    return moment.format('YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ')
   }
 
   deselectCrosshair = () => {

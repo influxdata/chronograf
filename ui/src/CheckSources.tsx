@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
-import {withRouter} from 'react-router'
+import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -16,8 +16,9 @@ import {DEFAULT_HOME_PAGE} from './shared/constants'
 // getting the list of data nodes, but not every page requires them to function.
 // Routes that do require data nodes can be nested under this component.
 const {arrayOf, func, node, shape, string} = PropTypes
-const CheckSources = React.createClass({
-  propTypes: {
+
+class CheckSources extends React.Component {
+  propTypes = {
     sources: arrayOf(
       shape({
         links: shape({
@@ -43,9 +44,9 @@ const CheckSources = React.createClass({
     }).isRequired,
     loadSources: func.isRequired,
     errorThrown: func.isRequired,
-  },
+  }
 
-  childContextTypes: {
+  childContextTypes = {
     source: shape({
       links: shape({
         proxy: string.isRequired,
@@ -57,18 +58,16 @@ const CheckSources = React.createClass({
         databases: string.isRequired,
       }).isRequired,
     }),
-  },
+  }
 
-  getChildContext() {
+  getChildContext = () => {
     const {sources, params: {sourceID}} = this.props
     return {source: sources.find(s => s.id === sourceID)}
-  },
+  }
 
-  getInitialState() {
-    return {
-      isFetching: true,
-    }
-  },
+  state = {
+    isFetching: true,
+  }
 
   async componentWillMount() {
     const {loadSources, errorThrown} = this.props
@@ -81,7 +80,7 @@ const CheckSources = React.createClass({
       errorThrown(error, 'Unable to connect to Chronograf server')
       this.setState({isFetching: false})
     }
-  },
+  }
 
   async componentWillUpdate(nextProps, nextState) {
     const {router, location, params, errorThrown, sources} = nextProps
@@ -110,7 +109,7 @@ const CheckSources = React.createClass({
         errorThrown(error, 'Unable to connect to source')
       }
     }
-  },
+  }
 
   render() {
     const {params, sources} = this.props
@@ -130,8 +129,8 @@ const CheckSources = React.createClass({
         })
       )
     )
-  },
-})
+  }
+}
 
 const mapStateToProps = ({sources}) => ({
   sources,

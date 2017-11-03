@@ -1,20 +1,17 @@
-import React from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-const {node} = React.PropTypes
-const PanelHeading = React.createClass({
-  propTypes: {
-    children: node.isRequired,
-  },
+const PanelHeading = () =>
+  <div className="panel-heading text-center">
+    <h2 className="deluxe">
+      {this.props.children}
+    </h2>
+  </div>
 
-  render() {
-    return (
-      <div className="panel-heading text-center">
-        <h2 className="deluxe">
-          {this.props.children}
-        </h2>
-      </div>
-    )
-  },
-})
+const {node} = PropTypes
+
+PanelHeading.propTypes = {
+  children: node.isRequired,
+}
 
 export default PanelHeading

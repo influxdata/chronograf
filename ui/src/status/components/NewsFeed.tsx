@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -7,7 +8,7 @@ import {fetchJSONFeedAsync} from 'status/actions'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import JSONFeedReader from 'status/components/JSONFeedReader'
 
-class NewsFeed extends Component {
+class NewsFeed extends React.Component {
   constructor(props) {
     super(props)
   }

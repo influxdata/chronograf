@@ -1,9 +1,10 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import AlertTabs from 'kapacitor/components/AlertTabs'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 
-class KapacitorForm extends Component {
+class KapacitorForm extends React.Component {
   render() {
     const {onInputChange, onReset, kapacitor, onSubmit, exists} = this.props
     const {url, name, username, password} = kapacitor

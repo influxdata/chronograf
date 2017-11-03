@@ -1,14 +1,15 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 import WriteDataBody from 'data_explorer/components/WriteDataBody'
 import WriteDataHeader from 'data_explorer/components/WriteDataHeader'
 
 import {OVERLAY_TECHNOLOGY} from 'shared/constants/classNames'
 let dragCounter = 0
 
-class WriteDataForm extends Component {
+class WriteDataForm extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -182,4 +183,4 @@ WriteDataForm.propTypes = {
   selectedDatabase: string,
 }
 
-export default OnClickOutside(WriteDataForm)
+export default onClickOutside(WriteDataForm)

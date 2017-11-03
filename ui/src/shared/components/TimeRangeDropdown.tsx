@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import moment from 'moment'
+import * as moment from 'moment'
 
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import CustomTimeRangeOverlay from 'shared/components/CustomTimeRangeOverlay'
 
@@ -13,7 +14,7 @@ const dateFormat = 'YYYY-MM-DD HH:mm'
 const emptyTime = {lower: '', upper: ''}
 const format = t => moment(t.replace(/\'/g, '')).format(dateFormat)
 
-class TimeRangeDropdown extends Component {
+class TimeRangeDropdown extends React.Component {
   constructor(props) {
     super(props)
     const {lower, upper} = props.selected
@@ -166,4 +167,4 @@ TimeRangeDropdown.propTypes = {
   page: string,
 }
 
-export default OnClickOutside(TimeRangeDropdown)
+export default onClickOutside(TimeRangeDropdown)

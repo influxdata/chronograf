@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import {ROLES_TABLE} from 'admin/constants/tableSizing'
 
-class RoleEditingRow extends Component {
+class RoleEditingRow extends React.Component {
   handleKeyPress = role => {
     return e => {
       if (e.key === 'Enter') {

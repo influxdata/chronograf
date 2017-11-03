@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import DashboardsTable from 'dashboards/components/DashboardsTable'
 import FancyScrollbar from 'shared/components/FancyScrollbar'

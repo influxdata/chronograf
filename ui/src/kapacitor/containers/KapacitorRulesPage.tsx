@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {getActiveKapacitor} from 'shared/apis'
 import * as kapacitorActionCreators from '../actions/view'
 import KapacitorRules from 'kapacitor/components/KapacitorRules'
 
-class KapacitorRulesPage extends Component {
+class KapacitorRulesPage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

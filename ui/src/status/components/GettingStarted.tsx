@@ -1,8 +1,8 @@
-import React, {Component} from 'react'
+import * as React from 'react'
 
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 
-class GettingStarted extends Component {
+class GettingStarted extends React.Component {
   constructor(props) {
     super(props)
   }

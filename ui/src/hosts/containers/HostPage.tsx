@@ -1,7 +1,8 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import classnames from 'classnames'
 
 import Dygraph from 'external/dygraph'
@@ -23,7 +24,7 @@ import {fetchLayouts} from 'shared/apis'
 import {setAutoRefresh} from 'shared/actions/app'
 import {presentationButtonDispatcher} from 'shared/dispatchers'
 
-class HostPage extends Component {
+class HostPage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

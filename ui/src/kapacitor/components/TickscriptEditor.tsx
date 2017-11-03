@@ -1,8 +1,9 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import CodeMirror from '@skidding/react-codemirror'
 import 'external/codemirror'
 
-class TickscriptEditor extends Component {
+class TickscriptEditor extends React.Component {
   constructor(props) {
     super(props)
   }

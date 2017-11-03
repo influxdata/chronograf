@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import {showMeasurements} from 'shared/apis/metaQuery'
 import showMeasurementsParser from 'shared/parsing/showMeasurements'
@@ -10,8 +11,8 @@ import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 const {func, shape, string} = PropTypes
 
-const MeasurementList = React.createClass({
-  propTypes: {
+class MeasurementList extends React.Component {
+  propTypes = {
     query: shape({
       database: string,
       measurement: string,
@@ -25,28 +26,20 @@ const MeasurementList = React.createClass({
         proxy: string.isRequired,
       }).isRequired,
     }),
-  },
+  }
 
-  contextTypes: {
+  contextTypes = {
     source: shape({
       links: shape({
         proxy: string.isRequired,
       }).isRequired,
     }).isRequired,
-  },
+  }
 
-  getInitialState() {
-    return {
-      measurements: [],
-      filterText: '',
-    }
-  },
-
-  getDefaultProps() {
-    return {
-      querySource: null,
-    }
-  },
+  state = {
+    measurements: [],
+    filterText: '',
+  }
 
   componentDidMount() {
     if (!this.props.query.database) {
@@ -54,7 +47,7 @@ const MeasurementList = React.createClass({
     }
 
     this._getMeasurements()
-  },
+  }
 
   componentDidUpdate(prevProps) {
     const {query, querySource} = this.props
@@ -71,16 +64,16 @@ const MeasurementList = React.createClass({
     }
 
     this._getMeasurements()
-  },
+  }
 
-  handleFilterText(e) {
+  handleFilterText = e => {
     e.stopPropagation()
     this.setState({
       filterText: this.refs.filterText.value,
     })
-  },
+  }
 
-  handleEscape(e) {
+  handleEscape = e => {
     if (e.key !== 'Escape') {
       return
     }
@@ -89,12 +82,12 @@ const MeasurementList = React.createClass({
     this.setState({
       filterText: '',
     })
-  },
+  }
 
-  handleAcceptReject(e) {
+  handleAcceptReject = e => {
     e.stopPropagation()
     this.props.onToggleTagAcceptance()
-  },
+  }
 
   render() {
     return (
@@ -121,9 +114,9 @@ const MeasurementList = React.createClass({
         {this.renderList()}
       </div>
     )
-  },
+  }
 
-  renderList() {
+  renderList = () => {
     if (!this.props.query.database) {
       return (
         <div className="query-builder--list-empty">
@@ -193,9 +186,9 @@ const MeasurementList = React.createClass({
         </FancyScrollbar>
       </div>
     )
-  },
+  }
 
-  _getMeasurements() {
+  _getMeasurements = () => {
     const {source} = this.context
     const {querySource} = this.props
 
@@ -213,7 +206,7 @@ const MeasurementList = React.createClass({
         measurements: measurementSets[0].measurements,
       })
     })
-  },
-})
+  }
+}
 
 export default MeasurementList

@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import {withRouter, Link} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {withRouter, Link} from 'react-router-dom'
 import {connect} from 'react-redux'
 
 import {
@@ -13,8 +14,8 @@ import {DEFAULT_HOME_PAGE} from 'shared/constants'
 
 const {arrayOf, bool, shape, string} = PropTypes
 
-const SideNav = React.createClass({
-  propTypes: {
+class SideNav extends React.Component {
+  propTypes = {
     params: shape({
       sourceID: string.isRequired,
     }).isRequired,
@@ -29,9 +30,9 @@ const SideNav = React.createClass({
         url: string.isRequired,
       })
     ),
-  },
+  }
 
-  renderUserMenuBlockWithCustomLinks(customLinks, logoutLink) {
+  renderUserMenuBlockWithCustomLinks = (customLinks, logoutLink) => {
     return [
       <NavHeader key={0} title="User" />,
       ...customLinks
@@ -54,7 +55,7 @@ const SideNav = React.createClass({
         Logout
       </NavListItem>,
     ]
-  },
+  }
 
   render() {
     const {
@@ -131,8 +132,8 @@ const SideNav = React.createClass({
               </NavBlock>
             : null}
         </NavBar>
-  },
-})
+  }
+}
 
 const mapStateToProps = ({
   auth: {logoutLink},

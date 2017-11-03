@@ -1,5 +1,6 @@
-import React, {Component, PropTypes} from 'react'
-import {withRouter} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {withRouter} from 'react-router-dom'
 
 import {
   getKapacitor,
@@ -12,7 +13,7 @@ import KapacitorForm from '../components/KapacitorForm'
 const defaultName = 'My Kapacitor'
 const kapacitorPort = '9092'
 
-class KapacitorPage extends Component {
+class KapacitorPage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

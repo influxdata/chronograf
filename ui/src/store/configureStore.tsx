@@ -23,7 +23,7 @@ const rootReducer = combineReducers({
   admin: adminReducer,
   dashboardUI,
   dashTimeV1,
-  routing: routerReducer,
+  router: routerReducer,
 })
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

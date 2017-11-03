@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import {NEW_DEFAULT_DASHBOARD_CELL} from 'dashboards/constants/index'
 
-class VisualizationName extends Component {
+class VisualizationName extends React.Component {
   constructor(props) {
     super(props)
 

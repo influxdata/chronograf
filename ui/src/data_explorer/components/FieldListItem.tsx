@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import FunctionSelector from 'shared/components/FunctionSelector'
 import {firstFieldName} from 'shared/reducers/helpers/fields'
 
-class FieldListItem extends Component {
+class FieldListItem extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

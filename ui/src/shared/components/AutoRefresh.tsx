@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
 import {removeUnselectedTemplateValues} from 'dashboards/constants'
 
 const AutoRefresh = ComposedComponent => {
-  class wrapper extends Component {
+  class wrapper extends React.Component {
     constructor() {
       super()
       this.state = {

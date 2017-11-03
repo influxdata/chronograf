@@ -1,9 +1,10 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import classnames from 'classnames'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
 
@@ -24,7 +25,7 @@ const labelText = ({localSelectedItems, isOpen, label}) => {
   return 'None'
 }
 
-class MultiSelectDropdown extends Component {
+class MultiSelectDropdown extends React.Component {
   constructor(props) {
     super(props)
 
@@ -173,4 +174,4 @@ MultiSelectDropdown.defaultProps = {
   isApplyShown: true,
 }
 
-export default OnClickOutside(MultiSelectDropdown)
+export default onClickOutside(MultiSelectDropdown)

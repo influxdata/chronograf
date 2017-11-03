@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import moment from 'moment'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as moment from 'moment'
 
 const CustomCell = ({data, columnName}) => {
   if (columnName === 'time') {

@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import rome from 'rome'
-import moment from 'moment'
+import * as moment from 'moment'
 
 import shortcuts from 'shared/data/timeRangeShortcuts'
 const dateFormat = 'YYYY-MM-DD HH:mm'
 
-class CustomTimeRange extends Component {
+class CustomTimeRange extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import {withRouter} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {withRouter} from 'react-router-dom'
 
 import groupByTimeOptions from 'data_explorer/data/groupByTimes'
 

@@ -1,6 +1,7 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-class NameSection extends Component {
+class NameSection extends React.Component {
   constructor(props) {
     super(props)
 

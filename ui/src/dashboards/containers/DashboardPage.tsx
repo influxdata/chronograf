@@ -1,4 +1,5 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -29,7 +30,7 @@ const defaultTimeRange = {
   format: FORMAT_INFLUXQL,
 }
 
-class DashboardPage extends Component {
+class DashboardPage extends React.Component {
   constructor(props) {
     super(props)
 

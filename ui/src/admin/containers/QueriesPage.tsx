@@ -1,4 +1,5 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -19,7 +20,7 @@ import {
 
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
-class QueriesPage extends Component {
+class QueriesPage extends React.Component {
   constructor(props) {
     super(props)
   }

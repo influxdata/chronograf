@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import {
   RULE_ALERT_OPTIONS,
   ALERT_NODES_ACCESSORS,
 } from 'kapacitor/constants'
 
-class RuleMessageOptions extends Component {
+class RuleMessageOptions extends React.Component {
   constructor(props) {
     super(props)
   }

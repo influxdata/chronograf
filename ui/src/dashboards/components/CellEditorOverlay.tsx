@@ -1,6 +1,7 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-import _ from 'lodash'
+import * as _ from 'lodash'
 import uuid from 'node-uuid'
 
 import ResizeContainer from 'shared/components/ResizeContainer'
@@ -23,7 +24,7 @@ import {OVERLAY_TECHNOLOGY} from 'shared/constants/classNames'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'data_explorer/constants'
 import {AUTO_GROUP_BY} from 'shared/constants'
 
-class CellEditorOverlay extends Component {
+class CellEditorOverlay extends React.Component {
   constructor(props) {
     super(props)
 

@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import QuestionMarkTooltip from 'shared/components/QuestionMarkTooltip'
 import {TELEGRAM_CHAT_ID_TIP, TELEGRAM_TOKEN_TIP} from 'kapacitor/copy'
 
 import RedactedInput from './RedactedInput'
 
-class TelegramConfig extends Component {
+class TelegramConfig extends React.Component {
   constructor(props) {
     super(props)
   }

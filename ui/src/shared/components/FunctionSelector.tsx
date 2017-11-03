@@ -1,9 +1,10 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {INFLUXQL_FUNCTIONS} from 'data_explorer/constants'
 
-class FunctionSelector extends Component {
+class FunctionSelector extends React.Component {
   constructor(props) {
     super(props)
 

@@ -1,7 +1,8 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {OPERATORS} from 'kapacitor/constants'
 import Dropdown from 'shared/components/Dropdown'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 const mapToItems = (arr, type) => arr.map(text => ({text, type}))
 const operators = mapToItems(OPERATORS, 'operator')

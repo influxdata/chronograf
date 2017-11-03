@@ -1,41 +1,41 @@
-import React, {PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 import classnames from 'classnames'
 
 const {string, arrayOf, func, bool} = PropTypes
-const TagListItem = React.createClass({
-  propTypes: {
+
+class TagListItem extends React.Component {
+  propTypes = {
     tagKey: string.isRequired,
     tagValues: arrayOf(string.isRequired).isRequired,
     selectedTagValues: arrayOf(string.isRequired).isRequired,
     isUsingGroupBy: bool,
     onChooseTag: func.isRequired,
     onGroupByTag: func.isRequired,
-  },
+  }
 
-  getInitialState() {
-    return {
-      isOpen: false,
-      filterText: '',
-    }
-  },
+  state = {
+    isOpen: false,
+    filterText: '',
+  }
 
-  handleChoose(tagValue) {
+  handleChoose = tagValue => {
     this.props.onChooseTag({key: this.props.tagKey, value: tagValue})
-  },
+  }
 
-  handleClickKey() {
+  handleClickKey = () => {
     this.setState({isOpen: !this.state.isOpen})
-  },
+  }
 
-  handleFilterText(e) {
+  handleFilterText = e => {
     e.stopPropagation()
     this.setState({
       filterText: this.refs.filterText.value,
     })
-  },
+  }
 
-  handleEscape(e) {
+  handleEscape = e => {
     if (e.key !== 'Escape') {
       return
     }
@@ -44,9 +44,9 @@ const TagListItem = React.createClass({
     this.setState({
       filterText: '',
     })
-  },
+  }
 
-  renderTagValues() {
+  renderTagValues = () => {
     const {tagValues, selectedTagValues} = this.props
     if (!tagValues || !tagValues.length) {
       return <div>no tag values</div>
@@ -91,12 +91,12 @@ const TagListItem = React.createClass({
         })}
       </div>
     )
-  },
+  }
 
-  handleGroupBy(e) {
+  handleGroupBy = e => {
     e.stopPropagation()
     this.props.onGroupByTag(this.props.tagKey)
-  },
+  }
 
   render() {
     const {tagKey, tagValues, isUsingGroupBy} = this.props
@@ -127,7 +127,7 @@ const TagListItem = React.createClass({
         {isOpen ? this.renderTagValues() : null}
       </div>
     )
-  },
-})
+  }
+}
 
 export default TagListItem

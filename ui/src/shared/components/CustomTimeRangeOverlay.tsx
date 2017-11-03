@@ -1,9 +1,10 @@
-import React, {PropTypes, Component} from 'react'
-import OnClickOutside from 'react-onclickoutside'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import onClickOutside from 'react-onClickOutside'
 
 import CustomTimeRange from 'shared/components/CustomTimeRange'
 
-class CustomTimeRangeOverlay extends Component {
+class CustomTimeRangeOverlay extends React.Component {
   constructor(props) {
     super(props)
   }
@@ -40,4 +41,4 @@ CustomTimeRangeOverlay.propTypes = {
   page: string,
 }
 
-export default OnClickOutside(CustomTimeRangeOverlay)
+export default onClickOutside(CustomTimeRangeOverlay)

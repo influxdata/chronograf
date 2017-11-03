@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import {
   DASHBOARD_NAME_MAX_LENGTH,
   NEW_DASHBOARD,
 } from 'dashboards/constants/index'
 
-class DashboardEditHeader extends Component {
+class DashboardEditHeader extends React.Component {
   constructor(props) {
     super(props)
 

@@ -1,5 +1,6 @@
-import React, {Component, PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import {Tab, Tabs, TabPanel, TabPanels, TabList} from 'shared/components/Tabs'
 import {getKapacitorConfig, updateKapacitorConfigSection} from 'shared/apis'
@@ -18,7 +19,7 @@ import {
   VictorOpsConfig,
 } from './config'
 
-class AlertTabs extends Component {
+class AlertTabs extends React.Component {
   constructor(props) {
     super(props)
 

@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import Dropdown from 'shared/components/Dropdown'
 import {showMeasurements} from 'shared/apis/metaQuery'
 import parsers from 'shared/parsing'
 const {measurements: showMeasurementsParser} = parsers
 
-class MeasurementDropdown extends Component {
+class MeasurementDropdown extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

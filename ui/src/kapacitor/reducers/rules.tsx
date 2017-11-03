@@ -1,5 +1,5 @@
 import {defaultRuleConfigs, DEFAULT_RULE_ID} from 'kapacitor/constants'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import {parseAlerta} from 'shared/parsing/parseAlerta'
 
 export default function rules(state = {}, action) {

@@ -1,6 +1,6 @@
 import {proxy} from 'utils/queryUrlGenerator'
 import AJAX from 'utils/ajax'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 export function getCpuAndLoadForHosts(proxyLink, telegrafDB) {
   return proxy({

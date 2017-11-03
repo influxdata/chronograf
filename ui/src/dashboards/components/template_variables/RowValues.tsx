@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import TableInput from 'dashboards/components/template_variables/TableInput'
 
 const RowValues = ({

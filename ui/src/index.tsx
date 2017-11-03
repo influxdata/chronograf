@@ -3,9 +3,9 @@ import 'babel-polyfill'
 import * as React from 'react'
 import {render} from 'react-dom'
 import {Provider} from 'react-redux'
-import {Router, Route, useRouterHistory} from 'react-router'
-import {createHistory} from 'history'
-import {syncHistoryWithStore} from 'react-router-redux'
+import {Route} from 'react-router'
+import {ConnectedRouter} from 'react-router-redux'
+import createHistory from 'history/createBrowserHistory'
 
 import configureStore from './store/configureStore'
 import {loadLocalStorage} from './localStorage'
@@ -53,14 +53,17 @@ const rootNode = document.getElementById('react-root')
 // Older method used for pre-IE 11 compatibility
 const basepath = rootNode.getAttribute('data-basepath') || ''
 window.basepath = basepath
-const browserHistory = useRouterHistory(createHistory)({
-  basename: basepath, // this is written in when available by the URL prefixer middleware
-})
 
-const store = configureStore(loadLocalStorage(errorsQueue), browserHistory)
+const history = createHistory()
+
+// const history = useRouterHistory(createHistory)({
+//   basename: basepath, // this is written in when available by the URL prefixer middleware
+// })
+
+const store = configureStore(loadLocalStorage(errorsQueue), history)
 const {dispatch} = store
 
-browserHistory.listen(() => {
+history.listen(() => {
   dispatch(disablePresentationMode())
 })
 
@@ -72,15 +75,13 @@ window.addEventListener('keyup', event => {
   }
 })
 
-const history = syncHistoryWithStore(browserHistory, store)
-
-const Root = React.createClass({
+class Root extends React.Component {
   componentWillMount() {
     this.flushErrorsQueue()
     this.checkAuth()
-  },
+  }
 
-  async checkAuth() {
+  checkAuth = async () => {
     dispatch(authRequested())
     dispatch(meRequested())
     try {
@@ -88,9 +89,9 @@ const Root = React.createClass({
     } catch (error) {
       dispatch(errorThrown(error))
     }
-  },
+  }
 
-  async startHeartbeat({shouldDispatchResponse}) {
+  startHeartbeat = async ({shouldDispatchResponse}) => {
     try {
       // These non-me objects are added to every response by some AJAX trickery
       const {data: me, auth, logoutLink, external} = await getMe()
@@ -109,55 +110,57 @@ const Root = React.createClass({
     } catch (error) {
       dispatch(errorThrown(error))
     }
-  },
+  }
 
-  flushErrorsQueue() {
+  flushErrorsQueue = () => {
     if (errorsQueue.length) {
       errorsQueue.forEach(errorText => {
         dispatch(errorThrown({status: 0, auth: null}, errorText, 'warning'))
       })
     }
-  },
+  }
 
   render() {
     return (
       <Provider store={store}>
-        <Router history={history}>
-          <Route path="/" component={UserIsAuthenticated(CheckSources)} />
-          <Route path="/login" component={UserIsNotAuthenticated(Login)} />
-          <Route
-            path="/sources/new"
-            component={UserIsAuthenticated(SourcePage)}
-          />
-          <Route path="/sources/:sourceID" component={UserIsAuthenticated(App)}>
-            <Route component={CheckSources}>
-              <Route path="status" component={StatusPage} />
-              <Route path="hosts" component={HostsPage} />
-              <Route path="hosts/:hostID" component={HostPage} />
-              <Route path="chronograf/data-explorer" component={DataExplorer} />
-              <Route path="dashboards" component={DashboardsPage} />
-              <Route path="dashboards/:dashboardID" component={DashboardPage} />
-              <Route path="alerts" component={AlertsApp} />
-              <Route path="alert-rules" component={KapacitorRulesPage} />
-              <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
-              <Route path="alert-rules/new" component={KapacitorRulePage} />
-              <Route path="tickscript/new" component={TickscriptPage} />
-              <Route path="tickscript/:ruleID" component={TickscriptPage} />
-              <Route path="kapacitors/new" component={KapacitorPage} />
-              <Route path="kapacitors/:id/edit" component={KapacitorPage} />
-              <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
-              <Route path="admin" component={AdminPage} />
-              <Route path="manage-sources" component={ManageSources} />
-              <Route path="manage-sources/new" component={SourcePage} />
-              <Route path="manage-sources/:id/edit" component={SourcePage} />
+        <ConnectedRouter basename={basepath}>
+          <div>
+            <Route path="/" component={UserIsAuthenticated(CheckSources)} />
+            <Route path="/login" component={UserIsNotAuthenticated(Login)} />
+            <Route
+              path="/sources/new"
+              component={UserIsAuthenticated(SourcePage)}
+            />
+            <Route path="/sources/:sourceID" component={UserIsAuthenticated(App)}>
+              <Route component={CheckSources}>
+                <Route path="status" component={StatusPage} />
+                <Route path="hosts" component={HostsPage} />
+                <Route path="hosts/:hostID" component={HostPage} />
+                <Route path="chronograf/data-explorer" component={DataExplorer} />
+                <Route path="dashboards" component={DashboardsPage} />
+                <Route path="dashboards/:dashboardID" component={DashboardPage} />
+                <Route path="alerts" component={AlertsApp} />
+                <Route path="alert-rules" component={KapacitorRulesPage} />
+                <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
+                <Route path="alert-rules/new" component={KapacitorRulePage} />
+                <Route path="tickscript/new" component={TickscriptPage} />
+                <Route path="tickscript/:ruleID" component={TickscriptPage} />
+                <Route path="kapacitors/new" component={KapacitorPage} />
+                <Route path="kapacitors/:id/edit" component={KapacitorPage} />
+                <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
+                <Route path="admin" component={AdminPage} />
+                <Route path="manage-sources" component={ManageSources} />
+                <Route path="manage-sources/new" component={SourcePage} />
+                <Route path="manage-sources/:id/edit" component={SourcePage} />
+              </Route>
             </Route>
-          </Route>
-          <Route path="*" component={NotFound} />
-        </Router>
+            <Route path="*" component={NotFound} />
+          </div>
+        </ConnectedRouter>
       </Provider>
     )
-  },
-})
+  }
+}
 
 if (rootNode) {
   render(<Root />, rootNode)

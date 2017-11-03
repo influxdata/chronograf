@@ -1,10 +1,11 @@
-import React, {Component, PropTypes} from 'react'
-import {Link} from 'react-router'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
+import * as _ from 'lodash'
 import classnames from 'classnames'
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 
-class DashboardSwitcher extends Component {
+class DashboardSwitcher extends React.Component {
   constructor(props) {
     super(props)
 
@@ -86,4 +87,4 @@ NameLink.propTypes = {
   onClose: func.isRequired,
 }
 
-export default OnClickOutside(DashboardSwitcher)
+export default onClickOutside(DashboardSwitcher)

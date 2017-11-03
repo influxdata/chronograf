@@ -1,4 +1,4 @@
-import Dygraph from 'dygraphs/src-es5/dygraph'
+import * as Dygraph from 'dygraphs/src-es5/dygraph'
 /* eslint-disable */
 /**
  * Synchronize zooming and/or selections between a set of dygraphs.

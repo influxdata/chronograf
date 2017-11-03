@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import TagListItem from './TagListItem'
 
@@ -9,8 +10,8 @@ import showTagValuesParser from 'shared/parsing/showTagValues'
 
 const {string, shape, func, bool} = PropTypes
 
-const TagList = React.createClass({
-  propTypes: {
+class TagList extends React.Component {
+  propTypes = {
     query: shape({
       database: string,
       measurement: string,
@@ -24,29 +25,21 @@ const TagList = React.createClass({
         proxy: string.isRequired,
       }).isRequired,
     }),
-  },
+  }
 
-  contextTypes: {
+  contextTypes = {
     source: shape({
       links: shape({
         proxy: string.isRequired,
       }).isRequired,
     }).isRequired,
-  },
+  }
 
-  getDefaultProps() {
-    return {
-      querySource: null,
-    }
-  },
+  state = {
+    tags: {},
+  }
 
-  getInitialState() {
-    return {
-      tags: {},
-    }
-  },
-
-  _getTags() {
+  _getTags = () => {
     const {database, measurement, retentionPolicy} = this.props.query
     const {source} = this.context
     const {querySource} = this.props
@@ -77,7 +70,7 @@ const TagList = React.createClass({
 
         this.setState({tags})
       })
-  },
+  }
 
   componentDidMount() {
     const {database, measurement, retentionPolicy} = this.props.query
@@ -86,7 +79,7 @@ const TagList = React.createClass({
     }
 
     this._getTags()
-  },
+  }
 
   componentDidUpdate(prevProps) {
     const {query, querySource} = this.props
@@ -111,7 +104,7 @@ const TagList = React.createClass({
     }
 
     this._getTags()
-  },
+  }
 
   render() {
     const {query} = this.props
@@ -133,7 +126,7 @@ const TagList = React.createClass({
         })}
       </div>
     )
-  },
-})
+  }
+}
 
 export default TagList

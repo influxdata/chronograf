@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
-import {Link} from 'react-router'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
 import classnames from 'classnames'
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
 
-class Dropdown extends Component {
+class Dropdown extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -299,4 +300,4 @@ Dropdown.propTypes = {
   toggleStyle: shape(),
 }
 
-export default OnClickOutside(Dropdown)
+export default onClickOutside(Dropdown)

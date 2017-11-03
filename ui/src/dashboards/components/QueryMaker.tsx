@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import EmptyQuery from 'shared/components/EmptyQuery'
 import QueryTabList from 'shared/components/QueryTabList'

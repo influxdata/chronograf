@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import OnClickOutside from 'shared/components/OnClickOutside'
+import onClickOutside from 'shared/components/onClickOutside'
 
 import autoRefreshItems from 'shared/data/autoRefreshes'
 
-class AutoRefreshDropdown extends Component {
+class AutoRefreshDropdown extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -86,4 +87,4 @@ AutoRefreshDropdown.propTypes = {
   onManualRefresh: func,
 }
 
-export default OnClickOutside(AutoRefreshDropdown)
+export default onClickOutside(AutoRefreshDropdown)

@@ -1,5 +1,6 @@
-import React, {Component, PropTypes} from 'react'
-import _ from 'lodash'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 import classnames from 'classnames'
 
 import RuleMessageOptions from 'kapacitor/components/RuleMessageOptions'
@@ -8,7 +9,7 @@ import RuleMessageTemplates from 'kapacitor/components/RuleMessageTemplates'
 
 import {DEFAULT_ALERTS, RULE_ALERT_OPTIONS} from 'kapacitor/constants'
 
-class RuleMessage extends Component {
+class RuleMessage extends React.Component {
   constructor(props) {
     super(props)
 

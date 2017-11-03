@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import OptIn from 'shared/components/OptIn'
 import Input from 'dashboards/components/DisplayOptionsInput'

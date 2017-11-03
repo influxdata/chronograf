@@ -1,4 +1,5 @@
-import React, {PropTypes, Component} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import SourceIndicator from 'shared/components/SourceIndicator'
 import AlertsTable from 'alerts/components/AlertsTable'
@@ -8,12 +9,12 @@ import CustomTimeRangeDropdown from 'shared/components/CustomTimeRangeDropdown'
 import {getAlerts} from 'alerts/apis'
 import AJAX from 'utils/ajax'
 
-import _ from 'lodash'
-import moment from 'moment'
+import * as _ from 'lodash'
+import * as moment from 'moment'
 
 import timeRanges from 'shared/data/timeRanges'
 
-class AlertsApp extends Component {
+class AlertsApp extends React.Component {
   constructor(props) {
     super(props)
 

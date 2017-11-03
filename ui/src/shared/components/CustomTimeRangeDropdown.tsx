@@ -1,11 +1,12 @@
-import React, {PropTypes, Component} from 'react'
-import moment from 'moment'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
+import * as moment from 'moment'
 import classnames from 'classnames'
-import OnClickOutside from 'react-onclickoutside'
+import onClickOutside from 'react-onClickOutside'
 
 import CustomTimeRange from 'shared/components/CustomTimeRange'
 
-class CustomTimeRangeDropdown extends Component {
+class CustomTimeRangeDropdown extends React.Component {
   constructor(props) {
     super(props)
 
@@ -66,4 +67,4 @@ CustomTimeRangeDropdown.propTypes = {
   }).isRequired,
 }
 
-export default OnClickOutside(CustomTimeRangeDropdown)
+export default onClickOutside(CustomTimeRangeDropdown)

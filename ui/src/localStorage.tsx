@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import normalizer from './normalizers/dashboardTime'
 
 export const loadLocalStorage = errorsQueue => {
@@ -8,7 +8,7 @@ export const loadLocalStorage = errorsQueue => {
     const state = JSON.parse(serializedState) || {}
 
     // eslint-disable-next-line no-undef
-    if (state.VERSION && state.VERSION !== window.VERSION) {
+    if (state.VERSION && state.VERSION !== process.env.VERSION) {
       const errorText =
         'New version of Chronograf detected. Local settings cleared.'
 
@@ -64,7 +64,7 @@ export const saveToLocalStorage = ({
         dataExplorerQueryConfigs,
         timeRange,
         dataExplorer,
-        VERSION: window.VERSION, // eslint-disable-line no-undef
+        VERSION: process.env.VERSION, // eslint-disable-line no-undef
         dashTimeV1,
       })
     )

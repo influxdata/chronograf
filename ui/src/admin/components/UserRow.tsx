@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
-import _ from 'lodash'
+import * as _ from 'lodash'
 import classnames from 'classnames'
 
 import UserEditName from 'admin/components/UserEditName'

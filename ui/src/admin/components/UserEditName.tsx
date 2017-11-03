@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import * as React from 'react'
+import * as PropTypes from 'prop-types'
 
 import {USERS_TABLE} from 'admin/constants/tableSizing'
 
-class UserEditName extends Component {
+class UserEditName extends React.Component {
   handleKeyPress = user => {
     return e => {
       if (e.key === 'Enter') {
