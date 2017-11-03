@@ -11,12 +11,12 @@ import query from './stubs/query';
 import queryConfigs from './stubs/queryConfigs';
 
 // Actions for Spies
-import * as kapacitorActions from 'src/kapacitor/actions/view'
-import * as queryActions from 'src/data_explorer/actions/view';
+import * as kapacitorActions from 'kapacitor/actions/view'
+import * as queryActions from 'data_explorer/actions/view';
 
 // Components
-import KapacitorRule from 'src/kapacitor/components/KapacitorRule';
-import ValuesSection from 'src/kapacitor/components/ValuesSection';
+import KapacitorRule from 'kapacitor/components/KapacitorRule';
+import ValuesSection from 'kapacitor/components/ValuesSection';
 
 const valuesSection = (trigger, values) => (
   <div className="rule-builder">
