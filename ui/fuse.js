@@ -1,10 +1,11 @@
 const {
   FuseBox,
   EnvPlugin,
-  SVGPlugin,
+  // SVGPlugin,
+  SassPlugin,
+  PostCSSPlugin,
   CSSPlugin,
   JSONPlugin,
-  SassPlugin,
   QuantumPlugin,
   WebIndexPlugin,
   Sparky,
@@ -24,28 +25,38 @@ Sparky.task('config', () => {
     useTypescriptCompiler: true,
     experimentalFeatures: true,
     plugins: [
-      EnvPlugin({
-        NODE_ENV: isProduction ? 'production' : 'development',
-        VERSION: JSON.stringify(version),
-      }),
-      SVGPlugin(),
+      // SVGPlugin(),
       SassPlugin({
         sourceMap: false, // https://github.com/sass/libsass/issues/2312
+        // includePaths: ['src/style'],
+        outputStyle: 'compressed',
+        importer: true,
       }),
+      // PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
+      //   sourceMaps: false,
+      // }),
       CSSPlugin({
         group: 'chronograf.css',
-        outFile: 'build/chronograf.css',
-        inject: true,
+        outFile: () => 'build/chronograf.css',
+        inject: false,
+        // inject: file => `built/${file}`,
+        // minify: true,
       }),
       JSONPlugin(),
       WebIndexPlugin({
         template: 'src/index.template.html',
       }),
-      isProduction &&
-        QuantumPlugin({
-          treeshake: true,
-          uglify: false,
-        }),
+      EnvPlugin({
+        NODE_ENV: isProduction ? 'production' : 'development',
+        VERSION: JSON.stringify(version),
+      }),
+      // isProduction &&
+      //   QuantumPlugin({
+      //     treeshake: true,
+      //     uglify: {
+      //       es6: true,
+      //     },
+      //   }),
     ],
     cache: true,
     log: true,
@@ -87,7 +98,7 @@ Sparky.task('config', () => {
 Sparky.task('default', ['clean', 'config'], () => {
   fuse.dev({
     port: 4444,
-    open: true,
+    open: false,
     // httpServer: false,
     proxy: {
       '/chronograf/v1': {

@@ -1,5 +1,4 @@
-import {createStore, applyMiddleware, compose} from 'redux'
-import {combineReducers} from 'redux'
+import {createStore, applyMiddleware, compose, combineReducers} from 'redux'
 import {routerReducer, routerMiddleware} from 'react-router-redux'
 import thunkMiddleware from 'redux-thunk'
 
@@ -29,11 +28,6 @@ const rootReducer = combineReducers({
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export default function configureStore(initialState, browserHistory) {
-  console.log('thunkMiddleware', thunkMiddleware)
-  console.log('errorsMiddleware', errorsMiddleware)
-  console.log('queryStringConfig', queryStringConfig)
-  console.log('resizeLayout', resizeLayout)
-
   const routingMiddleware = routerMiddleware(browserHistory)
   const createPersistentStore = composeEnhancers(
     persistStateEnhancer(),

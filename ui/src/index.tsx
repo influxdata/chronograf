@@ -74,16 +74,7 @@ window.addEventListener('keyup', event => {
 })
 
 class Root extends React.Component {
-  componentDidCatch(error, info) {
-    console.error(error, info)
-  }
-
-  componentWillMount() {
-    this.flushErrorsQueue()
-    this.checkAuth()
-  }
-
-  checkAuth = async () => {
+  private checkAuth = async () => {
     dispatch(authRequested())
     dispatch(meRequested())
     try {
@@ -93,7 +84,7 @@ class Root extends React.Component {
     }
   }
 
-  startHeartbeat = async ({shouldDispatchResponse}) => {
+  private startHeartbeat = async ({shouldDispatchResponse}) => {
     try {
       // These non-me objects are added to every response by some AJAX trickery
       const {data: me, auth, logoutLink, external} = await getMe()
@@ -114,7 +105,7 @@ class Root extends React.Component {
     }
   }
 
-  flushErrorsQueue = () => {
+  private flushErrorsQueue = () => {
     if (errorsQueue.length) {
       errorsQueue.forEach(errorText => {
         dispatch(errorThrown({status: 0, auth: null}, errorText, 'warning'))
@@ -122,7 +113,16 @@ class Root extends React.Component {
     }
   }
 
-  render() {
+  public componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error(error, info)
+  }
+
+  public componentWillMount() {
+    this.flushErrorsQueue()
+    this.checkAuth()
+  }
+
+  public render() {
     return (
       <Provider store={store}>
         <ConnectedRouter history={history}>
@@ -133,27 +133,39 @@ class Root extends React.Component {
               path="/sources/new"
               component={UserIsAuthenticated(SourcePage)}
             />
-            <Route path="/sources/:sourceID" component={UserIsAuthenticated(App)}>
-              <Route component={CheckSources} />
-              <Route path="status" component={StatusPage} />
-              <Route path="hosts" component={HostsPage} />
-              <Route path="hosts/:hostID" component={HostPage} />
-              <Route path="chronograf/data-explorer" component={DataExplorer} />
-              <Route path="dashboards" component={DashboardsPage} />
-              <Route path="dashboards/:dashboardID" component={DashboardPage} />
-              <Route path="alerts" component={AlertsApp} />
-              <Route path="alert-rules" component={KapacitorRulesPage} />
-              <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
-              <Route path="alert-rules/new" component={KapacitorRulePage} />
-              <Route path="tickscript/new" component={TickscriptPage} />
-              <Route path="tickscript/:ruleID" component={TickscriptPage} />
-              <Route path="kapacitors/new" component={KapacitorPage} />
-              <Route path="kapacitors/:id/edit" component={KapacitorPage} />
-              <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
-              <Route path="admin" component={AdminPage} />
-              <Route path="manage-sources" component={ManageSources} />
-              <Route path="manage-sources/new" component={SourcePage} />
-              <Route path="manage-sources/:id/edit" component={SourcePage} />
+            <Route path="/sources/:sourceID">
+              <div>
+                <Route component={UserIsAuthenticated(App)} />
+                <Route component={CheckSources} />
+                <Route path="status" component={StatusPage} />
+                <Route path="hosts" component={HostsPage} />
+                <Route path="hosts/:hostID" component={HostPage} />
+                <Route
+                  path="chronograf/data-explorer"
+                  component={DataExplorer}
+                />
+                <Route path="dashboards" component={DashboardsPage} />
+                <Route
+                  path="dashboards/:dashboardID"
+                  component={DashboardPage}
+                />
+                <Route path="alerts" component={AlertsApp} />
+                <Route path="alert-rules" component={KapacitorRulesPage} />
+                <Route
+                  path="alert-rules/:ruleID"
+                  component={KapacitorRulePage}
+                />
+                <Route path="alert-rules/new" component={KapacitorRulePage} />
+                <Route path="tickscript/new" component={TickscriptPage} />
+                <Route path="tickscript/:ruleID" component={TickscriptPage} />
+                <Route path="kapacitors/new" component={KapacitorPage} />
+                <Route path="kapacitors/:id/edit" component={KapacitorPage} />
+                <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
+                <Route path="admin" component={AdminPage} />
+                <Route path="manage-sources" component={ManageSources} />
+                <Route path="manage-sources/new" component={SourcePage} />
+                <Route path="manage-sources/:id/edit" component={SourcePage} />
+              </div>
             </Route>
             <Route path="*" component={NotFound} />
           </div>

@@ -4,72 +4,62 @@ import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import {getSources} from './shared/apis'
-import {showDatabases} from './shared/apis/metaQuery'
+import {getSources} from 'shared/apis'
+import {showDatabases} from 'shared/apis/metaQuery'
 
-import {loadSources as loadSourcesAction} from './shared/actions/sources'
-import {errorThrown as errorThrownAction} from './shared/actions/errors'
+import {loadSources as loadSourcesAction} from 'shared/actions/sources'
+import {errorThrown as errorThrownAction} from 'shared/actions/errors'
 
-import {DEFAULT_HOME_PAGE} from './shared/constants'
+import {DEFAULT_HOME_PAGE} from 'shared/constants'
+import {Router, Source} from 'src/types'
+
+export interface CheckSourcesProps {
+  sources: Source[]
+  params: {
+    sourceID: string
+  }
+  router: Router
+  location: Location
+  loadSources: (sources: Source[]) => void
+  errorThrown: (error: string, altText: string) => void
+  children: React.ReactChildren
+}
+
+export interface CheckSourcesState {
+  isFetching: boolean
+}
 
 // Acts as a 'router middleware'. The main `App` component is responsible for
 // getting the list of data nodes, but not every page requires them to function.
 // Routes that do require data nodes can be nested under this component.
-const {arrayOf, func, node, shape, string} = PropTypes
-
-class CheckSources extends React.Component {
-  propTypes = {
-    sources: arrayOf(
-      shape({
-        links: shape({
-          proxy: string.isRequired,
-          self: string.isRequired,
-          kapacitors: string.isRequired,
-          queries: string.isRequired,
-          permissions: string.isRequired,
-          users: string.isRequired,
-          databases: string.isRequired,
-        }).isRequired,
-      })
-    ),
-    children: node,
-    params: shape({
-      sourceID: string,
-    }).isRequired,
-    router: shape({
-      push: func.isRequired,
-    }).isRequired,
-    location: shape({
-      pathname: string.isRequired,
-    }).isRequired,
-    loadSources: func.isRequired,
-    errorThrown: func.isRequired,
+class CheckSources extends React.Component<
+  CheckSourcesProps,
+  CheckSourcesState
+> {
+  public static state = {
+    isFetching: true,
   }
 
-  childContextTypes = {
-    source: shape({
-      links: shape({
-        proxy: string.isRequired,
-        self: string.isRequired,
-        kapacitors: string.isRequired,
-        queries: string.isRequired,
-        permissions: string.isRequired,
-        users: string.isRequired,
-        databases: string.isRequired,
+  public static childContextTypes = {
+    source: PropTypes.shape({
+      links: PropTypes.shape({
+        proxy: PropTypes.string.isRequired,
+        self: PropTypes.string.isRequired,
+        kapacitors: PropTypes.string.isRequired,
+        queries: PropTypes.string.isRequired,
+        permissions: PropTypes.string.isRequired,
+        users: PropTypes.string.isRequired,
+        databases: PropTypes.string.isRequired,
       }).isRequired,
     }),
   }
 
-  getChildContext = () => {
+  public getChildContext = () => {
     const {sources, params: {sourceID}} = this.props
     return {source: sources.find(s => s.id === sourceID)}
   }
 
-  state = {
-    isFetching: true,
-  }
-
-  async componentWillMount() {
+  public async componentWillMount() {
     const {loadSources, errorThrown} = this.props
 
     try {
@@ -82,7 +72,10 @@ class CheckSources extends React.Component {
     }
   }
 
-  async componentWillUpdate(nextProps, nextState) {
+  public async componentWillUpdate(
+    nextProps: CheckSourcesProps,
+    nextState: CheckSourcesState
+  ) {
     const {router, location, params, errorThrown, sources} = nextProps
     const {isFetching} = nextState
     const source = sources.find(s => s.id === params.sourceID)
@@ -111,7 +104,7 @@ class CheckSources extends React.Component {
     }
   }
 
-  render() {
+  public render() {
     const {params, sources} = this.props
     const {isFetching} = this.state
     const source = sources.find(s => s.id === params.sourceID)
@@ -122,12 +115,11 @@ class CheckSources extends React.Component {
 
     return (
       this.props.children &&
-      React.cloneElement(
-        this.props.children,
-        Object.assign({}, this.props, {
-          source,
-        })
-      )
+      // tslint:disable-next-line:no-any
+      React.cloneElement(this.props.children as React.ReactElement<any>, {
+        ...this.props,
+        source,
+      })
     )
   }
 }
