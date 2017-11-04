@@ -10,7 +10,6 @@
     ],
     "isolatedModules": false,
     "jsx": "react",
-    "allowJs": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": true,

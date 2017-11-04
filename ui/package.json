@@ -11,13 +11,14 @@
   "scripts": {
     "build": "node fuse build",
     "start": "node fuse",
-    "lint": "esw src/",
+    "lint": "tslint --project .",
+    "ts": "tsc --noEmit --pretty",
+    "ts:dev": "tsc --noEmit --pretty --watch",
     "test": "karma start",
     "test:integration": "nightwatch tests --skip",
     "test:lint": "yarn run lint; yarn run test",
     "test:dev": "concurrently \"yarn run lint -- --watch\" \"yarn run test -- --no-single-run --reporters=verbose\"",
     "clean": "rm -rf build",
-    "storybook": "node ./storybook.js",
     "prettier": "prettier --single-quote --trailing-comma es5 --bracket-spacing false --semi false --write \"{src,spec}/**/*.js\""
   },
   "author": "",

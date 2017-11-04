@@ -8,7 +8,7 @@
   ],
   "rules": {
     "align": [
-      true,
+      false, // Prettier
       "parameters",
       "arguments",
       "statements"
