@@ -29,6 +29,11 @@ const rootReducer = combineReducers({
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export default function configureStore(initialState, browserHistory) {
+  console.log('thunkMiddleware', thunkMiddleware)
+  console.log('errorsMiddleware', errorsMiddleware)
+  console.log('queryStringConfig', queryStringConfig)
+  console.log('resizeLayout', resizeLayout)
+
   const routingMiddleware = routerMiddleware(browserHistory)
   const createPersistentStore = composeEnhancers(
     persistStateEnhancer(),
@@ -36,7 +41,7 @@ export default function configureStore(initialState, browserHistory) {
       thunkMiddleware,
       routingMiddleware,
       errorsMiddleware,
-      queryStringConfig,
+      // queryStringConfig,
       resizeLayout
     )
   )(createStore)

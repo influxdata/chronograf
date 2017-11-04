@@ -42,7 +42,7 @@ import {
 import {linksReceived} from 'shared/actions/links'
 import {errorThrown} from 'shared/actions/errors'
 
-// import './style/chronograf.scss'
+import './style/chronograf.scss'
 
 import {HEARTBEAT_INTERVAL} from 'shared/constants'
 
@@ -54,11 +54,9 @@ const rootNode = document.getElementById('react-root')
 const basepath = rootNode.getAttribute('data-basepath') || ''
 window.basepath = basepath
 
-const history = createHistory()
-
-// const history = useRouterHistory(createHistory)({
-//   basename: basepath, // this is written in when available by the URL prefixer middleware
-// })
+const history = createHistory({
+  basename: basepath, // this is written in when available by the URL prefixer middleware
+})
 
 const store = configureStore(loadLocalStorage(errorsQueue), history)
 const {dispatch} = store
@@ -76,6 +74,10 @@ window.addEventListener('keyup', event => {
 })
 
 class Root extends React.Component {
+  componentDidCatch(error, info) {
+    console.error(error, info)
+  }
+
   componentWillMount() {
     this.flushErrorsQueue()
     this.checkAuth()
@@ -123,7 +125,7 @@ class Root extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <ConnectedRouter basename={basepath}>
+        <ConnectedRouter history={history}>
           <div>
             <Route path="/" component={UserIsAuthenticated(CheckSources)} />
             <Route path="/login" component={UserIsNotAuthenticated(Login)} />
@@ -132,27 +134,26 @@ class Root extends React.Component {
               component={UserIsAuthenticated(SourcePage)}
             />
             <Route path="/sources/:sourceID" component={UserIsAuthenticated(App)}>
-              <Route component={CheckSources}>
-                <Route path="status" component={StatusPage} />
-                <Route path="hosts" component={HostsPage} />
-                <Route path="hosts/:hostID" component={HostPage} />
-                <Route path="chronograf/data-explorer" component={DataExplorer} />
-                <Route path="dashboards" component={DashboardsPage} />
-                <Route path="dashboards/:dashboardID" component={DashboardPage} />
-                <Route path="alerts" component={AlertsApp} />
-                <Route path="alert-rules" component={KapacitorRulesPage} />
-                <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
-                <Route path="alert-rules/new" component={KapacitorRulePage} />
-                <Route path="tickscript/new" component={TickscriptPage} />
-                <Route path="tickscript/:ruleID" component={TickscriptPage} />
-                <Route path="kapacitors/new" component={KapacitorPage} />
-                <Route path="kapacitors/:id/edit" component={KapacitorPage} />
-                <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
-                <Route path="admin" component={AdminPage} />
-                <Route path="manage-sources" component={ManageSources} />
-                <Route path="manage-sources/new" component={SourcePage} />
-                <Route path="manage-sources/:id/edit" component={SourcePage} />
-              </Route>
+              <Route component={CheckSources} />
+              <Route path="status" component={StatusPage} />
+              <Route path="hosts" component={HostsPage} />
+              <Route path="hosts/:hostID" component={HostPage} />
+              <Route path="chronograf/data-explorer" component={DataExplorer} />
+              <Route path="dashboards" component={DashboardsPage} />
+              <Route path="dashboards/:dashboardID" component={DashboardPage} />
+              <Route path="alerts" component={AlertsApp} />
+              <Route path="alert-rules" component={KapacitorRulesPage} />
+              <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
+              <Route path="alert-rules/new" component={KapacitorRulePage} />
+              <Route path="tickscript/new" component={TickscriptPage} />
+              <Route path="tickscript/:ruleID" component={TickscriptPage} />
+              <Route path="kapacitors/new" component={KapacitorPage} />
+              <Route path="kapacitors/:id/edit" component={KapacitorPage} />
+              <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
+              <Route path="admin" component={AdminPage} />
+              <Route path="manage-sources" component={ManageSources} />
+              <Route path="manage-sources/new" component={SourcePage} />
+              <Route path="manage-sources/:id/edit" component={SourcePage} />
             </Route>
             <Route path="*" component={NotFound} />
           </div>

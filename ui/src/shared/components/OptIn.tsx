@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-import uuid from 'node-uuid'
+import uuidv4 from 'uuid/v4'
 
 import ClickOutsideInput from 'shared/components/ClickOutsideInput'
 
@@ -18,7 +18,7 @@ class OptIn extends React.Component {
       customValue,
     }
 
-    this.id = uuid.v4()
+    this.id = uuidv4()
     this.isCustomValueInputFocused = false
   }
 

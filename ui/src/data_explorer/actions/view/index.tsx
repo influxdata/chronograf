@@ -1,4 +1,4 @@
-import uuid from 'node-uuid'
+import uuidv4 from 'uuid/v4'
 
 import {getQueryConfig} from 'shared/apis'
 
@@ -7,7 +7,7 @@ import {errorThrown} from 'shared/actions/errors'
 export const addQuery = () => ({
   type: 'DE_ADD_QUERY',
   payload: {
-    queryID: uuid.v4(),
+    queryID: uuidv4(),
   },
 })
 

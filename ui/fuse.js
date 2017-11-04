@@ -32,7 +32,11 @@ Sparky.task('config', () => {
       SassPlugin({
         sourceMap: false, // https://github.com/sass/libsass/issues/2312
       }),
-      CSSPlugin(),
+      CSSPlugin({
+        group: 'chronograf.css',
+        outFile: 'build/chronograf.css',
+        inject: true,
+      }),
       JSONPlugin(),
       WebIndexPlugin({
         template: 'src/index.template.html',

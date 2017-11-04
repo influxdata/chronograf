@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
 import * as _ from 'lodash'
-import uuid from 'node-uuid'
+import uuidv4 from 'uuid/v4'
 
 import ResizeContainer from 'shared/components/ResizeContainer'
 import QueryMaker from 'dashboards/components/QueryMaker'
@@ -36,7 +36,7 @@ class CellEditorOverlay extends React.Component {
     const queriesWorkingDraft = _.cloneDeep(
       queries.map(({queryConfig}) => ({
         ...queryConfig,
-        id: uuid.v4(),
+        id: uuidv4(),
         source,
       }))
     )
@@ -127,7 +127,7 @@ class CellEditorOverlay extends React.Component {
     this.setState({
       queriesWorkingDraft: [
         ...queriesWorkingDraft,
-        defaultQueryConfig({id: uuid.v4()}),
+        defaultQueryConfig({id: uuidv4()}),
       ],
     })
     this.handleSetActiveQueryIndex(newIndex)

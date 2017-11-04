@@ -1,41 +1,40 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-
 import * as _ from 'lodash'
 import classnames from 'classnames'
 import {Link} from 'react-router-dom'
-import uuid from 'node-uuid'
+import uuidv4 from 'uuid/v4'
 
 import FancyScrollbar from 'shared/components/FancyScrollbar'
+import SearchBar from 'alerts/components/SearchBar'
 
 import {ALERTS_TABLE} from 'alerts/constants/tableSizing'
 
 import {Alert, Source} from 'src/types'
 
-interface IProps {
-  alerts: Alert[]
-  source: Source
-  shouldNotBeFilterable: boolean
-  limit: number
-  onGetMoreAlerts: (evt) => void
-  isAlertsMaxedOut: boolean
-  alertsCount: number
-}
-
-enum SortDirection {
+export enum SortDirection {
   asc = 'asc',
   desc = 'desc',
 }
 
-interface IState {
+export interface AlertsTableProps {
+  alerts: Alert[]
+  source: Source
+  shouldNotBeFilterable: boolean
+  limit: number
+  onGetMoreAlerts: (evt: {}) => void
+  isAlertsMaxedOut: boolean
+  alertsCount: number
+}
+
+export interface AlertsTableState {
   searchTerm: string
   filteredAlerts: Alert[]
   sortDirection: SortDirection
   sortKey: string
 }
 
-class AlertsTable extends React.Component<IProps, IState> {
-  public constructor(props) {
+class AlertsTable extends React.Component<AlertsTableProps, AlertsTableState> {
+  public constructor(props: AlertsTableProps) {
     super(props)
     this.state = {
       searchTerm: '',
@@ -45,11 +44,7 @@ class AlertsTable extends React.Component<IProps, IState> {
     }
   }
 
-  public componentWillReceiveProps(newProps) {
-    this.filterAlerts(this.state.searchTerm, newProps.alerts)
-  }
-
-  private filterAlerts = (searchTerm, newAlerts) => {
+  private filterAlerts = (searchTerm, newAlerts?) => {
     const alerts = newAlerts || this.props.alerts
     const filterText = searchTerm.toLowerCase()
     const filteredAlerts = alerts.filter(({name, host, level}) => {
@@ -101,125 +96,130 @@ class AlertsTable extends React.Component<IProps, IState> {
     const {filteredAlerts, sortKey, sortDirection} = this.state
     const alerts = this.sort(filteredAlerts, sortKey, sortDirection)
     const {colName, colLevel, colTime, colHost, colValue} = ALERTS_TABLE
-    return this.props.alerts.length
-      ? <div className="alert-history-table">
-          <div className="alert-history-table--thead">
-            <div
-              onClick={this.changeSort('name')}
-              className={this.sortableClasses('name')}
-              style={{width: colName}}
-            >
-              Name
-            </div>
-            <div
-              onClick={this.changeSort('level')}
-              className={this.sortableClasses('level')}
-              style={{width: colLevel}}
-            >
-              Level
-            </div>
-            <div
-              onClick={this.changeSort('time')}
-              className={this.sortableClasses('time')}
-              style={{width: colTime}}
-            >
-              Time
-            </div>
-            <div
-              onClick={this.changeSort('host')}
-              className={this.sortableClasses('host')}
-              style={{width: colHost}}
-            >
-              Host
-            </div>
-            <div
-              onClick={this.changeSort('value')}
-              className={this.sortableClasses('value')}
-              style={{width: colValue}}
-            >
-              Value
-            </div>
-          </div>
-          <FancyScrollbar
-            className="alert-history-table--tbody"
-            autoHide={false}
+    return this.props.alerts.length ? (
+      <div className="alert-history-table">
+        <div className="alert-history-table--thead">
+          <div
+            onClick={this.changeSort('name')}
+            className={this.sortableClasses('name')}
+            style={{width: colName}}
           >
-            {alerts.map(({name, level, time, host, value}) => {
-              return (
-                <div className="alert-history-table--tr" key={uuid.v4()}>
-                  <div
-                    className="alert-history-table--td"
-                    style={{width: colName}}
-                  >
-                    {name}
-                  </div>
-                  <div
-                    className={`alert-history-table--td alert-level-${level.toLowerCase()}`}
-                    style={{width: colLevel}}
-                  >
-                    <span
-                      className={classnames(
-                        'table-dot',
-                        {'dot-critical': level === 'CRITICAL'},
-                        {'dot-success': level === 'OK'}
-                      )}
-                    />
-                  </div>
-                  <div
-                    className="alert-history-table--td"
-                    style={{width: colTime}}
-                  >
-                    {new Date(Number(time)).toISOString()}
-                  </div>
-                  <div
-                    className="alert-history-table--td alert-history-table--host"
-                    style={{width: colHost}}
-                  >
-                    <Link to={`/sources/${id}/hosts/${host}`} title={host}>
-                      {host}
-                    </Link>
-                  </div>
-                  <div
-                    className="alert-history-table--td"
-                    style={{width: colValue}}
-                  >
-                    {value}
-                  </div>
-                </div>
-              )
-            })}
-          </FancyScrollbar>
+            Name
+          </div>
+          <div
+            onClick={this.changeSort('level')}
+            className={this.sortableClasses('level')}
+            style={{width: colLevel}}
+          >
+            Level
+          </div>
+          <div
+            onClick={this.changeSort('time')}
+            className={this.sortableClasses('time')}
+            style={{width: colTime}}
+          >
+            Time
+          </div>
+          <div
+            onClick={this.changeSort('host')}
+            className={this.sortableClasses('host')}
+            style={{width: colHost}}
+          >
+            Host
+          </div>
+          <div
+            onClick={this.changeSort('value')}
+            className={this.sortableClasses('value')}
+            style={{width: colValue}}
+          >
+            Value
+          </div>
         </div>
-      : this.renderTableEmpty()
+        <FancyScrollbar className="alert-history-table--tbody" autoHide={false}>
+          {alerts.map(({name, level, time, host, value}) => {
+            return (
+              <div className="alert-history-table--tr" key={uuidv4()}>
+                <div
+                  className="alert-history-table--td"
+                  style={{width: colName}}
+                >
+                  {name}
+                </div>
+                <div
+                  className={`alert-history-table--td alert-level-${level.toLowerCase()}`}
+                  style={{width: colLevel}}
+                >
+                  <span
+                    className={classnames(
+                      'table-dot',
+                      {'dot-critical': level === 'CRITICAL'},
+                      {'dot-success': level === 'OK'}
+                    )}
+                  />
+                </div>
+                <div
+                  className="alert-history-table--td"
+                  style={{width: colTime}}
+                >
+                  {new Date(Number(time)).toISOString()}
+                </div>
+                <div
+                  className="alert-history-table--td alert-history-table--host"
+                  style={{width: colHost}}
+                >
+                  <Link to={`/sources/${id}/hosts/${host}`} title={host}>
+                    {host}
+                  </Link>
+                </div>
+                <div
+                  className="alert-history-table--td"
+                  style={{width: colValue}}
+                >
+                  {value}
+                </div>
+              </div>
+            )
+          })}
+        </FancyScrollbar>
+      </div>
+    ) : (
+      this.renderTableEmpty()
+    )
   }
 
-  renderTableEmpty() {
+  private renderTableEmpty = () => {
     const {source: {id}, shouldNotBeFilterable} = this.props
 
-    return shouldNotBeFilterable
-      ? <div className="graph-empty">
-          <p>
-            Learn how to configure your first <strong>Rule</strong> in<br />
-            the <em>Getting Started</em> guide
-          </p>
-        </div>
-      : <div className="generic-empty-state">
-          <h4 className="no-user-select">There are no Alerts to display</h4>
-          <br />
-          <h6 className="no-user-select">
-            Try changing the Time Range or
-            <Link
-              style={{marginLeft: '10px'}}
-              to={`/sources/${id}/alert-rules/new`}
-              className="btn btn-primary btn-sm"
-            >
-              Create an Alert Rule
-            </Link>
-          </h6>
-        </div>
+    return shouldNotBeFilterable ? (
+      <div className="graph-empty">
+        <p>
+          Learn how to configure your first <strong>Rule</strong> in<br />
+          the <em>Getting Started</em> guide
+        </p>
+      </div>
+    ) : (
+      <div className="generic-empty-state">
+        <h4 className="no-user-select">There are no Alerts to display</h4>
+        <br />
+        <h6 className="no-user-select">
+          Try changing the Time Range or
+          <Link
+            style={{marginLeft: '10px'}}
+            to={`/sources/${id}/alert-rules/new`}
+            className="btn btn-primary btn-sm"
+          >
+            Create an Alert Rule
+          </Link>
+        </h6>
+      </div>
+    )
   }
 
-  render() {
+  public componentWillReceiveProps(newProps: AlertsTableProps) {
+    this.filterAlerts(this.state.searchTerm, newProps.alerts)
+  }
+
+  public render() {
     const {
       shouldNotBeFilterable,
       limit,
@@ -228,84 +228,34 @@ class AlertsTable extends React.Component<IProps, IState> {
       alertsCount,
     } = this.props
 
-    return shouldNotBeFilterable
-      ? <div className="alerts-widget">
-          {this.renderTable()}
-          {limit && alertsCount
-            ? <button
-                className="btn btn-sm btn-default btn-block"
-                onClick={onGetMoreAlerts}
-                disabled={isAlertsMaxedOut}
-                style={{marginBottom: '20px'}}
-              >
-                {isAlertsMaxedOut
-                  ? `All ${alertsCount} Alerts displayed`
-                  : 'Load next 30 Alerts'}
-              </button>
-            : null}
+    return shouldNotBeFilterable ? (
+      <div className="alerts-widget">
+        {this.renderTable()}
+        {limit && alertsCount ? (
+          <button
+            className="btn btn-sm btn-default btn-block"
+            onClick={onGetMoreAlerts}
+            disabled={isAlertsMaxedOut}
+            style={{marginBottom: '20px'}}
+          >
+            {isAlertsMaxedOut
+              ? `All ${alertsCount} Alerts displayed`
+              : 'Load next 30 Alerts'}
+          </button>
+        ) : null}
+      </div>
+    ) : (
+      <div className="panel panel-minimal">
+        <div className="panel-heading u-flex u-ai-center u-jc-space-between">
+          <h2 className="panel-title">{this.props.alerts.length} Alerts</h2>
+          {this.props.alerts.length ? (
+            <SearchBar onSearch={this.filterAlerts} />
+          ) : null}
         </div>
-      : <div className="panel panel-minimal">
-          <div className="panel-heading u-flex u-ai-center u-jc-space-between">
-            <h2 className="panel-title">
-              {this.props.alerts.length} Alerts
-            </h2>
-            {this.props.alerts.length
-              ? <SearchBar onSearch={this.filterAlerts} />
-              : null}
-          </div>
-          <div className="panel-body">
-            {this.renderTable()}
-          </div>
-        </div>
-  }
-}
-
-class SearchBar extends React.Component<
-  {onSearch: (term: string) => void},
-  {searchTerm: string}
-> {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      searchTerm: '',
-    }
-
-    this.handleSearch = this.handleSearch
-    this.handleChange = this.handleChange
-  }
-
-  componentWillMount() {
-    const waitPeriod = 300
-    this.handleSearch = _.debounce(this.handleSearch, waitPeriod)
-  }
-
-  private handleSearch = () => {
-    this.props.onSearch(this.state.searchTerm)
-  }
-
-  private handleChange = e => {
-    this.setState({searchTerm: e.target.value}, this.handleSearch)
-  }
-
-  render() {
-    return (
-      <div className="users__search-widget input-group">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Filter Alerts..."
-          onChange={this.handleChange}
-          value={this.state.searchTerm}
-        />
-        <div className="input-group-addon">
-          <span className="icon search" />
-        </div>
+        <div className="panel-body">{this.renderTable()}</div>
       </div>
     )
   }
 }
-
-const {arrayOf, bool, func, number, shape, string} = PropTypes
 
 export default AlertsTable

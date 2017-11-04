@@ -3,21 +3,25 @@ import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {Scrollbars} from 'react-custom-scrollbars'
 
-class FancyScrollbar extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+export interface FancyScrollbarProps {
+  children: React.ReactChildren
+  className: string
+  autoHide?: boolean
+  autoHeight?: boolean
+  maxHeight?: number
+}
 
-  static defaultProps = {
+class FancyScrollbar extends React.Component<FancyScrollbarProps> {
+  public defaultProps = {
     autoHide: true,
     autoHeight: false,
   }
 
-  handleMakeDiv = className => props => {
+  private handleMakeDiv = className => props => {
     return <div {...props} className={`fancy-scroll--${className}`} />
   }
 
-  render() {
+  public render() {
     const {autoHide, autoHeight, children, className, maxHeight} = this.props
 
     return (
@@ -40,16 +44,6 @@ class FancyScrollbar extends React.Component {
       </Scrollbars>
     )
   }
-}
-
-const {bool, node, number, string} = PropTypes
-
-FancyScrollbar.propTypes = {
-  children: node.isRequired,
-  className: string,
-  autoHide: bool,
-  autoHeight: bool,
-  maxHeight: number,
 }
 
 export default FancyScrollbar

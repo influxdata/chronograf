@@ -5,7 +5,7 @@ import {
   NEW_DEFAULT_DATABASE,
   NEW_EMPTY_RP,
 } from 'admin/constants'
-import uuid from 'node-uuid'
+import uuidv4 from 'uuid/v4'
 
 const initialState = {
   users: null,
@@ -53,7 +53,7 @@ export default function admin(state = initialState, action) {
     case 'ADD_DATABASE': {
       const newDatabase = {
         ...NEW_DEFAULT_DATABASE,
-        links: {self: `temp-ID${uuid.v4()}`},
+        links: {self: `temp-ID${uuidv4()}`},
         isEditing: true,
       }
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import classnames from 'classnames'
-import uuid from 'node-uuid'
+import uuidv4 from 'uuid/v4'
 
 import TemplateVariableTable from 'dashboards/components/template_variables/Table'
 
@@ -73,7 +73,7 @@ class TemplateVariableManagerWrapper extends React.Component {
     const newRow = {
       tempVar: '',
       values: [],
-      id: uuid.v4(),
+      id: uuidv4(),
       type: 'csv',
       query: {
         influxql: '',

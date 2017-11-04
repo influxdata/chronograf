@@ -22,6 +22,7 @@
     "noEmitHelpers": true,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "*": ["./*"],
