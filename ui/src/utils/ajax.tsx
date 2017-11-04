@@ -16,9 +16,27 @@ const generateResponseWithLinks = (response, {auth, logout, external}) => ({
   external,
 })
 
+export interface AJAXOptions {
+  url: string
+  resource?: string
+  id?: string
+  method: string
+  data?: {}
+  params?: {}
+  headers?: {}
+}
+
 const AJAX = async (
-  {url, resource, id, method = 'GET', data = {}, params = {}, headers = {}},
-  excludeBasepath
+  {
+    url,
+    resource,
+    id,
+    method = 'GET',
+    data = {},
+    params = {},
+    headers = {},
+  }: AJAXOptions,
+  excludeBasepath?
 ) => {
   try {
     let response

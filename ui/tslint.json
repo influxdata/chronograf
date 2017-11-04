@@ -14,6 +14,7 @@
       "statements"
     ],
     "ban": false,
+    "ban-comma-operator": false,
     "class-name": true,
     "comment-format": [
       true,

@@ -10,42 +10,59 @@ const defaultMinBottomHeight = 200
 const defaultInitialTopHeight = '50%'
 const defaultInitialBottomHeight = '50%'
 
-class ResizeContainer extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isDragging: false,
-      topHeight: props.initialTopHeight,
-      bottomHeight: props.initialBottomHeight,
-    }
-  }
+export interface ResizeContainerProps {
+  children: React.ReactChildren
+  containerClass: string
+  minTopHeight?: number
+  minBottomHeight?: number
+  initialTopHeight?: string
+  initialBottomHeight?: string
+}
 
-  static defaultProps = {
+export interface ResizeContainerState {
+  isDragging: boolean
+  topHeight: string
+  bottomHeight: string
+  bottomHeightPixels: number
+}
+
+class ResizeContainer extends React.Component<
+  ResizeContainerProps,
+  ResizeContainerState
+> {
+  public static defaultProps = {
     minTopHeight: defaultMinTopHeight,
     minBottomHeight: defaultMinBottomHeight,
     initialTopHeight: defaultInitialTopHeight,
     initialBottomHeight: defaultInitialBottomHeight,
   }
 
-  componentDidMount() {
-    this.setState({
-      bottomHeightPixels: this.bottom.getBoundingClientRect().height,
-    })
+  private resizeContainer
+  private bottom
+
+  constructor(props: ResizeContainerProps) {
+    super(props)
+    this.state = {
+      isDragging: false,
+      topHeight: props.initialTopHeight,
+      bottomHeight: props.initialBottomHeight,
+      bottomHeightPixels: 0,
+    }
   }
 
-  handleStartDrag = () => {
+  private handleStartDrag = () => {
     this.setState({isDragging: true})
   }
 
-  handleStopDrag = () => {
+  private handleStopDrag = () => {
     this.setState({isDragging: false})
   }
 
-  handleMouseLeave = () => {
+  private handleMouseLeave = () => {
     this.setState({isDragging: false})
   }
 
-  handleDrag = (e =>) {
+  private handleDrag = e => {
     if (!this.state.isDragging) {
       return
     }
@@ -91,7 +108,13 @@ class ResizeContainer extends React.Component {
     })
   }
 
-  render() {
+  public componentDidMount() {
+    this.setState({
+      bottomHeightPixels: this.bottom.getBoundingClientRect().height,
+    })
+  }
+
+  public render() {
     const {bottomHeightPixels, topHeight, bottomHeight, isDragging} = this.state
     const {containerClass, children} = this.props
 
@@ -134,17 +157,6 @@ class ResizeContainer extends React.Component {
       </div>
     )
   }
-}
-
-const {node, number, string} = PropTypes
-
-ResizeContainer.propTypes = {
-  children: node.isRequired,
-  containerClass: string.isRequired,
-  minTopHeight: number,
-  minBottomHeight: number,
-  initialTopHeight: string,
-  initialBottomHeight: string,
 }
 
 export default ResizeContainer
