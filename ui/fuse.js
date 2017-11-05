@@ -71,7 +71,7 @@ Sparky.task('config', () => {
       WebIndexPlugin({
         template: 'src/index.template.html',
         target: 'index.html',
-        path: 'assets/',
+        path: '/assets/',
       }),
       isProduction &&
         QuantumPlugin({
