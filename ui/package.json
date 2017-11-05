@@ -9,7 +9,7 @@
     "url": "github:influxdata/chronograf"
   },
   "scripts": {
-    "build": "node fuse build",
+    "build": "NODE_ENV=production node fuse build",
     "start": "node fuse",
     "lint": "tslint --project .",
     "ts": "tsc --noEmit --pretty",

@@ -1,11 +1,11 @@
 const {
   FuseBox,
   EnvPlugin,
-  // SVGPlugin,
   SassPlugin,
   PostCSSPlugin,
   CSSPlugin,
   JSONPlugin,
+  CopyPlugin,
   QuantumPlugin,
   WebIndexPlugin,
   Sparky,
@@ -14,6 +14,43 @@ const {
 const {version} = require('./package.json')
 
 let fuse, app, isProduction
+
+const productionStylePlugins = [
+  SassPlugin({
+    sourceMap: false, // https://github.com/sass/libsass/issues/2312
+    outputStyle: 'compressed',
+    importer: true,
+  }),
+  PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
+    sourceMaps: false,
+  }),
+  CSSPlugin({
+    group: 'chronograf.css',
+    outFile: 'build/chronograf.css',
+    inject: false,
+  }),
+  EnvPlugin({
+    NODE_ENV: 'production',
+    VERSION: JSON.stringify(version),
+  }),
+]
+
+const devStylePlugins = [
+  SassPlugin({
+    sourceMap: false, // https://github.com/sass/libsass/issues/2312
+    outputStyle: 'expanded',
+    importer: true,
+  }),
+  CSSPlugin({
+    group: 'chronograf.css',
+    outFile: 'build/chronograf.css',
+    inject: false,
+  }),
+  EnvPlugin({
+    NODE_ENV: 'development',
+    VERSION: JSON.stringify(version),
+  }),
+]
 
 Sparky.task('config', () => {
   fuse = new FuseBox({
@@ -25,48 +62,22 @@ Sparky.task('config', () => {
     useTypescriptCompiler: true,
     experimentalFeatures: true,
     plugins: [
-      // SVGPlugin(),
-      SassPlugin({
-        sourceMap: false, // https://github.com/sass/libsass/issues/2312
-        // includePaths: ['src/style'],
-        outputStyle: 'compressed',
-        importer: true,
-      }),
-      // PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
-      //   sourceMaps: false,
-      // }),
-      CSSPlugin({
-        group: 'chronograf.css',
-        outFile: () => 'build/chronograf.css',
-        inject: false,
-        // inject: file => `built/${file}`,
-        // minify: true,
-      }),
       JSONPlugin(),
       WebIndexPlugin({
         template: 'src/index.template.html',
       }),
-      EnvPlugin({
-        NODE_ENV: isProduction ? 'production' : 'development',
-        VERSION: JSON.stringify(version),
-      }),
-      // isProduction &&
-      //   QuantumPlugin({
-      //     treeshake: true,
-      //     uglify: {
-      //       es6: true,
-      //     },
-      //   }),
+      isProduction &&
+        QuantumPlugin({
+          treeshake: true,
+          uglify: {
+            es6: true,
+          },
+        }),
     ],
     cache: true,
     log: true,
     debug: true,
     tsConfig: 'tsconfig.json',
-    // useJsNext: true,
-    // polyfillNonStandardDefaultUsage: true,
-    // polyfillNonStandardDefaultUsage: ['react-router'],
-    // useJsNext: ['redux'],
-    // useJsNext: ['memoizerific'],
     alias: {
       admin: '~/admin',
       alerts: '~/alerts',
@@ -88,14 +99,19 @@ Sparky.task('config', () => {
     },
   })
 
+  const stylePlugins = isProduction ? productionStylePlugins : devStylePlugins
+
   // vendor
   fuse.bundle('vendor').instructions('~ index.tsx')
 
   // bundle app
-  app = fuse.bundle('app').instructions('> [index.tsx]')
+  app = fuse
+    .bundle('app')
+    .plugin(stylePlugins)
+    .instructions('> [index.tsx]')
 })
 
-Sparky.task('default', ['clean', 'config'], () => {
+Sparky.task('default', ['clean', 'copy', 'config'], () => {
   fuse.dev({
     port: 4444,
     open: false,
@@ -116,7 +132,9 @@ Sparky.task('default', ['clean', 'config'], () => {
 
 Sparky.task('clean', () => Sparky.src('build/').clean('build/'))
 
-Sparky.task('prod-env', ['clean'], () => {
+Sparky.task('copy', () => Sparky.src('assets/').dest('build/'))
+
+Sparky.task('prod-env', ['clean', 'copy'], () => {
   isProduction = true
 })
 
