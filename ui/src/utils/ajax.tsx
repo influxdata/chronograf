@@ -17,10 +17,10 @@ const generateResponseWithLinks = (response, {auth, logout, external}) => ({
 })
 
 export interface AJAXOptions {
-  url: string
+  url?: string
   resource?: string
   id?: string
-  method: string
+  method?: string
   data?: {}
   params?: {}
   headers?: {}

@@ -10,7 +10,7 @@ import createHistory from 'history/createBrowserHistory'
 import configureStore from './store/configureStore'
 import {loadLocalStorage} from './localStorage'
 
-import App from './App'
+import {withApp} from './App'
 import {Login, UserIsAuthenticated, UserIsNotAuthenticated} from './auth'
 import CheckSources from './CheckSources'
 import {StatusPage} from './status'
@@ -135,36 +135,65 @@ class Root extends React.Component {
             />
             <Route path="/sources/:sourceID">
               <div>
-                <Route component={UserIsAuthenticated(App)} />
                 <Route component={CheckSources} />
-                <Route path="status" component={StatusPage} />
-                <Route path="hosts" component={HostsPage} />
-                <Route path="hosts/:hostID" component={HostPage} />
+                <Route path="status" component={withApp(StatusPage)} />
+                <Route path="hosts" component={withApp(HostsPage)} />
+                <Route path="hosts/:hostID" component={withApp(HostPage)} />
                 <Route
                   path="chronograf/data-explorer"
-                  component={DataExplorer}
+                  component={withApp(DataExplorer)}
                 />
-                <Route path="dashboards" component={DashboardsPage} />
+                <Route path="dashboards" component={withApp(DashboardsPage)} />
                 <Route
                   path="dashboards/:dashboardID"
-                  component={DashboardPage}
+                  component={withApp(DashboardPage)}
                 />
-                <Route path="alerts" component={AlertsApp} />
-                <Route path="alert-rules" component={KapacitorRulesPage} />
+                <Route path="alerts" component={withApp(AlertsApp)} />
+                <Route
+                  path="alert-rules"
+                  component={withApp(KapacitorRulesPage)}
+                />
                 <Route
                   path="alert-rules/:ruleID"
-                  component={KapacitorRulePage}
+                  component={withApp(KapacitorRulePage)}
                 />
-                <Route path="alert-rules/new" component={KapacitorRulePage} />
-                <Route path="tickscript/new" component={TickscriptPage} />
-                <Route path="tickscript/:ruleID" component={TickscriptPage} />
-                <Route path="kapacitors/new" component={KapacitorPage} />
-                <Route path="kapacitors/:id/edit" component={KapacitorPage} />
-                <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
-                <Route path="admin" component={AdminPage} />
-                <Route path="manage-sources" component={ManageSources} />
-                <Route path="manage-sources/new" component={SourcePage} />
-                <Route path="manage-sources/:id/edit" component={SourcePage} />
+                <Route
+                  path="alert-rules/new"
+                  component={withApp(KapacitorRulePage)}
+                />
+                <Route
+                  path="tickscript/new"
+                  component={withApp(TickscriptPage)}
+                />
+                <Route
+                  path="tickscript/:ruleID"
+                  component={withApp(TickscriptPage)}
+                />
+                <Route
+                  path="kapacitors/new"
+                  component={withApp(KapacitorPage)}
+                />
+                <Route
+                  path="kapacitors/:id/edit"
+                  component={withApp(KapacitorPage)}
+                />
+                <Route
+                  path="kapacitor-tasks"
+                  component={withApp(KapacitorTasksPage)}
+                />
+                <Route path="admin" component={withApp(AdminPage)} />
+                <Route
+                  path="manage-sources"
+                  component={withApp(ManageSources)}
+                />
+                <Route
+                  path="manage-sources/new"
+                  component={withApp(SourcePage)}
+                />
+                <Route
+                  path="manage-sources/:id/edit"
+                  component={withApp(SourcePage)}
+                />
               </div>
             </Route>
             <Route path="*" component={NotFound} />

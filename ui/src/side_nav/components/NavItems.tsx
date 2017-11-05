@@ -1,140 +1,101 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
-import {Link} from 'react-router-dom'
+import {withRouter, Link} from 'react-router-dom'
+import {Location} from 'history'
 import classnames from 'classnames'
 
-const {bool, node, string} = PropTypes
+export const NavListItem: React.SFC<{
+  link: string
+  useAnchor?: boolean
+  isExternal?: boolean
+  location: Location
+}> = ({link, children, location, useAnchor, isExternal}) => {
+  const isActive = location.pathname.startsWith(link)
 
-class NavListItem extends React.Component {
-  propTypes = {
-    link: string.isRequired,
-    children: node,
-    location: string,
-    useAnchor: bool,
-    isExternal: bool,
-  }
-
-  render() {
-    const {link, children, location, useAnchor, isExternal} = this.props
-    const isActive = location.startsWith(link)
-
-    return useAnchor
-      ? <a
-          className={classnames('sidebar-menu--item', {active: isActive})}
-          href={link}
-          target={isExternal ? '_blank' : '_self'}
-        >
-          {children}
-        </a>
-      : <Link
-          className={classnames('sidebar-menu--item', {active: isActive})}
-          to={link}
-        >
-          {children}
-        </Link>
-  }
+  return useAnchor ? (
+    <a
+      className={classnames('sidebar-menu--item', {active: isActive})}
+      href={link}
+      target={isExternal ? '_blank' : '_self'}
+    >
+      {children}
+    </a>
+  ) : (
+    <Link
+      className={classnames('sidebar-menu--item', {active: isActive})}
+      to={link}
+    >
+      {children}
+    </Link>
+  )
 }
 
-class NavHeader extends React.Component {
-  propTypes = {
-    link: string,
-    title: string,
-    useAnchor: bool,
-  }
+// Some nav items, such as Logout, need to hit an external link rather
+// than simply route to an internal page. Anchor tags serve that purpose.
+export const NavHeader: React.SFC<{
+  link: string
+  title: string
+  useAnchor?: boolean
+}> = ({link, title, useAnchor}) =>
+  useAnchor ? (
+    <a className="sidebar-menu--heading" href={link}>
+      {title}
+    </a>
+  ) : (
+    <Link className="sidebar-menu--heading" to={link}>
+      {title}
+    </Link>
+  )
 
-  render() {
-    const {link, title, useAnchor} = this.props
+export const NavBlock: React.SFC<{
+  link?: string
+  icon: string
+  className?: string
+  location: Location
+}> = ({location, className, link, icon, children}) => {
+  const isActive = React.Children.toArray(children).find(child => {
+    return location.pathname.startsWith(child.props.link)
+  })
 
-    // Some nav items, such as Logout, need to hit an external link rather
-    // than simply route to an internal page. Anchor tags serve that purpose.
-    return useAnchor
-      ? <a className="sidebar-menu--heading" href={link}>
-          {title}
-        </a>
-      : <Link className="sidebar-menu--heading" to={link}>
-          {title}
-        </Link>
-  }
-}
+  const locationChildren = React.Children.map(children, child => {
+    if (child && child.type === NavListItem) {
+      return React.cloneElement(child, {location})
+    }
 
-class NavBlock extends React.Component {
-  propTypes = {
-    children: node,
-    link: string,
-    icon: string.isRequired,
-    location: string,
-    className: string,
-  }
+    return child
+  })
 
-  render() {
-    const {location, className} = this.props
-
-    const isActive = React.Children.toArray(this.props.children).find(child => {
-      return location.startsWith(child.props.link)
-    })
-
-    const children = React.Children.map(this.props.children, child => {
-      if (child && child.type === NavListItem) {
-        return React.cloneElement(child, {location})
-      }
-
-      return child
-    })
-
-    return (
-      <div
-        className={classnames('sidebar--item', className, {active: isActive})}
-      >
-        {this.renderSquare()}
-        <div className="sidebar-menu">
-          {children}
-          <div className="sidebar-menu--triangle" />
-        </div>
-      </div>
-    )
-  }
-
-  renderSquare = () => {
-    const {link, icon} = this.props
-
-    if (!link) {
-      return (
+  return (
+    <div className={classnames('sidebar--item', className, {active: isActive})}>
+      {link ? (
         <div className="sidebar--square">
           <div className={`sidebar--icon icon ${icon}`} />
         </div>
-      )
+      ) : (
+        <Link className="sidebar--square" to={link}>
+          <div className={`sidebar--icon icon ${icon}`} />
+        </Link>
+      )}
+      <div className="sidebar-menu">
+        {locationChildren}
+        <div className="sidebar-menu--triangle" />
+      </div>
+    </div>
+  )
+}
+
+export const NavBar: React.SFC<{location: Location}> = ({
+  location,
+  children,
+}) => {
+  const locationChildren = React.Children.map(children, child => {
+    if (child && child.type === NavBlock) {
+      return React.cloneElement(child, {
+        location,
+      })
     }
 
-    return (
-      <Link className="sidebar--square" to={link}>
-        <div className={`sidebar--icon icon ${icon}`} />
-      </Link>
-    )
-  }
+    return child
+  })
+  return <nav className="sidebar">{locationChildren}</nav>
 }
-
-class NavBar extends React.Component {
-  propTypes = {
-    children: node,
-    location: string.isRequired,
-  }
-
-  render() {
-    const children = React.Children.map(this.props.children, child => {
-      if (child && child.type === NavBlock) {
-        return React.cloneElement(child, {
-          location: this.props.location,
-        })
-      }
-
-      return child
-    })
-    return (
-      <nav className="sidebar">
-        {children}
-      </nav>
-    )
-  }
-}
-
-export {NavBar, NavBlock, NavHeader, NavListItem}

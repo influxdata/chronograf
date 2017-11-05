@@ -4,41 +4,40 @@ import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import SideNav from './side_nav/containers/SideNav'
-import Notifications from './shared/components/Notifications'
+import SideNav from 'side_nav/containers/SideNav'
+import Notifications from 'shared/components/Notifications'
 
-import {publishNotification} from './shared/actions/notifications'
+import {publishNotification} from 'shared/actions/notifications'
+
+import {Dispatch} from 'src/types/redux'
 
 const {func, node} = PropTypes
 
-class App extends React.Component {
-  propTypes = {
-    children: node.isRequired,
-    notify: func.isRequired,
-  }
-
-  handleAddFlashMessage = ({type, text}) => {
-    const {notify} = this.props
-
-    notify(type, text)
-  }
-
-  render() {
-    return (
-      <div className="chronograf-root">
-        <Notifications />
-        <SideNav />
-        {this.props.children &&
-          React.cloneElement(this.props.children, {
-            addFlashMessage: this.handleAddFlashMessage,
-          })}
-      </div>
-    )
-  }
+export interface AppProps {
+  children: React.ReactChildren
+  notify: typeof publishNotification
 }
 
-const mapDispatchToProps = dispatch => ({
+const handleAddFlashMessage = notify => ({type, text}) => {
+  notify(type, text)
+}
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
   notify: bindActionCreators(publishNotification, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(App)
+export const withApp = (
+  Component
+): React.ComponentClass & {
+  WrappedComponent: React.ComponentType<AppProps>
+} => {
+  const App: React.SFC<AppProps> = ({notify}) => (
+    <div className="chronograf-root">
+      <Notifications />
+      <SideNav />
+      <Component addFlashMessage={handleAddFlashMessage(notify)} />
+    </div>
+  )
+
+  return connect(null, mapDispatchToProps)(App)
+}

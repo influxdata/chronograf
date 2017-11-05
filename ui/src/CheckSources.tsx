@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
+import * as ReactRouter from 'react-router'
 import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
 
 import {getSources} from 'shared/apis'
 import {showDatabases} from 'shared/apis/metaQuery'
@@ -11,19 +12,17 @@ import {loadSources as loadSourcesAction} from 'shared/actions/sources'
 import {errorThrown as errorThrownAction} from 'shared/actions/errors'
 
 import {DEFAULT_HOME_PAGE} from 'shared/constants'
-import {Router, Source} from 'src/types'
+import {RouterSourceID, Source} from 'src/types'
+import {Dispatch} from 'src/types/redux'
 
 export interface CheckSourcesProps {
   sources: Source[]
-  params: {
-    sourceID: string
-  }
-  router: Router
-  location: Location
   loadSources: (sources: Source[]) => void
   errorThrown: (error: string, altText: string) => void
   children: React.ReactChildren
 }
+
+type CheckSourcesPropsRouter = CheckSourcesProps & RouterSourceID
 
 export interface CheckSourcesState {
   isFetching: boolean
@@ -33,13 +32,9 @@ export interface CheckSourcesState {
 // getting the list of data nodes, but not every page requires them to function.
 // Routes that do require data nodes can be nested under this component.
 class CheckSources extends React.Component<
-  CheckSourcesProps,
+  CheckSourcesPropsRouter,
   CheckSourcesState
 > {
-  public static state = {
-    isFetching: true,
-  }
-
   public static childContextTypes = {
     source: PropTypes.shape({
       links: PropTypes.shape({
@@ -54,8 +49,13 @@ class CheckSources extends React.Component<
     }),
   }
 
+  public state = {
+    isFetching: true,
+  }
+
   public getChildContext = () => {
-    const {sources, params: {sourceID}} = this.props
+    const {sources, match: {params: {sourceID}}} = this.props
+    // console.log(sources, sourceID)
     return {source: sources.find(s => s.id === sourceID)}
   }
 
@@ -73,25 +73,25 @@ class CheckSources extends React.Component<
   }
 
   public async componentWillUpdate(
-    nextProps: CheckSourcesProps,
+    nextProps: CheckSourcesPropsRouter,
     nextState: CheckSourcesState
   ) {
-    const {router, location, params, errorThrown, sources} = nextProps
+    const {history, location, match, errorThrown, sources} = nextProps
     const {isFetching} = nextState
-    const source = sources.find(s => s.id === params.sourceID)
+    const source = sources.find(s => s.id === match.params.sourceID)
     const defaultSource = sources.find(s => s.default === true)
 
     if (!isFetching && !source) {
       const rest = location.pathname.match(/\/sources\/\d+?\/(.+)/)
       const restString = rest === null ? DEFAULT_HOME_PAGE : rest[1]
 
-      if (defaultSource) {
-        return router.push(`/sources/${defaultSource.id}/${restString}`)
-      } else if (sources[0]) {
-        return router.push(`/sources/${sources[0].id}/${restString}`)
-      }
+      // if (defaultSource) {
+      //   return history.push(`/sources/${defaultSource.id}/${restString}`)
+      // } else if (sources[0]) {
+      //   return history.push(`/sources/${sources[0].id}/${restString}`)
+      // }
 
-      return router.push(`/sources/new?redirectPath=${location.pathname}`)
+      // return history.push(`/sources/new?redirectPath=${location.pathname}`)
     }
 
     if (!isFetching && !location.pathname.includes('/manage-sources')) {
@@ -105,18 +105,22 @@ class CheckSources extends React.Component<
   }
 
   public render() {
-    const {params, sources} = this.props
+    const {match, sources, children} = this.props
     const {isFetching} = this.state
-    const source = sources.find(s => s.id === params.sourceID)
+    const source = sources.find(s => s.id === match.params.sourceID)
 
     if (isFetching || !source) {
       return <div className="page-spinner" />
     }
 
+    if (!children) {
+      console.error('CheckSources error')
+      return <div />
+    }
+
     return (
-      this.props.children &&
       // tslint:disable-next-line:no-any
-      React.cloneElement(this.props.children as React.ReactElement<any>, {
+      React.cloneElement(children as React.ReactElement<any>, {
         ...this.props,
         source,
       })
@@ -128,11 +132,13 @@ const mapStateToProps = ({sources}) => ({
   sources,
 })
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch: Dispatch) => ({
   loadSources: bindActionCreators(loadSourcesAction, dispatch),
   errorThrown: bindActionCreators(errorThrownAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(CheckSources)
-)
+// https://github.com/ReactTraining/react-router/blob/master/packages/react-router/docs/api/withRouter.md#important-note
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(CheckSources)

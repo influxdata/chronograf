@@ -1,10 +1,6 @@
-export interface Location {
-  pathname: string
-}
+import {RouteComponentProps} from 'react-router'
 
-export interface Router {
-  push: (route: string) => void
-}
+export type RouterSourceID = RouteComponentProps<{sourceID: string}>
 
 export interface Source {
   id: string
@@ -27,4 +23,9 @@ export interface Alert {
   value: string
   host: string
   level: string
+}
+
+export interface CustomLink {
+  name: string
+  url: string
 }

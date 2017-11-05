@@ -10,6 +10,9 @@ const {
   WebIndexPlugin,
   Sparky,
 } = require('fuse-box')
+const path = require('path')
+const express = require('express')
+const proxy = require('http-proxy-middleware')
 
 const {version} = require('./package.json')
 
@@ -20,13 +23,14 @@ const productionStylePlugins = [
     sourceMap: false, // https://github.com/sass/libsass/issues/2312
     outputStyle: 'compressed',
     importer: true,
+    cache: false,
   }),
   PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
     sourceMaps: false,
   }),
   CSSPlugin({
     group: 'chronograf.css',
-    outFile: 'build/chronograf.css',
+    outFile: 'build/assets/chronograf.css',
     inject: false,
   }),
   EnvPlugin({
@@ -40,10 +44,11 @@ const devStylePlugins = [
     sourceMap: false, // https://github.com/sass/libsass/issues/2312
     outputStyle: 'expanded',
     importer: true,
+    cache: false,
   }),
   CSSPlugin({
     group: 'chronograf.css',
-    outFile: 'build/chronograf.css',
+    outFile: 'build/assets/chronograf.css',
     inject: false,
   }),
   EnvPlugin({
@@ -58,13 +63,15 @@ Sparky.task('config', () => {
     sourceMaps: !isProduction,
     hash: isProduction,
     target: 'browser',
-    output: 'build/$name.js',
+    output: 'build/assets/$name.js',
     useTypescriptCompiler: true,
     experimentalFeatures: true,
     plugins: [
       JSONPlugin(),
       WebIndexPlugin({
         template: 'src/index.template.html',
+        target: 'index.html',
+        path: 'assets/',
       }),
       isProduction &&
         QuantumPlugin({
@@ -99,34 +106,35 @@ Sparky.task('config', () => {
     },
   })
 
-  const stylePlugins = isProduction ? productionStylePlugins : devStylePlugins
-
   // vendor
   fuse.bundle('vendor').instructions('~ index.tsx')
 
   // bundle app
-  app = fuse
-    .bundle('app')
-    .plugin(stylePlugins)
-    .instructions('> [index.tsx]')
+  app = fuse.bundle('app').instructions('!> [index.tsx]')
 })
 
 Sparky.task('default', ['clean', 'copy', 'config'], () => {
-  fuse.dev({
-    port: 4444,
-    open: false,
-    // httpServer: false,
-    proxy: {
-      '/chronograf/v1': {
-        target: 'http://localhost:8888',
-        // changeOrigin: true,
-        // pathRewrite: {
-        //   '^/chronograf/v1/': '/chronograf/v1/',
-        // },
-      },
+  fuse.dev(
+    {
+      port: 4444,
+      open: false,
     },
-  })
-  app.watch().hmr({reload: true})
+    server => {
+      const dist = path.resolve('./build')
+      const app = server.httpServer.app
+      app.use('/assets', express.static(path.join(dist, 'assets')))
+      app.use('/chronograf/v1', proxy({
+        target: 'http://localhost:8888',
+      }))
+      app.get('*', function(req, res) {
+        res.sendFile(path.join(dist, 'assets/index.html'))
+      })
+    }
+  )
+  app
+    .watch('src/**')
+    .plugin(devStylePlugins)
+    .hmr({reload: true})
   return fuse.run()
 })
 
@@ -139,5 +147,5 @@ Sparky.task('prod-env', ['clean', 'copy'], () => {
 })
 
 Sparky.task('build', ['prod-env', 'config'], () => {
-  return fuse.run()
+  return fuse.plugin(productionStylePlugins).run()
 })

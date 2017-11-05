@@ -1,11 +1,11 @@
 import * as React from 'react'
-import {replace} from 'react-router-redux'
+import {routerActions} from 'react-router-redux'
 import {connectedReduxRedirect} from 'redux-auth-wrapper/history4/redirect'
 
 export const UserIsAuthenticated = connectedReduxRedirect({
   authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
   AuthenticatingComponent: () => <div className="page-spinner" />,
-  redirectAction: replace,
+  redirectAction: routerActions.replace,
   wrapperDisplayName: 'UserIsAuthenticated',
   redirectPath: '/',
   authenticatedSelector: ({auth: {me, isMeLoading}}) =>
@@ -15,7 +15,7 @@ export const UserIsAuthenticated = connectedReduxRedirect({
 export const UserIsNotAuthenticated = connectedReduxRedirect({
   authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
   AuthenticatingComponent: () => <div className="page-spinner" />,
-  redirectAction: replace,
+  redirectAction: routerActions.replace,
   wrapperDisplayName: 'UserIsNotAuthenticated',
   authenticatedSelector: ({auth: {me, isMeLoading}}) =>
     !isMeLoading && me === null,
