@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
@@ -10,8 +9,6 @@ import Notifications from 'shared/components/Notifications'
 import {publishNotification} from 'shared/actions/notifications'
 
 import {Dispatch} from 'src/types/redux'
-
-const {func, node} = PropTypes
 
 export interface AppProps {
   children: React.ReactChildren

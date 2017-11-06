@@ -147,5 +147,6 @@ Sparky.task('prod-env', ['clean', 'copy'], () => {
 })
 
 Sparky.task('build', ['prod-env', 'config'], () => {
-  return fuse.plugin(productionStylePlugins).run()
+  app.plugin(productionStylePlugins)
+  return fuse.run()
 })
