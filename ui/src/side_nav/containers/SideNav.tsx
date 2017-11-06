@@ -1,8 +1,6 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 import {withRouter, Link} from 'react-router-dom'
-import {Location} from 'history'
 import {compose} from 'redux'
 import {connect} from 'react-redux'
 

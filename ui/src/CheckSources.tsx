@@ -1,6 +1,5 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
-import * as ReactRouter from 'react-router'
 import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {bindActionCreators, compose} from 'redux'
