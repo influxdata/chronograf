@@ -17,4 +17,5 @@ npm-debug.log
 .jssrc
 .dev-jssrc
 .bindata
+.fusebox
 ui/reports
