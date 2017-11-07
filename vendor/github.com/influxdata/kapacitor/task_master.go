@@ -10,16 +10,20 @@ import (
 	imodels "github.com/influxdata/influxdb/models"
 	"github.com/influxdata/kapacitor/alert"
 	"github.com/influxdata/kapacitor/command"
+	"github.com/influxdata/kapacitor/edge"
 	"github.com/influxdata/kapacitor/expvar"
 	"github.com/influxdata/kapacitor/influxdb"
+	"github.com/influxdata/kapacitor/keyvalue"
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
+	"github.com/influxdata/kapacitor/server/vars"
 	alertservice "github.com/influxdata/kapacitor/services/alert"
 	"github.com/influxdata/kapacitor/services/alerta"
 	"github.com/influxdata/kapacitor/services/hipchat"
 	"github.com/influxdata/kapacitor/services/httpd"
 	"github.com/influxdata/kapacitor/services/httppost"
 	k8s "github.com/influxdata/kapacitor/services/k8s/client"
+	"github.com/influxdata/kapacitor/services/mqtt"
 	"github.com/influxdata/kapacitor/services/opsgenie"
 	"github.com/influxdata/kapacitor/services/pagerduty"
 	"github.com/influxdata/kapacitor/services/pushover"
@@ -27,13 +31,13 @@ import (
 	"github.com/influxdata/kapacitor/services/slack"
 	"github.com/influxdata/kapacitor/services/smtp"
 	"github.com/influxdata/kapacitor/services/snmptrap"
+	swarm "github.com/influxdata/kapacitor/services/swarm/client"
 	"github.com/influxdata/kapacitor/services/telegram"
 	"github.com/influxdata/kapacitor/services/victorops"
 	"github.com/influxdata/kapacitor/tick"
 	"github.com/influxdata/kapacitor/tick/stateful"
 	"github.com/influxdata/kapacitor/timer"
 	"github.com/influxdata/kapacitor/udf"
-	"github.com/influxdata/kapacitor/vars"
 )
 
 const (
@@ -45,10 +49,28 @@ type LogService interface {
 	NewLogger(prefix string, flag int) *log.Logger
 }
 
+type Diagnostic interface {
+	WithTaskContext(task string) TaskDiagnostic
+	WithTaskMasterContext(tm string) Diagnostic
+	WithNodeContext(node string) NodeDiagnostic
+	WithEdgeContext(task, parent, child string) EdgeDiagnostic
+
+	TaskMasterOpened()
+	TaskMasterClosed()
+
+	StartingTask(id string)
+	StartedTask(id string)
+
+	StoppedTask(id string)
+	StoppedTaskWithError(id string, err error)
+
+	TaskMasterDot(d string)
+}
+
 type UDFService interface {
 	List() []string
 	Info(name string) (udf.Info, bool)
-	Create(name string, l *log.Logger, abortCallback func()) (udf.Interface, error)
+	Create(name, taskID, nodeID string, d udf.Diagnostic, abortCallback func()) (udf.Interface, error)
 }
 
 var ErrTaskMasterClosed = errors.New("TaskMaster is closed")
@@ -60,6 +82,8 @@ type deleteHook func(*TaskMaster)
 type TaskMaster struct {
 	// Unique id for this task master instance
 	id string
+
+	ServerInfo vars.Infoer
 
 	HTTPDService interface {
 		AddRoutes([]httpd.Route) error
@@ -86,54 +110,58 @@ type TaskMaster struct {
 	SMTPService interface {
 		Global() bool
 		StateChangesOnly() bool
-		Handler(smtp.HandlerConfig, *log.Logger) alert.Handler
+		Handler(smtp.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
+	MQTTService interface {
+		Handler(mqtt.HandlerConfig, ...keyvalue.T) alert.Handler
+	}
+
 	OpsGenieService interface {
 		Global() bool
-		Handler(opsgenie.HandlerConfig, *log.Logger) alert.Handler
+		Handler(opsgenie.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	VictorOpsService interface {
 		Global() bool
-		Handler(victorops.HandlerConfig, *log.Logger) alert.Handler
+		Handler(victorops.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	PagerDutyService interface {
 		Global() bool
-		Handler(pagerduty.HandlerConfig, *log.Logger) alert.Handler
+		Handler(pagerduty.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	PushoverService interface {
-		Handler(pushover.HandlerConfig, *log.Logger) alert.Handler
+		Handler(pushover.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	HTTPPostService interface {
-		Handler(httppost.HandlerConfig, *log.Logger) alert.Handler
+		Handler(httppost.HandlerConfig, ...keyvalue.T) alert.Handler
 		Endpoint(string) (*httppost.Endpoint, bool)
 	}
 	SlackService interface {
 		Global() bool
 		StateChangesOnly() bool
-		Handler(slack.HandlerConfig, *log.Logger) alert.Handler
+		Handler(slack.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	SNMPTrapService interface {
-		Handler(snmptrap.HandlerConfig, *log.Logger) (alert.Handler, error)
+		Handler(snmptrap.HandlerConfig, ...keyvalue.T) (alert.Handler, error)
 	}
 	TelegramService interface {
 		Global() bool
 		StateChangesOnly() bool
-		Handler(telegram.HandlerConfig, *log.Logger) alert.Handler
+		Handler(telegram.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	HipChatService interface {
 		Global() bool
 		StateChangesOnly() bool
-		Handler(hipchat.HandlerConfig, *log.Logger) alert.Handler
+		Handler(hipchat.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	AlertaService interface {
 		DefaultHandlerConfig() alerta.HandlerConfig
-		Handler(alerta.HandlerConfig, *log.Logger) (alert.Handler, error)
+		Handler(alerta.HandlerConfig, ...keyvalue.T) (alert.Handler, error)
 	}
 	SensuService interface {
-		Handler(sensu.HandlerConfig, *log.Logger) (alert.Handler, error)
+		Handler(sensu.HandlerConfig, ...keyvalue.T) (alert.Handler, error)
 	}
 	TalkService interface {
-		Handler(*log.Logger) alert.Handler
+		Handler(...keyvalue.T) alert.Handler
 	}
 	TimingService interface {
 		NewTimer(timer.Setter) timer.Timer
@@ -141,7 +169,9 @@ type TaskMaster struct {
 	K8sService interface {
 		Client(string) (k8s.Client, error)
 	}
-	LogService LogService
+	SwarmService interface {
+		Client(string) (swarm.Client, error)
+	}
 
 	Commander command.Commander
 
@@ -156,7 +186,7 @@ type TaskMaster struct {
 	// We are mapping from (db, rp, measurement) to map of task ids to their edges
 	// The outer map (from dbrp&measurement) is for fast access on forkPoint
 	// While the inner map is for handling fork deletions better (see taskToForkKeys)
-	forks map[forkKey]map[string]*Edge
+	forks map[forkKey]map[string]edge.Edge
 
 	// Stats for number of points each fork has received
 	forkStats map[forkKey]*expvar.Int
@@ -174,7 +204,7 @@ type TaskMaster struct {
 	// DeleteHooks for tasks
 	deleteHooks map[string][]deleteHook
 
-	logger *log.Logger
+	diag Diagnostic
 
 	closed  bool
 	drained bool
@@ -189,25 +219,26 @@ type forkKey struct {
 }
 
 // Create a new Executor with a given clock.
-func NewTaskMaster(id string, l LogService) *TaskMaster {
+func NewTaskMaster(id string, info vars.Infoer, d Diagnostic) *TaskMaster {
 	return &TaskMaster{
 		id:             id,
-		forks:          make(map[forkKey]map[string]*Edge),
+		forks:          make(map[forkKey]map[string]edge.Edge),
 		forkStats:      make(map[forkKey]*expvar.Int),
 		taskToForkKeys: make(map[string][]forkKey),
 		batches:        make(map[string][]BatchCollector),
 		tasks:          make(map[string]*ExecutingTask),
 		deleteHooks:    make(map[string][]deleteHook),
-		LogService:     l,
-		logger:         l.NewLogger(fmt.Sprintf("[task_master:%s] ", id), log.LstdFlags),
-		closed:         true,
-		TimingService:  noOpTimingService{},
+		ServerInfo:     info,
+		diag:           d.WithTaskMasterContext(id),
+
+		closed:        true,
+		TimingService: noOpTimingService{},
 	}
 }
 
 // Returns a new TaskMaster instance with the same services as the current one.
 func (tm *TaskMaster) New(id string) *TaskMaster {
-	n := NewTaskMaster(id, tm.LogService)
+	n := NewTaskMaster(id, tm.ServerInfo, tm.diag)
 	n.DefaultRetentionPolicy = tm.DefaultRetentionPolicy
 	n.HTTPDService = tm.HTTPDService
 	n.TaskStore = tm.TaskStore
@@ -216,10 +247,12 @@ func (tm *TaskMaster) New(id string) *TaskMaster {
 	n.AlertService = tm.AlertService
 	n.InfluxDBService = tm.InfluxDBService
 	n.SMTPService = tm.SMTPService
+	n.MQTTService = tm.MQTTService
 	n.OpsGenieService = tm.OpsGenieService
 	n.VictorOpsService = tm.VictorOpsService
 	n.PagerDutyService = tm.PagerDutyService
 	n.PushoverService = tm.PushoverService
+	n.HTTPPostService = tm.HTTPPostService
 	n.SlackService = tm.SlackService
 	n.TelegramService = tm.TelegramService
 	n.SNMPTrapService = tm.SNMPTrapService
@@ -250,7 +283,7 @@ func (tm *TaskMaster) Open() (err error) {
 		tm.closed = true
 		return
 	}
-	tm.logger.Println("I! opened")
+	tm.diag.TaskMasterOpened()
 	return
 }
 
@@ -279,7 +312,7 @@ func (tm *TaskMaster) Close() error {
 	for _, et := range tm.tasks {
 		_ = tm.stopTask(et.Task.ID)
 	}
-	tm.logger.Println("I! closed")
+	tm.diag.TaskMasterClosed()
 	return nil
 }
 
@@ -418,30 +451,34 @@ func (tm *TaskMaster) StartTask(t *Task) (*ExecutingTask, error) {
 	if tm.closed {
 		return nil, errors.New("task master is closed cannot start a task")
 	}
-	tm.logger.Println("D! Starting task:", t.ID)
+	if len(t.DBRPs) == 0 {
+		return nil, errors.New("task does contain any dbrps")
+	}
+	tm.diag.StartingTask(t.ID)
 	et, err := NewExecutingTask(tm, t)
 	if err != nil {
 		return nil, err
 	}
 
-	var ins []*Edge
+	var ins []edge.StatsEdge
 	switch et.Task.Type {
 	case StreamTask:
 		e, err := tm.newFork(et.Task.ID, et.Task.DBRPs, et.Task.Measurements())
 		if err != nil {
 			return nil, err
 		}
-		ins = []*Edge{e}
+		ins = []edge.StatsEdge{e}
 	case BatchTask:
 		count, err := et.BatchCount()
 		if err != nil {
 			return nil, err
 		}
-		ins = make([]*Edge, count)
+		ins = make([]edge.StatsEdge, count)
 		for i := 0; i < count; i++ {
-			in := newEdge(t.ID, "batch", fmt.Sprintf("batch%d", i), pipeline.BatchEdge, defaultEdgeBufferSize, tm.LogService)
+			d := tm.diag.WithEdgeContext(t.ID, "batch", fmt.Sprintf("batch%d", i))
+			in := newEdge(t.ID, "batch", fmt.Sprintf("batch%d", i), pipeline.BatchEdge, defaultEdgeBufferSize, d)
 			ins[i] = in
-			tm.batches[t.ID] = append(tm.batches[t.ID], in)
+			tm.batches[t.ID] = append(tm.batches[t.ID], &batchCollector{edge: in})
 		}
 	}
 
@@ -459,8 +496,8 @@ func (tm *TaskMaster) StartTask(t *Task) (*ExecutingTask, error) {
 	}
 
 	tm.tasks[et.Task.ID] = et
-	tm.logger.Println("I! Started task:", t.ID)
-	tm.logger.Println("D!", string(t.Dot()))
+	tm.diag.StartedTask(t.ID)
+	tm.diag.TaskMasterDot(string(t.Dot()))
 
 	return et, nil
 }
@@ -501,9 +538,9 @@ func (tm *TaskMaster) stopTask(id string) (err error) {
 
 		err = et.stop()
 		if err != nil {
-			tm.logger.Println("E! Stopped task:", id, err)
+			tm.diag.StoppedTaskWithError(id, err)
 		} else {
-			tm.logger.Println("I! Stopped task:", id)
+			tm.diag.StoppedTask(id)
 		}
 	}
 	return
@@ -562,22 +599,57 @@ func (tm *TaskMaster) stream(name string) (StreamCollector, error) {
 	if tm.closed {
 		return nil, ErrTaskMasterClosed
 	}
-	in := newEdge(fmt.Sprintf("task_master:%s", tm.id), name, "stream", pipeline.StreamEdge, defaultEdgeBufferSize, tm.LogService)
+	d := tm.diag.WithEdgeContext(fmt.Sprintf("task_master:%s", tm.id), name, "stream")
+	in := newEdge(fmt.Sprintf("task_master:%s", tm.id), name, "stream", pipeline.StreamEdge, defaultEdgeBufferSize, d)
+	se := &streamEdge{edge: in}
 	tm.wg.Add(1)
 	go func() {
 		defer tm.wg.Done()
-		tm.runForking(in)
+		tm.runForking(se)
 	}()
-	return in, nil
+	return se, nil
 }
 
-func (tm *TaskMaster) runForking(in *Edge) {
-	for p, ok := in.NextPoint(); ok; p, ok = in.NextPoint() {
+type StreamCollector interface {
+	CollectPoint(edge.PointMessage) error
+	Close() error
+}
+
+type StreamEdge interface {
+	CollectPoint(edge.PointMessage) error
+	EmitPoint() (edge.PointMessage, bool)
+	Close() error
+}
+
+type streamEdge struct {
+	edge edge.Edge
+}
+
+func (s *streamEdge) CollectPoint(p edge.PointMessage) error {
+	return s.edge.Collect(p)
+}
+func (s *streamEdge) EmitPoint() (edge.PointMessage, bool) {
+	m, ok := s.edge.Emit()
+	if !ok {
+		return nil, false
+	}
+	p, ok := m.(edge.PointMessage)
+	if !ok {
+		panic("impossible to receive non PointMessage message")
+	}
+	return p, true
+}
+func (s *streamEdge) Close() error {
+	return s.edge.Close()
+}
+
+func (tm *TaskMaster) runForking(in StreamEdge) {
+	for p, ok := in.EmitPoint(); ok; p, ok = in.EmitPoint() {
 		tm.forkPoint(p)
 	}
 }
 
-func (tm *TaskMaster) forkPoint(p models.Point) {
+func (tm *TaskMaster) forkPoint(p edge.PointMessage) {
 	tm.mu.RLock()
 	locked := true
 	defer func() {
@@ -588,26 +660,26 @@ func (tm *TaskMaster) forkPoint(p models.Point) {
 
 	// Create the fork keys - which is (db, rp, measurement)
 	key := forkKey{
-		Database:        p.Database,
-		RetentionPolicy: p.RetentionPolicy,
-		Measurement:     p.Name,
+		Database:        p.Database(),
+		RetentionPolicy: p.RetentionPolicy(),
+		Measurement:     p.Name(),
 	}
 
 	// If we have empty measurement in this db,rp we need to send it all
 	// the points
 	emptyMeasurementKey := forkKey{
-		Database:        p.Database,
-		RetentionPolicy: p.RetentionPolicy,
+		Database:        p.Database(),
+		RetentionPolicy: p.RetentionPolicy(),
 		Measurement:     "",
 	}
 
 	// Merge the results to the forks map
 	for _, edge := range tm.forks[key] {
-		_ = edge.CollectPoint(p)
+		_ = edge.Collect(p)
 	}
 
 	for _, edge := range tm.forks[emptyMeasurementKey] {
-		_ = edge.CollectPoint(p)
+		_ = edge.Collect(p)
 	}
 
 	c, ok := tm.forkStats[key]
@@ -649,15 +721,15 @@ func (tm *TaskMaster) WritePoints(database, retentionPolicy string, consistencyL
 		retentionPolicy = tm.DefaultRetentionPolicy
 	}
 	for _, mp := range points {
-		p := models.Point{
-			Database:        database,
-			RetentionPolicy: retentionPolicy,
-			Name:            mp.Name(),
-			Group:           models.NilGroup,
-			Tags:            models.Tags(mp.Tags().Map()),
-			Fields:          models.Fields(mp.Fields()),
-			Time:            mp.Time(),
-		}
+		p := edge.NewPointMessage(
+			mp.Name(),
+			database,
+			retentionPolicy,
+			models.Dimensions{},
+			models.Fields(mp.Fields()),
+			models.Tags(mp.Tags().Map()),
+			mp.Time(),
+		)
 		err := tm.writePointsIn.CollectPoint(p)
 		if err != nil {
 			return err
@@ -666,19 +738,18 @@ func (tm *TaskMaster) WritePoints(database, retentionPolicy string, consistencyL
 	return nil
 }
 
-func (tm *TaskMaster) WriteKapacitorPoint(p models.Point) error {
+func (tm *TaskMaster) WriteKapacitorPoint(p edge.PointMessage) error {
 	tm.writesMu.RLock()
 	defer tm.writesMu.RUnlock()
 	if tm.writesClosed {
 		return ErrTaskMasterClosed
 	}
-
-	p.Group = models.NilGroup
-	p.Dimensions = models.Dimensions{}
+	p = p.ShallowCopy()
+	p.SetDimensions(models.Dimensions{})
 	return tm.writePointsIn.CollectPoint(p)
 }
 
-func (tm *TaskMaster) NewFork(taskName string, dbrps []DBRP, measurements []string) (*Edge, error) {
+func (tm *TaskMaster) NewFork(taskName string, dbrps []DBRP, measurements []string) (edge.StatsEdge, error) {
 	tm.mu.Lock()
 	defer tm.mu.Unlock()
 	return tm.newFork(taskName, dbrps, measurements)
@@ -703,12 +774,13 @@ func forkKeys(dbrps []DBRP, measurements []string) []forkKey {
 }
 
 // internal newFork, must have acquired lock before calling.
-func (tm *TaskMaster) newFork(taskName string, dbrps []DBRP, measurements []string) (*Edge, error) {
+func (tm *TaskMaster) newFork(taskName string, dbrps []DBRP, measurements []string) (edge.StatsEdge, error) {
 	if tm.closed {
 		return nil, ErrTaskMasterClosed
 	}
 
-	e := newEdge(taskName, "stream", "stream0", pipeline.StreamEdge, defaultEdgeBufferSize, tm.LogService)
+	d := tm.diag.WithEdgeContext(taskName, "stream", "stream0")
+	e := newEdge(taskName, "stream", "stream0", pipeline.StreamEdge, defaultEdgeBufferSize, d)
 
 	for _, key := range forkKeys(dbrps, measurements) {
 		tm.taskToForkKeys[taskName] = append(tm.taskToForkKeys[taskName], key)
@@ -716,7 +788,7 @@ func (tm *TaskMaster) newFork(taskName string, dbrps []DBRP, measurements []stri
 		// Add the task to the tasksMap if it doesn't exists
 		tasksMap, ok := tm.forks[key]
 		if !ok {
-			tasksMap = make(map[string]*Edge, 0)
+			tasksMap = make(map[string]edge.Edge, 0)
 		}
 
 		// Add the edge to task map
@@ -812,4 +884,20 @@ func (tml *TaskMasterLookup) Delete(tm *TaskMaster) {
 	tml.Lock()
 	defer tml.Unlock()
 	delete(tml.taskMasters, tm.id)
+}
+
+type BatchCollector interface {
+	CollectBatch(edge.BufferedBatchMessage) error
+	Close() error
+}
+
+type batchCollector struct {
+	edge edge.Edge
+}
+
+func (c *batchCollector) CollectBatch(batch edge.BufferedBatchMessage) error {
+	return c.edge.Collect(batch)
+}
+func (c *batchCollector) Close() error {
+	return c.edge.Close()
 }
