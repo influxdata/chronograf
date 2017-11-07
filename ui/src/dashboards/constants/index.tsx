@@ -95,11 +95,11 @@ export const removeUnselectedTemplateValues = templates => {
   })
 }
 
-export const DISPLAY_OPTIONS = {
-  LINEAR: 'linear',
-  LOG: 'log',
-  BASE_2: '2',
-  BASE_10: '10',
+export enum DISPLAY_OPTIONS {
+  LINEAR = 'linear',
+  LOG = 'log',
+  BASE_2 = '2',
+  BASE_10 = '10',
 }
 
 export const TOOLTIP_CONTENT = {

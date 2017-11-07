@@ -5,6 +5,7 @@ import {bindActionCreators} from 'redux'
 
 import SideNav from 'side_nav/containers/SideNav'
 import Notifications from 'shared/components/Notifications'
+import CheckSources from './CheckSources'
 
 import {publishNotification} from 'shared/actions/notifications'
 
@@ -23,17 +24,27 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   notify: bindActionCreators(publishNotification, dispatch),
 })
 
+const bla = b => {
+  console.log('bla', b)
+  return b
+}
+
 export const withApp = (
   Component
 ): React.ComponentClass & {
   WrappedComponent: React.ComponentType<AppProps>
 } => {
-  const App: React.SFC<AppProps> = ({notify}) => (
-    <div className="chronograf-root">
-      <Notifications />
-      <SideNav />
-      <Component addFlashMessage={handleAddFlashMessage(notify)} />
-    </div>
+  const App: React.SFC<AppProps> = props => (
+    <CheckSources>
+      <div className="chronograf-root">
+        <Notifications />
+        <SideNav />
+        <Component
+          {...bla(props)}
+          addFlashMessage={handleAddFlashMessage(props.notify)}
+        />
+      </div>
+    </CheckSources>
   )
 
   return connect(null, mapDispatchToProps)(App)

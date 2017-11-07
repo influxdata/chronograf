@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import classnames from 'classnames'
 import {Link} from 'react-router-dom'
-import uuidv4 from 'uuid/v4'
+import * as uuidv4 from 'uuid/v4'
 
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import SearchBar from 'alerts/components/SearchBar'

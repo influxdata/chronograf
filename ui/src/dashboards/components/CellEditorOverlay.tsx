@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
 import * as _ from 'lodash'
-import uuidv4 from 'uuid/v4'
+import * as uuidv4 from 'uuid/v4'
 
 import ResizeContainer from 'shared/components/ResizeContainer'
 import QueryMaker from 'dashboards/components/QueryMaker'

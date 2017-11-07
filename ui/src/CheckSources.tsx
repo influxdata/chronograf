@@ -54,7 +54,6 @@ class CheckSources extends React.Component<
 
   public getChildContext = () => {
     const {sources, match: {params: {sourceID}}} = this.props
-    // console.log(sources, sourceID)
     return {source: sources.find(s => s.id === sourceID)}
   }
 
@@ -84,13 +83,15 @@ class CheckSources extends React.Component<
       const rest = location.pathname.match(/\/sources\/\d+?\/(.+)/)
       const restString = rest === null ? DEFAULT_HOME_PAGE : rest[1]
 
-      // if (defaultSource) {
-      //   return history.push(`/sources/${defaultSource.id}/${restString}`)
-      // } else if (sources[0]) {
-      //   return history.push(`/sources/${sources[0].id}/${restString}`)
-      // }
+      if (defaultSource) {
+        return history.push(`/sources/${defaultSource.id}/${restString}`)
+      }
 
-      // return history.push(`/sources/new?redirectPath=${location.pathname}`)
+      if (sources[0]) {
+        return history.push(`/sources/${sources[0].id}/${restString}`)
+      }
+
+      return history.push(`/sources/new?redirectPath=${location.pathname}`)
     }
 
     if (!isFetching && !location.pathname.includes('/manage-sources')) {
@@ -106,7 +107,12 @@ class CheckSources extends React.Component<
   public render() {
     const {match, sources, children} = this.props
     const {isFetching} = this.state
+
+    console.log(match)
+
     const source = sources.find(s => s.id === match.params.sourceID)
+
+    console.log(source)
 
     if (isFetching || !source) {
       return <div className="page-spinner" />

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
 import SourceIndicator from 'shared/components/SourceIndicator'
@@ -8,16 +7,24 @@ import LayoutRenderer from 'shared/components/LayoutRenderer'
 
 import {fixtureStatusPageCells} from 'status/fixtures'
 
-class StatusPage extends React.Component {
-  constructor(props) {
-    super(props)
+import {AutoRefresh, Cell, Source, TimeRange} from 'src/types'
 
-    this.state = {
-      cells: fixtureStatusPageCells,
-    }
+export interface StatusPageProps {
+  source: Source
+  autoRefresh: AutoRefresh
+  timeRange: TimeRange
+}
+
+export interface StatusPageState {
+  cells: Cell[]
+}
+
+class StatusPage extends React.Component<StatusPageProps, StatusPageState> {
+  public state = {
+    cells: fixtureStatusPageCells,
   }
 
-  render() {
+  public render() {
     const {source, autoRefresh, timeRange} = this.props
     const {cells} = this.state
 
@@ -63,38 +70,25 @@ class StatusPage extends React.Component {
         </div>
         <FancyScrollbar className="page-contents">
           <div className="dashboard container-fluid full-width">
-            {cells.length
-              ? <LayoutRenderer
-                  autoRefresh={autoRefresh}
-                  timeRange={timeRange}
-                  cells={cells}
-                  templates={templates}
-                  source={source}
-                  shouldNotBeEditable={true}
-                  isStatusPage={true}
-                  isEditable={false}
-                />
-              : <span>Loading Status Page...</span>}
+            {cells.length ? (
+              <LayoutRenderer
+                autoRefresh={autoRefresh}
+                timeRange={timeRange}
+                cells={cells}
+                templates={templates}
+                source={source}
+                shouldNotBeEditable={true}
+                isStatusPage={true}
+                isEditable={false}
+              />
+            ) : (
+              <span>Loading Status Page...</span>
+            )}
           </div>
         </FancyScrollbar>
       </div>
     )
   }
-}
-
-const {number, shape, string} = PropTypes
-
-StatusPage.propTypes = {
-  source: shape({
-    name: string.isRequired,
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  autoRefresh: number.isRequired,
-  timeRange: shape({
-    lower: string.isRequired,
-  }).isRequired,
 }
 
 const mapStateToProps = ({statusUI: {autoRefresh, timeRange}}) => ({

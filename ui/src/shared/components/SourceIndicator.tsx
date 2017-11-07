@@ -1,11 +1,20 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
-import uuidv4 from 'uuid/v4'
+import * as uuidv4 from 'uuid/v4'
 
 import ReactTooltip from 'react-tooltip'
 
-const SourceIndicator = ({sourceOverride}, {source: {name, url}}) => {
+import {Source} from 'src/types'
+
+export interface SourceIndicatorProps {
+  sourceOverride?: Source
+}
+
+const SourceIndicator: React.SFC<SourceIndicatorProps> = (
+  {sourceOverride},
+  {source: {name, url}}
+) => {
   const sourceName = _.get(sourceOverride, 'name', null)
     ? sourceOverride.name
     : name
@@ -37,19 +46,10 @@ const SourceIndicator = ({sourceOverride}, {source: {name, url}}) => {
   )
 }
 
-const {shape, string} = PropTypes
-
-SourceIndicator.propTypes = {
-  sourceOverride: shape({
-    name: string,
-    url: string,
-  }),
-}
-
 SourceIndicator.contextTypes = {
-  source: shape({
-    name: string,
-    url: string,
+  source: PropTypes.shape({
+    name: PropTypes.string,
+    url: PropTypes.string,
   }),
 }
 

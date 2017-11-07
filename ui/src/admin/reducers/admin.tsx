@@ -5,7 +5,7 @@ import {
   NEW_DEFAULT_DATABASE,
   NEW_EMPTY_RP,
 } from 'admin/constants'
-import uuidv4 from 'uuid/v4'
+import * as uuidv4 from 'uuid/v4'
 
 const initialState = {
   users: null,

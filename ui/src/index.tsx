@@ -3,7 +3,7 @@ import 'babel-polyfill'
 import * as React from 'react'
 import {render} from 'react-dom'
 import {Provider} from 'react-redux'
-import {Route} from 'react-router'
+import {Route, Switch} from 'react-router'
 import {ConnectedRouter} from 'react-router-redux'
 import createHistory from 'history/createBrowserHistory'
 
@@ -126,78 +126,115 @@ class Root extends React.Component {
     return (
       <Provider store={store}>
         <ConnectedRouter history={history}>
-          <div>
-            <Route path="/" component={UserIsAuthenticated(CheckSources)} />
-            <Route path="/login" component={UserIsNotAuthenticated(Login)} />
+          <Switch>
             <Route
+              exact={true}
+              path="/"
+              component={UserIsAuthenticated(CheckSources)}
+            />
+            <Route
+              exact={true}
+              path="/login"
+              component={UserIsNotAuthenticated(Login)}
+            />
+            <Route
+              exact={true}
               path="/sources/new"
               component={UserIsAuthenticated(SourcePage)}
             />
-            <Route path="/sources/:sourceID">
-              <div>
-                <Route component={CheckSources} />
-                <Route path="status" component={withApp(StatusPage)} />
-                <Route path="hosts" component={withApp(HostsPage)} />
-                <Route path="hosts/:hostID" component={withApp(HostPage)} />
-                <Route
-                  path="chronograf/data-explorer"
-                  component={withApp(DataExplorer)}
-                />
-                <Route path="dashboards" component={withApp(DashboardsPage)} />
-                <Route
-                  path="dashboards/:dashboardID"
-                  component={withApp(DashboardPage)}
-                />
-                <Route path="alerts" component={withApp(AlertsApp)} />
-                <Route
-                  path="alert-rules"
-                  component={withApp(KapacitorRulesPage)}
-                />
-                <Route
-                  path="alert-rules/:ruleID"
-                  component={withApp(KapacitorRulePage)}
-                />
-                <Route
-                  path="alert-rules/new"
-                  component={withApp(KapacitorRulePage)}
-                />
-                <Route
-                  path="tickscript/new"
-                  component={withApp(TickscriptPage)}
-                />
-                <Route
-                  path="tickscript/:ruleID"
-                  component={withApp(TickscriptPage)}
-                />
-                <Route
-                  path="kapacitors/new"
-                  component={withApp(KapacitorPage)}
-                />
-                <Route
-                  path="kapacitors/:id/edit"
-                  component={withApp(KapacitorPage)}
-                />
-                <Route
-                  path="kapacitor-tasks"
-                  component={withApp(KapacitorTasksPage)}
-                />
-                <Route path="admin" component={withApp(AdminPage)} />
-                <Route
-                  path="manage-sources"
-                  component={withApp(ManageSources)}
-                />
-                <Route
-                  path="manage-sources/new"
-                  component={withApp(SourcePage)}
-                />
-                <Route
-                  path="manage-sources/:id/edit"
-                  component={withApp(SourcePage)}
-                />
-              </div>
-            </Route>
+            <Route
+              exact={true}
+              path="/sources/:sourceID/status"
+              component={withApp(StatusPage)}
+            />
+            <Route exact={true} path="hosts" component={withApp(HostsPage)} />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/hosts/:hostID"
+              component={withApp(HostPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/chronograf/data-explorer"
+              component={withApp(DataExplorer)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/dashboards"
+              component={withApp(DashboardsPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/dashboards/:dashboardID"
+              component={withApp(DashboardPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/alerts"
+              component={withApp(AlertsApp)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/alert-rules"
+              component={withApp(KapacitorRulesPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/alert-rules/:ruleID"
+              component={withApp(KapacitorRulePage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/alert-rules/new"
+              component={withApp(KapacitorRulePage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/tickscript/new"
+              component={withApp(TickscriptPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/tickscript/:ruleID"
+              component={withApp(TickscriptPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/kapacitors/new"
+              component={withApp(KapacitorPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/kapacitors/:id/edit"
+              component={withApp(KapacitorPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/kapacitor-tasks"
+              component={withApp(KapacitorTasksPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/admin"
+              component={withApp(AdminPage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/manage-sources"
+              component={withApp(ManageSources)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/manage-sources/new"
+              component={withApp(SourcePage)}
+            />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/manage-sources/:id/edit"
+              component={withApp(SourcePage)}
+            />
             <Route path="*" component={NotFound} />
-          </div>
+          </Switch>
         </ConnectedRouter>
       </Provider>
     )

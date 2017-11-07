@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4'
+import * as uuidv4 from 'uuid/v4'
 import {getActiveKapacitor} from 'shared/apis'
 import {publishNotification} from 'shared/actions/notifications'
 import {

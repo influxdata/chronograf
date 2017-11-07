@@ -1,11 +1,18 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
 import Resizeable from 'react-resizable'
 
-import * as _ from 'lodash'
-
 import Layout from 'shared/components/Layout'
+import {
+  AutoRefresh,
+  Cell,
+  ManualRefresh,
+  Source,
+  Template,
+  TimeRange,
+} from 'src/types'
 
 import {
   // TODO: get these const values dynamically
@@ -18,8 +25,36 @@ import {
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
-class LayoutRenderer extends React.Component {
-  constructor(props) {
+export interface LayoutRendererProps {
+  autoRefresh: AutoRefresh
+  manualRefresh?: ManualRefresh
+  timeRange: TimeRange
+  cells: Cell[]
+  templates: Template[]
+  host: string
+  source: Source
+  sources: Source[]
+  onPositionChange: (newCells: Cell[]) => void
+  onEditCell: () => void
+  onDeleteCell: () => void
+  onSummonOverlayTechnologies: () => void
+  synchronizer: () => void
+  onCancelEditCell: () => void
+  onZoom: () => void
+  isStatusPage: boolean
+  isEditable: boolean
+}
+
+export interface LayoutRendererState {
+  rowHeight: number
+  resizeCoords: null
+}
+
+class LayoutRenderer extends React.Component<
+  LayoutRendererProps,
+  LayoutRendererState
+> {
+  constructor(props: LayoutRendererProps) {
     super(props)
 
     this.state = {
@@ -28,7 +63,7 @@ class LayoutRenderer extends React.Component {
     }
   }
 
-  handleLayoutChange = layout => {
+  private handleLayoutChange = layout => {
     if (!this.props.onPositionChange) {
       return
     }
@@ -43,7 +78,7 @@ class LayoutRenderer extends React.Component {
   }
 
   // ensures that Status Page height fits the window
-  calculateRowHeight = () => {
+  private calculateRowHeight = () => {
     const {isStatusPage} = this.props
 
     return isStatusPage
@@ -52,11 +87,11 @@ class LayoutRenderer extends React.Component {
           PAGE_HEADER_HEIGHT -
           PAGE_CONTAINER_MARGIN -
           PAGE_CONTAINER_MARGIN) /
-        STATUS_PAGE_ROW_COUNT
+          STATUS_PAGE_ROW_COUNT
       : DASHBOARD_LAYOUT_ROW_HEIGHT
   }
 
-  handleCellResize = (__, oldCoords, resizeCoords) => {
+  private handleCellResize = (__, oldCoords, resizeCoords) => {
     if (_.isEqual(oldCoords, resizeCoords)) {
       return
     }
@@ -64,7 +99,7 @@ class LayoutRenderer extends React.Component {
     this.setState({resizeCoords})
   }
 
-  render() {
+  public render() {
     const {
       host,
       cells,
@@ -101,7 +136,7 @@ class LayoutRenderer extends React.Component {
           isDraggable={isDashboard}
           isResizable={isDashboard}
         >
-          {cells.map(cell =>
+          {cells.map(cell => (
             <div key={cell.i}>
               <Layout
                 key={cell.i}
@@ -123,7 +158,7 @@ class LayoutRenderer extends React.Component {
                 onSummonOverlayTechnologies={onSummonOverlayTechnologies}
               />
             </div>
-          )}
+          ))}
         </GridLayout>
       </Resizeable>
     )
@@ -131,50 +166,5 @@ class LayoutRenderer extends React.Component {
 }
 
 const {arrayOf, bool, func, number, shape, string} = PropTypes
-
-LayoutRenderer.propTypes = {
-  autoRefresh: number.isRequired,
-  manualRefresh: number,
-  timeRange: shape({
-    lower: string.isRequired,
-  }),
-  cells: arrayOf(
-    shape({
-      // isWidget cells will not have queries
-      isWidget: bool,
-      queries: arrayOf(
-        shape({
-          label: string,
-          text: string,
-          query: string,
-        }).isRequired
-      ),
-      x: number.isRequired,
-      y: number.isRequired,
-      w: number.isRequired,
-      h: number.isRequired,
-      i: string.isRequired,
-      name: string.isRequired,
-      type: string.isRequired,
-    }).isRequired
-  ),
-  templates: arrayOf(shape()),
-  host: string,
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  onPositionChange: func,
-  onEditCell: func,
-  onDeleteCell: func,
-  onSummonOverlayTechnologies: func,
-  synchronizer: func,
-  isStatusPage: bool,
-  isEditable: bool,
-  onCancelEditCell: func,
-  onZoom: func,
-  sources: arrayOf(shape({})),
-}
 
 export default LayoutRenderer

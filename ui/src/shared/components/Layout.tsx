@@ -1,11 +1,12 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
+
 import WidgetCell from 'shared/components/WidgetCell'
 import LayoutCell from 'shared/components/LayoutCell'
 import RefreshingGraph from 'shared/components/RefreshingGraph'
 import {buildQueriesForLayouts} from 'utils/influxql'
-
-import * as _ from 'lodash'
+import {Cell, LayoutProps, ResizeCoords} from 'src/types'
 
 const getSource = (cell, source, sources, defaultSource) => {
   const s = _.get(cell, ['queries', '0', 'source'], null)
@@ -16,19 +17,24 @@ const getSource = (cell, source, sources, defaultSource) => {
   return sources.find(src => src.links.self === s) || defaultSource
 }
 
-class LayoutState extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      celldata: [],
-    }
+export type LayoutStateProps = LayoutProps & {
+  resizeCoords: ResizeCoords
+}
+
+export interface LayoutStateState {
+  celldata: Cell[]
+}
+
+class LayoutState extends React.Component<LayoutStateProps, LayoutStateState> {
+  public state = {
+    celldata: [],
   }
 
-  grabDataForDownload = celldata => {
+  private grabDataForDownload = celldata => {
     this.setState({celldata})
   }
 
-  render() {
+  public render() {
     const {celldata} = this.state
     return (
       <Layout
@@ -63,7 +69,7 @@ const Layout = (
     celldata,
   },
   {source: defaultSource}
-) =>
+) => (
   <LayoutCell
     cell={cell}
     isEditable={isEditable}
@@ -73,29 +79,32 @@ const Layout = (
     onCancelEditCell={onCancelEditCell}
     onSummonOverlayTechnologies={onSummonOverlayTechnologies}
   >
-    {cell.isWidget
-      ? <WidgetCell cell={cell} timeRange={timeRange} source={source} />
-      : <RefreshingGraph
-          axes={axes}
-          type={type}
-          cellHeight={h}
-          onZoom={onZoom}
-          sources={sources}
-          timeRange={timeRange}
-          templates={templates}
-          autoRefresh={autoRefresh}
-          manualRefresh={manualRefresh}
-          synchronizer={synchronizer}
-          grabDataForDownload={grabDataForDownload}
-          resizeCoords={resizeCoords}
-          queries={buildQueriesForLayouts(
-            cell,
-            getSource(cell, source, sources, defaultSource),
-            timeRange,
-            host
-          )}
-        />}
+    {cell.isWidget ? (
+      <WidgetCell cell={cell} timeRange={timeRange} source={source} />
+    ) : (
+      <RefreshingGraph
+        axes={axes}
+        type={type}
+        cellHeight={h}
+        onZoom={onZoom}
+        sources={sources}
+        timeRange={timeRange}
+        templates={templates}
+        autoRefresh={autoRefresh}
+        manualRefresh={manualRefresh}
+        synchronizer={synchronizer}
+        grabDataForDownload={grabDataForDownload}
+        resizeCoords={resizeCoords}
+        queries={buildQueriesForLayouts(
+          cell,
+          getSource(cell, source, sources, defaultSource),
+          timeRange,
+          host
+        )}
+      />
+    )}
   </LayoutCell>
+)
 
 const {arrayOf, bool, func, number, shape, string} = PropTypes
 
@@ -103,49 +112,7 @@ Layout.contextTypes = {
   source: shape(),
 }
 
-const propTypes = {
-  autoRefresh: number.isRequired,
-  manualRefresh: number,
-  timeRange: shape({
-    lower: string.isRequired,
-  }),
-  cell: shape({
-    // isWidget cells will not have queries
-    isWidget: bool,
-    queries: arrayOf(
-      shape({
-        label: string,
-        text: string,
-        query: string,
-      }).isRequired
-    ),
-    x: number.isRequired,
-    y: number.isRequired,
-    w: number.isRequired,
-    h: number.isRequired,
-    i: string.isRequired,
-    name: string.isRequired,
-    type: string.isRequired,
-  }).isRequired,
-  templates: arrayOf(shape()),
-  host: string,
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  onPositionChange: func,
-  onEditCell: func,
-  onDeleteCell: func,
-  onSummonOverlayTechnologies: func,
-  synchronizer: func,
-  isStatusPage: bool,
-  isEditable: bool,
-  onCancelEditCell: func,
-  resizeCoords: shape(),
-  onZoom: func,
-  sources: arrayOf(shape()),
-}
+const propTypes = {}
 
 LayoutState.propTypes = {...propTypes}
 Layout.propTypes = {
