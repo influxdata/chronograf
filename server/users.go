@@ -198,6 +198,16 @@ func (s *Service) RemoveUser(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusNotFound, err.Error(), s.Logger)
 		return
 	}
+
+	// If the user making the request is not a super admin and the user they're
+	// trying to delete is a super admin, return not authorized error.
+	//
+	// For the sake of clarity, we have used u.SuperAdmin == true even though it is equivalent
+	// to u.SuperAdmin == true
+	if isSuperAdmin := hasSuperAdminContext(ctx); !isSuperAdmin && u.SuperAdmin == true {
+		Error(w, http.StatusUnauthorized, "User is not authorized", s.Logger)
+		return
+	}
 	if err := s.Store.Users(ctx).Delete(ctx, u); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return
