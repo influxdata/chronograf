@@ -383,9 +383,9 @@ func TestService_RemoveUser(t *testing.T) {
 		Logger     chronograf.Logger
 	}
 	type args struct {
-		w    *httptest.ResponseRecorder
-		r    *http.Request
-		user *userRequest
+		w                     *httptest.ResponseRecorder
+		r                     *http.Request
+		withSuperAdminContext bool
 	}
 	tests := []struct {
 		name       string
@@ -394,6 +394,7 @@ func TestService_RemoveUser(t *testing.T) {
 		user       *chronograf.User
 		id         string
 		wantStatus int
+		wantBody   string
 	}{
 		{
 			name: "Delete a Chronograf User",
@@ -425,12 +426,114 @@ func TestService_RemoveUser(t *testing.T) {
 					"http://any.url",
 					nil,
 				),
-				user: &userRequest{
-					ID:       1339,
-					Name:     "helena",
-					Provider: "heroku",
-					Scheme:   "oauth2",
+			},
+			id:         "1339",
+			wantStatus: http.StatusNoContent,
+		},
+		{
+			name: "Delete SuperAdmin Chronograf User - without SuperAdmin context",
+			fields: fields{
+				Logger: log.New(log.DebugLevel),
+				UsersStore: &mocks.UsersStore{
+					GetF: func(ctx context.Context, q chronograf.UserQuery) (*chronograf.User, error) {
+						switch *q.ID {
+						case 1339:
+							return &chronograf.User{
+								ID:         1339,
+								Name:       "helena",
+								Provider:   "heroku",
+								Scheme:     "oauth2",
+								SuperAdmin: true,
+							}, nil
+						default:
+							return nil, fmt.Errorf("User with ID %d not found", *q.ID)
+						}
+					},
+					DeleteF: func(ctx context.Context, user *chronograf.User) error {
+						return nil
+					},
 				},
+			},
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"DELETE",
+					"http://any.url",
+					nil,
+				),
+				withSuperAdminContext: false,
+			},
+			id:         "1339",
+			wantStatus: http.StatusUnauthorized,
+			wantBody:   `{"code":401,"message":"User is not authorized"}`,
+		},
+		{
+			name: "Delete SuperAdmin Chronograf User - with SuperAdmin context",
+			fields: fields{
+				Logger: log.New(log.DebugLevel),
+				UsersStore: &mocks.UsersStore{
+					GetF: func(ctx context.Context, q chronograf.UserQuery) (*chronograf.User, error) {
+						switch *q.ID {
+						case 1339:
+							return &chronograf.User{
+								ID:         1339,
+								Name:       "helena",
+								Provider:   "heroku",
+								Scheme:     "oauth2",
+								SuperAdmin: true,
+							}, nil
+						default:
+							return nil, fmt.Errorf("User with ID %d not found", *q.ID)
+						}
+					},
+					DeleteF: func(ctx context.Context, user *chronograf.User) error {
+						return nil
+					},
+				},
+			},
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"DELETE",
+					"http://any.url",
+					nil,
+				),
+				withSuperAdminContext: true,
+			},
+			id:         "1339",
+			wantStatus: http.StatusNoContent,
+		},
+		{
+			name: "Delete Chronograf User - with SuperAdmin context",
+			fields: fields{
+				Logger: log.New(log.DebugLevel),
+				UsersStore: &mocks.UsersStore{
+					GetF: func(ctx context.Context, q chronograf.UserQuery) (*chronograf.User, error) {
+						switch *q.ID {
+						case 1339:
+							return &chronograf.User{
+								ID:       1339,
+								Name:     "helena",
+								Provider: "heroku",
+								Scheme:   "oauth2",
+							}, nil
+						default:
+							return nil, fmt.Errorf("User with ID %d not found", *q.ID)
+						}
+					},
+					DeleteF: func(ctx context.Context, user *chronograf.User) error {
+						return nil
+					},
+				},
+			},
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"DELETE",
+					"http://any.url",
+					nil,
+				),
+				withSuperAdminContext: true,
 			},
 			id:         "1339",
 			wantStatus: http.StatusNoContent,
@@ -455,12 +558,22 @@ func TestService_RemoveUser(t *testing.T) {
 				},
 			))
 
+			ctx := tt.args.r.Context()
+			if tt.args.withSuperAdminContext {
+				ctx = context.WithValue(ctx, SuperAdminKey, true)
+				tt.args.r = tt.args.r.WithContext(ctx)
+			}
+
 			s.RemoveUser(tt.args.w, tt.args.r)
 
 			resp := tt.args.w.Result()
+			body, _ := ioutil.ReadAll(resp.Body)
 
 			if resp.StatusCode != tt.wantStatus {
 				t.Errorf("%q. RemoveUser() = %v, want %v", tt.name, resp.StatusCode, tt.wantStatus)
+			}
+			if eq, _ := jsonEqual(string(body), tt.wantBody); tt.wantBody != "" && !eq {
+				t.Errorf("%q. RemoveUser() = \n***%v***\n,\nwant\n***%v***", tt.name, string(body), tt.wantBody)
 			}
 		})
 	}
