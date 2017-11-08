@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
 import * as _ from 'lodash'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import UserEditName from 'admin/components/UserEditName'
 import UserNewPassword from 'admin/components/UserNewPassword'

@@ -158,9 +158,9 @@ export interface LayoutProps {
   onEditCell: () => void
   onDeleteCell: () => void
   onSummonOverlayTechnologies: () => void
-  synchronizer: FuncTypes.synchronizer
   onCancelEditCell: () => void
-  onZoom: () => void
+  synchronizer: FuncTypes.synchronizer
+  onZoom: FuncTypes.onZoom
   isStatusPage: boolean
   isEditable: boolean
 }
@@ -185,3 +185,9 @@ export interface RuleValues {
   rangeValue: string | null
   operator: string
 }
+
+export interface DygraphOptions {
+  plotter: () => void
+}
+
+export interface LegendSeries {}

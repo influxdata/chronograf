@@ -40,7 +40,7 @@ export interface LayoutRendererProps {
   onSummonOverlayTechnologies: () => void
   synchronizer: FuncTypes.synchronizer
   onCancelEditCell: () => void
-  onZoom: () => void
+  onZoom: FuncTypes.onZoom
   isStatusPage: boolean
   isEditable: boolean
 }

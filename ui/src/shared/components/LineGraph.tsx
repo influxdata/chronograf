@@ -35,17 +35,17 @@ export interface LineGraphProps {
   data: Result[]
   setResolution: () => void
   underlayCallback: () => void
-  onZoom: () => void
+  onZoom: FuncTypes.onZoom
 }
 
 class LineGraph extends React.PureComponent<LineGraphProps> {
-  private _timeSeries
-
-  public defaultProps = {
+  public static defaultProps = {
     underlayCallback: () => ({}),
     isGraphFilled: true,
     overrideLineColors: null,
   }
+
+  private _timeSeries
 
   public componentWillMount() {
     const {data, isInDataExplorer} = this.props

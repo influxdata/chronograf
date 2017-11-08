@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import LoadingDots from 'shared/components/LoadingDots'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 const QueryStatus = ({status, children}) => {
   if (!status) {

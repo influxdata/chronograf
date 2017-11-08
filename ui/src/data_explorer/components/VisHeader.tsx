@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
 import {resultsToCSV} from 'shared/parsing/resultsToCSV'

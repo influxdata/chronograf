@@ -6,7 +6,7 @@ import {bindActionCreators} from 'redux'
 import uniq from 'lodash/uniq'
 
 import onClickOutside from 'react-onClickOutside'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import Dropdown from 'shared/components/Dropdown'
 import TemplateQueryBuilder from 'dashboards/components/template_variables/TemplateQueryBuilder'

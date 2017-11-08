@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
 import * as _ from 'lodash'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import RoleEditingRow from 'admin/components/RoleEditingRow'
 import MultiSelectDropdown from 'shared/components/MultiSelectDropdown'

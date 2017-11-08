@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@skidding/react-codemirror": "^1.0.2",
+    "@types/classnames": "^2.2.3",
     "@types/history": "^4.6.1",
     "@types/lodash": "^4.14.80",
     "@types/prop-types": "^15.5.2",

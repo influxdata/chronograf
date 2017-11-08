@@ -36,14 +36,15 @@ export interface DygraphProps {
   axes: Axes
   queries: TextQuery[]
   timeSeries: TimeSeries[]
-  labels: string[]
   options: DygraphOptions
-  containerStyle: {}
-  isGraphFilled: boolean
   overrideLineColors: Color[]
-  dygraphSeries: {}
   ruleValues: RuleValues
   timeRange: TimeRange
+  labels: string[]
+  containerStyle: {}
+  isGraphFilled: boolean
+  isBarGraph: boolean
+  dygraphSeries: {}
   setResolution: () => void
   dygraphRef: () => void
   synchronizer: FuncTypes.synchronizer
@@ -88,7 +89,7 @@ export default class Dygraph extends React.PureComponent<
     isFilterVisible: false,
   }
 
-  public defaultProps = {
+  public static defaultProps = {
     axes: {
       y: {
         bounds: [null, null],
@@ -219,7 +220,7 @@ export default class Dygraph extends React.PureComponent<
     const numSeries = series.length
     return Array(numSeries ? numSeries - 1 : numSeries)
       .fill(true)
-      .map((s, i) => {
+      .map((_s, i) => {
         if (!legend.series[i]) {
           return true
         }
@@ -259,7 +260,7 @@ export default class Dygraph extends React.PureComponent<
     if (!timeRange) {
       return ''
     }
-    return moment.format('YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ')
+    return moment(timeRange).format('YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ')
   }
 
   private deselectCrosshair = () => {

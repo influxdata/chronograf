@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import ResizeHandle from 'shared/components/ResizeHandle'
 

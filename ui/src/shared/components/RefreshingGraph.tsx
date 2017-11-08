@@ -30,7 +30,7 @@ export interface RefreshingGraphProps {
   queries: QueryConfig[]
   templates: Template[]
   resizeCoords: ResizeCoords
-  onZoom: () => void
+  onZoom: FuncTypes.onZoom
   synchronizer: FuncTypes.synchronizer
   editQueryStatus: FuncTypes.editQueryStatus
   grabDataForDownload: FuncTypes.grabDataForDownload

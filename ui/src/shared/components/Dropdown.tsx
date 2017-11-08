@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import onClickOutside from 'shared/components/onClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'

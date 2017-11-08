@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import {Link} from 'react-router-dom'
 import * as uuidv4 from 'uuid/v4'
 

@@ -86,6 +86,7 @@ Sparky.task('config', () => {
     debug: true,
     tsConfig: 'tsconfig.json',
     alias: {
+      src: '~',
       admin: '~/admin',
       alerts: '~/alerts',
       auth: '~/auth',

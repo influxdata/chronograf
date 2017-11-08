@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import buildInfluxQLQuery from 'utils/influxql'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import VisHeader from 'data_explorer/components/VisHeader'
 import VisView from 'data_explorer/components/VisView'
 import {GRAPH, TABLE} from 'shared/constants'

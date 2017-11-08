@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import onClickOutside from 'react-onClickOutside'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 const TemplateDrawer = ({
   templates,

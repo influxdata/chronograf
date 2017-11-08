@@ -2,8 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 import * as uuidv4 from 'uuid/v4'
-
-import ReactTooltip from 'react-tooltip'
+import * as ReactTooltip from 'react-tooltip'
 
 import {Source} from 'src/types'
 

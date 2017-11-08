@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import RuleMessageOptions from 'kapacitor/components/RuleMessageOptions'
 import RuleMessageText from 'kapacitor/components/RuleMessageText'

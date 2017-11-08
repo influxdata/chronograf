@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import AutoRefreshDropdown from 'shared/components/AutoRefreshDropdown'
 import TimeRangeDropdown from 'shared/components/TimeRangeDropdown'

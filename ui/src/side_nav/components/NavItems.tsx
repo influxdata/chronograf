@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import {withRouter, Link} from 'react-router-dom'
 import {Location} from 'history'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 export const NavListItem: React.SFC<{
   link: string

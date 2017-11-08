@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import lastValues from 'shared/parsing/lastValues'
 
 import {SMALL_CELL_HEIGHT} from 'shared/graphs/helpers'

@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
 import * as _ from 'lodash'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 
 import DatabaseRow from 'admin/components/DatabaseRow'
 import DatabaseTableHeader from 'admin/components/DatabaseTableHeader'

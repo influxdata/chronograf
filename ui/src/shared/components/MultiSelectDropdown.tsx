@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import * as _ from 'lodash'
 
 import onClickOutside from 'shared/components/onClickOutside'

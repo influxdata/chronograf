@@ -1,5 +1,5 @@
 import * as React from 'react'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import {Scrollbars} from 'react-custom-scrollbars'
 
 export interface FancyScrollbarProps {
@@ -11,7 +11,7 @@ export interface FancyScrollbarProps {
 }
 
 class FancyScrollbar extends React.Component<FancyScrollbarProps> {
-  public defaultProps = {
+  public static defaultProps = {
     autoHide: true,
     autoHeight: false,
   }

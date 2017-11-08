@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import onClickOutside from 'shared/components/onClickOutside'
 
 import autoRefreshItems from 'shared/data/autoRefreshes'

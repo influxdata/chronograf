@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import * as moment from 'moment'
-import classnames from 'classnames'
+import * as classnames from 'classnames'
 import onClickOutside from 'react-onClickOutside'
 
 import CustomTimeRange from 'shared/components/CustomTimeRange'
