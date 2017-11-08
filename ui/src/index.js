@@ -12,6 +12,7 @@ import {loadLocalStorage} from 'src/localStorage'
 
 import App from 'src/App'
 import {Login, UserIsAuthenticated, UserIsNotAuthenticated} from 'src/auth'
+import CheckAdmin from 'src/CheckAdmin'
 import CheckSources from 'src/CheckSources'
 import {StatusPage} from 'src/status'
 import {HostsPage, HostPage} from 'src/hosts'
@@ -46,6 +47,8 @@ import {errorThrown} from 'shared/actions/errors'
 import 'src/style/chronograf.scss'
 
 import {HEARTBEAT_INTERVAL} from 'shared/constants'
+
+// import {SUPERADMIN_ROLE, ADMIN_ROLE} from 'src/auth/Authorized'
 
 const errorsQueue = []
 
@@ -137,6 +140,14 @@ const Root = React.createClass({
         <Router history={history}>
           <Route path="/" component={UserIsAuthenticated(CheckSources)} />
           <Route path="/login" component={UserIsNotAuthenticated(Login)} />
+          <Route path="/admin" component={UserIsAuthenticated(App)}>
+            <Route component={CheckSources}>
+              <Route component={CheckAdmin}>
+                <Route path="users" component={AdminChronografPage} />
+                <Route path="organizations" component={OrganizationsPage} />
+              </Route>
+            </Route>
+          </Route>
           <Route
             path="/sources/new"
             component={UserIsAuthenticated(SourcePage)}
@@ -158,7 +169,6 @@ const Root = React.createClass({
               <Route path="kapacitors/new" component={KapacitorPage} />
               <Route path="kapacitors/:id/edit" component={KapacitorPage} />
               <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
-              <Route path="admin-chronograf" component={AdminChronografPage} />
               <Route path="admin-influxdb" component={AdminInfluxDBPage} />
               <Route path="manage-sources" component={ManageSources} />
               <Route path="manage-sources/new" component={SourcePage} />
