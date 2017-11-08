@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 
 import LayoutCellMenu from 'shared/components/LayoutCellMenu'
@@ -8,33 +7,44 @@ import {errorThrown} from 'shared/actions/errors'
 import {dashboardtoCSV} from 'shared/parsing/resultsToCSV'
 import download from 'external/download'
 
-class LayoutCell extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isDeleting: false,
-    }
+import {Cell} from 'src/types'
+
+export interface LayoutCellProps {
+  cell: Cell
+  celldata: Cell[]
+  onDeleteCell: (cell: Cell) => void
+  onSummonOverlayTechnologies: (cell: Cell) => void
+  isEditable: boolean
+}
+
+export interface LayoutCellState {
+  isDeleting: boolean
+}
+
+class LayoutCell extends React.Component<LayoutCellProps, LayoutCellState> {
+  public state = {
+    isDeleting: false,
   }
 
-  closeMenu = () => {
+  private closeMenu = () => {
     this.setState({
       isDeleting: false,
     })
   }
 
-  handleDeleteClick = () => {
+  private handleDeleteClick = () => {
     this.setState({isDeleting: true})
   }
 
-  handleDeleteCell = cell => () => {
+  private handleDeleteCell = cell => () => {
     this.props.onDeleteCell(cell)
   }
 
-  handleSummonOverlay = cell => () => {
+  private handleSummonOverlay = cell => () => {
     this.props.onSummonOverlayTechnologies(cell)
   }
 
-  handleCSVDownload = cell => () => {
+  private handleCSVDownload = cell => () => {
     const joinedName = cell.name.split(' ').join('_')
     const {celldata} = this.props
     try {
@@ -45,7 +55,7 @@ class LayoutCell extends React.Component {
     }
   }
 
-  render() {
+  public render() {
     const {cell, children, isEditable, celldata} = this.props
 
     const {isDeleting} = this.state
@@ -70,38 +80,22 @@ class LayoutCell extends React.Component {
           isEditable={isEditable}
         />
         <div className="dash-graph--container">
-          {queries.length
-            ? children
-            : <div className="graph-empty">
-                <button
-                  className="no-query--button btn btn-md btn-primary"
-                  onClick={this.handleSummonOverlay(cell)}
-                >
-                  <span className="icon plus" /> Add Graph
-                </button>
-              </div>}
+          {queries.length ? (
+            children
+          ) : (
+            <div className="graph-empty">
+              <button
+                className="no-query--button btn btn-md btn-primary"
+                onClick={this.handleSummonOverlay(cell)}
+              >
+                <span className="icon plus" /> Add Graph
+              </button>
+            </div>
+          )}
         </div>
       </div>
     )
   }
-}
-
-const {arrayOf, bool, func, node, number, shape, string} = PropTypes
-
-LayoutCell.propTypes = {
-  cell: shape({
-    name: string.isRequired,
-    isEditing: bool,
-    x: number.isRequired,
-    y: number.isRequired,
-    queries: arrayOf(shape()),
-  }).isRequired,
-  children: node.isRequired,
-  onDeleteCell: func,
-  onSummonOverlayTechnologies: func,
-  isEditable: bool,
-  onCancelEditCell: func,
-  celldata: arrayOf(shape()),
 }
 
 export default LayoutCell

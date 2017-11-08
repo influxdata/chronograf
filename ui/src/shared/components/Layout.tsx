@@ -7,6 +7,7 @@ import LayoutCell from 'shared/components/LayoutCell'
 import RefreshingGraph from 'shared/components/RefreshingGraph'
 import {buildQueriesForLayouts} from 'utils/influxql'
 import {Cell, LayoutProps, ResizeCoords} from 'src/types'
+import * as FuncTypes from 'src/types/funcs'
 
 const getSource = (cell, source, sources, defaultSource) => {
   const s = _.get(cell, ['queries', '0', 'source'], null)
@@ -46,7 +47,12 @@ class LayoutState extends React.Component<LayoutStateProps, LayoutStateState> {
   }
 }
 
-const Layout = (
+const Layout: React.SFC<
+  LayoutStateProps & {
+    grabDataForDownload: FuncTypes.grabDataForDownload
+    celldata: Cell[]
+  }
+> = (
   {
     host,
     cell,
@@ -57,13 +63,11 @@ const Layout = (
     templates,
     timeRange,
     isEditable,
-    onEditCell,
     autoRefresh,
     manualRefresh,
     onDeleteCell,
     synchronizer,
     resizeCoords,
-    onCancelEditCell,
     onSummonOverlayTechnologies,
     grabDataForDownload,
     celldata,
@@ -73,10 +77,8 @@ const Layout = (
   <LayoutCell
     cell={cell}
     isEditable={isEditable}
-    onEditCell={onEditCell}
     celldata={celldata}
     onDeleteCell={onDeleteCell}
-    onCancelEditCell={onCancelEditCell}
     onSummonOverlayTechnologies={onSummonOverlayTechnologies}
   >
     {cell.isWidget ? (
@@ -106,19 +108,8 @@ const Layout = (
   </LayoutCell>
 )
 
-const {arrayOf, bool, func, number, shape, string} = PropTypes
-
 Layout.contextTypes = {
-  source: shape(),
-}
-
-const propTypes = {}
-
-LayoutState.propTypes = {...propTypes}
-Layout.propTypes = {
-  ...propTypes,
-  grabDataForDownload: func,
-  celldata: arrayOf(shape()),
+  source: PropTypes.shape({}),
 }
 
 export default LayoutState

@@ -2,6 +2,8 @@ import {RouteComponentProps} from 'react-router'
 
 import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
 
+import * as FuncTypes from 'src/types/funcs'
+
 export type RouterSourceID = RouteComponentProps<{sourceID: string}>
 
 export interface Source {
@@ -89,6 +91,10 @@ export interface Axes {
   y2?: Axis
 }
 
+export interface AxesBounds {
+  bounds: Axes
+}
+
 export interface Cell {
   i: string
   isWidget: boolean
@@ -105,7 +111,34 @@ export interface Cell {
   axes?: Axes
 }
 
-export interface Template {}
+export interface Query {
+  id?: string
+  query: TextQuery
+  source?: string
+  db?: string
+  rp?: string
+  tempVars?: Template[]
+  resolution?: number
+}
+
+export interface TemplateQuery {
+  db: string
+  rp: string
+  influxql: string
+}
+
+export interface TemplateValue {
+  type: string
+  value: string
+  selected?: boolean
+}
+
+export interface Template {
+  type: string
+  tempVar: string
+  query?: TemplateQuery
+  values: TemplateValue[]
+}
 
 export interface ResizeCoords {
   x: number
@@ -125,9 +158,30 @@ export interface LayoutProps {
   onEditCell: () => void
   onDeleteCell: () => void
   onSummonOverlayTechnologies: () => void
-  synchronizer: () => void
+  synchronizer: FuncTypes.synchronizer
   onCancelEditCell: () => void
   onZoom: () => void
   isStatusPage: boolean
   isEditable: boolean
+}
+
+export enum GraphType {
+  SingleStat = 'single-stat',
+  LineStepplot = 'line-stepplot',
+  LineStacked = 'line-stacked',
+  Bar = 'bar',
+  LinePlusSingleStat = 'line-plus-single-stat',
+}
+
+export interface TextQuery {
+  host: string | string[]
+  text: string
+}
+
+export type Color = string
+
+export interface RuleValues {
+  value: string | null
+  rangeValue: string | null
+  operator: string
 }

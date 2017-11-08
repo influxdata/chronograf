@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import {emptyGraphCopy} from 'shared/copy/cell'
 
@@ -7,10 +6,38 @@ import AutoRefresh from 'shared/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import SingleStat from 'shared/components/SingleStat'
 
+import {
+  AutoRefresh as AutoRefreshType,
+  Axes,
+  GraphType,
+  ManualRefresh,
+  QueryConfig,
+  ResizeCoords,
+  Template,
+  TimeRange,
+} from 'src/types'
+import * as FuncTypes from 'src/types/funcs'
+
 const RefreshingLineGraph = AutoRefresh(LineGraph)
 const RefreshingSingleStat = AutoRefresh(SingleStat)
 
-const RefreshingGraph = ({
+export interface RefreshingGraphProps {
+  timeRange: TimeRange
+  autoRefresh: AutoRefreshType
+  manualRefresh: ManualRefresh
+  axes: Axes
+  type: GraphType
+  queries: QueryConfig[]
+  templates: Template[]
+  resizeCoords: ResizeCoords
+  onZoom: () => void
+  synchronizer: FuncTypes.synchronizer
+  editQueryStatus: FuncTypes.editQueryStatus
+  grabDataForDownload: FuncTypes.grabDataForDownload
+  cellHeight: number
+}
+
+const RefreshingGraph: React.SFC<RefreshingGraphProps> = ({
   axes,
   type,
   onZoom,
@@ -28,14 +55,12 @@ const RefreshingGraph = ({
   if (!queries.length) {
     return (
       <div className="graph-empty">
-        <p data-test="data-explorer-no-results">
-          {emptyGraphCopy}
-        </p>
+        <p data-test="data-explorer-no-results">{emptyGraphCopy}</p>
       </div>
     )
   }
 
-  if (type === 'single-stat') {
+  if (type === GraphType.SingleStat) {
     return (
       <RefreshingSingleStat
         key={manualRefresh}
@@ -48,8 +73,8 @@ const RefreshingGraph = ({
   }
 
   const displayOptions = {
-    stepPlot: type === 'line-stepplot',
-    stackedGraph: type === 'line-stacked',
+    stepPlot: type === GraphType.LineStepplot,
+    stackedGraph: type === GraphType.LineStacked,
   }
 
   return (
@@ -61,35 +86,15 @@ const RefreshingGraph = ({
       templates={templates}
       timeRange={timeRange}
       autoRefresh={autoRefresh}
-      isBarGraph={type === 'bar'}
+      isBarGraph={type === GraphType.Bar}
       synchronizer={synchronizer}
       resizeCoords={resizeCoords}
       displayOptions={displayOptions}
       editQueryStatus={editQueryStatus}
       grabDataForDownload={grabDataForDownload}
-      showSingleStat={type === 'line-plus-single-stat'}
+      showSingleStat={type === GraphType.LinePlusSingleStat}
     />
   )
-}
-
-const {arrayOf, func, number, shape, string} = PropTypes
-
-RefreshingGraph.propTypes = {
-  timeRange: shape({
-    lower: string.isRequired,
-  }),
-  autoRefresh: number.isRequired,
-  manualRefresh: number,
-  templates: arrayOf(shape()),
-  synchronizer: func,
-  type: string.isRequired,
-  cellHeight: number,
-  axes: shape(),
-  queries: arrayOf(shape()).isRequired,
-  editQueryStatus: func,
-  onZoom: func,
-  resizeCoords: shape(),
-  grabDataForDownload: func,
 }
 
 RefreshingGraph.defaultProps = {

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
 import Resizeable from 'react-resizable'
@@ -13,6 +12,7 @@ import {
   Template,
   TimeRange,
 } from 'src/types'
+import * as FuncTypes from 'src/types/funcs'
 
 import {
   // TODO: get these const values dynamically
@@ -38,7 +38,7 @@ export interface LayoutRendererProps {
   onEditCell: () => void
   onDeleteCell: () => void
   onSummonOverlayTechnologies: () => void
-  synchronizer: () => void
+  synchronizer: FuncTypes.synchronizer
   onCancelEditCell: () => void
   onZoom: () => void
   isStatusPage: boolean
@@ -164,7 +164,5 @@ class LayoutRenderer extends React.Component<
     )
   }
 }
-
-const {arrayOf, bool, func, number, shape, string} = PropTypes
 
 export default LayoutRenderer

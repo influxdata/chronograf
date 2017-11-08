@@ -1,10 +1,12 @@
 import * as _ from 'lodash'
 import {map, reduce, forEach, concat, clone} from 'fast.js'
 
+import {Dygraph, Result, Serieses} from 'src/types/timeSeries'
+
 /**
  * Accepts an array of raw influxdb responses and returns a format
  * that Dygraph understands.
-**/
+ */
 
 const DEFAULT_SIZE = 0
 const cells = {
@@ -17,12 +19,11 @@ const cells = {
 
 // activeQueryIndex is an optional argument that indicated which query's series we want highlighted.
 export default function timeSeriesToDygraph(
-  raw = [],
-  activeQueryIndex,
-  isInDataExplorer
-) {
+  raw: Result[] = [],
+  isInDataExplorer: boolean
+): Dygraph {
   // collect results from each influx response
-  const results = reduce(
+  const results: Result[] = reduce(
     raw,
     (acc, rawResponse, responseIndex) => {
       const responses = _.get(rawResponse, 'response.results', [])
@@ -36,7 +37,7 @@ export default function timeSeriesToDygraph(
   )
 
   // collect each series
-  const serieses = reduce(
+  const serieses: Serieses[] = reduce(
     results,
     (acc, {series = [], responseIndex}, index) => {
       return [...acc, ...map(series, item => ({...item, responseIndex, index}))]
@@ -44,7 +45,7 @@ export default function timeSeriesToDygraph(
     []
   )
 
-  const size = reduce(
+  const size: number = reduce(
     serieses,
     (acc, {columns, values}) => {
       if (columns.length && (values && values.length)) {
@@ -56,8 +57,8 @@ export default function timeSeriesToDygraph(
   )
 
   // convert series into cells with rows and columns
-  let cellIndex = 0
-  let labels = []
+  let cellIndex: number = 0
+  let labels: string[] = []
 
   forEach(
     serieses,

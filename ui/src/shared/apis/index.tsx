@@ -1,5 +1,7 @@
 import AJAX from 'utils/ajax'
 
+import {Query, Template} from 'src/types'
+
 export function fetchLayouts() {
   return AJAX({
     url: '/chronograf/v1/layouts',
@@ -21,7 +23,7 @@ export function getSources() {
   })
 }
 
-export function getSource(id) {
+export function getSource(id: string) {
   return AJAX({
     resource: 'sources',
     id,
@@ -144,7 +146,7 @@ export function updateKapacitor({
 }
 
 export const getKapacitorConfig = async kapacitor => {
-  return await kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/config', '')
+  return kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/config', '')
 }
 
 export const getKapacitorConfigSection = (kapacitor, section) => {
@@ -174,12 +176,10 @@ export function testAlertOutput(kapacitor, outputName, properties) {
     '/kapacitor/v1/service-tests'
   ).then(({data: {services}}) => {
     const service = services.find(s => s.name === outputName)
-    return kapacitorProxy(
-      kapacitor,
-      'POST',
-      service.link.href,
-      Object.assign({}, service.options, properties)
-    )
+    return kapacitorProxy(kapacitor, 'POST', service.link.href, {
+      ...service.options,
+      ...properties,
+    })
   })
 }
 
@@ -220,7 +220,11 @@ export function kapacitorProxy(kapacitor, method, path, body) {
   })
 }
 
-export const getQueryConfig = (url, queries, tempVars) =>
+export const getQueryConfig = (
+  url: string,
+  queries: Query[],
+  tempVars?: Template[]
+) =>
   AJAX({
     url,
     method: 'POST',

@@ -3,6 +3,8 @@ import {noop} from 'shared/actions/app'
 import * as _ from 'lodash'
 
 import {errorThrown} from 'shared/actions/errors'
+import {Query} from 'src/types'
+import * as FuncTypes from 'src/types/funcs'
 
 export const handleLoading = (query, editQueryStatus) => {
   editQueryStatus(query.id, {loading: true})
@@ -40,8 +42,8 @@ export const handleError = (error, query, editQueryStatus) => {
 }
 
 export const fetchTimeSeriesAsync = async (
-  {source, db, rp, query, tempVars, resolution},
-  editQueryStatus = noop
+  {source, db, rp, query, tempVars, resolution}: Query,
+  editQueryStatus: FuncTypes.editQueryStatus | typeof noop = noop
 ) => {
   handleLoading(query, editQueryStatus)
   try {

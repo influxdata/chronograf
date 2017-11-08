@@ -139,7 +139,7 @@ export const addInitialField = (queryID, field, groupBy) => ({
   },
 })
 
-export const editQueryStatus = (queryID, status) => ({
+export const editQueryStatus = (queryID: string, status: string) => ({
   type: 'DE_EDIT_QUERY_STATUS',
   payload: {
     queryID,
