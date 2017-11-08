@@ -1,8 +1,10 @@
 import * as React from 'react'
 
+import {GraphType} from 'src/types'
+
 export const graphTypes = [
   {
-    type: 'line',
+    type: GraphType.Line,
     menuOption: 'Line',
     graphic: (
       <div className="viz-type-selector--graphic">
@@ -45,7 +47,7 @@ export const graphTypes = [
     ),
   },
   {
-    type: 'line-stacked',
+    type: GraphType.LineStacked,
     menuOption: 'Stacked',
     graphic: (
       <div className="viz-type-selector--graphic">
@@ -88,7 +90,7 @@ export const graphTypes = [
     ),
   },
   {
-    type: 'line-stepplot',
+    type: GraphType.LineStepplot,
     menuOption: 'Step-Plot',
     graphic: (
       <div className="viz-type-selector--graphic">
@@ -123,7 +125,7 @@ export const graphTypes = [
     ),
   },
   {
-    type: 'single-stat',
+    type: GraphType.SingleStat,
     menuOption: 'SingleStat',
     graphic: (
       <div className="viz-type-selector--graphic">
@@ -158,7 +160,7 @@ export const graphTypes = [
     ),
   },
   {
-    type: 'line-plus-single-stat',
+    type: GraphType.LinePlusSingleStat,
     menuOption: 'Line + Stat',
     graphic: (
       <div className="viz-type-selector--graphic">
@@ -209,7 +211,7 @@ export const graphTypes = [
     ),
   },
   {
-    type: 'bar',
+    type: GraphType.Bar,
     menuOption: 'Bar',
     graphic: (
       <div className="viz-type-selector--graphic">

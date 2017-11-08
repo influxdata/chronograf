@@ -32,7 +32,7 @@ export interface RefreshingGraphProps {
   resizeCoords: ResizeCoords
   onZoom: FuncTypes.onZoom
   synchronizer: FuncTypes.synchronizer
-  editQueryStatus: FuncTypes.editQueryStatus
+  editQueryStatus?: FuncTypes.editQueryStatus
   grabDataForDownload: FuncTypes.grabDataForDownload
   cellHeight: number
 }

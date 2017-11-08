@@ -74,6 +74,7 @@ export interface QueryConfig {
 }
 
 export interface CellQuery {
+  id?: QueryID
   query: string
   label?: string
   queryConfig: QueryConfig
@@ -107,7 +108,7 @@ export interface Cell {
   h: number
   name: string
   queries: CellQuery[]
-  type: string
+  type: GraphType
   links?: {
     self: string
   }
@@ -169,9 +170,10 @@ export interface LayoutProps {
 }
 
 export enum GraphType {
-  SingleStat = 'single-stat',
-  LineStepplot = 'line-stepplot',
+  Line = 'line',
   LineStacked = 'line-stacked',
+  LineStepplot = 'line-stepplot',
+  SingleStat = 'single-stat',
   Bar = 'bar',
   LinePlusSingleStat = 'line-plus-single-stat',
 }

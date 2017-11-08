@@ -131,7 +131,7 @@ export const formatRPDuration = duration => {
   }
 
   let adjustedTime = duration
-  const [_, hours, minutes, seconds] = duration.match(/(\d*)h(\d*)m(\d*)s/) // eslint-disable-line no-unused-vars
+  const [, hours, minutes, seconds] = duration.match(/(\d*)h(\d*)m(\d*)s/) // eslint-disable-line no-unused-vars
   const hoursInDay = 24
   if (hours > hoursInDay) {
     const remainder = hours % hoursInDay

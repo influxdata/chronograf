@@ -10,7 +10,7 @@ export interface DisplayOptionsProps {
   selectedGraphType: GraphType
   axes: Axes
   queryConfigs: QueryConfig[]
-  onSelectGraphType: (graphType: GraphType) => void
+  onSelectGraphType: (graphType: GraphType) => () => void
   onSetPrefixSuffix: () => void
   onSetYAxisBoundMin: () => void
   onSetYAxisBoundMax: () => void

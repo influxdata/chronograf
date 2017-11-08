@@ -4,12 +4,7 @@ import * as _ from 'lodash'
 import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
 import {removeUnselectedTemplateValues} from 'dashboards/constants'
 
-import {
-  AutoRefresh as AutoRefreshType,
-  Axes,
-  Template,
-  TextQuery,
-} from 'src/types'
+import {AutoRefresh as AutoRefreshType, Template, TextQuery} from 'src/types'
 import {RawResponse} from 'src/types/timeSeries'
 import * as FuncTypes from 'src/types/funcs'
 
@@ -17,7 +12,6 @@ export interface AutoRefreshProps {
   autoRefresh: AutoRefreshType
   templates: Template[]
   queries: TextQuery[]
-  axes: Axes
   editQueryStatus: FuncTypes.editQueryStatus
   grabDataForDownload: FuncTypes.grabDataForDownload
 }

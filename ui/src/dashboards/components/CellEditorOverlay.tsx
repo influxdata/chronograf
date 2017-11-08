@@ -51,7 +51,7 @@ export interface CEOProps {
 
 export interface CEOState {
   cellWorkingName: string
-  cellWorkingType: string
+  cellWorkingType: GraphType
   queriesWorkingDraft: QueryConfig[]
   activeQueryIndex: number
   isDisplayOptionsTabActive: boolean
