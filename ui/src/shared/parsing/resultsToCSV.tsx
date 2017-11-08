@@ -1,6 +1,8 @@
 import * as _ from 'lodash'
 import * as moment from 'moment'
 
+import {RawResponse} from 'src/types/timeSeries'
+
 export const formatDate = timestamp =>
   moment(timestamp).format('M/D/YYYY h:mm:ss.SSSSSSSSS A')
 
@@ -22,15 +24,15 @@ export const resultsToCSV = results => {
       )
       .join('\n')
     return {flag: 'ok', name, CSVString}
+  } else {
+    const CSVString = [columns.join(',')]
+      .concat(values.map(row => row.join(',')))
+      .join('\n')
+    return {flag: 'ok', name, CSVString}
   }
-
-  const CSVString = [columns.join(',')]
-    .concat(values.map(row => row.join(',')))
-    .join('\n')
-  return {flag: 'ok', name, CSVString}
 }
 
-export const dashboardtoCSV = data => {
+export const dashboardtoCSV = (data: RawResponse[]) => {
   const columnNames = _.flatten(
     data.map(r => _.get(r, 'results[0].series[0].columns', []))
   )

@@ -8,10 +8,11 @@ import {dashboardtoCSV} from 'shared/parsing/resultsToCSV'
 import download from 'external/download'
 
 import {Cell} from 'src/types'
+import {RawResponse} from 'src/types/timeSeries'
 
 export interface LayoutCellProps {
   cell: Cell
-  celldata: Cell[]
+  celldata: RawResponse[]
   onDeleteCell: (cell: Cell) => void
   onSummonOverlayTechnologies: (cell: Cell) => void
   isEditable: boolean

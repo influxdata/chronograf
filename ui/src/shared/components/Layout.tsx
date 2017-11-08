@@ -6,10 +6,16 @@ import WidgetCell from 'shared/components/WidgetCell'
 import LayoutCell from 'shared/components/LayoutCell'
 import RefreshingGraph from 'shared/components/RefreshingGraph'
 import {buildQueriesForLayouts} from 'utils/influxql'
-import {Cell, LayoutProps, ResizeCoords} from 'src/types'
+import {Cell, LayoutProps, ResizeCoords, Source} from 'src/types'
+import {RawResponse} from 'src/types/timeSeries'
 import * as FuncTypes from 'src/types/funcs'
 
-const getSource = (cell, source, sources, defaultSource) => {
+const getSource = (
+  cell: Cell,
+  source: Source,
+  sources: Source[],
+  defaultSource: Source
+) => {
   const s = _.get(cell, ['queries', '0', 'source'], null)
   if (!s) {
     return source
@@ -23,7 +29,7 @@ export type LayoutStateProps = LayoutProps & {
 }
 
 export interface LayoutStateState {
-  celldata: Cell[]
+  celldata: RawResponse[]
 }
 
 class LayoutState extends React.Component<LayoutStateProps, LayoutStateState> {
@@ -31,7 +37,7 @@ class LayoutState extends React.Component<LayoutStateProps, LayoutStateState> {
     celldata: [],
   }
 
-  private grabDataForDownload = celldata => {
+  private grabDataForDownload = (celldata: RawResponse[]) => {
     this.setState({celldata})
   }
 
@@ -50,7 +56,7 @@ class LayoutState extends React.Component<LayoutStateProps, LayoutStateState> {
 const Layout: React.SFC<
   LayoutStateProps & {
     grabDataForDownload: FuncTypes.grabDataForDownload
-    celldata: Cell[]
+    celldata: RawResponse[]
   }
 > = (
   {

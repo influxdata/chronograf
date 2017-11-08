@@ -11,9 +11,9 @@ import {
   Axes,
   GraphType,
   ManualRefresh,
-  QueryConfig,
   ResizeCoords,
   Template,
+  TextQuery,
   TimeRange,
 } from 'src/types'
 import * as FuncTypes from 'src/types/funcs'
@@ -27,7 +27,7 @@ export interface RefreshingGraphProps {
   manualRefresh: ManualRefresh
   axes: Axes
   type: GraphType
-  queries: QueryConfig[]
+  queries: TextQuery[]
   templates: Template[]
   resizeCoords: ResizeCoords
   onZoom: FuncTypes.onZoom

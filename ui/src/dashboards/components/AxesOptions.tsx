@@ -1,16 +1,36 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import OptIn from 'shared/components/OptIn'
 import Input from 'dashboards/components/DisplayOptionsInput'
 import {Tabber, Tab} from 'dashboards/components/Tabber'
 import {DISPLAY_OPTIONS, TOOLTIP_CONTENT} from 'dashboards/constants'
+import {Axes, OptInType} from 'src/types'
 
 const {LINEAR, LOG, BASE_2, BASE_10} = DISPLAY_OPTIONS
 const getInputMin = scale => (scale === LOG ? '0' : null)
 
-const AxesOptions = ({
-  axes: {y: {bounds, label, prefix, suffix, base, scale, defaultYLabel}},
+export interface AxesOptionsProps {
+  onSetPrefixSuffix: () => void
+  onSetYAxisBoundMin: () => void
+  onSetYAxisBoundMax: () => void
+  onSetLabel: () => void
+  onSetScale: (base: DISPLAY_OPTIONS) => () => void
+  onSetBase: (base: DISPLAY_OPTIONS) => () => void
+  axes: Axes
+}
+
+const AxesOptions: React.SFC<AxesOptionsProps> = ({
+  axes: {
+    y: {
+      bounds = ['', ''],
+      label,
+      prefix = '',
+      suffix = '',
+      base = BASE_10,
+      scale = LINEAR,
+      defaultYLabel = '',
+    },
+  },
   onSetBase,
   onSetScale,
   onSetLabel,
@@ -30,7 +50,7 @@ const AxesOptions = ({
             customPlaceholder={defaultYLabel}
             customValue={label}
             onSetValue={onSetLabel}
-            type="text"
+            type={OptInType.text}
           />
         </div>
         <div className="form-group col-sm-6">
@@ -39,7 +59,7 @@ const AxesOptions = ({
             customPlaceholder={'min'}
             customValue={min}
             onSetValue={onSetYAxisBoundMin}
-            type="number"
+            type={OptInType.number}
             min={getInputMin(scale)}
           />
         </div>
@@ -49,7 +69,7 @@ const AxesOptions = ({
             customPlaceholder={'max'}
             customValue={max}
             onSetValue={onSetYAxisBoundMax}
-            type="number"
+            type={OptInType.number}
             min={getInputMin(scale)}
           />
         </div>
@@ -98,37 +118,6 @@ const AxesOptions = ({
       </form>
     </div>
   )
-}
-
-const {arrayOf, func, shape, string} = PropTypes
-
-AxesOptions.defaultProps = {
-  axes: {
-    y: {
-      bounds: ['', ''],
-      prefix: '',
-      suffix: '',
-      base: BASE_10,
-      scale: LINEAR,
-      defaultYLabel: '',
-    },
-  },
-}
-
-AxesOptions.propTypes = {
-  onSetPrefixSuffix: func.isRequired,
-  onSetYAxisBoundMin: func.isRequired,
-  onSetYAxisBoundMax: func.isRequired,
-  onSetLabel: func.isRequired,
-  onSetScale: func.isRequired,
-  onSetBase: func.isRequired,
-  axes: shape({
-    y: shape({
-      bounds: arrayOf(string),
-      label: string,
-      defaultYLabel: string,
-    }),
-  }).isRequired,
 }
 
 export default AxesOptions

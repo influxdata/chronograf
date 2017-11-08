@@ -1,18 +1,28 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import onClickOutside from 'shared/components/onClickOutside'
 
-class ClickOutsideInput extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+import {OptInType} from 'src/types'
 
-  handleClickOutside = e => {
+export interface ClickOutsideInputProps {
+  min?: string
+  id: string
+  type: OptInType
+  customPlaceholder: string
+  customValue: string
+  onGetRef: (el: {}) => void
+  onFocus: (e: {}) => void
+  onChange: (e: {}) => void
+  onKeyDown: (e: {}) => void
+  handleClickOutsideInput: (e: {}) => void
+}
+
+class ClickOutsideInput extends React.Component<ClickOutsideInputProps> {
+  public handleClickOutside = e => {
     this.props.handleClickOutsideInput(e)
   }
 
-  render() {
+  public render() {
     const {
       id,
       min,
@@ -43,19 +53,4 @@ class ClickOutsideInput extends React.Component {
   }
 }
 
-const {func, string} = PropTypes
-
-ClickOutsideInput.propTypes = {
-  min: string,
-  id: string.isRequired,
-  type: string.isRequired,
-  customPlaceholder: string.isRequired,
-  customValue: string.isRequired,
-  onGetRef: func.isRequired,
-  onFocus: func.isRequired,
-  onChange: func.isRequired,
-  onKeyDown: func.isRequired,
-  handleClickOutsideInput: func.isRequired,
-}
-
-export default onClickOutside(ClickOutsideInput)
+export default onClickOutside<ClickOutsideInputProps>(ClickOutsideInput)

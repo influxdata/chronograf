@@ -24,11 +24,6 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   notify: bindActionCreators(publishNotification, dispatch),
 })
 
-const bla = b => {
-  console.log('bla', b)
-  return b
-}
-
 export const withApp = (
   Component
 ): React.ComponentClass & {
@@ -40,7 +35,7 @@ export const withApp = (
         <Notifications />
         <SideNav />
         <Component
-          {...bla(props)}
+          {...props}
           addFlashMessage={handleAddFlashMessage(props.notify)}
         />
       </div>

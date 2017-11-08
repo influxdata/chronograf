@@ -5,13 +5,15 @@ import {NULL_STRING} from 'shared/constants/queryFillOptions'
 import {TYPE_QUERY_CONFIG, TYPE_IFQL} from 'dashboards/constants'
 import timeRanges from 'shared/data/timeRanges'
 
+import {Cell, QueryConfig, Source, TextQuery, TimeRange} from 'src/types'
+
 /* eslint-disable quotes */
 export const quoteIfTimestamp = ({lower, upper}) => {
-  if (lower && lower.includes('Z') && !lower.includes("'")) {
+  if (lower && lower.includes('Z') && !lower.includes(`'`)) {
     lower = `'${lower}'`
   }
 
-  if (upper && upper.includes('Z') && !upper.includes("'")) {
+  if (upper && upper.includes('Z') && !upper.includes(`'`)) {
     upper = `'${upper}'`
   }
 
@@ -155,7 +157,7 @@ function _buildFill(fill) {
   return ` FILL(${fill})`
 }
 
-const buildCannedDashboardQuery = (query, {lower, upper}, host) => {
+const buildCannedDashboardQuery = (query, {lower, upper}: TimeRange, host) => {
   const {defaultGroupBy} = timeRanges.find(range => range.lower === lower) || {
     defaultGroupBy: '5m',
   }
@@ -192,8 +194,14 @@ const buildCannedDashboardQuery = (query, {lower, upper}, host) => {
   return text
 }
 
-export const buildQueriesForLayouts = (cell, source, timeRange, host) => {
-  return cell.queries.map(query => {
+export const buildQueriesForLayouts = (
+  cell: Cell,
+  source: Source,
+  timeRange: TimeRange,
+  host
+): TextQuery[] =>
+  cell.queries.map(query => {
+    console.log(query, cell, source, timeRange, host)
     let queryText
     // Canned dashboards use an different a schema different from queryConfig.
     if (query.queryConfig) {
@@ -209,7 +217,6 @@ export const buildQueriesForLayouts = (cell, source, timeRange, host) => {
 
     return {...query, host: source.links.proxy, text: queryText}
   })
-}
 
 export const buildRawText = (q, timeRange) =>
   q.rawText || buildInfluxQLQuery(timeRange, q) || ''

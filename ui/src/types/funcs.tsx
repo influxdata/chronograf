@@ -1,8 +1,8 @@
-import {TimeSeries} from 'src/types/timeSeries'
+import {RawResponse} from 'src/types/timeSeries'
 
 import {Dygraph} from 'src/types'
 
-export type grabDataForDownload = (celldata: TimeSeries[]) => void
+export type grabDataForDownload = (celldata: RawResponse[]) => void
 
 export type editQueryStatus = (
   queryID: string,

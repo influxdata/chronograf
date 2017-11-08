@@ -20,11 +20,11 @@ import {
 } from 'shared/graphs/helpers'
 import {
   Axes,
+  CellQuery,
   Color,
   DygraphOptions,
   LegendSeries,
   RuleValues,
-  TextQuery,
   TimeRange,
 } from 'src/types'
 import {TimeSeries} from 'src/types/timeSeries'
@@ -34,7 +34,7 @@ const {LINEAR, LOG, BASE_10, BASE_2} = DISPLAY_OPTIONS
 
 export interface DygraphProps {
   axes: Axes
-  queries: TextQuery[]
+  queries: CellQuery[]
   timeSeries: TimeSeries[]
   options: DygraphOptions
   overrideLineColors: Color[]
@@ -70,25 +70,6 @@ export default class Dygraph extends React.PureComponent<
   DygraphProps,
   DygraphState
 > {
-  private dygraph
-  private graphRef
-  private legendRef
-
-  public state = {
-    legend: {
-      x: null,
-      series: [],
-    },
-    pageX: null,
-    sortType: '',
-    filterText: '',
-    isSynced: false,
-    isHidden: true,
-    isAscending: true,
-    isSnipped: false,
-    isFilterVisible: false,
-  }
-
   public static defaultProps = {
     axes: {
       y: {
@@ -110,6 +91,25 @@ export default class Dygraph extends React.PureComponent<
     dygraphRef: () => ({}),
     onZoom: () => ({}),
   }
+
+  public state = {
+    legend: {
+      x: null,
+      series: [],
+    },
+    pageX: null,
+    sortType: '',
+    filterText: '',
+    isSynced: false,
+    isHidden: true,
+    isAscending: true,
+    isSnipped: false,
+    isFilterVisible: false,
+  }
+
+  private dygraph
+  private graphRef
+  private legendRef
 
   private getYRange = timeSeries => {
     const {options, axes: {y}, ruleValues} = this.props

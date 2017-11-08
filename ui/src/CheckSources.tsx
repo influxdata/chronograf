@@ -108,11 +108,7 @@ class CheckSources extends React.Component<
     const {match, sources, children} = this.props
     const {isFetching} = this.state
 
-    console.log(match)
-
     const source = sources.find(s => s.id === match.params.sourceID)
-
-    console.log(source)
 
     if (isFetching || !source) {
       return <div className="page-spinner" />

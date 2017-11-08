@@ -1,13 +1,33 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import GraphTypeSelector from 'dashboards/components/GraphTypeSelector'
 import AxesOptions from 'dashboards/components/AxesOptions'
-
 import {buildDefaultYLabel} from 'shared/presenters'
+import {Axes, GraphType, QueryConfig} from 'src/types'
+import {DISPLAY_OPTIONS} from 'dashboards/constants'
 
-class DisplayOptions extends React.Component {
-  constructor(props) {
+export interface DisplayOptionsProps {
+  selectedGraphType: GraphType
+  axes: Axes
+  queryConfigs: QueryConfig[]
+  onSelectGraphType: (graphType: GraphType) => void
+  onSetPrefixSuffix: () => void
+  onSetYAxisBoundMin: () => void
+  onSetYAxisBoundMax: () => void
+  onSetLabel: () => void
+  onSetScale: (base: DISPLAY_OPTIONS) => () => void
+  onSetBase: (base: DISPLAY_OPTIONS) => () => void
+}
+
+export interface DisplayOptionsState {
+  axes: Axes
+}
+
+class DisplayOptions extends React.Component<
+  DisplayOptionsProps,
+  DisplayOptionsState
+> {
+  constructor(props: DisplayOptionsProps) {
     super(props)
 
     const {axes, queryConfigs} = props
@@ -17,13 +37,7 @@ class DisplayOptions extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const {axes, queryConfigs} = nextProps
-
-    this.setState({axes: this.setDefaultLabels(axes, queryConfigs)})
-  }
-
-  setDefaultLabels(axes, queryConfigs) {
+  private setDefaultLabels(axes: Axes, queryConfigs: QueryConfig[]) {
     return queryConfigs.length
       ? {
           ...axes,
@@ -32,7 +46,13 @@ class DisplayOptions extends React.Component {
       : axes
   }
 
-  render() {
+  public componentWillReceiveProps(nextProps: DisplayOptionsProps) {
+    const {axes, queryConfigs} = nextProps
+
+    this.setState({axes: this.setDefaultLabels(axes, queryConfigs)})
+  }
+
+  public render() {
     const {
       onSetBase,
       onSetScale,
@@ -63,20 +83,6 @@ class DisplayOptions extends React.Component {
       </div>
     )
   }
-}
-const {arrayOf, func, shape, string} = PropTypes
-
-DisplayOptions.propTypes = {
-  selectedGraphType: string.isRequired,
-  onSelectGraphType: func.isRequired,
-  onSetPrefixSuffix: func.isRequired,
-  onSetYAxisBoundMin: func.isRequired,
-  onSetYAxisBoundMax: func.isRequired,
-  onSetScale: func.isRequired,
-  onSetLabel: func.isRequired,
-  onSetBase: func.isRequired,
-  axes: shape({}).isRequired,
-  queryConfigs: arrayOf(shape()).isRequired,
 }
 
 export default DisplayOptions

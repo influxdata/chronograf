@@ -1,21 +1,15 @@
 import * as React from 'react'
 import ReactDOM from 'react-dom'
 
-export default function enhanceWithClickOutside(WrappedComponent) {
+const enhanceWithClickOutside = <T extends {}>(WrappedComponent) => {
   const componentName = WrappedComponent.displayName || WrappedComponent.name
 
-  return class OnClickOutside extends React.Component {
-    displayName = `Wrapped${componentName}`
+  return class OnClickOutside extends React.Component<T> {
+    public wrappedComponent
 
-    componentDidMount() {
-      document.addEventListener('click', this.handleClickOutside, true)
-    }
+    public displayName = `Wrapped${componentName}`
 
-    componentWillUnmount() {
-      document.removeEventListener('click', this.handleClickOutside, true)
-    }
-
-    handleClickOutside = e => {
+    public handleClickOutside = e => {
       const domNode = ReactDOM.findDOMNode(this)
       if (
         (!domNode || !domNode.contains(e.target)) &&
@@ -25,7 +19,15 @@ export default function enhanceWithClickOutside(WrappedComponent) {
       }
     }
 
-    render() {
+    public componentDidMount() {
+      document.addEventListener('click', this.handleClickOutside, true)
+    }
+
+    public componentWillUnmount() {
+      document.removeEventListener('click', this.handleClickOutside, true)
+    }
+
+    public render() {
       return (
         <WrappedComponent
           {...this.props}
@@ -35,3 +37,5 @@ export default function enhanceWithClickOutside(WrappedComponent) {
     }
   }
 }
+
+export default enhanceWithClickOutside

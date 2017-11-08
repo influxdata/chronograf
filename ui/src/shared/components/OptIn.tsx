@@ -1,13 +1,43 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 
 import * as uuidv4 from 'uuid/v4'
 
 import ClickOutsideInput from 'shared/components/ClickOutsideInput'
 
-class OptIn extends React.Component {
-  constructor(props) {
+import {OptInType} from 'src/types'
+
+export interface OptInProps {
+  min?: string
+  fixedValue?: string
+  fixedPlaceholder?: string
+  customValue?: string
+  customPlaceholder?: string
+  onSetValue: (value: string) => void
+  type: OptInType
+}
+
+export interface OptInState {
+  useCustomValue: boolean
+  fixedValue: string
+  customValue: string
+}
+
+class OptIn extends React.Component<OptInProps, OptInState> {
+  private id = uuidv4()
+  private isCustomValueInputFocused = false
+  private customValueInput
+  private grooveKnobContainer
+  private grooveKnob
+
+  public defaultProps = {
+    fixedValue: '',
+    fixedPlaceholder: 'auto',
+    customValue: '',
+    customPlaceholder: 'Custom Value',
+  }
+
+  constructor(props: OptInProps) {
     super(props)
 
     const {customValue, fixedValue} = props
@@ -17,22 +47,19 @@ class OptIn extends React.Component {
       fixedValue,
       customValue,
     }
-
-    this.id = uuidv4()
-    this.isCustomValueInputFocused = false
   }
 
-  useFixedValue = () => {
+  public useFixedValue = () => {
     this.setState({useCustomValue: false, customValue: ''}, () =>
       this.setValue()
     )
   }
 
-  useCustomValue = () => {
+  public useCustomValue = () => {
     this.setState({useCustomValue: true}, () => this.setValue())
   }
 
-  handleClickToggle = () => {
+  public handleClickToggle = () => {
     const useCustomValueNext = !this.state.useCustomValue
     if (useCustomValueNext) {
       this.useCustomValue()
@@ -42,16 +69,16 @@ class OptIn extends React.Component {
     }
   }
 
-  handleFocusCustomValueInput = () => {
+  public handleFocusCustomValueInput = () => {
     this.isCustomValueInputFocused = true
     this.useCustomValue()
   }
 
-  handleChangeCustomValue = e => {
+  public handleChangeCustomValue = e => {
     this.setCustomValue(e.target.value)
   }
 
-  handleKeyDownCustomValueInput = e => {
+  public handleKeyDownCustomValueInput = e => {
     if (e.key === 'Enter' || e.key === 'Tab') {
       if (e.key === 'Enter') {
         this.customValueInput.blur()
@@ -60,7 +87,7 @@ class OptIn extends React.Component {
     }
   }
 
-  handleClickOutsideInput = e => {
+  public handleClickOutsideInput = e => {
     if (
       e.target.id !== this.grooveKnob.id &&
       e.target.id !== this.grooveKnobContainer.id &&
@@ -70,7 +97,7 @@ class OptIn extends React.Component {
     }
   }
 
-  considerResetCustomValue = () => {
+  public considerResetCustomValue = () => {
     const customValue = this.customValueInput.value.trim()
 
     this.setState({customValue})
@@ -82,11 +109,11 @@ class OptIn extends React.Component {
     this.isCustomValueInputFocused = false
   }
 
-  setCustomValue = value => {
+  public setCustomValue = value => {
     this.setState({customValue: value}, this.setValue)
   }
 
-  setValue = () => {
+  public setValue = () => {
     const {onSetValue} = this.props
     const {useCustomValue, fixedValue, customValue} = this.state
 
@@ -97,9 +124,9 @@ class OptIn extends React.Component {
     }
   }
 
-  handleInputRef = el => (this.customValueInput = el)
+  public handleInputRef = el => (this.customValueInput = el)
 
-  render() {
+  public render() {
     const {fixedPlaceholder, customPlaceholder, type, min} = this.props
     const {useCustomValue, customValue} = this.state
 
@@ -139,25 +166,6 @@ class OptIn extends React.Component {
       </div>
     )
   }
-}
-
-OptIn.defaultProps = {
-  fixedValue: '',
-  customPlaceholder: 'Custom Value',
-  fixedPlaceholder: 'auto',
-  customValue: '',
-}
-
-const {func, oneOf, string} = PropTypes
-
-OptIn.propTypes = {
-  min: string,
-  fixedPlaceholder: string,
-  fixedValue: string,
-  customPlaceholder: string,
-  customValue: string,
-  onSetValue: func.isRequired,
-  type: oneOf(['text', 'number']),
 }
 
 export default OptIn

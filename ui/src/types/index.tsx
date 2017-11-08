@@ -60,6 +60,7 @@ export interface QueryConfigTags {}
 export interface QueryConfigGroupBy {}
 
 export interface QueryConfig {
+  id: QueryID
   database: string
   measurement: string
   retentionPolicy: string
@@ -68,7 +69,8 @@ export interface QueryConfig {
   groupBy: QueryConfigGroupBy
   areTagsAccepted: boolean
   rawText: string | null
-  range: string | null
+  range?: string | null
+  source?: string
 }
 
 export interface CellQuery {
@@ -84,6 +86,7 @@ export interface Axis {
   base: DISPLAY_OPTIONS
   scale: DISPLAY_OPTIONS
   defaultYLabel: string
+  label?: string
 }
 
 export interface Axes {
@@ -175,6 +178,8 @@ export enum GraphType {
 
 export interface TextQuery {
   host: string | string[]
+  // database?: string
+  // rp?: string
   text: string
 }
 
@@ -191,3 +196,21 @@ export interface DygraphOptions {
 }
 
 export interface LegendSeries {}
+
+export type QueryID = string
+
+export type DashboardID = string
+
+export interface QueryStatus {
+  queryID: QueryID
+  status: {
+    error?: string
+    success?: string
+    warn?: string
+  }
+}
+
+export enum OptInType {
+  text = 'text',
+  number = 'number',
+}

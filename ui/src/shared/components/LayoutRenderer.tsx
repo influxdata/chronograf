@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
-import Resizeable from 'react-resizable'
+import * as ReactGridLayout from 'react-grid-layout'
+import * as Resizable from 're-resizable'
 
 import Layout from 'shared/components/Layout'
 import {
@@ -23,7 +23,7 @@ import {
   DASHBOARD_LAYOUT_ROW_HEIGHT,
 } from 'shared/constants'
 
-const GridLayout = WidthProvider(ReactGridLayout)
+const GridLayout = ReactGridLayout.WidthProvider(ReactGridLayout)
 
 export interface LayoutRendererProps {
   autoRefresh: AutoRefresh
@@ -38,8 +38,8 @@ export interface LayoutRendererProps {
   onEditCell: () => void
   onDeleteCell: () => void
   onSummonOverlayTechnologies: () => void
-  synchronizer: FuncTypes.synchronizer
   onCancelEditCell: () => void
+  synchronizer: FuncTypes.synchronizer
   onZoom: FuncTypes.onZoom
   isStatusPage: boolean
   isEditable: boolean
@@ -122,7 +122,7 @@ class LayoutRenderer extends React.Component<
     const isDashboard = !!this.props.onPositionChange
 
     return (
-      <Resizeable onResize={this.handleCellResize}>
+      <Resizable onResize={this.handleCellResize}>
         <GridLayout
           layout={cells}
           cols={12}
@@ -160,7 +160,7 @@ class LayoutRenderer extends React.Component<
             </div>
           ))}
         </GridLayout>
-      </Resizeable>
+      </Resizable>
     )
   }
 }

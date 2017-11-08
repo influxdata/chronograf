@@ -1,6 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-
 import * as _ from 'lodash'
 import * as uuidv4 from 'uuid/v4'
 
@@ -24,8 +22,44 @@ import {OVERLAY_TECHNOLOGY} from 'shared/constants/classNames'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'data_explorer/constants'
 import {AUTO_GROUP_BY} from 'shared/constants'
 
-class CellEditorOverlay extends React.Component {
-  constructor(props) {
+import {
+  Axes,
+  AutoRefresh,
+  Cell,
+  DashboardID,
+  GraphType,
+  QueryConfig,
+  QueryStatus,
+  Source,
+  Template,
+  TimeRange,
+} from 'src/types'
+
+export interface CEOProps {
+  cell: Cell
+  source: Source
+  sources: Source[]
+  templates: Template[]
+  timeRange: TimeRange
+  autoRefresh: AutoRefresh
+  queryStatus: QueryStatus
+  dashboardID: DashboardID
+  onCancel: () => void
+  onSave: (cell: Cell) => void
+  editQueryStatus: () => void
+}
+
+export interface CEOState {
+  cellWorkingName: string
+  cellWorkingType: string
+  queriesWorkingDraft: QueryConfig[]
+  activeQueryIndex: number
+  isDisplayOptionsTabActive: boolean
+  axes: Axes
+}
+
+class CellEditorOverlay extends React.Component<CEOProps, CEOState> {
+  constructor(props: CEOProps) {
     super(props)
 
     const {cell: {name, type, queries, axes}, sources} = props
@@ -51,20 +85,7 @@ class CellEditorOverlay extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const {status, queryID} = this.props.queryStatus
-    const nextStatus = nextProps.queryStatus
-    if (nextStatus.status && nextStatus.queryID) {
-      if (nextStatus.queryID !== queryID || nextStatus.status !== status) {
-        const nextQueries = this.state.queriesWorkingDraft.map(
-          q => (q.id === queryID ? {...q, status: nextStatus.status} : q)
-        )
-        this.setState({queriesWorkingDraft: nextQueries})
-      }
-    }
-  }
-
-  queryStateReducer = queryModifier => (queryID, ...payload) => {
+  private queryStateReducer = queryModifier => (queryID, ...payload) => {
     const {queriesWorkingDraft} = this.state
     const query = queriesWorkingDraft.find(q => q.id === queryID)
 
@@ -80,7 +101,7 @@ class CellEditorOverlay extends React.Component {
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
-  handleSetYAxisBoundMin = min => {
+  private handleSetYAxisBoundMin = min => {
     const {axes} = this.state
     const {y: {bounds: [, max]}} = axes
 
@@ -89,7 +110,7 @@ class CellEditorOverlay extends React.Component {
     })
   }
 
-  handleSetYAxisBoundMax = max => {
+  private handleSetYAxisBoundMax = max => {
     const {axes} = this.state
     const {y: {bounds: [min]}} = axes
 
@@ -98,13 +119,13 @@ class CellEditorOverlay extends React.Component {
     })
   }
 
-  handleSetLabel = label => {
+  private handleSetLabel = label => {
     const {axes} = this.state
 
     this.setState({axes: {...axes, y: {...axes.y, label}}})
   }
 
-  handleSetPrefixSuffix = e => {
+  private handleSetPrefixSuffix = e => {
     const {axes} = this.state
     const {prefix, suffix} = e.target.form
 
@@ -120,7 +141,7 @@ class CellEditorOverlay extends React.Component {
     })
   }
 
-  handleAddQuery = () => {
+  private handleAddQuery = () => {
     const {queriesWorkingDraft} = this.state
     const newIndex = queriesWorkingDraft.length
 
@@ -133,14 +154,14 @@ class CellEditorOverlay extends React.Component {
     this.handleSetActiveQueryIndex(newIndex)
   }
 
-  handleDeleteQuery = index => {
+  private handleDeleteQuery = index => {
     const nextQueries = this.state.queriesWorkingDraft.filter(
       (__, i) => i !== index
     )
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
-  handleSaveCell = () => {
+  private handleSaveCell = () => {
     const {
       queriesWorkingDraft,
       cellWorkingType: type,
@@ -170,19 +191,19 @@ class CellEditorOverlay extends React.Component {
     })
   }
 
-  handleSelectGraphType = graphType => () => {
+  private handleSelectGraphType = (graphType: GraphType) => () => {
     this.setState({cellWorkingType: graphType})
   }
 
-  handleClickDisplayOptionsTab = isDisplayOptionsTabActive => () => {
+  private handleClickDisplayOptionsTab = isDisplayOptionsTabActive => () => {
     this.setState({isDisplayOptionsTabActive})
   }
 
-  handleSetActiveQueryIndex = activeQueryIndex => {
+  private handleSetActiveQueryIndex = activeQueryIndex => {
     this.setState({activeQueryIndex})
   }
 
-  handleSetBase = base => () => {
+  private handleSetBase = base => () => {
     const {axes} = this.state
 
     this.setState({
@@ -196,11 +217,11 @@ class CellEditorOverlay extends React.Component {
     })
   }
 
-  handleCellRename = newName => {
+  private handleCellRename = newName => {
     this.setState({cellWorkingName: newName})
   }
 
-  handleSetScale = scale => () => {
+  private handleSetScale = scale => () => {
     const {axes} = this.state
 
     this.setState({
@@ -214,7 +235,7 @@ class CellEditorOverlay extends React.Component {
     })
   }
 
-  handleSetQuerySource = source => {
+  private handleSetQuerySource = source => {
     const queriesWorkingDraft = this.state.queriesWorkingDraft.map(q => ({
       ..._.cloneDeep(q),
       source,
@@ -223,7 +244,7 @@ class CellEditorOverlay extends React.Component {
     this.setState({queriesWorkingDraft})
   }
 
-  getActiveQuery = () => {
+  private getActiveQuery = () => {
     const {queriesWorkingDraft, activeQueryIndex} = this.state
     const activeQuery = queriesWorkingDraft[activeQueryIndex]
     const defaultQuery = queriesWorkingDraft[0]
@@ -231,7 +252,7 @@ class CellEditorOverlay extends React.Component {
     return activeQuery || defaultQuery
   }
 
-  handleEditRawText = async (url, id, text) => {
+  private handleEditRawText = async (url, id, text) => {
     const templates = removeUnselectedTemplateValues(this.props.templates)
 
     // use this as the handler passed into fetchTimeSeries to update a query status
@@ -247,14 +268,15 @@ class CellEditorOverlay extends React.Component {
     }
   }
 
-  formatSources = this.props.sources.map(s => ({
-    ...s,
-    text: `${s.name} @ ${s.url}`,
-  }))
+  private formatSources = () =>
+    this.props.sources.map(s => ({
+      ...s,
+      text: `${s.name} @ ${s.url}`,
+    }))
 
-  findSelectedSource = () => {
+  private findSelectedSource = () => {
     const {source} = this.props
-    const sources = this.formatSources
+    const sources = this.formatSources()
     const query = _.get(this.state.queriesWorkingDraft, 0, false)
 
     if (!query || !query.source) {
@@ -266,7 +288,7 @@ class CellEditorOverlay extends React.Component {
     return (selected && selected.text) || 'No sources'
   }
 
-  getSource = () => {
+  private getSource = () => {
     const {source, sources} = this.props
     const query = _.get(this.state.queriesWorkingDraft, 0, false)
 
@@ -278,7 +300,7 @@ class CellEditorOverlay extends React.Component {
     return querySource || source
   }
 
-  nextSource = (prevQuery, nextQuery) => {
+  private nextSource = (prevQuery, nextQuery) => {
     if (nextQuery.source) {
       return nextQuery.source
     }
@@ -286,7 +308,20 @@ class CellEditorOverlay extends React.Component {
     return prevQuery.source
   }
 
-  render() {
+  public componentWillReceiveProps(nextProps: CEOProps) {
+    const {status, queryID} = this.props.queryStatus
+    const nextStatus = nextProps.queryStatus
+    if (nextStatus.status && nextStatus.queryID) {
+      if (nextStatus.queryID !== queryID || nextStatus.status !== status) {
+        const nextQueries = this.state.queriesWorkingDraft.map(
+          q => (q.id === queryID ? {...q, status: nextStatus.status} : q)
+        )
+        this.setState({queriesWorkingDraft: nextQueries})
+      }
+    }
+  }
+
+  public render() {
     const {
       onCancel,
       templates,
@@ -345,33 +380,35 @@ class CellEditorOverlay extends React.Component {
               isDisplayOptionsTabActive={isDisplayOptionsTabActive}
               onClickDisplayOptions={this.handleClickDisplayOptionsTab}
             />
-            {isDisplayOptionsTabActive
-              ? <DisplayOptions
-                  axes={axes}
-                  onSetBase={this.handleSetBase}
-                  onSetLabel={this.handleSetLabel}
-                  onSetScale={this.handleSetScale}
-                  queryConfigs={queriesWorkingDraft}
-                  selectedGraphType={cellWorkingType}
-                  onSetPrefixSuffix={this.handleSetPrefixSuffix}
-                  onSelectGraphType={this.handleSelectGraphType}
-                  onSetYAxisBoundMin={this.handleSetYAxisBoundMin}
-                  onSetYAxisBoundMax={this.handleSetYAxisBoundMax}
-                />
-              : <QueryMaker
-                  source={this.getSource()}
-                  templates={templates}
-                  queries={queriesWorkingDraft}
-                  actions={queryActions}
-                  autoRefresh={autoRefresh}
-                  timeRange={timeRange}
-                  onDeleteQuery={this.handleDeleteQuery}
-                  onAddQuery={this.handleAddQuery}
-                  activeQueryIndex={activeQueryIndex}
-                  activeQuery={this.getActiveQuery()}
-                  setActiveQueryIndex={this.handleSetActiveQueryIndex}
-                  initialGroupByTime={AUTO_GROUP_BY}
-                />}
+            {isDisplayOptionsTabActive ? (
+              <DisplayOptions
+                axes={axes}
+                onSetBase={this.handleSetBase}
+                onSetLabel={this.handleSetLabel}
+                onSetScale={this.handleSetScale}
+                queryConfigs={queriesWorkingDraft}
+                selectedGraphType={cellWorkingType}
+                onSetPrefixSuffix={this.handleSetPrefixSuffix}
+                onSelectGraphType={this.handleSelectGraphType}
+                onSetYAxisBoundMin={this.handleSetYAxisBoundMin}
+                onSetYAxisBoundMax={this.handleSetYAxisBoundMax}
+              />
+            ) : (
+              <QueryMaker
+                source={this.getSource()}
+                templates={templates}
+                queries={queriesWorkingDraft}
+                actions={queryActions}
+                autoRefresh={autoRefresh}
+                timeRange={timeRange}
+                onDeleteQuery={this.handleDeleteQuery}
+                onAddQuery={this.handleAddQuery}
+                activeQueryIndex={activeQueryIndex}
+                activeQuery={this.getActiveQuery()}
+                setActiveQueryIndex={this.handleSetActiveQueryIndex}
+                initialGroupByTime={AUTO_GROUP_BY}
+              />
+            )}
           </CEOBottom>
         </ResizeContainer>
       </div>
@@ -379,44 +416,8 @@ class CellEditorOverlay extends React.Component {
   }
 }
 
-const CEOBottom = ({children}) =>
-  <div className="overlay-technology--editor">
-    {children}
-  </div>
-
-const {arrayOf, func, node, number, shape, string} = PropTypes
-
-CellEditorOverlay.propTypes = {
-  onCancel: func.isRequired,
-  onSave: func.isRequired,
-  cell: shape({}).isRequired,
-  templates: arrayOf(
-    shape({
-      tempVar: string.isRequired,
-    })
-  ).isRequired,
-  timeRange: shape({
-    upper: string,
-    lower: string,
-  }).isRequired,
-  autoRefresh: number.isRequired,
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-      queries: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  editQueryStatus: func.isRequired,
-  queryStatus: shape({
-    queryID: string,
-    status: shape({}),
-  }).isRequired,
-  dashboardID: string.isRequired,
-  sources: arrayOf(shape()),
-}
-
-CEOBottom.propTypes = {
-  children: node,
-}
+const CEOBottom = ({children}) => (
+  <div className="overlay-technology--editor">{children}</div>
+)
 
 export default CellEditorOverlay

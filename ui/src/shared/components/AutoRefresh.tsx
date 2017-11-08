@@ -10,7 +10,7 @@ import {
   Template,
   TextQuery,
 } from 'src/types'
-import {TimeSeries} from 'src/types/timeSeries'
+import {RawResponse} from 'src/types/timeSeries'
 import * as FuncTypes from 'src/types/funcs'
 
 export interface AutoRefreshProps {
@@ -24,7 +24,7 @@ export interface AutoRefreshProps {
 
 export interface AutoRefreshState {
   lastQuerySuccessful: boolean
-  timeSeries: TimeSeries[]
+  timeSeries: RawResponse[]
   resolution: number | null
   isFetching: boolean
 }
@@ -89,7 +89,10 @@ const AutoRefresh = ComposedComponent =>
       )
     }
 
-    public executeQueries = async (queries, templates = []) => {
+    public executeQueries = async (
+      queries: TextQuery[],
+      templates: Template[] = []
+    ) => {
       const {editQueryStatus, grabDataForDownload} = this.props
       const {resolution} = this.state
 
@@ -127,7 +130,7 @@ const AutoRefresh = ComposedComponent =>
       })
 
       try {
-        const timeSeries = await Promise.all(timeSeriesPromises)
+        const timeSeries: RawResponse[] = await Promise.all(timeSeriesPromises)
         const newSeries = timeSeries.map(response => ({response}))
         const lastQuerySuccessful = this._resultsForQuery(newSeries)
 
