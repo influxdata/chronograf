@@ -42,10 +42,26 @@ func TestOrganizationsStore_GetWithName(t *testing.T) {
 				ctx: context.Background(),
 				org: &chronograf.Organization{
 					Name: "EE - Evil Empire",
+					Mappings: []chronograf.Mapping{
+						chronograf.Mapping{
+							Provider:    chronograf.MappingWildcard,
+							Scheme:      chronograf.MappingWildcard,
+							Group:       chronograf.MappingWildcard,
+							GrantedRole: roles.ViewerRoleName,
+						},
+					},
 				},
 			},
 			want: &chronograf.Organization{
 				Name: "EE - Evil Empire",
+				Mappings: []chronograf.Mapping{
+					chronograf.Mapping{
+						Provider:    chronograf.MappingWildcard,
+						Scheme:      chronograf.MappingWildcard,
+						Group:       chronograf.MappingWildcard,
+						GrantedRole: roles.ViewerRoleName,
+					},
+				},
 			},
 			addFirst: true,
 		},
@@ -185,8 +201,12 @@ func TestOrganizationsStore_All(t *testing.T) {
 			},
 			want: []chronograf.Organization{
 				{
-					Name:        bolt.DefaultOrganizationName,
-					DefaultRole: bolt.DefaultOrganizationRole,
+					Name:          bolt.DefaultOrganizationName,
+					DefaultRole:   bolt.DefaultOrganizationRole,
+					WhitelistOnly: bolt.DefaultOrganizationWhitelistOnly,
+					Mappings: []chronograf.Mapping{
+						bolt.DefaultOrganizationMapping,
+					},
 				},
 				{
 					Name: "EE - Evil Empire",
@@ -243,6 +263,7 @@ func TestOrganizationsStore_Update(t *testing.T) {
 		name          string
 		defaultRole   string
 		whitelistOnly bool
+		mappings      []chronograf.Mapping
 	}
 	tests := []struct {
 		name     string
@@ -353,6 +374,38 @@ func TestOrganizationsStore_Update(t *testing.T) {
 			addFirst: true,
 		},
 		{
+			name:   "Update organization name and mappings",
+			fields: fields{},
+			args: args{
+				ctx: context.Background(),
+				org: &chronograf.Organization{
+					Name:          "The Good Place",
+					WhitelistOnly: false,
+				},
+				name: "The Bad Place",
+				mappings: []chronograf.Mapping{
+					chronograf.Mapping{
+						Provider:    chronograf.MappingWildcard,
+						Scheme:      chronograf.MappingWildcard,
+						Group:       chronograf.MappingWildcard,
+						GrantedRole: roles.ViewerRoleName,
+					},
+				},
+			},
+			want: &chronograf.Organization{
+				Name: "The Bad Place",
+				Mappings: []chronograf.Mapping{
+					chronograf.Mapping{
+						Provider:    chronograf.MappingWildcard,
+						Scheme:      chronograf.MappingWildcard,
+						Group:       chronograf.MappingWildcard,
+						GrantedRole: roles.ViewerRoleName,
+					},
+				},
+			},
+			addFirst: true,
+		},
+		{
 			name: "Update organization name - name already taken",
 			fields: fields{
 				orgs: []chronograf.Organization{
@@ -401,12 +454,12 @@ func TestOrganizationsStore_Update(t *testing.T) {
 			tt.args.org.DefaultRole = tt.args.defaultRole
 		}
 
-		if tt.args.defaultRole != "" {
-			tt.args.org.DefaultRole = tt.args.defaultRole
-		}
-
 		if tt.args.whitelistOnly != tt.args.org.WhitelistOnly {
 			tt.args.org.WhitelistOnly = tt.args.whitelistOnly
+		}
+
+		if tt.args.mappings != nil {
+			tt.args.org.Mappings = tt.args.mappings
 		}
 
 		if err := s.Update(tt.args.ctx, tt.args.org); (err != nil) != tt.wantErr {
@@ -617,9 +670,13 @@ func TestOrganizationsStore_DefaultOrganization(t *testing.T) {
 				ctx: context.Background(),
 			},
 			want: &chronograf.Organization{
-				ID:          bolt.DefaultOrganizationID,
-				Name:        bolt.DefaultOrganizationName,
-				DefaultRole: bolt.DefaultOrganizationRole,
+				ID:            bolt.DefaultOrganizationID,
+				Name:          bolt.DefaultOrganizationName,
+				DefaultRole:   bolt.DefaultOrganizationRole,
+				WhitelistOnly: bolt.DefaultOrganizationWhitelistOnly,
+				Mappings: []chronograf.Mapping{
+					bolt.DefaultOrganizationMapping,
+				},
 			},
 			wantErr: false,
 		},
