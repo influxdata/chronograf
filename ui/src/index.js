@@ -34,6 +34,7 @@ import {
   AdminChronografPage,
   AdminInfluxDBPage,
   OrganizationsPage,
+  ProvidersPage,
 } from 'src/admin'
 import {SourcePage, ManageSources} from 'src/sources'
 import NotFound from 'shared/components/NotFound'
@@ -170,6 +171,7 @@ const Root = React.createClass({
               <Route path="kapacitor-tasks" component={KapacitorTasksPage} />
               <Route path="organizations" component={OrganizationsPage} />
               <Route path="users" component={AdminChronografPage} />
+              <Route path="providers" component={ProvidersPage} />
               <Route path="admin-influxdb" component={AdminInfluxDBPage} />
               <Route path="manage-sources" component={ManageSources} />
               <Route path="manage-sources/new" component={SourcePage} />

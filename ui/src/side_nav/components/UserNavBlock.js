@@ -55,6 +55,14 @@ class UserNavBlock extends Component {
               Manage Organizations
             </Link>
           </Authorized>
+          <Authorized requiredRole={SUPERADMIN_ROLE}>
+            <Link
+              className="sidebar-menu--item"
+              to={`${sourcePrefix}/providers`}
+            >
+              Manage Providers
+            </Link>
+          </Authorized>
           <Authorized requiredRole={ADMIN_ROLE}>
             <Link className="sidebar-menu--item" to={`${sourcePrefix}/users`}>
               Manage Users
