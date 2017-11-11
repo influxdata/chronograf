@@ -27,6 +27,14 @@ const (
 	DefaultOrganizationWhitelistOnly bool = false
 )
 
+// DefaultOrganizationMapping is the mapping for the default organization
+var DefaultOrganizationMapping = chronograf.Mapping{
+	Provider:    chronograf.MappingWildcard,
+	Scheme:      chronograf.MappingWildcard,
+	Group:       chronograf.MappingWildcard,
+	GrantedRole: DefaultOrganizationRole,
+}
+
 // OrganizationsStore uses bolt to store and retrieve Organizations
 type OrganizationsStore struct {
 	client *Client
@@ -44,6 +52,9 @@ func (s *OrganizationsStore) CreateDefault(ctx context.Context) error {
 		Name:          DefaultOrganizationName,
 		DefaultRole:   DefaultOrganizationRole,
 		WhitelistOnly: DefaultOrganizationWhitelistOnly,
+		Mappings: []chronograf.Mapping{
+			DefaultOrganizationMapping,
+		},
 	}
 	return s.client.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(OrganizationsBucket)
