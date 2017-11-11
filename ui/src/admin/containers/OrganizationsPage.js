@@ -2,6 +2,8 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
+import {getMeAsync} from 'shared/actions/auth'
+
 import * as adminChronografActionCreators from 'src/admin/actions/chronograf'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
@@ -10,23 +12,30 @@ import OrganizationsTable from 'src/admin/components/chronograf/OrganizationsTab
 class OrganizationsPage extends Component {
   componentDidMount() {
     const {links, actions: {loadOrganizationsAsync}} = this.props
-
     loadOrganizationsAsync(links.organizations)
   }
 
-  handleCreateOrganization = organizationName => {
+  handleCreateOrganization = async organizationName => {
     const {links, actions: {createOrganizationAsync}} = this.props
-    createOrganizationAsync(links.organizations, {name: organizationName})
+    await createOrganizationAsync(links.organizations, {name: organizationName})
+    this.refreshMe()
   }
 
-  handleRenameOrganization = (organization, name) => {
+  handleRenameOrganization = async (organization, name) => {
     const {actions: {updateOrganizationAsync}} = this.props
-    updateOrganizationAsync(organization, {...organization, name})
+    await updateOrganizationAsync(organization, {...organization, name})
+    this.refreshMe()
   }
 
   handleDeleteOrganization = organization => {
     const {actions: {deleteOrganizationAsync}} = this.props
     deleteOrganizationAsync(organization)
+    this.refreshMe()
+  }
+
+  refreshMe = () => {
+    const {getMe} = this.props
+    getMe({allowReset: false})
   }
 
   render() {
@@ -73,6 +82,7 @@ const mapStateToProps = ({links, adminChronograf: {organizations}}) => ({
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(adminChronografActionCreators, dispatch),
   notify: bindActionCreators(publishAutoDismissingNotification, dispatch),
+  getMe: bindActionCreators(getMeAsync, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrganizationsPage)
