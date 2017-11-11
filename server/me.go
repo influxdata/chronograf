@@ -72,14 +72,14 @@ func getValidPrincipal(ctx context.Context) (oauth2.Principal, error) {
 	return p, nil
 }
 
-type meOrganizationRequest struct {
+type meRequest struct {
 	// Organization is the OrganizationID
 	Organization string `json:"organization"`
 }
 
-// MeOrganization changes the user's current organization on the JWT and responds
+// UpdateMe changes the user's current organization on the JWT and responds
 // with the same semantics as Me
-func (s *Service) MeOrganization(auth oauth2.Authenticator) func(http.ResponseWriter, *http.Request) {
+func (s *Service) UpdateMe(auth oauth2.Authenticator) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		serverCtx := serverContext(ctx)
@@ -89,7 +89,7 @@ func (s *Service) MeOrganization(auth oauth2.Authenticator) func(http.ResponseWr
 			Error(w, http.StatusForbidden, "invalid principal", s.Logger)
 			return
 		}
-		var req meOrganizationRequest
+		var req meRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			invalidJSON(w, s.Logger)
 			return
@@ -134,7 +134,7 @@ func (s *Service) MeOrganization(auth oauth2.Authenticator) func(http.ResponseWr
 			Scheme:   &scheme,
 		})
 		if err == chronograf.ErrUserNotFound {
-			Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+			Error(w, http.StatusForbidden, err.Error(), s.Logger)
 			return
 		}
 		if err != nil {
@@ -242,6 +242,13 @@ func (s *Service) Me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// If users must be explicitly added to the default organization, respond with 403
+	// forbidden
+	if !defaultOrg.Public {
+		Error(w, http.StatusForbidden, "users must be explicitly added", s.Logger)
+		return
+	}
+
 	// Because we didnt find a user, making a new one
 	user := &chronograf.User{
 		Name:     p.Subject,
@@ -252,7 +259,7 @@ func (s *Service) Me(w http.ResponseWriter, r *http.Request) {
 		Scheme: scheme,
 		Roles: []chronograf.Role{
 			{
-				Name: roles.MemberRoleName,
+				Name: defaultOrg.DefaultRole,
 				// This is the ID of the default organization
 				Organization: fmt.Sprintf("%d", defaultOrg.ID),
 			},

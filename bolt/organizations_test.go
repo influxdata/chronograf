@@ -242,6 +242,7 @@ func TestOrganizationsStore_Update(t *testing.T) {
 		org         *chronograf.Organization
 		name        string
 		defaultRole string
+		public      bool
 	}
 	tests := []struct {
 		name     string
@@ -313,6 +314,45 @@ func TestOrganizationsStore_Update(t *testing.T) {
 			addFirst: true,
 		},
 		{
+			name:   "Update organization name, role, public",
+			fields: fields{},
+			args: args{
+				ctx: context.Background(),
+				org: &chronograf.Organization{
+					Name:        "The Good Place",
+					DefaultRole: roles.ViewerRoleName,
+					Public:      false,
+				},
+				name:        "The Bad Place",
+				public:      true,
+				defaultRole: roles.AdminRoleName,
+			},
+			want: &chronograf.Organization{
+				Name:        "The Bad Place",
+				Public:      true,
+				DefaultRole: roles.AdminRoleName,
+			},
+			addFirst: true,
+		},
+		{
+			name:   "Update organization name and public",
+			fields: fields{},
+			args: args{
+				ctx: context.Background(),
+				org: &chronograf.Organization{
+					Name:   "The Good Place",
+					Public: false,
+				},
+				name:   "The Bad Place",
+				public: true,
+			},
+			want: &chronograf.Organization{
+				Name:   "The Bad Place",
+				Public: true,
+			},
+			addFirst: true,
+		},
+		{
 			name: "Update organization name - name already taken",
 			fields: fields{
 				orgs: []chronograf.Organization{
@@ -359,6 +399,14 @@ func TestOrganizationsStore_Update(t *testing.T) {
 		}
 		if tt.args.defaultRole != "" {
 			tt.args.org.DefaultRole = tt.args.defaultRole
+		}
+
+		if tt.args.defaultRole != "" {
+			tt.args.org.DefaultRole = tt.args.defaultRole
+		}
+
+		if tt.args.public != tt.args.org.Public {
+			tt.args.org.Public = tt.args.public
 		}
 
 		if err := s.Update(tt.args.ctx, tt.args.org); (err != nil) != tt.wantErr {
