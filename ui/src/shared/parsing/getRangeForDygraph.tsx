@@ -5,12 +5,12 @@ const SUB_FACTOR = 0.9
 
 const checkNumeric = num => (isFinite(num) ? num : null)
 
-const considerEmpty = (userNumber, number) => {
+const considerEmpty = (userNumber, num) => {
   if (userNumber) {
     return +userNumber
   }
 
-  return number
+  return num
 }
 
 const getRange = (
@@ -43,25 +43,25 @@ const getRange = (
   const points = [...timeSeries, [null, pad(value)], [null, pad(rangeValue)]]
 
   const range = points.reduce(
-    ([min, max] = [], series) => {
+    ([pmin, pmax] = [], series) => {
       for (let i = 1; i < series.length; i++) {
         const val = series[i]
 
-        if (max === null) {
-          max = val
+        if (pmax === null) {
+          pmax = val
         }
 
-        if (min === null) {
-          min = val
+        if (pmin === null) {
+          pmin = val
         }
 
         if (typeof val === 'number') {
-          min = Math.min(min, val)
-          max = Math.max(max, val)
+          pmin = Math.min(pmin, val)
+          pmax = Math.max(pmax, val)
         }
       }
 
-      return [min, max]
+      return [pmin, pmax]
     },
     [null, null]
   )

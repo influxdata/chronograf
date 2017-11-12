@@ -1,17 +1,38 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 import * as classnames from 'classnames'
 
 import {makeLegendStyles} from 'shared/graphs/helpers'
+import {DygraphSeries} from 'src/types'
 
 const removeMeasurement = (label = '') => {
   const [measurement] = label.match(/^(.*)[.]/g) || ['']
   return label.replace(measurement, '')
 }
 
-const DygraphLegend = ({
-  xHTML,
+export interface DygraphLegendProps {
+  x: number
+  xHTML?: string
+  series: DygraphSeries[]
+  pageX: number
+  legend: {}
+  graph: {}
+  onSnip: () => void
+  onHide: (e: {}) => void
+  onSort: (sortType: string) => (e: {}) => void
+  onInputChange: (e: {}) => void
+  onToggleFilter: () => void
+  legendRef: (ref: {}) => void
+  filterText: string
+  isAscending: boolean
+  sortType: string
+  isHidden: boolean
+  isSnipped: boolean
+  isFilterVisible: boolean
+}
+
+const DygraphLegend: React.SFC<DygraphLegendProps> = ({
+  xHTML = '',
   pageX,
   graph,
   legend,
@@ -78,9 +99,7 @@ const DygraphLegend = ({
       style={style}
     >
       <div className="dygraph-legend--header">
-        <div className="dygraph-legend--timestamp">
-          {xHTML}
-        </div>
+        <div className="dygraph-legend--timestamp">{xHTML}</div>
         {renderSortAlpha}
         {renderSortNum}
         <button
@@ -102,16 +121,17 @@ const DygraphLegend = ({
           Snip
         </button>
       </div>
-      {isFilterVisible
-        ? <input
-            className="dygraph-legend--filter form-control input-sm"
-            type="text"
-            value={filterText}
-            onChange={onInputChange}
-            placeholder="Filter items..."
-            autoFocus={true}
-          />
-        : null}
+      {isFilterVisible && (
+        <input
+          className="dygraph-legend--filter form-control input-sm"
+          type="text"
+          value={filterText}
+          onChange={onInputChange}
+          placeholder="Filter items..."
+          autoFocus={true}
+        />
+      )}
+      )
       <div className="dygraph-legend--divider" />
       <div className="dygraph-legend--contents">
         {filtered.map(({label, color, yHTML, isHighlighted}) => {
@@ -123,47 +143,13 @@ const DygraphLegend = ({
               <span style={{color}}>
                 {isSnipped ? removeMeasurement(label) : label}
               </span>
-              <figure>
-                {yHTML || 'no value'}
-              </figure>
+              <figure>{yHTML || 'no value'}</figure>
             </div>
           )
         })}
       </div>
     </div>
   )
-}
-
-const {arrayOf, bool, func, number, shape, string} = PropTypes
-
-DygraphLegend.propTypes = {
-  x: number,
-  xHTML: string,
-  series: arrayOf(
-    shape({
-      color: string,
-      dashHTML: string,
-      isVisible: bool,
-      label: string,
-      y: number,
-      yHTML: string,
-    })
-  ),
-  pageX: number,
-  legend: shape({}),
-  graph: shape({}),
-  onSnip: func.isRequired,
-  onHide: func.isRequired,
-  onSort: func.isRequired,
-  onInputChange: func.isRequired,
-  onToggleFilter: func.isRequired,
-  filterText: string.isRequired,
-  isAscending: bool.isRequired,
-  sortType: string.isRequired,
-  isHidden: bool.isRequired,
-  legendRef: func.isRequired,
-  isSnipped: bool.isRequired,
-  isFilterVisible: bool.isRequired,
 }
 
 export default DygraphLegend

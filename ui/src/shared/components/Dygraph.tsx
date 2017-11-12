@@ -23,7 +23,9 @@ import {
   CellQuery,
   Color,
   DygraphOptions,
-  LegendSeries,
+  DygraphSeries,
+  Legend,
+  Resolution,
   RuleValues,
   TimeRange,
 } from 'src/types'
@@ -44,18 +46,15 @@ export interface DygraphProps {
   containerStyle: {}
   isGraphFilled: boolean
   isBarGraph: boolean
-  dygraphSeries: {}
-  setResolution: () => void
-  dygraphRef: () => void
+  dygraphSeries: DygraphSeries
+  setResolution: (r: Resolution) => void
+  dygraphRef: (ref: {}) => void
   synchronizer: FuncTypes.synchronizer
   onZoom: FuncTypes.onZoom
 }
 
 export interface DygraphState {
-  legend: {
-    x: number | null
-    series: LegendSeries
-  }
+  legend: Legend
   pageX: number | null
   sortType: string
   filterText: string
@@ -96,6 +95,10 @@ export default class Dygraph extends React.PureComponent<
     legend: {
       x: null,
       series: [],
+      prevLegend: {
+        x: null,
+        series: [],
+      },
     },
     pageX: null,
     sortType: '',
@@ -305,7 +308,7 @@ export default class Dygraph extends React.PureComponent<
       return ''
     }
 
-    const {state: {legend: prevLegend}} = this
+    const {prevLegend} = this.state.legend
     const highlighted = legend.series.find(s => s.isHighlighted)
     const prevHighlighted = prevLegend.series.find(s => s.isHighlighted)
 
@@ -331,9 +334,9 @@ export default class Dygraph extends React.PureComponent<
     const timeSeries = this.getTimeSeries()
     const graphRef = this.graphRef
 
-    let defaultOptions = {
+    let defaultOptions: DygraphOptions = {
       fillGraph,
-      logscale: y.scale === LOG,
+      logscale: y.scale === DISPLAY_OPTIONS.LOG,
       colors: this.getLineColors(),
       series: this.hashColorDygraphSeries(),
       legendFormatter: this.legendFormatter,

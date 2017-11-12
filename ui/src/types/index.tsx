@@ -46,6 +46,8 @@ export interface TimeRange {
 export interface Args {
   value: string
   type: string
+  alias: string
+  args: Args[]
 }
 
 export interface QueryConfigField {
@@ -55,9 +57,14 @@ export interface QueryConfigField {
   args: Args[]
 }
 
-export interface QueryConfigTags {}
+export interface QueryConfigTags {
+  [key: string]: string[]
+}
 
-export interface QueryConfigGroupBy {}
+export interface QueryConfigGroupBy {
+  time?: string
+  tags?: string[]
+}
 
 export interface QueryConfig {
   id: QueryID
@@ -69,8 +76,9 @@ export interface QueryConfig {
   groupBy: QueryConfigGroupBy
   areTagsAccepted: boolean
   rawText: string | null
-  range?: string | null
+  range?: TimeRange | null
   source?: string
+  fill: string
 }
 
 export interface CellQuery {
@@ -97,6 +105,19 @@ export interface Axes {
 
 export interface AxesBounds {
   bounds: Axes
+}
+
+export interface AxisOptions {
+  valueRange: number[]
+  axisLabelFormatter?: (yval: number, __: {}, opts: {}) => void
+  axisLabelWidth?: number
+  labelsKMB?: boolean
+  labelsKMG2?: boolean
+}
+
+export interface AxesOptions {
+  y: AxisOptions
+  y2: AxisOptions
 }
 
 export interface Cell {
@@ -193,11 +214,51 @@ export interface RuleValues {
   operator: string
 }
 
-export interface DygraphOptions {
-  plotter: () => void
+export interface DygraphSeries {
+  color: string
+  dashHTML: string
+  isVisible: boolean
+  label: string
+  y: number
+  yHTML: string
+  isHighlighted?: boolean
 }
 
-export interface LegendSeries {}
+export interface DygraphPlugin {}
+
+export interface DygraphHighlightSeries {}
+
+export interface DygraphSeriesColors {
+  [key: string]: string
+}
+
+export interface DygraphOptions {
+  fillGraph?: boolean
+  stackedGraph?: boolean
+  logscale: boolean
+  colors: string[]
+  series: DygraphSeriesColors
+  plotter?: (e: {}) => void
+  legendFormatter: (legend: string) => void
+  highlightCallback: ({pageX}: {pageX: number}) => void
+  unhighlightCallback: (e: {}) => void
+  plugins: DygraphPlugin[]
+  axes: AxesOptions
+  highlightSeriesOpts: DygraphHighlightSeries
+  zoomCallback: (lower: string, upper: string) => void
+}
+
+export interface LegendSeries {
+  label: string
+}
+
+export interface Legend {
+  x: number | null
+  series: LegendSeries[]
+  prevLegend?: Legend
+}
+
+export type Resolution = number | null
 
 export type QueryID = string
 

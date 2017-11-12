@@ -5,10 +5,25 @@ import {NULL_STRING} from 'shared/constants/queryFillOptions'
 import {TYPE_QUERY_CONFIG, TYPE_IFQL} from 'dashboards/constants'
 import timeRanges from 'shared/data/timeRanges'
 
-import {Cell, QueryConfig, Source, TextQuery, TimeRange} from 'src/types'
+import {
+  Cell,
+  QueryConfigGroupBy,
+  QueryConfigField,
+  QueryConfigTags,
+  QueryConfig,
+  Source,
+  TextQuery,
+  TimeRange,
+} from 'src/types'
 
 /* eslint-disable quotes */
-export const quoteIfTimestamp = ({lower, upper}) => {
+export const quoteIfTimestamp = ({
+  lower,
+  upper,
+}: {
+  lower: string
+  upper?: string
+}) => {
   if (lower && lower.includes('Z') && !lower.includes(`'`)) {
     lower = `'${lower}'`
   }
@@ -21,7 +36,10 @@ export const quoteIfTimestamp = ({lower, upper}) => {
 }
 /* eslint-enable quotes */
 
-export default function buildInfluxQLQuery(timeRange, config) {
+export default function buildInfluxQLQuery(
+  timeRange: TimeRange,
+  config: QueryConfig
+): string {
   const {groupBy, fill = NULL_STRING, tags, areTagsAccepted} = config
   const {upper, lower} = quoteIfTimestamp(timeRange)
 
@@ -37,14 +55,21 @@ export default function buildInfluxQLQuery(timeRange, config) {
   return `${select}${condition}${dimensions}${fillClause}`
 }
 
-function _buildSelect({fields, database, retentionPolicy, measurement}) {
+function _buildSelect({
+  fields,
+  database,
+  retentionPolicy,
+  measurement,
+}: QueryConfig) {
   if (!database || !measurement || !fields || !fields.length) {
     return null
   }
 
   const rpSegment = retentionPolicy ? `"${retentionPolicy}"` : ''
   const fieldsClause = _buildFields(fields)
-  const fullyQualifiedMeasurement = `"${database}".${rpSegment}."${measurement}"`
+  const fullyQualifiedMeasurement = `"${database}".${rpSegment}."${
+    measurement
+  }"`
   const statement = `SELECT ${fieldsClause} FROM ${fullyQualifiedMeasurement}`
   return statement
 }
@@ -64,11 +89,11 @@ export const buildQuery = (type, timeRange, config) => {
   return buildInfluxQLQuery(timeRange, config)
 }
 
-export function buildSelectStatement(config) {
+export function buildSelectStatement(config: QueryConfig) {
   return _buildSelect(config)
 }
 
-function _buildFields(fieldFuncs) {
+function _buildFields(fieldFuncs: QueryConfigField[]) {
   if (!fieldFuncs) {
     return ''
   }
@@ -89,7 +114,15 @@ function _buildFields(fieldFuncs) {
     .join(', ')
 }
 
-function _buildWhereClause({lower, upper, tags, areTagsAccepted}) {
+function _buildWhereClause({
+  lower,
+  upper,
+  tags,
+  areTagsAccepted,
+}: TimeRange & {
+  tags: QueryConfigTags
+  areTagsAccepted: boolean
+}) {
   const timeClauses = []
 
   const timeClause = quoteIfTimestamp({lower, upper})
@@ -125,21 +158,21 @@ function _buildWhereClause({lower, upper, tags, areTagsAccepted}) {
   return ` WHERE ${subClauses.join(' AND ')}`
 }
 
-function _buildGroupBy(groupBy) {
+function _buildGroupBy(groupBy: QueryConfigGroupBy) {
   return `${_buildGroupByTime(groupBy)}${_buildGroupByTags(groupBy)}`
 }
 
-function _buildGroupByTime(groupBy) {
+function _buildGroupByTime(groupBy: QueryConfigGroupBy) {
   if (!groupBy || !groupBy.time) {
     return ''
   }
 
-  return ` GROUP BY ${groupBy.time === AUTO_GROUP_BY
-    ? TEMP_VAR_INTERVAL
-    : `time(${groupBy.time})`}`
+  return ` GROUP BY ${
+    groupBy.time === AUTO_GROUP_BY ? TEMP_VAR_INTERVAL : `time(${groupBy.time})`
+  }`
 }
 
-function _buildGroupByTags(groupBy) {
+function _buildGroupByTags(groupBy: QueryConfigGroupBy) {
   if (!groupBy || !groupBy.tags.length) {
     return ''
   }
@@ -153,7 +186,7 @@ function _buildGroupByTags(groupBy) {
   return ` GROUP BY ${tags}`
 }
 
-function _buildFill(fill) {
+function _buildFill(fill: string) {
   return ` FILL(${fill})`
 }
 

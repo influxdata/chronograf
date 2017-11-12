@@ -6,7 +6,16 @@ import timeSeriesToDygraph from 'utils/timeSeriesToDygraph'
 
 import {SINGLE_STAT_LINE_COLORS} from 'shared/graphs/helpers'
 
-import {Axes, Cell, Color, ResizeCoords, RuleValues, TimeRange} from 'src/types'
+import {
+  Axes,
+  Cell,
+  CellQuery,
+  Color,
+  ResizeCoords,
+  Resolution,
+  RuleValues,
+  TimeRange,
+} from 'src/types'
 import {Result} from 'src/types/timeSeries'
 import * as FuncTypes from 'src/types/funcs'
 
@@ -31,9 +40,9 @@ export interface LineGraphProps {
   activeQueryIndex: number
   cellHeight: number
   synchronizer: FuncTypes.synchronizer
-  queries: {}
+  queries: CellQuery[]
   data: Result[]
-  setResolution: () => void
+  setResolution: (r: Resolution) => void
   underlayCallback: () => void
   onZoom: FuncTypes.onZoom
 }
