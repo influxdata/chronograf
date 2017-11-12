@@ -48,7 +48,7 @@ export interface DygraphProps {
   isBarGraph: boolean
   dygraphSeries: DygraphSeries
   setResolution: (r: Resolution) => void
-  dygraphRef: (ref: {}) => void
+  dygraphRef?: (ref: {}) => void
   synchronizer: FuncTypes.synchronizer
   onZoom: FuncTypes.onZoom
 }

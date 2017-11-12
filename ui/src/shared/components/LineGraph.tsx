@@ -11,6 +11,7 @@ import {
   Cell,
   CellQuery,
   Color,
+  DygraphOptions,
   ResizeCoords,
   Resolution,
   RuleValues,
@@ -78,7 +79,7 @@ class LineGraph extends React.PureComponent<LineGraphProps> {
     const {
       data,
       axes,
-      cell,
+      // cell,
       title,
       onZoom,
       queries,
@@ -86,7 +87,7 @@ class LineGraph extends React.PureComponent<LineGraphProps> {
       cellHeight,
       ruleValues,
       isBarGraph,
-      resizeCoords,
+      // resizeCoords,
       synchronizer,
       isRefreshing,
       isGraphFilled,
@@ -127,7 +128,7 @@ class LineGraph extends React.PureComponent<LineGraphProps> {
       <div className="dygraph graph--hasYLabel" style={{height: '100%'}}>
         {isRefreshing ? <GraphLoadingDots /> : null}
         <Dygraph
-          cell={cell}
+          /* cell={cell} */
           axes={axes}
           onZoom={onZoom}
           labels={labels}
@@ -137,7 +138,7 @@ class LineGraph extends React.PureComponent<LineGraphProps> {
           timeSeries={timeSeries}
           ruleValues={ruleValues}
           synchronizer={synchronizer}
-          resizeCoords={resizeCoords}
+          /* resizeCoords={resizeCoords} */
           overrideLineColors={lineColors}
           dygraphSeries={dygraphSeries}
           setResolution={this.props.setResolution}

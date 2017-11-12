@@ -238,13 +238,13 @@ export interface DygraphOptions {
   logscale: boolean
   colors: string[]
   series: DygraphSeriesColors
+  plugins: DygraphPlugin[]
+  axes: AxesOptions
+  highlightSeriesOpts: DygraphHighlightSeries
   plotter?: (e: {}) => void
   legendFormatter: (legend: string) => void
   highlightCallback: ({pageX}: {pageX: number}) => void
   unhighlightCallback: (e: {}) => void
-  plugins: DygraphPlugin[]
-  axes: AxesOptions
-  highlightSeriesOpts: DygraphHighlightSeries
   zoomCallback: (lower: string, upper: string) => void
 }
 

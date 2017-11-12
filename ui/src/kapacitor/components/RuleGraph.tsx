@@ -1,15 +1,39 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import buildInfluxQLQuery from 'utils/influxql'
 import AutoRefresh from 'shared/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import TimeRangeDropdown from 'shared/components/TimeRangeDropdown'
 import underlayCallback from 'kapacitor/helpers/ruleGraphUnderlay'
 
-const RefreshingLineGraph = AutoRefresh(LineGraph)
+import {
+  AutoRefresh as AutoRefreshType,
+  Color,
+  Rule,
+  Source,
+  TextQuery,
+  TimeRange,
+} from 'src/types'
 
-const {shape, string, func} = PropTypes
-const RuleGraph = ({
+export interface RefreshingRuleGraphProps {
+  queries: TextQuery[]
+  isGraphFilled: boolean
+  ruleValues: RuleValues
+  autoRefresh: AutoRefreshType
+  overrideLineColors: Color[]
+  underlayCallback: () => void
+}
+
+const RefreshingLineGraph = AutoRefresh<RefreshingRuleGraphProps>(LineGraph)
+
+export interface RuleGraphProps {
+  source: Source
+  query: TextQuery
+  rule: Rule
+  timeRange: TimeRange
+  onChooseTimeRange: () => void
+}
+
+const RuleGraph: React.SFC<RuleGraphProps> = ({
   query,
   source,
   timeRange: {lower},
@@ -52,18 +76,6 @@ const RuleGraph = ({
       />
     </div>
   )
-}
-
-RuleGraph.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  query: shape({}).isRequired,
-  rule: shape({}).isRequired,
-  timeRange: shape({}).isRequired,
-  onChooseTimeRange: func.isRequired,
 }
 
 export default RuleGraph

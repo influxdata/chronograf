@@ -17,7 +17,7 @@ export interface AutoRefreshProps {
   autoRefresh: AutoRefreshType
   templates: Template[]
   queries: TextQuery[]
-  editQueryStatus: FuncTypes.editQueryStatus
+  editQueryStatus?: FuncTypes.editQueryStatus
   grabDataForDownload: FuncTypes.grabDataForDownload
 }
 
@@ -28,8 +28,11 @@ export interface AutoRefreshState {
   isFetching: boolean
 }
 
-const AutoRefresh = ComposedComponent =>
-  class Wrapper extends React.Component<AutoRefreshProps, AutoRefreshState> {
+const AutoRefresh = <T extends {}>(ComposedComponent) =>
+  class Wrapper extends React.Component<
+    T & AutoRefreshProps,
+    AutoRefreshState
+  > {
     public state = {
       lastQuerySuccessful: false,
       timeSeries: [],

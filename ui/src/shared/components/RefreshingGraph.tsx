@@ -12,14 +12,41 @@ import {
   GraphType,
   ManualRefresh,
   ResizeCoords,
+  Source,
   Template,
   TextQuery,
   TimeRange,
 } from 'src/types'
 import * as FuncTypes from 'src/types/funcs'
 
-const RefreshingLineGraph = AutoRefresh(LineGraph)
-const RefreshingSingleStat = AutoRefresh(SingleStat)
+export interface RefreshingLineGraphProps {
+  timeRange: TimeRange
+  autoRefresh: AutoRefreshType
+  axes: Axes
+  queries: TextQuery[]
+  templates: Template[]
+  resizeCoords: ResizeCoords
+  onZoom: FuncTypes.onZoom
+  synchronizer: FuncTypes.synchronizer
+  editQueryStatus: FuncTypes.editQueryStatus
+  grabDataForDownload: FuncTypes.grabDataForDownload
+  isBarGraph: boolean
+  displayOptions: {
+    stepPlot: boolean
+    stackedGraph: boolean
+  }
+  showSingleStat: boolean
+}
+
+export interface RefreshingSingleStatProps {
+  queries: TextQuery[]
+  templates: Template[]
+  autoRefresh: AutoRefreshType
+  cellHeight: number
+}
+
+const RefreshingLineGraph = AutoRefresh<RefreshingLineGraphProps>(LineGraph)
+const RefreshingSingleStat = AutoRefresh<RefreshingSingleStatProps>(SingleStat)
 
 export interface RefreshingGraphProps {
   timeRange: TimeRange
@@ -30,11 +57,12 @@ export interface RefreshingGraphProps {
   queries: TextQuery[]
   templates: Template[]
   resizeCoords: ResizeCoords
+  sources: Source[]
   onZoom: FuncTypes.onZoom
   synchronizer: FuncTypes.synchronizer
   editQueryStatus?: FuncTypes.editQueryStatus
   grabDataForDownload: FuncTypes.grabDataForDownload
-  cellHeight: number
+  cellHeight?: number
 }
 
 const RefreshingGraph: React.SFC<RefreshingGraphProps> = ({
@@ -46,7 +74,7 @@ const RefreshingGraph: React.SFC<RefreshingGraphProps> = ({
   timeRange,
   cellHeight,
   autoRefresh,
-  manualRefresh, // when changed, re-mounts the component
+  manualRefresh = 0, // when changed, re-mounts the component
   synchronizer,
   resizeCoords,
   editQueryStatus,
@@ -68,6 +96,7 @@ const RefreshingGraph: React.SFC<RefreshingGraphProps> = ({
         templates={templates}
         autoRefresh={autoRefresh}
         cellHeight={cellHeight}
+        grabDataForDownload={grabDataForDownload}
       />
     )
   }
@@ -95,10 +124,6 @@ const RefreshingGraph: React.SFC<RefreshingGraphProps> = ({
       showSingleStat={type === GraphType.LinePlusSingleStat}
     />
   )
-}
-
-RefreshingGraph.defaultProps = {
-  manualRefresh: 0,
 }
 
 export default RefreshingGraph

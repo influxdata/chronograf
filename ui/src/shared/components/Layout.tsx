@@ -18,7 +18,7 @@ const getSource = (
 ) => {
   const s = _.get(cell, ['queries', '0', 'source'], null)
   if (!s) {
-    return source
+    return source || defaultSource
   }
 
   return sources.find(src => src.links.self === s) || defaultSource

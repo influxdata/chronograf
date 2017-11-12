@@ -21,7 +21,7 @@ export interface StatusPageState {
 
 class StatusPage extends React.Component<StatusPageProps, StatusPageState> {
   public state = {
-    cells: fixtureStatusPageCells,
+    cells: fixtureStatusPageCells as Cell[],
   }
 
   public render() {
