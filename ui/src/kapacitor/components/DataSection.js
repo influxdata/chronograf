@@ -43,6 +43,10 @@ const makeQueryHandlers = (actions, query) => ({
   handleRemoveFuncs: fields => {
     actions.removeFuncs(query.id, fields)
   },
+
+  handleTimeShift: timeShift => {
+    actions.timeShift(query.id, timeShift)
+  },
 })
 
 const DataSection = ({
@@ -54,6 +58,7 @@ const DataSection = ({
 }) => {
   const {
     handleChooseTag,
+    handleTimeShift,
     handleGroupByTag,
     handleToggleField,
     handleGroupByTime,
@@ -70,15 +75,16 @@ const DataSection = ({
         <DatabaseList query={query} onChooseNamespace={handleChooseNamespace} />
         <MeasurementList
           query={query}
-          onChooseMeasurement={handleChooseMeasurement}
           onChooseTag={handleChooseTag}
           onGroupByTag={handleGroupByTag}
+          onChooseMeasurement={handleChooseMeasurement}
           onToggleTagAcceptance={handleToggleTagAcceptance}
         />
         {isDeadman
           ? null
           : <FieldList
               query={query}
+              onTimeShift={handleTimeShift}
               onToggleField={handleToggleField}
               isKapacitorRule={isKapacitorRule}
               onGroupByTime={handleGroupByTime}

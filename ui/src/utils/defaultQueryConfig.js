@@ -1,6 +1,4 @@
-import {NULL_STRING} from 'shared/constants/queryFillOptions'
-
-const defaultQueryConfig = ({id, isKapacitorRule = false}) => {
+const defaultQueryConfig = ({id}) => {
   const queryConfig = {
     id,
     database: null,
@@ -18,7 +16,7 @@ const defaultQueryConfig = ({id, isKapacitorRule = false}) => {
     shifts: [],
   }
 
-  return isKapacitorRule ? queryConfig : {...queryConfig, fill: NULL_STRING}
+  return queryConfig
 }
 
 export default defaultQueryConfig

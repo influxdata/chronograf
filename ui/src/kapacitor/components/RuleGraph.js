@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react'
-import buildInfluxQLQuery from 'utils/influxql'
+import buildQueries from 'src/utils/buildQueriesForGraphs.js'
 import AutoRefresh from 'shared/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import TimeRangeDropdown from 'shared/components/TimeRangeDropdown'
@@ -8,20 +8,12 @@ import underlayCallback from 'src/kapacitor/helpers/ruleGraphUnderlay'
 const RefreshingLineGraph = AutoRefresh(LineGraph)
 
 const {shape, string, func} = PropTypes
-const RuleGraph = ({
-  query,
-  source,
-  timeRange: {lower},
-  timeRange,
-  rule,
-  onChooseTimeRange,
-}) => {
+const RuleGraph = ({query, source, timeRange, rule, onChooseTimeRange}) => {
   const autoRefreshMs = 30000
-  const queryText = buildInfluxQLQuery({lower}, query)
-  const queries = [{host: source.links.proxy, text: queryText}]
-  const kapacitorLineColors = ['#4ED8A0']
+  const queries = buildQueries(source.links.proxy, [query], timeRange)
+  const kapacitorLineColors = ['#4ED8A0', '#50ACF0']
 
-  if (!queryText) {
+  if (!queries.length) {
     return (
       <div className="rule-builder--graph-empty">
         <p>

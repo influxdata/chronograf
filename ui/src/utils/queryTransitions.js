@@ -11,30 +11,35 @@ export function editRawText(query, rawText) {
   return Object.assign({}, query, {rawText})
 }
 
-export const chooseNamespace = (query, namespace, isKapacitorRule = false) => ({
-  ...defaultQueryConfig({id: query.id, isKapacitorRule}),
+export const chooseNamespace = (query, namespace) => ({
+  ...defaultQueryConfig({id: query.id}),
   ...namespace,
 })
 
-export const chooseMeasurement = (
-  query,
-  measurement,
-  isKapacitorRule = false
-) => ({
-  ...defaultQueryConfig({id: query.id, isKapacitorRule}),
+export const chooseMeasurement = (query, measurement) => ({
+  ...defaultQueryConfig({id: query.id}),
   database: query.database,
   retentionPolicy: query.retentionPolicy,
   measurement,
 })
 
 export const toggleKapaField = (query, field) => {
+  const {value} = field
+
   if (field.type === 'field') {
+    const defaultField = {
+      type: 'func',
+      alias: `mean_${value}`,
+      args: [{value, type: 'field'}],
+      value: 'mean',
+    }
+
     return {
       ...query,
-      fields: [field],
+      fields: [defaultField],
       groupBy: {
         ...query.groupBy,
-        time: null,
+        time: '1m',
       },
     }
   }
