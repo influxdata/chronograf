@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 
 import ResizeHandle from 'shared/components/ResizeHandle'
@@ -11,7 +10,6 @@ const defaultInitialTopHeight = '50%'
 const defaultInitialBottomHeight = '50%'
 
 export interface ResizeContainerProps {
-  children: React.ReactChildren
   containerClass: string
   minTopHeight?: number
   minBottomHeight?: number
@@ -120,7 +118,9 @@ class ResizeContainer extends React.Component<
 
     if (React.Children.count(children) > maximumNumChildren) {
       console.error(
-        `There cannot be more than ${maximumNumChildren}' children in ResizeContainer`
+        `There cannot be more than ${
+          maximumNumChildren
+        }' children in ResizeContainer`
       )
       return
     }

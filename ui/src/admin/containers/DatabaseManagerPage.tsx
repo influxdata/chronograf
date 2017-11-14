@@ -10,29 +10,19 @@ import * as adminActionCreators from 'admin/actions'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
 class DatabaseManagerPage extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
-  componentDidMount() {
-    const {source: {links: {databases}}, actions} = this.props
-
-    actions.loadDBsAndRPsAsync(databases)
-  }
-
-  handleDeleteRetentionPolicy = (db, rp) => () => {
+  private handleDeleteRetentionPolicy = (db, rp) => () => {
     this.props.actions.deleteRetentionPolicyAsync(db, rp)
   }
 
-  handleStartDeleteDatabase = database => () => {
+  private handleStartDeleteDatabase = database => () => {
     this.props.actions.addDatabaseDeleteCode(database)
   }
 
-  handleEditDatabase = database => e => {
+  private handleEditDatabase = database => e => {
     this.props.actions.editDatabase(database, {name: e.target.value})
   }
 
-  handleCreateDatabase = database => {
+  private handleCreateDatabase = database => {
     const {actions, notify, source, databases} = this.props
     if (!database.name) {
       return notify('error', 'Database name cannot be blank')
@@ -45,12 +35,12 @@ class DatabaseManagerPage extends React.Component {
     actions.createDatabaseAsync(source.links.databases, database)
   }
 
-  handleAddRetentionPolicy = database => () => {
+  private handleAddRetentionPolicy = database => () => {
     const {addRetentionPolicy} = this.props.actions
     addRetentionPolicy(database)
   }
 
-  handleKeyDownDatabase = database => e => {
+  private handleKeyDownDatabase = database => e => {
     const {key} = e
     const {actions, notify, source, databases} = this.props
 
@@ -71,7 +61,7 @@ class DatabaseManagerPage extends React.Component {
     }
   }
 
-  handleDatabaseDeleteConfirm = database => e => {
+  private handleDatabaseDeleteConfirm = database => e => {
     const {key, target: {value}} = e
     const {actions, notify} = this.props
 
@@ -90,7 +80,13 @@ class DatabaseManagerPage extends React.Component {
     actions.editDatabase(database, {deleteCode: value})
   }
 
-  render() {
+  public componentDidMount() {
+    const {source: {links: {databases}}, actions} = this.props
+
+    actions.loadDBsAndRPsAsync(databases)
+  }
+
+  public render() {
     const {source, databases, actions, notify} = this.props
     return (
       <DatabaseManager

@@ -3,7 +3,6 @@ import * as classnames from 'classnames'
 import {Scrollbars} from 'react-custom-scrollbars'
 
 export interface FancyScrollbarProps {
-  children: React.ReactChildren
   className: string
   autoHide?: boolean
   autoHeight?: boolean
@@ -25,9 +24,7 @@ class FancyScrollbar extends React.Component<FancyScrollbarProps> {
 
     return (
       <Scrollbars
-        className={classnames('fancy-scroll--container', {
-          [className]: className,
-        })}
+        className={classnames('fancy-scroll--container', className)}
         autoHide={autoHide}
         autoHideTimeout={1000}
         autoHideDuration={250}

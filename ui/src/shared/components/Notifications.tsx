@@ -1,9 +1,8 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
 
 import {
   publishNotification as publishNotificationAction,
@@ -11,18 +10,22 @@ import {
   dismissAllNotifications as dismissAllNotificationsAction,
 } from 'shared/actions/notifications'
 
-class Notifications extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+import {Location} from 'src/types'
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.location.pathname !== this.props.location.pathname) {
-      this.props.dismissAllNotifications()
-    }
+export interface NotificationsProps {
+  location: Location
+  publishNotification: () => void
+  dismissNotification: (type: string) => void
+  dismissAllNotifications: () => void
+  notifications: {
+    success?: string
+    error?: string
+    warning?: string
   }
+}
 
-  renderNotification = (type, message) => {
+class Notifications extends React.Component<NotificationsProps> {
+  private renderNotification = (type, message) => {
     if (!message) {
       return null
     }
@@ -39,9 +42,9 @@ class Notifications extends React.Component {
     )
   }
 
-  handleDismiss = type => () => this.props.dismissNotification(type)
+  private handleDismiss = type => () => this.props.dismissNotification(type)
 
-  renderDismiss = type => {
+  private renderDismiss = type => {
     return (
       <button
         className="close"
@@ -54,7 +57,13 @@ class Notifications extends React.Component {
     )
   }
 
-  render() {
+  public componentWillReceiveProps(nextProps: NotificationsProps) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      this.props.dismissAllNotifications()
+    }
+  }
+
+  public render() {
     const {success, error, warning} = this.props.notifications
     if (!success && !error && !warning) {
       return null
@@ -70,22 +79,6 @@ class Notifications extends React.Component {
   }
 }
 
-const {func, shape, string} = PropTypes
-
-Notifications.propTypes = {
-  location: shape({
-    pathname: string.isRequired,
-  }).isRequired,
-  publishNotification: func.isRequired,
-  dismissNotification: func.isRequired,
-  dismissAllNotifications: func.isRequired,
-  notifications: shape({
-    success: string,
-    error: string,
-    warning: string,
-  }),
-}
-
 const mapStateToProps = ({notifications}) => ({
   notifications,
 })
@@ -99,6 +92,7 @@ const mapDispatchToProps = dispatch => ({
   ),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(Notifications)
-)
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(Notifications)

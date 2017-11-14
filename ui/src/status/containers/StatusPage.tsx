@@ -64,7 +64,7 @@ class StatusPage extends React.Component<StatusPageProps, StatusPageState> {
               <h1 className="page-header__title">Status</h1>
             </div>
             <div className="page-header__right">
-              <SourceIndicator />
+              <SourceIndicator source={source} />
             </div>
           </div>
         </div>

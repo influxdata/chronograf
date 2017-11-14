@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 import * as uuidv4 from 'uuid/v4'
 import * as ReactTooltip from 'react-tooltip'
@@ -7,13 +6,14 @@ import * as ReactTooltip from 'react-tooltip'
 import {Source} from 'src/types'
 
 export interface SourceIndicatorProps {
+  source: Source
   sourceOverride?: Source
 }
 
-const SourceIndicator: React.SFC<SourceIndicatorProps> = (
-  {sourceOverride},
-  {source: {name, url}}
-) => {
+const SourceIndicator: React.SFC<SourceIndicatorProps> = ({
+  sourceOverride,
+  source: {name, url},
+}) => {
   const sourceName = _.get(sourceOverride, 'name', null)
     ? sourceOverride.name
     : name
@@ -24,7 +24,10 @@ const SourceIndicator: React.SFC<SourceIndicatorProps> = (
   if (!sourceName) {
     return null
   }
-  const sourceNameTooltip = `<h1>Connected to Source:</h1><p><code>${sourceName} @ ${sourceUrl}</code></p>`
+
+  const sourceNameTooltip = `<h1>Connected to Source:</h1><p><code>${
+    sourceName
+  } @ ${sourceUrl}</code></p>`
   const uuidTooltip = uuidv4()
 
   return (
@@ -43,13 +46,6 @@ const SourceIndicator: React.SFC<SourceIndicatorProps> = (
       />
     </div>
   )
-}
-
-SourceIndicator.contextTypes = {
-  source: PropTypes.shape({
-    name: PropTypes.string,
-    url: PropTypes.string,
-  }),
 }
 
 export default SourceIndicator

@@ -1,10 +1,14 @@
 import {RouteComponentProps} from 'react-router'
+import {History, Location} from 'history'
 
 import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
-
 import * as FuncTypes from 'src/types/funcs'
 
 export type RouterSourceID = RouteComponentProps<{sourceID: string}>
+
+export type Location = Location
+
+export type History = History
 
 export interface Source {
   id: string
@@ -20,6 +24,7 @@ export interface Source {
     databases: string
   }
   default: boolean
+  telegraf?: string
 }
 
 export interface Alert {
@@ -41,6 +46,11 @@ export type ManualRefresh = number
 export interface TimeRange {
   lower: string
   upper?: string
+}
+
+export interface ZoomedTimeRange {
+  zoomedLower: string
+  zoomedUpper?: string
 }
 
 export interface Args {
@@ -277,3 +287,39 @@ export enum OptInType {
   text = 'text',
   number = 'number',
 }
+
+export interface Tags {
+  [keys: string]: string
+}
+
+export interface Host {
+  name?: string
+  cpu?: number
+  load?: number
+  apps?: string[]
+  deltaUptime?: number
+  winDeltaUptime?: number
+  tags?: Tags
+}
+
+export enum SortDirection {
+  asc = 'asc',
+  desc = 'desc',
+}
+
+export interface Message {
+  type: string
+  text: string
+}
+
+export interface AppMapping {
+  name?: string
+  measurement?: string
+  tags?: Tags
+}
+
+export interface Rule {}
+
+export interface Dashboard {}
+
+export interface DashboardName {}

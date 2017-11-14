@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 
 import WidgetCell from 'shared/components/WidgetCell'
@@ -10,18 +9,13 @@ import {Cell, LayoutProps, ResizeCoords, Source} from 'src/types'
 import {RawResponse} from 'src/types/timeSeries'
 import * as FuncTypes from 'src/types/funcs'
 
-const getSource = (
-  cell: Cell,
-  source: Source,
-  sources: Source[],
-  defaultSource: Source
-) => {
+const getSource = (cell: Cell, source: Source, sources: Source[]) => {
   const s = _.get(cell, ['queries', '0', 'source'], null)
   if (!s) {
-    return source || defaultSource
+    return source
   }
 
-  return sources.find(src => src.links.self === s) || defaultSource
+  return sources.find(src => src.links.self === s)
 }
 
 export type LayoutStateProps = LayoutProps & {
@@ -58,28 +52,25 @@ const Layout: React.SFC<
     grabDataForDownload: FuncTypes.grabDataForDownload
     celldata: RawResponse[]
   }
-> = (
-  {
-    host,
-    cell,
-    cell: {h, axes, type},
-    source,
-    sources,
-    onZoom,
-    templates,
-    timeRange,
-    isEditable,
-    autoRefresh,
-    manualRefresh,
-    onDeleteCell,
-    synchronizer,
-    resizeCoords,
-    onSummonOverlayTechnologies,
-    grabDataForDownload,
-    celldata,
-  },
-  {source: defaultSource}
-) => (
+> = ({
+  host,
+  cell,
+  cell: {h, axes, type},
+  source,
+  sources,
+  onZoom,
+  templates,
+  timeRange,
+  isEditable,
+  autoRefresh,
+  manualRefresh,
+  onDeleteCell,
+  synchronizer,
+  resizeCoords,
+  onSummonOverlayTechnologies,
+  grabDataForDownload,
+  celldata,
+}) => (
   <LayoutCell
     cell={cell}
     isEditable={isEditable}
@@ -105,7 +96,7 @@ const Layout: React.SFC<
         resizeCoords={resizeCoords}
         queries={buildQueriesForLayouts(
           cell,
-          getSource(cell, source, sources, defaultSource),
+          getSource(cell, source, sources),
           timeRange,
           host
         )}
@@ -113,9 +104,5 @@ const Layout: React.SFC<
     )}
   </LayoutCell>
 )
-
-Layout.contextTypes = {
-  source: PropTypes.shape({}),
-}
 
 export default LayoutState

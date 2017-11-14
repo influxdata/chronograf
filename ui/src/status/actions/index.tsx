@@ -1,5 +1,5 @@
 // he is a library for safely encoding and decoding HTML Entities
-import he from 'he'
+import * as he from 'he'
 
 import {fetchJSONFeed as fetchJSONFeedAJAX} from 'status/apis'
 

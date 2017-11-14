@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 
 import HostsTable from 'hosts/components/HostsTable'
@@ -8,27 +7,28 @@ import SourceIndicator from 'shared/components/SourceIndicator'
 
 import {getCpuAndLoadForHosts, getMappings, getAppsForHosts} from '../apis'
 
-export class HostsPage extends React.Component {
-  propTypes = {
-    source: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string, // 'influx-enterprise'
-      links: PropTypes.shape({
-        proxy: PropTypes.string.isRequired,
-      }).isRequired,
-      telegraf: PropTypes.string.isRequired,
-    }),
-    addFlashMessage: PropTypes.func,
-  }
+import {Host, Source} from 'src/types'
+import {addFlashMessage as addFlashMessageType} from 'src/types/funcs'
 
-  state = {
+export interface HostsPageProps {
+  source: Source
+  addFlashMessage: addFlashMessageType
+}
+
+export interface HostsPageState {
+  hosts: Host
+  hostsLoading: boolean
+  hostsError: string
+}
+
+export class HostsPage extends React.Component<HostsPageProps, HostsPageState> {
+  public state = {
     hosts: {},
     hostsLoading: true,
     hostsError: '',
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const {source, addFlashMessage} = this.props
     Promise.all([
       getCpuAndLoadForHosts(source.links.proxy, source.telegraf),
@@ -72,7 +72,7 @@ export class HostsPage extends React.Component {
       })
   }
 
-  render() {
+  public render() {
     const {source} = this.props
     const {hosts, hostsLoading, hostsError} = this.state
     return (
@@ -83,7 +83,7 @@ export class HostsPage extends React.Component {
               <h1 className="page-header__title">Host List</h1>
             </div>
             <div className="page-header__right">
-              <SourceIndicator />
+              <SourceIndicator source={source} />
             </div>
           </div>
         </div>

@@ -92,6 +92,7 @@
     ],
     "ordered-imports": false,
     "prefer-const": true,
+    "prefer-conditional-expression": false,
     "prettier": [true, {
       "printWidth": 80,
       "tabWidth": 2,

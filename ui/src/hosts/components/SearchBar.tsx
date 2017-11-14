@@ -1,36 +1,42 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 
-class SearchBar extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      searchTerm: '',
-    }
+export interface SearchBarProps {
+  onSearch: (term: string) => void
+}
+
+export interface SearchBarState {
+  searchTerm: string
+}
+
+class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
+  private searchInput: HTMLInputElement
+
+  public state = {
+    searchTerm: '',
   }
 
-  componentWillMount() {
+  private handleSearch = () => {
+    this.props.onSearch(this.state.searchTerm)
+  }
+
+  private handleChange = () => {
+    this.setState({searchTerm: this.searchInput.value}, this.handleSearch)
+  }
+
+  public componentWillMount() {
     const waitPeriod = 300
     this.handleSearch = _.debounce(this.handleSearch, waitPeriod)
   }
 
-  handleSearch = () => {
-    this.props.onSearch(this.state.searchTerm)
-  }
-
-  handleChange = () => {
-    this.setState({searchTerm: this.refs.searchInput.value}, this.handleSearch)
-  }
-
-  render() {
+  public render() {
     return (
       <div className="users__search-widget input-group">
         <input
           type="text"
           className="form-control"
           placeholder="Filter by Host..."
-          ref="searchInput"
+          ref={r => (this.searchInput = r)}
           onChange={this.handleChange}
         />
         <div className="input-group-addon">
@@ -39,12 +45,6 @@ class SearchBar extends React.Component {
       </div>
     )
   }
-}
-
-const {func} = PropTypes
-
-SearchBar.propTypes = {
-  onSearch: func.isRequired,
 }
 
 export default SearchBar

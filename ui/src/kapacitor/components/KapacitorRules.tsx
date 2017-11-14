@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 
 import NoKapacitorError from 'shared/components/NoKapacitorError'
@@ -8,7 +7,18 @@ import KapacitorRulesTable from 'kapacitor/components/KapacitorRulesTable'
 import TasksTable from 'kapacitor/components/TasksTable'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 
-const KapacitorRules = ({
+import {Rule, Source} from 'src/types'
+
+export interface KapacitorRulesProps {
+  source: Source
+  rules: Rule[]
+  hasKapacitor: boolean
+  loading: boolean
+  onDelete: () => void
+  onChangeRuleStatus: () => void
+}
+
+const KapacitorRules: React.SFC<KapacitorRulesProps> = ({
   source,
   rules,
   hasKapacitor,
@@ -18,7 +28,7 @@ const KapacitorRules = ({
 }) => {
   if (loading) {
     return (
-      <PageContents>
+      <PageContents source={source}>
         <div className="panel-heading u-flex u-ai-center u-jc-space-between">
           <h2 className="panel-title">Alert Rules</h2>
           <button className="btn btn-primary btn-sm disabled" disabled={true}>
@@ -36,7 +46,7 @@ const KapacitorRules = ({
 
   if (!hasKapacitor) {
     return (
-      <PageContents>
+      <PageContents source={source}>
         <NoKapacitorError source={source} />
       </PageContents>
     )
@@ -51,9 +61,7 @@ const KapacitorRules = ({
   return (
     <PageContents source={source}>
       <div className="panel-heading u-flex u-ai-center u-jc-space-between">
-        <h2 className="panel-title">
-          {rHeader}
-        </h2>
+        <h2 className="panel-title">{rHeader}</h2>
         <div className="u-flex u-ai-center u-jc-space-between">
           <Link
             to={`/sources/${source.id}/alert-rules/new`}
@@ -75,9 +83,7 @@ const KapacitorRules = ({
         <div className="col-md-12">
           <div className="panel panel-minimal">
             <div className="panel-heading u-flex u-ai-center u-jc-space-between">
-              <h2 className="panel-title">
-                {tHeader}
-              </h2>
+              <h2 className="panel-title">{tHeader}</h2>
               <div className="u-flex u-ai-center u-jc-space-between">
                 <Link
                   to={`/sources/${source.id}/tickscript/new`}
@@ -100,7 +106,11 @@ const KapacitorRules = ({
   )
 }
 
-const PageContents = ({children}) =>
+export interface PageContentsProps {
+  source: Source
+}
+
+const PageContents: React.SFC<PageContentsProps> = ({source, children}) => (
   <div className="page">
     <div className="page-header">
       <div className="page-header__container">
@@ -110,7 +120,7 @@ const PageContents = ({children}) =>
           </h1>
         </div>
         <div className="page-header__right">
-          <SourceIndicator />
+          <SourceIndicator source={source} />
         </div>
       </div>
     </div>
@@ -118,29 +128,12 @@ const PageContents = ({children}) =>
       <div className="container-fluid">
         <div className="row">
           <div className="col-md-12">
-            <div className="panel panel-minimal">
-              {children}
-            </div>
+            <div className="panel panel-minimal">{children}</div>
           </div>
         </div>
       </div>
     </FancyScrollbar>
   </div>
-
-const {arrayOf, bool, func, node, shape} = PropTypes
-
-KapacitorRules.propTypes = {
-  source: shape(),
-  rules: arrayOf(shape()),
-  hasKapacitor: bool,
-  loading: bool,
-  onChangeRuleStatus: func,
-  onDelete: func,
-}
-
-PageContents.propTypes = {
-  children: node,
-  onCloseTickscript: func,
-}
+)
 
 export default KapacitorRules

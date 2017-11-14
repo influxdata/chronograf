@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import SourceIndicator from 'shared/components/SourceIndicator'
 import AlertsTable from 'alerts/components/AlertsTable'
@@ -13,9 +12,27 @@ import * as _ from 'lodash'
 import * as moment from 'moment'
 
 import timeRanges from 'shared/data/timeRanges'
+import {Alert, Source, TimeRange} from 'src/types'
 
-class AlertsApp extends React.Component {
-  constructor(props) {
+export interface AlertsAppProps {
+  source: Source
+  timeRange: TimeRange
+  isWidget: boolean
+  limit: number
+}
+
+export interface AlertsAppState {
+  loading: boolean
+  hasKapacitor: boolean
+  alerts: Alert[]
+  timeRange: TimeRange
+  limit: number
+  limitMultiplier: number
+  isAlertsMaxedOut: boolean
+}
+
+class AlertsApp extends React.Component<AlertsAppProps, AlertsAppState> {
+  constructor(props: AlertsAppProps) {
     super(props)
 
     const lowerInSec = props.timeRange
@@ -30,7 +47,9 @@ class AlertsApp extends React.Component {
       alerts: [],
       timeRange: {
         upper: moment().format(),
-        lower: moment().subtract(lowerInSec || oneDayInSec, 'seconds').format(),
+        lower: moment()
+          .subtract(lowerInSec || oneDayInSec, 'seconds')
+          .format(),
       },
       limit: props.limit || 0, // only used if AlertsApp receives a limit prop
       limitMultiplier: 1, // only used if AlertsApp receives a limit prop
@@ -38,30 +57,7 @@ class AlertsApp extends React.Component {
     }
   }
 
-  // TODO: show a loading screen until we figure out if there is a kapacitor and fetch the alerts
-  componentDidMount() {
-    const {source} = this.props
-    AJAX({
-      url: source.links.kapacitors,
-      method: 'GET',
-    }).then(({data}) => {
-      if (data.kapacitors[0]) {
-        this.setState({hasKapacitor: true})
-
-        this.fetchAlerts()
-      } else {
-        this.setState({loading: false})
-      }
-    })
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (!_.isEqual(prevState.timeRange, this.state.timeRange)) {
-      this.fetchAlerts()
-    }
-  }
-
-  fetchAlerts = () => {
+  private fetchAlerts = () => {
     getAlerts(
       this.props.source.links.proxy,
       this.state.timeRange,
@@ -108,34 +104,62 @@ class AlertsApp extends React.Component {
     })
   }
 
-  handleGetMoreAlerts = () => {
+  private handleGetMoreAlerts = () => {
     this.setState({limitMultiplier: this.state.limitMultiplier + 1}, () => {
-      this.fetchAlerts(this.state.limitMultiplier)
+      this.fetchAlerts()
     })
   }
 
-  renderSubComponents = () => {
+  private renderSubComponents = () => {
     const {source, isWidget, limit} = this.props
     const {isAlertsMaxedOut, alerts} = this.state
 
-    return this.state.hasKapacitor
-      ? <AlertsTable
-          source={source}
-          alerts={this.state.alerts}
-          shouldNotBeFilterable={isWidget}
-          limit={limit}
-          onGetMoreAlerts={this.handleGetMoreAlerts}
-          isAlertsMaxedOut={isAlertsMaxedOut}
-          alertsCount={alerts.length}
-        />
-      : <NoKapacitorError source={source} />
+    return this.state.hasKapacitor ? (
+      <AlertsTable
+        source={source}
+        alerts={this.state.alerts}
+        shouldNotBeFilterable={isWidget}
+        limit={limit}
+        onGetMoreAlerts={this.handleGetMoreAlerts}
+        isAlertsMaxedOut={isAlertsMaxedOut}
+        alertsCount={alerts.length}
+      />
+    ) : (
+      <NoKapacitorError source={source} />
+    )
   }
 
-  handleApplyTime = timeRange => {
+  private handleApplyTime = timeRange => {
     this.setState({timeRange})
   }
 
-  render() {
+  // TODO: show a loading screen until we figure out if there is a kapacitor and fetch the alerts
+  public componentDidMount() {
+    const {source} = this.props
+    AJAX({
+      url: source.links.kapacitors,
+      method: 'GET',
+    }).then(({data}) => {
+      if (data.kapacitors[0]) {
+        this.setState({hasKapacitor: true})
+
+        this.fetchAlerts()
+      } else {
+        this.setState({loading: false})
+      }
+    })
+  }
+
+  public componentDidUpdate(
+    _prevProps: AlertsAppProps,
+    prevState: AlertsAppState
+  ) {
+    if (!_.isEqual(prevState.timeRange, this.state.timeRange)) {
+      this.fetchAlerts()
+    }
+  }
+
+  public render() {
     const {isWidget, source} = this.props
     const {loading, timeRange} = this.state
 
@@ -143,53 +167,34 @@ class AlertsApp extends React.Component {
       return <div className="page-spinner" />
     }
 
-    return isWidget
-      ? this.renderSubComponents()
-      : <div className="page alert-history-page">
-          <div className="page-header">
-            <div className="page-header__container">
-              <div className="page-header__left">
-                <h1 className="page-header__title">Alert History</h1>
-              </div>
-              <div className="page-header__right">
-                <SourceIndicator />
-                <CustomTimeRangeDropdown
-                  onApplyTimeRange={this.handleApplyTime}
-                  timeRange={timeRange}
-                />
-              </div>
+    return isWidget ? (
+      this.renderSubComponents()
+    ) : (
+      <div className="page alert-history-page">
+        <div className="page-header">
+          <div className="page-header__container">
+            <div className="page-header__left">
+              <h1 className="page-header__title">Alert History</h1>
             </div>
-          </div>
-          <div className="page-contents">
-            <div className="container-fluid">
-              <div className="row">
-                <div className="col-md-12">
-                  {this.renderSubComponents()}
-                </div>
-              </div>
+            <div className="page-header__right">
+              <SourceIndicator source={source} />
+              <CustomTimeRangeDropdown
+                onApplyTimeRange={this.handleApplyTime}
+                timeRange={timeRange}
+              />
             </div>
           </div>
         </div>
+        <div className="page-contents">
+          <div className="container-fluid">
+            <div className="row">
+              <div className="col-md-12">{this.renderSubComponents()}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
-}
-
-const {bool, number, oneOfType, shape, string} = PropTypes
-
-AlertsApp.propTypes = {
-  source: shape({
-    id: string.isRequired,
-    name: string.isRequired,
-    type: string, // 'influx-enterprise'
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }),
-  timeRange: shape({
-    lower: string.isRequired,
-    upper: oneOfType([shape(), string]),
-  }),
-  isWidget: bool,
-  limit: number,
 }
 
 export default AlertsApp

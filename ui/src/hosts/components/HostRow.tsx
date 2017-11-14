@@ -1,16 +1,19 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import * as classnames from 'classnames'
+import * as qs from 'query-string'
 
 import {HOSTS_TABLE} from 'hosts/constants/tableSizing'
 
-class HostRow extends React.PureComponent {
-  constructor(props) {
-    super(props)
-  }
+import {Host, Source} from 'src/types'
 
-  render() {
+export interface HostRowProps {
+  host: Host
+  source: Source
+}
+
+class HostRow extends React.PureComponent<HostRowProps> {
+  public render() {
     const {host, source} = this.props
     const {name, cpu, load, apps = []} = host
     const {colName, colStatus, colCPU, colLoad} = HOSTS_TABLE
@@ -18,9 +21,7 @@ class HostRow extends React.PureComponent {
     return (
       <tr>
         <td style={{width: colName}}>
-          <Link to={`/sources/${source.id}/hosts/${name}`}>
-            {name}
-          </Link>
+          <Link to={`/sources/${source.id}/hosts/${name}`}>{name}</Link>
         </td>
         <td style={{width: colStatus}}>
           <div
@@ -46,7 +47,7 @@ class HostRow extends React.PureComponent {
                   style={{marginLeft: '2px'}}
                   to={{
                     pathname: `/sources/${source.id}/hosts/${name}`,
-                    query: {app},
+                    search: qs.stringify({app}),
                   }}
                 >
                   {app}
@@ -59,20 +60,6 @@ class HostRow extends React.PureComponent {
       </tr>
     )
   }
-}
-
-HostRow.propTypes = {
-  source: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  host: PropTypes.shape({
-    name: PropTypes.string,
-    cpu: PropTypes.number,
-    load: PropTypes.number,
-    deltaUptime: PropTypes.number.required,
-    apps: PropTypes.arrayOf(PropTypes.string.isRequired),
-  }),
 }
 
 export default HostRow

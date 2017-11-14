@@ -1,24 +1,33 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 
 import SearchBar from 'hosts/components/SearchBar'
 import HostRow from 'hosts/components/HostRow'
-
 import {HOSTS_TABLE} from 'hosts/constants/tableSizing'
 
-class HostsTable extends React.Component {
-  constructor(props) {
-    super(props)
+import {Host, SortDirection, Source} from 'src/types'
 
-    this.state = {
-      searchTerm: '',
-      sortDirection: null,
-      sortKey: null,
-    }
+export interface HostsTableProps {
+  hosts: Host[]
+  hostsLoading: boolean
+  hostsError: string
+  source: Source
+}
+
+export interface HostsTableState {
+  searchTerm: string
+  sortDirection: SortDirection
+  sortKey: string
+}
+
+class HostsTable extends React.Component<HostsTableProps, HostsTableState> {
+  public state = {
+    searchTerm: '',
+    sortDirection: null,
+    sortKey: null,
   }
 
-  filter(allHosts, searchTerm) {
+  private filter(allHosts: Host[], searchTerm: string) {
     const filterText = searchTerm.toLowerCase()
     return allHosts.filter(h => {
       const apps = h.apps ? h.apps.join(', ') : ''
@@ -39,35 +48,37 @@ class HostsTable extends React.Component {
     })
   }
 
-  sort(hosts, key, direction) {
+  private sort(hosts: Host[], key: string, direction: SortDirection) {
     switch (direction) {
-      case 'asc':
+      case SortDirection.asc:
         return _.sortBy(hosts, e => e[key])
-      case 'desc':
+      case SortDirection.desc:
         return _.sortBy(hosts, e => e[key]).reverse()
       default:
         return hosts
     }
   }
 
-  updateSearchTerm = term => {
+  private updateSearchTerm = term => {
     this.setState({searchTerm: term})
   }
 
-  updateSort = key => () => {
+  private updateSort = key => () => {
     // if we're using the key, reverse order; otherwise, set it with ascending
     if (this.state.sortKey === key) {
       const reverseDirection =
-        this.state.sortDirection === 'asc' ? 'desc' : 'asc'
+        this.state.sortDirection === SortDirection.asc
+          ? SortDirection.desc
+          : SortDirection.asc
       this.setState({sortDirection: reverseDirection})
     } else {
-      this.setState({sortKey: key, sortDirection: 'asc'})
+      this.setState({sortKey: key, sortDirection: SortDirection.asc})
     }
   }
 
-  sortableClasses = key => {
+  private sortableClasses = key => {
     if (this.state.sortKey === key) {
-      if (this.state.sortDirection === 'asc') {
+      if (this.state.sortDirection === SortDirection.asc) {
         return 'sortable-header sorting-ascending'
       }
       return 'sortable-header sorting-descending'
@@ -75,7 +86,7 @@ class HostsTable extends React.Component {
     return 'sortable-header'
   }
 
-  render() {
+  public render() {
     const {searchTerm, sortKey, sortDirection} = this.state
     const {hosts, hostsLoading, hostsError, source} = this.props
     const sortedHosts = this.sort(
@@ -101,80 +112,61 @@ class HostsTable extends React.Component {
     return (
       <div className="panel panel-minimal">
         <div className="panel-heading u-flex u-ai-center u-jc-space-between">
-          <h2 className="panel-title">
-            {hostsTitle}
-          </h2>
+          <h2 className="panel-title">{hostsTitle}</h2>
           <SearchBar onSearch={this.updateSearchTerm} />
         </div>
         <div className="panel-body">
-          {hostCount > 0 && !hostsError.length
-            ? <table className="table v-center table-highlight">
-                <thead>
-                  <tr>
-                    <th
-                      onClick={this.updateSort('name')}
-                      className={this.sortableClasses('name')}
-                      style={{width: colName}}
-                    >
-                      Host
-                    </th>
-                    <th
-                      onClick={this.updateSort('deltaUptime')}
-                      className={this.sortableClasses('deltaUptime')}
-                      style={{width: colStatus}}
-                    >
-                      Status
-                    </th>
-                    <th
-                      onClick={this.updateSort('cpu')}
-                      className={this.sortableClasses('cpu')}
-                      style={{width: colCPU}}
-                    >
-                      CPU
-                    </th>
-                    <th
-                      onClick={this.updateSort('load')}
-                      className={this.sortableClasses('load')}
-                      style={{width: colLoad}}
-                    >
-                      Load
-                    </th>
-                    <th>Apps</th>
-                  </tr>
-                </thead>
+          {hostCount > 0 && !hostsError.length ? (
+            <table className="table v-center table-highlight">
+              <thead>
+                <tr>
+                  <th
+                    onClick={this.updateSort('name')}
+                    className={this.sortableClasses('name')}
+                    style={{width: colName}}
+                  >
+                    Host
+                  </th>
+                  <th
+                    onClick={this.updateSort('deltaUptime')}
+                    className={this.sortableClasses('deltaUptime')}
+                    style={{width: colStatus}}
+                  >
+                    Status
+                  </th>
+                  <th
+                    onClick={this.updateSort('cpu')}
+                    className={this.sortableClasses('cpu')}
+                    style={{width: colCPU}}
+                  >
+                    CPU
+                  </th>
+                  <th
+                    onClick={this.updateSort('load')}
+                    className={this.sortableClasses('load')}
+                    style={{width: colLoad}}
+                  >
+                    Load
+                  </th>
+                  <th>Apps</th>
+                </tr>
+              </thead>
 
-                <tbody>
-                  {sortedHosts.map(h =>
-                    <HostRow key={h.name} host={h} source={source} />
-                  )}
-                </tbody>
-              </table>
-            : <div className="generic-empty-state">
-                <h4 style={{margin: '90px 0'}}>No Hosts found</h4>
-              </div>}
+              <tbody>
+                {sortedHosts.map(h => (
+                  <HostRow key={h.name} host={h} source={source} />
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="generic-empty-state">
+              <h4 style={{margin: '90px 0'}}>No Hosts found</h4>
+            </div>
+          )}
         </div>
       </div>
     )
   }
-}
-
-const {arrayOf, bool, number, shape, string} = PropTypes
-
-HostsTable.propTypes = {
-  hosts: arrayOf(
-    shape({
-      name: string,
-      cpu: number,
-      load: number,
-      apps: arrayOf(string.isRequired),
-    })
-  ),
-  hostsLoading: bool,
-  hostsError: string,
-  source: shape({
-    id: string.isRequired,
-    name: string.isRequired,
-  }).isRequired,
 }
 
 export default HostsTable

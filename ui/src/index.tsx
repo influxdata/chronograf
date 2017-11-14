@@ -12,7 +12,7 @@ import {loadLocalStorage} from './localStorage'
 
 import {withApp} from './App'
 import {Login, UserIsAuthenticated, UserIsNotAuthenticated} from './auth'
-import CheckSources from './CheckSources'
+import {checkSources} from './CheckSources'
 import {StatusPage} from './status'
 import {HostsPage, HostPage} from './hosts'
 import DataExplorer from './data_explorer'
@@ -130,7 +130,7 @@ class Root extends React.Component {
             <Route
               exact={true}
               path="/"
-              component={UserIsAuthenticated(CheckSources)}
+              component={checkSources(UserIsAuthenticated)}
             />
             <Route
               exact={true}
@@ -147,7 +147,11 @@ class Root extends React.Component {
               path="/sources/:sourceID/status"
               component={withApp(StatusPage)}
             />
-            <Route exact={true} path="hosts" component={withApp(HostsPage)} />
+            <Route
+              exact={true}
+              path="/sources/:sourceID/hosts"
+              component={withApp(HostsPage)}
+            />
             <Route
               exact={true}
               path="/sources/:sourceID/hosts/:hostID"

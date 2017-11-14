@@ -46,7 +46,7 @@ class AdminPage extends React.Component {
     super(props)
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const {source, loadUsers, loadRoles, loadPermissions} = this.props
 
     loadUsers(source.links.users)
@@ -56,7 +56,7 @@ class AdminPage extends React.Component {
     }
   }
 
-  handleClickCreate = type => () => {
+  public handleClickCreate = type => () => {
     if (type === 'users') {
       this.props.addUser()
     } else if (type === 'roles') {
@@ -64,15 +64,15 @@ class AdminPage extends React.Component {
     }
   }
 
-  handleEditUser = (user, updates) => {
+  public handleEditUser = (user, updates) => {
     this.props.editUser(user, updates)
   }
 
-  handleEditRole = (role, updates) => {
+  public handleEditRole = (role, updates) => {
     this.props.editRole(role, updates)
   }
 
-  handleSaveUser = async user => {
+  public handleSaveUser = async user => {
     const {notify} = this.props
     if (!isValidUser(user)) {
       notify('error', 'Username and/or password too short')
@@ -85,7 +85,7 @@ class AdminPage extends React.Component {
     }
   }
 
-  handleSaveRole = async role => {
+  public handleSaveRole = async role => {
     const {notify} = this.props
     if (!isValidRole(role)) {
       notify('error', 'Role name too short')
@@ -98,43 +98,43 @@ class AdminPage extends React.Component {
     }
   }
 
-  handleCancelEditUser = user => {
+  public handleCancelEditUser = user => {
     this.props.removeUser(user)
   }
 
-  handleCancelEditRole = role => {
+  public handleCancelEditRole = role => {
     this.props.removeRole(role)
   }
 
-  handleDeleteRole = role => {
+  public handleDeleteRole = role => {
     this.props.deleteRole(role)
   }
 
-  handleDeleteUser = user => {
+  public handleDeleteUser = user => {
     this.props.deleteUser(user)
   }
 
-  handleUpdateRoleUsers = (role, users) => {
+  public handleUpdateRoleUsers = (role, users) => {
     this.props.updateRoleUsers(role, users)
   }
 
-  handleUpdateRolePermissions = (role, permissions) => {
+  public handleUpdateRolePermissions = (role, permissions) => {
     this.props.updateRolePermissions(role, permissions)
   }
 
-  handleUpdateUserPermissions = (user, permissions) => {
+  public handleUpdateUserPermissions = (user, permissions) => {
     this.props.updateUserPermissions(user, permissions)
   }
 
-  handleUpdateUserRoles = (user, roles) => {
+  public handleUpdateUserRoles = (user, roles) => {
     this.props.updateUserRoles(user, roles)
   }
 
-  handleUpdateUserPassword = (user, password) => {
+  public handleUpdateUserPassword = (user, password) => {
     this.props.updateUserPassword(user, password)
   }
 
-  render() {
+  public render() {
     const {
       users,
       roles,
@@ -155,42 +155,44 @@ class AdminPage extends React.Component {
               <h1 className="page-header__title">Admin</h1>
             </div>
             <div className="page-header__right">
-              <SourceIndicator />
+              <SourceIndicator source={source} />
             </div>
           </div>
         </div>
         <FancyScrollbar className="page-contents">
-          {users
-            ? <div className="container-fluid">
-                <div className="row">
-                  <AdminTabs
-                    users={users}
-                    roles={roles}
-                    source={source}
-                    hasRoles={hasRoles}
-                    permissions={allowed}
-                    onFilterUsers={filterUsers}
-                    onFilterRoles={filterRoles}
-                    onEditUser={this.handleEditUser}
-                    onEditRole={this.handleEditRole}
-                    onSaveUser={this.handleSaveUser}
-                    onSaveRole={this.handleSaveRole}
-                    onDeleteUser={this.handleDeleteUser}
-                    onDeleteRole={this.handleDeleteRole}
-                    onClickCreate={this.handleClickCreate}
-                    onCancelEditUser={this.handleCancelEditUser}
-                    onCancelEditRole={this.handleCancelEditRole}
-                    isEditingUsers={users.some(u => u.isEditing)}
-                    isEditingRoles={roles.some(r => r.isEditing)}
-                    onUpdateRoleUsers={this.handleUpdateRoleUsers}
-                    onUpdateUserRoles={this.handleUpdateUserRoles}
-                    onUpdateUserPassword={this.handleUpdateUserPassword}
-                    onUpdateRolePermissions={this.handleUpdateRolePermissions}
-                    onUpdateUserPermissions={this.handleUpdateUserPermissions}
-                  />
-                </div>
+          {users ? (
+            <div className="container-fluid">
+              <div className="row">
+                <AdminTabs
+                  users={users}
+                  roles={roles}
+                  source={source}
+                  hasRoles={hasRoles}
+                  permissions={allowed}
+                  onFilterUsers={filterUsers}
+                  onFilterRoles={filterRoles}
+                  onEditUser={this.handleEditUser}
+                  onEditRole={this.handleEditRole}
+                  onSaveUser={this.handleSaveUser}
+                  onSaveRole={this.handleSaveRole}
+                  onDeleteUser={this.handleDeleteUser}
+                  onDeleteRole={this.handleDeleteRole}
+                  onClickCreate={this.handleClickCreate}
+                  onCancelEditUser={this.handleCancelEditUser}
+                  onCancelEditRole={this.handleCancelEditRole}
+                  isEditingUsers={users.some(u => u.isEditing)}
+                  isEditingRoles={roles.some(r => r.isEditing)}
+                  onUpdateRoleUsers={this.handleUpdateRoleUsers}
+                  onUpdateUserRoles={this.handleUpdateUserRoles}
+                  onUpdateUserPassword={this.handleUpdateUserPassword}
+                  onUpdateRolePermissions={this.handleUpdateRolePermissions}
+                  onUpdateUserPermissions={this.handleUpdateUserPermissions}
+                />
               </div>
-            : <div className="page-spinner" />}
+            </div>
+          ) : (
+            <div className="page-spinner" />
+          )}
         </FancyScrollbar>
       </div>
     )

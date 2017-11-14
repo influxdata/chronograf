@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 
 import AutoRefreshDropdown from 'shared/components/AutoRefreshDropdown'
@@ -9,7 +8,38 @@ import GraphTips from 'shared/components/GraphTips'
 import DashboardHeaderEdit from 'dashboards/components/DashboardHeaderEdit'
 import DashboardSwitcher from 'dashboards/components/DashboardSwitcher'
 
-const DashboardHeader = ({
+import {
+  Dashboard,
+  DashboardName,
+  Source,
+  TimeRange,
+  ZoomedTimeRange,
+} from 'src/types'
+
+export interface DashboardHeaderProps {
+  source: Source
+  activeDashboard: string
+  onEditDashboard: () => void
+  dashboard: Dashboard
+  timeRange: TimeRange
+  autoRefresh: number
+  isHidden: boolean
+  isEditMode: boolean
+  handleChooseTimeRange: () => void
+  handleChooseAutoRefresh: () => void
+  onManualRefresh: () => void
+  handleClickPresentationButton: () => void
+  onAddCell: () => void
+  onToggleTempVarControls: () => void
+  showTemplateControlBar: boolean
+  zoomedTimeRange: ZoomedTimeRange
+  onCancel: () => void
+  onSave: () => void
+  names: DashboardName[]
+}
+
+const DashboardHeader: React.SFC<DashboardHeaderProps> = ({
+  source,
   names,
   onSave,
   onCancel,
@@ -27,110 +57,78 @@ const DashboardHeader = ({
   showTemplateControlBar,
   timeRange: {upper, lower},
   handleClickPresentationButton,
-  zoomedTimeRange: {zoomedLower, zoomedUpper},
+  zoomedTimeRange: {zoomedLower = null, zoomedUpper = null},
 }) =>
-  isHidden
-    ? null
-    : <div className="page-header full-width">
-        <div className="page-header__container">
-          <div
-            className={
-              dashboard
-                ? 'page-header__left page-header__dash-editable'
-                : 'page-header__left'
-            }
-          >
-            {names && names.length > 1
-              ? <DashboardSwitcher
-                  names={names}
-                  activeDashboard={activeDashboard}
-                />
-              : null}
-            {dashboard
-              ? <DashboardHeaderEdit
-                  onSave={onSave}
-                  onCancel={onCancel}
-                  activeDashboard={activeDashboard}
-                  onEditDashboard={onEditDashboard}
-                  isEditMode={isEditMode}
-                />
-              : <h1 className="page-header__title">
-                  {activeDashboard}
-                </h1>}
-          </div>
-          <div className="page-header__right">
-            <GraphTips />
-            <SourceIndicator />
-            {dashboard
-              ? <button className="btn btn-primary btn-sm" onClick={onAddCell}>
-                  <span className="icon plus" />
-                  Add Cell
-                </button>
-              : null}
-            {dashboard
-              ? <div
-                  className={classnames('btn btn-default btn-sm', {
-                    active: showTemplateControlBar,
-                  })}
-                  onClick={onToggleTempVarControls}
-                >
-                  <span className="icon cube" />Template Variables
-                </div>
-              : null}
-            <AutoRefreshDropdown
-              onChoose={handleChooseAutoRefresh}
-              onManualRefresh={onManualRefresh}
-              selected={autoRefresh}
-              iconName="refresh"
+  !isHidden && (
+    <div className="page-header full-width">
+      <div className="page-header__container">
+        <div
+          className={
+            dashboard
+              ? 'page-header__left page-header__dash-editable'
+              : 'page-header__left'
+          }
+        >
+          {names &&
+            names.length > 1 && (
+              <DashboardSwitcher
+                names={names}
+                activeDashboard={activeDashboard}
+              />
+            )}
+          {dashboard ? (
+            <DashboardHeaderEdit
+              onSave={onSave}
+              onCancel={onCancel}
+              activeDashboard={activeDashboard}
+              onEditDashboard={onEditDashboard}
+              isEditMode={isEditMode}
             />
-            <TimeRangeDropdown
-              onChooseTimeRange={handleChooseTimeRange}
-              selected={{
-                upper: zoomedUpper || upper,
-                lower: zoomedLower || lower,
-              }}
-            />
+          ) : (
+            <h1 className="page-header__title">{activeDashboard}</h1>
+          )}
+        </div>
+        <div className="page-header__right">
+          <GraphTips />
+          <SourceIndicator source={source} />
+          {dashboard && (
+            <button className="btn btn-primary btn-sm" onClick={onAddCell}>
+              <span className="icon plus" />
+              Add Cell
+            </button>
+          )}
+          {dashboard ? (
             <div
-              className="btn btn-default btn-sm btn-square"
-              onClick={handleClickPresentationButton}
+              className={classnames('btn btn-default btn-sm', {
+                active: showTemplateControlBar,
+              })}
+              onClick={onToggleTempVarControls}
             >
-              <span className="icon expand-a" />
+              <span className="icon cube" />Template Variables
             </div>
+          ) : null}
+          <AutoRefreshDropdown
+            onChoose={handleChooseAutoRefresh}
+            onManualRefresh={onManualRefresh}
+            selected={autoRefresh}
+            iconName="refresh"
+          />
+          <TimeRangeDropdown
+            onChooseTimeRange={handleChooseTimeRange}
+            selected={{
+              upper: zoomedUpper || upper,
+              lower: zoomedLower || lower,
+            }}
+          />
+          <div
+            className="btn btn-default btn-sm btn-square"
+            onClick={handleClickPresentationButton}
+          >
+            <span className="icon expand-a" />
           </div>
         </div>
       </div>
-
-const {arrayOf, bool, func, number, shape, string} = PropTypes
-
-DashboardHeader.defaultProps = {
-  zoomedTimeRange: {
-    zoomedLower: null,
-    zoomedUpper: null,
-  },
-}
-
-DashboardHeader.propTypes = {
-  activeDashboard: string.isRequired,
-  onEditDashboard: func,
-  dashboard: shape({}),
-  timeRange: shape({
-    lower: string,
-    upper: string,
-  }).isRequired,
-  autoRefresh: number.isRequired,
-  isHidden: bool.isRequired,
-  isEditMode: bool,
-  handleChooseTimeRange: func.isRequired,
-  handleChooseAutoRefresh: func.isRequired,
-  onManualRefresh: func.isRequired,
-  handleClickPresentationButton: func.isRequired,
-  onAddCell: func,
-  onToggleTempVarControls: func,
-  showTemplateControlBar: bool,
-  zoomedTimeRange: shape({}),
-  onCancel: func,
-  onSave: func,
-  names: arrayOf(shape({})).isRequired,
-}
+    </div>
+  )
 
 export default DashboardHeader

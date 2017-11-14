@@ -16,6 +16,10 @@
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.3.tgz#3f0ff6873da793870e20a260cada55982f38a9e5"
 
+"@types/he@^0.5.29":
+  version "0.5.29"
+  resolved "https://registry.yarnpkg.com/@types/he/-/he-0.5.29.tgz#67f9392287b05558013d1cabc96801a5185adbea"
+
 "@types/history@*", "@types/history@^4.6.1":
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.6.1.tgz#0dbaef4febad5d074d06dbdfae6b027d1d701d25"
@@ -31,6 +35,10 @@
 "@types/prop-types@^15.5.2":
   version "15.5.2"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.5.2.tgz#3c6b8dceb2906cc87fe4358e809f9d20c8d59be1"
+
+"@types/query-string@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/query-string/-/query-string-5.0.1.tgz#6cb41c724cb1644d56c2d1dae7c7b204e706b39e"
 
 "@types/react-dom@^16.0.2":
   version "16.0.2"

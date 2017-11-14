@@ -234,7 +234,6 @@ export const buildQueriesForLayouts = (
   host
 ): TextQuery[] =>
   cell.queries.map(query => {
-    console.log(query, cell, source, timeRange, host)
     let queryText
     // Canned dashboards use an different a schema different from queryConfig.
     if (query.queryConfig) {

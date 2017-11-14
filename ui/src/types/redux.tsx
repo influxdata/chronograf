@@ -1,5 +1,5 @@
 import {publishNotification} from '../shared/actions/notifications'
-import {Dispatch as ReduxDispatch, Reducer as ReduxReducer} from 'redux'
+import {Action, Dispatch as ReduxDispatch, Reducer as ReduxReducer} from 'redux'
 import {
   RouterState,
   RouterAction,
@@ -24,4 +24,5 @@ export interface RootState {
 }
 
 export type Dispatch = ReduxDispatch<RootAction>
+export type Action = Action
 // export type Reducer = ReduxReducer<RootState, RootAction>

@@ -2,7 +2,9 @@ import {proxy} from 'utils/queryUrlGenerator'
 import AJAX from 'utils/ajax'
 import * as _ from 'lodash'
 
-export function getCpuAndLoadForHosts(proxyLink, telegrafDB) {
+import {AppMapping, Host, Source} from 'src/types'
+
+export function getCpuAndLoadForHosts(proxyLink: string, telegrafDB: string) {
   return proxy({
     source: proxyLink,
     query: `SELECT mean("usage_user") FROM cpu WHERE "cpu" = 'cpu-total' AND time > now() - 10m GROUP BY host;
@@ -83,7 +85,7 @@ export function getCpuAndLoadForHosts(proxyLink, telegrafDB) {
   })
 }
 
-export async function getAllHosts(proxyLink, telegrafDB) {
+export async function getAllHosts(proxyLink: string, telegrafDB: string) {
   try {
     const resp = await proxy({
       source: proxyLink,
@@ -117,7 +119,12 @@ export function getMappings() {
   })
 }
 
-export function getAppsForHosts(proxyLink, hosts, appMappings, telegrafDB) {
+export function getAppsForHosts(
+  proxyLink: string,
+  hosts: Host,
+  appMappings: AppMapping[],
+  telegrafDB: string
+): Promise<Host> {
   const measurements = appMappings.map(m => `^${m.measurement}$`).join('|')
   const measurementsToApps = _.zipObject(
     appMappings.map(m => m.measurement),
@@ -129,7 +136,7 @@ export function getAppsForHosts(proxyLink, hosts, appMappings, telegrafDB) {
     query: `show series from /${measurements}/`,
     db: telegrafDB,
   }).then(resp => {
-    const newHosts = Object.assign({}, hosts)
+    const newHosts = {...hosts}
     const allSeries = _.get(
       resp,
       ['data', 'results', '0', 'series', '0', 'values'],
@@ -163,7 +170,7 @@ export function getAppsForHosts(proxyLink, hosts, appMappings, telegrafDB) {
   })
 }
 
-export function getMeasurementsForHost(source, host) {
+export function getMeasurementsForHost(source: Source, host: Host) {
   return proxy({
     source: source.links.proxy,
     query: `SHOW MEASUREMENTS WHERE "host" = '${host}'`,
@@ -180,11 +187,11 @@ export function getMeasurementsForHost(source, host) {
   })
 }
 
-function parseSeries(series) {
+function parseSeries(series: string) {
   const ident = /\w+/
   const tag = /,?([^=]+)=([^,]+)/
 
-  function parseMeasurement(s, obj) {
+  function parseMeasurement(s: string, obj: AppMapping) {
     const match = ident.exec(s)
     const measurement = match[0]
     if (measurement) {
@@ -193,24 +200,28 @@ function parseSeries(series) {
     return s.slice(match.index + measurement.length)
   }
 
-  function parseTag(s, obj) {
+  function parseTag(s: string, obj: AppMapping) {
     const match = tag.exec(s)
 
-    const kv = match[0]
-    const key = match[1]
-    const value = match[2]
+    if (match) {
+      const kv = match[0]
+      const key = match[1]
+      const value = match[2]
 
-    if (key) {
-      if (!obj.tags) {
-        obj.tags = {}
+      if (key) {
+        if (!obj.tags) {
+          obj.tags = {}
+        }
+        obj.tags[key] = value
       }
-      obj.tags[key] = value
+      return s.slice(match.index + kv.length)
+    } else {
+      return s
     }
-    return s.slice(match.index + kv.length)
   }
 
   let workStr = series.slice()
-  const out = {}
+  const out: AppMapping = {}
 
   // Consume measurement
   workStr = parseMeasurement(workStr, out)
@@ -223,10 +234,19 @@ function parseSeries(series) {
   return out
 }
 
-function _isEmpty(resp) {
+interface Series {
+  series: string
+  error: string
+}
+
+interface Response {
+  results: Series[]
+}
+
+function _isEmpty(resp: Response) {
   return !resp.results[0].series
 }
 
-function _hasError(resp) {
+function _hasError(resp: Response) {
   return !!resp.results[0].error
 }

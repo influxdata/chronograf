@@ -1,6 +1,6 @@
 import {RawResponse} from 'src/types/timeSeries'
 
-import {Dygraph} from 'src/types'
+import {Dygraph, Message} from 'src/types'
 
 export type grabDataForDownload = (celldata: RawResponse[]) => void
 
@@ -18,3 +18,5 @@ export type editQueryStatus = (
 export type synchronizer = (dygraph: {}) => void
 
 export type onZoom = (lower: string, upper: string) => void
+
+export type addFlashMessage = (message: Message) => void

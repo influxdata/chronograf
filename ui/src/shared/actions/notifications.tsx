@@ -1,7 +1,4 @@
-import actionCreatorFactory, {
-  ActionCreator,
-  EmptyActionCreator,
-} from 'typescript-fsa'
+import actionCreatorFactory from 'typescript-fsa'
 
 const actionCreator = actionCreatorFactory('NOTIFICATIONS')
 
