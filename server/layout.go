@@ -52,18 +52,25 @@ func newLayoutResponse(layout chronograf.Layout) layoutResponse {
 // NewLayout adds a valid layout to store.
 func (s *Service) NewLayout(w http.ResponseWriter, r *http.Request) {
 	var layout chronograf.Layout
+	var err error
 	if err := json.NewDecoder(r.Body).Decode(&layout); err != nil {
 		invalidJSON(w, s.Logger)
 		return
 	}
 
-	if err := ValidLayoutRequest(layout); err != nil {
+	ctx := r.Context()
+	defaultOrg, err := s.Store.Organizations(ctx).DefaultOrganization(ctx)
+	if err != nil {
+		unknownErrorWithMessage(w, err, s.Logger)
+		return
+	}
+
+	if err := ValidLayoutRequest(layout, fmt.Sprintf("%d", defaultOrg.ID)); err != nil {
 		invalidData(w, err, s.Logger)
 		return
 	}
 
-	var err error
-	if layout, err = s.LayoutStore.Add(r.Context(), layout); err != nil {
+	if layout, err = s.Store.Layouts(ctx).Add(r.Context(), layout); err != nil {
 		msg := fmt.Errorf("Error storing layout %v: %v", layout, err)
 		unknownErrorWithMessage(w, msg, s.Logger)
 		return
@@ -91,7 +98,7 @@ func (s *Service) Layouts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	layouts, err := s.LayoutStore.All(ctx)
+	layouts, err := s.Store.Layouts(ctx).All(ctx)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "Error loading layouts", s.Logger)
 		return
@@ -123,7 +130,7 @@ func (s *Service) LayoutsID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := httprouter.GetParamFromContext(ctx, "id")
 
-	layout, err := s.LayoutStore.Get(ctx, id)
+	layout, err := s.Store.Layouts(ctx).Get(ctx, id)
 	if err != nil {
 		Error(w, http.StatusNotFound, fmt.Sprintf("ID %s not found", id), s.Logger)
 		return
@@ -142,7 +149,7 @@ func (s *Service) RemoveLayout(w http.ResponseWriter, r *http.Request) {
 		ID: id,
 	}
 
-	if err := s.LayoutStore.Delete(ctx, layout); err != nil {
+	if err := s.Store.Layouts(ctx).Delete(ctx, layout); err != nil {
 		unknownErrorWithMessage(w, err, s.Logger)
 		return
 	}
@@ -155,7 +162,7 @@ func (s *Service) UpdateLayout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := httprouter.GetParamFromContext(ctx, "id")
 
-	_, err := s.LayoutStore.Get(ctx, id)
+	_, err := s.Store.Layouts(ctx).Get(ctx, id)
 	if err != nil {
 		Error(w, http.StatusNotFound, fmt.Sprintf("ID %s not found", id), s.Logger)
 		return
@@ -168,12 +175,18 @@ func (s *Service) UpdateLayout(w http.ResponseWriter, r *http.Request) {
 	}
 	req.ID = id
 
-	if err := ValidLayoutRequest(req); err != nil {
+	defaultOrg, err := s.Store.Organizations(ctx).DefaultOrganization(ctx)
+	if err != nil {
+		unknownErrorWithMessage(w, err, s.Logger)
+		return
+	}
+
+	if err := ValidLayoutRequest(req, fmt.Sprintf("%d", defaultOrg.ID)); err != nil {
 		invalidData(w, err, s.Logger)
 		return
 	}
 
-	if err := s.LayoutStore.Update(ctx, req); err != nil {
+	if err := s.Store.Layouts(ctx).Update(ctx, req); err != nil {
 		msg := fmt.Sprintf("Error updating layout ID %s: %v", id, err)
 		Error(w, http.StatusInternalServerError, msg, s.Logger)
 		return
@@ -184,9 +197,13 @@ func (s *Service) UpdateLayout(w http.ResponseWriter, r *http.Request) {
 }
 
 // ValidLayoutRequest checks if the layout has valid application, measurement and cells.
-func ValidLayoutRequest(l chronograf.Layout) error {
+func ValidLayoutRequest(l chronograf.Layout, defaultOrgID string) error {
 	if l.Application == "" || l.Measurement == "" || len(l.Cells) == 0 {
 		return fmt.Errorf("app, measurement, and cells required")
+	}
+
+	if l.Organization == "" {
+		l.Organization = defaultOrgID
 	}
 
 	for _, c := range l.Cells {

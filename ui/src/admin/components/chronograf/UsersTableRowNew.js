@@ -9,7 +9,7 @@ import {USERS_TABLE} from 'src/admin/constants/chronografTableSizing'
 import {USER_ROLES} from 'src/admin/constants/dummyUsers'
 import {MEMBER_ROLE} from 'src/auth/Authorized'
 
-class NewUserTableRow extends Component {
+class UsersTableRowNew extends Component {
   constructor(props) {
     super(props)
 
@@ -26,7 +26,7 @@ class NewUserTableRow extends Component {
     this.setState({[fieldName]: e.target.value.trim()})
   }
 
-  handleClickCreateUser = () => {
+  handleConfirmCreateUser = () => {
     const {onBlur, onCreateUser, organization} = this.props
     const {name, provider, scheme, role, superAdmin} = this.state
 
@@ -34,7 +34,7 @@ class NewUserTableRow extends Component {
       name,
       provider,
       scheme,
-      superAdmin: superAdmin.value,
+      superAdmin,
       roles: [
         {
           name: role,
@@ -70,11 +70,11 @@ class NewUserTableRow extends Component {
     const {onBlur} = this.props
     const {name, provider, scheme, role, superAdmin} = this.state
 
+    const dropdownRolesItems = USER_ROLES.map(r => ({...r, text: r.name}))
     const preventCreate = !name || !provider
 
     return (
       <tr className="chronograf-admin-table--new-user">
-        <td className="chronograf-admin-table--check-col" />
         <td>
           <input
             className="form-control input-xs"
@@ -87,7 +87,7 @@ class NewUserTableRow extends Component {
         </td>
         <td style={{width: colRole}}>
           <Dropdown
-            items={USER_ROLES.map(r => ({...r, text: r.name}))}
+            items={dropdownRolesItems}
             selected={role}
             onChoose={this.handleSelectRole}
             buttonColor="btn-primary"
@@ -129,7 +129,7 @@ class NewUserTableRow extends Component {
           <button
             className="btn btn-xs btn-square btn-success"
             disabled={preventCreate}
-            onClick={this.handleClickCreateUser}
+            onClick={this.handleConfirmCreateUser}
           >
             <span className="icon checkmark" />
           </button>
@@ -141,7 +141,7 @@ class NewUserTableRow extends Component {
 
 const {func, shape, string} = PropTypes
 
-NewUserTableRow.propTypes = {
+UsersTableRowNew.propTypes = {
   organization: shape({
     id: string.isRequired,
     name: string.isRequired,
@@ -150,4 +150,4 @@ NewUserTableRow.propTypes = {
   onCreateUser: func.isRequired,
 }
 
-export default NewUserTableRow
+export default UsersTableRowNew

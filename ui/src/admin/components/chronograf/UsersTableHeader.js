@@ -7,17 +7,26 @@ class UsersTableHeader extends Component {
   }
 
   render() {
-    const {onCreateUserRow, numUsers} = this.props
+    const {
+      onClickCreateUser,
+      numUsers,
+      isCreatingUser,
+      organization,
+    } = this.props
 
     const panelTitle = numUsers === 1 ? `${numUsers} User` : `${numUsers} Users`
 
     return (
       <div className="panel-heading u-flex u-ai-center u-jc-space-between">
         <h2 className="panel-title">
-          {panelTitle}
+          {panelTitle} in <em>{organization.name}</em>
         </h2>
         <Authorized requiredRole={ADMIN_ROLE}>
-          <button className="btn btn-primary btn-sm" onClick={onCreateUserRow}>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={onClickCreateUser}
+            disabled={isCreatingUser}
+          >
             <span className="icon plus" />
             Create User
           </button>
@@ -27,11 +36,16 @@ class UsersTableHeader extends Component {
   }
 }
 
-const {func, number} = PropTypes
+const {bool, func, shape, string, number} = PropTypes
 
 UsersTableHeader.propTypes = {
   numUsers: number.isRequired,
-  onCreateUserRow: func.isRequired,
+  onClickCreateUser: func.isRequired,
+  isCreatingUser: bool.isRequired,
+  organization: shape({
+    name: string.isRequired,
+    id: string.isRequired,
+  }),
 }
 
 export default UsersTableHeader

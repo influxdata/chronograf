@@ -5,7 +5,7 @@ import {
   updateUser as updateUserAJAX,
   deleteUser as deleteUserAJAX,
   createOrganization as createOrganizationAJAX,
-  renameOrganization as renameOrganizationAJAX,
+  updateOrganization as updateOrganizationAJAX,
   deleteOrganization as deleteOrganizationAJAX,
 } from 'src/admin/apis/chronograf'
 
@@ -151,11 +151,11 @@ export const updateUserAsync = (user, updatedUser) => async dispatch => {
 export const deleteUserAsync = user => async dispatch => {
   dispatch(removeUser(user))
   try {
-    await deleteUserAJAX(user.links.self)
+    await deleteUserAJAX(user)
     dispatch(
       publishAutoDismissingNotification(
         'success',
-        `User deleted: ${user.scheme}::${user.provider}::${user.name}`
+        `User removed from organization: ${user.scheme}::${user.provider}::${user.name}`
       )
     )
   } catch (error) {
@@ -178,13 +178,13 @@ export const createOrganizationAsync = (
   }
 }
 
-export const renameOrganizationAsync = (
+export const updateOrganizationAsync = (
   organization,
   updatedOrganization
 ) => async dispatch => {
   dispatch(renameOrganization(organization, updatedOrganization.name))
   try {
-    const {data} = await renameOrganizationAJAX(updatedOrganization)
+    const {data} = await updateOrganizationAJAX(updatedOrganization)
     // it's not necessary to syncOrganization again but it's useful for good
     // measure and for the clarity of insight in the redux story
     dispatch(syncOrganization(updatedOrganization, data))
@@ -197,7 +197,7 @@ export const renameOrganizationAsync = (
 export const deleteOrganizationAsync = organization => async dispatch => {
   dispatch(removeOrganization(organization))
   try {
-    await deleteOrganizationAJAX(organization.links.self)
+    await deleteOrganizationAJAX(organization)
     dispatch(
       publishAutoDismissingNotification(
         'success',

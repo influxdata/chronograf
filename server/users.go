@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,14 +10,16 @@ import (
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/roles"
 )
 
 type userRequest struct {
-	ID       uint64            `json:"id,string"`
-	Name     string            `json:"name"`
-	Provider string            `json:"provider"`
-	Scheme   string            `json:"scheme"`
-	Roles    []chronograf.Role `json:"roles"`
+	ID         uint64            `json:"id,string"`
+	Name       string            `json:"name"`
+	Provider   string            `json:"provider"`
+	Scheme     string            `json:"scheme"`
+	SuperAdmin bool              `json:"superAdmin"`
+	Roles      []chronograf.Role `json:"roles"`
 }
 
 func (r *userRequest) ValidCreate() error {
@@ -37,24 +40,35 @@ func (r *userRequest) ValidCreate() error {
 	return r.ValidRoles()
 }
 
-// TODO: Provide detailed error message
-// TODO: Reconsider what fields should actually be updateable once this is more robust
 func (r *userRequest) ValidUpdate() error {
-	if r.Name == "" && r.Provider == "" && r.Scheme == "" && r.Roles == nil {
-		return fmt.Errorf("No fields to update")
+	if r.Name != "" {
+		return fmt.Errorf("Cannot update Name")
+	}
+	if r.Provider != "" {
+		return fmt.Errorf("Cannot update Provider")
+	}
+	if r.Scheme != "" {
+		return fmt.Errorf("Cannot update Scheme")
+	}
+	if len(r.Roles) == 0 {
+		return fmt.Errorf("No Roles to update")
 	}
 	return r.ValidRoles()
 }
 
 func (r *userRequest) ValidRoles() error {
+	orgs := map[string]bool{}
 	if len(r.Roles) > 0 {
 		for _, r := range r.Roles {
+			if _, ok := orgs[r.Organization]; ok {
+				return fmt.Errorf("duplicate organization %q in roles", r.Organization)
+			}
+			orgs[r.Organization] = true
 			switch r.Name {
-			// TODO: add SuperAdmin
-			case ViewerRoleName, EditorRoleName, AdminRoleName:
+			case roles.MemberRoleName, roles.ViewerRoleName, roles.EditorRoleName, roles.AdminRoleName:
 				continue
 			default:
-				return fmt.Errorf("Unknown role %s. Valid roles are 'viewer', 'editor', 'admin', and 'superadmin'", r.Name)
+				return fmt.Errorf("Unknown role %s. Valid roles are 'member', 'viewer', 'editor', and 'admin'", r.Name)
 			}
 		}
 	}
@@ -62,12 +76,13 @@ func (r *userRequest) ValidRoles() error {
 }
 
 type userResponse struct {
-	Links    selfLinks         `json:"links"`
-	ID       uint64            `json:"id,string"`
-	Name     string            `json:"name"`
-	Provider string            `json:"provider"`
-	Scheme   string            `json:"scheme"`
-	Roles    []chronograf.Role `json:"roles"`
+	Links      selfLinks         `json:"links"`
+	ID         uint64            `json:"id,string"`
+	Name       string            `json:"name"`
+	Provider   string            `json:"provider"`
+	Scheme     string            `json:"scheme"`
+	SuperAdmin bool              `json:"superAdmin"`
+	Roles      []chronograf.Role `json:"roles"`
 }
 
 func newUserResponse(u *chronograf.User) *userResponse {
@@ -78,11 +93,12 @@ func newUserResponse(u *chronograf.User) *userResponse {
 		u.Roles = []chronograf.Role{}
 	}
 	return &userResponse{
-		ID:       u.ID,
-		Name:     u.Name,
-		Provider: u.Provider,
-		Scheme:   u.Scheme,
-		Roles:    u.Roles,
+		ID:         u.ID,
+		Name:       u.Name,
+		Provider:   u.Provider,
+		Scheme:     u.Scheme,
+		Roles:      u.Roles,
+		SuperAdmin: u.SuperAdmin,
 		Links: selfLinks{
 			Self: fmt.Sprintf("/chronograf/v1/users/%d", u.ID),
 		},
@@ -110,30 +126,6 @@ func newUsersResponse(users []chronograf.User) *usersResponse {
 	}
 }
 
-// Chronograf User Roles
-const (
-	ViewerRoleName = "viewer"
-	EditorRoleName = "editor"
-	AdminRoleName  = "admin"
-)
-
-var (
-	// ViewerRole is the role for a user who can only perform READ operations on Dashboards, Rules, and Sources
-	ViewerRole = chronograf.Role{
-		Name: ViewerRoleName,
-	}
-
-	// EditorRole is the role for a user who can perform READ and WRITE operations on Dashboards, Rules, and Sources
-	EditorRole = chronograf.Role{
-		Name: EditorRoleName,
-	}
-
-	// AdminRole is the role for a user who can perform READ and WRITE operations on Dashboards, Rules, Sources, and Users
-	AdminRole = chronograf.Role{
-		Name: AdminRoleName,
-	}
-)
-
 // UserID retrieves a Chronograf user with ID from store
 func (s *Service) UserID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -144,7 +136,7 @@ func (s *Service) UserID(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusBadRequest, fmt.Sprintf("invalid user id: %s", err.Error()), s.Logger)
 		return
 	}
-	user, err := s.UsersStore.Get(ctx, chronograf.UserQuery{ID: &id})
+	user, err := s.Store.Users(ctx).Get(ctx, chronograf.UserQuery{ID: &id})
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return
@@ -175,7 +167,12 @@ func (s *Service) NewUser(w http.ResponseWriter, r *http.Request) {
 		Roles:    req.Roles,
 	}
 
-	res, err := s.UsersStore.Add(ctx, user)
+	if err := setSuperAdmin(ctx, req, user); err != nil {
+		Error(w, http.StatusUnauthorized, err.Error(), s.Logger)
+		return
+	}
+
+	res, err := s.Store.Users(ctx).Add(ctx, user)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return
@@ -196,12 +193,23 @@ func (s *Service) RemoveUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := s.UsersStore.Get(ctx, chronograf.UserQuery{ID: &id})
+	u, err := s.Store.Users(ctx).Get(ctx, chronograf.UserQuery{ID: &id})
 	if err != nil {
 		Error(w, http.StatusNotFound, err.Error(), s.Logger)
+		return
 	}
-	if err := s.UsersStore.Delete(ctx, u); err != nil {
+	ctxUser, ok := hasUserContext(ctx)
+	if !ok {
+		Error(w, http.StatusBadRequest, "failed to retrieve user from context", s.Logger)
+		return
+	}
+	if ctxUser.ID == u.ID {
+		Error(w, http.StatusForbidden, "user cannot delete themselves", s.Logger)
+		return
+	}
+	if err := s.Store.Users(ctx).Delete(ctx, u); err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
@@ -228,25 +236,21 @@ func (s *Service) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := s.UsersStore.Get(ctx, chronograf.UserQuery{ID: &id})
+	u, err := s.Store.Users(ctx).Get(ctx, chronograf.UserQuery{ID: &id})
 	if err != nil {
 		Error(w, http.StatusNotFound, err.Error(), s.Logger)
+		return
 	}
 
-	if req.Name != "" {
-		u.Name = req.Name
-	}
-	if req.Provider != "" {
-		u.Provider = req.Provider
-	}
-	if req.Scheme != "" {
-		u.Scheme = req.Scheme
-	}
-	if req.Roles != nil {
-		u.Roles = req.Roles
+	// ValidUpdate should ensure that req.Roles is not nil
+	u.Roles = req.Roles
+
+	if err := setSuperAdmin(ctx, req, u); err != nil {
+		Error(w, http.StatusUnauthorized, err.Error(), s.Logger)
+		return
 	}
 
-	err = s.UsersStore.Update(ctx, u)
+	err = s.Store.Users(ctx).Update(ctx, u)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return
@@ -261,7 +265,7 @@ func (s *Service) UpdateUser(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Users(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	users, err := s.UsersStore.All(ctx)
+	users, err := s.Store.Users(ctx).All(ctx)
 	if err != nil {
 		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return
@@ -269,4 +273,22 @@ func (s *Service) Users(w http.ResponseWriter, r *http.Request) {
 
 	res := newUsersResponse(users)
 	encodeJSON(w, http.StatusOK, res, s.Logger)
+}
+
+func setSuperAdmin(ctx context.Context, req userRequest, user *chronograf.User) error {
+	// Only allow users to set SuperAdmin if they have the superadmin context
+	// TODO(desa): Refactor this https://github.com/influxdata/chronograf/issues/2207
+	if isSuperAdmin := hasSuperAdminContext(ctx); isSuperAdmin {
+		user.SuperAdmin = req.SuperAdmin
+	} else if !isSuperAdmin && (req.SuperAdmin == true) {
+		// If req.SuperAdmin has been set, and the request was not made with the SuperAdmin
+		// context, return error
+		//
+		// Even though req.SuperAdmin == true is logically equivalent to req.SuperAdmin it is
+		// more clear that this code should only be ran in the case that a user is trying to
+		// set the SuperAdmin field.
+		return fmt.Errorf("Cannot set SuperAdmin")
+	}
+
+	return nil
 }

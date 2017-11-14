@@ -6,27 +6,22 @@ import * as adminChronografActionCreators from 'src/admin/actions/chronograf'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
 import OrganizationsTable from 'src/admin/components/chronograf/OrganizationsTable'
-import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 class OrganizationsPage extends Component {
-  constructor(props) {
-    super(props)
-  }
-
   componentDidMount() {
     const {links, actions: {loadOrganizationsAsync}} = this.props
 
     loadOrganizationsAsync(links.organizations)
   }
 
-  handleCreateOrganization = organizationName => {
+  handleCreateOrganization = organization => {
     const {links, actions: {createOrganizationAsync}} = this.props
-    createOrganizationAsync(links.organizations, {name: organizationName})
+    createOrganizationAsync(links.organizations, organization)
   }
 
   handleRenameOrganization = (organization, name) => {
-    const {actions: {renameOrganizationAsync}} = this.props
-    renameOrganizationAsync(organization, {...organization, name})
+    const {actions: {updateOrganizationAsync}} = this.props
+    updateOrganizationAsync(organization, {...organization, name})
   }
 
   handleDeleteOrganization = organization => {
@@ -34,29 +29,31 @@ class OrganizationsPage extends Component {
     deleteOrganizationAsync(organization)
   }
 
+  handleTogglePublic = organization => {
+    const {actions: {updateOrganizationAsync}} = this.props
+    updateOrganizationAsync(organization, {
+      ...organization,
+      public: !organization.public,
+    })
+  }
+
+  handleChooseDefaultRole = (organization, defaultRole) => {
+    const {actions: {updateOrganizationAsync}} = this.props
+    updateOrganizationAsync(organization, {...organization, defaultRole})
+  }
+
   render() {
     const {organizations} = this.props
 
     return (
-      <div className="page">
-        <div className="page-header">
-          <div className="page-header__container">
-            <div className="page-header__left">
-              <h1 className="page-header__title">Admin</h1>
-            </div>
-          </div>
-        </div>
-        <FancyScrollbar className="page-contents">
-          {organizations
-            ? <OrganizationsTable
-                organizations={organizations}
-                onCreateOrg={this.handleCreateOrganization}
-                onDeleteOrg={this.handleDeleteOrganization}
-                onRenameOrg={this.handleRenameOrganization}
-              />
-            : <div className="page-spinner" />}
-        </FancyScrollbar>
-      </div>
+      <OrganizationsTable
+        organizations={organizations}
+        onCreateOrg={this.handleCreateOrganization}
+        onDeleteOrg={this.handleDeleteOrganization}
+        onRenameOrg={this.handleRenameOrganization}
+        onTogglePublic={this.handleTogglePublic}
+        onChooseDefaultRole={this.handleChooseDefaultRole}
+      />
     )
   }
 }
@@ -77,7 +74,7 @@ OrganizationsPage.propTypes = {
   actions: shape({
     loadOrganizationsAsync: func.isRequired,
     createOrganizationAsync: func.isRequired,
-    renameOrganizationAsync: func.isRequired,
+    updateOrganizationAsync: func.isRequired,
     deleteOrganizationAsync: func.isRequired,
   }),
   notify: func.isRequired,

@@ -6,7 +6,7 @@ import Dropdown from 'shared/components/Dropdown'
 import {USER_ROLES} from 'src/admin/constants/dummyUsers'
 import {MEMBER_ROLE} from 'src/auth/Authorized'
 
-class Organization extends Component {
+class OrganizationsTableRowNew extends Component {
   constructor(props) {
     super(props)
 
@@ -21,11 +21,9 @@ class Organization extends Component {
 
     if (e.key === 'Escape') {
       onCancelCreateOrganization()
-      this.inputRef.blur()
     }
     if (e.key === 'Enter') {
       this.handleClickSave()
-      this.inputRef.blur()
     }
   }
 
@@ -38,11 +36,10 @@ class Organization extends Component {
   }
 
   handleClickSave = () => {
-    const {onCancelCreateOrganization, onCreateOrganization} = this.props
+    const {onCreateOrganization} = this.props
     const {name, defaultRole} = this.state
 
-    onCreateOrganization(name, defaultRole)
-    onCancelCreateOrganization()
+    onCreateOrganization({name, defaultRole})
   }
 
   handleChooseDefaultRole = role => {
@@ -55,7 +52,7 @@ class Organization extends Component {
 
     const isSaveDisabled = name === null || name === ''
 
-    const defaultRoleItems = USER_ROLES.map(role => ({
+    const dropdownRolesItems = USER_ROLES.map(role => ({
       ...role,
       text: role.name,
     }))
@@ -76,7 +73,7 @@ class Organization extends Component {
         />
         <div className="orgs-table--default-role editing">
           <Dropdown
-            items={defaultRoleItems}
+            items={dropdownRolesItems}
             onChoose={this.handleChooseDefaultRole}
             selected={defaultRole}
             className="dropdown-stretch"
@@ -86,6 +83,7 @@ class Organization extends Component {
           disabled={isSaveDisabled}
           onCancel={onCancelCreateOrganization}
           onConfirm={this.handleClickSave}
+          confirmLeft={true}
         />
       </div>
     )
@@ -94,9 +92,9 @@ class Organization extends Component {
 
 const {func} = PropTypes
 
-Organization.propTypes = {
+OrganizationsTableRowNew.propTypes = {
   onCreateOrganization: func.isRequired,
   onCancelCreateOrganization: func.isRequired,
 }
 
-export default Organization
+export default OrganizationsTableRowNew

@@ -4,18 +4,15 @@ import ConfirmButtons from 'shared/components/ConfirmButtons'
 import Dropdown from 'shared/components/Dropdown'
 
 import {USER_ROLES} from 'src/admin/constants/dummyUsers'
-import {MEMBER_ROLE} from 'src/auth/Authorized'
 
-class Organization extends Component {
+class OrganizationsTableRow extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      reset: false,
       isEditing: false,
       isDeleting: false,
       workingName: this.props.organization.name,
-      defaultRole: MEMBER_ROLE,
     }
   }
 
@@ -23,25 +20,43 @@ class Organization extends Component {
     this.setState({isEditing: true})
   }
 
-  handleInputBlur = reset => e => {
+  handleConfirmRename = () => {
     const {onRename, organization} = this.props
+    const {workingName} = this.state
 
-    if (!reset && organization.name !== e.target.value) {
-      onRename(organization, e.target.value)
+    onRename(organization, workingName)
+    this.setState({workingName, isEditing: false})
+  }
+
+  handleCancelRename = () => {
+    const {organization} = this.props
+
+    this.setState({
+      workingName: organization.name,
+      isEditing: false,
+    })
+  }
+
+  handleInputChange = e => {
+    this.setState({workingName: e.target.value})
+  }
+
+  handleInputBlur = () => {
+    const {organization} = this.props
+    const {workingName} = this.state
+
+    if (organization.name === workingName) {
+      this.handleCancelRename()
+    } else {
+      this.handleConfirmRename()
     }
-
-    this.setState({reset: false, isEditing: false})
   }
 
   handleKeyDown = e => {
     if (e.key === 'Enter') {
-      this.inputRef.blur()
-    }
-    if (e.key === 'Escape') {
-      this.setState(
-        {reset: true, workingName: this.props.organization.name},
-        () => this.inputRef.blur()
-      )
+      this.handleInputBlur()
+    } else if (e.key === 'Escape') {
+      this.handleCancelRename()
     }
   }
 
@@ -59,19 +74,19 @@ class Organization extends Component {
 
   handleDeleteOrg = organization => {
     const {onDelete} = this.props
-    this.setState({isDeleting: false})
     onDelete(organization)
   }
 
   handleChooseDefaultRole = role => {
-    this.setState({defaultRole: role.name})
+    const {organization, onChooseDefaultRole} = this.props
+    onChooseDefaultRole(organization, role.name)
   }
 
   render() {
-    const {workingName, reset, isEditing, isDeleting, defaultRole} = this.state
+    const {workingName, isEditing, isDeleting} = this.state
     const {organization} = this.props
 
-    const defaultRoleItems = USER_ROLES.map(role => ({
+    const dropdownRolesItems = USER_ROLES.map(role => ({
       ...role,
       text: role.name,
     }))
@@ -90,7 +105,8 @@ class Organization extends Component {
               type="text"
               className="form-control input-sm orgs-table--input"
               defaultValue={workingName}
-              onBlur={this.handleInputBlur(reset)}
+              onChange={this.handleInputChange}
+              onBlur={this.handleInputBlur}
               onKeyDown={this.handleKeyDown}
               placeholder="Name this Organization..."
               autoFocus={true}
@@ -101,11 +117,12 @@ class Organization extends Component {
               {workingName}
               <span className="icon pencil" />
             </div>}
+        <div className="orgs-table--public disabled">&mdash;</div>
         <div className={defaultRoleClassName}>
           <Dropdown
-            items={defaultRoleItems}
+            items={dropdownRolesItems}
             onChoose={this.handleChooseDefaultRole}
-            selected={defaultRole}
+            selected={organization.defaultRole}
             className="dropdown-stretch"
           />
         </div>
@@ -115,6 +132,7 @@ class Organization extends Component {
               onCancel={this.handleDismissDeleteConfirmation}
               onConfirm={this.handleDeleteOrg}
               onClickOutside={this.handleDismissDeleteConfirmation}
+              confirmLeft={true}
             />
           : <button
               className="btn btn-sm btn-default btn-square"
@@ -129,13 +147,15 @@ class Organization extends Component {
 
 const {func, shape, string} = PropTypes
 
-Organization.propTypes = {
+OrganizationsTableRow.propTypes = {
   organization: shape({
     id: string, // when optimistically created, organization will not have an id
     name: string.isRequired,
+    defaultRole: string.isRequired,
   }).isRequired,
   onDelete: func.isRequired,
   onRename: func.isRequired,
+  onChooseDefaultRole: func.isRequired,
 }
 
-export default Organization
+export default OrganizationsTableRow

@@ -23,20 +23,24 @@ func TestSourceStore(t *testing.T) {
 
 	srcs := []chronograf.Source{
 		chronograf.Source{
-			Name:     "Of Truth",
-			Type:     "influx",
-			Username: "marty",
-			Password: "I❤️  jennifer parker",
-			URL:      "toyota-hilux.lyon-estates.local",
-			Default:  true,
+			Name:         "Of Truth",
+			Type:         "influx",
+			Username:     "marty",
+			Password:     "I❤️  jennifer parker",
+			URL:          "toyota-hilux.lyon-estates.local",
+			Default:      true,
+			Organization: "1337",
+			Role:         "member",
 		},
 		chronograf.Source{
-			Name:     "HipToBeSquare",
-			Type:     "influx",
-			Username: "calvinklein",
-			Password: "chuck b3rry",
-			URL:      "toyota-hilux.lyon-estates.local",
-			Default:  true,
+			Name:         "HipToBeSquare",
+			Type:         "influx",
+			Username:     "calvinklein",
+			Password:     "chuck b3rry",
+			URL:          "toyota-hilux.lyon-estates.local",
+			Default:      true,
+			Organization: "1337",
+			Role:         "admin",
 		},
 		chronograf.Source{
 			Name:               "HipToBeSquare",
@@ -46,6 +50,8 @@ func TestSourceStore(t *testing.T) {
 			URL:                "https://toyota-hilux.lyon-estates.local",
 			InsecureSkipVerify: true,
 			Default:            false,
+			Organization:       "1337",
+			Role:               "viewer",
 		},
 	}
 
@@ -95,12 +101,13 @@ func TestSourceStore(t *testing.T) {
 
 	// Attempt to add a new default source
 	srcs = append(srcs, chronograf.Source{
-		Name:     "Biff Tannen",
-		Type:     "influx",
-		Username: "HELLO",
-		Password: "MCFLY",
-		URL:      "anybody.in.there.local",
-		Default:  true,
+		Name:         "Biff Tannen",
+		Type:         "influx",
+		Username:     "HELLO",
+		Password:     "MCFLY",
+		URL:          "anybody.in.there.local",
+		Default:      true,
+		Organization: "1892",
 	})
 
 	srcs[3] = mustAddSource(t, s, srcs[3])
@@ -153,12 +160,13 @@ func TestSourceStore(t *testing.T) {
 	// Try to add one source as a non-default and ensure that it becomes a
 	// default
 	src := mustAddSource(t, s, chronograf.Source{
-		Name:     "Biff Tannen",
-		Type:     "influx",
-		Username: "HELLO",
-		Password: "MCFLY",
-		URL:      "anybody.in.there.local",
-		Default:  false,
+		Name:         "Biff Tannen",
+		Type:         "influx",
+		Username:     "HELLO",
+		Password:     "MCFLY",
+		URL:          "anybody.in.there.local",
+		Default:      false,
+		Organization: "1234",
 	})
 
 	if actual, err := s.Get(ctx, src.ID); err != nil {

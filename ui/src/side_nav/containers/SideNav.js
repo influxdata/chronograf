@@ -88,14 +88,6 @@ const SideNav = React.createClass({
               <span className="sidebar--icon icon cubo-uniform" />
             </Link>
           </div>
-          {isUsingAuth
-            ? <UserNavBlock
-                logoutLink={logoutLink}
-                links={links}
-                me={me}
-                sourcePrefix={sourcePrefix}
-              />
-            : null}
           <NavBlock
             icon="cubo-node"
             link={`${sourcePrefix}/hosts`}
@@ -150,16 +142,21 @@ const SideNav = React.createClass({
           >
             <NavBlock
               icon="crown2"
-              link={`${sourcePrefix}/admin-influxdb`}
+              link={`${sourcePrefix}/admin-chronograf`}
               location={location}
             >
               <NavHeader
-                link={`${sourcePrefix}/admin-influxdb`}
-                title="InfluxDB Admin"
+                link={`${sourcePrefix}/admin-chronograf`}
+                title="Admin"
               />
+              <NavListItem link={`${sourcePrefix}/admin-chronograf`}>
+                Chronograf
+              </NavListItem>
+              <NavListItem link={`${sourcePrefix}/admin-influxdb`}>
+                InfluxDB
+              </NavListItem>
             </NavBlock>
           </Authorized>
-
           <NavBlock
             icon="cog-thick"
             link={`${sourcePrefix}/manage-sources`}
@@ -170,6 +167,14 @@ const SideNav = React.createClass({
               title="Configuration"
             />
           </NavBlock>
+          {isUsingAuth
+            ? <UserNavBlock
+                logoutLink={logoutLink}
+                links={links}
+                me={me}
+                sourcePrefix={sourcePrefix}
+              />
+            : null}
         </NavBar>
   },
 })

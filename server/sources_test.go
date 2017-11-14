@@ -11,10 +11,215 @@ import (
 	"testing"
 
 	"github.com/bouk/httprouter"
+	"github.com/google/go-cmp/cmp"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/mocks"
+	"github.com/influxdata/chronograf/roles"
 )
+
+func Test_ValidSourceRequest(t *testing.T) {
+	type args struct {
+		source       *chronograf.Source
+		defaultOrgID string
+	}
+	type wants struct {
+		err    error
+		source *chronograf.Source
+	}
+	tests := []struct {
+		name  string
+		args  args
+		wants wants
+	}{
+		{
+			name: "nil source",
+			args: args{},
+			wants: wants{
+				err: fmt.Errorf("source must be non-nil"),
+			},
+		},
+		{
+			name: "missing url",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDB,
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+					Organization:       "0",
+					Role:               roles.ViewerRoleName,
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("url required"),
+			},
+		},
+		{
+			name: "invalid source type",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               "non-existent-type",
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+					Organization:       "0",
+					Role:               roles.ViewerRoleName,
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("invalid source type non-existent-type"),
+			},
+		},
+		{
+			name: "set organization to be default org if not specified",
+			args: args{
+				defaultOrgID: "2",
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDB,
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+					Role:               roles.ViewerRoleName,
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDB,
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Organization:       "2",
+					Telegraf:           "telegraf",
+					Role:               roles.ViewerRoleName,
+				},
+			},
+		},
+		{
+			name: "bad url",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDB,
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					URL:                "im a bad url",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Organization:       "0",
+					Default:            true,
+					Telegraf:           "telegraf",
+					Role:               roles.ViewerRoleName,
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("invalid source URI: parse im a bad url: invalid URI for request"),
+			},
+		},
+		{
+			name: "set Role to be viewer if not specified",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDB,
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+					Organization:       "0",
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDB,
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Organization:       "0",
+					Telegraf:           "telegraf",
+					Role:               roles.ViewerRoleName,
+				},
+			},
+		},
+		{
+			name: "bad role type",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDB,
+					Username:           "fancy",
+					Password:           "i'm so",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+					Organization:       "0",
+					Role:               "superperson",
+				},
+			},
+			wants: wants{
+				err: fmt.Errorf("Unknown role superperson. Valid roles are 'viewer', 'editor', and 'admin'"),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidSourceRequest(tt.args.source, tt.args.defaultOrgID)
+			if err == nil && tt.wants.err == nil {
+				if diff := cmp.Diff(tt.args.source, tt.wants.source); diff != "" {
+					t.Errorf("%q. ValidSourceRequest():\n-got/+want\ndiff %s", tt.name, diff)
+				}
+				return
+			}
+			if err.Error() != tt.wants.err.Error() {
+				t.Errorf("%q. ValidSourceRequest() = %q, want %q", tt.name, err, tt.wants.err)
+			}
+		})
+	}
+}
 
 func Test_newSourceResponse(t *testing.T) {
 	tests := []struct {
@@ -239,9 +444,11 @@ func TestService_newSourceKapacitor(t *testing.T) {
 			srcCount = 0
 			srvCount = 0
 			h := &Service{
-				SourcesStore: tt.fields.SourcesStore,
-				ServersStore: tt.fields.ServersStore,
-				Logger:       tt.fields.Logger,
+				Store: &mocks.Store{
+					SourcesStore: tt.fields.SourcesStore,
+					ServersStore: tt.fields.ServersStore,
+				},
+				Logger: tt.fields.Logger,
 			}
 			if err := h.newSourceKapacitor(tt.args.ctx, tt.args.src, tt.args.kapa); (err != nil) != tt.wantErr {
 				t.Errorf("Service.newSourceKapacitor() error = %v, wantErr %v", err, tt.wantErr)
@@ -535,7 +742,9 @@ func TestService_NewSourceUser(t *testing.T) {
 			}))
 
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 			UseAuth:          tt.fields.UseAuth,
@@ -702,7 +911,9 @@ func TestService_SourceUsers(t *testing.T) {
 				},
 			}))
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 			UseAuth:          tt.fields.UseAuth,
@@ -867,7 +1078,9 @@ func TestService_SourceUserID(t *testing.T) {
 				},
 			}))
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 			UseAuth:          tt.fields.UseAuth,
@@ -962,7 +1175,9 @@ func TestService_RemoveSourceUser(t *testing.T) {
 				},
 			}))
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 			UseAuth:          tt.fields.UseAuth,
@@ -1144,7 +1359,9 @@ func TestService_UpdateSourceUser(t *testing.T) {
 				},
 			}))
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 			UseAuth:          tt.fields.UseAuth,
@@ -1367,7 +1584,9 @@ func TestService_NewSourceRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 		}
@@ -1480,7 +1699,9 @@ func TestService_UpdateSourceRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 		}
@@ -1603,7 +1824,9 @@ func TestService_SourceRoleID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 		}
@@ -1699,7 +1922,9 @@ func TestService_RemoveSourceRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 		}
@@ -1811,7 +2036,9 @@ func TestService_SourceRoles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		h := &Service{
-			SourcesStore:     tt.fields.SourcesStore,
+			Store: &mocks.Store{
+				SourcesStore: tt.fields.SourcesStore,
+			},
 			TimeSeriesClient: tt.fields.TimeSeries,
 			Logger:           tt.fields.Logger,
 		}

@@ -4,51 +4,31 @@ import Authorized, {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
 import Dropdown from 'shared/components/Dropdown'
 import SlideToggle from 'shared/components/SlideToggle'
+import DeleteConfirmTableCell from 'shared/components/DeleteConfirmTableCell'
 
 import {USER_ROLES} from 'src/admin/constants/dummyUsers'
 import {USERS_TABLE} from 'src/admin/constants/chronografTableSizing'
 
-const OrgTableRow = ({
+const UsersTableRow = ({
   user,
   organization,
-  onToggleUserSelected,
-  selectedUsers,
-  isSameUser,
   onChangeUserRole,
   onChangeSuperAdmin,
+  onDelete,
 }) => {
-  const {
-    colRole,
-    colSuperAdmin,
-    colProvider,
-    colScheme,
-    colActions,
-  } = USERS_TABLE
+  const {colRole, colSuperAdmin, colProvider, colScheme} = USERS_TABLE
 
-  const isSelected = selectedUsers.find(u => isSameUser(user, u))
-
+  const dropdownRolesItems = USER_ROLES.map(r => ({
+    ...r,
+    text: r.name,
+  }))
   const currentRole = user.roles.find(
     role => role.organization === organization.id
   )
 
   return (
-    <tr
-      className={
-        isSelected
-          ? 'chronograf-admin-table--user selected'
-          : 'chronograf-admin-table--user'
-      }
-    >
-      <td
-        onClick={onToggleUserSelected(user)}
-        className="chronograf-admin-table--check-col chronograf-admin-table--selectable"
-      >
-        <div className="user-checkbox" />
-      </td>
-      <td
-        onClick={onToggleUserSelected(user)}
-        className="chronograf-admin-table--selectable"
-      >
+    <tr className={'chronograf-admin-table--user'}>
+      <td>
         <strong>
           {user.name}
         </strong>
@@ -56,10 +36,7 @@ const OrgTableRow = ({
       <td style={{width: colRole}}>
         <span className="chronograf-user--role">
           <Dropdown
-            items={USER_ROLES.map(r => ({
-              ...r,
-              text: r.name,
-            }))}
+            items={dropdownRolesItems}
             selected={currentRole.name}
             onChoose={onChangeUserRole(user, currentRole)}
             buttonColor="btn-primary"
@@ -72,7 +49,7 @@ const OrgTableRow = ({
         <td style={{width: colSuperAdmin}} className="text-center">
           <SlideToggle
             active={user.superAdmin}
-            onToggle={onChangeSuperAdmin(user, user.superAdmin)}
+            onToggle={onChangeSuperAdmin(user)}
             size="xs"
           />
         </td>
@@ -83,24 +60,27 @@ const OrgTableRow = ({
       <td style={{width: colScheme}}>
         {user.scheme}
       </td>
-      <td className="text-right" style={{width: colActions}} />
+      <DeleteConfirmTableCell
+        text="Remove"
+        onDelete={onDelete}
+        item={user}
+        buttonSize="btn-xs"
+      />
     </tr>
   )
 }
 
-const {arrayOf, func, shape, string} = PropTypes
+const {func, shape, string} = PropTypes
 
-OrgTableRow.propTypes = {
+UsersTableRow.propTypes = {
   user: shape(),
   organization: shape({
     name: string.isRequired,
     id: string.isRequired,
   }),
-  onToggleUserSelected: func.isRequired,
-  selectedUsers: arrayOf(shape()),
-  isSameUser: func.isRequired,
   onChangeUserRole: func.isRequired,
   onChangeSuperAdmin: func.isRequired,
+  onDelete: func.isRequired,
 }
 
-export default OrgTableRow
+export default UsersTableRow

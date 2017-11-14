@@ -13,7 +13,7 @@ import (
 var _ chronograf.UsersStore = &UsersStore{}
 
 // UsersBucket is used to store users local to chronograf
-var UsersBucket = []byte("UsersV1")
+var UsersBucket = []byte("UsersV2")
 
 // UsersStore uses bolt to store and retrieve users
 type UsersStore struct {
@@ -82,8 +82,35 @@ func (s *UsersStore) Get(ctx context.Context, q chronograf.UserQuery) (*chronogr
 	return nil, fmt.Errorf("must specify either ID, or Name, Provider, and Scheme in UserQuery")
 }
 
-// Add a new Users in the UsersStore.
+func (s *UsersStore) userExists(ctx context.Context, u *chronograf.User) (bool, error) {
+	_, err := s.Get(ctx, chronograf.UserQuery{
+		Name:     &u.Name,
+		Provider: &u.Provider,
+		Scheme:   &u.Scheme,
+	})
+	if err == chronograf.ErrUserNotFound {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// Add a new User to the UsersStore.
 func (s *UsersStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.User, error) {
+	if u == nil {
+		return nil, fmt.Errorf("user provided is nil")
+	}
+	userExists, err := s.userExists(ctx, u)
+	if err != nil {
+		return nil, err
+	}
+	if userExists {
+		return nil, chronograf.ErrUserAlreadyExists
+	}
 	if err := s.client.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(UsersBucket)
 		seq, err := b.NextSequence()
@@ -104,7 +131,7 @@ func (s *UsersStore) Add(ctx context.Context, u *chronograf.User) (*chronograf.U
 	return u, nil
 }
 
-// Delete the users from the UsersStore
+// Delete a user from the UsersStore
 func (s *UsersStore) Delete(ctx context.Context, usr *chronograf.User) error {
 	_, err := s.get(ctx, usr.ID)
 	if err != nil {
