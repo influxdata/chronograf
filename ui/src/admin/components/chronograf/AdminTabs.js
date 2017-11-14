@@ -8,10 +8,12 @@ import {
 
 import {Tab, Tabs, TabPanel, TabPanels, TabList} from 'shared/components/Tabs'
 import OrganizationsPage from 'src/admin/containers/OrganizationsPage'
+import ProvidersPage from 'src/admin/containers/ProvidersPage'
 import UsersTable from 'src/admin/components/chronograf/UsersTable'
 
 const ORGANIZATIONS_TAB_NAME = 'Organizations'
 const USERS_TAB_NAME = 'Users'
+const PROVIDERS_TAB_NAME = 'Providers'
 
 const AdminTabs = ({
   meRole,
@@ -42,6 +44,11 @@ const AdminTabs = ({
           onDeleteUser={onDeleteUser}
         />
       ),
+    },
+    {
+      requiredRole: SUPERADMIN_ROLE,
+      type: PROVIDERS_TAB_NAME,
+      component: <ProvidersPage />,
     },
   ].filter(t => isUserAuthorized(meRole, t.requiredRole))
 
