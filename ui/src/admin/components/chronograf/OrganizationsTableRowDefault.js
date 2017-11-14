@@ -26,21 +26,23 @@ class OrganizationsTableRowDefault extends Component {
     }))
 
     return (
-      <div className="orgs-table--org">
-        <div className="orgs-table--id">
+      <div className="fancytable--row">
+        <div className="fancytable--td orgs-table--id">
           {organization.id}
         </div>
-        <div className="orgs-table--name-disabled">
+        <div className="fancytable--td orgs-table--name">
           {organization.name}
         </div>
-        <div className="orgs-table--public">
-          <SlideToggle
-            size="xs"
-            active={organization.public}
-            onToggle={this.togglePublic}
-          />
+        <div className="fancytable--td orgs-table--public">
+          <div className="orgs-table--public-toggle">
+            <SlideToggle
+              size="xs"
+              active={organization.public}
+              onToggle={this.togglePublic}
+            />
+          </div>
         </div>
-        <div className="orgs-table--default-role">
+        <div className="fancytable--td orgs-table--default-role">
           <Dropdown
             items={dropdownRolesItems}
             onChoose={this.handleChooseDefaultRole}
