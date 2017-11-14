@@ -1,9 +1,10 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
+import {bindActionCreators, compose} from 'redux'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {withRouter} from 'react-router-dom'
 import * as _ from 'lodash'
 import * as classnames from 'classnames'
+import * as qs from 'query-string'
 
 import Dygraph from 'external/dygraph'
 
@@ -23,61 +24,34 @@ import {fetchLayouts} from 'shared/apis'
 
 import {setAutoRefresh} from 'shared/actions/app'
 import {presentationButtonDispatcher} from 'shared/dispatchers'
+import {
+  Source,
+  Location,
+  AutoRefresh,
+  ManualRefresh as ManualRefreshType,
+  RouterHostID,
+} from 'src/types'
 
-class HostPage extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      layouts: [],
-      hosts: {},
-      timeRange: timeRanges.find(tr => tr.lower === 'now() - 1h'),
-      dygraphs: [],
-    }
+export interface HostPageProps {
+  source: Source
+  location: Location
+  inPresentationMode: boolean
+  autoRefresh: AutoRefresh
+  manualRefresh: ManualRefreshType
+  onManualRefresh: (num: number) => void
+  handleChooseAutoRefresh: () => void
+  handleClickPresentationButton: () => void
+}
+
+class HostPage extends React.Component<HostPageProps & RouterHostID> {
+  public state = {
+    layouts: [],
+    hosts: {},
+    timeRange: timeRanges.find(tr => tr.lower === 'now() - 1h'),
+    dygraphs: [],
   }
 
-  async componentDidMount() {
-    const {source, params, location} = this.props
-
-    // fetching layouts and mappings can be done at the same time
-    const {data: {layouts}} = await fetchLayouts()
-    const {data: {mappings}} = await getMappings()
-    const hosts = await getAllHosts(source.links.proxy, source.telegraf)
-    const newHosts = await getAppsForHosts(
-      source.links.proxy,
-      hosts,
-      mappings,
-      source.telegraf
-    )
-
-    const measurements = await getMeasurementsForHost(source, params.hostID)
-
-    const host = newHosts[this.props.params.hostID]
-    const focusedApp = location.query.app
-
-    const filteredLayouts = layouts.filter(layout => {
-      if (focusedApp) {
-        return layout.app === focusedApp
-      }
-
-      return (
-        host.apps &&
-        host.apps.includes(layout.app) &&
-        measurements.includes(layout.measurement)
-      )
-    })
-
-    // only display hosts in the list if they match the current app
-    let filteredHosts = hosts
-    if (focusedApp) {
-      filteredHosts = _.pickBy(hosts, (val, __, ___) => {
-        return val.apps.includes(focusedApp)
-      })
-    }
-
-    this.setState({layouts: filteredLayouts, hosts: filteredHosts}) // eslint-disable-line react/no-did-mount-set-state
-  }
-
-  handleChooseTimeRange = ({lower, upper}) => {
+  private handleChooseTimeRange = ({lower, upper}) => {
     if (upper) {
       this.setState({timeRange: {lower, upper}})
     } else {
@@ -86,7 +60,7 @@ class HostPage extends React.Component {
     }
   }
 
-  synchronizer = dygraph => {
+  private synchronizer = dygraph => {
     const dygraphs = [...this.state.dygraphs, dygraph].filter(d => d.graphDiv)
     const numGraphs = this.state.layouts.reduce((acc, {cells}) => {
       return acc + cells.length
@@ -102,9 +76,9 @@ class HostPage extends React.Component {
     this.setState({dygraphs})
   }
 
-  renderLayouts = layouts => {
+  private renderLayouts = layouts => {
     const {timeRange} = this.state
-    const {source, autoRefresh, manualRefresh} = this.props
+    const {source, autoRefresh, manualRefresh, match} = this.props
 
     const autoflowLayouts = layouts.filter(layout => !!layout.autoflow)
 
@@ -116,15 +90,16 @@ class HostPage extends React.Component {
     const autoflowCells = autoflowLayouts.reduce((allCells, layout) => {
       return allCells.concat(
         layout.cells.map(cell => {
-          const x = cellCount * cellWidth % pageWidth
+          const x = (cellCount * cellWidth) % pageWidth
           const y = Math.floor(cellCount * cellWidth / pageWidth) * cellHeight
           cellCount += 1
-          return Object.assign(cell, {
+          return {
+            ...cell,
             w: cellWidth,
             h: cellHeight,
             x,
             y,
-          })
+          }
         })
       )
     }, [])
@@ -158,17 +133,63 @@ class HostPage extends React.Component {
         timeRange={timeRange}
         autoRefresh={autoRefresh}
         manualRefresh={manualRefresh}
-        host={this.props.params.hostID}
+        host={match.params.hostID}
         synchronizer={this.synchronizer}
       />
     )
   }
 
-  render() {
+  public async componentDidMount() {
+    const {source, match, location} = this.props
+
+    // fetching layouts and mappings can be done at the same time
+    const {data: {layouts}} = await fetchLayouts()
+    const {data: {mappings}} = await getMappings()
+    const hosts = await getAllHosts(source.links.proxy, source.telegraf)
+    const newHosts = await getAppsForHosts(
+      source.links.proxy,
+      hosts,
+      mappings,
+      source.telegraf
+    )
+
+    const measurements = await getMeasurementsForHost(
+      source,
+      match.params.hostID
+    )
+
+    const host = newHosts[this.props.match.params.hostID]
+    const focusedApp = qs.parse(location.search).app
+
+    const filteredLayouts = layouts.filter(layout => {
+      if (focusedApp) {
+        return layout.app === focusedApp
+      }
+
+      return (
+        host.apps &&
+        host.apps.includes(layout.app) &&
+        measurements.includes(layout.measurement)
+      )
+    })
+
+    // only display hosts in the list if they match the current app
+    let filteredHosts = hosts
+    if (focusedApp) {
+      filteredHosts = _.pickBy(hosts, (val, __, ___) => {
+        return val.apps.includes(focusedApp)
+      })
+    }
+
+    this.setState({layouts: filteredLayouts, hosts: filteredHosts}) // eslint-disable-line react/no-did-mount-set-state
+  }
+
+  public render() {
     const {
+      source,
       autoRefresh,
       onManualRefresh,
-      params: {hostID, sourceID},
+      match: {params: {hostID, sourceID}},
       inPresentationMode,
       handleChooseAutoRefresh,
       handleClickPresentationButton,
@@ -183,6 +204,7 @@ class HostPage extends React.Component {
       <div className="page">
         <DashboardHeader
           names={names}
+          source={source}
           timeRange={timeRange}
           activeDashboard={hostID}
           autoRefresh={autoRefresh}
@@ -207,32 +229,6 @@ class HostPage extends React.Component {
   }
 }
 
-const {shape, string, bool, func, number} = PropTypes
-
-HostPage.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-    telegraf: string.isRequired,
-    id: string.isRequired,
-  }),
-  params: shape({
-    hostID: string.isRequired,
-  }).isRequired,
-  location: shape({
-    query: shape({
-      app: string,
-    }),
-  }),
-  inPresentationMode: bool,
-  autoRefresh: number.isRequired,
-  manualRefresh: number.isRequired,
-  onManualRefresh: func.isRequired,
-  handleChooseAutoRefresh: func.isRequired,
-  handleClickPresentationButton: func,
-}
-
 const mapStateToProps = ({
   app: {ephemeral: {inPresentationMode}, persisted: {autoRefresh}},
 }) => ({
@@ -245,6 +241,7 @@ const mapDispatchToProps = dispatch => ({
   handleClickPresentationButton: presentationButtonDispatcher(dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  ManualRefresh(HostPage)
-)
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(ManualRefresh(HostPage))

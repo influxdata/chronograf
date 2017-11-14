@@ -57,7 +57,7 @@ const DashboardHeader: React.SFC<DashboardHeaderProps> = ({
   showTemplateControlBar,
   timeRange: {upper, lower},
   handleClickPresentationButton,
-  zoomedTimeRange: {zoomedLower = null, zoomedUpper = null},
+  zoomedTimeRange = {zoomedLower: null, zoomedUpper: null},
 }) =>
   !isHidden && (
     <div className="page-header full-width">
@@ -116,8 +116,8 @@ const DashboardHeader: React.SFC<DashboardHeaderProps> = ({
           <TimeRangeDropdown
             onChooseTimeRange={handleChooseTimeRange}
             selected={{
-              upper: zoomedUpper || upper,
-              lower: zoomedLower || lower,
+              upper: zoomedTimeRange.zoomedUpper || upper,
+              lower: zoomedTimeRange.zoomedLower || lower,
             }}
           />
           <div

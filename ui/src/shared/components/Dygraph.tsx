@@ -95,10 +95,6 @@ export default class Dygraph extends React.PureComponent<
     legend: {
       x: null,
       series: [],
-      prevLegend: {
-        x: null,
-        series: [],
-      },
     },
     pageX: null,
     sortType: '',
@@ -308,7 +304,7 @@ export default class Dygraph extends React.PureComponent<
       return ''
     }
 
-    const {prevLegend} = this.state.legend
+    const {legend: prevLegend} = this.state
     const highlighted = legend.series.find(s => s.isHighlighted)
     const prevHighlighted = prevLegend.series.find(s => s.isHighlighted)
 

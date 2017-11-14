@@ -6,6 +6,11 @@ import * as FuncTypes from 'src/types/funcs'
 
 export type RouterSourceID = RouteComponentProps<{sourceID: string}>
 
+export type RouterHostID = RouteComponentProps<{
+  sourceID: string
+  hostID: string
+}>
+
 export type Location = Location
 
 export type History = History
@@ -265,7 +270,6 @@ export interface LegendSeries {
 export interface Legend {
   x: number | null
   series: LegendSeries[]
-  prevLegend?: Legend
 }
 
 export type Resolution = number | null
@@ -322,4 +326,7 @@ export interface Rule {}
 
 export interface Dashboard {}
 
-export interface DashboardName {}
+export interface DashboardName {
+  name: string
+  link: string
+}

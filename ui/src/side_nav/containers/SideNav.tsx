@@ -38,7 +38,7 @@ const SideNav: React.SFC<SideNavPropsRouter> = ({
   const isDefaultPage = location.pathname.split('/').includes(DEFAULT_HOME_PAGE)
 
   return (
-    isHidden && (
+    !isHidden && (
       <NavBar location={location}>
         <div
           className={isDefaultPage ? 'sidebar--item active' : 'sidebar--item'}

@@ -1,32 +1,41 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import * as _ from 'lodash'
 import * as classnames from 'classnames'
 import onClickOutside from 'shared/components/onClickOutside'
 
-class DashboardSwitcher extends React.Component {
-  constructor(props) {
-    super(props)
+import {DashboardName} from 'src/types'
 
-    this.state = {
-      isOpen: false,
-    }
+export interface DashboardSwitcherProps {
+  activeDashboard: string
+  names: DashboardName[]
+}
+
+export interface DashboardSwitcherState {
+  isOpen: boolean
+}
+
+class DashboardSwitcher extends React.Component<
+  DashboardSwitcherProps,
+  DashboardSwitcherState
+> {
+  public state = {
+    isOpen: false,
   }
 
-  handleToggleMenu = () => {
+  private handleToggleMenu = () => {
     this.setState({isOpen: !this.state.isOpen})
   }
 
-  handleCloseMenu = () => {
+  private handleCloseMenu = () => {
     this.setState({isOpen: false})
   }
 
-  handleClickOutside = () => {
+  public handleClickOutside = () => {
     this.setState({isOpen: false})
   }
 
-  render() {
+  public render() {
     const {activeDashboard, names} = this.props
     const {isOpen} = this.state
     const sorted = _.sortBy(names, ({name}) => name.toLowerCase())
@@ -42,7 +51,7 @@ class DashboardSwitcher extends React.Component {
           <span className="icon dash-f" />
         </button>
         <ul className="dropdown-menu">
-          {sorted.map(({name, link}) =>
+          {sorted.map(({name, link}) => (
             <NameLink
               key={link}
               name={name}
@@ -50,14 +59,26 @@ class DashboardSwitcher extends React.Component {
               activeName={activeDashboard}
               onClose={this.handleCloseMenu}
             />
-          )}
+          ))}
         </ul>
       </div>
     )
   }
 }
 
-const NameLink = ({name, link, activeName, onClose}) =>
+export interface NameLinkProps {
+  name: string
+  link: string
+  activeName: string
+  onClose: () => void
+}
+
+const NameLink: React.SFC<NameLinkProps> = ({
+  name,
+  link,
+  activeName,
+  onClose,
+}) => (
   <li
     className={classnames('dropdown-item', {
       active: name === activeName,
@@ -67,24 +88,6 @@ const NameLink = ({name, link, activeName, onClose}) =>
       {name}
     </Link>
   </li>
-
-const {arrayOf, func, shape, string} = PropTypes
-
-DashboardSwitcher.propTypes = {
-  activeDashboard: string.isRequired,
-  names: arrayOf(
-    shape({
-      link: string.isRequired,
-      name: string.isRequired,
-    })
-  ).isRequired,
-}
-
-NameLink.propTypes = {
-  name: string.isRequired,
-  link: string.isRequired,
-  activeName: string.isRequired,
-  onClose: func.isRequired,
-}
+)
 
 export default onClickOutside(DashboardSwitcher)

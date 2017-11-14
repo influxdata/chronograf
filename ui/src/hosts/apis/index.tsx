@@ -170,7 +170,7 @@ export function getAppsForHosts(
   })
 }
 
-export function getMeasurementsForHost(source: Source, host: Host) {
+export function getMeasurementsForHost(source: Source, host: string) {
   return proxy({
     source: source.links.proxy,
     query: `SHOW MEASUREMENTS WHERE "host" = '${host}'`,

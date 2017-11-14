@@ -131,7 +131,6 @@ const DygraphLegend: React.SFC<DygraphLegendProps> = ({
           autoFocus={true}
         />
       )}
-      )
       <div className="dygraph-legend--divider" />
       <div className="dygraph-legend--contents">
         {filtered.map(({label, color, yHTML, isHighlighted}) => {
