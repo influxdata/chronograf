@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react'
 
 import ConfirmButtons from 'shared/components/ConfirmButtons'
 import Dropdown from 'shared/components/Dropdown'
+import InputClickToEdit from 'shared/components/InputClickToEdit'
 
 import {USER_ROLES} from 'src/admin/constants/dummyUsers'
 
@@ -10,60 +11,14 @@ class OrganizationsTableRow extends Component {
     super(props)
 
     this.state = {
-      isEditing: false,
       isDeleting: false,
-      workingName: this.props.organization.name,
     }
   }
 
-  handleNameClick = () => {
-    this.setState({isEditing: true})
+  handleUpdateOrgName = newName => {
+    const {organization, onRename} = this.props
+    onRename(organization, newName)
   }
-
-  handleConfirmRename = () => {
-    const {onRename, organization} = this.props
-    const {workingName} = this.state
-
-    onRename(organization, workingName)
-    this.setState({workingName, isEditing: false})
-  }
-
-  handleCancelRename = () => {
-    const {organization} = this.props
-
-    this.setState({
-      workingName: organization.name,
-      isEditing: false,
-    })
-  }
-
-  handleInputChange = e => {
-    this.setState({workingName: e.target.value})
-  }
-
-  handleInputBlur = () => {
-    const {organization} = this.props
-    const {workingName} = this.state
-
-    if (organization.name === workingName) {
-      this.handleCancelRename()
-    } else {
-      this.handleConfirmRename()
-    }
-  }
-
-  handleKeyDown = e => {
-    if (e.key === 'Enter') {
-      this.handleInputBlur()
-    } else if (e.key === 'Escape') {
-      this.handleCancelRename()
-    }
-  }
-
-  handleFocus = e => {
-    e.target.select()
-  }
-
   handleDeleteClick = () => {
     this.setState({isDeleting: true})
   }
@@ -83,7 +38,7 @@ class OrganizationsTableRow extends Component {
   }
 
   render() {
-    const {workingName, isEditing, isDeleting} = this.state
+    const {isDeleting} = this.state
     const {organization} = this.props
 
     const dropdownRolesItems = USER_ROLES.map(role => ({
@@ -92,32 +47,22 @@ class OrganizationsTableRow extends Component {
     }))
 
     const defaultRoleClassName = isDeleting
-      ? 'orgs-table--default-role editing'
-      : 'orgs-table--default-role'
+      ? 'fancytable--td orgs-table--default-role deleting'
+      : 'fancytable--td orgs-table--default-role'
 
     return (
-      <div className="orgs-table--org">
-        <div className="orgs-table--id">
+      <div className="fancytable--row">
+        <div className="fancytable--td orgs-table--id">
           {organization.id}
         </div>
-        {isEditing
-          ? <input
-              type="text"
-              className="form-control input-sm orgs-table--input"
-              defaultValue={workingName}
-              onChange={this.handleInputChange}
-              onBlur={this.handleInputBlur}
-              onKeyDown={this.handleKeyDown}
-              placeholder="Name this Organization..."
-              autoFocus={true}
-              onFocus={this.handleFocus}
-              ref={r => (this.inputRef = r)}
-            />
-          : <div className="orgs-table--name" onClick={this.handleNameClick}>
-              {workingName}
-              <span className="icon pencil" />
-            </div>}
-        <div className="orgs-table--public disabled">&mdash;</div>
+        <InputClickToEdit
+          value={organization.name}
+          wrapperClass="fancytable--td orgs-table--name"
+          onUpdate={this.handleUpdateOrgName}
+        />
+        <div className="fancytable--td orgs-table--public">
+          <div className="orgs-table--public-toggle disabled">&mdash;</div>
+        </div>
         <div className={defaultRoleClassName}>
           <Dropdown
             items={dropdownRolesItems}
