@@ -31,13 +31,15 @@ export const SINGLE_STAT_LINE_COLORS = [
   '#6BDFFF',
 ]
 
-export const darkenColor = colorStr => {
+export const lightenColor = colorStr => {
   // Defined in dygraph-utils.js
   const color = Dygraphs.toRGB_(colorStr)
-  color.r = Math.floor((255 + color.r) / 2)
-  color.g = Math.floor((255 + color.g) / 2)
-  color.b = Math.floor((255 + color.b) / 2)
-  return `rgb(${color.r},${color.g},${color.b})`
+  color.r = Math.floor(color.r + 50)
+  color.g = Math.floor(color.g + 50)
+  color.b = Math.floor(color.b + 50)
+  return `rgb(${color.r < 255 ? color.r : 255},${color.g < 255
+    ? color.g
+    : 255},${color.b < 255 ? color.b : 255})`
 }
 
 // Bar Graph code below is adapted from http://dygraphs.com/tests/plotters.html
@@ -69,22 +71,17 @@ export const barPlotter = e => {
   // ensuring a bar is never smaller than one px, so it is always rendered
   const barWidth = Math.max(Math.floor(2.0 / 3.0 * minSep), 1.0)
 
-  const fillColors = []
-  const strokeColors = g.getColors()
+  const fillColors = g.getColors()
 
   let selPointX
   if (g.selPoints_ && g.selPoints_.length) {
     selPointX = g.selPoints_[0].canvasx
   }
 
-  for (let i = 0; i < strokeColors.length; i++) {
-    fillColors.push(darkenColor(strokeColors[i]))
-  }
-
-  ctx.lineWidth = 2
+  ctx.lineWidth = 0
 
   for (let j = 0; j < sets.length; j++) {
-    ctx.strokeStyle = strokeColors[j]
+    // ctx.strokeStyle = strokeColors[j]
     for (let i = 0; i < sets[j].length; i++) {
       const p = sets[j][i]
       const centerX = p.canvasx
@@ -103,7 +100,8 @@ export const barPlotter = e => {
 
       // hover highlighting
       if (selPointX === centerX) {
-        ctx.strokeRect(
+        ctx.fillStyle = lightenColor(fillColors[j])
+        ctx.fillRect(
           xLeft,
           p.canvasy,
           barWidth / sets.length,
