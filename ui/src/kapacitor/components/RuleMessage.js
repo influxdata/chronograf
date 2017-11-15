@@ -1,19 +1,48 @@
 import React, {Component, PropTypes} from 'react'
 import _ from 'lodash'
-import classnames from 'classnames'
 
-import RuleMessageOptions from 'src/kapacitor/components/RuleMessageOptions'
+import EndpointOptions from 'src/kapacitor/components/EndpointOptions'
 import RuleMessageText from 'src/kapacitor/components/RuleMessageText'
 import RuleMessageTemplates from 'src/kapacitor/components/RuleMessageTemplates'
+import EndpointTabs from 'src/kapacitor/components/EndpointTabs'
+import Dropdown from 'shared/components/Dropdown'
 
-import {DEFAULT_ALERTS, RULE_ALERT_OPTIONS} from 'src/kapacitor/constants'
+import {DEFAULT_ALERTS} from 'src/kapacitor/constants'
+
+const alertNodesToEndpoints = rule => {
+  const endpointsOfKind = {} // TODO why are these consts?
+  const endpointsOnThisAlert = []
+  rule.alertNodes.forEach(an => {
+    const count = _.get(endpointsOfKind, an.name, 0) + 1
+    endpointsOfKind[an.name] = count
+    const ep = {
+      ...an.properties,
+      ...an.args,
+      ...an,
+      alias: an.name + count,
+      type: an.name,
+    }
+    endpointsOnThisAlert.push(ep)
+  })
+  const selectedEndpoint = endpointsOnThisAlert.length
+    ? endpointsOnThisAlert[0]
+    : null
+  return {endpointsOnThisAlert, selectedEndpoint, endpointsOfKind}
+}
 
 class RuleMessage extends Component {
   constructor(props) {
     super(props)
+    const {
+      endpointsOnThisAlert,
+      selectedEndpoint,
+      endpointsOfKind,
+    } = alertNodesToEndpoints(this.props.rule)
 
     this.state = {
-      selectedAlertNodeName: null,
+      selectedEndpoint,
+      endpointsOnThisAlert,
+      endpointsOfKind,
     }
   }
 
@@ -22,73 +51,130 @@ class RuleMessage extends Component {
     actions.updateMessage(rule.id, e.target.value)
   }
 
-  handleChooseAlert = item => () => {
-    const {actions} = this.props
-    actions.updateAlerts(item.ruleID, [item.text])
-    actions.updateAlertNodes(item.ruleID, item.text, '')
-    this.setState({selectedAlertNodeName: item.text})
+  handleChooseAlert = ep => () => {
+    this.setState({selectedEndpoint: ep})
+  }
+
+  handleAddEndpoint = selectedItem => {
+    const {endpointsOnThisAlert, endpointsOfKind} = this.state
+    const newItemNumbering = _.get(endpointsOfKind, selectedItem.type, 0) + 1
+    const newItemName = selectedItem.type + newItemNumbering
+    const newEndpoint = {
+      ...selectedItem,
+      alias: newItemName,
+    }
+    this.setState(
+      {
+        endpointsOnThisAlert: [...endpointsOnThisAlert, newEndpoint],
+        endpointsOfKind: {
+          ...endpointsOfKind,
+          [selectedItem.type]: newItemNumbering,
+        },
+        selectedEndpoint: newEndpoint,
+      },
+      this.handleUpdateAllAlerts
+    )
+  }
+
+  handleRemoveEndpoint = removedEP => e => {
+    e.stopPropagation()
+    const {endpointsOnThisAlert, selectedEndpoint} = this.state
+    const removedIndex = _.findIndex(endpointsOnThisAlert, [
+      'alias',
+      removedEP.alias,
+    ])
+    const remainingEndpoints = _.reject(endpointsOnThisAlert, [
+      'alias',
+      removedEP.alias,
+    ])
+    if (selectedEndpoint.alias === removedEP.alias) {
+      const selectedIndex = removedIndex > 0 ? removedIndex - 1 : 0
+      const newSelected = remainingEndpoints.length
+        ? remainingEndpoints[selectedIndex]
+        : null
+      this.setState({selectedEndpoint: newSelected})
+    }
+    this.setState(
+      {endpointsOnThisAlert: remainingEndpoints},
+      this.handleUpdateAllAlerts
+    )
+  }
+
+  handleUpdateAllAlerts = () => {
+    const {rule, actions} = this.props
+    const {endpointsOnThisAlert} = this.state
+
+    actions.updateAlertNodes(rule.id, endpointsOnThisAlert)
+  }
+
+  handleModifyEndpoint = (selectedEndpoint, fieldName) => e => {
+    const {endpointsOnThisAlert} = this.state
+    const modifiedEP = {
+      ...selectedEndpoint,
+      [fieldName]: e.target.value,
+    }
+    const remainingEndpoints = _.reject(endpointsOnThisAlert, [
+      'alias',
+      modifiedEP.alias,
+    ])
+    this.setState(
+      {
+        selectedEndpoint: modifiedEP,
+        endpointsOnThisAlert: [...remainingEndpoints, modifiedEP],
+      },
+      this.handleUpdateAllAlerts
+    )
   }
 
   render() {
     const {rule, actions, enabledAlerts} = this.props
-    const defaultAlertEndpoints = DEFAULT_ALERTS.map(text => {
-      return {text, ruleID: rule.id}
+    const {endpointsOnThisAlert, selectedEndpoint} = this.state
+    const alerts = _.map([...DEFAULT_ALERTS, ...enabledAlerts], a => {
+      return {...a, text: a.type}
     })
-
-    const alerts = [
-      ...defaultAlertEndpoints,
-      ...enabledAlerts.map(text => {
-        return {text, ruleID: rule.id}
-      }),
-    ]
-
-    const selectedAlertNodeName = rule.alerts[0] || alerts[0].text
-
     return (
       <div className="rule-section">
         <h3 className="rule-section--heading">Alert Message</h3>
         <div className="rule-section--body">
           <div className="rule-section--row rule-section--row-first rule-section--border-bottom">
             <p>Send this Alert to:</p>
-            <ul className="nav nav-tablist nav-tablist-sm nav-tablist-malachite">
-              {alerts
-                // only display alert endpoints that have rule alert options configured
-                .filter(alert => _.get(RULE_ALERT_OPTIONS, alert.text, false))
-                .map(alert =>
-                  <li
-                    key={alert.text}
-                    className={classnames({
-                      active: alert.text === selectedAlertNodeName,
-                    })}
-                    onClick={this.handleChooseAlert(alert)}
-                  >
-                    {alert.text}
-                  </li>
-                )}
-            </ul>
+            <EndpointTabs
+              endpointsOnThisAlert={endpointsOnThisAlert}
+              selectedEndpoint={selectedEndpoint}
+              handleChooseAlert={this.handleChooseAlert}
+              handleRemoveEndpoint={this.handleRemoveEndpoint}
+            />
+            <Dropdown
+              items={alerts}
+              menuClass="dropdown-malachite"
+              selected="Add an Endpoint"
+              onChoose={this.handleAddEndpoint}
+              className="dropdown-140 rule-message--add-endpoint"
+            />
           </div>
-          <RuleMessageOptions
-            rule={rule}
-            alertNodeName={selectedAlertNodeName}
-            updateAlertNodes={actions.updateAlertNodes}
-            updateDetails={actions.updateDetails}
-            updateAlertProperty={actions.updateAlertProperty}
-          />
-          <RuleMessageText
-            rule={rule}
-            updateMessage={this.handleChangeMessage}
-          />
-          <RuleMessageTemplates
-            rule={rule}
-            updateMessage={actions.updateMessage}
-          />
+          {endpointsOnThisAlert.length
+            ? <div>
+                <EndpointOptions
+                  selectedEndpoint={selectedEndpoint}
+                  handleModifyEndpoint={this.handleModifyEndpoint}
+                />
+                <RuleMessageText
+                  rule={rule}
+                  updateMessage={this.handleChangeMessage}
+                />
+                <RuleMessageTemplates
+                  rule={rule}
+                  updateMessage={actions.updateMessage}
+                />
+              </div>
+            : null}
         </div>
       </div>
     )
   }
 }
 
-const {arrayOf, func, shape, string} = PropTypes
+const {arrayOf, func, shape} = PropTypes
 
 RuleMessage.propTypes = {
   rule: shape({}).isRequired,
@@ -98,7 +184,7 @@ RuleMessage.propTypes = {
     updateDetails: func.isRequired,
     updateAlertProperty: func.isRequired,
   }).isRequired,
-  enabledAlerts: arrayOf(string.isRequired).isRequired,
+  enabledAlerts: arrayOf(shape({})),
 }
 
 export default RuleMessage
