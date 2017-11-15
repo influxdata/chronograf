@@ -4,7 +4,6 @@ import Dropdown from 'shared/components/Dropdown'
 
 const mapToItems = (arr, type) => arr.map(text => ({text, type}))
 const changes = mapToItems(CHANGES, 'change')
-const shifts = mapToItems(SHIFTS, 'shift')
 const operators = mapToItems(RELATIVE_OPERATORS, 'operator')
 
 const Relative = ({
@@ -25,7 +24,7 @@ const Relative = ({
     <Dropdown
       className="dropdown-80"
       menuClass="dropdown-malachite"
-      items={shifts}
+      items={SHIFTS}
       selected={shift}
       onChoose={onDropdownChange}
     />

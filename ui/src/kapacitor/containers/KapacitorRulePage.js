@@ -124,7 +124,9 @@ KapacitorRulePage.propTypes = {
     updateAlerts: func.isRequired,
     updateRuleName: func.isRequired,
   }).isRequired,
-  queryConfigActions: shape({}).isRequired,
+  queryConfigActions: shape({
+    timeShift: func.isRequired,
+  }).isRequired,
   params: shape({
     ruleID: string,
   }).isRequired,

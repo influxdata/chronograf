@@ -25,7 +25,6 @@ export const chooseMeasurement = (query, measurement) => ({
 
 export const toggleKapaField = (query, field) => {
   const {value} = field
-
   if (field.type === 'field') {
     const defaultField = {
       type: 'func',
