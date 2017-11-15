@@ -1,170 +1,146 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 
-const {node, func, bool, number, string} = PropTypes
-
-export class Tab extends React.Component {
-  propTypes = {
-    children: node.isRequired,
-    onClick: func,
-    isDisabled: bool,
-    isActive: bool,
-    isKapacitorTab: bool,
-  }
-
-  render() {
-    if (this.props.isKapacitorTab) {
-      return (
-        <li
-          className={classnames({active: this.props.isActive})}
-          onClick={this.props.isDisabled ? null : this.props.onClick}
-        >
-          {this.props.children}
-        </li>
-      )
-    }
-    return (
-      <div
-        className={classnames('btn tab', {active: this.props.isActive})}
-        onClick={this.props.isDisabled ? null : this.props.onClick}
-      >
-        {this.props.children}
-      </div>
-    )
-  }
+export interface TabProps {
+  onClick: () => void
+  isDisabled: boolean
+  isActive: boolean
+  isKapacitorTab: boolean
 }
 
-export class TabList extends React.Component {
-  propTypes = {
-    children: node.isRequired,
-    activeIndex: number,
-    onActivate: func,
-    isKapacitorTabs: string,
-    customClass: string,
-  }
+export const Tab: React.SFC<TabProps> = ({
+  isKapacitorTab,
+  isActive,
+  isDisabled,
+  onClick,
+  children,
+}) =>
+  isKapacitorTab ? (
+    <li
+      className={classnames({active: isActive})}
+      onClick={isDisabled ? null : onClick}
+    >
+      {children}
+    </li>
+  ) : (
+    <div
+      className={classnames('btn tab', {active: isActive})}
+      onClick={isDisabled ? null : onClick}
+    >
+      {children}
+    </div>
+  )
 
-  getDefaultProps() {
-    return {
-      isKapacitorTabs: '',
-    }
-  }
+export interface TabListProps {
+  activeIndex: number
+  onActivate: (index: number) => void
+  isKapacitorTabs: string
+  customClass: string
+}
 
-  render() {
-    const children = React.Children.map(this.props.children, (child, index) => {
-      return React.cloneElement(child, {
-        isActive: index === this.props.activeIndex,
-        onClick: () => this.props.onActivate(index),
-      })
+export const TabList: React.SFC<TabListProps> = ({
+  activeIndex,
+  onActivate,
+  customClass,
+  isKapacitorTabs = '',
+  children,
+}) => {
+  const withTabList = (Child, index) =>
+    React.cloneElement(Child, {
+      isActive: index === activeIndex,
+      onClick: () => onActivate(index),
     })
 
-    if (this.props.isKapacitorTabs === 'true') {
-      return (
-        <div className="rule-section--row rule-section--row-first rule-section--row-last">
-          <p>Choose One:</p>
-          <div className="nav nav-tablist nav-tablist-sm nav-tablist-malachite">
-            {children}
-          </div>
+  React.Children.map(children, withTabList)
+
+  if (isKapacitorTabs === 'true') {
+    return (
+      <div className="rule-section--row rule-section--row-first rule-section--row-last">
+        <p>Choose One:</p>
+        <div className="nav nav-tablist nav-tablist-sm nav-tablist-malachite">
+          {children}
         </div>
-      )
-    }
-
-    if (this.props.customClass) {
-      return (
-        <div className={this.props.customClass}>
-          <div className="btn-group btn-group-lg tab-group">
-            {children}
-          </div>
-        </div>
-      )
-    }
-
-    return (
-      <div className="btn-group btn-group-lg tab-group">
-        {children}
       </div>
     )
   }
-}
 
-export class TabPanels extends React.Component {
-  propTypes = {
-    children: node.isRequired,
-    activeIndex: number,
-    customClass: string,
-  }
-
-  // if only 1 child, children array index lookup will fail
-  render() {
+  if (customClass) {
     return (
-      <div className={this.props.customClass ? this.props.customClass : null}>
-        {this.props.children[this.props.activeIndex]}
+      <div className={customClass}>
+        <div className="btn-group btn-group-lg tab-group">{children}</div>
       </div>
     )
   }
+
+  return <div className="btn-group btn-group-lg tab-group">{children}</div>
 }
 
-export class TabPanel extends React.Component {
-  propTypes = {
-    children: node.isRequired,
-  }
+TabList.displayName = 'TabList'
 
-  render() {
-    return (
-      <div>
-        {this.props.children}
-      </div>
-    )
-  }
+export interface TabPanelsProps {
+  activeIndex: number
+  customClass: string
 }
 
-export class Tabs extends React.Component {
-  propTypes = {
-    children: node.isRequired,
-    onSelect: func,
-    tabContentsClass: string,
-    tabsClass: string,
-    initialIndex: number,
+export const TabPanels: React.SFC<TabPanelsProps> = ({
+  customClass,
+  activeIndex,
+  children,
+}) => (
+  <div className={customClass ? customClass : null}>
+    {children[activeIndex]}
+  </div>
+)
+
+TabPanels.displayName = 'TabPanels'
+
+export const TabPanel: React.SFC<{}> = ({children}) => <div>{children}</div>
+
+export interface TabsProps {
+  onSelect: (index: number) => void
+  tabContentsClass: string
+  tabsClass: string
+  initialIndex: number
+}
+
+export interface TabsState {
+  activeIndex: number
+}
+
+export class Tabs extends React.Component<TabsProps, TabsState> {
+  public static defaultProps = {
+    tabContentsClass: '',
   }
 
-  getDefaultProps() {
-    return {
-      onSelect() {},
-      tabContentsClass: '',
-    }
-  }
-
-  state = {
+  public state = {
     activeIndex: this.props.initialIndex || 0,
   }
 
-  handleActivateTab = activeIndex => {
+  private handleActivateTab = activeIndex => {
     this.setState({activeIndex})
-    this.props.onSelect(activeIndex)
+    if (this.props.onSelect) {
+      this.props.onSelect(activeIndex)
+    }
   }
 
-  render() {
-    const children = React.Children.map(this.props.children, child => {
-      if (child && child.type === TabPanels) {
-        return React.cloneElement(child, {
+  public render() {
+    const withTabs = Child => {
+      if (Child && Child.type.displayName === 'TabPanels') {
+        return React.cloneElement(Child, {
           activeIndex: this.state.activeIndex,
         })
       }
 
-      if (child && child.type === TabList) {
-        return React.cloneElement(child, {
+      if (Child && Child.type.displayName === 'TabList') {
+        return React.cloneElement(Child, {
           activeIndex: this.state.activeIndex,
           onActivate: this.handleActivateTab,
         })
       }
+    }
 
-      return child
-    })
+    const children = React.Children.map(this.props.children, withTabs)
 
-    return (
-      <div className={this.props.tabContentsClass}>
-        {children}
-      </div>
-    )
+    return <div className={this.props.tabContentsClass}>{children}</div>
   }
 }
