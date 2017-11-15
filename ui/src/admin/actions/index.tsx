@@ -1,3 +1,5 @@
+import * as _ from 'lodash'
+
 import {
   getUsers as getUsersAJAX,
   getRoles as getRolesAJAX,
@@ -17,35 +19,45 @@ import {
 } from 'admin/apis'
 
 import {killQuery as killQueryProxy} from 'shared/apis/metaQuery'
-
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 import {errorThrown} from 'shared/actions/errors'
-
 import {REVERT_STATE_DELAY} from 'shared/constants'
-import * as _ from 'lodash'
+import {Source} from 'src/types'
+import {
+  Database,
+  InfluxDBUser as User,
+  InfluxDBRole as Role,
+  InfluxDBPermission as Permission,
+  RetentionPolicy as RP,
+  InfluxDBAdminQuery,
+} from 'src/types/influxdbAdmin'
 
-export const loadUsers = ({users}) => ({
+export const loadUsers = ({users}: {users: User[]}) => ({
   type: 'LOAD_USERS',
   payload: {
     users,
   },
 })
 
-export const loadRoles = ({roles}) => ({
+export const loadRoles = ({roles}: {roles: Role[]}) => ({
   type: 'LOAD_ROLES',
   payload: {
     roles,
   },
 })
 
-export const loadPermissions = ({permissions}) => ({
+export const loadPermissions = ({
+  permissions,
+}: {
+  permissions: Permission[]
+}) => ({
   type: 'LOAD_PERMISSIONS',
   payload: {
     permissions,
   },
 })
 
-export const loadDatabases = databases => ({
+export const loadDatabases = (databases: Database[]) => ({
   type: 'LOAD_DATABASES',
   payload: {
     databases,
@@ -64,14 +76,14 @@ export const addDatabase = () => ({
   type: 'ADD_DATABASE',
 })
 
-export const addRetentionPolicy = database => ({
+export const addRetentionPolicy = (database: Database) => ({
   type: 'ADD_RETENTION_POLICY',
   payload: {
     database,
   },
 })
 
-export const syncUser = (staleUser, syncedUser) => ({
+export const syncUser = (staleUser: User, syncedUser: User) => ({
   type: 'SYNC_USER',
   payload: {
     staleUser,
@@ -79,7 +91,7 @@ export const syncUser = (staleUser, syncedUser) => ({
   },
 })
 
-export const syncRole = (staleRole, syncedRole) => ({
+export const syncRole = (staleRole: Role, syncedRole: Role) => ({
   type: 'SYNC_ROLE',
   payload: {
     staleRole,
@@ -87,7 +99,7 @@ export const syncRole = (staleRole, syncedRole) => ({
   },
 })
 
-export const syncDatabase = (stale, synced) => ({
+export const syncDatabase = (stale: Database, synced: Database) => ({
   type: 'SYNC_DATABASE',
   payload: {
     stale,
@@ -95,7 +107,11 @@ export const syncDatabase = (stale, synced) => ({
   },
 })
 
-export const syncRetentionPolicy = (database, stale, synced) => ({
+export const syncRetentionPolicy = (
+  database: Database,
+  stale: RP,
+  synced: RP
+) => ({
   type: 'SYNC_RETENTION_POLICY',
   payload: {
     database,
@@ -104,7 +120,7 @@ export const syncRetentionPolicy = (database, stale, synced) => ({
   },
 })
 
-export const editUser = (user, updates) => ({
+export const editUser = (user: User, updates: {}) => ({
   type: 'EDIT_USER',
   payload: {
     user,
@@ -112,7 +128,7 @@ export const editUser = (user, updates) => ({
   },
 })
 
-export const editRole = (role, updates) => ({
+export const editRole = (role: Role, updates: {}) => ({
   type: 'EDIT_ROLE',
   payload: {
     role,
@@ -120,7 +136,7 @@ export const editRole = (role, updates) => ({
   },
 })
 
-export const editDatabase = (database, updates) => ({
+export const editDatabase = (database: Database, updates) => ({
   type: 'EDIT_DATABASE',
   payload: {
     database,
@@ -128,21 +144,21 @@ export const editDatabase = (database, updates) => ({
   },
 })
 
-export const killQuery = queryID => ({
+export const killQuery = (queryID: string) => ({
   type: 'KILL_QUERY',
   payload: {
     queryID,
   },
 })
 
-export const setQueryToKill = queryIDToKill => ({
+export const setQueryToKill = (queryIDToKill: string) => ({
   type: 'SET_QUERY_TO_KILL',
   payload: {
     queryIDToKill,
   },
 })
 
-export const loadQueries = queries => ({
+export const loadQueries = (queries: InfluxDBAdminQuery[]) => ({
   type: 'LOAD_QUERIES',
   payload: {
     queries,
@@ -150,7 +166,7 @@ export const loadQueries = queries => ({
 })
 
 // TODO: change to 'removeUser'
-export const deleteUser = user => ({
+export const deleteUser = (user: User) => ({
   type: 'DELETE_USER',
   payload: {
     user,
@@ -158,21 +174,24 @@ export const deleteUser = user => ({
 })
 
 // TODO: change to 'removeRole'
-export const deleteRole = role => ({
+export const deleteRole = (role: Role) => ({
   type: 'DELETE_ROLE',
   payload: {
     role,
   },
 })
 
-export const removeDatabase = database => ({
+export const removeDatabase = (database: Database) => ({
   type: 'REMOVE_DATABASE',
   payload: {
     database,
   },
 })
 
-export const removeRetentionPolicy = (database, retentionPolicy) => ({
+export const removeRetentionPolicy = (
+  database: Database,
+  retentionPolicy: RP
+) => ({
   type: 'REMOVE_RETENTION_POLICY',
   payload: {
     database,
@@ -180,35 +199,39 @@ export const removeRetentionPolicy = (database, retentionPolicy) => ({
   },
 })
 
-export const filterUsers = text => ({
+export const filterUsers = (text: string) => ({
   type: 'FILTER_USERS',
   payload: {
     text,
   },
 })
 
-export const filterRoles = text => ({
+export const filterRoles = (text: string) => ({
   type: 'FILTER_ROLES',
   payload: {
     text,
   },
 })
 
-export const addDatabaseDeleteCode = database => ({
+export const addDatabaseDeleteCode = (database: Database) => ({
   type: 'ADD_DATABASE_DELETE_CODE',
   payload: {
     database,
   },
 })
 
-export const removeDatabaseDeleteCode = database => ({
+export const removeDatabaseDeleteCode = (database: Database) => ({
   type: 'REMOVE_DATABASE_DELETE_CODE',
   payload: {
     database,
   },
 })
 
-export const editRetentionPolicy = (database, retentionPolicy, updates) => ({
+export const editRetentionPolicy = (
+  database: Database,
+  retentionPolicy: RP,
+  updates: {}
+) => ({
   type: 'EDIT_RETENTION_POLICY',
   payload: {
     database,
@@ -218,7 +241,7 @@ export const editRetentionPolicy = (database, retentionPolicy, updates) => ({
 })
 
 // async actions
-export const loadUsersAsync = url => async dispatch => {
+export const loadUsersAsync = (url: string) => async dispatch => {
   try {
     const {data} = await getUsersAJAX(url)
     dispatch(loadUsers(data))
@@ -227,7 +250,7 @@ export const loadUsersAsync = url => async dispatch => {
   }
 }
 
-export const loadRolesAsync = url => async dispatch => {
+export const loadRolesAsync = (url: string) => async dispatch => {
   try {
     const {data} = await getRolesAJAX(url)
     dispatch(loadRoles(data))
@@ -236,7 +259,7 @@ export const loadRolesAsync = url => async dispatch => {
   }
 }
 
-export const loadPermissionsAsync = url => async dispatch => {
+export const loadPermissionsAsync = (url: string) => async dispatch => {
   try {
     const {data} = await getPermissionsAJAX(url)
     dispatch(loadPermissions(data))
@@ -245,7 +268,7 @@ export const loadPermissionsAsync = url => async dispatch => {
   }
 }
 
-export const loadDBsAndRPsAsync = url => async dispatch => {
+export const loadDBsAndRPsAsync = (url: string) => async dispatch => {
   try {
     const {data: {databases}} = await getDbsAndRpsAJAX(url)
     dispatch(loadDatabases(_.sortBy(databases, ({name}) => name.toLowerCase())))
@@ -254,7 +277,7 @@ export const loadDBsAndRPsAsync = url => async dispatch => {
   }
 }
 
-export const createUserAsync = (url, user) => async dispatch => {
+export const createUserAsync = (url: string, user: User) => async dispatch => {
   try {
     const {data} = await createUserAJAX(url, user)
     dispatch(
@@ -268,7 +291,7 @@ export const createUserAsync = (url, user) => async dispatch => {
   }
 }
 
-export const createRoleAsync = (url, role) => async dispatch => {
+export const createRoleAsync = (url: string, role: Role) => async dispatch => {
   try {
     const {data} = await createRoleAJAX(url, role)
     dispatch(
@@ -282,7 +305,10 @@ export const createRoleAsync = (url, role) => async dispatch => {
   }
 }
 
-export const createDatabaseAsync = (url, database) => async dispatch => {
+export const createDatabaseAsync = (
+  url: string,
+  database: Database
+) => async dispatch => {
   try {
     const {data} = await createDatabaseAJAX(url, database)
     dispatch(syncDatabase(database, data))
@@ -302,8 +328,8 @@ export const createDatabaseAsync = (url, database) => async dispatch => {
 }
 
 export const createRetentionPolicyAsync = (
-  database,
-  retentionPolicy
+  database: Database,
+  retentionPolicy: RP
 ) => async dispatch => {
   try {
     const {data} = await createRetentionPolicyAJAX(
@@ -333,9 +359,9 @@ export const createRetentionPolicyAsync = (
 }
 
 export const updateRetentionPolicyAsync = (
-  database,
-  retentionPolicy,
-  updates
+  database: Database,
+  retentionPolicy: RP,
+  updates: {}
 ) => async dispatch => {
   try {
     dispatch(editRetentionPolicy(database, retentionPolicy, updates))
@@ -360,7 +386,10 @@ export const updateRetentionPolicyAsync = (
   }
 }
 
-export const killQueryAsync = (source, queryID) => async dispatch => {
+export const killQueryAsync = (
+  source: Source,
+  queryID: string
+) => async dispatch => {
   // optimistic update
   dispatch(killQuery(queryID))
   dispatch(setQueryToKill(null))
@@ -373,7 +402,7 @@ export const killQueryAsync = (source, queryID) => async dispatch => {
   }
 }
 
-export const deleteRoleAsync = role => async dispatch => {
+export const deleteRoleAsync = (role: Role) => async dispatch => {
   dispatch(deleteRole(role))
   try {
     await deleteRoleAJAX(role.links.self)
@@ -383,7 +412,7 @@ export const deleteRoleAsync = role => async dispatch => {
   }
 }
 
-export const deleteUserAsync = user => async dispatch => {
+export const deleteUserAsync = (user: User) => async dispatch => {
   dispatch(deleteUser(user))
   try {
     await deleteUserAJAX(user.links.self)
@@ -393,7 +422,7 @@ export const deleteUserAsync = user => async dispatch => {
   }
 }
 
-export const deleteDatabaseAsync = database => async dispatch => {
+export const deleteDatabaseAsync = (database: Database) => async dispatch => {
   dispatch(removeDatabase(database))
   try {
     await deleteDatabaseAJAX(database.links.self)
@@ -406,8 +435,8 @@ export const deleteDatabaseAsync = database => async dispatch => {
 }
 
 export const deleteRetentionPolicyAsync = (
-  database,
-  retentionPolicy
+  database: Database,
+  retentionPolicy: RP
 ) => async dispatch => {
   dispatch(removeRetentionPolicy(database, retentionPolicy))
   try {
@@ -428,7 +457,10 @@ export const deleteRetentionPolicyAsync = (
   }
 }
 
-export const updateRoleUsersAsync = (role, users) => async dispatch => {
+export const updateRoleUsersAsync = (
+  role: Role,
+  users: User[]
+) => async dispatch => {
   try {
     const {data} = await updateRoleAJAX(
       role.links.self,
@@ -443,8 +475,8 @@ export const updateRoleUsersAsync = (role, users) => async dispatch => {
 }
 
 export const updateRolePermissionsAsync = (
-  role,
-  permissions
+  role: Role,
+  permissions: Permission[]
 ) => async dispatch => {
   try {
     const {data} = await updateRoleAJAX(
@@ -464,8 +496,8 @@ export const updateRolePermissionsAsync = (
 }
 
 export const updateUserPermissionsAsync = (
-  user,
-  permissions
+  user: User,
+  permissions: Permission[]
 ) => async dispatch => {
   try {
     const {data} = await updateUserAJAX(user.links.self, {permissions})
@@ -480,7 +512,10 @@ export const updateUserPermissionsAsync = (
   }
 }
 
-export const updateUserRolesAsync = (user, roles) => async dispatch => {
+export const updateUserRolesAsync = (
+  user: User,
+  roles: Role[]
+) => async dispatch => {
   try {
     const {data} = await updateUserAJAX(user.links.self, {roles})
     dispatch(publishAutoDismissingNotification('success', 'User roles updated'))
@@ -492,7 +527,10 @@ export const updateUserRolesAsync = (user, roles) => async dispatch => {
   }
 }
 
-export const updateUserPasswordAsync = (user, password) => async dispatch => {
+export const updateUserPasswordAsync = (
+  user: User,
+  password: string
+) => async dispatch => {
   try {
     const {data} = await updateUserAJAX(user.links.self, {password})
     dispatch(

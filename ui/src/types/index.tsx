@@ -27,6 +27,7 @@ export interface Source {
     permissions: string
     users: string
     databases: string
+    roles: string
   }
   default: boolean
   telegraf?: string

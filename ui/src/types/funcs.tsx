@@ -20,3 +20,7 @@ export type synchronizer = (dygraph: {}) => void
 export type onZoom = (lower: string, upper: string) => void
 
 export type addFlashMessage = (message: Message) => void
+
+export type func = () => void
+
+export type linkFunc = (link: string) => void

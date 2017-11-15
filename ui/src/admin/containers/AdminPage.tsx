@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {
@@ -30,22 +29,52 @@ import SourceIndicator from 'shared/components/SourceIndicator'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
+import {Source} from 'src/types'
+import {
+  InfluxDBUser as User,
+  InfluxDBRole as Role,
+  InfluxDBPermission as Permission,
+} from 'src/types/influxdbAdmin'
 
-const isValidUser = user => {
+const isValidUser = (user: User): boolean => {
   const minLen = 3
   return user.name.length >= minLen && user.password.length >= minLen
 }
 
-const isValidRole = role => {
+const isValidRole = (role: Role): boolean => {
   const minLen = 3
   return role.name.length >= minLen
 }
 
-class AdminPage extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+export interface AdminPageProps {
+  source: Source
+  users: User[]
+  roles: Role[]
+  permissions: Permission[]
+  editUser: (user: User, updates: {}) => void
+  editRole: (role: Role, updates: {}) => void
+  loadUsers: typeof loadUsersAsync
+  loadRoles: typeof loadRolesAsync
+  loadPermissions: typeof loadPermissionsAsync
+  addUser: typeof addUser
+  addRole: typeof addRole
+  removeUser: typeof deleteUserAsync
+  removeRole: typeof deleteRoleAsync
+  createUser: typeof createUserAsync
+  createRole: typeof createRoleAsync
+  deleteRole: typeof deleteRole
+  deleteUser: typeof deleteUser
+  filterRoles: typeof filterRolesAction
+  filterUsers: typeof filterUsersAction
+  updateRoleUsers: typeof updateRoleUsersAsync
+  updateRolePermissions: typeof updateRolePermissionsAsync
+  updateUserPermissions: typeof updateUserPermissionsAsync
+  updateUserRoles: typeof updateUserRolesAsync
+  updateUserPassword: typeof updateUserPasswordAsync
+  notify: typeof publishAutoDismissingNotification
+}
 
+class AdminPage extends React.Component<AdminPageProps, {}> {
   public componentDidMount() {
     const {source, loadUsers, loadRoles, loadPermissions} = this.props
 
@@ -80,7 +109,6 @@ class AdminPage extends React.Component {
     }
     if (user.isNew) {
       this.props.createUser(this.props.source.links.users, user)
-    } else {
       // TODO update user
     }
   }
@@ -199,42 +227,11 @@ class AdminPage extends React.Component {
   }
 }
 
-const {arrayOf, func, shape, string} = PropTypes
-
-AdminPage.propTypes = {
-  source: shape({
-    id: string.isRequired,
-    links: shape({
-      users: string.isRequired,
-    }),
-  }).isRequired,
-  users: arrayOf(shape()),
-  roles: arrayOf(shape()),
-  permissions: arrayOf(shape()),
-  loadUsers: func,
-  loadRoles: func,
-  loadPermissions: func,
-  addUser: func,
-  addRole: func,
-  removeUser: func,
-  removeRole: func,
-  editUser: func,
-  editRole: func,
-  createUser: func,
-  createRole: func,
-  deleteRole: func,
-  deleteUser: func,
-  filterRoles: func,
-  filterUsers: func,
-  updateRoleUsers: func,
-  updateRolePermissions: func,
-  updateUserPermissions: func,
-  updateUserRoles: func,
-  updateUserPassword: func,
-  notify: func,
-}
-
-const mapStateToProps = ({admin: {users, roles, permissions}}) => ({
+const mapStateToProps = ({
+  admin: {users, roles, permissions},
+}: {
+  admin: {users: User[]; roles: Role[]; permissions: Permission[]}
+}) => ({
   users,
   roles,
   permissions,
