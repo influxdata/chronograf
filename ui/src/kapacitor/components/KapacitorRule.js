@@ -109,8 +109,14 @@ class KapacitorRule extends Component {
     return ''
   }
 
-  handleRuleTypeDropdownChange = ({type, text}) => {
-    const {ruleActions, rule} = this.props
+  handleRuleTypeDropdownChange = foo => {
+    const {type, text} = foo
+    const {ruleActions, rule, query, queryConfigActions} = this.props
+    if (type === 'relative') {
+      const {quantity, unit} = foo
+      queryConfigActions.timeShift(query.id, {unit, quantity})
+    }
+
     ruleActions.updateRuleValues(rule.id, rule.trigger, {
       ...this.props.rule.values,
       [type]: text,

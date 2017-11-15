@@ -54,7 +54,16 @@ export const RELATIVE_OPERATORS = [
 // export const RELATIONS = ['once', 'more than ', 'less than'];
 export const PERIODS = ['1m', '5m', '10m', '30m', '1h', '2h', '24h']
 export const CHANGES = ['change', '% change']
-export const SHIFTS = ['1m', '5m', '10m', '30m', '1h', '2h', '24h']
+export const SHIFTS = [
+  {type: 'relative', label: 'none', text: 'none', quantity: null, unit: null},
+  {type: 'relative', label: '1m', text: '1m', quantity: '1', unit: 'm'},
+  {type: 'relative', label: '1h', text: '1h', quantity: '1', unit: 'h'},
+  {type: 'relative', label: '12h', text: '12h', quantity: '12', unit: 'h'},
+  {type: 'relative', label: '1d', text: '1d', quantity: '1', unit: 'd'},
+  {type: 'relative', label: '7d', text: '7d', quantity: '7', unit: 'd'},
+  {type: 'relative', label: '30d', text: '30d', quantity: '30', unit: 'd'},
+  {type: 'relative', label: '365d', text: '365d', quantity: '365', unit: 'd'},
+]
 
 export const DEFAULT_RULE_ID = 'DEFAULT_RULE_ID'
 

@@ -61,13 +61,13 @@ class KapacitorRulePage extends Component {
   render() {
     const {
       rules,
-      queryConfigs,
       params,
-      ruleActions,
       source,
-      queryConfigActions,
-      addFlashMessage,
       router,
+      ruleActions,
+      queryConfigs,
+      addFlashMessage,
+      queryConfigActions,
     } = this.props
     const {enabledAlerts, kapacitor} = this.state
     const rule = this.isEditing()
@@ -80,17 +80,17 @@ class KapacitorRulePage extends Component {
     }
     return (
       <KapacitorRule
-        source={source}
         rule={rule}
         query={query}
-        queryConfigs={queryConfigs}
-        queryConfigActions={queryConfigActions}
-        ruleActions={ruleActions}
-        addFlashMessage={addFlashMessage}
-        enabledAlerts={enabledAlerts}
-        isEditing={this.isEditing()}
         router={router}
+        source={source}
         kapacitor={kapacitor}
+        ruleActions={ruleActions}
+        queryConfigs={queryConfigs}
+        isEditing={this.isEditing()}
+        enabledAlerts={enabledAlerts}
+        addFlashMessage={addFlashMessage}
+        queryConfigActions={queryConfigActions}
       />
     )
   }
@@ -124,7 +124,9 @@ KapacitorRulePage.propTypes = {
     updateAlerts: func.isRequired,
     updateRuleName: func.isRequired,
   }).isRequired,
-  queryConfigActions: shape({}).isRequired,
+  queryConfigActions: shape({
+    timeShift: func.isRequired,
+  }).isRequired,
   params: shape({
     ruleID: string,
   }).isRequired,
