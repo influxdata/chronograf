@@ -1,63 +1,42 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-import rome from 'rome'
+import * as rome from 'rome'
 import * as moment from 'moment'
 
 import shortcuts from 'shared/data/timeRangeShortcuts'
 const dateFormat = 'YYYY-MM-DD HH:mm'
 
-class CustomTimeRange extends React.Component {
-  constructor(props) {
+import {TimeRange} from 'src/types'
+
+export interface CustomTimeRangeProps {
+  timeRange: TimeRange
+  onApplyTimeRange: (timeRange: TimeRange) => void
+  onClose: () => void
+  page?: string
+}
+
+export interface CustomTimeRangeState {
+  isNow: boolean
+}
+
+class CustomTimeRange extends React.Component<
+  CustomTimeRangeProps,
+  CustomTimeRangeState
+> {
+  private lowerCal
+  private upperCal
+  private lower: HTMLInputElement
+  private upper: HTMLInputElement
+  private lowerContainer: HTMLDivElement
+  private upperContainer: HTMLDivElement
+
+  constructor(props: CustomTimeRangeProps) {
     super(props)
     this.state = {
       isNow: this.props.timeRange.upper === 'now()',
     }
   }
 
-  componentDidMount() {
-    const {timeRange} = this.props
-
-    const lower = rome(this.lower, {
-      dateValidator: rome.val.beforeEq(this.upper),
-      appendTo: this.lowerContainer,
-      initialValue: this.getInitialDate(timeRange.lower),
-      autoClose: false,
-      autoHideOnBlur: false,
-      autoHideOnClick: false,
-    })
-
-    const upper = rome(this.upper, {
-      dateValidator: rome.val.afterEq(this.lower),
-      appendTo: this.upperContainer,
-      autoClose: false,
-      initialValue: this.getInitialDate(timeRange.upper),
-      autoHideOnBlur: false,
-      autoHideOnClick: false,
-    })
-
-    this.lowerCal = lower
-    this.upperCal = upper
-
-    this.lowerCal.show()
-    this.upperCal.show()
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const {lower, upper} = nextProps.timeRange
-    if (lower) {
-      const formattedLower = this._formatTimeRange(lower)
-      this.lowerCal.setValue(this._formatTimeRange(lower))
-      this.lower.value = formattedLower
-    }
-
-    if (upper) {
-      const formattedUpper = this._formatTimeRange(upper)
-      this.upperCal.setValue(this._formatTimeRange(upper))
-      this.upper.value = formattedUpper
-    }
-  }
-
-  getInitialDate = time => {
+  private getInitialDate = time => {
     const {upper, lower} = this.props.timeRange
 
     if (upper || lower) {
@@ -67,16 +46,16 @@ class CustomTimeRange extends React.Component {
     return moment(new Date()).format(dateFormat)
   }
 
-  handleRefreshCals = () => {
+  private handleRefreshCals = () => {
     this.lowerCal.refresh()
     this.upperCal.refresh()
   }
 
-  handleToggleNow = () => {
+  private handleToggleNow = () => {
     this.setState({isNow: !this.state.isNow})
   }
 
-  handleNowOff = () => {
+  private handleNowOff = () => {
     this.setState({isNow: false})
   }
 
@@ -85,7 +64,7 @@ class CustomTimeRange extends React.Component {
    * the string literal, i.e. "'2015-09-23T18:00:00.000Z'".  Remove them
    * before passing the string to be parsed.
    */
-  _formatTimeRange = timeRange => {
+  private _formatTimeRange = timeRange => {
     if (!timeRange) {
       return ''
     }
@@ -103,7 +82,7 @@ class CustomTimeRange extends React.Component {
     return moment(timeRange.replace(/\'/g, '')).format(dateFormat)
   }
 
-  handleClick = () => {
+  private handleClick = () => {
     const {onApplyTimeRange, onClose} = this.props
     const {isNow} = this.state
 
@@ -121,7 +100,7 @@ class CustomTimeRange extends React.Component {
     }
   }
 
-  handleTimeRangeShortcut = shortcut => {
+  private handleTimeRangeShortcut = shortcut => {
     return () => {
       let lower
       const upper = moment()
@@ -163,7 +142,50 @@ class CustomTimeRange extends React.Component {
     }
   }
 
-  render() {
+  public componentDidMount() {
+    const {timeRange} = this.props
+
+    const lower = rome(this.lower, {
+      dateValidator: rome.val.beforeEq(this.upper),
+      appendTo: this.lowerContainer,
+      initialValue: this.getInitialDate(timeRange.lower),
+      autoClose: false,
+      autoHideOnBlur: false,
+      autoHideOnClick: false,
+    })
+
+    const upper = rome(this.upper, {
+      dateValidator: rome.val.afterEq(this.lower),
+      appendTo: this.upperContainer,
+      autoClose: false,
+      initialValue: this.getInitialDate(timeRange.upper),
+      autoHideOnBlur: false,
+      autoHideOnClick: false,
+    })
+
+    this.lowerCal = lower
+    this.upperCal = upper
+
+    this.lowerCal.show()
+    this.upperCal.show()
+  }
+
+  public componentWillReceiveProps(nextProps: CustomTimeRangeProps) {
+    const {lower, upper} = nextProps.timeRange
+    if (lower) {
+      const formattedLower = this._formatTimeRange(lower)
+      this.lowerCal.setValue(this._formatTimeRange(lower))
+      this.lower.value = formattedLower
+    }
+
+    if (upper) {
+      const formattedUpper = this._formatTimeRange(upper)
+      this.upperCal.setValue(this._formatTimeRange(upper))
+      this.upper.value = formattedUpper
+    }
+  }
+
+  public render() {
     const {isNow} = this.state
     const {page} = this.props
     const isNowDisplayed = page !== 'DataExplorer'
@@ -172,7 +194,7 @@ class CustomTimeRange extends React.Component {
       <div className="custom-time--container">
         <div className="custom-time--shortcuts">
           <div className="custom-time--shortcuts-header">Shortcuts</div>
-          {shortcuts.map(({id, name}) =>
+          {shortcuts.map(({id, name}) => (
             <div
               key={id}
               className="custom-time--shortcut"
@@ -180,7 +202,7 @@ class CustomTimeRange extends React.Component {
             >
               {name}
             </div>
-          )}
+          ))}
         </div>
         <div className="custom-time--wrap">
           <div className="custom-time--dates" onClick={this.handleRefreshCals}>
@@ -198,18 +220,17 @@ class CustomTimeRange extends React.Component {
             <div
               className="custom-time--upper-container"
               ref={r => (this.upperContainer = r)}
-              disabled={isNow}
             >
-              {isNowDisplayed
-                ? <div
-                    className={`btn btn-xs custom-time--now ${isNow
-                      ? 'btn-primary'
-                      : 'btn-default'}`}
-                    onClick={this.handleToggleNow}
-                  >
-                    Now
-                  </div>
-                : null}
+              {isNowDisplayed && (
+                <div
+                  className={`btn btn-xs custom-time--now ${
+                    isNow ? 'btn-primary' : 'btn-default'
+                  }`}
+                  onClick={this.handleToggleNow}
+                >
+                  Now
+                </div>
+              )}
               <input
                 className="custom-time--upper form-control input-sm"
                 ref={r => (this.upper = r)}
@@ -217,12 +238,12 @@ class CustomTimeRange extends React.Component {
                 onKeyUp={this.handleRefreshCals}
                 disabled={isNow}
               />
-              {isNow && page !== 'DataExplorer'
-                ? <div
-                    className="custom-time--mask"
-                    onClick={this.handleNowOff}
-                  />
-                : null}
+              {isNow && page !== 'DataExplorer' ? (
+                <div
+                  className="custom-time--mask"
+                  onClick={this.handleNowOff}
+                />
+              ) : null}
             </div>
           </div>
           <div
@@ -235,18 +256,6 @@ class CustomTimeRange extends React.Component {
       </div>
     )
   }
-}
-
-const {func, shape, string} = PropTypes
-
-CustomTimeRange.propTypes = {
-  onApplyTimeRange: func.isRequired,
-  timeRange: shape({
-    lower: string.isRequired,
-    upper: string,
-  }).isRequired,
-  onClose: func,
-  page: string,
 }
 
 export default CustomTimeRange
