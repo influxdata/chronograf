@@ -2,8 +2,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import flatten from 'lodash/flatten'
-import uniqBy from 'lodash/uniqBy'
+import {flatten, uniqBy} from 'lodash'
 
 import {showDatabases, showQueries} from 'shared/apis/metaQuery'
 
