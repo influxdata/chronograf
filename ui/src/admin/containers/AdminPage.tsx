@@ -101,7 +101,7 @@ class AdminPage extends React.Component<AdminPageProps, {}> {
     this.props.editRole(role, updates)
   }
 
-  public handleSaveUser = async user => {
+  public handleSaveUser = user => {
     const {notify} = this.props
     if (!isValidUser(user)) {
       notify('error', 'Username and/or password too short')
@@ -113,7 +113,7 @@ class AdminPage extends React.Component<AdminPageProps, {}> {
     }
   }
 
-  public handleSaveRole = async role => {
+  public handleSaveRole = role => {
     const {notify} = this.props
     if (!isValidRole(role)) {
       notify('error', 'Role name too short')

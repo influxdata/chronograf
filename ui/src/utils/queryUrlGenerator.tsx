@@ -11,7 +11,7 @@ export const proxy = async ({
 }: {
   source: string
   query: string
-  db: string
+  db?: string
   rp?: string
   tempVars?: Template[]
   resolution?: number

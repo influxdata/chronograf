@@ -24,3 +24,5 @@ export type addFlashMessage = (message: Message) => void
 export type func = () => void
 
 export type linkFunc = (link: string) => void
+
+export type eFunc = (e: {}) => func

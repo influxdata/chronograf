@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -11,7 +10,10 @@ import {showDatabases, showQueries} from 'shared/apis/metaQuery'
 import QueriesTable from 'admin/components/QueriesTable'
 import showDatabasesParser from 'shared/parsing/showDatabases'
 import showQueriesParser from 'shared/parsing/showQueries'
-import {TIMES} from 'admin/constants'
+import {Source} from 'src/types'
+import {func} from 'src/types/funcs'
+import {InfluxDBAdminQuery as Query} from 'src/types/influxdbAdmin'
+
 import {
   loadQueries as loadQueriesAction,
   setQueryToKill as setQueryToKillAction,
@@ -20,28 +22,20 @@ import {
 
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
-class QueriesPage extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+export interface QueriesPageProps {
+  source: Source
+  queries: Query[]
+  loadQueries: (queries: Query[]) => void
+  queryIDToKill: string
+  setQueryToKill: func
+  killQuery: (proxy: string, id: string) => void
+  notify: (type: string, message: string) => void
+}
 
-  componentDidMount() {
-    this.updateQueries()
-    const updateInterval = 5000
-    this.intervalID = setInterval(this.updateQueries, updateInterval)
-  }
+class QueriesPage extends React.Component<QueriesPageProps> {
+  private intervalID
 
-  componentWillUnmount() {
-    clearInterval(this.intervalID)
-  }
-
-  render() {
-    const {queries} = this.props
-
-    return <QueriesTable queries={queries} onKillQuery={this.handleKillQuery} />
-  }
-
-  updateQueries = () => {
+  private updateQueries = () => {
     const {source, notify, loadQueries} = this.props
     showDatabases(source.links.proxy).then(resp => {
       const {databases, errors} = showDatabasesParser(resp.data)
@@ -54,7 +48,7 @@ class QueriesPage extends React.Component {
 
       Promise.all(fetches).then(queryResponses => {
         const allQueries = []
-        queryResponses.forEach(queryResponse => {
+        queryResponses.forEach((queryResponse: {data: {}}) => {
           const result = showQueriesParser(queryResponse.data)
           if (result.errors.length) {
             result.errors.forEach(message => notify('error', message))
@@ -64,39 +58,31 @@ class QueriesPage extends React.Component {
         })
 
         const queries = uniqBy(flatten(allQueries), q => q.id)
-
-        // sorting queries by magnitude, so generally longer queries will appear atop the list
-        const sortedQueries = queries.sort((a, b) => {
-          const aTime = TIMES.find(t => a.duration.match(t.test))
-          const bTime = TIMES.find(t => b.duration.match(t.test))
-          return +aTime.magnitude <= +bTime.magnitude
-        })
-
-        loadQueries(sortedQueries)
+        loadQueries(queries)
       })
     })
   }
 
-  handleKillQuery = (id) => {
+  private handleKillQuery = id => {
     const {source, killQuery} = this.props
     killQuery(source.links.proxy, id)
   }
-}
 
-const {arrayOf, func, string, shape} = PropTypes
+  public componentDidMount() {
+    this.updateQueries()
+    const updateInterval = 5000
+    this.intervalID = setInterval(this.updateQueries, updateInterval)
+  }
 
-QueriesPage.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string,
-    }),
-  }),
-  queries: arrayOf(shape()),
-  loadQueries: func,
-  queryIDToKill: string,
-  setQueryToKill: func,
-  killQuery: func,
-  notify: func,
+  public componentWillUnmount() {
+    clearInterval(this.intervalID)
+  }
+
+  public render() {
+    const {queries} = this.props
+
+    return <QueriesTable queries={queries} onKillQuery={this.handleKillQuery} />
+  }
 }
 
 const mapStateToProps = ({admin: {queries, queryIDToKill}}) => ({

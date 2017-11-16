@@ -2,10 +2,10 @@ import * as React from 'react'
 import * as classnames from 'classnames'
 
 export interface TabProps {
-  onClick: () => void
-  isDisabled: boolean
-  isActive: boolean
-  isKapacitorTab: boolean
+  onClick?: () => void
+  isDisabled?: boolean
+  isActive?: boolean
+  isKapacitorTab?: boolean
 }
 
 export const Tab: React.SFC<TabProps> = ({
@@ -32,10 +32,10 @@ export const Tab: React.SFC<TabProps> = ({
   )
 
 export interface TabListProps {
-  activeIndex: number
-  onActivate: (index: number) => void
-  isKapacitorTabs: string
-  customClass: string
+  activeIndex?: number
+  onActivate?: (index: number) => void
+  isKapacitorTabs?: string
+  customClass?: string
 }
 
 export const TabList: React.SFC<TabListProps> = ({
@@ -78,8 +78,8 @@ export const TabList: React.SFC<TabListProps> = ({
 TabList.displayName = 'TabList'
 
 export interface TabPanelsProps {
-  activeIndex: number
-  customClass: string
+  activeIndex?: number
+  customClass?: string
 }
 
 export const TabPanels: React.SFC<TabPanelsProps> = ({
@@ -97,10 +97,11 @@ TabPanels.displayName = 'TabPanels'
 export const TabPanel: React.SFC<{}> = ({children}) => <div>{children}</div>
 
 export interface TabsProps {
-  onSelect: (index: number) => void
-  tabContentsClass: string
-  tabsClass: string
-  initialIndex: number
+  onSelect?: (index: number) => void
+  tabContentsClass?: string
+  tabsClass?: string
+  initialIndex?: number
+  className?: string
 }
 
 export interface TabsState {

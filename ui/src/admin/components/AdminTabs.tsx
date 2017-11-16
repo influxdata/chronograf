@@ -1,12 +1,44 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {Tab, Tabs, TabPanel, TabPanels, TabList} from 'shared/components/Tabs'
 import UsersTable from 'admin/components/UsersTable'
 import RolesTable from 'admin/components/RolesTable'
 import QueriesPage from 'admin/containers/QueriesPage'
 import DatabaseManagerPage from 'admin/containers/DatabaseManagerPage'
+import {eFunc} from 'src/types/funcs'
+import {Source} from 'src/types'
+import {
+  InfluxDBUser as User,
+  InfluxDBRole as Role,
+  InfluxDBPermission as Permission,
+} from 'src/types/influxdbAdmin'
 
-const AdminTabs = ({
+export interface AdminTabsProps {
+  source: Source
+  users: User[]
+  roles: Role[]
+  permissions: string[]
+  hasRoles: boolean
+  isEditingUsers: boolean
+  isEditingRoles: boolean
+  onClickCreate: eFunc
+  onEditUser: (user: User, updates: {}) => void
+  onSaveUser: (user: User) => void
+  onCancelEditUser: (user: User) => void
+  onEditRole: (role: Role, updates: {}) => void
+  onCancelEditRole: (role: Role, updates: {}) => void
+  onSaveRole: (role: Role, updates: {}) => void
+  onDeleteRole: (role: Role, updates: {}) => void
+  onDeleteUser: (user: User) => void
+  onFilterRoles: (text: string) => void
+  onFilterUsers: (text: string) => void
+  onUpdateRoleUsers: (role: Role, users: User[]) => void
+  onUpdateRolePermissions: (role: Role, permissions: Permission[]) => void
+  onUpdateUserRoles: (user: User, roles: Role[]) => void
+  onUpdateUserPermissions: (user: User, permissions: Permission[]) => void
+  onUpdateUserPassword: (user: User, password: string) => void
+}
+
+const AdminTabs: React.SFC<AdminTabsProps> = ({
   users,
   roles,
   permissions,
@@ -89,58 +121,14 @@ const AdminTabs = ({
   return (
     <Tabs className="row">
       <TabList customClass="col-md-2 admin-tabs">
-        {tabs.map((t, i) =>
-          <Tab key={tabs[i].type}>
-            {tabs[i].type}
-          </Tab>
-        )}
+        {tabs.map((_, i) => <Tab key={tabs[i].type}>{tabs[i].type}</Tab>)}
       </TabList>
       <TabPanels customClass="col-md-10 admin-tabs--content">
-        {tabs.map((t, i) =>
-          <TabPanel key={tabs[i].type}>
-            {t.component}
-          </TabPanel>
-        )}
+        {tabs.map((t, i) => (
+          <TabPanel key={tabs[i].type}>{t.component}</TabPanel>
+        ))}
       </TabPanels>
     </Tabs>
   )
 }
-
-const {arrayOf, bool, func, shape, string} = PropTypes
-
-AdminTabs.propTypes = {
-  users: arrayOf(
-    shape({
-      name: string.isRequired,
-      roles: arrayOf(
-        shape({
-          name: string,
-        })
-      ),
-    })
-  ),
-  roles: arrayOf(shape()),
-  source: shape(),
-  permissions: arrayOf(string),
-  isEditingUsers: bool,
-  isEditingRoles: bool,
-  onClickCreate: func.isRequired,
-  onEditUser: func.isRequired,
-  onSaveUser: func.isRequired,
-  onCancelEditUser: func.isRequired,
-  onEditRole: func.isRequired,
-  onSaveRole: func.isRequired,
-  onCancelEditRole: func.isRequired,
-  onDeleteRole: func.isRequired,
-  onDeleteUser: func.isRequired,
-  onFilterRoles: func.isRequired,
-  onFilterUsers: func.isRequired,
-  onUpdateRoleUsers: func.isRequired,
-  onUpdateRolePermissions: func.isRequired,
-  hasRoles: bool.isRequired,
-  onUpdateUserPermissions: func,
-  onUpdateUserRoles: func,
-  onUpdateUserPassword: func,
-}
-
 export default AdminTabs

@@ -1,13 +1,10 @@
-import AJAX from 'utils/ajax'
 import * as _ from 'lodash'
-import {buildInfluxUrl, proxy} from 'utils/queryUrlGenerator'
+import {proxy} from 'utils/queryUrlGenerator'
 
-export const showDatabases = async source => {
-  const query = 'SHOW DATABASES'
-  return await proxy({source, query})
-}
+export const showDatabases = (source: string) =>
+  proxy({source, query: 'SHOW DATABASES'})
 
-export const showRetentionPolicies = async (source, databases) => {
+export const showRetentionPolicies = (source: string, databases: string[]) => {
   let query
   if (Array.isArray(databases)) {
     query = databases.map(db => `SHOW RETENTION POLICIES ON "${db}"`).join(';')
@@ -15,81 +12,55 @@ export const showRetentionPolicies = async (source, databases) => {
     query = `SHOW RETENTION POLICIES ON "${databases}"`
   }
 
-  return await proxy({source, query})
-}
-
-export function showQueries(source, db) {
-  const query = 'SHOW QUERIES'
-
-  return proxy({source, query, db})
-}
-
-export function killQuery(source, queryId) {
-  const query = `KILL QUERY ${queryId}`
-
   return proxy({source, query})
 }
 
-export const showMeasurements = async (source, db) => {
-  const query = 'SHOW MEASUREMENTS'
+export const showQueries = (source: string, db: string): Promise<{data: {}}> =>
+  proxy({source, query: 'SHOW QUERIES', db})
 
-  return await proxy({source, db, query})
-}
+export const killQuery = (source: string, queryID: string) =>
+  proxy({source, query: `KILL QUERY ${queryID}`})
 
-export const showTagKeys = async ({
+export const showMeasurements = (source: string, db: string) =>
+  proxy({source, db, query: 'SHOW MEASUREMENTS'})
+
+export const showTagKeys = ({
   source,
   database,
   retentionPolicy,
   measurement,
+}: {
+  source: string
+  database: string
+  retentionPolicy: string
+  measurement: string
 }) => {
   const rp = _.toString(retentionPolicy)
   const query = `SHOW TAG KEYS FROM "${rp}"."${measurement}"`
-  return await proxy({source, db: database, rp: retentionPolicy, query})
+  return proxy({source, db: database, rp: retentionPolicy, query})
 }
 
-export const showTagValues = async ({
+export const showTagValues = ({
   source,
   database,
   retentionPolicy,
   measurement,
   tagKeys,
+}: {
+  source: string
+  database: string
+  retentionPolicy: string
+  measurement: string
+  tagKeys: string[]
 }) => {
-  const keys = tagKeys.sort().map(k => `"${k}"`).join(', ')
+  const keys = tagKeys
+    .sort()
+    .map(k => `"${k}"`)
+    .join(', ')
   const rp = _.toString(retentionPolicy)
-  const query = `SHOW TAG VALUES FROM "${rp}"."${measurement}" WITH KEY IN (${keys})`
+  const query = `SHOW TAG VALUES FROM "${rp}"."${measurement}" WITH KEY IN (${
+    keys
+  })`
 
-  return await proxy({source, db: database, rp: retentionPolicy, query})
-}
-
-export function showShards() {
-  return AJAX({
-    url: '/api/int/v1/show-shards',
-  })
-}
-
-export function createRetentionPolicy({
-  host,
-  database,
-  rpName,
-  duration,
-  replicationFactor,
-  clusterID,
-}) {
-  const statement = `CREATE RETENTION POLICY "${rpName}" ON "${database}" DURATION ${duration} REPLICATION ${replicationFactor}`
-  const url = buildInfluxUrl({host, statement})
-
-  return proxy(url, clusterID)
-}
-
-export function dropShard(host, shard, clusterID) {
-  const statement = `DROP SHARD ${shard.shardId}`
-  const url = buildInfluxUrl({host, statement})
-
-  return proxy(url, clusterID)
-}
-
-export const showFieldKeys = async (source, db, measurement, rp) => {
-  const query = `SHOW FIELD KEYS FROM "${rp}"."${measurement}"`
-
-  return await proxy({source, query, db})
+  return proxy({source, db: database, rp: retentionPolicy, query})
 }
