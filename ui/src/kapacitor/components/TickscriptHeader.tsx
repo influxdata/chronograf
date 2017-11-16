@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 
 import SourceIndicator from 'shared/components/SourceIndicator'
@@ -8,10 +7,22 @@ import MultiSelectDBDropdown from 'shared/components/MultiSelectDBDropdown'
 import TickscriptID, {
   TickscriptStaticID,
 } from 'kapacitor/components/TickscriptID'
+import {Source, Task} from 'src/types'
+import {eFunc} from 'src/types/funcs'
 
 const addName = list => list.map(l => ({...l, name: `${l.db}.${l.rp}`}))
 
-const TickscriptHeader = ({
+export interface TickscriptHeaderProps {
+  task: Task
+  source: Source
+  onSave: eFunc
+  onChangeType: eFunc
+  onChangeID: eFunc
+  onSelectDbrps: eFunc
+  isNewTickscript: boolean
+}
+
+const TickscriptHeader: React.SFC<TickscriptHeaderProps> = ({
   task: {id, type, dbrps},
   task,
   source,
@@ -20,18 +31,21 @@ const TickscriptHeader = ({
   onChangeID,
   onSelectDbrps,
   isNewTickscript,
-}) =>
+}) => (
   <div className="page-header">
     <div className="page-header__container">
       <div className="page-header__left">
-        {isNewTickscript
-          ? <TickscriptID onChangeID={onChangeID} id={id} />
-          : <TickscriptStaticID id={task.name} />}
+        {isNewTickscript ? (
+          <TickscriptID onChangeID={onChangeID} id={id} />
+        ) : (
+          <TickscriptStaticID id={task.name} />
+        )}
       </div>
       <div className="page-header__right">
-        <SourceIndicator />
+        <SourceIndicator source={source} />
         <TickscriptType type={type} onChangeType={onChangeType} />
         <MultiSelectDBDropdown
+          source={source}
           selectedItems={addName(dbrps)}
           onApply={onSelectDbrps}
         />
@@ -52,26 +66,6 @@ const TickscriptHeader = ({
       </div>
     </div>
   </div>
-
-const {arrayOf, bool, func, shape, string} = PropTypes
-
-TickscriptHeader.propTypes = {
-  onSave: func,
-  source: shape({
-    id: string,
-  }),
-  onSelectDbrps: func.isRequired,
-  task: shape({
-    dbrps: arrayOf(
-      shape({
-        db: string,
-        rp: string,
-      })
-    ),
-  }),
-  onChangeType: func.isRequired,
-  onChangeID: func.isRequired,
-  isNewTickscript: bool.isRequired,
-}
+)
 
 export default TickscriptHeader

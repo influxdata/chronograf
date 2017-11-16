@@ -1,12 +1,11 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-
 import * as classnames from 'classnames'
 import * as _ from 'lodash'
 
 import onClickOutside from 'shared/components/onClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
+import {eFunc} from 'src/types/funcs'
 
 const labelText = ({localSelectedItems, isOpen, label}) => {
   if (localSelectedItems.length) {
@@ -25,34 +24,54 @@ const labelText = ({localSelectedItems, isOpen, label}) => {
   return 'None'
 }
 
-class MultiSelectDropdown extends React.Component {
-  constructor(props) {
-    super(props)
+export interface Item {
+  [key: string]: string
+  name: string
+}
 
+export interface MultiSelectDropdownProps {
+  onApply: eFunc
+  items: Item[]
+  selectedItems: Item[]
+  label: string
+  buttonSize: string
+  buttonColor: string
+  customClass: string
+  iconName: string
+  isApplyShown: boolean
+}
+
+export interface MultiSelectDropdownState {
+  isOpen: boolean
+  localSelectedItems: Item[]
+}
+
+class MultiSelectDropdown extends React.Component<
+  MultiSelectDropdownProps,
+  MultiSelectDropdownState
+> {
+  public static defaultProps = {
+    buttonSize: 'btn-sm',
+    buttonColor: 'btn-default',
+    customClass: 'dropdown-160',
+    selectedItems: [],
+    isApplyShown: true,
+  }
+
+  constructor(props: MultiSelectDropdownProps) {
+    super(props)
     this.state = {
       isOpen: false,
       localSelectedItems: props.selectedItems,
     }
   }
 
-  handleClickOutside() {
-    this.setState({isOpen: false})
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!_.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
-      return
-    }
-
-    this.setState({localSelectedItems: nextProps.selectedItems})
-  }
-
-  toggleMenu = e => {
+  private toggleMenu = e => {
     e.stopPropagation()
     this.setState({isOpen: !this.state.isOpen})
   }
 
-  onSelect = (item, e) => {
+  private onSelect = (item, e) => {
     e.stopPropagation()
 
     const {onApply, isApplyShown} = this.props
@@ -72,18 +91,30 @@ class MultiSelectDropdown extends React.Component {
     this.setState({localSelectedItems: nextItems})
   }
 
-  isSelected(item) {
+  private isSelected(item: Item) {
     return !!this.state.localSelectedItems.find(({name}) => name === item.name)
   }
 
-  handleApply = e => {
+  private handleApply = e => {
     e.stopPropagation()
 
     this.setState({isOpen: false})
     this.props.onApply(this.state.localSelectedItems)
   }
 
-  render() {
+  public handleClickOutside() {
+    this.setState({isOpen: false})
+  }
+
+  public componentWillReceiveProps(nextProps: MultiSelectDropdownProps) {
+    if (!_.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
+      return
+    }
+
+    this.setState({localSelectedItems: nextProps.selectedItems})
+  }
+
+  public render() {
     const {localSelectedItems, isOpen} = this.state
     const {label, buttonSize, buttonColor, customClass, iconName} = this.props
 
@@ -104,15 +135,15 @@ class MultiSelectDropdown extends React.Component {
     )
   }
 
-  renderMenu() {
+  public renderMenu() {
     const {items, isApplyShown} = this.props
-    const applyButton = isApplyShown
-      ? <li className="multi-select--apply">
-          <button className="btn btn-xs btn-info" onClick={this.handleApply}>
-            Apply
-          </button>
-        </li>
-      : null
+    const applyButton = isApplyShown ? (
+      <li className="multi-select--apply">
+        <button className="btn btn-xs btn-info" onClick={this.handleApply}>
+          Apply
+        </button>
+      </li>
+    ) : null
 
     return (
       <ul className="dropdown-menu">
@@ -132,9 +163,7 @@ class MultiSelectDropdown extends React.Component {
                 onClick={_.wrap(listItem, this.onSelect)}
               >
                 <div className="multi-select--checkbox" />
-                <span>
-                  {listItem.name}
-                </span>
+                <span>{listItem.name}</span>
               </li>
             )
           })}
@@ -142,36 +171,6 @@ class MultiSelectDropdown extends React.Component {
       </ul>
     )
   }
-}
-
-const {arrayOf, bool, func, shape, string} = PropTypes
-
-MultiSelectDropdown.propTypes = {
-  onApply: func.isRequired,
-  items: arrayOf(
-    shape({
-      name: string.isRequired,
-    })
-  ).isRequired,
-  selectedItems: arrayOf(
-    shape({
-      name: string.isRequired,
-    })
-  ),
-  label: string,
-  buttonSize: string,
-  buttonColor: string,
-  customClass: string,
-  iconName: string,
-  isApplyShown: bool,
-}
-
-MultiSelectDropdown.defaultProps = {
-  buttonSize: 'btn-sm',
-  buttonColor: 'btn-default',
-  customClass: 'dropdown-160',
-  selectedItems: [],
-  isApplyShown: true,
 }
 
 export default onClickOutside(MultiSelectDropdown)

@@ -1,24 +1,32 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import {showDatabases, showRetentionPolicies} from 'shared/apis/metaQuery'
 import showDatabasesParser from 'shared/parsing/showDatabases'
 import showRetentionPoliciesParser from 'shared/parsing/showRetentionPolicies'
 import MultiSelectDropdown from 'shared/components/MultiSelectDropdown'
 
-class MultiSelectDBDropdown extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      dbrps: [],
-    }
+import {Rule, Source, Task} from 'src/types'
+import {eFunc} from 'src/types/funcs'
+
+export interface MultiSelectDBDropdownProps {
+  onErrorThrown?: eFunc
+  onApply: eFunc
+  selectedItems: Rule | Task
+  source: Source
+}
+
+class MultiSelectDBDropdown extends React.Component<
+  MultiSelectDBDropdownProps
+> {
+  public state = {
+    dbrps: [],
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this._getDbRps()
   }
 
-  render() {
+  public render() {
     const {dbrps} = this.state
     const {onApply, selectedItems} = this.props
     const label = 'Select databases'
@@ -34,9 +42,8 @@ class MultiSelectDBDropdown extends React.Component {
     )
   }
 
-  _getDbRps = async () => {
-    const {source: {links: {proxy}}} = this.context
-    const {onErrorThrown} = this.props
+  public _getDbRps = async () => {
+    const {onErrorThrown, source: {links: {proxy}}} = this.props
 
     try {
       const {data} = await showDatabases(proxy)
@@ -65,22 +72,6 @@ class MultiSelectDBDropdown extends React.Component {
       onErrorThrown(error)
     }
   }
-}
-
-const {arrayOf, func, shape, string} = PropTypes
-
-MultiSelectDBDropdown.contextTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-}
-
-MultiSelectDBDropdown.propTypes = {
-  onErrorThrown: func,
-  onApply: func.isRequired,
-  selectedItems: arrayOf(shape()),
 }
 
 export default MultiSelectDBDropdown

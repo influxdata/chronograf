@@ -1,38 +1,109 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
+import {History} from 'history'
+import {withRouter} from 'react-router-dom'
 
 import Tickscript from 'kapacitor/components/Tickscript'
-import * as kapactiorActionCreators from 'kapacitor/actions/view'
+import * as kapacitorActionCreators from 'kapacitor/actions/view'
 import * as errorActionCreators from 'shared/actions/errors'
 import {getActiveKapacitor} from 'shared/apis'
 
-class TickscriptPage extends React.Component {
-  constructor(props) {
-    super(props)
+import {Kapacitor, RouterRuleID, Rule, Source, Task} from 'src/types'
 
-    this.state = {
-      kapacitor: {},
-      task: {
-        id: '',
-        name: '',
-        status: 'enabled',
-        tickscript: '',
-        dbrps: [],
-        type: 'stream',
-      },
-      validation: '',
-      isEditingID: true,
+export interface TickscriptPageProps {
+  source: Source
+  errorActions: {
+    errorThrown: typeof errorActionCreators.errorThrown
+  }
+  kapacitorActions: {
+    updateTask: typeof kapacitorActionCreators.updateTask
+    createTask: typeof kapacitorActionCreators.createTask
+    getRule: typeof kapacitorActionCreators.getRule
+  }
+  history: History
+  rules: Rule[]
+}
+
+export interface TickscriptPageState {
+  kapacitor: Kapacitor
+  task: Task
+  validation: string
+  isEditingID: boolean
+}
+
+class TickscriptPage extends React.Component<
+  TickscriptPageProps & RouterRuleID,
+  TickscriptPageState
+> {
+  public state = {
+    kapacitor: {},
+    task: {
+      id: '',
+      name: '',
+      status: 'enabled',
+      tickscript: '',
+      dbrps: [],
+      type: 'stream',
+    },
+    validation: '',
+    isEditingID: true,
+  }
+
+  private handleSave = async () => {
+    const {kapacitor, task} = this.state
+    const {
+      source: {id: sourceID},
+      history,
+      kapacitorActions: {createTask, updateTask},
+      match: {params: {ruleID}},
+    } = this.props
+
+    let response
+
+    try {
+      if (this._isEditing()) {
+        response = await updateTask(kapacitor, task, ruleID, history, sourceID)
+      } else {
+        response = await createTask(kapacitor, task, history, sourceID)
+      }
+
+      if (response && response.code === 500) {
+        return this.setState({validation: response.message})
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   }
 
-  async componentDidMount() {
+  private handleChangeScript = tickscript => {
+    this.setState({task: {...this.state.task, tickscript}})
+  }
+
+  private handleSelectDbrps = dbrps => {
+    this.setState({task: {...this.state.task, dbrps}})
+  }
+
+  private handleChangeType = type => () => {
+    this.setState({task: {...this.state.task, type}})
+  }
+
+  private handleChangeID = e => {
+    this.setState({task: {...this.state.task, id: e.target.value}})
+  }
+
+  private _isEditing() {
+    const {match} = this.props
+    return match.params.ruleID && match.params.ruleID !== 'new'
+  }
+
+  public async componentDidMount() {
     const {
       source,
       errorActions,
       kapacitorActions,
-      params: {ruleID},
+      match: {params: {ruleID}},
     } = this.props
 
     const kapacitor = await getActiveKapacitor(source)
@@ -54,50 +125,7 @@ class TickscriptPage extends React.Component {
     this.setState({kapacitor})
   }
 
-  handleSave = async () => {
-    const {kapacitor, task} = this.state
-    const {
-      source: {id: sourceID},
-      router,
-      kapacitorActions: {createTask, updateTask},
-      params: {ruleID},
-    } = this.props
-
-    let response
-
-    try {
-      if (this._isEditing()) {
-        response = await updateTask(kapacitor, task, ruleID, router, sourceID)
-      } else {
-        response = await createTask(kapacitor, task, router, sourceID)
-      }
-
-      if (response && response.code === 500) {
-        return this.setState({validation: response.message})
-      }
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
-  }
-
-  handleChangeScript = tickscript => {
-    this.setState({task: {...this.state.task, tickscript}})
-  }
-
-  handleSelectDbrps = dbrps => {
-    this.setState({task: {...this.state.task, dbrps}})
-  }
-
-  handleChangeType = type => () => {
-    this.setState({task: {...this.state.task, type}})
-  }
-
-  handleChangeID = e => {
-    this.setState({task: {...this.state.task, id: e.target.value}})
-  }
-
-  render() {
+  public render() {
     const {source} = this.props
     const {task, validation} = this.state
 
@@ -115,34 +143,6 @@ class TickscriptPage extends React.Component {
       />
     )
   }
-
-  _isEditing() {
-    const {params} = this.props
-    return params.ruleID && params.ruleID !== 'new'
-  }
-}
-
-const {arrayOf, func, shape, string} = PropTypes
-
-TickscriptPage.propTypes = {
-  source: shape({
-    name: string,
-  }),
-  errorActions: shape({
-    errorThrown: func.isRequired,
-  }).isRequired,
-  kapacitorActions: shape({
-    updateTask: func.isRequired,
-    createTask: func.isRequired,
-    getRule: func.isRequired,
-  }),
-  router: shape({
-    push: func.isRequired,
-  }).isRequired,
-  params: shape({
-    ruleID: string,
-  }).isRequired,
-  rules: arrayOf(shape()),
 }
 
 const mapStateToProps = state => {
@@ -152,8 +152,11 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => ({
-  kapacitorActions: bindActionCreators(kapactiorActionCreators, dispatch),
+  kapacitorActions: bindActionCreators(kapacitorActionCreators, dispatch),
   errorActions: bindActionCreators(errorActionCreators, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(TickscriptPage)
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(TickscriptPage)

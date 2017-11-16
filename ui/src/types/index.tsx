@@ -11,6 +11,11 @@ export type RouterHostID = RouteComponentProps<{
   hostID: string
 }>
 
+export type RouterRuleID = RouteComponentProps<{
+  sourceID: string
+  ruleID: string
+}>
+
 export type Location = Location
 
 export type History = History
@@ -323,11 +328,33 @@ export interface AppMapping {
   tags?: Tags
 }
 
-export interface Rule {}
+export interface Rule {
+  id: string
+  name: string
+  tickscript: string
+  dbrps: string[]
+  type: string
+}
 
 export interface Dashboard {}
 
 export interface DashboardName {
   name: string
   link: string
+}
+
+export interface Kapacitor {}
+
+export interface Rule {
+  id: string
+  name: string
+}
+
+export interface Task {
+  id: string
+  name: string
+  dbrps: string[]
+  tickscript: string
+  type: string
+  status: string
 }

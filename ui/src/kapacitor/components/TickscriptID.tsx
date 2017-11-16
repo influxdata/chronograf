@@ -1,45 +1,37 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
-class TickscriptID extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+import {eFunc} from 'src/types/funcs'
 
-  render() {
-    const {onChangeID, id} = this.props
-
-    return (
-      <input
-        className="page-header--editing kapacitor-theme"
-        autoFocus={true}
-        value={id}
-        onChange={onChangeID}
-        placeholder="ID your TICKscript"
-        spellCheck={false}
-        autoComplete={false}
-      />
-    )
-  }
+export interface TickscriptIDProps {
+  onChangeID: eFunc
+  id: string
 }
 
-export const TickscriptStaticID = ({id}) =>
+const TickscriptID: React.SFC<TickscriptIDProps> = ({onChangeID, id}) => (
+  <input
+    className="page-header--editing kapacitor-theme"
+    autoFocus={true}
+    value={id}
+    onChange={onChangeID}
+    placeholder="ID your TICKscript"
+    spellCheck={false}
+    autoComplete="false"
+  />
+)
+
+export interface TickscriptStaticIDProps {
+  id: string
+}
+
+export const TickscriptStaticID: React.SFC<TickscriptStaticIDProps> = ({
+  id,
+}) => (
   <h1
     className="page-header--editing kapacitor-theme"
     style={{display: 'flex', justifyContent: 'baseline'}}
   >
     {id}
   </h1>
-
-const {func, string} = PropTypes
-
-TickscriptID.propTypes = {
-  onChangeID: func.isRequired,
-  id: string.isRequired,
-}
-
-TickscriptStaticID.propTypes = {
-  id: string.isRequired,
-}
+)
 
 export default TickscriptID

@@ -1,4 +1,6 @@
 import * as uuidv4 from 'uuid/v4'
+import {History} from 'history'
+
 import {getActiveKapacitor} from 'shared/apis'
 import {publishNotification} from 'shared/actions/notifications'
 import {
@@ -11,21 +13,23 @@ import {
 } from 'kapacitor/apis'
 import {errorThrown} from 'shared/actions/errors'
 
-const loadQuery = query => ({
+import {Kapacitor, Query, Rule, Source, Task} from 'src/types'
+
+const loadQuery = (query: Query) => ({
   type: 'KAPA_LOAD_QUERY',
   payload: {
     query,
   },
 })
 
-export function fetchRule(source, ruleID) {
+export function fetchRule(source: Source, ruleID: string) {
   return dispatch => {
     getActiveKapacitor(source).then(kapacitor => {
       getRuleAJAX(kapacitor, ruleID).then(({data: rule}) => {
         dispatch({
           type: 'LOAD_RULE',
           payload: {
-            rule: Object.assign(rule, {queryID: rule.query.id}),
+            rule: {...rule, queryID: rule.query.id},
           },
         })
         dispatch(loadQuery(rule.query))
@@ -34,14 +38,17 @@ export function fetchRule(source, ruleID) {
   }
 }
 
-const addQuery = queryID => ({
+const addQuery = (queryID: string) => ({
   type: 'KAPA_ADD_QUERY',
   payload: {
     queryID,
   },
 })
 
-export const getRule = (kapacitor, ruleID) => async dispatch => {
+export const getRule = (
+  kapacitor: Kapacitor,
+  ruleID: string
+) => async dispatch => {
   try {
     const {data: rule} = await getRuleAJAX(kapacitor, ruleID)
 
@@ -66,20 +73,18 @@ export const getRule = (kapacitor, ruleID) => async dispatch => {
   }
 }
 
-export function loadDefaultRule() {
-  return dispatch => {
-    const queryID = uuidv4()
-    dispatch({
-      type: 'LOAD_DEFAULT_RULE',
-      payload: {
-        queryID,
-      },
-    })
-    dispatch(addQuery(queryID))
-  }
+export const loadDefaultRule = () => dispatch => {
+  const queryID = uuidv4()
+  dispatch({
+    type: 'LOAD_DEFAULT_RULE',
+    payload: {
+      queryID,
+    },
+  })
+  dispatch(addQuery(queryID))
 }
 
-export const fetchRules = kapacitor => async dispatch => {
+export const fetchRules = (kapacitor: Kapacitor) => async dispatch => {
   try {
     const {data: {rules}} = await getRules(kapacitor)
     dispatch({type: 'LOAD_RULES', payload: {rules}})
@@ -88,7 +93,7 @@ export const fetchRules = kapacitor => async dispatch => {
   }
 }
 
-export function chooseTrigger(ruleID, trigger) {
+export function chooseTrigger(ruleID: string, trigger: string) {
   return {
     type: 'CHOOSE_TRIGGER',
     payload: {
@@ -98,7 +103,7 @@ export function chooseTrigger(ruleID, trigger) {
   }
 }
 
-export const addEvery = (ruleID, frequency) => ({
+export const addEvery = (ruleID: string, frequency: string) => ({
   type: 'ADD_EVERY',
   payload: {
     ruleID,
@@ -106,14 +111,18 @@ export const addEvery = (ruleID, frequency) => ({
   },
 })
 
-export const removeEvery = ruleID => ({
+export const removeEvery = (ruleID: string) => ({
   type: 'REMOVE_EVERY',
   payload: {
     ruleID,
   },
 })
 
-export function updateRuleValues(ruleID, trigger, values) {
+export function updateRuleValues(
+  ruleID: string,
+  trigger: string,
+  values: string[]
+) {
   return {
     type: 'UPDATE_RULE_VALUES',
     payload: {
@@ -124,7 +133,7 @@ export function updateRuleValues(ruleID, trigger, values) {
   }
 }
 
-export function updateMessage(ruleID, message) {
+export function updateMessage(ruleID: string, message: string) {
   return {
     type: 'UPDATE_RULE_MESSAGE',
     payload: {
@@ -134,7 +143,7 @@ export function updateMessage(ruleID, message) {
   }
 }
 
-export function updateDetails(ruleID, details) {
+export function updateDetails(ruleID: string, details: string) {
   return {
     type: 'UPDATE_RULE_DETAILS',
     payload: {
@@ -144,7 +153,11 @@ export function updateDetails(ruleID, details) {
   }
 }
 
-export const updateAlertProperty = (ruleID, alertNodeName, alertProperty) => ({
+export const updateAlertProperty = (
+  ruleID: string,
+  alertNodeName: string,
+  alertProperty: string
+) => ({
   type: 'UPDATE_RULE_ALERT_PROPERTY',
   payload: {
     ruleID,
@@ -153,7 +166,7 @@ export const updateAlertProperty = (ruleID, alertNodeName, alertProperty) => ({
   },
 })
 
-export function updateAlerts(ruleID, alerts) {
+export function updateAlerts(ruleID: string, alerts: string[]) {
   return {
     type: 'UPDATE_RULE_ALERTS',
     payload: {
@@ -163,7 +176,11 @@ export function updateAlerts(ruleID, alerts) {
   }
 }
 
-export function updateAlertNodes(ruleID, alertNodeName, alertNodesText) {
+export function updateAlertNodes(
+  ruleID: string,
+  alertNodeName: string,
+  alertNodesText: string
+) {
   return {
     type: 'UPDATE_RULE_ALERT_NODES',
     payload: {
@@ -174,7 +191,7 @@ export function updateAlertNodes(ruleID, alertNodeName, alertNodesText) {
   }
 }
 
-export function updateRuleName(ruleID, name) {
+export function updateRuleName(ruleID: string, name: string) {
   return {
     type: 'UPDATE_RULE_NAME',
     payload: {
@@ -184,7 +201,7 @@ export function updateRuleName(ruleID, name) {
   }
 }
 
-export function deleteRuleSuccess(ruleID) {
+export function deleteRuleSuccess(ruleID: string) {
   return {
     type: 'DELETE_RULE_SUCCESS',
     payload: {
@@ -193,7 +210,7 @@ export function deleteRuleSuccess(ruleID) {
   }
 }
 
-export function updateRuleStatusSuccess(ruleID, status) {
+export function updateRuleStatusSuccess(ruleID: string, status: string) {
   return {
     type: 'UPDATE_RULE_STATUS_SUCCESS',
     payload: {
@@ -203,49 +220,63 @@ export function updateRuleStatusSuccess(ruleID, status) {
   }
 }
 
-export function deleteRule(rule) {
+export function deleteRule(rule: Rule) {
   return dispatch => {
     deleteRuleAPI(rule)
       .then(() => {
         dispatch(deleteRuleSuccess(rule.id))
         dispatch(
-          publishNotification('success', `${rule.name} deleted successfully`)
+          publishNotification({
+            type: 'success',
+            message: `${rule.name} deleted successfully`,
+          })
         )
       })
       .catch(() => {
         dispatch(
-          publishNotification('error', `${rule.name} could not be deleted`)
+          publishNotification({
+            type: 'error',
+            message: `${rule.name} could not be deleted`,
+          })
         )
       })
   }
 }
 
-export function updateRuleStatus(rule, status) {
+export function updateRuleStatus(rule: Rule, status: string) {
   return dispatch => {
     updateRuleStatusAPI(rule, status)
       .then(() => {
         dispatch(
-          publishNotification('success', `${rule.name} ${status} successfully`)
+          publishNotification({
+            type: 'success',
+            message: `${rule.name} ${status} successfully`,
+          })
         )
       })
       .catch(() => {
         dispatch(
-          publishNotification('error', `${rule.name} could not be ${status}`)
+          publishNotification({
+            type: 'error',
+            message: `${rule.name} could not be ${status}`,
+          })
         )
       })
   }
 }
 
 export const createTask = (
-  kapacitor,
-  task,
-  router,
-  sourceID
+  kapacitor: Kapacitor,
+  task: Task,
+  history: History,
+  sourceID: string
 ) => async dispatch => {
   try {
     const {data} = await createTaskAJAX(kapacitor, task)
-    router.push(`/sources/${sourceID}/alert-rules`)
-    dispatch(publishNotification('success', 'You made a TICKscript!'))
+    history.push(`/sources/${sourceID}/alert-rules`)
+    dispatch(
+      publishNotification({type: 'success', message: 'You made a TICKscript!'})
+    )
     return data
   } catch (error) {
     if (!error) {
@@ -258,16 +289,21 @@ export const createTask = (
 }
 
 export const updateTask = (
-  kapacitor,
-  task,
-  ruleID,
-  router,
-  sourceID
+  kapacitor: Kapacitor,
+  task: Task,
+  ruleID: string,
+  history: History,
+  sourceID: string
 ) => async dispatch => {
   try {
-    const {data} = await updateTaskAJAX(kapacitor, task, ruleID, sourceID)
-    router.push(`/sources/${sourceID}/alert-rules`)
-    dispatch(publishNotification('success', 'TICKscript updated successully'))
+    const {data} = await updateTaskAJAX(kapacitor, task, ruleID)
+    history.push(`/sources/${sourceID}/alert-rules`)
+    dispatch(
+      publishNotification({
+        type: 'success',
+        message: 'TICKscript updated successully',
+      })
+    )
     return data
   } catch (error) {
     if (!error) {

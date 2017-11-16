@@ -3,7 +3,7 @@ import * as classnames from 'classnames'
 import {Scrollbars} from 'react-custom-scrollbars'
 
 export interface FancyScrollbarProps {
-  className: string
+  className?: string
   autoHide?: boolean
   autoHeight?: boolean
   maxHeight?: number
