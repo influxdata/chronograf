@@ -8,10 +8,6 @@ export interface TabProps {
   isKapacitorTab?: boolean
 }
 
-const log = x => {
-  console.log(x)
-}
-
 export const Tab: React.SFC<TabProps> = ({
   isKapacitorTab,
   isActive,

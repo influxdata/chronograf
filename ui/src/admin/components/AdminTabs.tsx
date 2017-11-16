@@ -4,7 +4,7 @@ import UsersTable from 'admin/components/UsersTable'
 import RolesTable from 'admin/components/RolesTable'
 import QueriesPage from 'admin/containers/QueriesPage'
 import DatabaseManagerPage from 'admin/containers/DatabaseManagerPage'
-import {eFunc} from 'src/types/funcs'
+import {eReturnFunc} from 'src/types/funcs'
 import {Source} from 'src/types'
 import {
   InfluxDBUser as User,
@@ -20,7 +20,7 @@ export interface AdminTabsProps {
   hasRoles: boolean
   isEditingUsers: boolean
   isEditingRoles: boolean
-  onClickCreate: eFunc
+  onClickCreate: eReturnFunc
   onEditUser: (user: User, updates: {}) => void
   onSaveUser: (user: User) => void
   onCancelEditUser: (user: User) => void
@@ -30,7 +30,7 @@ export interface AdminTabsProps {
   onDeleteRole: (role: Role, updates: {}) => void
   onDeleteUser: (user: User) => void
   onFilterRoles: (text: string) => void
-  onFilterUsers: (text: string) => void
+  onFilterUsers: (text: string) => {}
   onUpdateRoleUsers: (role: Role, users: User[]) => void
   onUpdateRolePermissions: (role: Role, permissions: Permission[]) => void
   onUpdateUserRoles: (user: User, roles: Role[]) => void

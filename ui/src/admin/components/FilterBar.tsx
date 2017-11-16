@@ -1,8 +1,14 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
-class FilterBar extends React.Component {
-  constructor(props) {
+export interface FilterBarProps {
+  onFilter: (filterText: string) => {}
+  type: string
+  isEditing: boolean
+  onClickCreate: (type: string) => () => void
+}
+
+class FilterBar extends React.Component<FilterBarProps, {filterText: string}> {
+  constructor(props: FilterBarProps) {
     super(props)
 
     this.state = {
@@ -10,22 +16,25 @@ class FilterBar extends React.Component {
     }
   }
 
-  handleText = e => {
-    this.setState(
-      {filterText: e.target.value},
-      this.props.onFilter(e.target.value)
-    )
+  private handleFilter = text => () => {
+    this.props.onFilter(text)
   }
 
-  componentWillUnmount() {
+  private handleText = e => {
+    const {value: filterText} = e.target
+    this.setState({filterText}, this.handleFilter(filterText))
+  }
+
+  public componentWillUnmount() {
     this.props.onFilter('')
   }
 
-  render() {
+  public render() {
     const {type, isEditing, onClickCreate} = this.props
-    const placeholderText = type.replace(/\w\S*/g, function(txt) {
+    const placeholderText = type.replace(/\w\S*/g, txt => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     })
+
     return (
       <div className="panel-heading u-flex u-ai-center u-jc-space-between">
         <div className="users__search-widget input-group admin__search-widget">
@@ -51,15 +60,6 @@ class FilterBar extends React.Component {
       </div>
     )
   }
-}
-
-const {bool, func, string} = PropTypes
-
-FilterBar.propTypes = {
-  onFilter: func.isRequired,
-  type: string,
-  isEditing: bool,
-  onClickCreate: func,
 }
 
 export default FilterBar

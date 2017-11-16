@@ -1,26 +1,48 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import UserRow from 'admin/components/UserRow'
 import EmptyRow from 'admin/components/EmptyRow'
 import FilterBar from 'admin/components/FilterBar'
+import {
+  InfluxDBUser as User,
+  InfluxDBRole as Role,
+  InfluxDBPermission as Permission,
+} from 'src/types/influxdbAdmin'
+import {eReturnFunc} from 'src/types/funcs'
 
-const UsersTable = ({
+export interface UsersTableProps {
+  users: User[]
+  onEdit: (user: User, updates: {}) => void
+  onSave: (user: User) => void
+  onCancel: (user: User) => void
+  onDelete: (user: User) => void
+  onFilter: (text: string) => {}
+  allRoles: Role[]
+  hasRoles: boolean
+  isEditing: boolean
+  permissions: string[]
+  onClickCreate: eReturnFunc
+  onUpdateRoles: (user: User, roles: Role[]) => void
+  onUpdatePassword: (user: User, password: string) => void
+  onUpdatePermissions: (user: User, permissions: Permission[]) => void
+}
+
+const UsersTable: React.SFC<UsersTableProps> = ({
   users,
-  allRoles,
-  hasRoles,
-  permissions,
-  isEditing,
-  onClickCreate,
   onEdit,
   onSave,
   onCancel,
   onDelete,
   onFilter,
-  onUpdatePermissions,
+  allRoles,
+  hasRoles,
+  isEditing,
+  permissions,
+  onClickCreate,
   onUpdateRoles,
   onUpdatePassword,
-}) =>
+  onUpdatePermissions,
+}) => (
   <div className="panel panel-default">
     <FilterBar
       type="users"
@@ -40,65 +62,34 @@ const UsersTable = ({
           </tr>
         </thead>
         <tbody>
-          {users.length
-            ? users
-                .filter(u => !u.hidden)
-                .map(user =>
-                  <UserRow
-                    key={user.links.self}
-                    user={user}
-                    onEdit={onEdit}
-                    onSave={onSave}
-                    onCancel={onCancel}
-                    onDelete={onDelete}
-                    isEditing={user.isEditing}
-                    isNew={user.isNew}
-                    allRoles={allRoles}
-                    hasRoles={hasRoles}
-                    allPermissions={permissions}
-                    onUpdatePermissions={onUpdatePermissions}
-                    onUpdateRoles={onUpdateRoles}
-                    onUpdatePassword={onUpdatePassword}
-                  />
-                )
-            : <EmptyRow tableName={'Users'} />}
+          {users.length ? (
+            users
+              .filter(u => !u.hidden)
+              .map(user => (
+                <UserRow
+                  key={user.links.self}
+                  user={user}
+                  onEdit={onEdit}
+                  onSave={onSave}
+                  onCancel={onCancel}
+                  onDelete={onDelete}
+                  isNew={user.isNew}
+                  allRoles={allRoles}
+                  hasRoles={hasRoles}
+                  isEditing={user.isEditing}
+                  allPermissions={permissions}
+                  onUpdatePermissions={onUpdatePermissions}
+                  onUpdateRoles={onUpdateRoles}
+                  onUpdatePassword={onUpdatePassword}
+                />
+              ))
+          ) : (
+            <EmptyRow tableName={'Users'} />
+          )}
         </tbody>
       </table>
     </div>
   </div>
-
-const {arrayOf, bool, func, shape, string} = PropTypes
-
-UsersTable.propTypes = {
-  users: arrayOf(
-    shape({
-      name: string.isRequired,
-      roles: arrayOf(
-        shape({
-          name: string,
-        })
-      ),
-      permissions: arrayOf(
-        shape({
-          name: string,
-          scope: string.isRequired,
-        })
-      ),
-    })
-  ),
-  isEditing: bool,
-  onClickCreate: func.isRequired,
-  onEdit: func.isRequired,
-  onSave: func.isRequired,
-  onCancel: func.isRequired,
-  onDelete: func.isRequired,
-  onFilter: func,
-  allRoles: arrayOf(shape()),
-  permissions: arrayOf(string),
-  hasRoles: bool.isRequired,
-  onUpdatePermissions: func,
-  onUpdateRoles: func,
-  onUpdatePassword: func,
-}
+)
 
 export default UsersTable

@@ -25,4 +25,6 @@ export type func = () => void
 
 export type linkFunc = (link: string) => void
 
-export type eFunc = (e: {}) => func
+export type eReturnFunc = (e: {}) => func
+
+export type eFunc = (e: {}) => void

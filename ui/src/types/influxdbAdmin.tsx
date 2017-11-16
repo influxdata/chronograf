@@ -50,6 +50,8 @@ export interface InfluxDBUser {
   name: string
   permissions: InfluxDBPermission[]
   links: InfluxDBUserLinks
+  isNew?: boolean
+  hidden?: boolean
   password?: string
   isEditing: boolean
 }
