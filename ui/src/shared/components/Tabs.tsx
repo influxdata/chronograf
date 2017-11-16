@@ -8,6 +8,10 @@ export interface TabProps {
   isKapacitorTab?: boolean
 }
 
+const log = x => {
+  console.log(x)
+}
+
 export const Tab: React.SFC<TabProps> = ({
   isKapacitorTab,
   isActive,
@@ -51,14 +55,14 @@ export const TabList: React.SFC<TabListProps> = ({
       onClick: () => onActivate(index),
     })
 
-  React.Children.map(children, withTabList)
+  const c = React.Children.map(children, withTabList)
 
   if (isKapacitorTabs === 'true') {
     return (
       <div className="rule-section--row rule-section--row-first rule-section--row-last">
         <p>Choose One:</p>
         <div className="nav nav-tablist nav-tablist-sm nav-tablist-malachite">
-          {children}
+          {c}
         </div>
       </div>
     )
@@ -67,12 +71,12 @@ export const TabList: React.SFC<TabListProps> = ({
   if (customClass) {
     return (
       <div className={customClass}>
-        <div className="btn-group btn-group-lg tab-group">{children}</div>
+        <div className="btn-group btn-group-lg tab-group">{c}</div>
       </div>
     )
   }
 
-  return <div className="btn-group btn-group-lg tab-group">{children}</div>
+  return <div className="btn-group btn-group-lg tab-group">{c}</div>
 }
 
 TabList.displayName = 'TabList'
