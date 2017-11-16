@@ -1,4 +1,4 @@
-import reject from 'lodash/reject'
+import {reject} from 'lodash'
 import {
   NEW_DEFAULT_USER,
   NEW_DEFAULT_ROLE,

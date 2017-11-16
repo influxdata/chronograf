@@ -387,7 +387,7 @@ export const updateRetentionPolicyAsync = (
 }
 
 export const killQueryAsync = (
-  source: Source,
+  source: string,
   queryID: string
 ) => async dispatch => {
   // optimistic update

@@ -62,14 +62,14 @@ const Header = ({
       >
         <span className="icon plus" /> Add Retention Policy
       </button>
-      {database.name === '_internal'
-        ? null
-        : <button
-            className="btn btn-xs btn-danger"
-            onClick={onStartDelete(database)}
-          >
-            Delete
-          </button>}
+      {database.name === '_internal' ? null : (
+        <button
+          className="btn btn-xs btn-danger"
+          onClick={onStartDelete(database)}
+        >
+          Delete
+        </button>
+      )}
     </div>
   )
 
@@ -106,15 +106,13 @@ const Header = ({
 
   return (
     <div className="db-manager-header">
-      <h4>
-        {database.name}
-      </h4>
+      <h4>{database.name}</h4>
       {database.hasOwnProperty('deleteCode') ? deleteConfirmation : buttons}
     </div>
   )
 }
 
-const EditHeader = ({database, onEdit, onKeyDown, onConfirm, onCancel}) =>
+const EditHeader = ({database, onEdit, onKeyDown, onConfirm, onCancel}) => (
   <div className="db-manager-header db-manager-header--edit">
     <input
       className="form-control input-sm"
@@ -126,10 +124,11 @@ const EditHeader = ({database, onEdit, onKeyDown, onConfirm, onCancel}) =>
       onKeyDown={onKeyDown(database)}
       autoFocus={true}
       spellCheck={false}
-      autoComplete={false}
+      autoComplete="off"
     />
     <ConfirmButtons item={database} onConfirm={onConfirm} onCancel={onCancel} />
   </div>
+)
 
 const {func, shape, bool} = PropTypes
 
