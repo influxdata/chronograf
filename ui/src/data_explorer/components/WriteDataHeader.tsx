@@ -1,15 +1,25 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import DatabaseDropdown from 'shared/components/DatabaseDropdown'
 
-const WriteDataHeader = ({
+import {eFunc} from 'src/types/funcs'
+
+export interface WriteDataHeaderProps {
+  isManual: boolean
+  selectedDatabase: string
+  handleSelectDatabase: (db: string) => void
+  toggleWriteView: (toggle: boolean) => () => void
+  errorThrown: (error: string) => void
+  onClose: () => void
+}
+
+const WriteDataHeader: React.SFC<WriteDataHeaderProps> = ({
   handleSelectDatabase,
   selectedDatabase,
   errorThrown,
   toggleWriteView,
   isManual,
   onClose,
-}) =>
+}) => (
   <div className="write-data-form--header">
     <div className="page-header__left">
       <h1 className="page-header__title">Write Data To</h1>
@@ -38,16 +48,6 @@ const WriteDataHeader = ({
       <span className="page-header__dismiss" onClick={onClose} />
     </div>
   </div>
-
-const {func, string, bool} = PropTypes
-
-WriteDataHeader.propTypes = {
-  handleSelectDatabase: func.isRequired,
-  selectedDatabase: string,
-  toggleWriteView: func.isRequired,
-  errorThrown: func.isRequired,
-  onClose: func.isRequired,
-  isManual: bool,
-}
+)
 
 export default WriteDataHeader

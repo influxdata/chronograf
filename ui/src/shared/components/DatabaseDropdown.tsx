@@ -1,42 +1,36 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import Dropdown from 'shared/components/Dropdown'
 
 import {showDatabases} from 'shared/apis/metaQuery'
 import parsers from 'shared/parsing'
 const {databases: showDatabasesParser} = parsers
 
-class DatabaseDropdown extends React.Component {
-  constructor(props) {
+import {Source} from 'src/types'
+
+export interface DatabaseDropdownProps {
+  source: Source
+  database: string
+  onSelectDatabase: () => void
+  onStartEdit: () => void
+  onErrorThrown: () => void
+}
+
+export interface DatabaseDropdownState {
+  databases: string[]
+}
+
+class DatabaseDropdown extends React.Component<
+  DatabaseDropdownProps,
+  DatabaseDropdownState
+> {
+  constructor(props: DatabaseDropdownProps) {
     super(props)
     this.state = {
       databases: [],
     }
   }
 
-  componentDidMount() {
-    this._getDatabases()
-  }
-
-  render() {
-    const {databases} = this.state
-    const {database, onSelectDatabase, onStartEdit} = this.props
-
-    if (!database) {
-      this.componentDidMount()
-    }
-
-    return (
-      <Dropdown
-        items={databases.map(text => ({text}))}
-        selected={database || 'Loading...'}
-        onChoose={onSelectDatabase}
-        onClick={onStartEdit ? onStartEdit : null}
-      />
-    )
-  }
-
-  _getDatabases = async () => {
+  private _getDatabases = async () => {
     const {source} = this.context
     const {database, onSelectDatabase, onErrorThrown} = this.props
     const proxy = source.links.proxy
@@ -59,23 +53,28 @@ class DatabaseDropdown extends React.Component {
       onErrorThrown(error)
     }
   }
-}
 
-const {func, shape, string} = PropTypes
+  public componentDidMount() {
+    this._getDatabases()
+  }
 
-DatabaseDropdown.contextTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-}
+  public render() {
+    const {databases} = this.state
+    const {database, onSelectDatabase, onStartEdit} = this.props
 
-DatabaseDropdown.propTypes = {
-  database: string,
-  onSelectDatabase: func.isRequired,
-  onStartEdit: func,
-  onErrorThrown: func.isRequired,
+    if (!database) {
+      this.componentDidMount()
+    }
+
+    return (
+      <Dropdown
+        items={databases.map(text => ({text}))}
+        selected={database || 'Loading...'}
+        onChoose={onSelectDatabase}
+        onClick={onStartEdit ? onStartEdit : null}
+      />
+    )
+  }
 }
 
 export default DatabaseDropdown

@@ -1,9 +1,8 @@
-import * as React from 'react'
-import * as PropTypes from 'prop-types'
+import * as React from 'react';
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import Dygraph from 'external/dygraph'
+import Dygraph from 'src/external/dygraph'
 
 import OverlayTechnologies from 'shared/components/OverlayTechnologies'
 import CellEditorOverlay from 'dashboards/components/CellEditorOverlay'
@@ -15,7 +14,7 @@ import ManualRefresh from 'shared/components/ManualRefresh'
 import {errorThrown as errorThrownAction} from 'shared/actions/errors'
 import idNormalizer, {TYPE_ID} from 'normalizers/id'
 
-import * as dashboardActionCreators from 'dashboards/actions'
+import * as dashboardActionCreators from 'dashboards/actions';
 
 import {
   setAutoRefresh,
@@ -30,8 +29,82 @@ const defaultTimeRange = {
   format: FORMAT_INFLUXQL,
 }
 
-class DashboardPage extends React.Component {
-  constructor(props) {
+import {Cell, Dygraph as DygraphType, ZoomedTimeRange} from 'src/types'
+
+export interface DashboardPageProps {
+  source: Source
+  sources: Source[]
+  params: shape({
+    sourceID: string.isRequired,
+    dashboardID: string.isRequired,
+  }).isRequired,
+  location: shape({
+    pathname: string.isRequired,
+    query: shape({}),
+  }).isRequired,
+  dashboard: shape({}),
+  dashboardActions: shape({
+    putDashboard: func.isRequired,
+    getDashboardsAsync: func.isRequired,
+    setTimeRange: func.isRequired,
+    addDashboardCellAsync: func.isRequired,
+    editDashboardCell: func.isRequired,
+    cancelEditCell: func.isRequired,
+  }).isRequired,
+  dashboards: arrayOf(
+    shape({
+      id: number.isRequired,
+      cells: arrayOf(shape({})).isRequired,
+      templates: arrayOf(
+        shape({
+          type: string.isRequired,
+          tempVar: string.isRequired,
+          query: shape({
+            db: string,
+            rp: string,
+            influxql: string,
+          }),
+          values: arrayOf(
+            shape({
+              value: string.isRequired,
+              selected: bool.isRequired,
+              type: string.isRequired,
+            })
+          ),
+        })
+      ),
+    })
+  ),
+  handleChooseAutoRefresh: func.isRequired,
+  autoRefresh: number.isRequired,
+  templateControlBarVisibilityToggled: func.isRequired,
+  timeRange: shape({
+    upper: string,
+    lower: string,
+  }),
+  showTemplateControlBar: bool.isRequired,
+  inPresentationMode: bool.isRequired,
+  handleClickPresentationButton: func,
+  cellQueryStatus: shape({
+    queryID: string,
+    status: shape(),
+  }).isRequired,
+  errorThrown: func,
+  manualRefresh: number.isRequired,
+  onManualRefresh: func.isRequired,
+}
+
+export interface DashboardPageState {
+  dygraphs: Dygraph[]
+  selectedCell?: Cell
+  isEditMode: boolean
+  isTemplating: boolean
+  zoomedTimeRange: ZoomedTimeRange
+  names: string[]
+}
+
+class DashboardPage extends React.Component<DashboardPageProps, DashboardPageState> {
+  constructor(props: DashboardPageProps) {
     super(props)
 
     this.state = {
@@ -130,7 +203,7 @@ class DashboardPage extends React.Component {
     this.setState({isEditMode: false})
   }
 
-  handleRenameDashboard = name => {
+  public handleRenameDashboard = name => {
     const {dashboardActions, dashboard} = this.props
     this.setState({isEditMode: false})
     const newDashboard = {...dashboard, name}
@@ -139,24 +212,24 @@ class DashboardPage extends React.Component {
     dashboardActions.putDashboard(newDashboard)
   }
 
-  handleUpdateDashboardCell = newCell => () => {
+  public handleUpdateDashboardCell = newCell => () => {
     const {dashboardActions, dashboard} = this.props
     dashboardActions.updateDashboardCell(dashboard, newCell)
   }
 
-  handleDeleteDashboardCell = cell => {
+  public handleDeleteDashboardCell = cell => {
     const {dashboardActions, dashboard} = this.props
     dashboardActions.deleteDashboardCellAsync(dashboard, cell)
   }
 
-  handleSelectTemplate = templateID => values => {
+  public handleSelectTemplate = templateID => values => {
     const {dashboardActions, dashboard} = this.props
     dashboardActions.templateVariableSelected(dashboard.id, templateID, [
       values,
     ])
   }
 
-  handleEditTemplateVariables = (
+  public handleEditTemplateVariables = (
     templates,
     onSaveTemplatesSuccess
   ) => async () => {
@@ -173,12 +246,12 @@ class DashboardPage extends React.Component {
     }
   }
 
-  handleRunQueryFailure = error => {
+  public handleRunQueryFailure = error => {
     console.error(error)
     this.props.errorThrown(error)
   }
 
-  synchronizer = dygraph => {
+  public synchronizer = dygraph => {
     const dygraphs = [...this.state.dygraphs, dygraph].filter(d => d.graphDiv)
     const {dashboards, params: {dashboardID}} = this.props
 
@@ -201,15 +274,15 @@ class DashboardPage extends React.Component {
     this.setState({dygraphs})
   }
 
-  handleToggleTempVarControls = () => {
+  public handleToggleTempVarControls = () => {
     this.props.templateControlBarVisibilityToggled()
   }
 
-  handleZoomedTimeRange = (zoomedLower, zoomedUpper) => {
+  public handleZoomedTimeRange = (zoomedLower, zoomedUpper) => {
     this.setState({zoomedTimeRange: {zoomedLower, zoomedUpper}})
   }
 
-  render() {
+  public render() {
     const {zoomedTimeRange} = this.state
     const {zoomedLower, zoomedUpper} = zoomedTimeRange
 
@@ -362,76 +435,6 @@ class DashboardPage extends React.Component {
       </div>
     )
   }
-}
-
-const {arrayOf, bool, func, number, shape, string} = PropTypes
-
-DashboardPage.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string,
-      self: string,
-    }),
-  }).isRequired,
-  sources: arrayOf(shape({})).isRequired,
-  params: shape({
-    sourceID: string.isRequired,
-    dashboardID: string.isRequired,
-  }).isRequired,
-  location: shape({
-    pathname: string.isRequired,
-    query: shape({}),
-  }).isRequired,
-  dashboard: shape({}),
-  dashboardActions: shape({
-    putDashboard: func.isRequired,
-    getDashboardsAsync: func.isRequired,
-    setTimeRange: func.isRequired,
-    addDashboardCellAsync: func.isRequired,
-    editDashboardCell: func.isRequired,
-    cancelEditCell: func.isRequired,
-  }).isRequired,
-  dashboards: arrayOf(
-    shape({
-      id: number.isRequired,
-      cells: arrayOf(shape({})).isRequired,
-      templates: arrayOf(
-        shape({
-          type: string.isRequired,
-          tempVar: string.isRequired,
-          query: shape({
-            db: string,
-            rp: string,
-            influxql: string,
-          }),
-          values: arrayOf(
-            shape({
-              value: string.isRequired,
-              selected: bool.isRequired,
-              type: string.isRequired,
-            })
-          ),
-        })
-      ),
-    })
-  ),
-  handleChooseAutoRefresh: func.isRequired,
-  autoRefresh: number.isRequired,
-  templateControlBarVisibilityToggled: func.isRequired,
-  timeRange: shape({
-    upper: string,
-    lower: string,
-  }),
-  showTemplateControlBar: bool.isRequired,
-  inPresentationMode: bool.isRequired,
-  handleClickPresentationButton: func,
-  cellQueryStatus: shape({
-    queryID: string,
-    status: shape(),
-  }).isRequired,
-  errorThrown: func,
-  manualRefresh: number.isRequired,
-  onManualRefresh: func.isRequired,
 }
 
 const mapStateToProps = (state, {params: {dashboardID}}) => {
