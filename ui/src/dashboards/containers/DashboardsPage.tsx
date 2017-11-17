@@ -1,8 +1,7 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
 
 import DashboardsHeader from 'dashboards/components/DashboardsHeader'
 import DashboardsContents from 'dashboards/components/DashboardsPageContents'
@@ -11,49 +10,38 @@ import {createDashboard} from 'dashboards/apis'
 import {getDashboardsAsync, deleteDashboardAsync} from 'dashboards/actions'
 
 import {NEW_DASHBOARD} from 'dashboards/constants'
+import {Dashboard, History, Source} from 'src/types'
 
-const {arrayOf, func, string, shape} = PropTypes
+export interface DashboardsPageProps {
+  source: Source
+  history: History
+  handleGetDashboards: () => void
+  handleDeleteDashboard: (dashboard: Dashboard) => void
+  dashboards: Dashboard[]
+}
 
-class DashboardsPage extends React.Component {
-  propTypes = {
-    source: shape({
-      id: string.isRequired,
-      name: string.isRequired,
-      type: string,
-      links: shape({
-        proxy: string.isRequired,
-      }).isRequired,
-      telegraf: string.isRequired,
-    }),
-    router: shape({
-      push: func.isRequired,
-    }).isRequired,
-    handleGetDashboards: func.isRequired,
-    handleDeleteDashboard: func.isRequired,
-    dashboards: arrayOf(shape()),
-  }
-
-  componentDidMount() {
-    this.props.handleGetDashboards()
-  }
-
-  handleCreateDashbord = async () => {
-    const {source: {id}, router: {push}} = this.props
+class DashboardsPage extends React.Component<DashboardsPageProps> {
+  private handleCreateDashbord = async () => {
+    const {source: {id}, history: {push}} = this.props
     const {data} = await createDashboard(NEW_DASHBOARD)
     push(`/sources/${id}/dashboards/${data.id}`)
   }
 
-  handleDeleteDashboard = (dashboard) => {
+  private handleDeleteDashboard = dashboard => {
     this.props.handleDeleteDashboard(dashboard)
   }
 
-  render() {
-    const {dashboards} = this.props
-    const dashboardLink = `/sources/${this.props.source.id}`
+  public componentDidMount() {
+    this.props.handleGetDashboards()
+  }
+
+  public render() {
+    const {dashboards, source} = this.props
+    const dashboardLink = `/sources/${source.id}`
 
     return (
       <div className="page">
-        <DashboardsHeader sourceName={this.props.source.name} />
+        <DashboardsHeader source={source} />
         <DashboardsContents
           dashboardLink={dashboardLink}
           dashboards={dashboards}
@@ -75,6 +63,7 @@ const mapDispatchToProps = dispatch => ({
   handleDeleteDashboard: bindActionCreators(deleteDashboardAsync, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(DashboardsPage)
-)
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(DashboardsPage)
