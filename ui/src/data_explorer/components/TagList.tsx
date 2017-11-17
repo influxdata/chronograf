@@ -29,8 +29,7 @@ class TagList extends React.Component<TagListProps, TagListState> {
 
   public _getTags = () => {
     const {database, measurement, retentionPolicy} = this.props.query
-    const {source} = this.context
-    const {querySource} = this.props
+    const {querySource, source} = this.props
 
     const proxy =
       _.get(querySource, ['links', 'proxy'], null) || source.links.proxy

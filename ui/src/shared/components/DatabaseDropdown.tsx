@@ -10,9 +10,9 @@ import {Source} from 'src/types'
 export interface DatabaseDropdownProps {
   source: Source
   database: string
-  onSelectDatabase: () => void
-  onStartEdit: () => void
-  onErrorThrown: () => void
+  onSelectDatabase: ({text}: {text: string}) => void
+  onStartEdit?: () => void
+  onErrorThrown: (error: string) => void
 }
 
 export interface DatabaseDropdownState {
@@ -31,8 +31,7 @@ class DatabaseDropdown extends React.Component<
   }
 
   private _getDatabases = async () => {
-    const {source} = this.context
-    const {database, onSelectDatabase, onErrorThrown} = this.props
+    const {database, onSelectDatabase, onErrorThrown, source} = this.props
     const proxy = source.links.proxy
     try {
       const {data} = await showDatabases(proxy)
