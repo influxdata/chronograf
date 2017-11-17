@@ -1,20 +1,29 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import QueryEditor from './QueryEditor'
 import SchemaExplorer from 'shared/components/SchemaExplorer'
 import {buildRawText} from 'utils/influxql'
+import {QueryConfig, Source, TimeRange} from 'src/types'
+import {QueryConfigActions} from '../containers/DataExplorer'
+
+export interface QueryMakerProps {
+  source: Source
+  timeRange: TimeRange
+  actions: QueryConfigActions
+  activeQuery?: QueryConfig
+  initialGroupByTime: string
+}
 
 const rawTextBinder = (links, id, action) => text =>
   action(links.queries, id, text)
 
-const QueryMaker = ({
+const QueryMaker: React.SFC<QueryMakerProps> = ({
   source,
   actions,
   timeRange,
   activeQuery,
   initialGroupByTime,
-}) =>
+}) => (
   <div className="query-maker query-maker--panel">
     <div className="query-maker--tab-contents">
       <QueryEditor
@@ -33,34 +42,6 @@ const QueryMaker = ({
       />
     </div>
   </div>
-
-const {func, shape, string} = PropTypes
-
-QueryMaker.propTypes = {
-  source: shape({
-    links: shape({
-      queries: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  timeRange: shape({
-    upper: string,
-    lower: string,
-  }).isRequired,
-  actions: shape({
-    chooseNamespace: func.isRequired,
-    chooseMeasurement: func.isRequired,
-    chooseTag: func.isRequired,
-    groupByTag: func.isRequired,
-    addQuery: func.isRequired,
-    toggleField: func.isRequired,
-    groupByTime: func.isRequired,
-    toggleTagAcceptance: func.isRequired,
-    applyFuncsToField: func.isRequired,
-    editRawTextAsync: func.isRequired,
-    addInitialField: func.isRequired,
-  }).isRequired,
-  activeQuery: shape({}),
-  initialGroupByTime: string.isRequired,
-}
+)
 
 export default QueryMaker

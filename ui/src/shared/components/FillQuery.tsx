@@ -1,16 +1,30 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
+
 import Dropdown from 'shared/components/Dropdown'
-
 import {NULL_STRING, NUMBER} from 'shared/constants/queryFillOptions'
+import queryFills, {QueryFill} from 'shared/data/queryFills'
 
-import queryFills from 'shared/data/queryFills'
+export interface FillQueryProps {
+  onChooseFill: (fill: string) => void
+  value: string
+  size?: string
+  theme?: string
+}
 
-class FillQuery extends React.Component {
-  constructor(props) {
+export interface FillQueryState {
+  selected: QueryFill
+  currentNumberValue: string
+  resetNumberValue: string
+}
+
+class FillQuery extends React.Component<FillQueryProps, FillQueryState> {
+  private numberInput
+
+  constructor(props: FillQueryProps) {
     super(props)
 
-    const isNumberValue = !isNaN(Number(props.value))
+    const isNumberValue = _.isNumber(props.value)
 
     this.state = isNumberValue
       ? {
@@ -25,7 +39,7 @@ class FillQuery extends React.Component {
         }
   }
 
-  handleDropdown = item => {
+  private handleDropdown = item => {
     if (item.text === NUMBER) {
       this.setState({selected: item}, () => {
         this.numberInput.focus()
@@ -37,7 +51,7 @@ class FillQuery extends React.Component {
     }
   }
 
-  handleInputBlur = e => {
+  private handleInputBlur = e => {
     const nextNumberValue = e.target.value
       ? e.target.value
       : this.state.resetNumberValue || '0'
@@ -50,19 +64,19 @@ class FillQuery extends React.Component {
     this.props.onChooseFill(nextNumberValue)
   }
 
-  handleInputChange = e => {
+  private handleInputChange = e => {
     const currentNumberValue = e.target.value
 
     this.setState({currentNumberValue})
   }
 
-  handleKeyDown = e => {
+  private handleKeyDown = e => {
     if (e.key === 'Enter') {
       this.numberInput.blur()
     }
   }
 
-  handleKeyUp = e => {
+  private handleKeyUp = e => {
     if (e.key === 'Escape') {
       this.setState({currentNumberValue: this.state.resetNumberValue}, () => {
         this.numberInput.blur()
@@ -70,7 +84,7 @@ class FillQuery extends React.Component {
     }
   }
 
-  getColor = theme => {
+  private getColor = theme => {
     switch (theme) {
       case 'BLUE':
         return 'plutonium'
@@ -83,13 +97,19 @@ class FillQuery extends React.Component {
     }
   }
 
-  render() {
+  public static defaultProps = () => ({
+    size: 'sm',
+    theme: 'blue',
+    value: NULL_STRING,
+  })
+
+  public render() {
     const {size, theme} = this.props
     const {selected, currentNumberValue} = this.state
 
     return (
       <div className={`fill-query fill-query--${size}`}>
-        {selected.type === NUMBER &&
+        {selected.type === NUMBER && (
           <input
             ref={r => (this.numberInput = r)}
             type="number"
@@ -102,7 +122,8 @@ class FillQuery extends React.Component {
             onKeyDown={this.handleKeyDown}
             onChange={this.handleInputChange}
             onBlur={this.handleInputBlur}
-          />}
+          />
+        )}
         <Dropdown
           selected={selected.text}
           items={queryFills}
@@ -116,21 +137,6 @@ class FillQuery extends React.Component {
       </div>
     )
   }
-}
-
-const {func, string} = PropTypes
-
-FillQuery.defaultProps = {
-  size: 'sm',
-  theme: 'blue',
-  value: NULL_STRING,
-}
-
-FillQuery.propTypes = {
-  onChooseFill: func.isRequired,
-  value: string,
-  size: string,
-  theme: string,
 }
 
 export default FillQuery

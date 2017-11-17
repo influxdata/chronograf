@@ -3,11 +3,12 @@ import * as classnames from 'classnames'
 import onClickOutside from 'shared/components/onClickOutside'
 
 import autoRefreshItems from 'shared/data/autoRefreshes'
+import {func} from 'src/types/funcs'
 
 export interface AutoRefreshDropdownProps {
   selected: number
   onChoose: (milliseconds: number) => void
-  onManualRefresh: () => void
+  onManualRefresh: func
 }
 
 class AutoRefreshDropdown extends React.Component<AutoRefreshDropdownProps> {
@@ -79,4 +80,4 @@ class AutoRefreshDropdown extends React.Component<AutoRefreshDropdownProps> {
   }
 }
 
-export default onClickOutside(AutoRefreshDropdown)
+export default onClickOutside<AutoRefreshDropdownProps>(AutoRefreshDropdown)

@@ -64,3 +64,10 @@ export const showTagValues = ({
 
   return proxy({source, db: database, rp: retentionPolicy, query})
 }
+
+export const showFieldKeys = (source, db, measurement, rp) =>
+  proxy({
+    source,
+    query: `SHOW FIELD KEYS FROM "${rp}"."${measurement}"`,
+    db,
+  })

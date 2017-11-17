@@ -31,6 +31,7 @@ import {
   ManualRefresh as ManualRefreshType,
   RouterHostID,
 } from 'src/types'
+import {func} from 'src/types/funcs'
 
 export interface HostPageProps {
   source: Source
@@ -38,7 +39,7 @@ export interface HostPageProps {
   inPresentationMode: boolean
   autoRefresh: AutoRefresh
   manualRefresh: ManualRefreshType
-  onManualRefresh: (num: number) => void
+  onManualRefresh: func
   handleChooseAutoRefresh: () => void
   handleClickPresentationButton: () => void
 }
@@ -176,7 +177,7 @@ class HostPage extends React.Component<HostPageProps & RouterHostID> {
     // only display hosts in the list if they match the current app
     let filteredHosts = hosts
     if (focusedApp) {
-      filteredHosts = _.pickBy(hosts, (val, __, ___) => {
+      filteredHosts = _.pickBy(hosts, val => {
         return val.apps.includes(focusedApp)
       })
     }

@@ -108,7 +108,7 @@ class Root extends React.Component {
   private flushErrorsQueue = () => {
     if (errorsQueue.length) {
       errorsQueue.forEach(errorText => {
-        dispatch(errorThrown({status: 0, auth: null}, errorText, 'warning'))
+        dispatch(errorThrown(errorText, 'warning'))
       })
     }
   }

@@ -5,7 +5,7 @@ import * as classnames from 'classnames'
 import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
 import {resultsToCSV} from 'shared/parsing/resultsToCSV'
 import download from 'external/download'
-import {Query} from 'src/types'
+import {VisualizationQuery} from 'src/types'
 
 const getCSV = (query, errorThrown) => async () => {
   try {
@@ -23,7 +23,7 @@ const getCSV = (query, errorThrown) => async () => {
 }
 
 export interface VisHeaderProps {
-  query: Query
+  query: VisualizationQuery
   onToggleView: (view: string) => () => void
   errorThrown: (error: string) => void
   views: string[]

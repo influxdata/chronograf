@@ -1,4 +1,5 @@
 import * as _ from 'lodash'
+
 import defaultQueryConfig from 'utils/defaultQueryConfig'
 import {
   hasField,
@@ -7,18 +8,31 @@ import {
   getFuncsByFieldName,
 } from 'shared/reducers/helpers/fields'
 
-export function editRawText(query, rawText) {
-  return Object.assign({}, query, {rawText})
-}
+import {
+  QueryConfig,
+  QueryConfigField,
+  QueryConfigTagValues,
+  QueryConfigNamespace,
+  QueryConfigGroupBy,
+} from 'src/types'
 
-export const chooseNamespace = (query, namespace, isKapacitorRule = false) => ({
+export const editRawText = (
+  query: QueryConfig,
+  rawText: string
+): QueryConfig => ({...query, rawText})
+
+export const chooseNamespace = (
+  query: QueryConfig,
+  namespace: QueryConfigNamespace,
+  isKapacitorRule = false
+) => ({
   ...defaultQueryConfig({id: query.id, isKapacitorRule}),
   ...namespace,
 })
 
 export const chooseMeasurement = (
-  query,
-  measurement,
+  query: QueryConfig,
+  measurement: string,
   isKapacitorRule = false
 ) => ({
   ...defaultQueryConfig({id: query.id, isKapacitorRule}),
@@ -27,7 +41,10 @@ export const chooseMeasurement = (
   measurement,
 })
 
-export const toggleKapaField = (query, field) => {
+export const toggleKapaField = (
+  query: QueryConfig,
+  field: QueryConfigField
+): QueryConfig => {
   if (field.type === 'field') {
     return {
       ...query,
@@ -45,7 +62,7 @@ export const toggleKapaField = (query, field) => {
   }
 }
 
-export const buildInitialField = value => [
+export const buildInitialField = (value: string): QueryConfigField[] => [
   {
     type: 'func',
     alias: `mean_${value}`,
@@ -54,15 +71,20 @@ export const buildInitialField = value => [
   },
 ]
 
-export const addInitialField = (query, field, groupBy) => {
-  return {
-    ...query,
-    fields: buildInitialField(field.value),
-    groupBy,
-  }
-}
+export const addInitialField = (
+  query: QueryConfig,
+  field: QueryConfigField,
+  groupBy: QueryConfigGroupBy
+): QueryConfig => ({
+  ...query,
+  fields: buildInitialField(field.value),
+  groupBy,
+})
 
-export const toggleField = (query, {value}) => {
+export const toggleField = (
+  query: QueryConfig,
+  {value}: {value: string}
+): QueryConfig => {
   const {fields = [], groupBy} = query
   const isSelected = hasField(value, fields)
   const newFuncs = fields.filter(f => f.type === 'func')
@@ -108,23 +130,25 @@ export const toggleField = (query, {value}) => {
   }
 }
 
-export function groupByTime(query, time) {
-  return Object.assign({}, query, {
-    groupBy: Object.assign({}, query.groupBy, {
-      time,
-    }),
-  })
-}
+export const groupByTime = (query: QueryConfig, time: string): QueryConfig => ({
+  ...query,
+  groupBy: {
+    ...query.groupBy,
+    time,
+  },
+})
 
 export const fill = (query, value) => ({...query, fill: value})
 
-export function toggleTagAcceptance(query) {
-  return Object.assign({}, query, {
-    areTagsAccepted: !query.areTagsAccepted,
-  })
-}
+export const toggleTagAcceptance = (query: QueryConfig): QueryConfig => ({
+  ...query,
+  areTagsAccepted: !query.areTagsAccepted,
+})
 
-export const removeFuncs = (query, fields) => ({
+export const removeFuncs = (
+  query: QueryConfig,
+  fields: QueryConfigField[]
+): QueryConfig => ({
   ...query,
   fields: getFieldsDeep(fields),
   groupBy: {...query.groupBy, time: null},
@@ -185,13 +209,15 @@ export const applyFuncsToField = (query, {field, funcs = []}, groupBy) => {
   }
 }
 
-export function updateRawQuery(query, rawText) {
-  return Object.assign({}, query, {
-    rawText,
-  })
-}
+export const updateRawQuery = (
+  query: QueryConfig,
+  rawText: string
+): QueryConfig => ({
+  ...query,
+  rawText,
+})
 
-export function groupByTag(query, tagKey) {
+export const groupByTag = (query: QueryConfig, tagKey: string): QueryConfig => {
   const oldTags = query.groupBy.tags
   let newTags
 
@@ -204,20 +230,34 @@ export function groupByTag(query, tagKey) {
     newTags = oldTags.concat(tagKey)
   }
 
-  return Object.assign({}, query, {
-    groupBy: Object.assign({}, query.groupBy, {tags: newTags}),
-  })
+  return {
+    ...query,
+    groupBy: {...query.groupBy, tags: newTags},
+  }
 }
 
-export function chooseTag(query, tag) {
+export interface Tag {
+  key: string
+  value: string
+}
+
+export const chooseTag = (query: QueryConfig, tag: Tag): QueryConfig => {
   const tagValues = query.tags[tag.key]
   const shouldRemoveTag =
     tagValues && tagValues.length === 1 && tagValues[0] === tag.value
   if (shouldRemoveTag) {
-    const newTags = Object.assign({}, query.tags)
+    const newTags = {...query.tags}
     delete newTags[tag.key]
-    return Object.assign({}, query, {tags: newTags})
+    return {...query, tags: newTags}
   }
+
+  const updateTagValues = (newTagValues: QueryConfigTagValues) => ({
+    ...query,
+    tags: {
+      ...query.tags,
+      [tag.key]: newTagValues,
+    },
+  })
 
   const oldTagValues = query.tags[tag.key]
   if (!oldTagValues) {
@@ -232,13 +272,5 @@ export function chooseTag(query, tag) {
     return updateTagValues(tagValuesCopy)
   }
 
-  return updateTagValues(query.tags[tag.key].concat(tag.value))
-
-  function updateTagValues(newTagValues) {
-    return Object.assign({}, query, {
-      tags: Object.assign({}, query.tags, {
-        [tag.key]: newTagValues,
-      }),
-    })
-  }
+  return updateTagValues([...query.tags[tag.key], tag.value])
 }

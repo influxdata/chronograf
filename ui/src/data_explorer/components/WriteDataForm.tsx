@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 
 import onClickOutside from 'shared/components/onClickOutside'
@@ -9,8 +8,39 @@ import WriteDataHeader from 'data_explorer/components/WriteDataHeader'
 import {OVERLAY_TECHNOLOGY} from 'shared/constants/classNames'
 let dragCounter = 0
 
-class WriteDataForm extends React.Component {
-  constructor(props) {
+import {Source} from 'src/types'
+import {eFunc, func} from 'src/types/funcs'
+
+export interface WriteDataFormProps {
+  source: Source
+  onClose: func
+  writeLineProtocol: (
+    source: Source,
+    selectedDatabase: string,
+    content: string
+  ) => void
+  errorThrown: eFunc
+  selectedDatabase: string
+}
+
+export interface WriteDataFormState {
+  selectedDatabase: string
+  inputContent: string | null
+  uploadContent: string
+  fileName: string
+  progress: string
+  isManual: boolean
+  dragClass: string
+  isUploading: boolean
+}
+
+class WriteDataForm extends React.Component<
+  WriteDataFormProps,
+  WriteDataFormState
+> {
+  private fileInput
+
+  constructor(props: WriteDataFormProps) {
     super(props)
     this.state = {
       selectedDatabase: props.selectedDatabase,
@@ -24,23 +54,15 @@ class WriteDataForm extends React.Component {
     }
   }
 
-  toggleWriteView = isManual => () => {
+  private toggleWriteView = isManual => () => {
     this.setState({isManual})
   }
 
-  handleSelectDatabase = item => {
+  private handleSelectDatabase = item => {
     this.setState({selectedDatabase: item.text})
   }
 
-  handleClickOutside = e => {
-    // guard against clicking to close error notification
-    if (e.target.className === OVERLAY_TECHNOLOGY) {
-      const {onClose} = this.props
-      onClose()
-    }
-  }
-
-  handleKeyUp = e => {
+  private handleKeyUp = e => {
     e.stopPropagation()
     if (e.key === 'Escape') {
       const {onClose} = this.props
@@ -48,7 +70,7 @@ class WriteDataForm extends React.Component {
     }
   }
 
-  handleSubmit = async () => {
+  private handleSubmit = async () => {
     const {onClose, source, writeLineProtocol} = this.props
     const {inputContent, uploadContent, selectedDatabase, isManual} = this.state
     const content = isManual ? inputContent : uploadContent
@@ -65,11 +87,11 @@ class WriteDataForm extends React.Component {
     }
   }
 
-  handleEdit = e => {
+  private handleEdit = e => {
     this.setState({inputContent: e.target.value.trim()})
   }
 
-  handleFile = drop => e => {
+  private handleFile = drop => e => {
     let file
     if (drop) {
       file = e.dataTransfer.files[0]
@@ -89,31 +111,31 @@ class WriteDataForm extends React.Component {
 
     const reader = new FileReader()
     reader.readAsText(file)
-    reader.onload = loadEvent => {
+    reader.onload = () => {
       this.setState({
-        uploadContent: loadEvent.target.result,
+        uploadContent: reader.result,
         fileName: file.name,
       })
     }
   }
 
-  handleCancelFile = () => {
+  private handleCancelFile = () => {
     this.setState({uploadContent: ''})
     this.fileInput.value = ''
   }
 
-  handleDragOver = e => {
+  private handleDragOver = e => {
     e.preventDefault()
     e.stopPropagation()
   }
 
-  handleDragEnter = e => {
+  private handleDragEnter = e => {
     dragCounter += 1
     e.preventDefault()
     this.setState({dragClass: 'drag-over'})
   }
 
-  handleDragLeave = e => {
+  private handleDragLeave = e => {
     dragCounter -= 1
     e.preventDefault()
     if (dragCounter === 0) {
@@ -121,16 +143,24 @@ class WriteDataForm extends React.Component {
     }
   }
 
-  handleFileOpen = () => {
+  private handleFileOpen = () => {
     const {uploadContent} = this.state
     if (uploadContent === '') {
       this.fileInput.click()
     }
   }
 
-  handleFileInputRef = el => (this.fileInput = el)
+  private handleFileInputRef = el => (this.fileInput = el)
 
-  render() {
+  public handleClickOutside = e => {
+    // guard against clicking to close error notification
+    if (e.target.className === OVERLAY_TECHNOLOGY) {
+      const {onClose} = this.props
+      onClose()
+    }
+  }
+
+  public render() {
     const {onClose, errorThrown} = this.props
     const {dragClass} = this.state
 
@@ -167,20 +197,4 @@ class WriteDataForm extends React.Component {
   }
 }
 
-const {func, shape, string} = PropTypes
-
-WriteDataForm.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-      self: string.isRequired,
-      queries: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  onClose: func.isRequired,
-  writeLineProtocol: func.isRequired,
-  errorThrown: func.isRequired,
-  selectedDatabase: string,
-}
-
-export default onClickOutside(WriteDataForm)
+export default onClickOutside<WriteDataFormProps>(WriteDataForm)

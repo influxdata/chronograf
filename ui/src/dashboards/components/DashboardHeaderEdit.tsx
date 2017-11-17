@@ -1,20 +1,34 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {
   DASHBOARD_NAME_MAX_LENGTH,
   NEW_DASHBOARD,
 } from 'dashboards/constants/index'
 
-class DashboardEditHeader extends React.Component {
-  constructor(props) {
-    super(props)
+import {func} from 'src/types/funcs'
 
-    this.state = {
-      reset: false,
-    }
+export interface DashboardEditHeaderProps {
+  activeDashboard: string
+  onSave: (name: string) => void
+  onCancel: func
+  isEditMode: boolean
+  onEditDashboard: func
+}
+
+export interface DashboardEditHeaderState {
+  reset: boolean
+}
+
+class DashboardEditHeader extends React.Component<
+  DashboardEditHeaderProps,
+  DashboardEditHeaderState
+> {
+  private inputRef
+
+  public state = {
+    reset: false,
   }
 
-  handleInputBlur = e => {
+  public handleInputBlur = e => {
     const {onSave, onCancel} = this.props
     const {reset} = this.state
 
@@ -27,7 +41,7 @@ class DashboardEditHeader extends React.Component {
     this.setState({reset: false})
   }
 
-  handleKeyDown = e => {
+  public handleKeyDown = e => {
     if (e.key === 'Enter') {
       this.inputRef.blur()
     }
@@ -37,46 +51,36 @@ class DashboardEditHeader extends React.Component {
     }
   }
 
-  handleFocus = e => {
+  public handleFocus = e => {
     e.target.select()
   }
 
-  render() {
+  public render() {
     const {onEditDashboard, isEditMode, activeDashboard} = this.props
 
     return (
       <div className="dashboard-title">
-        {isEditMode
-          ? <input
-              maxLength={DASHBOARD_NAME_MAX_LENGTH}
-              type="text"
-              className="dashboard-title--input form-control input-sm"
-              defaultValue={activeDashboard}
-              autoComplete="off"
-              autoFocus={true}
-              spellCheck={false}
-              onBlur={this.handleInputBlur}
-              onKeyDown={this.handleKeyDown}
-              onFocus={this.handleFocus}
-              placeholder="Name this Dashboard"
-              ref={r => (this.inputRef = r)}
-            />
-          : <h1 onClick={onEditDashboard}>
-              {activeDashboard}
-            </h1>}
+        {isEditMode ? (
+          <input
+            maxLength={DASHBOARD_NAME_MAX_LENGTH}
+            type="text"
+            className="dashboard-title--input form-control input-sm"
+            defaultValue={activeDashboard}
+            autoComplete="off"
+            autoFocus={true}
+            spellCheck={false}
+            onBlur={this.handleInputBlur}
+            onKeyDown={this.handleKeyDown}
+            onFocus={this.handleFocus}
+            placeholder="Name this Dashboard"
+            ref={r => (this.inputRef = r)}
+          />
+        ) : (
+          <h1 onClick={onEditDashboard}>{activeDashboard}</h1>
+        )}
       </div>
     )
   }
-}
-
-const {bool, func, string} = PropTypes
-
-DashboardEditHeader.propTypes = {
-  activeDashboard: string.isRequired,
-  onSave: func.isRequired,
-  onCancel: func.isRequired,
-  isEditMode: bool,
-  onEditDashboard: func.isRequired,
 }
 
 export default DashboardEditHeader

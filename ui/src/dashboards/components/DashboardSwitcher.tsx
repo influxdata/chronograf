@@ -90,4 +90,4 @@ const NameLink: React.SFC<NameLinkProps> = ({
   </li>
 )
 
-export default onClickOutside(DashboardSwitcher)
+export default onClickOutside<DashboardSwitcherProps>(DashboardSwitcher)

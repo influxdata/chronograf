@@ -1,25 +1,32 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import Dropdown from 'shared/components/Dropdown'
 import {QUERY_TEMPLATES} from 'data_explorer/constants'
 import QueryStatus from 'shared/components/QueryStatus'
 
-class QueryEditor extends React.Component {
-  constructor(props) {
+import {QueryConfig} from 'src/types'
+
+export interface QueryEditorProps {
+  query: string
+  onUpdate: (value: string) => void
+  config: QueryConfig
+}
+
+export interface QueryEditorState {
+  value: string
+}
+
+class QueryEditor extends React.Component<QueryEditorProps, QueryEditorState> {
+  private editor
+
+  constructor(props: QueryEditorProps) {
     super(props)
     this.state = {
       value: this.props.query,
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.query !== nextProps.query) {
-      this.setState({value: nextProps.query})
-    }
-  }
-
-  handleKeyDown = e => {
+  private handleKeyDown = e => {
     const {value} = this.state
 
     if (e.key === 'Escape') {
@@ -33,19 +40,25 @@ class QueryEditor extends React.Component {
     }
   }
 
-  handleChange = () => {
+  private handleChange = () => {
     this.setState({value: this.editor.value})
   }
 
-  handleUpdate = () => {
+  private handleUpdate = () => {
     this.props.onUpdate(this.state.value)
   }
 
-  handleChooseMetaQuery = template => {
+  private handleChooseMetaQuery = template => {
     this.setState({value: template.query})
   }
 
-  render() {
+  public componentWillReceiveProps(nextProps: QueryEditorProps) {
+    if (this.props.query !== nextProps.query) {
+      this.setState({value: nextProps.query})
+    }
+  }
+
+  public render() {
     const {config: {status}} = this.props
     const {value} = this.state
 
@@ -60,7 +73,7 @@ class QueryEditor extends React.Component {
           value={value}
           placeholder="Enter a query or select database, measurement, and field below and have us build one for you..."
           autoComplete="off"
-          spellCheck="false"
+          spellCheck={false}
           data-test="query-editor-field"
         />
         <div className="varmoji">
@@ -81,14 +94,6 @@ class QueryEditor extends React.Component {
       </div>
     )
   }
-}
-
-const {func, shape, string} = PropTypes
-
-QueryEditor.propTypes = {
-  query: string.isRequired,
-  onUpdate: func.isRequired,
-  config: shape().isRequired,
 }
 
 export default QueryEditor
