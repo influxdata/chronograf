@@ -126,6 +126,20 @@ func (p *Pipeline) MarshalJSON() ([]byte, error) {
 	}{}
 
 	for _, n := range p.sorted {
+		// we skip all noop nodes
+		if _, ok := n.(*NoOpNode); ok {
+			continue
+		}
+
+		// With a stats node we "fake" a parent to hook it correctly into the graph
+		if stat, ok := n.(*StatsNode); ok {
+			raw.Edges = append(raw.Edges,
+				Edge{
+					Parent: stat.SourceNode.ID(),
+					Child:  stat.ID(),
+				})
+		}
+
 		raw.Nodes = append(raw.Nodes, n)
 		for _, parent := range n.Parents() {
 			raw.Edges = append(raw.Edges,
@@ -166,6 +180,7 @@ func init() {
 		"stateDuration":     func(parent chainnodeAlias) Node { return parent.StateDuration(nil) },
 		"stateCount":        func(parent chainnodeAlias) Node { return parent.StateCount(nil) },
 		"shift":             func(parent chainnodeAlias) Node { return parent.Shift(0) },
+		"sideload":          func(parent chainnodeAlias) Node { return parent.Sideload() },
 		"sample":            func(parent chainnodeAlias) Node { return parent.Sample(0) },
 		"log":               func(parent chainnodeAlias) Node { return parent.Log() },
 		"kapacitorLoopback": func(parent chainnodeAlias) Node { return parent.KapacitorLoopback() },
@@ -481,6 +496,10 @@ func isChainNode(node Node) (chainnodeAlias, bool) {
 	if ok {
 		return &alert.AlertNodeData.chainnode, true
 	}
+	shift, ok := node.(*ShiftNode)
+	if ok {
+		return &shift.chainnode, true
+	}
 	return nil, false
 }
 
@@ -527,6 +546,7 @@ type chainnodeAlias interface {
 	Sample(interface{}) *SampleNode
 	SetName(string)
 	Shift(time.Duration) *ShiftNode
+	Sideload() *SideloadNode
 	Spread(string) *InfluxQLNode
 	StateCount(*ast.LambdaNode) *StateCountNode
 	StateDuration(*ast.LambdaNode) *StateDurationNode

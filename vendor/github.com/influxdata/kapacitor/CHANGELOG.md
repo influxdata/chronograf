@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.4.0-rc1 [2017-11-09]
 
 ### Features
 - [#1408](https://github.com/influxdata/kapacitor/issues/1408): Add Previous state
@@ -26,9 +26,12 @@
     Topic-Handler file format was modified to include the TopicID and HandlerID in the file.
     Load service was added; the service can load tasks/handlers from a directory.
 - [#1606](https://github.com/influxdata/kapacitor/pull/1606): Update Go version to 1.9.1
-- [#1578](https://github.com/influxdata/kapacitor/pull/1578): Add support for exposing logs via the API.
+- [#1578](https://github.com/influxdata/kapacitor/pull/1578): Add support for exposing logs via the API. API is released as a technical preview.
 - [#1605](https://github.com/influxdata/kapacitor/issues/1605): Add support for {{ .Duration }} on Alert Message property.
 - [#1644](https://github.com/influxdata/kapacitor/issues/1644): Add support for [JSON lines](https://en.wikipedia.org/wiki/JSON_Streaming#Line_delimited_JSON) for steaming HTTP logs.
+- [#1637](https://github.com/influxdata/kapacitor/issues/1637): Add new node Sideload, that allows loading data from files into the stream of data. Data can be loaded using a hierarchy.
+- [#1667](https://github.com/influxdata/kapacitor/pull/1667): Promote Alert API to stable v1 path.
+- [#1668](https://github.com/influxdata/kapacitor/pull/1668): Change WARN level logs to INFO level.
 
 ### Bugfixes
 
@@ -43,6 +46,12 @@
 - [#1623](https://github.com/influxdata/kapacitor/issues/1623): Fix k8s incluster master api dns resolution
 - [#1630](https://github.com/influxdata/kapacitor/issues/1630): Remove the pidfile after the server has exited.
 - [#1641](https://github.com/influxdata/kapacitor/issues/1641): Logs API writes multiple http headers.
+- [#1657](https://github.com/influxdata/kapacitor/issues/1657): Fix missing dependency in rpm package.
+- [#1660](https://github.com/influxdata/kapacitor/pull/1660): Force tar owner/group to be root.
+- [#1663](https://github.com/influxdata/kapacitor/pull/1663): Fixed install/remove of kapacitor on non-systemd Debian/Ubuntu systems.
+    Fixes packaging to not enable services on RHEL systems.
+    Fixes issues with recusive symlinks on systemd systems.
+- [#1662](https://github.com/influxdata/kapacitor/issues/1662): Fix invalid default MQTT config.
 
 ## v1.3.3 [2017-08-11]
 
