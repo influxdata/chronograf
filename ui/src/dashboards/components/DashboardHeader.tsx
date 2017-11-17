@@ -15,26 +15,27 @@ import {
   TimeRange,
   ZoomedTimeRange,
 } from 'src/types'
+import {func} from 'src/types/funcs'
 
 export interface DashboardHeaderProps {
   source: Source
   activeDashboard: string
-  onEditDashboard: () => void
-  dashboard: Dashboard
+  onEditDashboard?: func
+  dashboard?: Dashboard
   timeRange: TimeRange
   autoRefresh: number
   isHidden: boolean
-  isEditMode: boolean
-  handleChooseTimeRange: () => void
-  handleChooseAutoRefresh: () => void
-  onManualRefresh: () => void
-  handleClickPresentationButton: () => void
-  onAddCell: () => void
-  onToggleTempVarControls: () => void
-  showTemplateControlBar: boolean
-  zoomedTimeRange: ZoomedTimeRange
-  onCancel: () => void
-  onSave: () => void
+  isEditMode?: boolean
+  handleChooseTimeRange: (timeRange: TimeRange) => void
+  handleChooseAutoRefresh: func
+  onManualRefresh: func
+  handleClickPresentationButton: func
+  onAddCell?: func
+  onToggleTempVarControls?: func
+  showTemplateControlBar?: boolean
+  zoomedTimeRange?: ZoomedTimeRange
+  onCancel?: func
+  onSave?: func
   names: DashboardName[]
 }
 
@@ -111,7 +112,6 @@ const DashboardHeader: React.SFC<DashboardHeaderProps> = ({
             onChoose={handleChooseAutoRefresh}
             onManualRefresh={onManualRefresh}
             selected={autoRefresh}
-            iconName="refresh"
           />
           <TimeRangeDropdown
             onChooseTimeRange={handleChooseTimeRange}

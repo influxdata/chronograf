@@ -1,13 +1,22 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import DatabaseList from 'shared/components/DatabaseList'
 import MeasurementList from 'shared/components/MeasurementList'
 import FieldList from 'shared/components/FieldList'
+import {QueryConfig, Source} from 'src/types'
+
+import {QueryConfigActions} from 'src/data_explorer/containers/DataExplorer'
 
 const actionBinder = (id, action) => (...args) => action(id, ...args)
 
-const SchemaExplorer = ({
+export interface SchemaExplorerProps {
+  query: QueryConfig
+  source: Source
+  initialGroupByTime: string
+  actions: QueryConfigActions
+}
+
+const SchemaExplorer: React.SFC<SchemaExplorerProps> = ({
   query,
   query: {id},
   source,
@@ -25,7 +34,7 @@ const SchemaExplorer = ({
     applyFuncsToField,
     toggleTagAcceptance,
   },
-}) =>
+}) => (
   <div className="query-builder">
     <DatabaseList
       query={query}
@@ -54,29 +63,6 @@ const SchemaExplorer = ({
       addInitialField={actionBinder(id, addInitialField)}
     />
   </div>
-
-const {func, shape, string} = PropTypes
-
-SchemaExplorer.propTypes = {
-  query: shape({
-    id: string,
-  }).isRequired,
-  actions: shape({
-    chooseNamespace: func.isRequired,
-    chooseMeasurement: func.isRequired,
-    applyFuncsToField: func.isRequired,
-    chooseTag: func.isRequired,
-    groupByTag: func.isRequired,
-    toggleField: func.isRequired,
-    groupByTime: func.isRequired,
-    toggleTagAcceptance: func.isRequired,
-    fill: func.isRequired,
-    editRawTextAsync: func.isRequired,
-    addInitialField: func.isRequired,
-    removeFuncs: func.isRequired,
-  }).isRequired,
-  source: shape({}),
-  initialGroupByTime: string.isRequired,
-}
+)
 
 export default SchemaExplorer

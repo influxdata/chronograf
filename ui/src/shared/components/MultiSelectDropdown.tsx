@@ -173,4 +173,4 @@ class MultiSelectDropdown extends React.Component<
   }
 }
 
-export default onClickOutside(MultiSelectDropdown)
+export default onClickOutside<MultiSelectDropdownProps>(MultiSelectDropdown)

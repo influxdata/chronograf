@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 
 import TagListItem from './TagListItem'
@@ -8,38 +7,27 @@ import {showTagKeys, showTagValues} from 'shared/apis/metaQuery'
 import showTagKeysParser from 'shared/parsing/showTagKeys'
 import showTagValuesParser from 'shared/parsing/showTagValues'
 
-const {string, shape, func, bool} = PropTypes
+import {QueryConfig, QuerySource, Source, Tags} from 'src/types'
+import {eFunc} from 'src/types/funcs'
 
-class TagList extends React.Component {
-  propTypes = {
-    query: shape({
-      database: string,
-      measurement: string,
-      retentionPolicy: string,
-      areTagsAccepted: bool.isRequired,
-    }).isRequired,
-    onChooseTag: func.isRequired,
-    onGroupByTag: func.isRequired,
-    querySource: shape({
-      links: shape({
-        proxy: string.isRequired,
-      }).isRequired,
-    }),
-  }
+export interface TagListProps {
+  source: Source
+  query: QueryConfig
+  querySource: QuerySource
+  onChooseTag: eFunc
+  onGroupByTag: eFunc
+}
 
-  contextTypes = {
-    source: shape({
-      links: shape({
-        proxy: string.isRequired,
-      }).isRequired,
-    }).isRequired,
-  }
+export interface TagListState {
+  tags: Tags
+}
 
-  state = {
+class TagList extends React.Component<TagListProps, TagListState> {
+  public state = {
     tags: {},
   }
 
-  _getTags = () => {
+  public _getTags = () => {
     const {database, measurement, retentionPolicy} = this.props.query
     const {source} = this.context
     const {querySource} = this.props
@@ -72,7 +60,7 @@ class TagList extends React.Component {
       })
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const {database, measurement, retentionPolicy} = this.props.query
     if (!database || !measurement || !retentionPolicy) {
       return
@@ -81,7 +69,7 @@ class TagList extends React.Component {
     this._getTags()
   }
 
-  componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: TagListProps) {
     const {query, querySource} = this.props
     const {database, measurement, retentionPolicy} = query
 
@@ -106,12 +94,12 @@ class TagList extends React.Component {
     this._getTags()
   }
 
-  render() {
+  public render() {
     const {query} = this.props
 
     return (
       <div className="query-builder--sub-list">
-        {_.map(this.state.tags, (tagValues, tagKey) => {
+        {_.map(this.state.tags, (tagValues: string[], tagKey) => {
           return (
             <TagListItem
               key={tagKey}

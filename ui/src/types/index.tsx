@@ -67,24 +67,38 @@ export interface ZoomedTimeRange {
 export interface Args {
   value: string
   type: string
-  alias: string
-  args: Args[]
+  alias?: string
+  args?: Args[]
 }
 
 export interface QueryConfigField {
   value: string
   type: string
-  alias: string
-  args: Args[]
+  alias?: string
+  args?: Args[]
 }
 
+export type QueryConfigTagValues = string[]
+
 export interface QueryConfigTags {
-  [key: string]: string[]
+  [key: string]: QueryConfigTagValues
 }
 
 export interface QueryConfigGroupBy {
   time?: string
   tags?: string[]
+}
+
+export interface QueryConfigNamespace {
+  database: string
+  retentionPolicy: string
+}
+
+export interface QueryConfigStatus {
+  loading: string
+  error?: string
+  warn?: string
+  success?: string
 }
 
 export interface QueryConfig {
@@ -100,6 +114,13 @@ export interface QueryConfig {
   range?: TimeRange | null
   source?: string
   fill: string
+  status?: QueryConfigStatus
+}
+
+export interface QuerySource {
+  links: {
+    proxy: string
+  }
 }
 
 export interface CellQuery {
@@ -200,14 +221,14 @@ export interface LayoutProps {
   host: string
   source: Source
   sources: Source[]
-  onPositionChange: (newCells: Cell[]) => void
+  onPositionChange?: (newCells: Cell[]) => void
   onEditCell: () => void
   onDeleteCell: () => void
   onSummonOverlayTechnologies: () => void
   onCancelEditCell: () => void
   synchronizer: FuncTypes.synchronizer
   onZoom: FuncTypes.onZoom
-  isStatusPage: boolean
+  isStatusPage?: boolean
   isEditable: boolean
 }
 
@@ -298,8 +319,10 @@ export enum OptInType {
   number = 'number',
 }
 
+export type TagValues = string[]
+
 export interface Tags {
-  [keys: string]: string
+  [keys: string]: TagValues
 }
 
 export interface Host {
@@ -357,4 +380,22 @@ export interface Task {
   tickscript: string
   type: string
   status: string
+}
+
+export interface VisualizationQuery {
+  queryConfig: QueryConfig
+  host: string[]
+  text: string
+  id: string
+}
+
+export interface DropdownActions {
+  icon: string
+  text: string
+  handler: () => void
+}
+
+export interface DropdownItem {
+  text: string
+  type?: string
 }

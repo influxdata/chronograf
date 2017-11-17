@@ -17,9 +17,7 @@ export interface Result {
 }
 
 export interface RawResponse {
-  response: {
-    results: Result[]
-  }
+  results: Result[]
 }
 
 export type Time = Date | Value

@@ -7,15 +7,16 @@ import SourceIndicator from 'shared/components/SourceIndicator'
 import GraphTips from 'shared/components/GraphTips'
 
 import {AutoRefresh, Source, TimeRange} from 'src/types'
+import {eFunc, func} from 'src/types/funcs'
 
 export interface HeaderProps {
   source: Source
   timeRange: TimeRange
   autoRefresh: AutoRefresh
   showWriteForm: () => void
-  onManualRefresh: () => void
-  onChooseTimeRange: () => void
-  onChooseAutoRefresh: () => void
+  onManualRefresh: func
+  onChooseTimeRange: (bounds: TimeRange) => void
+  onChooseAutoRefresh: eFunc
 }
 
 const Header: React.SFC<HeaderProps> = ({
@@ -44,7 +45,6 @@ const Header: React.SFC<HeaderProps> = ({
           Write Data
         </div>
         <AutoRefreshDropdown
-          iconName="refresh"
           selected={autoRefresh}
           onChoose={onChooseAutoRefresh}
           onManualRefresh={onManualRefresh}

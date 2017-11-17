@@ -1,14 +1,11 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
 
 import groupByTimeOptions from 'data_explorer/data/groupByTimes'
-
 import Dropdown from 'shared/components/Dropdown'
-
 import {AUTO_GROUP_BY} from 'shared/constants'
 
-const {func, string, shape} = PropTypes
+import {Location, QueryConfigGroupBy} from 'src/types'
 
 const isInRuleBuilder = pathname => pathname.includes('alert-rules')
 const isInDataExplorer = pathname => pathname.includes('data-explorer')
@@ -18,11 +15,17 @@ const getOptions = pathname =>
     ? groupByTimeOptions.filter(({menuOption}) => menuOption !== AUTO_GROUP_BY)
     : groupByTimeOptions
 
-const GroupByTimeDropdown = ({
+export interface GroupByTimeDropdownProps {
+  location?: Location
+  selected: string
+  onChooseGroupByTime: (groupBy: QueryConfigGroupBy) => void
+}
+
+const GroupByTimeDropdown: React.SFC<GroupByTimeDropdownProps> = ({
   selected,
   onChooseGroupByTime,
   location: {pathname},
-}) =>
+}) => (
   <div className="group-by-time">
     <label className="group-by-time--label">Group by:</label>
     <Dropdown
@@ -37,13 +40,6 @@ const GroupByTimeDropdown = ({
       selected={selected || 'Time'}
     />
   </div>
-
-GroupByTimeDropdown.propTypes = {
-  location: shape({
-    pathname: string.isRequired,
-  }).isRequired,
-  selected: string,
-  onChooseGroupByTime: func.isRequired,
-}
+)
 
 export default withRouter(GroupByTimeDropdown)

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 import * as _ from 'lodash'
 
@@ -9,39 +8,56 @@ import showMeasurementsParser from 'shared/parsing/showMeasurements'
 import TagList from 'data_explorer/components/TagList'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 
-const {func, shape, string} = PropTypes
+import {QueryConfig, QuerySource, Source} from 'src/types'
+import {func} from 'src/types/funcs'
 
-class MeasurementList extends React.Component {
-  propTypes = {
-    query: shape({
-      database: string,
-      measurement: string,
-    }).isRequired,
-    onChooseMeasurement: func.isRequired,
-    onChooseTag: func.isRequired,
-    onToggleTagAcceptance: func.isRequired,
-    onGroupByTag: func.isRequired,
-    querySource: shape({
-      links: shape({
-        proxy: string.isRequired,
-      }).isRequired,
-    }),
-  }
+export interface MeasurementListProps {
+  source: Source
+  query: QueryConfig
+  onChooseMeasurement: (measurement: string) => func
+  onChooseTag: func
+  onToggleTagAcceptance: func
+  onGroupByTag: func
+  querySource: QuerySource
+}
 
-  contextTypes = {
-    source: shape({
-      links: shape({
-        proxy: string.isRequired,
-      }).isRequired,
-    }).isRequired,
-  }
+export interface MeasurementListState {
+  measurements: string[]
+  filterText: string
+}
 
-  state = {
+class MeasurementList extends React.Component<MeasurementListProps> {
+  private filterText
+
+  public state = {
     measurements: [],
     filterText: '',
   }
 
-  componentDidMount() {
+  private handleFilterText = e => {
+    e.stopPropagation()
+    this.setState({
+      filterText: this.filterText.value,
+    })
+  }
+
+  private handleEscape = e => {
+    if (e.key !== 'Escape') {
+      return
+    }
+
+    e.stopPropagation()
+    this.setState({
+      filterText: '',
+    })
+  }
+
+  private handleAcceptReject = e => {
+    e.stopPropagation()
+    this.props.onToggleTagAcceptance()
+  }
+
+  public componentDidMount() {
     if (!this.props.query.database) {
       return
     }
@@ -49,7 +65,7 @@ class MeasurementList extends React.Component {
     this._getMeasurements()
   }
 
-  componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: MeasurementListProps) {
     const {query, querySource} = this.props
 
     if (!query.database) {
@@ -66,57 +82,34 @@ class MeasurementList extends React.Component {
     this._getMeasurements()
   }
 
-  handleFilterText = e => {
-    e.stopPropagation()
-    this.setState({
-      filterText: this.refs.filterText.value,
-    })
-  }
-
-  handleEscape = e => {
-    if (e.key !== 'Escape') {
-      return
-    }
-
-    e.stopPropagation()
-    this.setState({
-      filterText: '',
-    })
-  }
-
-  handleAcceptReject = e => {
-    e.stopPropagation()
-    this.props.onToggleTagAcceptance()
-  }
-
-  render() {
+  public render() {
     return (
       <div className="query-builder--column">
         <div className="query-builder--heading">
           <span>Measurements & Tags</span>
-          {this.props.query.database
-            ? <div className="query-builder--filter">
-                <input
-                  className="form-control input-sm"
-                  ref="filterText"
-                  placeholder="Filter"
-                  type="text"
-                  value={this.state.filterText}
-                  onChange={this.handleFilterText}
-                  onKeyUp={this.handleEscape}
-                  spellCheck={false}
-                  autoComplete={false}
-                />
-                <span className="icon search" />
-              </div>
-            : null}
+          {this.props.query.database && (
+            <div className="query-builder--filter">
+              <input
+                className="form-control input-sm"
+                ref={r => (this.filterText = r)}
+                placeholder="Filter"
+                type="text"
+                value={this.state.filterText}
+                onChange={this.handleFilterText}
+                onKeyUp={this.handleEscape}
+                spellCheck={false}
+                autoComplete="false"
+              />
+              <span className="icon search" />
+            </div>
+          )}
         </div>
         {this.renderList()}
       </div>
     )
   }
 
-  renderList = () => {
+  public renderList = () => {
     if (!this.props.query.database) {
       return (
         <div className="query-builder--list-empty">
@@ -143,23 +136,24 @@ class MeasurementList extends React.Component {
               <div
                 key={measurement}
                 onClick={
-                  isActive
-                    ? () => {}
-                    : () => this.props.onChooseMeasurement(measurement)
+                  isActive ? this.props.onChooseMeasurement(measurement) : null
                 }
               >
                 <div
                   className={classnames('query-builder--list-item', {
                     active: isActive,
                   })}
-                  data-test={`query-builder-list-item-measurement-${measurement}`}
+                  data-test={`query-builder-list-item-measurement-${
+                    measurement
+                  }`}
                 >
                   <span>
                     <div className="query-builder--caret icon caret-right" />
                     {measurement}
                   </span>
-                  {isActive && numTagsActive >= 1
-                    ? <div
+                  {isActive &&
+                    numTagsActive >= 1 && (
+                      <div
                         className={classnames('flip-toggle', {
                           flipped: this.props.query.areTagsAccepted,
                         })}
@@ -170,16 +164,17 @@ class MeasurementList extends React.Component {
                           <div className="flip-toggle--back">=</div>
                         </div>
                       </div>
-                    : null}
+                    )}
                 </div>
-                {isActive
-                  ? <TagList
-                      query={this.props.query}
-                      querySource={this.props.querySource}
-                      onChooseTag={this.props.onChooseTag}
-                      onGroupByTag={this.props.onGroupByTag}
-                    />
-                  : null}
+                {isActive ? (
+                  <TagList
+                    source={this.props.source}
+                    query={this.props.query}
+                    querySource={this.props.querySource}
+                    onChooseTag={this.props.onChooseTag}
+                    onGroupByTag={this.props.onGroupByTag}
+                  />
+                ) : null}
               </div>
             )
           })}
@@ -188,7 +183,7 @@ class MeasurementList extends React.Component {
     )
   }
 
-  _getMeasurements = () => {
+  public _getMeasurements = () => {
     const {source} = this.context
     const {querySource} = this.props
 

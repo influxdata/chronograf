@@ -1,16 +1,50 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-import buildInfluxQLQuery from 'utils/influxql'
+import * as _ from 'lodash'
 import * as classnames from 'classnames'
+
+import buildInfluxQLQuery from 'utils/influxql'
 import VisHeader from 'data_explorer/components/VisHeader'
 import VisView from 'data_explorer/components/VisView'
 import {GRAPH, TABLE} from 'shared/constants'
-import * as _ from 'lodash'
+
+import {editQueryStatus as editQueryStatusAction} from 'data_explorer/actions/view'
+import {Axes, QueryConfig, Source, Template, TimeRange} from 'src/types'
 
 const META_QUERY_REGEX = /^show/i
 
-class Visualization extends React.Component {
-  constructor(props) {
+export interface VisualizationProps {
+  source: Source
+  cellName?: string
+  cellType?: string
+  autoRefresh: number
+  templates?: Template[]
+  timeRange: TimeRange
+  queryConfigs: QueryConfig[]
+  activeQueryIndex: number
+  height?: string
+  heightPixels?: number
+  editQueryStatus: typeof editQueryStatusAction
+  views: string[]
+  axes?: Axes
+  resizerBottomHeight?: number
+  errorThrown: (error: string) => void
+  manualRefresh: number
+}
+
+export interface VisualizationState {
+  view: string
+}
+
+class Visualization extends React.Component<
+  VisualizationProps,
+  VisualizationState
+> {
+  public static defaultProps = {
+    cellName: '',
+    cellType: '',
+  }
+
+  constructor(props: VisualizationProps) {
     super(props)
 
     const {activeQueryIndex, queryConfigs} = this.props
@@ -21,7 +55,14 @@ class Visualization extends React.Component {
       : {view: GRAPH}
   }
 
-  componentWillReceiveProps(nextProps) {
+  private handleToggleView = view => () => {
+    this.setState({view})
+  }
+
+  private getQueryText = (queryConfigs, index) =>
+    _.get(queryConfigs, [`${index}`, 'rawText'], '') || ''
+
+  public componentWillReceiveProps(nextProps: VisualizationProps) {
     const {activeQueryIndex, queryConfigs} = nextProps
     const nextQueryText = this.getQueryText(queryConfigs, activeQueryIndex)
     const queryText = this.getQueryText(
@@ -40,11 +81,7 @@ class Visualization extends React.Component {
     this.setState({view: GRAPH})
   }
 
-  handleToggleView = view => () => {
-    this.setState({view})
-  }
-
-  render() {
+  public render() {
     const {
       axes,
       views,
@@ -61,14 +98,13 @@ class Visualization extends React.Component {
       activeQueryIndex,
       resizerBottomHeight,
       errorThrown,
+      source: {links: {proxy}},
     } = this.props
-    const {source: {links: {proxy}}} = this.context
     const {view} = this.state
 
-    const statements = queryConfigs.map(query => {
-      const text =
-        query.rawText || buildInfluxQLQuery(query.range || timeRange, query)
-      return {text, id: query.id, queryConfig: query}
+    const statements = queryConfigs.map(q => {
+      const text = q.rawText || buildInfluxQLQuery(q.range || timeRange, q)
+      return {text, id: q.id, queryConfig: q}
     })
 
     const queries = statements.filter(s => s.text !== null).map(s => {
@@ -112,51 +148,6 @@ class Visualization extends React.Component {
       </div>
     )
   }
-
-  getQueryText(queryConfigs, index) {
-    // rawText can be null
-    return _.get(queryConfigs, [`${index}`, 'rawText'], '') || ''
-  }
-}
-
-Visualization.defaultProps = {
-  cellName: '',
-  cellType: '',
-}
-
-const {arrayOf, func, number, shape, string} = PropTypes
-
-Visualization.contextTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-}
-
-Visualization.propTypes = {
-  cellName: string,
-  cellType: string,
-  autoRefresh: number.isRequired,
-  templates: arrayOf(shape()),
-  timeRange: shape({
-    upper: string,
-    lower: string,
-  }).isRequired,
-  queryConfigs: arrayOf(shape({})).isRequired,
-  activeQueryIndex: number,
-  height: string,
-  heightPixels: number,
-  editQueryStatus: func.isRequired,
-  views: arrayOf(string).isRequired,
-  axes: shape({
-    y: shape({
-      bounds: arrayOf(string),
-    }),
-  }),
-  resizerBottomHeight: number,
-  errorThrown: func.isRequired,
-  manualRefresh: number,
 }
 
 export default Visualization

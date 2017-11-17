@@ -30,18 +30,18 @@ export interface LayoutRendererProps {
   manualRefresh?: ManualRefresh
   timeRange: TimeRange
   cells: Cell[]
-  templates: Template[]
+  templates?: Template[]
   host: string
   source: Source
-  sources: Source[]
-  onPositionChange: (newCells: Cell[]) => void
-  onEditCell: () => void
-  onDeleteCell: () => void
-  onSummonOverlayTechnologies: () => void
-  onCancelEditCell: () => void
+  sources?: Source[]
+  onPositionChange?: (newCells: Cell[]) => void
+  onEditCell?: () => void
+  onDeleteCell?: () => void
+  onSummonOverlayTechnologies?: () => void
+  onCancelEditCell?: () => void
   synchronizer: FuncTypes.synchronizer
-  onZoom: FuncTypes.onZoom
-  isStatusPage: boolean
+  onZoom?: FuncTypes.onZoom
+  isStatusPage?: boolean
   isEditable: boolean
 }
 

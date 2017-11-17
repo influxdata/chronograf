@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 import * as _ from 'lodash'
 
@@ -9,48 +8,30 @@ import showRetentionPoliciesParser from 'shared/parsing/showRetentionPolicies'
 
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 
-const {func, shape, string} = PropTypes
+import {QueryConfig, QuerySource} from 'src/types'
+import {eFunc} from 'src/types/funcs'
 
-class DatabaseList extends React.Component {
-  propTypes = {
-    query: shape({}).isRequired,
-    onChooseNamespace: func.isRequired,
-    querySource: shape({
-      links: shape({
-        proxy: string.isRequired,
-      }).isRequired,
-    }),
-  }
+export interface DatabaseListProps {
+  query: QueryConfig
+  onChooseNamespace: eFunc
+  querySource: QuerySource
+}
 
-  contextTypes = {
-    source: shape({
-      links: shape({
-        proxy: string.isRequired,
-      }).isRequired,
-    }).isRequired,
-  }
+export interface DatabaseListState {
+  namespaces: string[]
+}
 
-  state = {
+class DatabaseList extends React.Component<
+  DatabaseListProps,
+  DatabaseListState
+> {
+  public state = {
     namespaces: [],
   }
 
-  componentDidMount() {
-    this.getDbRp()
-  }
-
-  componentDidUpdate(prevProps) {
-    if (_.isEqual(prevProps.querySource, this.props.querySource)) {
-      return
-    }
-
-    this.getDbRp()
-  }
-
-  getDbRp = () => {
-    const {source} = this.context
+  private getDbRp = () => {
     const {querySource} = this.props
-    const proxy =
-      _.get(querySource, ['links', 'proxy'], null) || source.links.proxy
+    const proxy = _.get(querySource, ['links', 'proxy'], null)
 
     showDatabases(proxy).then(resp => {
       const {errors, databases} = showDatabasesParser(resp.data)
@@ -81,7 +62,19 @@ class DatabaseList extends React.Component {
     })
   }
 
-  render() {
+  public componentDidMount() {
+    this.getDbRp()
+  }
+
+  public componentDidUpdate(prevProps: DatabaseListProps) {
+    if (_.isEqual(prevProps.querySource, this.props.querySource)) {
+      return
+    }
+
+    this.getDbRp()
+  }
+
+  public render() {
     const {query, onChooseNamespace} = this.props
     const {namespaces} = this.state
     const sortedNamespaces = namespaces.length

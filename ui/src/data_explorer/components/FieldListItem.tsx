@@ -1,31 +1,49 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 import * as _ from 'lodash'
 
 import FunctionSelector from 'shared/components/FunctionSelector'
 import {firstFieldName} from 'shared/reducers/helpers/fields'
+import {QueryConfigField} from 'src/types'
 
-class FieldListItem extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isOpen: false,
-    }
+export interface Field {
+  value: string
+  type: string
+}
+
+export interface FieldListItemProps {
+  fieldFuncs: QueryConfigField[]
+  onToggleField: (field: Field) => void
+  onApplyFuncsToField: ({field, funcs}: {field: Field; funcs: string[]}) => void
+  isSelected: boolean
+  isKapacitorRule: boolean
+  funcs: string[]
+}
+
+export interface FieldListItemState {
+  isOpen: boolean
+}
+
+class FieldListItem extends React.Component<
+  FieldListItemProps,
+  FieldListItemState
+> {
+  public state = {
+    isOpen: false,
   }
 
-  toggleFunctionsMenu = e => {
+  private toggleFunctionsMenu = e => {
     if (e) {
       e.stopPropagation()
     }
     this.setState({isOpen: !this.state.isOpen})
   }
 
-  close = () => {
+  private close = () => {
     this.setState({isOpen: false})
   }
 
-  handleToggleField = () => {
+  private handleToggleField = () => {
     const {onToggleField} = this.props
     const value = this._getFieldName()
 
@@ -33,7 +51,7 @@ class FieldListItem extends React.Component {
     this.close()
   }
 
-  handleApplyFunctions = selectedFuncs => {
+  private handleApplyFunctions = selectedFuncs => {
     const {onApplyFuncsToField} = this.props
     const fieldName = this._getFieldName()
     const field = {value: fieldName, type: 'field'}
@@ -45,12 +63,12 @@ class FieldListItem extends React.Component {
     this.close()
   }
 
-  _makeFunc = value => ({
+  private _makeFunc = value => ({
     value,
     type: 'func',
   })
 
-  _getFieldName = () => {
+  private _getFieldName = () => {
     const {fieldFuncs} = this.props
     const fieldFunc = _.head(fieldFuncs)
 
@@ -59,7 +77,7 @@ class FieldListItem extends React.Component {
       : firstFieldName(_.get(fieldFunc, 'args'))
   }
 
-  render() {
+  public render() {
     const {isKapacitorRule, isSelected, funcs} = this.props
     const {isOpen} = this.state
     const fieldName = this._getFieldName()
@@ -90,52 +108,31 @@ class FieldListItem extends React.Component {
             <div className="query-builder--checkbox" />
             {fieldName}
           </span>
-          {isSelected
-            ? <div
-                className={classnames('btn btn-xs', {
-                  active: isOpen,
-                  'btn-default': !num,
-                  'btn-primary': num,
-                })}
-                onClick={this.toggleFunctionsMenu}
-                data-test={`query-builder-list-item-function-${fieldName}`}
-              >
-                {fieldFuncsLabel}
-              </div>
-            : null}
+          {isSelected && (
+            <div
+              className={classnames('btn btn-xs', {
+                active: isOpen,
+                'btn-default': !num,
+                'btn-primary': num,
+              })}
+              onClick={this.toggleFunctionsMenu}
+              data-test={`query-builder-list-item-function-${fieldName}`}
+            >
+              {fieldFuncsLabel}
+            </div>
+          )}
         </div>
-        {isSelected && isOpen
-          ? <FunctionSelector
+        {isSelected &&
+          isOpen && (
+            <FunctionSelector
               onApply={this.handleApplyFunctions}
               selectedItems={funcs}
               singleSelect={isKapacitorRule}
             />
-          : null}
+          )}
       </div>
     )
   }
 }
 
-const {string, shape, func, arrayOf, bool} = PropTypes
-
-FieldListItem.propTypes = {
-  fieldFuncs: arrayOf(
-    shape({
-      type: string.isRequired,
-      value: string.isRequired,
-      alias: string,
-      args: arrayOf(
-        shape({
-          type: string.isRequired,
-          value: string.isRequired,
-        })
-      ),
-    })
-  ).isRequired,
-  isSelected: bool.isRequired,
-  onToggleField: func.isRequired,
-  onApplyFuncsToField: func.isRequired,
-  isKapacitorRule: bool.isRequired,
-  funcs: arrayOf(string.isRequired).isRequired,
-}
 export default FieldListItem

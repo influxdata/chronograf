@@ -1,11 +1,23 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 import * as _ from 'lodash'
 import {INFLUXQL_FUNCTIONS} from 'data_explorer/constants'
 
-class FunctionSelector extends React.Component {
-  constructor(props) {
+export interface FunctionSelectorProps {
+  onApply: (items: string[]) => void
+  selectedItems: string[]
+  singleSelect?: boolean
+}
+
+export interface FunctionSelectorState {
+  localSelectedItems: string[]
+}
+
+class FunctionSelector extends React.Component<
+  FunctionSelectorProps,
+  FunctionSelectorState
+> {
+  constructor(props: FunctionSelectorProps) {
     super(props)
 
     this.state = {
@@ -13,13 +25,7 @@ class FunctionSelector extends React.Component {
     }
   }
 
-  componentWillUpdate(nextProps) {
-    if (!_.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
-      this.setState({localSelectedItems: nextProps.selectedItems})
-    }
-  }
-
-  onSelect = (item, e) => {
+  private onSelect = (item, e) => {
     e.stopPropagation()
 
     const {localSelectedItems} = this.state
@@ -34,7 +40,7 @@ class FunctionSelector extends React.Component {
     this.setState({localSelectedItems: nextItems})
   }
 
-  onSingleSelect = (item) => {
+  private onSingleSelect = item => {
     if (item === this.state.localSelectedItems[0]) {
       this.props.onApply([])
       this.setState({localSelectedItems: []})
@@ -44,38 +50,44 @@ class FunctionSelector extends React.Component {
     }
   }
 
-  isSelected = (item) => {
+  private isSelected = item => {
     return !!this.state.localSelectedItems.find(text => text === item)
   }
 
-  handleApplyFunctions = (e) => {
+  private handleApplyFunctions = e => {
     e.stopPropagation()
 
     this.props.onApply(this.state.localSelectedItems)
   }
 
-  render() {
+  public componentWillUpdate(nextProps: FunctionSelectorProps) {
+    if (!_.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
+      this.setState({localSelectedItems: nextProps.selectedItems})
+    }
+  }
+
+  public render() {
     const {localSelectedItems} = this.state
     const {singleSelect} = this.props
 
     return (
       <div className="function-selector">
-        {singleSelect
-          ? null
-          : <div className="function-selector--header">
-              <span>
-                {localSelectedItems.length > 0
-                  ? `${localSelectedItems.length} Selected`
-                  : 'Select functions below'}
-              </span>
-              <div
-                className="btn btn-xs btn-success"
-                onClick={this.handleApplyFunctions}
-                data-test="function-selector-apply"
-              >
-                Apply
-              </div>
-            </div>}
+        {!singleSelect && (
+          <div className="function-selector--header">
+            <span>
+              {localSelectedItems.length > 0
+                ? `${localSelectedItems.length} Selected`
+                : 'Select functions below'}
+            </span>
+            <div
+              className="btn btn-xs btn-success"
+              onClick={this.handleApplyFunctions}
+              data-test="function-selector-apply"
+            >
+              Apply
+            </div>
+          </div>
+        )}
         <div className="function-selector--grid">
           {INFLUXQL_FUNCTIONS.map((f, i) => {
             return (
@@ -98,14 +110,6 @@ class FunctionSelector extends React.Component {
       </div>
     )
   }
-}
-
-const {arrayOf, bool, func, string} = PropTypes
-
-FunctionSelector.propTypes = {
-  onApply: func.isRequired,
-  selectedItems: arrayOf(string.isRequired).isRequired,
-  singleSelect: bool,
 }
 
 export default FunctionSelector

@@ -1,10 +1,8 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
-import {withRouter} from 'react-router-dom'
-import queryString from 'query-string'
-
+import {bindActionCreators, compose} from 'redux'
+import {Router, withRouter} from 'react-router-dom'
+import * as queryString from 'query-string'
 import * as _ from 'lodash'
 
 import QueryMaker from '../components/QueryMaker'
@@ -13,26 +11,71 @@ import WriteDataForm from 'data_explorer/components/WriteDataForm'
 import Header from '../containers/Header'
 import ResizeContainer from 'shared/components/ResizeContainer'
 import OverlayTechnologies from 'shared/components/OverlayTechnologies'
-import ManualRefresh from 'shared/components/ManualRefresh'
 
 import {VIS_VIEWS, INITIAL_GROUP_BY_TIME} from 'shared/constants'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from '../constants'
 import {errorThrown} from 'shared/actions/errors'
 import {setAutoRefresh} from 'shared/actions/app'
-import * as dataExplorerActionCreators from 'data_explorer/actions/view'
+import * as dataExplorerActions from 'data_explorer/actions/view'
 import {writeLineProtocolAsync} from 'data_explorer/actions/view/write'
 import {buildRawText} from 'utils/influxql'
 
-class DataExplorer extends React.Component {
-  constructor(props) {
-    super(props)
+import {
+  AutoRefresh,
+  QueryConfig,
+  Source,
+  TimeRange,
+  ManualRefresh as ManualRefreshType,
+  RouterRuleID,
+} from 'src/types'
+import {eFunc, func} from 'src/types/funcs'
 
-    this.state = {
-      showWriteForm: false,
-    }
+export interface QueryConfigActions {
+  chooseNamespace: typeof dataExplorerActions.chooseNamespace
+  chooseMeasurement: typeof dataExplorerActions.chooseMeasurement
+  chooseTag: typeof dataExplorerActions.chooseTag
+  groupByTag: typeof dataExplorerActions.groupByTag
+  toggleField: typeof dataExplorerActions.toggleField
+  groupByTime: typeof dataExplorerActions.groupByTime
+  toggleTagAcceptance: typeof dataExplorerActions.toggleTagAcceptance
+  applyFuncsToField: typeof dataExplorerActions.applyFuncsToField
+  editRawTextAsync: typeof dataExplorerActions.editRawTextAsync
+  addInitialField: typeof dataExplorerActions.addInitialField
+  addQuery: typeof dataExplorerActions.addQuery
+  editQueryStatus: typeof dataExplorerActions.editQueryStatus
+  editRawText: typeof dataExplorerActions.editRawText
+  fill: typeof dataExplorerActions.fill
+  removeFuncs: typeof dataExplorerActions.removeFuncs
+}
+
+export interface DataExplorerProps {
+  source: Source
+  router: Router
+  queryConfigs: QueryConfig[]
+  queryConfigActions: QueryConfigActions
+  autoRefresh: AutoRefresh
+  handleChooseAutoRefresh: eFunc
+  timeRange: TimeRange
+  setTimeRange: eFunc
+  dataExplorer: {
+    queryIDs: string[]
+  }
+  writeLineProtocol: eFunc
+  errorThrownAction: eFunc
+  onManualRefresh: func
+  manualRefresh: ManualRefreshType
+}
+
+export interface DataExplorerState {
+  showWriteForm: boolean
+}
+
+class DataExplorer extends React.Component<DataExplorerProps & RouterRuleID> {
+  public state = {
+    showWriteForm: false,
   }
 
-  getActiveQuery = () => {
+  public getActiveQuery = () => {
     const {queryConfigs} = this.props
     if (queryConfigs.length === 0) {
       this.props.queryConfigActions.addQuery()
@@ -41,39 +84,39 @@ class DataExplorer extends React.Component {
     return queryConfigs[0]
   }
 
-  componentDidMount() {
-    const {router} = this.props
-    const {query} = queryString.parse(router.location.search)
+  public handleCloseWriteData = () => {
+    this.setState({showWriteForm: false})
+  }
+
+  public handleOpenWriteData = () => {
+    this.setState({showWriteForm: true})
+  }
+
+  public handleChooseTimeRange = bounds => {
+    this.props.setTimeRange(bounds)
+  }
+
+  public componentDidMount() {
+    const {location} = this.props
+    const {query} = queryString.parse(location.search)
     if (query && query.length) {
       const qc = this.props.queryConfigs[0]
       this.props.queryConfigActions.editRawText(qc.id, query)
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const {router} = this.props
+  public componentWillReceiveProps(nextProps: DataExplorerProps) {
+    const {location, history} = this.props
     const {queryConfigs, timeRange} = nextProps
     const query = buildRawText(_.get(queryConfigs, ['0'], ''), timeRange)
-    const qsCurrent = queryString.parse(router.location.search)
+    const qsCurrent = queryString.parse(location.search)
     if (query.length && qsCurrent.query !== query) {
       const qsNew = queryString.stringify({query})
-      router.push(`${router.location.pathname}?${qsNew}`)
+      history.push(`${location.pathname}?${qsNew}`)
     }
   }
 
-  handleCloseWriteData = () => {
-    this.setState({showWriteForm: false})
-  }
-
-  handleOpenWriteData = () => {
-    this.setState({showWriteForm: true})
-  }
-
-  handleChooseTimeRange = bounds => {
-    this.props.setTimeRange(bounds)
-  }
-
-  render() {
+  public render() {
     const {
       source,
       timeRange,
@@ -92,18 +135,19 @@ class DataExplorer extends React.Component {
 
     return (
       <div className="data-explorer">
-        {showWriteForm
-          ? <OverlayTechnologies>
-              <WriteDataForm
-                source={source}
-                errorThrown={errorThrownAction}
-                selectedDatabase={selectedDatabase}
-                onClose={this.handleCloseWriteData}
-                writeLineProtocol={writeLineProtocol}
-              />
-            </OverlayTechnologies>
-          : null}
+        {showWriteForm && (
+          <OverlayTechnologies>
+            <WriteDataForm
+              source={source}
+              errorThrown={errorThrownAction}
+              selectedDatabase={selectedDatabase}
+              onClose={this.handleCloseWriteData}
+              writeLineProtocol={writeLineProtocol}
+            />
+          </OverlayTechnologies>
+        )}
         <Header
+          source={source}
           timeRange={timeRange}
           autoRefresh={autoRefresh}
           showWriteForm={this.handleOpenWriteData}
@@ -126,6 +170,7 @@ class DataExplorer extends React.Component {
             initialGroupByTime={INITIAL_GROUP_BY_TIME}
           />
           <Visualization
+            source={source}
             views={VIS_VIEWS}
             activeQueryIndex={0}
             timeRange={timeRange}
@@ -139,51 +184,6 @@ class DataExplorer extends React.Component {
       </div>
     )
   }
-}
-
-const {arrayOf, func, number, shape, string} = PropTypes
-
-DataExplorer.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-      self: string.isRequired,
-      queries: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  router: shape({
-    location: shape({
-      search: string,
-      pathanme: string,
-    }),
-  }),
-  queryConfigs: arrayOf(shape({})).isRequired,
-  queryConfigActions: shape({
-    editQueryStatus: func.isRequired,
-  }).isRequired,
-  autoRefresh: number.isRequired,
-  handleChooseAutoRefresh: func.isRequired,
-  timeRange: shape({
-    upper: string,
-    lower: string,
-  }).isRequired,
-  setTimeRange: func.isRequired,
-  dataExplorer: shape({
-    queryIDs: arrayOf(string).isRequired,
-  }).isRequired,
-  writeLineProtocol: func.isRequired,
-  errorThrownAction: func.isRequired,
-  onManualRefresh: func.isRequired,
-  manualRefresh: number.isRequired,
-}
-
-DataExplorer.childContextTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-      self: string.isRequired,
-    }).isRequired,
-  }).isRequired,
 }
 
 const mapStateToProps = state => {
@@ -208,17 +208,15 @@ const mapDispatchToProps = dispatch => {
     handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
     errorThrownAction: bindActionCreators(errorThrown, dispatch),
     setTimeRange: bindActionCreators(
-      dataExplorerActionCreators.setTimeRange,
+      dataExplorerActions.setTimeRange,
       dispatch
     ),
     writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
-    queryConfigActions: bindActionCreators(
-      dataExplorerActionCreators,
-      dispatch
-    ),
+    queryConfigActions: bindActionCreators(dataExplorerActions, dispatch),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(ManualRefresh(DataExplorer))
-)
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(DataExplorer)

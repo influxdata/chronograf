@@ -1,7 +1,13 @@
 import * as _ from 'lodash'
 
+import {QueryConfigField} from 'src/types'
+
 // fieldWalk traverses fields rescursively into args mapping fn on every field
-export const fieldWalk = (fields, fn, acc = []) =>
+export const fieldWalk = (
+  fields: QueryConfigField[],
+  fn,
+  acc = []
+): QueryConfigField[] =>
   _.compact(
     _.flattenDeep(
       fields.reduce((a, f) => {
@@ -27,7 +33,7 @@ export const numFunctions = fields => _.size(getFunctions(fields))
 export const functionNames = fields => getFunctions(fields).map(f => f.value)
 
 // returns a flattened list of all fieldNames in a queryConfig
-export const getFieldsDeep = fields =>
+export const getFieldsDeep = (fields: QueryConfigField[]): QueryConfigField[] =>
   _.uniqBy(
     fieldWalk(fields, f => (_.get(f, 'type') === 'field' ? f : null)),
     'value'
@@ -43,7 +49,10 @@ export const hasField = (fieldName, fields) =>
   fieldNamesDeep(fields).some(f => f === fieldName)
 
 // getAllFields and funcs with fieldName
-export const getFieldsWithName = (fieldName, fields) =>
+export const getFieldsWithName = (
+  fieldName: string,
+  fields: QueryConfigField[]
+): QueryConfigField[] =>
   getFieldsDeep(fields).filter(f => f.value === fieldName)
 
 // everyOfType returns true if all top-level field types are type
