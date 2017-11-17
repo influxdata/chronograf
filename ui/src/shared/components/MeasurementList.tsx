@@ -57,6 +57,106 @@ class MeasurementList extends React.Component<MeasurementListProps> {
     this.props.onToggleTagAcceptance()
   }
 
+  private handleChooseMeasurement = (
+    measurement: string,
+    isActive: boolean
+  ) => () => {
+    if (!isActive) {
+      this.props.onChooseMeasurement(measurement)
+    }
+  }
+
+  private renderList = () => {
+    if (!this.props.query.database) {
+      return (
+        <div className="query-builder--list-empty">
+          <span>
+            No <strong>Database</strong> selected
+          </span>
+        </div>
+      )
+    }
+
+    const filterText = this.state.filterText.toLowerCase()
+    const measurements = this.state.measurements.filter(m =>
+      m.toLowerCase().includes(filterText)
+    )
+
+    return (
+      <div className="query-builder--list">
+        <FancyScrollbar>
+          {measurements.map(measurement => {
+            const isActive = measurement === this.props.query.measurement
+            const numTagsActive = Object.keys(this.props.query.tags).length
+
+            return (
+              <div
+                key={measurement}
+                onClick={this.handleChooseMeasurement(measurement, isActive)}
+              >
+                <div
+                  className={classnames('query-builder--list-item', {
+                    active: isActive,
+                  })}
+                  data-test={`query-builder-list-item-measurement-${
+                    measurement
+                  }`}
+                >
+                  <span>
+                    <div className="query-builder--caret icon caret-right" />
+                    {measurement}
+                  </span>
+                  {isActive &&
+                    numTagsActive >= 1 && (
+                      <div
+                        className={classnames('flip-toggle', {
+                          flipped: this.props.query.areTagsAccepted,
+                        })}
+                        onClick={this.handleAcceptReject}
+                      >
+                        <div className="flip-toggle--container">
+                          <div className="flip-toggle--front">!=</div>
+                          <div className="flip-toggle--back">=</div>
+                        </div>
+                      </div>
+                    )}
+                </div>
+                {isActive ? (
+                  <TagList
+                    source={this.props.source}
+                    query={this.props.query}
+                    querySource={this.props.querySource}
+                    onChooseTag={this.props.onChooseTag}
+                    onGroupByTag={this.props.onGroupByTag}
+                  />
+                ) : null}
+              </div>
+            )
+          })}
+        </FancyScrollbar>
+      </div>
+    )
+  }
+
+  private _getMeasurements = () => {
+    const {querySource, source} = this.props
+
+    const proxy =
+      _.get(querySource, ['links', 'proxy'], null) || source.links.proxy
+
+    showMeasurements(proxy, this.props.query.database).then(resp => {
+      const {errors, measurementSets} = showMeasurementsParser(resp.data)
+      if (errors.length) {
+        // TODO: display errors in the UI.
+        return console.error('InfluxDB returned error(s): ', errors) // eslint-disable-line no-console
+      }
+
+      this.setState({
+        measurements: measurementSets[0].measurements,
+      })
+    })
+  }
+
   public componentDidMount() {
     if (!this.props.query.database) {
       return
@@ -107,100 +207,6 @@ class MeasurementList extends React.Component<MeasurementListProps> {
         {this.renderList()}
       </div>
     )
-  }
-
-  public renderList = () => {
-    if (!this.props.query.database) {
-      return (
-        <div className="query-builder--list-empty">
-          <span>
-            No <strong>Database</strong> selected
-          </span>
-        </div>
-      )
-    }
-
-    const filterText = this.state.filterText.toLowerCase()
-    const measurements = this.state.measurements.filter(m =>
-      m.toLowerCase().includes(filterText)
-    )
-
-    return (
-      <div className="query-builder--list">
-        <FancyScrollbar>
-          {measurements.map(measurement => {
-            const isActive = measurement === this.props.query.measurement
-            const numTagsActive = Object.keys(this.props.query.tags).length
-
-            return (
-              <div
-                key={measurement}
-                onClick={
-                  isActive ? this.props.onChooseMeasurement(measurement) : null
-                }
-              >
-                <div
-                  className={classnames('query-builder--list-item', {
-                    active: isActive,
-                  })}
-                  data-test={`query-builder-list-item-measurement-${
-                    measurement
-                  }`}
-                >
-                  <span>
-                    <div className="query-builder--caret icon caret-right" />
-                    {measurement}
-                  </span>
-                  {isActive &&
-                    numTagsActive >= 1 && (
-                      <div
-                        className={classnames('flip-toggle', {
-                          flipped: this.props.query.areTagsAccepted,
-                        })}
-                        onClick={this.handleAcceptReject}
-                      >
-                        <div className="flip-toggle--container">
-                          <div className="flip-toggle--front">!=</div>
-                          <div className="flip-toggle--back">=</div>
-                        </div>
-                      </div>
-                    )}
-                </div>
-                {isActive ? (
-                  <TagList
-                    source={this.props.source}
-                    query={this.props.query}
-                    querySource={this.props.querySource}
-                    onChooseTag={this.props.onChooseTag}
-                    onGroupByTag={this.props.onGroupByTag}
-                  />
-                ) : null}
-              </div>
-            )
-          })}
-        </FancyScrollbar>
-      </div>
-    )
-  }
-
-  public _getMeasurements = () => {
-    const {source} = this.context
-    const {querySource} = this.props
-
-    const proxy =
-      _.get(querySource, ['links', 'proxy'], null) || source.links.proxy
-
-    showMeasurements(proxy, this.props.query.database).then(resp => {
-      const {errors, measurementSets} = showMeasurementsParser(resp.data)
-      if (errors.length) {
-        // TODO: display errors in the UI.
-        return console.error('InfluxDB returned error(s): ', errors) // eslint-disable-line no-console
-      }
-
-      this.setState({
-        measurements: measurementSets[0].measurements,
-      })
-    })
   }
 }
 

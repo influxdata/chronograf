@@ -159,7 +159,7 @@ class Dropdown extends React.Component<DropdownProps, DropdownState> {
       <ul
         className={classnames('dropdown-menu', {
           'dropdown-menu--no-highlight': useAutoComplete,
-          [menuClass]: menuClass,
+          [menuClass]: !!menuClass,
         })}
         style={{width: menuWidth}}
       >
@@ -245,7 +245,7 @@ class Dropdown extends React.Component<DropdownProps, DropdownState> {
         onClick={this.handleClick}
         className={classnames('dropdown', {
           open: isOpen,
-          [className]: className,
+          [className]: !!className,
         })}
       >
         {useAutoComplete && isOpen ? (
@@ -286,7 +286,7 @@ class Dropdown extends React.Component<DropdownProps, DropdownState> {
             <ul
               className={classnames('dropdown-menu', {
                 'dropdown-menu--no-highlight': useAutoComplete,
-                [menuClass]: menuClass,
+                [menuClass]: !!menuClass,
               })}
             >
               <li className="dropdown-empty">No matching items</li>

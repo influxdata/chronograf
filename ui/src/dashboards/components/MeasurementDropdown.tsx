@@ -1,51 +1,42 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import Dropdown from 'shared/components/Dropdown'
 import {showMeasurements} from 'shared/apis/metaQuery'
 import parsers from 'shared/parsing'
 const {measurements: showMeasurementsParser} = parsers
+import {Source} from 'src/types'
 
-class MeasurementDropdown extends React.Component {
-  constructor(props) {
+export interface MeasurementDropdownProps {
+  source: Source
+  database: string
+  measurement: string
+  onSelectMeasurement: ({text}: {text: string}) => void
+  onStartEdit: () => void
+  onErrorThrown: (error: string) => void
+}
+
+export interface MeasurementDropdownState {
+  measurements: string[]
+}
+
+class MeasurementDropdown extends React.Component<
+  MeasurementDropdownProps,
+  MeasurementDropdownState
+> {
+  constructor(props: MeasurementDropdownProps) {
     super(props)
     this.state = {
       measurements: [],
     }
   }
 
-  componentDidMount() {
-    this._getMeasurements()
-  }
-
-  componentDidUpdate(nextProps) {
-    if (nextProps.database === this.props.database) {
-      return
-    }
-
-    this._getMeasurements()
-  }
-
-  render() {
-    const {measurements} = this.state
-    const {measurement, onSelectMeasurement, onStartEdit} = this.props
-    return (
-      <Dropdown
-        items={measurements.map(text => ({text}))}
-        selected={measurement || 'Select Measurement'}
-        onChoose={onSelectMeasurement}
-        onClick={onStartEdit}
-      />
-    )
-  }
-
-  _getMeasurements = async () => {
-    const {source: {links: {proxy}}} = this.context
+  private _getMeasurements = async () => {
     const {
       measurement,
       database,
       onSelectMeasurement,
       onErrorThrown,
+      source: {links: {proxy}},
     } = this.props
 
     try {
@@ -62,24 +53,31 @@ class MeasurementDropdown extends React.Component {
       onErrorThrown(error)
     }
   }
-}
 
-const {func, shape, string} = PropTypes
+  public componentDidMount() {
+    this._getMeasurements()
+  }
 
-MeasurementDropdown.contextTypes = {
-  source: shape({
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-}
+  public componentDidUpdate(nextProps: MeasurementDropdownProps) {
+    if (nextProps.database === this.props.database) {
+      return
+    }
 
-MeasurementDropdown.propTypes = {
-  database: string.isRequired,
-  measurement: string,
-  onSelectMeasurement: func.isRequired,
-  onStartEdit: func.isRequired,
-  onErrorThrown: func.isRequired,
+    this._getMeasurements()
+  }
+
+  public render() {
+    const {measurements} = this.state
+    const {measurement, onSelectMeasurement, onStartEdit} = this.props
+    return (
+      <Dropdown
+        items={measurements.map(text => ({text}))}
+        selected={measurement || 'Select Measurement'}
+        onChoose={onSelectMeasurement}
+        onClick={onStartEdit}
+      />
+    )
+  }
 }
 
 export default MeasurementDropdown

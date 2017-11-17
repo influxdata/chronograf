@@ -113,7 +113,7 @@ class FieldListItem extends React.Component<
               className={classnames('btn btn-xs', {
                 active: isOpen,
                 'btn-default': !num,
-                'btn-primary': num,
+                'btn-primary': !!num,
               })}
               onClick={this.toggleFunctionsMenu}
               data-test={`query-builder-list-item-function-${fieldName}`}
