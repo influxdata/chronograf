@@ -36,6 +36,7 @@ export interface Source {
   }
   default: boolean
   telegraf?: string
+  kapacitors?: Kapacitor
 }
 
 export interface Alert {
@@ -366,7 +367,9 @@ export interface DashboardName {
   link: string
 }
 
-export interface Kapacitor {}
+export interface Kapacitor {
+  id: string
+}
 
 export interface Rule {
   id: string
@@ -392,10 +395,10 @@ export interface VisualizationQuery {
 export interface DropdownActions {
   icon: string
   text: string
-  handler: () => void
+  handler: (item: DropdownItem) => void
 }
 
 export interface DropdownItem {
   text: string
-  type?: string
+  [key: string]: string
 }
