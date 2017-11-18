@@ -1,15 +1,16 @@
 import * as React from 'react'
 import DatabaseDropdown from 'shared/components/DatabaseDropdown'
 
-import {eFunc} from 'src/types/funcs'
+import {Source} from 'src/types'
 
 export interface WriteDataHeaderProps {
   isManual: boolean
   selectedDatabase: string
-  handleSelectDatabase: (db: string) => void
+  handleSelectDatabase: ({text}: {text: string}) => void
   toggleWriteView: (toggle: boolean) => () => void
   errorThrown: (error: string) => void
   onClose: () => void
+  source: Source
 }
 
 const WriteDataHeader: React.SFC<WriteDataHeaderProps> = ({
@@ -19,6 +20,7 @@ const WriteDataHeader: React.SFC<WriteDataHeaderProps> = ({
   toggleWriteView,
   isManual,
   onClose,
+  source,
 }) => (
   <div className="write-data-form--header">
     <div className="page-header__left">
@@ -27,6 +29,7 @@ const WriteDataHeader: React.SFC<WriteDataHeaderProps> = ({
         onSelectDatabase={handleSelectDatabase}
         database={selectedDatabase}
         onErrorThrown={errorThrown}
+        source={source}
       />
       <ul className="nav nav-tablist nav-tablist-sm">
         <li

@@ -4,6 +4,8 @@ import {History, Location} from 'history'
 import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
 import * as FuncTypes from 'src/types/funcs'
 
+export type RouterID = RouteComponentProps<{id: string}>
+
 export type RouterSourceID = RouteComponentProps<{sourceID: string}>
 
 export type RouterHostID = RouteComponentProps<{
@@ -36,6 +38,7 @@ export interface Source {
   }
   default: boolean
   telegraf?: string
+  kapacitors?: Kapacitor[]
 }
 
 export interface Alert {
@@ -321,7 +324,7 @@ export enum OptInType {
   number = 'number',
 }
 
-export type TagValues = string[]
+export type TagValues = string
 
 export interface Tags {
   [keys: string]: TagValues
@@ -368,7 +371,17 @@ export interface DashboardName {
   link: string
 }
 
-export interface Kapacitor {}
+export interface Kapacitor {
+  id?: string
+  url: string
+  name: string
+  username?: string
+  password?: string
+  active: boolean
+  links: {
+    self: string
+  }
+}
 
 export interface Rule {
   id: string
@@ -394,10 +407,10 @@ export interface VisualizationQuery {
 export interface DropdownActions {
   icon: string
   text: string
-  handler: () => void
+  handler: (item: DropdownItem) => void
 }
 
 export interface DropdownItem {
   text: string
-  type?: string
+  [key: string]: string
 }

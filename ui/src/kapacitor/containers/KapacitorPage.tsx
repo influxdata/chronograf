@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
 
 import {
@@ -8,13 +7,37 @@ import {
   updateKapacitor,
   pingKapacitor,
 } from 'shared/apis'
-import KapacitorForm from '../components/KapacitorForm'
+import KapacitorForm from 'src/kapacitor/components/KapacitorForm'
+import {RouterID, Source} from 'src/types'
+import {addFlashMessage as addFlashMessageType} from 'src/types/funcs'
 
 const defaultName = 'My Kapacitor'
 const kapacitorPort = '9092'
 
-class KapacitorPage extends React.Component {
-  constructor(props) {
+export interface KapacitorPageProps {
+  source: Source
+  addFlashMessage: addFlashMessageType
+}
+
+export interface KapacitorPageState {
+  kapacitor: {
+    url: string
+    name: string
+    username: string
+    password: string
+    links: {
+      self: string
+    }
+    active: boolean
+  }
+  exists: boolean
+}
+
+class KapacitorPage extends React.Component<
+  KapacitorPageProps & RouterID,
+  KapacitorPageState
+> {
+  constructor(props: KapacitorPageProps & RouterID) {
     super(props)
     this.state = {
       kapacitor: {
@@ -22,24 +45,16 @@ class KapacitorPage extends React.Component {
         name: defaultName,
         username: '',
         password: '',
+        links: {
+          self: '',
+        },
+        active: false,
       },
       exists: false,
     }
   }
 
-  componentDidMount() {
-    const {source, params: {id}} = this.props
-    if (!id) {
-      return
-    }
-
-    getKapacitor(source, id).then(kapacitor => {
-      this.setState({kapacitor})
-      this.checkKapacitorConnection(kapacitor)
-    })
-  }
-
-  checkKapacitorConnection = async kapacitor => {
+  private checkKapacitorConnection = async kapacitor => {
     try {
       await pingKapacitor(kapacitor)
       this.setState({exists: true})
@@ -52,7 +67,7 @@ class KapacitorPage extends React.Component {
     }
   }
 
-  handleInputChange = e => {
+  private handleInputChange = e => {
     const {value, name} = e.target
 
     this.setState(prevState => {
@@ -61,29 +76,31 @@ class KapacitorPage extends React.Component {
     })
   }
 
-  handleSubmit = e => {
+  private handleSubmit = e => {
     e.preventDefault()
     const {
       addFlashMessage,
       source,
       source: {kapacitors = []},
-      params,
-      router,
+      match,
+      history,
     } = this.props
     const {kapacitor} = this.state
 
     const isNameTaken = kapacitors.some(k => k.name === kapacitor.name)
-    const isNew = !params.id
+    const isNew = !match.params.id
 
     if (isNew && isNameTaken) {
       addFlashMessage({
         type: 'error',
-        text: `There is already a Kapacitor configuration named "${kapacitor.name}"`,
+        text: `There is already a Kapacitor configuration named "${
+          kapacitor.name
+        }"`,
       })
       return
     }
 
-    if (params.id) {
+    if (match.params.id) {
       updateKapacitor(kapacitor)
         .then(({data}) => {
           this.setState({kapacitor: data})
@@ -102,7 +119,7 @@ class KapacitorPage extends React.Component {
           // need up update kapacitor with info from server to AlertOutputs
           this.setState({kapacitor: data})
           this.checkKapacitorConnection(data)
-          router.push(`/sources/${source.id}/kapacitors/${data.id}/edit`)
+          history.push(`/sources/${source.id}/kapacitors/${data.id}/edit`)
           addFlashMessage({
             type: 'success',
             text: 'Kapacitor Created! Configuring endpoints is optional.',
@@ -117,26 +134,42 @@ class KapacitorPage extends React.Component {
     }
   }
 
-  handleResetToDefaults = e => {
+  private handleResetToDefaults = e => {
     e.preventDefault()
     const defaultState = {
       url: this._parseKapacitorURL(),
       name: defaultName,
       username: '',
       password: '',
+      links: {
+        self: '',
+      },
+      active: false,
     }
 
     this.setState({kapacitor: {...defaultState}})
   }
 
-  _parseKapacitorURL = () => {
+  private _parseKapacitorURL = () => {
     const parser = document.createElement('a')
     parser.href = this.props.source.url
 
     return `${parser.protocol}//${parser.hostname}:${kapacitorPort}`
   }
 
-  render() {
+  public componentDidMount() {
+    const {source, match: {params: {id}}} = this.props
+    if (!id) {
+      return
+    }
+
+    getKapacitor(source, id).then(kapacitor => {
+      this.setState({kapacitor})
+      this.checkKapacitorConnection(kapacitor)
+    })
+  }
+
+  public render() {
     const {source, addFlashMessage} = this.props
     const {kapacitor, exists} = this.state
 
@@ -154,21 +187,4 @@ class KapacitorPage extends React.Component {
   }
 }
 
-const {array, func, shape, string} = PropTypes
-
-KapacitorPage.propTypes = {
-  addFlashMessage: func,
-  params: shape({
-    id: string,
-  }).isRequired,
-  router: shape({
-    push: func.isRequired,
-  }).isRequired,
-  source: shape({
-    id: string.isRequired,
-    url: string.isRequired,
-    kapacitors: array,
-  }),
-}
-
-export default withRouter(KapacitorPage)
+export default withRouter<KapacitorPageProps>(KapacitorPage)

@@ -1,43 +1,90 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-import {withRouter} from 'react-router-dom'
 import * as _ from 'lodash'
-import {getSource} from 'shared/apis'
-import {createSource, updateSource} from 'shared/apis'
+import * as qs from 'query-string'
+import {withRouter} from 'react-router-dom'
+import {connect} from 'react-redux'
+import {compose} from 'redux'
+
+import {getSource, createSource, updateSource} from 'shared/apis'
 import {
   addSource as addSourceAction,
   updateSource as updateSourceAction,
 } from 'shared/actions/sources'
 import {publishNotification} from 'shared/actions/notifications'
-import {connect} from 'react-redux'
 
 import SourceForm from 'sources/components/SourceForm'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import SourceIndicator from 'shared/components/SourceIndicator'
 import {DEFAULT_SOURCE} from 'shared/constants'
+import {Source, History} from 'src/types'
+
 const initialPath = '/sources/new'
 
-class SourcePage extends React.Component {
-  constructor(props) {
+export interface SourcePageProps {
+  match: {
+    params: {
+      id: string
+      sourceID: string
+    }
+  }
+  history: History
+  location: Location
+  notify: (type: string, message: string) => void
+  addSourceAction: typeof addSourceAction
+  updateSourceAction: typeof updateSourceAction
+}
+
+export interface SourcePageState {
+  isLoading: boolean
+  isCreated: boolean
+  source: {
+    id: string
+    url: string
+    name: string
+    username: string
+    password: string
+    default: boolean
+    telegraf: string
+    insecureSkipVerify: boolean
+    metaUrl: string
+    type?: string
+    links: {
+      proxy: string
+      self: string
+      kapacitors: string
+      queries: string
+      permissions: string
+      users: string
+      databases: string
+      roles: string
+    }
+  }
+  editMode: boolean
+  isInitialSource: boolean
+}
+
+class SourcePage extends React.Component<SourcePageProps, SourcePageState> {
+  constructor(props: SourcePageProps) {
     super(props)
 
     this.state = {
+      isCreated: false,
       isLoading: true,
       source: DEFAULT_SOURCE,
-      editMode: props.params.id !== undefined,
-      isInitialSource: props.router.location.pathname === initialPath,
+      editMode: props.match.params.id !== undefined,
+      isInitialSource: props.location.pathname === initialPath,
     }
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const {editMode} = this.state
-    const {params} = this.props
+    const {match} = this.props
 
     if (!editMode) {
       return this.setState({isLoading: false})
     }
 
-    getSource(params.id)
+    getSource(match.params.id)
       .then(({data: source}) => {
         this.setState({
           source: {...DEFAULT_SOURCE, ...source},
@@ -50,7 +97,7 @@ class SourcePage extends React.Component {
       })
   }
 
-  handleInputChange = e => {
+  public handleInputChange = e => {
     let val = e.target.value
     const name = e.target.name
 
@@ -68,7 +115,7 @@ class SourcePage extends React.Component {
     })
   }
 
-  handleBlurSourceURL = () => {
+  public handleBlurSourceURL = () => {
     const {source, editMode} = this.state
     if (editMode) {
       this.setState(this._normalizeSource)
@@ -82,7 +129,7 @@ class SourcePage extends React.Component {
     this.setState(this._normalizeSource, this._createSourceOnBlur)
   }
 
-  handleSubmit = e => {
+  public handleSubmit = e => {
     e.preventDefault()
     const {isCreated, editMode} = this.state
     const isNewSource = !editMode
@@ -94,14 +141,14 @@ class SourcePage extends React.Component {
     this.setState(this._normalizeSource, this._updateSource)
   }
 
-  handleError = (bannerText, err) => {
+  public handleError = (bannerText, err) => {
     const {notify} = this.props
     const error = this._parseError(err)
     console.error('Error: ', error)
     notify('error', `${bannerText}: ${error}`)
   }
 
-  _normalizeSource({source}) {
+  public _normalizeSource({source}: {source: Source}) {
     const url = source.url.trim()
     if (source.url.startsWith('http')) {
       return {source: {...source, url}}
@@ -109,7 +156,7 @@ class SourcePage extends React.Component {
     return {source: {...source, url: `http://${url}`}}
   }
 
-  _createSourceOnBlur = () => {
+  public _createSourceOnBlur = () => {
     const {source} = this.state
     // if there is a type on source it has already been created
     if (source.type) {
@@ -130,7 +177,7 @@ class SourcePage extends React.Component {
       })
   }
 
-  _createSource = () => {
+  public _createSource = () => {
     const {source} = this.state
     createSource(source)
       .then(({data: sourceFromServer}) => {
@@ -142,7 +189,7 @@ class SourcePage extends React.Component {
       })
   }
 
-  _updateSource = () => {
+  public _updateSource = () => {
     const {source} = this.state
     const {notify} = this.props
     updateSource(source)
@@ -156,37 +203,37 @@ class SourcePage extends React.Component {
       })
   }
 
-  _redirect = source => {
+  public _redirect = source => {
     const {isInitialSource} = this.state
-    const {params, router} = this.props
+    const {match, history} = this.props
 
     if (isInitialSource) {
       return this._redirectToApp(source)
     }
 
-    router.push(`/sources/${params.sourceID}/manage-sources`)
+    history.push(`/sources/${match.params.sourceID}/manage-sources`)
   }
 
-  _redirectToApp = source => {
-    const {location, router} = this.props
-    const {redirectPath} = location.query
+  public _redirectToApp = source => {
+    const {location, history} = this.props
+    const {redirectPath} = qs.parse(location.search)
 
     if (!redirectPath) {
-      return router.push(`/sources/${source.id}/hosts`)
+      return history.push(`/sources/${source.id}/hosts`)
     }
 
     const fixedPath = redirectPath.replace(
       /\/sources\/[^/]*/,
       `/sources/${source.id}`
     )
-    return router.push(fixedPath)
+    return history.push(fixedPath)
   }
 
-  _parseError = error => {
+  public _parseError = error => {
     return _.get(error, ['data', 'message'], error)
   }
 
-  render() {
+  public render() {
     const {isLoading, source, editMode, isInitialSource} = this.state
 
     if (isLoading) {
@@ -195,22 +242,22 @@ class SourcePage extends React.Component {
 
     return (
       <div className={`${isInitialSource ? '' : 'page'}`}>
-        {isInitialSource
-          ? null
-          : <div className="page-header">
-              <div className="page-header__container page-header__source-page">
-                <div className="page-header__col-md-8">
-                  <div className="page-header__left">
-                    <h1 className="page-header__title">
-                      {editMode ? 'Edit Source' : 'Add a New Source'}
-                    </h1>
-                  </div>
-                  <div className="page-header__right">
-                    <SourceIndicator />
-                  </div>
+        {!isInitialSource && (
+          <div className="page-header">
+            <div className="page-header__container page-header__source-page">
+              <div className="page-header__col-md-8">
+                <div className="page-header__left">
+                  <h1 className="page-header__title">
+                    {editMode ? 'Edit Source' : 'Add a New Source'}
+                  </h1>
+                </div>
+                <div className="page-header__right">
+                  <SourceIndicator source={source as Source} />
                 </div>
               </div>
-            </div>}
+            </div>
+          </div>
+        )}
         <FancyScrollbar className="page-contents">
           <div className="container-fluid">
             <div className="row">
@@ -233,30 +280,11 @@ class SourcePage extends React.Component {
   }
 }
 
-const {func, shape, string} = PropTypes
-
-SourcePage.propTypes = {
-  params: shape({
-    id: string,
-    sourceID: string,
-  }),
-  router: shape({
-    push: func.isRequired,
-  }).isRequired,
-  location: shape({
-    query: shape({
-      redirectPath: string,
-    }).isRequired,
-  }).isRequired,
-  notify: func,
-  addSourceAction: func,
-  updateSourceAction: func,
-}
-
-const mapStateToProps = () => ({})
-
-export default connect(mapStateToProps, {
-  notify: publishNotification,
-  addSourceAction,
-  updateSourceAction,
-})(withRouter(SourcePage))
+export default compose(
+  withRouter,
+  connect(null, {
+    notify: publishNotification,
+    addSourceAction,
+    updateSourceAction,
+  })
+)(SourcePage)

@@ -1,9 +1,11 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as _ from 'lodash'
 
 import {Tab, Tabs, TabPanel, TabPanels, TabList} from 'shared/components/Tabs'
 import {getKapacitorConfig, updateKapacitorConfigSection} from 'shared/apis'
+
+import {Source, Kapacitor} from 'src/types'
+import {addFlashMessage as addFlashMessageType} from 'src/types/funcs'
 
 import {
   AlertaConfig,
@@ -19,8 +21,21 @@ import {
   VictorOpsConfig,
 } from './config'
 
-class AlertTabs extends React.Component {
-  constructor(props) {
+export interface AlertTabsProps {
+  source: Source
+  kapacitor: Kapacitor
+  addFlashMessage: addFlashMessageType
+}
+
+export interface AlertTabsState {
+  selectedEndpoint: string
+  configSections: {
+    [key: string]: string
+  }
+}
+
+class AlertTabs extends React.Component<AlertTabsProps, AlertTabsState> {
+  constructor(props: AlertTabsProps) {
     super(props)
 
     this.state = {
@@ -29,17 +44,7 @@ class AlertTabs extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.refreshKapacitorConfig(this.props.kapacitor)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.kapacitor.url !== nextProps.kapacitor.url) {
-      this.refreshKapacitorConfig(nextProps.kapacitor)
-    }
-  }
-
-  refreshKapacitorConfig = kapacitor => {
+  private refreshKapacitorConfig = kapacitor => {
     getKapacitorConfig(kapacitor)
       .then(({data: {sections}}) => {
         this.setState({configSections: sections})
@@ -53,15 +58,11 @@ class AlertTabs extends React.Component {
       })
   }
 
-  getSection = (sections, section) => {
+  private getSection = (sections, section) => {
     return _.get(sections, [section, 'elements', '0'], null)
   }
 
-  handleGetSection = (sections, section) => () => {
-    return this.getSection(sections, section)
-  }
-
-  handleSaveConfig = section => properties => {
+  private handleSaveConfig = section => properties => {
     if (section !== '') {
       const propsToSend = this.sanitizeProperties(section, properties)
       updateKapacitorConfigSection(this.props.kapacitor, section, propsToSend)
@@ -81,7 +82,7 @@ class AlertTabs extends React.Component {
     }
   }
 
-  sanitizeProperties = (section, properties) => {
+  private sanitizeProperties = (section, properties) => {
     const cleanProps = {...properties, enabled: true}
     const {redacted} = this.getSection(this.state.configSections, section)
     if (redacted && redacted.length) {
@@ -95,7 +96,17 @@ class AlertTabs extends React.Component {
     return cleanProps
   }
 
-  render() {
+  public componentDidMount() {
+    this.refreshKapacitorConfig(this.props.kapacitor)
+  }
+
+  public componentWillReceiveProps(nextProps: AlertTabsProps) {
+    if (this.props.kapacitor.url !== nextProps.kapacitor.url) {
+      this.refreshKapacitorConfig(nextProps.kapacitor)
+    }
+  }
+
+  public render() {
     const {configSections} = this.state
 
     if (!configSections) {
@@ -105,91 +116,102 @@ class AlertTabs extends React.Component {
     const supportedConfigs = {
       alerta: {
         type: 'Alerta',
-        renderComponent: () =>
+        renderComponent: () => (
           <AlertaConfig
             onSave={this.handleSaveConfig('alerta')}
             config={this.getSection(configSections, 'alerta')}
-          />,
+          />
+        ),
       },
       hipchat: {
         type: 'HipChat',
-        renderComponent: () =>
+        renderComponent: () => (
           <HipChatConfig
             onSave={this.handleSaveConfig('hipchat')}
             config={this.getSection(configSections, 'hipchat')}
-          />,
+          />
+        ),
       },
       opsgenie: {
         type: 'OpsGenie',
-        renderComponent: () =>
+        renderComponent: () => (
           <OpsGenieConfig
             onSave={this.handleSaveConfig('opsgenie')}
             config={this.getSection(configSections, 'opsgenie')}
-          />,
+          />
+        ),
       },
       pagerduty: {
         type: 'PagerDuty',
-        renderComponent: () =>
+        renderComponent: () => (
           <PagerDutyConfig
             onSave={this.handleSaveConfig('pagerduty')}
             config={this.getSection(configSections, 'pagerduty')}
-          />,
+          />
+        ),
       },
       pushover: {
         type: 'Pushover',
-        renderComponent: () =>
+        renderComponent: () => (
           <PushoverConfig
             onSave={this.handleSaveConfig('pushover')}
             config={this.getSection(configSections, 'pushover')}
-          />,
+          />
+        ),
       },
       sensu: {
         type: 'Sensu',
-        renderComponent: () =>
+        renderComponent: () => (
           <SensuConfig
             onSave={this.handleSaveConfig('sensu')}
             config={this.getSection(configSections, 'sensu')}
-          />,
+          />
+        ),
       },
       slack: {
         type: 'Slack',
-        renderComponent: () =>
+        renderComponent: () => (
           <SlackConfig
             onSave={this.handleSaveConfig('slack')}
             config={this.getSection(configSections, 'slack')}
-          />,
+          />
+        ),
       },
       smtp: {
         type: 'SMTP',
-        renderComponent: () =>
+        renderComponent: () => (
           <SMTPConfig
             onSave={this.handleSaveConfig('smtp')}
             config={this.getSection(configSections, 'smtp')}
-          />,
+          />
+        ),
       },
       talk: {
         type: 'Talk',
-        renderComponent: () =>
+        renderComponent: () => (
           <TalkConfig
             onSave={this.handleSaveConfig('talk')}
             config={this.getSection(configSections, 'talk')}
-          />,
+          />
+        ),
       },
       telegram: {
         type: 'Telegram',
-        renderComponent: () =>
+        renderComponent: () => (
           <TelegramConfig
             onSave={this.handleSaveConfig('telegram')}
             config={this.getSection(configSections, 'telegram')}
-          />,
+          />
+        ),
       },
       victorops: {
         type: 'VictorOps',
-        renderComponent: () =>
+        renderComponent: () => (
           <VictorOpsConfig
             onSave={this.handleSaveConfig('victorops')}
             config={this.getSection(configSections, 'victorops')}
-          />,
+          />
+        ),
       },
     }
 
@@ -234,21 +256,6 @@ class AlertTabs extends React.Component {
       </div>
     )
   }
-}
-
-const {func, shape, string} = PropTypes
-
-AlertTabs.propTypes = {
-  source: shape({
-    id: string.isRequired,
-  }).isRequired,
-  kapacitor: shape({
-    url: string.isRequired,
-    links: shape({
-      proxy: string.isRequired,
-    }).isRequired,
-  }),
-  addFlashMessage: func.isRequired,
 }
 
 export default AlertTabs

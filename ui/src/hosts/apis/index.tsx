@@ -226,10 +226,11 @@ function parseSeries(series: string) {
   // Consume measurement
   workStr = parseMeasurement(workStr, out)
 
+  // TODO fix the while loop
   // Consume tags
-  while (workStr.length > 0) {
-    workStr = parseTag(workStr, out)
-  }
+  // while (workStr.length > 0) {
+  //   workStr = parseTag(workStr, out)
+  // }
 
   return out
 }

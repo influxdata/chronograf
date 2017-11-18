@@ -1,8 +1,15 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-import ReactTooltip from 'react-tooltip'
+import * as ReactTooltip from 'react-tooltip'
 
-const QuestionMarkTooltip = ({tipID, tipContent}) =>
+export interface QuestionMarkTooltipProps {
+  tipID: string
+  tipContent: string
+}
+
+const QuestionMarkTooltip: React.SFC<QuestionMarkTooltipProps> = ({
+  tipID,
+  tipContent,
+}) => (
   <div className="question-mark-tooltip">
     <div
       className="question-mark-tooltip--icon"
@@ -19,12 +26,6 @@ const QuestionMarkTooltip = ({tipID, tipContent}) =>
       class="influx-tooltip"
     />
   </div>
-
-const {string} = PropTypes
-
-QuestionMarkTooltip.propTypes = {
-  tipID: string.isRequired,
-  tipContent: string.isRequired,
-}
+)
 
 export default QuestionMarkTooltip

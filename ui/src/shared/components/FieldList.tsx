@@ -110,8 +110,7 @@ class FieldList extends React.Component<FieldListProps, FieldListState> {
 
   private _getFields = () => {
     const {database, measurement, retentionPolicy} = this.props.query
-    const {source} = this.context
-    const {querySource} = this.props
+    const {querySource, source} = this.props
 
     const proxy =
       _.get(querySource, ['links', 'proxy'], null) || source.links.proxy

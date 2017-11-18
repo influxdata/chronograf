@@ -1,14 +1,28 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import RedactedInput from './RedactedInput'
 
-class AlertaConfig extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+export interface AlertaOptions {
+  environment: string
+  origin: string
+  token: boolean
+  url: string
+}
 
-  handleSaveAlert = e => {
+export interface AlertaConfigProps {
+  config: {
+    options: AlertaOptions
+  }
+  onSave: (properties: AlertaOptions) => void
+}
+
+class AlertaConfig extends React.Component<AlertaConfigProps> {
+  private environment
+  private origin
+  private token
+  private url
+
+  private handleSaveAlert = e => {
     e.preventDefault()
 
     const properties = {
@@ -21,9 +35,9 @@ class AlertaConfig extends React.Component {
     this.props.onSave(properties)
   }
 
-  handleTokenRef = r => (this.token = r)
+  private handleTokenRef = r => (this.token = r)
 
-  render() {
+  public render() {
     const {environment, origin, token, url} = this.props.config.options
 
     return (
@@ -78,20 +92,6 @@ class AlertaConfig extends React.Component {
       </form>
     )
   }
-}
-
-const {bool, func, shape, string} = PropTypes
-
-AlertaConfig.propTypes = {
-  config: shape({
-    options: shape({
-      environment: string,
-      origin: string,
-      token: bool,
-      url: string,
-    }).isRequired,
-  }).isRequired,
-  onSave: func.isRequired,
 }
 
 export default AlertaConfig

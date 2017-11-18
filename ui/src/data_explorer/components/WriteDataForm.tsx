@@ -161,7 +161,7 @@ class WriteDataForm extends React.Component<
   }
 
   public render() {
-    const {onClose, errorThrown} = this.props
+    const {onClose, errorThrown, source} = this.props
     const {dragClass} = this.state
 
     return (
@@ -180,6 +180,7 @@ class WriteDataForm extends React.Component<
             errorThrown={errorThrown}
             toggleWriteView={this.toggleWriteView}
             onClose={onClose}
+            source={source}
           />
           <WriteDataBody
             {...this.state}

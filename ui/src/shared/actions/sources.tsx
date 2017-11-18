@@ -71,7 +71,10 @@ export const removeAndLoadSources = source => async dispatch => {
     dispatch(loadSources(newSources))
   } catch (err) {
     dispatch(
-      publishNotification('error', 'Internal Server Error. Check API Logs')
+      publishNotification({
+        type: 'error',
+        message: 'Internal Server Error. Check API Logs',
+      })
     )
   }
 }
@@ -82,10 +85,12 @@ export const fetchKapacitorsAsync = source => async dispatch => {
     dispatch(fetchKapacitors(source, data.kapacitors))
   } catch (err) {
     dispatch(
-      publishNotification(
-        'error',
-        `Internal Server Error. Could not retrieve kapacitors for source ${source.id}.`
-      )
+      publishNotification({
+        type: 'error',
+        message: `Internal Server Error. Could not retrieve kapacitors for source ${
+          source.id
+        }.`,
+      })
     )
   }
 }
@@ -103,10 +108,10 @@ export const deleteKapacitorAsync = kapacitor => async dispatch => {
     dispatch(deleteKapacitor(kapacitor))
   } catch (err) {
     dispatch(
-      publishNotification(
-        'error',
-        'Internal Server Error. Could not delete Kapacitor config.'
-      )
+      publishNotification({
+        type: 'error',
+        message: 'Internal Server Error. Could not delete Kapacitor config.',
+      })
     )
   }
 }

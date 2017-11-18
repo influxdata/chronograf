@@ -33,10 +33,6 @@ const productionStylePlugins = [
     outFile: 'build/assets/chronograf.css',
     inject: false,
   }),
-  EnvPlugin({
-    NODE_ENV: 'production',
-    VERSION: JSON.stringify(version),
-  }),
 ]
 
 const devStylePlugins = [
@@ -50,10 +46,6 @@ const devStylePlugins = [
     group: 'chronograf.css',
     outFile: 'build/assets/chronograf.css',
     inject: false,
-  }),
-  EnvPlugin({
-    NODE_ENV: 'development',
-    VERSION: JSON.stringify(version),
   }),
 ]
 
@@ -80,6 +72,10 @@ Sparky.task('config', () => {
             es6: true,
           },
         }),
+      EnvPlugin({
+        NODE_ENV: isProduction ? 'production' : 'development',
+        VERSION: version,
+      }),
     ],
     cache: true,
     log: true,
@@ -124,9 +120,12 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
       const dist = path.resolve('./build')
       const app = server.httpServer.app
       app.use('/assets', express.static(path.join(dist, 'assets')))
-      app.use('/chronograf/v1', proxy({
-        target: 'http://localhost:8888',
-      }))
+      app.use(
+        '/chronograf/v1',
+        proxy({
+          target: 'http://localhost:8888',
+        })
+      )
       app.get('*', function(req, res) {
         res.sendFile(path.join(dist, 'assets/index.html'))
       })

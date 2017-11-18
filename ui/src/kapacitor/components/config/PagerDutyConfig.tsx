@@ -1,12 +1,21 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
-class PagerDutyConfig extends React.Component {
-  constructor(props) {
-    super(props)
+export interface PagerDutyOptions {
+  'service-key': string
+  url: string
+}
+
+export interface PagerDutyConfigProps {
+  config: {
+    options: PagerDutyOptions
   }
+  onSave: (properties: PagerDutyOptions) => void
+}
+class PagerDutyConfig extends React.Component<PagerDutyConfigProps> {
+  private serviceKey
+  private url
 
-  handleSaveAlert = e => {
+  private handleSaveAlert = e => {
     e.preventDefault()
 
     const properties = {
@@ -17,7 +26,7 @@ class PagerDutyConfig extends React.Component {
     this.props.onSave(properties)
   }
 
-  render() {
+  public render() {
     const {options} = this.props.config
     const {url} = options
     const serviceKey = options['service-key']
@@ -58,18 +67,6 @@ class PagerDutyConfig extends React.Component {
       </form>
     )
   }
-}
-
-const {bool, func, shape, string} = PropTypes
-
-PagerDutyConfig.propTypes = {
-  config: shape({
-    options: shape({
-      'service-key': bool.isRequired,
-      url: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  onSave: func.isRequired,
 }
 
 export default PagerDutyConfig
