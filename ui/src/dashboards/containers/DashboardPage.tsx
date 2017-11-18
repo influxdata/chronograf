@@ -38,6 +38,11 @@ import {
 } from 'src/types'
 import {Dashboard as Dash} from 'src/types/dashboards'
 
+export interface Name {
+  name: string
+  link: string
+}
+
 export interface DashboardPageProps {
   source: Source
   sources: Source[]
@@ -57,6 +62,7 @@ export interface DashboardPageProps {
     putDashboardByID: typeof dashboardActionCreators.putDashboardByID
     updateDashboardCell: (dashboard: Dash, cell: Cell) => Promise<void>
     updateDashboard: typeof dashboardActionCreators.updateDashboard
+    setDashTimeV1: typeof dashboardActionCreators.setDashTimeV1
   }
   dashboards: Dash[]
   handleChooseAutoRefresh: () => void
@@ -81,7 +87,7 @@ export interface DashboardPageState {
   isEditMode: boolean
   isTemplating: boolean
   zoomedTimeRange: ZoomedTimeRange
-  names: string[]
+  names: Name[]
 }
 
 class DashboardPage extends React.Component<
@@ -155,17 +161,87 @@ class DashboardPage extends React.Component<
     dashboardActions.putDashboard(newDashboard)
   }
 
-  handleAddCell = () => {
+  private handleAddCell = () => {
     const {dashboardActions, dashboard} = this.props
     dashboardActions.addDashboardCellAsync(dashboard)
   }
 
-  handleEditDashboard = () => {
+  private handleEditDashboard = () => {
     this.setState({isEditMode: true})
   }
 
-  handleCancelEditDashboard = () => {
+  private handleCancelEditDashboard = () => {
     this.setState({isEditMode: false})
+  }
+
+  private handleUpdateDashboardCell = newCell => () => {
+    const {dashboardActions, dashboard} = this.props
+    dashboardActions.updateDashboardCell(dashboard, newCell)
+  }
+
+  private handleDeleteDashboardCell = cell => {
+    const {dashboardActions, dashboard} = this.props
+    dashboardActions.deleteDashboardCellAsync(dashboard, cell)
+  }
+
+  private handleSelectTemplate = templateID => values => {
+    const {dashboardActions, dashboard} = this.props
+    dashboardActions.templateVariableSelected(dashboard.id, templateID, [
+      values,
+    ])
+  }
+
+  private handleEditTemplateVariables = (
+    templates,
+    onSaveTemplatesSuccess
+  ) => async () => {
+    const {dashboardActions, dashboard} = this.props
+
+    try {
+      await dashboardActions.putDashboard({
+        ...dashboard,
+        templates,
+      })
+      onSaveTemplatesSuccess()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  private handleRunQueryFailure = error => {
+    console.error(error)
+    this.props.errorThrown(error)
+  }
+
+  private synchronizer = dygraph => {
+    const dygraphs = [...this.state.dygraphs, dygraph].filter(d => d.graphDiv)
+    const {dashboards, params: {dashboardID}} = this.props
+
+    const dashboard = dashboards.find(
+      d => d.id === idNormalizer(TYPE_ID, dashboardID)
+    )
+
+    if (
+      dashboard &&
+      dygraphs.length === dashboard.cells.length &&
+      dashboard.cells.length > 1
+    ) {
+      Dygraph.synchronize(dygraphs, {
+        selection: true,
+        zoom: false,
+        range: false,
+      })
+    }
+
+    this.setState({dygraphs})
+  }
+
+  private handleToggleTempVarControls = () => {
+    this.props.templateControlBarVisibilityToggled()
+  }
+
+  private handleZoomedTimeRange = (zoomedLower, zoomedUpper) => {
+    this.setState({zoomedTimeRange: {zoomedLower, zoomedUpper}})
   }
 
   public async componentDidMount() {
@@ -194,76 +270,6 @@ class DashboardPage extends React.Component<
     }))
 
     this.setState({names})
-  }
-
-  public handleUpdateDashboardCell = newCell => () => {
-    const {dashboardActions, dashboard} = this.props
-    dashboardActions.updateDashboardCell(dashboard, newCell)
-  }
-
-  public handleDeleteDashboardCell = cell => {
-    const {dashboardActions, dashboard} = this.props
-    dashboardActions.deleteDashboardCellAsync(dashboard, cell)
-  }
-
-  public handleSelectTemplate = templateID => values => {
-    const {dashboardActions, dashboard} = this.props
-    dashboardActions.templateVariableSelected(dashboard.id, templateID, [
-      values,
-    ])
-  }
-
-  public handleEditTemplateVariables = (
-    templates,
-    onSaveTemplatesSuccess
-  ) => async () => {
-    const {dashboardActions, dashboard} = this.props
-
-    try {
-      await dashboardActions.putDashboard({
-        ...dashboard,
-        templates,
-      })
-      onSaveTemplatesSuccess()
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  public handleRunQueryFailure = error => {
-    console.error(error)
-    this.props.errorThrown(error)
-  }
-
-  public synchronizer = dygraph => {
-    const dygraphs = [...this.state.dygraphs, dygraph].filter(d => d.graphDiv)
-    const {dashboards, params: {dashboardID}} = this.props
-
-    const dashboard = dashboards.find(
-      d => d.id === idNormalizer(TYPE_ID, dashboardID)
-    )
-
-    if (
-      dashboard &&
-      dygraphs.length === dashboard.cells.length &&
-      dashboard.cells.length > 1
-    ) {
-      Dygraph.synchronize(dygraphs, {
-        selection: true,
-        zoom: false,
-        range: false,
-      })
-    }
-
-    this.setState({dygraphs})
-  }
-
-  public handleToggleTempVarControls = () => {
-    this.props.templateControlBarVisibilityToggled()
-  }
-
-  public handleZoomedTimeRange = (zoomedLower, zoomedUpper) => {
-    this.setState({zoomedTimeRange: {zoomedLower, zoomedUpper}})
   }
 
   public render() {
