@@ -266,6 +266,8 @@ export interface DygraphSeries {
   isHighlighted?: boolean
 }
 
+export interface Dygraph {}
+
 export interface DygraphPlugin {}
 
 export interface DygraphHighlightSeries {}

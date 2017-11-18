@@ -19,6 +19,7 @@ import {
 } from 'shared/constants/actionTypes'
 import {makeQueryForTemplate} from 'dashboards/utils/templateVariableQueryGenerator'
 import parsers from 'shared/parsing'
+import {Dashboard, Cell} from 'src/types/dashboards'
 
 export const loadDashboards = (dashboards, dashboardID) => ({
   type: 'LOAD_DASHBOARDS',
@@ -184,7 +185,9 @@ export const editTemplateVariableValues = (
 
 // Async Action Creators
 
-export const getDashboardsAsync = () => async dispatch => {
+export const getDashboardsAsync = () => async (
+  dispatch
+): Promise<Dashboard[]> => {
   try {
     const {data: {dashboards}} = await getDashboardsAJAX()
     dispatch(loadDashboards(dashboards))
@@ -216,7 +219,10 @@ export const putDashboardByID = dashboardID => async (dispatch, getState) => {
   }
 }
 
-export const updateDashboardCell = (dashboard, cell) => async dispatch => {
+export const updateDashboardCell = (
+  dashboard: Dashboard,
+  cell: Cell
+) => async dispatch => {
   try {
     const {data} = await updateDashboardCellAJAX(cell)
     dispatch(syncDashboardCell(dashboard, data))
