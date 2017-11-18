@@ -1,19 +1,28 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
-class RedactedInput extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      editing: false,
-    }
+export interface RedactedInputProps {
+  id: string
+  defaultValue: boolean | string
+  refFunc: (r: {}) => void
+}
+
+export interface RedactedInputState {
+  editing: boolean
+}
+
+class RedactedInput extends React.Component<
+  RedactedInputProps,
+  RedactedInputState
+> {
+  public state = {
+    editing: false,
   }
 
-  handleClick = () => {
+  private handleClick = () => {
     this.setState({editing: true})
   }
 
-  render() {
+  public render() {
     const {defaultValue, id, refFunc} = this.props
     const {editing} = this.state
 
@@ -31,7 +40,7 @@ class RedactedInput extends React.Component {
             id={id}
             type="hidden"
             ref={refFunc}
-            defaultValue={defaultValue}
+            defaultValue={`${defaultValue}`}
           />
         </div>
       )
@@ -47,14 +56,6 @@ class RedactedInput extends React.Component {
       />
     )
   }
-}
-
-const {bool, func, string} = PropTypes
-
-RedactedInput.propTypes = {
-  id: string.isRequired,
-  defaultValue: bool,
-  refFunc: func.isRequired,
 }
 
 export default RedactedInput

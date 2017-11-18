@@ -1,16 +1,28 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import QuestionMarkTooltip from 'shared/components/QuestionMarkTooltip'
 import {HIPCHAT_TOKEN_TIP} from 'kapacitor/copy'
 import RedactedInput from './RedactedInput'
 
-class HipchatConfig extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+export interface HipchatOptions {
+  room: string
+  token: boolean
+  url: string
+}
 
-  handleSaveAlert = e => {
+export interface HipchatConfigProps {
+  config: {
+    options: HipchatOptions
+  }
+  onSave: (properties: HipchatOptions) => void
+}
+
+class HipchatConfig extends React.Component<HipchatConfigProps> {
+  private room
+  private token
+  private url
+
+  private handleSaveAlert = e => {
     e.preventDefault()
 
     const properties = {
@@ -22,9 +34,9 @@ class HipchatConfig extends React.Component {
     this.props.onSave(properties)
   }
 
-  handleTokenRef = r => (this.token = r)
+  private handleTokenRef = r => (this.token = r)
 
-  render() {
+  public render() {
     const {options} = this.props.config
     const {url, room, token} = options
 
@@ -78,19 +90,6 @@ class HipchatConfig extends React.Component {
       </form>
     )
   }
-}
-
-const {bool, func, shape, string} = PropTypes
-
-HipchatConfig.propTypes = {
-  config: shape({
-    options: shape({
-      room: string.isRequired,
-      token: bool.isRequired,
-      url: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  onSave: func.isRequired,
 }
 
 export default HipchatConfig

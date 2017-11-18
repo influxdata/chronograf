@@ -1,73 +1,64 @@
 import AJAX from 'utils/ajax'
 
-import {Query, Template} from 'src/types'
+import {Query, Source, Template} from 'src/types'
 
-export function fetchLayouts() {
-  return AJAX({
+export const fetchLayouts = () =>
+  AJAX({
     url: '/chronograf/v1/layouts',
     method: 'GET',
     resource: 'layouts',
   })
-}
 
-export function getMe() {
-  return AJAX({
+export const getMe = () =>
+  AJAX({
     resource: 'me',
     method: 'GET',
   })
-}
 
-export function getSources() {
-  return AJAX({
+export const getSources = () =>
+  AJAX({
     resource: 'sources',
   })
-}
 
-export function getSource(id: string) {
-  return AJAX({
+export const getSource = (id: string) =>
+  AJAX({
     resource: 'sources',
     id,
   })
-}
 
-export function createSource(attributes) {
-  return AJAX({
+export const createSource = attributes =>
+  AJAX({
     resource: 'sources',
     method: 'POST',
     data: attributes,
   })
-}
 
-export function updateSource(newSource) {
-  return AJAX({
+export const updateSource = (newSource: Source) =>
+  AJAX({
     url: newSource.links.self,
     method: 'PATCH',
     data: newSource,
   })
-}
 
-export function deleteSource(source) {
-  return AJAX({
+export const deleteSource = (source: Source) =>
+  AJAX({
     url: source.links.self,
     method: 'DELETE',
   })
-}
 
-export function pingKapacitor(kapacitor) {
-  return AJAX({
+export const pingKapacitor = kapacitor =>
+  AJAX({
     method: 'GET',
     url: kapacitor.links.ping,
   })
-}
 
-export function getKapacitor(source, kapacitorID) {
-  return AJAX({
+export const getKapacitor = (source: Source, kapacitorID: string) =>
+  AJAX({
     url: `${source.links.kapacitors}/${kapacitorID}`,
     method: 'GET',
   }).then(({data}) => {
     return data
   })
-}
 
 export const getActiveKapacitor = async source => {
   try {
@@ -108,11 +99,11 @@ export const deleteKapacitor = async kapacitor => {
   }
 }
 
-export function createKapacitor(
-  source,
+export const createKapacitor = (
+  source: Source,
   {url, name = 'My Kapacitor', username, password}
-) {
-  return AJAX({
+) =>
+  AJAX({
     url: source.links.kapacitors,
     method: 'POST',
     data: {
@@ -122,17 +113,16 @@ export function createKapacitor(
       password,
     },
   })
-}
 
-export function updateKapacitor({
+export const updateKapacitor = ({
   links,
   url,
   name = 'My Kapacitor',
   username,
   password,
   active,
-}) {
-  return AJAX({
+}) =>
+  AJAX({
     url: links.self,
     method: 'PATCH',
     data: {
@@ -143,7 +133,6 @@ export function updateKapacitor({
       active,
     },
   })
-}
 
 export const getKapacitorConfig = async kapacitor => {
   return kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/config', '')
@@ -153,8 +142,8 @@ export const getKapacitorConfigSection = (kapacitor, section) => {
   return kapacitorProxy(kapacitor, 'GET', `/kapacitor/v1/config/${section}`, '')
 }
 
-export function updateKapacitorConfigSection(kapacitor, section, properties) {
-  return AJAX({
+export const updateKapacitorConfigSection = (kapacitor, section, properties) =>
+  AJAX({
     method: 'POST',
     url: kapacitor.links.proxy,
     params: {
@@ -167,50 +156,42 @@ export function updateKapacitorConfigSection(kapacitor, section, properties) {
       'Content-Type': 'application/json',
     },
   })
-}
 
-export function testAlertOutput(kapacitor, outputName, properties) {
-  return kapacitorProxy(
-    kapacitor,
-    'GET',
-    '/kapacitor/v1/service-tests'
-  ).then(({data: {services}}) => {
-    const service = services.find(s => s.name === outputName)
-    return kapacitorProxy(kapacitor, 'POST', service.link.href, {
-      ...service.options,
-      ...properties,
-    })
-  })
-}
+export const testAlertOutput = (kapacitor, outputName, properties) =>
+  kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/service-tests').then(
+    ({data: {services}}) => {
+      const service = services.find(s => s.name === outputName)
+      return kapacitorProxy(kapacitor, 'POST', service.link.href, {
+        ...service.options,
+        ...properties,
+      })
+    }
+  )
 
-export function createKapacitorTask(kapacitor, id, type, dbrps, script) {
-  return kapacitorProxy(kapacitor, 'POST', '/kapacitor/v1/tasks', {
+export const createKapacitorTask = (kapacitor, id, type, dbrps, script) =>
+  kapacitorProxy(kapacitor, 'POST', '/kapacitor/v1/tasks', {
     id,
     type,
     dbrps,
     script,
     status: 'enabled',
   })
-}
 
-export function enableKapacitorTask(kapacitor, id) {
-  return kapacitorProxy(kapacitor, 'PATCH', `/kapacitor/v1/tasks/${id}`, {
+export const enableKapacitorTask = (kapacitor, id) =>
+  kapacitorProxy(kapacitor, 'PATCH', `/kapacitor/v1/tasks/${id}`, {
     status: 'enabled',
   })
-}
 
-export function disableKapacitorTask(kapacitor, id) {
-  return kapacitorProxy(kapacitor, 'PATCH', `/kapacitor/v1/tasks/${id}`, {
+export const disableKapacitorTask = (kapacitor, id) =>
+  kapacitorProxy(kapacitor, 'PATCH', `/kapacitor/v1/tasks/${id}`, {
     status: 'disabled',
   })
-}
 
-export function deleteKapacitorTask(kapacitor, id) {
-  return kapacitorProxy(kapacitor, 'DELETE', `/kapacitor/v1/tasks/${id}`, '')
-}
+export const deleteKapacitorTask = (kapacitor, id) =>
+  kapacitorProxy(kapacitor, 'DELETE', `/kapacitor/v1/tasks/${id}`, '')
 
-export function kapacitorProxy(kapacitor, method, path, body) {
-  return AJAX({
+export const kapacitorProxy = (kapacitor, method, path, body?) =>
+  AJAX({
     method,
     url: kapacitor.links.proxy,
     params: {
@@ -218,7 +199,6 @@ export function kapacitorProxy(kapacitor, method, path, body) {
     },
     data: body,
   })
-}
 
 export const getQueryConfig = (
   url: string,

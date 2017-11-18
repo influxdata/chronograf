@@ -1,14 +1,24 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import RedactedInput from './RedactedInput'
 
-class TalkConfig extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+export interface TalkOptions {
+  url: string
+  author_name: string
+}
 
-  handleSaveAlert = e => {
+export interface TalkConfigProps {
+  config: {
+    options: TalkOptions
+  }
+  onSave: (properties: TalkOptions) => void
+}
+
+class TalkConfig extends React.Component<TalkConfigProps> {
+  private url
+  private author
+
+  private handleSaveAlert = e => {
     e.preventDefault()
 
     const properties = {
@@ -19,9 +29,9 @@ class TalkConfig extends React.Component {
     this.props.onSave(properties)
   }
 
-  handleUrlRef = r => (this.url = r)
+  private handleUrlRef = r => (this.url = r)
 
-  render() {
+  public render() {
     const {url, author_name: author} = this.props.config.options
 
     return (
@@ -54,18 +64,6 @@ class TalkConfig extends React.Component {
       </form>
     )
   }
-}
-
-const {bool, string, shape, func} = PropTypes
-
-TalkConfig.propTypes = {
-  config: shape({
-    options: shape({
-      url: bool.isRequired,
-      author_name: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  onSave: func.isRequired,
 }
 
 export default TalkConfig

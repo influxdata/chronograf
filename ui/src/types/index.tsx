@@ -4,6 +4,8 @@ import {History, Location} from 'history'
 import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
 import * as FuncTypes from 'src/types/funcs'
 
+export type RouterID = RouteComponentProps<{id: string}>
+
 export type RouterSourceID = RouteComponentProps<{sourceID: string}>
 
 export type RouterHostID = RouteComponentProps<{
@@ -36,7 +38,7 @@ export interface Source {
   }
   default: boolean
   telegraf?: string
-  kapacitors?: Kapacitor
+  kapacitors?: Kapacitor[]
 }
 
 export interface Alert {
@@ -368,7 +370,15 @@ export interface DashboardName {
 }
 
 export interface Kapacitor {
-  id: string
+  id?: string
+  url: string
+  name: string
+  username?: string
+  password?: string
+  active: boolean
+  links: {
+    self: string
+  }
 }
 
 export interface Rule {

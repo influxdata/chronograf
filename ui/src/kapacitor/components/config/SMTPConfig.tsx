@@ -1,12 +1,28 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
-class SMTPConfig extends React.Component {
-  constructor(props) {
-    super(props)
+export interface SMTPOptions {
+  host: string
+  port: string
+  from: string
+  username: string
+  password: string
+}
+
+export interface SMTPConfigProps {
+  config: {
+    options: SMTPOptions
   }
+  onSave: (properties: SMTPOptions) => void
+}
 
-  handleSaveAlert = e => {
+class SMTPConfig extends React.Component<SMTPConfigProps> {
+  private host
+  private port
+  private from
+  private username
+  private password
+
+  private handleSaveAlert = e => {
     e.preventDefault()
 
     const properties = {
@@ -20,7 +36,7 @@ class SMTPConfig extends React.Component {
     this.props.onSave(properties)
   }
 
-  render() {
+  public render() {
     const {host, port, from, username, password} = this.props.config.options
 
     return (
@@ -89,21 +105,6 @@ class SMTPConfig extends React.Component {
       </form>
     )
   }
-}
-
-const {bool, func, number, shape, string} = PropTypes
-
-SMTPConfig.propTypes = {
-  config: shape({
-    options: shape({
-      host: string,
-      port: number,
-      username: string,
-      password: bool,
-      from: string,
-    }).isRequired,
-  }).isRequired,
-  onSave: func.isRequired,
 }
 
 export default SMTPConfig

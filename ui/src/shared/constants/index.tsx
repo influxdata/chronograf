@@ -414,6 +414,7 @@ export const LAYOUT_MARGIN = 4
 export const DASHBOARD_LAYOUT_ROW_HEIGHT = 83.5
 
 export const DEFAULT_SOURCE = {
+  id: null,
   url: 'http://localhost:8086',
   name: 'Influx 1',
   username: '',
@@ -422,4 +423,14 @@ export const DEFAULT_SOURCE = {
   telegraf: 'telegraf',
   insecureSkipVerify: false,
   metaUrl: '',
+  links: {
+    self: null,
+    proxy: null,
+    kapacitors: null,
+    queries: null,
+    permissions: null,
+    users: null,
+    databases: null,
+    roles: null,
+  },
 }

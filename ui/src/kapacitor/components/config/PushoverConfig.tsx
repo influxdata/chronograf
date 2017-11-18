@@ -1,17 +1,29 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import QuestionMarkTooltip from 'shared/components/QuestionMarkTooltip'
 import RedactedInput from './RedactedInput'
 
 import {PUSHOVER_DOCS_LINK} from 'kapacitor/copy'
 
-class PushoverConfig extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+export interface PushoverOptions {
+  token: string
+  url: string
+  'user-key': string
+}
 
-  handleSaveAlert = e => {
+export interface PushoverConfigProps {
+  config: {
+    options: PushoverOptions
+  }
+  onSave: (properties: PushoverOptions) => void
+}
+
+class PushoverConfig extends React.Component<PushoverConfigProps> {
+  private token
+  private url
+  private userKey
+
+  private handleSaveAlert = e => {
     e.preventDefault()
 
     const properties = {
@@ -23,11 +35,11 @@ class PushoverConfig extends React.Component {
     this.props.onSave(properties)
   }
 
-  handleUserKeyRef = r => (this.userKey = r)
+  private handleUserKeyRef = r => (this.userKey = r)
 
-  handleTokenRef = r => (this.token = r)
+  private handleTokenRef = r => (this.token = r)
 
-  render() {
+  public render() {
     const {options} = this.props.config
     const {token, url} = options
     const userKey = options['user-key']
@@ -83,19 +95,6 @@ class PushoverConfig extends React.Component {
       </form>
     )
   }
-}
-
-const {bool, func, shape, string} = PropTypes
-
-PushoverConfig.propTypes = {
-  config: shape({
-    options: shape({
-      token: bool.isRequired,
-      'user-key': bool.isRequired,
-      url: string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  onSave: func.isRequired,
 }
 
 export default PushoverConfig
