@@ -322,7 +322,7 @@ export enum OptInType {
   number = 'number',
 }
 
-export type TagValues = string[]
+export type TagValues = string
 
 export interface Tags {
   [keys: string]: TagValues
