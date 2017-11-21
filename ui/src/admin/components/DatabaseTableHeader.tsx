@@ -1,8 +1,25 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import ConfirmButtons from 'shared/components/ConfirmButtons'
 
-const DatabaseTableHeader = ({
+import {Database} from 'src/types/influxdbAdmin'
+import {func} from 'src/types/funcs'
+
+export interface DatabaseTableHeaderProps {
+  database: Database
+  isAddRPDisabled: boolean
+  onEdit: (database: Database) => (e: {}) => void
+  onKeyDown: (database: Database) => (e: {}) => void
+  notify: (type: string, message: string) => void
+  onDelete: (database: Database) => (e: {}) => void
+  onStartDelete: (database: Database) => (e: {}) => void
+  onDatabaseDeleteConfirm: (database: Database) => (e: {}) => void
+  onAddRetentionPolicy: (database: Database) => (e: {}) => void
+  onCancel: func
+  onConfirm: func
+  onRemoveDeleteCode: func
+}
+
+const DatabaseTableHeader: React.SFC<DatabaseTableHeaderProps> = ({
   database,
   onEdit,
   notify,
@@ -43,7 +60,19 @@ const DatabaseTableHeader = ({
   )
 }
 
-const Header = ({
+export interface HeaderProps {
+  database: Database
+  isAddRPDisabled: boolean
+  notify: (type: string, message: string) => void
+  onConfirm: func
+  onCancel: func
+  onDelete: (database: Database) => (e: {}) => void
+  onStartDelete: (database: Database) => (e: {}) => void
+  onAddRetentionPolicy: (database: Database) => (e: {}) => void
+  onDatabaseDeleteConfirm: (database: Database) => (e: {}) => void
+}
+
+const Header: React.SFC<HeaderProps> = ({
   notify,
   database,
   onCancel,
@@ -92,7 +121,7 @@ const Header = ({
         onChange={onDatabaseDeleteConfirm(database)}
         onKeyDown={onDatabaseDeleteConfirm(database)}
         autoFocus={true}
-        autoComplete={false}
+        autoComplete="false"
         spellCheck={false}
       />
       <ConfirmButtons
@@ -112,7 +141,21 @@ const Header = ({
   )
 }
 
-const EditHeader = ({database, onEdit, onKeyDown, onConfirm, onCancel}) => (
+export interface EditHeaderProps {
+  database: Database
+  onEdit: (database: Database) => (e: {}) => void
+  onKeyDown: (database: Database) => (e: {}) => void
+  onCancel: (e: {}) => void
+  onConfirm: func
+}
+
+const EditHeader: React.SFC<EditHeaderProps> = ({
+  database,
+  onEdit,
+  onKeyDown,
+  onConfirm,
+  onCancel,
+}) => (
   <div className="db-manager-header db-manager-header--edit">
     <input
       className="form-control input-sm"
@@ -129,43 +172,5 @@ const EditHeader = ({database, onEdit, onKeyDown, onConfirm, onCancel}) => (
     <ConfirmButtons item={database} onConfirm={onConfirm} onCancel={onCancel} />
   </div>
 )
-
-const {func, shape, bool} = PropTypes
-
-DatabaseTableHeader.propTypes = {
-  onEdit: func,
-  notify: func,
-  database: shape(),
-  onKeyDown: func,
-  onCancel: func,
-  onConfirm: func,
-  onDelete: func,
-  onStartDelete: func,
-  onDatabaseDeleteConfirm: func,
-  onRemoveDeleteCode: func,
-  onAddRetentionPolicy: func,
-  isAddRPDisabled: bool,
-}
-
-Header.propTypes = {
-  notify: func,
-  onConfirm: func,
-  onCancel: func,
-  onDelete: func,
-  database: shape(),
-  onStartDelete: func,
-  isAddRPDisabled: bool,
-  onAddRetentionPolicy: func,
-  onDatabaseDeleteConfirm: func,
-}
-
-EditHeader.propTypes = {
-  database: shape(),
-  onEdit: func,
-  onKeyDown: func,
-  onCancel: func,
-  onConfirm: func,
-  isRFDisplayed: bool,
-}
 
 export default DatabaseTableHeader

@@ -22,7 +22,6 @@ import {killQuery as killQueryProxy} from 'shared/apis/metaQuery'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 import {errorThrown} from 'shared/actions/errors'
 import {REVERT_STATE_DELAY} from 'shared/constants'
-import {Source} from 'src/types'
 import {
   Database,
   InfluxDBUser as User,

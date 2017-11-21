@@ -1,9 +1,31 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import DatabaseTable from 'admin/components/DatabaseTable'
+import {Database} from 'src/types/influxdbAdmin'
+import {func} from 'src/types/funcs'
 
-const DatabaseManager = ({
+export interface DatabaseManagerProps {
+  databases: Database[]
+  isRFDisplayed: boolean
+  isAddDBDisabled: boolean
+  notify: (type: string, message: string) => void
+  addDatabase: func
+  onEditDatabase: (database: Database) => (e: {}) => void
+  onKeyDownDatabase: (database: Database) => (e: {}) => void
+  onDeleteDatabase: (database: Database) => (e: {}) => void
+  onStartDeleteDatabase: (database: Database) => (e: {}) => void
+  onDatabaseDeleteConfirm: (database: Database) => (e: {}) => void
+  onAddRetentionPolicy: (database: Database) => (e: {}) => void
+  onCancelDatabase: (database: Database) => (e: {}) => void
+  onConfirmDatabase: (database: Database) => void
+  onRemoveDeleteCode: func
+  onCreateRetentionPolicy: func
+  onUpdateRetentionPolicy: func
+  onRemoveRetentionPolicy: func
+  onDeleteRetentionPolicy: func
+}
+
+const DatabaseManager: React.SFC<DatabaseManagerProps> = ({
   databases,
   notify,
   isRFDisplayed,
@@ -18,8 +40,6 @@ const DatabaseManager = ({
   onDatabaseDeleteConfirm,
   onRemoveDeleteCode,
   onAddRetentionPolicy,
-  onStopEditRetentionPolicy,
-  onCancelRetentionPolicy,
   onCreateRetentionPolicy,
   onUpdateRetentionPolicy,
   onRemoveRetentionPolicy,
@@ -42,7 +62,7 @@ const DatabaseManager = ({
         </button>
       </div>
       <div className="panel-body">
-        {databases.map(db =>
+        {databases.map(db => (
           <DatabaseTable
             key={db.links.self}
             database={db}
@@ -57,43 +77,15 @@ const DatabaseManager = ({
             onStartDeleteDatabase={onStartDeleteDatabase}
             onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
             onAddRetentionPolicy={onAddRetentionPolicy}
-            onStopEditRetentionPolicy={onStopEditRetentionPolicy}
-            onCancelRetentionPolicy={onCancelRetentionPolicy}
             onCreateRetentionPolicy={onCreateRetentionPolicy}
             onUpdateRetentionPolicy={onUpdateRetentionPolicy}
             onRemoveRetentionPolicy={onRemoveRetentionPolicy}
             onDeleteRetentionPolicy={onDeleteRetentionPolicy}
           />
-        )}
+        ))}
       </div>
     </div>
   )
-}
-
-const {arrayOf, bool, func, shape} = PropTypes
-
-DatabaseManager.propTypes = {
-  databases: arrayOf(shape()),
-  notify: func,
-  addDatabase: func,
-  isRFDisplayed: bool,
-  isAddDBDisabled: bool,
-  onEditDatabase: func,
-  onKeyDownDatabase: func,
-  onCancelDatabase: func,
-  onConfirmDatabase: func,
-  onDeleteDatabase: func,
-  onRemoveDeleteCode: func,
-  onStartDeleteDatabase: func,
-  onDatabaseDeleteConfirm: func,
-  onAddRetentionPolicy: func,
-  onEditRetentionPolicy: func,
-  onStopEditRetentionPolicy: func,
-  onCancelRetentionPolicy: func,
-  onCreateRetentionPolicy: func,
-  onUpdateRetentionPolicy: func,
-  onRemoveRetentionPolicy: func,
-  onDeleteRetentionPolicy: func,
 }
 
 export default DatabaseManager

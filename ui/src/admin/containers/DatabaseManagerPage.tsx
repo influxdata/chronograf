@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import * as _ from 'lodash'
@@ -9,7 +8,32 @@ import DatabaseManager from 'admin/components/DatabaseManager'
 import * as adminActionCreators from 'admin/actions'
 import {publishAutoDismissingNotification} from 'shared/dispatchers'
 
-class DatabaseManagerPage extends React.Component {
+import {SourceNotifyProp} from 'src/types'
+import {Database, RetentionPolicy} from 'src/types/influxdbAdmin'
+
+export interface DatabaseManagerPageProps {
+  databases: Database[]
+  retentionPolicies: RetentionPolicy
+  actions: {
+    addRetentionPolicy: typeof adminActionCreators.addRetentionPolicy
+    loadDBsAndRPsAsync: typeof adminActionCreators.loadDBsAndRPsAsync
+    createDatabaseAsync: typeof adminActionCreators.createDatabaseAsync
+    deleteDatabaseAsync: typeof adminActionCreators.deleteDatabaseAsync
+    createRetentionPolicyAsync: typeof adminActionCreators.createRetentionPolicyAsync
+    updateRetentionPolicyAsync: typeof adminActionCreators.updateRetentionPolicyAsync
+    addDatabase: typeof adminActionCreators.addDatabase
+    removeDatabase: typeof adminActionCreators.removeDatabase
+    removeDatabaseDeleteCode: typeof adminActionCreators.removeDatabaseDeleteCode
+    removeRetentionPolicy: typeof adminActionCreators.removeRetentionPolicy
+    deleteRetentionPolicyAsync: typeof adminActionCreators.deleteRetentionPolicyAsync
+    addDatabaseDeleteCode: typeof adminActionCreators.addDatabaseDeleteCode
+    editDatabase: typeof adminActionCreators.editDatabase
+  }
+}
+
+class DatabaseManagerPage extends React.Component<
+  DatabaseManagerPageProps & SourceNotifyProp
+> {
   private handleDeleteRetentionPolicy = (db, rp) => () => {
     this.props.actions.deleteRetentionPolicyAsync(db, rp)
   }
@@ -18,7 +42,7 @@ class DatabaseManagerPage extends React.Component {
     this.props.actions.addDatabaseDeleteCode(database)
   }
 
-  private handleEditDatabase = database => e => {
+  private handleEditDatabase = (database: Database) => e => {
     this.props.actions.editDatabase(database, {name: e.target.value})
   }
 
@@ -111,45 +135,6 @@ class DatabaseManagerPage extends React.Component {
       />
     )
   }
-}
-
-const {arrayOf, bool, func, number, shape, string} = PropTypes
-
-DatabaseManagerPage.propTypes = {
-  source: shape({
-    links: shape({
-      proxy: string,
-    }),
-  }),
-  databases: arrayOf(
-    shape({
-      name: string,
-      isEditing: bool,
-    })
-  ),
-  retentionPolicies: arrayOf(
-    arrayOf(
-      shape({
-        name: string,
-        duration: string,
-        replication: number,
-        isDefault: bool,
-      })
-    )
-  ),
-  actions: shape({
-    addRetentionPolicy: func,
-    loadDBsAndRPsAsync: func,
-    createDatabaseAsync: func,
-    createRetentionPolicyAsync: func,
-    addDatabase: func,
-    removeDatabase: func,
-    startDeleteDatabase: func,
-    removeDatabaseDeleteCode: func,
-    removeRetentionPolicy: func,
-    deleteRetentionPolicyAsync: func,
-  }),
-  notify: func,
 }
 
 const mapStateToProps = ({admin: {databases, retentionPolicies}}) => ({

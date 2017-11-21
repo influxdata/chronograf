@@ -1,58 +1,66 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import onClickOutside from 'react-onClickOutside'
 
 import {formatRPDuration} from 'utils/formatting'
 import YesNoButtons from 'shared/components/YesNoButtons'
 import {DATABASE_TABLE} from 'admin/constants/tableSizing'
 
-class DatabaseRow extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isEditing: false,
-      isDeleting: false,
-    }
+import {Database, RetentionPolicy} from 'src/types/influxdbAdmin'
+import {notify as notifyType} from 'src/types/funcs'
+
+export interface DatabaseRowProps {
+  database: Database
+  retentionPolicy: RetentionPolicy
+  isDeletable: boolean
+  isRFDisplayed: boolean
+  onRemove: (database: Database, retentionPolicy: RetentionPolicy) => void
+  onCreate: (database: Database, opts: {}) => void
+  onUpdate: (
+    database: Database,
+    retentionPolicy: RetentionPolicy,
+    validInputs: {}
+  ) => void
+  onDelete: (database: Database, retentionPolicy: RetentionPolicy) => void
+  notify: notifyType
+}
+
+export interface DatabaseRowState {
+  isEditing: boolean
+  isDeleting: boolean
+}
+
+class DatabaseRow extends React.Component<DatabaseRowProps, DatabaseRowState> {
+  private name
+  private duration
+  private replication
+
+  public state = {
+    isEditing: false,
+    isDeleting: false,
   }
 
-  componentWillMount() {
-    if (this.props.retentionPolicy.isNew) {
-      this.setState({isEditing: true})
-    }
-  }
-
-  handleRemove = () => {
+  private handleRemove = () => {
     const {database, retentionPolicy, onRemove} = this.props
     onRemove(database, retentionPolicy)
   }
 
-  handleClickOutside = () => {
-    const {database, retentionPolicy, onRemove} = this.props
-    if (retentionPolicy.isNew) {
-      onRemove(database, retentionPolicy)
-    }
-
-    this.handleEndEdit()
-    this.handleEndDelete()
-  }
-
-  handleStartEdit = () => {
+  private handleStartEdit = () => {
     this.setState({isEditing: true})
   }
 
-  handleEndEdit = () => {
+  private handleEndEdit = () => {
     this.setState({isEditing: false})
   }
 
-  handleStartDelete = () => {
+  private handleStartDelete = () => {
     this.setState({isDeleting: true})
   }
 
-  handleEndDelete = () => {
+  private handleEndDelete = () => {
     this.setState({isDeleting: false})
   }
 
-  handleCreate = () => {
+  private handleCreate = () => {
     const {database, retentionPolicy, onCreate} = this.props
     const validInputs = this.getInputValues()
     if (!validInputs) {
@@ -63,7 +71,7 @@ class DatabaseRow extends React.Component {
     this.handleEndEdit()
   }
 
-  handleUpdate = () => {
+  private handleUpdate = () => {
     const {database, retentionPolicy, onUpdate} = this.props
     const validInputs = this.getInputValues()
     if (!validInputs) {
@@ -74,7 +82,7 @@ class DatabaseRow extends React.Component {
     this.handleEndEdit()
   }
 
-  handleKeyDown = e => {
+  private handleKeyDown = e => {
     const {key} = e
     const {retentionPolicy, database, onRemove} = this.props
 
@@ -97,7 +105,7 @@ class DatabaseRow extends React.Component {
     }
   }
 
-  getInputValues = () => {
+  private getInputValues = () => {
     const {
       notify,
       retentionPolicy: {name: currentName},
@@ -125,7 +133,23 @@ class DatabaseRow extends React.Component {
     }
   }
 
-  render() {
+  public handleClickOutside = () => {
+    const {database, retentionPolicy, onRemove} = this.props
+    if (retentionPolicy.isNew) {
+      onRemove(database, retentionPolicy)
+    }
+
+    this.handleEndEdit()
+    this.handleEndDelete()
+  }
+
+  public componentWillMount() {
+    if (this.props.retentionPolicy.isNew) {
+      this.setState({isEditing: true})
+    }
+  }
+
+  public render() {
     const {
       retentionPolicy: {name, duration, replication, isDefault, isNew},
       retentionPolicy,
@@ -142,19 +166,21 @@ class DatabaseRow extends React.Component {
       return (
         <tr>
           <td style={{width: `${DATABASE_TABLE.colRetentionPolicy}px`}}>
-            {isNew
-              ? <input
-                  className="form-control input-xs"
-                  type="text"
-                  defaultValue={name}
-                  placeholder="Name this RP"
-                  onKeyDown={this.handleKeyDown}
-                  ref={r => (this.name = r)}
-                  autoFocus={true}
-                  spellCheck={false}
-                  autoComplete={false}
-                />
-              : name}
+            {isNew ? (
+              <input
+                className="form-control input-xs"
+                type="text"
+                defaultValue={name}
+                placeholder="Name this RP"
+                onKeyDown={this.handleKeyDown}
+                ref={r => (this.name = r)}
+                autoFocus={true}
+                spellCheck={false}
+                autoComplete="false"
+              />
+            ) : (
+              name
+            )}
           </td>
           <td style={{width: `${DATABASE_TABLE.colDuration}px`}}>
             <input
@@ -167,25 +193,25 @@ class DatabaseRow extends React.Component {
               ref={r => (this.duration = r)}
               autoFocus={!isNew}
               spellCheck={false}
-              autoComplete={false}
+              autoComplete="false"
             />
           </td>
-          {isRFDisplayed
-            ? <td style={{width: `${DATABASE_TABLE.colReplication}px`}}>
-                <input
-                  className="form-control input-xs"
-                  name="name"
-                  type="number"
-                  min="1"
-                  defaultValue={replication || 1}
-                  placeholder="# of Nodes"
-                  onKeyDown={this.handleKeyDown}
-                  ref={r => (this.replication = r)}
-                  spellCheck={false}
-                  autoComplete={false}
-                />
-              </td>
-            : null}
+          {isRFDisplayed && (
+            <td style={{width: `${DATABASE_TABLE.colReplication}px`}}>
+              <input
+                className="form-control input-xs"
+                name="name"
+                type="number"
+                min="1"
+                defaultValue={`${replication}` || '1'}
+                placeholder="# of Nodes"
+                onKeyDown={this.handleKeyDown}
+                ref={r => (this.replication = r)}
+                spellCheck={false}
+                autoComplete="false"
+              />
+            </td>
+          )}
           <td
             className="text-right"
             style={{width: `${DATABASE_TABLE.colDelete}px`}}
@@ -204,9 +230,9 @@ class DatabaseRow extends React.Component {
       <tr>
         <td>
           {`${name} `}
-          {isDefault
-            ? <span className="default-source-label">default</span>
-            : null}
+          {isDefault ? (
+            <span className="default-source-label">default</span>
+          ) : null}
         </td>
         <td
           onClick={this.handleStartEdit}
@@ -214,55 +240,37 @@ class DatabaseRow extends React.Component {
         >
           {formattedDuration}
         </td>
-        {isRFDisplayed
-          ? <td
-              onClick={this.handleStartEdit}
-              style={{width: `${DATABASE_TABLE.colReplication}px`}}
-            >
-              {replication}
-            </td>
-          : null}
+        {isRFDisplayed ? (
+          <td
+            onClick={this.handleStartEdit}
+            style={{width: `${DATABASE_TABLE.colReplication}px`}}
+          >
+            {replication}
+          </td>
+        ) : null}
         <td
           className="text-right"
           style={{width: `${DATABASE_TABLE.colDelete}px`}}
         >
-          {isDeleting
-            ? <YesNoButtons
-                onConfirm={onDelete(database, retentionPolicy)}
-                onCancel={this.handleEndDelete}
-                buttonSize="btn-xs"
-              />
-            : <button
-                className="btn btn-danger btn-xs table--show-on-row-hover"
-                style={isDeletable ? {} : {visibility: 'hidden'}}
-                onClick={this.handleStartDelete}
-              >
-                {`Delete ${name}`}
-              </button>}
+          {isDeleting ? (
+            <YesNoButtons
+              onConfirm={onDelete(database, retentionPolicy)}
+              onCancel={this.handleEndDelete}
+              buttonSize="btn-xs"
+            />
+          ) : (
+            <button
+              className="btn btn-danger btn-xs table--show-on-row-hover"
+              style={isDeletable ? {} : {visibility: 'hidden'}}
+              onClick={this.handleStartDelete}
+            >
+              {`Delete ${name}`}
+            </button>
+          )}
         </td>
       </tr>
     )
   }
-}
-
-const {bool, func, number, shape, string} = PropTypes
-
-DatabaseRow.propTypes = {
-  retentionPolicy: shape({
-    name: string,
-    duration: string,
-    replication: number,
-    isDefault: bool,
-    isEditing: bool,
-  }),
-  isDeletable: bool,
-  database: shape({}),
-  onRemove: func,
-  onCreate: func,
-  onUpdate: func,
-  onDelete: func,
-  notify: func,
-  isRFDisplayed: bool,
 }
 
 export default onClickOutside(DatabaseRow)

@@ -21,6 +21,8 @@ export type onZoom = (lower: string, upper: string) => void
 
 export type addFlashMessage = (message: Message) => void
 
+export type notify = (type: string, message: string) => void
+
 export type func = () => void
 
 export type linkFunc = (link: string) => void

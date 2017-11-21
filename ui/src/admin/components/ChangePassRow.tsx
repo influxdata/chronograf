@@ -1,35 +1,46 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import onClickOutside from 'shared/components/onClickOutside'
 import ConfirmButtons from 'shared/components/ConfirmButtons'
 
-class ChangePassRow extends React.Component {
-  constructor(props) {
+import {User} from 'src/types'
+
+export interface ChangePassRowProps {
+  user: User
+  onApply: (user: User) => void
+  onEdit: (user: User, edits: {}) => void
+  buttonSize: string
+}
+
+export interface ChangePassRowState {
+  showForm: boolean
+}
+
+class ChangePassRow extends React.Component<
+  ChangePassRowProps,
+  ChangePassRowState
+> {
+  constructor(props: ChangePassRowProps) {
     super(props)
     this.state = {
       showForm: false,
     }
   }
 
-  showForm = () => {
+  private showForm = () => {
     this.setState({showForm: true})
   }
 
-  handleCancel = () => {
+  private handleCancel = () => {
     this.setState({showForm: false})
   }
 
-  handleClickOutside = () => {
-    this.setState({showForm: false})
-  }
-
-  handleSubmit = (user) => {
+  private handleSubmit = user => {
     this.props.onApply(user)
     this.setState({showForm: false})
   }
 
-  handleKeyPress = (user) => {
+  private handleKeyPress = user => {
     return e => {
       if (e.key === 'Enter') {
         this.handleSubmit(user)
@@ -37,13 +48,17 @@ class ChangePassRow extends React.Component {
     }
   }
 
-  handleEdit = (user) => {
+  private handleEdit = user => {
     return e => {
       this.props.onEdit(user, {[e.target.name]: e.target.value})
     }
   }
 
-  render() {
+  public handleClickOutside = () => {
+    this.setState({showForm: false})
+  }
+
+  public render() {
     const {user, buttonSize} = this.props
 
     if (this.state.showForm) {
@@ -77,15 +92,6 @@ class ChangePassRow extends React.Component {
       </div>
     )
   }
-}
-
-const {func, shape, string} = PropTypes
-
-ChangePassRow.propTypes = {
-  user: shape().isRequired,
-  onApply: func.isRequired,
-  onEdit: func.isRequired,
-  buttonSize: string,
 }
 
 export default onClickOutside(ChangePassRow)

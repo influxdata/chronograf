@@ -1,6 +1,4 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
-
 import * as _ from 'lodash'
 import * as classnames from 'classnames'
 
@@ -8,9 +6,29 @@ import DatabaseRow from 'admin/components/DatabaseRow'
 import DatabaseTableHeader from 'admin/components/DatabaseTableHeader'
 import {DATABASE_TABLE} from 'admin/constants/tableSizing'
 
-const {func, shape, bool} = PropTypes
+import {Database} from 'src/types/influxdbAdmin'
+import {func} from 'src/types/funcs'
 
-const DatabaseTable = ({
+export interface DatabaseTableProps {
+  database: Database
+  isRFDisplayed: boolean
+  notify: (type: string, message: string) => void
+  onEditDatabase: (database: Database) => (e: {}) => void
+  onKeyDownDatabase: (database: Database) => (e: {}) => void
+  onDeleteDatabase: (database: Database) => (e: {}) => void
+  onStartDeleteDatabase: (database: Database) => (e: {}) => void
+  onDatabaseDeleteConfirm: (database: Database) => (e: {}) => void
+  onAddRetentionPolicy: (database: Database) => (e: {}) => void
+  onCancelDatabase: func
+  onConfirmDatabase: func
+  onRemoveDeleteCode: func
+  onCreateRetentionPolicy: func
+  onUpdateRetentionPolicy: func
+  onRemoveRetentionPolicy: func
+  onDeleteRetentionPolicy: func
+}
+
+const DatabaseTable: React.SFC<DatabaseTableProps> = ({
   database,
   notify,
   isRFDisplayed,
@@ -45,7 +63,6 @@ const DatabaseTable = ({
         onStartDelete={onStartDeleteDatabase}
         onRemoveDeleteCode={onRemoveDeleteCode}
         onAddRetentionPolicy={onAddRetentionPolicy}
-        onDeleteRetentionPolicy={onDeleteRetentionPolicy}
         onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
         isAddRPDisabled={!!database.retentionPolicies.some(rp => rp.isNew)}
       />
@@ -59,11 +76,11 @@ const DatabaseTable = ({
               <th style={{width: `${DATABASE_TABLE.colDuration}px`}}>
                 Duration
               </th>
-              {isRFDisplayed
-                ? <th style={{width: `${DATABASE_TABLE.colReplication}px`}}>
-                    Replication Factor
-                  </th>
-                : null}
+              {isRFDisplayed ? (
+                <th style={{width: `${DATABASE_TABLE.colReplication}px`}}>
+                  Replication Factor
+                </th>
+              ) : null}
               <th style={{width: `${DATABASE_TABLE.colDelete}px`}} />
             </tr>
           </thead>
@@ -91,27 +108,6 @@ const DatabaseTable = ({
       </div>
     </div>
   )
-}
-
-DatabaseTable.propTypes = {
-  onEditDatabase: func,
-  database: shape(),
-  notify: func,
-  isRFDisplayed: bool,
-  isAddRPDisabled: bool,
-  onKeyDownDatabase: func,
-  onDeleteDatabase: func,
-  onCancelDatabase: func,
-  onConfirmDatabase: func,
-  onRemoveDeleteCode: func,
-  onStartDeleteDatabase: func,
-  onDatabaseDeleteConfirm: func,
-  onAddRetentionPolicy: func,
-  onCancelRetentionPolicy: func,
-  onCreateRetentionPolicy: func,
-  onUpdateRetentionPolicy: func,
-  onRemoveRetentionPolicy: func,
-  onDeleteRetentionPolicy: func,
 }
 
 export default DatabaseTable

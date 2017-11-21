@@ -21,6 +21,9 @@ export interface RetentionPolicy {
   shardDuration: string
   default: boolean
   links: RPLinks
+  isNew?: boolean
+  isDefault?: boolean
+  isEditing?: boolean
 }
 
 export interface Database {
@@ -30,6 +33,8 @@ export interface Database {
   shardDuration: string
   retentionPolicies: RetentionPolicy[]
   links: DatabaseLinks
+  deleteCode?: string
+  isEditing?: boolean
 }
 
 export interface InfluxDBUserLinks {

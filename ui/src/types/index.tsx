@@ -39,6 +39,12 @@ export interface Source {
   default: boolean
   telegraf?: string
   kapacitors?: Kapacitor[]
+  metaUrl?: string
+}
+
+export interface SourceNotifyProp {
+  source: Source
+  notify: FuncTypes.notify
 }
 
 export interface Alert {
@@ -413,4 +419,8 @@ export interface DropdownActions {
 export interface DropdownItem {
   text: string
   [key: string]: string
+}
+
+export interface User {
+  password: string
 }

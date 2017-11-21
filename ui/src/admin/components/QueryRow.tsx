@@ -1,30 +1,36 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import ConfirmButtons from 'shared/components/ConfirmButtons'
 import {QUERIES_TABLE} from 'admin/constants/tableSizing'
+import {InfluxDBAdminQuery} from 'src/types/influxdbAdmin'
 
-class QueryRow extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      confirmingKill: false,
-    }
+export interface QueryRowProps {
+  query: InfluxDBAdminQuery
+  onKill: (queryID: string) => void
+}
+
+export interface QueryRowState {
+  confirmingKill: boolean
+}
+
+class QueryRow extends React.Component<QueryRowProps, QueryRowState> {
+  public state = {
+    confirmingKill: false,
   }
 
-  handleInitiateKill = () => {
+  private handleInitiateKill = () => {
     this.setState({confirmingKill: true})
   }
 
-  handleFinishHim = () => {
+  private handleFinishHim = () => {
     this.props.onKill(this.props.query.id)
   }
 
-  handleShowMercy = () => {
+  private handleShowMercy = () => {
     this.setState({confirmingKill: false})
   }
 
-  render() {
+  public render() {
     const {query: {database, query, duration}} = this.props
 
     return (
@@ -36,9 +42,7 @@ class QueryRow extends React.Component {
           {database}
         </td>
         <td>
-          <code>
-            {query}
-          </code>
+          <code>{query}</code>
         </td>
         <td
           style={{width: `${QUERIES_TABLE.colRunning}px`}}
@@ -50,29 +54,24 @@ class QueryRow extends React.Component {
           style={{width: `${QUERIES_TABLE.colKillQuery}px`}}
           className="text-right"
         >
-          {this.state.confirmingKill
-            ? <ConfirmButtons
-                onConfirm={this.handleFinishHim}
-                onCancel={this.handleShowMercy}
-                buttonSize="btn-xs"
-              />
-            : <button
-                className="btn btn-xs btn-danger table--show-on-row-hover"
-                onClick={this.handleInitiateKill}
-              >
-                Kill
-              </button>}
+          {this.state.confirmingKill ? (
+            <ConfirmButtons
+              onConfirm={this.handleFinishHim}
+              onCancel={this.handleShowMercy}
+              buttonSize="btn-xs"
+            />
+          ) : (
+            <button
+              className="btn btn-xs btn-danger table--show-on-row-hover"
+              onClick={this.handleInitiateKill}
+            >
+              Kill
+            </button>
+          )}
         </td>
       </tr>
     )
   }
-}
-
-const {func, shape} = PropTypes
-
-QueryRow.propTypes = {
-  query: shape().isRequired,
-  onKill: func.isRequired,
 }
 
 export default QueryRow

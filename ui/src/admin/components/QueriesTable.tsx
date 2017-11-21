@@ -1,10 +1,17 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 
 import QueryRow from 'admin/components/QueryRow'
 import {QUERIES_TABLE} from 'admin/constants/tableSizing'
 
-const QueriesTable = ({queries, onKillQuery}) =>
+import {InfluxDBAdminQuery} from 'src/types/influxdbAdmin'
+
+export interface QueriesTableProps {
+  queries: InfluxDBAdminQuery[]
+  onConfirm: () => void
+  onKillQuery: () => void
+}
+
+const QueriesTable = ({queries, onKillQuery}) => (
   <div>
     <div className="panel panel-default">
       <div className="panel-body">
@@ -20,21 +27,14 @@ const QueriesTable = ({queries, onKillQuery}) =>
             </tr>
           </thead>
           <tbody>
-            {queries.map(q =>
+            {queries.map(q => (
               <QueryRow key={q.id} query={q} onKill={onKillQuery} />
-            )}
+            ))}
           </tbody>
         </table>
       </div>
     </div>
   </div>
-
-const {arrayOf, func, shape} = PropTypes
-
-QueriesTable.propTypes = {
-  queries: arrayOf(shape()),
-  onConfirm: func,
-  onKillQuery: func,
-}
+)
 
 export default QueriesTable

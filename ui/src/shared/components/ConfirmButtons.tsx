@@ -1,28 +1,41 @@
 import * as React from 'react'
-import * as PropTypes from 'prop-types'
 import * as classnames from 'classnames'
 
-class ConfirmButtons extends React.Component {
-  constructor(props) {
+export type Item = {} | string
+
+export interface ConfirmButtonsProps {
+  item?: Item
+  onConfirm: (item?: Item) => void
+  onCancel: (item?: Item) => void
+  buttonSize?: string
+  isDisabled?: boolean
+}
+
+class ConfirmButtons extends React.Component<ConfirmButtonsProps> {
+  public static defaultProps = {
+    buttonSize: 'btn-sm',
+  }
+
+  constructor(props: ConfirmButtonsProps) {
     super(props)
   }
 
-  handleConfirm = item => () => {
+  private handleConfirm = item => () => {
     this.props.onConfirm(item)
   }
 
-  handleCancel = item => () => {
+  private handleCancel = item => () => {
     this.props.onCancel(item)
   }
 
-  render() {
+  public render() {
     const {item, buttonSize, isDisabled} = this.props
 
     return (
       <div className="confirm-buttons">
         <button
           className={classnames('btn btn-info btn-square', {
-            [buttonSize]: buttonSize,
+            [buttonSize]: !!buttonSize,
           })}
           onClick={this.handleCancel(item)}
         >
@@ -30,7 +43,7 @@ class ConfirmButtons extends React.Component {
         </button>
         <button
           className={classnames('btn btn-success btn-square', {
-            [buttonSize]: buttonSize,
+            [buttonSize]: !!buttonSize,
           })}
           disabled={isDisabled}
           title={isDisabled ? 'Cannot Save' : 'Save'}
@@ -43,17 +56,4 @@ class ConfirmButtons extends React.Component {
   }
 }
 
-const {func, oneOfType, shape, string, bool} = PropTypes
-
-ConfirmButtons.propTypes = {
-  onConfirm: func.isRequired,
-  item: oneOfType([shape(), string]),
-  onCancel: func.isRequired,
-  buttonSize: string,
-  isDisabled: bool,
-}
-
-ConfirmButtons.defaultProps = {
-  buttonSize: 'btn-sm',
-}
 export default ConfirmButtons
