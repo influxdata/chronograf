@@ -35,7 +35,7 @@ export interface DashboardHeaderProps {
   showTemplateControlBar?: boolean
   zoomedTimeRange?: ZoomedTimeRange
   onCancel?: func
-  onSave?: func
+  onSave?: (name: string) => void
   names: DashboardName[]
 }
 

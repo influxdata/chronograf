@@ -1,6 +1,7 @@
 import * as React from 'react'
+import {Router, withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
 
 import Dygraph from 'src/external/dygraph'
 
@@ -43,13 +44,17 @@ export interface Name {
   link: string
 }
 
+export interface DashboardParams {
+  params: {
+    dashboardID: string
+    sourceID: string
+  }
+}
+
 export interface DashboardPageProps {
   source: Source
   sources: Source[]
-  params: {
-    sourceID: string
-    dashboardID: string
-  }
+  match: DashboardParams
   dashboard: Dash
   dashboardActions: {
     putDashboard: typeof dashboardActionCreators.putDashboard
@@ -107,7 +112,7 @@ class DashboardPage extends React.Component<
     }
   }
 
-  private handleRenameDashboard = name => {
+  private handleRenameDashboard = (name: string) => {
     const {dashboardActions, dashboard} = this.props
     this.setState({isEditMode: false})
     const newDashboard = {...dashboard, name}
@@ -172,11 +177,6 @@ class DashboardPage extends React.Component<
 
   private handleCancelEditDashboard = () => {
     this.setState({isEditMode: false})
-  }
-
-  private handleUpdateDashboardCell = newCell => () => {
-    const {dashboardActions, dashboard} = this.props
-    dashboardActions.updateDashboardCell(dashboard, newCell)
   }
 
   private handleDeleteDashboardCell = cell => {
@@ -246,7 +246,7 @@ class DashboardPage extends React.Component<
 
   public async componentDidMount() {
     const {
-      params: {dashboardID, sourceID},
+      match: {params: {dashboardID, sourceID}},
       dashboardActions: {
         getDashboardsAsync,
         updateTempVarValues,
@@ -292,7 +292,7 @@ class DashboardPage extends React.Component<
       inPresentationMode,
       handleChooseAutoRefresh,
       handleClickPresentationButton,
-      params: {sourceID, dashboardID},
+      match: {params: {sourceID, dashboardID}},
     } = this.props
 
     const low = zoomedLower ? zoomedLower : lower
@@ -381,9 +381,8 @@ class DashboardPage extends React.Component<
         ) : null}
         <DashboardHeader
           names={names}
-          sourceID={sourceID}
+          source={source}
           dashboard={dashboard}
-          dashboards={dashboards}
           timeRange={timeRange}
           isEditMode={isEditMode}
           autoRefresh={autoRefresh}
@@ -427,7 +426,8 @@ class DashboardPage extends React.Component<
   }
 }
 
-const mapStateToProps = (state, {params: {dashboardID}}) => {
+const mapStateToProps = (state, props) => {
+  const {match: {params: dashboardID}} = props
   const {
     app: {
       ephemeral: {inPresentationMode},
@@ -470,6 +470,8 @@ const mapDispatchToProps = dispatch => ({
   errorThrown: bindActionCreators(errorThrownAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  ManualRefresh(DashboardPage)
-)
+export default compose(
+  ManualRefresh,
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(DashboardPage)

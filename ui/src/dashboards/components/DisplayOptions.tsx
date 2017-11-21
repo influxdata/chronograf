@@ -14,7 +14,7 @@ export interface DisplayOptionsProps {
   onSetPrefixSuffix: (e: {}) => void
   onSetYAxisBoundMin: (min: string) => void
   onSetYAxisBoundMax: (max: string) => void
-  onSetLabel: () => void
+  onSetLabel: (label: string) => void
   onSetScale: (base: DISPLAY_OPTIONS) => () => void
   onSetBase: (base: DISPLAY_OPTIONS) => () => void
 }
