@@ -4,14 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff"
 	"github.com/influxdata/kapacitor/command"
-	"github.com/influxdata/kapacitor/models"
+	"github.com/influxdata/kapacitor/edge"
 	"github.com/influxdata/kapacitor/pipeline"
 	"github.com/influxdata/kapacitor/udf"
 	"github.com/influxdata/kapacitor/udf/agent"
@@ -31,16 +30,18 @@ type UDFNode struct {
 }
 
 // Create a new UDFNode that sends incoming data to child udf
-func newUDFNode(et *ExecutingTask, n *pipeline.UDFNode, l *log.Logger) (*UDFNode, error) {
+func newUDFNode(et *ExecutingTask, n *pipeline.UDFNode, d NodeDiagnostic) (*UDFNode, error) {
 	un := &UDFNode{
-		node:    node{Node: n, et: et, logger: l},
+		node:    node{Node: n, et: et, diag: d},
 		u:       n,
 		aborted: make(chan struct{}),
 	}
 	// Create the UDF
 	f, err := et.tm.UDFService.Create(
 		n.UDFName,
-		l,
+		et.Task.ID,
+		n.Name(),
+		d,
 		un.abortedCallback,
 	)
 	if err != nil {
@@ -54,65 +55,47 @@ func newUDFNode(et *ExecutingTask, n *pipeline.UDFNode, l *log.Logger) (*UDFNode
 
 var errNodeAborted = errors.New("node aborted")
 
-func (u *UDFNode) stopUDF() {
-	u.mu.Lock()
-	defer u.mu.Unlock()
-	if !u.stopped {
-		u.stopped = true
-		if u.udf != nil {
-			u.udf.Abort(errNodeAborted)
+func (n *UDFNode) stopUDF() {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	if !n.stopped {
+		n.stopped = true
+		if n.udf != nil {
+			n.udf.Abort(errNodeAborted)
 		}
 	}
 }
 
-func (u *UDFNode) runUDF(snapshot []byte) (err error) {
+func (n *UDFNode) runUDF(snapshot []byte) (err error) {
 	defer func() {
-		u.mu.Lock()
-		defer u.mu.Unlock()
+		n.mu.Lock()
+		defer n.mu.Unlock()
 		//Ignore stopped errors if the udf was stopped externally
-		if u.stopped && (err == udf.ErrServerStopped || err == errNodeAborted) {
+		if n.stopped && (err == udf.ErrServerStopped || err == errNodeAborted) {
 			err = nil
 		}
-		u.stopped = true
+		n.stopped = true
 	}()
-	err = u.udf.Open()
-	if err != nil {
-		return
+
+	if err := n.udf.Open(); err != nil {
+		return err
 	}
-	err = u.udf.Init(u.u.Options)
-	if err != nil {
-		return
+	if err := n.udf.Init(n.u.Options); err != nil {
+		return err
 	}
 	if snapshot != nil {
-		err = u.udf.Restore(snapshot)
-		if err != nil {
-			return
+		if err := n.udf.Restore(snapshot); err != nil {
+			return err
 		}
 	}
+
 	forwardErr := make(chan error, 1)
 	go func() {
-		switch u.Provides() {
-		case pipeline.StreamEdge:
-			pointOut := u.udf.PointOut()
-			for p := range pointOut {
-				for _, out := range u.outs {
-					err := out.CollectPoint(p)
-					if err != nil {
-						forwardErr <- err
-						return
-					}
-				}
-			}
-		case pipeline.BatchEdge:
-			batchOut := u.udf.BatchOut()
-			for b := range batchOut {
-				for _, out := range u.outs {
-					err := out.CollectBatch(b)
-					if err != nil {
-						forwardErr <- err
-						return
-					}
-				}
+		out := n.udf.Out()
+		for m := range out {
+			if err := edge.Forward(n.outs, m); err != nil {
+				forwardErr <- err
+				return
 			}
 		}
 		forwardErr <- nil
@@ -120,61 +103,50 @@ func (u *UDFNode) runUDF(snapshot []byte) (err error) {
 
 	// The abort callback needs to know when we are done writing
 	// so we wrap in a wait group.
-	u.wg.Add(1)
+	n.wg.Add(1)
 	go func() {
-		defer u.wg.Done()
-		switch u.Wants() {
-		case pipeline.StreamEdge:
-			pointIn := u.udf.PointIn()
-			for p, ok := u.ins[0].NextPoint(); ok; p, ok = u.ins[0].NextPoint() {
-				u.timer.Start()
-				select {
-				case pointIn <- p:
-				case <-u.aborted:
-					return
-				}
-				u.timer.Stop()
+		defer n.wg.Done()
+		in := n.udf.In()
+		for m, ok := n.ins[0].Emit(); ok; m, ok = n.ins[0].Emit() {
+			n.timer.Start()
+			select {
+			case in <- m:
+			case <-n.aborted:
+				return
 			}
-		case pipeline.BatchEdge:
-			batchIn := u.udf.BatchIn()
-			for b, ok := u.ins[0].NextBatch(); ok; b, ok = u.ins[0].NextBatch() {
-				u.timer.Start()
-				select {
-				case batchIn <- b:
-				case <-u.aborted:
-					return
-				}
-				u.timer.Stop()
-			}
+			n.timer.Stop()
 		}
 	}()
+
 	// wait till we are done writing
-	u.wg.Wait()
+	n.wg.Wait()
 
 	// Close the udf
-	err = u.udf.Close()
-	if err != nil {
-		return
+	if err := n.udf.Close(); err != nil {
+		return err
 	}
+
 	// Wait/Return any error from the forwarding goroutine
-	err = <-forwardErr
-	return
+	return <-forwardErr
 }
 
-func (u *UDFNode) abortedCallback() {
-	close(u.aborted)
+func (n *UDFNode) abortedCallback() {
+	close(n.aborted)
 	// wait till we are done writing
-	u.wg.Wait()
+	n.wg.Wait()
 }
 
-func (u *UDFNode) snapshot() ([]byte, error) {
-	return u.udf.Snapshot()
+func (n *UDFNode) snapshot() ([]byte, error) {
+	return n.udf.Snapshot()
 }
 
 // UDFProcess wraps an external process and sends and receives data
 // over STDIN and STDOUT. Lines received over STDERR are logged
 // via normal Kapacitor logging.
 type UDFProcess struct {
+	taskName string
+	nodeName string
+
 	server    *udf.Server
 	commander command.Commander
 	cmdSpec   command.Spec
@@ -188,22 +160,25 @@ type UDFProcess struct {
 
 	mu sync.Mutex
 
-	logger        *log.Logger
+	diag          udf.Diagnostic
 	timeout       time.Duration
 	abortCallback func()
 }
 
 func NewUDFProcess(
+	taskName, nodeName string,
 	commander command.Commander,
 	cmdSpec command.Spec,
-	l *log.Logger,
+	d udf.Diagnostic,
 	timeout time.Duration,
 	abortCallback func(),
 ) *UDFProcess {
 	return &UDFProcess{
+		taskName:      taskName,
+		nodeName:      nodeName,
 		commander:     commander,
+		diag:          d,
 		cmdSpec:       cmdSpec,
-		logger:        l,
 		timeout:       timeout,
 		abortCallback: abortCallback,
 	}
@@ -240,9 +215,11 @@ func (p *UDFProcess) Open() error {
 	outBuf := bufio.NewReader(stdout)
 
 	p.server = udf.NewServer(
+		p.taskName,
+		p.nodeName,
 		outBuf,
 		stdin,
-		p.logger,
+		p.diag,
 		p.timeout,
 		p.abortCallback,
 		cmd.Kill,
@@ -288,7 +265,7 @@ func (p *UDFProcess) logStdErr() {
 	defer p.logStdErrGroup.Done()
 	scanner := bufio.NewScanner(p.stderr)
 	for scanner.Scan() {
-		p.logger.Println("I!P", scanner.Text())
+		p.diag.UDFLog(scanner.Text())
 	}
 }
 
@@ -296,17 +273,18 @@ func (p *UDFProcess) Abort(err error)                    { p.server.Abort(err) }
 func (p *UDFProcess) Init(options []*agent.Option) error { return p.server.Init(options) }
 func (p *UDFProcess) Snapshot() ([]byte, error)          { return p.server.Snapshot() }
 func (p *UDFProcess) Restore(snapshot []byte) error      { return p.server.Restore(snapshot) }
-func (p *UDFProcess) PointIn() chan<- models.Point       { return p.server.PointIn() }
-func (p *UDFProcess) BatchIn() chan<- models.Batch       { return p.server.BatchIn() }
-func (p *UDFProcess) PointOut() <-chan models.Point      { return p.server.PointOut() }
-func (p *UDFProcess) BatchOut() <-chan models.Batch      { return p.server.BatchOut() }
+func (p *UDFProcess) In() chan<- edge.Message            { return p.server.In() }
+func (p *UDFProcess) Out() <-chan edge.Message           { return p.server.Out() }
 func (p *UDFProcess) Info() (udf.Info, error)            { return p.server.Info() }
 
 type UDFSocket struct {
+	taskName string
+	nodeName string
+
 	server *udf.Server
 	socket Socket
 
-	logger        *log.Logger
+	diag          udf.Diagnostic
 	timeout       time.Duration
 	abortCallback func()
 }
@@ -319,14 +297,17 @@ type Socket interface {
 }
 
 func NewUDFSocket(
+	taskName, nodeName string,
 	socket Socket,
-	l *log.Logger,
+	d udf.Diagnostic,
 	timeout time.Duration,
 	abortCallback func(),
 ) *UDFSocket {
 	return &UDFSocket{
+		taskName:      taskName,
+		nodeName:      nodeName,
 		socket:        socket,
-		logger:        l,
+		diag:          d,
 		timeout:       timeout,
 		abortCallback: abortCallback,
 	}
@@ -342,9 +323,11 @@ func (s *UDFSocket) Open() error {
 	outBuf := bufio.NewReader(out)
 
 	s.server = udf.NewServer(
+		s.taskName,
+		s.nodeName,
 		outBuf,
 		in,
-		s.logger,
+		s.diag,
 		s.timeout,
 		s.abortCallback,
 		func() { s.socket.Close() },
@@ -368,10 +351,8 @@ func (s *UDFSocket) Abort(err error)                    { s.server.Abort(err) }
 func (s *UDFSocket) Init(options []*agent.Option) error { return s.server.Init(options) }
 func (s *UDFSocket) Snapshot() ([]byte, error)          { return s.server.Snapshot() }
 func (s *UDFSocket) Restore(snapshot []byte) error      { return s.server.Restore(snapshot) }
-func (s *UDFSocket) PointIn() chan<- models.Point       { return s.server.PointIn() }
-func (s *UDFSocket) BatchIn() chan<- models.Batch       { return s.server.BatchIn() }
-func (s *UDFSocket) PointOut() <-chan models.Point      { return s.server.PointOut() }
-func (s *UDFSocket) BatchOut() <-chan models.Batch      { return s.server.BatchOut() }
+func (s *UDFSocket) In() chan<- edge.Message            { return s.server.In() }
+func (s *UDFSocket) Out() <-chan edge.Message           { return s.server.Out() }
 func (s *UDFSocket) Info() (udf.Info, error)            { return s.server.Info() }
 
 type socket struct {
