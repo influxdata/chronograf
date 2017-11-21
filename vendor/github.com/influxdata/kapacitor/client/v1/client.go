@@ -3,12 +3,14 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"path"
 	"strconv"
@@ -31,6 +33,7 @@ const (
 	basePreviewPath   = "/kapacitor/v1preview"
 	pingPath          = basePath + "/ping"
 	logLevelPath      = basePath + "/loglevel"
+	logsPath          = basePreviewPath + "/logs"
 	debugVarsPath     = basePath + "/debug/vars"
 	tasksPath         = basePath + "/tasks"
 	templatesPath     = basePath + "/templates"
@@ -43,7 +46,7 @@ const (
 	replayQueryPath   = basePath + "/replays/query"
 	configPath        = basePath + "/config"
 	serviceTestsPath  = basePath + "/service-tests"
-	alertsPath        = basePreviewPath + "/alerts"
+	alertsPath        = basePath + "/alerts"
 	topicsPath        = alertsPath + "/topics"
 	topicEventsPath   = "events"
 	topicHandlersPath = "handlers"
@@ -73,6 +76,10 @@ type Config struct {
 
 	// Optional credentials for authenticating with the server.
 	Credentials *Credentials
+
+	// Optional Transport https://golang.org/pkg/net/http/#RoundTripper
+	// If nil the default transport will be used
+	Transport http.RoundTripper
 }
 
 // AuthenticationMethod defines the type of authentication used.
@@ -118,6 +125,23 @@ func (c Credentials) Validate() error {
 	return nil
 }
 
+type localTransport struct {
+	h http.Handler
+}
+
+func (l *localTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	w := httptest.NewRecorder()
+	l.h.ServeHTTP(w, r)
+
+	return w.Result(), nil
+}
+
+func NewLocalTransport(h http.Handler) http.RoundTripper {
+	return &localTransport{
+		h: h,
+	}
+}
+
 // Basic HTTP client
 type Client struct {
 	url         *url.URL
@@ -148,21 +172,28 @@ func New(conf Config) (*Client, error) {
 		}
 	}
 
-	tr := &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: conf.InsecureSkipVerify,
-		},
-	}
-	if conf.TLSConfig != nil {
-		tr.TLSClientConfig = conf.TLSConfig
+	rt := conf.Transport
+	var tr *http.Transport
+
+	if rt == nil {
+		tr = &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: conf.InsecureSkipVerify,
+			},
+		}
+		if conf.TLSConfig != nil {
+			tr.TLSClientConfig = conf.TLSConfig
+		}
+
+		rt = tr
 	}
 	return &Client{
 		url:       u,
 		userAgent: conf.UserAgent,
 		httpClient: &http.Client{
 			Timeout:   conf.Timeout,
-			Transport: tr,
+			Transport: rt,
 		},
 		credentials: conf.Credentials,
 	}, nil
@@ -195,16 +226,17 @@ func (d DBRP) String() string {
 // Statistics about the execution of a task.
 type ExecutionStats struct {
 	// Summary stats about the entire task
-	TaskStats map[string]interface{} `json:"task-stats"`
+	TaskStats map[string]interface{} `json:"task-stats,omitempty"`
 	// Stats for each node in the task
-	NodeStats map[string]map[string]interface{} `json:"node-stats"`
+	NodeStats map[string]map[string]interface{} `json:"node-stats,omitempty"`
 }
 
 type TaskType int
 
 const (
-	StreamTask TaskType = 1
-	BatchTask  TaskType = 2
+	InvalidTask TaskType = 0
+	StreamTask  TaskType = 1
+	BatchTask   TaskType = 2
 )
 
 func (tt TaskType) MarshalText() ([]byte, error) {
@@ -213,6 +245,8 @@ func (tt TaskType) MarshalText() ([]byte, error) {
 		return []byte("stream"), nil
 	case BatchTask:
 		return []byte("batch"), nil
+	case InvalidTask:
+		return []byte("invalid"), nil
 	default:
 		return nil, fmt.Errorf("unknown TaskType %d", tt)
 	}
@@ -224,6 +258,8 @@ func (tt *TaskType) UnmarshalText(text []byte) error {
 		*tt = StreamTask
 	case "batch":
 		*tt = BatchTask
+	case "invalid":
+		*tt = InvalidTask
 	default:
 		return fmt.Errorf("unknown TaskType %s", s)
 	}
@@ -513,9 +549,9 @@ func (vs *Vars) UnmarshalJSON(b []byte) error {
 }
 
 type Var struct {
-	Type        VarType     `json:"type"`
-	Value       interface{} `json:"value"`
-	Description string      `json:"description"`
+	Type        VarType     `json:"type" yaml:"type"`
+	Value       interface{} `json:"value" yaml:"value"`
+	Description string      `json:"description" yaml:"description"`
 }
 
 // A Task plus its read-only attributes.
@@ -564,16 +600,17 @@ type Recording struct {
 
 // Information about a replay.
 type Replay struct {
-	Link          Link      `json:"link"`
-	ID            string    `json:"id"`
-	Task          string    `json:"task"`
-	Recording     string    `json:"recording"`
-	RecordingTime bool      `json:"recording-time"`
-	Clock         Clock     `json:"clock"`
-	Date          time.Time `json:"date"`
-	Error         string    `json:"error"`
-	Status        Status    `json:"status"`
-	Progress      float64   `json:"progress"`
+	Link           Link           `json:"link"`
+	ID             string         `json:"id"`
+	Task           string         `json:"task"`
+	Recording      string         `json:"recording"`
+	RecordingTime  bool           `json:"recording-time"`
+	Clock          Clock          `json:"clock"`
+	Date           time.Time      `json:"date"`
+	Error          string         `json:"error"`
+	Status         Status         `json:"status"`
+	Progress       float64        `json:"progress"`
+	ExecutionStats ExecutionStats `json:"stats,omitempty"`
 }
 
 type JSONOperation struct {
@@ -659,6 +696,51 @@ func (c *Client) Do(req *http.Request, result interface{}, codes ...int) (*http.
 	return resp, nil
 }
 
+func (c *Client) Logs(ctx context.Context, w io.Writer, q map[string]string) error {
+	u := c.BaseURL()
+	u.Path = logsPath
+
+	qp := u.Query()
+	for k, v := range q {
+		qp.Add(k, v)
+	}
+	u.RawQuery = qp.Encode()
+
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(ctx)
+	err = c.prepRequest(req)
+	if err != nil {
+		return err
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode/100 != 2 {
+		return fmt.Errorf("bad status code %v", resp.StatusCode)
+	}
+
+	errCh := make(chan error, 1)
+	defer close(errCh)
+	go func() {
+		_, err := io.Copy(w, resp.Body)
+		errCh <- err
+	}()
+
+	select {
+	case <-ctx.Done():
+		return nil
+	case err := <-errCh:
+		return err
+	}
+
+}
+
 // Ping the server for a response.
 // Ping returns how long the request took, the version of the server it connected to, and an error if one occurred.
 func (c *Client) Ping() (time.Duration, string, error) {
@@ -725,13 +807,13 @@ func (c *Client) StorageLink(name string) Link {
 }
 
 type CreateTaskOptions struct {
-	ID         string     `json:"id,omitempty"`
-	TemplateID string     `json:"template-id,omitempty"`
+	ID         string     `json:"id,omitempty" yaml:"id"`
+	TemplateID string     `json:"template-id,omitempty" yaml:"template-id"`
 	Type       TaskType   `json:"type,omitempty"`
-	DBRPs      []DBRP     `json:"dbrps,omitempty"`
+	DBRPs      []DBRP     `json:"dbrps,omitempty" yaml:"dbrps"`
 	TICKscript string     `json:"script,omitempty"`
 	Status     TaskStatus `json:"status,omitempty"`
-	Vars       Vars       `json:"vars,omitempty"`
+	Vars       Vars       `json:"vars,omitempty" yaml:"vars"`
 }
 
 // Create a new task.
@@ -759,13 +841,13 @@ func (c *Client) CreateTask(opt CreateTaskOptions) (Task, error) {
 }
 
 type UpdateTaskOptions struct {
-	ID         string     `json:"id,omitempty"`
-	TemplateID string     `json:"template-id,omitempty"`
+	ID         string     `json:"id,omitempty" yaml:"id"`
+	TemplateID string     `json:"template-id,omitempty" yaml:"template-id"`
 	Type       TaskType   `json:"type,omitempty"`
-	DBRPs      []DBRP     `json:"dbrps,omitempty"`
+	DBRPs      []DBRP     `json:"dbrps,omitempty" yaml:"dbrps"`
 	TICKscript string     `json:"script,omitempty"`
 	Status     TaskStatus `json:"status,omitempty"`
-	Vars       Vars       `json:"vars,omitempty"`
+	Vars       Vars       `json:"vars,omitempty" yaml:"vars"`
 }
 
 // Update an existing task.
@@ -1963,6 +2045,7 @@ func (c *Client) TopicHandler(link Link) (TopicHandler, error) {
 }
 
 type TopicHandlerOptions struct {
+	Topic   string                 `json:"topic" yaml:"topic"`
 	ID      string                 `json:"id" yaml:"id"`
 	Kind    string                 `json:"kind" yaml:"kind"`
 	Options map[string]interface{} `json:"options" yaml:"options"`
@@ -2281,4 +2364,38 @@ func (d *Duration) UnmarshalText(data []byte) error {
 	}
 	*d = Duration(dur)
 	return nil
+}
+
+type DBRPs []DBRP
+
+func (d *DBRPs) String() string {
+	return fmt.Sprint(*d)
+}
+
+type TaskVars struct {
+	ID         string `json:"id,omitempty" yaml:"id"`
+	TemplateID string `json:"template-id,omitempty" yaml:"template-id"`
+	DBRPs      []DBRP `json:"dbrps,omitempty" yaml:"dbrps"`
+	Vars       Vars   `json:"vars,omitempty" yaml:"vars"`
+}
+
+func (t TaskVars) CreateTaskOptions() (CreateTaskOptions, error) {
+	o := CreateTaskOptions{
+		ID:         t.ID,
+		TemplateID: t.TemplateID,
+		Vars:       t.Vars,
+		DBRPs:      t.DBRPs,
+	}
+
+	return o, nil
+}
+
+func (t TaskVars) UpdateTaskOptions() (UpdateTaskOptions, error) {
+	o := UpdateTaskOptions{
+		ID:         t.ID,
+		TemplateID: t.TemplateID,
+		Vars:       t.Vars,
+		DBRPs:      t.DBRPs,
+	}
+	return o, nil
 }

@@ -23,15 +23,65 @@ const (
 	maxArgs = 4
 )
 
+type ErrMissingType struct {
+	Name  string
+	Args  []string
+	Scope []string
+}
+
+func (e ErrMissingType) Error() string {
+	s := "Cannot call function \"%s\" argument %s is missing, values in scope are [%s]"
+	if len(e.Args) > 1 {
+		s = "Cannot call function \"%s\" arguments %s are missing, values in scope are [%s]"
+	}
+
+	// remove missing values from scope
+	for _, a := range e.Args {
+		e.Scope = removeElement(e.Scope, a)
+	}
+
+	return fmt.Sprintf(s, e.Name, strings.Join(e.Args, ", "), strings.Join(e.Scope, ", "))
+}
+
+func removeElement(xs []string, el string) []string {
+	for i, x := range xs {
+		if x == el {
+			xs = append(xs[:i], xs[i+1:]...)
+			break
+		}
+	}
+	return xs
+}
+
 type ErrWrongFuncSignature struct {
 	Name           string
 	DomainProvided Domain
+	ArgLiterals    []string
 	Func           Func
 }
 
 func (e ErrWrongFuncSignature) Error() string {
-	return fmt.Sprintf("Cannot call function \"%s\" with args signature %s, available signatures are %s.",
-		e.Name, e.DomainProvided, FuncDomains(e.Func))
+	var argStringer fmt.Stringer = &argDomain{args: e.ArgLiterals, domain: e.DomainProvided}
+	if e.ArgLiterals == nil {
+		argStringer = e.DomainProvided
+	}
+	return fmt.Sprintf("Cannot call function \"%s\" with args %s, available signatures are %s.",
+		e.Name, argStringer, FuncDomains(e.Func))
+}
+
+type argDomain struct {
+	args   []string
+	domain Domain
+}
+
+func (a *argDomain) String() string {
+	input := []string{}
+	for j, el := range a.args {
+		t := a.domain[j]
+		input = append(input, fmt.Sprintf("%s: %s", el, t))
+	}
+
+	return "(" + strings.Join(input, ",") + ")"
 }
 
 var ErrNotFloat = errors.New("value is not a float")
@@ -168,12 +218,14 @@ func init() {
 	statelessFuncs["isPresent"] = isPresent{}
 
 	// Time functions
+	statelessFuncs["unixNano"] = unixNano{}
 	statelessFuncs["minute"] = minute{}
 	statelessFuncs["hour"] = hour{}
 	statelessFuncs["weekday"] = weekday{}
 	statelessFuncs["day"] = day{}
 	statelessFuncs["month"] = month{}
 	statelessFuncs["year"] = year{}
+	statelessFuncs["now"] = now{}
 
 	// Humanize functions
 	statelessFuncs["humanBytes"] = humanBytes{}
@@ -1135,6 +1187,30 @@ func init() {
 	timeFuncSignature[d] = ast.TInt
 }
 
+type unixNano struct {
+}
+
+func (unixNano) Reset() {
+}
+
+// Return the nanosecond unix timestamp for the given time.
+func (unixNano) Call(args ...interface{}) (v interface{}, err error) {
+	if len(args) != 1 {
+		return 0, errors.New("unixNano expects exactly one argument")
+	}
+	switch a := args[0].(type) {
+	case time.Time:
+		v = int64(a.UnixNano())
+	default:
+		err = fmt.Errorf("cannot convert %T to time.Time", a)
+	}
+	return
+}
+
+func (unixNano) Signature() map[Domain]ast.ValueType {
+	return timeFuncSignature
+}
+
 type minute struct {
 }
 
@@ -1277,6 +1353,34 @@ func (year) Call(args ...interface{}) (v interface{}, err error) {
 
 func (year) Signature() map[Domain]ast.ValueType {
 	return timeFuncSignature
+}
+
+var nowFuncSignature = map[Domain]ast.ValueType{}
+
+// Initialize Now function signature
+func init() {
+	d := Domain{}
+	nowFuncSignature[d] = ast.TTime
+}
+
+type now struct {
+}
+
+func (now) Reset() {
+}
+
+// Return the current local time.
+func (now) Call(args ...interface{}) (v interface{}, err error) {
+	if len(args) != 0 {
+		return 0, errors.New("now expects exactly zero argument")
+	}
+	v = time.Now()
+
+	return
+}
+
+func (now) Signature() map[Domain]ast.ValueType {
+	return nowFuncSignature
 }
 
 type humanBytes struct {

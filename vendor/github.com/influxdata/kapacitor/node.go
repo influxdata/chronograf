@@ -4,17 +4,19 @@ import (
 	"bytes"
 	"expvar"
 	"fmt"
-	"log"
 	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/influxdata/kapacitor/alert"
+	"github.com/influxdata/kapacitor/edge"
 	kexpvar "github.com/influxdata/kapacitor/expvar"
+	"github.com/influxdata/kapacitor/keyvalue"
 	"github.com/influxdata/kapacitor/models"
 	"github.com/influxdata/kapacitor/pipeline"
+	"github.com/influxdata/kapacitor/server/vars"
 	"github.com/influxdata/kapacitor/timer"
-	"github.com/influxdata/kapacitor/vars"
 	"github.com/pkg/errors"
 )
 
@@ -24,11 +26,48 @@ const (
 	statAverageExecTime  = "avg_exec_time_ns"
 )
 
+type NodeDiagnostic interface {
+	Error(msg string, err error, ctx ...keyvalue.T)
+
+	// AlertNode
+	AlertTriggered(level alert.Level, id string, message string, rows *models.Row)
+
+	// AutoscaleNode
+	SettingReplicas(new int, old int, id string)
+
+	// QueryNode
+	StartingBatchQuery(q string)
+
+	// LogNode
+	LogPointData(key, prefix string, data edge.PointMessage)
+	LogBatchData(key, prefix string, data edge.BufferedBatchMessage)
+
+	//UDF
+	UDFLog(s string)
+}
+
+type nodeDiagnostic struct {
+	NodeDiagnostic
+	node *node
+}
+
+func newNodeDiagnostic(n *node, diag NodeDiagnostic) *nodeDiagnostic {
+	return &nodeDiagnostic{
+		NodeDiagnostic: diag,
+		node:           n,
+	}
+}
+
+func (n *nodeDiagnostic) Error(msg string, err error, ctx ...keyvalue.T) {
+	n.node.incrementErrorCount()
+	n.NodeDiagnostic.Error(msg, err, ctx...)
+}
+
 // A node that can be  in an executor.
 type Node interface {
 	pipeline.Node
 
-	addParentEdge(*Edge)
+	addParentEdge(edge.StatsEdge)
 
 	init()
 
@@ -78,9 +117,9 @@ type node struct {
 	err        error
 	finishedMu sync.Mutex
 	finished   bool
-	ins        []*Edge
-	outs       []*Edge
-	logger     *log.Logger
+	ins        []edge.StatsEdge
+	outs       []edge.StatsEdge
+	diag       NodeDiagnostic
 	timer      timer.Timer
 	statsKey   string
 	statMap    *kexpvar.Map
@@ -88,7 +127,7 @@ type node struct {
 	nodeErrors *kexpvar.Int
 }
 
-func (n *node) addParentEdge(e *Edge) {
+func (n *node) addParentEdge(e edge.StatsEdge) {
 	n.ins = append(n.ins, e)
 }
 
@@ -110,6 +149,7 @@ func (n *node) init() {
 	n.statMap.Set(statAverageExecTime, avgExecVar)
 	n.nodeErrors = &kexpvar.Int{}
 	n.statMap.Set(statErrorCount, n.nodeErrors)
+	n.diag = newNodeDiagnostic(n, n.diag)
 	n.statMap.Set(statCardinalityGauge, kexpvar.NewIntFuncGauge(nil))
 	n.timer = n.et.tm.TimingService.NewTimer(avgExecVar)
 	n.errCh = make(chan error, 1)
@@ -131,7 +171,8 @@ func (n *node) start(snapshot []byte) {
 					err = fmt.Errorf("%s: Trace:%s", r, string(trace[:n]))
 				}
 				n.abortParentEdges()
-				n.logger.Println("E!", err)
+				n.diag.Error("node failed", err)
+
 				err = errors.Wrap(err, n.Name())
 			}
 			n.errCh <- err
@@ -164,7 +205,7 @@ func (n *node) Wait() error {
 	return n.err
 }
 
-func (n *node) addChild(c Node) (*Edge, error) {
+func (n *node) addChild(c Node) (edge.StatsEdge, error) {
 	if n.Provides() != c.Wants() {
 		return nil, fmt.Errorf("cannot add child mismatched edges: %s:%s -> %s:%s", n.Name(), n.Provides(), c.Name(), c.Wants())
 	}
@@ -173,7 +214,8 @@ func (n *node) addChild(c Node) (*Edge, error) {
 	}
 	n.children = append(n.children, c)
 
-	edge := newEdge(n.et.Task.ID, n.Name(), c.Name(), n.Provides(), defaultEdgeBufferSize, n.et.tm.LogService)
+	d := n.et.tm.diag.WithEdgeContext(n.et.Task.ID, n.Name(), c.Name())
+	edge := newEdge(n.et.Task.ID, n.Name(), c.Name(), n.Provides(), defaultEdgeBufferSize, d)
 	if edge == nil {
 		return nil, fmt.Errorf("unknown edge type %s", n.Provides())
 	}
@@ -241,7 +283,7 @@ func (n *node) edot(buf *bytes.Buffer, labels bool) {
 				fmt.Sprintf("%s -> %s [label=\"processed=%d\"];\n",
 					n.Name(),
 					c.Name(),
-					n.outs[i].collectedCount(),
+					n.outs[i].Collected(),
 				),
 			))
 		}
@@ -273,7 +315,7 @@ func (n *node) edot(buf *bytes.Buffer, labels bool) {
 				fmt.Sprintf("%s -> %s [processed=\"%d\"];\n",
 					n.Name(),
 					c.Name(),
-					n.outs[i].collectedCount(),
+					n.outs[i].Collected(),
 				),
 			))
 		}
@@ -283,7 +325,7 @@ func (n *node) edot(buf *bytes.Buffer, labels bool) {
 // node collected count is the sum of emitted counts of parent edges
 func (n *node) collectedCount() (count int64) {
 	for _, in := range n.ins {
-		count += in.emittedCount()
+		count += in.Emitted()
 	}
 	return
 }
@@ -291,7 +333,7 @@ func (n *node) collectedCount() (count int64) {
 // node emitted count is the sum of collected counts of children edges
 func (n *node) emittedCount() (count int64) {
 	for _, out := range n.outs {
-		count += out.collectedCount()
+		count += out.Collected()
 	}
 	return
 }
@@ -331,14 +373,14 @@ func (n *node) nodeStatsByGroup() (stats map[models.GroupID]nodeStats) {
 	// Get the counts for just one output.
 	stats = make(map[models.GroupID]nodeStats)
 	if len(n.outs) > 0 {
-		n.outs[0].readGroupStats(func(group models.GroupID, c, e int64, tags models.Tags, dims models.Dimensions) {
-			stats[group] = nodeStats{
+		n.outs[0].ReadGroupStats(func(g *edge.GroupStats) {
+			stats[g.GroupInfo.ID] = nodeStats{
 				Fields: models.Fields{
 					// A node's emitted count is the collected count of its output.
-					"emitted": c,
+					"emitted": g.Collected,
 				},
-				Tags:       tags,
-				Dimensions: dims,
+				Tags:       g.GroupInfo.Tags,
+				Dimensions: g.GroupInfo.Dimensions,
 			}
 		})
 	}
