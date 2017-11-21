@@ -199,6 +199,10 @@ func (s *Service) Me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(desa): REMOVE ME!!!!!!!!!!! THIS JUST SHOWS THAT THE GROUP
+	//             IS PROPERLY SET ON THE CONTEXT
+	fmt.Println(p.Group)
+
 	if usr != nil {
 		orgID, err := parseOrganizationID(p.Organization)
 		if err != nil {
@@ -248,7 +252,6 @@ func (s *Service) Me(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusForbidden, "users must be explicitly added", s.Logger)
 		return
 	}
-
 	// Because we didnt find a user, making a new one
 	user := &chronograf.User{
 		Name:     p.Subject,
