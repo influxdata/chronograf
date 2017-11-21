@@ -104,7 +104,7 @@ export interface QueryConfigNamespace {
 }
 
 export interface QueryConfigStatus {
-  loading: string
+  loading?: string
   error?: string
   warn?: string
   success?: string

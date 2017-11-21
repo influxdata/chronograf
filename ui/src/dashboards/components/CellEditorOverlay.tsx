@@ -21,6 +21,7 @@ import {
 import {OVERLAY_TECHNOLOGY} from 'shared/constants/classNames'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'data_explorer/constants'
 import {AUTO_GROUP_BY} from 'shared/constants'
+import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
 
 import {
   Axes,
@@ -203,7 +204,7 @@ class CellEditorOverlay extends React.Component<CEOProps, CEOState> {
     this.setState({activeQueryIndex})
   }
 
-  private handleSetBase = base => () => {
+  private handleSetBase = (base: DISPLAY_OPTIONS) => () => {
     const {axes} = this.state
 
     this.setState({
