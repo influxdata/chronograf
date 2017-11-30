@@ -7,18 +7,18 @@ import (
 	"github.com/influxdata/kapacitor/tick/ast"
 )
 
-func TestSwarmAutoscale(t *testing.T) {
+func TestEc2Autoscale(t *testing.T) {
 	type args struct {
-		cluster              string
-		serviceName          string
-		serviceNameTag       string
-		outputServiceNameTag string
-		currentField         string
-		max                  int64
-		min                  int64
-		replicas             *ast.LambdaNode
-		increaseCooldown     time.Duration
-		decreaseCooldown     time.Duration
+		cluster            string
+		groupName          string
+		groupNameTag       string
+		outputGroupNameTag string
+		currentField       string
+		max                int64
+		min                int64
+		replicas           *ast.LambdaNode
+		increaseCooldown   time.Duration
+		decreaseCooldown   time.Duration
 	}
 	tests := []struct {
 		name string
@@ -26,15 +26,15 @@ func TestSwarmAutoscale(t *testing.T) {
 		want string
 	}{
 		{
-			name: "upgrade mutalisk to guardian",
+			name: "upgrade mutalisk_autoscale to guardian_autoscale",
 			args: args{
-				cluster:              "zerg",
-				serviceName:          "units",
-				serviceNameTag:       "mutalisk",
-				outputServiceNameTag: "guardian",
-				currentField:         "hitPoints",
-				max:                  120,
-				min:                  0,
+				cluster:            "zerg",
+				groupName:          "mutalisk_autoscale",
+				groupNameTag:       "mutalisk_autoscale",
+				outputGroupNameTag: "guardian_autoscale",
+				currentField:       "hitPoints",
+				max:                10,
+				min:                5,
 				replicas: &ast.LambdaNode{
 					Expression: &ast.FunctionNode{
 						Type: ast.GlobalFunc,
@@ -73,13 +73,14 @@ func TestSwarmAutoscale(t *testing.T) {
 			},
 			want: `stream
     |from()
-    |swarmAutoscale()
+    |ec2Autoscale()
         .cluster('zerg')
-        .serviceName('mutalisk')
-        .serviceNameTag('mutalisk')
-        .outputServiceNameTag('guardian')
+        .groupName('mutalisk_autoscale')
+        .groupNameTag('mutalisk_autoscale')
+        .outputGroupNameTag('guardian_autoscale')
         .currentField('hitPoints')
-        .max(120)
+        .max(10)
+        .min(5)
         .replicas(lambda: if("greater spire" > 1, "replicas" + 1, "replicas"))
         .increaseCooldown(6670ms)
         .decreaseCooldown(2500ms)
@@ -89,11 +90,11 @@ func TestSwarmAutoscale(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pipe, _, from := StreamFrom()
-			n := from.SwarmAutoscale()
+			n := from.Ec2Autoscale()
 			n.Cluster = tt.args.cluster
-			n.ServiceName = tt.args.serviceName
-			n.ServiceNameTag = tt.args.serviceNameTag
-			n.OutputServiceNameTag = tt.args.outputServiceNameTag
+			n.GroupName = tt.args.groupName
+			n.GroupNameTag = tt.args.groupNameTag
+			n.OutputGroupNameTag = tt.args.outputGroupNameTag
 			n.CurrentField = tt.args.currentField
 			n.Max = tt.args.max
 			n.Min = tt.args.min
@@ -106,7 +107,7 @@ func TestSwarmAutoscale(t *testing.T) {
 				t.Fatalf("Unexpected error building pipeline %v", err)
 			}
 			if got != tt.want {
-				t.Errorf("%q. TestSwarmAutoscale() =\n%v\n want\n%v\n", tt.name, got, tt.want)
+				t.Errorf("%q. TestEc2Autoscale() =\n%v\n want\n%v\n", tt.name, got, tt.want)
 				t.Log(got)
 			}
 		})
