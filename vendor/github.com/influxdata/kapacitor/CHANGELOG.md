@@ -1,5 +1,19 @@
 # Changelog
 
+## unreleased
+
+## v1.4.0-rc2 [2017-11-28]
+
+### Features
+
+- [#1622](https://github.com/influxdata/kapacitor/pull/1622): Add support for AWS EC2 autoscaling services.
+- [#1566](https://github.com/influxdata/kapacitor/pull/1566): Add BarrierNode to emit BarrierMessage periodically
+
+### Bugfixes
+
+- [#1250](https://github.com/influxdata/kapacitor/issues/1250): Fix VictorOps "data" field being a string instead of actual JSON.
+- [#1697](https://github.com/influxdata/kapacitor/issues/1697): Fix panic with MQTT toml configuration generation.
+
 ## v1.4.0-rc1 [2017-11-09]
 
 ### Features
