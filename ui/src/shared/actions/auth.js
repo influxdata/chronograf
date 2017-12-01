@@ -85,12 +85,16 @@ export const getMeAsync = ({shouldResetMe = false} = {}) => async dispatch => {
       meLink,
     } = await getMeAJAX()
     const isUsingAuth = !!logoutLink
+    dispatch(logoutLinkReceived(logoutLink))
+    dispatch(linksReceived({external, users, organizations, me: meLink}))
+    dispatch(authReceived(auth))
+    // dispatch meGetCompleted after logoutLinkReceived, linksReceived, and
+    // authReceived so that isMeLoading is changed last, which is used as the
+    // predicate for UserIsAuthenticated, UserIsNotAuthenticated, and
+    // UserIsAuthorized
     dispatch(
       isUsingAuth ? meGetCompletedUsingAuth(me) : meGetCompletedNotUsingAuth(me)
     )
-    dispatch(authReceived(auth))
-    dispatch(logoutLinkReceived(logoutLink))
-    dispatch(linksReceived({external, users, organizations, me: meLink}))
   } catch (error) {
     dispatch(errorThrown(error))
     dispatch(meGetFailed())
