@@ -243,7 +243,7 @@ func (h *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 	if req.URL != "" {
 		src.URL = req.URL
 	}
-	if req.MetaURL != "" {
+	if req.MetaURL != nil {
 		src.MetaURL = req.MetaURL
 	}
 	if req.Type != "" {
