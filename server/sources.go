@@ -38,6 +38,12 @@ func newSourceResponse(src chronograf.Source) sourceResponse {
 	src.Password = ""
 	src.SharedSecret = ""
 
+	// The front end does not like null values for fields. It prefers
+	// to receive an empty array in its place.
+	if src.MetaURL == nil {
+		src.MetaURL = []string{}
+	}
+
 	httpAPISrcs := "/chronograf/v1/sources"
 	res := sourceResponse{
 		Source: src,
@@ -243,7 +249,7 @@ func (h *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 	if req.URL != "" {
 		src.URL = req.URL
 	}
-	if req.MetaURL != "" {
+	if req.MetaURL != nil {
 		src.MetaURL = req.MetaURL
 	}
 	if req.Type != "" {

@@ -26,6 +26,7 @@ func Test_newSourceResponse(t *testing.T) {
 				Source: chronograf.Source{
 					ID:       1,
 					Telegraf: "telegraf",
+					MetaURL:  []string{},
 				},
 				Links: sourceLinks{
 					Self:        "/chronograf/v1/sources/1",
@@ -49,6 +50,7 @@ func Test_newSourceResponse(t *testing.T) {
 				Source: chronograf.Source{
 					ID:       1,
 					Telegraf: "howdy",
+					MetaURL:  []string{},
 				},
 				Links: sourceLinks{
 					Self:        "/chronograf/v1/sources/1",

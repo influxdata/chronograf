@@ -2,6 +2,7 @@ package enterprise
 
 import (
 	"container/ring"
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -51,7 +52,12 @@ type Client struct {
 }
 
 // NewClientWithTimeSeries initializes a Client with a known set of TimeSeries.
-func NewClientWithTimeSeries(lg chronograf.Logger, mu, username, password string, tls bool, series ...chronograf.TimeSeries) (*Client, error) {
+func NewClientWithTimeSeries(lg chronograf.Logger, mus []string, username, password string, tls bool, series ...chronograf.TimeSeries) (*Client, error) {
+	if len(mus) == 0 {
+		return nil, fmt.Errorf("expected at least one meta url")
+	}
+	// This is safe since we just did len check
+	mu := mus[0]
 	metaURL, err := parseMetaURL(mu, tls)
 	if err != nil {
 		return nil, err

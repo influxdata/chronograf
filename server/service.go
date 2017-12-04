@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/influxdata/chronograf"
@@ -49,8 +50,20 @@ func (c *InfluxClient) New(src chronograf.Source, logger chronograf.Logger) (chr
 	if err := client.Connect(context.TODO(), &src); err != nil {
 		return nil, err
 	}
-	if src.Type == chronograf.InfluxEnterprise && src.MetaURL != "" {
-		tls := strings.Contains(src.MetaURL, "https")
+	if src.Type == chronograf.InfluxEnterprise && len(src.MetaURL) != 0 {
+		for i, j := 0, 1; j < len(src.MetaURL); j++ {
+			prev := src.MetaURL[i]
+			next := src.MetaURL[j]
+			prevTLS := strings.Contains(prev, "https")
+			nextTLS := strings.Contains(next, "https")
+			if prevTLS != nextTLS {
+				return nil, fmt.Errorf("mismatched use of https for meta: %q and %q found", prev, next)
+			}
+			i = j
+		}
+
+		// This is safe since we have at least one element of meta url
+		tls := strings.Contains(src.MetaURL[0], "https")
 		return enterprise.NewClientWithTimeSeries(logger, src.MetaURL, src.Username, src.Password, tls, client)
 	}
 	return client, nil
