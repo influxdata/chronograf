@@ -11,8 +11,10 @@ class KubernetesConfig extends Component {
     e.preventDefault()
 
     const properties = {
-      apiServers: this.apiServers.value,
-      resource: this.resource.value,
+      'api-servers': [this.apiServers.value],
+      enabled: this.enabled.checked,
+      // 'ca-path': this.caPath.value,
+      // 'in-cluster': this.inCluster.checked,
     }
 
     this.props.onSave(properties)
@@ -21,9 +23,29 @@ class KubernetesConfig extends Component {
   handleTokenRef = r => (this.token = r)
 
   render() {
-    const {apiServers, resource} = this.props.config.options
+    const {
+      apiServers,
+      enabled,
+      // resource,
+      // caPath,
+      // inCluster,
+      // namespace,
+      // token,
+    } = this.props.config.options
     return (
       <form onSubmit={this.handleSaveAlert}>
+        <div className="form-group col-xs-12">
+          <div className="form-control-static">
+            <input
+              id="enabled"
+              type="checkbox"
+              defaultChecked={enabled}
+              ref={r => (this.enabled = r)}
+            />
+            <label htmlFor="enabled">Enable Kubernetes auto-scaling</label>
+          </div>
+        </div>
+
         <div className="form-group col-xs-12">
           <label htmlFor="apiServers">API Servers</label>
           <input
@@ -34,18 +56,7 @@ class KubernetesConfig extends Component {
             defaultValue={apiServers || ''}
           />
         </div>
-        <div className="form-group col-xs-12">
-          <label htmlFor="resource">
-            Resource Dropdown: node/pod/service/endpoint
-          </label>
-          <input
-            className="form-control"
-            id="resource"
-            type="text"
-            ref={r => (this.resource = r)}
-            defaultValue={resource || ''}
-          />
-        </div>
+
         <div className="form-group-submit col-xs-12 text-center">
           <button className="btn btn-primary" type="submit">
             Update Kubernetes Config
@@ -56,16 +67,49 @@ class KubernetesConfig extends Component {
   }
 }
 
-//   <div className="form-group col-xs-12">
-//     <label htmlFor="inCluster">In cluster checkbox</label>
+// id?
+
+// <div className="form-group col-xs-12">
+//   <label htmlFor="caPath">CA Path</label>
+//   <input
+//     className="form-control"
+//     id="caPath"
+//     type="text"
+//     ref={r => (this.caPath = r)}
+//     defaultValue={caPath || ''}
+//   />
+// </div>
+// <div className="form-group col-xs-12">
+//   <div className="form-control-static">
 //     <input
-//       className="form-control"
 //       id="inCluster"
-//       type="text"
+//       type="checkbox"
+//       defaultChecked={inCluster}
 //       ref={r => (this.inCluster = r)}
-//       defaultValue={inCluster || ''}
 //     />
+//     <label htmlFor="inCluster">In cluster?</label>
 //   </div>
+// </div>
+// <div className="form-group col-xs-12">
+//   <label htmlFor="namespace">Namespace</label>
+//   <input
+//     className="form-control"
+//     id="namespace"
+//     type="text"
+//     ref={r => (this.namespace = r)}
+//     defaultValue={namespace || ''}
+//   />
+// </div>
+// <div className="form-group col-xs-12">
+//   <label htmlFor="resource">Resource</label>
+//   <input
+//     className="form-control"
+//     id="resource"
+//     type="text"
+//     ref={r => (this.resource = r)}
+//     defaultValue={resource || ''}
+//   />
+// </div>
 // <div className="form-group col-xs-12">
 //   <label htmlFor="token">Token</label>
 //   <input
@@ -74,16 +118,6 @@ class KubernetesConfig extends Component {
 //     type="text"
 //     ref={r => (this.token = r)}
 //     defaultValue={token || ''}
-//   />
-// </div>
-// <div className="form-group col-xs-12">
-//   <label htmlFor="caPath">CA path</label>
-//   <input
-//     className="form-control"
-//     id="caPath"
-//     type="text"
-//     ref={r => (this.caPath = r)}
-//     defaultValue={caPath || ''}
 //   />
 // </div>
 

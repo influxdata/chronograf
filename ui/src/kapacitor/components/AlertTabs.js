@@ -104,22 +104,6 @@ class AlertTabs extends Component {
       return null
     }
 
-    configSections.kubernetes = {
-      // TODO: not this
-      elements: [
-        {
-          link: {rel: 'self', href: '/kapacitor/v1/config/kubernetes/'},
-          options: {
-            enabled: true,
-            apiServers: '',
-            resource: 'pod',
-          },
-          redacted: ['token'],
-        },
-      ],
-      link: {rel: 'self', href: '/kapacitor/v1/config/kubernetes/'},
-    }
-
     const supportedConfigs = {
       alerta: {
         type: 'Alerta',
