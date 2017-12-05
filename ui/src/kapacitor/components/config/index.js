@@ -9,6 +9,7 @@ import SMTPConfig from './SMTPConfig'
 import TalkConfig from './TalkConfig'
 import TelegramConfig from './TelegramConfig'
 import VictorOpsConfig from './VictorOpsConfig'
+import KubernetesConfig from './KubernetesConfig'
 
 export {
   AlertaConfig,
@@ -22,4 +23,5 @@ export {
   TalkConfig,
   TelegramConfig,
   VictorOpsConfig,
+  KubernetesConfig,
 }

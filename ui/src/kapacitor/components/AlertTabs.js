@@ -16,6 +16,7 @@ import {
   TalkConfig,
   TelegramConfig,
   VictorOpsConfig,
+  KubernetesConfig,
 } from './config'
 
 class AlertTabs extends Component {
@@ -40,7 +41,8 @@ class AlertTabs extends Component {
 
   refreshKapacitorConfig = kapacitor => {
     getKapacitorConfig(kapacitor)
-      .then(({data: {sections}}) => {
+      .then(config => {
+        const {data: {sections}} = config
         this.setState({configSections: sections})
       })
       .catch(() => {
@@ -62,7 +64,8 @@ class AlertTabs extends Component {
 
   handleSaveConfig = section => properties => {
     if (section !== '') {
-      const propsToSend = this.sanitizeProperties(section, properties)
+      const propsToSend = properties
+      // this.sanitizeProperties(section, properties)
       updateKapacitorConfigSection(this.props.kapacitor, section, propsToSend)
         .then(() => {
           this.refreshKapacitorConfig(this.props.kapacitor)
@@ -99,6 +102,22 @@ class AlertTabs extends Component {
 
     if (!configSections) {
       return null
+    }
+
+    configSections.kubernetes = {
+      // TODO: not this
+      elements: [
+        {
+          link: {rel: 'self', href: '/kapacitor/v1/config/kubernetes/'},
+          options: {
+            enabled: true,
+            apiServers: '',
+            resource: 'pod',
+          },
+          redacted: ['token'],
+        },
+      ],
+      link: {rel: 'self', href: '/kapacitor/v1/config/kubernetes/'},
     }
 
     const supportedConfigs = {
@@ -188,6 +207,14 @@ class AlertTabs extends Component {
           <VictorOpsConfig
             onSave={this.handleSaveConfig('victorops')}
             config={this.getSection(configSections, 'victorops')}
+          />,
+      },
+      kubernetes: {
+        type: 'Kubernetes',
+        renderComponent: () =>
+          <KubernetesConfig
+            onSave={this.handleSaveConfig('kubernetes')}
+            config={this.getSection(configSections, 'kubernetes')}
           />,
       },
     }
