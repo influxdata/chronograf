@@ -1,4 +1,7 @@
 import React, {PropTypes} from 'react'
+
+console.log(React)
+
 import {Link} from 'react-router'
 import classnames from 'classnames'
 
