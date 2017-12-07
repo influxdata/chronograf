@@ -3,25 +3,16 @@ import React, {Component, PropTypes} from 'react'
 import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 
 class UserNewPassword extends Component {
-  constructor(props) {
-    super(props)
-
-    this.handleKeyPress = ::this.handleKeyPress
-    this.handleEdit = ::this.handleEdit
-  }
-
-  handleKeyPress(user) {
-    return e => {
-      if (e.key === 'Enter') {
-        this.props.onSave(user)
-      }
+  handleKeyPress = e => {
+    const {onSave, user} = this.props
+    if (e.key === 'Enter') {
+      onSave(user)
     }
   }
 
-  handleEdit(user) {
-    return e => {
-      this.props.onEdit(user, {[e.target.name]: e.target.value})
-    }
+  handleEdit = e => {
+    const {onEdit, user} = this.props
+    onEdit(user, {[e.target.name]: e.target.value})
   }
 
   render() {
@@ -35,8 +26,8 @@ class UserNewPassword extends Component {
               type="password"
               value={user.password || ''}
               placeholder="Password"
-              onChange={this.handleEdit(user)}
-              onKeyPress={this.handleKeyPress(user)}
+              onChange={this.handleEdit}
+              onKeyPress={this.handleKeyPress}
               spellCheck={false}
               autoComplete={false}
             />
