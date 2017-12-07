@@ -3,25 +3,16 @@ import React, {Component, PropTypes} from 'react'
 import {ROLES_TABLE} from 'src/admin/constants/tableSizing'
 
 class RoleEditingRow extends Component {
-  constructor(props) {
-    super(props)
-
-    this.handleKeyPress = ::this.handleKeyPress
-    this.handleEdit = ::this.handleEdit
-  }
-
-  handleKeyPress(role) {
-    return e => {
-      if (e.key === 'Enter') {
-        this.props.onSave(role)
-      }
+  handleKeyPress = e => {
+    const {onSave, role} = this.props
+    if (e.key === 'Enter') {
+      onSave(role)
     }
   }
 
-  handleEdit(role) {
-    return e => {
-      this.props.onEdit(role, {[e.target.name]: e.target.value})
-    }
+  handleEdit = e => {
+    const {onEdit, role} = this.props
+    onEdit(role, {[e.target.name]: e.target.value})
   }
 
   render() {
@@ -34,8 +25,8 @@ class RoleEditingRow extends Component {
           type="text"
           value={role.name || ''}
           placeholder="Role name"
-          onChange={this.handleEdit(role)}
-          onKeyPress={this.handleKeyPress(role)}
+          onChange={this.handleEdit}
+          onKeyPress={this.handleKeyPress}
           autoFocus={true}
           spellCheck={false}
           autoComplete={false}
