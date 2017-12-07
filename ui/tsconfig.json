@@ -21,6 +21,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
+    "checkJs": true,
     "baseUrl": ".",
     "paths": {
       "*": ["./*"],

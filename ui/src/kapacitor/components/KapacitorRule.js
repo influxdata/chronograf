@@ -8,7 +8,7 @@ import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 import {createRule, editRule} from 'src/kapacitor/apis'
 import buildInfluxQLQuery from 'utils/influxql'
-import timeRanges from 'hson!shared/data/timeRanges.hson'
+import timeRanges from 'shared/data/timeRanges'
 
 class KapacitorRule extends Component {
   constructor(props) {
