@@ -323,7 +323,6 @@ Dygraph.Plugins.Crosshair = (function() {
 
   /**
    * @param {Dygraph} g Graph instance.
-   * @return {object.<string, function(ev)>} Mapping of event names to callbacks.
    */
   crosshair.prototype.activate = function(g) {
     g.graphDiv.appendChild(this.canvas_)

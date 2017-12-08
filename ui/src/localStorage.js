@@ -8,7 +8,7 @@ export const loadLocalStorage = errorsQueue => {
     const state = JSON.parse(serializedState) || {}
 
     // eslint-disable-next-line no-undef
-    if (state.VERSION && state.VERSION !== VERSION) {
+    if (state.VERSION && state.VERSION !== process.env.VERSION) {
       const errorText =
         'New version of Chronograf detected. Local settings cleared.'
 
@@ -65,7 +65,7 @@ export const saveToLocalStorage = ({
         dataExplorerQueryConfigs,
         timeRange,
         dataExplorer,
-        VERSION, // eslint-disable-line no-undef
+        VERSION: process.env.VERSION,
         dashTimeV1,
         dismissedNotifications,
       })
