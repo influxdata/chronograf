@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    "module": "es6",
     "moduleResolution": "node",
     "lib": ["es6", "es2017", "dom"],
     "isolatedModules": false,
@@ -23,6 +23,7 @@
     "allowJs": true,
     "checkJs": true,
     "baseUrl": ".",
+    "sourceMap": true,
     "paths": {
       "*": ["./*"],
       "src/*": ["./src/*"],
@@ -44,5 +45,6 @@
       "style/*": ["./src/style/*"],
       "utils/*": ["./src/utils/*"]
     }
-  }
+  },
+  "exclude": ["build"]
 }

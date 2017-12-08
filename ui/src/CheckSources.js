@@ -1,7 +1,7 @@
-import React, {PropTypes} from 'react'
+import React, {Component, PropTypes} from 'react'
 import {withRouter} from 'react-router'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
 
 import {getSources} from 'shared/apis'
 import {showDatabases} from 'shared/apis/metaQuery'
@@ -15,59 +15,18 @@ import {DEFAULT_HOME_PAGE} from 'shared/constants'
 // getting the list of data nodes, but not every page requires them to function.
 // Routes that do require data nodes can be nested under this component.
 const {arrayOf, func, node, shape, string} = PropTypes
-const CheckSources = React.createClass({
-  propTypes: {
-    sources: arrayOf(
-      shape({
-        links: shape({
-          proxy: string.isRequired,
-          self: string.isRequired,
-          kapacitors: string.isRequired,
-          queries: string.isRequired,
-          permissions: string.isRequired,
-          users: string.isRequired,
-          databases: string.isRequired,
-        }).isRequired,
-      })
-    ),
-    children: node,
-    params: shape({
-      sourceID: string,
-    }).isRequired,
-    router: shape({
-      push: func.isRequired,
-    }).isRequired,
-    location: shape({
-      pathname: string.isRequired,
-    }).isRequired,
-    loadSources: func.isRequired,
-    errorThrown: func.isRequired,
-  },
-
-  childContextTypes: {
-    source: shape({
-      links: shape({
-        proxy: string.isRequired,
-        self: string.isRequired,
-        kapacitors: string.isRequired,
-        queries: string.isRequired,
-        permissions: string.isRequired,
-        users: string.isRequired,
-        databases: string.isRequired,
-      }).isRequired,
-    }),
-  },
+class CheckSources extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      isFetching: true,
+    }
+  }
 
   getChildContext() {
     const {sources, params: {sourceID}} = this.props
     return {source: sources.find(s => s.id === sourceID)}
-  },
-
-  getInitialState() {
-    return {
-      isFetching: true,
-    }
-  },
+  }
 
   async componentWillMount() {
     const {loadSources, errorThrown} = this.props
@@ -80,7 +39,7 @@ const CheckSources = React.createClass({
       errorThrown(error, 'Unable to connect to Chronograf server')
       this.setState({isFetching: false})
     }
-  },
+  }
 
   async componentWillUpdate(nextProps, nextState) {
     const {router, location, params, errorThrown, sources} = nextProps
@@ -109,7 +68,7 @@ const CheckSources = React.createClass({
         errorThrown(error, 'Unable to connect to source')
       }
     }
-  },
+  }
 
   render() {
     const {params, sources} = this.props
@@ -122,15 +81,55 @@ const CheckSources = React.createClass({
 
     return (
       this.props.children &&
-      React.cloneElement(
-        this.props.children,
-        Object.assign({}, this.props, {
-          source,
-        })
-      )
+      React.cloneElement(this.props.children, {
+        ...this.props,
+        source,
+      })
     )
-  },
-})
+  }
+}
+
+CheckSources.propTypes = {
+  sources: arrayOf(
+    shape({
+      links: shape({
+        proxy: string.isRequired,
+        self: string.isRequired,
+        kapacitors: string.isRequired,
+        queries: string.isRequired,
+        permissions: string.isRequired,
+        users: string.isRequired,
+        databases: string.isRequired,
+      }).isRequired,
+    })
+  ),
+  children: node,
+  params: shape({
+    sourceID: string,
+  }).isRequired,
+  router: shape({
+    push: func.isRequired,
+  }).isRequired,
+  location: shape({
+    pathname: string.isRequired,
+  }).isRequired,
+  loadSources: func.isRequired,
+  errorThrown: func.isRequired,
+}
+
+CheckSources.childContextTypes = {
+  source: shape({
+    links: shape({
+      proxy: string.isRequired,
+      self: string.isRequired,
+      kapacitors: string.isRequired,
+      queries: string.isRequired,
+      permissions: string.isRequired,
+      users: string.isRequired,
+      databases: string.isRequired,
+    }).isRequired,
+  }),
+}
 
 const mapStateToProps = ({sources}) => ({
   sources,
@@ -141,6 +140,8 @@ const mapDispatchToProps = dispatch => ({
   errorThrown: bindActionCreators(errorThrownAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(CheckSources)
-)
+// https://github.com/ReactTraining/react-router/blob/master/packages/react-router/docs/api/withRouter.md#important-note
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(CheckSources)

@@ -57,6 +57,7 @@ Sparky.task('config', () => {
     output: 'build/assets/$name.js',
     useTypescriptCompiler: true,
     experimentalFeatures: true,
+    polyfillNonStandardDefaultUsage: true,
     plugins: [
       JSONPlugin(),
       WebIndexPlugin({
@@ -138,7 +139,7 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
 
 Sparky.task('clean', () => Sparky.src('build/').clean('build/'))
 
-Sparky.task('copy', () => Sparky.src('assets/').dest('build/'))
+Sparky.task('copy', () => Sparky.src('assets/**/*').dest('build'))
 
 Sparky.task('prod-env', ['clean', 'copy'], () => {
   isProduction = true
