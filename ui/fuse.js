@@ -56,7 +56,6 @@ Sparky.task('config', () => {
     target: 'browser',
     output: 'build/assets/$name.js',
     useTypescriptCompiler: true,
-    experimentalFeatures: true,
     polyfillNonStandardDefaultUsage: true,
     plugins: [
       JSONPlugin(),
@@ -126,7 +125,7 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
           target: 'http://localhost:8888',
         })
       )
-      appServer.get('*', function(req, res) {
+      appServer.get('*', function(_req, res) {
         res.sendFile(path.join(dist, 'assets/index.html'))
       })
     }
@@ -139,7 +138,7 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
 
 Sparky.task('clean', () => Sparky.src('build/').clean('build/'))
 
-Sparky.task('copy', () => Sparky.src('assets/**/*').dest('build'))
+Sparky.task('copy', () => Sparky.src('assets/**/*').dest('build/'))
 
 Sparky.task('prod-env', ['clean', 'copy'], () => {
   isProduction = true

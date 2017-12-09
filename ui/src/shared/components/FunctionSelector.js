@@ -47,9 +47,8 @@ class FunctionSelector extends Component {
     return !!this.state.localSelectedItems.find(text => text === item)
   }
 
-  handleApplyFunctions(e) {
+  handleApplyFunctions = e => {
     e.stopPropagation()
-
     this.props.onApply(this.state.localSelectedItems)
   }
 

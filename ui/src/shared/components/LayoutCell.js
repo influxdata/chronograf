@@ -62,7 +62,7 @@ class LayoutCell extends Component {
             isEditable={isEditable}
             onDelete={this.handleDeleteCell}
             onEdit={this.handleSummonOverlay}
-            handleClickOutside={this.closeMenu}
+            onCloseMenu={this.closeMenu}
             onDeleteClick={this.handleDeleteClick}
             onCSVDownload={this.handleCSVDownload}
           />
