@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {withRouter} from 'react-router'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
 
 import {
   isUserAuthorized,
@@ -24,7 +24,6 @@ import {DEFAULT_HOME_PAGE} from 'shared/constants'
 class CheckSources extends Component {
   constructor(props) {
     super(props)
-
     this.state = {
       isFetching: true,
     }
@@ -166,12 +165,10 @@ class CheckSources extends Component {
 
     return (
       this.props.children &&
-      React.cloneElement(
-        this.props.children,
-        Object.assign({}, this.props, {
-          source,
-        })
-      )
+      React.cloneElement(this.props.children, {
+        ...this.props,
+        source,
+      })
     )
   }
 }
@@ -213,6 +210,7 @@ CheckSources.propTypes = {
     }),
   }),
   notify: func.isRequired,
+  errorThrown: func.isRequired,
 }
 
 CheckSources.childContextTypes = {
@@ -240,6 +238,8 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(publishNotification, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(CheckSources)
-)
+// https://github.com/ReactTraining/react-router/blob/master/packages/react-router/docs/api/withRouter.md#important-note
+export default compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)(CheckSources)
