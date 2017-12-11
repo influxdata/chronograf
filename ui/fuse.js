@@ -52,7 +52,7 @@ Sparky.task('config', () => {
   fuse = new FuseBox({
     homeDir: 'src',
     sourceMaps: !isProduction,
-    hash: isProduction,
+    hash: false,
     target: 'browser',
     output: 'build/assets/$name.js',
     useTypescriptCompiler: true,
@@ -62,7 +62,7 @@ Sparky.task('config', () => {
       WebIndexPlugin({
         template: 'src/index.template.html',
         target: 'index.html',
-        path: '/assets/',
+        path: '/',
       }),
       isProduction &&
         QuantumPlugin({
