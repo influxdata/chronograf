@@ -86,6 +86,7 @@ input[type="text"].form-control.orgs-table--input {
   margin-right: 4px;
   width: 88px;
   background-color: $g4-onyx;
+  text-align: left;
   border-radius: 4px;
   line-height: 30px;
   position: relative;
@@ -153,6 +154,7 @@ input[type="text"].form-control.orgs-table--input {
   > .orgs-table--active {
     color: $g17-whisper;
     font-weight: 500;
+    text-align: center;
   }
   > .orgs-table--default-role,
   > .orgs-table--public,
