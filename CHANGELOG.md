@@ -6,6 +6,8 @@
 ## v1.4.0.0-rc2 [unreleased]
 ### Bug Fixes
 1. [#2639](https://github.com/influxdata/chronograf/pull/2639): Prevent SuperAdmin from modifying their own status
+1. [#2632](https://github.com/influxdata/chronograf/pull/2632): Give SuperAdmin DefaultRole when switching to organization where they have no role
+1. [#2642](https://github.com/influxdata/chronograf/pull/2642): Fix DE query config on first run
 
 ## v1.4.0.0-rc1 [2017-12-19]
 ### Features
