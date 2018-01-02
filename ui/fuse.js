@@ -9,6 +9,7 @@ const {
   WebIndexPlugin,
   Sparky,
 } = require('fuse-box')
+const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const proxy = require('http-proxy-middleware')
@@ -116,17 +117,23 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
       open: false,
     },
     server => {
-      const dist = path.resolve('./build')
+      const dist = path.resolve('./build/assets')
       const appServer = server.httpServer.app
-      appServer.use('/assets', express.static(path.join(dist, 'assets')))
       appServer.use(
         '/chronograf/v1',
         proxy({
           target: 'http://localhost:8888',
         })
       )
-      appServer.get('*', function(_req, res) {
-        res.sendFile(path.join(dist, 'assets/index.html'))
+      appServer.get('*', function(req, res) {
+        const filepath = path.resolve(dist, req.path.substr(1))
+        fs.access(filepath, fs.constants.R_OK, (err) => {
+          if (err) {
+            res.sendFile(path.resolve(dist, 'index.html'))
+          } else {
+            res.sendFile(filepath)
+          }
+        })        
       })
     }
   )
