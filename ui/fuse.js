@@ -18,37 +18,6 @@ const {version} = require('./package.json')
 
 let fuse, app, isProduction
 
-const productionStylePlugins = [
-  SassPlugin({
-    sourceMap: false, // https://github.com/sass/libsass/issues/2312
-    outputStyle: 'compressed',
-    importer: true,
-    cache: false,
-  }),
-  PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
-    sourceMaps: false,
-  }),
-  CSSPlugin({
-    group: 'chronograf.css',
-    outFile: 'build/assets/chronograf.css',
-    inject: false,
-  }),
-]
-
-const devStylePlugins = [
-  SassPlugin({
-    sourceMap: false, // https://github.com/sass/libsass/issues/2312
-    outputStyle: 'expanded',
-    importer: true,
-    cache: false,
-  }),
-  CSSPlugin({
-    group: 'chronograf.css',
-    outFile: 'build/assets/chronograf.css',
-    inject: false,
-  }),
-]
-
 Sparky.task('config', () => {
   fuse = new FuseBox({
     homeDir: 'src',
@@ -64,6 +33,20 @@ Sparky.task('config', () => {
         template: 'src/index.template.html',
         target: 'index.html',
         path: '/',
+      }),
+      SassPlugin({
+        sourceMap: false, // https://github.com/sass/libsass/issues/2312
+        outputStyle: isProduction ? 'compressed' : 'expanded',
+        importer: true,
+        cache: false,
+      }),
+      PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
+        sourceMaps: false,
+      }),
+      CSSPlugin({
+        group: 'chronograf.css',
+        outFile: 'build/assets/chronograf.css',
+        inject: false,
       }),
       isProduction &&
         QuantumPlugin({
@@ -137,7 +120,7 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
       })
     }
   )
-  app.watch('src/**').plugin(devStylePlugins).hmr({
+  app.watch('src/**').hmr({
     reload: true,
   })
   return fuse.run()
@@ -152,6 +135,5 @@ Sparky.task('prod-env', ['clean', 'copy'], () => {
 })
 
 Sparky.task('build', ['prod-env', 'config'], () => {
-  app.plugin(productionStylePlugins)
   return fuse.run()
 })
