@@ -66,7 +66,7 @@ Sparky.task('config', () => {
       }),
       isProduction &&
         QuantumPlugin({
-          treeshake: true,
+          // treeshake: true, // Tree-shaking removes things that imported like `import * as foo from 'file/path'`
           uglify: {
             es6: true,
           },
