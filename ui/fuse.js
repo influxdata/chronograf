@@ -18,6 +18,23 @@ const {version} = require('./package.json')
 
 let fuse, app, isProduction
 
+const StylePlugins = [
+  SassPlugin({
+    sourceMap: false, // https://github.com/sass/libsass/issues/2312
+    outputStyle: isProduction ? 'compressed' : 'expanded',
+    importer: true,
+    cache: false,
+  }),
+  PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
+    sourceMaps: false,
+  }),
+  CSSPlugin({
+    group: 'chronograf.css',
+    outFile: 'build/assets/chronograf.css',
+    inject: false,
+  }),
+]
+
 Sparky.task('config', () => {
   fuse = new FuseBox({
     homeDir: 'src',
@@ -34,20 +51,7 @@ Sparky.task('config', () => {
         target: 'index.html',
         path: '/',
       }),
-      SassPlugin({
-        sourceMap: false, // https://github.com/sass/libsass/issues/2312
-        outputStyle: isProduction ? 'compressed' : 'expanded',
-        importer: true,
-        cache: false,
-      }),
-      PostCSSPlugin([require('autoprefixer'), require('cssnano')], {
-        sourceMaps: false,
-      }),
-      CSSPlugin({
-        group: 'chronograf.css',
-        outFile: 'build/assets/chronograf.css',
-        inject: false,
-      }),
+      // ...StylePlugins, // Prevents warning, but breaks build
       isProduction &&
         QuantumPlugin({
           // treeshake: true, // Tree-shaking removes things that imported like `import * as foo from 'file/path'`
@@ -120,7 +124,7 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
       })
     }
   )
-  app.watch('src/**').hmr({
+  app.watch('src/**').plugin(StylePlugins).hmr({
     reload: true,
   })
   return fuse.run()
@@ -135,5 +139,6 @@ Sparky.task('prod-env', ['clean', 'copy'], () => {
 })
 
 Sparky.task('build', ['prod-env', 'config'], () => {
+  app.plugin(StylePlugins)
   return fuse.run()
 })
