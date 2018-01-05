@@ -7,7 +7,7 @@
       "chai"
     ],
     "target": "es6",
-    "module": "es6",
+    "module": "commonjs",
     "moduleResolution": "node",
     "lib": [
       "es6",
@@ -32,65 +32,66 @@
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": true,
-    "baseUrl": ".",
+    "baseUrl": "./",
     "sourceMap": true,
+    "rootDirs": ["src", "spec"],
     "paths": {
       "*": [
-        "./*"
+        "*"
       ],
       "src/*": [
-        "./src/*"
+        "src/*"
       ],
       "admin/*": [
-        "./src/admin/*"
+        "src/admin/*"
       ],
       "alerts/*": [
-        "./src/alerts/*"
+        "src/alerts/*"
       ],
       "auth/*": [
-        "./src/auth/*"
+        "src/auth/*"
       ],
       "dashboards/*": [
-        "./src/dashboards/*"
+        "src/dashboards/*"
       ],
       "data_explorer/*": [
-        "./src/data_explorer/*"
+        "src/data_explorer/*"
       ],
       "external/*": [
-        "./src/external/*"
+        "src/external/*"
       ],
       "hosts/*": [
-        "./src/hosts/*"
+        "src/hosts/*"
       ],
       "influxql/*": [
-        "./src/influxql/*"
+        "src/influxql/*"
       ],
       "kapacitor/*": [
-        "./src/kapacitor/*"
+        "src/kapacitor/*"
       ],
       "normalizers/*": [
-        "./src/normalizers/*"
+        "src/normalizers/*"
       ],
       "shared/*": [
-        "./src/shared/*"
+        "src/shared/*"
       ],
       "side_nav/*": [
-        "./src/side_nav/*"
+        "src/side_nav/*"
       ],
       "sources/*": [
-        "./src/sources/*"
+        "src/sources/*"
       ],
       "status/*": [
-        "./src/status/*"
+        "src/status/*"
       ],
       "store/*": [
-        "./src/store/*"
+        "src/store/*"
       ],
       "style/*": [
-        "./src/style/*"
+        "src/style/*"
       ],
       "utils/*": [
-        "./src/utils/*"
+        "src/utils/*"
       ]
     }
   },
