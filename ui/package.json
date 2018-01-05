@@ -16,9 +16,8 @@
     "ts:dev": "tsc --noEmit --pretty --watch",
     "tscount": "tsc --noEmit | grep ': error ' | wc -l",
     "test": "mocha -r ts-node/register -r tsconfig-paths/register -r chai/register-expect \"./spec/**/*Spec.js\"",
+    "test:watch": "mocha -r ts-node/register -r tsconfig-paths/register -r chai/register-expect --watch \"./spec/**/*Spec.js\"",
     "test:integration": "nightwatch tests --skip",
-    "test:lint": "yarn run lint; yarn run test",
-    "test:dev": "concurrently \"yarn run lint --watch\" \"yarn run test --no-single-run --reporters=verbose\"",
     "clean": "rm -rf build/assets/* .fusebox",
     "prettier": "prettier --single-quote --trailing-comma es5 --bracket-spacing false --semi false --write \"{src,spec}/**/*.js\"; eslint src --fix"
   },
