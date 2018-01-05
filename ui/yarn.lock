@@ -12,6 +12,14 @@
     lodash.isequal "^4.5.0"
     prop-types "^15.5.4"
 
+"@types/bluebird@*":
+  version "3.5.19"
+  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.19.tgz#1a47308819ac2d1d6d1ca4f5d800ac84924100de"
+
+"@types/chai@^4.0.10":
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.0.10.tgz#0eb222c7353adde8e0980bea04165d4d3b6afef3"
+
 "@types/classnames@^2.2.3":
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.3.tgz#3f0ff6873da793870e20a260cada55982f38a9e5"
@@ -20,13 +28,28 @@
   version "0.5.29"
   resolved "https://registry.yarnpkg.com/@types/he/-/he-0.5.29.tgz#67f9392287b05558013d1cabc96801a5185adbea"
 
+"@types/karma@^1.7.3":
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@types/karma/-/karma-1.7.3.tgz#bc286bcd64b9abfda86ceb9e3e89a15862c34b06"
+  dependencies:
+    "@types/bluebird" "*"
+    "@types/node" "*"
+
 "@types/lodash@^4.14.88":
   version "4.14.88"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.88.tgz#97eaf2dc668f33ed8e511a5b627035f4ea20b0f5"
 
-"@types/node@^8.5.2":
-  version "8.5.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.2.tgz#83b8103fa9a2c2e83d78f701a9aa7c9539739aa5"
+"@types/mocha@^2.2.46":
+  version "2.2.46"
+  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.46.tgz#b04713f7759d1cf752effdaae7b3969e285ebc16"
+
+"@types/node@*":
+  version "8.5.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.5.tgz#6f9e8164ae1a55a9beb1d2571cfb7acf9d720c61"
+
+"@types/node@^0.12.14":
+  version "0.12.14"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-0.12.14.tgz#117c531e3f49b0ecfa1b439495abe22517fdfa7f"
 
 "@types/query-string@^5.0.1":
   version "5.0.1"

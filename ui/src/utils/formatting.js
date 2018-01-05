@@ -10,7 +10,7 @@ const pow = (base, exp) => {
   return Math.pow(base, exp)
 }
 
-const round_ = (num, places) => {
+const _round = (num, places) => {
   const shift = Math.pow(10, places)
   return Math.round(num * shift) / shift
 }
@@ -65,7 +65,7 @@ export const numberValueFormatter = (x, opts, prefix, suffix) => {
   ) {
     label = x.toExponential(digits)
   } else {
-    label = `${round_(x, digits)}`
+    label = `${_round(x, digits)}`
   }
 
   if (kmb || kmg2) {
@@ -89,7 +89,7 @@ export const numberValueFormatter = (x, opts, prefix, suffix) => {
     let n = pow(k, kLabels.length)
     for (let j = kLabels.length - 1; j >= 0; j -= 1, n /= k) {
       if (absx >= n) {
-        label = round_(x / n, digits) + kLabels[j]
+        label = _round(x / n, digits) + kLabels[j]
         break
       }
     }
@@ -97,7 +97,7 @@ export const numberValueFormatter = (x, opts, prefix, suffix) => {
       const xParts = String(x.toExponential()).split('e-')
       if (xParts.length === 2 && xParts[1] >= 3 && xParts[1] <= 24) {
         if (xParts[1] % 3 > 0) {
-          label = round_(xParts[0] / pow(10, xParts[1] % 3), digits)
+          label = _round(xParts[0] / pow(10, xParts[1] % 3), digits)
         } else {
           label = Number(xParts[0]).toFixed(2)
         }

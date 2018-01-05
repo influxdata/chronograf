@@ -42,6 +42,7 @@ const getRange = (
 
   const points = [...timeSeries, [null, pad(value)], [null, pad(rangeValue)]]
 
+  // tslint:disable no-shadowed-variable
   const range = points.reduce(
     ([min, max] = [], series) => {
       for (let i = 1; i < series.length; i++) {

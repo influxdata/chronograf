@@ -24,10 +24,11 @@ export const resultsToCSV = results => {
     return {flag: 'ok', name, CSVString}
   }
 
-  const CSVString = [columns.join(',')]
+  const s = [columns.join(',')]
     .concat(values.map(row => row.join(',')))
     .join('\n')
-  return {flag: 'ok', name, CSVString}
+
+  return {flag: 'ok', name, CSVString: s}
 }
 
 export const dashboardtoCSV = data => {

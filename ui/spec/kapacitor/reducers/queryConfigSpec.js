@@ -85,7 +85,7 @@ describe('Chronograf.Reducers.Kapacitor.queryConfigs', () => {
     describe('choosing a new namespace', () => {
       it('clears out the old measurement and fields', () => {
         // what about tags?
-        expect(state[queryID].measurement).to.exist
+        expect(state[queryID].measurement).to.equal('disk')
         expect(state[queryID].fields.length).to.equal(1)
 
         const newState = reducer(
@@ -96,7 +96,7 @@ describe('Chronograf.Reducers.Kapacitor.queryConfigs', () => {
           })
         )
 
-        expect(newState[queryID].measurement).not.to.exist
+        expect(newState[queryID].measurement).to.equal(null)
         expect(newState[queryID].fields.length).to.equal(0)
       })
     })

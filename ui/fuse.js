@@ -11,9 +11,7 @@ const {
 } = require('fuse-box')
 const fs = require('fs')
 const path = require('path')
-const express = require('express')
 const proxy = require('http-proxy-middleware')
-
 const {version} = require('./package.json')
 
 let fuse, app, isProduction
@@ -114,13 +112,13 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
       )
       appServer.get('*', function(req, res) {
         const filepath = path.resolve(dist, req.path.substr(1))
-        fs.access(filepath, fs.constants.R_OK, (err) => {
+        fs.access(filepath, fs.constants.R_OK, err => {
           if (err) {
             res.sendFile(path.resolve(dist, 'index.html'))
           } else {
             res.sendFile(filepath)
           }
-        })        
+        })
       })
     }
   )

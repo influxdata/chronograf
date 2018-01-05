@@ -1,5 +1,5 @@
 import Dygraph from 'dygraphs/src/dygraph'
-/* eslint-disable */
+/* tslint:disable */
 /**
  * Synchronize zooming and/or selections between a set of dygraphs.
  *
@@ -388,6 +388,6 @@ Dygraph.Plugins.Crosshair = (function() {
 
   return crosshair
 })()
-/* eslint-enable */
+/* tslint:enable */
 
 export default Dygraph

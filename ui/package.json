@@ -29,6 +29,9 @@
     }
   },
   "devDependencies": {
+    "@types/chai": "^4.0.10",
+    "@types/karma": "^1.7.3",
+    "@types/mocha": "^2.2.46",
     "autoprefixer": "^6.3.1",
     "babel-core": "^6.5.1",
     "babel-eslint": "6.1.2",
@@ -108,7 +111,7 @@
     "@types/classnames": "^2.2.3",
     "@types/he": "^0.5.29",
     "@types/lodash": "^4.14.88",
-    "@types/node": "^8.5.2",
+    "@types/node": "^0.12.14",
     "@types/query-string": "^5.0.1",
     "@types/react": "^15.6.7",
     "@types/react-dom": "^15.5.6",

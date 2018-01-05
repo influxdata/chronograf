@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* tslint:disable */
 
 var precss = require('precss');
 var autoprefixer = require('autoprefixer');
