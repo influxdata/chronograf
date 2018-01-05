@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 // TODO make recursive
 const exprStr = ({expr, val, type}) => {

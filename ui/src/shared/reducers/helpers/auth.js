@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import {SUPERADMIN_ROLE, MEMBER_ROLE} from 'src/auth/Authorized'
 

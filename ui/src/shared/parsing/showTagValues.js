@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 export default function parseShowTagValues(response) {
   // Currently only supports SHOW TAG VALUES responses that explicitly specify a measurement,

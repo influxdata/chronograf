@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 // fieldWalk traverses fields rescursively into args mapping fn on every field
 export const fieldWalk = (fields, fn, acc = []) =>

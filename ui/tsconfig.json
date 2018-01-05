@@ -4,7 +4,8 @@
       "node",
       "karma",
       "mocha",
-      "chai"
+      "chai",
+      "lodash"
     ],
     "target": "es6",
     "module": "commonjs",

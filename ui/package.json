@@ -112,7 +112,7 @@
     "@skidding/react-codemirror": "^1.0.1",
     "@types/classnames": "^2.2.3",
     "@types/he": "^0.5.29",
-    "@types/lodash": "^4.14.88",
+    "@types/lodash": "^4.14.92",
     "@types/node": "^8.5.7",
     "@types/query-string": "^5.0.1",
     "@types/react": "^15.6.7",

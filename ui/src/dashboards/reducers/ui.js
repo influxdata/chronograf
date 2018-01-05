@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 import timeRanges from 'shared/data/timeRanges'
 
 const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')

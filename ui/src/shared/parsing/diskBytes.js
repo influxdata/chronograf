@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 // sums one or many queries for diskBytes from shards i.e.
 // SELECT last(diskBytes) from "shards" 'GROUP BY *;
