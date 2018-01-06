@@ -14,7 +14,7 @@ const parseShowDatabases = response => {
   })
 
   if (!databases.length) {
-    alert('No databases were found.') // eslint-disable-line no-alert
+    alert('No databases were found.')
   }
 
   return {errors: [], databases}

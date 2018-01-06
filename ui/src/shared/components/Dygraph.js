@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import React, {Component, PropTypes} from 'react'
 import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'

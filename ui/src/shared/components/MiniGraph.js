@@ -7,7 +7,7 @@ import timeSeriesToDygraph from 'utils/timeSeriesToDygraph'
 export default React.createClass({
   displayName: 'MiniGraph',
   propTypes: {
-    data: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+    data: PropTypes.array.isRequired,
     title: PropTypes.string,
     queryDescription: PropTypes.string,
     yRange: PropTypes.arrayOf(PropTypes.number.isRequired),

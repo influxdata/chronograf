@@ -26,7 +26,7 @@ function buildPermissionsWithResources(rawPermissions) {
 
   return _.map(nextPermissions, (resources, permissionName) => {
     if (!PERMISSIONS[permissionName]) {
-      console.error('Could not find details for plutonium permission!') // eslint-disable-line no-console
+      console.error('Could not find details for plutonium permission!')
       return {
         name: permissionName,
         displayName: '',
@@ -50,7 +50,7 @@ function buildPermissionsWithResources(rawPermissions) {
 export function buildAllPermissions() {
   return _.map(PERMISSIONS, ({displayName, description}, permissionName) => {
     if (!PERMISSIONS[permissionName]) {
-      console.error('Could not find details for plutonium permission!') // eslint-disable-line no-console
+      console.error('Could not find details for plutonium permission!')
       return {
         name: permissionName,
         displayName: '',
@@ -72,7 +72,7 @@ export function buildAllPermissions() {
 // with more detail like a description and display name.
 export function buildPermission(permissionName, resources) {
   if (!PERMISSIONS[permissionName]) {
-    console.error('Could not find details for plutonium permission!') // eslint-disable-line no-console
+    console.error('Could not find details for plutonium permission!')
     return {
       name: permissionName,
       displayName: '',

@@ -19,20 +19,14 @@
     "test:watch": "mocha -r ts-node/register -r tsconfig-paths/register -r chai/register-expect --watch \"./spec/**/*Spec.js\"",
     "test:integration": "nightwatch tests --skip",
     "clean": "rm -rf build/assets/* .fusebox",
-    "prettier": "prettier --single-quote --trailing-comma es5 --bracket-spacing false --semi false --write \"{src,spec}/**/*.js\"; eslint src --fix"
+    "prettier": "prettier --single-quote --trailing-comma es5 --bracket-spacing false --semi false --write \"{src,spec}/**/*.js\""
   },
   "author": "",
-  "eslintConfig": {
-    "env": {
-      "mocha": true
-    }
-  },
   "devDependencies": {
     "@types/chai": "^4.0.10",
     "@types/mocha": "^2.2.46",
     "autoprefixer": "^6.3.1",
     "babel-core": "^6.5.1",
-    "babel-eslint": "6.1.2",
     "babel-loader": "^6.2.2",
     "babel-plugin-lodash": "^2.0.1",
     "babel-plugin-syntax-trailing-function-commas": "^6.5.0",
@@ -51,11 +45,6 @@
     "css-loader": "^0.23.1",
     "envify": "^3.4.0",
     "enzyme": "^2.4.1",
-    "eslint": "^3.14.1",
-    "eslint-loader": "1.6.1",
-    "eslint-plugin-prettier": "^2.1.2",
-    "eslint-plugin-react": "6.6.0",
-    "eslint-watch": "^3.1.2",
     "express": "^4.16.2",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
@@ -111,7 +100,6 @@
     "calculate-size": "^1.1.1",
     "classnames": "^2.2.3",
     "dygraphs": "2.1.0",
-    "eslint-plugin-babel": "^4.1.2",
     "fast.js": "^0.1.1",
     "fixed-data-table": "^0.6.1",
     "he": "^1.1.1",

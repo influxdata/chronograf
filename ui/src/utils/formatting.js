@@ -138,7 +138,7 @@ export const formatRPDuration = duration => {
   let adjustedTime = duration
   const durationMatcher = /(?:(\d*)d)?(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?/
   const [
-    _match, // eslint-disable-line no-unused-vars
+    _match,
     days = 0,
     hours = 0,
     minutes = 0,

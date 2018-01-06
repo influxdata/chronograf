@@ -38,7 +38,7 @@ export const loadLocalStorage = errorsQueue => {
   } catch (error) {
     const errorText = `Loading local settings failed: ${error}`
 
-    console.error(errorText) // eslint-disable-line no-console
+    console.error(errorText)
     errorsQueue.push(errorText)
 
     return {}
@@ -70,6 +70,6 @@ export const saveToLocalStorage = ({
       })
     )
   } catch (err) {
-    console.error('Unable to save data explorer: ', JSON.parse(err)) // eslint-disable-line no-console
+    console.error('Unable to save data explorer: ', JSON.parse(err))
   }
 }

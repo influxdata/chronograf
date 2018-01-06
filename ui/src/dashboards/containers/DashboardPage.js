@@ -83,13 +83,14 @@ class DashboardPage extends Component {
   }
 
   handleOpenTemplateManager = () => {
+    const foo = 'foo'
     this.setState({isTemplating: true})
   }
 
   handleCloseTemplateManager = isEdited => () => {
     if (
       !isEdited ||
-      (isEdited && confirm('Do you want to close without saving?')) // eslint-disable-line no-alert
+      (isEdited && confirm('Do you want to close without saving?'))
     ) {
       this.setState({isTemplating: false})
     }

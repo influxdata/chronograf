@@ -32,7 +32,7 @@ class KapacitorRulePage extends Component {
     if (!kapacitor) {
       return addFlashMessage({
         type: 'error',
-        text: "We couldn't find a configured Kapacitor for this source", // eslint-disable-line quotes
+        text: "We couldn't find a configured Kapacitor for this source",
       })
     }
 

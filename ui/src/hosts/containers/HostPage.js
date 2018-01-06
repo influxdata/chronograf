@@ -71,7 +71,7 @@ class HostPage extends Component {
       })
     }
 
-    this.setState({layouts: filteredLayouts, hosts: filteredHosts}) // eslint-disable-line react/no-did-mount-set-state
+    this.setState({layouts: filteredLayouts, hosts: filteredHosts})
   }
 
   handleChooseTimeRange = ({lower, upper}) => {

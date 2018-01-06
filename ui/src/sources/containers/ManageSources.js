@@ -13,7 +13,7 @@ import FancyScrollbar from 'shared/components/FancyScrollbar'
 import SourceIndicator from 'shared/components/SourceIndicator'
 import InfluxTable from 'src/sources/components/InfluxTable'
 
-const V_NUMBER = process.env.VERSION // eslint-disable-line no-undef
+const V_NUMBER = process.env.VERSION
 
 class ManageSources extends Component {
   constructor(props) {
