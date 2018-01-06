@@ -1,72 +1,70 @@
-import React, {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
 import OnClickOutside from 'react-onclickoutside'
+import CustomTimeIndicator from 'shared/components/CustomTimeIndicator'
 
-const LayoutCellMenu = ({
-  isDeleting,
-  onEdit,
-  onDeleteClick,
-  onDelete,
-  onCSVDownload,
-  dataExists,
-  cell,
-}) =>
-  <div
-    className={
-      isDeleting
-        ? 'dash-graph-context dash-graph-context__deleting'
-        : 'dash-graph-context'
-    }
-  >
-    <div className="dash-graph-context--button" onClick={onEdit(cell)}>
-      <span className="icon pencil" />
-    </div>
-    {dataExists
-      ? <div
-          className="dash-graph-context--button"
-          onClick={onCSVDownload(cell)}
-        >
-          <span className="icon download" />
-        </div>
-      : null}
-    {isDeleting
-      ? <div className="dash-graph-context--button active">
-          <span className="icon trash" />
-          <div className="dash-graph-context--confirm" onClick={onDelete(cell)}>
-            Confirm
+const LayoutCellMenu = OnClickOutside(
+  ({
+    cell,
+    onEdit,
+    queries,
+    onDelete,
+    isEditable,
+    dataExists,
+    isDeleting,
+    onDeleteClick,
+    onCSVDownload,
+  }) =>
+    <div className="dash-graph-context">
+      <div
+        className={`${isEditable
+          ? 'dash-graph--custom-indicators dash-graph--draggable'
+          : 'dash-graph--custom-indicators'}`}
+      >
+        {queries && <CustomTimeIndicator queries={queries} />}
+      </div>
+      {isEditable &&
+        <div className="dash-graph-context--buttons">
+          <div className="dash-graph-context--button" onClick={onEdit(cell)}>
+            <span className="icon pencil" />
           </div>
-        </div>
-      : <div className="dash-graph-context--button" onClick={onDeleteClick}>
-          <span className="icon trash" />
+          {dataExists &&
+            <div
+              className="dash-graph-context--button"
+              onClick={onCSVDownload(cell)}
+            >
+              <span className="icon download" />
+            </div>}
+          {isDeleting
+            ? <div className="dash-graph-context--button active">
+                <span className="icon trash" />
+                <div
+                  className="dash-graph-context--confirm"
+                  onClick={onDelete(cell)}
+                >
+                  Confirm
+                </div>
+              </div>
+            : <div
+                className="dash-graph-context--button"
+                onClick={onDeleteClick}
+              >
+                <span className="icon trash" />
+              </div>}
         </div>}
-  </div>
+    </div>
+)
 
-class LayoutCellMenuContainer extends Component {
-  handleClickOutside() {
-    this.props.onCloseMenu()
-  }
+const {arrayOf, bool, func, shape} = PropTypes
 
-  render() {
-    if (!this.props.isEditable) {
-      return null
-    }
-
-    return <LayoutCellMenu {...this.props} />
-  }
-}
-
-const {bool, func, shape} = PropTypes
-
-LayoutCellMenuContainer.propTypes = {
+LayoutCellMenu.propTypes = {
   isDeleting: bool,
   onEdit: func,
   onDelete: func,
   onDeleteClick: func,
-  onCloseMenu: func,
   cell: shape(),
   isEditable: bool,
   dataExists: bool,
+  queries: arrayOf(shape()),
 }
 
-LayoutCellMenu.propTypes = LayoutCellMenuContainer.propTypes
-
-export default OnClickOutside(LayoutCellMenuContainer)
+export default LayoutCellMenu
