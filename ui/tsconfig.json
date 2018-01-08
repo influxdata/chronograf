@@ -27,6 +27,7 @@
     "importHelpers": true,
     "noLib": false,
     "noEmitHelpers": true,
+    "noEmit": true,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,

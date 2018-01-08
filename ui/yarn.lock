@@ -1587,9 +1587,9 @@ fuse-box-typechecker@^2.7.0:
     object.entries "^1.0.4"
     watch "^1.0.2"
 
-fuse-box@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/fuse-box/-/fuse-box-2.4.0.tgz#da0d0752d7a22f83fda8222e717b329fe823f910"
+fuse-box@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/fuse-box/-/fuse-box-3.0.2.tgz#446b86990d608dd22a35b4c86a8b18479ceafa1f"
   dependencies:
     acorn "^5.1.2"
     acorn-jsx "^4.0.1"
@@ -1603,7 +1603,6 @@ fuse-box@2.4.0:
     express "^4.14.0"
     fliplog "^0.3.13"
     fs-extra "^2.0.0"
-    fuse-tools "^1.0.4"
     glob "^7.1.1"
     ieee754 "^1.1.8"
     inquirer "^3.0.6"
@@ -1613,16 +1612,13 @@ fuse-box@2.4.0:
     postcss "^6.0.1"
     pretty-time "^0.2.0"
     prettysize "0.0.3"
-    realm-utils "^1.0.8"
+    realm-utils "^1.0.9"
     request "^2.79.0"
     shorthash "0.0.2"
+    tslib "^1.8.0"
     watch "^1.0.1"
     ws "^1.1.1"
     yargs "^9.0.1"
-
-fuse-tools@^1.0.4:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/fuse-tools/-/fuse-tools-1.0.5.tgz#98c9f5133348a9a91357cbf8bf57171fa6cd614a"
 
 gauge@~2.6.0:
   version "2.6.0"
@@ -3716,7 +3712,7 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-realm-utils@^1.0.8:
+realm-utils@^1.0.9:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/realm-utils/-/realm-utils-1.0.9.tgz#5c76a5ff39e4816af2c133a161f4221d6628eff4"
   dependencies:
@@ -4342,7 +4338,7 @@ tsconfig@^7.0.0:
     strip-bom "^3.0.0"
     strip-json-comments "^2.0.0"
 
-tslib@^1.0.0, tslib@^1.7.1, tslib@^1.8.1:
+tslib@^1.0.0, tslib@^1.7.1, tslib@^1.8.0, tslib@^1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.8.1.tgz#6946af2d1d651a7b1863b531d6e5afa41aa44eac"
 
