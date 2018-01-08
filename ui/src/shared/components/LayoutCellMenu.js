@@ -50,7 +50,7 @@ const LayoutCellMenu = ({
   </div>
 
 class LayoutCellMenuWrapper extends Component {
-  onClickOutside() {
+  handleClickOutside() {
     this.props.onCloseMenu()
   }
 
