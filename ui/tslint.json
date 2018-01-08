@@ -1,5 +1,4 @@
 {
-  "allowJS": true,
   "jsRules": {
     "one-variable-per-declaration": false,
     "no-console": [

@@ -14,11 +14,11 @@
       "es2017",
       "dom"
     ],
+    "skipLibCheck": true,
     "isolatedModules": false,
     "jsx": "react",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "declaration": true,
     "noImplicitAny": false,
     "noImplicitUseStrict": false,
     "noUnusedParameters": true,
@@ -31,10 +31,13 @@
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "baseUrl": "./",
     "sourceMap": true,
-    "rootDirs": ["src", "spec"],
+    "rootDirs": [
+      "src",
+      "spec"
+    ],
     "paths": {
       "*": [
         "*"
@@ -96,6 +99,7 @@
     }
   },
   "exclude": [
-    "build"
+    "./build/*",
+    "./node_modules/*"
   ]
 }

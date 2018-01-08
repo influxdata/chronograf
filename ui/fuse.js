@@ -13,8 +13,20 @@ const fs = require('fs')
 const path = require('path')
 const proxy = require('http-proxy-middleware')
 const {version} = require('./package.json')
+const {TypeHelper} = require('fuse-box-typechecker')
 
 let fuse, app, isProduction
+
+const typeHelper = TypeHelper({
+  tsConfig: './tsconfig.json',
+  basePath: './',
+  tsLint: './tslint.json',
+  name: 'App Linter',
+  throwOnOptions: false,
+  throwOnSyntactic: true,
+  shortenFilenames: true,
+  yellowOnLint: true,
+})
 
 const StylePlugins = [
   SassPlugin({
@@ -122,9 +134,16 @@ Sparky.task('default', ['clean', 'copy', 'config'], () => {
       })
     }
   )
-  app.watch('src/**').plugin(StylePlugins).hmr({
-    reload: true,
-  })
+  app
+    .watch('src/**')
+    .plugin(StylePlugins)
+    .hmr({
+      reload: true,
+    })
+    .completed(_ => {
+      // run the typechecker
+      typeHelper.runSync()
+    })
   return fuse.run()
 })
 

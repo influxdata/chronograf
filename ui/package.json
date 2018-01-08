@@ -67,6 +67,7 @@
     "dygraphs": "2.1.0",
     "fast.js": "^0.1.1",
     "fixed-data-table": "^0.6.1",
+    "fuse-box-typechecker": "^2.7.0",
     "he": "^1.1.1",
     "jquery": "^3.1.0",
     "lodash": "^4.3.0",
