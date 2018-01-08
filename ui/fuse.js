@@ -65,7 +65,7 @@ Sparky.task('config', () => {
         target: 'index.html',
         path: '/',
       }),
-      // ...StylePlugins, // Prevents warning, but breaks build
+      StylePlugins, // Prevents warning, but breaks build
       isProduction &&
         QuantumPlugin({
           // treeshake: true, // Tree-shaking removes things that imported like `import * as foo from 'file/path'`
