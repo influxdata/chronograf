@@ -17,19 +17,20 @@ const {TypeHelper} = require('fuse-box-typechecker')
 
 let fuse, app, isProduction
 
-const typeHelper = isProd => TypeHelper({
-  tsConfig: './tsconfig.json',
-  basePath: './',
-  tsLint: './tslint.json',
-  name: 'App Linter',
-  throwOnSyntactic: isProd,
-  throwOnSemantic: isProd,
-  throwOnGlobal: isProd,
-  throwOnOptions: isProd,
-  throwOnTsLint: isProd,
-  shortenFilenames: true,
-  yellowOnLint: true,
-})
+const typeHelper = isProd =>
+  TypeHelper({
+    tsConfig: './tsconfig.json',
+    basePath: './',
+    tsLint: './tslint.json',
+    name: 'App Linter',
+    throwOnSyntactic: isProd,
+    throwOnSemantic: isProd,
+    throwOnGlobal: isProd,
+    throwOnOptions: isProd,
+    throwOnTsLint: isProd,
+    shortenFilenames: true,
+    yellowOnLint: true,
+  })
 
 const StylePlugins = [
   SassPlugin({
@@ -159,11 +160,9 @@ Sparky.task('prod-env', ['clean', 'copy'], () => {
 })
 
 Sparky.task('build', ['prod-env', 'config'], () => {
-  app
-    .plugin(StylePlugins)
-    .completed(_ => {
-      // run the typechecker
-      typeHelper(isProduction).runSync()
-    })
+  app.plugin(StylePlugins).completed(_ => {
+    // run the typechecker
+    typeHelper(isProduction).runSync()
+  })
   return fuse.run()
 })
