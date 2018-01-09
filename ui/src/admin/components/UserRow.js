@@ -27,8 +27,8 @@ const UserRow = ({
   onUpdateRoles,
   onUpdatePassword,
 }) => {
-  const handleUpdatePermissions = perms => {
-    const allowed = perms.map(p => p.name)
+  const handleUpdatePermissions = ps => {
+    const allowed = ps.map(p => p.name)
     onUpdatePermissions(user, [{scope: 'all', allowed}])
   }
 

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 export default function parseShowTagValues(response) {
   // Currently only supports SHOW TAG VALUES responses that explicitly specify a measurement,
@@ -10,7 +10,8 @@ export default function parseShowTagValues(response) {
   }
 
   const tags = {}
-  ;(result.series || []).forEach(({columns, values}) => {
+  const series = result.series || []
+  series.forEach(({columns, values}) => {
     values.forEach(v => {
       const tagKey = v[columns.indexOf('key')]
       const tagValue = v[columns.indexOf('value')]

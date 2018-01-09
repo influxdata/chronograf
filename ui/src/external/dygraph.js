@@ -1,5 +1,5 @@
-import Dygraph from 'dygraphs/src-es5/dygraph'
-/* eslint-disable */
+import Dygraph from 'dygraphs/src/dygraph'
+/* tslint:disable */
 /**
  * Synchronize zooming and/or selections between a set of dygraphs.
  *
@@ -323,7 +323,6 @@ Dygraph.Plugins.Crosshair = (function() {
 
   /**
    * @param {Dygraph} g Graph instance.
-   * @return {object.<string, function(ev)>} Mapping of event names to callbacks.
    */
   crosshair.prototype.activate = function(g) {
     g.graphDiv.appendChild(this.canvas_)
@@ -389,6 +388,6 @@ Dygraph.Plugins.Crosshair = (function() {
 
   return crosshair
 })()
-/* eslint-enable */
+/* tslint:enable */
 
 export default Dygraph

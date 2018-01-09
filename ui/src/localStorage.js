@@ -7,12 +7,11 @@ export const loadLocalStorage = errorsQueue => {
 
     const state = JSON.parse(serializedState) || {}
 
-    // eslint-disable-next-line no-undef
-    if (state.VERSION && state.VERSION !== VERSION) {
+    if (state.VERSION && state.VERSION !== process.env.VERSION) {
       const errorText =
         'New version of Chronograf detected. Local settings cleared.'
 
-      console.log(errorText) // eslint-disable-line no-console
+      console.log(errorText) // tslint:disable-line no-console
       errorsQueue.push(errorText)
 
       if (!state.dashTimeV1) {
@@ -39,7 +38,7 @@ export const loadLocalStorage = errorsQueue => {
   } catch (error) {
     const errorText = `Loading local settings failed: ${error}`
 
-    console.error(errorText) // eslint-disable-line no-console
+    console.error(errorText)
     errorsQueue.push(errorText)
 
     return {}
@@ -65,12 +64,12 @@ export const saveToLocalStorage = ({
         dataExplorerQueryConfigs,
         timeRange,
         dataExplorer,
-        VERSION, // eslint-disable-line no-undef
+        VERSION: process.env.VERSION,
         dashTimeV1,
         dismissedNotifications,
       })
     )
   } catch (err) {
-    console.error('Unable to save data explorer: ', JSON.parse(err)) // eslint-disable-line no-console
+    console.error('Unable to save data explorer: ', JSON.parse(err))
   }
 }

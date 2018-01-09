@@ -1,8 +1,6 @@
-/* eslint-disable no-magic-numbers */
 import React, {Component, PropTypes} from 'react'
 import shallowCompare from 'react-addons-shallow-compare'
 import _ from 'lodash'
-import NanoDate from 'nano-date'
 
 import Dygraphs from 'src/external/dygraph'
 import getRange, {getStackedRange} from 'shared/parsing/getRangeForDygraph'
@@ -204,10 +202,12 @@ export default class Dygraph extends Component {
     const hashColorDygraphSeries = {}
 
     for (const seriesName in dygraphSeries) {
-      const series = dygraphSeries[seriesName]
-      const hashIndex = hasherino(seriesName, colors.length)
-      const color = colors[hashIndex]
-      hashColorDygraphSeries[seriesName] = {...series, color}
+      if (dygraphSeries.hasOwnProperty(seriesName)) {
+        const series = dygraphSeries[seriesName]
+        const hashIndex = hasherino(seriesName, colors.length)
+        const color = colors[hashIndex]
+        hashColorDygraphSeries[seriesName] = {...series, color}
+      }
     }
 
     return hashColorDygraphSeries
@@ -251,7 +251,7 @@ export default class Dygraph extends Component {
 
     if (!isMouseHoveringGraph) {
       this.setState({isHidden: true})
-      if (!this.visibility().find(bool => bool === true)) {
+      if (!this.visibility().find(boolean => boolean === true)) {
         this.setState({filterText: ''})
       }
     }
@@ -317,8 +317,7 @@ export default class Dygraph extends Component {
     if (!timeRange) {
       return ''
     }
-    const date = new NanoDate(timeRange)
-    return date.toISOString()
+    return moment(timeRange).format('YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ')
   }
 
   deselectCrosshair = () => {
@@ -348,7 +347,7 @@ export default class Dygraph extends Component {
     if (!isMouseHoveringLegend) {
       this.setState({isHidden: true})
 
-      if (!this.visibility().find(bool => bool === true)) {
+      if (!this.visibility().find(boolean => boolean === true)) {
         this.setState({filterText: ''})
       }
     }

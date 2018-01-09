@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* tslint:disable */
 const CodeMirror = require('codemirror')
 
 CodeMirror.defineSimpleMode = function(name, states) {

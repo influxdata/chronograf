@@ -1,44 +1,46 @@
+$font-path: '/assets/fonts/';
+
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 200;
-  src: url('Roboto-Thin.ttf');
+  src: url('#{$font-path}Roboto-Thin.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 300;
-  src: url('Roboto-Light.ttf');
+  src: url('#{$font-path}Roboto-Light.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: url('Roboto-Regular.ttf');
+  src: url('#{$font-path}Roboto-Regular.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
-  src: url('Roboto-Medium.ttf');
+  src: url('#{$font-path}Roboto-Medium.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 600;
-  src: url('Roboto-Bold.ttf');
+  src: url('#{$font-path}Roboto-Bold.ttf') format('truetype');
 }
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 700;
-  src: url('Roboto-Black.ttf');
+  src: url('#{$font-path}Roboto-Black.ttf') format('truetype');
 }
 @font-face {
   font-family: 'RobotoMono';
   font-style: normal;
   font-weight: 500;
-  src: url('RobotoMono-Medium.ttf');
+  src: url('#{$font-path}RobotoMono-Medium.ttf') format('truetype');
 }
 
 $default-font: 'Roboto', Helvetica, sans-serif;

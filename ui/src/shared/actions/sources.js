@@ -63,7 +63,6 @@ export const removeAndLoadSources = source => async dispatch => {
       // A 404 means that either a concurrent write occurred or the source
       // passed to this action creator doesn't exist (or is undefined)
       if (err.status !== HTTP_NOT_FOUND) {
-        // eslint-disable-line no-magic-numbers
         throw err
       }
     }

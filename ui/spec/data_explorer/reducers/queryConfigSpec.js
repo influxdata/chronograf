@@ -105,7 +105,7 @@ describe('Chronograf.Reducers.DataExplorer.queryConfigs', () => {
           })
         )
 
-        expect(newState[queryID].measurement).to.be.null
+        expect(newState[queryID].measurement).to.equal(null)
         expect(newState[queryID].fields.length).to.equal(0)
       })
     })

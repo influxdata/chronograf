@@ -2,7 +2,7 @@ import React from 'react'
 import ClusterError from 'shared/components/ClusterError'
 import PanelHeading from 'shared/components/PanelHeading'
 import PanelBody from 'shared/components/PanelBody'
-import errorCopy from 'hson!shared/copy/errors.hson'
+import errorCopy from 'shared/copy/errors'
 
 const NoDataNodeError = React.createClass({
   render() {

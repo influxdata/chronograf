@@ -5,7 +5,7 @@ import {fetchTimeSeriesAsync} from 'shared/actions/timeSeries'
 import {removeUnselectedTemplateValues} from 'src/dashboards/constants'
 
 const AutoRefresh = ComposedComponent => {
-  class wrapper extends Component {
+  class Wrapper extends Component {
     constructor() {
       super()
       this.state = {
@@ -201,7 +201,7 @@ const AutoRefresh = ComposedComponent => {
     string,
   } = PropTypes
 
-  wrapper.propTypes = {
+  Wrapper.propTypes = {
     children: element,
     autoRefresh: number.isRequired,
     templates: arrayOf(
@@ -238,7 +238,7 @@ const AutoRefresh = ComposedComponent => {
     grabDataForDownload: func,
   }
 
-  return wrapper
+  return Wrapper
 }
 
 export default AutoRefresh

@@ -11,8 +11,8 @@ const RenameCluster = React.createClass({
     this.props.onRenameCluster(this._displayName.value)
     this._displayName.value = ''
 
-    $('.modal').hide() // eslint-disable-line no-undef
-    $('.modal-backdrop').hide() // eslint-disable-line no-undef
+    $('.modal').hide()
+    $('.modal-backdrop').hide()
   },
 
   render() {

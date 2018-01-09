@@ -109,7 +109,7 @@ export async function getAllHosts(proxyLink, telegrafDB) {
 
     return hosts
   } catch (error) {
-    console.error(error) // eslint-disable-line no-console
+    console.error(error)
     throw error
   }
 }

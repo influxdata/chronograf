@@ -6,7 +6,7 @@ GOBINDATA := $(shell go list -f {{.Root}}  github.com/jteeuwen/go-bindata 2> /de
 YARN := $(shell command -v yarn 2> /dev/null)
 
 SOURCES := $(shell find . -name '*.go' ! -name '*_gen.go' -not -path "./vendor/*" )
-UISOURCES := $(shell find ui -type f -not \( -path ui/build/\* -o -path ui/node_modules/\* -prune \) )
+UISOURCES := $(shell find ui -type f -not \( -path ui/build/assets/\* -o -path ui/node_modules/\* -o -path ui/.fusebox/\* -o -name .DS_Store -prune \) )
 
 unexport LDFLAGS
 LDFLAGS=-ldflags "-s -X main.version=${VERSION} -X main.commit=${COMMIT}"

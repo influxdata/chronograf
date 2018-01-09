@@ -5,23 +5,18 @@ import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 class UserEditName extends Component {
   constructor(props) {
     super(props)
-
-    this.handleKeyPress = ::this.handleKeyPress
-    this.handleEdit = ::this.handleEdit
   }
 
-  handleKeyPress(user) {
-    return e => {
-      if (e.key === 'Enter') {
-        this.props.onSave(user)
-      }
+  handleKeyPress = e => {
+    const {user, onSave} = this.props
+    if (e.key === 'Enter') {
+      onSave(user)
     }
   }
 
-  handleEdit(user) {
-    return e => {
-      this.props.onEdit(user, {[e.target.name]: e.target.value})
-    }
+  handleEdit = e => {
+    const {user, onEdit} = this.props
+    onEdit(user, {[e.target.name]: e.target.value})
   }
 
   render() {
@@ -34,8 +29,8 @@ class UserEditName extends Component {
           type="text"
           value={user.name || ''}
           placeholder="Username"
-          onChange={this.handleEdit(user)}
-          onKeyPress={this.handleKeyPress(user)}
+          onChange={this.handleEdit}
+          onKeyPress={this.handleKeyPress}
           autoFocus={true}
           spellCheck={false}
           autoComplete={false}

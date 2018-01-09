@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 import {TEMP_VAR_INTERVAL, AUTO_GROUP_BY} from 'shared/constants'
 import {NULL_STRING} from 'shared/constants/queryFillOptions'
@@ -9,7 +9,6 @@ import {
 } from 'src/dashboards/constants'
 import {shiftTimeRange} from 'shared/query/helpers'
 
-/* eslint-disable quotes */
 export const quoteIfTimestamp = ({lower, upper}) => {
   if (lower && lower.includes('Z') && !lower.includes("'")) {
     lower = `'${lower}'`
@@ -21,7 +20,6 @@ export const quoteIfTimestamp = ({lower, upper}) => {
 
   return {lower, upper}
 }
-/* eslint-enable quotes */
 
 export default function buildInfluxQLQuery(timeRange, config, shift) {
   const {groupBy, fill = NULL_STRING, tags, areTagsAccepted} = config

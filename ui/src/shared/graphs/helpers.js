@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import Dygraphs from 'src/external/dygraph'
 
 export const LINE_COLORS = [

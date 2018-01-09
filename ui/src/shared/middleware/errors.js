@@ -13,7 +13,7 @@ const actionsAllowedDuringBlackout = [
   'ERROR_',
 ]
 const notificationsBlackoutDuration = 5000
-let allowNotifications = true // eslint-disable-line
+let allowNotifications = true
 
 const errorsMiddleware = store => next => action => {
   const {auth: {me}} = store.getState()
@@ -25,14 +25,14 @@ const errorsMiddleware = store => next => action => {
       const message = _.get(error, 'data.message', '')
 
       const organizationWasRemoved =
-        message === `user's current organization was not found` // eslint-disable-line quotes
+        message === `user's current organization was not found`
       const wasSessionTimeout = me !== null
 
       store.dispatch(authExpired(auth))
 
       if (
         message ===
-        `This organization is private. To gain access, you must be explicitly added by an administrator.` // eslint-disable-line quotes
+        `This organization is private. To gain access, you must be explicitly added by an administrator.`
       ) {
         store.dispatch(notify(alertType, message))
       }

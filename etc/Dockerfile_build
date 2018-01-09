@@ -18,8 +18,9 @@ RUN pip install boto requests python-jose --upgrade
 RUN gem install fpm
 
 # Install node
-ENV NODE_VERSION v6.11.5
-RUN wget -q https://nodejs.org/dist/latest-v6.x/node-${NODE_VERSION}-linux-x64.tar.gz; \
+ENV NODE_MAJOR v8
+ENV NODE_VERSION v8.9.4
+RUN wget -q https://nodejs.org/dist/latest-${NODE_MAJOR}.x/node-${NODE_VERSION}-linux-x64.tar.gz; \
    tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C / --strip-components=1; \
    rm -f node-${NODE_VERSION}-linux-x64.tar.gz
 

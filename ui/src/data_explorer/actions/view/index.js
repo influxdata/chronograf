@@ -1,4 +1,4 @@
-import uuid from 'node-uuid'
+import * as uuid from 'node-uuid'
 
 import {getQueryConfig} from 'shared/apis'
 

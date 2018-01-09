@@ -206,30 +206,30 @@ describe('Kapacitor.Reducers.rules', () => {
 
     const alertNodeName = 'pushover'
 
-    const alertProperty1_Name = 'device'
-    const alertProperty1_ArgsOrig =
+    const alertProperty1Name = 'device'
+    const alertProperty1ArgsOrig =
       'pineapple_kingdom_control_room,bob_cOreos_watch'
-    const alertProperty1_ArgsDiff = 'pineapple_kingdom_control_tower'
+    const alertProperty1ArgsDiff = 'pineapple_kingdom_control_tower'
 
-    const alertProperty2_Name = 'URLTitle'
-    const alertProperty2_ArgsOrig = 'Cubeapple Rising'
-    const alertProperty2_ArgsDiff = 'Cubeapple Falling'
+    const alertProperty2Name = 'URLTitle'
+    const alertProperty2ArgsOrig = 'Cubeapple Rising'
+    const alertProperty2ArgsDiff = 'Cubeapple Falling'
 
-    const alertProperty1_Orig = {
-      name: alertProperty1_Name,
-      args: [alertProperty1_ArgsOrig],
+    const alertProperty1Orig = {
+      name: alertProperty1Name,
+      args: [alertProperty1ArgsOrig],
     }
-    const alertProperty1_Diff = {
-      name: alertProperty1_Name,
-      args: [alertProperty1_ArgsDiff],
+    const alertProperty1Diff = {
+      name: alertProperty1Name,
+      args: [alertProperty1ArgsDiff],
     }
-    const alertProperty2_Orig = {
-      name: alertProperty2_Name,
-      args: [alertProperty2_ArgsOrig],
+    const alertProperty2Orig = {
+      name: alertProperty2Name,
+      args: [alertProperty2ArgsOrig],
     }
-    const alertProperty2_Diff = {
-      name: alertProperty2_Name,
-      args: [alertProperty2_ArgsDiff],
+    const alertProperty2Diff = {
+      name: alertProperty2Name,
+      args: [alertProperty2ArgsDiff],
     }
 
     const initialState = {
@@ -253,31 +253,31 @@ describe('Kapacitor.Reducers.rules', () => {
     // add first property
     let newState = reducer(
       initialState,
-      updateAlertProperty(ruleID, alertNodeName, alertProperty1_Orig)
+      updateAlertProperty(ruleID, alertNodeName, alertProperty1Orig)
     )
-    expect(getAlertPropertyArgs(newState, alertProperty1_Name)).to.equal(
-      alertProperty1_ArgsOrig
+    expect(getAlertPropertyArgs(newState, alertProperty1Name)).to.equal(
+      alertProperty1ArgsOrig
     )
 
     // change first property
     newState = reducer(
       initialState,
-      updateAlertProperty(ruleID, alertNodeName, alertProperty1_Diff)
+      updateAlertProperty(ruleID, alertNodeName, alertProperty1Diff)
     )
-    expect(getAlertPropertyArgs(newState, alertProperty1_Name)).to.equal(
-      alertProperty1_ArgsDiff
+    expect(getAlertPropertyArgs(newState, alertProperty1Name)).to.equal(
+      alertProperty1ArgsDiff
     )
 
     // add second property
     newState = reducer(
       initialState,
-      updateAlertProperty(ruleID, alertNodeName, alertProperty2_Orig)
+      updateAlertProperty(ruleID, alertNodeName, alertProperty2Orig)
     )
-    expect(getAlertPropertyArgs(newState, alertProperty1_Name)).to.equal(
-      alertProperty1_ArgsDiff
+    expect(getAlertPropertyArgs(newState, alertProperty1Name)).to.equal(
+      alertProperty1ArgsDiff
     )
-    expect(getAlertPropertyArgs(newState, alertProperty2_Name)).to.equal(
-      alertProperty2_ArgsOrig
+    expect(getAlertPropertyArgs(newState, alertProperty2Name)).to.equal(
+      alertProperty2ArgsOrig
     )
     expect(
       newState[ruleID].alertNodes.find(node => node.name === alertNodeName)
@@ -287,13 +287,13 @@ describe('Kapacitor.Reducers.rules', () => {
     // change second property
     newState = reducer(
       initialState,
-      updateAlertProperty(ruleID, alertNodeName, alertProperty2_Diff)
+      updateAlertProperty(ruleID, alertNodeName, alertProperty2Diff)
     )
-    expect(getAlertPropertyArgs(newState, alertProperty1_Name)).to.equal(
-      alertProperty1_ArgsDiff
+    expect(getAlertPropertyArgs(newState, alertProperty1Name)).to.equal(
+      alertProperty1ArgsDiff
     )
-    expect(getAlertPropertyArgs(newState, alertProperty2_Name)).to.equal(
-      alertProperty2_ArgsDiff
+    expect(getAlertPropertyArgs(newState, alertProperty2Name)).to.equal(
+      alertProperty2ArgsDiff
     )
     expect(
       newState[ruleID].alertNodes.find(node => node.name === alertNodeName)

@@ -3,7 +3,7 @@ import {
   formatDate,
   dashboardtoCSV,
 } from 'shared/parsing/resultsToCSV'
-import moment from 'moment'
+import * as moment from 'moment'
 
 describe('formatDate', () => {
   it('converts timestamp to an excel compatible date string', () => {

@@ -3,7 +3,6 @@
 // localStorage was chosen, for now, to simplify use of this app outside of electron.
 export default function makeAppStorage(localStorage) {
   return () => {
-    // eslint-disable-line no-unused-vars
     return next => {
       return action => {
         if (action.meta && action.meta.appStorage) {

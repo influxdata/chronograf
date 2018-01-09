@@ -206,7 +206,7 @@ const MeasurementList = React.createClass({
       const {errors, measurementSets} = showMeasurementsParser(resp.data)
       if (errors.length) {
         // TODO: display errors in the UI.
-        return console.error('InfluxDB returned error(s): ', errors) // eslint-disable-line no-console
+        return console.error('InfluxDB returned error(s): ', errors)
       }
 
       this.setState({

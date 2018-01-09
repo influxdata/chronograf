@@ -230,7 +230,7 @@ class AlertsTable extends Component {
               : null}
           </div>
           <div className="panel-body">
-            {this.renderTable()}
+            {this.renderTable()} beap
           </div>
         </div>
   }
@@ -243,9 +243,6 @@ class SearchBar extends Component {
     this.state = {
       searchTerm: '',
     }
-
-    this.handleSearch = ::this.handleSearch
-    this.handleChange = ::this.handleChange
   }
 
   componentWillMount() {
@@ -253,11 +250,11 @@ class SearchBar extends Component {
     this.handleSearch = _.debounce(this.handleSearch, waitPeriod)
   }
 
-  handleSearch() {
+  handleSearch = () => {
     this.props.onSearch(this.state.searchTerm)
   }
 
-  handleChange(e) {
+  handleChange = e => {
     this.setState({searchTerm: e.target.value}, this.handleSearch)
   }
 

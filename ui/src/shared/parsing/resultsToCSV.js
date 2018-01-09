@@ -1,5 +1,5 @@
-import _ from 'lodash'
-import moment from 'moment'
+import * as _ from 'lodash'
+import * as moment from 'moment'
 
 export const formatDate = timestamp =>
   moment(timestamp).format('M/D/YYYY h:mm:ss.SSSSSSSSS A')
@@ -24,10 +24,11 @@ export const resultsToCSV = results => {
     return {flag: 'ok', name, CSVString}
   }
 
-  const CSVString = [columns.join(',')]
+  const s = [columns.join(',')]
     .concat(values.map(row => row.join(',')))
     .join('\n')
-  return {flag: 'ok', name, CSVString}
+
+  return {flag: 'ok', name, CSVString: s}
 }
 
 export const dashboardtoCSV = data => {

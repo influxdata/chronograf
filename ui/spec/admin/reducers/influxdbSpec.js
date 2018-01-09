@@ -30,8 +30,6 @@ import {
   NEW_EMPTY_RP,
 } from 'src/admin/constants'
 
-let state
-
 // Users
 const u1 = {
   name: 'acidburn',
@@ -214,7 +212,7 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('it can add a user', () => {
-    state = {
+    const state = {
       users: [u1],
     }
 
@@ -228,7 +226,7 @@ describe('Admin.InfluxDB.Reducers', () => {
 
   it('it can sync a stale user', () => {
     const staleUser = {...u1, roles: []}
-    state = {users: [u2, staleUser]}
+    const state = {users: [u2, staleUser]}
 
     const actual = reducer(state, syncUser(staleUser, u1))
     const expected = {
@@ -240,7 +238,7 @@ describe('Admin.InfluxDB.Reducers', () => {
 
   it('it can edit a user', () => {
     const updates = {name: 'onecool'}
-    state = {
+    const state = {
       users: [u2, u1],
     }
 
@@ -253,7 +251,7 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('it can add a role', () => {
-    state = {
+    const state = {
       roles: [r1],
     }
 
@@ -267,7 +265,7 @@ describe('Admin.InfluxDB.Reducers', () => {
 
   it('it can sync a stale role', () => {
     const staleRole = {...r1, permissions: []}
-    state = {roles: [r2, staleRole]}
+    const state = {roles: [r2, staleRole]}
 
     const actual = reducer(state, syncRole(staleRole, r1))
     const expected = {
@@ -279,7 +277,7 @@ describe('Admin.InfluxDB.Reducers', () => {
 
   it('it can edit a role', () => {
     const updates = {name: 'onecool'}
-    state = {
+    const state = {
       roles: [r2, r1],
     }
 
@@ -292,6 +290,10 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('it can load the roles', () => {
+    const state = {
+      users,
+    }
+
     const actual = reducer(state, loadRoles({roles}))
     const expected = {
       roles,
@@ -301,7 +303,7 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('it can delete a role', () => {
-    state = {
+    const state = {
       roles: [r1],
     }
 
@@ -314,7 +316,7 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('it can delete a user', () => {
-    state = {
+    const state = {
       users: [u1],
     }
 
@@ -327,7 +329,7 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('can filter roles w/ "x" text', () => {
-    state = {
+    const state = {
       roles,
     }
 
@@ -342,7 +344,7 @@ describe('Admin.InfluxDB.Reducers', () => {
   })
 
   it('can filter users w/ "zero" text', () => {
-    state = {
+    const state = {
       users,
     }
 
@@ -358,6 +360,10 @@ describe('Admin.InfluxDB.Reducers', () => {
 
   // Permissions
   it('it can load the permissions', () => {
+    const state = {
+      users,
+    }
+
     const actual = reducer(state, loadPermissions({permissions}))
     const expected = {
       permissions,

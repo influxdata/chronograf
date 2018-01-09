@@ -4,8 +4,8 @@ export function parseAlerta(string) {
   const properties = []
   let match
 
+  // tslint:disable-next-line no-conditional-assignment
   while ((match = alertaRegex.exec(string))) {
-    // eslint-disable-line no-cond-assign
     for (let m = 1; m < match.length; m += 2) {
       if (match[m]) {
         properties.push({

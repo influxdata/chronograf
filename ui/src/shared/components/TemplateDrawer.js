@@ -1,5 +1,4 @@
 import React, {PropTypes} from 'react'
-import OnClickOutside from 'react-onclickoutside'
 import classnames from 'classnames'
 
 const TemplateDrawer = ({
@@ -38,4 +37,4 @@ TemplateDrawer.propTypes = {
   onClickTempVar: func.isRequired,
 }
 
-export default OnClickOutside(TemplateDrawer)
+export default TemplateDrawer
