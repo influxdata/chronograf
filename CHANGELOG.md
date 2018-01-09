@@ -1,13 +1,11 @@
-## v1.4.1.0 [unreleased]
+## v1.4.0.1 [2017-1-9]
 ### Features
-### UI Improvements
+1. [#2690](https://github.com/influxdata/chronograf/pull/2690): Add separate CLI flag for canned sources, kapacitors, dashboards, and organizations
+1. [#2672](https://github.com/influxdata/chronograf/pull/2672): Add telegraf interval configuration
+
 ### Bug Fixes
 1. [#2689](https://github.com/influxdata/chronograf/pull/2689): Allow insecure (self-signed) certificates for kapacitor and influxdb
-
-
-## v1.4.0.1 [unreleased]
-### UI Improvements
-1. [#2690](https://github.com/influxdata/chronograf/pull/2690): Add separate CLI flag for canned sources, kapacitors, dashboards, and organizations
+1. [#2664](https://github.com/influxdata/chronograf/pull/2664): Fix positioning of custom time indicator
 
 ## v1.4.0.0 [2017-12-22]
 ### UI Improvements
@@ -15,7 +13,6 @@
 
 ### Bug Fixes
 1. [#2652](https://github.com/influxdata/chronograf/pull/2652): Make page render successfully when attempting to edit a source
-1. [#2664](https://github.com/influxdata/chronograf/pull/2664): Fix CustomTimeIndicator positioning
 
 ## v1.4.0.0-rc2 [2017-12-21]
 ### UI Improvements
