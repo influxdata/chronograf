@@ -1,6 +1,9 @@
 package pipeline
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/influxdata/influxdb/influxql"
@@ -28,22 +31,25 @@ import (
 // Note: Derivative has its own implementation as a DerivativeNode instead of as part of the
 // InfluxQL functions.
 type InfluxQLNode struct {
-	chainnode
+	chainnode `json:"-"`
 
 	// tick:ignore
-	Method string
+	Method string `json:"-"`
 	// tick:ignore
-	Field string
+	Field string `json:"field"`
 
 	// The name of the field, defaults to the name of
 	// function used (i.e. .mean -> 'mean')
-	As string
+	As string `json:"as"`
 
 	// tick:ignore
-	ReduceCreater ReduceCreater
+	ReduceCreater ReduceCreater `json:"-"`
 
 	// tick:ignore
-	PointTimes bool `tick:"UsePointTimes"`
+	PointTimes bool `tick:"UsePointTimes" json:"usePointTimes"`
+
+	// tick:ignore
+	Args []interface{} `json:"args"`
 }
 
 func newInfluxQLNode(method, field string, wants, provides EdgeType, reducer ReduceCreater) *InfluxQLNode {
@@ -54,6 +60,98 @@ func newInfluxQLNode(method, field string, wants, provides EdgeType, reducer Red
 		As:            method,
 		ReduceCreater: reducer,
 	}
+}
+
+// MarshalJSON converts InfluxQLNode to JSON
+// tick:ignore
+func (n *InfluxQLNode) MarshalJSON() ([]byte, error) {
+	type Alias InfluxQLNode
+	var raw = &struct {
+		TypeOf
+		*Alias
+		Args []interface{} `json:"args"`
+	}{
+		TypeOf: TypeOf{
+			Type: n.Method,
+			ID:   n.ID(),
+		},
+		Alias: (*Alias)(n),
+		Args:  n.Args,
+	}
+	for i, arg := range raw.Args {
+		switch dur := arg.(type) {
+		case time.Duration:
+			raw.Args[i] = influxql.FormatDuration(dur)
+		}
+	}
+	return json.Marshal(raw)
+}
+
+// UnmarshalJSON converts JSON to an InfluxQLNode
+// tick:ignore
+func (n *InfluxQLNode) UnmarshalJSON(data []byte) error {
+	type Alias InfluxQLNode
+	var raw = &struct {
+		TypeOf
+		*Alias
+		Args []interface{} `json:"args"`
+	}{
+		Alias: (*Alias)(n),
+	}
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+	err := dec.Decode(&raw)
+	if err != nil {
+		return err
+	}
+	switch raw.Type {
+	case "count", "distinct", "mean", "median", "mode", "spread", "sum", "first":
+	case "last", "min", "max", "stddev", "difference", "cumulativeSum":
+	case "top", "bottom", "movingAverage":
+		for i, arg := range raw.Args {
+			switch num := arg.(type) {
+			case json.Number:
+				if raw.Args[i], err = num.Int64(); err != nil {
+					return err
+				}
+			}
+		}
+	case "elapsed", "holtWinters", "holtWintersWithFit":
+		for i, arg := range raw.Args {
+			switch a := arg.(type) {
+			case json.Number:
+				if raw.Args[i], err = a.Int64(); err != nil {
+					return err
+				}
+			case string:
+				if raw.Args[i], err = influxql.ParseDuration(a); err != nil {
+					return err
+				}
+			}
+		}
+	case "percentile":
+		for i, arg := range raw.Args {
+			switch a := arg.(type) {
+			case json.Number:
+				if raw.Args[i], err = a.Float64(); err != nil {
+					return err
+				}
+			}
+		}
+	default:
+		return fmt.Errorf("error unmarshaling node %d of type %s as InfluxQLNode", raw.ID, raw.Type)
+	}
+
+	for i, arg := range raw.Args {
+		switch integer := arg.(type) {
+		case int:
+			raw.Args[i] = int64(integer)
+		}
+	}
+	n.Args = raw.Args
+	n.Method = raw.Type
+	n.setID(raw.ID)
+	return nil
 }
 
 // Use the time of the selected point instead of the time of the batch.
@@ -139,11 +237,11 @@ func (n *chainnode) Mean(field string) *InfluxQLNode {
 // if you want the median point use `.percentile(field, 50.0)`.
 func (n *chainnode) Median(field string) *InfluxQLNode {
 	i := newInfluxQLNode("median", field, n.Provides(), StreamEdge, ReduceCreater{
-		CreateFloatBulkReducer: func() (FloatBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateFloatReducer: func() (influxql.FloatPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewFloatSliceFuncReducer(influxql.FloatMedianReduceSlice)
 			return fn, fn
 		},
-		CreateIntegerBulkFloatReducer: func() (IntegerBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateIntegerFloatReducer: func() (influxql.IntegerPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewIntegerSliceFuncFloatReducer(influxql.IntegerMedianReduceSlice)
 			return fn, fn
 		},
@@ -155,11 +253,11 @@ func (n *chainnode) Median(field string) *InfluxQLNode {
 // Compute the mode of the data.
 func (n *chainnode) Mode(field string) *InfluxQLNode {
 	i := newInfluxQLNode("mode", field, n.Provides(), StreamEdge, ReduceCreater{
-		CreateFloatBulkReducer: func() (FloatBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateFloatReducer: func() (influxql.FloatPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewFloatSliceFuncReducer(influxql.FloatModeReduceSlice)
 			return fn, fn
 		},
-		CreateIntegerBulkReducer: func() (IntegerBulkPointAggregator, influxql.IntegerPointEmitter) {
+		CreateIntegerReducer: func() (influxql.IntegerPointAggregator, influxql.IntegerPointEmitter) {
 			fn := influxql.NewIntegerSliceFuncReducer(influxql.IntegerModeReduceSlice)
 			return fn, fn
 		},
@@ -171,11 +269,11 @@ func (n *chainnode) Mode(field string) *InfluxQLNode {
 // Compute the difference between `min` and `max` points.
 func (n *chainnode) Spread(field string) *InfluxQLNode {
 	i := newInfluxQLNode("spread", field, n.Provides(), StreamEdge, ReduceCreater{
-		CreateFloatBulkReducer: func() (FloatBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateFloatReducer: func() (influxql.FloatPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewFloatSliceFuncReducer(influxql.FloatSpreadReduceSlice)
 			return fn, fn
 		},
-		CreateIntegerBulkReducer: func() (IntegerBulkPointAggregator, influxql.IntegerPointEmitter) {
+		CreateIntegerReducer: func() (influxql.IntegerPointAggregator, influxql.IntegerPointEmitter) {
 			fn := influxql.NewIntegerSliceFuncReducer(influxql.IntegerSpreadReduceSlice)
 			return fn, fn
 		},
@@ -292,16 +390,17 @@ func (n *chainnode) Max(field string) *InfluxQLNode {
 // Select a point at the given percentile. This is a selector function, no interpolation between points is performed.
 func (n *chainnode) Percentile(field string, percentile float64) *InfluxQLNode {
 	i := newInfluxQLNode("percentile", field, n.Provides(), StreamEdge, ReduceCreater{
-		CreateFloatBulkReducer: func() (FloatBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateFloatReducer: func() (influxql.FloatPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewFloatSliceFuncReducer(influxql.NewFloatPercentileReduceSliceFunc(percentile))
 			return fn, fn
 		},
-		CreateIntegerBulkReducer: func() (IntegerBulkPointAggregator, influxql.IntegerPointEmitter) {
+		CreateIntegerReducer: func() (influxql.IntegerPointAggregator, influxql.IntegerPointEmitter) {
 			fn := influxql.NewIntegerSliceFuncReducer(influxql.NewIntegerPercentileReduceSliceFunc(percentile))
 			return fn, fn
 		},
 		IsSimpleSelector: true,
 	})
+	i.Args = []interface{}{percentile}
 	n.linkChild(i)
 	return i
 }
@@ -318,7 +417,7 @@ func (n *chainnode) Top(num int64, field string, fieldsAndTags ...string) *Influ
 		tags[i] = i
 	}
 	i := newInfluxQLNode("top", field, n.Provides(), BatchEdge, ReduceCreater{
-		CreateFloatBulkReducer: func() (FloatBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateFloatReducer: func() (influxql.FloatPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewFloatSliceFuncReducer(influxql.NewFloatTopReduceSliceFunc(
 				int(num),
 				tags,
@@ -326,7 +425,7 @@ func (n *chainnode) Top(num int64, field string, fieldsAndTags ...string) *Influ
 			))
 			return fn, fn
 		},
-		CreateIntegerBulkReducer: func() (IntegerBulkPointAggregator, influxql.IntegerPointEmitter) {
+		CreateIntegerReducer: func() (influxql.IntegerPointAggregator, influxql.IntegerPointEmitter) {
 			fn := influxql.NewIntegerSliceFuncReducer(influxql.NewIntegerTopReduceSliceFunc(
 				int(num),
 				tags,
@@ -338,6 +437,10 @@ func (n *chainnode) Top(num int64, field string, fieldsAndTags ...string) *Influ
 			FieldsAndTags: fieldsAndTags,
 		},
 	})
+	i.Args = []interface{}{num}
+	for _, ft := range fieldsAndTags {
+		i.Args = append(i.Args, ft)
+	}
 	n.linkChild(i)
 	return i
 }
@@ -349,7 +452,7 @@ func (n *chainnode) Bottom(num int64, field string, fieldsAndTags ...string) *In
 		tags[i] = i
 	}
 	i := newInfluxQLNode("bottom", field, n.Provides(), BatchEdge, ReduceCreater{
-		CreateFloatBulkReducer: func() (FloatBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateFloatReducer: func() (influxql.FloatPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewFloatSliceFuncReducer(influxql.NewFloatBottomReduceSliceFunc(
 				int(num),
 				tags,
@@ -357,7 +460,7 @@ func (n *chainnode) Bottom(num int64, field string, fieldsAndTags ...string) *In
 			))
 			return fn, fn
 		},
-		CreateIntegerBulkReducer: func() (IntegerBulkPointAggregator, influxql.IntegerPointEmitter) {
+		CreateIntegerReducer: func() (influxql.IntegerPointAggregator, influxql.IntegerPointEmitter) {
 			fn := influxql.NewIntegerSliceFuncReducer(influxql.NewIntegerBottomReduceSliceFunc(
 				int(num),
 				tags,
@@ -369,6 +472,10 @@ func (n *chainnode) Bottom(num int64, field string, fieldsAndTags ...string) *In
 			FieldsAndTags: fieldsAndTags,
 		},
 	})
+	i.Args = []interface{}{num}
+	for _, ft := range fieldsAndTags {
+		i.Args = append(i.Args, ft)
+	}
 	n.linkChild(i)
 	return i
 }
@@ -380,11 +487,11 @@ func (n *chainnode) Bottom(num int64, field string, fieldsAndTags ...string) *In
 // Compute the standard deviation.
 func (n *chainnode) Stddev(field string) *InfluxQLNode {
 	i := newInfluxQLNode("stddev", field, n.Provides(), StreamEdge, ReduceCreater{
-		CreateFloatBulkReducer: func() (FloatBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateFloatReducer: func() (influxql.FloatPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewFloatSliceFuncReducer(influxql.FloatStddevReduceSlice)
 			return fn, fn
 		},
-		CreateIntegerBulkFloatReducer: func() (IntegerBulkPointAggregator, influxql.FloatPointEmitter) {
+		CreateIntegerFloatReducer: func() (influxql.IntegerPointAggregator, influxql.FloatPointEmitter) {
 			fn := influxql.NewIntegerSliceFuncFloatReducer(influxql.IntegerStddevReduceSlice)
 			return fn, fn
 		},
@@ -414,6 +521,7 @@ func (n *chainnode) Elapsed(field string, unit time.Duration) *InfluxQLNode {
 		},
 		IsStreamTransformation: true,
 	})
+	i.Args = []interface{}{unit}
 	n.linkChild(i)
 	return i
 }
@@ -449,6 +557,7 @@ func (n *chainnode) MovingAverage(field string, window int64) *InfluxQLNode {
 		},
 		IsStreamTransformation: true,
 	})
+	i.Args = []interface{}{window}
 	n.linkChild(i)
 	return i
 }
@@ -477,6 +586,7 @@ func (n *chainnode) holtWinters(field string, h, m int64, interval time.Duration
 	})
 	// Always use point times for Holt Winters
 	i.PointTimes = true
+	i.Args = []interface{}{h, m, interval, includeFitData}
 	n.linkChild(i)
 	return i
 }
