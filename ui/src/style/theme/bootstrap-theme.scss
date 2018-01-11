@@ -124,6 +124,12 @@ span.text-color-danger {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.icon.annotate-plus:before {
+  content: "\e952";
+}
+.icon.annotate:before {
+  content: "\e953";
+}
 .icon.maximize:before {
   content: "\e91f";
 }
@@ -358,8 +364,17 @@ span.text-color-danger {
 .icon.heroku-simple:before {
   content: "\e948";
 }
+.icon.oauth:before {
+  content: "\e94f";
+}
+.icon.authzero:before {
+  content: "\e951";
+}
 .icon.shuffle:before {
   content: "\e94e";
+}
+.icon.disks:before {
+  content: "\e950";
 }
 .icon.alert-triangle:before {
   content: "\f02d";
