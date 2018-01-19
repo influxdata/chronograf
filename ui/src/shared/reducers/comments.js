@@ -19,18 +19,18 @@ const initialState = [
 
 const commentsReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'LOAD_ANNOTATIONS': {
+    case 'LOAD_COMMENTS': {
       return action.payload.comments
     }
 
-    case 'UPDATE_ANNOTATION': {
+    case 'UPDATE_COMMENT': {
       const {comment} = action.payload
       const newState = state.map(a => (a.id === comment.id ? comment : a))
 
       return newState
     }
 
-    case 'DELETE_ANNOTATION': {
+    case 'DELETE_COMMENT': {
       const {comment} = action.payload
       const newState = state.filter(a => a.id !== comment.id)
 

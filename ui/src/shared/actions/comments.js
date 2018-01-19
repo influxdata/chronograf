@@ -1,19 +1,19 @@
 export const loadComments = comments => ({
-  type: 'LOAD_ANNOTATIONS',
+  type: 'LOAD_COMMENTS',
   payload: {
     comments,
   },
 })
 
 export const updateComment = comment => ({
-  type: 'UPDATE_ANNOTATION',
+  type: 'UPDATE_COMMENT',
   payload: {
     comment,
   },
 })
 
 export const deleteComment = comment => ({
-  type: 'DELETE_ANNOTATION',
+  type: 'DELETE_COMMENT',
   payload: {
     comment,
   },
