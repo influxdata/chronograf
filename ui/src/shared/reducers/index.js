@@ -5,7 +5,7 @@ import errors from './errors'
 import links from './links'
 import {notifications, dismissedNotifications} from './notifications'
 import sources from './sources'
-import annotations from './annotations'
+import comments from './comments'
 
 export default {
   app,
@@ -14,7 +14,7 @@ export default {
   config,
   errors,
   sources,
-  annotations,
+  comments,
   notifications,
   dismissedNotifications,
 }

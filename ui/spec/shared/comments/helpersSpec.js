@@ -1,4 +1,4 @@
-import {getAnnotations} from 'shared/annotations/helpers'
+import {getComments} from 'shared/comments/helpers'
 import Dygraph from 'src/external/dygraph'
 
 const start = 1515628800000
@@ -17,8 +17,6 @@ const labels = ['time', 'test.label']
 const div = document.createElement('div')
 const graph = new Dygraph(div, timeSeries, {labels})
 
-const oneHourMs = '3600000'
-
 const a1 = {
   group: '',
   name: 'a1',
@@ -35,25 +33,25 @@ const a2 = {
   text: 'you have no swoggels',
 }
 
-const annotations = [a1]
+const comments = [a1]
 
-describe('Shared.Annotations.Helpers', () => {
-  describe('getAnnotations', () => {
-    it('returns an empty array with no graph or annotations are provided', () => {
-      const actual = getAnnotations(undefined, annotations)
+describe('Shared.Comments.Helpers', () => {
+  describe('getComments', () => {
+    it('returns an empty array with no graph or comments are provided', () => {
+      const actual = getComments(undefined, comments)
       const expected = []
 
       expect(actual).to.deep.equal(expected)
     })
 
-    it('returns an annotation if it is in the time range', () => {
-      const actual = getAnnotations(graph, annotations)
-      const expected = annotations
+    it('returns an comment if it is in the time range', () => {
+      const actual = getComments(graph, comments)
+      const expected = comments
 
       expect(actual).to.deep.equal(expected)
     })
 
-    it('removes an annotation if it is out of the time range', () => {
+    it('removes an comment if it is out of the time range', () => {
       const outOfBounds = {
         group: '',
         name: 'not in time range',
@@ -61,39 +59,39 @@ describe('Shared.Annotations.Helpers', () => {
         duration: '',
       }
 
-      const newAnnos = [...annotations, outOfBounds]
-      const actual = getAnnotations(graph, newAnnos)
-      const expected = annotations
+      const newAnnos = [...comments, outOfBounds]
+      const actual = getComments(graph, newAnnos)
+      const expected = comments
 
       expect(actual).to.deep.equal(expected)
     })
 
     describe('with a duration', () => {
-      it('it adds an annotation', () => {
-        const withDurations = [...annotations, a2]
-        const actual = getAnnotations(graph, withDurations)
-        const expectedAnnotation = {
+      it('it adds an comment', () => {
+        const withDurations = [...comments, a2]
+        const actual = getComments(graph, withDurations)
+        const expectedComment = {
           ...a2,
           time: `${Number(a2.time) + Number(a2.duration)}`,
           duration: '',
         }
 
-        const expected = [...withDurations, expectedAnnotation]
+        const expected = [...withDurations, expectedComment]
         expect(actual).to.deep.equal(expected)
       })
 
-      it('does not add a duration annotation if it is out of bounds', () => {
-        const annotationWithOutOfBoundsDuration = {
+      it('does not add a duration comment if it is out of bounds', () => {
+        const commentWithOutOfBoundsDuration = {
           ...a2,
           duration: a2.time,
         }
 
         const withDurations = [
-          ...annotations,
-          annotationWithOutOfBoundsDuration,
+          ...comments,
+          commentWithOutOfBoundsDuration,
         ]
 
-        const actual = getAnnotations(graph, withDurations)
+        const actual = getComments(graph, withDurations)
         const expected = withDurations
 
         expect(actual).to.deep.equal(expected)

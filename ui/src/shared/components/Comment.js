@@ -1,29 +1,29 @@
 import React, {Component, PropTypes} from 'react'
 
-import AnnotationTooltip from 'src/shared/components/AnnotationTooltip'
+import CommentTooltip from 'src/shared/components/CommentTooltip'
 
 import {
   flagStyle,
   clickAreaStyle,
-  annotationStyle,
-} from 'src/shared/annotations/styles'
+  commentStyle,
+} from 'src/shared/comments/styles'
 
 const idAppendage = '-end'
 
-class Annotation extends Component {
+class Comment extends Component {
   state = {
     isDragging: false,
     isMouseOver: false,
   }
 
   isEndpoint = () => {
-    const {annotation: {id}} = this.props
+    const {comment: {id}} = this.props
 
     return id.substring(id.length - idAppendage.length) === idAppendage
   }
 
   getStartID = () => {
-    const {annotation: {id}} = this.props
+    const {comment: {id}} = this.props
 
     return id.substring(0, id.length - idAppendage.length)
   }
@@ -41,9 +41,9 @@ class Annotation extends Component {
   }
 
   handleMouseLeave = e => {
-    const {annotation} = this.props
+    const {comment} = this.props
 
-    if (e.relatedTarget.id === `tooltip-${annotation.id}`) {
+    if (e.relatedTarget.id === `tooltip-${comment.id}`) {
       return this.setState({isDragging: false})
     }
     this.setState({isDragging: false, isMouseOver: false})
@@ -55,8 +55,8 @@ class Annotation extends Component {
     }
 
     const {pageX} = e
-    const {annotation, annotations, dygraph, onUpdateAnnotation} = this.props
-    const {time, duration} = annotation
+    const {comment, comments, dygraph, onUpdateComment} = this.props
+    const {time, duration} = comment
     const {left} = dygraph.graphDiv.getBoundingClientRect()
     const [startX, endX] = dygraph.xAxisRange()
 
@@ -85,16 +85,16 @@ class Annotation extends Component {
     }
 
     if (this.isEndpoint()) {
-      const startAnnotation = annotations.find(a => a.id === this.getStartID())
-      if (!startAnnotation) {
-        return console.error('Start annotation does not exist')
+      const startComment = comments.find(a => a.id === this.getStartID())
+      if (!startComment) {
+        return console.error('Start comment does not exist')
       }
 
-      const newDuration = newTime - oldTime + Number(startAnnotation.duration)
+      const newDuration = newTime - oldTime + Number(startComment.duration)
 
       this.counter = this.counter + 1
-      return onUpdateAnnotation({
-        ...startAnnotation,
+      return onUpdateComment({
+        ...startComment,
         duration: `${newDuration}`,
       })
     }
@@ -103,46 +103,53 @@ class Annotation extends Component {
       const differenceInTimes = oldTime - newTime
       const newDuration = Number(duration) + differenceInTimes
 
-      return onUpdateAnnotation({
-        ...annotation,
+      return onUpdateComment({
+        ...comment,
         time: `${newTime}`,
         duration: `${newDuration}`,
       })
     }
 
-    onUpdateAnnotation({...annotation, time: `${newTime}`})
+    onUpdateComment({...comment, time: `${newTime}`})
 
     e.preventDefault()
     e.stopPropagation()
   }
 
-  handleConfirmUpdate = annotation => {
-    const {onUpdateAnnotation} = this.props
+  handleConfirmUpdate = comment => {
+    const {onUpdateComment} = this.props
 
     if (this.isEndpoint()) {
       const id = this.getStartID()
-      return onUpdateAnnotation({...annotation, id})
+      return onUpdateComment({...comment, id})
     }
 
-    onUpdateAnnotation(annotation)
+    onUpdateComment(comment)
   }
 
-  handleDeleteAnnotation = () => {
-    this.props.onDeleteAnnotation(this.props.annotation)
+  handleDeleteComment = () => {
+    const {onDeleteComment, comment} = this.props
+
+    if (this.isEndpoint()) {
+      const id = this.getStartID()
+      return onDeleteComment({...comment, id})
+    }
+
+    onDeleteComment(comment)
   }
 
   render() {
-    const {dygraph, annotation} = this.props
+    const {dygraph, comment} = this.props
     const {isDragging, isMouseOver} = this.state
 
-    const humanTime = `${new Date(+annotation.time)}`
-    const hasDuration = !!annotation.duration
+    const humanTime = `${new Date(+comment.time)}`
+    const hasDuration = !!comment.duration
 
     return (
       <div
-        className="dygraph-annotation"
-        style={annotationStyle(annotation, dygraph, isMouseOver, isDragging)}
-        data-time-ms={annotation.time}
+        className="dygraph-comment"
+        style={commentStyle(comment, dygraph, isMouseOver, isDragging)}
+        data-time-ms={comment.time}
         data-time-local={humanTime}
       >
         <div
@@ -161,12 +168,12 @@ class Annotation extends Component {
             this.isEndpoint()
           )}
         />
-        <AnnotationTooltip
-          annotation={annotation}
+        <CommentTooltip
+          comment={comment}
           onMouseLeave={this.handleMouseLeave}
-          annotationState={this.state}
+          commentState={this.state}
           onConfirmUpdate={this.handleConfirmUpdate}
-          onDelete={this.handleDeleteAnnotation}
+          onDelete={this.handleDeleteComment}
         />
       </div>
     )
@@ -175,16 +182,16 @@ class Annotation extends Component {
 
 const {arrayOf, func, shape, string} = PropTypes
 
-Annotation.propTypes = {
-  annotations: arrayOf(shape({})),
-  annotation: shape({
+Comment.propTypes = {
+  comments: arrayOf(shape({})),
+  comment: shape({
     id: string.isRequired,
     time: string.isRequired,
     duration: string,
   }).isRequired,
   dygraph: shape({}).isRequired,
-  onUpdateAnnotation: func.isRequired,
-  onDeleteAnnotation: func.isRequired,
+  onUpdateComment: func.isRequired,
+  onDeleteComment: func.isRequired,
 }
 
-export default Annotation
+export default Comment

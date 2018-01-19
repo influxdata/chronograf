@@ -13,26 +13,26 @@ const initialState = [
     name: 'anno2',
     time: '1515772377000',
     duration: '',
-    text: 'another annotation',
+    text: 'another comment',
   },
 ]
 
-const annotationsReducer = (state = initialState, action) => {
+const commentsReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_ANNOTATIONS': {
-      return action.payload.annotations
+      return action.payload.comments
     }
 
     case 'UPDATE_ANNOTATION': {
-      const {annotation} = action.payload
-      const newState = state.map(a => (a.id === annotation.id ? annotation : a))
+      const {comment} = action.payload
+      const newState = state.map(a => (a.id === comment.id ? comment : a))
 
       return newState
     }
 
     case 'DELETE_ANNOTATION': {
-      const {annotation} = action.payload
-      const newState = state.filter(a => a.id !== annotation.id)
+      const {comment} = action.payload
+      const newState = state.filter(a => a.id !== comment.id)
 
       return newState
     }
@@ -41,4 +41,4 @@ const annotationsReducer = (state = initialState, action) => {
   return state
 }
 
-export default annotationsReducer
+export default commentsReducer

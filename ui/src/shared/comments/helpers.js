@@ -1,15 +1,15 @@
-export const getAnnotations = (graph, annotations = []) => {
+export const getComments = (graph, comments = []) => {
   if (!graph) {
     return []
   }
 
   const [xStart, xEnd] = graph.xAxisRange()
-  return annotations.reduce((acc, a) => {
-    // Don't render if annotation.time is outside the graph
+  return comments.reduce((acc, a) => {
+    // Don't render if comment.time is outside the graph
     const time = +a.time
     const duration = +a.duration
     const endTime = time + duration
-    const endAnnotation = {
+    const endComment = {
       ...a,
       id: `${a.id}-end`,
       time: `${endTime}`,
@@ -18,7 +18,7 @@ export const getAnnotations = (graph, annotations = []) => {
 
     if (time < xStart) {
       if (endTime > xStart) {
-        return [...acc, a, endAnnotation]
+        return [...acc, a, endComment]
       }
 
       return acc
@@ -28,7 +28,7 @@ export const getAnnotations = (graph, annotations = []) => {
       return acc
     }
 
-    // If annotation does not have duration, include in array
+    // If comment does not have duration, include in array
     if (!duration) {
       return [...acc, a]
     }
@@ -39,6 +39,6 @@ export const getAnnotations = (graph, annotations = []) => {
     }
 
     // Render both the start and end point
-    return [...acc, a, endAnnotation]
+    return [...acc, a, endComment]
   }, [])
 }

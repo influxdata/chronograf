@@ -1,54 +1,50 @@
 import React, {Component, PropTypes} from 'react'
 
-import AnnotationInput from 'src/shared/components/AnnotationInput'
+import CommentInput from 'src/shared/components/CommentInput'
 
 import {
   tooltipStyle,
   tooltipItemsStyle,
   tooltipTimestampStyle,
-} from 'src/shared/annotations/styles'
+} from 'src/shared/comments/styles'
 
 const TimeStamp = ({time}) =>
   <div style={tooltipTimestampStyle}>
     {`${new Date(+time)}`}
   </div>
 
-class AnnotationTooltip extends Component {
+class CommentTooltip extends Component {
   state = {
-    annotation: this.props.annotation,
+    comment: this.props.comment,
   }
 
   handleChangeInput = key => value => {
-    const {annotation} = this.state
-    const newAnnotation = {...annotation, [key]: value}
+    const {comment} = this.state
+    const newComment = {...comment, [key]: value}
 
-    this.setState({annotation: newAnnotation})
+    this.setState({comment: newComment})
   }
 
   handleConfirmUpdate = () => {
-    this.props.onConfirmUpdate(this.state.annotation)
+    this.props.onConfirmUpdate(this.state.comment)
   }
 
   handleRejectUpdate = () => {
-    this.setState({annotation: this.props.annotation})
+    this.setState({comment: this.props.comment})
   }
 
   render() {
-    const {annotation} = this.state
-    const {
-      onMouseLeave,
-      annotationState,
-      annotationState: {isDragging},
-    } = this.props
+    const {comment} = this.state
+    const {onMouseLeave, commentState, commentState: {isDragging}} = this.props
 
     return (
       <div
-        id={`tooltip-${annotation.id}`}
+        id={`tooltip-${comment.id}`}
         onMouseLeave={onMouseLeave}
-        style={tooltipStyle(annotationState)}
+        style={tooltipStyle(commentState)}
       >
         {isDragging
-          ? <TimeStamp time={this.props.annotation.time} />
+          ? <TimeStamp time={this.props.comment.time} />
           : <div style={tooltipItemsStyle}>
               <button
                 className="btn btn-sm btn-danger btn-square"
@@ -56,19 +52,19 @@ class AnnotationTooltip extends Component {
               >
                 <span className="icon trash" />
               </button>
-              <AnnotationInput
-                value={annotation.name}
+              <CommentInput
+                value={comment.name}
                 onChangeInput={this.handleChangeInput('name')}
                 onConfirmUpdate={this.handleConfirmUpdate}
                 onRejectUpdate={this.handleRejectUpdate}
               />
-              <AnnotationInput
-                value={annotation.text}
+              <CommentInput
+                value={comment.text}
                 onChangeInput={this.handleChangeInput('text')}
                 onConfirmUpdate={this.handleConfirmUpdate}
                 onRejectUpdate={this.handleRejectUpdate}
               />
-              <TimeStamp time={this.props.annotation.time} />
+              <TimeStamp time={this.props.comment.time} />
             </div>}
       </div>
     )
@@ -80,12 +76,12 @@ const {func, shape, string} = PropTypes
 TimeStamp.propTypes = {
   time: string.isRequired,
 }
-AnnotationTooltip.propTypes = {
-  annotation: shape({}).isRequired,
+CommentTooltip.propTypes = {
+  comment: shape({}).isRequired,
   onMouseLeave: func.isRequired,
-  annotationState: shape({}),
+  commentState: shape({}),
   onConfirmUpdate: func.isRequired,
   onDelete: func.isRequired,
 }
 
-export default AnnotationTooltip
+export default CommentTooltip

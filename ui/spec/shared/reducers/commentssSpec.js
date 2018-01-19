@@ -1,10 +1,10 @@
-import reducer from 'shared/reducers/annotations'
+import reducer from 'shared/reducers/comments'
 
 import {
-  deleteAnnotation,
-  loadAnnotations,
-  updateAnnotation,
-} from 'shared/actions/annotations'
+  deleteComment,
+  loadComments,
+  updateComment,
+} from 'shared/actions/comments'
 
 const a1 = {
   id: '1',
@@ -24,27 +24,27 @@ const a2 = {
   text: 'you have no swoggels',
 }
 
-describe.only('Shared.Reducers.annotations', () => {
-  it('can load the annotations', () => {
+describe.only('Shared.Reducers.comments', () => {
+  it('can load the comments', () => {
     const state = []
     const expected = [{time: '0', duration: ''}]
-    const actual = reducer(state, loadAnnotations(expected))
+    const actual = reducer(state, loadComments(expected))
 
     expect(actual).to.deep.equal(expected)
   })
 
-  it('can update an annotation', () => {
+  it('can update an comment', () => {
     const state = [a1]
     const expected = [{...a1, time: ''}]
-    const actual = reducer(state, updateAnnotation(expected[0]))
+    const actual = reducer(state, updateComment(expected[0]))
 
     expect(actual).to.deep.equal(expected)
   })
 
-  it('can delete an annotation', () => {
+  it('can delete an comment', () => {
     const state = [a1, a2]
     const expected = [a2]
-    const actual = reducer(state, deleteAnnotation(a1))
+    const actual = reducer(state, deleteComment(a1))
 
     expect(actual).to.deep.equal(expected)
   })

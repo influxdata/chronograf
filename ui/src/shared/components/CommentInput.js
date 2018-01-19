@@ -6,9 +6,9 @@ import {
   tooltipFormStyle,
   tooltipInputButton,
   tooltipInput,
-} from 'src/shared/annotations/styles'
+} from 'src/shared/comments/styles'
 
-class AnnotationInput extends Component {
+class CommentInput extends Component {
   state = {
     isEditing: false,
   }
@@ -62,7 +62,7 @@ class AnnotationInput extends Component {
     const {value} = this.props
 
     return (
-      <div className="annotation-tooltip-input" style={tooltipInputContainer}>
+      <div className="comment-tooltip-input" style={tooltipInputContainer}>
         {isEditing
           ? <form onSubmit={this.handleFormSubmit} style={tooltipFormStyle}>
               <input
@@ -102,11 +102,11 @@ class AnnotationInput extends Component {
 
 const {func, string} = PropTypes
 
-AnnotationInput.propTypes = {
+CommentInput.propTypes = {
   value: string,
   onChangeInput: func.isRequired,
   onConfirmUpdate: func.isRequired,
   onRejectUpdate: func.isRequired,
 }
 
-export default onClickOutside(AnnotationInput)
+export default onClickOutside(CommentInput)

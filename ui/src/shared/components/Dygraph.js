@@ -6,7 +6,7 @@ import NanoDate from 'nano-date'
 
 import Dygraphs from 'src/external/dygraph'
 import DygraphLegend from 'src/shared/components/DygraphLegend'
-import Annotations from 'src/shared/components/Annotations'
+import Comments from 'src/shared/components/Comments'
 
 import getRange, {getStackedRange} from 'shared/parsing/getRangeForDygraph'
 import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
@@ -154,7 +154,7 @@ export default class Dygraph extends Component {
       plotter: isBarGraph ? barPlotter : null,
       legendFormatter: this.legendComponent.legendFormatter,
       drawCallback: graph => {
-        this.annotationsRef.setState({dygraph: graph})
+        this.commentsRef.setState({dygraph: graph})
       },
     }
 
@@ -319,14 +319,14 @@ export default class Dygraph extends Component {
     this.setState({isHidden: false})
   }
 
-  handleAnnotationsRef = ref => (this.annotationsRef = ref)
+  handleCommentsRef = ref => (this.commentsRef = ref)
 
   render() {
     const {isHidden} = this.state
 
     return (
       <div className="dygraph-child" onMouseLeave={this.deselectCrosshair}>
-        <Annotations annotationsRef={this.handleAnnotationsRef} />
+        <Comments commentsRef={this.handleCommentsRef} />
         <DygraphLegend
           dygraph={this.dygraph}
           graph={this.graphRef}

@@ -1,11 +1,11 @@
 import {NEUTRALS} from 'src/shared/constants/InfluxColors'
 
-// Styles for all things Annotations
-const annotationColor = '255,255,255'
-const annotationDragColor = '0,201,255'
+// Styles for all things Comments
+const commentColor = '255,255,255'
+const commentDragColor = '0,201,255'
 const zIndexWindow = '1'
-const zIndexAnnotation = '3'
-const zIndexAnnotationActive = '4'
+const zIndexComment = '3'
+const zIndexCommentActive = '4'
 
 export const flagStyle = (mouseOver, dragging, hasDuration, isEndpoint) => {
   const baseStyle = {
@@ -18,7 +18,7 @@ export const flagStyle = (mouseOver, dragging, hasDuration, isEndpoint) => {
     left: '-2px',
     width: '6px',
     height: '6px',
-    backgroundColor: `rgb(${annotationColor})`,
+    backgroundColor: `rgb(${commentColor})`,
     borderRadius: '50%',
     transition: 'background-color 0.25s ease, transform 0.25s ease',
   }
@@ -31,7 +31,7 @@ export const flagStyle = (mouseOver, dragging, hasDuration, isEndpoint) => {
       height: '0',
       left: '0',
       border: '6px solid transparent',
-      borderLeftColor: `rgb(${annotationColor})`,
+      borderLeftColor: `rgb(${commentColor})`,
       borderRadius: '0',
       background: 'none',
       transition: 'border-left-color 0.25s ease, transform 0.25s ease',
@@ -48,7 +48,7 @@ export const flagStyle = (mouseOver, dragging, hasDuration, isEndpoint) => {
       left: 'initial',
       right: '0',
       border: '6px solid transparent',
-      borderRightColor: `rgb(${annotationColor})`,
+      borderRightColor: `rgb(${commentColor})`,
       borderRadius: '0',
       background: 'none',
       transition: 'border-right-color 0.25s ease, transform 0.25s ease',
@@ -61,7 +61,7 @@ export const flagStyle = (mouseOver, dragging, hasDuration, isEndpoint) => {
       return {
         ...style,
         transform: 'scale(1.5,1.5)',
-        borderLeftColor: `rgb(${annotationDragColor})`,
+        borderLeftColor: `rgb(${commentDragColor})`,
       }
     }
 
@@ -69,14 +69,14 @@ export const flagStyle = (mouseOver, dragging, hasDuration, isEndpoint) => {
       return {
         ...style,
         transform: 'scale(1.5,1.5)',
-        borderRightColor: `rgb(${annotationDragColor})`,
+        borderRightColor: `rgb(${commentDragColor})`,
       }
     }
 
     return {
       ...style,
       transform: 'scale(1.5,1.5)',
-      backgroundColor: `rgb(${annotationDragColor})`,
+      backgroundColor: `rgb(${commentDragColor})`,
     }
   }
 
@@ -111,8 +111,8 @@ export const clickAreaStyle = dragging => {
   return style
 }
 
-export const tooltipStyle = annotationState => {
-  const {isDragging, isMouseOver} = annotationState
+export const tooltipStyle = commentState => {
+  const {isDragging, isMouseOver} = commentState
   const isVisible = isDragging || isMouseOver
 
   return {
@@ -150,7 +150,7 @@ export const tooltipFormStyle = {
 export const tooltipInputButton = {marginLeft: '2px'}
 export const tooltipInput = {flex: '1 0 0'}
 
-export const annotationStyle = ({time}, dygraph, isMouseOver, isDragging) => {
+export const commentStyle = ({time}, dygraph, isMouseOver, isDragging) => {
   // TODO: export and test this function
   const [startX, endX] = dygraph.xAxisRange()
   let visibility = 'visible'
@@ -167,30 +167,27 @@ export const annotationStyle = ({time}, dygraph, isMouseOver, isDragging) => {
     left,
     position: 'absolute',
     top: '8px',
-    backgroundColor: `rgb(${isDragging
-      ? annotationDragColor
-      : annotationColor})`,
+    backgroundColor: `rgb(${isDragging ? commentDragColor : commentColor})`,
     height: 'calc(100% - 36px)',
     width: `${width}px`,
     transition: 'background-color 0.25s ease',
-    transform: `translateX(-${width / 2}px)`, // translate should always be half with width to horizontally center the annotation pole
+    transform: `translateX(-${width / 2}px)`, // translate should always be half with width to horizontally center the comment pole
     visibility,
-    zIndex:
-      isDragging || isMouseOver ? zIndexAnnotationActive : zIndexAnnotation,
+    zIndex: isDragging || isMouseOver ? zIndexCommentActive : zIndexComment,
   }
 }
 
-export const annotationWindowStyle = (annotation, dygraph) => {
+export const commentWindowStyle = (comment, dygraph) => {
   // TODO: export and test this function
   const [startX, endX] = dygraph.xAxisRange()
   const containerLeftPadding = 16
-  const windowEnd = Number(annotation.time) + Number(annotation.duration)
+  const windowEnd = Number(comment.time) + Number(comment.duration)
 
-  let windowStartXCoord = dygraph.toDomXCoord(annotation.time)
+  let windowStartXCoord = dygraph.toDomXCoord(comment.time)
   let windowEndXCoord = dygraph.toDomXCoord(windowEnd)
   let visibility = 'visible'
 
-  if (annotation.time < startX) {
+  if (comment.time < startX) {
     windowStartXCoord = dygraph.toDomXCoord(startX)
   }
 
@@ -198,7 +195,7 @@ export const annotationWindowStyle = (annotation, dygraph) => {
     windowEndXCoord = dygraph.toDomXCoord(endX)
   }
 
-  if (windowEnd < startX || annotation.time > endX) {
+  if (windowEnd < startX || comment.time > endX) {
     visibility = 'hidden'
   }
 
@@ -209,8 +206,8 @@ export const annotationWindowStyle = (annotation, dygraph) => {
   const left = `${windowStartXCoord + containerLeftPadding + foo}px`
   const width = `${Math.abs(windowWidth)}px`
 
-  const gradientStartColor = `rgba(${annotationColor},0.15)`
-  const gradientEndColor = `rgba(${annotationColor},0)`
+  const gradientStartColor = `rgba(${commentColor},0.15)`
+  const gradientEndColor = `rgba(${commentColor},0)`
 
   return {
     left,
@@ -218,7 +215,7 @@ export const annotationWindowStyle = (annotation, dygraph) => {
     top: '8px',
     background: `linear-gradient(to bottom, ${gradientStartColor} 0%,${gradientEndColor} 100%)`,
     height: 'calc(100% - 36px)',
-    borderTop: `2px dotted rgba(${annotationColor},0.35)`,
+    borderTop: `2px dotted rgba(${commentColor},0.35)`,
     width,
     zIndex: zIndexWindow,
     visibility,
