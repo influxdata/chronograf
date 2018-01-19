@@ -5,14 +5,16 @@ import errors from './errors'
 import links from './links'
 import {notifications, dismissedNotifications} from './notifications'
 import sources from './sources'
+import comments from './comments'
 
 export default {
   app,
   auth,
+  links,
   config,
   errors,
-  links,
+  sources,
+  comments,
   notifications,
   dismissedNotifications,
-  sources,
 }

@@ -65,9 +65,9 @@ const Layout = (
 ) =>
   <LayoutCell
     cell={cell}
+    celldata={celldata}
     isEditable={isEditable}
     onEditCell={onEditCell}
-    celldata={celldata}
     onDeleteCell={onDeleteCell}
     onCancelEditCell={onCancelEditCell}
     onSummonOverlayTechnologies={onSummonOverlayTechnologies}

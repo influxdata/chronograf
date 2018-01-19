@@ -480,6 +480,7 @@ const mapStateToProps = (state, {params: {dashboardID}}) => {
     dashTimeV1,
     auth: {me, isUsingAuth},
   } = state
+
   const meRole = _.get(me, 'role', null)
 
   const timeRange =
@@ -492,16 +493,16 @@ const mapStateToProps = (state, {params: {dashboardID}}) => {
   )
 
   return {
-    dashboards,
-    autoRefresh,
-    dashboard,
-    timeRange,
-    showTemplateControlBar,
-    inPresentationMode,
-    cellQueryStatus,
     sources,
     meRole,
+    dashboard,
+    timeRange,
+    dashboards,
+    autoRefresh,
     isUsingAuth,
+    cellQueryStatus,
+    inPresentationMode,
+    showTemplateControlBar,
   }
 }
 

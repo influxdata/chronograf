@@ -5,11 +5,14 @@ import _ from 'lodash'
 import NanoDate from 'nano-date'
 
 import Dygraphs from 'src/external/dygraph'
-import getRange, {getStackedRange} from 'shared/parsing/getRangeForDygraph'
 import DygraphLegend from 'src/shared/components/DygraphLegend'
+import Comments from 'src/shared/components/Comments'
+
+import getRange, {getStackedRange} from 'shared/parsing/getRangeForDygraph'
 import {DISPLAY_OPTIONS} from 'src/dashboards/constants'
 import {buildDefaultYLabel} from 'shared/presenters'
 import {numberValueFormatter} from 'src/utils/formatting'
+
 import {
   OPTIONS,
   LINE_COLORS,
@@ -25,18 +28,8 @@ export default class Dygraph extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      legend: {
-        x: null,
-        series: [],
-      },
-      pageX: null,
-      sortType: '',
-      filterText: '',
       isSynced: false,
       isHidden: true,
-      isAscending: true,
-      isSnipped: false,
-      isFilterVisible: false,
     }
   }
 
@@ -56,7 +49,6 @@ export default class Dygraph extends Component {
       logscale: y.scale === LOG,
       colors: this.getLineColors(),
       series: this.hashColorDygraphSeries(),
-      legendFormatter: this.legendFormatter,
       highlightCallback: this.highlightCallback,
       unhighlightCallback: this.unhighlightCallback,
       plugins: [new Dygraphs.Plugins.Crosshair({direction: 'vertical'})],
@@ -160,7 +152,10 @@ export default class Dygraph extends Component {
       colors: this.getLineColors(),
       series: this.hashColorDygraphSeries(),
       plotter: isBarGraph ? barPlotter : null,
-      visibility: this.visibility(),
+      legendFormatter: this.legendComponent.legendFormatter,
+      drawCallback: graph => {
+        this.commentsRef.setState({dygraph: graph})
+      },
     }
 
     dygraph.updateOptions(updateOptions)
@@ -220,25 +215,6 @@ export default class Dygraph extends Component {
     }
   }
 
-  handleSortLegend = sortType => () => {
-    this.setState({sortType, isAscending: !this.state.isAscending})
-  }
-
-  handleLegendInputChange = e => {
-    this.setState({filterText: e.target.value})
-  }
-
-  handleSnipLabel = () => {
-    this.setState({isSnipped: !this.state.isSnipped})
-  }
-
-  handleToggleFilter = () => {
-    this.setState({
-      isFilterVisible: !this.state.isFilterVisible,
-      filterText: '',
-    })
-  }
-
   handleHideLegend = e => {
     const {top, bottom, left, right} = this.graphRef.getBoundingClientRect()
 
@@ -251,9 +227,6 @@ export default class Dygraph extends Component {
 
     if (!isMouseHoveringGraph) {
       this.setState({isHidden: true})
-      if (!this.visibility().find(bool => bool === true)) {
-        this.setState({filterText: ''})
-      }
     }
   }
 
@@ -268,22 +241,6 @@ export default class Dygraph extends Component {
       y.prefix.length * CHAR_PIXELS +
       y.suffix.length * CHAR_PIXELS
     )
-  }
-
-  visibility = () => {
-    const timeSeries = this.getTimeSeries()
-    const {filterText, legend} = this.state
-    const series = _.get(timeSeries, '0', [])
-    const numSeries = series.length
-    return Array(numSeries ? numSeries - 1 : numSeries)
-      .fill(true)
-      .map((s, i) => {
-        if (!legend.series[i]) {
-          return true
-        }
-
-        return !!legend.series[i].label.match(filterText)
-      })
   }
 
   getTimeSeries = () => {
@@ -305,7 +262,9 @@ export default class Dygraph extends Component {
     return buildDefaultYLabel(queryConfig)
   }
 
-  handleLegendRef = el => (this.legendRef = el)
+  handleLegendRef = el => (this.legendNodeRef = el)
+
+  handleLegendComponentRef = ref => (this.legendComponent = ref)
 
   resize = () => {
     this.dygraph.resizeElements_()
@@ -335,7 +294,12 @@ export default class Dygraph extends Component {
   }
 
   unhighlightCallback = e => {
-    const {top, bottom, left, right} = this.legendRef.getBoundingClientRect()
+    const {
+      top,
+      bottom,
+      left,
+      right,
+    } = this.legendNodeRef.getBoundingClientRect()
 
     const mouseY = e.clientY
     const mouseX = e.clientX
@@ -347,68 +311,30 @@ export default class Dygraph extends Component {
 
     if (!isMouseHoveringLegend) {
       this.setState({isHidden: true})
-
-      if (!this.visibility().find(bool => bool === true)) {
-        this.setState({filterText: ''})
-      }
     }
   }
 
   highlightCallback = ({pageX}) => {
-    this.pageX = pageX
+    this.legendComponent.setState({pageX})
     this.setState({isHidden: false})
   }
 
-  legendFormatter = legend => {
-    if (!legend.x) {
-      return ''
-    }
-
-    const {state: {legend: prevLegend}} = this
-    const highlighted = legend.series.find(s => s.isHighlighted)
-    const prevHighlighted = prevLegend.series.find(s => s.isHighlighted)
-
-    const yVal = highlighted && highlighted.y
-    const prevY = prevHighlighted && prevHighlighted.y
-
-    if (legend.x === prevLegend.x && yVal === prevY) {
-      return ''
-    }
-
-    this.setState({legend})
-    return ''
-  }
+  handleCommentsRef = ref => (this.commentsRef = ref)
 
   render() {
-    const {
-      legend,
-      sortType,
-      isHidden,
-      isSnipped,
-      filterText,
-      isAscending,
-      isFilterVisible,
-    } = this.state
+    const {isHidden} = this.state
 
     return (
       <div className="dygraph-child" onMouseLeave={this.deselectCrosshair}>
+        <Comments commentsRef={this.handleCommentsRef} />
         <DygraphLegend
-          {...legend}
+          dygraph={this.dygraph}
           graph={this.graphRef}
-          legend={this.legendRef}
-          pageX={this.pageX}
-          sortType={sortType}
-          onHide={this.handleHideLegend}
           isHidden={isHidden}
-          isFilterVisible={isFilterVisible}
-          isSnipped={isSnipped}
-          filterText={filterText}
-          isAscending={isAscending}
-          onSnip={this.handleSnipLabel}
-          onSort={this.handleSortLegend}
-          legendRef={this.handleLegendRef}
-          onToggleFilter={this.handleToggleFilter}
-          onInputChange={this.handleLegendInputChange}
+          legendNode={this.legendNodeRef}
+          onHide={this.handleHideLegend}
+          legendNodeRef={this.handleLegendRef}
+          legendComponent={this.handleLegendComponentRef}
         />
         <div
           ref={r => {
@@ -416,7 +342,7 @@ export default class Dygraph extends Component {
             this.props.dygraphRef(r)
           }}
           className="dygraph-child-container"
-          style={this.props.containerStyle}
+          style={{...this.props.containerStyle, zIndex: '2'}}
         />
       </div>
     )
