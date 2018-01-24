@@ -30,6 +30,7 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export default function configureStore(initialState, browserHistory) {
   const routingMiddleware = routerMiddleware(browserHistory)
+
   const createPersistentStore = composeEnhancers(
     persistStateEnhancer(),
     applyMiddleware(
