@@ -9,10 +9,15 @@ mapboxgl.accessToken =
 class Mapbox extends Component {
   constructor(props) {
     super(props)
+    this.state={
+      lat: this.props.lat,
+      lng: this.props.lng,
+      zoom: this.props.zoom
+    }
   }
 
   componentDidMount() {
-    const {lng, lat, zoom} = this.props
+    const {lng, lat, zoom} = this.state
 
     const map = new mapboxgl.Map({
       container: this.mapContainer,

@@ -6,10 +6,13 @@ import AutoRefresh from 'shared/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import SingleStat from 'shared/components/SingleStat'
 import GaugeChart from 'shared/components/GaugeChart'
+import MapGraph from 'shared/components/MapGraph'
 
 const RefreshingLineGraph = AutoRefresh(LineGraph)
 const RefreshingSingleStat = AutoRefresh(SingleStat)
 const RefreshingGaugeChart = AutoRefresh(GaugeChart)
+const RefreshingMapGraph = MapGraph
+
 
 const RefreshingGraph = ({
   axes,
@@ -64,6 +67,19 @@ const RefreshingGraph = ({
         cellHeight={cellHeight}
         resizerTopHeight={resizerTopHeight}
         resizeCoords={resizeCoords}
+      />
+    )
+  }
+
+  if (type === 'map') {
+    return (
+      <RefreshingMapGraph
+        colors={colors}
+        key={manualRefresh}
+        queries={[queries[0]]}
+        templates={templates}
+        autoRefresh={autoRefresh}
+        cellHeight={cellHeight}
       />
     )
   }
