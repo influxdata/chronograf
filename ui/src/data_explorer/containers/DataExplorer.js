@@ -75,6 +75,14 @@ class DataExplorer extends Component {
     this.setState({showWriteForm: true})
   }
 
+  handleCloseImageGetter = () => {
+    this.setState({showImageGetter: false})
+  }
+
+  handleOpenImageGetter = () => {
+    this.setState({showImageGetter: true})
+  }
+
   handleChooseTimeRange = bounds => {
     this.props.setTimeRange(bounds)
   }
@@ -110,10 +118,19 @@ class DataExplorer extends Component {
               />
             </OverlayTechnologies>
           : null}
+        {showImageGetter
+          ? <OverlayTechnologies>
+              <ImageGetter
+                source={source}
+                onClose={this.handleCloseImageGetter}
+              />
+            </OverlayTechnologies>
+          : null}
         <Header
           timeRange={timeRange}
           autoRefresh={autoRefresh}
           showWriteForm={this.handleOpenWriteData}
+          showImageGetter={this.handleOpenImageGetter}
           onChooseTimeRange={this.handleChooseTimeRange}
           onChooseAutoRefresh={handleChooseAutoRefresh}
           onManualRefresh={onManualRefresh}

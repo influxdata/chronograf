@@ -12,6 +12,7 @@ const Header = ({
   timeRange,
   autoRefresh,
   showWriteForm,
+  showImageGetter,
   onManualRefresh,
   onChooseTimeRange,
   onChooseAutoRefresh,
@@ -31,6 +32,14 @@ const Header = ({
         >
           <span className="icon pencil" />
           Write Data
+        </div>
+        <div
+          className="btn btn-sm btn-default"
+          onClick={showImageGetter}
+          data-test="write-data-button"
+        >
+          <span className="icon pencil" />
+          View Images
         </div>
         <AutoRefreshDropdown
           iconName="refresh"
@@ -53,6 +62,7 @@ Header.propTypes = {
   onManualRefresh: func.isRequired,
   autoRefresh: number.isRequired,
   showWriteForm: func.isRequired,
+  showImageGetter: func.isRequired,
   timeRange: shape({
     lower: string,
     upper: string,
