@@ -24,6 +24,15 @@ const App = React.createClass({
   render() {
     return (
       <div className="chronograf-root">
+        <link
+          href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.43.0/mapbox-gl.css"
+          rel="stylesheet"
+        />
+        <link
+          href="https://api.mapbox.com/mapbox-assembly/mbx/v0.18.0/assembly.min.css"
+          rel="stylesheet"
+        />
+
         <Notifications />
         <SideNav />
         {this.props.children &&
