@@ -11,8 +11,7 @@ import MapGraph from 'shared/components/MapGraph'
 const RefreshingLineGraph = AutoRefresh(LineGraph)
 const RefreshingSingleStat = AutoRefresh(SingleStat)
 const RefreshingGaugeChart = AutoRefresh(GaugeChart)
-const RefreshingMapGraph = MapGraph
-
+const RefreshingMapGraph = AutoRefresh(MapGraph)
 
 const RefreshingGraph = ({
   axes,
