@@ -6,3 +6,14 @@ export const writeLineProtocol = async (source, db, data) =>
     method: 'POST',
     data,
   })
+
+export const uploadImage = async (source, db, imageBlob) => {
+  let form = new FormData()
+  form.append('file', new Blob([imageBlob]))
+
+  return await AJAX({
+    url: `${source.links.images}`,
+    method: 'POST',
+    data: form,
+  })
+}

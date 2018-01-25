@@ -19,7 +19,10 @@ import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS, TEMPLATES} from '../constants'
 import {errorThrown} from 'shared/actions/errors'
 import {setAutoRefresh} from 'shared/actions/app'
 import * as dataExplorerActionCreators from 'src/data_explorer/actions/view'
-import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
+import {
+  writeLineProtocolAsync,
+  uploadImageAsync,
+} from 'src/data_explorer/actions/view/write'
 import {buildRawText} from 'src/utils/influxql'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
@@ -86,6 +89,7 @@ class DataExplorer extends Component {
       onManualRefresh,
       errorThrownAction,
       writeLineProtocol,
+      uploadImage,
       queryConfigActions,
       handleChooseAutoRefresh,
     } = this.props
@@ -102,6 +106,7 @@ class DataExplorer extends Component {
                 selectedDatabase={selectedDatabase}
                 onClose={this.handleCloseWriteData}
                 writeLineProtocol={writeLineProtocol}
+                uploadImage={uploadImage}
               />
             </OverlayTechnologies>
           : null}
@@ -175,6 +180,7 @@ DataExplorer.propTypes = {
     queryIDs: arrayOf(string).isRequired,
   }).isRequired,
   writeLineProtocol: func.isRequired,
+  uploadImage: func.isRequired,
   errorThrownAction: func.isRequired,
   onManualRefresh: func.isRequired,
   manualRefresh: number.isRequired,
@@ -215,6 +221,7 @@ const mapDispatchToProps = dispatch => {
       dispatch
     ),
     writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
+    uploadImage: bindActionCreators(uploadImageAsync, dispatch),
     queryConfigActions: bindActionCreators(
       dataExplorerActionCreators,
       dispatch

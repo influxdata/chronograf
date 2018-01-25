@@ -18,6 +18,7 @@ type sourceLinks struct {
 	Proxy       string `json:"proxy"`           // URL for proxy endpoint
 	Queries     string `json:"queries"`         // URL for the queries analysis endpoint
 	Write       string `json:"write"`           // URL for the write line-protocol endpoint
+	Images      string `json:"images"`           // URL for the write line-protocol endpoint
 	Permissions string `json:"permissions"`     // URL for all allowed permissions for this source
 	Users       string `json:"users"`           // URL for all users associated with this source
 	Roles       string `json:"roles,omitempty"` // URL for all users associated with this source
@@ -48,6 +49,7 @@ func newSourceResponse(src chronograf.Source) sourceResponse {
 			Proxy:       fmt.Sprintf("%s/%d/proxy", httpAPISrcs, src.ID),
 			Queries:     fmt.Sprintf("%s/%d/queries", httpAPISrcs, src.ID),
 			Write:       fmt.Sprintf("%s/%d/write", httpAPISrcs, src.ID),
+			Images:      fmt.Sprintf("%s/%d/images", httpAPISrcs, src.ID),
 			Permissions: fmt.Sprintf("%s/%d/permissions", httpAPISrcs, src.ID),
 			Users:       fmt.Sprintf("%s/%d/users", httpAPISrcs, src.ID),
 			Databases:   fmt.Sprintf("%s/%d/dbs", httpAPISrcs, src.ID),

@@ -48,17 +48,22 @@ class WriteDataForm extends Component {
   }
 
   handleSubmit = async () => {
-    const {onClose, source, writeLineProtocol} = this.props
+    const {onClose, source, writeLineProtocol, uploadImage} = this.props
     const {inputContent, uploadContent, selectedDatabase, isManual} = this.state
     const content = isManual ? inputContent : uploadContent
     this.setState({isUploading: true})
 
     try {
-      await writeLineProtocol(source, selectedDatabase, content)
+      if (this.state.isImage) {
+        await uploadImage(source, selectedDatabase, content)
+      } else {
+        await writeLineProtocol(source, selectedDatabase, content)
+      }
       this.setState({isUploading: false})
-      onClose()
-      window.location.reload()
+      // onClose()
+      // window.location.reload()
     } catch (error) {
+      console.log('about to fail', error)
       this.setState({isUploading: false})
       console.error(error.data.error)
     }
@@ -83,14 +88,32 @@ class WriteDataForm extends Component {
       return
     }
 
+    window.file = file
+
     e.preventDefault()
     e.stopPropagation()
 
+    let isImage = false
+
     const reader = new FileReader()
-    reader.readAsText(file)
+    reader.readAsArrayBuffer(file)
     reader.onload = loadEvent => {
+      var buffer = reader.result
+      var int32View = new Int32Array(buffer, 0, 1)
+      switch (int32View[0]) {
+        case 1196314761:
+        case 944130375:
+        case 544099650:
+        case -520103681:
+          isImage = true
+          break
+        default:
+          break
+      }
+
       this.setState({
-        uploadContent: loadEvent.target.result,
+        isImage,
+        uploadContent: reader.result,
         fileName: file.name,
       })
     }
@@ -178,6 +201,7 @@ WriteDataForm.propTypes = {
   }).isRequired,
   onClose: func.isRequired,
   writeLineProtocol: func.isRequired,
+  uploadImage: func.isRequired,
   errorThrown: func.isRequired,
   selectedDatabase: string,
 }
