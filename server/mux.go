@@ -133,6 +133,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	// Write proxies line protocol write requests to InfluxDB
 	router.POST("/chronograf/v1/sources/:id/write", EnsureViewer(service.Write))
 	router.POST("/chronograf/v1/sources/:id/images", EnsureViewer(service.Images))
+	router.GET("/chronograf/v1/sources/:id/images", EnsureViewer(service.Images))
 
 	// Queries is used to analyze a specific queries and does not create any
 	// resources. It's a POST because Queries are POSTed to InfluxDB, but this

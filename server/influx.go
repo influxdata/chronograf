@@ -12,7 +12,6 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/influx"
-	"github.com/sethgrid/gencurl"
 )
 
 // ValidInfluxRequest checks if queries specify a command.
@@ -165,9 +164,6 @@ func (s *Service) Images(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u.Path = "/image"
-
-	curl := gencurl.FromRequest(r)
-	fmt.Println(curl)
 
 	director := func(req *http.Request) {
 		// Set the Host header of the original source URL
