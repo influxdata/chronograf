@@ -18,9 +18,9 @@ class Mapbox extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidUpdate() {
     const { lng, lat, zoom } = this.state;
-    const { data_past, data_curr } = this.props;
+    const { data_past } = this.props;
 
     const map = new mapboxgl.Map({
       container: this.mapContainer,
