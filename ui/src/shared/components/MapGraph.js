@@ -1,51 +1,84 @@
-import React, {PropTypes, Component} from 'react'
-import Mapbox from 'shared/components/Mapbox'
-import _ from 'lodash'
+import React, { PropTypes, Component } from "react";
+import Mapbox from "shared/components/Mapbox";
+import _ from "lodash";
 
-import SingleStat from 'src/shared/components/SingleStat'
-import timeSeriesToDygraph from 'utils/timeSeriesToDygraph'
+import SingleStat from "src/shared/components/SingleStat";
+import timeSeriesToDygraph from "utils/timeSeriesToDygraph";
 
-import {SINGLE_STAT_LINE_COLORS} from 'src/shared/graphs/helpers'
+import { SINGLE_STAT_LINE_COLORS } from "src/shared/graphs/helpers";
 
 class MapGraph extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-        data_keys:['key1','name2']
-    //   data_past: []
-    }
+      data_keys: ["key1", "name2"]
+    };
   }
 
   componentWillMount() {
-    const {data} = this.props
-    // do something to data here
-    const dataAll= data[0].response.results[0].series
-    // const dataAll = [{"name":"1","columns":["_time","lat","lon"],"tags":{"hwid":"a"},"values":[[1516841493,0,0],[1516841494,10,10],[1516841495,20,20]]},{"name":"2","columns":["_time","lat","lon"],"tags":{"hwid":"b"},"values":[[1516841493,0,0],[1516841494,0,10],[1516841495,0,20]]},{"name":"3","columns":["_time","lat","lon"],"tags":{"hwid":"c"},"values":[[1516841493,0,0],[1516841494,10,0],[1516841495,20,0]]}]
+    const { data } = this.props;
+    //const dataAll= data[0].response.results[0].series
+    const dataAll = [
+      {
+        name: "1",
+        columns: ["_time", "lat", "lon"],
+        tags: { hwid: "a" },
+        values: [
+          [1516841493, 15, 0],
+          [1516841494, 10, 10],
+          [1516841495, 20, 20]
+        ]
+      },
+      {
+        name: "2",
+        columns: ["_time", "lat", "lon"],
+        tags: { hwid: "b" },
+        values: [[1516841493, 2, 3], [1516841494, 0, 10], [1516841495, 0, 22]]
+      },
+      {
+        name: "3",
+        columns: ["_time", "lat", "lon"],
+        tags: { hwid: "c" },
+        values: [
+          [1516841493, 5, 0],
+          [1516841494, 10, -10],
+          [1516841495, 20, 13]
+        ]
+      }
+    ];
 
-    const data_past=_.reduce(dataAll, (r, v)=>{
-        const vals = v.values
-        const mappedvals= _.map(vals, (arr)=>[arr[1],arr[2]])
-        r.push(mappedvals)
-        return r
-    }, [])
-    this.setState({data_past})
+    const data_past = _.reduce(
+      dataAll,
+      (r, v) => {
+        const vals = v.values;
+        const mappedvals = _.map(vals, arr => [arr[1], arr[2]]);
+        r.push(mappedvals);
+        return r;
+      },
+      []
+    );
+
+    const data_curr = _.map(data_past, arr => arr[arr.length - 1]);
+
+    this.setState({ data_past, data_curr });
   }
 
   render() {
-    const {data_past} = this.state
+    const { data_past, data_curr } = this.state;
     return (
       <Mapbox
         lat={0}
         lng={0}
         zoom={1}
         data_past={data_past}
+        data_curr={data_curr}
       />
-    )
+    );
   }
 }
 
-const {array, arrayOf, bool, func, number, shape, string} = PropTypes
+const { array, arrayOf, bool, func, number, shape, string } = PropTypes;
 
-MapGraph.propTypes = {}
+MapGraph.propTypes = {};
 
-export default MapGraph
+export default MapGraph;
