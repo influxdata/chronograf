@@ -66,21 +66,7 @@ class Mapbox extends Component {
         });
       });
 
-      const currentPointFeatures = _.reduce(
-        data_curr,
-        (r, v, k) => {
-          r.push({
-            type: "Feature",
-            geometry: { type: "Point", coordinates: [v] },
-            properties: { title: "Mapbox " + k, icon: "monument" }
-          });
-          return r;
-        },
-        []
-      );
-
       _.forEach(data_curr, (v, k) => {
-        console.log(v);
         map.addLayer({
           id: "points" + k,
           type: "symbol",
@@ -97,7 +83,7 @@ class Mapbox extends Component {
                     coordinates: v
                   },
                   properties: {
-                    title: "Mapbox DC",
+                    title: k,
                     icon: "monument"
                   }
                 }
