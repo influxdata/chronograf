@@ -18,7 +18,7 @@ class Mapbox extends Component {
     }
   }
 
-  componentDidMount() {
+    componentDidUpdate() {
     const {lng, lat, zoom} = this.state
     const {data_past} = this.props
 
@@ -40,6 +40,7 @@ class Mapbox extends Component {
     })
 
     map.on('load', function() {
+      console.log(data_past)
       _.forEach(data_past,(linepts)=>{
       map.addLayer({
         id: uuid.v4(),

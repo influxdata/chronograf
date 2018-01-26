@@ -52,7 +52,7 @@ func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, err
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 	command := q.Command
 	// TODO(timraymond): move this upper Query() function
 	if len(q.TemplateVars) > 0 {

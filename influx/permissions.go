@@ -110,11 +110,11 @@ func (r *showResults) RetentionPolicies() []chronograf.RetentionPolicy {
 					continue
 				} else {
 					d := chronograf.RetentionPolicy{
-						Name: name,
-						Duration: duration,
+						Name:          name,
+						Duration:      duration,
 						ShardDuration: sduration,
-						Replication: int32(replication),
-						Default: def,
+						Replication:   int32(replication),
+						Default:       def,
 					}
 					res = append(res, d)
 				}
