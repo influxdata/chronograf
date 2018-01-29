@@ -18,9 +18,10 @@ class Mapbox extends Component {
     };
   }
 
-  componentDidUpdate() {
+  // will need to be componentDidUpdate but getting warnings in browser
+  componentDidMount() {
     const { lng, lat, zoom } = this.state;
-    const { data_past } = this.props;
+    const { data_past, data_curr } = this.props;
 
     const map = new mapboxgl.Map({
       container: this.mapContainer,
@@ -66,39 +67,47 @@ class Mapbox extends Component {
         });
       });
 
-      _.forEach(data_curr, (v, k) => {
-        map.addLayer({
-          id: "points" + k,
-          type: "symbol",
-          source: {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
+      const data_curr_sum = _.reduce(
+        data_curr,
+        (r, v, k) => {
+          map.addLayer({
+            id: "points" + k,
+            type: "symbol",
+            source: {
+              type: "geojson",
+              data: {
+                type: "FeatureCollection",
 
-              features: [
-                {
-                  type: "Feature",
-                  geometry: {
-                    type: "Point",
-                    coordinates: v
-                  },
-                  properties: {
-                    title: k,
-                    icon: "monument"
+                features: [
+                  {
+                    type: "Feature",
+                    geometry: {
+                      type: "Point",
+                      coordinates: v
+                    },
+                    properties: {
+                      title: k,
+                      icon: "monument"
+                    }
                   }
-                }
-              ]
+                ]
+              }
+            },
+            layout: {
+              "icon-image": "{icon}-15",
+              "text-field": "{title}",
+              "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+              "text-offset": [0, 0.6],
+              "text-anchor": "top"
             }
-          },
-          layout: {
-            "icon-image": "{icon}-15",
-            "text-field": "{title}",
-            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-            "text-offset": [0, 0.6],
-            "text-anchor": "top"
+          });
+          if (r.length == 0) {
+            r == [0, 0];
           }
-        });
-      });
+          return r;
+        },
+        []
+      );
     });
   }
 

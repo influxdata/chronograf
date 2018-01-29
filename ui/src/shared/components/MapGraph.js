@@ -17,8 +17,7 @@ class MapGraph extends Component {
 
   componentWillMount() {
     const { data } = this.props;
-    //const dataAll= data[0].response.results[0].series
-    const dataAll = [
+    /*const dataAll = [
       {
         name: "1",
         columns: ["_time", "lat", "lon"],
@@ -45,22 +44,26 @@ class MapGraph extends Component {
           [1516841495, 20, 13]
         ]
       }
-    ];
+    ]; //*/
+    try {
+      console.log(this.props);
+      const dataAll = data[0].response.results[0].series;
+      data_past = _.reduce(
+        dataAll,
+        (r, v) => {
+          const vals = v.values;
+          const mappedvals = _.map(vals, arr => [arr[1], arr[2]]);
+          r.push(mappedvals);
+          return r;
+        },
+        []
+      );
 
-    const data_past = _.reduce(
-      dataAll,
-      (r, v) => {
-        const vals = v.values;
-        const mappedvals = _.map(vals, arr => [arr[1], arr[2]]);
-        r.push(mappedvals);
-        return r;
-      },
-      []
-    );
-
-    const data_curr = _.map(data_past, arr => arr[arr.length - 1]);
-
-    this.setState({ data_past, data_curr });
+      data_curr = _.map(data_past, arr => arr[arr.length - 1]);
+      this.setState({ data_past, data_curr });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   render() {
