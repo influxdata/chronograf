@@ -10,16 +10,14 @@ class SlackConfig extends Component {
     }
   }
 
-  handleSubmit = async e => {
+  handleSubmit = e => {
     e.preventDefault()
     const properties = {
       url: this.url.value,
       channel: this.channel.value,
     }
-    const success = await this.props.onSave(properties)
-    if (success) {
-      this.setState({testEnabled: true})
-    }
+    this.props.onSave(properties)
+    this.setState({testEnabled: true})
   }
   disableTest = () => {
     this.setState({testEnabled: false})

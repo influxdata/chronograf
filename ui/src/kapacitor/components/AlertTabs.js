@@ -84,14 +84,11 @@ class AlertTabs extends Component {
           type: 'success',
           text: `Alert configuration for ${section} successfully saved.`,
         })
-        return true
-      } catch ({data: {error}}) {
-        const errorMsg = _.join(_.drop(_.split(error, ': '), 2), ': ')
+      } catch (error) {
         this.props.addFlashMessage({
           type: 'error',
-          text: `There was an error saving the alert configuration for ${section}. ${errorMsg}`,
+          text: `There was an error saving the alert configuration for ${section}.`,
         })
-        return false
       }
     }
   }
@@ -100,18 +97,11 @@ class AlertTabs extends Component {
     e.preventDefault()
 
     try {
-      const {data} = await testAlertOutput(this.props.kapacitor, section)
-      if (data.success) {
-        this.props.addFlashMessage({
-          type: 'success',
-          text: `Successfully triggered an alert to ${section}. If the alert does not reach its destination, please check your configuration settings.`,
-        })
-      } else {
-        this.props.addFlashMessage({
-          type: 'error',
-          text: `There was an error sending an alert to ${section}: ${data.message}`,
-        })
-      }
+      await testAlertOutput(this.props.kapacitor, section)
+      this.props.addFlashMessage({
+        type: 'success',
+        text: `Successfully triggered an alert to ${section}. If the alert does not reach its destination, please check your configuration settings.`,
+      })
     } catch (error) {
       this.props.addFlashMessage({
         type: 'error',

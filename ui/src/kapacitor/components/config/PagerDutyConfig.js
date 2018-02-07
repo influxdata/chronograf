@@ -9,7 +9,7 @@ class PagerDutyConfig extends Component {
     }
   }
 
-  handleSubmit = async e => {
+  handleSubmit = e => {
     e.preventDefault()
 
     const properties = {
@@ -17,10 +17,8 @@ class PagerDutyConfig extends Component {
       url: this.url.value,
     }
 
-    const success = await this.props.onSave(properties)
-    if (success) {
-      this.setState({testEnabled: true})
-    }
+    this.props.onSave(properties)
+    this.setState({testEnabled: true})
   }
 
   disableTest = () => {

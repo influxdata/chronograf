@@ -8,21 +8,19 @@ class SMTPConfig extends Component {
     }
   }
 
-  handleSubmit = async e => {
+  handleSubmit = e => {
     e.preventDefault()
 
     const properties = {
       host: this.host.value,
       port: this.port.value,
       from: this.from.value,
-      to: this.to.value ? [this.to.value] : [],
       username: this.username.value,
       password: this.password.value,
     }
-    const success = await this.props.onSave(properties)
-    if (success) {
-      this.setState({testEnabled: true})
-    }
+
+    this.props.onSave(properties)
+    this.setState({testEnabled: true})
   }
 
   disableTest = () => {
@@ -30,7 +28,7 @@ class SMTPConfig extends Component {
   }
 
   render() {
-    const {host, port, from, username, password, to} = this.props.config.options
+    const {host, port, from, username, password} = this.props.config.options
 
     return (
       <form onSubmit={this.handleSubmit}>
@@ -58,7 +56,7 @@ class SMTPConfig extends Component {
           />
         </div>
 
-        <div className="form-group col-xs-6">
+        <div className="form-group col-xs-12">
           <label htmlFor="smtp-from">From Email</label>
           <input
             className="form-control"
@@ -67,18 +65,6 @@ class SMTPConfig extends Component {
             type="text"
             ref={r => (this.from = r)}
             defaultValue={from || ''}
-            onChange={this.disableTest}
-          />
-        </div>
-
-        <div className="form-group col-xs-12 col-md-6">
-          <label htmlFor="smtp-to">To Email</label>
-          <input
-            className="form-control"
-            id="smtp-to"
-            type="text"
-            ref={r => (this.to = r)}
-            defaultValue={to || ''}
             onChange={this.disableTest}
           />
         </div>

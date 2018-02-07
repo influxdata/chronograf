@@ -12,7 +12,7 @@ class TelegramConfig extends Component {
     }
   }
 
-  handleSubmit = async e => {
+  handleSubmit = e => {
     e.preventDefault()
 
     let parseMode
@@ -31,10 +31,8 @@ class TelegramConfig extends Component {
       token: this.token.value,
     }
 
-    const success = await this.props.onSave(properties)
-    if (success) {
-      this.setState({testEnabled: true})
-    }
+    this.props.onSave(properties)
+    this.setState({testEnabled: true})
   }
 
   disableTest = () => {
