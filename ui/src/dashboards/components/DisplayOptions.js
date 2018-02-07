@@ -51,6 +51,8 @@ class DisplayOptions extends Component {
       colorSingleStatText,
       onToggleSingleStatText,
       onSetSuffix,
+      staticLegend,
+      onToggleStaticLegend,
     } = this.props
     const {axes, axes: {y: {suffix}}} = this.state
 
@@ -92,6 +94,8 @@ class DisplayOptions extends Component {
             onSetPrefixSuffix={onSetPrefixSuffix}
             onSetYAxisBoundMin={onSetYAxisBoundMin}
             onSetYAxisBoundMax={onSetYAxisBoundMax}
+            onToggleStaticLegend={onToggleStaticLegend}
+            staticLegend={staticLegend}
           />
         )
     }
@@ -141,6 +145,8 @@ DisplayOptions.propTypes = {
   queryConfigs: arrayOf(shape()).isRequired,
   colorSingleStatText: bool.isRequired,
   onToggleSingleStatText: func.isRequired,
+  onToggleStaticLegend: func.isRequired,
+  staticLegend: bool,
 }
 
 export default DisplayOptions

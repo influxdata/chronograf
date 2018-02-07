@@ -20,6 +20,8 @@ const AxesOptions = ({
   onSetYAxisBoundMin,
   onSetYAxisBoundMax,
   selectedGraphType,
+  staticLegend,
+  onToggleStaticLegend,
 }) => {
   const [min, max] = bounds
 
@@ -108,13 +110,25 @@ const AxesOptions = ({
               onClickTab={onSetScale(LOG)}
             />
           </Tabber>
+          <Tabber labelText="Static Legend">
+            <Tab
+              text="Show"
+              isActive={staticLegend}
+              onClickTab={onToggleStaticLegend(true)}
+            />
+            <Tab
+              text="Hide"
+              isActive={!staticLegend}
+              onClickTab={onToggleStaticLegend(false)}
+            />
+          </Tabber>
         </form>
       </div>
     </FancyScrollbar>
   )
 }
 
-const {arrayOf, func, shape, string} = PropTypes
+const {arrayOf, bool, func, shape, string} = PropTypes
 
 AxesOptions.defaultProps = {
   axes: {
@@ -144,6 +158,8 @@ AxesOptions.propTypes = {
       defaultYLabel: string,
     }),
   }).isRequired,
+  onToggleStaticLegend: func.isRequired,
+  staticLegend: bool,
 }
 
 export default AxesOptions

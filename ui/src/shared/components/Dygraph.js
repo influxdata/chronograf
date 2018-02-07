@@ -7,6 +7,7 @@ import NanoDate from 'nano-date'
 
 import Dygraphs from 'src/external/dygraph'
 import DygraphLegend from 'src/shared/components/DygraphLegend'
+import StaticLegend from 'src/shared/components/StaticLegend'
 import Annotations from 'src/shared/components/Annotations'
 
 import getRange, {getStackedRange} from 'shared/parsing/getRangeForDygraph'
@@ -32,6 +33,7 @@ class Dygraph extends Component {
     this.state = {
       isSynced: false,
       isHidden: true,
+      staticLegendHeight: null,
     }
   }
 
@@ -296,15 +298,32 @@ class Dygraph extends Component {
 
   handleAnnotationsRef = ref => (this.annotationsRef = ref)
 
-  render() {
-    const {isHidden} = this.state
-    const {mode} = this.props
+  handleReceiveStaticLegendHeight = staticLegendHeight => {
+    this.setState({staticLegendHeight})
+  }
 
+  render() {
+    const {isHidden, staticLegendHeight} = this.state
+    const {staticLegend, mode} = this.props
     const hideLegend = mode === EDITING || mode === ADDING ? true : isHidden
+
+    let dygraphStyle = {...this.props.containerStyle, zIndex: '2'}
+    if (staticLegend) {
+      const cellVerticalPadding = 16
+
+      dygraphStyle = {
+        ...this.props.containerStyle,
+        zIndex: '2',
+        height: `calc(100% - ${staticLegendHeight + cellVerticalPadding}px)`,
+      }
+    }
 
     return (
       <div className="dygraph-child" onMouseLeave={this.deselectCrosshair}>
-        <Annotations annotationsRef={this.handleAnnotationsRef} />
+        <Annotations
+          annotationsRef={this.handleAnnotationsRef}
+          staticLegendHeight={staticLegendHeight}
+        />
         {this.dygraph &&
           <DygraphLegend
             isHidden={hideLegend}
@@ -318,8 +337,16 @@ class Dygraph extends Component {
             this.props.dygraphRef(r)
           }}
           className="dygraph-child-container"
-          style={{...this.props.containerStyle, zIndex: '2'}}
+          style={dygraphStyle}
         />
+        {staticLegend
+          ? <StaticLegend
+              dygraph={this.dygraph}
+              handleReceiveStaticLegendHeight={
+                this.handleReceiveStaticLegendHeight
+              }
+            />
+          : null}
       </div>
     )
   }
@@ -347,6 +374,9 @@ Dygraph.defaultProps = {
   overrideLineColors: null,
   dygraphRef: () => {},
   onZoom: () => {},
+  staticLegend: {
+    type: null,
+  },
 }
 
 Dygraph.propTypes = {
@@ -365,6 +395,7 @@ Dygraph.propTypes = {
   containerStyle: shape({}),
   isGraphFilled: bool,
   isBarGraph: bool,
+  staticLegend: bool,
   overrideLineColors: array,
   dygraphSeries: shape({}).isRequired,
   ruleValues: shape({
