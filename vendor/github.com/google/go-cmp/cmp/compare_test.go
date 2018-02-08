@@ -6,8 +6,10 @@ package cmp_test
 
 import (
 	"bytes"
+	"crypto/md5"
 	"fmt"
 	"io"
+	"math"
 	"math/rand"
 	"reflect"
 	"regexp"
@@ -16,52 +18,16 @@ import (
 	"sync"
 	"testing"
 	"time"
-	"unicode"
-	"unicode/utf8"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	pb "github.com/google/go-cmp/cmp/internal/testprotos"
 	ts "github.com/google/go-cmp/cmp/internal/teststructs"
 )
 
 var now = time.Now()
-var boolType = reflect.TypeOf(true)
-var mutexType = reflect.TypeOf(sync.Mutex{})
 
 func intPtr(n int) *int { return &n }
-
-func equalRegexp(x, y *regexp.Regexp) bool {
-	if x == nil || y == nil {
-		return x == nil && y == nil
-	}
-	return x.String() == y.String()
-}
-
-func IgnoreUnexported(typs ...interface{}) cmp.Option {
-	m := make(map[reflect.Type]bool)
-	for _, typ := range typs {
-		t := reflect.TypeOf(typ)
-		if t.Kind() != reflect.Struct {
-			panic(fmt.Sprintf("invalid struct type: %T", typ))
-		}
-		m[t] = true
-	}
-	return cmp.FilterPath(func(p cmp.Path) bool {
-		if len(p) < 2 {
-			return false
-		}
-		sf, ok := p[len(p)-1].(cmp.StructField)
-		if !ok {
-			return false
-		}
-		return m[p[len(p)-2].Type()] && !isExported(sf.Name())
-	}, cmp.Ignore())
-}
-
-func isExported(id string) bool {
-	r, _ := utf8.DecodeRuneInString(id)
-	return unicode.IsUpper(r)
-}
 
 type test struct {
 	label     string       // Test description
@@ -83,7 +49,8 @@ func TestDiff(t *testing.T) {
 	tests = append(tests, project4Tests()...)
 
 	for _, tt := range tests {
-		tRun(t, tt.label, func(t *testing.T) {
+		tt := tt
+		tRunParallel(t, tt.label, func(t *testing.T) {
 			var gotDiff, gotPanic string
 			func() {
 				defer func() {
@@ -101,8 +68,8 @@ func TestDiff(t *testing.T) {
 				if gotPanic != "" {
 					t.Fatalf("unexpected panic message: %s", gotPanic)
 				}
-				if strings.TrimSpace(gotDiff) != strings.TrimSpace(tt.wantDiff) {
-					t.Fatalf("difference message:\ngot:\n%s\nwant:\n%s", gotDiff, tt.wantDiff)
+				if got, want := strings.TrimSpace(gotDiff), strings.TrimSpace(tt.wantDiff); got != want {
+					t.Fatalf("difference message:\ngot:\n%s\n\nwant:\n%s", got, want)
 				}
 			} else {
 				if !strings.Contains(gotPanic, tt.wantPanic) {
@@ -117,10 +84,9 @@ func comparerTests() []test {
 	const label = "Comparer"
 
 	return []test{{
-		label:    label,
-		x:        1,
-		y:        1,
-		wantDiff: "",
+		label: label,
+		x:     1,
+		y:     1,
 	}, {
 		label:     label,
 		x:         1,
@@ -147,7 +113,7 @@ func comparerTests() []test {
 			cmp.Comparer(func(x, y int) bool { return true }),
 			cmp.Transformer("", func(x int) float64 { return float64(x) }),
 		},
-		wantPanic: "ambiguous set of options",
+		wantPanic: "ambiguous set of applicable options",
 	}, {
 		label: label,
 		x:     1,
@@ -164,10 +130,9 @@ func comparerTests() []test {
 		opts:      []cmp.Option{struct{ cmp.Option }{}},
 		wantPanic: "unknown option",
 	}, {
-		label:    label,
-		x:        struct{ A, B, C int }{1, 2, 3},
-		y:        struct{ A, B, C int }{1, 2, 3},
-		wantDiff: "",
+		label: label,
+		x:     struct{ A, B, C int }{1, 2, 3},
+		y:     struct{ A, B, C int }{1, 2, 3},
 	}, {
 		label:    label,
 		x:        struct{ A, B, C int }{1, 2, 3},
@@ -244,17 +209,29 @@ func comparerTests() []test {
 		y:         []*regexp.Regexp{nil, regexp.MustCompile("a*b*c*")},
 		wantPanic: "cannot handle unexported field",
 	}, {
-		label:    label,
-		x:        []*regexp.Regexp{nil, regexp.MustCompile("a*b*c*")},
-		y:        []*regexp.Regexp{nil, regexp.MustCompile("a*b*c*")},
-		opts:     []cmp.Option{cmp.Comparer(equalRegexp)},
-		wantDiff: "",
+		label: label,
+		x:     []*regexp.Regexp{nil, regexp.MustCompile("a*b*c*")},
+		y:     []*regexp.Regexp{nil, regexp.MustCompile("a*b*c*")},
+		opts: []cmp.Option{cmp.Comparer(func(x, y *regexp.Regexp) bool {
+			if x == nil || y == nil {
+				return x == nil && y == nil
+			}
+			return x.String() == y.String()
+		})},
 	}, {
-		label:    label,
-		x:        []*regexp.Regexp{nil, regexp.MustCompile("a*b*c*")},
-		y:        []*regexp.Regexp{nil, regexp.MustCompile("a*b*d*")},
-		opts:     []cmp.Option{cmp.Comparer(equalRegexp)},
-		wantDiff: "{[]*regexp.Regexp}[1]:\n\t-: \"a*b*c*\"\n\t+: \"a*b*d*\"\n",
+		label: label,
+		x:     []*regexp.Regexp{nil, regexp.MustCompile("a*b*c*")},
+		y:     []*regexp.Regexp{nil, regexp.MustCompile("a*b*d*")},
+		opts: []cmp.Option{cmp.Comparer(func(x, y *regexp.Regexp) bool {
+			if x == nil || y == nil {
+				return x == nil && y == nil
+			}
+			return x.String() == y.String()
+		})},
+		wantDiff: `
+{[]*regexp.Regexp}[1]:
+	-: "a*b*c*"
+	+: "a*b*d*"`,
 	}, {
 		label: label,
 		x: func() ***int {
@@ -307,6 +284,22 @@ root:
 	+: "hello2"`,
 	}, {
 		label: label,
+		x:     md5.Sum([]byte{'a'}),
+		y:     md5.Sum([]byte{'b'}),
+		wantDiff: `
+{[16]uint8}:
+	-: [16]uint8{0x0c, 0xc1, 0x75, 0xb9, 0xc0, 0xf1, 0xb6, 0xa8, 0x31, 0xc3, 0x99, 0xe2, 0x69, 0x77, 0x26, 0x61}
+	+: [16]uint8{0x92, 0xeb, 0x5f, 0xfe, 0xe6, 0xae, 0x2f, 0xec, 0x3a, 0xd7, 0x1c, 0x77, 0x75, 0x31, 0x57, 0x8f}`,
+	}, {
+		label: label,
+		x:     new(fmt.Stringer),
+		y:     nil,
+		wantDiff: `
+:
+	-: &<nil>
+	+: <non-existent>`,
+	}, {
+		label: label,
 		x:     make([]int, 1000),
 		y:     make([]int, 1000),
 		opts: []cmp.Option{
@@ -325,6 +318,41 @@ root:
 			}, cmp.Ignore()),
 		},
 		wantPanic: "non-deterministic or non-symmetric function detected",
+	}, {
+		label: label,
+		x:     []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+		y:     []int{10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
+		opts: []cmp.Option{
+			cmp.Comparer(func(x, y int) bool {
+				return x < y
+			}),
+		},
+		wantPanic: "non-deterministic or non-symmetric function detected",
+	}, {
+		label: label,
+		x:     make([]string, 1000),
+		y:     make([]string, 1000),
+		opts: []cmp.Option{
+			cmp.Transformer("", func(x string) int {
+				return rand.Int()
+			}),
+		},
+		wantPanic: "non-deterministic function detected",
+	}, {
+		// Make sure the dynamic checks don't raise a false positive for
+		// non-reflexive comparisons.
+		label: label,
+		x:     make([]int, 10),
+		y:     make([]int, 10),
+		opts: []cmp.Option{
+			cmp.Transformer("", func(x int) float64 {
+				return math.NaN()
+			}),
+		},
+		wantDiff: `
+{[]int}:
+	-: []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	+: []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}`,
 	}}
 }
 
@@ -352,7 +380,7 @@ func transformerTests() []test {
 			cmp.Transformer("", func(in int) int { return in / 2 }),
 			cmp.Transformer("", func(in int) int { return in }),
 		},
-		wantPanic: "ambiguous set of options",
+		wantPanic: "ambiguous set of applicable options",
 	}, {
 		label: label,
 		x:     []int{0, -5, 0, -1},
@@ -383,7 +411,7 @@ func transformerTests() []test {
 				if in == 0 {
 					return "string"
 				}
-				return in
+				return float64(in)
 			}),
 		},
 		wantDiff: `
@@ -496,7 +524,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructA{},
 		y:     ts.ParentStructA{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructA{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructA{}),
 		},
 	}, {
 		label: label + "ParentStructA",
@@ -532,7 +560,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructB{},
 		y:     ts.ParentStructB{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructB{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructB{}),
 		},
 		wantPanic: "cannot handle unexported field",
 	}, {
@@ -540,8 +568,8 @@ func embeddedTests() []test {
 		x:     ts.ParentStructB{},
 		y:     ts.ParentStructB{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructB{}),
-			IgnoreUnexported(ts.PublicStruct{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructB{}),
+			cmpopts.IgnoreUnexported(ts.PublicStruct{}),
 		},
 	}, {
 		label: label + "ParentStructB",
@@ -582,7 +610,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructC{},
 		y:     ts.ParentStructC{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructC{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructC{}),
 		},
 	}, {
 		label: label + "ParentStructC",
@@ -624,7 +652,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructD{},
 		y:     ts.ParentStructD{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructD{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructD{}),
 		},
 		wantPanic: "cannot handle unexported field",
 	}, {
@@ -632,8 +660,8 @@ func embeddedTests() []test {
 		x:     ts.ParentStructD{},
 		y:     ts.ParentStructD{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructD{}),
-			IgnoreUnexported(ts.PublicStruct{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructD{}),
+			cmpopts.IgnoreUnexported(ts.PublicStruct{}),
 		},
 	}, {
 		label: label + "ParentStructD",
@@ -675,7 +703,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructE{},
 		y:     ts.ParentStructE{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructE{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructE{}),
 		},
 		wantPanic: "cannot handle unexported field",
 	}, {
@@ -683,8 +711,8 @@ func embeddedTests() []test {
 		x:     ts.ParentStructE{},
 		y:     ts.ParentStructE{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructE{}),
-			IgnoreUnexported(ts.PublicStruct{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructE{}),
+			cmpopts.IgnoreUnexported(ts.PublicStruct{}),
 		},
 	}, {
 		label: label + "ParentStructE",
@@ -734,7 +762,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructF{},
 		y:     ts.ParentStructF{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructF{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructF{}),
 		},
 		wantPanic: "cannot handle unexported field",
 	}, {
@@ -742,8 +770,8 @@ func embeddedTests() []test {
 		x:     ts.ParentStructF{},
 		y:     ts.ParentStructF{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructF{}),
-			IgnoreUnexported(ts.PublicStruct{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructF{}),
+			cmpopts.IgnoreUnexported(ts.PublicStruct{}),
 		},
 	}, {
 		label: label + "ParentStructF",
@@ -804,7 +832,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructG{},
 		y:     ts.ParentStructG{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructG{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructG{}),
 		},
 	}, {
 		label: label + "ParentStructG",
@@ -849,7 +877,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructH{},
 		y:     ts.ParentStructH{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructH{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructH{}),
 		},
 	}, {
 		label: label + "ParentStructH",
@@ -890,14 +918,14 @@ func embeddedTests() []test {
 		x:     ts.ParentStructI{},
 		y:     ts.ParentStructI{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructI{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructI{}),
 		},
 	}, {
 		label: label + "ParentStructI",
 		x:     createStructI(0),
 		y:     createStructI(0),
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructI{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructI{}),
 		},
 		wantPanic: "cannot handle unexported field",
 	}, {
@@ -905,7 +933,7 @@ func embeddedTests() []test {
 		x:     createStructI(0),
 		y:     createStructI(0),
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructI{}, ts.PublicStruct{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructI{}, ts.PublicStruct{}),
 		},
 	}, {
 		label: label + "ParentStructI",
@@ -952,7 +980,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructJ{},
 		y:     ts.ParentStructJ{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructJ{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructJ{}),
 		},
 		wantPanic: "cannot handle unexported field",
 	}, {
@@ -960,7 +988,7 @@ func embeddedTests() []test {
 		x:     ts.ParentStructJ{},
 		y:     ts.ParentStructJ{},
 		opts: []cmp.Option{
-			IgnoreUnexported(ts.ParentStructJ{}, ts.PublicStruct{}),
+			cmpopts.IgnoreUnexported(ts.ParentStructJ{}, ts.PublicStruct{}),
 		},
 	}, {
 		label: label + "ParentStructJ",
@@ -1029,7 +1057,7 @@ func methodTests() []test {
 		if m, ok := reflect.PtrTo(t).MethodByName("Equal"); ok {
 			tf := m.Func.Type()
 			return !tf.IsVariadic() && tf.NumIn() == 2 && tf.NumOut() == 1 &&
-				tf.In(0).AssignableTo(tf.In(1)) && tf.Out(0) == boolType
+				tf.In(0).AssignableTo(tf.In(1)) && tf.Out(0) == reflect.TypeOf(true)
 		}
 		return false
 	}, cmp.Transformer("Ref", func(x interface{}) interface{} {
@@ -1319,7 +1347,7 @@ func methodTests() []test {
 func project1Tests() []test {
 	const label = "Project1"
 
-	ignoreUnexported := IgnoreUnexported(
+	ignoreUnexported := cmpopts.IgnoreUnexported(
 		ts.EagleImmutable{},
 		ts.DreamerImmutable{},
 		ts.SlapImmutable{},
@@ -1392,8 +1420,7 @@ func project1Tests() []test {
 		y: ts.Eagle{Slaps: []ts.Slap{{
 			Args: &pb.MetaData{Stringer: pb.Stringer{"metadata"}},
 		}}},
-		opts:     []cmp.Option{cmp.Comparer(pb.Equal)},
-		wantDiff: "",
+		opts: []cmp.Option{cmp.Comparer(pb.Equal)},
 	}, {
 		label: label,
 		x: ts.Eagle{Slaps: []ts.Slap{{}, {}, {}, {}, {
@@ -1430,15 +1457,15 @@ func project1Tests() []test {
 	-: "southbay2"
 	+: "southbay"
 *{teststructs.Eagle}.Dreamers[1].Animal[0].(teststructs.Goat).Immutable.State:
-	-: 6
-	+: 5
+	-: testprotos.Goat_States(6)
+	+: testprotos.Goat_States(5)
 {teststructs.Eagle}.Slaps[0].Immutable.MildSlap:
 	-: false
 	+: true
-{teststructs.Eagle}.Slaps[0].Immutable.LoveRadius.Summer.Summary.Devices[1]:
+{teststructs.Eagle}.Slaps[0].Immutable.LoveRadius.Summer.Summary.Devices[1->?]:
 	-: "bar"
 	+: <non-existent>
-{teststructs.Eagle}.Slaps[0].Immutable.LoveRadius.Summer.Summary.Devices[2]:
+{teststructs.Eagle}.Slaps[0].Immutable.LoveRadius.Summer.Summary.Devices[2->?]:
 	-: "baz"
 	+: <non-existent>`,
 	}}
@@ -1524,14 +1551,11 @@ func project2Tests() []test {
 		}(),
 		opts: []cmp.Option{cmp.Comparer(pb.Equal), equalDish},
 		wantDiff: `
-{teststructs.GermBatch}.DirtyGerms[18][0]:
+{teststructs.GermBatch}.DirtyGerms[18][0->?]:
 	-: "germ2"
-	+: "germ3"
-{teststructs.GermBatch}.DirtyGerms[18][1]:
-	-: "germ3"
-	+: "germ4"
-{teststructs.GermBatch}.DirtyGerms[18][2]:
-	-: "germ4"
+	+: <non-existent>
+{teststructs.GermBatch}.DirtyGerms[18][?->2]:
+	-: <non-existent>
 	+: "germ2"`,
 	}, {
 		label: label,
@@ -1562,7 +1586,7 @@ func project2Tests() []test {
 {teststructs.GermBatch}.DirtyGerms[17]:
 	-: <non-existent>
 	+: []*testprotos.Germ{"germ1"}
-{teststructs.GermBatch}.DirtyGerms[18][2]:
+{teststructs.GermBatch}.DirtyGerms[18][2->?]:
 	-: "germ4"
 	+: <non-existent>
 {teststructs.GermBatch}.DishMap[1]:
@@ -1579,9 +1603,7 @@ func project3Tests() []test {
 
 	allowVisibility := cmp.AllowUnexported(ts.Dirt{})
 
-	ignoreLocker := cmp.FilterPath(func(p cmp.Path) bool {
-		return len(p) > 0 && p[len(p)-1].Type() == mutexType
-	}, cmp.Ignore())
+	ignoreLocker := cmpopts.IgnoreInterfaces(struct{ sync.Locker }{})
 
 	transformProtos := cmp.Transformer("", func(x pb.Dirt) *pb.Dirt {
 		return &x
@@ -1647,8 +1669,8 @@ func project3Tests() []test {
 	-: &teststructs.MockTable{state: []string{"a", "c"}}
 	+: &teststructs.MockTable{state: []string{"a", "b", "c"}}
 {teststructs.Dirt}.Discord:
-	-: 554
-	+: 500
+	-: teststructs.DiscordState(554)
+	+: teststructs.DiscordState(500)
 λ({teststructs.Dirt}.Proto):
 	-: "blah"
 	+: "proto"
@@ -1736,14 +1758,8 @@ func project4Tests() []test {
 		}(),
 		opts: []cmp.Option{allowVisibility, transformProtos, cmp.Comparer(pb.Equal)},
 		wantDiff: `
-{teststructs.Cartel}.Headquarter.subDivisions[0]:
+{teststructs.Cartel}.Headquarter.subDivisions[0->?]:
 	-: "alpha"
-	+: "bravo"
-{teststructs.Cartel}.Headquarter.subDivisions[1]:
-	-: "bravo"
-	+: "charlie"
-{teststructs.Cartel}.Headquarter.subDivisions[2]:
-	-: "charlie"
 	+: <non-existent>
 {teststructs.Cartel}.Headquarter.publicMessage[2]:
 	-: 0x03
@@ -1752,23 +1768,27 @@ func project4Tests() []test {
 	-: 0x04
 	+: 0x03
 {teststructs.Cartel}.poisons[0].poisonType:
-	-: 1
-	+: 5
-{teststructs.Cartel}.poisons[1]:
-	-: &teststructs.Poison{poisonType: 2, manufactuer: "acme2"}
+	-: testprotos.PoisonType(1)
+	+: testprotos.PoisonType(5)
+{teststructs.Cartel}.poisons[1->?]:
+	-: &teststructs.Poison{poisonType: testprotos.PoisonType(2), manufactuer: "acme2"}
 	+: <non-existent>`,
 	}}
 }
 
 // TODO: Delete this hack when we drop Go1.6 support.
-func tRun(t *testing.T, name string, f func(t *testing.T)) {
+func tRunParallel(t *testing.T, name string, f func(t *testing.T)) {
 	type runner interface {
 		Run(string, func(t *testing.T)) bool
 	}
 	var ti interface{} = t
 	if r, ok := ti.(runner); ok {
-		r.Run(name, f)
+		r.Run(name, func(t *testing.T) {
+			t.Parallel()
+			f(t)
+		})
 	} else {
+		// Cannot run sub-tests in parallel in Go1.6.
 		t.Logf("Test: %s", name)
 		f(t)
 	}
