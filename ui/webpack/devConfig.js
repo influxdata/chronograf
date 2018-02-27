@@ -10,10 +10,31 @@ const package = require('../package.json')
 const dependencies = package.dependencies
 
 const buildDir = path.resolve(__dirname, '../build')
+const babelLoader = {
+  loader: 'babel-loader',
+  options: {
+    cacheDirectory: true,
+    presets: [
+      'react',
+      [
+        'es2015',
+        {
+          modules: false,
+        },
+      ],
+      'es2016',
+    ],
+  },
+}
 
 module.exports = {
+  node: {
+    fs: 'empty',
+    module: 'empty',
+  },
   watch: true,
-  devtool: 'source-map',
+  cache: true,
+  devtool: 'inline-eval-cheap-source-map',
   entry: {
     app: path.resolve(__dirname, '..', 'src', 'index.js'),
     vendor: Object.keys(dependencies),
@@ -30,6 +51,7 @@ module.exports = {
       style: path.resolve(__dirname, '..', 'src', 'style'),
       utils: path.resolve(__dirname, '..', 'src', 'utils'),
     },
+    extensions: ['.ts', '.tsx', '.js'],
   },
   module: {
     noParse: [
@@ -41,55 +63,70 @@ module.exports = {
         'memoizerific.js'
       ),
     ],
-    preLoaders: [
+    loaders: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'eslint-loader',
-      },
-    ],
-    loaders: [
-      {
-        test: /\.json$/,
-        loader: 'json',
+        enforce: 'pre',
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader!sass-loader!resolve-url!sass?sourceMap'
-        ),
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader',
+            'sass-loader',
+            'resolve-url-loader',
+            'sass-loader?sourceMap',
+          ],
+        }),
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader!postcss-loader'
-        ),
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'postcss-loader'],
+        }),
       },
       {
         test: /\.(ico|png|cur|jpg|ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-        loader: 'file',
+        loader: 'file-loader',
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loader: 'babel-loader',
         query: {
           presets: ['es2015', 'react', 'stage-0'],
           cacheDirectory: true, // use a cache directory to speed up compilation
         },
       },
+      {
+        test: /\.ts(x?)$/,
+        exclude: /node_modules/,
+        use: [
+          babelLoader,
+          {
+            loader: 'ts-loader',
+          },
+        ],
+      },
     ],
   },
-  sassLoader: {
-    includePaths: [path.resolve(__dirname, 'node_modules')],
-  },
-  eslint: {
-    failOnWarning: false,
-    failOnError: false,
-  },
   plugins: [
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        postcss: require('./postcss'),
+        sassLoader: {
+          includePaths: [path.resolve(__dirname, 'node_modules')],
+        },
+        eslint: {
+          failOnWarning: false,
+          failOnError: false,
+        },
+      },
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.ProvidePlugin({
       $: 'jquery',
@@ -131,13 +168,14 @@ module.exports = {
       })
     }),
   ],
-  postcss: require('./postcss'),
   target: 'web',
   devServer: {
     hot: true,
     historyApiFallback: true,
     clientLogLevel: 'info',
-    stats: {colors: true},
+    stats: {
+      colors: true,
+    },
     contentBase: 'build',
     quiet: false,
     watchOptions: {

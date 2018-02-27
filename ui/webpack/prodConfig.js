@@ -1,12 +1,33 @@
 /* eslint-disable no-var */
-var webpack = require('webpack')
-var path = require('path')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
-var package = require('../package.json')
-var dependencies = package.dependencies
+const webpack = require('webpack')
+const path = require('path')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const package = require('../package.json')
+const dependencies = package.dependencies
 
-var config = {
+const babelLoader = {
+  loader: 'babel-loader',
+  options: {
+    cacheDirectory: true,
+    presets: [
+      'react',
+      [
+        'es2015',
+        {
+          modules: false,
+        },
+      ],
+      'es2016',
+    ],
+  },
+}
+
+const config = {
+  node: {
+    fs: "empty",
+    module: "empty"
+ },
   bail: true,
   devtool: 'eval',
   entry: {
@@ -26,6 +47,7 @@ var config = {
       style: path.resolve(__dirname, '..', 'src', 'style'),
       utils: path.resolve(__dirname, '..', 'src', 'utils'),
     },
+    extensions: ['.ts', '.tsx', '.js'],
   },
   module: {
     noParse: [
@@ -37,52 +59,67 @@ var config = {
         'memoizerific.js'
       ),
     ],
-    preLoaders: [
+    loaders: [
       {
         test: /\.js$/,
         exclude: [/node_modules/, /(_s|S)pec\.js$/],
         loader: 'eslint-loader',
-      },
-    ],
-    loaders: [
-      {
-        test: /\.json$/,
-        loader: 'json',
+        enforce: 'pre',
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader!sass-loader!resolve-url!sass?sourceMap'
-        ),
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader',
+            'sass-loader',
+            'resolve-url-loader',
+            'sass-loader?sourceMap',
+          ],
+        }),
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          'css-loader!postcss-loader'
-        ),
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'postcss-loader'],
+        }),
       },
       {
         test: /\.(ico|png|cur|jpg|ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-        loader: 'file',
+        loader: 'file-loader',
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loader: 'babel-loader',
         query: {
           presets: ['es2015', 'react', 'stage-0'],
           cacheDirectory: false, // Using the cache directory on production builds has never been helpful.
         },
       },
+      {
+        test: /\.ts(x?)$/,
+        exclude: /node_modules/,
+        use: [
+          babelLoader,
+          {
+            loader: 'ts-loader',
+          },
+        ],
+      },
     ],
   },
-  eslint: {
-    failOnWarning: false,
-    failOnError: false,
-  },
   plugins: [
+    new webpack.LoaderOptionsPlugin({
+      postcss: require('./postcss'),
+      options: {
+        eslint: {
+          failOnWarning: false,
+          failOnError: false,
+        },
+      },
+    }),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
@@ -128,7 +165,6 @@ var config = {
       VERSION: JSON.stringify(require('../package.json').version),
     }),
   ],
-  postcss: require('./postcss'),
   target: 'web',
 }
 

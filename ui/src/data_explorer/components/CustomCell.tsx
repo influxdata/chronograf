@@ -1,7 +1,12 @@
-import React, {PropTypes} from 'react'
+import React, {SFC} from 'react'
 import moment from 'moment'
 
-const CustomCell = ({data, columnName}) => {
+export interface CustomCellProps {
+  data?: string
+  columnName?: string
+}
+
+const CustomCell: SFC<CustomCellProps> = ({data, columnName}) => {
   if (columnName === 'time') {
     const date = moment(new Date(data)).format('MM/DD/YY hh:mm:ssA')
 
@@ -17,13 +22,6 @@ const CustomCell = ({data, columnName}) => {
       {data}
     </span>
   )
-}
-
-const {number, oneOfType, string} = PropTypes
-
-CustomCell.propTypes = {
-  data: oneOfType([number, string]),
-  columnName: string.isRequired,
 }
 
 export default CustomCell
