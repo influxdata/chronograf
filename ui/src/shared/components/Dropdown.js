@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {Link} from 'react-router'
 import classnames from 'classnames'
 import OnClickOutside from 'shared/components/OnClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
 
-class Dropdown extends Component {
+export class Dropdown extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -35,6 +36,7 @@ class Dropdown extends Component {
     if (disabled) {
       return
     }
+
     this.toggleMenu(e)
     if (this.props.onClick) {
       this.props.onClick(e)
@@ -140,11 +142,13 @@ class Dropdown extends Component {
           [menuClass]: menuClass,
         })}
         style={{width: menuWidth}}
+        data-test="dropdown-ul"
       >
         <FancyScrollbar
           autoHide={false}
           autoHeight={true}
           maxHeight={DROPDOWN_MENU_MAX_HEIGHT}
+          data-test="scrollbar"
         >
           {menuLabel
             ? <li className="dropdown-header">
@@ -161,6 +165,7 @@ class Dropdown extends Component {
                   highlight: i === highlightedItemIndex,
                   active: item.text === selected,
                 })}
+                data-test="dropdown-item"
                 key={i}
               >
                 <a
@@ -227,6 +232,7 @@ class Dropdown extends Component {
           open: isOpen,
           [className]: className,
         })}
+        data-test="dropdown-button"
       >
         {useAutoComplete && isOpen
           ? <div
