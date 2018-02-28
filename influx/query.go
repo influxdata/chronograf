@@ -63,8 +63,10 @@ func ParseTime(influxQL string, now time.Time) (time.Duration, error) {
 func Convert(influxQL string) (chronograf.QueryConfig, error) {
 	itsDashboardTime := false
 	intervalTime := false
+
 	if strings.Contains(influxQL, ":interval:") {
-		influxQL = strings.Replace(influxQL, ":interval:", "8675309ns", 1)
+		influxQL = strings.Replace(influxQL, " :interval: ", " time(:interval:) ", 1)
+		influxQL = strings.Replace(influxQL, ":interval:", "8675309ns", -1)
 		intervalTime = true
 	}
 
@@ -83,7 +85,7 @@ func Convert(influxQL string) (chronograf.QueryConfig, error) {
 	}
 
 	if intervalTime {
-		influxQL = strings.Replace(influxQL, "8675309ns", ":interval:", 1)
+		influxQL = strings.Replace(influxQL, "8675309ns", ":interval:", -1)
 	}
 
 	raw := chronograf.QueryConfig{
