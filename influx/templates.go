@@ -1,7 +1,6 @@
 package influx
 
 import (
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -38,8 +37,6 @@ func SortTemplates(ts []chronograf.TemplateVar) []chronograf.TemplateVar {
 	return ts
 }
 
-var groupByRe = regexp.MustCompile("(?i)GROUP BY :interval:")
-
 // RenderTemplate converts the template variable into a correct InfluxQL string based
 // on its type
 func RenderTemplate(query string, t chronograf.TemplateVar, now time.Time) (string, error) {
@@ -65,8 +62,6 @@ func RenderTemplate(query string, t chronograf.TemplateVar, now time.Time) (stri
 	for i := range t.Values {
 		tv[t.Values[i].Type] = t.Values[i].Value
 	}
-
-	query = groupByRe.ReplaceAllString(query, "GROUP BY time(:interval:)")
 
 	if pts, ok := tv["points"]; ok {
 		points, err := strconv.ParseInt(pts, 0, 64)
