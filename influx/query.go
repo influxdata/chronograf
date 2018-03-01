@@ -65,14 +65,6 @@ func Convert(influxQL string) (chronograf.QueryConfig, error) {
 	intervalTime := false
 
 	if strings.Contains(influxQL, ":interval:") {
-		// We're targeting statements like
-		// 		GROUP BY :interval FILL
-		//  	GROUP BY :interval, "path" FILL
-		// while avoiding statements like
-		// 		GROUP BY time(:interval:) FILL
-		// 		non_negative_derivative(mean("usage_user"), :interval:)
-		influxQL = strings.Replace(influxQL, " :interval: ", " time(:interval:) ", 1)
-		influxQL = strings.Replace(influxQL, " :interval:,", " time(:interval:),", 1)
 		influxQL = strings.Replace(influxQL, ":interval:", "8675309ns", -1)
 		intervalTime = true
 	}
