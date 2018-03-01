@@ -1,9 +1,10 @@
 {
-  parser: 'babel-eslint',
+  "parser": "babel-eslint",
   plugins: [
     'react',
     'prettier',
     'babel',
+    'jest',
   ],
   extends: [
     "prettier",
@@ -12,6 +13,7 @@
   env: {
     browser: true,
     mocha: true,
+    "jest": true,
   node: true,
     es6: true,
   },
@@ -247,6 +249,10 @@
       'bracketSpacing': false,
       'semi': false,
     }],
+
+    // jest
+    'jest/no-disabled-tests': "warn",
+    'jest/no-focused-tests': "error",
 
     // Babel
     'babel/no-invalid-this': 1
