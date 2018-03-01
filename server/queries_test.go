@@ -98,7 +98,7 @@ func TestService_Queries(t *testing.T) {
 			r: httptest.NewRequest("POST", "/queries", bytes.NewReader([]byte(`{
 					"queries": [
 					  {
-						"query": "SELECT \"pingReq\" FROM :dbs:.\"monitor\".\"httpd\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY :interval:",
+						"query": "SELECT \"pingReq\" FROM :dbs:.\"monitor\".\"httpd\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:)",
 						"id": "82b60d37-251e-4afe-ac93-ca20a3642b11"
 					  }
 					],
@@ -162,7 +162,7 @@ func TestService_Queries(t *testing.T) {
 					  }
 					]
 				  }`))),
-			want: `{"queries":[{"id":"82b60d37-251e-4afe-ac93-ca20a3642b11","query":"SELECT \"pingReq\" FROM :dbs:.\"monitor\".\"httpd\" WHERE time \u003e :dashboardTime: AND time \u003c :upperDashboardTime: GROUP BY :interval:","queryConfig":{"id":"82b60d37-251e-4afe-ac93-ca20a3642b11","database":"","measurement":"","retentionPolicy":"","fields":[],"tags":{},"groupBy":{"time":"","tags":[]},"areTagsAccepted":false,"rawText":"SELECT \"pingReq\" FROM :dbs:.\"monitor\".\"httpd\" WHERE time \u003e :dashboardTime: AND time \u003c :upperDashboardTime: GROUP BY :interval:","range":null,"shifts":[]},"queryTemplated":"SELECT \"pingReq\" FROM \"_internal\".\"monitor\".\"httpd\" WHERE time \u003e now() - 15m AND time \u003c now() GROUP BY time(2s)","tempVars":[{"tempVar":":upperDashboardTime:","values":[{"value":"now()","type":"constant","selected":true}]},{"tempVar":":dashboardTime:","values":[{"value":"now() - 15m","type":"constant","selected":true}]},{"tempVar":":dbs:","values":[{"value":"_internal","type":"database","selected":true}]},{"tempVar":":interval:","values":[{"value":"333","type":"points","selected":false}]}]}]}
+			want: `{"queries":[{"id":"82b60d37-251e-4afe-ac93-ca20a3642b11","query":"SELECT \"pingReq\" FROM :dbs:.\"monitor\".\"httpd\" WHERE time \u003e :dashboardTime: AND time \u003c :upperDashboardTime: GROUP BY time(:interval:)","queryConfig":{"id":"82b60d37-251e-4afe-ac93-ca20a3642b11","database":"","measurement":"","retentionPolicy":"","fields":[],"tags":{},"groupBy":{"time":"","tags":[]},"areTagsAccepted":false,"rawText":"SELECT \"pingReq\" FROM :dbs:.\"monitor\".\"httpd\" WHERE time \u003e :dashboardTime: AND time \u003c :upperDashboardTime: GROUP BY time(:interval:)","range":null,"shifts":[]},"queryTemplated":"SELECT \"pingReq\" FROM \"_internal\".\"monitor\".\"httpd\" WHERE time \u003e now() - 15m AND time \u003c now() GROUP BY time(2s)","tempVars":[{"tempVar":":upperDashboardTime:","values":[{"value":"now()","type":"constant","selected":true}]},{"tempVar":":dashboardTime:","values":[{"value":"now() - 15m","type":"constant","selected":true}]},{"tempVar":":dbs:","values":[{"value":"_internal","type":"database","selected":true}]},{"tempVar":":interval:","values":[{"value":"333","type":"points","selected":false}]}]}]}
 `,
 		},
 	}
