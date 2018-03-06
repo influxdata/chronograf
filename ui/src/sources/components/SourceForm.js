@@ -140,8 +140,8 @@ const SourceForm = ({
     <div className="form-group form-group-submit text-center col-xs-12 col-sm-6 col-sm-offset-3">
       <button
         className={classnames('btn btn-block', {
-          'btn-primary': editMode,
-          'btn-success': !editMode,
+          'btn-success': editMode,
+          'btn-primary': !editMode,
         })}
         type="submit"
       >
