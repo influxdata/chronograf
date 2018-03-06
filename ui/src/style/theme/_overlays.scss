@@ -1,0 +1,138 @@
+/*
+   Modal Overlays
+   -----------------------------------------------------------------------------
+   We don't say "Modal" here
+*/
+
+$overlay-z: 7777;
+$overlay-window-z: 8888;
+
+%overlay-styles {
+  position: fixed;
+  transition: opacity 0.25s ease;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.overlay-mask {
+  @extend %overlay-styles;
+  z-index: $overlay-z;
+  @include gradient-diag-down($c-pool,$c-comet);
+}
+
+.overlay {
+  transform: translateY(72px);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.overlay-window {
+  @extend %overlay-styles;
+  z-index: $overlay-window-z;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.overlay-container {
+  visibility: hidden;
+  transition: all 0.25s ease;
+
+  &.show {
+    visibility: visible;
+  }
+}
+
+.overlay-container.show {
+  .overlay-mask {
+    opacity: 0.7;
+  }
+  .overlay-window {
+    opacity: 1;
+  }
+  .overlay {
+    transform: translateY(0);
+  }
+}
+
+//  Overlay Contents
+//  ----------------------------------------------------------------------------
+
+.overlay-header {
+  background-color: $g0-obsidian;
+  height: 60px;
+  padding: 0 30px;
+  border-radius: 5px 5px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.overlay-header > .overlay-title {
+  font-size: 19px;
+  color: $g17-whisper;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 19px;
+  margin: 0;
+  @extend %no-user-select;
+}
+.overlay-dismiss {
+  border: 0;
+  background-color: transparent;
+  outline: none;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  left: 12px; // Aligns the right edge of the X with the edge of the gutter
+
+  /* Use psuedo elements to render the X */
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px;
+    background-color: $g11-sidewalk;
+    transition: background-color 0.25s ease;
+  }
+  &:before {
+    transform: translate(-50%,-50%) rotate(45deg);
+  }
+  &:after {
+    transform: translate(-50%,-50%) rotate(-45deg);
+  }
+  /* Hover State */
+  &:hover {
+    cursor: pointer;
+  }
+  &:hover:before,
+  &:hover:after {
+    background-color: $g18-cloud;
+  }
+}
+.overlay-body {
+  @include gradient-v($g2-kevlar,$g0-obsidian);
+  padding: 30px;
+  border-radius: 0 0 5px 5px;
+}
+.overlay-actions {
+  margin-top: 30px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}

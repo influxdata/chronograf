@@ -4,6 +4,7 @@ import {bindActionCreators} from 'redux'
 
 import SideNav from 'src/side_nav'
 import Notifications from 'shared/components/Notifications'
+import Overlay from 'shared/components/Overlay'
 
 import {publishNotification} from 'shared/actions/notifications'
 
@@ -25,6 +26,7 @@ const App = React.createClass({
     return (
       <div className="chronograf-root">
         <Notifications />
+        <Overlay />
         <SideNav />
         {this.props.children &&
           React.cloneElement(this.props.children, {
