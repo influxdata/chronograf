@@ -21,6 +21,15 @@
     color: $g13-mist;
     border: 1px solid $g5-pepper;
 
+    &__wrap {
+      overflow: visible;
+      white-space: normal;
+    }
+    &__truncate {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
     &__fixed-row,
     &__fixed-column {
         font-weight: 700;

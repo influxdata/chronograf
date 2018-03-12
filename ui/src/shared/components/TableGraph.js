@@ -10,6 +10,8 @@ import {
   DEFAULT_ROW_HEIGHT,
   COLUMN_PADDING,
   TABLE_TEXT_SINGLE_LINE,
+  TABLE_TEXT_WRAP,
+  TABLE_TEXT_TRUNCATE,
 } from 'shared/constants/tableGraph'
 
 class TableGraph extends Component {
@@ -26,6 +28,7 @@ class TableGraph extends Component {
   }
 
   cellRenderer = ({columnIndex, key, rowIndex, style}) => {
+    const {textWrapping} = this.props
     const data = this._data
     const columnCount = _.get(data, ['0', 'length'], 0)
     const rowCount = data.length
@@ -42,6 +45,8 @@ class TableGraph extends Component {
       'table-graph-cell__fixed-corner': isFixedCorner,
       'table-graph-cell__last-row': isLastRow,
       'table-graph-cell__last-column': isLastColumn,
+      'table-graph-cell__wrap': textWrapping === TABLE_TEXT_WRAP,
+      'table-graph-cell__truncate': textWrapping === TABLE_TEXT_TRUNCATE,
     })
 
     return (
@@ -52,20 +57,30 @@ class TableGraph extends Component {
   }
 
   measureColumnWidth = cell => {
+    const {textWrapping} = this.props
     const data = this._data
     const {index: columnIndex} = cell
     const columnValues = []
-    const rowCount = data.length
+    let longestValue = ''
 
-    for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-      columnValues[rowIndex] = data[rowIndex][columnIndex]
-        ? `${data[rowIndex][columnIndex]}`
-        : ''
+    if (
+      textWrapping === TABLE_TEXT_TRUNCATE ||
+      textWrapping === TABLE_TEXT_WRAP
+    ) {
+      longestValue = `${data[0][columnIndex]}`
+    } else if (textWrapping === TABLE_TEXT_SINGLE_LINE) {
+      const rowCount = data.length
+
+      for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+        columnValues[rowIndex] = data[rowIndex][columnIndex]
+          ? `${data[rowIndex][columnIndex]}`
+          : ''
+      }
+
+      longestValue = columnValues.reduce(
+        (a, b) => (a.length > b.length ? a : b)
+      )
     }
-
-    const longestValue = columnValues.reduce(
-      (a, b) => (a.length > b.length ? a : b)
-    )
 
     const {width} = calculateSize(longestValue, {
       font: 'Roboto',
