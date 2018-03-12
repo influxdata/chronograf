@@ -1,8 +1,16 @@
 import React, {PropTypes, Component} from 'react'
 import _ from 'lodash'
 import classnames from 'classnames'
+import calculateSize from 'calculate-size'
 import {timeSeriesToTable} from 'src/utils/timeSeriesToDygraph'
 import {MultiGrid} from 'react-virtualized'
+
+import {
+  DEFAULT_COLUMN_WIDTH,
+  DEFAULT_ROW_HEIGHT,
+  COLUMN_PADDING,
+  TABLE_TEXT_SINGLE_LINE,
+} from 'shared/constants/tableGraph'
 
 class TableGraph extends Component {
   componentWillMount() {
@@ -43,30 +51,55 @@ class TableGraph extends Component {
     )
   }
 
+  measureColumnWidth = cell => {
+    const data = this._data
+    const {index: columnIndex} = cell
+    const columnValues = []
+    const rowCount = data.length
+
+    for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      columnValues[rowIndex] = data[rowIndex][columnIndex]
+        ? `${data[rowIndex][columnIndex]}`
+        : ''
+    }
+
+    const longestValue = columnValues.reduce(
+      (a, b) => (a.length > b.length ? a : b)
+    )
+
+    const {width} = calculateSize(longestValue, {
+      font: 'Roboto',
+      fontSize: '13px',
+      fontWeight: 'bold',
+    })
+
+    return width + COLUMN_PADDING
+  }
+
   render() {
     const data = this._data
     const columnCount = _.get(data, ['0', 'length'], 0)
     const rowCount = data.length
-    const COLUMN_WIDTH = 300
-    const ROW_HEIGHT = 30
     const tableWidth = this.gridContainer ? this.gridContainer.clientWidth : 0
     const tableHeight = this.gridContainer ? this.gridContainer.clientHeight : 0
 
+    const dataExists = data.length > 2
     return (
       <div
         className="table-graph-container"
         ref={gridContainer => (this.gridContainer = gridContainer)}
       >
-        {data.length > 1 &&
+        {dataExists &&
           <MultiGrid
             fixedColumnCount={1}
             fixedRowCount={1}
             cellRenderer={this.cellRenderer}
             columnCount={columnCount}
-            columnWidth={COLUMN_WIDTH}
+            estimatedColumnSize={DEFAULT_COLUMN_WIDTH}
+            columnWidth={this.measureColumnWidth}
             height={tableHeight}
             rowCount={rowCount}
-            rowHeight={ROW_HEIGHT}
+            rowHeight={DEFAULT_ROW_HEIGHT}
             width={tableWidth}
             enableFixedColumnScroll={true}
             enableFixedRowScroll={true}
@@ -76,11 +109,16 @@ class TableGraph extends Component {
   }
 }
 
-const {arrayOf, number, shape} = PropTypes
+const {arrayOf, number, shape, string} = PropTypes
+
+TableGraph.defaultProps = {
+  textWrapping: TABLE_TEXT_SINGLE_LINE,
+}
 
 TableGraph.propTypes = {
   cellHeight: number,
   data: arrayOf(shape()),
+  textWrapping: string.isRequired,
 }
 
 export default TableGraph
