@@ -92,7 +92,7 @@ class TableGraph extends Component {
       rowIndex === parent.props.scrollToRow ||
       (rowIndex === hoveredRowIndex && hoveredRowIndex !== 0) ||
       (columnIndex === hoveredColumnIndex && hoveredColumnIndex !== 0)
-    const dataIsNumerical = _.isNumber([rowIndex][columnIndex])
+    const dataIsNumerical = _.isNumber(data[rowIndex][columnIndex])
 
     const cellClass = classnames('table-graph-cell', {
       'table-graph-cell__fixed-row': isFixedRow,
