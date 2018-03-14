@@ -1,9 +1,20 @@
-import React, {PropTypes, Component} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import _ from 'lodash'
 import classnames from 'classnames'
 import calculateSize from 'calculate-size'
-import {timeSeriesToTable} from 'src/utils/timeSeriesToDygraph'
+import moment from 'moment'
+
 import {MultiGrid} from 'react-virtualized'
+import {timeSeriesToTableGraph} from 'src/utils/timeSeriesToDygraph'
+import {
+  NULL_COLUMN_INDEX,
+  NULL_ROW_INDEX,
+  NULL_HOVER_TIME,
+  TIME_FORMAT_DEFAULT,
+} from 'src/shared/constants/tableGraph'
+
+const isEmpty = data => data.length <= 1
 
 import {
   DEFAULT_COLUMN_WIDTH,
@@ -15,29 +26,73 @@ import {
 } from 'shared/constants/tableGraph'
 
 class TableGraph extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      hoveredColumnIndex: NULL_COLUMN_INDEX,
+      hoveredRowIndex: NULL_ROW_INDEX,
+    }
+  }
+
   componentWillMount() {
-    this._labels = []
     this._data = [[]]
   }
 
   componentWillUpdate(nextProps) {
-    // TODO: determine if in dataExplorer
-    const {labels, data} = timeSeriesToTable(nextProps.data)
-    this._labels = labels
+    const {data} = timeSeriesToTableGraph(nextProps.data)
     this._data = data
   }
 
-  cellRenderer = ({columnIndex, key, rowIndex, style}) => {
-    const {textWrapping} = this.props
+  calcHoverTimeRow = (data, hoverTime) =>
+    !isEmpty(data) && hoverTime !== NULL_HOVER_TIME
+      ? data.findIndex(
+          row => row[0] && _.isNumber(row[0]) && row[0] >= hoverTime
+        )
+      : undefined
+
+  handleHover = (columnIndex, rowIndex) => () => {
+    if (this.props.onSetHoverTime) {
+      this.props.onSetHoverTime(this._data[rowIndex][0].toString())
+      this.setState({
+        hoveredColumnIndex: columnIndex,
+        hoveredRowIndex: rowIndex,
+      })
+    }
+  }
+
+  handleMouseOut = () => {
+    if (this.props.onSetHoverTime) {
+      this.props.onSetHoverTime(NULL_HOVER_TIME)
+      this.setState({
+        hoveredColumnIndex: NULL_COLUMN_INDEX,
+        hoveredRowIndex: NULL_ROW_INDEX,
+      })
+    }
+  }
+
+  cellRenderer = ({columnIndex, rowIndex, key, style, parent}) => {
+    const {tableOptions: {textWrapping}} = this.props
     const data = this._data
+    const {hoveredColumnIndex, hoveredRowIndex} = this.state
+
     const columnCount = _.get(data, ['0', 'length'], 0)
     const rowCount = data.length
+    const {tableOptions} = this.props
+    const timeFormat = tableOptions
+      ? tableOptions.timeFormat
+      : TIME_FORMAT_DEFAULT
 
     const isFixedRow = rowIndex === 0 && columnIndex > 0
     const isFixedColumn = rowIndex > 0 && columnIndex === 0
+    const isTimeData = isFixedColumn
     const isFixedCorner = rowIndex === 0 && columnIndex === 0
     const isLastRow = rowIndex === rowCount - 1
     const isLastColumn = columnIndex === columnCount - 1
+    const isHighlighted =
+      rowIndex === parent.props.scrollToRow ||
+      (rowIndex === hoveredRowIndex && hoveredRowIndex !== 0) ||
+      (columnIndex === hoveredColumnIndex && hoveredColumnIndex !== 0)
+    const dataIsNumerical = _.isNumber([rowIndex][columnIndex])
 
     const cellClass = classnames('table-graph-cell', {
       'table-graph-cell__fixed-row': isFixedRow,
@@ -47,17 +102,26 @@ class TableGraph extends Component {
       'table-graph-cell__last-column': isLastColumn,
       'table-graph-cell__wrap': textWrapping === TABLE_TEXT_WRAP,
       'table-graph-cell__truncate': textWrapping === TABLE_TEXT_TRUNCATE,
+      'table-graph-cell__highlight': isHighlighted,
+      'table-graph-cell__numerical': dataIsNumerical,
     })
 
     return (
-      <div key={key} className={cellClass} style={style}>
-        {data[rowIndex][columnIndex]}
+      <div
+        key={key}
+        style={style}
+        className={cellClass}
+        onMouseOver={this.handleHover(columnIndex, rowIndex)}
+      >
+        {isTimeData
+          ? `${moment(data[rowIndex][columnIndex]).format(timeFormat)}`
+          : `${data[rowIndex][columnIndex]}`}
       </div>
     )
   }
 
   measureColumnWidth = cell => {
-    const {textWrapping} = this.props
+    const {tableOptions: {textWrapping}} = this.props
     const data = this._data
     const {index: columnIndex} = cell
     const columnValues = []
@@ -92,48 +156,58 @@ class TableGraph extends Component {
   }
 
   render() {
+    const {hoveredColumnIndex, hoveredRowIndex} = this.state
+    const {hoverTime, tableOptions} = this.props
     const data = this._data
     const columnCount = _.get(data, ['0', 'length'], 0)
     const rowCount = data.length
     const tableWidth = this.gridContainer ? this.gridContainer.clientWidth : 0
     const tableHeight = this.gridContainer ? this.gridContainer.clientHeight : 0
+    const hoverTimeRow = this.calcHoverTimeRow(data, hoverTime)
 
-    const dataExists = data.length > 2
     return (
       <div
         className="table-graph-container"
         ref={gridContainer => (this.gridContainer = gridContainer)}
+        onMouseOut={this.handleMouseOut}
       >
-        {dataExists &&
+        {!isEmpty(data) &&
           <MultiGrid
-            fixedColumnCount={1}
-            fixedRowCount={1}
-            cellRenderer={this.cellRenderer}
+            height={tableHeight}
+            width={tableWidth}
             columnCount={columnCount}
+            fixedColumnCount={1}
+            rowCount={rowCount}
+            fixedRowCount={1}
             estimatedColumnSize={DEFAULT_COLUMN_WIDTH}
             columnWidth={this.measureColumnWidth}
-            height={tableHeight}
-            rowCount={rowCount}
             rowHeight={DEFAULT_ROW_HEIGHT}
-            width={tableWidth}
             enableFixedColumnScroll={true}
             enableFixedRowScroll={true}
+            timeFormat={
+              tableOptions ? tableOptions.timeFormat : TIME_FORMAT_DEFAULT
+            }
+            scrollToRow={hoverTimeRow}
+            cellRenderer={this.cellRenderer}
+            hoveredColumnIndex={hoveredColumnIndex}
+            hoveredRowIndex={hoveredRowIndex}
+            hoverTime={hoverTime}
           />}
       </div>
     )
   }
 }
 
-const {arrayOf, number, shape, string} = PropTypes
-
-TableGraph.defaultProps = {
-  textWrapping: TABLE_TEXT_SINGLE_LINE,
-}
+const {arrayOf, number, shape, string, func} = PropTypes
 
 TableGraph.propTypes = {
   cellHeight: number,
   data: arrayOf(shape()),
-  textWrapping: string.isRequired,
+  tableOptions: shape({
+    textWrapping: string.isRequired,
+  }),
+  hoverTime: string,
+  onSetHoverTime: func,
 }
 
 export default TableGraph
