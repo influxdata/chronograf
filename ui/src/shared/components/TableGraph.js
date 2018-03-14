@@ -71,7 +71,7 @@ class TableGraph extends Component {
   }
 
   cellRenderer = ({columnIndex, rowIndex, key, style, parent}) => {
-    const {tableOptions: {textWrapping}} = this.props
+    const {tableOptions: {wrapping}} = this.props
     const data = this._data
     const {hoveredColumnIndex, hoveredRowIndex} = this.state
 
@@ -100,8 +100,8 @@ class TableGraph extends Component {
       'table-graph-cell__fixed-corner': isFixedCorner,
       'table-graph-cell__last-row': isLastRow,
       'table-graph-cell__last-column': isLastColumn,
-      'table-graph-cell__wrap': textWrapping === TABLE_TEXT_WRAP,
-      'table-graph-cell__truncate': textWrapping === TABLE_TEXT_TRUNCATE,
+      'table-graph-cell__wrap': wrapping === TABLE_TEXT_WRAP,
+      'table-graph-cell__truncate': wrapping === TABLE_TEXT_TRUNCATE,
       'table-graph-cell__highlight': isHighlighted,
       'table-graph-cell__numerical': dataIsNumerical,
     })
@@ -121,18 +121,15 @@ class TableGraph extends Component {
   }
 
   measureColumnWidth = cell => {
-    const {tableOptions: {textWrapping}} = this.props
+    const {tableOptions: {wrapping}} = this.props
     const data = this._data
     const {index: columnIndex} = cell
     const columnValues = []
     let longestValue = ''
 
-    if (
-      textWrapping === TABLE_TEXT_TRUNCATE ||
-      textWrapping === TABLE_TEXT_WRAP
-    ) {
+    if (wrapping === TABLE_TEXT_TRUNCATE || wrapping === TABLE_TEXT_WRAP) {
       longestValue = `${data[0][columnIndex]}`
-    } else if (textWrapping === TABLE_TEXT_SINGLE_LINE) {
+    } else if (wrapping === TABLE_TEXT_SINGLE_LINE) {
       const rowCount = data.length
 
       for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
@@ -200,11 +197,17 @@ class TableGraph extends Component {
 
 const {arrayOf, number, shape, string, func} = PropTypes
 
+TableGraph.defaultProps = {
+  tableOptions: {
+    wrapping: TABLE_TEXT_SINGLE_LINE,
+  },
+}
+
 TableGraph.propTypes = {
   cellHeight: number,
   data: arrayOf(shape()),
   tableOptions: shape({
-    textWrapping: string.isRequired,
+    wrapping: string.isRequired,
   }),
   hoverTime: string,
   onSetHoverTime: func,

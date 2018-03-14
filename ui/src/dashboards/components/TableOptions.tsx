@@ -72,7 +72,10 @@ export class TableOptions extends PureComponent<Props, {}> {
 
   handleToggleTimeAxis = () => {}
 
-  handleToggleTextWrapping = () => {}
+  handleToggleTextWrapping = wrapping => () => {
+    const {tableOptions, handleUpdateTableOptions} = this.props
+    handleUpdateTableOptions({...tableOptions, wrapping})
+  }
 
   handleColumnRename = () => {}
 
@@ -85,6 +88,7 @@ export class TableOptions extends PureComponent<Props, {}> {
       singleStatColors,
       singleStatType,
       tableOptions: {timeFormat},
+      tableOptions: {wrapping},
     } = this.props
 
     const disableAddThreshold = singleStatColors.length > MAX_THRESHOLDS
@@ -127,7 +131,7 @@ export class TableOptions extends PureComponent<Props, {}> {
               onChooseSortBy={this.handleChooseSortBy}
             />
             <GraphOptionsTextWrapping
-              singleStatType={singleStatType}
+              wrapping={wrapping}
               onToggleTextWrapping={this.handleToggleTextWrapping}
             />
           </div>
