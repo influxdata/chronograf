@@ -3,13 +3,15 @@
     ----------------------------------------------------------------------------
 */
 
+$table-graph--border: $g5-pepper;
+
 .table-graph-container {
   position: absolute;
   width: calc(100% - 32px);
   height: calc(100% - 16px);
   top: 8px;
   left: 16px;
-  border: 2px solid $g5-pepper;
+  border: 2px solid $table-graph--border;
   border-radius: 3px;
   overflow: hidden;
 }
@@ -18,8 +20,8 @@
   line-height: 28px; // Cell height - 2x border width
   padding: 0 6px;
   font-size: 13px;
-  color: $g12-forge;
-  border: 1px solid $g5-pepper;
+  color: $g11-sidewalk;
+  border: 1px solid $table-graph--border;
 
   &__wrap {
     overflow: visible;
@@ -36,7 +38,7 @@
   &__fixed-row,
   &__fixed-column {
     font-weight: 700;
-    color: $g16-pearl;
+    color: $g14-chromium;
     background-color: $g4-onyx;
   }
   &__fixed-row {
@@ -50,7 +52,7 @@
     border-left: 0;
     font-weight: 700;
     color: $g18-cloud;
-    background-color: $g5-pepper;
+    background-color: $table-graph--border;
   }
   &__last-row {
     border-bottom: 0;
@@ -91,26 +93,38 @@
   &:focus {
     outline: none;
   }
+  &::-webkit-scrollbar,
+  &::-webkit-resizer {
+    display: none;
+  }
+}
+
+.table-graph-container > div > div:nth-child(2) > .ReactVirtualized__Grid:nth-child(2) {
   &::-webkit-scrollbar {
-    width: 0;
+    display: block;
+    width: 10px;
+    height: 10px;
 
     &-button {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
     &-track {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
     &-track-piece {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
     &-thumb {
-      background-color: #fff;
+      border-radius: 5px;
+      border: 2px solid $table-graph--border;
+      background-color: $g11-sidewalk;
     }
     &-corner {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
   }
   &::-webkit-resizer {
-    background-color: #f00;
+    display: block;
+    background-color: $table-graph--border;
   }
 }
