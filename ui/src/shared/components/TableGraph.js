@@ -120,10 +120,10 @@ class TableGraph extends Component {
     )
   }
 
-  measureColumnWidth = cell => {
+  measureColumnWidth = column => {
     const {tableOptions: {wrapping}} = this.props
     const data = this._data
-    const {index: columnIndex} = cell
+    const {index: columnIndex} = column
     const columnValues = []
     let longestValue = ''
 
