@@ -16,6 +16,12 @@ import {
 
 const isEmpty = data => data.length <= 1
 
+const dataCount = data => {
+  const columnCount = _.get(data, ['0', 'length'], 0)
+  const rowCount = data.length
+  return {columnCount, rowCount}
+}
+
 import {
   DEFAULT_COLUMN_WIDTH,
   DEFAULT_ROW_HEIGHT,
@@ -76,8 +82,7 @@ class TableGraph extends Component {
     const data = this._data
     const {hoveredColumnIndex, hoveredRowIndex} = this.state
 
-    const columnCount = _.get(data, ['0', 'length'], 0)
-    const rowCount = data.length
+    const {columnCount, rowCount} = dataCount(data)
     const {tableOptions} = this.props
     const timeFormat = tableOptions
       ? tableOptions.timeFormat
@@ -134,7 +139,7 @@ class TableGraph extends Component {
     ) {
       longestValue = `${data[0][columnIndex]}`
     } else {
-      const rowCount = data.length
+      const {rowCount} = dataCount(data)
 
       for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
         columnValues[rowIndex] = data[rowIndex][columnIndex]
@@ -197,8 +202,7 @@ class TableGraph extends Component {
     const {hoveredColumnIndex, hoveredRowIndex} = this.state
     const {hoverTime, tableOptions} = this.props
     const data = this._data
-    const columnCount = _.get(data, ['0', 'length'], 0)
-    const rowCount = data.length
+    const {columnCount, rowCount} = dataCount(data)
     const tableWidth = this.gridContainer ? this.gridContainer.clientWidth : 0
     const tableHeight = this.gridContainer ? this.gridContainer.clientHeight : 0
     const hoverTimeRow = this.calcHoverTimeRow(data, hoverTime)
