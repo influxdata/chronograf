@@ -17,15 +17,17 @@ $table-graph--border: $g5-pepper;
 }
 
 .table-graph-cell {
-  line-height: 28px; // Cell height - 2x border width
-  padding: 0 6px;
+  padding: 8px 6px;
+  line-height: 13px;
   font-size: 13px;
+  font-weight: 500;
   color: $g11-sidewalk;
   border: 1px solid $table-graph--border;
 
   &__wrap {
     overflow: visible;
     white-space: normal;
+    word-break: break-all;
   }
   &__truncate {
     overflow: hidden;

@@ -20,6 +20,7 @@ import {
   DEFAULT_COLUMN_WIDTH,
   DEFAULT_ROW_HEIGHT,
   COLUMN_PADDING,
+  ROW_PADDING,
   TABLE_TEXT_SINGLE_LINE,
   TABLE_TEXT_WRAP,
   TABLE_TEXT_TRUNCATE,
@@ -127,9 +128,12 @@ class TableGraph extends Component {
     const columnValues = []
     let longestValue = ''
 
-    if (wrapping === TABLE_TEXT_TRUNCATE || wrapping === TABLE_TEXT_WRAP) {
+    if (
+      columnIndex > 0 &&
+      (wrapping === TABLE_TEXT_TRUNCATE || wrapping === TABLE_TEXT_WRAP)
+    ) {
       longestValue = `${data[0][columnIndex]}`
-    } else if (wrapping === TABLE_TEXT_SINGLE_LINE) {
+    } else {
       const rowCount = data.length
 
       for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
@@ -150,6 +154,43 @@ class TableGraph extends Component {
     })
 
     return width + COLUMN_PADDING
+  }
+
+  measureRowHeight = row => {
+    const {tableOptions: {wrapping}} = this.props
+
+    if (wrapping === TABLE_TEXT_WRAP) {
+      const {index: rowIndex} = row
+      const data = this._data
+      const columnCount = data[rowIndex].length
+      const cellHeights = []
+
+      for (let colIndex = 0; colIndex < columnCount; colIndex++) {
+        const columnHeaderData = data[0][colIndex]
+        const {width} = calculateSize(columnHeaderData, {
+          font: 'Roboto',
+          fontSize: '13px',
+          fontWeight: 'bold',
+        })
+
+        const {height} = calculateSize(columnHeaderData, {
+          font: 'Roboto',
+          fontSize: '13px',
+          fontWeight: 'bold',
+          width: `${width}px`,
+        })
+
+        cellHeights[colIndex] = height
+      }
+
+      const rowHeight = cellHeights.reduce(
+        (a, b) => (a.length > b.length ? a : b)
+      )
+
+      return rowIndex === 0 ? DEFAULT_ROW_HEIGHT : rowHeight + ROW_PADDING
+    }
+
+    return DEFAULT_ROW_HEIGHT
   }
 
   render() {
@@ -178,7 +219,8 @@ class TableGraph extends Component {
             fixedRowCount={1}
             estimatedColumnSize={DEFAULT_COLUMN_WIDTH}
             columnWidth={this.measureColumnWidth}
-            rowHeight={DEFAULT_ROW_HEIGHT}
+            estimatedRowSize={DEFAULT_ROW_HEIGHT}
+            rowHeight={this.measureRowHeight}
             enableFixedColumnScroll={true}
             enableFixedRowScroll={true}
             timeFormat={
