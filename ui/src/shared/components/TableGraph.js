@@ -127,7 +127,7 @@ class TableGraph extends Component {
   }
 
   measureColumnWidth = column => {
-    const {tableOptions: {wrapping}} = this.props
+    const {tableOptions: {timeFormat, wrapping}} = this.props
     const data = this._data
     const {index: columnIndex} = column
     const columnValues = []
@@ -141,9 +141,11 @@ class TableGraph extends Component {
     } else {
       const {rowCount} = dataCount(data)
 
-      for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      columnValues[0] = `${data[0][columnIndex]}`
+
+      for (let rowIndex = 1; rowIndex < rowCount; rowIndex++) {
         columnValues[rowIndex] = data[rowIndex][columnIndex]
-          ? `${data[rowIndex][columnIndex]}`
+          ? `${moment(data[rowIndex][columnIndex]).format(timeFormat)}`
           : ''
       }
 
@@ -153,7 +155,7 @@ class TableGraph extends Component {
     }
 
     const {width} = calculateSize(longestValue, {
-      font: 'Roboto',
+      font: '"RobotoMono", monospace',
       fontSize: '13px',
       fontWeight: 'bold',
     })
