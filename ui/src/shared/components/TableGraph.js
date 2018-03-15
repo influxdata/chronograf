@@ -128,37 +128,50 @@ class TableGraph extends Component {
 
   measureColumnWidth = column => {
     const {tableOptions: {timeFormat, wrapping}} = this.props
-    const data = this._data
     const {index: columnIndex} = column
-    const columnValues = []
-    let longestValue = ''
-
-    if (
-      columnIndex > 0 &&
-      (wrapping === TABLE_TEXT_TRUNCATE || wrapping === TABLE_TEXT_WRAP)
-    ) {
-      longestValue = `${data[0][columnIndex]}`
-    } else {
-      const {rowCount} = dataCount(data)
-
-      columnValues[0] = `${data[0][columnIndex]}`
-
-      for (let rowIndex = 1; rowIndex < rowCount; rowIndex++) {
-        columnValues[rowIndex] = data[rowIndex][columnIndex]
-          ? `${moment(data[rowIndex][columnIndex]).format(timeFormat)}`
-          : ''
-      }
-
-      longestValue = columnValues.reduce(
-        (a, b) => (a.length > b.length ? a : b)
-      )
-    }
-
-    const {width} = calculateSize(longestValue, {
-      font: '"RobotoMono", monospace',
+    const data = this._data
+    const textStyle = {
+      font: 'Courier',
       fontSize: '13px',
       fontWeight: 'bold',
+    }
+
+    // Time column is always treated as "Single-Line"
+    // Include moment time formatting
+    if (columnIndex === 0) {
+      const columnValues = data.map((row, i) => {
+        return i === 0
+          ? `${row[columnIndex]}`
+          : `${moment(row[columnIndex]).format(timeFormat)}`
+      })
+
+      const longestColumnValue = columnValues.reduce(
+        (a, b) => (a.length > b.length ? a : b)
+      )
+
+      const {width} = calculateSize(longestColumnValue, textStyle)
+
+      return width + COLUMN_PADDING
+    }
+
+    // Truncate & Wrap set column width to width of header cell
+    if (wrapping === TABLE_TEXT_TRUNCATE || wrapping === TABLE_TEXT_WRAP) {
+      const headerCellData = `${data[0][columnIndex]}`
+      const {width} = calculateSize(headerCellData, textStyle)
+
+      return width + COLUMN_PADDING
+    }
+
+    // Wrap set to Single-Line
+    const columnValues = data.map(row => {
+      return `${row[columnIndex]}`
     })
+
+    const longestColumnValue = columnValues.reduce(
+      (a, b) => (a.length > b.length ? a : b)
+    )
+
+    const {width} = calculateSize(longestColumnValue, textStyle)
 
     return width + COLUMN_PADDING
   }
