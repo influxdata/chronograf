@@ -23,14 +23,13 @@ $table-graph--border: $g5-pepper;
   font-weight: 500;
   color: $g11-sidewalk;
   border: 1px solid $table-graph--border;
+  overflow: hidden;
 
   &__wrap {
-    overflow: visible;
     white-space: normal;
     word-break: break-all;
   }
   &__truncate {
-    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
