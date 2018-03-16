@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import classnames from 'classnames'
-import calculateSize from 'calculate-size'
 import moment from 'moment'
 
 import {MultiGrid} from 'react-virtualized'
@@ -13,6 +12,10 @@ import {
   NULL_HOVER_TIME,
   TIME_FORMAT_DEFAULT,
 } from 'src/shared/constants/tableGraph'
+import {
+  calculateTextDimensions,
+  calculateRowDimensions,
+} from 'shared/graphs/helpers'
 
 const isEmpty = data => data.length <= 1
 
@@ -26,7 +29,6 @@ import {
   DEFAULT_COLUMN_WIDTH,
   DEFAULT_ROW_HEIGHT,
   COLUMN_PADDING,
-  ROW_PADDING,
   TABLE_TEXT_SINGLE_LINE,
   TABLE_TEXT_WRAP,
   TABLE_TEXT_TRUNCATE,
@@ -131,9 +133,9 @@ class TableGraph extends Component {
     const {index: columnIndex} = column
     const data = this._data
     const textStyle = {
-      font: 'Courier',
-      fontSize: '13px',
-      fontWeight: 'bold',
+      font: '"RobotoMono", monospace',
+      size: '13px',
+      weight: 'bold',
     }
 
     // Time column is always treated as "Single-Line"
@@ -149,7 +151,10 @@ class TableGraph extends Component {
         (a, b) => (a.length > b.length ? a : b)
       )
 
-      const {width} = calculateSize(longestColumnValue, textStyle)
+      const {width} = calculateTextDimensions({
+        ...textStyle,
+        text: longestColumnValue,
+      })
 
       return width + COLUMN_PADDING
     }
@@ -157,7 +162,10 @@ class TableGraph extends Component {
     // Truncate & Wrap set column width to width of header cell
     if (wrapping === TABLE_TEXT_TRUNCATE || wrapping === TABLE_TEXT_WRAP) {
       const headerCellData = `${data[0][columnIndex]}`
-      const {width} = calculateSize(headerCellData, textStyle)
+      const {width} = calculateTextDimensions({
+        ...textStyle,
+        text: headerCellData,
+      })
 
       return width + COLUMN_PADDING
     }
@@ -171,43 +179,27 @@ class TableGraph extends Component {
       (a, b) => (a.length > b.length ? a : b)
     )
 
-    const {width} = calculateSize(longestColumnValue, textStyle)
+    const {width} = calculateTextDimensions({
+      ...textStyle,
+      text: longestColumnValue,
+    })
 
     return width + COLUMN_PADDING
   }
 
   measureRowHeight = row => {
     const {tableOptions: {wrapping}} = this.props
+    const {index: rowIndex} = row
+    const data = this._data
+
+    if (rowIndex === 0) {
+      return DEFAULT_ROW_HEIGHT
+    }
 
     if (wrapping === TABLE_TEXT_WRAP) {
-      const {index: rowIndex} = row
-      const data = this._data
-      const columnCount = data[rowIndex].length
-      const cellHeights = []
+      const {height} = calculateRowDimensions(rowIndex, data)
 
-      for (let colIndex = 0; colIndex < columnCount; colIndex++) {
-        const columnHeaderData = data[0][colIndex]
-        const {width} = calculateSize(columnHeaderData, {
-          font: 'Roboto',
-          fontSize: '13px',
-          fontWeight: 'bold',
-        })
-
-        const {height} = calculateSize(columnHeaderData, {
-          font: 'Roboto',
-          fontSize: '13px',
-          fontWeight: 'bold',
-          width: `${width}px`,
-        })
-
-        cellHeights[colIndex] = height
-      }
-
-      const rowHeight = cellHeights.reduce(
-        (a, b) => (a.length > b.length ? a : b)
-      )
-
-      return rowIndex === 0 ? DEFAULT_ROW_HEIGHT : rowHeight + ROW_PADDING
+      return height
     }
 
     return DEFAULT_ROW_HEIGHT
