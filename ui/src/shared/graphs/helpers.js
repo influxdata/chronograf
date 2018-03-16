@@ -1,6 +1,8 @@
 /* eslint-disable no-magic-numbers */
 import Dygraphs from 'src/external/dygraph'
 
+import {DEFAULT_ROW_HEIGHT, COLUMN_PADDING} from 'shared/constants/tableGraph'
+
 export const LINE_COLORS = [
   '#00C9FF',
   '#9394FF',
@@ -202,3 +204,129 @@ export const hasherino = (str, len) =>
 
 export const LABEL_WIDTH = 60
 export const CHAR_PIXELS = 7
+
+export const calculateTextDimensions = ({
+  text,
+  font,
+  size,
+  weight,
+  width,
+  wordBreak,
+}) => {
+  if (!text) {
+    return console.error('text required for this helper to work')
+  }
+
+  if (typeof text !== 'string') {
+    return console.error('Must pass string into text')
+  }
+
+  const element = document.createElement('div')
+  const textNode = document.createTextNode(text)
+
+  element.appendChild(textNode)
+
+  element.style.fontFamily = font || 'Times'
+  element.style.fontSize = size || '16px'
+  element.style.lineHeight = size || '16px'
+  element.style.fontWeight = weight || '400'
+  element.style.width = width || 'auto'
+  element.style.wordBreak = wordBreak || 'normal'
+  element.style.visibility = 'hidden'
+  element.style.height = 'auto'
+  element.style.position = 'absolute'
+  element.style.top = '-9999px'
+  element.style.left = '-9999px'
+  element.style.zIndex = '9999'
+
+  document.body.appendChild(element)
+
+  const elementSize = {
+    width: element.offsetWidth,
+    height: element.offsetHeight,
+  }
+
+  element.parentNode.removeChild(element)
+
+  return elementSize
+}
+
+const calculateColumnHeaderWidth = text => {
+  const element = document.createElement('div')
+  const textNode = document.createTextNode(text)
+
+  element.appendChild(textNode)
+
+  element.style.fontFamily = '"RobotoMono", monospace'
+  element.style.fontSize = '13px'
+  element.style.lineHeight = '13px'
+  element.style.fontWeight = 'bold'
+  element.style.width = 'auto'
+  element.style.letterSpacing = '0'
+  element.style.boxSizing = 'border-box'
+  element.style.visibility = 'hidden'
+  element.style.height = 'auto'
+  element.style.position = 'absolute'
+  element.style.top = '-9999px'
+  element.style.left = '-9999px'
+  element.style.zIndex = '9999'
+
+  document.body.appendChild(element)
+
+  const elementWidth = element.offsetWidth
+
+  element.parentNode.removeChild(element)
+
+  return elementWidth + COLUMN_PADDING
+}
+
+export const calculateRowDimensions = (rowIndex, data) => {
+  const rowElement = document.createElement('div')
+
+  rowElement.style.position = 'absolute'
+  rowElement.style.top = '-9999px'
+  rowElement.style.left = '-9999px'
+  rowElement.style.zIndex = '9999'
+  rowElement.style.display = 'flex'
+  rowElement.style.alignItems = 'center'
+  rowElement.style.flexWrap = 'no-wrap'
+  rowElement.style.visibility = 'hidden'
+
+  data[rowIndex].forEach((column, i) => {
+    const columnElement = document.createElement('div')
+    const textNode = document.createTextNode(column)
+
+    columnElement.appendChild(textNode)
+
+    let width = 'auto'
+    if (i > 0) {
+      width = `${calculateColumnHeaderWidth(`${data[0][i]}`)}px`
+    }
+
+    columnElement.style.fontFamily = '"RobotoMono", monospace'
+    columnElement.style.fontSize = '13px'
+    columnElement.style.lineHeight = '13px'
+    columnElement.style.fontWeight = 'bold'
+    columnElement.style.width = width
+    columnElement.style.wordBreak = 'break-all'
+    columnElement.style.padding = '8px 6px'
+    columnElement.style.letterSpacing = '0'
+    columnElement.style.boxSizing = 'border-box'
+
+    rowElement.appendChild(columnElement)
+  })
+
+  document.body.appendChild(rowElement)
+
+  const rowDimensions = {
+    width: rowElement.offsetWidth,
+    height:
+      DEFAULT_ROW_HEIGHT > rowElement.offsetHeight
+        ? DEFAULT_ROW_HEIGHT
+        : rowElement.offsetHeight,
+  }
+
+  rowElement.parentNode.removeChild(rowElement)
+
+  return rowDimensions
+}

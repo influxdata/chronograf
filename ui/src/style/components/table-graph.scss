@@ -3,39 +3,36 @@
     ----------------------------------------------------------------------------
 */
 
+$table-graph--border: $g5-pepper;
+
 .table-graph-container {
   position: absolute;
   width: calc(100% - 32px);
   height: calc(100% - 16px);
   top: 8px;
   left: 16px;
-  border: 2px solid $g5-pepper;
+  border: 2px solid $table-graph--border;
   border-radius: 3px;
   overflow: hidden;
 }
 
 .table-graph-cell {
-  line-height: 28px; // Cell height - 2x border width
-  padding: 0 6px;
+  padding: 8px 6px;
+  line-height: 13px;
   font-size: 13px;
-  color: $g12-forge;
-  border: 1px solid $g5-pepper;
+  font-weight: 500;
+  color: $g11-sidewalk;
+  border: 1px solid $table-graph--border;
+  overflow: hidden;
 
-  // Blue Highlight
-  &:after {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    width: calc(100% + 2px);
-    height: calc(100% + 2px);
-    z-index: 5;
-    border: 2px solid $c-pool;
-    border-radius: 3px;
-    visibility: hidden;
-    box-sizing: border-box;
+  &__wrap {
+    white-space: normal;
+    word-break: break-all;
   }
-
+  &__truncate {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
   &__numerical {
     font-family: $code-font;
   }
@@ -54,8 +51,9 @@
   &__fixed-corner {
     border-top: 0;
     border-left: 0;
+    font-weight: 700;
     color: $g18-cloud;
-    background-color: $g5-pepper;
+    background-color: $table-graph--border;
   }
   &__last-row {
     border-bottom: 0;
@@ -71,6 +69,20 @@
     color: $g14-chromium;
     background-color: $g6-smoke;
   }
+  // Hover Highlight
+  &:after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    z-index: 5;
+    border: 2px solid $c-pool;
+    border-radius: 3px;
+    visibility: hidden;
+    box-sizing: border-box;
+  }
   &:hover:not(.table-graph-cell__fixed-row):not(.table-graph-cell__fixed-column):not(.table-graph-cell__fixed-corner) {
     color: $g20-white;
     background-color: $g0-obsidian;
@@ -82,26 +94,38 @@
   &:focus {
     outline: none;
   }
+  &::-webkit-scrollbar,
+  &::-webkit-resizer {
+    display: none;
+  }
+}
+
+.table-graph-container > div > div:nth-child(2) > .ReactVirtualized__Grid:nth-child(2) {
   &::-webkit-scrollbar {
-    width: 0;
+    display: block;
+    width: 10px;
+    height: 10px;
 
     &-button {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
     &-track {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
     &-track-piece {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
     &-thumb {
-      background-color: #fff;
+      border-radius: 5px;
+      border: 2px solid $table-graph--border;
+      background-color: $g11-sidewalk;
     }
     &-corner {
-      background-color: #f00;
+      background-color: $table-graph--border;
     }
   }
   &::-webkit-resizer {
-    background-color: #f00;
+    display: block;
+    background-color: $table-graph--border;
   }
 }
