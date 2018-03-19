@@ -78,6 +78,7 @@ const AllUsersTableRow = ({
           confirmText={removeWarning}
           confirmAction={_.curry(onDelete, user)}
           size="btn-xs"
+          type="btn-danger"
           text="Delete"
           customClass="table--show-on-row-hover"
         />
