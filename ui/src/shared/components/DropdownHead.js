@@ -9,17 +9,16 @@ const DropdownHead = ({
   toggleStyle,
   buttonColor,
   disabledClass,
-}) =>
+}) => (
   <div
     className={`btn dropdown-toggle ${buttonSize} ${buttonColor} ${disabledClass}`}
     style={toggleStyle}
   >
     {iconName && <span className={classnames('icon', {[iconName]: true})} />}
-    <span className="dropdown-selected">
-      {selected}
-    </span>
+    <span className="dropdown-selected">{selected}</span>
     <span className="caret" />
   </div>
+)
 
 const {string, shape} = PropTypes
 

@@ -138,26 +138,28 @@ class ThresholdsList extends Component {
         </button>
         {thresholdsListColors.map(
           color =>
-            color.id === THRESHOLD_TYPE_BASE
-              ? <div className="threshold-item" key={uuid.v4()}>
-                  <div className="threshold-item--label">Base Color</div>
-                  <ColorDropdown
-                    colors={THRESHOLD_COLORS}
-                    selected={formatColor(color)}
-                    onChoose={this.handleChooseColor(color)}
-                    stretchToFit={true}
-                  />
-                </div>
-              : <Threshold
-                  visualizationType="single-stat"
-                  threshold={color}
-                  key={color.id}
-                  onChooseColor={this.handleChooseColor}
-                  onValidateColorValue={this.handleValidateColorValue}
-                  onUpdateColorValue={this.handleUpdateColorValue}
-                  onDeleteThreshold={this.handleDeleteThreshold}
-                  onSortColors={this.handleSortColors}
+            color.id === THRESHOLD_TYPE_BASE ? (
+              <div className="threshold-item" key={uuid.v4()}>
+                <div className="threshold-item--label">Base Color</div>
+                <ColorDropdown
+                  colors={THRESHOLD_COLORS}
+                  selected={formatColor(color)}
+                  onChoose={this.handleChooseColor(color)}
+                  stretchToFit={true}
                 />
+              </div>
+            ) : (
+              <Threshold
+                visualizationType="single-stat"
+                threshold={color}
+                key={color.id}
+                onChooseColor={this.handleChooseColor}
+                onValidateColorValue={this.handleValidateColorValue}
+                onUpdateColorValue={this.handleUpdateColorValue}
+                onDeleteThreshold={this.handleDeleteThreshold}
+                onSortColors={this.handleSortColors}
+              />
+            )
         )}
       </div>
     )

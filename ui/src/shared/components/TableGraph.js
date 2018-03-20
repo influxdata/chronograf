@@ -180,7 +180,7 @@ class TableGraph extends Component {
         ref={gridContainer => (this.gridContainer = gridContainer)}
         onMouseOut={this.handleMouseOut}
       >
-        {!isEmpty(data) &&
+        {!isEmpty(data) && (
           <MultiGrid
             columnCount={columnCount}
             columnWidth={COLUMN_WIDTH}
@@ -207,7 +207,8 @@ class TableGraph extends Component {
             hoveredRowIndex={hoveredRowIndex}
             hoverTime={hoverTime}
             colors={colors}
-          />}
+          />
+        )}
       </div>
     )
   }

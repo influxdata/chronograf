@@ -9,7 +9,7 @@ const DropdownInput = ({
   disabledClass,
   onFilterChange,
   onFilterKeyPress,
-}) =>
+}) => (
   <div
     className={`dropdown-autocomplete dropdown-toggle ${buttonSize} ${buttonColor} ${disabledClass}`}
     style={toggleStyle}
@@ -26,6 +26,7 @@ const DropdownInput = ({
     />
     <span className="caret" />
   </div>
+)
 
 export default DropdownInput
 
