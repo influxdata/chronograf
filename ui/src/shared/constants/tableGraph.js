@@ -9,6 +9,8 @@ export const TIME_FORMAT_CUSTOM = 'Custom'
 export const TIME_COLUMN_DEFAULT = {internalName: 'time', displayName: ''}
 
 export const FIX_FIRST_COLUMN_DEFAULT = true
+export const DEFAULT_SORT = 'asc'
+export const ALT_SORT = 'desc'
 
 export const FORMAT_OPTIONS = [
   {text: TIME_FORMAT_DEFAULT},
