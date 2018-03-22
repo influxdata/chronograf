@@ -61,6 +61,7 @@ const config = {
         enforce: 'pre',
         options: {
           emitWarning: true,
+          failOnHint: true,
         },
       },
       {
