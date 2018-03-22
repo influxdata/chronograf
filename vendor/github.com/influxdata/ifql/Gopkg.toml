@@ -1,0 +1,17 @@
+required = ["github.com/mna/pigeon", "github.com/goreleaser/goreleaser"]
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/google/go-cmp"
+
+[[override]]
+  branch = "master"
+  name = "github.com/mna/pigeon"
+
+[[constraint]]
+  name = "github.com/opentracing/opentracing-go"
+  version = "1.0.2"
+
+[[constraint]]
+  name = "github.com/uber/jaeger-client-go"
+  version = "2.10.0"
