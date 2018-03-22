@@ -58,6 +58,15 @@ module.exports = {
     ],
     rules: [
       {
+        test: /\.ts(x?)$/,
+        exclude: /node_modules/,
+        loader: 'tslint-loader',
+        enforce: 'pre',
+        options: {
+          emitWarning: true,
+        },
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'eslint-loader',
@@ -133,7 +142,6 @@ module.exports = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
-      tslint: true,
     }),
     new webpack.LoaderOptionsPlugin({
       options: {

@@ -55,6 +55,16 @@ const config = {
     ],
     loaders: [
       {
+        test: /\.ts(x?)$/,
+        exclude: /node_modules/,
+        loader: 'tslint-loader',
+        enforce: 'pre',
+        options: {
+          emitWarning: true,
+          failOnHint: true,
+        },
+      },
+      {
         test: /\.js$/,
         exclude: [/node_modules/, /(_s|S)pec\.js$/],
         use: 'eslint-loader',
@@ -118,7 +128,6 @@ const config = {
     new webpack.optimize.ModuleConcatenationPlugin(),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
-      tslint: true,
     }),
     new webpack.LoaderOptionsPlugin({
       postcss: require('./postcss'),
