@@ -2,13 +2,8 @@
    "parser": "babel-eslint",
    "plugins": [
       "react",
-      "prettier",
       "babel",
       "jest"
-   ],
-   "extends": [
-      "prettier",
-      "prettier/react"
    ],
    "env": {
       "browser": true,
@@ -276,15 +271,6 @@
       "react/require-extension": 0,
       "react/self-closing-comp": 0,
       "react/sort-comp": 0,
-      "prettier/prettier": [
-         "error",
-         {
-            "singleQuote": true,
-            "trailingComma": "es5",
-            "bracketSpacing": false,
-            "semi": false
-         }
-      ],
       "jest/no-disabled-tests": "warn",
       "jest/no-focused-tests": "error",
       "babel/no-invalid-this": 1

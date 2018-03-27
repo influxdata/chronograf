@@ -1,0 +1,88 @@
+.feature-body {
+    background-color: #31313d;
+    padding-top: 11px;
+    border-top: 2px solid rgb(56, 56, 70);
+}
+
+.feature-column {
+    display: flex;
+    flex-direction: column;
+    /*flex: 2 0 0%;*/
+    flex: 2;
+}
+
+.feature-column:first-child {
+    /*flex: 1 0 0%;*/
+    flex: 3;
+}
+
+.feature-column-tags {
+    border-radius: 3px 3px 0 0;
+    border: 1px solid #383846;
+    margin-bottom: 8px;
+    margin-right: 11px;
+    margin-left: 11px;
+    padding: 5px;
+}
+
+.feature-column-tags--header {
+    border-bottom: 1px solid #383846;
+    margin: -5px;
+    padding: 7px;
+    background-color: #383846;
+    color: #c6cad3;
+}
+
+.feature-column-tags--content {
+    margin-top: 5px;
+    padding-top: 5px;
+}
+
+.feature-row {
+    background-color: #31313d;
+    display: flex;
+}
+
+.feature-row .fill-query--label {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.table-feature {
+    background-color: #31313d;
+}
+
+.feature-column-label {
+    display: flex;
+    flex: 1;
+}
+
+.feature-column-item {
+    display: flex;
+    flex: 3;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+.input-group-append {
+    margin-left: -1px;
+}
+
+.input-group-append, .input-group-prepend {
+    display: flex;
+}
+
+.input-group > .input-group-append > .input-group-text {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group > .input-group-prepend .dropdown-toggle {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}

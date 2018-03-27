@@ -10,6 +10,7 @@ import LineGraph from 'shared/components/LineGraph'
 import SingleStat from 'shared/components/SingleStat'
 import GaugeChart from 'shared/components/GaugeChart'
 import TableGraph from 'shared/components/TableGraph'
+import ErrorGraph from 'src/loudml/components/ErrorGraph';
 
 import {colorsStringSchema} from 'shared/schemas'
 import {setHoverTime} from 'src/dashboards/actions'
@@ -22,6 +23,7 @@ const RefreshingLineGraph = AutoRefresh(LineGraph)
 const RefreshingSingleStat = AutoRefresh(SingleStat)
 const RefreshingGaugeChart = AutoRefresh(GaugeChart)
 const RefreshingTableGraph = AutoRefresh(TableGraph)
+const RefreshingErrorGraph = AutoRefresh(ErrorGraph)
 
 const RefreshingGraph = ({
   axes,
@@ -126,6 +128,39 @@ const RefreshingGraph = ({
         grabDataForDownload={grabDataForDownload}
         handleSetHoverTime={handleSetHoverTime}
         onSetResolution={onSetResolution}
+      />
+    )
+  }
+
+  if (type === 'error') {
+    return (
+      <RefreshingErrorGraph
+      type={type}
+      axes={axes}
+      source={source}
+      cellID={cellID}
+      colors={colors}
+      onZoom={onZoom}
+      queries={queries}
+      inView={inView}
+      key={manualRefresh}
+      templates={templates}
+      timeRange={timeRange}
+      cellHeight={cellHeight}
+      autoRefresh={autoRefresh}
+      decimalPlaces={decimalPlaces}
+      staticLegend={staticLegend}
+//      displayOptions={displayOptions}
+      editQueryStatus={editQueryStatus}
+      grabDataForDownload={grabDataForDownload}
+      handleSetHoverTime={handleSetHoverTime}
+      onSetResolution={onSetResolution}
+//        resizerTopHeight={resizerTopHeight}
+//         resizeCoords={resizeCoords}
+//        tableOptions={tableOptions}
+//        hoverTime={hoverTime}
+//        onSetHoverTime={onSetHoverTime}
+//        setDataLabels={setDataLabels}
       />
     )
   }

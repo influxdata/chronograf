@@ -49,6 +49,7 @@ interface Props {
   notify: (message: Notification | NotificationFunc) => void
 }
 
+// @ts-ignore
 export const SourceContext = React.createContext()
 
 // Acts as a 'router middleware'. The main `App` component is responsible for

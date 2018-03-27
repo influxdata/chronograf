@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 )
@@ -106,6 +107,64 @@ func (s *Service) ProxyGet(w http.ResponseWriter, r *http.Request) {
 // ProxyDelete proxies DELETE to service
 func (s *Service) ProxyDelete(w http.ResponseWriter, r *http.Request) {
 	s.Proxy(w, r)
+}
+
+// LoudMLProxy proxies requests to loudmld
+func (s *Service) LoudMLProxy(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+
+	// To preserve any HTTP query arguments to the LoudML path,
+	// we concat and parse them into u.
+	loudMLURL := os.Getenv("LOUDML_URL")
+	path = strings.TrimPrefix(path, "/loudml/api")
+	uri := singleJoiningSlash(loudMLURL, path)
+	u, err := url.Parse(uri)
+	if err != nil {
+		msg := fmt.Sprintf("Error parsing LoudML URL: %v", err)
+		Error(w, http.StatusUnprocessableEntity, msg, s.Logger)
+		return
+	}
+
+	director := func(req *http.Request) {
+		// Set the Host header of the original Kapacitor URL
+		req.Host = u.Host
+		req.URL = u
+		req.URL.RawQuery = r.URL.RawQuery
+	}
+
+	// Without a FlushInterval the HTTP Chunked response for loudml logs is
+	// buffered and flushed every 30 seconds.
+	proxy := &httputil.ReverseProxy{
+		Director:      director,
+		FlushInterval: time.Second,
+	}
+
+	proxy.ServeHTTP(w, r)
+}
+
+// LoudMLProxyPost proxies POST to loudmld
+func (s *Service) LoudMLProxyPost(w http.ResponseWriter, r *http.Request) {
+	s.LoudMLProxy(w, r)
+}
+
+// LoudMLProxyPatch proxies PATCH to loudmld
+func (s *Service) LoudMLProxyPatch(w http.ResponseWriter, r *http.Request) {
+	s.LoudMLProxy(w, r)
+}
+
+// LoudMLProxyPut proxies PUT to loudmld
+func (s *Service) LoudMLProxyPut(w http.ResponseWriter, r *http.Request) {
+	s.LoudMLProxy(w, r)
+}
+
+// LoudMLProxyGet proxies GET to loudmld
+func (s *Service) LoudMLProxyGet(w http.ResponseWriter, r *http.Request) {
+	s.LoudMLProxy(w, r)
+}
+
+// LoudMLProxyDelete proxies DELETE to loudmld
+func (s *Service) LoudMLProxyDelete(w http.ResponseWriter, r *http.Request) {
+	s.LoudMLProxy(w, r)
 }
 
 func singleJoiningSlash(a, b string) string {

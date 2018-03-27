@@ -90,6 +90,7 @@ export enum CellType {
   Alerts = 'alerts',
   News = 'news',
   Guide = 'guide',
+  Error = 'error',
 }
 
 interface DashboardLinks {

@@ -18,7 +18,6 @@
     "no-empty": false,
     "prefer-for-of": false,
     "prettier": [
-      true,
       {
         "singleQuote": true,
         "semi": false,

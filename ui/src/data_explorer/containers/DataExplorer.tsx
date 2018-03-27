@@ -19,6 +19,7 @@ import AutoRefreshDropdown from 'src/shared/components/AutoRefreshDropdown'
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import OneClickML from 'src/loudml/components/OneClickML'
 
 import {VIS_VIEWS, AUTO_GROUP_BY, TEMPLATES} from 'src/shared/constants'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'src/data_explorer/constants'
@@ -195,6 +196,7 @@ export class DataExplorer extends PureComponent<Props, State> {
     return (
       <>
         <GraphTips />
+        <OneClickML />
         <div
           className="btn btn-sm btn-default"
           onClick={this.handleOpenWriteData}

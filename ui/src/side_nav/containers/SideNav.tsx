@@ -117,6 +117,14 @@ class SideNav extends PureComponent<Props> {
             Alert History
           </NavListItem>
         </NavBlock>
+        <NavBlock
+          highlightWhen={['loudml']}
+          icon="loudml-bold"
+          link={`${sourcePrefix}/loudml`}
+          location={location}
+        >
+          <NavHeader link={`${sourcePrefix}/loudml`} title={'Loud ML'} />
+        </NavBlock>
 
         <NavBlock
           highlightWhen={['logs']}

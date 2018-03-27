@@ -17,6 +17,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'loudml';
+  src: url('loudml.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .icon {
   font-family: 'icomoon' !important;
   speak: none;
@@ -95,4 +102,15 @@
   &.zap:before {content: "\26a1";}
   &.google:before {content: "\ea88";}
   &.github:before {content: "\eab0";}
+
+  &.loudml {
+    font-family: 'loudml' !important;
+    font-size: 2em;
+    &:before {content: "\e900";}
+  }
+  &.loudml-bold {
+    font-family: 'loudml' !important;
+    font-size: 2em;
+    &:before {content: "\e901";}
+  }
 }

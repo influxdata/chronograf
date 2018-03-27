@@ -57,6 +57,7 @@ interface State {
 
 type ScriptFunc = (script: string) => void
 
+// @ts-ignore
 export const FluxContext = React.createContext()
 
 @ErrorHandling

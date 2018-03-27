@@ -19,6 +19,7 @@ const validateTimeSeries = ts => {
   return _.every(ts, r =>
     _.every(
       r,
+      // @ts-ignore
       (v, i: number) =>
         (i === 0 && Date.parse(v)) || _.isNumber(v) || _.isNull(v)
     )

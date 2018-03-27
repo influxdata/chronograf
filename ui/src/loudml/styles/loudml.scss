@@ -1,0 +1,29 @@
+
+.actions-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.time-job--button {
+    position: relative;
+}
+
+.time-job--button .dropdown-toggle {
+    display: flex!important;
+}
+
+.time-job--button .custom-time--overlay {
+    right: 0;
+    position: relative;
+    top: 5px;
+}
+
+.time-job--button .custom-time--container {
+    top: 0;
+}
+
+.custom-time--lower {
+    margin-right: 0!important;
+    margin-left: 4px!important;
+    text-align: center;
+}

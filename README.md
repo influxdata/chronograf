@@ -1,4 +1,10 @@
-# Chronograf
+# Chronograf + LoudML extension
+
+This is a fork of Chronograf that embeds a LoudML extension.
+
+For further information about Chronograf and LoudML, see:
+* https://github.com/influxdata/chronograf
+* https://github.com/regel/loudml
 
 Chronograf is an open-source web application written in Go and React.js that
 provides the tools to visualize your monitoring data and easily create alerting
@@ -184,43 +190,45 @@ docker pull chronograf:1.6.1
 ### From Source
 
 * Chronograf works with go 1.10+, node 8.x, and yarn 1.5+.
+
+LoudML extension
 * Chronograf requires [Kapacitor](https://github.com/influxdata/kapacitor)
   1.2.x+ to create and store alerts.
 
+1. [install LoudML](http://loudml.io/guide/en/loudml/reference/current/setup.html)
 1. [Install Go](https://golang.org/doc/install)
 1. [Install Node and NPM](https://nodejs.org/en/download/)
 1. [Install yarn](https://yarnpkg.com/docs/install)
 1. [Setup your GOPATH](https://golang.org/doc/code.html#GOPATH)
-1. Build the Chronograf package:
+1. Get Chronograf sources
     ```bash
     go get github.com/influxdata/chronograf
-    cd $GOPATH/src/github.com/influxdata/chronograf
-    make
     ```
-1. Install the newly built Chronograf package:
+1. Setup `github.com/regel/chronograf` as remote:
     ```bash
-    go install github.com/influxdata/chronograf/cmd/chronograf
+    cd src/github.com/influxdata/chronograf
+    git remote add regel git@github.com:regel/chronograf.git
     ```
+1. Switch to `regel/loudml` branch:
+    ```bash
+    git fetch regel
+    git checkout -b loudml regel/loudml
+    ```
+1. Then, you can build Chronograf with LoudML extension:
 
-## Documentation
+   ```bash
+   make
+   ```
 
-[Getting Started](https://docs.influxdata.com/chronograf/v1.4/introduction/getting-started/)
-will get you up and running with Chronograf with as little configuration and
-code as possible. See our
-[guides](https://docs.influxdata.com/chronograf/v1.4/guides/) to get familiar
-with Chronograf's main features.
+To build the Docker image, execute:
+```bash
+make docker
+```
 
-Documentation for Telegraf, InfluxDB, and Kapacitor are available at
-https://docs.influxdata.com/.
-
-Chronograf uses
-[swagger](https://swagger.io/specification://swagger.io/specification/) to
-document its REST interfaces. To reach the documentation, run the server and go
-to the `/docs` for example at http://localhost:8888/docs
-
-The swagger JSON document is in `server/swagger.json`
-
-## Contributing
-
-Please see the [contributing guide](CONTRIBUTING.md) for details on contributing
-to Chronograf.
+To start Chronograf in development mode:
+```bash
+cd chronograf/ui
+npm install
+yarn build:vendor
+yarn start:hmr
+```

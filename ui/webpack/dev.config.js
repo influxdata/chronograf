@@ -257,6 +257,13 @@ module.exports = {
         target: 'http://localhost:8888',
         secure: false,
       },
+      '/loudml/api': {
+        target: 'http://localhost:8077',
+        secure: false,
+        pathRewrite: {
+          '^/loudml/api': '/',
+        },
+      },
     },
   },
 }

@@ -569,4 +569,9 @@ export const GRAPH_TYPES: GraphType[] = [
     menuOption: 'Table',
     graphic: GRAPH_SVGS[CellType.Table],
   },
+  {
+    type: CellType.Error,
+    menuOption: 'Error',
+    graphic: GRAPH_SVGS[CellType.Error],
+  },
 ]
