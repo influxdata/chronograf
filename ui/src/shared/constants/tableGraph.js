@@ -7,6 +7,7 @@ export const NULL_HOVER_TIME = '0'
 
 export const TIME_FORMAT_DEFAULT = 'MM/DD/YYYY HH:mm:ss.SS'
 export const TIME_FORMAT_CUSTOM = 'Custom'
+export const PRECISION_DEFAULT = 0
 
 export const TIME_FIELD_DEFAULT = {
   internalName: 'time',
@@ -36,6 +37,7 @@ export const FORMAT_OPTIONS = [
 export const DEFAULT_TABLE_OPTIONS = {
   verticalTimeAxis: VERTICAL_TIME_AXIS_DEFAULT,
   timeFormat: TIME_FORMAT_DEFAULT,
+  precision: PRECISION_DEFAULT,
   sortBy: TIME_FIELD_DEFAULT,
   wrapping: 'truncate',
   fieldNames: [TIME_FIELD_DEFAULT],

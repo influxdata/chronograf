@@ -7,6 +7,7 @@ import GraphOptionsFixFirstColumn from 'src/dashboards/components/GraphOptionsFi
 import GraphOptionsSortBy from 'src/dashboards/components/GraphOptionsSortBy'
 import GraphOptionsTimeAxis from 'src/dashboards/components/GraphOptionsTimeAxis'
 import GraphOptionsTimeFormat from 'src/dashboards/components/GraphOptionsTimeFormat'
+import GraphOptionsPrecision from 'src/dashboards/components/GraphOptionsPrecision'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 import _ from 'lodash'
@@ -30,6 +31,7 @@ interface RenamableField {
 
 interface Options {
   timeFormat: string
+  precision: number
   verticalTimeAxis: boolean
   sortBy: RenamableField
   fieldNames: RenamableField[]
@@ -88,6 +90,11 @@ export class TableOptions extends PureComponent<Props, {}> {
     handleUpdateTableOptions({...tableOptions, timeFormat})
   }
 
+  public handlePrecisionChange = precision => {
+    const {tableOptions, handleUpdateTableOptions} = this.props
+    handleUpdateTableOptions({...tableOptions, precision})
+  }
+
   public handleToggleVerticalTimeAxis = verticalTimeAxis => () => {
     const {tableOptions, handleUpdateTableOptions} = this.props
     handleUpdateTableOptions({...tableOptions, verticalTimeAxis})
@@ -142,7 +149,13 @@ export class TableOptions extends PureComponent<Props, {}> {
 
   public render() {
     const {
-      tableOptions: {timeFormat, fieldNames, verticalTimeAxis, fixFirstColumn},
+      tableOptions: {
+        timeFormat,
+        precision,
+        fieldNames,
+        verticalTimeAxis,
+        fixFirstColumn,
+      },
       onResetFocus,
       tableOptions,
     } = this.props
@@ -165,6 +178,10 @@ export class TableOptions extends PureComponent<Props, {}> {
             <GraphOptionsTimeFormat
               timeFormat={timeFormat}
               onTimeFormatChange={this.handleTimeFormatChange}
+            />
+            <GraphOptionsPrecision
+              precision={precision}
+              onPrecisionChange={this.handlePrecisionChange}
             />
             <GraphOptionsTimeAxis
               verticalTimeAxis={verticalTimeAxis}

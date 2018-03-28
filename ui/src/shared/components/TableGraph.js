@@ -11,6 +11,7 @@ import {
   NULL_ARRAY_INDEX,
   NULL_HOVER_TIME,
   TIME_FORMAT_DEFAULT,
+  PRECISION_DEFAULT,
   TIME_FIELD_DEFAULT,
   ASCENDING,
   DESCENDING,
@@ -239,6 +240,7 @@ class TableGraph extends Component {
 
     const {
       timeFormat = TIME_FORMAT_DEFAULT,
+      precision,
       verticalTimeAxis = VERTICAL_TIME_AXIS_DEFAULT,
       fixFirstColumn = FIX_FIRST_COLUMN_DEFAULT,
       fieldNames = [TIME_FIELD_DEFAULT],

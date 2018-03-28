@@ -5,6 +5,7 @@ import GraphOptionsFixFirstColumn from 'src/dashboards/components/GraphOptionsFi
 import GraphOptionsSortBy from 'src/dashboards/components/GraphOptionsSortBy'
 import GraphOptionsTimeAxis from 'src/dashboards/components/GraphOptionsTimeAxis'
 import GraphOptionsTimeFormat from 'src/dashboards/components/GraphOptionsTimeFormat'
+import GraphOptionsPrecision from 'src/dashboards/components/GraphOptionsPrecision'
 import {TableOptions} from 'src/dashboards/components/TableOptions'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import ThresholdsList from 'src/shared/components/ThresholdsList'
@@ -17,6 +18,7 @@ const defaultProps = {
   tableOptions: {
     columnNames: [],
     fieldNames: [],
+    precision: 0,
     fixFirstColumn: true,
     sortBy: {displayName: '', internalName: '', visible: true},
     timeFormat: '',
@@ -45,6 +47,7 @@ describe('Dashboards.Components.TableOptions', () => {
       const {wrapper} = setup()
       const fancyScrollbar = wrapper.find(FancyScrollbar)
       const graphOptionsTimeFormat = wrapper.find(GraphOptionsTimeFormat)
+      const graphOptionsPrecision = wrapper.find(GraphOptionsPrecision)
       const graphOptionsTimeAxis = wrapper.find(GraphOptionsTimeAxis)
       const graphOptionsSortBy = wrapper.find(GraphOptionsSortBy)
       const graphOptionsFixFirstColumn = wrapper.find(
@@ -58,6 +61,7 @@ describe('Dashboards.Components.TableOptions', () => {
 
       expect(fancyScrollbar.exists()).toBe(true)
       expect(graphOptionsTimeFormat.exists()).toBe(true)
+      expect(graphOptionsPrecision.exists()).toBe(true)
       expect(graphOptionsTimeAxis.exists()).toBe(true)
       expect(graphOptionsSortBy.exists()).toBe(true)
       expect(graphOptionsFixFirstColumn.exists()).toBe(true)
