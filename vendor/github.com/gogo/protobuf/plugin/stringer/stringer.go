@@ -1,4 +1,6 @@
-// Copyright (c) 2013, Vastech SA (PTY) LTD. All rights reserved.
+// Protocol Buffers for Go with Gadgets
+//
+// Copyright (c) 2013, The GoGo Authors. All rights reserved.
 // http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
@@ -201,7 +203,7 @@ func (p *stringer) Generate(file *generator.FileDescriptor) {
 			} else if p.IsMap(field) {
 				mapName := `mapStringFor` + fieldname
 				p.P("`", fieldname, ":`", ` + `, mapName, " + `,", "`,")
-			} else if field.IsMessage() || p.IsGroup(field) {
+			} else if (field.IsMessage() && !gogoproto.IsCustomType(field)) || p.IsGroup(field) {
 				desc := p.ObjectNamed(field.GetTypeName())
 				msgname := p.TypeName(desc)
 				msgnames := strings.Split(msgname, ".")

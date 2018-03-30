@@ -1,0 +1,54 @@
+project_name: ifql
+builds:
+- goos:
+  - linux
+  - darwin
+  - windows
+  goarch:
+  - amd64
+  - 386
+  - arm
+  - arm64
+  goarm:
+  - 6
+  - 7
+  ignore:
+    - goos: darwin
+      goarch: 386
+    - goos: windows
+      goarch: 386
+  main: ./cmd/ifqld/main.go
+  ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+  binary: ifqld
+archive:
+  format: tar.gz
+  wrap_in_directory: true
+  format_overrides:
+    - goos: windows
+      format: zip
+  replacements:
+    darwin: macOS
+  name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{
+    .Arm }}{{ end }}'
+  files:
+  - LICENSE
+  - README.md
+fpm:
+  vendor: InfluxData
+  homepage: https://influxdata.com
+  maintainer: contact@influxdata.com
+  description: IFQLD is an HTTP server for processing IFQL queries to 1 or more InfluxDB servers.
+  license: AGPL
+  formats:
+    - deb
+    - rpm
+  bindir: /usr/bin
+  dependencies:
+    - coreutils
+  files:
+    "LICENSE": "/usr/share/ifqld/"
+    "README.md": "/usr/share/ifqld/"
+snapshot:
+  name_template: SNAPSHOT-{{ .Commit }}
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
