@@ -40,7 +40,7 @@ class PagerDutyConfig extends Component {
         <div className="form-group col-xs-12">
           <label htmlFor="service-key">Service Key</label>
           <RedactedInput
-            defaultValue={serviceKey || ''}
+            defaultValue={serviceKey}
             id="service-key"
             refFunc={this.refFunc}
             disableTest={this.disableTest}
