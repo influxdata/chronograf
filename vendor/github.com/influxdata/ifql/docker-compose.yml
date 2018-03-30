@@ -1,0 +1,23 @@
+version: "3"
+services:
+  ifqld:
+    image:  quay.io/influxdb/ifqld
+    ports:
+      - 8093:8093
+    networks:
+      - ifql_net
+    environment:
+      - "HOSTS=influxdb:8082"
+    depends_on:
+      - influxdb
+  influxdb:
+    image:  influxdb
+    ports:
+      - 8082:8082
+      - 8086:8086
+    volumes:
+      - ./examples/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+    networks:
+      - ifql_net
+networks:
+  ifql_net:
