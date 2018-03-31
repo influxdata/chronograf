@@ -47,6 +47,7 @@ interface AlertNodes {
   log: Log[]
   victorOps: VictorOps[]
   pagerDuty: PagerDuty[]
+  pagerDuty2: PagerDuty[]
   pushover: Pushover[]
   sensu: Sensu[]
   slack: Slack[]
