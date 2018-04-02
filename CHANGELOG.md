@@ -2,20 +2,19 @@
 
 ### Features
 
-1.  [#2526](https://github.com/influxdata/chronograf/pull/2526): Add support for RS256/JWKS verification, support for id_token parsing (as in ADFS)
+### UI Improvements
+
+### Bug Fixes
+
+## v1.4.3.1 [unreleased]
+
+### Features
 
 ### UI Improvements
 
 ### Bug Fixes
 
-1.  [#2950](https://github.com/influxdata/chronograf/pull/2094): Always save template variables on first edit
 1.  [#3101](https://github.com/influxdata/chronograf/pull/3101): Fix template variables not loading
-
-## v1.4.3.0 [unreleased]
-
-### UI Improvements
-
-### Bug Fixes
 
 ## v1.4.3.0 [2018-3-28]
 
