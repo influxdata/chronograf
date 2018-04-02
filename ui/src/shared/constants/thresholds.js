@@ -9,11 +9,11 @@ export const COLOR_TYPE_MAX = 'max'
 export const DEFAULT_VALUE_MAX = 100
 export const COLOR_TYPE_THRESHOLD = 'threshold'
 
-export const SINGLE_STAT_TEXT = 'text'
-export const SINGLE_STAT_BG = 'background'
-export const SINGLE_STAT_BASE = 'base'
+export const THRESHOLD_TYPE_TEXT = 'text'
+export const THRESHOLD_TYPE_BG = 'background'
+export const THRESHOLD_TYPE_BASE = 'base'
 
-export const GAUGE_COLORS = [
+export const THRESHOLD_COLORS = [
   {
     hex: '#BF3D5E',
     name: 'ruby',
@@ -86,44 +86,48 @@ export const GAUGE_COLORS = [
     hex: '#ffffff',
     name: 'white',
   },
+  {
+    hex: '#292933',
+    name: 'castle',
+  },
 ]
 
 export const DEFAULT_GAUGE_COLORS = [
   {
     type: COLOR_TYPE_MIN,
-    hex: GAUGE_COLORS[11].hex,
+    hex: THRESHOLD_COLORS[11].hex,
     id: '0',
-    name: GAUGE_COLORS[11].name,
+    name: THRESHOLD_COLORS[11].name,
     value: DEFAULT_VALUE_MIN,
   },
   {
     type: COLOR_TYPE_MAX,
-    hex: GAUGE_COLORS[14].hex,
+    hex: THRESHOLD_COLORS[14].hex,
     id: '1',
-    name: GAUGE_COLORS[14].name,
+    name: THRESHOLD_COLORS[14].name,
     value: DEFAULT_VALUE_MAX,
   },
 ]
 
-export const DEFAULT_SINGLESTAT_COLORS = [
+export const DEFAULT_THRESHOLDS_LIST_COLORS = [
   {
-    type: SINGLE_STAT_TEXT,
-    hex: GAUGE_COLORS[11].hex,
-    id: SINGLE_STAT_BASE,
-    name: GAUGE_COLORS[11].name,
+    type: THRESHOLD_TYPE_TEXT,
+    hex: THRESHOLD_COLORS[11].hex,
+    id: THRESHOLD_TYPE_BASE,
+    name: THRESHOLD_COLORS[11].name,
     value: -999999999999999999,
   },
 ]
 
-export const validateSingleStatColors = (colors, type) => {
+export const validateThresholdsListColors = (colors, type) => {
   if (!colors || colors.length === 0) {
-    return DEFAULT_SINGLESTAT_COLORS
+    return DEFAULT_THRESHOLDS_LIST_COLORS
   }
 
   let containsBaseColor = false
 
   const formattedColors = colors.map(color => {
-    if (color.id === SINGLE_STAT_BASE) {
+    if (color.id === THRESHOLD_TYPE_BASE) {
       // Check for existance of base color
       containsBaseColor = true
       return {...color, value: Number(color.value), type}
@@ -134,22 +138,22 @@ export const validateSingleStatColors = (colors, type) => {
 
   const formattedColorsWithBase = [
     ...formattedColors,
-    DEFAULT_SINGLESTAT_COLORS[0],
+    DEFAULT_THRESHOLDS_LIST_COLORS[0],
   ]
 
   return containsBaseColor ? formattedColors : formattedColorsWithBase
 }
 
-export const getSingleStatType = colors => {
+export const getThresholdsListType = colors => {
   const type = _.get(colors, ['0', 'type'], false)
 
   if (type) {
-    if (_.includes([SINGLE_STAT_TEXT, SINGLE_STAT_BG], type)) {
+    if (_.includes([THRESHOLD_TYPE_TEXT, THRESHOLD_TYPE_BG], type)) {
       return type
     }
   }
 
-  return SINGLE_STAT_TEXT
+  return THRESHOLD_TYPE_TEXT
 }
 
 export const validateGaugeColors = colors => {
@@ -158,13 +162,13 @@ export const validateGaugeColors = colors => {
   }
 
   // Gauge colors should have a type of min, any number of thresholds, and a max
-  const formattedColors = _.sortBy(colors, color =>
-    Number(color.value)
-  ).map(color => ({
-    ...color,
-    value: Number(color.value),
-    type: COLOR_TYPE_THRESHOLD,
-  }))
+  const formattedColors = _.sortBy(colors, color => Number(color.value)).map(
+    color => ({
+      ...color,
+      value: Number(color.value),
+      type: COLOR_TYPE_THRESHOLD,
+    })
+  )
 
   formattedColors[0].type = COLOR_TYPE_MIN
   formattedColors[formattedColors.length - 1].type = COLOR_TYPE_MAX

@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 
 import ColorDropdown from 'shared/components/ColorDropdown'
 
-import {GAUGE_COLORS} from 'src/dashboards/constants/gaugeColors'
+import {THRESHOLD_COLORS} from 'shared/constants/thresholds'
 
 class Threshold extends Component {
   constructor(props) {
@@ -53,14 +54,14 @@ class Threshold extends Component {
     const selectedColor = {hex, name}
 
     let label = 'Threshold'
-    let labelClass = 'gauge-controls--label-editable'
+    let labelClass = 'threshold-item--label__editable'
     let canBeDeleted = true
 
     if (visualizationType === 'gauge') {
       labelClass =
         isMin || isMax
-          ? 'gauge-controls--label'
-          : 'gauge-controls--label-editable'
+          ? 'threshold-item--label'
+          : 'threshold-item--label__editable'
       canBeDeleted = !(isMin || isMax)
     }
 
@@ -72,22 +73,20 @@ class Threshold extends Component {
     }
 
     const inputClass = valid
-      ? 'form-control input-sm gauge-controls--input'
-      : 'form-control input-sm gauge-controls--input form-volcano'
+      ? 'form-control input-sm threshold-item--input'
+      : 'form-control input-sm threshold-item--input form-volcano'
 
     return (
-      <div className="gauge-controls--section">
-        <div className={labelClass}>
-          {label}
-        </div>
-        {canBeDeleted
-          ? <button
-              className="btn btn-default btn-sm btn-square gauge-controls--delete"
-              onClick={onDeleteThreshold(threshold)}
-            >
-              <span className="icon remove" />
-            </button>
-          : null}
+      <div className="threshold-item">
+        <div className={labelClass}>{label}</div>
+        {canBeDeleted ? (
+          <button
+            className="btn btn-default btn-sm btn-square"
+            onClick={onDeleteThreshold(threshold)}
+          >
+            <span className="icon remove" />
+          </button>
+        ) : null}
         <input
           value={workingValue}
           className={inputClass}
@@ -98,7 +97,7 @@ class Threshold extends Component {
           ref={r => (this.thresholdInputRef = r)}
         />
         <ColorDropdown
-          colors={GAUGE_COLORS}
+          colors={THRESHOLD_COLORS}
           selected={selectedColor}
           onChoose={onChooseColor(threshold)}
           disabled={isMax && disableMaxColor}

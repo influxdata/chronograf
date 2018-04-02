@@ -1,11 +1,11 @@
 import _ from 'lodash'
 import {shiftDate} from 'shared/query/helpers'
-import {map, reduce, forEach, concat, clone} from 'fast.js'
+import {map, reduce, filter, forEach, concat, clone} from 'fast.js'
 
 /**
  * Accepts an array of raw influxdb responses and returns a format
  * that Dygraph understands.
-**/
+ **/
 
 const DEFAULT_SIZE = 0
 const cells = {
@@ -16,7 +16,7 @@ const cells = {
   responseIndex: new Array(DEFAULT_SIZE),
 }
 
-export default function timeSeriesToDygraph(raw = [], isInDataExplorer) {
+const timeSeriesTransform = (raw = []) => {
   // collect results from each influx response
   const results = reduce(
     raw,
@@ -139,6 +139,15 @@ export default function timeSeriesToDygraph(raw = [], isInDataExplorer) {
   }
   const sortedTimeSeries = _.sortBy(timeSeries, 'time')
 
+  return {
+    sortedLabels,
+    sortedTimeSeries,
+  }
+}
+
+export const timeSeriesToDygraph = (raw = [], isInDataExplorer) => {
+  const {sortedLabels, sortedTimeSeries} = timeSeriesTransform(raw)
+
   const dygraphSeries = reduce(
     sortedLabels,
     (acc, {label, responseIndex}) => {
@@ -147,7 +156,6 @@ export default function timeSeriesToDygraph(raw = [], isInDataExplorer) {
           axis: responseIndex === 0 ? 'y' : 'y2',
         }
       }
-
       return acc
     },
     {}
@@ -162,3 +170,51 @@ export default function timeSeriesToDygraph(raw = [], isInDataExplorer) {
     dygraphSeries,
   }
 }
+
+export const timeSeriesToTableGraph = raw => {
+  const {sortedLabels, sortedTimeSeries} = timeSeriesTransform(raw)
+
+  const labels = ['time', ...map(sortedLabels, ({label}) => label)]
+
+  const tableData = map(sortedTimeSeries, ({time, values}) => [time, ...values])
+  const data = tableData.length ? [labels, ...tableData] : [[]]
+  return {
+    labels,
+    data,
+  }
+}
+
+export const filterTableColumns = (data, fieldNames) => {
+  const visibility = {}
+  const filteredData = map(data, (row, i) => {
+    return filter(row, (col, j) => {
+      if (i === 0) {
+        const foundField = fieldNames.find(field => field.internalName === col)
+        visibility[j] = foundField ? foundField.visible : true
+      }
+      return visibility[j]
+    })
+  })
+  return filteredData[0].length ? filteredData : [[]]
+}
+
+export const processTableData = (
+  data,
+  sortFieldName,
+  direction,
+  verticalTimeAxis,
+  fieldNames
+) => {
+  const sortIndex = _.indexOf(data[0], sortFieldName)
+  const sortedData = [
+    data[0],
+    ..._.orderBy(_.drop(data, 1), sortIndex, [direction]),
+  ]
+  const sortedTimeVals = map(sortedData, r => r[0])
+  const filteredData = filterTableColumns(sortedData, fieldNames)
+  const processedData = verticalTimeAxis ? filteredData : _.unzip(filteredData)
+
+  return {processedData, sortedTimeVals}
+}
+
+export default timeSeriesToDygraph

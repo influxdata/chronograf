@@ -164,7 +164,8 @@ func TestServer(t *testing.T) {
   "id": "5000",
   "name": "Kapa 1",
   "url": "http://localhost:9092",
-  "active": true,
+	"active": true,
+	"insecureSkipVerify": false,
   "links": {
     "proxy": "/chronograf/v1/sources/5000/kapacitors/5000/proxy",
     "self": "/chronograf/v1/sources/5000/kapacitors/5000",
@@ -222,7 +223,8 @@ func TestServer(t *testing.T) {
       "id": "5000",
       "name": "Kapa 1",
       "url": "http://localhost:9092",
-      "active": true,
+			"active": true,
+			"insecureSkipVerify": false,
       "links": {
         "proxy": "/chronograf/v1/sources/5000/kapacitors/5000/proxy",
         "self": "/chronograf/v1/sources/5000/kapacitors/5000",
@@ -540,7 +542,19 @@ func TestServer(t *testing.T) {
       "legend":{
           "type": "static",
           "orientation": "bottom"
-      },
+			},
+			"tableOptions":{
+				"timeFormat": "",
+				"verticalTimeAxis": false,
+				"sortBy":{
+					"internalName": "",
+					"displayName": "",
+					"visible": false
+				},
+				"wrapping": "",
+				"fieldNames": null,
+				"fixFirstColumn": false
+			},
       "links": {
         "self": "/chronograf/v1/dashboards/1000/cells/8f61c619-dd9b-4761-8aa8-577f27247093"
       }
@@ -779,7 +793,19 @@ func TestServer(t *testing.T) {
               "name": "comet",
               "value": "100"
             }
-          ],
+					],
+					"tableOptions":{
+						"timeFormat":"",
+						"verticalTimeAxis":false,
+						"sortBy":{
+							"internalName":"",
+							"displayName":"",
+							"visible":false
+						},
+						"wrapping":"",
+						"fieldNames":null,
+						"fixFirstColumn":false
+					},
           "legend":{
               "type": "static",
               "orientation": "bottom"
@@ -2689,6 +2715,11 @@ func TestServer(t *testing.T) {
 		  "logout": "/oauth/logout",
 		  "external": {
 		    "statusFeed": ""
+		  },
+		  "ifql": {
+				"ast": "/chronograf/v1/ifql/ast",
+				"self": "/chronograf/v1/ifql",
+				"suggestions": "/chronograf/v1/ifql/suggestions"
 		  }
 		}
 		`,
@@ -2772,6 +2803,11 @@ func TestServer(t *testing.T) {
 		  "logout": "/oauth/logout",
 		  "external": {
 		    "statusFeed": ""
+		  },
+		  "ifql": {
+				"ast": "/chronograf/v1/ifql/ast",
+				"self": "/chronograf/v1/ifql",
+				"suggestions": "/chronograf/v1/ifql/suggestions"
 		  }
 		}
 		`,
@@ -2794,6 +2830,9 @@ func TestServer(t *testing.T) {
 
 			// This is so that we can use staticly generate jwts
 			tt.args.server.TokenSecret = "secret"
+
+			// Endpoint for validating RSA256 signatures when using id_token parsing for ADFS
+			tt.args.server.JwksURL = ""
 
 			boltFile := newBoltFile()
 			tt.args.server.BoltPath = boltFile
@@ -2912,7 +2951,7 @@ func TestServer(t *testing.T) {
 			buf, _ := json.Marshal(tt.args.payload)
 			reqBody := ioutil.NopCloser(bytes.NewReader(buf))
 			req, _ := http.NewRequest(tt.args.method, serverURL, reqBody)
-			token, _ := oauth2.NewJWT(tt.args.server.TokenSecret).Create(ctx, tt.args.principal)
+			token, _ := oauth2.NewJWT(tt.args.server.TokenSecret, tt.args.server.JwksURL).Create(ctx, tt.args.principal)
 			req.AddCookie(&http.Cookie{
 				Name:     "session",
 				Value:    string(token),

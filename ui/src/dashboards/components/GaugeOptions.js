@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
@@ -10,10 +11,10 @@ import Threshold from 'src/dashboards/components/Threshold'
 
 import {
   COLOR_TYPE_THRESHOLD,
-  GAUGE_COLORS,
+  THRESHOLD_COLORS,
   MAX_THRESHOLDS,
   MIN_THRESHOLDS,
-} from 'src/dashboards/constants/gaugeColors'
+} from 'shared/constants/thresholds'
 
 import {
   updateGaugeColors,
@@ -26,7 +27,7 @@ class GaugeOptions extends Component {
     const sortedColors = _.sortBy(gaugeColors, color => color.value)
 
     if (sortedColors.length <= MAX_THRESHOLDS) {
-      const randomColor = _.random(0, GAUGE_COLORS.length - 1)
+      const randomColor = _.random(0, THRESHOLD_COLORS.length - 1)
 
       const maxValue = sortedColors[sortedColors.length - 1].value
       const minValue = sortedColors[0].value
@@ -42,8 +43,8 @@ class GaugeOptions extends Component {
         type: COLOR_TYPE_THRESHOLD,
         id: uuid.v4(),
         value: randomValue,
-        hex: GAUGE_COLORS[randomColor].hex,
-        name: GAUGE_COLORS[randomColor].name,
+        hex: THRESHOLD_COLORS[randomColor].hex,
+        name: THRESHOLD_COLORS[randomColor].name,
       }
 
       const updatedColors = _.sortBy(
@@ -164,15 +165,15 @@ class GaugeOptions extends Component {
       >
         <div className="display-options--cell-wrapper">
           <h5 className="display-options--header">Gauge Controls</h5>
-          <div className="gauge-controls">
+          <div className="thresholds-list">
             <button
-              className="btn btn-sm btn-primary gauge-controls--add-threshold"
+              className="btn btn-sm btn-primary"
               onClick={this.handleAddThreshold}
               disabled={disableAddThreshold}
             >
               <span className="icon plus" /> Add Threshold
             </button>
-            {gaugeColors.map(color =>
+            {gaugeColors.map(color => (
               <Threshold
                 isMin={color.value === gaugeColors[0].value}
                 isMax={
@@ -188,9 +189,9 @@ class GaugeOptions extends Component {
                 onDeleteThreshold={this.handleDeleteThreshold}
                 onSortColors={this.handleSortColors}
               />
-            )}
+            ))}
           </div>
-          <div className="single-stat-controls">
+          <div className="graph-options-group form-group-wrapper">
             <div className="form-group col-xs-6">
               <label>Prefix</label>
               <input

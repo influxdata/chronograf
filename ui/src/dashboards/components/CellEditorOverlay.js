@@ -1,9 +1,10 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 
 import _ from 'lodash'
 import uuid from 'uuid'
 
-import ResizeContainer from 'shared/components/ResizeContainer'
+import ResizeContainer from 'src/shared/components/ResizeContainer'
 import QueryMaker from 'src/dashboards/components/QueryMaker'
 import Visualization from 'src/dashboards/components/Visualization'
 import OverlayControls from 'src/dashboards/components/OverlayControls'
@@ -20,10 +21,10 @@ import {
   removeUnselectedTemplateValues,
   TYPE_QUERY_CONFIG,
 } from 'src/dashboards/constants'
-import {OVERLAY_TECHNOLOGY} from 'shared/constants/classNames'
+import {OVERLAY_TECHNOLOGY} from 'src/shared/constants/classNames'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'src/data_explorer/constants'
-import {AUTO_GROUP_BY} from 'shared/constants'
-import {stringifyColorValues} from 'src/dashboards/constants/gaugeColors'
+import {AUTO_GROUP_BY} from 'src/shared/constants'
+import {stringifyColorValues} from 'src/shared/constants/colorOperations'
 
 class CellEditorOverlay extends Component {
   constructor(props) {
@@ -47,6 +48,7 @@ class CellEditorOverlay extends Component {
       activeQueryIndex: 0,
       isDisplayOptionsTabActive: false,
       staticLegend: IS_STATIC_LEGEND(legend),
+      dataLabels: [],
     }
   }
 
@@ -105,7 +107,7 @@ class CellEditorOverlay extends Component {
 
   handleSaveCell = () => {
     const {queriesWorkingDraft, staticLegend} = this.state
-    const {cell, singleStatColors, gaugeColors} = this.props
+    const {cell, thresholdsListColors, gaugeColors} = this.props
 
     const queries = queriesWorkingDraft.map(q => {
       const timeRange = q.range || {upper: null, lower: ':dashboardTime:'}
@@ -119,13 +121,18 @@ class CellEditorOverlay extends Component {
     })
 
     let colors = []
-    if (cell.type === 'gauge') {
-      colors = stringifyColorValues(gaugeColors)
-    } else if (
-      cell.type === 'single-stat' ||
-      cell.type === 'line-plus-single-stat'
-    ) {
-      colors = stringifyColorValues(singleStatColors)
+
+    switch (cell.type) {
+      case 'gauge': {
+        colors = stringifyColorValues(gaugeColors)
+        break
+      }
+      case 'single-stat':
+      case 'line-plus-single-stat':
+      case 'table': {
+        colors = stringifyColorValues(thresholdsListColors)
+        break
+      }
     }
 
     this.props.onSave({
@@ -253,6 +260,10 @@ class CellEditorOverlay extends Component {
     this.overlayRef.focus()
   }
 
+  setDataLabels = dataLabels => {
+    this.setState({dataLabels})
+  }
+
   render() {
     const {
       onCancel,
@@ -267,6 +278,7 @@ class CellEditorOverlay extends Component {
       isDisplayOptionsTabActive,
       queriesWorkingDraft,
       staticLegend,
+      dataLabels,
     } = this.state
 
     const queryActions = {
@@ -299,6 +311,7 @@ class CellEditorOverlay extends Component {
             queryConfigs={queriesWorkingDraft}
             editQueryStatus={editQueryStatus}
             staticLegend={staticLegend}
+            setDataLabels={this.setDataLabels}
           />
           <CEOBottom>
             <OverlayControls
@@ -312,27 +325,30 @@ class CellEditorOverlay extends Component {
               isDisplayOptionsTabActive={isDisplayOptionsTabActive}
               onClickDisplayOptions={this.handleClickDisplayOptionsTab}
             />
-            {isDisplayOptionsTabActive
-              ? <DisplayOptions
-                  queryConfigs={queriesWorkingDraft}
-                  onToggleStaticLegend={this.handleToggleStaticLegend}
-                  staticLegend={staticLegend}
-                  onResetFocus={this.handleResetFocus}
-                />
-              : <QueryMaker
-                  source={this.getSource()}
-                  templates={templates}
-                  queries={queriesWorkingDraft}
-                  actions={queryActions}
-                  autoRefresh={autoRefresh}
-                  timeRange={timeRange}
-                  onDeleteQuery={this.handleDeleteQuery}
-                  onAddQuery={this.handleAddQuery}
-                  activeQueryIndex={activeQueryIndex}
-                  activeQuery={this.getActiveQuery()}
-                  setActiveQueryIndex={this.handleSetActiveQueryIndex}
-                  initialGroupByTime={AUTO_GROUP_BY}
-                />}
+            {isDisplayOptionsTabActive ? (
+              <DisplayOptions
+                queryConfigs={queriesWorkingDraft}
+                onToggleStaticLegend={this.handleToggleStaticLegend}
+                staticLegend={staticLegend}
+                onResetFocus={this.handleResetFocus}
+                dataLabels={dataLabels}
+              />
+            ) : (
+              <QueryMaker
+                source={this.getSource()}
+                templates={templates}
+                queries={queriesWorkingDraft}
+                actions={queryActions}
+                autoRefresh={autoRefresh}
+                timeRange={timeRange}
+                onDeleteQuery={this.handleDeleteQuery}
+                onAddQuery={this.handleAddQuery}
+                activeQueryIndex={activeQueryIndex}
+                activeQuery={this.getActiveQuery()}
+                setActiveQueryIndex={this.handleSetActiveQueryIndex}
+                initialGroupByTime={AUTO_GROUP_BY}
+              />
+            )}
           </CEOBottom>
         </ResizeContainer>
       </div>
@@ -340,10 +356,9 @@ class CellEditorOverlay extends Component {
   }
 }
 
-const CEOBottom = ({children}) =>
-  <div className="overlay-technology--editor">
-    {children}
-  </div>
+const CEOBottom = ({children}) => (
+  <div className="overlay-technology--editor">{children}</div>
+)
 
 const {arrayOf, func, node, number, shape, string} = PropTypes
 
@@ -374,8 +389,8 @@ CellEditorOverlay.propTypes = {
   }).isRequired,
   dashboardID: string.isRequired,
   sources: arrayOf(shape()),
-  singleStatType: string.isRequired,
-  singleStatColors: arrayOf(shape({}).isRequired).isRequired,
+  thresholdsListType: string.isRequired,
+  thresholdsListColors: arrayOf(shape({}).isRequired).isRequired,
   gaugeColors: arrayOf(shape({}).isRequired).isRequired,
 }
 

@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 
 import {emptyGraphCopy} from 'src/shared/copy/cell'
 
@@ -6,10 +7,12 @@ import AutoRefresh from 'shared/components/AutoRefresh'
 import LineGraph from 'shared/components/LineGraph'
 import SingleStat from 'shared/components/SingleStat'
 import GaugeChart from 'shared/components/GaugeChart'
+import TableGraph from 'shared/components/TableGraph'
 
 const RefreshingLineGraph = AutoRefresh(LineGraph)
 const RefreshingSingleStat = AutoRefresh(SingleStat)
 const RefreshingGaugeChart = AutoRefresh(GaugeChart)
+const RefreshingTableGraph = AutoRefresh(TableGraph)
 
 const RefreshingGraph = ({
   axes,
@@ -19,6 +22,8 @@ const RefreshingGraph = ({
   onZoom,
   cellID,
   queries,
+  tableOptions,
+  setDataLabels,
   templates,
   timeRange,
   cellHeight,
@@ -26,10 +31,11 @@ const RefreshingGraph = ({
   resizerTopHeight,
   staticLegend,
   manualRefresh, // when changed, re-mounts the component
-  synchronizer,
   resizeCoords,
   editQueryStatus,
   grabDataForDownload,
+  hoverTime,
+  onSetHoverTime,
 }) => {
   const prefix = (axes && axes.y.prefix) || ''
   const suffix = (axes && axes.y.suffix) || ''
@@ -37,9 +43,7 @@ const RefreshingGraph = ({
   if (!queries.length) {
     return (
       <div className="graph-empty">
-        <p data-test="data-explorer-no-results">
-          {emptyGraphCopy}
-        </p>
+        <p data-test="data-explorer-no-results">{emptyGraphCopy}</p>
       </div>
     )
   }
@@ -79,6 +83,27 @@ const RefreshingGraph = ({
     )
   }
 
+  if (type === 'table') {
+    return (
+      <RefreshingTableGraph
+        colors={colors}
+        key={manualRefresh}
+        queries={queries}
+        templates={templates}
+        autoRefresh={autoRefresh}
+        cellHeight={cellHeight}
+        resizerTopHeight={resizerTopHeight}
+        resizeCoords={resizeCoords}
+        cellID={cellID}
+        tableOptions={tableOptions}
+        hoverTime={hoverTime}
+        onSetHoverTime={onSetHoverTime}
+        inView={inView}
+        setDataLabels={setDataLabels}
+      />
+    )
+  }
+
   const displayOptions = {
     stepPlot: type === 'line-stepplot',
     stackedGraph: type === 'line-stacked',
@@ -96,7 +121,8 @@ const RefreshingGraph = ({
       timeRange={timeRange}
       autoRefresh={autoRefresh}
       isBarGraph={type === 'bar'}
-      synchronizer={synchronizer}
+      hoverTime={hoverTime}
+      onSetHoverTime={onSetHoverTime}
       resizeCoords={resizeCoords}
       staticLegend={staticLegend}
       displayOptions={displayOptions}
@@ -116,7 +142,8 @@ RefreshingGraph.propTypes = {
   autoRefresh: number.isRequired,
   manualRefresh: number,
   templates: arrayOf(shape()),
-  synchronizer: func,
+  hoverTime: string,
+  onSetHoverTime: func,
   type: string.isRequired,
   cellHeight: number,
   resizerTopHeight: number,
@@ -138,6 +165,8 @@ RefreshingGraph.propTypes = {
   ),
   cellID: string,
   inView: bool,
+  tableOptions: shape({}),
+  setDataLabels: func,
 }
 
 RefreshingGraph.defaultProps = {

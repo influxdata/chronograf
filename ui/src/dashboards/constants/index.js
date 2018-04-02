@@ -1,3 +1,5 @@
+import {DEFAULT_TABLE_OPTIONS} from 'src/shared/constants/tableGraph'
+
 export const EMPTY_DASHBOARD = {
   id: 0,
   name: '',
@@ -20,6 +22,50 @@ export const NEW_DEFAULT_DASHBOARD_CELL = {
   name: 'Untitled Cell',
   type: 'line',
   queries: [],
+  tableOptions: DEFAULT_TABLE_OPTIONS,
+}
+
+const getMostCommonValue = values => {
+  const results = values.reduce(
+    (acc, value) => {
+      const {distribution, mostCommonCount} = acc
+      distribution[value] = (distribution[value] || 0) + 1
+      if (distribution[value] > mostCommonCount) {
+        return {
+          distribution,
+          mostCommonCount: distribution[value],
+          mostCommonValue: value,
+        }
+      }
+      return acc
+    },
+    {distribution: {}, mostCommonCount: 0}
+  )
+
+  return results.mostCommonValue
+}
+
+export const generateNewDashboardCell = dashboard => {
+  if (dashboard.cells.length === 0) {
+    return NEW_DEFAULT_DASHBOARD_CELL
+  }
+
+  const newCellY = dashboard.cells
+    .map(cell => cell.y + cell.h)
+    .reduce((a, b) => (a > b ? a : b))
+
+  const existingCellWidths = dashboard.cells.map(cell => cell.w)
+  const existingCellHeights = dashboard.cells.map(cell => cell.h)
+
+  const mostCommonCellWidth = getMostCommonValue(existingCellWidths)
+  const mostCommonCellHeight = getMostCommonValue(existingCellHeights)
+
+  return {
+    ...NEW_DEFAULT_DASHBOARD_CELL,
+    y: newCellY,
+    w: mostCommonCellWidth,
+    h: mostCommonCellHeight,
+  }
 }
 
 export const NEW_DASHBOARD = {
@@ -91,16 +137,7 @@ export const removeUnselectedTemplateValues = templates => {
     return {...template, values: selectedValues}
   })
 }
-export const DISPLAY_OPTIONS = {
-  LINEAR: 'linear',
-  LOG: 'log',
-  BASE_2: '2',
-  BASE_10: '10',
-}
-export const TOOLTIP_CONTENT = {
-  FORMAT:
-    '<p><strong>K/M/B</strong> = Thousand / Million / Billion<br/><strong>K/M/G</strong> = Kilo / Mega / Giga </p>',
-}
+
 export const TYPE_QUERY_CONFIG = 'queryConfig'
 export const TYPE_SHIFTED = 'shifted queryConfig'
 export const TYPE_IFQL = 'ifql'
