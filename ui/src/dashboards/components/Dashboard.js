@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import TemplateControlBar from 'src/dashboards/components/TemplateControlBar'
@@ -15,7 +16,6 @@ const Dashboard = ({
   autoRefresh,
   manualRefresh,
   onDeleteCell,
-  synchronizer,
   onPositionChange,
   inPresentationMode,
   onOpenTemplateManager,
@@ -25,6 +25,8 @@ const Dashboard = ({
   showTemplateControlBar,
   setScrollTop,
   inView,
+  onSetHoverTime,
+  hoverTime,
 }) => {
   const cells = dashboard.cells.map(cell => {
     const dashboardCell = {
@@ -47,36 +49,39 @@ const Dashboard = ({
       setScrollTop={setScrollTop}
     >
       <div className="dashboard container-fluid full-width">
-        {inPresentationMode
-          ? null
-          : <TemplateControlBar
-              templates={dashboard.templates}
-              onSelectTemplate={onSelectTemplate}
-              onOpenTemplateManager={onOpenTemplateManager}
-              isOpen={showTemplateControlBar}
-            />}
-        {cells.length
-          ? <LayoutRenderer
-              cells={cells}
-              onZoom={onZoom}
-              source={source}
-              sources={sources}
-              isEditable={true}
-              timeRange={timeRange}
-              autoRefresh={autoRefresh}
-              manualRefresh={manualRefresh}
-              synchronizer={synchronizer}
-              onDeleteCell={onDeleteCell}
-              onPositionChange={onPositionChange}
-              templates={templatesIncludingDashTime}
-              onSummonOverlayTechnologies={onSummonOverlayTechnologies}
-            />
-          : <div className="dashboard__empty">
-              <p>This Dashboard has no Cells</p>
-              <button className="btn btn-primary btn-m" onClick={onAddCell}>
-                <span className="icon plus" />Add a Cell
-              </button>
-            </div>}
+        {inPresentationMode ? null : (
+          <TemplateControlBar
+            templates={dashboard.templates}
+            onSelectTemplate={onSelectTemplate}
+            onOpenTemplateManager={onOpenTemplateManager}
+            isOpen={showTemplateControlBar}
+          />
+        )}
+        {cells.length ? (
+          <LayoutRenderer
+            cells={cells}
+            onZoom={onZoom}
+            source={source}
+            sources={sources}
+            isEditable={true}
+            timeRange={timeRange}
+            autoRefresh={autoRefresh}
+            manualRefresh={manualRefresh}
+            hoverTime={hoverTime}
+            onSetHoverTime={onSetHoverTime}
+            onDeleteCell={onDeleteCell}
+            onPositionChange={onPositionChange}
+            templates={templatesIncludingDashTime}
+            onSummonOverlayTechnologies={onSummonOverlayTechnologies}
+          />
+        ) : (
+          <div className="dashboard__empty">
+            <p>This Dashboard has no Cells</p>
+            <button className="btn btn-primary btn-m" onClick={onAddCell}>
+              <span className="icon plus" />Add a Cell
+            </button>
+          </div>
+        )}
       </div>
     </FancyScrollbar>
   )
@@ -111,7 +116,8 @@ Dashboard.propTypes = {
   onPositionChange: func,
   onDeleteCell: func,
   onSummonOverlayTechnologies: func,
-  synchronizer: func,
+  hoverTime: string,
+  onSetHoverTime: func,
   source: shape({
     links: shape({
       proxy: string,

@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import WidgetCell from 'shared/components/WidgetCell'
 import LayoutCell from 'shared/components/LayoutCell'
 import RefreshingGraph from 'shared/components/RefreshingGraph'
@@ -40,7 +41,7 @@ const Layout = (
   {
     host,
     cell,
-    cell: {h, axes, type, colors, legend},
+    cell: {h, axes, type, colors, legend, tableOptions},
     source,
     sources,
     onZoom,
@@ -52,15 +53,16 @@ const Layout = (
     autoRefresh,
     manualRefresh,
     onDeleteCell,
-    synchronizer,
     resizeCoords,
     onCancelEditCell,
     onStopAddAnnotation,
     onSummonOverlayTechnologies,
     grabDataForDownload,
+    hoverTime,
+    onSetHoverTime,
   },
   {source: defaultSource}
-) =>
+) => (
   <LayoutCell
     cell={cell}
     celldata={celldata}
@@ -70,33 +72,38 @@ const Layout = (
     onCancelEditCell={onCancelEditCell}
     onSummonOverlayTechnologies={onSummonOverlayTechnologies}
   >
-    {cell.isWidget
-      ? <WidgetCell cell={cell} timeRange={timeRange} source={source} />
-      : <RefreshingGraph
-          colors={colors}
-          inView={cell.inView}
-          axes={axes}
-          type={type}
-          staticLegend={IS_STATIC_LEGEND(legend)}
-          cellHeight={h}
-          onZoom={onZoom}
-          sources={sources}
-          timeRange={timeRange}
-          templates={templates}
-          autoRefresh={autoRefresh}
-          synchronizer={synchronizer}
-          manualRefresh={manualRefresh}
-          onStopAddAnnotation={onStopAddAnnotation}
-          grabDataForDownload={grabDataForDownload}
-          resizeCoords={resizeCoords}
-          queries={buildQueriesForLayouts(
-            cell,
-            getSource(cell, source, sources, defaultSource),
-            timeRange,
-            host
-          )}
-        />}
+    {cell.isWidget ? (
+      <WidgetCell cell={cell} timeRange={timeRange} source={source} />
+    ) : (
+      <RefreshingGraph
+        colors={colors}
+        inView={cell.inView}
+        axes={axes}
+        type={type}
+        tableOptions={tableOptions}
+        staticLegend={IS_STATIC_LEGEND(legend)}
+        cellHeight={h}
+        onZoom={onZoom}
+        sources={sources}
+        timeRange={timeRange}
+        templates={templates}
+        autoRefresh={autoRefresh}
+        hoverTime={hoverTime}
+        onSetHoverTime={onSetHoverTime}
+        manualRefresh={manualRefresh}
+        onStopAddAnnotation={onStopAddAnnotation}
+        grabDataForDownload={grabDataForDownload}
+        resizeCoords={resizeCoords}
+        queries={buildQueriesForLayouts(
+          cell,
+          getSource(cell, source, sources, defaultSource),
+          timeRange,
+          host
+        )}
+      />
+    )}
   </LayoutCell>
+)
 
 const {arrayOf, bool, func, number, shape, string} = PropTypes
 
@@ -148,7 +155,8 @@ const propTypes = {
   onEditCell: func,
   onDeleteCell: func,
   onSummonOverlayTechnologies: func,
-  synchronizer: func,
+  hoverTime: string,
+  onSetHoverTime: func,
   isStatusPage: bool,
   isEditable: bool,
   onCancelEditCell: func,

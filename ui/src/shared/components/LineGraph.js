@@ -1,9 +1,10 @@
-import React, {PropTypes, Component} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import Dygraph from 'shared/components/Dygraph'
 import shallowCompare from 'react-addons-shallow-compare'
 
 import SingleStat from 'src/shared/components/SingleStat'
-import timeSeriesToDygraph from 'utils/timeSeriesToDygraph'
+import timeSeriesToDygraph from 'utils/timeSeriesTransformers'
 
 import {SINGLE_STAT_LINE_COLORS} from 'src/shared/graphs/helpers'
 
@@ -48,7 +49,6 @@ class LineGraph extends Component {
       ruleValues,
       isBarGraph,
       resizeCoords,
-      synchronizer,
       isRefreshing,
       setResolution,
       isGraphFilled,
@@ -58,6 +58,8 @@ class LineGraph extends Component {
       underlayCallback,
       overrideLineColors,
       isFetchingInitially,
+      hoverTime,
+      onSetHoverTime,
     } = this.props
 
     const {labels, timeSeries, dygraphSeries} = this._timeSeries
@@ -74,6 +76,7 @@ class LineGraph extends Component {
       rightGap: 0,
       yRangePad: 10,
       labelsKMB: true,
+      fillGraph: true,
       underlayCallback,
       axisLabelWidth: 60,
       drawAxesAtZero: true,
@@ -110,7 +113,8 @@ class LineGraph extends Component {
           isBarGraph={isBarGraph}
           timeSeries={timeSeries}
           ruleValues={ruleValues}
-          synchronizer={synchronizer}
+          hoverTime={hoverTime}
+          onSetHoverTime={onSetHoverTime}
           resizeCoords={resizeCoords}
           dygraphSeries={dygraphSeries}
           setResolution={setResolution}
@@ -119,7 +123,7 @@ class LineGraph extends Component {
           staticLegend={staticLegend}
           isGraphFilled={showSingleStat ? false : isGraphFilled}
         >
-          {showSingleStat &&
+          {showSingleStat && (
             <SingleStat
               prefix={prefix}
               suffix={suffix}
@@ -127,24 +131,27 @@ class LineGraph extends Component {
               lineGraph={true}
               colors={colors}
               cellHeight={cellHeight}
-            />}
+            />
+          )}
         </Dygraph>
       </div>
     )
   }
 }
 
-const GraphLoadingDots = () =>
+const GraphLoadingDots = () => (
   <div className="graph-panel__refreshing">
     <div />
     <div />
     <div />
   </div>
+)
 
-const GraphSpinner = () =>
+const GraphSpinner = () => (
   <div className="graph-fetching">
     <div className="graph-spinner" />
   </div>
+)
 
 const {array, arrayOf, bool, func, number, shape, string} = PropTypes
 
@@ -185,7 +192,8 @@ LineGraph.propTypes = {
     lower: string.isRequired,
   }),
   isInDataExplorer: bool,
-  synchronizer: func,
+  hoverTime: string,
+  onSetHoverTime: func,
   setResolution: func,
   cellHeight: number,
   cell: shape(),
