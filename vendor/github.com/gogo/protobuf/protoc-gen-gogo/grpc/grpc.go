@@ -36,7 +36,6 @@ package grpc
 
 import (
 	"fmt"
-	"path"
 	"strconv"
 	"strings"
 
@@ -48,7 +47,7 @@ import (
 // It is incremented whenever an incompatibility between the generated code and
 // the grpc package is introduced; the generated code references
 // a constant, grpc.SupportPackageIsVersionN (where N is generatedCodeVersion).
-const generatedCodeVersion = 3
+const generatedCodeVersion = 4
 
 // Paths for packages used by code generated in this file,
 // relative to the import_prefix of the generator.Generator.
@@ -129,11 +128,11 @@ func (g *grpc) GenerateImports(file *generator.FileDescriptor) {
 	if len(file.FileDescriptorProto.Service) == 0 {
 		return
 	}
-	g.P("import (")
-	g.P(contextPkg, " ", strconv.Quote(path.Join(g.gen.ImportPrefix, contextPkgPath)))
-	g.P(grpcPkg, " ", strconv.Quote(path.Join(g.gen.ImportPrefix, grpcPkgPath)))
-	g.P(")")
-	g.P()
+	imports := generator.NewPluginImports(g.gen)
+	for _, i := range []string{contextPkgPath, grpcPkgPath} {
+		imports.NewImport(i).Use()
+	}
+	imports.GenerateImports(file)
 }
 
 // reservedClientName records whether a client name is reserved on the client side.
@@ -254,7 +253,7 @@ func (g *grpc) generateService(file *generator.FileDescriptor, service *pb.Servi
 		g.P("},")
 	}
 	g.P("},")
-	g.P("Metadata: ", file.VarName(), ",")
+	g.P("Metadata: \"", file.GetName(), "\",")
 	g.P("}")
 	g.P()
 }
