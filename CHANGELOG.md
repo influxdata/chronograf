@@ -1,16 +1,4 @@
-## v1.5.0.0 [unreleased]
-
-### Features
-
-### UI Improvements
-
-### Bug Fixes
-
-## v1.4.3.1 [unreleased]
-
-### Features
-
-### UI Improvements
+## v1.4.3.1 [2018-04-02]
 
 ### Bug Fixes
 
