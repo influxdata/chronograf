@@ -545,9 +545,10 @@ export const GRAPH_TYPES = [
     menuOption: 'Gauge',
     graphic: GRAPH_SVGS.gauge,
   },
-  {
-    type: 'table',
-    menuOption: 'Table',
-    graphic: GRAPH_SVGS.table,
-  },
+  // FEATURE FLAG for Table-Graph
+  // {
+  //   type: 'table',
+  //   menuOption: 'Table',
+  //   graphic: GRAPH_SVGS.table,
+  // },
 ]
