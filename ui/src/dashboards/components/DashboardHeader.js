@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
@@ -10,6 +9,7 @@ import SourceIndicator from 'shared/components/SourceIndicator'
 import GraphTips from 'shared/components/GraphTips'
 import DashboardHeaderEdit from 'src/dashboards/components/DashboardHeaderEdit'
 import DashboardSwitcher from 'src/dashboards/components/DashboardSwitcher'
+import DashboardOptionsMenu from 'src/dashboards/components/DashboardOptionsMenu'
 
 const DashboardHeader = ({
   names,
@@ -25,10 +25,7 @@ const DashboardHeader = ({
   onManualRefresh,
   handleChooseTimeRange,
   handleChooseAutoRefresh,
-  onToggleTempVarControls,
-  showTemplateControlBar,
   timeRange: {upper, lower},
-  handleClickPresentationButton,
   zoomedTimeRange: {zoomedLower, zoomedUpper},
 }) =>
   isHidden ? null : (
@@ -77,16 +74,6 @@ const DashboardHeader = ({
               </button>
             </Authorized>
           ) : null}
-          {dashboard ? (
-            <div
-              className={classnames('btn btn-default btn-sm', {
-                active: showTemplateControlBar,
-              })}
-              onClick={onToggleTempVarControls}
-            >
-              <span className="icon cube" />Template Variables
-            </div>
-          ) : null}
           <AutoRefreshDropdown
             onChoose={handleChooseAutoRefresh}
             onManualRefresh={onManualRefresh}
@@ -100,12 +87,7 @@ const DashboardHeader = ({
               lower: zoomedLower || lower,
             }}
           />
-          <div
-            className="btn btn-default btn-sm btn-square"
-            onClick={handleClickPresentationButton}
-          >
-            <span className="icon expand-a" />
-          </div>
+          <DashboardOptionsMenu isEditableDashboard={!!dashboard} />
         </div>
       </div>
     </div>
@@ -134,10 +116,7 @@ DashboardHeader.propTypes = {
   handleChooseTimeRange: func.isRequired,
   handleChooseAutoRefresh: func.isRequired,
   onManualRefresh: func.isRequired,
-  handleClickPresentationButton: func.isRequired,
   onAddCell: func,
-  onToggleTempVarControls: func,
-  showTemplateControlBar: bool,
   zoomedTimeRange: shape({}),
   onCancel: func,
   onSave: func,

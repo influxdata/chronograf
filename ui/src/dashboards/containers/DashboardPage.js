@@ -30,11 +30,7 @@ import {
 
 import {dismissEditingAnnotation} from 'src/shared/actions/annotations'
 
-import {
-  setAutoRefresh,
-  templateControlBarVisibilityToggled as templateControlBarVisibilityToggledAction,
-} from 'shared/actions/app'
-import {presentationButtonDispatcher} from 'shared/dispatchers'
+import {setAutoRefresh} from 'shared/actions/app'
 import {interval, DASHBOARD_LAYOUT_ROW_HEIGHT} from 'shared/constants'
 import {notifyDashboardNotFound} from 'shared/copy/notifications'
 import {colorsStringSchema, colorsNumberSchema} from 'shared/schemas'
@@ -283,10 +279,6 @@ class DashboardPage extends Component {
     this.setState({hoverTime})
   }
 
-  handleToggleTempVarControls = () => {
-    this.props.templateControlBarVisibilityToggled()
-  }
-
   handleZoomedTimeRange = (zoomedLower, zoomedUpper) => {
     this.setState({zoomedTimeRange: {zoomedLower, zoomedUpper}})
   }
@@ -303,7 +295,6 @@ class DashboardPage extends Component {
       sources,
       timeRange,
       timeRange: {lower, upper},
-      showTemplateControlBar,
       dashboard,
       dashboards,
       lineColors,
@@ -313,14 +304,14 @@ class DashboardPage extends Component {
       manualRefresh,
       onManualRefresh,
       cellQueryStatus,
-      thresholdsListType,
-      thresholdsListColors,
       dashboardActions,
+      thresholdsListType,
       inPresentationMode,
+      thresholdsListColors,
+      showTemplateControlBar,
       handleChooseAutoRefresh,
       handleShowCellEditorOverlay,
       handleHideCellEditorOverlay,
-      handleClickPresentationButton,
       params: {sourceID, dashboardID},
     } = this.props
 
@@ -423,11 +414,8 @@ class DashboardPage extends Component {
           onCancel={this.handleCancelEditDashboard}
           onEditDashboard={this.handleEditDashboard}
           activeDashboard={dashboard ? dashboard.name : ''}
-          showTemplateControlBar={showTemplateControlBar}
           handleChooseAutoRefresh={handleChooseAutoRefresh}
           handleChooseTimeRange={this.handleChooseTimeRange}
-          onToggleTempVarControls={this.handleToggleTempVarControls}
-          handleClickPresentationButton={handleClickPresentationButton}
         />
         {dashboard ? (
           <Dashboard
@@ -511,14 +499,12 @@ DashboardPage.propTypes = {
   ),
   handleChooseAutoRefresh: func.isRequired,
   autoRefresh: number.isRequired,
-  templateControlBarVisibilityToggled: func.isRequired,
   timeRange: shape({
     upper: string,
     lower: string,
   }),
   showTemplateControlBar: bool.isRequired,
   inPresentationMode: bool.isRequired,
-  handleClickPresentationButton: func,
   cellQueryStatus: shape({
     queryID: string,
     status: shape(),
@@ -582,10 +568,10 @@ const mapStateToProps = (state, {params: {dashboardID}}) => {
     isUsingAuth,
     cellQueryStatus,
     inPresentationMode,
-    showTemplateControlBar,
     selectedCell,
     thresholdsListType,
     thresholdsListColors,
+    showTemplateControlBar,
     gaugeColors,
     lineColors,
   }
@@ -593,11 +579,6 @@ const mapStateToProps = (state, {params: {dashboardID}}) => {
 
 const mapDispatchToProps = dispatch => ({
   handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
-  templateControlBarVisibilityToggled: bindActionCreators(
-    templateControlBarVisibilityToggledAction,
-    dispatch
-  ),
-  handleClickPresentationButton: presentationButtonDispatcher(dispatch),
   dashboardActions: bindActionCreators(dashboardActionCreators, dispatch),
   errorThrown: bindActionCreators(errorThrownAction, dispatch),
   notify: bindActionCreators(notifyAction, dispatch),
