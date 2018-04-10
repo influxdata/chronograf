@@ -1,0 +1,62 @@
+/*
+   Dashboard Options Menu
+   -----------------------------------------------------------------------------
+*/
+
+.dashboard-options-menu {
+    position: relative;
+}
+
+.dashboard-options-menu--menu {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px 0.6px fade-out($g0-obsidian, 0.8);
+    @include gradient-h($c-ocean,$c-pool);
+    @extend %no-user-select;
+}
+
+.dashboard-options-menu--item {
+    font-size: 13px;
+    line-height: 13px;
+    color: $c-yeti;
+    font-weight: 500;
+    padding: 7px 9px;
+    outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    span.icon {
+        display: inline-block;
+        margin-right: 4px;
+    }
+
+    &:hover {
+        cursor: pointer;
+        color: $g20-white;
+        @include gradient-h($c-laser,$c-pool);
+    }
+    &:active {
+        color: $g20-white;
+        @include gradient-h($c-sapphire,$c-pool);
+    }
+}
+
+/*
+    Expanded State
+   -----------------------------------------------------------------------------
+*/
+
+.dashboard-options-menu.expanded {
+    z-index: 9999;
+
+    .dashboard-options-menu--menu {
+        display: flex;
+    }
+}
