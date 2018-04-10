@@ -39,6 +39,7 @@ class DashboardOptionsMenu extends Component {
       showTemplateControlBar,
       onToggleTemplateControlBar,
       onEnterPresentationMode,
+      isEditableDashboard,
     } = this.props
 
     const containerClass = `dashboard-options-menu ${
@@ -66,13 +67,15 @@ class DashboardOptionsMenu extends Component {
             <span className="icon expand-a" />
             Presentation Mode
           </div>
-          <div
-            className="dashboard-options-menu--item"
-            onClick={this.handleItemClick(onToggleTemplateControlBar)}
-          >
-            <span className="icon cube" />
-            {tempVarItemLabel}
-          </div>
+          {isEditableDashboard && (
+            <div
+              className="dashboard-options-menu--item"
+              onClick={this.handleItemClick(onToggleTemplateControlBar)}
+            >
+              <span className="icon cube" />
+              {tempVarItemLabel}
+            </div>
+          )}
         </div>
       </div>
     )
@@ -85,6 +88,7 @@ DashboardOptionsMenu.propTypes = {
   onEnterPresentationMode: func.isRequired,
   onToggleTemplateControlBar: func.isRequired,
   showTemplateControlBar: bool,
+  isEditableDashboard: bool,
 }
 
 const mapStateToProps = ({app: {persisted: {showTemplateControlBar}}}) => ({
