@@ -53,6 +53,7 @@ class MenuTooltipButton extends Component {
           option.disabled ? null : this.handleMenuItemClick(option.action)
         }
       >
+        <span className={`icon ${option.icon}`} />
         {option.text}
       </div>
     ))

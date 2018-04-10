@@ -64,14 +64,20 @@ class LayoutCellMenu extends Component {
                 <MenuTooltipButton
                   icon="pencil"
                   menuOptions={[
-                    {text: 'Configure', action: onEdit(cell)},
+                    {
+                      text: 'Configure',
+                      icon: 'cog-thick',
+                      action: onEdit(cell),
+                    },
                     {
                       text: 'Add Annotation',
+                      icon: 'cog-thick',
                       action: onStartAddingAnnotation,
                       disabled: !cellSupportsAnnotations(cell.type),
                     },
                     {
                       text: 'Edit Annotations',
+                      icon: 'cog-thick',
                       action: onStartEditingAnnotation,
                       disabled: !cellSupportsAnnotations(cell.type),
                     },

@@ -300,6 +300,13 @@ $dash-graph-options-arrow: 8px;
     color: $g20-white;
     transition: background-color 0.25s ease;
 
+    span.icon {
+      display: inline-block;
+      margin-right: 4px;
+      position: relative;
+      top: -1px;
+    }
+
     &:first-child {
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
