@@ -175,10 +175,24 @@ class CellEditorOverlay extends Component {
     // use this as the handler passed into fetchTimeSeries to update a query status
     try {
       const {data} = await getQueryConfig(url, [{query: text, id}], templates)
-      const config = data.queries.find(q => q.id === id)
-      const nextQueries = this.state.queriesWorkingDraft.map(
-        q => (q.id === id ? {...config.queryConfig, source: q.source} : q)
-      )
+      const {queryConfig} = data.queries.find(q => q.id === id)
+
+      const nextQueries = this.state.queriesWorkingDraft.map(q => {
+        if (q.id === id) {
+          if (text.includes('time(:interval:)')) {
+            const groupBy = {
+              ...queryConfig.groupBy,
+              time: AUTO_GROUP_BY,
+            }
+
+            return {...queryConfig, groupBy, source: q.source}
+          }
+          return {...queryConfig, source: q.source}
+        }
+
+        return q
+      })
+
       this.setState({queriesWorkingDraft: nextQueries})
     } catch (error) {
       console.error(error)
