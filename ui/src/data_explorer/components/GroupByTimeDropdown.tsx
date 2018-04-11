@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
-import {Location} from 'history'
 
 import groupByTimeOptions from 'src/data_explorer/data/groupByTimes'
 
@@ -9,12 +8,11 @@ import Dropdown from 'src/shared/components/Dropdown'
 import {AUTO_GROUP_BY} from 'src/shared/constants'
 
 interface Props {
-  location: Location
   selected: string
   onChooseGroupByTime: () => void
 }
 
-class GroupByTimeDropdown extends PureComponent<Props> {
+class GroupByTimeDropdown extends PureComponent<Props & WithRouterProps> {
   public render() {
     return (
       <div className="group-by-time">
