@@ -72,13 +72,13 @@ func (s *Service) Queries(w http.ResponseWriter, r *http.Request) {
 			Query: q.Query,
 		}
 
-		qc := ToQueryConfig(q.Query)
 		query, err := influx.TemplateReplace(q.Query, req.TemplateVars, time.Now())
 		if err != nil {
 			Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 			return
 		}
 
+		qc := ToQueryConfig(query)
 		if err := s.DefaultRP(ctx, &qc, &src); err != nil {
 			Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 			return
