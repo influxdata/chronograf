@@ -19,21 +19,17 @@ class GroupByTimeDropdown extends PureComponent<Props & WithRouterProps> {
         <label className="group-by-time--label">Group by:</label>
         <Dropdown
           className="group-by-time--dropdown"
+          items={this.dropdownItems}
           menuClass={this.menuClass}
-          buttonColor={this.buttonColors}
-          items={this.items}
-          onChoose={this.props.onChooseGroupByTime}
           selected={this.selectedText}
+          buttonColor={this.buttonColors}
+          onChoose={this.props.onChooseGroupByTime}
         />
       </div>
     )
   }
 
-  private get selectedText() {
-    return this.props.selected || 'Time'
-  }
-
-  private get items() {
+  private get options() {
     if (this.isInRuleBuilder) {
       return groupByTimeOptions.filter(
         ({menuOption}) => menuOption !== AUTO_GROUP_BY
@@ -41,6 +37,17 @@ class GroupByTimeDropdown extends PureComponent<Props & WithRouterProps> {
     }
 
     return groupByTimeOptions
+  }
+
+  private get selectedText() {
+    return this.props.selected || 'Time'
+  }
+
+  private get dropdownItems() {
+    return this.options.map(groupBy => ({
+      ...groupBy,
+      text: groupBy.menuOption,
+    }))
   }
 
   private get menuClass() {
