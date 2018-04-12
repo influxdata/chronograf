@@ -1,3 +1,9 @@
+## v1.4.0.3 [2018-4-12]
+### Bug Fixes
+1. [#3168](https://github.com/influxdata/chronograf/pull/3168): Require that emails on GitHub & Generic OAuth2 principals be verified & primary, if those fields are provided
+
+## v1.4.0.2 [2018-4-12]
+
 ## v1.4.0.1 [2017-1-9]
 ### Features
 1. [#2690](https://github.com/influxdata/chronograf/pull/2690): Add separate CLI flag for canned sources, kapacitors, dashboards, and organizations
