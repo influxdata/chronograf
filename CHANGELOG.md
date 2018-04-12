@@ -1,7 +1,8 @@
-## v1.4.2.0 [unreleased]
-### Features
-### UI Improvements
+## v1.4.1.5 [2018-04-12]
 ### Bug Fixes
+1. [#3168](https://github.com/influxdata/chronograf/pull/3168): Require that emails on GitHub & Generic OAuth2 principals be verified & primary, if those fields are provided
+
+## v1.4.1.4 [2018-04-12]
 
 ## v1.4.1.3 [2018-02-14]
 ### Bug Fixes
