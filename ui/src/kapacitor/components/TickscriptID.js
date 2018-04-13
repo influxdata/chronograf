@@ -17,14 +17,14 @@ class TickscriptID extends Component {
         onChange={onChangeID}
         placeholder="ID your TICKscript"
         spellCheck={false}
-        autoComplete={false}
+        autoComplete="off"
       />
     )
   }
 }
 
 export const TickscriptStaticID = ({id}) => (
-  <h1 className="tickscript-controls--name">{id}</h1>
+  <h1 className="tickscript-controls--name"> {id} </h1>
 )
 
 const {func, string} = PropTypes
