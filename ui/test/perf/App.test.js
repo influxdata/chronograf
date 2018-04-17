@@ -14,7 +14,10 @@ let page
 beforeAll(async () => {
   browser = await puppeteer.launch(isDebugging())
   page = await browser.newPage()
+
+  await page.tracing.start({path: 'trace.json'})
   await page.goto('http://localhost:8888')
+  await page.tracing.stop()
   page.setViewport({width: 500, height: 2400})
 }, 16000)
 
