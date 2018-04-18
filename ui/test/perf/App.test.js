@@ -33,6 +33,7 @@ describe('on page load ', () => {
       await page.click('.dash-graph-context--menu-item')
       await page.waitForSelector('.overlay-controls')
       await page.tracing.stop()
+
       browser.close()
     },
     16001
