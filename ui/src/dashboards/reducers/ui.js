@@ -286,7 +286,7 @@ export default function ui(state = initialState, action) {
         }
 
         const templates = dashboard.templates.map(template => {
-          if (template.id !== templateID && template.type !== 'csv') {
+          if (template.id !== templateID || template.type === 'csv') {
             return template
           }
 
