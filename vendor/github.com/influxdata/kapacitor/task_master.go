@@ -24,9 +24,12 @@ import (
 	"github.com/influxdata/kapacitor/services/httpd"
 	"github.com/influxdata/kapacitor/services/httppost"
 	k8s "github.com/influxdata/kapacitor/services/k8s/client"
+	"github.com/influxdata/kapacitor/services/kafka"
 	"github.com/influxdata/kapacitor/services/mqtt"
 	"github.com/influxdata/kapacitor/services/opsgenie"
+	"github.com/influxdata/kapacitor/services/opsgenie2"
 	"github.com/influxdata/kapacitor/services/pagerduty"
+	"github.com/influxdata/kapacitor/services/pagerduty2"
 	"github.com/influxdata/kapacitor/services/pushover"
 	"github.com/influxdata/kapacitor/services/sensu"
 	"github.com/influxdata/kapacitor/services/sideload"
@@ -105,6 +108,7 @@ type TaskMaster struct {
 		alertservice.AnonHandlerRegistrar
 		alertservice.Events
 		alertservice.TopicPersister
+		alertservice.InhibitorLookup
 	}
 	InfluxDBService interface {
 		NewNamedClient(name string) (influxdb.Client, error)
@@ -122,6 +126,10 @@ type TaskMaster struct {
 		Global() bool
 		Handler(opsgenie.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
+	OpsGenie2Service interface {
+		Global() bool
+		Handler(opsgenie2.HandlerConfig, ...keyvalue.T) alert.Handler
+	}
 	VictorOpsService interface {
 		Global() bool
 		Handler(victorops.HandlerConfig, ...keyvalue.T) alert.Handler
@@ -129,6 +137,10 @@ type TaskMaster struct {
 	PagerDutyService interface {
 		Global() bool
 		Handler(pagerduty.HandlerConfig, ...keyvalue.T) alert.Handler
+	}
+	PagerDuty2Service interface {
+		Global() bool
+		Handler(pagerduty2.HandlerConfig, ...keyvalue.T) alert.Handler
 	}
 	PushoverService interface {
 		Handler(pushover.HandlerConfig, ...keyvalue.T) alert.Handler
@@ -154,6 +166,9 @@ type TaskMaster struct {
 		Global() bool
 		StateChangesOnly() bool
 		Handler(hipchat.HandlerConfig, ...keyvalue.T) alert.Handler
+	}
+	KafkaService interface {
+		Handler(kafka.HandlerConfig, ...keyvalue.T) (alert.Handler, error)
 	}
 	AlertaService interface {
 		DefaultHandlerConfig() alerta.HandlerConfig
@@ -258,8 +273,10 @@ func (tm *TaskMaster) New(id string) *TaskMaster {
 	n.SMTPService = tm.SMTPService
 	n.MQTTService = tm.MQTTService
 	n.OpsGenieService = tm.OpsGenieService
+	n.OpsGenie2Service = tm.OpsGenie2Service
 	n.VictorOpsService = tm.VictorOpsService
 	n.PagerDutyService = tm.PagerDutyService
+	n.PagerDuty2Service = tm.PagerDuty2Service
 	n.PushoverService = tm.PushoverService
 	n.HTTPPostService = tm.HTTPPostService
 	n.SlackService = tm.SlackService

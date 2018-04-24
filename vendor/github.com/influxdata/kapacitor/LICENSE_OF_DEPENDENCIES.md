@@ -1,7 +1,7 @@
 Dependencies
 ============
 
-* github.com/BurntSushi/toml [WTFPL](https://github.com/BurntSushi/toml/blob/master/COPYING)
+* github.com/BurntSushi/toml [MIT](https://github.com/BurntSushi/toml/blob/master/COPYING)
 * github.com/boltdb/bolt [MIT](https://github.com/boltdb/bolt/blob/master/LICENSE)
 * github.com/cenkalti/backoff [MIT](https://github.com/cenkalti/backoff/blob/master/LICENSE)
 * github.com/dgrijalva/jwt-go [MIT](https://github.com/dgrijalva/jwt-go/blob/master/LICENSE)
@@ -16,6 +16,7 @@ Dependencies
 * github.com/mitchellh/reflectwalk [MIT](https://github.com/mitchellh/reflectwalk/blob/master/LICENSE)
 * github.com/pkg/errors [BSD](https://github.com/pkg/errors/blob/master/LICENSE)
 * github.com/russross/blackfriday [BSD](https://github.com/russross/blackfriday/blob/master/LICENSE.txt)
+* github.com/segmentio/kafka-go [MIT](https://github.com/segmentio/kafka-go/blob/master/LICENSE)
 * github.com/serenize/snaker [MIT](https://github.com/serenize/snaker/blob/master/LICENSE.txt)
 * github.com/shurcooL/go [MIT](https://github.com/shurcooL/go/blob/master/README.md)
 * github.com/shurcooL/markdownfmt [MIT](https://github.com/shurcooL/markdownfmt/blob/master/README.md)

@@ -136,7 +136,7 @@ Kapacitor uses the golang [dep](https://github.com/golang/dep) tool.
 Install the dep tool:
 
 ```
-go get -u github.com/golang/dep
+go get -v -u github.com/golang/dep/cmd/dep
 ```
 
 See the dep help for usage and documentation.
@@ -193,7 +193,7 @@ If you want to generate code run:
 If you want to build packages run:
 
 ```bash
-./build.py --packages
+./build.py --package
 ```
 
 There are many more options available see
