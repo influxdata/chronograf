@@ -183,6 +183,7 @@ func (b *flattenBuffer) Barrier(barrier edge.BarrierMessage) error {
 func (b *flattenBuffer) DeleteGroup(d edge.DeleteGroupMessage) error {
 	return edge.Forward(b.n.outs, d)
 }
+func (b *flattenBuffer) Done() {}
 
 func (n *FlattenNode) flatten(points []edge.FieldsTagsTimeGetter) (models.Fields, error) {
 	fields := make(models.Fields)
@@ -201,7 +202,7 @@ POINTS:
 				}
 				fieldPrefix.WriteString(v)
 			} else {
-				n.diag.Error("poing missing tag for flatten operation", fmt.Errorf("tag %s is missing from point", tag))
+				n.diag.Error("point missing tag for flatten operation", fmt.Errorf("tag %s is missing from point", tag))
 				continue POINTS
 			}
 		}
