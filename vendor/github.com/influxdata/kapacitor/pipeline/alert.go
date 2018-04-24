@@ -23,6 +23,7 @@ const defaultMessageTmpl = "{{ .ID }} is {{ .Level }}"
 // Default template for constructing a details message.
 const defaultDetailsTmpl = "{{ json . }}"
 
+// AlertNode struct wraps the default AlertNodeData
 // tick:wraps:AlertNodeData
 type AlertNode struct{ *AlertNodeData }
 
@@ -126,6 +127,10 @@ type AlertNode struct{ *AlertNodeData }
 //
 type AlertNodeData struct {
 	chainnode
+
+	// Category places this alert in a named category.
+	// Categories are used to inhibit alerts.
+	Category string `json:"category"`
 
 	// Topic specifies the name of an alert topic to which,
 	// alerts will be published.
@@ -297,6 +302,10 @@ type AlertNodeData struct {
 	// tick:ignore
 	StateChangesOnlyDuration time.Duration `json:"stateChangesOnlyDuration"`
 
+	// Inhibitors
+	// tick:ignore
+	Inhibitors []Inhibitor `tick:"Inhibit" json:"inhibitors"`
+
 	// Post the JSON alert data to the specified URL.
 	// tick:ignore
 	HTTPPostHandlers []*AlertHTTPPostHandler `tick:"Post" json:"post"`
@@ -324,6 +333,10 @@ type AlertNodeData struct {
 	// Send alert to PagerDuty.
 	// tick:ignore
 	PagerDutyHandlers []*PagerDutyHandler `tick:"PagerDuty" json:"pagerDuty"`
+
+	// Send alert to PagerDuty API v2.
+	// tick:ignore
+	PagerDuty2Handlers []*PagerDuty2Handler `tick:"PagerDuty2" json:"pagerDuty2"`
 
 	// Send alert to Pushover.
 	// tick:ignore
@@ -353,6 +366,10 @@ type AlertNodeData struct {
 	// tick:ignore
 	OpsGenieHandlers []*OpsGenieHandler `tick:"OpsGenie" json:"opsGenie"`
 
+	// Send alert to OpsGenie using v2 API
+	// tick:ignore
+	OpsGenie2Handlers []*OpsGenie2Handler `tick:"OpsGenie2" json:"opsGenie2"`
+
 	// Send alert to Talk.
 	// tick:ignore
 	TalkHandlers []*TalkHandler `tick:"Talk" json:"talk"`
@@ -364,6 +381,10 @@ type AlertNodeData struct {
 	// Send alert using SNMPtraps.
 	// tick:ignore
 	SNMPTrapHandlers []*SNMPTrapHandler `tick:"SnmpTrap" json:"snmpTrap"`
+
+	// Send alert to Kafka topic
+	// tick:ignore
+	KafkaHandlers []*KafkaHandler `tick:"Kafka" json:"kafka"`
 }
 
 func newAlertNode(wants EdgeType) *AlertNode {
@@ -523,6 +544,49 @@ func (n *AlertNodeData) Flapping(low, high float64) *AlertNodeData {
 	n.FlapLow = low
 	n.FlapHigh = high
 	return n
+}
+
+// Inhibit other alerts in a category.
+// The equal tags provides a list of tags that must be equal in order for an alert event to be inhibited.
+//
+// The following two TICKscripts demonstrate how to use the inhibit feature.
+//
+// Example:
+//    //cpu_alert.tick
+//    stream
+//        |from()
+//            .measurement('cpu')
+//            .groupBy('host')
+//        |alert()
+//            .category('system_alerts')
+//            .crit(lambda: "usage_idle" < 10.0)
+//
+//    //host_alert.tick
+//    stream
+//        |from()
+//            .measurement('uptime')
+//            .groupBy('host')
+//        |deadman(0.0, 1m)
+//            .inhibit('system_alerts', 'host')
+//
+// The deadman is a kind of alert node and so can be used to inhibit all alerts in the `system_alerts` category when it triggers.
+// The 'host` argument to the inhibit function says that the host tag must be equal between the cpu alert and the host alert in order for it to be inhibited.
+// This has the effect of the deadman alerts only inhibits cpu alerts for hosts are are currently dead.
+//
+// tick:property
+func (n *AlertNodeData) Inhibit(category string, equalTags ...string) *AlertNodeData {
+	n.Inhibitors = append(n.Inhibitors, Inhibitor{
+		Category:  category,
+		EqualTags: equalTags,
+	})
+	return n
+}
+
+// Inhibitor represents a single alert inhibitor
+// tick:ignore
+type Inhibitor struct {
+	Category  string   `json:"category"`
+	EqualTags []string `json:"equalTags"`
 }
 
 // HTTP POST JSON alert data to a specified URL.
@@ -899,8 +963,66 @@ type PagerDutyHandler struct {
 	ServiceKey string `json:"serviceKey"`
 }
 
+// Send the alert to PagerDuty API v2.
+// To use PagerDuty alerting you must first follow the steps to enable a new 'Generic API' service.
+// NOTE: the API v2 endpoint is different and requires a new configuration in order to process/handle alerts
+//
+// From https://developer.pagerduty.com/documentation/integration/events
+//
+//    1. In your account, under the Services tab, click "Add New Service".
+//    2. Enter a name for the service and select an escalation policy. Then, select "Generic API" for the Service Type.
+//    3. Click the "Add Service" button.
+//    4. Once the service is created, you'll be taken to the service page. On this page, you'll see the "Service key", which is needed to access the API
+//
+// Place the 'service key' into the 'pagerduty' section of the Kapacitor configuration as the option 'service-key'.
+//
+// Example:
+//    [pagerduty2]
+//      enabled = true
+//      service-key = "xxxxxxxxx"
+//
+// With the correct configuration you can now use PagerDuty in TICKscripts.
+//
+// Example:
+//    stream
+//         |alert()
+//             .pagerDuty2()
+//
+// If the 'pagerduty' section in the configuration has the option: global = true
+// then all alerts are sent to PagerDuty without the need to explicitly state it
+// in the TICKscript.
+//
+// Example:
+//    [pagerduty2]
+//      enabled = true
+//      service-key = "xxxxxxxxx"
+//      global = true
+//
+// Example:
+//    stream
+//         |alert()
+//
+// Send alert to PagerDuty API v2.
+// tick:property
+func (n *AlertNodeData) PagerDuty2() *PagerDuty2Handler {
+	pd2 := &PagerDuty2Handler{
+		AlertNodeData: n,
+	}
+	n.PagerDuty2Handlers = append(n.PagerDuty2Handlers, pd2)
+	return pd2
+}
+
+// tick:embedded:AlertNode.PagerDuty
+type PagerDuty2Handler struct {
+	*AlertNodeData `json:"-"`
+
+	// The service key to use for the alert.
+	// Defaults to the value in the configuration if empty.
+	ServiceKey string `json:"serviceKey"`
+}
+
 // Send the alert to HipChat.
-// For step-by-step instructions on setting up Kapacitor with HipChat, see the Event Handler Setup Guide (https://docs.influxdata.com//kapacitor/latest/guides/event-handler-setup/#hipchat-setup).
+// For step-by-step instructions on setting up Kapacitor with HipChat, see the [Event Handler Setup Guide](https://docs.influxdata.com//kapacitor/latest/guides/event-handler-setup/#hipchat-setup).
 // To allow Kapacitor to post to HipChat,
 // go to the URL https://www.hipchat.com/docs/apiv2 for
 // information on how to get your room id and tokens.
@@ -1113,7 +1235,7 @@ type MQTTHandler struct {
 // Example:
 //    [sensu]
 //      enabled = true
-//      url = "http://sensu:3030"
+//      addr = "sensu:3030"
 //      source = "Kapacitor"
 //      handlers = ["sns","slack"]
 //
@@ -1252,7 +1374,7 @@ type PushoverHandler struct {
 //         |alert()
 //             .slack()
 //
-// Send alerts to Slack channel in the configuration file.
+// Send alerts to the default worskace Slack channel in the configuration file.
 //
 // Example:
 //    stream
@@ -1260,7 +1382,7 @@ type PushoverHandler struct {
 //             .slack()
 //             .channel('#alerts')
 //
-// Send alerts to Slack channel '#alerts'
+// Send alerts to the default workspace with Slack channel '#alerts'
 //
 // Example:
 //    stream
@@ -1270,13 +1392,24 @@ type PushoverHandler struct {
 //
 // Send alert to user '@jsmith'
 //
+// Example:
+// stream
+//      |alert()
+//          .slack()
+//          .workspace('opencommunity')
+//          .channel('#support')
+//
+// send alerts to the opencommunity workspace on the channel '#support'
+//
 // If the 'slack' section in the configuration has the option: global = true
 // then all alerts are sent to Slack without the need to explicitly state it
 // in the TICKscript.
 //
 // Example:
-//    [slack]
+//    [[slack]]
 //      enabled = true
+//      default = true
+//      workspace = examplecorp
 //      url = "https://hooks.slack.com/services/xxxxxxxxx/xxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxx"
 //      channel = "#general"
 //      global = true
@@ -1300,6 +1433,10 @@ func (n *AlertNodeData) Slack() *SlackHandler {
 type SlackHandler struct {
 	*AlertNodeData `json:"-"`
 
+	// The workspace to publish the alert to.  If empty defaults to the configured
+	// default broker.
+	Workspace string `json:"workspace"`
+
 	// Slack channel in which to post messages.
 	// If empty uses the channel from the configuration.
 	Channel string `json:"channel"`
@@ -1314,7 +1451,7 @@ type SlackHandler struct {
 }
 
 // Send the alert to Telegram.
-// For step-by-step instructions on setting up Kapacitor with Telegram, see the Event Handler Setup Guide (https://docs.influxdata.com//kapacitor/latest/guides/event-handler-setup/#telegram-setup).
+// For step-by-step instructions on setting up Kapacitor with Telegram, see the [Event Handler Setup Guide](https://docs.influxdata.com//kapacitor/latest/guides/event-handler-setup/#telegram-setup).
 // To allow Kapacitor to post to Telegram,
 //
 // Example:
@@ -1486,6 +1623,87 @@ func (og *OpsGenieHandler) Recipients(recipients ...string) *OpsGenieHandler {
 	return og
 }
 
+// Send alert to OpsGenie using the v2 API.
+// To use OpsGenie2 alerting you must first enable the 'Alert Ingestion API'
+// in the 'Integrations' section of OpsGenie2.
+// Then place the API key from the URL into the 'opsgenie2' section of the Kapacitor configuration.
+//
+// Example:
+//    [opsgenie2]
+//      enabled = true
+//      api-key = "xxxxx"
+//      teams = ["everyone"]
+//      recipients = ["jim", "bob"]
+//
+// With the correct configuration you can now use OpsGenie2 in TICKscripts.
+//
+// Example:
+//    stream
+//         |alert()
+//             .opsGenie()
+//
+// Send alerts to OpsGenie2 using the teams and recipients in the configuration file.
+//
+// Example:
+//    stream
+//         |alert()
+//             .opsGenie()
+//             .teams('team_rocket','team_test')
+//
+// Send alerts to OpsGenie2 with team set to 'team_rocket' and 'team_test'
+//
+// If the 'opsgenie2' section in the configuration has the option: global = true
+// then all alerts are sent to OpsGenie2 without the need to explicitly state it
+// in the TICKscript.
+//
+// Example:
+//    [opsgenie2]
+//      enabled = true
+//      api-key = "xxxxx"
+//      recipients = ["johndoe"]
+//      global = true
+//
+// Example:
+//    stream
+//         |alert()
+//
+// Send alert to OpsGenie2 using the default recipients, found in the configuration.
+// tick:property
+func (n *AlertNodeData) OpsGenie2() *OpsGenie2Handler {
+	og := &OpsGenie2Handler{
+		AlertNodeData: n,
+	}
+	n.OpsGenie2Handlers = append(n.OpsGenie2Handlers, og)
+	return og
+}
+
+// tick:embedded:AlertNode.OpsGenie2
+type OpsGenie2Handler struct {
+	*AlertNodeData `json:"-"`
+
+	// OpsGenie2 Teams.
+	// tick:ignore
+	TeamsList []string `tick:"Teams" json:"teams"`
+
+	// OpsGenie2 Recipients.
+	// tick:ignore
+	RecipientsList []string `tick:"Recipients" json:"recipients"`
+}
+
+// The list of teams to be alerted. If empty defaults to the teams from the configuration.
+// tick:property
+func (og *OpsGenie2Handler) Teams(teams ...string) *OpsGenie2Handler {
+	og.TeamsList = teams
+	return og
+}
+
+// The list of recipients to be alerted. If empty defaults to the recipients from the configuration.
+// tick:property
+func (og *OpsGenie2Handler) Recipients(recipients ...string) *OpsGenie2Handler {
+	og.RecipientsList = recipients
+	return og
+}
+
 // Send the alert to Talk.
 // To use Talk alerting you must first follow the steps to create a new incoming webhook.
 //
@@ -1618,4 +1836,45 @@ func (h *SNMPTrapHandler) validate() error {
 		}
 	}
 	return nil
+}
+
+// Send the alert to a Kafka topic.
+//
+// Example:
+//    [[kafka]]
+//      enabled = true
+//      id = "default"
+//      brokers = ["localhost:9092"]
+//
+// Example:
+//    stream
+//         |alert()
+//             .kafka()
+//                 .cluster('default')
+//                 .kafkaTopic('alerts')
+//
+//
+// tick:property
+func (n *AlertNodeData) Kafka() *KafkaHandler {
+	k := &KafkaHandler{
+		AlertNodeData: n,
+	}
+	n.KafkaHandlers = append(n.KafkaHandlers, k)
+	return k
+}
+
+// Kafka alert Handler
+// tick:embedded:AlertNode.Kafka
+type KafkaHandler struct {
+	*AlertNodeData `json:"-"`
+
+	// Cluster is the id of the configure kafka cluster
+	Cluster string `json:"cluster"`
+
+	// Kafka Topic
+	KafkaTopic string `json:"kafka-topic"`
+
+	// Template used to construct the message body
+	// If empty the alert data in JSON is sent as the message body.
+	Template string `json:"template"`
 }

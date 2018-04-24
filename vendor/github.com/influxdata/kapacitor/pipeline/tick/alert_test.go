@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/influxdata/kapacitor/pipeline"
 	"github.com/influxdata/kapacitor/tick/ast"
 )
 
@@ -46,6 +47,7 @@ func TestAlert(t *testing.T) {
 	alert.IdTag = "idTag"
 	alert.IdField = "idField"
 	alert.All().NoRecoveries().StateChangesOnly(time.Hour)
+	alert.Inhibitors = []pipeline.Inhibitor{{Category: "other", EqualTags: []string{"t1", "t2"}}}
 
 	want := `stream
     |from()
@@ -69,6 +71,7 @@ func TestAlert(t *testing.T) {
         .idField('idField')
         .all()
         .noRecoveries()
+        .inhibit('other', 't1', 't2')
         .stateChangesOnly(1h)
         .flapping(0.4, 0.7)
 `
@@ -193,6 +196,7 @@ func TestAlertTCPJSON(t *testing.T) {
         "log": null,
         "victorOps": null,
         "pagerDuty": null,
+        "pagerDuty2": null,
         "pushover": null,
         "sensu": null,
         "slack": null,
@@ -200,6 +204,7 @@ func TestAlertTCPJSON(t *testing.T) {
         "hipChat": null,
         "alerta": null,
         "opsGenie": null,
+        "opsGenie2": null,
         "talk": null
     }`
 	node := from.Alert()
@@ -305,6 +310,24 @@ func TestAlertPagerDuty(t *testing.T) {
 	PipelineTickTestHelper(t, pipe, want)
 }
 
+func TestAlertPagerDuty2(t *testing.T) {
+	pipe, _, from := StreamFrom()
+	handler := from.Alert().PagerDuty2()
+	handler.ServiceKey = "LeafsNation"
+
+	want := `stream
+    |from()
+    |alert()
+        .id('{{ .Name }}:{{ .Group }}')
+        .message('{{ .ID }} is {{ .Level }}')
+        .details('{{ json . }}')
+        .history(21)
+        .pagerDuty2()
+        .serviceKey('LeafsNation')
+`
+	PipelineTickTestHelper(t, pipe, want)
+}
+
 func TestAlertPushover(t *testing.T) {
 	pipe, _, from := StreamFrom()
 	handler := from.Alert().Pushover()
@@ -356,6 +379,7 @@ func TestAlertSensu(t *testing.T) {
 func TestAlertSlack(t *testing.T) {
 	pipe, _, from := StreamFrom()
 	handler := from.Alert().Slack()
+	handler.Workspace = "openchannel"
 	handler.Channel = "#application"
 	handler.Username = "prbot"
 	handler.IconEmoji = ":non-potable_water:"
@@ -368,6 +392,7 @@ func TestAlertSlack(t *testing.T) {
         .details('{{ json . }}')
         .history(21)
         .slack()
+        .workspace('openchannel')
         .channel('#application')
         .username('prbot')
         .iconEmoji(':non-potable_water:')
@@ -414,6 +439,28 @@ func TestAlertHipchat(t *testing.T) {
         .hipChat()
         .room('escape room')
         .token('waxed mustache and plaid shirt')
+`
+	PipelineTickTestHelper(t, pipe, want)
+}
+
+func TestAlertKafka(t *testing.T) {
+	pipe, _, from := StreamFrom()
+	handler := from.Alert().Kafka()
+	handler.Cluster = "default"
+	handler.KafkaTopic = "test"
+	handler.Template = "tmpl"
+
+	want := `stream
+    |from()
+    |alert()
+        .id('{{ .Name }}:{{ .Group }}')
+        .message('{{ .ID }} is {{ .Level }}')
+        .details('{{ json . }}')
+        .history(21)
+        .kafka()
+        .cluster('default')
+        .kafkaTopic('test')
+        .template('tmpl')
 `
 	PipelineTickTestHelper(t, pipe, want)
 }
@@ -466,6 +513,26 @@ func TestAlertOpsGenie(t *testing.T) {
         .details('{{ json . }}')
         .history(21)
         .opsGenie()
+        .teams('radiant', 'dire')
+        .recipients('huskar', 'dazzle', 'nature\'s prophet', 'faceless void', 'bounty hunter')
+`
+	PipelineTickTestHelper(t, pipe, want)
+}
+
+func TestAlertOpsGenie2(t *testing.T) {
+	pipe, _, from := StreamFrom()
+	handler := from.Alert().OpsGenie2()
+	handler.Teams("radiant", "dire")
+	handler.Recipients("huskar", "dazzle", "nature's prophet", "faceless void", "bounty hunter")
+
+	want := `stream
+    |from()
+    |alert()
+        .id('{{ .Name }}:{{ .Group }}')
+        .message('{{ .ID }} is {{ .Level }}')
+        .details('{{ json . }}')
+        .history(21)
+        .opsGenie2()
         .teams('radiant', 'dire')
         .recipients('huskar', 'dazzle', 'nature\'s prophet', 'faceless void', 'bounty hunter')
 `
