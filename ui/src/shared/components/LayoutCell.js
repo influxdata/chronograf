@@ -5,6 +5,7 @@ import _ from 'lodash'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 import LayoutCellMenu from 'shared/components/LayoutCellMenu'
+import LayoutCellBody from 'shared/components/LayoutCellBody'
 import LayoutCellHeader from 'shared/components/LayoutCellHeader'
 import {notify} from 'src/shared/actions/notifications'
 import {notifyCSVDownloadFailed} from 'src/shared/copy/notifications'
@@ -58,22 +59,11 @@ class LayoutCell extends Component {
           />
         </Authorized>
         <LayoutCellHeader cellName={cell.name} isEditable={isEditable} />
-        <div className="dash-graph--container">
-          {queries.length ? (
-            layoutCellGraph
-          ) : (
-            <div className="graph-empty">
-              <Authorized requiredRole={EDITOR_ROLE}>
-                <button
-                  className="no-query--button btn btn-md btn-primary"
-                  onClick={this.handleSummonOverlay(cell)}
-                >
-                  <span className="icon plus" /> Add Data
-                </button>
-              </Authorized>
-            </div>
-          )}
-        </div>
+        <LayoutCellBody
+          queries={queries}
+          visualization={layoutCellGraph}
+          onSummonOverlay={this.handleSummonOverlay(cell)}
+        />
       </div>
     )
   }
