@@ -1,3 +1,9 @@
+## v1.4.4.2 [2018-05-01]
+
+### Bug Fixes
+
+1.  [#3291](https://github.com/influxdata/chronograf/pull/3291): Only update template variables that are not csv type
+
 ## v1.4.4.1 [2018-04-16]
 
 ### Bug Fixes
