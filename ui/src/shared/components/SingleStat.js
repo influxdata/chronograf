@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import getLastValues from 'shared/parsing/lastValues'
@@ -11,7 +11,7 @@ import {colorsStringSchema} from 'shared/schemas'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 @ErrorHandling
-class SingleStat extends PureComponent {
+class SingleStat extends Component {
   render() {
     const {
       data,
