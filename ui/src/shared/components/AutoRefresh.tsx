@@ -128,6 +128,8 @@ const AutoRefresh = (
           isLastQuerySuccessful,
           isFetching: false,
         })
+        console.log('newSeries', newSeries)
+        console.log(newSeries[0].response.results[0].series[0].values[450])
 
         if (grabDataForDownload) {
           grabDataForDownload(newSeries)
