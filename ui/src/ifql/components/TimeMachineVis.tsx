@@ -1,13 +1,22 @@
 import React, {SFC} from 'react'
+import uuid from 'uuid'
 
 interface Props {
-  blob: string
+  tabs: string[]
 }
-const TimeMachineVis: SFC<Props> = ({blob}) => (
+const TimeMachineVis: SFC<Props> = ({tabs}) => (
   <div className="time-machine-visualization">
-    <div className="time-machine--graph">
-      <div className="time-machine--graph-body">{blob}</div>
+    <div className="time-machine--graph-header">
+      <div className="time-machine--graph-title">Visualize</div>
+      <ul className="time-machine--tabs">
+        {tabs.map(tab => (
+          <li key={uuid.v4()} className="time-machine--tab">
+            {tab}
+          </li>
+        ))}
+      </ul>
     </div>
+    <div className="time-machine--graph" />
   </div>
 )
 

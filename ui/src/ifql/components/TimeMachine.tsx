@@ -17,6 +17,7 @@ interface Props {
 
 interface Body extends FlatBody {
   id: string
+  source: string
 }
 
 @ErrorHandling
@@ -32,6 +33,9 @@ class TimeMachine extends PureComponent<Props> {
   }
 
   private get mainSplit() {
+    const {body} = this.props
+    const queryNames = body.length ? body.map(q => q.declarations[0].name) : []
+
     return [
       {
         handleDisplay: 'none',
@@ -44,7 +48,7 @@ class TimeMachine extends PureComponent<Props> {
       },
       {
         handlePixels: 8,
-        render: () => <TimeMachineVis blob="Visualizer" />,
+        render: () => <TimeMachineVis tabs={queryNames} />,
       },
     ]
   }

@@ -3,46 +3,70 @@
     ----------------------------------------------------------------------------
 */
 
-.time-machine-visualization {
-  display: flex;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  @include gradient-v($g2-kevlar, $g0-obsidian);
-}
+$time-machine-vis-header: 60px;
+$time-machine-tab-size: 40px;
 
-.time-machine--graph {
-  width: calc(100% - 60px);
-  height: calc(100% - 60px);
-  background-color: $g3-castle;
-  border-radius: $radius;
+.time-machine-visualization {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  flex-wrap: nowrap;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
 }
 
 .time-machine--graph-header {
-  height: 56px;
-  padding: 0 16px;
+  height: $time-machine-vis-header;
+  padding: 0 60px;
   display: flex;
   align-items: center;
-  justify-content: center
+  justify-content: space-between;
+  @include no-user-select();
 }
 
-.time-machine--graph-header .nav.nav-tablist {
-  width: 180px;
+.time-machine--graph-title {
+  font-weight: 500;
+  white-space: nowrap;
+  font-size: 16px;
+  color: $g11-sidewalk;
+}
 
-  li {
-    justify-content: center;
-    flex: 1 0 0;
-    white-space: nowrap;
+.time-machine--tabs {
+  margin: 0;
+  padding: 0;
+  margin-top: $time-machine-vis-header - $time-machine-tab-size;
+  height: $time-machine-tab-size;
+  display: flex;
+}
+
+.time-machine--tab {
+  height: $time-machine-tab-size;
+  display: flex;
+  align-items: center;
+  border-radius: $radius $radius 0 0;
+  background-color: $g2-kevlar;
+  color: $g9-mountain;
+  margin: 0 2px 0 0;
+  padding: 0 11px;
+  font-size: 13px;
+  font-weight: 600;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $g3-castle;
+    color: $g13-mist;
+  }
+
+  &.active {
+    background-color: $g3-castle;
+    color: $g16-pearl;
   }
 }
 
-.time-machine--graph-body {
+
+
+.time-machine--graph {
+  @include gradient-v($g3-castle, $g2-kevlar);
   padding: 0 16px 8px 16px;
   flex: 1 0 0;
 }
