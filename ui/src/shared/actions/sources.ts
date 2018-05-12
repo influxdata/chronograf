@@ -4,39 +4,41 @@ import {
   getKapacitors as getKapacitorsAJAX,
   updateKapacitor as updateKapacitorAJAX,
   deleteKapacitor as deleteKapacitorAJAX,
-} from 'shared/apis'
-import {notify} from './notifications'
-import {errorThrown} from 'shared/actions/errors'
+} from 'src/shared/apis'
+import { notify } from './notifications'
+import { errorThrown } from 'src/shared/actions/errors'
 
-import {HTTP_NOT_FOUND} from 'shared/constants'
+import { HTTP_NOT_FOUND } from 'src/shared/constants'
 import {
   notifyServerError,
   notifyCouldNotRetrieveKapacitors,
   notifyCouldNotDeleteKapacitor,
-} from 'shared/copy/notifications'
+} from 'src/shared/copy/notifications'
 
-export const loadSources = sources => ({
+import { Source, Kapacitor } from 'src/types'
+
+export const loadSources = (sources: Source[]) => ({
   type: 'LOAD_SOURCES',
   payload: {
     sources,
   },
 })
 
-export const updateSource = source => ({
+export const updateSource = (source: Source) => ({
   type: 'SOURCE_UPDATED',
   payload: {
     source,
   },
 })
 
-export const addSource = source => ({
+export const addSource = (source: Source) => ({
   type: 'SOURCE_ADDED',
   payload: {
     source,
   },
 })
 
-export const fetchKapacitors = (source, kapacitors) => ({
+export const fetchKapacitors = (source: Source, kapacitors: Kapacitor[]) => ({
   type: 'LOAD_KAPACITORS',
   payload: {
     source,
@@ -44,14 +46,14 @@ export const fetchKapacitors = (source, kapacitors) => ({
   },
 })
 
-export const setActiveKapacitor = kapacitor => ({
+export const setActiveKapacitor = (kapacitor: Kapacitor) => ({
   type: 'SET_ACTIVE_KAPACITOR',
   payload: {
     kapacitor,
   },
 })
 
-export const deleteKapacitor = kapacitor => ({
+export const deleteKapacitor = (kapacitor: Kapacitor) => ({
   type: 'DELETE_KAPACITOR',
   payload: {
     kapacitor,
@@ -60,7 +62,7 @@ export const deleteKapacitor = kapacitor => ({
 
 // Async action creators
 
-export const removeAndLoadSources = source => async dispatch => {
+export const removeAndLoadSources = (source: Source) => async dispatch => {
   try {
     try {
       await deleteSource(source)
@@ -73,18 +75,16 @@ export const removeAndLoadSources = source => async dispatch => {
       }
     }
 
-    const {
-      data: {sources: newSources},
-    } = await getSourcesAJAX()
+    const { data: { sources: newSources } } = await getSourcesAJAX()
     dispatch(loadSources(newSources))
   } catch (err) {
     dispatch(notify(notifyServerError()))
   }
 }
 
-export const fetchKapacitorsAsync = source => async dispatch => {
+export const fetchKapacitorsAsync = (source: Source) => async dispatch => {
   try {
-    const {data} = await getKapacitorsAJAX(source)
+    const { data } = await getKapacitorsAJAX(source)
     dispatch(fetchKapacitors(source, data.kapacitors))
   } catch (err) {
     dispatch(notify(notifyCouldNotRetrieveKapacitors(source.id)))
@@ -94,11 +94,13 @@ export const fetchKapacitorsAsync = source => async dispatch => {
 export const setActiveKapacitorAsync = kapacitor => async dispatch => {
   // eagerly update the redux state
   dispatch(setActiveKapacitor(kapacitor))
-  const kapacitorPost = {...kapacitor, active: true}
+  const kapacitorPost = { ...kapacitor, active: true }
   await updateKapacitorAJAX(kapacitorPost)
 }
 
-export const deleteKapacitorAsync = kapacitor => async dispatch => {
+export const deleteKapacitorAsync = (
+  kapacitor: Kapacitor,
+) => async dispatch => {
   try {
     await deleteKapacitorAJAX(kapacitor)
     dispatch(deleteKapacitor(kapacitor))
@@ -109,9 +111,7 @@ export const deleteKapacitorAsync = kapacitor => async dispatch => {
 
 export const getSourcesAsync = () => async dispatch => {
   try {
-    const {
-      data: {sources},
-    } = await getSourcesAJAX()
+    const { data: { sources } } = await getSourcesAJAX()
     dispatch(loadSources(sources))
     return sources
   } catch (error) {
