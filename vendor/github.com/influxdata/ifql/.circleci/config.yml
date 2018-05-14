@@ -1,0 +1,16 @@
+# CircleCI 2.0 configuration
+version: 2
+jobs:
+  build:
+    parallelism: 1
+    docker:
+      - image: nathanielc/docker-client
+    working_directory: ~/ifql
+    steps:
+      - checkout
+      - setup_remote_docker:
+          reusable: true
+      - run:
+          name: Tests
+          command: |
+            ./circle-test.sh
