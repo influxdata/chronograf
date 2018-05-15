@@ -1,13 +1,15 @@
-import AJAX from 'utils/ajax'
+import AJAX from 'src/utils/ajax'
 
 export function getSources() {
   return AJAX({
+    url: null,
     resource: 'sources',
   })
 }
 
 export function getSource(id) {
   return AJAX({
+    url: null,
     resource: 'sources',
     id,
   })
@@ -15,6 +17,7 @@ export function getSource(id) {
 
 export function createSource(attributes) {
   return AJAX({
+    url: null,
     resource: 'sources',
     method: 'POST',
     data: attributes,
@@ -51,7 +54,7 @@ export const pingKapacitor = async kapacitor => {
 
 export const getKapacitor = async (source, kapacitorID) => {
   try {
-    const {data} = await AJAX({
+    const { data } = await AJAX({
       url: `${source.links.kapacitors}/${kapacitorID}`,
       method: 'GET',
     })
@@ -65,7 +68,7 @@ export const getKapacitor = async (source, kapacitorID) => {
 
 export const getActiveKapacitor = async source => {
   try {
-    const {data} = await AJAX({
+    const { data } = await AJAX({
       url: source.links.kapacitors,
       method: 'GET',
     })
@@ -104,7 +107,7 @@ export const deleteKapacitor = async kapacitor => {
 
 export function createKapacitor(
   source,
-  {url, name = 'My Kapacitor', username, password, insecureSkipVerify}
+  { url, name = 'My Kapacitor', username, password, insecureSkipVerify },
 ) {
   return AJAX({
     url: source.links.kapacitors,
@@ -175,9 +178,11 @@ export function updateKapacitorConfigSection(kapacitor, section, properties) {
 
 export const testAlertOutput = async (kapacitor, outputName, options) => {
   try {
-    const {
-      data: {services},
-    } = await kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/service-tests')
+    const { data: { services } } = await kapacitorProxy(
+      kapacitor,
+      'GET',
+      '/kapacitor/v1/service-tests',
+    )
     const service = services.find(s => s.name === outputName)
     return kapacitorProxy(kapacitor, 'POST', service.link.href, options)
   } catch (error) {
@@ -187,9 +192,11 @@ export const testAlertOutput = async (kapacitor, outputName, options) => {
 
 export const getAllServices = async kapacitor => {
   try {
-    const {
-      data: {services},
-    } = await kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/service-tests')
+    const { data: { services } } = await kapacitorProxy(
+      kapacitor,
+      'GET',
+      '/kapacitor/v1/service-tests',
+    )
     return services
   } catch (error) {
     console.error(error)
@@ -222,7 +229,7 @@ export function deleteKapacitorTask(kapacitor, id) {
   return kapacitorProxy(kapacitor, 'DELETE', `/kapacitor/v1/tasks/${id}`, '')
 }
 
-export function kapacitorProxy(kapacitor, method, path, body) {
+export function kapacitorProxy(kapacitor, method, path, body?) {
   return AJAX({
     method,
     url: kapacitor.links.proxy,
@@ -237,5 +244,5 @@ export const getQueryConfigAndStatus = (url, queries, tempVars) =>
   AJAX({
     url,
     method: 'POST',
-    data: {queries, tempVars},
+    data: { queries, tempVars },
   })

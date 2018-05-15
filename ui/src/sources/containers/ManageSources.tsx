@@ -1,41 +1,52 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { ErrorHandling } from 'src/shared/decorators/errors'
 
 import {
   removeAndLoadSources,
   fetchKapacitorsAsync,
   setActiveKapacitorAsync,
   deleteKapacitorAsync,
-} from 'shared/actions/sources'
-import {notify as notifyAction} from 'shared/actions/notifications'
+} from 'src/shared/actions/sources'
+import { notify as notifyAction } from 'src/shared/actions/notifications'
 
-import FancyScrollbar from 'shared/components/FancyScrollbar'
-import SourceIndicator from 'shared/components/SourceIndicator'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import SourceIndicator from 'src/shared/components/SourceIndicator'
 import InfluxTable from 'src/sources/components/InfluxTable'
 
 import {
   notifySourceDeleted,
   notifySourceDeleteFailed,
-} from 'shared/copy/notifications'
+} from 'src/shared/copy/notifications'
+
+import { Source } from 'src/types'
+
+interface Props {
+  source: Source
+  sources: Source[]
+  notify: () => void
+  remoteAndLoadSources: () => void
+  fetchKapacitors: () => void
+  setActiveKapacitor: () => void
+  deleteKapacitor: () => void
+}
 
 const V_NUMBER = VERSION // eslint-disable-line no-undef
 
 @ErrorHandling
-class ManageSources extends Component {
+class ManageSources extends Component<Props, any> {
   constructor(props) {
     super(props)
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this.props.sources.forEach(source => {
       this.props.fetchKapacitors(source)
     })
   }
 
-  componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: Props) {
     if (prevProps.sources.length !== this.props.sources.length) {
       this.props.sources.forEach(source => {
         this.props.fetchKapacitors(source)
@@ -43,23 +54,8 @@ class ManageSources extends Component {
     }
   }
 
-  handleDeleteSource = source => () => {
-    const {notify} = this.props
-
-    try {
-      this.props.removeAndLoadSources(source)
-      notify(notifySourceDeleted(source.name))
-    } catch (e) {
-      notify(notifySourceDeleteFailed(source.name))
-    }
-  }
-
-  handleSetActiveKapacitor = ({kapacitor}) => {
-    this.props.setActiveKapacitor(kapacitor)
-  }
-
-  render() {
-    const {sources, source, deleteKapacitor} = this.props
+  public render() {
+    const { sources, source, deleteKapacitor } = this.props
 
     return (
       <div className="page" id="manage-sources-page">
@@ -82,33 +78,32 @@ class ManageSources extends Component {
               handleDeleteSource={this.handleDeleteSource}
               setActiveKapacitor={this.handleSetActiveKapacitor}
             />
-            <p className="version-number">Chronograf Version: {V_NUMBER}</p>
+            <p className="version-number">
+              Chronograf Version: {V_NUMBER}
+            </p>
           </div>
         </FancyScrollbar>
       </div>
     )
   }
+
+  private handleDeleteSource = (source: Source) => () => {
+    const { notify } = this.props
+
+    try {
+      this.props.removeAndLoadSources(source)
+      notify(notifySourceDeleted(source.name))
+    } catch (e) {
+      notify(notifySourceDeleteFailed(source.name))
+    }
+  }
+
+  private handleSetActiveKapacitor = ({ kapacitor }) => {
+    this.props.setActiveKapacitor(kapacitor)
+  }
 }
 
-const {array, func, shape, string} = PropTypes
-
-ManageSources.propTypes = {
-  source: shape({
-    id: string.isRequired,
-    links: shape({
-      proxy: string.isRequired,
-      self: string.isRequired,
-    }),
-  }),
-  sources: array,
-  notify: func.isRequired,
-  removeAndLoadSources: func.isRequired,
-  fetchKapacitors: func.isRequired,
-  setActiveKapacitor: func.isRequired,
-  deleteKapacitor: func.isRequired,
-}
-
-const mapStateToProps = ({sources}) => ({
+const mapStateToProps = ({ sources }) => ({
   sources,
 })
 
