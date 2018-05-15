@@ -27,15 +27,39 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 class HostPage extends Component {
   constructor(props) {
     super(props)
+
+    const hostsWithLinks = this.generateHostsWithLinks([
+      {name: props.params.hostID},
+    ])
+    hostsWithLinks.push({
+      name: 'Loading more hosts...',
+      link: 'nowhere',
+      isClickable: false,
+    })
+
     this.state = {
       layouts: [],
       hosts: {},
       timeRange: timeRanges.find(tr => tr.lower === 'now() - 1h'),
       dygraphs: [],
+      hostsWithLinks,
     }
+
+    this.getHosts = this.getHosts.bind(this)
   }
 
-  async componentDidMount() {
+  generateHostsWithLinks(hosts) {
+    const {
+      params: {sourceID},
+    } = this.props
+
+    return hosts.map(({name}) => ({
+      name,
+      link: `/sources/${sourceID}/hosts/${name}`,
+    }))
+  }
+
+  async getHosts() {
     const {source, params, location} = this.props
 
     // fetching layouts and mappings can be done at the same time
@@ -75,7 +99,13 @@ class HostPage extends Component {
       })
     }
 
-    this.setState({layouts: filteredLayouts, hosts: filteredHosts}) // eslint-disable-line react/no-did-mount-set-state
+    const hostsWithLinks = this.generateHostsWithLinks(filteredHosts)
+    debugger
+    this.setState({
+      layouts: filteredLayouts,
+      hosts: filteredHosts,
+      hostsWithLinks,
+    }) // eslint-disable-line react/no-did-mount-set-state
   }
 
   handleChooseTimeRange = ({lower, upper}) => {
@@ -156,21 +186,17 @@ class HostPage extends Component {
     const {
       autoRefresh,
       onManualRefresh,
-      params: {hostID, sourceID},
+      params: {hostID},
       inPresentationMode,
       handleChooseAutoRefresh,
       handleClickPresentationButton,
     } = this.props
-    const {layouts, timeRange, hosts} = this.state
-    const names = _.map(hosts, ({name}) => ({
-      name,
-      link: `/sources/${sourceID}/hosts/${name}`,
-    }))
+    const {layouts, timeRange, hostsWithLinks} = this.state
 
     return (
       <div className="page">
         <DashboardHeader
-          names={names}
+          names={hostsWithLinks}
           timeRange={timeRange}
           activeDashboard={hostID}
           autoRefresh={autoRefresh}
@@ -179,6 +205,7 @@ class HostPage extends Component {
           handleChooseAutoRefresh={handleChooseAutoRefresh}
           handleChooseTimeRange={this.handleChooseTimeRange}
           handleClickPresentationButton={handleClickPresentationButton}
+          handleOpenSwitcher={this.getHosts}
         />
         <FancyScrollbar
           className={classnames({

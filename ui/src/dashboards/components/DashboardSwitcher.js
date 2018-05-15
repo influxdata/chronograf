@@ -19,6 +19,9 @@ class DashboardSwitcher extends Component {
   }
 
   handleToggleMenu = () => {
+    if (!this.state.isOpen && this.props.onOpen) {
+      this.props.onOpen()
+    }
     this.setState({isOpen: !this.state.isOpen})
   }
 
@@ -49,11 +52,12 @@ class DashboardSwitcher extends Component {
             autoHeight={true}
             maxHeight={DROPDOWN_MENU_MAX_HEIGHT}
           >
-            {this.sortedList.map(({name, link}) => (
+            {this.sortedList.map(({name, link, isClickable}) => (
               <NameLink
                 key={link}
                 name={name}
                 link={link}
+                isClickable={isClickable}
                 activeName={activeDashboard}
                 onClose={this.handleCloseMenu}
               />
@@ -70,33 +74,46 @@ class DashboardSwitcher extends Component {
   }
 }
 
-const NameLink = ({name, link, activeName, onClose}) => (
-  <li
-    className={classnames('dropdown-item', {
-      active: name === activeName,
-    })}
-  >
-    <Link to={link} onClick={onClose}>
-      {name}
-    </Link>
-  </li>
-)
+const NameLink = ({name, link, isClickable = true, activeName, onClose}) => {
+  let item
+  if (isClickable) {
+    item = (
+      <Link to={link} onClick={onClose}>
+        {name}
+      </Link>
+    )
+  } else {
+    item = <span>{name}</span>
+  }
+  return (
+    <li
+      className={classnames('dropdown-item', {
+        active: name === activeName,
+      })}
+    >
+      {item}
+    </li>
+  )
+}
 
-const {arrayOf, func, shape, string} = PropTypes
+const {arrayOf, bool, func, shape, string} = PropTypes
 
 DashboardSwitcher.propTypes = {
   activeDashboard: string.isRequired,
   names: arrayOf(
     shape({
-      link: string.isRequired,
       name: string.isRequired,
+      link: string.isRequired,
+      isClickable: bool, // optional
     })
   ).isRequired,
+  onOpen: func, // optional
 }
 
 NameLink.propTypes = {
   name: string.isRequired,
   link: string.isRequired,
+  isClickable: bool, // optional
   activeName: string.isRequired,
   onClose: func.isRequired,
 }

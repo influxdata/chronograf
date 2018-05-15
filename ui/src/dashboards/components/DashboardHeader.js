@@ -30,6 +30,7 @@ const DashboardHeader = ({
   timeRange: {upper, lower},
   handleClickPresentationButton,
   zoomedTimeRange: {zoomedLower, zoomedUpper},
+  handleOpenSwitcher,
 }) =>
   isHidden ? null : (
     <div className="page-header full-width">
@@ -45,6 +46,7 @@ const DashboardHeader = ({
             <DashboardSwitcher
               names={names}
               activeDashboard={activeDashboard}
+              onOpen={handleOpenSwitcher}
             />
           ) : null}
           {dashboard ? (
@@ -142,6 +144,7 @@ DashboardHeader.propTypes = {
   onCancel: func,
   onSave: func,
   names: arrayOf(shape({})).isRequired,
+  handleOpenSwitcher: func, // optional
 }
 
 export default DashboardHeader
