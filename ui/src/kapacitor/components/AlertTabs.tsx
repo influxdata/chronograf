@@ -278,7 +278,7 @@ class AlertTabs extends PureComponent<Props, State> {
               AlertTypes.kafka
             )}
             notify={this.props.notify}
-            isMultipleConfigsSupported={true}
+            isMultipleConfigsSupported={this.isMultipleConfigsSupported}
             onDelete={this.handleDeleteConfig(AlertTypes.kafka)}
           />
         )
@@ -356,19 +356,6 @@ class AlertTabs extends PureComponent<Props, State> {
           />
         )
       case AlertTypes.slack:
-        const hasPagerDuty2: Section = get(
-          configSections,
-          AlertTypes.pagerduty2,
-          undefined
-        )
-        const hasOpsGenie2: Section = get(
-          configSections,
-          AlertTypes.opsgenie2,
-          undefined
-        )
-        // if kapacitor supports pagerduty2 and opsgenie2, its at least v1.5
-        const isMultipleConfigsSupported: boolean =
-          !_.isUndefined(hasPagerDuty2) && !_.isUndefined(hasOpsGenie2)
         return (
           <SlackConfigs
             configs={this.getSectionElements(configSections, AlertTypes.slack)}
@@ -379,7 +366,7 @@ class AlertTabs extends PureComponent<Props, State> {
               configSections,
               AlertTypes.slack
             )}
-            isMultipleConfigsSupported={isMultipleConfigsSupported}
+            isMultipleConfigsSupported={this.isMultipleConfigsSupported}
           />
         )
 
@@ -449,6 +436,23 @@ class AlertTabs extends PureComponent<Props, State> {
     return _.get(sections, [section, 'elements', '0'], null)
   }
 
+  private get isMultipleConfigsSupported(): boolean {
+    const {configSections} = this.state
+    const hasPagerDuty2: Section = get(
+      configSections,
+      AlertTypes.pagerduty2,
+      undefined
+    )
+    const hasOpsGenie2: Section = get(
+      configSections,
+      AlertTypes.opsgenie2,
+      undefined
+    )
+    // if kapacitor supports pagerduty2 and opsgenie2, its at least v1.5
+    return
+    !_.isUndefined(hasPagerDuty2) && !_.isUndefined(hasOpsGenie2)
+  }
+
   private getSectionElements = (
     sections: Sections,
     section: string
@@ -457,7 +461,7 @@ class AlertTabs extends PureComponent<Props, State> {
   }
 
   private getConfigEnabled = (sections: Sections, section: string): boolean => {
-    if (section === AlertTypes.slack) {
+    if (section === AlertTypes.slack || section === AlertTypes.kafka) {
       const configElements: Section[] = get(sections, `${section}.elements`, [])
       const enabledConfigElements = configElements.filter(e => {
         const enabled: boolean = get(e, 'options.enabled', false)
