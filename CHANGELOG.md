@@ -53,6 +53,7 @@
 1.  [#3166](https://github.com/influxdata/chronograf/pull/3166): Fix naming of new TICKScripts
 1.  [#3449](https://github.com/influxdata/chronograf/pull/3449): Fix data explorer query error reporting regression
 1.  [#3453](https://github.com/influxdata/chronograf/pull/3453): Fix Kapacitor Logs fetch regression
+1.  [#3500](https://github.com/influxdata/chronograf/pull/3500): Fix switching sources for a dashboard cell
 
 ## v1.4.4.1 [2018-04-16]
 
