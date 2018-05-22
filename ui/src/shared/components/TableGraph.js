@@ -146,17 +146,19 @@ class TableGraph extends Component {
     }
 
     const {sort} = this.state
-    const internalName = _.get(
+    const nextInternalName = _.get(
       nextProps,
       ['tableOptions', 'sortBy', 'internalName'],
       ''
     )
-    if (
-      !_.get(this.props, ['tableOptions', 'sortBy', 'internalName'], '') ===
-      internalName
-    ) {
+    const thisInternalName = _.get(
+      this.props,
+      ['tableOptions', 'sortBy', 'internalName'],
+      ''
+    )
+    if (thisInternalName !== nextInternalName) {
       sort.direction = DEFAULT_SORT_DIRECTION
-      sort.field = internalName
+      sort.field = nextInternalName
     }
 
     if (
