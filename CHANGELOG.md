@@ -1,13 +1,4 @@
-## v1.5.1.0 [unreleased]
-
-### Features
-
-### UI Improvements
-
-1.  [#3474](https://github.com/influxdata/chronograf/pull/3474): Sort task table on Manage Alert page alphabetically
-### Bug Fixes
-
-## v1.5.0.0 [2018-05-15-RC]
+## v1.5.0.0 [2018-05-22]
 
 ### Features
 
@@ -36,6 +27,7 @@
 1.  [#3404](https://github.com/influxdata/chronograf/pull/3404): Get cloned cell name for notification from cloned cell generator function
 1.  [#3461](https://github.com/influxdata/chronograf/pull/3461): Improve load time for host pages
 1.  [#3423](https://github.com/influxdata/chronograf/pull/3423): Show kapacitor batch point info in log panel
+1.  [#3474](https://github.com/influxdata/chronograf/pull/3474): Sort task table on Manage Alert page alphabetically
 
 ### Bug Fixes
 
