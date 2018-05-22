@@ -1,7 +1,9 @@
+import {Service, NewService} from './services'
 import {AuthLinks, Organization, Role, User, Me} from './auth'
 import {Template, Cell, CellQuery, Legend, Axes} from './dashboard'
 import {
   GroupBy,
+  Query,
   QueryConfig,
   Status,
   TimeRange,
@@ -21,6 +23,8 @@ import {DropdownAction, DropdownItem} from './shared'
 import {Notification, NotificationFunc} from './notifications'
 
 export {
+  Service,
+  NewService,
   Me,
   AuthLinks,
   Role,
@@ -31,6 +35,7 @@ export {
   CellQuery,
   Legend,
   Status,
+  Query,
   QueryConfig,
   TimeShift,
   ApplyFuncsToFieldArgs,

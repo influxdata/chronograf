@@ -32,6 +32,20 @@ interface CellLinks {
   self: string
 }
 
+export enum CellType {
+  Line = 'line',
+  Stacked = 'line-stacked',
+  StepPlot = 'line-stepplot',
+  Bar = 'bar',
+  LinePlusSingleStat = 'line-plus-single-stat',
+  SingleStat = 'single-stat',
+  Gauge = 'gauge',
+  Table = 'table',
+  Alerts = 'alerts',
+  News = 'news',
+  Guide = 'guide',
+}
+
 // corresponds to DashboardQuery on the backend
 export interface CellQuery {
   query: string
