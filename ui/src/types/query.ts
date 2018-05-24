@@ -5,6 +5,9 @@ export interface Query {
   text: string
   id: string
   queryConfig: QueryConfig
+  database?: string
+  rp?: string
+  db?: string
 }
 
 export interface QueryConfig {

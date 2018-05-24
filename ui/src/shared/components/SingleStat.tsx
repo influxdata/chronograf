@@ -6,30 +6,32 @@ import _ from 'lodash'
 import {SMALL_CELL_HEIGHT} from 'src/shared/graphs/helpers'
 import {DYGRAPH_CONTAINER_V_MARGIN} from 'src/shared/constants'
 import {generateThresholdsListHexs} from 'src/shared/constants/colorOperations'
-import {ColorNumber} from 'src/types/colors'
+import {ColorString} from 'src/types/colors'
 import {CellType} from 'src/types/dashboard'
-import {Data} from 'src/types/dygraphs'
+// import {Data} from 'src/types/dygraphs'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {TimeSeriesServerResponse} from 'src/types/series'
 
-interface Props {
-  isFetchingInitially: boolean
+export interface SingleStatProps {
+  isFetchingInitially?: boolean
   cellHeight: number
-  colors: ColorNumber[]
+  colors: ColorString[]
   prefix?: string
   suffix?: string
   lineGraph: boolean
   staticLegendHeight: number
-  data: Data
+  data: TimeSeriesServerResponse[]
 }
 
 @ErrorHandling
-class SingleStat extends PureComponent<Props> {
-  public static defaultProps: Partial<Props> = {
+class SingleStat extends PureComponent<SingleStatProps> {
+  public static defaultProps: Partial<SingleStatProps> = {
     prefix: '',
     suffix: '',
   }
 
   public render() {
+    console.log(this.props.data)
     const {isFetchingInitially} = this.props
 
     if (isFetchingInitially) {

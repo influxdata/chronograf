@@ -1,29 +1,74 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, {SFC} from 'react'
 import {connect} from 'react-redux'
 
 import {emptyGraphCopy} from 'src/shared/copy/cell'
 import {bindActionCreators} from 'redux'
 
-import AutoRefresh from 'shared/components/AutoRefresh'
-import LineGraph from 'shared/components/LineGraph'
-import SingleStat from 'shared/components/SingleStat'
-import GaugeChart from 'shared/components/GaugeChart'
-import TableGraph from 'shared/components/TableGraph'
+import AutoRefresh, {
+  IndividualRefreshingGraphProps,
+} from 'src/shared/components/AutoRefresh'
+import LineGraph from 'src/shared/components/LineGraph'
+import SingleStat from 'src/shared/components/SingleStat'
+import GaugeChart from 'src/shared/components/GaugeChart'
+import TableGraph from 'src/shared/components/TableGraph'
 
-import {colorsStringSchema} from 'shared/schemas'
 import {setHoverTime} from 'src/dashboards/actions'
 import {
   DEFAULT_TIME_FORMAT,
   DEFAULT_DECIMAL_PLACES,
 } from 'src/dashboards/constants'
 
-const RefreshingLineGraph = AutoRefresh(LineGraph)
-const RefreshingSingleStat = AutoRefresh(SingleStat)
-const RefreshingGaugeChart = AutoRefresh(GaugeChart)
-const RefreshingTableGraph = AutoRefresh(TableGraph)
+import {TimeRange, Template, Axes, Query} from 'src/types'
+import {ColorString} from 'src/types/colors'
+import {TableOptions, FieldName, DecimalPlaces} from 'src/types/dashboard'
+import {TimeSeriesServerResponse} from 'src/types/series'
 
-const RefreshingGraph = ({
+interface Props {
+  timeRange: TimeRange
+  autoRefresh: number
+  manualRefresh: number
+  templates: Template[]
+  type: string
+  cellHeight: number
+  resizerTopHeight: number
+  axes: Axes
+  queries: Query[]
+  editQueryStatus: () => void
+  staticLegend: boolean
+  onZoom: () => void
+  grabDataForDownload: (timeSeries: TimeSeriesServerResponse[]) => void
+  colors: ColorString[]
+  cellID: string
+  inView: boolean
+  tableOptions: TableOptions
+  fieldOptions: FieldName[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  hoverTime: string
+  handleSetHoverTime: (hovertime: string) => void
+  isInCEO: boolean
+  onSetResolution: (resolution: number) => void
+}
+
+export interface DisplayOptions {
+  stepPlot: boolean
+  stackedGraph: boolean
+}
+
+const RefreshingLineGraph: IndividualRefreshingGraphProps = AutoRefresh(
+  LineGraph
+)
+const RefreshingSingleStat: IndividualRefreshingGraphProps = AutoRefresh(
+  SingleStat
+)
+const RefreshingGaugeChart: IndividualRefreshingGraphProps = AutoRefresh(
+  GaugeChart
+)
+const RefreshingTableGraph: IndividualRefreshingGraphProps = AutoRefresh(
+  TableGraph
+)
+
+const RefreshingGraph: SFC<Props> = ({
   axes,
   inView,
   type,
@@ -74,6 +119,8 @@ const RefreshingGraph = ({
         suffix={suffix}
         inView={inView}
         onSetResolution={onSetResolution}
+        lineGraph={false}
+        staticLegendHeight={null}
       />
     )
   }
@@ -126,7 +173,7 @@ const RefreshingGraph = ({
     )
   }
 
-  const displayOptions = {
+  const displayOptions: DisplayOptions = {
     stepPlot: type === 'line-stepplot',
     stackedGraph: type === 'line-stacked',
   }
@@ -154,55 +201,6 @@ const RefreshingGraph = ({
       onSetResolution={onSetResolution}
     />
   )
-}
-
-const {arrayOf, bool, func, number, shape, string} = PropTypes
-
-RefreshingGraph.propTypes = {
-  timeRange: shape({
-    lower: string.isRequired,
-  }),
-  autoRefresh: number.isRequired,
-  manualRefresh: number,
-  templates: arrayOf(shape()),
-  type: string.isRequired,
-  cellHeight: number,
-  resizerTopHeight: number,
-  axes: shape(),
-  queries: arrayOf(shape()).isRequired,
-  editQueryStatus: func,
-  staticLegend: bool,
-  onZoom: func,
-  grabDataForDownload: func,
-  colors: colorsStringSchema,
-  cellID: string,
-  inView: bool,
-  tableOptions: shape({
-    verticalTimeAxis: bool.isRequired,
-    sortBy: shape({
-      internalName: string.isRequired,
-      displayName: string.isRequired,
-      visible: bool.isRequired,
-    }).isRequired,
-    wrapping: string.isRequired,
-    fixFirstColumn: bool.isRequired,
-  }),
-  fieldOptions: arrayOf(
-    shape({
-      internalName: string.isRequired,
-      displayName: string.isRequired,
-      visible: bool.isRequired,
-    }).isRequired
-  ),
-  timeFormat: string.isRequired,
-  decimalPlaces: shape({
-    isEnforced: bool.isRequired,
-    digits: number.isRequired,
-  }).isRequired,
-  hoverTime: string.isRequired,
-  handleSetHoverTime: func.isRequired,
-  isInCEO: bool,
-  onSetResolution: func,
 }
 
 RefreshingGraph.defaultProps = {

@@ -188,8 +188,8 @@ LineGraph.propTypes = {
   hoverTime: string,
   handleSetHoverTime: func,
   title: string,
-  isFetchingInitially: bool,
-  isRefreshing: bool,
+  isFetchingInitially: bool, // TODO for typescript: optional
+  isRefreshing: bool, // TODO fro typescript: optional
   underlayCallback: func,
   isGraphFilled: bool,
   isBarGraph: bool,

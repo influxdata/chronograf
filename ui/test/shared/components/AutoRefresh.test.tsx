@@ -1,23 +1,18 @@
 import AutoRefresh, {
-  Props,
-  OriginalProps,
+  AutoRefreshProps,
+  ComposedComponentProps,
 } from 'src/shared/components/AutoRefresh'
 import React, {Component} from 'react'
 import {shallow} from 'enzyme'
 
-type ComponentProps = Props & OriginalProps
+import {axes} from 'test/fixtures'
+
+type ComponentProps = AutoRefreshProps & ComposedComponentProps
 
 class MyComponent extends Component<ComponentProps> {
   public render(): JSX.Element {
     return <p>Here</p>
   }
-}
-
-const axes = {
-  bounds: {
-    y: [1],
-    y2: [2],
-  },
 }
 
 const defaultProps = {

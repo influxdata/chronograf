@@ -3,36 +3,83 @@ import _ from 'lodash'
 
 import {fetchTimeSeries} from 'src/shared/apis/query'
 import {DEFAULT_TIME_SERIES} from 'src/shared/constants/series'
+
+import {Template, Query} from 'src/types'
 import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
-import {Template} from 'src/types'
 
-interface Axes {
-  bounds: {
-    y: number[]
-    y2: number[]
-  }
-}
+import {SingleStatProps} from 'src/shared/components/SingleStat'
+import {GaugeChartProps} from 'src/shared/components/GaugeChart'
+import {TableGraphProps} from 'src/shared/components/TableGraph'
+// import {TimeRange, Template, Axes, Query} from 'src/types'
+// import {ColorString} from 'src/types/colors'
+// import {TableOptions, FieldName, DecimalPlaces} from 'src/types/dashboard'
+// import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
+// import {DisplayOptions} from 'src/shared/components/RefreshingGraph'
 
-interface Query {
-  host: string | string[]
-  text: string
-  database: string
-  db: string
-  rp: string
-  id: string
-}
-
-export interface Props {
+export interface AutoRefreshProps {
   type: string
   autoRefresh: number
   inView: boolean
   templates: Template[]
   queries: Query[]
-  axes: Axes
   editQueryStatus: () => void
-  grabDataForDownload: (timeSeries: TimeSeriesServerResponse[]) => void
+  grabDataForDownload?: (timeSeries: TimeSeriesServerResponse[]) => void
   onSetResolution?: (resolution: number) => void
 }
+
+interface ComposedComponentPropsNotFetching {
+  data: TimeSeriesServerResponse[]
+  setResolution: (resolution: number) => void
+}
+
+export interface ComposedComponentPropsFetching
+  extends ComposedComponentPropsNotFetching {
+  isFetchingInitially: boolean
+  isRefreshing: boolean
+}
+
+export type RefreshProps =
+  | ComposedComponentPropsNotFetching
+  | ComposedComponentPropsFetching
+
+type ComposedSingleStatProps = SingleStatProps & RefreshProps
+type ComposedGaugeChartProps = GaugeChartProps & RefreshProps
+type ComposedTableGraphProps = TableGraphProps & RefreshProps
+
+type ComposedComponentProps =
+  | ComposedSingleStatProps
+  | ComposedGaugeChartProps
+  | ComposedTableGraphProps
+
+type SingleStatPropsWithoutRefreshProps = Pick<
+  SingleStatProps,
+  Exclude<keyof SingleStatProps, keyof ComposedComponentPropsFetching>
+>
+
+type GaugeChartPropsWithoutRefreshProps = Pick<
+  GaugeChartProps,
+  Exclude<keyof GaugeChartProps, keyof ComposedComponentPropsFetching>
+>
+
+type TableGraphPropsWithoutRefreshProps = Pick<
+  TableGraphProps,
+  Exclude<keyof TableGraphProps, keyof ComposedComponentPropsFetching>
+>
+
+type GraphPropsWithoutRefreshProps =
+  | SingleStatPropsWithoutRefreshProps
+  | GaugeChartPropsWithoutRefreshProps
+  | TableGraphPropsWithoutRefreshProps
+
+type Props = AutoRefreshProps & GraphPropsWithoutRefreshProps
+
+// export type IndividualRefreshingGraphProps = GraphPropsWithoutRefreshProps &
+//   RefreshProps
+export type IndividualRefreshingGraphProps =
+  | SingleStatProps
+  | GaugeChartProps
+  | TableGraphProps
+// | LineGraphProps (TODO once linegraph is converted to ts)
 
 interface State {
   isFetching: boolean
@@ -41,18 +88,11 @@ interface State {
   resolution: number | null
 }
 
-export interface OriginalProps {
-  data: TimeSeriesServerResponse[]
-  setResolution: (resolution: number) => void
-  isFetchingInitially?: boolean
-  isRefreshing?: boolean
-}
-
 const AutoRefresh = (
-  ComposedComponent: ComponentClass<OriginalProps & Props>
-) => {
+  ComposedComponent: ComponentClass<ComposedComponentProps>
+): ComponentClass<GraphPropsWithoutRefreshProps> => {
   class Wrapper extends Component<Props, State> {
-    public static defaultProps = {
+    public static defaultProps: Partial<Props> = {
       inView: true,
     }
 

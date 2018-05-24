@@ -52,16 +52,16 @@ interface CellRendererProps {
   style: {[x: string]: any}
 }
 
-interface Props {
+export interface TableGraphProps {
   data: TimeSeriesServerResponse[]
   tableOptions: TableOptions
   timeFormat: string
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
   hoverTime: string
-  handleUpdateFieldOptions: (fieldOptions: FieldOption[]) => void
+  handleUpdateFieldOptions?: (fieldOptions: FieldOption[]) => void
   handleSetHoverTime: (hovertime: string) => void
-  colors: ColorString
+  colors: ColorString[]
   isInCEO: boolean
 }
 
@@ -80,9 +80,9 @@ interface State {
 }
 
 @ErrorHandling
-class TableGraph extends Component<Props, State> {
+class TableGraph extends Component<TableGraphProps, State> {
   private gridContainer: HTMLDivElement
-  constructor(props: Props) {
+  constructor(props: TableGraphProps) {
     super(props)
 
     const sortField: string = _.get(
@@ -234,7 +234,7 @@ class TableGraph extends Component<Props, State> {
     })
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  public componentWillReceiveProps(nextProps: TableGraphProps) {
     const updatedProps = _.keys(nextProps).filter(
       k => !_.isEqual(this.props[k], nextProps[k])
     )

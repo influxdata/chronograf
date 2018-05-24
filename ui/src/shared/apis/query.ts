@@ -4,16 +4,7 @@ import {removeUnselectedTemplateValues} from 'src/dashboards/constants'
 
 import {intervalValuesPoints} from 'src/shared/constants'
 
-import {Template} from 'src/types'
-
-interface Query {
-  host: string | string[]
-  text: string
-  database: string
-  db: string
-  rp: string
-  id: string
-}
+import {Template, Query} from 'src/types'
 
 const parseSource = source => {
   if (Array.isArray(source)) {
