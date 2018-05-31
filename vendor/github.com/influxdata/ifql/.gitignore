@@ -1,8 +1,0 @@
-/vendor/
-/bin/
-.vscode
-/dist/
-ifqld.id
-.*.swp
-ifql_pkgs
-/*.ifql
