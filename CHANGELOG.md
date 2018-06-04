@@ -1,3 +1,9 @@
+## v1.5.0.1 [2018-06-04]
+
+### Bug Fixes
+
+1. [#3564](https://github.com/influxdata/chronograf/pull/3564): Fix Color Scale Dropdown
+
 ## v1.5.0.0 [2018-05-22]
 
 ### Features
