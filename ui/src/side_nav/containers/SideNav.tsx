@@ -111,16 +111,14 @@ class SideNav extends PureComponent<Props> {
           </NavListItem>
         </NavBlock>
 
-        <FeatureFlag name="log-viewer">
-          <NavBlock
-            highlightWhen={['logs']}
-            icon="text-block"
-            link={'/logs'}
-            location={location}
-          >
-            <NavHeader link={'/logs'} title="Log Viewer" />
-          </NavBlock>
-        </FeatureFlag>
+        <NavBlock
+          highlightWhen={['logs']}
+          icon="text-block"
+          link={'/logs'}
+          location={location}
+        >
+          <NavHeader link={'/logs'} title="Log Viewer" />
+        </NavBlock>
 
         <Authorized
           requiredRole={ADMIN_ROLE}
