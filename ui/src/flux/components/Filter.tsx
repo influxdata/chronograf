@@ -1,8 +1,9 @@
-import {PureComponent, ReactNode} from 'react'
+import React, {PureComponent, ReactNode} from 'react'
 import {connect} from 'react-redux'
 import {getAST} from 'src/flux/apis'
 import {Links, BinaryExpressionNode, MemberExpressionNode} from 'src/types/flux'
 import Walker from 'src/flux/ast/walker'
+import FilterPreview from 'src/flux/components/FilterPreview'
 
 interface Props {
   value: string
@@ -36,7 +37,7 @@ export class Filter extends PureComponent<Props, State> {
   }
 
   public render() {
-    return this.props.render(this.state.nodes)
+    return <FilterPreview nodes={this.state.nodes} />
   }
 }
 

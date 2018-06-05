@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {BinaryExpressionNode, MemberExpressionNode} from 'src/types/flux'
 
-type FilterNode = BinaryExpressionNode & MemberExpressionNode
+type FilterNode = BinaryExpressionNode | MemberExpressionNode
 
 interface Props {
   nodes: FilterNode[]
@@ -35,7 +35,10 @@ class FilterPreviewNode extends PureComponent<FilterPreviewNodeProps> {
         return <div className="flux-filter--key">{node.source}</div>
       }
       case 'MemberExpression': {
-        return <div className="flux-filter--key">{node.property.name}</div>
+        const memberNode = node as MemberExpressionNode
+        return (
+          <div className="flux-filter--key">{memberNode.property.name}</div>
+        )
       }
       case 'OpenParen': {
         return <div className="flux-filter--paren-open" />

@@ -4,7 +4,8 @@ import {OnChangeArg} from 'src/types/flux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Func} from 'src/types/flux'
 import {funcNames} from 'src/flux/constants'
-import Join from 'src/flux/components/Join'
+import JoinArgs from 'src/flux/components/JoinArgs'
+import FilterArgs from 'src/flux/components/FilterArgs'
 import {Service} from 'src/types'
 
 interface Props {
@@ -20,22 +21,23 @@ interface Props {
 
 @ErrorHandling
 export default class FuncArgs extends PureComponent<Props> {
-  public render() {
+  public renderArgs() {
     const {
       func,
       bodyID,
       service,
       onChangeArg,
-      onDeleteFunc,
       declarationID,
       onGenerateScript,
       declarationsFromBody,
     } = this.props
+
     const {name: funcName, id: funcID} = func
-    return (
-      <div className="func-node--tooltip">
-        {funcName === funcNames.JOIN ? (
-          <Join
+
+    switch (funcName) {
+      case funcNames.JOIN: {
+        return (
+          <JoinArgs
             func={func}
             bodyID={bodyID}
             declarationID={declarationID}
@@ -43,23 +45,36 @@ export default class FuncArgs extends PureComponent<Props> {
             declarationsFromBody={declarationsFromBody}
             onGenerateScript={onGenerateScript}
           />
-        ) : (
-          func.args.map(({key, value, type}) => (
-            <FuncArg
-              key={key}
-              type={type}
-              argKey={key}
-              value={value}
-              bodyID={bodyID}
-              funcID={funcID}
-              funcName={funcName}
-              service={service}
-              onChangeArg={onChangeArg}
-              declarationID={declarationID}
-              onGenerateScript={onGenerateScript}
-            />
-          ))
-        )}
+        )
+      }
+      case funcNames.FILTER: {
+        return <FilterArgs service={service} db={'telegraf'} />
+      }
+      default: {
+        return func.args.map(({key, value, type}) => (
+          <FuncArg
+            key={key}
+            type={type}
+            argKey={key}
+            value={value}
+            bodyID={bodyID}
+            funcID={funcID}
+            funcName={funcName}
+            service={service}
+            onChangeArg={onChangeArg}
+            declarationID={declarationID}
+            onGenerateScript={onGenerateScript}
+          />
+        ))
+      }
+    }
+  }
+  public render() {
+    const {onDeleteFunc} = this.props
+
+    return (
+      <div className="func-node--tooltip">
+        {this.renderArgs()}
         <div className="func-node--buttons">
           <div
             className="btn btn-sm btn-danger func-node--delete"
