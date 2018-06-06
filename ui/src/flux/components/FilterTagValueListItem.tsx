@@ -10,18 +10,12 @@ interface Props {
   tagKey: string
   value: string
   changeValue: SetFilterTagValue
+  selected: boolean
 }
 
-interface State {
-  isSelected: boolean
-}
-
-class FilterTagValueListItem extends PureComponent<Props, State> {
+class FilterTagValueListItem extends PureComponent<Props> {
   constructor(props) {
     super(props)
-    this.state = {
-      isSelected: false,
-    }
   }
 
   public render() {
@@ -42,17 +36,15 @@ class FilterTagValueListItem extends PureComponent<Props, State> {
   }
 
   private handleClick = (e: MouseEvent<HTMLDivElement>) => {
-    const {tagKey, value} = this.props
+    const {tagKey, value, selected} = this.props
 
     e.stopPropagation()
-    this.props.changeValue(tagKey, value, !this.state.isSelected)
-    this.setState({isSelected: !this.state.isSelected})
+    this.props.changeValue(tagKey, value, !selected)
   }
 
   private get listItemClasses() {
-    const {isSelected} = this.state
     const baseClasses = 'flux-schema-item query-builder--list-item'
-    return isSelected ? baseClasses + ' active' : baseClasses
+    return this.props.selected ? baseClasses + ' active' : baseClasses
   }
 }
 

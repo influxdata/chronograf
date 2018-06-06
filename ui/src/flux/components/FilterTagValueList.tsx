@@ -1,4 +1,5 @@
 import React, {PureComponent, MouseEvent} from 'react'
+import _ from 'lodash'
 
 import FilterTagValueListItem from 'src/flux/components/FilterTagValueListItem'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
@@ -15,6 +16,7 @@ interface Props {
   db: string
   tagKey: string
   values: string[]
+  selectedValues: string[]
   changeValue: SetFilterTagValue
   filter: SchemaFilter[]
   isLoadingMoreValues: boolean
@@ -33,6 +35,7 @@ export default class FilterTagValueList extends PureComponent<Props> {
           <FilterTagValueListItem
             key={i}
             value={v}
+            selected={_.includes(this.props.selectedValues, v)}
             tagKey={tagKey}
             changeValue={this.props.changeValue}
           />

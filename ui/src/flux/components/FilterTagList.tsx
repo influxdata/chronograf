@@ -21,28 +21,30 @@ interface Props {
   declarationID: string
 }
 
-interface State {
-  conditions: TagCondition[]
-}
+export default class FilterTagList extends PureComponent<Props> {
+  public get conditions(): TagCondition[] {
+    const filterFunc: string = this.props.func.args.find(
+      arg => arg.key === 'fn'
+    ).value
 
-export default class FilterTagList extends PureComponent<Props, State> {
-  constructor(props) {
-    super(props)
-    this.state = {
-      conditions: [],
-    }
+    const conditionMatcher = /(r\.[\w\d-]* == "[\w\d-]+")/g
+    const conditionStrings: string[] = filterFunc.match(conditionMatcher) || []
+
+    const tagMatcher = /r\.([\w\d-]*) == "([\w\d-]+)"/
+    const conditions: TagCondition[] = conditionStrings.map(str => {
+      const [, tagKey, tagValue] = tagMatcher.exec(str)
+      return {tagKey, tagValue}
+    })
+
+    return conditions
   }
 
   public addCondition(condition: TagCondition): TagCondition[] {
-    const conditions = [...this.state.conditions, condition]
-    this.setState({conditions})
-    return conditions
+    return [...this.conditions, condition]
   }
 
   public removeCondition(condition: TagCondition): TagCondition[] {
-    const conditions = _.without(this.state.conditions, condition)
-    this.setState({conditions})
-    return conditions
+    return _.reject(this.conditions, c => _.isEqual(c, condition))
   }
 
   public buildFilterString(conditions: TagCondition[]): string {
@@ -50,6 +52,10 @@ export default class FilterTagList extends PureComponent<Props, State> {
       .map(c => `r.${c.tagKey} == "${c.tagValue}"`)
       .join(' AND ')
     return `(r) => ${conditionString}`
+  }
+
+  public selectedValues(key: string): string[] {
+    return this.conditions.filter(c => c.tagKey === key).map(c => c.tagValue)
   }
 
   public changeValue = (
@@ -93,6 +99,7 @@ export default class FilterTagList extends PureComponent<Props, State> {
               key={t}
               db={db}
               tagKey={t}
+              selectedValues={this.selectedValues(t)}
               changeValue={this.changeValue}
               service={service}
               filter={filter}

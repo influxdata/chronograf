@@ -24,6 +24,7 @@ export type SetFilterTagValue = (
 interface Props {
   tagKey: string
   changeValue: SetFilterTagValue
+  selectedValues: string[]
   db: string
   service: Service
   filter: SchemaFilter[]
@@ -101,6 +102,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
                   db={db}
                   service={service}
                   values={tagValues}
+                  selectedValues={this.props.selectedValues}
                   tagKey={tagKey}
                   changeValue={this.props.changeValue}
                   filter={filter}
