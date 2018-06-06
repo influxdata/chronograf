@@ -48,7 +48,16 @@ export default class FuncArgs extends PureComponent<Props> {
         )
       }
       case funcNames.FILTER: {
-        return <FilterArgs service={service} db={'telegraf'} />
+        return (
+          <FilterArgs
+            func={func}
+            bodyID={bodyID}
+            declarationID={declarationID}
+            onChangeArg={onChangeArg}
+            service={service}
+            db={'telegraf'}
+          />
+        )
       }
       default: {
         return func.args.map(({key, value, type}) => (
