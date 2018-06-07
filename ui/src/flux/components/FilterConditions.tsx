@@ -1,7 +1,5 @@
 import React, {PureComponent} from 'react'
-import {BinaryExpressionNode, MemberExpressionNode} from 'src/types/flux'
-
-type FilterNode = BinaryExpressionNode | MemberExpressionNode
+import {FilterNode, MemberExpressionNode} from 'src/types/flux'
 
 interface Props {
   nodes: FilterNode[]
@@ -26,10 +24,6 @@ interface FilterConditionNodeProps {
 /* tslint:disable */
 class FilterConditionNode extends PureComponent<FilterConditionNodeProps> {
   public render() {
-    return this.className
-  }
-
-  private get className(): JSX.Element {
     const {node} = this.props
 
     switch (node.type) {

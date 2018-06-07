@@ -4,12 +4,7 @@ import _ from 'lodash'
 import FilterTagValueListItem from 'src/flux/components/FilterTagValueListItem'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
 import {Service, SchemaFilter} from 'src/types'
-
-export type SetFilterTagValue = (
-  key: string,
-  value: string,
-  selected: boolean
-) => void
+import {SetFilterTagValue} from 'src/types/flux'
 
 interface Props {
   service: Service
@@ -17,7 +12,7 @@ interface Props {
   tagKey: string
   values: string[]
   selectedValues: string[]
-  changeValue: SetFilterTagValue
+  onChangeValue: SetFilterTagValue
   filter: SchemaFilter[]
   isLoadingMoreValues: boolean
   onLoadMoreValues: () => void
@@ -37,7 +32,7 @@ export default class FilterTagValueList extends PureComponent<Props> {
             value={v}
             selected={_.includes(this.props.selectedValues, v)}
             tagKey={tagKey}
-            changeValue={this.props.changeValue}
+            onChangeValue={this.props.onChangeValue}
           />
         ))}
         {shouldShowMoreValues && (

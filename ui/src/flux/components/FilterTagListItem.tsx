@@ -10,31 +10,21 @@ import _ from 'lodash'
 import {Service, SchemaFilter, RemoteDataState} from 'src/types'
 import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
 import {explorer} from 'src/flux/constants'
+import {
+  SetFilterTagValue,
+  SetEquality,
+  FilterTagKeyCondition,
+} from 'src/types/flux'
 import parseValuesColumn from 'src/shared/parsing/flux/values'
 import FilterTagValueList from 'src/flux/components/FilterTagValueList'
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
 
-export type SetFilterTagValue = (
-  key: string,
-  value: string,
-  selected: boolean
-) => void
-
-type SetEquality = (tagKey: string, equal: boolean) => void
-
-type TagValue = string
-
-interface TagKeyCondition {
-  operator: string
-  tagValues: TagValue[]
-}
-
 interface Props {
   tagKey: string
   onSetEquality: SetEquality
-  changeValue: SetFilterTagValue
-  keyCondition: TagKeyCondition
+  onChangeValue: SetFilterTagValue
+  keyCondition: FilterTagKeyCondition
   db: string
   service: Service
   filter: SchemaFilter[]
@@ -146,7 +136,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
                   values={tagValues}
                   selectedValues={selectedValues}
                   tagKey={tagKey}
-                  changeValue={this.props.changeValue}
+                  onChangeValue={this.props.onChangeValue}
                   filter={filter}
                   onLoadMoreValues={this.handleLoadMoreValues}
                   isLoadingMoreValues={loadingMore === RemoteDataState.Loading}

@@ -2,20 +2,14 @@ import React, {PureComponent, MouseEvent} from 'react'
 import _ from 'lodash'
 
 import {SchemaFilter, Service} from 'src/types'
-import {OnChangeArg, Func} from 'src/types/flux'
+import {
+  OnChangeArg,
+  Func,
+  FilterTagKeyConditions,
+  FilterTagKeyCondition,
+} from 'src/types/flux'
 import FilterTagListItem from 'src/flux/components/FilterTagListItem'
 import FancyScrollbar from '../../shared/components/FancyScrollbar'
-
-type TagValue = string
-
-interface TagKeyCondition {
-  operator: string
-  tagValues: TagValue[]
-}
-
-interface TagKeyConditions {
-  [tagKey: string]: TagKeyCondition
-}
 
 interface Props {
   db: string
@@ -29,10 +23,10 @@ interface Props {
 }
 
 export default class FilterTagList extends PureComponent<Props> {
-  public newKeyCondition(): TagKeyCondition {
+  public newKeyCondition(): FilterTagKeyCondition {
     return {operator: '==', tagValues: []}
   }
-  public get conditions(): TagKeyConditions {
+  public get conditions(): FilterTagKeyConditions {
     const filterFunc: string = this.props.func.args.find(
       arg => arg.key === 'fn'
     ).value
@@ -41,25 +35,28 @@ export default class FilterTagList extends PureComponent<Props> {
     const conditionStrings: string[] = filterFunc.match(conditionMatcher) || []
 
     const tagMatcher = /r\.([\w\d-]*) (==|!=) "([\w\d-]+)"/
-    const conditions: TagKeyConditions = conditionStrings.reduce((acc, str) => {
-      const [, tagKey, operator, tagValue] = tagMatcher.exec(str)
-      const currentCondition: TagKeyCondition =
-        acc[tagKey] || this.newKeyCondition()
-      const nextCondition: TagKeyCondition = {
-        operator,
-        tagValues: [...currentCondition.tagValues, tagValue],
-      }
-      acc[tagKey] = nextCondition
-      return acc
-    }, {})
+    const conditions: FilterTagKeyConditions = conditionStrings.reduce(
+      (acc, str) => {
+        const [, tagKey, operator, tagValue] = tagMatcher.exec(str)
+        const currentCondition: FilterTagKeyCondition =
+          acc[tagKey] || this.newKeyCondition()
+        const nextCondition: FilterTagKeyCondition = {
+          operator,
+          tagValues: [...currentCondition.tagValues, tagValue],
+        }
+        acc[tagKey] = nextCondition
+        return acc
+      },
+      {}
+    )
 
     return conditions
   }
 
-  public addCondition({tagKey, tagValue}): TagKeyConditions {
-    const condition: TagKeyCondition =
+  public addCondition({tagKey, tagValue}): FilterTagKeyConditions {
+    const condition: FilterTagKeyCondition =
       this.conditions[tagKey] || this.newKeyCondition()
-    const updatedCondition: TagKeyCondition = {
+    const updatedCondition: FilterTagKeyCondition = {
       ...condition,
       tagValues: [...condition.tagValues, tagValue],
     }
@@ -69,10 +66,10 @@ export default class FilterTagList extends PureComponent<Props> {
     }
   }
 
-  public removeCondition({tagKey, tagValue}): TagKeyConditions {
-    const condition: TagKeyCondition =
+  public removeCondition({tagKey, tagValue}): FilterTagKeyConditions {
+    const condition: FilterTagKeyCondition =
       this.conditions[tagKey] || this.newKeyCondition()
-    const updatedCondition: TagKeyCondition = {
+    const updatedCondition: FilterTagKeyCondition = {
       ...condition,
       tagValues: _.reject(condition.tagValues, v => v === tagValue),
     }
@@ -82,7 +79,7 @@ export default class FilterTagList extends PureComponent<Props> {
     }
   }
 
-  public buildFilterString(conditions: TagKeyConditions): string {
+  public buildFilterString(conditions: FilterTagKeyConditions): string {
     const conditionsPerKey = _.toPairs(conditions)
     const conditionString = conditionsPerKey
       .map(([key, {operator, tagValues}]) => {
@@ -97,17 +94,17 @@ export default class FilterTagList extends PureComponent<Props> {
     return `(r) => ${conditionString}`
   }
 
-  public keyCondition(key: string): TagKeyCondition {
+  public keyCondition(key: string): FilterTagKeyCondition {
     return this.conditions[key] || this.newKeyCondition()
   }
 
-  public changeValue = (
+  public onChangeValue = (
     tagKey: string,
     tagValue: string,
     selected: boolean
   ): void => {
     const condition = {tagKey, tagValue}
-    const conditions: TagKeyConditions = selected
+    const conditions: FilterTagKeyConditions = selected
       ? this.addCondition(condition)
       : this.removeCondition(condition)
     const filterString: string = this.buildFilterString(conditions)
@@ -117,11 +114,11 @@ export default class FilterTagList extends PureComponent<Props> {
   public setEquality = (tagKey: string, equal: boolean): void => {
     const keyCondition = this.conditions[tagKey] || this.newKeyCondition()
     const operator = equal ? '==' : '!='
-    const newCondition: TagKeyCondition = {
+    const newCondition: FilterTagKeyCondition = {
       ...keyCondition,
       operator,
     }
-    const conditions: TagKeyConditions = {
+    const conditions: FilterTagKeyConditions = {
       ...this.conditions,
       [tagKey]: newCondition,
     }
@@ -158,7 +155,7 @@ export default class FilterTagList extends PureComponent<Props> {
               db={db}
               tagKey={t}
               keyCondition={this.keyCondition(t)}
-              changeValue={this.changeValue}
+              onChangeValue={this.onChangeValue}
               onSetEquality={this.setEquality}
               service={service}
               filter={filter}

@@ -1,15 +1,11 @@
 import React, {PureComponent, MouseEvent} from 'react'
 
-export type SetFilterTagValue = (
-  key: string,
-  value: string,
-  selected: boolean
-) => void
+import {SetFilterTagValue} from 'src/types/flux'
 
 interface Props {
   tagKey: string
   value: string
-  changeValue: SetFilterTagValue
+  onChangeValue: SetFilterTagValue
   selected: boolean
 }
 
@@ -41,7 +37,7 @@ class FilterTagValueListItem extends PureComponent<Props> {
     const {tagKey, value, selected} = this.props
 
     e.stopPropagation()
-    this.props.changeValue(tagKey, value, !selected)
+    this.props.onChangeValue(tagKey, value, !selected)
   }
 
   private get listItemClasses() {

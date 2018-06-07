@@ -65,6 +65,25 @@ export interface MemberExpressionNode {
   property: PropertyNode
 }
 
+export type FilterNode = BinaryExpressionNode | MemberExpressionNode
+
+export interface FilterTagKeyCondition {
+  operator: string
+  tagValues: string[]
+}
+
+export interface FilterTagKeyConditions {
+  [tagKey: string]: FilterTagKeyCondition
+}
+
+export type SetFilterTagValue = (
+  key: string,
+  value: string,
+  selected: boolean
+) => void
+
+export type SetEquality = (tagKey: string, equal: boolean) => void
+
 export interface FlatBody {
   type: string
   source: string

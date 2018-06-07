@@ -1,17 +1,14 @@
-import React, {PureComponent, ReactNode} from 'react'
+import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {getAST} from 'src/flux/apis'
-import {Links, BinaryExpressionNode, MemberExpressionNode} from 'src/types/flux'
+import {Links, FilterNode} from 'src/types/flux'
 import Walker from 'src/flux/ast/walker'
 import FilterConditions from 'src/flux/components/FilterConditions'
 
 interface Props {
   value: string
   links: Links
-  render: (nodes: FilterNode[]) => ReactNode
 }
-
-type FilterNode = BinaryExpressionNode | MemberExpressionNode
 
 interface State {
   filterString: string
