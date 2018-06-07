@@ -23,13 +23,15 @@ class FilterTagValueListItem extends PureComponent<Props> {
 
     return (
       <div
-        className="flux-schema-tree flux-tree-node"
+        className="flux-schema-tree flux-schema--child"
         onClick={this.handleClick}
       >
         <div className={this.listItemClasses}>
-          <div className="query-builder--checkbox" />
-          {value}
-          <span className="flux-schema-type">Tag Value</span>
+          <div className="flex-schema-item-group">
+            <div className="query-builder--checkbox" />
+            {value}
+            <span className="flux-schema--type">Tag Value</span>
+          </div>
         </div>
       </div>
     )
@@ -43,7 +45,7 @@ class FilterTagValueListItem extends PureComponent<Props> {
   }
 
   private get listItemClasses() {
-    const baseClasses = 'flux-schema-item query-builder--list-item'
+    const baseClasses = 'flux-schema--item query-builder--list-item'
     return this.props.selected ? baseClasses + ' active' : baseClasses
   }
 }

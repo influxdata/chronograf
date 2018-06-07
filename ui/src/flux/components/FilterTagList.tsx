@@ -4,6 +4,7 @@ import _ from 'lodash'
 import {SchemaFilter, Service} from 'src/types'
 import {OnChangeArg, Func} from 'src/types/flux'
 import FilterTagListItem from 'src/flux/components/FilterTagListItem'
+import FancyScrollbar from '../../shared/components/FancyScrollbar'
 
 type TagValue = string
 
@@ -150,7 +151,7 @@ export default class FilterTagList extends PureComponent<Props> {
 
     if (tags.length) {
       return (
-        <>
+        <FancyScrollbar className="flux-filter--fancyscroll" maxHeight={600}>
           {tags.map(t => (
             <FilterTagListItem
               key={t}
@@ -163,13 +164,13 @@ export default class FilterTagList extends PureComponent<Props> {
               filter={filter}
             />
           ))}
-        </>
+        </FancyScrollbar>
       )
     }
 
     return (
-      <div className="flux-schema-tree flux-tree-node">
-        <div className="flux-schema-item no-hover" onClick={this.handleClick}>
+      <div className="flux-schema-tree">
+        <div className="flux-schema--item no-hover" onClick={this.handleClick}>
           <div className="no-results">No more tag keys.</div>
         </div>
       </div>

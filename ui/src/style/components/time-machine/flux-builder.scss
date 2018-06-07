@@ -22,7 +22,6 @@ $flux-invalid-color: $c-viridian;
   position: relative;
   background-color: $g4-onyx;
   transition: background-color 0.25s ease;
-
   &:hover {
     background-color: $g6-smoke;
   }
@@ -43,7 +42,6 @@ $flux-invalid-color: $c-viridian;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-
   &:last-of-type {
     margin-bottom: 0;
   }
@@ -89,10 +87,7 @@ $flux-invalid-color: $c-viridian;
   @extend %flux-node;
   display: flex;
   align-items: center;
-
-  margin-left: $flux-node-gap;
-
-  // Connection Line
+  margin-left: $flux-node-gap; // Connection Line
   &:after {
     content: '';
     height: 4px;
@@ -103,7 +98,6 @@ $flux-invalid-color: $c-viridian;
     left: 0;
     transform: translate(-100%, -50%);
   }
-
   &:first-child:after {
     content: none;
     margin-left: 0;
@@ -262,16 +256,16 @@ $flux-filter-parens: $g5-pepper;
   padding: 0 ($flux-filter-gap / 2);
 }
 
-.flux-filter--value + .flux-filter--operator,
-.flux-filter--paren-close + .flux-filter--operator {
+.flux-filter--value+.flux-filter--operator,
+.flux-filter--paren-close+.flux-filter--operator {
   padding: 0 $flux-filter-gap;
 }
 
-.flux-filter--key + .flux-filter--operator {
+.flux-filter--key+.flux-filter--operator {
   background-color: $flux-filter-expression;
 }
 
-.flux-filter--key + .flux-filter--operator + .flux-filter--value {
+.flux-filter--key+.flux-filter--operator+.flux-filter--value {
   background-color: $flux-filter-expression;
   border-radius: 0 3px 3px 0;
 }
@@ -296,8 +290,7 @@ $flux-filter-parens: $g5-pepper;
   height: $flux-filter-unit-wrapped;
   width: ($flux-filter-unit-wrapped - $flux-filter-unit) / 2;
   background-color: $flux-filter-parens;
-  border: (($flux-filter-unit-wrapped - $flux-filter-unit) / 2) solid
-    $flux-filter-expression;
+  border: (($flux-filter-unit-wrapped - $flux-filter-unit) / 2) solid $flux-filter-expression;
 }
 
 .flux-filter--paren-open {
@@ -346,4 +339,9 @@ $flux-filter-parens: $g5-pepper;
   background-color: $flux-filter-expression;
   height: $flux-filter-unit-wrapped;
   line-height: $flux-filter-unit-wrapped;
+}
+
+.flux-filter--fancyscroll {
+  min-width: 300px;
+  min-height: 250px;
 }

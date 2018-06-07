@@ -72,22 +72,50 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
     }, 250)
   }
 
+  public renderEqualitySwitcher() {
+    const {operator} = this.props.keyCondition
+
+    if (!this.state.isOpen) {
+      return null
+    }
+
+    return (
+      <ul className="nav nav-tablist nav-tablist-xs">
+        <li
+          className={operator === '==' && 'active'}
+          onClick={this.setEquality(true)}
+        >
+          =
+        </li>
+        <li
+          className={operator === '!=' && 'active'}
+          onClick={this.setEquality(false)}
+        >
+          !=
+        </li>
+      </ul>
+    )
+  }
+
   public render() {
     const {tagKey, db, service, filter} = this.props
     const {tagValues, searchTerm, loadingMore, count, limit} = this.state
-    const {tagValues: selectedValues, operator} = this.props.keyCondition
+    const {tagValues: selectedValues} = this.props.keyCondition
 
     return (
       <div className={this.className}>
-        <div className="flux-schema-item" onClick={this.handleClick}>
-          <div className="flux-schema-item-toggle" />
-          {tagKey}
-          <span className="flux-schema-type">Tag Key</span>
+        <div className="flux-schema--item" onClick={this.handleClick}>
+          <div className="flex-schema-item-group">
+            <div className="flux-schema--expander" />
+            {tagKey}
+            <span className="flux-schema--type">Tag Key</span>
+          </div>
+          {this.renderEqualitySwitcher()}
         </div>
         {this.state.isOpen && (
           <>
             <div
-              className="tag-value-list--header"
+              className="flux-schema--header"
               onClick={this.handleInputClick}
             >
               <div className="flux-schema--filter">
@@ -104,22 +132,11 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
                   <LoadingSpinner style={this.spinnerStyle} />
                 )}
               </div>
-              {!!count && `${count} total`}
+
+              {!!count && (
+                <div className="flux-schema--count">{`${count} Tag Values`}</div>
+              )}
             </div>
-            <ul className="nav nav-tablist nav-tablist-xs">
-              <li
-                className={operator === '==' && 'active'}
-                onClick={this.setEquality(true)}
-              >
-                =
-              </li>
-              <li
-                className={operator === '!=' && 'active'}
-                onClick={this.setEquality(false)}
-              >
-                !=
-              </li>
-            </ul>
             {this.isLoading && <LoaderSkeleton />}
             {!this.isLoading && (
               <>
@@ -145,7 +162,9 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
   }
 
   private setEquality(equal: boolean) {
-    return (): void => {
+    return (e): void => {
+      e.stopPropagation()
+
       const {tagKey} = this.props
       this.props.onSetEquality(tagKey, equal)
     }
@@ -315,6 +334,6 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
     const {isOpen} = this.state
     const openClass = isOpen ? 'expanded' : ''
 
-    return `flux-schema-tree flux-tree-node ${openClass}`
+    return `flux-schema-tree ${openClass}`
   }
 }
