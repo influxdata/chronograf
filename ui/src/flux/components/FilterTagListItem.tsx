@@ -21,10 +21,20 @@ export type SetFilterTagValue = (
   selected: boolean
 ) => void
 
+type SetEquality = (tagKey: string, equal: boolean) => void
+
+type TagValue = string
+
+interface TagKeyCondition {
+  operator: string
+  tagValues: TagValue[]
+}
+
 interface Props {
   tagKey: string
+  onSetEquality: SetEquality
   changeValue: SetFilterTagValue
-  selectedValues: string[]
+  keyCondition: TagKeyCondition
   db: string
   service: Service
   filter: SchemaFilter[]
@@ -65,6 +75,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
   public render() {
     const {tagKey, db, service, filter} = this.props
     const {tagValues, searchTerm, loadingMore, count, limit} = this.state
+    const {tagValues: selectedValues, operator} = this.props.keyCondition
 
     return (
       <div className={this.className}>
@@ -95,6 +106,20 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
               </div>
               {!!count && `${count} total`}
             </div>
+            <ul className="nav nav-tablist nav-tablist-xs">
+              <li
+                className={operator === '==' && 'active'}
+                onClick={this.setEquality(true)}
+              >
+                =
+              </li>
+              <li
+                className={operator === '!=' && 'active'}
+                onClick={this.setEquality(false)}
+              >
+                !=
+              </li>
+            </ul>
             {this.isLoading && <LoaderSkeleton />}
             {!this.isLoading && (
               <>
@@ -102,7 +127,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
                   db={db}
                   service={service}
                   values={tagValues}
-                  selectedValues={this.props.selectedValues}
+                  selectedValues={selectedValues}
                   tagKey={tagKey}
                   changeValue={this.props.changeValue}
                   filter={filter}
@@ -118,6 +143,14 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
       </div>
     )
   }
+
+  private setEquality(equal: boolean) {
+    return (): void => {
+      const {tagKey} = this.props
+      this.props.onSetEquality(tagKey, equal)
+    }
+  }
+
   private get spinnerStyle(): CSSProperties {
     return {
       position: 'absolute',
