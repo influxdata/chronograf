@@ -1,69 +1,65 @@
-import React, {PureComponent} from 'react'
-import {BinaryExpressionNode, MemberExpressionNode} from 'src/types/flux'
+import React, {PureComponent, ReactNode} from 'react'
+import {connect} from 'react-redux'
+import {getAST} from 'src/flux/apis'
+import {Links, BinaryExpressionNode, MemberExpressionNode} from 'src/types/flux'
+import Walker from 'src/flux/ast/walker'
+import FilterConditions from 'src/flux/components/FilterConditions'
+
+interface Props {
+  value: string
+  links: Links
+  render: (nodes: FilterNode[]) => ReactNode
+}
 
 type FilterNode = BinaryExpressionNode | MemberExpressionNode
 
-interface Props {
+interface State {
+  filterString: string
   nodes: FilterNode[]
 }
 
-class FilterPreview extends PureComponent<Props> {
-  public render() {
-    return (
-      <>
-        {this.props.nodes.map((n, i) => <FilterPreviewNode node={n} key={i} />)}
-      </>
-    )
-  }
-}
-
-interface FilterPreviewNodeProps {
-  node: FilterNode
-}
-
-/* tslint:disable */
-class FilterPreviewNode extends PureComponent<FilterPreviewNodeProps> {
-  public render() {
-    return this.className
-  }
-
-  private get className(): JSX.Element {
-    const {node} = this.props
-
-    switch (node.type) {
-      case 'ObjectExpression': {
-        return <div className="flux-filter--key">{node.source}</div>
-      }
-      case 'MemberExpression': {
-        const memberNode = node as MemberExpressionNode
-        return (
-          <div className="flux-filter--key">{memberNode.property.name}</div>
-        )
-      }
-      case 'OpenParen': {
-        return <div className="flux-filter--paren-open" />
-      }
-      case 'CloseParen': {
-        return <div className="flux-filter--paren-close" />
-      }
-      case 'NumberLiteral':
-      case 'IntegerLiteral': {
-        return <div className="flux-filter--value number">{node.source}</div>
-      }
-      case 'BooleanLiteral': {
-        return <div className="flux-filter--value boolean">{node.source}</div>
-      }
-      case 'StringLiteral': {
-        return <div className="flux-filter--value string">{node.source}</div>
-      }
-      case 'Operator': {
-        return <div className="flux-filter--operator">{node.source}</div>
-      }
-      default: {
-        return <div />
-      }
+export class FilterPreview extends PureComponent<Props, State> {
+  public static getDerivedStateFromProps(nextProps, __) {
+    return {
+      filterString: nextProps.value,
+      nodes: [],
     }
   }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      filterString: '',
+      nodes: [],
+    }
+  }
+
+  public async componentDidMount() {
+    this.convertStringToNodes()
+  }
+
+  // https://github.com/reactjs/rfcs/issues/26
+  public async componentDidUpdate(__, prevState) {
+    if (this.state.filterString !== prevState.filterString) {
+      this.convertStringToNodes()
+    }
+  }
+
+  public async convertStringToNodes() {
+    const {links, value} = this.props
+
+    const ast = await getAST({url: links.ast, body: value})
+    const nodes = new Walker(ast).inOrderExpression
+    this.setState({nodes})
+  }
+
+  public render() {
+    return <FilterConditions nodes={this.state.nodes} />
+  }
 }
 
-export default FilterPreview
+const mapStateToProps = ({links}) => {
+  return {links: links.flux}
+}
+
+export default connect(mapStateToProps, null)(FilterPreview)

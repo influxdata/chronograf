@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import {Func} from 'src/types/flux'
 import {funcNames} from 'src/flux/constants'
-import Filter from 'src/flux/components/Filter'
+import FilterPreview from 'src/flux/components/FilterPreview'
 
 import {getDeep} from 'src/utils/wrappers'
 
@@ -31,7 +31,7 @@ export default class FuncArgsPreview extends PureComponent<Props> {
         return this.colorizedArguments
       }
 
-      return <Filter value={value} />
+      return <FilterPreview value={value} />
     }
 
     return this.colorizedArguments
