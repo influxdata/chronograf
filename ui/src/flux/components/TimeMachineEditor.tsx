@@ -1,10 +1,12 @@
 import React, {PureComponent} from 'react'
-import {Controlled as CodeMirror, IInstance} from 'react-codemirror2'
-import {EditorChange} from 'codemirror'
-import 'src/external/codemirror'
+import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
+import {EditorChange, LineWidget} from 'codemirror'
+import {ShowHintOptions} from 'src/types/codemirror'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {OnChangeScript, OnSubmitScript} from 'src/types/flux'
-import {editor} from 'src/flux/constants'
+import {OnChangeScript, OnSubmitScript, Suggestion} from 'src/types/flux'
+import {EXCLUDED_KEYS} from 'src/flux/constants/editor'
+import {getSuggestions} from 'src/flux/helpers/autoComplete'
+import 'src/external/codemirror'
 
 interface Gutter {
   line: number
@@ -22,35 +24,47 @@ interface Props {
   status: Status
   onChangeScript: OnChangeScript
   onSubmitScript: OnSubmitScript
+  suggestions: Suggestion[]
+}
+
+interface Widget extends LineWidget {
+  node: HTMLElement
+}
+
+interface State {
+  lineWidgets: Widget[]
 }
 
 interface EditorInstance extends IInstance {
-  showHint: (options?: any) => void
+  showHint: (options?: ShowHintOptions) => void
 }
 
 @ErrorHandling
-class TimeMachineEditor extends PureComponent<Props> {
+class TimeMachineEditor extends PureComponent<Props, State> {
   private editor: EditorInstance
-  private prevKey: string
+  private lineWidgets: Widget[] = []
 
   constructor(props) {
     super(props)
   }
 
   public componentDidUpdate(prevProps) {
-    if (this.props.status.type === 'error') {
+    const {status, visibility} = this.props
+
+    if (status.type === 'error') {
       this.makeError()
     }
 
-    if (this.props.status.type !== 'error') {
+    if (status.type !== 'error') {
       this.editor.clearGutter('error-gutter')
+      this.clearWidgets()
     }
 
-    if (prevProps.visibility === this.props.visibility) {
+    if (prevProps.visibility === visibility) {
       return
     }
 
-    if (this.props.visibility === 'visible') {
+    if (visibility === 'visible') {
       setTimeout(() => this.editor.refresh(), 60)
     }
   }
@@ -59,29 +73,28 @@ class TimeMachineEditor extends PureComponent<Props> {
     const {script} = this.props
 
     const options = {
-      lineNumbers: true,
-      theme: 'time-machine',
       tabIndex: 1,
-      readonly: false,
-      extraKeys: {'Ctrl-Space': 'autocomplete'},
-      completeSingle: false,
-      autoRefresh: true,
       mode: 'flux',
+      readonly: false,
+      lineNumbers: true,
+      autoRefresh: true,
+      theme: 'time-machine',
+      completeSingle: false,
       gutters: ['error-gutter'],
     }
 
     return (
       <div className="time-machine-editor">
-        <CodeMirror
+        <ReactCodeMirror
           autoFocus={true}
           autoCursor={true}
           value={script}
           options={options}
-          onKeyUp={this.handleKeyUp}
           onBeforeChange={this.updateCode}
           onTouchStart={this.onTouchStart}
           editorDidMount={this.handleMount}
           onBlur={this.handleBlur}
+          onKeyUp={this.handleKeyUp}
         />
       </div>
     )
@@ -95,21 +108,53 @@ class TimeMachineEditor extends PureComponent<Props> {
     this.editor.clearGutter('error-gutter')
     const lineNumbers = this.statusLine
     lineNumbers.forEach(({line, text}) => {
+      const lineNumber = line - 1
       this.editor.setGutterMarker(
-        line - 1,
+        lineNumber,
         'error-gutter',
-        this.errorMarker(text)
+        this.errorMarker(text, lineNumber)
       )
     })
 
     this.editor.refresh()
   }
 
-  private errorMarker(message: string): HTMLElement {
+  private errorMarker(message: string, line: number): HTMLElement {
     const span = document.createElement('span')
     span.className = 'icon stop error-warning'
     span.title = message
+    span.addEventListener('click', this.handleClickError(message, line))
     return span
+  }
+
+  private handleClickError = (text: string, line: number) => () => {
+    let widget = this.lineWidgets.find(w => w.node.textContent === text)
+
+    if (widget) {
+      return this.clearWidget(widget)
+    }
+
+    const errorDiv = document.createElement('div')
+    errorDiv.className = 'inline-error-message'
+    errorDiv.innerText = text
+    widget = this.editor.addLineWidget(line, errorDiv) as Widget
+
+    this.lineWidgets = [...this.lineWidgets, widget]
+  }
+
+  private clearWidget = (widget: Widget): void => {
+    widget.clear()
+    this.lineWidgets = this.lineWidgets.filter(
+      w => w.node.textContent !== widget.node.textContent
+    )
+  }
+
+  private clearWidgets = () => {
+    this.lineWidgets.forEach(w => {
+      w.clear()
+    })
+
+    this.lineWidgets = []
   }
 
   private get statusLine(): Gutter[] {
@@ -129,32 +174,32 @@ class TimeMachineEditor extends PureComponent<Props> {
     this.editor = instance
   }
 
-  private handleKeyUp = (instance: EditorInstance, e: KeyboardEvent) => {
-    const {key} = e
-    const prevKey = this.prevKey
+  private onTouchStart = () => {}
 
-    if (
-      prevKey === 'Control' ||
-      prevKey === 'Meta' ||
-      (prevKey === 'Shift' && key === '.')
-    ) {
-      return (this.prevKey = key)
-    }
+  private handleKeyUp = (__, e: KeyboardEvent) => {
+    const {ctrlKey, metaKey, key} = e
 
-    this.prevKey = key
+    if (ctrlKey && key === ' ') {
+      this.showAutoComplete()
 
-    if (editor.EXCLUDED_KEYS.includes(key)) {
       return
     }
 
-    if (editor.EXCLUDED_KEYS.includes(key)) {
+    if (ctrlKey || metaKey || EXCLUDED_KEYS.includes(key)) {
       return
     }
 
-    instance.showHint({completeSingle: false})
+    this.showAutoComplete()
   }
 
-  private onTouchStart = () => {}
+  private showAutoComplete() {
+    const {suggestions} = this.props
+
+    this.editor.showHint({
+      hint: () => getSuggestions(this.editor, suggestions),
+      completeSingle: false,
+    })
+  }
 
   private updateCode = (
     _: IInstance,

@@ -1,11 +1,12 @@
 import React, {PureComponent} from 'react'
-import {Filter} from 'src/logs/containers/LogsPage'
+import {Filter} from 'src/types/logs'
 import FilterBlock from 'src/logs/components/LogsFilter'
 
 interface Props {
   numResults: number
   filters: Filter[]
-  onUpdateFilters: (fitlers: Filter[]) => void
+  onDelete: (id: string) => void
+  onFilterChange: (id: string, operator: string, value: string) => void
 }
 
 class LogsFilters extends PureComponent<Props> {
@@ -29,55 +30,10 @@ class LogsFilters extends PureComponent<Props> {
       <FilterBlock
         key={filter.id}
         filter={filter}
-        onDelete={this.handleDeleteFilter}
-        onToggleStatus={this.handleToggleFilterStatus}
-        onToggleOperator={this.handleToggleFilterOperator}
+        onDelete={this.props.onDelete}
+        onChangeFilter={this.props.onFilterChange}
       />
     ))
-  }
-
-  private handleDeleteFilter = (id: string) => (): void => {
-    const {filters, onUpdateFilters} = this.props
-
-    const filteredFilters = filters.filter(filter => filter.id !== id)
-
-    onUpdateFilters(filteredFilters)
-  }
-
-  private handleToggleFilterStatus = (id: string) => (): void => {
-    const {filters, onUpdateFilters} = this.props
-
-    const filteredFilters = filters.map(filter => {
-      if (filter.id === id) {
-        return {...filter, enabled: !filter.enabled}
-      }
-
-      return filter
-    })
-
-    onUpdateFilters(filteredFilters)
-  }
-
-  private handleToggleFilterOperator = (id: string) => (): void => {
-    const {filters, onUpdateFilters} = this.props
-
-    const filteredFilters = filters.map(filter => {
-      if (filter.id === id) {
-        return {...filter, operator: this.toggleOperator(filter.operator)}
-      }
-
-      return filter
-    })
-
-    onUpdateFilters(filteredFilters)
-  }
-
-  private toggleOperator = (op: string): string => {
-    if (op === '==') {
-      return '!='
-    }
-
-    return '=='
   }
 }
 

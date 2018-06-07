@@ -6,6 +6,7 @@ import React, {
 } from 'react'
 
 import _ from 'lodash'
+import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 import {Service, SchemaFilter, RemoteDataState} from 'src/types'
 import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
@@ -14,12 +15,19 @@ import parseValuesColumn from 'src/shared/parsing/flux/values'
 import TagValueList from 'src/flux/components/TagValueList'
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
+import {
+  notifyCopyToClipboardSuccess,
+  notifyCopyToClipboardFailed,
+} from 'src/shared/copy/notifications'
+
+import {NotificationAction} from 'src/types'
 
 interface Props {
   tagKey: string
   db: string
   service: Service
   filter: SchemaFilter[]
+  notify: NotificationAction
 }
 
 interface State {
@@ -34,6 +42,8 @@ interface State {
 }
 
 export default class TagListItem extends PureComponent<Props, State> {
+  private debouncedOnSearch: () => void
+
   constructor(props) {
     super(props)
 
@@ -60,20 +70,28 @@ export default class TagListItem extends PureComponent<Props, State> {
 
     return (
       <div className={this.className}>
-        <div className="flux-schema-item" onClick={this.handleClick}>
-          <div className="flux-schema-item-toggle" />
-          {tagKey}
-          <span className="flux-schema-type">Tag Key</span>
+        <div className="flux-schema--item" onClick={this.handleClick}>
+          <div className="flex-schema-item-group">
+            <div className="flux-schema--expander" />
+            {tagKey}
+            <span className="flux-schema--type">Tag Key</span>
+          </div>
+          <CopyToClipboard text={tagKey} onCopy={this.handleCopyAttempt}>
+            <div className="flux-schema-copy" onClick={this.handleClickCopy}>
+              <span className="icon duplicate" title="copy to clipboard" />
+              Copy
+            </div>
+          </CopyToClipboard>
         </div>
         {this.state.isOpen && (
           <>
             <div
-              className="tag-value-list--header"
+              className="flux-schema--header"
               onClick={this.handleInputClick}
             >
               <div className="flux-schema--filter">
                 <input
-                  className="form-control input-sm"
+                  className="form-control input-xs"
                   placeholder={`Filter within ${tagKey}`}
                   type="text"
                   spellCheck={false}
@@ -85,7 +103,7 @@ export default class TagListItem extends PureComponent<Props, State> {
                   <LoadingSpinner style={this.spinnerStyle} />
                 )}
               </div>
-              {!!count && `${count} total`}
+              {this.count}
             </div>
             {this.isLoading && <LoaderSkeleton />}
             {!this.isLoading && (
@@ -109,11 +127,29 @@ export default class TagListItem extends PureComponent<Props, State> {
     )
   }
 
+  private get count(): JSX.Element {
+    const {count} = this.state
+
+    if (!count) {
+      return
+    }
+
+    let pluralizer = 's'
+
+    if (count === 1) {
+      pluralizer = ''
+    }
+
+    return (
+      <div className="flux-schema--count">{`${count} Tag Value${pluralizer}`}</div>
+    )
+  }
+
   private get spinnerStyle(): CSSProperties {
     return {
       position: 'absolute',
-      right: '15px',
-      top: '6px',
+      right: '18px',
+      top: '11px',
     }
   }
 
@@ -132,8 +168,6 @@ export default class TagListItem extends PureComponent<Props, State> {
       this.debouncedOnSearch()
     )
   }
-
-  private debouncedOnSearch() {} // See constructor
 
   private handleInputClick = (e: MouseEvent<HTMLDivElement>): void => {
     e.stopPropagation()
@@ -220,6 +254,22 @@ export default class TagListItem extends PureComponent<Props, State> {
     )
   }
 
+  private handleClickCopy = e => {
+    e.stopPropagation()
+  }
+
+  private handleCopyAttempt = (
+    copiedText: string,
+    isSuccessful: boolean
+  ): void => {
+    const {notify} = this.props
+    if (isSuccessful) {
+      notify(notifyCopyToClipboardSuccess(copiedText))
+    } else {
+      notify(notifyCopyToClipboardFailed(copiedText))
+    }
+  }
+
   private async getCount() {
     const {service, db, filter, tagKey} = this.props
     const {limit, searchTerm} = this.state
@@ -273,6 +323,6 @@ export default class TagListItem extends PureComponent<Props, State> {
     const {isOpen} = this.state
     const openClass = isOpen ? 'expanded' : ''
 
-    return `flux-schema-tree flux-tree-node ${openClass}`
+    return `flux-schema-tree flux-schema--child ${openClass}`
   }
 }
