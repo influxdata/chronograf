@@ -22,7 +22,41 @@ interface Props {
 
 @ErrorHandling
 export default class FuncArgs extends PureComponent<Props> {
-  public renderArgs() {
+  public render() {
+    const {onDeleteFunc} = this.props
+
+    return (
+      <div className="func-node--tooltip">
+        <div className="func-args">{this.renderArguments}</div>
+        <div className="func-arg--buttons">
+          <div
+            className="btn btn-sm btn-danger btn-square"
+            onClick={onDeleteFunc}
+          >
+            <span className="icon trash" />
+          </div>
+          {this.build}
+        </div>
+      </div>
+    )
+  }
+
+  get renderArguments(): JSX.Element | JSX.Element[] {
+    const {func} = this.props
+    const {name: funcName} = func
+
+    if (funcName === funcNames.JOIN) {
+      return this.renderJoin
+    }
+
+    if (funcName === funcNames.FILTER) {
+      return this.renderFilter
+    }
+
+    return this.renderGeneralArguments
+  }
+
+  get renderGeneralArguments(): JSX.Element | JSX.Element[] {
     const {
       func,
       bodyID,
@@ -30,74 +64,63 @@ export default class FuncArgs extends PureComponent<Props> {
       onChangeArg,
       declarationID,
       onGenerateScript,
-      declarationsFromBody,
     } = this.props
 
     const {name: funcName, id: funcID} = func
 
-    switch (funcName) {
-      case funcNames.JOIN: {
-        return (
-          <JoinArgs
-            func={func}
-            bodyID={bodyID}
-            declarationID={declarationID}
-            onChangeArg={onChangeArg}
-            declarationsFromBody={declarationsFromBody}
-            onGenerateScript={onGenerateScript}
-          />
-        )
-      }
-      case funcNames.FILTER: {
-        const value = getDeep<string>(func.args, '0.value', '')
-
-        return (
-          <FilterArgs
-            value={value}
-            func={func}
-            bodyID={bodyID}
-            declarationID={declarationID}
-            onChangeArg={onChangeArg}
-            service={service}
-            db={'telegraf'}
-          />
-        )
-      }
-      default: {
-        return func.args.map(({key, value, type}) => (
-          <FuncArg
-            key={key}
-            type={type}
-            argKey={key}
-            value={value}
-            bodyID={bodyID}
-            funcID={funcID}
-            funcName={funcName}
-            service={service}
-            onChangeArg={onChangeArg}
-            declarationID={declarationID}
-            onGenerateScript={onGenerateScript}
-          />
-        ))
-      }
-    }
+    return func.args.map(({key, value, type}) => (
+      <FuncArg
+        key={key}
+        type={type}
+        argKey={key}
+        value={value}
+        bodyID={bodyID}
+        funcID={funcID}
+        funcName={funcName}
+        service={service}
+        onChangeArg={onChangeArg}
+        declarationID={declarationID}
+        onGenerateScript={onGenerateScript}
+      />
+    ))
   }
-  public render() {
-    const {onDeleteFunc} = this.props
+
+  get renderFilter(): JSX.Element {
+    const {func, bodyID, service, onChangeArg, declarationID} = this.props
+    const value = getDeep<string>(func.args, '0.value', '')
 
     return (
-      <div className="func-node--tooltip">
-        {this.renderArgs()}
-        <div className="func-node--buttons">
-          <div
-            className="btn btn-sm btn-danger func-node--delete"
-            onClick={onDeleteFunc}
-          >
-            Delete
-          </div>
-          {this.build}
-        </div>
-      </div>
+      <FilterArgs
+        value={value}
+        func={func}
+        bodyID={bodyID}
+        declarationID={declarationID}
+        onChangeArg={onChangeArg}
+        service={service}
+        db={'telegraf'}
+      />
+    )
+  }
+
+  get renderJoin(): JSX.Element {
+    const {
+      func,
+      bodyID,
+      onChangeArg,
+      declarationID,
+      onGenerateScript,
+      declarationsFromBody,
+    } = this.props
+
+    return (
+      <JoinArgs
+        func={func}
+        bodyID={bodyID}
+        declarationID={declarationID}
+        onChangeArg={onChangeArg}
+        declarationsFromBody={declarationsFromBody}
+        onGenerateScript={onGenerateScript}
+      />
     )
   }
 
