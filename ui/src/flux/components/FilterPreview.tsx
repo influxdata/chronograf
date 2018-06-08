@@ -6,29 +6,23 @@ import Walker from 'src/flux/ast/walker'
 import FilterConditions from 'src/flux/components/FilterConditions'
 
 interface Props {
-  value: string
+  filterString?: string
   links: Links
 }
 
 interface State {
-  filterString: string
   nodes: FilterNode[]
   ast: object
 }
 
 export class FilterPreview extends PureComponent<Props, State> {
-  public static getDerivedStateFromProps(nextProps, __) {
-    return {
-      filterString: nextProps.value,
-      nodes: [],
-      ast: {},
-    }
+  public static defaultProps: Partial<Props> = {
+    filterString: '',
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      filterString: '',
       nodes: [],
       ast: {},
     }
@@ -38,16 +32,16 @@ export class FilterPreview extends PureComponent<Props, State> {
     this.convertStringToNodes()
   }
 
-  public async componentDidUpdate(__, prevState) {
-    if (this.state.filterString !== prevState.filterString) {
+  public async componentDidUpdate(prevProps, __) {
+    if (this.props.filterString !== prevProps.filterString) {
       this.convertStringToNodes()
     }
   }
 
   public async convertStringToNodes() {
-    const {links, value} = this.props
+    const {links, filterString} = this.props
 
-    const ast = await getAST({url: links.ast, body: value})
+    const ast = await getAST({url: links.ast, body: filterString})
     const nodes = new Walker(ast).inOrderExpression
     this.setState({nodes, ast})
   }
@@ -55,6 +49,10 @@ export class FilterPreview extends PureComponent<Props, State> {
   public render() {
     return <FilterConditions nodes={this.state.nodes} />
   }
+}
+
+FilterPreview.defaultProps = {
+  filterString: '',
 }
 
 const mapStateToProps = ({links}) => {

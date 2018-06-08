@@ -31,7 +31,7 @@ export default class FuncArgsPreview extends PureComponent<Props> {
         return this.colorizedArguments
       }
 
-      return <FilterPreview value={value} />
+      return <FilterPreview filterString={value} />
     }
 
     return this.colorizedArguments
