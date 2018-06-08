@@ -1,0 +1,15 @@
+vendor
+.netrc
+
+# binary databases
+idpdb.bolt
+
+# Project distirbution
+/dist
+
+# Project binaries.
+/influx
+/idpd
+/ifqld
+/transpilerd
+/bin
