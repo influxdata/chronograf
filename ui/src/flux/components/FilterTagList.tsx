@@ -29,6 +29,8 @@ interface Props {
   onGenerateScript: () => void
 }
 
+type ParsedClause = [FilterClause, boolean]
+
 export default class FilterTagList extends PureComponent<Props> {
   public get clauseIsParseable(): boolean {
     const [, parseable] = this.reduceNodesToClause(this.props.nodes, [])
@@ -186,7 +188,7 @@ export default class FilterTagList extends PureComponent<Props> {
   private reduceNodesToClause(
     nodes,
     conditions: FilterTagCondition[]
-  ): [FilterClause, boolean] {
+  ): ParsedClause {
     if (!nodes.length) {
       return [_.groupBy(conditions, condition => condition.key), true]
     } else if (this.noConditions(nodes, conditions)) {

@@ -51,10 +51,6 @@ export class FilterPreview extends PureComponent<Props, State> {
   }
 }
 
-FilterPreview.defaultProps = {
-  filterString: '',
-}
-
 const mapStateToProps = ({links}) => {
   return {links: links.flux}
 }
