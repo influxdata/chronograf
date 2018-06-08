@@ -86,7 +86,14 @@ export default class FuncArgs extends PureComponent<Props> {
   }
 
   get renderFilter(): JSX.Element {
-    const {func, bodyID, service, onChangeArg, declarationID} = this.props
+    const {
+      func,
+      bodyID,
+      service,
+      onChangeArg,
+      declarationID,
+      onGenerateScript,
+    } = this.props
     const value = getDeep<string>(func.args, '0.value', '')
 
     return (
@@ -96,6 +103,7 @@ export default class FuncArgs extends PureComponent<Props> {
         bodyID={bodyID}
         declarationID={declarationID}
         onChangeArg={onChangeArg}
+        onGenerateScript={onGenerateScript}
         service={service}
         db={'telegraf'}
       />

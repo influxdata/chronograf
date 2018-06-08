@@ -18,6 +18,7 @@ interface Props {
   onChangeArg: OnChangeArg
   db: string
   service: Service
+  onGenerateScript: () => void
 }
 
 interface State {
@@ -64,7 +65,15 @@ class FilterArgs extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, service, onChangeArg, func, bodyID, declarationID} = this.props
+    const {
+      db,
+      service,
+      onChangeArg,
+      func,
+      bodyID,
+      declarationID,
+      onGenerateScript,
+    } = this.props
     const {nodes} = this.state
 
     return (
@@ -78,6 +87,7 @@ class FilterArgs extends PureComponent<Props, State> {
         nodes={nodes}
         bodyID={bodyID}
         declarationID={declarationID}
+        onGenerateScript={onGenerateScript}
       />
     )
   }

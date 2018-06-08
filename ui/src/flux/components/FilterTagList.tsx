@@ -9,6 +9,9 @@ import {
   FilterTagCondition,
   FilterNode,
 } from 'src/types/flux'
+import {argTypes} from 'src/flux/constants'
+
+import FuncArgInput from 'src/flux/components/FuncArgInput'
 import FilterTagListItem from 'src/flux/components/FilterTagListItem'
 import FancyScrollbar from '../../shared/components/FancyScrollbar'
 import {getDeep} from 'src/utils/wrappers'
@@ -23,6 +26,7 @@ interface Props {
   nodes: FilterNode[]
   bodyID: string
   declarationID: string
+  onGenerateScript: () => void
 }
 
 export default class FilterTagList extends PureComponent<Props> {
@@ -122,10 +126,32 @@ export default class FilterTagList extends PureComponent<Props> {
   }
 
   public render() {
-    const {db, service, tags, filter} = this.props
+    const {
+      db,
+      service,
+      tags,
+      filter,
+      bodyID,
+      declarationID,
+      onChangeArg,
+      onGenerateScript,
+      func: {id: funcID, args},
+    } = this.props
+    const {value, key: argKey} = args[0]
 
     if (!this.clauseIsParseable) {
-      return <div />
+      return (
+        <FuncArgInput
+          type={argTypes.STRING}
+          value={value}
+          argKey={argKey}
+          funcID={funcID}
+          bodyID={bodyID}
+          onChangeArg={onChangeArg}
+          declarationID={declarationID}
+          onGenerateScript={onGenerateScript}
+        />
+      )
     }
 
     if (tags.length) {
@@ -163,6 +189,8 @@ export default class FilterTagList extends PureComponent<Props> {
   ): [FilterClause, boolean] {
     if (!nodes.length) {
       return [_.groupBy(conditions, condition => condition.key), true]
+    } else if (this.noConditions(nodes, conditions)) {
+      return [{}, true]
     } else if (
       ['OpenParen', 'CloseParen', 'Operator'].includes(nodes[0].type)
     ) {
@@ -173,6 +201,15 @@ export default class FilterTagList extends PureComponent<Props> {
       // Unparseable
       return [{}, false]
     }
+  }
+
+  private noConditions(nodes, conditions) {
+    return (
+      !conditions.length &&
+      nodes.length === 1 &&
+      nodes[0].type === 'BooleanLiteral' &&
+      nodes[0].source === 'true'
+    )
   }
 
   private skipNode([, ...nodes], conditions) {
