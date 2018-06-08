@@ -26,8 +26,14 @@ interface Props {
 }
 
 export default class FilterTagList extends PureComponent<Props> {
+  public get clauseIsParseable(): boolean {
+    const [, parseable] = this.reduceNodesToClause(this.props.nodes, [])
+    return parseable
+  }
+
   public get clause(): FilterClause {
-    return this.reduceNodesToClause(this.props.nodes, [])
+    const [clause] = this.reduceNodesToClause(this.props.nodes, [])
+    return clause
   }
 
   public conditions(key: string, clause?): FilterTagCondition[] {
@@ -118,6 +124,10 @@ export default class FilterTagList extends PureComponent<Props> {
   public render() {
     const {db, service, tags, filter} = this.props
 
+    if (!this.clauseIsParseable) {
+      return <div />
+    }
+
     if (tags.length) {
       return (
         <FancyScrollbar className="flux-filter--fancyscroll" maxHeight={600}>
@@ -141,7 +151,7 @@ export default class FilterTagList extends PureComponent<Props> {
     return (
       <div className="flux-schema-tree">
         <div className="flux-schema--item no-hover" onClick={this.handleClick}>
-          <div className="no-results">No more tag keys.</div>
+          <div className="no-results">No tag keys found.</div>
         </div>
       </div>
     )
@@ -150,32 +160,49 @@ export default class FilterTagList extends PureComponent<Props> {
   private reduceNodesToClause(
     nodes,
     conditions: FilterTagCondition[]
-  ): FilterClause {
+  ): [FilterClause, boolean] {
     if (!nodes.length) {
-      return _.groupBy(conditions, condition => condition.key)
+      return [_.groupBy(conditions, condition => condition.key), true]
     } else if (
       ['OpenParen', 'CloseParen', 'Operator'].includes(nodes[0].type)
     ) {
-      return this.reduceNodesToClause(nodes.slice(1), conditions)
-    } else if (
+      return this.skipNode(nodes, conditions)
+    } else if (this.conditionExtractable(nodes)) {
+      return this.extractCondition(nodes, conditions)
+    } else {
+      // Unparseable
+      return [{}, false]
+    }
+  }
+
+  private skipNode([, ...nodes], conditions) {
+    return this.reduceNodesToClause(nodes, conditions)
+  }
+
+  private conditionExtractable(nodes): boolean {
+    return (
       nodes.length >= 3 &&
       nodes[0].type === 'MemberExpression' &&
       nodes[1].type === 'Operator' &&
+      this.supportedOperator(nodes[1].source) &&
       nodes[2].type === 'StringLiteral'
-    ) {
-      const condition: FilterTagCondition = {
-        key: nodes[0].property.name,
-        operator: nodes[1].source,
-        value: nodes[2].source.replace(/"/g, ''),
-      }
-      return this.reduceNodesToClause(nodes.slice(3), [
-        ...conditions,
-        condition,
-      ])
-    } else {
-      console.log(nodes[0])
-      return this.reduceNodesToClause(nodes.slice(1), conditions)
+    )
+  }
+
+  private supportedOperator(operator): boolean {
+    return operator === '==' || operator === '!='
+  }
+
+  private extractCondition(
+    [keyNode, operatorNode, valueNode, ...nodes],
+    conditions
+  ) {
+    const condition: FilterTagCondition = {
+      key: keyNode.property.name,
+      operator: operatorNode.source,
+      value: valueNode.source.replace(/"/g, ''),
     }
+    return this.reduceNodesToClause(nodes, [...conditions, condition])
   }
 
   private handleClick(e: MouseEvent<HTMLDivElement>) {
