@@ -67,13 +67,14 @@ export interface MemberExpressionNode {
 
 export type FilterNode = BinaryExpressionNode | MemberExpressionNode
 
-export interface FilterTagKeyCondition {
+export interface FilterTagCondition {
+  key: string
   operator: string
-  tagValues: string[]
+  value: string
 }
 
-export interface FilterTagKeyConditions {
-  [tagKey: string]: FilterTagKeyCondition
+export interface FilterClause {
+  [tagKey: string]: FilterTagCondition[]
 }
 
 export type SetFilterTagValue = (

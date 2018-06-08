@@ -7,6 +7,7 @@ import {funcNames} from 'src/flux/constants'
 import JoinArgs from 'src/flux/components/JoinArgs'
 import FilterArgs from 'src/flux/components/FilterArgs'
 import {Service} from 'src/types'
+import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
   func: Func
@@ -48,8 +49,11 @@ export default class FuncArgs extends PureComponent<Props> {
         )
       }
       case funcNames.FILTER: {
+        const value = getDeep<string>(func.args, '0.value', '')
+
         return (
           <FilterArgs
+            value={value}
             func={func}
             bodyID={bodyID}
             declarationID={declarationID}

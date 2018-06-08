@@ -13,6 +13,7 @@ interface Props {
 interface State {
   filterString: string
   nodes: FilterNode[]
+  ast: object
 }
 
 export class FilterPreview extends PureComponent<Props, State> {
@@ -20,6 +21,7 @@ export class FilterPreview extends PureComponent<Props, State> {
     return {
       filterString: nextProps.value,
       nodes: [],
+      ast: {},
     }
   }
 
@@ -28,6 +30,7 @@ export class FilterPreview extends PureComponent<Props, State> {
     this.state = {
       filterString: '',
       nodes: [],
+      ast: {},
     }
   }
 
@@ -35,7 +38,6 @@ export class FilterPreview extends PureComponent<Props, State> {
     this.convertStringToNodes()
   }
 
-  // https://github.com/reactjs/rfcs/issues/26
   public async componentDidUpdate(__, prevState) {
     if (this.state.filterString !== prevState.filterString) {
       this.convertStringToNodes()
@@ -47,7 +49,7 @@ export class FilterPreview extends PureComponent<Props, State> {
 
     const ast = await getAST({url: links.ast, body: value})
     const nodes = new Walker(ast).inOrderExpression
-    this.setState({nodes})
+    this.setState({nodes, ast})
   }
 
   public render() {

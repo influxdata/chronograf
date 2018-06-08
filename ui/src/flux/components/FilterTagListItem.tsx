@@ -13,7 +13,7 @@ import {explorer} from 'src/flux/constants'
 import {
   SetFilterTagValue,
   SetEquality,
-  FilterTagKeyCondition,
+  FilterTagCondition,
 } from 'src/types/flux'
 import parseValuesColumn from 'src/shared/parsing/flux/values'
 import FilterTagValueList from 'src/flux/components/FilterTagValueList'
@@ -24,7 +24,8 @@ interface Props {
   tagKey: string
   onSetEquality: SetEquality
   onChangeValue: SetFilterTagValue
-  keyCondition: FilterTagKeyCondition
+  conditions: FilterTagCondition[]
+  operator: string
   db: string
   service: Service
   filter: SchemaFilter[]
@@ -63,7 +64,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
   }
 
   public renderEqualitySwitcher() {
-    const {operator} = this.props.keyCondition
+    const {operator} = this.props
 
     if (!this.state.isOpen) {
       return null
@@ -72,13 +73,13 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
     return (
       <ul className="nav nav-tablist nav-tablist-xs">
         <li
-          className={operator === '==' && 'active'}
+          className={operator === '==' ? 'active' : ''}
           onClick={this.setEquality(true)}
         >
           =
         </li>
         <li
-          className={operator === '!=' && 'active'}
+          className={operator === '!=' ? 'active' : ''}
           onClick={this.setEquality(false)}
         >
           !=
@@ -90,7 +91,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
   public render() {
     const {tagKey, db, service, filter} = this.props
     const {tagValues, searchTerm, loadingMore, count, limit} = this.state
-    const {tagValues: selectedValues} = this.props.keyCondition
+    const selectedValues = this.props.conditions.map(c => c.value)
 
     return (
       <div className={this.className}>

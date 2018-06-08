@@ -5,11 +5,13 @@ import {SchemaFilter, Service} from 'src/types'
 import {
   OnChangeArg,
   Func,
-  FilterTagKeyConditions,
-  FilterTagKeyCondition,
+  FilterClause,
+  FilterTagCondition,
+  FilterNode,
 } from 'src/types/flux'
 import FilterTagListItem from 'src/flux/components/FilterTagListItem'
 import FancyScrollbar from '../../shared/components/FancyScrollbar'
+import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
   db: string
@@ -18,115 +20,85 @@ interface Props {
   filter: SchemaFilter[]
   onChangeArg: OnChangeArg
   func: Func
+  nodes: FilterNode[]
   bodyID: string
   declarationID: string
 }
 
 export default class FilterTagList extends PureComponent<Props> {
-  public newKeyCondition(): FilterTagKeyCondition {
-    return {operator: '==', tagValues: []}
-  }
-  public get conditions(): FilterTagKeyConditions {
-    const filterFunc: string = this.props.func.args.find(
-      arg => arg.key === 'fn'
-    ).value
-
-    const conditionMatcher = /(r\.[\w\d-]* (==|!=) "[\w\d-]+")/g
-    const conditionStrings: string[] = filterFunc.match(conditionMatcher) || []
-
-    const tagMatcher = /r\.([\w\d-]*) (==|!=) "([\w\d-]+)"/
-    const conditions: FilterTagKeyConditions = conditionStrings.reduce(
-      (acc, str) => {
-        const [, tagKey, operator, tagValue] = tagMatcher.exec(str)
-        const currentCondition: FilterTagKeyCondition =
-          acc[tagKey] || this.newKeyCondition()
-        const nextCondition: FilterTagKeyCondition = {
-          operator,
-          tagValues: [...currentCondition.tagValues, tagValue],
-        }
-        acc[tagKey] = nextCondition
-        return acc
-      },
-      {}
-    )
-
-    return conditions
+  public get clause(): FilterClause {
+    return this.reduceNodesToClause(this.props.nodes, [])
   }
 
-  public addCondition({tagKey, tagValue}): FilterTagKeyConditions {
-    const condition: FilterTagKeyCondition =
-      this.conditions[tagKey] || this.newKeyCondition()
-    const updatedCondition: FilterTagKeyCondition = {
-      ...condition,
-      tagValues: [...condition.tagValues, tagValue],
-    }
+  public conditions(key: string, clause?): FilterTagCondition[] {
+    clause = clause || this.clause
+    return clause[key] || []
+  }
+
+  public operator(key: string, clause?): string {
+    const conditions = this.conditions(key, clause)
+    return getDeep<string>(conditions, '0.operator', '==')
+  }
+
+  public addCondition(condition: FilterTagCondition): FilterClause {
+    const conditions = this.conditions(condition.key)
     return {
-      ...this.conditions,
-      [tagKey]: updatedCondition,
+      ...this.clause,
+      [condition.key]: [...conditions, condition],
     }
   }
 
-  public removeCondition({tagKey, tagValue}): FilterTagKeyConditions {
-    const condition: FilterTagKeyCondition =
-      this.conditions[tagKey] || this.newKeyCondition()
-    const updatedCondition: FilterTagKeyCondition = {
-      ...condition,
-      tagValues: _.reject(condition.tagValues, v => v === tagValue),
-    }
+  public removeCondition(condition: FilterTagCondition): FilterClause {
+    const conditions = this.conditions(condition.key)
+    const newConditions = _.reject(conditions, c => _.isEqual(c, condition))
     return {
-      ...this.conditions,
-      [tagKey]: updatedCondition,
+      ...this.clause,
+      [condition.key]: newConditions,
     }
   }
 
-  public buildFilterString(conditions: FilterTagKeyConditions): string {
-    const conditionsPerKey = _.toPairs(conditions)
-    const conditionString = conditionsPerKey
-      .map(([key, {operator, tagValues}]) => {
-        const joiner = operator === '==' ? ' OR ' : ' AND '
-        return (
-          '(' +
-          tagValues.map(v => `r.${key} ${operator} "${v}"`).join(joiner) +
-          ')'
-        )
+  public buildFilterString(clause: FilterClause): string {
+    const funcBody = Object.entries(clause)
+      .filter(([__, conditions]) => conditions.length)
+      .map(([key, conditions]) => {
+        const joiner = this.operator(key, clause) === '==' ? ' OR ' : ' AND '
+        const subClause = conditions
+          .map(c => `r.${key} ${c.operator} "${c.value}"`)
+          .join(joiner)
+        return '(' + subClause + ')'
       })
       .join(' AND ')
-    return `(r) => ${conditionString}`
+    return `(r) => ${funcBody}`
   }
 
-  public keyCondition(key: string): FilterTagKeyCondition {
-    return this.conditions[key] || this.newKeyCondition()
-  }
-
-  public onChangeValue = (
-    tagKey: string,
-    tagValue: string,
+  public handleChangeValue = (
+    key: string,
+    value: string,
     selected: boolean
   ): void => {
-    const condition = {tagKey, tagValue}
-    const conditions: FilterTagKeyConditions = selected
+    const condition: FilterTagCondition = {
+      key,
+      operator: this.operator(key),
+      value,
+    }
+    const clause: FilterClause = selected
       ? this.addCondition(condition)
       : this.removeCondition(condition)
-    const filterString: string = this.buildFilterString(conditions)
-    this.propagateChange(filterString)
+    const filterString: string = this.buildFilterString(clause)
+    this.updateFilterString(filterString)
   }
 
-  public setEquality = (tagKey: string, equal: boolean): void => {
-    const keyCondition = this.conditions[tagKey] || this.newKeyCondition()
+  public handleSetEquality = (key: string, equal: boolean): void => {
     const operator = equal ? '==' : '!='
-    const newCondition: FilterTagKeyCondition = {
-      ...keyCondition,
-      operator,
+    const clause: FilterClause = {
+      ...this.clause,
+      [key]: this.conditions(key).map(c => ({...c, operator})),
     }
-    const conditions: FilterTagKeyConditions = {
-      ...this.conditions,
-      [tagKey]: newCondition,
-    }
-    const filterString: string = this.buildFilterString(conditions)
-    this.propagateChange(filterString)
+    const filterString: string = this.buildFilterString(clause)
+    this.updateFilterString(filterString)
   }
 
-  public propagateChange = (newFilterString: string): void => {
+  public updateFilterString = (newFilterString: string): void => {
     const {
       func: {id},
       bodyID,
@@ -154,9 +126,10 @@ export default class FilterTagList extends PureComponent<Props> {
               key={t}
               db={db}
               tagKey={t}
-              keyCondition={this.keyCondition(t)}
-              onChangeValue={this.onChangeValue}
-              onSetEquality={this.setEquality}
+              conditions={this.conditions(t)}
+              operator={this.operator(t)}
+              onChangeValue={this.handleChangeValue}
+              onSetEquality={this.handleSetEquality}
               service={service}
               filter={filter}
             />
@@ -172,6 +145,37 @@ export default class FilterTagList extends PureComponent<Props> {
         </div>
       </div>
     )
+  }
+
+  private reduceNodesToClause(
+    nodes,
+    conditions: FilterTagCondition[]
+  ): FilterClause {
+    if (!nodes.length) {
+      return _.groupBy(conditions, condition => condition.key)
+    } else if (
+      ['OpenParen', 'CloseParen', 'Operator'].includes(nodes[0].type)
+    ) {
+      return this.reduceNodesToClause(nodes.slice(1), conditions)
+    } else if (
+      nodes.length >= 3 &&
+      nodes[0].type === 'MemberExpression' &&
+      nodes[1].type === 'Operator' &&
+      nodes[2].type === 'StringLiteral'
+    ) {
+      const condition: FilterTagCondition = {
+        key: nodes[0].property.name,
+        operator: nodes[1].source,
+        value: nodes[2].source.replace(/"/g, ''),
+      }
+      return this.reduceNodesToClause(nodes.slice(3), [
+        ...conditions,
+        condition,
+      ])
+    } else {
+      console.log(nodes[0])
+      return this.reduceNodesToClause(nodes.slice(1), conditions)
+    }
   }
 
   private handleClick(e: MouseEvent<HTMLDivElement>) {

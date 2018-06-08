@@ -1,12 +1,17 @@
 import React, {PureComponent} from 'react'
+import {connect} from 'react-redux'
+import {getAST} from 'src/flux/apis'
 import {tagKeys as fetchTagKeys} from 'src/shared/apis/flux/metaQueries'
 import parseValuesColumn from 'src/shared/parsing/flux/values'
 import FilterTagList from 'src/flux/components/FilterTagList'
+import Walker from 'src/flux/ast/walker'
 
 import {Service} from 'src/types'
-import {OnChangeArg, Func} from 'src/types/flux'
+import {Links, OnChangeArg, Func, FilterNode} from 'src/types/flux'
 
 interface Props {
+  links: Links
+  value: string
   func: Func
   bodyID: string
   declarationID: string
@@ -17,6 +22,8 @@ interface Props {
 
 interface State {
   tagKeys: string[]
+  nodes: FilterNode[]
+  ast: object
 }
 
 class FilterArgs extends PureComponent<Props, State> {
@@ -24,6 +31,22 @@ class FilterArgs extends PureComponent<Props, State> {
     super(props)
     this.state = {
       tagKeys: [],
+      nodes: [],
+      ast: {},
+    }
+  }
+
+  public async convertStringToNodes() {
+    const {links, value} = this.props
+
+    const ast = await getAST({url: links.ast, body: value})
+    const nodes = new Walker(ast).inOrderExpression
+    this.setState({nodes, ast})
+  }
+
+  public componentDidUpdate(prevProps) {
+    if (prevProps.value !== this.props.value) {
+      this.convertStringToNodes()
     }
   }
 
@@ -31,6 +54,7 @@ class FilterArgs extends PureComponent<Props, State> {
     const {db, service} = this.props
 
     try {
+      this.convertStringToNodes()
       const response = await fetchTagKeys(service, db, [])
       const tagKeys = parseValuesColumn(response)
       this.setState({tagKeys})
@@ -41,6 +65,7 @@ class FilterArgs extends PureComponent<Props, State> {
 
   public render() {
     const {db, service, onChangeArg, func, bodyID, declarationID} = this.props
+    const {nodes} = this.state
 
     return (
       <FilterTagList
@@ -50,6 +75,7 @@ class FilterArgs extends PureComponent<Props, State> {
         filter={[]}
         onChangeArg={onChangeArg}
         func={func}
+        nodes={nodes}
         bodyID={bodyID}
         declarationID={declarationID}
       />
@@ -57,4 +83,8 @@ class FilterArgs extends PureComponent<Props, State> {
   }
 }
 
-export default FilterArgs
+const mapStateToProps = ({links}) => {
+  return {links: links.flux}
+}
+
+export default connect(mapStateToProps, null)(FilterArgs)

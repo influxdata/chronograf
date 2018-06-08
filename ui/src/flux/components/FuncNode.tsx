@@ -54,7 +54,7 @@ export default class FuncNode extends PureComponent<Props, State> {
       >
         <div className="func-node--name">{func.name}</div>
         <FuncArgsPreview func={func} />
-        {isExpanded && (
+        {(isExpanded || func.name === 'filter') && (
           <FuncArgs
             func={func}
             bodyID={bodyID}
