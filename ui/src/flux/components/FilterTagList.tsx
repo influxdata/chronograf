@@ -68,7 +68,7 @@ export default class FilterTagList extends PureComponent<Props> {
         return '(' + subClause + ')'
       })
       .join(' AND ')
-    return `(r) => ${funcBody}`
+    return funcBody && `(r) => ${funcBody}`
   }
 
   public handleChangeValue = (
