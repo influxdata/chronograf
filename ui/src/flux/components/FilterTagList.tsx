@@ -11,7 +11,7 @@ import {
 } from 'src/types/flux'
 import {argTypes} from 'src/flux/constants'
 
-import FuncArgInput from 'src/flux/components/FuncArgInput'
+import FuncArgTextArea from 'src/flux/components/FuncArgTextArea'
 import FilterTagListItem from 'src/flux/components/FilterTagListItem'
 import FancyScrollbar from '../../shared/components/FancyScrollbar'
 import {getDeep} from 'src/utils/wrappers'
@@ -143,16 +143,21 @@ export default class FilterTagList extends PureComponent<Props> {
 
     if (!this.clauseIsParseable) {
       return (
-        <FuncArgInput
-          type={argTypes.STRING}
-          value={value}
-          argKey={argKey}
-          funcID={funcID}
-          bodyID={bodyID}
-          onChangeArg={onChangeArg}
-          declarationID={declarationID}
-          onGenerateScript={onGenerateScript}
-        />
+        <>
+          <p className="flux-filter--helper-text">
+            Unable to render expression as a Builder
+          </p>
+          <FuncArgTextArea
+            type={argTypes.STRING}
+            value={value}
+            argKey={argKey}
+            funcID={funcID}
+            bodyID={bodyID}
+            onChangeArg={onChangeArg}
+            declarationID={declarationID}
+            onGenerateScript={onGenerateScript}
+          />
+        </>
       )
     }
 

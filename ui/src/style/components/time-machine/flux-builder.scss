@@ -412,3 +412,11 @@ $flux-filter-parens: $g5-pepper;
   min-width: 300px;
   min-height: 250px;
 }
+
+.flux-filter--helper-text {
+  @include no-user-select();
+  color: $g13-mist;
+  font-size: 12px;
+  font-weight: 500;
+  padding-left: 20px;
+}
