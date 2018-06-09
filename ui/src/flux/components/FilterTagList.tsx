@@ -80,7 +80,7 @@ export default class FilterTagList extends PureComponent<Props> {
         return '(' + subClause + ')'
       })
       .join(' AND ')
-    return funcBody ? `(r) => ${funcBody}` : `(r) => true`
+    return funcBody ? `(r) => ${funcBody}` : `() => true`
   }
 
   public handleChangeValue = (
@@ -185,12 +185,12 @@ export default class FilterTagList extends PureComponent<Props> {
     )
   }
 
-  private reduceNodesToClause(
+  public reduceNodesToClause(
     nodes,
     conditions: FilterTagCondition[]
   ): ParsedClause {
     if (!nodes.length) {
-      return [_.groupBy(conditions, condition => condition.key), true]
+      return this.constructClause(conditions)
     } else if (this.noConditions(nodes, conditions)) {
       return [{}, true]
     } else if (
@@ -203,6 +203,21 @@ export default class FilterTagList extends PureComponent<Props> {
       // Unparseable
       return [{}, false]
     }
+  }
+
+  private constructClause(conditions: FilterTagCondition[]): ParsedClause {
+    const clause = _.groupBy(conditions, condition => condition.key)
+    if (this.validateClause(clause)) {
+      return [clause, true]
+    } else {
+      return [{}, false]
+    }
+  }
+
+  private validateClause(clause) {
+    return Object.values(clause).every((conditions: FilterTagCondition[]) =>
+      conditions.every(c => conditions[0].operator === c.operator)
+    )
   }
 
   private noConditions(nodes, conditions) {
