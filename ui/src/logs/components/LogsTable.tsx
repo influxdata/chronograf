@@ -61,6 +61,10 @@ class LogsTable extends Component<Props, State> {
   }
 
   public componentDidUpdate() {
+    if (this.isTableEmpty) {
+      return
+    }
+
     this.grid.current.recomputeGridSize()
     this.headerGrid.current.recomputeGridSize()
   }
@@ -76,6 +80,10 @@ class LogsTable extends Component<Props, State> {
   public render() {
     const rowCount = getDeep(this.props, 'data.values.length', 0)
     const columnCount = getDeep(this.props, 'data.columns.length', 1) - 1
+
+    if (this.isTableEmpty) {
+      return this.emptyTable
+    }
 
     return (
       <div
@@ -378,6 +386,24 @@ class LogsTable extends Component<Props, State> {
       ['appname', 'facility', 'host', 'hostname', 'severity_1'],
       key
     )
+  }
+
+  private get emptyTable(): JSX.Element {
+    return (
+      <div className="logs-viewer--table-container generic-empty-state">
+        <h4>No logs to display</h4>
+        <p>
+          Try changing the <strong>time range</strong> or{' '}
+          <strong>removing filters</strong>
+        </p>
+      </div>
+    )
+  }
+
+  private get isTableEmpty(): boolean {
+    const rowCount = getDeep(this.props, 'data.values.length', 0)
+
+    return rowCount === 0
   }
 }
 
