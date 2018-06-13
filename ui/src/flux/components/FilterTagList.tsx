@@ -192,18 +192,30 @@ export default class FilterTagList extends PureComponent<Props> {
 
   public reduceNodesToClause(
     nodes,
-    conditions: FilterTagCondition[]
+    conditions: FilterTagCondition[],
+    parensStack: number = 0
   ): ParsedClause {
     if (!nodes.length) {
       return this.constructClause(conditions)
     } else if (this.noConditions(nodes, conditions)) {
       return [{}, true]
-    } else if (
-      ['OpenParen', 'CloseParen', 'Operator'].includes(nodes[0].type)
-    ) {
-      return this.skipNode(nodes, conditions)
+    } else if (nodes[0].type === 'Operator') {
+      return this.skipNode(nodes, conditions, parensStack)
+    } else if (nodes[0].type === 'OpenParen') {
+      if (parensStack === 1) return [{}, false]
+      return this.reduceNodesToClause(
+        nodes.slice(1),
+        conditions,
+        parensStack + 1
+      )
+    } else if (nodes[0].type === 'CloseParen') {
+      return this.reduceNodesToClause(
+        nodes.slice(1),
+        conditions,
+        parensStack - 1
+      )
     } else if (this.conditionExtractable(nodes)) {
-      return this.extractCondition(nodes, conditions)
+      return this.extractCondition(nodes, conditions, parensStack)
     } else {
       // Unparseable
       return [{}, false]
@@ -234,8 +246,8 @@ export default class FilterTagList extends PureComponent<Props> {
     )
   }
 
-  private skipNode([, ...nodes], conditions) {
-    return this.reduceNodesToClause(nodes, conditions)
+  private skipNode([, ...nodes], conditions, parensStack) {
+    return this.reduceNodesToClause(nodes, conditions, parensStack)
   }
 
   private conditionExtractable(nodes): boolean {
@@ -254,14 +266,19 @@ export default class FilterTagList extends PureComponent<Props> {
 
   private extractCondition(
     [keyNode, operatorNode, valueNode, ...nodes],
-    conditions
+    conditions,
+    parensStack
   ) {
     const condition: FilterTagCondition = {
       key: keyNode.property.name,
       operator: operatorNode.source,
       value: valueNode.source.replace(/"/g, ''),
     }
-    return this.reduceNodesToClause(nodes, [...conditions, condition])
+    return this.reduceNodesToClause(
+      nodes,
+      [...conditions, condition],
+      parensStack
+    )
   }
 
   private handleClick(e: MouseEvent<HTMLDivElement>) {

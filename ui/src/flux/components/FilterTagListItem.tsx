@@ -104,7 +104,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
           {this.renderEqualitySwitcher()}
         </div>
         {this.state.isOpen && (
-          <>
+          <div className="flux-schema--children">
             <div
               className="flux-schema--header"
               onClick={this.handleInputClick}
@@ -146,7 +146,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
                 />
               </>
             )}
-          </>
+          </div>
         )}
       </div>
     )

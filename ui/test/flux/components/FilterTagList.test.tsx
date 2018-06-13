@@ -193,6 +193,20 @@ describe('Flux.Components.FilterTagList', () => {
       expect(parseable).toBe(false)
       expect(clause).toEqual({})
     })
+
+    it('will not parse deeply nested conditionals', () => {
+      const nodes = [
+        {type: 'OpenParen'},
+        {type: 'OpenParen'},
+        {type: 'MemberExpression', property: {name: 'tagKey'}},
+        {type: 'Operator', source: '=='},
+        {type: 'StringLiteral', source: 'tagValue'},
+      ]
+      const [clause, parseable] = parser.reduceNodesToClause(nodes, [])
+
+      expect(parseable).toBe(false)
+      expect(clause).toEqual({})
+    })
   })
 
   describe('building a filter string', () => {
