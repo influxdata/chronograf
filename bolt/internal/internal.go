@@ -312,6 +312,11 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			}
 		}
 
+		separators := &Separators{
+			IsEnabled:  c.Separators.IsEnabled,
+			FormatType: c.Separators.FormatType,
+		}
+
 		cells[i] = &DashboardCell{
 			ID:      c.ID,
 			X:       c.X,
@@ -331,6 +336,7 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			FieldOptions:  fieldOptions,
 			TimeFormat:    c.TimeFormat,
 			DecimalPlaces: decimalPlaces,
+			Separators:    separators,
 		}
 	}
 	templates := make([]*Template, len(d.Templates))
@@ -488,6 +494,15 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			decimalPlaces.Digits = 3
 		}
 
+		separators := chronograf.Separators{}
+		if c.Separators != nil {
+			separators.IsEnabled = c.Separators.IsEnabled
+			separators.FormatType = c.Separators.FormatType
+		} else {
+			separators.IsEnabled = false
+			separators.FormatType = "US"
+		}
+
 		// FIXME: this is merely for legacy cells and
 		//        should be removed as soon as possible
 		cellType := c.Type
@@ -511,6 +526,7 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			FieldOptions:  fieldOptions,
 			TimeFormat:    c.TimeFormat,
 			DecimalPlaces: decimalPlaces,
+			Separators:    separators,
 		}
 	}
 

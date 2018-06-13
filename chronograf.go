@@ -580,6 +580,13 @@ type DashboardCell struct {
 	FieldOptions  []RenamableField `json:"fieldOptions"`
 	TimeFormat    string           `json:"timeFormat"`
 	DecimalPlaces DecimalPlaces    `json:"decimalPlaces"`
+	Separators    Separators       `json:"separators"`
+}
+
+// Separators indicate whether separators should be added to numbers, and what format they should use
+type Separators struct {
+	IsEnabled  bool   `json:"isEnabled"`
+	FormatType string `json:"formatType"`
 }
 
 // RenamableField is a column/row field in a DashboardCell of type Table
