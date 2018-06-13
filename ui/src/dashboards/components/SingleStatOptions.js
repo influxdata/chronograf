@@ -3,11 +3,15 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import FancyScrollbar from 'shared/components/FancyScrollbar'
-import ThresholdsList from 'shared/components/ThresholdsList'
-import ThresholdsListTypeToggle from 'shared/components/ThresholdsListTypeToggle'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import ThresholdsList from 'src/shared/components/ThresholdsList'
+import ThresholdsListTypeToggle from 'src/shared/components/ThresholdsListTypeToggle'
+import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDecimalPlaces'
 
-import {updateAxes} from 'src/dashboards/actions/cellEditorOverlay'
+import {
+  updateAxes,
+  changeDecimalPlaces,
+} from 'src/dashboards/actions/cellEditorOverlay'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 @ErrorHandling
@@ -26,11 +30,17 @@ class SingleStatOptions extends Component {
     handleUpdateAxes(newAxes)
   }
 
+  handleDecimalPlacesChange = decimalPlaces => {
+    const {handleChangeDecimalPlaces} = this.props
+    handleChangeDecimalPlaces(decimalPlaces)
+  }
+
   render() {
     const {
       axes: {
         y: {prefix, suffix},
       },
+      decimalPlaces,
       onResetFocus,
     } = this.props
 
@@ -64,6 +74,11 @@ class SingleStatOptions extends Component {
               />
             </div>
             <ThresholdsListTypeToggle containerClass="form-group col-xs-6" />
+            <GraphOptionsDecimalPlaces
+              digits={decimalPlaces.digits}
+              isEnforced={decimalPlaces.isEnforced}
+              onDecimalPlacesChange={this.handleDecimalPlacesChange}
+            />
           </div>
         </div>
       </FancyScrollbar>
@@ -71,24 +86,31 @@ class SingleStatOptions extends Component {
   }
 }
 
-const {func, shape} = PropTypes
+const {bool, func, number, shape} = PropTypes
 
 SingleStatOptions.propTypes = {
   handleUpdateAxes: func.isRequired,
   axes: shape({}).isRequired,
   onResetFocus: func.isRequired,
+  handleChangeDecimalPlaces: func.isRequired,
+  decimalPlaces: shape({
+    isEnforced: bool.isRequired,
+    digits: number.isRequired,
+  }).isRequired,
 }
 
 const mapStateToProps = ({
   cellEditorOverlay: {
-    cell: {axes},
+    cell: {axes, decimalPlaces},
   },
 }) => ({
   axes,
+  decimalPlaces,
 })
 
 const mapDispatchToProps = dispatch => ({
   handleUpdateAxes: bindActionCreators(updateAxes, dispatch),
+  handleChangeDecimalPlaces: bindActionCreators(changeDecimalPlaces, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleStatOptions)

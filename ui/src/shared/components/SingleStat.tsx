@@ -7,7 +7,7 @@ import {SMALL_CELL_HEIGHT} from 'src/shared/graphs/helpers'
 import {DYGRAPH_CONTAINER_V_MARGIN} from 'src/shared/constants'
 import {generateThresholdsListHexs} from 'src/shared/constants/colorOperations'
 import {ColorNumber} from 'src/types/colors'
-import {CellType} from 'src/types/dashboard'
+import {CellType, DecimalPlaces} from 'src/types/dashboard'
 import {Data} from 'src/types/dygraphs'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -20,6 +20,7 @@ interface Props {
   lineGraph: boolean
   staticLegendHeight: number
   data: Data
+  decimalPlaces: DecimalPlaces
 }
 
 @ErrorHandling
@@ -63,7 +64,7 @@ class SingleStat extends PureComponent<Props> {
   }
 
   private get roundedLastValue(): string {
-    const {data} = this.props
+    const {data, decimalPlaces} = this.props
     const {lastValues, series} = getLastValues(data)
     const firstAlphabeticalSeriesName = _.sortBy(series)[0]
 
@@ -72,8 +73,14 @@ class SingleStat extends PureComponent<Props> {
       firstAlphabeticalSeriesName
     )
     const lastValue = lastValues[firstAlphabeticalindex]
-    const HUNDRED = 100.0
-    const roundedValue = Math.round(+lastValue * HUNDRED) / HUNDRED
+
+    let roundedValue
+    if (decimalPlaces.isEnforced) {
+      roundedValue = lastValue.toFixed(decimalPlaces.digits)
+    } else {
+      const HUNDRED = 100.0
+      roundedValue = Math.round(+lastValue * HUNDRED) / HUNDRED
+    }
 
     return `${roundedValue}`
   }

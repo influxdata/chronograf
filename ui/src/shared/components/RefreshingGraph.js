@@ -74,6 +74,7 @@ const RefreshingGraph = ({
         suffix={suffix}
         inView={inView}
         onSetResolution={onSetResolution}
+        decimalPlaces={decimalPlaces}
       />
     )
   }
