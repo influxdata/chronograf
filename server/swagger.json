@@ -4692,19 +4692,17 @@
             "timeFormat describes the display format for time values according to moment.js date formatting",
           "type": "string"
         },
-        "decimalPoints": {
-          "description":
-            "decimal points indicates whether and how many digits to show after decimal point",
+        "numberFormat": {
+          "description": "numberFormat describes the display format of a number in certain cell types displaying a single value",
           "type": "object",
           "properties": {
-            "isEnforced": {
-              "description":
-                "Indicates whether decimal point setting should be enforced",
-              "type": "bool"
+            "thousands": {
+              "description": "describes the format of a number in the thousands place",
+              "$ref": "#/definitions/PlaceFormat"
             },
-            "digits": {
-              "description": "The number of digits after decimal to display",
-              "type": "integer"
+            "decimals": {
+              "description": "describes the format of the separators used in numbers for thousands and decimals",
+              "$ref": "#/definitions/PlaceFormat"
             }
           }
         },
@@ -5044,6 +5042,20 @@
           "description":
             "visible indicates whether this field should be visible on the table",
           "type": "boolean"
+        }
+      }
+    },
+    "PlaceFormat": {
+      "description": "Describe the format of a number in a particular place",
+      "type": "object",
+      "properties": {
+        "digits": {
+          "description": "if not empty, digits indicates how many digits to show",
+          "type": "string"
+        },
+        "separator": {
+          "description": "if not empty, separator indicates what the thousands or decimal places should be separated by",
+          "type": "string"
         }
       }
     },
