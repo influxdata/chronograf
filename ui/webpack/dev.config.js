@@ -188,7 +188,7 @@ module.exports = {
     }),
     new HtmlWebpackIncludeAssetsPlugin({
       assets: ['vendor.dll.js'],
-      publicPath: '{{.basePath}}',
+      publicPath: '{{.Base}}',
       append: false,
     }),
     new webpack.DefinePlugin({

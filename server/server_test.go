@@ -25,43 +25,65 @@ func Test_validBasepath(t *testing.T) {
 		basepath string
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name    string
+		args    args
+		wantErr bool
+		want    string
 	}{
 		{
 			name: "Basepath can be empty",
 			args: args{
 				basepath: "",
 			},
-			want: true,
+			want: "/",
 		},
 		{
 			name: "Basepath is not empty and valid",
 			args: args{
 				basepath: "/russ",
 			},
-			want: true,
+			want: "/russ/",
 		},
 		{
-			name: "Basepath is not empty and invalid - no slashes",
+			name: "Basepath is not empty and no slashes",
 			args: args{
 				basepath: "russ",
 			},
-			want: false,
+			want: "russ/",
 		},
 		{
-			name: "Basepath is not empty and invalid - extra slashes",
+			name: "Basepath is valid with multiple dirs",
 			args: args{
-				basepath: "//russ//",
+				basepath: "/howdy/doody/",
 			},
-			want: false,
+			want: "/howdy/doody",
+		},
+		{
+			name: "Basepath is valid with a slash at the end",
+			args: args{
+				basepath: "/howdy//",
+			},
+			want: "/howdy/",
+		},
+		{
+			name: "Basepath is RFC-3960 compliant",
+			args: args{
+				basepath: `/a1@:~%FF_.-!$&'()*+,;=howdy/`,
+			},
+			want: `/a1@:~%FF_.-!$&'()*+,;=howdy/`,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validBasepath(tt.args.basepath); got != tt.want {
-				t.Errorf("validBasepath() = %v, want %v", got, tt.want)
+			err := validBasepath(&tt.args.basepath)
+			if err != nil && !tt.wantErr {
+				t.Errorf("Unexpected error validating basepath: %s, err: %s", tt.args.basepath, err.Error())
+			} else if err == nil && tt.wantErr {
+				t.Errorf("Expected error validating basepath: %s", tt.args.basepath)
+			}
+
+			if tt.args.basepath != tt.want {
+				t.Errorf("Expected basepath: %s actual basepath: %s", tt.want, tt.args.basepath)
 			}
 		})
 	}

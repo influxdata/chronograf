@@ -26,15 +26,20 @@ type AssetsOpts struct {
 	Develop bool
 	// Logger will log the asset served
 	Logger chronograf.Logger
+	// Base specifies the base URL to use for all relative URLs contained within a document
+	Base string
 }
 
 // Assets creates a middleware that will serve a single page app.
 func Assets(opts AssetsOpts) http.Handler {
+	// sanitize AssetsOpts
+
 	var assets chronograf.Assets
 	if opts.Develop {
 		assets = &dist.DebugAssets{
 			Dir:     DebugDir,
 			Default: DebugDefault,
+			Base:    opts.Base,
 		}
 	} else {
 		assets = &dist.BindataAssets{

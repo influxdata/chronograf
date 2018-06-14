@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"log"
 	"math/rand"
 	"net"
@@ -11,7 +10,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"regexp"
 	"runtime"
 	"strconv"
 	"time"
@@ -344,8 +342,7 @@ func (s *Server) Serve(ctx context.Context) error {
 		return err
 	}
 
-	if !validBasepath(s.Basepath) {
-		err := fmt.Errorf("Invalid basepath, must follow format \"/mybasepath\"")
+	if err := validBasepath(&s.Basepath); err != nil {
 		logger.
 			WithField("component", "server").
 			WithField("basepath", "invalid").
@@ -539,7 +536,13 @@ func clientUsage(values client.Values) *client.Usage {
 	}
 }
 
-func validBasepath(basepath string) bool {
-	re := regexp.MustCompile(`(\/{1}\w+)+`)
-	return re.ReplaceAllLiteralString(basepath, "") == ""
+func validBasepath(basepath *string) error {
+	u, err := url.Parse(*basepath)
+	if err != nil {
+		return err
+	}
+
+	*basepath = u.String() + "/"
+
+	return nil
 }

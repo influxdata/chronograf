@@ -40,13 +40,14 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	assets := Assets(AssetsOpts{
 		Develop: opts.Develop,
 		Logger:  opts.Logger,
+		Base:    opts.Basepath,
 	})
 
 	// Prefix any URLs found in the React assets with any configured basepath
-	prefixedAssets := NewDefaultURLPrefixer(opts.Basepath, assets, opts.Logger)
+	// prefixedAssets := NewDefaultURLPrefixer(opts.Basepath, assets, opts.Logger)
 
 	// Compress the assets with gzip if an accepted encoding
-	compressed := gziphandler.GzipHandler(prefixedAssets)
+	compressed := gziphandler.GzipHandler(assets)
 
 	// The react application handles all the routing if the server does not
 	// know about the route.  This means that we never have unknown routes on
