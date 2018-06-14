@@ -4730,7 +4730,17 @@
             "label": "%"
           }
         ],
-        "type": "line"
+        "type": "line",
+          "numberFormat": {
+            "thousands": {
+              "digits": "",
+              "separators": ","
+            },
+            "decimals": {
+              "digits": "3",
+              "separators": "."
+            }
+          }
       }
     },
     "LayoutQuery": {
@@ -5057,6 +5067,10 @@
           "description": "if not empty, separator indicates what the thousands or decimal places should be separated by",
           "type": "string"
         }
+      },
+      "example": {
+        "digits": "3",
+        "separators": "."
       }
     },
     "Routes": {
