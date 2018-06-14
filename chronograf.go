@@ -579,7 +579,7 @@ type DashboardCell struct {
 	TableOptions  TableOptions     `json:"tableOptions,omitempty"`
 	FieldOptions  []RenamableField `json:"fieldOptions"`
 	TimeFormat    string           `json:"timeFormat"`
-	DecimalPlaces DecimalPlaces    `json:"decimalPlaces"`
+	DecimalPlaces DecimalPlaces    `json:"-"` // Not Currently Used.
 	NumberFormat  NumberFormat     `json:"numberFormat"`
 }
 
@@ -611,9 +611,10 @@ type TableOptions struct {
 }
 
 // DecimalPlaces indicates whether decimal places should be enforced, and how many digits it should show.
+// No longer in use; replaced by NumberFormat
 type DecimalPlaces struct {
-	IsEnforced bool  `json:"isEnforced"`
-	Digits     int32 `json:"digits"`
+	IsEnforced bool  `json:"isEnforced,omitempty"`
+	Digits     int32 `json:"digits,omitempty"`
 }
 
 // DashboardsStore is the storage and retrieval of dashboards

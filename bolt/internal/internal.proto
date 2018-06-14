@@ -41,7 +41,7 @@ message DashboardCell {
 	TableOptions tableOptions            = 12; // TableOptions for visualization of cell with type 'table'
 	repeated RenamableField fieldOptions = 13; // Options for each of the fields returned in a cell
 	string timeFormat                    = 14; // format for time
-	DecimalPlaces decimalPlaces          = 15; // Represents how precise the values of this field should be
+	reserved 15;
 	NumberFormat numberFormat            = 16; // Options for how numbers are formatted
 }
 
@@ -53,11 +53,6 @@ message NumberFormat {
 message PlaceFormat {
 	string digits     = 1; // the number of digits to display
 	string separator  = 2; // value that should be used as a separator between parts of a number
-}
-
-message DecimalPlaces {
-	bool isEnforced			= 1; // whether decimal places should be enforced
-	int32 digits				= 2; // the number of digits to display after decical point
 }
 
 message TableOptions {

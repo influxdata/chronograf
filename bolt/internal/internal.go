@@ -298,11 +298,6 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			FixFirstColumn:   c.TableOptions.FixFirstColumn,
 		}
 
-		decimalPlaces := &DecimalPlaces{
-			IsEnforced: c.DecimalPlaces.IsEnforced,
-			Digits:     c.DecimalPlaces.Digits,
-		}
-
 		thousands := &PlaceFormat{
 			Digits:    c.NumberFormat.Thousands.Digits,
 			Separator: c.NumberFormat.Thousands.Separator,
@@ -348,11 +343,10 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 				Type:        c.Legend.Type,
 				Orientation: c.Legend.Orientation,
 			},
-			TableOptions:  tableOptions,
-			FieldOptions:  fieldOptions,
-			TimeFormat:    c.TimeFormat,
-			DecimalPlaces: decimalPlaces,
-			NumberFormat:  numberFormat,
+			TableOptions: tableOptions,
+			FieldOptions: fieldOptions,
+			TimeFormat:   c.TimeFormat,
+			NumberFormat: numberFormat,
 		}
 	}
 	templates := make([]*Template, len(d.Templates))
@@ -501,15 +495,6 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			fieldOptions[i].Visible = field.Visible
 		}
 
-		decimalPlaces := chronograf.DecimalPlaces{}
-		if c.DecimalPlaces != nil {
-			decimalPlaces.IsEnforced = c.DecimalPlaces.IsEnforced
-			decimalPlaces.Digits = c.DecimalPlaces.Digits
-		} else {
-			decimalPlaces.IsEnforced = false
-			decimalPlaces.Digits = 3
-		}
-
 		numberFormat := chronograf.NumberFormat{}
 		if c.NumberFormat != nil {
 			thousands := chronograf.PlaceFormat{}
@@ -523,12 +508,6 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			if c.NumberFormat.Decimals != nil {
 				decimals.Digits = c.NumberFormat.Decimals.Digits
 				decimals.Separator = c.NumberFormat.Decimals.Separator
-			} else {
-				if c.DecimalPlaces != nil {
-					if c.DecimalPlaces.IsEnforced {
-						decimals.Digits = fmt.Sprintf("%v", c.DecimalPlaces.Digits)
-					}
-				}
 			}
 			numberFormat.Decimals = decimals
 		}
@@ -541,22 +520,21 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 		}
 
 		cells[i] = chronograf.DashboardCell{
-			ID:            c.ID,
-			X:             c.X,
-			Y:             c.Y,
-			W:             c.W,
-			H:             c.H,
-			Name:          c.Name,
-			Queries:       queries,
-			Type:          cellType,
-			Axes:          axes,
-			CellColors:    colors,
-			Legend:        legend,
-			TableOptions:  tableOptions,
-			FieldOptions:  fieldOptions,
-			TimeFormat:    c.TimeFormat,
-			DecimalPlaces: decimalPlaces,
-			NumberFormat:  numberFormat,
+			ID:           c.ID,
+			X:            c.X,
+			Y:            c.Y,
+			W:            c.W,
+			H:            c.H,
+			Name:         c.Name,
+			Queries:      queries,
+			Type:         cellType,
+			Axes:         axes,
+			CellColors:   colors,
+			Legend:       legend,
+			TableOptions: tableOptions,
+			FieldOptions: fieldOptions,
+			TimeFormat:   c.TimeFormat,
+			NumberFormat: numberFormat,
 		}
 	}
 
