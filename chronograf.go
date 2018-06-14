@@ -580,6 +580,19 @@ type DashboardCell struct {
 	FieldOptions  []RenamableField `json:"fieldOptions"`
 	TimeFormat    string           `json:"timeFormat"`
 	DecimalPlaces DecimalPlaces    `json:"decimalPlaces"`
+	NumberFormat  NumberFormat     `json:"numberFormat"`
+}
+
+// NumberFormat is the options for formatting numbers in a cell
+type NumberFormat struct {
+	Thousands PlaceFormat `json:"thousands"`
+	Decimals  PlaceFormat `json:"decimals"`
+}
+
+// PlaceFormat is the options for formatting specific parts of a number
+type PlaceFormat struct {
+	Digits    string `json:"digits"`
+	Separator string `json:"separator"`
 }
 
 // RenamableField is a column/row field in a DashboardCell of type Table

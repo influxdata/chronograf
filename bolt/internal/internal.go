@@ -303,6 +303,27 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			Digits:     c.DecimalPlaces.Digits,
 		}
 
+		thousands := &PlaceFormat{
+			Digits:    c.NumberFormat.Thousands.Digits,
+			Separator: c.NumberFormat.Thousands.Separator,
+		}
+
+		digits := ""
+		if c.DecimalPlaces.IsEnforced {
+			digits = fmt.Sprintf("%v", c.DecimalPlaces.Digits)
+		} else {
+			digits = c.NumberFormat.Decimals.Digits
+		}
+		decimals := &PlaceFormat{
+			Digits:    digits,
+			Separator: c.NumberFormat.Decimals.Separator,
+		}
+
+		numberFormat := &NumberFormat{
+			Thousands: thousands,
+			Decimals:  decimals,
+		}
+
 		fieldOptions := make([]*RenamableField, len(c.FieldOptions))
 		for i, field := range c.FieldOptions {
 			fieldOptions[i] = &RenamableField{
@@ -331,6 +352,7 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			FieldOptions:  fieldOptions,
 			TimeFormat:    c.TimeFormat,
 			DecimalPlaces: decimalPlaces,
+			NumberFormat:  numberFormat,
 		}
 	}
 	templates := make([]*Template, len(d.Templates))
@@ -488,6 +510,29 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			decimalPlaces.Digits = 3
 		}
 
+		numberFormat := chronograf.NumberFormat{}
+		if c.NumberFormat != nil {
+			thousands := chronograf.PlaceFormat{}
+			if c.NumberFormat.Thousands != nil {
+				thousands.Digits = c.NumberFormat.Thousands.Digits
+				thousands.Separator = c.NumberFormat.Thousands.Separator
+			}
+			numberFormat.Thousands = thousands
+
+			decimals := chronograf.PlaceFormat{}
+			if c.NumberFormat.Decimals != nil {
+				decimals.Digits = c.NumberFormat.Decimals.Digits
+				decimals.Separator = c.NumberFormat.Decimals.Separator
+			} else {
+				if c.DecimalPlaces != nil {
+					if c.DecimalPlaces.IsEnforced {
+						decimals.Digits = fmt.Sprintf("%v", c.DecimalPlaces.Digits)
+					}
+				}
+			}
+			numberFormat.Decimals = decimals
+		}
+
 		// FIXME: this is merely for legacy cells and
 		//        should be removed as soon as possible
 		cellType := c.Type
@@ -511,6 +556,7 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			FieldOptions:  fieldOptions,
 			TimeFormat:    c.TimeFormat,
 			DecimalPlaces: decimalPlaces,
+			NumberFormat:  numberFormat,
 		}
 	}
 

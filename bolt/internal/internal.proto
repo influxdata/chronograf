@@ -42,6 +42,17 @@ message DashboardCell {
 	repeated RenamableField fieldOptions = 13; // Options for each of the fields returned in a cell
 	string timeFormat                    = 14; // format for time
 	DecimalPlaces decimalPlaces          = 15; // Represents how precise the values of this field should be
+	NumberFormat numberFormat            = 16; // Options for how numbers are formatted
+}
+
+message NumberFormat {
+	PlaceFormat thousands = 1; // how the thousands spots of a number should be formatted
+	PlaceFormat decimals  = 2; // how the decimal portion of a number should be formatted
+}
+
+message PlaceFormat {
+	string digits     = 1; // the number of digits to display
+	string separator  = 2; // value that should be used as a separator between parts of a number
 }
 
 message DecimalPlaces {
