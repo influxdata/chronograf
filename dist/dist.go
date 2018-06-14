@@ -12,12 +12,13 @@ import (
 // DebugAssets serves assets via a specified directory
 type DebugAssets struct {
 	Dir     string // Dir is a directory location of asset files
-	Default string // Default is the file to serve if file is not found.
+	Default string // Default is the file to serve if file is not found
+	Base    string // Base specifies the base URL to use for all relative URLs contained within a document
 }
 
 // Handler is an http.FileServer for the Dir
 func (d *DebugAssets) Handler() http.Handler {
-	return http.FileServer(NewDir(d.Dir, d.Default))
+	return http.FileServer(NewDir(d.Dir, d.Default, d.Base))
 }
 
 // BindataAssets serves assets from go-bindata, but, also serves Default if assent doesn't exist
