@@ -15,7 +15,7 @@ import (
 
 const (
 	// AllAnnotations returns all annotations from the chronograf database
-	AllAnnotations = `SELECT "start_time", "modified_time_ns", "text", "type", "id" FROM "annotations" WHERE "deleted"=false AND time >= %dns and "start_time" <= %d ORDER BY time DESC`
+	AllAnnotations = `SELECT "start_time", "modified_time_ns", "text", "type", "id" FROM "annotations" WHERE "type"='%s' AND deleted"=false AND time >= %dns and "start_time" <= %d ORDER BY time DESC`
 	// GetAnnotationID returns all annotations from the chronograf database where id is %s
 	GetAnnotationID = `SELECT "start_time", "modified_time_ns", "text", "type", "id" FROM "annotations" WHERE "id"='%s' AND "deleted"=false ORDER BY time DESC`
 	// AnnotationsDB is chronograf.  Perhaps later we allow this to be changed
@@ -45,8 +45,8 @@ func NewAnnotationStore(client chronograf.TimeSeries) *AnnotationStore {
 }
 
 // All lists all Annotations
-func (a *AnnotationStore) All(ctx context.Context, start, stop time.Time) ([]chronograf.Annotation, error) {
-	return a.queryAnnotations(ctx, fmt.Sprintf(AllAnnotations, start.UnixNano(), stop.UnixNano()))
+func (a *AnnotationStore) All(ctx context.Context, annotationType string, start, stop time.Time) ([]chronograf.Annotation, error) {
+	return a.queryAnnotations(ctx, fmt.Sprintf(AllAnnotations, annotationType, start.UnixNano(), stop.UnixNano()))
 }
 
 // Get retrieves an annotation
