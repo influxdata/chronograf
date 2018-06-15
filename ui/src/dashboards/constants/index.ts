@@ -3,7 +3,7 @@ import {
   DEFAULT_FIX_FIRST_COLUMN,
 } from 'src/shared/constants/tableGraph'
 import {Cell, QueryConfig} from 'src/types'
-import {CellType, Dashboard, DecimalPlaces} from 'src/types/dashboard'
+import {CellType, Dashboard, NumberFormat} from 'src/types/dashboard'
 import {TimeRange} from 'src/types/query'
 import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
 
@@ -11,11 +11,6 @@ export const UNTITLED_GRAPH: string = 'Untitled Graph'
 
 export const TIME_FORMAT_TOOLTIP_LINK: string =
   'http://momentjs.com/docs/#/parsing/string-format/'
-
-export const DEFAULT_DECIMAL_PLACES: DecimalPlaces = {
-  isEnforced: false,
-  digits: 3,
-}
 
 export interface TimeField {
   internalName: string
@@ -49,6 +44,17 @@ export const FORMAT_OPTIONS: Array<{text: string}> = [
   {text: TIME_FORMAT_CUSTOM},
 ]
 
+const DEFAULT_NUMBER_FORMAT: NumberFormat = {
+  thousands: {
+    separator: '',
+    digits: '',
+  },
+  decimals: {
+    separator: '',
+    digits: '',
+  },
+}
+
 export type NewDefaultCell = Pick<
   Cell,
   Exclude<keyof Cell, 'i' | 'axes' | 'colors' | 'links' | 'legend'>
@@ -63,7 +69,7 @@ export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   queries: [],
   tableOptions: DEFAULT_TABLE_OPTIONS,
   timeFormat: DEFAULT_TIME_FORMAT,
-  decimalPlaces: DEFAULT_DECIMAL_PLACES,
+  numberFormat: DEFAULT_NUMBER_FORMAT,
   fieldOptions: [DEFAULT_TIME_FIELD],
 }
 

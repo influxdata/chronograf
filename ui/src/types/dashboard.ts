@@ -54,6 +54,16 @@ export interface Legend {
   orientation?: string
 }
 
+interface PlaceFormat {
+  digits: string
+  separator: string
+}
+
+export interface NumberFormat {
+  thousands: PlaceFormat
+  decimals: PlaceFormat
+}
+
 export interface DecimalPlaces {
   isEnforced: boolean
   digits: number
@@ -73,7 +83,7 @@ export interface Cell {
   tableOptions: TableOptions
   fieldOptions: FieldOption[]
   timeFormat: string
-  decimalPlaces: DecimalPlaces
+  numberFormat: NumberFormat
   links: CellLinks
   legend: Legend
 }

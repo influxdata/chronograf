@@ -60,7 +60,7 @@ const Layout = (
       timeFormat,
       fieldOptions,
       tableOptions,
-      decimalPlaces,
+      numberFormat,
     },
     source,
     sources,
@@ -82,52 +82,54 @@ const Layout = (
     grabDataForDownload,
   },
   {source: defaultSource}
-) => (
-  <LayoutCell
-    cell={cell}
-    cellData={cellData}
-    templates={templates}
-    isEditable={isEditable}
-    resolution={resolution}
-    onEditCell={onEditCell}
-    onCloneCell={onCloneCell}
-    onDeleteCell={onDeleteCell}
-    onSummonOverlayTechnologies={onSummonOverlayTechnologies}
-  >
-    {cell.isWidget ? (
-      <WidgetCell cell={cell} timeRange={timeRange} source={source} />
-    ) : (
-      <RefreshingGraph
-        colors={colors}
-        inView={cell.inView}
-        axes={axes}
-        type={type}
-        isDragging={isDragging}
-        tableOptions={tableOptions}
-        fieldOptions={fieldOptions}
-        timeFormat={timeFormat}
-        decimalPlaces={decimalPlaces}
-        staticLegend={IS_STATIC_LEGEND(legend)}
-        cellHeight={h}
-        onZoom={onZoom}
-        sources={sources}
-        timeRange={timeRange}
-        templates={templates}
-        autoRefresh={autoRefresh}
-        manualRefresh={manualRefresh}
-        onStopAddAnnotation={onStopAddAnnotation}
-        grabDataForDownload={grabDataForDownload}
-        queries={buildQueriesForLayouts(
-          cell,
-          getSource(cell, source, sources, defaultSource),
-          timeRange,
-          host
-        )}
-        onSetResolution={onSetResolution}
-      />
-    )}
-  </LayoutCell>
-)
+) => {
+  return (
+    <LayoutCell
+      cell={cell}
+      cellData={cellData}
+      templates={templates}
+      isEditable={isEditable}
+      resolution={resolution}
+      onEditCell={onEditCell}
+      onCloneCell={onCloneCell}
+      onDeleteCell={onDeleteCell}
+      onSummonOverlayTechnologies={onSummonOverlayTechnologies}
+    >
+      {cell.isWidget ? (
+        <WidgetCell cell={cell} timeRange={timeRange} source={source} />
+      ) : (
+        <RefreshingGraph
+          colors={colors}
+          inView={cell.inView}
+          axes={axes}
+          type={type}
+          isDragging={isDragging}
+          tableOptions={tableOptions}
+          fieldOptions={fieldOptions}
+          timeFormat={timeFormat}
+          numberFormat={numberFormat}
+          staticLegend={IS_STATIC_LEGEND(legend)}
+          cellHeight={h}
+          onZoom={onZoom}
+          sources={sources}
+          timeRange={timeRange}
+          templates={templates}
+          autoRefresh={autoRefresh}
+          manualRefresh={manualRefresh}
+          onStopAddAnnotation={onStopAddAnnotation}
+          grabDataForDownload={grabDataForDownload}
+          queries={buildQueriesForLayouts(
+            cell,
+            getSource(cell, source, sources, defaultSource),
+            timeRange,
+            host
+          )}
+          onSetResolution={onSetResolution}
+        />
+      )}
+    </LayoutCell>
+  )
+}
 
 const {arrayOf, bool, func, number, shape, string} = PropTypes
 
@@ -171,10 +173,8 @@ const propTypes = {
       fixFirstColumn: bool.isRequired,
     }),
     timeFormat: string,
-    decimalPlaces: shape({
-      isEnforced: bool.isRequired,
-      digits: number.isRequired,
-    }),
+
+    numberFormat: shape({}),
     fieldOptions: arrayOf(
       shape({
         internalName: string.isRequired,

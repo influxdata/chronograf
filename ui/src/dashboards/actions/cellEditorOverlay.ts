@@ -5,6 +5,7 @@ import {
   Axes,
   DecimalPlaces,
   FieldOption,
+  NumberFormat,
   TableOptions,
 } from 'src/types/dashboard'
 
@@ -171,6 +172,21 @@ export const changeDecimalPlaces = (
   type: 'CHANGE_DECIMAL_PLACES',
   payload: {
     decimalPlaces,
+  },
+})
+
+interface ChangeNumberFormatAction {
+  type: 'CHANGE_NUMBER_FORMAT'
+  payload: {
+    numberFormat: NumberFormat
+  }
+}
+export const changeNumberFormat = (
+  numberFormat: NumberFormat
+): ChangeNumberFormatAction => ({
+  type: 'CHANGE_NUMBER_FORMAT',
+  payload: {
+    numberFormat,
   },
 })
 

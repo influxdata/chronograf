@@ -12,7 +12,7 @@ import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 import {TimeRange, QueryConfig, Axes, Template, Source} from 'src/types'
 import {
   TableOptions,
-  DecimalPlaces,
+  NumberFormat,
   FieldOption,
   CellType,
 } from 'src/types/dashboard'
@@ -28,7 +28,7 @@ interface Props {
   axes: Axes
   tableOptions: TableOptions
   timeFormat: string
-  decimalPlaces: DecimalPlaces
+  numberFormat: NumberFormat
   fieldOptions: FieldOption[]
   resizerTopHeight: number
   thresholdsListColors: ColorNumber[]
@@ -53,7 +53,7 @@ const DashVisualization: SFC<Props> = ({
   thresholdsListColors,
   tableOptions,
   timeFormat,
-  decimalPlaces,
+  numberFormat,
   fieldOptions,
   isInCEO,
 }) => {
@@ -86,7 +86,7 @@ const DashVisualization: SFC<Props> = ({
               resizerTopHeight={resizerTopHeight}
               staticLegend={staticLegend}
               timeFormat={timeFormat}
-              decimalPlaces={decimalPlaces}
+              numberFormat={numberFormat}
               fieldOptions={fieldOptions}
               isInCEO={isInCEO}
             />
@@ -102,7 +102,7 @@ const mapStateToProps = ({
     thresholdsListColors,
     gaugeColors,
     lineColors,
-    cell: {type, axes, tableOptions, fieldOptions, timeFormat, decimalPlaces},
+    cell: {type, axes, tableOptions, fieldOptions, timeFormat, numberFormat},
   },
 }) => ({
   gaugeColors,
@@ -113,7 +113,7 @@ const mapStateToProps = ({
   tableOptions,
   fieldOptions,
   timeFormat,
-  decimalPlaces,
+  numberFormat,
 })
 
 export default connect(mapStateToProps, null)(DashVisualization)

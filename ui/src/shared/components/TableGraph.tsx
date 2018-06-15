@@ -9,6 +9,7 @@ import {bindActionCreators} from 'redux'
 import moment from 'moment'
 
 import {fastReduce} from 'src/utils/fast'
+import {getDeep} from 'src/utils/wrappers'
 
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {
@@ -35,6 +36,7 @@ import {
   TableOptions,
   FieldOption,
   DecimalPlaces,
+  NumberFormat,
   Sort,
 } from 'src/types/dashboard'
 
@@ -56,7 +58,7 @@ interface Props {
   data: TimeSeriesServerResponse[]
   tableOptions: TableOptions
   timeFormat: string
-  decimalPlaces: DecimalPlaces
+  numberFormat: NumberFormat
   fieldOptions: FieldOption[]
   hoverTime: string
   handleUpdateFieldOptions: (fieldOptions: FieldOption[]) => void
@@ -120,7 +122,6 @@ class TableGraph extends Component<Props, State> {
       colors,
       fieldOptions,
       timeFormat,
-      decimalPlaces,
     } = this.props
     const {fixFirstColumn = DEFAULT_FIX_FIRST_COLUMN} = tableOptions
     const columnCount = _.get(transformedData, ['0', 'length'], 0)
@@ -171,7 +172,7 @@ class TableGraph extends Component<Props, State> {
                 fieldOptions={fieldOptions}
                 tableOptions={tableOptions}
                 timeFormat={timeFormat}
-                decimalPlaces={decimalPlaces}
+                decimalPlaces={this.decimalPlaces}
                 timeColumnWidth={timeColumnWidth}
                 classNameBottomRightGrid="table-graph--scroll-window"
               />
@@ -190,13 +191,7 @@ class TableGraph extends Component<Props, State> {
     )
 
     const sort: Sort = {field: sortField, direction: DEFAULT_SORT_DIRECTION}
-    const {
-      data,
-      tableOptions,
-      timeFormat,
-      fieldOptions,
-      decimalPlaces,
-    } = this.props
+    const {data, tableOptions, timeFormat, fieldOptions} = this.props
     const result = timeSeriesToTableGraph(data)
     const sortedLabels = result.sortedLabels
 
@@ -211,7 +206,7 @@ class TableGraph extends Component<Props, State> {
       computedFieldOptions,
       tableOptions,
       timeFormat,
-      decimalPlaces
+      this.decimalPlaces
     )
 
     const timeField = _.find(
@@ -238,7 +233,7 @@ class TableGraph extends Component<Props, State> {
     const updatedProps = _.keys(nextProps).filter(
       k => !_.isEqual(this.props[k], nextProps[k])
     )
-    const {tableOptions, fieldOptions, timeFormat, decimalPlaces} = nextProps
+    const {tableOptions, fieldOptions, timeFormat} = nextProps
 
     let result = {}
 
@@ -289,7 +284,7 @@ class TableGraph extends Component<Props, State> {
         computedFieldOptions,
         tableOptions,
         timeFormat,
-        decimalPlaces
+        this.decimalPlaces
       )
 
       let isTimeVisible = this.state.isTimeVisible
@@ -320,6 +315,19 @@ class TableGraph extends Component<Props, State> {
       return
     }
     this.props.handleUpdateFieldOptions(fieldOptions)
+  }
+
+  private get decimalPlaces(): DecimalPlaces {
+    const {numberFormat} = this.props
+
+    const digits = getDeep<string>(numberFormat, 'decimals.digits', '')
+    let isEnforced = false
+    let digitsNumber = 0
+    if (digits !== '') {
+      isEnforced = true
+      digitsNumber = Number(digits)
+    }
+    return {isEnforced, digits: digitsNumber}
   }
 
   private get scrollToColRow(): {
@@ -396,7 +404,7 @@ class TableGraph extends Component<Props, State> {
   }
 
   private handleClickFieldName = (clickedFieldName: string) => (): void => {
-    const {tableOptions, fieldOptions, timeFormat, decimalPlaces} = this.props
+    const {tableOptions, fieldOptions, timeFormat} = this.props
     const {data, sort} = this.state
 
     if (clickedFieldName === sort.field) {
@@ -412,7 +420,7 @@ class TableGraph extends Component<Props, State> {
       fieldOptions,
       tableOptions,
       timeFormat,
-      decimalPlaces
+      this.decimalPlaces
     )
 
     this.setState({
@@ -459,15 +467,15 @@ class TableGraph extends Component<Props, State> {
     isTimeData: boolean,
     isFieldName: boolean
   ): string => {
-    const {timeFormat, decimalPlaces} = this.props
+    const {timeFormat} = this.props
     if (isTimeData) {
       return `${moment(cellData).format(timeFormat)}`
     }
     if (typeof cellData === 'string' && isFieldName) {
       return `${fieldName}`
     }
-    if (typeof cellData === 'number' && decimalPlaces.isEnforced) {
-      return cellData.toFixed(decimalPlaces.digits)
+    if (typeof cellData === 'number' && this.decimalPlaces.isEnforced) {
+      return cellData.toFixed(this.decimalPlaces.digits)
     }
     return `${cellData}`
   }

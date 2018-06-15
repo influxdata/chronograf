@@ -2,10 +2,9 @@ import React, {PureComponent} from 'react'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OptIn from 'src/shared/components/OptIn'
 
-import {DecimalPlaces} from 'src/types/dashboard'
-
-interface Props extends DecimalPlaces {
-  onDecimalPlacesChange: (decimalPlaces: DecimalPlaces) => void
+interface Props {
+  digits: string
+  onDecimalPlacesChange: (digits: string) => void
 }
 
 const fixedValueString = 'fixed'
@@ -16,33 +15,14 @@ class GraphOptionsDecimalPlaces extends PureComponent<Props> {
     super(props)
   }
 
-  public onSetValue = (valueFromSelector: string): void => {
-    let digits
-    let isEnforced
-    if (valueFromSelector === fixedValueString) {
-      digits = this.props.digits
-      isEnforced = false
-    } else if (valueFromSelector === '') {
-      digits = this.props.digits
-      isEnforced = true
-    } else {
-      digits = Number(valueFromSelector)
-      if (digits < 0) {
-        digits = 0
-      }
-      isEnforced = true
-    }
-    this.props.onDecimalPlacesChange({digits, isEnforced})
-  }
-
   public render() {
-    const {digits, isEnforced} = this.props
+    const {digits} = this.props
     return (
       <div className="form-group col-xs-6">
-        <label> Decimal Places </label>
+        <label>Decimal Places </label>
         <OptIn
-          customPlaceholder={isEnforced ? digits.toString() : 'unlimited'}
-          customValue={isEnforced ? digits.toString() : ''}
+          customPlaceholder={this.isEnforced ? digits : 'unlimited'}
+          customValue={this.isEnforced ? digits : ''}
           onSetValue={this.onSetValue}
           fixedPlaceholder={''}
           fixedValue={fixedValueString}
@@ -51,6 +31,38 @@ class GraphOptionsDecimalPlaces extends PureComponent<Props> {
         />
       </div>
     )
+  }
+
+  private get isEnforced(): boolean {
+    const {digits} = this.props
+
+    return digits !== ''
+  }
+
+  private get digits(): string {
+    if (!this.isEnforced) {
+      return '0'
+    }
+
+    return this.props.digits
+  }
+
+  private onSetValue = (valueFromSelector: string): void => {
+    let digits: string
+    if (valueFromSelector === 'fixed') {
+      digits = ''
+    } else if (valueFromSelector === '') {
+      digits = this.digits
+    } else {
+      const num = Number(valueFromSelector)
+      if (num < 0) {
+        digits = '0'
+      } else {
+        digits = valueFromSelector
+      }
+    }
+
+    this.props.onDecimalPlacesChange(digits)
   }
 }
 

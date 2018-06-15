@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
+import _ from 'lodash'
 
 import GraphOptionsCustomizeFields from 'src/dashboards/components/GraphOptionsCustomizeFields'
 import GraphOptionsFixFirstColumn from 'src/dashboards/components/GraphOptionsFixFirstColumn'
@@ -10,7 +11,7 @@ import GraphOptionsTimeFormat from 'src/dashboards/components/GraphOptionsTimeFo
 import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDecimalPlaces'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
-import _ from 'lodash'
+import {getDeep} from 'src/utils/wrappers'
 
 import ThresholdsList from 'src/shared/components/ThresholdsList'
 import ThresholdsListTypeToggle from 'src/shared/components/ThresholdsListTypeToggle'
@@ -19,12 +20,12 @@ import {
   updateTableOptions,
   updateFieldOptions,
   changeTimeFormat,
-  changeDecimalPlaces,
+  changeNumberFormat,
 } from 'src/dashboards/actions/cellEditorOverlay'
 import {DEFAULT_TIME_FIELD} from 'src/dashboards/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {DecimalPlaces} from 'src/types/dashboard'
+import {NumberFormat} from 'src/types/dashboard'
 import {QueryConfig} from 'src/types/query'
 
 interface DropdownOption {
@@ -49,11 +50,11 @@ interface Props {
   handleUpdateTableOptions: (options: TableOptionsInterface) => void
   handleUpdateFieldOptions: (fieldOptions: RenamableField[]) => void
   handleChangeTimeFormat: (timeFormat: string) => void
-  handleChangeDecimalPlaces: (decimalPlaces: number) => void
+  handleChangeNumberFormat: (numberFormat: NumberFormat) => void
   tableOptions: TableOptionsInterface
   fieldOptions: RenamableField[]
   timeFormat: string
-  decimalPlaces: DecimalPlaces
+  numberFormat: NumberFormat
   onResetFocus: () => void
 }
 
@@ -71,7 +72,6 @@ export class TableOptions extends Component<Props, {}> {
       timeFormat,
       onResetFocus,
       tableOptions,
-      decimalPlaces,
     } = this.props
 
     const tableSortByOptions = fieldOptions.map(field => ({
@@ -93,8 +93,7 @@ export class TableOptions extends Component<Props, {}> {
               onChooseSortBy={this.handleChooseSortBy}
             />
             <GraphOptionsDecimalPlaces
-              digits={decimalPlaces.digits}
-              isEnforced={decimalPlaces.isEnforced}
+              digits={this.digits}
               onDecimalPlacesChange={this.handleDecimalPlacesChange}
             />
             <GraphOptionsTimeAxis
@@ -122,6 +121,11 @@ export class TableOptions extends Component<Props, {}> {
         </div>
       </FancyScrollbar>
     )
+  }
+
+  private get digits(): string {
+    const {numberFormat} = this.props
+    return getDeep<string>(numberFormat, 'decimals.digits', '')
   }
 
   private moveField(dragIndex, hoverIndex) {
@@ -154,9 +158,10 @@ export class TableOptions extends Component<Props, {}> {
     handleChangeTimeFormat(timeFormat)
   }
 
-  private handleDecimalPlacesChange = decimalPlaces => {
-    const {handleChangeDecimalPlaces} = this.props
-    handleChangeDecimalPlaces(decimalPlaces)
+  private handleDecimalPlacesChange = digits => {
+    const {handleChangeNumberFormat, numberFormat} = this.props
+    const decimals = {..._.get(numberFormat, 'decimals'), digits}
+    handleChangeNumberFormat({...numberFormat, decimals})
   }
 
   private handleToggleVerticalTimeAxis = verticalTimeAxis => () => {
@@ -197,20 +202,20 @@ export class TableOptions extends Component<Props, {}> {
 
 const mapStateToProps = ({
   cellEditorOverlay: {
-    cell: {tableOptions, timeFormat, fieldOptions, decimalPlaces},
+    cell: {tableOptions, timeFormat, fieldOptions, numberFormat},
   },
 }) => ({
   tableOptions,
   timeFormat,
   fieldOptions,
-  decimalPlaces,
+  numberFormat,
 })
 
 const mapDispatchToProps = dispatch => ({
   handleUpdateTableOptions: bindActionCreators(updateTableOptions, dispatch),
   handleUpdateFieldOptions: bindActionCreators(updateFieldOptions, dispatch),
   handleChangeTimeFormat: bindActionCreators(changeTimeFormat, dispatch),
-  handleChangeDecimalPlaces: bindActionCreators(changeDecimalPlaces, dispatch),
+  handleChangeNumberFormat: bindActionCreators(changeNumberFormat, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(TableOptions)

@@ -13,10 +13,7 @@ import TableGraph from 'shared/components/TableGraph'
 
 import {colorsStringSchema} from 'shared/schemas'
 import {setHoverTime} from 'src/dashboards/actions'
-import {
-  DEFAULT_TIME_FORMAT,
-  DEFAULT_DECIMAL_PLACES,
-} from 'src/dashboards/constants'
+import {DEFAULT_TIME_FORMAT} from 'src/dashboards/constants'
 
 const RefreshingLineGraph = AutoRefresh(LineGraph)
 const RefreshingSingleStat = AutoRefresh(SingleStat)
@@ -39,7 +36,7 @@ const RefreshingGraph = ({
   autoRefresh,
   fieldOptions,
   timeFormat,
-  decimalPlaces,
+  numberFormat,
   onSetResolution,
   resizerTopHeight,
   staticLegend,
@@ -115,7 +112,7 @@ const RefreshingGraph = ({
         tableOptions={tableOptions}
         fieldOptions={fieldOptions}
         timeFormat={timeFormat}
-        decimalPlaces={decimalPlaces}
+        numberFormat={numberFormat}
         editQueryStatus={editQueryStatus}
         resizerTopHeight={resizerTopHeight}
         grabDataForDownload={grabDataForDownload}
@@ -195,10 +192,7 @@ RefreshingGraph.propTypes = {
     }).isRequired
   ),
   timeFormat: string.isRequired,
-  decimalPlaces: shape({
-    isEnforced: bool.isRequired,
-    digits: number.isRequired,
-  }).isRequired,
+  numberFormat: shape({}),
   hoverTime: string.isRequired,
   handleSetHoverTime: func.isRequired,
   isInCEO: bool,
@@ -210,7 +204,6 @@ RefreshingGraph.defaultProps = {
   staticLegend: false,
   inView: true,
   timeFormat: DEFAULT_TIME_FORMAT,
-  decimalPlaces: DEFAULT_DECIMAL_PLACES,
 }
 
 const mapStateToProps = ({dashboardUI, annotations: {mode}}) => ({

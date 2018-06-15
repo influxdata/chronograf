@@ -126,6 +126,12 @@ export default function cellEditorOverlay(state = initialState, action) {
 
       return {...state, cell}
     }
+    case 'CHANGE_NUMBER_FORMAT': {
+      const {numberFormat} = action.payload
+      const cell = {...state.cell, numberFormat}
+
+      return {...state, cell}
+    }
     case 'UPDATE_FIELD_OPTIONS': {
       const {fieldOptions} = action.payload
       const cell = {...state.cell, fieldOptions}
