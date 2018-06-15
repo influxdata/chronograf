@@ -207,7 +207,7 @@ export const LINE_COLOR_SCALES = [
   return {name, colors, id}
 })
 
-export const validateLineColors = (colors, numSeries) => {
+export const validateLineColors = (colors, numSeries = 0) => {
   const multipleSeriesButOneColor = numSeries > 1 && colors.length < 2
   if (!colors || colors.length === 0 || multipleSeriesButOneColor) {
     return DEFAULT_LINE_COLORS

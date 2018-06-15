@@ -1,13 +1,12 @@
-import _ from 'lodash'
+import {getDeep} from 'src/utils/wrappers'
 
 import {
-  THRESHOLD_TYPE_TEXT,
   DEFAULT_THRESHOLDS_LIST_COLORS,
   DEFAULT_GAUGE_COLORS,
   validateGaugeColors,
   validateThresholdsListColors,
   getThresholdsListType,
-} from 'shared/constants/thresholds'
+} from 'src/shared/constants/thresholds'
 
 import {
   DEFAULT_LINE_COLORS,
@@ -15,16 +14,34 @@ import {
 } from 'src/shared/constants/graphColorPalettes'
 
 import {initializeOptions} from 'src/dashboards/constants/cellEditor'
+import {Action} from 'src/dashboards/actions/cellEditorOverlay'
+import {CellType, Cell} from 'src/types'
+import {ThresholdType, TableOptions} from 'src/types/dashboard'
+import {ThresholdColor, ColorString, ColorNumber} from 'src/types/colors'
+
+type GaugeColors = Array<ColorNumber | ColorString>
+type LineColors = Array<ColorNumber | ColorString>
+
+interface CEOInitialState {
+  cell: Cell | null
+  thresholdsListType: ThresholdType
+  thresholdsListColors: ThresholdColor[]
+  gaugeColors: GaugeColors
+  lineColors: LineColors
+}
 
 export const initialState = {
   cell: null,
-  thresholdsListType: THRESHOLD_TYPE_TEXT,
+  thresholdsListType: ThresholdType.Text,
   thresholdsListColors: DEFAULT_THRESHOLDS_LIST_COLORS,
   gaugeColors: DEFAULT_GAUGE_COLORS,
   lineColors: DEFAULT_LINE_COLORS,
 }
 
-export default function cellEditorOverlay(state = initialState, action) {
+const cellEditorOverlay = (
+  state = initialState,
+  action: Action
+): CEOInitialState => {
   switch (action.type) {
     case 'SHOW_CELL_EDITOR_OVERLAY': {
       const {
@@ -39,10 +56,10 @@ export default function cellEditorOverlay(state = initialState, action) {
       )
       const gaugeColors = validateGaugeColors(colors)
 
-      const tableOptions = _.get(
+      const tableOptions = getDeep<TableOptions>(
         cell,
         'tableOptions',
-        initializeOptions('table')
+        initializeOptions(CellType.Table)
       )
 
       const lineColors = validateLineColors(colors)
@@ -142,3 +159,5 @@ export default function cellEditorOverlay(state = initialState, action) {
 
   return state
 }
+
+export default cellEditorOverlay
