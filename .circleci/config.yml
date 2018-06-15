@@ -6,25 +6,25 @@ workflows:
       - deploy-nightly:
           requires:
             - build
-          #filters:
-          #  branches:
-          #    only: master
+          filters:
+            branches:
+              only: master
       - deploy-pre-release:
           requires:
             - build
-          #filters:
-          #  branches:
-          #    ignore: /.*/
-          #  tags:
-          #    only: /^[0-9]+(\.[0-9]+)*(\S*)([a|rc|beta]([0-9]+))+$/
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[0-9]+(\.[0-9]+)*(\S*)([a|rc|beta]([0-9]+))+$/
       - deploy-release:
           requires:
             - build
-          #filters:
-          #  branches:
-          #    ignore: /.*/
-          #  tags:
-          #    only: /^[0-9]+(\.[0-9]+)*$/
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[0-9]+(\.[0-9]+)*$/
 
 
 version: 2
