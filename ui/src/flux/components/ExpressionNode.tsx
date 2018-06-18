@@ -209,7 +209,17 @@ class ExpressionNode extends PureComponent<Props, State> {
   private get isImplicitYieldToggled(): boolean {
     const {isLastBody} = this.props
 
-    return isLastBody && this.isLastFuncYield
+    return isLastBody && this.isLastFuncYield && this.isFilteredAndRanged
+  }
+
+  private get isFilteredAndRanged(): boolean {
+    const {funcs} = this.props
+
+    const nodeGroups = _.groupBy(funcs, 'name')
+    const isFiltered = _.get(nodeGroups, 'filter', []).length > 0
+    const isRanged = _.get(nodeGroups, 'range', []).length > 0
+
+    return isFiltered && isRanged
   }
 
   private get isLastFuncYield(): boolean {
