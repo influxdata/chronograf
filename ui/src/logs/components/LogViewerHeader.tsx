@@ -23,11 +23,12 @@ interface Props {
   onChooseNamespace: (namespace: Namespace) => void
   onChooseTimerange: (timeRange: TimeRange) => void
   onChangeLiveUpdatingStatus: () => void
+  onShowOptionsOverlay: () => void
 }
 
 class LogViewerHeader extends PureComponent<Props> {
   public render(): JSX.Element {
-    const {timeRange} = this.props
+    const {timeRange, onShowOptionsOverlay} = this.props
     return (
       <div className="page-header full-width">
         <div className="page-header__container">
@@ -55,6 +56,12 @@ class LogViewerHeader extends PureComponent<Props> {
               onChooseTimeRange={this.handleChooseTimeRange}
               selected={timeRange}
             />
+            <button
+              className="btn btn-sm btn-square btn-default"
+              onClick={onShowOptionsOverlay}
+            >
+              <span className="icon cog-thick" />
+            </button>
           </div>
         </div>
       </div>
