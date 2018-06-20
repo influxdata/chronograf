@@ -297,12 +297,18 @@ class LogsPage extends PureComponent<Props, State> {
         {({onDismissOverlay}) => (
           <OptionsOverlay
             onDismissOverlay={onDismissOverlay}
-            severityConfigs={DEFAULT_SEVERITY_LEVELS}
+            severityConfigs={DEFAULT_SEVERITY_LEVELS} // Todo: replace with real
+            onUpdateConfigs={this.handleUpdateSeverityConfigs}
           />
         )}
       </OverlayContext.Consumer>,
       options
     )
+  }
+
+  private handleUpdateSeverityConfigs = configs => {
+    console.log(configs)
+    // Save these new configs here
   }
 }
 
