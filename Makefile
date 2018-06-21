@@ -1,4 +1,4 @@
-.PHONY: assets dep clean test gotest gotestrace jstest run run-dev run-hmr ctags
+.PHONY: assets dep clean test gotest gotestrace jstest run run-dev run-hmr ctags wasm
 
 VERSION ?= $(shell git describe --always --tags)
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
@@ -14,6 +14,9 @@ BINARY=chronograf
 CTLBINARY=chronoctl
 
 .DEFAULT_GOAL := all
+
+wasm:
+	GOARCH=wasm GOOS=js ~/dev/go/bin/go build -o ./wasm/slug.wasm ./wasm/main.go
 
 all: dep build
 
@@ -40,7 +43,7 @@ chronogiraffe: ${BINARY}
 	@echo "$$CHRONOGIRAFFE"
 
 docker-${BINARY}: $(SOURCES)
-	CGO_ENABLED=0 GOOS=linux go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
+  CGO_ENABLED=0 GOOS=linux go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
 		./cmd/chronograf/main.go
 
 docker: dep assets docker-${BINARY}
