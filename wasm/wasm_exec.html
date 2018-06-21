@@ -29,8 +29,15 @@ license that can be found in the LICENSE file.
 		})()
 
 		async function run() {
-			await fluxToAST("once upon a time")
-			console.log(currentCount)
+			fluxPromise = new Promise(r => window.fluxResolve = r)
+			fluxToAST(`
+				from(db:"telegraf")
+				|> filter(fn: (r) => r["_measurement"] == "cpu" AND r["_field"] == "usage_user")
+				|> range(start:-170h)
+				|> sum()
+			`)
+			await fluxPromise
+			console.log(currentAST)
 		}
 	</script>
 
