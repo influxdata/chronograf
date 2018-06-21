@@ -29,7 +29,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {OverlayContext} from 'src/shared/components/OverlayTechnology'
 
 import {Source, Namespace, TimeRange} from 'src/types'
-import {Filter, SeverityLevel} from 'src/types/logs'
+import {Filter, SeverityLevel, SeverityFormat} from 'src/types/logs'
 
 // Mock
 import {DEFAULT_SEVERITY_LEVELS} from 'src/logs/constants'
@@ -286,7 +286,10 @@ class LogsPage extends PureComponent<Props, State> {
   }
 
   private handleShowOptionsOverlay = (): void => {
-    const {showOverlay} = this.props
+    const {
+      showOverlay,
+      tableData: {columns},
+    } = this.props
     const options = {
       dismissOnClickOutside: false,
       dismissOnEscape: false,
@@ -299,6 +302,9 @@ class LogsPage extends PureComponent<Props, State> {
             severityLevels={DEFAULT_SEVERITY_LEVELS} // Todo: replace with real
             onUpdateSeverityLevels={this.handleUpdateSeverityLevels}
             onDismissOverlay={onDismissOverlay}
+            columns={columns}
+            onUpdateSeverityFormat={this.handleUpdateSeverityFormat}
+            severityFormat="dotText" // Todo: repleace with real value
           />
         )}
       </OverlayContext.Consumer>,
@@ -308,6 +314,11 @@ class LogsPage extends PureComponent<Props, State> {
 
   private handleUpdateSeverityLevels = (levels: SeverityLevel[]) => {
     console.log(levels)
+    // Save these new configs here
+  }
+
+  private handleUpdateSeverityFormat = (format: SeverityFormat) => () => {
+    console.log(format)
     // Save these new configs here
   }
 }
