@@ -19,7 +19,7 @@ export default class TableSidebarItem extends PureComponent<Props> {
   public render() {
     return (
       <div
-        className={`yield-node--tab ${this.active}`}
+        className={`yield-node--result ${this.active}`}
         onClick={this.handleClick}
       >
         {this.name}

@@ -31,20 +31,20 @@ export default class TableSidebar extends PureComponent<Props, State> {
     const {searchTerm} = this.state
 
     return (
-      <div className="yield-node--sidebar">
+      <div className="yield-node--results">
         {!this.isDataEmpty && (
-          <div className="yield-node--sidebar-heading">
+          <div className="yield-node--results-filter">
             <input
               type="text"
-              className="form-control input-xs yield-node--sidebar-filter"
+              className="form-control input-sm"
               onChange={this.handleSearch}
               placeholder="Filter tables"
               value={searchTerm}
             />
           </div>
         )}
-        <FancyScrollbar>
-          <div className="yield-node--tabs">
+        <FancyScrollbar autoHide={false}>
+          <div className="yield-node--results-list">
             {this.data.map(({partitionKey, id}) => {
               return (
                 <TableSidebarItem
