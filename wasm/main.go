@@ -31,7 +31,6 @@ func main() {
 func fluxToAST(args []js.Value) {
 	query := args[0].String()
 	ast, _ := parser.NewAST(query)
-
 	astJSON, _ := json.Marshal(ast)
 	js.Global.Set("currentAST", string(astJSON))
 	js.Global.Get("window").Get("fluxResolve").Invoke()

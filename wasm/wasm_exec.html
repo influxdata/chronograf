@@ -12,6 +12,12 @@ license that can be found in the LICENSE file.
 </head>
 
 <body>
+	<style>
+		textarea {
+			width: 500px;
+			height: 500px;
+		}
+	</style>
 	<script src="wasm_exec.js"></script>
 	<script>
 		if (!WebAssembly.instantiateStreaming) { // polyfill
@@ -29,18 +35,16 @@ license that can be found in the LICENSE file.
 		})()
 
 		async function run() {
+			const input = document.getElementById("inputarea").value
 			fluxPromise = new Promise(r => window.fluxResolve = r)
-			fluxToAST(`
-				from(db:"telegraf")
-				|> filter(fn: (r) => r["_measurement"] == "cpu" AND r["_field"] == "usage_user")
-				|> range(start:-170h)
-				|> sum()
-			`)
+			fluxToAST(input)
 			await fluxPromise
 			console.log(currentAST)
 		}
 	</script>
 
+	<textarea id="inputarea"></textarea>
+	<br />
 	<button onClick="run();" id="runButton" disabled>Run Me</button>
 </body>
 
