@@ -308,6 +308,11 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/chronograf/v1/config/:section", EnsureSuperAdmin(service.ConfigSection))
 	router.PUT("/chronograf/v1/config/:section", EnsureSuperAdmin(service.ReplaceConfigSection))
 
+	// UI settings for Chronograf
+	router.GET("/chronograf/v1/settings", EnsureViewer(service.Settings))
+	router.GET("/chronograf/v1/settings/:section", EnsureViewer(service.SettingsSection))
+	router.PUT("/chronograf/v1/settings/:section", EnsureEditor(service.ReplaceSettingsSection))
+
 	router.GET("/chronograf/v1/env", EnsureViewer(service.Environment))
 
 	allRoutes := &AllRoutes{

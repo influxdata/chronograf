@@ -738,6 +738,31 @@ type OrganizationsStore interface {
 	DefaultOrganization(ctx context.Context) (*Organization, error)
 }
 
+// HexColor is a simple format for persisting color as used by the UI
+type HexColor struct {
+	Hex  string
+	Name string
+}
+
+// SeverityColor is a color configuration option for a severity level in the log viewer
+type SeverityColor struct {
+	Type     string
+	Default  HexColor
+	Override HexColor
+}
+
+// LogViewerSettings is the log viewer config in the UI settings
+type LogViewerSettings struct {
+	Columns              []RenamableField
+	SeverityColors       []SeverityColor
+	SeverityColumnFormat string
+}
+
+// Settings is the settings for the UI
+type Settings struct {
+	LogViewer LogViewerSettings `json:"logViewer"`
+}
+
 // AuthConfig is the global application config section for auth parameters
 type AuthConfig struct {
 	// SuperAdminNewUsers should be true by default to give a seamless upgrade to
