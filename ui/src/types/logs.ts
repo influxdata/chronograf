@@ -25,3 +25,22 @@ export interface LogsState {
   filters: Filter[]
   queryCount: number
 }
+
+export interface SeverityLevel {
+  severity: string
+  default: SeverityColor
+  override?: SeverityColor
+}
+
+export interface SeverityColor {
+  hex: string
+  name: string
+}
+
+export type SeverityFormat = 'dot' | 'dotText' | 'text'
+
+export interface LogsTableColumn {
+  internalName: string
+  displayName: string
+  visible: boolean
+}
