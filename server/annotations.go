@@ -14,6 +14,7 @@ import (
 const (
 	since           = "since"
 	until           = "until"
+	typeParameter   = "type"
 	timeMilliFormat = "2006-01-02T15:04:05.999Z07:00"
 )
 
@@ -64,10 +65,10 @@ func newAnnotationsResponse(src chronograf.Source, as []chronograf.Annotation) a
 	}
 }
 
-func validAnnotationQuery(query url.Values) (startTime, stopTime time.Time, err error) {
+func validAnnotationQuery(query url.Values) (annotationType string, startTime, stopTime time.Time, err error) {
 	start := query.Get(since)
 	if start == "" {
-		return time.Time{}, time.Time{}, fmt.Errorf("since parameter is required")
+		return "", time.Time{}, time.Time{}, fmt.Errorf("since parameter is required")
 	}
 
 	startTime, err = time.Parse(timeMilliFormat, start)
@@ -81,13 +82,14 @@ func validAnnotationQuery(query url.Values) (startTime, stopTime time.Time, err 
 	if stop != "" {
 		stopTime, err = time.Parse(timeMilliFormat, stop)
 		if err != nil {
-			return time.Time{}, time.Time{}, err
+			return "", time.Time{}, time.Time{}, err
 		}
 	}
 	if startTime.After(stopTime) {
 		startTime, stopTime = stopTime, startTime
 	}
-	return startTime, stopTime, nil
+	t := query.Get(typeParameter)
+	return t, startTime, stopTime, nil
 }
 
 // Annotations returns all annotations within the annotations store
@@ -98,7 +100,7 @@ func (s *Service) Annotations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, stop, err := validAnnotationQuery(r.URL.Query())
+	annotationType, start, stop, err := validAnnotationQuery(r.URL.Query())
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
 		return
@@ -125,7 +127,7 @@ func (s *Service) Annotations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	store := influx.NewAnnotationStore(ts)
-	annotations, err := store.All(ctx, start, stop)
+	annotations, err := store.All(ctx, annotationType, start, stop)
 	if err != nil {
 		msg := fmt.Errorf("Error loading annotations: %v", err)
 		unknownErrorWithMessage(w, msg, s.Logger)

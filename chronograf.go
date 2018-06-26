@@ -519,11 +519,11 @@ type Annotation struct {
 
 // AnnotationStore represents storage and retrieval of annotations
 type AnnotationStore interface {
-	All(ctx context.Context, start, stop time.Time) ([]Annotation, error) // All lists all Annotations between start and stop
-	Add(context.Context, *Annotation) (*Annotation, error)                // Add creates a new annotation in the store
-	Delete(ctx context.Context, id string) error                          // Delete removes the annotation from the store
-	Get(ctx context.Context, id string) (*Annotation, error)              // Get retrieves an annotation
-	Update(context.Context, *Annotation) error                            // Update replaces annotation
+	All(ctx context.Context, annotationType string, start, stop time.Time) ([]Annotation, error) // All lists all Annotations between start and stop with an optional type.
+	Add(context.Context, *Annotation) (*Annotation, error)                                       // Add creates a new annotation in the store
+	Delete(ctx context.Context, id string) error                                                 // Delete removes the annotation from the store
+	Get(ctx context.Context, id string) (*Annotation, error)                                     // Get retrieves an annotation
+	Update(context.Context, *Annotation) error                                                   // Update replaces annotation
 }
 
 // DashboardID is the dashboard ID

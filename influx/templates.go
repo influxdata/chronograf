@@ -98,6 +98,7 @@ func RenderTemplate(query string, t chronograf.TemplateVar, now time.Time) (stri
 	return query, nil
 }
 
+// AutoInterval uses the number of points and duration to define the group by time.
 func AutoInterval(points int64, duration time.Duration) string {
 	// The function is: ((total_seconds * millisecond_converstion) / group_by) = pixels / 3
 	// Number of points given the pixels
