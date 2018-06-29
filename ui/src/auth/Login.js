@@ -1,10 +1,11 @@
-/* global VERSION */
 import React from 'react'
 import PropTypes from 'prop-types'
 
 import Notifications from 'shared/components/Notifications'
 
 import SplashPage from 'shared/components/SplashPage'
+
+const VERSION = process.env.npm_package_version
 
 const Login = ({authData: {auth}}) => {
   if (auth.isAuthLoading) {

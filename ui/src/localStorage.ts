@@ -7,7 +7,7 @@ import {
 
 import {LocalStorage} from 'src/types/localStorage'
 
-declare var VERSION: string
+const VERSION = process.env.npm_package_version
 
 export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
   try {
