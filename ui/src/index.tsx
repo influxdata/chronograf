@@ -95,6 +95,7 @@ interface State {
 class Root extends PureComponent<{}, State> {
   private getLinks = bindActionCreators(getLinksAsync, dispatch)
   private getMe = bindActionCreators(getMeAsync, dispatch)
+  private heartbeatTimer: number
 
   constructor(props) {
     super(props)
@@ -113,6 +114,10 @@ class Root extends PureComponent<{}, State> {
     } catch (error) {
       dispatch(errorThrown(error))
     }
+  }
+
+  public componentWillUnmount() {
+    clearTimeout(this.heartbeatTimer)
   }
 
   public render() {
@@ -174,7 +179,7 @@ class Root extends PureComponent<{}, State> {
   private async performHeartbeat({shouldResetMe = false} = {}) {
     await this.getMe({shouldResetMe})
 
-    setTimeout(() => {
+    this.heartbeatTimer = window.setTimeout(() => {
       if (store.getState().auth.me !== null) {
         this.performHeartbeat()
       }

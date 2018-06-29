@@ -26,7 +26,7 @@ interface Props {
   setActiveKapacitor: actions.SetActiveKapacitorAsync
 }
 
-declare var VERSION: string
+const VERSION = process.env.npm_package_version
 
 @ErrorHandling
 class ManageSources extends PureComponent<Props> {
