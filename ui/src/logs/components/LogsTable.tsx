@@ -5,7 +5,7 @@ import React, {Component, MouseEvent, CSSProperties} from 'react'
 import {Grid, AutoSizer, InfiniteLoader} from 'react-virtualized'
 import {color} from 'd3-color'
 
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import {getDeep} from 'src/utils/wrappers'
 
 import {colorForSeverity} from 'src/logs/utils/colors'

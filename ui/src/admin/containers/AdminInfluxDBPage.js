@@ -30,7 +30,7 @@ import RolesTable from 'src/admin/components/RolesTable'
 import QueriesPage from 'src/admin/containers/QueriesPage'
 import DatabaseManagerPage from 'src/admin/containers/DatabaseManagerPage'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
-import FancyScrollbar from 'shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import SubSections from 'shared/components/SubSections'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 

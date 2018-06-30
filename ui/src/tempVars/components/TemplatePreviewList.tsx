@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 import uuid from 'uuid'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 
 const LI_HEIGHT = 28
 const LI_MARGIN_BOTTOM = 2

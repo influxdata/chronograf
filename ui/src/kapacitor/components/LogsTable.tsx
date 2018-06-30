@@ -1,7 +1,7 @@
 import React, {SFC} from 'react'
 
 import LogsTableRow from 'src/kapacitor/components/LogsTableRow'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 
 import {LogItem} from 'src/types/kapacitor'
 

@@ -7,7 +7,7 @@ import {getActiveKapacitor} from 'src/shared/apis'
 import * as kapacitorActionCreators from '../actions/view'
 
 import KapacitorRules from 'src/kapacitor/components/KapacitorRules'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 

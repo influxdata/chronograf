@@ -13,7 +13,7 @@ import {argTypes} from 'src/flux/constants'
 
 import FuncArgTextArea from 'src/flux/components/FuncArgTextArea'
 import FilterTagListItem from 'src/flux/components/FilterTagListItem'
-import FancyScrollbar from '../../shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import {getDeep} from 'src/utils/wrappers'
 
 interface Props {

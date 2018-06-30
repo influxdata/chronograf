@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import SubSections from 'src/shared/components/SubSections'
-import FancyScrollbar from 'shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 
 import UsersPage from 'src/admin/containers/chronograf/UsersPage'
 import AllUsersPage from 'src/admin/containers/chronograf/AllUsersPage'

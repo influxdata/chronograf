@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import LayoutRenderer from 'src/shared/components/LayoutRenderer'
 import {STATUS_PAGE_TIME_RANGE} from 'src/shared/data/timeRanges'
 import {AUTOREFRESH_DEFAULT} from 'src/shared/constants'

@@ -7,7 +7,7 @@ import {QueryConfig, Source} from 'src/types'
 import {Namespace} from 'src/types/queries'
 
 import DatabaseListItem from 'src/shared/components/DatabaseListItem'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {getDatabasesWithRetentionPolicies} from 'src/shared/apis/databases'

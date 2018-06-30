@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 
 import DatabaseList from 'src/flux/components/DatabaseList'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import {Service} from 'src/types'
 
 interface Props {

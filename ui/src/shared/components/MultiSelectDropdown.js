@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import _ from 'lodash'
 
 import OnClickOutside from 'shared/components/OnClickOutside'
-import FancyScrollbar from 'shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 

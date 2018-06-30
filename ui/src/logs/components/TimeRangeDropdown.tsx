@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import moment from 'moment'
 import _ from 'lodash'
 
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import timeRanges from 'src/logs/data/timeRanges'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'src/shared/constants/index'
 import {ErrorHandling} from 'src/shared/decorators/errors'

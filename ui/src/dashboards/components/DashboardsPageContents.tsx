@@ -5,7 +5,7 @@ import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import DashboardsTable from 'src/dashboards/components/DashboardsTable'
 import ImportDashboardOverlay from 'src/dashboards/components/ImportDashboardOverlay'
 import SearchBar from 'src/hosts/components/SearchBar'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 

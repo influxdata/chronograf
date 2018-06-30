@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import LayoutRenderer from 'shared/components/LayoutRenderer'
-import FancyScrollbar from 'shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import DashboardEmpty from 'src/dashboards/components/DashboardEmpty'
 
 const Dashboard = ({

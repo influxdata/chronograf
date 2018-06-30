@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import FancyScrollbar from 'shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import ThresholdsList from 'shared/components/ThresholdsList'
 import ThresholdsListTypeToggle from 'shared/components/ThresholdsListTypeToggle'
 

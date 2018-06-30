@@ -6,7 +6,7 @@ import {bindActionCreators} from 'redux'
 import _ from 'lodash'
 import uuid from 'uuid'
 
-import FancyScrollbar from 'shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 import Threshold from 'src/dashboards/components/Threshold'
 
 import {

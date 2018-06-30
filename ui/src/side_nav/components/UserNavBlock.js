@@ -6,7 +6,7 @@ import {withRouter} from 'react-router'
 
 import classnames from 'classnames'
 
-import FancyScrollbar from 'shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 
 import {meChangeOrganizationAsync} from 'shared/actions/auth'
 

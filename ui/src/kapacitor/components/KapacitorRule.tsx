@@ -9,7 +9,7 @@ import ValuesSection from 'src/kapacitor/components/ValuesSection'
 import RuleHeaderSave from 'src/kapacitor/components/RuleHeaderSave'
 import RuleHandlers from 'src/kapacitor/components/RuleHandlers'
 import RuleMessage from 'src/kapacitor/components/RuleMessage'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import FancyScrollbar from 'src/reusable_ui/components/fancy_scrollbar/FancyScrollbar'
 
 import {createRule, editRule} from 'src/kapacitor/apis'
 import buildInfluxQLQuery from 'src/utils/influxql'
