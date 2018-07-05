@@ -24,9 +24,17 @@ const ui = (state = initialState, action) => {
       const {dashboards: dashboardsInState} = state
       const {dashboards: loadedDashboards} = action.payload
 
-      const dashboards = loadedDashboards.map(loadedDash =>
-        _.find(dashboardsInState, d => d.id === loadedDash.id, loadedDash)
-      )
+      const dashboards = loadedDashboards.map(loadedDash => {
+        const dashInState = _.find(
+          dashboardsInState,
+          d => d.id === loadedDash.id
+        )
+
+        if (dashInState) {
+          return dashInState
+        }
+        return loadedDash
+      })
 
       const newState = {
         dashboards,

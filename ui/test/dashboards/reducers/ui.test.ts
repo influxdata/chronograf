@@ -71,6 +71,22 @@ describe('DataExplorer.Reducers.UI', () => {
     expect(actual.dashboards).toEqual(expected.dashboards)
   })
 
+  it('can load dashbaords into existing dashboards state', () => {
+    const newTemplate = {id: '3', ...template}
+    const updatedD1 = {...d1, templates: [...d1.templates, newTemplate]}
+
+    state = {
+      dashboards: [updatedD1],
+    }
+
+    const actual = reducer(state, loadDashboards(dashboards))
+    const expected = {
+      dashboards: [updatedD1, d2],
+    }
+
+    expect(actual.dashboards).toEqual(expected.dashboards)
+  })
+
   it('can delete a dashboard', () => {
     const actual = reducer({...initialState, dashboards}, deleteDashboard(d1))
     const expected = dashboards.filter(dash => dash.id !== d1.id)
