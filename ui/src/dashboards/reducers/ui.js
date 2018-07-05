@@ -21,7 +21,13 @@ import {TEMPLATE_VARIABLE_TYPES} from 'src/tempVars/constants'
 const ui = (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_DASHBOARDS': {
-      const {dashboards} = action.payload
+      const {dashboards: dashboardsInState} = state
+      const {dashboards: loadedDashboards} = action.payload
+
+      const dashboards = loadedDashboards.map(loadedDash =>
+        _.find(dashboardsInState, d => d.id === loadedDash.id, loadedDash)
+      )
+
       const newState = {
         dashboards,
       }
