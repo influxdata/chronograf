@@ -58,10 +58,30 @@ const d2 = {...dashboard, id: 2, cells: [], name: 'd2', templates: []}
 const dashboards = [d1, d2]
 
 describe('DataExplorer.Reducers.UI', () => {
+  beforeEach(() => {
+    state = undefined
+  })
+
   it('can load the dashboards', () => {
-    const actual = reducer(state, loadDashboards(dashboards, d1.id))
+    const actual = reducer(state, loadDashboards(dashboards))
     const expected = {
       dashboards,
+    }
+
+    expect(actual.dashboards).toEqual(expected.dashboards)
+  })
+
+  it('can load dashbaords into existing dashboards state', () => {
+    const newTemplate = {id: '3', ...template}
+    const updatedD1 = {...d1, templates: [...d1.templates, newTemplate]}
+
+    state = {
+      dashboards: [updatedD1],
+    }
+
+    const actual = reducer(state, loadDashboards(dashboards))
+    const expected = {
+      dashboards: [updatedD1, d2],
     }
 
     expect(actual.dashboards).toEqual(expected.dashboards)

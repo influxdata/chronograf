@@ -19,7 +19,6 @@ export interface LoadDashboardsAction {
   type: 'LOAD_DASHBOARDS'
   payload: {
     dashboards: DashboardsModels.Dashboard[]
-    dashboardID: number
   }
 }
 
