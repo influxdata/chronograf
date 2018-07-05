@@ -58,6 +58,10 @@ const d2 = {...dashboard, id: 2, cells: [], name: 'd2', templates: []}
 const dashboards = [d1, d2]
 
 describe('DataExplorer.Reducers.UI', () => {
+  beforeEach(() => {
+    state = undefined
+  })
+
   it('can load the dashboards', () => {
     const actual = reducer(state, loadDashboards(dashboards))
     const expected = {
