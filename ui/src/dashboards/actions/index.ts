@@ -68,13 +68,11 @@ import * as TempVarsModels from 'src/types/tempVars'
 import * as NotificationsActions from 'src/types/actions/notifications'
 
 export const loadDashboards: DashboardsActions.LoadDashboardsActionCreator = (
-  dashboards: DashboardsModels.Dashboard[],
-  dashboardID?: number
+  dashboards: DashboardsModels.Dashboard[]
 ): DashboardsActions.LoadDashboardsAction => ({
   type: 'LOAD_DASHBOARDS',
   payload: {
     dashboards,
-    dashboardID,
   },
 })
 

@@ -59,7 +59,7 @@ const dashboards = [d1, d2]
 
 describe('DataExplorer.Reducers.UI', () => {
   it('can load the dashboards', () => {
-    const actual = reducer(state, loadDashboards(dashboards, d1.id))
+    const actual = reducer(state, loadDashboards(dashboards))
     const expected = {
       dashboards,
     }
