@@ -1961,6 +1961,13 @@
             "type": "string",
             "description": "RFC3339 datetime to retrieve annotations until (defaults to now if not supplied)",
             "required": false
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string",
+            "description": "What types of annotations to retrieve (either 'global', 'scoped', or 'all', defaults to 'global')",
+            "required": false
           }
         ],
         "responses": {
@@ -5681,7 +5688,19 @@
         },
         "type": {
           "type": "string",
-          "description": "A description of the type of annotation"
+          "description": "A description of the type of annotation",
+          "default": "",
+          "enum": [
+            "",
+            "scoped"
+          ]
+        },
+        "scope": {
+          "type": "array",
+          "description": "A collection of template variables and template variable values that specify the scope for which an annotation applies",
+          "items": {
+            "$ref": "#/definitions/AnnotationScopeItem"
+          }
         },
         "links": {
           "type": "object",
@@ -5699,11 +5718,36 @@
         "startTime": "2018-07-09T17:48:04.23Z",
         "endTime": "2018-07-09T17:48:08.652Z",
         "text": "no name",
-        "type": "",
+        "type": "scoped",
+        "scope": [
+          {
+            "template": "43c3b4d6-4dad-4482-abba-90d5a9c7d898",
+            "templateValue": "mem"
+          },
+          {
+            "template": "cca31f0a-2cc6-48f7-b836-866eba272dfa",
+            "templateValue": "s1.us-west.service.tld"
+          }
+        ],
         "links": {
           "self": "/chronograf/v1/sources/1/annotations/59434c1c-fa16-40e9-8b92-af71544cc3eb"
         }
       }
+    },
+    "AnnotationScopeItem": {
+      "type": "object",
+      "properties": [
+        {
+          "template": {
+            "type": "string",
+            "description": "The ID of a template variable"
+          },
+          "templateValue": {
+            "type": "string",
+            "description": "A template variable value"
+          }
+        }
+      ]
     },
     "UpdateAnnotationRequest": {
       "type": "object",
@@ -5732,13 +5776,26 @@
         "type": {
           "type": "string",
           "description": "A description of the type of annotation"
+        },
+        "scope": {
+          "type": "array",
+          "description": "A collection of template variables and template variable values that specify the scope for which an annotation applies",
+          "items": {
+            "$ref": "#/definitions/AnnotationScopeItem"
+          }
         }
       },
       "example": {
         "startTime": "2018-07-10T17:48:04.23Z",
         "endTime": "2018-07-10T17:48:08.652Z",
         "text": "new annotation text",
-        "type": ""
+        "type": "",
+        "scope": [
+          {
+            "template": "cca31f0a-2cc6-48f7-b836-866eba272dfa",
+            "templateValue": "s2.us-west.service.tld"
+          }
+        ]
       }
     }
   }
