@@ -187,7 +187,6 @@ class HostPage extends Component {
           handleChooseTimeRange={this.handleChooseTimeRange}
           handleClickPresentationButton={handleClickPresentationButton}
           dashboardLinks={this.dashboardLinks}
-          activeDashboardLink={this.activeDashboardLink}
         />
         <FancyScrollbar
           className={classnames({
@@ -205,28 +204,23 @@ class HostPage extends Component {
 
   get dashboardLinks() {
     const {
-      params: {sourceID},
+      params: {sourceID, hostID},
     } = this.props
     const {hosts} = this.state
 
     if (!sourceID || !hosts) {
-      return []
+      return {links: []}
     }
 
-    return Object.values(hosts).map(({name}) => ({
+    const links = Object.values(hosts).map(({name}) => ({
       key: name,
       text: name,
       to: `/sources/${sourceID}/hosts/${name}`,
     }))
-  }
 
-  get activeDashboardLink() {
-    const {
-      params: {hostID},
-    } = this.props
-    const {dashboardLinks} = this
+    const active = links.find(d => d.key === hostID)
 
-    return dashboardLinks.find(d => d.key === hostID)
+    return {active, links}
   }
 }
 
