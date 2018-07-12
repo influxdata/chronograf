@@ -7,7 +7,8 @@ import {
 
 import {LocalStorage} from 'src/types/localStorage'
 
-declare var VERSION: string
+// FIXME
+const VERSION = '2'
 
 export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
   try {

@@ -56,7 +56,7 @@ describe('Hosts.Containers.HostsPage', () => {
         process.nextTick(() => {
           wrapper.update()
           const hostsTable = wrapper.find(HostsTable)
-          expect(hostsTable.prop('hosts').length).toBe(1)
+          expect(hostsTable.prop('hosts')).toHaveLength(1)
           expect(getCpuAndLoadForHosts).toHaveBeenCalledTimes(2)
           done()
         })

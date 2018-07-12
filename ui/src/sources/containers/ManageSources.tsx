@@ -26,7 +26,7 @@ interface Props {
   setActiveKapacitor: actions.SetActiveKapacitorAsync
 }
 
-declare var VERSION: string
+const VERSION = '1' // TODO
 
 @ErrorHandling
 class ManageSources extends PureComponent<Props> {

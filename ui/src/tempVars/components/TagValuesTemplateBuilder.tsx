@@ -11,6 +11,7 @@ import parseShowTagValues from 'src/shared/parsing/showTagValues'
 import {fetchTagKeys} from 'src/tempVars/components/TagKeysTemplateBuilder'
 import TemplateMetaQueryPreview from 'src/tempVars/components/TemplateMetaQueryPreview'
 import DropdownLoadingPlaceholder from 'src/shared/components/DropdownLoadingPlaceholder'
+import {getDeep} from 'src/utils/wrappers'
 
 import {
   TemplateBuilderProps,
@@ -219,7 +220,7 @@ class KeysTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
       })
 
       const {tags} = parseShowTagValues(data)
-      const tagValues = _.get(Object.values(tags), 0, [])
+      const tagValues = getDeep<string[]>(Object.values(tags), 0, [])
 
       this.setState({tagValuesStatus: RemoteDataState.Done})
 

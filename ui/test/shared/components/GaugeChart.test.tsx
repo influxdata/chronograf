@@ -48,7 +48,7 @@ describe('GaugeChart', () => {
         const wrapper = setup()
 
         expect(wrapper.find(Gauge).exists()).toBe(true)
-        expect(wrapper.find(Gauge).props().gaugePosition).toBe(0)
+        expect(wrapper.find(Gauge).prop('gaugePosition')).toBe(0)
       })
     })
 
@@ -57,7 +57,7 @@ describe('GaugeChart', () => {
         const wrapper = setup({data})
 
         expect(wrapper.find(Gauge).exists()).toBe(true)
-        expect(wrapper.find(Gauge).props().gaugePosition).toBe(2)
+        expect(wrapper.find(Gauge).prop('gaugePosition')).toBe(2)
       })
     })
   })
