@@ -19,10 +19,18 @@
   border-bottom: 0;
   border-radius: $radius $radius 0 0;
   padding: 6px 8px;
-  transition: border-color 0.25s ease;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+
+  &:hover {
+    cursor: text;
+  }
 
   &.focus {
     border-color: $c-pool;
+  }
+
+  &.read-only {
+    background-color: $g3-castle;
   }
 }
 .query-editor--status {
@@ -76,48 +84,6 @@ button.btn.query-editor--submit {
 }
 
 /*
-  Old Textarea Styles
-  ------------------------------------------------------------------------------
-  Currently used in the CEO but intended to be replaced
-*/
-
-.query-editor--field {
-  font-family: $code-font;
-  font-size: 12px;
-  line-height: 14px;
-  font-weight: 600;
-  word-wrap: break-word;
-  word-break: break-all;
-  @include custom-scrollbar($query-editor--field-bg, $query-editor--field-text);
-  display: block;
-  resize: none;
-  width: 100%;
-  height: $query-editor--field-height;
-  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
-  border: 2px solid $query-editor--bg;
-  border-bottom: 0;
-  background-color: $query-editor--field-bg;
-  color: $query-editor--field-text;
-  padding: 12px 10px 0 10px;
-  border-radius: $radius $radius 0 0;
-  margin: 0;
-
-  &:hover,
-  &:hover + .query-editor--status {
-    border-color: $query-editor--bg;
-  }
-  &:focus {
-    outline: none;
-    color: $query-editor--field-text !important;
-    border-color: $c-pool;
-  }
-  &:focus + .varmoji {
-    border-color: $c-pool;
-  }
-}
-
-
-/*
   Varmoji Flipper
   ------------------------------------------------------------------------------
   Handles the 3D flip transition between two states (isTemplating)
@@ -132,9 +98,18 @@ button.btn.query-editor--submit {
   height: $query-editor--status-height;
   width: 100%;
   perspective: 1000px;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+
+  &:hover {
+    cursor: text;
+  }
 
   &.focus {
     border-color: $c-pool;
+  }
+
+  &.read-only {
+    background-color: $g3-castle;
   }
 }
 .varmoji-container {
@@ -177,6 +152,7 @@ button.btn.query-editor--submit {
   align-items: center;
   padding: 0 4px;
 }
+
 .template-drawer--item {
   margin-right: 2px;
   display: inline-block;
@@ -202,5 +178,44 @@ button.btn.query-editor--submit {
 
   .divider {
     background: linear-gradient(to right, #00C9FF 0%, #22ADF6 100%);
+  }
+}
+
+.query-editor--dismiss {
+  position: absolute;
+  z-index: 3;
+  top: -2px;
+  right: -2px;
+  width: 26px;
+  height: 26px;
+  outline: none;
+  border-radius: 50%;
+  background-color: $c-pool;
+  transition: background-color 0.25s ease;
+  border: 0;
+
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 3px;
+    top: 50%;
+    left: 50%;
+    border-radius: 1px;
+    background-color: $g20-white;
+  }
+
+  &:before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  &:after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  &:hover {
+    background-color: $c-laser;
+    cursor: pointer;
   }
 }

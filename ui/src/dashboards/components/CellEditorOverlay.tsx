@@ -468,12 +468,21 @@ class CellEditorOverlay extends Component<Props, State> {
           const isQuerySupportedByExplorer = !isUsingUserDefinedTempVars
 
           if (isUsingUserDefinedTempVars) {
-            return {...q, rawText: text, isQuerySupportedByExplorer}
+            return {
+              ...q,
+              rawText: text,
+              status: {loading: true},
+              isQuerySupportedByExplorer,
+            }
           }
 
+          // preserve query range and groupBy
           return {
             ...queryConfig,
+            status: {loading: true},
             rawText: text,
+            range: q.range,
+            groupBy: q.groupBy,
             source: q.source,
             isQuerySupportedByExplorer,
           }
