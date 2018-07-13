@@ -347,7 +347,26 @@ class LogsPage extends Component<Props, State> {
             colors={histogramColors}
             onBarClick={this.handleBarClick}
             sortBarGroups={this.handleSortHistogramBarGroups}
-          />
+          >
+            {({adjustedWidth, adjustedHeight, margins}) => {
+              const x = margins.left + adjustedWidth / 2
+              const y1 = margins.top
+              const y2 = margins.top + adjustedHeight
+
+              return (
+                <svg width={width} height={height}>
+                  <line
+                    x1={x}
+                    x2={x}
+                    y1={y1}
+                    y2={y2}
+                    stroke="#ff6b81"
+                    strokeWidth="2"
+                  />
+                </svg>
+              )
+            }}
+          </HistogramChart>
         )}
       </AutoSizer>
     )
