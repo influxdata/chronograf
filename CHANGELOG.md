@@ -8,6 +8,7 @@
 1.  [#3814](https://github.com/influxdata/chronograf/pull/3814): Add pprof routes to chronograf server
 1.  [#3806](https://github.com/influxdata/chronograf/pull/3806): Add API to get/update Log Viewer UI config
 1.  [#3896](https://github.com/influxdata/chronograf/pull/3896): Consume new Log Viewer config API in client to allow user to configure log viewer UI for their organization
+1.  [#3842](https://github.com/influxdata/chronograf/pull/3842): Add v2 cells API
 
 ### UI Improvements
 
