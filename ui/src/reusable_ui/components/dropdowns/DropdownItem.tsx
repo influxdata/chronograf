@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, {Component} from 'react'
 import classnames from 'classnames'
 
@@ -57,5 +58,23 @@ class DropdownItem extends Component<Props> {
     }
   }
 }
+=======
+import React, {SFC} from 'react'
+import {DropdownContext} from 'src/reusable_ui/components/dropdowns/Dropdown'
+
+interface Props {
+  text: string
+}
+
+const DropdownItem: SFC<Props> = ({text}) => (
+  <DropdownContext.Consumer>
+    {({onClick}) => (
+      <div className="dropdown--menu-item" onClick={onClick(text)}>
+        {text}
+      </div>
+    )}
+  </DropdownContext.Consumer>
+)
+>>>>>>> WIP Introduce new components for dropdowns
 
 export default DropdownItem
