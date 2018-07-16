@@ -4,6 +4,7 @@ import {withRouter, Link} from 'react-router'
 import {connect} from 'react-redux'
 
 import Authorized, {ADMIN_ROLE} from 'src/auth/Authorized'
+import FeatureFlag from 'src/shared/components/FeatureFlag'
 
 import UserNavBlock from 'src/side_nav/components/UserNavBlock'
 
@@ -84,14 +85,16 @@ class SideNav extends PureComponent<Props> {
         >
           <NavHeader link={dataExplorerLink} title="Data Explorer" />
         </NavBlock>
-        <NavBlock
-          highlightWhen={['delorean']}
-          icon="capacitor2"
-          link={`${sourcePrefix}/delorean`}
-          location={location}
-        >
-          <NavHeader link={`${sourcePrefix}/delorean`} title="Flux Editor" />
-        </NavBlock>
+        <FeatureFlag name="flux-builder">
+          <NavBlock
+            highlightWhen={['delorean']}
+            icon="capacitor2"
+            link={`${sourcePrefix}/delorean`}
+            location={location}
+          >
+            <NavHeader link={`${sourcePrefix}/delorean`} title="Flux Editor" />
+          </NavBlock>
+        </FeatureFlag>
         <NavBlock
           highlightWhen={['dashboards']}
           icon="dash-j"
