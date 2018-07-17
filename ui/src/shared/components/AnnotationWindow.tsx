@@ -5,7 +5,7 @@ import {
   DYGRAPH_CONTAINER_V_MARGIN,
   DYGRAPH_CONTAINER_XLABEL_MARGIN,
 } from 'src/shared/constants'
-import {AnnotationInterface, DygraphClass} from 'src/types'
+import {Annotation, DygraphClass} from 'src/types'
 
 interface WindowDimensionsReturn {
   left: string
@@ -14,7 +14,7 @@ interface WindowDimensionsReturn {
 }
 
 const windowDimensions = (
-  anno: AnnotationInterface,
+  anno: Annotation,
   dygraph: DygraphClass,
   staticLegendHeight: number
 ): WindowDimensionsReturn => {
@@ -44,7 +44,7 @@ const windowDimensions = (
 }
 
 interface AnnotationWindowProps {
-  annotation: AnnotationInterface
+  annotation: Annotation
   dygraph: DygraphClass
   active: boolean
   staticLegendHeight: number

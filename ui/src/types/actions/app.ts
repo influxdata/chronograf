@@ -12,7 +12,6 @@ export type Action =
   | EnablePresentationModeAction
   | DisablePresentationModeAction
   | SetAutoRefreshAction
-  | TemplateControlBarVisibilityToggledAction
 
 export type EnablePresentationModeActionCreator = () => EnablePresentationModeAction
 
@@ -39,10 +38,4 @@ export interface SetAutoRefreshAction {
   payload: {
     milliseconds: number
   }
-}
-
-export type TemplateControlBarVisibilityToggledActionCreator = () => TemplateControlBarVisibilityToggledAction
-
-export interface TemplateControlBarVisibilityToggledAction {
-  type: ActionTypes.TemplateControlBarVisibilityToggled
 }

@@ -29,8 +29,10 @@ interface Props {
   onManualRefresh: () => void
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   onAddCell: () => void
-  onToggleTempVarControls: () => void
-  showTemplateControlBar: boolean
+  showTempVarControls?: boolean
+  onToggleShowTempVarControls?: () => void
+  showAnnotationControls: boolean
+  onToggleShowAnnotationControls?: () => void
   zoomedTimeRange: QueriesModels.TimeRange
   onRenameDashboard: (name: string) => Promise<void>
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
@@ -109,7 +111,7 @@ class DashboardHeader extends Component<Props, State> {
       <>
         <GraphTips />
         {this.addCellButton}
-        {this.tempVarsButton}
+        {this.toolButtons}
         <AutoRefreshDropdown
           onChoose={handleChooseAutoRefresh}
           onManualRefresh={onManualRefresh}
@@ -159,23 +161,35 @@ class DashboardHeader extends Component<Props, State> {
     }
   }
 
-  private get tempVarsButton(): JSX.Element {
+  private get toolButtons(): JSX.Element {
     const {
       dashboard,
-      showTemplateControlBar,
-      onToggleTempVarControls,
+      showTempVarControls,
+      onToggleShowTempVarControls,
+      showAnnotationControls,
+      onToggleShowAnnotationControls,
     } = this.props
 
     if (dashboard) {
       return (
-        <div
-          className={classnames('btn btn-default btn-sm', {
-            active: showTemplateControlBar,
-          })}
-          onClick={onToggleTempVarControls}
-        >
-          <span className="icon cube" />Template Variables
-        </div>
+        <>
+          <div
+            className={classnames('btn btn-default btn-sm', {
+              active: showTempVarControls,
+            })}
+            onClick={onToggleShowTempVarControls}
+          >
+            <span className="icon cube" />Template Variables
+          </div>
+          <div
+            className={classnames('btn btn-default btn-sm', {
+              active: showAnnotationControls,
+            })}
+            onClick={onToggleShowAnnotationControls}
+          >
+            <span className="icon pencil" />Annotations
+          </div>
+        </>
       )
     }
   }
