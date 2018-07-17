@@ -8,6 +8,7 @@ import {
   COLOR_TYPE_MAX,
   MIN_THRESHOLDS,
 } from 'src/shared/constants/thresholds'
+import {MAX_TOLOCALESTRING_VAL} from 'src/dashboards/constants'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -66,8 +67,8 @@ class Gauge extends Component<Props> {
     this.resetCanvas(canvas, ctx)
 
     const centerX = canvas.width / 2
-    const centerY = (canvas.height / 2) * 1.13
-    const radius = (Math.min(canvas.width, canvas.height) / 2) * 0.5
+    const centerY = canvas.height / 2 * 1.13
+    const radius = Math.min(canvas.width, canvas.height) / 2 * 0.5
 
     const {minLineWidth, minFontSize} = GAUGE_SPECS
     const gradientThickness = Math.max(minLineWidth, radius / 4)
@@ -178,15 +179,17 @@ class Gauge extends Component<Props> {
       lineStrokeLarge,
       tickSizeSmall,
       tickSizeLarge,
+      smallLineCount,
     } = GAUGE_SPECS
 
     const arcStart = Math.PI * 0.75
     const arcLength = Math.PI * 1.5
     const arcStop = arcStart + arcLength
-    const lineSmallCount = lineCount * 5
+    const totalSmallLineCount = lineCount * smallLineCount
+
     const startDegree = degree * 135
     const arcLargeIncrement = arcLength / lineCount
-    const arcSmallIncrement = arcLength / lineSmallCount
+    const arcSmallIncrement = arcLength / totalSmallLineCount
 
     // Semi-circle
     const arcRadius = radius + gradientThickness * 0.8
@@ -221,7 +224,7 @@ class Gauge extends Component<Props> {
     }
 
     // Draw Small ticks
-    for (let lt = 0; lt <= lineSmallCount; lt++) {
+    for (let lt = 0; lt <= totalSmallLineCount; lt++) {
       // Rototion before drawing line
       ctx.rotate(startDegree)
       ctx.rotate(lt * arcSmallIncrement)
@@ -254,11 +257,11 @@ class Gauge extends Component<Props> {
 
     const gaugeValues = []
     for (let g = minValue; g < maxValue; g += incrementValue) {
-      const valueString = this.toDisplayString(g)
+      const valueString = this.labelToString(g)
       gaugeValues.push(valueString)
     }
 
-    gaugeValues.push(this.toDisplayString(maxValue))
+    gaugeValues.push(this.labelToString(maxValue))
 
     const startDegree = degree * 135
     const arcLength = Math.PI * 1.5
@@ -306,26 +309,50 @@ class Gauge extends Component<Props> {
     ctx.textBaseline = 'middle'
     ctx.textAlign = 'center'
 
-    const valueString = this.toDisplayString(gaugePosition)
+    const valueString = this.valueToString(gaugePosition)
 
     const textY = radius
     const textContent = `${prefix}${valueString}${suffix}`
     ctx.fillText(textContent, 0, textY)
   }
 
-  private toDisplayString(value: number): string {
+  private labelToString(value: number): string {
     const {decimalPlaces} = this.props
 
     let valueString
 
     if (decimalPlaces.isEnforced) {
+      const digits = Math.min(decimalPlaces.digits, MAX_TOLOCALESTRING_VAL)
       valueString = value.toLocaleString(undefined, {
-        minimumFractionDigits: decimalPlaces.digits,
-        maximumFractionDigits: decimalPlaces.digits,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: digits,
       })
     } else {
-      const roundedValue = Math.round(value * 100) / 100
-      valueString = roundedValue.toLocaleString()
+      valueString = value.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: MAX_TOLOCALESTRING_VAL,
+      })
+    }
+
+    return valueString
+  }
+
+  private valueToString(value: number): string {
+    const {decimalPlaces} = this.props
+
+    let valueString
+
+    if (decimalPlaces.isEnforced) {
+      const digits = Math.min(decimalPlaces.digits, MAX_TOLOCALESTRING_VAL)
+      valueString = value.toLocaleString(undefined, {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+      })
+    } else {
+      valueString = value.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: MAX_TOLOCALESTRING_VAL,
+      })
     }
 
     return valueString
