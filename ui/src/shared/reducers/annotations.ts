@@ -1,24 +1,44 @@
-import {ADDING, EDITING, TEMP_ANNOTATION} from 'src/shared/annotations/helpers'
+import {
+  ADDING,
+  EDITING,
+  DEFAULT_ANNOTATION,
+} from 'src/shared/annotations/helpers'
 
-import {Action} from 'src/types/actions/annotations'
-import {AnnotationInterface} from 'src/types'
+import {Action} from 'src/shared/actions/annotations'
+import {Annotation, TagFilter} from 'src/types/annotations'
 
 export interface AnnotationState {
+  annotations: {
+    [annotationId: string]: Annotation
+  }
   mode: string
   isTempHovering: boolean
-  annotations: AnnotationInterface[]
+  editingAnnotation?: string
+  addingAnnotation?: Annotation
+  tagKeys?: string[]
+  tagValues: {
+    [tagKey: string]: string[]
+  }
+  tagFilters: {
+    [dashboardID: number]: {
+      [tagFilterID: string]: TagFilter
+    }
+  }
 }
 
 const initialState = {
   mode: null,
   isTempHovering: false,
-  annotations: [],
+  annotations: {},
+  tagKeys: null,
+  tagValues: {},
+  tagFilters: {},
 }
 
 const annotationsReducer = (
   state: AnnotationState = initialState,
   action: Action
-) => {
+): AnnotationState => {
   switch (action.type) {
     case 'EDITING_ANNOTATION': {
       return {
@@ -35,15 +55,11 @@ const annotationsReducer = (
     }
 
     case 'ADDING_ANNOTATION': {
-      const annotations = state.annotations.filter(
-        a => a.id !== TEMP_ANNOTATION.id
-      )
-
       return {
         ...state,
         mode: ADDING,
         isTempHovering: true,
-        annotations: [...annotations, TEMP_ANNOTATION],
+        addingAnnotation: DEFAULT_ANNOTATION(),
       }
     }
 
@@ -56,15 +72,11 @@ const annotationsReducer = (
     }
 
     case 'DISMISS_ADDING_ANNOTATION': {
-      const annotations = state.annotations.filter(
-        a => a.id !== TEMP_ANNOTATION.id
-      )
-
       return {
         ...state,
         isTempHovering: false,
         mode: null,
-        annotations,
+        addingAnnotation: null,
       }
     }
 
@@ -86,8 +98,14 @@ const annotationsReducer = (
       return newState
     }
 
-    case 'LOAD_ANNOTATIONS': {
-      const {annotations} = action.payload
+    case 'SET_ANNOTATIONS': {
+      const annotations = action.payload.annotations.reduce(
+        (acc, a) => ({
+          ...acc,
+          [a.id]: a,
+        }),
+        {}
+      )
 
       return {
         ...state,
@@ -97,33 +115,101 @@ const annotationsReducer = (
 
     case 'UPDATE_ANNOTATION': {
       const {annotation} = action.payload
-      const annotations = state.annotations.map(
-        a => (a.id === annotation.id ? annotation : a)
-      )
 
       return {
         ...state,
-        annotations,
+        annotations: {
+          ...state.annotations,
+          [annotation.id]: annotation,
+        },
+      }
+    }
+
+    case 'SET_ADDING_ANNOTATION': {
+      return {
+        ...state,
+        addingAnnotation: action.payload,
       }
     }
 
     case 'DELETE_ANNOTATION': {
       const {annotation} = action.payload
-      const annotations = state.annotations.filter(a => a.id !== annotation.id)
 
       return {
         ...state,
-        annotations,
+        annotations: {
+          ...state.annotations,
+          [annotation.id]: null,
+        },
       }
     }
 
     case 'ADD_ANNOTATION': {
       const {annotation} = action.payload
-      const annotations = [...state.annotations, annotation]
 
       return {
         ...state,
-        annotations,
+        annotations: {
+          ...state.annotations,
+          [annotation.id]: annotation,
+        },
+      }
+    }
+
+    case 'SET_EDITING_ANNOTATION': {
+      return {
+        ...state,
+        editingAnnotation: action.payload,
+      }
+    }
+
+    case 'UPDATE_TAG_FILTER': {
+      const {tagFilter, dashboardID} = action.payload
+      const dashboardTagFilters = state.tagFilters[dashboardID] || {}
+
+      return {
+        ...state,
+        tagFilters: {
+          [dashboardID]: {
+            ...dashboardTagFilters,
+            [tagFilter.id]: tagFilter,
+          },
+        },
+      }
+    }
+
+    case 'DELETE_TAG_FILTER': {
+      const {tagFilter, dashboardID} = action.payload
+      const dashboardTagFilters = state.tagFilters[dashboardID] || {}
+
+      return {
+        ...state,
+        tagFilters: {
+          ...state.tagFilters,
+          [dashboardID]: {
+            ...dashboardTagFilters,
+            [tagFilter.id]: null,
+          },
+        },
+      }
+    }
+
+    case 'SET_TAG_KEYS': {
+      return {
+        ...state,
+        tagKeys: action.payload,
+      }
+    }
+
+    case 'SET_TAG_VALUES': {
+      const {tagKey, tagValues} = action.payload
+
+      return {
+        ...state,
+        tagValues: {
+          ...state.tagValues,
+          [tagKey]: tagValues,
+        },
       }
     }
   }

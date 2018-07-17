@@ -3,7 +3,6 @@ import {
   enablePresentationMode,
   disablePresentationMode,
   setAutoRefresh,
-  templateControlBarVisibilityToggled,
 } from 'src/shared/actions/app'
 
 describe('Shared.Reducers.appReducer', () => {
@@ -13,7 +12,6 @@ describe('Shared.Reducers.appReducer', () => {
     },
     persisted: {
       autoRefresh: 0,
-      showTemplateControlBar: false,
     },
   }
 
@@ -37,18 +35,5 @@ describe('Shared.Reducers.appReducer', () => {
     const reducedState = appReducer(initialState, setAutoRefresh(expectedMs))
 
     expect(reducedState.persisted.autoRefresh).toBe(expectedMs)
-  })
-
-  it('should handle TEMPLATE_CONTROL_BAR_VISIBILITY_TOGGLED', () => {
-    const reducedState = appReducer(
-      initialState,
-      templateControlBarVisibilityToggled()
-    )
-
-    const expectedTestState = !reducedState.persisted.showTemplateControlBar
-
-    expect(initialState.persisted.showTemplateControlBar).toBe(
-      expectedTestState
-    )
   })
 })

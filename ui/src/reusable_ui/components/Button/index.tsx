@@ -14,7 +14,7 @@ import {
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
-  text: string
+  text?: string
   onClick?: () => void
   color?: ComponentColor
   size?: ComponentSize

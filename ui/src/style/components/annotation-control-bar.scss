@@ -1,0 +1,133 @@
+.annotation-control-bar {
+  background: $g3-castle;
+  height: 64px;
+  display: flex;
+  padding: 8px 60px;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $g2-kevlar;
+  color: $g11-sidewalk;
+  font-size: 14px;
+  font-weight: 500;
+  @include no-user-select();
+
+  .annotation-filter-control {
+    margin-right: 10px;
+  }
+}
+
+.annotation-control-bar--lhs {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-flow: wrap;
+}
+
+
+.toolbar-title {
+  display: block;
+  margin-right: 15px;
+  color: $g11-sidewalk;
+  font-size: 14px;
+  font-weight: bold;
+  @include no-user-select();
+}
+
+.annotation-filter-control {
+  display: flex;
+  align-items: center;
+  background-color: $g4-onyx;
+  padding: 4px 5px;
+  border-radius: 4px;
+  text-shadow: none;
+  border-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+
+  .annotation-filter-control--tag-key, 
+  .annotation-filter-control--tag-value {
+    color: $g16-pearl;
+    width: 90px;
+    display: flex;
+
+    .suggestion-input--input {
+      height: 24px;
+    }
+  }
+  
+
+  .suggestion-input--suggestions {
+    margin-left: 2px;
+    width: calc(100% - 3px);
+  }
+
+  button {
+    margin: 0 4px;
+    font-family: $code-font;
+    letter-spacing: -1px;
+  }
+
+  button:last-child {
+    margin-right: 0;
+    padding-right: 1px;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.annotation-filter-control--loading {
+  border: 2px solid $g8-storm;
+  border-top: 2px solid $g16-pearl;
+  border-radius: 50%;
+  width: 13px;
+  height: 13px;
+  margin: 0 3.5px 0 6.5px;
+  animation: spin 1s linear infinite;
+}
+
+.suggestion-input {
+  position: relative;
+  overflow: visible;
+  font-family: $code-font;
+}
+
+.suggestion-input .form-control.suggestion-input--input {
+  font-family: $code-font;
+  font-size: 12px;
+}
+
+.suggestion-input--suggestions {
+  position: absolute;
+  top: calc(100% + 2px);
+  width: 100%;
+  max-height: 250px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px 0.6px fade-out($g0-obsidian, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+  @include gradient-h($dropdown-purple-dark,$dropdown-purple-bg);
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.suggestion-input-suggestion {
+  padding: 5px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &:hover,
+  &.selected:hover {
+    @include gradient-h($dropdown-purple-hover,$dropdown-purple-bg);
+  }
+
+  &:active, &.selected {
+      @include gradient-h($dropdown-purple-press,$dropdown-purple-bg);
+  }
+}
