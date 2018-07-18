@@ -222,12 +222,15 @@ export async function hydrateTemplate(
     selections = {},
   }: HydrateTemplateOptions
 ): Promise<Template> {
-  if (!template.query || !template.query.influxql) {
-    return Promise.resolve(template)
-  }
+  let values
 
-  const query = templateReplace(templateInternalReplace(template), templates)
-  const values = await fetcher.fetch(query)
+  if (template.query && template.query.influxql) {
+    const query = templateReplace(templateInternalReplace(template), templates)
+
+    values = await fetcher.fetch(query)
+  } else {
+    values = template.values.map(v => v.value)
+  }
 
   const templateValues = newTemplateValues(
     template,
