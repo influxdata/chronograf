@@ -1,11 +1,16 @@
 import React, {SFC} from 'react'
+import classnames from 'classnames'
 
 interface Props {
-  text: string
+  text?: string
 }
 
 const DropdownDivider: SFC<Props> = ({text}) => (
-  <div className="dropdown--menu-divider">{text}</div>
+  <div className={classnames('dropdown--divider', {line: !text})}>{text}</div>
 )
+
+DropdownDivider.defaultProps = {
+  text: '',
+}
 
 export default DropdownDivider

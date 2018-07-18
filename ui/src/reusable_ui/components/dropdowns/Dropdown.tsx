@@ -1,24 +1,26 @@
-import React, {Component} from 'react'
+import React, {Component, CSSProperties} from 'react'
 import classnames from 'classnames'
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import {ComponentColor, ComponentSize, IconFont} from 'src/reusable_ui/types'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import './Dropdown.scss'
 
 interface Props {
   color?: ComponentColor
   size?: ComponentSize
   disabled?: boolean
-  children: JSX.Element
+  children: JSX.Element[]
   width?: number
   icon?: IconFont
-  selectedItems: string
+  wrapText?: boolean
+  selectedItem: string
+  onChange: (text: string) => void
 }
 
 interface State {
   expanded: boolean
 }
-
-export const DropdownContext = React.createContext()
 
 @ErrorHandling
 class Dropdown extends Component<Props, State> {
@@ -27,7 +29,10 @@ class Dropdown extends Component<Props, State> {
     size: ComponentSize.Small,
     disabled: false,
     width: 120,
+    wrapText: false,
   }
+
+  private containerRef: HTMLElement
 
   constructor(props: Props) {
     super(props)
@@ -42,18 +47,20 @@ class Dropdown extends Component<Props, State> {
 
     return (
       <ClickOutside onClickOutside={this.collapseMenu}>
-        <DropdownContext.Provider value={width}>
-          <div className={this.containerClassName} style={{width}}>
-            {this.button}
-            {this.menu}
-          </div>
-        </DropdownContext.Provider>
+        <div
+          className={this.containerClassName}
+          style={{width}}
+          ref={el => (this.containerRef = el)}
+        >
+          {this.button}
+          {this.menu}
+        </div>
       </ClickOutside>
     )
   }
 
-  private expandMenu = (): void => {
-    this.setState({expanded: true})
+  private toggleMenu = (): void => {
+    this.setState({expanded: !this.state.expanded})
   }
 
   private collapseMenu = (): void => {
@@ -61,23 +68,31 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get containerClassName(): string {
-    const {color, size, disabled} = this.props
+    const {color, size, disabled, wrapText} = this.props
 
-    return classnames(`dropdown dropdown-${size} dropdown-${color}`, {disabled})
+    return classnames(`dropdown dropdown-${size} dropdown-${color}`, {
+      disabled,
+      'dropdown-wrap': wrapText,
+    })
   }
 
   private get button(): JSX.Element {
-    const {selectedItems, disabled, color, size} = this.props
+    const {selectedItem, disabled, color, size} = this.props
+    const {expanded} = this.state
+
     const className = classnames(
-      `dropdown-button btn btn-${color} btn-${size}`,
-      {disabled}
+      `dropdown--button btn btn-${color} btn-${size}`,
+      {
+        disabled,
+        active: expanded,
+      }
     )
 
     return (
-      <div className={className} onClick={this.expandMenu}>
+      <div className={className} onClick={this.toggleMenu}>
         {this.icon}
-        <span className="dropdown--selected">{selectedItems}</span>
-        <span className="dropdown--caret" />
+        <span className="dropdown--selected">{selectedItem}</span>
+        <span className="dropdown--caret icon caret-down" />
       </div>
     )
   }
@@ -86,21 +101,60 @@ class Dropdown extends Component<Props, State> {
     const {icon} = this.props
 
     if (icon) {
-      return <span className={`icon ${icon}`} />
+      return <span className={`dropdown--icon icon ${icon}`} />
     }
 
     return null
   }
 
   private get menu(): JSX.Element {
-    const {children} = this.props
+    const {children, selectedItem} = this.props
     const {expanded} = this.state
 
     if (expanded) {
-      return <div className="dropdown--menu">{children}</div>
+      return (
+        <div className="dropdown--menu-container" style={this.menuStyle}>
+          <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={240}>
+            <div className="dropdown--menu">
+              {React.Children.map(children, (child: JSX.Element) =>
+                React.cloneElement(child, {
+                  ...child.props,
+                  selected: child.props.text === selectedItem,
+                  onClick: this.handleItemClick(child.props.text),
+                })
+              )}
+            </div>
+          </FancyScrollbar>
+        </div>
+      )
     }
 
     return null
+  }
+
+  private get menuStyle(): CSSProperties {
+    const {wrapText} = this.props
+    const {width, top, height, left} = this.containerRef.getBoundingClientRect()
+
+    if (wrapText) {
+      return {
+        top: `${top + height}px`,
+        left: `${left}px`,
+        width: `${width}px`,
+      }
+    }
+
+    return {
+      top: `${top + height}px`,
+      left: `${left}px`,
+      minWidth: `${width}px`,
+    }
+  }
+
+  private handleItemClick = (text: string) => () => {
+    const {onChange} = this.props
+    onChange(text)
+    this.collapseMenu()
   }
 }
 
