@@ -4,20 +4,10 @@ export interface AutoRefreshOption {
 }
 
 export const autoRefreshOptions: AutoRefreshOption[] = [
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Cleanup formatting
   {
     milliseconds: 0,
     text: 'Paused',
   },
-<<<<<<< HEAD
-=======
-  {milliseconds: 0, text: 'Paused'},
->>>>>>> Organize component into folder
-=======
->>>>>>> Cleanup formatting
   {
     milliseconds: 5000,
     text: 'Every 5s',

@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 import React, {Component} from 'react'
 import classnames from 'classnames'
 
@@ -9,7 +7,6 @@ interface Props {
   checkbox?: boolean
   onClick?: (value: any) => void
   value: any
-<<<<<<< HEAD
 }
 
 class DropdownItem extends Component<Props> {
@@ -60,77 +57,5 @@ class DropdownItem extends Component<Props> {
     }
   }
 }
-=======
-import React, {SFC} from 'react'
-import {DropdownContext} from 'src/reusable_ui/components/dropdowns/Dropdown'
-=======
-import React, {Component} from 'react'
-import classnames from 'classnames'
->>>>>>> WIP use wrapper and children for configuring dropdowns
-
-interface Props {
-  text: string
-  selected?: boolean
-  checkbox?: boolean
-  onClick?: () => void
-=======
->>>>>>> Require a value prop on each item and return that on click
-}
-
-class DropdownItem extends Component<Props> {
-  public static defaultProps = {
-    checkbox: false,
-    selected: false,
-  }
-
-  public render() {
-    const {text, selected, checkbox} = this.props
-
-    return (
-      <div
-        className={classnames('dropdown--item', {
-          active: selected,
-          'multi-select--item': checkbox,
-        })}
-        onClick={this.handleClick}
-      >
-        {this.checkBox}
-        {this.dot}
-        {text}
-      </div>
-<<<<<<< HEAD
-    )}
-  </DropdownContext.Consumer>
-)
->>>>>>> WIP Introduce new components for dropdowns
-=======
-    )
-  }
-
-  private handleClick = () => {
-    const {onClick, value} = this.props
-
-    onClick(value)
-  }
-
-  private get checkBox(): JSX.Element {
-    const {checkbox} = this.props
-
-    if (checkbox) {
-      return <div className="dropdown-item--checkbox" />
-    }
-
-    return null
-  }
-
-  private get dot(): JSX.Element {
-    const {checkbox, selected} = this.props
-
-    if (selected && !checkbox) {
-      return <div className="dropdown-item--dot" />
-    }
-  }
-}
->>>>>>> WIP use wrapper and children for configuring dropdowns
 
 export default DropdownItem
