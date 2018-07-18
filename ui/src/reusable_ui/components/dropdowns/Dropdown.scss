@@ -94,7 +94,10 @@ span.icon.dropdown--caret {
 .dropdown--item {
   padding: 6px 11px;
   font-size: 12px;
+<<<<<<< HEAD
   line-height: 12px;
+=======
+>>>>>>> WIP use wrapper and children for configuring dropdowns
   font-weight: 600;
   color: fade-out($g20-white, 0.18);
   white-space: nowrap;
@@ -152,6 +155,7 @@ span.icon.dropdown--caret {
   left: 11px;
   top: 50%;
   transform: translateY(-50%);
+<<<<<<< HEAD
   width: 12px;
   height: 12px;
   border-radius: 3px;
@@ -167,12 +171,33 @@ span.icon.dropdown--caret {
     height: 6px;
     opacity: 0;
     transform: translate(-50%,-50%) scale(1.5,1.5);
+=======
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:after {
+    content: '';
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    opacity: 0;
+    transform: scale(1.5,1.5);
+>>>>>>> WIP use wrapper and children for configuring dropdowns
     transition: transform 0.25s ease, opacity 0.25s ease;
   }
 
   .active &:after {
     opacity: 1;
+<<<<<<< HEAD
     transform: translate(-50%,-50%) scale(1,1);
+=======
+    transform: scale(1,1);
+>>>>>>> WIP use wrapper and children for configuring dropdowns
   }
 }
 
