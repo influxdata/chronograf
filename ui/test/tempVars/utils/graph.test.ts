@@ -3,6 +3,7 @@ import {
   graphFromTemplates,
   hydrateTemplates,
   newTemplateValues,
+  newConstantTemplateValues,
   topologicalSort,
 } from 'src/tempVars/utils/graph'
 
@@ -472,6 +473,180 @@ describe('newTemplateValues', () => {
         localSelected: false,
       },
     ])
+  })
+})
+
+describe('newConstantTemplateValues', () => {
+  test('maintains current selections for Map template variables', () => {
+    const template = {
+      id: '',
+      label: '',
+      query: {},
+      tempVar: ':a:',
+      type: TemplateType.Map,
+      values: [
+        {
+          type: TemplateValueType.Map,
+          key: 'k1',
+          value: 'v1',
+          selected: true,
+          localSelected: false,
+        },
+        {
+          type: TemplateValueType.Map,
+          key: 'k2',
+          value: 'v2',
+          selected: false,
+          localSelected: true,
+        },
+      ],
+    }
+
+    const expected = [
+      {
+        type: TemplateValueType.Map,
+        key: 'k1',
+        value: 'v1',
+        selected: true,
+        localSelected: false,
+      },
+      {
+        type: TemplateValueType.Map,
+        key: 'k2',
+        value: 'v2',
+        selected: false,
+        localSelected: true,
+      },
+    ]
+
+    expect(newConstantTemplateValues(template)).toEqual(expected)
+  })
+
+  test('maintains current selections for CSV template variables', () => {
+    const template = {
+      id: '',
+      label: '',
+      query: {},
+      tempVar: ':a:',
+      type: TemplateType.CSV,
+      values: [
+        {
+          type: TemplateValueType.CSV,
+          value: 'v1',
+          selected: true,
+          localSelected: false,
+        },
+        {
+          type: TemplateValueType.CSV,
+          value: 'v2',
+          selected: false,
+          localSelected: true,
+        },
+      ],
+    }
+
+    const expected = [
+      {
+        type: TemplateValueType.CSV,
+        value: 'v1',
+        selected: true,
+        localSelected: false,
+      },
+      {
+        type: TemplateValueType.CSV,
+        value: 'v2',
+        selected: false,
+        localSelected: true,
+      },
+    ]
+
+    expect(newConstantTemplateValues(template)).toEqual(expected)
+  })
+
+  test('applies a selected value for Map template variables', () => {
+    const template = {
+      id: '',
+      label: '',
+      query: {},
+      tempVar: ':a:',
+      type: TemplateType.Map,
+      values: [
+        {
+          type: TemplateValueType.Map,
+          key: 'k1',
+          value: 'v1',
+          selected: true,
+          localSelected: false,
+        },
+        {
+          type: TemplateValueType.Map,
+          key: 'k2',
+          value: 'v2',
+          selected: false,
+          localSelected: true,
+        },
+      ],
+    }
+
+    const expected = [
+      {
+        type: TemplateValueType.Map,
+        key: 'k1',
+        value: 'v1',
+        selected: true,
+        localSelected: true,
+      },
+      {
+        type: TemplateValueType.Map,
+        key: 'k2',
+        value: 'v2',
+        selected: false,
+        localSelected: false,
+      },
+    ]
+
+    expect(newConstantTemplateValues(template, 'k1')).toEqual(expected)
+  })
+
+  test('applies a selected value for CSV template variables', () => {
+    const template = {
+      id: '',
+      label: '',
+      query: {},
+      tempVar: ':a:',
+      type: TemplateType.CSV,
+      values: [
+        {
+          type: TemplateValueType.CSV,
+          value: 'v1',
+          selected: true,
+          localSelected: false,
+        },
+        {
+          type: TemplateValueType.CSV,
+          value: 'v2',
+          selected: false,
+          localSelected: true,
+        },
+      ],
+    }
+
+    const expected = [
+      {
+        type: TemplateValueType.CSV,
+        value: 'v1',
+        selected: true,
+        localSelected: true,
+      },
+      {
+        type: TemplateValueType.CSV,
+        value: 'v2',
+        selected: false,
+        localSelected: false,
+      },
+    ]
+
+    expect(newConstantTemplateValues(template, 'v1')).toEqual(expected)
   })
 })
 
