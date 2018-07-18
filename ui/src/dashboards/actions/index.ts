@@ -14,14 +14,13 @@ import {
   createDashboard as createDashboardAJAX,
 } from 'src/dashboards/apis'
 import {getMe} from 'src/shared/apis/auth'
-import {hydrateTemplate, isTemplateNested} from 'src/tempVars/apis'
+import {hydrateTemplates} from 'src/tempVars/utils/graph'
 
 import {notify} from 'src/shared/actions/notifications'
 import {errorThrown} from 'src/shared/actions/errors'
 import {stripPrefix} from 'src/utils/basepath'
 
 import {
-  applyLocalSelections,
   templateSelectionsFromQueryParams,
   templateSelectionsFromTemplates,
 } from 'src/dashboards/utils/tempVars'
@@ -40,7 +39,6 @@ import {
   notifyDashboardNotFound,
   notifyInvalidZoomedTimeRangeValueInURLQuery,
   notifyInvalidTimeRangeValueInURLQuery,
-  notifyInvalidTempVarValueInMetaQuery,
 } from 'src/shared/copy/notifications'
 
 import {getDeep} from 'src/utils/wrappers'
@@ -659,29 +657,6 @@ const updateTimeRangeFromQueryParams = (dashboardID: number) => (
   dispatch(updateQueryParams(updatedQueryParams))
 }
 
-const hydrateTemplates = (
-  templates: Template[],
-  nonNestedTemplates: Template[],
-  proxyLink: string,
-  dispatch: Dispatch<Action>
-) => {
-  const hydratedTemplates = templates.map(async t => {
-    try {
-      return await hydrateTemplate(proxyLink, t, nonNestedTemplates)
-    } catch (error) {
-      const errorMessage = getDeep(error, 'data.message', '')
-        .replace(/.*(err):/g, '')
-        .trim()
-
-      dispatch(
-        notify(notifyInvalidTempVarValueInMetaQuery(t.tempVar, errorMessage))
-      )
-    }
-  })
-
-  return Promise.all(hydratedTemplates)
-}
-
 export const getDashboardWithTemplatesAsync = (
   dashboardId: number,
   source: Source
@@ -698,27 +673,10 @@ export const getDashboardWithTemplatesAsync = (
     return
   }
 
-  const templateSelections = templateSelectionsFromQueryParams()
-  const proxyLink = source.links.proxy
-  const nonNestedTemplates = await hydrateTemplates(
-    dashboard.templates.filter(t => !isTemplateNested(t)),
-    [],
-    proxyLink,
-    dispatch
-  )
-
-  applyLocalSelections(nonNestedTemplates, templateSelections)
-
-  const nestedTemplates = await hydrateTemplates(
-    dashboard.templates.filter(t => isTemplateNested(t)),
-    nonNestedTemplates,
-    proxyLink,
-    dispatch
-  )
-
-  applyLocalSelections(nestedTemplates, templateSelections)
-
-  const templates = [...nonNestedTemplates, ...nestedTemplates]
+  const templates = await hydrateTemplates(dashboard.templates, {
+    proxyUrl: source.links.proxy,
+    selections: templateSelectionsFromQueryParams(),
+  })
 
   // TODO: Notify if any of the supplied query params were invalid
   dispatch(loadDashboard({...dashboard, templates}))
@@ -726,24 +684,17 @@ export const getDashboardWithTemplatesAsync = (
   dispatch(updateTimeRangeFromQueryParams(dashboardId))
 }
 
-export const rehydrateNestedTemplatesAsync = (
+export const rehydrateTemplatesAsync = (
   dashboardId: number,
   source: Source
 ) => async (dispatch, getState): Promise<void> => {
   const dashboard = getDashboard(getState(), dashboardId)
-  const proxyLink = source.links.proxy
-  const templateSelections = templateSelectionsFromQueryParams()
 
-  const nestedTemplates = await hydrateTemplates(
-    dashboard.templates.filter(isTemplateNested),
-    dashboard.templates,
-    proxyLink,
-    dispatch
-  )
+  const templates = await hydrateTemplates(dashboard.templates, {
+    proxyUrl: source.links.proxy,
+  })
 
-  applyLocalSelections(nestedTemplates, templateSelections)
-
-  dispatch(updateTemplates(nestedTemplates))
+  dispatch(updateTemplates(templates))
   dispatch(updateTemplateQueryParams(dashboardId))
 }
 

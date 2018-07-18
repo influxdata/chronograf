@@ -3,7 +3,7 @@ import qs from 'qs'
 
 import {formatTempVar} from 'src/tempVars/utils'
 
-import {Template, TemplateType} from 'src/types'
+import {Template} from 'src/types'
 import {TemplateSelections} from 'src/types/dashboards'
 
 export const templateSelectionsFromQueryParams = (): TemplateSelections => {
@@ -33,39 +33,6 @@ export const templateSelectionsFromTemplates = (
 
     return {...acc, [tempVar]: value}
   }, {})
-}
-
-export const applyLocalSelections = (
-  templates: Template[],
-  selections: TemplateSelections
-): void => {
-  // Ensure that every supplied template has an appropriately set
-  // `localSelected` value.
-  for (const {tempVar, values, type} of templates) {
-    if (!values.length) {
-      continue
-    }
-
-    // Attempt to use supplied selection
-    let selection = selections[tempVar]
-
-    if (
-      !selection ||
-      (type !== TemplateType.Text && !values.find(v => v.value === selection))
-    ) {
-      // Default to template's `selected` value if no valid selection is found
-      selection = values.find(v => v.selected).value
-    }
-
-    if (type === TemplateType.Text) {
-      values[0].value = selection
-      values[0].selected = false
-    }
-
-    for (const value of values) {
-      value.localSelected = value.value === selection
-    }
-  }
 }
 
 export const stripTempVar = (tempVarName: string): string =>

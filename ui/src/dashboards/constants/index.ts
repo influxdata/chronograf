@@ -11,8 +11,8 @@ export const TIME_FORMAT_TOOLTIP_LINK: string =
   'http://momentjs.com/docs/#/parsing/string-format/'
 
 export const DEFAULT_DECIMAL_PLACES: DecimalPlaces = {
-  isEnforced: false,
-  digits: 3,
+  isEnforced: true,
+  digits: 2,
 }
 
 export interface TimeField {
@@ -63,6 +63,7 @@ export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   timeFormat: DEFAULT_TIME_FORMAT,
   decimalPlaces: DEFAULT_DECIMAL_PLACES,
   fieldOptions: [DEFAULT_TIME_FIELD],
+  inView: true,
 }
 
 interface EmptyDefaultDashboardCell {
@@ -113,3 +114,7 @@ export enum CEOTabs {
   Queries = 'Queries',
   Vis = 'Visualization',
 }
+
+export const MAX_TOLOCALESTRING_VAL = 20 // 20 is the max input to maximumFractionDigits in spec for tolocalestring
+export const MIN_DECIMAL_PLACES = '0'
+export const MAX_DECIMAL_PLACES = MAX_TOLOCALESTRING_VAL.toString()

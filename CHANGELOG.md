@@ -10,6 +10,8 @@
 1.  [#3814](https://github.com/influxdata/chronograf/pull/3814): Add pprof routes to chronograf server
 1.  [#3806](https://github.com/influxdata/chronograf/pull/3806): Add API to get/update Log Viewer UI config
 1.  [#3896](https://github.com/influxdata/chronograf/pull/3896): Consume new Log Viewer config API in client to allow user to configure log viewer UI for their organization
+1.  [#3842](https://github.com/influxdata/chronograf/pull/3842): Add V2 Cells API
+1.  [#3947](https://github.com/influxdata/chronograf/pull/3947): Add V2 Dashboard API
 
 ### UI Improvements
 
@@ -35,6 +37,7 @@
 1.  [#3759](https://github.com/influxdata/chronograf/pull/3759): Change y-axis options to have valid defaults
 1.  [#3793](https://github.com/influxdata/chronograf/pull/3793): Stop making requests for old sources after changing sources
 1.  [#3888](https://github.com/influxdata/chronograf/pull/3888): Fix health check status code creating firefox error
+1.  [#3951](https://github.com/influxdata/chronograf/pull/3951): Change decimal places to enforce 2 places by default in cells
 
 ## v1.5.0.0 [2018-05-15-RC]
 
