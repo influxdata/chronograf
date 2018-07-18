@@ -15,7 +15,7 @@ interface Props {
   icon?: IconFont
   wrapText?: boolean
   selectedItem: string
-  onChange: (text: string) => void
+  onChange: (value: any) => void
 }
 
 interface State {
@@ -151,9 +151,9 @@ class Dropdown extends Component<Props, State> {
     }
   }
 
-  private handleItemClick = (text: string) => () => {
+  private handleItemClick = (value: any) => () => {
     const {onChange} = this.props
-    onChange(text)
+    onChange(value)
     this.collapseMenu()
   }
 }

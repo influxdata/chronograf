@@ -94,6 +94,7 @@ span.icon.dropdown--caret {
 .dropdown--item {
   padding: 6px 11px;
   font-size: 12px;
+  line-height: 12px;
   font-weight: 600;
   color: fade-out($g20-white, 0.18);
   white-space: nowrap;
@@ -151,27 +152,27 @@ span.icon.dropdown--caret {
   left: 11px;
   top: 50%;
   transform: translateY(-50%);
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border-radius: 3px;
   background-color: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   &:after {
     content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
     border-radius: 50%;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     opacity: 0;
-    transform: scale(1.5,1.5);
+    transform: translate(-50%,-50%) scale(1.5,1.5);
     transition: transform 0.25s ease, opacity 0.25s ease;
   }
 
   .active &:after {
     opacity: 1;
-    transform: scale(1,1);
+    transform: translate(-50%,-50%) scale(1,1);
   }
 }
 
