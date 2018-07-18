@@ -8,6 +8,10 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
+import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
+import {IconFont, ComponentColor} from 'src/reusable_ui/types'
 
 import {Dashboard} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -66,6 +70,108 @@ class DashboardsPageContents extends Component<Props, State> {
                     onExportDashboard={onExportDashboard}
                     dashboardLink={dashboardLink}
                   />
+                  <Dropdown
+                    onChange={this.handleDropdownChange}
+                    selectedItem="Bloooooooooooooooooooop"
+                    icon={IconFont.Clock}
+                    color={ComponentColor.Primary}
+                    width={130}
+                    wrapText={true}
+                  >
+                    <DropdownItem text="Swoop" />
+                    <DropdownItem text="Scoop" />
+                    <DropdownDivider text="Things" />
+                    <DropdownItem text="Bloooooooooooooooooooop" />
+                    <DropdownItem text="Ploop" />
+                    <DropdownDivider />
+                    <DropdownItem text="Droop" />
+                    <DropdownItem text="Boop" />
+                  </Dropdown>
+
+                  <Dropdown
+                    onChange={this.handleDropdownChange}
+                    selectedItem="Bloooooooooooooooooooop"
+                    icon={IconFont.Clock}
+                    color={ComponentColor.Success}
+                    width={130}
+                  >
+                    <DropdownItem text="Swoop" />
+                    <DropdownItem text="Scoop" />
+                    <DropdownDivider text="Things" />
+                    <DropdownItem text="Bloooooooooooooooooooop" />
+                    <DropdownItem text="Ploop" />
+                    <DropdownDivider />
+                    <DropdownItem text="Droop" />
+                    <DropdownItem text="Boop" />
+                  </Dropdown>
+
+                  <Dropdown
+                    onChange={this.handleDropdownChange}
+                    selectedItem="Bloooooooooooooooooooop"
+                    icon={IconFont.Clock}
+                    color={ComponentColor.Warning}
+                    width={130}
+                  >
+                    <DropdownItem text="Swoop" />
+                    <DropdownItem text="Scoop" />
+                    <DropdownDivider text="Things" />
+                    <DropdownItem text="Bloooooooooooooooooooop" />
+                    <DropdownItem text="Ploop" />
+                    <DropdownDivider />
+                    <DropdownItem text="Droop" />
+                    <DropdownItem text="Boop" />
+                  </Dropdown>
+
+                  <Dropdown
+                    onChange={this.handleDropdownChange}
+                    selectedItem="Bloooooooooooooooooooop"
+                    icon={IconFont.Cube}
+                    color={ComponentColor.Danger}
+                    width={130}
+                  >
+                    <DropdownItem text="Swoop" />
+                    <DropdownItem text="Scoop" />
+                    <DropdownDivider text="Things" />
+                    <DropdownItem text="Bloooooooooooooooooooop" />
+                    <DropdownItem text="Ploop" />
+                    <DropdownDivider />
+                    <DropdownItem text="Droop" />
+                    <DropdownItem text="Boop" />
+                  </Dropdown>
+
+                  <Dropdown
+                    onChange={this.handleDropdownChange}
+                    selectedItem="Bloooooooooooooooooooop"
+                    icon={IconFont.Clock}
+                    color={ComponentColor.Alert}
+                    width={130}
+                  >
+                    <DropdownItem text="Swoop" />
+                    <DropdownItem text="Scoop" />
+                    <DropdownDivider text="Things" />
+                    <DropdownItem text="Bloooooooooooooooooooop" />
+                    <DropdownItem text="Ploop" />
+                    <DropdownDivider />
+                    <DropdownItem text="Droop" />
+                    <DropdownItem text="Boop" />
+                  </Dropdown>
+
+                  <Dropdown
+                    onChange={this.handleDropdownChange}
+                    selectedItem="Bloooooooooooooooooooop"
+                    icon={IconFont.Clock}
+                    color={ComponentColor.Default}
+                    width={130}
+                  >
+                    <DropdownItem text="Swoop" />
+                    <DropdownItem text="Scoop" />
+                    <DropdownDivider text="Things" />
+                    <DropdownItem text="Bloooooooooooooooooooop" />
+                    <DropdownItem text="Ploop" />
+                    <DropdownDivider />
+                    <DropdownItem text="Droop" />
+                    <DropdownItem text="Boop" />
+                  </Dropdown>
                 </div>
               </div>
             </div>
@@ -73,6 +179,10 @@ class DashboardsPageContents extends Component<Props, State> {
         </div>
       </FancyScrollbar>
     )
+  }
+
+  private handleDropdownChange = (text: string) => {
+    console.log(text)
   }
 
   private get renderPanelHeading(): JSX.Element {
