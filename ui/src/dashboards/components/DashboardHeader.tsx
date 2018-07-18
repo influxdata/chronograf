@@ -5,7 +5,7 @@ import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
-import AutoRefreshDropdown from 'src/shared/components/AutoRefreshDropdown'
+import AutoRefreshDropdown from 'src/shared/components/auto_refresh_dropdown/AutoRefreshDropdown'
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import DashboardHeaderEdit from 'src/dashboards/components/DashboardHeaderEdit'
@@ -86,7 +86,6 @@ class DashboardHeader extends Component<Props> {
           onChoose={handleChooseAutoRefresh}
           onManualRefresh={onManualRefresh}
           selected={autoRefresh}
-          iconName="refresh"
         />
         <TimeRangeDropdown
           onChooseTimeRange={handleChooseTimeRange}
