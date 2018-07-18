@@ -12,6 +12,7 @@ interface Props {
   children: Array<JSX.Element | JSX.Element[]>
   onChange: (value: any) => void
   selectedItem: string
+<<<<<<< HEAD
   color?: ComponentColor
   size?: ComponentSize
   disabled?: boolean
@@ -31,10 +32,11 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import './Dropdown.scss'
 
 interface Props {
+=======
+>>>>>>> Allow for more flexible children
   color?: ComponentColor
   size?: ComponentSize
   disabled?: boolean
-  children: JSX.Element[]
   width?: number
   icon?: IconFont
 <<<<<<< HEAD
@@ -42,6 +44,7 @@ interface Props {
 >>>>>>> WIP Introduce new components for dropdowns
 =======
   wrapText?: boolean
+<<<<<<< HEAD
   selectedItem: string
 <<<<<<< HEAD
   onChange: (text: string) => void
@@ -49,6 +52,8 @@ interface Props {
 =======
   onChange: (value: any) => void
 >>>>>>> Require a value prop on each item and return that on click
+=======
+>>>>>>> Allow for more flexible children
 }
 
 interface State {
