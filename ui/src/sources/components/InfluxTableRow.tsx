@@ -7,12 +7,14 @@ import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 import ConnectionLink from 'src/sources/components/ConnectionLink'
+import FluxDropdown from 'src/sources/components/FluxDropdown'
 
-import {Source} from 'src/types'
+import {Source, Service} from 'src/types'
 
 interface Props {
   source: Source
   currentSource: Source
+  services: Service[]
   onDeleteSource: (source: Source) => void
   setActiveKapacitor: actions.SetActiveKapacitor
   deleteKapacitor: actions.DeleteKapacitor
@@ -22,6 +24,7 @@ class InfluxTableRow extends PureComponent<Props> {
   public render() {
     const {
       source,
+      services,
       currentSource,
       setActiveKapacitor,
       deleteKapacitor,
@@ -52,6 +55,9 @@ class InfluxTableRow extends PureComponent<Props> {
             deleteKapacitor={deleteKapacitor}
             setActiveKapacitor={setActiveKapacitor}
           />
+        </td>
+        <td className="source-table--kapacitor">
+          <FluxDropdown services={services} source={source} />
         </td>
       </tr>
     )

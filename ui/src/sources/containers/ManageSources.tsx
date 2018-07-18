@@ -15,11 +15,12 @@ import {
   notifySourceDeleteFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Notification} from 'src/types'
+import {Source, Notification, Service} from 'src/types'
 
 interface Props {
   source: Source
   sources: Source[]
+  services: Service[]
   notify: (n: Notification) => void
   deleteKapacitor: sourcesActions.DeleteKapacitorAsync
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
@@ -48,7 +49,7 @@ class ManageSources extends PureComponent<Props> {
   }
 
   public render() {
-    const {sources, source, deleteKapacitor} = this.props
+    const {sources, source, deleteKapacitor, services} = this.props
 
     return (
       <div className="page" id="manage-sources-page">
@@ -58,6 +59,7 @@ class ManageSources extends PureComponent<Props> {
             <InfluxTable
               source={source}
               sources={sources}
+              services={services}
               deleteKapacitor={deleteKapacitor}
               onDeleteSource={this.handleDeleteSource}
               setActiveKapacitor={this.handleSetActiveKapacitor}
@@ -85,8 +87,9 @@ class ManageSources extends PureComponent<Props> {
   }
 }
 
-const mstp = ({sources}) => ({
+const mstp = ({sources, services}) => ({
   sources,
+  services,
 })
 
 const mdtp = {

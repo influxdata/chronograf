@@ -20,6 +20,13 @@ const InfluxTableHead: SFC<{}> = (): ReactElement<
             tipContent={KAPACITOR_TOOLTIP_COPY}
           />
         </th>
+        <th>
+          Flux Connection
+          <QuestionMarkTooltip
+            tipID="kapacitor-node-helper"
+            tipContent={KAPACITOR_TOOLTIP_COPY.replace('Kapacitor', 'Flux')}
+          />
+        </th>
       </tr>
     </thead>
   )
