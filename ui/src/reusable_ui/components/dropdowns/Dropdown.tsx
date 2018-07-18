@@ -43,8 +43,12 @@ interface Props {
 =======
   wrapText?: boolean
   selectedItem: string
+<<<<<<< HEAD
   onChange: (text: string) => void
 >>>>>>> WIP use wrapper and children for configuring dropdowns
+=======
+  onChange: (value: any) => void
+>>>>>>> Require a value prop on each item and return that on click
 }
 
 interface State {
@@ -306,6 +310,7 @@ class Dropdown extends Component<Props, State> {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   private handleItemClick = (value: any) => () => {
     const {onChange} = this.props
     onChange(value)
@@ -315,8 +320,11 @@ class Dropdown extends Component<Props, State> {
 >>>>>>> WIP Introduce new components for dropdowns
 =======
   private handleItemClick = (text: string) => () => {
+=======
+  private handleItemClick = (value: any) => () => {
+>>>>>>> Require a value prop on each item and return that on click
     const {onChange} = this.props
-    onChange(text)
+    onChange(value)
     this.collapseMenu()
   }
 >>>>>>> WIP use wrapper and children for configuring dropdowns

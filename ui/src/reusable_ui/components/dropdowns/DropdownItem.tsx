@@ -9,6 +9,7 @@ interface Props {
   checkbox?: boolean
   onClick?: (value: any) => void
   value: any
+<<<<<<< HEAD
 }
 
 class DropdownItem extends Component<Props> {
@@ -72,16 +73,18 @@ interface Props {
   selected?: boolean
   checkbox?: boolean
   onClick?: () => void
+=======
+>>>>>>> Require a value prop on each item and return that on click
 }
 
 class DropdownItem extends Component<Props> {
   public static defaultProps = {
-    checkbox: true,
+    checkbox: false,
     selected: false,
   }
 
   public render() {
-    const {text, selected, onClick, checkbox} = this.props
+    const {text, selected, checkbox} = this.props
 
     return (
       <div
@@ -89,7 +92,7 @@ class DropdownItem extends Component<Props> {
           active: selected,
           'multi-select--item': checkbox,
         })}
-        onClick={onClick}
+        onClick={this.handleClick}
       >
         {this.checkBox}
         {this.dot}
@@ -102,6 +105,12 @@ class DropdownItem extends Component<Props> {
 >>>>>>> WIP Introduce new components for dropdowns
 =======
     )
+  }
+
+  private handleClick = () => {
+    const {onClick, value} = this.props
+
+    onClick(value)
   }
 
   private get checkBox(): JSX.Element {
