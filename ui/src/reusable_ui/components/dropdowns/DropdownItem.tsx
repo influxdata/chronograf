@@ -5,17 +5,18 @@ interface Props {
   text: string
   selected?: boolean
   checkbox?: boolean
-  onClick?: () => void
+  onClick?: (value: any) => void
+  value: any
 }
 
 class DropdownItem extends Component<Props> {
   public static defaultProps = {
-    checkbox: true,
+    checkbox: false,
     selected: false,
   }
 
   public render() {
-    const {text, selected, onClick, checkbox} = this.props
+    const {text, selected, checkbox} = this.props
 
     return (
       <div
@@ -23,13 +24,19 @@ class DropdownItem extends Component<Props> {
           active: selected,
           'multi-select--item': checkbox,
         })}
-        onClick={onClick}
+        onClick={this.handleClick}
       >
         {this.checkBox}
         {this.dot}
         {text}
       </div>
     )
+  }
+
+  private handleClick = () => {
+    const {onClick, value} = this.props
+
+    onClick(value)
   }
 
   private get checkBox(): JSX.Element {
