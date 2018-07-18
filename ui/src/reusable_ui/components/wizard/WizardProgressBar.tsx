@@ -20,9 +20,20 @@ interface Props {
 
 class WizardProgressBar extends PureComponent<Props> {
   public render() {
-    const {steps, currentStepIndex} = this.props
+    return <div className="progress-bar">{this.WizardProgress}</div>
+  }
 
-    return <div className="progress-bar">ProgressBar</div>
+  private get WizardProgress(): JSX.Element {
+    const {steps, currentStepIndex} = this.props
+    const progressBar = steps.reduce((acc, step, i) => {
+      const stepEle = <span key={`stepEle${i}`} className="icon checkmark" />
+
+      const connectorEle =
+        i === 0 ? null : <span key={`connectorEle${i}`}>connects</span>
+
+      return [...acc, connectorEle, stepEle]
+    }, [])
+    return <>{progressBar}</>
   }
 }
 

@@ -1,7 +1,13 @@
-import React, {PureComponent, ReactNode} from 'react'
+import React, {PureComponent, ReactElement, ReactNode} from 'react'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
+import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 
 // import {} from 'src/types'
+
+interface WizardStepProps {
+  children: ReactNode
+  title: string
+}
 
 enum StepStatus {
   Incomplete = 'INCOMPLETE',
@@ -20,20 +26,28 @@ interface State {
 }
 
 interface Props {
-  children: ReactNode
+  children: ReactElement<WizardStep>
 }
 
 class WizardCloak extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
+    // {title: 'First Step', stepStatus: StepStatus.Complete},
+
+    const childSteps = React.Children.map(
+      props.children,
+      (child: ReactElement<WizardStepProps>, i) => {
+        return {
+          title: child.props.title,
+          stepStatus: StepStatus.Incomplete,
+        }
+      }
+    )
+
     this.state = {
-      steps: [
-        {title: 'First Step', stepStatus: StepStatus.Complete},
-        {title: 'Second Step', stepStatus: StepStatus.Error},
-        {title: 'Third Step', stepStatus: StepStatus.Incomplete},
-      ],
-      currentStepIndex: 0,
+      steps: childSteps,
+      currentStepIndex: 2,
     }
   }
 
