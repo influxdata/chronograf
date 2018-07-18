@@ -4,7 +4,10 @@ export interface AutoRefreshOption {
 }
 
 export const autoRefreshOptions: AutoRefreshOption[] = [
-  {milliseconds: 0, text: 'Paused'},
+  {
+    milliseconds: 0,
+    text: 'Paused',
+  },
   {
     milliseconds: 5000,
     text: 'Every 5s',
