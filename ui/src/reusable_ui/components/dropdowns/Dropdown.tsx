@@ -7,15 +7,15 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import './Dropdown.scss'
 
 interface Props {
+  children: Array<JSX.Element | JSX.Element[]>
+  onChange: (value: any) => void
+  selectedItem: string
   color?: ComponentColor
   size?: ComponentSize
   disabled?: boolean
-  children: JSX.Element[]
   width?: number
   icon?: IconFont
   wrapText?: boolean
-  selectedItem: string
-  onChange: (value: any) => void
 }
 
 interface State {
