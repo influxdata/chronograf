@@ -102,8 +102,29 @@ export const setActiveService = (
   },
 })
 
-export type FetchServicesAsync = (source: Source) => (dispatch) => Promise<void>
-export const fetchServicesAsync = (source: Source) => async (
+export type FetchAllServicesAsync = (
+  sources: Source[]
+) => (dispatch) => Promise<void>
+
+export const fetchAllServicesAsync: FetchAllServicesAsync = sources => async (
+  dispatch
+): Promise<void> => {
+  const allServices = []
+  sources.forEach(async s => {
+    try {
+      const services = await getServicesAJAX(s.links.services)
+      allServices.push(...services)
+      dispatch(loadServices(allServices))
+    } catch (err) {
+      dispatch(notify(couldNotGetServices))
+    }
+  })
+}
+
+export type FetchServicesForSourceAsync = (
+  source: Source
+) => (dispatch) => Promise<void>
+export const fetchServicesForSourceAsync: FetchServicesForSourceAsync = source => async (
   dispatch
 ): Promise<void> => {
   try {

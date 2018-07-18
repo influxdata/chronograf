@@ -2,7 +2,8 @@ import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import * as actions from 'src/shared/actions/sources'
+import * as sourcesActions from 'src/shared/actions/sources'
+import * as servicesActions from 'src/shared/actions/services'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -20,10 +21,11 @@ interface Props {
   source: Source
   sources: Source[]
   notify: (n: Notification) => void
-  deleteKapacitor: actions.DeleteKapacitorAsync
-  fetchKapacitors: actions.FetchKapacitorsAsync
-  removeAndLoadSources: actions.RemoveAndLoadSources
-  setActiveKapacitor: actions.SetActiveKapacitorAsync
+  deleteKapacitor: sourcesActions.DeleteKapacitorAsync
+  fetchKapacitors: sourcesActions.FetchKapacitorsAsync
+  removeAndLoadSources: sourcesActions.RemoveAndLoadSources
+  setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
+  fetchAllServices: servicesActions.FetchAllServicesAsync
 }
 
 const VERSION = process.env.npm_package_version
@@ -31,6 +33,7 @@ const VERSION = process.env.npm_package_version
 @ErrorHandling
 class ManageSources extends PureComponent<Props> {
   public componentDidMount() {
+    this.props.fetchAllServices(this.props.sources)
     this.props.sources.forEach(source => {
       this.props.fetchKapacitors(source)
     })
@@ -87,11 +90,12 @@ const mstp = ({sources}) => ({
 })
 
 const mdtp = {
-  removeAndLoadSources: actions.removeAndLoadSources,
-  fetchKapacitors: actions.fetchKapacitorsAsync,
-  setActiveKapacitor: actions.setActiveKapacitorAsync,
-  deleteKapacitor: actions.deleteKapacitorAsync,
+  removeAndLoadSources: sourcesActions.removeAndLoadSources,
+  fetchKapacitors: sourcesActions.fetchKapacitorsAsync,
+  setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
+  deleteKapacitor: sourcesActions.deleteKapacitorAsync,
   notify: notifyAction,
+  fetchAllServices: servicesActions.fetchAllServicesAsync,
 }
 
 export default connect(mstp, mdtp)(ManageSources)
