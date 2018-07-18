@@ -9,15 +9,19 @@ interface Props {
   me: Me
   source: Source
   isUsingAuth: boolean
+  toggleVisibility: (isVisible: boolean) => () => void
 }
 
 class InfluxTableHeader extends PureComponent<Props> {
   public render() {
-    const {source} = this.props
+    const {source, toggleVisibility} = this.props
 
     return (
       <div className="panel-heading">
         <h2 className="panel-title">{this.title}</h2>
+        <div onClick={toggleVisibility(true)}>
+          <p>show wiz</p>
+        </div>
         <Authorized requiredRole={EDITOR_ROLE}>
           <Link
             to={`/sources/${source.id}/manage-sources/new`}

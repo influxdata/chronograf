@@ -9,12 +9,18 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import InfluxTable from 'src/sources/components/InfluxTable'
 
+import GrandWizard from 'src/sources/components/GrandWizard'
+
 import {
   notifySourceDeleted,
   notifySourceDeleteFailed,
 } from 'src/shared/copy/notifications'
 
 import {Source, Notification} from 'src/types'
+
+interface State {
+  wizardVisibility: boolean
+}
 
 interface Props {
   source: Source
@@ -29,7 +35,15 @@ interface Props {
 declare var VERSION: string
 
 @ErrorHandling
-class ManageSources extends PureComponent<Props> {
+class ManageSources extends PureComponent<Props, State> {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      wizardVisibility: true,
+    }
+  }
+
   public componentDidMount() {
     this.props.sources.forEach(source => {
       this.props.fetchKapacitors(source)
@@ -46,6 +60,7 @@ class ManageSources extends PureComponent<Props> {
 
   public render() {
     const {sources, source, deleteKapacitor} = this.props
+    const {wizardVisibility} = this.state
 
     return (
       <div className="page" id="manage-sources-page">
@@ -58,12 +73,20 @@ class ManageSources extends PureComponent<Props> {
               deleteKapacitor={deleteKapacitor}
               onDeleteSource={this.handleDeleteSource}
               setActiveKapacitor={this.handleSetActiveKapacitor}
+              toggleVisibility={this.toggleVisibility}
             />
             <p className="version-number">Chronograf Version: {VERSION}</p>
           </div>
         </FancyScrollbar>
+        <GrandWizard wizardVisibility={wizardVisibility} />
       </div>
     )
+  }
+
+  private toggleVisibility = isVisible => () => {
+    this.setState({
+      wizardVisibility: isVisible,
+    })
   }
 
   private handleDeleteSource = (source: Source) => {
