@@ -4,11 +4,12 @@ import {parseMetaQuery} from 'src/tempVars/parsing'
 import templateReplace, {
   templateInternalReplace,
 } from 'src/tempVars/utils/replace'
+
 import {getSelectedValue, getLocalSelectedValue} from 'src/tempVars/utils'
 
 import {TEMPLATE_VARIABLE_TYPES} from 'src/tempVars/constants'
 
-import {Template, TemplateValue, RemoteDataState} from 'src/types'
+import {Template, TemplateType, TemplateValue, RemoteDataState} from 'src/types'
 
 type TemplateName = string
 
@@ -222,21 +223,19 @@ export async function hydrateTemplate(
     selections = {},
   }: HydrateTemplateOptions
 ): Promise<Template> {
+  const selection = selections[template.tempVar]
+
   let values
+  let templateValues
 
   if (template.query && template.query.influxql) {
     const query = templateReplace(templateInternalReplace(template), templates)
 
     values = await fetcher.fetch(query)
+    templateValues = newTemplateValues(template, values, selection)
   } else {
-    values = template.values.map(v => v.value)
+    templateValues = newConstantTemplateValues(template, selection)
   }
-
-  const templateValues = newTemplateValues(
-    template,
-    values,
-    selections[template.tempVar]
-  )
 
   return {...template, values: templateValues}
 }
@@ -278,6 +277,41 @@ export function newTemplateValues(
       localSelected: value === localSelectedValue,
     }
   })
+}
+
+export function newConstantTemplateValues(
+  template: Template,
+  hopefullySelectedValue?: string
+): TemplateValue[] {
+  if (!template.values.length) {
+    return []
+  }
+
+  let selectedValue = template.values.find(v => v.selected)
+
+  if (!selectedValue) {
+    selectedValue = template.values[0]
+  }
+
+  let localSelectedValue = template.values.find(v => {
+    return template.type === TemplateType.Map
+      ? v.key === hopefullySelectedValue
+      : v.value === hopefullySelectedValue
+  })
+
+  if (!localSelectedValue) {
+    localSelectedValue = template.values.find(v => v.localSelected)
+  }
+
+  if (!localSelectedValue) {
+    localSelectedValue = selectedValue
+  }
+
+  return template.values.map(v => ({
+    ...v,
+    selected: v.value === selectedValue.value,
+    localSelected: v.value === localSelectedValue.value,
+  }))
 }
 
 export async function hydrateTemplates(
