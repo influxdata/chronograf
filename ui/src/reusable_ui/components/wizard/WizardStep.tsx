@@ -5,6 +5,7 @@ import React, {PureComponent, ReactNode} from 'react'
 interface Props {
   children: ReactNode
   title: string
+  isComplete: () => boolean
 }
 
 class WizardStep extends PureComponent<Props> {

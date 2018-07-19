@@ -14,11 +14,30 @@ class WizardWithSteps extends PureComponent<Props> {
 
     return (
       <WizardOverlay visible={wizardVisibility} title="Grand Wizard">
-        <WizardStep title="First Real Step">some first children</WizardStep>
-        <WizardStep title="Second Real Step">some second children</WizardStep>
-        <WizardStep title="Third Real Step">some third children</WizardStep>
+        <WizardStep
+          title="First Real Step"
+          isComplete={this.completeTest(true)}
+        >
+          some first children
+        </WizardStep>
+        <WizardStep
+          title="Second Real Step"
+          isComplete={this.completeTest(true)}
+        >
+          some second children
+        </WizardStep>
+        <WizardStep
+          title="Third Real Step"
+          isComplete={this.completeTest(false)}
+        >
+          some third children
+        </WizardStep>
       </WizardOverlay>
     )
+  }
+
+  private completeTest = currState => () => {
+    return currState
   }
 }
 

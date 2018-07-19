@@ -7,6 +7,7 @@ import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 interface WizardStepProps {
   children: ReactNode
   title: string
+  isComplete: () => boolean
 }
 
 enum StepStatus {
@@ -35,10 +36,12 @@ class WizardCloak extends PureComponent<Props, State> {
 
     const childSteps = React.Children.map(
       props.children,
-      (child: ReactElement<WizardStepProps>, i) => {
+      (child: ReactElement<WizardStepProps>) => {
         return {
           title: child.props.title,
-          stepStatus: StepStatus.Incomplete,
+          stepStatus: child.props.isComplete()
+            ? StepStatus.Complete
+            : StepStatus.Incomplete,
         }
       }
     )

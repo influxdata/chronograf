@@ -38,6 +38,7 @@ class WizardProgressBar extends PureComponent<Props> {
       const {stepStatus} = step
       let currentStep = ''
 
+      // STEP STATUS
       if (i === currentStepIndex) {
         currentStep = 'circle-thick current'
       }
@@ -49,11 +50,21 @@ class WizardProgressBar extends PureComponent<Props> {
         />
       )
 
+      // CONNECTION ELE
+      let connectorStatus
+      if (i > 0 && steps[i - 1].stepStatus === StepStatus.Complete) {
+        connectorStatus = statusStates.Some
+
+        if (stepStatus === StepStatus.Complete) {
+          connectorStatus = statusStates.Full
+        }
+      }
+
       const connectorEle =
         i === 0 ? null : (
           <ProgressConnector
             key={`connectorEle${i}`}
-            status={statusStates.Full}
+            status={connectorStatus}
           />
         )
 
