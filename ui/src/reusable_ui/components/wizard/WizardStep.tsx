@@ -12,7 +12,7 @@ class WizardStep extends PureComponent<Props> {
     const {children, title} = this.props
 
     return (
-      <div className="progress-bar">
+      <div className="progress-step">
         <h2>{title}</h2>
         {children}
       </div>

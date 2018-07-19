@@ -1,4 +1,4 @@
-import React, {PureComponent, ReactNode} from 'react'
+import React, {PureComponent} from 'react'
 
 import 'src/reusable_ui/components/wizard/ProgressConnector.scss'
 

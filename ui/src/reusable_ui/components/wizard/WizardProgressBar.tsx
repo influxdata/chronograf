@@ -1,6 +1,8 @@
 import React, {PureComponent} from 'react'
 import ProgressConnector from 'src/reusable_ui/components/wizard/ProgressConnector'
 
+import 'src/reusable_ui/components/wizard/WizardProgressBar.scss'
+
 // import {} from 'src/types'
 
 enum statusStates {
@@ -44,7 +46,7 @@ class WizardProgressBar extends PureComponent<Props> {
           stepEle = <span key={`stepEle${i}`} className="icon stop" />
           break
         default:
-          stepEle = <span key={`stepEle${i}`} className="icon circle" />
+          stepEle = <span key={`stepEle${i}`} className="icon circle-thick" />
       }
 
       const connectorEle =
