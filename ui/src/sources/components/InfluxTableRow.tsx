@@ -17,6 +17,7 @@ interface Props {
   services: Service[]
   onDeleteSource: (source: Source) => void
   setActiveKapacitor: actions.SetActiveKapacitor
+  setActiveFlux: (source: Source, service: Service) => void
   deleteKapacitor: actions.DeleteKapacitor
 }
 
@@ -27,6 +28,7 @@ class InfluxTableRow extends PureComponent<Props> {
       services,
       currentSource,
       setActiveKapacitor,
+      setActiveFlux,
       deleteKapacitor,
     } = this.props
 
@@ -57,7 +59,11 @@ class InfluxTableRow extends PureComponent<Props> {
           />
         </td>
         <td className="source-table--kapacitor">
-          <FluxDropdown services={services} source={source} />
+          <FluxDropdown
+            services={services}
+            source={source}
+            setActiveFlux={setActiveFlux}
+          />
         </td>
       </tr>
     )

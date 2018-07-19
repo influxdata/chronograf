@@ -6,8 +6,10 @@ import {FluxPage} from 'src/flux'
 import EmptyFluxPage from 'src/flux/components/EmptyFluxPage'
 import FluxOverlay from 'src/flux/components/FluxOverlay'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
+
 import {Source, Service, Notification} from 'src/types'
 import {Links} from 'src/types/flux'
+import {FluxFormMode} from 'src/flux/constants/connection'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   updateScript as updateScriptAction,
@@ -99,7 +101,7 @@ export class CheckServices extends PureComponent<
     return (
       <OverlayTechnology visible={isOverlayShown}>
         <FluxOverlay
-          mode="new"
+          mode={FluxFormMode.new}
           source={this.source}
           onDismiss={this.handleDismissOverlay}
         />

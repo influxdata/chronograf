@@ -5,10 +5,11 @@ import FluxForm from 'src/flux/components/FluxForm'
 import {Service, Notification} from 'src/types'
 import {fluxUpdated, fluxNotUpdated} from 'src/shared/copy/notifications'
 import {UpdateServiceAsync} from 'src/shared/actions/services'
+import {FluxFormMode} from 'src/flux/constants/connection'
 
 interface Props {
   service: Service
-  onDismiss: () => void
+  onDismiss?: () => void
   updateService: UpdateServiceAsync
   notify: (message: Notification) => void
 }
@@ -31,7 +32,7 @@ class FluxEdit extends PureComponent<Props, State> {
         service={this.state.service}
         onSubmit={this.handleSubmit}
         onInputChange={this.handleInputChange}
-        mode="edit"
+        mode={FluxFormMode.edit}
       />
     )
   }
@@ -58,7 +59,9 @@ class FluxEdit extends PureComponent<Props, State> {
     }
 
     notify(fluxUpdated)
-    onDismiss()
+    if (onDismiss) {
+      onDismiss()
+    }
   }
 }
 

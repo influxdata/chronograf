@@ -102,6 +102,32 @@ export const setActiveService = (
   },
 })
 
+export type SetActiveServiceAsync = (
+  source: Source,
+  activeService: Service,
+  prevActiveService: Service
+) => (dispatch) => Promise<void>
+
+export const setActiveServiceAsync = (
+  source: Source,
+  activeService: Service,
+  prevActiveService: Service
+) => async (dispatch): Promise<void> => {
+  try {
+    activeService = {...activeService, metadata: {active: true}}
+    await updateServiceAJAX(activeService)
+
+    if (prevActiveService) {
+      prevActiveService = {...prevActiveService, metadata: {active: false}}
+      await updateServiceAJAX(prevActiveService)
+    }
+
+    dispatch(setActiveService(source, activeService))
+  } catch (err) {
+    console.error(err.data)
+  }
+}
+
 export type FetchAllServicesAsync = (
   sources: Source[]
 ) => (dispatch) => Promise<void>
@@ -138,15 +164,17 @@ export const fetchServicesForSourceAsync: FetchServicesForSourceAsync = source =
 export type CreateServiceAsync = (
   source: Source,
   service: NewService
-) => (dispatch) => Promise<void>
+) => Service
 
 export const createServiceAsync = (
   source: Source,
   service: NewService
-) => async (dispatch): Promise<void> => {
+) => async (dispatch): Promise<Service> => {
   try {
-    const s = await createServiceAJAX(source, service)
+    const metadata = {active: true}
+    const s = await createServiceAJAX(source, {...service, metadata})
     dispatch(addService(s))
+    return s
   } catch (err) {
     console.error(err.data)
     throw err.data

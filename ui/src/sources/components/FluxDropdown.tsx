@@ -3,11 +3,15 @@ import {Link, withRouter, RouteComponentProps} from 'react-router'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
+
+import {getDeep} from 'src/utils/wrappers'
+
 import {Source, Service} from 'src/types'
 
 interface Props {
   source: Source
   services: Service[]
+  setActiveFlux: (source: Source, service: Service) => void
 }
 
 interface FluxServiceItem {
@@ -26,7 +30,7 @@ class FluxDropdown extends PureComponent<
       return (
         <Authorized requiredRole={EDITOR_ROLE}>
           <Link
-            to={`/sources/${source.id}/services/new`}
+            to={`/sources/${source.id}/flux/new`}
             className="btn btn-xs btn-default"
           >
             <span className="icon plus" /> Add Flux Connection
@@ -74,7 +78,8 @@ class FluxDropdown extends PureComponent<
   }
 
   private handleChoose = (selected: FluxServiceItem) => {
-    selected = selected
+    const {source, setActiveFlux} = this.props
+    setActiveFlux(source, selected.service)
   }
 
   private get UnauthorizedDropdown(): ReactElement<HTMLDivElement> {
@@ -102,6 +107,12 @@ class FluxDropdown extends PureComponent<
 
   private get selected(): string {
     const {services} = this.props
+    const service = services.find(s => {
+      return getDeep(s, 'metadata.active', false)
+    })
+    if (service) {
+      return service.name
+    }
     return services[0].name
   }
 }

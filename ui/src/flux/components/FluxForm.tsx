@@ -3,10 +3,11 @@ import React, {ChangeEvent, PureComponent} from 'react'
 import Input from 'src/kapacitor/components/KapacitorFormInput'
 
 import {NewService} from 'src/types'
+import {FluxFormMode} from 'src/flux/constants/connection'
 
 interface Props {
   service: NewService
-  mode: string
+  mode: FluxFormMode
   onSubmit: (e: ChangeEvent<HTMLFormElement>) => void
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void
 }

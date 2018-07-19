@@ -6,6 +6,9 @@ export interface NewService {
   password?: string
   active: boolean
   insecureSkipVerify: boolean
+  metadata?: {
+    [x: string]: any
+  }
 }
 
 export interface Service {

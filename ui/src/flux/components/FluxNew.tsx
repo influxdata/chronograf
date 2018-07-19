@@ -5,11 +5,13 @@ import FluxForm from 'src/flux/components/FluxForm'
 import {NewService, Source, Notification} from 'src/types'
 import {fluxCreated, fluxNotCreated} from 'src/shared/copy/notifications'
 import {CreateServiceAsync} from 'src/shared/actions/services'
+import {FluxFormMode} from 'src/flux/constants/connection'
 
 interface Props {
   source: Source
-  onDismiss: () => void
+  onDismiss?: () => void
   createService: CreateServiceAsync
+  router?: {push: (url: string) => void}
   notify: (message: Notification) => void
 }
 
@@ -33,7 +35,7 @@ class FluxNew extends PureComponent<Props, State> {
         service={this.state.service}
         onSubmit={this.handleSubmit}
         onInputChange={this.handleInputChange}
-        mode="new"
+        mode={FluxFormMode.new}
       />
     )
   }
@@ -49,19 +51,23 @@ class FluxNew extends PureComponent<Props, State> {
     e: FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault()
-    const {notify, source, onDismiss, createService} = this.props
-
+    const {notify, router, source, onDismiss, createService} = this.props
     const {service} = this.state
 
     try {
-      await createService(source, service)
+      const s = await createService(source, service)
+      if (router) {
+        router.push(`/sources/${source.id}/flux/${s.id}/edit`)
+      }
     } catch (error) {
       notify(fluxNotCreated(error.message))
       return
     }
 
     notify(fluxCreated)
-    onDismiss()
+    if (onDismiss) {
+      onDismiss()
+    }
   }
 
   private get defaultService(): NewService {

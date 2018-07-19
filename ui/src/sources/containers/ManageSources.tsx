@@ -16,6 +16,7 @@ import {
 } from 'src/shared/copy/notifications'
 
 import {Source, Notification, Service} from 'src/types'
+import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
   source: Source
@@ -27,6 +28,7 @@ interface Props {
   removeAndLoadSources: sourcesActions.RemoveAndLoadSources
   setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
   fetchAllServices: servicesActions.FetchAllServicesAsync
+  setActiveFlux: servicesActions.SetActiveServiceAsync
 }
 
 const VERSION = process.env.npm_package_version
@@ -63,12 +65,21 @@ class ManageSources extends PureComponent<Props> {
               deleteKapacitor={deleteKapacitor}
               onDeleteSource={this.handleDeleteSource}
               setActiveKapacitor={this.handleSetActiveKapacitor}
+              setActiveFlux={this.handleSetActiveFlux}
             />
             <p className="version-number">Chronograf Version: {VERSION}</p>
           </div>
         </FancyScrollbar>
       </div>
     )
+  }
+
+  private handleSetActiveFlux = async (source, service) => {
+    const {services, setActiveFlux} = this.props
+    const prevActiveService = services.find(s => {
+      return getDeep(s, 'metadata.active', false)
+    })
+    await setActiveFlux(source, service, prevActiveService)
   }
 
   private handleDeleteSource = (source: Source) => {
@@ -93,12 +104,13 @@ const mstp = ({sources, services}) => ({
 })
 
 const mdtp = {
+  notify: notifyAction,
   removeAndLoadSources: sourcesActions.removeAndLoadSources,
   fetchKapacitors: sourcesActions.fetchKapacitorsAsync,
   setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
-  notify: notifyAction,
   fetchAllServices: servicesActions.fetchAllServicesAsync,
+  setActiveFlux: servicesActions.setActiveServiceAsync,
 }
 
 export default connect(mstp, mdtp)(ManageSources)

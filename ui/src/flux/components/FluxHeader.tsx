@@ -5,6 +5,7 @@ import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechno
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 
 import {Service} from 'src/types'
+import {FluxFormMode} from 'src/flux/constants/connection'
 
 interface Props {
   service: Service
@@ -58,7 +59,7 @@ class FluxHeader extends PureComponent<Props, State> {
     return (
       <OverlayTechnology visible={isOverlayVisible}>
         <FluxOverlay
-          mode="edit"
+          mode={FluxFormMode.edit}
           service={service}
           onDismiss={this.handleToggleOverlay}
         />
