@@ -4,7 +4,7 @@ import {GroupBy, TimeShift} from 'src/types'
 
 import GroupByTimeDropdown from 'src/shared/components/group_by_time_dropdown/GroupByTimeDropdown'
 import TimeShiftDropdown from 'src/shared/components/time_shift_dropdown/TimeShiftDropdown'
-import FillQuery from 'src/shared/components/FillQuery'
+import FillQueryDropdown from 'src/shared/components/fill_query_dropdown/FillQueryDropdown'
 
 interface Props {
   fill: string
@@ -42,7 +42,11 @@ const QueryOptions: SFC<Props> = ({
       />
     )}
     {isKapacitorRule ? null : (
-      <FillQuery value={fill} onChooseFill={onFill} isDisabled={isDisabled} />
+      <FillQueryDropdown
+        selected={fill}
+        onChooseFill={onFill}
+        isDisabled={isDisabled}
+      />
     )}
   </div>
 )

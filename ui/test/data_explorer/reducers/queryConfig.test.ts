@@ -21,7 +21,10 @@ import {
   ActionAddQuery,
 } from 'src/data_explorer/actions/view'
 
-import {LINEAR, NULL_STRING} from 'src/shared/constants/queryFillOptions'
+import {
+  LINEAR,
+  NULL_STRING,
+} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
 
 const fakeAddQueryAction = (queryID: string): ActionAddQuery => {
   return {

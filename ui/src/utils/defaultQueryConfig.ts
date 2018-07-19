@@ -1,6 +1,6 @@
 import uuid from 'uuid'
 
-import {NULL_STRING} from 'src/shared/constants/queryFillOptions'
+import {NULL_STRING} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
 import {QueryConfig} from 'src/types'
 
 interface DefaultQueryArgs {

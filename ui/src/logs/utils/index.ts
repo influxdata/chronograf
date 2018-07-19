@@ -3,7 +3,7 @@ import moment from 'moment'
 import uuid from 'uuid'
 import {Filter} from 'src/types/logs'
 import {TimeRange, Namespace, QueryConfig} from 'src/types'
-import {NULL_STRING} from 'src/shared/constants/queryFillOptions'
+import {NULL_STRING} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
 import {getDeep} from 'src/utils/wrappers'
 import {
   quoteIfTimestamp,

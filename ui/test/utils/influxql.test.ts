@@ -1,7 +1,10 @@
 import buildInfluxQLQuery, {buildQuery} from 'src/utils/influxql'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
-import {NONE, NULL_STRING} from 'src/shared/constants/queryFillOptions'
+import {
+  NONE,
+  NULL_STRING,
+} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 
 import {QueryConfig} from 'src/types'
