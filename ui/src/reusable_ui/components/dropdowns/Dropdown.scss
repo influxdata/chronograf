@@ -193,3 +193,8 @@ span.icon.dropdown--caret {
     background-color: $c-yeti;
   }
 }
+
+/* TODO: Make fancyscroll more customizable */
+.dropdown .fancy-scroll--track-h {
+  display: none;
+}
