@@ -1,9 +1,12 @@
 import React, {PureComponent, MouseEvent} from 'react'
+import uuid from 'uuid'
 import _ from 'lodash'
 
 import HandlerOptions from 'src/kapacitor/components/HandlerOptions'
 import HandlerTabs from 'src/kapacitor/components/HandlerTabs'
-import Dropdown from 'src/shared/components/Dropdown'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
+import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
 import {parseHandlersFromRule} from 'src/shared/parsing/parseHandlersFromRule'
 
 import {DEFAULT_HANDLERS, AlertTypes} from 'src/kapacitor/constants'
@@ -128,12 +131,25 @@ class RuleHandlers extends PureComponent<Props, State> {
           <div className={ruleSectionClassName}>
             <p>Send this Alert to:</p>
             <Dropdown
-              items={handlers}
-              menuClass="dropdown-malachite"
-              selected={dropdownLabel}
-              onChoose={this.handleAddHandler}
-              className="dropdown-170 rule-message--add-endpoint"
-            />
+              width={170}
+              customClass="rule-message--add-endpoint"
+              selectedItem={dropdownLabel}
+              onChange={this.handleAddHandler}
+            >
+              {handlers.map(option => {
+                if (option.text === 'SEPARATOR') {
+                  return <DropdownDivider key={uuid.v4()} />
+                }
+
+                return (
+                  <DropdownItem
+                    key={uuid.v4()}
+                    text={option.text}
+                    value={option}
+                  />
+                )
+              })}
+            </Dropdown>
           </div>
           {mappedHandlersOnThisAlert.length ? (
             <div className="rule-message--endpoints">
