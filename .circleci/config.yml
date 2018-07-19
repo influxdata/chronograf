@@ -13,8 +13,6 @@ workflows:
           requires:
             - build
           filters:
-            branches:
-              ignore: /.*/
             tags:
               only: /^[0-9]+(\.[0-9]+)*(\S*)([a|rc|beta]([0-9]+))+$/
       - deploy-release:
