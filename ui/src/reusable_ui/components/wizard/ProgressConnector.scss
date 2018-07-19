@@ -1,0 +1,37 @@
+@import 'src/style/modules/influx-colors';
+
+.progress-connector {
+  width: 50px;
+  height: 2px;
+  background-color: $g7-graphite;
+  position: relative;
+  display: inline-block;
+  margin: 0 10px;
+  border-radius: 2px;
+}
+
+.progress-connector:after {
+  content: '\A';
+  position: absolute;
+  background-color: $c-rainforest;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  border-radius: 2px;
+}
+
+.progress-connector--none:after {
+  width: 0;
+  transition: all 0.5s;
+}
+
+.progress-connector--some:after {
+  width: 50%;
+  transition: all 0.5s;
+}
+
+.progress-connector--full:after {
+  width: 100%;
+  transition: all 0.5s;
+}

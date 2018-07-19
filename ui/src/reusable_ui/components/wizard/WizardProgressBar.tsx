@@ -1,6 +1,13 @@
 import React, {PureComponent} from 'react'
+import ProgressConnector from 'src/reusable_ui/components/wizard/ProgressConnector'
 
 // import {} from 'src/types'
+
+enum statusStates {
+  None = 'none',
+  Some = 'some',
+  Full = 'full',
+}
 
 enum StepStatus {
   Incomplete = 'INCOMPLETE',
@@ -26,10 +33,27 @@ class WizardProgressBar extends PureComponent<Props> {
   private get WizardProgress(): JSX.Element {
     const {steps, currentStepIndex} = this.props
     const progressBar = steps.reduce((acc, step, i) => {
-      const stepEle = <span key={`stepEle${i}`} className="icon checkmark" />
+      const {stepStatus} = step
+      let stepEle
+
+      switch (stepStatus) {
+        case StepStatus.Complete:
+          stepEle = <span key={`stepEle${i}`} className="icon checkmark" />
+          break
+        case StepStatus.Error:
+          stepEle = <span key={`stepEle${i}`} className="icon stop" />
+          break
+        default:
+          stepEle = <span key={`stepEle${i}`} className="icon circle" />
+      }
 
       const connectorEle =
-        i === 0 ? null : <span key={`connectorEle${i}`}>connects</span>
+        i === 0 ? null : (
+          <ProgressConnector
+            key={`connectorEle${i}`}
+            status={statusStates.Full}
+          />
+        )
 
       return [...acc, connectorEle, stepEle]
     }, [])

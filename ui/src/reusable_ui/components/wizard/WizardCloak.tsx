@@ -33,8 +33,6 @@ class WizardCloak extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
-    // {title: 'First Step', stepStatus: StepStatus.Complete},
-
     const childSteps = React.Children.map(
       props.children,
       (child: ReactElement<WizardStepProps>, i) => {
