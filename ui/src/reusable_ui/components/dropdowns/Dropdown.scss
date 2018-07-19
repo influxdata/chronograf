@@ -15,8 +15,8 @@
 }
 
 .dropdown--selected,
-span.icon.dropdown--icon,
-span.icon.dropdown--caret {
+.dropdown--button > span.icon.dropdown--icon,
+.dropdown--button > span.icon.dropdown--caret {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -34,8 +34,9 @@ span.icon.dropdown--icon {
   width: calc(100% - 20px);
 }
 
-span.icon.dropdown--caret {
+.dropdown--button > span.icon.dropdown--caret {
   margin: 0;
+  font-size: 1em;
 }
 
 /* Button Size Modifiers */
@@ -193,10 +194,10 @@ span.icon.dropdown--caret {
     background-color: $c-yeti;
   }
   .fancy-scroll--thumb-h {
-    @include gradient-h($c-neutrino, $c-laser);
+    @include gradient-h($c-neutrino, $c-hydrogen);
   }
   .fancy-scroll--thumb-v {
-    @include gradient-v($c-neutrino, $c-laser);
+    @include gradient-v($c-neutrino, $c-hydrogen);
   }
   /* TODO: Make fancyscroll more customizable */
   .fancy-scroll--track-h {

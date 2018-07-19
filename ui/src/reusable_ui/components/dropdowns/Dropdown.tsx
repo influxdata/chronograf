@@ -91,11 +91,15 @@ class Dropdown extends Component<Props, State> {
     )
 
     return (
-      <div className={className} onClick={this.toggleMenu}>
+      <button
+        className={className}
+        onClick={this.toggleMenu}
+        disabled={disabled}
+      >
         {this.icon}
         <span className="dropdown--selected">{selectedItem}</span>
         <span className="dropdown--caret icon caret-down" />
-      </div>
+      </button>
     )
   }
 
