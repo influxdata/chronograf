@@ -192,9 +192,15 @@ span.icon.dropdown--caret {
   .dropdown-item--checkbox:after {
     background-color: $c-yeti;
   }
+  .fancy-scroll--thumb-h {
+    @include gradient-h($c-neutrino, $c-laser);
+  }
+  .fancy-scroll--thumb-v {
+    @include gradient-v($c-neutrino, $c-laser);
+  }
+  /* TODO: Make fancyscroll more customizable */
+  .fancy-scroll--track-h {
+    display: none;
+  }
 }
-
-/* TODO: Make fancyscroll more customizable */
-.dropdown .fancy-scroll--track-h {
-  display: none;
-}
+ 

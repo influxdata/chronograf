@@ -1,14 +1,14 @@
 import React, {PureComponent} from 'react'
-
+import classnames from 'classnames'
+import 'src/external/codemirror'
 import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
 import {EditorChange} from 'codemirror'
-import Dropdown from 'src/shared/components/Dropdown'
-import classnames from 'classnames'
-import {QUERY_TEMPLATES, QueryTemplate} from 'src/data_explorer/constants'
+
+import QueryTemplatesDropdown from 'src/shared/components/query_templates_dropdown/QueryTemplatesDropdown'
+import {QueryTemplate} from 'src/shared/components/query_templates_dropdown/queryTemplates'
 import QueryStatus from 'src/shared/components/QueryStatus'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {QueryConfig} from 'src/types'
-import 'src/external/codemirror'
 
 interface Props {
   query: string
@@ -70,26 +70,16 @@ class QueryEditor extends PureComponent<Props, State> {
             onKeyUp={this.handleKeyUp}
           />
         </div>
-        <div className={this.varmojiClassName}>
-          <div className="varmoji-container">
-            <div className="varmoji-front">
-              <QueryStatus status={status}>
-                <Dropdown
-                  items={QUERY_TEMPLATES}
-                  selected="Query Templates"
-                  onChoose={this.handleChooseMetaQuery}
-                  className="dropdown-140 query-editor--templates"
-                  buttonSize="btn-xs"
-                />
-                <button
-                  className="btn btn-xs btn-primary query-editor--submit"
-                  onClick={this.handleSubmit}
-                >
-                  Submit Query
-                </button>
-              </QueryStatus>
-            </div>
-          </div>
+        <div className={this.statusBarClassName}>
+          <QueryStatus status={status}>
+            <QueryTemplatesDropdown onChoose={this.handleChooseMetaQuery} />
+            <button
+              className="btn btn-xs btn-primary query-editor--submit"
+              onClick={this.handleSubmit}
+            >
+              Submit Query
+            </button>
+          </QueryStatus>
         </div>
       </div>
     )
@@ -105,10 +95,10 @@ class QueryEditor extends PureComponent<Props, State> {
     return classnames('query-editor--code', {focus: focused})
   }
 
-  private get varmojiClassName(): string {
+  private get statusBarClassName(): string {
     const {focused} = this.state
 
-    return classnames('varmoji', {focus: focused})
+    return classnames('query-editor--bar', {focus: focused})
   }
 
   private onTouchStart = () => {}
@@ -125,7 +115,9 @@ class QueryEditor extends PureComponent<Props, State> {
   }
 
   private handleChooseMetaQuery = (template: QueryTemplate): void => {
-    this.setState({value: template.query})
+    if (template.query) {
+      this.setState({value: template.query})
+    }
   }
 
   private handleKeyUp = (__, e: KeyboardEvent) => {

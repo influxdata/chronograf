@@ -116,6 +116,20 @@ button.btn.query-editor--submit {
   }
 }
 
+/* TODO: Replace varmoji flipper with autosuggest in Code Mirrror */
+.query-editor--bar {
+  transition: border-color 0.25s ease;
+  border: 2px solid $query-editor--bg;
+  border-top: 0;
+  background-color: $query-editor--field-bg;
+  border-radius: 0 0 $radius $radius;
+  height: $query-editor--status-height;
+  width: 100%;
+
+  &.focus {
+    border-color: $c-pool;
+  }
+}
 
 /*
   Varmoji Flipper

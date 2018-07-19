@@ -16,6 +16,7 @@ interface Props {
   width?: number
   icon?: IconFont
   wrapText?: boolean
+  customClass?: string
 }
 
 interface State {
@@ -68,11 +69,12 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get containerClassName(): string {
-    const {color, size, disabled, wrapText} = this.props
+    const {color, size, disabled, wrapText, customClass} = this.props
 
     return classnames(`dropdown dropdown-${size} dropdown-${color}`, {
       disabled,
       'dropdown-wrap': wrapText,
+      [customClass]: customClass,
     })
   }
 
