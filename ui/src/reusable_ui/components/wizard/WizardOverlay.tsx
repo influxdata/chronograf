@@ -1,19 +1,11 @@
-import React, {PureComponent, ReactElement, ReactNode} from 'react'
+import React, {PureComponent, ReactElement} from 'react'
 import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
 import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
 import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
-interface WizardStepProps {
-  children: ReactNode
-  title: string
-  isComplete: () => boolean
-  onPrevious: () => void
-  onNext: () => void
-  increment?: () => void
-  decrement?: () => void
-}
-// import {} from 'src/types'
+
+import {WizardStepProps} from 'src/types/wizard'
 
 interface Props {
   children: Array<ReactElement<WizardStepProps>>

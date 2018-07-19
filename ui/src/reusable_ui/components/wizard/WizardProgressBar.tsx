@@ -1,26 +1,9 @@
 import React, {PureComponent} from 'react'
 import ProgressConnector from 'src/reusable_ui/components/wizard/ProgressConnector'
 
+import {Step, connectorState, StepStatus} from 'src/types/wizard'
+
 import 'src/reusable_ui/components/wizard/WizardProgressBar.scss'
-
-// import {} from 'src/types'
-
-enum statusStates {
-  None = 'none',
-  Some = 'some',
-  Full = 'full',
-}
-
-enum StepStatus {
-  Incomplete = 'circle-thick',
-  Complete = 'checkmark',
-  Error = 'remove',
-}
-
-interface Step {
-  title: string
-  stepStatus: StepStatus
-}
 
 interface Props {
   steps: Step[]
@@ -53,10 +36,10 @@ class WizardProgressBar extends PureComponent<Props> {
       // CONNECTION ELE
       let connectorStatus
       if (i > 0 && steps[i - 1].stepStatus === StepStatus.Complete) {
-        connectorStatus = statusStates.Some
+        connectorStatus = connectorState.Some
 
         if (stepStatus === StepStatus.Complete) {
-          connectorStatus = statusStates.Full
+          connectorStatus = connectorState.Full
         }
       }
 

@@ -1,26 +1,7 @@
-import React, {PureComponent, ReactElement, ReactNode} from 'react'
+import React, {PureComponent, ReactElement} from 'react'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 
-interface WizardStepProps {
-  children: ReactNode
-  title: string
-  isComplete: () => boolean
-  onPrevious: () => void
-  onNext: () => void
-  increment?: () => void
-  decrement?: () => void
-}
-
-enum StepStatus {
-  Incomplete = 'circle-thick',
-  Complete = 'checkmark',
-  Error = 'remove',
-}
-
-interface Step {
-  title: string
-  stepStatus: StepStatus
-}
+import {WizardStepProps, StepStatus, Step} from 'src/types/wizard'
 
 interface State {
   steps: Step[]

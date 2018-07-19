@@ -2,8 +2,6 @@ import React, {PureComponent} from 'react'
 import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 
-// import {} from 'src/types'
-
 interface Props {
   wizardVisibility: boolean
   toggleVisibility: (isVisible: boolean) => () => void
@@ -13,7 +11,7 @@ interface State {
   completion: object
 }
 
-class WizardWithSteps extends PureComponent<Props, State> {
+class GrandWizard extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -108,4 +106,4 @@ class WizardWithSteps extends PureComponent<Props, State> {
   }
 }
 
-export default WizardWithSteps
+export default GrandWizard

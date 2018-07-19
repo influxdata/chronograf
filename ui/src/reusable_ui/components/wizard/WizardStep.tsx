@@ -2,8 +2,6 @@ import React, {PureComponent, ReactNode} from 'react'
 
 import 'src/reusable_ui/components/wizard/WizardStep.scss'
 
-// import {} from 'src/types'
-
 interface Props {
   children: ReactNode
   title: string
