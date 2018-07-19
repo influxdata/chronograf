@@ -1,7 +1,9 @@
 import React, {SFC, ChangeEvent} from 'react'
+import uuid from 'uuid'
 
 import {CHANGES, RELATIVE_OPERATORS, SHIFTS} from 'src/kapacitor/constants'
-import Dropdown from 'src/shared/components/Dropdown'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 
 import {AlertRule} from 'src/types'
 
@@ -30,29 +32,23 @@ const Relative: SFC<Props> = ({
 }) => (
   <div className="rule-section--row rule-section--row-first rule-section--border-bottom">
     <p>Send Alert when</p>
-    <Dropdown
-      className="dropdown-110"
-      menuClass="dropdown-malachite"
-      items={changes}
-      selected={change}
-      onChoose={onDropdownChange}
-    />
+    <Dropdown width={110} selectedItem={change} onChange={onDropdownChange}>
+      {changes.map(option => (
+        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+      ))}
+    </Dropdown>
     <p>compared to previous</p>
-    <Dropdown
-      className="dropdown-80"
-      menuClass="dropdown-malachite"
-      items={shifts}
-      selected={shift}
-      onChoose={onDropdownChange}
-    />
+    <Dropdown width={80} selectedItem={shift} onChange={onDropdownChange}>
+      {shifts.map(option => (
+        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+      ))}
+    </Dropdown>
     <p>is</p>
-    <Dropdown
-      className="dropdown-160"
-      menuClass="dropdown-malachite"
-      items={operators}
-      selected={operator}
-      onChoose={onDropdownChange}
-    />
+    <Dropdown width={160} selectedItem={operator} onChange={onDropdownChange}>
+      {operators.map(option => (
+        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+      ))}
+    </Dropdown>
     <form style={{display: 'flex'}}>
       <input
         className="form-control input-sm form-malachite monotype"

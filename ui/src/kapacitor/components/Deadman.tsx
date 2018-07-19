@@ -1,7 +1,9 @@
 import React, {SFC} from 'react'
+import uuid from 'uuid'
 
 import {PERIODS} from 'src/kapacitor/constants'
-import Dropdown from 'src/shared/components/Dropdown'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 
 import {AlertRule} from 'src/types'
 
@@ -21,13 +23,11 @@ interface Props {
 const Deadman: SFC<Props> = ({rule, onChange}) => (
   <div className="rule-section--row rule-section--row-first rule-section--row-last">
     <p>Send Alert if Data is missing for</p>
-    <Dropdown
-      className="dropdown-80"
-      menuClass="dropdown-malachite"
-      items={periods}
-      selected={rule.values.period}
-      onChoose={onChange}
-    />
+    <Dropdown width={70} selectedItem={rule.values.period} onChange={onChange}>
+      {periods.map(option => (
+        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+      ))}
+    </Dropdown>
   </div>
 )
 
