@@ -27,7 +27,7 @@ const QueryOptions: SFC<Props> = ({
   isKapacitorRule,
   isDisabled,
 }) => (
-  <div className="query-builder--groupby-fill-container">
+  <div className="query-builder--field-options">
     <GroupByTimeDropdown
       selected={groupBy.time}
       onChooseGroupByTime={onGroupByTime}
