@@ -120,7 +120,7 @@ class Dropdown extends Component<Props, State> {
     if (expanded) {
       return (
         <div className="dropdown--menu-container" style={this.menuStyle}>
-          <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={240}>
+          <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={255}>
             <div className="dropdown--menu">
               {React.Children.map(children, (child: JSX.Element) =>
                 React.cloneElement(child, {

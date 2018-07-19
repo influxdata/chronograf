@@ -79,7 +79,6 @@ span.icon.dropdown--icon {
   overflow: hidden;
   position: fixed;
   z-index: 500;
-  background-color: #0f0;
   border-radius: $radius;
   box-shadow: 0 2px 5px 0.6px fade-out($g0-obsidian, 0.7);
 }
@@ -126,7 +125,7 @@ span.icon.dropdown--icon {
   top: 50%;
   left: 11px;
   transform: translateY(-50%);
-  background-color: #fff;
+  background-color: $g20-white;
 
   .active & {
     display: inline-block;
@@ -141,6 +140,10 @@ span.icon.dropdown--icon {
   &.line {
     padding: 0;
     height: 2px;
+  }
+
+  &:hover {
+    cursor: default;
   }
 }
 
@@ -174,6 +177,9 @@ span.icon.dropdown--icon {
     transform: translate(-50%,-50%) scale(1,1);
   }
 }
+
+/* Themes */
+/* Currently only a single theme, I plan on adding more later */
 
 .dropdown {
   .dropdown--menu-container {
