@@ -1,17 +1,17 @@
 /*
-  Group By Time Dropdown
+  Time Shift Dropdown
   ------------------------------------------------------------------------------
 */
 
 @import 'src/style/modules/influx-colors';
 @import 'src/style/modules/variables';
 
-.group-by-time {
+.time-shift {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
 }
-.group-by-time--label {
+.time-shift--label {
   white-space: nowrap;
   margin: 0;
   color: $g12-forge;

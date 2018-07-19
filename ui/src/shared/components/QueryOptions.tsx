@@ -3,7 +3,7 @@ import React, {SFC} from 'react'
 import {GroupBy, TimeShift} from 'src/types'
 
 import GroupByTimeDropdown from 'src/shared/components/group_by_time_dropdown/GroupByTimeDropdown'
-import TimeShiftDropdown from 'src/shared/components/TimeShiftDropdown'
+import TimeShiftDropdown from 'src/shared/components/time_shift_dropdown/TimeShiftDropdown'
 import FillQuery from 'src/shared/components/FillQuery'
 
 interface Props {
