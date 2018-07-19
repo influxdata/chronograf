@@ -10,9 +10,9 @@ interface WizardStepProps {
 }
 
 enum StepStatus {
-  Incomplete = 'INCOMPLETE',
-  Complete = 'COMPLETE',
-  Error = 'ERROR',
+  Incomplete = 'circle-thick',
+  Complete = 'checkmark',
+  Error = 'remove',
 }
 
 interface Step {

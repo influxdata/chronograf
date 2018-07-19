@@ -1,6 +1,25 @@
+@import 'src/style/modules/influx-colors';
+
 .progress-bar {
   display: flex;
   width: 100%;
   justify-content: center;
   align-items: center;
 }
+
+.checkmark:before {
+  color: $c-rainforest;
+}
+
+.circle-thick:before {
+  color: $g7-graphite;
+}
+
+.current.circle-thick:before {
+  color: $c-pool;
+}
+
+.remove:before {
+  color: $c-curacao;
+}
+

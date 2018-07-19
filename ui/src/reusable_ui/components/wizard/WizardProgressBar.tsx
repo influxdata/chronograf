@@ -12,9 +12,9 @@ enum statusStates {
 }
 
 enum StepStatus {
-  Incomplete = 'INCOMPLETE',
-  Complete = 'COMPLETE',
-  Error = 'ERROR',
+  Incomplete = 'circle-thick',
+  Complete = 'checkmark',
+  Error = 'remove',
 }
 
 interface Step {
@@ -36,18 +36,18 @@ class WizardProgressBar extends PureComponent<Props> {
     const {steps, currentStepIndex} = this.props
     const progressBar = steps.reduce((acc, step, i) => {
       const {stepStatus} = step
-      let stepEle
+      let currentStep = ''
 
-      switch (stepStatus) {
-        case StepStatus.Complete:
-          stepEle = <span key={`stepEle${i}`} className="icon checkmark" />
-          break
-        case StepStatus.Error:
-          stepEle = <span key={`stepEle${i}`} className="icon stop" />
-          break
-        default:
-          stepEle = <span key={`stepEle${i}`} className="icon circle-thick" />
+      if (i === currentStepIndex) {
+        currentStep = 'circle-thick current'
       }
+
+      const stepEle = (
+        <span
+          key={`stepEle${i}`}
+          className={`icon ${currentStep || stepStatus}`}
+        />
+      )
 
       const connectorEle =
         i === 0 ? null : (
