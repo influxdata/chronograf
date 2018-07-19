@@ -29,25 +29,25 @@ interface Props {
 }
 
 class WizardCloak extends PureComponent<Props, State> {
-  constructor(props) {
-    super(props)
-
+  public static getDerivedStateFromProps(props: Props) {
+    let currentStepIndex = -1
     const childSteps = React.Children.map(
       props.children,
-      (child: ReactElement<WizardStepProps>) => {
+      (child: ReactElement<WizardStepProps>, i) => {
+        const isComplete = child.props.isComplete()
+        if (currentStepIndex === -1 && !isComplete) {
+          currentStepIndex = i
+        }
         return {
           title: child.props.title,
-          stepStatus: child.props.isComplete()
-            ? StepStatus.Complete
-            : StepStatus.Incomplete,
+          stepStatus: isComplete ? StepStatus.Complete : StepStatus.Incomplete,
         }
       }
     )
-
-    this.state = {
-      steps: childSteps,
-      currentStepIndex: 2,
+    if (currentStepIndex === -1) {
+      currentStepIndex = childSteps.length - 1
     }
+    return {steps: childSteps, currentStepIndex}
   }
 
   public render() {
