@@ -78,7 +78,10 @@ class ManageSources extends PureComponent<Props, State> {
             <p className="version-number">Chronograf Version: {VERSION}</p>
           </div>
         </FancyScrollbar>
-        <GrandWizard wizardVisibility={wizardVisibility} />
+        <GrandWizard
+          wizardVisibility={wizardVisibility}
+          toggleVisibility={this.toggleVisibility}
+        />
       </div>
     )
   }

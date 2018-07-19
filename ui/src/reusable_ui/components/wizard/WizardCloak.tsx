@@ -1,11 +1,14 @@
 import React, {PureComponent, ReactElement, ReactNode} from 'react'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
-import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 
 interface WizardStepProps {
   children: ReactNode
   title: string
   isComplete: () => boolean
+  onPrevious: () => void
+  onNext: () => void
+  increment?: () => void
+  decrement?: () => void
 }
 
 enum StepStatus {
@@ -25,12 +28,13 @@ interface State {
 }
 
 interface Props {
-  children: ReactElement<WizardStep>
+  children: Array<ReactElement<WizardStepProps>>
+  toggleVisibility: (isVisible: boolean) => () => void
 }
 
 class WizardCloak extends PureComponent<Props, State> {
-  public static getDerivedStateFromProps(props: Props) {
-    let currentStepIndex = -1
+  public static getDerivedStateFromProps(props: Props, state: State) {
+    let {currentStepIndex} = state
     const childSteps = React.Children.map(
       props.children,
       (child: ReactElement<WizardStepProps>, i) => {
@@ -50,6 +54,14 @@ class WizardCloak extends PureComponent<Props, State> {
     return {steps: childSteps, currentStepIndex}
   }
 
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      steps: [],
+      currentStepIndex: -1,
+    }
+  }
+
   public render() {
     const {steps, currentStepIndex} = this.state
 
@@ -61,11 +73,37 @@ class WizardCloak extends PureComponent<Props, State> {
     )
   }
 
-  private get CurrentChild(): JSX.Element {
-    const {children} = this.props
+  private incrementStep = () => {
     const {currentStepIndex} = this.state
 
-    return children[currentStepIndex]
+    this.setState({
+      currentStepIndex: currentStepIndex + 1,
+    })
+  }
+
+  private decrementStep = () => {
+    const {currentStepIndex} = this.state
+
+    this.setState({
+      currentStepIndex: currentStepIndex - 1,
+    })
+  }
+
+  private get CurrentChild(): JSX.Element {
+    const {children, toggleVisibility} = this.props
+    const {currentStepIndex, steps} = this.state
+
+    const advance =
+      currentStepIndex === steps.length - 1
+        ? toggleVisibility(false)
+        : this.incrementStep
+
+    const retreat = currentStepIndex === 0 ? null : this.decrementStep
+
+    return React.cloneElement<WizardStepProps>(children[currentStepIndex], {
+      increment: advance,
+      decrement: retreat,
+    })
   }
 }
 

@@ -10,26 +10,48 @@ interface Props {
   isComplete: () => boolean
   onPrevious: () => void
   onNext: () => void
+  increment?: () => void
+  decrement?: () => void
 }
 
 class WizardStep extends PureComponent<Props> {
   public render() {
-    const {children, title, onPrevious, onNext} = this.props
+    const {children, title, decrement} = this.props
 
     return (
       <div className="progress-step">
         <h2>{title}</h2>
         {children}
         <div className="button-bar">
-          <button className="btn btn-md btn-default" onClick={onPrevious}>
-            Alakazam
-          </button>
-          <button className="btn btn-md btn-primary" onClick={onNext}>
+          {decrement && (
+            <button
+              className="btn btn-md btn-default"
+              onClick={this.handleClickPrevious}
+            >
+              Alakazam
+            </button>
+          )}
+          <button
+            className="btn btn-md btn-primary"
+            onClick={this.handleClickNext}
+          >
             Abrakabra
           </button>
         </div>
       </div>
     )
+  }
+
+  private handleClickPrevious = () => {
+    const {onPrevious, decrement} = this.props
+    onPrevious() // TODO wait if async function
+    decrement()
+  }
+
+  private handleClickNext = () => {
+    const {onNext, increment} = this.props
+    onNext()
+    increment()
   }
 }
 
