@@ -8,7 +8,21 @@ interface Props {
   wizardVisibility: boolean
 }
 
-class WizardWithSteps extends PureComponent<Props> {
+interface State {
+  completion: object
+}
+
+class WizardWithSteps extends PureComponent<Props, State> {
+  constructor(props) {
+    super(props)
+    this.state = {
+      completion: {
+        first: false,
+        second: false,
+        third: false,
+      },
+    }
+  }
   public render() {
     const {wizardVisibility} = this.props
 
@@ -16,19 +30,21 @@ class WizardWithSteps extends PureComponent<Props> {
       <WizardOverlay visible={wizardVisibility} title="Grand Wizard">
         <WizardStep
           title="First Real Step"
-          isComplete={this.completeTest(true)}
+          isComplete={this.completeTest('first')}
         >
           some first children
         </WizardStep>
         <WizardStep
           title="Second Real Step"
-          isComplete={this.completeTest(true)}
+          isComplete={this.completeTest('second')}
+          onNext={this.handleSecondNext}
         >
           some second children
         </WizardStep>
         <WizardStep
           title="Third Real Step"
-          isComplete={this.completeTest(false)}
+          isComplete={this.completeTest('third')}
+          onNext={this.handleThirdNext}
         >
           some third children
         </WizardStep>
@@ -36,8 +52,23 @@ class WizardWithSteps extends PureComponent<Props> {
     )
   }
 
-  private completeTest = currState => () => {
-    return currState
+  private completeTest = curr => () => {
+    const {completion} = this.state
+    return completion[curr]
+  }
+
+  private handleSecondNext = () => {
+    const {completion} = this.state
+    this.setState({
+      completion: {...completion, second: true},
+    })
+  }
+
+  private handleThirdNext = () => {
+    const {completion} = this.state
+    this.setState({
+      completion: {...completion, third: true},
+    })
   }
 }
 

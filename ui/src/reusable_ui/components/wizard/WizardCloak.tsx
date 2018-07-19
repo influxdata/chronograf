@@ -2,8 +2,6 @@ import React, {PureComponent, ReactElement, ReactNode} from 'react'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 
-// import {} from 'src/types'
-
 interface WizardStepProps {
   children: ReactNode
   title: string
