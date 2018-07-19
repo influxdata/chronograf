@@ -32,6 +32,7 @@ const QueryOptions: SFC<Props> = ({
       selected={groupBy.time}
       onChooseGroupByTime={onGroupByTime}
       isDisabled={isDisabled}
+      excludeAutoOption={isKapacitorRule}
     />
     {isKapacitorRule ? null : (
       <TimeShiftDropdown
