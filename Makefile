@@ -1,6 +1,6 @@
 .PHONY: assets dep clean test gotest gotestrace jstest run run-dev run-hmr ctags
 
-VERSION ?= $(shell git describe --always --tags)
+VERSION ?= 1.6.0
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
 GOBINDATA := $(shell go list -f {{.Root}}  github.com/kevinburke/go-bindata 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
