@@ -46,8 +46,6 @@ class Dropdown extends Component<Props, State> {
     menuColor: DropdownMenuColor.Sapphire,
   }
 
-  private containerRef: HTMLElement
-
   constructor(props: Props) {
     super(props)
 
@@ -61,11 +59,7 @@ class Dropdown extends Component<Props, State> {
 
     return (
       <ClickOutside onClickOutside={this.collapseMenu}>
-        <div
-          className={this.containerClassName}
-          style={{width}}
-          ref={el => (this.containerRef = el)}
-        >
+        <div className={this.containerClassName} style={{width}}>
           {this.button}
           {this.menu}
         </div>
@@ -157,20 +151,15 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get menuStyle(): CSSProperties {
-    const {wrapText} = this.props
-    const {width, top, height, left} = this.containerRef.getBoundingClientRect()
+    const {wrapText, width} = this.props
 
     if (wrapText) {
       return {
-        top: `${top + height}px`,
-        left: `${left}px`,
         width: `${width}px`,
       }
     }
 
     return {
-      top: `${top + height}px`,
-      left: `${left}px`,
       minWidth: `${width}px`,
     }
   }

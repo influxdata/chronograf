@@ -77,7 +77,9 @@ span.icon.dropdown--icon {
 /* Dropdown Menu */
 .dropdown--menu-container {
   overflow: hidden;
-  position: fixed;
+  position: absolute;
+  top: 100%;
+  left: 0;
   z-index: 500;
   border-radius: $radius;
   box-shadow: 0 2px 5px 0.6px fade-out($g0-obsidian, 0.7);
@@ -226,4 +228,3 @@ span.icon.dropdown--icon {
 .dropdown--menu-container .fancy-scroll--track-h {
   display: none;
 }
- 
