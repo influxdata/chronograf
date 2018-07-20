@@ -1,3 +1,11 @@
+## v1.6.1 [unreleased]
+
+### Bug Fixes
+
+1.  [#3976](https://github.com/influxdata/chronograf/pull/3976): Ensure text template variables reflect query parameters
+1.  [#3976](https://github.com/influxdata/chronograf/pull/3976): Enable using a new, blank text template variable in a query
+1.  [#3976](https://github.com/influxdata/chronograf/pull/3976): Ensure cells with broken queries display “No Data”
+
 ## v1.6.0 [2018-06-18]
 
 ### Features
