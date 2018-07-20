@@ -1,5 +1,8 @@
-import React, {Component, CSSProperties} from 'react'
+import React, {Component, CSSProperties, Fragment} from 'react'
 import classnames from 'classnames'
+import uuid from 'uuid'
+import _ from 'lodash'
+
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import {ComponentColor, ComponentSize, IconFont} from 'src/reusable_ui/types'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -114,7 +117,7 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get menu(): JSX.Element {
-    const {children, selectedItem} = this.props
+    const {selectedItem} = this.props
     const {expanded} = this.state
 
     if (expanded) {
@@ -122,9 +125,10 @@ class Dropdown extends Component<Props, State> {
         <div className="dropdown--menu-container" style={this.menuStyle}>
           <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={255}>
             <div className="dropdown--menu">
-              {React.Children.map(children, (child: JSX.Element) =>
+              {this.flatChildren.map((child: JSX.Element) =>
                 React.cloneElement(child, {
                   ...child.props,
+                  key: uuid.v4(),
                   selected: child.props.text === selectedItem,
                   onClick: this.handleItemClick,
                 })
@@ -136,6 +140,21 @@ class Dropdown extends Component<Props, State> {
     }
 
     return null
+  }
+
+  private get flatChildren() {
+    const children = React.Children.toArray(this.props.children)
+
+    const childrenWithoutFragments = children.map((child: JSX.Element) => {
+      if (child.type === Fragment) {
+        const childArray = React.Children.toArray(child.props.children)
+        return childArray
+      }
+
+      return child
+    })
+
+    return _.flattenDeep(childrenWithoutFragments)
   }
 
   private get menuStyle(): CSSProperties {
