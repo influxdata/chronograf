@@ -1,0 +1,18 @@
+/*
+  Calendar Dropdown
+  ------------------------------------------------------------------------------
+*/
+
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+
+.calendar-dropdown {
+  position: relative;
+}
+
+.calendar-dropdown--container {
+  position: absolute;
+  top: calc(100% + #{$ix-marg-a});
+  right: 0;
+  z-index: 500;
+}

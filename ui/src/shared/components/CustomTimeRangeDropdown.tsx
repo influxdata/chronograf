@@ -32,10 +32,7 @@ class CustomTimeRangeDropdown extends PureComponent<Props, State> {
     const {expanded} = this.state
 
     return (
-      <div
-        className="calendar-dropdown"
-        style={{width: this.buttonWidth, position: 'relative'}}
-      >
+      <div className="calendar-dropdown" style={{width: this.buttonWidth}}>
         <DropdownButton
           icon={IconFont.Clock}
           label={this.dropdownLabel}
@@ -61,10 +58,7 @@ class CustomTimeRangeDropdown extends PureComponent<Props, State> {
     if (expanded) {
       return (
         <ClickOutside onClickOutside={this.handleCollapseCalendar}>
-          <div
-            className="calendar-dropdown--container"
-            style={{position: 'absolute', top: '100%', right: '0', zIndex: 500}}
-          >
+          <div className="calendar-dropdown--container">
             <CalendarSelector
               onApplyTimeRange={this.handleApplyTimeRange}
               timeRange={timeRange}
@@ -104,29 +98,6 @@ class CustomTimeRangeDropdown extends PureComponent<Props, State> {
 
     return 297
   }
-
-  // private get upperTimeRange(): string {
-  //   const {
-  //     timeRange: {upper},
-  //   } = this.props
-
-  //   if (upper === 'now()') {
-  //     return moment().format(this.timeFormat)
-  //   }
-
-  //   return moment(upper).format(this.timeFormat)
-  // }
-
-  // private get lowerTimeRange(): string {
-  //   const {
-  //     timeRange: {lower},
-  //   } = this.props
-  //   return moment(lower).format(this.timeFormat)
-  // }
-
-  // private get timeFormat(): string {
-  //   return 'MMM Do HH:mm'
-  // }
 
   private handleToggleCalendar = () => {
     this.setState({expanded: !this.state.expanded})
