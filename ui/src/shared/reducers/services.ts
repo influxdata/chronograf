@@ -16,8 +16,8 @@ const servicesReducer = (state = initialState, action: Action): Service[] => {
 
     case 'DELETE_SERVICE': {
       const {service} = action.payload
-
-      return state.filter(s => s.id !== service.id)
+      const services = state.filter(s => s.id !== service.id)
+      return services
     }
 
     case 'UPDATE_SERVICE': {

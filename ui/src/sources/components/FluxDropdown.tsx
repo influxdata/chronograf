@@ -11,7 +11,8 @@ import {Source, Service} from 'src/types'
 interface Props {
   source: Source
   services: Service[]
-  setActiveFlux: (source: Source, service: Service) => void
+  setActiveFlux: (source: Source, fluxService: Service) => void
+  deleteFlux: (fluxService: Service) => void
 }
 
 interface FluxServiceItem {
@@ -24,7 +25,7 @@ class FluxDropdown extends PureComponent<
   Props & RouteComponentProps<any, any>
 > {
   public render() {
-    const {source, router} = this.props
+    const {source, router, deleteFlux} = this.props
 
     if (this.isServicesEmpty) {
       return (
@@ -62,14 +63,14 @@ class FluxDropdown extends PureComponent<
                 router.push(`${item.resource}/edit`)
               },
             },
-            // {
-            //   icon: 'trash',
-            //   text: 'delete',
-            //   handler: item => {
-            //     deleteKapacitor(item.kapacitor)
-            //   },
-            //   confirmable: true,
-            // },
+            {
+              icon: 'trash',
+              text: 'delete',
+              handler: item => {
+                deleteFlux(item.service)
+              },
+              confirmable: true,
+            },
           ]}
           selected={this.selected}
         />

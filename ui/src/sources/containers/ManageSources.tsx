@@ -29,6 +29,7 @@ interface Props {
   setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
   fetchAllServices: servicesActions.FetchAllServicesAsync
   setActiveFlux: servicesActions.SetActiveServiceAsync
+  deleteFlux: servicesActions.DeleteServiceAsync
 }
 
 const VERSION = process.env.npm_package_version
@@ -51,7 +52,7 @@ class ManageSources extends PureComponent<Props> {
   }
 
   public render() {
-    const {sources, source, deleteKapacitor, services} = this.props
+    const {sources, source, deleteKapacitor, deleteFlux, services} = this.props
 
     return (
       <div className="page" id="manage-sources-page">
@@ -62,10 +63,11 @@ class ManageSources extends PureComponent<Props> {
               source={source}
               sources={sources}
               services={services}
+              deleteFlux={deleteFlux}
               deleteKapacitor={deleteKapacitor}
               onDeleteSource={this.handleDeleteSource}
-              setActiveKapacitor={this.handleSetActiveKapacitor}
               setActiveFlux={this.handleSetActiveFlux}
+              setActiveKapacitor={this.handleSetActiveKapacitor}
             />
             <p className="version-number">Chronograf Version: {VERSION}</p>
           </div>
@@ -111,6 +113,7 @@ const mdtp = {
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
   fetchAllServices: servicesActions.fetchAllServicesAsync,
   setActiveFlux: servicesActions.setActiveServiceAsync,
+  deleteFlux: servicesActions.deleteServiceAsync,
 }
 
 export default connect(mstp, mdtp)(ManageSources)

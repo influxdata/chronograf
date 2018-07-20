@@ -19,6 +19,7 @@ interface Props {
   setActiveKapacitor: actions.SetActiveKapacitor
   setActiveFlux: (source: Source, service: Service) => void
   deleteKapacitor: actions.DeleteKapacitor
+  deleteFlux: (fluxService: Service) => void
 }
 
 class InfluxTableRow extends PureComponent<Props> {
@@ -30,6 +31,7 @@ class InfluxTableRow extends PureComponent<Props> {
       setActiveKapacitor,
       setActiveFlux,
       deleteKapacitor,
+      deleteFlux,
     } = this.props
 
     return (
@@ -63,6 +65,7 @@ class InfluxTableRow extends PureComponent<Props> {
             services={services}
             source={source}
             setActiveFlux={setActiveFlux}
+            deleteFlux={deleteFlux}
           />
         </td>
       </tr>

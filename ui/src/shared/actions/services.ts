@@ -3,6 +3,7 @@ import {
   updateService as updateServiceAJAX,
   getServices as getServicesAJAX,
   createService as createServiceAJAX,
+  deleteService as deleteServiceAJAX,
 } from 'src/shared/apis'
 import {notify} from './notifications'
 import {couldNotGetServices} from 'src/shared/copy/notifications'
@@ -190,6 +191,21 @@ export const updateServiceAsync = (service: Service) => async (
   try {
     const s = await updateServiceAJAX(service)
     dispatch(updateService(s))
+  } catch (err) {
+    console.error(err.data)
+    throw err.data
+  }
+}
+
+export type DeleteServiceAsync = (
+  service: Service
+) => (dispatch) => Promise<void>
+export const deleteServiceAsync = (service: Service) => async (
+  dispatch
+): Promise<void> => {
+  try {
+    await deleteServiceAJAX(service)
+    dispatch(deleteService(service))
   } catch (err) {
     console.error(err.data)
     throw err.data

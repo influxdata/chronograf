@@ -433,3 +433,15 @@ export const updateService = async (service: Service): Promise<Service> => {
     throw error
   }
 }
+
+export const deleteService = async (service: Service): Promise<void> => {
+  try {
+    await AJAX({
+      url: service.links.self,
+      method: 'DELETE',
+    })
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
