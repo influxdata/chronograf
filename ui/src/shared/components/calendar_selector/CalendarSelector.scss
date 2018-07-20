@@ -1,7 +1,12 @@
 /*
-  Custom Time Range Dropdown
-  ------------------------------------------------------
+  Calendar Selector
+  ------------------------------------------------------------------------------
 */
+
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
+@import 'src/style/fonts/fonts';
 
 .custom-time-range {
   position: relative;
