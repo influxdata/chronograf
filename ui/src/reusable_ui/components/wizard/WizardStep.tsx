@@ -1,4 +1,5 @@
 import React, {PureComponent, ReactNode} from 'react'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 import 'src/reusable_ui/components/wizard/WizardStep.scss'
 
@@ -25,7 +26,13 @@ class WizardStep extends PureComponent<Props> {
         <div className="tip-text">
           <p>{tipText}</p>
         </div>
-        <div className="step-content">{children}</div>
+        <FancyScrollbar
+          maxHeight={400}
+          autoHeight={true}
+          className="step-content"
+        >
+          {children}
+        </FancyScrollbar>
         <div className="button-bar">
           {decrement && (
             <button

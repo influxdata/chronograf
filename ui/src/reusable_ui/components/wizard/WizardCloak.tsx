@@ -51,7 +51,7 @@ class WizardCloak extends PureComponent<Props, State> {
     const {skipLinkText, toggleVisibility} = this.props
 
     return (
-      <div>
+      <div className="wizard-cloak">
         <h2 className="step-title">{this.CurrentChild.props.title}</h2>
         <WizardProgressBar
           handleJump={this.jumpToStep}
@@ -67,18 +67,18 @@ class WizardCloak extends PureComponent<Props, State> {
   }
 
   private incrementStep = () => {
-    const {currentStepIndex} = this.state
-
-    this.setState({
-      currentStepIndex: currentStepIndex + 1,
+    this.setState(prevState => {
+      return {
+        currentStepIndex: prevState.currentStepIndex + 1,
+      }
     })
   }
 
   private decrementStep = () => {
-    const {currentStepIndex} = this.state
-
-    this.setState({
-      currentStepIndex: currentStepIndex - 1,
+    this.setState(prevState => {
+      return {
+        currentStepIndex: prevState.currentStepIndex - 1,
+      }
     })
   }
 

@@ -27,7 +27,7 @@ class WizardOverlay extends PureComponent<Props> {
 
     return (
       <OverlayTechnology visible={visible}>
-        <OverlayContainer>
+        <OverlayContainer maxWidth={800}>
           <OverlayHeading title={title} />
           <OverlayBody>
             <WizardCloak
