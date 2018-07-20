@@ -1,46 +1,52 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import OnClickOutside from 'react-onclickoutside'
+import moment from 'moment'
 
-import CustomTimeRange from 'shared/components/CustomTimeRange'
+import CustomTimeRange from 'src/shared/components/CustomTimeRange'
+import {ClickOutside} from 'src/shared/components/ClickOutside'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {TimeRange} from 'src/types'
+
+interface Props {
+  timeRange: TimeRange
+  onDismiss: () => void
+  onSelect: (timeRange: TimeRange) => void
+}
 
 @ErrorHandling
-class CustomTimeRangeOverlay extends Component {
-  constructor(props) {
-    super(props)
-  }
-
-  handleClickOutside() {
-    this.props.onClose()
-  }
-
-  render() {
-    const {onClose, timeRange, onApplyTimeRange, page} = this.props
+class AbsoluteTime extends Component<Props> {
+  public render() {
+    const {onDismiss, onSelect} = this.props
 
     return (
-      <div className="custom-time--overlay">
-        <CustomTimeRange
-          onApplyTimeRange={onApplyTimeRange}
-          timeRange={timeRange}
-          onClose={onClose}
-          page={page}
-        />
-      </div>
+      <ClickOutside onClickOutside={onDismiss}>
+        <div className="time-range-dropdown--custom">
+          <CustomTimeRange
+            onApplyTimeRange={onSelect}
+            timeRange={this.validatedTime}
+            onClose={onDismiss}
+            page="default"
+          />
+        </div>
+      </ClickOutside>
     )
+  }
+
+  private get validatedTime(): TimeRange {
+    const {
+      timeRange: {upper, lower},
+    } = this.props
+
+    const valid = moment(upper).isValid() && moment(lower).isValid()
+
+    if (valid) {
+      return {upper, lower}
+    }
+
+    return {
+      upper: '',
+      lower: '',
+    }
   }
 }
 
-const {func, shape, string} = PropTypes
-
-CustomTimeRangeOverlay.propTypes = {
-  onApplyTimeRange: func.isRequired,
-  timeRange: shape({
-    lower: string.isRequired,
-    upper: string,
-  }).isRequired,
-  onClose: func,
-  page: string,
-}
-
-export default OnClickOutside(CustomTimeRangeOverlay)
+export default AbsoluteTime

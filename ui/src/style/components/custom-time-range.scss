@@ -7,11 +7,11 @@
   position: relative;
 }
 .custom-time--container {
-  display: none;
+  display: flex;
   position: absolute;
   flex-direction: row;
   align-items: stretch;
-  top: 35px;
+  top: 0;
   right: 0;
   border-radius: $radius;
   z-index: 1000;

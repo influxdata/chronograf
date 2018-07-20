@@ -89,3 +89,13 @@ export const defaultTimeRange = {
 export const STATUS_PAGE_TIME_RANGE = timeRanges.find(
   tr => tr.lower === nowMinus30d
 )
+
+export const CUSTOM_TIME_ABSOLUTE = 'Date Picker'
+export const CUSTOM_TIME_OPTION = {
+  defaultGroupBy: '10s',
+  seconds: 300,
+  inputValue: CUSTOM_TIME_ABSOLUTE,
+  lower: 'now() - 5m',
+  upper: null,
+  menuOption: CUSTOM_TIME_ABSOLUTE,
+}
