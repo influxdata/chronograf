@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import {ComponentColor, ComponentSize, IconFont} from 'src/reusable_ui/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import './DropdownButton.scss'
 
 interface Props {
   onClick: () => void
