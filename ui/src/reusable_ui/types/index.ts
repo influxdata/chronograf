@@ -7,6 +7,13 @@ export enum ComponentColor {
   Alert = 'alert',
 }
 
+export enum DropdownMenuColor {
+  Amethyst = 'amethyst',
+  Malachite = 'malachite',
+  Sapphire = 'sapphire',
+  Onyx = 'onyx',
+}
+
 export enum ComponentSize {
   ExtraSmall = 'xs',
   Small = 'sm',

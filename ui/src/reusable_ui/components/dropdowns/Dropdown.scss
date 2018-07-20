@@ -181,33 +181,49 @@ span.icon.dropdown--icon {
 /* Themes */
 /* Currently only a single theme, I plan on adding more later */
 
-.dropdown {
-  .dropdown--menu-container {
-    @include gradient-h($c-star, $c-pool);
-  }
+@mixin dropdownMenuColor($backgroundA, $backgroundB, $hoverA, $hoverB, $dividerA, $dividerB, $dividerText, $scrollA, $scrollB) {
+  @include gradient-h($backgroundA, $backgroundB);
+
   .dropdown--item:hover,
   .dropdown--item.active {
-    @include gradient-h($c-comet, $c-laser);
+    @include gradient-h($hoverA, $hoverB);
   }
   .dropdown--divider {
-    color: $c-potassium;
-    @include gradient-h($c-amethyst, $c-ocean);
+    color: $dividerText;
+    @include gradient-h($dividerA, $dividerB);
   }
   .dropdown-item--checkbox {
-    background-color: $c-amethyst;
+    background-color: $dividerA;
   }
   .dropdown-item--checkbox:after {
-    background-color: $c-yeti;
+    background-color: $scrollA;
   }
   .fancy-scroll--thumb-h {
-    @include gradient-h($c-neutrino, $c-hydrogen);
+    @include gradient-h($scrollA, $scrollB);
   }
   .fancy-scroll--thumb-v {
-    @include gradient-v($c-neutrino, $c-hydrogen);
+    @include gradient-v($scrollA, $scrollB);
   }
-  /* TODO: Make fancyscroll more customizable */
-  .fancy-scroll--track-h {
-    display: none;
-  }
+}
+
+.dropdown--amethyst {
+  @include dropdownMenuColor($c-star, $c-pool, $c-comet, $c-laser, $c-amethyst, $c-ocean, $c-potassium, $c-neutrino, $c-hydrogen);
+}
+
+.dropdown--sapphire {
+  @include dropdownMenuColor($c-ocean, $c-pool, $c-pool, $c-laser, $c-sapphire, $c-ocean, $c-laser, $c-neutrino, $c-hydrogen);
+}
+
+.dropdown--malachite {
+  @include dropdownMenuColor($c-pool, $c-rainforest, $c-laser, $c-honeydew, $c-ocean, $c-viridian, $c-krypton, $c-neutrino, $c-krypton);
+}
+
+.dropdown--onyx {
+  @include dropdownMenuColor($g2-kevlar, $g4-onyx, $g4-onyx, $g6-smoke, $g0-obsidian, $g2-kevlar, $g11-sidewalk, $c-pool, $c-comet);
+}
+
+/* TODO: Make fancyscroll more customizable */
+.dropdown--menu-container .fancy-scroll--track-h {
+  display: none;
 }
  

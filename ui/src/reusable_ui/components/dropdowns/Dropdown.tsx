@@ -4,7 +4,12 @@ import uuid from 'uuid'
 import _ from 'lodash'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
-import {ComponentColor, ComponentSize, IconFont} from 'src/reusable_ui/types'
+import {
+  ComponentColor,
+  ComponentSize,
+  IconFont,
+  DropdownMenuColor,
+} from 'src/reusable_ui/types'
 import DropdownButton from 'src/reusable_ui/components/dropdowns/DropdownButton'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -15,6 +20,7 @@ interface Props {
   onChange: (value: any) => void
   selectedItem: string
   color?: ComponentColor
+  menuColor?: DropdownMenuColor
   size?: ComponentSize
   disabled?: boolean
   width?: number
@@ -37,6 +43,7 @@ class Dropdown extends Component<Props, State> {
     width: 120,
     wrapText: false,
     maxMenuHeight: 250,
+    menuColor: DropdownMenuColor.Sapphire,
   }
 
   private containerRef: HTMLElement
@@ -102,12 +109,15 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get menu(): JSX.Element {
-    const {selectedItem, maxMenuHeight} = this.props
+    const {selectedItem, maxMenuHeight, menuColor} = this.props
     const {expanded} = this.state
 
     if (expanded) {
       return (
-        <div className="dropdown--menu-container" style={this.menuStyle}>
+        <div
+          className={`dropdown--menu-container dropdown--${menuColor}`}
+          style={this.menuStyle}
+        >
           <FancyScrollbar
             autoHide={false}
             autoHeight={true}
