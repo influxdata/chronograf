@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import moment from 'moment'
 
-import CustomTimeRange from 'src/shared/components/CustomTimeRange'
+import CalendarSelector from 'src/shared/components/calendar_selector/CalendarSelector'
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {TimeRange} from 'src/types'
@@ -21,7 +21,7 @@ class AbsoluteTime extends Component<Props> {
     return (
       <ClickOutside onClickOutside={onDismiss}>
         <div className="time-range-dropdown--custom">
-          <CustomTimeRange
+          <CalendarSelector
             onApplyTimeRange={onSelect}
             timeRange={this.validatedTime}
             onClose={onDismiss}

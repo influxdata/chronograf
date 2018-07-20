@@ -3,7 +3,7 @@ import moment from 'moment'
 import classnames from 'classnames'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
-import CustomTimeRange from 'src/shared/components/CustomTimeRange'
+import CalendarSelector from 'src/shared/components/calendar_selector/CalendarSelector'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {TimeRange} from 'src/types'
 
@@ -48,7 +48,7 @@ class CustomTimeRangeDropdown extends PureComponent<Props, State> {
             </span>
             <span className="caret" />
           </button>
-          <CustomTimeRange
+          <CalendarSelector
             onApplyTimeRange={onApplyTimeRange}
             timeRange={timeRange}
             onClose={this.closeDropdown}
