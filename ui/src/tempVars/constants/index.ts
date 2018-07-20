@@ -178,7 +178,14 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
     return {
       id: uuid.v4(),
       tempVar: ':my-text:',
-      values: [],
+      values: [
+        {
+          type: TemplateValueType.Constant,
+          value: '',
+          selected: false,
+          localSelected: true,
+        },
+      ],
       type: TemplateType.Text,
       label: '',
     }
