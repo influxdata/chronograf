@@ -16,6 +16,7 @@ import {UpdateScript} from 'src/flux/actions'
 import {bodyNodes} from 'src/flux/helpers'
 import {getSuggestions, getAST, getTimeSeries} from 'src/flux/apis'
 import {builder, argTypes, emptyAST} from 'src/flux/constants'
+import {getDeep} from 'src/utils/wrappers'
 
 import {Source, Service, Notification, FluxTable} from 'src/types'
 import {
@@ -133,7 +134,11 @@ export class FluxPage extends PureComponent<Props, State> {
   }
 
   private get service(): Service {
-    return this.props.services[0]
+    const {services} = this.props
+    const activeService = services.find(s => {
+      return getDeep(s, 'metadata.active', false)
+    })
+    return activeService || services[0]
   }
 
   private get getContext(): Context {

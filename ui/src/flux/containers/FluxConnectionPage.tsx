@@ -15,6 +15,8 @@ import {
   CreateServiceAsync,
   fetchServicesForSourceAsync,
   FetchServicesForSourceAsync,
+  setActiveServiceAsync,
+  SetActiveServiceAsync,
 } from 'src/shared/actions/services'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Service, Source, Notification} from 'src/types'
@@ -27,6 +29,7 @@ interface Props {
   notify: (message: Notification) => void
   createService: CreateServiceAsync
   updateService: UpdateServiceAsync
+  setActiveFlux: SetActiveServiceAsync
   fetchServicesForSource: FetchServicesForSourceAsync
 }
 
@@ -95,6 +98,7 @@ class FluxConnectionPage extends PureComponent<Props, State> {
       notify,
       createService,
       updateService,
+      setActiveFlux,
       services,
       router,
     } = this.props
@@ -107,6 +111,7 @@ class FluxConnectionPage extends PureComponent<Props, State> {
           services={services}
           notify={notify}
           router={router}
+          setActiveFlux={setActiveFlux}
           createService={createService}
         />
       )
@@ -127,6 +132,7 @@ const mdtp = {
   notify: notifyAction,
   createService: createServiceAsync,
   updateService: updateServiceAsync,
+  setActiveFlux: setActiveServiceAsync,
   fetchServicesForSource: fetchServicesForSourceAsync,
 }
 

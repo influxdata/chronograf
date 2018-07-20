@@ -8,12 +8,17 @@ import {
   fluxNotCreated,
   notifyFluxNameAlreadyTaken,
 } from 'src/shared/copy/notifications'
-import {CreateServiceAsync} from 'src/shared/actions/services'
+import {
+  CreateServiceAsync,
+  SetActiveServiceAsync,
+} from 'src/shared/actions/services'
 import {FluxFormMode} from 'src/flux/constants/connection'
+import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
   source: Source
   services: Service[]
+  setActiveFlux?: SetActiveServiceAsync
   onDismiss?: () => void
   createService: CreateServiceAsync
   router?: {push: (url: string) => void}
@@ -62,6 +67,7 @@ class FluxNew extends PureComponent<Props, State> {
       source,
       services,
       onDismiss,
+      setActiveFlux,
       createService,
     } = this.props
     const {service} = this.state
@@ -74,7 +80,11 @@ class FluxNew extends PureComponent<Props, State> {
     }
 
     try {
+      const active = this.activeService
       const s = await createService(source, service)
+      if (setActiveFlux) {
+        await setActiveFlux(source, s, active)
+      }
       if (router) {
         router.push(`/sources/${source.id}/flux/${s.id}/edit`)
       }
@@ -98,6 +108,14 @@ class FluxNew extends PureComponent<Props, State> {
       type: 'flux',
       active: true,
     }
+  }
+
+  private get activeService(): Service {
+    const {services} = this.props
+    const activeService = services.find(s => {
+      return getDeep(s, 'metadata.active', false)
+    })
+    return activeService || services[0]
   }
 
   private get url(): string {
