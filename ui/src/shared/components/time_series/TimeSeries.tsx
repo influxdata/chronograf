@@ -100,7 +100,10 @@ class TimeSeries extends Component<Props, State> {
         loading: RemoteDataState.Done,
       })
     } catch (err) {
-      console.error(err)
+      this.setState({
+        timeSeries: [],
+        loading: RemoteDataState.Error,
+      })
     }
   }
 
