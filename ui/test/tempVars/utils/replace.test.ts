@@ -221,6 +221,38 @@ describe('templates.utils.replace', () => {
 
       expect(actual).toBe(expected)
     })
+
+    it('replaces a query with a single / properly', () => {
+      const templates = [
+        {
+          tempVar: ':Cluster_Id:',
+          values: [
+            {
+              value: 'e87a44cb9df65eb0d6fa50730842d926',
+              type: TemplateValueType.TagValue,
+              selected: true,
+              localSelected: true,
+            },
+          ],
+          id: 'e4731672-e3d6-4633-b2ed-146ea51cbb7f',
+          type: TemplateType.TagValues,
+          label: '',
+          query: {
+            influxql:
+              'SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:',
+            db: 'telegraf',
+            measurement: 'cpu',
+            tagKey: 'cluster_id',
+            fieldKey: '',
+          },
+        },
+      ]
+      const query = `SELECT last("max") from (SELECT max("total")/1073741824 FROM "telegraf".."mem" WHERE "cluster_id" = :Cluster_Id: AND (host =~ /.*data.*/ OR host =~ /tot-.*-(3|4)/) GROUP BY time(1s), host)`
+      const expected = `SELECT last("max") from (SELECT max("total")/1073741824 FROM "telegraf".."mem" WHERE "cluster_id" = 'e87a44cb9df65eb0d6fa50730842d926' AND (host =~ /.*data.*/ OR host =~ /tot-.*-(3|4)/) GROUP BY time(1s), host)`
+      const actual = templateReplace(query, templates)
+
+      expect(actual).toBe(expected)
+    })
   })
 
   describe('with no templates', () => {
