@@ -1,10 +1,40 @@
 @import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
 
 .progress-bar {
   display: flex;
   width: 100%;
   justify-content: center;
   align-items: center;
+  margin: 20px 0;
+}
+
+.progress-button {
+  position: relative;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .progress-title {
+    font-size: $ix-text-tiny;
+    color: $g12-forge;
+    opacity: 0;
+    position: absolute;
+    white-space: nowrap;
+    margin-top: -10px;
+    font-weight: 600;
+  }
+}
+
+.progress-button:hover {
+  .progress-title {
+    color: $g12-forge;
+    opacity: 1;
+    margin-top: -20px;
+    transition: all .5s;
+  }
 }
 
 .checkmark:before {
@@ -22,4 +52,3 @@
 .remove:before {
   color: $c-curacao;
 }
-

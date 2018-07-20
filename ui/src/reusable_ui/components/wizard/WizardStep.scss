@@ -1,8 +1,27 @@
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+
 .button-bar {
   display: flex;
   margin: 0 auto;
-  width: 40%;
-  justify-content: space-around;
+  min-width: 100%;
+  justify-content: center;
   align-items: center;
+  .btn {
+    position: relative;
+    white-space: nowrap;
+    margin: $ix-marg-d $ix-marg-b $ix-marg-b $ix-marg-b;
+  }
+}
 
+.tip-text {
+  min-width: 100%;
+  color: $g12-forge;
+  text-align: center;
+}
+
+.skip-link {
+  color: $g7-graphite;
+  text-decoration: underline;
+  text-align: center;
 }

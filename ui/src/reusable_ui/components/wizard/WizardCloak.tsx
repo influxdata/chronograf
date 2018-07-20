@@ -11,6 +11,7 @@ interface State {
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
   toggleVisibility: (isVisible: boolean) => () => void
+  skipLinkText?: string
 }
 
 class WizardCloak extends PureComponent<Props, State> {
@@ -45,11 +46,19 @@ class WizardCloak extends PureComponent<Props, State> {
 
   public render() {
     const {steps, currentStepIndex} = this.state
+    const {skipLinkText, toggleVisibility} = this.props
 
     return (
       <div>
-        <WizardProgressBar steps={steps} currentStepIndex={currentStepIndex} />
+        <WizardProgressBar
+          handleJump={this.jumpToStep}
+          steps={steps}
+          currentStepIndex={currentStepIndex}
+        />
         {this.CurrentChild}
+        <p className="skip-link">
+          <a onClick={toggleVisibility(false)}> {skipLinkText || 'skip'}</a>
+        </p>
       </div>
     )
   }
@@ -67,6 +76,12 @@ class WizardCloak extends PureComponent<Props, State> {
 
     this.setState({
       currentStepIndex: currentStepIndex - 1,
+    })
+  }
+
+  private jumpToStep = jumpIndex => () => {
+    this.setState({
+      currentStepIndex: jumpIndex,
     })
   }
 

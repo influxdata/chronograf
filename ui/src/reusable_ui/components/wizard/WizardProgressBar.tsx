@@ -8,6 +8,7 @@ import 'src/reusable_ui/components/wizard/WizardProgressBar.scss'
 interface Props {
   steps: Step[]
   currentStepIndex: number
+  handleJump: (jumpIndex: number) => () => void
 }
 
 class WizardProgressBar extends PureComponent<Props> {
@@ -16,7 +17,7 @@ class WizardProgressBar extends PureComponent<Props> {
   }
 
   private get WizardProgress(): JSX.Element {
-    const {steps, currentStepIndex} = this.props
+    const {steps, currentStepIndex, handleJump} = this.props
     const progressBar = steps.reduce((acc, step, i) => {
       const {stepStatus} = step
       let currentStep = ''
@@ -27,10 +28,14 @@ class WizardProgressBar extends PureComponent<Props> {
       }
 
       const stepEle = (
-        <span
+        <div
           key={`stepEle${i}`}
-          className={`icon ${currentStep || stepStatus}`}
-        />
+          className="progress-button"
+          onClick={handleJump(i)}
+        >
+          <div className="progress-title">{step.title}</div>
+          <span className={`icon ${currentStep || stepStatus}`} />
+        </div>
       )
 
       // CONNECTION ELE

@@ -8,6 +8,9 @@ export interface WizardStepProps {
   onNext: () => void
   increment?: () => void
   decrement?: () => void
+  tipText?: string
+  nextLabel?: string
+  previousLabel?: string
 }
 
 export enum connectorState {

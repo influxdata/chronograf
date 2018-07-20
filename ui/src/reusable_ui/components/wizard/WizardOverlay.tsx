@@ -12,18 +12,28 @@ interface Props {
   visible: boolean
   title: string
   toggleVisibility: (isVisible: boolean) => () => void
+  skipLinkText?: string
 }
 
 class WizardOverlay extends PureComponent<Props> {
   public render() {
-    const {children, visible, title, toggleVisibility} = this.props
+    const {
+      children,
+      visible,
+      title,
+      toggleVisibility,
+      skipLinkText,
+    } = this.props
 
     return (
       <OverlayTechnology visible={visible}>
         <OverlayContainer>
           <OverlayHeading title={title} />
           <OverlayBody>
-            <WizardCloak toggleVisibility={toggleVisibility}>
+            <WizardCloak
+              skipLinkText={skipLinkText}
+              toggleVisibility={toggleVisibility}
+            >
               {children}
             </WizardCloak>
           </OverlayBody>

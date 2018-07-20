@@ -29,9 +29,11 @@ class GrandWizard extends PureComponent<Props, State> {
         visible={wizardVisibility}
         toggleVisibility={toggleVisibility}
         title="Grand Wizard"
+        skipLinkText="configure later"
       >
         <WizardStep
           title="First Real Step"
+          tipText="One is the lonliest number that you ever knew..."
           isComplete={this.completeTest('first')}
           onNext={this.handleFirstNext}
           onPrevious={this.handleFirstPrev}
@@ -40,14 +42,18 @@ class GrandWizard extends PureComponent<Props, State> {
         </WizardStep>
         <WizardStep
           title="Second Real Step"
+          tipText="It takes two to tango."
           isComplete={this.completeTest('second')}
           onNext={this.handleSecondNext}
           onPrevious={this.handleSecondPrev}
+          nextLabel="Go On!"
+          previousLabel="Now hold on a sec..."
         >
           some second children
         </WizardStep>
         <WizardStep
           title="Third Real Step"
+          tipText="Three's a crowd... or drama..."
           isComplete={this.completeTest('third')}
           onNext={this.handleThirdNext}
           onPrevious={this.handleThirdPrev}

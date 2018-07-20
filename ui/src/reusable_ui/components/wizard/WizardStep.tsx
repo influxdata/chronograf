@@ -10,15 +10,28 @@ interface Props {
   onNext: () => void
   increment?: () => void
   decrement?: () => void
+  tipText?: string
+  nextLabel?: string
+  previousLabel?: string
 }
 
 class WizardStep extends PureComponent<Props> {
   public render() {
-    const {children, title, decrement} = this.props
+    const {
+      children,
+      title,
+      decrement,
+      tipText,
+      nextLabel,
+      previousLabel,
+    } = this.props
 
     return (
       <div className="progress-step">
         <h2>{title}</h2>
+        <div className="tip-text">
+          <p>{tipText}</p>
+        </div>
         {children}
         <div className="button-bar">
           {decrement && (
@@ -26,14 +39,14 @@ class WizardStep extends PureComponent<Props> {
               className="btn btn-md btn-default"
               onClick={this.handleClickPrevious}
             >
-              Alakazam
+              {previousLabel || 'back'}
             </button>
           )}
           <button
             className="btn btn-md btn-primary"
             onClick={this.handleClickNext}
           >
-            Abrakabra
+            {nextLabel || 'next'}
           </button>
         </div>
       </div>
