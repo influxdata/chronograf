@@ -3,6 +3,8 @@ import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressB
 
 import {WizardStepProps, StepStatus, Step} from 'src/types/wizard'
 
+import 'src/reusable_ui/components/wizard/WizardCloak.scss'
+
 interface State {
   steps: Step[]
   currentStepIndex: number
@@ -50,6 +52,7 @@ class WizardCloak extends PureComponent<Props, State> {
 
     return (
       <div>
+        <h2 className="step-title">{this.CurrentChild.props.title}</h2>
         <WizardProgressBar
           handleJump={this.jumpToStep}
           steps={steps}
@@ -88,17 +91,16 @@ class WizardCloak extends PureComponent<Props, State> {
   private get CurrentChild(): JSX.Element {
     const {children, toggleVisibility} = this.props
     const {currentStepIndex, steps} = this.state
+    const lastStep = currentStepIndex === steps.length - 1
 
-    const advance =
-      currentStepIndex === steps.length - 1
-        ? toggleVisibility(false)
-        : this.incrementStep
+    const advance = lastStep ? toggleVisibility(false) : this.incrementStep
 
     const retreat = currentStepIndex === 0 ? null : this.decrementStep
 
     return React.cloneElement<WizardStepProps>(children[currentStepIndex], {
       increment: advance,
       decrement: retreat,
+      lastStep,
     })
   }
 }

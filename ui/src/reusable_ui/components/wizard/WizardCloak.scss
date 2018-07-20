@@ -1,0 +1,7 @@
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+
+.step-title {
+  text-align: center;
+  font-size: $ix-text-base-2;
+}

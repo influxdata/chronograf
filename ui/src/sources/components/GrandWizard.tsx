@@ -16,7 +16,7 @@ class GrandWizard extends PureComponent<Props, State> {
     super(props)
     this.state = {
       completion: {
-        first: true,
+        first: false,
         second: false,
         third: false,
       },
@@ -32,7 +32,7 @@ class GrandWizard extends PureComponent<Props, State> {
         skipLinkText="configure later"
       >
         <WizardStep
-          title="First Real Step"
+          title="First Step"
           tipText="One is the lonliest number that you ever knew..."
           isComplete={this.completeTest('first')}
           onNext={this.handleFirstNext}
@@ -41,7 +41,7 @@ class GrandWizard extends PureComponent<Props, State> {
           some first children
         </WizardStep>
         <WizardStep
-          title="Second Real Step"
+          title="Second Step"
           tipText="It takes two to tango."
           isComplete={this.completeTest('second')}
           onNext={this.handleSecondNext}
@@ -52,7 +52,7 @@ class GrandWizard extends PureComponent<Props, State> {
           some second children
         </WizardStep>
         <WizardStep
-          title="Third Real Step"
+          title="Third Step"
           tipText="Three's a crowd... or drama..."
           isComplete={this.completeTest('third')}
           onNext={this.handleThirdNext}

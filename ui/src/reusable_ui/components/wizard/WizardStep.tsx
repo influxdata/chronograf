@@ -13,26 +13,19 @@ interface Props {
   tipText?: string
   nextLabel?: string
   previousLabel?: string
+  lastStep?: boolean
 }
 
 class WizardStep extends PureComponent<Props> {
   public render() {
-    const {
-      children,
-      title,
-      decrement,
-      tipText,
-      nextLabel,
-      previousLabel,
-    } = this.props
+    const {children, decrement, tipText, nextLabel, previousLabel} = this.props
 
     return (
       <div className="progress-step">
-        <h2>{title}</h2>
         <div className="tip-text">
           <p>{tipText}</p>
         </div>
-        {children}
+        <div className="step-content">{children}</div>
         <div className="button-bar">
           {decrement && (
             <button
@@ -43,7 +36,7 @@ class WizardStep extends PureComponent<Props> {
             </button>
           )}
           <button
-            className="btn btn-md btn-primary"
+            className={`btn btn-md ${this.buttonColor}`}
             onClick={this.handleClickNext}
           >
             {nextLabel || 'next'}
@@ -63,6 +56,16 @@ class WizardStep extends PureComponent<Props> {
     const {onNext, increment} = this.props
     onNext()
     increment()
+  }
+
+  private get buttonColor() {
+    const {lastStep} = this.props
+
+    if (lastStep) {
+      return 'btn-success'
+    }
+
+    return 'btn-primary'
   }
 }
 

@@ -11,6 +11,7 @@ export interface WizardStepProps {
   tipText?: string
   nextLabel?: string
   previousLabel?: string
+  lastStep?: boolean
 }
 
 export enum connectorState {

@@ -10,7 +10,7 @@
   .btn {
     position: relative;
     white-space: nowrap;
-    margin: $ix-marg-d $ix-marg-b $ix-marg-b $ix-marg-b;
+    margin: 0 $ix-marg-b;
   }
 }
 
@@ -24,4 +24,9 @@
   color: $g7-graphite;
   text-decoration: underline;
   text-align: center;
+  margin-top: $ix-marg-c;
+}
+
+.step-content {
+  margin: $ix-marg-d 0;
 }
