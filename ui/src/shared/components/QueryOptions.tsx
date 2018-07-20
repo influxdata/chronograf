@@ -5,6 +5,7 @@ import {GroupBy, TimeShift} from 'src/types'
 import GroupByTimeDropdown from 'src/shared/components/group_by_time_dropdown/GroupByTimeDropdown'
 import TimeShiftDropdown from 'src/shared/components/time_shift_dropdown/TimeShiftDropdown'
 import FillQueryDropdown from 'src/shared/components/fill_query_dropdown/FillQueryDropdown'
+import {DropdownMenuColor} from 'src/reusable_ui/types'
 
 interface Props {
   fill: string
@@ -33,6 +34,11 @@ const QueryOptions: SFC<Props> = ({
       onChooseGroupByTime={onGroupByTime}
       isDisabled={isDisabled}
       excludeAutoOption={isKapacitorRule}
+      menuColor={
+        isKapacitorRule
+          ? DropdownMenuColor.Malachite
+          : DropdownMenuColor.Sapphire
+      }
     />
     {isKapacitorRule ? null : (
       <TimeShiftDropdown

@@ -4,6 +4,7 @@ import uuid from 'uuid'
 import {CHANGES, RELATIVE_OPERATORS, SHIFTS} from 'src/kapacitor/constants'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
+import {DropdownMenuColor} from 'src/reusable_ui/types'
 
 import {AlertRule} from 'src/types'
 
@@ -32,19 +33,34 @@ const Relative: SFC<Props> = ({
 }) => (
   <div className="rule-section--row rule-section--row-first rule-section--border-bottom">
     <p>Send Alert when</p>
-    <Dropdown width={110} selectedItem={change} onChange={onDropdownChange}>
+    <Dropdown
+      width={110}
+      selectedItem={change}
+      onChange={onDropdownChange}
+      menuColor={DropdownMenuColor.Malachite}
+    >
       {changes.map(option => (
         <DropdownItem key={uuid.v4()} text={option.text} value={option} />
       ))}
     </Dropdown>
     <p>compared to previous</p>
-    <Dropdown width={80} selectedItem={shift} onChange={onDropdownChange}>
+    <Dropdown
+      width={80}
+      selectedItem={shift}
+      onChange={onDropdownChange}
+      menuColor={DropdownMenuColor.Malachite}
+    >
       {shifts.map(option => (
         <DropdownItem key={uuid.v4()} text={option.text} value={option} />
       ))}
     </Dropdown>
     <p>is</p>
-    <Dropdown width={160} selectedItem={operator} onChange={onDropdownChange}>
+    <Dropdown
+      width={160}
+      selectedItem={operator}
+      onChange={onDropdownChange}
+      menuColor={DropdownMenuColor.Malachite}
+    >
       {operators.map(option => (
         <DropdownItem key={uuid.v4()} text={option.text} value={option} />
       ))}

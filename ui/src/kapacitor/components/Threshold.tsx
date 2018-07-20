@@ -3,6 +3,7 @@ import React, {Component, FormEvent, ChangeEvent} from 'react'
 import {THRESHOLD_OPERATORS} from 'src/kapacitor/constants'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
+import {DropdownMenuColor} from 'src/reusable_ui/types'
 
 import {getDeep} from 'src/utils/wrappers'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -42,6 +43,7 @@ class Threshold extends Component<Props> {
           width={180}
           selectedItem={operator}
           onChange={onDropdownChange}
+          menuColor={DropdownMenuColor.Malachite}
         >
           {this.operators.map(option => (
             <DropdownItem key={option.text} text={option.text} value={option} />

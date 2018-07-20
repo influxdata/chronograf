@@ -4,6 +4,8 @@ import moment from 'moment'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
+import {DropdownMenuColor} from 'src/reusable_ui/types'
+
 import {IconFont} from 'src/reusable_ui/types'
 
 import AbsoluteTime from 'src/shared/components/time_range_dropdown/AbsoluteTime'
@@ -25,6 +27,7 @@ interface Props {
   preventCustomTimeRange?: boolean
   onChooseTimeRange: (timeRange: TimeRange) => void
   disableNowButton?: boolean
+  menuColor?: DropdownMenuColor
 }
 
 interface State {
@@ -36,6 +39,7 @@ class TimeRangeDropdown extends Component<Props, State> {
   public static defaultProps = {
     preventCustomTimeRange: false,
     disableNowButton: false,
+    menuColor: DropdownMenuColor.Sapphire,
   }
 
   constructor(props: Props) {
@@ -47,6 +51,8 @@ class TimeRangeDropdown extends Component<Props, State> {
   }
 
   public render() {
+    const {menuColor} = this.props
+
     return (
       <div className="time-range-dropdown">
         {this.absoluteTimePicker}
@@ -55,6 +61,7 @@ class TimeRangeDropdown extends Component<Props, State> {
           width={this.dropdownWidth}
           icon={IconFont.Clock}
           onChange={this.handleRelativeSelection}
+          menuColor={menuColor}
         >
           {this.absoluteTimes}
           {timeRanges.map(option => (

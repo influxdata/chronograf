@@ -47,20 +47,20 @@ $scrollbar-color-kap-a: $c-rainforest;
 $scrollbar-color-kap-b: $c-pool;
 
 .fancy-scroll--kapacitor {
-  & > .fancy-scroll--thumb-h {
+  & > .fancy-scroll--track-h > .fancy-scroll--thumb-h {
     @include gradient-h($scrollbar-color-kap-a, $scrollbar-color-kap-b);
   }
-  & > .fancy-scroll--thumb-v {
+  & > .fancy-scroll--track-v > .fancy-scroll--thumb-v {
     @include gradient-v($scrollbar-color-kap-a, $scrollbar-color-kap-b);
   }
 }
 
 /* Flux Function Theme Scrollbars */
 .fancy-scroll--func-selector {
-  & > .fancy-scroll--thumb-h {
+  & > .fancy-scroll--track-h > .fancy-scroll--thumb-h {
     @include gradient-h($c-neutrino, $c-hydrogen);
   }
-  & > .fancy-scroll--thumb-v {
+  & > .fancy-scroll--track-v > .fancy-scroll--thumb-v {
     @include gradient-v($c-neutrino, $c-hydrogen);
   }
 }
