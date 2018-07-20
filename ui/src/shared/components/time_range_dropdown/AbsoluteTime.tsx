@@ -10,26 +10,32 @@ interface Props {
   timeRange: TimeRange
   onDismiss: () => void
   onSelect: (timeRange: TimeRange) => void
-  selectNowDisabled: boolean
+  disableNowButton: boolean
 }
 
 @ErrorHandling
 class AbsoluteTime extends Component<Props> {
   public render() {
-    const {onDismiss, onSelect, selectNowDisabled} = this.props
+    const {onDismiss, disableNowButton} = this.props
 
     return (
       <ClickOutside onClickOutside={onDismiss}>
         <div className="time-range-dropdown--custom">
           <CalendarSelector
-            onApplyTimeRange={onSelect}
+            onApplyTimeRange={this.handleApplyTimeRange}
             timeRange={this.validatedTime}
-            onClose={onDismiss}
-            selectNowDisabled={selectNowDisabled}
+            disableNowButton={disableNowButton}
           />
         </div>
       </ClickOutside>
     )
+  }
+
+  private handleApplyTimeRange = (timeRange: TimeRange): void => {
+    const {onSelect, onDismiss} = this.props
+
+    onSelect(timeRange)
+    onDismiss()
   }
 
   private get validatedTime(): TimeRange {

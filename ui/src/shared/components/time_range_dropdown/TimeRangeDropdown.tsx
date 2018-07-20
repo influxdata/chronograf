@@ -15,7 +15,7 @@ import {
 } from 'src/shared/data/timeRanges'
 import {TimeRange} from 'src/types'
 import {TimeRangeOption} from 'src/types/queries'
-
+import {dateFormat} from 'src/shared/utils/time'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import './TimeRangeDropdown.scss'
@@ -24,7 +24,7 @@ interface Props {
   selected: TimeRange
   preventCustomTimeRange?: boolean
   onChooseTimeRange: (timeRange: TimeRange) => void
-  selectNowDisabled?: boolean
+  disableNowButton?: boolean
 }
 
 interface State {
@@ -35,7 +35,7 @@ interface State {
 class TimeRangeDropdown extends Component<Props, State> {
   public static defaultProps = {
     preventCustomTimeRange: false,
-    selectNowDisabled: false,
+    disableNowButton: false,
   }
 
   constructor(props: Props) {
@@ -87,7 +87,7 @@ class TimeRangeDropdown extends Component<Props, State> {
 
   private get absoluteTimePicker(): JSX.Element {
     const {isSelectingAbsolute} = this.state
-    const {selected, selectNowDisabled} = this.props
+    const {selected, disableNowButton} = this.props
 
     if (isSelectingAbsolute) {
       return (
@@ -95,7 +95,7 @@ class TimeRangeDropdown extends Component<Props, State> {
           onSelect={this.handleAbsoluteSelection}
           onDismiss={this.handleCollapseAbsolute}
           timeRange={selected}
-          selectNowDisabled={selectNowDisabled}
+          disableNowButton={disableNowButton}
         />
       )
     }
@@ -158,8 +158,6 @@ class TimeRangeDropdown extends Component<Props, State> {
   }
 
   private formatTimestamp = (timestamp: string): string => {
-    const dateFormat = 'YYYY-MM-DD HH:mm'
-
     return moment(timestamp.replace(/\'/g, '')).format(dateFormat)
   }
 }

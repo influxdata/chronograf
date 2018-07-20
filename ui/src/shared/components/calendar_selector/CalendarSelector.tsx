@@ -1,28 +1,59 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import rome from 'rome'
 import moment from 'moment'
 
-import {formatTimeRange} from 'shared/utils/time'
-import shortcuts from 'shared/data/timeRangeShortcuts'
+import {formatTimeRange} from 'src/shared/utils/time'
+import {
+  calendarShortcuts,
+  CalendarShortcut,
+} from 'src/shared/components/calendar_selector/calendarShortcuts'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-const dateFormat = 'YYYY-MM-DD HH:mm'
+import {TimeRange} from 'src/types'
+import {dateFormat} from 'src/shared/utils/time'
+
+import './CalendarSelector.scss'
+
+interface Props {
+  timeRange: TimeRange
+  timeInterval?: number
+  onApplyTimeRange: (timeRange: TimeRange) => void
+  disableNowButton?: boolean
+  disableShortcuts?: boolean
+}
+
+interface State {
+  isNow: boolean
+}
 
 @ErrorHandling
-class CustomTimeRange extends Component {
-  constructor(props) {
+class CalendarSelector extends Component<Props, State> {
+  public static defaultProps = {
+    timeInterval: 1800,
+    disableNowButton: false,
+    disableShortcuts: false,
+  }
+
+  private lowerContainerRef: HTMLDivElement
+  private upperContainerRef: HTMLDivElement
+  private lowerInputRef: HTMLInputElement
+  private upperInputRef: HTMLInputElement
+  private lowerRomeRef
+  private upperRomeRef
+
+  constructor(props: Props) {
     super(props)
     this.state = {
       isNow: this.props.timeRange.upper === 'now()',
     }
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const {timeRange, timeInterval} = this.props
 
-    const lower = rome(this.lower, {
-      dateValidator: rome.val.beforeEq(this.upper),
-      appendTo: this.lowerContainer,
+    this.lowerRomeRef = rome(this.lowerInputRef, {
+      dateValidator: rome.val.beforeEq(this.upperInputRef),
+      appendTo: this.lowerContainerRef,
       initialValue: this.getInitialDate(timeRange.lower),
       autoClose: false,
       autoHideOnBlur: false,
@@ -30,9 +61,9 @@ class CustomTimeRange extends Component {
       timeInterval,
     })
 
-    const upper = rome(this.upper, {
-      dateValidator: rome.val.afterEq(this.lower),
-      appendTo: this.upperContainer,
+    this.upperRomeRef = rome(this.upperInputRef, {
+      dateValidator: rome.val.afterEq(this.lowerInputRef),
+      appendTo: this.upperContainerRef,
       autoClose: false,
       initialValue: this.getInitialDate(timeRange.upper),
       autoHideOnBlur: false,
@@ -40,208 +71,176 @@ class CustomTimeRange extends Component {
       timeInterval,
     })
 
-    this.lowerCal = lower
-    this.upperCal = upper
-
-    this.lowerCal.show()
-    this.upperCal.show()
+    this.lowerRomeRef.show()
+    this.upperRomeRef.show()
   }
 
-  componentWillReceiveProps(nextProps) {
-    const {lower, upper} = nextProps.timeRange
-    if (lower) {
-      const formattedLower = this._formatTimeRange(lower)
-      this.lowerCal.setValue(this._formatTimeRange(lower))
-      this.lower.value = formattedLower
-    }
-
-    if (upper) {
-      const formattedUpper = this._formatTimeRange(upper)
-      this.upperCal.setValue(this._formatTimeRange(upper))
-      this.upper.value = formattedUpper
-    }
+  public render() {
+    return (
+      <div className="calendar-selector">
+        {this.shortcutsPanel}
+        <div className="calendar-selector--container">
+          <div
+            className="calendar-selector--dates"
+            onClick={this.handleRefreshCalendars}
+          >
+            {this.calendarLower}
+            {this.calendarUpper}
+          </div>
+          <button
+            className="calendar-selector--apply btn btn-sm btn-primary"
+            onClick={this.handleClick}
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    )
   }
 
-  getInitialDate = time => {
+  private get calendarLower(): JSX.Element {
+    return (
+      <div
+        className="calendar-selector--month"
+        ref={r => (this.lowerContainerRef = r)}
+      >
+        <input
+          className="calendar-selector--input form-control input-sm"
+          ref={r => (this.lowerInputRef = r)}
+          placeholder="from"
+          onKeyUp={this.handleRefreshCalendars}
+        />
+      </div>
+    )
+  }
+
+  private get calendarUpper(): JSX.Element {
+    const {isNow} = this.state
+
+    return (
+      <div
+        className="calendar-selector--month"
+        ref={r => (this.upperContainerRef = r)}
+      >
+        {this.nowButton}
+        <input
+          className="calendar-selector--input form-control input-sm"
+          ref={r => (this.upperInputRef = r)}
+          placeholder="to"
+          onKeyUp={this.handleRefreshCalendars}
+          disabled={isNow}
+        />
+        {this.nowMask}
+      </div>
+    )
+  }
+
+  private get nowButton(): JSX.Element {
+    const {disableNowButton} = this.props
+    const {isNow} = this.state
+
+    if (disableNowButton) {
+      return null
+    }
+
+    return (
+      <div
+        className={classnames('btn btn-xs calendar-selector--now', {
+          'btn-warning': isNow,
+          'btn-default': !isNow,
+        })}
+        onClick={this.handleToggleNow}
+      >
+        Now
+      </div>
+    )
+  }
+
+  private get nowMask(): JSX.Element {
+    const {disableNowButton} = this.props
+    const {isNow} = this.state
+
+    if (isNow && !disableNowButton) {
+      return (
+        <div className="calendar-selector--mask" onClick={this.handleNowOff} />
+      )
+    }
+
+    return null
+  }
+
+  private getInitialDate = time => {
     const {upper, lower} = this.props.timeRange
 
     if (upper || lower) {
-      return this._formatTimeRange(time)
+      return formatTimeRange(time)
     }
 
     return moment(new Date()).format(dateFormat)
   }
 
-  handleRefreshCals = () => {
-    this.lowerCal.refresh()
-    this.upperCal.refresh()
+  private handleRefreshCalendars = (): void => {
+    this.lowerRomeRef.refresh()
+    this.upperRomeRef.refresh()
   }
 
-  handleToggleNow = () => {
+  private handleToggleNow = (): void => {
     this.setState({isNow: !this.state.isNow})
   }
 
-  handleNowOff = () => {
+  private handleNowOff = (): void => {
     this.setState({isNow: false})
   }
 
-  /*
-   * Upper and lower time ranges are passed in with single quotes as part of
-   * the string literal, i.e. "'2015-09-23T18:00:00.000Z'".  Remove them
-   * before passing the string to be parsed.
-   */
-  _formatTimeRange = timeRange => {
-    return formatTimeRange(timeRange)
-  }
-
-  handleClick = () => {
-    const {onApplyTimeRange, onClose} = this.props
+  private handleClick = (): void => {
+    const {onApplyTimeRange} = this.props
     const {isNow} = this.state
 
-    const lower = this.lowerCal.getDate().toISOString()
-    const upper = this.upperCal.getDate().toISOString()
+    const lower = this.lowerRomeRef.getDate().toISOString()
+    const upper = this.upperRomeRef.getDate().toISOString()
 
     if (isNow) {
       onApplyTimeRange({lower, upper: 'now()'})
     } else {
       onApplyTimeRange({lower, upper})
     }
-
-    if (onClose) {
-      onClose()
-    }
   }
 
-  handleTimeRangeShortcut = shortcut => {
-    return () => {
-      let lower
-      const upper = moment()
+  private get shortcutsPanel(): JSX.Element {
+    const {disableShortcuts} = this.props
 
-      switch (shortcut) {
-        case 'pastWeek': {
-          lower = moment().subtract(1, 'week')
-          break
-        }
-        case 'pastMonth': {
-          lower = moment().subtract(1, 'month')
-          break
-        }
-        case 'pastYear': {
-          lower = moment().subtract(1, 'year')
-          break
-        }
-        case 'thisWeek': {
-          lower = moment().startOf('week')
-          break
-        }
-        case 'thisMonth': {
-          lower = moment().startOf('month')
-          break
-        }
-        case 'thisYear': {
-          lower = moment().startOf('year')
-          break
-        }
-      }
-
-      this.lower.value = lower.format(dateFormat)
-      this.upper.value = upper.format(dateFormat)
-
-      this.lowerCal.setValue(lower)
-      this.upperCal.setValue(upper)
-
-      this.handleRefreshCals()
+    if (disableShortcuts) {
+      return null
     }
-  }
-
-  render() {
-    const {isNow} = this.state
-    const {selectNowDisabled} = this.props
 
     return (
-      <div className="custom-time--container">
-        <div className="custom-time--shortcuts">
-          <div className="custom-time--shortcuts-header">Shortcuts</div>
-          {shortcuts.map(({id, name}) => (
-            <div
-              key={id}
-              className="custom-time--shortcut"
-              onClick={this.handleTimeRangeShortcut(id)}
-            >
-              {name}
-            </div>
-          ))}
-        </div>
-        <div className="custom-time--wrap">
-          <div className="custom-time--dates" onClick={this.handleRefreshCals}>
-            <div
-              className="custom-time--lower-container"
-              ref={r => (this.lowerContainer = r)}
-            >
-              <input
-                className="custom-time--lower form-control input-sm"
-                ref={r => (this.lower = r)}
-                placeholder="from"
-                onKeyUp={this.handleRefreshCals}
-              />
-            </div>
-            <div
-              className="custom-time--upper-container"
-              ref={r => (this.upperContainer = r)}
-              disabled={isNow}
-            >
-              {selectNowDisabled ? null : (
-                <div
-                  className={`btn btn-xs custom-time--now ${
-                    isNow ? 'btn-primary' : 'btn-default'
-                  }`}
-                  onClick={this.handleToggleNow}
-                >
-                  Now
-                </div>
-              )}
-              <input
-                className="custom-time--upper form-control input-sm"
-                ref={r => (this.upper = r)}
-                placeholder="to"
-                onKeyUp={this.handleRefreshCals}
-                disabled={isNow}
-              />
-              {isNow && !selectNowDisabled ? (
-                <div
-                  className="custom-time--mask"
-                  onClick={this.handleNowOff}
-                />
-              ) : null}
-            </div>
-          </div>
+      <div className="calendar-selector--shortcuts">
+        <div className="calendar-selector--shortcuts-header">Shortcuts</div>
+        {calendarShortcuts.map(shortcut => (
           <div
-            className="custom-time--apply btn btn-sm btn-primary"
-            onClick={this.handleClick}
+            key={shortcut.id}
+            className="calendar-selector--shortcut"
+            onClick={this.handleShortcutClick(shortcut)}
           >
-            Apply
+            {shortcut.name}
           </div>
-        </div>
+        ))}
       </div>
     )
   }
+
+  private handleShortcutClick = (shortcut: CalendarShortcut) => (): void => {
+    const {lower} = shortcut
+    const upper = moment()
+
+    this.lowerInputRef.value = lower.format(dateFormat)
+    this.upperInputRef.value = upper.format(dateFormat)
+
+    this.lowerRomeRef.setValue(lower)
+    this.upperRomeRef.setValue(upper)
+
+    this.handleRefreshCalendars()
+  }
 }
 
-CustomTimeRange.defaultProps = {
-  timeInterval: 1800,
-}
-
-const {bool, func, shape, string, number} = PropTypes
-
-CustomTimeRange.propTypes = {
-  onApplyTimeRange: func.isRequired,
-  timeRange: shape({
-    lower: string.isRequired,
-    upper: string,
-  }).isRequired,
-  timeInterval: number,
-  onClose: func,
-  selectNowDisabled: bool,
-}
-
-export default CustomTimeRange
+export default CalendarSelector

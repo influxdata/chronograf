@@ -5,6 +5,7 @@ import _ from 'lodash'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import {ComponentColor, ComponentSize, IconFont} from 'src/reusable_ui/types'
+import DropdownButton from 'src/reusable_ui/components/dropdowns/DropdownButton'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import './Dropdown.scss'
@@ -20,6 +21,7 @@ interface Props {
   icon?: IconFont
   wrapText?: boolean
   customClass?: string
+  maxMenuHeight?: number
 }
 
 interface State {
@@ -34,6 +36,7 @@ class Dropdown extends Component<Props, State> {
     disabled: false,
     width: 120,
     wrapText: false,
+    maxMenuHeight: 250,
   }
 
   private containerRef: HTMLElement
@@ -82,48 +85,34 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get button(): JSX.Element {
-    const {selectedItem, disabled, color, size} = this.props
+    const {selectedItem, disabled, color, size, icon} = this.props
     const {expanded} = this.state
 
-    const className = classnames(
-      `dropdown--button btn btn-${color} btn-${size}`,
-      {
-        disabled,
-        active: expanded,
-      }
-    )
-
     return (
-      <button
-        className={className}
-        onClick={this.toggleMenu}
+      <DropdownButton
+        label={selectedItem}
+        active={expanded}
+        color={color}
+        size={size}
+        icon={icon}
         disabled={disabled}
-      >
-        {this.icon}
-        <span className="dropdown--selected">{selectedItem}</span>
-        <span className="dropdown--caret icon caret-down" />
-      </button>
+        onClick={this.toggleMenu}
+      />
     )
-  }
-
-  private get icon(): JSX.Element {
-    const {icon} = this.props
-
-    if (icon) {
-      return <span className={`dropdown--icon icon ${icon}`} />
-    }
-
-    return null
   }
 
   private get menu(): JSX.Element {
-    const {selectedItem} = this.props
+    const {selectedItem, maxMenuHeight} = this.props
     const {expanded} = this.state
 
     if (expanded) {
       return (
         <div className="dropdown--menu-container" style={this.menuStyle}>
-          <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={255}>
+          <FancyScrollbar
+            autoHide={false}
+            autoHeight={true}
+            maxHeight={maxMenuHeight}
+          >
             <div className="dropdown--menu">
               {this.flatChildren.map((child: JSX.Element) =>
                 React.cloneElement(child, {
