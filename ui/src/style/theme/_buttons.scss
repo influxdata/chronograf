@@ -7,14 +7,11 @@
 button.btn,
 input.btn {
   display: block;
-  text-decoration: none;
   text-align: center;
   box-shadow: none;
   font-weight: 700;
   font-family: $ix-text-font;
   border-style: solid;
-  margin: 0;
-  position: relative;
   transition: background-color 0.25s ease, color 0.25s ease,
     border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease;
   outline: none !important;
