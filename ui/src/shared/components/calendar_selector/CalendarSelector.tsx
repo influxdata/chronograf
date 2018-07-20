@@ -107,6 +107,7 @@ class CalendarSelector extends Component<Props, State> {
         <input
           className="calendar-selector--input form-control input-sm"
           ref={r => (this.lowerInputRef = r)}
+          data-test="calendar-input-lower"
           placeholder="from"
           onKeyUp={this.handleRefreshCalendars}
         />
@@ -126,6 +127,7 @@ class CalendarSelector extends Component<Props, State> {
         <input
           className="calendar-selector--input form-control input-sm"
           ref={r => (this.upperInputRef = r)}
+          data-test="calendar-input-upper"
           placeholder="to"
           onKeyUp={this.handleRefreshCalendars}
           disabled={isNow}
