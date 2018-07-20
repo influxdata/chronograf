@@ -16,27 +16,18 @@ const setup = (overrides = {}) => {
 
 describe('shared.Components.CalendarSelector', () => {
   describe('rendering', () => {
-    // it('renders correct time when now is selected', () => {
-    //   const wrapper = setup()
-
-    //   expect(wrapper.exists()).toBe(true)
-
-    //   expect(wrapper.dive().text()).toContain(moment().format('MMM Do HH:mm'))
-    // })
-
     it('renders current time when no time is provided', () => {
       const wrapper = setup({timeRange: {lower: '', upper: ''}})
 
       expect(wrapper.exists()).toBe(true)
 
-      const input = wrapper.find({'data-test': 'calendar-input-lower'})
-
-      console.debug(input)
-      console.debug(input.text())
+      const input: any = wrapper
+        .find({'data-test': 'calendar-input-lower'})
+        .instance()
 
       const now = moment().format(dateFormat)
 
-      expect(input.props().value).toEqual(now)
+      expect(input.value).toEqual(now)
     })
   })
 })
