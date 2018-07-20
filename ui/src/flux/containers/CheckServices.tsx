@@ -96,6 +96,7 @@ export class CheckServices extends PureComponent<
   }
 
   private get renderOverlay(): JSX.Element {
+    const {services} = this.props
     const {isOverlayShown} = this.state
 
     return (
@@ -103,6 +104,7 @@ export class CheckServices extends PureComponent<
         <FluxOverlay
           mode={FluxFormMode.new}
           source={this.source}
+          services={services}
           onDismiss={this.handleDismissOverlay}
         />
       </OverlayTechnology>

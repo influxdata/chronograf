@@ -2,13 +2,18 @@ import React, {PureComponent, ChangeEvent, FormEvent} from 'react'
 
 import FluxForm from 'src/flux/components/FluxForm'
 
-import {NewService, Source, Notification} from 'src/types'
-import {fluxCreated, fluxNotCreated} from 'src/shared/copy/notifications'
+import {NewService, Source, Service, Notification} from 'src/types'
+import {
+  fluxCreated,
+  fluxNotCreated,
+  notifyFluxNameAlreadyTaken,
+} from 'src/shared/copy/notifications'
 import {CreateServiceAsync} from 'src/shared/actions/services'
 import {FluxFormMode} from 'src/flux/constants/connection'
 
 interface Props {
   source: Source
+  services: Service[]
   onDismiss?: () => void
   createService: CreateServiceAsync
   router?: {push: (url: string) => void}
@@ -51,8 +56,22 @@ class FluxNew extends PureComponent<Props, State> {
     e: FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault()
-    const {notify, router, source, onDismiss, createService} = this.props
+    const {
+      notify,
+      router,
+      source,
+      services,
+      onDismiss,
+      createService,
+    } = this.props
     const {service} = this.state
+    service.name = service.name.trim()
+    const isNameTaken = services.some(s => s.name === service.name)
+
+    if (isNameTaken) {
+      notify(notifyFluxNameAlreadyTaken(service.name))
+      return
+    }
 
     try {
       const s = await createService(source, service)

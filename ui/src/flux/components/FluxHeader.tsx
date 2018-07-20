@@ -9,6 +9,7 @@ import {FluxFormMode} from 'src/flux/constants/connection'
 
 interface Props {
   service: Service
+  services: Service[]
 }
 
 interface State {
@@ -53,7 +54,7 @@ class FluxHeader extends PureComponent<Props, State> {
   }
 
   private get overlay(): JSX.Element {
-    const {service} = this.props
+    const {service, services} = this.props
     const {isOverlayVisible} = this.state
 
     return (
@@ -61,6 +62,7 @@ class FluxHeader extends PureComponent<Props, State> {
         <FluxOverlay
           mode={FluxFormMode.edit}
           service={service}
+          services={services}
           onDismiss={this.handleToggleOverlay}
         />
       </OverlayTechnology>

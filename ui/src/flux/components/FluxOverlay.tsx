@@ -18,6 +18,7 @@ interface Props {
   mode: string
   source?: Source
   service?: Service
+  services: Service[]
   onDismiss: () => void
   notify: (message: Notification) => void
   createService: CreateServiceAsync
@@ -49,6 +50,7 @@ class FluxOverlay extends PureComponent<Props> {
       mode,
       source,
       service,
+      services,
       notify,
       onDismiss,
       createService,
@@ -60,6 +62,7 @@ class FluxOverlay extends PureComponent<Props> {
         <FluxNew
           source={source}
           notify={notify}
+          services={services}
           onDismiss={onDismiss}
           createService={createService}
         />
@@ -70,6 +73,7 @@ class FluxOverlay extends PureComponent<Props> {
       <FluxEdit
         notify={notify}
         service={service}
+        services={services}
         onDismiss={onDismiss}
         updateService={updateService}
       />

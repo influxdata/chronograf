@@ -13,18 +13,21 @@ import {
   UpdateServiceAsync,
   createServiceAsync,
   CreateServiceAsync,
+  fetchServicesForSourceAsync,
+  FetchServicesForSourceAsync,
 } from 'src/shared/actions/services'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Service, Source, Notification} from 'src/types'
 
 interface Props {
-  services: Service[]
   source: Source
+  services: Service[]
   params: {id: string; sourceID: string}
   router: {push: (url: string) => void}
   notify: (message: Notification) => void
   createService: CreateServiceAsync
   updateService: UpdateServiceAsync
+  fetchServicesForSource: FetchServicesForSourceAsync
 }
 
 interface State {
@@ -52,6 +55,7 @@ class FluxConnectionPage extends PureComponent<Props, State> {
     }
     return null
   }
+
   constructor(props) {
     super(props)
 
@@ -65,6 +69,7 @@ class FluxConnectionPage extends PureComponent<Props, State> {
     const {
       source,
       params: {id},
+      fetchServicesForSource,
     } = this.props
 
     let service: Service
@@ -81,15 +86,25 @@ class FluxConnectionPage extends PureComponent<Props, State> {
       formMode = FluxFormMode.new
       this.setState({formMode})
     }
+    await fetchServicesForSource(source)
   }
 
   public render() {
-    const {source, notify, createService, updateService, router} = this.props
+    const {
+      source,
+      notify,
+      createService,
+      updateService,
+      services,
+      router,
+    } = this.props
     const {service, formMode} = this.state
+
     if (formMode === FluxFormMode.new) {
       return (
         <FluxNew
           source={source}
+          services={services}
           notify={notify}
           router={router}
           createService={createService}
@@ -100,6 +115,7 @@ class FluxConnectionPage extends PureComponent<Props, State> {
         <FluxEdit
           notify={notify}
           service={service}
+          services={services}
           updateService={updateService}
         />
       )
@@ -111,6 +127,7 @@ const mdtp = {
   notify: notifyAction,
   createService: createServiceAsync,
   updateService: updateServiceAsync,
+  fetchServicesForSource: fetchServicesForSourceAsync,
 }
 
 const mstp = ({services}) => ({services})

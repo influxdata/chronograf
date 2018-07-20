@@ -1,14 +1,20 @@
 import React, {PureComponent, ChangeEvent, FormEvent} from 'react'
+import _ from 'lodash'
 
 import FluxForm from 'src/flux/components/FluxForm'
 
 import {Service, Notification} from 'src/types'
-import {fluxUpdated, fluxNotUpdated} from 'src/shared/copy/notifications'
+import {
+  fluxUpdated,
+  fluxNotUpdated,
+  notifyFluxNameAlreadyTaken,
+} from 'src/shared/copy/notifications'
 import {UpdateServiceAsync} from 'src/shared/actions/services'
 import {FluxFormMode} from 'src/flux/constants/connection'
 
 interface Props {
   service: Service
+  services: Service[]
   onDismiss?: () => void
   updateService: UpdateServiceAsync
   notify: (message: Notification) => void
@@ -19,7 +25,14 @@ interface State {
 }
 
 class FluxEdit extends PureComponent<Props, State> {
-  constructor(props) {
+  public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+    if (_.isEmpty(prevState.service) && !_.isEmpty(nextProps.service)) {
+      return {service: nextProps.service}
+    }
+    return null
+  }
+
+  constructor(props: Props) {
     super(props)
     this.state = {
       service: this.props.service,
@@ -48,8 +61,20 @@ class FluxEdit extends PureComponent<Props, State> {
     e: FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault()
-    const {notify, onDismiss, updateService} = this.props
+    const {notify, onDismiss, updateService, services} = this.props
     const {service} = this.state
+    service.name = service.name.trim()
+    let isNameTaken = false
+    services.forEach(s => {
+      if (s.name === service.name && s.id !== service.id) {
+        isNameTaken = true
+      }
+    })
+
+    if (isNameTaken) {
+      notify(notifyFluxNameAlreadyTaken(service.name))
+      return
+    }
 
     try {
       await updateService(service)

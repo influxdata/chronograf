@@ -634,7 +634,7 @@ export const notifyKapacitorNameAlreadyTaken = (
   kapacitorName: string
 ): Notification => ({
   ...defaultErrorNotification,
-  message: `There is already a Kapacitor Connection named "${kapacitorName}".`,
+  message: `There is already a Kapacitor Connection named "${kapacitorName}."`,
 })
 
 export const notifyCouldNotFindKapacitor = (): Notification => ({
@@ -773,6 +773,11 @@ export const notifyCopyToClipboardSuccess = (text: string): Notification => ({
 export const notifyCopyToClipboardFailed = (text: string): Notification => ({
   ...defaultErrorNotification,
   message: `'${text}' was not copied to clipboard.`,
+})
+
+export const notifyFluxNameAlreadyTaken = (fluxName: string): Notification => ({
+  ...defaultErrorNotification,
+  message: `There is already a Flux Connection named "${fluxName}."`,
 })
 
 // Service notifications

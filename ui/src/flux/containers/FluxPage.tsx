@@ -129,7 +129,7 @@ export class FluxPage extends PureComponent<Props, State> {
       return null
     }
 
-    return <FluxHeader service={this.service} />
+    return <FluxHeader service={this.service} services={services} />
   }
 
   private get service(): Service {

@@ -1,4 +1,5 @@
 import React, {ChangeEvent, PureComponent} from 'react'
+import _ from 'lodash'
 
 import Input from 'src/kapacitor/components/KapacitorFormInput'
 
@@ -15,6 +16,7 @@ interface Props {
 class FluxForm extends PureComponent<Props> {
   public render() {
     const {service, onSubmit, onInputChange} = this.props
+    const name = _.get(service, 'name', '')
 
     return (
       <div className="template-variable-manager--body">
@@ -30,8 +32,8 @@ class FluxForm extends PureComponent<Props> {
           <Input
             name="name"
             label="Name"
-            value={service.name}
-            placeholder={service.name}
+            value={name}
+            placeholder={name}
             onChange={onInputChange}
             maxLength={33}
             customClass="col-sm-6"
@@ -61,14 +63,8 @@ class FluxForm extends PureComponent<Props> {
   }
 
   private get url(): string {
-    const {
-      service: {url},
-    } = this.props
-    if (url) {
-      return url
-    }
-
-    return ''
+    const {service} = this.props
+    return _.get(service, 'url', '')
   }
 }
 
