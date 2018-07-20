@@ -9,6 +9,8 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {TimeRange} from 'src/types'
 import {dateFormat} from 'src/shared/utils/time'
 
+import './CalendarDropdown.scss'
+
 interface State {
   expanded: boolean
 }
