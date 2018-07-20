@@ -110,26 +110,51 @@ const renderTemplate = (query: string, template: Template): string => {
   }
 }
 
+const REGEX_COMPARATORS = ['=~', '!~']
+const REGEX_DELIMITER = '/'
+
 const replaceAllRegex = (
   query: string,
   search: string,
   replacement: string
 ) => {
-  // check for presence of anything between two forward slashes /[your stuff here]/
-  const matches = query.match(/\/([^\/]*)\//gm)
+  let result = query
+  let i = 0
 
-  if (!matches) {
-    return query
-  }
+  while (i < result.length - 1) {
+    const chars = result[i] + result[i + 1]
+    const isStartOfRegex = REGEX_COMPARATORS.includes(chars)
 
-  return matches.reduce((acc, m) => {
-    if (m.includes(search)) {
-      const replaced = m.replace(search, replacement)
-      return acc.split(m).join(replaced)
+    if (!isStartOfRegex) {
+      i += 1
+      continue
     }
 
-    return acc
-  }, query)
+    const regexStart = findNext(result, REGEX_DELIMITER, i)
+    const regexEnd = findNext(result, REGEX_DELIMITER, regexStart + 1)
+    const regexContent = result.slice(regexStart + 1, regexEnd)
+    const replacedRegexContent = regexContent.replace(search, replacement)
+
+    result =
+      result.slice(0, regexStart + 1) +
+      replacedRegexContent +
+      result.slice(regexEnd)
+
+    i = findNext(result, REGEX_DELIMITER, regexStart + 1)
+  }
+
+  return result
+}
+
+const findNext = (s: string, t: string, startIndex: number) => {
+  const tail = s.slice(startIndex)
+  const i = tail.indexOf(t)
+
+  if (i === -1) {
+    throw new Error(`Expected token '${t}' in '${tail}'`)
+  }
+
+  return startIndex + i
 }
 
 const replaceAll = (query: string, search: string, replacement: string) => {
