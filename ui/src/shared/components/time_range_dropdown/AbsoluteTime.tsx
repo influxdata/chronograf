@@ -10,12 +10,13 @@ interface Props {
   timeRange: TimeRange
   onDismiss: () => void
   onSelect: (timeRange: TimeRange) => void
+  selectNowDisabled: boolean
 }
 
 @ErrorHandling
 class AbsoluteTime extends Component<Props> {
   public render() {
-    const {onDismiss, onSelect} = this.props
+    const {onDismiss, onSelect, selectNowDisabled} = this.props
 
     return (
       <ClickOutside onClickOutside={onDismiss}>
@@ -24,7 +25,7 @@ class AbsoluteTime extends Component<Props> {
             onApplyTimeRange={onSelect}
             timeRange={this.validatedTime}
             onClose={onDismiss}
-            page="default"
+            selectNowDisabled={selectNowDisabled}
           />
         </div>
       </ClickOutside>

@@ -24,6 +24,7 @@ interface Props {
   selected: TimeRange
   preventCustomTimeRange?: boolean
   onChooseTimeRange: (timeRange: TimeRange) => void
+  selectNowDisabled?: boolean
 }
 
 interface State {
@@ -34,6 +35,7 @@ interface State {
 class TimeRangeDropdown extends Component<Props, State> {
   public static defaultProps = {
     preventCustomTimeRange: false,
+    selectNowDisabled: false,
   }
 
   constructor(props: Props) {
@@ -85,7 +87,7 @@ class TimeRangeDropdown extends Component<Props, State> {
 
   private get absoluteTimePicker(): JSX.Element {
     const {isSelectingAbsolute} = this.state
-    const {selected} = this.props
+    const {selected, selectNowDisabled} = this.props
 
     if (isSelectingAbsolute) {
       return (
@@ -93,6 +95,7 @@ class TimeRangeDropdown extends Component<Props, State> {
           onSelect={this.handleAbsoluteSelection}
           onDismiss={this.handleCollapseAbsolute}
           timeRange={selected}
+          selectNowDisabled={selectNowDisabled}
         />
       )
     }

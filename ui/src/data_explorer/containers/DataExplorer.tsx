@@ -225,6 +225,7 @@ export class DataExplorer extends PureComponent<Props, State> {
         />
         <TimeRangeDropdown
           selected={timeRange}
+          selectNowDisabled={true}
           onChooseTimeRange={this.handleChooseTimeRange}
         />
       </>
