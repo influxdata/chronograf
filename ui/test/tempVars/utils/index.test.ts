@@ -339,4 +339,86 @@ describe('template value resolution', () => {
       expect(resolveValues(template, null, 'v1')).toEqual(expected)
     })
   })
+
+  describe('Text templates', () => {
+    test('maintains current selection', () => {
+      const template = {
+        id: '',
+        label: '',
+        query: {},
+        tempVar: ':a:',
+        type: TemplateType.Text,
+        values: [
+          {
+            type: TemplateValueType.Constant,
+            value: 'v1',
+            selected: true,
+            localSelected: false,
+          },
+        ],
+      }
+
+      const expected = [
+        {
+          type: TemplateValueType.Constant,
+          value: 'v1',
+          selected: true,
+          localSelected: true,
+        },
+      ]
+
+      expect(resolveValues(template)).toEqual(expected)
+    })
+
+    test('uses supplied selected value when exists', () => {
+      const template = {
+        id: '',
+        label: '',
+        query: {},
+        tempVar: ':a:',
+        type: TemplateType.Text,
+        values: [
+          {
+            type: TemplateValueType.Constant,
+            value: 'v1',
+            selected: true,
+            localSelected: false,
+          },
+        ],
+      }
+
+      const expected = [
+        {
+          type: TemplateValueType.Constant,
+          value: 'v2',
+          selected: false,
+          localSelected: true,
+        },
+      ]
+
+      expect(resolveValues(template, null, 'v2')).toEqual(expected)
+    })
+
+    test('returns blank value if no existing values and no supplied value', () => {
+      const template = {
+        id: '',
+        label: '',
+        query: {},
+        tempVar: ':a:',
+        type: TemplateType.Text,
+        values: [],
+      }
+
+      const expected = [
+        {
+          type: TemplateValueType.Constant,
+          value: '',
+          selected: false,
+          localSelected: true,
+        },
+      ]
+
+      expect(resolveValues(template)).toEqual(expected)
+    })
+  })
 })

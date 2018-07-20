@@ -131,7 +131,7 @@ const newTemplateValueText = (
       },
     ]
   } else if (template.values.length) {
-    return [template.values[0]]
+    return [{...template.values[0], localSelected: true}]
   } else {
     return [
       {
