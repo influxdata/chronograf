@@ -38,6 +38,7 @@ import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
 import {SourcePage, ManageSources} from 'src/sources'
 import {CheckServices} from 'src/flux'
 import NotFound from 'src/shared/components/NotFound'
+import WizardTower from 'src/sources/components/WizardTower'
 
 import {getLinksAsync} from 'src/shared/actions/links'
 import {getMeAsync} from 'src/shared/actions/auth'
@@ -125,6 +126,7 @@ class Root extends PureComponent<{}, State> {
           <Route component={UserIsAuthenticated(App)}>
             <Route path="/logs" component={LogsPage} />
           </Route>
+          <Route path="wizard-tower" component={WizardTower} />
           <Route
             path="/sources/new"
             component={UserIsAuthenticated(SourcePage)}

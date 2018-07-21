@@ -12,7 +12,7 @@ interface State {
 
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
-  toggleVisibility: (isVisible: boolean) => () => void
+  handleSkip?: () => void
   skipLinkText?: string
 }
 
@@ -48,7 +48,7 @@ class WizardCloak extends PureComponent<Props, State> {
 
   public render() {
     const {steps, currentStepIndex} = this.state
-    const {skipLinkText, toggleVisibility} = this.props
+    const {skipLinkText, handleSkip} = this.props
 
     return (
       <div className="wizard-cloak">
@@ -60,7 +60,7 @@ class WizardCloak extends PureComponent<Props, State> {
         />
         {this.CurrentChild}
         <p className="skip-link">
-          <a onClick={toggleVisibility(false)}> {skipLinkText || 'skip'}</a>
+          <a onClick={handleSkip}> {skipLinkText || 'skip'}</a>
         </p>
       </div>
     )
@@ -89,11 +89,11 @@ class WizardCloak extends PureComponent<Props, State> {
   }
 
   private get CurrentChild(): JSX.Element {
-    const {children, toggleVisibility} = this.props
+    const {children, handleSkip} = this.props
     const {currentStepIndex, steps} = this.state
     const lastStep = currentStepIndex === steps.length - 1
 
-    const advance = lastStep ? toggleVisibility(false) : this.incrementStep
+    const advance = lastStep ? handleSkip : this.incrementStep
 
     const retreat = currentStepIndex === 0 ? null : this.decrementStep
 

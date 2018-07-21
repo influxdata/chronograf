@@ -22,6 +22,9 @@ class InfluxTableHeader extends PureComponent<Props> {
         <div onClick={toggleVisibility(true)}>
           <p>show wiz</p>
         </div>
+        <Link to={`/wizard-tower`} className="btn btn-sm btn-primary">
+          <span className="icon plus" /> To Wizard Tower
+        </Link>
         <Authorized requiredRole={EDITOR_ROLE}>
           <Link
             to={`/sources/${source.id}/manage-sources/new`}

@@ -1,16 +1,31 @@
-import React, {PureComponent, ReactNode} from 'react'
+import React, {PureComponent, ReactElement} from 'react'
 
-// import {} from 'src/types'
+import SplashPage from 'src/shared/components/SplashPage'
+import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
 
+import {WizardStepProps} from 'src/types/wizard'
+
+import 'src/reusable_ui/components/wizard/WizardFullScreen.scss'
 interface Props {
-  children: ReactNode
+  children: Array<ReactElement<WizardStepProps>>
+  title: string
+  skipLinkText?: string
 }
 
 class WizardFullScreen extends PureComponent<Props> {
   public render() {
-    const {children} = this.props
+    const {children, title, skipLinkText} = this.props
 
-    return <div className="progress-bar">Step: {children}</div>
+    return (
+      <SplashPage>
+        <>
+          <h1 className="wizard-title">{title}</h1>
+          <div className="wizard-container">
+            <WizardCloak skipLinkText={skipLinkText}>{children}</WizardCloak>
+          </div>
+        </>
+      </SplashPage>
+    )
   }
 }
 

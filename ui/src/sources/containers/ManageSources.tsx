@@ -40,7 +40,7 @@ class ManageSources extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      wizardVisibility: true,
+      wizardVisibility: false,
     }
   }
 

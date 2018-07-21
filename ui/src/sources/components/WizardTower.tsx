@@ -1,18 +1,13 @@
 import React, {PureComponent} from 'react'
-import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
+import WizardFullScreen from 'src/reusable_ui/components/wizard/WizardFullScreen'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
-
-interface Props {
-  wizardVisibility: boolean
-  toggleVisibility: (isVisible: boolean) => () => void
-}
 
 interface State {
   completion: object
 }
 
-class GrandWizard extends PureComponent<Props, State> {
-  constructor(props: Props) {
+class WizardTower extends PureComponent<null, State> {
+  constructor(props) {
     super(props)
     this.state = {
       completion: {
@@ -23,14 +18,8 @@ class GrandWizard extends PureComponent<Props, State> {
     }
   }
   public render() {
-    const {wizardVisibility, toggleVisibility} = this.props
     return (
-      <WizardOverlay
-        visible={wizardVisibility}
-        toggleVisibility={toggleVisibility}
-        title="Grand Wizard"
-        skipLinkText="configure later"
-      >
+      <WizardFullScreen title="Wizard Tower" skipLinkText="configure later">
         <WizardStep
           title="First Step"
           tipText="One is the lonliest number that you ever knew..."
@@ -129,7 +118,7 @@ class GrandWizard extends PureComponent<Props, State> {
         >
           some third children
         </WizardStep>
-      </WizardOverlay>
+      </WizardFullScreen>
     )
   }
 
@@ -181,4 +170,4 @@ class GrandWizard extends PureComponent<Props, State> {
   }
 }
 
-export default GrandWizard
+export default WizardTower

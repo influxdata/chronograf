@@ -32,7 +32,7 @@ class WizardOverlay extends PureComponent<Props> {
           <OverlayBody>
             <WizardCloak
               skipLinkText={skipLinkText}
-              toggleVisibility={toggleVisibility}
+              handleSkip={toggleVisibility(false)}
             >
               {children}
             </WizardCloak>
