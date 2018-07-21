@@ -10,18 +10,21 @@ interface Props {
   children: Array<ReactElement<WizardStepProps>>
   title: string
   skipLinkText?: string
+  handleSkip: () => void
 }
 
 class WizardFullScreen extends PureComponent<Props> {
   public render() {
-    const {children, title, skipLinkText} = this.props
+    const {children, title, skipLinkText, handleSkip} = this.props
 
     return (
       <SplashPage>
         <>
           <h1 className="wizard-title">{title}</h1>
           <div className="wizard-container">
-            <WizardCloak skipLinkText={skipLinkText}>{children}</WizardCloak>
+            <WizardCloak handleSkip={handleSkip} skipLinkText={skipLinkText}>
+              {children}
+            </WizardCloak>
           </div>
         </>
       </SplashPage>

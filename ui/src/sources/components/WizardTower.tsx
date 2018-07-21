@@ -19,7 +19,11 @@ class WizardTower extends PureComponent<null, State> {
   }
   public render() {
     return (
-      <WizardFullScreen title="Wizard Tower" skipLinkText="configure later">
+      <WizardFullScreen
+        title="Wizard Tower"
+        handleSkip={this.handleSkip}
+        skipLinkText="configure later"
+      >
         <WizardStep
           title="First Step"
           tipText="One is the lonliest number that you ever knew..."
@@ -120,6 +124,10 @@ class WizardTower extends PureComponent<null, State> {
         </WizardStep>
       </WizardFullScreen>
     )
+  }
+
+  private handleSkip = () => {
+    // HANDLE SKIP
   }
 
   private completeTest = curr => () => {
