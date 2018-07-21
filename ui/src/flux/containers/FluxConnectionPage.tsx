@@ -13,8 +13,8 @@ import {
   UpdateServiceAsync,
   createServiceAsync,
   CreateServiceAsync,
-  fetchServicesForSourceAsync,
-  FetchServicesForSourceAsync,
+  fetchFluxServicesForSourceAsync,
+  FetchFluxServicesForSourceAsync,
   setActiveServiceAsync,
   SetActiveServiceAsync,
 } from 'src/shared/actions/services'
@@ -30,7 +30,7 @@ interface Props {
   createService: CreateServiceAsync
   updateService: UpdateServiceAsync
   setActiveFlux: SetActiveServiceAsync
-  fetchServicesForSource: FetchServicesForSourceAsync
+  fetchServicesForSource: FetchFluxServicesForSourceAsync
 }
 
 interface State {
@@ -133,7 +133,7 @@ const mdtp = {
   createService: createServiceAsync,
   updateService: updateServiceAsync,
   setActiveFlux: setActiveServiceAsync,
-  fetchServicesForSource: fetchServicesForSourceAsync,
+  fetchServicesForSource: fetchFluxServicesForSourceAsync,
 }
 
 const mstp = ({services}) => ({services})

@@ -23,7 +23,7 @@ interface Props {
   sources: Source[]
   services: Service[]
   children: ReactChildren
-  fetchServicesAsync: actions.FetchServicesForSourceAsync
+  fetchServicesAsync: actions.FetchFluxServicesForSourceAsync
   notify: (message: Notification) => void
   updateScript: UpdateScript
   script: string
@@ -121,7 +121,7 @@ export class CheckServices extends PureComponent<
 }
 
 const mdtp = {
-  fetchServicesAsync: actions.fetchServicesForSourceAsync,
+  fetchServicesAsync: actions.fetchFluxServicesForSourceAsync,
   updateScript: updateScriptAction,
   notify: notifyAction,
 }

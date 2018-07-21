@@ -27,7 +27,7 @@ interface Props {
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
   removeAndLoadSources: sourcesActions.RemoveAndLoadSources
   setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
-  fetchAllServices: servicesActions.FetchAllServicesAsync
+  fetchAllServices: servicesActions.FetchAllFluxServicesAsync
   setActiveFlux: servicesActions.SetActiveServiceAsync
   deleteFlux: servicesActions.DeleteServiceAsync
 }
@@ -111,7 +111,7 @@ const mdtp = {
   fetchKapacitors: sourcesActions.fetchKapacitorsAsync,
   setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
-  fetchAllServices: servicesActions.fetchAllServicesAsync,
+  fetchAllServices: servicesActions.fetchAllFluxServicesAsync,
   setActiveFlux: servicesActions.setActiveServiceAsync,
   deleteFlux: servicesActions.deleteServiceAsync,
 }
