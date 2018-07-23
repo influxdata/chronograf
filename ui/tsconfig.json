@@ -35,7 +35,8 @@
     "checkJs": false,
     "sourceMap": true,
     "baseUrl": "./",
-    "rootDir": "./src"
+    "rootDir": "./",
+    "outDir": "./build",
   },
-  "exclude": ["./assets/*", "./build/*", "./node_modules/*"]
+  "exclude": ["assets", "build", "node_modules"]
 }
