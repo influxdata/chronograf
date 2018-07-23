@@ -21,6 +21,7 @@
 1.  [#4038](https://github.com/influxdata/chronograf/pull/4038): Fix crosshairs and hover legend display in Alert Rule visualization
 1.  [#4067](https://github.com/influxdata/chronograf/pull/4067): Size loading spinners based on height of their container
 
+
 ## v1.6.0 [2018-06-18]
 
 ### Features
