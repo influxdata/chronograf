@@ -14,7 +14,7 @@ export interface WizardStepProps {
   lastStep?: boolean
 }
 
-export enum connectorState {
+export enum ConnectorState {
   None = 'none',
   Some = 'some',
   Full = 'full',

@@ -1,15 +1,10 @@
 import React, {PureComponent} from 'react'
+import {ConnectorState} from 'src/types/wizard'
 
 import 'src/reusable_ui/components/wizard/ProgressConnector.scss'
 
-enum statusStates {
-  None = 'none',
-  Some = 'some',
-  Full = 'full',
-}
-
 interface Props {
-  status: statusStates
+  status: ConnectorState
 }
 
 class ProgressConnector extends PureComponent<Props> {
@@ -18,7 +13,8 @@ class ProgressConnector extends PureComponent<Props> {
 
     return (
       <span
-        className={`progress-connector progress-connector--${status || 'none'}`}
+        className={`progress-connector progress-connector--${status ||
+          ConnectorState.None}`}
       />
     )
   }

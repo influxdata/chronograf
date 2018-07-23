@@ -19,19 +19,17 @@
   left: 0;
   width: 0;
   border-radius: 2px;
+  transition: all 0.5s;
 }
 
 .progress-connector--none:after {
   width: 0;
-  transition: all 0.5s;
 }
 
 .progress-connector--some:after {
   width: 50%;
-  transition: all 0.5s;
 }
 
 .progress-connector--full:after {
   width: 100%;
-  transition: all 0.5s;
 }
