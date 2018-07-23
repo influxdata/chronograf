@@ -113,6 +113,8 @@ class WizardTower extends PureComponent<null, State> {
           previousLabel="Now hold on a sec..."
         >
           some second children
+          <span>span stuff</span>
+          <div>div stuff</div>
         </WizardStep>
         <WizardStep
           title="Third Step"

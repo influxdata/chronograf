@@ -1,0 +1,16 @@
+@import 'src/style/modules/variables';
+
+.button-bar {
+  display: flex;
+  margin: $ix-marg-b auto;
+  position: relative;
+  min-width: 100%;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  .btn {
+    position: relative;
+    white-space: nowrap;
+    margin: 0 $ix-marg-c;
+  }
+}

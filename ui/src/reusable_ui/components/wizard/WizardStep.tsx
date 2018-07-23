@@ -1,5 +1,6 @@
 import React, {PureComponent, ReactNode} from 'react'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
 
 import 'src/reusable_ui/components/wizard/WizardStep.scss'
 
@@ -19,7 +20,7 @@ interface Props {
 
 class WizardStep extends PureComponent<Props> {
   public render() {
-    const {children, decrement, nextLabel, previousLabel} = this.props
+    const {children, decrement, nextLabel, previousLabel, lastStep} = this.props
 
     return (
       <>
@@ -30,46 +31,28 @@ class WizardStep extends PureComponent<Props> {
         >
           {children}
         </FancyScrollbar>
-        <div className="button-bar">
-          {decrement && (
-            <button
-              className="btn btn-md btn-default"
-              onClick={this.handleClickPrevious}
-            >
-              {previousLabel || 'back'}
-            </button>
-          )}
-          <button
-            className={`btn btn-md ${this.buttonColor}`}
-            onClick={this.handleClickNext}
-          >
-            {nextLabel || 'next'}
-          </button>
-        </div>
+        <WizardButtonBar
+          decrement={decrement}
+          nextLabel={nextLabel}
+          previousLabel={previousLabel}
+          onClickPrevious={this.handleClickPrevious}
+          onClickNext={this.handleClickNext}
+          lastStep={lastStep}
+        />
       </>
     )
   }
 
-  private handleClickPrevious = () => {
+  private handleClickPrevious = async () => {
     const {onPrevious, decrement} = this.props
-    onPrevious() // TODO wait if async function
+    await onPrevious()
     decrement()
   }
 
-  private handleClickNext = () => {
+  private handleClickNext = async () => {
     const {onNext, increment} = this.props
-    onNext()
+    await onNext()
     increment()
-  }
-
-  private get buttonColor() {
-    const {lastStep} = this.props
-
-    if (lastStep) {
-      return 'btn-success'
-    }
-
-    return 'btn-primary'
   }
 }
 
