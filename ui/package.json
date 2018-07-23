@@ -9,19 +9,20 @@
     "url": "github:influxdata/chronograf"
   },
   "scripts": {
-    "build": "parcel build -d build --public-url '' src/index.html",
     "start": "node parcel.js",
-    "lint": "esw src/",
+    "build": "parcel build -d build --public-url '' src/index.html",
+    "clean": "rm -rf ./build && rm -rf ./.cache",
     "test": "jest",
-    "test:lint": "yarn run lint; yarn run test",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --watch",
-    "clean": "rm -rf ./build && rm -rf ./.cache",
+    "lint": "yarn run eslint; yarn run tslint; yarn run tsc",
+    "eslint": "eslint src",
+    "eslint:watch": "esw src --watch --cache",
     "eslint:fix": "eslint src --fix",
+    "tslint": "tslint -c ./tslint.json '{src,test}/**/*.ts?(x)'",
     "tslint:fix": "tslint --fix -c ./tslint.json '{src,test}/**/*.ts?(x)'",
-    "prettier": "prettier --single-quote --trailing-comma es5 --bracket-spacing false --semi false --write \"{src,spec}/**/*.js\"",
-    "lint:fix": "yarn run prettier && yarn run eslint:fix && yarn run tslint:fix",
-    "eslint-check": "eslint --print-config .eslintrc | eslint-config-prettier-check"
+    "tsc": "tsc -p ./tsconfig.json --noEmit --pretty",
+    "tsc:watch": "tsc -p ./tsconfig.json --noEmit --pretty -w"
   },
   "author": "",
   "devDependencies": {
