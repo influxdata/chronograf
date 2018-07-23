@@ -2,8 +2,7 @@ import _ from 'lodash'
 import React, {PureComponent} from 'react'
 import {Source, Namespace} from 'src/types'
 
-import RadioButtons from 'src/reusable_ui/components/radio_buttons/RadioButtons'
-import {ButtonShape, ComponentColor} from 'src/reusable_ui/types'
+import {getDeep} from 'src/utils/wrappers'
 import Dropdown from 'src/shared/components/Dropdown'
 import PointInTimeDropDown from 'src/logs/components/PointInTimeDropDown'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
@@ -11,6 +10,7 @@ import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTi
 import TimeWindowDropdown from 'src/logs/components/TimeWindowDropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import {TimeRange, TimeWindow, LiveUpdating} from 'src/types/logs'
+import LiveUpdatingStatus from 'src/logs/components/LiveUpdatingStatus'
 
 interface SourceItem {
   id: string
@@ -22,9 +22,9 @@ interface Props {
   availableSources: Source[]
   currentSource: Source | null
   currentNamespaces: Namespace[]
-  liveUpdating: LiveUpdating
   onChooseSource: (sourceID: string) => void
   onChooseNamespace: (namespace: Namespace) => void
+  liveUpdating: LiveUpdating
   onChangeLiveUpdatingStatus: () => void
   onShowOptionsOverlay: () => void
   timeRange: TimeRange
@@ -47,9 +47,14 @@ class LogViewerHeader extends PureComponent<Props> {
   }
 
   private get renderHeaderTitle(): JSX.Element {
+    const {liveUpdating, onChangeLiveUpdatingStatus} = this.props
+
     return (
       <>
-        {this.status}
+        <LiveUpdatingStatus
+          onChangeLiveUpdatingStatus={onChangeLiveUpdatingStatus}
+          liveUpdating={liveUpdating}
+        />
         <PageHeaderTitle title="Log Viewer" />
       </>
     )
@@ -65,8 +70,7 @@ class LogViewerHeader extends PureComponent<Props> {
       onChooseRelativeTime,
     } = this.props
 
-    // Todo: Replace w/ getDeep
-    const timeRange = _.get(this.props, 'timeRange', {
+    const timeRange = getDeep(this.props, 'timeRange', {
       upper: null,
       lower: 'now() - 1m',
       seconds: 60,
@@ -108,22 +112,6 @@ class LogViewerHeader extends PureComponent<Props> {
           </button>
         </Authorized>
       </>
-    )
-  }
-
-  private get status(): JSX.Element {
-    const {liveUpdating, onChangeLiveUpdatingStatus} = this.props
-    const buttons = ['icon play', 'icon pause']
-
-    return (
-      <RadioButtons
-        customClass="logs-viewer--mode-toggle"
-        shape={ButtonShape.Square}
-        color={ComponentColor.Primary}
-        buttons={buttons}
-        onChange={onChangeLiveUpdatingStatus}
-        activeButton={liveUpdating}
-      />
     )
   }
 
