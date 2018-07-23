@@ -4,6 +4,8 @@ import {withRouter} from 'react-router'
 
 import FluxNew from 'src/flux/components/FluxNew'
 import FluxEdit from 'src/flux/components/FluxEdit'
+import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {getService} from 'src/shared/apis'
 import {FluxFormMode} from 'src/flux/constants/connection'
@@ -93,6 +95,25 @@ class FluxConnectionPage extends PureComponent<Props, State> {
   }
 
   public render() {
+    return (
+      <div className="page">
+        <PageHeader titleText={this.pageTitle} />
+        <FancyScrollbar className="page-contents">
+          <div className="container-fluid">
+            <div className="row">
+              <div className="col-md-8 col-md-offset-2">
+                <div className="panel">
+                  <div className="panel-body">{this.form}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FancyScrollbar>
+      </div>
+    )
+  }
+
+  private get form() {
     const {
       source,
       notify,
@@ -115,16 +136,24 @@ class FluxConnectionPage extends PureComponent<Props, State> {
           createService={createService}
         />
       )
-    } else {
-      return (
-        <FluxEdit
-          notify={notify}
-          service={service}
-          services={services}
-          updateService={updateService}
-        />
-      )
     }
+    return (
+      <FluxEdit
+        notify={notify}
+        service={service}
+        services={services}
+        updateService={updateService}
+      />
+    )
+  }
+
+  private get pageTitle() {
+    const {formMode} = this.state
+
+    if (formMode === FluxFormMode.new) {
+      return 'Add Flux Connection'
+    }
+    return 'Edit Flux Connection'
   }
 }
 

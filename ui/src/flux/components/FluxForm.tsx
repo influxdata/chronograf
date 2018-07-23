@@ -19,47 +19,50 @@ class FluxForm extends PureComponent<Props> {
     const name = _.get(service, 'name', '')
 
     return (
-      <div className="template-variable-manager--body">
-        <form onSubmit={onSubmit} style={{display: 'inline-block'}}>
-          <Input
-            name="url"
-            label="Flux URL"
-            value={this.url}
-            placeholder={this.url}
-            onChange={onInputChange}
-            customClass="col-sm-6"
-          />
-          <Input
-            name="name"
-            label="Name"
-            value={name}
-            placeholder={name}
-            onChange={onInputChange}
-            maxLength={33}
-            customClass="col-sm-6"
-          />
-          <div className="form-group form-group-submit col-xs-12 text-center">
-            <button
-              className="btn btn-success"
-              type="submit"
-              data-test="submit-button"
-            >
-              {this.buttonText}
-            </button>
-          </div>
-        </form>
-      </div>
+      <form onSubmit={onSubmit}>
+        <Input
+          name="url"
+          label="Flux URL"
+          value={this.url}
+          placeholder={this.url}
+          onChange={onInputChange}
+          customClass="col-sm-6"
+        />
+        <Input
+          name="name"
+          label="Name"
+          value={name}
+          placeholder={name}
+          onChange={onInputChange}
+          maxLength={33}
+          customClass="col-sm-6"
+        />
+        <div className="form-group form-group-submit col-xs-12 text-center">
+          {this.saveButton}
+        </div>
+      </form>
     )
   }
 
-  private get buttonText(): string {
+  private get saveButton(): JSX.Element {
     const {mode} = this.props
 
+    let text = 'Connect'
+
     if (mode === 'edit') {
-      return 'Update'
+      text = 'Save Changes'
     }
 
-    return 'Connect'
+    return (
+      <button
+        className="btn btn-success"
+        type="submit"
+        data-test="submit-button"
+      >
+        <span className="icon checkmark" />
+        {text}
+      </button>
+    )
   }
 
   private get url(): string {
