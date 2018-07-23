@@ -6,6 +6,8 @@ import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {Greys} from 'src/reusable_ui/types'
 
+const NOW = 0
+
 import {
   setTableCustomTimeAsync,
   setTableRelativeTimeAsync,
@@ -263,7 +265,7 @@ class LogsPage extends Component<Props, State> {
     }
 
     let liveUpdating = LiveUpdating.Pause
-    if (time === 0) {
+    if (time === NOW) {
       timeOption = {timeOption: 'now'}
       liveUpdating = LiveUpdating.Play
     }
@@ -498,7 +500,7 @@ class LogsPage extends Component<Props, State> {
       this.setState({liveUpdating: LiveUpdating.Pause})
       clearInterval(this.interval)
     } else {
-      this.handleChooseRelativeTime(0)
+      this.handleChooseRelativeTime(NOW)
     }
   }
 
