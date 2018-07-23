@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react'
+import {browserHistory} from 'react-router'
 import WizardFullScreen from 'src/reusable_ui/components/wizard/WizardFullScreen'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 
@@ -127,7 +128,7 @@ class WizardTower extends PureComponent<null, State> {
   }
 
   private handleSkip = () => {
-    // HANDLE SKIP
+    browserHistory.goBack()
   }
 
   private completeTest = curr => () => {

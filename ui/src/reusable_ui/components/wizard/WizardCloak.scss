@@ -5,3 +5,17 @@
   text-align: center;
   font-size: $ix-text-base-2;
 }
+
+.wizard-cloak {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tip-text {
+  min-width: 100%;
+  color: $g12-forge;
+  text-align: center;
+}

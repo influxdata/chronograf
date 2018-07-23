@@ -52,12 +52,15 @@ class WizardCloak extends PureComponent<Props, State> {
 
     return (
       <div className="wizard-cloak">
-        <h2 className="step-title">{this.CurrentChild.props.title}</h2>
-        <WizardProgressBar
-          handleJump={this.jumpToStep}
-          steps={steps}
-          currentStepIndex={currentStepIndex}
-        />
+        <div className="progress-header">
+          <h2 className="step-title">{this.CurrentChild.props.title}</h2>
+          <WizardProgressBar
+            handleJump={this.jumpToStep}
+            steps={steps}
+            currentStepIndex={currentStepIndex}
+          />
+          {this.tipText}
+        </div>
         {this.CurrentChild}
         <p className="skip-link">
           <a onClick={handleSkip}> {skipLinkText || 'skip'}</a>
@@ -102,6 +105,22 @@ class WizardCloak extends PureComponent<Props, State> {
       decrement: retreat,
       lastStep,
     })
+  }
+
+  private get tipText() {
+    const {currentStepIndex} = this.state
+    const {
+      props: {tipText},
+    } = this.props.children[currentStepIndex]
+
+    if (tipText) {
+      return (
+        <div className="tip-text">
+          <p>{tipText}</p>
+        </div>
+      )
+    }
+    return null
   }
 }
 

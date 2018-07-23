@@ -19,17 +19,14 @@ interface Props {
 
 class WizardStep extends PureComponent<Props> {
   public render() {
-    const {children, decrement, tipText, nextLabel, previousLabel} = this.props
+    const {children, decrement, nextLabel, previousLabel} = this.props
 
     return (
-      <div className="progress-step">
-        <div className="tip-text">
-          <p>{tipText}</p>
-        </div>
+      <>
         <FancyScrollbar
+          className="step-content"
           maxHeight={400}
           autoHeight={true}
-          className="step-content"
         >
           {children}
         </FancyScrollbar>
@@ -49,7 +46,7 @@ class WizardStep extends PureComponent<Props> {
             {nextLabel || 'next'}
           </button>
         </div>
-      </div>
+      </>
     )
   }
 
