@@ -120,6 +120,7 @@ export const makeLegendStyles = (graph, legend, hoverTimeX) => {
   const screenHeight = window.innerHeight
   const legendMaxLeft = graphWidth - legendWidth / 2
 
+  let marginTop = 0
   let legendLeft = hoverTimeX
 
   // Enforcing max & min legend offsets
@@ -139,6 +140,7 @@ export const makeLegendStyles = (graph, legend, hoverTimeX) => {
   // If legend is only clipped on the bottom, position above graph
   if (isLegendBottomClipped && !isLegendTopClipped) {
     legendTop = -legendHeight
+    marginTop = 7
   }
 
   // If legend is clipped on top and bottom, posiition on either side of crosshair
@@ -157,6 +159,7 @@ export const makeLegendStyles = (graph, legend, hoverTimeX) => {
   return {
     left: `${legendLeft}px`,
     top: `${legendTop}px`,
+    marginTop: `${marginTop}px`,
   }
 }
 
