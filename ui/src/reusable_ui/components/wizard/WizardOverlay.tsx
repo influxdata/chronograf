@@ -19,29 +19,33 @@ interface Props {
 @ErrorHandling
 class WizardOverlay extends PureComponent<Props> {
   public render() {
-    const {
-      children,
-      visible,
-      title,
-      toggleVisibility,
-      skipLinkText,
-    } = this.props
+    const {visible, title} = this.props
 
     return (
       <OverlayTechnology visible={visible}>
         <OverlayContainer maxWidth={800}>
           <OverlayHeading title={title} />
-          <OverlayBody>
-            <WizardCloak
-              skipLinkText={skipLinkText}
-              handleSkip={toggleVisibility(false)}
-            >
-              {children}
-            </WizardCloak>
-          </OverlayBody>
+          <OverlayBody>{this.wizardCloak}</OverlayBody>
         </OverlayContainer>
       </OverlayTechnology>
     )
+  }
+
+  private get wizardCloak() {
+    const {children, skipLinkText, toggleVisibility} = this.props
+
+    if (children) {
+      return (
+        <WizardCloak
+          skipLinkText={skipLinkText}
+          handleSkip={toggleVisibility(false)}
+        >
+          {children}
+        </WizardCloak>
+      )
+    }
+
+    return null
   }
 }
 

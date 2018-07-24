@@ -1,7 +1,6 @@
 import React, {PureComponent, ReactElement} from 'react'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-
 import {WizardStepProps, StepStatus, Step} from 'src/types/wizard'
 
 import 'src/reusable_ui/components/wizard/WizardCloak.scss'
@@ -19,11 +18,16 @@ interface Props {
 
 @ErrorHandling
 class WizardCloak extends PureComponent<Props, State> {
+  public static defaultProps: Partial<Props> = {
+    skipLinkText: 'skip',
+  }
+
   public static getDerivedStateFromProps(props: Props, state: State) {
     let {currentStepIndex} = state
+    const {children} = props
 
     const childSteps = React.Children.map(
-      props.children,
+      children,
       (child: ReactElement<WizardStepProps>, i) => {
         const isComplete = child.props.isComplete()
         if (currentStepIndex === -1 && !isComplete) {
@@ -35,7 +39,6 @@ class WizardCloak extends PureComponent<Props, State> {
         }
       }
     )
-
     if (currentStepIndex === -1) {
       currentStepIndex = childSteps.length - 1
     }
@@ -53,12 +56,12 @@ class WizardCloak extends PureComponent<Props, State> {
 
   public render() {
     const {steps, currentStepIndex} = this.state
-    const {skipLinkText, handleSkip} = this.props
+    const currentChild = this.CurrentChild
 
     return (
       <div className="wizard-cloak">
         <div className="progress-header">
-          <h2 className="step-title">{this.CurrentChild.props.title}</h2>
+          <h2 className="step-title">{currentChild.props.title}</h2>
           <WizardProgressBar
             handleJump={this.jumpToStep}
             steps={steps}
@@ -66,10 +69,8 @@ class WizardCloak extends PureComponent<Props, State> {
           />
           {this.tipText}
         </div>
-        {this.CurrentChild}
-        <p className="skip-link">
-          <a onClick={handleSkip}> {skipLinkText || 'skip'}</a>
-        </p>
+        {currentChild}
+        {this.skipLink}
       </div>
     )
   }
@@ -102,10 +103,16 @@ class WizardCloak extends PureComponent<Props, State> {
     const lastStep = currentStepIndex === steps.length - 1
 
     const advance = lastStep ? handleSkip : this.incrementStep
-
     const retreat = currentStepIndex === 0 ? null : this.decrementStep
 
-    return React.cloneElement<WizardStepProps>(children[currentStepIndex], {
+    let currentChild
+    if (React.Children.count(children) === 1) {
+      currentChild = children
+    } else {
+      currentChild = children[currentStepIndex]
+    }
+
+    return React.cloneElement<WizardStepProps>(currentChild, {
       increment: advance,
       decrement: retreat,
       lastStep,
@@ -114,15 +121,37 @@ class WizardCloak extends PureComponent<Props, State> {
 
   private get tipText() {
     const {currentStepIndex} = this.state
+    const {children} = this.props
+
+    let currentChild
+    if (React.Children.count(children) === 1) {
+      currentChild = children
+    } else {
+      currentChild = children[currentStepIndex]
+    }
+
     const {
       props: {tipText},
-    } = this.props.children[currentStepIndex]
+    } = currentChild
 
     if (tipText) {
       return (
         <div className="tip-text">
           <p>{tipText}</p>
         </div>
+      )
+    }
+    return null
+  }
+
+  private get skipLink() {
+    const {handleSkip, skipLinkText} = this.props
+
+    if (handleSkip) {
+      return (
+        <p className="skip-link">
+          <a onClick={handleSkip}> {skipLinkText}</a>
+        </p>
       )
     }
     return null

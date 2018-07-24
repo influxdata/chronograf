@@ -11,26 +11,36 @@ interface Props {
   children: Array<ReactElement<WizardStepProps>>
   title: string
   skipLinkText?: string
-  handleSkip: () => void
+  handleSkip?: () => void
 }
 
 @ErrorHandling
 class WizardFullScreen extends PureComponent<Props> {
   public render() {
-    const {children, title, skipLinkText, handleSkip} = this.props
+    const {title} = this.props
 
     return (
       <SplashPage>
         <>
           <h1 className="wizard-title">{title}</h1>
-          <div className="wizard-container">
-            <WizardCloak handleSkip={handleSkip} skipLinkText={skipLinkText}>
-              {children}
-            </WizardCloak>
-          </div>
+          <div className="wizard-container">{this.wizardCloak}</div>
         </>
       </SplashPage>
     )
+  }
+
+  private get wizardCloak() {
+    const {children, skipLinkText, handleSkip} = this.props
+
+    if (children) {
+      return (
+        <WizardCloak handleSkip={handleSkip} skipLinkText={skipLinkText}>
+          {children}
+        </WizardCloak>
+      )
+    }
+
+    return null
   }
 }
 
