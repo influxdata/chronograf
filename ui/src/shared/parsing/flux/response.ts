@@ -18,13 +18,13 @@ export const parseResponseError = (response: string): FluxTable[] => {
 }
 
 export const parseResponse = (response: string): FluxTable[] => {
-  const trimmedReponse = response.trim()
+  const trimmedResponse = response.trim()
 
-  if (_.isEmpty(trimmedReponse)) {
+  if (_.isEmpty(trimmedResponse)) {
     return []
   }
 
-  return trimmedReponse.split(/\n\s*\n/).reduce((acc, chunk) => {
+  return trimmedResponse.split(/\n\s*\n/).reduce((acc, chunk) => {
     return [...acc, ...parseTables(chunk)]
   }, [])
 }
