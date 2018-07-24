@@ -4,6 +4,7 @@ import {ScaleLinear, ScaleTime} from 'd3-scale'
 import {color} from 'd3-color'
 
 import {getDeep} from 'src/utils/wrappers'
+import {clipPathUrl} from 'src/utils/svg'
 
 import {
   HistogramData,
@@ -202,7 +203,7 @@ class HistogramChartBars extends PureComponent<Props, State> {
               width={d.width}
               height={d.height}
               fill={d.fill}
-              clipPath={`url(#histogram-chart-bars--clip-${key})`}
+              clipPath={clipPathUrl(`histogram-chart-bars--clip-${key}`)}
               data-group={d.group}
               data-key={d.key}
             />
