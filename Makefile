@@ -92,7 +92,7 @@ gen: internal.pb.go
 internal.pb.go: bolt/internal/internal.proto
 	go generate -x ./bolt/internal
 
-test: jstest gotest gotestrace
+test: jstest gotest gotestrace lint-ci
 
 gotest:
 	go test -timeout 10s ./...
@@ -103,8 +103,11 @@ gotestrace:
 jstest:
 	cd ui && yarn test --runInBand
 
-jslint:
-	cd ui && yarn run lint:fix
+lint:
+	cd ui && yarn run lint
+
+lint-ci:
+	cd ui && yarn run eslint && yarn run tslint && yarn run tsc # fail fast for ci process
 
 run: ${BINARY}
 	./chronograf
@@ -124,6 +127,3 @@ clean:
 
 ctags:
 	ctags -R --languages="Go" --exclude=.git --exclude=ui .
-
-lint:
-	cd ui && yarn prettier
