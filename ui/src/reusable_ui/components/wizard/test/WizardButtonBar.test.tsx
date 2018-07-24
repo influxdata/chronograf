@@ -36,7 +36,11 @@ describe('WizardButtonBar', () => {
     expect(buttonColor).toBe('btn-primary')
   })
 
-  describe('WizardButtonBar', () => {
+  it('matches snapshot when provided minimal props', () => {
+    expect(wrapper).toMatchSnapshot()
+  })
+
+  describe('with decrement and last step is "true"', () => {
     const propsWithDecrement = {
       ...props,
       decrement: jest.fn(),
@@ -57,6 +61,10 @@ describe('WizardButtonBar', () => {
     it('renders a success button if lastStep is true', () => {
       const buttonColor = wrapper.instance().buttonColor
       expect(buttonColor).toBe('btn-success')
+    })
+
+    it('matches snapshot when provided decrement function and last step as "true"', () => {
+      expect(wrapper).toMatchSnapshot()
     })
   })
 })

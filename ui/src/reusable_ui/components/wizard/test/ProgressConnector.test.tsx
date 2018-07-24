@@ -33,6 +33,10 @@ describe('Progress Connector', () => {
     it('defaults to enum state "none" when no props provided', () => {
       expect(wrapper.find('span').props().className).toBe(expectedWithoutStatus)
     })
+
+    it('matches snapshot when provided minimal props', () => {
+      expect(wrapper).toMatchSnapshot()
+    })
   })
 
   describe('with status: some', () => {
@@ -47,6 +51,10 @@ describe('Progress Connector', () => {
         expectedWithStatusSome
       )
     })
+
+    it('matches snapshot when provided "some" status', () => {
+      expect(wrapper).toMatchSnapshot()
+    })
   })
 
   describe('with status: all', () => {
@@ -58,6 +66,10 @@ describe('Progress Connector', () => {
 
     it('defaults to enum state "all" when no props provided', () => {
       expect(wrapper.find('span').props().className).toBe(expectedWithStatusAll)
+    })
+
+    it('matches snapshot when provided "full" status', () => {
+      expect(wrapper).toMatchSnapshot()
     })
   })
 })
