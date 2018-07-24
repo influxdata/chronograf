@@ -65,10 +65,10 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
     )
   )
 
-  const partitionRow = annotationData.find(row => row[0] === '#partition')
+  const partitionRow = annotationData.find(row => row[0] === '#group')
   const defaultsRow = annotationData.find(row => row[0] === '#default')
 
-  // partitionRow = ['#partition', 'false', 'true', 'true', 'false']
+  // partitionRow = ['#group', 'false', 'true', 'true', 'false']
   const partitionKeyIndices = partitionRow.reduce((acc, value, i) => {
     if (value === 'true') {
       return [...acc, i]
