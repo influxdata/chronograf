@@ -36,7 +36,7 @@ class WizardButtonBar extends PureComponent<Props> {
           className={`btn btn-md ${this.buttonColor}`}
           onClick={onClickNext}
         >
-          {nextLabel || 'next'}
+          {nextLabel}
         </button>
       </div>
     )
