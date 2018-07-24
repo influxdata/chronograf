@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import ProgressConnector from 'src/reusable_ui/components/wizard/ProgressConnector'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {Step, ConnectorState, StepStatus} from 'src/types/wizard'
 
@@ -11,6 +12,7 @@ interface Props {
   handleJump: (jumpIndex: number) => () => void
 }
 
+@ErrorHandling
 class WizardProgressBar extends PureComponent<Props> {
   public render() {
     return <div className="progress-bar">{this.WizardProgress}</div>

@@ -6,6 +6,7 @@ import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
 import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 
 import {WizardStepProps} from 'src/types/wizard'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
@@ -15,6 +16,7 @@ interface Props {
   skipLinkText?: string
 }
 
+@ErrorHandling
 class WizardOverlay extends PureComponent<Props> {
   public render() {
     const {

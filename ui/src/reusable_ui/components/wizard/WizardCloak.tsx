@@ -1,5 +1,6 @@
 import React, {PureComponent, ReactElement} from 'react'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {WizardStepProps, StepStatus, Step} from 'src/types/wizard'
 
@@ -16,9 +17,11 @@ interface Props {
   skipLinkText?: string
 }
 
+@ErrorHandling
 class WizardCloak extends PureComponent<Props, State> {
   public static getDerivedStateFromProps(props: Props, state: State) {
     let {currentStepIndex} = state
+
     const childSteps = React.Children.map(
       props.children,
       (child: ReactElement<WizardStepProps>, i) => {
@@ -32,9 +35,11 @@ class WizardCloak extends PureComponent<Props, State> {
         }
       }
     )
+
     if (currentStepIndex === -1) {
       currentStepIndex = childSteps.length - 1
     }
+
     return {steps: childSteps, currentStepIndex}
   }
 
@@ -85,7 +90,7 @@ class WizardCloak extends PureComponent<Props, State> {
     })
   }
 
-  private jumpToStep = jumpIndex => () => {
+  private jumpToStep = (jumpIndex: number) => () => {
     this.setState({
       currentStepIndex: jumpIndex,
     })

@@ -2,6 +2,7 @@ import React, {PureComponent, ReactElement} from 'react'
 
 import SplashPage from 'src/shared/components/SplashPage'
 import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {WizardStepProps} from 'src/types/wizard'
 
@@ -13,6 +14,7 @@ interface Props {
   handleSkip: () => void
 }
 
+@ErrorHandling
 class WizardFullScreen extends PureComponent<Props> {
   public render() {
     const {children, title, skipLinkText, handleSkip} = this.props

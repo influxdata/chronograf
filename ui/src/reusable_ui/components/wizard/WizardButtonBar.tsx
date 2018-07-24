@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import 'src/reusable_ui/components/wizard/WizardButtonBar.scss'
 
@@ -11,6 +12,7 @@ interface Props {
   onClickNext: () => void
 }
 
+@ErrorHandling
 class WizardButtonBar extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
     nextLabel: 'next',
