@@ -6,6 +6,8 @@ import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {Greys} from 'src/reusable_ui/types'
 
+const NOW = 0
+
 import {
   setTableCustomTimeAsync,
   setTableRelativeTimeAsync,
@@ -263,7 +265,7 @@ class LogsPage extends Component<Props, State> {
     }
 
     let liveUpdating = LiveUpdating.Pause
-    if (time === 0) {
+    if (time === NOW) {
       timeOption = {timeOption: 'now'}
       liveUpdating = LiveUpdating.Play
     }
@@ -299,19 +301,13 @@ class LogsPage extends Component<Props, State> {
     return _.get(logConfig, 'tableColumns', [])
   }
 
-  private get isSpecificTimeRange(): boolean {
-    return !!getDeep(this.props, 'tableTime.custom', false)
-  }
-
   private startUpdating = () => {
     if (this.interval) {
       clearInterval(this.interval)
     }
 
-    if (!this.isSpecificTimeRange) {
-      this.interval = setInterval(this.handleInterval, 10000)
-      this.setState({liveUpdating: LiveUpdating.Play})
-    }
+    this.interval = setInterval(this.handleInterval, 10000)
+    this.setState({liveUpdating: LiveUpdating.Play})
   }
 
   private handleScrollToTop = () => {
@@ -486,7 +482,7 @@ class LogsPage extends Component<Props, State> {
   private get liveUpdatingStatus(): LiveUpdating {
     const {liveUpdating} = this.state
 
-    if (liveUpdating === LiveUpdating.Play && !this.isSpecificTimeRange) {
+    if (liveUpdating === LiveUpdating.Play) {
       return LiveUpdating.Play
     }
 
@@ -497,14 +493,14 @@ class LogsPage extends Component<Props, State> {
     return _.get(this.props.logConfig, 'severityLevelColors', [])
   }
 
-  private handleChangeLiveUpdatingStatus = (): void => {
+  private handleChangeLiveUpdatingStatus = async (): Promise<void> => {
     const {liveUpdating} = this.state
 
     if (liveUpdating === LiveUpdating.Play) {
       this.setState({liveUpdating: LiveUpdating.Pause})
       clearInterval(this.interval)
     } else {
-      this.startUpdating()
+      this.handleChooseRelativeTime(NOW)
     }
   }
 
@@ -535,7 +531,12 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleSetTimeBounds = async () => {
-    const {seconds, windowOption, timeOption} = this.props.timeRange
+    const {seconds, windowOption, timeOption} = _.get(this.props, 'timeRange', {
+      seconds: null,
+      windowOption: null,
+      timeOption: null,
+    })
+
     let lower = `now() - ${windowOption}`
     let upper = null
 
