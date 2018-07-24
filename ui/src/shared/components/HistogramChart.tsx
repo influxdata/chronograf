@@ -8,6 +8,7 @@ import HistogramChartTooltip from 'src/shared/components/HistogramChartTooltip'
 import HistogramChartSkeleton from 'src/shared/components/HistogramChartSkeleton'
 
 import extentBy from 'src/utils/extentBy'
+import {clipPathUrl} from 'src/utils/svg'
 
 import {
   HistogramData,
@@ -114,7 +115,7 @@ class HistogramChart extends PureComponent<Props, State> {
           <g
             transform={bodyTransform}
             className="histogram-chart--bars"
-            clipPath="url(#histogram-chart--bars-clip)"
+            clipPath={clipPathUrl('histogram-chart--bars-clip')}
           >
             <HistogramChartBars
               width={adjustedWidth}
