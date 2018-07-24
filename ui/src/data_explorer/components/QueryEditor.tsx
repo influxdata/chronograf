@@ -67,7 +67,7 @@ class QueryEditor extends PureComponent<Props, State> {
             onTouchStart={this.onTouchStart}
             onBlur={this.handleBlur}
             onFocus={this.handleFocus}
-            onKeyUp={this.handleKeyUp}
+            onKeyDown={this.handleKeyDown}
           />
         </div>
         <div className={this.varmojiClassName}>
@@ -128,10 +128,10 @@ class QueryEditor extends PureComponent<Props, State> {
     this.setState({value: template.query})
   }
 
-  private handleKeyUp = (__, e: KeyboardEvent) => {
-    const {ctrlKey, metaKey, key} = e
-
-    if (key === 'Enter' && (ctrlKey || metaKey)) {
+  private handleKeyDown = (__, e: KeyboardEvent) => {
+    const {key, shiftKey} = e
+    if (key === 'Enter' && !shiftKey) {
+      e.preventDefault()
       this.handleSubmit()
     }
   }
