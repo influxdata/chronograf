@@ -151,7 +151,7 @@ class SingleStat extends PureComponent<Props> {
         <svg width="100%" height="100%" viewBox={viewBox}>
           <text
             className="single-stat--text"
-            fontSize="100"
+            fontSize="87"
             y="59%"
             x="50%"
             dominantBaseline="middle"
