@@ -43,7 +43,7 @@ export const EXPECTED_METADATA = [
     'string',
   ],
   [
-    'partition',
+    'group',
     'false',
     'false',
     'false',
