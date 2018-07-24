@@ -1,5 +1,8 @@
 ## v1.6.1 [unreleased]
 
+### UI Improvements
+1.  [#4009](https://github.com/influxdata/chronograf/pull/4009): Make it to get mouse into hover legend
+
 ### Bug Fixes
 
 1.  [#3976](https://github.com/influxdata/chronograf/pull/3976): Ensure text template variables reflect query parameters
