@@ -1,13 +1,14 @@
 import React, {SFC} from 'react'
-import uuid from 'uuid'
 
-import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import {ComponentColor} from 'src/reusable_ui/types'
+import Dropdown from '../../../reusable_ui/components/dropdowns/Dropdown'
+import {ComponentColor} from '../../../reusable_ui/types'
 
-import {TIME_SHIFTS} from 'src/shared/components/dropdown_time_shift/timeShiftOptions'
-import {TimeShift} from 'src/types'
+import {TIME_SHIFTS} from './timeShiftOptions'
+import {TimeShift} from '../../../types'
 
 import './TimeShiftDropdown.scss'
+
+const TIME_SHIFT_DROPDOWN_WIDTH = 73
 
 interface Props {
   selected: string
@@ -27,10 +28,14 @@ const TimeShiftDropdown: SFC<Props> = ({
       onChange={onChooseTimeShift}
       selectedItem={selected || 'none'}
       disabled={isDisabled}
-      width={73}
+      width={TIME_SHIFT_DROPDOWN_WIDTH}
     >
       {TIME_SHIFTS.map(option => (
-        <Dropdown.Item key={uuid.v4()} text={option.label} value={option} />
+        <Dropdown.Item
+          key={`time-shift-option-${option.label}`}
+          text={option.label}
+          value={option}
+        />
       ))}
     </Dropdown>
   </div>
