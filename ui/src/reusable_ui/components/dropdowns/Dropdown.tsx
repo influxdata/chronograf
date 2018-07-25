@@ -37,7 +37,7 @@ interface State {
 
 @ErrorHandling
 class Dropdown extends Component<Props, State> {
-  public static defaultProps = {
+  public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
     size: ComponentSize.Small,
     disabled: false,

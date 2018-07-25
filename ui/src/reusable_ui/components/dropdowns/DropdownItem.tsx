@@ -10,7 +10,7 @@ interface Props {
 }
 
 class DropdownItem extends Component<Props> {
-  public static defaultProps = {
+  public static defaultProps: Partial<Props> = {
     checkbox: false,
     selected: false,
   }

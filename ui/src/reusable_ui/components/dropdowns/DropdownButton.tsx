@@ -16,7 +16,7 @@ interface Props {
 
 @ErrorHandling
 class DropdownButton extends Component<Props> {
-  public static defaultProps = {
+  public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
     size: ComponentSize.Small,
     disabled: false,
