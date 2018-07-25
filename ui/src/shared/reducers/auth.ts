@@ -1,4 +1,4 @@
-import {AuthMe, AuthLink} from 'src/types/auth'
+import {Me, AuthLink} from 'src/types/auth'
 import {getMeRole} from 'src/shared/reducers/helpers/auth'
 import {getDeep} from 'src/utils/wrappers'
 
@@ -6,7 +6,7 @@ import {ActionTypes} from 'src/shared/actions/auth'
 
 interface State {
   links: AuthLink[] | null
-  me: AuthMe | null
+  me: Me | null
   isMeLoading: boolean
   isAuthLoading: boolean
   logoutLink: string | null
@@ -32,7 +32,7 @@ export const initialState = getInitialState()
 
 const meGetCompleted = (
   state: State,
-  {me}: {me: AuthMe},
+  {me}: {me: Me},
   isUsingAuth: boolean
 ): State => {
   let newMe = me
