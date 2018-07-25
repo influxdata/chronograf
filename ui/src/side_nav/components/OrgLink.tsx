@@ -26,8 +26,7 @@ class OrgLink extends PureComponent<Props & WithRouterProps> {
 
     return (
       <span className={this.className} onClick={this.handleChangeOrganization}>
-        {this.orgName}
-        <strong>({role.name})</strong>
+        {this.orgName} <strong>({role.name})</strong>
       </span>
     )
   }
