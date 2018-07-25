@@ -7,7 +7,7 @@ import CalendarSelector from 'src/shared/components/calendar_selector/CalendarSe
 const setup = (overrides = {}) => {
   const props = {
     timeRange: {upper: 'now()', lower: '2017-10-24'},
-    onApplyTimeRange: () => {},
+    onCalendarUpdated: () => {},
     ...overrides,
   }
 

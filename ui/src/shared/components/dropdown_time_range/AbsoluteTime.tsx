@@ -22,7 +22,7 @@ class AbsoluteTime extends Component<Props> {
       <ClickOutside onClickOutside={onDismiss}>
         <div className="time-range-dropdown--custom">
           <CalendarSelector
-            onApplyTimeRange={this.handleApplyTimeRange}
+            onCalendarUpdated={this.handleCalendarUpdated}
             timeRange={this.validatedTime}
             disableNowButton={disableNowButton}
           />
@@ -31,7 +31,7 @@ class AbsoluteTime extends Component<Props> {
     )
   }
 
-  private handleApplyTimeRange = (timeRange: TimeRange): void => {
+  private handleCalendarUpdated = (timeRange: TimeRange): void => {
     const {onSelect, onDismiss} = this.props
 
     onSelect(timeRange)

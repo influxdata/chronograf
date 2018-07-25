@@ -116,7 +116,7 @@ class AlertsApp extends PureComponent<Props, State> {
 
     return (
       <CalendarDropdown
-        onApplyTimeRange={this.handleApplyTime}
+        onCalendarUpdated={this.handleCalendarUpdated}
         timeRange={timeRange}
       />
     )
@@ -194,7 +194,7 @@ class AlertsApp extends PureComponent<Props, State> {
     )
   }
 
-  private handleApplyTime = (timeRange: TimeRange): void => {
+  private handleCalendarUpdated = (timeRange: TimeRange): void => {
     this.setState({timeRange})
   }
 }

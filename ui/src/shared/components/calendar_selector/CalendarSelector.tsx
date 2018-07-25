@@ -17,7 +17,7 @@ import './CalendarSelector.scss'
 interface Props {
   timeRange: TimeRange
   timeInterval?: number
-  onApplyTimeRange: (timeRange: TimeRange) => void
+  onCalendarUpdated: (timeRange: TimeRange) => void
   disableNowButton?: boolean
   disableShortcuts?: boolean
 }
@@ -28,7 +28,7 @@ interface State {
 
 @ErrorHandling
 class CalendarSelector extends Component<Props, State> {
-  public static defaultProps = {
+  public static defaultProps: Partial<Props> = {
     timeInterval: 1800,
     disableNowButton: false,
     disableShortcuts: false,
@@ -38,8 +38,8 @@ class CalendarSelector extends Component<Props, State> {
   private upperContainerRef: HTMLDivElement
   private lowerInputRef: HTMLInputElement
   private upperInputRef: HTMLInputElement
-  private lowerRomeRef
-  private upperRomeRef
+  private lowerRomeRef: rome
+  private upperRomeRef: rome
 
   constructor(props: Props) {
     super(props)
@@ -171,7 +171,7 @@ class CalendarSelector extends Component<Props, State> {
     return null
   }
 
-  private getInitialDate = time => {
+  private getInitialDate = (time: string) => {
     const {upper, lower} = this.props.timeRange
 
     if (upper || lower) {
@@ -195,16 +195,16 @@ class CalendarSelector extends Component<Props, State> {
   }
 
   private handleClick = (): void => {
-    const {onApplyTimeRange} = this.props
+    const {onCalendarUpdated} = this.props
     const {isNow} = this.state
 
     const lower = this.lowerRomeRef.getDate().toISOString()
     const upper = this.upperRomeRef.getDate().toISOString()
 
     if (isNow) {
-      onApplyTimeRange({lower, upper: 'now()'})
+      onCalendarUpdated({lower, upper: 'now()'})
     } else {
-      onApplyTimeRange({lower, upper})
+      onCalendarUpdated({lower, upper})
     }
   }
 
@@ -231,7 +231,9 @@ class CalendarSelector extends Component<Props, State> {
     )
   }
 
-  private handleShortcutClick = (shortcut: CalendarShortcut) => (): void => {
+  private handleShortcutClick = (
+    shortcut: CalendarShortcut
+  ): (() => void) => (): void => {
     const {lower} = shortcut
     const upper = moment()
 

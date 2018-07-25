@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import moment from 'moment'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
@@ -17,11 +17,11 @@ interface State {
 
 interface Props {
   timeRange: TimeRange
-  onApplyTimeRange: (tr: TimeRange) => void
+  onCalendarUpdated: (tr: TimeRange) => void
 }
 
 @ErrorHandling
-class CustomTimeRangeDropdown extends PureComponent<Props, State> {
+class CustomTimeRangeDropdown extends Component<Props, State> {
   constructor(props) {
     super(props)
 
@@ -46,10 +46,10 @@ class CustomTimeRangeDropdown extends PureComponent<Props, State> {
     )
   }
 
-  private handleApplyTimeRange = (timeRange: TimeRange): void => {
-    const {onApplyTimeRange} = this.props
+  private handleCalendarUpdated = (timeRange: TimeRange): void => {
+    const {onCalendarUpdated} = this.props
 
-    onApplyTimeRange(timeRange)
+    onCalendarUpdated(timeRange)
     this.handleCollapseCalendar()
   }
 
@@ -62,7 +62,7 @@ class CustomTimeRangeDropdown extends PureComponent<Props, State> {
         <ClickOutside onClickOutside={this.handleCollapseCalendar}>
           <div className="calendar-dropdown--container">
             <CalendarSelector
-              onApplyTimeRange={this.handleApplyTimeRange}
+              onCalendarUpdated={this.handleCalendarUpdated}
               timeRange={timeRange}
             />
           </div>
