@@ -136,23 +136,7 @@ class RuleHandlers extends PureComponent<Props, State> {
               onChange={this.handleAddHandler}
               menuColor={DropdownMenuColors.Malachite}
             >
-              {handlers.map(option => {
-                if (option.type === AlertTypes.separator) {
-                  return (
-                    <Dropdown.Divider
-                      key={`alert-handlers-dropdown-${option.text}`}
-                    />
-                  )
-                }
-
-                return (
-                  <Dropdown.Item
-                    key={`alert-handlers-dropdown-${option.text}`}
-                    text={option.text}
-                    value={option}
-                  />
-                )
-              })}
+              {this.dropdownMenuItems(handlers)}
             </Dropdown>
           </div>
           {mappedHandlersOnThisAlert.length ? (
@@ -176,6 +160,24 @@ class RuleHandlers extends PureComponent<Props, State> {
         </div>
       </div>
     )
+  }
+
+  private dropdownMenuItems = (handlers: HandlerWithText[]): JSX.Element[] => {
+    return handlers.map(option => {
+      if (option.type === AlertTypes.separator) {
+        return (
+          <Dropdown.Divider key={`alert-handlers-dropdown-${option.text}`} />
+        )
+      }
+
+      return (
+        <Dropdown.Item
+          key={`alert-handlers-dropdown-${option.text}`}
+          text={option.text}
+          value={option}
+        />
+      )
+    })
   }
 
   private handleChooseHandler = (ep: HandlerWithText): (() => void) => () => {
