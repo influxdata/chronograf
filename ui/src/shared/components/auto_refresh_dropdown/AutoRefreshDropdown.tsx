@@ -2,8 +2,6 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
-import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
 import {IconFont} from 'src/reusable_ui/types'
 
 import {
@@ -28,9 +26,13 @@ class AutoRefreshDropdown extends Component<Props> {
           selectedItem={this.optionText}
           onChange={this.handleDropdownChange}
         >
-          <DropdownDivider text="AutoRefresh" />
+          <Dropdown.Divider text="AutoRefresh" />
           {autoRefreshOptions.map(option => (
-            <DropdownItem key={option.text} text={option.text} value={option} />
+            <Dropdown.Item
+              key={option.text}
+              text={option.text}
+              value={option}
+            />
           ))}
         </Dropdown>
         {this.manualRefreshButton}

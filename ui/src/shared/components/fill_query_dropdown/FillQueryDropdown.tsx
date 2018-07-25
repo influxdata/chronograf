@@ -2,7 +2,6 @@ import React, {PureComponent, ChangeEvent, KeyboardEvent} from 'react'
 import uuid from 'uuid'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import {ComponentColor} from 'src/reusable_ui/types'
 
 import {
@@ -61,7 +60,7 @@ class FillQuery extends PureComponent<Props, State> {
           disabled={isDisabled}
         >
           {fillQueryOptions.map(option => (
-            <DropdownItem key={uuid.v4()} text={option.label} value={option} />
+            <Dropdown.Item key={uuid.v4()} text={option.label} value={option} />
           ))}
         </Dropdown>
         {this.customNumberInput}

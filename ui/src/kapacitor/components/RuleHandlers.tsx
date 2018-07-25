@@ -4,8 +4,6 @@ import _ from 'lodash'
 import HandlerOptions from 'src/kapacitor/components/HandlerOptions'
 import HandlerTabs from 'src/kapacitor/components/HandlerTabs'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
-import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
 import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {parseHandlersFromRule} from 'src/shared/parsing/parseHandlersFromRule'
@@ -141,14 +139,14 @@ class RuleHandlers extends PureComponent<Props, State> {
               {handlers.map(option => {
                 if (option.type === AlertTypes.seperator) {
                   return (
-                    <DropdownDivider
+                    <Dropdown.Divider
                       key={`alert-handlers-dropdown-${option.text}`}
                     />
                   )
                 }
 
                 return (
-                  <DropdownItem
+                  <Dropdown.Item
                     key={`alert-handlers-dropdown-${option.text}`}
                     text={option.text}
                     value={option}

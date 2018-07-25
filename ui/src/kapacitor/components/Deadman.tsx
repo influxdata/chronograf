@@ -2,7 +2,6 @@ import React, {SFC} from 'react'
 
 import {PERIODS} from 'src/kapacitor/constants'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {AlertRule} from 'src/types'
@@ -30,7 +29,7 @@ const Deadman: SFC<Props> = ({rule, onChange}) => (
       menuColor={DropdownMenuColors.Malachite}
     >
       {periods.map(option => (
-        <DropdownItem
+        <Dropdown.Item
           key={`deadman-period-${option.text}`}
           text={option.text}
           value={option}

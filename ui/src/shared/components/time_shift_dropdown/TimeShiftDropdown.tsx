@@ -2,7 +2,6 @@ import React, {SFC} from 'react'
 import uuid from 'uuid'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import {ComponentColor} from 'src/reusable_ui/types'
 
 import {TIME_SHIFTS} from 'src/shared/components/time_shift_dropdown/timeShiftOptions'
@@ -31,7 +30,7 @@ const TimeShiftDropdown: SFC<Props> = ({
       width={73}
     >
       {TIME_SHIFTS.map(option => (
-        <DropdownItem key={uuid.v4()} text={option.label} value={option} />
+        <Dropdown.Item key={uuid.v4()} text={option.label} value={option} />
       ))}
     </Dropdown>
   </div>

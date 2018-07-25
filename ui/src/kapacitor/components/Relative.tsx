@@ -2,7 +2,6 @@ import React, {SFC, ChangeEvent} from 'react'
 
 import {CHANGES, RELATIVE_OPERATORS, SHIFTS} from 'src/kapacitor/constants'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {AlertRule} from 'src/types'
@@ -40,7 +39,7 @@ const Relative: SFC<Props> = ({
       menuColor={DropdownMenuColors.Malachite}
     >
       {changes.map(option => (
-        <DropdownItem
+        <Dropdown.Item
           key={`relative-changes-${option.text}`}
           text={option.text}
           value={option}
@@ -55,7 +54,7 @@ const Relative: SFC<Props> = ({
       menuColor={DropdownMenuColors.Malachite}
     >
       {shifts.map(option => (
-        <DropdownItem
+        <Dropdown.Item
           key={`relative-shifts-${option.text}`}
           text={option.text}
           value={option}
@@ -70,7 +69,7 @@ const Relative: SFC<Props> = ({
       menuColor={DropdownMenuColors.Malachite}
     >
       {operators.map(option => (
-        <DropdownItem
+        <Dropdown.Item
           key={`relative-operators-${option.text}`}
           text={option.text}
           value={option}

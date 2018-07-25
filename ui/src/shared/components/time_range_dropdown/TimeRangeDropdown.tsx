@@ -2,8 +2,6 @@ import React, {Component} from 'react'
 import moment from 'moment'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
-import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
 import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {IconFont} from 'src/reusable_ui/types'
@@ -65,7 +63,7 @@ class TimeRangeDropdown extends Component<Props, State> {
         >
           {this.absoluteTimes}
           {timeRanges.map(option => (
-            <DropdownItem
+            <Dropdown.Item
               key={option.lower}
               text={option.menuOption}
               value={option}
@@ -80,14 +78,14 @@ class TimeRangeDropdown extends Component<Props, State> {
     const {preventCustomTimeRange} = this.props
 
     if (preventCustomTimeRange) {
-      return <DropdownDivider text="Global Time" />
+      return <Dropdown.Divider text="Global Time" />
     }
 
     return (
       <>
-        <DropdownDivider text="Absolute Time" />
-        <DropdownItem text="Date Picker" value={CUSTOM_TIME_OPTION} />
-        <DropdownDivider text="Relative Time" />
+        <Dropdown.Divider text="Absolute Time" />
+        <Dropdown.Item text="Date Picker" value={CUSTOM_TIME_OPTION} />
+        <Dropdown.Divider text="Relative Time" />
       </>
     )
   }

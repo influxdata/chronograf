@@ -3,7 +3,6 @@ import React, {Component} from 'react'
 import groupByTimeOptions from 'src/shared/components/group_by_time_dropdown/groupByTimes'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import {ComponentColor} from 'src/reusable_ui/types'
 
 import {AUTO_GROUP_BY} from 'src/shared/constants'
@@ -68,7 +67,7 @@ class GroupByTimeDropdown extends Component<Props> {
     }
 
     return items.map(item => (
-      <DropdownItem
+      <Dropdown.Item
         key={item.defaultTimeBound}
         text={item.menuOption}
         value={item}

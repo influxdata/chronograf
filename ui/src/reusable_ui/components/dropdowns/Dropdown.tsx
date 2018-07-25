@@ -9,6 +9,8 @@ import {
   IconFont,
   DropdownMenuColors,
 } from 'src/reusable_ui/types'
+import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
+import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import DropdownButton from 'src/reusable_ui/components/dropdowns/DropdownButton'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -44,6 +46,10 @@ class Dropdown extends Component<Props, State> {
     maxMenuHeight: 250,
     menuColor: DropdownMenuColors.Sapphire,
   }
+
+  public static Button = DropdownButton
+  public static Item = DropdownItem
+  public static Divider = DropdownDivider
 
   constructor(props: Props) {
     super(props)
@@ -176,7 +182,7 @@ class Dropdown extends Component<Props, State> {
 
     if (React.Children.count(children) === 0) {
       throw new Error(
-        'Dropdowns require at least 1 child element. We recommend using DropdownItem and/or DropdownDivider.'
+        'Dropdowns require at least 1 child element. We recommend using Dropdown.Item and/or Dropdown.Divider.'
       )
     }
   }

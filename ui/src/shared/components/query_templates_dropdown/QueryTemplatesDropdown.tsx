@@ -1,9 +1,6 @@
 import React, {Component} from 'react'
-import uuid from 'uuid'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import {ComponentSize} from 'src/reusable_ui/types'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
-import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
 import {
   QUERY_TEMPLATES,
   DIVIDER,
@@ -28,11 +25,15 @@ class QueryTemplatesDropdown extends Component<Props> {
       >
         {QUERY_TEMPLATES.map(option => {
           if (option.text === DIVIDER) {
-            return <DropdownDivider key={uuid.v4()} />
+            return <Dropdown.Divider key={`group-by-time-${option.key}`} />
           }
 
           return (
-            <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+            <Dropdown.Item
+              key={`group-by-time-${option.key}`}
+              text={option.text}
+              value={option}
+            />
           )
         })}
       </Dropdown>
