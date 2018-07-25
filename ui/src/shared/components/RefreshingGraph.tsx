@@ -25,6 +25,12 @@ import {ColorString} from 'src/types/colors'
 import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
 import {TableOptions, FieldOption, DecimalPlaces} from 'src/types/dashboards'
 
+// Contexts
+import {
+  ResizeContext,
+  ResizeContextType,
+} from 'src/shared/components/LayoutRenderer'
+
 interface Props {
   axes: Axes
   source: Source
@@ -153,24 +159,28 @@ class RefreshingGraph extends PureComponent<Props> {
     const {
       colors,
       cellID,
-      cellHeight,
       decimalPlaces,
       manualRefresh,
       resizerTopHeight,
     } = this.props
 
     return (
-      <GaugeChart
-        data={data}
-        cellID={cellID}
-        colors={colors}
-        prefix={this.prefix}
-        suffix={this.suffix}
-        key={manualRefresh}
-        cellHeight={cellHeight}
-        decimalPlaces={decimalPlaces}
-        resizerTopHeight={resizerTopHeight}
-      />
+      <ResizeContext.Consumer>
+        {({isResizing = false, resizingCellID = ''}: ResizeContextType) => {
+          return (
+            <GaugeChart
+              data={data}
+              colors={colors}
+              prefix={this.prefix}
+              suffix={this.suffix}
+              key={manualRefresh}
+              decimalPlaces={decimalPlaces}
+              resizerTopHeight={resizerTopHeight}
+              isResizing={isResizing && cellID === resizingCellID}
+            />
+          )
+        }}
+      </ResizeContext.Consumer>
     )
   }
 

@@ -1,11 +1,15 @@
 // Libraries
-import React, {Component} from 'react'
-import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
+import React, {Component, CSSProperties} from 'react'
+import ReactGridLayout, {
+  WidthProvider,
+  Layout as LayoutType,
+} from 'react-grid-layout'
 
 // Components
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import Layout from 'src/shared/components/Layout'
 const GridLayout = WidthProvider(ReactGridLayout)
+import StyleInterceptor from 'src/shared/components/LayoutSizeInterceptor'
 
 // Utils
 import {fastMap} from 'src/utils/fast'
@@ -45,7 +49,16 @@ interface Props {
 
 interface State {
   rowHeight: number
+  isResizing: boolean
+  resizingCellID: string
 }
+
+export interface ResizeContextType {
+  isResizing: boolean
+  resizingCellID: string
+}
+
+export const ResizeContext = React.createContext()
 
 @ErrorHandling
 class LayoutRenderer extends Component<Props, State> {
@@ -54,6 +67,8 @@ class LayoutRenderer extends Component<Props, State> {
 
     this.state = {
       rowHeight: this.calculateRowHeight(),
+      resizingCellID: '',
+      isResizing: false,
     }
   }
 
@@ -74,60 +89,79 @@ class LayoutRenderer extends Component<Props, State> {
       onSummonOverlayTechnologies,
     } = this.props
 
-    const {rowHeight} = this.state
+    const {rowHeight, isResizing, resizingCellID} = this.state
     const isDashboard = !!this.props.onPositionChange
 
     return (
-      <Authorized
-        requiredRole={EDITOR_ROLE}
-        propsOverride={{
-          isDraggable: false,
-          isResizable: false,
-          draggableHandle: null,
-        }}
-      >
-        <GridLayout
-          layout={cells}
-          cols={12}
-          rowHeight={rowHeight}
-          margin={[LAYOUT_MARGIN, LAYOUT_MARGIN]}
-          containerPadding={[0, 0]}
-          useCSSTransforms={false}
-          onLayoutChange={this.handleLayoutChange}
-          draggableHandle={'.dash-graph--draggable'}
-          isDraggable={isDashboard}
-          isResizable={isDashboard}
+      <ResizeContext.Provider value={{isResizing, resizingCellID}}>
+        <Authorized
+          requiredRole={EDITOR_ROLE}
+          propsOverride={{
+            isDraggable: false,
+            isResizable: false,
+            draggableHandle: null,
+          }}
         >
-          {fastMap(cells, cell => (
-            <div key={cell.i}>
-              <Authorized
-                requiredRole={EDITOR_ROLE}
-                propsOverride={{
-                  isEditable: false,
-                }}
+          <GridLayout
+            layout={cells}
+            cols={12}
+            rowHeight={rowHeight}
+            margin={[LAYOUT_MARGIN, LAYOUT_MARGIN]}
+            containerPadding={[0, 0]}
+            useCSSTransforms={false}
+            onLayoutChange={this.handleLayoutChange}
+            draggableHandle={'.dash-graph--draggable'}
+            isDraggable={isDashboard}
+            isResizable={isDashboard}
+            onResizeStart={this.handleResizeStart}
+            onResizeStop={this.handleResizeStop}
+          >
+            {fastMap(cells, cell => (
+              <StyleInterceptor
+                key={cell.i}
+                onInterceptStyle={this.interceptStyle}
               >
-                <Layout
-                  key={cell.i}
-                  cell={cell}
-                  host={host}
-                  source={source}
-                  onZoom={onZoom}
-                  sources={sources}
-                  templates={templates}
-                  timeRange={timeRange}
-                  isEditable={isEditable}
-                  autoRefresh={autoRefresh}
-                  onDeleteCell={onDeleteCell}
-                  onCloneCell={onCloneCell}
-                  manualRefresh={manualRefresh}
-                  onSummonOverlayTechnologies={onSummonOverlayTechnologies}
-                />
-              </Authorized>
-            </div>
-          ))}
-        </GridLayout>
-      </Authorized>
+                <Authorized
+                  requiredRole={EDITOR_ROLE}
+                  propsOverride={{
+                    isEditable: false,
+                  }}
+                >
+                  <Layout
+                    key={cell.i}
+                    cell={cell}
+                    host={host}
+                    source={source}
+                    onZoom={onZoom}
+                    sources={sources}
+                    templates={templates}
+                    timeRange={timeRange}
+                    isEditable={isEditable}
+                    autoRefresh={autoRefresh}
+                    onDeleteCell={onDeleteCell}
+                    onCloneCell={onCloneCell}
+                    manualRefresh={manualRefresh}
+                    onSummonOverlayTechnologies={onSummonOverlayTechnologies}
+                  />
+                </Authorized>
+              </StyleInterceptor>
+            ))}
+          </GridLayout>
+        </Authorized>
+      </ResizeContext.Provider>
     )
+  }
+
+  private interceptStyle = (style: CSSProperties): void => {
+    console.log('style', style)
+  }
+
+  private handleResizeStart = (_: LayoutType[], oldItem: LayoutType): void => {
+    this.setState({isResizing: true, resizingCellID: oldItem.i})
+  }
+
+  private handleResizeStop = (): void => {
+    this.setState({isResizing: false, resizingCellID: ''})
   }
 
   private handleLayoutChange = layout => {

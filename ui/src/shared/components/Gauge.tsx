@@ -16,8 +16,8 @@ import {ColorString} from 'src/types/colors'
 import {DecimalPlaces} from 'src/types/dashboards'
 
 interface Props {
-  width: string
-  height: string
+  width: number
+  height: number
   gaugePosition: number
   colors?: ColorString[]
   prefix: string
@@ -47,8 +47,8 @@ class Gauge extends Component<Props> {
     return (
       <canvas
         className="gauge"
-        width={width}
-        height={height}
+        width={`${width}`}
+        height={`${height}`}
         ref={this.canvasRef}
       />
     )
