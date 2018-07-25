@@ -6,7 +6,7 @@ import {
   handleLoading,
 } from 'src/shared/actions/timeSeries'
 import {analyzeQueries} from 'src/shared/apis'
-import {DEFAULT_DURATION_MS} from 'src/shared/constants'
+import {DEFAULT_DURATION_MS, TEMP_VAR_INTERVAL} from 'src/shared/constants'
 import replaceTemplates, {replaceInterval} from 'src/tempVars/utils/replace'
 import {proxy} from 'src/utils/queryUrlGenerator'
 
@@ -82,8 +82,13 @@ export const replace = async (
 ): Promise<string> => {
   try {
     query = replaceTemplates(query, templates)
-    const durationMs = await duration(query, source)
-    return replaceInterval(query, Math.floor(resolution / 3), durationMs)
+
+    if (query.includes(TEMP_VAR_INTERVAL)) {
+      const durationMs = await duration(query, source)
+      return replaceInterval(query, Math.floor(resolution / 3), durationMs)
+    } else {
+      return query
+    }
   } catch (error) {
     console.error(error)
     throw error
