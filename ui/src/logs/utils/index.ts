@@ -17,7 +17,7 @@ import {HistogramData} from 'src/types/histogram'
 import {executeQueryAsync} from 'src/logs/api'
 
 const BIN_COUNT = 30
-const LOOK_BACK_LIMIT = 2592000
+const SECONDS_AWAY_LIMIT = 2592000
 
 const histogramFields = [
   {
@@ -176,7 +176,7 @@ export function buildGeneralLogQuery(
   return `${select}${condition}${dimensions}${fillClause}`
 }
 
-export async function findCount(
+export async function queryCount(
   lower,
   upper,
   config,
@@ -218,12 +218,12 @@ export async function findBackwardLower(
   let currentLower = parsedUpper.subtract(secondsBack, 'seconds')
 
   while (true) {
-    if (secondsBack > LOOK_BACK_LIMIT) {
+    if (secondsBack > SECONDS_AWAY_LIMIT) {
       // One day
       break
     }
 
-    const count = await findCount(
+    const count = await queryCount(
       currentLower.toISOString(),
       upper,
       config,
@@ -254,16 +254,15 @@ export async function findForwardUpper(
 ): Promise<string> {
   const parsedLower = moment(lower)
 
-  let secondsBack = 30
-  let currentUpper = parsedLower.add(secondsBack, 'seconds')
+  let secondsForward = 30
+  let currentUpper = parsedLower.add(secondsForward, 'seconds')
 
   while (true) {
-    if (secondsBack > LOOK_BACK_LIMIT) {
-      // One day
+    if (secondsForward > SECONDS_AWAY_LIMIT) {
       break
     }
 
-    const count = await findCount(
+    const count = await queryCount(
       lower,
       currentUpper.toISOString(),
       config,
@@ -277,8 +276,8 @@ export async function findForwardUpper(
       break
     }
 
-    secondsBack *= secondsBack
-    currentUpper = parsedLower.add(secondsBack, 'seconds')
+    secondsForward *= secondsForward
+    currentUpper = parsedLower.add(secondsForward, 'seconds')
   }
 
   return currentUpper.toISOString()
