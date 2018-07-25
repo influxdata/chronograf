@@ -14,8 +14,10 @@ import {
 } from 'src/utils/influxql'
 
 import {HistogramData} from 'src/types/histogram'
+import {executeQueryAsync} from 'src/logs/api'
 
 const BIN_COUNT = 30
+const LOOK_BACK_LIMIT = 2592000
 
 const histogramFields = [
   {
@@ -174,7 +176,116 @@ export function buildGeneralLogQuery(
   return `${select}${condition}${dimensions}${fillClause}`
 }
 
-export function buildBackwardLogQuery(
+export async function findCount(
+  lower,
+  upper,
+  config,
+  filters,
+  searchTerm,
+  proxyLink,
+  namespace
+): Promise<number> {
+  const {database, retentionPolicy, measurement} = config
+  const rpSegment = retentionPolicy ? `"${retentionPolicy}"` : ''
+  const fullyQualifiedMeasurement = `"${database}".${rpSegment}."${measurement}"`
+  const select = `SELECT count(message) FROM ${fullyQualifiedMeasurement}`
+  let condition = `WHERE time >= '${lower}' AND time <='${upper}'`
+
+  if (!_.isEmpty(searchTerm)) {
+    condition = `${condition} AND message =~ ${new RegExp(searchTerm)}`
+  }
+
+  if (!_.isEmpty(filters)) {
+    condition = `${condition} AND ${filtersClause(filters)}`
+  }
+
+  const query = `${select} ${condition} FILL(0)`
+  const result = await executeQueryAsync(proxyLink, namespace, query)
+  return getDeep<number>(result, 'results.0.series.0.values.0.1', 0)
+}
+
+export async function findBackwardLower(
+  upper: string,
+  config: QueryConfig,
+  filters: Filter[],
+  searchTerm: string | null = null,
+  proxyLink: string,
+  namespace: Namespace
+): Promise<string> {
+  const parsedUpper = moment(upper)
+
+  let secondsBack = 30
+  let currentLower = parsedUpper.subtract(secondsBack, 'seconds')
+
+  while (true) {
+    if (secondsBack > LOOK_BACK_LIMIT) {
+      // One day
+      break
+    }
+
+    const count = await findCount(
+      currentLower.toISOString(),
+      upper,
+      config,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    if (count >= 400) {
+      break
+    }
+
+    secondsBack *= secondsBack
+    currentLower = parsedUpper.subtract(secondsBack, 'seconds')
+  }
+
+  return currentLower.toISOString()
+}
+
+export async function findForwardUpper(
+  lower: string,
+  config: QueryConfig,
+  filters: Filter[],
+  searchTerm: string | null = null,
+  proxyLink: string,
+  namespace: Namespace
+): Promise<string> {
+  const parsedLower = moment(lower)
+
+  let secondsBack = 30
+  let currentUpper = parsedLower.add(secondsBack, 'seconds')
+
+  while (true) {
+    if (secondsBack > LOOK_BACK_LIMIT) {
+      // One day
+      break
+    }
+
+    const count = await findCount(
+      lower,
+      currentUpper.toISOString(),
+      config,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    if (count >= 400) {
+      break
+    }
+
+    secondsBack *= secondsBack
+    currentUpper = parsedLower.add(secondsBack, 'seconds')
+  }
+
+  return currentUpper.toISOString()
+}
+
+export async function buildInfiniteLogQuery(
+  lower: string,
   upper: string,
   config: QueryConfig,
   filters: Filter[],
@@ -183,24 +294,8 @@ export function buildBackwardLogQuery(
   const {tags, areTagsAccepted} = config
 
   const condition = buildInfiniteWhereClause({
-    upper,
-    tags,
-    areTagsAccepted,
-  })
-
-  return buildGeneralLogQuery(condition, config, filters, searchTerm)
-}
-
-export function buildForwardLogQuery(
-  lower: string,
-  config: QueryConfig,
-  filters: Filter[],
-  searchTerm: string | null = null
-) {
-  const {tags, areTagsAccepted} = config
-
-  const condition = buildInfiniteWhereClause({
     lower,
+    upper,
     tags,
     areTagsAccepted,
   })
