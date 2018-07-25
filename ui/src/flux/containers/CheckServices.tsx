@@ -15,7 +15,7 @@ import {
 } from 'src/flux/actions'
 import * as actions from 'src/shared/actions/services'
 
-export const NotificationContext = React.createContext()
+export const NotificationContext = React.createContext(undefined)
 
 interface Props {
   sources: Source[]
