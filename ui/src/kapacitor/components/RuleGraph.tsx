@@ -17,7 +17,14 @@ import {timeSeriesToDygraph} from 'src/utils/timeSeriesTransformers'
 import {LINE_COLORS_RULE_GRAPH} from 'src/shared/constants/graphColorPalettes'
 
 // Types
-import {Source, AlertRule, QueryConfig, Query, TimeRange} from 'src/types'
+import {
+  Source,
+  AlertRule,
+  QueryConfig,
+  Query,
+  TimeRange,
+  CellType,
+} from 'src/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
@@ -65,17 +72,18 @@ class RuleGraph extends PureComponent<Props> {
               )
               return (
                 <Dygraph
-                  labels={labels}
-                  staticLegend={false}
-                  isGraphFilled={false}
-                  ruleValues={rule.values}
-                  options={this.options}
-                  timeRange={timeRange}
+                  type={CellType.Line}
                   queries={this.queries}
                   timeSeries={timeSeries}
-                  dygraphSeries={dygraphSeries}
-                  colors={LINE_COLORS_RULE_GRAPH}
+                  labels={labels}
+                  options={this.options}
                   containerStyle={this.containerStyle}
+                  dygraphSeries={dygraphSeries}
+                  timeRange={timeRange}
+                  colors={LINE_COLORS_RULE_GRAPH}
+                  ruleValues={rule.values}
+                  staticLegend={false}
+                  isGraphFilled={false}
                   underlayCallback={underlayCallback(rule)}
                   handleSetHoverTime={this.props.setHoverTime}
                 />
