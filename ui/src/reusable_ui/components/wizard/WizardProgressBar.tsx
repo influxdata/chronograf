@@ -40,7 +40,7 @@ class WizardProgressBar extends PureComponent<Props> {
         </div>
       )
 
-      // CONNECTION ELE
+      // PROGRESS BAR CONNECTOR
       let connectorStatus
       if (i > 0 && steps[i - 1].stepStatus === StepStatus.Complete) {
         connectorStatus = ConnectorState.Some
