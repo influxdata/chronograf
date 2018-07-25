@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WizardStep matches snapshot 1`] = `
+<React.Fragment>
+  <FancyScrollbar
+    autoHeight={true}
+    autoHide={false}
+    className="step-content"
+    maxHeight={400}
+    setScrollTop={[Function]}
+    style={Object {}}
+  >
+    <div
+      className="step-child"
+    >
+      this is a text
+    </div>
+  </FancyScrollbar>
+  <WizardButtonBar
+    nextLabel="next"
+    onClickNext={[Function]}
+    onClickPrevious={[Function]}
+    previousLabel="previous"
+  />
+</React.Fragment>
+`;

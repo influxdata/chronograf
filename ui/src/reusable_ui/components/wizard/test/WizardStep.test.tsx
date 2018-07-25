@@ -8,27 +8,29 @@ import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
 describe('WizardStep', () => {
   let wrapper
 
-  const mockChild = 'this is a text'
+  const wrapperSetup = (override = {}) => {
+    const props = {
+      title: 'my wizard step',
+      isComplete: () => true,
+      onPrevious: undefined,
+      onNext: undefined,
+      increment: undefined,
+      decrement: undefined,
+      tipText: undefined,
+      nextLabel: undefined,
+      previousLabel: undefined,
+      lastStep: undefined,
+      ...override,
+    }
 
-  const decrement = jest.fn()
+    const mockChild = 'this is a text'
 
-  const increment = jest.fn()
-
-  const props = {
-    title: 'my wizard step',
-    isComplete: () => true,
-    onPrevious: jest.fn(),
-    onNext: jest.fn(),
-    increment: undefined,
-    decrement: undefined,
-    tipText: undefined,
-    nextLabel: undefined,
-    previousLabel: undefined,
-    lastStep: undefined,
+    return shallow(<WizardStep {...props}>{mockChild}</WizardStep>)
   }
 
-  beforeEach(() =>
-    (wrapper = shallow(<WizardStep {...props}>{mockChild}</WizardStep>)))
+  beforeEach(() => {
+    wrapper = wrapperSetup()
+  })
 
   it('mounts without exploding', () => {
     expect(wrapper).toHaveLength(1)
@@ -42,16 +44,19 @@ describe('WizardStep', () => {
     expect(wrapper.find(WizardButtonBar)).toHaveLength(1)
   })
 
-  it('mounts children', () => {
-    expect(wrapper.find(FancyScrollbar).props().children).toBe(mockChild)
+  it('matches snapshot', () => {
+    expect(wrapper).toMatchSnapshot()
   })
 
   describe('WizardStep handleClickPrevious', () => {
-    const newProps = {...props, decrement}
+    const newProps = {
+      onPrevious: jest.fn(),
+      decrement: jest.fn(),
+    }
 
     beforeEach(() => {
       jest.resetAllMocks()
-      wrapper = shallow(<WizardStep {...newProps}>{mockChild}</WizardStep>)
+      wrapper = wrapperSetup(newProps)
     })
 
     it('calls onPrevious on handleClickPrevious', () => {
@@ -72,11 +77,14 @@ describe('WizardStep', () => {
   })
 
   describe('WizardStep handleClickNext', () => {
-    const newProps = {...props, increment}
+    const newProps = {
+      onNext: jest.fn(),
+      increment: jest.fn(),
+    }
 
     beforeEach(() => {
       jest.resetAllMocks()
-      wrapper = shallow(<WizardStep {...newProps}>{mockChild}</WizardStep>)
+      wrapper = wrapperSetup(newProps)
     })
 
     it('calls onNext on handleClickNext', () => {

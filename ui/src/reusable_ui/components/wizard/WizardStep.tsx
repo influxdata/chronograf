@@ -9,8 +9,8 @@ interface Props {
   children: ReactNode
   title: string
   isComplete: () => boolean
-  onPrevious: () => void
-  onNext: () => void
+  onPrevious?: () => void
+  onNext?: () => void
   increment?: () => void
   decrement?: () => void
   tipText?: string
@@ -30,8 +30,9 @@ class WizardStep extends PureComponent<Props> {
           className="step-content"
           maxHeight={400}
           autoHeight={true}
+          autoHide={false}
         >
-          {children}
+          <div className="step-child">{children}</div>
         </FancyScrollbar>
         <WizardButtonBar
           decrement={decrement}
@@ -47,13 +48,17 @@ class WizardStep extends PureComponent<Props> {
 
   private handleClickPrevious = async () => {
     const {onPrevious, decrement} = this.props
-    await onPrevious()
+    if (onPrevious) {
+      await onPrevious()
+    }
     decrement()
   }
 
   private handleClickNext = async () => {
     const {onNext, increment} = this.props
-    await onNext()
+    if (onNext) {
+      await onNext()
+    }
     increment()
   }
 }
