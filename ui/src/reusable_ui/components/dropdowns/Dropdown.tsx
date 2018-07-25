@@ -56,6 +56,8 @@ class Dropdown extends Component<Props, State> {
   public render() {
     const width = `${this.props.width}px`
 
+    this.validateChildren()
+
     return (
       <ClickOutside onClickOutside={this.collapseMenu}>
         <div className={this.containerClassName} style={{width}}>
@@ -167,6 +169,16 @@ class Dropdown extends Component<Props, State> {
     const {onChange} = this.props
     onChange(value)
     this.collapseMenu()
+  }
+
+  private validateChildren = (): void => {
+    const {children} = this.props
+
+    if (React.Children.count(children) === 0) {
+      throw new Error(
+        'Dropdowns require at least 1 child element. We recommend using DropdownItem and/or DropdownDivider.'
+      )
+    }
   }
 }
 
