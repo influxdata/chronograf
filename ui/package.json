@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node parcel.js",
-    "build": "parcel build -d build --public-url '' src/index.html",
+    "build": "parcel build -d build --no-source-maps --public-url '' src/index.html",
     "clean": "rm -rf ./build && rm -rf ./.cache",
     "test": "jest",
     "test:watch": "jest --watch",
