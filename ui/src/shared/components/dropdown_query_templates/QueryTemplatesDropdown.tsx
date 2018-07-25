@@ -3,7 +3,7 @@ import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import {ComponentSize} from 'src/reusable_ui/types'
 import {
   QUERY_TEMPLATES,
-  DIVIDER,
+  QueryTemplateTypes,
   QueryTemplate,
 } from 'src/shared/components/dropdown_query_templates/queryTemplates'
 
@@ -24,7 +24,7 @@ class QueryTemplatesDropdown extends Component<Props> {
         width={142}
       >
         {QUERY_TEMPLATES.map(option => {
-          if (option.text === DIVIDER) {
+          if (option.type === QueryTemplateTypes.Divider) {
             return <Dropdown.Divider key={`group-by-time-${option.key}`} />
           }
 
