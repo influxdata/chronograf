@@ -38,7 +38,6 @@ import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
 import {SourcePage, ManageSources} from 'src/sources'
 import {CheckServices} from 'src/flux'
 import NotFound from 'src/shared/components/NotFound'
-import WizardTower from 'src/sources/components/WizardTower'
 
 import {getLinksAsync} from 'src/shared/actions/links'
 import {getMeAsync} from 'src/shared/actions/auth'
@@ -96,6 +95,7 @@ interface State {
 class Root extends PureComponent<{}, State> {
   private getLinks = bindActionCreators(getLinksAsync, dispatch)
   private getMe = bindActionCreators(getMeAsync, dispatch)
+  private heartbeatTimer: number
 
   constructor(props) {
     super(props)
@@ -116,6 +116,10 @@ class Root extends PureComponent<{}, State> {
     }
   }
 
+  public componentWillUnmount() {
+    clearTimeout(this.heartbeatTimer)
+  }
+
   public render() {
     return this.state.ready ? (
       <Provider store={store}>
@@ -126,7 +130,6 @@ class Root extends PureComponent<{}, State> {
           <Route component={UserIsAuthenticated(App)}>
             <Route path="/logs" component={LogsPage} />
           </Route>
-          <Route path="wizard-tower" component={WizardTower} />
           <Route
             path="/sources/new"
             component={UserIsAuthenticated(SourcePage)}
@@ -176,7 +179,7 @@ class Root extends PureComponent<{}, State> {
   private async performHeartbeat({shouldResetMe = false} = {}) {
     await this.getMe({shouldResetMe})
 
-    setTimeout(() => {
+    this.heartbeatTimer = window.setTimeout(() => {
       if (store.getState().auth.me !== null) {
         this.performHeartbeat()
       }

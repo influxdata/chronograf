@@ -9,18 +9,12 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import InfluxTable from 'src/sources/components/InfluxTable'
 
-import GrandWizard from 'src/sources/components/GrandWizard'
-
 import {
   notifySourceDeleted,
   notifySourceDeleteFailed,
 } from 'src/shared/copy/notifications'
 
 import {Source, Notification} from 'src/types'
-
-interface State {
-  wizardVisibility: boolean
-}
 
 interface Props {
   source: Source
@@ -32,18 +26,10 @@ interface Props {
   setActiveKapacitor: actions.SetActiveKapacitorAsync
 }
 
-declare var VERSION: string
+const VERSION = process.env.npm_package_version
 
 @ErrorHandling
-class ManageSources extends PureComponent<Props, State> {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      wizardVisibility: false,
-    }
-  }
-
+class ManageSources extends PureComponent<Props> {
   public componentDidMount() {
     this.props.sources.forEach(source => {
       this.props.fetchKapacitors(source)
@@ -60,7 +46,6 @@ class ManageSources extends PureComponent<Props, State> {
 
   public render() {
     const {sources, source, deleteKapacitor} = this.props
-    const {wizardVisibility} = this.state
 
     return (
       <div className="page" id="manage-sources-page">
@@ -73,23 +58,12 @@ class ManageSources extends PureComponent<Props, State> {
               deleteKapacitor={deleteKapacitor}
               onDeleteSource={this.handleDeleteSource}
               setActiveKapacitor={this.handleSetActiveKapacitor}
-              toggleVisibility={this.toggleVisibility}
             />
             <p className="version-number">Chronograf Version: {VERSION}</p>
           </div>
         </FancyScrollbar>
-        <GrandWizard
-          wizardVisibility={wizardVisibility}
-          toggleVisibility={this.toggleVisibility}
-        />
       </div>
     )
-  }
-
-  private toggleVisibility = isVisible => () => {
-    this.setState({
-      wizardVisibility: isVisible,
-    })
   }
 
   private handleDeleteSource = (source: Source) => {
