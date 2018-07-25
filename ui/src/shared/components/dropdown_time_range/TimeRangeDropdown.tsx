@@ -6,13 +6,14 @@ import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {IconFont} from 'src/reusable_ui/types'
 
-import AbsoluteTime from 'src/shared/components/dropdown_time_range/AbsoluteTime'
+import DatePickerContainer from 'src/shared/components/dropdown_time_range/DatePickerContainer'
 
 import {
   timeRanges,
   CUSTOM_TIME_OPTION,
   CUSTOM_TIME_ABSOLUTE,
 } from 'src/shared/data/timeRanges'
+import {TimeRangeSizes} from 'src/shared/components/dropdown_time_range/TimeRangeSizes'
 import {TimeRange} from 'src/types'
 import {TimeRangeOption} from 'src/types/queries'
 import {dateFormat} from 'src/shared/utils/time'
@@ -29,7 +30,7 @@ interface Props {
 }
 
 interface State {
-  isSelectingAbsolute: boolean
+  datePickerVisible: boolean
 }
 
 @ErrorHandling
@@ -44,7 +45,7 @@ class TimeRangeDropdown extends Component<Props, State> {
     super(props)
 
     this.state = {
-      isSelectingAbsolute: false,
+      datePickerVisible: false,
     }
   }
 
@@ -58,7 +59,7 @@ class TimeRangeDropdown extends Component<Props, State> {
           selectedItem={this.dropdownLabel}
           width={this.dropdownWidth}
           icon={IconFont.Clock}
-          onChange={this.handleRelativeSelection}
+          onChange={this.handleRelativeTimeSelected}
           menuColor={menuColor}
         >
           {this.absoluteTimes}
@@ -91,13 +92,13 @@ class TimeRangeDropdown extends Component<Props, State> {
   }
 
   private get absoluteTimePicker(): JSX.Element {
-    const {isSelectingAbsolute} = this.state
+    const {datePickerVisible} = this.state
     const {selected, disableNowButton} = this.props
 
-    if (isSelectingAbsolute) {
+    if (datePickerVisible) {
       return (
-        <AbsoluteTime
-          onSelect={this.handleAbsoluteSelection}
+        <DatePickerContainer
+          onSelect={this.handleAbsoluteTimeSelected}
           onDismiss={this.handleCollapseAbsolute}
           timeRange={selected}
           disableNowButton={disableNowButton}
@@ -109,7 +110,7 @@ class TimeRangeDropdown extends Component<Props, State> {
   }
 
   private handleCollapseAbsolute = (): void => {
-    this.setState({isSelectingAbsolute: false})
+    this.setState({datePickerVisible: false})
   }
 
   private get dropdownLabel(): string {
@@ -135,25 +136,25 @@ class TimeRangeDropdown extends Component<Props, State> {
     const {selected} = this.props
 
     if (selected.upper === null) {
-      return 117
+      return TimeRangeSizes.Relative
     }
 
     if (selected.upper === 'now()') {
-      return 216
+      return TimeRangeSizes.AbsoluteNow
     }
 
-    return 297
+    return TimeRangeSizes.Absolute
   }
 
-  private handleAbsoluteSelection = (selected: TimeRange): void => {
+  private handleAbsoluteTimeSelected = (selected: TimeRange): void => {
     const {onChooseTimeRange} = this.props
 
     onChooseTimeRange(selected)
   }
 
-  private handleRelativeSelection = (selected: TimeRangeOption) => {
+  private handleRelativeTimeSelected = (selected: TimeRangeOption) => {
     if (selected.menuOption === CUSTOM_TIME_ABSOLUTE) {
-      return this.setState({isSelectingAbsolute: true})
+      return this.setState({datePickerVisible: true})
     }
 
     const {onChooseTimeRange} = this.props
