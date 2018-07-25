@@ -9,14 +9,14 @@ import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 import {TEMPLATE_RANGE} from 'src/tempVars/constants'
 
-import {QueryConfig, Source, SourceLinks, TimeRange, Template} from 'src/types'
+import {QueryConfig, Source, TimeRange, Template} from 'src/types'
 import {CellEditorOverlayActions} from 'src/dashboards/components/CellEditorOverlay'
 
 const rawTextBinder = (
-  links: SourceLinks,
+  source: Source,
   id: string,
-  action: (linksQueries: string, id: string, text: string) => void
-) => (text: string) => action(links.queries, id, text)
+  action: (source: Source, id: string, text: string) => void
+) => (text: string) => action(source, id, text)
 
 const buildText = (q: QueryConfig): string =>
   q.rawText || buildQuery(TYPE_QUERY_CONFIG, q.range || TEMPLATE_RANGE, q) || ''
@@ -63,7 +63,7 @@ const QueryMaker: SFC<Props> = ({
           query={buildText(activeQuery)}
           config={activeQuery}
           onUpdate={rawTextBinder(
-            source.links,
+            source,
             activeQuery.id,
             actions.editRawTextAsync
           )}
