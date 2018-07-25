@@ -6,7 +6,7 @@ import {errorThrown} from 'src/shared/actions/errors'
 
 import {linksLink} from 'src/shared/constants'
 
-import {AuthLinks} from 'src/types/auth'
+import {Links} from 'src/types/auth'
 
 export enum ActionTypes {
   LinksGetRequested = 'LINKS_GET_REQUESTED',
@@ -23,11 +23,9 @@ const linksGetRequested = (): LinksGetRequestedAction => ({
 
 export interface LinksGetCompletedAction {
   type: ActionTypes.LinksGetCompleted
-  payload: {links: AuthLinks}
+  payload: {links: Links}
 }
-export const linksGetCompleted = (
-  links: AuthLinks
-): LinksGetCompletedAction => ({
+export const linksGetCompleted = (links: Links): LinksGetCompletedAction => ({
   type: ActionTypes.LinksGetCompleted,
   payload: {links},
 })
