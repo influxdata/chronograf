@@ -100,7 +100,7 @@ class RuleHandlers extends PureComponent<Props, State> {
     )
 
     const separator = {
-      type: AlertTypes.seperator,
+      type: AlertTypes.separator,
       enabled: true,
       text: 'SEPARATOR',
     }
@@ -137,7 +137,7 @@ class RuleHandlers extends PureComponent<Props, State> {
               menuColor={DropdownMenuColors.Malachite}
             >
               {handlers.map(option => {
-                if (option.type === AlertTypes.seperator) {
+                if (option.type === AlertTypes.separator) {
                   return (
                     <Dropdown.Divider
                       key={`alert-handlers-dropdown-${option.text}`}
