@@ -171,7 +171,7 @@ class Dropdown extends Component<Props, State> {
     }
   }
 
-  private handleItemClick = (value: any) => {
+  private handleItemClick = (value: any): void => {
     const {onChange} = this.props
     onChange(value)
     this.collapseMenu()

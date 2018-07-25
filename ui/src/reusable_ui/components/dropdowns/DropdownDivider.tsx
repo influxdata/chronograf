@@ -5,7 +5,7 @@ interface Props {
   text?: string
 }
 
-const DropdownDivider: SFC<Props> = ({text}) => (
+const DropdownDivider: SFC<Props> = ({text}): JSX.Element => (
   <div className={classnames('dropdown--divider', {line: !text})}>{text}</div>
 )
 

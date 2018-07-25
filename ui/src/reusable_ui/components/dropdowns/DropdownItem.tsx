@@ -33,7 +33,7 @@ class DropdownItem extends Component<Props> {
     )
   }
 
-  private handleClick = () => {
+  private handleClick = (): void => {
     const {onClick, value} = this.props
 
     onClick(value)
