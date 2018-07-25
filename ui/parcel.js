@@ -2,7 +2,7 @@ const proxy = require('http-proxy-middleware')
 const Bundler = require('parcel')
 const express = require('express')
 
-const port = Number(process.env.PORT || 1234)
+const port = Number(process.env.PORT || 8080)
 
 console.log(`Serving on http://localhost:${port}`) // eslint-disable-line no-console
 
