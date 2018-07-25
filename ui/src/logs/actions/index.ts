@@ -9,9 +9,10 @@ import {
   buildHistogramQueryConfig,
   buildTableQueryConfig,
   buildLogQuery,
-  buildForwardLogQuery,
-  buildBackwardLogQuery,
+  buildInfiniteLogQuery,
   parseHistogramQueryResponse,
+  findBackwardLower,
+  findForwardUpper,
 } from 'src/logs/utils'
 import {logConfigServerToUI, logConfigUIToServer} from 'src/logs/utils/config'
 import {getDeep} from 'src/utils/wrappers'
@@ -367,7 +368,23 @@ export const executeTableForwardQueryAsync = () => async (
   try {
     dispatch(incrementQueryCount())
 
-    const query = buildForwardLogQuery(time, queryConfig, filters, searchTerm)
+    const upper = await findForwardUpper(
+      time,
+      queryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query: string = await buildInfiniteLogQuery(
+      time,
+      upper,
+      queryConfig,
+      filters,
+      searchTerm
+    )
+
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
@@ -407,7 +424,23 @@ export const executeTableBackwardQueryAsync = () => async (
   try {
     dispatch(incrementQueryCount())
 
-    const query = buildBackwardLogQuery(time, queryConfig, filters, searchTerm)
+    const lower: string = await findBackwardLower(
+      time,
+      queryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query: string = await buildInfiniteLogQuery(
+      lower,
+      time,
+      queryConfig,
+      filters,
+      searchTerm
+    )
+
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
@@ -577,7 +610,7 @@ export const setTableQueryConfigAsync = () => async (
   }
 }
 
-export const fetchMoreAsync = (queryTimeEnd: string) => async (
+export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
   dispatch,
   getState
 ): Promise<void> => {
@@ -595,7 +628,17 @@ export const fetchMoreAsync = (queryTimeEnd: string) => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const query = buildBackwardLogQuery(
+    const lower = await findBackwardLower(
+      queryTimeEnd,
+      newQueryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query = await buildInfiniteLogQuery(
+      lower,
       queryTimeEnd,
       newQueryConfig,
       filters,
@@ -613,7 +656,7 @@ export const fetchMoreAsync = (queryTimeEnd: string) => async (
   }
 }
 
-export const fetchNewerAsync = (queryTimeStart: string) => async (
+export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
   dispatch,
   getState
 ): Promise<void> => {
@@ -631,8 +674,18 @@ export const fetchNewerAsync = (queryTimeStart: string) => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const query = buildForwardLogQuery(
+    const upper = await findForwardUpper(
       queryTimeStart,
+      newQueryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query: string = await buildInfiniteLogQuery(
+      queryTimeStart,
+      upper,
       newQueryConfig,
       filters,
       searchTerm
