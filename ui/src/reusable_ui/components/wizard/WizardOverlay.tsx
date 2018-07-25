@@ -14,16 +14,21 @@ interface Props {
   title: string
   toggleVisibility: (isVisible: boolean) => () => void
   skipLinkText?: string
+  maxWidth?: number
 }
 
 @ErrorHandling
 class WizardOverlay extends PureComponent<Props> {
+  public static defaultProps: Partial<Props> = {
+    maxWidth: 800,
+  }
+
   public render() {
-    const {visible, title} = this.props
+    const {visible, title, maxWidth} = this.props
 
     return (
       <OverlayTechnology visible={visible}>
-        <OverlayContainer maxWidth={800}>
+        <OverlayContainer maxWidth={maxWidth}>
           <OverlayHeading title={title} />
           <OverlayBody>{this.wizardCloak}</OverlayBody>
         </OverlayContainer>
