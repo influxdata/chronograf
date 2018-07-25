@@ -37,60 +37,42 @@ describe('WizardCloak', () => {
     return <WizardStep {...props} />
   }
 
-  const wizardChildren = [
-    childSetup({
-      children: 'step child 1',
-      title: 'wizard step 1',
-    }),
-    childSetup({
-      children: 'step child 2',
-      title: 'wizard step 2',
-      lastStep: true,
-    }),
-  ]
+  describe('with no children', () => {
+    const wizardChild = childSetup({
+      children: 'only step child',
+      title: 'only wizard step',
+    })
 
-  beforeEach(() => {
-    jest.resetAllMocks()
-    wrapper = wrapperSetup({children: wizardChildren})
+    beforeEach(() => {
+      jest.resetAllMocks()
+      wrapper = wrapperSetup({children: wizardChild})
+    })
+
+    it('mounts without exploding', () => {
+      expect(wrapper).toHaveLength(1)
+    })
+
+    it('renders one WizardProgressBar component', () => {
+      expect(wrapper.find(WizardProgressBar)).toHaveLength(1)
+    })
+
+    it('renders the first wizard step', () => {
+      const currentStep = wrapper.find(WizardStep)
+
+      expect(currentStep).toHaveLength(1)
+      expect(currentStep.props().title).toBe('only wizard step')
+    })
+
+    it('matches snapshot with one child', () => {
+      expect(wrapper).toMatchSnapshot()
+    })
   })
 
-  it('mounts without exploding', () => {
-    expect(wrapper).toHaveLength(1)
-  })
-
-  it('renders one WizardProgressBar component', () => {
-    expect(wrapper.find(WizardProgressBar)).toHaveLength(1)
-  })
-
-  it('renders the first wizard step', () => {
-    const currentStep = wrapper.find(WizardStep)
-
-    expect(currentStep).toHaveLength(1)
-    expect(currentStep.props().title).toBe('wizard step 1')
-  })
-
-  it('matches snapshot when provided minimal props', () => {
-    expect(wrapper).toMatchSnapshot()
-  })
-
-  it('increments the currentStepIndex when incrementStep is invoked', () => {
-    expect(wrapper.state().currentStepIndex).toBe(0)
-    wrapper.instance().incrementStep()
-    expect(wrapper.state().currentStepIndex).toBe(1)
-  })
-
-  it('jumps to specific index when jumpToStep is invoked with a valid number parameter', () => {
-    expect(wrapper.state().currentStepIndex).toBe(0)
-    wrapper.instance().jumpToStep(1)()
-    expect(wrapper.state().currentStepIndex).toBe(1)
-  })
-
-  describe('with first step complete', () => {
-    const completeChildren = [
+  describe('with multiple children', () => {
+    const wizardChildren = [
       childSetup({
-        isComplete: () => true,
-        children: 'complete step child 1',
-        title: 'complete wizard step 1',
+        children: 'step child 1',
+        title: 'wizard step 1',
       }),
       childSetup({
         children: 'step child 2',
@@ -101,24 +83,75 @@ describe('WizardCloak', () => {
 
     beforeEach(() => {
       jest.resetAllMocks()
-      wrapper = wrapperSetup({children: completeChildren})
+      wrapper = wrapperSetup({children: wizardChildren})
     })
 
-    it('renders step two when step one is complete', () => {
+    it('mounts without exploding', () => {
+      expect(wrapper).toHaveLength(1)
+    })
+
+    it('renders one WizardProgressBar component', () => {
+      expect(wrapper.find(WizardProgressBar)).toHaveLength(1)
+    })
+
+    it('renders the first wizard step', () => {
       const currentStep = wrapper.find(WizardStep)
 
       expect(currentStep).toHaveLength(1)
-      expect(currentStep.props().title).toBe('wizard step 2')
+      expect(currentStep.props().title).toBe('wizard step 1')
     })
 
-    it('increments the currentStepIndex when decrementStep is invoked', () => {
-      expect(wrapper.state().currentStepIndex).toBe(1)
-      wrapper.instance().decrementStep()
+    it('increments the currentStepIndex when incrementStep is invoked', () => {
       expect(wrapper.state().currentStepIndex).toBe(0)
+      wrapper.instance().incrementStep()
+      expect(wrapper.state().currentStepIndex).toBe(1)
     })
 
-    it('matches snapshot when provided minimal props', () => {
+    it('jumps to specific index when jumpToStep is invoked with a valid number parameter', () => {
+      expect(wrapper.state().currentStepIndex).toBe(0)
+      wrapper.instance().jumpToStep(1)()
+      expect(wrapper.state().currentStepIndex).toBe(1)
+    })
+
+    it('matches snapshot with two children', () => {
       expect(wrapper).toMatchSnapshot()
+    })
+
+    describe('with first step complete', () => {
+      const completeChildren = [
+        childSetup({
+          isComplete: () => true,
+          children: 'complete step child 1',
+          title: 'complete wizard step 1',
+        }),
+        childSetup({
+          children: 'step child 2',
+          title: 'wizard step 2',
+          lastStep: true,
+        }),
+      ]
+
+      beforeEach(() => {
+        jest.resetAllMocks()
+        wrapper = wrapperSetup({children: completeChildren})
+      })
+
+      it('renders step two when step one is complete', () => {
+        const currentStep = wrapper.find(WizardStep)
+
+        expect(currentStep).toHaveLength(1)
+        expect(currentStep.props().title).toBe('wizard step 2')
+      })
+
+      it('increments the currentStepIndex when decrementStep is invoked', () => {
+        expect(wrapper.state().currentStepIndex).toBe(1)
+        wrapper.instance().decrementStep()
+        expect(wrapper.state().currentStepIndex).toBe(0)
+      })
+
+      it('matches snapshot with first step complete', () => {
+        expect(wrapper).toMatchSnapshot()
+      })
     })
   })
 })

@@ -4,8 +4,8 @@ export interface WizardStepProps {
   children: ReactNode
   title: string
   isComplete: () => boolean
-  onPrevious: () => void
-  onNext: () => void
+  onPrevious?: () => void
+  onNext?: () => void
   increment?: () => void
   decrement?: () => void
   tipText?: string

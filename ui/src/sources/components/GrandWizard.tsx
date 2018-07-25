@@ -30,6 +30,7 @@ class GrandWizard extends PureComponent<Props, State> {
         toggleVisibility={toggleVisibility}
         title="Grand Wizard"
         skipLinkText="configure later"
+        maxWidth={1200}
       >
         <WizardStep
           title="First Step"

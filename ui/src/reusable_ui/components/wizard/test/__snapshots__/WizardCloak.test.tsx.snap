@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WizardCloak matches snapshot when provided minimal props 1`] = `
+exports[`WizardCloak with multiple children matches snapshot with two children 1`] = `
 <div
   className="wizard-cloak"
 >
@@ -40,18 +40,10 @@ exports[`WizardCloak matches snapshot when provided minimal props 1`] = `
   >
     step child 1
   </WizardStep>
-  <p
-    className="skip-link"
-  >
-    <a>
-       
-      skip
-    </a>
-  </p>
 </div>
 `;
 
-exports[`WizardCloak with first step complete matches snapshot when provided minimal props 1`] = `
+exports[`WizardCloak with multiple children with first step complete matches snapshot with first step complete 1`] = `
 <div
   className="wizard-cloak"
 >
@@ -90,13 +82,43 @@ exports[`WizardCloak with first step complete matches snapshot when provided min
   >
     step child 2
   </WizardStep>
-  <p
-    className="skip-link"
+</div>
+`;
+
+exports[`WizardCloak with no children matches snapshot with one child 1`] = `
+<div
+  className="wizard-cloak"
+>
+  <div
+    className="progress-header"
   >
-    <a>
-       
-      skip
-    </a>
-  </p>
+    <h2
+      className="step-title"
+    >
+      only wizard step
+    </h2>
+    <WizardProgressBar
+      currentStepIndex={0}
+      handleJump={[Function]}
+      steps={
+        Array [
+          Object {
+            "stepStatus": "circle-thick",
+            "title": "only wizard step",
+          },
+        ]
+      }
+    />
+  </div>
+  <WizardStep
+    decrement={null}
+    isComplete={[Function]}
+    lastStep={true}
+    onNext={[MockFunction]}
+    onPrevious={[MockFunction]}
+    title="only wizard step"
+  >
+    only step child
+  </WizardStep>
 </div>
 `;
