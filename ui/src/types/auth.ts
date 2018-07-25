@@ -9,7 +9,12 @@ export interface Organization {
 
 export interface Me {
   currentOrganization?: Organization
-  role: Role
+  role: string
+  scheme: string
+  provider: string
+  name: string
+  roles: Role[]
+  organizations: Organization[]
 }
 
 export enum InfluxDBPermissions {
@@ -73,15 +78,13 @@ export interface AuthConfig {
   self: string
 }
 
-export interface AuthLinks {
+export interface Links {
   allUsers: string
   auth: Auth[]
   config: AuthConfig
   dashboards: string
   environment: string
-  external: {
-    statusFeed?: string
-  }
+  external: ExternalLinks
   layouts: string
   logout: string
   mappings: string
@@ -89,4 +92,14 @@ export interface AuthLinks {
   organizations: string
   sources: string
   users: string
+}
+
+export interface ExternalLink {
+  name: string
+  url: string
+}
+
+interface ExternalLinks {
+  statusFeed?: string
+  custom?: ExternalLink[]
 }
