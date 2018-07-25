@@ -42,6 +42,7 @@ interface Props {
   notify: (message: Notification) => void
   script: string
   updateScript: UpdateScript
+  onGoToEditFlux: (service: Service) => void
 }
 
 interface Body extends FlatBody {
@@ -124,13 +125,19 @@ export class FluxPage extends PureComponent<Props, State> {
   }
 
   private get header(): JSX.Element {
-    const {services} = this.props
+    const {services, onGoToEditFlux} = this.props
 
     if (!services.length) {
       return null
     }
 
-    return <FluxHeader service={this.service} services={services} />
+    return (
+      <FluxHeader
+        service={this.service}
+        services={services}
+        onGoToEditFlux={onGoToEditFlux}
+      />
+    )
   }
 
   private get service(): Service {
