@@ -6,7 +6,7 @@ import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {IconFont} from 'src/reusable_ui/types'
 
-import AbsoluteTime from 'src/shared/components/time_range_dropdown/AbsoluteTime'
+import AbsoluteTime from 'src/shared/components/dropdown_time_range/AbsoluteTime'
 
 import {
   timeRanges,

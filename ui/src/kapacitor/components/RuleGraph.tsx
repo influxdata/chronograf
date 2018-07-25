@@ -4,7 +4,7 @@ import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 
 // Components
 import Dygraph from 'src/shared/components/Dygraph'
-import TimeRangeDropdown from 'src/shared/components/time_range_dropdown/TimeRangeDropdown'
+import TimeRangeDropdown from 'src/shared/components/dropdown_time_range/TimeRangeDropdown'
 
 // Utils
 import buildInfluxQLQuery from 'src/utils/influxql'

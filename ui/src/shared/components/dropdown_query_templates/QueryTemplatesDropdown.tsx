@@ -5,7 +5,7 @@ import {
   QUERY_TEMPLATES,
   DIVIDER,
   QueryTemplate,
-} from 'src/shared/components/query_templates_dropdown/queryTemplates'
+} from 'src/shared/components/dropdown_query_templates/queryTemplates'
 
 interface Props {
   onChoose: (template: QueryTemplate) => void

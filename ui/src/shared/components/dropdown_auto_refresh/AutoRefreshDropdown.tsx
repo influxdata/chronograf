@@ -7,7 +7,7 @@ import {IconFont} from 'src/reusable_ui/types'
 import {
   autoRefreshOptions,
   AutoRefreshOption,
-} from 'src/shared/components/auto_refresh_dropdown/autoRefreshOptions'
+} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {

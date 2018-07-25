@@ -5,7 +5,7 @@ import {bindActionCreators} from 'redux'
 import _ from 'lodash'
 
 import HostsTable from 'src/hosts/components/HostsTable'
-import AutoRefreshDropdown from 'shared/components/auto_refresh_dropdown/AutoRefreshDropdown'
+import AutoRefreshDropdown from 'shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
 import ManualRefresh from 'src/shared/components/ManualRefresh'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 

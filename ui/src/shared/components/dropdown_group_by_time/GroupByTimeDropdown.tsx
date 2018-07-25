@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-import groupByTimeOptions from 'src/shared/components/group_by_time_dropdown/groupByTimes'
+import groupByTimeOptions from 'src/shared/components/dropdown_group_by_time/groupByTimes'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import {ComponentColor} from 'src/reusable_ui/types'

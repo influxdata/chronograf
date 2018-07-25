@@ -9,7 +9,7 @@ import {
   FillQueryOption,
   NULL_STRING,
   NUMBER,
-} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
+} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 
 import './FillQueryDropdown.scss'
 

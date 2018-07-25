@@ -2,9 +2,9 @@ import React, {SFC} from 'react'
 
 import {GroupBy, TimeShift} from 'src/types'
 
-import GroupByTimeDropdown from 'src/shared/components/group_by_time_dropdown/GroupByTimeDropdown'
-import TimeShiftDropdown from 'src/shared/components/time_shift_dropdown/TimeShiftDropdown'
-import FillQueryDropdown from 'src/shared/components/fill_query_dropdown/FillQueryDropdown'
+import GroupByTimeDropdown from 'src/shared/components/dropdown_group_by_time/GroupByTimeDropdown'
+import TimeShiftDropdown from 'src/shared/components/dropdown_time_shift/TimeShiftDropdown'
+import FillQueryDropdown from 'src/shared/components/dropdown_fill_query/FillQueryDropdown'
 import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 interface Props {

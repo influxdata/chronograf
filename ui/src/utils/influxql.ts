@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 import {TEMP_VAR_INTERVAL, AUTO_GROUP_BY} from 'src/shared/constants'
-import {NULL_STRING} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
+import {NULL_STRING} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 import {
   TYPE_QUERY_CONFIG,
   TYPE_SHIFTED,

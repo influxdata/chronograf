@@ -24,7 +24,7 @@ import {
 import {
   LINEAR,
   NULL_STRING,
-} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
+} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 
 const fakeAddQueryAction = (queryID: string): ActionAddQuery => {
   return {

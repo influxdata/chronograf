@@ -4,7 +4,7 @@ import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import {
   NONE,
   NULL_STRING,
-} from 'src/shared/components/fill_query_dropdown/fillQueryOptions'
+} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 
 import {QueryConfig} from 'src/types'

@@ -4,7 +4,7 @@ import uuid from 'uuid'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import {ComponentColor} from 'src/reusable_ui/types'
 
-import {TIME_SHIFTS} from 'src/shared/components/time_shift_dropdown/timeShiftOptions'
+import {TIME_SHIFTS} from 'src/shared/components/dropdown_time_shift/timeShiftOptions'
 import {TimeShift} from 'src/types'
 
 import './TimeShiftDropdown.scss'

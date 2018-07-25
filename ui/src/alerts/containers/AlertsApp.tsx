@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 
 import AlertsTable from 'src/alerts/components/AlertsTable'
 import NoKapacitorError from 'src/shared/components/NoKapacitorError'
-import CalendarDropdown from 'src/shared/components/calendar_dropdown/CalendarDropdown'
+import CalendarDropdown from 'src/shared/components/dropdown_calendar/CalendarDropdown'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
