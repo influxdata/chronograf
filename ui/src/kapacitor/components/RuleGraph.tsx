@@ -17,7 +17,7 @@ import {LINE_COLORS_RULE_GRAPH} from 'src/shared/constants/graphColorPalettes'
 
 // Types
 import {Source, AlertRule, QueryConfig, Query, TimeRange} from 'src/types'
-import {DropdownMenuColor} from 'src/reusable_ui/types'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -49,7 +49,7 @@ class RuleGraph extends PureComponent<Props> {
         <div className="rule-builder--graph-options">
           <p>Preview Data from</p>
           <TimeRangeDropdown
-            menuColor={DropdownMenuColor.Malachite}
+            menuColor={DropdownMenuColors.Malachite}
             onChooseTimeRange={onChooseTimeRange}
             selected={timeRange}
             preventCustomTimeRange={true}

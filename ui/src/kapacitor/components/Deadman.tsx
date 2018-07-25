@@ -4,7 +4,7 @@ import uuid from 'uuid'
 import {PERIODS} from 'src/kapacitor/constants'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
-import {DropdownMenuColor} from 'src/reusable_ui/types'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {AlertRule} from 'src/types'
 
@@ -28,7 +28,7 @@ const Deadman: SFC<Props> = ({rule, onChange}) => (
       width={70}
       selectedItem={rule.values.period}
       onChange={onChange}
-      menuColor={DropdownMenuColor.Malachite}
+      menuColor={DropdownMenuColors.Malachite}
     >
       {periods.map(option => (
         <DropdownItem key={uuid.v4()} text={option.text} value={option} />

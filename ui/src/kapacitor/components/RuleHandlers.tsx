@@ -7,7 +7,7 @@ import HandlerTabs from 'src/kapacitor/components/HandlerTabs'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
 import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
-import {DropdownMenuColor} from 'src/reusable_ui/types'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {parseHandlersFromRule} from 'src/shared/parsing/parseHandlersFromRule'
 
@@ -137,7 +137,7 @@ class RuleHandlers extends PureComponent<Props, State> {
               customClass="rule-message--add-endpoint"
               selectedItem={dropdownLabel}
               onChange={this.handleAddHandler}
-              menuColor={DropdownMenuColor.Malachite}
+              menuColor={DropdownMenuColors.Malachite}
             >
               {handlers.map(option => {
                 if (option.text === 'SEPARATOR') {

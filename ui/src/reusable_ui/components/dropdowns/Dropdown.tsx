@@ -8,7 +8,7 @@ import {
   ComponentColor,
   ComponentSize,
   IconFont,
-  DropdownMenuColor,
+  DropdownMenuColors,
 } from 'src/reusable_ui/types'
 import DropdownButton from 'src/reusable_ui/components/dropdowns/DropdownButton'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -20,7 +20,7 @@ interface Props {
   onChange: (value: any) => void
   selectedItem: string
   color?: ComponentColor
-  menuColor?: DropdownMenuColor
+  menuColor?: DropdownMenuColors
   size?: ComponentSize
   disabled?: boolean
   width?: number
@@ -43,7 +43,7 @@ class Dropdown extends Component<Props, State> {
     width: 120,
     wrapText: false,
     maxMenuHeight: 250,
-    menuColor: DropdownMenuColor.Sapphire,
+    menuColor: DropdownMenuColors.Sapphire,
   }
 
   constructor(props: Props) {

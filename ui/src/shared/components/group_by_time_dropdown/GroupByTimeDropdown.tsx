@@ -8,7 +8,7 @@ import {ComponentColor} from 'src/reusable_ui/types'
 
 import {AUTO_GROUP_BY} from 'src/shared/constants'
 import {GroupBy} from 'src/types'
-import {DropdownMenuColor} from 'src/reusable_ui/types'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import './GroupByTimeDropdown.scss'
 
@@ -17,13 +17,13 @@ interface Props {
   onChooseGroupByTime: (groupBy: GroupBy) => void
   isDisabled: boolean
   excludeAutoOption?: boolean
-  menuColor?: DropdownMenuColor
+  menuColor?: DropdownMenuColors
 }
 
 class GroupByTimeDropdown extends Component<Props> {
   public static defaultProps = {
     excludeAutoOption: false,
-    menuColor: DropdownMenuColor.Sapphire,
+    menuColor: DropdownMenuColors.Sapphire,
   }
 
   public render() {
