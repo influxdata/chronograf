@@ -3,7 +3,7 @@ import moment from 'moment'
 import uuid from 'uuid'
 import {Filter} from 'src/types/logs'
 import {TimeRange, Namespace, QueryConfig} from 'src/types'
-import {NULL_STRING} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
+import {FillQueryTypes} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 import {getDeep} from 'src/utils/wrappers'
 import {
   quoteIfTimestamp,
@@ -158,7 +158,7 @@ export function buildGeneralLogQuery(
   filters: Filter[],
   searchTerm: string | null = null
 ) {
-  const {groupBy, fill = NULL_STRING} = config
+  const {groupBy, fill = FillQueryTypes.NullString} = config
   const select = buildSelect(config, '')
   const dimensions = buildGroupBy(groupBy)
   const fillClause = groupBy.time ? buildFill(fill) : ''
@@ -214,7 +214,12 @@ export function buildLogQuery(
   filters: Filter[],
   searchTerm: string | null = null
 ): string {
-  const {groupBy, fill = NULL_STRING, tags, areTagsAccepted} = config
+  const {
+    groupBy,
+    fill = FillQueryTypes.NullString,
+    tags,
+    areTagsAccepted,
+  } = config
   const {upper, lower} = quoteIfTimestamp(timeRange)
   const select = buildSelect(config, '')
   const dimensions = buildGroupBy(groupBy)

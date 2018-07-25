@@ -1,10 +1,7 @@
 import buildInfluxQLQuery, {buildQuery} from 'src/utils/influxql'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
-import {
-  NONE,
-  NULL_STRING,
-} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
+import {FillQueryTypes} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 
 import {QueryConfig} from 'src/types'
@@ -107,7 +104,7 @@ describe('buildInfluxQLQuery', () => {
           },
         ],
         groupBy: {time: '10m', tags: []},
-        fill: NULL_STRING,
+        fill: FillQueryTypes.NullString,
       })
       timeBounds = {lower: 'now() - 12h'}
     })
@@ -180,7 +177,7 @@ describe('buildInfluxQLQuery', () => {
           },
         ],
         groupBy: {time: '10m', tags: ['t1', 't2']},
-        fill: NULL_STRING,
+        fill: FillQueryTypes.NullString,
       })
       timeBounds = {lower: 'now() - 12h'}
     })
@@ -278,7 +275,7 @@ describe('buildInfluxQLQuery', () => {
             },
           ],
           groupBy: {time: '10m', tags: []},
-          fill: NULL_STRING,
+          fill: FillQueryTypes.NullString,
         })
         timeBounds = {lower: 'now() - 12h'}
 
@@ -300,7 +297,7 @@ describe('buildInfluxQLQuery', () => {
             },
           ],
           groupBy: {time: '10m', tags: []},
-          fill: NONE,
+          fill: FillQueryTypes.None,
         })
         timeBounds = {lower: 'now() - 12h'}
 

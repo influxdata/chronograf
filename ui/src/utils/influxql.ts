@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 import {TEMP_VAR_INTERVAL, AUTO_GROUP_BY} from 'src/shared/constants'
-import {NULL_STRING} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
+import {FillQueryTypes} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 import {
   TYPE_QUERY_CONFIG,
   TYPE_SHIFTED,
@@ -27,7 +27,12 @@ export default function buildInfluxQLQuery(
   config: QueryConfig,
   shift: string = ''
 ): string {
-  const {groupBy, fill = NULL_STRING, tags, areTagsAccepted} = config
+  const {
+    groupBy,
+    fill = FillQueryTypes.NullString,
+    tags,
+    areTagsAccepted,
+  } = config
   const {upper, lower} = quoteIfTimestamp(timeRange)
 
   const select = buildSelect(config, shift)

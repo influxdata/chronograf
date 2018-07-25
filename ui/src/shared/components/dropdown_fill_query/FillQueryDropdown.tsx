@@ -1,5 +1,4 @@
 import React, {PureComponent, ChangeEvent, KeyboardEvent} from 'react'
-import uuid from 'uuid'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import {ComponentColor} from 'src/reusable_ui/types'
@@ -7,8 +6,7 @@ import {ComponentColor} from 'src/reusable_ui/types'
 import {
   fillQueryOptions,
   FillQueryOption,
-  NULL_STRING,
-  NUMBER,
+  FillQueryTypes,
 } from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 
 import './FillQueryDropdown.scss'
@@ -29,7 +27,7 @@ interface State {
 @ErrorHandling
 class FillQuery extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
-    selected: NULL_STRING,
+    selected: FillQueryTypes.NullString,
   }
 
   private numberInput: HTMLElement
@@ -37,7 +35,9 @@ class FillQuery extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
-    const selected = fillQueryOptions.find(fill => fill.type === NUMBER)
+    const selected = fillQueryOptions.find(
+      fill => fill.type === FillQueryTypes.Number
+    )
 
     this.state = {
       selected,
@@ -60,7 +60,11 @@ class FillQuery extends PureComponent<Props, State> {
           disabled={isDisabled}
         >
           {fillQueryOptions.map(option => (
-            <Dropdown.Item key={uuid.v4()} text={option.label} value={option} />
+            <Dropdown.Item
+              key={`fill-query-${option.label}`}
+              text={option.label}
+              value={option}
+            />
           ))}
         </Dropdown>
         {this.customNumberInput}
@@ -71,7 +75,7 @@ class FillQuery extends PureComponent<Props, State> {
   private get customNumberInput(): JSX.Element {
     const {selected, customNumber} = this.state
 
-    if (selected.type === NUMBER) {
+    if (selected.type === FillQueryTypes.Number) {
       return (
         <input
           ref={r => (this.numberInput = r)}
