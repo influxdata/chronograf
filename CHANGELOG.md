@@ -11,6 +11,7 @@
 1.  [#3978](https://github.com/influxdata/chronograf/pull/3978): Fix use of template variables within InfluxQL regexes
 1.  [#3994](https://github.com/influxdata/chronograf/pull/3994): Pressing play on log viewer goes to now
 1.  [#4008](https://github.com/influxdata/chronograf/pull/4008): Fix display of log viewer histogram when a basepath is enabled
+1.  [#4024](https://github.com/influxdata/chronograf/pull/4024): Show crosshairs on alert rule visualization:
 
 
 ## v1.6.0 [2018-06-18]
