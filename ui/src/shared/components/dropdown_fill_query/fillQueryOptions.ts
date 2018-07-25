@@ -1,7 +1,7 @@
 export enum FillQueryTypes {
   Linear = 'linear',
   None = 'none',
-  NullString = 'nulk',
+  NullString = 'null',
   Number = 'number',
   Previous = 'previous',
 }

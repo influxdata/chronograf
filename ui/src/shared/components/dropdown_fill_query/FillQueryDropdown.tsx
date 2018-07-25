@@ -8,6 +8,7 @@ import {
   FillQueryOption,
   FillQueryTypes,
 } from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
+const FILL_QUERY_DROPDOWN_WIDTH = 100
 
 import './FillQueryDropdown.scss'
 
@@ -54,7 +55,7 @@ class FillQuery extends PureComponent<Props, State> {
         <label className="fill-query--label">Fill:</label>
         <Dropdown
           selectedItem={selected.label}
-          width={100}
+          width={FILL_QUERY_DROPDOWN_WIDTH}
           color={ComponentColor.Primary}
           onChange={this.handleDropdown}
           disabled={isDisabled}
