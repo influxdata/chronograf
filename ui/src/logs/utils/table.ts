@@ -10,6 +10,7 @@ import {
 
 export const ROW_HEIGHT = 18
 const CHAR_WIDTH = 9
+const DEFAULT_COLUMN_WIDTH = 200
 
 export const getValuesFromData = (data: TableData): string[][] =>
   getDeep(data, 'values', [])
@@ -37,6 +38,9 @@ export const formatColumnValue = (
   switch (column) {
     case 'timestamp':
       return moment(+value / 1000000).format('YYYY/MM/DD HH:mm:ss')
+    case 'appname':
+      const length = Math.floor(DEFAULT_COLUMN_WIDTH / CHAR_WIDTH) - 2
+      return _.truncate(value || '', {length})
     case 'message':
       value = (value || 'No Message Provided').replace('\\n', '')
       if (value.indexOf(' ') > charLimit - 5) {
@@ -70,7 +74,7 @@ export const getColumnWidth = (column: string): number => {
       host: 300,
     },
     column,
-    200
+    DEFAULT_COLUMN_WIDTH
   )
 }
 
