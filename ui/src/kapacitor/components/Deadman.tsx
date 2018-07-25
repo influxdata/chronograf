@@ -1,5 +1,4 @@
 import React, {SFC} from 'react'
-import uuid from 'uuid'
 
 import {PERIODS} from 'src/kapacitor/constants'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
@@ -31,7 +30,11 @@ const Deadman: SFC<Props> = ({rule, onChange}) => (
       menuColor={DropdownMenuColors.Malachite}
     >
       {periods.map(option => (
-        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+        <DropdownItem
+          key={`deadman-period-${option.text}`}
+          text={option.text}
+          value={option}
+        />
       ))}
     </Dropdown>
   </div>

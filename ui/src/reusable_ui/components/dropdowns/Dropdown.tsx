@@ -1,6 +1,5 @@
 import React, {Component, CSSProperties, Fragment} from 'react'
 import classnames from 'classnames'
-import uuid from 'uuid'
 import _ from 'lodash'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
@@ -121,7 +120,7 @@ class Dropdown extends Component<Props, State> {
               {this.flatChildren.map((child: JSX.Element) =>
                 React.cloneElement(child, {
                   ...child.props,
-                  key: uuid.v4(),
+                  key: `dropdown-menu--${child.props.text}`,
                   selected: child.props.text === selectedItem,
                   onClick: this.handleItemClick,
                 })

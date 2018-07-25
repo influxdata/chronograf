@@ -1,5 +1,4 @@
 import React, {SFC, ChangeEvent} from 'react'
-import uuid from 'uuid'
 
 import {CHANGES, RELATIVE_OPERATORS, SHIFTS} from 'src/kapacitor/constants'
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
@@ -10,6 +9,7 @@ import {AlertRule} from 'src/types'
 
 const mapToItems = (arr: string[], type: string) =>
   arr.map(text => ({text, type}))
+
 const changes = mapToItems(CHANGES, 'change')
 const shifts = mapToItems(SHIFTS, 'shift')
 const operators = mapToItems(RELATIVE_OPERATORS, 'operator')
@@ -40,7 +40,11 @@ const Relative: SFC<Props> = ({
       menuColor={DropdownMenuColors.Malachite}
     >
       {changes.map(option => (
-        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+        <DropdownItem
+          key={`relative-changes-${option.text}`}
+          text={option.text}
+          value={option}
+        />
       ))}
     </Dropdown>
     <p>compared to previous</p>
@@ -51,7 +55,11 @@ const Relative: SFC<Props> = ({
       menuColor={DropdownMenuColors.Malachite}
     >
       {shifts.map(option => (
-        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+        <DropdownItem
+          key={`relative-shifts-${option.text}`}
+          text={option.text}
+          value={option}
+        />
       ))}
     </Dropdown>
     <p>is</p>
@@ -62,7 +70,11 @@ const Relative: SFC<Props> = ({
       menuColor={DropdownMenuColors.Malachite}
     >
       {operators.map(option => (
-        <DropdownItem key={uuid.v4()} text={option.text} value={option} />
+        <DropdownItem
+          key={`relative-operators-${option.text}`}
+          text={option.text}
+          value={option}
+        />
       ))}
     </Dropdown>
     <form style={{display: 'flex'}}>

@@ -1,5 +1,4 @@
 import React, {PureComponent, MouseEvent} from 'react'
-import uuid from 'uuid'
 import _ from 'lodash'
 
 import HandlerOptions from 'src/kapacitor/components/HandlerOptions'
@@ -140,13 +139,17 @@ class RuleHandlers extends PureComponent<Props, State> {
               menuColor={DropdownMenuColors.Malachite}
             >
               {handlers.map(option => {
-                if (option.text === 'SEPARATOR') {
-                  return <DropdownDivider key={uuid.v4()} />
+                if (option.type === AlertTypes.seperator) {
+                  return (
+                    <DropdownDivider
+                      key={`alert-handlers-dropdown-${option.text}`}
+                    />
+                  )
                 }
 
                 return (
                   <DropdownItem
-                    key={uuid.v4()}
+                    key={`alert-handlers-dropdown-${option.text}`}
                     text={option.text}
                     value={option}
                   />
