@@ -3,10 +3,9 @@
   ------------------------------------------------------------------------------
 */
 
-@import 'src/style/modules/influx-colors';
-@import 'src/style/modules/variables';
-@import 'src/style/modules/mixins';
-@import 'src/style/fonts/fonts';
+@import 'src/style/modules/influx-colors.scss';
+@import 'src/style/modules/variables.scss';
+@import 'src/style/modules/mixins.scss';
 
 $rd-arrow-button: 30px;
 $rd-cell-size: 30px;
