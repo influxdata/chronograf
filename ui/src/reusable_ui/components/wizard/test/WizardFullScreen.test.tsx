@@ -2,7 +2,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 import WizardFullScreen from 'src/reusable_ui/components/wizard/WizardFullScreen'
-import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
+import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import SplashPage from 'src/shared/components/SplashPage'
 
 describe('WizardFullScreen', () => {
@@ -33,8 +33,8 @@ describe('WizardFullScreen', () => {
     expect(wrapper.find(SplashPage)).toHaveLength(1)
   })
 
-  it('renders no WizardCloak component', () => {
-    expect(wrapper.find(WizardCloak)).toHaveLength(0)
+  it('renders no WizardController component', () => {
+    expect(wrapper.find(WizardController)).toHaveLength(0)
   })
 
   it('matches snapshot with minimal props', () => {
@@ -42,9 +42,9 @@ describe('WizardFullScreen', () => {
   })
 
   describe('with children', () => {
-    it('renders one WizardCloak component', () => {
+    it('renders one WizardController component', () => {
       wrapper = wrapperSetup({children: {}})
-      expect(wrapper.find(WizardCloak)).toHaveLength(1)
+      expect(wrapper.find(WizardController)).toHaveLength(1)
     })
 
     it('matches snapshot with children props', () => {

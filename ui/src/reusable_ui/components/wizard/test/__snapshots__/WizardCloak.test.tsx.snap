@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WizardCloak with multiple children matches snapshot with two children 1`] = `
+exports[`WizardController with multiple children matches snapshot with two children 1`] = `
 <div
   className="wizard-cloak"
 >
@@ -43,7 +43,7 @@ exports[`WizardCloak with multiple children matches snapshot with two children 1
 </div>
 `;
 
-exports[`WizardCloak with multiple children with first step complete matches snapshot with first step complete 1`] = `
+exports[`WizardController with multiple children with first step complete matches snapshot with first step complete 1`] = `
 <div
   className="wizard-cloak"
 >
@@ -85,7 +85,7 @@ exports[`WizardCloak with multiple children with first step complete matches sna
 </div>
 `;
 
-exports[`WizardCloak with no children matches snapshot with one child 1`] = `
+exports[`WizardController with no children matches snapshot with one child 1`] = `
 <div
   className="wizard-cloak"
 >

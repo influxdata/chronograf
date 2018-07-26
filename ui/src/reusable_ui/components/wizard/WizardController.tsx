@@ -4,7 +4,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {WizardStepProps, Step} from 'src/types/wizard'
 import {StepStatus} from 'src/reusable_ui/constants/wizard'
 
-import 'src/reusable_ui/components/wizard/WizardCloak.scss'
+import 'src/reusable_ui/components/wizard/WizardController.scss'
 
 interface State {
   steps: Step[]
@@ -18,7 +18,7 @@ interface Props {
 }
 
 @ErrorHandling
-class WizardCloak extends PureComponent<Props, State> {
+class WizardController extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     skipLinkText: 'skip',
   }
@@ -159,4 +159,4 @@ class WizardCloak extends PureComponent<Props, State> {
   }
 }
 
-export default WizardCloak
+export default WizardController

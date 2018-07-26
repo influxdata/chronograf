@@ -2,7 +2,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
-import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
+import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
 import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
@@ -34,8 +34,8 @@ describe('WizardOverlay', () => {
     expect(wrapper).toHaveLength(1)
   })
 
-  it('renders no WizardCloak component', () => {
-    expect(wrapper.find(WizardCloak)).toHaveLength(0)
+  it('renders no WizardController component', () => {
+    expect(wrapper.find(WizardController)).toHaveLength(0)
   })
 
   it('renders no OverlayTechnology component', () => {
@@ -59,9 +59,9 @@ describe('WizardOverlay', () => {
   })
 
   describe('with children', () => {
-    it('renders one WizardCloak component', () => {
+    it('renders one WizardController component', () => {
       wrapper = wrapperSetup({children: {}})
-      expect(wrapper.find(WizardCloak)).toHaveLength(1)
+      expect(wrapper.find(WizardController)).toHaveLength(1)
     })
 
     it('matches snapshot with children props', () => {

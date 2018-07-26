@@ -1,7 +1,7 @@
 import React, {PureComponent, ReactElement} from 'react'
 
 import SplashPage from 'src/shared/components/SplashPage'
-import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
+import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {WizardStepProps} from 'src/types/wizard'
@@ -23,20 +23,20 @@ class WizardFullScreen extends PureComponent<Props> {
       <SplashPage>
         <>
           <h1 className="wizard-title">{title}</h1>
-          <div className="wizard-container">{this.wizardCloak}</div>
+          <div className="wizard-container">{this.WizardController}</div>
         </>
       </SplashPage>
     )
   }
 
-  private get wizardCloak() {
+  private get WizardController() {
     const {children, skipLinkText, handleSkip} = this.props
 
     if (children) {
       return (
-        <WizardCloak handleSkip={handleSkip} skipLinkText={skipLinkText}>
+        <WizardController handleSkip={handleSkip} skipLinkText={skipLinkText}>
           {children}
-        </WizardCloak>
+        </WizardController>
       )
     }
 

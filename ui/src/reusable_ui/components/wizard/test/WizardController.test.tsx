@@ -1,11 +1,11 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 
-import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
+import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 
-describe('WizardCloak', () => {
+describe('WizardController', () => {
   let wrapper
 
   const wrapperSetup = (override = {}) => {
@@ -16,7 +16,7 @@ describe('WizardCloak', () => {
       ...override,
     }
 
-    return shallow(<WizardCloak {...props} />)
+    return shallow(<WizardController {...props} />)
   }
 
   const childSetup = (override = {}) => {

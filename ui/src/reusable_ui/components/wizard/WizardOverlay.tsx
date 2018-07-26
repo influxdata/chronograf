@@ -2,7 +2,7 @@ import React, {PureComponent, ReactElement} from 'react'
 import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
 import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
-import WizardCloak from 'src/reusable_ui/components/wizard/WizardCloak'
+import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 
 import {WizardStepProps} from 'src/types/wizard'
@@ -30,23 +30,23 @@ class WizardOverlay extends PureComponent<Props> {
       <OverlayTechnology visible={visible}>
         <OverlayContainer maxWidth={maxWidth}>
           <OverlayHeading title={title} />
-          <OverlayBody>{this.wizardCloak}</OverlayBody>
+          <OverlayBody>{this.WizardController}</OverlayBody>
         </OverlayContainer>
       </OverlayTechnology>
     )
   }
 
-  private get wizardCloak() {
+  private get WizardController() {
     const {children, skipLinkText, toggleVisibility} = this.props
 
     if (children) {
       return (
-        <WizardCloak
+        <WizardController
           skipLinkText={skipLinkText}
           handleSkip={toggleVisibility(false)}
         >
           {children}
-        </WizardCloak>
+        </WizardController>
       )
     }
 
