@@ -45,7 +45,7 @@ class FluxEdit extends PureComponent<Props, State> {
         service={this.state.service}
         onSubmit={this.handleSubmit}
         onInputChange={this.handleInputChange}
-        mode={FluxFormMode.edit}
+        mode={FluxFormMode.EDIT}
       />
     )
   }

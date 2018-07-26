@@ -1,6 +1,6 @@
 export enum FluxFormMode {
-  new = 'new',
-  edit = 'edit',
+  NEW = 'new',
+  EDIT = 'edit',
 }
 
 export const FLUX_CONNECTION_TOOLTIP =

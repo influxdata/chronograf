@@ -45,7 +45,7 @@ class FluxNew extends PureComponent<Props, State> {
         service={this.state.service}
         onSubmit={this.handleSubmit}
         onInputChange={this.handleInputChange}
-        mode={FluxFormMode.new}
+        mode={FluxFormMode.NEW}
       />
     )
   }

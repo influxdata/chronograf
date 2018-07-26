@@ -48,14 +48,14 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
       services,
     } = nextProps
 
-    if (prevState.formMode === FluxFormMode.new && id) {
+    if (prevState.formMode === FluxFormMode.NEW && id) {
       const service = services.find(s => {
         return s.id === id
       })
       return {
         ...prevState,
         service,
-        formMode: FluxFormMode.edit,
+        formMode: FluxFormMode.EDIT,
       }
     }
     return null
@@ -66,7 +66,7 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
 
     this.state = {
       service: null,
-      formMode: FluxFormMode.new,
+      formMode: FluxFormMode.NEW,
     }
   }
 
@@ -82,13 +82,13 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
     if (id) {
       try {
         service = await getService(source.links.services, id)
-        formMode = FluxFormMode.edit
+        formMode = FluxFormMode.EDIT
         this.setState({service, formMode})
       } catch (err) {
         console.error('Could not get Service', err)
       }
     } else {
-      formMode = FluxFormMode.new
+      formMode = FluxFormMode.NEW
       this.setState({formMode})
     }
     await fetchServicesForSource(source)
@@ -125,7 +125,7 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
     } = this.props
     const {service, formMode} = this.state
 
-    if (formMode === FluxFormMode.new) {
+    if (formMode === FluxFormMode.NEW) {
       return (
         <FluxNew
           source={source}
@@ -150,7 +150,7 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
   private get pageTitle() {
     const {formMode} = this.state
 
-    if (formMode === FluxFormMode.new) {
+    if (formMode === FluxFormMode.NEW) {
       return 'Add Flux Connection'
     }
     return 'Edit Flux Connection'
