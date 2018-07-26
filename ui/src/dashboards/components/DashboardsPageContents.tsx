@@ -8,6 +8,7 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 
 import {Dashboard} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -68,11 +69,38 @@ class DashboardsPageContents extends Component<Props, State> {
                   />
                 </div>
               </div>
+
+              <div className="panel">
+                <div className="panel-body">{this.dropdown}</div>
+              </div>
             </div>
           </div>
         </div>
       </FancyScrollbar>
     )
+  }
+
+  private get dropdown(): JSX.Element {
+    const dropdownItems = [
+      {text: 'A', key: 'item-a', swagger: 'a'},
+      {text: 'B', key: 'item-b', swagger: 'b'},
+      {text: 'C', key: 'item-c', swagger: 'c'},
+    ]
+
+    return (
+      <Dropdown
+        selectedItem={dropdownItems[0].text}
+        onChange={this.handleDropdownChange}
+      >
+        {dropdownItems.map(item => (
+          <Dropdown.Item key={item.key} text={item.text} value={item} />
+        ))}
+      </Dropdown>
+    )
+  }
+
+  private handleDropdownChange = item => {
+    console.log(item)
   }
 
   private get renderPanelHeading(): JSX.Element {
