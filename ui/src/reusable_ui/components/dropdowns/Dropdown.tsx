@@ -26,7 +26,7 @@ interface Props {
   children: JSX.Element[]
   onChange: (value: any) => void
   selectedItemKey: string
-  color?: ComponentColor
+  buttonColor?: ComponentColor
   menuColor?: DropdownMenuColors
   size?: ComponentSize
   disabled?: boolean
@@ -44,7 +44,7 @@ interface State {
 @ErrorHandling
 class Dropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
-    color: ComponentColor.Default,
+    buttonColor: ComponentColor.Default,
     size: ComponentSize.Small,
     disabled: false,
     width: 120,
@@ -89,9 +89,9 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get containerClassName(): string {
-    const {color, size, disabled, wrapText, customClass} = this.props
+    const {buttonColor, size, disabled, wrapText, customClass} = this.props
 
-    return classnames(`dropdown dropdown-${size} dropdown-${color}`, {
+    return classnames(`dropdown dropdown-${size} dropdown-${buttonColor}`, {
       disabled,
       'dropdown-wrap': wrapText,
       [customClass]: customClass,
@@ -99,7 +99,14 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get button(): JSX.Element {
-    const {selectedItemKey, disabled, color, size, icon, children} = this.props
+    const {
+      selectedItemKey,
+      disabled,
+      buttonColor,
+      size,
+      icon,
+      children,
+    } = this.props
     const {expanded} = this.state
 
     const selectedChild = children.find(
@@ -109,7 +116,7 @@ class Dropdown extends Component<Props, State> {
     return (
       <DropdownButton
         active={expanded}
-        color={color}
+        color={buttonColor}
         size={size}
         icon={icon}
         disabled={disabled}
