@@ -25,16 +25,24 @@ import {DecimalPlaces} from 'src/types/dashboards'
 const {LINEAR, LOG, BASE_2, BASE_10} = AXES_SCALE_OPTIONS
 const getInputMin = scale => (scale === LOG ? '0' : null)
 
-interface Props {
-  type: string
+interface PropsFromState {
   axes: Axes
+  type: string
+}
+
+interface PropsFromDispatch {
+  onUpdateDecimalPlaces: () => void
+  handleUpdateAxes: (axes: Axes) => void
+}
+
+interface ClassProps {
   staticLegend: boolean
   defaultYLabel: string
-  onUpdateDecimalPlaces: () => void
   decimalPlaces: DecimalPlaces
-  handleUpdateAxes: (axes: Axes) => void
   onToggleStaticLegend: (x: boolean) => (e: MouseEvent<HTMLLIElement>) => void
 }
+
+type Props = ClassProps & PropsFromState & PropsFromDispatch
 
 @ErrorHandling
 class AxesOptions extends PureComponent<Props> {
@@ -274,4 +282,7 @@ const mdtp = {
   onUpdateDecimalPlaces: changeDecimalPlaces,
 }
 
-export default connect(mstp, mdtp)(AxesOptions)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mstp,
+  mdtp
+)(AxesOptions)

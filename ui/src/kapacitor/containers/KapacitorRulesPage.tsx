@@ -17,10 +17,10 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   source: Source
   actions: {
-    fetchRules: (kapacitor: Kapacitor) => void
-    deleteRule: (rule: AlertRule) => void
-    updateRuleStatus: (rule: AlertRule, status: string) => void
-    updateRuleStatusSuccess: (id: string, status: string) => void
+    fetchRules: typeof kapacitorActionCreators.fetchRules
+    deleteRule: typeof kapacitorActionCreators.deleteRule
+    updateRuleStatus: typeof kapacitorActionCreators.updateRuleStatus
+    updateRuleStatusSuccess: typeof kapacitorActionCreators.updateRuleStatusSuccess
   }
   rules: AlertRule[]
 }
@@ -115,7 +115,7 @@ const renderHeaderOptions = (): JSX.Element => {
 
 const mapStateToProps = state => {
   return {
-    rules: Object.values(state.rules),
+    rules: state.rules,
   }
 }
 

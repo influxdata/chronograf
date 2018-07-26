@@ -1,23 +1,28 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
-import {SetActiveKapacitor, DeleteKapacitor} from 'src/shared/actions/sources'
+import {DeleteKapacitor} from 'src/shared/actions/sources'
 
 import InfluxTableHead from 'src/sources/components/InfluxTableHead'
 import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
 import InfluxTableRow from 'src/sources/components/InfluxTableRow'
 
-import {Source, Me} from 'src/types'
+import {Source, Me, Kapacitor} from 'src/types'
 
-interface Props {
+interface PropsFromState {
   me: Me
+  isUsingAuth: boolean
+}
+
+interface ClassProps {
   source: Source
   sources: Source[]
-  isUsingAuth: boolean
   deleteKapacitor: DeleteKapacitor
-  setActiveKapacitor: SetActiveKapacitor
+  setActiveKapacitor: (kapacitor: Kapacitor) => void
   onDeleteSource: (source: Source) => void
 }
+
+type Props = PropsFromState & ClassProps
 
 class InfluxTable extends PureComponent<Props> {
   public render() {
@@ -68,4 +73,6 @@ class InfluxTable extends PureComponent<Props> {
 
 const mapStateToProps = ({auth: {isUsingAuth, me}}) => ({isUsingAuth, me})
 
-export default connect(mapStateToProps)(InfluxTable)
+export default connect<PropsFromState, {}, ClassProps>(mapStateToProps)(
+  InfluxTable
+)

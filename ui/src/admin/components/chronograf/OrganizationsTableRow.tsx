@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import {withRouter, InjectedRouter} from 'react-router'
+import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
 
 import _ from 'lodash'
 
@@ -34,7 +34,7 @@ interface Props {
 }
 
 @ErrorHandling
-class OrganizationsTableRow extends Component<Props, {}> {
+class OrganizationsTableRow extends Component<Props & WithRouterProps, {}> {
   public shouldComponentUpdate(nextProps) {
     return !_.isEqual(this.props, nextProps)
   }
@@ -119,6 +119,9 @@ const mapStateToProps = ({links}) => ({
   links,
 })
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(OrganizationsTableRow)
+export default withRouter<Props>(
+  connect<{links?: any}, {meChangeOrganization?: any}, Props & WithRouterProps>(
+    mapStateToProps,
+    mapDispatchToProps
+  )(OrganizationsTableRow)
 )

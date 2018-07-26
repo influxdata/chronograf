@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import * as actions from 'src/shared/actions/sources'
+
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -14,19 +15,27 @@ import {
   notifySourceDeleteFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Notification} from 'src/types'
+import {Source, Notification, Kapacitor} from 'src/types'
 
-interface Props {
-  source: Source
-  sources: Source[]
+interface PropsFromDispatch {
   notify: (n: Notification) => void
-  deleteKapacitor: actions.DeleteKapacitorAsync
+  deleteKapacitor: actions.DeleteKapacitor
   fetchKapacitors: actions.FetchKapacitorsAsync
   removeAndLoadSources: actions.RemoveAndLoadSources
-  setActiveKapacitor: actions.SetActiveKapacitorAsync
+  setActiveKapacitor: actions.SetActiveKapacitor
 }
 
-const VERSION = process.env.npm_package_version
+interface PropsFromState {
+  sources: Source[]
+}
+
+interface ClassProps {
+  source: Source
+}
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
+
+declare var VERSION: string
 
 @ErrorHandling
 class ManageSources extends PureComponent<Props> {
@@ -77,7 +86,7 @@ class ManageSources extends PureComponent<Props> {
     }
   }
 
-  private handleSetActiveKapacitor = ({kapacitor}) => {
+  private handleSetActiveKapacitor = (kapacitor: Kapacitor) => {
     this.props.setActiveKapacitor(kapacitor)
   }
 }
@@ -94,4 +103,7 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(mstp, mdtp)(ManageSources)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mstp,
+  mdtp
+)(ManageSources)

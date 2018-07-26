@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {withRouter, InjectedRouter} from 'react-router'
+import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
 import {connect} from 'react-redux'
 import download from 'src/external/download'
 import _ from 'lodash'
@@ -33,9 +33,10 @@ import {Source, Dashboard} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
 
-interface Props {
-  source: Source
+interface ClassProps {
+  dashboards: Dashboard[]
   sources: Source[]
+  source: Source
   router: InjectedRouter
   handleGetDashboards: () => Dashboard[]
   handleGetChronografVersion: () => string
@@ -43,11 +44,12 @@ interface Props {
   handleImportDashboard: (dashboard: Dashboard) => void
   notify: (message: Notification) => void
   retainRangesDashTimeV1: (dashboardIDs: number[]) => void
-  dashboards: Dashboard[]
 }
 
+type Props = ClassProps // & PropsFromDispatch & PropsFromState
+
 @ErrorHandling
-class DashboardsPage extends PureComponent<Props> {
+class DashboardsPage extends PureComponent<Props & WithRouterProps> {
   public async componentDidMount() {
     const dashboards = await this.props.handleGetDashboards()
     const dashboardIDs = dashboards.map(d => d.id)
@@ -159,9 +161,8 @@ class DashboardsPage extends PureComponent<Props> {
   }
 }
 
-const mapStateToProps = ({dashboardUI: {dashboards, dashboard}, sources}) => ({
+const mapStateToProps = ({dashboardUI: {dashboards}, sources}) => ({
   dashboards,
-  dashboard,
   sources,
 })
 
@@ -174,6 +175,6 @@ const mapDispatchToProps = {
   retainRangesDashTimeV1: retainRangesDashTimeV1Action,
 }
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(DashboardsPage)
+export default connect(mapStateToProps, mapDispatchToProps)(
+  withRouter(DashboardsPage)
 )

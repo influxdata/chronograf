@@ -43,6 +43,9 @@ import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
+
+import {Source} from 'src/types'
+
 import {Template} from 'src/types/tempVars'
 
 type QueryTransitions = typeof queryTransitions
@@ -70,11 +73,11 @@ interface QueryStatus {
 }
 
 interface Props {
-  sources: SourcesModels.Source[]
+  sources: Source[]
   editQueryStatus: typeof editCellQueryStatus
   onCancel: () => void
   onSave: (cell: DashboardsModels.Cell) => void
-  source: SourcesModels.Source
+  source: Source
   dashboardID: number
   queryStatus: QueryStatus
   autoRefresh: number
@@ -177,6 +180,7 @@ class CellEditorOverlay extends Component<Props, State> {
       timeRange,
       autoRefresh,
       editQueryStatus,
+      source,
     } = this.props
 
     const {activeEditorTab, queriesWorkingDraft, isStaticLegend} = this.state
@@ -196,10 +200,10 @@ class CellEditorOverlay extends Component<Props, State> {
           initialBottomHeight={INITIAL_HEIGHTS.queryMaker}
         >
           <Visualization
-            source={this.source}
-            timeRange={timeRange}
-            templates={templates}
+            source={source}
             autoRefresh={autoRefresh}
+            templates={templates}
+            timeRange={timeRange}
             queryConfigs={queriesWorkingDraft}
             editQueryStatus={editQueryStatus}
             staticLegend={isStaticLegend}

@@ -5,10 +5,15 @@ import {Links, FilterNode} from 'src/types/flux'
 import Walker from 'src/flux/ast/walker'
 import FilterConditions from 'src/flux/components/FilterConditions'
 
-interface Props {
-  filterString?: string
+interface PropsFromState {
   links: Links
 }
+
+interface ClassProps {
+  filterString?: string
+}
+
+type Props = ClassProps & PropsFromState
 
 interface State {
   nodes: FilterNode[]
@@ -55,4 +60,6 @@ const mapStateToProps = ({links}) => {
   return {links: links.flux}
 }
 
-export default connect(mapStateToProps, null)(FilterPreview)
+export default connect<PropsFromState, {}, ClassProps>(mapStateToProps, null)(
+  FilterPreview
+)

@@ -3,26 +3,15 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
 import * as adminChronografActionCreators from 'src/admin/actions/chronograf'
+import * as NotificationsActions from 'src/shared/actions/notifications'
 import * as configActionCreators from 'src/shared/actions/config'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import AllUsersTable from 'src/admin/components/chronograf/AllUsersTable'
-import {
-  Links,
-  Organization,
-  Role,
-  User,
-  Notification,
-  NotificationFunc,
-} from 'src/types'
+import {Links, Organization, Role, User} from 'src/types'
 
-interface Props {
-  notify: (message: Notification | NotificationFunc) => void
-  links: Links
-  meID: string
-  users: User[]
-  organizations: Organization[]
+interface PropsFromDispatch {
   actionsAdmin: {
     loadUsersAsync: (link: string) => void
     loadOrganizationsAsync: (link: string) => void
@@ -37,10 +26,26 @@ interface Props {
     getAuthConfigAsync: (link: string) => void
     updateAuthConfigAsync: () => void
   }
+  notify: typeof NotificationsActions.notify
+}
+
+interface PropsFromState {
+  authConfig: {
+    superAdminNewUsers: boolean
+  }
+  links: Links
+  organizations: Organization[]
+  users: User[]
+}
+
+interface ClassProps {
+  meID: string
   authConfig: {
     superAdminNewUsers: boolean
   }
 }
+
+type Props = ClassProps & PropsFromState & PropsFromDispatch
 
 interface State {
   isLoading: boolean
@@ -166,4 +171,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(AllUsersPage)
+export default connect<PropsFromState, PropsFromDispatch, Props>(
+  mapStateToProps,
+  mapDispatchToProps
+)(AllUsersPage)

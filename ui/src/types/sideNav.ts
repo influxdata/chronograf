@@ -15,11 +15,6 @@ export interface ExternalLinks {
   custom: ExternalLink[]
 }
 
-export interface Links {
-  me?: string
-  external?: ExternalLinks
-}
-
 export interface Organization {
   id: string
   name: string
@@ -28,11 +23,4 @@ export interface Organization {
 export interface Role {
   id?: string
   name?: string
-}
-
-export interface Me {
-  name: string
-  currentOrganization: Organization
-  organizations: Organization[]
-  role: Role[]
 }

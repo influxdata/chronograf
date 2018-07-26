@@ -10,15 +10,19 @@ import {
 } from 'src/shared/constants/thresholds'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface PropsFromRedux {
+interface PropsFromState {
   thresholdsListType: string
 }
-interface PropsFromParent {
-  containerClass: string
+
+interface PropsFromDispatch {
   handleUpdateThresholdsListType: (newType: string) => void
 }
 
-type Props = PropsFromRedux & PropsFromParent
+interface ClassProps {
+  containerClass: string
+}
+
+type Props = PropsFromState & PropsFromDispatch & ClassProps
 
 @ErrorHandling
 class ThresholdsListTypeToggle extends Component<Props> {
@@ -73,9 +77,7 @@ class ThresholdsListTypeToggle extends Component<Props> {
   }
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {thresholdsListType},
-}): PropsFromRedux => ({
+const mapStateToProps = ({cellEditorOverlay: {thresholdsListType}}) => ({
   thresholdsListType,
 })
 
@@ -85,6 +87,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch
   ),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(
-  ThresholdsListTypeToggle
-)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(ThresholdsListTypeToggle)

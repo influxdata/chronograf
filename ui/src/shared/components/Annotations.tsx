@@ -20,14 +20,13 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {AnnotationInterface, DygraphClass, Source} from 'src/types'
 import {UpdateAnnotationAction} from 'src/types/actions/annotations'
 
-interface Props {
-  dWidth: number
-  staticLegendHeight: number
+interface PropsFromState {
   annotations: AnnotationInterface[]
-  mode: string
-  xAxisRange: [number, number]
-  dygraph: DygraphClass
   isTempHovering: boolean
+  mode: string
+}
+
+interface PropsFromDispatch {
   handleUpdateAnnotation: (
     annotation: AnnotationInterface
   ) => UpdateAnnotationAction
@@ -37,12 +36,19 @@ interface Props {
   handleMouseLeaveTempAnnotation: () => void
 }
 
+interface ClassProps {
+  staticLegendHeight: number
+  xAxisRange: [number, number]
+  dygraph: DygraphClass
+}
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
+
 @ErrorHandling
 class Annotations extends Component<Props> {
   public render() {
     const {
       mode,
-      dWidth,
       dygraph,
       xAxisRange,
       isTempHovering,
@@ -81,7 +87,6 @@ class Annotations extends Component<Props> {
             xAxisRange={xAxisRange}
             annotation={a}
             dygraph={dygraph}
-            dWidth={dWidth}
             staticLegendHeight={staticLegendHeight}
           />
         ))}
@@ -116,4 +121,7 @@ const mdtp = {
   handleUpdateAnnotation: updateAnnotation,
 }
 
-export default connect(mstp, mdtp)(Annotations)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mstp,
+  mdtp
+)(Annotations)

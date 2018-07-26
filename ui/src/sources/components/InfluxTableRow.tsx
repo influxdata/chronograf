@@ -1,21 +1,19 @@
 import React, {PureComponent, ReactElement} from 'react'
 import {Link} from 'react-router'
 
-import * as actions from 'src/shared/actions/sources'
-
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 import ConnectionLink from 'src/sources/components/ConnectionLink'
 
-import {Source} from 'src/types'
+import {Source, Kapacitor} from 'src/types'
 
 interface Props {
   source: Source
   currentSource: Source
   onDeleteSource: (source: Source) => void
-  setActiveKapacitor: actions.SetActiveKapacitor
-  deleteKapacitor: actions.DeleteKapacitor
+  setActiveKapacitor: (kapacitor: Kapacitor) => void
+  deleteKapacitor: (Kapacitor: Kapacitor) => void
 }
 
 class InfluxTableRow extends PureComponent<Props> {

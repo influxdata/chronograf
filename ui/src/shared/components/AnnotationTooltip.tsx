@@ -10,19 +10,14 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {AnnotationInterface} from 'src/types'
 
 interface TimeStampProps {
-  time: string
+  time: number
 }
 
 const TimeStamp = ({time}: TimeStampProps): JSX.Element => (
   <div className="annotation-tooltip--timestamp">
-    {`${moment(+time).format('YYYY/MM/DD HH:mm:ss.SS')}`}
+    {`${moment(time).format('YYYY/MM/DD HH:mm:ss.SS')}`}
   </div>
 )
-
-interface AnnotationState {
-  isDragging: boolean
-  isMouseOver: boolean
-}
 
 interface Span {
   spanCenter: number
@@ -34,16 +29,26 @@ interface State {
   annotation: AnnotationInterface
 }
 
-interface Props {
-  isEditing: boolean
-  annotation: AnnotationInterface
-  timestamp: string
-  onMouseLeave: (e: MouseEvent<HTMLDivElement>) => {}
-  annotationState: AnnotationState
+interface PropsFromDispatch {
   deleteAnnotationAsync: (a: AnnotationInterface) => void
   updateAnnotationAsync: (a: AnnotationInterface) => void
-  span: Span
 }
+
+interface AnnotationState {
+  isDragging: boolean
+  isMouseOver: boolean
+}
+
+interface ClassProps {
+  isEditing: boolean
+  annotation: AnnotationInterface
+  timestamp: number
+  onMouseLeave: (e: MouseEvent<HTMLDivElement>) => void
+  annotationState: AnnotationState
+  span?: Span
+}
+
+type Props = ClassProps & PropsFromDispatch
 
 @ErrorHandling
 class AnnotationTooltip extends Component<Props, State> {
@@ -137,4 +142,6 @@ const mdtp = {
   updateAnnotationAsync: actions.updateAnnotationAsync,
 }
 
-export default connect(null, mdtp)(AnnotationTooltip)
+export default connect<{}, PropsFromDispatch, ClassProps>(null, mdtp)(
+  AnnotationTooltip
+)

@@ -12,26 +12,15 @@ import {proxy} from 'src/utils/queryUrlGenerator'
 
 import {Source} from 'src/types'
 
-import {Template} from 'src/types'
-
-const noop = () => ({
-  type: 'NOOP',
-  payload: {},
-})
-interface Query {
-  text: string
-  database?: string
-  db?: string
-  rp?: string
-  id: string
-}
+import {Template, Query} from 'src/types'
+import {editCellQueryStatus} from 'src/dashboards/actions'
 
 export const fetchTimeSeries = async (
   source: Source,
   queries: Query[],
   resolution: number,
   templates: Template[],
-  editQueryStatus: () => any = noop
+  editQueryStatus: typeof editCellQueryStatus
 ) => {
   const timeSeriesPromises = queries.map(async query => {
     try {
@@ -49,7 +38,7 @@ export const fetchTimeSeries = async (
 const handleQueryFetchStatus = async (
   query: Query,
   source: Source,
-  editQueryStatus: () => any
+  editQueryStatus: typeof editCellQueryStatus
 ) => {
   const {database, rp} = query
   const db = _.get(query, 'db', database)

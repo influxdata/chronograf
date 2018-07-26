@@ -12,14 +12,19 @@ import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes, Cell, QueryConfig} from 'src/types'
 
-interface Props {
+interface PropsFromState {
   cell: Cell
-  Axes: Axes
+  axes: Axes
+}
+
+interface ClassProps {
   queryConfigs: QueryConfig[]
   staticLegend: boolean
   onResetFocus: () => void
   onToggleStaticLegend: (x: boolean) => () => void
 }
+
+type Props = ClassProps & PropsFromState
 
 interface State {
   defaultYLabel: string
@@ -102,4 +107,6 @@ const mstp = ({cellEditorOverlay}) => ({
   axes: cellEditorOverlay.cell.axes,
 })
 
-export default connect(mstp, null)(DisplayOptions)
+export default connect<PropsFromState, {}, ClassProps>(mstp, null)(
+  DisplayOptions
+)

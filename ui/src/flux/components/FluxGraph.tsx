@@ -4,15 +4,20 @@ import {connect} from 'react-redux'
 import {fluxTablesToDygraph} from 'src/shared/parsing/flux/dygraph'
 
 import Dygraph from 'src/shared/components/Dygraph'
-import {FluxTable} from 'src/types'
+import {FluxTable, CellType} from 'src/types'
 import {DygraphSeries, DygraphValue} from 'src/types'
 import {DEFAULT_LINE_COLORS} from 'src/shared/constants/graphColorPalettes'
 import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
 
-interface Props {
-  data: FluxTable[]
+interface PropsFromDispatch {
   setHoverTime: (time: number) => void
 }
+
+interface ClassProps {
+  data: FluxTable[]
+}
+
+type Props = ClassProps & PropsFromDispatch
 
 class FluxGraph extends PureComponent<Props> {
   public render() {
@@ -25,6 +30,7 @@ class FluxGraph extends PureComponent<Props> {
     return (
       <div className="yield-node--graph">
         <Dygraph
+          type={CellType.Table}
           labels={this.labels}
           staticLegend={false}
           timeSeries={this.timeSeries}
@@ -67,4 +73,4 @@ const mdtp = {
   setHoverTime: setHoverTimeAction,
 }
 
-export default connect(null, mdtp)(FluxGraph)
+export default connect<{}, PropsFromDispatch, ClassProps>(null, mdtp)(FluxGraph)

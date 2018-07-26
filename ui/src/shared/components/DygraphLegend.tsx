@@ -14,16 +14,24 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {NO_CELL} from 'src/shared/constants'
 import {DygraphClass} from 'src/types'
 
-interface Props {
+interface PropsFromState {
+  activeCellID: string
   hoverTime: number
+}
+
+interface PropsFromDispatch {
+  setActiveCell: (cellID: string) => void
+}
+
+interface ClassProps {
   dygraph: DygraphClass
   cellID: string
   onHide: () => void
-  onShow: (e: MouseEvent) => void
-  activeCellID: string
-  setActiveCell: (cellID: string) => void
+  onShow: (pageX: number) => void
   onMouseEnter: () => void
 }
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 interface LegendData {
   x: number
@@ -185,7 +193,7 @@ class DygraphLegend extends PureComponent<Props, State> {
     }
 
     this.setState({pageX: e.pageX})
-    this.props.onShow(e)
+    this.props.onShow(e.pageX)
   }
 
   private legendFormatter = (legend: LegendData) => {
@@ -280,4 +288,7 @@ const mapStateToProps = ({dashboardUI}) => ({
   hoverTime: +dashboardUI.hoverTime,
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(DygraphLegend)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(DygraphLegend)

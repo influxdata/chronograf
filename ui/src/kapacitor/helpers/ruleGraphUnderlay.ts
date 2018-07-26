@@ -1,5 +1,6 @@
 import {ThresholdOperators} from 'src/kapacitor/constants'
 import {AlertRule} from 'src/types'
+import {DygraphClass} from 'src/types'
 
 const HIGHLIGHT = 'rgba(78, 216, 160, 0.3)'
 const BACKGROUND = 'rgba(41, 41, 51, 1)'
@@ -29,13 +30,13 @@ interface Area {
 export type underlayCallBackType = (
   canvas: CanvasRenderingContext2D,
   area: Area,
-  dygraph: Dygraph
+  dygraph: DygraphClass
 ) => void
 
 const underlayCallback = (rule: AlertRule) => (
   canvas: CanvasRenderingContext2D,
   area: Area,
-  dygraph: Dygraph
+  dygraph: DygraphClass
 ) => {
   const {values} = rule
   const {operator, value} = values

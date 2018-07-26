@@ -2,15 +2,10 @@ import React, {SFC} from 'react'
 import _ from 'lodash'
 
 import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
-import {QueryConfig} from 'src/types/queries'
-
-interface Query {
-  config: QueryConfig
-  text: string
-}
+import {CellQuery} from 'src/types/'
 
 interface Props {
-  queries: Query[]
+  queries: CellQuery[]
 }
 
 const CustomTimeIndicator: SFC<Props> = ({queries}) => {

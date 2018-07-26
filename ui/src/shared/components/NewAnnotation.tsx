@@ -11,12 +11,15 @@ import {DYGRAPH_CONTAINER_XLABEL_MARGIN} from 'src/shared/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {AnnotationInterface, DygraphClass, Source} from 'src/types'
 
-interface Props {
+interface PropsFromDispatch {
+  addAnnotationAsync: (url: string, a: AnnotationInterface) => void
+}
+
+interface ClassProps {
   dygraph: DygraphClass
   source: Source
   isTempHovering: boolean
   tempAnnotation: AnnotationInterface
-  addAnnotationAsync: (url: string, a: AnnotationInterface) => void
   onDismissAddingAnnotation: () => void
   onAddingAnnotationSuccess: () => void
   onUpdateAnnotation: (a: AnnotationInterface) => void
@@ -24,6 +27,9 @@ interface Props {
   onMouseLeaveTempAnnotation: () => void
   staticLegendHeight: number
 }
+
+type Props = ClassProps & PropsFromDispatch
+
 interface State {
   isMouseOver: boolean
   gatherMode: string
@@ -216,4 +222,6 @@ const mdtp = {
   addAnnotationAsync: actions.addAnnotationAsync,
 }
 
-export default connect(null, mdtp)(OnClickOutside(NewAnnotation))
+export default connect<{}, PropsFromDispatch, ClassProps>(null, mdtp)(
+  OnClickOutside(NewAnnotation)
+)

@@ -7,7 +7,6 @@ import {AnnotationInterface, DygraphClass} from 'src/types'
 
 interface Props {
   mode: string
-  dWidth: number
   xAxisRange: [number, number]
   annotation: AnnotationInterface
   dygraph: DygraphClass
@@ -17,7 +16,6 @@ interface Props {
 const Annotation: SFC<Props> = ({
   mode,
   dygraph,
-  dWidth,
   xAxisRange,
   annotation,
   staticLegendHeight,
@@ -28,7 +26,6 @@ const Annotation: SFC<Props> = ({
         mode={mode}
         dygraph={dygraph}
         annotation={annotation}
-        dWidth={dWidth}
         staticLegendHeight={staticLegendHeight}
         xAxisRange={xAxisRange}
       />
@@ -37,7 +34,6 @@ const Annotation: SFC<Props> = ({
         mode={mode}
         dygraph={dygraph}
         annotation={annotation}
-        dWidth={dWidth}
         staticLegendHeight={staticLegendHeight}
         xAxisRange={xAxisRange}
       />

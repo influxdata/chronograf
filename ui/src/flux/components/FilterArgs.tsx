@@ -11,8 +11,11 @@ import {Service} from 'src/types'
 import {Links, OnChangeArg, Func, FilterNode} from 'src/types/flux'
 import {WrappedCancelablePromise} from 'src/types/promises'
 
-interface Props {
+interface PropsFromState {
   links: Links
+}
+
+interface ClassProps {
   value: string
   func: Func
   bodyID: string
@@ -22,6 +25,8 @@ interface Props {
   service: Service
   onGenerateScript: () => void
 }
+
+type Props = ClassProps & PropsFromState
 
 interface State {
   tagKeys: string[]
@@ -118,4 +123,6 @@ const mapStateToProps = ({links}) => {
   return {links: links.flux}
 }
 
-export default connect(mapStateToProps, null)(FilterArgs)
+export default connect<PropsFromState, {}, ClassProps>(mapStateToProps, null)(
+  FilterArgs
+)

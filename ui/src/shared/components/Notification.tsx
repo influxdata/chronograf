@@ -10,10 +10,15 @@ import {dismissNotification as dismissNotificationAction} from 'src/shared/actio
 import {NOTIFICATION_TRANSITION} from 'src/shared/constants/index'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface Props {
-  notification: NotificationType
+interface PropsFromDispatch {
   dismissNotification: (id: string) => void
 }
+
+interface ClassProps {
+  notification: NotificationType
+}
+
+type Props = ClassProps & PropsFromDispatch
 
 interface State {
   opacity: number
@@ -129,4 +134,7 @@ const mapDispatchToProps = dispatch => ({
   dismissNotification: bindActionCreators(dismissNotificationAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(Notification)
+export default connect<{}, PropsFromDispatch, ClassProps>(
+  null,
+  mapDispatchToProps
+)(Notification)

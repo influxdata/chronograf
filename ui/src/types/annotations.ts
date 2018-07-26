@@ -11,3 +11,8 @@ export interface AnnotationRange {
   since: number
   until: number
 }
+
+export interface AnnotationState {
+  isMouseOver: boolean
+  isDragging: boolean
+}

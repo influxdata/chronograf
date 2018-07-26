@@ -20,7 +20,6 @@ import {DEFAULT_TIME_FIELD} from 'src/dashboards/constants'
 import {
   ASCENDING,
   DESCENDING,
-  NULL_HOVER_TIME,
   NULL_ARRAY_INDEX,
   DEFAULT_FIX_FIRST_COLUMN,
   DEFAULT_VERTICAL_TIME_AXIS,
@@ -52,18 +51,26 @@ interface CellRendererProps {
   style: {[x: string]: any}
 }
 
-interface Props {
+interface PropsFromState {
+  hoverTime: string
+}
+
+interface PropsFromDispatch {
+  handleUpdateFieldOptions: (fieldOptions: FieldOption[]) => void
+}
+
+interface ClassProps {
   data: TimeSeriesServerResponse[]
   tableOptions: TableOptions
   timeFormat: string
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
-  hoverTime: string
-  handleUpdateFieldOptions: (fieldOptions: FieldOption[]) => void
   handleSetHoverTime: (hovertime: string) => void
-  colors: ColorString
+  colors: ColorString[]
   isInCEO: boolean
 }
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 interface State {
   data: TimeSeriesValue[][]
@@ -329,7 +336,7 @@ class TableGraph extends Component<Props, State> {
     const {data, sortedTimeVals, hoveredColumnIndex, isTimeVisible} = this.state
     const {hoverTime, tableOptions} = this.props
     const hoveringThisTable = hoveredColumnIndex !== NULL_ARRAY_INDEX
-    const notHovering = hoverTime === NULL_HOVER_TIME
+    const notHovering = _.isNull(hoverTime)
     if (
       _.isEmpty(data[0]) ||
       notHovering ||
@@ -387,7 +394,7 @@ class TableGraph extends Component<Props, State> {
 
   private handleMouseLeave = (): void => {
     if (this.props.handleSetHoverTime) {
-      this.props.handleSetHoverTime(NULL_HOVER_TIME)
+      this.props.handleSetHoverTime(null)
       this.setState({
         hoveredColumnIndex: NULL_ARRAY_INDEX,
         hoveredRowIndex: NULL_ARRAY_INDEX,
@@ -593,8 +600,11 @@ const mstp = ({dashboardUI}) => ({
   hoverTime: dashboardUI.hoverTime,
 })
 
-const mapDispatchToProps = dispatch => ({
+const mdtp = dispatch => ({
   handleUpdateFieldOptions: bindActionCreators(updateFieldOptions, dispatch),
 })
 
-export default connect(mstp, mapDispatchToProps)(TableGraph)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mstp,
+  mdtp
+)(TableGraph)

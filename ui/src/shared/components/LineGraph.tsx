@@ -20,12 +20,13 @@ import {ColorString} from 'src/types/colors'
 import {DecimalPlaces} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {DygraphValue} from 'src/types/dygraphs'
-import {Query, Axes, TimeRange, RemoteDataState, CellType} from 'src/types'
+import {CellQuery, Axes, TimeRange, RemoteDataState, CellType} from 'src/types'
+import {setHoverTime} from 'src/dashboards/actions'
 
 interface Props {
   axes: Axes
   type: CellType
-  queries: Query[]
+  queries: CellQuery[]
   timeRange: TimeRange
   colors: ColorString[]
   loading: RemoteDataState
@@ -35,7 +36,7 @@ interface Props {
   cellHeight: number
   staticLegend: boolean
   onZoom: () => void
-  handleSetHoverTime: () => void
+  handleSetHoverTime: typeof setHoverTime
   activeQueryIndex?: number
 }
 

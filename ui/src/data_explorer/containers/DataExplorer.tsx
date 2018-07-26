@@ -26,32 +26,45 @@ import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'src/data_explorer/constants'
 import {errorThrown} from 'src/shared/actions/errors'
 import {setAutoRefresh} from 'src/shared/actions/app'
 import * as dataExplorerActionCreators from 'src/data_explorer/actions/view'
+
+import * as AppActions from 'src/types/actions/app'
+import * as ErrorsActions from 'src/types/actions/errors'
+
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {buildRawText} from 'src/utils/influxql'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
+import {KapacitorQueryConfigActions} from 'src/types/actions'
 import {Source, QueryConfig, TimeRange} from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface Props {
-  source: Source
-  queryConfigs: QueryConfig[]
-  queryConfigActions: any
-  autoRefresh: number
-  handleChooseAutoRefresh: () => void
-  router?: InjectedRouter
-  location?: Location
-  setTimeRange: (range: TimeRange) => void
-  timeRange: TimeRange
-  manualRefresh: number
-  onManualRefresh: () => void
-  errorThrownAction: () => void
-  writeLineProtocol: () => void
-}
+// interface PropsFromState {
+//   autoRefresh: number
+//   queryConfigs: QueryConfig[]
+//   timeRange: TimeRange
+// }
+
+// // interface PropsFromDispatch {
+// //   handleChooseAutoRefresh: () => void
+// //   errorThrownAction: () => void
+// //   setTimeRange: (range: TimeRange) => void
+// //   writeLineProtocol: () => void
+// //   queryConfigActions: any
+// // }
+
+// interface ClassProps {
+//   source: Source
+//   router?: InjectedRouter
+//   location?: Location
+//   manualRefresh: number
+//   onManualRefresh: () => void
+// }
 
 interface State {
   isWriteFormVisible: boolean
 }
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 @ErrorHandling
 export class DataExplorer extends PureComponent<Props, State> {
@@ -239,7 +252,6 @@ const mapStateToProps = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer,
     dataExplorerQueryConfigs: queryConfigs,
     timeRange,
   } = state
@@ -247,28 +259,49 @@ const mapStateToProps = state => {
 
   return {
     autoRefresh,
-    dataExplorer,
     queryConfigs: queryConfigValues,
     timeRange,
   }
 }
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch): PropsFromDispatch => {
   return {
     handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
     errorThrownAction: bindActionCreators(errorThrown, dispatch),
-    setTimeRange: bindActionCreators(
-      dataExplorerActionCreators.setTimeRange,
-      dispatch
-    ),
-    writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
+    // setTimeRange: bindActionCreators(
+    //   dataExplorerActionCreators.setTimeRange,
+    //   dispatch
+    // ),
+    // writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
     queryConfigActions: bindActionCreators(
       dataExplorerActionCreators,
       dispatch
     ),
   }
 }
+interface PropsFromDispatch {
+  handleChooseAutoRefresh: AppActions.SetAutoRefreshActionCreator
+  errorThrownAction: ErrorsActions.ErrorThrownActionCreator
+  // setTimeRange: ActionSetTimeRange
+  // writeLineProtocol: () => void
+  queryConfigActions: any
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(ManualRefresh(DataExplorer))
-)
+interface PropsFromState {
+  autoRefresh: number
+  queryConfigs: QueryConfig[]
+  timeRange: TimeRange
+}
+
+interface ClassProps {
+  source: Source
+  router?: InjectedRouter
+  location?: Location
+  manualRefresh: number
+  onManualRefresh: () => void
+}
+
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(ManualRefresh(DataExplorer)))

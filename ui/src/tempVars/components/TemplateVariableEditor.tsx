@@ -48,7 +48,11 @@ import {
 } from 'src/tempVars/constants'
 import {FIVE_SECONDS} from 'src/shared/constants/index'
 
-interface Props {
+interface PropsFromDispatch {
+  notify?: (n: Notification) => void
+}
+
+interface ClassProps {
   // We will assume we are creating a new template if none is passed in
   template?: Template
   templates: Template[]
@@ -57,8 +61,9 @@ interface Props {
   onCreate?: (template: Template) => Promise<any>
   onUpdate?: (template: Template) => Promise<any>
   onDelete?: () => Promise<any>
-  notify: (n: Notification) => void
 }
+
+type Props = ClassProps & PropsFromDispatch
 
 interface State {
   nextTemplate: Template
@@ -386,4 +391,6 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
 
 const mapDispatchToProps = {notify: notifyActionCreator}
 
-export default connect(null, mapDispatchToProps)(TemplateVariableEditor)
+export default connect<{}, PropsFromDispatch, Props>(null, mapDispatchToProps)(
+  TemplateVariableEditor
+)

@@ -22,12 +22,17 @@ interface OrgID {
   organization: string
 }
 
-interface Props {
+interface PropsFromDispatch {
+  meChangeOrg: (meLink: string, orgID: OrgID) => void
+}
+
+interface ClassProps {
   me: Me
   links: Links
   logoutLink: string
-  meChangeOrg: (meLink: string, orgID: OrgID) => void
 }
+
+type Props = ClassProps & PropsFromDispatch
 
 @ErrorHandling
 class UserNavBlock extends PureComponent<Props> {
@@ -114,4 +119,6 @@ const mdtp = {
   meChangeOrg: meChangeOrganizationAsync,
 }
 
-export default connect(null, mdtp)(UserNavBlock)
+export default connect<{}, PropsFromDispatch, ClassProps>(null, mdtp)(
+  UserNavBlock
+)

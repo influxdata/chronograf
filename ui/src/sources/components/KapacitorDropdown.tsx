@@ -4,13 +4,12 @@ import {Link, withRouter, RouteComponentProps} from 'react-router'
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import {Source, Kapacitor} from 'src/types'
-import {SetActiveKapacitor} from 'src/shared/actions/sources'
 
 interface Props {
   source: Source
   kapacitors: Kapacitor[]
-  setActiveKapacitor: SetActiveKapacitor
-  deleteKapacitor: (Kapacitor: Kapacitor) => void
+  setActiveKapacitor: (kapacitor: Kapacitor) => void
+  deleteKapacitor: (kapacitor: Kapacitor) => void
 }
 
 interface KapacitorItem {

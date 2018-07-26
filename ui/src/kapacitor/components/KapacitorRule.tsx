@@ -42,20 +42,25 @@ import {
   KapacitorRuleActions,
 } from 'src/types/actions'
 
-interface Props {
+interface PropsFromDispatch {
+  notify: (message: Notification) => void
+}
+
+interface ClassProps {
   source: Source
   rule: AlertRule
   query: QueryConfig
   queryConfigs: QueryConfig[]
   queryConfigActions: KapacitorQueryConfigActions
   ruleActions: KapacitorRuleActions
-  notify: (message: Notification) => void
   ruleID: string
   handlersFromConfig: Handler[]
   router: InjectedRouter
   kapacitor: Kapacitor
   configLink: string
 }
+
+type Props = ClassProps & PropsFromDispatch
 
 interface Item {
   text: string
@@ -285,4 +290,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(KapacitorRule)
+export default connect<{}, PropsFromDispatch, ClassProps>(
+  null,
+  mapDispatchToProps
+)(KapacitorRule)

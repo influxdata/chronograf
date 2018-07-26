@@ -16,19 +16,24 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {AnnotationInterface, DygraphClass} from 'src/types'
 
 interface State {
-  isMouseOver: string
   isDragging: string
+  isMouseOver: string
 }
 
-interface Props {
+interface PropsFromDispatch {
+  updateAnnotation: (a: AnnotationInterface) => void
+  updateAnnotationAsync: (a: AnnotationInterface) => void
+}
+
+interface ClassProps {
   annotation: AnnotationInterface
   mode: string
   dygraph: DygraphClass
   staticLegendHeight: number
-  updateAnnotation: (a: AnnotationInterface) => void
-  updateAnnotationAsync: (a: AnnotationInterface) => void
   xAxisRange: [number, number]
 }
+
+type Props = ClassProps & PropsFromDispatch
 
 @ErrorHandling
 class AnnotationSpan extends Component<Props, State> {
@@ -36,7 +41,7 @@ class AnnotationSpan extends Component<Props, State> {
     staticLegendHeight: 0,
   }
 
-  public state: State = {
+  public state = {
     isDragging: null,
     isMouseOver: null,
   }
@@ -249,4 +254,7 @@ const mapDispatchToProps = {
   updateAnnotation: actions.updateAnnotation,
 }
 
-export default connect(null, mapDispatchToProps)(AnnotationSpan)
+export default connect<{}, PropsFromDispatch, ClassProps>(
+  null,
+  mapDispatchToProps
+)(AnnotationSpan)

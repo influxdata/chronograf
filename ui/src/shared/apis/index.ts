@@ -90,7 +90,9 @@ export const getKapacitor = async (source, kapacitorID) => {
   }
 }
 
-export const getActiveKapacitor = async source => {
+export const getActiveKapacitor = async (
+  source: Source
+): Promise<Kapacitor> => {
   try {
     const {data} = await AJAX({
       url: source.links.kapacitors,

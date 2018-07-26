@@ -18,15 +18,20 @@ interface State {
   isDragging: boolean
 }
 
-interface Props {
+interface PropsFromDispatch {
+  updateAnnotation: (a: AnnotationInterface) => void
+  updateAnnotationAsync: (a: AnnotationInterface) => void
+}
+
+interface ClassProps {
   annotation: AnnotationInterface
   mode: string
   xAxisRange: [number, number]
   dygraph: DygraphClass
-  updateAnnotation: (a: AnnotationInterface) => void
-  updateAnnotationAsync: (a: AnnotationInterface) => void
   staticLegendHeight: number
 }
+
+type Props = ClassProps & PropsFromDispatch
 
 @ErrorHandling
 class AnnotationPoint extends Component<Props, State> {
@@ -168,4 +173,6 @@ const mdtp = {
   updateAnnotation: actions.updateAnnotation,
 }
 
-export default connect(null, mdtp)(AnnotationPoint)
+export default connect<{}, PropsFromDispatch, ClassProps>(null, mdtp)(
+  AnnotationPoint
+)

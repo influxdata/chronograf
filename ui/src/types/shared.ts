@@ -21,7 +21,7 @@ export interface PageSection {
 export interface Constructable<T> {
   new (
     container: HTMLElement | string,
-    data: DygraphValue[][] | (() => DygraphValue[][]),
+    data: DygraphValue[][],
     options?: DygraphOptions
   ): T
 }

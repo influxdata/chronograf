@@ -22,8 +22,9 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {DEFAULT_HOME_PAGE} from 'src/shared/constants'
 
 import * as copy from 'src/shared/copy/notifications'
+import * as NotificationsActions from 'src/shared/actions/notifications'
 
-import {Source, Me, Notification, NotificationFunc} from 'src/types'
+import {Source, Me} from 'src/types'
 
 interface Auth {
   isUsingAuth: boolean
@@ -46,7 +47,7 @@ interface Props {
   router: InjectedRouter
   location: Location
   auth: Auth
-  notify: (message: Notification | NotificationFunc) => void
+  notify: typeof NotificationsActions.notify
 }
 
 export const SourceContext = React.createContext(undefined)

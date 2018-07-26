@@ -11,8 +11,8 @@ import CustomTimeIndicator from 'src/shared/components/CustomTimeIndicator'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import {EDITING} from 'src/shared/annotations/helpers'
 import {cellSupportsAnnotations} from 'src/shared/constants/index'
-import {Cell} from 'src/types/dashboards'
-import {QueryConfig} from 'src/types/queries'
+
+import {Cell, CellQuery} from 'src/types/'
 
 import {
   addingAnnotation,
@@ -21,25 +21,28 @@ import {
 } from 'src/shared/actions/annotations'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface Query {
-  text: string
-  config: QueryConfig
+interface PropsFromState {
+  mode: string
 }
 
-interface Props {
+interface PropsFromDispatch {
+  onStartAddingAnnotation: () => void
+  onStartEditingAnnotation: () => void
+  onDismissEditingAnnotation: () => void
+}
+
+interface ClassProps {
   cell: Cell
   isEditable: boolean
   dataExists: boolean
-  mode: string
   onEdit: () => void
   onClone: (cell: Cell) => void
   onDelete: (cell: Cell) => void
   onCSVDownload: () => void
-  onStartAddingAnnotation: () => void
-  onStartEditingAnnotation: () => void
-  onDismissEditingAnnotation: () => void
-  queries: Query[]
+  queries: CellQuery[]
 }
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 interface State {
   subMenuIsOpen: boolean
@@ -211,4 +214,7 @@ const mapDispatchToProps = dispatch => ({
   ),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(LayoutCellMenu)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(LayoutCellMenu)

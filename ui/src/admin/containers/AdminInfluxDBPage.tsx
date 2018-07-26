@@ -68,11 +68,7 @@ interface Role extends InfluxDBRole {
   isEditing: boolean
 }
 
-interface Props {
-  source: Source
-  users: User[]
-  roles: Role[]
-  permissions: Permission[]
+interface PropsFromDispatch {
   loadUsers: (url: string) => void
   loadRoles: (url: string) => void
   loadPermissions: (url: string) => void
@@ -94,11 +90,21 @@ interface Props {
   updateUserRoles: (user: User, roles: Role[]) => void
   updateUserPassword: (user: User, password: string) => void
   notify: NotificationAction
+}
+
+interface PropsFromRedux {
+  users: User[]
+  roles: Role[]
+  permissions: Permission[]
+}
+
+interface ClassProps {
+  source: Source
   params: {
     tab: string
   }
 }
-
+type Props = ClassProps & PropsFromDispatch & PropsFromRedux
 interface State {
   loading: RemoteDataState
 }
@@ -359,4 +365,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(AdminInfluxDBPage)
+export default connect<PropsFromRedux, PropsFromDispatch, Props>(
+  mapStateToProps,
+  mapDispatchToProps
+)(AdminInfluxDBPage)

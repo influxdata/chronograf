@@ -14,15 +14,20 @@ import {
   CreateServiceAsync,
 } from 'src/shared/actions/services'
 
-interface Props {
-  mode: string
-  source?: Source
-  service?: Service
-  onDismiss: () => void
+interface PropsFromDispatch {
   notify: (message: Notification) => void
   createService: CreateServiceAsync
   updateService: UpdateServiceAsync
 }
+
+interface ClassProps {
+  mode: string
+  source?: Source
+  service?: Service
+  onDismiss: () => void
+}
+
+type Props = ClassProps & PropsFromDispatch
 
 class FluxOverlay extends PureComponent<Props> {
   public render() {
@@ -83,4 +88,6 @@ const mdtp = {
   updateService: updateServiceAsync,
 }
 
-export default connect(null, mdtp)(FluxOverlay)
+export default connect<{}, PropsFromDispatch, ClassProps>(null, mdtp)(
+  FluxOverlay
+)

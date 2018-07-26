@@ -25,15 +25,23 @@ import {Axes} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
 import {ColorNumber} from 'src/types/colors'
 
-interface Props {
-  axes: Axes
-  gaugeColors: ColorNumber[]
-  decimalPlaces: DecimalPlaces
-  onResetFocus: () => void
+interface PropsFromDispatch {
+  handleUpdateGaugeColors: (d: ColorNumber[]) => void
   handleUpdateAxes: (a: Axes) => void
   onUpdateDecimalPlaces: (d: DecimalPlaces) => void
-  handleUpdateGaugeColors: (d: ColorNumber[]) => void
 }
+
+interface PropsFromState {
+  decimalPlaces: DecimalPlaces
+  gaugeColors: ColorNumber[]
+  axes: Axes
+}
+
+interface ClassProps {
+  onResetFocus: () => void
+}
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 @ErrorHandling
 class GaugeOptions extends PureComponent<Props> {
@@ -266,4 +274,7 @@ const mapDispatchToProps = {
   onUpdateDecimalPlaces: changeDecimalPlaces,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GaugeOptions)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(GaugeOptions)

@@ -14,13 +14,21 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
 
-interface Props {
-  axes: Axes
-  decimalPlaces: DecimalPlaces
-  onResetFocus: () => void
+interface PropsFromDispatch {
   onUpdateAxes: (axes: Axes) => void
   onUpdateDecimalPlaces: (decimalPlaces: DecimalPlaces) => void
 }
+
+interface PropsFromState {
+  axes: Axes
+  decimalPlaces: DecimalPlaces
+}
+
+interface ClassProps {
+  onResetFocus: () => void
+}
+
+type Props = ClassProps & PropsFromState & PropsFromDispatch
 
 @ErrorHandling
 class SingleStatOptions extends PureComponent<Props> {
@@ -104,4 +112,7 @@ const mdtp = {
   onUpdateDecimalPlaces: changeDecimalPlaces,
 }
 
-export default connect(mstp, mdtp)(SingleStatOptions)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mstp,
+  mdtp
+)(SingleStatOptions)

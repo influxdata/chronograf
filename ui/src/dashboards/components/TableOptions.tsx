@@ -44,18 +44,26 @@ interface TableOptionsInterface {
   fixFirstColumn: boolean
 }
 
-interface Props {
-  queryConfigs: QueryConfig[]
-  handleUpdateTableOptions: (options: TableOptionsInterface) => void
-  handleUpdateFieldOptions: (fieldOptions: RenamableField[]) => void
-  handleChangeTimeFormat: (timeFormat: string) => void
-  handleChangeDecimalPlaces: (decimalPlaces: number) => void
+interface PropsFromState {
   tableOptions: TableOptionsInterface
   fieldOptions: RenamableField[]
   timeFormat: string
   decimalPlaces: DecimalPlaces
+}
+
+interface PropsFromDispatch {
+  handleUpdateTableOptions: (options: TableOptionsInterface) => void
+  handleUpdateFieldOptions: (fieldOptions: RenamableField[]) => void
+  handleChangeTimeFormat: (timeFormat: string) => void
+  handleChangeDecimalPlaces: (decimalPlaces: number) => void
+}
+
+interface ClassProps {
+  queryConfigs: QueryConfig[]
   onResetFocus: () => void
 }
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 @ErrorHandling
 export class TableOptions extends Component<Props, {}> {
@@ -213,4 +221,7 @@ const mapDispatchToProps = dispatch => ({
   handleChangeDecimalPlaces: bindActionCreators(changeDecimalPlaces, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(TableOptions)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(TableOptions)

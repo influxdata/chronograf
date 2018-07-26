@@ -16,8 +16,8 @@ import {
 import {DEFAULT_HOME_PAGE} from 'src/shared/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {Params, Location, Links, Me} from 'src/types/sideNav'
-import {Source} from 'src/types'
+import {Params, Location} from 'src/types/sideNav'
+import {Source, Me, Links} from 'src/types'
 
 interface Props {
   sources: Source[]
@@ -172,12 +172,7 @@ class SideNav extends PureComponent<Props> {
           />
         </NavBlock>
         {isUsingAuth ? (
-          <UserNavBlock
-            logoutLink={logoutLink}
-            links={links}
-            me={me}
-            sourcePrefix={sourcePrefix}
-          />
+          <UserNavBlock logoutLink={logoutLink} links={links} me={me} />
         ) : null}
       </nav>
     )

@@ -10,7 +10,7 @@ const initialState = {
 
 type State = Readonly<TimeRange>
 
-interface ActionSetTimeRange {
+export interface ActionSetTimeRange {
   type: 'DE_SET_TIME_RANGE'
   payload: {
     bounds: TimeRange

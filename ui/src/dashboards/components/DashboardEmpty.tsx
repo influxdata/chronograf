@@ -14,25 +14,20 @@ interface Dashboard {
   cells: Cell[]
 }
 
-interface Props {
-  dashboard: Dashboard
+interface PropsFromDispatch {
   addDashboardCell: (dashboard: Dashboard, cell?: Cell) => void
 }
 
-const mapDispatchToProps = dispatch => ({
-  addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
-})
+interface ClassProps {
+  dashboard: Dashboard
+}
+
+type Props = ClassProps & PropsFromDispatch
 
 @ErrorHandling
-@connect(null, mapDispatchToProps)
 class DashboardEmpty extends Component<Props> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
-  }
-
-  public handleAddCell = type => () => {
-    const {dashboard, addDashboardCell} = this.props
-    addDashboardCell(dashboard, type)
   }
 
   public render() {
@@ -60,6 +55,17 @@ class DashboardEmpty extends Component<Props> {
       </div>
     )
   }
+
+  private handleAddCell = type => () => {
+    const {dashboard, addDashboardCell} = this.props
+    addDashboardCell(dashboard, type)
+  }
 }
 
-export default DashboardEmpty
+const mdtp = dispatch => ({
+  addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
+})
+
+export default connect<{}, PropsFromDispatch, ClassProps>(null, mdtp)(
+  DashboardEmpty
+)

@@ -22,35 +22,52 @@ import {setHoverTime} from 'src/dashboards/actions'
 
 // Types
 import {ColorString} from 'src/types/colors'
-import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
+import {
+  Source,
+  Axes,
+  TimeRange,
+  Template,
+  Query,
+  CellQuery,
+  CellType,
+} from 'src/types'
 import {TableOptions, FieldOption, DecimalPlaces} from 'src/types/dashboards'
+import {editCellQueryStatus} from 'src/dashboards/actions'
 
-interface Props {
+interface PropsFromState {
+  mode: string
+}
+interface PropsFromDispatch {
+  handleSetHoverTime: typeof setHoverTime
+}
+
+interface ClassProps {
   axes: Axes
   source: Source
   queries: Query[]
-  timeRange: TimeRange
+  timeRange?: TimeRange
   colors: ColorString[]
   templates: Template[]
   tableOptions: TableOptions
   fieldOptions: FieldOption[]
   decimalPlaces: DecimalPlaces
   type: CellType
-  cellID: string
-  inView: boolean
-  isInCEO: boolean
-  timeFormat: string
-  cellHeight: number
+  cellID?: string
+  inView?: boolean
+  isInCEO?: boolean
+  timeFormat?: string
+  cellHeight?: number
   autoRefresh: number
   staticLegend: boolean
-  manualRefresh: number
-  resizerTopHeight: number
-  onZoom: () => void
-  editQueryStatus: () => void
-  onSetResolution: () => void
-  grabDataForDownload: () => void
-  handleSetHoverTime: () => void
+  manualRefresh?: number
+  onZoom?: () => void
+  editQueryStatus?: typeof editCellQueryStatus
+  onSetResolution?: () => void
+  grabDataForDownload?: (cellData: any) => void
+  resizerTopHeight?: number
 }
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 class RefreshingGraph extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
@@ -129,7 +146,6 @@ class RefreshingGraph extends PureComponent<Props> {
       decimalPlaces,
       manualRefresh,
       handleSetHoverTime,
-      grabDataForDownload,
       isInCEO,
     } = this.props
 
@@ -143,7 +159,6 @@ class RefreshingGraph extends PureComponent<Props> {
         fieldOptions={fieldOptions}
         timeFormat={timeFormat}
         decimalPlaces={decimalPlaces}
-        grabDataForDownload={grabDataForDownload}
         handleSetHoverTime={handleSetHoverTime}
       />
     )
@@ -210,7 +225,7 @@ class RefreshingGraph extends PureComponent<Props> {
     )
   }
 
-  private get queries(): Query[] {
+  private get queries(): CellQuery[] {
     const {queries, type} = this.props
     if (type === CellType.SingleStat) {
       return [queries[0]]
@@ -243,4 +258,7 @@ const mdtp = {
   handleSetHoverTime: setHoverTime,
 }
 
-export default connect(mapStateToProps, mdtp)(RefreshingGraph)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mdtp
+)(RefreshingGraph)

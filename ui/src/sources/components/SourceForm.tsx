@@ -13,17 +13,22 @@ interface Me {
   currentOrganization: Organization
 }
 
-interface Props {
+interface PropsFromState {
   me: Me
+  isUsingAuth: boolean
+}
+
+interface ClassProps {
   source: Partial<Source>
   editMode: boolean
-  isUsingAuth: boolean
   gotoPurgatory: () => void
   isInitialSource: boolean
   onSubmit: (e: MouseEvent<HTMLFormElement>) => void
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void
   onBlurSourceURL: (e: FocusEvent<HTMLInputElement>) => void
 }
+
+type Props = ClassProps & PropsFromState
 
 export class SourceForm extends PureComponent<Props> {
   public render() {
@@ -226,4 +231,6 @@ export class SourceForm extends PureComponent<Props> {
 
 const mapStateToProps = ({auth: {isUsingAuth, me}}) => ({isUsingAuth, me})
 
-export default connect(mapStateToProps)(SourceForm)
+export default connect<PropsFromState, {}, ClassProps>(mapStateToProps)(
+  SourceForm
+)

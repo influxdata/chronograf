@@ -8,10 +8,15 @@ import {updateLineColors} from 'src/dashboards/actions/cellEditorOverlay'
 import {ColorNumber} from 'src/types/colors'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface Props {
+interface PropsFromState {
   lineColors: ColorNumber[]
+}
+
+interface PropsFromDispatch {
   handleUpdateLineColors: (colors: ColorNumber[]) => void
 }
+
+type Props = PropsFromDispatch & PropsFromState
 
 @ErrorHandling
 class LineGraphColorSelector extends Component<Props> {
@@ -46,6 +51,7 @@ const mapDispatchToProps = dispatch => ({
   handleUpdateLineColors: bindActionCreators(updateLineColors, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  LineGraphColorSelector
-)
+export default connect<PropsFromState, PropsFromDispatch, {}>(
+  mapStateToProps,
+  mapDispatchToProps
+)(LineGraphColorSelector)

@@ -1,20 +1,13 @@
 import {TimeSeriesResponse, TimeSeriesSeries} from 'src/types/series'
-import {Status} from 'src/types'
+import {Status, CellQuery} from 'src/types'
+import {editCellQueryStatus} from 'src/dashboards/actions'
 
 import {getDeep} from 'src/utils/wrappers'
-
-interface Query {
-  text: string
-  id: string
-  database?: string
-  db?: string
-  rp?: string
-}
 
 type EditQueryStatusFunction = (queryID: string, status: Status) => void
 
 export const handleLoading = (
-  query: Query,
+  query: CellQuery,
   editQueryStatus: EditQueryStatusFunction
 ): void =>
   editQueryStatus(query.id, {
@@ -23,8 +16,8 @@ export const handleLoading = (
 
 export const handleSuccess = (
   data: TimeSeriesResponse,
-  query: Query,
-  editQueryStatus: EditQueryStatusFunction
+  query: CellQuery,
+  editQueryStatus: typeof editCellQueryStatus
 ): TimeSeriesResponse => {
   const {results} = data
   const error = getDeep<string>(results, '0.error', null)
@@ -54,7 +47,7 @@ export const handleSuccess = (
 
 export const handleError = (
   error,
-  query: Query,
+  query: CellQuery,
   editQueryStatus: EditQueryStatusFunction
 ): void => {
   const message =

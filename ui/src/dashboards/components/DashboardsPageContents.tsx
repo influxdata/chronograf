@@ -10,7 +10,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 
 import {Dashboard} from 'src/types'
-import {Notification} from 'src/types/notifications'
+import * as NotificationsActions from 'src/shared/actions/notifications'
 
 interface Props {
   dashboards: Dashboard[]
@@ -21,7 +21,7 @@ interface Props {
   ) => (event: MouseEvent<HTMLButtonElement>) => void
   onExportDashboard: (dashboard: Dashboard) => () => void
   onImportDashboard: (dashboard: Dashboard) => void
-  notify: (message: Notification) => void
+  notify: typeof NotificationsActions.notify
   dashboardLink: string
 }
 

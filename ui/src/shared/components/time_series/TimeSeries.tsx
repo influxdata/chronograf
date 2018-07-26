@@ -6,8 +6,9 @@ import _ from 'lodash'
 import {fetchTimeSeries} from 'src/shared/apis/query'
 
 // Types
-import {Template, Source, Query, RemoteDataState} from 'src/types'
+import {Template, Source, CellQuery, RemoteDataState} from 'src/types'
 import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
+import {editCellQueryStatus} from 'src/dashboards/actions'
 
 // Utils
 import AutoRefresh from 'src/utils/AutoRefresh'
@@ -21,11 +22,11 @@ interface RenderProps {
 
 interface Props {
   source: Source
-  queries: Query[]
+  queries: CellQuery[]
   children: (r: RenderProps) => JSX.Element
   inView?: boolean
   templates?: Template[]
-  editQueryStatus?: () => void
+  editQueryStatus?: typeof editCellQueryStatus
 }
 
 interface State {

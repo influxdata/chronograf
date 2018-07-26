@@ -19,13 +19,8 @@ import {
 } from 'src/shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {
-  Source,
-  Notification,
-  AlertRule,
-  QueryConfig,
-  Kapacitor,
-} from 'src/types'
+import {Source, AlertRule, QueryConfig, Kapacitor} from 'src/types'
+
 import {
   KapacitorQueryConfigActions,
   KapacitorRuleActions,
@@ -37,7 +32,7 @@ interface Params {
 
 interface Props {
   source: Source
-  notify: (notification: Notification) => void
+  notify: typeof notifyAction
   rules: AlertRule[]
   queryConfigs: QueryConfig[]
   ruleActions: KapacitorRuleActions
@@ -48,7 +43,7 @@ interface Props {
 
 interface State {
   handlersFromConfig: any[]
-  kapacitor: Kapacitor | {}
+  kapacitor: Kapacitor
 }
 
 @ErrorHandling
@@ -58,7 +53,7 @@ class KapacitorRulePage extends Component<Props, State> {
 
     this.state = {
       handlersFromConfig: [],
-      kapacitor: {},
+      kapacitor: null,
     }
   }
 

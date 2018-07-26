@@ -57,6 +57,7 @@ import {
   Template,
   TemplateValue,
   TemplateType,
+  Status,
 } from 'src/types'
 
 export enum ActionType {
@@ -172,7 +173,7 @@ interface EditCellQueryStatusAction {
   type: ActionType.EditCellQueryStatus
   payload: {
     queryID: string
-    status: string
+    status: Status
   }
 }
 
@@ -331,7 +332,7 @@ export const deleteDashboardCell = (
 
 export const editCellQueryStatus = (
   queryID: string,
-  status: string
+  status: Status
 ): EditCellQueryStatusAction => ({
   type: ActionType.EditCellQueryStatus,
   payload: {queryID, status},

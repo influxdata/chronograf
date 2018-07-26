@@ -6,14 +6,14 @@ import Heading from 'src/reusable_ui/components/overlays/OverlayHeading'
 import Body from 'src/reusable_ui/components/overlays/OverlayBody'
 import DragAndDrop from 'src/shared/components/DragAndDrop'
 import {notifyDashboardImportFailed} from 'src/shared/copy/notifications'
+import * as NotificationsActions from 'src/shared/actions/notifications'
 
 import {Dashboard} from 'src/types'
-import {Notification} from 'src/types/notifications'
 
 interface Props {
   onDismissOverlay: () => void
   onImportDashboard: (dashboard: Dashboard) => void
-  notify: (message: Notification) => void
+  notify: typeof NotificationsActions.notify
 }
 
 interface State {

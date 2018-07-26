@@ -23,7 +23,6 @@ import {
   DEFAULT_AXIS,
 } from 'src/dashboards/constants/cellEditor'
 import {buildDefaultYLabel} from 'src/shared/presenters'
-import {NULL_HOVER_TIME} from 'src/shared/constants/tableGraph'
 import {
   OPTIONS,
   LINE_COLORS,
@@ -39,7 +38,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 // Types
 import {
   Axes,
-  Query,
+  CellQuery,
   CellType,
   TriggerValues,
   TimeRange,
@@ -51,12 +50,17 @@ import {
 } from 'src/types'
 import {LineColor} from 'src/types/colors'
 import {underlayCallBackType} from 'src/kapacitor/helpers/ruleGraphUnderlay'
+import {setHoverTime} from 'src/dashboards/actions'
 
 const Dygraphs = D as Constructable<DygraphClass>
 
-interface Props {
+interface PropsFromState {
+  mode: string
+}
+
+interface ClassProps {
   type: CellType
-  queries: Query[]
+  queries?: CellQuery[]
   timeSeries: DygraphValue[][]
   labels: string[]
   options: DygraphOptions
@@ -64,7 +68,7 @@ interface Props {
   dygraphSeries: DygraphSeries
   timeRange: TimeRange
   colors: LineColor[]
-  handleSetHoverTime?: (t: string) => void
+  handleSetHoverTime: typeof setHoverTime
   ruleValues?: TriggerValues
   axes?: Axes
   isGraphFilled?: boolean
@@ -72,9 +76,11 @@ interface Props {
   cellID: string
   setResolution?: (w: number) => void
   onZoom?: (timeRange: TimeRange) => void
-  mode?: string
+
   underlayCallback?: underlayCallBackType
 }
+
+type Props = ClassProps & PropsFromState
 
 interface State {
   staticLegendHeight: number
@@ -260,7 +266,7 @@ class Dygraph extends Component<Props, State> {
     return (
       <div
         className="dygraph-child"
-        onMouseMove={this.handleShowLegend}
+        onMouseMove={this.handleMouseMove}
         onMouseLeave={this.handleHideLegend}
       >
         {this.dygraph && (
@@ -268,7 +274,6 @@ class Dygraph extends Component<Props, State> {
             {this.areAnnotationsVisible && (
               <Annotations
                 dygraph={this.dygraph}
-                dWidth={this.dygraph.width_}
                 staticLegendHeight={staticLegendHeight}
                 xAxisRange={xAxisRange}
               />
@@ -390,9 +395,7 @@ class Dygraph extends Component<Props, State> {
     }
   }
 
-  private eventToTimestamp = ({
-    pageX: pxBetweenMouseAndPage,
-  }: MouseEvent<HTMLDivElement>): string => {
+  private eventToTimestamp = (pxBetweenMouseAndPage: number): number => {
     const {
       left: pxBetweenGraphAndPage,
     } = this.graphRef.current.getBoundingClientRect()
@@ -400,22 +403,26 @@ class Dygraph extends Component<Props, State> {
     const timestamp = this.dygraph.toDataXCoord(graphXCoordinate)
     const [xRangeStart] = this.dygraph.xAxisRange()
     const clamped = Math.max(xRangeStart, timestamp)
-    return `${clamped}`
+    return clamped
   }
 
   private handleHideLegend = () => {
     this.setState({isMouseInLegend: false})
-    this.props.handleSetHoverTime(NULL_HOVER_TIME)
+    this.props.handleSetHoverTime(null)
   }
 
-  private handleShowLegend = (e: MouseEvent<HTMLDivElement>): void => {
+  private handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    this.handleShowLegend(e.pageX)
+  }
+
+  private handleShowLegend = (pageX: number): void => {
     const {isMouseInLegend} = this.state
 
     if (isMouseInLegend) {
       return
     }
 
-    const newTime = this.eventToTimestamp(e)
+    const newTime = this.eventToTimestamp(pageX).toString()
     this.props.handleSetHoverTime(newTime)
   }
 
@@ -498,6 +505,6 @@ const mapStateToProps = ({annotations: {mode}}) => ({
   mode,
 })
 
-export default connect<{mode?: string}, {}, Props>(mapStateToProps, null)(
+export default connect<PropsFromState, {}, ClassProps>(mapStateToProps, null)(
   Dygraph
 )

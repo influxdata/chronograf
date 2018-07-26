@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import {timeRanges} from 'src/shared/data/timeRanges'
-import {NULL_HOVER_TIME} from 'src/shared/constants/tableGraph'
 import {DashboardUIState} from 'src/types/dashboards'
 import {Action, ActionType} from 'src/dashboards/actions'
 
@@ -14,7 +13,7 @@ export const initialState: DashboardUIState = {
   zoomedTimeRange: {lower: null, upper: null},
   isEditMode: false,
   cellQueryStatus: {queryID: null, status: null},
-  hoverTime: NULL_HOVER_TIME,
+  hoverTime: null,
   activeCellID: '',
 }
 

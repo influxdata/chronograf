@@ -1,6 +1,6 @@
 export type DygraphData = number[][]
 
-export type Data = string | DygraphData | google.visualization.DataTable
+export type Data = string | DygraphData
 
 export type DygraphValue = string | number | Date | null
 
@@ -125,7 +125,7 @@ export interface PerAxisOptions {
     v: number | Date,
     granularity: number,
     opts: (name: string) => any,
-    dygraph: Dygraph
+    dygraph: DygraphClass
   ) => any
 
   /**
@@ -237,7 +237,7 @@ export interface PerAxisOptions {
     max: number,
     pixels: number,
     opts: (name: string) => any,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     vals: number[]
   ) => Array<{v: number; label: string}>
 
@@ -251,7 +251,7 @@ export interface PerAxisOptions {
     v: number,
     opts: (name: string) => any,
     seriesName: string,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     row: number,
     col: number
   ) => any
@@ -330,9 +330,9 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    * If provided, this function is called whenever the user clicks on an annotation.
    */
   annotationClickHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 
@@ -340,9 +340,9 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    * If provided, this function is called whenever the user double-clicks on an annotation.
    */
   annotationDblClickHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 
@@ -350,9 +350,9 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    * If provided, this function is called whenever the user mouses out of an annotation.
    */
   annotationMouseOutHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 
@@ -360,9 +360,9 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    * If provided, this function is called whenever the user mouses over an annotation.
    */
   annotationMouseOverHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 
@@ -463,7 +463,7 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    * initial draw, after zooming and repeatedly while panning.
    */
   /* tslint:disable */
-  drawCallback?: (dygraph: Dygraph, is_initial: boolean) => any
+  drawCallback?: (dygraph: DygraphClass, is_initial: boolean) => any
   /* tslint:enable */
 
   /**
@@ -478,7 +478,7 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    * cy) Also see <a href='#drawPointCallback'>drawPointCallback</a>
    */
   drawHighlightPointCallback?: (
-    g: Dygraph,
+    g: DygraphClass,
     seriesName: string,
     canvasContext: CanvasRenderingContext2D,
     cx: number,
@@ -493,7 +493,7 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    * Also see <a href='#drawHighlightPointCallback'>drawHighlightPointCallback</a>
    */
   drawPointCallback?: (
-    g: Dygraph,
+    g: DygraphClass,
     seriesName: string,
     canvasContext: CanvasRenderingContext2D,
     cx: number,
@@ -751,8 +751,8 @@ export interface DygraphOptions extends PerSeriesOptions, PerAxisOptions {
    */
   underlayCallback?: (
     context: CanvasRenderingContext2D,
-    area: dygraphs.Area,
-    dygraph: Dygraph
+    area: Area,
+    dygraph: DygraphClass
   ) => any
 
   /**
@@ -875,7 +875,7 @@ export interface LegendData {
   /**
    * Dygraph object for this graph
    */
-  dygraph: Dygraph
+  dygraph: DygraphClass
 }
 
 export interface SeriesProperties {
@@ -914,7 +914,7 @@ export interface Point {
   yval?: number
   yval_plus?: number
   yval_stacked?: number
-  annotation?: dygraphs.Annotation
+  annotation?: Annotation
 }
 
 export interface Annotation {
@@ -964,33 +964,33 @@ export interface Annotation {
 
   /** This function is called whenever the user clicks on this annotation. */
   clickHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 
   /** This function is called whenever the user mouses over this annotation. */
   mouseOverHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 
   /** This function is called whenever the user mouses out of this annotation. */
   mouseOutHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 
   /** this function is called whenever the user double-clicks on this annotation. */
   dblClickHandler?: (
-    annotation: dygraphs.Annotation,
+    annotation: Annotation,
     point: Point,
-    dygraph: Dygraph,
+    dygraph: DygraphClass,
     event: MouseEvent
   ) => any
 }
@@ -1084,7 +1084,7 @@ export declare class DygraphClass {
   /**
    * Get the value of an option on a per-axis basis.
    */
-  public getOptionForAxis(name: string, axis: dygraphs.Axis): any
+  public getOptionForAxis(name: string, axis: Axis): any
 
   /**
    * Returns the current rolling period, as set by the user or an option.
@@ -1251,7 +1251,7 @@ export declare class DygraphClass {
    * The "column" property can be fed back into getValue(row, column) to get
    * values for this series.
    */
-  public getPropertiesForSeries(seriesName: string): dygraphs.SeriesProperties
+  public getPropertiesForSeries(seriesName: string): SeriesProperties
 
   /**
    * Reset the zoom to the original view coordinates. This is the same as
@@ -1262,7 +1262,7 @@ export declare class DygraphClass {
   /**
    * Get the current graph's area object.
    */
-  public getArea(): dygraphs.Area
+  public getArea(): Area
 
   /**
    * Convert a mouse event to DOM coordinates relative to the graph origin.
@@ -1378,15 +1378,12 @@ export declare class DygraphClass {
    * @param ann {Array} An array of annotation objects.
    * @param suppressDraw {Boolean} Set to "true" to block chart redraw (optional).
    */
-  public setAnnotations(
-    ann: dygraphs.Annotation[],
-    suppressDraw?: boolean
-  ): void
+  public setAnnotations(ann: Annotation[], suppressDraw?: boolean): void
 
   /**
    * Return the list of annotations.
    */
-  public annotations(): dygraphs.Annotation[]
+  public annotations(): Annotation[]
 
   /**
    * Get the list of label names for this graph. The first column is the
@@ -1411,5 +1408,5 @@ export declare class DygraphClass {
    *
    * This is a good place to call setAnnotations().
    */
-  public ready(callback: (g: Dygraph) => any): void
+  public ready(callback: (g: DygraphClass) => any): void
 }

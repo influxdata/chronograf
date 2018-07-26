@@ -61,15 +61,23 @@ interface Params {
   ruleID: string
 }
 
-interface Props {
-  source: Source
-  errorActions: ErrorActions
-  kapacitorActions: KapacitorActions
-  router: Router
-  params: Params
+interface PropsFromState {
   rules: AlertRule[]
+}
+
+interface PropsFromDispatch {
+  kapacitorActions: KapacitorActions
+  errorActions: ErrorActions
   notify: (message: Notification | NotificationFunc) => void
 }
+
+interface ClassProps {
+  source: Source
+  router: Router
+  params: Params
+}
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 interface State {
   kapacitor: Kapacitor
@@ -364,7 +372,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   return {
-    rules: Object.values(state.rules),
+    rules: state.rules,
   }
 }
 
@@ -374,4 +382,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(TickscriptPage)
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(TickscriptPage)

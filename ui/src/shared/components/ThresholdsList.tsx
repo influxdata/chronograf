@@ -20,13 +20,21 @@ import {
 } from 'src/shared/constants/thresholds'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface Props {
-  onResetFocus: () => void
-  showListHeading: boolean
+interface PropsFromState {
   thresholdsListType: string
   thresholdsListColors: ColorNumber[]
+}
+
+interface PropsFromDispatch {
   handleUpdateThresholdsListColors: (c: ColorNumber[]) => void
 }
+
+interface ClassProps {
+  onResetFocus: () => void
+  showListHeading?: boolean
+}
+
+type Props = ClassProps & PropsFromDispatch & PropsFromState
 
 @ErrorHandling
 class ThresholdsList extends PureComponent<Props> {
@@ -199,4 +207,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch
   ),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(ThresholdsList)
+
+export default connect<PropsFromState, PropsFromDispatch, ClassProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(ThresholdsList)

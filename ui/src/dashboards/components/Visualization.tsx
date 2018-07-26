@@ -7,6 +7,8 @@ import VisualizationName from 'src/dashboards/components/VisualizationName'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
+import {editCellQueryStatus} from 'src/dashboards/actions'
+
 import {TimeRange, QueryConfig, Axes, Template, Source} from 'src/types'
 import {
   TableOptions,
@@ -16,26 +18,31 @@ import {
 } from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
-interface Props {
-  axes: Axes
+interface PropsFromState {
+  gaugeColors: ColorNumber[]
+  thresholdsListColors: ColorNumber[]
+  lineColors: ColorString[]
   type: CellType
+  axes: Axes
+  tableOptions: TableOptions
+  fieldOptions: FieldOption[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+}
+
+interface ClassProps {
   source: Source
   autoRefresh: number
   templates: Template[]
   timeRange: TimeRange
   queryConfigs: QueryConfig[]
-  editQueryStatus: () => void
-  tableOptions: TableOptions
-  timeFormat: string
-  decimalPlaces: DecimalPlaces
-  fieldOptions: FieldOption[]
-  resizerTopHeight: number
-  thresholdsListColors: ColorNumber[]
-  gaugeColors: ColorNumber[]
-  lineColors: ColorString[]
+  editQueryStatus: typeof editCellQueryStatus
+  resizerTopHeight?: number
   staticLegend: boolean
   isInCEO: boolean
 }
+
+type Props = ClassProps & PropsFromState
 
 const DashVisualization: SFC<Props> = ({
   axes,
@@ -109,4 +116,6 @@ const mapStateToProps = ({
   decimalPlaces,
 })
 
-export default connect(mapStateToProps, null)(DashVisualization)
+export default connect<PropsFromState, {}, ClassProps>(mapStateToProps, null)(
+  DashVisualization
+)
