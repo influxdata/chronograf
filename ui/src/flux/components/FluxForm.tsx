@@ -49,7 +49,7 @@ class FluxForm extends PureComponent<Props> {
 
     let text = 'Connect'
 
-    if (mode === 'edit') {
+    if (mode === FluxFormMode.edit) {
       text = 'Save Changes'
     }
 
