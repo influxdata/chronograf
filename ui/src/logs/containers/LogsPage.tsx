@@ -146,7 +146,12 @@ class LogsPage extends Component<Props, State> {
 
   public componentDidUpdate() {
     if (!this.props.currentSource && this.props.sources.length > 0) {
-      this.props.getSource(this.props.sources[0].id)
+      const source =
+        this.props.sources.find(src => {
+          return src.default
+        }) || this.props.sources[0]
+
+      this.props.getSource(source.id)
     }
   }
 
