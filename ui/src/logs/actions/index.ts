@@ -751,7 +751,7 @@ export const populateNamespacesAsync = (
 
   if (namespaces && namespaces.length > 0) {
     dispatch(setNamespaces(namespaces))
-    if (source) {
+    if (source && source.telegraf) {
       const defaultNamespace = namespaces.find(
         namespace => namespace.database === source.telegraf
       )
