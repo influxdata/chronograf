@@ -41,7 +41,7 @@ interface State {
 }
 
 @ErrorHandling
-class FluxConnectionPage extends PureComponent<Props, State> {
+export class FluxConnectionPage extends PureComponent<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     const {
       params: {id},
