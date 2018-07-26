@@ -781,6 +781,11 @@ export const notifyFluxNameAlreadyTaken = (fluxName: string): Notification => ({
 })
 
 // Service notifications
+export const couldNotGetFluxService = (id: string): Notification => ({
+  ...defaultErrorNotification,
+  message: `Could not find Flux with id ${id}.`,
+})
+
 export const couldNotGetServices: Notification = {
   ...defaultErrorNotification,
   message: 'We could not get services',

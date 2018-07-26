@@ -20,6 +20,7 @@ import {
   setActiveServiceAsync,
   SetActiveServiceAsync,
 } from 'src/shared/actions/services'
+import {couldNotGetFluxService} from 'src/shared/copy/notifications'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Service, Source, Notification} from 'src/types'
 
@@ -73,6 +74,7 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
   public async componentDidMount() {
     const {
       source,
+      notify,
       params: {id},
       fetchServicesForSource,
     } = this.props
@@ -86,6 +88,7 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
         this.setState({service, formMode})
       } catch (err) {
         console.error('Could not get Service', err)
+        notify(couldNotGetFluxService(id))
       }
     } else {
       formMode = FluxFormMode.NEW
