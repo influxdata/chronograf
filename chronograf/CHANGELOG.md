@@ -1,4 +1,24 @@
 ## v1.5.1.0 [unreleased]
+## v1.6.1 [unreleased]
+
+### Features
+
+1.  [#4033](https://github.com/influxdata/chronograf/pull/4033): Include sources id, links, and names in dashboard export
+
+### UI Improvements
+1.  [#4009](https://github.com/influxdata/chronograf/pull/4009): Make it to get mouse into hover legend
+
+### Bug Fixes
+
+1.  [#3976](https://github.com/influxdata/chronograf/pull/3976): Ensure text template variables reflect query parameters
+1.  [#3976](https://github.com/influxdata/chronograf/pull/3976): Enable using a new, blank text template variable in a query
+1.  [#3976](https://github.com/influxdata/chronograf/pull/3976): Ensure cells with broken queries display “No Data”
+1.  [#3978](https://github.com/influxdata/chronograf/pull/3978): Fix use of template variables within InfluxQL regexes
+1.  [#3994](https://github.com/influxdata/chronograf/pull/3994): Pressing play on log viewer goes to now
+1.  [#4008](https://github.com/influxdata/chronograf/pull/4008): Fix display of log viewer histogram when a basepath is enabled
+
+
+## v1.6.0 [2018-06-18]
 
 ### Features
 
