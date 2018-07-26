@@ -117,7 +117,7 @@ export const filtersClause = (filters: Filter[]): string => {
   ).join(' AND ')
 }
 
-export function buildInfiniteWhereClause({
+export function buildInfiniteScrollWhereClause({
   lower,
   upper,
   tags,
@@ -176,17 +176,22 @@ export function buildGeneralLogQuery(
   return `${select}${condition}${dimensions}${fillClause}`
 }
 
-export async function queryCount(
-  lower,
-  upper,
-  config,
-  filters,
-  searchTerm,
-  proxyLink,
-  namespace
+export async function getQueryCountForBounds(
+  lower: string,
+  upper: string,
+  config: QueryConfig,
+  filters: Filter[],
+  searchTerm: string,
+  proxyLink: string,
+  namespace: Namespace
 ): Promise<number> {
   const {database, retentionPolicy, measurement} = config
-  const rpSegment = retentionPolicy ? `"${retentionPolicy}"` : ''
+
+  let rpSegment = ''
+  if (retentionPolicy) {
+    rpSegment = `"${retentionPolicy}"`
+  }
+
   const fullyQualifiedMeasurement = `"${database}".${rpSegment}."${measurement}"`
   const select = `SELECT count(message) FROM ${fullyQualifiedMeasurement}`
   let condition = `WHERE time >= '${lower}' AND time <='${upper}'`
@@ -204,7 +209,7 @@ export async function queryCount(
   return getDeep<number>(result, 'results.0.series.0.values.0.1', 0)
 }
 
-export async function findBackwardLower(
+export async function findOlderLowerTimeBounds(
   upper: string,
   config: QueryConfig,
   filters: Filter[],
@@ -219,11 +224,10 @@ export async function findBackwardLower(
 
   while (true) {
     if (secondsBack > SECONDS_AWAY_LIMIT) {
-      // One day
       break
     }
 
-    const count = await queryCount(
+    const count = await getQueryCountForBounds(
       currentLower.toISOString(),
       upper,
       config,
@@ -237,14 +241,14 @@ export async function findBackwardLower(
       break
     }
 
-    secondsBack *= secondsBack
+    secondsBack *= secondsBack // exponential backoff
     currentLower = parsedUpper.subtract(secondsBack, 'seconds')
   }
 
   return currentLower.toISOString()
 }
 
-export async function findForwardUpper(
+export async function findNewerUpperTimeBounds(
   lower: string,
   config: QueryConfig,
   filters: Filter[],
@@ -262,7 +266,7 @@ export async function findForwardUpper(
       break
     }
 
-    const count = await queryCount(
+    const count = await getQueryCountForBounds(
       lower,
       currentUpper.toISOString(),
       config,
@@ -276,14 +280,14 @@ export async function findForwardUpper(
       break
     }
 
-    secondsForward *= secondsForward
+    secondsForward *= secondsForward // exponential backoff
     currentUpper = parsedLower.add(secondsForward, 'seconds')
   }
 
   return currentUpper.toISOString()
 }
 
-export async function buildInfiniteLogQuery(
+export async function buildInfiniteScrollLogQuery(
   lower: string,
   upper: string,
   config: QueryConfig,
@@ -292,7 +296,7 @@ export async function buildInfiniteLogQuery(
 ) {
   const {tags, areTagsAccepted} = config
 
-  const condition = buildInfiniteWhereClause({
+  const condition = buildInfiniteScrollWhereClause({
     lower,
     upper,
     tags,
