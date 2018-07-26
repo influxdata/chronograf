@@ -183,11 +183,19 @@ export enum EncodingVisibilityOptions {
   hidden = 'hidden',
 }
 
+const MINUTE = 60
+const HOUR = 60 * MINUTE
+const DAY = 24 * HOUR
+
 export const TIME_RANGE_VALUES = [
-  {text: '1m', seconds: 60},
-  {text: '5m', seconds: 300},
-  {text: '10m', seconds: 600},
-  {text: '15m', seconds: 900},
+  {text: '1m', seconds: MINUTE},
+  {text: '5m', seconds: 5 * MINUTE},
+  {text: '1h', seconds: HOUR},
+  {text: '6h', seconds: 6 * HOUR},
+  {text: '12h', seconds: 12 * HOUR},
+  {text: '24h', seconds: DAY},
+  {text: '7d', seconds: 7 * DAY},
+  {text: '30d', seconds: 30 * DAY},
 ]
 
 export const SECONDS_TO_MS = 1000
