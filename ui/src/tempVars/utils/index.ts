@@ -1,4 +1,10 @@
-import {Template} from 'src/types'
+import {TEMPLATE_VARIABLE_TYPES} from 'src/tempVars/constants'
+import {
+  Template,
+  TemplateValue,
+  TemplateType,
+  TemplateValueType,
+} from 'src/types'
 
 export const trimAndRemoveQuotes = elt => {
   const trimmed = elt.trim()
@@ -10,7 +16,135 @@ export const trimAndRemoveQuotes = elt => {
 export const formatTempVar = name =>
   `:${name.replace(/:/g, '').replace(/\s/g, '')}:`
 
-export const getSelectedValue = (template: Template): string | null => {
+export const resolveValues = (
+  template: Template,
+  newValues?: string[],
+  hopefullySelectedValue?: string
+): TemplateValue[] => {
+  switch (template.type) {
+    case TemplateType.Text:
+      return newTemplateValueText(template, hopefullySelectedValue)
+    case TemplateType.CSV:
+    case TemplateType.Map:
+      return newTemplateValueConstant(template, hopefullySelectedValue)
+    case TemplateType.MetaQuery:
+    case TemplateType.FieldKeys:
+    case TemplateType.Measurements:
+    case TemplateType.TagKeys:
+    case TemplateType.TagValues:
+    case TemplateType.Databases:
+      return newTemplateValueQuery(template, newValues, hopefullySelectedValue)
+    default:
+      throw new Error(
+        `TemplateValue resolution for TemplateType ${
+          template.type
+        } not implemented`
+      )
+  }
+}
+
+const newTemplateValueQuery = (
+  template: Template,
+  newValues: string[],
+  hopefullySelectedValue?: string
+) => {
+  if (!newValues.length) {
+    return []
+  }
+
+  const type = TEMPLATE_VARIABLE_TYPES[template.type]
+
+  let selectedValue = getSelectedValue(template)
+
+  if (!selectedValue || !newValues.includes(selectedValue)) {
+    // The persisted selected value may no longer exist as a result for the
+    // templates metaquery. In this case we select the first actual result
+    selectedValue = newValues[0]
+  }
+
+  let localSelectedValue = hopefullySelectedValue
+
+  if (!localSelectedValue) {
+    localSelectedValue = getLocalSelectedValue(template)
+  }
+
+  if (!localSelectedValue || !newValues.includes(localSelectedValue)) {
+    localSelectedValue = selectedValue
+  }
+
+  return newValues.map(value => {
+    return {
+      type,
+      value,
+      selected: value === selectedValue,
+      localSelected: value === localSelectedValue,
+    }
+  })
+}
+
+const newTemplateValueConstant = (
+  template: Template,
+  hopefullySelectedValue?: string
+) => {
+  if (!template.values.length) {
+    return []
+  }
+
+  let selectedValue = template.values.find(v => v.selected)
+
+  if (!selectedValue) {
+    selectedValue = template.values[0]
+  }
+
+  let localSelectedValue = template.values.find(v => {
+    return template.type === TemplateType.Map
+      ? v.key === hopefullySelectedValue
+      : v.value === hopefullySelectedValue
+  })
+
+  if (!localSelectedValue) {
+    localSelectedValue = template.values.find(v => v.localSelected)
+  }
+
+  if (!localSelectedValue) {
+    localSelectedValue = selectedValue
+  }
+
+  return template.values.map(v => ({
+    ...v,
+    selected: v.value === selectedValue.value,
+    localSelected: v.value === localSelectedValue.value,
+  }))
+}
+
+const newTemplateValueText = (
+  template: Template,
+  hopefullySelectedValue?: string
+) => {
+  if (!!hopefullySelectedValue) {
+    return [
+      {
+        value: hopefullySelectedValue,
+        type: TemplateValueType.Constant,
+        localSelected: true,
+        selected: false,
+      },
+    ]
+  } else if (template.values.length) {
+    return [{...template.values[0], localSelected: true}]
+  } else {
+    return [
+      {
+        value: '',
+        type: TemplateValueType.Constant,
+        localSelected: true,
+        selected: false,
+      },
+    ]
+  }
+}
+
+const getSelectedValue = (template: Template): string | null => {
   const selected = template.values.find(v => v.selected)
 
   if (selected) {
@@ -20,7 +154,7 @@ export const getSelectedValue = (template: Template): string | null => {
   return null
 }
 
-export const getLocalSelectedValue = (template: Template): string | null => {
+const getLocalSelectedValue = (template: Template): string | null => {
   const selected = template.values.find(v => v.localSelected)
 
   if (selected) {

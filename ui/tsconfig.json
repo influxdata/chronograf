@@ -2,7 +2,6 @@
   "compilerOptions": {
     "types": [
       "node",
-      "chai",
       "lodash",
       "enzyme",
       "react",
@@ -27,9 +26,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "removeComments": true,
-    "importHelpers": true,
     "noLib": false,
-    "noEmitHelpers": true,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
@@ -37,7 +34,8 @@
     "checkJs": false,
     "sourceMap": true,
     "baseUrl": "./",
-    "rootDir": "./src"
+    "rootDir": "./",
+    "outDir": "./build"
   },
-  "exclude": ["./assets/*", "./build/*", "./node_modules/*"]
+  "exclude": ["assets", "build", "node_modules"]
 }

@@ -4,11 +4,10 @@ import {parseMetaQuery} from 'src/tempVars/parsing'
 import templateReplace, {
   templateInternalReplace,
 } from 'src/tempVars/utils/replace'
-import {getSelectedValue, getLocalSelectedValue} from 'src/tempVars/utils'
 
-import {TEMPLATE_VARIABLE_TYPES} from 'src/tempVars/constants'
+import {resolveValues} from 'src/tempVars/utils'
 
-import {Template, TemplateValue, RemoteDataState} from 'src/types'
+import {Template, RemoteDataState} from 'src/types'
 
 type TemplateName = string
 
@@ -222,62 +221,21 @@ export async function hydrateTemplate(
     selections = {},
   }: HydrateTemplateOptions
 ): Promise<Template> {
-  let values
+  let newValues: string[]
 
   if (template.query && template.query.influxql) {
-    const query = templateReplace(templateInternalReplace(template), templates)
+    const renderedQuery = templateReplace(
+      templateInternalReplace(template),
+      templates
+    )
 
-    values = await fetcher.fetch(query)
-  } else {
-    values = template.values.map(v => v.value)
+    newValues = await fetcher.fetch(renderedQuery)
   }
 
-  const templateValues = newTemplateValues(
-    template,
-    values,
-    selections[template.tempVar]
-  )
+  const selection = selections[template.tempVar]
+  const templateValues = resolveValues(template, newValues, selection)
 
   return {...template, values: templateValues}
-}
-
-export function newTemplateValues(
-  template: Template,
-  newValues: string[],
-  hopefullySelectedValue?: string
-): TemplateValue[] {
-  if (!newValues.length) {
-    return []
-  }
-
-  const type = TEMPLATE_VARIABLE_TYPES[template.type]
-
-  let selectedValue = getSelectedValue(template)
-
-  if (!selectedValue || !newValues.includes(selectedValue)) {
-    // The persisted selected value may no longer exist as a result for the
-    // templates metaquery. In this case we select the first actual result
-    selectedValue = newValues[0]
-  }
-
-  let localSelectedValue = hopefullySelectedValue
-
-  if (!localSelectedValue) {
-    localSelectedValue = getLocalSelectedValue(template)
-  }
-
-  if (!localSelectedValue || !newValues.includes(localSelectedValue)) {
-    localSelectedValue = selectedValue
-  }
-
-  return newValues.map(value => {
-    return {
-      type,
-      value,
-      selected: value === selectedValue,
-      localSelected: value === localSelectedValue,
-    }
-  })
 }
 
 export async function hydrateTemplates(

@@ -57,7 +57,7 @@ interface State {
 
 type ScriptFunc = (script: string) => void
 
-export const FluxContext = React.createContext()
+export const FluxContext = React.createContext(undefined)
 
 @ErrorHandling
 export class FluxPage extends PureComponent<Props, State> {

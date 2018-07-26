@@ -7,3 +7,4 @@ bower_components/
 log/
 .tern-project
 yarn-error.log
+.cache/

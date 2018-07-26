@@ -1,6 +1,6 @@
 .PHONY: assets dep clean test gotest gotestrace jstest run run-dev run-hmr ctags
 
-VERSION ?= $(shell git describe --always --tags)
+VERSION = 1.7.0
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
 GOBINDATA := $(shell go list -f {{.Root}}  github.com/kevinburke/go-bindata 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
@@ -92,7 +92,7 @@ gen: internal.pb.go
 internal.pb.go: bolt/internal/internal.proto
 	go generate -x ./bolt/internal
 
-test: jstest gotest gotestrace
+test: jstest gotest gotestrace lint-ci
 
 gotest:
 	go test -timeout 10s ./...
@@ -103,8 +103,11 @@ gotestrace:
 jstest:
 	cd ui && yarn test --runInBand
 
-jslint:
-	cd ui && yarn run lint:fix
+lint:
+	cd ui && yarn run lint
+
+lint-ci:
+	cd ui && yarn run eslint && yarn run tslint && yarn run tsc # fail fast for ci process
 
 run: ${BINARY}
 	./chronograf
@@ -124,6 +127,3 @@ clean:
 
 ctags:
 	ctags -R --languages="Go" --exclude=.git --exclude=ui .
-
-lint:
-	cd ui && yarn prettier

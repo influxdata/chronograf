@@ -19,6 +19,7 @@ import {
 import {ColorString} from 'src/types/colors'
 import {DecimalPlaces} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
+import {DygraphValue} from 'src/types/dygraphs'
 import {Query, Axes, TimeRange, RemoteDataState, CellType} from 'src/types'
 
 interface Props {
@@ -146,12 +147,12 @@ class LineGraph extends PureComponent<LineGraphProps> {
     )
   }
 
-  private validateTimeSeries = ts => {
+  private validateTimeSeries = (ts: DygraphValue[][]) => {
     return _.every(ts, r =>
       _.every(
         r,
         (v, i: number) =>
-          (i === 0 && Date.parse(v)) || _.isNumber(v) || _.isNull(v)
+          (i === 0 && Date.parse(v as string)) || _.isNumber(v) || _.isNull(v)
       )
     )
   }
