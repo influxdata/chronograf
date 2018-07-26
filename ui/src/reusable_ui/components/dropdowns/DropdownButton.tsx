@@ -1,17 +1,22 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
-import {ComponentColor, ComponentSize, IconFont} from 'src/reusable_ui/types'
+import {
+  ComponentColor,
+  ComponentSize,
+  IconFont,
+  DropdownChild,
+} from 'src/reusable_ui/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import './DropdownButton.scss'
 
 interface Props {
+  children: DropdownChild
   onClick: () => void
   disabled?: boolean
   active?: boolean
   color?: ComponentColor
   size?: ComponentSize
   icon?: IconFont
-  label: string
 }
 
 @ErrorHandling
@@ -24,11 +29,11 @@ class DropdownButton extends Component<Props> {
   }
 
   public render() {
-    const {onClick, disabled, label} = this.props
+    const {onClick, disabled, children} = this.props
     return (
       <button className={this.classname} onClick={onClick} disabled={disabled}>
         {this.icon}
-        <span className="dropdown--selected">{label}</span>
+        <span className="dropdown--selected">{children}</span>
         <span className="dropdown--caret icon caret-down" />
       </button>
     )

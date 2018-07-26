@@ -1,12 +1,15 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 
+import {DropdownChild} from 'src/reusable_ui/types'
+
 interface Props {
-  text: string
+  itemKey: string
+  children: DropdownChild
+  value: any
   selected?: boolean
   checkbox?: boolean
   onClick?: (value: any) => void
-  value: any
 }
 
 class DropdownItem extends Component<Props> {
@@ -15,8 +18,8 @@ class DropdownItem extends Component<Props> {
     selected: false,
   }
 
-  public render() {
-    const {text, selected, checkbox} = this.props
+  public render(): JSX.Element {
+    const {selected, checkbox} = this.props
 
     return (
       <div
@@ -28,7 +31,7 @@ class DropdownItem extends Component<Props> {
       >
         {this.checkBox}
         {this.dot}
-        {text}
+        {this.childElements}
       </div>
     )
   }
@@ -55,6 +58,12 @@ class DropdownItem extends Component<Props> {
     if (selected && !checkbox) {
       return <div className="dropdown-item--dot" />
     }
+  }
+
+  private get childElements(): JSX.Element {
+    const {children} = this.props
+
+    return <div className="dropdown-item--children">{children}</div>
   }
 }
 

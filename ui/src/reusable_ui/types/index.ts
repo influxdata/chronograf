@@ -14,6 +14,8 @@ export enum DropdownMenuColors {
   Onyx = 'onyx',
 }
 
+export type DropdownChild = Array<string | JSX.Element | Element>
+
 export enum ComponentSize {
   ExtraSmall = 'xs',
   Small = 'sm',
@@ -63,6 +65,7 @@ export enum IconFont {
   CaretUp = 'caret-up',
   Checkmark = 'checkmark',
   Circle = 'circle',
+  CircleThick = 'circle-thick',
   Clock = 'clock',
   CogOutline = 'cog-outline',
   CogThick = 'cog-thick',

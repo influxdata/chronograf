@@ -1,16 +1,28 @@
-import React, {SFC} from 'react'
+import React, {Component} from 'react'
 import classnames from 'classnames'
 
+import {DropdownChild} from 'src/reusable_ui/types'
+
 interface Props {
+  children: DropdownChild
+  itemKey: string
   text?: string
 }
 
-const DropdownDivider: SFC<Props> = ({text}): JSX.Element => (
-  <div className={classnames('dropdown--divider', {line: !text})}>{text}</div>
-)
+class DropdownDivider extends Component<Props> {
+  public static defaultProps: Partial<Props> = {
+    text: '',
+  }
 
-DropdownDivider.defaultProps = {
-  text: '',
+  public render() {
+    const {text} = this.props
+
+    return (
+      <div className={classnames('dropdown--divider', {line: !text})}>
+        {text}
+      </div>
+    )
+  }
 }
 
 export default DropdownDivider

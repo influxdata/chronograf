@@ -1,25 +1,31 @@
-import React, {Component, CSSProperties, Fragment} from 'react'
+// Librarries
+import React, {Component, CSSProperties} from 'react'
 import classnames from 'classnames'
-import _ from 'lodash'
 
+// Components
 import {ClickOutside} from 'src/shared/components/ClickOutside'
+import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
+import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
+import DropdownButton from 'src/reusable_ui/components/dropdowns/DropdownButton'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+
+// Types
 import {
   ComponentColor,
   ComponentSize,
   IconFont,
   DropdownMenuColors,
 } from 'src/reusable_ui/types'
-import DropdownDivider from 'src/reusable_ui/components/dropdowns/DropdownDivider'
-import DropdownItem from 'src/reusable_ui/components/dropdowns/DropdownItem'
-import DropdownButton from 'src/reusable_ui/components/dropdowns/DropdownButton'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Styles
 import './Dropdown.scss'
 
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
 interface Props {
-  children: Array<JSX.Element | JSX.Element[]>
+  children: JSX.Element[]
   onChange: (value: any) => void
-  selectedItem: string
+  selectedItemKey: string
   color?: ComponentColor
   menuColor?: DropdownMenuColors
   size?: ComponentSize
@@ -68,7 +74,7 @@ class Dropdown extends Component<Props, State> {
       <ClickOutside onClickOutside={this.collapseMenu}>
         <div className={this.containerClassName} style={{width}}>
           {this.button}
-          {this.menu}
+          {this.menuItems}
         </div>
       </ClickOutside>
     )
@@ -93,24 +99,29 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get button(): JSX.Element {
-    const {selectedItem, disabled, color, size, icon} = this.props
+    const {selectedItemKey, disabled, color, size, icon, children} = this.props
     const {expanded} = this.state
+
+    const selectedChild = children.find(
+      child => child.props.itemKey === selectedItemKey
+    )
 
     return (
       <DropdownButton
-        label={selectedItem}
         active={expanded}
         color={color}
         size={size}
         icon={icon}
         disabled={disabled}
         onClick={this.toggleMenu}
-      />
+      >
+        {selectedChild.props.children}
+      </DropdownButton>
     )
   }
 
-  private get menu(): JSX.Element {
-    const {selectedItem, maxMenuHeight, menuColor} = this.props
+  private get menuItems(): JSX.Element {
+    const {selectedItemKey, maxMenuHeight, menuColor, children} = this.props
     const {expanded} = this.state
 
     if (expanded) {
@@ -125,11 +136,11 @@ class Dropdown extends Component<Props, State> {
             maxHeight={maxMenuHeight}
           >
             <div className="dropdown--menu">
-              {this.flatChildren.map((child: JSX.Element) =>
+              {React.Children.map(children, (child: JSX.Element) =>
                 React.cloneElement(child, {
                   ...child.props,
-                  key: `dropdown-menu--${child.props.text}`,
-                  selected: child.props.text === selectedItem,
+                  key: child.props.itemKey,
+                  selected: child.props.itemKey === selectedItemKey,
                   onClick: this.handleItemClick,
                 })
               )}
@@ -140,21 +151,6 @@ class Dropdown extends Component<Props, State> {
     }
 
     return null
-  }
-
-  private get flatChildren() {
-    const children = React.Children.toArray(this.props.children)
-
-    const childrenWithoutFragments = children.map((child: JSX.Element) => {
-      if (child.type === Fragment) {
-        const childArray = React.Children.toArray(child.props.children)
-        return childArray
-      }
-
-      return child
-    })
-
-    return _.flattenDeep(childrenWithoutFragments)
   }
 
   private get menuStyle(): CSSProperties {
