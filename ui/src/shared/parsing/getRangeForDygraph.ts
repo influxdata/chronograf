@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import {RuleValues} from 'src/types'
+import {TriggerValues} from 'src/types'
 
 const ADD_FACTOR = 1.1
 const SUB_FACTOR = 0.9
@@ -17,10 +17,10 @@ const considerEmpty = (userNumber, num) => {
 const getRange = (
   timeSeries,
   userSelectedRange = [null, null],
-  ruleValues?: RuleValues
+  ruleValues?: TriggerValues
 ): [number, number] => {
   if (!ruleValues) {
-    ruleValues = {value: null, rangeValue: null, operator: ''}
+    ruleValues = {value: null, rangeValue: null, operator: null}
   }
 
   const {value, rangeValue, operator} = ruleValues

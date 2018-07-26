@@ -1,5 +1,5 @@
 import {QueryConfig} from './'
-import {AlertTypes} from 'src/kapacitor/constants'
+import {AlertTypes, ThresholdOperators} from 'src/kapacitor/constants'
 
 export interface Kapacitor {
   id?: string
@@ -190,12 +190,12 @@ interface OpsGenie {
 interface Talk { } // tslint:disable-line
 
 // TriggerValues specifies the alerting logic for a specific trigger type
-interface TriggerValues {
+export interface TriggerValues {
   change?: string
   period?: string
   shift?: string
-  operator?: string
-  value?: string
+  operator?: ThresholdOperators
+  value?: number
   rangeValue: string
 }
 
@@ -406,12 +406,6 @@ export type ServiceProperties =
   | VictorOpsProperties
 
 export type SpecificConfigOptions = Partial<SlackProperties>
-
-export interface RuleValues {
-  value?: string | null
-  rangeValue?: string | null
-  operator?: string
-}
 
 export interface LogItem {
   key: string
