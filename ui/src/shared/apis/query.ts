@@ -82,16 +82,23 @@ export const replace = async (
 ): Promise<string> => {
   try {
     query = replaceTemplates(query, templates)
-
-    if (query.includes(TEMP_VAR_INTERVAL)) {
-      const durationMs = await duration(query, source)
-      return replaceInterval(query, Math.floor(resolution / 3), durationMs)
-    } else {
-      return query
-    }
+    return replaceIntervalAsync(query, source, resolution)
   } catch (error) {
     console.error(error)
     throw error
+  }
+}
+
+const replaceIntervalAsync = async (
+  query: string,
+  source: Source,
+  resolution: number
+): Promise<string> => {
+  if (query.includes(TEMP_VAR_INTERVAL)) {
+    const durationMs = await duration(query, source)
+    return replaceInterval(query, Math.floor(resolution / 3), durationMs)
+  } else {
+    return query
   }
 }
 
