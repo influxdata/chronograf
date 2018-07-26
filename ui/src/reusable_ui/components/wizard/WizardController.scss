@@ -1,0 +1,29 @@
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
+
+.wizard-step-title {
+  text-align: center;
+  @include no-user-select();
+}
+
+.wizard-controller {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wizard-skip-link {
+  flex-shrink: 0;
+}
+
+.wizard-tip-text {
+  min-width: 100%;
+  color: $g12-forge;
+  text-align: center;
+  p {
+    font-weight: 600;
+  }
+}

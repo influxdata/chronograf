@@ -1,0 +1,16 @@
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
+
+.wizard-container {
+  padding: 30px;
+  display: flex;
+  border-radius: $radius;
+  max-height: 60vh;
+  min-width: 800px;
+  background-color: $g1-raven;
+}
+
+.wizard-title {
+  margin-top: $ix-marg-c;
+}
