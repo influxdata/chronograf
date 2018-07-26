@@ -2,7 +2,8 @@ import React, {PureComponent} from 'react'
 import ProgressConnector from 'src/reusable_ui/components/wizard/ProgressConnector'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {Step, ConnectorState, StepStatus} from 'src/types/wizard'
+import {Step} from 'src/types/wizard'
+import {ConnectorState, StepStatus} from 'src/reusable_ui/constants/wizard'
 
 import 'src/reusable_ui/components/wizard/WizardProgressBar.scss'
 

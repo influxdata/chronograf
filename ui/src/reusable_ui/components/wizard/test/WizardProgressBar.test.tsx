@@ -4,7 +4,7 @@ import {shallow} from 'enzyme'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 import ProgressConnector from 'src/reusable_ui/components/wizard/ProgressConnector'
 
-import {StepStatus} from 'src/types/wizard'
+import {StepStatus} from 'src/reusable_ui/constants/wizard'
 
 describe('Wizard Progress Bar', () => {
   let wrapper

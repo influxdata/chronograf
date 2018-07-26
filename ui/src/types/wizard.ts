@@ -1,4 +1,5 @@
 import {ReactNode} from 'react'
+import {StepStatus} from 'src/reusable_ui/constants/wizard'
 
 export interface WizardStepProps {
   children: ReactNode
@@ -12,18 +13,6 @@ export interface WizardStepProps {
   nextLabel?: string
   previousLabel?: string
   lastStep?: boolean
-}
-
-export enum ConnectorState {
-  None = 'none',
-  Some = 'some',
-  Full = 'full',
-}
-
-export enum StepStatus {
-  Incomplete = 'circle-thick',
-  Complete = 'checkmark',
-  Error = 'remove',
 }
 
 export interface Step {

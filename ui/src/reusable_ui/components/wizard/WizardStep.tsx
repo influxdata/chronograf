@@ -51,7 +51,9 @@ class WizardStep extends PureComponent<Props> {
     if (onPrevious) {
       await onPrevious()
     }
-    decrement()
+    if (decrement) {
+      decrement()
+    }
   }
 
   private handleClickNext = async () => {
@@ -59,7 +61,9 @@ class WizardStep extends PureComponent<Props> {
     if (onNext) {
       await onNext()
     }
-    increment()
+    if (increment) {
+      increment()
+    }
   }
 }
 
