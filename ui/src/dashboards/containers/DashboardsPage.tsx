@@ -35,6 +35,7 @@ import {DashboardFile, Cell} from 'src/types/dashboards'
 
 interface Props {
   source: Source
+  sources: Source[]
   router: InjectedRouter
   handleGetDashboards: () => Dashboard[]
   handleGetChronografVersion: () => string
@@ -122,8 +123,22 @@ class DashboardsPage extends PureComponent<Props> {
   private modifyDashboardForDownload = async (
     dashboard: Dashboard
   ): Promise<DashboardFile> => {
+    const {sources} = this.props
+    const sourceMappings = _.reduce(
+      sources,
+      (acc, s) => {
+        const {name, id, links} = s
+        const link = _.get(links, 'self', '')
+        acc[id] = {name, link}
+        return acc
+      },
+      {}
+    )
     const version = await this.props.handleGetChronografVersion()
-    return {meta: {chronografVersion: version}, dashboard}
+    return {
+      meta: {chronografVersion: version, sources: sourceMappings},
+      dashboard,
+    }
   }
 
   private handleImportDashboard = async (
@@ -144,9 +159,10 @@ class DashboardsPage extends PureComponent<Props> {
   }
 }
 
-const mapStateToProps = ({dashboardUI: {dashboards, dashboard}}) => ({
+const mapStateToProps = ({dashboardUI: {dashboards, dashboard}, sources}) => ({
   dashboards,
   dashboard,
+  sources,
 })
 
 const mapDispatchToProps = {

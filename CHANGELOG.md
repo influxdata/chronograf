@@ -1,5 +1,9 @@
 ## v1.6.1 [unreleased]
 
+### Features
+
+1.  [#4033](https://github.com/influxdata/chronograf/pull/4033): Include sources id, links, and names in dashboard export
+
 ### UI Improvements
 1.  [#4009](https://github.com/influxdata/chronograf/pull/4009): Make it to get mouse into hover legend
 
