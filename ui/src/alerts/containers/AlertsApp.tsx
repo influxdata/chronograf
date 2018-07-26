@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 
 import AlertsTable from 'src/alerts/components/AlertsTable'
 import NoKapacitorError from 'src/shared/components/NoKapacitorError'
-import CustomTimeRangeDropdown from 'src/shared/components/CustomTimeRangeDropdown'
+import CalendarDropdown from 'src/shared/components/dropdown_calendar/CalendarDropdown'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -115,8 +115,8 @@ class AlertsApp extends PureComponent<Props, State> {
     const {timeRange} = this.state
 
     return (
-      <CustomTimeRangeDropdown
-        onApplyTimeRange={this.handleApplyTime}
+      <CalendarDropdown
+        onCalendarUpdated={this.handleCalendarUpdated}
         timeRange={timeRange}
       />
     )
@@ -194,7 +194,7 @@ class AlertsApp extends PureComponent<Props, State> {
     )
   }
 
-  private handleApplyTime = (timeRange: TimeRange): void => {
+  private handleCalendarUpdated = (timeRange: TimeRange): void => {
     this.setState({timeRange})
   }
 }

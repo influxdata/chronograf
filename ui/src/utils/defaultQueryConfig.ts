@@ -1,6 +1,6 @@
 import uuid from 'uuid'
 
-import {NULL_STRING} from 'src/shared/constants/queryFillOptions'
+import {FillQueryTypes} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 import {QueryConfig} from 'src/types'
 
 interface DefaultQueryArgs {
@@ -29,7 +29,9 @@ const defaultQueryConfig = (
     fill: null,
   }
 
-  return isKapacitorRule ? queryConfig : {...queryConfig, fill: NULL_STRING}
+  return isKapacitorRule
+    ? queryConfig
+    : {...queryConfig, fill: FillQueryTypes.NullString}
 }
 
 export default defaultQueryConfig

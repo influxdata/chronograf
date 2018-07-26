@@ -15,8 +15,8 @@ import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
 import ResizeContainer from 'src/shared/components/ResizeContainer'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import ManualRefresh from 'src/shared/components/ManualRefresh'
-import AutoRefreshDropdown from 'src/shared/components/AutoRefreshDropdown'
-import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
+import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
+import TimeRangeDropdown from 'src/shared/components/dropdown_time_range/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import AutoRefresh from 'src/utils/AutoRefresh'
@@ -219,14 +219,13 @@ export class DataExplorer extends PureComponent<Props, State> {
           Write Data
         </div>
         <AutoRefreshDropdown
-          iconName="refresh"
           selected={autoRefresh}
           onChoose={handleChooseAutoRefresh}
           onManualRefresh={onManualRefresh}
         />
         <TimeRangeDropdown
           selected={timeRange}
-          page="DataExplorer"
+          disableNowButton={true}
           onChooseTimeRange={this.handleChooseTimeRange}
         />
       </>

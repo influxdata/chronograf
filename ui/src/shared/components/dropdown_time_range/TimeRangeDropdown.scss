@@ -1,0 +1,19 @@
+/*
+  Absolute Time Range Picker
+  ------------------------------------------------------------------------------
+*/
+
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
+
+.time-range-dropdown {
+  position: relative;
+}
+
+.time-range-dropdown--custom {
+  position: absolute;
+  top: calc(100% + 22px);
+  right:0;
+  z-index: 999;
+}

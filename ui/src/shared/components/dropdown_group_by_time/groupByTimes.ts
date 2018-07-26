@@ -1,6 +1,12 @@
 import {TEMP_VAR_INTERVAL} from 'src/shared/constants'
 
-const groupByTimes = [
+export interface GroupByTimeOption {
+  defaultTimeBound: string
+  seconds: number
+  menuOption: string
+}
+
+const groupByTimes: GroupByTimeOption[] = [
   {defaultTimeBound: TEMP_VAR_INTERVAL, seconds: 604800, menuOption: 'auto'},
   {defaultTimeBound: 'now() - 5m', seconds: 10, menuOption: '10s'},
   {defaultTimeBound: 'now() - 15m', seconds: 60, menuOption: '1m'},

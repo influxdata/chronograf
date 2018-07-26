@@ -3,7 +3,9 @@ import _ from 'lodash'
 
 import HandlerOptions from 'src/kapacitor/components/HandlerOptions'
 import HandlerTabs from 'src/kapacitor/components/HandlerTabs'
-import Dropdown from 'src/shared/components/Dropdown'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
+
 import {parseHandlersFromRule} from 'src/shared/parsing/parseHandlersFromRule'
 
 import {DEFAULT_HANDLERS, AlertTypes} from 'src/kapacitor/constants'
@@ -98,7 +100,7 @@ class RuleHandlers extends PureComponent<Props, State> {
     )
 
     const separator = {
-      type: AlertTypes.seperator,
+      type: AlertTypes.separator,
       enabled: true,
       text: 'SEPARATOR',
     }
@@ -128,12 +130,14 @@ class RuleHandlers extends PureComponent<Props, State> {
           <div className={ruleSectionClassName}>
             <p>Send this Alert to:</p>
             <Dropdown
-              items={handlers}
-              menuClass="dropdown-malachite"
-              selected={dropdownLabel}
-              onChoose={this.handleAddHandler}
-              className="dropdown-170 rule-message--add-endpoint"
-            />
+              width={170}
+              customClass="rule-message--add-endpoint"
+              selectedItem={dropdownLabel}
+              onChange={this.handleAddHandler}
+              menuColor={DropdownMenuColors.Malachite}
+            >
+              {this.dropdownMenuItems(handlers)}
+            </Dropdown>
           </div>
           {mappedHandlersOnThisAlert.length ? (
             <div className="rule-message--endpoints">
@@ -156,6 +160,24 @@ class RuleHandlers extends PureComponent<Props, State> {
         </div>
       </div>
     )
+  }
+
+  private dropdownMenuItems = (handlers: HandlerWithText[]): JSX.Element[] => {
+    return handlers.map(option => {
+      if (option.type === AlertTypes.separator) {
+        return (
+          <Dropdown.Divider key={`alert-handlers-dropdown-${option.text}`} />
+        )
+      }
+
+      return (
+        <Dropdown.Item
+          key={`alert-handlers-dropdown-${option.text}`}
+          text={option.text}
+          value={option}
+        />
+      )
+    })
   }
 
   private handleChooseHandler = (ep: HandlerWithText): (() => void) => () => {

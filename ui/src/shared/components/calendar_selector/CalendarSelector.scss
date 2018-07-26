@@ -1,85 +1,107 @@
 /*
-  Custom Time Range Dropdown
-  ------------------------------------------------------
+  Calendar Selector
+  ------------------------------------------------------------------------------
 */
 
-.custom-time-range {
-  position: relative;
-}
-.custom-time--container {
-  display: none;
-  position: absolute;
-  flex-direction: row;
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
+@import 'src/style/fonts/fonts';
+
+$rd-arrow-button: 30px;
+$rd-cell-size: 30px;
+$rd-tiny-gap: 2px;
+$rd-background-color: $g4-onyx;
+
+$rd-mask-z: 2;
+$rd-now-z: $rd-mask-z + 1;
+
+.calendar-selector {
+  display: flex;
   align-items: stretch;
-  top: 35px;
-  right: 0;
   border-radius: $radius;
-  z-index: 1000;
   @extend %drop-shadow;
 }
-.custom-time--wrap,
-.custom-time--moving-dates {
+
+.calendar-selector--wrap,
+.calendar-selector--moving-dates {
   display: flex;
   flex-direction: column;
 }
-.custom-time--wrap {
-  padding: 8px;
+
+.calendar-selector--container {
+  padding: $ix-marg-c $ix-marg-b;
   align-items: center;
-  border-radius: 0 $radius $radius 0;
-  background: $g5-pepper;
+  display: flex;
+  flex-direction: column;
+  border-radius: $radius;
+  background: $rd-background-color;
+
+  .calendar-selector--shortcuts + & {
+    border-radius: 0 $radius $radius 0;
+  }
 }
-.custom-time--dates {
+
+.calendar-selector--dates {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 }
-.custom-time--upper-container,
-.custom-time--lower-container {
+
+.calendar-selector--month {
   position: relative;
+  margin: 0 $ix-marg-b;
 }
-.custom-time--lower {
-  margin-right: 4px;
+
+input.form-control.calendar-selector--input {
   text-align: center;
+  margin: 0 $rd-tiny-gap;
+  margin-bottom: $ix-marg-b;
+  width: calc(100% - #{$rd-tiny-gap * 2});
 }
-.custom-time--upper {
-  margin-left: 4px;
-  text-align: center;
-}
-.custom-time--mask {
+
+.calendar-selector--mask {
   position: absolute;
   width: 100%;
-  height: calc(100% - 30px);
-  top: 30px;
+  height: 100%;
+  top: 0;
   left: 0;
   opacity: 0.5;
-  background-color: $g5-pepper;
-  z-index: 2;
+  background-color: $rd-background-color;
+  z-index: $rd-mask-z;
 }
-.custom-time--now {
-  position: absolute !important;
-  right: 0;
+
+.calendar-selector--now {
+  position: absolute;
+  z-index: $rd-now-z;
+  right: 6px;
   top: 4px;
 }
-.custom-time--shortcuts {
+
+.calendar-selector--shortcuts {
   @include no-user-select();
   align-items: stretch;
-  background-color: $g6-smoke;
+  background-color: $g5-pepper;
   border-radius: $radius 0 0 $radius;
+  font-size: $form-sm-font;
 }
-.custom-time--shortcuts-header {
+
+.calendar-selector--shortcuts-header {
   white-space: nowrap;
-  padding: 16px;
+  padding: $ix-marg-c $ix-marg-b;
   color: $g15-platinum;
+  line-height: $form-sm-height;
   font-weight: 700;
 }
-.custom-time--shortcut {
+
+.calendar-selector--shortcut {
   white-space: nowrap;
-  padding: 6px 16px;
+  padding: 6px $ix-marg-b;
   transition:
     color 0.25s ease,
     background-color 0.25s ease;
   color: $g11-sidewalk;
-  font-weight: 500;
+  font-weight: 600;
 
   &:hover {
     cursor: pointer;
@@ -88,32 +110,48 @@
   }
 }
 
-$custom-time-arrow: 28px;
-$rd-cell-size: 30px;
+.calendar-selector--apply {
+  margin-top: $ix-marg-c;
+  width: 210px;
+}
 
-.rd-container {
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-}
+/*
+  Styles for Rome.js calendar widget
+  ------------------------------------------------------------------------------
+*/
+
 .rd-date {
-  position: relative;
+  display: flex;
 }
+.rd-month {
+  display: flex;
+  flex-wrap: wrap;
+}
+.rd-back {
+  order: 1;
+}
+.rd-month-label {
+  order: 2;
+}
+.rd-next {
+  order: 3;
+}
+
 .rd-back,
 .rd-next,
 .rd-month-label {
-  position: absolute;
-  top: 0;
-  height: $custom-time-arrow;
-  line-height: $custom-time-arrow;
+  height: $rd-arrow-button;
+  line-height: $rd-arrow-button;
 }
+
 .rd-back,
 .rd-next {
+  position: relative;
   outline: none;
-  width: $custom-time-arrow;
+  width: $rd-arrow-button;
   border: 0;
-  background-color: transparent;
-  border-radius: 50%;
+  background-color: $g5-pepper;
+  border-radius: $radius;
   color: $g15-platinum;
   transition: background-color 0.25s ease, color 0.25s ease;
 
@@ -125,40 +163,44 @@ $rd-cell-size: 30px;
     color: inherit;
     position: absolute;
     top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     font-size: 16px;
-  }
+  } 
+
   &:hover {
     cursor: pointer;
     background-color: $g6-smoke;
     color: $g20-white;
   }
 }
+
 .rd-back {
-  left: 0;
-  &:after {
-    left: calc(50% - 1px);
-    content: "\e901";
-  }
+  margin-left: $rd-tiny-gap;
 }
+.rd-back:after {
+  content: "\e901";
+}
+
 .rd-next {
-  left: calc(100% - #{$custom-time-arrow});
-  &:after {
-    left: calc(50% + 1px);
-    content: "\e903";
-  }
+  margin-right: $rd-tiny-gap;
 }
+.rd-next:after {
+  content: "\e903";
+}
+
 .rd-month-label {
+  @include no-user-select();
   font-weight: 600;
   color: $g15-platinum;
-  left: $custom-time-arrow;
   text-align: center;
-  @include no-user-select();
-  width: calc(100% - #{($custom-time-arrow * 2)});
+  width: calc(100% - #{($rd-arrow-button + $rd-tiny-gap) * 2});
 }
+
 .rd-days {
-  font-size: 13px;
-  margin-top: ($custom-time-arrow + 8px);
+  order: 4;
+  font-size: $form-sm-font;
+  margin-top: $ix-marg-a;
   background-color: transparent;
   border-radius: $radius-small;
 
@@ -182,8 +224,9 @@ $rd-cell-size: 30px;
     border: 0 !important;
   }
   thead.rd-days-head th.rd-day-head {
+    @include no-user-select();
     color: $g15-platinum !important;
-    background-color: $g5-pepper !important;
+    background-color: $rd-background-color !important;
   }
   tbody.rd-days-body td.rd-day-body {
     @include no-user-select();
@@ -217,14 +260,16 @@ $rd-cell-size: 30px;
 }
 
 .rd-time {
-  margin: 0 2px;
-  width: calc(100% - 4px);
+  margin: 0 $rd-tiny-gap;
+  margin-top: $ix-marg-b + $rd-tiny-gap;
+  width: calc(100% - #{$rd-tiny-gap * 2});
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
+
 .rd-time-selected {
   @include no-user-select();
   height: 28px;
@@ -283,32 +328,4 @@ $rd-cell-size: 30px;
   }
 }
 
-.custom-time--container .btn.custom-time--apply {
-  margin-top: 8px;
-  width: 210px;
-}
 
-/* Open State */
-.custom-time-range.open {
-  .custom-time--container {
-    display: flex;
-  }
-  .custom-time-range--btn {
-    color: $g20-white !important;
-    background-color: $g6-smoke;
-  }
-}
-/* Custom positioning for dashboard use */
-.time-range-dropdown {
-  position: relative;
-}
-.custom-time--overlay {
-  position: absolute;
-  top: 0;
-  right: calc(100% + 4px);
-  z-index: 4;
-
-  .custom-time--container {
-    display: flex;
-  }
-}

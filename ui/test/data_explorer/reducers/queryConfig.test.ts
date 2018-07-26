@@ -21,7 +21,7 @@ import {
   ActionAddQuery,
 } from 'src/data_explorer/actions/view'
 
-import {LINEAR, NULL_STRING} from 'src/shared/constants/queryFillOptions'
+import {FillQueryTypes} from 'src/shared/components/dropdown_fill_query/fillQueryOptions'
 
 const fakeAddQueryAction = (queryID: string): ActionAddQuery => {
   return {
@@ -524,18 +524,18 @@ describe('Chronograf.Reducers.DataExplorer.queryConfigs', () => {
 
       const nextState = reducer(initialState, action)
 
-      expect(nextState[queryID].fill).toBe(NULL_STRING)
+      expect(nextState[queryID].fill).toBe(FillQueryTypes.NullString)
     })
 
     it('updates fill to non-null-string non-number string value', () => {
       const initialState = {
         [queryID]: buildInitialState(queryID),
       }
-      const action = fill(queryID, LINEAR)
+      const action = fill(queryID, FillQueryTypes.Linear)
 
       const nextState = reducer(initialState, action)
 
-      expect(nextState[queryID].fill).toBe(LINEAR)
+      expect(nextState[queryID].fill).toBe(FillQueryTypes.Linear)
     })
 
     it('updates fill to string integer value', () => {

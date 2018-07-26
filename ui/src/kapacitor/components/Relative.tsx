@@ -1,12 +1,14 @@
 import React, {SFC, ChangeEvent} from 'react'
 
 import {CHANGES, RELATIVE_OPERATORS, SHIFTS} from 'src/kapacitor/constants'
-import Dropdown from 'src/shared/components/Dropdown'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {AlertRule} from 'src/types'
 
 const mapToItems = (arr: string[], type: string) =>
   arr.map(text => ({text, type}))
+
 const changes = mapToItems(CHANGES, 'change')
 const shifts = mapToItems(SHIFTS, 'shift')
 const operators = mapToItems(RELATIVE_OPERATORS, 'operator')
@@ -31,28 +33,49 @@ const Relative: SFC<Props> = ({
   <div className="rule-section--row rule-section--row-first rule-section--border-bottom">
     <p>Send Alert when</p>
     <Dropdown
-      className="dropdown-110"
-      menuClass="dropdown-malachite"
-      items={changes}
-      selected={change}
-      onChoose={onDropdownChange}
-    />
+      width={110}
+      selectedItem={change}
+      onChange={onDropdownChange}
+      menuColor={DropdownMenuColors.Malachite}
+    >
+      {changes.map(option => (
+        <Dropdown.Item
+          key={`relative-changes-${option.text}`}
+          text={option.text}
+          value={option}
+        />
+      ))}
+    </Dropdown>
     <p>compared to previous</p>
     <Dropdown
-      className="dropdown-80"
-      menuClass="dropdown-malachite"
-      items={shifts}
-      selected={shift}
-      onChoose={onDropdownChange}
-    />
+      width={80}
+      selectedItem={shift}
+      onChange={onDropdownChange}
+      menuColor={DropdownMenuColors.Malachite}
+    >
+      {shifts.map(option => (
+        <Dropdown.Item
+          key={`relative-shifts-${option.text}`}
+          text={option.text}
+          value={option}
+        />
+      ))}
+    </Dropdown>
     <p>is</p>
     <Dropdown
-      className="dropdown-160"
-      menuClass="dropdown-malachite"
-      items={operators}
-      selected={operator}
-      onChoose={onDropdownChange}
-    />
+      width={160}
+      selectedItem={operator}
+      onChange={onDropdownChange}
+      menuColor={DropdownMenuColors.Malachite}
+    >
+      {operators.map(option => (
+        <Dropdown.Item
+          key={`relative-operators-${option.text}`}
+          text={option.text}
+          value={option}
+        />
+      ))}
+    </Dropdown>
     <form style={{display: 'flex'}}>
       <input
         className="form-control input-sm form-malachite monotype"

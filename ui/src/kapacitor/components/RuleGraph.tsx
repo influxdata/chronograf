@@ -4,7 +4,7 @@ import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 
 // Components
 import Dygraph from 'src/shared/components/Dygraph'
-import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
+import TimeRangeDropdown from 'src/shared/components/dropdown_time_range/TimeRangeDropdown'
 
 // Utils
 import buildInfluxQLQuery from 'src/utils/influxql'
@@ -17,6 +17,7 @@ import {LINE_COLORS_RULE_GRAPH} from 'src/shared/constants/graphColorPalettes'
 
 // Types
 import {Source, AlertRule, QueryConfig, Query, TimeRange} from 'src/types'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -48,6 +49,7 @@ class RuleGraph extends PureComponent<Props> {
         <div className="rule-builder--graph-options">
           <p>Preview Data from</p>
           <TimeRangeDropdown
+            menuColor={DropdownMenuColors.Malachite}
             onChooseTimeRange={onChooseTimeRange}
             selected={timeRange}
             preventCustomTimeRange={true}

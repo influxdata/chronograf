@@ -1,7 +1,9 @@
 import React, {Component, FormEvent, ChangeEvent} from 'react'
 
 import {THRESHOLD_OPERATORS} from 'src/kapacitor/constants'
-import Dropdown from 'src/shared/components/Dropdown'
+import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
+
 import {getDeep} from 'src/utils/wrappers'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -37,12 +39,19 @@ class Threshold extends Component<Props> {
         <span className="rule-builder--metric">{this.getField(query)}</span>
         <p>is</p>
         <Dropdown
-          className="dropdown-180"
-          menuClass="dropdown-malachite"
-          items={this.operators}
-          selected={operator}
-          onChoose={onDropdownChange}
-        />
+          width={180}
+          selectedItem={operator}
+          onChange={onDropdownChange}
+          menuColor={DropdownMenuColors.Malachite}
+        >
+          {this.operators.map(option => (
+            <Dropdown.Item
+              key={option.text}
+              text={option.text}
+              value={option}
+            />
+          ))}
+        </Dropdown>
         <form style={{display: 'flex'}} onSubmit={this.noopSubmit}>
           <input
             className="form-control input-sm form-malachite monotype"
@@ -60,7 +69,7 @@ class Threshold extends Component<Props> {
     )
   }
 
-  private get operators() {
+  private get operators(): TypeItem[] {
     const type = 'operator'
     return THRESHOLD_OPERATORS.map(text => {
       return {text, type}

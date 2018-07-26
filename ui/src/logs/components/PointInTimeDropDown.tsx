@@ -8,6 +8,7 @@ import {DROPDOWN_MENU_MAX_HEIGHT} from 'src/shared/constants/index'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import CustomSingularTime from 'src/shared/components/CustomSingularTime'
+import {dateFormat} from 'src/shared/utils/time'
 
 interface Props {
   customTime?: string
@@ -21,7 +22,6 @@ interface State {
   isTimeSelectorOpen: boolean
 }
 
-const dateFormat = 'YYYY-MM-DD HH:mm'
 const format = (t: string) => moment(t.replace(/\'/g, '')).format(dateFormat)
 
 @ErrorHandling

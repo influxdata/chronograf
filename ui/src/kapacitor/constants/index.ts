@@ -8,7 +8,7 @@ import {
 } from 'src/types/kapacitor'
 
 export enum AlertTypes {
-  seperator = '',
+  separator = '',
   alerta = 'alerta',
   hipchat = 'hipchat',
   httppost = 'httppost',

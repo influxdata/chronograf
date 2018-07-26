@@ -1,6 +1,10 @@
 import moment from 'moment'
 
-const dateFormat = 'YYYY-MM-DD HH:mm'
+export const dateFormat = 'YYYY-MM-DD HH:mm'
+
+export const formatTimeStamp = (timeStamp: string): string => {
+  return moment(timeStamp).format(dateFormat)
+}
 
 export const formatTimeRange = (timeRange: string | null): string => {
   if (!timeRange) {

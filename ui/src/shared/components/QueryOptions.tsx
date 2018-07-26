@@ -2,9 +2,10 @@ import React, {SFC} from 'react'
 
 import {GroupBy, TimeShift} from 'src/types'
 
-import GroupByTimeDropdown from 'src/data_explorer/components/GroupByTimeDropdown'
-import TimeShiftDropdown from 'src/shared/components/TimeShiftDropdown'
-import FillQuery from 'src/shared/components/FillQuery'
+import GroupByTimeDropdown from 'src/shared/components/dropdown_group_by_time/GroupByTimeDropdown'
+import TimeShiftDropdown from 'src/shared/components/dropdown_time_shift/TimeShiftDropdown'
+import FillQueryDropdown from 'src/shared/components/dropdown_fill_query/FillQueryDropdown'
+import {DropdownMenuColors} from 'src/reusable_ui/types'
 
 interface Props {
   fill: string
@@ -27,11 +28,17 @@ const QueryOptions: SFC<Props> = ({
   isKapacitorRule,
   isDisabled,
 }) => (
-  <div className="query-builder--groupby-fill-container">
+  <div className="query-builder--field-options">
     <GroupByTimeDropdown
       selected={groupBy.time}
       onChooseGroupByTime={onGroupByTime}
       isDisabled={isDisabled}
+      excludeAutoOption={isKapacitorRule}
+      menuColor={
+        isKapacitorRule
+          ? DropdownMenuColors.Malachite
+          : DropdownMenuColors.Sapphire
+      }
     />
     {isKapacitorRule ? null : (
       <TimeShiftDropdown
@@ -41,7 +48,11 @@ const QueryOptions: SFC<Props> = ({
       />
     )}
     {isKapacitorRule ? null : (
-      <FillQuery value={fill} onChooseFill={onFill} isDisabled={isDisabled} />
+      <FillQueryDropdown
+        selected={fill}
+        onChooseFill={onFill}
+        isDisabled={isDisabled}
+      />
     )}
   </div>
 )

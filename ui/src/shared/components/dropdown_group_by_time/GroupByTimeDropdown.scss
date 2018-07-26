@@ -1,0 +1,22 @@
+/*
+  Group By Time Dropdown
+  ------------------------------------------------------------------------------
+*/
+
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+
+.group-by-time {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.group-by-time--label {
+  white-space: nowrap;
+  margin: 0;
+  color: $g12-forge;
+  padding: 0 $ix-marg-a 0 $ix-marg-b;
+  font-size: $form-sm-font;
+  height: $form-sm-height;
+  line-height: $form-sm-height;
+}
