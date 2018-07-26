@@ -106,7 +106,9 @@ class FluxNew extends PureComponent<Props, State> {
       username: '',
       insecureSkipVerify: false,
       type: 'flux',
-      active: true,
+      metadata: {
+        active: true,
+      },
     }
   }
 

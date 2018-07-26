@@ -1,5 +1,6 @@
 import React, {PureComponent, ReactElement} from 'react'
 import {Link, withRouter, RouteComponentProps} from 'react-router'
+import _ from 'lodash'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
@@ -101,7 +102,10 @@ class ServiceDropdown extends PureComponent<
   }
 
   private get activeService(): Service {
-    return this.props.services.find(s => s.active)
+    const service = this.props.services.find(s =>
+      _.get(s, 'metadata.active', false)
+    )
+    return service || this.props.services[0]
   }
 
   private get selected(): string {
