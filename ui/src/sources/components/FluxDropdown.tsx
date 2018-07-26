@@ -21,9 +21,9 @@ interface FluxServiceItem {
   service: Service
 }
 
-class FluxDropdown extends PureComponent<
-  Props & RouteComponentProps<any, any>
-> {
+type FluxDropdownProps = Props & RouteComponentProps<any, any>
+
+export class FluxDropdown extends PureComponent<FluxDropdownProps> {
   public render() {
     const {source, router, deleteFlux} = this.props
 
@@ -33,6 +33,7 @@ class FluxDropdown extends PureComponent<
           <Link
             to={`/sources/${source.id}/flux/new`}
             className="btn btn-xs btn-default"
+            data-test="link"
           >
             <span className="icon plus" /> Add Flux Connection
           </Link>
@@ -47,6 +48,7 @@ class FluxDropdown extends PureComponent<
       >
         <Dropdown
           className="dropdown-260"
+          data-test="dropdown"
           buttonColor="btn-primary"
           buttonSize="btn-xs"
           items={this.fluxItems}
