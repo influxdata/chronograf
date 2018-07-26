@@ -79,7 +79,7 @@ class ManageSources extends PureComponent<Props> {
   private handleSetActiveFlux = async (source, service) => {
     const {services, setActiveFlux} = this.props
     const prevActiveService = services.find(s => {
-      return getDeep(s, 'metadata.active', false)
+      return getDeep<boolean>(s, 'metadata.active', false)
     })
     await setActiveFlux(source, service, prevActiveService)
   }

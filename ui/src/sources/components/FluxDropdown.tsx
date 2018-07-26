@@ -109,7 +109,7 @@ class FluxDropdown extends PureComponent<
   private get selected(): string {
     const {services} = this.props
     const service = services.find(s => {
-      return getDeep(s, 'metadata.active', false)
+      return getDeep<boolean>(s, 'metadata.active', false)
     })
     if (service) {
       return service.name

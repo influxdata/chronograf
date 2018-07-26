@@ -1,12 +1,12 @@
 import React, {PureComponent, ReactElement} from 'react'
 import {Link, withRouter, RouteComponentProps} from 'react-router'
-import _ from 'lodash'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 import {Source, Service} from 'src/types'
 import {SetActiveService} from 'src/shared/actions/services'
+import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
   source: Source
@@ -102,9 +102,9 @@ class ServiceDropdown extends PureComponent<
   }
 
   private get activeService(): Service {
-    const service = this.props.services.find(s =>
-      _.get(s, 'metadata.active', false)
-    )
+    const service = this.props.services.find(s => {
+      return getDeep<boolean>(s, 'metadata.active', false)
+    })
     return service || this.props.services[0]
   }
 

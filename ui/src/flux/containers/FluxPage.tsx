@@ -143,7 +143,7 @@ export class FluxPage extends PureComponent<Props, State> {
   private get service(): Service {
     const {services} = this.props
     const activeService = services.find(s => {
-      return getDeep(s, 'metadata.active', false)
+      return getDeep<boolean>(s, 'metadata.active', false)
     })
     return activeService || services[0]
   }
