@@ -27,12 +27,12 @@ class WizardStep extends PureComponent<Props> {
     return (
       <>
         <FancyScrollbar
-          className="step-content"
+          className="wizard-step-content"
           maxHeight={400}
           autoHeight={true}
           autoHide={false}
         >
-          <div className="step-child">{children}</div>
+          <div className="wizard-step-child">{children}</div>
         </FancyScrollbar>
         <WizardButtonBar
           decrement={decrement}

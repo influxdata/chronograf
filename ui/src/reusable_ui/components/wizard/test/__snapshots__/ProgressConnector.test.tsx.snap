@@ -2,18 +2,18 @@
 
 exports[`Progress Connector with status: all matches snapshot when provided "full" status 1`] = `
 <span
-  className="progress-connector progress-connector--full"
+  className="wizard-progress-connector wizard-progress-connector--full"
 />
 `;
 
 exports[`Progress Connector with status: some matches snapshot when provided "some" status 1`] = `
 <span
-  className="progress-connector progress-connector--some"
+  className="wizard-progress-connector wizard-progress-connector--some"
 />
 `;
 
 exports[`Progress Connector without Props matches snapshot when provided minimal props 1`] = `
 <span
-  className="progress-connector progress-connector--none"
+  className="wizard-progress-connector wizard-progress-connector--none"
 />
 `;

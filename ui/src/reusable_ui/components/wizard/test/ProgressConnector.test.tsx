@@ -7,15 +7,15 @@ import {ConnectorState} from 'src/reusable_ui/constants/wizard'
 describe('Progress Connector', () => {
   let wrapper
 
-  const expectedWithoutStatus = `progress-connector progress-connector--${
+  const expectedWithoutStatus = `wizard-progress-connector wizard-progress-connector--${
     ConnectorState.None
   }`
 
-  const expectedWithStatusSome = `progress-connector progress-connector--${
+  const expectedWithStatusSome = `wizard-progress-connector wizard-progress-connector--${
     ConnectorState.Some
   }`
 
-  const expectedWithStatusAll = `progress-connector progress-connector--${
+  const expectedWithStatusAll = `wizard-progress-connector wizard-progress-connector--${
     ConnectorState.Full
   }`
 

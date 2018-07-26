@@ -1,15 +1,16 @@
 @import 'src/style/modules/influx-colors';
 @import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
 
-.progress-bar {
-  display: flex;
+.wizard-progress-bar {
+  display: inline-flex;
   width: 100%;
   justify-content: center;
   align-items: center;
-  margin: 20px 0;
+  margin-bottom: $ix-marg-c;
 }
 
-.progress-button {
+.wizard-progress-button {
   position: relative;
   background-color: transparent;
   border: none;
@@ -17,7 +18,29 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  .progress-title {
+  padding: $ix-marg-b;
+  
+  .checkmark {
+    color: $c-rainforest;
+    transition: all .5s;
+  }
+
+  .circle-thick {
+    color: $g7-graphite;
+    transition: all .5s;
+  }
+
+  .current.circle-thick {
+    color: $c-pool;
+    transition: all .5s;
+  }
+
+  .remove {
+    color: $c-curacao;
+    transition: all .5s;
+  }
+
+  .wizard-progress-title {
     font-size: $ix-text-tiny;
     color: $g12-forge;
     opacity: 0;
@@ -25,30 +48,32 @@
     white-space: nowrap;
     margin-top: -$ix-marg-b;
     font-weight: 600;
+    pointer-events: none;
+    transition: all .5s;
+    @include no-user-select();
   }
 }
 
-.progress-button:hover {
-  .progress-title {
+.wizard-progress-button:hover {
+  .checkmark {
+    color: $c-honeydew;
+  }
+
+  .circle-thick {
+    color: $g12-forge;
+  }
+
+  .current.circle-thick {
+    color: $c-laser;
+  }
+
+  .remove {
+    color: $c-dreamsicle;
+  }
+
+  .wizard-progress-title {
     color: $g12-forge;
     opacity: 1;
     margin-top: -$ix-marg-c;
-    transition: all .5s;
   }
-}
-
-.checkmark:before {
-  color: $c-rainforest;
-}
-
-.circle-thick:before {
-  color: $g7-graphite;
-}
-
-.current.circle-thick:before {
-  color: $c-pool;
-}
-
-.remove:before {
-  color: $c-curacao;
 }

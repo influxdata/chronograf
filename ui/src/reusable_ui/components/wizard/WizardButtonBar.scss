@@ -1,8 +1,8 @@
 @import 'src/style/modules/variables';
 
-.button-bar {
+.wizard-button-bar {
   display: flex;
-  margin: $ix-marg-b auto;
+  margin: $ix-marg-b auto $ix-marg-c auto;
   position: relative;
   min-width: 100%;
   justify-content: center;
@@ -11,6 +11,6 @@
   .btn {
     position: relative;
     white-space: nowrap;
-    margin: 0 $ix-marg-c;
+    margin: 0 $ix-marg-a;
   }
 }

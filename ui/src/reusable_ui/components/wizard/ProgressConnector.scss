@@ -1,16 +1,15 @@
 @import 'src/style/modules/influx-colors';
 
-.progress-connector {
+.wizard-progress-connector {
   width: 50px;
   height: 2px;
   background-color: $g7-graphite;
   position: relative;
   display: inline-block;
-  margin: 0 10px;
   border-radius: 2px;
 }
 
-.progress-connector:after {
+.wizard-progress-connector:after {
   content: '\A';
   position: absolute;
   background-color: $c-rainforest;
@@ -22,14 +21,14 @@
   transition: all 0.5s;
 }
 
-.progress-connector--none:after {
+.wizard-progress-connector--none:after {
   width: 0;
 }
 
-.progress-connector--some:after {
+.wizard-progress-connector--some:after {
   width: 50%;
 }
 
-.progress-connector--full:after {
+.wizard-progress-connector--full:after {
   width: 100%;
 }

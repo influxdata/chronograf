@@ -2,7 +2,7 @@
 
 exports[`WizardButtonBar matches snapshot when provided minimal props 1`] = `
 <div
-  className="button-bar"
+  className="wizard-button-bar"
 >
   <button
     className="btn btn-md btn-primary"
@@ -15,7 +15,7 @@ exports[`WizardButtonBar matches snapshot when provided minimal props 1`] = `
 
 exports[`WizardButtonBar with decrement and last step is "true" matches snapshot when provided decrement function and last step as "true" 1`] = `
 <div
-  className="button-bar"
+  className="wizard-button-bar"
 >
   <button
     className="btn btn-md btn-default"

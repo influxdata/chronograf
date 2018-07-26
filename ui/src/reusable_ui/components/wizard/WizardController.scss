@@ -1,12 +1,13 @@
 @import 'src/style/modules/influx-colors';
 @import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
 
-.step-title {
+.wizard-step-title {
   text-align: center;
-  font-size: $ix-text-base-2;
+  @include no-user-select();
 }
 
-.wizard-cloak {
+.wizard-controller {
   display: flex;
   flex-direction: column;
   min-width: 100%;
@@ -14,14 +15,15 @@
   align-items: center;
 }
 
-.skip-link {
-  color: $g7-graphite;
-  text-decoration: underline;
-  text-align: center;
+.wizard-skip-link {
+  flex-shrink: 0;
 }
 
-.tip-text {
+.wizard-tip-text {
   min-width: 100%;
   color: $g12-forge;
   text-align: center;
+  p {
+    font-weight: 600;
+  }
 }

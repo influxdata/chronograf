@@ -60,9 +60,9 @@ class WizardController extends PureComponent<Props, State> {
     const currentChild = this.CurrentChild
 
     return (
-      <div className="wizard-cloak">
+      <div className="wizard-controller">
         <div className="progress-header">
-          <h2 className="step-title">{currentChild.props.title}</h2>
+          <h3 className="wizard-step-title">{currentChild.props.title}</h3>
           <WizardProgressBar
             handleJump={this.jumpToStep}
             steps={steps}
@@ -137,7 +137,7 @@ class WizardController extends PureComponent<Props, State> {
 
     if (tipText) {
       return (
-        <div className="tip-text">
+        <div className="wizard-tip-text">
           <p>{tipText}</p>
         </div>
       )
@@ -150,9 +150,12 @@ class WizardController extends PureComponent<Props, State> {
 
     if (handleSkip) {
       return (
-        <p className="skip-link">
-          <a onClick={handleSkip}> {skipLinkText}</a>
-        </p>
+        <button
+          className="btn btn-xs btn-primary btn-link wizard-skip-link"
+          onClick={handleSkip}
+        >
+          {skipLinkText}
+        </button>
       )
     }
     return null

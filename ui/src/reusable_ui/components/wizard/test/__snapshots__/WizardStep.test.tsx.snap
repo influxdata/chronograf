@@ -5,13 +5,13 @@ exports[`WizardStep matches snapshot 1`] = `
   <FancyScrollbar
     autoHeight={true}
     autoHide={false}
-    className="step-content"
+    className="wizard-step-content"
     maxHeight={400}
     setScrollTop={[Function]}
     style={Object {}}
   >
     <div
-      className="step-child"
+      className="wizard-step-child"
     >
       this is a text
     </div>

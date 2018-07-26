@@ -2,15 +2,15 @@
 
 exports[`Wizard Progress Bar when no steps are complete matches snapshot 1`] = `
 <div
-  className="progress-bar"
+  className="wizard-progress-bar"
 >
   <React.Fragment>
     <div
-      className="progress-button"
+      className="wizard-progress-button"
       key="stepEle0"
     >
       <div
-        className="progress-title"
+        className="wizard-progress-title"
       >
         this is step1
       </div>
@@ -22,11 +22,11 @@ exports[`Wizard Progress Bar when no steps are complete matches snapshot 1`] = `
       key="connectorEle1"
     />
     <div
-      className="progress-button"
+      className="wizard-progress-button"
       key="stepEle1"
     >
       <div
-        className="progress-title"
+        className="wizard-progress-title"
       >
         this is step2
       </div>
@@ -38,11 +38,11 @@ exports[`Wizard Progress Bar when no steps are complete matches snapshot 1`] = `
       key="connectorEle2"
     />
     <div
-      className="progress-button"
+      className="wizard-progress-button"
       key="stepEle2"
     >
       <div
-        className="progress-title"
+        className="wizard-progress-title"
       >
         this is step3
       </div>
@@ -56,15 +56,15 @@ exports[`Wizard Progress Bar when no steps are complete matches snapshot 1`] = `
 
 exports[`Wizard Progress Bar when the first two steps are completed matches snapshot 1`] = `
 <div
-  className="progress-bar"
+  className="wizard-progress-bar"
 >
   <React.Fragment>
     <div
-      className="progress-button"
+      className="wizard-progress-button"
       key="stepEle0"
     >
       <div
-        className="progress-title"
+        className="wizard-progress-title"
       >
         this is step1
       </div>
@@ -77,11 +77,11 @@ exports[`Wizard Progress Bar when the first two steps are completed matches snap
       status="full"
     />
     <div
-      className="progress-button"
+      className="wizard-progress-button"
       key="stepEle1"
     >
       <div
-        className="progress-title"
+        className="wizard-progress-title"
       >
         this is step2
       </div>
@@ -94,11 +94,11 @@ exports[`Wizard Progress Bar when the first two steps are completed matches snap
       status="some"
     />
     <div
-      className="progress-button"
+      className="wizard-progress-button"
       key="stepEle2"
     >
       <div
-        className="progress-title"
+        className="wizard-progress-title"
       >
         this is step3
       </div>

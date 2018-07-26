@@ -16,7 +16,7 @@ interface Props {
 @ErrorHandling
 class WizardProgressBar extends PureComponent<Props> {
   public render() {
-    return <div className="progress-bar">{this.WizardProgress}</div>
+    return <div className="wizard-progress-bar">{this.WizardProgress}</div>
   }
 
   private get WizardProgress(): JSX.Element {
@@ -33,10 +33,10 @@ class WizardProgressBar extends PureComponent<Props> {
       const stepEle = (
         <div
           key={`stepEle${i}`}
-          className="progress-button"
+          className="wizard-progress-button"
           onClick={handleJump(i)}
         >
-          <div className="progress-title">{step.title}</div>
+          <div className="wizard-progress-title">{step.title}</div>
           <span className={`icon ${currentStep || stepStatus}`} />
         </div>
       )

@@ -2,16 +2,16 @@
 
 exports[`WizardController with multiple children matches snapshot with two children 1`] = `
 <div
-  className="wizard-cloak"
+  className="wizard-controller"
 >
   <div
     className="progress-header"
   >
-    <h2
-      className="step-title"
+    <h3
+      className="wizard-step-title"
     >
       wizard step 1
-    </h2>
+    </h3>
     <WizardProgressBar
       currentStepIndex={0}
       handleJump={[Function]}
@@ -45,16 +45,16 @@ exports[`WizardController with multiple children matches snapshot with two child
 
 exports[`WizardController with multiple children with first step complete matches snapshot with first step complete 1`] = `
 <div
-  className="wizard-cloak"
+  className="wizard-controller"
 >
   <div
     className="progress-header"
   >
-    <h2
-      className="step-title"
+    <h3
+      className="wizard-step-title"
     >
       wizard step 2
-    </h2>
+    </h3>
     <WizardProgressBar
       currentStepIndex={1}
       handleJump={[Function]}
@@ -87,16 +87,16 @@ exports[`WizardController with multiple children with first step complete matche
 
 exports[`WizardController with no children matches snapshot with one child 1`] = `
 <div
-  className="wizard-cloak"
+  className="wizard-controller"
 >
   <div
     className="progress-header"
   >
-    <h2
-      className="step-title"
+    <h3
+      className="wizard-step-title"
     >
       only wizard step
-    </h2>
+    </h3>
     <WizardProgressBar
       currentStepIndex={0}
       handleJump={[Function]}
