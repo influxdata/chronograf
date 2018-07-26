@@ -5,21 +5,11 @@ import EmptyQuery from 'src/shared/components/EmptyQuery'
 import QueryTabList from 'src/shared/components/QueryTabList'
 import InfluxQLEditor from 'src/dashboards/components/InfluxQLEditor'
 import SchemaExplorer from 'src/shared/components/SchemaExplorer'
-import {buildQuery} from 'src/utils/influxql'
-import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
-import {TEMPLATE_RANGE} from 'src/tempVars/constants'
 
-import {QueryConfig, Source, SourceLinks, TimeRange, Template} from 'src/types'
+import {buildText, rawTextBinder} from 'src/dashboards/utils/queryMaker'
+
+import {QueryConfig, Source, TimeRange, Template} from 'src/types'
 import {CellEditorOverlayActions} from 'src/dashboards/components/CellEditorOverlay'
-
-const rawTextBinder = (
-  links: SourceLinks,
-  id: string,
-  action: (linksQueries: string, id: string, text: string) => void
-) => (text: string) => action(links.queries, id, text)
-
-const buildText = (q: QueryConfig): string =>
-  q.rawText || buildQuery(TYPE_QUERY_CONFIG, q.range || TEMPLATE_RANGE, q) || ''
 
 interface Props {
   source: Source
@@ -63,7 +53,7 @@ const QueryMaker: SFC<Props> = ({
           query={buildText(activeQuery)}
           config={activeQuery}
           onUpdate={rawTextBinder(
-            source.links,
+            source,
             activeQuery.id,
             actions.editRawTextAsync
           )}
