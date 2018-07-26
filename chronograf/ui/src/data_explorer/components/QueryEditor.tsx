@@ -40,6 +40,7 @@ class QueryEditor extends PureComponent<Props, State> {
   public render() {
     const {
       config: {status},
+      query,
     } = this.props
     const {value} = this.state
 
@@ -53,6 +54,8 @@ class QueryEditor extends PureComponent<Props, State> {
       completeSingle: false,
       lineWrapping: true,
     }
+
+    const isSubmitted = query === value
 
     return (
       <div className="query-editor">
@@ -73,7 +76,7 @@ class QueryEditor extends PureComponent<Props, State> {
         <div className={this.varmojiClassName}>
           <div className="varmoji-container">
             <div className="varmoji-front">
-              <QueryStatus status={status}>
+              <QueryStatus status={status} isSubmitted={isSubmitted}>
                 <Dropdown
                   items={QUERY_TEMPLATES}
                   selected="Query Templates"
