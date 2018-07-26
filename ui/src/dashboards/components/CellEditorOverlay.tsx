@@ -14,7 +14,6 @@ import CEOBottom from 'src/dashboards/components/CEOBottom'
 
 // APIs
 import {getQueryConfigAndStatus} from 'src/shared/apis'
-import {replace as replaceTempVars} from 'src/shared/apis/query'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -22,6 +21,7 @@ import * as queryTransitions from 'src/utils/queryTransitions'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import {buildQuery} from 'src/utils/influxql'
 import {nextSource} from 'src/dashboards/utils/sources'
+import replaceTemplate, {replaceInterval} from 'src/tempVars/utils/replace'
 import {editCellQueryStatus} from 'src/dashboards/actions'
 
 // Constants
@@ -33,6 +33,7 @@ import {
   AUTO_GROUP_BY,
   PREDEFINED_TEMP_VARS,
   TEMP_VAR_DASHBOARD_TIME,
+  DEFAULT_DURATION_MS,
   DEFAULT_PIXELS,
 } from 'src/shared/constants'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
@@ -46,7 +47,7 @@ import {Template} from 'src/types/tempVars'
 
 type QueryTransitions = typeof queryTransitions
 type EditRawTextAsyncFunc = (
-  source: SourcesModels.Source,
+  url: string,
   id: string,
   text: string
 ) => Promise<void>
@@ -408,13 +409,23 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private getConfig = async (
-    source: SourcesModels.Source,
+    url,
     id: string,
     query: string,
     templates: Template[]
   ): Promise<QueriesModels.QueryConfig> => {
+    // replace all templates but :interval:
+    query = replaceTemplate(query, templates)
+    let queries = []
+    let durationMs = DEFAULT_DURATION_MS
+
     try {
-      query = await replaceTempVars(query, source, templates, DEFAULT_PIXELS)
+      // get durationMs to calculate interval
+      queries = await getQueryConfigAndStatus(url, [{query, id}])
+      durationMs = _.get(queries, '0.durationMs', DEFAULT_DURATION_MS)
+
+      // calc and replace :interval:
+      query = replaceInterval(query, DEFAULT_PIXELS, durationMs)
     } catch (error) {
       console.error(error)
       throw error
@@ -422,16 +433,15 @@ class CellEditorOverlay extends Component<Props, State> {
 
     try {
       // fetch queryConfig for with all template variables replaced
-      const queries = await getQueryConfigAndStatus(source.links.queries, [
-        {query, id},
-      ])
-      const {queryConfig} = queries.find(q => q.id === id)
-
-      return queryConfig
+      queries = await getQueryConfigAndStatus(url, [{query, id}])
     } catch (error) {
       console.error(error)
       throw error
     }
+
+    const {queryConfig} = queries.find(q => q.id === id)
+
+    return queryConfig
   }
 
   // The schema explorer is not built to handle user defined template variables
@@ -439,7 +449,7 @@ class CellEditorOverlay extends Component<Props, State> {
   // the query config in order to disable the fields column down stream because
   // at this point the query string is disconnected from the schema explorer.
   private handleEditRawText = async (
-    source: SourcesModels.Source,
+    url: string,
     id: string,
     text: string
   ): Promise<void> => {
@@ -452,7 +462,7 @@ class CellEditorOverlay extends Component<Props, State> {
     const isUsingUserDefinedTempVars: boolean = !!userDefinedTempVarsInQuery.length
 
     try {
-      const queryConfig = await this.getConfig(source, id, text, templates)
+      const queryConfig = await this.getConfig(url, id, text, templates)
       const nextQueries = this.state.queriesWorkingDraft.map(q => {
         if (q.id === id) {
           const isQuerySupportedByExplorer = !isUsingUserDefinedTempVars
