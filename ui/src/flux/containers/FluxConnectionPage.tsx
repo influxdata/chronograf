@@ -12,13 +12,10 @@ import {FluxFormMode} from 'src/flux/constants/connection'
 
 import {
   updateServiceAsync,
-  UpdateServiceAsync,
   createServiceAsync,
   CreateServiceAsync,
   fetchFluxServicesForSourceAsync,
-  FetchFluxServicesForSourceAsync,
   setActiveServiceAsync,
-  SetActiveServiceAsync,
 } from 'src/shared/actions/services'
 import {couldNotGetFluxService} from 'src/shared/copy/notifications'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -31,9 +28,9 @@ interface Props {
   router: {push: (url: string) => void}
   notify: (message: Notification) => void
   createService: CreateServiceAsync
-  updateService: UpdateServiceAsync
-  setActiveFlux: SetActiveServiceAsync
-  fetchServicesForSource: FetchFluxServicesForSourceAsync
+  updateService: typeof updateServiceAsync
+  setActiveFlux: typeof setActiveServiceAsync
+  fetchServicesForSource: typeof fetchFluxServicesForSourceAsync
 }
 
 interface State {
