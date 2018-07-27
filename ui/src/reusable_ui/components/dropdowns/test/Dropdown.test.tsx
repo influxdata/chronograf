@@ -7,7 +7,7 @@
 // component throws error when no children
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {mount} from 'enzyme'
 
 import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 
@@ -36,31 +36,63 @@ describe('Dropdown', () => {
     return <Dropdown.Item {...props} />
   }
 
-  it('renders successfully', () => {
-    const childA = childSetup()
+  const childA = childSetup()
 
-    const childB = childSetup({
-      children: 'johnny',
-      itemKey: 'johnny',
-      value: 'johnny',
+  const childB = childSetup({
+    children: 'johnny',
+    itemKey: 'johnny',
+    value: 'johnny',
+  })
+
+  const children = [childA, childB]
+
+  describe('collapsed', () => {
+    beforeEach(() => {
+      wrapper = wrapperSetup({
+        selectedItemKey: 'johnny',
+        children,
+      })
     })
 
-    wrapper = wrapperSetup({
-      children: [childA, childB],
+    it('can hide menu items', () => {
+      expect(wrapper.find(Dropdown.Item)).toHaveLength(0)
+    })
+  })
+
+  describe('expanded', () => {
+    beforeEach(() => {
+      wrapper = wrapperSetup({
+        selectedItemKey: 'johnny',
+        children,
+      })
+
+      wrapper.find('button').simulate('click')
     })
 
-    expect(wrapper).toHaveLength(1)
+    it('can display menu items', () => {
+      expect(wrapper.find(Dropdown.Item)).toHaveLength(2)
+    })
+
+    it('can set the selectedItemKey', () => {
+      const actualProps = wrapper
+        .find(Dropdown.Item)
+        .find({selected: true})
+        .props()
+
+      const expectedProps = expect.objectContaining({
+        itemKey: 'johnny',
+        value: 'johnny',
+      })
+
+      expect(actualProps).toEqual(expectedProps)
+    })
   })
 
   it('throws error when no children are present', () => {
     expect(() => {
       wrapperSetup({children: null})
-    }).toThrow()
+    }).toThrow(
+      'Dropdowns require at least 1 child element. We recommend using Dropdown.Item and/or Dropdown.Divider.'
+    )
   })
-
-  // it('throws error when empty children', () => {
-  //   expect(() => {
-  //     wrapperSetup({children: []})
-  //   }).toThrow()
-  // })
 })
