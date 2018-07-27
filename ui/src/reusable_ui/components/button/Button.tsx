@@ -4,6 +4,7 @@ import classnames from 'classnames'
 
 // Types
 import {ComponentColor, ComponentSize, ButtonShape} from 'src/reusable_ui/types'
+import {RemoteDataState} from 'src/types/flux'
 
 // Styles
 import './Button.scss'
@@ -16,7 +17,7 @@ interface Props {
   shape?: ButtonShape
   icon?: string // TODO: Replace with enum when Dropdown PR gets merged
   disabled?: boolean
-  loading?: boolean
+  status?: RemoteDataState
   titleText?: string
 }
 
@@ -26,7 +27,7 @@ class Button extends Component<Props> {
     size: ComponentSize.Small,
     shape: ButtonShape.Default,
     disabled: false,
-    loading: false,
+    status: RemoteDataState.Done,
   }
 
   public render() {
@@ -41,7 +42,7 @@ class Button extends Component<Props> {
       >
         {this.icon}
         {this.text}
-        {this.loadingSpinner}
+        {this.statusIndicator}
       </button>
     )
   }
@@ -66,23 +67,28 @@ class Button extends Component<Props> {
     return text
   }
 
-  private get loadingSpinner(): JSX.Element {
-    const {loading, size} = this.props
+  private get statusIndicator(): JSX.Element {
+    const {status, size} = this.props
 
-    if (loading) {
+    if (status === RemoteDataState.Loading) {
       return <div className={`button-spinner button-spinner--${size}`} />
+    }
+
+    if (status === RemoteDataState.Error) {
+      return <div className="button--error" />
     }
 
     return null
   }
 
   private get className(): string {
-    const {color, size, shape, loading} = this.props
+    const {color, size, shape, status} = this.props
 
     return classnames(`button button-${size} button-${color}`, {
       'button-square': shape === ButtonShape.Square,
       'button-stretch': shape === ButtonShape.StretchToFit,
-      'button--loading': loading,
+      'button--loading': status === RemoteDataState.Loading,
+      'button--error': status === RemoteDataState.Error,
     })
   }
 }
