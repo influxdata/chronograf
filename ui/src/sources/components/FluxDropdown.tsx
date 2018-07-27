@@ -4,37 +4,38 @@ import {Link, withRouter, RouteComponentProps} from 'react-router'
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
-import {Source, Service} from 'src/types'
-import {SetActiveService} from 'src/shared/actions/services'
 import {getDeep} from 'src/utils/wrappers'
+
+import {Source, Service} from 'src/types'
 
 interface Props {
   source: Source
   services: Service[]
-  setActiveService: SetActiveService
-  deleteService: (service: Service) => void
+  setActiveFlux: (source: Source, fluxService: Service) => void
+  deleteFlux: (fluxService: Service) => void
 }
 
-interface ServiceItem {
+interface FluxServiceItem {
   text: string
   resource: string
   service: Service
 }
 
-class ServiceDropdown extends PureComponent<
-  Props & RouteComponentProps<any, any>
-> {
+type FluxDropdownProps = Props & RouteComponentProps<any, any>
+
+export class FluxDropdown extends PureComponent<FluxDropdownProps> {
   public render() {
-    const {source, router, setActiveService, deleteService} = this.props
+    const {source, router, deleteFlux} = this.props
 
     if (this.isServicesEmpty) {
       return (
         <Authorized requiredRole={EDITOR_ROLE}>
           <Link
-            to={`/sources/${source.id}/services/new`}
+            to={`/sources/${source.id}/flux/new`}
             className="btn btn-xs btn-default"
+            data-test="link"
           >
-            <span className="icon plus" /> Add Service Connection
+            <span className="icon plus" /> Add Flux Connection
           </Link>
         </Authorized>
       )
@@ -47,13 +48,14 @@ class ServiceDropdown extends PureComponent<
       >
         <Dropdown
           className="dropdown-260"
+          data-test="dropdown"
           buttonColor="btn-primary"
           buttonSize="btn-xs"
-          items={this.serviceItems}
-          onChoose={setActiveService}
+          items={this.fluxItems}
+          onChoose={this.handleChoose}
           addNew={{
-            url: `/sources/${source.id}/services/new`,
-            text: 'Add Service Connection',
+            url: `/sources/${source.id}/flux/new`,
+            text: 'Add Flux Connection',
           }}
           actions={[
             {
@@ -67,7 +69,7 @@ class ServiceDropdown extends PureComponent<
               icon: 'trash',
               text: 'delete',
               handler: item => {
-                deleteService(item.service)
+                deleteFlux(item.service)
               },
               confirmable: true,
             },
@@ -78,9 +80,14 @@ class ServiceDropdown extends PureComponent<
     )
   }
 
+  private handleChoose = (selected: FluxServiceItem) => {
+    const {source, setActiveFlux} = this.props
+    setActiveFlux(source, selected.service)
+  }
+
   private get UnauthorizedDropdown(): ReactElement<HTMLDivElement> {
     return (
-      <div className="source-table--service__view-only">{this.selected}</div>
+      <div className="source-table--kapacitor__view-only">{this.selected}</div>
     )
   }
 
@@ -89,35 +96,28 @@ class ServiceDropdown extends PureComponent<
     return !services || services.length === 0
   }
 
-  private get serviceItems(): ServiceItem[] {
+  private get fluxItems(): FluxServiceItem[] {
     const {services, source} = this.props
 
-    return services.map(service => {
+    return services.map(s => {
       return {
-        text: service.name,
-        resource: `/sources/${source.id}/services/${service.id}`,
-        service,
+        text: s.name,
+        resource: `/sources/${source.id}/flux/${s.id}`,
+        service: s,
       }
     })
   }
 
-  private get activeService(): Service {
-    const service = this.props.services.find(s => {
+  private get selected(): string {
+    const {services} = this.props
+    const service = services.find(s => {
       return getDeep<boolean>(s, 'metadata.active', false)
     })
-    return service || this.props.services[0]
-  }
-
-  private get selected(): string {
-    let selected = ''
-    if (this.activeService) {
-      selected = this.activeService.name
-    } else {
-      selected = this.serviceItems[0].text
+    if (service) {
+      return service.name
     }
-
-    return selected
+    return services[0].name
   }
 }
 
-export default withRouter<Props>(ServiceDropdown)
+export default withRouter<Props>(FluxDropdown)
