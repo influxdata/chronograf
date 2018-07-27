@@ -154,7 +154,7 @@ class Dropdown extends Component<Props, State> {
             <div className="dropdown--menu">
               {React.Children.map(children, (child: JSX.Element) => {
                 if (this.childTypeIsValid(child)) {
-                  if (child instanceof DropdownItem) {
+                  if (child.type === DropdownItem) {
                     return (
                       <DropdownItem
                         {...child.props}
@@ -218,12 +218,8 @@ class Dropdown extends Component<Props, State> {
     }
   }
 
-  private childTypeIsValid = (child: JSX.Element): boolean => {
-    const blargh =
-      child instanceof DropdownItem || child instanceof DropdownDivider
-    console.log(blargh)
-    return blargh
-  }
+  private childTypeIsValid = (child: JSX.Element): boolean =>
+    child.type === DropdownItem || child.type === DropdownDivider
 }
 
 export default Dropdown
