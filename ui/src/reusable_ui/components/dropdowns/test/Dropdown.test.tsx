@@ -1,11 +1,3 @@
-// Tests to make:
-// Successful render of component
-// Click dropdown and see items in list
-// Selected item appears in button
-
-// for fun (and profit)
-// component throws error when no children
-
 import React from 'react'
 import {mount} from 'enzyme'
 
@@ -16,7 +8,7 @@ describe('Dropdown', () => {
 
   const wrapperSetup = (override = {}) => {
     const props = {
-      selectedItemKey: 'jimmy',
+      selectedKey: 'jimmy',
       onChange: () => {},
       children: null,
       ...override,
@@ -49,7 +41,7 @@ describe('Dropdown', () => {
   describe('collapsed', () => {
     beforeEach(() => {
       wrapper = wrapperSetup({
-        selectedItemKey: 'johnny',
+        selectedKey: 'johnny',
         children,
       })
     })
@@ -62,7 +54,7 @@ describe('Dropdown', () => {
   describe('expanded', () => {
     beforeEach(() => {
       wrapper = wrapperSetup({
-        selectedItemKey: 'johnny',
+        selectedKey: 'johnny',
         children,
       })
 
@@ -73,7 +65,7 @@ describe('Dropdown', () => {
       expect(wrapper.find(Dropdown.Item)).toHaveLength(2)
     })
 
-    it('can set the selectedItemKey', () => {
+    it('can set the selectedKey', () => {
       const actualProps = wrapper
         .find(Dropdown.Item)
         .find({selected: true})

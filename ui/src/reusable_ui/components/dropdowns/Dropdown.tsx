@@ -25,7 +25,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   children: JSX.Element[]
   onChange: (value: any) => void
-  selectedItemKey: string
+  selectedKey: string
   buttonColor?: ComponentColor
   buttonSize?: ComponentSize
   menuColor?: DropdownMenuColors
@@ -68,7 +68,7 @@ class Dropdown extends Component<Props, State> {
   public render() {
     const width = `${this.props.widthPixels}px`
 
-    this.validateChildren()
+    this.validateChildCount()
 
     return (
       <ClickOutside onClickOutside={this.collapseMenu}>
@@ -109,7 +109,7 @@ class Dropdown extends Component<Props, State> {
 
   private get button(): JSX.Element {
     const {
-      selectedItemKey,
+      selectedKey,
       disabled,
       buttonColor,
       buttonSize,
@@ -119,7 +119,7 @@ class Dropdown extends Component<Props, State> {
     const {expanded} = this.state
 
     const selectedChild = children.find(
-      child => child.props.itemKey === selectedItemKey
+      child => child.props.itemKey === selectedKey
     )
 
     return (
@@ -137,7 +137,7 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get menuItems(): JSX.Element {
-    const {selectedItemKey, maxMenuHeight, menuColor, children} = this.props
+    const {selectedKey, maxMenuHeight, menuColor, children} = this.props
     const {expanded} = this.state
 
     if (expanded) {
@@ -152,14 +152,33 @@ class Dropdown extends Component<Props, State> {
             maxHeight={maxMenuHeight}
           >
             <div className="dropdown--menu">
-              {React.Children.map(children, (child: JSX.Element) =>
-                React.cloneElement(child, {
-                  ...child.props,
-                  key: child.props.itemKey,
-                  selected: child.props.itemKey === selectedItemKey,
-                  onClick: this.handleItemClick,
-                })
-              )}
+              {React.Children.map(children, (child: JSX.Element) => {
+                if (this.childTypeIsValid(child)) {
+                  if (child instanceof DropdownItem) {
+                    return (
+                      <DropdownItem
+                        {...child.props}
+                        key={child.props.itemKey}
+                        selected={child.props.itemKey === selectedKey}
+                        onClick={this.handleItemClick}
+                      >
+                        {child.props.children}
+                      </DropdownItem>
+                    )
+                  }
+
+                  return (
+                    <DropdownDivider
+                      {...child.props}
+                      key={child.props.itemKey}
+                    />
+                  )
+                } else {
+                  throw new Error(
+                    'Expected children of type <Dropdown.Item /> or <Dropdown.Divider />'
+                  )
+                }
+              })}
             </div>
           </FancyScrollbar>
         </div>
@@ -189,7 +208,7 @@ class Dropdown extends Component<Props, State> {
     this.collapseMenu()
   }
 
-  private validateChildren = (): void => {
+  private validateChildCount = (): void => {
     const {children} = this.props
 
     if (React.Children.count(children) === 0) {
@@ -197,6 +216,13 @@ class Dropdown extends Component<Props, State> {
         'Dropdowns require at least 1 child element. We recommend using Dropdown.Item and/or Dropdown.Divider.'
       )
     }
+  }
+
+  private childTypeIsValid = (child: JSX.Element): boolean => {
+    const blargh =
+      child instanceof DropdownItem || child instanceof DropdownDivider
+    console.log(blargh)
+    return blargh
   }
 }
 
