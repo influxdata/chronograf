@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent, CSSProperties} from 'react'
+import {connect} from 'react-redux'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 
 // Components
@@ -19,6 +20,7 @@ import {LINE_COLORS_RULE_GRAPH} from 'src/shared/constants/graphColorPalettes'
 import {Source, AlertRule, QueryConfig, Query, TimeRange} from 'src/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
 
 interface Props {
   source: Source
@@ -26,6 +28,7 @@ interface Props {
   rule: AlertRule
   timeRange: TimeRange
   onChooseTimeRange: (tR: TimeRange) => void
+  setHoverTime: typeof setHoverTimeAction
 }
 
 @ErrorHandling
@@ -60,7 +63,6 @@ class RuleGraph extends PureComponent<Props> {
                 data.timeSeries,
                 'rule-builder'
               )
-
               return (
                 <Dygraph
                   labels={labels}
@@ -75,6 +77,7 @@ class RuleGraph extends PureComponent<Props> {
                   colors={LINE_COLORS_RULE_GRAPH}
                   containerStyle={this.containerStyle}
                   underlayCallback={underlayCallback(rule)}
+                  handleSetHoverTime={this.props.setHoverTime}
                 />
               )
             }}
@@ -124,4 +127,8 @@ class RuleGraph extends PureComponent<Props> {
   }
 }
 
-export default RuleGraph
+const mdtp = {
+  setHoverTime: setHoverTimeAction,
+}
+
+export default connect(null, mdtp)(RuleGraph)
