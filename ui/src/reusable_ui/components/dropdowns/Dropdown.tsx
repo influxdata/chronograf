@@ -45,9 +45,9 @@ interface State {
 class Dropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     buttonColor: ComponentColor.Default,
-    size: ComponentSize.Small,
+    buttonSize: ComponentSize.Small,
     disabled: false,
-    width: 120,
+    widthPixels: 120,
     wrapText: false,
     maxMenuHeight: 250,
     menuColor: DropdownMenuColors.Sapphire,
@@ -66,7 +66,7 @@ class Dropdown extends Component<Props, State> {
   }
 
   public render() {
-    const width = `${this.props.width}px`
+    const width = `${this.props.widthPixels}px`
 
     this.validateChildren()
 
@@ -89,13 +89,22 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get containerClassName(): string {
-    const {buttonColor, size, disabled, wrapText, customClass} = this.props
-
-    return classnames(`dropdown dropdown-${size} dropdown-${buttonColor}`, {
+    const {
+      buttonColor,
+      buttonSize,
       disabled,
-      'dropdown-wrap': wrapText,
-      [customClass]: customClass,
-    })
+      wrapText,
+      customClass,
+    } = this.props
+
+    return classnames(
+      `dropdown dropdown-${buttonSize} dropdown-${buttonColor}`,
+      {
+        disabled,
+        'dropdown-wrap': wrapText,
+        [customClass]: customClass,
+      }
+    )
   }
 
   private get button(): JSX.Element {
@@ -103,7 +112,7 @@ class Dropdown extends Component<Props, State> {
       selectedItemKey,
       disabled,
       buttonColor,
-      size,
+      buttonSize,
       icon,
       children,
     } = this.props
@@ -117,7 +126,7 @@ class Dropdown extends Component<Props, State> {
       <DropdownButton
         active={expanded}
         color={buttonColor}
-        size={size}
+        size={buttonSize}
         icon={icon}
         disabled={disabled}
         onClick={this.toggleMenu}
@@ -161,16 +170,16 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get menuStyle(): CSSProperties {
-    const {wrapText, width} = this.props
+    const {wrapText, widthPixels} = this.props
 
     if (wrapText) {
       return {
-        width: `${width}px`,
+        width: `${widthPixels}px`,
       }
     }
 
     return {
-      minWidth: `${width}px`,
+      minWidth: `${widthPixels}px`,
     }
   }
 
