@@ -9,6 +9,7 @@ import {
   TemplateType,
   TemplateValueType,
 } from 'src/types'
+import {ThresholdOperators} from 'src/kapacitor/constants'
 
 export const role = {
   name: '',
@@ -288,8 +289,8 @@ export const kapacitorRules = [
     details: '',
     trigger: 'threshold',
     values: {
-      operator: 'equal to',
-      value: '0',
+      operator: ThresholdOperators.EqualTo,
+      value: 0,
       rangeValue: '',
     },
     name: 'Untitled bob',

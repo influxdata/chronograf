@@ -27,7 +27,7 @@ import {
   Tags,
   TagValues,
 } from './queries'
-import {AlertRule, Kapacitor, Task, RuleValues} from './kapacitor'
+import {AlertRule, Kapacitor, Task, TriggerValues} from './kapacitor'
 import {
   NewSource,
   Source,
@@ -47,6 +47,7 @@ import {
   DygraphAxis,
   DygraphClass,
   DygraphData,
+  DygraphOptions,
 } from './dygraphs'
 import {JSONFeedData} from './status'
 import {AnnotationInterface} from './annotations'
@@ -90,12 +91,13 @@ export {
   DropdownItem,
   TimeRange,
   Task,
-  RuleValues,
+  TriggerValues,
   DygraphData,
   DygraphSeries,
   DygraphValue,
   DygraphAxis,
   DygraphClass,
+  DygraphOptions,
   Notification,
   NotificationFunc,
   NotificationAction,

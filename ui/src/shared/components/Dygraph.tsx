@@ -41,37 +41,39 @@ import {
   Axes,
   Query,
   CellType,
-  RuleValues,
+  TriggerValues,
   TimeRange,
-  DygraphData,
+  DygraphValue,
   DygraphClass,
+  DygraphOptions,
   DygraphSeries,
   Constructable,
 } from 'src/types'
 import {LineColor} from 'src/types/colors'
+import {underlayCallBackType} from 'src/kapacitor/helpers/ruleGraphUnderlay'
 
 const Dygraphs = D as Constructable<DygraphClass>
 
 interface Props {
   type: CellType
-  cellID: string
   queries: Query[]
-  timeSeries: DygraphData
+  timeSeries: DygraphValue[][]
   labels: string[]
-  options: dygraphs.Options
+  options: DygraphOptions
   containerStyle: object // TODO
   dygraphSeries: DygraphSeries
   timeRange: TimeRange
   colors: LineColor[]
-  handleSetHoverTime: (t: string) => void
-  ruleValues?: RuleValues
+  handleSetHoverTime?: (t: string) => void
+  ruleValues?: TriggerValues
   axes?: Axes
   isGraphFilled?: boolean
   staticLegend?: boolean
+  cellID: string
   setResolution?: (w: number) => void
   onZoom?: (timeRange: TimeRange) => void
   mode?: string
-  underlayCallback?: () => void
+  underlayCallback?: underlayCallBackType
 }
 
 interface State {
@@ -102,7 +104,6 @@ class Dygraph extends Component<Props, State> {
     onZoom: () => {},
     staticLegend: false,
     setResolution: () => {},
-    handleSetHoverTime: () => {},
     underlayCallback: () => {},
   }
 
@@ -341,7 +342,7 @@ class Dygraph extends Component<Props, State> {
     return {...containerStyle, zIndex: 2}
   }
 
-  private getYRange = (timeSeries: DygraphData): [number, number] => {
+  private getYRange = (timeSeries: DygraphValue[][]): [number, number] => {
     const {
       options,
       axes: {y},
@@ -497,4 +498,6 @@ const mapStateToProps = ({annotations: {mode}}) => ({
   mode,
 })
 
-export default connect(mapStateToProps, null)(Dygraph)
+export default connect<{mode?: string}, {}, Props>(mapStateToProps, null)(
+  Dygraph
+)
