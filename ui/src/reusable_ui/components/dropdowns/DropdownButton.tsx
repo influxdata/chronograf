@@ -1,13 +1,19 @@
+// Libraries
 import React, {Component} from 'react'
 import classnames from 'classnames'
+
+// Types
 import {
   ComponentColor,
   ComponentSize,
   IconFont,
   DropdownChild,
 } from 'src/reusable_ui/types'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Styles
 import './DropdownButton.scss'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   children: DropdownChild

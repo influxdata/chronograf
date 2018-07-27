@@ -1,7 +1,11 @@
+// Libraries
 import React, {Component} from 'react'
 import classnames from 'classnames'
 
+// Types
 import {DropdownChild} from 'src/reusable_ui/types'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   children: DropdownChild
@@ -9,6 +13,7 @@ interface Props {
   text?: string
 }
 
+@ErrorHandling
 class DropdownDivider extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     text: '',
