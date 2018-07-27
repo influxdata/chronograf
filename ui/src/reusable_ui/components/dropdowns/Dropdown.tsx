@@ -27,10 +27,10 @@ interface Props {
   onChange: (value: any) => void
   selectedItemKey: string
   buttonColor?: ComponentColor
+  buttonSize?: ComponentSize
   menuColor?: DropdownMenuColors
-  size?: ComponentSize
   disabled?: boolean
-  width?: number
+  widthPixels?: number
   icon?: IconFont
   wrapText?: boolean
   customClass?: string
