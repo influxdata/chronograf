@@ -8,7 +8,7 @@ import {DropdownChild} from 'src/reusable_ui/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
-  children: DropdownChild
+  children?: DropdownChild
   itemKey: string
   text?: string
 }

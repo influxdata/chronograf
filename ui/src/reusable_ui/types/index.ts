@@ -14,7 +14,11 @@ export enum DropdownMenuColors {
   Onyx = 'onyx',
 }
 
-export type DropdownChild = Array<string | JSX.Element | Element>
+export type DropdownChild =
+  | Array<string | JSX.Element | Element>
+  | string
+  | JSX.Element
+  | Element
 
 export enum ComponentSize {
   ExtraSmall = 'xs',

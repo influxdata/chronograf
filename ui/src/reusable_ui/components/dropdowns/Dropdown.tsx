@@ -1,4 +1,4 @@
-// Librarries
+// Libraries
 import React, {Component, CSSProperties} from 'react'
 import classnames from 'classnames'
 
