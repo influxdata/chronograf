@@ -10,6 +10,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import Button from 'src/reusable_ui/components/button/Button'
 import {ComponentColor, ComponentSize, ButtonShape} from 'src/reusable_ui/types'
+import {RemoteDataState} from 'src/types/flux'
 
 import {Dashboard} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -1283,14 +1284,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Default}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Default}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1300,14 +1301,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Default}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Default}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1317,14 +1318,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Default}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Default}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1334,14 +1335,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Default}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Default}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1354,14 +1355,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Primary}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Primary}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1371,14 +1372,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Primary}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Primary}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1388,14 +1389,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Primary}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Primary}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1405,14 +1406,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Primary}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Primary}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1425,14 +1426,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Secondary}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Secondary}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1442,14 +1443,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Secondary}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Secondary}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1459,14 +1460,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Secondary}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Secondary}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1476,14 +1477,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Secondary}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Secondary}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1496,14 +1497,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Success}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Success}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1513,14 +1514,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Success}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Success}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1530,14 +1531,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Success}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Success}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1547,14 +1548,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Success}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Success}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1567,14 +1568,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Warning}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Warning}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1584,14 +1585,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Warning}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Warning}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1601,14 +1602,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Warning}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Warning}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1618,14 +1619,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Warning}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Warning}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1638,14 +1639,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Danger}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Danger}
                             size={ComponentSize.ExtraSmall}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1655,14 +1656,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Danger}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Danger}
                             size={ComponentSize.Small}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1672,14 +1673,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Danger}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Danger}
                             size={ComponentSize.Medium}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
@@ -1689,14 +1690,14 @@ class DashboardsPageContents extends Component<Props, State> {
                             color={ComponentColor.Danger}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                           />
                           <Button
                             color={ComponentColor.Danger}
                             size={ComponentSize.Large}
                             text="Example"
-                            loading={true}
+                            status={RemoteDataState.Loading}
                             icon="oauth"
                             disabled={true}
                           />
