@@ -17,7 +17,7 @@ import {HistogramData} from 'src/types/histogram'
 import {executeQueryAsync} from 'src/logs/api'
 
 const BIN_COUNT = 30
-const SECONDS_AWAY_LIMIT = 2592000
+const SECONDS_AWAY_LIMIT = 1296000
 
 const histogramFields = [
   {
@@ -197,7 +197,7 @@ export async function getQueryCountForBounds(
   let condition = `WHERE time >= '${lower}' AND time <='${upper}'`
 
   if (!_.isEmpty(searchTerm)) {
-    condition = `${condition} AND message =~ ${new RegExp(searchTerm)}`
+    condition = `${condition} AND "message" =~ ${new RegExp(searchTerm)}`
   }
 
   if (!_.isEmpty(filters)) {
@@ -219,11 +219,11 @@ export async function findOlderLowerTimeBounds(
 ): Promise<string> {
   const parsedUpper = moment(upper)
 
-  let secondsBack = 30
+  let secondsBack = 5
   let currentLower = parsedUpper.subtract(secondsBack, 'seconds')
 
   while (true) {
-    if (secondsBack > SECONDS_AWAY_LIMIT) {
+    if (secondsBack >= SECONDS_AWAY_LIMIT) {
       break
     }
 
@@ -241,7 +241,7 @@ export async function findOlderLowerTimeBounds(
       break
     }
 
-    secondsBack *= secondsBack // exponential backoff
+    secondsBack += 2 * secondsBack
     currentLower = parsedUpper.subtract(secondsBack, 'seconds')
   }
 
@@ -258,7 +258,7 @@ export async function findNewerUpperTimeBounds(
 ): Promise<string> {
   const parsedLower = moment(lower)
 
-  let secondsForward = 30
+  let secondsForward = 5
   let currentUpper = parsedLower.add(secondsForward, 'seconds')
 
   while (true) {
@@ -280,7 +280,7 @@ export async function findNewerUpperTimeBounds(
       break
     }
 
-    secondsForward *= secondsForward // exponential backoff
+    secondsForward += 2 * secondsForward
     currentUpper = parsedLower.add(secondsForward, 'seconds')
   }
 
