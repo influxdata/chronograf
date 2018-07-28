@@ -8,7 +8,7 @@ import {DropdownChild} from 'src/reusable_ui/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
-  itemKey: string
+  id: string
   children: DropdownChild
   value: any
   selected?: boolean

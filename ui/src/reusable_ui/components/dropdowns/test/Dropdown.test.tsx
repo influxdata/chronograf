@@ -8,7 +8,7 @@ describe('Dropdown', () => {
 
   const wrapperSetup = (override = {}) => {
     const props = {
-      selectedKey: 'jimmy',
+      selectedID: 'jimmy',
       onChange: () => {},
       children: null,
       ...override,
@@ -19,7 +19,7 @@ describe('Dropdown', () => {
 
   const childSetup = (override = {}) => {
     const props = {
-      itemKey: 'jimmy',
+      id: 'jimmy',
       value: 'jimmy',
       children: 'jimmy',
       ...override,
@@ -31,9 +31,9 @@ describe('Dropdown', () => {
   const childA = childSetup()
 
   const childB = childSetup({
-    children: 'johnny',
-    itemKey: 'johnny',
+    id: 'johnny',
     value: 'johnny',
+    children: 'johnny',
   })
 
   const children = [childA, childB]
@@ -41,7 +41,7 @@ describe('Dropdown', () => {
   describe('collapsed', () => {
     beforeEach(() => {
       wrapper = wrapperSetup({
-        selectedKey: 'johnny',
+        selectedID: 'johnny',
         children,
       })
     })
@@ -54,7 +54,7 @@ describe('Dropdown', () => {
   describe('expanded', () => {
     beforeEach(() => {
       wrapper = wrapperSetup({
-        selectedKey: 'johnny',
+        selectedID: 'johnny',
         children,
       })
 
@@ -65,14 +65,14 @@ describe('Dropdown', () => {
       expect(wrapper.find(Dropdown.Item)).toHaveLength(2)
     })
 
-    it('can set the selectedKey', () => {
+    it('can set the selectedID', () => {
       const actualProps = wrapper
         .find(Dropdown.Item)
         .find({selected: true})
         .props()
 
       const expectedProps = expect.objectContaining({
-        itemKey: 'johnny',
+        id: 'johnny',
         value: 'johnny',
       })
 

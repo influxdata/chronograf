@@ -25,7 +25,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   children: JSX.Element[]
   onChange: (value: any) => void
-  selectedKey: string
+  selectedID: string
   buttonColor?: ComponentColor
   buttonSize?: ComponentSize
   menuColor?: DropdownMenuColors
@@ -109,7 +109,7 @@ class Dropdown extends Component<Props, State> {
 
   private get button(): JSX.Element {
     const {
-      selectedKey,
+      selectedID,
       disabled,
       buttonColor,
       buttonSize,
@@ -118,9 +118,7 @@ class Dropdown extends Component<Props, State> {
     } = this.props
     const {expanded} = this.state
 
-    const selectedChild = children.find(
-      child => child.props.itemKey === selectedKey
-    )
+    const selectedChild = children.find(child => child.props.id === selectedID)
 
     return (
       <DropdownButton
@@ -137,7 +135,7 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get menuItems(): JSX.Element {
-    const {selectedKey, maxMenuHeight, menuColor, children} = this.props
+    const {selectedID, maxMenuHeight, menuColor, children} = this.props
     const {expanded} = this.state
 
     if (expanded) {
@@ -158,8 +156,8 @@ class Dropdown extends Component<Props, State> {
                     return (
                       <DropdownItem
                         {...child.props}
-                        key={child.props.itemKey}
-                        selected={child.props.itemKey === selectedKey}
+                        key={child.props.id}
+                        selected={child.props.id === selectedID}
                         onClick={this.handleItemClick}
                       >
                         {child.props.children}
@@ -168,10 +166,7 @@ class Dropdown extends Component<Props, State> {
                   }
 
                   return (
-                    <DropdownDivider
-                      {...child.props}
-                      key={child.props.itemKey}
-                    />
+                    <DropdownDivider {...child.props} key={child.props.id} />
                   )
                 } else {
                   throw new Error(

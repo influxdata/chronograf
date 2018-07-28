@@ -9,7 +9,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   children?: DropdownChild
-  itemKey: string
+  id: string
   text?: string
 }
 
