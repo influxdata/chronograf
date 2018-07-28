@@ -8,7 +8,6 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
-import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 
 import {Dashboard} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -29,14 +28,7 @@ interface Props {
 interface State {
   searchTerm: string
   isOverlayVisible: boolean
-  dropdownSelectedKey: string
 }
-
-const dropdownItems = [
-  {key: 'swag-a', text: 'Ultra Swag'},
-  {key: 'swag-b', text: 'Secret Swag'},
-  {key: 'swag-c', text: 'Shady Swag'},
-]
 
 @ErrorHandling
 class DashboardsPageContents extends Component<Props, State> {
@@ -46,7 +38,6 @@ class DashboardsPageContents extends Component<Props, State> {
     this.state = {
       searchTerm: '',
       isOverlayVisible: false,
-      dropdownSelectedKey: dropdownItems[0].key,
     }
   }
 
@@ -75,7 +66,6 @@ class DashboardsPageContents extends Component<Props, State> {
                     onExportDashboard={onExportDashboard}
                     dashboardLink={dashboardLink}
                   />
-                  {this.dropdown}
                 </div>
               </div>
             </div>
@@ -83,26 +73,6 @@ class DashboardsPageContents extends Component<Props, State> {
         </div>
       </FancyScrollbar>
     )
-  }
-
-  private get dropdown() {
-    const {dropdownSelectedKey} = this.state
-    return (
-      <Dropdown
-        selectedKey={dropdownSelectedKey}
-        onChange={this.handleDropdownChange}
-      >
-        {dropdownItems.map(item => (
-          <Dropdown.Item key={item.key} itemKey={item.key} value={item}>
-            {item.text}
-          </Dropdown.Item>
-        ))}
-      </Dropdown>
-    )
-  }
-
-  private handleDropdownChange = item => {
-    this.setState({dropdownSelectedKey: item.key})
   }
 
   private get renderPanelHeading(): JSX.Element {
