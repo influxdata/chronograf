@@ -3,7 +3,12 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 
 // Types
-import {ComponentColor, ComponentSize, ButtonShape} from 'src/reusable_ui/types'
+import {
+  ComponentColor,
+  ComponentSize,
+  ButtonShape,
+  IconFont,
+} from 'src/reusable_ui/types'
 import {RemoteDataState} from 'src/types/flux'
 
 // Styles
@@ -15,7 +20,7 @@ interface Props {
   color?: ComponentColor
   size?: ComponentSize
   shape?: ButtonShape
-  icon?: string // TODO: Replace with enum when Dropdown PR gets merged
+  icon?: IconFont
   disabled?: boolean
   status?: RemoteDataState
   titleText?: string
