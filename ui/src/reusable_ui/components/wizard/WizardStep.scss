@@ -1,0 +1,9 @@
+@import 'src/style/modules/variables';
+
+.wizard-step-content {
+  margin: $ix-marg-b 0;
+}
+
+.wizard-step-child {
+  padding: 0 $ix-marg-c;
+}

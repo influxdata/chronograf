@@ -251,3 +251,76 @@ export const modeInfluxQL = {
     lineComment: '//',
   },
 }
+
+export const modeInfluxQLReadOnly = {
+  // The start state contains the rules that are intially used
+  start: [
+    // The regex matches the token, the token property contains the type
+    {
+      regex: /"(?:[^\\]|\\.)*?(?:"|$)/,
+      token: 'string.double',
+    },
+    {
+      regex: /'(?:[^\\]|\\.)*?(?:'|$)/,
+      token: 'string.single',
+    },
+    {
+      regex: /(function)(\s+)([a-z$][\w$]*)/,
+      token: ['keyword', null, 'variable-2'],
+    },
+    // Rules are matched in the order in which they appear, so there is
+    // no ambiguity between this one and the one above
+    {
+      regex: /(SELECT\s|AS\s|FROM\s|WHERE\s|GROUP\sBY\s)/i,
+      token: 'clause',
+    },
+    {
+      regex: /FILL(?=[(])/i,
+      token: 'clause',
+    },
+    {
+      regex: /(CREATE\s|SHOW\s|DROP\s)/i,
+      token: 'meta',
+    },
+    {
+      regex: /[:]['](\w|[-:.])+['][:]/,
+      token: 'temp-var',
+    },
+    {
+      regex: /[:]now[(][)]\s[-]\s(\w+)[:]/,
+      token: 'temp-var',
+    },
+    {
+      regex: /[:]\w+[:]/,
+      token: 'temp-var',
+    },
+    {
+      regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
+      token: 'number',
+    },
+    {
+      regex: /(NULL)/i,
+      token: 'null',
+    },
+  ],
+  // The multi-line comment state.
+  comment: [
+    {
+      regex: /.*?\*\//,
+      token: 'comment',
+      next: 'start',
+    },
+    {
+      regex: /.*/,
+      token: 'comment',
+    },
+  ],
+  // The meta property contains global information about the mode. It
+  // can contain properties like lineComment, which are supported by
+  // all modes, and also directives like dontIndentStates, which are
+  // specific to simple modes.
+  meta: {
+    dontIndentStates: ['comment'],
+    lineComment: '//',
+  },
+}

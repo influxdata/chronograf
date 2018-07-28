@@ -22,8 +22,8 @@ import {
   addFilter,
   removeFilter,
   changeFilter,
-  fetchMoreAsync,
-  fetchNewerAsync,
+  fetchOlderLogsAsync,
+  fetchNewerLogsAsync,
   getLogConfigAsync,
   updateLogConfigAsync,
 } from 'src/logs/actions'
@@ -81,8 +81,8 @@ interface Props {
   setSearchTermAsync: (searchTerm: string) => void
   setTableRelativeTime: (time: number) => void
   setTableCustomTime: (time: string) => void
-  fetchMoreAsync: (queryTimeEnd: string) => Promise<void>
-  fetchNewerAsync: (queryTimeEnd: string) => Promise<void>
+  fetchOlderLogsAsync: (queryTimeEnd: string) => Promise<void>
+  fetchNewerLogsAsync: (queryTimeEnd: string) => Promise<void>
   addFilter: (filter: Filter) => void
   removeFilter: (id: string) => void
   changeFilter: (id: string, operator: string, value: string) => void
@@ -146,7 +146,12 @@ class LogsPage extends Component<Props, State> {
 
   public componentDidUpdate() {
     if (!this.props.currentSource && this.props.sources.length > 0) {
-      this.props.getSource(this.props.sources[0].id)
+      const source =
+        this.props.sources.find(src => {
+          return src.default
+        }) || this.props.sources[0]
+
+      this.props.getSource(source.id)
     }
   }
 
@@ -195,7 +200,7 @@ class LogsPage extends Component<Props, State> {
               onScrolledToTop={this.handleScrollToTop}
               isScrolledToTop={false}
               onTagSelection={this.handleTagSelection}
-              fetchMore={this.props.fetchMoreAsync}
+              fetchMore={this.props.fetchOlderLogsAsync}
               fetchNewer={this.fetchNewer}
               timeRange={timeRange}
               scrollToRow={this.tableScrollToRow}
@@ -215,7 +220,7 @@ class LogsPage extends Component<Props, State> {
 
   private fetchNewer = (time: string) => {
     this.loadingNewer = true
-    this.props.fetchNewerAsync(time)
+    this.props.fetchNewerLogsAsync(time)
   }
 
   private get tableScrollToRow() {
@@ -506,7 +511,6 @@ class LogsPage extends Component<Props, State> {
 
   private handleSubmitSearch = (value: string): void => {
     this.props.setSearchTermAsync(value)
-    this.setState({liveUpdating: LiveUpdating.Play})
   }
 
   private handleFilterDelete = (id: string): void => {
@@ -689,8 +693,8 @@ const mapDispatchToProps = {
   addFilter,
   removeFilter,
   changeFilter,
-  fetchMoreAsync,
-  fetchNewerAsync,
+  fetchOlderLogsAsync,
+  fetchNewerLogsAsync,
   setTableCustomTime: setTableCustomTimeAsync,
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,

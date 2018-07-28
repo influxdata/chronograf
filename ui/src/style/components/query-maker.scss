@@ -35,9 +35,7 @@ $query-maker--tab-contents-bg: $g3-castle;
 $query-maker--empty-text: $g10-wolf;
 
 $query-editor--bg: $query-maker--tab-bg-active;
-$query-editor--field-text: $c-pool;
 $query-editor--field-bg: $g2-kevlar;
-$query-editor--field-height: 52px;
 $query-editor--status-height: 34px;
 /* ^ These 2 should total 86px */
 $query-editor--status-default: $g11-sidewalk;
@@ -199,4 +197,3 @@ $query-editor-tab-active: $g3-castle;
 */
 @import 'query-editor';
 @import 'query-builder';
-@import 'query-maker-responsive';

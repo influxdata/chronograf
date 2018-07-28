@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import EmptyQuery from 'src/shared/components/EmptyQuery'
 import QueryTabList from 'src/shared/components/QueryTabList'
-import QueryTextArea from 'src/dashboards/components/QueryTextArea'
+import InfluxQLEditor from 'src/dashboards/components/InfluxQLEditor'
 import SchemaExplorer from 'src/shared/components/SchemaExplorer'
 import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
@@ -59,7 +59,7 @@ const QueryMaker: SFC<Props> = ({
     />
     {activeQuery && activeQuery.id ? (
       <div className="query-maker--tab-contents">
-        <QueryTextArea
+        <InfluxQLEditor
           query={buildText(activeQuery)}
           config={activeQuery}
           onUpdate={rawTextBinder(

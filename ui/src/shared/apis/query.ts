@@ -74,7 +74,7 @@ const handleQueryFetchStatus = async (
   }
 }
 
-const replace = async (
+export const replace = async (
   query: string,
   source: Source,
   templates: Template[],

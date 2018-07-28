@@ -144,7 +144,7 @@ const newTemplateValueText = (
   }
 }
 
-const getSelectedValue = (template: Template): string | null => {
+export const getSelectedValue = (template: Template): string | null => {
   const selected = template.values.find(v => v.selected)
 
   if (selected) {
@@ -154,7 +154,7 @@ const getSelectedValue = (template: Template): string | null => {
   return null
 }
 
-const getLocalSelectedValue = (template: Template): string | null => {
+export const getLocalSelectedValue = (template: Template): string | null => {
   const selected = template.values.find(v => v.localSelected)
 
   if (selected) {
