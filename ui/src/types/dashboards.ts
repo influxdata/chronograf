@@ -116,12 +116,16 @@ export interface DashboardName {
 
 interface DashboardFileMetaSection {
   chronografVersion?: string
-  sources?: {
-    [x: string]: {
-      name: string
-      link: string
-    }
-  }
+  sources?: ImportedSources
+}
+
+export interface ImportedSources {
+  [x: string]: ImportedSourceInfo
+}
+
+export interface ImportedSourceInfo {
+  name: string
+  link: string
 }
 
 export interface DashboardFile {
