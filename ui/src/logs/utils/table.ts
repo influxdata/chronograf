@@ -28,7 +28,10 @@ export const getColumnFromData = (data: TableData, index: number): string =>
   getDeep(data, `columns.${index}`, '')
 
 export const isClickable = (column: string): boolean =>
-  _.includes(['appname', 'facility', 'host', 'hostname', 'severity'], column)
+  _.includes(
+    ['appname', 'facility', 'host', 'hostname', 'severity', 'procid'],
+    column
+  )
 
 export const formatColumnValue = (
   column: string,
