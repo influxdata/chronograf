@@ -79,10 +79,6 @@ class Button extends Component<Props> {
       return <div className={`button-spinner button-spinner--${size}`} />
     }
 
-    if (status === RemoteDataState.Error) {
-      return <div className="button--error" />
-    }
-
     return null
   }
 
@@ -93,7 +89,6 @@ class Button extends Component<Props> {
       'button-square': shape === ButtonShape.Square,
       'button-stretch': shape === ButtonShape.StretchToFit,
       'button--loading': status === RemoteDataState.Loading,
-      'button--error': status === RemoteDataState.Error,
     })
   }
 }

@@ -10,9 +10,12 @@
 .button {
   font-weight: 700;
   font-family: $ix-text-font;
-  border: 0;
+  border-style: solid;
+  border-width: $ix-border;
   transition:
     background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
     color 0.25s ease;
   outline: none;
   border-radius: $radius;
@@ -31,6 +34,7 @@
 .button-icon {
   font-size: 1.25em;
   margin-right: 0.4em;
+  margin-left: -0.1em;
   display: inline-block;
   vertical-align: middle;
   transform: translateY(-5%);
@@ -44,7 +48,7 @@
   font-size: $fontSize;
   padding: 0 $padding;
   height: $height;
-  line-height: $height;
+  line-height: $height - ($ix-border * 2);
 
   .button-spinner {
     width: $height * 0.5;
@@ -105,16 +109,29 @@
 @mixin buttonColorModifier($bg, $bgHover, $bgActive, $text, $textHover) {
   color: $text;
   background-color: $bg;
+  border-color: $bg;
 
   &:hover {
     color: $textHover;
     background-color: $bgHover;
+    border-color: $bgHover;
   }
 
   &:active,
-  &:active:hover {
+  &:active:hover,
+  &.active,
+  &.active:hover {
     color: $textHover;
-    background-color: $bgActive
+    background-color: $bgHover;
+    border-color: $bgActive;
+    box-shadow: 0 0 4px 1px $bg;
+  }
+
+  &.button--loading,
+  &.button--loading:hover {
+    background-color: $bgHover;
+    border-color: $bgHover;
+    box-shadow: 0 0 0 0;
   }
 
   &[disabled],
@@ -122,6 +139,7 @@
     color: rgba($text, 0.3);
     font-style: italic;
     background-color: mix($bg, $g4-onyx, 25%);
+    border-color: mix($bg, $g4-onyx, 25%);
   }
 
   .button-spinner {
@@ -140,10 +158,10 @@
   @include buttonColorModifier($c-star, $c-comet, $c-potassium, $c-twilight, $g20-white);
 }
 .button-success {
-  @include buttonColorModifier($c-rainforest, $c-honeydew, $c-krypton, $c-mint, $g20-white);
+  @include buttonColorModifier($c-rainforest, $c-honeydew, $c-wasabi, $c-mint, $g20-white);
 }
 .button-warning {
-  @include buttonColorModifier($c-pineapple, $c-thunder, $c-sulfur, $g20-white, $g20-white);
+  @include buttonColorModifier($c-pineapple, $c-thunder, $c-daisy, $g20-white, $g20-white);
 }
 .button-danger {
   @include buttonColorModifier($c-curacao, $c-dreamsicle, $c-tungsten, $g20-white, $g20-white);
