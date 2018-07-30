@@ -117,7 +117,11 @@ class InfluxQLEditor extends Component<Props, State> {
     } = this.state
 
     return (
-      <div className="query-editor">
+      <div
+        className="query-editor"
+        onMouseDown={this.handleVarmojiFocus}
+        onBlur={this.handleBlurEditor}
+      >
         {this.dismissPreviewButton}
         <ReactCodeMirror
           ref={this.codeMirrorRef}
@@ -142,7 +146,6 @@ class InfluxQLEditor extends Component<Props, State> {
             focus: focused,
             'read-only': isShowingTemplateValues,
           })}
-          onClick={this.handleVarmojiFocus}
         >
           <div className="varmoji-container">
             <div className="varmoji-front">
@@ -175,7 +178,7 @@ class InfluxQLEditor extends Component<Props, State> {
     this.setState({focused: false})
 
     this.hideTemplateValues()
-    this.handleUpdate()
+    this.handleBlurEditor()
   }
 
   private handleTemplateSelection = (
@@ -191,6 +194,10 @@ class InfluxQLEditor extends Component<Props, State> {
 
   private handleFocusEditor = (): void => {
     this.setState({focused: true})
+  }
+
+  private handleBlurEditor = (): void => {
+    this.handleUpdate()
   }
 
   private handleCloseDrawer = (): void => {
@@ -209,8 +216,11 @@ class InfluxQLEditor extends Component<Props, State> {
     this.closeDrawer()
   }
 
-  private handleVarmojiFocus = (): void => {
+  private handleVarmojiFocus = (e: MouseEvent): void => {
     this.setState({focused: true})
+
+    e.stopPropagation()
+    e.preventDefault()
   }
 
   private handleUpdateTemplatingQueryText = (value: string): void => {
@@ -362,6 +372,7 @@ class InfluxQLEditor extends Component<Props, State> {
         <button
           className="query-editor--dismiss"
           onClick={this.handleHideAndFocus}
+          onMouseDown={this.handleVarmojiFocus}
         />
       )
     }
