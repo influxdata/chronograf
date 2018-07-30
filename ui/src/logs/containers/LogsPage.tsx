@@ -208,12 +208,17 @@ class LogsPage extends Component<Props, State> {
               hasScrolled={this.state.hasScrolled}
               tableInfiniteData={this.props.tableInfiniteData}
               onChooseCustomTime={this.handleChooseCustomTime}
+              onExpandMessage={this.handleExpandMessage}
             />
           </div>
         </div>
         {this.renderImportOverlay()}
       </>
     )
+  }
+
+  private handleExpandMessage = () => {
+    this.setState({liveUpdating: LiveUpdating.Pause})
   }
 
   private fetchNewer = (time: string) => {
