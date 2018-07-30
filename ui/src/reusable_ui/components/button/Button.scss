@@ -38,6 +38,7 @@
   display: inline-block;
   vertical-align: middle;
   transform: translateY(-5%);
+  pointer-events: none;
 }
 
 /*
@@ -196,6 +197,7 @@
 }
 
 .button-spinner {
+  pointer-events: none;
   border-style: solid;
   border-radius: 50%; 
   animation-duration: 0.85s;
