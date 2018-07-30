@@ -8,6 +8,7 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import InfluxTable from 'src/sources/components/InfluxTable'
+import ConnectionWizard from 'src/sources/components/ConnectionWizard'
 
 import {
   notifySourceDeleted,
@@ -15,6 +16,10 @@ import {
 } from 'src/shared/copy/notifications'
 
 import {Source, Notification} from 'src/types'
+
+interface State {
+  wizardVisibility: boolean
+}
 
 interface Props {
   source: Source
@@ -29,7 +34,13 @@ interface Props {
 const VERSION = process.env.npm_package_version
 
 @ErrorHandling
-class ManageSources extends PureComponent<Props> {
+class ManageSources extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      wizardVisibility: false,
+    }
+  }
   public componentDidMount() {
     this.props.sources.forEach(source => {
       this.props.fetchKapacitors(source)
@@ -46,6 +57,7 @@ class ManageSources extends PureComponent<Props> {
 
   public render() {
     const {sources, source, deleteKapacitor} = this.props
+    const {wizardVisibility} = this.state
 
     return (
       <div className="page" id="manage-sources-page">
@@ -58,10 +70,15 @@ class ManageSources extends PureComponent<Props> {
               deleteKapacitor={deleteKapacitor}
               onDeleteSource={this.handleDeleteSource}
               setActiveKapacitor={this.handleSetActiveKapacitor}
+              toggleWizard={this.toggleWizard}
             />
             <p className="version-number">Chronograf Version: {VERSION}</p>
           </div>
         </FancyScrollbar>
+        <ConnectionWizard
+          isVisible={wizardVisibility}
+          toggleVisibility={this.toggleWizard}
+        />
       </div>
     )
   }
@@ -75,6 +92,12 @@ class ManageSources extends PureComponent<Props> {
     } catch (e) {
       notify(notifySourceDeleteFailed(source.name))
     }
+  }
+
+  private toggleWizard = isVisible => () => {
+    this.setState({
+      wizardVisibility: isVisible,
+    })
   }
 
   private handleSetActiveKapacitor = ({kapacitor}) => {

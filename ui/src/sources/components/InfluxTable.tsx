@@ -17,6 +17,7 @@ interface Props {
   deleteKapacitor: DeleteKapacitor
   setActiveKapacitor: SetActiveKapacitor
   onDeleteSource: (source: Source) => void
+  toggleWizard: (isVisible: boolean) => () => void
 }
 
 class InfluxTable extends PureComponent<Props> {
@@ -29,6 +30,7 @@ class InfluxTable extends PureComponent<Props> {
       deleteKapacitor,
       isUsingAuth,
       me,
+      toggleWizard,
     } = this.props
 
     return (
@@ -39,6 +41,7 @@ class InfluxTable extends PureComponent<Props> {
               me={me}
               source={source}
               isUsingAuth={isUsingAuth}
+              toggleWizard={toggleWizard}
             />
             <div className="panel-body">
               <table className="table v-center margin-bottom-zero table-highlight">

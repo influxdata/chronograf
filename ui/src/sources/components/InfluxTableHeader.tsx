@@ -1,5 +1,4 @@
 import React, {PureComponent, ReactElement} from 'react'
-import {Link} from 'react-router'
 
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
@@ -9,22 +8,19 @@ interface Props {
   me: Me
   source: Source
   isUsingAuth: boolean
+  toggleWizard: (isVisible: boolean) => () => void
 }
 
 class InfluxTableHeader extends PureComponent<Props> {
   public render() {
-    const {source} = this.props
-
+    const {toggleWizard} = this.props
     return (
       <div className="panel-heading">
         <h2 className="panel-title">{this.title}</h2>
         <Authorized requiredRole={EDITOR_ROLE}>
-          <Link
-            to={`/sources/${source.id}/manage-sources/new`}
-            className="btn btn-sm btn-primary"
-          >
+          <div onClick={toggleWizard(true)} className="btn btn-sm btn-primary">
             <span className="icon plus" /> Add Connection
-          </Link>
+          </div>
         </Authorized>
       </div>
     )
