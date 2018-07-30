@@ -8,7 +8,6 @@ import ReactCodeMirror from 'src/dashboards/components/ReactCodeMirror'
 import TemplateDrawer from 'src/shared/components/TemplateDrawer'
 import QueryStatus from 'src/shared/components/QueryStatus'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import OnClickOutside from 'src/shared/components/OnClickOutside'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -41,7 +40,6 @@ interface Props {
   onUpdate: (text: string) => Promise<void>
   config: QueryConfig
   templates: Template[]
-  onClickOutside: () => void
 }
 
 const FIRST_TEMP_VAR = '0.tempVar'
@@ -172,13 +170,6 @@ class InfluxQLEditor extends Component<Props, State> {
         </div>
       </div>
     )
-  }
-
-  public handleClickOutside = (): void => {
-    this.setState({focused: false})
-
-    this.hideTemplateValues()
-    this.handleBlurEditor()
   }
 
   private handleTemplateSelection = (
@@ -410,4 +401,4 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 }
 
-export default OnClickOutside(InfluxQLEditor)
+export default InfluxQLEditor
