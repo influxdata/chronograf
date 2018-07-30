@@ -325,10 +325,6 @@ class InfluxQLEditor extends Component<Props, State> {
     }
   }
 
-  private hideTemplateValues = (): void => {
-    this.setState({isShowingTemplateValues: false})
-  }
-
   private handleHideAndFocus = (): void => {
     this.setState({isShowingTemplateValues: false, focused: true})
   }
