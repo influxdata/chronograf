@@ -115,11 +115,7 @@ class InfluxQLEditor extends Component<Props, State> {
     } = this.state
 
     return (
-      <div
-        className="query-editor"
-        onMouseDown={this.handleMouseDown}
-        onBlur={this.handleBlurEditor}
-      >
+      <div className="query-editor" onMouseDown={this.handleMouseDown}>
         {this.dismissPreviewButton}
         <ReactCodeMirror
           ref={this.codeMirrorRef}
@@ -133,6 +129,7 @@ class InfluxQLEditor extends Component<Props, State> {
           readOnly={isShowingTemplateValues}
           onChange={this.handleChange}
           onFocus={this.handleFocusEditor}
+          onBlur={this.handleBlurEditor}
           isShowingTemplateValues={isShowingTemplateValues}
           onKeyDown={this.handleKeyDownEditor}
           onBeforeChange={this.handleUpdateTemplatingQueryText}
