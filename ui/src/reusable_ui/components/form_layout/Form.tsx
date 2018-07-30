@@ -1,5 +1,6 @@
 // Libraries
-import React, {Component} from 'react'
+import React, {Component, ComponentClass} from 'react'
+import _ from 'lodash'
 
 // Components
 import FormElement from 'src/reusable_ui/components/form_layout/FormElement'
@@ -23,23 +24,47 @@ class Form extends Component<Props> {
   public static Divider = FormDivider
   public static Footer = FormFooter
 
+  public static ValidElements: ComponentClass[] = [
+    FormElement,
+    FormLabel,
+    FormDivider,
+    FormFooter,
+  ]
+
+  public static ValidElementNames: string = _.map(Form.ValidElements, valid => {
+    const name = valid.displayName.split('Form').pop()
+
+    return `<Form.${name}>`
+  }).join(', ')
+
   public render() {
     const {children} = this.props
 
-    this.validateChildCount()
+    this.validateChildren()
 
     return <div className="form--wrapper">{children}</div>
   }
 
-  private validateChildCount = (): void => {
-    const {children} = this.props
+  private validateChildren = (): void => {
+    const childArray = React.Children.toArray(this.props.children)
 
-    if (React.Children.count(children) === 0) {
+    if (childArray.length === 0) {
       throw new Error(
         'Form require at least 1 child element. We recommend using <Form.Element>'
       )
     }
+
+    const childrenAreValid = _.every(childArray, this.childTypeIsValid)
+
+    if (!childrenAreValid) {
+      throw new Error(
+        `<Form> expected children of type ${Form.ValidElementNames}`
+      )
+    }
   }
+
+  private childTypeIsValid = (child: JSX.Element): boolean =>
+    _.includes(Form.ValidElements, child.type)
 }
 
 export default Form
