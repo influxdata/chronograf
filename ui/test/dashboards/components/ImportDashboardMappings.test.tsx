@@ -50,7 +50,7 @@ describe('Dashboards.Components.ImportDashboardMappings', () => {
   })
 
   describe('if there are cells and imported sources', () => {
-    it('should display a table with rows correlating with source names', () => {
+    it('should display a table with rows correlating to source names', () => {
       const sourceLink = '/chronograf/v1/sources/1'
       const queryWithSource = {...query, source: sourceLink}
       const cellWithSource = {...cell, queries: [queryWithSource]}
@@ -60,6 +60,7 @@ describe('Dashboards.Components.ImportDashboardMappings', () => {
       const importedSources = {
         [sourceID]: {name: importedSourceName, link: sourceLink},
       }
+
       const {wrapper} = setup({cells, importedSources})
 
       const table = wrapper.find('table')
@@ -71,9 +72,32 @@ describe('Dashboards.Components.ImportDashboardMappings', () => {
       expect(table.length).toBe(1)
       expect(bodyRows.length).toBe(1)
       expect(sourceLabel.length).toBe(1)
-      expect(sourceLabel.contains(importedSourceName)).toBe(true)
-      expect(sourceLabel.contains(sourceID.toString())).toBe(true)
+      expect(sourceLabel.text()).toContain(importedSourceName)
+      expect(sourceLabel.text()).toContain(sourceID.toString())
       expect(noMapping.length).toBe(0)
+    })
+
+    describe('if cells have queries and no associated source', () => {
+      it('should list those cells as not having source', () => {
+        const sourceLink = ''
+        const queryWithoutSource = {...query, source: sourceLink}
+        const cellWithSource = {...cell, queries: [queryWithoutSource]}
+        const cells = [cellWithSource]
+        const importedSourceName = 'Old Source'
+        const sourceID = 1
+        const importedSources = {
+          [sourceID]: {name: importedSourceName, link: sourceLink},
+        }
+        const {wrapper} = setup({cells, importedSources})
+
+        const noMapping = wrapper.find({'data-test': 'no-mapping'})
+        const noSourceLabel = wrapper.find({'data-test': 'source-label'})
+
+        expect(noSourceLabel.length).toBe(1)
+        // if there was a source, there'd be (id) in the label
+        expect(noSourceLabel.text()).toContain('No')
+        expect(noMapping.length).toBe(0)
+      })
     })
   })
 })

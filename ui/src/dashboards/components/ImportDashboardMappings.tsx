@@ -45,10 +45,12 @@ interface SourceItemValue {
   sourceInfo: SourceInfo
 }
 
+const NO_SOURCE = 'none'
+
 class ImportDashboardMappings extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = {sourcesCells: null, sourceMappings: null}
+    this.state = {sourcesCells: {}, sourceMappings: {}}
   }
 
   public componentDidMount() {
@@ -61,13 +63,20 @@ class ImportDashboardMappings extends Component<Props, State> {
     let sourcesCells: SourcesCells = {}
     const sourceMappings: SourceMappings = {}
     const sourceInfo: SourceInfo = this.getSourceInfo(source)
+    const cellsWithNoSource: CellInfo[] = []
 
     sourcesCells = _.reduce(
       cells,
       (acc, c) => {
         const cellInfo: CellInfo = {id: c.i, name: c.name}
-        const sourceLink = getDeep<string>(c, 'queries.0.source', '')
+        const query = getDeep<CellQuery>(c, 'queries.0', null)
+        if (_.isEmpty(query)) {
+          return acc
+        }
+
+        const sourceLink = getDeep<string>(query, 'source', '')
         if (!sourceLink) {
+          cellsWithNoSource.push(cellInfo)
           return acc
         }
 
@@ -95,6 +104,10 @@ class ImportDashboardMappings extends Component<Props, State> {
       },
       sourcesCells
     )
+
+    if (cellsWithNoSource.length) {
+      sourcesCells[NO_SOURCE] = cellsWithNoSource
+    }
 
     this.setState({sourcesCells, sourceMappings})
   }
@@ -138,27 +151,41 @@ class ImportDashboardMappings extends Component<Props, State> {
     //     }
     //   })
     // } else {
-    return _.map(sourcesCells, (__, i) => {
-      if (sourcesCells[i]) {
-        const sourceName = getDeep<string>(
-          importedSources,
-          `${i}.name`,
-          'Source'
-        )
-        return this.getRow(sourceName, i)
-      }
-    })
+    const rows = _.reduce(
+      sourcesCells,
+      (acc, __, i) => {
+        if (i !== NO_SOURCE && sourcesCells[i]) {
+          const sourceName = getDeep<string>(
+            importedSources,
+            `${i}.name`,
+            'Source'
+          )
+          acc.push(this.getRow(sourceName, i))
+        }
+        return acc
+      },
+      []
+    )
+    if (sourcesCells[NO_SOURCE]) {
+      const noSourceRow = this.getRow('No Source Found', NO_SOURCE)
+      rows.push(noSourceRow)
+    }
+    return rows
     // }
   }
 
   private getRow(sourceName: string, sourceID: string): JSX.Element {
+    let sourceLabel = `${sourceName} (${sourceID})`
+    let description = 'Cells that use this Source:'
+    if (sourceID === NO_SOURCE) {
+      sourceLabel = sourceName
+      description = 'Cells with no Source:'
+    }
     return (
       <tr key={sourceID}>
         <td>
-          <div data-test="source-label">
-            {sourceName} ({sourceID})
-          </div>
-          <div>Cells that use this Source:</div>
+          <div data-test="source-label">{sourceLabel}</div>
+          <div>{description}</div>
           {this.getCellsForSource(sourceID)}
         </td>
         <td>
@@ -238,7 +265,21 @@ class ImportDashboardMappings extends Component<Props, State> {
     const {sourceMappings} = this.state
 
     const mappedCells = cells.map(c => {
-      const sourceLink = getDeep<string>(c, 'queries.0.source', '')
+      const query = getDeep<CellQuery>(c, 'queries.0', null)
+      if (_.isEmpty(query)) {
+        return c
+      }
+      const sourceLink = getDeep<string>(query, 'source', '')
+      if (!sourceLink) {
+        const mappedSourceLink = sourceMappings[NO_SOURCE].link
+        let queries = getDeep<CellQuery[]>(c, 'queries', [])
+        if (queries.length) {
+          queries = queries.map(q => {
+            return {...q, source: mappedSourceLink}
+          })
+        }
+        return {...c, queries}
+      }
       const importedSourceID = _.findKey(
         importedSources,
         is => is.link === sourceLink
