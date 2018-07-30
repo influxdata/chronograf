@@ -114,10 +114,23 @@ class ImportDashboardMappings extends Component<Props, State> {
 
   public render() {
     return (
-      <>
-        {this.table}
-        <button onClick={this.handleSubmit}>Done</button>
-      </>
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-md-12">
+            <div className="panel">
+              <div className="panel-body">
+                {this.table}
+                <button
+                  className="btn btn-sm btn-success"
+                  onClick={this.handleSubmit}
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 
@@ -133,7 +146,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     }
 
     return (
-      <table>
+      <table className="table v-center admin-table table-highlight">
         {this.header}
         <tbody>{this.tableBody}</tbody>
       </table>
@@ -189,6 +202,11 @@ class ImportDashboardMappings extends Component<Props, State> {
           {this.getCellsForSource(sourceID)}
         </td>
         <td>
+          <div className="fancytable--td provider--arrow">
+            <span />
+          </div>
+        </td>
+        <td className="text-right">
           <Dropdown
             onChange={this.handleDropdownChange}
             selectedID={this.getSelectedSourceID(sourceID)}
@@ -213,6 +231,7 @@ class ImportDashboardMappings extends Component<Props, State> {
       <thead>
         <tr>
           <th>Sources in Dashboard</th>
+          <th />
           <th>Available Sources</th>
         </tr>
       </thead>
