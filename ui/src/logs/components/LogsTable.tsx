@@ -525,7 +525,7 @@ class LogsTable extends Component<Props, State> {
           className={classnames('logs-viewer--cell', {
             highlight: highlightRow,
           })}
-          title={`Jump to '${title}'`}
+          title={`Jump to '${value}'`}
           key={key}
           style={style}
           data-index={rowIndex}
