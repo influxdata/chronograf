@@ -1,5 +1,5 @@
 // Libraries
-import React, {Component} from 'react'
+import React, {Component, MouseEvent} from 'react'
 import _ from 'lodash'
 import classnames from 'classnames'
 
@@ -119,7 +119,7 @@ class InfluxQLEditor extends Component<Props, State> {
     return (
       <div
         className="query-editor"
-        onMouseDown={this.handleVarmojiFocus}
+        onMouseDown={this.handleMouseDown}
         onBlur={this.handleBlurEditor}
       >
         {this.dismissPreviewButton}
@@ -216,7 +216,7 @@ class InfluxQLEditor extends Component<Props, State> {
     this.closeDrawer()
   }
 
-  private handleVarmojiFocus = (e: MouseEvent): void => {
+  private handleMouseDown = (e: MouseEvent): void => {
     this.setState({focused: true})
 
     e.stopPropagation()
@@ -372,7 +372,6 @@ class InfluxQLEditor extends Component<Props, State> {
         <button
           className="query-editor--dismiss"
           onClick={this.handleHideAndFocus}
-          onMouseDown={this.handleVarmojiFocus}
         />
       )
     }
