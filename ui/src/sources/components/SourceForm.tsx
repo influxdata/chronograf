@@ -6,13 +6,13 @@ import _ from 'lodash'
 
 // Components
 import Form from 'src/reusable_ui/components/form_layout/Form'
-import {Columns} from 'src/reusable_ui/types'
 
 // Constants
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
 // Types
+import {Columns} from 'src/reusable_ui/types'
 import {Source, Role, Organization} from 'src/types'
 
 interface Me {
