@@ -24,14 +24,14 @@ class Form extends Component<Props> {
   public static Divider = FormDivider
   public static Footer = FormFooter
 
-  public static ValidElements: ComponentClass[] = [
+  public static ValidChildTypes: ComponentClass[] = [
     FormElement,
     FormLabel,
     FormDivider,
     FormFooter,
   ]
 
-  public static ValidElementNames: string = _.map(Form.ValidElements, valid => {
+  public static ValidChildNames: string = _.map(Form.ValidChildTypes, valid => {
     const name = valid.displayName.split('Form').pop()
 
     return `<Form.${name}>`
@@ -58,13 +58,13 @@ class Form extends Component<Props> {
 
     if (!childrenAreValid) {
       throw new Error(
-        `<Form> expected children of type ${Form.ValidElementNames}`
+        `<Form> expected children of type ${Form.ValidChildNames}`
       )
     }
   }
 
   private childTypeIsValid = (child: JSX.Element): boolean =>
-    _.includes(Form.ValidElements, child.type)
+    _.includes(Form.ValidChildTypes, child.type)
 }
 
 export default Form
