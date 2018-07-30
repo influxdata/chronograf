@@ -1,6 +1,7 @@
 // Libraries
-import React, {Component, Children} from 'react'
+import React, {Component, ComponentClass} from 'react'
 import classnames from 'classnames'
+import _ from 'lodash'
 
 // Components
 import PanelHeader from 'src/reusable_ui/components/panel/PanelHeader'
@@ -32,6 +33,21 @@ class Panel extends Component<Props> {
   public static Body = PanelBody
   public static Footer = PanelFooter
 
+  public static ValidChildTypes: ComponentClass[] = [
+    PanelHeader,
+    PanelBody,
+    PanelFooter,
+  ]
+
+  public static ValidChildNames: string = _.map(
+    Panel.ValidChildTypes,
+    child => {
+      const name = child.displayName.split('Panel').pop()
+
+      return `<Panel.${name}>`
+    }
+  ).join(', ')
+
   public render() {
     const {children} = this.props
 
@@ -47,29 +63,25 @@ class Panel extends Component<Props> {
   }
 
   private validateChildren = (): void => {
-    const {children} = this.props
+    const childArray = React.Children.toArray(this.props.children)
 
-    let invalidCount = 0
-
-    Children.forEach(children, (child: JSX.Element) => {
-      if (
-        child.type === PanelHeader ||
-        child.type === PanelBody ||
-        child.type === PanelFooter
-      ) {
-        return
-      }
-
-      invalidCount += 1
-      return
-    })
-
-    if (invalidCount > 0) {
+    if (childArray.length === 0) {
       throw new Error(
-        'Panel expected children of type <Panel.Header>, <Panel.Body>, or <Panel.Footer>'
+        '<Panel> requires at least 1 child element. We recommend using <Panel.Body>'
+      )
+    }
+
+    const childrenAreValid = _.every(childArray, this.childTypeIsValid)
+
+    if (!childrenAreValid) {
+      throw new Error(
+        `<Panel> expected children of type ${Panel.ValidChildNames}`
       )
     }
   }
+
+  private childTypeIsValid = (child: JSX.Element): boolean =>
+    _.includes(Panel.ValidChildTypes, child.type)
 }
 
 export default Panel
