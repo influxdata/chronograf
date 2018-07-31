@@ -29,7 +29,7 @@ class WizardTextInput extends PureComponent<Props, State> {
     isDisabled: false,
     isValid: () => ({
       status: true,
-      reason: 'this is the reason your input is bad',
+      reason: '',
     }),
     valueModifier: x => x,
     autoFocus: false,
@@ -59,12 +59,10 @@ class WizardTextInput extends PureComponent<Props, State> {
     if (validation.status === false) {
       inputClass = 'form-volcano'
       errorText = validation.reason
-      console.log('false')
     }
-    console.log(value)
 
     return (
-      <div className="form-group col-xs-12 wizard-input">
+      <div className="form-group col-xs-6 wizard-input">
         <label htmlFor={label}>{label}</label>
         <input
           type="text"

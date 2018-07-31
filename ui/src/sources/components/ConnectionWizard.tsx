@@ -1,8 +1,11 @@
 import React, {PureComponent} from 'react'
-import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
-import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
+import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
+import SourceStep from 'src/sources/components/SourceStep'
+import {DEFAULT_SOURCE} from 'src/shared/constants'
+import {Source} from 'src/types'
 
 interface Props {
   isVisible: boolean
@@ -11,6 +14,7 @@ interface Props {
 
 interface State {
   completion: object
+  source: Partial<Source>
 }
 
 @ErrorHandling
@@ -19,10 +23,13 @@ class ConnectionWizard extends PureComponent<Props, State> {
     super(props)
     this.state = {
       completion: [false, false, false],
+      source: DEFAULT_SOURCE,
     }
   }
   public render() {
     const {isVisible, toggleVisibility} = this.props
+    const {source} = this.state
+
     return (
       <WizardOverlay
         visible={isVisible}
@@ -35,12 +42,14 @@ class ConnectionWizard extends PureComponent<Props, State> {
           title="Add a New InfluxDB Connection"
           tipText=""
           isComplete={this.isSourceComplete}
-          onNext={this.handleFirstNext}
-          onPrevious={this.handleFirstPrev}
-          nextLabel="Continue"
+          onNext={this.handleSourceNext}
+          nextLabel="Create Source"
           previousLabel="Cancel"
         >
-          first children
+          <SourceStep
+            isComplete={this.isSourceComplete}
+            ref={c => (this.sourceStepRef = c && c.getWrappedInstance())}
+          />
         </WizardStep>
         <WizardStep
           title="Add a Kapacitor Connection"
@@ -62,47 +71,47 @@ class ConnectionWizard extends PureComponent<Props, State> {
           nextLabel="Complete Connection"
           previousLabel="Go Back"
         >
-          some third children
+          Dashboards boxes here
         </WizardStep>
       </WizardOverlay>
     )
+  }
+  private handleSourceNext = () => {
+    this.sourceStepRef.next()
   }
 
   private isSourceComplete = () => {
     const {completion} = this.state
     return completion[0]
   }
-
   private isKapacitorComplete = () => {
     const {completion} = this.state
     return completion[1]
   }
-
   private isDashboardSelectionComplete = () => {
     const {completion} = this.state
     return completion[2]
   }
 
-
   private handleFirstNext = () => {
     const {completion} = this.state
     completion[0] = true
     this.setState({
-      completion
+      completion,
     })
   }
   private handleSecondNext = () => {
     const {completion} = this.state
     completion[1] = true
     this.setState({
-      completion
+      completion,
     })
   }
   private handleThirdNext = () => {
     const {completion} = this.state
     completion[2] = true
     this.setState({
-      completion
+      completion,
     })
   }
 
