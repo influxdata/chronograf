@@ -64,6 +64,7 @@ class ImportDashboardMappings extends Component<Props, State> {
   public render() {
     return (
       <>
+        {this.description}
         {this.table}
         <button className="btn btn-sm btn-success" onClick={this.handleSubmit}>
           Done
@@ -74,6 +75,17 @@ class ImportDashboardMappings extends Component<Props, State> {
 
   private get noMappings(): JSX.Element {
     return <div data-test="no-mapping">No source mappings required</div>
+  }
+
+  private get description(): JSX.Element {
+    const description =
+      'In order to ensure a smooth import you need to tell us how to match sources in the imported dashboard with your available sources. Selecting Dyanmic Source will allow the cell to use whatever source you are currently connected to instead of a specific source.'
+    return (
+      <div className="alert alert-primary">
+        <span className="icon octagon" />
+        <div className="alert-message">{description}</div>
+      </div>
+    )
   }
 
   private get table(): JSX.Element {
