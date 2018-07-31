@@ -17,7 +17,7 @@ import {IS_STATIC_LEGEND} from 'src/shared/constants'
 import {TimeRange, Cell, Template, Source} from 'src/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {GrabDataForDownload} from 'src/types/layout'
+import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 interface Props {
   cell: Cell
@@ -95,7 +95,7 @@ class Layout extends Component<Props> {
     )
   }
 
-  private grabDataForDownload: GrabDataForDownload = cellData => {
+  private grabDataForDownload: GrabDataForDownloadHandler = cellData => {
     this.setState({cellData})
   }
 

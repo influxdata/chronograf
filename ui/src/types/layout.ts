@@ -1,5 +1,5 @@
 import {TimeSeriesServerResponse} from 'src/types/series'
 
-export type GrabDataForDownload = (
+export type GrabDataForDownloadHandler = (
   timeSeries: TimeSeriesServerResponse[]
 ) => void

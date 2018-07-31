@@ -24,7 +24,7 @@ import {setHoverTime} from 'src/dashboards/actions'
 import {ColorString} from 'src/types/colors'
 import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
 import {TableOptions, FieldOption, DecimalPlaces} from 'src/types/dashboards'
-import {GrabDataForDownload} from 'src/types/layout'
+import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 interface Props {
   axes: Axes
@@ -50,7 +50,7 @@ interface Props {
   editQueryStatus: () => void
   onSetResolution: () => void
   handleSetHoverTime: () => void
-  grabDataForDownload?: GrabDataForDownload
+  grabDataForDownload?: GrabDataForDownloadHandler
 }
 
 class RefreshingGraph extends PureComponent<Props> {

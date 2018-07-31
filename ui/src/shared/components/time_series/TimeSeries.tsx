@@ -8,7 +8,7 @@ import {fetchTimeSeries} from 'src/shared/apis/query'
 // Types
 import {Template, Source, Query, RemoteDataState} from 'src/types'
 import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
-import {GrabDataForDownload} from 'src/types/layout'
+import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
 import AutoRefresh from 'src/utils/AutoRefresh'
@@ -27,7 +27,7 @@ interface Props {
   inView?: boolean
   templates?: Template[]
   editQueryStatus?: () => void
-  grabDataForDownload?: GrabDataForDownload
+  grabDataForDownload?: GrabDataForDownloadHandler
 }
 
 interface State {
