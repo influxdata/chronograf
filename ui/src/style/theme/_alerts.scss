@@ -105,3 +105,16 @@
     $ix-link-default-hover
   );
 }
+.alert-grey {
+  @include alert-styles(
+    $g5-pepper,
+    $g4-onyx,
+    $g15-platinum,
+    $ix-link-default,
+    $ix-link-default-hover
+  );
+
+  strong {
+    color: $g19-ghost;
+  }
+}
