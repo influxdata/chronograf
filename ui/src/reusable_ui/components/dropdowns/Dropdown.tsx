@@ -11,10 +11,11 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 // Types
 import {
+  DropdownMenuColors,
+  ComponentStatus,
   ComponentColor,
   ComponentSize,
   IconFont,
-  DropdownMenuColors,
 } from 'src/reusable_ui/types'
 
 // Styles
@@ -29,7 +30,7 @@ interface Props {
   buttonColor?: ComponentColor
   buttonSize?: ComponentSize
   menuColor?: DropdownMenuColors
-  disabled?: boolean
+  status?: ComponentStatus
   widthPixels?: number
   icon?: IconFont
   wrapText?: boolean
@@ -46,7 +47,7 @@ class Dropdown extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     buttonColor: ComponentColor.Default,
     buttonSize: ComponentSize.Small,
-    disabled: false,
+    status: ComponentStatus.Default,
     widthPixels: 120,
     wrapText: false,
     maxMenuHeight: 250,
@@ -89,18 +90,12 @@ class Dropdown extends Component<Props, State> {
   }
 
   private get containerClassName(): string {
-    const {
-      buttonColor,
-      buttonSize,
-      disabled,
-      wrapText,
-      customClass,
-    } = this.props
+    const {buttonColor, buttonSize, status, wrapText, customClass} = this.props
 
     return classnames(
       `dropdown dropdown-${buttonSize} dropdown-${buttonColor}`,
       {
-        disabled,
+        disabled: status === ComponentStatus.Disabled,
         'dropdown-wrap': wrapText,
         [customClass]: customClass,
       }
@@ -110,7 +105,7 @@ class Dropdown extends Component<Props, State> {
   private get button(): JSX.Element {
     const {
       selectedID,
-      disabled,
+      status,
       buttonColor,
       buttonSize,
       icon,
@@ -126,8 +121,8 @@ class Dropdown extends Component<Props, State> {
         color={buttonColor}
         size={buttonSize}
         icon={icon}
-        disabled={disabled}
         onClick={this.toggleMenu}
+        status={status}
       >
         {selectedChild.props.children}
       </DropdownButton>
