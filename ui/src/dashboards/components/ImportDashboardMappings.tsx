@@ -12,7 +12,9 @@ import {
   getSourceInfo,
   createSourceMappings,
 } from 'src/dashboards/utils/importDashboardMappings'
-import {NO_SOURCE} from 'src/dashboards/constants'
+
+// Constants
+import {DYNAMIC_SOURCE, DYNAMIC_SOURCE_ITEM} from 'src/dashboards/constants'
 
 // Types
 import {Source, Cell} from 'src/types'
@@ -89,6 +91,14 @@ class ImportDashboardMappings extends Component<Props, State> {
     )
   }
 
+  private get arrow(): JSX.Element {
+    return (
+      <div className="fancytable--td provider--arrow">
+        <span />
+      </div>
+    )
+  }
+
   private get description(): JSX.Element {
     const description = [
       'Match the sources from your imported dashboard with your available sources below. A ',
@@ -126,7 +136,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     const rows = _.reduce(
       sourcesCells,
       (acc, __, i) => {
-        if (i !== NO_SOURCE && sourcesCells[i]) {
+        if (i !== DYNAMIC_SOURCE && sourcesCells[i]) {
           const sourceName = getDeep<string>(
             importedSources,
             `${i}.name`,
@@ -138,8 +148,8 @@ class ImportDashboardMappings extends Component<Props, State> {
       },
       []
     )
-    if (sourcesCells[NO_SOURCE]) {
-      const noSourceRow = this.getRow('No Source Found', NO_SOURCE)
+    if (sourcesCells[DYNAMIC_SOURCE]) {
+      const noSourceRow = this.getRow('Dynamic Source', DYNAMIC_SOURCE)
       rows.push(noSourceRow)
     }
     return rows
@@ -148,9 +158,9 @@ class ImportDashboardMappings extends Component<Props, State> {
   private getRow(sourceName: string, sourceID: string): JSX.Element {
     let sourceLabel = `${sourceName} (${sourceID})`
     let description = 'Cells that use this Source:'
-    if (sourceID === NO_SOURCE) {
+    if (sourceID === DYNAMIC_SOURCE) {
       sourceLabel = sourceName
-      description = 'Cells with no Source:'
+      description = 'Cells using Dynamic Source:'
     }
     return (
       <tr key={sourceID}>
@@ -162,9 +172,7 @@ class ImportDashboardMappings extends Component<Props, State> {
           {this.getCellsForSource(sourceID)}
         </td>
         <td className="dash-map--table-cell dash-map--table-center">
-          <div className="fancytable--td provider--arrow">
-            <span />
-          </div>
+          {this.arrow}
         </td>
         <td className="dash-map--table-cell dash-map--table-half">
           <Dropdown
@@ -172,7 +180,7 @@ class ImportDashboardMappings extends Component<Props, State> {
             buttonColor="btn-default"
             buttonSize="btn-sm"
             items={this.getSourceItems(sourceID)}
-            onChoose={this.handleDropdownChange}
+            onChoose={this.handleChooseDropdown}
             selected={this.getSelected(sourceID)}
           />
         </td>
@@ -183,7 +191,7 @@ class ImportDashboardMappings extends Component<Props, State> {
   private getSourceItems(importedSourceID: string) {
     const {sources} = this.props
 
-    return sources.map(source => {
+    const sourceItems = sources.map(source => {
       const sourceInfo = getSourceInfo(source)
       const sourceMap: SourceItemValue = {
         sourceInfo,
@@ -192,6 +200,8 @@ class ImportDashboardMappings extends Component<Props, State> {
       }
       return sourceMap
     })
+    sourceItems.push({...DYNAMIC_SOURCE_ITEM, importedSourceID})
+    return sourceItems
   }
 
   private get header() {
@@ -230,7 +240,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     })
   }
 
-  private handleDropdownChange = (item: SourceItemValue): void => {
+  private handleChooseDropdown = (item: SourceItemValue): void => {
     const {sourceMappings} = this.state
 
     sourceMappings[item.importedSourceID] = item.sourceInfo

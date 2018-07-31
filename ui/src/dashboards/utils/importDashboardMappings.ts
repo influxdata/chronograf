@@ -1,8 +1,13 @@
+// Libraries
 import _ from 'lodash'
 
+// Utils
 import {getDeep} from 'src/utils/wrappers'
-import {NO_SOURCE} from 'src/dashboards/constants'
 
+// Constants
+import {DYNAMIC_SOURCE, DYNAMIC_SOURCE_INFO} from 'src/dashboards/constants'
+
+// Types
 import {CellQuery, Cell, Source} from 'src/types'
 import {
   CellInfo,
@@ -57,7 +62,8 @@ export const createSourceMappings = (source, cells, importedSources) => {
   )
 
   if (cellsWithNoSource.length) {
-    sourcesCells[NO_SOURCE] = cellsWithNoSource
+    sourcesCells[DYNAMIC_SOURCE] = cellsWithNoSource
+    sourceMappings[DYNAMIC_SOURCE] = DYNAMIC_SOURCE_INFO
   }
 
   return {sourcesCells, sourceMappings}
@@ -76,7 +82,7 @@ export const mapCells = (
 
     const sourceLink = getDeep<string>(query, 'source', '')
     if (!sourceLink) {
-      return mapQueriesInCells(sourceMappings, c, NO_SOURCE)
+      return mapQueriesInCells(sourceMappings, c, DYNAMIC_SOURCE)
     }
 
     let importedSourceID = _.findKey(
