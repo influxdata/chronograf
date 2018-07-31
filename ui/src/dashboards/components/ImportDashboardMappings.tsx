@@ -79,7 +79,14 @@ class ImportDashboardMappings extends Component<Props, State> {
   }
 
   private get noMappings(): JSX.Element {
-    return <div data-test="no-mapping">No source mappings required</div>
+    return (
+      <div
+        data-test="no-mapping"
+        className="generic-empty-state dash-map--empty"
+      >
+        <h5>No source mappings required</h5>
+      </div>
+    )
   }
 
   private get description(): JSX.Element {
