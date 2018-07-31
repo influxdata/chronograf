@@ -10,10 +10,9 @@ interface Validation {
 interface Props {
   value: string
   label: string
-  onBlur?: (value: string) => void
   isValid?: (value) => Validation
   isDisabled?: boolean
-  onChange?: (value: string) => void
+  onChange: (value: string) => void
   valueModifier?: (value: string) => string
   placeholder?: string
   autoFocus?: boolean
@@ -68,7 +67,7 @@ class WizardTextInput extends PureComponent<Props, State> {
           type="text"
           id={label}
           className={`form-control input-sm wizard-input ${inputClass}`}
-          defaultValue={value}
+          value={value}
           placeholder={placeholder}
           onBlur={this.handleBlur}
           onKeyDown={this.handleKeyDown}
@@ -84,12 +83,30 @@ class WizardTextInput extends PureComponent<Props, State> {
   }
 
   private handleBlur = (e: ChangeEvent<HTMLInputElement>) => {
-    const {onBlur, value, valueModifier} = this.props
+    this.submit(e.target.value)
+  }
 
-    const newValue = valueModifier(e.target.value)
+  private handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      this.submit(e.currentTarget.value)
+    }
+    if (e.key === 'Escape') {
+      this.handleEscape()
+    }
+  }
+
+  private handleEscape = () => {
+    const {onChange} = this.props
+    const {initialValue} = this.state
+    onChange(initialValue)
+  }
+
+  private submit = incomingValue => {
+    const {onChange, value, valueModifier} = this.props
+    const newValue = valueModifier(incomingValue)
 
     if (value !== newValue) {
-      onBlur(newValue)
+      onChange(newValue)
     }
 
     this.setState({
@@ -98,34 +115,10 @@ class WizardTextInput extends PureComponent<Props, State> {
   }
 
   private handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const {onChange, valueModifier} = this.props
+    const {onChange} = this.props
     if (onChange) {
-      onChange(valueModifier(e.target.value))
+      onChange(e.target.value)
     }
-  }
-
-  private handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    const {onBlur, value, valueModifier} = this.props
-    if (e.key === 'Enter') {
-      const newValue = valueModifier(e.currentTarget.value) // could this be target instead?
-      if (value !== newValue) {
-        onBlur(newValue)
-      }
-
-      this.setState({
-        initialValue: newValue,
-      })
-    }
-    if (e.key === 'Escape') {
-      this.handleEscape()
-    }
-  }
-
-  private handleEscape = () => {
-    const {onBlur} = this.props
-    const {initialValue} = this.state
-
-    onBlur(initialValue)
   }
 }
 
