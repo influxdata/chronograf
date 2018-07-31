@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import _ from 'lodash'
 
-import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
+import Dropdown from 'src/shared/components/Dropdown'
 
 import {getDeep} from 'src/utils/wrappers'
 
@@ -43,6 +43,7 @@ interface SourceMappings {
 interface SourceItemValue {
   importedSourceID: string
   sourceInfo: SourceInfo
+  text?: string
 }
 
 const NO_SOURCE = 'none'
@@ -146,7 +147,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     }
 
     return (
-      <table className="table v-center admin-table table-highlight">
+      <table className="table v-center admin-table">
         {this.header}
         <tbody>{this.tableBody}</tbody>
       </table>
@@ -157,13 +158,6 @@ class ImportDashboardMappings extends Component<Props, State> {
     const {importedSources} = this.props
     const {sourcesCells} = this.state
 
-    // if (!_.isEmpty(importedSources)) {
-    //   return _.map(importedSources, (s, i) => {
-    //     if (sourcesCells[i]) {
-    //       return this.getRow(s.name, i)
-    //     }
-    //   })
-    // } else {
     const rows = _.reduce(
       sourcesCells,
       (acc, __, i) => {
@@ -184,7 +178,6 @@ class ImportDashboardMappings extends Component<Props, State> {
       rows.push(noSourceRow)
     }
     return rows
-    // }
   }
 
   private getRow(sourceName: string, sourceID: string): JSX.Element {
@@ -207,15 +200,37 @@ class ImportDashboardMappings extends Component<Props, State> {
           </div>
         </td>
         <td className="text-right">
-          <Dropdown
+          {/* <Dropdown
             onChange={this.handleDropdownChange}
             selectedID={this.getSelectedSourceID(sourceID)}
           >
             {this.getSourceItems(sourceID)}
-          </Dropdown>
+          </Dropdown> */}
+          <Dropdown
+            className="dropdown-stretch"
+            buttonColor="btn-default"
+            buttonSize="btn-xs"
+            items={this.getSourceItems(sourceID)}
+            onChoose={this.handleDropdownChange}
+            selected={this.getSelected(sourceID)}
+          />
         </td>
       </tr>
     )
+  }
+
+  private getSourceItems(importedSourceID: string) {
+    const {sources} = this.props
+
+    return sources.map(source => {
+      const sourceInfo = this.getSourceInfo(source)
+      const sourceMap: SourceItemValue = {
+        sourceInfo,
+        importedSourceID,
+        text: source.name,
+      }
+      return sourceMap
+    })
   }
 
   private getSourceInfo(source: Source): SourceInfo {
@@ -238,30 +253,16 @@ class ImportDashboardMappings extends Component<Props, State> {
     )
   }
 
-  private getSourceItems(importedSourceID: string): JSX.Element[] {
-    const {sources} = this.props
-    const sourceItems = sources.map(s => {
-      const sourceInfo = this.getSourceInfo(s)
-      const sourceMap: SourceItemValue = {sourceInfo, importedSourceID}
-      return (
-        <Dropdown.Item key={s.id} id={s.id} value={sourceMap}>
-          {s.name}
-        </Dropdown.Item>
-      )
-    })
-    return sourceItems
-  }
-
-  private getSelectedSourceID(importedSourceID: string): string {
+  private getSelected(importedSourceID: string): string {
     const {sources} = this.props
     const {sourceMappings} = this.state
 
     const sourceMapping = sourceMappings[importedSourceID]
     if (sourceMapping) {
-      return sourceMappings[importedSourceID].id
+      return sourceMappings[importedSourceID].name
     }
 
-    return sources[0].id
+    return sources[0].name
   }
 
   private getCellsForSource(sourceID): JSX.Element[] {
