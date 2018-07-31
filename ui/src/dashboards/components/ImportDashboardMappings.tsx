@@ -83,11 +83,15 @@ class ImportDashboardMappings extends Component<Props, State> {
   }
 
   private get description(): JSX.Element {
-    const description =
-      'In order to ensure a smooth import you need to tell us how to match sources in the imported dashboard with your available sources. Selecting Dyanmic Source will allow the cell to use whatever source you are currently connected to instead of a specific source.'
+    const description = [
+      'In order to ensure a smooth import you need to tell us how to match sources in the imported dashboard with your available sources. Selecting ',
+      <strong key="emphasis">Dynamic Source</strong>,
+      ' will allow the cell to use whatever source you are currently connected to instead of a specific source.',
+    ]
+
     return (
-      <div className="alert alert-primary">
-        <span className="icon octagon" />
+      <div className="alert alert-grey">
+        <span className="icon graphline-2" />
         <div className="alert-message">{description}</div>
       </div>
     )
