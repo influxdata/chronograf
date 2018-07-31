@@ -66,9 +66,14 @@ class ImportDashboardMappings extends Component<Props, State> {
       <>
         {this.description}
         {this.table}
-        <button className="btn btn-sm btn-success" onClick={this.handleSubmit}>
-          Done
-        </button>
+        <div className="dash-map--footer">
+          <button
+            className="dash-map--submit btn btn-sm btn-success"
+            onClick={this.handleSubmit}
+          >
+            Done
+          </button>
+        </div>
       </>
     )
   }
