@@ -4,12 +4,12 @@ import classnames from 'classnames'
 
 // Types
 import {
+  ComponentStatus,
   ComponentColor,
   ComponentSize,
   ButtonShape,
   IconFont,
 } from 'src/reusable_ui/types'
-import {RemoteDataState} from 'src/types/flux'
 
 // Styles
 import './Button.scss'
@@ -21,8 +21,7 @@ interface Props {
   size?: ComponentSize
   shape?: ButtonShape
   icon?: IconFont
-  disabled?: boolean
-  status?: RemoteDataState
+  status?: ComponentStatus
   titleText?: string
 }
 
@@ -31,17 +30,16 @@ class Button extends Component<Props> {
     color: ComponentColor.Default,
     size: ComponentSize.Small,
     shape: ButtonShape.Default,
-    disabled: false,
-    status: RemoteDataState.Done,
+    status: ComponentStatus.Default,
   }
 
   public render() {
-    const {disabled, onClick, text, titleText} = this.props
+    const {status, onClick, text, titleText} = this.props
 
     return (
       <button
         className={this.className}
-        disabled={disabled}
+        disabled={status === ComponentStatus.Disabled}
         onClick={onClick}
         title={titleText || text}
       >
@@ -75,7 +73,7 @@ class Button extends Component<Props> {
   private get statusIndicator(): JSX.Element {
     const {status, size} = this.props
 
-    if (status === RemoteDataState.Loading) {
+    if (status === ComponentStatus.Loading) {
       return <div className={`button-spinner button-spinner--${size}`} />
     }
 
@@ -88,7 +86,7 @@ class Button extends Component<Props> {
     return classnames(`button button-${size} button-${color}`, {
       'button-square': shape === ButtonShape.Square,
       'button-stretch': shape === ButtonShape.StretchToFit,
-      'button--loading': status === RemoteDataState.Loading,
+      'button--loading': status === ComponentStatus.Loading,
     })
   }
 }
