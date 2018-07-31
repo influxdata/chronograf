@@ -132,7 +132,6 @@ class RefreshingGraph extends PureComponent<Props> {
       decimalPlaces,
       manualRefresh,
       handleSetHoverTime,
-      grabDataForDownload,
       isInCEO,
     } = this.props
 
@@ -146,7 +145,6 @@ class RefreshingGraph extends PureComponent<Props> {
         fieldOptions={fieldOptions}
         timeFormat={timeFormat}
         decimalPlaces={decimalPlaces}
-        grabDataForDownload={grabDataForDownload}
         handleSetHoverTime={handleSetHoverTime}
       />
     )
