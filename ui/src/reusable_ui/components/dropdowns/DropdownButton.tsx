@@ -4,7 +4,6 @@ import classnames from 'classnames'
 
 // Types
 import {
-  ComponentStatus,
   ComponentColor,
   ComponentSize,
   IconFont,
@@ -12,7 +11,6 @@ import {
 } from 'src/reusable_ui/types'
 
 // Styles
-import 'src/reusable_ui/components/button/Button.scss'
 import './DropdownButton.scss'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -20,7 +18,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   children: DropdownChild
   onClick: () => void
-  status?: ComponentStatus
+  disabled?: boolean
   active?: boolean
   color?: ComponentColor
   size?: ComponentSize
@@ -32,18 +30,14 @@ class DropdownButton extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
     size: ComponentSize.Small,
-    status: ComponentStatus.Default,
+    disabled: false,
     active: false,
   }
 
   public render() {
-    const {onClick, status, children} = this.props
+    const {onClick, disabled, children} = this.props
     return (
-      <button
-        className={this.classname}
-        onClick={onClick}
-        disabled={status === ComponentStatus.Disabled}
-      >
+      <button className={this.classname} onClick={onClick} disabled={disabled}>
         {this.icon}
         <span className="dropdown--selected">{children}</span>
         <span className="dropdown--caret icon caret-down" />
@@ -52,13 +46,10 @@ class DropdownButton extends Component<Props> {
   }
 
   private get classname(): string {
-    const {status, active, color, size} = this.props
+    const {disabled, active, color, size} = this.props
 
-    return classnames('dropdown--button button', {
-      'button-stretch': true,
-      [`button-${color}`]: color,
-      [`button-${size}`]: size,
-      disabled: status === ComponentStatus.Disabled,
+    return classnames(`dropdown--button btn btn-${color} btn-${size}`, {
+      disabled,
       active,
     })
   }
