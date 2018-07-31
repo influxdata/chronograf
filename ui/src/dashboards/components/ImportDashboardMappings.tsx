@@ -91,9 +91,9 @@ class ImportDashboardMappings extends Component<Props, State> {
 
   private get description(): JSX.Element {
     const description = [
-      'In order to ensure a smooth import you need to tell us how to match sources in the imported dashboard with your available sources. Selecting ',
+      'Match the sources from your imported dashboard with your available sources below. A ',
       <strong key="emphasis">Dynamic Source</strong>,
-      ' will allow the cell to use whatever source you are currently connected to instead of a specific source.',
+      ' allows the cell source to change based on your currently selected source.',
     ]
 
     return (
