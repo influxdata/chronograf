@@ -1,8 +1,11 @@
+// Libaries
 import React, {Component} from 'react'
 import _ from 'lodash'
 
+// Components
 import Dropdown from 'src/shared/components/Dropdown'
 
+// Utils
 import {getDeep} from 'src/utils/wrappers'
 import {
   mapCells,
@@ -11,6 +14,7 @@ import {
 } from 'src/dashboards/utils/importDashboardMappings'
 import {NO_SOURCE} from 'src/dashboards/constants'
 
+// Types
 import {Source, Cell} from 'src/types'
 import {
   SourcesCells,
@@ -18,6 +22,9 @@ import {
   ImportedSources,
   SourceItemValue,
 } from 'src/types/dashboards'
+
+// Styles
+import 'src/dashboards/components/ImportDashboardMappings.scss'
 
 interface Props {
   cells: Cell[]
@@ -56,23 +63,12 @@ class ImportDashboardMappings extends Component<Props, State> {
 
   public render() {
     return (
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-12">
-            <div className="panel">
-              <div className="panel-body">
-                {this.table}
-                <button
-                  className="btn btn-sm btn-success"
-                  onClick={this.handleSubmit}
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <>
+        {this.table}
+        <button className="btn btn-sm btn-success" onClick={this.handleSubmit}>
+          Done
+        </button>
+      </>
     )
   }
 
@@ -88,7 +84,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     }
 
     return (
-      <table className="table v-center admin-table">
+      <table className="table dash-map--table">
         {this.header}
         <tbody>{this.tableBody}</tbody>
       </table>
@@ -130,21 +126,23 @@ class ImportDashboardMappings extends Component<Props, State> {
     }
     return (
       <tr key={sourceID}>
-        <td>
-          <div data-test="source-label">{sourceLabel}</div>
-          <div>{description}</div>
+        <td className="dash-map--table-cell dash-map--table-half">
+          <div className="dash-map--source" data-test="source-label">
+            {sourceLabel}
+          </div>
+          <div className="dash-map--header">{description}</div>
           {this.getCellsForSource(sourceID)}
         </td>
-        <td>
+        <td className="dash-map--table-cell dash-map--table-center">
           <div className="fancytable--td provider--arrow">
             <span />
           </div>
         </td>
-        <td className="text-right">
+        <td className="dash-map--table-cell dash-map--table-half">
           <Dropdown
             className="dropdown-stretch"
             buttonColor="btn-default"
-            buttonSize="btn-xs"
+            buttonSize="btn-sm"
             items={this.getSourceItems(sourceID)}
             onChoose={this.handleDropdownChange}
             selected={this.getSelected(sourceID)}
@@ -172,9 +170,9 @@ class ImportDashboardMappings extends Component<Props, State> {
     return (
       <thead>
         <tr>
-          <th>Sources in Dashboard</th>
-          <th />
-          <th>Available Sources</th>
+          <th className="dash-map--table-half">Sources in Dashboard</th>
+          <th className="dash-map--table-center" />
+          <th className="dash-map--table-half">Available Sources</th>
         </tr>
       </thead>
     )
@@ -196,7 +194,11 @@ class ImportDashboardMappings extends Component<Props, State> {
     const {sourcesCells} = this.state
 
     return _.map(sourcesCells[sourceID], c => {
-      return <div key={c.id}>{c.name}</div>
+      return (
+        <div className="dash-map--cell" key={c.id}>
+          {c.name}
+        </div>
+      )
     })
   }
 
