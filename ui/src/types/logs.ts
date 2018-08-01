@@ -1,3 +1,5 @@
+import {Index} from 'react-virtualized'
+
 import {
   SeverityFormatOptions,
   SeverityColorOptions,
@@ -128,3 +130,5 @@ export interface TimeWindow {
 export interface TimeMarker {
   timeOption: string
 }
+
+export type RowHeightHandler = (index: Index) => number

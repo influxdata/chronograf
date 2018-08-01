@@ -37,6 +37,7 @@ import {
   LogsTableColumn,
   SeverityFormat,
   SeverityLevelColor,
+  RowHeightHandler,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
@@ -268,10 +269,17 @@ class LogsTable extends Component<Props, State> {
   ) => {
     const {scrollToRow} = this.props
     const {scrollLeft, scrollTop} = this.state
+
+    let rowHeight: number | RowHeightHandler = ROW_HEIGHT
+
+    if (!this.props.isTruncated) {
+      rowHeight = this.calculateRowHeight
+    }
+
     const result: any = {
       width,
       height,
-      rowHeight: this.calculateRowHeight,
+      rowHeight,
       rowCount: this.rowCount(),
       scrollLeft,
       scrollTop,
@@ -452,10 +460,6 @@ class LogsTable extends Component<Props, State> {
   }
 
   private calculateRowHeight = ({index}: {index: number}): number => {
-    if (this.props.isTruncated) {
-      return ROW_HEIGHT
-    }
-
     return calculateMessageHeight(index, this.props.data, this.rowCharLimit)
   }
 
