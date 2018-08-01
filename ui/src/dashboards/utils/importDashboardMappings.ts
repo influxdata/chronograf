@@ -17,7 +17,13 @@ import {
   ImportedSources,
 } from 'src/types/dashboards'
 
-export const createSourceMappings = (source, cells, importedSources) => {
+const REGEX_SOURCE_ID = /sources\/(\d+)/g
+
+export const createSourceMappings = (
+  source,
+  cells,
+  importedSources
+): {sourcesCells: SourcesCells; sourceMappings: SourceMappings} => {
   let sourcesCells: SourcesCells = {}
   const sourceMappings: SourceMappings = {}
   const sourceInfo: SourceInfo = getSourceInfo(source)
@@ -73,7 +79,7 @@ export const mapCells = (
   cells: Cell[],
   sourceMappings: SourceMappings,
   importedSources: ImportedSources
-) => {
+): Cell[] => {
   const mappedCells = cells.map(c => {
     const query = getDeep<CellQuery>(c, 'queries.0', null)
     if (_.isEmpty(query)) {
@@ -106,7 +112,11 @@ export const mapCells = (
   return mappedCells
 }
 
-export const mapQueriesInCell = (sourceMappings, cell, sourceID) => {
+export const mapQueriesInCell = (
+  sourceMappings: SourceMappings,
+  cell: Cell,
+  sourceID: string
+): Cell => {
   const mappedSourceLink = sourceMappings[sourceID].link
   let queries = getDeep<CellQuery[]>(cell, 'queries', [])
   if (queries.length) {
@@ -125,9 +135,8 @@ export const getSourceInfo = (source: Source): SourceInfo => {
   }
 }
 
-export const getSourceIDFromLink = (sourceLink: string) => {
-  const sourceIDRegex = /sources\/(\d+)/g
+export const getSourceIDFromLink = (sourceLink: string): string => {
   // first capture group
-  const sourceLinkSID = sourceIDRegex.exec(sourceLink)[1]
+  const sourceLinkSID = REGEX_SOURCE_ID.exec(sourceLink)[1]
   return sourceLinkSID
 }

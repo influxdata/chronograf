@@ -188,7 +188,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     )
   }
 
-  private getSourceItems(importedSourceID: string) {
+  private getSourceItems(importedSourceID: string): SourceItemValue[] {
     const {sources} = this.props
 
     const sourceItems = sources.map(source => {
@@ -204,7 +204,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     return sourceItems
   }
 
-  private get header() {
+  private get header(): JSX.Element {
     return (
       <thead>
         <tr>
@@ -228,7 +228,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     return sources[0].name
   }
 
-  private getCellsForSource(sourceID): JSX.Element[] {
+  private getCellsForSource(sourceID: string): JSX.Element[] {
     const {sourcesCells} = this.state
 
     return _.map(sourcesCells[sourceID], c => {

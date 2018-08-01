@@ -155,7 +155,7 @@ describe('Dashboards.Utils.importDashboardMappings', () => {
   describe('mapQueriesInCell', () => {
     it('returns cell with source from sourceMappings', () => {
       const sourceLink1 = '/chronograf/v1/sources/1'
-      const sourceID = 1
+      const sourceID = '1'
       const sourceMappings = {
         [sourceID]: DYNAMIC_SOURCE_INFO,
       }

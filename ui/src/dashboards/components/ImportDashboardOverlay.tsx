@@ -132,7 +132,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
     }
   }
 
-  private handleUploadDashboard = (cells: Cell[]) => {
+  private handleUploadDashboard = (cells: Cell[]): void => {
     const {dashboard} = this.state
 
     const {onImportDashboard, onDismissOverlay} = this.props
