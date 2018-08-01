@@ -1,18 +1,11 @@
-// Libraries
 import React, {PureComponent, FocusEvent, MouseEvent, ChangeEvent} from 'react'
 import classnames from 'classnames'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 
-// Components
-import Form from 'src/reusable_ui/components/form_layout/Form'
-
-// Constants
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
-import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
-// Types
-import {Columns} from 'src/reusable_ui/types'
+import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 import {Source, Role, Organization} from 'src/types'
 
 interface Me {
@@ -47,131 +40,133 @@ export class SourceForm extends PureComponent<Props> {
       <div className="panel-body">
         {isUsingAuth && isInitialSource && this.authIndicator}
         <form onSubmit={onSubmit}>
-          <Form>
-            <Form.Element label="Connection String" colsSM={Columns.Six}>
+          <div className="form-group col-xs-12 col-sm-6">
+            <label htmlFor="connect-string">Connection String</label>
+            <input
+              type="text"
+              name="url"
+              className="form-control"
+              id="connect-string"
+              placeholder="Address of InfluxDB"
+              onChange={onInputChange}
+              value={source.url}
+              onBlur={onBlurSourceURL}
+              required={true}
+            />
+          </div>
+          <div className="form-group col-xs-12 col-sm-6">
+            <label htmlFor="name">Name</label>
+            <input
+              type="text"
+              name="name"
+              className="form-control"
+              id="name"
+              placeholder="Name this source"
+              onChange={onInputChange}
+              value={source.name}
+              required={true}
+            />
+          </div>
+          <div className="form-group col-xs-12 col-sm-6">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              name="username"
+              className="form-control"
+              id="username"
+              onChange={onInputChange}
+              value={source.username}
+            />
+          </div>
+          <div className="form-group col-xs-12 col-sm-6">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              id="password"
+              onChange={onInputChange}
+              value={source.password}
+            />
+          </div>
+          {this.isEnterprise && (
+            <div className="form-group col-xs-12">
+              <label htmlFor="meta-url">Meta Service Connection URL</label>
               <input
                 type="text"
-                name="url"
+                name="metaUrl"
                 className="form-control"
-                id="connect-string"
-                placeholder="Address of InfluxDB"
+                id="meta-url"
+                placeholder="http://localhost:8091"
                 onChange={onInputChange}
-                value={source.url}
-                onBlur={onBlurSourceURL}
-                required={true}
+                value={source.metaUrl}
               />
-            </Form.Element>
-            <Form.Element label="Name" colsSM={Columns.Six}>
+            </div>
+          )}
+          <div className="form-group col-xs-12 col-sm-6">
+            <label htmlFor="telegraf">Telegraf Database</label>
+            <input
+              type="text"
+              name="telegraf"
+              className="form-control"
+              id="telegraf"
+              onChange={onInputChange}
+              value={source.telegraf}
+            />
+          </div>
+          <div className="form-group col-xs-12 col-sm-6">
+            <label htmlFor="defaultRP">Default Retention Policy</label>
+            <input
+              type="text"
+              name="defaultRP"
+              className="form-control"
+              id="defaultRP"
+              onChange={onInputChange}
+              value={source.defaultRP}
+            />
+          </div>
+          <div className="form-group col-xs-12">
+            <div className="form-control-static">
               <input
-                type="text"
-                name="name"
-                className="form-control"
-                id="name"
-                placeholder="Name this source"
+                type="checkbox"
+                id="defaultConnectionCheckbox"
+                name="default"
+                checked={source.default}
                 onChange={onInputChange}
-                value={source.name}
-                required={true}
               />
-            </Form.Element>
-            <Form.Element label="Username" colsSM={Columns.Six}>
-              <input
-                type="text"
-                name="username"
-                className="form-control"
-                id="username"
-                onChange={onInputChange}
-                value={source.username}
-              />
-            </Form.Element>
-            <Form.Element label="Password" colsSM={Columns.Six}>
-              <input
-                type="password"
-                name="password"
-                className="form-control"
-                id="password"
-                onChange={onInputChange}
-                value={source.password}
-              />
-            </Form.Element>
-            {this.isEnterprise && (
-              <Form.Element
-                label="Meta Service Connection URL"
-                colsSM={Columns.Twelve}
-              >
-                <input
-                  type="text"
-                  name="metaUrl"
-                  className="form-control"
-                  id="meta-url"
-                  placeholder="http://localhost:8091"
-                  onChange={onInputChange}
-                  value={source.metaUrl}
-                />
-              </Form.Element>
-            )}
-            <Form.Element label="Telegraf Database" colsSM={Columns.Six}>
-              <input
-                type="text"
-                name="telegraf"
-                className="form-control"
-                id="telegraf"
-                onChange={onInputChange}
-                value={source.telegraf}
-              />
-            </Form.Element>
-            <Form.Element label="Default Retention Policy" colsSM={Columns.Six}>
-              <input
-                type="text"
-                name="defaultRP"
-                className="form-control"
-                id="defaultRP"
-                onChange={onInputChange}
-                value={source.defaultRP}
-              />
-            </Form.Element>
-            <Form.Element colsSM={Columns.Twelve}>
+              <label htmlFor="defaultConnectionCheckbox">
+                Make this the default connection
+              </label>
+            </div>
+          </div>
+          {this.isHTTPS && (
+            <div className="form-group col-xs-12">
               <div className="form-control-static">
                 <input
                   type="checkbox"
-                  id="defaultConnectionCheckbox"
-                  name="default"
-                  checked={source.default}
+                  id="insecureSkipVerifyCheckbox"
+                  name="insecureSkipVerify"
+                  checked={source.insecureSkipVerify}
                   onChange={onInputChange}
                 />
-                <label htmlFor="defaultConnectionCheckbox">
-                  Make this the default connection
-                </label>
+                <label htmlFor="insecureSkipVerifyCheckbox">Unsafe SSL</label>
               </div>
-            </Form.Element>
-            {this.isHTTPS && (
-              <Form.Element
-                colsSM={Columns.Twelve}
-                helpText={insecureSkipVerifyText}
-              >
-                <div className="form-control-static">
-                  <input
-                    type="checkbox"
-                    id="insecureSkipVerifyCheckbox"
-                    name="insecureSkipVerify"
-                    checked={source.insecureSkipVerify}
-                    onChange={onInputChange}
-                  />
-                  <label htmlFor="insecureSkipVerifyCheckbox">Unsafe SSL</label>
-                </div>
-              </Form.Element>
-            )}
-            <Form.Footer colsSM={Columns.Six} offsetSM={Columns.Three}>
-              <button className={this.submitClass} type="submit">
-                <span className={this.submitIconClass} />
-                {this.submitText}
+              <label className="form-helper">{insecureSkipVerifyText}</label>
+            </div>
+          )}
+          <div className="form-group form-group-submit text-center col-xs-12 col-sm-6 col-sm-offset-3">
+            <button className={this.submitClass} type="submit">
+              <span className={this.submitIconClass} />
+              {this.submitText}
+            </button>
+
+            <br />
+            {isUsingAuth && (
+              <button className="btn btn-link btn-sm" onClick={gotoPurgatory}>
+                <span className="icon shuffle" /> Switch Orgs
               </button>
-              {isUsingAuth && (
-                <button className="btn btn-link btn-sm" onClick={gotoPurgatory}>
-                  <span className="icon shuffle" /> Switch Orgs
-                </button>
-              )}
-            </Form.Footer>
-          </Form>
+            )}
+          </div>
         </form>
       </div>
     )
