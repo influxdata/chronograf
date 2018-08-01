@@ -204,6 +204,7 @@ class LogsPage extends Component<Props, State> {
               onScrollVertical={this.handleVerticalScroll}
               onScrolledToTop={this.handleScrollToTop}
               isScrolledToTop={false}
+              isTruncated={this.isTruncated}
               onTagSelection={this.handleTagSelection}
               fetchMore={this.props.fetchOlderLogsAsync}
               fetchNewer={this.fetchNewer}

@@ -13,6 +13,7 @@ import {colorForSeverity} from 'src/logs/utils/colors'
 import {
   ROW_HEIGHT,
   calculateRowCharWidth,
+  calculateMessageHeight,
   getColumnFromData,
   getValueFromData,
   getValuesFromData,
@@ -42,6 +43,7 @@ import {INITIAL_LIMIT} from 'src/logs/actions'
 interface Props {
   data: TableData
   isScrolledToTop: boolean
+  isTruncated: boolean
   onScrollVertical: () => void
   onScrolledToTop: () => void
   onTagSelection: (selection: {tag: string; key: string}) => void
@@ -236,7 +238,6 @@ class LogsTable extends Component<Props, State> {
                   autoHide={false}
                 >
                   <Grid
-                    rowHeight={ROW_HEIGHT}
                     {...this.gridProperties(
                       width,
                       height,
@@ -270,6 +271,7 @@ class LogsTable extends Component<Props, State> {
     const result: any = {
       width,
       height,
+      rowHeight: this.calculateRowHeight,
       rowCount: this.rowCount(),
       scrollLeft,
       scrollTop,
@@ -449,6 +451,9 @@ class LogsTable extends Component<Props, State> {
     return data.length * ROW_HEIGHT
   }
 
+  private calculateRowHeight = ({index}: {index: number}): number =>
+    calculateMessageHeight(index, this.props.data, this.rowCharLimit)
+
   private headerRenderer = ({key, style, columnIndex}) => {
     const column = getColumnFromData(this.props.data, columnIndex)
     const classes = 'logs-viewer--cell logs-viewer--cell-header'
@@ -514,7 +519,7 @@ class LogsTable extends Component<Props, State> {
       title = formattedValue
     }
 
-    if (column === 'message') {
+    if (column === 'message' && this.props.isTruncated) {
       formattedValue = (
         <ExpandableMessage
           formattedValue={formattedValue}

@@ -34,7 +34,7 @@ interface State {
   workingLevelColumns: SeverityLevelColor[]
   workingColumns: LogsTableColumn[]
   workingFormat: SeverityFormat
-  isTruncated: boolean
+  isWorkingTruncated: boolean
 }
 
 @ErrorHandling
@@ -46,14 +46,14 @@ class OptionsOverlay extends Component<Props, State> {
       workingLevelColumns: this.props.severityLevelColors,
       workingColumns: this.props.columns,
       workingFormat: this.props.severityFormat,
-      isTruncated: this.props.isTruncated,
+      isWorkingTruncated: this.props.isTruncated,
     }
   }
 
   public shouldComponentUpdate(__, nextState: State) {
     const isTruncatedDifferent = !_.isEqual(
-      nextState.isTruncated,
-      this.state.isTruncated
+      nextState.isWorkingTruncated,
+      this.state.isWorkingTruncated
     )
 
     const isColorsDifferent = !_.isEqual(
@@ -135,34 +135,50 @@ class OptionsOverlay extends Component<Props, State> {
   }
 
   private get renderTruncateOption() {
-    const {isTruncated} = this.state
+    const {isWorkingTruncated} = this.state
 
     return (
       <>
         <label className="form-label">Truncate Log Lines</label>
         <SlideToggle
           onChange={this.handleTruncationToggle}
-          active={isTruncated}
+          active={isWorkingTruncated}
         />
       </>
     )
   }
 
   private handleTruncationToggle = (): void => {
-    const {isTruncated} = this.state
+    const {isWorkingTruncated} = this.state
 
-    this.setState({isTruncated: !isTruncated})
+    this.setState({isWorkingTruncated: !isWorkingTruncated})
   }
 
   private get isSaveDisabled(): boolean {
-    const {workingLevelColumns, workingColumns, workingFormat} = this.state
-    const {severityLevelColors, columns, severityFormat} = this.props
+    const {
+      workingLevelColumns,
+      workingColumns,
+      workingFormat,
+      isWorkingTruncated,
+    } = this.state
+    const {
+      severityLevelColors,
+      columns,
+      severityFormat,
+      isTruncated,
+    } = this.props
 
     const severityChanged = !_.isEqual(workingLevelColumns, severityLevelColors)
     const columnsChanged = !_.isEqual(workingColumns, columns)
     const formatChanged = !_.isEqual(workingFormat, severityFormat)
+    const isTruncatedChagned = !_.isEqual(isWorkingTruncated, isTruncated)
 
-    if (severityChanged || columnsChanged || formatChanged) {
+    if (
+      severityChanged ||
+      columnsChanged ||
+      formatChanged ||
+      isTruncatedChagned
+    ) {
       return false
     }
 
@@ -181,13 +197,13 @@ class OptionsOverlay extends Component<Props, State> {
       workingLevelColumns,
       workingFormat,
       workingColumns,
-      isTruncated,
+      isWorkingTruncated,
     } = this.state
 
     await onUpdateSeverityFormat(workingFormat)
     await onUpdateSeverityLevels(workingLevelColumns)
     await onUpdateColumns(workingColumns)
-    await onUpdateTruncation(isTruncated)
+    await onUpdateTruncation(isWorkingTruncated)
     onDismissOverlay()
   }
 
