@@ -456,7 +456,20 @@ class LogsTable extends Component<Props, State> {
   private calculateTotalHeight = (): number => {
     const data = getValuesFromData(this.props.data)
 
-    return data.length * ROW_HEIGHT
+    if (this.props.isTruncated) {
+      return data.length * ROW_HEIGHT
+    }
+
+    return _.reduce(
+      data,
+      (acc, __, index) => {
+        return (
+          acc +
+          calculateMessageHeight(index, this.props.data, this.rowCharLimit)
+        )
+      },
+      0
+    )
   }
 
   private calculateRowHeight = ({index}: {index: number}): number => {
