@@ -1,0 +1,87 @@
+@import 'src/style/modules/influx-colors';
+@import 'src/style/modules/variables';
+@import 'src/style/modules/mixins';
+
+.card-select--card {
+    background-color: $g1-raven;
+    border-radius: $radius;
+    height: 197px;
+    width: 197px;
+    margin: $ix-marg-b;
+    border: 3px solid transparent;
+    transition: border 0.2s ease;
+    transition: background-color 0.2s ease;
+    box-sizing: content-box;
+}
+
+.card-select--image {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    img {
+        filter: grayscale(0.80);
+        width: 100px;
+        height: 100px;
+        transition: filter .2s ease;
+        font-size: $ix-text-base;
+    }
+}
+
+.card-select--card:hover,
+.card-select--card.checked {
+    border: 3px solid $c-rainforest;
+    background-color: $g5-pepper;
+    .card-select--image{
+        img {
+            filter: grayscale(0);
+        }
+    }
+}
+
+.card-select--container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    font-size: 22px;
+    user-select: none;
+    width: 100%;
+    height: 100%;
+    input {
+      background: white;
+    }
+}
+
+.card-select--label {
+  text-align: center;
+  min-width: 100%;
+  display: inline-block;
+  position: absolute;
+  bottom: $ix-marg-c;
+  font-family: $ix-text-font;
+  color: $ix-text-default;
+  font-size: $ix-text-base;
+  font-weight: 600;
+}
+
+.card-select--container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.card-select--checkmark {
+    position: absolute;
+    left: $ix-marg-c;
+    top: $ix-marg-c;
+    height: 22px;
+    width: 22px;
+    color: $c-rainforest;
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.card-select--checkmark.checked {
+    opacity: 1;
+}
