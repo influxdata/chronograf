@@ -14,6 +14,7 @@ import {
   notifySourceCreationFailed,
   notifySourceCreationSucceeded,
 } from 'src/shared/copy/notifications'
+import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 
 import {Source} from 'src/types'
 import {DEFAULT_SOURCE} from 'src/shared/constants'
@@ -87,9 +88,16 @@ class SourceStep extends PureComponent<Props, State> {
         />
         <WizardCheckbox
           isChecked={source.default}
-          text="Make this the default connection"
+          text={'Make this the default connection'}
           onChange={this.onChangeInput('default')}
         />
+        {this.isHTTPS && (
+          <WizardCheckbox
+            isChecked={source.insecureSkipVerify}
+            text={`Unsafe SSL: ${insecureSkipVerifyText}`}
+            onChange={this.onChangeInput('insecureSkipVerify')}
+          />
+        )}
       </>
     )
   }
@@ -109,6 +117,11 @@ class SourceStep extends PureComponent<Props, State> {
   private onChangeInput = (key: string) => (value: string | boolean) => {
     const {source} = this.state
     this.setState({source: {...source, [key]: value}})
+  }
+
+  private get isHTTPS(): boolean {
+    const {source} = this.state
+    return getDeep<string>(source, 'url', '').startsWith('https')
   }
 }
 
