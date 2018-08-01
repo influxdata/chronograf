@@ -38,6 +38,7 @@ interface Props {
   widthPixels?: number
   titleText?: string
   disabledTitleText?: string
+  customClass?: string
 }
 
 class ControlledInput extends Component<Props> {
@@ -149,7 +150,7 @@ class ControlledInput extends Component<Props> {
   }
 
   private get className(): string {
-    const {size, status, icon} = this.props
+    const {size, status, icon, customClass} = this.props
 
     return classnames('input', {
       [`input-${size}`]: size,
@@ -158,6 +159,7 @@ class ControlledInput extends Component<Props> {
       'input--error': status === ComponentStatus.Error,
       'input--loading': status === ComponentStatus.Loading,
       'input--disabled': status === ComponentStatus.Disabled,
+      [`${customClass}`]: customClass,
     })
   }
 
