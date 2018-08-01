@@ -114,21 +114,6 @@ export interface DashboardName {
   link: string
 }
 
-interface DashboardFileMetaSection {
-  chronografVersion?: string
-  sources?: {
-    [x: string]: {
-      name: string
-      link: string
-    }
-  }
-}
-
-export interface DashboardFile {
-  meta?: DashboardFileMetaSection
-  dashboard: Dashboard
-}
-
 export enum ThresholdType {
   Text = 'text',
   BG = 'background',
@@ -162,4 +147,49 @@ export interface DashboardUIState {
 export interface DashboardSwitcherLinks {
   active?: DashboardSwitcherLink
   links: DashboardSwitcherLink[]
+}
+
+// Dashboards Imports
+interface DashboardFileMetaSection {
+  chronografVersion?: string
+  sources?: ImportedSources
+}
+
+export interface ImportedSources {
+  [x: string]: ImportedSourceInfo
+}
+
+export interface ImportedSourceInfo {
+  name: string
+  link: string
+}
+
+export interface CellInfo {
+  id: string
+  name: string
+}
+
+export interface SourcesCells {
+  [x: string]: CellInfo[]
+}
+
+export interface SourceInfo {
+  name: string
+  id: string
+  link: string
+}
+
+export interface SourceMappings {
+  [x: string]: SourceInfo
+}
+
+export interface SourceItemValue {
+  importedSourceID: string
+  sourceInfo: SourceInfo
+  text?: string
+}
+
+export interface DashboardFile {
+  meta?: DashboardFileMetaSection
+  dashboard: Dashboard
 }

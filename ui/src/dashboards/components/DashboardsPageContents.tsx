@@ -9,10 +9,12 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 
-import {Dashboard} from 'src/types'
+import {Dashboard, Source} from 'src/types'
 import {Notification} from 'src/types/notifications'
 
 interface Props {
+  source: Source
+  sources: Source[]
   dashboards: Dashboard[]
   onDeleteDashboard: (dashboard: Dashboard) => () => void
   onCreateDashboard: () => void
@@ -140,7 +142,7 @@ class DashboardsPageContents extends Component<Props, State> {
   }
 
   private get renderImportOverlay(): JSX.Element {
-    const {onImportDashboard, notify} = this.props
+    const {onImportDashboard, notify, sources, source} = this.props
     const {isOverlayVisible} = this.state
 
     return (
@@ -149,6 +151,8 @@ class DashboardsPageContents extends Component<Props, State> {
           onDismissOverlay={this.handleToggleOverlay}
           onImportDashboard={onImportDashboard}
           notify={notify}
+          source={source}
+          sources={sources}
         />
       </OverlayTechnology>
     )

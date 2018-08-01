@@ -3,7 +3,12 @@ import {
   DEFAULT_FIX_FIRST_COLUMN,
 } from 'src/shared/constants/tableGraph'
 import {Cell, QueryConfig} from 'src/types'
-import {CellType, Dashboard, DecimalPlaces} from 'src/types/dashboards'
+import {
+  CellType,
+  Dashboard,
+  DecimalPlaces,
+  SourceItemValue,
+} from 'src/types/dashboards'
 
 export const UNTITLED_GRAPH: string = 'Untitled Graph'
 
@@ -118,3 +123,16 @@ export enum CEOTabs {
 export const MAX_TOLOCALESTRING_VAL = 20 // 20 is the max input to maximumFractionDigits in spec for tolocalestring
 export const MIN_DECIMAL_PLACES = '0'
 export const MAX_DECIMAL_PLACES = MAX_TOLOCALESTRING_VAL.toString()
+
+// used in importing dashboards and mapping sources
+export const DYNAMIC_SOURCE = 'dynamic'
+export const DYNAMIC_SOURCE_INFO = {
+  name: 'Dynamic Source',
+  id: DYNAMIC_SOURCE,
+  link: '',
+}
+export const DYNAMIC_SOURCE_ITEM: SourceItemValue = {
+  text: 'Dynamic Source',
+  sourceInfo: DYNAMIC_SOURCE_INFO,
+  importedSourceID: '',
+}
