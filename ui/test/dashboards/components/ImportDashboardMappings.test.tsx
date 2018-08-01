@@ -78,7 +78,7 @@ describe('Dashboards.Components.ImportDashboardMappings', () => {
     })
 
     describe('if cells have queries and no associated source', () => {
-      it('should list those cells as not having source', () => {
+      it('should list those cells as dynamic source', () => {
         const sourceLink = ''
         const queryWithoutSource = {...query, source: sourceLink}
         const cellWithSource = {...cell, queries: [queryWithoutSource]}
@@ -95,7 +95,7 @@ describe('Dashboards.Components.ImportDashboardMappings', () => {
 
         expect(noSourceLabel.length).toBe(1)
         // if there was a source, there'd be (id) in the label
-        expect(noSourceLabel.text()).toContain('No')
+        expect(noSourceLabel.text()).toContain('Dynamic Source')
         expect(noMapping.length).toBe(0)
       })
     })

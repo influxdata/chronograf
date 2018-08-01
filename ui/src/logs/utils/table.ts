@@ -28,7 +28,10 @@ export const getColumnFromData = (data: TableData, index: number): string =>
   getDeep(data, `columns.${index}`, '')
 
 export const isClickable = (column: string): boolean =>
-  _.includes(['appname', 'facility', 'host', 'hostname', 'severity'], column)
+  _.includes(
+    ['appname', 'facility', 'host', 'hostname', 'severity', 'procid'],
+    column
+  )
 
 export const formatColumnValue = (
   column: string,
@@ -38,9 +41,10 @@ export const formatColumnValue = (
   switch (column) {
     case 'timestamp':
       return moment(+value / 1000000).format('YYYY/MM/DD HH:mm:ss')
+    case 'procid':
+    case 'host':
     case 'appname':
-      const length = Math.floor(DEFAULT_COLUMN_WIDTH / CHAR_WIDTH) - 2
-      return _.truncate(value || '', {length})
+      return truncateText(value, column)
     case 'message':
       value = (value || 'No Message Provided').replace('\\n', '')
       if (value.indexOf(' ') > charLimit - 5) {
@@ -60,6 +64,13 @@ export const header = (
 
   const headerOption = _.find(headerOptions, h => h.internalName === key)
   return _.get(headerOption, 'displayName') || _.capitalize(key)
+}
+
+const truncateText = (value: string, column: string): string => {
+  const columnWidth = getColumnWidth(column)
+  const length = Math.floor(columnWidth / CHAR_WIDTH) - 2
+
+  return _.truncate(value || '', {length})
 }
 
 export const getColumnWidth = (column: string): number => {

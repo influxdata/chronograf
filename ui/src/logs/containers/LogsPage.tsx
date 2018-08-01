@@ -5,6 +5,7 @@ import moment from 'moment'
 import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {Greys} from 'src/reusable_ui/types'
+import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 
@@ -180,17 +181,16 @@ class LogsPage extends Component<Props, State> {
         <div className="page">
           {this.header}
           <div className="page-contents logs-viewer">
+            <QueryResults count={this.histogramTotal} queryCount={queryCount} />
             <LogsGraphContainer>{this.chart}</LogsGraphContainer>
             <SearchBar
               searchString={searchTerm}
               onSearch={this.handleSubmitSearch}
             />
             <FilterBar
-              numResults={this.histogramTotal}
               filters={filters || []}
               onDelete={this.handleFilterDelete}
               onFilterChange={this.handleFilterChange}
-              queryCount={queryCount}
             />
             <LogsTable
               count={this.histogramTotal}
@@ -210,12 +210,17 @@ class LogsPage extends Component<Props, State> {
               hasScrolled={this.state.hasScrolled}
               tableInfiniteData={this.props.tableInfiniteData}
               onChooseCustomTime={this.handleChooseCustomTime}
+              onExpandMessage={this.handleExpandMessage}
             />
           </div>
         </div>
         {this.renderImportOverlay()}
       </>
     )
+  }
+
+  private handleExpandMessage = () => {
+    this.setState({liveUpdating: LiveUpdating.Pause})
   }
 
   private fetchNewer = (time: string) => {

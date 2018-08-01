@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
+import {getDeep} from 'src/utils/wrappers'
 
 import Container from 'src/reusable_ui/components/overlays/OverlayContainer'
 import Heading from 'src/reusable_ui/components/overlays/OverlayHeading'
@@ -114,8 +115,8 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
       const {dashboard, meta} = JSON.parse(uploadContent)
 
       if (!_.isEmpty(dashboard)) {
-        const cells = _.get(dashboard, 'cells', [])
-        const importedSources = _.get(meta, 'sources', {})
+        const cells = getDeep<Cell[]>(dashboard, 'cells', [])
+        const importedSources = getDeep<ImportedSources>(meta, 'sources', {})
         this.setState({
           cells,
           dashboard,
@@ -132,7 +133,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
     }
   }
 
-  private handleUploadDashboard = (cells: Cell[]) => {
+  private handleUploadDashboard = (cells: Cell[]): void => {
     const {dashboard} = this.state
 
     const {onImportDashboard, onDismissOverlay} = this.props

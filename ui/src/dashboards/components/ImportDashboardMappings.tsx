@@ -1,4 +1,4 @@
-// Libaries
+// Libraries
 import React, {Component} from 'react'
 import _ from 'lodash'
 
@@ -12,7 +12,9 @@ import {
   getSourceInfo,
   createSourceMappings,
 } from 'src/dashboards/utils/importDashboardMappings'
-import {NO_SOURCE} from 'src/dashboards/constants'
+
+// Constants
+import {DYNAMIC_SOURCE, DYNAMIC_SOURCE_ITEM} from 'src/dashboards/constants'
 
 // Types
 import {Source, Cell} from 'src/types'
@@ -86,11 +88,19 @@ class ImportDashboardMappings extends Component<Props, State> {
     )
   }
 
+  private get arrow(): JSX.Element {
+    return (
+      <div className="fancytable--td provider--arrow">
+        <span />
+      </div>
+    )
+  }
+
   private get description(): JSX.Element {
     const description = [
-      'In order to ensure a smooth import you need to tell us how to match sources in the imported dashboard with your available sources. Selecting ',
+      'Match the sources from your imported dashboard with your available sources below. A ',
       <strong key="emphasis">Dynamic Source</strong>,
-      ' will allow the cell to use whatever source you are currently connected to instead of a specific source.',
+      ' allows the cell source to change based on your currently selected source.',
     ]
 
     return (
@@ -123,7 +133,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     const rows = _.reduce(
       sourcesCells,
       (acc, __, i) => {
-        if (i !== NO_SOURCE && sourcesCells[i]) {
+        if (i !== DYNAMIC_SOURCE && sourcesCells[i]) {
           const sourceName = getDeep<string>(
             importedSources,
             `${i}.name`,
@@ -135,8 +145,8 @@ class ImportDashboardMappings extends Component<Props, State> {
       },
       []
     )
-    if (sourcesCells[NO_SOURCE]) {
-      const noSourceRow = this.getRow('No Source Found', NO_SOURCE)
+    if (sourcesCells[DYNAMIC_SOURCE]) {
+      const noSourceRow = this.getRow('Dynamic Source', DYNAMIC_SOURCE)
       rows.push(noSourceRow)
     }
     return rows
@@ -145,9 +155,9 @@ class ImportDashboardMappings extends Component<Props, State> {
   private getRow(sourceName: string, sourceID: string): JSX.Element {
     let sourceLabel = `${sourceName} (${sourceID})`
     let description = 'Cells that use this Source:'
-    if (sourceID === NO_SOURCE) {
+    if (sourceID === DYNAMIC_SOURCE) {
       sourceLabel = sourceName
-      description = 'Cells with no Source:'
+      description = 'Cells using Dynamic Source:'
     }
     return (
       <tr key={sourceID}>
@@ -159,9 +169,7 @@ class ImportDashboardMappings extends Component<Props, State> {
           {this.getCellsForSource(sourceID)}
         </td>
         <td className="dash-map--table-cell dash-map--table-center">
-          <div className="fancytable--td provider--arrow">
-            <span />
-          </div>
+          {this.arrow}
         </td>
         <td className="dash-map--table-cell dash-map--table-half">
           <Dropdown
@@ -169,7 +177,7 @@ class ImportDashboardMappings extends Component<Props, State> {
             buttonColor="btn-default"
             buttonSize="btn-sm"
             items={this.getSourceItems(sourceID)}
-            onChoose={this.handleDropdownChange}
+            onChoose={this.handleChooseDropdown}
             selected={this.getSelected(sourceID)}
           />
         </td>
@@ -177,10 +185,10 @@ class ImportDashboardMappings extends Component<Props, State> {
     )
   }
 
-  private getSourceItems(importedSourceID: string) {
+  private getSourceItems(importedSourceID: string): SourceItemValue[] {
     const {sources} = this.props
 
-    return sources.map(source => {
+    const sourceItems = sources.map(source => {
       const sourceInfo = getSourceInfo(source)
       const sourceMap: SourceItemValue = {
         sourceInfo,
@@ -189,9 +197,11 @@ class ImportDashboardMappings extends Component<Props, State> {
       }
       return sourceMap
     })
+    sourceItems.push({...DYNAMIC_SOURCE_ITEM, importedSourceID})
+    return sourceItems
   }
 
-  private get header() {
+  private get header(): JSX.Element {
     return (
       <thead>
         <tr>
@@ -215,7 +225,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     return sources[0].name
   }
 
-  private getCellsForSource(sourceID): JSX.Element[] {
+  private getCellsForSource(sourceID: string): JSX.Element[] {
     const {sourcesCells} = this.state
 
     return _.map(sourcesCells[sourceID], c => {
@@ -227,7 +237,7 @@ class ImportDashboardMappings extends Component<Props, State> {
     })
   }
 
-  private handleDropdownChange = (item: SourceItemValue): void => {
+  private handleChooseDropdown = (item: SourceItemValue): void => {
     const {sourceMappings} = this.state
 
     sourceMappings[item.importedSourceID] = item.sourceInfo

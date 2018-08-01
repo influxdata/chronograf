@@ -1,8 +1,13 @@
+// Libraries
 import _ from 'lodash'
 
+// Utils
 import {getDeep} from 'src/utils/wrappers'
-import {NO_SOURCE} from 'src/dashboards/constants'
 
+// Constants
+import {DYNAMIC_SOURCE, DYNAMIC_SOURCE_INFO} from 'src/dashboards/constants'
+
+// Types
 import {CellQuery, Cell, Source} from 'src/types'
 import {
   CellInfo,
@@ -12,7 +17,13 @@ import {
   ImportedSources,
 } from 'src/types/dashboards'
 
-export const createSourceMappings = (source, cells, importedSources) => {
+const REGEX_SOURCE_ID = /sources\/(\d+)/g
+
+export const createSourceMappings = (
+  source,
+  cells,
+  importedSources
+): {sourcesCells: SourcesCells; sourceMappings: SourceMappings} => {
   let sourcesCells: SourcesCells = {}
   const sourceMappings: SourceMappings = {}
   const sourceInfo: SourceInfo = getSourceInfo(source)
@@ -57,7 +68,8 @@ export const createSourceMappings = (source, cells, importedSources) => {
   )
 
   if (cellsWithNoSource.length) {
-    sourcesCells[NO_SOURCE] = cellsWithNoSource
+    sourcesCells[DYNAMIC_SOURCE] = cellsWithNoSource
+    sourceMappings[DYNAMIC_SOURCE] = DYNAMIC_SOURCE_INFO
   }
 
   return {sourcesCells, sourceMappings}
@@ -67,7 +79,7 @@ export const mapCells = (
   cells: Cell[],
   sourceMappings: SourceMappings,
   importedSources: ImportedSources
-) => {
+): Cell[] => {
   const mappedCells = cells.map(c => {
     const query = getDeep<CellQuery>(c, 'queries.0', null)
     if (_.isEmpty(query)) {
@@ -76,7 +88,7 @@ export const mapCells = (
 
     const sourceLink = getDeep<string>(query, 'source', '')
     if (!sourceLink) {
-      return mapQueriesInCells(sourceMappings, c, NO_SOURCE)
+      return mapQueriesInCell(sourceMappings, c, DYNAMIC_SOURCE)
     }
 
     let importedSourceID = _.findKey(
@@ -91,7 +103,7 @@ export const mapCells = (
       importedSourceID = sourceLinkSID
     }
     if (importedSourceID) {
-      return mapQueriesInCells(sourceMappings, c, importedSourceID)
+      return mapQueriesInCell(sourceMappings, c, importedSourceID)
     }
 
     return c
@@ -100,7 +112,11 @@ export const mapCells = (
   return mappedCells
 }
 
-export const mapQueriesInCells = (sourceMappings, cell, sourceID) => {
+export const mapQueriesInCell = (
+  sourceMappings: SourceMappings,
+  cell: Cell,
+  sourceID: string
+): Cell => {
   const mappedSourceLink = sourceMappings[sourceID].link
   let queries = getDeep<CellQuery[]>(cell, 'queries', [])
   if (queries.length) {
@@ -119,9 +135,8 @@ export const getSourceInfo = (source: Source): SourceInfo => {
   }
 }
 
-export const getSourceIDFromLink = (sourceLink: string) => {
-  const sourceIDRegex = /sources\/(\d+)/g
+export const getSourceIDFromLink = (sourceLink: string): string => {
   // first capture group
-  const sourceLinkSID = sourceIDRegex.exec(sourceLink)[1]
+  const sourceLinkSID = REGEX_SOURCE_ID.exec(sourceLink)[1]
   return sourceLinkSID
 }
