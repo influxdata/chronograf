@@ -41,7 +41,7 @@ interface Props {
   customClass?: string
 }
 
-class ControlledInput extends Component<Props> {
+class Input extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     value: '',
     placeholder: '',
@@ -174,4 +174,4 @@ class ControlledInput extends Component<Props> {
   }
 }
 
-export default ControlledInput
+export default Input
