@@ -25,7 +25,6 @@ func Test_toPoint(t *testing.T) {
 			anno: &chronograf.Annotation{
 				ID:   "1",
 				Text: "mytext",
-				Type: "mytype",
 			},
 			now: time.Unix(0, 0),
 			want: chronograf.Point{
@@ -41,7 +40,6 @@ func Test_toPoint(t *testing.T) {
 					"start_time":       time.Time{}.UnixNano(),
 					"modified_time_ns": int64(time.Unix(0, 0).UnixNano()),
 					"text":             "mytext",
-					"type":             "mytype",
 				},
 			},
 		},
@@ -50,7 +48,6 @@ func Test_toPoint(t *testing.T) {
 			anno: &chronograf.Annotation{
 				ID:        "1",
 				Text:      "mytext",
-				Type:      "mytype",
 				StartTime: time.Unix(100, 0),
 				EndTime:   time.Unix(200, 0),
 			},
@@ -68,7 +65,6 @@ func Test_toPoint(t *testing.T) {
 					"start_time":       time.Unix(100, 0).UnixNano(),
 					"modified_time_ns": int64(time.Unix(0, 0).UnixNano()),
 					"text":             "mytext",
-					"type":             "mytype",
 				},
 			},
 		},
@@ -109,7 +105,6 @@ func Test_toDeletedPoint(t *testing.T) {
 					"start_time":       int64(0),
 					"modified_time_ns": int64(0),
 					"text":             "",
-					"type":             "",
 				},
 			},
 		},
@@ -310,7 +305,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 									"modified_time_ns",
 									"start_time",
 									"text",
-									"type"
 								],
 								"values": [
 									[
@@ -320,7 +314,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 										1517425994487495051,
 										0,
 										"",
-										""
 									]
 								]
 							}
@@ -345,7 +338,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 										"start_time",
 										"modified_time_ns",
 										"text",
-										"type",
 										"id"
 									],
 									"values": [
@@ -354,7 +346,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 											0,
 											1516989242129417403,
 											"mytext",
-											"mytype",
 											"ecf3a75d-f1c0-40e8-9790-902701467e92"
 										],
 										[
@@ -362,7 +353,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 											0,
 											1517425914433539296,
 											"mytext2",
-											"mytype2",
 											"ea0aa94b-969a-4cd5-912a-5db61d502268"
 										]
 									]
@@ -377,15 +367,15 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 					EndTime:   time.Unix(0, 1516920177345000000),
 					StartTime: time.Unix(0, 0),
 					Text:      "mytext2",
-					Type:      "mytype2",
 					ID:        "ea0aa94b-969a-4cd5-912a-5db61d502268",
+					Tags:      chronograf.AnnotationTags{},
 				},
 				{
 					EndTime:   time.Unix(0, 1516920177345000000),
 					StartTime: time.Unix(0, 0),
 					Text:      "mytext",
-					Type:      "mytype",
 					ID:        "ecf3a75d-f1c0-40e8-9790-902701467e92",
+					Tags:      chronograf.AnnotationTags{},
 				},
 			},
 		},
@@ -403,7 +393,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 										"start_time",
 										"modified_time_ns",
 										"text",
-										"type",
 										"id"
 									],
 									"values": [
@@ -412,7 +401,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 											0,
 											1516989242129417403,
 											"mytext",
-											"mytype",
 											"ea0aa94b-969a-4cd5-912a-5db61d502268"
 										],
 										[
@@ -420,7 +408,6 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 											0,
 											1517425914433539296,
 											"mytext2",
-											"mytype2",
 											"ea0aa94b-969a-4cd5-912a-5db61d502268"
 										]
 									]
@@ -435,8 +422,8 @@ func TestAnnotationStore_queryAnnotations(t *testing.T) {
 					EndTime:   time.Unix(0, 1516920177345000000),
 					StartTime: time.Unix(0, 0),
 					Text:      "mytext2",
-					Type:      "mytype2",
 					ID:        "ea0aa94b-969a-4cd5-912a-5db61d502268",
+					Tags:      chronograf.AnnotationTags{},
 				},
 			},
 		},
@@ -518,7 +505,6 @@ func TestAnnotationStore_Update(t *testing.T) {
 											"start_time",
 											"modified_time_ns",
 											"text",
-											"type",
 											"id"
 										],
 										"values": [
@@ -527,7 +513,6 @@ func TestAnnotationStore_Update(t *testing.T) {
 												0,
 												1516989242129417403,
 												"mytext",
-												"mytype",
 												"ecf3a75d-f1c0-40e8-9790-902701467e92"
 											],
 											[
@@ -535,7 +520,6 @@ func TestAnnotationStore_Update(t *testing.T) {
 												0,
 												1517425914433539296,
 												"mytext2",
-												"mytype2",
 												"ea0aa94b-969a-4cd5-912a-5db61d502268"
 											]
 										]
@@ -573,7 +557,6 @@ func TestAnnotationStore_Update(t *testing.T) {
 											"start_time",
 											"modified_time_ns",
 											"text",
-											"type",
 											"id"
 										],
 										"values": [
@@ -582,7 +565,6 @@ func TestAnnotationStore_Update(t *testing.T) {
 												0,
 												1516989242129417403,
 												"mytext",
-												"mytype",
 												"ecf3a75d-f1c0-40e8-9790-902701467e92"
 											]
 										]
@@ -619,7 +601,6 @@ func TestAnnotationStore_Update(t *testing.T) {
 											"start_time",
 											"modified_time_ns",
 											"text",
-											"type",
 											"id"
 										],
 										"values": [
@@ -628,7 +609,6 @@ func TestAnnotationStore_Update(t *testing.T) {
 												0,
 												1516989242129417403,
 												"mytext",
-												"mytype",
 												"ecf3a75d-f1c0-40e8-9790-902701467e92"
 											]
 										]
