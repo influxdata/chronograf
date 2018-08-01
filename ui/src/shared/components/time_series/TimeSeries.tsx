@@ -8,6 +8,7 @@ import {fetchTimeSeries} from 'src/shared/apis/query'
 // Types
 import {Template, Source, Query, RemoteDataState} from 'src/types'
 import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
+import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
 import AutoRefresh from 'src/utils/AutoRefresh'
@@ -26,6 +27,7 @@ interface Props {
   inView?: boolean
   templates?: Template[]
   editQueryStatus?: () => void
+  grabDataForDownload?: GrabDataForDownloadHandler
 }
 
 interface State {
@@ -68,7 +70,14 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public executeQueries = async (isFirstFetch: boolean = false) => {
-    const {source, inView, queries, templates, editQueryStatus} = this.props
+    const {
+      source,
+      inView,
+      queries,
+      templates,
+      editQueryStatus,
+      grabDataForDownload,
+    } = this.props
 
     if (!inView) {
       return
@@ -99,6 +108,10 @@ class TimeSeries extends Component<Props, State> {
         timeSeries: newSeries,
         loading: RemoteDataState.Done,
       })
+
+      if (grabDataForDownload) {
+        grabDataForDownload(newSeries)
+      }
     } catch (err) {
       this.setState({
         timeSeries: [],

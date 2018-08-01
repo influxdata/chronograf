@@ -1,5 +1,5 @@
 // Libraries
-import React, {Component} from 'react'
+import React, {Component, MouseEvent} from 'react'
 import _ from 'lodash'
 import classnames from 'classnames'
 
@@ -8,7 +8,6 @@ import ReactCodeMirror from 'src/dashboards/components/ReactCodeMirror'
 import TemplateDrawer from 'src/shared/components/TemplateDrawer'
 import QueryStatus from 'src/shared/components/QueryStatus'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import OnClickOutside from 'src/shared/components/OnClickOutside'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -41,7 +40,6 @@ interface Props {
   onUpdate: (text: string) => Promise<void>
   config: QueryConfig
   templates: Template[]
-  onClickOutside: () => void
 }
 
 const FIRST_TEMP_VAR = '0.tempVar'
@@ -117,7 +115,7 @@ class InfluxQLEditor extends Component<Props, State> {
     } = this.state
 
     return (
-      <div className="query-editor">
+      <div className="query-editor" onMouseDown={this.handleMouseDown}>
         {this.dismissPreviewButton}
         <ReactCodeMirror
           ref={this.codeMirrorRef}
@@ -131,6 +129,7 @@ class InfluxQLEditor extends Component<Props, State> {
           readOnly={isShowingTemplateValues}
           onChange={this.handleChange}
           onFocus={this.handleFocusEditor}
+          onBlur={this.handleBlurEditor}
           isShowingTemplateValues={isShowingTemplateValues}
           onKeyDown={this.handleKeyDownEditor}
           onBeforeChange={this.handleUpdateTemplatingQueryText}
@@ -142,7 +141,6 @@ class InfluxQLEditor extends Component<Props, State> {
             focus: focused,
             'read-only': isShowingTemplateValues,
           })}
-          onClick={this.handleVarmojiFocus}
         >
           <div className="varmoji-container">
             <div className="varmoji-front">
@@ -171,13 +169,6 @@ class InfluxQLEditor extends Component<Props, State> {
     )
   }
 
-  public handleClickOutside = (): void => {
-    this.setState({focused: false})
-
-    this.hideTemplateValues()
-    this.handleUpdate()
-  }
-
   private handleTemplateSelection = (
     selectedTemplate: TempVar,
     templatingQueryText: string
@@ -191,6 +182,10 @@ class InfluxQLEditor extends Component<Props, State> {
 
   private handleFocusEditor = (): void => {
     this.setState({focused: true})
+  }
+
+  private handleBlurEditor = (): void => {
+    this.handleUpdate()
   }
 
   private handleCloseDrawer = (): void => {
@@ -209,8 +204,11 @@ class InfluxQLEditor extends Component<Props, State> {
     this.closeDrawer()
   }
 
-  private handleVarmojiFocus = (): void => {
+  private handleMouseDown = (e: MouseEvent): void => {
     this.setState({focused: true})
+
+    e.stopPropagation()
+    e.preventDefault()
   }
 
   private handleUpdateTemplatingQueryText = (value: string): void => {
@@ -325,10 +323,6 @@ class InfluxQLEditor extends Component<Props, State> {
     }
   }
 
-  private hideTemplateValues = (): void => {
-    this.setState({isShowingTemplateValues: false})
-  }
-
   private handleHideAndFocus = (): void => {
     this.setState({isShowingTemplateValues: false, focused: true})
   }
@@ -404,4 +398,4 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 }
 
-export default OnClickOutside(InfluxQLEditor)
+export default InfluxQLEditor

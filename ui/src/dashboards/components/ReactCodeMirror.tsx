@@ -36,6 +36,7 @@ interface Props {
   isTemplating: boolean
   isShowingTemplateValues: boolean
   onFocus: () => void
+  onBlur: () => void
   onChange: (value: string) => void
   onKeyDown: (e: KeyboardEvent) => void
   onBeforeChange: (value: string) => void
@@ -76,7 +77,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
   private editor?: CMEditor
 
   public render() {
-    const {value, onFocus} = this.props
+    const {value, onFocus, onBlur} = this.props
 
     return (
       <div className={this.queryCodeClassName}>
@@ -88,6 +89,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
           value={value}
           onChange={this.handleChange}
           onFocus={onFocus}
+          onBlur={onBlur}
           onKeyDown={this.handleKeyDownEditor}
           editorWillUnmount={this.handleUnmountEditor}
           editorDidMount={this.handleMountEditor}
