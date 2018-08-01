@@ -25,9 +25,6 @@ import {
   SourceItemValue,
 } from 'src/types/dashboards'
 
-// Styles
-import 'src/dashboards/components/ImportDashboardMappings.scss'
-
 interface Props {
   cells: Cell[]
   source: Source
@@ -137,11 +134,7 @@ class ImportDashboardMappings extends Component<Props, State> {
       sourcesCells,
       (acc, __, i) => {
         if (i !== DYNAMIC_SOURCE && sourcesCells[i]) {
-          const sourceName = getDeep<string>(
-            importedSources,
-            `${i}.name`,
-            'Source'
-          )
+          const sourceName = importedSources[i].name
           acc.push(this.getRow(sourceName, i))
         }
         return acc
