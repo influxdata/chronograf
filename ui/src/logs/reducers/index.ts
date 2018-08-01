@@ -52,6 +52,7 @@ export const defaultState: LogsState = {
     tableColumns: [],
     severityFormat: SeverityFormatOptions.dotText,
     severityLevelColors: [],
+    isTruncated: true,
   },
   tableTime: {},
   tableInfiniteData: {
@@ -165,13 +166,14 @@ const prependMoreLogs = (
 export const setConfigs = (state: LogsState, action: SetConfigsAction) => {
   const {logConfig} = state
   const {
-    logConfig: {tableColumns, severityFormat, severityLevelColors},
+    logConfig: {tableColumns, severityFormat, severityLevelColors, isTruncated},
   } = action.payload
   const updatedLogConfig = {
     ...logConfig,
     tableColumns,
     severityFormat,
     severityLevelColors,
+    isTruncated,
   }
   return {...state, logConfig: updatedLogConfig}
 }

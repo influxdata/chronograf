@@ -606,6 +606,8 @@ class LogsPage extends Component<Props, State> {
           onUpdateColumns={this.handleUpdateColumns}
           onUpdateSeverityFormat={this.handleUpdateSeverityFormat}
           severityFormat={this.severityFormat}
+          onUpdateTruncation={this.handleUpdateTruncation}
+          isTruncated={this.isTruncated}
         />
       </OverlayTechnology>
     )
@@ -649,6 +651,21 @@ class LogsPage extends Component<Props, State> {
       ...logConfig,
       tableColumns,
     })
+  }
+
+  private handleUpdateTruncation = async (
+    isTruncated: boolean
+  ): Promise<void> => {
+    const {logConfig} = this.props
+
+    await this.props.updateConfig(this.logConfigLink, {
+      ...logConfig,
+      isTruncated,
+    })
+  }
+
+  private get isTruncated(): boolean {
+    return this.props.logConfig.isTruncated
   }
 }
 

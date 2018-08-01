@@ -48,6 +48,7 @@ export interface LogConfig {
   tableColumns: LogsTableColumn[]
   severityFormat: SeverityFormat
   severityLevelColors: SeverityLevelColor[]
+  isTruncated: boolean
 }
 
 export interface SeverityLevelColor {

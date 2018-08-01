@@ -21,6 +21,8 @@ export enum SeverityColorOptions {
   pearl = 'pearl',
 }
 
+export const DEFAULT_TRUNCATION = true
+
 export const SeverityColorValues = {
   [SeverityColorOptions.ruby]: '#BF3D5E',
   [SeverityColorOptions.fire]: '#DC4E58',
