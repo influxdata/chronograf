@@ -19,7 +19,7 @@ export enum ComponentStatus {
   Default = '',
   Loading = 'loading',
   Error = 'error',
-  Valiid = 'valid',
+  Valid = 'valid',
   Disabled = 'disabled',
 }
 
