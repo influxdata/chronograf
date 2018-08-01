@@ -105,6 +105,7 @@ run: ${BINARY}
 	./chronograf
 
 run-dev: chronogiraffe
+	mkdir -p ui/build
 	./chronograf -d --log-level=debug
 
 clean:
