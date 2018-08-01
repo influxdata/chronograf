@@ -59,10 +59,10 @@ canned/bin_gen.go: canned/*.json
 	go generate -x ./canned
 
 .jssrc: $(UISOURCES)
-	cd ui && yarn run clean && yarn run build
+	cd ui && yarn run build
 	@touch .jssrc
 
-dep: .jsdep .godep
+dep: clean .jsdep .godep
 
 .godep:
 ifndef GOBINDATA
