@@ -5,6 +5,8 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {createSource} from 'src/shared/apis'
 
 import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
+import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
+
 import {addSource as addSourceAction} from 'src/shared/actions/sources'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
@@ -83,6 +85,11 @@ class SourceStep extends PureComponent<Props, State> {
           label="Default Retention Policy"
           onChange={this.onChangeInput('defaultRP')}
         />
+        <WizardCheckbox
+          isChecked={source.default}
+          text="Make this the default connection"
+          onChange={this.onChangeInput('default')}
+        />
       </>
     )
   }
@@ -99,7 +106,7 @@ class SourceStep extends PureComponent<Props, State> {
     return getDeep<string>(error, 'data.message', error)
   }
 
-  private onChangeInput = (key: string) => (value: string) => {
+  private onChangeInput = (key: string) => (value: string | boolean) => {
     const {source} = this.state
     this.setState({source: {...source, [key]: value}})
   }
