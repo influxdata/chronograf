@@ -23,9 +23,6 @@ import {
   SourceItemValue,
 } from 'src/types/dashboards'
 
-// Styles
-import 'src/dashboards/components/ImportDashboardMappings.scss'
-
 interface Props {
   cells: Cell[]
   source: Source
