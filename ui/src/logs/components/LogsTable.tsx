@@ -451,8 +451,13 @@ class LogsTable extends Component<Props, State> {
     return data.length * ROW_HEIGHT
   }
 
-  private calculateRowHeight = ({index}: {index: number}): number =>
-    calculateMessageHeight(index, this.props.data, this.rowCharLimit)
+  private calculateRowHeight = ({index}: {index: number}): number => {
+    if (this.props.isTruncated) {
+      return ROW_HEIGHT
+    }
+
+    return calculateMessageHeight(index, this.props.data, this.rowCharLimit)
+  }
 
   private headerRenderer = ({key, style, columnIndex}) => {
     const column = getColumnFromData(this.props.data, columnIndex)
