@@ -4,8 +4,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import SourceStep from 'src/sources/components/SourceStep'
-import {DEFAULT_SOURCE} from 'src/shared/constants'
-import {Source} from 'src/types'
 
 interface Props {
   isVisible: boolean
@@ -14,21 +12,19 @@ interface Props {
 
 interface State {
   completion: object
-  source: Partial<Source>
 }
 
 @ErrorHandling
 class ConnectionWizard extends PureComponent<Props, State> {
+  public sourceStepRef: any
   constructor(props: Props) {
     super(props)
     this.state = {
       completion: [false, false, false],
-      source: DEFAULT_SOURCE,
     }
   }
   public render() {
     const {isVisible, toggleVisibility} = this.props
-    const {source} = this.state
 
     return (
       <WizardOverlay
@@ -47,8 +43,8 @@ class ConnectionWizard extends PureComponent<Props, State> {
           previousLabel="Cancel"
         >
           <SourceStep
-            isComplete={this.isSourceComplete}
             ref={c => (this.sourceStepRef = c && c.getWrappedInstance())}
+            setCompletion={this.setCompletion(0)}
           />
         </WizardStep>
         <WizardStep
@@ -76,6 +72,13 @@ class ConnectionWizard extends PureComponent<Props, State> {
       </WizardOverlay>
     )
   }
+
+  private setCompletion = index => isComplete => {
+    const {completion} = this.state
+    completion[index] = isComplete
+    this.setState({completion})
+  }
+
   private handleSourceNext = () => {
     this.sourceStepRef.next()
   }
@@ -84,22 +87,17 @@ class ConnectionWizard extends PureComponent<Props, State> {
     const {completion} = this.state
     return completion[0]
   }
+
   private isKapacitorComplete = () => {
     const {completion} = this.state
     return completion[1]
   }
+
   private isDashboardSelectionComplete = () => {
     const {completion} = this.state
     return completion[2]
   }
 
-  private handleFirstNext = () => {
-    const {completion} = this.state
-    completion[0] = true
-    this.setState({
-      completion,
-    })
-  }
   private handleSecondNext = () => {
     const {completion} = this.state
     completion[1] = true
@@ -115,29 +113,20 @@ class ConnectionWizard extends PureComponent<Props, State> {
     })
   }
 
-  private handleFirstPrev = () => {
-    const {completion} = this.state
-    completion[0] = false
-    this.setState({
-      completion
-    })
-  }
   private handleSecondPrev = () => {
     const {completion} = this.state
     completion[1] = false
     this.setState({
-      completion
+      completion,
     })
   }
   private handleThirdPrev = () => {
     const {completion} = this.state
     completion[2] = false
     this.setState({
-      completion
+      completion,
     })
   }
-
-
-  }
 }
+
 export default ConnectionWizard
