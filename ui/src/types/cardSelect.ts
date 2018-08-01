@@ -4,5 +4,4 @@ export interface CardSelectCardProps {
   image?: string
   checked?: boolean
   disabled?: boolean
-  // validState: ...
 }
