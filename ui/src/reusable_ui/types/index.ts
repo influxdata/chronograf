@@ -1,10 +1,26 @@
 export enum ComponentColor {
   Default = 'default',
   Primary = 'primary',
+  Secondary = 'secondary',
   Success = 'success',
   Warning = 'warning',
   Danger = 'danger',
   Alert = 'alert',
+}
+
+export enum ComponentSize {
+  ExtraSmall = 'xs',
+  Small = 'sm',
+  Medium = 'md',
+  Large = 'lg',
+}
+
+export enum ComponentStatus {
+  Default = '',
+  Loading = 'loading',
+  Error = 'error',
+  Valiid = 'valid',
+  Disabled = 'disabled',
 }
 
 export enum DropdownMenuColors {
@@ -19,13 +35,6 @@ export type DropdownChild =
   | string
   | JSX.Element
   | Element
-
-export enum ComponentSize {
-  ExtraSmall = 'xs',
-  Small = 'sm',
-  Medium = 'md',
-  Large = 'lg',
-}
 
 export enum ButtonShape {
   Default = 'none',
