@@ -3,6 +3,7 @@
 ### Features
 
 1.  [#4033](https://github.com/influxdata/chronograf/pull/4033): Include sources id, links, and names in dashboard export
+1.  [#4068](https://github.com/influxdata/chronograf/pull/4068): Add ability to map sources when importing dashboard
 
 ### UI Improvements
 1.  [#4009](https://github.com/influxdata/chronograf/pull/4009): Make it to get mouse into hover legend
