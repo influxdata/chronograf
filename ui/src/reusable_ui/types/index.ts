@@ -16,10 +16,10 @@ export enum ComponentSize {
 }
 
 export enum ComponentStatus {
-  Default = '',
+  Default = 'default',
   Loading = 'loading',
   Error = 'error',
-  Valiid = 'valid',
+  Valid = 'valid',
   Disabled = 'disabled',
 }
 
