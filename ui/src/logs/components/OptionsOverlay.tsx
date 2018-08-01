@@ -171,13 +171,13 @@ class OptionsOverlay extends Component<Props, State> {
     const severityChanged = !_.isEqual(workingLevelColumns, severityLevelColors)
     const columnsChanged = !_.isEqual(workingColumns, columns)
     const formatChanged = !_.isEqual(workingFormat, severityFormat)
-    const isTruncatedChagned = !_.isEqual(isWorkingTruncated, isTruncated)
+    const isTruncatedChanged = !_.isEqual(isWorkingTruncated, isTruncated)
 
     if (
       severityChanged ||
       columnsChanged ||
       formatChanged ||
-      isTruncatedChagned
+      isTruncatedChanged
     ) {
       return false
     }
