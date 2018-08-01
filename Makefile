@@ -1,4 +1,4 @@
-.PHONY: assets dep clean test gotest gotestrace jstest run run-dev run-hmr ctags
+.PHONY: assets dep clean test gotest gotestrace jstest run run-dev ctags
 
 VERSION = 1.7.0
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
@@ -18,8 +18,6 @@ CTLBINARY=chronoctl
 all: dep build
 
 build: assets ${BINARY}
-
-dev: dep dev-assets ${BINARY}
 
 ${BINARY}: $(SOURCES) .bindata .jsdep .godep
 	go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
@@ -48,8 +46,6 @@ docker: dep assets docker-${BINARY}
 
 assets: .jssrc .bindata
 
-dev-assets: .dev-jssrc .bindata
-
 .bindata: server/swagger_gen.go canned/bin_gen.go dist/dist_gen.go
 	@touch .bindata
 
@@ -65,10 +61,6 @@ canned/bin_gen.go: canned/*.json
 .jssrc: $(UISOURCES)
 	cd ui && yarn run clean && yarn run build
 	@touch .jssrc
-
-.dev-jssrc: $(UISOURCES)
-	cd ui && yarn run build:dev
-	@touch .dev-jssrc
 
 dep: .jsdep .godep
 
@@ -115,15 +107,12 @@ run: ${BINARY}
 run-dev: chronogiraffe
 	./chronograf -d --log-level=debug
 
-run-hmr:
-	cd ui && npm run start:hmr
-
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
 	cd ui && yarn run clean
 	cd ui && rm -rf node_modules
 	rm -f dist/dist_gen.go canned/bin_gen.go server/swagger_gen.go
-	@rm -f .godep .jsdep .jssrc .dev-jssrc .bindata
+	@rm -f .godep .jsdep .jssrc .bindata
 
 ctags:
 	ctags -R --languages="Go" --exclude=.git --exclude=ui .
