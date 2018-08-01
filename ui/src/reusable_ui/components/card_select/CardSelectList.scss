@@ -1,0 +1,13 @@
+.card-select--wrapper {
+  width: 100%;
+  border: none;
+  box-sizing: border-box;
+  legend {
+    font-weight: 600;
+  }
+}
+
+.card-select--cards {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
