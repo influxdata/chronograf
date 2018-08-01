@@ -82,7 +82,7 @@ export const mapCells = (
 
     const sourceLink = getDeep<string>(query, 'source', '')
     if (!sourceLink) {
-      return mapQueriesInCells(sourceMappings, c, DYNAMIC_SOURCE)
+      return mapQueriesInCell(sourceMappings, c, DYNAMIC_SOURCE)
     }
 
     let importedSourceID = _.findKey(
@@ -97,7 +97,7 @@ export const mapCells = (
       importedSourceID = sourceLinkSID
     }
     if (importedSourceID) {
-      return mapQueriesInCells(sourceMappings, c, importedSourceID)
+      return mapQueriesInCell(sourceMappings, c, importedSourceID)
     }
 
     return c
@@ -106,7 +106,7 @@ export const mapCells = (
   return mappedCells
 }
 
-export const mapQueriesInCells = (sourceMappings, cell, sourceID) => {
+export const mapQueriesInCell = (sourceMappings, cell, sourceID) => {
   const mappedSourceLink = sourceMappings[sourceID].link
   let queries = getDeep<CellQuery[]>(cell, 'queries', [])
   if (queries.length) {
