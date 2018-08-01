@@ -29,14 +29,28 @@
     }
 }
 
-.card-select--card:hover,
-.card-select--card.checked {
-    border: 3px solid $c-rainforest;
+.card-select--active:hover,
+.card-select--active.card-select--checked {
     background-color: $g5-pepper;
-    .card-select--image{
+    .card-select--image {
         img {
             filter: grayscale(0);
         }
+    }
+}
+
+.card-select--active:hover {
+    border: 3px solid $c-rainforest-disabled;
+}
+
+.card-select--active.card-select--checked {
+    border: 3px solid $c-rainforest;
+}
+
+.card-select--disabled {
+    opacity: .3;
+    .card-select--container {
+        cursor: not-allowed;
     }
 }
 
@@ -82,6 +96,6 @@
     transition: opacity .2s;
 }
 
-.card-select--checkmark.checked {
+.card-select--checkmark.card-select--checked {
     opacity: 1;
 }

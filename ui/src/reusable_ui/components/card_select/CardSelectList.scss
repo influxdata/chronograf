@@ -1,10 +1,11 @@
+@import 'src/style/modules/influx-colors';
+
 .card-select--wrapper {
+  background-color: $g3-castle;
   width: 100%;
   border: none;
   box-sizing: border-box;
-  legend {
-    font-weight: 600;
-  }
+  padding: 20px;
 }
 
 .card-select--cards {

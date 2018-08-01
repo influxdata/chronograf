@@ -3,13 +3,14 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import 'src/reusable_ui/components/card_select/CardSelectCard.scss'
 
+import classnames from 'classnames'
+
 interface Props {
   id: string
   label: string
   image?: string
   checked?: boolean
   disabled?: boolean
-  // validState: ...
 }
 
 interface State {
@@ -32,7 +33,11 @@ class CardSelectCard extends PureComponent<Props, State> {
     return (
       <div
         onClick={this.handleClick}
-        className={`card-select--card${this.checkedClass}`}
+        className={classnames('card-select--card', {
+          'card-select--checked': checked,
+          'card-select--disabled': disabled,
+          'card-select--active': !disabled,
+        })}
       >
         <label className="card-select--container">
           <span className="card-select--label">{label}</span>
@@ -45,9 +50,14 @@ class CardSelectCard extends PureComponent<Props, State> {
             disabled={disabled}
           />
           <span
-            className={`card-select--checkmark icon checkmark${
-              this.checkedClass
-            }`}
+            className={classnames(
+              'card-select--checkmark',
+              'icon',
+              'checkmark',
+              {
+                'card-select--checked': checked,
+              }
+            )}
           />
           {this.cardImage}
         </label>
@@ -56,19 +66,15 @@ class CardSelectCard extends PureComponent<Props, State> {
   }
 
   private handleClick = e => {
-    const {checked} = this.state
-    e.preventDefault()
-    this.setState({
-      checked: !checked,
-    })
-  }
+    const {disabled} = this.props
 
-  private get checkedClass() {
-    const {checked} = this.state
-    if (checked) {
-      return ' checked'
+    if (!disabled) {
+      const {checked} = this.state
+      e.preventDefault()
+      this.setState({
+        checked: !checked,
+      })
     }
-    return ''
   }
 
   private get cardImage() {
