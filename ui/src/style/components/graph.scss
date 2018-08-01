@@ -146,11 +146,12 @@ $graph-gutter: 16px;
   align-items: center;
   justify-content: center;
 }
+
 .graph-spinner {
-  width: 121px !important;
-  height: 121px !important;
+  width: 100%;
+  height: 100%;
   background-image: url('../../assets/images/laser-spinner.png');
-  background-size: 100% 100%;
+  background-size: auto 30%;
   background-position: center center;
   background-repeat: no-repeat;
   animation: graph-panel-spinner 1s infinite linear;

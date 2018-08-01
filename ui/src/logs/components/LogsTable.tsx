@@ -59,6 +59,7 @@ interface Props {
     forward: TableData
     backward: TableData
   }
+  onExpandMessage: () => void
   onChooseCustomTime: (time: string) => void
 }
 
@@ -514,7 +515,12 @@ class LogsTable extends Component<Props, State> {
     }
 
     if (column === 'message') {
-      formattedValue = <ExpandableMessage formattedValue={formattedValue} />
+      formattedValue = (
+        <ExpandableMessage
+          formattedValue={formattedValue}
+          onExpand={this.props.onExpandMessage}
+        />
+      )
     }
 
     const highlightRow = rowIndex === this.state.currentRow
@@ -525,7 +531,7 @@ class LogsTable extends Component<Props, State> {
           className={classnames('logs-viewer--cell', {
             highlight: highlightRow,
           })}
-          title={`Jump to '${title}'`}
+          title={`Jump to '${value}'`}
           key={key}
           style={style}
           data-index={rowIndex}

@@ -9,6 +9,7 @@ interface State {
 
 interface Props {
   formattedValue: string | JSX.Element
+  onExpand?: () => void
 }
 
 export class ExpandableMessage extends Component<Props, State> {
@@ -43,6 +44,13 @@ export class ExpandableMessage extends Component<Props, State> {
   }
 
   private handleClick = () => {
+    const {expanded} = this.state
+    const {onExpand} = this.props
+
+    if (!expanded && onExpand) {
+      onExpand()
+    }
+
     this.setState({
       expanded: true,
     })
