@@ -12,7 +12,7 @@ interface Props {
 }
 
 interface State {
-  checked?: boolean
+  checked: boolean
 }
 
 @ErrorHandling
@@ -72,13 +72,15 @@ class CardSelectCard extends PureComponent<Props, State> {
   private toggleChecked = e => {
     const {disabled} = this.props
 
-    if (!disabled) {
-      const {checked} = this.state
-      e.preventDefault()
-      this.setState({
-        checked: !checked,
-      })
+    if (disabled) {
+      return
     }
+
+    const {checked} = this.state
+    e.preventDefault()
+    this.setState({
+      checked: !checked,
+    })
   }
 
   private get cardImage() {
