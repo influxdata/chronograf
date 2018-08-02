@@ -137,6 +137,7 @@ export const getSourceInfo = (source: Source): SourceInfo => {
 
 export const getSourceIDFromLink = (sourceLink: string): string => {
   // first capture group
-  const sourceLinkSID = REGEX_SOURCE_ID.exec(sourceLink)[1]
+  const matcher = new RegExp(REGEX_SOURCE_ID)
+  const sourceLinkSID = matcher.exec(sourceLink)[1]
   return sourceLinkSID
 }
