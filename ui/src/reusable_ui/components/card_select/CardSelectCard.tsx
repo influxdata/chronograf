@@ -1,23 +1,17 @@
 import React, {PureComponent} from 'react'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import classnames from 'classnames'
+import {CardSelectCardProps} from 'src/types/cardSelect'
 
-interface Props {
-  id: string
-  label: string
-  image?: string
-  checked?: boolean
-  disabled?: boolean
-}
+import classnames from 'classnames'
 
 interface State {
   checked: boolean
 }
 
 @ErrorHandling
-class CardSelectCard extends PureComponent<Props, State> {
-  public static defaultProps: Partial<Props> = {
+class CardSelectCard extends PureComponent<CardSelectCardProps, State> {
+  public static defaultProps: Partial<CardSelectCardProps> = {
     checked: false,
     disabled: false,
   }
