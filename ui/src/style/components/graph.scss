@@ -141,7 +141,7 @@ $graph-gutter: 16px;
 }
 .graph-fetching {
   width: 100%;
-  height: 320px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,7 +150,7 @@ $graph-gutter: 16px;
 .graph-spinner {
   width: 100%;
   height: 100%;
-  background-image: url('../../assets/images/laser-spinner.png');
+  background-image: url('assets/images/laser-spinner.png');
   background-size: auto 30%;
   background-position: center center;
   background-repeat: no-repeat;
