@@ -19,10 +19,15 @@ interface State {
 
 @ErrorHandling
 class CardSelectCard extends PureComponent<Props, State> {
+  public static defaultProps: Partial<Props> = {
+    checked: false,
+    disabled: false,
+  }
+
   constructor(props) {
     super(props)
     this.state = {
-      checked: false,
+      checked: this.props.checked,
     }
   }
 
@@ -32,7 +37,8 @@ class CardSelectCard extends PureComponent<Props, State> {
 
     return (
       <div
-        onClick={this.handleClick}
+        data-toggle="card_toggle"
+        onClick={this.toggleChecked}
         className={classnames('card-select--card', {
           'card-select--checked': checked,
           'card-select--disabled': disabled,
@@ -65,7 +71,7 @@ class CardSelectCard extends PureComponent<Props, State> {
     )
   }
 
-  private handleClick = e => {
+  private toggleChecked = e => {
     const {disabled} = this.props
 
     if (!disabled) {
