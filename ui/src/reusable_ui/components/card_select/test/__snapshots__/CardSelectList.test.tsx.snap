@@ -34,6 +34,13 @@ exports[`Card Select Card matches snapshot with two children 1`] = `
         <span
           className="card-select--checkmark icon checkmark"
         />
+        <div
+          className="card-select--image"
+        >
+          <span
+            className="card-select--placeholder icon dash-j"
+          />
+        </div>
       </label>
     </div>
     <div
@@ -60,6 +67,13 @@ exports[`Card Select Card matches snapshot with two children 1`] = `
         <span
           className="card-select--checkmark icon checkmark"
         />
+        <div
+          className="card-select--image"
+        >
+          <span
+            className="card-select--placeholder icon dash-j"
+          />
+        </div>
       </label>
     </div>
   </div>

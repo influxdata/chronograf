@@ -65,7 +65,7 @@ class CardSelectCard extends PureComponent<Props, State> {
               }
             )}
           />
-          {this.cardImage}
+          <div className="card-select--image">{this.cardImage}</div>
         </label>
       </div>
     )
@@ -87,14 +87,10 @@ class CardSelectCard extends PureComponent<Props, State> {
     const {image, label} = this.props
 
     if (image) {
-      return (
-        <div className="card-select--image">
-          <img src={image} alt={`${label} icon`} />
-        </div>
-      )
+      return <img src={image} alt={`${label} icon`} />
     }
 
-    return null
+    return <span className="card-select--placeholder icon dash-j" />
   }
 }
 
