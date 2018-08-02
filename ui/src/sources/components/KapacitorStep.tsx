@@ -39,7 +39,7 @@ interface State {
 }
 
 @ErrorHandling
-class SourceStep extends PureComponent<Props, State> {
+class KapacitorStep extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -141,4 +141,4 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(null, mdtp, null, {withRef: true})(SourceStep)
+export default connect(null, mdtp, null, {withRef: true})(KapacitorStep)
