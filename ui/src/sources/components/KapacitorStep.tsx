@@ -17,13 +17,13 @@ import {
   notifyKapacitorConnectionFailed,
 } from 'src/shared/copy/notifications'
 
-import {Kapacitor} from 'src/types'
+import {Kapacitor, Source} from 'src/types'
 import {DEFAULT_KAPACITOR} from 'src/shared/constants'
 import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
-  setCompletion: (isComplete: boolean) => void
   notify: typeof notifyAction
+  source: Source
 }
 
 interface State {
@@ -39,13 +39,11 @@ class SourceStep extends PureComponent<Props, State> {
       kapacitor: DEFAULT_KAPACITOR,
       exists: false,
     }
-    // NEED SOURCE FROM PREV STEP, not current source!!!
-    // and other kapacitors associated with source.
   }
 
   public next = async () => {
     const {kapacitor} = this.state
-    const {notify} = this.props
+    const {notify, source} = this.props
 
     // const isNameTaken = kapacitors.some(k => k.name === kapacitor.name)
     // const isNew = !params.id

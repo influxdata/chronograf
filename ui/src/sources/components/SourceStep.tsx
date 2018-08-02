@@ -21,9 +21,9 @@ import {DEFAULT_SOURCE} from 'src/shared/constants'
 import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
-  setCompletion: (isComplete: boolean) => void
   notify: typeof notifyAction
   addSource: typeof addSourceAction
+  source: Source
 }
 
 interface State {
@@ -35,7 +35,7 @@ class SourceStep extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      source: DEFAULT_SOURCE,
+      source: this.props.source || DEFAULT_SOURCE,
     }
   }
 
@@ -46,6 +46,7 @@ class SourceStep extends PureComponent<Props, State> {
       const sourceFromServer = await createSource(source)
       this.props.addSource(sourceFromServer)
       notify(notifySourceCreationSucceeded(source.name))
+      return sourceFromServer
     } catch (err) {
       notify(notifySourceCreationFailed(source.name, this.parseError(err)))
     }

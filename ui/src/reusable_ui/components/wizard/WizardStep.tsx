@@ -48,22 +48,26 @@ class WizardStep extends PureComponent<Props> {
 
   private handleClickPrevious = async () => {
     const {onPrevious, decrement} = this.props
+    let returnedValue
     if (onPrevious) {
-      await onPrevious()
+      returnedValue = await onPrevious()
     }
     if (decrement) {
       decrement()
     }
+    return returnedValue
   }
 
   private handleClickNext = async () => {
     const {onNext, increment} = this.props
+    let returnedValue
     if (onNext) {
-      await onNext()
+      returnedValue = await onNext()
     }
     if (increment) {
       increment()
     }
+    return returnedValue
   }
 }
 
