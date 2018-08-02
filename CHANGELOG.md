@@ -1,6 +1,12 @@
 ## v1.6.1 [unreleased]
 
+### Features
+
+1.  [#4033](https://github.com/influxdata/chronograf/pull/4033): Include sources id, links, and names in dashboard export
+1.  [#4068](https://github.com/influxdata/chronograf/pull/4068): Add ability to map sources when importing dashboard
+
 ### UI Improvements
+
 1.  [#4009](https://github.com/influxdata/chronograf/pull/4009): Make it to get mouse into hover legend
 
 ### Bug Fixes
@@ -11,7 +17,8 @@
 1.  [#3978](https://github.com/influxdata/chronograf/pull/3978): Fix use of template variables within InfluxQL regexes
 1.  [#3994](https://github.com/influxdata/chronograf/pull/3994): Pressing play on log viewer goes to now
 1.  [#4008](https://github.com/influxdata/chronograf/pull/4008): Fix display of log viewer histogram when a basepath is enabled
-
+1.  [#4038](https://github.com/influxdata/chronograf/pull/4038): Fix crosshairs and hover legend display in Alert Rule visualization
+1.  [#4067](https://github.com/influxdata/chronograf/pull/4067): Size loading spinners based on height of their container
 
 ## v1.6.0 [2018-06-18]
 

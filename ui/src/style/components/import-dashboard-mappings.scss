@@ -1,0 +1,72 @@
+/*
+   Styles for Mapping Dashboard Sources After Import
+   -----------------------------------------------------------------------------
+*/
+
+.dash-map--source,
+.dash-map--header,
+.dash-map--cell {
+  @include no-user-select();
+  width: 100%;
+}
+
+.dash-map--source {
+  height: $form-sm-height;
+  line-height: $form-sm-height;
+  background-color: $g4-onyx;
+  padding: 0 $form-sm-padding;
+  font-size: $form-sm-font;
+  border-radius: $ix-radius;
+  width: 100%;
+  font-weight: 600;
+}
+
+.dash-map--table .dash-map--table-cell {
+  vertical-align: top;
+  padding: $ix-marg-b;
+}
+
+.dash-map--header,
+.dash-map--cell {
+  font-size: 12px;
+  padding: 0 $form-sm-padding;
+}
+
+.dash-map--header {
+  color: $g11-sidewalk;
+  margin: $ix-marg-a 0;
+  font-weight: 600;
+}
+
+.dash-map--cell {
+  color: $g16-pearl;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-map--table-half {
+  width: 45%;
+}
+
+.dash-map--table-cell.dash-map--table-center {
+  width: 10%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.dash-map--footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.dash-map--submit {
+  width: 140px;
+}
+
+.dash-map--empty {
+  margin-top: 30px;
+}

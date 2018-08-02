@@ -5,6 +5,7 @@ import moment from 'moment'
 import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {Greys} from 'src/reusable_ui/types'
+import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 
@@ -22,8 +23,8 @@ import {
   addFilter,
   removeFilter,
   changeFilter,
-  fetchMoreAsync,
-  fetchNewerAsync,
+  fetchOlderLogsAsync,
+  fetchNewerLogsAsync,
   getLogConfigAsync,
   updateLogConfigAsync,
 } from 'src/logs/actions'
@@ -81,8 +82,8 @@ interface Props {
   setSearchTermAsync: (searchTerm: string) => void
   setTableRelativeTime: (time: number) => void
   setTableCustomTime: (time: string) => void
-  fetchMoreAsync: (queryTimeEnd: string) => Promise<void>
-  fetchNewerAsync: (queryTimeEnd: string) => Promise<void>
+  fetchOlderLogsAsync: (queryTimeEnd: string) => Promise<void>
+  fetchNewerLogsAsync: (queryTimeEnd: string) => Promise<void>
   addFilter: (filter: Filter) => void
   removeFilter: (id: string) => void
   changeFilter: (id: string, operator: string, value: string) => void
@@ -153,6 +154,11 @@ class LogsPage extends Component<Props, State> {
 
       this.props.getSource(source.id)
     }
+
+    if (this.liveUpdatingStatus === LiveUpdating.Pause && this.interval) {
+      clearInterval(this.interval)
+      this.interval = null
+    }
   }
 
   public componentDidMount() {
@@ -180,17 +186,16 @@ class LogsPage extends Component<Props, State> {
         <div className="page">
           {this.header}
           <div className="page-contents logs-viewer">
+            <QueryResults count={this.histogramTotal} queryCount={queryCount} />
             <LogsGraphContainer>{this.chart}</LogsGraphContainer>
             <SearchBar
               searchString={searchTerm}
               onSearch={this.handleSubmitSearch}
             />
             <FilterBar
-              numResults={this.histogramTotal}
               filters={filters || []}
               onDelete={this.handleFilterDelete}
               onFilterChange={this.handleFilterChange}
-              queryCount={queryCount}
             />
             <LogsTable
               count={this.histogramTotal}
@@ -200,7 +205,7 @@ class LogsPage extends Component<Props, State> {
               onScrolledToTop={this.handleScrollToTop}
               isScrolledToTop={false}
               onTagSelection={this.handleTagSelection}
-              fetchMore={this.props.fetchMoreAsync}
+              fetchMore={this.props.fetchOlderLogsAsync}
               fetchNewer={this.fetchNewer}
               timeRange={timeRange}
               scrollToRow={this.tableScrollToRow}
@@ -210,6 +215,7 @@ class LogsPage extends Component<Props, State> {
               hasScrolled={this.state.hasScrolled}
               tableInfiniteData={this.props.tableInfiniteData}
               onChooseCustomTime={this.handleChooseCustomTime}
+              onExpandMessage={this.handleExpandMessage}
             />
           </div>
         </div>
@@ -218,9 +224,13 @@ class LogsPage extends Component<Props, State> {
     )
   }
 
+  private handleExpandMessage = () => {
+    this.setState({liveUpdating: LiveUpdating.Pause})
+  }
+
   private fetchNewer = (time: string) => {
     this.loadingNewer = true
-    this.props.fetchNewerAsync(time)
+    this.props.fetchNewerLogsAsync(time)
   }
 
   private get tableScrollToRow() {
@@ -511,7 +521,6 @@ class LogsPage extends Component<Props, State> {
 
   private handleSubmitSearch = (value: string): void => {
     this.props.setSearchTermAsync(value)
-    this.setState({liveUpdating: LiveUpdating.Play})
   }
 
   private handleFilterDelete = (id: string): void => {
@@ -694,8 +703,8 @@ const mapDispatchToProps = {
   addFilter,
   removeFilter,
   changeFilter,
-  fetchMoreAsync,
-  fetchNewerAsync,
+  fetchOlderLogsAsync,
+  fetchNewerLogsAsync,
   setTableCustomTime: setTableCustomTimeAsync,
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,

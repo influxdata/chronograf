@@ -3658,7 +3658,7 @@ func TestServer(t *testing.T) {
 			serverURL := fmt.Sprintf("http://%v:%v%v", host, port, tt.args.path)
 
 			// Wait for the server to come online
-			timeout := time.Now().Add(60 * time.Second)
+			timeout := time.Now().Add(10 * time.Second)
 			for {
 				_, err := http.Get(serverURL + "/swagger.json")
 				if err == nil {

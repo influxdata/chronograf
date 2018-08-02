@@ -15,6 +15,10 @@ import * as AppActions from 'src/types/actions/app'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 
+interface State {
+  selected: QueriesModels.TimeRange
+}
+
 interface Props {
   activeDashboard: string
   dashboard: DashboardsModels.Dashboard
@@ -33,12 +37,35 @@ interface Props {
   isHidden: boolean
 }
 
-class DashboardHeader extends Component<Props> {
+class DashboardHeader extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     zoomedTimeRange: {
       upper: null,
       lower: null,
     },
+  }
+
+  public static getDerivedStateFromProps(props: Props): Partial<State> {
+    const {upper, lower} = props.zoomedTimeRange
+
+    if (upper || lower) {
+      return {selected: {upper, lower}}
+    }
+
+    return {}
+  }
+
+  constructor(props: Props) {
+    super(props)
+
+    const {timeRange, zoomedTimeRange} = props
+
+    this.state = {
+      selected: {
+        upper: timeRange.upper || zoomedTimeRange.upper,
+        lower: timeRange.lower || zoomedTimeRange.lower,
+      },
+    }
   }
 
   public render() {
@@ -65,14 +92,9 @@ class DashboardHeader extends Component<Props> {
   }
 
   private get optionsComponents(): JSX.Element {
-    const {
-      handleChooseAutoRefresh,
-      onManualRefresh,
-      autoRefresh,
-      handleChooseTimeRange,
-      timeRange: {upper, lower},
-      zoomedTimeRange: {upper: zoomedUpper, lower: zoomedLower},
-    } = this.props
+    const {handleChooseAutoRefresh, onManualRefresh, autoRefresh} = this.props
+
+    const {selected} = this.state
 
     return (
       <>
@@ -86,11 +108,8 @@ class DashboardHeader extends Component<Props> {
           iconName="refresh"
         />
         <TimeRangeDropdown
-          onChooseTimeRange={handleChooseTimeRange}
-          selected={{
-            upper: zoomedUpper || upper,
-            lower: zoomedLower || lower,
-          }}
+          onChooseTimeRange={this.handleChooseTimeRange}
+          selected={selected}
         />
         <button
           className="btn btn-default btn-sm btn-square"
@@ -101,6 +120,17 @@ class DashboardHeader extends Component<Props> {
       </>
     )
   }
+
+  private handleChooseTimeRange = (
+    timeRange: QueriesModels.TimeRange
+  ): void => {
+    this.setState({selected: timeRange}, () => {
+      window.setTimeout(() => {
+        this.props.handleChooseTimeRange(timeRange)
+      }, 0)
+    })
+  }
+
   private handleClickPresentationButton = (): void => {
     this.props.handleClickPresentationButton()
   }

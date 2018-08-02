@@ -9,9 +9,10 @@ import {
   buildHistogramQueryConfig,
   buildTableQueryConfig,
   buildLogQuery,
-  buildForwardLogQuery,
-  buildBackwardLogQuery,
+  buildInfiniteScrollLogQuery,
   parseHistogramQueryResponse,
+  findOlderLowerTimeBounds,
+  findNewerUpperTimeBounds,
 } from 'src/logs/utils'
 import {logConfigServerToUI, logConfigUIToServer} from 'src/logs/utils/config'
 import {getDeep} from 'src/utils/wrappers'
@@ -347,27 +348,43 @@ export const setTimeBounds = (timeBounds: TimeBounds): SetTimeBoundsAction => ({
   payload: {timeBounds},
 })
 
-export const executeTableForwardQueryAsync = () => async (
+export const executeTableNewerQueryAsync = () => async (
   dispatch,
   getState: GetState
 ) => {
   const state = getState()
 
-  const time = getTableSelectedTime(state)
+  const startTime = getTableSelectedTime(state)
   const queryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
   const searchTerm = getSearchTerm(state)
   const filters = getFilters(state)
 
-  if (!_.every([queryConfig, time, namespace, proxyLink])) {
+  if (!_.every([queryConfig, startTime, namespace, proxyLink])) {
     return
   }
 
   try {
     dispatch(incrementQueryCount())
 
-    const query = buildForwardLogQuery(time, queryConfig, filters, searchTerm)
+    const endTime = await findNewerUpperTimeBounds(
+      startTime,
+      queryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query: string = await buildInfiniteScrollLogQuery(
+      startTime,
+      endTime,
+      queryConfig,
+      filters,
+      searchTerm
+    )
+
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
@@ -387,7 +404,7 @@ export const executeTableForwardQueryAsync = () => async (
   }
 }
 
-export const executeTableBackwardQueryAsync = () => async (
+export const executeTableOlderQueryAsync = () => async (
   dispatch,
   getState: GetState
 ) => {
@@ -407,7 +424,23 @@ export const executeTableBackwardQueryAsync = () => async (
   try {
     dispatch(incrementQueryCount())
 
-    const query = buildBackwardLogQuery(time, queryConfig, filters, searchTerm)
+    const lower: string = await findOlderLowerTimeBounds(
+      time,
+      queryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query: string = await buildInfiniteScrollLogQuery(
+      lower,
+      time,
+      queryConfig,
+      filters,
+      searchTerm
+    )
+
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
@@ -489,8 +522,8 @@ export const executeHistogramQueryAsync = () => async (
 
 export const executeTableQueryAsync = () => async (dispatch): Promise<void> => {
   await Promise.all([
-    dispatch(executeTableForwardQueryAsync()),
-    dispatch(executeTableBackwardQueryAsync()),
+    dispatch(executeTableNewerQueryAsync()),
+    dispatch(executeTableOlderQueryAsync()),
     dispatch(clearRowsAdded()),
   ])
 }
@@ -577,7 +610,7 @@ export const setTableQueryConfigAsync = () => async (
   }
 }
 
-export const fetchMoreAsync = (queryTimeEnd: string) => async (
+export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
   dispatch,
   getState
 ): Promise<void> => {
@@ -595,7 +628,17 @@ export const fetchMoreAsync = (queryTimeEnd: string) => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const query = buildBackwardLogQuery(
+    const queryTimeStart = await findOlderLowerTimeBounds(
+      queryTimeEnd,
+      newQueryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query = await buildInfiniteScrollLogQuery(
+      queryTimeStart,
       queryTimeEnd,
       newQueryConfig,
       filters,
@@ -613,7 +656,7 @@ export const fetchMoreAsync = (queryTimeEnd: string) => async (
   }
 }
 
-export const fetchNewerAsync = (queryTimeStart: string) => async (
+export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
   dispatch,
   getState
 ): Promise<void> => {
@@ -631,8 +674,18 @@ export const fetchNewerAsync = (queryTimeStart: string) => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const query = buildForwardLogQuery(
+    const queryTimeEnd = await findNewerUpperTimeBounds(
       queryTimeStart,
+      newQueryConfig,
+      filters,
+      searchTerm,
+      proxyLink,
+      namespace
+    )
+
+    const query: string = await buildInfiniteScrollLogQuery(
+      queryTimeStart,
+      queryTimeEnd,
       newQueryConfig,
       filters,
       searchTerm

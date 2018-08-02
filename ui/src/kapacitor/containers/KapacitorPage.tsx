@@ -117,7 +117,7 @@ export class KapacitorPage extends PureComponent<Props, State> {
     const isNew = !params.id
 
     if (isNew && isNameTaken) {
-      notify(notifyKapacitorNameAlreadyTaken)
+      notify(notifyKapacitorNameAlreadyTaken(kapacitor.name))
       return
     }
 

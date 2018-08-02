@@ -15,7 +15,7 @@ import {CellEditorOverlayActions} from 'src/dashboards/components/CellEditorOver
 const rawTextBinder = (
   links: SourceLinks,
   id: string,
-  action: (linksQueries: string, id: string, text: string) => void
+  action: (linksQueries: string, id: string, text: string) => Promise<void>
 ) => (text: string) => action(links.queries, id, text)
 
 const buildText = (q: QueryConfig): string =>

@@ -163,9 +163,7 @@ export type FetchKapacitorsAsync = (
   source: Source
 ) => (dispatch) => Promise<void>
 
-export const fetchKapacitorsAsync = (source: Source) => async (
-  dispatch
-): Promise<void> => {
+export const fetchKapacitorsAsync: FetchKapacitorsAsync = source => async dispatch => {
   try {
     const kapacitors = await getKapacitorsAJAX(source)
     dispatch(fetchKapacitors(source, kapacitors))

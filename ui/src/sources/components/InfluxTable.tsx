@@ -7,17 +7,20 @@ import InfluxTableHead from 'src/sources/components/InfluxTableHead'
 import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
 import InfluxTableRow from 'src/sources/components/InfluxTableRow'
 
-import {Source, Me} from 'src/types'
+import {Source, Me, Service} from 'src/types'
 
 interface Props {
   me: Me
   source: Source
   sources: Source[]
+  services: Service[]
   isUsingAuth: boolean
   deleteKapacitor: DeleteKapacitor
   setActiveKapacitor: SetActiveKapacitor
   onDeleteSource: (source: Source) => void
   toggleWizard: (isVisible: boolean) => () => void
+  setActiveFlux: (source: Source, service: Service) => void
+  deleteFlux: (fluxService: Service) => void
 }
 
 class InfluxTable extends PureComponent<Props> {
@@ -26,8 +29,10 @@ class InfluxTable extends PureComponent<Props> {
       source,
       sources,
       setActiveKapacitor,
+      setActiveFlux,
       onDeleteSource,
       deleteKapacitor,
+      deleteFlux,
       isUsingAuth,
       me,
       toggleWizard,
@@ -52,10 +57,13 @@ class InfluxTable extends PureComponent<Props> {
                       <InfluxTableRow
                         key={s.id}
                         source={s}
+                        services={this.getServicesForSource(s.id)}
                         currentSource={source}
                         onDeleteSource={onDeleteSource}
                         deleteKapacitor={deleteKapacitor}
                         setActiveKapacitor={setActiveKapacitor}
+                        setActiveFlux={setActiveFlux}
+                        deleteFlux={deleteFlux}
                       />
                     )
                   })}
@@ -66,6 +74,12 @@ class InfluxTable extends PureComponent<Props> {
         </div>
       </div>
     )
+  }
+
+  private getServicesForSource(sourceID: string) {
+    return this.props.services.filter(s => {
+      return s.sourceID === sourceID
+    })
   }
 }
 

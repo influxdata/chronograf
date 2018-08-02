@@ -2,7 +2,8 @@ import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import * as actions from 'src/shared/actions/sources'
+import * as sourcesActions from 'src/shared/actions/sources'
+import * as servicesActions from 'src/shared/actions/services'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -15,7 +16,8 @@ import {
   notifySourceDeleteFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Notification} from 'src/types'
+import {Source, Notification, Service} from 'src/types'
+import {getDeep} from 'src/utils/wrappers'
 
 interface State {
   wizardVisibility: boolean
@@ -24,11 +26,15 @@ interface State {
 interface Props {
   source: Source
   sources: Source[]
+  services: Service[]
   notify: (n: Notification) => void
-  deleteKapacitor: actions.DeleteKapacitorAsync
-  fetchKapacitors: actions.FetchKapacitorsAsync
-  removeAndLoadSources: actions.RemoveAndLoadSources
-  setActiveKapacitor: actions.SetActiveKapacitorAsync
+  deleteKapacitor: sourcesActions.DeleteKapacitorAsync
+  fetchKapacitors: sourcesActions.FetchKapacitorsAsync
+  removeAndLoadSources: sourcesActions.RemoveAndLoadSources
+  setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
+  fetchAllServices: servicesActions.FetchAllFluxServicesAsync
+  setActiveFlux: servicesActions.SetActiveServiceAsync
+  deleteFlux: servicesActions.DeleteServiceAsync
 }
 
 const VERSION = process.env.npm_package_version
@@ -42,6 +48,7 @@ class ManageSources extends PureComponent<Props, State> {
     }
   }
   public componentDidMount() {
+    this.props.fetchAllServices(this.props.sources)
     this.props.sources.forEach(source => {
       this.props.fetchKapacitors(source)
     })
@@ -56,7 +63,7 @@ class ManageSources extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {sources, source, deleteKapacitor} = this.props
+    const {sources, source, deleteKapacitor, deleteFlux, services} = this.props
     const {wizardVisibility} = this.state
 
     return (
@@ -67,8 +74,11 @@ class ManageSources extends PureComponent<Props, State> {
             <InfluxTable
               source={source}
               sources={sources}
+              services={services}
+              deleteFlux={deleteFlux}
               deleteKapacitor={deleteKapacitor}
               onDeleteSource={this.handleDeleteSource}
+              setActiveFlux={this.handleSetActiveFlux}
               setActiveKapacitor={this.handleSetActiveKapacitor}
               toggleWizard={this.toggleWizard}
             />
@@ -81,6 +91,14 @@ class ManageSources extends PureComponent<Props, State> {
         />
       </div>
     )
+  }
+
+  private handleSetActiveFlux = async (source, service) => {
+    const {services, setActiveFlux} = this.props
+    const prevActiveService = services.find(s => {
+      return getDeep<boolean>(s, 'metadata.active', false)
+    })
+    await setActiveFlux(source, service, prevActiveService)
   }
 
   private handleDeleteSource = (source: Source) => {
@@ -105,16 +123,20 @@ class ManageSources extends PureComponent<Props, State> {
   }
 }
 
-const mstp = ({sources}) => ({
+const mstp = ({sources, services}) => ({
   sources,
+  services,
 })
 
 const mdtp = {
-  removeAndLoadSources: actions.removeAndLoadSources,
-  fetchKapacitors: actions.fetchKapacitorsAsync,
-  setActiveKapacitor: actions.setActiveKapacitorAsync,
-  deleteKapacitor: actions.deleteKapacitorAsync,
   notify: notifyAction,
+  removeAndLoadSources: sourcesActions.removeAndLoadSources,
+  fetchKapacitors: sourcesActions.fetchKapacitorsAsync,
+  setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
+  deleteKapacitor: sourcesActions.deleteKapacitorAsync,
+  fetchAllServices: servicesActions.fetchAllFluxServicesAsync,
+  setActiveFlux: servicesActions.setActiveServiceAsync,
+  deleteFlux: servicesActions.deleteServiceAsync,
 }
 
 export default connect(mstp, mdtp)(ManageSources)

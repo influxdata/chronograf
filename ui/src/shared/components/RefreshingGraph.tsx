@@ -24,6 +24,7 @@ import {setHoverTime} from 'src/dashboards/actions'
 import {ColorString} from 'src/types/colors'
 import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
 import {TableOptions, FieldOption, DecimalPlaces} from 'src/types/dashboards'
+import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 interface Props {
   axes: Axes
@@ -48,8 +49,8 @@ interface Props {
   onZoom: () => void
   editQueryStatus: () => void
   onSetResolution: () => void
-  grabDataForDownload: () => void
   handleSetHoverTime: () => void
+  grabDataForDownload?: GrabDataForDownloadHandler
 }
 
 class RefreshingGraph extends PureComponent<Props> {
@@ -69,6 +70,7 @@ class RefreshingGraph extends PureComponent<Props> {
       source,
       templates,
       editQueryStatus,
+      grabDataForDownload,
     } = this.props
 
     if (!queries.length) {
@@ -86,6 +88,7 @@ class RefreshingGraph extends PureComponent<Props> {
         queries={this.queries}
         templates={templates}
         editQueryStatus={editQueryStatus}
+        grabDataForDownload={grabDataForDownload}
       >
         {({timeSeries, loading}) => {
           switch (type) {
@@ -129,7 +132,6 @@ class RefreshingGraph extends PureComponent<Props> {
       decimalPlaces,
       manualRefresh,
       handleSetHoverTime,
-      grabDataForDownload,
       isInCEO,
     } = this.props
 
@@ -143,7 +145,6 @@ class RefreshingGraph extends PureComponent<Props> {
         fieldOptions={fieldOptions}
         timeFormat={timeFormat}
         decimalPlaces={decimalPlaces}
-        grabDataForDownload={grabDataForDownload}
         handleSetHoverTime={handleSetHoverTime}
       />
     )
