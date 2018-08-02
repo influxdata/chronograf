@@ -11,9 +11,6 @@ import {
   IconFont,
 } from 'src/reusable_ui/types'
 
-// Styles
-import './Button.scss'
-
 interface Props {
   text: string
   onClick?: () => void
