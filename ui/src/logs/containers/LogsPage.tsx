@@ -154,6 +154,11 @@ class LogsPage extends Component<Props, State> {
 
       this.props.getSource(source.id)
     }
+
+    if (this.liveUpdatingStatus === LiveUpdating.Pause && this.interval) {
+      clearInterval(this.interval)
+      this.interval = null
+    }
   }
 
   public componentDidMount() {
