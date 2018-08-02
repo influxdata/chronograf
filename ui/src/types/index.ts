@@ -1,5 +1,5 @@
 import {LayoutCell, LayoutQuery} from './layouts'
-import {Service, NewService} from './services'
+import {Service, NewService, ServiceLinks} from './services'
 import {Links, Organization, Role, Permission, User, Me} from './auth'
 import {Cell, CellQuery, Legend, Axes, Dashboard, CellType} from './dashboards'
 import {
@@ -103,6 +103,7 @@ export {
   Dashboard,
   Service,
   NewService,
+  ServiceLinks,
   LayoutCell,
   LayoutQuery,
   FluxTable,

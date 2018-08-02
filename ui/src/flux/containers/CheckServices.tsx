@@ -13,6 +13,7 @@ import {
   UpdateScript,
 } from 'src/flux/actions'
 import * as actions from 'src/shared/actions/services'
+import {getDeep} from 'src/utils/wrappers'
 
 export const NotificationContext = React.createContext(undefined)
 
@@ -20,32 +21,42 @@ interface Props {
   sources: Source[]
   services: Service[]
   children: ReactChildren
-  fetchServicesAsync: actions.FetchFluxServicesForSourceAsync
+  fetchServicesAsync: actions.FetchAllFluxServicesAsync
   notify: (message: Notification) => void
   updateScript: UpdateScript
   script: string
   links: Links
 }
 
-export class CheckServices extends PureComponent<Props & WithRouterProps> {
+interface State {
+  selectedSource: Source
+  selectedService: Service
+}
+
+export class CheckServices extends PureComponent<
+  Props & WithRouterProps,
+  State
+> {
   constructor(props: Props & WithRouterProps) {
     super(props)
+
+    this.state = {
+      selectedSource: null,
+      selectedService: null,
+    }
   }
 
   public async componentDidMount() {
-    const source = this.props.sources.find(
-      s => s.id === this.props.params.sourceID
-    )
-
-    if (!source) {
+    const {sources} = this.props
+    if (!sources.length) {
       return
     }
 
-    await this.props.fetchServicesAsync(source)
+    await this.props.fetchServicesAsync(sources)
   }
 
   public render() {
-    const {services, notify, updateScript, links, script} = this.props
+    const {services, sources, notify, updateScript, links, script} = this.props
 
     if (!this.props.services.length) {
       return <EmptyFluxPage onGoToNewService={this.handleGoToNewFlux} />
@@ -55,12 +66,15 @@ export class CheckServices extends PureComponent<Props & WithRouterProps> {
       <NotificationContext.Provider value={{notify}}>
         <FluxPage
           source={this.source}
+          sources={sources}
+          service={this.service}
           services={services}
           links={links}
           script={script}
           notify={notify}
           updateScript={updateScript}
           onGoToEditFlux={this.handleGoToEditFlux}
+          onChangeService={this.handleChangeService}
         />
       </NotificationContext.Provider>
     )
@@ -80,15 +94,45 @@ export class CheckServices extends PureComponent<Props & WithRouterProps> {
     router.push(editFluxResource)
   }
 
+  private handleChangeService = (
+    selectedService: Service,
+    selectedSource: Source
+  ) => {
+    this.setState({
+      selectedService,
+      selectedSource,
+    })
+  }
+
   private get source(): Source {
     const {params, sources} = this.props
+    const {selectedSource} = this.state
+
+    if (selectedSource) {
+      return selectedSource
+    }
 
     return sources.find(s => s.id === params.sourceID)
+  }
+
+  private get service(): Service {
+    const {services} = this.props
+    const {selectedService} = this.state
+
+    if (selectedService) {
+      return selectedService
+    }
+
+    const activeService = services.find(s => {
+      return getDeep<boolean>(s, 'metadata.active', false)
+    })
+
+    return activeService || services[0]
   }
 }
 
 const mdtp = {
-  fetchServicesAsync: actions.fetchFluxServicesForSourceAsync,
+  fetchServicesAsync: actions.fetchAllFluxServicesAsync,
   updateScript: updateScriptAction,
   notify: notifyAction,
 }
