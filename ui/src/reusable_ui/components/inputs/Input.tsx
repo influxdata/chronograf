@@ -10,9 +10,6 @@ import classnames from 'classnames'
 // Types
 import {ComponentStatus, ComponentSize, IconFont} from 'src/reusable_ui/types'
 
-// Styles
-import './Input.scss'
-
 export enum InputType {
   Text = 'text',
   Number = 'number',

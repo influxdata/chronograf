@@ -11,10 +11,6 @@ import {
   DropdownChild,
 } from 'src/reusable_ui/types'
 
-// Styles
-import 'src/reusable_ui/components/button/Button.scss'
-import './DropdownButton.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
