@@ -55,21 +55,23 @@ class DashboardsPage extends PureComponent<Props> {
   }
 
   public render() {
-    const {dashboards, notify} = this.props
+    const {dashboards, notify, sources, source} = this.props
     const dashboardLink = `/sources/${this.props.source.id}`
 
     return (
       <div className="page">
         <PageHeader titleText="Dashboards" sourceIndicator={true} />
         <DashboardsContents
-          dashboardLink={dashboardLink}
+          notify={notify}
+          source={source}
+          sources={sources}
           dashboards={dashboards}
+          dashboardLink={dashboardLink}
           onDeleteDashboard={this.handleDeleteDashboard}
           onCreateDashboard={this.handleCreateDashboard}
           onCloneDashboard={this.handleCloneDashboard}
           onExportDashboard={this.handleExportDashboard}
           onImportDashboard={this.handleImportDashboard}
-          notify={notify}
         />
       </div>
     )
