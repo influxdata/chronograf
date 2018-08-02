@@ -1,0 +1,11 @@
+@import 'src/style/modules/influx-colors';
+
+.card-select--wrapper {
+  border: none;
+  box-sizing: border-box;
+}
+
+.card-select--cards {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
