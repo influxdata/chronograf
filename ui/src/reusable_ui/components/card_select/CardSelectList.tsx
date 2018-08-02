@@ -13,10 +13,11 @@ interface Props {
 @ErrorHandling
 class CardSelectList extends PureComponent<Props> {
   public render() {
-    const {children} = this.props
+    const {children, legend} = this.props
 
     return (
       <fieldset className="card-select--wrapper">
+        <legend>{legend}</legend>
         <div className="card-select--cards">{children}</div>
       </fieldset>
     )

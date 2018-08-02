@@ -9,8 +9,8 @@ describe('Card Select Card', () => {
 
   const wrapperSetup = (override = {}) => {
     const props = {
-      children: null,
-      legend: null,
+      children: undefined,
+      legend: 'legend',
       ...override,
     }
 
@@ -19,10 +19,11 @@ describe('Card Select Card', () => {
 
   const childSetup = (override = {}) => {
     const props = {
-      id: null,
-      label: null,
-      image: null,
-      checked: null,
+      id: 'card_id',
+      label: 'Card Label',
+      image: undefined,
+      checked: undefined,
+      disabled: undefined,
       ...override,
     }
 
@@ -32,7 +33,6 @@ describe('Card Select Card', () => {
   const cardChildren = [childSetup(), childSetup()]
 
   beforeEach(() => {
-    jest.resetAllMocks()
     wrapper = wrapperSetup({children: cardChildren})
   })
 
@@ -40,7 +40,15 @@ describe('Card Select Card', () => {
     expect(wrapper).toHaveLength(1)
   })
 
-  // it('matches snapshot with minimal props', () => {
-  //   expect(wrapper).toMatchSnapshot()
-  // })
+  it('renders one fieldset', () => {
+    expect(wrapper.find('fieldset')).toHaveLength(1)
+  })
+
+  it('renders one legend', () => {
+    expect(wrapper.find('legend')).toHaveLength(1)
+  })
+
+  it('matches snapshot with two children', () => {
+    expect(wrapper).toMatchSnapshot()
+  })
 })

@@ -5,12 +5,11 @@
 .card-select--card {
     background-color: $g1-raven;
     border-radius: $radius;
+    border: 3px solid transparent;
     height: 197px;
     width: 197px;
     margin: $ix-marg-b;
-    border: 3px solid transparent;
-    transition: border 0.2s ease;
-    transition: background-color 0.2s ease;
+    transition: border-color .2s ease, background-color .2s ease;
     box-sizing: content-box;
 }
 
@@ -39,12 +38,8 @@
     }
 }
 
-.card-select--active:hover {
-    border: 3px solid $c-rainforest-disabled;
-}
-
 .card-select--active.card-select--checked {
-    border: 3px solid $c-rainforest;
+    border-color: $c-rainforest;
 }
 
 .card-select--disabled {
@@ -63,7 +58,9 @@
     width: 100%;
     height: 100%;
     input {
-      background: white;
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
     }
 }
 
@@ -79,12 +76,6 @@
   font-weight: 600;
 }
 
-.card-select--container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
-
 .card-select--checkmark {
     position: absolute;
     left: $ix-marg-c;
@@ -93,7 +84,7 @@
     width: 22px;
     color: $c-rainforest;
     opacity: 0;
-    transition: opacity .2s;
+    transition: opacity .2s ease;
 }
 
 .card-select--checkmark.card-select--checked {
