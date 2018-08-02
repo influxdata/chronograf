@@ -1,25 +1,32 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
+// Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
-
 import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
 import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
 
+// Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 
+// Utils
+import {getDeep} from 'src/utils/wrappers'
+
+// APIs
 import {createKapacitor, pingKapacitor} from 'src/shared/apis'
 
+// Constants
+import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {
   notifyKapacitorCreateFailed,
   notifyKapacitorCreated,
   notifyKapacitorConnectionFailed,
 } from 'src/shared/copy/notifications'
-
-import {Kapacitor, Source} from 'src/types'
 import {DEFAULT_KAPACITOR} from 'src/shared/constants'
-import {getDeep} from 'src/utils/wrappers'
+
+// Types
+import {Kapacitor, Source} from 'src/types'
 
 interface Props {
   notify: typeof notifyAction

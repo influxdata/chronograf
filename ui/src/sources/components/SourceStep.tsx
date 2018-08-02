@@ -1,24 +1,32 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
+// Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {createSource} from 'src/shared/apis'
-
 import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
 import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
 
+// Actions
 import {addSource as addSourceAction} from 'src/shared/actions/sources'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
+// Utils
+import {getDeep} from 'src/utils/wrappers'
+
+// APIs
+import {createSource} from 'src/shared/apis'
+
+// Constants
 import {
   notifySourceCreationFailed,
   notifySourceCreationSucceeded,
 } from 'src/shared/copy/notifications'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
-
-import {Source} from 'src/types'
 import {DEFAULT_SOURCE} from 'src/shared/constants'
-import {getDeep} from 'src/utils/wrappers'
+
+// Types
+import {Source} from 'src/types'
 
 interface Props {
   notify: typeof notifyAction

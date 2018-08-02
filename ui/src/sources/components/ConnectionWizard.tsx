@@ -1,11 +1,17 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
+// Components
+import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import SourceStep from 'src/sources/components/SourceStep'
 import KapacitorStep from 'src/sources/components/KapacitorStep'
+import DashboardsStep from 'src/sources/components/DashboardsStep'
+import CompletionStep from 'src/sources/components/CompletionStep'
+
+// Types
 import {Kapacitor, Source} from 'src/types'
 
 interface Props {
