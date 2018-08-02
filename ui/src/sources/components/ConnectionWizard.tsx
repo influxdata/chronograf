@@ -42,6 +42,7 @@ class ConnectionWizard extends PureComponent<Props, State> {
       <WizardOverlay
         visible={isVisible}
         toggleVisibility={toggleVisibility}
+        resetWizardState={this.resetWizardState}
         title="Add Connection"
         skipLinkText="skip this step"
         maxWidth={1200}
@@ -112,8 +113,17 @@ class ConnectionWizard extends PureComponent<Props, State> {
   private isCompletionComplete = () => {
     return false
   }
-  private handleCompletionNext = () => {}
+  private handleCompletionNext = () => {
+    this.resetWizardState()
+  }
   private handleCompletionPrev = () => {}
+
+  private resetWizardState = () => {
+    this.setState({
+      source: null,
+      kapacitor: null,
+    })
+  }
 }
 
 export default ConnectionWizard

@@ -13,6 +13,7 @@ interface Props {
   visible: boolean
   title: string
   toggleVisibility: (isVisible: boolean) => () => void
+  resetWizardState: () => void
   skipLinkText?: string
   maxWidth?: number
 }
@@ -37,13 +38,13 @@ class WizardOverlay extends PureComponent<Props> {
   }
 
   private get WizardController() {
-    const {children, skipLinkText, toggleVisibility} = this.props
+    const {children, skipLinkText} = this.props
 
     if (children) {
       return (
         <WizardController
           skipLinkText={skipLinkText}
-          handleSkip={toggleVisibility(false)}
+          handleSkip={this.handleSkip}
         >
           {children}
         </WizardController>
@@ -51,6 +52,12 @@ class WizardOverlay extends PureComponent<Props> {
     }
 
     return null
+  }
+
+  private handleSkip = () => {
+    const {toggleVisibility, resetWizardState} = this.props
+    toggleVisibility(false)()
+    resetWizardState()
   }
 }
 
