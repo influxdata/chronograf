@@ -442,6 +442,15 @@ export const DEFAULT_SOURCE = {
   metaUrl: '',
 }
 
+export const DEFAULT_KAPACITOR = {
+  url: 'http://localhost:9092',
+  name: 'My Kapacitor',
+  username: '',
+  password: '',
+  active: true,
+  insecureSkipVerify: false,
+}
+
 export const intervalValuesPoints = [
   {
     value: `${DEFAULT_PIXELS}`,

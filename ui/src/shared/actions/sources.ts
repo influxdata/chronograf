@@ -167,8 +167,8 @@ export const fetchKapacitorsAsync = (source: Source) => async (
   dispatch
 ): Promise<void> => {
   try {
-    const {data} = await getKapacitorsAJAX(source)
-    dispatch(fetchKapacitors(source, data.kapacitors))
+    const kapacitors = await getKapacitorsAJAX(source)
+    dispatch(fetchKapacitors(source, kapacitors))
   } catch (err) {
     dispatch(notify(notifyCouldNotRetrieveKapacitors(source.id)))
   }

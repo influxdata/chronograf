@@ -73,8 +73,8 @@ function generateResponseWithLinks<T extends object>(
 
 interface RequestParams {
   url?: string | string[]
-  resource?: string | null
-  id?: string | null
+  resource?: string
+  id?: string
   method?: string
   data?: object | string
   params?: object

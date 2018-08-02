@@ -48,7 +48,7 @@ import {
 import DeprecationWarning from 'src/admin/components/DeprecationWarning'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {Source, Kapacitor} from 'src/types'
+import {Source, Kapacitor, Service} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {ServiceProperties, SpecificConfigOptions} from 'src/types/kapacitor'
 
@@ -57,14 +57,6 @@ import {
   SupportedServices,
   AlertTypes,
 } from 'src/kapacitor/constants'
-
-interface Service {
-  link: Link
-  name: string
-  options: {
-    id: string
-  }
-}
 
 interface Link {
   rel: string
@@ -130,7 +122,7 @@ class AlertTabs extends PureComponent<Props, State> {
     const {kapacitor} = this.props
     try {
       this.refreshKapacitorConfig(kapacitor)
-      const services: Service[] = await getAllServices(kapacitor)
+      const services = await getAllServices(kapacitor)
       this.setState({services})
     } catch (error) {
       this.setState({services: null})
@@ -422,11 +414,8 @@ class AlertTabs extends PureComponent<Props, State> {
     }
   }
 
-  private getSectionElement = (
-    sections: Sections,
-    section: string
-  ): Element => {
-    return _.get(sections, [section, 'elements', '0'], null)
+  private getSectionElement = (sections: Sections, section: string) => {
+    return getDeep<Element>(sections, `${section}.elements.0`, null)
   }
 
   private get isMultipleConfigsSupported(): boolean {
@@ -445,11 +434,8 @@ class AlertTabs extends PureComponent<Props, State> {
     return !_.isUndefined(hasPagerDuty2) && !_.isUndefined(hasOpsGenie2)
   }
 
-  private getSectionElements = (
-    sections: Sections,
-    section: string
-  ): Element[] => {
-    return _.get(sections, [section, 'elements'], null)
+  private getSectionElements = (sections: Sections, section: string) => {
+    return getDeep<Element[]>(sections, `${section}.elements`, null)
   }
 
   private getConfigEnabled = (sections: Sections, section: string): boolean => {
@@ -465,9 +451,9 @@ class AlertTabs extends PureComponent<Props, State> {
       })
       return enabledConfigElements.length > 0
     }
-    return _.get(
+    return getDeep<boolean>(
       sections,
-      [section, 'elements', '0', 'options', 'enabled'],
+      `${section}.elements.0.options.enabled`,
       false
     )
   }
@@ -477,9 +463,9 @@ class AlertTabs extends PureComponent<Props, State> {
     section: string,
     property: string
   ): boolean => {
-    return _.get(
+    return getDeep<boolean>(
       sections,
-      [section, 'elements', '0', 'options', property],
+      `${section}.elements.0.options.${property}`,
       null
     )
   }
@@ -619,7 +605,7 @@ class AlertTabs extends PureComponent<Props, State> {
       service => service === serviceType
     )
 
-    const foundSection: Section = _.get(configSections, serviceType, undefined)
+    const foundSection = getDeep<Section>(configSections, serviceType, null)
 
     const isSupported: boolean =
       !_.isUndefined(foundKapacitorService) &&
