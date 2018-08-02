@@ -1,8 +1,6 @@
 import React, {PureComponent} from 'react'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import 'src/reusable_ui/components/card_select/CardSelectCard.scss'
-
 import classnames from 'classnames'
 
 interface Props {
