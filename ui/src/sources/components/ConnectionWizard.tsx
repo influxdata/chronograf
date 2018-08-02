@@ -8,7 +8,6 @@ import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import SourceStep from 'src/sources/components/SourceStep'
 import KapacitorStep from 'src/sources/components/KapacitorStep'
-import DashboardsStep from 'src/sources/components/DashboardsStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
 
 // Types
@@ -28,6 +27,7 @@ interface State {
 class ConnectionWizard extends PureComponent<Props, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
+  public completionStepRef: any
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -74,24 +74,17 @@ class ConnectionWizard extends PureComponent<Props, State> {
           />
         </WizardStep>
         <WizardStep
-          title="Select Preset Dashboards"
-          tipText="this step is optional"
-          isComplete={this.isDashboardComplete}
-          onNext={this.handleDashboardNext}
-          onPrevious={this.handleDashboardPrev}
-          nextLabel="Complete Connection"
-          previousLabel="Go Back"
-        >
-          something something
-        </WizardStep>
-        <WizardStep
           title="You are complete"
-          isComplete={this.isDashboardComplete}
           tipText="yay"
+          isComplete={this.isCompletionComplete}
+          onNext={this.handleCompletionNext}
+          onPrevious={this.handleCompletionPrev}
           nextLabel="Dismiss"
           previousLabel="Go Back"
         >
-          yay!
+          <CompletionStep
+            ref={c => (this.completionStepRef = c && c.getWrappedInstance())}
+          />
         </WizardStep>
       </WizardOverlay>
     )
@@ -101,7 +94,6 @@ class ConnectionWizard extends PureComponent<Props, State> {
     const source = await this.sourceStepRef.next()
     this.setState({source})
   }
-
   private isSourceComplete = () => {
     const {source} = this.state
     return !_.isNull(source)
@@ -111,21 +103,17 @@ class ConnectionWizard extends PureComponent<Props, State> {
     const {kapacitor} = this.state
     return !_.isNull(kapacitor)
   }
-
   private handleKapacitorNext = async () => {
     const kapacitor = await this.kapacitorStepRef.next()
     this.setState({kapacitor})
   }
-
   private handleKapacitorPrev = () => {}
 
-  private isDashboardComplete = () => {
+  private isCompletionComplete = () => {
     return false
   }
-
-  private handleDashboardNext = () => {}
-
-  private handleDashboardPrev = () => {}
+  private handleCompletionNext = () => {}
+  private handleCompletionPrev = () => {}
 }
 
 export default ConnectionWizard
