@@ -2,7 +2,7 @@
 import Button from './components/Button'
 import Dropdown from './components/dropdowns/Dropdown'
 import Form from './components/form_layout/Form'
-import Input from './components/inputs/Input'
+import Input, {InputType} from './components/inputs/Input'
 import OverlayTechnology from './components/overlays/OverlayTechnology'
 import OverlayContainer from './components/overlays/OverlayContainer'
 import OverlayHeading from './components/overlays/OverlayHeading'
@@ -32,6 +32,7 @@ export {
   Dropdown,
   Form,
   Input,
+  InputType,
   OverlayTechnology,
   OverlayContainer,
   OverlayHeading,
