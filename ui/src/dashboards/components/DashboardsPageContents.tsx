@@ -8,6 +8,7 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
+import MixinTester from 'src/shared/mixin_tester/MixinTester'
 
 import {Dashboard, Source} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -60,6 +61,7 @@ class DashboardsPageContents extends Component<Props, State> {
               <div className="panel">
                 {this.renderPanelHeading}
                 <div className="panel-body">
+                  <MixinTester />
                   <DashboardsTable
                     dashboards={this.filteredDashboards}
                     onDeleteDashboard={onDeleteDashboard}
