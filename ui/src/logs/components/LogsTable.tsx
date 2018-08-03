@@ -604,10 +604,13 @@ class LogsTable extends Component<Props, State> {
       )
     }
 
+    const wrapMessage = column === 'message' && !this.props.isTruncated
+
     return (
       <div
         className={classnames(`logs-viewer--cell  ${column}--cell`, {
           highlight: highlightRow,
+          'message-wrap': wrapMessage,
         })}
         key={key}
         style={style}
