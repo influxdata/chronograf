@@ -9,6 +9,7 @@ interface Props {
   service: Service
   services: Service[]
   sources: Source[]
+  source: Source
   onGoToEditFlux: (service: Service) => void
   onChangeService: (service: Service, source: Source) => void
 }
@@ -31,10 +32,11 @@ class FluxHeader extends PureComponent<Props> {
   }
 
   private get optionsComponents(): JSX.Element {
-    const {service, services, sources, onChangeService} = this.props
+    const {service, services, source, sources, onChangeService} = this.props
     return (
       <>
         <SourceDropdown
+          source={source}
           sources={sources}
           services={services}
           service={service}

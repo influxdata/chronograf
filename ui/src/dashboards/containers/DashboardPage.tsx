@@ -19,6 +19,7 @@ import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOver
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
+import * as serviceActions from 'src/shared/actions/services'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
@@ -54,6 +55,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import * as NotificationsActions from 'src/types/actions/notifications'
+import * as ServicesModels from 'src/types/services'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   source: SourcesModels.Source
@@ -62,6 +64,8 @@ interface Props extends ManualRefreshProps, WithRouterProps {
     sourceID: string
     dashboardID: string
   }
+  services: ServicesModels.Service[]
+  fetchServicesAsync: serviceActions.FetchAllFluxServicesAsync
   location: Location
   dashboardID: number
   dashboard: DashboardsModels.Dashboard
@@ -142,6 +146,7 @@ class DashboardPage extends Component<Props, State> {
 
     this.fetchAnnotations()
     this.getDashboardLinks()
+    this.fetchFluxServices()
   }
 
   public fetchAnnotations = () => {
@@ -260,6 +265,7 @@ class DashboardPage extends Component<Props, State> {
           <CellEditorOverlay
             source={source}
             sources={sources}
+            services={this.services}
             cell={selectedCell}
             timeRange={timeRange}
             autoRefresh={autoRefresh}
@@ -332,6 +338,15 @@ class DashboardPage extends Component<Props, State> {
     return getDeep(dashboard, 'templates', []).map(t => t.tempVar)
   }
 
+  private get services() {
+    const {services} = this.props
+    if (!services || !services.length) {
+      return []
+    }
+
+    return services
+  }
+
   private handleWindowResize = (): void => {
     this.setState({windowHeight: window.innerHeight})
   }
@@ -350,6 +365,15 @@ class DashboardPage extends Component<Props, State> {
         props.dashboard
       ),
     }))
+  }
+
+  private async fetchFluxServices() {
+    const {fetchServicesAsync, sources} = this.props
+    if (!sources.length) {
+      return
+    }
+
+    await fetchServicesAsync(sources)
   }
 
   private inView = (cell: DashboardsModels.Cell): boolean => {
@@ -508,6 +532,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     },
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
+    services,
     dashTimeV1,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {
@@ -534,6 +559,7 @@ const mstp = (state, {params: {dashboardID}}) => {
 
   return {
     sources,
+    services,
     meRole,
     dashboard,
     dashboardID: Number(dashboardID),
@@ -580,6 +606,7 @@ const mdtp = {
   handleHideCellEditorOverlay: cellEditorOverlayActions.hideCellEditorOverlay,
   getAnnotationsAsync: annotationActions.getAnnotationsAsync,
   handleDismissEditingAnnotation: annotationActions.dismissEditingAnnotation,
+  fetchServicesAsync: serviceActions.fetchAllFluxServicesAsync,
 }
 
 export default connect(mstp, mdtp)(

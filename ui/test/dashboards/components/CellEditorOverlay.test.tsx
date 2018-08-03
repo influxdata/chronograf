@@ -21,6 +21,7 @@ const setup = (override = {}) => {
   const props = {
     source,
     sources: [source],
+    services: [],
     cell,
     timeRange,
     autoRefresh: 0,

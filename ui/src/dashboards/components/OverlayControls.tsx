@@ -9,6 +9,7 @@ import {CEOTabs} from 'src/dashboards/constants'
 
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
+import * as ServicesModels from 'src/types/services'
 
 interface Props {
   onCancel: () => void
@@ -16,46 +17,57 @@ interface Props {
   activeEditorTab: CEOTabs
   onSetActiveEditorTab: (tabName: CEOTabs) => void
   isSavable: boolean
+  source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  onSetQuerySource: (source: SourcesModels.Source) => void
-  selected: string
+  service: ServicesModels.Service
+  services: ServicesModels.Service[]
+  onChangeService: (
+    service: ServicesModels.Service,
+    source: SourcesModels.Source
+  ) => void
   queries: QueriesModels.QueryConfig[]
 }
 
 const OverlayControls: SFC<Props> = ({
   onSave,
+  source,
   sources,
+  service,
   queries,
-  selected,
+  services,
   onCancel,
   isSavable,
-  onSetQuerySource,
+  onChangeService,
   activeEditorTab,
   onSetActiveEditorTab,
-}) => (
-  <div className="overlay-controls">
-    <SourceSelector
-      sources={sources}
-      selected={selected}
-      onSetQuerySource={onSetQuerySource}
-      queries={queries}
-    />
-    <div className="overlay-controls--tabs">
-      <RadioButtons
-        activeButton={activeEditorTab}
-        buttons={[CEOTabs.Queries, CEOTabs.Vis]}
-        onChange={onSetActiveEditorTab}
-        shape={ButtonShape.StretchToFit}
+}) => {
+  return (
+    <div className="overlay-controls">
+      <SourceSelector
+        source={source}
+        sources={sources}
+        service={service}
+        services={services}
+        queries={queries}
+        onChangeService={onChangeService}
       />
+      <div className="overlay-controls--tabs">
+        <RadioButtons
+          activeButton={activeEditorTab}
+          buttons={[CEOTabs.Queries, CEOTabs.Vis]}
+          onChange={onSetActiveEditorTab}
+          shape={ButtonShape.StretchToFit}
+        />
+      </div>
+      <div className="overlay-controls--right">
+        <ConfirmOrCancel
+          onCancel={onCancel}
+          onConfirm={onSave}
+          isDisabled={!isSavable}
+        />
+      </div>
     </div>
-    <div className="overlay-controls--right">
-      <ConfirmOrCancel
-        onCancel={onCancel}
-        onConfirm={onSave}
-        isDisabled={!isSavable}
-      />
-    </div>
-  </div>
-)
+  )
+}
 
 export default OverlayControls
