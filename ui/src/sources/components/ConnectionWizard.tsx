@@ -54,8 +54,8 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         toggleVisibility={toggleVisibility}
         resetWizardState={this.resetWizardState}
         title="Add Connection"
-        skipLinkText="skip this step"
-        maxWidth={1200}
+        skipLinkText="dismiss"
+        maxWidth={800}
         jumpStep={jumpStep}
       >
         <WizardStep
@@ -63,7 +63,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           tipText=""
           isComplete={this.isSourceComplete}
           onNext={this.handleSourceNext}
-          nextLabel={source ? 'Update Source' : 'Create Source'}
+          nextLabel={source ? 'Update Connection' : 'Add Connection'}
           previousLabel="Cancel"
         >
           <SourceStep
