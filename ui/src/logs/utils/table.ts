@@ -107,7 +107,7 @@ export const calculateMessageHeight = (
 
   const lines = Math.ceil(value.length / (rowCharLimit * 1.25))
 
-  return Math.max(lines, 1) * ROW_HEIGHT
+  return Math.max(lines, 1) * ROW_HEIGHT + 2
 }
 
 export const getMessageWidth = (
