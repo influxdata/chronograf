@@ -7,7 +7,7 @@ export interface DropdownItem {
 export interface DropdownAction {
   icon: string
   text: string
-  handler: () => void
+  handler: (item: DropdownItem) => void
 }
 
 export interface PageSection {

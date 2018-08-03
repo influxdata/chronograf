@@ -1,15 +1,61 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
+import React, {Component, MouseEvent, ChangeEvent, KeyboardEvent} from 'react'
 import classnames from 'classnames'
-import OnClickOutside from 'shared/components/OnClickOutside'
-import DropdownMenu, {DropdownMenuEmpty} from 'shared/components/DropdownMenu'
-import DropdownInput from 'shared/components/DropdownInput'
-import DropdownHead from 'shared/components/DropdownHead'
+import OnClickOutside from 'src/shared/components/OnClickOutside'
+import DropdownMenu, {
+  DropdownMenuEmpty,
+} from 'src/shared/components/DropdownMenu'
+import DropdownInput from 'src/shared/components/DropdownInput'
+import DropdownHead from 'src/shared/components/DropdownHead'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+import {DropdownItem, DropdownAction} from 'src/types'
+
+interface AddNew {
+  url: string
+  text: string
+}
+
+interface Props {
+  actions: DropdownAction[]
+  items: DropdownItem[]
+  onChoose: (item: DropdownItem) => void
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void
+  addNew: AddNew
+  selected: string
+  iconName?: string
+  className?: string
+  buttonSize?: string
+  buttonColor?: string
+  menuWidth?: string
+  menuLabel?: string
+  menuClass?: string
+  useAutoComplete?: boolean
+  toggleStyle?: object
+  disabled?: boolean
+  tabIndex?: number
+}
+
+interface State {
+  isOpen: boolean
+  searchTerm: string
+  filteredItems: DropdownItem[]
+  highlightedItemIndex: number
+}
+
 @ErrorHandling
-export class Dropdown extends Component {
-  constructor(props) {
+export class Dropdown extends Component<Props, State> {
+  public static defaultProps: Partial<Props> = {
+    actions: [],
+    buttonSize: 'btn-sm',
+    buttonColor: 'btn-default',
+    menuWidth: '100%',
+    useAutoComplete: false,
+    disabled: false,
+    tabIndex: 0,
+  }
+  public dropdownRef: any
+
+  constructor(props: Props) {
     super(props)
     this.state = {
       isOpen: false,
@@ -19,44 +65,34 @@ export class Dropdown extends Component {
     }
   }
 
-  static defaultProps = {
-    actions: [],
-    buttonSize: 'btn-sm',
-    buttonColor: 'btn-default',
-    menuWidth: '100%',
-    useAutoComplete: false,
-    disabled: false,
-    tabIndex: 0,
-  }
-
-  handleClickOutside = () => {
+  public handleClickOutside = () => {
     this.setState({isOpen: false})
   }
 
-  handleClick = e => {
-    const {disabled} = this.props
+  public handleClick = (e: MouseEvent<HTMLDivElement>) => {
+    const {disabled, onClick} = this.props
 
     if (disabled) {
       return
     }
 
     this.toggleMenu(e)
-    if (this.props.onClick) {
-      this.props.onClick(e)
+    if (onClick) {
+      onClick(e)
     }
   }
 
-  handleSelection = item => () => {
+  public handleSelection = (item: DropdownItem) => () => {
     this.toggleMenu()
     this.props.onChoose(item)
     this.dropdownRef.focus()
   }
 
-  handleHighlight = itemIndex => () => {
+  public handleHighlight = (itemIndex: number) => () => {
     this.setState({highlightedItemIndex: itemIndex})
   }
 
-  toggleMenu = e => {
+  public toggleMenu = (e?: MouseEvent<HTMLDivElement>) => {
     if (e) {
       e.stopPropagation()
     }
@@ -72,12 +108,14 @@ export class Dropdown extends Component {
     this.setState({isOpen: !this.state.isOpen})
   }
 
-  handleAction = (action, item) => e => {
+  public handleAction = (action: DropdownAction, item: DropdownItem) => (
+    e: MouseEvent<HTMLDivElement>
+  ) => {
     e.stopPropagation()
     action.handler(item)
   }
 
-  handleFilterKeyPress = e => {
+  public handleFilterKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     const {filteredItems, highlightedItemIndex} = this.state
 
     if (e.key === 'Enter' && filteredItems.length) {
@@ -100,7 +138,7 @@ export class Dropdown extends Component {
     }
   }
 
-  handleFilterChange = e => {
+  public handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
       return this.setState({searchTerm: e.target.value}, () =>
         this.applyFilter(this.state.searchTerm)
@@ -114,7 +152,7 @@ export class Dropdown extends Component {
     })
   }
 
-  applyFilter = searchTerm => {
+  public applyFilter = (searchTerm: string) => {
     const {items} = this.props
     const filterText = searchTerm.toLowerCase()
     const matchingItems = items.filter(item => {
@@ -131,7 +169,7 @@ export class Dropdown extends Component {
     })
   }
 
-  render() {
+  public render() {
     const {
       items,
       addNew,
@@ -178,7 +216,6 @@ export class Dropdown extends Component {
           <DropdownHead
             iconName={iconName}
             selected={selected}
-            searchTerm={searchTerm}
             buttonSize={buttonSize}
             buttonColor={buttonColor}
             toggleStyle={toggleStyle}
@@ -209,41 +246,6 @@ export class Dropdown extends Component {
       </div>
     )
   }
-}
-
-const {arrayOf, bool, number, shape, string, func} = PropTypes
-
-Dropdown.propTypes = {
-  actions: arrayOf(
-    shape({
-      icon: string.isRequired,
-      text: string.isRequired,
-      handler: func.isRequired,
-    })
-  ),
-  items: arrayOf(
-    shape({
-      text: string.isRequired,
-    })
-  ).isRequired,
-  onChoose: func.isRequired,
-  onClick: func,
-  addNew: shape({
-    url: string.isRequired,
-    text: string.isRequired,
-  }),
-  selected: string.isRequired,
-  iconName: string,
-  className: string,
-  buttonSize: string,
-  buttonColor: string,
-  menuWidth: string,
-  menuLabel: string,
-  menuClass: string,
-  useAutoComplete: bool,
-  toggleStyle: shape(),
-  disabled: bool,
-  tabIndex: number,
 }
 
 export default OnClickOutside(Dropdown)
