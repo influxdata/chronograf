@@ -13,7 +13,7 @@ import {
   SetConfigsAction,
 } from 'src/logs/actions'
 
-import {SeverityFormatOptions} from 'src/logs/constants'
+import {SeverityFormatOptions, DEFAULT_TRUNCATION} from 'src/logs/constants'
 import {LogsState, TableData} from 'src/types/logs'
 
 const defaultTableData: TableData = {
@@ -52,7 +52,7 @@ export const defaultState: LogsState = {
     tableColumns: [],
     severityFormat: SeverityFormatOptions.dotText,
     severityLevelColors: [],
-    isTruncated: true,
+    isTruncated: DEFAULT_TRUNCATION,
   },
   tableTime: {},
   tableInfiniteData: {
