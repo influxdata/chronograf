@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import {withRouter, WithRouterProps} from 'react-router'
 import _ from 'lodash'
 
 // Components
@@ -13,7 +14,7 @@ import CompletionStep from 'src/sources/components/CompletionStep'
 // Types
 import {Kapacitor, Source} from 'src/types'
 
-interface Props {
+interface Props extends WithRouterProps {
   isVisible: boolean
   toggleVisibility: (isVisible: boolean) => () => void
 }
@@ -114,7 +115,13 @@ class ConnectionWizard extends PureComponent<Props, State> {
     return false
   }
   private handleCompletionNext = () => {
+    const {router} = this.props
+    const {source} = this.state
+
     this.resetWizardState()
+    if (source) {
+      router.push(`/sources/${source.id}/manage-sources`)
+    }
   }
   private handleCompletionPrev = () => {}
 
@@ -126,4 +133,4 @@ class ConnectionWizard extends PureComponent<Props, State> {
   }
 }
 
-export default ConnectionWizard
+export default withRouter(ConnectionWizard)
