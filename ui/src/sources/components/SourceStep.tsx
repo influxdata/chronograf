@@ -1,6 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
+import _ from 'lodash'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -8,17 +9,22 @@ import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
 import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
 
 // Actions
-import {addSource as addSourceAction} from 'src/shared/actions/sources'
+import {
+  addSource as addSourceAction,
+  updateSource as updateSourceAction,
+} from 'src/shared/actions/sources'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
 
 // APIs
-import {createSource} from 'src/shared/apis'
+import {createSource, updateSource} from 'src/shared/apis'
 
 // Constants
 import {
+  notifySourceUdpated,
+  notifySourceUdpateFailed,
   notifySourceCreationFailed,
   notifySourceCreationSucceeded,
 } from 'src/shared/copy/notifications'
@@ -31,6 +37,7 @@ import {Source} from 'src/types'
 interface Props {
   notify: typeof notifyAction
   addSource: typeof addSourceAction
+  updateSource: typeof updateSourceAction
   source: Source
 }
 
@@ -50,13 +57,24 @@ class SourceStep extends PureComponent<Props, State> {
   public next = async () => {
     const {source} = this.state
     const {notify} = this.props
-    try {
-      const sourceFromServer = await createSource(source)
-      this.props.addSource(sourceFromServer)
-      notify(notifySourceCreationSucceeded(source.name))
-      return sourceFromServer
-    } catch (err) {
-      notify(notifySourceCreationFailed(source.name, this.parseError(err)))
+
+    if (this.isNewSource) {
+      try {
+        const sourceFromServer = await createSource(source)
+        this.props.addSource(sourceFromServer)
+        notify(notifySourceCreationSucceeded(source.name))
+        return sourceFromServer
+      } catch (err) {
+        notify(notifySourceCreationFailed(source.name, this.parseError(err)))
+      }
+    } else {
+      try {
+        const sourceFromServer = await updateSource(source)
+        this.props.updateSource(sourceFromServer)
+        notify(notifySourceUdpated(source.name))
+      } catch (error) {
+        notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
+      }
     }
   }
 
@@ -128,6 +146,10 @@ class SourceStep extends PureComponent<Props, State> {
     this.setState({source: {...source, [key]: value}})
   }
 
+  private get isNewSource(): boolean {
+    return _.isNull(this.props.source)
+  }
+
   private get isHTTPS(): boolean {
     const {source} = this.state
     return getDeep<string>(source, 'url', '').startsWith('https')
@@ -137,6 +159,7 @@ class SourceStep extends PureComponent<Props, State> {
 const mdtp = {
   notify: notifyAction,
   addSource: addSourceAction,
+  updateSource: updateSourceAction,
 }
 
 export default connect(null, mdtp, null, {withRef: true})(SourceStep)
