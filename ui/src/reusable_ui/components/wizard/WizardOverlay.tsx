@@ -7,12 +7,13 @@ import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 
 import {WizardStepProps} from 'src/types/wizard'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {Source} from 'src/types'
 
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
   visible: boolean
   title: string
-  toggleVisibility: (isVisible: boolean) => () => void
+  toggleVisibility: (isVisible: boolean) => (source?: Source) => () => void
   resetWizardState: () => void
   skipLinkText?: string
   maxWidth?: number
@@ -56,7 +57,7 @@ class WizardOverlay extends PureComponent<Props> {
 
   private handleSkip = () => {
     const {toggleVisibility, resetWizardState} = this.props
-    toggleVisibility(false)()
+    toggleVisibility(false)()()
     resetWizardState()
   }
 }

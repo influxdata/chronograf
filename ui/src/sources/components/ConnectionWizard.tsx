@@ -16,7 +16,8 @@ import {Kapacitor, Source} from 'src/types'
 
 interface Props {
   isVisible: boolean
-  toggleVisibility: (isVisible: boolean) => () => void
+  toggleVisibility: (isVisible: boolean) => (source?: Source) => () => void
+  source: Source
 }
 
 interface State {
@@ -26,9 +27,14 @@ interface State {
 
 @ErrorHandling
 class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
+  public static getDerivedStateFromProps(props: Props) {
+    const {source} = props
+    return {source}
+  }
   public sourceStepRef: any
   public kapacitorStepRef: any
   public completionStepRef: any
+
   constructor(props: Props & WithRouterProps) {
     super(props)
     this.state = {
@@ -36,6 +42,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       kapacitor: null,
     }
   }
+
   public render() {
     const {isVisible, toggleVisibility} = this.props
     const {source} = this.state

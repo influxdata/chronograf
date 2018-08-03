@@ -18,9 +18,9 @@ interface Props {
   deleteKapacitor: DeleteKapacitor
   setActiveKapacitor: SetActiveKapacitor
   onDeleteSource: (source: Source) => void
-  toggleWizard: (isVisible: boolean) => () => void
   setActiveFlux: (source: Source, service: Service) => void
   deleteFlux: (fluxService: Service) => void
+  toggleWizard: (isVisible: boolean) => (source?: Source) => () => void
 }
 
 class InfluxTable extends PureComponent<Props> {
@@ -64,6 +64,7 @@ class InfluxTable extends PureComponent<Props> {
                         setActiveKapacitor={setActiveKapacitor}
                         setActiveFlux={setActiveFlux}
                         deleteFlux={deleteFlux}
+                        toggleWizard={toggleWizard}
                       />
                     )
                   })}

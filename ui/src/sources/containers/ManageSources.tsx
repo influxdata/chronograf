@@ -21,6 +21,7 @@ import {getDeep} from 'src/utils/wrappers'
 
 interface State {
   wizardVisibility: boolean
+  sourceInWizard: Source
 }
 
 interface Props {
@@ -45,6 +46,7 @@ class ManageSources extends PureComponent<Props, State> {
     super(props)
     this.state = {
       wizardVisibility: false,
+      sourceInWizard: null,
     }
   }
   public componentDidMount() {
@@ -64,8 +66,7 @@ class ManageSources extends PureComponent<Props, State> {
 
   public render() {
     const {sources, source, deleteKapacitor, deleteFlux, services} = this.props
-    const {wizardVisibility} = this.state
-
+    const {wizardVisibility, sourceInWizard} = this.state
     return (
       <div className="page" id="manage-sources-page">
         <PageHeader titleText="Configuration" sourceIndicator={true} />
@@ -88,6 +89,7 @@ class ManageSources extends PureComponent<Props, State> {
         <ConnectionWizard
           isVisible={wizardVisibility}
           toggleVisibility={this.toggleWizard}
+          source={sourceInWizard}
         />
       </div>
     )
@@ -112,9 +114,12 @@ class ManageSources extends PureComponent<Props, State> {
     }
   }
 
-  private toggleWizard = isVisible => () => {
+  private toggleWizard = (isVisible: boolean) => (
+    source: Source = null
+  ) => () => {
     this.setState({
       wizardVisibility: isVisible,
+      sourceInWizard: source,
     })
   }
 

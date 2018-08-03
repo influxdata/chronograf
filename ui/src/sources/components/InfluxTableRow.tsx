@@ -1,5 +1,5 @@
 import React, {PureComponent, ReactElement} from 'react'
-import {Link} from 'react-router'
+import {withRouter, WithRouterProps} from 'react-router'
 
 import * as actions from 'src/shared/actions/sources'
 
@@ -8,7 +8,9 @@ import ConfirmButton from 'src/shared/components/ConfirmButton'
 import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 import ConnectionLink from 'src/sources/components/ConnectionLink'
 import FluxDropdown from 'src/sources/components/FluxDropdown'
+import Button from 'src/reusable_ui/components/Button'
 
+import {ComponentColor, ComponentSize, ButtonShape} from 'src/reusable_ui/types'
 import {Source, Service} from 'src/types'
 
 interface Props {
@@ -20,9 +22,10 @@ interface Props {
   setActiveFlux: (source: Source, service: Service) => void
   deleteKapacitor: actions.DeleteKapacitor
   deleteFlux: (fluxService: Service) => void
+  toggleWizard: (isVisible: boolean) => (source?: Source) => () => void
 }
 
-class InfluxTableRow extends PureComponent<Props> {
+class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
   public render() {
     const {
       source,
@@ -32,13 +35,18 @@ class InfluxTableRow extends PureComponent<Props> {
       setActiveFlux,
       deleteKapacitor,
       deleteFlux,
+      toggleWizard,
     } = this.props
 
     return (
       <tr className={this.className}>
         <td>{this.connectButton}</td>
         <td>
-          <ConnectionLink source={source} currentSource={currentSource} />
+          <ConnectionLink
+            source={source}
+            currentSource={currentSource}
+            toggleWizard={toggleWizard}
+          />
           <span>{source.url}</span>
         </td>
         <td className="text-right">
@@ -77,23 +85,30 @@ class InfluxTableRow extends PureComponent<Props> {
   }
 
   private get connectButton(): ReactElement<HTMLDivElement> {
-    const {source} = this.props
     if (this.isCurrentSource) {
       return (
-        <div className="btn btn-success btn-xs source-table--connect">
-          Connected
-        </div>
+        <Button
+          text={'Connected'}
+          color={ComponentColor.Success}
+          size={ComponentSize.ExtraSmall}
+          shape={ButtonShape.StretchToFit}
+        />
       )
     }
-
     return (
-      <Link
-        className="btn btn-default btn-xs source-table--connect"
-        to={`/sources/${source.id}/hosts`}
-      >
-        Connect
-      </Link>
+      <Button
+        text={'Connect'}
+        onClick={this.routeToSource}
+        color={ComponentColor.Default}
+        size={ComponentSize.ExtraSmall}
+        shape={ButtonShape.StretchToFit}
+      />
     )
+  }
+
+  private routeToSource = () => {
+    const {source, router} = this.props
+    router.push(`/sources/${source.id}/manage-sources`)
   }
 
   private get className(): string {
@@ -110,4 +125,4 @@ class InfluxTableRow extends PureComponent<Props> {
   }
 }
 
-export default InfluxTableRow
+export default withRouter(InfluxTableRow)

@@ -1,0 +1,14 @@
+.connection-title {
+    color: $c-pool;
+    cursor: pointer;
+    :hover {
+     color: $c-laser;
+    }
+}
+
+.connection-title.link-success {
+    color: $c-rainforest;
+    :hover {
+        color: $c-honeydew;
+    }
+}
