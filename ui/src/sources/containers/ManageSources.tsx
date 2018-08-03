@@ -18,10 +18,12 @@ import {
 
 import {Source, Notification, Service} from 'src/types'
 import {getDeep} from 'src/utils/wrappers'
+import {ToggleVisibility} from 'src/types/wizard'
 
 interface State {
   wizardVisibility: boolean
   sourceInWizard: Source
+  jumpStep: number
 }
 
 interface Props {
@@ -47,6 +49,7 @@ class ManageSources extends PureComponent<Props, State> {
     this.state = {
       wizardVisibility: false,
       sourceInWizard: null,
+      jumpStep: null,
     }
   }
   public componentDidMount() {
@@ -66,7 +69,7 @@ class ManageSources extends PureComponent<Props, State> {
 
   public render() {
     const {sources, source, deleteKapacitor, deleteFlux, services} = this.props
-    const {wizardVisibility, sourceInWizard} = this.state
+    const {wizardVisibility, sourceInWizard, jumpStep} = this.state
     return (
       <div className="page" id="manage-sources-page">
         <PageHeader titleText="Configuration" sourceIndicator={true} />
@@ -90,6 +93,7 @@ class ManageSources extends PureComponent<Props, State> {
           isVisible={wizardVisibility}
           toggleVisibility={this.toggleWizard}
           source={sourceInWizard}
+          jumpStep={jumpStep}
         />
       </div>
     )
@@ -114,12 +118,15 @@ class ManageSources extends PureComponent<Props, State> {
     }
   }
 
-  private toggleWizard = (isVisible: boolean) => (
-    source: Source = null
+  private toggleWizard: ToggleVisibility = (
+    isVisible,
+    source = null,
+    jumpStep = null
   ) => () => {
     this.setState({
       wizardVisibility: isVisible,
       sourceInWizard: source,
+      jumpStep,
     })
   }
 

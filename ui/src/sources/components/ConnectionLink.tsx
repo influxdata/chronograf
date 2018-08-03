@@ -1,13 +1,13 @@
 import React, {PureComponent} from 'react'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import {stripPrefix} from 'src/utils/basepath'
 
 import {Source} from 'src/types'
+import {ToggleVisibility} from 'src/types/wizard'
 
 interface Props {
   source: Source
   currentSource: Source
-  toggleWizard: (isVisible: boolean) => (source?: Source) => () => void
+  toggleWizard: ToggleVisibility
 }
 
 class ConnectionLink extends PureComponent<Props> {
@@ -20,7 +20,7 @@ class ConnectionLink extends PureComponent<Props> {
           replaceWithIfNotAuthorized={<strong>{source.name}</strong>}
         >
           <span
-            onClick={toggleWizard(true)(source)}
+            onClick={toggleWizard(true, source, 0)}
             className={`connection-title ${this.className}`}
           >
             <strong>{source.name}</strong>

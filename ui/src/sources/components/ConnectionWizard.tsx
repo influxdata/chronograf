@@ -13,11 +13,13 @@ import CompletionStep from 'src/sources/components/CompletionStep'
 
 // Types
 import {Kapacitor, Source} from 'src/types'
+import {ToggleVisibility} from 'src/types/wizard'
 
 interface Props {
   isVisible: boolean
-  toggleVisibility: (isVisible: boolean) => (source?: Source) => () => void
+  toggleVisibility: ToggleVisibility
   source: Source
+  jumpStep: number
 }
 
 interface State {
@@ -44,7 +46,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   }
 
   public render() {
-    const {isVisible, toggleVisibility} = this.props
+    const {isVisible, toggleVisibility, jumpStep} = this.props
     const {source} = this.state
     return (
       <WizardOverlay
@@ -54,6 +56,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         title="Add Connection"
         skipLinkText="skip this step"
         maxWidth={1200}
+        jumpStep={jumpStep}
       >
         <WizardStep
           title="Add a New InfluxDB Connection"

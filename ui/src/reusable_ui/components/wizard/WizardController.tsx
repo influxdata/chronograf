@@ -1,4 +1,5 @@
 import React, {PureComponent, ReactElement} from 'react'
+import _ from 'lodash'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {WizardStepProps, Step} from 'src/types/wizard'
@@ -15,6 +16,7 @@ interface Props {
   children: Array<ReactElement<WizardStepProps>>
   handleSkip?: () => void
   skipLinkText?: string
+  jumpStep: number
 }
 
 @ErrorHandling
@@ -26,7 +28,6 @@ class WizardController extends PureComponent<Props, State> {
   public static getDerivedStateFromProps(props: Props, state: State) {
     let {currentStepIndex} = state
     const {children} = props
-
     const childSteps = React.Children.map(
       children,
       (child: ReactElement<WizardStepProps>, i) => {
@@ -49,9 +50,11 @@ class WizardController extends PureComponent<Props, State> {
 
   constructor(props: Props) {
     super(props)
+    const {jumpStep} = this.props
+    const currentStepIndex = _.isNull(jumpStep) ? -1 : jumpStep
     this.state = {
       steps: [],
-      currentStepIndex: -1,
+      currentStepIndex,
     }
   }
 
