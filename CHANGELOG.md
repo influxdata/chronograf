@@ -1,4 +1,4 @@
-## v1.6.1 [unreleased]
+## v1.6.1 [2018-08-02]
 
 ### Features
 
