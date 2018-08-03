@@ -1,5 +1,4 @@
 import React, {PureComponent, ReactElement} from 'react'
-import {withRouter, RouteComponentProps} from 'react-router'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
@@ -30,11 +29,9 @@ interface KapacitorItem {
   kapacitor: Kapacitor
 }
 
-class KapacitorDropdown extends PureComponent<
-  Props & RouteComponentProps<any, any>
-> {
+class KapacitorDropdown extends PureComponent<Props> {
   public render() {
-    const {source, router, setActiveKapacitor, deleteKapacitor} = this.props
+    const {setActiveKapacitor, deleteKapacitor} = this.props
 
     if (this.isKapacitorsEmpty) {
       return (
@@ -63,16 +60,14 @@ class KapacitorDropdown extends PureComponent<
           items={this.kapacitorItems}
           onChoose={setActiveKapacitor}
           addNew={{
-            url: `/sources/${source.id}/kapacitors/new`,
             text: 'Add Kapacitor Connection',
+            handler: this.launchWizard,
           }}
           actions={[
             {
               icon: 'pencil',
               text: 'edit',
-              handler: item => {
-                router.push(`${item.resource}/edit`)
-              },
+              handler: this.launchWizard,
             },
             {
               icon: 'trash',
@@ -133,4 +128,4 @@ class KapacitorDropdown extends PureComponent<
   }
 }
 
-export default withRouter<Props>(KapacitorDropdown)
+export default KapacitorDropdown

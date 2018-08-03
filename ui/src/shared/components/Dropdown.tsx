@@ -11,8 +11,9 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {DropdownItem, DropdownAction} from 'src/types'
 
 interface AddNew {
-  url: string
+  url?: string
   text: string
+  handler?: () => void
 }
 
 interface Props {
