@@ -53,7 +53,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           tipText=""
           isComplete={this.isSourceComplete}
           onNext={this.handleSourceNext}
-          nextLabel="Create Source"
+          nextLabel={source ? 'Update Source' : 'Create Source'}
           previousLabel="Cancel"
         >
           <SourceStep
