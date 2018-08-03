@@ -1,16 +1,27 @@
 import React, {PureComponent, ReactElement} from 'react'
-import {Link, withRouter, RouteComponentProps} from 'react-router'
+import {withRouter, RouteComponentProps} from 'react-router'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import {Source, Kapacitor} from 'src/types'
+
 import {SetActiveKapacitor} from 'src/shared/actions/sources'
+import Button from 'src/reusable_ui/components/Button'
+import {ToggleVisibility} from 'src/types/wizard'
+
+import {
+  ComponentColor,
+  ComponentSize,
+  ButtonShape,
+  IconFont,
+} from 'src/reusable_ui/types'
+import {Source, Kapacitor} from 'src/types'
 
 interface Props {
   source: Source
   kapacitors: Kapacitor[]
   setActiveKapacitor: SetActiveKapacitor
   deleteKapacitor: (Kapacitor: Kapacitor) => void
+  toggleWizard: ToggleVisibility
 }
 
 interface KapacitorItem {
@@ -28,12 +39,14 @@ class KapacitorDropdown extends PureComponent<
     if (this.isKapacitorsEmpty) {
       return (
         <Authorized requiredRole={EDITOR_ROLE}>
-          <Link
-            to={`/sources/${source.id}/kapacitors/new`}
-            className="btn btn-xs btn-default"
-          >
-            <span className="icon plus" /> Add Kapacitor Connection
-          </Link>
+          <Button
+            text={'Add Kapacitor Connection'}
+            onClick={this.launchWizard}
+            color={ComponentColor.Default}
+            size={ComponentSize.ExtraSmall}
+            shape={ButtonShape.StretchToFit}
+            icon={IconFont.Plus}
+          />
         </Authorized>
       )
     }
@@ -112,6 +125,11 @@ class KapacitorDropdown extends PureComponent<
     }
 
     return selected
+  }
+
+  private launchWizard = () => {
+    const {toggleWizard, source} = this.props
+    toggleWizard(true, source, 1)()
   }
 }
 

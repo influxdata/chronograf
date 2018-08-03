@@ -67,6 +67,7 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
             kapacitors={source.kapacitors}
             deleteKapacitor={deleteKapacitor}
             setActiveKapacitor={setActiveKapacitor}
+            toggleWizard={toggleWizard}
           />
         </td>
         <td className="source-table--kapacitor">
