@@ -10,7 +10,7 @@ import OverlayBody from './components/overlays/OverlayBody'
 import PageHeader from './components/page_layout/PageHeader'
 import PageHeaderTitle from './components/page_layout/PageHeaderTitle'
 import Panel, {PanelType} from './components/panel/Panel'
-import RadioButtons from './components/radio_buttons/RadioButtons'
+import Radio from './components/RadioButtons'
 import SlideToggle from './components/slide_toggle/SlideToggle'
 
 // Import Types
@@ -41,7 +41,7 @@ export {
   PageHeaderTitle,
   Panel,
   PanelType,
-  RadioButtons,
+  Radio,
   SlideToggle,
   ComponentColor,
   ComponentSize,
