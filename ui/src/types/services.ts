@@ -10,6 +10,12 @@ export interface NewService {
   }
 }
 
+export interface ServiceLinks {
+  source: string
+  self: string
+  proxy: string
+}
+
 export interface Service {
   id?: string
   sourceID: string
@@ -22,9 +28,5 @@ export interface Service {
   metadata: {
     [x: string]: any
   }
-  links: {
-    source: string
-    self: string
-    proxy: string
-  }
+  links: ServiceLinks
 }
