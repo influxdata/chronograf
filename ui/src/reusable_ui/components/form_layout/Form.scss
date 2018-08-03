@@ -3,8 +3,9 @@
   ------------------------------------------------------------------------------
 */
 
-$grid--form-gutter: 6px;
+@import 'src/style/modules/modules';
 
+$grid--form-gutter: 6px;
 
 .form--wrapper {
   width: calc(100% + #{$grid--form-gutter * 2});

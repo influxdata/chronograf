@@ -1,4 +1,9 @@
-@import 'src/style/modules/variables';
+/*
+  Wizard Step Styles
+  ------------------------------------------------------------------------------
+*/
+
+@import 'src/style/modules/modules';
 
 .wizard-step-content {
   margin: $ix-marg-b 0;

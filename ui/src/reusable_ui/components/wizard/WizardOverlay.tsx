@@ -1,11 +1,16 @@
+// Libraries
 import React, {PureComponent, ReactElement} from 'react'
+
+// Components
 import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
 import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 
+// Types
 import {WizardStepProps} from 'src/types/wizard'
+
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {

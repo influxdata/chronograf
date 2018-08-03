@@ -1,6 +1,9 @@
-@import 'src/style/modules/influx-colors';
-@import 'src/style/modules/variables';
-@import 'src/style/modules/mixins';
+/*
+  Full Screen Wizard Styles
+  ------------------------------------------------------------------------------
+*/
+
+@import 'src/style/modules/modules';
 
 .wizard-container {
   padding: 30px;

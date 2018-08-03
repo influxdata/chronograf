@@ -11,6 +11,11 @@ import {
   IconFont,
 } from 'src/reusable_ui/types'
 
+// Styles
+import 'src/reusable_ui/components/Button/Button.scss'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
 interface Props {
   text: string
   onClick?: () => void
@@ -22,6 +27,7 @@ interface Props {
   titleText?: string
 }
 
+@ErrorHandling
 class Button extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
