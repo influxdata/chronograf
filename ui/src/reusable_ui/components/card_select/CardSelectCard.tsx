@@ -28,37 +28,39 @@ class CardSelectCard extends PureComponent<CardSelectCardProps, State> {
     const {checked} = this.state
 
     return (
-      <div
-        data-toggle="card_toggle"
-        onClick={this.toggleChecked}
-        className={classnames('card-select--card', {
-          'card-select--checked': checked,
-          'card-select--disabled': disabled,
-          'card-select--active': !disabled,
-        })}
-      >
-        <label className="card-select--container">
-          <span className="card-select--label">{label}</span>
-          <input
-            id={`card_select_${id}`}
-            name={`card_select_${id}`}
-            type="checkbox"
-            value={id}
-            checked={checked}
-            disabled={disabled}
-          />
-          <span
-            className={classnames(
-              'card-select--checkmark',
-              'icon',
-              'checkmark',
-              {
-                'card-select--checked': checked,
-              }
-            )}
-          />
-          <div className="card-select--image">{this.cardImage}</div>
-        </label>
+      <div className="card-select--card-holder">
+        <div
+          data-toggle="card_toggle"
+          onClick={this.toggleChecked}
+          className={classnames('card-select--card', {
+            'card-select--checked': checked,
+            'card-select--disabled': disabled,
+            'card-select--active': !disabled,
+          })}
+        >
+          <label className="card-select--container">
+            <input
+              id={`card_select_${id}`}
+              name={`card_select_${id}`}
+              type="checkbox"
+              value={id}
+              checked={checked}
+              disabled={disabled}
+            />
+            <span
+              className={classnames(
+                'card-select--checkmark',
+                'icon',
+                'checkmark',
+                {
+                  'card-select--checked': checked,
+                }
+              )}
+            />
+            <div className="card-select--image">{this.cardImage}</div>
+            <span className="card-select--label">{label}</span>
+          </label>
+        </div>
       </div>
     )
   }

@@ -11,70 +11,78 @@ exports[`Card Select Card matches snapshot with two children 1`] = `
     className="card-select--cards"
   >
     <div
-      className="card-select--card card-select--active"
-      data-toggle="card_toggle"
-      onClick={[Function]}
+      className="card-select--card-holder"
     >
-      <label
-        className="card-select--container"
+      <div
+        className="card-select--card card-select--active"
+        data-toggle="card_toggle"
+        onClick={[Function]}
       >
-        <span
-          className="card-select--label"
+        <label
+          className="card-select--container"
         >
-          Card Label
-        </span>
-        <input
-          checked={false}
-          disabled={false}
-          id="card_select_card_id"
-          name="card_select_card_id"
-          type="checkbox"
-          value="card_id"
-        />
-        <span
-          className="card-select--checkmark icon checkmark"
-        />
-        <div
-          className="card-select--image"
-        >
-          <span
-            className="card-select--placeholder icon dash-j"
+          <input
+            checked={false}
+            disabled={false}
+            id="card_select_card_id"
+            name="card_select_card_id"
+            type="checkbox"
+            value="card_id"
           />
-        </div>
-      </label>
+          <span
+            className="card-select--checkmark icon checkmark"
+          />
+          <div
+            className="card-select--image"
+          >
+            <span
+              className="card-select--placeholder icon dash-j"
+            />
+          </div>
+          <span
+            className="card-select--label"
+          >
+            Card Label
+          </span>
+        </label>
+      </div>
     </div>
     <div
-      className="card-select--card card-select--active"
-      data-toggle="card_toggle"
-      onClick={[Function]}
+      className="card-select--card-holder"
     >
-      <label
-        className="card-select--container"
+      <div
+        className="card-select--card card-select--active"
+        data-toggle="card_toggle"
+        onClick={[Function]}
       >
-        <span
-          className="card-select--label"
+        <label
+          className="card-select--container"
         >
-          Card Label
-        </span>
-        <input
-          checked={false}
-          disabled={false}
-          id="card_select_card_id"
-          name="card_select_card_id"
-          type="checkbox"
-          value="card_id"
-        />
-        <span
-          className="card-select--checkmark icon checkmark"
-        />
-        <div
-          className="card-select--image"
-        >
-          <span
-            className="card-select--placeholder icon dash-j"
+          <input
+            checked={false}
+            disabled={false}
+            id="card_select_card_id"
+            name="card_select_card_id"
+            type="checkbox"
+            value="card_id"
           />
-        </div>
-      </label>
+          <span
+            className="card-select--checkmark icon checkmark"
+          />
+          <div
+            className="card-select--image"
+          >
+            <span
+              className="card-select--placeholder icon dash-j"
+            />
+          </div>
+          <span
+            className="card-select--label"
+          >
+            Card Label
+          </span>
+        </label>
+      </div>
     </div>
   </div>
 </fieldset>
