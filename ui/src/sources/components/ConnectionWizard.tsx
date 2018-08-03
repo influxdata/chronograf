@@ -14,7 +14,7 @@ import CompletionStep from 'src/sources/components/CompletionStep'
 // Types
 import {Kapacitor, Source} from 'src/types'
 
-interface Props extends WithRouterProps {
+interface Props {
   isVisible: boolean
   toggleVisibility: (isVisible: boolean) => () => void
 }
@@ -25,11 +25,11 @@ interface State {
 }
 
 @ErrorHandling
-class ConnectionWizard extends PureComponent<Props, State> {
+class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
   public completionStepRef: any
-  constructor(props: Props) {
+  constructor(props: Props & WithRouterProps) {
     super(props)
     this.state = {
       source: null,

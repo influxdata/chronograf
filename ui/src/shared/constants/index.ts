@@ -436,7 +436,7 @@ export const DEFAULT_SOURCE = {
   name: 'Influx 1',
   username: '',
   password: '',
-  default: true,
+  default: false,
   telegraf: 'telegraf',
   insecureSkipVerify: false,
   metaUrl: '',
