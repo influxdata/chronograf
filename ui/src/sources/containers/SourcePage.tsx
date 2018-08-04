@@ -1,8 +1,10 @@
+// Libraries
 import React, {PureComponent, MouseEvent, ChangeEvent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
 import _ from 'lodash'
-import {getSource} from 'src/shared/apis'
-import {createSource, updateSource} from 'src/shared/apis'
+import {connect} from 'react-redux'
+
+// Actions
 import {
   addSource as addSourceAction,
   updateSource as updateSourceAction,
@@ -10,16 +12,22 @@ import {
   UpdateSource,
 } from 'src/shared/actions/sources'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {connect} from 'react-redux'
+import * as NotificationsActions from 'src/types/actions/notifications'
 
+// Components
 import Notifications from 'src/shared/components/Notifications'
 import SourceForm from 'src/sources/components/SourceForm'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Panel} from 'src/reusable_ui'
+
+// APIs
+import {getSource} from 'src/shared/apis'
+import {createSource, updateSource} from 'src/shared/apis'
+
+// Constants
 import {DEFAULT_SOURCE} from 'src/shared/constants'
-
 const INITIAL_PATH = '/sources/new'
-
 import {
   notifySourceUdpated,
   notifySourceUdpateFailed,
@@ -27,10 +35,11 @@ import {
   notifyErrorConnectingToSource,
   notifySourceCreationSucceeded,
 } from 'src/shared/copy/notifications'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
+// Types
 import * as SourcesModels from 'src/types/sources'
-import * as NotificationsActions from 'src/types/actions/notifications'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props extends WithRouterProps {
   notify: NotificationsActions.PublishNotificationActionCreator
@@ -95,17 +104,19 @@ class SourcePage extends PureComponent<Props, State> {
           <div className="container-fluid">
             <div className="row">
               <div className="col-md-8 col-md-offset-2">
-                <div className="panel">
-                  <SourceForm
-                    source={source}
-                    editMode={editMode}
-                    onInputChange={this.handleInputChange}
-                    onSubmit={this.handleSubmit}
-                    onBlurSourceURL={this.handleBlurSourceURL}
-                    isInitialSource={isInitialSource}
-                    gotoPurgatory={this.gotoPurgatory}
-                  />
-                </div>
+                <Panel>
+                  <Panel.Body>
+                    <SourceForm
+                      source={source}
+                      editMode={editMode}
+                      onInputChange={this.handleInputChange}
+                      onSubmit={this.handleSubmit}
+                      onBlurSourceURL={this.handleBlurSourceURL}
+                      isInitialSource={isInitialSource}
+                      gotoPurgatory={this.gotoPurgatory}
+                    />
+                  </Panel.Body>
+                </Panel>
               </div>
             </div>
           </div>

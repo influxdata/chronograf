@@ -1,11 +1,14 @@
+// Libraries
 import React, {PureComponent, FocusEvent, MouseEvent, ChangeEvent} from 'react'
 import classnames from 'classnames'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 
+// Constants
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
-
 import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
+
+// Types
 import {Source, Role, Organization} from 'src/types'
 
 interface Me {
@@ -37,7 +40,7 @@ export class SourceForm extends PureComponent<Props> {
       isInitialSource,
     } = this.props
     return (
-      <div className="panel-body">
+      <>
         {isUsingAuth && isInitialSource && this.authIndicator}
         <form onSubmit={onSubmit}>
           <div className="form-group col-xs-12 col-sm-6">
@@ -168,7 +171,7 @@ export class SourceForm extends PureComponent<Props> {
             )}
           </div>
         </form>
-      </div>
+      </>
     )
   }
 
