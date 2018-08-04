@@ -1,12 +1,18 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
+import {Link} from 'react-router'
 
+// Components
+import InfluxTableHead from 'src/sources/components/InfluxTableHead'
+import InfluxTableRow from 'src/sources/components/InfluxTableRow'
+import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
+import {Panel, IconFont} from 'src/reusable_ui'
+
+// Actions
 import {SetActiveKapacitor, DeleteKapacitor} from 'src/shared/actions/sources'
 
-import InfluxTableHead from 'src/sources/components/InfluxTableHead'
-import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
-import InfluxTableRow from 'src/sources/components/InfluxTableRow'
-
+// Types
 import {Source, Me, Service} from 'src/types'
 
 interface Props {
@@ -32,20 +38,14 @@ class InfluxTable extends PureComponent<Props> {
       onDeleteSource,
       deleteKapacitor,
       deleteFlux,
-      isUsingAuth,
-      me,
     } = this.props
 
     return (
       <div className="row">
         <div className="col-md-12">
-          <div className="panel">
-            <InfluxTableHeader
-              me={me}
-              source={source}
-              isUsingAuth={isUsingAuth}
-            />
-            <div className="panel-body">
+          <Panel>
+            {this.panelHeader}
+            <Panel.Body>
               <table className="table v-center margin-bottom-zero table-highlight">
                 <InfluxTableHead />
                 <tbody>
@@ -66,8 +66,8 @@ class InfluxTable extends PureComponent<Props> {
                   })}
                 </tbody>
               </table>
-            </div>
-          </div>
+            </Panel.Body>
+          </Panel>
         </div>
       </div>
     )
@@ -77,6 +77,32 @@ class InfluxTable extends PureComponent<Props> {
     return this.props.services.filter(s => {
       return s.sourceID === sourceID
     })
+  }
+
+  private get panelHeader(): JSX.Element {
+    const {source} = this.props
+
+    return (
+      <Panel.Header title={this.panelTitle}>
+        <Authorized requiredRole={EDITOR_ROLE}>
+          <Link
+            to={`/sources/${source.id}/manage-sources/new`}
+            className="btn btn-sm btn-primary"
+          >
+            <span className={`icon ${IconFont.Plus}`} /> Add Connection
+          </Link>
+        </Authorized>
+      </Panel.Header>
+    )
+  }
+
+  private get panelTitle(): string {
+    const {isUsingAuth, me} = this.props
+    if (isUsingAuth) {
+      return `Connections for ${me.currentOrganization.name}`
+    }
+
+    return 'Connections'
   }
 }
 
