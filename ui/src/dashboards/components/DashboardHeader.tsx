@@ -52,6 +52,15 @@ class DashboardHeader extends Component<Props, State> {
       return {selected: {upper, lower}}
     }
 
+    if (!props.zoomedTimeRange.lower) {
+      return {
+        selected: {
+          upper: props.timeRange.upper,
+          lower: props.timeRange.lower,
+        },
+      }
+    }
+
     return {}
   }
 

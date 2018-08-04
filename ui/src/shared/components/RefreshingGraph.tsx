@@ -68,6 +68,7 @@ class RefreshingGraph extends PureComponent<Props> {
       type,
       queries,
       source,
+      timeRange,
       templates,
       editQueryStatus,
       grabDataForDownload,
@@ -86,6 +87,7 @@ class RefreshingGraph extends PureComponent<Props> {
         source={source}
         inView={inView}
         queries={this.queries}
+        timeRange={timeRange}
         templates={templates}
         editQueryStatus={editQueryStatus}
         grabDataForDownload={grabDataForDownload}
@@ -200,8 +202,8 @@ class RefreshingGraph extends PureComponent<Props> {
         colors={colors}
         onZoom={onZoom}
         queries={queries}
-        loading={loading}
         key={manualRefresh}
+        loading={loading}
         timeRange={timeRange}
         cellHeight={cellHeight}
         staticLegend={staticLegend}
