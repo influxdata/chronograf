@@ -19,7 +19,7 @@ export enum PanelType {
 }
 
 interface Props {
-  children: JSX.Element[]
+  children: JSX.Element[] | JSX.Element
   type?: PanelType
 }
 
