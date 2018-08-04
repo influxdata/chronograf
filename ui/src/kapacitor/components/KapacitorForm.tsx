@@ -1,11 +1,15 @@
+// Libraries
 import React, {ChangeEvent, MouseEvent, PureComponent} from 'react'
 
+// Components
 import AlertOutputs from 'src/kapacitor/components/AlertOutputs'
 import Input from 'src/kapacitor/components/KapacitorFormInput'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import KapacitorFormSkipVerify from 'src/kapacitor/components/KapacitorFormSkipVerify'
+import {Panel} from 'src/reusable_ui'
 
+// Types
 import {Kapacitor, Source, Notification, NotificationFunc} from 'src/types'
 
 interface Props {
@@ -44,11 +48,9 @@ class KapacitorForm extends PureComponent<Props> {
           <div className="container-fluid">
             <div className="row">
               <div className="col-md-3">
-                <div className="panel">
-                  <div className="panel-heading">
-                    <h2 className="panel-title">Connection Details</h2>
-                  </div>
-                  <div className="panel-body">
+                <Panel>
+                  <Panel.Header title="Connection Details" />
+                  <Panel.Body>
                     <form onSubmit={onSubmit}>
                       <div>
                         <Input
@@ -106,8 +108,8 @@ class KapacitorForm extends PureComponent<Props> {
                         </button>
                       </div>
                     </form>
-                  </div>
-                </div>
+                  </Panel.Body>
+                </Panel>
               </div>
               <div className="col-md-9">
                 <AlertOutputs
