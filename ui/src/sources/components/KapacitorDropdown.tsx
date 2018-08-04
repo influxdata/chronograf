@@ -21,7 +21,7 @@ interface Props {
   kapacitors: Kapacitor[]
   setActiveKapacitor: SetActiveKapacitor
   deleteKapacitor: (Kapacitor: Kapacitor) => void
-  toggleWizard: ToggleVisibility
+  toggleWizard?: ToggleVisibility
 }
 
 interface KapacitorItem {
@@ -127,7 +127,9 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
 
   private launchWizard = () => {
     const {toggleWizard, source} = this.props
-    toggleWizard(true, source, 1)()
+    if (toggleWizard) {
+      toggleWizard(true, source, 1)()
+    }
   }
 }
 

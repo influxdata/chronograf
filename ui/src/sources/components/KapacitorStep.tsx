@@ -6,9 +6,11 @@ import {connect} from 'react-redux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
 import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
+import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
+import * as actions from 'src/shared/actions/sources'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -31,6 +33,8 @@ import {Kapacitor, Source} from 'src/types'
 interface Props {
   notify: typeof notifyAction
   source: Source
+  deleteKapacitor: actions.DeleteKapacitor
+  setActiveKapacitor: actions.SetActiveKapacitor
 }
 
 interface State {
@@ -75,34 +79,37 @@ class KapacitorStep extends PureComponent<Props, State> {
     const {kapacitor} = this.state
     return (
       <>
-        <WizardTextInput
-          value={kapacitor.url}
-          label="Kapacitor URL"
-          onChange={this.onChangeInput('url')}
-          valueModifier={this.URLModifier}
-        />
-        <WizardTextInput
-          value={kapacitor.name}
-          label="Name"
-          onChange={this.onChangeInput('name')}
-        />
-        <WizardTextInput
-          value={kapacitor.username}
-          label="Username"
-          onChange={this.onChangeInput('username')}
-        />
-        <WizardTextInput
-          value={kapacitor.password}
-          label="Password"
-          onChange={this.onChangeInput('password')}
-        />
-        {this.isHTTPS && (
-          <WizardCheckbox
-            isChecked={kapacitor.insecureSkipVerify}
-            text={`Unsafe SSL: ${insecureSkipVerifyText}`}
-            onChange={this.onChangeInput('insecureSkipVerify')}
+        {this.kapacitorDropdown}
+        <div>
+          <WizardTextInput
+            value={kapacitor.url}
+            label="Kapacitor URL"
+            onChange={this.onChangeInput('url')}
+            valueModifier={this.URLModifier}
           />
-        )}
+          <WizardTextInput
+            value={kapacitor.name}
+            label="Name"
+            onChange={this.onChangeInput('name')}
+          />
+          <WizardTextInput
+            value={kapacitor.username}
+            label="Username"
+            onChange={this.onChangeInput('username')}
+          />
+          <WizardTextInput
+            value={kapacitor.password}
+            label="Password"
+            onChange={this.onChangeInput('password')}
+          />
+          {this.isHTTPS && (
+            <WizardCheckbox
+              isChecked={kapacitor.insecureSkipVerify}
+              text={`Unsafe SSL: ${insecureSkipVerifyText}`}
+              onChange={this.onChangeInput('insecureSkipVerify')}
+            />
+          )}
+        </div>
       </>
     )
   }
@@ -134,6 +141,24 @@ class KapacitorStep extends PureComponent<Props, State> {
   private get isHTTPS(): boolean {
     const {kapacitor} = this.state
     return getDeep<string>(kapacitor, 'url', '').startsWith('https')
+  }
+
+  private get kapacitorDropdown() {
+    const {source, deleteKapacitor, setActiveKapacitor} = this.props
+    if (source) {
+      return (
+        <div>
+          <KapacitorDropdown
+            source={source}
+            kapacitors={source.kapacitors}
+            deleteKapacitor={deleteKapacitor}
+            setActiveKapacitor={setActiveKapacitor}
+          />
+        </div>
+      )
+    }
+
+    return
   }
 }
 
