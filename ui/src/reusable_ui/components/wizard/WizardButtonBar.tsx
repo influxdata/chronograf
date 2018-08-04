@@ -1,7 +1,10 @@
+// Libraries
 import React, {PureComponent} from 'react'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
+// Styles
 import 'src/reusable_ui/components/wizard/WizardButtonBar.scss'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   decrement?: () => void

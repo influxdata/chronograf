@@ -1,9 +1,14 @@
+// Libraries
 import React, {PureComponent} from 'react'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+import classnames from 'classnames'
 
+// Types
 import {CardSelectCardProps} from 'src/types/cardSelect'
 
-import classnames from 'classnames'
+// Styles
+import 'src/reusable_ui/components/card_select/CardSelectCard.scss'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface State {
   checked: boolean

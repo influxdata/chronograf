@@ -1,10 +1,17 @@
+// Libraries
 import React, {PureComponent, ReactElement} from 'react'
+
+// Components
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Types
 import {WizardStepProps, Step} from 'src/types/wizard'
 import {StepStatus} from 'src/reusable_ui/constants/wizard'
 
+// Styles
 import 'src/reusable_ui/components/wizard/WizardController.scss'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface State {
   steps: Step[]
@@ -20,7 +27,7 @@ interface Props {
 @ErrorHandling
 class WizardController extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
-    skipLinkText: 'skip',
+    skipLinkText: 'Skip',
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {

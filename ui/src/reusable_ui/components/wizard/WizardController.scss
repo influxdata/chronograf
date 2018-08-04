@@ -1,6 +1,9 @@
-@import 'src/style/modules/influx-colors';
-@import 'src/style/modules/variables';
-@import 'src/style/modules/mixins';
+/*
+  Wizard Controller Styles
+  ------------------------------------------------------------------------------
+*/
+
+@import 'src/style/modules/modules';
 
 .wizard-step-title {
   text-align: center;
