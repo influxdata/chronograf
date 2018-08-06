@@ -3483,6 +3483,14 @@
             "type": "string",
             "description": "RFC3339 datetime to retrieve annotations until (defaults to now if not supplied)",
             "required": false
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "type": "string",
+            "description": "An InfluxQL binary expression for querying annotations by their tags",
+            "required": false,
+            "example": "repo =~ /chronograf/"
           }
         ],
         "responses": {
@@ -6318,7 +6326,7 @@
             "startTime": "2018-07-09T18:08:15.933Z",
             "endTime": "2018-07-09T18:08:15.933Z",
             "text": "unknown event",
-            "type": "",
+            "tags": {},
             "links": {
               "self": "/chronograf/v1/sources/1/annotations/50ee18e8-8115-4fac-abed-24ce89e96047"
             }
@@ -6328,7 +6336,9 @@
             "startTime": "2018-07-09T17:48:04.23Z",
             "endTime": "2018-07-09T17:48:08.652Z",
             "text": "todo: investigate this spike",
-            "type": "",
+            "tags": {
+              "repo": "influxdata/chronograf"
+            },
             "links": {
               "self": "/chronograf/v1/sources/1/annotations/59434c1c-fa16-40e9-8b92-af71544cc3eb"
             }
@@ -6367,9 +6377,12 @@
             "text": "my annotation"
           }
         },
-        "type": {
-          "type": "string",
-          "description": "A description of the type of annotation"
+        "tags": {
+          "type": "object",
+          "description": "A set of user-defined tags associated with the annotation",
+          "additionalProperties": {
+            "type": "string"
+          }
         },
         "links": {
           "type": "object",
@@ -6387,7 +6400,9 @@
         "startTime": "2018-07-09T17:48:04.23Z",
         "endTime": "2018-07-09T17:48:08.652Z",
         "text": "no name",
-        "type": "",
+        "tags": {
+          "repo": "influxdata/chronograf"
+        },
         "links": {
           "self": "/chronograf/v1/sources/1/annotations/59434c1c-fa16-40e9-8b92-af71544cc3eb"
         }
@@ -6417,16 +6432,16 @@
             "text": "my annotation"
           }
         },
-        "type": {
-          "type": "string",
-          "description": "A description of the type of annotation"
+        "tags": {
+          "type": "object",
+          "description": "A set of user-defined tags associated with the annotation",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       },
       "example": {
-        "startTime": "2018-07-10T17:48:04.23Z",
-        "endTime": "2018-07-10T17:48:08.652Z",
-        "text": "new annotation text",
-        "type": ""
+        "text": "new annotation text"
       }
     }
   }
