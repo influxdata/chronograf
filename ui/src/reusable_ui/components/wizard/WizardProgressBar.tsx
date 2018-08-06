@@ -26,7 +26,7 @@ class WizardProgressBar extends PureComponent<Props> {
       let currentStep = ''
 
       // STEP STATUS
-      if (i === currentStepIndex) {
+      if (i === currentStepIndex && stepStatus !== StepStatus.Error) {
         currentStep = 'circle-thick current'
       }
 
