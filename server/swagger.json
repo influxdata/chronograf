@@ -3457,6 +3457,231 @@
           }
         }
       }
+    },
+    "/sources/{id}/annotations/": {
+      "get": {
+        "tags": ["sources", "annotations"],
+        "description": "Retrieve a list of user-defined annotations.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the source",
+            "required": true
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "type": "string",
+            "description": "RFC3339 datetime to retrieve annotations after",
+            "required": true
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "type": "string",
+            "description": "RFC3339 datetime to retrieve annotations until (defaults to now if not supplied)",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of annotations",
+            "schema": {
+              "$ref": "#/definitions/AnnotationsResponse"
+            }
+          },
+          "422": {
+            "description": "Source ID not supplied",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "default": {
+            "description": "Unexpected internal server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["sources", "annotations"],
+        "description": "Create an annotation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the source",
+            "required": true
+          },
+          {
+            "name": "annotation",
+            "in": "body",
+            "description": "Annotation to be created",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateAnnotationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The created annotation",
+            "schema": {
+              "$ref": "#/definitions/Annotation"
+            }
+          },
+          "400": {
+            "description": "Invalid data schema provided to server for annotation",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "default": {
+            "description": "Unexpected internal server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sources/{id}/annotations/{annotation_id}": {
+      "get": {
+        "tags": ["sources", "annotations"],
+        "description": "Retrieve a single annotation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the source",
+            "required": true
+          },
+          {
+            "name": "annotation_id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the annotation",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Annotation for supplied ID",
+            "schema": {
+              "$ref": "#/definitions/Annotation"
+            }
+          },
+          "400": {
+            "description": "Annotation not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "Source or annotation ID not supplied",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "default": {
+            "description": "Unexpected internal server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["sources", "annotations"],
+        "description": "Delete an annotation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the source",
+            "required": true
+          },
+          {
+            "name": "annotation_id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the annotation",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Annotation has been removed"
+          },
+          "422": {
+            "description": "Source or annotation ID not supplied",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "default": {
+            "description": "Unexpected internal server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["sources", "annotations"],
+        "description": "Update an annotation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the source",
+            "required": true
+          },
+          {
+            "name": "annotation_id",
+            "in": "path",
+            "type": "string",
+            "description": "ID of the annotation",
+            "required": true
+          },
+          {
+            "name": "annotation",
+            "in": "body",
+            "description": "Updated annotation data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateAnnotationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated annotation",
+            "schema": {
+              "$ref": "#/definitions/Annotation"
+            }
+          },
+          "422": {
+            "description": "Source or annotation ID not supplied",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "default": {
+            "description": "Unexpected internal server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -6074,6 +6299,134 @@
         "message": {
           "type": "string"
         }
+      }
+    },
+    "AnnotationsResponse": {
+      "type": "object",
+      "properties": {
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Annotation"
+          }
+        }
+      },
+      "example": {
+        "annotations": [
+          {
+            "id": "50ee18e8-8115-4fac-abed-24ce89e96047",
+            "startTime": "2018-07-09T18:08:15.933Z",
+            "endTime": "2018-07-09T18:08:15.933Z",
+            "text": "unknown event",
+            "type": "",
+            "links": {
+              "self": "/chronograf/v1/sources/1/annotations/50ee18e8-8115-4fac-abed-24ce89e96047"
+            }
+          },
+          {
+            "id": "59434c1c-fa16-40e9-8b92-af71544cc3eb",
+            "startTime": "2018-07-09T17:48:04.23Z",
+            "endTime": "2018-07-09T17:48:08.652Z",
+            "text": "todo: investigate this spike",
+            "type": "",
+            "links": {
+              "self": "/chronograf/v1/sources/1/annotations/59434c1c-fa16-40e9-8b92-af71544cc3eb"
+            }
+          }
+        ]
+      }
+    },
+    "Annotation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the annotation",
+          "example": {
+            "id": "b19c707a-ac7b-4518-86e3-0ee52e563934"
+          }
+        },
+        "startTime": {
+          "type": "string",
+          "description": "RFC3339 datetime for the start of the annotation",
+          "example": {
+            "startTime": "2018-07-09T15:49:07.064Z"
+          }
+        },
+        "endTime": {
+          "type": "string",
+          "description": "RFC3339 datetime for the end of the annotation",
+          "example": {
+            "endTime": "2018-07-09T15:49:07.064Z"
+          }
+        },
+        "text": {
+          "type": "string",
+          "description": "A user-facing description of the annotation",
+          "example": {
+            "text": "my annotation"
+          }
+        },
+        "type": {
+          "type": "string",
+          "description": "A description of the type of annotation"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "self": {
+              "type": "string",
+              "description": "Self link mapping to this resource",
+              "format": "url"
+            }
+          }
+        }
+      },
+      "example": {
+        "id": "59434c1c-fa16-40e9-8b92-af71544cc3eb",
+        "startTime": "2018-07-09T17:48:04.23Z",
+        "endTime": "2018-07-09T17:48:08.652Z",
+        "text": "no name",
+        "type": "",
+        "links": {
+          "self": "/chronograf/v1/sources/1/annotations/59434c1c-fa16-40e9-8b92-af71544cc3eb"
+        }
+      }
+    },
+    "UpdateAnnotationRequest": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "description": "RFC3339 datetime for the start of the annotation",
+          "example": {
+            "startTime": "2018-07-09T15:49:07.064Z"
+          }
+        },
+        "endTime": {
+          "type": "string",
+          "description": "RFC3339 datetime for the end of the annotation",
+          "example": {
+            "endTime": "2018-07-09T15:49:07.064Z"
+          }
+        },
+        "text": {
+          "type": "string",
+          "description": "A user-facing description of the annotation",
+          "example": {
+            "text": "my annotation"
+          }
+        },
+        "type": {
+          "type": "string",
+          "description": "A description of the type of annotation"
+        }
+      },
+      "example": {
+        "startTime": "2018-07-10T17:48:04.23Z",
+        "endTime": "2018-07-10T17:48:08.652Z",
+        "text": "new annotation text",
+        "type": ""
       }
     }
   }
