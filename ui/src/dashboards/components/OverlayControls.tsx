@@ -9,7 +9,7 @@ import {CEOTabs} from 'src/dashboards/constants'
 
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import * as ServicesModels from 'src/types/services'
+import {Service} from 'src/types'
 
 interface Props {
   onCancel: () => void
@@ -19,12 +19,9 @@ interface Props {
   isSavable: boolean
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  service: ServicesModels.Service
-  services: ServicesModels.Service[]
-  onChangeService: (
-    service: ServicesModels.Service,
-    source: SourcesModels.Source
-  ) => void
+  service: Service
+  services: Service[]
+  onChangeService: (service: Service, source: SourcesModels.Source) => void
   queries: QueriesModels.QueryConfig[]
 }
 

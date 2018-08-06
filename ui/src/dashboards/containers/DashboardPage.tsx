@@ -19,7 +19,10 @@ import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOver
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
-import * as serviceActions from 'src/shared/actions/services'
+import {
+  fetchAllFluxServicesAsync,
+  FetchAllFluxServicesAsync,
+} from 'src/shared/actions/services'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
@@ -55,7 +58,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import * as NotificationsActions from 'src/types/actions/notifications'
-import * as ServicesModels from 'src/types/services'
+import {Service} from 'src/types'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   source: SourcesModels.Source
@@ -64,8 +67,8 @@ interface Props extends ManualRefreshProps, WithRouterProps {
     sourceID: string
     dashboardID: string
   }
-  services: ServicesModels.Service[]
-  fetchServicesAsync: serviceActions.FetchAllFluxServicesAsync
+  services: Service[]
+  fetchServicesAsync: FetchAllFluxServicesAsync
   location: Location
   dashboardID: number
   dashboard: DashboardsModels.Dashboard
@@ -606,7 +609,7 @@ const mdtp = {
   handleHideCellEditorOverlay: cellEditorOverlayActions.hideCellEditorOverlay,
   getAnnotationsAsync: annotationActions.getAnnotationsAsync,
   handleDismissEditingAnnotation: annotationActions.dismissEditingAnnotation,
-  fetchServicesAsync: serviceActions.fetchAllFluxServicesAsync,
+  fetchServicesAsync: fetchAllFluxServicesAsync,
 }
 
 export default connect(mstp, mdtp)(

@@ -43,7 +43,7 @@ import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import * as ServicesModels from 'src/types/services'
+import {Service} from 'src/types'
 import {Template} from 'src/types/tempVars'
 
 type QueryTransitions = typeof queryTransitions
@@ -72,7 +72,7 @@ interface QueryStatus {
 
 interface Props {
   sources: SourcesModels.Source[]
-  services: ServicesModels.Service[]
+  services: Service[]
   editQueryStatus: typeof editCellQueryStatus
   onCancel: () => void
   onSave: (cell: DashboardsModels.Cell) => void
@@ -95,7 +95,7 @@ interface State {
   activeEditorTab: CEOTabs
   isStaticLegend: boolean
   selectedSource: SourcesModels.Source
-  selectedService: ServicesModels.Service
+  selectedService: Service
 }
 
 const createWorkingDraft = (
@@ -303,7 +303,7 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private handleChangeService = (
-    selectedService: ServicesModels.Service,
+    selectedService: Service,
     selectedSource: SourcesModels.Source
   ) => {
     const queriesWorkingDraft: QueriesModels.QueryConfig[] = this.state.queriesWorkingDraft.map(

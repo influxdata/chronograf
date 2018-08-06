@@ -4,18 +4,15 @@ import SourceDropdown from 'src/flux/components/SourceDropdown'
 
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import * as ServicesModels from 'src/types/services'
+import {Service} from 'src/types'
 
 interface Props {
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  service: ServicesModels.Service
-  services: ServicesModels.Service[]
+  service: Service
+  services: Service[]
   queries: QueriesModels.QueryConfig[]
-  onChangeService: (
-    service: ServicesModels.Service,
-    source: SourcesModels.Source
-  ) => void
+  onChangeService: (service: Service, source: SourcesModels.Source) => void
 }
 
 const SourceSelector: SFC<Props> = ({
