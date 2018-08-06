@@ -38,6 +38,7 @@ interface Props {
   notify: typeof notifyAction
   addSource: typeof addSourceAction
   updateSource: typeof updateSourceAction
+  setError?: (b: boolean) => void
   source: Source
 }
 
@@ -56,27 +57,33 @@ class SourceStep extends PureComponent<Props, State> {
 
   public next = async () => {
     const {source} = this.state
-    const {notify} = this.props
+    const {notify, setError} = this.props
 
     if (this.isNewSource) {
       try {
         const sourceFromServer = await createSource(source)
         this.props.addSource(sourceFromServer)
         notify(notifySourceCreationSucceeded(source.name))
-        return sourceFromServer
+        return {status: true, payload: sourceFromServer}
       } catch (err) {
         notify(notifySourceCreationFailed(source.name, this.parseError(err)))
+        setError(true)
+        return {status: false, payload: null}
       }
     } else {
       if (this.sourceIsEdited) {
         try {
           const sourceFromServer = await updateSource(source)
-          this.props.updateSource(sourceFromServer)
+          const updatedSource = this.props.updateSource(sourceFromServer)
           notify(notifySourceUdpated(source.name))
+          return {status: true, payload: updatedSource}
         } catch (error) {
           notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
+          setError(true)
+          return {status: false, payload: null}
         }
       }
+      return {status: true, payload: null}
     }
   }
 
@@ -145,7 +152,9 @@ class SourceStep extends PureComponent<Props, State> {
 
   private onChangeInput = (key: string) => (value: string | boolean) => {
     const {source} = this.state
+    const {setError} = this.props
     this.setState({source: {...source, [key]: value}})
+    setError(false)
   }
 
   private get isNewSource(): boolean {

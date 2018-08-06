@@ -5,7 +5,7 @@ import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechno
 import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 
-import {WizardStepProps} from 'src/types/wizard'
+import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {ToggleVisibility} from 'src/types/wizard'

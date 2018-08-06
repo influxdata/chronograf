@@ -5,12 +5,21 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import 'src/reusable_ui/components/wizard/WizardStep.scss'
 
-interface Props {
+type booleanFunction = () => boolean
+
+interface NextReturn {
+  status: boolean
+  payload: any
+}
+
+export interface WizardStepProps {
   children: ReactNode
   title: string
   isComplete: () => boolean
+  isErrored?: boolean | booleanFunction
   onPrevious?: () => void
-  onNext?: () => void
+  onNext?: () => NextReturn | Promise<NextReturn>
+  isBlockingStep?: boolean
   increment?: () => void
   decrement?: () => void
   tipText?: string
@@ -20,7 +29,10 @@ interface Props {
 }
 
 @ErrorHandling
-class WizardStep extends PureComponent<Props> {
+class WizardStep extends PureComponent<WizardStepProps> {
+  public static defaultProps: Partial<WizardStepProps> = {
+    isBlockingStep: false,
+  }
   public render() {
     const {children, decrement, nextLabel, previousLabel, lastStep} = this.props
 
@@ -59,15 +71,22 @@ class WizardStep extends PureComponent<Props> {
   }
 
   private handleClickNext = async () => {
-    const {onNext, increment} = this.props
-    let returnedValue
+    const {onNext, increment, isBlockingStep} = this.props
+    let payload
+    let status = true
+
     if (onNext) {
-      returnedValue = await onNext()
+      const response = await onNext()
+      status = response.status
+      payload = response.payload
     }
+
     if (increment) {
-      increment()
+      if (!isBlockingStep || (isBlockingStep && status === true)) {
+        increment()
+      }
     }
-    return returnedValue
+    return payload
   }
 }
 

@@ -24,6 +24,7 @@ interface Props {
 
 interface State {
   source: Source
+  sourceError: boolean
   kapacitor: Kapacitor
 }
 
@@ -42,12 +43,13 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
     this.state = {
       source: null,
       kapacitor: null,
+      sourceError: false,
     }
   }
 
   public render() {
     const {isVisible, toggleVisibility, jumpStep} = this.props
-    const {source} = this.state
+    const {source, sourceError} = this.state
     return (
       <WizardOverlay
         visible={isVisible}
@@ -62,12 +64,15 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="Add a New InfluxDB Connection"
           tipText=""
           isComplete={this.isSourceComplete}
+          isErrored={sourceError}
+          isBlockingStep={true}
           onNext={this.handleSourceNext}
           nextLabel={source ? 'Update Connection' : 'Add Connection'}
           previousLabel="Cancel"
         >
           <SourceStep
             ref={c => (this.sourceStepRef = c && c.getWrappedInstance())}
+            setError={this.handleSetSourceError}
             source={source}
           />
         </WizardStep>
@@ -75,6 +80,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="Add a Kapacitor Connection"
           tipText="this step is optional"
           isComplete={this.isKapacitorComplete}
+          isErrored={false}
           onNext={this.handleKapacitorNext}
           onPrevious={this.handleKapacitorPrev}
           nextLabel="Continue"
@@ -89,6 +95,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="You are complete"
           tipText="yay"
           isComplete={this.isCompletionComplete}
+          isErrored={false}
           onNext={this.handleCompletionNext}
           onPrevious={this.handleCompletionPrev}
           nextLabel="Dismiss"
@@ -103,12 +110,16 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   }
 
   private handleSourceNext = async () => {
-    const source = await this.sourceStepRef.next()
-    this.setState({source})
+    const response = await this.sourceStepRef.next()
+    this.setState({source: response.payload})
+    return response
   }
   private isSourceComplete = () => {
     const {source} = this.state
     return !_.isNull(source)
+  }
+  private handleSetSourceError = (b: boolean) => {
+    this.setState({sourceError: b})
   }
 
   private isKapacitorComplete = () => {
@@ -118,6 +129,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   private handleKapacitorNext = async () => {
     const kapacitor = await this.kapacitorStepRef.next()
     this.setState({kapacitor})
+    return {status: true, payload: kapacitor}
   }
   private handleKapacitorPrev = () => {}
 
@@ -127,11 +139,11 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   private handleCompletionNext = () => {
     const {router} = this.props
     const {source} = this.state
-
     this.resetWizardState()
     if (source) {
       router.push(`/sources/${source.id}/manage-sources`)
     }
+    return {status: true, payload: null}
   }
   private handleCompletionPrev = () => {}
 

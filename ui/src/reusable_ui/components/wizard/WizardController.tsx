@@ -2,7 +2,8 @@ import React, {PureComponent, ReactElement} from 'react'
 import _ from 'lodash'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {WizardStepProps, Step} from 'src/types/wizard'
+import {Step} from 'src/types/wizard'
+import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 import {StepStatus} from 'src/reusable_ui/constants/wizard'
 
 import 'src/reusable_ui/components/wizard/WizardController.scss'
@@ -32,15 +33,31 @@ class WizardController extends PureComponent<Props, State> {
       children,
       (child: ReactElement<WizardStepProps>, i) => {
         const isComplete = child.props.isComplete()
+        let isErrored
+        if (typeof child.props.isErrored === 'boolean') {
+          isErrored = child.props.isErrored
+        }
+        if (typeof child.props.isErrored === 'function') {
+          isErrored = child.props.isErrored()
+        }
+        let stepStatus = StepStatus.Incomplete
+        if (isComplete) {
+          stepStatus = StepStatus.Complete
+        }
+        if (isErrored) {
+          stepStatus = StepStatus.Error
+        }
+
         if (currentStepIndex === -1 && !isComplete) {
           currentStepIndex = i
         }
         return {
           title: child.props.title,
-          stepStatus: isComplete ? StepStatus.Complete : StepStatus.Incomplete,
+          stepStatus,
         }
       }
     )
+
     if (currentStepIndex === -1) {
       currentStepIndex = childSteps.length - 1
     }
