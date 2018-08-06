@@ -556,7 +556,7 @@ class LogsPage extends Component<Props, State> {
 
     if (timeOption !== 'now') {
       const numberTimeOption = new Date(timeOption).valueOf()
-      const milliseconds = seconds * SECONDS_TO_MS
+      const milliseconds = Math.floor(seconds * SECONDS_TO_MS / 2)
       lower = moment(numberTimeOption - milliseconds).toISOString()
       upper = moment(numberTimeOption + milliseconds).toISOString()
     }
