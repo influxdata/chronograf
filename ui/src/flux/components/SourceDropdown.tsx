@@ -95,7 +95,7 @@ class SourceDropdown extends PureComponent<Props> {
     const {service, source} = this.props
 
     if (service) {
-      return service.sourceID + '-' + service.id
+      return `${service.sourceID}-${service.id}`
     }
 
     return source.id
