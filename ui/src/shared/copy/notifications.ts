@@ -462,6 +462,12 @@ export const notifyDashboardNotFound = (dashboardID: number): Notification => ({
   message: `Dashboard ${dashboardID} could not be found`,
 })
 
+export const notifyInvalidQueryParam = (queryParam: string): Notification => ({
+  ...defaultErrorNotification,
+  icon: 'dash-h',
+  message: `Invalid query parameter value for ${queryParam}, reverting to default`,
+})
+
 export const notifyDashboardDeleted = (name: string): Notification => ({
   ...defaultSuccessNotification,
   icon: 'dash-h',
