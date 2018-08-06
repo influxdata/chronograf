@@ -214,6 +214,7 @@ class LogsTable extends Component<Props, State> {
               cellRenderer={this.headerRenderer}
               columnCount={columnCount}
               columnWidth={this.getColumnWidth}
+              style={{overflowX: 'hidden'}}
             />
           )}
         </AutoSizer>
