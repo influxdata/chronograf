@@ -68,12 +68,14 @@ class SourceStep extends PureComponent<Props, State> {
         notify(notifySourceCreationFailed(source.name, this.parseError(err)))
       }
     } else {
-      try {
-        const sourceFromServer = await updateSource(source)
-        this.props.updateSource(sourceFromServer)
-        notify(notifySourceUdpated(source.name))
-      } catch (error) {
-        notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
+      if (this.sourceIsEdited) {
+        try {
+          const sourceFromServer = await updateSource(source)
+          this.props.updateSource(sourceFromServer)
+          notify(notifySourceUdpated(source.name))
+        } catch (error) {
+          notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
+        }
       }
     }
   }
@@ -148,6 +150,12 @@ class SourceStep extends PureComponent<Props, State> {
 
   private get isNewSource(): boolean {
     return _.isNull(this.props.source)
+  }
+
+  private get sourceIsEdited(): boolean {
+    const sourceInProps = this.props.source
+    const sourceInState = this.state.source
+    return !_.isEqual(sourceInProps, sourceInState)
   }
 
   private get isHTTPS(): boolean {
