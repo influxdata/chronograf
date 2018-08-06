@@ -512,9 +512,7 @@ class CellEditorOverlay extends Component<Props, State> {
   private get service() {
     const {selectedService} = this.state
 
-    if (selectedService) {
-      return selectedService
-    }
+    return selectedService
   }
 
   private handleKeyDown = e => {
