@@ -39,6 +39,7 @@ import {
   notifyDashboardNotFound,
   notifyInvalidZoomedTimeRangeValueInURLQuery,
   notifyInvalidTimeRangeValueInURLQuery,
+  notifyInvalidQueryParam,
 } from 'src/shared/copy/notifications'
 
 import {getDeep} from 'src/utils/wrappers'
@@ -673,12 +674,25 @@ export const getDashboardWithTemplatesAsync = (
     return
   }
 
-  const templates = await hydrateTemplates(dashboard.templates, {
+  const selections = templateSelectionsFromQueryParams()
+
+  let templates
+  templates = await hydrateTemplates(dashboard.templates, {
     proxyUrl: source.links.proxy,
-    selections: templateSelectionsFromQueryParams(),
+    selections,
   })
 
-  // TODO: Notify if any of the supplied query params were invalid
+  _.each(selections, (val, key) => {
+    const result = _.some(
+      templates,
+      temp => temp.tempVar === key && _.some(temp.values, v => v.value === val)
+    )
+
+    if (!result) {
+      dispatch(notify(notifyInvalidQueryParam(key)))
+    }
+  })
+
   dispatch(loadDashboard({...dashboard, templates}))
   dispatch(updateTemplateQueryParams(dashboardId))
   dispatch(updateTimeRangeFromQueryParams(dashboardId))
