@@ -263,6 +263,7 @@ describe('Logs.Config', () => {
       const uiLogConfig = logConfigServerToUI(serverLogConfig)
 
       const expected = {
+        isTruncated: true,
         tableColumns: [
           {internalName: 'time', displayName: '', visible: false},
           {internalName: 'severity', displayName: '', visible: true},
@@ -469,6 +470,7 @@ describe('Logs.Config', () => {
 
     it('converts the config from what the UI uses to what the server takes', () => {
       const uiLogConfig: LogConfig = {
+        isTruncated: true,
         tableColumns: [
           {internalName: 'time', displayName: '', visible: false},
           {internalName: 'severity', displayName: '', visible: true},

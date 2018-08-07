@@ -13,6 +13,7 @@ import {colorForSeverity} from 'src/logs/utils/colors'
 import {
   ROW_HEIGHT,
   calculateRowCharWidth,
+  calculateMessageHeight,
   getColumnFromData,
   getValueFromData,
   getValuesFromData,
@@ -36,12 +37,14 @@ import {
   LogsTableColumn,
   SeverityFormat,
   SeverityLevelColor,
+  RowHeightHandler,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
 interface Props {
   data: TableData
   isScrolledToTop: boolean
+  isTruncated: boolean
   onScrollVertical: () => void
   onScrolledToTop: () => void
   onTagSelection: (selection: {tag: string; key: string}) => void
@@ -237,7 +240,6 @@ class LogsTable extends Component<Props, State> {
                   autoHide={false}
                 >
                   <Grid
-                    rowHeight={ROW_HEIGHT}
                     {...this.gridProperties(
                       width,
                       height,
@@ -268,9 +270,17 @@ class LogsTable extends Component<Props, State> {
   ) => {
     const {scrollToRow} = this.props
     const {scrollLeft, scrollTop} = this.state
+
+    let rowHeight: number | RowHeightHandler = ROW_HEIGHT
+
+    if (!this.props.isTruncated) {
+      rowHeight = this.calculateRowHeight
+    }
+
     const result: any = {
       width,
       height,
+      rowHeight,
       rowCount: this.rowCount(),
       scrollLeft,
       scrollTop,
@@ -447,7 +457,24 @@ class LogsTable extends Component<Props, State> {
   private calculateTotalHeight = (): number => {
     const data = getValuesFromData(this.props.data)
 
-    return data.length * ROW_HEIGHT
+    if (this.props.isTruncated) {
+      return data.length * ROW_HEIGHT
+    }
+
+    return _.reduce(
+      data,
+      (acc, __, index) => {
+        return (
+          acc +
+          calculateMessageHeight(index, this.props.data, this.rowCharLimit)
+        )
+      },
+      0
+    )
+  }
+
+  private calculateRowHeight = ({index}: {index: number}): number => {
+    return calculateMessageHeight(index, this.props.data, this.rowCharLimit)
   }
 
   private headerRenderer = ({key, style, columnIndex}) => {
@@ -515,7 +542,7 @@ class LogsTable extends Component<Props, State> {
       title = formattedValue
     }
 
-    if (column === 'message') {
+    if (column === 'message' && this.props.isTruncated) {
       formattedValue = (
         <ExpandableMessage
           formattedValue={formattedValue}
@@ -578,10 +605,13 @@ class LogsTable extends Component<Props, State> {
       )
     }
 
+    const wrapMessage = column === 'message' && !this.props.isTruncated
+
     return (
       <div
         className={classnames(`logs-viewer--cell  ${column}--cell`, {
           highlight: highlightRow,
+          'message-wrap': wrapMessage,
         })}
         key={key}
         style={style}
