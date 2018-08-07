@@ -11,9 +11,6 @@ import {
   IconFont,
 } from 'src/reusable_ui/types'
 
-// Styles
-import 'src/reusable_ui/components/Button/Button.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
