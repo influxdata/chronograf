@@ -4,9 +4,6 @@ import React, {PureComponent} from 'react'
 // Types
 import {ConnectorState} from 'src/reusable_ui/constants/wizard'
 
-// Styles
-import 'src/reusable_ui/components/wizard/ProgressConnector.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {

@@ -8,9 +8,6 @@ import FormLabel from 'src/reusable_ui/components/form_layout/FormLabel'
 import FormDivider from 'src/reusable_ui/components/form_layout/FormDivider'
 import FormFooter from 'src/reusable_ui/components/form_layout/FormFooter'
 
-// Styles
-import 'src/reusable_ui/components/form_layout/Form.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {

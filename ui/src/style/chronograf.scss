@@ -71,6 +71,24 @@
 @import 'components/kapacitor-logs-table';
 @import 'components/dropdown-placeholder';
 @import 'components/histogram-chart';
+@import '../logs/components/expandable_message/ExpandableMessage';
+@import '../reusable_ui/components/panel/Panel.scss';
+@import '../reusable_ui/components/overlays/Overlay.scss';
+@import '../dashboards/components/import_dashboard_mappings/ImportDashboardMappings.scss';
+@import '../reusable_ui/components/card_select/CardSelectCard.scss';
+@import '../reusable_ui/components/wizard/WizardController.scss';
+@import '../reusable_ui/components/wizard/WizardButtonBar.scss';
+@import '../reusable_ui/components/wizard/WizardFullScreen.scss';
+@import '../reusable_ui/components/wizard/ProgressConnector.scss';
+@import '../reusable_ui/components/wizard/WizardProgressBar.scss';
+@import '../reusable_ui/components/wizard/WizardStep.scss';
+@import '../reusable_ui/components/Button/Button.scss';
+@import '../reusable_ui/components/dropdowns/Dropdown.scss';
+@import '../reusable_ui/components/slide_toggle/SlideToggle.scss';
+@import '../reusable_ui/components/Button/Button.scss';
+@import '../reusable_ui/components/dropdowns/DropdownButton.scss';
+@import '../reusable_ui/components/inputs/Input.scss';
+@import '../reusable_ui/components/form_layout/Form.scss';
 
 // Pages
 @import 'pages/config-endpoints';

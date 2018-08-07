@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
 
-import './ExpandableMessage.scss'
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 
 interface State {

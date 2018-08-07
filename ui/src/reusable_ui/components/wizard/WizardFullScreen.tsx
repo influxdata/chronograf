@@ -8,9 +8,6 @@ import WizardController from 'src/reusable_ui/components/wizard/WizardController
 // Types
 import {WizardStepProps} from 'src/types/wizard'
 
-// Styles
-import 'src/reusable_ui/components/wizard/WizardFullScreen.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
