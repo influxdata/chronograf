@@ -57,9 +57,6 @@ class KapacitorStep extends PureComponent<Props, State> {
     const {kapacitor} = this.state
     const {notify, source, setError} = this.props
 
-    // const isNameTaken = kapacitors.some(k => k.name === kapacitor.name)
-    // const isNew = !params.id
-
     try {
       const {data} = await createKapacitor(source, kapacitor)
       this.setState({kapacitor: data})

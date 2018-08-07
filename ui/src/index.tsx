@@ -35,7 +35,8 @@ import {
   TickscriptPage,
 } from 'src/kapacitor'
 import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
-import {SourcePage, ManageSources} from 'src/sources'
+import {SourcePage, ManageSources, OnboardingWizard} from 'src/sources'
+
 import {CheckServices, FluxConnectionPage} from 'src/flux'
 import NotFound from 'src/shared/components/NotFound'
 
@@ -132,7 +133,7 @@ class Root extends PureComponent<{}, State> {
           </Route>
           <Route
             path="/sources/new"
-            component={UserIsAuthenticated(SourcePage)}
+            component={UserIsAuthenticated(OnboardingWizard)}
           />
           <Route path="/sources/:sourceID" component={UserIsAuthenticated(App)}>
             <Route component={CheckSources}>

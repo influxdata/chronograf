@@ -4,7 +4,7 @@ import SplashPage from 'src/shared/components/SplashPage'
 import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {WizardStepProps} from 'src/types/wizard'
+import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 
 import 'src/reusable_ui/components/wizard/WizardFullScreen.scss'
 interface Props {
@@ -34,7 +34,11 @@ class WizardFullScreen extends PureComponent<Props> {
 
     if (children) {
       return (
-        <WizardController handleSkip={handleSkip} skipLinkText={skipLinkText}>
+        <WizardController
+          handleSkip={handleSkip}
+          skipLinkText={skipLinkText}
+          jumpStep={0}
+        >
           {children}
         </WizardController>
       )
