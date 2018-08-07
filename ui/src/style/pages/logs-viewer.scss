@@ -248,6 +248,10 @@ $logs-viewer-gutter: 60px;
   &.highlight {
     color: $g20-white;
   }
+
+  &.message-wrap {
+    word-break: break-all
+  }
 }
 .logs-viewer--cell-header {
   font-weight: 600;
