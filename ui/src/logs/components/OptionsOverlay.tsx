@@ -51,10 +51,8 @@ class OptionsOverlay extends Component<Props, State> {
   }
 
   public shouldComponentUpdate(__, nextState: State) {
-    const isTruncatedDifferent = !_.isEqual(
-      nextState.isWorkingTruncated,
-      this.state.isWorkingTruncated
-    )
+    const isTruncatedDifferent =
+      nextState.isWorkingTruncated !== this.state.isWorkingTruncated
 
     const isColorsDifferent = !_.isEqual(
       nextState.workingLevelColumns,
@@ -90,9 +88,6 @@ class OptionsOverlay extends Component<Props, State> {
         </Heading>
         <Body>
           <div className="row">
-            <div className="col-sm-12">{this.renderTruncateOption}</div>
-          </div>
-          <div className="row">
             <div className="col-sm-5">
               <SeverityOptions
                 severityLevelColors={workingLevelColumns}
@@ -102,6 +97,7 @@ class OptionsOverlay extends Component<Props, State> {
                 onChangeSeverityFormat={this.handleChangeSeverityFormat}
               />
             </div>
+            <div className="col-sm-7">{this.renderTruncateOption}</div>
             <div className="col-sm-7">
               <ColumnsOptions
                 columns={workingColumns}
@@ -137,9 +133,15 @@ class OptionsOverlay extends Component<Props, State> {
   private get renderTruncateOption() {
     const {isWorkingTruncated} = this.state
 
+    let labelMessage = 'Truncate Log Lines'
+
+    if (isWorkingTruncated) {
+      labelMessage = 'Show Log Lines'
+    }
+
     return (
       <>
-        <label className="form-label">Truncate Log Lines</label>
+        <label className="form-label">{labelMessage}</label>
         <SlideToggle
           onChange={this.handleTruncationToggle}
           active={isWorkingTruncated}
@@ -171,7 +173,7 @@ class OptionsOverlay extends Component<Props, State> {
     const severityChanged = !_.isEqual(workingLevelColumns, severityLevelColors)
     const columnsChanged = !_.isEqual(workingColumns, columns)
     const formatChanged = !_.isEqual(workingFormat, severityFormat)
-    const isTruncatedChanged = !_.isEqual(isWorkingTruncated, isTruncated)
+    const isTruncatedChanged = isWorkingTruncated !== isTruncated
 
     if (
       severityChanged ||
