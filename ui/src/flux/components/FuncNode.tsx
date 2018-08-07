@@ -103,6 +103,7 @@ export default class FuncNode extends PureComponent<Props, State> {
         onGenerateScript={onGenerateScript}
         declarationsFromBody={declarationsFromBody}
         onStopPropagation={this.handleClickArgs}
+        db={this.db}
       />
     )
   }
@@ -222,6 +223,14 @@ export default class FuncNode extends PureComponent<Props, State> {
 
   private handleClickArgs = (e: MouseEvent<HTMLElement>): void => {
     e.stopPropagation()
+  }
+
+  private get db(): string {
+    const result = _.find(this.props.funcs, (func: Func) => {
+      return func.name === 'from'
+    })
+
+    return getDeep<string>(result, 'args.0.value', 'telegraf')
   }
 
   private get isLast(): boolean {

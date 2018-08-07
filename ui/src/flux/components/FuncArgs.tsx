@@ -18,6 +18,7 @@ interface Props {
   onGenerateScript: OnGenerateScript
   declarationsFromBody: string[]
   onStopPropagation: (e: MouseEvent<HTMLElement>) => void
+  db?: string
 }
 
 @ErrorHandling
@@ -34,7 +35,7 @@ export default class FuncArgs extends PureComponent<Props> {
     )
   }
 
-  get renderArguments(): JSX.Element | JSX.Element[] {
+  private get renderArguments(): JSX.Element | JSX.Element[] {
     const {func} = this.props
     const {name: funcName} = func
 
@@ -49,7 +50,7 @@ export default class FuncArgs extends PureComponent<Props> {
     return this.renderGeneralArguments
   }
 
-  get renderGeneralArguments(): JSX.Element | JSX.Element[] {
+  private get renderGeneralArguments(): JSX.Element | JSX.Element[] {
     const {
       func,
       bodyID,
@@ -79,7 +80,7 @@ export default class FuncArgs extends PureComponent<Props> {
     ))
   }
 
-  get renderFilter(): JSX.Element {
+  private get renderFilter(): JSX.Element {
     const {
       func,
       bodyID,
@@ -99,12 +100,16 @@ export default class FuncArgs extends PureComponent<Props> {
         onChangeArg={onChangeArg}
         onGenerateScript={onGenerateScript}
         service={service}
-        db={'telegraf'}
+        db={this.db}
       />
     )
   }
 
-  get renderJoin(): JSX.Element {
+  private get db(): string {
+    return this.props.db || 'telegraf'
+  }
+
+  private get renderJoin(): JSX.Element {
     const {
       func,
       bodyID,
@@ -126,7 +131,7 @@ export default class FuncArgs extends PureComponent<Props> {
     )
   }
 
-  get build(): ReactElement<HTMLDivElement> {
+  private get build(): ReactElement<HTMLDivElement> {
     const {func, onGenerateScript} = this.props
     if (func.name === funcNames.FILTER) {
       return (
