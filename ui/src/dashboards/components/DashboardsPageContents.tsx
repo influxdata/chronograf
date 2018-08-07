@@ -92,13 +92,11 @@ class DashboardsPageContents extends Component<Props, State> {
             />
             <Authorized requiredRole={EDITOR_ROLE}>
               <>
-                <button
-                  className="btn btn-sm btn-default"
+                <Button
+                  text="Import Dashboard"
+                  icon={IconFont.Import}
                   onClick={this.handleToggleOverlay}
-                >
-                  <span className="icon import" />
-                  Import Dashboard
-                </button>
+                />
                 <Button
                   text="Create Dashboard"
                   icon={IconFont.Plus}
