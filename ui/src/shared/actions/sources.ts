@@ -173,7 +173,7 @@ export const fetchKapacitorsAsync: FetchKapacitorsAsync = source => async dispat
 }
 
 export type SetActiveKapacitorAsync = (
-  source: Source
+  kapacitor: Kapacitor
 ) => (dispatch) => Promise<void>
 
 export const setActiveKapacitorAsync = (kapacitor: Kapacitor) => async (

@@ -10,7 +10,7 @@ import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import * as actions from 'src/shared/actions/sources'
+import * as sourcesActions from 'src/shared/actions/sources'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -29,13 +29,15 @@ import {DEFAULT_KAPACITOR} from 'src/shared/constants'
 
 // Types
 import {Kapacitor, Source} from 'src/types'
+import {KapacitorItem} from 'src/sources/components/KapacitorDropdown'
 
 interface Props {
   notify: typeof notifyAction
   source: Source
   setError?: (b: boolean) => void
-  deleteKapacitor: actions.DeleteKapacitor
-  setActiveKapacitor: actions.SetActiveKapacitor
+  sources: Source[]
+  deleteKapacitor: sourcesActions.DeleteKapacitor
+  setActiveKapacitor: sourcesActions.SetActiveKapacitor
 }
 
 interface State {
@@ -77,36 +79,34 @@ class KapacitorStep extends PureComponent<Props, State> {
     return (
       <>
         {this.kapacitorDropdown}
-        <div>
-          <WizardTextInput
-            value={kapacitor.url}
-            label="Kapacitor URL"
-            onChange={this.onChangeInput('url')}
-            valueModifier={this.URLModifier}
+        <WizardTextInput
+          value={kapacitor.url}
+          label="Kapacitor URL"
+          onChange={this.onChangeInput('url')}
+          valueModifier={this.URLModifier}
+        />
+        <WizardTextInput
+          value={kapacitor.name}
+          label="Name"
+          onChange={this.onChangeInput('name')}
+        />
+        <WizardTextInput
+          value={kapacitor.username}
+          label="Username"
+          onChange={this.onChangeInput('username')}
+        />
+        <WizardTextInput
+          value={kapacitor.password}
+          label="Password"
+          onChange={this.onChangeInput('password')}
+        />
+        {this.isHTTPS && (
+          <WizardCheckbox
+            isChecked={kapacitor.insecureSkipVerify}
+            text={`Unsafe SSL: ${insecureSkipVerifyText}`}
+            onChange={this.onChangeInput('insecureSkipVerify')}
           />
-          <WizardTextInput
-            value={kapacitor.name}
-            label="Name"
-            onChange={this.onChangeInput('name')}
-          />
-          <WizardTextInput
-            value={kapacitor.username}
-            label="Username"
-            onChange={this.onChangeInput('username')}
-          />
-          <WizardTextInput
-            value={kapacitor.password}
-            label="Password"
-            onChange={this.onChangeInput('password')}
-          />
-          {this.isHTTPS && (
-            <WizardCheckbox
-              isChecked={kapacitor.insecureSkipVerify}
-              text={`Unsafe SSL: ${insecureSkipVerifyText}`}
-              onChange={this.onChangeInput('insecureSkipVerify')}
-            />
-          )}
-        </div>
+        )}
       </>
     )
   }
@@ -137,21 +137,29 @@ class KapacitorStep extends PureComponent<Props, State> {
     }
   }
 
+  private handleSetActiveKapacitor = (item: KapacitorItem) => {
+    this.props.setActiveKapacitor(item.kapacitor)
+  }
+
   private get isHTTPS(): boolean {
     const {kapacitor} = this.state
     return getDeep<string>(kapacitor, 'url', '').startsWith('https')
   }
 
   private get kapacitorDropdown() {
-    const {source, deleteKapacitor, setActiveKapacitor} = this.props
-    if (source) {
+    const {source, sources, deleteKapacitor} = this.props
+
+    if (source && sources) {
+      const storeSource = sources.filter(s => s.id === source.id)[0]
       return (
-        <div>
+        <div className="form-group col-xs-12 wizard-input">
           <KapacitorDropdown
-            source={source}
-            kapacitors={source.kapacitors}
+            suppressEdit={true}
+            source={storeSource}
+            kapacitors={storeSource.kapacitors}
             deleteKapacitor={deleteKapacitor}
-            setActiveKapacitor={setActiveKapacitor}
+            setActiveKapacitor={this.handleSetActiveKapacitor}
+            buttonSize="btn-sm"
           />
         </div>
       )
@@ -161,8 +169,14 @@ class KapacitorStep extends PureComponent<Props, State> {
   }
 }
 
+const mstp = ({sources}) => ({
+  sources,
+})
+
 const mdtp = {
   notify: notifyAction,
+  setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
+  deleteKapacitor: sourcesActions.deleteKapacitorAsync,
 }
 
-export default connect(null, mdtp, null, {withRef: true})(KapacitorStep)
+export default connect(mstp, mdtp, null, {withRef: true})(KapacitorStep)

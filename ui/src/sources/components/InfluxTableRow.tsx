@@ -5,7 +5,9 @@ import * as actions from 'src/shared/actions/sources'
 
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
-import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
+import KapacitorDropdown, {
+  KapacitorItem,
+} from 'src/sources/components/KapacitorDropdown'
 import ConnectionLink from 'src/sources/components/ConnectionLink'
 import FluxDropdown from 'src/sources/components/FluxDropdown'
 import Button from 'src/reusable_ui/components/Button'
@@ -19,7 +21,7 @@ interface Props {
   currentSource: Source
   services: Service[]
   onDeleteSource: (source: Source) => void
-  setActiveKapacitor: actions.SetActiveKapacitor
+  setActiveKapacitor: (k: KapacitorItem) => void
   setActiveFlux: (source: Source, service: Service) => void
   deleteKapacitor: actions.DeleteKapacitor
   deleteFlux: (fluxService: Service) => void

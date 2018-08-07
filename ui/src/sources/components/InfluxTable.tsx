@@ -1,13 +1,14 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
-import {SetActiveKapacitor, DeleteKapacitor} from 'src/shared/actions/sources'
+import {DeleteKapacitor} from 'src/shared/actions/sources'
 
 import InfluxTableHead from 'src/sources/components/InfluxTableHead'
 import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
 import InfluxTableRow from 'src/sources/components/InfluxTableRow'
 
 import {Source, Me, Service} from 'src/types'
+import {KapacitorItem} from 'src/sources/components/KapacitorDropdown'
 import {ToggleVisibility} from 'src/types/wizard'
 
 interface Props {
@@ -17,7 +18,7 @@ interface Props {
   services: Service[]
   isUsingAuth: boolean
   deleteKapacitor: DeleteKapacitor
-  setActiveKapacitor: SetActiveKapacitor
+  setActiveKapacitor: (k: KapacitorItem) => void
   onDeleteSource: (source: Source) => void
   setActiveFlux: (source: Source, service: Service) => void
   deleteFlux: (fluxService: Service) => void
