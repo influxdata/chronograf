@@ -33,6 +33,7 @@ import {Kapacitor, Source} from 'src/types'
 interface Props {
   notify: typeof notifyAction
   source: Source
+  setError?: (b: boolean) => void
   deleteKapacitor: actions.DeleteKapacitor
   setActiveKapacitor: actions.SetActiveKapacitor
 }
@@ -54,24 +55,23 @@ class KapacitorStep extends PureComponent<Props, State> {
 
   public next = async () => {
     const {kapacitor} = this.state
-    const {notify, source} = this.props
+    const {notify, source, setError} = this.props
 
     // const isNameTaken = kapacitors.some(k => k.name === kapacitor.name)
     // const isNew = !params.id
-
-    // if (isNew && isNameTaken) {
-    //   notify(notifyKapacitorNameAlreadyTaken)
-    //   return
-    // }
 
     try {
       const {data} = await createKapacitor(source, kapacitor)
       this.setState({kapacitor: data})
       this.checkKapacitorConnection(data)
       notify(notifyKapacitorCreated())
+      setError(false)
+      return {status: true, payload: data}
     } catch (error) {
       console.error(error)
       notify(notifyKapacitorCreateFailed())
+      setError(true)
+      return {status: false, payload: null}
     }
   }
 
@@ -123,8 +123,10 @@ class KapacitorStep extends PureComponent<Props, State> {
   }
 
   private onChangeInput = (key: string) => (value: string | boolean) => {
+    const {setError} = this.props
     const {kapacitor} = this.state
     this.setState({kapacitor: {...kapacitor, [key]: value}})
+    setError(false)
   }
 
   private checkKapacitorConnection = async (kapacitor: Kapacitor) => {

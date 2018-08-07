@@ -49,12 +49,13 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       source: null,
       kapacitor: null,
       sourceError: false,
+      kapacitorError: false,
     }
   }
 
   public render() {
     const {isVisible, toggleVisibility, jumpStep} = this.props
-    const {source, sourceError} = this.state
+    const {source, sourceError, kapacitorError} = this.state
     return (
       <WizardOverlay
         visible={isVisible}
@@ -85,7 +86,8 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="Add a Kapacitor Connection"
           tipText="this step is optional"
           isComplete={this.isKapacitorComplete}
-          isErrored={false}
+          isErrored={kapacitorError}
+          isBlockingStep={true}
           onNext={this.handleKapacitorNext}
           onPrevious={this.handleKapacitorPrev}
           nextLabel="Continue"
@@ -93,6 +95,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         >
           <KapacitorStep
             ref={c => (this.kapacitorStepRef = c && c.getWrappedInstance())}
+            setError={this.handleSetKapacitorError}
             source={source}
           />
         </WizardStep>
@@ -103,7 +106,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           isErrored={false}
           onNext={this.handleCompletionNext}
           onPrevious={this.handleCompletionPrev}
-          nextLabel="Dismiss"
+          nextLabel="Connect to this source"
           previousLabel="Go Back"
         >
           <CompletionStep
@@ -132,11 +135,14 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
     return !_.isNull(kapacitor)
   }
   private handleKapacitorNext = async () => {
-    const kapacitor = await this.kapacitorStepRef.next()
-    this.setState({kapacitor})
-    return {status: true, payload: kapacitor}
+    const response = await this.kapacitorStepRef.next()
+    this.setState({kapacitor: response.payload})
+    return response
   }
   private handleKapacitorPrev = () => {}
+  private handleSetKapacitorError = (b: boolean) => {
+    this.setState({kapacitorError: b})
+  }
 
   private isCompletionComplete = () => {
     return false

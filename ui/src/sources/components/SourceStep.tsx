@@ -64,6 +64,7 @@ class SourceStep extends PureComponent<Props, State> {
         const sourceFromServer = await createSource(source)
         this.props.addSource(sourceFromServer)
         notify(notifySourceCreationSucceeded(source.name))
+        setError(false)
         return {status: true, payload: sourceFromServer}
       } catch (err) {
         notify(notifySourceCreationFailed(source.name, this.parseError(err)))
@@ -76,6 +77,7 @@ class SourceStep extends PureComponent<Props, State> {
           const sourceFromServer = await updateSource(source)
           const updatedSource = this.props.updateSource(sourceFromServer)
           notify(notifySourceUdpated(source.name))
+          setError(false)
           return {status: true, payload: updatedSource}
         } catch (error) {
           notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
