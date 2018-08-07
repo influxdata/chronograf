@@ -22,7 +22,7 @@ import {createKapacitor, pingKapacitor} from 'src/shared/apis'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {
   notifyKapacitorCreateFailed,
-  notifyKapacitorCreated,
+  notifyKapacitorSuccess,
   notifyKapacitorConnectionFailed,
 } from 'src/shared/copy/notifications'
 import {DEFAULT_KAPACITOR} from 'src/shared/constants'
@@ -61,7 +61,7 @@ class KapacitorStep extends PureComponent<Props, State> {
       const {data} = await createKapacitor(source, kapacitor)
       this.setState({kapacitor: data})
       this.checkKapacitorConnection(data)
-      notify(notifyKapacitorCreated())
+      notify(notifyKapacitorSuccess())
       setError(false)
       return {status: true, payload: data}
     } catch (error) {
