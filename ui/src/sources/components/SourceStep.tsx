@@ -75,10 +75,10 @@ class SourceStep extends PureComponent<Props, State> {
       if (this.sourceIsEdited) {
         try {
           const sourceFromServer = await updateSource(source)
-          const updatedSource = this.props.updateSource(sourceFromServer)
+          this.props.updateSource(sourceFromServer)
           notify(notifySourceUdpated(source.name))
           setError(false)
-          return {status: true, payload: updatedSource}
+          return {status: true, payload: sourceFromServer}
         } catch (error) {
           notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
           setError(true)
