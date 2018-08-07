@@ -133,8 +133,8 @@
     box-shadow: 0 0 0 0;
   }
 
-  &[disabled],
-  &:disabled:hover {
+  &.button--disabled,
+  &.button--disabled:hover {
     color: rgba($text, 0.3);
     font-style: italic;
     background-color: mix($bg, $g4-onyx, 25%);
