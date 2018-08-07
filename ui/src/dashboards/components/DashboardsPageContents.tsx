@@ -8,6 +8,7 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
+import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
 
 import {Dashboard, Source} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -91,18 +92,17 @@ class DashboardsPageContents extends Component<Props, State> {
             />
             <Authorized requiredRole={EDITOR_ROLE}>
               <>
-                <button
-                  className="btn btn-sm btn-default"
+                <Button
+                  text="Import Dashboard"
+                  icon={IconFont.Import}
                   onClick={this.handleToggleOverlay}
-                >
-                  <span className="icon import" /> Import Dashboard
-                </button>
-                <button
-                  className="btn btn-sm btn-primary"
+                />
+                <Button
+                  text="Create Dashboard"
+                  icon={IconFont.Plus}
                   onClick={onCreateDashboard}
-                >
-                  <span className="icon plus" /> Create Dashboard
-                </button>
+                  color={ComponentColor.Primary}
+                />
               </>
             </Authorized>
           </div>
