@@ -26,13 +26,18 @@ interface State {
   source: Source
   sourceError: boolean
   kapacitor: Kapacitor
+  kapacitorError: boolean
 }
 
 @ErrorHandling
 class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
-  public static getDerivedStateFromProps(props: Props) {
-    const {source} = props
-    return {source}
+  public static getDerivedStateFromProps(props: Props, state: State) {
+    const sourceInState = state.source
+    const sourceInProps = props.source
+    if (_.isNull(sourceInState) && !_.isNull(sourceInProps)) {
+      return {source: sourceInProps}
+    }
+    return null
   }
   public sourceStepRef: any
   public kapacitorStepRef: any
