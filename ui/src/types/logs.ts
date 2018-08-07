@@ -1,3 +1,5 @@
+import {Index} from 'react-virtualized'
+
 import {
   SeverityFormatOptions,
   SeverityColorOptions,
@@ -47,6 +49,7 @@ export interface LogConfig {
   tableColumns: LogsTableColumn[]
   severityFormat: SeverityFormat
   severityLevelColors: SeverityLevelColor[]
+  isTruncated: boolean
 }
 
 export interface SeverityLevelColor {
@@ -165,3 +168,5 @@ export enum Operator {
   EQUAL = '==',
   NOT_EQUAL = '!=',
 }
+
+export type RowHeightHandler = (index: Index) => number

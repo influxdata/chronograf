@@ -201,6 +201,7 @@ class LogsPage extends Component<Props, State> {
               onScrollVertical={this.handleVerticalScroll}
               onScrolledToTop={this.handleScrollToTop}
               isScrolledToTop={false}
+              isTruncated={this.isTruncated}
               onTagSelection={this.handleTagSelection}
               fetchMore={this.props.fetchOlderLogsAsync}
               fetchNewer={this.fetchNewer}
@@ -607,6 +608,8 @@ class LogsPage extends Component<Props, State> {
           onUpdateColumns={this.handleUpdateColumns}
           onUpdateSeverityFormat={this.handleUpdateSeverityFormat}
           severityFormat={this.severityFormat}
+          onUpdateTruncation={this.handleUpdateTruncation}
+          isTruncated={this.isTruncated}
         />
       </OverlayTechnology>
     )
@@ -650,6 +653,21 @@ class LogsPage extends Component<Props, State> {
       ...logConfig,
       tableColumns,
     })
+  }
+
+  private handleUpdateTruncation = async (
+    isTruncated: boolean
+  ): Promise<void> => {
+    const {logConfig} = this.props
+
+    await this.props.updateConfig(this.logConfigLink, {
+      ...logConfig,
+      isTruncated,
+    })
+  }
+
+  private get isTruncated(): boolean {
+    return this.props.logConfig.isTruncated
   }
 }
 
