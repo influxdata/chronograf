@@ -1,5 +1,4 @@
 import React, {PureComponent, ReactElement} from 'react'
-import _ from 'lodash'
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Step} from 'src/types/wizard'

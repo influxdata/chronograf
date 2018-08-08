@@ -86,6 +86,7 @@ class WizardStep extends PureComponent<WizardStepProps> {
         increment()
       }
     }
+
     return payload
   }
 }
