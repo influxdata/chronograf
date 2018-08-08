@@ -17,7 +17,7 @@ interface Props {
   children: Array<ReactElement<WizardStepProps>>
   handleSkip?: () => void
   skipLinkText?: string
-  jumpStep: number
+  jumpStep?: number
 }
 
 @ErrorHandling

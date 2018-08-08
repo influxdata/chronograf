@@ -38,8 +38,11 @@ interface Props {
   notify: typeof notifyAction
   addSource: typeof addSourceAction
   updateSource: typeof updateSourceAction
+  gotoPurgatory: () => void
   setError?: (b: boolean) => void
   source: Source
+  isUsingAuth: boolean
+  onBoarding?: boolean
 }
 
 interface State {
@@ -48,6 +51,9 @@ interface State {
 
 @ErrorHandling
 class SourceStep extends PureComponent<Props, State> {
+  public static defaultProps: Partial<Props> = {
+    onBoarding: false,
+  }
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -91,6 +97,7 @@ class SourceStep extends PureComponent<Props, State> {
 
   public render() {
     const {source} = this.state
+    const {isUsingAuth, gotoPurgatory, onBoarding} = this.props
     return (
       <>
         <WizardTextInput
@@ -124,11 +131,20 @@ class SourceStep extends PureComponent<Props, State> {
           label="Default Retention Policy"
           onChange={this.onChangeInput('defaultRP')}
         />
-        <WizardCheckbox
-          isChecked={source.default}
-          text={'Make this the default connection'}
-          onChange={this.onChangeInput('default')}
-        />
+        {this.isEnterprise && (
+          <WizardTextInput
+            value={source.metaUrl}
+            label="Meta Service Connection URL"
+            onChange={this.onChangeInput('metaUrl')}
+          />
+        )}
+        {!onBoarding && (
+          <WizardCheckbox
+            isChecked={source.default}
+            text={'Make this the default connection'}
+            onChange={this.onChangeInput('default')}
+          />
+        )}
         {this.isHTTPS && (
           <WizardCheckbox
             isChecked={source.insecureSkipVerify}
@@ -136,6 +152,12 @@ class SourceStep extends PureComponent<Props, State> {
             onChange={this.onChangeInput('insecureSkipVerify')}
           />
         )}
+        {onBoarding &&
+          isUsingAuth && (
+            <button className="btn btn-md btn-default" onClick={gotoPurgatory}>
+              <span className="icon shuffle" /> Switch Orgs
+            </button>
+          )}
       </>
     )
   }
@@ -173,7 +195,14 @@ class SourceStep extends PureComponent<Props, State> {
     const {source} = this.state
     return getDeep<string>(source, 'url', '').startsWith('https')
   }
+
+  private get isEnterprise(): boolean {
+    const {source} = this.props
+    return _.get(source, 'type', '').includes('enterprise')
+  }
 }
+
+const mstp = ({auth: {isUsingAuth, me}}) => ({isUsingAuth, me})
 
 const mdtp = {
   notify: notifyAction,
@@ -181,4 +210,4 @@ const mdtp = {
   updateSource: updateSourceAction,
 }
 
-export default connect(null, mdtp, null, {withRef: true})(SourceStep)
+export default connect(mstp, mdtp, null, {withRef: true})(SourceStep)

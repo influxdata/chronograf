@@ -1,44 +1,26 @@
 import React, {PureComponent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
 import _ from 'lodash'
-import {
-  addSource as addSourceAction,
-  AddSource,
-} from 'src/shared/actions/sources'
-import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {connect} from 'react-redux'
 
-import Notifications from 'src/shared/components/Notifications'
 import WizardFullScreen from 'src/reusable_ui/components/wizard/WizardFullScreen'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import SourceStep from 'src/sources/components/SourceStep'
 import KapacitorStep from 'src/sources/components/KapacitorStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
 
-const INITIAL_PATH = '/sources/new'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {Kapacitor, Source} from 'src/types'
-import * as NotificationsActions from 'src/types/actions/notifications'
-
-interface Props extends WithRouterProps {
-  notify: NotificationsActions.PublishNotificationActionCreator
-  addSource: AddSource
-}
 
 interface State {
-  isCreated: boolean
-  isLoading: boolean
   source: Partial<Source>
-  kapacitor: Kapacitor
-  editMode: boolean
-  isInitialSource: boolean
-  kapacitorError: boolean
   sourceError: boolean
+  kapacitor: Kapacitor
+  kapacitorError: boolean
 }
 
 @ErrorHandling
-class OnboardingWizard extends PureComponent<Props, State> {
+class OnboardingWizard extends PureComponent<WithRouterProps, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
   public completionStepRef: any
@@ -46,27 +28,18 @@ class OnboardingWizard extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      isLoading: false,
-      isCreated: false,
-      kapacitorError: false,
-      sourceError: false,
       source: null,
+      sourceError: false,
       kapacitor: null,
-      editMode: props.params.id !== undefined,
-      isInitialSource: props.router.location.pathname === INITIAL_PATH,
+      kapacitorError: false,
     }
   }
 
   public render() {
-    const {isLoading, source, sourceError, kapacitorError} = this.state
-
-    if (isLoading) {
-      return <div className="page-spinner" />
-    }
+    const {source, sourceError, kapacitorError} = this.state
 
     return (
       <>
-        <Notifications />
         <WizardFullScreen title={'Welcome to Influx'}>
           <WizardStep
             title="Add a New InfluxDB Connection"
@@ -77,11 +50,14 @@ class OnboardingWizard extends PureComponent<Props, State> {
             onNext={this.handleSourceNext}
             nextLabel={source ? 'Update Connection' : 'Add Connection'}
             previousLabel="Cancel"
+            onPrevious={this.handleKapacitorPrev}
           >
             <SourceStep
               ref={c => (this.sourceStepRef = c && c.getWrappedInstance())}
               setError={this.handleSetSourceError}
               source={source}
+              gotoPurgatory={this.gotoPurgatory}
+              onBoarding={true}
             />
           </WizardStep>
           <WizardStep
@@ -168,27 +144,10 @@ class OnboardingWizard extends PureComponent<Props, State> {
     })
   }
 
-  //   private gotoPurgatory = (): void => {
-  //     const {router} = this.props
-  //     router.push('/purgatory')
-  //   }
-  //   private redirect = source => {
-  //     const {location, router} = this.props
-  //     const {redirectPath} = location.query
-  //     if (!redirectPath) {
-  //       return router.push(`/sources/${source.id}/manage-sources`)
-  //     }
-  //     const fixedPath = redirectPath.replace(
-  //       /\/sources\/[^/]*/,
-  //       `/sources/${source.id}`
-  //     )
-  //     return router.push(fixedPath)
-  //   }
+  private gotoPurgatory = (): void => {
+    const {router} = this.props
+    router.push('/purgatory')
+  }
 }
 
-const mdtp = {
-  notify: notifyAction,
-  addSource: addSourceAction,
-}
-
-export default connect(null, mdtp)(withRouter(OnboardingWizard))
+export default withRouter(OnboardingWizard)
