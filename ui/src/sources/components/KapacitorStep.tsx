@@ -33,6 +33,7 @@ interface Props {
   sources: Source[]
   deleteKapacitor: sourcesActions.DeleteKapacitor
   setActiveKapacitor: sourcesActions.SetActiveKapacitor
+  fetchKapacitors: sourcesActions.FetchKapacitorsAsync
 }
 
 interface State {
@@ -78,6 +79,7 @@ class KapacitorStep extends PureComponent<Props, State> {
       this.checkKapacitorConnection(data)
       notify(notifyKapacitorSuccess())
       setError(false)
+      this.fetchNewKapacitors()
       return {status: true, payload: data}
     } catch (error) {
       console.error(error)
@@ -139,6 +141,12 @@ class KapacitorStep extends PureComponent<Props, State> {
     })
   }
 
+  private fetchNewKapacitors = () => {
+    const {source, sources, fetchKapacitors} = this.props
+    const storeSource = sources.filter(s => s.id === source.id)[0]
+    fetchKapacitors(storeSource)
+  }
+
   private get currentKapacitor() {
     const {exists, existingKapacitor, newKapacitor} = this.state
     if (exists) {
@@ -181,6 +189,7 @@ const mdtp = {
   notify: notifyAction,
   setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
+  fetchKapacitors: sourcesActions.fetchKapacitorsAsync,
 }
 
 export default connect(mstp, mdtp, null, {withRef: true})(KapacitorStep)
