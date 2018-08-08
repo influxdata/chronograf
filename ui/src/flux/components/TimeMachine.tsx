@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {SFC} from 'react'
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import BodyBuilder from 'src/flux/components/BodyBuilder'
 import TimeMachineEditor from 'src/flux/components/TimeMachineEditor'
@@ -13,8 +13,7 @@ import {
 } from 'src/types/flux'
 
 import {Service} from 'src/types'
-import {ErrorHandling} from 'src/shared/decorators/errors'
-import {HANDLE_VERTICAL, HANDLE_HORIZONTAL} from 'src/shared/constants'
+import {HANDLE_VERTICAL} from 'src/shared/constants'
 
 interface Props {
   service: Service
@@ -34,47 +33,47 @@ interface Body extends FlatBody {
   id: string
 }
 
-@ErrorHandling
-class TimeMachine extends PureComponent<Props> {
-  public render() {
-    return (
-      <Threesizer
-        orientation={HANDLE_VERTICAL}
-        divisions={this.verticals}
-        containerClass="page-contents"
-      />
-    )
-  }
+const TimeMachine: SFC<Props> = props => {
+  const {
+    body,
+    service,
+    suggestions,
+    onAppendFrom,
+    onDeleteBody,
+    onAppendJoin,
+    script,
+    status,
+    onValidate,
+    onChangeScript,
+    onSubmitScript,
+  } = props
 
-  private get verticals() {
-    return [
-      {
-        handleDisplay: 'none',
-        menuOptions: [],
-        headerButtons: [],
-        size: 0.33,
-        render: () => (
-          <Threesizer
-            divisions={this.scriptAndExplorer}
-            orientation={HANDLE_HORIZONTAL}
-          />
-        ),
-      },
-      this.builder,
-    ]
-  }
-
-  private get builder() {
-    const {
-      body,
-      service,
-      suggestions,
-      onAppendFrom,
-      onDeleteBody,
-      onAppendJoin,
-    } = this.props
-
-    return {
+  const divisions = [
+    {
+      name: 'Script',
+      headerOrientation: HANDLE_VERTICAL,
+      headerButtons: [
+        <div
+          key="validate"
+          className="btn btn-default btn-xs validate--button"
+          onClick={onValidate}
+        >
+          Validate
+        </div>,
+      ],
+      menuOptions: [],
+      render: visibility => (
+        <TimeMachineEditor
+          status={status}
+          script={script}
+          visibility={visibility}
+          suggestions={suggestions}
+          onChangeScript={onChangeScript}
+          onSubmitScript={onSubmitScript}
+        />
+      ),
+    },
+    {
       name: 'Build',
       headerButtons: [],
       menuOptions: [],
@@ -89,56 +88,23 @@ class TimeMachine extends PureComponent<Props> {
           onAppendJoin={onAppendJoin}
         />
       ),
-    }
-  }
+    },
+    {
+      name: 'Explore',
+      headerButtons: [],
+      menuOptions: [],
+      render: () => <SchemaExplorer service={service} />,
+      headerOrientation: HANDLE_VERTICAL,
+    },
+  ]
 
-  private get scriptAndExplorer() {
-    const {
-      script,
-      status,
-      service,
-      onValidate,
-      suggestions,
-      onChangeScript,
-      onSubmitScript,
-    } = this.props
-
-    return [
-      {
-        name: 'Script',
-        handlePixels: 44,
-        headerOrientation: HANDLE_VERTICAL,
-        headerButtons: [
-          <div
-            key="validate"
-            className="btn btn-default btn-xs validate--button"
-            onClick={onValidate}
-          >
-            Validate
-          </div>,
-        ],
-        menuOptions: [],
-        render: visibility => (
-          <TimeMachineEditor
-            status={status}
-            script={script}
-            visibility={visibility}
-            suggestions={suggestions}
-            onChangeScript={onChangeScript}
-            onSubmitScript={onSubmitScript}
-          />
-        ),
-      },
-      {
-        name: 'Explore',
-        handlePixels: 44,
-        headerButtons: [],
-        menuOptions: [],
-        render: () => <SchemaExplorer service={service} />,
-        headerOrientation: HANDLE_VERTICAL,
-      },
-    ]
-  }
+  return (
+    <Threesizer
+      orientation={HANDLE_VERTICAL}
+      divisions={divisions}
+      containerClass="page-contents"
+    />
+  )
 }
 
 export default TimeMachine
