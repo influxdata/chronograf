@@ -264,6 +264,13 @@
               "$ref": "#/definitions/Proxy"
             },
             "required": true
+          },
+          {
+            "name": "uuid",
+            "in": "body",
+            "type": "string",
+            "description": "Client id for the query, will be returned with results",
+            "required": false
           }
         ],
         "responses": {

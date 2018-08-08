@@ -234,6 +234,7 @@ class ChronoTable extends PureComponent<Props, State> {
         [query],
         NULL_RESOLUTION,
         templates,
+        '',
         editQueryStatus
       )
 

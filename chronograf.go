@@ -194,6 +194,7 @@ type Query struct {
 	GroupBys []string `json:"groupbys,omitempty"` // GroupBys collate the query by these tags
 	Label    string   `json:"label,omitempty"`    // Label is the Y-Axis label for the data
 	Range    *Range   `json:"range,omitempty"`    // Range is the default Y-Axis range for the data
+	UUID     string   `json:"uuid,omitempty"`     // Indentifier from client to be added to the result
 }
 
 // DashboardQuery includes state for the query builder.  This is a transition

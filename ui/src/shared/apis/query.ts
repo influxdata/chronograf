@@ -31,12 +31,18 @@ export const fetchTimeSeries = async (
   queries: Query[],
   resolution: number,
   templates: Template[],
+  uuid: string,
   editQueryStatus: () => any = noop
 ) => {
   const timeSeriesPromises = queries.map(async query => {
     try {
       const text = await replace(query.text, source, templates, resolution)
-      return handleQueryFetchStatus({...query, text}, source, editQueryStatus)
+      return handleQueryFetchStatus(
+        {...query, text},
+        source,
+        uuid,
+        editQueryStatus
+      )
     } catch (error) {
       console.error(error)
       throw error
@@ -49,6 +55,7 @@ export const fetchTimeSeries = async (
 const handleQueryFetchStatus = async (
   query: Query,
   source: Source,
+  uuid: string,
   editQueryStatus: () => any
 ) => {
   const {database, rp} = query
@@ -61,6 +68,7 @@ const handleQueryFetchStatus = async (
       source: source.links.proxy,
       db,
       rp,
+      uuid,
       query: query.text,
     }
 

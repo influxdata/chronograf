@@ -1,6 +1,7 @@
 // Library
 import React, {Component} from 'react'
 import _ from 'lodash'
+import uuid from 'uuid'
 
 // API
 import {fetchTimeSeries} from 'src/shared/apis/query'
@@ -70,6 +71,8 @@ class TimeSeries extends Component<Props, State> {
     }
   }
 
+  private latestUUID: string = uuid.v1()
+
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -130,13 +133,21 @@ class TimeSeries extends Component<Props, State> {
     const TEMP_RES = 300
 
     try {
+      this.latestUUID = uuid.v1()
+
       const timeSeries = await fetchTimeSeries(
         source,
         queries,
         TEMP_RES,
         templates,
+        this.latestUUID,
         editQueryStatus
       )
+
+      const comparer = _.get(timeSeries, '0', {uuid: null})
+      if (comparer.uuid !== this.latestUUID) {
+        return
+      }
 
       const newSeries = timeSeries.map((response: TimeSeriesResponse) => ({
         response,

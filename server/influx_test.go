@@ -67,7 +67,7 @@ func TestService_Influx(t *testing.T) {
 					"http://any.url",
 					ioutil.NopCloser(
 						bytes.NewReader([]byte(
-							`{"db":"bob", "rp":"joe", "query":"SELECT mean(\"usage_user\") FROM cpu WHERE \"cpu\" = 'cpu-total' AND time > now() - 10m GROUP BY host;"}`,
+							`{"db":"bob", "rp":"joe", "uuid": "bob", "query":"SELECT mean(\"usage_user\") FROM cpu WHERE \"cpu\" = 'cpu-total' AND time > now() - 10m GROUP BY host;"}`,
 						)),
 					),
 				),
@@ -76,7 +76,7 @@ func TestService_Influx(t *testing.T) {
 			want: want{
 				StatusCode:  http.StatusOK,
 				ContentType: "application/json",
-				Body: `{"results":{"results":[{"statement_id":0,"series":[{"name":"cpu","columns":["key","value"],"values":[["cpu","cpu-total"],["cpu","cpu0"],["cpu","cpu1"],["cpu","cpu2"],["cpu","cpu3"],["host","pineapples-MBP"],["host","pineapples-MacBook-Pro.local"]]}]}]}}
+				Body: `{"results":{"results":[{"statement_id":0,"series":[{"name":"cpu","columns":["key","value"],"values":[["cpu","cpu-total"],["cpu","cpu0"],["cpu","cpu1"],["cpu","cpu2"],["cpu","cpu3"],["host","pineapples-MBP"],["host","pineapples-MacBook-Pro.local"]]}]}]},"uuid":"bob"}
 `,
 			},
 		},
