@@ -1,6 +1,5 @@
 import React, {ChangeEvent, KeyboardEvent, PureComponent} from 'react'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import './wizard-text-input.scss'
 
 interface Validation {
   status: boolean
@@ -62,12 +61,12 @@ class WizardTextInput extends PureComponent<Props, State> {
     }
 
     return (
-      <div className="form-group col-xs-6 wizard-input">
+      <div className="form-group col-xs-6">
         <label htmlFor={label}>{label}</label>
         <input
           type="text"
           id={label}
-          className={`form-control input-sm wizard-input ${inputClass}`}
+          className={`form-control input-sm ${inputClass}`}
           value={value}
           placeholder={placeholder}
           onBlur={this.handleBlur}
