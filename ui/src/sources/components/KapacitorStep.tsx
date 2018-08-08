@@ -42,17 +42,27 @@ interface State {
   exists: boolean
 }
 
+const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
+  const ActiveSource = sources.find(s => s.id === source.id)
+  if (!ActiveSource || !ActiveSource.kapacitors) {
+    return null
+  }
+  const activeKapacitor = ActiveSource.kapacitors.find(k => k.active)
+  return activeKapacitor
+}
+
 @ErrorHandling
 class KapacitorStep extends PureComponent<Props, State> {
   public static getDerivedStateFromProps(props: Props, state: State) {
     const kapacitorInState = state.existingKapacitor
     const {source, sources} = props
-
     if (source && sources) {
-      const kapacitorInProps = sources
-        .filter(s => s.id === source.id)[0]
-        .kapacitors.filter(k => k.active)[0]
-      if (kapacitorInState && kapacitorInState.id !== kapacitorInProps.id) {
+      const kapacitorInProps = getActiveKapacitor(source, sources)
+      if (
+        kapacitorInProps &&
+        kapacitorInState &&
+        kapacitorInState.id !== kapacitorInProps.id
+      ) {
         return {existingKapacitor: kapacitorInProps}
       }
     }
