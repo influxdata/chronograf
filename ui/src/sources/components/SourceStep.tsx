@@ -148,8 +148,9 @@ class SourceStep extends PureComponent<Props, State> {
         {this.isHTTPS && (
           <WizardCheckbox
             isChecked={source.insecureSkipVerify}
-            text={`Unsafe SSL: ${insecureSkipVerifyText}`}
+            text={`Unsafe SSL`}
             onChange={this.onChangeInput('insecureSkipVerify')}
+            subtext={insecureSkipVerifyText}
           />
         )}
         {onBoarding &&

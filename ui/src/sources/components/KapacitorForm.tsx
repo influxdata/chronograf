@@ -51,8 +51,9 @@ class KapacitorForm extends PureComponent<Props> {
         {this.isHTTPS && (
           <WizardCheckbox
             isChecked={kapacitor.insecureSkipVerify}
-            text={`Unsafe SSL: ${insecureSkipVerifyText}`}
+            text={`Unsafe SSL`}
             onChange={onChangeInput('insecureSkipVerify')}
+            subtext={insecureSkipVerifyText}
           />
         )}
       </>
