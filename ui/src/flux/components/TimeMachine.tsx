@@ -1,8 +1,13 @@
 import React, {SFC} from 'react'
+
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import BodyBuilder from 'src/flux/components/BodyBuilder'
+import TimeMachineVis from 'src/flux/components/TimeMachineVis'
 import TimeMachineEditor from 'src/flux/components/TimeMachineEditor'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
+
+import {HANDLE_VERTICAL, HANDLE_HORIZONTAL} from 'src/shared/constants'
+
 import {
   Suggestion,
   OnChangeScript,
@@ -11,9 +16,7 @@ import {
   FlatBody,
   ScriptStatus,
 } from 'src/types/flux'
-
 import {Service} from 'src/types'
-import {HANDLE_VERTICAL} from 'src/shared/constants'
 
 interface Props {
   service: Service
@@ -48,7 +51,7 @@ const TimeMachine: SFC<Props> = props => {
     onSubmitScript,
   } = props
 
-  const divisions = [
+  const verticalDivisions = [
     {
       name: 'Script',
       headerOrientation: HANDLE_VERTICAL,
@@ -77,7 +80,6 @@ const TimeMachine: SFC<Props> = props => {
       name: 'Build',
       headerButtons: [],
       menuOptions: [],
-      size: 0.67,
       render: () => (
         <BodyBuilder
           body={body}
@@ -98,10 +100,33 @@ const TimeMachine: SFC<Props> = props => {
     },
   ]
 
+  const horizontalDivisions = [
+    {
+      name: '',
+      handleDisplay: 'none',
+      headerButtons: [],
+      menuOptions: [],
+      render: () => <TimeMachineVis service={service} script={script} />,
+      headerOrientation: HANDLE_HORIZONTAL,
+    },
+    {
+      name: '',
+      headerButtons: [],
+      menuOptions: [],
+      render: () => (
+        <Threesizer
+          orientation={HANDLE_VERTICAL}
+          divisions={verticalDivisions}
+        />
+      ),
+      headerOrientation: HANDLE_HORIZONTAL,
+    },
+  ]
+
   return (
     <Threesizer
-      orientation={HANDLE_VERTICAL}
-      divisions={divisions}
+      orientation={HANDLE_HORIZONTAL}
+      divisions={horizontalDivisions}
       containerClass="page-contents"
     />
   )

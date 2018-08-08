@@ -25,6 +25,10 @@ $flux-string-hover: $c-wasabi;
 $flux-boolean-hover: $c-rainforest;
 $flux-invalid-hover: $c-dreamsicle;
 
+$flux-builder-vis-height: 550px;
+$flux-builder-yield-tabs-min-width: 180px;
+$flux-builder-yield-tabs-max-width: 400px;
+
 // Shared Node styles
 %flux-node {
   min-height: $flux-node-height;
@@ -524,4 +528,54 @@ $flux-filter-parens: $g5-pepper;
   .flux-filter--paren-open+.flux-filter--key+.flux-filter--operator+.flux-filter--value+.flux-filter--operator+.flux-filter--key+.flux-filter--operator+.flux-filter--value+.flux-filter--operator {
     background-color: $c-amethyst;
   }
+}
+
+.yield-node--graph {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 8px 16px;
+  background-color: $g3-castle;
+  border-radius: 0 0 $radius $radius;
+}
+
+.yield-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - #{$flux-node-gap});
+  height: $flux-builder-vis-height;
+  margin-bottom: $flux-node-tooltip-gap / 2;
+  margin-top: $flux-node-tooltip-gap / 2;
+  margin-left: $flux-node-gap;
+
+  // Hide Horizontal Line
+  & > .func-node--connector:after {
+    content: none;
+  }
+}
+
+.yield-node--controls {
+  background-color: $g3-castle;
+  padding: $flux-node-padding;
+  border-radius: $radius $radius 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.yield-node--name {
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 6px;
+  @include no-user-select();
+  color: $c-honeydew;
+}
+
+.yield-node--visualization {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: none;
+  width: 100%;
+  height: 100%;
 }

@@ -16,25 +16,16 @@ interface Props {
 
 class FluxGraph extends PureComponent<Props> {
   public render() {
-    const containerStyle = {
-      width: 'calc(100% - 32px)',
-      height: 'calc(100% - 16px)',
-      position: 'absolute',
-    }
-
     return (
-      <div className="yield-node--graph">
-        <Dygraph
-          labels={this.labels}
-          staticLegend={false}
-          timeSeries={this.timeSeries}
-          colors={DEFAULT_LINE_COLORS}
-          dygraphSeries={this.dygraphSeries}
-          options={this.options}
-          containerStyle={containerStyle}
-          handleSetHoverTime={this.props.setHoverTime}
-        />
-      </div>
+      <Dygraph
+        labels={this.labels}
+        staticLegend={false}
+        timeSeries={this.timeSeries}
+        colors={DEFAULT_LINE_COLORS}
+        dygraphSeries={this.dygraphSeries}
+        options={this.options}
+        handleSetHoverTime={this.props.setHoverTime}
+      />
     )
   }
 
