@@ -3,8 +3,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import SlideToggle from 'src/reusable_ui/components/slide_toggle/SlideToggle'
 import {ComponentColor, ComponentSize} from 'src/reusable_ui/types'
 
-import './wizard-text-input.scss'
-
 interface Props {
   isChecked: boolean
   text: string
@@ -17,15 +15,16 @@ class WizardCheckbox extends PureComponent<Props> {
     const {text, isChecked} = this.props
 
     return (
-      <div className="form-group col-xs-12">
-        <div className=" form-control-static">
+      <div className="form-group col-xs-12 wizard-checkbox--group">
+        <div className="form-control-static">
           <SlideToggle
             color={ComponentColor.Success}
             size={ComponentSize.ExtraSmall}
             active={isChecked}
             onChange={this.onChangeSlideToggle}
+            tooltipText={text}
           />
-          {text}
+          <span className="wizard-checkbox--label">{text}</span>
         </div>
       </div>
     )
