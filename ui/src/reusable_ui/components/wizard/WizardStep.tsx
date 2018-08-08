@@ -5,9 +5,6 @@ import React, {PureComponent, ReactNode} from 'react'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
 
-// Styles
-import 'src/reusable_ui/components/wizard/WizardStep.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {

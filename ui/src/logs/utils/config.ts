@@ -15,6 +15,7 @@ import {
   EncodingTypes,
   EncodingLabelOptions,
   EncodingVisibilityOptions,
+  DEFAULT_TRUNCATION,
 } from 'src/logs/constants'
 
 export const logConfigServerToUI = (
@@ -42,6 +43,7 @@ export const logConfigServerToUI = (
     tableColumns: convertedColumns,
     severityFormat,
     severityLevelColors,
+    isTruncated: DEFAULT_TRUNCATION,
   }
 }
 

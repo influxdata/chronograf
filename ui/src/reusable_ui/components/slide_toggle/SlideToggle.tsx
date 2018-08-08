@@ -5,9 +5,6 @@ import classnames from 'classnames'
 // Types
 import {ComponentColor, ComponentSize} from 'src/reusable_ui/types'
 
-// Styles
-import 'src/reusable_ui/components/slide_toggle/SlideToggle.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {

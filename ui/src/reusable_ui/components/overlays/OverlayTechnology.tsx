@@ -2,9 +2,6 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 
-// Styles
-import 'src/reusable_ui/components/overlays/Overlay.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
