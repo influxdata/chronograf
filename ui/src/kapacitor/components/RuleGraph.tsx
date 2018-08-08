@@ -57,7 +57,11 @@ class RuleGraph extends PureComponent<Props> {
           />
         </div>
         <div className="dygraph graph--hasYLabel" style={this.style}>
-          <TimeSeries source={source} queries={this.queries}>
+          <TimeSeries
+            timeRange={timeRange}
+            source={source}
+            queries={this.queries}
+          >
             {data => {
               const {labels, timeSeries, dygraphSeries} = timeSeriesToDygraph(
                 data.timeSeries,

@@ -8,9 +8,6 @@ import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressB
 import {WizardStepProps, Step} from 'src/types/wizard'
 import {StepStatus} from 'src/reusable_ui/constants/wizard'
 
-// Styles
-import 'src/reusable_ui/components/wizard/WizardController.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface State {

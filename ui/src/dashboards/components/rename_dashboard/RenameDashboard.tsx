@@ -7,9 +7,6 @@ import {
   DEFAULT_DASHBOARD_NAME,
 } from 'src/dashboards/constants/index'
 
-// Styles
-import 'src/dashboards/components/rename_dashboard/RenameDashboard.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {

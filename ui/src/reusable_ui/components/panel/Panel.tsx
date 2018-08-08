@@ -8,9 +8,6 @@ import PanelHeader from 'src/reusable_ui/components/panel/PanelHeader'
 import PanelBody from 'src/reusable_ui/components/panel/PanelBody'
 import PanelFooter from 'src/reusable_ui/components/panel/PanelFooter'
 
-// Styles
-import 'src/reusable_ui/components/panel/Panel.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 export enum PanelType {

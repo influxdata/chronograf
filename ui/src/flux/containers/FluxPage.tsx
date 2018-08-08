@@ -130,6 +130,7 @@ export class FluxPage extends PureComponent<Props, State> {
     const {
       service,
       services,
+      source,
       sources,
       onGoToEditFlux,
       onChangeService,
@@ -141,6 +142,7 @@ export class FluxPage extends PureComponent<Props, State> {
 
     return (
       <FluxHeader
+        source={source}
         service={service}
         sources={sources}
         services={services}

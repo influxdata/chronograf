@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/influxdata/chronograf/id"
@@ -15,9 +16,9 @@ import (
 
 const (
 	// AllAnnotations returns all annotations from the chronograf database
-	AllAnnotations = `SELECT "start_time", "modified_time_ns", "text", "type", "id" FROM "annotations" WHERE "deleted"=false AND time >= %dns and "start_time" <= %d ORDER BY time DESC`
+	AllAnnotations = `SELECT * FROM "annotations" WHERE "deleted"=false AND time >= %dns and "start_time" <= %d %s ORDER BY time DESC`
 	// GetAnnotationID returns all annotations from the chronograf database where id is %s
-	GetAnnotationID = `SELECT "start_time", "modified_time_ns", "text", "type", "id" FROM "annotations" WHERE "id"='%s' AND "deleted"=false ORDER BY time DESC`
+	GetAnnotationID = `SELECT * FROM "annotations" WHERE "id"='%s' AND "deleted"=false ORDER BY time DESC`
 	// AnnotationsDB is chronograf.  Perhaps later we allow this to be changed
 	AnnotationsDB = "chronograf"
 	// DefaultRP is autogen. Perhaps later we allow this to be changed
@@ -45,8 +46,20 @@ func NewAnnotationStore(client chronograf.TimeSeries) *AnnotationStore {
 }
 
 // All lists all Annotations
-func (a *AnnotationStore) All(ctx context.Context, start, stop time.Time) ([]chronograf.Annotation, error) {
-	return a.queryAnnotations(ctx, fmt.Sprintf(AllAnnotations, start.UnixNano(), stop.UnixNano()))
+func (a *AnnotationStore) All(ctx context.Context, start, stop time.Time, filters []*chronograf.AnnotationTagFilter) ([]chronograf.Annotation, error) {
+	exprs := make([]string, len(filters))
+
+	for i, f := range filters {
+		exprs[i] = f.String()
+	}
+
+	expr := ""
+
+	if len(exprs) > 0 {
+		expr = " AND " + strings.Join(exprs, " AND ")
+	}
+
+	return a.queryAnnotations(ctx, fmt.Sprintf(AllAnnotations, start.UnixNano(), stop.UnixNano(), expr))
 }
 
 // Get retrieves an annotation
@@ -131,39 +144,49 @@ func (a *AnnotationStore) queryAnnotations(ctx context.Context, query string) ([
 }
 
 func toPoint(anno *chronograf.Annotation, now time.Time) chronograf.Point {
+	tags := chronograf.AnnotationTags{
+		"id": anno.ID,
+	}
+
+	for k, v := range anno.Tags {
+		tags[k] = v
+	}
+
 	return chronograf.Point{
 		Database:        AnnotationsDB,
 		RetentionPolicy: DefaultRP,
 		Measurement:     DefaultMeasurement,
 		Time:            anno.EndTime.UnixNano(),
-		Tags: map[string]string{
-			"id": anno.ID,
-		},
+		Tags:            tags,
 		Fields: map[string]interface{}{
 			"deleted":          false,
 			"start_time":       anno.StartTime.UnixNano(),
 			"modified_time_ns": int64(now.UnixNano()),
 			"text":             anno.Text,
-			"type":             anno.Type,
 		},
 	}
 }
 
 func toDeletedPoint(anno *chronograf.Annotation, now time.Time) chronograf.Point {
+	tags := chronograf.AnnotationTags{
+		"id": anno.ID,
+	}
+
+	for k, v := range anno.Tags {
+		tags[k] = v
+	}
+
 	return chronograf.Point{
 		Database:        AnnotationsDB,
 		RetentionPolicy: DefaultRP,
 		Measurement:     DefaultMeasurement,
 		Time:            anno.EndTime.UnixNano(),
-		Tags: map[string]string{
-			"id": anno.ID,
-		},
+		Tags:            tags,
 		Fields: map[string]interface{}{
 			"deleted":          true,
 			"start_time":       int64(0),
 			"modified_time_ns": int64(now.UnixNano()),
 			"text":             "",
-			"type":             "",
 		},
 	}
 }
@@ -202,7 +225,8 @@ func (v value) String(idx int) (string, error) {
 
 type influxResults []struct {
 	Series []struct {
-		Values []value `json:"values"`
+		Columns []string `json:"columns"`
+		Values  []value  `json:"values"`
 	} `json:"series"`
 }
 
@@ -220,31 +244,78 @@ func (r *influxResults) Annotations() (res []chronograf.Annotation, err error) {
 	annos := map[string]annotationResult{}
 	for _, u := range *r {
 		for _, s := range u.Series {
+			columnIndex := map[string]int{}
+
+			for i, c := range s.Columns {
+				columnIndex[c] = i
+			}
+
+			indexOf := func(k string) (int, error) {
+				i, prs := columnIndex[k]
+
+				if !prs {
+					return -1, fmt.Errorf("Could not find %q in annotation", k)
+				}
+
+				return i, nil
+			}
+
 			for _, v := range s.Values {
 				anno := annotationResult{}
+				var i int
 
-				if anno.EndTime, err = v.Time(0); err != nil {
+				i, err = indexOf("time")
+				if err != nil {
+					return
+				}
+				if anno.EndTime, err = v.Time(i); err != nil {
 					return
 				}
 
-				if anno.StartTime, err = v.Time(1); err != nil {
+				i, err = indexOf("start_time")
+				if err != nil {
+					return
+				}
+				if anno.StartTime, err = v.Time(i); err != nil {
 					return
 				}
 
-				if anno.modTime, err = v.Int64(2); err != nil {
+				i, err = indexOf("modified_time_ns")
+				if err != nil {
+					return
+				}
+				if anno.modTime, err = v.Int64(i); err != nil {
 					return
 				}
 
-				if anno.Text, err = v.String(3); err != nil {
+				i, err = indexOf("text")
+				if err != nil {
+					return
+				}
+				if anno.Text, err = v.String(i); err != nil {
 					return
 				}
 
-				if anno.Type, err = v.String(4); err != nil {
+				i, err = indexOf("id")
+				if err != nil {
+					return
+				}
+				if anno.ID, err = v.String(i); err != nil {
 					return
 				}
 
-				if anno.ID, err = v.String(5); err != nil {
-					return
+				anno.Tags = chronograf.AnnotationTags{}
+
+				// Collect all other columns as tags
+				for i, vv := range v {
+					key := s.Columns[i]
+					err := chronograf.ValidateAnnotationTagKey(key)
+					svv, ok := vv.(string)
+
+					// Ignore blacklisted tags and tags that cannot be coerced to a string
+					if err == nil && ok {
+						anno.Tags[key] = svv
+					}
 				}
 
 				// If there are two annotations with the same id, take

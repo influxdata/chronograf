@@ -5,6 +5,7 @@ import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import {Service, Source, ServiceLinks, SourceLinks} from 'src/types'
 
 interface Props {
+  source: Source
   service: Service
   services: Service[]
   sources: Source[]
@@ -91,8 +92,13 @@ class SourceDropdown extends PureComponent<Props> {
   }
 
   private get selectedID(): string {
-    const {service} = this.props
-    return service.sourceID + '-' + service.id
+    const {service, source} = this.props
+
+    if (service) {
+      return `${service.sourceID}-${service.id}`
+    }
+
+    return source.id
   }
 }
 

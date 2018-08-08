@@ -18,9 +18,6 @@ import {
   IconFont,
 } from 'src/reusable_ui/types'
 
-// Styles
-import 'src/reusable_ui/components/dropdowns/Dropdown.scss'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
