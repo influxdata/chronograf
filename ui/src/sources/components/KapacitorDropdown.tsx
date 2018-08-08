@@ -4,7 +4,6 @@ import {withRouter, WithRouterProps} from 'react-router'
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
-import {SetActiveKapacitor} from 'src/shared/actions/sources'
 import Button from 'src/reusable_ui/components/Button'
 import {ToggleVisibility} from 'src/types/wizard'
 
@@ -19,20 +18,28 @@ import {Source, Kapacitor} from 'src/types'
 interface Props {
   source: Source
   kapacitors: Kapacitor[]
-  setActiveKapacitor: SetActiveKapacitor
+  setActiveKapacitor: (k: KapacitorItem) => void
   deleteKapacitor: (Kapacitor: Kapacitor) => void
   toggleWizard?: ToggleVisibility
+  buttonSize?: string
+  suppressEdit?: boolean
+  onAddNew?: () => void
+  displayValue?: string
 }
 
-interface KapacitorItem {
+export interface KapacitorItem {
   text: string
   resource: string
   kapacitor: Kapacitor
 }
 
 class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
+  public static defaultProps: Partial<Props> = {
+    buttonSize: 'btn-xs',
+  }
+
   public render() {
-    const {setActiveKapacitor, deleteKapacitor, router} = this.props
+    const {buttonSize, setActiveKapacitor} = this.props
 
     if (this.isKapacitorsEmpty) {
       return (
@@ -57,30 +64,14 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
         <Dropdown
           className="dropdown-260"
           buttonColor="btn-primary"
-          buttonSize="btn-xs"
+          buttonSize={buttonSize}
           items={this.kapacitorItems}
           onChoose={setActiveKapacitor}
           addNew={{
             text: 'Add Kapacitor Connection',
-            handler: this.launchWizard,
+            handler: this.handleAddNew,
           }}
-          actions={[
-            {
-              icon: 'pencil',
-              text: 'edit',
-              handler: item => {
-                router.push(`${item.resource}/edit`)
-              },
-            },
-            {
-              icon: 'trash',
-              text: 'delete',
-              handler: item => {
-                deleteKapacitor(item.kapacitor)
-              },
-              confirmable: true,
-            },
-          ]}
+          actions={this.dropdownActions}
           selected={this.selected}
         />
       </Authorized>
@@ -93,6 +84,37 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
     )
   }
 
+  private get dropdownActions() {
+    const {deleteKapacitor, router, suppressEdit} = this.props
+
+    const deleteAction = [
+      {
+        icon: 'trash',
+        text: 'delete',
+        handler: item => {
+          deleteKapacitor(item.kapacitor)
+        },
+        confirmable: true,
+      },
+    ]
+
+    const editAction = [
+      {
+        icon: 'pencil',
+        text: 'edit',
+        handler: item => {
+          router.push(`${item.resource}/edit`)
+        },
+      },
+    ]
+
+    if (suppressEdit) {
+      return deleteAction
+    }
+
+    return [...editAction, ...deleteAction]
+  }
+
   private get isKapacitorsEmpty(): boolean {
     const {kapacitors} = this.props
     return !kapacitors || kapacitors.length === 0
@@ -100,7 +122,6 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
 
   private get kapacitorItems(): KapacitorItem[] {
     const {kapacitors, source} = this.props
-
     return kapacitors.map(k => {
       return {
         text: k.name,
@@ -115,7 +136,13 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   }
 
   private get selected(): string {
+    const {displayValue} = this.props
     let selected = ''
+
+    if (displayValue) {
+      return displayValue
+    }
+
     if (this.activeKapacitor) {
       selected = this.activeKapacitor.name
     } else {
@@ -123,6 +150,15 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
     }
 
     return selected
+  }
+
+  private handleAddNew = () => {
+    const {onAddNew} = this.props
+    if (onAddNew) {
+      onAddNew()
+    } else {
+      this.launchWizard()
+    }
   }
 
   private launchWizard = () => {
