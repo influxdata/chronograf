@@ -86,7 +86,13 @@ export class FluxPage extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {links} = this.props
+    const {links, script} = this.props
+
+    try {
+      this.debouncedASTResponse(script)
+    } catch (error) {
+      console.error('Could not retrieve AST for script', error)
+    }
 
     try {
       const suggestions = await getSuggestions(links.suggestions)
