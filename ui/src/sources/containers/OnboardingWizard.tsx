@@ -88,6 +88,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
               ref={c => (this.kapacitorStepRef = c && c.getWrappedInstance())}
               setError={this.handleSetKapacitorError}
               source={source}
+              onBoarding={true}
             />
           </WizardStep>
           <WizardStep

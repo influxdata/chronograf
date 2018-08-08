@@ -31,6 +31,7 @@ interface Props {
   source: Source
   setError?: (b: boolean) => void
   sources: Source[]
+  onBoarding?: boolean
   deleteKapacitor: sourcesActions.DeleteKapacitor
   setActiveKapacitor: sourcesActions.SetActiveKapacitor
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
@@ -53,6 +54,9 @@ const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
 
 @ErrorHandling
 class KapacitorStep extends PureComponent<Props, State> {
+  public static defaultProps: Partial<Props> = {
+    onBoarding: false,
+  }
   public static getDerivedStateFromProps(props: Props, state: State) {
     const kapacitorInState = state.existingKapacitor
     const {source, sources} = props
@@ -100,11 +104,11 @@ class KapacitorStep extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {setError} = this.props
+    const {setError, onBoarding} = this.props
 
     return (
       <>
-        {this.kapacitorDropdown}
+        {!onBoarding && this.kapacitorDropdown}
         <KapacitorForm
           setError={setError}
           kapacitor={this.currentKapacitor}
