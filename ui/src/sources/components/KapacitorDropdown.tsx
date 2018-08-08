@@ -23,6 +23,8 @@ interface Props {
   toggleWizard?: ToggleVisibility
   buttonSize?: string
   suppressEdit?: boolean
+  onAddNew?: () => void
+  displayValue?: string
 }
 
 export interface KapacitorItem {
@@ -35,6 +37,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   public static defaultProps: Partial<Props> = {
     buttonSize: 'btn-xs',
   }
+
   public render() {
     const {buttonSize, setActiveKapacitor} = this.props
 
@@ -66,7 +69,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
           onChoose={setActiveKapacitor}
           addNew={{
             text: 'Add Kapacitor Connection',
-            handler: this.launchWizard,
+            handler: this.handleAddNew,
           }}
           actions={this.dropdownActions}
           selected={this.selected}
@@ -133,7 +136,13 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   }
 
   private get selected(): string {
+    const {displayValue} = this.props
     let selected = ''
+
+    if (displayValue) {
+      return displayValue
+    }
+
     if (this.activeKapacitor) {
       selected = this.activeKapacitor.name
     } else {
@@ -141,6 +150,15 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
     }
 
     return selected
+  }
+
+  private handleAddNew = () => {
+    const {onAddNew} = this.props
+    if (onAddNew) {
+      onAddNew()
+    } else {
+      this.launchWizard()
+    }
   }
 
   private launchWizard = () => {

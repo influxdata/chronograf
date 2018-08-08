@@ -25,6 +25,7 @@ interface State {
 @ErrorHandling
 class WizardTextInput extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
+    value: '',
     isDisabled: false,
     isValid: () => ({
       status: true,

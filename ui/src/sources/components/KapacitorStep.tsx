@@ -4,22 +4,17 @@ import {connect} from 'react-redux'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import WizardTextInput from 'src/reusable_ui/components/wizard/WizardTextInput'
-import WizardCheckbox from 'src/reusable_ui/components/wizard/WizardCheckbox'
 import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
+import KapacitorForm from 'src/sources/components/KapacitorForm'
 
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import * as sourcesActions from 'src/shared/actions/sources'
 
-// Utils
-import {getDeep} from 'src/utils/wrappers'
-
 // APIs
 import {createKapacitor, pingKapacitor} from 'src/shared/apis'
 
 // Constants
-import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {
   notifyKapacitorCreateFailed,
   notifyKapacitorSuccess,
@@ -41,27 +36,45 @@ interface Props {
 }
 
 interface State {
-  kapacitor: Kapacitor
+  newKapacitor: Kapacitor
+  existingKapacitor: Kapacitor
   exists: boolean
 }
 
 @ErrorHandling
 class KapacitorStep extends PureComponent<Props, State> {
+  public static getDerivedStateFromProps(props: Props, state: State) {
+    const kapacitorInState = state.existingKapacitor
+    const {source, sources} = props
+
+    if (source && sources) {
+      const kapacitorInProps = sources
+        .filter(s => s.id === source.id)[0]
+        .kapacitors.filter(k => k.active)[0]
+      if (kapacitorInState && kapacitorInState.id !== kapacitorInProps.id) {
+        return {existingKapacitor: kapacitorInProps}
+      }
+    }
+    return null
+  }
+
   constructor(props: Props) {
     super(props)
+
     this.state = {
-      kapacitor: DEFAULT_KAPACITOR,
+      newKapacitor: DEFAULT_KAPACITOR,
+      existingKapacitor: DEFAULT_KAPACITOR,
       exists: false,
     }
   }
 
   public next = async () => {
-    const {kapacitor} = this.state
+    const {newKapacitor} = this.state
     const {notify, source, setError} = this.props
 
     try {
-      const {data} = await createKapacitor(source, kapacitor)
-      this.setState({kapacitor: data})
+      const {data} = await createKapacitor(source, newKapacitor)
+      this.setState({newKapacitor: data})
       this.checkKapacitorConnection(data)
       notify(notifyKapacitorSuccess())
       setError(false)
@@ -75,54 +88,29 @@ class KapacitorStep extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {kapacitor} = this.state
+    const {setError} = this.props
+
     return (
       <>
         {this.kapacitorDropdown}
-        <WizardTextInput
-          value={kapacitor.url}
-          label="Kapacitor URL"
-          onChange={this.onChangeInput('url')}
-          valueModifier={this.URLModifier}
+        <KapacitorForm
+          setError={setError}
+          kapacitor={this.currentKapacitor}
+          onChangeInput={this.onChangeInput}
         />
-        <WizardTextInput
-          value={kapacitor.name}
-          label="Name"
-          onChange={this.onChangeInput('name')}
-        />
-        <WizardTextInput
-          value={kapacitor.username}
-          label="Username"
-          onChange={this.onChangeInput('username')}
-        />
-        <WizardTextInput
-          value={kapacitor.password}
-          label="Password"
-          onChange={this.onChangeInput('password')}
-        />
-        {this.isHTTPS && (
-          <WizardCheckbox
-            isChecked={kapacitor.insecureSkipVerify}
-            text={`Unsafe SSL: ${insecureSkipVerifyText}`}
-            onChange={this.onChangeInput('insecureSkipVerify')}
-          />
-        )}
       </>
     )
   }
 
-  private URLModifier = (value: string): string => {
-    const url = value.trim()
-    if (url.startsWith('http')) {
-      return url
-    }
-    return `http://${url}`
-  }
-
   private onChangeInput = (key: string) => (value: string | boolean) => {
     const {setError} = this.props
-    const {kapacitor} = this.state
-    this.setState({kapacitor: {...kapacitor, [key]: value}})
+    const {newKapacitor, existingKapacitor, exists} = this.state
+    if (exists) {
+      this.setState({existingKapacitor: {...existingKapacitor, [key]: value}})
+    } else {
+      this.setState({newKapacitor: {...newKapacitor, [key]: value}})
+    }
+
     setError(false)
   }
 
@@ -139,18 +127,33 @@ class KapacitorStep extends PureComponent<Props, State> {
 
   private handleSetActiveKapacitor = (item: KapacitorItem) => {
     this.props.setActiveKapacitor(item.kapacitor)
+    this.setState({
+      exists: true,
+    })
   }
 
-  private get isHTTPS(): boolean {
-    const {kapacitor} = this.state
-    return getDeep<string>(kapacitor, 'url', '').startsWith('https')
+  private resetDefault = () => {
+    this.setState({
+      newKapacitor: DEFAULT_KAPACITOR,
+      exists: false,
+    })
+  }
+
+  private get currentKapacitor() {
+    const {exists, existingKapacitor, newKapacitor} = this.state
+    if (exists) {
+      return existingKapacitor
+    }
+    return newKapacitor
   }
 
   private get kapacitorDropdown() {
+    const {newKapacitor, exists} = this.state
     const {source, sources, deleteKapacitor} = this.props
 
     if (source && sources) {
       const storeSource = sources.filter(s => s.id === source.id)[0]
+
       return (
         <div className="form-group col-xs-12 wizard-input">
           <KapacitorDropdown
@@ -160,11 +163,12 @@ class KapacitorStep extends PureComponent<Props, State> {
             deleteKapacitor={deleteKapacitor}
             setActiveKapacitor={this.handleSetActiveKapacitor}
             buttonSize="btn-sm"
+            onAddNew={this.resetDefault}
+            displayValue={!exists && newKapacitor.name}
           />
         </div>
       )
     }
-
     return
   }
 }

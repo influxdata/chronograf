@@ -444,7 +444,7 @@ export const DEFAULT_SOURCE = {
 
 export const DEFAULT_KAPACITOR = {
   url: 'http://localhost:9092',
-  name: 'My Kapacitor',
+  name: 'New Kapacitor',
   username: '',
   password: '',
   active: true,
