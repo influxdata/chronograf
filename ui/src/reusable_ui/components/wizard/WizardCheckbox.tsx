@@ -24,7 +24,12 @@ class WizardCheckbox extends PureComponent<Props> {
             onChange={this.onChangeSlideToggle}
             tooltipText={text}
           />
-          <span className="wizard-checkbox--label">{text}</span>
+          <span
+            className="wizard-checkbox--label"
+            onClick={this.onChangeSlideToggle}
+          >
+            {text}
+          </span>
         </div>
       </div>
     )
