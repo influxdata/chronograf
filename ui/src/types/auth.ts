@@ -10,7 +10,7 @@ export interface Organization {
 export interface Me {
   currentOrganization?: Organization
   superAdmin: boolean
-  role: string
+  role: Role
   scheme: string
   provider: string
   name: string

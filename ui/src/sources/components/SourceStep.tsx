@@ -30,19 +30,20 @@ import {
 } from 'src/shared/copy/notifications'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {DEFAULT_SOURCE} from 'src/shared/constants'
+import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
 // Types
-import {Source} from 'src/types'
+import {Source, Me} from 'src/types'
 
 interface Props {
   notify: typeof notifyAction
   addSource: typeof addSourceAction
   updateSource: typeof updateSourceAction
-  gotoPurgatory: () => void
   setError?: (b: boolean) => void
   source: Source
-  isUsingAuth: boolean
   onBoarding?: boolean
+  me: Me
+  isUsingAuth: boolean
 }
 
 interface State {
@@ -97,9 +98,10 @@ class SourceStep extends PureComponent<Props, State> {
 
   public render() {
     const {source} = this.state
-    const {isUsingAuth, gotoPurgatory, onBoarding} = this.props
+    const {isUsingAuth, onBoarding} = this.props
     return (
       <>
+        {isUsingAuth && onBoarding && this.authIndicator}
         <WizardTextInput
           value={source.url}
           label="Connection URL"
@@ -153,13 +155,26 @@ class SourceStep extends PureComponent<Props, State> {
             subtext={insecureSkipVerifyText}
           />
         )}
-        {onBoarding &&
-          isUsingAuth && (
-            <button className="btn btn-md btn-default" onClick={gotoPurgatory}>
-              <span className="icon shuffle" /> Switch Orgs
-            </button>
-          )}
       </>
+    )
+  }
+
+  private get authIndicator(): JSX.Element {
+    const {me} = this.props
+    return (
+      <div className="text-center">
+        {me.role.name === SUPERADMIN_ROLE ? (
+          <h4>
+            <strong>{me.currentOrganization.name}</strong> currently has no
+            connections
+          </h4>
+        ) : (
+          <h3>
+            <strong>{me.currentOrganization.name}</strong> has no connections
+            available to <em>{me.role}s</em>
+          </h3>
+        )}
+      </div>
     )
   }
 
@@ -203,12 +218,10 @@ class SourceStep extends PureComponent<Props, State> {
   }
 }
 
-const mstp = ({auth: {isUsingAuth, me}}) => ({isUsingAuth, me})
-
 const mdtp = {
   notify: notifyAction,
   addSource: addSourceAction,
   updateSource: updateSourceAction,
 }
 
-export default connect(mstp, mdtp, null, {withRef: true})(SourceStep)
+export default connect(null, mdtp, null, {withRef: true})(SourceStep)

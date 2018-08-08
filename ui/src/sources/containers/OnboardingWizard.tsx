@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
+import {connect} from 'react-redux'
 import _ from 'lodash'
 
 import WizardFullScreen from 'src/reusable_ui/components/wizard/WizardFullScreen'
@@ -11,7 +12,12 @@ import Notifications from 'src/shared/components/Notifications'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {Kapacitor, Source} from 'src/types'
+import {Kapacitor, Source, Me} from 'src/types'
+
+interface Props extends WithRouterProps {
+  me: Me
+  isUsingAuth: boolean
+}
 
 interface State {
   source: Partial<Source>
@@ -21,7 +27,7 @@ interface State {
 }
 
 @ErrorHandling
-class OnboardingWizard extends PureComponent<WithRouterProps, State> {
+class OnboardingWizard extends PureComponent<Props, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
   public completionStepRef: any
@@ -38,12 +44,17 @@ class OnboardingWizard extends PureComponent<WithRouterProps, State> {
 
   public render() {
     const {source, sourceError, kapacitorError} = this.state
+    const {me, isUsingAuth} = this.props
     return (
       <>
         <Notifications />
-        <WizardFullScreen title={'Welcome to Influx'}>
+        <WizardFullScreen
+          title={'Welcome to Influx'}
+          skipLinkText={'Switch Organizations'}
+          handleSkip={isUsingAuth ? this.gotoPurgatory : null}
+        >
           <WizardStep
-            title="Add a New InfluxDB Connection"
+            title="Add an InfluxDB Connection"
             tipText=""
             isComplete={this.isSourceComplete}
             isErrored={sourceError}
@@ -57,8 +68,9 @@ class OnboardingWizard extends PureComponent<WithRouterProps, State> {
               ref={c => (this.sourceStepRef = c && c.getWrappedInstance())}
               setError={this.handleSetSourceError}
               source={source}
-              gotoPurgatory={this.gotoPurgatory}
               onBoarding={true}
+              me={me}
+              isUsingAuth={isUsingAuth}
             />
           </WizardStep>
           <WizardStep
@@ -151,4 +163,6 @@ class OnboardingWizard extends PureComponent<WithRouterProps, State> {
   }
 }
 
-export default withRouter(OnboardingWizard)
+const mstp = ({auth: {isUsingAuth, me}}) => ({isUsingAuth, me})
+
+export default connect(mstp, null)(withRouter(OnboardingWizard))
