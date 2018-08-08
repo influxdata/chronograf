@@ -4,6 +4,8 @@ import _ from 'lodash'
 import moment from 'moment'
 import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
+import {withRouter, InjectedRouter} from 'react-router'
+
 import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
 
@@ -89,6 +91,7 @@ interface Props {
   changeFilter: (id: string, operator: string, value: string) => void
   getConfig: (url: string) => Promise<void>
   updateConfig: (url: string, config: LogConfig) => Promise<void>
+  router: InjectedRouter
   newRowsAdded: number
   timeRange: TimeRange
   histogramData: HistogramData
@@ -146,6 +149,12 @@ class LogsPage extends Component<Props, State> {
   }
 
   public componentDidUpdate() {
+    const {router} = this.props
+
+    if (!this.props.sources || this.props.sources.length === 0) {
+      return router.push(`/sources/new?redirectPath=${location.pathname}`)
+    }
+
     if (!this.props.currentSource && this.props.sources.length > 0) {
       const source =
         this.props.sources.find(src => {
@@ -161,8 +170,8 @@ class LogsPage extends Component<Props, State> {
     }
   }
 
-  public componentDidMount() {
-    this.props.getSources()
+  public async componentDidMount() {
+    await this.props.getSources()
     this.props.getConfig(this.logConfigLink)
 
     if (this.props.currentNamespace) {
@@ -729,4 +738,6 @@ const mapDispatchToProps = {
   updateConfig: updateLogConfigAsync,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LogsPage)
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(LogsPage)
+)
