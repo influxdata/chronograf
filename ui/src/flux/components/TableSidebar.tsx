@@ -31,12 +31,12 @@ export default class TableSidebar extends PureComponent<Props, State> {
     const {searchTerm} = this.state
 
     return (
-      <div className="yield-node--sidebar">
+      <div className="time-machine-sidebar">
         {!this.isDataEmpty && (
-          <div className="yield-node--sidebar-heading">
+          <div className="time-machine-sidebar--heading">
             <input
               type="text"
-              className="form-control input-xs yield-node--sidebar-filter"
+              className="form-control input-xs time-machine-sidebar--filter"
               onChange={this.handleSearch}
               placeholder="Filter tables"
               value={searchTerm}
@@ -44,7 +44,7 @@ export default class TableSidebar extends PureComponent<Props, State> {
           </div>
         )}
         <FancyScrollbar>
-          <div className="yield-node--tabs">
+          <div className="time-machine-sidebar--items">
             {this.data.map(({groupKey, id}) => {
               return (
                 <TableSidebarItem
