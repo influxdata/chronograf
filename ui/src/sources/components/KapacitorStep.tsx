@@ -12,13 +12,15 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import * as sourcesActions from 'src/shared/actions/sources'
 
 // APIs
-import {createKapacitor, pingKapacitor} from 'src/shared/apis'
+import {createKapacitor, updateKapacitor, pingKapacitor} from 'src/shared/apis'
 
 // Constants
 import {
   notifyKapacitorCreateFailed,
   notifyKapacitorSuccess,
   notifyKapacitorConnectionFailed,
+  notifyKapacitorUpdated,
+  notifyKapacitorUpdateFailed,
 } from 'src/shared/copy/notifications'
 import {DEFAULT_KAPACITOR} from 'src/shared/constants'
 
@@ -80,22 +82,37 @@ class KapacitorStep extends PureComponent<Props, State> {
   }
 
   public next = async () => {
-    const {newKapacitor} = this.state
+    const {newKapacitor, existingKapacitor, exists} = this.state
     const {notify, source, setError} = this.props
-
-    try {
-      const {data} = await createKapacitor(source, newKapacitor)
-      this.setState({newKapacitor: data})
-      this.checkKapacitorConnection(data)
-      notify(notifyKapacitorSuccess())
-      setError(false)
-      this.fetchNewKapacitors()
-      return {status: true, payload: data}
-    } catch (error) {
-      console.error(error)
-      notify(notifyKapacitorCreateFailed())
-      setError(true)
-      return {status: false, payload: null}
+    if (exists) {
+      try {
+        const {data} = await updateKapacitor(existingKapacitor)
+        await this.checkKapacitorConnection(data)
+        setError(false)
+        await this.fetchNewKapacitors()
+        notify(notifyKapacitorUpdated())
+        return {status: true, payload: data}
+      } catch (error) {
+        console.error(error)
+        setError(true)
+        notify(notifyKapacitorUpdateFailed())
+        return {status: false, payload: null}
+      }
+    } else {
+      try {
+        const {data} = await createKapacitor(source, newKapacitor)
+        this.setState({newKapacitor: data})
+        await this.checkKapacitorConnection(data)
+        setError(false)
+        await this.fetchNewKapacitors()
+        notify(notifyKapacitorSuccess())
+        return {status: true, payload: data}
+      } catch (error) {
+        console.error(error)
+        setError(true)
+        notify(notifyKapacitorCreateFailed())
+        return {status: false, payload: null}
+      }
     }
   }
 
