@@ -24,20 +24,23 @@ describe('WizardController', () => {
       children: 'thing',
       title: 'title of thing',
       isComplete: () => false,
-      onPrevious: jest.fn(),
-      onNext: jest.fn(),
+      isErrored: undefined,
+      onPrevious: undefined,
+      onNext: undefined,
       increment: undefined,
       decrement: undefined,
       tipText: undefined,
       nextLabel: undefined,
       previousLabel: undefined,
+      isBlockingStep: undefined,
+      lastStep: undefined,
       ...override,
     }
 
     return <WizardStep {...props} />
   }
 
-  describe('with no children', () => {
+  describe('with one child', () => {
     const wizardChild = childSetup({
       children: 'only step child',
       title: 'only wizard step',

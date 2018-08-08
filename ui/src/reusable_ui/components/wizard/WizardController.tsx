@@ -5,6 +5,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Step} from 'src/types/wizard'
 import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 import {StepStatus} from 'src/reusable_ui/constants/wizard'
+import {getDeep} from 'src/utils/wrappers'
 
 import 'src/reusable_ui/components/wizard/WizardController.scss'
 
@@ -24,6 +25,7 @@ interface Props {
 class WizardController extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     skipLinkText: 'skip',
+    jumpStep: -1,
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
@@ -67,11 +69,9 @@ class WizardController extends PureComponent<Props, State> {
 
   constructor(props: Props) {
     super(props)
-    const {jumpStep} = this.props
-    const currentStepIndex = _.isNull(jumpStep) ? -1 : jumpStep
     this.state = {
       steps: [],
-      currentStepIndex,
+      currentStepIndex: this.props.jumpStep,
     }
   }
 
@@ -132,7 +132,6 @@ class WizardController extends PureComponent<Props, State> {
     } else {
       currentChild = children[currentStepIndex]
     }
-
     return React.cloneElement<WizardStepProps>(currentChild, {
       increment: advance,
       decrement: retreat,
@@ -151,9 +150,7 @@ class WizardController extends PureComponent<Props, State> {
       currentChild = children[currentStepIndex]
     }
 
-    const {
-      props: {tipText},
-    } = currentChild
+    const tipText = getDeep(currentChild, 'props.tipText', '')
 
     if (tipText) {
       return (
