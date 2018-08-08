@@ -91,7 +91,7 @@ class SourceStep extends PureComponent<Props, State> {
           return {status: false, payload: null}
         }
       }
-      return {status: true, payload: null}
+      return {status: true, payload: source}
     }
   }
 
