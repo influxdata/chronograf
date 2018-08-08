@@ -63,7 +63,7 @@ class OnboardingWizard extends PureComponent<WithRouterProps, State> {
           </WizardStep>
           <WizardStep
             title="Add a Kapacitor Connection"
-            tipText="this step is optional"
+            tipText=""
             isComplete={this.isKapacitorComplete}
             isErrored={kapacitorError}
             isBlockingStep={true}
@@ -80,7 +80,7 @@ class OnboardingWizard extends PureComponent<WithRouterProps, State> {
           </WizardStep>
           <WizardStep
             title="You are complete"
-            tipText="yay"
+            tipText=""
             isComplete={this.isCompletionComplete}
             isErrored={false}
             onNext={this.handleCompletionNext}
