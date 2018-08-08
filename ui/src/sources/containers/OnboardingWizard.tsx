@@ -7,6 +7,7 @@ import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import SourceStep from 'src/sources/components/SourceStep'
 import KapacitorStep from 'src/sources/components/KapacitorStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
+import Notifications from 'src/shared/components/Notifications'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -37,9 +38,9 @@ class OnboardingWizard extends PureComponent<WithRouterProps, State> {
 
   public render() {
     const {source, sourceError, kapacitorError} = this.state
-
     return (
       <>
+        <Notifications />
         <WizardFullScreen title={'Welcome to Influx'}>
           <WizardStep
             title="Add a New InfluxDB Connection"
