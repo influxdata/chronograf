@@ -55,7 +55,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
 
   public render() {
     const {isVisible, toggleVisibility, jumpStep} = this.props
-    const {source, sourceError, kapacitorError} = this.state
+    const {source, sourceError, kapacitor, kapacitorError} = this.state
     return (
       <WizardOverlay
         visible={isVisible}
@@ -97,6 +97,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
             ref={c => (this.kapacitorStepRef = c && c.getWrappedInstance())}
             setError={this.handleSetKapacitorError}
             source={source}
+            kapacitor={kapacitor}
           />
         </WizardStep>
         <WizardStep

@@ -1,7 +1,8 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
+import {getDeep} from 'src/utils/wrappers'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -34,6 +35,7 @@ interface Props {
   setError?: (b: boolean) => void
   sources: Source[]
   onBoarding?: boolean
+  kapacitor: Kapacitor
   deleteKapacitor: sourcesActions.DeleteKapacitor
   setActiveKapacitor: sourcesActions.SetActiveKapacitor
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
@@ -46,6 +48,9 @@ interface State {
 }
 
 const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
+  if (!source || !sources) {
+    return null
+  }
   const ActiveSource = sources.find(s => s.id === source.id)
   if (!ActiveSource || !ActiveSource.kapacitors) {
     return null
@@ -55,23 +60,21 @@ const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
 }
 
 @ErrorHandling
-class KapacitorStep extends PureComponent<Props, State> {
+class KapacitorStep extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     onBoarding: false,
   }
+
   public static getDerivedStateFromProps(props: Props, state: State) {
-    const kapacitorInState = state.existingKapacitor
-    const {source, sources} = props
-    if (source && sources) {
-      const kapacitorInProps = getActiveKapacitor(source, sources)
-      if (
-        kapacitorInProps &&
-        kapacitorInState &&
-        kapacitorInState.id !== kapacitorInProps.id
-      ) {
-        return {existingKapacitor: kapacitorInProps}
-      }
+    const existingKID = getDeep<string>(state, 'existingKapacitor.id', '')
+    const lastSavedKapacitor = props.kapacitor
+    const exists = lastSavedKapacitor ? true : false
+    const activeKapacitor = getActiveKapacitor(props.source, props.sources)
+
+    if (activeKapacitor && existingKID !== activeKapacitor.id) {
+      return {existingKapacitor: activeKapacitor, exists}
     }
+
     return null
   }
 
