@@ -45,6 +45,7 @@ class LogsSearchBar extends PureComponent<Props, State> {
 
   private handleSearch = () => {
     this.props.onSearch(this.state.searchTerm)
+    this.setState({searchTerm: ''})
   }
 
   private handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {

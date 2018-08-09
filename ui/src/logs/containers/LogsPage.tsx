@@ -6,6 +6,8 @@ import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {withRouter, InjectedRouter} from 'react-router'
 
+import {searchToFilter} 'src/logs/utils/search'
+
 import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
 
@@ -528,7 +530,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleSubmitSearch = (value: string): void => {
-    this.props.setSearchTermAsync(value)
+    this.props.addFilter(searchToFilter(value))
   }
 
   private handleFilterDelete = (id: string): void => {
