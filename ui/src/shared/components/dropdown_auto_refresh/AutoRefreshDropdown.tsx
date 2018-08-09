@@ -89,10 +89,10 @@ class AutoRefreshDropdown extends Component<Props> {
 
   private get dropdownWidthPixels(): number {
     if (this.isPaused) {
-      return 82
+      return 50
     }
 
-    return 82
+    return 84
   }
 
   private get selectedID(): string {
