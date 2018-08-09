@@ -34,10 +34,10 @@ class SourceStep extends PureComponent<Props> {
 
   public render() {
     return (
-      <p>
-        You have successfully added a Source connection and a Kapacitor. You may
-        close this overlay to view your existing connections.
-      </p>
+      <>
+        <p>You have successfully added a Source connection and a Kapacitor. </p>
+        <p>Continue to view your existing connections.</p>
+      </>
     )
   }
 }

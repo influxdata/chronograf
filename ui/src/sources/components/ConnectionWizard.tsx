@@ -84,7 +84,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         </WizardStep>
         <WizardStep
           title="Add a Kapacitor Connection"
-          tipText="this step is optional"
+          tipText=""
           isComplete={this.isKapacitorComplete}
           isErrored={kapacitorError}
           isBlockingStep={true}
@@ -101,7 +101,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         </WizardStep>
         <WizardStep
           title="Setup Complete"
-          tipText="You are complete!"
+          tipText=""
           isComplete={this.isCompletionComplete}
           isErrored={false}
           onNext={this.handleCompletionNext}

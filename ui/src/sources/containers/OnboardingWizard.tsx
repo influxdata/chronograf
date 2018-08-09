@@ -92,13 +92,13 @@ class OnboardingWizard extends PureComponent<Props, State> {
             />
           </WizardStep>
           <WizardStep
-            title="You are complete"
+            title="Setup Complete"
             tipText=""
             isComplete={this.isCompletionComplete}
             isErrored={false}
             onNext={this.handleCompletionNext}
             onPrevious={this.handleCompletionPrev}
-            nextLabel="Connect to this source"
+            nextLabel="View All Connections"
             previousLabel="Go Back"
           >
             <CompletionStep
