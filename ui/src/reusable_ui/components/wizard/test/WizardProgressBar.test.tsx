@@ -62,12 +62,12 @@ describe('Wizard Progress Bar', () => {
       wrapper = setup({currentStepIndex: 2}, [true, true, false])
     })
 
-    it('renders two checkmark icons', () => {
-      expect(wrapper.find('.checkmark')).toHaveLength(2)
+    it('renders three checkmark icons', () => {
+      expect(wrapper.find('.checkmark')).toHaveLength(3)
     })
 
-    it('renders a current step indicator icon', () => {
-      expect(wrapper.find('.current')).toHaveLength(1)
+    it('renders no current step indicator icons', () => {
+      expect(wrapper.find('.current')).toHaveLength(0)
     })
 
     it('matches snapshot', () => {
