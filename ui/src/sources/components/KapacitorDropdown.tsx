@@ -41,7 +41,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   }
 
   public render() {
-    const {buttonSize, setActiveKapacitor, onAddNew} = this.props
+    const {buttonSize, onAddNew} = this.props
 
     if (this.isKapacitorsEmpty) {
       return (

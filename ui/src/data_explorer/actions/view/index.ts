@@ -395,8 +395,9 @@ export const editRawTextAsync = (
   try {
     const queries = await getQueryConfigAndStatus(url, [
       {
-        query: text,
+        text,
         id,
+        queryConfig: {tags: {}, areTagsAccepted: true},
       },
     ])
     const config = queries.find(q => q.id === id)

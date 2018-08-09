@@ -1,3 +1,5 @@
+import {SourceAuthenticationMethod} from 'src/types'
+
 export const source = {
   id: '2',
   name: 'minikube-influx',
@@ -7,6 +9,9 @@ export const source = {
   telegraf: 'telegraf',
   organization: 'default',
   role: 'viewer',
+  defaultRP: '',
+  insecureSkipVerify: false,
+  authentication: SourceAuthenticationMethod.Basic,
   links: {
     self: '/chronograf/v1/sources/2',
     kapacitors: '/chronograf/v1/sources/2/kapacitors',
@@ -17,6 +22,8 @@ export const source = {
     users: '/chronograf/v1/sources/2/users',
     databases: '/chronograf/v1/sources/2/dbs',
     annotations: '/chronograf/v1/sources/2/annotations',
+    services: '/chronograf/v1/sources/2/services',
+    health: '/chronograf/v1/sources/2/health',
   },
 }
 

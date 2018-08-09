@@ -163,7 +163,7 @@ class SourceStep extends PureComponent<Props, State> {
     const {me} = this.props
     return (
       <div className="text-center">
-        {me.role.name === SUPERADMIN_ROLE ? (
+        {me.role === SUPERADMIN_ROLE ? (
           <h4>
             <strong>{me.currentOrganization.name}</strong> currently has no
             connections

@@ -17,12 +17,12 @@ interface AddNew {
 }
 
 interface Props {
-  actions: DropdownAction[]
   items: DropdownItem[]
   onChoose: (item: DropdownItem) => void
-  onClick?: (e: MouseEvent<HTMLDivElement>) => void
-  addNew: AddNew
   selected: string
+  addNew?: AddNew
+  actions?: DropdownAction[]
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void
   iconName?: string
   className?: string
   buttonSize?: string

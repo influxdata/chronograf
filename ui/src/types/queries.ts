@@ -7,14 +7,14 @@ export interface Query {
 }
 
 export interface QueryConfig {
+  tags: Tags
+  areTagsAccepted: boolean
   id?: string
   database?: string
   measurement?: string
   retentionPolicy?: string
   fields?: Field[]
-  tags: Tags
   groupBy?: GroupBy
-  areTagsAccepted: boolean
   rawText?: string
   range?: DurationRange | null
   source?: Source | null // doesn't come from server -- is set in CellEditorOverlay

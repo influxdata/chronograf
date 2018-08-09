@@ -26,7 +26,13 @@ export const currentOrganization = {
 
 export const me = {
   currentOrganization,
+  superAdmin: false,
   role,
+  scheme: '',
+  provider: '',
+  name: '',
+  roles: [role],
+  organizations: [currentOrganization],
 }
 
 export const sourceLinks: SourceLinks = {

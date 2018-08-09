@@ -6,7 +6,12 @@ import _ from 'lodash'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 
 import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
-import {Source, Me} from 'src/types'
+import {Source, Role, Organization} from 'src/types'
+
+interface Me {
+  role: Role
+  currentOrganization: Organization
+}
 
 interface Props {
   me: Me

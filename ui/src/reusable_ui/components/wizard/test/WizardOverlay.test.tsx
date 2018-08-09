@@ -17,8 +17,10 @@ describe('WizardOverlay', () => {
       visible: undefined,
       title: undefined,
       toggleVisibility: () => jest.fn(),
+      resetWizardState: jest.fn(),
       skipLinkText: undefined,
       maxWidth: undefined,
+      jumpStep: undefined,
       ...override,
     }
 

@@ -1,13 +1,6 @@
 import AJAX from 'src/utils/ajax'
 import {AlertTypes} from 'src/kapacitor/constants'
-import {
-  Kapacitor,
-  Source,
-  Service,
-  NewService,
-  QueryConfig,
-  Query,
-} from 'src/types'
+import {Kapacitor, Source, Service, NewService, QueryConfig} from 'src/types'
 import {SpecificConfigOptions} from 'src/types/kapacitor'
 
 export const getSources = () => {
@@ -146,16 +139,14 @@ export const deleteKapacitor = async (kapacitor: Kapacitor): Promise<void> => {
   }
 }
 
-export const createKapacitor = (
-  source: Source,
-  {
+export const createKapacitor = (source: Source, kapacitor: Kapacitor) => {
+  const {
     url,
-    name = 'My Kapacitor',
+    name = 'New Kapacitor',
     username,
     password,
     insecureSkipVerify,
-  }: Kapacitor
-) => {
+  } = kapacitor
   return AJAX({
     url: source.links.kapacitors,
     method: 'POST',
@@ -172,7 +163,7 @@ export const createKapacitor = (
 export const updateKapacitor = ({
   links,
   url,
-  name = 'My Kapacitor',
+  name = 'New Kapacitor',
   username,
   password,
   active,
@@ -363,8 +354,8 @@ export const kapacitorProxy = (
 }
 
 export const getQueryConfigAndStatus = async (
-  url: string,
-  queries: Query
+  url,
+  queries
 ): Promise<AnalyzeQueriesObject[]> => {
   try {
     const {data} = await AJAX({
@@ -389,7 +380,7 @@ interface AnalyzeQueriesObject {
 
 export const analyzeQueries = async (
   url: string,
-  queries: Query[]
+  queries: Array<{query: string}>
 ): Promise<AnalyzeQueriesObject[]> => {
   try {
     const {data} = await AJAX({

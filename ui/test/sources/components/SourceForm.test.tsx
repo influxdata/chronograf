@@ -3,20 +3,12 @@ import {shallow} from 'enzyme'
 
 import {SourceForm} from 'src/sources/components/SourceForm'
 import {me} from 'test/resources'
+import {source} from 'test/fixtures/index'
 
 const setup = (override = {}) => {
   const noop = () => {}
   const props = {
-    source: {
-      url: '',
-      name: '',
-      username: '',
-      password: '',
-      telegraf: '',
-      insecureSkipVerify: false,
-      default: false,
-      metaUrl: '',
-    },
+    source,
     editMode: false,
     onSubmit: noop,
     onInputChange: noop,
