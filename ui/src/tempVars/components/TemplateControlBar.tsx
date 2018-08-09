@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import classnames from 'classnames'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -15,7 +14,6 @@ interface Props {
   meRole: string
   isUsingAuth: boolean
   templates: Template[]
-  isOpen: boolean
   source: Source
   onPickTemplate: (template: Template, value: TemplateValue) => void
   onSaveTemplates: (templates: Template[]) => void
@@ -34,11 +32,11 @@ class TemplateControlBar extends Component<Props, State> {
   }
 
   public render() {
-    const {isOpen, templates, source} = this.props
+    const {templates, source} = this.props
     const {isAdding} = this.state
 
     return (
-      <div className={classnames('template-control-bar', {show: isOpen})}>
+      <div className="template-control-bar">
         <div className="template-control--container">
           <div className="template-control--controls">
             {this.renderTemplateControls()}
@@ -58,7 +56,7 @@ class TemplateControlBar extends Component<Props, State> {
               onClick={this.handleAddVariable}
             >
               <span className="icon plus" />
-              Add Variable
+              Add Template Variable
             </button>
           </Authorized>
         </div>

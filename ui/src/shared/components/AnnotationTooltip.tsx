@@ -1,140 +1,76 @@
-import React, {Component, MouseEvent} from 'react'
+import React, {SFC, MouseEvent} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment'
 import classnames from 'classnames'
 
-import AnnotationInput from 'src/shared/components/AnnotationInput'
-import * as actions from 'src/shared/actions/annotations'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+import {setEditingAnnotation} from 'src/shared/actions/annotations'
 
-import {AnnotationInterface} from 'src/types'
+import {Annotation} from 'src/types'
 
 interface TimeStampProps {
-  time: string
+  time: number
 }
 
-const TimeStamp = ({time}: TimeStampProps): JSX.Element => (
+const TimeStamp: SFC<TimeStampProps> = ({time}) => (
   <div className="annotation-tooltip--timestamp">
-    {`${moment(+time).format('YYYY/MM/DD HH:mm:ss.SS')}`}
+    {`${moment(time).format('YYYY/MM/DD HH:mm:ss.SS')}`}
   </div>
 )
 
 interface AnnotationState {
-  isDragging: boolean
-  isMouseOver: boolean
-}
-
-interface Span {
-  spanCenter: number
-  tooltipLeft: number
-  spanWidth: number
-}
-
-interface State {
-  annotation: AnnotationInterface
+  isDragging: string | boolean
+  isMouseOver: string | boolean
 }
 
 interface Props {
-  isEditing: boolean
-  annotation: AnnotationInterface
-  timestamp: string
-  onMouseLeave: (e: MouseEvent<HTMLDivElement>) => {}
+  annotation: Annotation
+  timestamp: number
+  onMouseLeave: (e: MouseEvent<HTMLDivElement>) => void
   annotationState: AnnotationState
-  deleteAnnotationAsync: (a: AnnotationInterface) => void
-  updateAnnotationAsync: (a: AnnotationInterface) => void
-  span: Span
+  onSetEditingAnnotation: typeof setEditingAnnotation
 }
 
-@ErrorHandling
-class AnnotationTooltip extends Component<Props, State> {
-  public state = {
-    annotation: this.props.annotation,
-  }
+const AnnotationTooltip: SFC<Props> = props => {
+  const {
+    annotation,
+    onMouseLeave,
+    timestamp,
+    annotationState: {isDragging, isMouseOver},
+    onSetEditingAnnotation,
+  } = props
 
-  public componentWillReceiveProps(nextProps: Props) {
-    const {annotation} = nextProps
-    this.setState({annotation})
-  }
+  const tooltipClass = classnames('annotation-tooltip', {
+    hidden: !(isDragging || isMouseOver),
+  })
 
-  public render() {
-    const {annotation} = this.state
-    const {
-      onMouseLeave,
-      timestamp,
-      annotationState: {isDragging, isMouseOver},
-      isEditing,
-      span,
-    } = this.props
+  const setEditing = () => onSetEditingAnnotation(annotation.id)
 
-    const tooltipClass = classnames('annotation-tooltip', {
-      hidden: !(isDragging || isMouseOver),
-      'annotation-span-tooltip': !!span,
-    })
-
-    return (
-      <div
-        id={`tooltip-${annotation.id}`}
-        onMouseLeave={onMouseLeave}
-        className={tooltipClass}
-        style={
-          span
-            ? {left: `${span.tooltipLeft}px`, minWidth: `${span.spanWidth}px`}
-            : {}
-        }
-      >
-        {isDragging ? (
-          <TimeStamp time={timestamp} />
-        ) : (
-          <div className="annotation-tooltip--items">
-            {isEditing ? (
-              <div>
-                <AnnotationInput
-                  value={annotation.text}
-                  onChangeInput={this.handleChangeInput('text')}
-                  onConfirmUpdate={this.handleConfirmUpdate}
-                  onRejectUpdate={this.handleRejectUpdate}
-                />
-                <button
-                  className="annotation-tooltip--delete"
-                  onClick={this.handleDelete}
-                  title="Delete this Annotation"
-                >
-                  <span className="icon trash" />
-                </button>
-              </div>
-            ) : (
-              <div>{annotation.text}</div>
-            )}
-            <TimeStamp time={timestamp} />
+  return (
+    <div
+      id={`tooltip-${annotation.id}`}
+      onMouseLeave={onMouseLeave}
+      className={tooltipClass}
+    >
+      {isDragging ? (
+        <TimeStamp time={timestamp} />
+      ) : (
+        <div className="annotation-tooltip--items">
+          <div>
+            {annotation.text}
+            <span
+              className="annotation-tooltip--edit icon pencil"
+              onClick={setEditing}
+            />
           </div>
-        )}
-      </div>
-    )
-  }
-
-  private handleChangeInput = (key: string) => (value: string) => {
-    const {annotation} = this.state
-    const newAnnotation = {...annotation, [key]: value}
-
-    this.setState({annotation: newAnnotation})
-  }
-
-  private handleConfirmUpdate = () => {
-    this.props.updateAnnotationAsync(this.state.annotation)
-  }
-
-  private handleRejectUpdate = () => {
-    this.setState({annotation: this.props.annotation})
-  }
-
-  private handleDelete = () => {
-    this.props.deleteAnnotationAsync(this.props.annotation)
-  }
+          <TimeStamp time={timestamp} />
+        </div>
+      )}
+    </div>
+  )
 }
 
 const mdtp = {
-  deleteAnnotationAsync: actions.deleteAnnotationAsync,
-  updateAnnotationAsync: actions.updateAnnotationAsync,
+  onSetEditingAnnotation: setEditingAnnotation,
 }
 
 export default connect(null, mdtp)(AnnotationTooltip)

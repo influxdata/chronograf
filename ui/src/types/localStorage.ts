@@ -44,5 +44,4 @@ interface DashboardTimeRange {
 
 interface Persisted {
   autoRefresh: number
-  showTemplateControlBar: boolean
 }
