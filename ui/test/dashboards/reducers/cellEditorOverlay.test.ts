@@ -12,6 +12,7 @@ import {
   updateAxes,
 } from 'src/dashboards/actions/cellEditorOverlay'
 import {DEFAULT_TABLE_OPTIONS} from 'src/dashboards/constants'
+import {Cell} from 'src/types/dashboards'
 
 import {
   validateGaugeColors,

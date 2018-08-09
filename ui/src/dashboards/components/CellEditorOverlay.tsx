@@ -45,7 +45,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service} from 'src/types'
 import {Template} from 'src/types/tempVars'
-import {NewDefaultCell} from 'src/dashboards/constants/index'
+import {NewDefaultCell} from 'src/types/dashboards'
 
 type QueryTransitions = typeof queryTransitions
 type EditRawTextAsyncFunc = (

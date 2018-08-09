@@ -15,7 +15,6 @@ import {
 } from 'src/dashboards/apis'
 import {getMe} from 'src/shared/apis/auth'
 import {hydrateTemplates} from 'src/tempVars/utils/graph'
-import {showCellEditorOverlay} from 'src/dashboards/actions/cellEditorOverlay'
 
 import {notify} from 'src/shared/actions/notifications'
 import {errorThrown} from 'src/shared/actions/errors'
@@ -56,7 +55,7 @@ import {
   TemplateValue,
   TemplateType,
 } from 'src/types'
-import {NewDefaultCell} from '../constants'
+import {NewDefaultCell} from 'src/types/dashboards'
 
 export enum ActionType {
   LoadDashboards = 'LOAD_DASHBOARDS',

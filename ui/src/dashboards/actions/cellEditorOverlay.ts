@@ -8,7 +8,7 @@ import {
   ThresholdType,
   TableOptions,
 } from 'src/types/dashboards'
-import {NewDefaultCell} from '../constants'
+import {NewDefaultCell} from 'src/types/dashboards'
 
 export enum ActionType {
   ShowCellEditorOverlay = 'SHOW_CELL_EDITOR_OVERLAY',

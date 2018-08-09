@@ -63,7 +63,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import * as NotificationsActions from 'src/types/actions/notifications'
-import {NewDefaultCell} from 'src/dashboards/constants/index'
+import {NewDefaultCell} from 'src/types/dashboards'
 import {Service} from 'src/types'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
