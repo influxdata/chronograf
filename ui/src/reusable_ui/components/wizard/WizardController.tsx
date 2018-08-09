@@ -5,6 +5,7 @@ import {Step} from 'src/types/wizard'
 import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 import {StepStatus} from 'src/reusable_ui/constants/wizard'
 import {getDeep} from 'src/utils/wrappers'
+import _ from 'lodash'
 
 import 'src/reusable_ui/components/wizard/WizardController.scss'
 
@@ -62,22 +63,21 @@ class WizardController extends PureComponent<Props, State> {
     if (currentStepIndex === -1) {
       currentStepIndex = childSteps.length - 1
     }
-
     return {steps: childSteps, currentStepIndex}
   }
 
   constructor(props: Props) {
     super(props)
+    const {jumpStep} = this.props
     this.state = {
       steps: [],
-      currentStepIndex: this.props.jumpStep || -1,
+      currentStepIndex: _.isNull(jumpStep) ? -1 : jumpStep,
     }
   }
 
   public render() {
     const {steps, currentStepIndex} = this.state
     const currentChild = this.CurrentChild
-
     return (
       <div className="wizard-controller">
         <div className="progress-header">
