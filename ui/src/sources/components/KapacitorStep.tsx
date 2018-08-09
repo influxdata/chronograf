@@ -1,6 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
+import _ from 'lodash'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -88,19 +89,22 @@ class KapacitorStep extends PureComponent<Props, State> {
     const {newKapacitor, existingKapacitor, exists} = this.state
     const {notify, source, setError} = this.props
     if (exists) {
-      try {
-        const {data} = await updateKapacitor(existingKapacitor)
-        await this.checkKapacitorConnection(data)
-        setError(false)
-        await this.fetchNewKapacitors()
-        notify(notifyKapacitorUpdated())
-        return {status: true, payload: data}
-      } catch (error) {
-        console.error(error)
-        setError(true)
-        notify(notifyKapacitorUpdateFailed())
-        return {status: false, payload: null}
+      if (this.existingKapacitorHasChanged) {
+        try {
+          const {data} = await updateKapacitor(existingKapacitor)
+          await this.checkKapacitorConnection(data)
+          setError(false)
+          await this.fetchNewKapacitors()
+          notify(notifyKapacitorUpdated())
+          return {status: true, payload: data}
+        } catch (error) {
+          console.error(error)
+          setError(true)
+          notify(notifyKapacitorUpdateFailed())
+          return {status: false, payload: null}
+        }
       }
+      return {status: true, payload: existingKapacitor}
     } else {
       try {
         const {data} = await createKapacitor(source, newKapacitor)
@@ -173,7 +177,7 @@ class KapacitorStep extends PureComponent<Props, State> {
 
   private fetchNewKapacitors = () => {
     const {source, sources, fetchKapacitors} = this.props
-    const storeSource = sources.filter(s => s.id === source.id)[0]
+    const storeSource = sources.find(s => s.id === source.id)
     fetchKapacitors(storeSource)
   }
 
@@ -185,12 +189,20 @@ class KapacitorStep extends PureComponent<Props, State> {
     return newKapacitor
   }
 
+  private get existingKapacitorHasChanged() {
+    const {source, sources} = this.props
+    const {existingKapacitor} = this.state
+
+    const activeKapacitor = getActiveKapacitor(source, sources)
+    return !_.isEqual(activeKapacitor, existingKapacitor)
+  }
+
   private get kapacitorDropdown() {
     const {newKapacitor, exists} = this.state
     const {source, sources, deleteKapacitor} = this.props
 
     if (source && sources) {
-      const storeSource = sources.filter(s => s.id === source.id)[0]
+      const storeSource = sources.find(s => s.id === source.id)
 
       return (
         <div className="kapacitor-step--dropdown col-xs-12">
