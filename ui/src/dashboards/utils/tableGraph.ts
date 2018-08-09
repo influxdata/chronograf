@@ -151,6 +151,7 @@ export const calculateColumnWidths = (
   const timeFormatWidth = calculateTimeColumnWidth(
     timeFormat === '' ? DEFAULT_TIME_FORMAT : timeFormat
   )
+
   return fastReduce<TimeSeriesValue[], ColumnWidths>(
     data,
     (acc: ColumnWidths, row: TimeSeriesValue[], r: number) => {

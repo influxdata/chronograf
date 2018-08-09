@@ -74,6 +74,7 @@ class Layout extends Component<Props> {
         ) : (
           <RefreshingGraph
             onZoom={onZoom}
+            timeFormat={cell.timeFormat}
             axes={cell.axes}
             type={cell.type}
             inView={cell.inView}
