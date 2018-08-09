@@ -46,7 +46,7 @@ class WizardProgressBar extends PureComponent<Props> {
       if (i > 0 && steps[i - 1].stepStatus === StepStatus.Complete) {
         connectorStatus = ConnectorState.Some
 
-        if (stepStatus === StepStatus.Complete) {
+        if (i === steps.length - 1 || stepStatus === StepStatus.Complete) {
           connectorStatus = ConnectorState.Full
         }
       }
