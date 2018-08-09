@@ -18,8 +18,8 @@ import {Source, Kapacitor} from 'src/types'
 interface Props {
   source: Source
   kapacitors: Kapacitor[]
-  setActiveKapacitor: (k: KapacitorItem) => void
-  deleteKapacitor: (Kapacitor: Kapacitor) => void
+  setActiveKapacitor: (kapacitor: Kapacitor) => void
+  deleteKapacitor: (kapacitor: Kapacitor) => void
   toggleWizard?: ToggleVisibility
   buttonSize?: string
   suppressEdit?: boolean
@@ -27,7 +27,7 @@ interface Props {
   displayValue?: string
 }
 
-export interface KapacitorItem {
+interface KapacitorItem {
   text: string
   resource: string
   kapacitor: Kapacitor
@@ -39,7 +39,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   }
 
   public render() {
-    const {buttonSize, setActiveKapacitor} = this.props
+    const {buttonSize} = this.props
 
     if (this.isKapacitorsEmpty) {
       return (
@@ -66,7 +66,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
           buttonColor="btn-primary"
           buttonSize={buttonSize}
           items={this.kapacitorItems}
-          onChoose={setActiveKapacitor}
+          onChoose={this.handleSetActiveKapacitor}
           addNew={{
             text: 'Add Kapacitor Connection',
             handler: this.handleAddNew,
@@ -78,6 +78,10 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
     )
   }
 
+  private handleSetActiveKapacitor = (item: KapacitorItem) => {
+    const {setActiveKapacitor} = this.props
+    setActiveKapacitor(item.kapacitor)
+  }
   private get UnauthorizedDropdown(): ReactElement<HTMLDivElement> {
     return (
       <div className="source-table--kapacitor__view-only">{this.selected}</div>

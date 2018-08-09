@@ -10,7 +10,6 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import InfluxTable from 'src/sources/components/InfluxTable'
 import ConnectionWizard from 'src/sources/components/ConnectionWizard'
-import {KapacitorItem} from 'src/sources/components/KapacitorDropdown'
 
 import {
   notifySourceDeleted,
@@ -131,8 +130,8 @@ class ManageSources extends PureComponent<Props, State> {
     })
   }
 
-  private handleSetActiveKapacitor = (item: KapacitorItem) => {
-    this.props.setActiveKapacitor(item.kapacitor)
+  private handleSetActiveKapacitor = kapacitor => {
+    this.props.setActiveKapacitor(kapacitor)
   }
 }
 

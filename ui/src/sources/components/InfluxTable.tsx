@@ -7,8 +7,7 @@ import InfluxTableHead from 'src/sources/components/InfluxTableHead'
 import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
 import InfluxTableRow from 'src/sources/components/InfluxTableRow'
 
-import {Source, Me, Service} from 'src/types'
-import {KapacitorItem} from 'src/sources/components/KapacitorDropdown'
+import {Source, Me, Service, Kapacitor} from 'src/types'
 import {ToggleVisibility} from 'src/types/wizard'
 
 interface Props {
@@ -18,7 +17,7 @@ interface Props {
   services: Service[]
   isUsingAuth: boolean
   deleteKapacitor: DeleteKapacitor
-  setActiveKapacitor: (k: KapacitorItem) => void
+  setActiveKapacitor: (kapacitor: Kapacitor) => void
   onDeleteSource: (source: Source) => void
   setActiveFlux: (source: Source, service: Service) => void
   deleteFlux: (fluxService: Service) => void

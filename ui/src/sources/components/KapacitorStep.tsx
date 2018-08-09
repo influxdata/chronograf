@@ -26,7 +26,6 @@ import {DEFAULT_KAPACITOR} from 'src/shared/constants'
 
 // Types
 import {Kapacitor, Source} from 'src/types'
-import {KapacitorItem} from 'src/sources/components/KapacitorDropdown'
 
 interface Props {
   notify: typeof notifyAction
@@ -158,8 +157,8 @@ class KapacitorStep extends PureComponent<Props, State> {
     }
   }
 
-  private handleSetActiveKapacitor = (item: KapacitorItem) => {
-    this.props.setActiveKapacitor(item.kapacitor)
+  private handleSetActiveKapacitor = (kapacitor: Kapacitor) => {
+    this.props.setActiveKapacitor(kapacitor)
     this.setState({
       exists: true,
     })
