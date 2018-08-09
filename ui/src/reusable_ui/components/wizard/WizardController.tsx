@@ -70,7 +70,7 @@ class WizardController extends PureComponent<Props, State> {
     super(props)
     this.state = {
       steps: [],
-      currentStepIndex: this.props.jumpStep,
+      currentStepIndex: this.props.jumpStep || -1,
     }
   }
 
