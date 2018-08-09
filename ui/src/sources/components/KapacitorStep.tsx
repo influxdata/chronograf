@@ -193,17 +193,19 @@ class KapacitorStep extends PureComponent<Props, State> {
       const storeSource = sources.filter(s => s.id === source.id)[0]
 
       return (
-        <div className="form-group col-xs-12 wizard-input">
-          <KapacitorDropdown
-            suppressEdit={true}
-            source={storeSource}
-            kapacitors={storeSource.kapacitors}
-            deleteKapacitor={deleteKapacitor}
-            setActiveKapacitor={this.handleSetActiveKapacitor}
-            buttonSize="btn-sm"
-            onAddNew={this.resetDefault}
-            displayValue={!exists && newKapacitor.name}
-          />
+        <div className="kapacitor-step--dropdown col-xs-12">
+          <div className="form-group col-xs-6">
+            <KapacitorDropdown
+              suppressEdit={true}
+              source={storeSource}
+              kapacitors={storeSource.kapacitors}
+              deleteKapacitor={deleteKapacitor}
+              setActiveKapacitor={this.handleSetActiveKapacitor}
+              buttonSize="btn-sm"
+              onAddNew={this.resetDefault}
+              displayValue={!exists && newKapacitor.name}
+            />
+          </div>
         </div>
       )
     }
