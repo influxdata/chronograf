@@ -3,6 +3,21 @@
   ------------------------------------------------------------------------------
 */
 
+.dropdown {
+  &.dropdown-xs {
+    height: $form-xs-height;
+  }
+  &.dropdown-sm {
+    height: $form-sm-height;
+  }
+  &.dropdown-md {
+    height: $form-md-height;
+  }
+  &.dropdown-lg {
+    height: $form-lg-height;
+  }
+}
+
 /* Dropdown Menu */
 .dropdown--menu-container {
   overflow: hidden;
@@ -110,7 +125,6 @@
 }
 
 /* Themes */
-/* Currently only a single theme, I plan on adding more later */
 
 @mixin dropdownMenuColor($backgroundA, $backgroundB, $hoverA, $hoverB, $dividerA, $dividerB, $dividerText, $scrollA, $scrollB) {
   @include gradient-h($backgroundA, $backgroundB);

@@ -9,15 +9,15 @@
 }
 
 .dropdown--selected,
-.dropdown--button > span.icon.dropdown--icon,
-.dropdown--button > span.icon.dropdown--caret {
+.dropdown--icon,
+.dropdown--caret {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
 }
 
-span.icon.dropdown--icon {
-  top: 49%;
+.dropdown--icon {
+  top: 48%;
 }
 
 .dropdown--selected {
@@ -25,12 +25,11 @@ span.icon.dropdown--icon {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  width: calc(100% - 20px);
 }
 
-.dropdown--button > span.icon.dropdown--caret {
+.dropdown--caret {
   margin: 0;
-  font-size: 1em;
+  font-size: 0.9em;
 }
 
 /* Button Size Modifiers */
