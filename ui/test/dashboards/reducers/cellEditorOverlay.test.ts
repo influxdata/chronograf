@@ -103,8 +103,9 @@ describe('Dashboards.Reducers.cellEditorOverlay', () => {
   it('should update the cell axes', () => {
     const actual = reducer(initialState, updateAxes(axes))
     const expected = axes
+    const actualCell = actual.cell as Cell
 
-    expect(actual.cell.axes).toBe(expected)
+    expect(actualCell.axes).toBe(expected)
   })
 
   it('should update the cell line graph colors', () => {

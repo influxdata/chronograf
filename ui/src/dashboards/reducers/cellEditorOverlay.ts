@@ -47,8 +47,9 @@ export default (state = initialState, action: Action): CEOInitialState => {
         initializeOptions(CellType.Table)
       )
 
-      const colors = (cell as any).colors
-      if (colors !== undefined) {
+      if ((cell as Cell).colors) {
+        const colors = (cell as Cell).colors
+
         const thresholdsListType = getThresholdsListType(colors)
         const thresholdsListColors = validateThresholdsListColors(
           colors,
