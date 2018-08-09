@@ -1,37 +1,28 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 
-import Annotation from 'src/shared/components/Annotation'
+import AnnotationComponent from 'src/shared/components/Annotation'
 import NewAnnotation from 'src/shared/components/NewAnnotation'
 import {SourceContext} from 'src/CheckSources'
 
-import {ADDING, TEMP_ANNOTATION} from 'src/shared/annotations/helpers'
+import {getSelectedAnnotations} from 'src/shared/selectors/annotations'
+import {ADDING} from 'src/shared/annotations/helpers'
 
-import {
-  updateAnnotation,
-  addingAnnotationSuccess,
-  dismissAddingAnnotation,
-  mouseEnterTempAnnotation,
-  mouseLeaveTempAnnotation,
-} from 'src/shared/actions/annotations'
 import {visibleAnnotations} from 'src/shared/annotations/helpers'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {AnnotationInterface, DygraphClass, Source} from 'src/types'
-import {UpdateAnnotationAction} from 'src/types/actions/annotations'
+import {Annotation, DygraphClass, Source} from 'src/types'
 
 interface Props {
   dWidth: number
   staticLegendHeight: number
-  annotations: AnnotationInterface[]
+  annotations: Annotation[]
   mode: string
   xAxisRange: [number, number]
   dygraph: DygraphClass
   isTempHovering: boolean
-  handleUpdateAnnotation: (
-    annotation: AnnotationInterface
-  ) => UpdateAnnotationAction
-  handleDismissAddingAnnotation: () => void
+  addingAnnotation?: Annotation
   handleAddingAnnotationSuccess: () => void
   handleMouseEnterTempAnnotation: () => void
   handleMouseLeaveTempAnnotation: () => void
@@ -45,9 +36,9 @@ class Annotations extends Component<Props> {
       dWidth,
       dygraph,
       xAxisRange,
+      annotations,
       isTempHovering,
-      handleUpdateAnnotation,
-      handleDismissAddingAnnotation,
+      addingAnnotation,
       handleAddingAnnotationSuccess,
       handleMouseEnterTempAnnotation,
       handleMouseLeaveTempAnnotation,
@@ -56,17 +47,15 @@ class Annotations extends Component<Props> {
     return (
       <div className="annotations-container">
         {mode === ADDING &&
-          this.tempAnnotation && (
+          addingAnnotation && (
             <SourceContext.Consumer>
               {(source: Source) => (
                 <NewAnnotation
                   dygraph={dygraph}
                   source={source}
                   isTempHovering={isTempHovering}
-                  tempAnnotation={this.tempAnnotation}
+                  addingAnnotation={addingAnnotation}
                   staticLegendHeight={staticLegendHeight}
-                  onUpdateAnnotation={handleUpdateAnnotation}
-                  onDismissAddingAnnotation={handleDismissAddingAnnotation}
                   onAddingAnnotationSuccess={handleAddingAnnotationSuccess}
                   onMouseEnterTempAnnotation={handleMouseEnterTempAnnotation}
                   onMouseLeaveTempAnnotation={handleMouseLeaveTempAnnotation}
@@ -74,8 +63,8 @@ class Annotations extends Component<Props> {
               )}
             </SourceContext.Consumer>
           )}
-        {this.annotations.map(a => (
-          <Annotation
+        {annotations.map(a => (
+          <AnnotationComponent
             key={a.id}
             mode={mode}
             xAxisRange={xAxisRange}
@@ -88,32 +77,22 @@ class Annotations extends Component<Props> {
       </div>
     )
   }
+}
 
-  get annotations() {
-    return visibleAnnotations(
-      this.props.xAxisRange,
-      this.props.annotations,
-      TEMP_ANNOTATION.id
-    )
-  }
+const mstp = (state, props) => {
+  const {mode, isTempHovering, addingAnnotation} = state.annotations
 
-  get tempAnnotation() {
-    return this.props.annotations.find(a => a.id === TEMP_ANNOTATION.id)
+  const annotations = visibleAnnotations(
+    props.xAxisRange,
+    getSelectedAnnotations(state)
+  )
+
+  return {
+    annotations,
+    addingAnnotation,
+    mode: mode || 'NORMAL',
+    isTempHovering,
   }
 }
 
-const mstp = ({annotations: {annotations, mode, isTempHovering}}) => ({
-  annotations,
-  mode: mode || 'NORMAL',
-  isTempHovering,
-})
-
-const mdtp = {
-  handleAddingAnnotationSuccess: addingAnnotationSuccess,
-  handleDismissAddingAnnotation: dismissAddingAnnotation,
-  handleMouseEnterTempAnnotation: mouseEnterTempAnnotation,
-  handleMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
-  handleUpdateAnnotation: updateAnnotation,
-}
-
-export default connect(mstp, mdtp)(Annotations)
+export default withRouter(connect(mstp)(Annotations))

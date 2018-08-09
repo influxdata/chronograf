@@ -22,6 +22,8 @@
   text-transform: capitalize;
   outline: none;
   border: 0;
+  flex: 1 1 auto;
+  text-align: center;
 
   &:last-child {
     margin-right: 0;

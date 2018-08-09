@@ -1,10 +1,13 @@
+// Libraries
 import React, {Component, KeyboardEvent} from 'react'
-import {ErrorHandling} from 'src/shared/decorators/errors'
-import './RenameDashboard.scss'
+
+// Constants
 import {
   DASHBOARD_NAME_MAX_LENGTH,
   DEFAULT_DASHBOARD_NAME,
 } from 'src/dashboards/constants/index'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   onRename: (name: string) => void

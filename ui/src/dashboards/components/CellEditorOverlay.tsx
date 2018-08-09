@@ -43,6 +43,7 @@ import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
+import {Service} from 'src/types'
 import {Template} from 'src/types/tempVars'
 
 type QueryTransitions = typeof queryTransitions
@@ -71,6 +72,7 @@ interface QueryStatus {
 
 interface Props {
   sources: SourcesModels.Source[]
+  services: Service[]
   editQueryStatus: typeof editCellQueryStatus
   onCancel: () => void
   onSave: (cell: DashboardsModels.Cell) => void
@@ -92,6 +94,8 @@ interface State {
   activeQueryIndex: number
   activeEditorTab: CEOTabs
   isStaticLegend: boolean
+  selectedSource: SourcesModels.Source
+  selectedService: Service
 }
 
 const createWorkingDraft = (
@@ -144,6 +148,8 @@ class CellEditorOverlay extends Component<Props, State> {
       activeQueryIndex: 0,
       activeEditorTab: CEOTabs.Queries,
       isStaticLegend: IS_STATIC_LEGEND(legend),
+      selectedService: null,
+      selectedSource: null,
     }
   }
 
@@ -172,6 +178,7 @@ class CellEditorOverlay extends Component<Props, State> {
 
   public render() {
     const {
+      services,
       onCancel,
       templates,
       timeRange,
@@ -209,13 +216,15 @@ class CellEditorOverlay extends Component<Props, State> {
             <OverlayControls
               onCancel={onCancel}
               queries={queriesWorkingDraft}
+              source={this.source}
               sources={this.formattedSources}
+              service={this.service}
+              services={services}
               onSave={this.handleSaveCell}
-              selected={this.findSelectedSource()}
-              onSetQuerySource={this.handleSetQuerySource}
               isSavable={this.isSaveable}
               activeEditorTab={activeEditorTab}
               onSetActiveEditorTab={this.handleSetActiveEditorTab}
+              onChangeService={this.handleChangeService}
             />
             {this.cellEditorBottom}
           </CEOBottom>
@@ -293,6 +302,19 @@ class CellEditorOverlay extends Component<Props, State> {
     this.setState({queriesWorkingDraft: nextQueries})
   }
 
+  private handleChangeService = (
+    selectedService: Service,
+    selectedSource: SourcesModels.Source
+  ) => {
+    const queriesWorkingDraft: QueriesModels.QueryConfig[] = this.state.queriesWorkingDraft.map(
+      q => ({
+        ..._.cloneDeep(q),
+        source: selectedSource,
+      })
+    )
+    this.setState({selectedService, selectedSource, queriesWorkingDraft})
+  }
+
   private handleAddQuery = () => {
     const {queriesWorkingDraft} = this.state
     const newIndex = queriesWorkingDraft.length
@@ -357,16 +379,6 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private handleToggleStaticLegend = isStaticLegend => (): void => {
     this.setState({isStaticLegend})
-  }
-
-  private handleSetQuerySource = (source: SourcesModels.Source): void => {
-    const queriesWorkingDraft: QueriesModels.QueryConfig[] = this.state.queriesWorkingDraft.map(
-      q => ({
-        ..._.cloneDeep(q),
-        source,
-      })
-    )
-    this.setState({queriesWorkingDraft})
   }
 
   private getActiveQuery = () => {
@@ -497,26 +509,10 @@ class CellEditorOverlay extends Component<Props, State> {
     }
   }
 
-  private findSelectedSource = (): string => {
-    const {source} = this.props
-    const sources = this.formattedSources
-    const currentSource = getDeep<SourcesModels.Source | null>(
-      this.state.queriesWorkingDraft,
-      '0.source',
-      null
-    )
+  private get service() {
+    const {selectedService} = this.state
 
-    if (!currentSource) {
-      const defaultSource: SourcesModels.Source = sources.find(
-        s => s.id === source.id
-      )
-      return (defaultSource && defaultSource.text) || 'No sources'
-    }
-
-    const selected: SourcesModels.Source = sources.find(
-      s => s.links.self === currentSource.links.self
-    )
-    return (selected && selected.text) || 'No sources'
+    return selectedService
   }
 
   private handleKeyDown = e => {
@@ -584,12 +580,10 @@ class CellEditorOverlay extends Component<Props, State> {
       sources,
     } = this.props
 
-    const initialSourceLink: string = getDeep<string>(queries, '0.source', null)
+    const cellSourceLink: string = getDeep<string>(queries, '0.source', null)
 
-    if (initialSourceLink) {
-      const initialSource = sources.find(
-        s => s.links.self === initialSourceLink
-      )
+    if (cellSourceLink) {
+      const initialSource = sources.find(s => s.links.self === cellSourceLink)
 
       return initialSource
     }
@@ -598,6 +592,12 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private get source(): SourcesModels.Source {
     const {source, sources} = this.props
+    const {selectedSource} = this.state
+
+    if (selectedSource) {
+      return selectedSource
+    }
+
     const query = _.get(this.state.queriesWorkingDraft, 0, {source: null})
 
     if (!query.source) {

@@ -1,5 +1,5 @@
 import {LayoutCell, LayoutQuery} from './layouts'
-import {Service, NewService} from './services'
+import {Service, NewService, ServiceLinks} from './services'
 import {Links, Organization, Role, Permission, User, Me} from './auth'
 import {Cell, CellQuery, Legend, Axes, Dashboard, CellType} from './dashboards'
 import {
@@ -49,7 +49,7 @@ import {
   DygraphData,
 } from './dygraphs'
 import {JSONFeedData} from './status'
-import {AnnotationInterface} from './annotations'
+import {Annotation} from './annotations'
 import {WriteDataMode} from './dataExplorer'
 
 export {
@@ -103,6 +103,7 @@ export {
   Dashboard,
   Service,
   NewService,
+  ServiceLinks,
   LayoutCell,
   LayoutQuery,
   FluxTable,
@@ -110,7 +111,7 @@ export {
   SchemaFilter,
   RemoteDataState,
   JSONFeedData,
-  AnnotationInterface,
+  Annotation,
   TemplateType,
   TemplateValueType,
   TemplateUpdate,

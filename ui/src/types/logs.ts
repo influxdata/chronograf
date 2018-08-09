@@ -1,3 +1,5 @@
+import {Index} from 'react-virtualized'
+
 import {
   SeverityFormatOptions,
   SeverityColorOptions,
@@ -48,6 +50,7 @@ export interface LogConfig {
   tableColumns: LogsTableColumn[]
   severityFormat: SeverityFormat
   severityLevelColors: SeverityLevelColor[]
+  isTruncated: boolean
 }
 
 export interface SeverityLevelColor {
@@ -127,3 +130,5 @@ export interface TimeWindow {
 export interface TimeMarker {
   timeOption: string
 }
+
+export type RowHeightHandler = (index: Index) => number

@@ -5,8 +5,8 @@ import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
 import {QueryConfig} from 'src/types/queries'
 
 interface Query {
-  config: QueryConfig
-  text: string
+  queryConfig: QueryConfig
+  text?: string
 }
 
 interface Props {

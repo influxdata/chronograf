@@ -2,6 +2,7 @@ package chronograf
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -507,22 +508,69 @@ type Databases interface {
 	GetMeasurements(ctx context.Context, db string, limit, offset int) ([]Measurement, error)
 }
 
+// AnnotationTags describes a set of user-defined tags associated with an Annotation
+type AnnotationTags map[string]string
+
+var annotationTagsBlacklist = map[string]bool{
+	"deleted":          true,
+	"start_time":       true,
+	"startTime":        true,
+	"end_time":         true,
+	"endTime":          true,
+	"modified_time_ns": true,
+	"text":             true,
+	"type":             true,
+	"id":               true,
+}
+
+// ValidateAnnotationTagKey checks whether a user supplied tag can be stored
+// in Annotation.Tags
+func ValidateAnnotationTagKey(tagKey string) error {
+	if _, prs := annotationTagsBlacklist[tagKey]; prs {
+		return fmt.Errorf("Cannot use %q as tag key", tagKey)
+	}
+
+	return nil
+}
+
+// Valid returns an error if any key of the AnnotationTags is invalid
+func (t AnnotationTags) Valid() error {
+	for k := range t {
+		if err := ValidateAnnotationTagKey(k); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Annotation represents a time-based metadata associated with a source
 type Annotation struct {
-	ID        string    // ID is the unique annotation identifier
-	StartTime time.Time // StartTime starts the annotation
-	EndTime   time.Time // EndTime ends the annotation
-	Text      string    // Text is the associated user-facing text describing the annotation
-	Type      string    // Type describes the kind of annotation
+	ID        string         // ID is the unique annotation identifier
+	StartTime time.Time      // StartTime starts the annotation
+	EndTime   time.Time      // EndTime ends the annotation
+	Text      string         // Text is the associated user-facing text describing the annotation
+	Tags      AnnotationTags // Tags is a collection of user defined key/value pairs that contextualize the annotation
+}
+
+// AnnotationTagFilter describes data used to filter a collection of Annotations by their Tags
+type AnnotationTagFilter struct {
+	Key        string
+	Value      string
+	Comparator string // Either '=', '==', '!=', '=~', or '!~'
+}
+
+func (f *AnnotationTagFilter) String() string {
+	return fmt.Sprintf("%s %s %s", f.Key, f.Comparator, f.Value)
 }
 
 // AnnotationStore represents storage and retrieval of annotations
 type AnnotationStore interface {
-	All(ctx context.Context, start, stop time.Time) ([]Annotation, error) // All lists all Annotations between start and stop
-	Add(context.Context, *Annotation) (*Annotation, error)                // Add creates a new annotation in the store
-	Delete(ctx context.Context, id string) error                          // Delete removes the annotation from the store
-	Get(ctx context.Context, id string) (*Annotation, error)              // Get retrieves an annotation
-	Update(context.Context, *Annotation) error                            // Update replaces annotation
+	All(ctx context.Context, start, stop time.Time, filters []*AnnotationTagFilter) ([]Annotation, error) // All lists all Annotations between start and stop
+	Add(context.Context, *Annotation) (*Annotation, error)                                                // Add creates a new annotation in the store
+	Delete(ctx context.Context, id string) error                                                          // Delete removes the annotation from the store
+	Get(ctx context.Context, id string) (*Annotation, error)                                              // Get retrieves an annotation
+	Update(context.Context, *Annotation) error                                                            // Update replaces annotation
 }
 
 // DashboardID is the dashboard ID

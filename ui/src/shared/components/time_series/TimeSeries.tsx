@@ -6,7 +6,7 @@ import _ from 'lodash'
 import {fetchTimeSeries} from 'src/shared/apis/query'
 
 // Types
-import {Template, Source, Query, RemoteDataState} from 'src/types'
+import {Template, Source, Query, RemoteDataState, TimeRange} from 'src/types'
 import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
@@ -23,6 +23,7 @@ interface RenderProps {
 interface Props {
   source: Source
   queries: Query[]
+  timeRange: TimeRange
   children: (r: RenderProps) => JSX.Element
   inView?: boolean
   templates?: Template[]
@@ -31,29 +32,56 @@ interface Props {
 }
 
 interface State {
+  timeRange: TimeRange
   loading: RemoteDataState
   isFirstFetch: boolean
   timeSeries: TimeSeriesServerResponse[]
 }
 
+const GraphLoadingDots = () => (
+  <div className="graph-panel__refreshing">
+    <div />
+    <div />
+    <div />
+  </div>
+)
 class TimeSeries extends Component<Props, State> {
   public static defaultProps = {
     inView: true,
     templates: [],
   }
 
+  public static getDerivedStateFromProps(props: Props, state: State) {
+    let {isFirstFetch, timeRange} = state
+
+    const oldUpper = _.get(state, 'timeRange.upper', null)
+    const oldLower = _.get(state, 'timeRange.lower', null)
+    const newUpper = _.get(props, 'timeRange.upper', null)
+    const newLower = _.get(props, 'timeRange.lower', null)
+
+    if (oldUpper !== newUpper || oldLower !== newLower) {
+      isFirstFetch = true
+      timeRange = props.timeRange
+    }
+
+    return {
+      isFirstFetch,
+      timeRange,
+    }
+  }
+
   constructor(props: Props) {
     super(props)
     this.state = {
+      timeRange: props.timeRange,
       timeSeries: DEFAULT_TIME_SERIES,
       loading: RemoteDataState.NotStarted,
-      isFirstFetch: false,
+      isFirstFetch: true,
     }
   }
 
   public async componentDidMount() {
-    const isFirstFetch = true
-    this.executeQueries(isFirstFetch)
+    this.executeQueries()
     AutoRefresh.subscribe(this.executeQueries)
   }
 
@@ -69,7 +97,17 @@ class TimeSeries extends Component<Props, State> {
     this.executeQueries()
   }
 
-  public executeQueries = async (isFirstFetch: boolean = false) => {
+  public setIsLoading(): Promise<void> {
+    return new Promise(resolve => {
+      this.setState({loading: RemoteDataState.Loading}, () => {
+        window.setTimeout(() => {
+          resolve()
+        }, 10)
+      })
+    })
+  }
+
+  public executeQueries = async () => {
     const {
       source,
       inView,
@@ -87,7 +125,7 @@ class TimeSeries extends Component<Props, State> {
       return this.setState({timeSeries: DEFAULT_TIME_SERIES})
     }
 
-    this.setState({loading: RemoteDataState.Loading, isFirstFetch})
+    await this.setIsLoading()
 
     const TEMP_RES = 300
 
@@ -117,6 +155,8 @@ class TimeSeries extends Component<Props, State> {
         timeSeries: [],
         loading: RemoteDataState.Error,
       })
+    } finally {
+      this.setState({isFirstFetch: false})
     }
   }
 
@@ -130,11 +170,7 @@ class TimeSeries extends Component<Props, State> {
     })
 
     if (isFirstFetch && loading === RemoteDataState.Loading) {
-      return (
-        <div className="graph-empty">
-          <h3 className="graph-spinner" />
-        </div>
-      )
+      return <div className="graph-empty">{this.spinner}</div>
     }
 
     if (!hasValues) {
@@ -145,7 +181,32 @@ class TimeSeries extends Component<Props, State> {
       )
     }
 
-    return this.props.children({timeSeries, loading})
+    return (
+      <>
+        {this.loadingDots}
+        {this.props.children({timeSeries, loading})}
+      </>
+    )
+  }
+
+  private get loadingDots(): JSX.Element {
+    const {loading} = this.state
+
+    if (loading === RemoteDataState.Loading) {
+      return <GraphLoadingDots />
+    }
+
+    return null
+  }
+
+  private get spinner(): JSX.Element {
+    const {loading} = this.state
+
+    if (loading === RemoteDataState.Loading) {
+      return <h3 className="graph-spinner" />
+    }
+
+    return null
   }
 
   private isPropsDifferent(nextProps: Props) {

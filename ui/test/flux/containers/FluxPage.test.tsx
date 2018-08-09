@@ -15,8 +15,10 @@ const setup = () => {
       suggestions: '',
       ast: '',
     },
+    service: null,
     services: [],
     source,
+    sources: [source],
     script: '',
     notify: () => {},
     params: {
@@ -31,6 +33,7 @@ const setup = () => {
       }
     },
     onGoToEditFlux: () => {},
+    onChangeService: () => {},
   }
 
   const wrapper = shallow(<FluxPage {...props} />)

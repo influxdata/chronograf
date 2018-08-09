@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/influxdb/influxql"
 )
 
 const (
@@ -22,12 +24,12 @@ type annotationLinks struct {
 }
 
 type annotationResponse struct {
-	ID        string          `json:"id"`        // ID is the unique annotation identifier
-	StartTime string          `json:"startTime"` // StartTime in RFC3339 of the start of the annotation
-	EndTime   string          `json:"endTime"`   // EndTime in RFC3339 of the end of the annotation
-	Text      string          `json:"text"`      // Text is the associated user-facing text describing the annotation
-	Type      string          `json:"type"`      // Type describes the kind of annotation
-	Links     annotationLinks `json:"links"`
+	ID        string                    `json:"id"`        // ID is the unique annotation identifier
+	StartTime string                    `json:"startTime"` // StartTime in RFC3339 of the start of the annotation
+	EndTime   string                    `json:"endTime"`   // EndTime in RFC3339 of the end of the annotation
+	Text      string                    `json:"text"`      // Text is the associated user-facing text describing the annotation
+	Tags      chronograf.AnnotationTags `json:"tags"`      // Tags is a collection of user defined key/value pairs that contextualize the annotation
+	Links     annotationLinks           `json:"links"`
 }
 
 func newAnnotationResponse(src chronograf.Source, a *chronograf.Annotation) annotationResponse {
@@ -37,10 +39,14 @@ func newAnnotationResponse(src chronograf.Source, a *chronograf.Annotation) anno
 		StartTime: a.StartTime.UTC().Format(timeMilliFormat),
 		EndTime:   a.EndTime.UTC().Format(timeMilliFormat),
 		Text:      a.Text,
-		Type:      a.Type,
+		Tags:      a.Tags,
 		Links: annotationLinks{
 			Self: fmt.Sprintf("%s/%d/annotations/%s", base, src.ID, a.ID),
 		},
+	}
+
+	if res.Tags == nil {
+		res.Tags = chronograf.AnnotationTags{}
 	}
 
 	if a.EndTime.IsZero() {
@@ -64,10 +70,30 @@ func newAnnotationsResponse(src chronograf.Source, as []chronograf.Annotation) a
 	}
 }
 
-func validAnnotationQuery(query url.Values) (startTime, stopTime time.Time, err error) {
+func parseTagQueryParam(tagQuery string) (*chronograf.AnnotationTagFilter, error) {
+	expr, err := influxql.ParseExpr(tagQuery)
+	if err != nil {
+		return &chronograf.AnnotationTagFilter{}, errors.New("Invalid tag query param")
+	}
+
+	binaryExpr, ok := expr.(*influxql.BinaryExpr)
+	if !ok {
+		return &chronograf.AnnotationTagFilter{}, errors.New("Invalid tag query param")
+	}
+
+	filter := chronograf.AnnotationTagFilter{
+		Key:        binaryExpr.LHS.String(),
+		Value:      binaryExpr.RHS.String(),
+		Comparator: binaryExpr.Op.String(),
+	}
+
+	return &filter, nil
+}
+
+func validAnnotationQuery(query url.Values) (startTime, stopTime time.Time, filters []*chronograf.AnnotationTagFilter, err error) {
 	start := query.Get(since)
 	if start == "" {
-		return time.Time{}, time.Time{}, fmt.Errorf("since parameter is required")
+		return startTime, stopTime, filters, fmt.Errorf("since parameter is required")
 	}
 
 	startTime, err = time.Parse(timeMilliFormat, start)
@@ -81,13 +107,26 @@ func validAnnotationQuery(query url.Values) (startTime, stopTime time.Time, err 
 	if stop != "" {
 		stopTime, err = time.Parse(timeMilliFormat, stop)
 		if err != nil {
-			return time.Time{}, time.Time{}, err
+			return time.Time{}, time.Time{}, filters, err
 		}
 	}
 	if startTime.After(stopTime) {
 		startTime, stopTime = stopTime, startTime
 	}
-	return startTime, stopTime, nil
+
+	tags, prs := query["tag"]
+	if prs {
+		for _, tag := range tags {
+			filter, err := parseTagQueryParam(tag)
+			if err != nil {
+				return startTime, stopTime, filters, err
+			}
+			filters = append(filters, filter)
+
+		}
+	}
+
+	return startTime, stopTime, filters, nil
 }
 
 // Annotations returns all annotations within the annotations store
@@ -98,7 +137,7 @@ func (s *Service) Annotations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, stop, err := validAnnotationQuery(r.URL.Query())
+	start, stop, filters, err := validAnnotationQuery(r.URL.Query())
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
 		return
@@ -125,7 +164,7 @@ func (s *Service) Annotations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	store := influx.NewAnnotationStore(ts)
-	annotations, err := store.All(ctx, start, stop)
+	annotations, err := store.All(ctx, start, stop, filters)
 	if err != nil {
 		msg := fmt.Errorf("Error loading annotations: %v", err)
 		unknownErrorWithMessage(w, msg, s.Logger)
@@ -188,8 +227,8 @@ func (s *Service) Annotation(w http.ResponseWriter, r *http.Request) {
 type newAnnotationRequest struct {
 	StartTime time.Time
 	EndTime   time.Time
-	Text      string `json:"text,omitempty"` // Text is the associated user-facing text describing the annotation
-	Type      string `json:"type,omitempty"` // Type describes the kind of annotation
+	Text      string                    `json:"text,omitempty"` // Text is the associated user-facing text describing the annotation
+	Tags      chronograf.AnnotationTags `json:"tags"`
 }
 
 func (ar *newAnnotationRequest) UnmarshalJSON(data []byte) error {
@@ -228,7 +267,7 @@ func (ar *newAnnotationRequest) Annotation() *chronograf.Annotation {
 		StartTime: ar.StartTime,
 		EndTime:   ar.EndTime,
 		Text:      ar.Text,
-		Type:      ar.Type,
+		Tags:      ar.Tags,
 	}
 }
 
@@ -263,6 +302,11 @@ func (s *Service) NewAnnotation(w http.ResponseWriter, r *http.Request) {
 	var req newAnnotationRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		invalidJSON(w, s.Logger)
+		return
+	}
+
+	if err = req.Tags.Valid(); err != nil {
+		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
 		return
 	}
 
@@ -332,10 +376,10 @@ func (s *Service) RemoveAnnotation(w http.ResponseWriter, r *http.Request) {
 }
 
 type updateAnnotationRequest struct {
-	StartTime *time.Time `json:"startTime,omitempty"` // StartTime is the time in rfc3339 milliseconds
-	EndTime   *time.Time `json:"endTime,omitempty"`   // EndTime is the time in rfc3339 milliseconds
-	Text      *string    `json:"text,omitempty"`      // Text is the associated user-facing text describing the annotation
-	Type      *string    `json:"type,omitempty"`      // Type describes the kind of annotation
+	StartTime *time.Time                `json:"startTime,omitempty"` // StartTime is the time in rfc3339 milliseconds
+	EndTime   *time.Time                `json:"endTime,omitempty"`   // EndTime is the time in rfc3339 milliseconds
+	Text      *string                   `json:"text,omitempty"`      // Text is the associated user-facing text describing the annotation
+	Tags      chronograf.AnnotationTags `json:"tags"`
 }
 
 // TODO: make sure that endtime is after starttime
@@ -369,7 +413,7 @@ func (u *updateAnnotationRequest) UnmarshalJSON(data []byte) error {
 	}
 
 	// Update must have at least one field set
-	if u.StartTime == nil && u.EndTime == nil && u.Text == nil && u.Type == nil {
+	if u.StartTime == nil && u.EndTime == nil && u.Text == nil {
 		return fmt.Errorf("update request must have at least one field")
 	}
 
@@ -432,8 +476,13 @@ func (s *Service) UpdateAnnotation(w http.ResponseWriter, r *http.Request) {
 	if req.Text != nil {
 		cur.Text = *req.Text
 	}
-	if req.Type != nil {
-		cur.Type = *req.Type
+	if req.Tags != nil {
+		if err = req.Tags.Valid(); err != nil {
+			Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+			return
+		}
+
+		cur.Tags = req.Tags
 	}
 
 	if err = store.Update(ctx, cur); err != nil {

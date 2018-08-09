@@ -1,4 +1,7 @@
+// Libraries
 import React, {PureComponent, ReactElement} from 'react'
+
+// Components
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Step} from 'src/types/wizard'
@@ -6,8 +9,6 @@ import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 import {StepStatus} from 'src/reusable_ui/constants/wizard'
 import {getDeep} from 'src/utils/wrappers'
 import _ from 'lodash'
-
-import 'src/reusable_ui/components/wizard/WizardController.scss'
 
 interface State {
   steps: Step[]

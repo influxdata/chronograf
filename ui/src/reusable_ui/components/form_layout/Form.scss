@@ -5,7 +5,6 @@
 
 $grid--form-gutter: 6px;
 
-
 .form--wrapper {
   width: calc(100% + #{$grid--form-gutter * 2});
   margin-left: -$grid--form-gutter;

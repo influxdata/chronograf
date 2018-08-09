@@ -1,7 +1,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 
-import ImportDashboardMappings from 'src/dashboards/components/ImportDashboardMappings'
+import ImportDashboardMappings from 'src/dashboards/components/import_dashboard_mappings/ImportDashboardMappings'
 import {source, cell, query} from 'test/fixtures'
 
 const setup = (override = {}) => {

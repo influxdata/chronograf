@@ -6,7 +6,7 @@ import Container from 'src/reusable_ui/components/overlays/OverlayContainer'
 import Heading from 'src/reusable_ui/components/overlays/OverlayHeading'
 import Body from 'src/reusable_ui/components/overlays/OverlayBody'
 import DragAndDrop from 'src/shared/components/DragAndDrop'
-import ImportDashboardMappings from 'src/dashboards/components/ImportDashboardMappings'
+import ImportDashboardMappings from 'src/dashboards/components/import_dashboard_mappings/ImportDashboardMappings'
 import {notifyDashboardImportFailed} from 'src/shared/copy/notifications'
 
 import {Dashboard, Cell, Source} from 'src/types'

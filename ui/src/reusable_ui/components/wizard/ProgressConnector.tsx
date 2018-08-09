@@ -1,8 +1,10 @@
+// Libraries
 import React, {PureComponent} from 'react'
-import {ConnectorState} from 'src/reusable_ui/constants/wizard'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import 'src/reusable_ui/components/wizard/ProgressConnector.scss'
+// Types
+import {ConnectorState} from 'src/reusable_ui/constants/wizard'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   status: ConnectorState

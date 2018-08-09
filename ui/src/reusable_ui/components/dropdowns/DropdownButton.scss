@@ -51,18 +51,18 @@ span.icon.dropdown--icon {
   }
 }
 
-.dropdown--button.btn-xs {
+.dropdown--button.button-xs {
   @include buttonSizing($form-xs-padding, $form-xs-font);
 }
 
-.dropdown--button.btn-sm {
+.dropdown--button.button-sm {
   @include buttonSizing($form-sm-padding, $form-sm-font);
 }
 
-.dropdown--button.btn-md {
+.dropdown--button.button-md {
   @include buttonSizing($form-md-padding, $form-md-font);
 }
 
-.dropdown--button.btn-lg {
+.dropdown--button.button-lg {
   @include buttonSizing($form-lg-padding, $form-lg-font);
 }

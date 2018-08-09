@@ -1,4 +1,7 @@
+// Libraries
 import React, {PureComponent, ReactElement} from 'react'
+
+// Components
 import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
 import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'

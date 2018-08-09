@@ -11,14 +11,23 @@ import DashboardHeader from 'src/dashboards/components/DashboardHeader'
 import Dashboard from 'src/dashboards/components/Dashboard'
 import ManualRefresh from 'src/shared/components/ManualRefresh'
 import TemplateControlBar from 'src/tempVars/components/TemplateControlBar'
+import AnnotationControlBar from 'src/shared/components/AnnotationControlBar'
+import AnnotationEditorContainer from 'src/shared/components/AnnotationEditorContainer'
 
 // Actions
 import * as dashboardActions from 'src/dashboards/actions'
-import * as annotationActions from 'src/shared/actions/annotations'
+import {
+  getAnnotationsAsync,
+  dismissEditingAnnotation,
+} from 'src/shared/actions/annotations'
 import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOverlay'
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
+import {
+  fetchAllFluxServicesAsync,
+  FetchAllFluxServicesAsync,
+} from 'src/shared/actions/services'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
@@ -45,7 +54,6 @@ import {WithRouterProps} from 'react-router'
 import {ManualRefreshProps} from 'src/shared/components/ManualRefresh'
 import {Location} from 'history'
 import {InjectedRouter} from 'react-router'
-import * as AnnotationsActions from 'src/types/actions/annotations'
 import * as AppActions from 'src/types/actions/app'
 import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
@@ -54,6 +62,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import * as NotificationsActions from 'src/types/actions/notifications'
+import {Service} from 'src/types'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   source: SourcesModels.Source
@@ -62,16 +71,16 @@ interface Props extends ManualRefreshProps, WithRouterProps {
     sourceID: string
     dashboardID: string
   }
+  services: Service[]
+  fetchServicesAsync: FetchAllFluxServicesAsync
   location: Location
   dashboardID: number
   dashboard: DashboardsModels.Dashboard
   dashboards: DashboardsModels.Dashboard[]
   handleChooseAutoRefresh: AppActions.SetAutoRefreshActionCreator
   autoRefresh: number
-  templateControlBarVisibilityToggled: () => AppActions.TemplateControlBarVisibilityToggledActionCreator
   timeRange: QueriesModels.TimeRange
   zoomedTimeRange: QueriesModels.TimeRange
-  showTemplateControlBar: boolean
   inPresentationMode: boolean
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   cellQueryStatus: {
@@ -83,10 +92,10 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   isUsingAuth: boolean
   router: InjectedRouter
   notify: NotificationsActions.PublishNotificationActionCreator
-  getAnnotationsAsync: AnnotationsActions.GetAnnotationsDispatcher
+  onGetAnnotationsAsync: typeof getAnnotationsAsync
   handleShowCellEditorOverlay: typeof cellEditorOverlayActions.showCellEditorOverlay
   handleHideCellEditorOverlay: typeof cellEditorOverlayActions.hideCellEditorOverlay
-  handleDismissEditingAnnotation: AnnotationsActions.DismissEditingAnnotationActionCreator
+  handleDismissEditingAnnotation: typeof dismissEditingAnnotation
   selectedCell: DashboardsModels.Cell
   thresholdsListType: string
   thresholdsListColors: ColorsModels.ColorNumber[]
@@ -115,6 +124,8 @@ interface State {
   windowHeight: number
   selectedCell: DashboardsModels.Cell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
+  showTempVarControls: boolean
+  showAnnotationControls: boolean
 }
 
 @ErrorHandling
@@ -127,6 +138,8 @@ class DashboardPage extends Component<Props, State> {
       selectedCell: null,
       windowHeight: window.innerHeight,
       dashboardLinks: EMPTY_LINKS,
+      showAnnotationControls: false,
+      showTempVarControls: false,
     }
   }
 
@@ -142,12 +155,13 @@ class DashboardPage extends Component<Props, State> {
 
     this.fetchAnnotations()
     this.getDashboardLinks()
+    this.fetchFluxServices()
   }
 
-  public fetchAnnotations = () => {
-    const {source, timeRange, getAnnotationsAsync} = this.props
+  public fetchAnnotations = async () => {
+    const {source, timeRange, onGetAnnotationsAsync, dashboardID} = this.props
     const rangeMs = millisecondTimeRange(timeRange)
-    getAnnotationsAsync(source.links.annotations, rangeMs)
+    await onGetAnnotationsAsync(source.links.annotations, rangeMs, dashboardID)
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -189,7 +203,6 @@ class DashboardPage extends Component<Props, State> {
       timeRange: {lower, upper},
       zoomedTimeRange,
       zoomedTimeRange: {lower: zoomedLower, upper: zoomedUpper},
-      showTemplateControlBar,
       dashboard,
       dashboardID,
       lineColors,
@@ -252,7 +265,11 @@ class DashboardPage extends Component<Props, State> {
       templatesIncludingDashTime = []
     }
 
-    const {dashboardLinks} = this.state
+    const {
+      dashboardLinks,
+      showTempVarControls,
+      showAnnotationControls,
+    } = this.state
 
     return (
       <div className="page dashboard-page">
@@ -260,6 +277,7 @@ class DashboardPage extends Component<Props, State> {
           <CellEditorOverlay
             source={source}
             sources={sources}
+            services={this.services}
             cell={selectedCell}
             timeRange={timeRange}
             autoRefresh={autoRefresh}
@@ -286,23 +304,33 @@ class DashboardPage extends Component<Props, State> {
           onRenameDashboard={this.handleRenameDashboard}
           dashboardLinks={dashboardLinks}
           activeDashboard={dashboard ? dashboard.name : ''}
-          showTemplateControlBar={showTemplateControlBar}
+          showAnnotationControls={showAnnotationControls}
+          showTempVarControls={showTempVarControls}
           handleChooseAutoRefresh={handleChooseAutoRefresh}
           handleChooseTimeRange={this.handleChooseTimeRange}
-          onToggleTempVarControls={this.handleToggleTempVarControls}
+          onToggleShowTempVarControls={this.toggleTempVarControls}
+          onToggleShowAnnotationControls={this.toggleAnnotationControls}
           handleClickPresentationButton={handleClickPresentationButton}
         />
-        {inPresentationMode || (
-          <TemplateControlBar
-            templates={dashboard && dashboard.templates}
-            meRole={meRole}
-            isUsingAuth={isUsingAuth}
-            onSaveTemplates={this.handleSaveTemplateVariables}
-            onPickTemplate={this.handlePickTemplate}
-            isOpen={showTemplateControlBar}
-            source={source}
-          />
-        )}
+        {!inPresentationMode &&
+          showTempVarControls && (
+            <TemplateControlBar
+              templates={dashboard && dashboard.templates}
+              meRole={meRole}
+              isUsingAuth={isUsingAuth}
+              onSaveTemplates={this.handleSaveTemplateVariables}
+              onPickTemplate={this.handlePickTemplate}
+              source={source}
+            />
+          )}
+        {!inPresentationMode &&
+          showAnnotationControls && (
+            <AnnotationControlBar
+              dashboardID={dashboardID}
+              source={source}
+              onRefreshAnnotations={this.fetchAnnotations}
+            />
+          )}
         {dashboard ? (
           <Dashboard
             source={source}
@@ -322,6 +350,7 @@ class DashboardPage extends Component<Props, State> {
             onSummonOverlayTechnologies={handleShowCellEditorOverlay}
           />
         ) : null}
+        <AnnotationEditorContainer />
       </div>
     )
   }
@@ -330,6 +359,15 @@ class DashboardPage extends Component<Props, State> {
     dashboard: DashboardsModels.Dashboard
   ): TempVarsModels.Template[] {
     return getDeep(dashboard, 'templates', []).map(t => t.tempVar)
+  }
+
+  private get services() {
+    const {services} = this.props
+    if (!services || !services.length) {
+      return []
+    }
+
+    return services
   }
 
   private handleWindowResize = (): void => {
@@ -350,6 +388,15 @@ class DashboardPage extends Component<Props, State> {
         props.dashboard
       ),
     }))
+  }
+
+  private async fetchFluxServices() {
+    const {fetchServicesAsync, sources} = this.props
+    if (!sources.length) {
+      return
+    }
+
+    await fetchServicesAsync(sources)
   }
 
   private inView = (cell: DashboardsModels.Cell): boolean => {
@@ -377,14 +424,14 @@ class DashboardPage extends Component<Props, State> {
     timeRange: QueriesModels.TimeRange
   ): void => {
     const {
-      dashboard,
-      getAnnotationsAsync,
+      dashboardID,
+      onGetAnnotationsAsync,
       source,
       setDashTimeV1,
       updateQueryParams,
     } = this.props
 
-    setDashTimeV1(dashboard.id, {
+    setDashTimeV1(dashboardID, {
       ...timeRange,
       format: FORMAT_INFLUXQL,
     })
@@ -395,7 +442,11 @@ class DashboardPage extends Component<Props, State> {
     })
 
     const annotationRange = millisecondTimeRange(timeRange)
-    getAnnotationsAsync(source.links.annotations, annotationRange)
+    onGetAnnotationsAsync(
+      source.links.annotations,
+      annotationRange,
+      dashboardID
+    )
   }
 
   private handleUpdatePosition = (cells: DashboardsModels.Cell[]): void => {
@@ -462,8 +513,12 @@ class DashboardPage extends Component<Props, State> {
     }
   }
 
-  private handleToggleTempVarControls = (): void => {
-    this.props.templateControlBarVisibilityToggled()
+  private toggleTempVarControls = () => {
+    this.setState({showTempVarControls: !this.state.showTempVarControls})
+  }
+
+  private toggleAnnotationControls = () => {
+    this.setState({showAnnotationControls: !this.state.showAnnotationControls})
   }
 
   private handleZoomedTimeRange = (
@@ -504,10 +559,11 @@ const mstp = (state, {params: {dashboardID}}) => {
   const {
     app: {
       ephemeral: {inPresentationMode},
-      persisted: {autoRefresh, showTemplateControlBar},
+      persisted: {autoRefresh},
     },
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
+    services,
     dashTimeV1,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {
@@ -534,6 +590,7 @@ const mstp = (state, {params: {dashboardID}}) => {
 
   return {
     sources,
+    services,
     meRole,
     dashboard,
     dashboardID: Number(dashboardID),
@@ -543,7 +600,6 @@ const mstp = (state, {params: {dashboardID}}) => {
     isUsingAuth,
     cellQueryStatus,
     inPresentationMode,
-    showTemplateControlBar,
     selectedCell,
     thresholdsListType,
     thresholdsListColors,
@@ -571,15 +627,14 @@ const mdtp = {
   updateTemplateQueryParams: dashboardActions.updateTemplateQueryParams,
   updateQueryParams: dashboardActions.updateQueryParams,
   handleChooseAutoRefresh: appActions.setAutoRefresh,
-  templateControlBarVisibilityToggled:
-    appActions.templateControlBarVisibilityToggled,
   handleClickPresentationButton: appActions.delayEnablePresentationMode,
   errorThrown: errorActions.errorThrown,
   notify: notifyActions.notify,
   handleShowCellEditorOverlay: cellEditorOverlayActions.showCellEditorOverlay,
   handleHideCellEditorOverlay: cellEditorOverlayActions.hideCellEditorOverlay,
-  getAnnotationsAsync: annotationActions.getAnnotationsAsync,
-  handleDismissEditingAnnotation: annotationActions.dismissEditingAnnotation,
+  onGetAnnotationsAsync: getAnnotationsAsync,
+  handleDismissEditingAnnotation: dismissEditingAnnotation,
+  fetchServicesAsync: fetchAllFluxServicesAsync,
 }
 
 export default connect(mstp, mdtp)(

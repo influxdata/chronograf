@@ -136,17 +136,27 @@ export type FetchAllFluxServicesAsync = (
 export const fetchAllFluxServicesAsync: FetchAllFluxServicesAsync = sources => async (
   dispatch
 ): Promise<void> => {
-  const allServices: Service[] = []
-  sources.forEach(async source => {
-    try {
-      const services = await getServicesAJAX(source.links.services)
-      const fluxServices = services.filter(s => s.type === 'flux')
-      allServices.push(...fluxServices)
-    } catch (err) {
-      dispatch(notify(couldNotGetServices))
+  const allServicesForSources: Array<Promise<Service[]>> = sources.map(
+    async source => {
+      try {
+        return getServicesAJAX(source.links.services)
+      } catch (err) {
+        dispatch(notify(couldNotGetServices))
+      }
     }
-  })
-  dispatch(loadServices(allServices))
+  )
+
+  try {
+    const sourceServices = await Promise.all(allServicesForSources)
+    const flat = sourceServices.reduce((acc, cur) => {
+      return [...acc, ...cur.filter(s => s.type === 'flux')]
+    })
+    dispatch(loadServices(flat))
+  } catch (err) {
+    console.error(err.data)
+    dispatch(notify(couldNotGetServices))
+    throw err.data
+  }
 }
 
 export type FetchFluxServicesForSourceAsync = (
@@ -160,7 +170,9 @@ export const fetchFluxServicesForSourceAsync: FetchFluxServicesForSourceAsync = 
     const fluxServices = services.filter(s => s.type === 'flux')
     dispatch(loadServices(fluxServices))
   } catch (err) {
+    console.error(err.data)
     dispatch(notify(couldNotGetServices))
+    throw err.data
   }
 }
 

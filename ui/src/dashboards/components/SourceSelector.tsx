@@ -1,38 +1,43 @@
 import React, {SFC} from 'react'
 
-import Dropdown from 'src/shared/components/Dropdown'
+import SourceDropdown from 'src/flux/components/SourceDropdown'
 
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
+import {Service} from 'src/types'
 
 interface Props {
+  source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  selected: string
-  onSetQuerySource: (source: SourcesModels.SourceOption) => void
+  service: Service
+  services: Service[]
   queries: QueriesModels.QueryConfig[]
+  onChangeService: (service: Service, source: SourcesModels.Source) => void
 }
 
 const SourceSelector: SFC<Props> = ({
+  source,
   sources = [],
-  selected,
-  onSetQuerySource,
+  service,
+  services,
   queries,
-}) =>
-  sources.length > 1 && queries.length ? (
+  onChangeService,
+}) => {
+  return sources.length > 1 && queries.length ? (
     <div className="source-selector">
       <h3>Source:</h3>
-      <Dropdown
-        items={sources}
-        buttonSize="btn-sm"
-        menuClass="dropdown-astronaut"
-        useAutoComplete={true}
-        selected={selected}
-        onChoose={onSetQuerySource}
-        className="dropdown-240"
+      <SourceDropdown
+        service={service}
+        services={services}
+        source={source}
+        sources={sources}
+        allowInfluxQL={true}
+        onChangeService={onChangeService}
       />
     </div>
   ) : (
     <div className="source-selector" />
   )
+}
 
 export default SourceSelector

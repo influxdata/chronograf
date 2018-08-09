@@ -130,8 +130,6 @@ class Dygraph extends Component<Props, State> {
       underlayCallback,
     } = this.props
 
-    const timeSeries = this.timeSeries
-
     let defaultOptions = {
       ...options,
       labels,
@@ -143,7 +141,7 @@ class Dygraph extends Component<Props, State> {
       series: this.colorDygraphSeries,
       axes: {
         y: {
-          valueRange: this.getYRange(timeSeries),
+          valueRange: this.getYRange(this.timeSeries),
           axisLabelFormatter: (
             yval: number,
             __,
@@ -154,7 +152,7 @@ class Dygraph extends Component<Props, State> {
           labelsKMG2: y.base === BASE_2,
         },
         y2: {
-          valueRange: getRange(timeSeries, y2.bounds),
+          valueRange: getRange(this.timeSeries, y2.bounds),
         },
       },
       zoomCallback: (lower: number, upper: number) =>
@@ -171,7 +169,7 @@ class Dygraph extends Component<Props, State> {
       }
     }
 
-    this.dygraph = new Dygraphs(this.graphRef.current, timeSeries, {
+    this.dygraph = new Dygraphs(this.graphRef.current, this.timeSeries, {
       ...defaultOptions,
       ...OPTIONS,
       ...options,
@@ -213,10 +211,6 @@ class Dygraph extends Component<Props, State> {
       this.props.timeRange
     )
 
-    if (this.dygraph.isZoomed() && timeRangeChanged) {
-      this.dygraph.resetZoom()
-    }
-
     const updateOptions = {
       ...options,
       labels,
@@ -246,6 +240,10 @@ class Dygraph extends Component<Props, State> {
     }
 
     dygraph.updateOptions(updateOptions)
+
+    if (this.dygraph.isZoomed('x') && timeRangeChanged) {
+      this.dygraph.resetZoom()
+    }
 
     const {w} = this.dygraph.getArea()
     this.props.setResolution(w)
@@ -366,14 +364,14 @@ class Dygraph extends Component<Props, State> {
   private handleZoom = (lower: number, upper: number) => {
     const {onZoom} = this.props
 
-    if (this.dygraph.isZoomed() === false) {
-      return onZoom({lower: null, upper: null})
+    if (this.dygraph.isZoomed('x')) {
+      return onZoom({
+        lower: this.formatTimeRange(lower),
+        upper: this.formatTimeRange(upper),
+      })
     }
 
-    onZoom({
-      lower: this.formatTimeRange(lower),
-      upper: this.formatTimeRange(upper),
-    })
+    return onZoom({lower: null, upper: null})
   }
 
   private handleDraw = () => {
@@ -434,7 +432,7 @@ class Dygraph extends Component<Props, State> {
     const {timeSeries} = this.props
     // Avoid 'Can't plot empty data set' errors by falling back to a
     // default dataset that's valid for Dygraph.
-    return timeSeries.length ? timeSeries : [[0]]
+    return timeSeries && timeSeries.length ? timeSeries : [[0]]
   }
 
   private get colorDygraphSeries() {

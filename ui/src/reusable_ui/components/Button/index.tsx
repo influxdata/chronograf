@@ -11,8 +11,10 @@ import {
   IconFont,
 } from 'src/reusable_ui/types'
 
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
 interface Props {
-  text: string
+  text?: string
   onClick?: () => void
   color?: ComponentColor
   size?: ComponentSize
@@ -22,6 +24,7 @@ interface Props {
   titleText?: string
 }
 
+@ErrorHandling
 class Button extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     color: ComponentColor.Default,
@@ -31,12 +34,12 @@ class Button extends Component<Props> {
   }
 
   public render() {
-    const {status, onClick, text, titleText} = this.props
+    const {onClick, text, titleText} = this.props
 
     return (
       <button
         className={this.className}
-        disabled={status === ComponentStatus.Disabled}
+        disabled={this.disabled}
         onClick={onClick}
         title={titleText || text}
       >
@@ -67,6 +70,14 @@ class Button extends Component<Props> {
     return text
   }
 
+  private get disabled(): boolean {
+    const {status} = this.props
+
+    return (
+      status === ComponentStatus.Disabled || status === ComponentStatus.Loading
+    )
+  }
+
   private get statusIndicator(): JSX.Element {
     const {status, size} = this.props
 
@@ -84,6 +95,7 @@ class Button extends Component<Props> {
       'button-square': shape === ButtonShape.Square,
       'button-stretch': shape === ButtonShape.StretchToFit,
       'button--loading': status === ComponentStatus.Loading,
+      'button--disabled': status === ComponentStatus.Disabled,
     })
   }
 }

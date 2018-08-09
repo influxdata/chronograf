@@ -12,7 +12,6 @@ import {
   DelayEnablePresentationModeDispatcher,
   SetAutoRefreshActionCreator,
   SetAutoRefreshAction,
-  TemplateControlBarVisibilityToggledAction,
 } from 'src/types/actions/app'
 
 // ephemeral state action creators
@@ -42,8 +41,4 @@ export const setAutoRefresh: SetAutoRefreshActionCreator = (
   payload: {
     milliseconds,
   },
-})
-
-export const templateControlBarVisibilityToggled = (): TemplateControlBarVisibilityToggledAction => ({
-  type: ActionTypes.TemplateControlBarVisibilityToggled,
 })

@@ -1,12 +1,14 @@
+// Libraries
 import React, {PureComponent, ReactElement} from 'react'
 
+// Components
 import SplashPage from 'src/shared/components/SplashPage'
 import WizardController from 'src/reusable_ui/components/wizard/WizardController'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 
-import 'src/reusable_ui/components/wizard/WizardFullScreen.scss'
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
   title: string

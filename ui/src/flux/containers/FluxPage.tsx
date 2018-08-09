@@ -16,7 +16,6 @@ import {UpdateScript} from 'src/flux/actions'
 import {bodyNodes} from 'src/flux/helpers'
 import {getSuggestions, getAST, getTimeSeries} from 'src/flux/apis'
 import {builder, argTypes, emptyAST} from 'src/flux/constants'
-import {getDeep} from 'src/utils/wrappers'
 
 import {Source, Service, Notification, FluxTable} from 'src/types'
 import {
@@ -37,12 +36,15 @@ interface Status {
 
 interface Props {
   links: Links
+  service: Service
   services: Service[]
   source: Source
+  sources: Source[]
   notify: (message: Notification) => void
   script: string
   updateScript: UpdateScript
   onGoToEditFlux: (service: Service) => void
+  onChangeService: (service: Service, source: Source) => void
 }
 
 interface Body extends FlatBody {
@@ -84,7 +86,13 @@ export class FluxPage extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {links} = this.props
+    const {links, script} = this.props
+
+    try {
+      this.debouncedASTResponse(script)
+    } catch (error) {
+      console.error('Could not retrieve AST for script', error)
+    }
 
     try {
       const suggestions = await getSuggestions(links.suggestions)
@@ -98,7 +106,7 @@ export class FluxPage extends PureComponent<Props, State> {
 
   public render() {
     const {suggestions, body, status} = this.state
-    const {script} = this.props
+    const {script, service} = this.props
 
     return (
       <FluxContext.Provider value={this.getContext}>
@@ -109,7 +117,7 @@ export class FluxPage extends PureComponent<Props, State> {
               body={body}
               script={script}
               status={status}
-              service={this.service}
+              service={service}
               suggestions={suggestions}
               onValidate={this.handleValidate}
               onAppendFrom={this.handleAppendFrom}
@@ -125,7 +133,14 @@ export class FluxPage extends PureComponent<Props, State> {
   }
 
   private get header(): JSX.Element {
-    const {services, onGoToEditFlux} = this.props
+    const {
+      service,
+      services,
+      source,
+      sources,
+      onGoToEditFlux,
+      onChangeService,
+    } = this.props
 
     if (!services.length) {
       return null
@@ -133,19 +148,14 @@ export class FluxPage extends PureComponent<Props, State> {
 
     return (
       <FluxHeader
-        service={this.service}
+        source={source}
+        service={service}
+        sources={sources}
         services={services}
         onGoToEditFlux={onGoToEditFlux}
+        onChangeService={onChangeService}
       />
     )
-  }
-
-  private get service(): Service {
-    const {services} = this.props
-    const activeService = services.find(s => {
-      return getDeep<boolean>(s, 'metadata.active', false)
-    })
-    return activeService || services[0]
   }
 
   private get getContext(): Context {
@@ -157,7 +167,7 @@ export class FluxPage extends PureComponent<Props, State> {
       onDeleteFuncNode: this.handleDeleteFuncNode,
       onGenerateScript: this.handleGenerateScript,
       onToggleYield: this.handleToggleYield,
-      service: this.service,
+      service: this.props.service,
       data: this.state.data,
       scriptUpToYield: this.handleScriptUpToYield,
     }
@@ -647,7 +657,7 @@ export class FluxPage extends PureComponent<Props, State> {
   }
 
   private getTimeSeries = async () => {
-    const {script, links, notify} = this.props
+    const {script, service, links, notify} = this.props
 
     if (!script) {
       return
@@ -661,7 +671,7 @@ export class FluxPage extends PureComponent<Props, State> {
     }
 
     try {
-      const {tables, didTruncate} = await getTimeSeries(this.service, script)
+      const {tables, didTruncate} = await getTimeSeries(service, script)
 
       this.setState({data: tables})
 
