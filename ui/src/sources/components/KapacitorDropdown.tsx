@@ -7,6 +7,8 @@ import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import Button from 'src/reusable_ui/components/Button'
 import {ToggleVisibility} from 'src/types/wizard'
 
+import classnames from 'classnames'
+
 import {
   ComponentColor,
   ComponentSize,
@@ -39,7 +41,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   }
 
   public render() {
-    const {buttonSize} = this.props
+    const {buttonSize, setActiveKapacitor, onAddNew} = this.props
 
     if (this.isKapacitorsEmpty) {
       return (
@@ -62,7 +64,10 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
         replaceWithIfNotAuthorized={this.UnauthorizedDropdown}
       >
         <Dropdown
-          className="dropdown-260"
+          className={classnames({
+            'kapacitor-dropdown': onAddNew,
+            'dropdown-260': !onAddNew,
+          })}
           buttonColor="btn-primary"
           buttonSize={buttonSize}
           items={this.kapacitorItems}

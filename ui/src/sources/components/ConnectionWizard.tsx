@@ -100,13 +100,13 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           />
         </WizardStep>
         <WizardStep
-          title="You are complete"
-          tipText="yay"
+          title="Setup Complete"
+          tipText="You are complete!"
           isComplete={this.isCompletionComplete}
           isErrored={false}
           onNext={this.handleCompletionNext}
           onPrevious={this.handleCompletionPrev}
-          nextLabel="Connect to this source"
+          nextLabel="View All Connections"
           previousLabel="Go Back"
         >
           <CompletionStep
