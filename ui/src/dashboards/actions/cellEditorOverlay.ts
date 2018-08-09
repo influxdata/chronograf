@@ -8,6 +8,7 @@ import {
   ThresholdType,
   TableOptions,
 } from 'src/types/dashboards'
+import {NewDefaultCell} from '../constants'
 
 export enum ActionType {
   ShowCellEditorOverlay = 'SHOW_CELL_EDITOR_OVERLAY',
@@ -43,7 +44,7 @@ export type Action =
 export interface ShowCellEditorOverlayAction {
   type: ActionType.ShowCellEditorOverlay
   payload: {
-    cell: Cell
+    cell: Cell | NewDefaultCell
   }
 }
 
@@ -129,7 +130,7 @@ export interface UpdateFieldOptionsAction {
 }
 
 export const showCellEditorOverlay = (
-  cell: Cell
+  cell: Cell | NewDefaultCell
 ): ShowCellEditorOverlayAction => ({
   type: ActionType.ShowCellEditorOverlay,
   payload: {

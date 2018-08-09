@@ -48,6 +48,7 @@ import {
 } from 'src/shared/constants'
 import {FORMAT_INFLUXQL, defaultTimeRange} from 'src/shared/data/timeRanges'
 import {EMPTY_LINKS} from 'src/dashboards/constants/dashboardHeader'
+import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
 
 // Types
 import {WithRouterProps} from 'react-router'
@@ -62,6 +63,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import * as NotificationsActions from 'src/types/actions/notifications'
+import {NewDefaultCell} from 'src/dashboards/constants/index'
 import {Service} from 'src/types'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
@@ -412,11 +414,21 @@ class DashboardPage extends Component<Props, State> {
     return topInView && bottomInView
   }
 
+  private isExistingCell(cell: DashboardsModels.Cell | NewDefaultCell) {
+    return (cell as DashboardsModels.Cell).i !== undefined
+  }
+
   private handleSaveEditedCell = async (
-    newCell: DashboardsModels.Cell
+    newCell: DashboardsModels.Cell | NewDefaultCell
   ): Promise<void> => {
     const {dashboard, handleHideCellEditorOverlay} = this.props
-    await this.props.updateDashboardCell(dashboard, newCell)
+
+    if (this.isExistingCell(newCell)) {
+      await this.props.updateDashboardCell(dashboard, newCell)
+    } else if (!this.isExistingCell(newCell)) {
+      this.props.addDashboardCellAsync(dashboard, newCell)
+    }
+
     handleHideCellEditorOverlay()
   }
 
@@ -459,7 +471,8 @@ class DashboardPage extends Component<Props, State> {
 
   private handleAddCell = (): void => {
     const {dashboard} = this.props
-    this.props.addDashboardCellAsync(dashboard)
+    const emptyCell = getNewDashboardCell(dashboard)
+    this.props.handleShowCellEditorOverlay(emptyCell)
   }
 
   private handleCloneCell = (cell: DashboardsModels.Cell): void => {

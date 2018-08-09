@@ -45,6 +45,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service} from 'src/types'
 import {Template} from 'src/types/tempVars'
+import {NewDefaultCell} from 'src/dashboards/constants/index'
 
 type QueryTransitions = typeof queryTransitions
 type EditRawTextAsyncFunc = (
@@ -75,7 +76,7 @@ interface Props {
   services: Service[]
   editQueryStatus: typeof editCellQueryStatus
   onCancel: () => void
-  onSave: (cell: DashboardsModels.Cell) => void
+  onSave: (cell: DashboardsModels.Cell | NewDefaultCell) => void
   source: SourcesModels.Source
   dashboardID: number
   queryStatus: QueryStatus
@@ -86,7 +87,7 @@ interface Props {
   thresholdsListColors: ColorsModels.ColorNumber[]
   gaugeColors: ColorsModels.ColorNumber[]
   lineColors: ColorsModels.ColorString[]
-  cell: DashboardsModels.Cell
+  cell: DashboardsModels.Cell | NewDefaultCell
 }
 
 interface State {
@@ -359,7 +360,7 @@ class CellEditorOverlay extends Component<Props, State> {
       lineColors,
     })
 
-    const newCell: DashboardsModels.Cell = {
+    const newCell: DashboardsModels.Cell | NewDefaultCell = {
       ...cell,
       queries,
       colors,
