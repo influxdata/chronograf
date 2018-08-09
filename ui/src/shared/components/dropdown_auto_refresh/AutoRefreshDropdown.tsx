@@ -4,7 +4,6 @@ import classnames from 'classnames'
 
 // Components
 import {Dropdown, Button, ButtonShape, IconFont} from 'src/reusable_ui'
-// import OnClickOutside from 'src/shared/components/OnClickOutside'
 
 // Constants
 import autoRefreshOptions, {
