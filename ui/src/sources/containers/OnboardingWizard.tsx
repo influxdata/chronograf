@@ -147,7 +147,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
     if (source) {
       router.push(`/sources/${source.id}/manage-sources`)
     }
-    return {status: true, payload: null}
+    return {success: true, payload: null}
   }
   private handleCompletionPrev = () => {}
 
