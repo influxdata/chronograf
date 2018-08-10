@@ -1,8 +1,7 @@
+// Libraries
 import React, {Component} from 'react'
-import classnames from 'classnames'
 
-import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-
+// Components
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
 import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
@@ -10,10 +9,15 @@ import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import RenameDashboard from 'src/dashboards/components/rename_dashboard/RenameDashboard'
 import DashboardSwitcher from 'src/dashboards/components/DashboardSwitcher'
+import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
+import {Button, ComponentColor, ButtonShape, IconFont} from 'src/reusable_ui'
 
+// Types
 import * as AppActions from 'src/types/actions/app'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface State {
   selected: QueriesModels.TimeRange
@@ -39,6 +43,7 @@ interface Props {
   isHidden: boolean
 }
 
+@ErrorHandling
 class DashboardHeader extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
     zoomedTimeRange: {
@@ -121,12 +126,11 @@ class DashboardHeader extends Component<Props, State> {
           onChooseTimeRange={this.handleChooseTimeRange}
           selected={selected}
         />
-        <button
-          className="btn btn-default btn-sm btn-square"
+        <Button
+          icon={IconFont.ExpandA}
           onClick={this.handleClickPresentationButton}
-        >
-          <span className="icon expand-a" />
-        </button>
+          shape={ButtonShape.Square}
+        />
       </>
     )
   }
@@ -151,10 +155,13 @@ class DashboardHeader extends Component<Props, State> {
     if (dashboard) {
       return (
         <Authorized requiredRole={EDITOR_ROLE}>
-          <button className="btn btn-primary btn-sm" onClick={onAddCell}>
-            <span className="icon plus" />
-            Add Cell
-          </button>
+          <Button
+            shape={ButtonShape.Square}
+            color={ComponentColor.Primary}
+            icon={IconFont.AddCell}
+            onClick={onAddCell}
+            titleText="Add a Cell to Dashboard"
+          />
         </Authorized>
       )
     }
@@ -172,22 +179,18 @@ class DashboardHeader extends Component<Props, State> {
     if (dashboard) {
       return (
         <>
-          <div
-            className={classnames('btn btn-default btn-sm', {
-              active: showTempVarControls,
-            })}
+          <Button
+            text="Variables"
+            icon={IconFont.Cube}
             onClick={onToggleShowTempVarControls}
-          >
-            <span className="icon cube" />Template Variables
-          </div>
-          <div
-            className={classnames('btn btn-default btn-sm', {
-              active: showAnnotationControls,
-            })}
+            active={showTempVarControls}
+          />
+          <Button
+            text="Annotations"
+            icon={IconFont.Annotate}
             onClick={onToggleShowAnnotationControls}
-          >
-            <span className="icon pencil" />Annotations
-          </div>
+            active={showAnnotationControls}
+          />
         </>
       )
     }
