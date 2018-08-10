@@ -68,6 +68,7 @@ import * as NotificationsActions from 'src/types/actions/notifications'
 import {NewDefaultCell} from 'src/types/dashboards'
 import {Service} from 'src/types'
 import {QueryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
+import {AnnotationsDisplaySetting} from 'src/types/annotations'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   source: SourcesModels.Source
@@ -100,6 +101,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   isUsingAuth: boolean
   router: InjectedRouter
   notify: NotificationsActions.PublishNotificationActionCreator
+  annotationsDisplaySetting: AnnotationsDisplaySetting
   onGetAnnotationsAsync: typeof getAnnotationsAsync
   handleLoadCellForCEO: typeof cellEditorOverlayActions.loadCellForCEO
   handleClearCellFromCEO: typeof cellEditorOverlayActions.clearCellFromCEO
@@ -189,7 +191,7 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    const {dashboard, autoRefresh} = this.props
+    const {dashboard, autoRefresh, annotationsDisplaySetting} = this.props
 
     const prevPath = getDeep(prevProps.location, 'pathname', null)
     const thisPath = getDeep(this.props.location, 'pathname', null)
@@ -206,6 +208,13 @@ class DashboardPage extends Component<Props, State> {
 
     if (autoRefresh !== prevProps.autoRefresh) {
       AutoRefresh.poll(autoRefresh)
+    }
+
+    if (
+      annotationsDisplaySetting !== AnnotationsDisplaySetting.HideAnnotations &&
+      annotationsDisplaySetting !== prevProps.annotationsDisplaySetting
+    ) {
+      this.fetchAnnotations()
     }
   }
 
@@ -655,6 +664,7 @@ const mstp = (state, {params: {dashboardID}}) => {
       ephemeral: {inPresentationMode},
       persisted: {autoRefresh, showTemplateVariableControlBar},
     },
+    annotations: {displaySetting},
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
     services,
@@ -702,6 +712,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     gaugeColors,
     lineColors,
     showTemplateVariableControlBar,
+    annotationsDisplaySetting: displaySetting,
   }
 }
 

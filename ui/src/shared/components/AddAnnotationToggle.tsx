@@ -2,16 +2,24 @@ import React, {SFC} from 'react'
 import {connect} from 'react-redux'
 
 import {
+  Button,
+  ComponentColor,
+  IconFont,
+  ComponentStatus,
+} from 'src/reusable_ui'
+
+import {
   addingAnnotation,
   dismissAddingAnnotation,
 } from 'src/shared/actions/annotations'
 
 import {ADDING} from 'src/shared/annotations/helpers'
 
-import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
+import {AnnotationsDisplaySetting} from 'src/types/annotations'
 
 interface Props {
   isAddingAnnotation: boolean
+  displaySetting: AnnotationsDisplaySetting
   onAddingAnnotation: typeof addingAnnotation
   onDismissAddingAnnotation: typeof dismissAddingAnnotation
 }
@@ -19,6 +27,7 @@ interface Props {
 const AddAnnotationToggle: SFC<Props> = props => {
   const {
     isAddingAnnotation,
+    displaySetting,
     onAddingAnnotation,
     onDismissAddingAnnotation,
   } = props
@@ -27,6 +36,7 @@ const AddAnnotationToggle: SFC<Props> = props => {
   let buttonContent = 'Annotate'
   let buttonColor = ComponentColor.Primary
   let buttonIcon = IconFont.AnnotatePlus
+  let buttonStatus = ComponentStatus.Default
 
   if (isAddingAnnotation) {
     onToggle = onDismissAddingAnnotation
@@ -37,18 +47,24 @@ const AddAnnotationToggle: SFC<Props> = props => {
     onToggle = onAddingAnnotation
   }
 
+  if (displaySetting === AnnotationsDisplaySetting.HideAnnotations) {
+    buttonStatus = ComponentStatus.Disabled
+  }
+
   return (
     <Button
       icon={buttonIcon}
       color={buttonColor}
-      onClick={onToggle}
+      status={buttonStatus}
       text={buttonContent}
+      onClick={onToggle}
     />
   )
 }
 
-const mstp = ({annotations: {mode}}) => ({
+const mstp = ({annotations: {mode, displaySetting}}) => ({
   isAddingAnnotation: mode === ADDING,
+  displaySetting,
 })
 
 const mdtp = {

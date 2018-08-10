@@ -6,7 +6,12 @@ import {parseMetaQuery} from 'src/tempVars/parsing'
 import {getTagFilters} from 'src/shared/selectors/annotations'
 import {BLACKLISTED_KEYS} from 'src/shared/annotations/helpers'
 
-import {Annotation, AnnotationRange, TagFilter} from 'src/types/annotations'
+import {
+  Annotation,
+  AnnotationRange,
+  TagFilter,
+  AnnotationsDisplaySetting,
+} from 'src/types/annotations'
 
 export type Action =
   | EditingAnnotationAction
@@ -26,6 +31,7 @@ export type Action =
   | DeleteTagFilterAction
   | SetTagKeysAction
   | SetTagValuesAction
+  | SetDisplaySettingAction
 
 interface EditingAnnotationAction {
   type: 'EDITING_ANNOTATION'
@@ -227,6 +233,18 @@ export const setTagValues = (
   payload: {tagKey, tagValues},
 })
 
+interface SetDisplaySettingAction {
+  type: 'SET_DISPLAY_SETTING'
+  payload: AnnotationsDisplaySetting
+}
+
+export const setDisplaySetting = (
+  setting: AnnotationsDisplaySetting
+): SetDisplaySettingAction => ({
+  type: 'SET_DISPLAY_SETTING',
+  payload: setting,
+})
+
 export const addAnnotationAsync = (
   createUrl: string,
   annotation: Annotation
@@ -245,6 +263,12 @@ export const getAnnotationsAsync = (
   dispatch: Dispatch<SetAnnotationsAction>,
   getState
 ): Promise<void> => {
+  const {displaySetting} = getState().annotations
+
+  if (displaySetting === AnnotationsDisplaySetting.HideAnnotations) {
+    return
+  }
+
   const tagFilters = getTagFilters(getState(), dashboardID)
   const annotations = await api.getAnnotations(
     indexUrl,
