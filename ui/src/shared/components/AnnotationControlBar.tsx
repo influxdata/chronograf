@@ -3,7 +3,8 @@ import {connect} from 'react-redux'
 
 import AddAnnotationToggle from 'src/shared/components/AddAnnotationToggle'
 import AnnotationFilterControl from 'src/shared/components/AnnotationFilterControl'
-import {Button, ComponentColor, ButtonShape, IconFont} from 'src/reusable_ui'
+import AnnotationsDisplaySettingDropdown from 'src/shared/components/AnnotationsDisplaySettingDropdown'
+import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
 
 import {
   updateTagFilter,
@@ -16,7 +17,7 @@ import {NEW_TAG_FILTER} from 'src/shared/annotations/helpers'
 import {getTagFilters} from 'src/shared/selectors/annotations'
 
 import {Source} from 'src/types'
-import {TagFilter} from 'src/types/annotations'
+import {TagFilter, AnnotationsDisplaySetting} from 'src/types/annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
 
 interface Props {
@@ -26,6 +27,7 @@ interface Props {
   tagValues: {
     [tagKey: string]: string[]
   }
+  displaySetting: AnnotationsDisplaySetting
   source: Source
   onUpdateTagFilter: typeof updateTagFilter
   onDeleteTagFilter: typeof deleteTagFilter
@@ -36,28 +38,34 @@ interface Props {
 
 class AnnotationControlBar extends PureComponent<Props> {
   public render() {
-    const {tagFilters} = this.props
+    const {tagFilters, displaySetting} = this.props
 
     return (
       <div className="annotation-control-bar">
         <div className="annotation-control-bar--lhs">
-          <div className="toolbar-title">Filter Annotations by Tags:</div>
-          {tagFilters.map(tagFilter => (
-            <AnnotationFilterControl
-              key={tagFilter.id}
-              tagFilter={tagFilter}
-              onUpdate={this.handleUpdateTagFilter}
-              onDelete={this.handleDeleteTagFilter}
-              onGetKeySuggestions={this.handleGetKeySuggestions}
-              onGetValueSuggestions={this.handleGetValueSuggestions}
-            />
-          ))}
-          <Button
-            onClick={this.handleAddTagFilter}
-            icon={IconFont.Plus}
-            shape={ButtonShape.Square}
-            color={ComponentColor.Primary}
-          />
+          <AnnotationsDisplaySettingDropdown />
+          {displaySetting ===
+            AnnotationsDisplaySetting.FilterAnnotationsByTag && (
+            <>
+              {tagFilters.map(tagFilter => (
+                <AnnotationFilterControl
+                  key={tagFilter.id}
+                  tagFilter={tagFilter}
+                  onUpdate={this.handleUpdateTagFilter}
+                  onDelete={this.handleDeleteTagFilter}
+                  onGetKeySuggestions={this.handleGetKeySuggestions}
+                  onGetValueSuggestions={this.handleGetValueSuggestions}
+                />
+              ))}
+              <Button
+                onClick={this.handleAddTagFilter}
+                icon={IconFont.Plus}
+                color={ComponentColor.Primary}
+                text={'Filter'}
+                titleText={'Add New Annotation Tag Filter'}
+              />
+            </>
+          )}
         </div>
         <div className="annotation-control-bar--rhs">
           <AddAnnotationToggle />
@@ -117,10 +125,10 @@ const mstp = (
   state: {annotations: AnnotationState},
   ownProps: {dashboardID: number}
 ): Partial<Props> => {
-  const {tagKeys, tagValues} = state.annotations
+  const {tagKeys, tagValues, displaySetting} = state.annotations
   const tagFilters = getTagFilters(state, ownProps.dashboardID)
 
-  return {tagFilters, tagKeys, tagValues}
+  return {tagFilters, tagKeys, tagValues, displaySetting}
 }
 
 const mdtp = {

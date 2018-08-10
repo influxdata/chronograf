@@ -26,6 +26,12 @@ export interface TagFilter {
   filterType: TagFilterType
 }
 
+export enum AnnotationsDisplaySetting {
+  HideAnnotations = 'Hide Annotations',
+  FilterAnnotationsByTag = 'Filter Annotations By Tags',
+  // ShowCellLevelAnnotations = 'Show Cell Level Annotations',
+}
+
 export interface AnnotationTags {
   [tagKey: string]: string
 }
