@@ -70,19 +70,6 @@ export class Dropdown extends Component<Props, State> {
     this.setState({isOpen: false})
   }
 
-  public handleClick = (e: MouseEvent<HTMLDivElement>) => {
-    const {disabled, onClick} = this.props
-
-    if (disabled) {
-      return
-    }
-
-    this.toggleMenu(e)
-    if (onClick) {
-      onClick(e)
-    }
-  }
-
   public handleSelection = (item: DropdownItem) => () => {
     this.toggleMenu()
     this.props.onChoose(item)
@@ -246,6 +233,19 @@ export class Dropdown extends Component<Props, State> {
         )}
       </div>
     )
+  }
+
+  private handleClick = (e: MouseEvent<HTMLDivElement>) => {
+    const {disabled, onClick} = this.props
+
+    if (disabled) {
+      return
+    }
+
+    this.toggleMenu(e)
+    if (onClick) {
+      onClick(e)
+    }
   }
 }
 
