@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import {Panel, PanelType} from 'src/reusable_ui'
 import DatabaseTable from 'src/admin/components/DatabaseTable'
 
 const DatabaseManager = ({
@@ -25,13 +26,14 @@ const DatabaseManager = ({
   onDeleteRetentionPolicy,
 }) => {
   return (
-    <div className="panel panel-solid">
-      <div className="panel-heading">
-        <h2 className="panel-title">
-          {databases.length === 1
+    <Panel type={PanelType.Solid}>
+      <Panel.Header
+        title={
+          databases.length === 1
             ? '1 Database'
-            : `${databases.length} Databases`}
-        </h2>
+            : `${databases.length} Databases`
+        }
+      >
         <button
           className="btn btn-sm btn-primary"
           disabled={isAddDBDisabled}
@@ -39,8 +41,8 @@ const DatabaseManager = ({
         >
           <span className="icon plus" /> Create Database
         </button>
-      </div>
-      <div className="panel-body">
+      </Panel.Header>
+      <Panel.Body>
         {databases.map(db => (
           <DatabaseTable
             key={db.links.self}
@@ -63,8 +65,8 @@ const DatabaseManager = ({
             onDeleteRetentionPolicy={onDeleteRetentionPolicy}
           />
         ))}
-      </div>
-    </div>
+      </Panel.Body>
+    </Panel>
   )
 }
 

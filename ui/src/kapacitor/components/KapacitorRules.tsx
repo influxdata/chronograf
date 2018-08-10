@@ -1,10 +1,14 @@
+// Libraries
 import React, {SFC} from 'react'
 import {Link} from 'react-router'
 
+// Components
 import NoKapacitorError from 'src/shared/components/NoKapacitorError'
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
 import TasksTable from 'src/kapacitor/components/TasksTable'
+import {Panel} from 'src/reusable_ui'
 
+// Types
 import {Source, AlertRule} from 'src/types'
 
 interface KapacitorRulesProps {
@@ -26,14 +30,13 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
 }) => {
   if (loading || !hasKapacitor) {
     return (
-      <div>
-        <div className="panel-heading">
-          <h2 className="panel-title">Alert Rules</h2>
+      <Panel>
+        <Panel.Header title="Alert Rules">
           <button className="btn btn-primary btn-sm disabled" disabled={true}>
             Create Rule
           </button>
-        </div>
-        <div className="panel-body">
+        </Panel.Header>
+        <Panel.Body>
           <div className="generic-empty-state">
             {!hasKapacitor ? (
               <NoKapacitorError source={source} />
@@ -41,8 +44,8 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
               <p>Loading Rules...</p>
             )}
           </div>
-        </div>
-      </div>
+        </Panel.Body>
+      </Panel>
     )
   }
 
@@ -56,10 +59,9 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
   }`
 
   return (
-    <div>
-      <div className="panel">
-        <div className="panel-heading">
-          <h2 className="panel-title">{builderHeader}</h2>
+    <>
+      <Panel>
+        <Panel.Header title={builderHeader}>
           <Link
             to={`/sources/${source.id}/alert-rules/new`}
             className="btn btn-sm btn-primary"
@@ -67,19 +69,18 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
           >
             <span className="icon plus" /> Build Alert Rule
           </Link>
-        </div>
-        <div className="panel-body">
+        </Panel.Header>
+        <Panel.Body>
           <KapacitorRulesTable
             source={source}
             rules={builderRules}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
           />
-        </div>
-      </div>
-      <div className="panel">
-        <div className="panel-heading">
-          <h2 className="panel-title">{scriptsHeader}</h2>
+        </Panel.Body>
+      </Panel>
+      <Panel>
+        <Panel.Header title={scriptsHeader}>
           <Link
             to={`/sources/${source.id}/tickscript/new`}
             className="btn btn-sm btn-success"
@@ -87,17 +88,17 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
           >
             <span className="icon plus" /> Write TICKscript
           </Link>
-        </div>
-        <div className="panel-body">
+        </Panel.Header>
+        <Panel.Body>
           <TasksTable
             source={source}
             tasks={rules}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
           />
-        </div>
-      </div>
-    </div>
+        </Panel.Body>
+      </Panel>
+    </>
   )
 }
 

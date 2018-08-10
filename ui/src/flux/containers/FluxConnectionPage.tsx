@@ -1,15 +1,16 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
 
+// Components
 import FluxNew from 'src/flux/components/FluxNew'
 import FluxEdit from 'src/flux/components/FluxEdit'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-import {ErrorHandling} from 'src/shared/decorators/errors'
-import {getService} from 'src/shared/apis'
-import {FluxFormMode} from 'src/flux/constants/connection'
+import {Panel} from 'src/reusable_ui'
 
+// Actions
 import {
   updateServiceAsync,
   createServiceAsync,
@@ -17,9 +18,19 @@ import {
   fetchFluxServicesForSourceAsync,
   setActiveServiceAsync,
 } from 'src/shared/actions/services'
+
+// APIs
+import {getService} from 'src/shared/apis'
+
+// Constants
+import {FluxFormMode} from 'src/flux/constants/connection'
 import {couldNotGetFluxService} from 'src/shared/copy/notifications'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
+
+// Types
 import {Service, Source, Notification} from 'src/types'
+
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   source: Source
@@ -102,9 +113,9 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
           <div className="container-fluid">
             <div className="row">
               <div className="col-md-8 col-md-offset-2">
-                <div className="panel">
-                  <div className="panel-body">{this.form}</div>
-                </div>
+                <Panel>
+                  <Panel.Body>{this.form}</Panel.Body>
+                </Panel>
               </div>
             </div>
           </div>

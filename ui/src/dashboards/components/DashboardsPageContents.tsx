@@ -8,7 +8,7 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
-import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
+import {Panel, Button, ComponentColor, IconFont} from 'src/reusable_ui'
 
 import {Dashboard, Source} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -54,27 +54,30 @@ class DashboardsPageContents extends Component<Props, State> {
     } = this.props
 
     return (
-      <FancyScrollbar className="page-contents">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-md-12">
-              <div className="panel">
-                {this.renderPanelHeading}
-                <div className="panel-body">
-                  <DashboardsTable
-                    dashboards={this.filteredDashboards}
-                    onDeleteDashboard={onDeleteDashboard}
-                    onCreateDashboard={onCreateDashboard}
-                    onCloneDashboard={onCloneDashboard}
-                    onExportDashboard={onExportDashboard}
-                    dashboardLink={dashboardLink}
-                  />
-                </div>
+      <>
+        <FancyScrollbar className="page-contents">
+          <div className="container-fluid">
+            <div className="row">
+              <div className="col-md-12">
+                <Panel>
+                  {this.renderPanelHeading}
+                  <Panel.Body>
+                    <DashboardsTable
+                      dashboards={this.filteredDashboards}
+                      onDeleteDashboard={onDeleteDashboard}
+                      onCreateDashboard={onCreateDashboard}
+                      onCloneDashboard={onCloneDashboard}
+                      onExportDashboard={onExportDashboard}
+                      dashboardLink={dashboardLink}
+                    />
+                  </Panel.Body>
+                </Panel>
               </div>
             </div>
           </div>
-        </div>
-      </FancyScrollbar>
+        </FancyScrollbar>
+        {this.renderImportOverlay}
+      </>
     )
   }
 
@@ -82,33 +85,27 @@ class DashboardsPageContents extends Component<Props, State> {
     const {onCreateDashboard} = this.props
 
     return (
-      <>
-        <div className="panel-heading">
-          <h2 className="panel-title">{this.panelTitle}</h2>
-          <div className="panel-controls">
-            <SearchBar
-              placeholder="Filter by Name..."
-              onSearch={this.filterDashboards}
+      <Panel.Header title={this.panelTitle}>
+        <SearchBar
+          placeholder="Filter by Name..."
+          onSearch={this.filterDashboards}
+        />
+        <Authorized requiredRole={EDITOR_ROLE}>
+          <>
+            <Button
+              text="Import Dashboard"
+              icon={IconFont.Import}
+              onClick={this.handleToggleOverlay}
             />
-            <Authorized requiredRole={EDITOR_ROLE}>
-              <>
-                <Button
-                  text="Import Dashboard"
-                  icon={IconFont.Import}
-                  onClick={this.handleToggleOverlay}
-                />
-                <Button
-                  text="Create Dashboard"
-                  icon={IconFont.Plus}
-                  onClick={onCreateDashboard}
-                  color={ComponentColor.Primary}
-                />
-              </>
-            </Authorized>
-          </div>
-        </div>
-        {this.renderImportOverlay}
-      </>
+            <Button
+              text="Create Dashboard"
+              icon={IconFont.Plus}
+              onClick={onCreateDashboard}
+              color={ComponentColor.Primary}
+            />
+          </>
+        </Authorized>
+      </Panel.Header>
     )
   }
 
