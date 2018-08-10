@@ -18,9 +18,10 @@ import {Action, ActionType} from 'src/dashboards/actions/cellEditorOverlay'
 import {CellType, Cell} from 'src/types'
 import {ThresholdType, TableOptions} from 'src/types/dashboards'
 import {ThresholdColor, GaugeColor, LineColor} from 'src/types/colors'
+import {NewDefaultCell} from 'src/types/dashboards'
 
 interface CEOInitialState {
-  cell: Cell | null
+  cell: Cell | NewDefaultCell | null
   thresholdsListType: ThresholdType
   thresholdsListColors: ThresholdColor[]
   gaugeColors: GaugeColor[]
@@ -38,17 +39,7 @@ export const initialState = {
 export default (state = initialState, action: Action): CEOInitialState => {
   switch (action.type) {
     case ActionType.ShowCellEditorOverlay: {
-      const {
-        cell,
-        cell: {colors},
-      } = action.payload
-
-      const thresholdsListType = getThresholdsListType(colors)
-      const thresholdsListColors = validateThresholdsListColors(
-        colors,
-        thresholdsListType
-      )
-      const gaugeColors = validateGaugeColors(colors)
+      const {cell} = action.payload
 
       const tableOptions = getDeep<TableOptions>(
         cell,
@@ -56,15 +47,30 @@ export default (state = initialState, action: Action): CEOInitialState => {
         initializeOptions(CellType.Table)
       )
 
-      const lineColors = validateLineColors(colors)
+      if ((cell as Cell).colors) {
+        const colors = (cell as Cell).colors
 
+        const thresholdsListType = getThresholdsListType(colors)
+        const thresholdsListColors = validateThresholdsListColors(
+          colors,
+          thresholdsListType
+        )
+        const gaugeColors = validateGaugeColors(colors)
+
+        const lineColors = validateLineColors(colors)
+
+        return {
+          ...state,
+          cell: {...cell, tableOptions},
+          thresholdsListType,
+          thresholdsListColors,
+          gaugeColors,
+          lineColors,
+        }
+      }
       return {
         ...state,
         cell: {...cell, tableOptions},
-        thresholdsListType,
-        thresholdsListColors,
-        gaugeColors,
-        lineColors,
       }
     }
 

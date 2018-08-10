@@ -15,7 +15,6 @@ import {
 } from 'src/dashboards/apis'
 import {getMe} from 'src/shared/apis/auth'
 import {hydrateTemplates} from 'src/tempVars/utils/graph'
-import {showCellEditorOverlay} from 'src/dashboards/actions/cellEditorOverlay'
 
 import {notify} from 'src/shared/actions/notifications'
 import {errorThrown} from 'src/shared/actions/errors'
@@ -26,10 +25,7 @@ import {
   templateSelectionsFromTemplates,
 } from 'src/dashboards/utils/tempVars'
 import {validTimeRange, validAbsoluteTimeRange} from 'src/dashboards/utils/time'
-import {
-  getNewDashboardCell,
-  getClonedDashboardCell,
-} from 'src/dashboards/utils/cellGetters'
+import {getClonedDashboardCell} from 'src/dashboards/utils/cellGetters'
 import {
   notifyDashboardDeleted,
   notifyDashboardDeleteFailed,
@@ -53,13 +49,13 @@ import {defaultTimeRange} from 'src/shared/data/timeRanges'
 import {
   Dashboard,
   Cell,
-  CellType,
   TimeRange,
   Source,
   Template,
   TemplateValue,
   TemplateType,
 } from 'src/types'
+import {NewDefaultCell} from 'src/types/dashboards'
 
 export enum ActionType {
   LoadDashboards = 'LOAD_DASHBOARDS',
@@ -482,9 +478,10 @@ export const putDashboardByID = (dashboardID: number) => async (
   }
 }
 
-export const updateDashboardCell = (dashboard: Dashboard, cell: Cell) => async (
-  dispatch: Dispatch<Action>
-): Promise<void> => {
+export const updateDashboardCell = (
+  dashboard: Dashboard,
+  cell: Cell | NewDefaultCell
+) => async (dispatch: Dispatch<Action>): Promise<void> => {
   try {
     const {data} = await updateDashboardCellAJAX(cell)
     dispatch(syncDashboardCell(dashboard, data))
@@ -514,16 +511,12 @@ export const deleteDashboardAsync = (dashboard: Dashboard) => async (
 
 export const addDashboardCellAsync = (
   dashboard: Dashboard,
-  cellType?: CellType
+  cell: NewDefaultCell
 ) => async (dispatch: Dispatch<Action>): Promise<void> => {
   try {
-    const {data} = await addDashboardCellAJAX(
-      dashboard,
-      getNewDashboardCell(dashboard, cellType)
-    )
+    const {data} = await addDashboardCellAJAX(dashboard, cell)
     dispatch(addDashboardCell(dashboard, data))
     dispatch(notify(notifyCellAdded(data.name)))
-    dispatch(showCellEditorOverlay(data))
   } catch (error) {
     console.error(error)
     dispatch(errorThrown(error))

@@ -2,12 +2,13 @@ import {
   DEFAULT_VERTICAL_TIME_AXIS,
   DEFAULT_FIX_FIRST_COLUMN,
 } from 'src/shared/constants/tableGraph'
-import {Cell, QueryConfig} from 'src/types'
+import {QueryConfig} from 'src/types'
 import {
   CellType,
   Dashboard,
   DecimalPlaces,
   SourceItemValue,
+  NewDefaultCell,
 } from 'src/types/dashboards'
 
 export const UNTITLED_GRAPH: string = 'Untitled Graph'
@@ -52,10 +53,6 @@ export const FORMAT_OPTIONS: Array<{text: string}> = [
   {text: TIME_FORMAT_CUSTOM},
 ]
 
-export type NewDefaultCell = Pick<
-  Cell,
-  Exclude<keyof Cell, 'i' | 'axes' | 'colors' | 'links' | 'legend'>
->
 export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   x: 0,
   y: 0,

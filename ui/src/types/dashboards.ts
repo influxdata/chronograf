@@ -193,3 +193,8 @@ export interface DashboardFile {
   meta?: DashboardFileMetaSection
   dashboard: Dashboard
 }
+
+export type NewDefaultCell = Pick<
+  Cell,
+  Exclude<keyof Cell, 'i' | 'axes' | 'colors' | 'links' | 'legend'>
+>

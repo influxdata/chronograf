@@ -12,6 +12,7 @@ import {
   updateAxes,
 } from 'src/dashboards/actions/cellEditorOverlay'
 import {DEFAULT_TABLE_OPTIONS} from 'src/dashboards/constants'
+import {Cell} from 'src/types/dashboards'
 
 import {
   validateGaugeColors,
@@ -102,8 +103,9 @@ describe('Dashboards.Reducers.cellEditorOverlay', () => {
   it('should update the cell axes', () => {
     const actual = reducer(initialState, updateAxes(axes))
     const expected = axes
+    const actualCell = actual.cell as Cell
 
-    expect(actual.cell.axes).toBe(expected)
+    expect(actualCell.axes).toBe(expected)
   })
 
   it('should update the cell line graph colors', () => {
