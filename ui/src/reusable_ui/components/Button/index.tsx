@@ -23,6 +23,7 @@ interface Props {
   status?: ComponentStatus
   titleText?: string
   active?: boolean
+  tabIndex?: number
 }
 
 @ErrorHandling
@@ -36,7 +37,7 @@ class Button extends Component<Props> {
   }
 
   public render() {
-    const {onClick, text, titleText} = this.props
+    const {onClick, text, titleText, tabIndex} = this.props
 
     return (
       <button
@@ -44,6 +45,7 @@ class Button extends Component<Props> {
         disabled={this.disabled}
         onClick={onClick}
         title={titleText || text}
+        tabIndex={!!tabIndex ? tabIndex : 0}
       >
         {this.icon}
         {this.text}

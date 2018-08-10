@@ -77,6 +77,7 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
           status={ComponentStatus.Default}
           size={ComponentSize.ExtraSmall}
           onClick={this.toggleFilterType}
+          tabIndex={-1}
         />
         <div className="annotation-filter-control--tag-value">
           <AnnotationFilterControlInput
