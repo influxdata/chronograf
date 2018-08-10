@@ -114,16 +114,18 @@ const tagsetFilter = (filter: SchemaFilter[]): string => {
 }
 
 const proxy = async (service: Service, script: string) => {
-  const and = encodeURIComponent('&')
   const mark = encodeURIComponent('?')
   const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
-
+  const dialect = {annotations: ['group', 'datatype', 'default']}
+  const data = {query: garbage, dialect}
   try {
     const response = await AJAX({
       method: 'POST',
       url: `${
         service.links.proxy
-      }?path=/v1/query${mark}orgName=defaulorgname${and}q=${garbage}`,
+      }?path=/query${mark}organization=defaultorgname`,
+      data,
+      headers: {'Content-Type': 'application/json'},
     })
 
     return response.data
