@@ -67,8 +67,10 @@ export enum Greys {
 }
 
 export enum IconFont {
-  Alerts = 'alerts',
   AlertTriangle = 'alert-triangle',
+  Alerts = 'alerts',
+  Annotate = 'annotate',
+  AnnotatePlus = 'annotate-plus',
   AuthZero = 'authzero',
   BarChart = 'bar-chart',
   Capacitor = 'capacitor2',
