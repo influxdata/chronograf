@@ -37,10 +37,10 @@ class WizardController extends PureComponent<Props, State> {
       (child: ReactElement<WizardStepProps>, i) => {
         const isComplete = child.props.isComplete()
         let isErrored
-        if (typeof child.props.isErrored === 'boolean') {
+        if (_.isBoolean(child.props.isErrored)) {
           isErrored = child.props.isErrored
         }
-        if (typeof child.props.isErrored === 'function') {
+        if (_.isFunction(child.props.isErrored)) {
           isErrored = child.props.isErrored()
         }
         let stepStatus = StepStatus.Incomplete
