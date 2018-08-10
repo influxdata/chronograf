@@ -18,6 +18,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/bolt"
+	"github.com/influxdata/chronograf/filestore"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
 	clog "github.com/influxdata/chronograf/log"
@@ -55,14 +56,15 @@ type Server struct {
 
 	NewSources string `long:"new-sources" description:"Config for adding a new InfluxDB source and Kapacitor server, in JSON as an array of objects, and surrounded by single quotes. E.g. --new-sources='[{\"influxdb\":{\"name\":\"Influx 1\",\"username\":\"user1\",\"password\":\"pass1\",\"url\":\"http://localhost:8086\",\"metaUrl\":\"http://metaurl.com\",\"type\":\"influx-enterprise\",\"insecureSkipVerify\":false,\"default\":true,\"telegraf\":\"telegraf\",\"sharedSecret\":\"cubeapples\"},\"kapacitor\":{\"name\":\"Kapa 1\",\"url\":\"http://localhost:9092\",\"active\":true}}]'" env:"NEW_SOURCES" hidden:"true"`
 
-	Develop       bool          `short:"d" long:"develop" description:"Run server in develop mode."`
-	BoltPath      string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
-	CannedPath    string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
-	ResourcesPath string        `long:"resources-path" description:"Path to directory of pre-canned dashboards, sources, kapacitors, and organizations (/usr/share/chronograf/resources)" env:"RESOURCES_PATH" default:"canned"`
-	TokenSecret   string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
-	JwksURL       string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
-	UseIDToken    bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
-	AuthDuration  time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
+	Develop         bool          `short:"d" long:"develop" description:"Run server in develop mode."`
+	BoltPath        string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
+	CannedPath      string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
+	ProtoboardsPath string        `long:"protoboards-path" description:"Path to directory of protoboards (/usr/share/chronograf/protoboards) "env:"PROTOBOARDS_PATH" default:"protoboards"`
+	ResourcesPath   string        `long:"resources-path" description:"Path to directory of pre-canned dashboards, sources, kapacitors, and organizations (/usr/share/chronograf/resources)" env:"RESOURCES_PATH" default:"canned"`
+	TokenSecret     string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
+	JwksURL         string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
+	UseIDToken      bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
+	AuthDuration    time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
 
 	GithubClientID     string   `short:"i" long:"github-client-id" description:"Github Client ID for OAuth 2 support" env:"GH_CLIENT_ID"`
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
@@ -331,7 +333,7 @@ func (s *Server) Serve(ctx context.Context) error {
 			Error(err)
 		return err
 	}
-	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), logger, s.useAuth())
+	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), s.ProtoboardsPath, logger, s.useAuth())
 	service.SuperAdminProviderGroups = superAdminProviderGroups{
 		auth0: s.Auth0SuperAdminOrg,
 	}
@@ -433,7 +435,7 @@ func (s *Server) Serve(ctx context.Context) error {
 	return nil
 }
 
-func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, logger chronograf.Logger, useAuth bool) Service {
+func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, protoboardsPath string, logger chronograf.Logger, useAuth bool) Service {
 	db := bolt.NewClient()
 	db.Path = boltPath
 
@@ -483,6 +485,8 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
+	protoboards := filestore.NewProtoboards(protoboardsPath, idgen.NewTime(), logger)
+
 	return Service{
 		TimeSeriesClient: &InfluxClient{},
 		Store: &Store{
@@ -491,6 +495,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 			SourcesStore:            sources,
 			ServersStore:            kapacitors,
 			OrganizationsStore:      organizations,
+			ProtoboardsStore:        protoboards,
 			UsersStore:              db.UsersStore,
 			ConfigStore:             db.ConfigStore,
 			MappingsStore:           db.MappingsStore,

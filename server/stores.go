@@ -87,6 +87,7 @@ type DataStore interface {
 	Sources(ctx context.Context) chronograf.SourcesStore
 	Servers(ctx context.Context) chronograf.ServersStore
 	Layouts(ctx context.Context) chronograf.LayoutsStore
+	Protoboards(ctx context.Context) chronograf.ProtoboardsStore
 	Users(ctx context.Context) chronograf.UsersStore
 	Organizations(ctx context.Context) chronograf.OrganizationsStore
 	Mappings(ctx context.Context) chronograf.MappingsStore
@@ -105,6 +106,7 @@ type Store struct {
 	SourcesStore            chronograf.SourcesStore
 	ServersStore            chronograf.ServersStore
 	LayoutsStore            chronograf.LayoutsStore
+	ProtoboardsStore        chronograf.ProtoboardsStore
 	UsersStore              chronograf.UsersStore
 	DashboardsStore         chronograf.DashboardsStore
 	MappingsStore           chronograf.MappingsStore
@@ -144,6 +146,11 @@ func (s *Store) Servers(ctx context.Context) chronograf.ServersStore {
 // Layouts returns all layouts in the underlying layouts store.
 func (s *Store) Layouts(ctx context.Context) chronograf.LayoutsStore {
 	return s.LayoutsStore
+}
+
+// Protoboards returns all protoboards in the underlying protoboards store.
+func (s *Store) Protoboards(ctx context.Context) chronograf.ProtoboardsStore {
+	return s.ProtoboardsStore
 }
 
 // Users returns a chronograf.UsersStore.
