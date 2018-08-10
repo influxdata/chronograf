@@ -20,17 +20,19 @@ import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import AutoRefresh from 'src/utils/AutoRefresh'
+import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboardOverlay'
 
 import {VIS_VIEWS, AUTO_GROUP_BY, TEMPLATES} from 'src/shared/constants'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'src/data_explorer/constants'
 import {errorThrown} from 'src/shared/actions/errors'
 import {setAutoRefresh} from 'src/shared/actions/app'
+import {getDashboardsAsync, addDashboardCellAsync} from 'src/dashboards/actions'
 import * as dataExplorerActionCreators from 'src/data_explorer/actions/view'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {buildRawText} from 'src/utils/influxql'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
-import {Source, QueryConfig, TimeRange} from 'src/types'
+import {Source, QueryConfig, TimeRange, Dashboard} from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
@@ -44,13 +46,17 @@ interface Props {
   setTimeRange: (range: TimeRange) => void
   timeRange: TimeRange
   manualRefresh: number
+  dashboards: Dashboard[]
   onManualRefresh: () => void
   errorThrownAction: () => void
   writeLineProtocol: () => void
+  handleGetDashboards: () => Dashboard[]
+  addDashboardCell: typeof addDashboardCellAsync
 }
 
 interface State {
   isWriteFormVisible: boolean
+  isSendToDashboardVisible: boolean
 }
 
 @ErrorHandling
@@ -60,12 +66,14 @@ export class DataExplorer extends PureComponent<Props, State> {
 
     this.state = {
       isWriteFormVisible: false,
+      isSendToDashboardVisible: false,
     }
   }
 
-  public componentDidMount() {
-    const {source, autoRefresh} = this.props
+  public async componentDidMount() {
+    const {source, autoRefresh, handleGetDashboards} = this.props
     const {query} = qs.parse(location.search, {ignoreQueryPrefix: true})
+    await handleGetDashboards()
 
     AutoRefresh.poll(autoRefresh)
 
@@ -108,15 +116,17 @@ export class DataExplorer extends PureComponent<Props, State> {
     const {
       source,
       timeRange,
+      dashboards,
       autoRefresh,
       queryConfigs,
       manualRefresh,
       errorThrownAction,
       writeLineProtocol,
       queryConfigActions,
+      addDashboardCell,
     } = this.props
 
-    const {isWriteFormVisible} = this.state
+    const {isWriteFormVisible, isSendToDashboardVisible} = this.state
 
     return (
       <>
@@ -129,11 +139,21 @@ export class DataExplorer extends PureComponent<Props, State> {
             writeLineProtocol={writeLineProtocol}
           />
         </OverlayTechnology>
+        <OverlayTechnology visible={isSendToDashboardVisible}>
+          <SendToDashboardOverlay
+            onCancel={this.toggleSendToDashboard}
+            queryConfig={this.activeQuery}
+            source={source}
+            rawText={this.rawText}
+            dashboards={dashboards}
+            addDashboardCell={addDashboardCell}
+          />
+        </OverlayTechnology>
         <PageHeader
-          titleText="Data Explorer"
+          titleText="Explore"
           fullWidth={true}
           optionsComponents={this.optionsComponents}
-          sourceIndicator={true}
+          sourceIndicator={false}
         />
         <ResizeContainer
           containerClass="page-contents"
@@ -209,15 +229,20 @@ export class DataExplorer extends PureComponent<Props, State> {
 
     return (
       <>
-        <GraphTips />
-        <div
-          className="btn btn-sm btn-default"
+        <button
           onClick={this.handleOpenWriteData}
           data-test="write-data-button"
+          className="button button-sm button-default"
         >
-          <span className="icon pencil" />
           Write Data
-        </div>
+        </button>
+        <button
+          onClick={this.toggleSendToDashboard}
+          className="button button-sm button-success"
+        >
+          Send to Dashboard
+        </button>
+        <GraphTips />
         <AutoRefreshDropdown
           selected={autoRefresh}
           onChoose={handleChooseAutoRefresh}
@@ -231,6 +256,12 @@ export class DataExplorer extends PureComponent<Props, State> {
       </>
     )
   }
+
+  private toggleSendToDashboard = () => {
+    this.setState({
+      isSendToDashboardVisible: !this.state.isSendToDashboardVisible,
+    })
+  }
 }
 
 const mapStateToProps = state => {
@@ -241,6 +272,7 @@ const mapStateToProps = state => {
     dataExplorer,
     dataExplorerQueryConfigs: queryConfigs,
     timeRange,
+    dashboardUI: {dashboards},
   } = state
   const queryConfigValues = _.values(queryConfigs)
 
@@ -249,6 +281,7 @@ const mapStateToProps = state => {
     dataExplorer,
     queryConfigs: queryConfigValues,
     timeRange,
+    dashboards,
   }
 }
 
@@ -265,6 +298,8 @@ const mapDispatchToProps = dispatch => {
       dataExplorerActionCreators,
       dispatch
     ),
+    handleGetDashboards: bindActionCreators(getDashboardsAsync, dispatch),
+    addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
   }
 }
 
