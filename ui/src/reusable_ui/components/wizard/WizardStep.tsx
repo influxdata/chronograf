@@ -10,7 +10,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 type booleanFunction = () => boolean
 
 interface NextReturn {
-  status: boolean
+  success: boolean
   payload: any
 }
 
@@ -75,16 +75,16 @@ class WizardStep extends PureComponent<WizardStepProps> {
   private handleClickNext = async () => {
     const {onNext, increment, isBlockingStep} = this.props
     let payload
-    let status = true
+    let success = true
 
     if (onNext) {
       const response = await onNext()
-      status = response.status
+      success = response.success
       payload = response.payload
     }
 
     if (increment) {
-      if (!isBlockingStep || (isBlockingStep && status === true)) {
+      if (!isBlockingStep || (isBlockingStep && success === true)) {
         increment()
       }
     }

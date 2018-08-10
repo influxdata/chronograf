@@ -72,11 +72,11 @@ class SourceStep extends PureComponent<Props, State> {
         this.props.addSource(sourceFromServer)
         notify(notifySourceCreationSucceeded(source.name))
         setError(false)
-        return {status: true, payload: sourceFromServer}
+        return {success: true, payload: sourceFromServer}
       } catch (err) {
         notify(notifySourceCreationFailed(source.name, this.parseError(err)))
         setError(true)
-        return {status: false, payload: null}
+        return {success: false, payload: null}
       }
     } else {
       if (this.sourceIsEdited) {
@@ -85,14 +85,14 @@ class SourceStep extends PureComponent<Props, State> {
           this.props.updateSource(sourceFromServer)
           notify(notifySourceUdpated(source.name))
           setError(false)
-          return {status: true, payload: sourceFromServer}
+          return {success: true, payload: sourceFromServer}
         } catch (error) {
           notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
           setError(true)
-          return {status: false, payload: null}
+          return {success: false, payload: null}
         }
       }
-      return {status: true, payload: source}
+      return {success: true, payload: source}
     }
   }
 

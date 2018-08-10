@@ -99,15 +99,15 @@ class KapacitorStep extends Component<Props, State> {
           setError(false)
           await this.fetchNewKapacitors()
           notify(notifyKapacitorUpdated())
-          return {status: true, payload: data}
+          return {success: true, payload: data}
         } catch (error) {
           console.error(error)
           setError(true)
           notify(notifyKapacitorUpdateFailed())
-          return {status: false, payload: null}
+          return {success: false, payload: null}
         }
       }
-      return {status: true, payload: existingKapacitor}
+      return {success: true, payload: existingKapacitor}
     } else {
       try {
         const {data} = await createKapacitor(source, newKapacitor)
@@ -116,12 +116,12 @@ class KapacitorStep extends Component<Props, State> {
         setError(false)
         await this.fetchNewKapacitors()
         notify(notifyKapacitorSuccess())
-        return {status: true, payload: data}
+        return {success: true, payload: data}
       } catch (error) {
         console.error(error)
         setError(true)
         notify(notifyKapacitorCreateFailed())
-        return {status: false, payload: null}
+        return {success: false, payload: null}
       }
     }
   }
