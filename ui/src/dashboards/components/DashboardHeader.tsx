@@ -130,6 +130,7 @@ class DashboardHeader extends Component<Props, State> {
           icon={IconFont.ExpandA}
           onClick={this.handleClickPresentationButton}
           shape={ButtonShape.Square}
+          titleText="Enter Full-Screen Presentation Mode"
         />
       </>
     )
@@ -177,6 +178,17 @@ class DashboardHeader extends Component<Props, State> {
     } = this.props
 
     if (dashboard) {
+      let variablesTooltip = 'Show Template Variables Controls'
+      let annotationsTooltip = 'Show Annotations Controls'
+
+      if (showTempVarControls) {
+        variablesTooltip = 'Hide Template Variables Controls'
+      }
+
+      if (showAnnotationControls) {
+        annotationsTooltip = 'Hide Annotations Controls'
+      }
+
       return (
         <>
           <Button
@@ -184,12 +196,14 @@ class DashboardHeader extends Component<Props, State> {
             icon={IconFont.Cube}
             onClick={onToggleShowTempVarControls}
             active={showTempVarControls}
+            titleText={variablesTooltip}
           />
           <Button
             text="Annotations"
             icon={IconFont.Annotate}
             onClick={onToggleShowAnnotationControls}
             active={showAnnotationControls}
+            titleText={annotationsTooltip}
           />
         </>
       )
