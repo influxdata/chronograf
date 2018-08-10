@@ -8,6 +8,8 @@ import {
 
 import {ADDING} from 'src/shared/annotations/helpers'
 
+import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
+
 interface Props {
   isAddingAnnotation: boolean
   onAddingAnnotation: typeof addingAnnotation
@@ -21,27 +23,27 @@ const AddAnnotationToggle: SFC<Props> = props => {
     onDismissAddingAnnotation,
   } = props
 
-  const buttonClass = isAddingAnnotation ? 'default' : 'primary'
-
   let onToggle
-  let buttonContent
+  let buttonContent = 'Annotate'
+  let buttonColor = ComponentColor.Primary
+  let buttonIcon = IconFont.AnnotatePlus
 
   if (isAddingAnnotation) {
     onToggle = onDismissAddingAnnotation
-    buttonContent = 'Cancel Add Annotation'
+    buttonContent = 'Cancel Annotate'
+    buttonColor = ComponentColor.Default
+    buttonIcon = IconFont.Remove
   } else {
     onToggle = onAddingAnnotation
-    buttonContent = (
-      <>
-        <span className="icon plus" /> Add Annotation
-      </>
-    )
   }
 
   return (
-    <div className={`btn btn-${buttonClass} btn-sm`} onClick={onToggle}>
-      {buttonContent}
-    </div>
+    <Button
+      icon={buttonIcon}
+      color={buttonColor}
+      onClick={onToggle}
+      text={buttonContent}
+    />
   )
 }
 

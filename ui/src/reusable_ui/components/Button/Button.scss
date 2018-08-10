@@ -28,7 +28,6 @@
 }
 
 .button-icon {
-  font-size: 1.25em;
   margin-right: 0.4em;
   margin-left: -0.1em;
   display: inline-block;
@@ -51,13 +50,14 @@
     width: $height * 0.5;
     height: $height * 0.5;
   }
+
+  .button-icon {
+    font-size: floor($fontSize * 1.25);
+  }
 }
 
 .button-xs {
   @include buttonSizeModifier($form-xs-font, $form-xs-padding, $form-xs-height);
-  .button-icon {
-    font-size: 1em;
-  }
 }
 .button-sm {
   @include buttonSizeModifier($form-sm-font, $form-sm-padding, $form-sm-height);

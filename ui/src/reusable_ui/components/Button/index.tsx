@@ -22,6 +22,7 @@ interface Props {
   icon?: IconFont
   status?: ComponentStatus
   titleText?: string
+  active?: boolean
 }
 
 @ErrorHandling
@@ -31,6 +32,7 @@ class Button extends Component<Props> {
     size: ComponentSize.Small,
     shape: ButtonShape.Default,
     status: ComponentStatus.Default,
+    active: false,
   }
 
   public render() {
@@ -89,13 +91,14 @@ class Button extends Component<Props> {
   }
 
   private get className(): string {
-    const {color, size, shape, status} = this.props
+    const {color, size, shape, status, active} = this.props
 
     return classnames(`button button-${size} button-${color}`, {
       'button-square': shape === ButtonShape.Square,
       'button-stretch': shape === ButtonShape.StretchToFit,
       'button--loading': status === ComponentStatus.Loading,
       'button--disabled': status === ComponentStatus.Disabled,
+      active,
     })
   }
 }

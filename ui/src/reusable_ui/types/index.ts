@@ -67,8 +67,11 @@ export enum Greys {
 }
 
 export enum IconFont {
-  Alerts = 'alerts',
+  AddCell = 'add-cell',
   AlertTriangle = 'alert-triangle',
+  Alerts = 'alerts',
+  Annotate = 'annotate',
+  AnnotatePlus = 'annotate-plus',
   AuthZero = 'authzero',
   BarChart = 'bar-chart',
   Capacitor = 'capacitor2',
@@ -114,6 +117,7 @@ export enum IconFont {
   Pencil = 'pencil',
   Play = 'play',
   Plus = 'plus',
+  PlusSkinny = 'plus-skinny',
   Pulse = 'pulse-c',
   Refresh = 'refresh',
   Remove = 'remove',
