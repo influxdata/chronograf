@@ -9,7 +9,6 @@ interface State {
   }
   persisted: {
     autoRefresh: number
-    showTemplateControlBar: boolean
   }
 }
 
@@ -19,7 +18,6 @@ const initialState: State = {
   },
   persisted: {
     autoRefresh: AUTOREFRESH_DEFAULT,
-    showTemplateControlBar: false,
   },
 }
 
@@ -62,12 +60,6 @@ const appPersistedReducer = (
         ...state,
         autoRefresh: action.payload.milliseconds,
       }
-    }
-
-    case ActionTypes.TemplateControlBarVisibilityToggled: {
-      const {showTemplateControlBar} = state
-
-      return {...state, showTemplateControlBar: !showTemplateControlBar}
     }
 
     default:

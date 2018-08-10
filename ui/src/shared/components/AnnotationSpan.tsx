@@ -13,7 +13,7 @@ import AnnotationTooltip from 'src/shared/components/AnnotationTooltip'
 import AnnotationWindow from 'src/shared/components/AnnotationWindow'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {AnnotationInterface, DygraphClass} from 'src/types'
+import {Annotation, DygraphClass} from 'src/types'
 
 interface State {
   isMouseOver: string
@@ -21,12 +21,12 @@ interface State {
 }
 
 interface Props {
-  annotation: AnnotationInterface
+  annotation: Annotation
   mode: string
   dygraph: DygraphClass
   staticLegendHeight: number
-  updateAnnotation: (a: AnnotationInterface) => void
-  updateAnnotationAsync: (a: AnnotationInterface) => void
+  updateAnnotation: (a: Annotation) => void
+  updateAnnotationAsync: (a: Annotation) => void
   xAxisRange: [number, number]
 }
 
@@ -168,7 +168,6 @@ class AnnotationSpan extends Component<Props, State> {
       <div className={markerClass} style={markerStyles}>
         {showTooltip && (
           <AnnotationTooltip
-            isEditing={isEditing}
             timestamp={annotation.startTime}
             annotation={annotation}
             onMouseLeave={this.handleMouseLeave}
@@ -222,7 +221,6 @@ class AnnotationSpan extends Component<Props, State> {
       <div className={markerClass} style={markerStyles}>
         {showTooltip && (
           <AnnotationTooltip
-            isEditing={isEditing}
             timestamp={annotation.endTime}
             annotation={annotation}
             onMouseLeave={this.handleMouseLeave}

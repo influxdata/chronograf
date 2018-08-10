@@ -15,6 +15,7 @@ import {
 } from 'src/dashboards/apis'
 import {getMe} from 'src/shared/apis/auth'
 import {hydrateTemplates} from 'src/tempVars/utils/graph'
+import {showCellEditorOverlay} from 'src/dashboards/actions/cellEditorOverlay'
 
 import {notify} from 'src/shared/actions/notifications'
 import {errorThrown} from 'src/shared/actions/errors'
@@ -522,6 +523,7 @@ export const addDashboardCellAsync = (
     )
     dispatch(addDashboardCell(dashboard, data))
     dispatch(notify(notifyCellAdded(data.name)))
+    dispatch(showCellEditorOverlay(data))
   } catch (error) {
     console.error(error)
     dispatch(errorThrown(error))

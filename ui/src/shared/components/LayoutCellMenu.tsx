@@ -1,6 +1,4 @@
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
 
 import classnames from 'classnames'
 
@@ -9,35 +7,23 @@ import MenuTooltipButton, {
 } from 'src/shared/components/MenuTooltipButton'
 import CustomTimeIndicator from 'src/shared/components/CustomTimeIndicator'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import {EDITING} from 'src/shared/annotations/helpers'
-import {cellSupportsAnnotations} from 'src/shared/constants/index'
 import {Cell} from 'src/types/dashboards'
 import {QueryConfig} from 'src/types/queries'
-
-import {
-  addingAnnotation,
-  editingAnnotation,
-  dismissEditingAnnotation,
-} from 'src/shared/actions/annotations'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Query {
-  text: string
-  config: QueryConfig
+  text?: string
+  queryConfig: QueryConfig
 }
 
 interface Props {
   cell: Cell
   isEditable: boolean
   dataExists: boolean
-  mode: string
   onEdit: () => void
   onClone: (cell: Cell) => void
   onDelete: (cell: Cell) => void
   onCSVDownload: () => void
-  onStartAddingAnnotation: () => void
-  onStartEditingAnnotation: () => void
-  onDismissEditingAnnotation: () => void
   queries: Query[]
 }
 
@@ -69,41 +55,30 @@ class LayoutCellMenu extends Component<Props, State> {
   }
 
   private get renderMenu(): JSX.Element {
-    const {isEditable, mode, cell, onDismissEditingAnnotation} = this.props
+    const {isEditable} = this.props
 
-    if (mode === EDITING && cellSupportsAnnotations(cell.type)) {
-      return (
-        <div className="dash-graph-context--buttons">
-          <div
-            className="btn btn-xs btn-success"
-            onClick={onDismissEditingAnnotation}
-          >
-            Done Editing
-          </div>
-        </div>
-      )
+    if (!isEditable) {
+      return
     }
 
-    if (isEditable && mode !== EDITING) {
-      return (
-        <div className="dash-graph-context--buttons">
-          {this.pencilMenu}
-          <Authorized requiredRole={EDITOR_ROLE}>
-            <MenuTooltipButton
-              icon="duplicate"
-              menuItems={this.cloneMenuItems}
-              informParent={this.handleToggleSubMenu}
-            />
-          </Authorized>
+    return (
+      <div className="dash-graph-context--buttons">
+        {this.pencilMenu}
+        <Authorized requiredRole={EDITOR_ROLE}>
           <MenuTooltipButton
-            icon="trash"
-            theme="danger"
-            menuItems={this.deleteMenuItems}
+            icon="duplicate"
+            menuItems={this.cloneMenuItems}
             informParent={this.handleToggleSubMenu}
           />
-        </div>
-      )
-    }
+        </Authorized>
+        <MenuTooltipButton
+          icon="trash"
+          theme="danger"
+          menuItems={this.deleteMenuItems}
+          informParent={this.handleToggleSubMenu}
+        />
+      </div>
+    )
   }
 
   private get pencilMenu(): JSX.Element {
@@ -138,29 +113,13 @@ class LayoutCellMenu extends Component<Props, State> {
   }
 
   private get editMenuItems(): MenuItem[] {
-    const {
-      cell,
-      dataExists,
-      onStartAddingAnnotation,
-      onStartEditingAnnotation,
-      onCSVDownload,
-    } = this.props
+    const {dataExists, onCSVDownload} = this.props
 
     return [
       {
         text: 'Configure',
         action: this.handleEditCell,
         disabled: false,
-      },
-      {
-        text: 'Add Annotation',
-        action: onStartAddingAnnotation,
-        disabled: !cellSupportsAnnotations(cell.type),
-      },
-      {
-        text: 'Edit Annotations',
-        action: onStartEditingAnnotation,
-        disabled: !cellSupportsAnnotations(cell.type),
       },
       {
         text: 'Download CSV',
@@ -198,17 +157,4 @@ class LayoutCellMenu extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = ({annotations: {mode}}) => ({
-  mode,
-})
-
-const mapDispatchToProps = dispatch => ({
-  onStartAddingAnnotation: bindActionCreators(addingAnnotation, dispatch),
-  onStartEditingAnnotation: bindActionCreators(editingAnnotation, dispatch),
-  onDismissEditingAnnotation: bindActionCreators(
-    dismissEditingAnnotation,
-    dispatch
-  ),
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(LayoutCellMenu)
+export default LayoutCellMenu

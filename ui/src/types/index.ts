@@ -49,7 +49,7 @@ import {
   DygraphData,
 } from './dygraphs'
 import {JSONFeedData} from './status'
-import {AnnotationInterface} from './annotations'
+import {Annotation} from './annotations'
 import {WriteDataMode} from './dataExplorer'
 
 export {
@@ -111,7 +111,7 @@ export {
   SchemaFilter,
   RemoteDataState,
   JSONFeedData,
-  AnnotationInterface,
+  Annotation,
   TemplateType,
   TemplateValueType,
   TemplateUpdate,

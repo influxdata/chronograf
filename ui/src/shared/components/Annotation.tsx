@@ -3,13 +3,13 @@ import React, {SFC} from 'react'
 import AnnotationPoint from 'src/shared/components/AnnotationPoint'
 import AnnotationSpan from 'src/shared/components/AnnotationSpan'
 
-import {AnnotationInterface, DygraphClass} from 'src/types'
+import {Annotation, DygraphClass} from 'src/types'
 
 interface Props {
   mode: string
   dWidth: number
   xAxisRange: [number, number]
-  annotation: AnnotationInterface
+  annotation: Annotation
   dygraph: DygraphClass
   staticLegendHeight: number
 }

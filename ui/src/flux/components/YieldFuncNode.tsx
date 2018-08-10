@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 import _ from 'lodash'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import TimeMachineVis from 'src/flux/components/TimeMachineVis'
+import YieldNodeVis from 'src/flux/components/YieldNodeVis'
 import {getTimeSeries} from 'src/flux/apis'
 import {getDeep} from 'src/utils/wrappers'
 
@@ -52,7 +52,7 @@ class YieldFuncNode extends PureComponent<Props, State> {
     return (
       <div className="yield-node">
         <div className="func-node--connector" />
-        <TimeMachineVis data={data} yieldName={yieldName} />
+        <YieldNodeVis data={data} yieldName={yieldName} />
       </div>
     )
   }

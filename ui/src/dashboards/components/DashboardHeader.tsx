@@ -5,7 +5,7 @@ import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
-import AutoRefreshDropdown from 'src/shared/components/AutoRefreshDropdown'
+import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import RenameDashboard from 'src/dashboards/components/rename_dashboard/RenameDashboard'
@@ -29,8 +29,10 @@ interface Props {
   onManualRefresh: () => void
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   onAddCell: () => void
-  onToggleTempVarControls: () => void
-  showTemplateControlBar: boolean
+  showTempVarControls?: boolean
+  onToggleShowTempVarControls?: () => void
+  showAnnotationControls: boolean
+  onToggleShowAnnotationControls?: () => void
   zoomedTimeRange: QueriesModels.TimeRange
   onRenameDashboard: (name: string) => Promise<void>
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
@@ -109,12 +111,11 @@ class DashboardHeader extends Component<Props, State> {
       <>
         <GraphTips />
         {this.addCellButton}
-        {this.tempVarsButton}
+        {this.toolButtons}
         <AutoRefreshDropdown
           onChoose={handleChooseAutoRefresh}
           onManualRefresh={onManualRefresh}
           selected={autoRefresh}
-          iconName="refresh"
         />
         <TimeRangeDropdown
           onChooseTimeRange={this.handleChooseTimeRange}
@@ -159,23 +160,35 @@ class DashboardHeader extends Component<Props, State> {
     }
   }
 
-  private get tempVarsButton(): JSX.Element {
+  private get toolButtons(): JSX.Element {
     const {
       dashboard,
-      showTemplateControlBar,
-      onToggleTempVarControls,
+      showTempVarControls,
+      onToggleShowTempVarControls,
+      showAnnotationControls,
+      onToggleShowAnnotationControls,
     } = this.props
 
     if (dashboard) {
       return (
-        <div
-          className={classnames('btn btn-default btn-sm', {
-            active: showTemplateControlBar,
-          })}
-          onClick={onToggleTempVarControls}
-        >
-          <span className="icon cube" />Template Variables
-        </div>
+        <>
+          <div
+            className={classnames('btn btn-default btn-sm', {
+              active: showTempVarControls,
+            })}
+            onClick={onToggleShowTempVarControls}
+          >
+            <span className="icon cube" />Template Variables
+          </div>
+          <div
+            className={classnames('btn btn-default btn-sm', {
+              active: showAnnotationControls,
+            })}
+            onClick={onToggleShowAnnotationControls}
+          >
+            <span className="icon pencil" />Annotations
+          </div>
+        </>
       )
     }
   }
