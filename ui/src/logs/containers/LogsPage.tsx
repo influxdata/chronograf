@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {withRouter, InjectedRouter} from 'react-router'
 
-import {searchToFilter} 'src/logs/utils/search'
+import {searchToFilters} from 'src/logs/utils/search'
 
 import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
@@ -44,6 +44,8 @@ import {getDeep} from 'src/utils/wrappers'
 import {colorForSeverity} from 'src/logs/utils/colors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import {SeverityFormatOptions, SEVERITY_SORTING_ORDER} from 'src/logs/constants'
+import {LOG_SEARCH_TERMS} from 'src/logs/constants/search'
+
 import {Source, Namespace} from 'src/types'
 
 import {
@@ -530,7 +532,9 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleSubmitSearch = (value: string): void => {
-    this.props.addFilter(searchToFilter(value))
+    searchToFilters(value, LOG_SEARCH_TERMS).forEach(filter => {
+      this.props.addFilter(filter)
+    })
   }
 
   private handleFilterDelete = (id: string): void => {

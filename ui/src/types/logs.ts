@@ -132,3 +132,32 @@ export interface TimeMarker {
 }
 
 export type RowHeightHandler = (index: Index) => number
+
+export interface Term {
+  type: TermType
+  term: string
+}
+
+export interface TermRule {
+  type: TermType
+  pattern: string
+}
+
+export enum TermType {
+  EXCLUDE,
+  INCLUDE,
+}
+
+export enum TermPart {
+  START = '(^|\\s)',
+  EXCLUSION = '-',
+  START_EXCLUSION = '(^|\\s)-',
+  SINGLE_QUOTED = "'([^']+)'",
+  DOUBLE_QUOTED = '"([^"]+)"',
+  UNQUOTED_WORD = '([\\S]+)',
+}
+
+export enum Operator {
+  NOT_LIKE = '!~',
+  LIKE = '=~',
+}
