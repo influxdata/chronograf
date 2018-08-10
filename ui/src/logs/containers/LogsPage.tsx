@@ -42,11 +42,7 @@ import LogsTable from 'src/logs/components/LogsTable'
 import {getDeep} from 'src/utils/wrappers'
 import {colorForSeverity} from 'src/logs/utils/colors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
-import {
-  SeverityFormatOptions,
-  SEVERITY_SORTING_ORDER,
-  SECONDS_TO_MS,
-} from 'src/logs/constants'
+import {SeverityFormatOptions, SEVERITY_SORTING_ORDER} from 'src/logs/constants'
 
 import {Source, Namespace, NotificationAction} from 'src/types'
 
@@ -69,6 +65,8 @@ import {
   TimeBounds,
 } from 'src/types/logs'
 import {applyChangesToTableData} from 'src/logs/utils/table'
+import extentBy from 'src/utils/extentBy'
+import {computeTimeBounds} from 'src/logs/utils/timeBounds'
 
 interface Props {
   sources: Source[]
@@ -380,8 +378,8 @@ class LogsPage extends Component<Props, State> {
             onBarClick={this.handleBarClick}
             sortBarGroups={this.handleSortHistogramBarGroups}
           >
-            {({adjustedWidth, adjustedHeight, margins}) => {
-              const x = margins.left + adjustedWidth / 2
+            {({xScale, adjustedHeight, margins}) => {
+              const x = xScale(new Date(timeOption).valueOf())
               const y1 = margins.top
               const y2 = margins.top + adjustedHeight
               const textSize = 11
@@ -558,24 +556,23 @@ class LogsPage extends Component<Props, State> {
       timeOption: null,
     })
 
-    let lower = `now() - ${windowOption}`
-    let upper = null
-
-    if (timeOption !== 'now') {
-      const numberTimeOption = new Date(timeOption).valueOf()
-      const milliseconds = seconds * SECONDS_TO_MS
-      lower = moment(numberTimeOption - milliseconds).toISOString()
-      upper = moment(numberTimeOption + milliseconds).toISOString()
+    let timeBounds: TimeBounds = {
+      lower: `now() - ${windowOption}`,
+      upper: null,
     }
 
-    const timeBounds: TimeBounds = {
-      lower,
-      upper,
+    if (timeOption !== 'now') {
+      const extentTimes = extentBy(this.props.histogramData, d => d.time).map(
+        d => d.time
+      )
+
+      timeBounds = computeTimeBounds(extentTimes, timeOption, seconds)
     }
 
     await this.props.setTimeBounds(timeBounds)
 
     this.props.setTimeRangeAsync(this.props.timeRange)
+
     this.fetchNewDataset()
   }
 

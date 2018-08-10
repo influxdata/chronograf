@@ -200,4 +200,7 @@ export const TIME_RANGE_VALUES = [
   {text: '30d', seconds: 30 * DAY},
 ]
 
+export const HISTOGRAM_CENTRAL_REGION = 3 / 5
+export const HISTOGRAM_SHIFT = 1 / 5
+
 export const SECONDS_TO_MS = 1000
