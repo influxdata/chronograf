@@ -1,13 +1,14 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
-import {SetActiveKapacitor, DeleteKapacitor} from 'src/shared/actions/sources'
+import {DeleteKapacitor} from 'src/shared/actions/sources'
 
 import InfluxTableHead from 'src/sources/components/InfluxTableHead'
 import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
 import InfluxTableRow from 'src/sources/components/InfluxTableRow'
 
-import {Source, Me, Service} from 'src/types'
+import {Source, Me, Service, Kapacitor} from 'src/types'
+import {ToggleVisibility} from 'src/types/wizard'
 
 interface Props {
   me: Me
@@ -16,10 +17,11 @@ interface Props {
   services: Service[]
   isUsingAuth: boolean
   deleteKapacitor: DeleteKapacitor
-  setActiveKapacitor: SetActiveKapacitor
+  setActiveKapacitor: (kapacitor: Kapacitor) => void
   onDeleteSource: (source: Source) => void
   setActiveFlux: (source: Source, service: Service) => void
   deleteFlux: (fluxService: Service) => void
+  toggleWizard: ToggleVisibility
 }
 
 class InfluxTable extends PureComponent<Props> {
@@ -34,6 +36,7 @@ class InfluxTable extends PureComponent<Props> {
       deleteFlux,
       isUsingAuth,
       me,
+      toggleWizard,
     } = this.props
 
     return (
@@ -44,6 +47,7 @@ class InfluxTable extends PureComponent<Props> {
               me={me}
               source={source}
               isUsingAuth={isUsingAuth}
+              toggleWizard={toggleWizard}
             />
             <div className="panel-body">
               <table className="table v-center margin-bottom-zero table-highlight">
@@ -61,6 +65,7 @@ class InfluxTable extends PureComponent<Props> {
                         setActiveKapacitor={setActiveKapacitor}
                         setActiveFlux={setActiveFlux}
                         deleteFlux={deleteFlux}
+                        toggleWizard={toggleWizard}
                       />
                     )
                   })}

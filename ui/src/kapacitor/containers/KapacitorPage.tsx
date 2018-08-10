@@ -26,20 +26,10 @@ import {
 } from 'src/shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+import {Kapacitor} from 'src/types'
+
 export const defaultName = 'My Kapacitor'
 export const kapacitorPort = '9092'
-
-interface Kapacitor {
-  url: string
-  name: string
-  username: string
-  password: string
-  active: boolean
-  insecureSkipVerify: boolean
-  links: {
-    self: string
-  }
-}
 
 interface Props {
   source: Source
@@ -196,7 +186,9 @@ export class KapacitorPage extends PureComponent<Props, State> {
     }
   }
 
-  private checkKapacitorConnection = async (kapacitor: Kapacitor) => {
+  private checkKapacitorConnection = async (
+    kapacitor: Kapacitor
+  ): Promise<void> => {
     try {
       await pingKapacitor(kapacitor)
       this.setState({exists: true})

@@ -436,10 +436,19 @@ export const DEFAULT_SOURCE = {
   name: 'Influx 1',
   username: '',
   password: '',
-  default: true,
+  default: false,
   telegraf: 'telegraf',
   insecureSkipVerify: false,
-  metaUrl: '',
+  metaUrl: 'http://localhost:8091',
+}
+
+export const DEFAULT_KAPACITOR = {
+  url: 'http://localhost:9092',
+  name: 'New Kapacitor',
+  username: '',
+  password: '',
+  active: true,
+  insecureSkipVerify: false,
 }
 
 export const intervalValuesPoints = [

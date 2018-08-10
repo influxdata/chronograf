@@ -16,7 +16,7 @@ describe('Shared.Apis', () => {
 
   describe('createKapacitor', () => {
     it('is called with the expected body', () => {
-      createKapacitor(source, createKapacitorBody)
+      createKapacitor(source, {...createKapacitorBody, active: true})
 
       expect(AJAX).toHaveBeenCalledWith({
         data: createKapacitorBody,

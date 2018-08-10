@@ -18,6 +18,7 @@ const noop = () => ({
   type: 'NOOP',
   payload: {},
 })
+
 interface Query {
   text: string
   database?: string

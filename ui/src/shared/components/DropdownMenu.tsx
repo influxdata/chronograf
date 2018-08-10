@@ -10,27 +10,44 @@ import {
   OnSelectionHandler,
   OnHighlightHandler,
 } from 'src/shared/components/DropdownMenuItem'
+import Button from 'src/reusable_ui/components/Button'
 
+import {
+  ComponentColor,
+  ComponentSize,
+  ButtonShape,
+  IconFont,
+} from 'src/reusable_ui/types'
 import {DropdownItem, DropdownAction} from 'src/types'
 
-// AddNewResource is an optional parameter that takes the user to another
-// route defined by url prop
-interface AddNewButtonProps {
-  url: string
+interface AddNew {
+  url?: string
   text: string
+  handler?: () => void
 }
 
-const AddNewButton: SFC<AddNewButtonProps> = ({url, text}) => (
-  <li className="multi-select--apply">
-    <Link className="btn btn-xs btn-default" to={url}>
-      {text}
-    </Link>
-  </li>
-)
-
-interface AddNew {
-  url: string
-  text: string
+const AddNewButton: SFC<AddNew> = ({url, text, handler}) => {
+  if (handler) {
+    return (
+      <li className="multi-select--apply">
+        <Button
+          text={text}
+          onClick={handler}
+          color={ComponentColor.Default}
+          size={ComponentSize.ExtraSmall}
+          shape={ButtonShape.StretchToFit}
+          icon={IconFont.Plus}
+        />
+      </li>
+    )
+  }
+  return (
+    <li className="multi-select--apply">
+      <Link className="btn btn-xs btn-default" to={url}>
+        {text}
+      </Link>
+    </li>
+  )
 }
 
 interface Props {
@@ -94,7 +111,13 @@ const DropdownMenu: SFC<Props> = ({
             key={i}
           />
         ))}
-        {addNew && <AddNewButton url={addNew.url} text={addNew.text} />}
+        {addNew && (
+          <AddNewButton
+            url={addNew.url}
+            text={addNew.text}
+            handler={addNew.handler}
+          />
+        )}
       </FancyScrollbar>
     </ul>
   )

@@ -1,6 +1,6 @@
 import React, {SFC, ChangeEvent, KeyboardEvent} from 'react'
 
-const disabledClass = disabled => (disabled ? ' disabled' : '')
+const disabledClass = (disabled: boolean) => (disabled ? ' disabled' : '')
 
 type OnFilterChangeHandler = (e: ChangeEvent<HTMLInputElement>) => void
 type OnFilterKeyPress = (e: KeyboardEvent<HTMLInputElement>) => void

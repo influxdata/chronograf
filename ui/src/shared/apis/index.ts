@@ -1,8 +1,9 @@
 import AJAX from 'src/utils/ajax'
 import {AlertTypes} from 'src/kapacitor/constants'
 import {Kapacitor, Source, Service, NewService, QueryConfig} from 'src/types'
+import {SpecificConfigOptions} from 'src/types/kapacitor'
 
-export function getSources() {
+export const getSources = () => {
   return AJAX({
     url: null,
     resource: 'sources',
@@ -56,14 +57,14 @@ export const updateSource = async (
   }
 }
 
-export function deleteSource(source) {
+export const deleteSource = (source: Source) => {
   return AJAX({
     url: source.links.self,
     method: 'DELETE',
   })
 }
 
-export const pingKapacitor = async kapacitor => {
+export const pingKapacitor = async (kapacitor: Kapacitor): Promise<void> => {
   try {
     const data = await AJAX({
       method: 'GET',
@@ -76,7 +77,10 @@ export const pingKapacitor = async kapacitor => {
   }
 }
 
-export const getKapacitor = async (source, kapacitorID) => {
+export const getKapacitor = async (
+  source: Source,
+  kapacitorID
+): Promise<Kapacitor> => {
   try {
     const {data} = await AJAX({
       url: `${source.links.kapacitors}/${kapacitorID}`,
@@ -90,7 +94,9 @@ export const getKapacitor = async (source, kapacitorID) => {
   }
 }
 
-export const getActiveKapacitor = async source => {
+export const getActiveKapacitor = async (
+  source: Source
+): Promise<Kapacitor> => {
   try {
     const {data} = await AJAX({
       url: source.links.kapacitors,
@@ -105,19 +111,23 @@ export const getActiveKapacitor = async source => {
   }
 }
 
-export const getKapacitors = async source => {
+export const getKapacitors = async (source: Source): Promise<Kapacitor[]> => {
   try {
-    return await AJAX({
+    const {
+      data: {kapacitors},
+    } = await AJAX({
       method: 'GET',
       url: source.links.kapacitors,
     })
+
+    return kapacitors
   } catch (error) {
     console.error(error)
     throw error
   }
 }
 
-export const deleteKapacitor = async kapacitor => {
+export const deleteKapacitor = async (kapacitor: Kapacitor): Promise<void> => {
   try {
     return await AJAX({
       method: 'DELETE',
@@ -129,10 +139,14 @@ export const deleteKapacitor = async kapacitor => {
   }
 }
 
-export function createKapacitor(
-  source,
-  {url, name = 'My Kapacitor', username, password, insecureSkipVerify}
-) {
+export const createKapacitor = (source: Source, kapacitor: Kapacitor) => {
+  const {
+    url,
+    name = 'New Kapacitor',
+    username,
+    password,
+    insecureSkipVerify,
+  } = kapacitor
   return AJAX({
     url: source.links.kapacitors,
     method: 'POST',
@@ -146,15 +160,15 @@ export function createKapacitor(
   })
 }
 
-export function updateKapacitor({
+export const updateKapacitor = ({
   links,
   url,
-  name = 'My Kaacitor',
+  name = 'New Kapacitor',
   username,
   password,
   active,
   insecureSkipVerify,
-}: Kapacitor) {
+}: Kapacitor) => {
   return AJAX({
     url: links.self,
     method: 'PATCH',
@@ -169,7 +183,7 @@ export function updateKapacitor({
   })
 }
 
-export const getKapacitorConfig = async kapacitor => {
+export const getKapacitorConfig = async (kapacitor: Kapacitor) => {
   try {
     return await kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/config', '')
   } catch (error) {
@@ -178,16 +192,19 @@ export const getKapacitorConfig = async kapacitor => {
   }
 }
 
-export const getKapacitorConfigSection = (kapacitor, section) => {
+export const getKapacitorConfigSection = (
+  kapacitor: Kapacitor,
+  section: string
+) => {
   return kapacitorProxy(kapacitor, 'GET', `/kapacitor/v1/config/${section}`, '')
 }
 
-export function updateKapacitorConfigSection(
-  kapacitor,
-  section,
+export const updateKapacitorConfigSection = (
+  kapacitor: Kapacitor,
+  section: string,
   properties,
-  specificConfig
-) {
+  specificConfig: string
+) => {
   const config = specificConfig || ''
   const path = `/kapacitor/v1/config/${section}/${config}`
 
@@ -208,7 +225,11 @@ export function updateKapacitorConfigSection(
   return AJAX(params)
 }
 
-export function addKapacitorConfigInSection(kapacitor, section, properties) {
+export const addKapacitorConfigInSection = (
+  kapacitor: Kapacitor,
+  section: string,
+  properties
+) => {
   return AJAX({
     method: 'POST',
     url: kapacitor.links.proxy,
@@ -224,11 +245,11 @@ export function addKapacitorConfigInSection(kapacitor, section, properties) {
   })
 }
 
-export function deleteKapacitorConfigInSection(
-  kapacitor,
-  section,
-  specificConfig
-) {
+export const deleteKapacitorConfigInSection = (
+  kapacitor: Kapacitor,
+  section: string,
+  specificConfig: string
+) => {
   const path = `/kapacitor/v1/config/${section}`
 
   return AJAX({
@@ -247,10 +268,10 @@ export function deleteKapacitorConfigInSection(
 }
 
 export const testAlertOutput = async (
-  kapacitor,
-  outputName,
-  options,
-  specificConfigOptions
+  kapacitor: Kapacitor,
+  outputName: string,
+  options: SpecificConfigOptions,
+  specificConfigOptions: SpecificConfigOptions
 ) => {
   try {
     const {
@@ -271,7 +292,9 @@ export const testAlertOutput = async (
   }
 }
 
-export const getAllServices = async kapacitor => {
+export const getAllServices = async (
+  kapacitor: Kapacitor
+): Promise<Service[]> => {
   try {
     const {
       data: {services},
@@ -282,7 +305,13 @@ export const getAllServices = async kapacitor => {
   }
 }
 
-export function createKapacitorTask(kapacitor, id, type, dbrps, script) {
+export const createKapacitorTask = (
+  kapacitor: Kapacitor,
+  id,
+  type,
+  dbrps,
+  script
+) => {
   return kapacitorProxy(kapacitor, 'POST', '/kapacitor/v1/tasks', {
     id,
     type,
@@ -292,23 +321,28 @@ export function createKapacitorTask(kapacitor, id, type, dbrps, script) {
   })
 }
 
-export function enableKapacitorTask(kapacitor, id) {
+export const enableKapacitorTask = (kapacitor: Kapacitor, id) => {
   return kapacitorProxy(kapacitor, 'PATCH', `/kapacitor/v1/tasks/${id}`, {
     status: 'enabled',
   })
 }
 
-export function disableKapacitorTask(kapacitor, id) {
+export const disableKapacitorTask = (kapacitor: Kapacitor, id) => {
   return kapacitorProxy(kapacitor, 'PATCH', `/kapacitor/v1/tasks/${id}`, {
     status: 'disabled',
   })
 }
 
-export function deleteKapacitorTask(kapacitor, id) {
+export const deleteKapacitorTask = (kapacitor: Kapacitor, id) => {
   return kapacitorProxy(kapacitor, 'DELETE', `/kapacitor/v1/tasks/${id}`, '')
 }
 
-export function kapacitorProxy(kapacitor, method, path, body?) {
+export const kapacitorProxy = (
+  kapacitor: Kapacitor,
+  method: string,
+  path,
+  body?
+) => {
   return AJAX({
     method,
     url: kapacitor.links.proxy,

@@ -1,31 +1,31 @@
 import React, {PureComponent} from 'react'
-import {Link} from 'react-router'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import {stripPrefix} from 'src/utils/basepath'
 
 import {Source} from 'src/types'
+import {ToggleVisibility} from 'src/types/wizard'
 
 interface Props {
   source: Source
   currentSource: Source
+  toggleWizard: ToggleVisibility
 }
 
 class ConnectionLink extends PureComponent<Props> {
   public render() {
-    const {source} = this.props
+    const {source, toggleWizard} = this.props
     return (
       <h5 className="margin-zero">
         <Authorized
           requiredRole={EDITOR_ROLE}
           replaceWithIfNotAuthorized={<strong>{source.name}</strong>}
         >
-          <Link
-            to={`${stripPrefix(location.pathname)}/${source.id}/edit`}
-            className={this.className}
+          <span
+            onClick={toggleWizard(true, source, 0)}
+            className={`connection-title ${this.className}`}
           >
             <strong>{source.name}</strong>
             {this.default}
-          </Link>
+          </span>
         </Authorized>
       </h5>
     )

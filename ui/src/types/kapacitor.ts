@@ -9,8 +9,10 @@ export interface Kapacitor {
   password?: string
   active: boolean
   insecureSkipVerify: boolean
-  links: {
-    self: string
+  links?: {
+    self?: string
+    proxy?: string
+    ping?: string
   }
 }
 
@@ -187,7 +189,7 @@ interface OpsGenie {
 }
 
 // Talk sends alerts to Jane Talk (https://jianliao.com/site)
-interface Talk { } // tslint:disable-line
+interface Talk {} // tslint:disable-line
 
 // TriggerValues specifies the alerting logic for a specific trigger type
 interface TriggerValues {

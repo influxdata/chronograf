@@ -435,7 +435,6 @@ class CellEditorOverlay extends Component<Props, State> {
       // get durationMs to calculate interval
       queries = await getQueryConfigAndStatus(url, [{query, id}])
       durationMs = _.get(queries, '0.durationMs', DEFAULT_DURATION_MS)
-
       // calc and replace :interval:
       query = replaceInterval(query, DEFAULT_PIXELS, durationMs)
     } catch (error) {

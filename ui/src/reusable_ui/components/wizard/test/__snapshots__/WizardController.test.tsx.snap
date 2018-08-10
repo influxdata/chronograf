@@ -32,10 +32,9 @@ exports[`WizardController with multiple children matches snapshot with two child
   <WizardStep
     decrement={null}
     increment={[Function]}
+    isBlockingStep={false}
     isComplete={[Function]}
     lastStep={false}
-    onNext={[MockFunction]}
-    onPrevious={[MockFunction]}
     title="wizard step 1"
   >
     step child 1
@@ -74,10 +73,9 @@ exports[`WizardController with multiple children with first step complete matche
   </div>
   <WizardStep
     decrement={[Function]}
+    isBlockingStep={false}
     isComplete={[Function]}
     lastStep={true}
-    onNext={[MockFunction]}
-    onPrevious={[MockFunction]}
     title="wizard step 2"
   >
     step child 2
@@ -85,7 +83,7 @@ exports[`WizardController with multiple children with first step complete matche
 </div>
 `;
 
-exports[`WizardController with no children matches snapshot with one child 1`] = `
+exports[`WizardController with one child matches snapshot with one child 1`] = `
 <div
   className="wizard-controller"
 >
@@ -112,10 +110,9 @@ exports[`WizardController with no children matches snapshot with one child 1`] =
   </div>
   <WizardStep
     decrement={null}
+    isBlockingStep={false}
     isComplete={[Function]}
     lastStep={true}
-    onNext={[MockFunction]}
-    onPrevious={[MockFunction]}
     title="only wizard step"
   >
     only step child

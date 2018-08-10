@@ -3,12 +3,12 @@ import React, {PureComponent, ReactElement} from 'react'
 
 // Components
 import WizardProgressBar from 'src/reusable_ui/components/wizard/WizardProgressBar'
-
-// Types
-import {WizardStepProps, Step} from 'src/types/wizard'
-import {StepStatus} from 'src/reusable_ui/constants/wizard'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {Step} from 'src/types/wizard'
+import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
+import {StepStatus} from 'src/reusable_ui/constants/wizard'
+import {getDeep} from 'src/utils/wrappers'
+import _ from 'lodash'
 
 interface State {
   steps: Step[]
@@ -19,50 +19,66 @@ interface Props {
   children: Array<ReactElement<WizardStepProps>>
   handleSkip?: () => void
   skipLinkText?: string
+  jumpStep?: number
 }
 
 @ErrorHandling
 class WizardController extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
-    skipLinkText: 'Skip',
+    skipLinkText: 'skip',
+    jumpStep: -1,
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
     let {currentStepIndex} = state
     const {children} = props
-
     const childSteps = React.Children.map(
       children,
       (child: ReactElement<WizardStepProps>, i) => {
         const isComplete = child.props.isComplete()
+        let isErrored
+        if (_.isBoolean(child.props.isErrored)) {
+          isErrored = child.props.isErrored
+        }
+        if (_.isFunction(child.props.isErrored)) {
+          isErrored = child.props.isErrored()
+        }
+        let stepStatus = StepStatus.Incomplete
+        if (isComplete) {
+          stepStatus = StepStatus.Complete
+        }
+        if (isErrored) {
+          stepStatus = StepStatus.Error
+        }
+
         if (currentStepIndex === -1 && !isComplete) {
           currentStepIndex = i
         }
         return {
           title: child.props.title,
-          stepStatus: isComplete ? StepStatus.Complete : StepStatus.Incomplete,
+          stepStatus,
         }
       }
     )
+
     if (currentStepIndex === -1) {
       currentStepIndex = childSteps.length - 1
     }
-
     return {steps: childSteps, currentStepIndex}
   }
 
   constructor(props: Props) {
     super(props)
+    const {jumpStep} = this.props
     this.state = {
       steps: [],
-      currentStepIndex: -1,
+      currentStepIndex: _.isNull(jumpStep) ? -1 : jumpStep,
     }
   }
 
   public render() {
     const {steps, currentStepIndex} = this.state
     const currentChild = this.CurrentChild
-
     return (
       <div className="wizard-controller">
         <div className="progress-header">
@@ -116,7 +132,6 @@ class WizardController extends PureComponent<Props, State> {
     } else {
       currentChild = children[currentStepIndex]
     }
-
     return React.cloneElement<WizardStepProps>(currentChild, {
       increment: advance,
       decrement: retreat,
@@ -135,9 +150,7 @@ class WizardController extends PureComponent<Props, State> {
       currentChild = children[currentStepIndex]
     }
 
-    const {
-      props: {tipText},
-    } = currentChild
+    const tipText = getDeep(currentChild, 'props.tipText', '')
 
     if (tipText) {
       return (

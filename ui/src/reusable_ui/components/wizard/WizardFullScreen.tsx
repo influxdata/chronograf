@@ -5,8 +5,7 @@ import React, {PureComponent, ReactElement} from 'react'
 import SplashPage from 'src/shared/components/SplashPage'
 import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 
-// Types
-import {WizardStepProps} from 'src/types/wizard'
+import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -37,7 +36,11 @@ class WizardFullScreen extends PureComponent<Props> {
 
     if (children) {
       return (
-        <WizardController handleSkip={handleSkip} skipLinkText={skipLinkText}>
+        <WizardController
+          handleSkip={handleSkip}
+          skipLinkText={skipLinkText}
+          jumpStep={0}
+        >
           {children}
         </WizardController>
       )

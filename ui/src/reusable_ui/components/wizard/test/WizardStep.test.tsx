@@ -12,6 +12,8 @@ describe('WizardStep', () => {
     const props = {
       title: 'my wizard step',
       isComplete: () => true,
+      isErrored: undefined,
+      isBlockingStep: undefined,
       onPrevious: undefined,
       onNext: undefined,
       increment: undefined,
@@ -72,34 +74,6 @@ describe('WizardStep', () => {
 
       expect(spy).not.toBeCalled()
       await wrapper.instance().handleClickPrevious()
-      expect(spy).toBeCalled()
-    })
-  })
-
-  describe('WizardStep handleClickNext', () => {
-    const newProps = {
-      onNext: jest.fn(),
-      increment: jest.fn(),
-    }
-
-    beforeEach(() => {
-      jest.resetAllMocks()
-      wrapper = wrapperSetup(newProps)
-    })
-
-    it('calls onNext on handleClickNext', () => {
-      const spy = jest.spyOn(newProps, 'onNext')
-
-      expect(spy).not.toBeCalled()
-      wrapper.instance().handleClickNext()
-      expect(spy).toBeCalled()
-    })
-
-    it('calls increment on handleClickNext', async () => {
-      const spy = jest.spyOn(newProps, 'increment')
-
-      expect(spy).not.toBeCalled()
-      await wrapper.instance().handleClickNext()
       expect(spy).toBeCalled()
     })
   })

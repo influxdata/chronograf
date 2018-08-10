@@ -9,6 +9,7 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import InfluxTable from 'src/sources/components/InfluxTable'
+import ConnectionWizard from 'src/sources/components/ConnectionWizard'
 
 import {
   notifySourceDeleted,
@@ -17,6 +18,13 @@ import {
 
 import {Source, Notification, Service} from 'src/types'
 import {getDeep} from 'src/utils/wrappers'
+import {ToggleVisibility} from 'src/types/wizard'
+
+interface State {
+  wizardVisibility: boolean
+  sourceInWizard: Source
+  jumpStep: number
+}
 
 interface Props {
   source: Source
@@ -35,7 +43,15 @@ interface Props {
 const VERSION = process.env.npm_package_version
 
 @ErrorHandling
-class ManageSources extends PureComponent<Props> {
+class ManageSources extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      wizardVisibility: false,
+      sourceInWizard: null,
+      jumpStep: null,
+    }
+  }
   public componentDidMount() {
     this.props.fetchAllServices(this.props.sources)
     this.props.sources.forEach(source => {
@@ -53,7 +69,7 @@ class ManageSources extends PureComponent<Props> {
 
   public render() {
     const {sources, source, deleteKapacitor, deleteFlux, services} = this.props
-
+    const {wizardVisibility, sourceInWizard, jumpStep} = this.state
     return (
       <div className="page" id="manage-sources-page">
         <PageHeader titleText="Configuration" sourceIndicator={true} />
@@ -68,10 +84,17 @@ class ManageSources extends PureComponent<Props> {
               onDeleteSource={this.handleDeleteSource}
               setActiveFlux={this.handleSetActiveFlux}
               setActiveKapacitor={this.handleSetActiveKapacitor}
+              toggleWizard={this.toggleWizard}
             />
             <p className="version-number">Chronograf Version: {VERSION}</p>
           </div>
         </FancyScrollbar>
+        <ConnectionWizard
+          isVisible={wizardVisibility}
+          toggleVisibility={this.toggleWizard}
+          source={sourceInWizard}
+          jumpStep={jumpStep}
+        />
       </div>
     )
   }
@@ -95,7 +118,19 @@ class ManageSources extends PureComponent<Props> {
     }
   }
 
-  private handleSetActiveKapacitor = ({kapacitor}) => {
+  private toggleWizard: ToggleVisibility = (
+    isVisible,
+    source = null,
+    jumpStep = null
+  ) => () => {
+    this.setState({
+      wizardVisibility: isVisible,
+      sourceInWizard: source,
+      jumpStep,
+    })
+  }
+
+  private handleSetActiveKapacitor = kapacitor => {
     this.props.setActiveKapacitor(kapacitor)
   }
 }

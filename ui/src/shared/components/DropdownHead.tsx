@@ -1,10 +1,18 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, {SFC} from 'react'
 import classnames from 'classnames'
 
-const disabledClass = disabled => (disabled ? ' disabled' : '')
+const disabledClass = (disabled: boolean) => (disabled ? ' disabled' : '')
 
-const DropdownHead = ({
+interface Props {
+  iconName: string
+  selected: string
+  buttonSize: string
+  toggleStyle: object
+  buttonColor: string
+  disabled: boolean
+}
+
+const DropdownHead: SFC<Props> = ({
   iconName,
   selected,
   buttonSize,
@@ -23,16 +31,5 @@ const DropdownHead = ({
     <span className="caret" />
   </div>
 )
-
-const {bool, string, shape} = PropTypes
-
-DropdownHead.propTypes = {
-  iconName: string,
-  selected: string.isRequired,
-  buttonSize: string.isRequired,
-  toggleStyle: shape(),
-  buttonColor: string.isRequired,
-  disabled: bool,
-}
 
 export default DropdownHead

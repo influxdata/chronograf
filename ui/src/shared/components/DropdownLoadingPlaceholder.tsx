@@ -2,11 +2,10 @@ import React, {SFC} from 'react'
 
 import {RemoteDataState} from 'src/types'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
-import Dropdown from 'src/shared/components/Dropdown'
 
 interface Props {
   rds: RemoteDataState
-  children: typeof Dropdown
+  children: JSX.Element
 }
 
 const DropdownLoadingPlaceholder: SFC<Props> = ({children, rds}) => {

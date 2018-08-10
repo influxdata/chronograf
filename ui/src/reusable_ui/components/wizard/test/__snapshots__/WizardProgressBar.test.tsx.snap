@@ -19,7 +19,8 @@ exports[`Wizard Progress Bar when no steps are complete matches snapshot 1`] = `
       />
     </div>
     <ProgressConnector
-      key="connectorEle1"
+      key="connectorEle0"
+      status="some"
     />
     <div
       className="wizard-progress-button"
@@ -35,7 +36,8 @@ exports[`Wizard Progress Bar when no steps are complete matches snapshot 1`] = `
       />
     </div>
     <ProgressConnector
-      key="connectorEle2"
+      key="connectorEle1"
+      status="none"
     />
     <div
       className="wizard-progress-button"
@@ -73,7 +75,7 @@ exports[`Wizard Progress Bar when the first two steps are completed matches snap
       />
     </div>
     <ProgressConnector
-      key="connectorEle1"
+      key="connectorEle0"
       status="full"
     />
     <div
@@ -90,8 +92,8 @@ exports[`Wizard Progress Bar when the first two steps are completed matches snap
       />
     </div>
     <ProgressConnector
-      key="connectorEle2"
-      status="some"
+      key="connectorEle1"
+      status="full"
     />
     <div
       className="wizard-progress-button"
@@ -103,7 +105,7 @@ exports[`Wizard Progress Bar when the first two steps are completed matches snap
         this is step3
       </div>
       <span
-        className="icon circle-thick current"
+        className="icon checkmark"
       />
     </div>
   </React.Fragment>

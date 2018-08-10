@@ -714,6 +714,11 @@ export const notifyKapacitorCreated = (): Notification => ({
     'Connected to Kapacitor successfully! Configuring endpoints is optional.',
 })
 
+export const notifyKapacitorSuccess = (): Notification => ({
+  ...defaultSuccessNotification,
+  message: 'Connected to Kapacitor successfully!',
+})
+
 export const notifyKapacitorCreateFailed = (): Notification => ({
   ...defaultErrorNotification,
   message: 'There was a problem connecting to Kapacitor.',

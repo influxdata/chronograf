@@ -1,3 +1,3 @@
-import SourcePage from './containers/SourcePage'
 import ManageSources from './containers/ManageSources'
-export {SourcePage, ManageSources}
+import OnboardingWizard from './containers/OnboardingWizard'
+export {ManageSources, OnboardingWizard}

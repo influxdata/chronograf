@@ -1,16 +1,32 @@
 import React, {PureComponent, ReactElement} from 'react'
-import {Link, withRouter, RouteComponentProps} from 'react-router'
+import {withRouter, WithRouterProps} from 'react-router'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
+
+import Button from 'src/reusable_ui/components/Button'
+import {ToggleVisibility} from 'src/types/wizard'
+
+import classnames from 'classnames'
+
+import {
+  ComponentColor,
+  ComponentSize,
+  ButtonShape,
+  IconFont,
+} from 'src/reusable_ui/types'
 import {Source, Kapacitor} from 'src/types'
-import {SetActiveKapacitor} from 'src/shared/actions/sources'
 
 interface Props {
   source: Source
   kapacitors: Kapacitor[]
-  setActiveKapacitor: SetActiveKapacitor
-  deleteKapacitor: (Kapacitor: Kapacitor) => void
+  setActiveKapacitor: (kapacitor: Kapacitor) => void
+  deleteKapacitor: (kapacitor: Kapacitor) => void
+  toggleWizard?: ToggleVisibility
+  buttonSize?: string
+  suppressEdit?: boolean
+  onAddNew?: () => void
+  displayValue?: string
 }
 
 interface KapacitorItem {
@@ -19,21 +35,25 @@ interface KapacitorItem {
   kapacitor: Kapacitor
 }
 
-class KapacitorDropdown extends PureComponent<
-  Props & RouteComponentProps<any, any>
-> {
+class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
+  public static defaultProps: Partial<Props> = {
+    buttonSize: 'btn-xs',
+  }
+
   public render() {
-    const {source, router, setActiveKapacitor, deleteKapacitor} = this.props
+    const {buttonSize, onAddNew} = this.props
 
     if (this.isKapacitorsEmpty) {
       return (
         <Authorized requiredRole={EDITOR_ROLE}>
-          <Link
-            to={`/sources/${source.id}/kapacitors/new`}
-            className="btn btn-xs btn-default"
-          >
-            <span className="icon plus" /> Add Kapacitor Connection
-          </Link>
+          <Button
+            text={'Add Kapacitor Connection'}
+            onClick={this.launchWizard}
+            color={ComponentColor.Default}
+            size={ComponentSize.ExtraSmall}
+            shape={ButtonShape.StretchToFit}
+            icon={IconFont.Plus}
+          />
         </Authorized>
       )
     }
@@ -44,42 +64,64 @@ class KapacitorDropdown extends PureComponent<
         replaceWithIfNotAuthorized={this.UnauthorizedDropdown}
       >
         <Dropdown
-          className="dropdown-260"
+          className={classnames({
+            'kapacitor-dropdown': onAddNew,
+            'dropdown-260': !onAddNew,
+          })}
           buttonColor="btn-primary"
-          buttonSize="btn-xs"
+          buttonSize={buttonSize}
           items={this.kapacitorItems}
-          onChoose={setActiveKapacitor}
+          onChoose={this.handleSetActiveKapacitor}
           addNew={{
-            url: `/sources/${source.id}/kapacitors/new`,
             text: 'Add Kapacitor Connection',
+            handler: this.handleAddNew,
           }}
-          actions={[
-            {
-              icon: 'pencil',
-              text: 'edit',
-              handler: item => {
-                router.push(`${item.resource}/edit`)
-              },
-            },
-            {
-              icon: 'trash',
-              text: 'delete',
-              handler: item => {
-                deleteKapacitor(item.kapacitor)
-              },
-              confirmable: true,
-            },
-          ]}
+          actions={this.dropdownActions}
           selected={this.selected}
         />
       </Authorized>
     )
   }
 
+  private handleSetActiveKapacitor = (item: KapacitorItem) => {
+    const {setActiveKapacitor} = this.props
+    setActiveKapacitor(item.kapacitor)
+  }
   private get UnauthorizedDropdown(): ReactElement<HTMLDivElement> {
     return (
       <div className="source-table--kapacitor__view-only">{this.selected}</div>
     )
+  }
+
+  private get dropdownActions() {
+    const {deleteKapacitor, router, suppressEdit} = this.props
+
+    const deleteAction = [
+      {
+        icon: 'trash',
+        text: 'delete',
+        handler: item => {
+          deleteKapacitor(item.kapacitor)
+        },
+        confirmable: true,
+      },
+    ]
+
+    const editAction = [
+      {
+        icon: 'pencil',
+        text: 'edit',
+        handler: item => {
+          router.push(`${item.resource}/edit`)
+        },
+      },
+    ]
+
+    if (suppressEdit) {
+      return deleteAction
+    }
+
+    return [...editAction, ...deleteAction]
   }
 
   private get isKapacitorsEmpty(): boolean {
@@ -89,7 +131,6 @@ class KapacitorDropdown extends PureComponent<
 
   private get kapacitorItems(): KapacitorItem[] {
     const {kapacitors, source} = this.props
-
     return kapacitors.map(k => {
       return {
         text: k.name,
@@ -104,7 +145,13 @@ class KapacitorDropdown extends PureComponent<
   }
 
   private get selected(): string {
+    const {displayValue} = this.props
     let selected = ''
+
+    if (displayValue) {
+      return displayValue
+    }
+
     if (this.activeKapacitor) {
       selected = this.activeKapacitor.name
     } else {
@@ -112,6 +159,22 @@ class KapacitorDropdown extends PureComponent<
     }
 
     return selected
+  }
+
+  private handleAddNew = () => {
+    const {onAddNew} = this.props
+    if (onAddNew) {
+      onAddNew()
+    } else {
+      this.launchWizard()
+    }
+  }
+
+  private launchWizard = () => {
+    const {toggleWizard, source} = this.props
+    if (toggleWizard) {
+      toggleWizard(true, source, 1)()
+    }
   }
 }
 
