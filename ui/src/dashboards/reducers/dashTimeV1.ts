@@ -7,7 +7,7 @@ interface Range extends TimeRange {
   dashboardID: number
 }
 
-interface State {
+export interface State {
   ranges: Range[]
 }
 

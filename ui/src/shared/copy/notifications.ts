@@ -841,3 +841,8 @@ export const csvExportFailed: Notification = {
   ...defaultErrorNotification,
   message: 'CSV Export failed',
 }
+
+export const annotationsError = (message: string): Notification => ({
+  ...defaultErrorNotification,
+  message,
+})

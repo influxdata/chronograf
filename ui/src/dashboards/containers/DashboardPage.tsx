@@ -34,10 +34,11 @@ import {updateScript as updateScriptAction} from 'src/flux/actions'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
-import {millisecondTimeRange} from 'src/dashboards/utils/time'
 import {getDeep} from 'src/utils/wrappers'
 import {updateDashboardLinks} from 'src/dashboards/utils/dashboardSwitcherLinks'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
+import {getTimeRange} from 'src/dashboards/selectors'
+import {annotationsError} from 'src/shared/copy/notifications'
 
 // APIs
 import {loadDashboardLinks} from 'src/dashboards/apis'
@@ -49,7 +50,7 @@ import {
   TEMP_VAR_DASHBOARD_TIME,
   TEMP_VAR_UPPER_DASHBOARD_TIME,
 } from 'src/shared/constants'
-import {FORMAT_INFLUXQL, defaultTimeRange} from 'src/shared/data/timeRanges'
+import {FORMAT_INFLUXQL} from 'src/shared/data/timeRanges'
 import {EMPTY_LINKS} from 'src/dashboards/constants/dashboardHeader'
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
 
@@ -192,9 +193,13 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public fetchAnnotations = async () => {
-    const {source, timeRange, onGetAnnotationsAsync, dashboardID} = this.props
-    const rangeMs = millisecondTimeRange(timeRange)
-    await onGetAnnotationsAsync(source.links.annotations, rangeMs, dashboardID)
+    const {source, dashboardID, onGetAnnotationsAsync, notify} = this.props
+
+    try {
+      await onGetAnnotationsAsync(source.links.annotations, dashboardID)
+    } catch {
+      notify(annotationsError('Error fetching annotations'))
+    }
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -383,11 +388,7 @@ class DashboardPage extends Component<Props, State> {
           )}
         {!inPresentationMode &&
           showAnnotationControls && (
-            <AnnotationControlBar
-              dashboardID={dashboardID}
-              source={source}
-              onRefreshAnnotations={this.fetchAnnotations}
-            />
+            <AnnotationControlBar dashboardID={dashboardID} source={source} />
           )}
         {dashboard ? (
           <Dashboard
@@ -545,13 +546,7 @@ class DashboardPage extends Component<Props, State> {
   private handleChooseTimeRange = (
     timeRange: QueriesModels.TimeRange
   ): void => {
-    const {
-      dashboardID,
-      onGetAnnotationsAsync,
-      source,
-      setDashTimeV1,
-      updateQueryParams,
-    } = this.props
+    const {dashboardID, setDashTimeV1, updateQueryParams} = this.props
 
     setDashTimeV1(dashboardID, {
       ...timeRange,
@@ -563,12 +558,7 @@ class DashboardPage extends Component<Props, State> {
       upper: timeRange.upper,
     })
 
-    const annotationRange = millisecondTimeRange(timeRange)
-    onGetAnnotationsAsync(
-      source.links.annotations,
-      annotationRange,
-      dashboardID
-    )
+    this.fetchAnnotations()
   }
 
   private handleUpdatePosition = (cells: DashboardsModels.Cell[]): void => {
@@ -686,7 +676,6 @@ const mstp = (state, {params: {dashboardID}}) => {
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
     services,
-    dashTimeV1,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {
       cell,
@@ -701,10 +690,7 @@ const mstp = (state, {params: {dashboardID}}) => {
 
   const meRole = _.get(me, 'role', null)
 
-  const timeRange =
-    dashTimeV1.ranges.find(
-      r => r.dashboardID === idNormalizer(TYPE_ID, dashboardID)
-    ) || defaultTimeRange
+  const timeRange = getTimeRange(state, dashboardID)
 
   const dashboard = dashboards.find(
     d => d.id === idNormalizer(TYPE_ID, dashboardID)
