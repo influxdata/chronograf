@@ -43,7 +43,7 @@ import {getDeep} from 'src/utils/wrappers'
 
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
 
-import {defaultTimeRange} from 'src/shared/data/timeRanges'
+import {DEFAULT_TIME_RANGE} from 'src/shared/data/timeRanges'
 
 // Types
 import {
@@ -621,7 +621,7 @@ const updateTimeRangeFromQueryParams = (dashboardID: number) => (
       r => r.dashboardID === idNormalizer(TYPE_ID, dashboardID)
     )
 
-    validatedTimeRange = dashboardTimeRange || defaultTimeRange
+    validatedTimeRange = dashboardTimeRange || DEFAULT_TIME_RANGE
 
     if (timeRangeFromQueries.lower || timeRangeFromQueries.upper) {
       dispatch(notify(notifyInvalidTimeRangeValueInURLQuery()))

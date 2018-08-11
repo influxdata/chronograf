@@ -79,7 +79,7 @@ export const timeRanges: TimeRangeOption[] = [
 
 export const FORMAT_INFLUXQL = 'influxql'
 
-export const defaultTimeRange = {
+export const DEFAULT_TIME_RANGE = {
   upper: null,
   lower: 'now() - 15m',
   seconds: 900,

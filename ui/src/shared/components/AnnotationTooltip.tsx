@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import moment from 'moment'
 import classnames from 'classnames'
 
+import AnnotationTagsDropdown from 'src/shared/components/AnnotationTagsDropdown'
 import {setEditingAnnotation} from 'src/shared/actions/annotations'
 
 import {Annotation} from 'src/types'
@@ -55,14 +56,19 @@ const AnnotationTooltip: SFC<Props> = props => {
         <TimeStamp time={timestamp} />
       ) : (
         <div className="annotation-tooltip--items">
-          <div>
+          <div className="annotation-tooltip-text">
             {annotation.text}
             <span
               className="annotation-tooltip--edit icon pencil"
               onClick={setEditing}
             />
           </div>
-          <TimeStamp time={timestamp} />
+          <div className="annotation-tooltip--lower">
+            <TimeStamp time={timestamp} />
+            {!!annotation.tags && (
+              <AnnotationTagsDropdown tags={annotation.tags} />
+            )}
+          </div>
         </div>
       )}
     </div>

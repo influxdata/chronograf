@@ -1,4 +1,5 @@
-import React, {Component, MouseEvent, DragEvent} from 'react'
+import React, {Component, MouseEvent, DragEvent, CSSProperties} from 'react'
+import classnames from 'classnames'
 import {connect} from 'react-redux'
 
 import {
@@ -40,33 +41,12 @@ class AnnotationPoint extends Component<Props, State> {
   }
 
   public render() {
-    const {annotation, mode, dygraph, staticLegendHeight} = this.props
-    const {isDragging} = this.state
-
-    const isEditing = mode === EDITING
-
-    const flagClass = isDragging
-      ? 'annotation-point--flag__dragging'
-      : 'annotation-point--flag'
-
-    const markerClass = isDragging ? 'annotation dragging' : 'annotation'
-
-    const clickClass = isEditing
-      ? 'annotation--click-area editing'
-      : 'annotation--click-area'
-
-    const markerStyles = {
-      left: `${dygraph.toDomXCoord(Number(annotation.startTime)) +
-        DYGRAPH_CONTAINER_H_MARGIN}px`,
-      height: `calc(100% - ${staticLegendHeight +
-        DYGRAPH_CONTAINER_XLABEL_MARGIN +
-        DYGRAPH_CONTAINER_V_MARGIN * 2}px)`,
-    }
+    const {annotation} = this.props
 
     return (
-      <div className={markerClass} style={markerStyles}>
+      <div className={this.markerClass} style={this.markerStyle}>
         <div
-          className={clickClass}
+          className={this.clickClass}
           draggable={true}
           onDrag={this.handleDrag}
           onDragStart={this.handleDragStart}
@@ -74,7 +54,7 @@ class AnnotationPoint extends Component<Props, State> {
           onMouseEnter={this.handleMouseEnter}
           onMouseLeave={this.handleMouseLeave}
         />
-        <div className={flagClass} />
+        <div className={this.flagClass} />
         <AnnotationTooltip
           timestamp={annotation.startTime}
           annotation={annotation}
@@ -156,10 +136,46 @@ class AnnotationPoint extends Component<Props, State> {
     e.preventDefault()
     e.stopPropagation()
   }
-}
 
-AnnotationPoint.defaultProps = {
-  staticLegendHeight: 0,
+  private get markerStyle(): CSSProperties {
+    const {annotation, dygraph, staticLegendHeight} = this.props
+
+    const left = `${dygraph.toDomXCoord(Number(annotation.startTime)) +
+      DYGRAPH_CONTAINER_H_MARGIN}px`
+
+    const height = `calc(100% - ${staticLegendHeight +
+      DYGRAPH_CONTAINER_XLABEL_MARGIN +
+      DYGRAPH_CONTAINER_V_MARGIN * 2}px)`
+
+    return {
+      left,
+      height,
+    }
+  }
+
+  private get markerClass(): string {
+    const {isDragging, isMouseOver} = this.state
+    return classnames('annotation', {
+      dragging: isDragging,
+      expanded: isMouseOver,
+    })
+  }
+
+  private get clickClass(): string {
+    const isEditing = this.props.mode === EDITING
+
+    return classnames('annotation--click-area', {editing: isEditing})
+  }
+
+  private get flagClass(): string {
+    const {isDragging} = this.state
+
+    if (isDragging) {
+      return 'annotation-point--flag__dragging'
+    }
+
+    return 'annotation-point--flag'
+  }
 }
 
 const mdtp = {
