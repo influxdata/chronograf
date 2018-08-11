@@ -55,14 +55,41 @@ const AnnotationTooltip: SFC<Props> = props => {
         <TimeStamp time={timestamp} />
       ) : (
         <div className="annotation-tooltip--items">
-          <div>
+          <div className="annotation-tooltip-text">
             {annotation.text}
             <span
               className="annotation-tooltip--edit icon pencil"
               onClick={setEditing}
             />
           </div>
-          <TimeStamp time={timestamp} />
+          <div className="annotation-tooltip--lower">
+            <TimeStamp time={timestamp} />
+            <div className="annotation-tag-count">
+              6 Tags
+              <div className="annotation-tooltip--tags">
+                <div className="annotation-tooltip--tags-list">
+                  <span>
+                    <strong>Foo:</strong> Bar
+                  </span>
+                  <span>
+                    <strong>Dinner:</strong> Crabshack
+                  </span>
+                  <span>
+                    <strong>Foo:</strong> Baz
+                  </span>
+                  <span>
+                    <strong>Crisis:</strong> Existential
+                  </span>
+                  <span>
+                    <strong>Sporty:</strong> WeekendsOnly
+                  </span>
+                  <span>
+                    <strong>EndOfDays:</strong> Tomorrow
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
