@@ -535,7 +535,7 @@ class LogsPage extends Component<Props, State> {
       this.props.addFilter(filter)
     })
 
-    this.props.setSearchTermAsync('')
+    this.fetchNewDataset()
   }
 
   private handleFilterDelete = (id: string): void => {
