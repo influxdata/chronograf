@@ -31,7 +31,6 @@ export interface LogsState {
   histogramData: object[]
   tableQueryConfig: QueryConfig | null
   tableData: TableData
-  searchTerm: string | null
   filters: Filter[]
   queryCount: number
   logConfig: LogConfig

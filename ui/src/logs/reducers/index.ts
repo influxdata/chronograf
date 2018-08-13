@@ -45,7 +45,6 @@ export const defaultState: LogsState = {
   tableQueryConfig: null,
   tableData: {columns: [], values: []},
   histogramData: [],
-  searchTerm: '',
   filters: [],
   queryCount: 0,
   logConfig: {
@@ -221,9 +220,6 @@ export default (state: LogsState = defaultState, action: Action) => {
           backward: action.payload.data,
         },
       }
-    case ActionTypes.SetSearchTerm:
-      const {searchTerm} = action.payload
-      return {...state, searchTerm}
     case ActionTypes.SetTableCustomTime:
       return {...state, tableTime: {custom: action.payload.time}}
     case ActionTypes.SetTableRelativeTime:
