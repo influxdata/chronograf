@@ -44,7 +44,6 @@ import {getDeep} from 'src/utils/wrappers'
 import {colorForSeverity} from 'src/logs/utils/colors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import {SeverityFormatOptions, SEVERITY_SORTING_ORDER} from 'src/logs/constants'
-import {LOG_SEARCH_TERMS} from 'src/logs/constants/search'
 
 import {Source, Namespace} from 'src/types'
 
@@ -532,9 +531,11 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleSubmitSearch = (value: string): void => {
-    searchToFilters(value, LOG_SEARCH_TERMS).forEach(filter => {
+    searchToFilters(value).forEach(filter => {
       this.props.addFilter(filter)
     })
+
+    this.props.setSearchTermAsync('')
   }
 
   private handleFilterDelete = (id: string): void => {

@@ -25,11 +25,17 @@ const getPattern = (type: TermType, phrase: TermPart) => {
   }
 }
 
-export const searchToFilters = (
-  searchTerm: string,
-  rules: TermRule[]
-): Filter[] => {
-  const allTerms = extractTermRules(searchTerm, rules)
+export const LOG_SEARCH_TERMS: TermRule[] = [
+  createRule(TermPart.SINGLE_QUOTED, TermType.EXCLUDE),
+  createRule(TermPart.DOUBLE_QUOTED, TermType.EXCLUDE),
+  createRule(TermPart.SINGLE_QUOTED),
+  createRule(TermPart.DOUBLE_QUOTED),
+  createRule(TermPart.UNQUOTED_WORD, TermType.EXCLUDE),
+  createRule(TermPart.UNQUOTED_WORD),
+]
+
+export const searchToFilters = (searchTerm: string): Filter[] => {
+  const allTerms = extractTermRules(searchTerm, LOG_SEARCH_TERMS)
 
   return termsToFilters(allTerms)
 }
