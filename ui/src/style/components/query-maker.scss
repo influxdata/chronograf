@@ -81,12 +81,8 @@ $query-editor-tab-active: $g3-castle;
   height: $query-maker--tabs-height;
   align-items: center;
 }
-.query-maker--tabs > div.btn.query-maker--new {
+.query-maker--new-tab {
   margin-left: 6px;
-  padding: 0 8px !important;
-}
-.query-maker--new > span.icon {
-  margin: 0 !important;
 }
 .query-maker--tab {
   border-radius: $radius $radius 0 0;
@@ -111,32 +107,28 @@ $query-editor-tab-active: $g3-castle;
     background: $query-maker--tab-bg-active;
   }
 }
-.query-maker--tab > label,
-.query-maker--delete {
+.query-maker--tab-label,
+.query-maker--delete,
+.query-maker--visibility {
   top: 50%;
   transform: translateY(-50%);
   position: absolute;
 }
-.query-maker--tab > label {
-  left: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  width: calc(100% - #{$query-maker--tabs-height});
-  text-overflow: ellipsis;
-  @include no-user-select();
-  cursor: inherit !important;
+$query-maker-vis-width: 22px;
+$query-maker-vis-gap: 12px;
+.query-maker--visibility {
+  left: $query-maker-vis-gap;
 }
+
+$query-maker-delete-width: 18px;
+$query-maker-delete-gap: 9px;
 .query-maker--delete {
-  margin: 0;
-  width: 18px;
-  height: 18px;
+  width: $query-maker-delete-width;
+  height: $query-maker-delete-width;
   background-color: transparent;
   display: block;
-  right: 9px;
-
+  right: $query-maker-delete-gap;
+  
   &:before,
   &:after {
     display: block;
@@ -146,7 +138,7 @@ $query-editor-tab-active: $g3-castle;
     border-radius: 1px;
     background-color: $g8-storm;
     transition:
-      background-color 0.25s ease;
+    background-color 0.25s ease;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -157,7 +149,7 @@ $query-editor-tab-active: $g3-castle;
   &:after {
     transform: translate(-50%,-50%) rotate(-45deg);
   }
-
+  
   &:hover {
     &:before,
     &:after {
@@ -165,6 +157,28 @@ $query-editor-tab-active: $g3-castle;
     }
   }
 }
+.query-maker--tab-label {
+  left: $query-maker-vis-gap + $query-maker-vis-width;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  width: calc(100% - #{$query-maker-vis-width + $query-maker-vis-gap + $query-maker-delete-width + $query-maker-delete-gap});
+  text-overflow: ellipsis;
+  @include no-user-select();
+}
+
+// Hidden Tab
+.query-maker--tab.hidden {
+  color: $g9-mountain;
+  
+  .query-maker--tab-label {
+    font-style: italic;
+  }
+}
+
+
+
 .query-maker--tab-contents {
   border-radius: 0 $radius $radius $radius;
   display: flex;

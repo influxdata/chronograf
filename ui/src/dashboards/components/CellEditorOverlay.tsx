@@ -254,6 +254,7 @@ class CellEditorOverlay extends Component<Props, State> {
           timeRange={timeRange}
           onDeleteQuery={this.handleDeleteQuery}
           onAddQuery={this.handleAddQuery}
+          onToggleQueryVisibility={this.handleToggleQueryVisibility}
           activeQueryIndex={activeQueryIndex}
           activeQuery={this.getActiveQuery()}
           setActiveQueryIndex={this.handleSetActiveQueryIndex}
@@ -327,6 +328,19 @@ class CellEditorOverlay extends Component<Props, State> {
       ],
     })
     this.handleSetActiveQueryIndex(newIndex)
+  }
+
+  private handleToggleQueryVisibility = (index: number): void => {
+    const {queriesWorkingDraft} = this.state
+    const nextQueries = queriesWorkingDraft.map((q, i) => {
+      if (i === index) {
+        return {...q, isQueryVisible: !q.isQueryVisible}
+      }
+
+      return q
+    })
+
+    this.setState({queriesWorkingDraft: nextQueries})
   }
 
   private handleDeleteQuery = index => {

@@ -28,6 +28,7 @@ interface Props {
   actions: CellEditorOverlayActions
   setActiveQueryIndex: (index: number) => void
   onDeleteQuery: (index: number) => void
+  onToggleQueryVisibility: (index: number) => void
   activeQueryIndex: number
   activeQuery: QueryConfig
   onAddQuery: () => void
@@ -47,6 +48,7 @@ const QueryMaker: SFC<Props> = ({
   activeQueryIndex,
   initialGroupByTime,
   setActiveQueryIndex,
+  onToggleQueryVisibility,
 }) => (
   <div className="query-maker query-maker--panel">
     <QueryTabList
@@ -54,6 +56,7 @@ const QueryMaker: SFC<Props> = ({
       timeRange={timeRange}
       onAddQuery={onAddQuery}
       onDeleteQuery={onDeleteQuery}
+      onToggleQueryVisibility={onToggleQueryVisibility}
       activeQueryIndex={activeQueryIndex}
       setActiveQueryIndex={setActiveQueryIndex}
     />
