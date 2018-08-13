@@ -158,14 +158,19 @@ $query-maker-delete-gap: 9px;
   }
 }
 .query-maker--tab-label {
-  left: $query-maker-vis-gap + $query-maker-vis-width;
+  left: $query-maker-vis-gap;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
-  width: calc(100% - #{$query-maker-vis-width + $query-maker-vis-gap + $query-maker-delete-width + $query-maker-delete-gap});
+  width: calc(100% - #{$query-maker-vis-gap + $query-maker-delete-width + $query-maker-delete-gap});
   text-overflow: ellipsis;
   @include no-user-select();
+}
+
+.query-maker--visibility + .query-maker--tab-label {
+  left: $query-maker-vis-gap + $query-maker-vis-width;
+  width: calc(100% - #{$query-maker-vis-width + $query-maker-vis-gap + $query-maker-delete-width + $query-maker-delete-gap});
 }
 
 // Hidden Tab

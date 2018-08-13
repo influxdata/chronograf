@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react'
 import classnames from 'classnames'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {QueryConfig} from 'src/types/queries'
+import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 interface Props {
   isActive: boolean
@@ -47,22 +48,22 @@ class QueryMakerTab extends PureComponent<Props> {
   private get visibilityIndicator(): JSX.Element {
     const {isVisible} = this.props
 
+    let titleText = 'Show this Query'
+    let icon = 'eye-closed'
+
     if (isVisible) {
-      return (
-        <span
-          className="query-maker--visibility icon eye-open"
-          title="Hide this Query"
-          onClick={this.handleToggleVisibility}
-        />
-      )
+      titleText = 'Hide this Query'
+      icon = 'eye-open'
     }
 
     return (
-      <span
-        className="query-maker--visibility icon eye-closed"
-        title="Show this Query"
-        onClick={this.handleToggleVisibility}
-      />
+      <Authorized requiredRole={EDITOR_ROLE}>
+        <span
+          className={`query-maker--visibility icon ${icon}`}
+          title={titleText}
+          onClick={this.handleToggleVisibility}
+        />
+      </Authorized>
     )
   }
 
