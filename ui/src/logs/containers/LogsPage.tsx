@@ -6,6 +6,8 @@ import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {withRouter, InjectedRouter} from 'react-router'
 
+import {searchToFilters} from 'src/logs/utils/search'
+
 import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
 
@@ -21,7 +23,6 @@ import {
   setTimeMarker,
   setNamespaceAsync,
   executeQueriesAsync,
-  setSearchTermAsync,
   addFilter,
   removeFilter,
   changeFilter,
@@ -42,6 +43,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {colorForSeverity} from 'src/logs/utils/colors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import {SeverityFormatOptions, SEVERITY_SORTING_ORDER} from 'src/logs/constants'
+
 import {Source, Namespace} from 'src/types'
 
 import {
@@ -79,7 +81,6 @@ interface Props {
   setTimeMarker: (timeMarker: TimeMarker) => void
   setNamespaceAsync: (namespace: Namespace) => void
   executeQueriesAsync: () => void
-  setSearchTermAsync: (searchTerm: string) => void
   setTableRelativeTime: (time: number) => void
   setTableCustomTime: (time: string) => void
   fetchOlderLogsAsync: (queryTimeEnd: string) => Promise<void>
@@ -94,7 +95,6 @@ interface Props {
   timeRange: TimeRange
   histogramData: HistogramData
   tableData: TableData
-  searchTerm: string
   filters: Filter[]
   queryCount: number
   logConfig: LogConfig
@@ -186,7 +186,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   public render() {
-    const {searchTerm, filters, queryCount, timeRange} = this.props
+    const {filters, queryCount, timeRange} = this.props
 
     return (
       <>
@@ -195,10 +195,7 @@ class LogsPage extends Component<Props, State> {
           <div className="page-contents logs-viewer">
             <QueryResults count={this.histogramTotal} queryCount={queryCount} />
             <LogsGraphContainer>{this.chart}</LogsGraphContainer>
-            <SearchBar
-              searchString={searchTerm}
-              onSearch={this.handleSubmitSearch}
-            />
+            <SearchBar onSearch={this.handleSubmitSearch} />
             <FilterBar
               filters={filters || []}
               onDelete={this.handleFilterDelete}
@@ -528,7 +525,11 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleSubmitSearch = (value: string): void => {
-    this.props.setSearchTermAsync(value)
+    searchToFilters(value).forEach(filter => {
+      this.props.addFilter(filter)
+    })
+
+    this.fetchNewDataset()
   }
 
   private handleFilterDelete = (id: string): void => {
@@ -689,7 +690,6 @@ const mapStateToProps = ({
     currentNamespace,
     histogramData,
     tableData,
-    searchTerm,
     filters,
     queryCount,
     logConfig,
@@ -704,7 +704,6 @@ const mapStateToProps = ({
   currentNamespace,
   histogramData,
   tableData,
-  searchTerm,
   filters,
   queryCount,
   logConfig,
@@ -723,7 +722,6 @@ const mapDispatchToProps = {
   setTimeMarker,
   setNamespaceAsync,
   executeQueriesAsync,
-  setSearchTermAsync,
   addFilter,
   removeFilter,
   changeFilter,

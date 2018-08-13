@@ -66,7 +66,6 @@ export enum ActionTypes {
   SetHistogramData = 'LOGS_SET_HISTOGRAM_DATA',
   SetTableQueryConfig = 'LOGS_SET_TABLE_QUERY_CONFIG',
   SetTableData = 'LOGS_SET_TABLE_DATA',
-  SetSearchTerm = 'LOGS_SET_SEARCH_TERM',
   AddFilter = 'LOGS_ADD_FILTER',
   RemoveFilter = 'LOGS_REMOVE_FILTER',
   ChangeFilter = 'LOGS_CHANGE_FILTER',
@@ -228,13 +227,6 @@ interface SetTableData {
   }
 }
 
-interface SetSearchTerm {
-  type: ActionTypes.SetSearchTerm
-  payload: {
-    searchTerm: string
-  }
-}
-
 export interface SetConfigsAction {
   type: ActionTypes.SetConfig
   payload: {
@@ -253,7 +245,6 @@ export type Action =
   | SetHistogramData
   | SetTableData
   | SetTableQueryConfig
-  | SetSearchTerm
   | AddFilterAction
   | RemoveFilterAction
   | ChangeFilterAction
@@ -545,14 +536,6 @@ export const executeQueriesAsync = () => async dispatch => {
   } catch {
     console.error('Could not make query requests')
   }
-}
-
-export const setSearchTermAsync = (searchTerm: string) => async dispatch => {
-  dispatch({
-    type: ActionTypes.SetSearchTerm,
-    payload: {searchTerm},
-  })
-  dispatch(executeQueriesAsync())
 }
 
 export const setHistogramQueryConfigAsync = () => async (
