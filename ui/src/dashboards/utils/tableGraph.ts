@@ -91,10 +91,10 @@ const updateMaxWidths = (
 
       const currentWidth = useTimeWidth
         ? timeFormatWidth
-        : calculateSize(colValue, {
+        : calculateSize(colValue.toString().trim(), {
             font: isLabel ? '"Roboto"' : '"RobotoMono", monospace',
-            fontSize: '13px',
-            fontWeight: 'bold',
+            fontSize: '12px',
+            fontWeight: '500',
           }).width + CELL_HORIZONTAL_PADDING
 
       const {widths: Widths} = maxColumnWidths

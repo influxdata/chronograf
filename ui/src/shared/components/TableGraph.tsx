@@ -352,10 +352,6 @@ class TableGraph extends Component<Props, State> {
     return tableWidth
   }
 
-  private get computedTableWidth(): number {
-    return this.tableWidth
-  }
-
   private handleUpdateFieldOptions = (fieldOptions: FieldOption[]): void => {
     const {isInCEO, handleUpdateFieldOptions} = this.props
     if (isInCEO) {
@@ -473,22 +469,24 @@ class TableGraph extends Component<Props, State> {
     const {transformedData, columnWidths, totalColumnWidths} = this.state
     const columnLabel = transformedData[0][index]
 
+    const original = columnWidths[columnLabel]
+
     if (this.fixFirstColumn && index === 0) {
-      return columnWidths[columnLabel]
+      return original
     }
 
-    if (this.computedTableWidth <= totalColumnWidths) {
-      return columnWidths[columnLabel]
+    if (this.tableWidth <= totalColumnWidths) {
+      return original
     }
 
     if (this.columnCount <= 1) {
       return columnSizerWidth
     }
 
-    const difference = this.computedTableWidth - totalColumnWidths
+    const difference = this.tableWidth - totalColumnWidths
     const increment = difference / this.computedColumnCount
 
-    return columnWidths[columnLabel] + increment
+    return original + increment
   }
 
   private createCellContents = (
