@@ -1,7 +1,6 @@
 import React, {PureComponent, ChangeEvent, KeyboardEvent} from 'react'
 
 interface Props {
-  searchString: string
   onSearch: (value: string) => void
 }
 
@@ -14,7 +13,7 @@ class LogsSearchBar extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      searchTerm: props.searchString,
+      searchTerm: '',
     }
   }
 
@@ -45,6 +44,7 @@ class LogsSearchBar extends PureComponent<Props, State> {
 
   private handleSearch = () => {
     this.props.onSearch(this.state.searchTerm)
+    this.setState({searchTerm: ''})
   }
 
   private handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {

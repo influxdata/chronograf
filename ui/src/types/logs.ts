@@ -29,7 +29,6 @@ export interface LogsState {
   histogramData: object[]
   tableQueryConfig: QueryConfig | null
   tableData: TableData
-  searchTerm: string | null
   filters: Filter[]
   queryCount: number
   logConfig: LogConfig
@@ -126,4 +125,37 @@ export interface TimeWindow {
 
 export interface TimeMarker {
   timeOption: string
+}
+
+export interface Term {
+  type: TermType
+  term: string
+}
+
+export interface TokenLiteralMatch {
+  literal: string
+  nextText: string
+  rule: TermRule
+}
+
+export interface TermRule {
+  type: TermType
+  pattern: RegExp
+}
+
+export enum TermType {
+  EXCLUDE,
+  INCLUDE,
+}
+
+export enum TermPart {
+  EXCLUSION = '-',
+  SINGLE_QUOTED = "'([^']+)'",
+  DOUBLE_QUOTED = '"([^"]+)"',
+  UNQUOTED_WORD = '([\\S]+)',
+}
+
+export enum Operator {
+  NOT_LIKE = '!~',
+  LIKE = '=~',
 }
