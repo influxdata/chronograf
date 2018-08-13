@@ -179,6 +179,14 @@ class SideNav extends PureComponent<Props> {
             sourcePrefix={sourcePrefix}
           />
         ) : null}
+        <NavBlock
+          highlightWhen={['perf']}
+          icon="alert-triangle"
+          link={`${sourcePrefix}/perf`}
+          location={location}
+        >
+          <NavHeader link={`${sourcePrefix}/perf`} title="Janky Dashboard" />
+        </NavBlock>
       </nav>
     )
   }

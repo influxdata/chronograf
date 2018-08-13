@@ -1,0 +1,56 @@
+.perf-test-page {
+  width: 100%;
+  height: 100%;
+
+  .react-grid-item {
+    border-radius: 4px;
+    overflow: hidden;
+  }
+}
+
+.perf-test-page--header {
+  height: 60px;
+  background: $g3-castle;
+  display: flex;
+  align-items: center;
+}
+
+.perf-test-page--body {
+  width: 100%;
+  height: 100%;
+  padding: 20px 20px 80px 20px;
+  overflow: scroll;
+}
+
+.perf-cell {
+  background: $g3-castle;
+  width: 100%;
+  height: 100%;
+}
+
+.perf-cell--loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $g14-chromium;
+  font-size: 18px;
+}
+
+.perf-cell--header {
+  height: 30px;
+  background: $g4-onyx;
+  cursor: grab;
+}
+
+.perf-cell--body {
+  height: 100%;
+  width: 100%;
+  padding: 30px 40px 50px 20px;
+
+  .dygraph-child, .dygraph-child-container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}

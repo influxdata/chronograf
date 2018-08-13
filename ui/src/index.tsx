@@ -35,6 +35,7 @@ import {
   TickscriptPage,
 } from 'src/kapacitor'
 import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
+import PerfTestPage from 'src/perf/components/PerfTestPage'
 import {ManageSources, OnboardingWizard} from 'src/sources'
 
 import {CheckServices, FluxConnectionPage} from 'src/flux'
@@ -167,6 +168,7 @@ class Root extends PureComponent<{}, State> {
               <Route path="admin-influxdb/:tab" component={AdminInfluxDBPage} />
               <Route path="manage-sources" component={ManageSources} />
               <Route path="delorean" component={CheckServices} />
+              <Route path="perf" component={PerfTestPage} />
             </Route>
           </Route>
           <Route path="*" component={NotFound} />
