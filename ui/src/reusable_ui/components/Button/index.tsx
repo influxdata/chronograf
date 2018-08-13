@@ -24,6 +24,7 @@ interface Props {
   titleText?: string
   active?: boolean
   tabIndex?: number
+  customClass?: string
 }
 
 @ErrorHandling
@@ -93,7 +94,7 @@ class Button extends Component<Props> {
   }
 
   private get className(): string {
-    const {color, size, shape, status, active} = this.props
+    const {color, size, shape, status, active, customClass} = this.props
 
     return classnames(`button button-${size} button-${color}`, {
       'button-square': shape === ButtonShape.Square,
@@ -101,6 +102,7 @@ class Button extends Component<Props> {
       'button--loading': status === ComponentStatus.Loading,
       'button--disabled': status === ComponentStatus.Disabled,
       active,
+      [customClass]: customClass,
     })
   }
 }
