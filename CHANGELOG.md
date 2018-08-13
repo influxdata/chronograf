@@ -6,6 +6,8 @@
 1.  [#4228](https://github.com/influxdata/chronograf/pull/4228): Add close button for logs pop over
 
 ### UI Improvements
+1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
+
 
 ### Bug Fixes
 

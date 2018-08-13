@@ -1,42 +1,22 @@
 // Libraries
 import React, {Component} from 'react'
 import _ from 'lodash'
-import uuid from 'uuid'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import ResizeContainer from 'src/shared/components/ResizeContainer'
-import QueryMaker from 'src/dashboards/components/QueryMaker'
-import Visualization from 'src/dashboards/components/Visualization'
-import OverlayControls from 'src/dashboards/components/OverlayControls'
-import DisplayOptions from 'src/dashboards/components/DisplayOptions'
-import CEOBottom from 'src/dashboards/components/CEOBottom'
-
-// APIs
-import {getQueryConfigAndStatus} from 'src/shared/apis'
+import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
+import CEOHeader from 'src/dashboards/components/CEOHeader'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
-import * as queryTransitions from 'src/utils/queryTransitions'
-import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import {buildQuery} from 'src/utils/influxql'
-import {nextSource} from 'src/dashboards/utils/sources'
-import replaceTemplate, {replaceInterval} from 'src/tempVars/utils/replace'
 import {editCellQueryStatus} from 'src/dashboards/actions'
+import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 
 // Constants
-import {IS_STATIC_LEGEND} from 'src/shared/constants'
-import {TYPE_QUERY_CONFIG, CEOTabs} from 'src/dashboards/constants'
-import {OVERLAY_TECHNOLOGY} from 'src/shared/constants/classNames'
-import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'src/data_explorer/constants'
-import {
-  AUTO_GROUP_BY,
-  PREDEFINED_TEMP_VARS,
-  TEMP_VAR_DASHBOARD_TIME,
-  DEFAULT_DURATION_MS,
-  DEFAULT_PIXELS,
-} from 'src/shared/constants'
+import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
+import {IS_STATIC_LEGEND} from 'src/shared/constants'
 
 // Types
 import * as ColorsModels from 'src/types/colors'
@@ -46,20 +26,11 @@ import * as SourcesModels from 'src/types/sources'
 import {Service} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
-
-type QueryTransitions = typeof queryTransitions
-type EditRawTextAsyncFunc = (
-  url: string,
-  id: string,
-  text: string
-) => Promise<void>
-type CellEditorOverlayActionsFunc = (queryID: string, ...args: any[]) => void
-type QueryActions = {
-  [K in keyof QueryTransitions]: CellEditorOverlayActionsFunc
-}
-export type CellEditorOverlayActions = QueryActions & {
-  editRawTextAsync: EditRawTextAsyncFunc
-}
+import {
+  QueryConfigActions,
+  addQueryAsync,
+  deleteQueryAsync,
+} from 'src/dashboards/actions/cellEditorOverlay'
 
 const staticLegend: DashboardsModels.Legend = {
   type: 'static',
@@ -88,86 +59,30 @@ interface Props {
   gaugeColors: ColorsModels.ColorNumber[]
   lineColors: ColorsModels.ColorString[]
   cell: DashboardsModels.Cell | NewDefaultCell
+  queryDrafts: DashboardsModels.CellQuery[]
+  renameCell: (name: string) => void
+  updateQueryDrafts: (queryDrafts: DashboardsModels.CellQuery[]) => void
+  queryConfigActions: QueryConfigActions
+  addQuery: typeof addQueryAsync
+  deleteQuery: typeof deleteQueryAsync
 }
 
 interface State {
-  queriesWorkingDraft: QueriesModels.QueryConfig[]
-  activeQueryIndex: number
-  activeEditorTab: CEOTabs
   isStaticLegend: boolean
-  selectedSource: SourcesModels.Source
-  selectedService: Service
 }
-
-const createWorkingDraft = (
-  source: SourcesModels.Source,
-  query: DashboardsModels.CellQuery
-): QueriesModels.QueryConfig => {
-  const {queryConfig} = query
-  const draft: QueriesModels.QueryConfig = {
-    ...queryConfig,
-    id: uuid.v4(),
-    source,
-  }
-
-  return draft
-}
-
-const createWorkingDrafts = (
-  source: SourcesModels.Source,
-  queries: DashboardsModels.CellQuery[]
-): QueriesModels.QueryConfig[] =>
-  _.cloneDeep(
-    queries.map((query: DashboardsModels.CellQuery) =>
-      createWorkingDraft(source, query)
-    )
-  )
 
 @ErrorHandling
 class CellEditorOverlay extends Component<Props, State> {
   private overlayRef: HTMLDivElement
 
-  constructor(props) {
+  public constructor(props: Props) {
     super(props)
 
-    const {
-      cell: {legend},
-    } = props
-    let {
-      cell: {queries},
-    } = props
-
-    // Always have at least one query
-    if (_.isEmpty(queries)) {
-      queries = [{id: uuid.v4()}]
-    }
-
-    const queriesWorkingDraft = createWorkingDrafts(this.initialSource, queries)
+    const {cell} = props
+    const legend = getDeep<DashboardsModels.Legend | null>(cell, 'legend', null)
 
     this.state = {
-      queriesWorkingDraft,
-      activeQueryIndex: 0,
-      activeEditorTab: CEOTabs.Queries,
       isStaticLegend: IS_STATIC_LEGEND(legend),
-      selectedService: null,
-      selectedSource: null,
-    }
-  }
-
-  public componentWillReceiveProps(nextProps: Props) {
-    const {status, queryID} = this.props.queryStatus
-    const {queriesWorkingDraft} = this.state
-    const {queryStatus} = nextProps
-
-    if (
-      queryStatus.status &&
-      queryStatus.queryID &&
-      (queryStatus.queryID !== queryID || queryStatus.status !== status)
-    ) {
-      const nextQueries = queriesWorkingDraft.map(
-        q => (q.id === queryID ? {...q, status: queryStatus.status} : q)
-      )
-      this.setState({queriesWorkingDraft: nextQueries})
     }
   }
 
@@ -185,170 +100,107 @@ class CellEditorOverlay extends Component<Props, State> {
       timeRange,
       autoRefresh,
       editQueryStatus,
+      cell,
+      queryDrafts,
+      source,
+      sources,
+      updateQueryDrafts,
+      renameCell,
+      addQuery,
+      deleteQuery,
     } = this.props
 
-    const {activeEditorTab, queriesWorkingDraft, isStaticLegend} = this.state
+    const {isStaticLegend} = this.state
 
     return (
       <div
-        className={OVERLAY_TECHNOLOGY}
+        className="deceo--overlay"
         onKeyDown={this.handleKeyDown}
         tabIndex={0}
         ref={this.onRef}
       >
-        <ResizeContainer
-          containerClass="resizer--full-size"
-          minTopHeight={MINIMUM_HEIGHTS.visualization}
-          minBottomHeight={MINIMUM_HEIGHTS.queryMaker}
-          initialTopHeight={INITIAL_HEIGHTS.visualization}
-          initialBottomHeight={INITIAL_HEIGHTS.queryMaker}
+        <TimeMachine
+          queryDrafts={queryDrafts}
+          editQueryStatus={editQueryStatus}
+          templates={templates}
+          timeRange={timeRange}
+          autoRefresh={autoRefresh}
+          source={source}
+          onResetFocus={this.handleResetFocus}
+          isInCEO={true}
+          sources={sources}
+          services={services}
+          updateQueryDrafts={updateQueryDrafts}
+          onToggleStaticLegend={this.handleToggleStaticLegend}
+          isStaticLegend={isStaticLegend}
+          queryConfigActions={this.props.queryConfigActions}
+          addQuery={addQuery}
+          deleteQuery={deleteQuery}
         >
-          <Visualization
-            source={this.source}
-            timeRange={timeRange}
-            templates={templates}
-            autoRefresh={autoRefresh}
-            queryConfigs={queriesWorkingDraft}
-            editQueryStatus={editQueryStatus}
-            staticLegend={isStaticLegend}
-            isInCEO={true}
-          />
-          <CEOBottom>
-            <OverlayControls
-              onCancel={onCancel}
-              queries={queriesWorkingDraft}
-              source={this.source}
-              sources={this.formattedSources}
-              service={this.service}
-              services={services}
+          {(activeEditorTab, onSetActiveEditorTab) => (
+            <CEOHeader
+              title={_.get(cell, 'name', '')}
+              renameCell={renameCell}
               onSave={this.handleSaveCell}
-              isSavable={this.isSaveable}
+              onCancel={onCancel}
               activeEditorTab={activeEditorTab}
-              onSetActiveEditorTab={this.handleSetActiveEditorTab}
-              onChangeService={this.handleChangeService}
+              onSetActiveEditorTab={onSetActiveEditorTab}
+              isSaveable={this.isSaveable}
             />
-            {this.cellEditorBottom}
-          </CEOBottom>
-        </ResizeContainer>
+          )}
+        </TimeMachine>
       </div>
     )
   }
 
-  private get cellEditorBottom(): JSX.Element {
-    const {templates, timeRange} = this.props
-
-    const {
-      activeQueryIndex,
-      activeEditorTab,
-      queriesWorkingDraft,
-      isStaticLegend,
-    } = this.state
-
-    if (activeEditorTab === CEOTabs.Queries) {
-      return (
-        <QueryMaker
-          source={this.source}
-          templates={templates}
-          queries={queriesWorkingDraft}
-          actions={this.queryActions}
-          timeRange={timeRange}
-          onDeleteQuery={this.handleDeleteQuery}
-          onAddQuery={this.handleAddQuery}
-          activeQueryIndex={activeQueryIndex}
-          activeQuery={this.getActiveQuery()}
-          setActiveQueryIndex={this.handleSetActiveQueryIndex}
-          initialGroupByTime={AUTO_GROUP_BY}
-        />
+  private get isSaveable(): boolean {
+    const {queryDrafts} = this.props
+    return queryDrafts.every(queryDraft => {
+      const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
+        queryDraft,
+        'queryConfig',
+        null
       )
-    }
-
-    return (
-      <DisplayOptions
-        queryConfigs={queriesWorkingDraft}
-        onToggleStaticLegend={this.handleToggleStaticLegend}
-        staticLegend={isStaticLegend}
-        onResetFocus={this.handleResetFocus}
-      />
-    )
-  }
-
-  private get formattedSources(): SourcesModels.SourceOption[] {
-    const {sources} = this.props
-    return sources.map(s => ({
-      ...s,
-      text: `${s.name} @ ${s.url}`,
-    }))
+      return (
+        (!!queryConfig.measurement &&
+          !!queryConfig.database &&
+          !!queryConfig.fields.length) ||
+        !!queryConfig.rawText
+      )
+    })
   }
 
   private onRef = (r: HTMLDivElement) => {
     this.overlayRef = r
   }
 
-  private queryStateReducer = (
-    queryTransition
-  ): CellEditorOverlayActionsFunc => (queryID: string, ...payload: any[]) => {
-    const {queriesWorkingDraft} = this.state
-    const queryWorkingDraft = queriesWorkingDraft.find(q => q.id === queryID)
-
-    const nextQuery = queryTransition(queryWorkingDraft, ...payload)
-
-    const nextQueries = queriesWorkingDraft.map(q => {
-      if (q.id === queryWorkingDraft.id) {
-        return {...nextQuery, source: nextSource(q, nextQuery)}
-      }
-
-      return q
-    })
-
-    this.setState({queriesWorkingDraft: nextQueries})
-  }
-
-  private handleChangeService = (
-    selectedService: Service,
-    selectedSource: SourcesModels.Source
-  ) => {
-    const queriesWorkingDraft: QueriesModels.QueryConfig[] = this.state.queriesWorkingDraft.map(
-      q => ({
-        ..._.cloneDeep(q),
-        source: selectedSource,
-      })
-    )
-    this.setState({selectedService, selectedSource, queriesWorkingDraft})
-  }
-
-  private handleAddQuery = () => {
-    const {queriesWorkingDraft} = this.state
-    const newIndex = queriesWorkingDraft.length
-
-    this.setState({
-      queriesWorkingDraft: [
-        ...queriesWorkingDraft,
-        {...defaultQueryConfig({id: uuid.v4()}), source: this.initialSource},
-      ],
-    })
-    this.handleSetActiveQueryIndex(newIndex)
-  }
-
-  private handleDeleteQuery = index => {
-    const {queriesWorkingDraft} = this.state
-    const nextQueries = queriesWorkingDraft.filter((__, i) => i !== index)
-
-    this.setState({queriesWorkingDraft: nextQueries})
-  }
-
   private handleSaveCell = () => {
-    const {queriesWorkingDraft, isStaticLegend} = this.state
-    const {cell, thresholdsListColors, gaugeColors, lineColors} = this.props
+    const {isStaticLegend} = this.state
+    const {
+      queryDrafts,
+      thresholdsListColors,
+      gaugeColors,
+      lineColors,
+      cell,
+    } = this.props
 
-    const queries: DashboardsModels.CellQuery[] = queriesWorkingDraft.map(q => {
-      const timeRange = q.range || {
-        upper: null,
-        lower: TEMP_VAR_DASHBOARD_TIME,
-      }
-      const source = getDeep<string | null>(q.source, 'links.self', null)
+    const queries: DashboardsModels.CellQuery[] = queryDrafts.map(q => {
+      const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
+        q,
+        'queryConfig',
+        null
+      )
+      const timeRange = getTimeRange(queryConfig)
+      const source = getDeep<string | null>(
+        queryConfig,
+        'source.links.self',
+        null
+      )
       return {
-        queryConfig: q,
-        query: q.rawText || buildQuery(TYPE_QUERY_CONFIG, timeRange, q),
+        ...q,
+        query:
+          queryConfig.rawText ||
+          buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig),
         source,
       }
     })
@@ -368,151 +220,6 @@ class CellEditorOverlay extends Component<Props, State> {
     }
 
     this.props.onSave(newCell)
-  }
-
-  private handleSetActiveEditorTab = (tabName: CEOTabs): void => {
-    this.setState({activeEditorTab: tabName})
-  }
-
-  private handleSetActiveQueryIndex = (activeQueryIndex): void => {
-    this.setState({activeQueryIndex})
-  }
-
-  private handleToggleStaticLegend = isStaticLegend => (): void => {
-    this.setState({isStaticLegend})
-  }
-
-  private getActiveQuery = () => {
-    const {queriesWorkingDraft, activeQueryIndex} = this.state
-    const activeQuery = _.get(
-      queriesWorkingDraft,
-      activeQueryIndex,
-      queriesWorkingDraft[0]
-    )
-
-    const queryText = _.get(activeQuery, 'rawText', '')
-    const userDefinedTempVarsInQuery = this.findUserDefinedTempVarsInQuery(
-      queryText,
-      this.props.templates
-    )
-
-    if (!!userDefinedTempVarsInQuery.length) {
-      activeQuery.isQuerySupportedByExplorer = false
-    }
-
-    return activeQuery
-  }
-
-  private findUserDefinedTempVarsInQuery = (
-    query: string,
-    templates: Template[]
-  ): Template[] => {
-    return templates.filter((temp: Template) => {
-      if (!query) {
-        return false
-      }
-      const isPredefinedTempVar: boolean = !!PREDEFINED_TEMP_VARS.find(
-        t => t === temp.tempVar
-      )
-      if (!isPredefinedTempVar) {
-        return query.includes(temp.tempVar)
-      }
-      return false
-    })
-  }
-
-  private getConfig = async (
-    url,
-    id: string,
-    query: string,
-    templates: Template[]
-  ): Promise<QueriesModels.QueryConfig> => {
-    // replace all templates but :interval:
-    query = replaceTemplate(query, templates)
-    let queries = []
-    let durationMs = DEFAULT_DURATION_MS
-
-    try {
-      // get durationMs to calculate interval
-      queries = await getQueryConfigAndStatus(url, [{query, id}])
-      durationMs = _.get(queries, '0.durationMs', DEFAULT_DURATION_MS)
-      // calc and replace :interval:
-      query = replaceInterval(query, DEFAULT_PIXELS, durationMs)
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
-
-    try {
-      // fetch queryConfig for with all template variables replaced
-      queries = await getQueryConfigAndStatus(url, [{query, id}])
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
-
-    const {queryConfig} = queries.find(q => q.id === id)
-
-    return queryConfig
-  }
-
-  // The schema explorer is not built to handle user defined template variables
-  // in the query in a clear manner. If they are being used, we indicate that in
-  // the query config in order to disable the fields column down stream because
-  // at this point the query string is disconnected from the schema explorer.
-  private handleEditRawText = async (
-    url: string,
-    id: string,
-    text: string
-  ): Promise<void> => {
-    const {templates} = this.props
-    const userDefinedTempVarsInQuery = this.findUserDefinedTempVarsInQuery(
-      text,
-      templates
-    )
-
-    const isUsingUserDefinedTempVars: boolean = !!userDefinedTempVarsInQuery.length
-
-    try {
-      const queryConfig = await this.getConfig(url, id, text, templates)
-      const nextQueries = this.state.queriesWorkingDraft.map(q => {
-        if (q.id === id) {
-          const isQuerySupportedByExplorer = !isUsingUserDefinedTempVars
-
-          if (isUsingUserDefinedTempVars) {
-            return {
-              ...q,
-              rawText: text,
-              status: {loading: true},
-              isQuerySupportedByExplorer,
-            }
-          }
-
-          // preserve query range and groupBy
-          return {
-            ...queryConfig,
-            status: {loading: true},
-            rawText: text,
-            range: q.range,
-            groupBy: q.groupBy,
-            source: q.source,
-            isQuerySupportedByExplorer,
-          }
-        }
-
-        return q
-      })
-
-      this.setState({queriesWorkingDraft: nextQueries})
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  private get service() {
-    const {selectedService} = this.state
-
-    return selectedService
   }
 
   private handleKeyDown = e => {
@@ -545,74 +252,12 @@ class CellEditorOverlay extends Component<Props, State> {
     }
   }
 
+  private handleToggleStaticLegend = isStaticLegend => (): void => {
+    this.setState({isStaticLegend})
+  }
+
   private handleResetFocus = () => {
     this.overlayRef.focus()
-  }
-
-  private get isSaveable(): boolean {
-    const {queriesWorkingDraft} = this.state
-
-    return queriesWorkingDraft.every(
-      (query: QueriesModels.QueryConfig) =>
-        (!!query.measurement && !!query.database && !!query.fields.length) ||
-        !!query.rawText
-    )
-  }
-
-  private get queryActions(): CellEditorOverlayActions {
-    const mapped: QueryActions = _.mapValues<
-      QueryActions,
-      CellEditorOverlayActionsFunc
-    >(queryTransitions, v => this.queryStateReducer(v)) as QueryActions
-
-    const result: CellEditorOverlayActions = {
-      ...mapped,
-      editRawTextAsync: this.handleEditRawText,
-    }
-
-    return result
-  }
-
-  private get initialSource(): SourcesModels.Source {
-    const {
-      cell: {queries},
-      source,
-      sources,
-    } = this.props
-
-    const cellSourceLink: string = getDeep<string>(queries, '0.source', null)
-
-    if (cellSourceLink) {
-      const initialSource = sources.find(s => s.links.self === cellSourceLink)
-
-      return initialSource
-    }
-    return source
-  }
-
-  private get source(): SourcesModels.Source {
-    const {source, sources} = this.props
-    const {selectedSource} = this.state
-
-    if (selectedSource) {
-      return selectedSource
-    }
-
-    const query = _.get(this.state.queriesWorkingDraft, 0, {source: null})
-
-    if (!query.source) {
-      return source
-    }
-
-    const foundSource = sources.find(
-      s =>
-        s.links.self ===
-        getDeep<string | null>(query, 'source.links.self', null)
-    )
-    if (foundSource) {
-      return foundSource
-    }
-    return source
   }
 }
 

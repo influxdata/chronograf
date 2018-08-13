@@ -1,3 +1,4 @@
+// Types
 import {Source} from 'src/types'
 
 export interface Query {

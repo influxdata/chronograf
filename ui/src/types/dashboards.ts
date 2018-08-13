@@ -46,6 +46,7 @@ export interface CellQuery {
   queryConfig: QueryConfig
   source: string
   text?: string // doesn't come from server
+  id?: string
 }
 
 export interface Legend {

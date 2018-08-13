@@ -7,9 +7,10 @@ $graph-type--gutter: 4px;
 
 .display-options {
   height: 100%;
+  min-height: 300px;
   display: flex;
   background-color: $g2-kevlar;
-  padding: 0 18px 8px 18px;
+  padding: 8px 60px;
   flex-wrap: nowrap;
   align-items: stretch;
 }

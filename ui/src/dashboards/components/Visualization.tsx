@@ -3,7 +3,6 @@ import {connect} from 'react-redux'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
-import VisualizationName from 'src/dashboards/components/VisualizationName'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
@@ -65,8 +64,7 @@ const DashVisualization: SFC<Props> = ({
   })
 
   return (
-    <div className="graph">
-      <VisualizationName />
+    <div className="deceo--visualization">
       <div className="graph-container">
         <RefreshingGraph
           source={source}

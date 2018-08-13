@@ -45,7 +45,7 @@ interface Props {
   onTimeShift?: (shift: TimeShiftOption) => void
   onToggleField: (field: Field) => void
   removeFuncs: (fields: Field[]) => void
-  isKapacitorRule: boolean
+  isKapacitorRule?: boolean
   querySource?: {
     links: Links
   }
