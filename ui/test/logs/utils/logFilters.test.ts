@@ -1,7 +1,7 @@
 import {searchToFilters} from 'src/logs/utils/search'
 import {Operator} from 'src/types/logs'
 
-describe('Logs.Search.logFilters', () => {
+describe('Logs.searchToFilters', () => {
   const isUUID = expect.stringMatching(
     /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
   )
@@ -42,6 +42,12 @@ describe('Logs.Search.logFilters', () => {
       {
         id: isUUID,
         key: 'message',
+        value: '/api/search',
+        operator: Operator.LIKE,
+      },
+      {
+        id: isUUID,
+        key: 'message',
         value: 'status_bad',
         operator: Operator.NOT_LIKE,
       },
@@ -50,12 +56,6 @@ describe('Logs.Search.logFilters', () => {
         key: 'message',
         value: '@123!',
         operator: Operator.NOT_LIKE,
-      },
-      {
-        id: isUUID,
-        key: 'message',
-        value: '/api/search',
-        operator: Operator.LIKE,
       },
     ]
 
@@ -114,6 +114,12 @@ describe('Logs.Search.logFilters', () => {
       {
         id: isUUID,
         key: 'message',
+        value: 'status:4d{2}',
+        operator: Operator.LIKE,
+      },
+      {
+        id: isUUID,
+        key: 'message',
         value: 'NOT FOUND',
         operator: Operator.NOT_LIKE,
       },
@@ -129,18 +135,12 @@ describe('Logs.Search.logFilters', () => {
         value: 'thing',
         operator: Operator.NOT_LIKE,
       },
-      {
-        id: isUUID,
-        key: 'message',
-        value: 'status:4d{2}',
-        operator: Operator.LIKE,
-      },
     ]
 
     expect(actual).toEqual(expected)
   })
 
-  it('cannot handle double quoted phrase containing single quotes', () => {
+  it('can return quoted phrase containing single quotes', () => {
     const text = `"some 'quote'"`
     const actual = searchToFilters(text)
 
@@ -148,13 +148,7 @@ describe('Logs.Search.logFilters', () => {
       {
         id: isUUID,
         key: 'message',
-        value: 'quote',
-        operator: Operator.LIKE,
-      },
-      {
-        id: isUUID,
-        key: 'message',
-        value: 'some',
+        value: "some 'quote'",
         operator: Operator.LIKE,
       },
     ]

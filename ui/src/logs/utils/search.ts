@@ -2,11 +2,16 @@ import uuid from 'uuid'
 import _ from 'lodash'
 
 import {Filter} from 'src/types/logs'
-import {Term, TermPart, TermRule, TermType, Operator} from 'src/types/logs'
+import {
+  Term,
+  TermPart,
+  TermRule,
+  TermType,
+  Operator,
+  TokenLiteralMatch,
+} from 'src/types/logs'
 
 const MESSAGE_KEY = 'message'
-
-type Extraction = [Term[], string]
 
 export const createRule = (
   part: TermPart,
@@ -16,12 +21,12 @@ export const createRule = (
   pattern: getPattern(type, part),
 })
 
-const getPattern = (type: TermType, phrase: TermPart) => {
+const getPattern = (type: TermType, phrase: TermPart): RegExp => {
   switch (type) {
     case TermType.EXCLUDE:
-      return `${TermPart.START_EXCLUSION}${phrase}`
+      return new RegExp(`^${TermPart.EXCLUSION}${phrase}`)
     default:
-      return `${TermPart.START}${phrase}`
+      return new RegExp(`^${phrase}`)
   }
 }
 
@@ -35,7 +40,7 @@ export const LOG_SEARCH_TERMS: TermRule[] = [
 ]
 
 export const searchToFilters = (searchTerm: string): Filter[] => {
-  const allTerms = extractTermRules(searchTerm, LOG_SEARCH_TERMS)
+  const allTerms = extractTerms(searchTerm, LOG_SEARCH_TERMS)
 
   return termsToFilters(allTerms)
 }
@@ -44,33 +49,41 @@ const termsToFilters = (terms: Term[]): Filter[] => {
   return terms.map(t => createMessageFilter(t.term, termToOp(t)))
 }
 
-const extractTermRules = (searchTerms: string, rules: TermRule[]): Term[] => {
-  const result: Extraction = [[], searchTerms]
-  return _.reduce<TermRule[], Extraction>(rules, extractTermRule, result)[0]
-}
+const extractTerms = (searchTerms: string, rules: TermRule[]): Term[] => {
+  let tokens = []
+  let text = searchTerms.trim()
 
-const extractTermRule = (
-  [prevPhrases, prevText]: Extraction,
-  rule: TermRule
-): Extraction => {
-  const phrases: Term[] = getPhraseMatches(rule, prevText)
-  const text: string = prevText.replace(new RegExp(rule.pattern, 'g'), '')
-
-  return [[...prevPhrases, ...phrases], text]
-}
-
-const getPhraseMatches = (rule: TermRule, text: string): Term[] => {
-  const pattern = new RegExp(rule.pattern, 'g')
-  let matches: Term[] = []
-  let match = pattern.exec(text)
-
-  while (match) {
-    matches = [...matches, createTerm(rule.type, match[2])]
-
-    match = pattern.exec(text)
+  while (!_.isEmpty(text)) {
+    const {nextTerm, nextText} = extractNextTerm(text, rules)
+    tokens = [...tokens, nextTerm]
+    text = nextText
   }
 
-  return matches
+  return tokens
+}
+
+const extractNextTerm = (text, rules: TermRule[]) => {
+  const {literal, rule, nextText} = readToken(eatSpaces(text), rules)
+
+  const nextTerm = createTerm(rule.type, literal)
+
+  return {nextText, nextTerm}
+}
+
+const eatSpaces = (text: string): string => {
+  return text.trim()
+}
+
+const readToken = (text: string, rules: TermRule[]): TokenLiteralMatch => {
+  const rule = rules.find(r => text.match(new RegExp(r.pattern)) !== null)
+
+  const term = new RegExp(rule.pattern).exec(text)
+  const literal = term[1]
+  // differs from literal length because of quote and exclusion removal
+  const termLength = term[0].length
+  const nextText = text.slice(termLength)
+
+  return {literal, nextText, rule}
 }
 
 const createTerm = (type: TermType, term: string): Term => ({

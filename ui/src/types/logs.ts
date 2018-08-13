@@ -138,9 +138,15 @@ export interface Term {
   term: string
 }
 
+export interface TokenLiteralMatch {
+  literal: string
+  nextText: string
+  rule: TermRule
+}
+
 export interface TermRule {
   type: TermType
-  pattern: string
+  pattern: RegExp
 }
 
 export enum TermType {
@@ -149,9 +155,7 @@ export enum TermType {
 }
 
 export enum TermPart {
-  START = '(^|\\s)',
   EXCLUSION = '-',
-  START_EXCLUSION = '(^|\\s)-',
   SINGLE_QUOTED = "'([^']+)'",
   DOUBLE_QUOTED = '"([^"]+)"',
   UNQUOTED_WORD = '([\\S]+)',
