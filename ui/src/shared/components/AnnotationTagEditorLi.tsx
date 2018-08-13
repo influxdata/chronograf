@@ -1,6 +1,5 @@
 import React, {PureComponent, ChangeEvent} from 'react'
 
-import {TagFilterType} from 'src/types/annotations'
 import {
   Button,
   ComponentColor,
@@ -27,7 +26,9 @@ class AnnotationTagEditorLi extends PureComponent<Props> {
           value={tagKey}
           onChange={this.handleChangeTagKey}
         />
-        <div className="tag-control--equals">{TagFilterType.Equals}</div>
+        <div className="tag-control--arrow">
+          <span />
+        </div>
         <input
           className="form-control input-sm tag-control--value"
           value={tagValue}
