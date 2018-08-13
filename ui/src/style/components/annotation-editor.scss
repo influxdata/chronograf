@@ -47,17 +47,40 @@
   justify-content: space-between;
 }
 
-.tag-control--equals {
-  flex: 0 0 auto;
-  padding: 3px 5px 0 5px;
-  height: $form-sm-height;
-  margin: 0 5px;
-  font-family: $code-font;
-  font-weight: 500;
-  color: $g14-chromium;
-  letter-spacing: -1px;
-  border-radius: 3px;
-  user-select: none;
+.tag-control--arrow {
+  display: flex;
+  align-items: center;
+  width: 50px;
+  padding: 0 6px;
+
+  > span {
+    position: relative;
+    height: 2px;
+    width: 100%;
+    @include gradient-h($c-pool, $c-star);
+
+    &:before,
+    &:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    &:before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: $c-pool;
+      left: 0;
+    }
+    &:after {
+      right: -6px;
+      border-style: solid;
+      border-color: transparent;
+      border-width: 6px;
+      border-left-color: $c-star;
+    }
+  }
 }
 
 .tag-control--key {
