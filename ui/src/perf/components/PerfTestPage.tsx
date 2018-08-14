@@ -5,6 +5,8 @@ import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
 
 import Cell from 'src/perf/components/Cell'
 
+import WebSocketConnection from 'src/perf/WebSocketConnection'
+
 import {QUERIES} from 'src/perf/constants'
 
 import {Source} from 'src/types'
@@ -44,6 +46,17 @@ class PerfTestPage extends PureComponent<Props, State> {
     }
 
     this.state = {layout}
+  }
+
+  public componentDidMount() {
+    const {source} = this.props
+
+    const ws = new WebSocketConnection(
+      `ws://localhost:8889/chronograf/v1/sources/${source.id}/timeseries`,
+      msg => console.log(JSON.parse(msg.data))
+    )
+
+    ws.send('hello')
   }
 
   public render() {

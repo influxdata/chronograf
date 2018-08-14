@@ -419,6 +419,11 @@ func (s *Server) Serve(ctx context.Context) error {
 		WithField("component", "server").
 		Info("Serving chronograf at ", scheme, "://", s.Listener.Addr())
 
+	// FIXME: Should be able to just put this in mux.go, working around
+	// https://github.com/tylerb/graceful/issues/58
+	http.HandleFunc("/chronograf/v1/sources/1/timeseries", Timeseries)
+	go http.ListenAndServe(":8889", nil)
+
 	if err := httpServer.Serve(s.Listener); err != nil {
 		logger.
 			WithField("component", "server").

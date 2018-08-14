@@ -75,3 +75,7 @@ required = ["github.com/kevinburke/go-bindata","github.com/gogo/protobuf/proto",
 [[constraint]]
   name = "github.com/influxdata/kapacitor"
   revision = "4f10efc41b4dcac070495cf95ba2c41cfcc2aa3a"
+
+[[constraint]]
+  name = "github.com/gorilla/websocket"
+  version = "1.2.0"
