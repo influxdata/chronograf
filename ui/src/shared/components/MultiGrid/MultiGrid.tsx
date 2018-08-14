@@ -60,7 +60,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
     const maxRow = rowCount - Math.floor(height / ROW_HEIGHT) / 2
 
     if (scrollTop <= 0) {
-      return null
+      return {scrollToRow}
     }
 
     if (scrollTop > maxScrollTop || scrollToRow > maxRow) {
@@ -69,7 +69,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
     return {
       scrollToRow,
-      scrollTop: scrollTop - height / 2,
+      scrollTop: Math.max(scrollTop - height / 2, height / 2),
     }
   }
 
