@@ -5,6 +5,7 @@
 1.  [#4033](https://github.com/influxdata/chronograf/pull/4033): Include sources id, links, and names in dashboard export
 1.  [#4068](https://github.com/influxdata/chronograf/pull/4068): Add ability to map sources when importing dashboard
 1.  [#4144](https://github.com/influxdata/chronograf/pull/4144): Create onboarding wizard for adding source and kapacitor connections
+1.  [#4208](https://github.com/influxdata/chronograf/pull/4208): Add a duration to the show series and tag values on host page
 
 ### UI Improvements
 
