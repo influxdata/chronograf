@@ -20,7 +20,7 @@ export const getCpuAndLoadForHosts = (
       SELECT mean("Percent_Processor_Time") FROM \":db:\".\":rp:\".\"win_cpu\" WHERE time > now() - 10m GROUP BY host;
       SELECT mean("Processor_Queue_Length") FROM \":db:\".\":rp:\".\"win_system\" WHERE time > now() - 10s GROUP BY host;
       SELECT non_negative_derivative(mean("System_Up_Time")) AS winDeltaUptime FROM \":db:\".\":rp:\".\"win_system\" WHERE time > now() - ${telegrafSystemInterval} * 10 GROUP BY host, time(${telegrafSystemInterval}) fill(0);
-      SHOW TAG VALUES WITH KEY = "host";`,
+      SHOW TAG VALUES WITH KEY = "host" where time > now() - 10m;`,
     tempVars
   )
 
@@ -184,7 +184,7 @@ export const getAppsForHosts = (proxyLink, hosts, appLayouts, telegrafDB) => {
 
   return proxy({
     source: proxyLink,
-    query: `show series from /${measurements}/`,
+    query: `show series from /${measurements}/ where time > now() - 10m`,
     db: telegrafDB,
   }).then(resp => {
     const newHosts = Object.assign({}, hosts)
