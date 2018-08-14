@@ -20,7 +20,7 @@ export const getCpuAndLoadForHosts = (
       SELECT mean("Percent_Processor_Time") FROM \":db:\".\":rp:\".\"win_cpu\" WHERE time > now() - 10m GROUP BY host;
       SELECT mean("Processor_Queue_Length") FROM \":db:\".\":rp:\".\"win_system\" WHERE time > now() - 10s GROUP BY host;
       SELECT non_negative_derivative(mean("System_Up_Time")) AS winDeltaUptime FROM \":db:\".\":rp:\".\"win_system\" WHERE time > now() - ${telegrafSystemInterval} * 10 GROUP BY host, time(${telegrafSystemInterval}) fill(0);
-      SHOW TAG VALUES WITH KEY = "host" where time > now() - 10m;`,
+      SHOW TAG VALUES WITH KEY = "host" WHERE TIME > now() - 10m;`,
     tempVars
   )
 
