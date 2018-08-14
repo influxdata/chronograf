@@ -9,7 +9,7 @@ import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
 import TimeWindowDropdown from 'src/logs/components/TimeWindowDropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import {TimeRange, TimeWindow, LiveUpdating} from 'src/types/logs'
+import {TimeRange, TimeWindow} from 'src/types/logs'
 import LiveUpdatingStatus from 'src/logs/components/LiveUpdatingStatus'
 
 interface SourceItem {
@@ -24,7 +24,7 @@ interface Props {
   currentNamespaces: Namespace[]
   onChooseSource: (sourceID: string) => void
   onChooseNamespace: (namespace: Namespace) => void
-  liveUpdating: LiveUpdating
+  liveUpdating: boolean
   onChangeLiveUpdatingStatus: () => void
   onShowOptionsOverlay: () => void
   timeRange: TimeRange

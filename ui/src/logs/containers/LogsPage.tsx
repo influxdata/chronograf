@@ -58,7 +58,6 @@ import {
   LogsTableColumn,
   LogConfig,
   TableData,
-  LiveUpdating,
   TimeRange,
   TimeWindow,
   TimeMarker,
@@ -111,7 +110,7 @@ interface Props {
 
 interface State {
   searchString: string
-  liveUpdating: LiveUpdating
+  liveUpdating: boolean
   isOverlayVisible: boolean
   histogramColors: HistogramColor[]
   hasScrolled: boolean
@@ -139,7 +138,7 @@ class LogsPage extends Component<Props, State> {
 
     this.state = {
       searchString: '',
-      liveUpdating: LiveUpdating.Pause,
+      liveUpdating: false,
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
@@ -162,7 +161,7 @@ class LogsPage extends Component<Props, State> {
       this.props.getSource(source.id)
     }
 
-    if (this.liveUpdatingStatus === LiveUpdating.Pause && this.interval) {
+    if (this.liveUpdatingStatus === false && this.interval) {
       clearInterval(this.interval)
       this.interval = null
     }
@@ -230,7 +229,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleExpandMessage = () => {
-    this.setState({liveUpdating: LiveUpdating.Pause})
+    this.setState({liveUpdating: false})
   }
 
   private fetchNewer = (time: string) => {
@@ -239,7 +238,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private get tableScrollToRow() {
-    if (this.liveUpdatingStatus === LiveUpdating.Play) {
+    if (this.liveUpdatingStatus === true) {
       return 0
     }
 
@@ -260,7 +259,7 @@ class LogsPage extends Component<Props, State> {
 
   private handleChooseCustomTime = async (time: string) => {
     this.props.setTableCustomTime(time)
-    const liveUpdating = LiveUpdating.Pause
+    const liveUpdating = false
 
     this.setState({
       hasScrolled: false,
@@ -284,10 +283,10 @@ class LogsPage extends Component<Props, State> {
         .toISOString(),
     }
 
-    let liveUpdating = LiveUpdating.Pause
+    let liveUpdating = false
     if (time === NOW) {
       timeOption = {timeOption: 'now'}
-      liveUpdating = LiveUpdating.Play
+      liveUpdating = true
     }
 
     this.setState({liveUpdating})
@@ -327,7 +326,7 @@ class LogsPage extends Component<Props, State> {
     }
 
     this.interval = setInterval(this.handleInterval, 10000)
-    this.setState({liveUpdating: LiveUpdating.Play})
+    this.setState({liveUpdating: true})
   }
 
   private handleScrollToTop = () => {
@@ -340,7 +339,7 @@ class LogsPage extends Component<Props, State> {
     if (this.state.liveUpdating) {
       clearInterval(this.interval)
     }
-    this.setState({liveUpdating: LiveUpdating.Pause, hasScrolled: true})
+    this.setState({liveUpdating: false, hasScrolled: true})
   }
 
   private handleTagSelection = (selection: {tag: string; key: string}) => {
@@ -499,14 +498,14 @@ class LogsPage extends Component<Props, State> {
     )
   }
 
-  private get liveUpdatingStatus(): LiveUpdating {
+  private get liveUpdatingStatus(): boolean {
     const {liveUpdating} = this.state
 
-    if (liveUpdating === LiveUpdating.Play) {
-      return LiveUpdating.Play
+    if (liveUpdating === true) {
+      return true
     }
 
-    return LiveUpdating.Pause
+    return false
   }
 
   private get severityLevelColors(): SeverityLevelColor[] {
@@ -516,8 +515,8 @@ class LogsPage extends Component<Props, State> {
   private handleChangeLiveUpdatingStatus = async (): Promise<void> => {
     const {liveUpdating} = this.state
 
-    if (liveUpdating === LiveUpdating.Play) {
-      this.setState({liveUpdating: LiveUpdating.Pause})
+    if (liveUpdating === true) {
+      this.setState({liveUpdating: false})
       clearInterval(this.interval)
     } else {
       this.handleChooseRelativeTime(NOW)
