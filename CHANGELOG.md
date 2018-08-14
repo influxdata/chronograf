@@ -10,6 +10,7 @@
 ### UI Improvements
 
 1.  [#4009](https://github.com/influxdata/chronograf/pull/4009): Make it to get mouse into hover legend
+1.  [#4213](https://github.com/influxdata/chronograf/pull/4213): Replace logs play/pause toggle with single button
 
 ### Bug Fixes
 
