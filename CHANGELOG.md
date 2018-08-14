@@ -6,6 +6,7 @@
 1.  [#4068](https://github.com/influxdata/chronograf/pull/4068): Add ability to map sources when importing dashboard
 1.  [#4144](https://github.com/influxdata/chronograf/pull/4144): Create onboarding wizard for adding source and kapacitor connections
 1.  [#4208](https://github.com/influxdata/chronograf/pull/4208): Add a duration to the show series and tag values on host page
+1.  [#4217](https://github.com/influxdata/chronograf/pull/4217): Add filestore backed API for protodashboards
 
 ### UI Improvements
 
