@@ -2,20 +2,21 @@ package server
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
-	"fmt"
-	"github.com/gorilla/websocket"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/websocket"
 )
 
 const proxyURL = "http://localhost:8888/chronograf/v1/sources/1/proxy"
 
 type series struct {
-	Columns []string        `json:"columns"`
-	Values  [][]interface{} `json:"values"`
+	Columns []string    `json:"columns"`
+	Values  [][]float64 `json:"values"`
 }
 
 type influxResponse struct {
@@ -24,28 +25,33 @@ type influxResponse struct {
 	} `json:"results"`
 }
 
-func (r *influxResponse) Series() *series {
+func (r *influxResponse) series() *series {
 	return &r.Results[0].Series[0]
 }
 
-type columnData = map[string][]interface{}
+type columnData = map[string]*bytes.Buffer
 
-func (s *series) AsColumns() columnData {
-	result := map[string][]interface{}{}
+func (s *series) columns() (columnData, error) {
+	result := map[string]*bytes.Buffer{}
 	columnForIndex := map[int]string{}
 
 	for i, column := range s.Columns {
-		result[column] = make([]interface{}, len(s.Values))
+		result[column] = &bytes.Buffer{}
 		columnForIndex[i] = column
 	}
 
-	for i, value := range s.Values {
+	for _, value := range s.Values {
 		for j, innerValue := range value {
-			result[columnForIndex[j]][i] = innerValue
+			buf := result[columnForIndex[j]]
+			err := binary.Write(buf, binary.LittleEndian, innerValue)
+
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func proxy(query string) (resp influxResponse, err error) {
@@ -86,29 +92,34 @@ func proxy(query string) (resp influxResponse, err error) {
 	return
 }
 
-type wsRequest struct {
-	ID   string                 `json:"string"`
-	Type string                 `json:"type"`
-	Data map[string]interface{} `json:"data"`
+type queryResult struct {
+	id   string
+	data columnData
+	err  error
 }
 
-type wsResponse struct {
-	ID   string                 `json:"string"`
-	Type string                 `json:"type"`
-	Data map[string]interface{} `json:"data"`
-	Done bool                   `json:"done"`
-}
-
-func poll(conn *websocket.Conn) {
-	defer Close(conn)
-
-	msg, err := proxy(`SELECT mean("value") FROM "stress"."autogen"."cpu" WHERE time > '2010-01-01' AND time < '2010-01-12' AND "host"='server-3' GROUP BY time(1m), host`)
+func performQuery(id string, query string, done chan<- queryResult) {
+	resp, err := proxy(query)
 
 	if err != nil {
-		fmt.Println(err)
+		done <- queryResult{id: id, err: err}
+		return
 	}
 
-	_ = conn.WriteJSON(msg.Series().AsColumns())
+	columns, err := resp.series().columns()
+
+	if err != nil {
+		done <- queryResult{id: id, err: err}
+		return
+	}
+
+	result := queryResult{
+		id:   id,
+		err:  nil,
+		data: columns,
+	}
+
+	done <- result
 }
 
 var upgrader = websocket.Upgrader{
@@ -117,16 +128,103 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
+type queryRequest struct {
+	ID          string `json:"id"`
+	RequestType string `json:"type"` // QUERY
+	Data        struct {
+		Query string `json:"query"`
+	} `json:"data"`
+}
+
+func receiveMessages(conn *websocket.Conn, messages chan<- queryResult) {
+	defer Close(conn)
+
+	for {
+		var req queryRequest
+		err := conn.ReadJSON(&req)
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		go performQuery(req.ID, req.Data.Query, messages)
+	}
+}
+
+type queryResponseData struct {
+	Column string `json:"column"`
+}
+
+type queryResponse struct {
+	ID           string            `json:"id"`
+	ResponseType string            `json:"type"` // 'QUERY_RESULT'
+	Data         queryResponseData `json:"data"`
+}
+
+type errResponseData struct {
+	Message string `json:"message"`
+}
+
+type errResponse struct {
+	ID           string          `json:"id"`
+	ResponseType string          `json:"type"` // 'ERROR'
+	Data         errResponseData `json:"data"`
+}
+
+func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
+	defer Close(conn)
+
+	for {
+		result := <-messages
+
+		if result.err != nil {
+			resp := errResponse{
+				ID:           result.id,
+				ResponseType: "ERROR",
+				Data: errResponseData{
+					Message: result.err.Error(),
+				},
+			}
+
+			err := conn.WriteJSON(resp)
+
+			if err != nil {
+				log.Fatalln(err)
+				return
+			}
+
+			continue
+		}
+
+		for column, data := range result.data {
+			resp := queryResponse{
+				ID:           result.id,
+				ResponseType: "QUERY_RESULT",
+				Data: queryResponseData{
+					Column: column,
+				},
+			}
+
+			conn.WriteJSON(resp)
+			conn.WriteMessage(websocket.BinaryMessage, data.Bytes())
+		}
+	}
+}
+
 // Timeseries returns InfluxDB query results over a WebSocket
 func Timeseries(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 		return
 	}
 
-	go poll(conn)
+	messages := make(chan queryResult)
+
+	go receiveMessages(conn, messages)
+	go sendMessages(conn, messages)
 }
 
 // Close closes a closer, and will panic if an error is encountered
