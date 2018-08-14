@@ -52,6 +52,19 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
     styleTopRightGrid: {},
   }
 
+  public static getDerivedStateFromProps(nextProps: PropsMultiGrid) {
+    const {scrollToRow} = nextProps
+    const scrollTop = scrollToRow * ROW_HEIGHT
+
+    if (scrollTop < 0) {
+      return null
+    }
+
+    return {
+      scrollTop,
+    }
+  }
+
   private bottomLeftGrid: Grid
   private bottomRightGrid: Grid
   private topLeftGrid: Grid
