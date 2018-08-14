@@ -1,28 +1,44 @@
 import React, {PureComponent} from 'react'
 
-import RadioButtons from 'src/reusable_ui/components/radio_buttons/RadioButtons'
-import {ButtonShape, ComponentColor} from 'src/reusable_ui/types'
-import {LiveUpdating} from 'src/types/logs'
+import {Button, ButtonShape, ComponentColor, IconFont} from 'src/reusable_ui'
 
 interface Props {
-  liveUpdating: LiveUpdating
+  liveUpdating: boolean
   onChangeLiveUpdatingStatus: () => void
 }
 
 export default class LiveUpdatingStatus extends PureComponent<Props> {
   public render() {
-    const {liveUpdating, onChangeLiveUpdatingStatus} = this.props
-    const buttons = ['icon play', 'icon pause']
+    const {onChangeLiveUpdatingStatus} = this.props
 
     return (
-      <RadioButtons
+      <Button
         customClass="logs-viewer--mode-toggle"
         shape={ButtonShape.Square}
-        color={ComponentColor.Primary}
-        buttons={buttons}
-        onChange={onChangeLiveUpdatingStatus}
-        activeButton={liveUpdating}
+        color={this.color}
+        icon={this.icon}
+        onClick={onChangeLiveUpdatingStatus}
       />
     )
+  }
+
+  private get icon(): IconFont {
+    const {liveUpdating} = this.props
+
+    if (liveUpdating) {
+      return IconFont.Play
+    }
+
+    return IconFont.Pause
+  }
+
+  private get color(): ComponentColor {
+    const {liveUpdating} = this.props
+
+    if (liveUpdating) {
+      return ComponentColor.Primary
+    }
+
+    return ComponentColor.Default
   }
 }
