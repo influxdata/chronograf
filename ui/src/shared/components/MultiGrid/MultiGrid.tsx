@@ -29,6 +29,7 @@ export interface PropsMultiGrid {
 }
 
 interface State {
+  scrollToRow: number
   scrollLeft: number
   scrollTop: number
   scrollbarSize: number
@@ -53,15 +54,22 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
   }
 
   public static getDerivedStateFromProps(nextProps: PropsMultiGrid) {
-    const {scrollToRow} = nextProps
+    const {scrollToRow, rowCount, height} = nextProps
     const scrollTop = scrollToRow * ROW_HEIGHT
+    const maxScrollTop = (rowCount + 1) * ROW_HEIGHT - (height + ROW_HEIGHT)
+    const maxRow = rowCount - Math.floor(height / ROW_HEIGHT) / 2
 
-    if (scrollTop < 0) {
+    if (scrollTop <= 0) {
+      return null
+    }
+
+    if (scrollTop > maxScrollTop || scrollToRow > maxRow) {
       return null
     }
 
     return {
-      scrollTop,
+      scrollToRow,
+      scrollTop: scrollTop - height / 2,
     }
   }
 
@@ -81,6 +89,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
     super(props, context)
 
     this.state = {
+      scrollToRow: props.scrollToRow,
       scrollLeft: 0,
       scrollTop: 0,
       scrollbarSize: 0,
@@ -267,6 +276,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
   private renderBottomLeftGrid(props) {
     const {fixedColumnCount, fixedRowCount, rowCount, columnWidth} = props
+    const {scrollToRow} = this.state
 
     if (!fixedColumnCount) {
       return null
@@ -289,6 +299,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
           >
             <Grid
               {...props}
+              scrollToRow={scrollToRow}
               cellRenderer={this.cellRendererBottomLeftGrid}
               className={this.props.classNameBottomLeftGrid}
               columnCount={fixedColumnCount}
@@ -317,10 +328,11 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
       fixedColumnCount,
       fixedRowCount,
       rowCount,
-      scrollToRow,
       scrollLeft,
       scrollTop,
     } = props
+
+    const {scrollToRow} = this.state
 
     const calculatedRowCount = Math.max(0, rowCount - fixedRowCount)
 
