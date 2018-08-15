@@ -1,6 +1,7 @@
 // Import Components
 import Button from './components/Button'
 import Dropdown from './components/dropdowns/Dropdown'
+import MultiSelectDropdown from './components/dropdowns/MultiSelectDropdown'
 import Form from './components/form_layout/Form'
 import Input, {InputType} from './components/inputs/Input'
 import OverlayTechnology from './components/overlays/OverlayTechnology'
@@ -30,6 +31,7 @@ import {
 export {
   Button,
   Dropdown,
+  MultiSelectDropdown,
   Form,
   Input,
   InputType,
