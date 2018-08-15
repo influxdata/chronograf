@@ -8,13 +8,7 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
-import {
-  Button,
-  ComponentColor,
-  IconFont,
-  MultiSelectDropdown,
-  DropdownMenuColors,
-} from 'src/reusable_ui'
+import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
 
 import {Dashboard, Source} from 'src/types'
 import {Notification} from 'src/types/notifications'
@@ -37,7 +31,6 @@ interface Props {
 interface State {
   searchTerm: string
   isOverlayVisible: boolean
-  selectedItemIDs: string[]
 }
 
 @ErrorHandling
@@ -48,7 +41,6 @@ class DashboardsPageContents extends Component<Props, State> {
     this.state = {
       searchTerm: '',
       isOverlayVisible: false,
-      selectedItemIDs: [],
     }
   }
 
@@ -78,56 +70,12 @@ class DashboardsPageContents extends Component<Props, State> {
                     dashboardLink={dashboardLink}
                   />
                 </div>
-                <div className="panel-body">{this.dropdown}</div>
               </div>
             </div>
           </div>
         </div>
       </FancyScrollbar>
     )
-  }
-
-  private get dropdown(): JSX.Element {
-    const {selectedItemIDs} = this.state
-
-    const items = [
-      {
-        id: 'ms-i-1',
-        text: 'FROOT',
-      },
-      {
-        id: 'ms-i-2',
-        text: 'FRUIT',
-      },
-      {
-        id: 'ms-i-3',
-        text: 'FR00T',
-      },
-      {
-        id: 'ms-i-4',
-        text: 'FRUUUT',
-      },
-    ]
-
-    return (
-      <MultiSelectDropdown
-        onChange={this.handleMSClick}
-        selectedIDs={selectedItemIDs}
-        widthPixels={300}
-        menuColor={DropdownMenuColors.Onyx}
-        separatorText=" "
-      >
-        {items.map(item => (
-          <MultiSelectDropdown.Item key={item.id} id={item.id} value={item}>
-            {item.text}
-          </MultiSelectDropdown.Item>
-        ))}
-      </MultiSelectDropdown>
-    )
-  }
-
-  private handleMSClick = updatedSelection => {
-    this.setState({selectedItemIDs: updatedSelection})
   }
 
   private get renderPanelHeading(): JSX.Element {
