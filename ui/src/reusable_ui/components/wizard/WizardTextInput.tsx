@@ -15,6 +15,7 @@ interface Props {
   valueModifier?: (value: string) => string
   placeholder?: string
   autoFocus?: boolean
+  type?: string
 }
 
 interface State {
@@ -32,6 +33,7 @@ class WizardTextInput extends PureComponent<Props, State> {
     }),
     valueModifier: x => x,
     autoFocus: false,
+    type: 'text',
   }
 
   constructor(props) {
@@ -50,6 +52,7 @@ class WizardTextInput extends PureComponent<Props, State> {
       value,
       autoFocus,
       label,
+      type,
     } = this.props
 
     let inputClass = ''
@@ -64,7 +67,7 @@ class WizardTextInput extends PureComponent<Props, State> {
       <div className="form-group col-xs-6">
         <label htmlFor={label}>{label}</label>
         <input
-          type="text"
+          type={type}
           id={label}
           className={`form-control input-sm ${inputClass}`}
           value={value}

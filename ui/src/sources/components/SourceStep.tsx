@@ -122,6 +122,7 @@ class SourceStep extends PureComponent<Props, State> {
           value={source.password}
           label="Password"
           placeholder={this.passwordPlaceholder}
+          type="password"
           onChange={this.onChangeInput('password')}
         />
         <WizardTextInput
