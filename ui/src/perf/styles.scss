@@ -13,6 +13,7 @@
   background: $g3-castle;
   display: flex;
   align-items: center;
+  padding: 0 30px;
 }
 
 .perf-test-page--body {
@@ -28,16 +29,6 @@
   height: 100%;
 }
 
-.perf-cell--loading {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: $g14-chromium;
-  font-size: 18px;
-}
-
 .perf-cell--header {
   height: 30px;
   background: $g4-onyx;
@@ -45,12 +36,32 @@
 }
 
 .perf-cell--body {
-  height: 100%;
+  height: calc(100% - 30px);
   width: 100%;
-  padding: 30px 40px 50px 20px;
+}
+
+.perf-cell--dygraph-container {
+  width: 100%;
+  height: 100%;
+  padding: 20px 40px 20px 10px;
 
   .dygraph-child, .dygraph-child-container {
     width: 100% !important;
     height: 100% !important;
   }
+}
+
+.perf-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $g14-chromium;
+  font-size: 18px;
+  padding-bottom: 20px;
+}
+
+.perf-cell--vis {
+  padding: 10px;
 }

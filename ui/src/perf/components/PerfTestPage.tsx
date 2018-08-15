@@ -4,8 +4,11 @@ import {connect} from 'react-redux'
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
 
 import Cell from 'src/perf/components/Cell'
+import NewCell from 'src/perf/components/NewCell'
+import {Dropdown} from 'src/reusable_ui'
 
-import WebSocketConnection from 'src/perf/WebSocketConnection'
+import QueryManager from 'src/perf/QueryManager'
+import QueriesManager from 'src/perf/QueriesManager'
 
 import {QUERIES} from 'src/perf/constants'
 
@@ -19,24 +22,34 @@ interface State {
   layout: Array<{
     i: string
     query: string
+    queryManager: QueryManager
     x: number
     y: number
     w: number
     h: number
   }>
+  implementation: 'current' | 'experiment'
 }
 
+const wsURL = `ws://${
+  location.hostname
+}:8889/chronograf/v1/sources/1/timeseries`
 const GridLayout = WidthProvider(ReactGridLayout)
 
 class PerfTestPage extends PureComponent<Props, State> {
+  private queriesManager: QueriesManager
+
   constructor(props) {
     super(props)
+
+    this.queriesManager = new QueriesManager(wsURL)
 
     const layout: any = []
 
     for (let i = 0; i < QUERIES.length; i++) {
       layout.push({
         query: QUERIES[i],
+        queryManager: this.queriesManager.addQuery(QUERIES[i]),
         i: uuid.v4(),
         x: i % 2 === 0 ? 0 : 6,
         y: Math.ceil(i / 2),
@@ -45,27 +58,34 @@ class PerfTestPage extends PureComponent<Props, State> {
       })
     }
 
-    this.state = {layout}
-  }
+    let implementation = window.localStorage.implementation
 
-  public componentDidMount() {
-    const {source} = this.props
+    if (!implementation) {
+      implementation = 'current'
+      window.localStorage.implementation = 'current'
+    }
 
-    const ws = new WebSocketConnection(
-      `ws://localhost:8889/chronograf/v1/sources/${source.id}/timeseries`,
-      msg => console.log(JSON.parse(msg.data))
-    )
-
-    ws.send('hello')
+    this.state = {layout, implementation}
   }
 
   public render() {
-    const {source} = this.props
-    const {layout} = this.state
+    const {layout, implementation} = this.state
 
     return (
       <div className="perf-test-page">
-        <div className="perf-test-page--header" />
+        <div className="perf-test-page--header">
+          <Dropdown
+            selectedID={implementation}
+            onChange={this.handleChangeImplementation}
+          >
+            <Dropdown.Item id={'current'} value={'current'}>
+              Current
+            </Dropdown.Item>
+            <Dropdown.Item id={'experiment'} value={'experiment'}>
+              Experimental
+            </Dropdown.Item>
+          </Dropdown>
+        </div>
         <div className="perf-test-page--body">
           <GridLayout
             className="layout"
@@ -75,15 +95,35 @@ class PerfTestPage extends PureComponent<Props, State> {
             measureBeforeMount={true}
             draggableHandle={'.perf-test-page--draggable'}
           >
-            {layout.map(cell => (
-              <div key={cell.i}>
-                <Cell query={cell.query} source={source} />
-              </div>
-            ))}
+            {this.cells}
           </GridLayout>
         </div>
       </div>
     )
+  }
+
+  private get cells() {
+    const {source} = this.props
+    const {layout, implementation} = this.state
+
+    if (implementation === 'current') {
+      return layout.map(cell => (
+        <div key={cell.i}>
+          <Cell query={cell.query} source={source} />
+        </div>
+      ))
+    }
+
+    return layout.map(cell => (
+      <div key={cell.i}>
+        <NewCell queryManager={cell.queryManager} />
+      </div>
+    ))
+  }
+
+  private handleChangeImplementation = implementation => {
+    this.setState({implementation})
+    window.localStorage.implementation = implementation
   }
 }
 

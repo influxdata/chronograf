@@ -123,9 +123,10 @@ func performQuery(id string, query string, done chan<- queryResult) {
 }
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
+	ReadBufferSize:    1024,
+	WriteBufferSize:   1024,
+	CheckOrigin:       func(r *http.Request) bool { return true },
+	EnableCompression: true,
 }
 
 type queryRequest struct {
@@ -159,6 +160,7 @@ type queryResponseData struct {
 type queryResponse struct {
 	ID           string            `json:"id"`
 	ResponseType string            `json:"type"` // 'QUERY_RESULT'
+	Done         bool              `json:"done"`
 	Data         queryResponseData `json:"data"`
 }
 
@@ -169,6 +171,7 @@ type errResponseData struct {
 type errResponse struct {
 	ID           string          `json:"id"`
 	ResponseType string          `json:"type"` // 'ERROR'
+	Done         bool            `json:"bool"`
 	Data         errResponseData `json:"data"`
 }
 
@@ -182,6 +185,7 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 			resp := errResponse{
 				ID:           result.id,
 				ResponseType: "ERROR",
+				Done:         true,
 				Data: errResponseData{
 					Message: result.err.Error(),
 				},
@@ -197,9 +201,12 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 			continue
 		}
 
+		i := 0
+
 		for column, data := range result.data {
 			resp := queryResponse{
 				ID:           result.id,
+				Done:         i == len(result.data)-1,
 				ResponseType: "QUERY_RESULT",
 				Data: queryResponseData{
 					Column: column,
@@ -208,6 +215,8 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 
 			conn.WriteJSON(resp)
 			conn.WriteMessage(websocket.BinaryMessage, data.Bytes())
+
+			i++
 		}
 	}
 }
@@ -220,6 +229,8 @@ func Timeseries(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 		return
 	}
+
+	conn.EnableWriteCompression(true)
 
 	messages := make(chan queryResult)
 

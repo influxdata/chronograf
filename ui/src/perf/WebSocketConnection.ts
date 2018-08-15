@@ -14,12 +14,18 @@ class Deferred {
 class WebSocketConnection {
   private url: string
   private onMessage: (msg: any) => void
+  private binaryType: BinaryType
   private ws?: WebSocket
   private opening: Deferred
 
-  constructor(url: string, onMessage: (msg: any) => void) {
+  constructor(
+    url: string,
+    onMessage: (msg: any) => void,
+    binaryType: BinaryType = 'blob'
+  ) {
     this.url = url
     this.onMessage = onMessage
+    this.binaryType = binaryType
   }
 
   public async send(msg) {
@@ -47,6 +53,7 @@ class WebSocketConnection {
   private async openWebSocket(): Promise<WebSocket> {
     this.opening = new Deferred()
     this.ws = new WebSocket(this.url)
+    this.ws.binaryType = this.binaryType
     this.ws.onmessage = this.onMessage
     this.ws.onopen = this.opening.resolve
     this.ws.onerror = (e: any) => {

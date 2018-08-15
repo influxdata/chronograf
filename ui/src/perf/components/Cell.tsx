@@ -40,31 +40,33 @@ class Cell extends PureComponent<Props, State> {
   }
 
   public render() {
+    return (
+      <div className="perf-cell">
+        <div className="perf-cell--header perf-test-page--draggable" />
+        <div className="perf-cell--body">{this.body}</div>
+      </div>
+    )
+  }
+
+  private get body() {
     const {onSetHoverTime} = this.props
     const {isLoading, dygraphsData} = this.state
 
     if (isLoading || !dygraphsData) {
-      return (
-        <div className="perf-cell">
-          <div className="perf-cell--loading">Loading...</div>
-        </div>
-      )
+      return <div className="perf-loading">Loading...</div>
     }
 
     return (
-      <div className="perf-cell">
-        <div className="perf-cell--header perf-test-page--draggable" />
-        <div className="perf-cell--body">
-          <Dygraph
-            labels={dygraphsData.labels}
-            staticLegend={false}
-            timeSeries={dygraphsData.timeSeries}
-            colors={DEFAULT_LINE_COLORS}
-            dygraphSeries={dygraphsData.dygraphSeries}
-            options={{}}
-            handleSetHoverTime={onSetHoverTime}
-          />
-        </div>
+      <div className="perf-cell--dygraph-container">
+        <Dygraph
+          labels={dygraphsData.labels}
+          staticLegend={false}
+          timeSeries={dygraphsData.timeSeries}
+          colors={DEFAULT_LINE_COLORS}
+          dygraphSeries={dygraphsData.dygraphSeries}
+          options={{}}
+          handleSetHoverTime={onSetHoverTime}
+        />
       </div>
     )
   }
