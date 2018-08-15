@@ -6,7 +6,7 @@ import {
   OverlayContainer,
   OverlayHeading,
   OverlayBody,
-  Dropdown,
+  MultiSelectDropdown,
 } from 'src/reusable_ui'
 
 import {addDashboardCellAsync} from 'src/dashboards/actions'
@@ -23,7 +23,7 @@ interface Props {
 }
 
 interface State {
-  selected: string
+  selectedIDs: string[]
   hasQuery: boolean
   name: string
 }
@@ -34,7 +34,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     const {queryConfig} = this.props
 
     this.state = {
-      selected: this.props.dashboards[0].id.toString(),
+      selectedIDs: [],
       hasQuery: queryConfig.fields.length !== 0,
       name: '',
     }
@@ -63,13 +63,12 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
               onChange={this.handleChangeName}
             />
           </div>
-          <Dropdown
+          <MultiSelectDropdown
             onChange={this.handleSelect}
-            selectedID={this.selectedID}
-            widthPixels={250}
+            selectedIDs={this.state.selectedIDs}
           >
             {this.dropdownItems}
-          </Dropdown>
+          </MultiSelectDropdown>
           <button
             className="button button-md button-default"
             onClick={onCancel}
@@ -90,31 +89,41 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
   private get dropdownItems(): JSX.Element[] {
     const {dashboards} = this.props
-    return dashboards.map(dashboard => {
-      const stringID = dashboard.id.toString()
+
+    const simpleArray = dashboards.map(d => ({
+      id: d.id.toString(),
+      name: d.name,
+    }))
+    return simpleArray.map(dashboard => {
       return (
-        <Dropdown.Item key={stringID} id={stringID} value={stringID}>
+        <MultiSelectDropdown.Item
+          key={dashboard.id}
+          id={dashboard.id}
+          value={dashboard}
+        >
           {dashboard.name}
-        </Dropdown.Item>
+        </MultiSelectDropdown.Item>
       )
     })
-    return []
   }
 
-  private get selectedID(): string {
-    return this.state.selected
-  }
-
-  private get selectedDashboard(): Dashboard {
+  private get selectedDashboards(): Dashboard[] {
     const {dashboards} = this.props
+    const {selectedIDs} = this.state
 
-    return dashboards.find(d => {
-      return d.id.toString() === this.selectedID
+    return dashboards.filter(d => {
+      let foundID = false
+      selectedIDs.forEach(id => {
+        if (d.id.toString() === id) {
+          foundID = true
+        }
+      })
+      return foundID
     })
   }
 
-  private handleSelect = choice => {
-    this.setState({selected: choice})
+  private handleSelect = (updatedSelection: string[]) => {
+    this.setState({selectedIDs: updatedSelection})
   }
 
   private sendToDashboard = async () => {
@@ -122,14 +131,17 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     const {hasQuery, name} = this.state
 
     if (hasQuery) {
-      const dashboard = this.selectedDashboard
-      const emptyCell = getNewDashboardCell(dashboard)
-      const newCell = {
-        ...emptyCell,
-        name,
-        queries: [{queryConfig, query: rawText, source: source.links.self}],
-      }
-      await addDashboardCell(dashboard, newCell)
+      await Promise.all(
+        this.selectedDashboards.map(dashboard => {
+          const emptyCell = getNewDashboardCell(dashboard)
+          const newCell = {
+            ...emptyCell,
+            name,
+            queries: [{queryConfig, query: rawText, source: source.links.self}],
+          }
+          return addDashboardCell(dashboard, newCell)
+        })
+      )
     }
   }
 }
