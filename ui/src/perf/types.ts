@@ -30,6 +30,4 @@ export interface ErrorResponse {
 
 export type JSONResponse = QueryResponse | ErrorResponse
 
-export interface Timeseries {
-  [columnKey: string]: Float64Array
-}
+export type Timeseries = [Float64Array, Float32Array]

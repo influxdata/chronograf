@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import {ScaleLinear} from 'd3-scale'
 
 import QueryManager, {Event} from 'src/perf/QueryManager'
@@ -13,9 +13,11 @@ interface Props {
 
 interface State {
   isLoading: boolean
+  xScale?: ScaleLinear<number, number>
+  yScale?: ScaleLinear<number, number>
 }
 
-class Vis extends Component<Props, State> {
+class Vis extends PureComponent<Props, State> {
   private canvas: React.RefObject<HTMLCanvasElement>
 
   constructor(props) {
@@ -36,10 +38,6 @@ class Vis extends Component<Props, State> {
     this.props.queryManager.unsubscribe(this.handleQueryManagerEvent)
   }
 
-  public shouldComponentUpdate() {
-    return true
-  }
-
   public componentDidUpdate(prevProps) {
     const {queryManager} = this.props
 
@@ -48,6 +46,8 @@ class Vis extends Component<Props, State> {
     }
 
     this.renderCanvas()
+
+    // TODO: Resimplify when dimensions change
   }
 
   public render() {
@@ -61,58 +61,59 @@ class Vis extends Component<Props, State> {
   }
 
   private renderCanvas() {
+    const {width, height, queryManager} = this.props
+    const {xScale, yScale} = this.state
     const canvas = this.canvas.current
+    const data = queryManager.getTimeseries()
 
-    if (!canvas) {
+    if (!canvas || !xScale || !yScale || !data) {
       return
     }
 
-    const {width, height} = this.props
-    const {xScale, yScale} = this
-    const data = this.props.queryManager.getTimeseries()
-
     clearCanvas(canvas, width, height)
 
-    const ctx = this.canvas.current.getContext('2d')
-    const times = data.time
-    const series = Object.entries(data)
-      .filter(([key]) => key !== 'time')
-      .map(([_, value]) => value)
+    const ctx = canvas.getContext('2d')
 
     ctx.strokeStyle = '#e7e8eb'
 
-    for (const s of series) {
-      drawLine(ctx, xScale, yScale, times, s)
+    for (const [times, values] of data) {
+      drawLine(ctx, xScale, yScale, times, values)
       ctx.stroke()
     }
   }
 
   private handleQueryManagerEvent = (e: Event) => {
+    const {queryManager} = this.props
+
     if (e === 'FETCHING_DATA') {
       this.setState({isLoading: true})
     } else if (e === 'FETCHED_DATA') {
+      const xScale = this.createXScale()
+      const yScale = this.createYScale()
+
+      this.setState({xScale, yScale}, () => {
+        queryManager.simplify(xScale, yScale)
+      })
+    } else if (e === 'SIMPLIFIED_DATA') {
       this.setState({isLoading: false})
+      this.renderCanvas()
     }
   }
 
-  private get xScale(): ScaleLinear<number, number> {
-    const {width} = this.props
+  private createXScale(): ScaleLinear<number, number> {
+    const {width, queryManager} = this.props
     const {left, right} = this.margins
-    const data = this.props.queryManager.getTimeseries()
+    const timess = queryManager.getRawTimeseries().map(([times]) => times)
 
-    return createScale([data.time], width, left, right)
+    return createScale(timess, width, left, right)
   }
 
-  private get yScale(): ScaleLinear<number, number> {
-    const {height} = this.props
+  private createYScale(): ScaleLinear<number, number> {
+    const {height, queryManager} = this.props
     const {top, bottom} = this.margins
-    const data = this.props.queryManager.getTimeseries()
+    const valuess = queryManager.getRawTimeseries().map(([_, values]) => values)
 
-    const valueData = Object.entries(data)
-      .filter(([k]) => k !== 'time')
-      .map(([_, v]) => v)
-
-    return createScale(valueData, height, top, bottom, true)
+    return createScale(valuess, height, top, bottom, true)
   }
 
   private get margins() {
