@@ -49,7 +49,6 @@ class MultiSelectDropdown extends Component<Props, State> {
     buttonColor: ComponentColor.Default,
     buttonSize: ComponentSize.Small,
     status: ComponentStatus.Default,
-    widthPixels: 120,
     wrapText: false,
     maxMenuHeight: 250,
     menuColor: DropdownMenuColors.Sapphire,
@@ -70,13 +69,11 @@ class MultiSelectDropdown extends Component<Props, State> {
   }
 
   public render() {
-    const width = `${this.props.widthPixels}px`
-
     this.validateChildCount()
 
     return (
       <ClickOutside onClickOutside={this.collapseMenu}>
-        <div className={this.containerClassName} style={{width}}>
+        <div className={this.containerClassName} style={this.containerStyle}>
           {this.button}
           {this.menuItems}
         </div>
@@ -92,7 +89,20 @@ class MultiSelectDropdown extends Component<Props, State> {
     const {onCollapse} = this.props
 
     this.setState({expanded: false})
-    onCollapse()
+
+    if (onCollapse) {
+      onCollapse()
+    }
+  }
+
+  private get containerStyle(): CSSProperties {
+    const {widthPixels} = this.props
+
+    if (widthPixels) {
+      return {width: `${widthPixels}px`}
+    }
+
+    return {width: '100%'}
   }
 
   private get containerClassName(): string {
@@ -211,14 +221,20 @@ class MultiSelectDropdown extends Component<Props, State> {
   private get menuStyle(): CSSProperties {
     const {wrapText, widthPixels} = this.props
 
-    if (wrapText) {
+    let containerWidth = '100%'
+
+    if (widthPixels) {
+      containerWidth = `${widthPixels}px`
+    }
+
+    if (wrapText && widthPixels) {
       return {
-        width: `${widthPixels}px`,
+        width: containerWidth,
       }
     }
 
     return {
-      minWidth: `${widthPixels}px`,
+      minWidth: containerWidth,
     }
   }
 
