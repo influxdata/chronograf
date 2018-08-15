@@ -1,0 +1,28 @@
+/*
+   LogsMessage
+   -----------------------------------------------------------------------------
+*/
+
+.logs-message--copy {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: $c-pool;
+    display: inline-block;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    margin-left: $ix-marg-a;
+
+    > .icon {
+        margin-right: $ix-marg-a;
+        display: inline-block;
+    }
+
+    .logs-message:hover & {
+      opacity: 1;
+    }
+
+    &:hover {
+      color: $c-laser;
+      cursor: pointer;
+    }
+  }
