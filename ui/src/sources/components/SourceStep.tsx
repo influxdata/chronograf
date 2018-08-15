@@ -121,6 +121,7 @@ class SourceStep extends PureComponent<Props, State> {
         <WizardTextInput
           value={source.password}
           label="Password"
+          placeholder={this.passwordPlaceholder}
           onChange={this.onChangeInput('password')}
         />
         <WizardTextInput
@@ -157,6 +158,14 @@ class SourceStep extends PureComponent<Props, State> {
         )}
       </>
     )
+  }
+
+  private get passwordPlaceholder() {
+    const {source} = this.props
+    if (source.authentication === 'basic') {
+      return 'Value saved in server'
+    }
+    return null
   }
 
   private get authIndicator(): JSX.Element {
