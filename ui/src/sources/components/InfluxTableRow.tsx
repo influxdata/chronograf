@@ -12,7 +12,7 @@ import Button from 'src/reusable_ui/components/Button'
 
 import {ComponentColor, ComponentSize, ButtonShape} from 'src/reusable_ui/types'
 import {Source, Service, Kapacitor} from 'src/types'
-import {ToggleVisibility} from 'src/types/wizard'
+import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
   source: Source
@@ -23,7 +23,7 @@ interface Props {
   setActiveFlux: (source: Source, service: Service) => void
   deleteKapacitor: actions.DeleteKapacitor
   deleteFlux: (fluxService: Service) => void
-  toggleWizard: ToggleVisibility
+  toggleWizard: ToggleWizard
 }
 
 class InfluxTableRow extends PureComponent<Props & WithRouterProps> {

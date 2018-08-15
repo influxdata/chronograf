@@ -39,12 +39,11 @@ interface Props {
   deleteKapacitor: sourcesActions.DeleteKapacitor
   setActiveKapacitor: sourcesActions.SetActiveKapacitor
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
+  showNewKapacitor?: boolean
 }
 
 interface State {
-  newKapacitor: Kapacitor
-  existingKapacitor: Kapacitor
-  exists: boolean
+  kapacitor: Kapacitor
 }
 
 const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
@@ -65,36 +64,25 @@ class KapacitorStep extends Component<Props, State> {
     onBoarding: false,
   }
 
-  public static getDerivedStateFromProps(props: Props, state: State) {
-    const existingKID = getDeep<string>(state, 'existingKapacitor.id', '')
-    const lastSavedKapacitor = props.kapacitor
-    const exists = lastSavedKapacitor ? true : false
-    const activeKapacitor = getActiveKapacitor(props.source, props.sources)
-
-    if (activeKapacitor && existingKID !== activeKapacitor.id) {
-      return {existingKapacitor: activeKapacitor, exists}
-    }
-
-    return null
-  }
-
   constructor(props: Props) {
     super(props)
 
+    const kapacitor = props.showNewKapacitor
+      ? DEFAULT_KAPACITOR
+      : getActiveKapacitor(props.source, props.sources)
+
     this.state = {
-      newKapacitor: DEFAULT_KAPACITOR,
-      existingKapacitor: DEFAULT_KAPACITOR,
-      exists: false,
+      kapacitor,
     }
   }
 
   public next = async () => {
-    const {newKapacitor, existingKapacitor, exists} = this.state
+    const {kapacitor} = this.state
     const {notify, source, setError} = this.props
-    if (exists) {
+    if (kapacitor.id) {
       if (this.existingKapacitorHasChanged) {
         try {
-          const {data} = await updateKapacitor(existingKapacitor)
+          const {data} = await updateKapacitor(kapacitor)
           await this.checkKapacitorConnection(data)
           setError(false)
           await this.fetchNewKapacitors()
@@ -107,11 +95,11 @@ class KapacitorStep extends Component<Props, State> {
           return {success: false, payload: null}
         }
       }
-      return {success: true, payload: existingKapacitor}
+      return {success: true, payload: kapacitor}
     } else {
       try {
-        const {data} = await createKapacitor(source, newKapacitor)
-        this.setState({newKapacitor: data})
+        const {data} = await createKapacitor(source, kapacitor)
+        this.setState({kapacitor: data})
         await this.checkKapacitorConnection(data)
         setError(false)
         await this.fetchNewKapacitors()
@@ -128,13 +116,14 @@ class KapacitorStep extends Component<Props, State> {
 
   public render() {
     const {setError, onBoarding} = this.props
+    const {kapacitor} = this.state
 
     return (
       <>
         {!onBoarding && this.kapacitorDropdown}
         <KapacitorForm
           setError={setError}
-          kapacitor={this.currentKapacitor}
+          kapacitor={kapacitor}
           onChangeInput={this.onChangeInput}
         />
       </>
@@ -143,12 +132,9 @@ class KapacitorStep extends Component<Props, State> {
 
   private onChangeInput = (key: string) => (value: string | boolean) => {
     const {setError} = this.props
-    const {newKapacitor, existingKapacitor, exists} = this.state
-    if (exists) {
-      this.setState({existingKapacitor: {...existingKapacitor, [key]: value}})
-    } else {
-      this.setState({newKapacitor: {...newKapacitor, [key]: value}})
-    }
+    const {kapacitor} = this.state
+
+    this.setState({kapacitor: {...kapacitor, [key]: value}})
 
     setError(false)
   }
@@ -156,10 +142,8 @@ class KapacitorStep extends Component<Props, State> {
   private checkKapacitorConnection = async (kapacitor: Kapacitor) => {
     try {
       await pingKapacitor(kapacitor)
-      this.setState({exists: true})
     } catch (error) {
       console.error(error)
-      this.setState({exists: false})
       this.props.notify(notifyKapacitorConnectionFailed())
     }
   }
@@ -167,14 +151,13 @@ class KapacitorStep extends Component<Props, State> {
   private handleSetActiveKapacitor = (kapacitor: Kapacitor) => {
     this.props.setActiveKapacitor(kapacitor)
     this.setState({
-      exists: true,
+      kapacitor,
     })
   }
 
   private resetDefault = () => {
     this.setState({
-      newKapacitor: DEFAULT_KAPACITOR,
-      exists: false,
+      kapacitor: DEFAULT_KAPACITOR,
     })
   }
 
@@ -184,24 +167,16 @@ class KapacitorStep extends Component<Props, State> {
     fetchKapacitors(storeSource)
   }
 
-  private get currentKapacitor() {
-    const {exists, existingKapacitor, newKapacitor} = this.state
-    if (exists) {
-      return existingKapacitor
-    }
-    return newKapacitor
-  }
-
   private get existingKapacitorHasChanged() {
     const {source, sources} = this.props
-    const {existingKapacitor} = this.state
+    const {kapacitor} = this.state
 
     const activeKapacitor = getActiveKapacitor(source, sources)
-    return !_.isEqual(activeKapacitor, existingKapacitor)
+    return !_.isEqual(activeKapacitor, kapacitor)
   }
 
   private get kapacitorDropdown() {
-    const {newKapacitor, exists} = this.state
+    const {kapacitor} = this.state
     const {source, sources, deleteKapacitor} = this.props
 
     if (source && sources) {
@@ -218,7 +193,7 @@ class KapacitorStep extends Component<Props, State> {
               setActiveKapacitor={this.handleSetActiveKapacitor}
               buttonSize="btn-sm"
               onAddNew={this.resetDefault}
-              displayValue={!exists && newKapacitor.name}
+              displayValue={!kapacitor.id && kapacitor.name}
             />
           </div>
         </div>

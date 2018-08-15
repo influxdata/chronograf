@@ -6,8 +6,9 @@ export interface Step {
   stepStatus: StepStatus
 }
 
-export type ToggleVisibility = (
+export type ToggleWizard = (
   isVisible: boolean,
   source?: Source,
-  jumpStep?: number
+  jumpStep?: number,
+  showNewKapacitor?: boolean
 ) => () => void

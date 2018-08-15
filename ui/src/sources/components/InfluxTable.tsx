@@ -8,7 +8,7 @@ import InfluxTableHeader from 'src/sources/components/InfluxTableHeader'
 import InfluxTableRow from 'src/sources/components/InfluxTableRow'
 
 import {Source, Me, Service, Kapacitor} from 'src/types'
-import {ToggleVisibility} from 'src/types/wizard'
+import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
   me: Me
@@ -21,7 +21,7 @@ interface Props {
   onDeleteSource: (source: Source) => void
   setActiveFlux: (source: Source, service: Service) => void
   deleteFlux: (fluxService: Service) => void
-  toggleWizard: ToggleVisibility
+  toggleWizard: ToggleWizard
 }
 
 class InfluxTable extends PureComponent<Props> {

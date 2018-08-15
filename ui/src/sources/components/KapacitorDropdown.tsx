@@ -5,7 +5,7 @@ import Dropdown from 'src/shared/components/Dropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 import Button from 'src/reusable_ui/components/Button'
-import {ToggleVisibility} from 'src/types/wizard'
+import {ToggleWizard} from 'src/types/wizard'
 
 import classnames from 'classnames'
 
@@ -22,7 +22,7 @@ interface Props {
   kapacitors: Kapacitor[]
   setActiveKapacitor: (kapacitor: Kapacitor) => void
   deleteKapacitor: (kapacitor: Kapacitor) => void
-  toggleWizard?: ToggleVisibility
+  toggleWizard?: ToggleWizard
   buttonSize?: string
   suppressEdit?: boolean
   onAddNew?: () => void
@@ -173,7 +173,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   private launchWizard = () => {
     const {toggleWizard, source} = this.props
     if (toggleWizard) {
-      toggleWizard(true, source, 1)()
+      toggleWizard(true, source, 1, true)()
     }
   }
 }
