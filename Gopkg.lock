@@ -109,6 +109,7 @@
 [[projects]]
   name = "github.com/influxdata/influxdb"
   packages = [
+    "client/v2",
     "influxql",
     "influxql/internal",
     "influxql/neldermead",
@@ -264,6 +265,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "66fda3689e3f28e93bedf907d299b67d5a5b21ddbe5dcf6340564fc7ccb2be6e"
+  inputs-digest = "d174360e211a42afd7c48840292c45870cb6b10652b955d1203abd893b6f9f0d"
   solver-name = "gps-cdcl"
   solver-version = 1

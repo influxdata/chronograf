@@ -4,46 +4,38 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/influxdata/influxdb/client/v2"
 )
 
 const proxyURL = "http://localhost:8888/chronograf/v1/sources/1/proxy"
 
-type series struct {
-	Columns []string    `json:"columns"`
-	Values  [][]float64 `json:"values"`
-}
+var influxClient client.Client
 
-type influxResponse struct {
-	Results []struct {
-		Series []series `json:"series"`
-	} `json:"results"`
-}
+type columnData = map[string][]byte
 
-func (r *influxResponse) series() *series {
-	return &r.Results[0].Series[0]
-}
+func toColumns(resp *client.Response) (columnData, error) {
+	s := resp.Results[0].Series[0]
 
-type columnData = map[string]*bytes.Buffer
-
-func (s *series) columns() (columnData, error) {
-	result := map[string]*bytes.Buffer{}
+	buffers := map[string]*bytes.Buffer{}
 	columnForIndex := map[int]string{}
 
 	for i, column := range s.Columns {
-		result[column] = &bytes.Buffer{}
+		buffers[column] = &bytes.Buffer{}
 		columnForIndex[i] = column
 	}
 
 	for _, value := range s.Values {
 		for j, innerValue := range value {
-			buf := result[columnForIndex[j]]
-			err := binary.Write(buf, binary.LittleEndian, innerValue)
+			n, _ := innerValue.(json.Number).Float64()
+			buf := buffers[columnForIndex[j]]
+			err := binary.Write(buf, binary.LittleEndian, n)
 
 			if err != nil {
 				return nil, err
@@ -51,45 +43,13 @@ func (s *series) columns() (columnData, error) {
 		}
 	}
 
+	result := map[string][]byte{}
+
+	for k, v := range buffers {
+		result[k] = v.Bytes()
+	}
+
 	return result, nil
-}
-
-func proxy(query string) (resp influxResponse, err error) {
-	client := http.Client{}
-
-	reqBody, err := json.Marshal(map[string]string{
-		"query": query,
-	})
-
-	if err != nil {
-		return
-	}
-
-	req, err := http.NewRequest("POST", proxyURL, bytes.NewBuffer(reqBody))
-
-	if err != nil {
-		return
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	proxyResp, err := client.Do(req)
-
-	if err != nil {
-		return
-	}
-
-	defer Close(proxyResp.Body)
-
-	body, err := ioutil.ReadAll(proxyResp.Body)
-
-	if err != nil {
-		return
-	}
-
-	_ = json.Unmarshal(body, &resp)
-
-	return
 }
 
 type queryResult struct {
@@ -99,14 +59,23 @@ type queryResult struct {
 }
 
 func performQuery(id string, query string, done chan<- queryResult) {
-	resp, err := proxy(query)
+	start := time.Now()
+
+	q := client.NewQuery(query, "stress", "ns")
+	resp, err := influxClient.Query(q)
 
 	if err != nil {
 		done <- queryResult{id: id, err: err}
 		return
 	}
 
-	columns, err := resp.series().columns()
+	fmt.Printf("Fetched data in %s\n", time.Since(start))
+
+	start = time.Now()
+
+	columns, err := toColumns(resp)
+
+	fmt.Printf("Columnized data in %s\n", time.Since(start))
 
 	if err != nil {
 		done <- queryResult{id: id, err: err}
@@ -214,7 +183,7 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 			}
 
 			conn.WriteJSON(resp)
-			conn.WriteMessage(websocket.BinaryMessage, data.Bytes())
+			conn.WriteMessage(websocket.BinaryMessage, data)
 
 			i++
 		}
@@ -224,6 +193,15 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 // Timeseries returns InfluxDB query results over a WebSocket
 func Timeseries(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
+
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	influxClient, err = client.NewHTTPClient(client.HTTPConfig{
+		Addr: "http://localhost:8086",
+	})
 
 	if err != nil {
 		log.Fatalln(err)
