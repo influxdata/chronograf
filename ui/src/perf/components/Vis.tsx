@@ -1,11 +1,9 @@
 import React, {Component} from 'react'
-import {scaleLinear, ScaleLinear} from 'd3-scale'
-import {range, extent} from 'd3-array'
-import {line} from 'd3-shape'
+import {ScaleLinear} from 'd3-scale'
 
 import QueryManager, {Event} from 'src/perf/QueryManager'
 
-import {clearCanvas} from 'src/perf/utils'
+import {clearCanvas, drawLine, createScale} from 'src/perf/utils'
 
 interface Props {
   queryManager: QueryManager
@@ -81,19 +79,10 @@ class Vis extends Component<Props, State> {
       .filter(([key]) => key !== 'time')
       .map(([_, value]) => value)
 
-    const is = range(0, times.length)
-    const plotters = series.map(s =>
-      line()
-        .x(i => xScale(times[i]))
-        .y(i => yScale(s[i]))
-        .context(ctx)
-    )
-
     ctx.strokeStyle = '#e7e8eb'
 
-    for (const plotter of plotters) {
-      ctx.beginPath()
-      plotter(is)
+    for (const s of series) {
+      drawLine(ctx, xScale, yScale, times, s)
       ctx.stroke()
     }
   }
@@ -108,41 +97,22 @@ class Vis extends Component<Props, State> {
 
   private get xScale(): ScaleLinear<number, number> {
     const {width} = this.props
-    const {margins} = this
+    const {left, right} = this.margins
     const data = this.props.queryManager.getTimeseries()
 
-    return scaleLinear()
-      .domain(extent(data.time))
-      .range([margins.left, width - margins.right])
+    return createScale([data.time], width, left, right)
   }
 
   private get yScale(): ScaleLinear<number, number> {
     const {height} = this.props
-    const {margins} = this
+    const {top, bottom} = this.margins
     const data = this.props.queryManager.getTimeseries()
 
-    let min = Infinity
-    let max = -Infinity
+    const valueData = Object.entries(data)
+      .filter(([k]) => k !== 'time')
+      .map(([_, v]) => v)
 
-    for (const [key, datum] of Object.entries(data)) {
-      if (key === 'time') {
-        continue
-      }
-
-      const [datumMin, datumMax] = extent(datum)
-
-      if (datumMin < min) {
-        min = datumMin
-      }
-
-      if (datumMax > max) {
-        max = datumMax
-      }
-    }
-
-    return scaleLinear()
-      .domain([min, max])
-      .range([height - margins.bottom, margins.top])
+    return createScale(valueData, height, top, bottom, true)
   }
 
   private get margins() {
