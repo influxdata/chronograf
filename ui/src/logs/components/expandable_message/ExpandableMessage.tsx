@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, MouseEvent} from 'react'
 
 import {ClickOutside} from 'src/shared/components/ClickOutside'
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
@@ -33,6 +33,7 @@ export class ExpandableMessage extends Component<Props, State> {
         <div onClick={this.handleClick} className="expandable--message">
           <div className="expandable--text">{trimmedValue}</div>
           <div className={this.isExpanded}>
+            {this.closeExpansionButton}
             <LogsMessage formattedValue={formattedValue} notify={notify} />
           </div>
         </div>
@@ -47,6 +48,18 @@ export class ExpandableMessage extends Component<Props, State> {
     } else {
       return 'collapsed--message'
     }
+  }
+
+  private get closeExpansionButton(): JSX.Element {
+    return (
+      <button className="expanded--dismiss" onClick={this.handleClickDismiss} />
+    )
+  }
+
+  private handleClickDismiss = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+
+    this.setState({expanded: false})
   }
 
   private handleClick = () => {
