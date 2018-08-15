@@ -11,13 +11,13 @@ import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {ToggleVisibility} from 'src/types/wizard'
+import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
   visible: boolean
   title: string
-  toggleVisibility: ToggleVisibility
+  toggleVisibility: ToggleWizard
   resetWizardState: () => void
   skipLinkText?: string
   maxWidth?: number

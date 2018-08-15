@@ -13,13 +13,14 @@ import CompletionStep from 'src/sources/components/CompletionStep'
 
 // Types
 import {Kapacitor, Source} from 'src/types'
-import {ToggleVisibility} from 'src/types/wizard'
+import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
   isVisible: boolean
-  toggleVisibility: ToggleVisibility
+  toggleVisibility: ToggleWizard
   source: Source
   jumpStep: number
+  showNewKapacitor?: boolean
 }
 
 interface State {
@@ -54,20 +55,20 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   }
 
   public render() {
-    const {isVisible, toggleVisibility, jumpStep} = this.props
+    const {isVisible, toggleVisibility, jumpStep, showNewKapacitor} = this.props
     const {source, sourceError, kapacitor, kapacitorError} = this.state
     return (
       <WizardOverlay
         visible={isVisible}
         toggleVisibility={toggleVisibility}
         resetWizardState={this.resetWizardState}
-        title="Add Connection"
+        title="Connection Configuration"
         skipLinkText="dismiss"
         maxWidth={800}
         jumpStep={jumpStep}
       >
         <WizardStep
-          title="Add a New InfluxDB Connection"
+          title="InfluxDB Connection"
           tipText=""
           isComplete={this.isSourceComplete}
           isErrored={sourceError}
@@ -83,7 +84,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           />
         </WizardStep>
         <WizardStep
-          title="Add a Kapacitor Connection"
+          title="Kapacitor Connection"
           tipText=""
           isComplete={this.isKapacitorComplete}
           isErrored={kapacitorError}
@@ -98,6 +99,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
             setError={this.handleSetKapacitorError}
             source={source}
             kapacitor={kapacitor}
+            showNewKapacitor={showNewKapacitor}
           />
         </WizardStep>
         <WizardStep

@@ -2,12 +2,12 @@ import React, {PureComponent} from 'react'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 import {Source} from 'src/types'
-import {ToggleVisibility} from 'src/types/wizard'
+import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
   source: Source
   currentSource: Source
-  toggleWizard: ToggleVisibility
+  toggleWizard: ToggleWizard
 }
 
 class ConnectionLink extends PureComponent<Props> {

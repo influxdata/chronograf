@@ -3,13 +3,13 @@ import React, {PureComponent, ReactElement} from 'react'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
 import {Me, Source} from 'src/types'
-import {ToggleVisibility} from 'src/types/wizard'
+import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
   me: Me
   source: Source
   isUsingAuth: boolean
-  toggleWizard: ToggleVisibility
+  toggleWizard: ToggleWizard
 }
 
 class InfluxTableHeader extends PureComponent<Props> {
