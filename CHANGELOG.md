@@ -14,6 +14,7 @@
 ### UI Improvements
 
 ### Bug Fixes
+1.  [#4231](https://github.com/influxdata/chronograf/pull/4231): Fix notifying user to press ESC to exit presentation mode
 
 ## v1.6.1 [2018-08-02]
 
