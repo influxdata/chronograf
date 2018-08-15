@@ -24,6 +24,7 @@ import {
   ButtonShape,
   Greys,
   IconFont,
+  NavIcon,
   Columns,
 } from './types'
 
@@ -53,5 +54,6 @@ export {
   ButtonShape,
   Greys,
   IconFont,
+  NavIcon,
   Columns,
 }

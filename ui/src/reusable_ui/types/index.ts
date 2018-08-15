@@ -99,12 +99,11 @@ export enum IconFont {
   ExpandA = 'expand-a',
   ExpandB = 'expand-b',
   Export = 'export',
-  Eye = 'eye',
   EyeClosed = 'eye-closed',
   EyeOpen = 'eye-open',
   GitHub = 'github',
   Google = 'google',
-  GraphLine = 'graphline2',
+  GraphLine = 'graphline-2',
   Group = 'group',
   Heroku = 'heroku',
   HerokuSimple = '',
@@ -137,6 +136,12 @@ export enum IconFont {
   Star = 'star',
   Stop = 'stop',
   Zap = 'zap',
+}
+
+export enum NavIcon {
+  Eye = 'nav-eye',
+  Dashboards = 'nav-dashboards',
+  Alerts = 'nav-alerts',
 }
 
 export enum Columns {

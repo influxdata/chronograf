@@ -62,7 +62,6 @@
   &.expand-a:before {content: "\e944";}
   &.expand-b:before {content: "\e942";}
   &.export:before {content: "\e90f";}
-  &.eye:before {content: "\e91f";}
   &.eye-closed:before {content: "\e956";}
   &.eye-open:before {content: "\e957";}
   &.github:before {content: "\e928";}
@@ -100,4 +99,7 @@
   &.wood:before {content: "\e91e";}
   &.wrench:before {content: "\e919";}
   &.zap:before {content: "\e932";}
+  &.nav-alerts:before {content: "\e933";}
+  &.nav-dashboards:before {content: "\e934";}
+  &.nav-eye:before {content: "\e91f";}
 }
