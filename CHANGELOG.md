@@ -16,6 +16,7 @@
 ### Features
 
 ### UI Improvements
+1.  [#4225](https://github.com/influxdata/chronograf/pull/4225): Make infinite scroll UX in Log Viewer more crisp by decreasing results queried for at a time
 
 1.  [#4225](https://github.com/influxdata/chronograf/pull/4225): Make infinite scroll UX in Log Viewer more crisp by decreasing results queried for at a time
 
