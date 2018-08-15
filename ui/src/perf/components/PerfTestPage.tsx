@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
-import uuid from 'uuid'
 import {connect} from 'react-redux'
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout'
+import {range} from 'd3-array'
 
 import Cell from 'src/perf/components/Cell'
 import NewCell from 'src/perf/components/NewCell'
@@ -10,7 +10,7 @@ import {Dropdown} from 'src/reusable_ui'
 import QueryManager from 'src/perf/QueryManager'
 import QueriesManager from 'src/perf/QueriesManager'
 
-import {QUERIES} from 'src/perf/constants'
+import {buildLayout} from 'src/perf/utils'
 
 import {Source} from 'src/types'
 
@@ -29,6 +29,9 @@ interface State {
     h: number
   }>
   implementation: 'current' | 'experiment'
+  numGraphs: number
+  numColumns: number
+  interval: string
 }
 
 const wsURL = `ws://${
@@ -44,47 +47,89 @@ class PerfTestPage extends PureComponent<Props, State> {
 
     this.queriesManager = new QueriesManager(wsURL)
 
-    const layout: any = []
+    let localStorageState
 
-    for (let i = 0; i < QUERIES.length; i++) {
-      layout.push({
-        query: QUERIES[i],
-        queryManager: this.queriesManager.addQuery(QUERIES[i]),
-        i: uuid.v4(),
-        x: i % 2 === 0 ? 0 : 6,
-        y: Math.ceil(i / 2),
-        w: 6,
-        h: 4,
-      })
+    if (window.localStorage.perfTest) {
+      localStorageState = JSON.parse(window.localStorage.perfTest)
+    } else {
+      localStorageState = {
+        implementation: 'current',
+        numGraphs: 6,
+        numColumns: 2,
+        interval: '1h',
+      }
+      window.localStorage.perfTest = JSON.stringify(localStorageState)
     }
 
-    let implementation = window.localStorage.implementation
+    const layout = buildLayout(
+      localStorageState.numColumns,
+      localStorageState.numGraphs,
+      localStorageState.interval
+    )
 
-    if (!implementation) {
-      implementation = 'current'
-      window.localStorage.implementation = 'current'
+    layout.forEach(
+      cell => (cell.queryManager = this.queriesManager.addQuery(cell.query))
+    )
+
+    this.state = {
+      ...localStorageState,
+      layout,
     }
-
-    this.state = {layout, implementation}
   }
 
   public render() {
-    const {layout, implementation} = this.state
+    const {layout, implementation, numGraphs, numColumns, interval} = this.state
 
     return (
       <div className="perf-test-page">
         <div className="perf-test-page--header">
-          <Dropdown
-            selectedID={implementation}
-            onChange={this.handleChangeImplementation}
-          >
-            <Dropdown.Item id={'current'} value={'current'}>
-              Current
-            </Dropdown.Item>
-            <Dropdown.Item id={'experiment'} value={'experiment'}>
-              Experimental
-            </Dropdown.Item>
-          </Dropdown>
+          <div className="lhs">
+            <Dropdown
+              selectedID={implementation}
+              onChange={this.handleChangeImplementation}
+            >
+              <Dropdown.Item id={'current'} value={'current'}>
+                Current
+              </Dropdown.Item>
+              <Dropdown.Item id={'experiment'} value={'experiment'}>
+                Experimental
+              </Dropdown.Item>
+            </Dropdown>
+          </div>
+          <div className="rhs">
+            <Dropdown
+              selectedID={String(numGraphs)}
+              onChange={this.handleChangeNumGraphs}
+            >
+              {range(1, 31).map(n => (
+                <Dropdown.Item key={n} id={String(n)} value={n}>
+                  {`${n} Graphs`}
+                </Dropdown.Item>
+              ))}
+            </Dropdown>
+            <Dropdown
+              selectedID={String(numColumns)}
+              onChange={this.handleChangeNumColumns}
+            >
+              {[1, 2, 3, 4, 6].map(n => (
+                <Dropdown.Item key={n} id={String(n)} value={n}>
+                  {`${n} Columns`}
+                </Dropdown.Item>
+              ))}
+            </Dropdown>
+            <Dropdown
+              selectedID={interval}
+              onChange={this.handleChangeInterval}
+            >
+              {['1s', '10s', '30s', '1m', '30m', '1h', '6h', '12h', '1d'].map(
+                i => (
+                  <Dropdown.Item key={i} id={i} value={i}>
+                    {i}
+                  </Dropdown.Item>
+                )
+              )}
+            </Dropdown>
+          </div>
         </div>
         <div className="perf-test-page--body">
           <GridLayout
@@ -121,9 +166,54 @@ class PerfTestPage extends PureComponent<Props, State> {
     ))
   }
 
+  private setLayout() {
+    const {numGraphs, numColumns, interval} = this.state
+    const layout = buildLayout(numColumns, numGraphs, interval)
+
+    layout.forEach(
+      cell => (cell.queryManager = this.queriesManager.addQuery(cell.query))
+    )
+
+    this.setState({layout})
+  }
+
   private handleChangeImplementation = implementation => {
-    this.setState({implementation})
-    window.localStorage.implementation = implementation
+    this.setState({implementation}, () => {
+      this.saveToLocalStorage()
+      this.setLayout()
+    })
+  }
+
+  private handleChangeNumGraphs = numGraphs => {
+    this.setState({numGraphs}, () => {
+      this.saveToLocalStorage()
+      this.setLayout()
+    })
+  }
+
+  private handleChangeNumColumns = numColumns => {
+    this.setState({numColumns}, () => {
+      this.saveToLocalStorage()
+      this.setLayout()
+    })
+  }
+
+  private handleChangeInterval = interval => {
+    this.setState({interval}, () => {
+      this.saveToLocalStorage()
+      this.setLayout()
+    })
+  }
+
+  private saveToLocalStorage = () => {
+    const {interval, implementation, numGraphs, numColumns} = this.state
+
+    window.localStorage.perfTest = JSON.stringify({
+      interval,
+      implementation,
+      numGraphs,
+      numColumns,
+    })
   }
 }
 

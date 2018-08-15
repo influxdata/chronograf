@@ -13,7 +13,12 @@
   background: $g3-castle;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 30px;
+
+  .rhs .dropdown {
+    margin-left: 10px;
+  }
 }
 
 .perf-test-page--body {
@@ -63,5 +68,5 @@
 }
 
 .perf-cell--vis {
-  padding: 10px;
+  padding: 20px;
 }

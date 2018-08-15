@@ -3,6 +3,8 @@ import uuid from 'uuid'
 import QueryManager from 'src/perf/QueryManager'
 import WebSocketConnection from 'src/perf/WebSocketConnection'
 
+import {decodeRunLengthEncodedTimes} from 'src/perf/utils'
+
 import {JSONResponse, DataResponse} from 'src/perf/types'
 
 class QueriesManager {
@@ -49,6 +51,16 @@ class QueriesManager {
   private handleJSONMessage = (msg: JSONResponse) => {
     if (msg.type === 'ERROR') {
       throw new Error(msg.data.message)
+    }
+
+    if (msg.data.column === 'time' && msg.data.isNormalized) {
+      const {startTime, timeDelta, timeCount} = msg.data
+      const queryManager = this.requests[msg.id]
+      const times = decodeRunLengthEncodedTimes(startTime, timeDelta, timeCount)
+
+      queryManager.addColumnData('time', times, msg.done)
+
+      return
     }
 
     this.lastMetadata = {

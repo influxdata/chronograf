@@ -25,7 +25,7 @@
       # Number of points to write to the database for each series
       point_count = 1000000
       # Number of series to write to the database?
-      series_count = 10
+      series_count = 30
       # This simulates collection interval in the timestamps of generated points
       tick = "1s"
       # This must be set to true

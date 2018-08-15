@@ -34,11 +34,21 @@ class Vis extends Component<Props, State> {
     queryManager.refetch()
   }
 
+  public componentWillUnmount() {
+    this.props.queryManager.unsubscribe(this.handleQueryManagerEvent)
+  }
+
   public shouldComponentUpdate() {
     return true
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps) {
+    const {queryManager} = this.props
+
+    if (prevProps.queryManager !== queryManager) {
+      queryManager.unsubscribe(this.handleQueryManagerEvent)
+    }
+
     this.renderCanvas()
   }
 
@@ -93,7 +103,6 @@ class Vis extends Component<Props, State> {
       this.setState({isLoading: true})
     } else if (e === 'FETCHED_DATA') {
       this.setState({isLoading: false})
-      console.log(this.props.queryManager.getTimeseries())
     }
   }
 
@@ -137,7 +146,7 @@ class Vis extends Component<Props, State> {
   }
 
   private get margins() {
-    return {top: 0, right: 0, bottom: 10, left: 20}
+    return {top: 0, right: 0, bottom: 0, left: 0}
   }
 }
 

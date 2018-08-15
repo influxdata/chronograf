@@ -12,6 +12,10 @@ export interface QueryResponse {
   done: boolean
   data: {
     column: string
+    isNormalized?: boolean
+    startTime?: number
+    timeDelta?: number
+    timeCount?: number
   }
 }
 

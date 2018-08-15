@@ -20,7 +20,15 @@ var influxClient client.Client
 
 type columnData = map[string][]byte
 
-func toColumns(resp *client.Response) (columnData, error) {
+type toColumnsResult struct {
+	columns      columnData
+	isNormalized bool
+	startTime    float64
+	timeDelta    float64
+	timeCount    int
+}
+
+func toColumns(resp *client.Response) (*toColumnsResult, error) {
 	s := resp.Results[0].Series[0]
 
 	buffers := map[string]*bytes.Buffer{}
@@ -31,22 +39,58 @@ func toColumns(resp *client.Response) (columnData, error) {
 		columnForIndex[i] = column
 	}
 
-	for _, value := range s.Values {
+	var startTime float64
+	var lastTime float64
+	var lastDelta float64
+	isNormalized := true
+
+	for i, value := range s.Values {
 		for j, innerValue := range value {
-			n, _ := innerValue.(json.Number).Float64()
-			buf := buffers[columnForIndex[j]]
+			n, _ := innerValue.(json.Number).Float64() // yolo
+			columnName := columnForIndex[j]
+			buf := buffers[columnName]
 			err := binary.Write(buf, binary.LittleEndian, n)
 
 			if err != nil {
-				return nil, err
+				return &toColumnsResult{}, err
+			}
+
+			if !isNormalized || columnName != "time" {
+				continue
+			}
+
+			if i == 0 {
+				startTime = n
+				lastTime = n
+			} else if i == 1 {
+				lastTime = n
+				lastDelta = n - startTime
+			} else {
+				timeDelta := n - lastTime
+
+				if timeDelta != lastDelta {
+					isNormalized = false
+					continue
+				}
+
+				lastDelta = timeDelta
+				lastTime = n
 			}
 		}
 	}
 
-	result := map[string][]byte{}
+	columns := map[string][]byte{}
 
 	for k, v := range buffers {
-		result[k] = v.Bytes()
+		columns[k] = v.Bytes()
+	}
+
+	result := &toColumnsResult{
+		columns:      columns,
+		isNormalized: isNormalized,
+		startTime:    startTime,
+		timeDelta:    lastDelta,
+		timeCount:    len(s.Values),
 	}
 
 	return result, nil
@@ -54,7 +98,7 @@ func toColumns(resp *client.Response) (columnData, error) {
 
 type queryResult struct {
 	id   string
-	data columnData
+	data *toColumnsResult
 	err  error
 }
 
@@ -123,7 +167,11 @@ func receiveMessages(conn *websocket.Conn, messages chan<- queryResult) {
 }
 
 type queryResponseData struct {
-	Column string `json:"column"`
+	Column       string  `json:"column"`
+	IsNormalized bool    `json:"isNormalized,omitempty"`
+	StartTime    float64 `json:"startTime,omitempty"`
+	TimeDelta    float64 `json:"timeDelta,omitempty"`
+	TimeCount    int     `json:"timeCount,omitempty"`
 }
 
 type queryResponse struct {
@@ -164,7 +212,6 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 
 			if err != nil {
 				log.Fatalln(err)
-				return
 			}
 
 			continue
@@ -172,18 +219,40 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 
 		i := 0
 
-		for column, data := range result.data {
-			resp := queryResponse{
-				ID:           result.id,
-				Done:         i == len(result.data)-1,
-				ResponseType: "QUERY_RESULT",
-				Data: queryResponseData{
-					Column: column,
-				},
+		for column, data := range result.data.columns {
+			respData := queryResponseData{
+				Column: column,
 			}
 
-			conn.WriteJSON(resp)
-			conn.WriteMessage(websocket.BinaryMessage, data)
+			useRunLengthEncoding := result.data.isNormalized && column == "time"
+
+			if useRunLengthEncoding {
+				respData.IsNormalized = true
+				respData.StartTime = result.data.startTime
+				respData.TimeDelta = result.data.timeDelta
+				respData.TimeCount = result.data.timeCount
+			}
+
+			resp := queryResponse{
+				ID:           result.id,
+				Done:         i == len(result.data.columns)-1,
+				ResponseType: "QUERY_RESULT",
+				Data:         respData,
+			}
+
+			err := conn.WriteJSON(resp)
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			if !useRunLengthEncoding {
+				err = conn.WriteMessage(websocket.BinaryMessage, data)
+
+				if err != nil {
+					log.Fatalln(err)
+				}
+			}
 
 			i++
 		}
@@ -196,7 +265,6 @@ func Timeseries(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
 
 	influxClient, err = client.NewHTTPClient(client.HTTPConfig{
@@ -205,7 +273,6 @@ func Timeseries(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
 
 	conn.EnableWriteCompression(true)
