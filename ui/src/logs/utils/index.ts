@@ -176,7 +176,7 @@ export function buildGeneralLogQuery(
   return `${select}${condition}${dimensions}${fillClause}`
 }
 
-export async function getQueryCountForBounds(
+export async function getQueryResultsCountForBounds(
   lower: string,
   upper: string,
   config: QueryConfig,
@@ -209,6 +209,9 @@ export async function getQueryCountForBounds(
   return getDeep<number>(result, 'results.0.series.0.values.0.1', 0)
 }
 
+// HOW_LOW_CAN_YOU_GO is the magical cut-off point for number of results where exponential backoff will stop
+const HOW_LOW_CAN_YOU_GO = 150
+
 export async function findOlderLowerTimeBounds(
   upper: string,
   config: QueryConfig,
@@ -227,7 +230,7 @@ export async function findOlderLowerTimeBounds(
       break
     }
 
-    const count = await getQueryCountForBounds(
+    const count = await getQueryResultsCountForBounds(
       currentLower.toISOString(),
       upper,
       config,
@@ -237,7 +240,7 @@ export async function findOlderLowerTimeBounds(
       namespace
     )
 
-    if (count >= 400) {
+    if (count >= HOW_LOW_CAN_YOU_GO) {
       break
     }
 
@@ -266,7 +269,7 @@ export async function findNewerUpperTimeBounds(
       break
     }
 
-    const count = await getQueryCountForBounds(
+    const count = await getQueryResultsCountForBounds(
       lower,
       currentUpper.toISOString(),
       config,
@@ -276,7 +279,7 @@ export async function findNewerUpperTimeBounds(
       namespace
     )
 
-    if (count >= 400) {
+    if (count >= HOW_LOW_CAN_YOU_GO) {
       break
     }
 
