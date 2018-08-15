@@ -1,9 +1,10 @@
 import React, {PureComponent} from 'react'
-import {ScaleLinear} from 'd3-scale'
 
 import QueryManager, {Event} from 'src/perf/QueryManager'
 
 import {clearCanvas, drawLine, createScale} from 'src/perf/utils'
+
+import {Scale} from 'src/perf/types'
 
 interface Props {
   queryManager: QueryManager
@@ -13,8 +14,8 @@ interface Props {
 
 interface State {
   isLoading: boolean
-  xScale?: ScaleLinear<number, number>
-  yScale?: ScaleLinear<number, number>
+  xScale?: Scale
+  yScale?: Scale
 }
 
 class Vis extends PureComponent<Props, State> {
@@ -100,7 +101,7 @@ class Vis extends PureComponent<Props, State> {
     }
   }
 
-  private createXScale(): ScaleLinear<number, number> {
+  private createXScale(): Scale {
     const {width, queryManager} = this.props
     const {left, right} = this.margins
     const timess = queryManager.getRawTimeseries().map(([times]) => times)
@@ -108,7 +109,7 @@ class Vis extends PureComponent<Props, State> {
     return createScale(timess, width, left, right)
   }
 
-  private createYScale(): ScaleLinear<number, number> {
+  private createYScale(): Scale {
     const {height, queryManager} = this.props
     const {top, bottom} = this.margins
     const valuess = queryManager.getRawTimeseries().map(([_, values]) => values)

@@ -1,6 +1,6 @@
-import {Timeseries} from 'src/perf/types'
+import {Timeseries, Scale} from 'src/perf/types'
 
-type Scale = (n: number) => number
+type Values = Float32Array | Float64Array
 
 export const simplify = (
   times: Float64Array,
@@ -10,22 +10,22 @@ export const simplify = (
   yScale: Scale
 ): Timeseries => {
   // First do one pass with a fast, low quality simplification algorithm
-  const xs = times.map(xScale)
-  const ys = values.map(yScale)
+  const xs = mapFloat32(times, xScale)
+  const ys = mapFloat32(values, yScale)
   const indicesToKeep = simplifyDist(xs, ys, epsilon)
   const [newTimes, newValues] = collect(times, values, indicesToKeep)
 
   // Then do another pass with a slower, high quality simplification algorithm
-  const nextXs = newTimes.map(xScale)
-  const nextYs = newValues.map(yScale)
+  const nextXs = mapFloat32(newTimes, xScale)
+  const nextYs = mapFloat32(newValues, yScale)
   const nextIndicesToKeep = simplifyDouglasPeucker(nextXs, nextYs, epsilon)
 
   return collect(times, values, nextIndicesToKeep)
 }
 
 const simplifyDouglasPeucker = (
-  times: Float64Array,
-  values: Float32Array,
+  times: Values,
+  values: Values,
   epsilon: number
 ) => {
   const keep = new Uint8Array(times.length)
@@ -47,8 +47,8 @@ const simplifyDouglasPeucker = (
 }
 
 const simplifyDouglasPeuckerHelper = (
-  times: Float64Array,
-  values: Float32Array,
+  times: Values,
+  values: Values,
   epsilonSq: number,
   i0: number,
   i1: number,
@@ -109,11 +109,7 @@ const sqSegmentDist = (x0, y0, x1, y1, x2, y2) => {
   return dx * dx + dy * dy
 }
 
-const simplifyDist = (
-  times: Float64Array,
-  values: Float32Array,
-  epsilon: number
-) => {
+const simplifyDist = (times: Values, values: Values, epsilon: number) => {
   const epsilonSq = epsilon ** 2
   const keep = new Uint8Array(times.length)
 
@@ -165,4 +161,14 @@ const collect = (
   }
 
   return [times, values]
+}
+
+const mapFloat32 = (xs, f) => {
+  const result = new Float32Array(xs.length)
+
+  for (let i = 0; i < xs.length; i++) {
+    result[i] = f(xs[i])
+  }
+
+  return result
 }

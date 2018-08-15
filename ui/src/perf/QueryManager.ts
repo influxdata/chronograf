@@ -1,9 +1,7 @@
-import {ScaleLinear} from 'd3-scale'
-
 import QueriesManager from 'src/perf/QueriesManager'
 import {simplify} from 'src/perf/simplify'
 
-import {Timeseries} from 'src/perf/types'
+import {Timeseries, Scale} from 'src/perf/types'
 
 export type Event = 'FETCHING_DATA' | 'FETCHED_DATA' | 'SIMPLIFIED_DATA'
 
@@ -50,10 +48,7 @@ export default class QueryManager {
     this.queriesManager.send(this)
   }
 
-  public simplify(
-    xScale: ScaleLinear<number, number>,
-    yScale: ScaleLinear<number, number>
-  ): void {
+  public simplify(xScale: Scale, yScale: Scale): void {
     this.data = this.rawValues.map(values =>
       simplify(this.rawTimes, values, SIMPLIFICATION_TOLERANCE, xScale, yScale)
     )

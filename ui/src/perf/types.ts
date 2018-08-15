@@ -31,3 +31,5 @@ export interface ErrorResponse {
 export type JSONResponse = QueryResponse | ErrorResponse
 
 export type Timeseries = [Float64Array, Float32Array]
+
+export type Scale = (n: number) => number

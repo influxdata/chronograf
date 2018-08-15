@@ -1,7 +1,8 @@
 import uuid from 'uuid'
 import {range, extent} from 'd3-array'
-import {scaleLinear, ScaleLinear} from 'd3-scale'
 import {line} from 'd3-shape'
+
+import {Scale} from 'src/perf/types'
 
 export const clearCanvas = (
   canvas: HTMLCanvasElement,
@@ -63,8 +64,8 @@ export const buildLayout = (
 
 export const drawLine = (
   context: CanvasRenderingContext2D,
-  xScale: ScaleLinear<number, number>,
-  yScale: ScaleLinear<Number, Number>,
+  xScale: Scale,
+  yScale: Scale,
   xs: Float32Array | Float64Array,
   ys: Float32Array | Float64Array
 ) => {
@@ -84,21 +85,23 @@ export const createScale = (
   startMargin: number = 0,
   endMargin: number = 0,
   reverse: boolean = false
-): ScaleLinear<number, number> => {
+): Scale => {
   const extents = []
 
   for (const xs of xss) {
     extents.push(...extent(xs))
   }
 
-  const domain = extent(extents)
+  const [d0, d1] = extent(extents)
   const range = [startMargin, size - endMargin]
 
   if (reverse) {
     range.reverse()
   }
 
-  return scaleLinear()
-    .domain(domain)
-    .range(range)
+  const [r0, r1] = range
+  const m = (r1 - r0) / (d1 - d0)
+  const b = r0 - m * d0
+
+  return x => m * x + b
 }
