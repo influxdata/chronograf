@@ -46,6 +46,7 @@ class KapacitorForm extends PureComponent<Props> {
         <WizardTextInput
           value={kapacitor.password}
           label="Password"
+          type="password"
           onChange={onChangeInput('password')}
         />
         {this.isHTTPS && (
