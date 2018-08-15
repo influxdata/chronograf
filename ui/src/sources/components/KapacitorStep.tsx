@@ -68,7 +68,7 @@ class KapacitorStep extends Component<Props, State> {
 
     const kapacitor = props.showNewKapacitor
       ? DEFAULT_KAPACITOR
-      : getActiveKapacitor(props.source, props.sources)
+      : getActiveKapacitor(props.source, props.sources) || DEFAULT_KAPACITOR
 
     this.state = {
       kapacitor,
