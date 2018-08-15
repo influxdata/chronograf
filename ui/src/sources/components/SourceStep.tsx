@@ -162,10 +162,9 @@ class SourceStep extends PureComponent<Props, State> {
 
   private get passwordPlaceholder() {
     const {source} = this.props
-    if (source.authentication === 'basic') {
+    if (source && source.authentication === 'basic') {
       return 'Value saved in server'
     }
-    return null
   }
 
   private get authIndicator(): JSX.Element {
