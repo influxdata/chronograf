@@ -125,7 +125,7 @@ class MultiSelectDropdown extends Component<Props, State> {
       _.includes(selectedIDs, child.props.id)
     )
 
-    let label
+    let label: string | Array<string | JSX.Element>
 
     if (selectedChildren.length) {
       label = selectedChildren.map((sc, i) => {
