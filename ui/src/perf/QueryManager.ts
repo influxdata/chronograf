@@ -12,7 +12,7 @@ export default class QueryManager {
   private queriesManager: QueriesManager
   private subscribers: Set<Subscriber>
   private data: {
-    [column: string]: Float64Array
+    [column: string]: Float32Array | Float64Array
   }
 
   constructor(query: string, queriesManager: QueriesManager) {
@@ -30,7 +30,7 @@ export default class QueryManager {
     this.subscribers.delete(subscriber)
   }
 
-  public getTimeseries(): {[column: string]: Float64Array} {
+  public getTimeseries(): {[column: string]: Float32Array | Float64Array} {
     return this.data
   }
 
@@ -46,7 +46,7 @@ export default class QueryManager {
 
   public addColumnData(
     column: string,
-    data: Float64Array,
+    data: Float32Array | Float64Array,
     isLastColumn: boolean
   ) {
     this.data[column] = data

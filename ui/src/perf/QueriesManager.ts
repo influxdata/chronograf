@@ -5,7 +5,7 @@ import WebSocketConnection from 'src/perf/WebSocketConnection'
 
 import {decodeRunLengthEncodedTimes} from 'src/perf/utils'
 
-import {JSONResponse, DataResponse} from 'src/perf/types'
+import {JSONResponse} from 'src/perf/types'
 
 class QueriesManager {
   private ws: WebSocketConnection
@@ -44,7 +44,7 @@ class QueriesManager {
     if (typeof msg.data === 'string') {
       this.handleJSONMessage(JSON.parse(msg.data))
     } else {
-      this.handleDataMessage(new Float64Array(msg.data))
+      this.handleDataMessage(msg.data)
     }
   }
 
@@ -70,9 +70,17 @@ class QueriesManager {
     }
   }
 
-  private handleDataMessage = (data: DataResponse) => {
+  private handleDataMessage = (buf: ArrayBuffer) => {
     const {column, requestID, requestDone} = this.lastMetadata
     const queryManager = this.requests[requestID]
+
+    let data
+
+    if (column === 'time') {
+      data = new Float64Array(buf)
+    } else {
+      data = new Float32Array(buf)
+    }
 
     queryManager.addColumnData(column, data, requestDone)
   }

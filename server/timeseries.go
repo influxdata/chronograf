@@ -46,16 +46,26 @@ func toColumns(resp *client.Response) (*toColumnsResult, error) {
 
 	for i, value := range s.Values {
 		for j, innerValue := range value {
-			n, _ := innerValue.(json.Number).Float64() // yolo
 			columnName := columnForIndex[j]
+			isTimeColumn := columnName == "time"
 			buf := buffers[columnName]
-			err := binary.Write(buf, binary.LittleEndian, n)
+			n, err := innerValue.(json.Number).Float64()
 
 			if err != nil {
 				return &toColumnsResult{}, err
 			}
 
-			if !isNormalized || columnName != "time" {
+			if isTimeColumn {
+				err = binary.Write(buf, binary.LittleEndian, n)
+			} else {
+				err = binary.Write(buf, binary.LittleEndian, float32(n))
+			}
+
+			if err != nil {
+				return &toColumnsResult{}, err
+			}
+
+			if !isNormalized || !isTimeColumn {
 				continue
 			}
 
