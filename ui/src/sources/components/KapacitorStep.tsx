@@ -2,7 +2,6 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
-import {getDeep} from 'src/utils/wrappers'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
