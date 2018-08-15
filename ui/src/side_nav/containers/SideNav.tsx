@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import Authorized, {ADMIN_ROLE} from 'src/auth/Authorized'
 
 import UserNavBlock from 'src/side_nav/components/UserNavBlock'
+import {NavIcon, IconFont} from 'src/reusable_ui'
 
 import {
   NavBlock,
@@ -70,7 +71,7 @@ class SideNav extends PureComponent<Props> {
         </div>
         <NavBlock
           highlightWhen={['hosts']}
-          icon="eye"
+          icon={NavIcon.Eye}
           link={`${sourcePrefix}/hosts`}
           location={location}
         >
@@ -78,7 +79,7 @@ class SideNav extends PureComponent<Props> {
         </NavBlock>
         <NavBlock
           highlightWhen={['data-explorer']}
-          icon="graphline-2"
+          icon={IconFont.GraphLine}
           link={dataExplorerLink}
           location={location}
         >
@@ -86,7 +87,7 @@ class SideNav extends PureComponent<Props> {
         </NavBlock>
         <NavBlock
           highlightWhen={['delorean']}
-          icon="capacitor2"
+          icon={IconFont.Capacitor}
           link={`${sourcePrefix}/delorean`}
           location={location}
         >
@@ -94,7 +95,7 @@ class SideNav extends PureComponent<Props> {
         </NavBlock>
         <NavBlock
           highlightWhen={['dashboards']}
-          icon="dash-j"
+          icon={NavIcon.Dashboards}
           link={`${sourcePrefix}/dashboards`}
           location={location}
         >
@@ -102,7 +103,7 @@ class SideNav extends PureComponent<Props> {
         </NavBlock>
         <NavBlock
           highlightWhen={['alerts', 'alert-rules', 'tickscript']}
-          icon="alerts"
+          icon={NavIcon.Alerts}
           link={`${sourcePrefix}/alert-rules`}
           location={location}
         >
@@ -117,7 +118,7 @@ class SideNav extends PureComponent<Props> {
 
         <NavBlock
           highlightWhen={['logs']}
-          icon="wood"
+          icon={IconFont.Wood}
           link="/logs"
           location={location}
         >
@@ -129,7 +130,7 @@ class SideNav extends PureComponent<Props> {
           replaceWithIfNotUsingAuth={
             <NavBlock
               highlightWhen={['admin-influxdb']}
-              icon="crown-outline"
+              icon={IconFont.CrownOutline}
               link={`${sourcePrefix}/admin-influxdb/databases`}
               location={location}
             >
@@ -142,7 +143,7 @@ class SideNav extends PureComponent<Props> {
         >
           <NavBlock
             highlightWhen={['admin-chronograf', 'admin-influxdb']}
-            icon="crown-outline"
+            icon={IconFont.CrownOutline}
             link={`${sourcePrefix}/admin-chronograf/current-organization`}
             location={location}
           >
@@ -162,7 +163,7 @@ class SideNav extends PureComponent<Props> {
         </Authorized>
         <NavBlock
           highlightWhen={['manage-sources', 'kapacitors']}
-          icon="wrench"
+          icon={IconFont.Wrench}
           link={`${sourcePrefix}/manage-sources`}
           location={location}
         >

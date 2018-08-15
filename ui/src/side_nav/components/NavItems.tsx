@@ -3,6 +3,8 @@ import {Link} from 'react-router'
 import classnames from 'classnames'
 import _ from 'lodash'
 
+import {NavIcon, IconFont} from 'src/reusable_ui'
+
 interface NavListItemProps {
   link: string
   location?: string
@@ -60,7 +62,7 @@ const NavHeader: SFC<NavHeaderProps> = ({link, title, useAnchor}) => {
 interface NavBlockProps {
   children?: ReactNode
   link?: string
-  icon: string
+  icon: NavIcon | IconFont
   location?: string
   className?: string
   highlightWhen: string[]
