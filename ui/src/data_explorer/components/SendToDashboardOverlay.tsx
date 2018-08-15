@@ -127,7 +127,13 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private sendToDashboard = async () => {
-    const {queryConfig, addDashboardCell, rawText, source} = this.props
+    const {
+      queryConfig,
+      addDashboardCell,
+      rawText,
+      source,
+      onCancel,
+    } = this.props
     const {hasQuery, name} = this.state
 
     if (hasQuery) {
@@ -142,6 +148,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
           return addDashboardCell(dashboard, newCell)
         })
       )
+      onCancel()
     }
   }
 }
