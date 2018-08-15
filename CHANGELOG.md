@@ -12,6 +12,7 @@
 ### Features
 
 ### UI Improvements
+1.  [#4225](https://github.com/influxdata/chronograf/pull/4225): Make infinite scroll UX in Log Viewer more crisp by decreasing results queried for at a time
 
 ### Bug Fixes
 1.  [#4231](https://github.com/influxdata/chronograf/pull/4231): Fix notifying user to press ESC to exit presentation mode
