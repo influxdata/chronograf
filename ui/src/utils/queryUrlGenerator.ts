@@ -5,9 +5,16 @@ interface ProxyQuery {
   query: string
   db?: string
   rp?: string
+  uuid?: string
 }
 
-export async function proxy<T = any>({source, query, db, rp}: ProxyQuery) {
+export async function proxy<T = any>({
+  source,
+  query,
+  db,
+  rp,
+  uuid,
+}: ProxyQuery) {
   try {
     return await AJAX<T>({
       method: 'POST',
@@ -16,6 +23,7 @@ export async function proxy<T = any>({source, query, db, rp}: ProxyQuery) {
         query,
         db,
         rp,
+        uuid,
       },
     })
   } catch (error) {

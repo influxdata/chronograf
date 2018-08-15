@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/influxdata/chronograf"
+	uuid "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
 )
 
@@ -23,7 +24,8 @@ func ValidInfluxRequest(p chronograf.Query) error {
 }
 
 type postInfluxResponse struct {
-	Results interface{} `json:"results"` // results from influx
+	Results interface{} `json:"results"`        // results from influx
+	UUID    string      `json:"uuid,omitempty"` // uuid passed from client to identify results
 }
 
 // Influx proxies requests to influxdb.
@@ -76,8 +78,19 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	uniqueID := req.UUID
+	if uniqueID == "" {
+		newUUID, err := (&uuid.UUID{}).Generate()
+		if err != nil {
+			Error(w, 500, "Failed to create a unique identifier", s.Logger)
+			return
+		}
+		uniqueID = newUUID
+	}
+
 	res := postInfluxResponse{
 		Results: response,
+		UUID:    uniqueID,
 	}
 	encodeJSON(w, http.StatusOK, res, s.Logger)
 }
