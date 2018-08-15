@@ -1,3 +1,11 @@
+## v1.6.2 [unreleased]
+
+### Features
+
+### UI Improvements
+
+### Bug Fixes
+
 ## v1.6.1 [2018-08-02]
 
 ### Features
