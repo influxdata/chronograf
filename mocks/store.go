@@ -13,6 +13,7 @@ type Store struct {
 	MappingsStore           chronograf.MappingsStore
 	ServersStore            chronograf.ServersStore
 	LayoutsStore            chronograf.LayoutsStore
+	ProtoboardsStore        chronograf.ProtoboardsStore
 	UsersStore              chronograf.UsersStore
 	DashboardsStore         chronograf.DashboardsStore
 	OrganizationsStore      chronograf.OrganizationsStore
@@ -34,6 +35,10 @@ func (s *Store) Layouts(ctx context.Context) chronograf.LayoutsStore {
 	return s.LayoutsStore
 }
 
+func (s *Store) Protoboards(ctx context.Context) chronograf.ProtoboardsStore {
+	return s.ProtoboardsStore
+}
+
 func (s *Store) Users(ctx context.Context) chronograf.UsersStore {
 	return s.UsersStore
 }
@@ -41,6 +46,7 @@ func (s *Store) Users(ctx context.Context) chronograf.UsersStore {
 func (s *Store) Organizations(ctx context.Context) chronograf.OrganizationsStore {
 	return s.OrganizationsStore
 }
+
 func (s *Store) Mappings(ctx context.Context) chronograf.MappingsStore {
 	return s.MappingsStore
 }

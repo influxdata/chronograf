@@ -14,9 +14,11 @@ const (
 	ErrSourceNotFound                  = Error("source not found")
 	ErrServerNotFound                  = Error("server not found")
 	ErrLayoutNotFound                  = Error("layout not found")
+	ErrProtoboardNotFound              = Error("protoboard not found")
 	ErrDashboardNotFound               = Error("dashboard not found")
 	ErrUserNotFound                    = Error("user not found")
 	ErrLayoutInvalid                   = Error("layout is invalid")
+	ErrProtoboardInvalid               = Error("protoboard is invalid")
 	ErrDashboardInvalid                = Error("dashboard is invalid")
 	ErrSourceInvalid                   = Error("source is invalid")
 	ErrServerInvalid                   = Error("server is invalid")
@@ -700,6 +702,56 @@ type LayoutsStore interface {
 	Get(ctx context.Context, ID string) (Layout, error)
 	// Update the dashboard in the store.
 	Update(context.Context, Layout) error
+}
+
+// ProtoboardMeta is the metadata of a Protoboard
+type ProtoboardMeta struct {
+	Name             string `json:"name"`
+	Icon             string `json:"icon,omitempty"`
+	Version          string `json:"version"`
+	DashboardVersion string `json:"dashboardVersion"`
+	Description      string `json:"description,omitempty"`
+	Author           string `json:"author,omitempty"`
+	License          string `json:"license,omitempty"`
+	URL              string `json:"url,omitempty"`
+}
+
+// ProtoboardCell holds visual and query information for a cell
+type ProtoboardCell struct {
+	X             int32            `json:"x"`
+	Y             int32            `json:"y"`
+	W             int32            `json:"w"`
+	H             int32            `json:"h"`
+	Name          string           `json:"name"`
+	Queries       []DashboardQuery `json:"queries"`
+	Axes          map[string]Axis  `json:"axes"`
+	Type          string           `json:"type"`
+	CellColors    []CellColor      `json:"colors"`
+	Legend        Legend           `json:"legend"`
+	TableOptions  TableOptions     `json:"tableOptions,omitempty"`
+	FieldOptions  []RenamableField `json:"fieldOptions"`
+	TimeFormat    string           `json:"timeFormat"`
+	DecimalPlaces DecimalPlaces    `json:"decimalPlaces"`
+}
+
+// ProtoboardData is the data of a Protoboard that can be instantiated into a dashboard, including a collection of cells
+type ProtoboardData struct {
+	Cells []ProtoboardCell `json:"cells"`
+}
+
+// Protoboard is a prototype of a dashboard that can be instantiated
+type Protoboard struct {
+	ID   string         `json:"id"`
+	Meta ProtoboardMeta `json:"meta"`
+	Data ProtoboardData `json:"data"`
+}
+
+// ProtoboardsStore stores protoboards that can be instantiated into dashboards
+type ProtoboardsStore interface {
+	// All returns all protoboards in the store
+	All(context.Context) ([]Protoboard, error)
+	// Add creates a new protoboards in the ProtoboardsStore
+	Get(ctx context.Context, ID string) (Protoboard, error)
 }
 
 // MappingWildcard is the wildcard value for mappings

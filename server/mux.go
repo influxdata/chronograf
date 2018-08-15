@@ -251,6 +251,10 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/chronograf/v1/layouts", EnsureViewer(service.Layouts))
 	router.GET("/chronograf/v1/layouts/:id", EnsureViewer(service.LayoutsID))
 
+	// Protoboards
+	router.GET("/chronograf/v1/protoboards", EnsureViewer(service.Protoboards))
+	router.GET("/chronograf/v1/protoboards/:id", EnsureViewer(service.ProtoboardsID))
+
 	// Users associated with Chronograf
 	router.GET("/chronograf/v1/me", service.Me)
 
