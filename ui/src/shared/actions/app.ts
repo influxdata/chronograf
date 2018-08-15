@@ -22,7 +22,7 @@ export const delayEnablePresentationMode: AppActions.DelayEnablePresentationMode
 ): Promise<NodeJS.Timer> =>
   setTimeout(() => {
     dispatch(enablePresentationMode())
-    notify(notifyPresentationMode())
+    dispatch(notify(notifyPresentationMode()))
   }, PRESENTATION_MODE_ANIMATION_DELAY)
 
 // persistent state action creators
