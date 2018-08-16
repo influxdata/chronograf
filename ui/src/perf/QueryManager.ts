@@ -39,6 +39,10 @@ export default class QueryManager {
   }
 
   public getRawTimeseries(): Timeseries[] {
+    if (!this.rawValues) {
+      return
+    }
+
     return this.rawValues.map<Timeseries>(values => [this.rawTimes, values])
   }
 

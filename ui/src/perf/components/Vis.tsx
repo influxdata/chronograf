@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 
+import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import QueryManager, {Event} from 'src/perf/QueryManager'
-
 import {clearCanvas, drawLine, createScale} from 'src/perf/utils'
 
 import {Scale} from 'src/perf/types'
@@ -18,14 +18,18 @@ interface State {
   yScale?: Scale
 }
 
+const SIMPLIFICATION_DEBOUNCE_TIME = 500
+
 class Vis extends PureComponent<Props, State> {
   private canvas: React.RefObject<HTMLCanvasElement>
+  private debouncer: Debouncer
 
   constructor(props) {
     super(props)
 
     this.state = {isLoading: true}
     this.canvas = React.createRef<HTMLCanvasElement>()
+    this.debouncer = new DefaultDebouncer()
   }
 
   public componentDidMount() {
@@ -40,15 +44,30 @@ class Vis extends PureComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps) {
-    const {queryManager} = this.props
+    const {queryManager, width, height} = this.props
 
     if (prevProps.queryManager !== queryManager) {
-      queryManager.unsubscribe(this.handleQueryManagerEvent)
+      prevProps.queryManager.unsubscribe(this.handleQueryManagerEvent)
+      queryManager.subscribe(this.handleQueryManagerEvent)
+      queryManager.refetch()
+
+      return
     }
 
-    this.renderCanvas()
+    if (
+      (prevProps.width !== width || prevProps.height !== height) &&
+      !!queryManager.getRawTimeseries()
+    ) {
+      this.debouncer.call(this.simplify, SIMPLIFICATION_DEBOUNCE_TIME)
 
-    // TODO: Resimplify when dimensions change
+      this.setState(
+        {
+          xScale: this.createXScale(),
+          yScale: this.createYScale(),
+        },
+        this.renderCanvas
+      )
+    }
   }
 
   public render() {
@@ -84,20 +103,18 @@ class Vis extends PureComponent<Props, State> {
   }
 
   private handleQueryManagerEvent = (e: Event) => {
-    const {queryManager} = this.props
-
     if (e === 'FETCHING_DATA') {
       this.setState({isLoading: true})
     } else if (e === 'FETCHED_DATA') {
-      const xScale = this.createXScale()
-      const yScale = this.createYScale()
-
-      this.setState({xScale, yScale}, () => {
-        queryManager.simplify(xScale, yScale)
-      })
+      this.setState(
+        {
+          xScale: this.createXScale(),
+          yScale: this.createYScale(),
+        },
+        this.simplify
+      )
     } else if (e === 'SIMPLIFIED_DATA') {
-      this.setState({isLoading: false})
-      this.renderCanvas()
+      this.setState({isLoading: false}, this.renderCanvas)
     }
   }
 
@@ -115,6 +132,13 @@ class Vis extends PureComponent<Props, State> {
     const valuess = queryManager.getRawTimeseries().map(([_, values]) => values)
 
     return createScale(valuess, height, top, bottom, true)
+  }
+
+  private simplify = () => {
+    const {queryManager} = this.props
+    const {xScale, yScale} = this.state
+
+    queryManager.simplify(xScale, yScale)
   }
 
   private get margins() {

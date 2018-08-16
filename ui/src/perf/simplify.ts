@@ -20,50 +20,39 @@ export const simplify = (
   const nextYs = mapFloat32(newValues, yScale)
   const nextIndicesToKeep = simplifyDouglasPeucker(nextXs, nextYs, epsilon)
 
-  return collect(times, values, nextIndicesToKeep)
+  return collect(newTimes, newValues, nextIndicesToKeep)
 }
 
-const simplifyDouglasPeucker = (
-  times: Values,
-  values: Values,
-  epsilon: number
-) => {
-  const keep = new Uint8Array(times.length)
+const simplifyDouglasPeucker = (xs: Values, ys: Values, epsilon: number) => {
+  const keep = new Uint8Array(xs.length)
   const sqEpsilon = epsilon * epsilon
 
   keep[0] = 1
   keep[keep.length - 1] = 1
 
-  simplifyDouglasPeuckerHelper(
-    times,
-    values,
-    sqEpsilon,
-    0,
-    keep.length - 1,
-    keep
-  )
+  simplifyDouglasPeuckerHelper(xs, ys, sqEpsilon, 0, keep.length - 1, keep)
 
   return keep
 }
 
 const simplifyDouglasPeuckerHelper = (
-  times: Values,
-  values: Values,
+  xs: Values,
+  ys: Values,
   epsilonSq: number,
   i0: number,
   i1: number,
   keep: Uint8Array
 ) => {
-  const x0 = times[i0]
-  const y0 = values[i0]
-  const x1 = times[i1]
-  const y1 = values[i1]
+  const x0 = xs[i0]
+  const y0 = ys[i0]
+  const x1 = xs[i1]
+  const y1 = ys[i1]
 
   let maxIndex = 0
   let maxDist = -1
 
   for (let i = i0 + 1; i < i1; i++) {
-    const sqDist = sqSegmentDist(x0, y0, x1, y1, times[i], values[i])
+    const sqDist = sqSegmentDist(x0, y0, x1, y1, xs[i], ys[i])
 
     if (sqDist > maxDist) {
       maxIndex = i
@@ -75,11 +64,11 @@ const simplifyDouglasPeuckerHelper = (
     keep[maxIndex] = 1
 
     if (maxIndex - i0 > 1) {
-      simplifyDouglasPeuckerHelper(times, values, epsilonSq, i0, maxIndex, keep)
+      simplifyDouglasPeuckerHelper(xs, ys, epsilonSq, i0, maxIndex, keep)
     }
 
     if (i1 - maxIndex > 1) {
-      simplifyDouglasPeuckerHelper(times, values, epsilonSq, maxIndex, i1, keep)
+      simplifyDouglasPeuckerHelper(xs, ys, epsilonSq, maxIndex, i1, keep)
     }
   }
 }
@@ -109,19 +98,19 @@ const sqSegmentDist = (x0, y0, x1, y1, x2, y2) => {
   return dx * dx + dy * dy
 }
 
-const simplifyDist = (times: Values, values: Values, epsilon: number) => {
+const simplifyDist = (xs: Values, ys: Values, epsilon: number) => {
   const epsilonSq = epsilon ** 2
-  const keep = new Uint8Array(times.length)
+  const keep = new Uint8Array(xs.length)
 
-  let prevX = times[0]
-  let prevY = values[0]
+  let prevX = xs[0]
+  let prevY = ys[0]
 
   keep[0] = 1
   keep[keep.length - 1] = 1
 
-  for (let i = 1; i < times.length; i++) {
-    const x = times[i]
-    const y = values[i]
+  for (let i = 1; i < xs.length; i++) {
+    const x = xs[i]
+    const y = ys[i]
     const sqDist = (prevY - y) ** 2 + (prevX - x) ** 2
 
     if (sqDist > epsilonSq) {

@@ -22,9 +22,6 @@ export const clearCanvas = (
   context.clearRect(0, 0, width, height)
 }
 
-// xScale(t: Timeseries, m: Margins, width, height)
-// yScale(t: Timeseries, m: Margins, width, height)
-
 export const decodeRunLengthEncodedTimes = (
   startTime: number,
   timeDelta: number,
