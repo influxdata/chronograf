@@ -104,6 +104,11 @@ $logs-viewer-gutter: 60px;
   }
 }
 
+.logs-viewer--table-count {
+  position: absolute;
+  top: -30px;
+}
+
 .logs-viewer--filters {
   flex: 1 0 0;
   display: flex;

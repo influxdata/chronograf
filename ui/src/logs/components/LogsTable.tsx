@@ -10,6 +10,7 @@ import ExpandableMessage from 'src/logs/components/expandable_message/Expandable
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
 import LoadingStatus from 'src/logs/components/loading_status/LoadingStatus'
 import {getDeep} from 'src/utils/wrappers'
+import QueryResults from 'src/logs/components/QueryResults'
 
 import {colorForSeverity} from 'src/logs/utils/colors'
 import {
@@ -87,6 +88,7 @@ interface State {
   firstQueryTime: number
   visibleColumnsCount: number
   searchPattern: string
+  loadMoreQueryCount: number
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -176,6 +178,7 @@ class LogsTable extends Component<Props, State> {
       currentMessageWidth: 0,
       lastQueryTime: null,
       firstQueryTime: null,
+      loadMoreQueryCount: 0,
       isMessageVisible,
       visibleColumnsCount,
     }
@@ -213,6 +216,8 @@ class LogsTable extends Component<Props, State> {
   }
 
   public render() {
+    const {queryCount} = this.props
+    const {loadMoreQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
     if (this.isLoadingTableData) {
@@ -224,6 +229,12 @@ class LogsTable extends Component<Props, State> {
         className="logs-viewer--table-container"
         onMouseOut={this.handleMouseOut}
       >
+        <div className="logs-viewer--table-count">
+          <QueryResults
+            count={this.rowCount()}
+            queryCount={loadMoreQueryCount + queryCount}
+          />
+        </div>
         <AutoSizer>
           {({width}) => (
             <Grid
@@ -388,9 +399,13 @@ class LogsTable extends Component<Props, State> {
     if (firstQueryTime && firstQueryTime > firstTime) {
       return
     }
-
-    this.setState({firstQueryTime: firstTime})
-    await this.props.fetchNewer(moment(firstTime).toISOString())
+    try {
+      this.incrementRowQueryCount()
+      this.setState({firstQueryTime: firstTime})
+      await this.props.fetchNewer(moment(firstTime).toISOString())
+    } finally {
+      this.decrementRowQueryCount()
+    }
   }
 
   private loadMoreBelowRows = async () => {
@@ -415,8 +430,25 @@ class LogsTable extends Component<Props, State> {
       return
     }
 
-    this.setState({lastQueryTime: lastTime})
-    await this.props.fetchMore(moment(lastTime).toISOString())
+    try {
+      this.incrementRowQueryCount()
+      this.setState({lastQueryTime: lastTime})
+      await this.props.fetchMore(moment(lastTime).toISOString())
+    } finally {
+      this.decrementRowQueryCount()
+    }
+  }
+
+  private incrementRowQueryCount() {
+    this.setState(({loadMoreQueryCount}) => ({
+      loadMoreQueryCount: loadMoreQueryCount + 1,
+    }))
+  }
+
+  private decrementRowQueryCount() {
+    this.setState(({loadMoreQueryCount}) => ({
+      loadMoreQueryCount: loadMoreQueryCount - 1,
+    }))
   }
 
   private rowCount = (): number => {
