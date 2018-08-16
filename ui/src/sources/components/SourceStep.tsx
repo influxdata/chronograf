@@ -107,7 +107,7 @@ class SourceStep extends PureComponent<Props, State> {
           label="Connection URL"
           onChange={this.onChangeInput('url')}
           valueModifier={this.URLModifier}
-          submitAction={this.syncHostnames}
+          onSubmit={this.syncHostnames}
         />
         <WizardTextInput
           value={source.name}
