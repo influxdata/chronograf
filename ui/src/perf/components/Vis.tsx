@@ -1,10 +1,18 @@
 import React, {PureComponent} from 'react'
+import memoizeOne from 'memoize-one'
 
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import QueryManager, {Event} from 'src/perf/QueryManager'
-import {clearCanvas, drawLine, createScale} from 'src/perf/utils'
+import {
+  clearCanvas,
+  drawLine,
+  drawAxes,
+  createScale,
+  calculateDomains,
+  timeTicks,
+} from 'src/perf/utils'
 
-import {Scale} from 'src/perf/types'
+import {VisDimensions} from 'src/perf/types'
 
 interface Props {
   queryManager: QueryManager
@@ -14,11 +22,16 @@ interface Props {
 
 interface State {
   isLoading: boolean
-  xScale?: Scale
-  yScale?: Scale
+  dimensions?: VisDimensions
 }
 
 const SIMPLIFICATION_DEBOUNCE_TIME = 500
+const LINE_COLOR = '#c6cad3'
+const AXES_COLOR = '#383846'
+const LABEL_COLOR = '#c6cad3'
+const VALUE_SCALE_PADDING = 0.15
+
+const fastCalculateDomains = memoizeOne(calculateDomains)
 
 class Vis extends PureComponent<Props, State> {
   private canvas: React.RefObject<HTMLCanvasElement>
@@ -44,29 +57,15 @@ class Vis extends PureComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps) {
+    const {width: prevWidth, height: prevHeight} = prevProps
     const {queryManager, width, height} = this.props
 
-    if (prevProps.queryManager !== queryManager) {
-      prevProps.queryManager.unsubscribe(this.handleQueryManagerEvent)
-      queryManager.subscribe(this.handleQueryManagerEvent)
-      queryManager.refetch()
+    const dimensionsChanged = prevWidth !== width || prevHeight !== height
+    const haveData = !!queryManager.getRawTimeseries()
 
-      return
-    }
-
-    if (
-      (prevProps.width !== width || prevProps.height !== height) &&
-      !!queryManager.getRawTimeseries()
-    ) {
+    if (dimensionsChanged && haveData) {
       this.debouncer.call(this.simplify, SIMPLIFICATION_DEBOUNCE_TIME)
-
-      this.setState(
-        {
-          xScale: this.createXScale(),
-          yScale: this.createYScale(),
-        },
-        this.renderCanvas
-      )
+      this.setState({dimensions: this.calculateDimensions()}, this.renderCanvas)
     }
   }
 
@@ -81,24 +80,28 @@ class Vis extends PureComponent<Props, State> {
   }
 
   private renderCanvas() {
-    const {width, height, queryManager} = this.props
-    const {xScale, yScale} = this.state
+    const {dimensions} = this.state
+    const data = this.props.queryManager.getTimeseries()
     const canvas = this.canvas.current
-    const data = queryManager.getTimeseries()
 
-    if (!canvas || !xScale || !yScale || !data) {
+    if (!dimensions || !data || !canvas) {
       return
     }
 
+    const {xScale, yScale, margins, width, height} = dimensions
+    const xTicks = this.xTicks()
+    const yTicks = this.yTicks()
+    const context = canvas.getContext('2d')
+
     clearCanvas(canvas, width, height)
 
-    const ctx = canvas.getContext('2d')
-
-    ctx.strokeStyle = '#e7e8eb'
+    context.strokeStyle = AXES_COLOR
+    context.fillStyle = LABEL_COLOR
+    drawAxes(context, xScale, yScale, xTicks, yTicks, width, height, margins)
 
     for (const [times, values] of data) {
-      drawLine(ctx, xScale, yScale, times, values)
-      ctx.stroke()
+      context.strokeStyle = LINE_COLOR
+      drawLine(context, xScale, yScale, times, values)
     }
   }
 
@@ -106,43 +109,48 @@ class Vis extends PureComponent<Props, State> {
     if (e === 'FETCHING_DATA') {
       this.setState({isLoading: true})
     } else if (e === 'FETCHED_DATA') {
-      this.setState(
-        {
-          xScale: this.createXScale(),
-          yScale: this.createYScale(),
-        },
-        this.simplify
-      )
+      this.setState({dimensions: this.calculateDimensions()}, this.simplify)
     } else if (e === 'SIMPLIFIED_DATA') {
       this.setState({isLoading: false}, this.renderCanvas)
     }
   }
 
-  private createXScale(): Scale {
-    const {width, queryManager} = this.props
-    const {left, right} = this.margins
-    const timess = queryManager.getRawTimeseries().map(([times]) => times)
+  private calculateDimensions(): VisDimensions {
+    const {width, height, queryManager} = this.props
+    const margins = {top: 10, right: 10, bottom: 15, left: 30}
+    const timeseries = queryManager.getRawTimeseries()
+    const [xDomain, yDomain] = fastCalculateDomains(timeseries)
+    const xScale = createScale(xDomain, [margins.left, width - margins.right])
+    const yScale = createScale(
+      yDomain,
+      [height - margins.bottom, margins.top],
+      VALUE_SCALE_PADDING
+    )
 
-    return createScale(timess, width, left, right)
-  }
-
-  private createYScale(): Scale {
-    const {height, queryManager} = this.props
-    const {top, bottom} = this.margins
-    const valuess = queryManager.getRawTimeseries().map(([_, values]) => values)
-
-    return createScale(valuess, height, top, bottom, true)
+    return {width, height, margins, xDomain, yDomain, xScale, yScale}
   }
 
   private simplify = () => {
     const {queryManager} = this.props
-    const {xScale, yScale} = this.state
+    const {dimensions} = this.state
 
-    queryManager.simplify(xScale, yScale)
+    queryManager.simplify(dimensions.xScale, dimensions.yScale)
   }
 
-  private get margins() {
-    return {top: 0, right: 0, bottom: 0, left: 0}
+  private yTicks(): number[] {
+    const {yScale, yDomain} = this.state.dimensions
+
+    return yScale.ticks(4).filter(t => t > yDomain[0] && t < yDomain[1])
+  }
+
+  private xTicks(): number[] {
+    const {
+      xDomain: [t0, t1],
+      margins: {left, right},
+      width,
+    } = this.state.dimensions
+
+    return timeTicks(t0, t1, left, width - right)
   }
 }
 

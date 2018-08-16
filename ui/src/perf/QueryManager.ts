@@ -7,7 +7,7 @@ export type Event = 'FETCHING_DATA' | 'FETCHED_DATA' | 'SIMPLIFIED_DATA'
 
 type Subscriber = (e: Event) => void
 
-const SIMPLIFICATION_TOLERANCE = 1
+const SIMPLIFICATION_TOLERANCE = 1.5
 
 export default class QueryManager {
   public query: string

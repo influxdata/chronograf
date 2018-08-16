@@ -1,3 +1,5 @@
+import {ScaleLinear} from 'd3-scale'
+
 export interface QueryRequest {
   id: string
   type: 'QUERY'
@@ -32,4 +34,21 @@ export type JSONResponse = QueryResponse | ErrorResponse
 
 export type Timeseries = [Float64Array, Float32Array]
 
-export type Scale = (n: number) => number
+export type Scale = ScaleLinear<number, number>
+
+export interface Margins {
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
+
+export interface VisDimensions {
+  margins: Margins
+  xDomain: [number, number]
+  yDomain: [number, number]
+  xScale: Scale
+  yScale: Scale
+  width: number
+  height: number
+}

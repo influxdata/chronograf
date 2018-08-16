@@ -3,7 +3,10 @@ import uuid from 'uuid'
 import QueryManager from 'src/perf/QueryManager'
 import WebSocketConnection from 'src/perf/WebSocketConnection'
 
-import {decodeRunLengthEncodedTimes} from 'src/perf/utils'
+import {
+  decodeRunLengthEncodedTimes,
+  nanosecondsToMilliseconds,
+} from 'src/perf/utils'
 
 import {JSONResponse} from 'src/perf/types'
 
@@ -78,6 +81,7 @@ class QueriesManager {
 
     if (column === 'time') {
       data = new Float64Array(buf)
+      nanosecondsToMilliseconds(data)
     } else {
       data = new Float32Array(buf)
     }

@@ -1,8 +1,9 @@
 import uuid from 'uuid'
-import {range, extent} from 'd3-array'
+import {range, extent as extentOne} from 'd3-array'
 import {line} from 'd3-shape'
+import {scaleLinear, scaleUtc} from 'd3-scale'
 
-import {Scale} from 'src/perf/types'
+import {Scale, Margins, Timeseries} from 'src/perf/types'
 
 export const clearCanvas = (
   canvas: HTMLCanvasElement,
@@ -28,12 +29,20 @@ export const decodeRunLengthEncodedTimes = (
   timeCount: number
 ): Float64Array => {
   const result = new Float64Array(timeCount)
+  const msStartTime = startTime / 1e6
+  const msTimeDelta = timeDelta / 1e6
 
   for (let i = 0; i < timeCount; i++) {
-    result[i] = startTime + timeDelta * i
+    result[i] = msStartTime + msTimeDelta * i
   }
 
   return result
+}
+
+export const nanosecondsToMilliseconds = (times: Float64Array): void => {
+  for (let i = 0; i < times.length; i++) {
+    times[i] = times[i] / 1e6
+  }
 }
 
 export const buildLayout = (
@@ -74,31 +83,103 @@ export const drawLine = (
 
   context.beginPath()
   plotter(is)
+  context.stroke()
 }
 
-export const createScale = (
-  xss: Array<Float32Array | Float64Array>,
-  size: number,
-  startMargin: number = 0,
-  endMargin: number = 0,
-  reverse: boolean = false
-): Scale => {
+export const drawAxes = (
+  context: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale,
+  xTicks: number[],
+  yTicks: number[],
+  width: number,
+  height: number,
+  margins: Margins
+) => {
+  const xAxisY = height - margins.bottom
+
+  context.beginPath()
+  context.moveTo(margins.left, xAxisY)
+  context.lineTo(width - margins.right, xAxisY)
+  context.stroke()
+
+  context.beginPath()
+  context.moveTo(margins.left, xAxisY)
+  context.lineTo(margins.left, margins.top)
+  context.stroke()
+
+  for (const xTick of xTicks) {
+    const x = xScale(xTick) + margins.left
+
+    context.beginPath()
+    context.moveTo(x, xAxisY)
+    context.lineTo(x, margins.top)
+    context.stroke()
+
+    context.textAlign = 'center'
+    context.textBaseline = 'top'
+    context.font = 'bold 10px Roboto'
+    context.fillText(String(xTick), x, xAxisY + 3)
+  }
+
+  for (const yTick of yTicks) {
+    const y = yScale(yTick) + margins.top
+
+    context.beginPath()
+    context.moveTo(margins.left, y)
+    context.lineTo(width - margins.right, y)
+    context.stroke()
+
+    context.textAlign = 'end'
+    context.textBaseline = 'middle'
+    context.font = 'bold 10px Roboto'
+    context.fillText(String(yTick), margins.left - 8, y)
+  }
+}
+
+const extent = (xss: Array<Float32Array | Float64Array>): [number, number] => {
   const extents = []
 
   for (const xs of xss) {
-    extents.push(...extent(xs))
+    extents.push(...extentOne(xs))
   }
 
-  const [d0, d1] = extent(extents)
-  const range = [startMargin, size - endMargin]
+  return extentOne(extents)
+}
 
-  if (reverse) {
-    range.reverse()
-  }
+export const calculateDomains = (
+  ts: Timeseries[]
+): [[number, number], [number, number]] => {
+  const timess = ts.map(([times]) => times)
+  const valuess = ts.map(([_, values]) => values)
+  const xDomain = extent(timess)
+  const yDomain = extent(valuess)
 
-  const [r0, r1] = range
-  const m = (r1 - r0) / (d1 - d0)
-  const b = r0 - m * d0
+  return [xDomain, yDomain]
+}
 
-  return x => m * x + b
+export const createScale = (
+  domain: [number, number],
+  range: [number, number],
+  paddingRatio: number = 0
+): Scale => {
+  const [d0, d1] = domain
+  const padding = (d1 - d0) * paddingRatio
+
+  return scaleLinear()
+    .domain([d0 - padding, d1 + padding])
+    .range(range)
+}
+
+export const timeTicks = (
+  t0: number,
+  t1: number,
+  x0: number,
+  x1: number
+): number[] => {
+  return scaleUtc()
+    .domain([t0, t1])
+    .range([x0, x1])
+    .ticks(4)
+    .map(d => d.valueOf())
 }
