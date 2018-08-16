@@ -73,7 +73,9 @@ export class DataExplorer extends PureComponent<Props, State> {
   public async componentDidMount() {
     const {source, autoRefresh, handleGetDashboards} = this.props
     const {query} = qs.parse(location.search, {ignoreQueryPrefix: true})
-    await handleGetDashboards()
+    if (!this.props.dashboards.length) {
+      await handleGetDashboards()
+    }
 
     AutoRefresh.poll(autoRefresh)
 
