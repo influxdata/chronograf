@@ -3,6 +3,7 @@
 ### Features
 1.  [#4217](https://github.com/influxdata/chronograf/pull/4217): Add filestore backed API for protodashboards
 1.  [#4220](https://github.com/influxdata/chronograf/pull/4220): Add ability to copy expanded/untruncated log message
+1.  [#4228](https://github.com/influxdata/chronograf/pull/4228): Add close button for logs pop over
 
 ### UI Improvements
 
