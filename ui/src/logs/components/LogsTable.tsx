@@ -7,6 +7,7 @@ import {color} from 'd3-color'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import ExpandableMessage from 'src/logs/components/expandable_message/ExpandableMessage'
+import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
 import {getDeep} from 'src/utils/wrappers'
 
 import {colorForSeverity} from 'src/logs/utils/colors'
@@ -31,7 +32,7 @@ import {
   SeverityLevelOptions,
 } from 'src/logs/constants'
 
-import {TimeRange} from 'src/types'
+import {TimeRange, NotificationAction} from 'src/types'
 import {
   TableData,
   LogsTableColumn,
@@ -64,6 +65,7 @@ interface Props {
   }
   onExpandMessage: () => void
   onChooseCustomTime: (time: string) => void
+  notify: NotificationAction
 }
 
 interface State {
@@ -542,13 +544,8 @@ class LogsTable extends Component<Props, State> {
       title = formattedValue
     }
 
-    if (column === 'message' && this.props.isTruncated) {
-      formattedValue = (
-        <ExpandableMessage
-          formattedValue={formattedValue}
-          onExpand={this.props.onExpandMessage}
-        />
-      )
+    if (column === 'message') {
+      formattedValue = this.renderMessage(formattedValue as string)
     }
 
     const highlightRow = rowIndex === this.state.currentRow
@@ -621,6 +618,22 @@ class LogsTable extends Component<Props, State> {
         {formattedValue}
       </div>
     )
+  }
+
+  private renderMessage = (formattedValue: string): JSX.Element => {
+    const {notify} = this.props
+
+    if (this.props.isTruncated) {
+      return (
+        <ExpandableMessage
+          notify={notify}
+          formattedValue={formattedValue}
+          onExpand={this.props.onExpandMessage}
+        />
+      )
+    }
+
+    return <LogsMessage notify={notify} formattedValue={formattedValue} />
   }
 
   private severityDotStyle = (
