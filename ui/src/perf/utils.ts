@@ -1,9 +1,10 @@
 import uuid from 'uuid'
 import {range, extent as extentOne} from 'd3-array'
-import {line} from 'd3-shape'
+import {line, curveLinear, curveStep, curveMonotoneX} from 'd3-shape'
 import {scaleLinear, scaleUtc} from 'd3-scale'
+import {DateTime} from 'luxon'
 
-import {Scale, Margins, Timeseries} from 'src/perf/types'
+import {Scale, Timeseries, VisDimensions} from 'src/perf/types'
 
 export const clearCanvas = (
   canvas: HTMLCanvasElement,
@@ -68,17 +69,27 @@ export const buildLayout = (
   return layout
 }
 
+const curveFactories = {
+  Linear: curveLinear,
+  Step: curveStep,
+  Smooth: curveMonotoneX,
+}
+
 export const drawLine = (
   context: CanvasRenderingContext2D,
-  xScale: Scale,
-  yScale: Scale,
   xs: Float32Array | Float64Array,
-  ys: Float32Array | Float64Array
+  ys: Float32Array | Float64Array,
+  dimensions: VisDimensions,
+  curvePreference: string
 ) => {
+  const {xScale, yScale, width} = dimensions
+  const xDensity = width / xs.length // px per point
+  const curve = xDensity < 1 ? curveLinear : curveFactories[curvePreference]
   const is = range(0, xs.length)
   const plotter = line()
     .x(i => xScale(xs[i]))
     .y(i => yScale(ys[i]))
+    .curve(curve)
     .context(context)
 
   context.beginPath()
@@ -88,14 +99,19 @@ export const drawLine = (
 
 export const drawAxes = (
   context: CanvasRenderingContext2D,
-  xScale: Scale,
-  yScale: Scale,
+  visDimensions: VisDimensions,
   xTicks: number[],
-  yTicks: number[],
-  width: number,
-  height: number,
-  margins: Margins
+  yTicks: number[]
 ) => {
+  const {
+    xScale,
+    yScale,
+    width,
+    height,
+    margins,
+    xTickFormatter,
+    yTickFormatter,
+  } = visDimensions
   const xAxisY = height - margins.bottom
 
   context.beginPath()
@@ -119,7 +135,7 @@ export const drawAxes = (
     context.textAlign = 'center'
     context.textBaseline = 'top'
     context.font = 'bold 10px Roboto'
-    context.fillText(String(xTick), x, xAxisY + 3)
+    context.fillText(xTickFormatter(xTick), x, xAxisY + 5)
   }
 
   for (const yTick of yTicks) {
@@ -133,9 +149,30 @@ export const drawAxes = (
     context.textAlign = 'end'
     context.textBaseline = 'middle'
     context.font = 'bold 10px Roboto'
-    context.fillText(String(yTick), margins.left - 8, y)
+    context.fillText(yTickFormatter(yTick), margins.left - 8, y)
   }
 }
+
+const dateTimeFormatForDuration = (ms: number): string => {
+  if (ms < 1000) {
+    return 'HH::mm:ss.SSS'
+  } else if (ms < 1000 * 60 * 60 * 24) {
+    return 'HH::mm:ss'
+  } else if (ms < 1000 * 60 * 60 * 24 * 30) {
+    return 'D HH:mm ZZZZ'
+  } else {
+    return 'D HH:mm ZZZZ'
+  }
+}
+
+export const formatTimeTick = (
+  t: number,
+  tz: String,
+  [d0, d1]: [number, number]
+): string =>
+  DateTime.fromMillis(t, {zone: tz}).toFormat(
+    dateTimeFormatForDuration(d1 - d0)
+  )
 
 const extent = (xss: Array<Float32Array | Float64Array>): [number, number] => {
   const extents = []
@@ -180,6 +217,6 @@ export const timeTicks = (
   return scaleUtc()
     .domain([t0, t1])
     .range([x0, x1])
-    .ticks(4)
+    .ticks(3)
     .map(d => d.valueOf())
 }

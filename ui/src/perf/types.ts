@@ -49,6 +49,8 @@ export interface VisDimensions {
   yDomain: [number, number]
   xScale: Scale
   yScale: Scale
+  xTickFormatter: (x: number) => string
+  yTickFormatter: (y: number) => string
   width: number
   height: number
 }

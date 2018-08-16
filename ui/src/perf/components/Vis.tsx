@@ -10,6 +10,7 @@ import {
   createScale,
   calculateDomains,
   timeTicks,
+  formatTimeTick,
 } from 'src/perf/utils'
 
 import {VisDimensions} from 'src/perf/types'
@@ -18,6 +19,8 @@ interface Props {
   queryManager: QueryManager
   width: number
   height: number
+  timezone: string
+  curve: string
 }
 
 interface State {
@@ -57,13 +60,20 @@ class Vis extends PureComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps) {
-    const {width: prevWidth, height: prevHeight} = prevProps
-    const {queryManager, width, height} = this.props
+    const {queryManager, width, height, timezone, curve} = this.props
+    const {
+      width: prevWidth,
+      height: prevHeight,
+      timezone: prevTimezone,
+      curve: prevCurve,
+    } = prevProps
 
     const dimensionsChanged = prevWidth !== width || prevHeight !== height
+    const timezoneChanged = prevTimezone !== timezone
     const haveData = !!queryManager.getRawTimeseries()
+    const curveChanged = prevCurve !== curve
 
-    if (dimensionsChanged && haveData) {
+    if ((curveChanged || timezoneChanged || dimensionsChanged) && haveData) {
       this.debouncer.call(this.simplify, SIMPLIFICATION_DEBOUNCE_TIME)
       this.setState({dimensions: this.calculateDimensions()}, this.renderCanvas)
     }
@@ -88,20 +98,21 @@ class Vis extends PureComponent<Props, State> {
       return
     }
 
-    const {xScale, yScale, margins, width, height} = dimensions
+    const {width, height} = dimensions
     const xTicks = this.xTicks()
     const yTicks = this.yTicks()
+    const {curve} = this.props
     const context = canvas.getContext('2d')
 
     clearCanvas(canvas, width, height)
 
     context.strokeStyle = AXES_COLOR
     context.fillStyle = LABEL_COLOR
-    drawAxes(context, xScale, yScale, xTicks, yTicks, width, height, margins)
+    drawAxes(context, dimensions, xTicks, yTicks)
 
     for (const [times, values] of data) {
       context.strokeStyle = LINE_COLOR
-      drawLine(context, xScale, yScale, times, values)
+      drawLine(context, times, values, dimensions, curve)
     }
   }
 
@@ -116,10 +127,12 @@ class Vis extends PureComponent<Props, State> {
   }
 
   private calculateDimensions(): VisDimensions {
-    const {width, height, queryManager} = this.props
+    const {width, height, queryManager, timezone} = this.props
     const margins = {top: 10, right: 10, bottom: 15, left: 30}
     const timeseries = queryManager.getRawTimeseries()
     const [xDomain, yDomain] = fastCalculateDomains(timeseries)
+    const xTickFormatter = x => formatTimeTick(x, timezone, xDomain)
+    const yTickFormatter = y => String(y)
     const xScale = createScale(xDomain, [margins.left, width - margins.right])
     const yScale = createScale(
       yDomain,
@@ -127,7 +140,17 @@ class Vis extends PureComponent<Props, State> {
       VALUE_SCALE_PADDING
     )
 
-    return {width, height, margins, xDomain, yDomain, xScale, yScale}
+    return {
+      width,
+      height,
+      margins,
+      xDomain,
+      yDomain,
+      xTickFormatter,
+      yTickFormatter,
+      xScale,
+      yScale,
+    }
   }
 
   private simplify = () => {

@@ -38,11 +38,27 @@
   height: 30px;
   background: $g4-onyx;
   cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 5px;
+
+  .button {
+    background: none;
+    border: none;
+  }
 }
 
 .perf-cell--body {
   height: calc(100% - 30px);
   width: 100%;
+  position: relative;
+
+  .perf-cell--vis, .perf-cell--settings {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 
 .perf-cell--dygraph-container {
@@ -69,4 +85,30 @@
 
 .perf-cell--vis {
   padding: 20px;
+}
+
+.perf-cell--settings {
+  background: rgba(41, 41, 51, 0.97);  // $g3-castle
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.perf-cell--setting {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  label {
+    margin-right: 10px;
+    width: 100px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 13px;
+    padding-bottom: 2px;
+  }
 }

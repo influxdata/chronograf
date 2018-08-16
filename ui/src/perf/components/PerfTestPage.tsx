@@ -121,7 +121,7 @@ class PerfTestPage extends PureComponent<Props, State> {
               selectedID={interval}
               onChange={this.handleChangeInterval}
             >
-              {['1s', '10s', '30s', '1m', '30m', '1h', '6h', '12h', '1d'].map(
+              {['2s', '10s', '30s', '1m', '30m', '1h', '6h', '12h', '1d'].map(
                 i => (
                   <Dropdown.Item key={i} id={i} value={i}>
                     {i}
@@ -136,7 +136,7 @@ class PerfTestPage extends PureComponent<Props, State> {
             className="layout"
             layout={layout}
             cols={12}
-            rowHeight={50}
+            rowHeight={60}
             measureBeforeMount={true}
             draggableHandle={'.perf-test-page--draggable'}
           >
