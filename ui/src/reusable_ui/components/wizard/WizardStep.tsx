@@ -2,7 +2,6 @@
 import React, {PureComponent, ReactNode} from 'react'
 
 // Components
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -40,14 +39,9 @@ class WizardStep extends PureComponent<WizardStepProps> {
 
     return (
       <>
-        <FancyScrollbar
-          className="wizard-step-content"
-          maxHeight={400}
-          autoHeight={true}
-          autoHide={false}
-        >
-          <div className="wizard-step-child">{children}</div>
-        </FancyScrollbar>
+        <div className="wizard-step--container">
+          <div className="wizard-step--child">{children}</div>
+        </div>
         <WizardButtonBar
           decrement={decrement}
           nextLabel={nextLabel}

@@ -5,10 +5,10 @@
 
 .wizard-container {
   padding: 30px;
-  display: flex;
+  display: inline-flex;
   border-radius: $radius;
-  max-height: 60vh;
   min-width: 800px;
+  max-width: 1200px;
   background-color: $g1-raven;
 }
 
