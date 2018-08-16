@@ -566,7 +566,8 @@ func TestServer(t *testing.T) {
       "decimalPlaces":{
         "isEnforced": false,
         "digits": 0
-      },
+			},
+			"note": "",
       "links": {
         "self": "/chronograf/v1/dashboards/1000/cells/8f61c619-dd9b-4761-8aa8-577f27247093"
       }
@@ -825,7 +826,8 @@ func TestServer(t *testing.T) {
           "decimalPlaces":{
             "isEnforced": false,
             "digits": 0
-          },
+					},
+					"note": "",
           "links": {
             "self": "/chronograf/v1/dashboards/1000/cells/8f61c619-dd9b-4761-8aa8-577f27247093"
           }

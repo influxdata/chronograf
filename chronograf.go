@@ -631,6 +631,7 @@ type DashboardCell struct {
 	FieldOptions  []RenamableField `json:"fieldOptions"`
 	TimeFormat    string           `json:"timeFormat"`
 	DecimalPlaces DecimalPlaces    `json:"decimalPlaces"`
+	Note          string           `json:"note"`
 }
 
 // RenamableField is a column/row field in a DashboardCell of type Table

@@ -312,6 +312,8 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			}
 		}
 
+		note := c.Note
+
 		cells[i] = &DashboardCell{
 			ID:      c.ID,
 			X:       c.X,
@@ -331,6 +333,7 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			FieldOptions:  fieldOptions,
 			TimeFormat:    c.TimeFormat,
 			DecimalPlaces: decimalPlaces,
+			Note:          note,
 		}
 	}
 	templates := make([]*Template, len(d.Templates))
@@ -489,6 +492,8 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			decimalPlaces.Digits = 2
 		}
 
+		note := c.Note
+
 		// FIXME: this is merely for legacy cells and
 		//        should be removed as soon as possible
 		cellType := c.Type
@@ -512,6 +517,7 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			FieldOptions:  fieldOptions,
 			TimeFormat:    c.TimeFormat,
 			DecimalPlaces: decimalPlaces,
+			Note:          note,
 		}
 	}
 

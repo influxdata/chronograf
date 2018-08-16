@@ -42,6 +42,7 @@ message DashboardCell {
 	repeated RenamableField fieldOptions = 13; // Options for each of the fields returned in a cell
 	string timeFormat                    = 14; // format for time
 	DecimalPlaces decimalPlaces          = 15; // Represents how precise the values of this field should be
+	string note                          = 16; // arbitrary string for note-taking/making
 }
 
 message DecimalPlaces {
