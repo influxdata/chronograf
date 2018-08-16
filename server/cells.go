@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/bouk/httprouter"
@@ -73,6 +74,8 @@ func ValidDashboardCellRequest(c *chronograf.DashboardCell) error {
 	if c == nil {
 		return fmt.Errorf("Chronograf dashboard cell was nil")
 	}
+
+	EscapeNoteHTML(c)
 
 	CorrectWidthHeight(c)
 	for _, q := range c.Queries {
@@ -185,6 +188,12 @@ func AddQueryConfig(c *chronograf.DashboardCell) {
 		q.QueryConfig = qc
 		c.Queries[i] = q
 	}
+}
+
+// EscapeNoteHTML html escapes a cell note to help prevent XSS attacks since
+// a note is an arbitrary, user-inputted string rendered to the DOM
+func EscapeNoteHTML(c *chronograf.DashboardCell) {
+	c.Note = template.HTMLEscapeString(c.Note)
 }
 
 // DashboardCells returns all cells from a dashboard within the store

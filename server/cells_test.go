@@ -974,3 +974,27 @@ func TestHasCorrectLegend(t *testing.T) {
 		})
 	}
 }
+
+func TestEscapeNoteHTML(t *testing.T) {
+	tests := []struct {
+		name string
+		c    *chronograf.DashboardCell
+		want string
+	}{
+		{
+			name: "escapes note html",
+			c: &chronograf.DashboardCell{
+				Note: "<script>performMalice('danger');</script>",
+			},
+			want: `&lt;script&gt;performMalice(&#39;danger&#39;);&lt;/script&gt;`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			EscapeNoteHTML(tt.c)
+			if tt.c.Note != tt.want {
+				t.Errorf("EscapeNoteHTML(): got\n**%v**\n, want\n**%v**\n", tt.c.Note, tt.want)
+			}
+		})
+	}
+}
