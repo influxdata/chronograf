@@ -107,6 +107,7 @@ class SourceStep extends PureComponent<Props, State> {
           label="Connection URL"
           onChange={this.onChangeInput('url')}
           valueModifier={this.URLModifier}
+          onSubmit={this.syncHostnames}
         />
         <WizardTextInput
           value={source.name}
@@ -204,6 +205,20 @@ class SourceStep extends PureComponent<Props, State> {
     const {setError} = this.props
     this.setState({source: {...source, [key]: value}})
     setError(false)
+  }
+
+  private syncHostnames = (sourceURLstring: string) => {
+    if (this.isEnterprise) {
+      if (sourceURLstring) {
+        const sourceURL = new URL(sourceURLstring)
+        const {source} = this.state
+        const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
+        if (sourceURL.hostname) {
+          metaserviceURL.hostname = sourceURL.hostname
+          this.onChangeInput('metaUrl')(metaserviceURL.href)
+        }
+      }
+    }
   }
 
   private get isNewSource(): boolean {

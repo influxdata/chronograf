@@ -13,6 +13,7 @@ interface Props {
   isDisabled?: boolean
   onChange: (value: string) => void
   valueModifier?: (value: string) => string
+  onSubmit?: (value: string) => void
   placeholder?: string
   autoFocus?: boolean
   type?: string
@@ -34,6 +35,7 @@ class WizardTextInput extends PureComponent<Props, State> {
     valueModifier: x => x,
     autoFocus: false,
     type: 'text',
+    onSubmit: () => null,
   }
 
   constructor(props) {
@@ -105,8 +107,9 @@ class WizardTextInput extends PureComponent<Props, State> {
   }
 
   private submit = incomingValue => {
-    const {onChange, value, valueModifier} = this.props
+    const {onChange, value, valueModifier, onSubmit} = this.props
     const newValue = valueModifier(incomingValue)
+    onSubmit(newValue)
 
     if (value !== newValue) {
       onChange(newValue)
