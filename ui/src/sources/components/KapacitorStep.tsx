@@ -58,10 +58,15 @@ const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
 }
 
 const syncHostnames = (source: Source, kapacitor: Kapacitor) => {
-  const sourceURL = new URL(source.url)
-  const kapacitorURL = new URL(kapacitor.url)
-  kapacitorURL.hostname = sourceURL.hostname
-  return {...kapacitor, url: kapacitorURL.href}
+  if (source && source.url) {
+    const sourceURL = new URL(source.url)
+    const kapacitorURL = new URL(kapacitor.url)
+    if (sourceURL.hostname) {
+      kapacitorURL.hostname = sourceURL.hostname
+      return {...kapacitor, url: kapacitorURL.href}
+    }
+  }
+  return kapacitor
 }
 
 @ErrorHandling

@@ -209,11 +209,15 @@ class SourceStep extends PureComponent<Props, State> {
 
   private syncHostnames = (sourceURLstring: string) => {
     if (this.isEnterprise) {
-      const sourceURL = new URL(sourceURLstring)
-      const {source} = this.state
-      const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
-      metaserviceURL.hostname = sourceURL.hostname
-      this.onChangeInput('metaUrl')(metaserviceURL.href)
+      if (sourceURLstring) {
+        const sourceURL = new URL(sourceURLstring)
+        const {source} = this.state
+        const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
+        if (sourceURL.hostname) {
+          metaserviceURL.hostname = sourceURL.hostname
+          this.onChangeInput('metaUrl')(metaserviceURL.href)
+        }
+      }
     }
   }
 
