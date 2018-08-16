@@ -84,6 +84,8 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   timeRange: QueriesModels.TimeRange
   zoomedTimeRange: QueriesModels.TimeRange
   inPresentationMode: boolean
+  showTemplateVariableControlBar: boolean
+  toggleTemplateVariableControlBar: typeof appActions.toggleTemplateVariableControlBar
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   cellQueryStatus: {
     queryID: string
@@ -126,7 +128,6 @@ interface State {
   windowHeight: number
   selectedCell: DashboardsModels.Cell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
-  showTempVarControls: boolean
   showAnnotationControls: boolean
 }
 
@@ -141,7 +142,6 @@ class DashboardPage extends Component<Props, State> {
       windowHeight: window.innerHeight,
       dashboardLinks: EMPTY_LINKS,
       showAnnotationControls: false,
-      showTempVarControls: false,
     }
   }
 
@@ -217,10 +217,12 @@ class DashboardPage extends Component<Props, State> {
       thresholdsListType,
       thresholdsListColors,
       inPresentationMode,
+      showTemplateVariableControlBar,
       handleChooseAutoRefresh,
       handleShowCellEditorOverlay,
       handleHideCellEditorOverlay,
       handleClickPresentationButton,
+      toggleTemplateVariableControlBar,
     } = this.props
     const low = zoomedLower || lower
     const up = zoomedUpper || upper
@@ -267,11 +269,7 @@ class DashboardPage extends Component<Props, State> {
       templatesIncludingDashTime = []
     }
 
-    const {
-      dashboardLinks,
-      showTempVarControls,
-      showAnnotationControls,
-    } = this.state
+    const {dashboardLinks, showAnnotationControls} = this.state
 
     return (
       <div className="page dashboard-page">
@@ -307,15 +305,15 @@ class DashboardPage extends Component<Props, State> {
           dashboardLinks={dashboardLinks}
           activeDashboard={dashboard ? dashboard.name : ''}
           showAnnotationControls={showAnnotationControls}
-          showTempVarControls={showTempVarControls}
+          showTempVarControls={showTemplateVariableControlBar}
           handleChooseAutoRefresh={handleChooseAutoRefresh}
           handleChooseTimeRange={this.handleChooseTimeRange}
-          onToggleShowTempVarControls={this.toggleTempVarControls}
+          onToggleShowTempVarControls={toggleTemplateVariableControlBar}
           onToggleShowAnnotationControls={this.toggleAnnotationControls}
           handleClickPresentationButton={handleClickPresentationButton}
         />
         {!inPresentationMode &&
-          showTempVarControls && (
+          showTemplateVariableControlBar && (
             <TemplateControlBar
               templates={dashboard && dashboard.templates}
               meRole={meRole}
@@ -526,10 +524,6 @@ class DashboardPage extends Component<Props, State> {
     }
   }
 
-  private toggleTempVarControls = () => {
-    this.setState({showTempVarControls: !this.state.showTempVarControls})
-  }
-
   private toggleAnnotationControls = () => {
     this.setState({showAnnotationControls: !this.state.showAnnotationControls})
   }
@@ -572,7 +566,7 @@ const mstp = (state, {params: {dashboardID}}) => {
   const {
     app: {
       ephemeral: {inPresentationMode},
-      persisted: {autoRefresh},
+      persisted: {autoRefresh, showTemplateVariableControlBar},
     },
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
@@ -618,6 +612,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     thresholdsListColors,
     gaugeColors,
     lineColors,
+    showTemplateVariableControlBar,
   }
 }
 
@@ -634,6 +629,7 @@ const mdtp = {
   cloneDashboardCellAsync: dashboardActions.cloneDashboardCellAsync,
   deleteDashboardCellAsync: dashboardActions.deleteDashboardCellAsync,
   templateVariableLocalSelected: dashboardActions.templateVariableLocalSelected,
+  toggleTemplateVariableControlBar: appActions.toggleTemplateVariableControlBar,
   getDashboardWithTemplatesAsync:
     dashboardActions.getDashboardWithTemplatesAsync,
   rehydrateTemplatesAsync: dashboardActions.rehydrateTemplatesAsync,

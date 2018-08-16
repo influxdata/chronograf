@@ -18,6 +18,7 @@
 
 ### Bug Fixes
 1.  [#4231](https://github.com/influxdata/chronograf/pull/4231): Fix notifying user to press ESC to exit presentation mode
+1.  [#4234](https://github.com/influxdata/chronograf/pull/4234): Fix persisting whether or not template variable control bar is open
 
 ## v1.6.1 [2018-08-02]
 

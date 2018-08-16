@@ -1,6 +1,9 @@
 import {combineReducers} from 'redux'
 
-import {AUTOREFRESH_DEFAULT} from 'src/shared/constants'
+import {
+  AUTOREFRESH_DEFAULT,
+  SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
+} from 'src/shared/constants'
 import {ActionTypes, Action} from 'src/types/actions/app'
 
 interface State {
@@ -9,6 +12,7 @@ interface State {
   }
   persisted: {
     autoRefresh: number
+    showTemplateVariableControlBar: boolean
   }
 }
 
@@ -18,6 +22,7 @@ const initialState: State = {
   },
   persisted: {
     autoRefresh: AUTOREFRESH_DEFAULT,
+    showTemplateVariableControlBar: SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
   },
 }
 
@@ -59,6 +64,14 @@ const appPersistedReducer = (
       return {
         ...state,
         autoRefresh: action.payload.milliseconds,
+      }
+    }
+
+    case ActionTypes.ToggleTemplateVariableControlBar: {
+      const update = !state.showTemplateVariableControlBar
+      return {
+        ...state,
+        showTemplateVariableControlBar: update,
       }
     }
 

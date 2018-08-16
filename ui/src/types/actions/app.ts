@@ -4,7 +4,7 @@ export enum ActionTypes {
   EnablePresentationMode = 'ENABLE_PRESENTATION_MODE',
   DisablePresentationMode = 'DISABLE_PRESENTATION_MODE',
   SetAutoRefresh = 'SET_AUTOREFRESH',
-  TemplateControlBarVisibilityToggled = 'TemplateControlBarVisibilityToggledAction',
+  ToggleTemplateVariableControlBar = 'TOGGLE_TEMPLATE_VARIABLE_CONTROL_BAR',
   Noop = 'NOOP',
 }
 
@@ -12,6 +12,7 @@ export type Action =
   | EnablePresentationModeAction
   | DisablePresentationModeAction
   | SetAutoRefreshAction
+  | ToggleTemplateVariableControlBarAction
 
 export type EnablePresentationModeActionCreator = () => EnablePresentationModeAction
 
@@ -21,6 +22,10 @@ export interface EnablePresentationModeAction {
 
 export interface DisablePresentationModeAction {
   type: ActionTypes.DisablePresentationMode
+}
+
+export interface ToggleTemplateVariableControlBarAction {
+  type: ActionTypes.ToggleTemplateVariableControlBar
 }
 
 export type DelayEnablePresentationModeDispatcher = () => DelayEnablePresentationModeThunk
