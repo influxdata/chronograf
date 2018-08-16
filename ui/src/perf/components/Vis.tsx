@@ -157,7 +157,7 @@ class Vis extends PureComponent<Props, State> {
     const {queryManager} = this.props
     const {dimensions} = this.state
 
-    queryManager.simplify(dimensions.xScale, dimensions.yScale)
+    queryManager.simplify(dimensions)
   }
 
   private yTicks(): number[] {

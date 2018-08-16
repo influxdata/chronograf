@@ -54,7 +54,7 @@ export const buildLayout = (
   const layout: any = []
 
   for (let i = 0; i < numGraphs; i++) {
-    const query = `SELECT mean("value") FROM "stress"."autogen"."cpu" WHERE time > '2010-01-01' AND time < '2010-01-12' AND "host"='server-${i}' GROUP BY time(${interval}), host`
+    const query = `SELECT mean("value") FROM "stress"."autogen"."cpu" WHERE time > '2010-01-02' AND time < '2010-01-07' AND "host"='server-${i}' GROUP BY time(${interval}), host`
 
     layout.push({
       query,
@@ -214,9 +214,11 @@ export const timeTicks = (
   x0: number,
   x1: number
 ): number[] => {
+  const numTicks = x1 - x0 < 550 ? 2 : 4
+
   return scaleUtc()
     .domain([t0, t1])
     .range([x0, x1])
-    .ticks(3)
+    .ticks(numTicks)
     .map(d => d.valueOf())
 }

@@ -121,13 +121,11 @@ class PerfTestPage extends PureComponent<Props, State> {
               selectedID={interval}
               onChange={this.handleChangeInterval}
             >
-              {['2s', '10s', '30s', '1m', '30m', '1h', '6h', '12h', '1d'].map(
-                i => (
-                  <Dropdown.Item key={i} id={i} value={i}>
-                    {i}
-                  </Dropdown.Item>
-                )
-              )}
+              {['2s', '10s', '30s', '1m', '30m', '1h', '6h', '12h'].map(i => (
+                <Dropdown.Item key={i} id={i} value={i}>
+                  {i}
+                </Dropdown.Item>
+              ))}
             </Dropdown>
           </div>
         </div>
