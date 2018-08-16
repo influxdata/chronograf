@@ -54,10 +54,12 @@
   width: 100%;
   position: relative;
 
-  .perf-cell--vis, .perf-cell--settings {
+  .perf-cell--vis-container, .perf-cell--settings {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 
@@ -72,6 +74,10 @@
   }
 }
 
+.perf-cell--vis-container {
+  padding: 20px;
+}
+
 .perf-loading {
   width: 100%;
   height: 100%;
@@ -81,10 +87,6 @@
   color: $g14-chromium;
   font-size: 18px;
   padding-bottom: 20px;
-}
-
-.perf-cell--vis {
-  padding: 20px;
 }
 
 .perf-cell--settings {

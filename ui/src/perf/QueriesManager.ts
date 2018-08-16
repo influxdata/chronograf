@@ -61,6 +61,10 @@ class QueriesManager {
       const queryManager = this.requests[msg.id]
       const times = decodeRunLengthEncodedTimes(startTime, timeDelta, timeCount)
 
+      if (msg.done) {
+        console.log(`${Date.now()}\treceived data\t${msg.id.slice(0, 6)}`)
+      }
+
       queryManager.addColumnData('time', times, msg.done)
 
       return
@@ -75,6 +79,11 @@ class QueriesManager {
 
   private handleDataMessage = (buf: ArrayBuffer) => {
     const {column, requestID, requestDone} = this.lastMetadata
+
+    if (requestDone) {
+      console.log(`${Date.now()}\treceived data\t${requestID.slice(0, 6)}`)
+    }
+
     const queryManager = this.requests[requestID]
 
     let data

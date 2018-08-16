@@ -112,24 +112,24 @@ type queryResult struct {
 	err  error
 }
 
+func logEvent(message string, id string) {
+	fmt.Printf("%f\t%s\t%s\n", float64(time.Now().UnixNano())/1e6, message, id[0:6])
+}
+
 func performQuery(id string, query string, done chan<- queryResult) {
-	start := time.Now()
+	logEvent("running query", id)
 
 	q := client.NewQuery(query, "stress", "ns")
 	resp, err := influxClient.Query(q)
+	logEvent("ran query", id)
 
 	if err != nil {
 		done <- queryResult{id: id, err: err}
 		return
 	}
 
-	fmt.Printf("Fetched data in %s\n", time.Since(start))
-
-	start = time.Now()
-
+	logEvent("serializing data", id)
 	columns, err := toColumns(resp)
-
-	fmt.Printf("Columnized data in %s\n", time.Since(start))
 
 	if err != nil {
 		done <- queryResult{id: id, err: err}

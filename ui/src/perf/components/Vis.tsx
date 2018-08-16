@@ -80,13 +80,24 @@ class Vis extends PureComponent<Props, State> {
   }
 
   public render() {
+    const {width, height} = this.props
     const {isLoading} = this.state
 
+    const style = {width: `${width}px`, height: `${height}px`}
+
     if (isLoading) {
-      return <div className="perf-loading">Loading...</div>
+      return (
+        <div className="perf-cell-vis" style={style}>
+          <div className="perf-loading">Loading...</div>
+        </div>
+      )
     }
 
-    return <canvas ref={this.canvas} />
+    return (
+      <div className="perf-cell-vis" style={style}>
+        <canvas ref={this.canvas} />
+      </div>
+    )
   }
 
   private renderCanvas() {
@@ -114,6 +125,8 @@ class Vis extends PureComponent<Props, State> {
       context.strokeStyle = LINE_COLOR
       drawLine(context, times, values, dimensions, curve)
     }
+
+    console.log(`${Date.now()}\trendered graph`)
   }
 
   private handleQueryManagerEvent = (e: Event) => {

@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {ParentSize} from '@vx/responsive'
+import {AutoSizer} from 'react-virtualized'
 
 import Vis from 'src/perf/components/Vis'
 import {
@@ -56,17 +56,19 @@ class NewCell extends PureComponent<Props, State> {
           />
         </div>
         <div className="perf-cell--body">
-          <ParentSize className="perf-cell--vis" debounceTime={0}>
-            {({width, height}) => (
-              <Vis
-                queryManager={queryManager}
-                width={width}
-                height={height}
-                timezone={timezone}
-                curve={curve}
-              />
-            )}
-          </ParentSize>
+          <div className="perf-cell--vis-container">
+            <AutoSizer>
+              {({width, height}) => (
+                <Vis
+                  queryManager={queryManager}
+                  width={width}
+                  height={height}
+                  timezone={timezone}
+                  curve={curve}
+                />
+              )}
+            </AutoSizer>
+          </div>
           {isEditing && (
             <div className="perf-cell--settings">
               <div className="perf-cell--setting">
