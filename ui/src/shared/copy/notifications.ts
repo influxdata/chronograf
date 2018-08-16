@@ -770,15 +770,21 @@ export const validateSuccess = (): Notification => ({
   message: 'No errors found. Happy Happy Joy Joy!',
 })
 
-export const notifyCopyToClipboardSuccess = (text: string): Notification => ({
+export const notifyCopyToClipboardSuccess = (
+  text: string,
+  title: string = ''
+): Notification => ({
   ...defaultSuccessNotification,
   icon: 'dash-h',
-  message: `'${text}' has been copied to clipboard.`,
+  message: `${title}'${text}' has been copied to clipboard.`,
 })
 
-export const notifyCopyToClipboardFailed = (text: string): Notification => ({
+export const notifyCopyToClipboardFailed = (
+  text: string,
+  title: string = ''
+): Notification => ({
   ...defaultErrorNotification,
-  message: `'${text}' was not copied to clipboard.`,
+  message: `${title}'${text}' was not copied to clipboard.`,
 })
 
 // Service notifications

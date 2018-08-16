@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 
 import {searchToFilters} from 'src/logs/utils/search'
+import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
@@ -46,7 +47,8 @@ import {
   SEVERITY_SORTING_ORDER,
   SECONDS_TO_MS,
 } from 'src/logs/constants'
-import {Source, Namespace} from 'src/types'
+
+import {Source, Namespace, NotificationAction} from 'src/types'
 
 import {
   HistogramData,
@@ -90,6 +92,7 @@ interface Props {
   changeFilter: (id: string, operator: string, value: string) => void
   getConfig: (url: string) => Promise<void>
   updateConfig: (url: string, config: LogConfig) => Promise<void>
+  notify: NotificationAction
   newRowsAdded: number
   timeRange: TimeRange
   histogramData: HistogramData
@@ -179,7 +182,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   public render() {
-    const {filters, queryCount, timeRange} = this.props
+    const {filters, queryCount, timeRange, notify} = this.props
 
     return (
       <>
@@ -214,6 +217,7 @@ class LogsPage extends Component<Props, State> {
               tableInfiniteData={this.props.tableInfiniteData}
               onChooseCustomTime={this.handleChooseCustomTime}
               onExpandMessage={this.handleExpandMessage}
+              notify={notify}
             />
           </div>
         </div>
@@ -725,6 +729,7 @@ const mapDispatchToProps = {
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,
   updateConfig: updateLogConfigAsync,
+  notify: notifyAction,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LogsPage)

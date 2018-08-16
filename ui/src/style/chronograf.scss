@@ -77,6 +77,9 @@
 @import 'components/histogram-chart';
 @import 'components/import-dashboard-mappings';
 
+@import '../logs/components/expandable_message/ExpandableMessage';
+@import '../logs/components/logs_message/LogsMessage';
+
 // Pages
 @import 'pages/config-endpoints';
 @import 'pages/signup';

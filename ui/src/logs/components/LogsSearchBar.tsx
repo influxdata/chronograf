@@ -24,20 +24,20 @@ class LogsSearchBar extends PureComponent<Props, State> {
       <div className="logs-viewer--search-bar">
         <div className="logs-viewer--search-input">
           <input
+            className="form-control input-sm"
             type="text"
             placeholder="Search logs using keywords or regular expressions..."
             value={searchTerm}
             onChange={this.handleChange}
             onKeyDown={this.handleInputKeyDown}
-            className="form-control input-sm"
             spellCheck={false}
             autoComplete="off"
           />
           <span className="icon search" />
         </div>
-        <button className="btn btn-sm btn-default" onClick={this.handleSearch}>
+        <div className="btn btn-sm btn-primary" onClick={this.handleSearch}>
           Search
-        </button>
+        </div>
       </div>
     )
   }

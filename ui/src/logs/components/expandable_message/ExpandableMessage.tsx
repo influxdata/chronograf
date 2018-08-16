@@ -2,6 +2,9 @@ import React, {Component} from 'react'
 
 import './ExpandableMessage.scss'
 import {ClickOutside} from 'src/shared/components/ClickOutside'
+import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
+
+import {NotificationAction} from 'src/types'
 
 interface State {
   expanded: boolean
@@ -9,6 +12,7 @@ interface State {
 
 interface Props {
   formattedValue: string | JSX.Element
+  notify: NotificationAction
   onExpand?: () => void
 }
 
@@ -21,6 +25,7 @@ export class ExpandableMessage extends Component<Props, State> {
   }
 
   public render() {
+    const {notify} = this.props
     const formattedValue = `${this.props.formattedValue}`
     const trimmedValue = formattedValue.trimLeft()
 
@@ -28,7 +33,9 @@ export class ExpandableMessage extends Component<Props, State> {
       <ClickOutside onClickOutside={this.handleClickOutside}>
         <div onClick={this.handleClick} className="expandable--message">
           <div className="expandable--text">{trimmedValue}</div>
-          <div className={this.isExpanded}>{trimmedValue}</div>
+          <div className={this.isExpanded}>
+            <LogsMessage formattedValue={formattedValue} notify={notify} />
+          </div>
         </div>
       </ClickOutside>
     )
