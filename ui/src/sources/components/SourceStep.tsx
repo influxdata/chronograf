@@ -23,10 +23,9 @@ import {createSource, updateSource} from 'src/shared/apis'
 
 // Constants
 import {
-  notifySourceUdpated,
-  notifySourceUdpateFailed,
+  notifySourceUpdateFailed,
   notifySourceCreationFailed,
-  notifySourceCreationSucceeded,
+  notifySourceConnectionSucceeded,
 } from 'src/shared/copy/notifications'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 import {DEFAULT_SOURCE} from 'src/shared/constants'
@@ -34,6 +33,8 @@ import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
 // Types
 import {Source, Me} from 'src/types'
+
+const isNewSource = (source: Partial<Source>) => !source.id
 
 interface Props {
   notify: typeof notifyAction
@@ -66,11 +67,11 @@ class SourceStep extends PureComponent<Props, State> {
     const {source} = this.state
     const {notify, setError} = this.props
 
-    if (this.isNewSource) {
+    if (isNewSource(source)) {
       try {
         const sourceFromServer = await createSource(source)
         this.props.addSource(sourceFromServer)
-        notify(notifySourceCreationSucceeded(source.name))
+        notify(notifySourceConnectionSucceeded(source.name))
         setError(false)
         return {success: true, payload: sourceFromServer}
       } catch (err) {
@@ -83,11 +84,12 @@ class SourceStep extends PureComponent<Props, State> {
         try {
           const sourceFromServer = await updateSource(source)
           this.props.updateSource(sourceFromServer)
-          notify(notifySourceUdpated(source.name))
+          // if the url field is blurred on a new source, the source is already created with no alert best to give a neutral success message
+          notify(notifySourceConnectionSucceeded(source.name))
           setError(false)
           return {success: true, payload: sourceFromServer}
-        } catch (error) {
-          notify(notifySourceUdpateFailed(source.name, this.parseError(error)))
+        } catch (err) {
+          notify(notifySourceUpdateFailed(source.name, this.parseError(err)))
           setError(true)
           return {success: false, payload: null}
         }
@@ -107,7 +109,7 @@ class SourceStep extends PureComponent<Props, State> {
           label="Connection URL"
           onChange={this.onChangeInput('url')}
           valueModifier={this.URLModifier}
-          onSubmit={this.syncHostnames}
+          onSubmit={this.handleSubmitUrl}
         />
         <WizardTextInput
           value={source.name}
@@ -207,22 +209,31 @@ class SourceStep extends PureComponent<Props, State> {
     setError(false)
   }
 
-  private syncHostnames = (sourceURLstring: string) => {
-    if (this.isEnterprise) {
-      if (sourceURLstring) {
-        const sourceURL = new URL(sourceURLstring)
-        const {source} = this.state
-        const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
-        if (sourceURL.hostname) {
-          metaserviceURL.hostname = sourceURL.hostname
-          this.onChangeInput('metaUrl')(metaserviceURL.href)
-        }
-      }
-    }
-  }
+  private handleSubmitUrl = async (sourceURLstring: string) => {
+    const {source} = this.state
+    const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
+    const sourceURL = new URL(sourceURLstring || DEFAULT_SOURCE.url)
+    metaserviceURL.hostname = sourceURL.hostname
 
-  private get isNewSource(): boolean {
-    return _.isNull(this.props.source)
+    if (isNewSource(source)) {
+      try {
+        let sourceFromServer = await createSource(source)
+        sourceFromServer = {...sourceFromServer, metaUrl: metaserviceURL.href}
+        this.props.addSource(sourceFromServer)
+        this.setState({
+          source: sourceFromServer,
+        })
+      } catch (err) {}
+    } else {
+      try {
+        let sourceFromServer = await updateSource(source)
+        sourceFromServer = {...sourceFromServer, metaUrl: metaserviceURL.href}
+        this.props.updateSource(sourceFromServer)
+        this.setState({
+          source: sourceFromServer,
+        })
+      } catch (err) {}
+    }
   }
 
   private get sourceIsEdited(): boolean {
@@ -237,7 +248,7 @@ class SourceStep extends PureComponent<Props, State> {
   }
 
   private get isEnterprise(): boolean {
-    const {source} = this.props
+    const {source} = this.state
     return _.get(source, 'type', '').includes('enterprise')
   }
 }
