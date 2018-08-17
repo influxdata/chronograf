@@ -66,6 +66,7 @@ export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   decimalPlaces: DEFAULT_DECIMAL_PLACES,
   fieldOptions: [DEFAULT_TIME_FIELD],
   inView: true,
+  note: '',
 }
 
 interface EmptyDefaultDashboardCell {
