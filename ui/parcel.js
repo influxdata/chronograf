@@ -7,7 +7,7 @@ const port = Number(process.env.PORT || 8080)
 console.log(`Serving on http://localhost:${port}`) // eslint-disable-line no-console
 
 const app = express()
-const bundler = new Bundler('src/index.html', {
+const bundler = new Bundler(['src/index.html', 'src/worker/worker.ts'], {
   outDir: './build/',
 })
 

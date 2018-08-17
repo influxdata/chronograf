@@ -14,12 +14,13 @@ import {
   timeSeriesToDygraph,
   TimeSeriesToDyGraphReturnType,
 } from 'src/utils/timeSeriesTransformers'
+import {manager} from 'src/worker/JobManager'
 
 // Types
 import {ColorString} from 'src/types/colors'
 import {DecimalPlaces} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
-import {DygraphValue} from 'src/types/dygraphs'
+// import {DygraphValue} from 'src/types/dygraphs'
 import {Query, Axes, TimeRange, RemoteDataState, CellType} from 'src/types'
 
 interface Props {
@@ -41,34 +42,50 @@ interface Props {
 
 type LineGraphProps = Props & RouteComponentProps<any, any>
 
+interface State {
+  timeSeries?: TimeSeriesToDyGraphReturnType
+}
+
 @ErrorHandlingWith(InvalidData)
-class LineGraph extends PureComponent<LineGraphProps> {
+class LineGraph extends PureComponent<LineGraphProps, State> {
   public static defaultProps: Partial<LineGraphProps> = {
     staticLegend: false,
   }
 
+  private isComponentMounted: boolean = false
   private isValidData: boolean = true
-  private timeSeries: TimeSeriesToDyGraphReturnType
 
-  public componentWillMount() {
-    const {data} = this.props
-    this.parseTimeSeries(data)
+  constructor(props: LineGraphProps) {
+    super(props)
+
+    this.state = {}
   }
 
-  public parseTimeSeries(data) {
+  public async componentDidMount() {
+    this.isComponentMounted = true
+    const {data} = this.props
+    await this.parseTimeSeries(data)
+  }
+
+  public componentWillUnmount() {
+    this.isComponentMounted = false
+  }
+
+  public async parseTimeSeries(data) {
     const {location} = this.props
 
-    this.timeSeries = timeSeriesToDygraph(data, location.pathname)
-    const timeSeries = _.get(this.timeSeries, 'timeSeries', [])
-    this.isValidData = this.validateTimeSeries(timeSeries)
+    const timeSeries = await timeSeriesToDygraph(data, location.pathname)
+    const innerTimeSeries = _.get(timeSeries, 'timeSeries', [])
+    this.isValidData = await manager.validateDygraphData(innerTimeSeries)
+    if (!this.isComponentMounted) {
+      return
+    }
+
+    this.setState({timeSeries})
   }
 
-  public componentWillUpdate(nextProps) {
-    const {data, activeQueryIndex} = this.props
-    if (
-      data !== nextProps.data ||
-      activeQueryIndex !== nextProps.activeQueryIndex
-    ) {
+  public componentWillReceiveProps(nextProps: LineGraphProps) {
+    if (nextProps.loading === RemoteDataState.Done) {
       this.parseTimeSeries(nextProps.data)
     }
   }
@@ -94,7 +111,11 @@ class LineGraph extends PureComponent<LineGraphProps> {
       handleSetHoverTime,
     } = this.props
 
-    const {labels, timeSeries, dygraphSeries} = this.timeSeries
+    if (!this.state.timeSeries) {
+      return <h3 className="graph-spinner" />
+    }
+
+    const {labels, timeSeries, dygraphSeries} = this.state.timeSeries
 
     const options = {
       rightGap: 0,
@@ -144,16 +165,6 @@ class LineGraph extends PureComponent<LineGraphProps> {
           )}
         </Dygraph>
       </div>
-    )
-  }
-
-  private validateTimeSeries = (ts: DygraphValue[][]) => {
-    return _.every(ts, r =>
-      _.every(
-        r,
-        (v, i: number) =>
-          (i === 0 && Date.parse(v as string)) || _.isNumber(v) || _.isNull(v)
-      )
     )
   }
 

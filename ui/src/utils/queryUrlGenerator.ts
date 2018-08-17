@@ -1,4 +1,4 @@
-import AJAX from 'src/utils/ajax'
+import {manager} from 'src/worker/JobManager'
 
 interface ProxyQuery {
   source: string
@@ -16,16 +16,8 @@ export async function proxy<T = any>({
   uuid,
 }: ProxyQuery) {
   try {
-    return await AJAX<T>({
-      method: 'POST',
-      url: source,
-      data: {
-        query,
-        db,
-        rp,
-        uuid,
-      },
-    })
+    const result = await manager.proxy(source, query, db, rp, uuid)
+    return result as T
   } catch (error) {
     console.error(error)
     throw error

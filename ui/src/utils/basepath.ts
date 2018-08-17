@@ -2,6 +2,10 @@ import {getRootNode} from 'src/utils/nodes'
 
 export const getBasepath = () => {
   const rootNode = getRootNode()
+  if (!rootNode) {
+    return ''
+  }
+
   return rootNode.getAttribute('data-basepath') || ''
 }
 

@@ -1,4 +1,3 @@
-import calculateSize from 'calculate-size'
 import _ from 'lodash'
 import {fastMap, fastReduce, fastFilter} from 'src/utils/fast'
 
@@ -15,6 +14,10 @@ import {
   DecimalPlaces,
 } from 'src/types/dashboards'
 import {TimeSeriesValue} from 'src/types/series'
+
+const calculateSize = (message: string): number => {
+  return message.length * 7
+}
 
 interface ColumnWidths {
   totalWidths: number
@@ -41,11 +44,7 @@ const calculateTimeColumnWidth = (timeFormat: string): number => {
   timeFormat = _.replace(timeFormat, 'h', '00')
   timeFormat = _.replace(timeFormat, 'X', '1522286058')
 
-  const {width} = calculateSize(timeFormat, {
-    font: '"RobotoMono", monospace',
-    fontSize: '13px',
-    fontWeight: 'bold',
-  })
+  const width = calculateSize(timeFormat)
 
   return width + CELL_HORIZONTAL_PADDING
 }
@@ -91,11 +90,7 @@ const updateMaxWidths = (
 
       const currentWidth = useTimeWidth
         ? timeFormatWidth
-        : calculateSize(colValue.toString().trim(), {
-            font: isLabel ? '"Roboto"' : '"RobotoMono", monospace',
-            fontSize: '12px',
-            fontWeight: '500',
-          }).width + CELL_HORIZONTAL_PADDING
+        : calculateSize(colValue.toString().trim()) + CELL_HORIZONTAL_PADDING
 
       const {widths: Widths} = maxColumnWidths
       const maxWidth = _.get(Widths, `${columnLabel}`, 0)
