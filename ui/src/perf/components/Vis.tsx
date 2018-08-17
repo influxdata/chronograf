@@ -1,4 +1,5 @@
 import React, {PureComponent} from 'react'
+import {memoize} from 'lodash'
 import memoizeOne from 'memoize-one'
 
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
@@ -28,13 +29,14 @@ interface State {
   dimensions?: VisDimensions
 }
 
-const SIMPLIFICATION_DEBOUNCE_TIME = 500
+const SIMPLIFICATION_DEBOUNCE_TIME = 300
 const LINE_COLOR = '#c6cad3'
 const AXES_COLOR = '#383846'
 const LABEL_COLOR = '#c6cad3'
 const VALUE_SCALE_PADDING = 0.15
 
 const fastCalculateDomains = memoizeOne(calculateDomains)
+const fastFormatTimeTick = memoize(formatTimeTick, (t, tz) => t + tz) // TODO: Evict cache
 
 class Vis extends PureComponent<Props, State> {
   private canvas: React.RefObject<HTMLCanvasElement>
@@ -144,7 +146,7 @@ class Vis extends PureComponent<Props, State> {
     const margins = {top: 10, right: 10, bottom: 15, left: 30}
     const timeseries = queryManager.getRawTimeseries()
     const [xDomain, yDomain] = fastCalculateDomains(timeseries)
-    const xTickFormatter = x => formatTimeTick(x, timezone, xDomain)
+    const xTickFormatter = x => fastFormatTimeTick(x, timezone, xDomain)
     const yTickFormatter = y => String(y)
     const xScale = createScale(xDomain, [margins.left, width - margins.right])
     const yScale = createScale(

@@ -167,7 +167,7 @@ const dateTimeFormatForDuration = (ms: number): string => {
 
 export const formatTimeTick = (
   t: number,
-  tz: String,
+  tz: string,
   [d0, d1]: [number, number]
 ): string =>
   DateTime.fromMillis(t, {zone: tz}).toFormat(

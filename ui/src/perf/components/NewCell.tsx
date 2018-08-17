@@ -78,7 +78,7 @@ class NewCell extends PureComponent<Props, State> {
                   onChange={this.handleChangeTimezone}
                 >
                   {TIMEZONES.map(tz => (
-                    <Dropdown.Item id={tz} value={tz}>
+                    <Dropdown.Item key={tz} id={tz} value={tz}>
                       {tz}
                     </Dropdown.Item>
                   ))}
@@ -88,7 +88,7 @@ class NewCell extends PureComponent<Props, State> {
                 <label>Line Style</label>
                 <Dropdown selectedID={curve} onChange={this.handleChangeCurve}>
                   {CURVES.map(curve => (
-                    <Dropdown.Item id={curve} value={curve}>
+                    <Dropdown.Item key={curve} id={curve} value={curve}>
                       {curve}
                     </Dropdown.Item>
                   ))}
