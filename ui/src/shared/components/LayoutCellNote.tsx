@@ -1,6 +1,7 @@
 // Libraries
 import React, {Component} from 'react'
 import classnames from 'classnames'
+import Markdown from 'react-markdown'
 
 // Components
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -26,7 +27,9 @@ class LayoutCellNote extends Component<Props> {
         </div>
         <div className={this.noteContentsClass}>
           <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={140}>
-            <div className="dash-graph--note-contents">{note}</div>
+            <div className="dash-graph--note-contents">
+              <Markdown source={note} />
+            </div>
           </FancyScrollbar>
         </div>
       </div>
