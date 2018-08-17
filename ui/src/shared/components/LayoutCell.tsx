@@ -47,7 +47,11 @@ export default class LayoutCell extends Component<Props> {
           />
         </Authorized>
         <LayoutCellNote note={cell.note} />
-        <LayoutCellHeader cellName={this.cellName} isEditable={isEditable} />
+        <LayoutCellHeader
+          cellName={this.cellName}
+          isEditable={isEditable}
+          cellNote={cell.note}
+        />
         <div className="dash-graph--container">{this.renderGraph}</div>
       </div>
     )

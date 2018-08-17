@@ -188,7 +188,6 @@ $dash-graph-options-arrow: 8px;
   margin: 0;
   display: flex;
   align-items: center;
-  // justify-content: space-between;
   border-radius: $radius-small;
   font-weight: 600;
   font-size: 13px;
@@ -216,13 +215,14 @@ $dash-graph-options-arrow: 8px;
   transition: color 0.25s ease, background-color 0.25s ease,
     border-color 0.25s ease;
 }
-.dash-graph--note + .dash-graph--heading > .dash-graph--name {
-  width: calc(100% - (78px + 22px));
-  margin-left: 22px;
-}
 
 .dash-graph--name.dash-graph--name__default {
   font-style: italic;
+}
+
+.dash-graph--name.dash-graph--name__note {
+  width: calc(100% - (78px + 22px));
+  margin-left: 22px;
 }
 
 .dash-graph--draggable {
