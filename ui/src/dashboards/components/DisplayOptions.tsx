@@ -9,6 +9,7 @@ import GaugeOptions from 'src/dashboards/components/GaugeOptions'
 import SingleStatOptions from 'src/dashboards/components/SingleStatOptions'
 import AxesOptions from 'src/dashboards/components/AxesOptions'
 import TableOptions from 'src/dashboards/components/TableOptions'
+import CellNoteEditor from 'src/shared/components/TimeMachine/CellNoteEditor'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
 // Constants
@@ -59,6 +60,8 @@ class DisplayOptions extends Component<Props, State> {
   }
 
   private get threesizerDivisions() {
+    const {cell} = this.props
+
     return [
       {
         name: 'Visualization Type',
@@ -72,6 +75,13 @@ class DisplayOptions extends Component<Props, State> {
         headerButtons: [],
         menuOptions: [],
         render: this.renderOptions,
+        headerOrientation: HANDLE_VERTICAL,
+      },
+      {
+        name: 'Add a Note',
+        headerButtons: [],
+        menuOptions: [],
+        render: () => <CellNoteEditor note={cell.note} />,
         headerOrientation: HANDLE_VERTICAL,
       },
     ]

@@ -64,6 +64,7 @@ export enum ActionType {
   UpdateFieldOptions = 'UPDATE_FIELD_OPTIONS',
   UpdateQueryDrafts = 'UPDATE_QUERY_DRAFTS',
   UpdateQueryDraft = 'UPDATE_QUERY_DRAFT',
+  UpdateCellNote = 'UPDATE_CELL_NOTE',
 }
 
 export type Action =
@@ -81,6 +82,7 @@ export type Action =
   | ChangeDecimalPlacesAction
   | UpdateFieldOptionsAction
   | UpdateQueryDraftsAction
+  | UpdateCellNoteAction
 
 export interface LoadCellForCEOAction {
   type: ActionType.LoadCellForCEO
@@ -184,6 +186,13 @@ export interface UpdateQueryDraftAction {
   }
 }
 
+export interface UpdateCellNoteAction {
+  type: ActionType.UpdateCellNote
+  payload: {
+    note: string
+  }
+}
+
 export const loadCellForCEO = (
   cell: Cell | NewDefaultCell
 ): LoadCellForCEOAction => ({
@@ -201,6 +210,13 @@ export const changeCellType = (cellType: CellType): ChangeCellTypeAction => ({
   type: ActionType.ChangeCellType,
   payload: {
     cellType,
+  },
+})
+
+export const updateCellNote = (note: string): UpdateCellNoteAction => ({
+  type: ActionType.UpdateCellNote,
+  payload: {
+    note,
   },
 })
 
