@@ -2,7 +2,6 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
 
 describe('WizardStep', () => {
@@ -36,10 +35,6 @@ describe('WizardStep', () => {
 
   it('mounts without exploding', () => {
     expect(wrapper).toHaveLength(1)
-  })
-
-  it('mounts a fancy scrollbar', () => {
-    expect(wrapper.find(FancyScrollbar)).toHaveLength(1)
   })
 
   it('mounts a button bar', () => {

@@ -2,20 +2,15 @@
 
 exports[`WizardStep matches snapshot 1`] = `
 <React.Fragment>
-  <FancyScrollbar
-    autoHeight={true}
-    autoHide={false}
-    className="wizard-step-content"
-    maxHeight={400}
-    setScrollTop={[Function]}
-    style={Object {}}
+  <div
+    className="wizard-step--container"
   >
     <div
-      className="wizard-step-child"
+      className="wizard-step--child"
     >
       this is a text
     </div>
-  </FancyScrollbar>
+  </div>
   <WizardButtonBar
     nextLabel="next"
     onClickNext={[Function]}
