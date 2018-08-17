@@ -7,14 +7,14 @@ describe('Logs.searchToFilters', () => {
   )
 
   it('can return like filters for terms', () => {
-    const text = 'seq_!@.#: TERMS /api/search'
+    const text = 'seq_!@.# TERMS /api/search'
     const actual = searchToFilters(text)
 
     const expected = [
       {
         id: isUUID,
         key: 'message',
-        value: 'seq_!@.#:',
+        value: 'seq_!@.#',
         operator: Operator.LIKE,
       },
       {
@@ -27,6 +27,40 @@ describe('Logs.searchToFilters', () => {
         id: isUUID,
         key: 'message',
         value: '/api/search',
+        operator: Operator.LIKE,
+      },
+    ]
+
+    expect(actual).toEqual(expected)
+  })
+
+  it('can return filters for attribute terms', () => {
+    const text = 'severity:info :TERMS -host:del.local foo:'
+    const actual = searchToFilters(text)
+
+    const expected = [
+      {
+        id: isUUID,
+        key: 'severity',
+        value: 'info',
+        operator: Operator.EQUAL,
+      },
+      {
+        id: isUUID,
+        key: 'message',
+        value: ':TERMS',
+        operator: Operator.LIKE,
+      },
+      {
+        id: isUUID,
+        key: 'host',
+        value: 'del.local',
+        operator: Operator.NOT_EQUAL,
+      },
+      {
+        id: isUUID,
+        key: 'message',
+        value: 'foo:',
         operator: Operator.LIKE,
       },
     ]
@@ -107,15 +141,15 @@ describe('Logs.searchToFilters', () => {
   })
 
   it('can create filters for phrases and terms', () => {
-    const text = `status:4\d{2} -"NOT FOUND" 'some "quote"' -thing`
+    const text = `severity:4\\d{2} -"NOT FOUND" 'some "quote"' -thing`
     const actual = searchToFilters(text)
 
     const expected = [
       {
         id: isUUID,
-        key: 'message',
-        value: 'status:4d{2}',
-        operator: Operator.LIKE,
+        key: 'severity',
+        value: '4\\d{2}',
+        operator: Operator.EQUAL,
       },
       {
         id: isUUID,
