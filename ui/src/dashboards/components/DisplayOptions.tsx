@@ -1,12 +1,18 @@
-import React, {PureComponent} from 'react'
+// Libraries
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 
+// Components
 import GraphTypeSelector from 'src/dashboards/components/GraphTypeSelector'
 import GaugeOptions from 'src/dashboards/components/GaugeOptions'
 import SingleStatOptions from 'src/dashboards/components/SingleStatOptions'
 import AxesOptions from 'src/dashboards/components/AxesOptions'
 import TableOptions from 'src/dashboards/components/TableOptions'
+import Threesizer from 'src/shared/components/threesizer/Threesizer'
+
+// Constants
+import {HANDLE_VERTICAL} from 'src/shared/constants'
 
 import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -26,7 +32,7 @@ interface State {
 }
 
 @ErrorHandling
-class DisplayOptions extends PureComponent<Props, State> {
+class DisplayOptions extends Component<Props, State> {
   constructor(props) {
     super(props)
 
@@ -45,14 +51,33 @@ class DisplayOptions extends PureComponent<Props, State> {
 
   public render() {
     return (
-      <div className="display-options">
-        <GraphTypeSelector />
-        {this.renderOptions}
-      </div>
+      <Threesizer
+        orientation={HANDLE_VERTICAL}
+        divisions={this.threesizerDivisions}
+      />
     )
   }
 
-  private get renderOptions(): JSX.Element {
+  private get threesizerDivisions() {
+    return [
+      {
+        name: 'Visualization Type',
+        headerButtons: [],
+        menuOptions: [],
+        render: () => <GraphTypeSelector />,
+        headerOrientation: HANDLE_VERTICAL,
+      },
+      {
+        name: 'Customize',
+        headerButtons: [],
+        menuOptions: [],
+        render: this.renderOptions,
+        headerOrientation: HANDLE_VERTICAL,
+      },
+    ]
+  }
+
+  private renderOptions = (): JSX.Element => {
     const {
       cell,
       staticLegend,

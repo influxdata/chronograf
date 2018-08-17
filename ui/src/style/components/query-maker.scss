@@ -8,7 +8,6 @@
 
 .query-maker {
   height: 100%;
-  margin: 0 $page-wrapper-padding;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -29,7 +28,7 @@ $query-maker--tab-text-hover: $g15-platinum;
 $query-maker--tab-text-active: $g18-cloud;
 $query-maker--tab-bg: $g3-castle;
 $query-maker--tab-bg-hover: $g4-onyx;
-$query-maker--tab-bg-active: $g5-pepper;
+$query-maker--tab-bg-active: $g4-onyx;
 
 $query-maker--tab-contents-bg: $g3-castle;
 $query-maker--empty-text: $g10-wolf;
@@ -76,9 +75,10 @@ $query-editor-tab-active: $g3-castle;
 */
 
 .query-maker--tabs {
-  margin: $query-maker--gutter 0 0 0;
+  padding: 12px 60px;
+  padding-bottom: 0;
   display: flex;
-  height: $query-maker--tabs-height;
+  height: $query-maker--tabs-height + 12px;
   align-items: center;
 }
 .query-maker--tabs > div.btn.query-maker--new {
@@ -166,14 +166,12 @@ $query-editor-tab-active: $g3-castle;
   }
 }
 .query-maker--tab-contents {
-  border-radius: 0 $radius $radius $radius;
   display: flex;
   flex-direction: column;
 }
 .query-maker--tab-contents,
 .query-maker--empty {
-  flex: 1 0 0%;
-  margin: 0 0 $query-maker--gutter 0;
+  flex: 1 0 0;
   background-color: $query-maker--tab-contents-bg;
 }
 .query-maker--empty {

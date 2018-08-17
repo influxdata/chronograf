@@ -1,5 +1,15 @@
-import {getDeep} from 'src/utils/wrappers'
+// libraries
+import _ from 'lodash'
+import uuid from 'uuid'
 
+// actions
+import {Action, ActionType} from 'src/dashboards/actions/cellEditorOverlay'
+
+// utils
+import {getDeep} from 'src/utils/wrappers'
+import defaultQueryConfig from 'src/utils/defaultQueryConfig'
+
+// constants
 import {
   DEFAULT_THRESHOLDS_LIST_COLORS,
   DEFAULT_GAUGE_COLORS,
@@ -7,25 +17,25 @@ import {
   validateThresholdsListColors,
   getThresholdsListType,
 } from 'src/shared/constants/thresholds'
-
 import {
   DEFAULT_LINE_COLORS,
   validateLineColors,
 } from 'src/shared/constants/graphColorPalettes'
-
 import {initializeOptions} from 'src/dashboards/constants/cellEditor'
-import {Action, ActionType} from 'src/dashboards/actions/cellEditorOverlay'
+
+// types
 import {CellType, Cell} from 'src/types'
-import {ThresholdType, TableOptions} from 'src/types/dashboards'
+import {CellQuery, ThresholdType, TableOptions} from 'src/types/dashboards'
 import {ThresholdColor, GaugeColor, LineColor} from 'src/types/colors'
 import {NewDefaultCell} from 'src/types/dashboards'
 
-interface CEOInitialState {
+export interface CEOInitialState {
   cell: Cell | NewDefaultCell | null
   thresholdsListType: ThresholdType
   thresholdsListColors: ThresholdColor[]
   gaugeColors: GaugeColor[]
   lineColors: LineColor[]
+  queryDrafts: CellQuery[]
 }
 
 export const initialState = {
@@ -34,11 +44,12 @@ export const initialState = {
   thresholdsListColors: DEFAULT_THRESHOLDS_LIST_COLORS,
   gaugeColors: DEFAULT_GAUGE_COLORS,
   lineColors: DEFAULT_LINE_COLORS,
+  queryDrafts: null,
 }
 
 export default (state = initialState, action: Action): CEOInitialState => {
   switch (action.type) {
-    case ActionType.ShowCellEditorOverlay: {
+    case ActionType.LoadCellForCEO: {
       const {cell} = action.payload
 
       const tableOptions = getDeep<TableOptions>(
@@ -46,6 +57,26 @@ export default (state = initialState, action: Action): CEOInitialState => {
         'tableOptions',
         initializeOptions(CellType.Table)
       )
+
+      let queryDrafts: CellQuery[] = cell.queries.map(q => {
+        const id = uuid.v4()
+        const queryConfig = {...q.queryConfig, id}
+        return {...q, queryConfig, id}
+      })
+
+      if (_.isEmpty(queryDrafts)) {
+        const id = uuid.v4()
+        const newQueryConfig = {
+          ...defaultQueryConfig({id}),
+        }
+        const newQueryDraft: CellQuery = {
+          query: '',
+          queryConfig: newQueryConfig,
+          source: '',
+          id,
+        }
+        queryDrafts = [newQueryDraft]
+      }
 
       if ((cell as Cell).colors) {
         const colors = (cell as Cell).colors
@@ -66,15 +97,17 @@ export default (state = initialState, action: Action): CEOInitialState => {
           thresholdsListColors,
           gaugeColors,
           lineColors,
+          queryDrafts,
         }
       }
       return {
         ...state,
         cell: {...cell, tableOptions},
+        queryDrafts,
       }
     }
 
-    case ActionType.HideCellEditorOverlay: {
+    case ActionType.ClearCellFromCEO: {
       const cell = null
 
       return {...state, cell}
@@ -156,6 +189,12 @@ export default (state = initialState, action: Action): CEOInitialState => {
       const {lineColors} = action.payload
 
       return {...state, lineColors}
+    }
+
+    case ActionType.UpdateQueryDrafts: {
+      const {queryDrafts} = action.payload
+
+      return {...state, queryDrafts}
     }
   }
 
