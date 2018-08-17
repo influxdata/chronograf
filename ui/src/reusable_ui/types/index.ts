@@ -79,6 +79,7 @@ export enum IconFont {
   CaretLeft = 'caret-left',
   CaretRight = 'caret-right',
   CaretUp = 'caret-up',
+  Chat = 'chat',
   Checkmark = 'checkmark',
   Circle = 'circle',
   CircleThick = 'circle-thick',
