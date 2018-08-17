@@ -4,6 +4,7 @@ import _ from 'lodash'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import LayoutCellMenu from 'src/shared/components/LayoutCellMenu'
 import LayoutCellHeader from 'src/shared/components/LayoutCellHeader'
+import LayoutCellNote from 'src/shared/components/LayoutCellNote'
 import {notify} from 'src/shared/actions/notifications'
 import {notifyCSVDownloadFailed} from 'src/shared/copy/notifications'
 import download from 'src/external/download.js'
@@ -36,15 +37,16 @@ export default class LayoutCell extends Component<Props> {
         <Authorized requiredRole={EDITOR_ROLE}>
           <LayoutCellMenu
             cell={cell}
-            queries={this.queries}
-            dataExists={!!cellData.length}
             isEditable={isEditable}
-            onDelete={onDeleteCell}
+            dataExists={!!cellData.length}
             onEdit={this.handleSummonOverlay}
             onClone={onCloneCell}
+            onDelete={onDeleteCell}
             onCSVDownload={this.handleCSVDownload}
+            queries={this.queries}
           />
         </Authorized>
+        <LayoutCellNote note={cell.note} />
         <LayoutCellHeader cellName={this.cellName} isEditable={isEditable} />
         <div className="dash-graph--container">{this.renderGraph}</div>
       </div>

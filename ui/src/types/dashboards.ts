@@ -77,6 +77,7 @@ export interface Cell {
   legend: Legend
   isWidget?: boolean
   inView: boolean
+  note: string
 }
 
 export enum CellType {

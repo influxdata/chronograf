@@ -123,11 +123,62 @@ $dash-graph-options-arrow: 8px;
   }
 }
 
+.dash-graph--note {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+}
+
+.dash-graph--note-icon {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: $g6-smoke;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  font-size: 12px;
+
+  > .icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.dash-graph--note-contents {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  top: 2px;
+  left: 100%;
+  width: 5000%;
+  max-width: 300px;
+  background-color: rgba($g0-obsidian, 0.95);
+  padding: 14px 16px;
+  border-radius: $radius;
+  font-size: 13px;
+  line-height: 15px;
+  font-weight: 500;
+  color: $g15-platinum;
+  @extend %drop-shadow;
+}
+.dash-graph--note:hover .dash-graph--note-contents {
+  display: block;
+}
+.dash-graph--note:hover .dash-graph--note-icon {
+  background-color: $c-pool;
+  color: $g20-white;  
+}
+
 .dash-graph--heading {
-  user-select: none !important;
-  -o-user-select: none !important;
-  -moz-user-select: none !important;
-  -webkit-user-select: none !important;
+  user-select: none;
   background-color: transparent;
   position: absolute;
   top: 0;
@@ -137,12 +188,13 @@ $dash-graph-options-arrow: 8px;
   margin: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  // justify-content: space-between;
   border-radius: $radius-small;
   font-weight: 600;
   font-size: 13px;
   color: $g14-chromium;
   transition: color 0.25s ease, background-color 0.25s ease;
+
   &.dash-graph--heading-draggable:hover {
     cursor: move;
     background-color: $g5-pepper;
@@ -163,9 +215,10 @@ $dash-graph-options-arrow: 8px;
   padding-left: 10px;
   transition: color 0.25s ease, background-color 0.25s ease,
     border-color 0.25s ease;
-  &:only-child {
-    width: 100%;
-  }
+}
+.dash-graph--note + .dash-graph--heading > .dash-graph--name {
+  width: calc(100% - (78px + 22px));
+  margin-left: 22px;
 }
 
 .dash-graph--name.dash-graph--name__default {
