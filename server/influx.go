@@ -79,6 +79,8 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 	res := postInfluxResponse{
 		Results: response,
 	}
+
+	LogEvent("ran query", "")
 	encodeJSON(w, http.StatusOK, res, s.Logger)
 }
 

@@ -5,8 +5,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -112,23 +110,27 @@ type queryResult struct {
 	err  error
 }
 
-func logEvent(message string, id string) {
-	fmt.Printf("%f\t%s\t%s\n", float64(time.Now().UnixNano())/1e6, message, id[0:6])
+func LogEvent(message string, id string) {
+	if len(id) >= 6 {
+		id = id[0:6]
+	}
+
+	fmt.Printf("%f\t%s\t%s\n", float64(time.Now().UnixNano())/1e6, message, id)
 }
 
 func performQuery(id string, query string, done chan<- queryResult) {
-	logEvent("running query", id)
+	LogEvent("running query", id)
 
 	q := client.NewQuery(query, "stress", "ns")
 	resp, err := influxClient.Query(q)
-	logEvent("ran query", id)
+	LogEvent("ran query", id)
 
 	if err != nil {
 		done <- queryResult{id: id, err: err}
 		return
 	}
 
-	logEvent("serializing data", id)
+	LogEvent("serializing data", id)
 	columns, err := toColumns(resp)
 
 	if err != nil {
@@ -161,14 +163,14 @@ type queryRequest struct {
 }
 
 func receiveMessages(conn *websocket.Conn, messages chan<- queryResult) {
-	defer Close(conn)
+	defer conn.Close()
 
 	for {
 		var req queryRequest
 		err := conn.ReadJSON(&req)
 
 		if err != nil {
-			log.Println(err)
+			LogEvent(err.Error(), "")
 			return
 		}
 
@@ -203,7 +205,7 @@ type errResponse struct {
 }
 
 func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
-	defer Close(conn)
+	defer conn.Close()
 
 	for {
 		result := <-messages
@@ -221,7 +223,8 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 			err := conn.WriteJSON(resp)
 
 			if err != nil {
-				log.Fatalln(err)
+				LogEvent(err.Error(), "")
+				return
 			}
 
 			continue
@@ -253,14 +256,16 @@ func sendMessages(conn *websocket.Conn, messages <-chan queryResult) {
 			err := conn.WriteJSON(resp)
 
 			if err != nil {
-				log.Fatalln(err)
+				LogEvent(err.Error(), "")
+				return
 			}
 
 			if !useRunLengthEncoding {
 				err = conn.WriteMessage(websocket.BinaryMessage, data)
 
 				if err != nil {
-					log.Fatalln(err)
+					LogEvent(err.Error(), "")
+					return
 				}
 			}
 
@@ -274,7 +279,8 @@ func Timeseries(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		LogEvent(err.Error(), "")
+		return
 	}
 
 	influxClient, err = client.NewHTTPClient(client.HTTPConfig{
@@ -282,7 +288,8 @@ func Timeseries(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		LogEvent(err.Error(), "")
+		return
 	}
 
 	conn.EnableWriteCompression(true)
@@ -291,13 +298,4 @@ func Timeseries(w http.ResponseWriter, r *http.Request) {
 
 	go receiveMessages(conn, messages)
 	go sendMessages(conn, messages)
-}
-
-// Close closes a closer, and will panic if an error is encountered
-func Close(c io.Closer) {
-	err := c.Close()
-
-	if err != nil {
-		log.Fatalln(err)
-	}
 }

@@ -379,6 +379,8 @@ class Dygraph extends Component<Props, State> {
       return
     }
 
+    console.log(`${Date.now()}\trendered graph`)
+
     const {xAxisRange} = this.state
     const newXAxisRange = this.dygraph.xAxisRange()
 

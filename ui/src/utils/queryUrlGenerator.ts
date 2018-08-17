@@ -9,7 +9,7 @@ interface ProxyQuery {
 
 export async function proxy<T = any>({source, query, db, rp}: ProxyQuery) {
   try {
-    return await AJAX<T>({
+    const resp = await AJAX<T>({
       method: 'POST',
       url: source,
       data: {
@@ -18,6 +18,10 @@ export async function proxy<T = any>({source, query, db, rp}: ProxyQuery) {
         rp,
       },
     })
+
+    console.log(`${Date.now()}\treceived data`)
+
+    return resp
   } catch (error) {
     console.error(error)
     throw error
