@@ -112,13 +112,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     const {selectedIDs} = this.state
 
     return dashboards.filter(d => {
-      let foundID = false
-      selectedIDs.forEach(id => {
-        if (d.id.toString() === id) {
-          foundID = true
-        }
-      })
-      return foundID
+      return selectedIDs.includes(d.id.toString())
     })
   }
 
