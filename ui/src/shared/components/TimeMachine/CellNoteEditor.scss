@@ -28,10 +28,11 @@
   height: 320px;
   border: $ix-border solid $g5-pepper;
   border-radius: $radius;
-  transition: border-color 0.25s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 
   &.focus {
     border-color: $c-pool;
+    box-shadow: 0 0 6px 0 $c-pool;
   }
 }
 

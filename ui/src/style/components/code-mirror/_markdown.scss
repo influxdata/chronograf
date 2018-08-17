@@ -1,0 +1,27 @@
+/*
+  CodeMirror "Markdown" Theme
+  ------------------------------------------------------------------------------
+  Intended for use with the Markdown CodeMirror Mode
+*/
+
+.cm-s-markdown {
+  color: $g15-platinum;
+
+  &:hover {
+    cursor: text;
+  }
+
+  .CodeMirror-scrollbar-filler {
+    background-color: transparent;
+  }
+
+  .CodeMirror-vscrollbar,
+  .CodeMirror-hscrollbar {
+    @include custom-scrollbar-round($g2-kevlar, $c-pool);
+  }
+}
+
+.cm-s-markdown.CodeMirror-empty {
+  font-style: italic;
+  color: $g9-mountain;
+}

@@ -1,6 +1,7 @@
 // Libraries
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
+import classnames from 'classnames'
 
 // Components
 import {Controlled as ReactCodeMirror} from 'react-codemirror2'
@@ -43,13 +44,16 @@ class CellNoteEditor extends Component<Props, State> {
       autoRefresh: true,
       theme: 'markdown',
       completeSingle: false,
+      lineWrapping: true,
+      placeholder:
+        'Notes are a great way to help others on your team use dashboards more effectively.\nYou can also talk to your future self!\n\nWhy not add a note?',
     }
 
     return (
       <FancyScrollbar className="cell-note-editor--container">
         <div className="cell-note-editor">
           <div className="cell-note-editor--header">Markdown is supported</div>
-          <div className="cell-note-editor--field">
+          <div className={this.fieldClassName}>
             <ReactCodeMirror
               autoCursor={true}
               value={noteDraft}
@@ -95,6 +99,12 @@ class CellNoteEditor extends Component<Props, State> {
 
   private handleChange = (_, __, note: string): void => {
     this.setState({noteDraft: note})
+  }
+
+  private get fieldClassName(): string {
+    const {editorIsFocused} = this.state
+
+    return classnames('cell-note-editor--field', {focus: editorIsFocused})
   }
 }
 
