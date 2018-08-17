@@ -128,7 +128,7 @@ export const notifyUnableToGetApps = (): Notification => ({
 
 //  InfluxDB Sources Notifications
 //  ----------------------------------------------------------------------------
-export const notifySourceCreationSucceeded = (
+export const notifySourceConnectionSucceeded = (
   sourceName: string
 ): Notification => ({
   ...defaultSuccessNotification,
@@ -145,13 +145,7 @@ export const notifySourceCreationFailed = (
   message: `Unable to connect to InfluxDB ${sourceName}: ${errorMessage}`,
 })
 
-export const notifySourceUdpated = (sourceName: string): Notification => ({
-  ...defaultSuccessNotification,
-  icon: 'server2',
-  message: `Updated InfluxDB ${sourceName} Connection successfully.`,
-})
-
-export const notifySourceUdpateFailed = (
+export const notifySourceUpdateFailed = (
   sourceName: string,
   errorMessage: string
 ): Notification => ({
