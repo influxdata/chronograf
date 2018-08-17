@@ -7,6 +7,7 @@ import {
   OverlayHeading,
   OverlayBody,
   MultiSelectDropdown,
+  Form,
 } from 'src/reusable_ui'
 
 import {addDashboardCellAsync} from 'src/dashboards/actions'
@@ -53,35 +54,44 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       <OverlayContainer>
         <OverlayHeading title="Send to Dashboard" />
         <OverlayBody>
-          <div className="form-group">
-            <label htmlFor="New Cell Name"> New Cell Name </label>
-            <input
-              type="text"
-              id="New Cell Name"
-              className="form-control input-sm"
-              value={name}
-              onChange={this.handleChangeName}
-            />
-          </div>
-          <MultiSelectDropdown
-            onChange={this.handleSelect}
-            selectedIDs={this.state.selectedIDs}
-          >
-            {this.dropdownItems}
-          </MultiSelectDropdown>
-          <button
-            className="button button-md button-default"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-          <button
-            className="button button-md button-success"
-            disabled={!hasQuery}
-            onClick={this.sendToDashboard}
-          >
-            Send to Dashboard
-          </button>
+          <Form>
+            <Form.Element label="New Cell Name">
+              <input
+                type="text"
+                id="New Cell Name"
+                className="form-control input-sm"
+                value={name}
+                onChange={this.handleChangeName}
+              />
+            </Form.Element>
+            <Form.Element>
+              <MultiSelectDropdown
+                onChange={this.handleSelect}
+                selectedIDs={this.state.selectedIDs}
+              >
+                {this.dropdownItems}
+              </MultiSelectDropdown>
+            </Form.Element>
+            <Form.Footer>
+              <div>
+                <button
+                  className="button button-md button-default"
+                  style={{margin: 5}}
+                  onClick={onCancel}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="button button-md button-success"
+                  style={{margin: 5}}
+                  disabled={!hasQuery}
+                  onClick={this.sendToDashboard}
+                >
+                  Send to Dashboard
+                </button>
+              </div>
+            </Form.Footer>
+          </Form>
         </OverlayBody>
       </OverlayContainer>
     )
