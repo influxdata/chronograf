@@ -1,7 +1,10 @@
+// Libraries
 import React, {PureComponent} from 'react'
 
+// Utils
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
 
+// Components
 import {
   OverlayContainer,
   OverlayHeading,
@@ -10,8 +13,10 @@ import {
   Form,
 } from 'src/reusable_ui'
 
+// Constants
 import {addDashboardCellAsync} from 'src/dashboards/actions'
 
+// Types
 import {QueryConfig, Dashboard, Source} from 'src/types'
 
 interface Props {
@@ -76,23 +81,19 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
               </MultiSelectDropdown>
             </Form.Element>
             <Form.Footer>
-              <div>
-                <button
-                  className="button button-md button-default"
-                  style={{margin: 5}}
-                  onClick={onCancel}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="button button-md button-success"
-                  style={{margin: 5}}
-                  disabled={!hasQuery || selectedIDs.length === 0}
-                  onClick={this.sendToDashboard}
-                >
-                  {`Send to ${numberDashboards} Dashboard${pluralizer}`}
-                </button>
-              </div>
+              <button
+                className="button button-md button-default"
+                onClick={onCancel}
+              >
+                Cancel
+              </button>
+              <button
+                className="button button-md button-success"
+                disabled={!hasQuery || selectedIDs.length === 0}
+                onClick={this.sendToDashboard}
+              >
+                {`Send to ${numberDashboards} Dashboard${pluralizer}`}
+              </button>
             </Form.Footer>
           </Form>
         </OverlayBody>

@@ -1,14 +1,16 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {withRouter, InjectedRouter} from 'react-router'
 import {Location} from 'history'
 import qs from 'qs'
-
 import _ from 'lodash'
 
+// Utils
 import {stripPrefix} from 'src/utils/basepath'
 
+// Components
 import QueryMaker from 'src/data_explorer/components/QueryMaker'
 import Visualization from 'src/data_explorer/components/Visualization'
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
@@ -21,7 +23,9 @@ import GraphTips from 'src/shared/components/GraphTips'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import AutoRefresh from 'src/utils/AutoRefresh'
 import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboardOverlay'
+import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
+// Constants
 import {VIS_VIEWS, AUTO_GROUP_BY, TEMPLATES} from 'src/shared/constants'
 import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'src/data_explorer/constants'
 import {errorThrown} from 'src/shared/actions/errors'
@@ -32,6 +36,7 @@ import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {buildRawText} from 'src/utils/influxql'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
+// Types
 import {Source, QueryConfig, TimeRange, Dashboard} from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -141,16 +146,18 @@ export class DataExplorer extends PureComponent<Props, State> {
             writeLineProtocol={writeLineProtocol}
           />
         </OverlayTechnology>
-        <OverlayTechnology visible={isSendToDashboardVisible}>
-          <SendToDashboardOverlay
-            onCancel={this.toggleSendToDashboard}
-            queryConfig={this.activeQuery}
-            source={source}
-            rawText={this.rawText}
-            dashboards={dashboards}
-            addDashboardCell={addDashboardCell}
-          />
-        </OverlayTechnology>
+        <Authorized requiredRole={EDITOR_ROLE}>
+          <OverlayTechnology visible={isSendToDashboardVisible}>
+            <SendToDashboardOverlay
+              onCancel={this.toggleSendToDashboard}
+              queryConfig={this.activeQuery}
+              source={source}
+              rawText={this.rawText}
+              dashboards={dashboards}
+              addDashboardCell={addDashboardCell}
+            />
+          </OverlayTechnology>
+        </Authorized>
         <PageHeader
           titleText="Explore"
           fullWidth={true}
@@ -238,12 +245,14 @@ export class DataExplorer extends PureComponent<Props, State> {
         >
           Write Data
         </button>
-        <button
-          onClick={this.toggleSendToDashboard}
-          className="button button-sm button-success"
-        >
-          Send to Dashboard
-        </button>
+        <Authorized requiredRole={EDITOR_ROLE}>
+          <button
+            onClick={this.toggleSendToDashboard}
+            className="button button-sm button-success"
+          >
+            Send to Dashboard
+          </button>
+        </Authorized>
         <GraphTips />
         <AutoRefreshDropdown
           selected={autoRefresh}
