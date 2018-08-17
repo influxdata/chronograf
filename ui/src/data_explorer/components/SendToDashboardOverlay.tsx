@@ -48,7 +48,10 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
   public render() {
     const {onCancel} = this.props
-    const {hasQuery, name} = this.state
+    const {hasQuery, name, selectedIDs} = this.state
+
+    const numberDashboards = selectedIDs.length > 1 ? selectedIDs.length : ''
+    const pluralizer = selectedIDs.length > 1 ? 's' : ''
 
     return (
       <OverlayContainer>
@@ -64,7 +67,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
                 onChange={this.handleChangeName}
               />
             </Form.Element>
-            <Form.Element>
+            <Form.Element label="Choose 1 or more Dashboards">
               <MultiSelectDropdown
                 onChange={this.handleSelect}
                 selectedIDs={this.state.selectedIDs}
@@ -84,10 +87,10 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
                 <button
                   className="button button-md button-success"
                   style={{margin: 5}}
-                  disabled={!hasQuery}
+                  disabled={!hasQuery || selectedIDs.length === 0}
                   onClick={this.sendToDashboard}
                 >
-                  Send to Dashboard
+                  {`Send to ${numberDashboards} Dashboard${pluralizer}`}
                 </button>
               </div>
             </Form.Footer>
