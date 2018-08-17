@@ -1,0 +1,48 @@
+/*
+  Cell Note Editor
+  ------------------------------------------------------------------------------
+*/
+
+.cell-note-editor--container {
+  width: 100%;
+  height: 100%;
+  background-color: $g3-castle;
+}
+
+.cell-note-editor {
+  padding: 30px;
+  min-width: 300px;
+}
+
+.cell-note-editor--header {
+  font-size: 13px;
+  font-weight: 600;
+  color: $g11-sidewalk;
+  @extend %no-user-select;
+  margin-bottom: $ix-marg-b;
+}
+
+.cell-note-editor--field {
+  background-color: $g2-kevlar;
+  padding: $ix-marg-b;
+  height: 320px;
+  border: $ix-border solid $g5-pepper;
+  border-radius: $radius;
+  transition: border-color 0.25s ease;
+
+  &.focus {
+    border-color: $c-pool;
+  }
+}
+
+.cell-note-editor--display-option {
+  display: flex;
+  align-items: center;
+  margin-top: $ix-marg-b;
+
+  > label {
+    flex: 1 0 0;
+    margin-left: $ix-marg-b;
+    color: $g11-sidewalk;
+  }
+}

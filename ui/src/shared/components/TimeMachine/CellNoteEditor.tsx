@@ -3,8 +3,9 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
 // Components
-import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
-import {EditorChange} from 'codemirror'
+import {Controlled as ReactCodeMirror} from 'react-codemirror2'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
 // Actions
 import {updateCellNote} from 'src/dashboards/actions/cellEditorOverlay'
@@ -14,47 +15,86 @@ interface Props {
   handleUpdateCellNote: (note: string) => void
 }
 
-class CellNoteEditor extends Component<Props> {
+interface State {
+  noteDraft: string
+  editorIsFocused: boolean
+  displayNoteWhenBadQuery: boolean
+}
+
+class CellNoteEditor extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {
+      noteDraft: props.note,
+      editorIsFocused: false,
+      displayNoteWhenBadQuery: false,
+    }
+  }
+
   public render() {
-    const {note} = this.props
+    const {noteDraft, displayNoteWhenBadQuery} = this.state
 
     const options = {
       tabIndex: 1,
-      mode: 'flux',
+      mode: 'markdown',
       readonly: false,
       lineNumbers: false,
       autoRefresh: true,
-      theme: 'time-machine',
+      theme: 'markdown',
       completeSingle: false,
     }
 
     return (
-      <div className="cell-note-editor">
-        <div className="cell-note-editor--field">
-          <ReactCodeMirror
-            autoFocus={true}
-            autoCursor={true}
-            value={note}
-            options={options}
-            onBeforeChange={this.handleUpdateNote}
-            onChange={this.handleChange}
-            onTouchStart={this.onTouchStart}
-          />
+      <FancyScrollbar className="cell-note-editor--container">
+        <div className="cell-note-editor">
+          <div className="cell-note-editor--header">Markdown is supported</div>
+          <div className="cell-note-editor--field">
+            <ReactCodeMirror
+              autoCursor={true}
+              value={noteDraft}
+              options={options}
+              onBeforeChange={this.handleChange}
+              onTouchStart={this.onTouchStart}
+              onFocus={this.handleFocus}
+              onBlur={this.handleBlur}
+            />
+          </div>
+          <div className="form-control-static cell-note-editor--display-option">
+            <SlideToggle
+              size={ComponentSize.ExtraSmall}
+              onChange={this.handleSlideToggle}
+              active={displayNoteWhenBadQuery}
+            />
+            <label>Display note in cell when query returns no results</label>
+          </div>
         </div>
-      </div>
+      </FancyScrollbar>
     )
   }
 
-  private onTouchStart = () => {}
+  private handleSlideToggle = (): void => {
+    this.setState({
+      displayNoteWhenBadQuery: !this.state.displayNoteWhenBadQuery,
+    })
+  }
 
-  private handleChange = (): void => {}
+  private handleFocus = (): void => {
+    this.setState({editorIsFocused: true})
+  }
 
-  private handleUpdateNote = (
-    _: IInstance,
-    __: EditorChange,
-    note: string
-  ): void => {
-    this.props.handleUpdateCellNote(note)
+  private handleBlur = (): void => {
+    const {handleUpdateCellNote} = this.props
+    const {noteDraft} = this.state
+
+    this.setState({editorIsFocused: false})
+    handleUpdateCellNote(noteDraft)
+  }
+
+  private onTouchStart = (): void => {}
+
+  private handleChange = (_, __, note: string): void => {
+    this.setState({noteDraft: note})
   }
 }
 
