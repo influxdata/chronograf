@@ -139,10 +139,9 @@ $dash-graph-options-arrow: 8px;
   position: absolute;
   width: 16px;
   height: 16px;
-  border-radius: 50%;
-  background-color: $g6-smoke;
-  transition: background-color 0.25s ease, color 0.25s ease;
-  font-size: 12px;
+  color: $g9-mountain;
+  transition: color 0.25s ease;
+  font-size: 14px;
 
   > .icon {
     position: absolute;
@@ -156,24 +155,39 @@ $dash-graph-options-arrow: 8px;
   display: none;
   position: absolute;
   z-index: 3;
-  top: 2px;
-  left: 100%;
-  width: 5000%;
-  max-width: 300px;
+  width: 290px;
+  max-height: 140px;
   background-color: rgba($g0-obsidian, 0.95);
   padding: 14px 16px;
   border-radius: $radius;
   font-size: 13px;
-  line-height: 15px;
+  line-height: 16px;
   font-weight: 500;
-  color: $g15-platinum;
+  color: $g13-mist;
   @extend %drop-shadow;
 }
+
+.dash-graph--note__top {
+  top: -10px;
+}
+.dash-graph--note__middle {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.dash-graph--note__bottom {
+  bottom: 0;
+}
+.dash-graph--note__right {
+  left: 100%;
+}
+.dash-graph--note__left {
+  right: 100%;
+}
+
 .dash-graph--note:hover .dash-graph--note-contents {
   display: block;
 }
 .dash-graph--note:hover .dash-graph--note-icon {
-  background-color: $c-pool;
   color: $g20-white;  
 }
 
@@ -189,11 +203,8 @@ $dash-graph-options-arrow: 8px;
   display: flex;
   align-items: center;
   border-radius: $radius-small;
-  font-weight: 600;
-  font-size: 13px;
-  color: $g14-chromium;
-  transition: color 0.25s ease, background-color 0.25s ease;
-
+  transition: background-color 0.25s ease;
+  
   &.dash-graph--heading-draggable:hover {
     cursor: move;
     background-color: $g5-pepper;
@@ -208,21 +219,28 @@ $dash-graph-options-arrow: 8px;
   text-overflow: ellipsis;
   white-space: nowrap;
   position: relative;
+  font-weight: 600;
+  font-size: 13px;
   height: $dash-graph-heading;
+  color: $g13-mist;
   line-height: $dash-graph-heading;
   width: calc(100% - 78px);
   padding-left: 10px;
-  transition: color 0.25s ease, background-color 0.25s ease,
-    border-color 0.25s ease;
+  transition: color 0.25s ease, opacity 0.25s ease;
+  
+  .dash-graph--heading-draggable:hover & {
+    color: $g16-pearl;
+  }
 }
 
 .dash-graph--name.dash-graph--name__default {
   font-style: italic;
+  opacity: 0.5;
 }
 
 .dash-graph--name.dash-graph--name__note {
   width: calc(100% - (78px + 22px));
-  margin-left: 22px;
+  margin-left: 20px;
 }
 
 .dash-graph--draggable {

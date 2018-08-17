@@ -1,8 +1,11 @@
 // Libraries
 import React, {Component} from 'react'
+import classnames from 'classnames'
 
 interface Props {
   note: string
+  cellX: number
+  cellY: number
 }
 
 class LayoutCellNote extends Component<Props> {
@@ -16,11 +19,22 @@ class LayoutCellNote extends Component<Props> {
     return (
       <div className="dash-graph--note">
         <div className="dash-graph--note-icon">
-          <span className="icon zap" />
+          <span className="icon chat" />
         </div>
-        <div className="dash-graph--note-contents">{note}</div>
+        <div className={this.noteContentsClass}>{note}</div>
       </div>
     )
+  }
+
+  private get noteContentsClass(): string {
+    const {cellX, cellY} = this.props
+
+    return classnames('dash-graph--note-contents', {
+      'dash-graph--note__top': cellY === 0,
+      'dash-graph--note__bottom': cellY > 0,
+      'dash-graph--note__left': cellX > 0,
+      'dash-graph--note__right': cellX === 0,
+    })
   }
 }
 

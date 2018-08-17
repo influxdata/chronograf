@@ -46,7 +46,7 @@ export default class LayoutCell extends Component<Props> {
             queries={this.queries}
           />
         </Authorized>
-        <LayoutCellNote note={cell.note} />
+        <LayoutCellNote note={cell.note} cellX={cell.x} cellY={cell.y} />
         <LayoutCellHeader
           cellName={this.cellName}
           isEditable={isEditable}
