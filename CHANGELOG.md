@@ -4,8 +4,10 @@
 1.  [#4217](https://github.com/influxdata/chronograf/pull/4217): Add filestore backed API for protodashboards
 1.  [#4220](https://github.com/influxdata/chronograf/pull/4220): Add ability to copy expanded/untruncated log message
 1.  [#4228](https://github.com/influxdata/chronograf/pull/4228): Add close button for logs pop over
+1.  [#4241](https://github.com/influxdata/chronograf/pull/4241): Add search attributes to log viewer
 
 ### UI Improvements
+1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
 
 ### Bug Fixes
 
@@ -18,6 +20,8 @@
 
 ### Bug Fixes
 1.  [#4231](https://github.com/influxdata/chronograf/pull/4231): Fix notifying user to press ESC to exit presentation mode
+1.  [#4234](https://github.com/influxdata/chronograf/pull/4234): Fix persisting whether or not template variable control bar is open
+1.  [#4235](https://github.com/influxdata/chronograf/pull/4235): Fix Submit Query button in Data Explorer to correctly return results
 
 ## v1.6.1 [2018-08-02]
 

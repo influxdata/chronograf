@@ -1,6 +1,25 @@
-import {NEW_DEFAULT_DASHBOARD_CELL} from 'src/dashboards/constants'
+// APIs
+import {getQueryConfigAndStatus} from 'src/shared/apis'
+
+// Utils
+import replaceTemplate, {replaceInterval} from 'src/tempVars/utils/replace'
+import {getDeep} from 'src/utils/wrappers'
+
+// Constants
+import {
+  UNTITLED_GRAPH,
+  NEW_DEFAULT_DASHBOARD_CELL,
+} from 'src/dashboards/constants'
+import {
+  TEMP_VAR_DASHBOARD_TIME,
+  DEFAULT_DURATION_MS,
+  DEFAULT_PIXELS,
+} from 'src/shared/constants'
+
+// Types
 import {Cell, CellType, Dashboard, NewDefaultCell} from 'src/types/dashboards'
-import {UNTITLED_GRAPH} from 'src/dashboards/constants'
+import {QueryConfig, DurationRange} from 'src/types/queries'
+import {Template} from 'src/types'
 
 const getMostCommonValue = (values: number[]): number => {
   const results = values.reduce(
@@ -97,4 +116,48 @@ export const getClonedDashboardCell = (
   const name = `${cloneCell.name} (clone)`
 
   return {...cloneCell, x, y, name}
+}
+
+export const getTimeRange = (queryConfig: QueryConfig): DurationRange => {
+  return (
+    queryConfig.range || {
+      upper: null,
+      lower: TEMP_VAR_DASHBOARD_TIME,
+    }
+  )
+}
+
+export const getConfig = async (
+  url,
+  id: string,
+  query: string,
+  templates: Template[]
+): Promise<QueryConfig> => {
+  // replace all templates but :interval:
+  query = replaceTemplate(query, templates)
+  let queries = []
+  let durationMs = DEFAULT_DURATION_MS
+
+  try {
+    // get durationMs to calculate interval
+    queries = await getQueryConfigAndStatus(url, [{query, id}])
+    durationMs = getDeep<number>(queries, '0.durationMs', DEFAULT_DURATION_MS)
+    // calc and replace :interval:
+    query = replaceInterval(query, DEFAULT_PIXELS, durationMs)
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+
+  try {
+    // fetch queryConfig for with all template variables replaced
+    queries = await getQueryConfigAndStatus(url, [{query, id}])
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+
+  const {queryConfig} = queries.find(q => q.id === id)
+
+  return queryConfig
 }

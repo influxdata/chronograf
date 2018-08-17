@@ -3,6 +3,7 @@ import {
   enablePresentationMode,
   disablePresentationMode,
   setAutoRefresh,
+  toggleTemplateVariableControlBar,
 } from 'src/shared/actions/app'
 
 describe('Shared.Reducers.appReducer', () => {
@@ -12,6 +13,7 @@ describe('Shared.Reducers.appReducer', () => {
     },
     persisted: {
       autoRefresh: 0,
+      showTemplateVariableControlBar: false,
     },
   }
 
@@ -35,5 +37,14 @@ describe('Shared.Reducers.appReducer', () => {
     const reducedState = appReducer(initialState, setAutoRefresh(expectedMs))
 
     expect(reducedState.persisted.autoRefresh).toBe(expectedMs)
+  })
+
+  it('should handle TOGGLE_TEMPLATE_VARIABLE_CONTROL_BAR', () => {
+    const reducedState = appReducer(
+      initialState,
+      toggleTemplateVariableControlBar()
+    )
+
+    expect(reducedState.persisted.showTemplateVariableControlBar).toBe(true)
   })
 })

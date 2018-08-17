@@ -22,11 +22,14 @@ export const createRule = (
 })
 
 const getPattern = (type: TermType, phrase: TermPart): RegExp => {
+  const {ATTRIBUTE, COLON, EXCLUSION} = TermPart
+  const PHRASE = `(${ATTRIBUTE}${COLON})?${phrase}`
+
   switch (type) {
     case TermType.EXCLUDE:
-      return new RegExp(`^${TermPart.EXCLUSION}${phrase}`)
+      return new RegExp(`^${EXCLUSION}${PHRASE}`)
     default:
-      return new RegExp(`^${phrase}`)
+      return new RegExp(`^${PHRASE}`)
   }
 }
 
@@ -46,7 +49,7 @@ export const searchToFilters = (searchTerm: string): Filter[] => {
 }
 
 const termsToFilters = (terms: Term[]): Filter[] => {
-  return terms.map(t => createMessageFilter(t.term, termToOp(t)))
+  return terms.map(t => createAttributeFilter(t.attribute, t.term, termToOp(t)))
 }
 
 const extractTerms = (searchTerms: string, rules: TermRule[]): Term[] => {
@@ -63,9 +66,9 @@ const extractTerms = (searchTerms: string, rules: TermRule[]): Term[] => {
 }
 
 const extractNextTerm = (text, rules: TermRule[]) => {
-  const {literal, rule, nextText} = readToken(eatSpaces(text), rules)
+  const {literal, rule, nextText, attribute} = readToken(eatSpaces(text), rules)
 
-  const nextTerm = createTerm(rule.type, literal)
+  const nextTerm = createTerm(rule.type, literal, attribute)
 
   return {nextText, nextTerm}
 }
@@ -78,31 +81,54 @@ const readToken = (text: string, rules: TermRule[]): TokenLiteralMatch => {
   const rule = rules.find(r => text.match(new RegExp(r.pattern)) !== null)
 
   const term = new RegExp(rule.pattern).exec(text)
-  const literal = term[1]
+  const literal = term[3]
+  const attribute = term[2]
   // differs from literal length because of quote and exclusion removal
   const termLength = term[0].length
   const nextText = text.slice(termLength)
 
-  return {literal, nextText, rule}
+  return {literal, nextText, rule, attribute}
 }
 
-const createTerm = (type: TermType, term: string): Term => ({
+const createTerm = (
+  type: TermType,
+  term: string,
+  attribute: string = MESSAGE_KEY
+): Term => ({
   type,
   term,
+  attribute,
 })
 
-const createMessageFilter = (value: string, operator: Operator): Filter => ({
+const createAttributeFilter = (
+  key: string,
+  value: string,
+  operator: Operator
+) => ({
   id: uuid.v4(),
-  key: MESSAGE_KEY,
+  key,
   value,
   operator,
 })
 
 const termToOp = (term: Term): Operator => {
+  switch (term.attribute) {
+    case MESSAGE_KEY:
+      return handleOpExclusion(term, Operator.LIKE, Operator.NOT_LIKE)
+    default:
+      return handleOpExclusion(term, Operator.EQUAL, Operator.NOT_EQUAL)
+  }
+}
+
+const handleOpExclusion = (
+  term: Term,
+  inclusion: Operator,
+  exclusion: Operator
+): Operator => {
   switch (term.type) {
     case TermType.EXCLUDE:
-      return Operator.NOT_LIKE
+      return exclusion
     case TermType.INCLUDE:
-      return Operator.LIKE
+      return inclusion
   }
 }

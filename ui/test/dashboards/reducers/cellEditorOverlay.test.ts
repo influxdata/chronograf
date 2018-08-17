@@ -1,8 +1,8 @@
 import reducer, {initialState} from 'src/dashboards/reducers/cellEditorOverlay'
 
 import {
-  showCellEditorOverlay,
-  hideCellEditorOverlay,
+  loadCellForCEO,
+  clearCellFromCEO,
   changeCellType,
   renameCell,
   updateThresholdsListColors,
@@ -37,7 +37,7 @@ const defaultLineColors = validateLineColors(defaultCell.colors)
 
 describe('Dashboards.Reducers.cellEditorOverlay', () => {
   it('should show cell editor overlay', () => {
-    const actual = reducer(initialState, showCellEditorOverlay(defaultCell))
+    const actual = reducer(initialState, loadCellForCEO(defaultCell))
     const expected = {
       cell: defaultCell,
       gaugeColors: defaultGaugeColors,
@@ -53,7 +53,7 @@ describe('Dashboards.Reducers.cellEditorOverlay', () => {
   })
 
   it('should hide cell editor overlay', () => {
-    const actual = reducer(initialState, hideCellEditorOverlay())
+    const actual = reducer(initialState, clearCellFromCEO())
     const expected = null
 
     expect(actual.cell).toBe(expected)

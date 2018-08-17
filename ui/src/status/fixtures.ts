@@ -42,6 +42,7 @@ export const fixtureStatusPageCells: Cell[] = [
     colors: DEFAULT_LINE_COLORS,
     queries: [
       {
+        id: '1234',
         query: `SELECT count("value") AS "count_value" FROM "chronograf"."autogen"."alerts" WHERE time > ${TEMP_VAR_DASHBOARD_TIME} GROUP BY time(1d)`,
         source: '',
         queryConfig: {

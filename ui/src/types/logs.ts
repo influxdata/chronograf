@@ -131,12 +131,14 @@ export type RowHeightHandler = (index: Index) => number
 export interface Term {
   type: TermType
   term: string
+  attribute: string
 }
 
 export interface TokenLiteralMatch {
   literal: string
   nextText: string
   rule: TermRule
+  attribute: string
 }
 
 export interface TermRule {
@@ -153,10 +155,14 @@ export enum TermPart {
   EXCLUSION = '-',
   SINGLE_QUOTED = "'([^']+)'",
   DOUBLE_QUOTED = '"([^"]+)"',
+  ATTRIBUTE = '(\\w+(?=\\:))',
+  COLON = '(?::)',
   UNQUOTED_WORD = '([\\S]+)',
 }
 
 export enum Operator {
   NOT_LIKE = '!~',
   LIKE = '=~',
+  EQUAL = '==',
+  NOT_EQUAL = '!=',
 }

@@ -9,6 +9,7 @@ import {
   ActionTypes,
   EnablePresentationModeAction,
   DisablePresentationModeAction,
+  ToggleTemplateVariableControlBarAction,
   DelayEnablePresentationModeDispatcher,
   SetAutoRefreshActionCreator,
   SetAutoRefreshAction,
@@ -41,4 +42,8 @@ export const setAutoRefresh: SetAutoRefreshActionCreator = (
   payload: {
     milliseconds,
   },
+})
+
+export const toggleTemplateVariableControlBar = (): ToggleTemplateVariableControlBarAction => ({
+  type: ActionTypes.ToggleTemplateVariableControlBar,
 })

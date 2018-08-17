@@ -21,7 +21,6 @@ const GraphTypeSelector = ({type, handleChangeCellType}) => {
       autoHide={false}
     >
       <div className="display-options--cell-wrapper">
-        <h5 className="display-options--header">Visualization Type</h5>
         <div className="viz-type-selector">
           {GRAPH_TYPES.map(graphType => (
             <div

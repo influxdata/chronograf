@@ -57,6 +57,18 @@ const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
   return activeKapacitor
 }
 
+const syncHostnames = (source: Source, kapacitor: Kapacitor) => {
+  if (source && source.url) {
+    const sourceURL = new URL(source.url)
+    const kapacitorURL = new URL(kapacitor.url)
+    if (sourceURL.hostname) {
+      kapacitorURL.hostname = sourceURL.hostname
+      return {...kapacitor, url: kapacitorURL.href}
+    }
+  }
+  return kapacitor
+}
+
 @ErrorHandling
 class KapacitorStep extends Component<Props, State> {
   public static defaultProps: Partial<Props> = {
@@ -66,13 +78,15 @@ class KapacitorStep extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    const kapacitor = props.showNewKapacitor
-      ? DEFAULT_KAPACITOR
-      : getActiveKapacitor(props.source, props.sources) || DEFAULT_KAPACITOR
+    let kapacitor = getActiveKapacitor(props.source, props.sources)
 
-    this.state = {
-      kapacitor,
+    if (!kapacitor || props.showNewKapacitor) {
+      kapacitor = DEFAULT_KAPACITOR
     }
+
+    kapacitor = syncHostnames(props.source, kapacitor)
+
+    this.state = {kapacitor}
   }
 
   public next = async () => {

@@ -255,10 +255,11 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 
   private handleUpdate = async (): Promise<void> => {
+    const {onUpdate} = this.props
+
     if (!this.isDisabled && !this.state.isSubmitted) {
       this.cancelPendingUpdates()
-
-      const update = this.props.onUpdate(this.state.editedQueryText)
+      const update = onUpdate(this.state.editedQueryText)
       const cancelableUpdate = makeCancelable(update)
 
       this.pendingUpdates = [...this.pendingUpdates, cancelableUpdate]

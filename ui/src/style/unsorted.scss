@@ -430,3 +430,77 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
 .annotation-selector {
   margin-left: 4px;
 }
+
+
+
+/*
+    New CEO/DE Styles
+    ----------------------------------------------------------------------------
+*/
+
+.deceo--overlay {
+  margin: 0 auto;
+  position: relative;
+  width: calc(100% - 120px);
+  height: calc(100% - 60px);
+  overflow: hidden;
+  border-radius: 0 0 $radius $radius;
+}
+
+.deceo {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+}
+
+.deceo--container {
+  height: calc(100% - 120px);
+  position: relative;
+}
+
+.deceo--top {
+  width: 100%;
+  height: 100%;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: $g3-castle;
+}
+
+.deceo--controls {
+  display: flex;
+  height: 60px;
+  padding: 0 60px;
+  background-color: $g3-castle;
+}
+
+.deceo--visualization {
+  padding: 0 (60px - 16px);
+  width: 100%;
+  height: 100%;
+
+  .graph-container {
+    top: 0;
+    height: 100%;
+  }
+}
+
+.deceo--bottom {
+  background-color: $g2-kevlar;
+  height: 100%;
+}
+
+$deceo--tab-width: 220px;
+
+.deceo--header {
+  .page-header--left,
+  .page-header--right {
+    flex: 1 0 calc(50% - #{$deceo--tab-width / 2});
+  }
+}
+
+.deceo--header-tabs {
+  flex: 1 0 $deceo--tab-width;
+}
