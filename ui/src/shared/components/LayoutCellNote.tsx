@@ -2,6 +2,9 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 
+// Components
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+
 interface Props {
   note: string
   cellX: number
@@ -21,7 +24,11 @@ class LayoutCellNote extends Component<Props> {
         <div className="dash-graph--note-icon">
           <span className="icon chat" />
         </div>
-        <div className={this.noteContentsClass}>{note}</div>
+        <div className={this.noteContentsClass}>
+          <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={140}>
+            <div className="dash-graph--note-contents">{note}</div>
+          </FancyScrollbar>
+        </div>
       </div>
     )
   }
@@ -29,7 +36,7 @@ class LayoutCellNote extends Component<Props> {
   private get noteContentsClass(): string {
     const {cellX, cellY} = this.props
 
-    return classnames('dash-graph--note-contents', {
+    return classnames('dash-graph--note-tooltip', {
       'dash-graph--note__top': cellY === 0,
       'dash-graph--note__bottom': cellY > 0,
       'dash-graph--note__left': cellX > 0,

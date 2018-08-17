@@ -151,20 +151,19 @@ $dash-graph-options-arrow: 8px;
   }
 }
 
-.dash-graph--note-contents {
+.dash-graph--note-tooltip {
   display: none;
   position: absolute;
   z-index: 3;
   width: 290px;
   max-height: 140px;
   background-color: rgba($g0-obsidian, 0.95);
-  padding: 14px 16px;
   border-radius: $radius;
-  font-size: 13px;
-  line-height: 16px;
-  font-weight: 500;
-  color: $g13-mist;
   @extend %drop-shadow;
+
+  .fancy-scroll--track-h {
+    display: none;
+  }
 }
 
 .dash-graph--note__top {
@@ -184,7 +183,14 @@ $dash-graph-options-arrow: 8px;
   right: 100%;
 }
 
-.dash-graph--note:hover .dash-graph--note-contents {
+.dash-graph--note-contents {
+  padding: 14px 16px;
+  font-size: 12px;
+  color: $g13-mist;
+}
+
+
+.dash-graph--note:hover .dash-graph--note-tooltip {
   display: block;
 }
 .dash-graph--note:hover .dash-graph--note-icon {
