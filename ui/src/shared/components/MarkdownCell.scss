@@ -1,0 +1,29 @@
+/*
+  Markdown Cell Styles
+  ------------------------------------------------------------------------------
+*/
+
+.markdown-cell {
+  position: absolute !important;
+  height: calc(100% - 20px) !important; // Prevent it from covering the cell resizer
+}
+
+.markdown-cell--contents {
+  padding: 8px 16px;
+}
+
+.markdown-cell > .fancy-scroll--track-v {
+  z-index: 2;
+}
+
+.markdown-cell:after {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 20px;
+  width: 100%;
+  @include gradient-v(rgba($g3-castle, 0), $g3-castle);
+  z-index: 1;
+}

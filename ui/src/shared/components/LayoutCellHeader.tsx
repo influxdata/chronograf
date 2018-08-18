@@ -5,10 +5,14 @@ import {isCellUntitled} from 'src/dashboards/utils/cellGetters'
 interface Props {
   isEditable: boolean
   cellName: string
-  cellNote: string
+  makeSpaceForCellNote: boolean
 }
 
-const LayoutCellHeader: SFC<Props> = ({isEditable, cellName, cellNote}) => {
+const LayoutCellHeader: SFC<Props> = ({
+  isEditable,
+  cellName,
+  makeSpaceForCellNote,
+}) => {
   const headingClass = `dash-graph--heading ${
     isEditable ? 'dash-graph--draggable dash-graph--heading-draggable' : ''
   }`
@@ -18,7 +22,7 @@ const LayoutCellHeader: SFC<Props> = ({isEditable, cellName, cellNote}) => {
       <span
         className={classnames('dash-graph--name', {
           'dash-graph--name__default': isCellUntitled(cellName),
-          'dash-graph--name__note': !!cellNote,
+          'dash-graph--name__note': makeSpaceForCellNote,
         })}
       >
         {cellName}

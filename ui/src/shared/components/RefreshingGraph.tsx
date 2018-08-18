@@ -8,6 +8,7 @@ import LineGraph from 'src/shared/components/LineGraph'
 import GaugeChart from 'src/shared/components/GaugeChart'
 import TableGraph from 'src/shared/components/TableGraph'
 import SingleStat from 'src/shared/components/SingleStat'
+import MarkdownCell from 'src/shared/components/MarkdownCell'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 
 // Constants
@@ -51,6 +52,7 @@ interface Props {
   onSetResolution: () => void
   handleSetHoverTime: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
+  cellNote: string
 }
 
 class RefreshingGraph extends PureComponent<Props> {
@@ -64,10 +66,11 @@ class RefreshingGraph extends PureComponent<Props> {
 
   public render() {
     const {
-      inView,
       type,
-      queries,
       source,
+      inView,
+      queries,
+      cellNote,
       timeRange,
       templates,
       editQueryStatus,
@@ -80,6 +83,10 @@ class RefreshingGraph extends PureComponent<Props> {
           <p data-test="data-explorer-no-results">{emptyGraphCopy}</p>
         </div>
       )
+    }
+
+    if (type === CellType.Note) {
+      return <MarkdownCell text={cellNote} />
     }
 
     return (

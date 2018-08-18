@@ -15,6 +15,7 @@ import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 
 import {Cell, CellQuery, Template} from 'src/types/'
 import {TimeSeriesServerResponse} from 'src/types/series'
+import {CellType} from 'src/types/dashboards'
 
 interface Props {
   cell: Cell
@@ -46,15 +47,26 @@ export default class LayoutCell extends Component<Props> {
             queries={this.queries}
           />
         </Authorized>
-        <LayoutCellNote note={cell.note} cellX={cell.x} cellY={cell.y} />
+        <LayoutCellNote
+          cellType={cell.type}
+          note={cell.note}
+          cellX={cell.x}
+          cellY={cell.y}
+        />
         <LayoutCellHeader
           cellName={this.cellName}
           isEditable={isEditable}
-          cellNote={cell.note}
+          makeSpaceForCellNote={this.makeSpaceForCellNote}
         />
         <div className="dash-graph--container">{this.renderGraph}</div>
       </div>
     )
+  }
+
+  private get makeSpaceForCellNote(): boolean {
+    const {cell} = this.props
+
+    return !!cell.note && cell.type !== CellType.Note
   }
 
   private get cellName(): string {

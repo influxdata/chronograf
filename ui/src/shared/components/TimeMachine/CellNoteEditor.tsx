@@ -11,6 +11,9 @@ import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 // Actions
 import {updateCellNote} from 'src/dashboards/actions/cellEditorOverlay'
 
+// Decorators
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
 interface Props {
   note: string
   handleUpdateCellNote: (note: string) => void
@@ -22,6 +25,7 @@ interface State {
   displayNoteWhenBadQuery: boolean
 }
 
+@ErrorHandling
 class CellNoteEditor extends Component<Props, State> {
   constructor(props: Props) {
     super(props)

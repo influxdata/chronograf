@@ -90,6 +90,7 @@ class Layout extends Component<Props> {
             grabDataForDownload={this.grabDataForDownload}
             queries={buildQueriesForLayouts(cell, timeRange, host)}
             source={this.getSource(cell, source, sources, source)}
+            cellNote={cell.note}
           />
         )}
       </LayoutCell>
