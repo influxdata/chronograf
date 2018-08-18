@@ -660,8 +660,7 @@ export const getDashboardWithTemplatesAsync = (
   let dashboard: Dashboard
 
   try {
-    const resp = await getDashboardAJAX(dashboardId)
-    dashboard = resp.data
+    dashboard = await getDashboardAJAX(dashboardId)
   } catch {
     dispatch(replace(`/sources/${source.id}/dashboards`))
     dispatch(notify(notifyDashboardNotFound(dashboardId)))

@@ -1,7 +1,5 @@
-import {
-  timeSeriesToDygraph,
-  timeSeriesToTableGraph,
-} from 'src/utils/timeSeriesTransformers'
+import {timeSeriesToDygraphWork as timeSeriesToDygraph} from 'src/worker/jobs/timeSeriesToDygraph'
+import {timeSeriesToTableGraphWork as timeSeriesToTableGraph} from 'src/worker/jobs/timeSeriesToTableGraph'
 
 import {
   filterTableColumns,
