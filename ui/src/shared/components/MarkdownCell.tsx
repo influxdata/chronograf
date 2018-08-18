@@ -21,7 +21,7 @@ class MarkdownCell extends Component<Props> {
     return (
       <FancyScrollbar className="markdown-cell" autoHide={true}>
         <div className="markdown-cell--contents">
-          <Markdown source={text} />
+          <Markdown source={text} className="markdown-format" />
         </div>
       </FancyScrollbar>
     )

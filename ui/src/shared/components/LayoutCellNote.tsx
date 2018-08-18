@@ -32,7 +32,7 @@ class LayoutCellNote extends Component<Props> {
         <div className={this.noteContentsClass}>
           <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={140}>
             <div className="dash-graph--note-contents">
-              <Markdown source={note} />
+              <Markdown source={note} className="markdown-format" />
             </div>
           </FancyScrollbar>
         </div>
