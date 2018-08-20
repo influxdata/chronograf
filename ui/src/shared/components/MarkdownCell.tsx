@@ -1,6 +1,5 @@
 // Libraries
 import React, {Component} from 'react'
-// import classnames from 'classnames'
 import Markdown from 'react-markdown'
 
 // Components
