@@ -1,7 +1,10 @@
+// Libraries
 import React, {SFC} from 'react'
 
+// Componentes
 import SourceDropdown from 'src/flux/components/SourceDropdown'
 
+// Types
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service} from 'src/types'
@@ -34,6 +37,8 @@ const SourceSelector: SFC<Props> = ({
         source={source}
         sources={sources}
         allowInfluxQL={true}
+        // TODO: when flux is added into CEO/DE, change to true
+        allowFlux={false}
         allowDynamicSource={true}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onChangeService={onChangeService}
