@@ -11,6 +11,37 @@
     cursor: text;
   }
 
+  .cm-italic {
+    font-style: italic;
+  }
+
+  .cm-bold {
+    font-weight: 900;
+  }
+
+  .cm-strikethrough {
+    text-decoration: none;
+    opacity: 0.5;
+  }
+
+  .cm-heading {
+    color: $c-honeydew;
+  }
+
+  .cm-image {
+    color: $c-comet;
+  }
+
+  .cm-link {
+    color: $c-pool;
+    text-decoration: none;
+  }
+
+  .cm-blockquote {
+    color: $g18-cloud;
+    background-color: $g3-castle;
+  }
+
   .CodeMirror-scrollbar-filler {
     background-color: transparent;
   }

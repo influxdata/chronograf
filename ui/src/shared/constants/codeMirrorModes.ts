@@ -330,8 +330,32 @@ export const modeMarkdown = {
   start: [
     // The regex matches the token, the token property contains the type
     {
-      regex: /"(?:[^\\]|\\.)*?(?:"|$)/,
-      token: 'string.double',
+      regex: /[*](\s|\w)+[*]/,
+      token: 'italic',
+    },
+    {
+      regex: /[*][*](\s|\w)+[*][*]/,
+      token: 'bold',
+    },
+    {
+      regex: /[~][~](\s|\w)+[~][~]/,
+      token: 'strikethrough',
+    },
+    {
+      regex: /\#+\s.+(?=$)/gm,
+      token: 'heading',
+    },
+    {
+      regex: /\>.+(?=$)/gm,
+      token: 'blockquote',
+    },
+    {
+      regex: /\[.+\]\(.+\)/,
+      token: 'link',
+    },
+    {
+      regex: /[!]\[.+\]\(.+\)/,
+      token: 'image',
     },
   ],
   // The multi-line comment state.
