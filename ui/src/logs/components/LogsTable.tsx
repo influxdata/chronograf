@@ -39,10 +39,13 @@ import {
   SeverityFormat,
   SeverityLevelColor,
   RowHeightHandler,
+  Filter,
+  Operator,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
 interface Props {
+  filters: Filter[]
   data: TableData
   isScrolledToTop: boolean
   isTruncated: boolean
@@ -621,7 +624,10 @@ class LogsTable extends Component<Props, State> {
   }
 
   private renderMessage = (formattedValue: string): JSX.Element => {
-    const {notify} = this.props
+    const {notify, filters} = this.props
+    const messageFilters = filters.filter(
+      f => f.key === 'message' && f.operator === Operator.LIKE
+    )
 
     if (this.props.isTruncated) {
       return (
@@ -629,11 +635,18 @@ class LogsTable extends Component<Props, State> {
           notify={notify}
           formattedValue={formattedValue}
           onExpand={this.props.onExpandMessage}
+          filters={messageFilters}
         />
       )
     }
 
-    return <LogsMessage notify={notify} formattedValue={formattedValue} />
+    return (
+      <LogsMessage
+        notify={notify}
+        formattedValue={formattedValue}
+        filters={messageFilters}
+      />
+    )
   }
 
   private severityDotStyle = (

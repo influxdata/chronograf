@@ -223,6 +223,7 @@ class LogsPage extends Component<Props, State> {
               onChooseCustomTime={this.handleChooseCustomTime}
               onExpandMessage={this.handleExpandMessage}
               notify={notify}
+              filters={filters}
             />
           </div>
         </div>

@@ -4,6 +4,7 @@ import {ClickOutside} from 'src/shared/components/ClickOutside'
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
 
 import {NotificationAction} from 'src/types'
+import {Filter} from 'src/types/logs'
 
 interface State {
   expanded: boolean
@@ -13,6 +14,7 @@ interface Props {
   formattedValue: string | JSX.Element
   notify: NotificationAction
   onExpand?: () => void
+  filters: Filter[]
 }
 
 export class ExpandableMessage extends Component<Props, State> {
@@ -24,17 +26,27 @@ export class ExpandableMessage extends Component<Props, State> {
   }
 
   public render() {
-    const {notify} = this.props
+    const {notify, filters} = this.props
     const formattedValue = `${this.props.formattedValue}`
     const trimmedValue = formattedValue.trimLeft()
 
     return (
       <ClickOutside onClickOutside={this.handleClickOutside}>
         <div onClick={this.handleClick} className="expandable--message">
-          <div className="expandable--text">{trimmedValue}</div>
+          <div className="expandable--text">
+            <LogsMessage
+              formattedValue={trimmedValue}
+              notify={notify}
+              filters={filters}
+            />
+          </div>
           <div className={this.isExpanded}>
             {this.closeExpansionButton}
-            <LogsMessage formattedValue={formattedValue} notify={notify} />
+            <LogsMessage
+              formattedValue={formattedValue}
+              notify={notify}
+              filters={filters}
+            />
           </div>
         </div>
       </ClickOutside>
