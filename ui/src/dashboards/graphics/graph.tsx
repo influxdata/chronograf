@@ -525,7 +525,7 @@ const GRAPH_SVGS: GraphSVGs = {
   note: (
     <div className="viz-type-selector--graphic">
       <svg
-        id="Table"
+        id="Note"
         x="0px"
         y="0px"
         width="100%"
@@ -533,67 +533,28 @@ const GRAPH_SVGS: GraphSVGs = {
         viewBox="0 0 150 150"
       >
         <path
-          className="viz-type-selector--graphic-fill graphic-fill-c"
-          d="M55.5,115H19.7c-1.7,0-3.1-1.4-3.1-3.1V61.7h38.9V115z"
+          className="viz-type-selector--graphic-fill graphic-fill-a"
+          d="M61,97.3H37l-4.2,13.6H14l26.7-72.8h16.5l26.9,72.8H65.3L61,97.3z M41.2,83.8h15.7L49,58.5L41.2,83.8z"
         />
         <path
           className="viz-type-selector--graphic-fill graphic-fill-b"
-          d="M133.4,61.7H55.5V35h74.8c1.7,0,3.1,1.4,3.1,3.1V61.7z"
-        />
-        <path
-          className="viz-type-selector--graphic-fill graphic-fill-a"
-          d="M55.5,61.7H16.6V38.1c0-1.7,1.4-3.1,3.1-3.1h35.9V61.7z"
-        />
-        <path
-          className="viz-type-selector--graphic-line graphic-line-c"
-          d="M16.6,88.3v23.6c0,1.7,1.4,3.1,3.1,3.1h35.9V88.3H16.6z"
-        />
-        <rect
-          className="viz-type-selector--graphic-line graphic-line-c"
-          x="16.6"
-          y="61.7"
-          width="38.9"
-          height="26.7"
-        />
-        <path
-          className="viz-type-selector--graphic-line graphic-line-b"
-          d="M94.5,35v26.7h38.9V38.1c0-1.7-1.4-3.1-3.1-3.1H94.5z"
-        />
-        <rect
-          className="viz-type-selector--graphic-line graphic-line-b"
-          x="55.5"
-          y="35"
-          width="38.9"
-          height="26.7"
-        />
-        <path
-          className="viz-type-selector--graphic-line graphic-line-d"
-          d="M94.5,115h35.9c1.7,0,3.1-1.4,3.1-3.1V88.3H94.5V115z"
-        />
-        <rect
-          className="viz-type-selector--graphic-line graphic-line-d"
-          x="55.5"
-          y="88.3"
-          width="38.9"
-          height="26.7"
-        />
-        <rect
-          className="viz-type-selector--graphic-line graphic-line-d"
-          x="94.5"
-          y="61.7"
-          width="38.9"
-          height="26.7"
-        />
-        <rect
-          className="viz-type-selector--graphic-line graphic-line-d"
-          x="55.5"
-          y="61.7"
-          width="38.9"
-          height="26.7"
+          d="M119.1,110.9c-0.6-1.1-1.1-2.7-1.6-4.9c-3.1,3.9-7.4,5.9-13,5.9c-5.1,0-9.4-1.5-13-4.6c-3.6-3.1-5.4-7-5.4-11.6
+	c0-5.9,2.2-10.3,6.5-13.3c4.3-3,10.6-4.5,18.9-4.5h5.2V75c0-5-2.2-7.5-6.5-7.5c-4,0-6,2-6,5.9H87.5c0-5.2,2.2-9.5,6.7-12.7
+	c4.5-3.3,10.1-4.9,17-4.9c6.9,0,12.4,1.7,16.4,5.1c4,3.4,6.1,8,6.2,13.9v24c0.1,5,0.8,8.8,2.3,11.4v0.9H119.1z M108.6,99.9
+	c2.1,0,3.8-0.5,5.2-1.4c1.4-0.9,2.4-1.9,3-3.1v-8.7h-4.9c-5.9,0-8.8,2.6-8.8,7.9c0,1.5,0.5,2.8,1.6,3.7
+	C105.7,99.4,107,99.9,108.6,99.9z"
         />
         <path
           className="viz-type-selector--graphic-line graphic-line-a"
-          d="M55.5,35H19.7c-1.7,0-3.1,1.4-3.1,3.1v23.6h38.9V35z"
+          d="M61,97.3H37l-4.2,13.6H14l26.7-72.8h16.5l26.9,72.8H65.3L61,97.3z M41.2,83.8h15.7L49,58.5L41.2,83.8z"
+        />
+        <path
+          className="viz-type-selector--graphic-line graphic-line-b"
+          d="M119.1,110.9c-0.6-1.1-1.1-2.7-1.6-4.9c-3.1,3.9-7.4,5.9-13,5.9c-5.1,0-9.4-1.5-13-4.6c-3.6-3.1-5.4-7-5.4-11.6
+	c0-5.9,2.2-10.3,6.5-13.3c4.3-3,10.6-4.5,18.9-4.5h5.2V75c0-5-2.2-7.5-6.5-7.5c-4,0-6,2-6,5.9H87.5c0-5.2,2.2-9.5,6.7-12.7
+	c4.5-3.3,10.1-4.9,17-4.9c6.9,0,12.4,1.7,16.4,5.1c4,3.4,6.1,8,6.2,13.9v24c0.1,5,0.8,8.8,2.3,11.4v0.9H119.1z M108.6,99.9
+	c2.1,0,3.8-0.5,5.2-1.4c1.4-0.9,2.4-1.9,3-3.1v-8.7h-4.9c-5.9,0-8.8,2.6-8.8,7.9c0,1.5,0.5,2.8,1.6,3.7
+	C105.7,99.4,107,99.9,108.6,99.9z"
         />
       </svg>
     </div>
