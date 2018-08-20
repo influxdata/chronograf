@@ -11,6 +11,10 @@ import {
   OverlayBody,
   MultiSelectDropdown,
   Form,
+  Button,
+  ComponentColor,
+  ComponentStatus,
+  Input,
 } from 'src/reusable_ui'
 
 // Constants
@@ -53,47 +57,41 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
   public render() {
     const {onCancel} = this.props
-    const {hasQuery, name, selectedIDs} = this.state
+    const {name, selectedIDs} = this.state
 
     const numberDashboards = selectedIDs.length > 1 ? selectedIDs.length : ''
     const pluralizer = selectedIDs.length > 1 ? 's' : ''
 
     return (
       <OverlayContainer>
-        <OverlayHeading title="Send to Dashboard" />
+        <OverlayHeading title="Send to Dashboard" onDismiss={onCancel} />
         <OverlayBody>
           <Form>
-            <Form.Element label="New Cell Name">
-              <input
-                type="text"
-                id="New Cell Name"
-                className="form-control input-sm"
+            <Form.Element label="Cell Name">
+              <Input
                 value={name}
                 onChange={this.handleChangeName}
+                placeholder={'Name this new cell'}
               />
             </Form.Element>
-            <Form.Element label="Choose 1 or more Dashboards">
+            <Form.Element label="Target Dashboard(s)">
               <MultiSelectDropdown
                 onChange={this.handleSelect}
                 selectedIDs={this.state.selectedIDs}
+                emptyText="Choose at least 1 dashboard"
               >
                 {this.dropdownItems}
               </MultiSelectDropdown>
             </Form.Element>
             <Form.Footer>
-              <button
-                className="button button-md button-default"
-                onClick={onCancel}
-              >
-                Cancel
-              </button>
-              <button
-                className="button button-md button-success"
-                disabled={!hasQuery || selectedIDs.length === 0}
+              <Button
+                color={ComponentColor.Success}
+                text={`Send to ${numberDashboards} Dashboard${pluralizer}`}
+                titleText="Must choose at least 1 dashboard and set a name"
+                status={this.submitButtonStatus}
                 onClick={this.sendToDashboard}
-              >
-                {`Send to ${numberDashboards} Dashboard${pluralizer}`}
-              </button>
+              />
+              <Button text="Cancel" onClick={onCancel} />
             </Form.Footer>
           </Form>
         </OverlayBody>
@@ -128,6 +126,16 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     return dashboards.filter(d => {
       return selectedIDs.includes(d.id.toString())
     })
+  }
+
+  private get submitButtonStatus(): ComponentStatus {
+    const {hasQuery, name, selectedIDs} = this.state
+
+    if (!hasQuery || selectedIDs.length === 0 || name.trim().length === 0) {
+      return ComponentStatus.Disabled
+    }
+
+    return ComponentStatus.Default
   }
 
   private handleSelect = (updatedSelection: string[]) => {
