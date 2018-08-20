@@ -9,6 +9,7 @@ import {
   TemplateType,
   TemplateValueType,
 } from 'src/types'
+import {CellNoteVisibility} from 'src/types/dashboards'
 
 export const role = {
   name: '',
@@ -696,4 +697,6 @@ export const cell: Cell = {
   },
   legend: {},
   inView: true,
+  note: 'I am the greatest cell!',
+  noteVisibility: CellNoteVisibility.Default,
 }
