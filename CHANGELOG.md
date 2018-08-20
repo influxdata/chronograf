@@ -14,6 +14,7 @@
 
 ### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
+1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
 
 ### Bug Fixes
 
