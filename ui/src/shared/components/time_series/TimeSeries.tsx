@@ -34,8 +34,8 @@ interface Props {
   templates?: Template[]
   editQueryStatus?: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
-  cellNote: string
-  cellNoteVisibility: CellNoteVisibility
+  cellNote?: string
+  cellNoteVisibility?: CellNoteVisibility
 }
 
 interface State {
