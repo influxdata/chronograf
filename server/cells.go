@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"github.com/bouk/httprouter"
@@ -52,6 +51,10 @@ func newCellResponse(dID chronograf.DashboardID, cell chronograf.DashboardCell) 
 	}
 	cell.Axes = newAxes
 
+	if cell.NoteVisibility == "" {
+		cell.NoteVisibility = "default"
+	}
+
 	return dashboardCellResponse{
 		DashboardCell: cell,
 		Links: dashboardCellLinks{
@@ -75,7 +78,12 @@ func ValidDashboardCellRequest(c *chronograf.DashboardCell) error {
 		return fmt.Errorf("Chronograf dashboard cell was nil")
 	}
 
-	EscapeNoteHTML(c)
+	if c.NoteVisibility == "" {
+		c.NoteVisibility = "default"
+	}
+	if c.NoteVisibility != "default" && c.NoteVisibility != "showWhenNoData" {
+		return fmt.Errorf("Chronograf dashboard cell note visibility value is invalid")
+	}
 
 	CorrectWidthHeight(c)
 	for _, q := range c.Queries {
@@ -188,12 +196,6 @@ func AddQueryConfig(c *chronograf.DashboardCell) {
 		q.QueryConfig = qc
 		c.Queries[i] = q
 	}
-}
-
-// EscapeNoteHTML html escapes a cell note to help prevent XSS attacks since
-// a note is an arbitrary, user-inputted string rendered to the DOM
-func EscapeNoteHTML(c *chronograf.DashboardCell) {
-	c.Note = template.HTMLEscapeString(c.Note)
 }
 
 // DashboardCells returns all cells from a dashboard within the store
