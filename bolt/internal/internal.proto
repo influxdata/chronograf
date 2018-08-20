@@ -43,6 +43,7 @@ message DashboardCell {
 	string timeFormat                    = 14; // format for time
 	DecimalPlaces decimalPlaces          = 15; // Represents how precise the values of this field should be
 	string note                          = 16; // arbitrary string for note-taking/making
+	string noteVisibility                = 17; // config option for showing note
 }
 
 message DecimalPlaces {

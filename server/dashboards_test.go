@@ -177,6 +177,7 @@ func TestValidDashboardRequest(t *testing.T) {
 								Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
 							},
 						},
+						NoteVisibility: "default",
 					},
 					{
 						W: 2,
@@ -186,6 +187,7 @@ func TestValidDashboardRequest(t *testing.T) {
 								Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
 							},
 						},
+						NoteVisibility: "default",
 					},
 				},
 			},
@@ -302,6 +304,7 @@ func Test_newDashboardResponse(t *testing.T) {
 									Bounds: []string{"", ""},
 								},
 							},
+							NoteVisibility: "default",
 						},
 					},
 					dashboardCellResponse{
@@ -347,6 +350,7 @@ func Test_newDashboardResponse(t *testing.T) {
 									},
 								},
 							},
+							NoteVisibility: "default",
 						},
 					},
 				},

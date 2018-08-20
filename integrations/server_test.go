@@ -568,6 +568,7 @@ func TestServer(t *testing.T) {
         "digits": 0
 			},
 			"note": "",
+			"noteVisibility": "default",
       "links": {
         "self": "/chronograf/v1/dashboards/1000/cells/8f61c619-dd9b-4761-8aa8-577f27247093"
       }
@@ -828,6 +829,7 @@ func TestServer(t *testing.T) {
             "digits": 0
 					},
 					"note": "",
+					"noteVisibility": "default",
           "links": {
             "self": "/chronograf/v1/dashboards/1000/cells/8f61c619-dd9b-4761-8aa8-577f27247093"
           }
