@@ -7,20 +7,25 @@ import Markdown from 'react-markdown'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 // Types
-import {CellType} from 'src/types/dashboards'
+import {CellType, CellNoteVisibility} from 'src/types/dashboards'
 
 interface Props {
   note: string
   cellX: number
   cellY: number
   cellType: CellType
+  visibility: CellNoteVisibility
 }
 
 class LayoutCellNote extends Component<Props> {
   public render() {
-    const {note, cellType} = this.props
+    const {note, cellType, visibility} = this.props
 
-    if (note === '' || cellType === CellType.Note) {
+    if (
+      note === '' ||
+      cellType === CellType.Note ||
+      visibility === CellNoteVisibility.ShowWhenNoData
+    ) {
       return null
     }
 

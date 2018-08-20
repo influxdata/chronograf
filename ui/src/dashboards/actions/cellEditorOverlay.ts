@@ -31,6 +31,7 @@ import {
   TableOptions,
   CellQuery,
   NewDefaultCell,
+  CellNoteVisibility,
 } from 'src/types/dashboards'
 import {
   Status,
@@ -65,6 +66,7 @@ export enum ActionType {
   UpdateQueryDrafts = 'UPDATE_QUERY_DRAFTS',
   UpdateQueryDraft = 'UPDATE_QUERY_DRAFT',
   UpdateCellNote = 'UPDATE_CELL_NOTE',
+  UpdateCellNoteVisibility = 'UPDATE_CELL_NOTE_VISIBILITY',
 }
 
 export type Action =
@@ -83,6 +85,7 @@ export type Action =
   | UpdateFieldOptionsAction
   | UpdateQueryDraftsAction
   | UpdateCellNoteAction
+  | UpdateCellNoteVisibilityAction
 
 export interface LoadCellForCEOAction {
   type: ActionType.LoadCellForCEO
@@ -193,6 +196,13 @@ export interface UpdateCellNoteAction {
   }
 }
 
+export interface UpdateCellNoteVisibilityAction {
+  type: ActionType.UpdateCellNoteVisibility
+  payload: {
+    noteVisibility: CellNoteVisibility
+  }
+}
+
 export const loadCellForCEO = (
   cell: Cell | NewDefaultCell
 ): LoadCellForCEOAction => ({
@@ -217,6 +227,15 @@ export const updateCellNote = (note: string): UpdateCellNoteAction => ({
   type: ActionType.UpdateCellNote,
   payload: {
     note,
+  },
+})
+
+export const UpdateCellNoteVisibility = (
+  noteVisibility: CellNoteVisibility
+): UpdateCellNoteVisibilityAction => ({
+  type: ActionType.UpdateCellNoteVisibility,
+  payload: {
+    noteVisibility,
   },
 })
 

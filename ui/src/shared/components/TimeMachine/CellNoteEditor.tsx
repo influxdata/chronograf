@@ -9,20 +9,27 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
 // Actions
-import {updateCellNote} from 'src/dashboards/actions/cellEditorOverlay'
+import {
+  updateCellNote,
+  UpdateCellNoteVisibility,
+} from 'src/dashboards/actions/cellEditorOverlay'
+
+// Types
+import {CellNoteVisibility} from 'src/types/dashboards'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   note: string
+  noteVisibility: CellNoteVisibility
   handleUpdateCellNote: (note: string) => void
+  handleUpdateCellNoteVisibility: (noteVisibility: CellNoteVisibility) => void
 }
 
 interface State {
   noteDraft: string
   editorIsFocused: boolean
-  displayNoteWhenBadQuery: boolean
 }
 
 @ErrorHandling
@@ -33,12 +40,12 @@ class CellNoteEditor extends Component<Props, State> {
     this.state = {
       noteDraft: props.note,
       editorIsFocused: false,
-      displayNoteWhenBadQuery: false,
     }
   }
 
   public render() {
-    const {noteDraft, displayNoteWhenBadQuery} = this.state
+    const {noteVisibility} = this.props
+    const {noteDraft} = this.state
 
     const options = {
       tabIndex: 1,
@@ -72,7 +79,7 @@ class CellNoteEditor extends Component<Props, State> {
             <SlideToggle
               size={ComponentSize.ExtraSmall}
               onChange={this.handleSlideToggle}
-              active={displayNoteWhenBadQuery}
+              active={noteVisibility === CellNoteVisibility.ShowWhenNoData}
             />
             <label>Display note in cell when query returns no results</label>
           </div>
@@ -82,9 +89,13 @@ class CellNoteEditor extends Component<Props, State> {
   }
 
   private handleSlideToggle = (): void => {
-    this.setState({
-      displayNoteWhenBadQuery: !this.state.displayNoteWhenBadQuery,
-    })
+    const {noteVisibility, handleUpdateCellNoteVisibility} = this.props
+
+    if (noteVisibility === CellNoteVisibility.Default) {
+      handleUpdateCellNoteVisibility(CellNoteVisibility.ShowWhenNoData)
+    } else {
+      handleUpdateCellNoteVisibility(CellNoteVisibility.Default)
+    }
   }
 
   private handleFocus = (): void => {
@@ -114,14 +125,16 @@ class CellNoteEditor extends Component<Props, State> {
 
 const mstp = ({
   cellEditorOverlay: {
-    cell: {note},
+    cell: {note, noteVisibility},
   },
 }) => ({
   note,
+  noteVisibility,
 })
 
 const mdtp = {
   handleUpdateCellNote: updateCellNote,
+  handleUpdateCellNoteVisibility: UpdateCellNoteVisibility,
 }
 
 export default connect(mstp, mdtp)(CellNoteEditor)

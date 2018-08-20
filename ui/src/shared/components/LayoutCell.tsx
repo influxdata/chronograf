@@ -14,6 +14,7 @@ import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 
 import {Cell, CellQuery, Template} from 'src/types/'
+import {CellNoteVisibility} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {CellType} from 'src/types/dashboards'
 
@@ -48,6 +49,7 @@ export default class LayoutCell extends Component<Props> {
           />
         </Authorized>
         <LayoutCellNote
+          visibility={cell.noteVisibility}
           cellType={cell.type}
           note={cell.note}
           cellX={cell.x}
@@ -66,7 +68,11 @@ export default class LayoutCell extends Component<Props> {
   private get makeSpaceForCellNote(): boolean {
     const {cell} = this.props
 
-    return !!cell.note && cell.type !== CellType.Note
+    return (
+      !!cell.note &&
+      cell.type !== CellType.Note &&
+      cell.noteVisibility === CellNoteVisibility.Default
+    )
   }
 
   private get cellName(): string {

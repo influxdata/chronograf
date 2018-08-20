@@ -9,6 +9,7 @@ import {
   DecimalPlaces,
   SourceItemValue,
   NewDefaultCell,
+  CellNoteVisibility,
 } from 'src/types/dashboards'
 
 export const UNTITLED_GRAPH: string = 'Untitled Graph'
@@ -67,6 +68,7 @@ export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   fieldOptions: [DEFAULT_TIME_FIELD],
   inView: true,
   note: '',
+  noteVisibility: CellNoteVisibility.Default,
 }
 
 interface EmptyDefaultDashboardCell {

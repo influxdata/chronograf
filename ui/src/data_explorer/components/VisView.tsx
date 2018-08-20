@@ -3,6 +3,7 @@ import React, {SFC} from 'react'
 import Table from './Table'
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 import {DEFAULT_LINE_COLORS} from 'src/shared/constants/graphColorPalettes'
+import {CellNoteVisibility} from 'src/types/dashboards'
 
 import {Source, Query, Template, CellType} from 'src/types'
 
@@ -56,6 +57,8 @@ const DataExplorerVisView: SFC<Props> = ({
       colors={DEFAULT_LINE_COLORS}
       manualRefresh={manualRefresh}
       editQueryStatus={editQueryStatus}
+      cellNote=""
+      cellNoteVisibility={CellNoteVisibility.Default}
     />
   )
 }
