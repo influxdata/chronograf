@@ -3,3 +3,8 @@ export const REQUIRED_ROLE_COPY =
 
 export const KAPACITOR_TOOLTIP_COPY =
   '<p>Kapacitor Connections are<br/>scoped per InfluxDB Connection.<br/>Only one can be active at a time.</p>'
+
+export enum DynamicSource {
+  name = 'Dynamic Source',
+  id = 'dynamic',
+}

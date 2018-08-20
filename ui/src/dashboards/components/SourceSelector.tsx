@@ -12,6 +12,7 @@ interface Props {
   service: Service
   services: Service[]
   queries: QueriesModels.QueryConfig[]
+  isDynamicSourceSelected: boolean
   onChangeService: (service: Service, source: SourcesModels.Source) => void
 }
 
@@ -22,6 +23,7 @@ const SourceSelector: SFC<Props> = ({
   services,
   queries,
   onChangeService,
+  isDynamicSourceSelected,
 }) => {
   return sources.length > 1 && queries.length ? (
     <div className="source-selector">
@@ -32,6 +34,8 @@ const SourceSelector: SFC<Props> = ({
         source={source}
         sources={sources}
         allowInfluxQL={true}
+        allowDynamicSource={true}
+        isDynamicSourceSelected={isDynamicSourceSelected}
         onChangeService={onChangeService}
       />
     </div>
