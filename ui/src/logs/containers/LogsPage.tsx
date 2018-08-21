@@ -63,6 +63,7 @@ import {
   TimeWindow,
   TimeMarker,
   TimeBounds,
+  SearchStatus,
 } from 'src/types/logs'
 import {applyChangesToTableData} from 'src/logs/utils/table'
 import extentBy from 'src/utils/extentBy'
@@ -116,6 +117,7 @@ interface State {
   isOverlayVisible: boolean
   histogramColors: HistogramColor[]
   hasScrolled: boolean
+  searchStatus: SearchStatus
 }
 
 class LogsPage extends Component<Props, State> {
@@ -144,6 +146,7 @@ class LogsPage extends Component<Props, State> {
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
+      searchStatus: SearchStatus.None,
     }
   }
 
@@ -188,6 +191,7 @@ class LogsPage extends Component<Props, State> {
 
   public render() {
     const {filters, queryCount, timeRange, notify} = this.props
+    const {searchStatus} = this.state
 
     return (
       <>
@@ -223,6 +227,7 @@ class LogsPage extends Component<Props, State> {
               onChooseCustomTime={this.handleChooseCustomTime}
               onExpandMessage={this.handleExpandMessage}
               notify={notify}
+              searchStatus={searchStatus}
             />
           </div>
         </div>
@@ -526,27 +531,42 @@ class LogsPage extends Component<Props, State> {
     }
   }
 
-  private handleSubmitSearch = (value: string): void => {
+  private handleSubmitSearch = async (value: string): Promise<void> => {
     searchToFilters(value).forEach(filter => {
       this.props.addFilter(filter)
     })
 
-    this.fetchNewDataset()
+    try {
+      this.setState({searchStatus: SearchStatus.Loading})
+      await this.fetchNewDataset()
+    } finally {
+      this.setState({searchStatus: SearchStatus.Loaded})
+    }
   }
 
-  private handleFilterDelete = (id: string): void => {
+  private handleFilterDelete = async (id: string): Promise<void> => {
     this.props.removeFilter(id)
-    this.fetchNewDataset()
+
+    try {
+      this.setState({searchStatus: SearchStatus.UpdatingFilters})
+      await this.fetchNewDataset()
+    } finally {
+      this.setState({searchStatus: SearchStatus.Loaded})
+    }
   }
 
-  private handleFilterChange = (
+  private handleFilterChange = async (
     id: string,
     operator: string,
     value: string
-  ) => {
+  ): Promise<void> => {
     this.props.changeFilter(id, operator, value)
-    this.fetchNewDataset()
-    this.props.executeQueriesAsync()
+    try {
+      this.setState({searchStatus: SearchStatus.UpdatingFilters})
+      await this.fetchNewDataset()
+    } finally {
+      this.setState({searchStatus: SearchStatus.Loaded})
+    }
   }
 
   private handleBarClick = (time: string): void => {
@@ -596,7 +616,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private fetchNewDataset() {
-    this.props.executeQueriesAsync()
+    return this.props.executeQueriesAsync()
   }
 
   private handleToggleOverlay = (): void => {

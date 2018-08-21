@@ -1,5 +1,7 @@
 import React, {PureComponent, ChangeEvent, KeyboardEvent} from 'react'
 
+import {Input, IconFont, Button, ComponentColor} from 'src/reusable_ui'
+
 interface Props {
   onSearch: (value: string) => void
 }
@@ -23,21 +25,19 @@ class LogsSearchBar extends PureComponent<Props, State> {
     return (
       <div className="logs-viewer--search-bar">
         <div className="logs-viewer--search-input">
-          <input
-            type="text"
+          <Input
+            icon={IconFont.Search}
             placeholder="Search logs using keywords or regular expressions..."
-            value={searchTerm}
             onChange={this.handleChange}
             onKeyDown={this.handleInputKeyDown}
-            className="form-control input-sm"
-            spellCheck={false}
-            autoComplete="off"
+            value={searchTerm}
           />
-          <span className="icon search" />
         </div>
-        <button className="btn btn-sm btn-default" onClick={this.handleSearch}>
-          Search
-        </button>
+        <Button
+          text="Search"
+          color={ComponentColor.Primary}
+          onClick={this.handleSearch}
+        />
       </div>
     )
   }

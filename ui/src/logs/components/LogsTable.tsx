@@ -39,6 +39,7 @@ import {
   SeverityFormat,
   SeverityLevelColor,
   RowHeightHandler,
+  SearchStatus,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
@@ -66,6 +67,7 @@ interface Props {
   onExpandMessage: () => void
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
+  searchStatus: SearchStatus
 }
 
 interface State {
@@ -199,6 +201,10 @@ class LogsTable extends Component<Props, State> {
 
     if (this.isTableEmpty) {
       return this.emptyTable
+    }
+
+    if (this.isLoading) {
+      return this.loadingTable
     }
 
     return (
@@ -688,6 +694,49 @@ class LogsTable extends Component<Props, State> {
         </p>
       </div>
     )
+  }
+
+  private get loadingTable(): JSX.Element {
+    return (
+      <div className="logs-viewer--table-container generic-empty-state">
+        <h4 className="logs-viewer--loading-message">
+          {this.loadingMessage}...
+        </h4>
+        <p>{this.randomLoadingMessage()}</p>
+      </div>
+    )
+  }
+
+  private randomLoadingMessage = (): string => {
+    const messages = [
+      'Looking for logs in all the wrong places',
+      'I have the best logs',
+      'Rolling like a log',
+      '100% natural logs',
+      'Chopping wood',
+    ]
+
+    return _.sample(messages)
+  }
+
+  private get loadingMessage(): string {
+    switch (this.props.searchStatus) {
+      case SearchStatus.Loading:
+        return 'Searching'
+      case SearchStatus.UpdatingFilters:
+        return 'Updating Search Filters'
+    }
+  }
+  private get isLoading(): boolean {
+    const {searchStatus} = this.props
+
+    switch (searchStatus) {
+      case SearchStatus.Loading:
+      case SearchStatus.UpdatingFilters:
+        return true
+      default:
+        return false
+    }
   }
 
   private get isTableEmpty(): boolean {
