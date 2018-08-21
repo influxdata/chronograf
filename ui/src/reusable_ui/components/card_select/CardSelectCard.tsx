@@ -15,13 +15,18 @@ interface Props {
 
 @ErrorHandling
 class CardSelectCard extends PureComponent<Props> {
+  public static defaultProps: Partial<Props> = {
+    checked: false,
+    disabled: false,
+  }
+
   public render() {
     const {id, label, checked, name, disabled} = this.props
 
     return (
       <div
         data-toggle="card_toggle"
-        onClick={!disabled && this.handleClick}
+        onClick={this.handleClick}
         className={classnames('card-select--card', {
           'card-select--checked': checked,
           'card-select--disabled': disabled,
@@ -34,8 +39,8 @@ class CardSelectCard extends PureComponent<Props> {
             name={name}
             type="checkbox"
             value={id}
-            checked={checked || false}
-            disabled={disabled || false}
+            checked={checked}
+            disabled={disabled}
           />
           <span
             className={classnames(
@@ -65,9 +70,11 @@ class CardSelectCard extends PureComponent<Props> {
   }
 
   private handleClick = e => {
-    const {onClick} = this.props
+    const {onClick, disabled} = this.props
     e.preventDefault()
-    onClick()
+    if (!disabled) {
+      onClick()
+    }
   }
 }
 
