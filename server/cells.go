@@ -8,6 +8,7 @@ import (
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
 	idgen "github.com/influxdata/chronograf/id"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 const (
@@ -78,11 +79,8 @@ func ValidDashboardCellRequest(c *chronograf.DashboardCell) error {
 		return fmt.Errorf("Chronograf dashboard cell was nil")
 	}
 
-	if c.NoteVisibility == "" {
-		c.NoteVisibility = "default"
-	}
-	if c.NoteVisibility != "default" && c.NoteVisibility != "showWhenNoData" {
-		return fmt.Errorf("Chronograf dashboard cell note visibility value is invalid")
+	if err := ValidateNote(c); err != nil {
+		return err
 	}
 
 	CorrectWidthHeight(c)
@@ -196,6 +194,21 @@ func AddQueryConfig(c *chronograf.DashboardCell) {
 		q.QueryConfig = qc
 		c.Queries[i] = q
 	}
+}
+
+// ValidateNote sanitizes note html against XSS attacks and validates note visibility
+func ValidateNote(c *chronograf.DashboardCell) error {
+	p := bluemonday.UGCPolicy()
+	c.Note = p.Sanitize(c.Note)
+
+	if c.NoteVisibility == "" {
+		c.NoteVisibility = "default"
+	}
+	if c.NoteVisibility != "default" && c.NoteVisibility != "showWhenNoData" {
+		return fmt.Errorf("Chronograf dashboard cell note visibility value is invalid")
+	}
+
+	return nil
 }
 
 // DashboardCells returns all cells from a dashboard within the store

@@ -985,3 +985,110 @@ func TestHasCorrectLegend(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateNote(t *testing.T) {
+	type want struct {
+		Note           string
+		NoteVisibility string
+	}
+	tests := []struct {
+		name    string
+		c       *chronograf.DashboardCell
+		want    want
+		wantErr bool
+	}{
+		{
+			name: "note text & visibility defaults",
+			c:    &chronograf.DashboardCell{},
+			want: want{
+				Note:           "",
+				NoteVisibility: "default",
+			},
+			wantErr: false,
+		},
+		{
+			name: "note text - allows non-html",
+			c: &chronograf.DashboardCell{
+				Note: "pineapples are tasty",
+			},
+			want: want{
+				Note:           "pineapples are tasty",
+				NoteVisibility: "default",
+			},
+			wantErr: false,
+		},
+		{
+			name: "note text - eliminates xss-vulnerable html",
+			c: &chronograf.DashboardCell{
+				Note: `
+<script>alert('bob');</script>
+<p>benevolent pineapples paragraph</p>
+<style>evil style</style>
+<iframe>evil iframe</iframe>
+<object>evil object</object>
+<embed>evil embed</embed>
+<base>evil base</base>
+`,
+			},
+			want: want{
+				Note: `
+
+<p>benevolent pineapples paragraph</p>
+
+
+
+evil embed
+evil base
+`,
+				NoteVisibility: "default",
+			},
+			wantErr: false,
+		},
+		{
+			name: "note visibility - valid default value",
+			c: &chronograf.DashboardCell{
+				Note: "",
+				NoteVisibility: "default",
+			},
+			want: want{
+				Note:           "",
+				NoteVisibility: "default",
+			},
+			wantErr: false,
+		},
+		{
+			name: "note visibility - valid non-default value",
+			c: &chronograf.DashboardCell{
+				Note: "",
+				NoteVisibility: "showWhenNoData",
+			},
+			want: want{
+				Note:           "",
+				NoteVisibility: "showWhenNoData",
+			},
+			wantErr: false,
+		},
+		{
+			name: "note visibility - invalid value",
+			c: &chronograf.DashboardCell{
+				Note: "",
+				NoteVisibility: "pineapple",
+			},
+			want: want{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidateNote(tt.c)
+			if (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
+				t.Errorf("ValidateNote() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr {
+				if tt.c.Note != tt.want.Note || tt.c.NoteVisibility != tt.want.NoteVisibility {
+					t.Errorf("ValidateNote()\ngot = **%v**, %v\nwant = **%v**, %v", tt.c.Note, tt.c.NoteVisibility, tt.want.Note, tt.want.NoteVisibility)
+				}
+			}
+		})
+	}
+}
