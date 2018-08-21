@@ -5,6 +5,7 @@
 1.  [#4220](https://github.com/influxdata/chronograf/pull/4220): Add ability to copy expanded/untruncated log message
 1.  [#4228](https://github.com/influxdata/chronograf/pull/4228): Add close button for logs pop over
 1.  [#4241](https://github.com/influxdata/chronograf/pull/4241): Add search attributes to log viewer
+1.  [#4254](https://github.com/influxdata/chronograf/pull/4254): Add Dynamic Source option to CEO source selector
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
