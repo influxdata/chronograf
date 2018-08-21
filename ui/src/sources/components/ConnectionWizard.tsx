@@ -9,10 +9,11 @@ import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
 import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import SourceStep from 'src/sources/components/SourceStep'
 import KapacitorStep from 'src/sources/components/KapacitorStep'
+import DashboardStep from 'src/sources/components/DashboardStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
 
 // Types
-import {Kapacitor, Source} from 'src/types'
+import {Kapacitor, Source, Protoboard} from 'src/types'
 import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
@@ -28,6 +29,8 @@ interface State {
   sourceError: boolean
   kapacitor: Kapacitor
   kapacitorError: boolean
+  dashboardError: boolean
+  dashboards: Protoboard[]
 }
 
 @ErrorHandling
@@ -43,6 +46,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
   public completionStepRef: any
+  public dashboardStepRef: any
 
   constructor(props: Props & WithRouterProps) {
     super(props)
@@ -51,12 +55,21 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       kapacitor: null,
       sourceError: false,
       kapacitorError: false,
+      dashboardError: false,
+      dashboards: null,
     }
   }
 
   public render() {
     const {isVisible, toggleVisibility, jumpStep, showNewKapacitor} = this.props
-    const {source, sourceError, kapacitor, kapacitorError} = this.state
+    const {
+      source,
+      sourceError,
+      kapacitor,
+      kapacitorError,
+      dashboardError,
+    } = this.state
+
     return (
       <WizardOverlay
         visible={isVisible}
@@ -103,6 +116,13 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           />
         </WizardStep>
         <WizardStep
+          title="Select Dashboards"
+          isComplete={this.isDashboardComplete}
+          isErrored={dashboardError}
+        >
+          {this.dashboardStep}
+        </WizardStep>
+        <WizardStep
           title="Setup Complete"
           tipText=""
           isComplete={this.isCompletionComplete}
@@ -118,6 +138,16 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         </WizardStep>
       </WizardOverlay>
     )
+  }
+
+  private get dashboardStep() {
+    const {dashboards} = this.state
+
+    if (dashboards) {
+      return <DashboardStep dashboards={dashboards} />
+    }
+
+    return null
   }
 
   private handleSourceNext = async () => {
@@ -145,6 +175,10 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   private handleKapacitorPrev = () => {}
   private handleSetKapacitorError = (b: boolean) => {
     this.setState({kapacitorError: b})
+  }
+
+  private isDashboardComplete = () => {
+    return false
   }
 
   private isCompletionComplete = () => {
