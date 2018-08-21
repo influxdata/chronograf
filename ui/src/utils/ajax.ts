@@ -94,15 +94,9 @@ async function AJAX<T = any>(
   excludeBasepath = false
 ): Promise<(T | T & {links: object}) | AxiosResponse<T>> {
   try {
-    if (!links) {
-      console.error(
-        `AJAX function has no links. Trying to reach url ${url}, resource ${resource}, id ${id}, method ${method}`
-      )
-    }
-
     url = addBasepath(url, excludeBasepath)
 
-    if (resource) {
+    if (resource && links) {
       url = id
         ? addBasepath(`${links[resource]}/${id}`, excludeBasepath)
         : addBasepath(`${links[resource]}`, excludeBasepath)

@@ -1,5 +1,7 @@
 import AJAX from 'src/utils/ajax'
 
+import {manager} from 'src/worker/JobManager'
+
 import {
   linksFromDashboards,
   updateDashboardLinks,
@@ -37,10 +39,8 @@ export const loadDashboardLinks = async (
 
 export const getDashboard = async dashboardID => {
   try {
-    return await AJAX({
-      method: 'GET',
-      url: `/chronograf/v1/dashboards/${dashboardID}`,
-    })
+    const url = `/chronograf/v1/dashboards/${dashboardID}`
+    return manager.get(url)
   } catch (error) {
     console.error(error)
     throw error

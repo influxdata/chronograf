@@ -15,7 +15,7 @@
     "target": "es6",
     "module": "es2015",
     "moduleResolution": "node",
-    "lib": ["es6", "es2017", "dom"],
+    "lib": ["es6", "es2017", "dom", "webworker"],
     "skipLibCheck": true,
     "isolatedModules": false,
     "jsx": "react",

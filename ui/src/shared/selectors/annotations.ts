@@ -1,14 +1,26 @@
 import {createSelector} from 'reselect'
 
-import {Annotation, TagFilterType} from 'src/types/annotations'
+import {
+  Annotation,
+  TagFilterType,
+  AnnotationsDisplaySetting,
+} from 'src/types/annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
 
 const getAnnotationsById = (state: {annotations: AnnotationState}) =>
   state.annotations.annotations
 
+const getDisplaySetting = (state: {annotations: AnnotationState}) =>
+  state.annotations.displaySetting
+
 export const getSelectedAnnotations = createSelector(
   getAnnotationsById,
-  annotationsById => {
+  getDisplaySetting,
+  (annotationsById, displaySetting) => {
+    if (displaySetting === AnnotationsDisplaySetting.HideAnnotations) {
+      return []
+    }
+
     return Object.values<Annotation>(annotationsById).filter(a => !!a)
   }
 )

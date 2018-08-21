@@ -99,6 +99,7 @@ class RefreshingGraph extends PureComponent<Props> {
     return (
       <TimeSeries
         source={source}
+        cellType={type}
         inView={inView}
         queries={this.queries}
         timeRange={timeRange}

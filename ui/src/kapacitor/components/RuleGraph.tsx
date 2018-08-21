@@ -4,17 +4,12 @@ import {connect} from 'react-redux'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 
 // Components
-import Dygraph from 'src/shared/components/Dygraph'
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
+import RuleGraphDygraph from 'src/kapacitor/components/RuleGraphDygraph'
 
 // Utils
 import buildInfluxQLQuery from 'src/utils/influxql'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
-import underlayCallback from 'src/kapacitor/helpers/ruleGraphUnderlay'
-import {timeSeriesToDygraph} from 'src/utils/timeSeriesTransformers'
-
-// Constants
-import {LINE_COLORS_RULE_GRAPH} from 'src/shared/constants/graphColorPalettes'
 
 // Types
 import {Source, AlertRule, QueryConfig, Query, TimeRange} from 'src/types'
@@ -63,25 +58,14 @@ class RuleGraph extends PureComponent<Props> {
             queries={this.queries}
           >
             {data => {
-              const {labels, timeSeries, dygraphSeries} = timeSeriesToDygraph(
-                data.timeSeries,
-                'rule-builder'
-              )
               return (
-                <Dygraph
-                  labels={labels}
-                  staticLegend={false}
-                  isGraphFilled={false}
-                  ruleValues={rule.values}
-                  options={this.options}
+                <RuleGraphDygraph
+                  loading={data.loading}
+                  query={this.props.query}
+                  rule={rule}
                   timeRange={timeRange}
-                  queries={this.queries}
-                  timeSeries={timeSeries}
-                  dygraphSeries={dygraphSeries}
-                  colors={LINE_COLORS_RULE_GRAPH}
-                  containerStyle={this.containerStyle}
-                  underlayCallback={underlayCallback(rule)}
-                  handleSetHoverTime={this.props.setHoverTime}
+                  timeSeries={data.timeSeries}
+                  setHoverTime={this.props.setHoverTime}
                 />
               )
             }}
@@ -89,30 +73,6 @@ class RuleGraph extends PureComponent<Props> {
         </div>
       </div>
     )
-  }
-
-  private get options() {
-    return {
-      rightGap: 0,
-      yRangePad: 10,
-      labelsKMB: true,
-      fillGraph: true,
-      axisLabelWidth: 60,
-      animatedZooms: true,
-      drawAxesAtZero: true,
-      axisLineColor: '#383846',
-      gridLineColor: '#383846',
-      connectSeparatedPoints: true,
-    }
-  }
-
-  private get containerStyle(): CSSProperties {
-    return {
-      width: 'calc(100% - 32px)',
-      height: 'calc(100% - 16px)',
-      position: 'absolute',
-      top: '8px',
-    }
   }
 
   private get style(): CSSProperties {

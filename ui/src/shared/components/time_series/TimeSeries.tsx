@@ -7,7 +7,14 @@ import uuid from 'uuid'
 import {fetchTimeSeries} from 'src/shared/apis/query'
 
 // Types
-import {Template, Source, Query, RemoteDataState, TimeRange} from 'src/types'
+import {
+  Template,
+  Source,
+  Query,
+  RemoteDataState,
+  TimeRange,
+  CellType,
+} from 'src/types'
 import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
@@ -27,6 +34,7 @@ interface RenderProps {
 
 interface Props {
   source: Source
+  cellType?: CellType
   queries: Query[]
   timeRange: TimeRange
   children: (r: RenderProps) => JSX.Element
@@ -52,6 +60,7 @@ const GraphLoadingDots = () => (
     <div />
   </div>
 )
+
 class TimeSeries extends Component<Props, State> {
   public static defaultProps = {
     inView: true,
@@ -59,25 +68,23 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
-    let {isFirstFetch, timeRange} = state
-
     const oldUpper = _.get(state, 'timeRange.upper', null)
     const oldLower = _.get(state, 'timeRange.lower', null)
     const newUpper = _.get(props, 'timeRange.upper', null)
     const newLower = _.get(props, 'timeRange.lower', null)
 
     if (oldUpper !== newUpper || oldLower !== newLower) {
-      isFirstFetch = true
-      timeRange = props.timeRange
+      return {
+        isFirstFetch: true,
+        timeRange: props.timeRange,
+      }
     }
 
-    return {
-      isFirstFetch,
-      timeRange,
-    }
+    return null
   }
 
   private latestUUID: string = uuid.v1()
+  private isComponentMounted: boolean = false
 
   constructor(props: Props) {
     super(props)
@@ -89,12 +96,32 @@ class TimeSeries extends Component<Props, State> {
     }
   }
 
+  public shouldComponentUpdate(prevProps: Props, prevState: State) {
+    const list = [
+      'source',
+      'queries',
+      'timeRange',
+      'inView',
+      'templates',
+      'cellType',
+    ]
+
+    return (
+      this.state.loading !== prevState.loading ||
+      _.some(list, key => {
+        return !_.isEqual(this.props[key], prevProps[key])
+      })
+    )
+  }
+
   public async componentDidMount() {
+    this.isComponentMounted = true
     this.executeQueries()
     AutoRefresh.subscribe(this.executeQueries)
   }
 
   public componentWillUnmount() {
+    this.isComponentMounted = false
     AutoRefresh.unsubscribe(this.executeQueries)
   }
 
@@ -111,7 +138,7 @@ class TimeSeries extends Component<Props, State> {
       this.setState({loading: RemoteDataState.Loading}, () => {
         window.setTimeout(() => {
           resolve()
-        }, 10)
+        }, 0)
       })
     })
   }
@@ -159,21 +186,28 @@ class TimeSeries extends Component<Props, State> {
         response,
       }))
 
+      if (!this.isComponentMounted) {
+        return
+      }
+
       this.setState({
         timeSeries: newSeries,
         loading: RemoteDataState.Done,
+        isFirstFetch: false,
       })
 
       if (grabDataForDownload) {
         grabDataForDownload(newSeries)
       }
     } catch (err) {
+      if (!this.isComponentMounted) {
+        return
+      }
+
       this.setState({
         timeSeries: [],
         loading: RemoteDataState.Error,
       })
-    } finally {
-      this.setState({isFirstFetch: false})
     }
   }
 

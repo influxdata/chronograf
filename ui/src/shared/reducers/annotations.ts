@@ -5,13 +5,18 @@ import {
 } from 'src/shared/annotations/helpers'
 
 import {Action} from 'src/shared/actions/annotations'
-import {Annotation, TagFilter} from 'src/types/annotations'
+import {
+  Annotation,
+  TagFilter,
+  AnnotationsDisplaySetting,
+} from 'src/types/annotations'
 
 export interface AnnotationState {
   annotations: {
     [annotationId: string]: Annotation
   }
   mode: string
+  displaySetting: AnnotationsDisplaySetting
   isTempHovering: boolean
   editingAnnotation?: string
   addingAnnotation?: Annotation
@@ -29,6 +34,7 @@ export interface AnnotationState {
 const initialState = {
   mode: null,
   isTempHovering: false,
+  displaySetting: AnnotationsDisplaySetting.HideAnnotations,
   annotations: {},
   tagKeys: null,
   tagValues: {},
@@ -210,6 +216,13 @@ const annotationsReducer = (
           ...state.tagValues,
           [tagKey]: tagValues,
         },
+      }
+    }
+
+    case 'SET_DISPLAY_SETTING': {
+      return {
+        ...state,
+        displaySetting: action.payload,
       }
     }
   }

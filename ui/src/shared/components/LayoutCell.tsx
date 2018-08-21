@@ -150,13 +150,13 @@ export default class LayoutCell extends Component<Props> {
     onSummonOverlayTechnologies(cell)
   }
 
-  private handleCSVDownload = (): void => {
+  private handleCSVDownload = async (): Promise<void> => {
     const {cellData, cell} = this.props
     const joinedName = cell.name.split(' ').join('_')
-    const {data} = timeSeriesToTableGraph(cellData)
+    const {data} = await timeSeriesToTableGraph(cellData)
 
     try {
-      download(dataToCSV(data), `${joinedName}.csv`, 'text/plain')
+      download(dataToCSV(data as any), `${joinedName}.csv`, 'text/plain')
     } catch (error) {
       notify(notifyCSVDownloadFailed())
       console.error(error)

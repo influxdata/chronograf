@@ -35,6 +35,8 @@ import {
   Sort,
 } from 'src/types/dashboards'
 
+import {manager} from 'src/worker/JobManager'
+
 const COLUMN_MIN_WIDTH = 100
 const ROW_HEIGHT = 30
 
@@ -84,6 +86,7 @@ interface State {
 class TableGraph extends Component<Props, State> {
   private gridContainer: HTMLDivElement
   private multiGrid?: MultiGrid
+  private isComponentMounted: boolean = false
 
   constructor(props: Props) {
     super(props)
@@ -167,6 +170,7 @@ class TableGraph extends Component<Props, State> {
   }
 
   public componentWillUnmount() {
+    this.isComponentMounted = false
     window.removeEventListener('resize', this.handleResize)
   }
 
@@ -179,7 +183,8 @@ class TableGraph extends Component<Props, State> {
     )
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
+    this.isComponentMounted = true
     window.addEventListener('resize', this.handleResize)
 
     const sortField: string = _.get(
@@ -196,13 +201,17 @@ class TableGraph extends Component<Props, State> {
       fieldOptions,
       decimalPlaces,
     } = this.props
-    const result = timeSeriesToTableGraph(data)
+    const result = await timeSeriesToTableGraph(data)
     const sortedLabels = result.sortedLabels
     const computedFieldOptions = computeFieldOptions(fieldOptions, sortedLabels)
 
     this.handleUpdateFieldOptions(computedFieldOptions)
 
-    const {transformedData, sortedTimeVals, columnWidths} = transformTableData(
+    const {
+      transformedData,
+      sortedTimeVals,
+      columnWidths,
+    } = await manager.tableTransform(
       result.data,
       sort,
       computedFieldOptions,
@@ -234,12 +243,12 @@ class TableGraph extends Component<Props, State> {
     )
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  public async componentWillReceiveProps(nextProps: Props) {
     const {sort} = this.state
 
     let result = {}
     if (this.hasDataChanged(nextProps.data)) {
-      result = timeSeriesToTableGraph(nextProps.data)
+      result = await timeSeriesToTableGraph(nextProps.data)
     }
     const data = _.get(result, 'data', this.state.data)
 
@@ -278,7 +287,7 @@ class TableGraph extends Component<Props, State> {
         transformedData,
         sortedTimeVals,
         columnWidths,
-      } = transformTableData(
+      } = await manager.tableTransform(
         data,
         sort,
         computedFieldOptions,
@@ -294,6 +303,10 @@ class TableGraph extends Component<Props, State> {
           f => f.internalName === DEFAULT_TIME_FIELD.internalName
         )
         isTimeVisible = _.get(timeField, 'visible', this.state.isTimeVisible)
+      }
+
+      if (!this.isComponentMounted) {
+        return
       }
 
       this.setState({

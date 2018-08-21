@@ -1,11 +1,7 @@
-import {fastMap, fastReduce} from 'src/utils/fast'
-import {groupByTimeSeriesTransform} from 'src/utils/groupByTimeSeriesTransform'
+import {fastMap} from 'src/utils/fast'
+import {manager} from 'src/worker/JobManager'
 
-import {
-  TimeSeriesServerResponse,
-  TimeSeries,
-  TimeSeriesValue,
-} from 'src/types/series'
+import {TimeSeriesServerResponse, TimeSeriesValue} from 'src/types/series'
 import {DygraphSeries, DygraphValue} from 'src/types'
 
 interface Label {
@@ -25,64 +21,22 @@ interface TimeSeriesToTableGraphReturnType {
   sortedLabels: Label[]
 }
 
-export const timeSeriesToDygraph = (
+export const timeSeriesToDygraph = async (
   raw: TimeSeriesServerResponse[],
   pathname: string = ''
-): TimeSeriesToDyGraphReturnType => {
-  const isTable = false
-  const isInDataExplorer = pathname.includes('data-explorer')
-  const {sortedLabels, sortedTimeSeries} = groupByTimeSeriesTransform(
-    raw,
-    isTable
+): Promise<TimeSeriesToDyGraphReturnType> => {
+  const result = await manager.timeSeriesToDygraph(raw, pathname)
+  const {timeSeries} = result
+  const newTimeSeries = fastMap<DygraphValue[], DygraphValue[]>(
+    timeSeries,
+    ([time, ...values]) => [new Date(time), ...values]
   )
 
-  const labels = [
-    'time',
-    ...fastMap<Label, string>(sortedLabels, ({label}) => label),
-  ]
-
-  const timeSeries = fastMap<TimeSeries, DygraphValue[]>(
-    sortedTimeSeries,
-    ({time, values}) => [new Date(time), ...values]
-  )
-
-  const dygraphSeries = fastReduce<Label, DygraphSeries>(
-    sortedLabels,
-    (acc, {label, responseIndex}) => {
-      if (!isInDataExplorer) {
-        acc[label] = {
-          axis: responseIndex === 0 ? 'y' : 'y2',
-        }
-      }
-      return acc
-    },
-    {}
-  )
-
-  return {labels, timeSeries, dygraphSeries}
+  return {...result, timeSeries: newTimeSeries}
 }
 
-export const timeSeriesToTableGraph = (
+export const timeSeriesToTableGraph = async (
   raw: TimeSeriesServerResponse[]
-): TimeSeriesToTableGraphReturnType => {
-  const isTable = true
-  const {sortedLabels, sortedTimeSeries} = groupByTimeSeriesTransform(
-    raw,
-    isTable
-  )
-
-  const labels = [
-    'time',
-    ...fastMap<Label, string>(sortedLabels, ({label}) => label),
-  ]
-
-  const tableData = fastMap<TimeSeries, TimeSeriesValue[]>(
-    sortedTimeSeries,
-    ({time, values}) => [time, ...values]
-  )
-  const data = tableData.length ? [labels, ...tableData] : [[]]
-  return {
-    data,
-    sortedLabels,
-  }
+): Promise<TimeSeriesToTableGraphReturnType> => {
+  return await manager.timeSeriesToTableGraph(raw)
 }

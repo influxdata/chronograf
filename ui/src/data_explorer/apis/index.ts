@@ -47,9 +47,9 @@ export const getDataForCSV = (
       query: queryString,
     })
 
-    const {data} = timeSeriesToTableGraph([{response}])
+    const {data} = await timeSeriesToTableGraph([{response}])
     const name = csvName(query.queryConfig)
-    download(dataToCSV(data), `${name}.csv`, 'text/plain')
+    download(dataToCSV(data as any), `${name}.csv`, 'text/plain')
   } catch (error) {
     errorThrown(error, 'Unable to download .csv file')
     console.error(error)
