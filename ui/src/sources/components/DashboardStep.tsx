@@ -9,8 +9,6 @@ import CardSelectCard from 'src/reusable_ui/components/card_select/CardSelectCar
 // Types
 import {Protoboard} from 'src/types'
 
-import './DashboardStep.scss'
-
 interface State {
   selected: object
 }
@@ -68,7 +66,7 @@ class DashboardStep extends Component<Props, State> {
 
     const newSelected = selected
 
-    if (newSelected[name]) {
+    if (selected[name]) {
       newSelected[name] = false
     } else {
       newSelected[name] = true
