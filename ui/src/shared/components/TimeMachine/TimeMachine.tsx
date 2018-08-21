@@ -232,10 +232,7 @@ class TimeMachine extends PureComponent<Props, State> {
       return source
     }
 
-    // return source from queryDraft
-    const foundSource = sources.find(
-      s => s.links.self === _.get(queryDraft, 'source', null)
-    )
+    const foundSource = sources.find(s => s.links.self === querySource)
     if (foundSource) {
       return foundSource
     }
@@ -376,8 +373,7 @@ class TimeMachine extends PureComponent<Props, State> {
   ): void => {
     const {queryDrafts, updateQueryDrafts} = this.props
 
-    const useDynamicSource: boolean =
-      selectedService === null && selectedSource === null
+    const useDynamicSource = selectedService === null && selectedSource === null
 
     const queries: CellQuery[] = queryDrafts.map(q => {
       const queryConfig = _.get(q, 'queryConfig')
