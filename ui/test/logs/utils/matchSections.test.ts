@@ -1,5 +1,5 @@
 import {Filter, MatchType} from 'src/types/logs'
-import {getMatchSections} from 'src/logs/utils/matchSections'
+import {getMatchSections, filtersToPattern} from 'src/logs/utils/matchSections'
 
 describe('Logs.matchFilters', () => {
   const isUUID = expect.stringMatching(
@@ -21,9 +21,11 @@ describe('Logs.matchFilters', () => {
     },
   ]
 
-  it('can match a filter', () => {
+  const searchPattern = filtersToPattern(filters)
+
+  it('can match a term', () => {
     const text = 'before term after'
-    const actual = getMatchSections(filters, text)
+    const actual = getMatchSections(searchPattern, text)
 
     const expected = [
       {
@@ -46,9 +48,9 @@ describe('Logs.matchFilters', () => {
     expect(actual).toEqual(expected)
   })
 
-  it('can match multiple filters', () => {
+  it('can match multiple terms', () => {
     const text = 'other term after term other term'
-    const actual = getMatchSections(filters, text)
+    const actual = getMatchSections(searchPattern, text)
 
     const expected = [
       {
@@ -91,9 +93,9 @@ describe('Logs.matchFilters', () => {
     expect(actual).toEqual(expected)
   })
 
-  it('can match empty filters', () => {
+  it('can handle null pattern', () => {
     const text = 'other term after term other term'
-    const actual = getMatchSections([], text)
+    const actual = getMatchSections(null, text)
 
     const expected = [
       {
@@ -108,7 +110,7 @@ describe('Logs.matchFilters', () => {
 
   it('can match termless text', () => {
     const text = '     '
-    const actual = getMatchSections(filters, text)
+    const actual = getMatchSections(searchPattern, text)
 
     const expected = [
       {
@@ -121,7 +123,7 @@ describe('Logs.matchFilters', () => {
     expect(actual).toEqual(expected)
   })
 
-  it('can match parenthesized filters', () => {
+  it('can match group terms', () => {
     const text = 'before stuff afterward'
     const filter = {
       id: '123',
@@ -129,7 +131,8 @@ describe('Logs.matchFilters', () => {
       value: '(stuff)',
       operator: '=~',
     }
-    const actual = getMatchSections([...filters, filter], text)
+    const pattern = filtersToPattern([...filters, filter])
+    const actual = getMatchSections(pattern, text)
 
     const expected = [
       {
@@ -152,7 +155,7 @@ describe('Logs.matchFilters', () => {
     expect(actual).toEqual(expected)
   })
 
-  it('can match complex filters', () => {
+  it('can match complex terms', () => {
     const text = 'start fluff puff fluff end'
     const filter = {
       id: '123',
@@ -160,7 +163,8 @@ describe('Logs.matchFilters', () => {
       value: '((fl|p)uff)',
       operator: '=~',
     }
-    const actual = getMatchSections([...filters, filter], text)
+    const pattern = filtersToPattern([...filters, filter])
+    const actual = getMatchSections(pattern, text)
 
     const expected = [
       {
@@ -201,41 +205,5 @@ describe('Logs.matchFilters', () => {
     ]
 
     expect(actual).toEqual(expected)
-  })
-
-  describe('bad filter pattern', () => {
-    const errorLog = console.error
-
-    beforeEach(() => {
-      console.error = jest.fn(() => {})
-    })
-
-    afterEach(() => {
-      console.error = errorLog
-    })
-
-    it('can handle bad search expressions', () => {
-      const text = 'start fluff puff fluff end'
-      const filter = {
-        id: '123',
-        key: 'message',
-        value: '((fl|puff)',
-        operator: '=~',
-      }
-      const actual = getMatchSections([...filters, filter], text)
-
-      const expected = [
-        {
-          id: isUUID,
-          type: MatchType.NONE,
-          text,
-        },
-      ]
-
-      expect(actual).toEqual(expected)
-      expect(console.error).toBeCalledWith(
-        'Syntax Error: bad search filter expression'
-      )
-    })
   })
 })

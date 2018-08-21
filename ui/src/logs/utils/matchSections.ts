@@ -1,42 +1,37 @@
-import {MatchType, Filter, MatchSection} from 'src/types/logs'
+import {MatchType, Filter, MatchSection, Operator} from 'src/types/logs'
 import uuid from 'uuid'
 
 export const getMatchSections = (
-  filters: Filter[],
+  pattern: string,
   text: string
 ): MatchSection[] => {
-  if (filters.length === 0) {
+  if (!pattern) {
     return [createSection(MatchType.NONE, text)]
   }
 
-  try {
-    const pattern = filtersToPattern(filters)
-    return sectionOnPattern(pattern, text)
-  } catch (e) {
-    console.error('Syntax Error: bad search filter expression')
-
-    return [createSection(MatchType.NONE, text)]
-  }
+  const regexp = new RegExp(pattern)
+  return matchSections(regexp, text)
 }
 
-const sectionOnPattern = (pattern: RegExp, text) => {
-  let sections = []
+const matchSections = (re: RegExp, text) => {
+  const sections = []
   let remaining = text
 
   for (
-    let match = remaining.match(pattern);
+    let match = remaining.match(re);
     match !== null;
-    match = remaining.match(pattern)
+    match = remaining.match(re)
   ) {
     remaining = match[match.length - 1]
-    sections = [
-      ...sections,
+    sections.push(
       createSection(MatchType.NONE, match[1]),
-      createSection(MatchType.MATCH, match[2]),
-    ]
+      createSection(MatchType.MATCH, match[2])
+    )
   }
 
-  return [...sections, createSection(MatchType.NONE, remaining)]
+  sections.push(createSection(MatchType.NONE, remaining))
+
+  return sections
 }
 
 const createSection = (type: MatchType, text: string): MatchSection => ({
@@ -45,8 +40,30 @@ const createSection = (type: MatchType, text: string): MatchSection => ({
   text,
 })
 
-const filtersToPattern = (filters: Filter[]): RegExp => {
+export const filtersToPattern = (filters: Filter[]): string => {
+  if (filters.length === 0) {
+    return null
+  }
+
   const values = filters.map(f => f.value).join('|')
 
-  return new RegExp(`^(.*?)(${values})(.*)`)
+  return `^(.*?)(${values})(.*)`
+}
+
+export const getValidMessageFilters = (filters: Filter[]): Filter[] =>
+  filters.filter(isValidMessageFilter)
+
+const isValidMessageFilter = (f: Filter): boolean =>
+  isMessage(f.key) && isLikeOp(f.operator) && isValidRegExp(f.value)
+
+const isMessage = (key: string): boolean => key === 'message'
+const isLikeOp = (op: string): boolean => op === Operator.LIKE
+
+const isValidRegExp = (value: string): boolean => {
+  try {
+    RegExp(value)
+    return true
+  } catch (error) {
+    return false
+  }
 }

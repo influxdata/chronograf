@@ -1,5 +1,4 @@
 import React, {PureComponent} from 'react'
-import _ from 'lodash'
 
 import CopyToClipboard from 'react-copy-to-clipboard'
 
@@ -10,12 +9,11 @@ import {
 import {getMatchSections} from 'src/logs/utils/matchSections'
 
 import {NotificationAction} from 'src/types'
-import {Filter} from 'src/types/logs'
 
 interface Props {
   formattedValue: string
   notify: NotificationAction
-  filters: Filter[]
+  searchPattern?: string
 }
 
 class LogsMessage extends PureComponent<Props> {
@@ -52,13 +50,13 @@ class LogsMessage extends PureComponent<Props> {
   }
 
   private get messageSections(): JSX.Element[] | string {
-    const {filters, formattedValue} = this.props
+    const {searchPattern, formattedValue} = this.props
 
-    if (_.isEmpty(filters)) {
+    if (!searchPattern) {
       return formattedValue
     }
 
-    const sections = getMatchSections(filters, formattedValue)
+    const sections = getMatchSections(searchPattern, formattedValue)
 
     return sections.map(s => (
       <span key={s.id} className={`logs-message--${s.type}`}>

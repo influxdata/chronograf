@@ -4,7 +4,6 @@ import {ClickOutside} from 'src/shared/components/ClickOutside'
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
 
 import {NotificationAction} from 'src/types'
-import {Filter} from 'src/types/logs'
 
 interface State {
   expanded: boolean
@@ -14,7 +13,7 @@ interface Props {
   formattedValue: string | JSX.Element
   notify: NotificationAction
   onExpand?: () => void
-  filters: Filter[]
+  searchPattern: string
 }
 
 export class ExpandableMessage extends Component<Props, State> {
@@ -26,7 +25,7 @@ export class ExpandableMessage extends Component<Props, State> {
   }
 
   public render() {
-    const {notify, filters} = this.props
+    const {notify, searchPattern} = this.props
     const formattedValue = `${this.props.formattedValue}`
     const trimmedValue = formattedValue.trimLeft()
 
@@ -37,7 +36,7 @@ export class ExpandableMessage extends Component<Props, State> {
             <LogsMessage
               formattedValue={trimmedValue}
               notify={notify}
-              filters={filters}
+              searchPattern={searchPattern}
             />
           </div>
           <div className={this.isExpanded}>
@@ -45,7 +44,7 @@ export class ExpandableMessage extends Component<Props, State> {
             <LogsMessage
               formattedValue={formattedValue}
               notify={notify}
-              filters={filters}
+              searchPattern={searchPattern}
             />
           </div>
         </div>
