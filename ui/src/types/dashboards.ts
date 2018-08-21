@@ -200,7 +200,7 @@ export type NewDefaultCell = Pick<
   Exclude<keyof Cell, 'i' | 'axes' | 'colors' | 'links' | 'legend'>
 >
 
-export interface DashboardMetadata {
+export interface ProtoboardMetadata {
   name: string
   icon: string
   version: string
@@ -210,8 +210,12 @@ export interface DashboardMetadata {
   license: string
   url: string
 }
+
+export interface ProtoboardData {
+  cells: object
+}
 export interface Protoboard {
   id: string
-  meta: DashboardMetadata
-  data: object
+  meta: ProtoboardMetadata
+  data: ProtoboardData
 }
