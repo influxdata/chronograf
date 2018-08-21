@@ -41,6 +41,8 @@ class FluxHeader extends PureComponent<Props> {
           services={services}
           service={service}
           allowInfluxQL={false}
+          allowFlux={true}
+          allowDynamicSource={false}
           onChangeService={onChangeService}
         />
         <button

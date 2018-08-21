@@ -1,7 +1,10 @@
+// Libraries
 import React, {SFC} from 'react'
 
+// Componentes
 import SourceDropdown from 'src/flux/components/SourceDropdown'
 
+// Types
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service} from 'src/types'
@@ -12,6 +15,8 @@ interface Props {
   service: Service
   services: Service[]
   queries: QueriesModels.QueryConfig[]
+  isDynamicSourceSelected: boolean
+  onSelectDynamicSource: () => void
   onChangeService: (service: Service, source: SourcesModels.Source) => void
 }
 
@@ -22,6 +27,8 @@ const SourceSelector: SFC<Props> = ({
   services,
   queries,
   onChangeService,
+  isDynamicSourceSelected,
+  onSelectDynamicSource,
 }) => {
   return sources.length > 1 && queries.length ? (
     <div className="source-selector">
@@ -32,7 +39,12 @@ const SourceSelector: SFC<Props> = ({
         source={source}
         sources={sources}
         allowInfluxQL={true}
+        // TODO: when flux is added into CEO/DE, change to true
+        allowFlux={false}
+        allowDynamicSource={true}
+        isDynamicSourceSelected={isDynamicSourceSelected}
         onChangeService={onChangeService}
+        onSelectDynamicSource={onSelectDynamicSource}
       />
     </div>
   ) : (

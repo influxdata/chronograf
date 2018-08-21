@@ -66,22 +66,29 @@ interface State {
   activeEditorTab: CEOTabs
   selectedSource: Source
   selectedService: Service
+  useDynamicSource: boolean
 }
 
 class TimeMachine extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
+    const {queryDrafts} = props
+
+    const useDynamicSource = getDeep(queryDrafts, '0.source', '') === ''
+
     this.state = {
       activeQueryIndex: 0,
       activeEditorTab: CEOTabs.Queries,
       selectedService: null,
       selectedSource: null,
+      useDynamicSource,
     }
   }
 
   public render() {
     const {services} = this.props
+    const {useDynamicSource} = this.state
     const horizontalDivisions = [
       {
         name: '',
@@ -112,6 +119,8 @@ class TimeMachine extends PureComponent<Props, State> {
           service={this.service}
           services={services}
           onChangeService={this.handleChangeService}
+          onSelectDynamicSource={this.handleSelectDynamicSource}
+          isDynamicSourceSelected={useDynamicSource}
         />
         <div className="deceo--container">
           <Threesizer
@@ -206,22 +215,25 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get source(): Source {
     const {source, sources, queryDrafts} = this.props
-    const {selectedSource} = this.state
+    const {selectedSource, useDynamicSource} = this.state
 
     if (selectedSource) {
       return selectedSource
     }
 
-    const query = _.get(queryDrafts, 0)
-    const querySource = _.get(query, 'source')
-
-    if (!query || !querySource) {
+    // return current source
+    if (useDynamicSource) {
       return source
     }
 
-    const foundSource = sources.find(
-      s => s.links.self === _.get(query, 'source', null)
-    )
+    const queryDraft = _.get(queryDrafts, 0)
+    const querySource = _.get(queryDraft, 'source')
+
+    if (!queryDraft || !querySource) {
+      return source
+    }
+
+    const foundSource = sources.find(s => s.links.self === querySource)
     if (foundSource) {
       return foundSource
     }
@@ -356,10 +368,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
-  private handleChangeService = (
-    selectedService: Service,
-    selectedSource: Source
-  ) => {
+  private updateQueryDrafts(selectedSource: Source) {
     const {queryDrafts, updateQueryDrafts} = this.props
 
     const queries: CellQuery[] = queryDrafts.map(q => {
@@ -372,7 +381,23 @@ class TimeMachine extends PureComponent<Props, State> {
     })
 
     updateQueryDrafts(queries)
-    this.setState({selectedService, selectedSource})
+  }
+
+  private handleChangeService = (
+    selectedService: Service,
+    selectedSource: Source
+  ): void => {
+    const useDynamicSource = false
+
+    this.updateQueryDrafts(selectedSource)
+    this.setState({selectedService, selectedSource, useDynamicSource})
+  }
+
+  private handleSelectDynamicSource = (): void => {
+    const useDynamicSource = true
+
+    this.updateQueryDrafts(null)
+    this.setState({useDynamicSource})
   }
 
   private handleAddQuery = () => {
