@@ -19,6 +19,7 @@ interface Props {
   allowFlux: boolean
   allowDynamicSource: boolean
   isDynamicSourceSelected?: boolean
+  onSelectDynamicSource?: () => void
   onChangeService: (service: Service, source: Source) => void
 }
 
@@ -42,10 +43,15 @@ class SourceDropdown extends PureComponent<Props> {
   }
 
   private handleSelect = (choice: SourceDropdownItem): void => {
-    const {sources, services, onChangeService} = this.props
+    const {
+      sources,
+      services,
+      onChangeService,
+      onSelectDynamicSource,
+    } = this.props
 
-    if (choice.sourceID === DynamicSource.id) {
-      onChangeService(null, null)
+    if (choice.sourceID === DynamicSource.id && onSelectDynamicSource) {
+      onSelectDynamicSource()
       return
     }
 

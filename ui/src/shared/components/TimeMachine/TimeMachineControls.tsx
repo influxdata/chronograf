@@ -14,6 +14,7 @@ interface Props {
   isDynamicSourceSelected: boolean
   onChangeService: (service: Service, source: SourcesModels.Source) => void
   queries: QueriesModels.QueryConfig[]
+  onSelectDynamicSource: () => void
 }
 
 const TimeMachineControls: SFC<Props> = ({
@@ -24,6 +25,7 @@ const TimeMachineControls: SFC<Props> = ({
   services,
   onChangeService,
   isDynamicSourceSelected,
+  onSelectDynamicSource,
 }) => {
   return (
     <div className="deceo--controls">
@@ -35,6 +37,7 @@ const TimeMachineControls: SFC<Props> = ({
         queries={queries}
         onChangeService={onChangeService}
         isDynamicSourceSelected={isDynamicSourceSelected}
+        onSelectDynamicSource={onSelectDynamicSource}
       />
     </div>
   )

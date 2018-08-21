@@ -119,6 +119,7 @@ class TimeMachine extends PureComponent<Props, State> {
           service={this.service}
           services={services}
           onChangeService={this.handleChangeService}
+          onSelectDynamicSource={this.handleSelectDynamicSource}
           isDynamicSourceSelected={useDynamicSource}
         />
         <div className="deceo--container">
@@ -367,13 +368,8 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
-  private handleChangeService = (
-    selectedService: Service,
-    selectedSource: Source
-  ): void => {
+  private updateQueryDrafts(selectedSource: Source) {
     const {queryDrafts, updateQueryDrafts} = this.props
-
-    const useDynamicSource = selectedService === null && selectedSource === null
 
     const queries: CellQuery[] = queryDrafts.map(q => {
       const queryConfig = _.get(q, 'queryConfig')
@@ -385,7 +381,23 @@ class TimeMachine extends PureComponent<Props, State> {
     })
 
     updateQueryDrafts(queries)
+  }
+
+  private handleChangeService = (
+    selectedService: Service,
+    selectedSource: Source
+  ): void => {
+    const useDynamicSource = false
+
+    this.updateQueryDrafts(selectedSource)
     this.setState({selectedService, selectedSource, useDynamicSource})
+  }
+
+  private handleSelectDynamicSource = (): void => {
+    const useDynamicSource = true
+
+    this.updateQueryDrafts(null)
+    this.setState({useDynamicSource})
   }
 
   private handleAddQuery = () => {
