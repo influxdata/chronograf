@@ -566,10 +566,7 @@ class LogsPage extends Component<Props, State> {
     value: string
   ): Promise<void> => {
     this.props.changeFilter(id, operator, value)
-<<<<<<< HEAD
-=======
-    this.fetchNewDataset()
->>>>>>> Add query results to table
+    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
   private handleBarClick = (time: string): void => {

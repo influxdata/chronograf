@@ -88,7 +88,7 @@ interface State {
   firstQueryTime: number
   visibleColumnsCount: number
   searchPattern: string
-  loadMoreQueryCount: number
+  infiniteLoaderQueryCount: number
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -178,7 +178,7 @@ class LogsTable extends Component<Props, State> {
       currentMessageWidth: 0,
       lastQueryTime: null,
       firstQueryTime: null,
-      loadMoreQueryCount: 0,
+      infiniteLoaderQueryCount: 0,
       isMessageVisible,
       visibleColumnsCount,
     }
@@ -217,7 +217,7 @@ class LogsTable extends Component<Props, State> {
 
   public render() {
     const {queryCount} = this.props
-    const {loadMoreQueryCount} = this.state
+    const {infiniteLoaderQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
     if (this.isLoadingTableData) {
@@ -232,7 +232,7 @@ class LogsTable extends Component<Props, State> {
         <div className="logs-viewer--table-count">
           <QueryResults
             count={this.rowCount()}
-            queryCount={loadMoreQueryCount + queryCount}
+            queryCount={infiniteLoaderQueryCount + queryCount}
           />
         </div>
         <AutoSizer>
@@ -288,6 +288,7 @@ class LogsTable extends Component<Props, State> {
             </AutoSizer>
           )}
         </InfiniteLoader>
+        {this.scrollLoadingIndicator}
       </div>
     )
   }
@@ -384,7 +385,6 @@ class LogsTable extends Component<Props, State> {
     if (queryCount > 0) {
       return
     }
-
     const data = getValuesFromData(this.props.tableInfiniteData.forward)
     const backwardData = getValuesFromData(
       this.props.tableInfiniteData.backward
@@ -399,12 +399,13 @@ class LogsTable extends Component<Props, State> {
     if (firstQueryTime && firstQueryTime > firstTime) {
       return
     }
+
     try {
-      this.incrementRowQueryCount()
+      this.incrementLoaderQueryCount()
       this.setState({firstQueryTime: firstTime})
       await this.props.fetchNewer(moment(firstTime).toISOString())
     } finally {
-      this.decrementRowQueryCount()
+      this.decrementLoaderQueryCount()
     }
   }
 
@@ -431,23 +432,23 @@ class LogsTable extends Component<Props, State> {
     }
 
     try {
-      this.incrementRowQueryCount()
+      this.incrementLoaderQueryCount()
       this.setState({lastQueryTime: lastTime})
       await this.props.fetchMore(moment(lastTime).toISOString())
     } finally {
-      this.decrementRowQueryCount()
+      this.decrementLoaderQueryCount()
     }
   }
 
-  private incrementRowQueryCount() {
-    this.setState(({loadMoreQueryCount}) => ({
-      loadMoreQueryCount: loadMoreQueryCount + 1,
+  private incrementLoaderQueryCount() {
+    this.setState(({infiniteLoaderQueryCount}) => ({
+      infiniteLoaderQueryCount: infiniteLoaderQueryCount + 1,
     }))
   }
 
-  private decrementRowQueryCount() {
-    this.setState(({loadMoreQueryCount}) => ({
-      loadMoreQueryCount: loadMoreQueryCount - 1,
+  private decrementLoaderQueryCount() {
+    this.setState(({infiniteLoaderQueryCount}) => ({
+      infiniteLoaderQueryCount: infiniteLoaderQueryCount - 1,
     }))
   }
 
@@ -749,6 +750,22 @@ class LogsTable extends Component<Props, State> {
       default:
         return true
     }
+  }
+
+  private get isLoadingMore(): boolean {
+    return this.state.infiniteLoaderQueryCount > 0
+  }
+
+  private get scrollLoadingIndicator(): JSX.Element {
+    const className = classnames('logs-viewer--scroll-loader', {
+      loading: this.isLoadingMore,
+    })
+
+    return (
+      <div className={className}>
+        <h6>Loading more logs...</h6>
+      </div>
+    )
   }
 }
 
