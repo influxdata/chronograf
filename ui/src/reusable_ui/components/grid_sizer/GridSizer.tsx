@@ -1,4 +1,8 @@
+// Libraries
 import React, {PureComponent} from 'react'
+import _ from 'lodash'
+
+// Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
@@ -14,9 +18,8 @@ interface State {
 class CardSelectList extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     cellWidth: 160,
+    width: null,
   }
-
-  public resizeTimeout: any
 
   constructor(props) {
     super(props)
@@ -31,7 +34,11 @@ class CardSelectList extends PureComponent<Props, State> {
     this.setColumns(widthValue)
 
     if (!width) {
-      window.addEventListener('resize', this.resizeThrottler, false)
+      window.addEventListener(
+        'resize',
+        _.debounce(() => this.setColumns(this.getWidth()), 250),
+        false
+      )
     }
   }
 
@@ -43,7 +50,11 @@ class CardSelectList extends PureComponent<Props, State> {
   }
 
   public componentWillUnmount() {
-    window.removeEventListener('resize', this.resizeThrottler, false)
+    window.removeEventListener(
+      'resize',
+      _.debounce(() => this.setColumns(this.getWidth()), 250),
+      false
+    )
   }
 
   public render() {
@@ -94,16 +105,6 @@ class CardSelectList extends PureComponent<Props, State> {
     this.setState({
       columns,
     })
-  }
-
-  private resizeThrottler = () => {
-    if (!this.resizeTimeout) {
-      this.resizeTimeout = setTimeout(() => {
-        this.resizeTimeout = null
-        const widthValue = this.getWidth()
-        this.setColumns(widthValue)
-      }, 250)
-    }
   }
 }
 
