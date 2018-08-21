@@ -199,3 +199,23 @@ export type NewDefaultCell = Pick<
   Cell,
   Exclude<keyof Cell, 'i' | 'axes' | 'colors' | 'links' | 'legend'>
 >
+
+export interface ProtoboardMetadata {
+  name: string
+  icon: string
+  version: string
+  dashboardVersion: string
+  description: string
+  author: string
+  license: string
+  url: string
+}
+
+export interface ProtoboardData {
+  cells: object
+}
+export interface Protoboard {
+  id: string
+  meta: ProtoboardMetadata
+  data: ProtoboardData
+}

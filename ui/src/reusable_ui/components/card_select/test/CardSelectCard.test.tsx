@@ -10,9 +10,11 @@ describe('Card Select Card', () => {
     const props = {
       id: 'card_id',
       label: 'Card Label',
+      name: undefined,
       image: undefined,
       checked: undefined,
       disabled: undefined,
+      onClick: undefined,
       ...override,
     }
 
@@ -44,27 +46,6 @@ describe('Card Select Card', () => {
     const field = wrapper.find('input')
     expect(field).toHaveLength(1)
     expect(field.prop('type')).toBe('checkbox')
-  })
-
-  describe('toggleChecked method', () => {
-    it('sets checked to true if false', () => {
-      expect(wrapper.find('input').prop('checked')).toBe(false)
-      wrapper
-        .find('div')
-        .filterWhere(div => div.prop('data-toggle'))
-        .simulate('click', {preventDefault() {}})
-      expect(wrapper.find('input').prop('checked')).toBe(true)
-    })
-
-    it('sets checked to false if true', () => {
-      wrapper = wrapperSetup({checked: true})
-      expect(wrapper.find('input').prop('checked')).toBe(true)
-      wrapper
-        .find('div')
-        .filterWhere(div => div.prop('data-toggle'))
-        .simulate('click', {preventDefault() {}})
-      expect(wrapper.find('input').prop('checked')).toBe(false)
-    })
   })
 
   it('matches snapshot with minimal props', () => {

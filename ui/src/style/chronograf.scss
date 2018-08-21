@@ -73,6 +73,7 @@
 @import 'components/histogram-chart';
 @import 'src/sources/components/ConnectionLink';
 @import 'src/sources/components/KapacitorStep';
+@import 'src/sources/components/DashboardStep';
 
 
 // Reusable UI Components
@@ -82,6 +83,7 @@
 @import '../reusable_ui/components/overlays/Overlay.scss';
 @import '../dashboards/components/import_dashboard_mappings/ImportDashboardMappings.scss';
 @import '../reusable_ui/components/card_select/CardSelectCard.scss';
+@import '../reusable_ui/components/grid_sizer/GridSizer.scss';
 @import '../reusable_ui/components/wizard/WizardController.scss';
 @import '../reusable_ui/components/wizard/WizardButtonBar.scss';
 @import '../reusable_ui/components/wizard/WizardFullScreen.scss';
