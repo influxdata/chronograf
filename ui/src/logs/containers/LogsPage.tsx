@@ -242,6 +242,7 @@ class LogsPage extends Component<Props, State> {
               onExpandMessage={this.handleExpandMessage}
               notify={notify}
               searchStatus={searchStatus}
+              filters={filters}
             />
           </div>
         </div>

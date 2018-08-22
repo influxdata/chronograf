@@ -8,7 +8,7 @@ exports[`MultiSelectDropdown matches snapshot with minimal props 1`] = `
     className="dropdown dropdown-sm dropdown-default"
     style={
       Object {
-        "width": "120px",
+        "width": "100%",
       }
     }
   >
@@ -33,7 +33,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
     className="dropdown dropdown-sm dropdown-default"
     style={
       Object {
-        "width": "120px",
+        "width": "100%",
       }
     }
   >
@@ -50,7 +50,7 @@ exports[`MultiSelectDropdown with menu expanded matches snapshot 1`] = `
       className="dropdown--menu-container dropdown--sapphire"
       style={
         Object {
-          "minWidth": "120px",
+          "minWidth": "100%",
         }
       }
     >

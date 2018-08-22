@@ -175,3 +175,14 @@ export enum Operator {
   EQUAL = '==',
   NOT_EQUAL = '!=',
 }
+
+export enum MatchType {
+  NONE = 'no-match',
+  MATCH = 'match',
+}
+
+export interface MatchSection {
+  id: string
+  type: MatchType
+  text: string
+}
