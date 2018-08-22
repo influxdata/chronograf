@@ -550,23 +550,13 @@ class LogsPage extends Component<Props, State> {
       this.props.addFilter(filter)
     })
 
-    try {
-      this.setState({searchStatus: SearchStatus.Loading})
-      await this.fetchNewDataset()
-    } finally {
-      this.setState({searchStatus: SearchStatus.Loaded})
-    }
+    this.fetchSearchDataset(SearchStatus.Loading)
   }
 
-  private handleFilterDelete = async (id: string): Promise<void> => {
+  private handleFilterDelete = (id: string): void => {
     this.props.removeFilter(id)
 
-    try {
-      this.setState({searchStatus: SearchStatus.UpdatingFilters})
-      await this.fetchNewDataset()
-    } finally {
-      this.setState({searchStatus: SearchStatus.Loaded})
-    }
+    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
   private handleFilterChange = async (
@@ -575,12 +565,6 @@ class LogsPage extends Component<Props, State> {
     value: string
   ): Promise<void> => {
     this.props.changeFilter(id, operator, value)
-    try {
-      this.setState({searchStatus: SearchStatus.UpdatingFilters})
-      await this.fetchNewDataset()
-    } finally {
-      this.setState({searchStatus: SearchStatus.Loaded})
-    }
   }
 
   private handleBarClick = (time: string): void => {
@@ -613,7 +597,7 @@ class LogsPage extends Component<Props, State> {
 
     this.props.setTimeRangeAsync(this.props.timeRange)
 
-    this.fetchNewDataset()
+    this.fetchSearchDataset(SearchStatus.UpdatingTimeBounds)
   }
 
   private handleSetTimeWindow = async (timeWindow: TimeWindow) => {
@@ -627,6 +611,17 @@ class LogsPage extends Component<Props, State> {
 
   private handleChooseNamespace = (namespace: Namespace) => {
     this.props.setNamespaceAsync(namespace)
+  }
+
+  private fetchSearchDataset = async (
+    searchStatus: SearchStatus
+  ): Promise<void> => {
+    try {
+      this.setState({searchStatus})
+      await this.fetchNewDataset()
+    } finally {
+      this.setState({searchStatus: SearchStatus.Loaded})
+    }
   }
 
   private fetchNewDataset() {

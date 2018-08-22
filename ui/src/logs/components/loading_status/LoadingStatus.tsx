@@ -1,4 +1,6 @@
 import React, {PureComponent} from 'react'
+import _ from 'lodash'
+
 import {SearchStatus} from 'src/types/logs'
 import {LoadingMessages} from 'src/logs/constants'
 
@@ -42,6 +44,8 @@ class LoadingStatus extends PureComponent<Props> {
         return 'Updating Search Filters'
       case SearchStatus.NoResults:
         return 'No logs to display'
+      case SearchStatus.UpdatingTimeBounds:
+        return 'Searching time bounds'
     }
   }
 }
