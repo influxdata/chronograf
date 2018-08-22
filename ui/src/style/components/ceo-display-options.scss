@@ -6,33 +6,16 @@
 $graph-type--gutter: 4px;
 
 .display-options {
-  height: 100%;
-  min-height: 300px;
-  display: flex;
-  background-color: $g2-kevlar;
-  padding: 8px 60px;
-  flex-wrap: nowrap;
-  align-items: stretch;
-}
-.display-options--cell {
-  flex: 1 0 0;
-  margin-right: 8px;
-  border-radius: 3px;
-  
-  &:last-of-type {
-    margin: 0;
-  }
-}
-.display-options--cellx2 {
-  flex: 2 0 0;
+  background-color: $g3-castle;
 }
 
-.display-options--cell-wrapper {
-  background-color: $g3-castle;
-  width: 100%;
-  position: relative;
-  display: inline-block;
+.display-options--wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: stretch;
   padding: 30px;
+  min-width: 500px;
 }
 
 .display-options--header {

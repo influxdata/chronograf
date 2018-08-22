@@ -42,11 +42,8 @@ class GaugeOptions extends PureComponent<Props> {
     const {y} = axes
 
     return (
-      <FancyScrollbar
-        className="display-options--cell y-axis-controls"
-        autoHide={false}
-      >
-        <div className="display-options--cell-wrapper">
+      <FancyScrollbar className="display-options" autoHide={false}>
+        <div className="display-options--wrapper">
           <h5 className="display-options--header">Gauge Controls</h5>
           <div className="thresholds-list">
             <button

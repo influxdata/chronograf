@@ -34,11 +34,8 @@ class SingleStatOptions extends PureComponent<Props> {
     } = this.props
 
     return (
-      <FancyScrollbar
-        className="display-options--cell y-axis-controls"
-        autoHide={false}
-      >
-        <div className="display-options--cell-wrapper">
+      <FancyScrollbar className="display-options" autoHide={false}>
+        <div className="display-options--wrapper">
           <h5 className="display-options--header">Single Stat Controls</h5>
           <ThresholdsList onResetFocus={onResetFocus} />
           <div className="graph-options-group form-group-wrapper">
