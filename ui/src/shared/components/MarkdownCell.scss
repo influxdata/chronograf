@@ -59,11 +59,39 @@
   table {
     border-collapse: collapse;
   }
+
   td, th {
     padding: 4px 8px;
     border: $ix-border solid $g5-pepper;
   }
+
   th {
     background-color: $g5-pepper;
+  }
+
+  code {
+    border-radius: 3px;
+    margin: 0;
+    padding: 2px 6px;
+    color: $c-potassium;
+    letter-spacing: 0;
+    font-weight: 500;
+  }
+
+  pre {
+    border-radius: 3px;
+    padding: 6px;
+
+    code {
+      padding: 0;
+    }
+  }
+
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    margin-bottom: 0;
   }
 }
