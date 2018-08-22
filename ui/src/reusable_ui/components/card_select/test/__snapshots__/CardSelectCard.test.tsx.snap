@@ -2,81 +2,71 @@
 
 exports[`Card Select Card matches snapshot with minimal props 1`] = `
 <div
-  className="card-select--card-holder"
+  className="card-select--card card-select--active"
+  data-toggle="card_toggle"
+  onClick={[Function]}
 >
-  <div
-    className="card-select--card card-select--active"
-    data-toggle="card_toggle"
-    onClick={[Function]}
+  <label
+    className="card-select--container"
   >
-    <label
-      className="card-select--container"
+    <input
+      checked={false}
+      disabled={false}
+      id="card_select_card_id"
+      type="checkbox"
+      value="card_id"
+    />
+    <span
+      className="card-select--checkmark icon checkmark"
+    />
+    <div
+      className="card-select--image"
     >
-      <input
-        checked={false}
-        disabled={false}
-        id="card_select_card_id"
-        name="card_select_card_id"
-        type="checkbox"
-        value="card_id"
-      />
       <span
-        className="card-select--checkmark icon checkmark"
+        className="card-select--placeholder icon dash-j"
       />
-      <div
-        className="card-select--image"
-      >
-        <span
-          className="card-select--placeholder icon dash-j"
-        />
-      </div>
-      <span
-        className="card-select--label"
-      >
-        Card Label
-      </span>
-    </label>
-  </div>
+    </div>
+    <span
+      className="card-select--label"
+    >
+      Card Label
+    </span>
+  </label>
 </div>
 `;
 
 exports[`Card Select Card with image matches snapshot when provided image source 1`] = `
 <div
-  className="card-select--card-holder"
+  className="card-select--card card-select--active"
+  data-toggle="card_toggle"
+  onClick={[Function]}
 >
-  <div
-    className="card-select--card card-select--active"
-    data-toggle="card_toggle"
-    onClick={[Function]}
+  <label
+    className="card-select--container"
   >
-    <label
-      className="card-select--container"
+    <input
+      checked={false}
+      disabled={false}
+      id="card_select_card_id"
+      type="checkbox"
+      value="card_id"
+    />
+    <span
+      className="card-select--checkmark icon checkmark"
+    />
+    <div
+      className="card-select--image"
     >
-      <input
-        checked={false}
-        disabled={false}
-        id="card_select_card_id"
-        name="card_select_card_id"
-        type="checkbox"
-        value="card_id"
+      <img
+        alt="Card Label icon"
+        src="URL"
       />
-      <span
-        className="card-select--checkmark icon checkmark"
-      />
-      <div
-        className="card-select--image"
-      >
-        <img
-          alt="Card Label icon"
-          src="URL"
-        />
-      </div>
-      <span
-        className="card-select--label"
-      >
-        Card Label
-      </span>
-    </label>
-  </div>
+    </div>
+    <span
+      className="card-select--label"
+    >
+      Card Label
+    </span>
+  </label>
 </div>
 `;

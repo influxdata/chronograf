@@ -1,7 +1,15 @@
 import {LayoutCell, LayoutQuery} from './layouts'
 import {Service, NewService, ServiceLinks} from './services'
 import {Links, Organization, Role, Permission, User, Me} from './auth'
-import {Cell, CellQuery, Legend, Axes, Dashboard, CellType} from './dashboards'
+import {
+  Cell,
+  CellQuery,
+  Legend,
+  Axes,
+  Dashboard,
+  CellType,
+  Protoboard,
+} from './dashboards'
 import {
   Template,
   TemplateQuery,
@@ -66,6 +74,7 @@ export {
   Cell,
   CellQuery,
   CellType,
+  Protoboard,
   Legend,
   Status,
   Query,
