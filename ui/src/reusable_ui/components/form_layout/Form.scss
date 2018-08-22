@@ -99,7 +99,13 @@ $grid--form-gutter: 6px;
   ------------------------------------------------------------------------------
 */
 .form--submit {
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
   margin-top: $form-sm-height - $ix-marg-b;
   margin-bottom: 0;
+
+  > .button {
+    margin: 0 $ix-marg-a;
+  }
 }
