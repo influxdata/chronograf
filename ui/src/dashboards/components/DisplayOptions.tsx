@@ -64,7 +64,7 @@ class DisplayOptions extends Component<Props, State> {
         name: 'Visualization Type',
         headerButtons: [],
         menuOptions: [],
-        render: () => <GraphTypeSelector />,
+        render: (__, pixels) => <GraphTypeSelector parentPixels={pixels} />,
         headerOrientation: HANDLE_VERTICAL,
       },
       {
