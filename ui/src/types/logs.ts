@@ -169,3 +169,13 @@ export enum Operator {
   NOT_EQUAL = '!=',
 }
 export type RowHeightHandler = (index: Index) => number
+
+export enum MatchType {
+  NONE = 'no-match',
+  MATCH = 'match',
+}
+export interface MatchSection {
+  id: string
+  type: MatchType
+  text: string
+}

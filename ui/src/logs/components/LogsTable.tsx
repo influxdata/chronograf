@@ -25,6 +25,10 @@ import {
   getMessageWidth,
   getColumnsFromData,
 } from 'src/logs/utils/table'
+import {
+  getValidMessageFilters,
+  filtersToPattern,
+} from 'src/logs/utils/matchSections'
 
 import {
   SeverityFormatOptions,
@@ -39,10 +43,12 @@ import {
   SeverityFormat,
   SeverityLevelColor,
   RowHeightHandler,
+  Filter,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
 interface Props {
+  filters: Filter[]
   data: TableData
   isScrolledToTop: boolean
   isTruncated: boolean
@@ -77,6 +83,7 @@ interface State {
   lastQueryTime: number
   firstQueryTime: number
   visibleColumnsCount: number
+  searchPattern: string
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -91,6 +98,7 @@ class LogsTable extends Component<Props, State> {
       data,
       tableColumns,
       severityFormat,
+      filters,
     } = props
     const currentMessageWidth = getMessageWidth(
       data,
@@ -121,8 +129,12 @@ class LogsTable extends Component<Props, State> {
       return c.visible
     }).length
 
+    const validFitlers = getValidMessageFilters(filters)
+    const searchPattern = filtersToPattern(validFitlers)
+
     return {
       ...state,
+      searchPattern,
       isQuerying: false,
       lastQueryTime,
       firstQueryTime,
@@ -154,6 +166,7 @@ class LogsTable extends Component<Props, State> {
     }).length
 
     this.state = {
+      searchPattern: null,
       scrollTop: 0,
       scrollLeft: 0,
       currentRow: -1,
@@ -622,6 +635,7 @@ class LogsTable extends Component<Props, State> {
 
   private renderMessage = (formattedValue: string): JSX.Element => {
     const {notify} = this.props
+    const {searchPattern} = this.state
 
     if (this.props.isTruncated) {
       return (
@@ -629,11 +643,18 @@ class LogsTable extends Component<Props, State> {
           notify={notify}
           formattedValue={formattedValue}
           onExpand={this.props.onExpandMessage}
+          searchPattern={searchPattern}
         />
       )
     }
 
-    return <LogsMessage notify={notify} formattedValue={formattedValue} />
+    return (
+      <LogsMessage
+        notify={notify}
+        formattedValue={formattedValue}
+        searchPattern={searchPattern}
+      />
+    )
   }
 
   private severityDotStyle = (

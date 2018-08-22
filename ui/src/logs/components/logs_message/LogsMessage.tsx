@@ -6,12 +6,14 @@ import {
   notifyCopyToClipboardSuccess,
   notifyCopyToClipboardFailed,
 } from 'src/shared/copy/notifications'
+import {getMatchSections} from 'src/logs/utils/matchSections'
 
 import {NotificationAction} from 'src/types'
 
 interface Props {
   formattedValue: string
   notify: NotificationAction
+  searchPattern?: string
 }
 
 class LogsMessage extends PureComponent<Props> {
@@ -20,7 +22,7 @@ class LogsMessage extends PureComponent<Props> {
 
     return (
       <div className="logs-message">
-        {formattedValue}
+        {this.messageSections}
         <CopyToClipboard text={formattedValue} onCopy={this.handleCopyAttempt}>
           <div className="logs-message--copy" title="copy to clipboard">
             <span className="icon duplicate" />
@@ -45,6 +47,22 @@ class LogsMessage extends PureComponent<Props> {
     } else {
       notify(notifyCopyToClipboardFailed(truncatedText, title))
     }
+  }
+
+  private get messageSections(): JSX.Element[] | string {
+    const {searchPattern, formattedValue} = this.props
+
+    if (!searchPattern) {
+      return formattedValue
+    }
+
+    const sections = getMatchSections(searchPattern, formattedValue)
+
+    return sections.map(s => (
+      <span key={s.id} className={`logs-message--${s.type}`}>
+        {s.text}
+      </span>
+    ))
   }
 }
 
