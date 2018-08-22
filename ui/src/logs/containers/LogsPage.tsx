@@ -65,7 +65,10 @@ import {
   TimeBounds,
   SearchStatus,
 } from 'src/types/logs'
-import {applyChangesToTableData} from 'src/logs/utils/table'
+import {
+  applyChangesToTableData,
+  isEmptyInfiniteData,
+} from 'src/logs/utils/table'
 import extentBy from 'src/utils/extentBy'
 import {computeTimeBounds} from 'src/logs/utils/timeBounds'
 
@@ -121,7 +124,9 @@ interface State {
 }
 
 class LogsPage extends Component<Props, State> {
-  public static getDerivedStateFromProps(props: Props) {
+  public static getDerivedStateFromProps(props: Props, state: State) {
+    const {tableInfiniteData} = props
+
     const severityLevelColors: SeverityLevelColor[] = _.get(
       props.logConfig,
       'severityLevelColors',
@@ -131,7 +136,16 @@ class LogsPage extends Component<Props, State> {
       group: lc.level,
       color: lc.color,
     }))
-    return {histogramColors}
+
+    let {searchStatus} = state
+
+    if (isEmptyInfiniteData(tableInfiniteData)) {
+      searchStatus = SearchStatus.NoResults
+    } else if (searchStatus === SearchStatus.None) {
+      searchStatus = SearchStatus.Loaded
+    }
+
+    return {histogramColors, searchStatus}
   }
 
   private interval: NodeJS.Timer

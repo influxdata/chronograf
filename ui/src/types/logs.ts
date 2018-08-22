@@ -13,6 +13,7 @@ import {TimeRange} from 'src/types/logs'
 export enum SearchStatus {
   None = 'None',
   Loading = 'Loading',
+  NoResults = 'NoResults',
   UpdatingFilters = 'UpdatingFilters',
   Loaded = 'Loaded',
 }

@@ -157,3 +157,14 @@ export const applyChangesToTableData = (
     values: updatedValues,
   }
 }
+
+export const isEmptyInfiniteData = (data: {
+  forward: TableData
+  backward: TableData
+}) => {
+  return isEmptyTableData(data.forward) && isEmptyTableData(data.backward)
+}
+
+const isEmptyTableData = (data: TableData): boolean => {
+  return getDeep(data, 'values.length', 0) === 0
+}
