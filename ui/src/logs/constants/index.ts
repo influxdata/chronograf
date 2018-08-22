@@ -201,3 +201,11 @@ export const TIME_RANGE_VALUES = [
 ]
 
 export const SECONDS_TO_MS = 1000
+
+export const LoadingMessages = [
+  'Looking for logs in all the wrong places',
+  'I have the best logs',
+  'Rolling like a log',
+  '100% natural logs',
+  'Chopping wood',
+]

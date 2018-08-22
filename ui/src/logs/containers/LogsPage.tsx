@@ -67,8 +67,12 @@ import {
   TimeWindow,
   TimeMarker,
   TimeBounds,
+  SearchStatus,
 } from 'src/types/logs'
-import {applyChangesToTableData} from 'src/logs/utils/table'
+import {
+  applyChangesToTableData,
+  isEmptyInfiniteData,
+} from 'src/logs/utils/table'
 
 interface Props {
   sources: Source[]
@@ -117,10 +121,13 @@ interface State {
   isOverlayVisible: boolean
   histogramColors: HistogramColor[]
   hasScrolled: boolean
+  searchStatus: SearchStatus
 }
 
 class LogsPage extends Component<Props, State> {
-  public static getDerivedStateFromProps(props: Props) {
+  public static getDerivedStateFromProps(props: Props, state: State) {
+    const {tableInfiniteData} = props
+
     const severityLevelColors: SeverityLevelColor[] = _.get(
       props.logConfig,
       'severityLevelColors',
@@ -130,7 +137,16 @@ class LogsPage extends Component<Props, State> {
       group: lc.level,
       color: lc.color,
     }))
-    return {histogramColors}
+
+    let {searchStatus} = state
+
+    if (isEmptyInfiniteData(tableInfiniteData)) {
+      searchStatus = SearchStatus.NoResults
+    } else if (searchStatus === SearchStatus.None) {
+      searchStatus = SearchStatus.Loaded
+    }
+
+    return {histogramColors, searchStatus}
   }
 
   private interval: NodeJS.Timer
@@ -145,6 +161,7 @@ class LogsPage extends Component<Props, State> {
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
+      searchStatus: SearchStatus.None,
     }
   }
 
@@ -183,6 +200,7 @@ class LogsPage extends Component<Props, State> {
 
   public render() {
     const {filters, queryCount, timeRange, notify} = this.props
+    const {searchStatus} = this.state
 
     return (
       <>
@@ -218,6 +236,7 @@ class LogsPage extends Component<Props, State> {
               onChooseCustomTime={this.handleChooseCustomTime}
               onExpandMessage={this.handleExpandMessage}
               notify={notify}
+              searchStatus={searchStatus}
             />
           </div>
         </div>
@@ -521,27 +540,26 @@ class LogsPage extends Component<Props, State> {
     }
   }
 
-  private handleSubmitSearch = (value: string): void => {
+  private handleSubmitSearch = async (value: string): Promise<void> => {
     searchToFilters(value).forEach(filter => {
       this.props.addFilter(filter)
     })
 
-    this.fetchNewDataset()
+    this.fetchSearchDataset(SearchStatus.Loading)
   }
 
   private handleFilterDelete = (id: string): void => {
     this.props.removeFilter(id)
-    this.fetchNewDataset()
+
+    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
-  private handleFilterChange = (
+  private handleFilterChange = async (
     id: string,
     operator: string,
     value: string
-  ) => {
+  ): Promise<void> => {
     this.props.changeFilter(id, operator, value)
-    this.fetchNewDataset()
-    this.props.executeQueriesAsync()
   }
 
   private handleBarClick = (time: string): void => {
@@ -575,7 +593,8 @@ class LogsPage extends Component<Props, State> {
     await this.props.setTimeBounds(timeBounds)
 
     this.props.setTimeRangeAsync(this.props.timeRange)
-    this.fetchNewDataset()
+
+    this.fetchSearchDataset(SearchStatus.UpdatingTimeBounds)
   }
 
   private handleSetTimeWindow = async (timeWindow: TimeWindow) => {
@@ -591,8 +610,19 @@ class LogsPage extends Component<Props, State> {
     this.props.setNamespaceAsync(namespace)
   }
 
+  private fetchSearchDataset = async (
+    searchStatus: SearchStatus
+  ): Promise<void> => {
+    try {
+      this.setState({searchStatus})
+      await this.fetchNewDataset()
+    } finally {
+      this.setState({searchStatus: SearchStatus.Loaded})
+    }
+  }
+
   private fetchNewDataset() {
-    this.props.executeQueriesAsync()
+    return this.props.executeQueriesAsync()
   }
 
   private handleToggleOverlay = (): void => {

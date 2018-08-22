@@ -8,6 +8,7 @@ import {color} from 'd3-color'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import ExpandableMessage from 'src/logs/components/expandable_message/ExpandableMessage'
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
+import LoadingStatus from 'src/logs/components/loading_status/LoadingStatus'
 import {getDeep} from 'src/utils/wrappers'
 
 import {colorForSeverity} from 'src/logs/utils/colors'
@@ -39,6 +40,7 @@ import {
   SeverityFormat,
   SeverityLevelColor,
   RowHeightHandler,
+  SearchStatus,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
@@ -66,6 +68,7 @@ interface Props {
   onExpandMessage: () => void
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
+  searchStatus: SearchStatus
 }
 
 interface State {
@@ -166,7 +169,9 @@ class LogsTable extends Component<Props, State> {
   }
 
   public componentDidUpdate() {
-    if (this.isTableEmpty) {
+    const {searchStatus} = this.props
+
+    if (searchStatus === SearchStatus.NoResults) {
       return
     }
 
@@ -197,8 +202,8 @@ class LogsTable extends Component<Props, State> {
   public render() {
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
-    if (this.isTableEmpty) {
-      return this.emptyTable
+    if (this.isLoadingTableData) {
+      return this.loadingStatus
     }
 
     return (
@@ -678,22 +683,19 @@ class LogsTable extends Component<Props, State> {
     this.setState({currentRow: -1})
   }
 
-  private get emptyTable(): JSX.Element {
-    return (
-      <div className="logs-viewer--table-container generic-empty-state">
-        <h4>No logs to display</h4>
-        <p>
-          Try changing the <strong>time range</strong> or{' '}
-          <strong>removing filters</strong>
-        </p>
-      </div>
-    )
+  private get loadingStatus(): JSX.Element {
+    return <LoadingStatus status={this.props.searchStatus} />
   }
 
-  private get isTableEmpty(): boolean {
-    const rowCount = getDeep(this.props, 'data.values.length', 0)
+  private get isLoadingTableData(): boolean {
+    const {searchStatus} = this.props
 
-    return rowCount === 0
+    switch (searchStatus) {
+      case SearchStatus.Loaded:
+        return false
+      default:
+        return true
+    }
   }
 }
 
