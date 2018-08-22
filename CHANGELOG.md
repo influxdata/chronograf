@@ -10,6 +10,7 @@
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
+1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
 
 ### Bug Fixes
 
