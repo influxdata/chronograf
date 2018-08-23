@@ -28,10 +28,7 @@ class DashboardStep extends Component<{}, State> {
   }
 
   public async componentDidMount() {
-    const {
-      data: {protoboards},
-    } = await getProtoBoards()
-
+    const protoboards = await getProtoBoards()
     this.setState({protoboards})
   }
 
