@@ -19,6 +19,8 @@
 
 ### Bug Fixes
 
+1. [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
+
 ## v1.6.2 [unreleased]
 
 ### Features
