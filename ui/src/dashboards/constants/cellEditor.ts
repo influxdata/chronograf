@@ -29,9 +29,6 @@ export const DEFAULT_AXIS: DefaultAxis = {
   label: '',
 }
 
-export const TOOLTIP_Y_VALUE_FORMAT =
-  '<p><strong>K/M/B</strong> = Thousand / Million / Billion<br/><strong>K/M/G</strong> = Kilo / Mega / Giga </p>'
-
 interface Color {
   cellType: CellType
   thresholdsListColors: ColorNumber[]

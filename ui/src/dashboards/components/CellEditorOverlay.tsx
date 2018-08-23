@@ -252,7 +252,7 @@ class CellEditorOverlay extends Component<Props, State> {
     }
   }
 
-  private handleToggleStaticLegend = isStaticLegend => (): void => {
+  private handleToggleStaticLegend = (isStaticLegend: boolean): void => {
     this.setState({isStaticLegend})
   }
 
