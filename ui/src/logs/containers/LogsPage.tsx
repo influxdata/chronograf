@@ -33,7 +33,7 @@ import {
   updateLogConfigAsync,
 } from 'src/logs/actions'
 import {getSourcesAsync} from 'src/shared/actions/sources'
-import LogViewerHeader from 'src/logs/components/LogViewerHeader'
+import LogsHeader from 'src/logs/components/LogsHeader'
 import HistogramChart from 'src/shared/components/HistogramChart'
 import LogsGraphContainer from 'src/logs/components/LogsGraphContainer'
 import OptionsOverlay from 'src/logs/components/OptionsOverlay'
@@ -501,7 +501,7 @@ class LogsPage extends Component<Props, State> {
     } = this.props
 
     return (
-      <LogViewerHeader
+      <LogsHeader
         timeRange={timeRange}
         onSetTimeWindow={this.handleSetTimeWindow}
         liveUpdating={this.liveUpdatingStatus}
