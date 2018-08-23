@@ -95,6 +95,14 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           />
         </WizardStep>
         <WizardStep
+          title="Dashboards"
+          tipText="Select dashboards you would like to create:"
+          isComplete={this.isDashboardComplete}
+          isErrored={dashboardError}
+        >
+          <DashboardStep />
+        </WizardStep>
+        <WizardStep
           title="Kapacitor Connection"
           tipText=""
           isComplete={this.isKapacitorComplete}
@@ -114,13 +122,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           />
         </WizardStep>
         <WizardStep
-          title="Select Dashboards"
-          isComplete={this.isDashboardComplete}
-          isErrored={dashboardError}
-        >
-          <DashboardStep />
-        </WizardStep>
-        <WizardStep
           title="Setup Complete"
           tipText=""
           isComplete={this.isCompletionComplete}
@@ -138,40 +139,50 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
     )
   }
 
+  // SourceStep
+  private isSourceComplete = () => {
+    const {source} = this.state
+    return !_.isNull(source)
+  }
+
   private handleSourceNext = async () => {
     const response = await this.sourceStepRef.next()
     this.setState({source: response.payload})
     return response
   }
-  private isSourceComplete = () => {
-    const {source} = this.state
-    return !_.isNull(source)
-  }
+
   private handleSetSourceError = (b: boolean) => {
     this.setState({sourceError: b})
   }
 
+  // DashboardStep
+  private isDashboardComplete = () => {
+    return false
+  }
+
+  // KapacitorStep
   private isKapacitorComplete = () => {
     const {kapacitor} = this.state
     return !_.isNull(kapacitor)
   }
+
   private handleKapacitorNext = async () => {
     const response = await this.kapacitorStepRef.next()
     this.setState({kapacitor: response.payload})
     return response
   }
+
   private handleKapacitorPrev = () => {}
+
   private handleSetKapacitorError = (b: boolean) => {
     this.setState({kapacitorError: b})
   }
 
-  private isDashboardComplete = () => {
-    return false
-  }
-
+  // CompletionStep
   private isCompletionComplete = () => {
     return false
   }
+
   private handleCompletionNext = () => {
     const {router} = this.props
     const {source} = this.state
@@ -181,6 +192,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
     }
     return {success: true, payload: null}
   }
+
   private handleCompletionPrev = () => {}
 
   private resetWizardState = () => {
