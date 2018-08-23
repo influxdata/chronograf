@@ -18,22 +18,22 @@ class LoadingStatus extends PureComponent<Props> {
     )
   }
 
-  private randomLoadingDescription = (): string => {
-    return _.sample(LoadingMessages)
-  }
-
   private get description(): JSX.Element {
     switch (this.props.status) {
       case SearchStatus.NoResults:
         return (
           <>
-            Try changing the <strong>time range</strong> or
+            Try changing the <strong>time range</strong> or{' '}
             <strong>removing filters</strong>
           </>
         )
       default:
         return <>{this.randomLoadingDescription}</>
     }
+  }
+
+  private get randomLoadingDescription(): string {
+    return _.sample(LoadingMessages)
   }
 
   private get loadingMessage(): string {
