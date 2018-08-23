@@ -1,4 +1,4 @@
-import React, {SFC, ChangeEvent} from 'react'
+import React, {Component, ChangeEvent} from 'react'
 import _ from 'lodash'
 
 import Deadman from 'src/kapacitor/components/Deadman'
@@ -53,77 +53,83 @@ interface Props {
   onChooseTimeRange: (timeRange: TimeRange) => void
 }
 
-const ValuesSection: SFC<Props> = ({
-  rule,
-  query,
-  source,
-  timeRange,
-  onAddEvery,
-  onChooseTrigger,
-  onDeadmanChange,
-  onChooseTimeRange,
-  queryConfigActions,
-  onRuleTypeInputChange,
-  onRuleTypeDropdownChange,
-}) => (
-  <div className="rule-section">
-    <h3 className="rule-section--heading">Alert Type</h3>
-    <div className="rule-section--body">
-      <Tabs
-        initialIndex={initialIndex(rule)}
-        onSelect={handleChooseTrigger(rule, onChooseTrigger)}
-      >
-        <TabList isKapacitorTabs="true">
-          {TABS.map(tab => (
-            <Tab key={tab} isKapacitorTab={true}>
-              {tab}
-            </Tab>
-          ))}
-        </TabList>
-        <div>
-          <h3 className="rule-section--sub-heading">Time Series</h3>
-          <DataSection
-            query={query}
-            timeRange={timeRange}
-            isKapacitorRule={true}
-            actions={queryConfigActions}
-            onAddEvery={onAddEvery}
-            isDeadman={isDeadman(rule)}
-          />
+class ValuesSection extends Component<Props> {
+  public render() {
+    const {
+      rule,
+      query,
+      source,
+      timeRange,
+      onAddEvery,
+      onChooseTrigger,
+      onDeadmanChange,
+      onChooseTimeRange,
+      queryConfigActions,
+      onRuleTypeInputChange,
+      onRuleTypeDropdownChange,
+    } = this.props
+
+    return (
+      <div className="rule-section">
+        <h3 className="rule-section--heading">Alert Type</h3>
+        <div className="rule-section--body">
+          <Tabs
+            initialIndex={initialIndex(rule)}
+            onSelect={handleChooseTrigger(rule, onChooseTrigger)}
+          >
+            <TabList isKapacitorTabs="true">
+              {TABS.map(tab => (
+                <Tab key={tab} isKapacitorTab={true}>
+                  {tab}
+                </Tab>
+              ))}
+            </TabList>
+            <div>
+              <h3 className="rule-section--sub-heading">Time Series</h3>
+              <DataSection
+                query={query}
+                timeRange={timeRange}
+                isKapacitorRule={true}
+                actions={queryConfigActions}
+                onAddEvery={onAddEvery}
+                isDeadman={isDeadman(rule)}
+              />
+            </div>
+            <h3 className="rule-section--sub-heading">Conditions</h3>
+            <TabPanels>
+              <TabPanel>
+                <Threshold
+                  rule={rule}
+                  query={query}
+                  onDropdownChange={onRuleTypeDropdownChange}
+                  onRuleTypeInputChange={onRuleTypeInputChange}
+                />
+              </TabPanel>
+              <TabPanel>
+                <Relative
+                  rule={rule}
+                  onDropdownChange={onRuleTypeDropdownChange}
+                  onRuleTypeInputChange={onRuleTypeInputChange}
+                />
+              </TabPanel>
+              <TabPanel>
+                <Deadman rule={rule} onChange={onDeadmanChange} />
+              </TabPanel>
+            </TabPanels>
+            {isDeadman(rule) ? null : (
+              <RuleGraph
+                rule={rule}
+                query={query}
+                source={source}
+                timeRange={timeRange}
+                onChooseTimeRange={onChooseTimeRange}
+              />
+            )}
+          </Tabs>
         </div>
-        <h3 className="rule-section--sub-heading">Conditions</h3>
-        <TabPanels>
-          <TabPanel>
-            <Threshold
-              rule={rule}
-              query={query}
-              onDropdownChange={onRuleTypeDropdownChange}
-              onRuleTypeInputChange={onRuleTypeInputChange}
-            />
-          </TabPanel>
-          <TabPanel>
-            <Relative
-              rule={rule}
-              onDropdownChange={onRuleTypeDropdownChange}
-              onRuleTypeInputChange={onRuleTypeInputChange}
-            />
-          </TabPanel>
-          <TabPanel>
-            <Deadman rule={rule} onChange={onDeadmanChange} />
-          </TabPanel>
-        </TabPanels>
-        {isDeadman(rule) ? null : (
-          <RuleGraph
-            rule={rule}
-            query={query}
-            source={source}
-            timeRange={timeRange}
-            onChooseTimeRange={onChooseTimeRange}
-          />
-        )}
-      </Tabs>
-    </div>
-  </div>
-)
+      </div>
+    )
+  }
+}
 
 export default ValuesSection
