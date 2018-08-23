@@ -1,10 +1,15 @@
-import React, {PureComponent, MouseEvent} from 'react'
+// Libaries
+import React, {PureComponent} from 'react'
 
+// Components
+import {Radio} from 'src/reusable_ui'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   type: string
-  onChangeType: (type: string) => (event: MouseEvent<HTMLLIElement>) => void
+  onChangeType: (type: string) => void
 }
 
 const STREAM = 'stream'
@@ -13,27 +18,30 @@ const BATCH = 'batch'
 @ErrorHandling
 class TickscriptType extends PureComponent<Props> {
   public render() {
-    const {onChangeType} = this.props
+    const {onChangeType, type} = this.props
+
     return (
-      <ul className="nav nav-tablist nav-tablist-sm">
-        <li
-          className={this.getClassName(STREAM)}
-          onClick={onChangeType(STREAM)}
+      <Radio>
+        <Radio.Button
+          id="tickscript-type--stream"
+          value={STREAM}
+          titleText="Change TICKscript to 'Stream' type"
+          active={type === STREAM}
+          onClick={onChangeType}
         >
           Stream
-        </li>
-        <li className={this.getClassName(BATCH)} onClick={onChangeType(BATCH)}>
+        </Radio.Button>
+        <Radio.Button
+          id="tickscript-type--batch"
+          value={BATCH}
+          titleText="Change TICKscript to 'Batch' type"
+          active={type === BATCH}
+          onClick={onChangeType}
+        >
           Batch
-        </li>
-      </ul>
+        </Radio.Button>
+      </Radio>
     )
-  }
-
-  private getClassName(type: string) {
-    if (type === this.props.type) {
-      return 'active'
-    }
-    return ''
   }
 }
 
