@@ -19,6 +19,7 @@ import parseValuesColumn from 'src/shared/parsing/flux/values'
 import FilterTagValueList from 'src/flux/components/FilterTagValueList'
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
+import {Radio, ComponentSize, ButtonShape} from 'src/reusable_ui'
 
 interface Props {
   tagKey: string
@@ -64,27 +65,33 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
   }
 
   public renderEqualitySwitcher() {
-    const {operator} = this.props
+    const {operator, tagKey} = this.props
 
     if (!this.state.isOpen) {
       return null
     }
 
     return (
-      <ul className="nav nav-tablist nav-tablist-xs">
-        <li
-          className={operator === '==' ? 'active' : ''}
-          onClick={this.setEquality(true)}
+      <Radio shape={ButtonShape.Square} size={ComponentSize.ExtraSmall}>
+        <Radio.Button
+          id={`filter-tag-list--${tagKey}--equals`}
+          value={true}
+          titleText="="
+          active={operator === '=='}
+          onClick={this.setEquality}
         >
           =
-        </li>
-        <li
-          className={operator === '!=' ? 'active' : ''}
-          onClick={this.setEquality(false)}
+        </Radio.Button>
+        <Radio.Button
+          id={`filter-tag-list--${tagKey}--not-equals`}
+          value={false}
+          titleText="!="
+          active={operator === '!='}
+          onClick={this.setEquality}
         >
-          !=
-        </li>
-      </ul>
+          =
+        </Radio.Button>
+      </Radio>
     )
   }
 
