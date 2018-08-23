@@ -17,6 +17,9 @@ import {
 // Types
 import {CellNoteVisibility} from 'src/types/dashboards'
 
+// Utils
+import {humanizeNote} from 'src/dashboards/utils/notes'
+
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -67,7 +70,7 @@ class CellNoteEditor extends Component<Props, State> {
           <div className={this.fieldClassName}>
             <ReactCodeMirror
               autoCursor={true}
-              value={noteDraft}
+              value={humanizeNote(noteDraft)}
               options={options}
               onBeforeChange={this.handleChange}
               onTouchStart={this.onTouchStart}

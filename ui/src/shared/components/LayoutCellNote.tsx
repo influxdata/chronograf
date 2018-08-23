@@ -6,6 +6,9 @@ import Markdown from 'react-markdown'
 // Components
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
+// Utils
+import {humanizeNote} from 'src/dashboards/utils/notes'
+
 // Types
 import {CellType, CellNoteVisibility} from 'src/types/dashboards'
 
@@ -37,7 +40,10 @@ class LayoutCellNote extends Component<Props> {
         <div className={this.noteContentsClass}>
           <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={140}>
             <div className="dash-graph--note-contents">
-              <Markdown source={note} className="markdown-format" />
+              <Markdown
+                source={humanizeNote(note)}
+                className="markdown-format"
+              />
             </div>
           </FancyScrollbar>
         </div>
