@@ -28,6 +28,7 @@ class RadioButton extends Component<Props> {
 
     return (
       <button
+        type="button"
         className={this.className}
         disabled={disabled}
         onClick={this.handleClick}
