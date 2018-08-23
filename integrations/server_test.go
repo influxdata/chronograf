@@ -3405,7 +3405,8 @@ func TestServer(t *testing.T) {
 				statusCode: 200,
 				body: `
 {
-  "layouts": "/chronograf/v1/layouts",
+	"layouts": "/chronograf/v1/layouts",
+	"protoboards":"/chronograf/v1/protoboards",
   "cells": "/chronograf/v2/cells",
   "users": "/chronograf/v1/organizations/default/users",
   "allUsers": "/chronograf/v1/users",
@@ -3499,7 +3500,8 @@ func TestServer(t *testing.T) {
 				statusCode: 200,
 				body: `
 {
-  "layouts": "/chronograf/v1/layouts",
+	"layouts": "/chronograf/v1/layouts",
+	"protoboards":"/chronograf/v1/protoboards",
   "cells": "/chronograf/v2/cells",
   "users": "/chronograf/v1/organizations/1/users",
   "allUsers": "/chronograf/v1/users",
