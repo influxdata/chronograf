@@ -3,9 +3,6 @@ import React, {PureComponent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
 import _ from 'lodash'
 
-// APIs
-import {getProtoBoards} from 'src/sources/apis'
-
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
@@ -16,7 +13,7 @@ import DashboardStep from 'src/sources/components/DashboardStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
 
 // Types
-import {Kapacitor, Source, Protoboard} from 'src/types'
+import {Kapacitor, Source} from 'src/types'
 import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
@@ -33,7 +30,6 @@ interface State {
   kapacitor: Kapacitor
   kapacitorError: boolean
   dashboardError: boolean
-  dashboards: Protoboard[]
 }
 
 @ErrorHandling
@@ -59,16 +55,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       sourceError: false,
       kapacitorError: false,
       dashboardError: false,
-      dashboards: null,
     }
-  }
-
-  public componentDidMount = async () => {
-    const {
-      data: {protoboards},
-    } = await getProtoBoards()
-
-    this.setState({dashboards: protoboards})
   }
 
   public render() {
@@ -131,7 +118,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           isComplete={this.isDashboardComplete}
           isErrored={dashboardError}
         >
-          {this.dashboardStep}
+          <DashboardStep />
         </WizardStep>
         <WizardStep
           title="Setup Complete"
@@ -149,16 +136,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         </WizardStep>
       </WizardOverlay>
     )
-  }
-
-  private get dashboardStep() {
-    const {dashboards} = this.state
-
-    if (dashboards) {
-      return <DashboardStep dashboards={dashboards} />
-    }
-
-    return null
   }
 
   private handleSourceNext = async () => {

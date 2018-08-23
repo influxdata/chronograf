@@ -1,6 +1,9 @@
 // Libraries
 import React, {Component} from 'react'
 
+// APIs
+import {getProtoBoards} from 'src/sources/apis'
+
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import GridSizer from 'src/reusable_ui/components/grid_sizer/GridSizer'
@@ -11,54 +14,55 @@ import {Protoboard} from 'src/types'
 
 interface State {
   selected: object
-}
-
-interface Props {
-  dashboards?: Protoboard[]
+  protoboards: Protoboard[]
 }
 
 @ErrorHandling
-class DashboardStep extends Component<Props, State> {
+class DashboardStep extends Component<{}, State> {
   public constructor(props) {
     super(props)
     this.state = {
       selected: {},
+      protoboards: [],
     }
+  }
+
+  public componentDidMount = async () => {
+    const {
+      data: {protoboards},
+    } = await getProtoBoards()
+
+    this.setState({protoboards})
   }
 
   public render() {
-    return (
-      <div className="dashboard-step">
-        <GridSizer>{this.dashboardCards}</GridSizer>
-      </div>
-    )
+    const {protoboards} = this.state
+    if (protoboards && protoboards.length) {
+      return (
+        <div className="dashboard-step">
+          <GridSizer>{this.dashboardCards}</GridSizer>
+        </div>
+      )
+    }
+    return <div />
   }
 
   private get dashboardCards() {
-    const {selected} = this.state
-    const {dashboards} = this.props
+    const {selected, protoboards} = this.state
 
-    const cards =
-      dashboards &&
-      dashboards.map((dashboard, i) => {
-        const {meta} = dashboard
-        return (
-          <CardSelectCard
-            key={`${dashboard.id}_${i}`}
-            id={meta.name}
-            name={meta.name}
-            label={meta.name}
-            checked={selected[meta.name]}
-            onClick={this.toggleChecked(meta.name)}
-          />
-        )
-      })
-
-    if (cards.length) {
-      return cards
-    }
-
-    return null
+    return protoboards.map((protoboard, i) => {
+      const {meta} = protoboard
+      return (
+        <CardSelectCard
+          key={`${protoboard.id}_${i}`}
+          id={meta.name}
+          name={meta.name}
+          label={meta.name}
+          checked={selected[meta.name]}
+          onClick={this.toggleChecked(meta.name)}
+        />
+      )
+    })
   }
 
   private toggleChecked = (name: string) => () => {
