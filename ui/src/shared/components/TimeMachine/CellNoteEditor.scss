@@ -19,7 +19,7 @@
   font-weight: 600;
   color: $g11-sidewalk;
   @extend %no-user-select;
-  margin-bottom: $ix-marg-b;
+  margin: $ix-marg-b 0;
 }
 
 .cell-note-editor--field {

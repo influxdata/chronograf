@@ -66,6 +66,14 @@ class CellNoteEditor extends Component<Props, State> {
     return (
       <FancyScrollbar className="cell-note-editor--container">
         <div className="cell-note-editor">
+          <div className="form-control-static cell-note-editor--display-option">
+            <SlideToggle
+              size={ComponentSize.ExtraSmall}
+              onChange={this.handleSlideToggle}
+              active={noteVisibility === CellNoteVisibility.ShowWhenNoData}
+            />
+            <label>Display note in cell when query returns no results</label>
+          </div>
           <div className="cell-note-editor--header">Markdown is supported</div>
           <div className={this.fieldClassName}>
             <ReactCodeMirror
@@ -77,14 +85,6 @@ class CellNoteEditor extends Component<Props, State> {
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
             />
-          </div>
-          <div className="form-control-static cell-note-editor--display-option">
-            <SlideToggle
-              size={ComponentSize.ExtraSmall}
-              onChange={this.handleSlideToggle}
-              active={noteVisibility === CellNoteVisibility.ShowWhenNoData}
-            />
-            <label>Display note in cell when query returns no results</label>
           </div>
         </div>
       </FancyScrollbar>
