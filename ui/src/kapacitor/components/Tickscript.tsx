@@ -17,7 +17,7 @@ interface Props {
   onExit: () => void
   areLogsVisible: boolean
   areLogsEnabled: boolean
-  onToggleLogsVisibility: () => void
+  onToggleLogsVisibility: (visibility: boolean) => void
   task: Task
   onChangeScript: (tickscript: string) => void
   onSelectDbrps: (dbrps: DBRP[]) => void

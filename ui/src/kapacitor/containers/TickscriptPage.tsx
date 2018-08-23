@@ -269,8 +269,8 @@ export class TickscriptPage extends PureComponent<Props, State> {
     })
   }
 
-  private handleToggleLogsVisibility = () => {
-    this.setState({areLogsVisible: !this.state.areLogsVisible})
+  private handleToggleLogsVisibility = (areLogsVisible: boolean): void => {
+    this.setState({areLogsVisible})
   }
 
   private get isEditing() {
