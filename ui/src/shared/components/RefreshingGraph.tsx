@@ -70,6 +70,14 @@ class RefreshingGraph extends PureComponent<Props> {
     decimalPlaces: DEFAULT_DECIMAL_PLACES,
   }
 
+  private timeSeries: React.RefObject<TimeSeries> = React.createRef()
+
+  public componentDidUpdate() {
+    if (this.props.isInCEO) {
+      this.timeSeries.current.forceUpdate()
+    }
+  }
+
   public render() {
     const {
       type,
@@ -98,6 +106,7 @@ class RefreshingGraph extends PureComponent<Props> {
 
     return (
       <TimeSeries
+        ref={this.timeSeries}
         source={source}
         cellType={type}
         inView={inView}
