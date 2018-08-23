@@ -1,20 +1,21 @@
-import React, {PureComponent, MouseEvent} from 'react'
+// Libraries
+import React, {PureComponent} from 'react'
 
-import {ErrorHandling} from 'src/shared/decorators/errors'
+// Components
+import {Radio, ButtonShape} from 'src/reusable_ui'
+
+// Constants
 import {SeverityFormatOptions} from 'src/logs/constants'
+
+// Types
 import {SeverityFormat} from 'src/types/logs'
+
+// Decorators
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   format: SeverityFormat
   onChangeFormat: (format: SeverityFormat) => void
-}
-
-const className = (name: SeverityFormat, format: SeverityFormat): string => {
-  if (name === format) {
-    return 'active'
-  }
-
-  return null
 }
 
 @ErrorHandling
@@ -24,44 +25,42 @@ class SeverityColumnFormat extends PureComponent<Props> {
   }
 
   public render() {
-    const {format} = this.props
+    const {format, onChangeFormat} = this.props
 
     return (
       <div className="graph-options-group">
         <label className="form-label">Severity Format</label>
-        <ul className="nav nav-tablist nav-tablist-sm stretch">
-          <li
-            data-tag-value={SeverityFormatOptions.dot}
-            onClick={this.handleClick}
-            className={className(SeverityFormatOptions.dot, format)}
+        <Radio shape={ButtonShape.StretchToFit}>
+          <Radio.Button
+            active={format === SeverityFormatOptions.dot}
+            id="severity-format-option--dot"
+            value={SeverityFormatOptions.dot}
+            onClick={onChangeFormat}
+            titleText="Show only a dot in the severity column"
           >
             Dot
-          </li>
-          <li
-            data-tag-value={SeverityFormatOptions.dotText}
-            onClick={this.handleClick}
-            className={className(SeverityFormatOptions.dotText, format)}
+          </Radio.Button>
+          <Radio.Button
+            active={format === SeverityFormatOptions.dotText}
+            id="severity-format-option--dot-text"
+            value={SeverityFormatOptions.dotText}
+            onClick={onChangeFormat}
+            titleText="Show both a dot and the severity name in the severity column"
           >
             Dot + Text
-          </li>
-          <li
-            data-tag-value={SeverityFormatOptions.text}
-            onClick={this.handleClick}
-            className={className(SeverityFormatOptions.text, format)}
+          </Radio.Button>
+          <Radio.Button
+            active={format === SeverityFormatOptions.text}
+            id="severity-format-option--text"
+            value={SeverityFormatOptions.text}
+            onClick={onChangeFormat}
+            titleText="Show only the severity name in the severity column"
           >
             Text
-          </li>
-        </ul>
+          </Radio.Button>
+        </Radio>
       </div>
     )
-  }
-
-  private handleClick = (e: MouseEvent<HTMLElement>) => {
-    const {onChangeFormat} = this.props
-    const target = e.target as HTMLElement
-    const value = target.dataset.tagValue
-
-    onChangeFormat(SeverityFormatOptions[value])
   }
 }
 
