@@ -8,3 +8,9 @@ export const getSourceHealth = async (url: string) => {
     throw error
   }
 }
+
+export const getProtoBoards = () =>
+  AJAX({
+    method: 'GET',
+    resource: 'protoboards',
+  })

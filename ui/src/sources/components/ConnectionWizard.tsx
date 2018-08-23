@@ -3,6 +3,9 @@ import React, {PureComponent} from 'react'
 import {withRouter, WithRouterProps} from 'react-router'
 import _ from 'lodash'
 
+// APIs
+import {getProtoBoards} from 'src/sources/apis'
+
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import WizardOverlay from 'src/reusable_ui/components/wizard/WizardOverlay'
@@ -58,6 +61,14 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       dashboardError: false,
       dashboards: null,
     }
+  }
+
+  public componentDidMount = async () => {
+    const {
+      data: {protoboards},
+    } = await getProtoBoards()
+
+    this.setState({dashboards: protoboards})
   }
 
   public render() {
