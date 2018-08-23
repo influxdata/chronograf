@@ -123,11 +123,82 @@ $dash-graph-options-arrow: 8px;
   }
 }
 
+.dash-graph--note {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+}
+
+.dash-graph--note-icon {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  color: $g9-mountain;
+  transition: color 0.25s ease;
+  font-size: 14px;
+
+  > .icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.dash-graph--note-tooltip {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  width: 290px;
+  max-height: 140px;
+  background-color: rgba($g0-obsidian, 0.95);
+  border-radius: $radius;
+  @extend %drop-shadow;
+
+  .fancy-scroll--track-h {
+    display: none;
+  }
+}
+
+.dash-graph--note__top {
+  top: -10px;
+}
+.dash-graph--note__middle {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.dash-graph--note__bottom {
+  bottom: 0;
+}
+.dash-graph--note__right {
+  left: 100%;
+}
+.dash-graph--note__left {
+  right: 100%;
+}
+
+.dash-graph--note-contents {
+  padding: 14px 16px;
+  font-size: 12px;
+  color: $g13-mist;
+}
+
+
+.dash-graph--note:hover .dash-graph--note-tooltip {
+  display: block;
+}
+.dash-graph--note:hover .dash-graph--note-icon {
+  color: $g20-white;  
+}
+
 .dash-graph--heading {
-  user-select: none !important;
-  -o-user-select: none !important;
-  -moz-user-select: none !important;
-  -webkit-user-select: none !important;
+  user-select: none;
   background-color: transparent;
   position: absolute;
   top: 0;
@@ -137,12 +208,9 @@ $dash-graph-options-arrow: 8px;
   margin: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   border-radius: $radius-small;
-  font-weight: 600;
-  font-size: 13px;
-  color: $g14-chromium;
-  transition: color 0.25s ease, background-color 0.25s ease;
+  transition: background-color 0.25s ease;
+  
   &.dash-graph--heading-draggable:hover {
     cursor: move;
     background-color: $g5-pepper;
@@ -157,19 +225,28 @@ $dash-graph-options-arrow: 8px;
   text-overflow: ellipsis;
   white-space: nowrap;
   position: relative;
+  font-weight: 600;
+  font-size: 13px;
   height: $dash-graph-heading;
+  color: $g13-mist;
   line-height: $dash-graph-heading;
   width: calc(100% - 78px);
   padding-left: 10px;
-  transition: color 0.25s ease, background-color 0.25s ease,
-    border-color 0.25s ease;
-  &:only-child {
-    width: 100%;
+  transition: color 0.25s ease, opacity 0.25s ease;
+  
+  .dash-graph--heading-draggable:hover & {
+    color: $g16-pearl;
   }
 }
 
 .dash-graph--name.dash-graph--name__default {
   font-style: italic;
+  opacity: 0.5;
+}
+
+.dash-graph--name.dash-graph--name__note {
+  width: calc(100% - (78px + 22px));
+  margin-left: 20px;
 }
 
 .dash-graph--draggable {

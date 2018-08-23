@@ -59,6 +59,11 @@ export interface DecimalPlaces {
   digits: number
 }
 
+export enum CellNoteVisibility {
+  Default = 'default',
+  ShowWhenNoData = 'showWhenNoData',
+}
+
 export interface Cell {
   i: string
   x: number
@@ -78,6 +83,8 @@ export interface Cell {
   legend: Legend
   isWidget?: boolean
   inView: boolean
+  note: string
+  noteVisibility: CellNoteVisibility
 }
 
 export enum CellType {
@@ -92,6 +99,7 @@ export enum CellType {
   Alerts = 'alerts',
   News = 'news',
   Guide = 'guide',
+  Note = 'note',
 }
 
 interface DashboardLinks {

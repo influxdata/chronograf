@@ -12,6 +12,7 @@ import {
   DecimalPlaces,
   FieldOption,
   CellType,
+  CellNoteVisibility,
 } from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
@@ -34,11 +35,14 @@ interface Props {
   lineColors: ColorString[]
   staticLegend: boolean
   isInCEO: boolean
+  note: string
+  noteVisibility: CellNoteVisibility
 }
 
 const DashVisualization: SFC<Props> = ({
   axes,
   type,
+  note,
   source,
   isInCEO,
   templates,
@@ -52,6 +56,7 @@ const DashVisualization: SFC<Props> = ({
   staticLegend,
   tableOptions,
   decimalPlaces,
+  noteVisibility,
   editQueryStatus,
   resizerTopHeight,
   thresholdsListColors,
@@ -82,6 +87,8 @@ const DashVisualization: SFC<Props> = ({
           decimalPlaces={decimalPlaces}
           fieldOptions={fieldOptions}
           isInCEO={isInCEO}
+          cellNote={note}
+          cellNoteVisibility={noteVisibility}
         />
       </div>
     </div>
@@ -93,7 +100,16 @@ const mapStateToProps = ({
     thresholdsListColors,
     gaugeColors,
     lineColors,
-    cell: {type, axes, tableOptions, fieldOptions, timeFormat, decimalPlaces},
+    cell: {
+      type,
+      axes,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      note,
+      noteVisibility,
+    },
   },
 }) => ({
   gaugeColors,
@@ -105,6 +121,8 @@ const mapStateToProps = ({
   fieldOptions,
   timeFormat,
   decimalPlaces,
+  note,
+  noteVisibility,
 })
 
 export default connect(mapStateToProps, null)(DashVisualization)

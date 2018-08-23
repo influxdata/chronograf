@@ -312,6 +312,9 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			}
 		}
 
+		note := c.Note
+		noteVisibility := c.NoteVisibility
+
 		cells[i] = &DashboardCell{
 			ID:      c.ID,
 			X:       c.X,
@@ -327,10 +330,12 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 				Type:        c.Legend.Type,
 				Orientation: c.Legend.Orientation,
 			},
-			TableOptions:  tableOptions,
-			FieldOptions:  fieldOptions,
-			TimeFormat:    c.TimeFormat,
-			DecimalPlaces: decimalPlaces,
+			TableOptions:   tableOptions,
+			FieldOptions:   fieldOptions,
+			TimeFormat:     c.TimeFormat,
+			DecimalPlaces:  decimalPlaces,
+			Note:           note,
+			NoteVisibility: noteVisibility,
 		}
 	}
 	templates := make([]*Template, len(d.Templates))
@@ -489,6 +494,9 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			decimalPlaces.Digits = 2
 		}
 
+		note := c.Note
+		noteVisibility := c.NoteVisibility
+
 		// FIXME: this is merely for legacy cells and
 		//        should be removed as soon as possible
 		cellType := c.Type
@@ -497,21 +505,23 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 		}
 
 		cells[i] = chronograf.DashboardCell{
-			ID:            c.ID,
-			X:             c.X,
-			Y:             c.Y,
-			W:             c.W,
-			H:             c.H,
-			Name:          c.Name,
-			Queries:       queries,
-			Type:          cellType,
-			Axes:          axes,
-			CellColors:    colors,
-			Legend:        legend,
-			TableOptions:  tableOptions,
-			FieldOptions:  fieldOptions,
-			TimeFormat:    c.TimeFormat,
-			DecimalPlaces: decimalPlaces,
+			ID:             c.ID,
+			X:              c.X,
+			Y:              c.Y,
+			W:              c.W,
+			H:              c.H,
+			Name:           c.Name,
+			Queries:        queries,
+			Type:           cellType,
+			Axes:           axes,
+			CellColors:     colors,
+			Legend:         legend,
+			TableOptions:   tableOptions,
+			FieldOptions:   fieldOptions,
+			TimeFormat:     c.TimeFormat,
+			DecimalPlaces:  decimalPlaces,
+			Note:           note,
+			NoteVisibility: noteVisibility,
 		}
 	}
 

@@ -120,6 +120,20 @@ export default (state = initialState, action: Action): CEOInitialState => {
       return {...state, cell}
     }
 
+    case ActionType.UpdateCellNote: {
+      const {note} = action.payload
+      const cell = {...state.cell, note}
+
+      return {...state, cell}
+    }
+
+    case ActionType.UpdateCellNoteVisibility: {
+      const {noteVisibility} = action.payload
+      const cell = {...state.cell, noteVisibility}
+
+      return {...state, cell}
+    }
+
     case ActionType.RenameCell: {
       const {cellName} = action.payload
       const cell = {...state.cell, name: cellName}
