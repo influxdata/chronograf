@@ -1,24 +1,33 @@
+// Libraries
 import React, {PureComponent, MouseEvent} from 'react'
 import {connect} from 'react-redux'
 
+// Components
 import OptIn from 'src/shared/components/OptIn'
 import Input from 'src/dashboards/components/DisplayOptionsInput'
 import {Tabber, Tab} from 'src/dashboards/components/Tabber'
+import {Radio, ButtonShape} from 'src/reusable_ui'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import LineGraphColorSelector from 'src/shared/components/LineGraphColorSelector'
 import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDecimalPlaces'
 
+// Constants
 import {
   AXES_SCALE_OPTIONS,
   TOOLTIP_Y_VALUE_FORMAT,
 } from 'src/dashboards/constants/cellEditor'
 import {GRAPH_TYPES} from 'src/dashboards/graphics/graph'
 
+// Actions
 import {
   updateAxes,
   changeDecimalPlaces,
 } from 'src/dashboards/actions/cellEditorOverlay'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Types
 import {Axes, CellType} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
 
@@ -126,27 +135,10 @@ class AxesOptions extends PureComponent<Props> {
               labelText="Y-Value's Suffix"
               onChange={this.handleSetPrefixSuffix}
             />
-            <Tabber
-              labelText="Y-Value's Format"
-              tipID="Y-Value's Format"
-              tipContent={TOOLTIP_Y_VALUE_FORMAT}
-            >
-              <Tab
-                text="Raw"
-                isActive={base === ''}
-                onClickTab={this.handleSetBase('')}
-              />
-              <Tab
-                text="K/M/B"
-                isActive={base === BASE_10}
-                onClickTab={this.handleSetBase(BASE_10)}
-              />
-              <Tab
-                text="K/M/G"
-                isActive={base === BASE_2}
-                onClickTab={this.handleSetBase(BASE_2)}
-              />
-            </Tabber>
+            <div className="form-group col-sm-6">
+              <label>Y-Value's Format</label>
+              {this.yValuesFormatTabs}
+            </div>
             <Tabber labelText="Scale">
               <Tab
                 text="Linear"
@@ -175,6 +167,46 @@ class AxesOptions extends PureComponent<Props> {
           </form>
         </div>
       </FancyScrollbar>
+    )
+  }
+
+  private get yValuesFormatTabs(): JSX.Element {
+    const {
+      axes: {
+        y: {base},
+      },
+    } = this.props
+
+    return (
+      <Radio shape={ButtonShape.StretchToFit}>
+        <Radio.Button
+          id="y-values-format-tab--raw"
+          value=""
+          active={base === ''}
+          titleText="Don't format values"
+          onClick={this.handleSetBase}
+        >
+          Raw
+        </Radio.Button>
+        <Radio.Button
+          id="y-values-format-tab--kmb"
+          value={BASE_10}
+          active={base === BASE_10}
+          titleText="Thousand / Million / Billion"
+          onClick={this.handleSetBase}
+        >
+          K/M/B
+        </Radio.Button>
+        <Radio.Button
+          id="y-values-format-tab--kmg"
+          value={BASE_2}
+          active={base === BASE_2}
+          titleText="Kilo / Mega / Giga"
+          onClick={this.handleSetBase}
+        >
+          K/M/G
+        </Radio.Button>
+      </Radio>
     )
   }
 
@@ -252,9 +284,11 @@ class AxesOptions extends PureComponent<Props> {
     handleUpdateAxes(newAxes)
   }
 
-  private handleSetBase = base => () => {
+  private handleSetBase = (base: string): void => {
     const {handleUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, base}}
+
+    console.log('thag')
 
     handleUpdateAxes(newAxes)
   }
