@@ -33,7 +33,7 @@ export interface AlertRule {
   trigger: string
   values: TriggerValues
   name: string
-  type: AlertRuleType
+  type: string
   dbrps: DBRP[]
   status: string
   executing: boolean

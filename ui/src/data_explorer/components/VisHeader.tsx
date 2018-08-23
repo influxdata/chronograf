@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {getDataForCSV} from 'src/data_explorer/apis'
-import {Radio, ButtonShape} from 'src/reusable_ui'
+import {Radio} from 'src/reusable_ui'
 import {Source} from 'src/types'
 
 interface Props {
