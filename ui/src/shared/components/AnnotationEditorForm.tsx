@@ -2,7 +2,7 @@ import React, {PureComponent, ChangeEvent} from 'react'
 import uuid from 'uuid'
 import moment from 'moment'
 
-import {RadioButtons, ButtonShape} from 'src/reusable_ui'
+import {Radio, ButtonShape} from 'src/reusable_ui'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import AnnotationTagEditorLi from 'src/shared/components/AnnotationTagEditorLi'
 
@@ -113,12 +113,26 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
           </div>
           <div className="form-group col-xs-6" data-test="type-group">
             <label>Type</label>
-            <RadioButtons
-              buttons={['point', 'window']}
-              activeButton={type}
-              onChange={this.handleTypeChange}
-              shape={ButtonShape.StretchToFit}
-            />
+            <Radio shape={ButtonShape.StretchToFit}>
+              <Radio.Button
+                id="annotation-editor-type--point"
+                value="point"
+                active={type === 'point'}
+                titleText="Assign a single timestamp to the Annotation"
+                onClick={this.handleTypeChange}
+              >
+                Point
+              </Radio.Button>
+              <Radio.Button
+                id="annotation-editor-type--window"
+                value="window"
+                active={type === 'window'}
+                titleText="Assign a timestamp window to the Annotation"
+                onClick={this.handleTypeChange}
+              >
+                Window
+              </Radio.Button>
+            </Radio>
           </div>
         </div>
         <div className="row">

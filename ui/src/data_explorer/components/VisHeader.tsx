@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {getDataForCSV} from 'src/data_explorer/apis'
-import RadioButtons from 'src/reusable_ui/components/radio_buttons/RadioButtons'
+import {Radio, ButtonShape} from 'src/reusable_ui'
 import {Source} from 'src/types'
 
 interface Props {
@@ -22,22 +22,25 @@ class VisHeader extends PureComponent<Props> {
     )
   }
 
-  private handleChangeVisType = (view: string): void => {
-    const {onToggleView} = this.props
-
-    onToggleView(view)
-  }
-
   private get visTypeToggle(): JSX.Element {
-    const {views, view} = this.props
+    const {views, view, onToggleView} = this.props
 
     if (views.length) {
       return (
-        <RadioButtons
-          buttons={views}
-          activeButton={view}
-          onChange={this.handleChangeVisType}
-        />
+        <Radio>
+          {views.map(v => (
+            <Radio.Button
+              id={`de-views-${v}`}
+              key={`de-views-${v}`}
+              value={v}
+              titleText={`View results as ${v}`}
+              onClick={onToggleView}
+              active={v === view}
+            >
+              {v}
+            </Radio.Button>
+          ))}
+        </Radio>
       )
     }
 
