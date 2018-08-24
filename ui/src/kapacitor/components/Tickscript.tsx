@@ -1,4 +1,4 @@
-import React, {PureComponent, MouseEvent, ChangeEvent} from 'react'
+import React, {PureComponent, ChangeEvent} from 'react'
 
 import TickscriptHeader from 'src/kapacitor/components/TickscriptHeader'
 import TickscriptEditor from 'src/kapacitor/components/TickscriptEditor'
@@ -17,12 +17,12 @@ interface Props {
   onExit: () => void
   areLogsVisible: boolean
   areLogsEnabled: boolean
-  onToggleLogsVisibility: () => void
+  onToggleLogsVisibility: (visibility: boolean) => void
   task: Task
   onChangeScript: (tickscript: string) => void
   onSelectDbrps: (dbrps: DBRP[]) => void
   consoleMessage: string
-  onChangeType: (type: string) => (event: MouseEvent<HTMLLIElement>) => void
+  onChangeType: (type: string) => void
   onChangeID: (e: ChangeEvent<HTMLInputElement>) => void
   isNewTickscript: boolean
   unsavedChanges: boolean

@@ -1,4 +1,4 @@
-import React, {Component, MouseEvent, ChangeEvent} from 'react'
+import React, {Component, ChangeEvent} from 'react'
 
 import TickscriptType from 'src/kapacitor/components/TickscriptType'
 import MultiSelectDBDropdown from 'src/shared/components/MultiSelectDBDropdown'
@@ -16,7 +16,7 @@ interface DBRPDropdownItem extends DBRP {
 interface Props {
   isNewTickscript: boolean
   onSelectDbrps: (dbrps: DBRP[]) => void
-  onChangeType: (type: string) => (event: MouseEvent<HTMLLIElement>) => void
+  onChangeType: (type: string) => void
   onChangeID: (e: ChangeEvent<HTMLInputElement>) => void
   task: Task
 }

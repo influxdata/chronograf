@@ -1,24 +1,29 @@
-import React, {PureComponent, MouseEvent} from 'react'
+// Libraries
+import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
+// Components
 import OptIn from 'src/shared/components/OptIn'
 import Input from 'src/dashboards/components/DisplayOptionsInput'
-import {Tabber, Tab} from 'src/dashboards/components/Tabber'
+import {Radio, ButtonShape} from 'src/reusable_ui'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import LineGraphColorSelector from 'src/shared/components/LineGraphColorSelector'
 import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDecimalPlaces'
 
-import {
-  AXES_SCALE_OPTIONS,
-  TOOLTIP_Y_VALUE_FORMAT,
-} from 'src/dashboards/constants/cellEditor'
+// Constants
+import {AXES_SCALE_OPTIONS} from 'src/dashboards/constants/cellEditor'
 import {GRAPH_TYPES} from 'src/dashboards/graphics/graph'
 
+// Actions
 import {
   updateAxes,
   changeDecimalPlaces,
 } from 'src/dashboards/actions/cellEditorOverlay'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Types
 import {Axes, CellType} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
 
@@ -33,7 +38,7 @@ interface Props {
   onUpdateDecimalPlaces: () => void
   decimalPlaces: DecimalPlaces
   handleUpdateAxes: (axes: Axes) => void
-  onToggleStaticLegend: (x: boolean) => (e: MouseEvent<HTMLLIElement>) => void
+  onToggleStaticLegend: (isStaticLegend: boolean) => void
 }
 
 @ErrorHandling
@@ -62,12 +67,10 @@ class AxesOptions extends PureComponent<Props> {
   public render() {
     const {
       axes: {
-        y: {bounds, label, prefix, suffix, base, scale},
+        y: {bounds, label, prefix, suffix, scale},
       },
       type,
-      staticLegend,
       defaultYLabel,
-      onToggleStaticLegend,
     } = this.props
 
     const [min, max] = bounds
@@ -126,55 +129,120 @@ class AxesOptions extends PureComponent<Props> {
               labelText="Y-Value's Suffix"
               onChange={this.handleSetPrefixSuffix}
             />
-            <Tabber
-              labelText="Y-Value's Format"
-              tipID="Y-Value's Format"
-              tipContent={TOOLTIP_Y_VALUE_FORMAT}
-            >
-              <Tab
-                text="Raw"
-                isActive={base === ''}
-                onClickTab={this.handleSetBase('')}
-              />
-              <Tab
-                text="K/M/B"
-                isActive={base === BASE_10}
-                onClickTab={this.handleSetBase(BASE_10)}
-              />
-              <Tab
-                text="K/M/G"
-                isActive={base === BASE_2}
-                onClickTab={this.handleSetBase(BASE_2)}
-              />
-            </Tabber>
-            <Tabber labelText="Scale">
-              <Tab
-                text="Linear"
-                isActive={scale === LINEAR || scale === ''}
-                onClickTab={this.handleSetScale(LINEAR)}
-              />
-              <Tab
-                text="Logarithmic"
-                isActive={scale === LOG}
-                onClickTab={this.handleSetScale(LOG)}
-              />
-            </Tabber>
+            {this.yValuesFormatTabs}
+            {this.scaleTabs}
             {this.decimalPlaces}
-            <Tabber labelText="Static Legend">
-              <Tab
-                text="Show"
-                isActive={staticLegend}
-                onClickTab={onToggleStaticLegend(true)}
-              />
-              <Tab
-                text="Hide"
-                isActive={!staticLegend}
-                onClickTab={onToggleStaticLegend(false)}
-              />
-            </Tabber>
+            {this.staticLegendTabs}
           </form>
         </div>
       </FancyScrollbar>
+    )
+  }
+
+  private get staticLegendTabs(): JSX.Element {
+    const {staticLegend, onToggleStaticLegend} = this.props
+
+    return (
+      <div className="form-group col-sm-6">
+        <label>Static Legend</label>
+        <Radio shape={ButtonShape.StretchToFit}>
+          <Radio.Button
+            id="static-legend-tab--show"
+            value={true}
+            active={staticLegend === true}
+            titleText="Show static legend below graph"
+            onClick={onToggleStaticLegend}
+          >
+            Show
+          </Radio.Button>
+          <Radio.Button
+            id="static-legend-tab--hide"
+            value={false}
+            active={staticLegend === false}
+            titleText="Hide static legend"
+            onClick={onToggleStaticLegend}
+          >
+            Hide
+          </Radio.Button>
+        </Radio>
+      </div>
+    )
+  }
+
+  private get scaleTabs(): JSX.Element {
+    const {
+      axes: {
+        y: {scale},
+      },
+    } = this.props
+
+    return (
+      <div className="form-group col-sm-6">
+        <label>Scale</label>
+        <Radio shape={ButtonShape.StretchToFit}>
+          <Radio.Button
+            id="y-scale-tab--linear"
+            value={LINEAR}
+            active={scale === LINEAR || scale === ''}
+            titleText="Set Y-Axis to Linear Scale"
+            onClick={this.handleSetScale}
+          >
+            Linear
+          </Radio.Button>
+          <Radio.Button
+            id="y-scale-tab--logarithmic"
+            value={LOG}
+            active={scale === LOG}
+            titleText="Set Y-Axis to Logarithmic Scale"
+            onClick={this.handleSetScale}
+          >
+            Logarithmic
+          </Radio.Button>
+        </Radio>
+      </div>
+    )
+  }
+
+  private get yValuesFormatTabs(): JSX.Element {
+    const {
+      axes: {
+        y: {base},
+      },
+    } = this.props
+
+    return (
+      <div className="form-group col-sm-6">
+        <label>Y-Value's Format</label>
+        <Radio shape={ButtonShape.StretchToFit}>
+          <Radio.Button
+            id="y-values-format-tab--raw"
+            value=""
+            active={base === ''}
+            titleText="Don't format values"
+            onClick={this.handleSetBase}
+          >
+            Raw
+          </Radio.Button>
+          <Radio.Button
+            id="y-values-format-tab--kmb"
+            value={BASE_10}
+            active={base === BASE_10}
+            titleText="Thousand / Million / Billion"
+            onClick={this.handleSetBase}
+          >
+            K/M/B
+          </Radio.Button>
+          <Radio.Button
+            id="y-values-format-tab--kmg"
+            value={BASE_2}
+            active={base === BASE_2}
+            titleText="Kilo / Mega / Giga"
+            onClick={this.handleSetBase}
+          >
+            K/M/G
+          </Radio.Button>
+        </Radio>
+      </div>
     )
   }
 
@@ -245,14 +313,14 @@ class AxesOptions extends PureComponent<Props> {
     handleUpdateAxes(newAxes)
   }
 
-  private handleSetScale = scale => () => {
+  private handleSetScale = (scale: string): void => {
     const {handleUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, scale}}
 
     handleUpdateAxes(newAxes)
   }
 
-  private handleSetBase = base => () => {
+  private handleSetBase = (base: string): void => {
     const {handleUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, base}}
 

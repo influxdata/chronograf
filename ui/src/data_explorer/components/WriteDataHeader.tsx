@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import DatabaseDropdown from 'src/shared/components/DatabaseDropdown'
-import RadioButtons from 'src/reusable_ui/components/radio_buttons/RadioButtons'
+import {Radio} from 'src/reusable_ui'
 import {Source, DropdownItem} from 'src/types'
 import {WriteDataMode} from 'src/types'
 
@@ -44,22 +44,30 @@ class WriteDataHeader extends PureComponent<Props> {
   }
 
   private get modeSelector(): JSX.Element {
-    const {mode} = this.props
-    const modes = [WriteDataMode.File, WriteDataMode.Manual]
+    const {mode, onToggleMode} = this.props
 
     return (
-      <RadioButtons
-        buttons={modes}
-        activeButton={mode}
-        onChange={this.handleRadioButtonClick}
-      />
+      <Radio>
+        <Radio.Button
+          id={`write-data-${WriteDataMode.File}`}
+          value={WriteDataMode.File}
+          titleText="Upload a file"
+          onClick={onToggleMode}
+          active={mode === WriteDataMode.File}
+        >
+          Upload File
+        </Radio.Button>
+        <Radio.Button
+          id={`write-data-${WriteDataMode.Manual}`}
+          value={WriteDataMode.Manual}
+          titleText="Write data manually using Line Protocol"
+          onClick={onToggleMode}
+          active={mode === WriteDataMode.Manual}
+        >
+          Manual Entry
+        </Radio.Button>
+      </Radio>
     )
-  }
-
-  private handleRadioButtonClick = (mode: WriteDataMode): void => {
-    const {onToggleMode} = this.props
-
-    onToggleMode(mode)
   }
 }
 

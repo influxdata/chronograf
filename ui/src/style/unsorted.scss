@@ -292,19 +292,6 @@ $tick-script-overlay-margin: 30px;
 }
 
 /*
-  Fix Display issue in Safari
-  -----------------------------------------------------------------------------
-  The pseudo elements offset items in the tablists
-*/
-.nav-tablist {
-  &:before,
-  &:after {
-    content: none;
-    display: none;
-  }
-}
-
-/*
   Data Explorer download CSV button
   -----------------------------------------------------------------------------
 */
@@ -331,39 +318,6 @@ $tick-script-overlay-margin: 30px;
   }
 }
 
-/*  Deletable tabs in .nav-tablist
-  -----------------------------------------------------------------------------
-  TODO: Add this into the theme styles
-*/
-.nav-tab--delete {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  margin-left: 4px;
-  border-radius: 3px;
-  position: relative;
-  background-color: $g5-pepper;
-
-  // Psuedo elements used to form the X
-  &:before,
-  &:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    background-color: $g11-sidewalk;
-    width: 10px;
-    height: 2px;
-    border-radius: 1px;
-  }
-  &:before {
-    transform: translate(-50%, -50%) rotate(45deg);
-  }
-  &:after {
-    transform: translate(-50%, -50%) rotate(-45deg);
-  }
-}
-
 /*
   Dashboard Switcher
   -----------------------------------------------------------------------------
@@ -380,23 +334,6 @@ $tick-script-overlay-margin: 30px;
 
 .dropdown.dashboard-switcher .dropdown-item {
   white-space: nowrap;
-}
-
-/*  Add borders between items in .nav-tablist
-    -----------------------------------------------------------------------------
-    TODO: Add these styles into the theme
-  */
-
-.nav.nav-tablist {
-  background-color: $g5-pepper;
-
-  > li {
-    margin-right: 2px;
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
 }
 
 /*

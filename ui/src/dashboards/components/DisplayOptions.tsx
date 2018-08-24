@@ -28,7 +28,7 @@ interface Props {
   queryConfigs: QueryConfig[]
   staticLegend: boolean
   onResetFocus: () => void
-  onToggleStaticLegend: (x: boolean) => () => void
+  onToggleStaticLegend: (isStaticLegend: boolean) => void
 }
 
 interface State {

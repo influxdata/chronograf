@@ -16,6 +16,12 @@ export interface Kapacitor {
   }
 }
 
+export enum AlertRuleType {
+  Threshold = 'threshold',
+  Relative = 'relative',
+  Deadman = 'deadman',
+}
+
 export interface AlertRule {
   id?: string
   tickscript: TICKScript

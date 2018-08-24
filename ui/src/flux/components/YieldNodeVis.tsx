@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 
 import FluxGraph from 'src/flux/components/FluxGraph'
 import TimeMachineTables from 'src/flux/components/TimeMachineTables'
-import RadioButtons from 'src/reusable_ui/components/radio_buttons/RadioButtons'
+import {Radio} from 'src/reusable_ui'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -37,11 +37,26 @@ class YieldNodeVis extends PureComponent<Props, State> {
     return (
       <>
         <div className="yield-node--controls">
-          <RadioButtons
-            buttons={[VisType.Table, VisType.Line]}
-            activeButton={visType}
-            onChange={this.selectVisType}
-          />
+          <Radio>
+            <Radio.Button
+              id={`yield-node-${VisType.Table}`}
+              value={VisType.Table}
+              active={visType === VisType.Table}
+              titleText="View data in a table"
+              onClick={this.selectVisType}
+            >
+              Table
+            </Radio.Button>
+            <Radio.Button
+              id={`yield-node-${VisType.Line}`}
+              value={VisType.Line}
+              active={visType === VisType.Line}
+              titleText="View data as a Line Graph"
+              onClick={this.selectVisType}
+            >
+              Line Graph
+            </Radio.Button>
+          </Radio>
           <div className="yield-node--name">{`"${yieldName}"`}</div>
         </div>
         <div className="yield-node--visualization">{this.vis}</div>
