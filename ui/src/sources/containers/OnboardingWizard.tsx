@@ -9,6 +9,7 @@ import SourceStep from 'src/sources/components/SourceStep'
 import KapacitorStep from 'src/sources/components/KapacitorStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
 import Notifications from 'src/shared/components/Notifications'
+import DashboardStep from 'src/sources/components/DashboardStep'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -24,6 +25,7 @@ interface State {
   sourceError: boolean
   kapacitor: Kapacitor
   kapacitorError: boolean
+  dashboardError: boolean
 }
 
 @ErrorHandling
@@ -31,6 +33,8 @@ class OnboardingWizard extends PureComponent<Props, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
   public completionStepRef: any
+  public dashboardStepRef: any
+
   constructor(props) {
     super(props)
 
@@ -39,11 +43,12 @@ class OnboardingWizard extends PureComponent<Props, State> {
       sourceError: false,
       kapacitor: null,
       kapacitorError: false,
+      dashboardError: false,
     }
   }
 
   public render() {
-    const {source, sourceError, kapacitorError} = this.state
+    const {source, sourceError, kapacitorError, dashboardError} = this.state
     const {me, isUsingAuth} = this.props
     return (
       <>
@@ -72,6 +77,14 @@ class OnboardingWizard extends PureComponent<Props, State> {
               me={me}
               isUsingAuth={isUsingAuth}
             />
+          </WizardStep>
+          <WizardStep
+            title="Dashboards"
+            tipText="Select dashboards you would like to create:"
+            isComplete={this.isDashboardComplete}
+            isErrored={dashboardError}
+          >
+            <DashboardStep />
           </WizardStep>
           <WizardStep
             title="Add a Kapacitor Connection"
@@ -110,36 +123,50 @@ class OnboardingWizard extends PureComponent<Props, State> {
     )
   }
 
+  // SourceStep
+  private isSourceComplete = () => {
+    const {source} = this.state
+    return !_.isNull(source)
+  }
+
   private handleSourceNext = async () => {
     const response = await this.sourceStepRef.next()
     this.setState({source: response.payload})
     return response
   }
-  private isSourceComplete = () => {
-    const {source} = this.state
-    return !_.isNull(source)
-  }
+
   private handleSetSourceError = (b: boolean) => {
     this.setState({sourceError: b})
   }
 
+  // DashboardStep
+  private isDashboardComplete = () => {
+    return false
+  }
+
+  // KapacitorStep
   private isKapacitorComplete = () => {
     const {kapacitor} = this.state
     return !_.isNull(kapacitor)
   }
+
   private handleKapacitorNext = async () => {
     const response = await this.kapacitorStepRef.next()
     this.setState({kapacitor: response.payload})
     return response
   }
+
   private handleKapacitorPrev = () => {}
+
   private handleSetKapacitorError = (b: boolean) => {
     this.setState({kapacitorError: b})
   }
 
+  // CompletionStep
   private isCompletionComplete = () => {
     return false
   }
+
   private handleCompletionNext = () => {
     const {router} = this.props
     const {source} = this.state
@@ -149,6 +176,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
     }
     return {success: true, payload: null}
   }
+
   private handleCompletionPrev = () => {}
 
   private resetWizardState = () => {

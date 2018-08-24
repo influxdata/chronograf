@@ -15,7 +15,7 @@ interface State {
   columns: number
 }
 @ErrorHandling
-class CardSelectList extends PureComponent<Props, State> {
+class GridSizer extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     cellWidth: 160,
     width: null,
@@ -108,4 +108,4 @@ class CardSelectList extends PureComponent<Props, State> {
   }
 }
 
-export default CardSelectList
+export default GridSizer
