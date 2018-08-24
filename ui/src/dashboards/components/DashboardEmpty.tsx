@@ -1,22 +1,25 @@
+// Libraries
 import React, {Component} from 'react'
 import {Cell} from 'src/types/dashboards'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
+// Utils
+import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
+
+// Types
+import {Dashboard} from 'src/types'
 import {addDashboardCellAsync} from 'src/dashboards/actions'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GRAPH_TYPES} from 'src/dashboards/graphics/graph'
+import {NewDefaultCell} from 'src/types/dashboards'
 
+// Constants
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-
-interface Dashboard {
-  id: string
-  cells: Cell[]
-}
 
 interface Props {
   dashboard: Dashboard
-  addDashboardCell: (dashboard: Dashboard, cell?: Cell) => void
+  addDashboardCell: (dashboard: Dashboard, cell?: Cell | NewDefaultCell) => void
 }
 
 const mapDispatchToProps = dispatch => ({
@@ -32,7 +35,10 @@ class DashboardEmpty extends Component<Props> {
 
   public handleAddCell = type => () => {
     const {dashboard, addDashboardCell} = this.props
-    addDashboardCell(dashboard, type)
+    const emptyCell = getNewDashboardCell(dashboard)
+    emptyCell.type = type
+
+    addDashboardCell(dashboard, emptyCell)
   }
 
   public render() {
