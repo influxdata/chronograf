@@ -17,6 +17,8 @@ export enum SearchStatus {
   UpdatingTimeBounds = 'UpdatingTimeBounds',
   UpdatingFilters = 'UpdatingFilters',
   Loaded = 'Loaded',
+  Clearing = 'Clearing',
+  Cleared = 'Cleared',
 }
 
 export interface Filter {
@@ -49,9 +51,19 @@ export interface LogsState {
   }
   tableTime: {
     custom?: string
-    relative?: string
+    relative?: number
   }
   newRowsAdded: number
+  searchStatus: SearchStatus
+  nextOlderUpperBound: number | undefined
+  nextOlderLowerBound: number | undefined
+  nextNewerUpperBound: number | undefined
+  nextNewerLowerBound: number | undefined
+  currentTailUpperBound: number | undefined
+  nextTailLowerBound: number | undefined
+  tailChunkDurationMs: number
+  olderChunkDurationMs: number
+  newerChunkDurationMs: number
 }
 
 export interface LogConfig {
@@ -185,4 +197,10 @@ export interface MatchSection {
   id: string
   type: MatchType
   text: string
+}
+
+export interface FetchLoop {
+  promise: Promise<void>
+  cancel: () => void
+  isCanceled: boolean
 }

@@ -58,8 +58,8 @@ interface Props {
   onScrollVertical: () => void
   onScrolledToTop: () => void
   onTagSelection: (selection: {tag: string; key: string}) => void
-  fetchMore: (time: string) => Promise<void>
-  fetchNewer: (time: string) => void
+  fetchMore: () => void
+  fetchNewer: () => void
   hasScrolled: boolean
   count: number
   timeRange: TimeRange
@@ -76,6 +76,8 @@ interface Props {
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
   searchStatus: SearchStatus
+  upper: number | undefined
+  lower: number | undefined
 }
 
 interface State {
@@ -216,7 +218,7 @@ class LogsTable extends Component<Props, State> {
   }
 
   public render() {
-    const {queryCount} = this.props
+    const {queryCount, upper, lower, searchStatus} = this.props
     const {infiniteLoaderQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
@@ -233,6 +235,9 @@ class LogsTable extends Component<Props, State> {
           <QueryResults
             count={this.rowCount()}
             queryCount={infiniteLoaderQueryCount + queryCount}
+            searchStatus={searchStatus}
+            upper={upper}
+            lower={lower}
           />
         </div>
         <AutoSizer>
@@ -381,10 +386,10 @@ class LogsTable extends Component<Props, State> {
 
   private loadMoreAboveRows = async () => {
     // Prevent multiple queries at the same time
-    const {queryCount} = this.props
-    if (queryCount > 0) {
-      return
-    }
+    // const {queryCount} = this.props
+    // if (queryCount > 0) {
+    //   return
+    // }
     const data = getValuesFromData(this.props.tableInfiniteData.forward)
     const backwardData = getValuesFromData(
       this.props.tableInfiniteData.backward
@@ -395,15 +400,15 @@ class LogsTable extends Component<Props, State> {
       getDeep(backwardData, '0.0', new Date().getTime())
     )
 
-    const {firstQueryTime} = this.state
-    if (firstQueryTime && firstQueryTime > firstTime) {
-      return
-    }
+    // const {firstQueryTime} = this.state
+    // if (firstQueryTime && firstQueryTime > firstTime) {
+    //   return
+    // }
 
     try {
       this.incrementLoaderQueryCount()
       this.setState({firstQueryTime: firstTime})
-      await this.props.fetchNewer(moment(firstTime).toISOString())
+      await this.props.fetchNewer()
     } finally {
       this.decrementLoaderQueryCount()
     }
@@ -411,10 +416,10 @@ class LogsTable extends Component<Props, State> {
 
   private loadMoreBelowRows = async () => {
     // Prevent multiple queries at the same time
-    const {queryCount} = this.props
-    if (queryCount > 0) {
-      return
-    }
+    // const {queryCount} = this.props
+    // if (queryCount > 0) {
+    //   return
+    // }
 
     const data = getValuesFromData(this.props.tableInfiniteData.backward)
     const forwardData = getValuesFromData(this.props.tableInfiniteData.forward)
@@ -434,7 +439,7 @@ class LogsTable extends Component<Props, State> {
     try {
       this.incrementLoaderQueryCount()
       this.setState({lastQueryTime: lastTime})
-      await this.props.fetchMore(moment(lastTime).toISOString())
+      await this.props.fetchMore()
     } finally {
       this.decrementLoaderQueryCount()
     }
@@ -738,7 +743,12 @@ class LogsTable extends Component<Props, State> {
   }
 
   private get loadingStatus(): JSX.Element {
-    return <LoadingStatus status={this.props.searchStatus} />
+    return (
+      <LoadingStatus
+        status={this.props.searchStatus}
+        currentOlderLowerBound={this.props.lower}
+      />
+    )
   }
 
   private get isLoadingTableData(): boolean {
@@ -746,6 +756,7 @@ class LogsTable extends Component<Props, State> {
 
     switch (searchStatus) {
       case SearchStatus.Loaded:
+        // case SearchStatus.Paused:
         return false
       default:
         return true

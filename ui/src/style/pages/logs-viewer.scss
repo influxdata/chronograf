@@ -5,7 +5,7 @@
 
 $logs-viewer-graph-height: 170px;
 $logs-viewer-search-height: 46px; 
-$logs-viewer-filter-height: 46px;
+$logs-viewer-filter-height: 60px;
 $logs-viewer-results-text-indent: 33px;
 $logs-viewer-gutter: 60px;
 
@@ -70,7 +70,7 @@ $logs-viewer-gutter: 60px;
   display: flex;
   align-items: center;
   @include no-user-select();
-  padding: 0 $logs-viewer-gutter 0 ($logs-viewer-gutter + 185);
+  padding: 0 $logs-viewer-gutter 0 ($logs-viewer-gutter + 190);
   height: $logs-viewer-filter-height;
   background-color: $g3-castle;
 }
@@ -333,5 +333,5 @@ $logs-viewer-gutter: 60px;
 
 .logs-viewer--table-count {
   position: absolute;
-  top: -30px;
+  top: -60px;
 }
