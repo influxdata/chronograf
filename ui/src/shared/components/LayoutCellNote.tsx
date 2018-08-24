@@ -25,6 +25,7 @@ class LayoutCellNote extends Component<Props> {
     const {note, cellType, visibility} = this.props
 
     if (
+      !note ||
       note === '' ||
       cellType === CellType.Note ||
       visibility === CellNoteVisibility.ShowWhenNoData
