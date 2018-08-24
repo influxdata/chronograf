@@ -21,6 +21,8 @@
 ### Bug Fixes
 
 1. [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
+1. [#4279](https://github.com/influxdata/chronograf/pull/4279): Fix log search hanging when query is specific
+
 
 ## v1.6.2 [unreleased]
 

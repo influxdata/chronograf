@@ -211,6 +211,7 @@ export async function getQueryResultsCountForBounds(
 
 // HOW_LOW_CAN_YOU_GO is the magical cut-off point for number of results where exponential backoff will stop
 const HOW_LOW_CAN_YOU_GO = 150
+const SUPER_LOW = 10 // For very specific queries w/ few results
 
 export async function findOlderLowerTimeBounds(
   upper: string,
@@ -240,7 +241,7 @@ export async function findOlderLowerTimeBounds(
       namespace
     )
 
-    if (count >= HOW_LOW_CAN_YOU_GO) {
+    if (count >= HOW_LOW_CAN_YOU_GO || (count > 0 && count <= SUPER_LOW)) {
       break
     }
 
@@ -279,7 +280,7 @@ export async function findNewerUpperTimeBounds(
       namespace
     )
 
-    if (count >= HOW_LOW_CAN_YOU_GO) {
+    if (count >= HOW_LOW_CAN_YOU_GO || (count > 0 && count <= SUPER_LOW)) {
       break
     }
 
