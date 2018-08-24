@@ -18,6 +18,7 @@ import {
   FieldOption,
   DecimalPlaces,
   CellType,
+  CellNoteVisibility,
 } from 'src/types/dashboards'
 import {LineColor, ColorNumber} from 'src/types/colors'
 import {ServerLogConfig, ServerColumn} from 'src/types/logs'
@@ -204,6 +205,8 @@ export const cell: Cell = {
       '/chronograf/v1/dashboards/9/cells/67435af2-17bf-4caa-a5fc-0dd1ffb40dab',
   },
   inView: true,
+  note: 'I am a note!',
+  noteVisibility: CellNoteVisibility.Default,
 }
 
 export const fullTimeRange = {

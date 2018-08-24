@@ -52,7 +52,7 @@ interface Props {
   queryDrafts: CellQuery[]
   editQueryStatus: typeof editCellQueryStatus
   updateQueryDrafts: (queryDrafts: CellQuery[]) => void
-  onToggleStaticLegend: (isStaticLegend: boolean) => () => void
+  onToggleStaticLegend: (isStaticLegend: boolean) => void
   children: (
     activeEditorTab: CEOTabs,
     onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void

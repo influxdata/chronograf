@@ -31,6 +31,7 @@ import {
   TableOptions,
   CellQuery,
   NewDefaultCell,
+  CellNoteVisibility,
 } from 'src/types/dashboards'
 import {
   Status,
@@ -64,6 +65,8 @@ export enum ActionType {
   UpdateFieldOptions = 'UPDATE_FIELD_OPTIONS',
   UpdateQueryDrafts = 'UPDATE_QUERY_DRAFTS',
   UpdateQueryDraft = 'UPDATE_QUERY_DRAFT',
+  UpdateCellNote = 'UPDATE_CELL_NOTE',
+  UpdateCellNoteVisibility = 'UPDATE_CELL_NOTE_VISIBILITY',
 }
 
 export type Action =
@@ -81,6 +84,8 @@ export type Action =
   | ChangeDecimalPlacesAction
   | UpdateFieldOptionsAction
   | UpdateQueryDraftsAction
+  | UpdateCellNoteAction
+  | UpdateCellNoteVisibilityAction
 
 export interface LoadCellForCEOAction {
   type: ActionType.LoadCellForCEO
@@ -184,6 +189,20 @@ export interface UpdateQueryDraftAction {
   }
 }
 
+export interface UpdateCellNoteAction {
+  type: ActionType.UpdateCellNote
+  payload: {
+    note: string
+  }
+}
+
+export interface UpdateCellNoteVisibilityAction {
+  type: ActionType.UpdateCellNoteVisibility
+  payload: {
+    noteVisibility: CellNoteVisibility
+  }
+}
+
 export const loadCellForCEO = (
   cell: Cell | NewDefaultCell
 ): LoadCellForCEOAction => ({
@@ -201,6 +220,22 @@ export const changeCellType = (cellType: CellType): ChangeCellTypeAction => ({
   type: ActionType.ChangeCellType,
   payload: {
     cellType,
+  },
+})
+
+export const updateCellNote = (note: string): UpdateCellNoteAction => ({
+  type: ActionType.UpdateCellNote,
+  payload: {
+    note,
+  },
+})
+
+export const UpdateCellNoteVisibility = (
+  noteVisibility: CellNoteVisibility
+): UpdateCellNoteVisibilityAction => ({
+  type: ActionType.UpdateCellNoteVisibility,
+  payload: {
+    noteVisibility,
   },
 })
 

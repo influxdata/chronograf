@@ -1,4 +1,4 @@
-import React, {PureComponent, ChangeEvent} from 'react'
+import React, {PureComponent, ChangeEvent, KeyboardEvent} from 'react'
 
 import {
   Button,
@@ -11,13 +11,15 @@ import {
 interface Props {
   tagKey: string
   tagValue: string
+  shouldAutoFocus: boolean
   onUpdate: (tagKey: string, tagValue: string) => void
   onDelete: () => void
+  onKeyDown: (e: string) => void
 }
 
 class AnnotationTagEditorLi extends PureComponent<Props> {
   public render() {
-    const {tagKey, tagValue, onDelete} = this.props
+    const {tagKey, tagValue, onDelete, shouldAutoFocus} = this.props
 
     return (
       <div className="tag-control">
@@ -25,6 +27,7 @@ class AnnotationTagEditorLi extends PureComponent<Props> {
           className="form-control input-sm tag-control--key"
           value={tagKey}
           onChange={this.handleChangeTagKey}
+          autoFocus={shouldAutoFocus}
         />
         <div className="tag-control--arrow">
           <span />
@@ -33,6 +36,7 @@ class AnnotationTagEditorLi extends PureComponent<Props> {
           className="form-control input-sm tag-control--value"
           value={tagValue}
           onChange={this.handleChangeTagValue}
+          onKeyDown={this.handleKeyDown}
         />
         <Button
           onClick={onDelete}
@@ -43,6 +47,12 @@ class AnnotationTagEditorLi extends PureComponent<Props> {
         />
       </div>
     )
+  }
+
+  private handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    const {onKeyDown} = this.props
+
+    onKeyDown(e.key)
   }
 
   private handleChangeTagKey = (e: ChangeEvent<HTMLInputElement>) => {

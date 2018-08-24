@@ -258,7 +258,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
     this.setState({task: {...this.state.task, dbrps}, unsavedChanges: true})
   }
 
-  private handleChangeType = (type: string) => () => {
+  private handleChangeType = (type: string) => {
     this.setState({task: {...this.state.task, type}, unsavedChanges: true})
   }
 
@@ -269,8 +269,8 @@ export class TickscriptPage extends PureComponent<Props, State> {
     })
   }
 
-  private handleToggleLogsVisibility = () => {
-    this.setState({areLogsVisible: !this.state.areLogsVisible})
+  private handleToggleLogsVisibility = (areLogsVisible: boolean): void => {
+    this.setState({areLogsVisible})
   }
 
   private get isEditing() {

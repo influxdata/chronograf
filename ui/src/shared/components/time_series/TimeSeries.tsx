@@ -20,6 +20,10 @@ import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
 import AutoRefresh from 'src/utils/AutoRefresh'
+import {CellNoteVisibility} from 'src/types/dashboards'
+
+// Components
+import MarkdownCell from 'src/shared/components/MarkdownCell'
 
 export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 
@@ -38,6 +42,8 @@ interface Props {
   templates?: Template[]
   editQueryStatus?: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
+  cellNote?: string
+  cellNoteVisibility?: CellNoteVisibility
 }
 
 interface State {
@@ -206,6 +212,7 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public render() {
+    const {cellNoteVisibility, cellNote} = this.props
     const {timeSeries, loading, isFirstFetch} = this.state
 
     const hasValues = _.some(timeSeries, s => {
@@ -219,6 +226,10 @@ class TimeSeries extends Component<Props, State> {
     }
 
     if (!hasValues) {
+      if (cellNoteVisibility === CellNoteVisibility.ShowWhenNoData) {
+        return <MarkdownCell text={cellNote} />
+      }
+
       return (
         <div className="graph-empty">
           <p>No Results</p>

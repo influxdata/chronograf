@@ -25,16 +25,6 @@ $graph-type--gutter: 4px;
   @include no-user-select();
 }
 
-.display-options--cell .form-group .nav.nav-tablist {
-  display: flex;
-  width: 100%;
-
-  > li {
-    flex: 1 0 0;
-    justify-content: center;
-  }
-}
-
 .display-options--footnote {
   color: $g11-sidewalk;
   margin: 0;

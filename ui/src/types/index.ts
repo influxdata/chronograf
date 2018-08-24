@@ -35,7 +35,13 @@ import {
   Tags,
   TagValues,
 } from './queries'
-import {AlertRule, Kapacitor, Task, RuleValues} from './kapacitor'
+import {
+  AlertRule,
+  Kapacitor,
+  Task,
+  RuleValues,
+  AlertRuleType,
+} from './kapacitor'
 import {
   NewSource,
   Source,
@@ -90,6 +96,7 @@ export {
   Tags,
   TagValues,
   AlertRule,
+  AlertRuleType,
   Kapacitor,
   NewSource,
   Source,

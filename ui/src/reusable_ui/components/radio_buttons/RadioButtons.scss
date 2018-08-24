@@ -1,0 +1,138 @@
+/*
+   Radio Buttons
+   -----------------------------------------------------------------------------
+*/
+
+.radio-buttons {
+  @include no-user-select();
+  display: inline-flex;
+  align-items: stretch;
+  border: $ix-border solid $g5-pepper;
+  background-color: $g5-pepper;
+  border-radius: $ix-radius;
+  overflow: hidden;
+}
+
+.radio-button {
+  font-family: $ix-text-font;
+  font-weight: 600;
+  margin-right: $ix-border;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  background-color: $g2-kevlar;
+  color: $g11-sidewalk;
+  text-transform: capitalize;
+  outline: none;
+  border: 0;
+  text-align: center;
+  white-space: nowrap;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    background-color: $g4-onyx;
+    color: $g15-platinum;
+    cursor: pointer;
+  }
+
+  &.active {
+    background-color: $g5-pepper;
+  }
+
+  &.disabled,
+  &.disabled:hover {
+    background-color: $g2-kevlar;
+    font-style: italic;
+    color: $g7-graphite;
+  }
+}
+
+/*  Size Modifiers */
+@mixin radioButtonSizeModifier($fontSize, $padding, $height) {
+  height: $height;
+  line-height: $height - ($ix-border * 2);
+
+  .radio-button {
+    line-height: $height - ($ix-border * 2);
+    padding: 0 $padding;
+    font-size: $fontSize;
+  }
+}
+
+.radio-buttons--xs {
+  @include radioButtonSizeModifier($form-xs-font, $form-xs-padding, $form-xs-height);
+}
+.radio-buttons--sm {
+  @include radioButtonSizeModifier($form-sm-font, $form-sm-padding, $form-sm-height);
+}
+.radio-buttons--md {
+  @include radioButtonSizeModifier($form-md-font, $form-md-padding, $form-md-height);
+}
+.radio-buttons--lg {
+  @include radioButtonSizeModifier($form-lg-font, $form-lg-padding, $form-lg-height);
+}
+
+
+/* Color Modifiers */
+.radio-buttons--default {
+  .radio-button.active {
+    color: $g18-cloud;
+  }
+}
+.radio-buttons--primary {
+  .radio-button.active {
+    color: $c-pool;
+  }
+}
+.radio-buttons--success {
+  .radio-button.active {
+    color: $c-rainforest;
+  }
+}
+.radio-buttons--warning {
+  .radio-button.active {
+    color: $c-comet;
+  }
+}
+.radio-buttons--danger {
+  .radio-button.active {
+    color: $c-dreamsicle;
+  }
+}
+.radio-buttons--alert {
+  .radio-button.active {
+    color: $c-pineapple;
+  }
+}
+
+/* Shape Modifiers */
+.radio-buttons.radio-buttons--square {
+  &.radio-buttons--xs .radio-button {
+    width: $form-xs-height - ($ix-border * 2);
+  }
+  
+  &.radio-buttons--sm .radio-button {
+    width: $form-sm-height - ($ix-border * 2);
+  }
+  
+  &.radio-buttons--md .radio-button {
+    width: $form-md-height - ($ix-border * 2);
+  }
+
+  &.radio-buttons--lg .radio-button {
+    width: $form-lg-height - ($ix-border * 2);
+  }
+
+  .radio-button {
+    padding: 0;
+  }
+}
+
+.radio-buttons.radio-buttons--stretch {
+  width: 100%;
+
+  .radio-button {
+    flex: 1 0 0;
+  }
+}

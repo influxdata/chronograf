@@ -566,7 +566,9 @@ func TestServer(t *testing.T) {
       "decimalPlaces":{
         "isEnforced": false,
         "digits": 0
-      },
+			},
+			"note": "",
+			"noteVisibility": "default",
       "links": {
         "self": "/chronograf/v1/dashboards/1000/cells/8f61c619-dd9b-4761-8aa8-577f27247093"
       }
@@ -825,7 +827,9 @@ func TestServer(t *testing.T) {
           "decimalPlaces":{
             "isEnforced": false,
             "digits": 0
-          },
+					},
+					"note": "",
+					"noteVisibility": "default",
           "links": {
             "self": "/chronograf/v1/dashboards/1000/cells/8f61c619-dd9b-4761-8aa8-577f27247093"
           }
@@ -3405,7 +3409,8 @@ func TestServer(t *testing.T) {
 				statusCode: 200,
 				body: `
 {
-  "layouts": "/chronograf/v1/layouts",
+	"layouts": "/chronograf/v1/layouts",
+	"protoboards":"/chronograf/v1/protoboards",
   "cells": "/chronograf/v2/cells",
   "users": "/chronograf/v1/organizations/default/users",
   "allUsers": "/chronograf/v1/users",
@@ -3499,7 +3504,8 @@ func TestServer(t *testing.T) {
 				statusCode: 200,
 				body: `
 {
-  "layouts": "/chronograf/v1/layouts",
+	"layouts": "/chronograf/v1/layouts",
+	"protoboards":"/chronograf/v1/protoboards",
   "cells": "/chronograf/v2/cells",
   "users": "/chronograf/v1/organizations/1/users",
   "allUsers": "/chronograf/v1/users",

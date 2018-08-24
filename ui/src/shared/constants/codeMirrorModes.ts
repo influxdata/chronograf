@@ -324,3 +324,58 @@ export const modeInfluxQLReadOnly = {
     lineComment: '//',
   },
 }
+
+export const modeMarkdown = {
+  // The start state contains the rules that are intially used
+  start: [
+    // The regex matches the token, the token property contains the type
+    {
+      regex: /[*](\s|\w)+[*]/,
+      token: 'italic',
+    },
+    {
+      regex: /[*][*](\s|\w)+[*][*]/,
+      token: 'bold',
+    },
+    {
+      regex: /[~][~](\s|\w)+[~][~]/,
+      token: 'strikethrough',
+    },
+    {
+      regex: /\#+\s.+(?=$)/gm,
+      token: 'heading',
+    },
+    {
+      regex: /\>.+(?=$)/gm,
+      token: 'blockquote',
+    },
+    {
+      regex: /\[.+\]\(.+\)/,
+      token: 'link',
+    },
+    {
+      regex: /[!]\[.+\]\(.+\)/,
+      token: 'image',
+    },
+  ],
+  // The multi-line comment state.
+  comment: [
+    {
+      regex: /.*?\*\//,
+      token: 'comment',
+      next: 'start',
+    },
+    {
+      regex: /.*/,
+      token: 'comment',
+    },
+  ],
+  // The meta property contains global information about the mode. It
+  // can contain properties like lineComment, which are supported by
+  // all modes, and also directives like dontIndentStates, which are
+  // specific to simple modes.
+  meta: {
+    dontIndentStates: ['comment'],
+    lineComment: '//',
+  },
+}

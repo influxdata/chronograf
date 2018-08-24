@@ -9,11 +9,15 @@ import GaugeOptions from 'src/dashboards/components/GaugeOptions'
 import SingleStatOptions from 'src/dashboards/components/SingleStatOptions'
 import AxesOptions from 'src/dashboards/components/AxesOptions'
 import TableOptions from 'src/dashboards/components/TableOptions'
+import NoteOptions from 'src/dashboards/components/NoteOptions'
+import CellNoteEditor from 'src/shared/components/TimeMachine/CellNoteEditor'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
 
+// Types
+import {CellType} from 'src/types/dashboards'
 import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes, Cell, QueryConfig} from 'src/types'
@@ -24,7 +28,7 @@ interface Props {
   queryConfigs: QueryConfig[]
   staticLegend: boolean
   onResetFocus: () => void
-  onToggleStaticLegend: (x: boolean) => () => void
+  onToggleStaticLegend: (isStaticLegend: boolean) => void
 }
 
 interface State {
@@ -59,6 +63,8 @@ class DisplayOptions extends Component<Props, State> {
   }
 
   private get threesizerDivisions() {
+    const {cell} = this.props
+
     return [
       {
         name: 'Visualization Type',
@@ -72,6 +78,13 @@ class DisplayOptions extends Component<Props, State> {
         headerButtons: [],
         menuOptions: [],
         render: this.renderOptions,
+        headerOrientation: HANDLE_VERTICAL,
+      },
+      {
+        name: 'Add a Note',
+        headerButtons: [],
+        menuOptions: [],
+        render: () => <CellNoteEditor note={cell.note} />,
         headerOrientation: HANDLE_VERTICAL,
       },
     ]
@@ -89,11 +102,13 @@ class DisplayOptions extends Component<Props, State> {
     const {defaultYLabel} = this.state
 
     switch (cell.type) {
-      case 'gauge':
+      case CellType.Gauge:
         return <GaugeOptions onResetFocus={onResetFocus} />
-      case 'single-stat':
+      case CellType.Note:
+        return <NoteOptions />
+      case CellType.SingleStat:
         return <SingleStatOptions onResetFocus={onResetFocus} />
-      case 'table':
+      case CellType.Table:
         return (
           <TableOptions
             onResetFocus={onResetFocus}

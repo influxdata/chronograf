@@ -8,6 +8,7 @@ import LineGraph from 'src/shared/components/LineGraph'
 import GaugeChart from 'src/shared/components/GaugeChart'
 import TableGraph from 'src/shared/components/TableGraph'
 import SingleStat from 'src/shared/components/SingleStat'
+import MarkdownCell from 'src/shared/components/MarkdownCell'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 
 // Constants
@@ -23,7 +24,12 @@ import {setHoverTime} from 'src/dashboards/actions'
 // Types
 import {ColorString} from 'src/types/colors'
 import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
-import {TableOptions, FieldOption, DecimalPlaces} from 'src/types/dashboards'
+import {
+  TableOptions,
+  FieldOption,
+  DecimalPlaces,
+  CellNoteVisibility,
+} from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 interface Props {
@@ -51,6 +57,8 @@ interface Props {
   onSetResolution: () => void
   handleSetHoverTime: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
+  cellNote: string
+  cellNoteVisibility: CellNoteVisibility
 }
 
 class RefreshingGraph extends PureComponent<Props> {
@@ -62,15 +70,25 @@ class RefreshingGraph extends PureComponent<Props> {
     decimalPlaces: DEFAULT_DECIMAL_PLACES,
   }
 
+  private timeSeries: React.RefObject<TimeSeries> = React.createRef()
+
+  public componentDidUpdate() {
+    if (this.props.isInCEO) {
+      this.timeSeries.current.forceUpdate()
+    }
+  }
+
   public render() {
     const {
-      inView,
       type,
-      queries,
       source,
+      inView,
+      queries,
+      cellNote,
       timeRange,
       templates,
       editQueryStatus,
+      cellNoteVisibility,
       grabDataForDownload,
     } = this.props
 
@@ -82,8 +100,13 @@ class RefreshingGraph extends PureComponent<Props> {
       )
     }
 
+    if (type === CellType.Note) {
+      return <MarkdownCell text={cellNote} />
+    }
+
     return (
       <TimeSeries
+        ref={this.timeSeries}
         source={source}
         cellType={type}
         inView={inView}
@@ -92,6 +115,8 @@ class RefreshingGraph extends PureComponent<Props> {
         templates={templates}
         editQueryStatus={editQueryStatus}
         grabDataForDownload={grabDataForDownload}
+        cellNote={cellNote}
+        cellNoteVisibility={cellNoteVisibility}
       >
         {({timeSeries, loading}) => {
           switch (type) {

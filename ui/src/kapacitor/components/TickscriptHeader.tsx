@@ -13,7 +13,7 @@ interface Props {
   isNewTickscript: boolean
   onSave: () => void
   onExit: () => void
-  onToggleLogsVisibility: () => void
+  onToggleLogsVisibility: (visibility: boolean) => void
 }
 
 class TickscriptHeader extends Component<Props> {

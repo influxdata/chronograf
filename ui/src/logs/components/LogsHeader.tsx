@@ -35,7 +35,7 @@ interface Props {
   onChooseRelativeTime: (time: number) => void
 }
 
-class LogViewerHeader extends PureComponent<Props> {
+class LogsHeader extends PureComponent<Props> {
   public render(): JSX.Element {
     return (
       <PageHeader
@@ -173,4 +173,4 @@ class LogViewerHeader extends PureComponent<Props> {
   }
 }
 
-export default LogViewerHeader
+export default LogsHeader

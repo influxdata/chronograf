@@ -2,7 +2,7 @@
 import React, {Component} from 'react'
 
 // Components
-import {RadioButtons, ButtonShape} from 'src/reusable_ui'
+import {Radio, ButtonShape} from 'src/reusable_ui'
 import VisualizationName from 'src/dashboards/components/VisualizationName'
 import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
 
@@ -42,12 +42,26 @@ class CEOHeader extends Component<Props> {
             <VisualizationName name={title} handleRenameCell={renameCell} />
           </div>
           <div className="deceo--header-tabs">
-            <RadioButtons
-              activeButton={activeEditorTab}
-              buttons={[CEOTabs.Queries, CEOTabs.Vis]}
-              onChange={onSetActiveEditorTab}
-              shape={ButtonShape.StretchToFit}
-            />
+            <Radio shape={ButtonShape.StretchToFit}>
+              <Radio.Button
+                id="deceo-tab-queries"
+                titleText="Queries"
+                value={CEOTabs.Queries}
+                active={activeEditorTab === CEOTabs.Queries}
+                onClick={onSetActiveEditorTab}
+              >
+                Queries
+              </Radio.Button>
+              <Radio.Button
+                id="deceo-tab-vis"
+                titleText="Visualization"
+                value={CEOTabs.Vis}
+                active={activeEditorTab === CEOTabs.Vis}
+                onClick={onSetActiveEditorTab}
+              >
+                Visualization
+              </Radio.Button>
+            </Radio>
           </div>
           <div className="page-header--right">
             <ConfirmOrCancel

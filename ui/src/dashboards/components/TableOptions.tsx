@@ -156,7 +156,7 @@ export class TableOptions extends Component<Props, {}> {
     handleChangeDecimalPlaces(decimalPlaces)
   }
 
-  private handleToggleVerticalTimeAxis = verticalTimeAxis => () => {
+  private handleToggleVerticalTimeAxis = (verticalTimeAxis: boolean): void => {
     const {tableOptions, handleUpdateTableOptions} = this.props
     handleUpdateTableOptions({...tableOptions, verticalTimeAxis})
   }

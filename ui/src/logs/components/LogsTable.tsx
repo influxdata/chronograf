@@ -8,7 +8,9 @@ import {color} from 'd3-color'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import ExpandableMessage from 'src/logs/components/expandable_message/ExpandableMessage'
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
+import LoadingStatus from 'src/logs/components/loading_status/LoadingStatus'
 import {getDeep} from 'src/utils/wrappers'
+import QueryResults from 'src/logs/components/QueryResults'
 
 import {colorForSeverity} from 'src/logs/utils/colors'
 import {
@@ -25,6 +27,10 @@ import {
   getMessageWidth,
   getColumnsFromData,
 } from 'src/logs/utils/table'
+import {
+  getValidMessageFilters,
+  filtersToPattern,
+} from 'src/logs/utils/matchSections'
 
 import {
   SeverityFormatOptions,
@@ -39,10 +45,13 @@ import {
   SeverityFormat,
   SeverityLevelColor,
   RowHeightHandler,
+  SearchStatus,
+  Filter,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
 interface Props {
+  filters: Filter[]
   data: TableData
   isScrolledToTop: boolean
   isTruncated: boolean
@@ -66,6 +75,7 @@ interface Props {
   onExpandMessage: () => void
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
+  searchStatus: SearchStatus
 }
 
 interface State {
@@ -77,6 +87,8 @@ interface State {
   lastQueryTime: number
   firstQueryTime: number
   visibleColumnsCount: number
+  searchPattern: string
+  infiniteLoaderQueryCount: number
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -91,6 +103,7 @@ class LogsTable extends Component<Props, State> {
       data,
       tableColumns,
       severityFormat,
+      filters,
     } = props
     const currentMessageWidth = getMessageWidth(
       data,
@@ -121,8 +134,12 @@ class LogsTable extends Component<Props, State> {
       return c.visible
     }).length
 
+    const validFitlers = getValidMessageFilters(filters)
+    const searchPattern = filtersToPattern(validFitlers)
+
     return {
       ...state,
+      searchPattern,
       isQuerying: false,
       lastQueryTime,
       firstQueryTime,
@@ -154,19 +171,23 @@ class LogsTable extends Component<Props, State> {
     }).length
 
     this.state = {
+      searchPattern: null,
       scrollTop: 0,
       scrollLeft: 0,
       currentRow: -1,
       currentMessageWidth: 0,
       lastQueryTime: null,
       firstQueryTime: null,
+      infiniteLoaderQueryCount: 0,
       isMessageVisible,
       visibleColumnsCount,
     }
   }
 
   public componentDidUpdate() {
-    if (this.isTableEmpty) {
+    const {searchStatus} = this.props
+
+    if (searchStatus === SearchStatus.NoResults) {
       return
     }
 
@@ -195,10 +216,12 @@ class LogsTable extends Component<Props, State> {
   }
 
   public render() {
+    const {queryCount} = this.props
+    const {infiniteLoaderQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
-    if (this.isTableEmpty) {
-      return this.emptyTable
+    if (this.isLoadingTableData) {
+      return this.loadingStatus
     }
 
     return (
@@ -206,6 +229,12 @@ class LogsTable extends Component<Props, State> {
         className="logs-viewer--table-container"
         onMouseOut={this.handleMouseOut}
       >
+        <div className="logs-viewer--table-count">
+          <QueryResults
+            count={this.rowCount()}
+            queryCount={infiniteLoaderQueryCount + queryCount}
+          />
+        </div>
         <AutoSizer>
           {({width}) => (
             <Grid
@@ -259,6 +288,7 @@ class LogsTable extends Component<Props, State> {
             </AutoSizer>
           )}
         </InfiniteLoader>
+        {this.scrollLoadingIndicator}
       </div>
     )
   }
@@ -355,7 +385,6 @@ class LogsTable extends Component<Props, State> {
     if (queryCount > 0) {
       return
     }
-
     const data = getValuesFromData(this.props.tableInfiniteData.forward)
     const backwardData = getValuesFromData(
       this.props.tableInfiniteData.backward
@@ -371,8 +400,13 @@ class LogsTable extends Component<Props, State> {
       return
     }
 
-    this.setState({firstQueryTime: firstTime})
-    await this.props.fetchNewer(moment(firstTime).toISOString())
+    try {
+      this.incrementLoaderQueryCount()
+      this.setState({firstQueryTime: firstTime})
+      await this.props.fetchNewer(moment(firstTime).toISOString())
+    } finally {
+      this.decrementLoaderQueryCount()
+    }
   }
 
   private loadMoreBelowRows = async () => {
@@ -397,8 +431,25 @@ class LogsTable extends Component<Props, State> {
       return
     }
 
-    this.setState({lastQueryTime: lastTime})
-    await this.props.fetchMore(moment(lastTime).toISOString())
+    try {
+      this.incrementLoaderQueryCount()
+      this.setState({lastQueryTime: lastTime})
+      await this.props.fetchMore(moment(lastTime).toISOString())
+    } finally {
+      this.decrementLoaderQueryCount()
+    }
+  }
+
+  private incrementLoaderQueryCount() {
+    this.setState(({infiniteLoaderQueryCount}) => ({
+      infiniteLoaderQueryCount: infiniteLoaderQueryCount + 1,
+    }))
+  }
+
+  private decrementLoaderQueryCount() {
+    this.setState(({infiniteLoaderQueryCount}) => ({
+      infiniteLoaderQueryCount: infiniteLoaderQueryCount - 1,
+    }))
   }
 
   private rowCount = (): number => {
@@ -622,6 +673,7 @@ class LogsTable extends Component<Props, State> {
 
   private renderMessage = (formattedValue: string): JSX.Element => {
     const {notify} = this.props
+    const {searchPattern} = this.state
 
     if (this.props.isTruncated) {
       return (
@@ -629,11 +681,18 @@ class LogsTable extends Component<Props, State> {
           notify={notify}
           formattedValue={formattedValue}
           onExpand={this.props.onExpandMessage}
+          searchPattern={searchPattern}
         />
       )
     }
 
-    return <LogsMessage notify={notify} formattedValue={formattedValue} />
+    return (
+      <LogsMessage
+        notify={notify}
+        formattedValue={formattedValue}
+        searchPattern={searchPattern}
+      />
+    )
   }
 
   private severityDotStyle = (
@@ -678,22 +737,35 @@ class LogsTable extends Component<Props, State> {
     this.setState({currentRow: -1})
   }
 
-  private get emptyTable(): JSX.Element {
-    return (
-      <div className="logs-viewer--table-container generic-empty-state">
-        <h4>No logs to display</h4>
-        <p>
-          Try changing the <strong>time range</strong> or{' '}
-          <strong>removing filters</strong>
-        </p>
-      </div>
-    )
+  private get loadingStatus(): JSX.Element {
+    return <LoadingStatus status={this.props.searchStatus} />
   }
 
-  private get isTableEmpty(): boolean {
-    const rowCount = getDeep(this.props, 'data.values.length', 0)
+  private get isLoadingTableData(): boolean {
+    const {searchStatus} = this.props
 
-    return rowCount === 0
+    switch (searchStatus) {
+      case SearchStatus.Loaded:
+        return false
+      default:
+        return true
+    }
+  }
+
+  private get isLoadingMore(): boolean {
+    return this.state.infiniteLoaderQueryCount > 0
+  }
+
+  private get scrollLoadingIndicator(): JSX.Element {
+    const className = classnames('logs-viewer--scroll-loader', {
+      loading: this.isLoadingMore,
+    })
+
+    return (
+      <div className={className}>
+        <h6>Loading more logs...</h6>
+      </div>
+    )
   }
 }
 

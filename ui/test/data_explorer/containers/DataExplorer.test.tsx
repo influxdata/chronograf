@@ -33,15 +33,15 @@ const setup = () => {
     queryConfigActions,
     autoRefresh: 1000,
     handleChooseAutoRefresh: () => {},
-    timeRange,
     setTimeRange: () => {},
-    dataExplorer: {
-      queryIDs: [query.id],
-    },
-    writeLineProtocol: () => {},
-    errorThrownAction: () => {},
-    onManualRefresh: () => {},
+    timeRange,
     manualRefresh: 0,
+    dashboards: [],
+    onManualRefresh: () => {},
+    errorThrownAction: () => {},
+    writeLineProtocol: () => {},
+    handleGetDashboards: () => [],
+    addDashboardCell: jest.fn(() => Promise.resolve()),
   }
 
   const wrapper = shallow(<DataExplorer {...props} />)

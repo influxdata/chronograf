@@ -10,6 +10,15 @@ import {FieldOption} from 'src/types/dashboards'
 import {TimeSeriesValue} from 'src/types/series'
 import {TimeRange} from 'src/types/logs'
 
+export enum SearchStatus {
+  None = 'None',
+  Loading = 'Loading',
+  NoResults = 'NoResults',
+  UpdatingTimeBounds = 'UpdatingTimeBounds',
+  UpdatingFilters = 'UpdatingFilters',
+  Loaded = 'Loaded',
+}
+
 export interface Filter {
   id: string
   key: string
@@ -165,4 +174,15 @@ export enum Operator {
   LIKE = '=~',
   EQUAL = '==',
   NOT_EQUAL = '!=',
+}
+
+export enum MatchType {
+  NONE = 'no-match',
+  MATCH = 'match',
+}
+
+export interface MatchSection {
+  id: string
+  type: MatchType
+  text: string
 }

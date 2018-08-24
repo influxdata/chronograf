@@ -13,6 +13,7 @@ interface Props {
   formattedValue: string | JSX.Element
   notify: NotificationAction
   onExpand?: () => void
+  searchPattern: string
 }
 
 export class ExpandableMessage extends Component<Props, State> {
@@ -24,17 +25,27 @@ export class ExpandableMessage extends Component<Props, State> {
   }
 
   public render() {
-    const {notify} = this.props
+    const {notify, searchPattern} = this.props
     const formattedValue = `${this.props.formattedValue}`
     const trimmedValue = formattedValue.trimLeft()
 
     return (
       <ClickOutside onClickOutside={this.handleClickOutside}>
         <div onClick={this.handleClick} className="expandable--message">
-          <div className="expandable--text">{trimmedValue}</div>
+          <div className="expandable--text">
+            <LogsMessage
+              formattedValue={trimmedValue}
+              notify={notify}
+              searchPattern={searchPattern}
+            />
+          </div>
           <div className={this.isExpanded}>
             {this.closeExpansionButton}
-            <LogsMessage formattedValue={formattedValue} notify={notify} />
+            <LogsMessage
+              formattedValue={formattedValue}
+              notify={notify}
+              searchPattern={searchPattern}
+            />
           </div>
         </div>
       </ClickOutside>

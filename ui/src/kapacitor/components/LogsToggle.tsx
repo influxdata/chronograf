@@ -1,66 +1,48 @@
+// Libraries
 import React, {PureComponent} from 'react'
+
+// Components
+import {Radio, ComponentColor} from 'src/reusable_ui'
+
+// Decorators
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   areLogsVisible: boolean
   areLogsEnabled: boolean
-  onToggleLogsVisibility: () => void
+  onToggleLogsVisibility: (visibility: boolean) => void
 }
 
+@ErrorHandling
 class LogsToggle extends PureComponent<Props> {
   public render() {
+    const {areLogsVisible, areLogsEnabled, onToggleLogsVisibility} = this.props
+
     return (
-      <ul className="nav nav-tablist nav-tablist-sm nav-tablist-malachite">
-        {this.leftTab}
-        {this.rightTab}
-      </ul>
-    )
-  }
-
-  private get leftTab(): JSX.Element {
-    const {areLogsEnabled, areLogsVisible, onToggleLogsVisibility} = this.props
-
-    if (areLogsEnabled) {
-      return (
-        <li
-          className={areLogsVisible ? null : 'active'}
+      <Radio color={ComponentColor.Success}>
+        <Radio.Button
+          id="tickscript-logs--hidden"
+          active={!areLogsVisible}
+          value={false}
           onClick={onToggleLogsVisibility}
+          titleText="Show just the TICKscript Editor"
+          disabledTitleText="Log viewing is currently disabled"
+          disabled={!areLogsEnabled}
         >
           Editor
-        </li>
-      )
-    }
-
-    return (
-      <li
-        className={areLogsVisible ? 'disabled' : ' disabled active'}
-        title="Log viewing is currently disabled"
-      >
-        Editor
-      </li>
-    )
-  }
-
-  private get rightTab(): JSX.Element {
-    const {areLogsEnabled, areLogsVisible, onToggleLogsVisibility} = this.props
-
-    if (areLogsEnabled) {
-      return (
-        <li
-          className={areLogsVisible ? 'active' : null}
+        </Radio.Button>
+        <Radio.Button
+          id="tickscript-logs--visible"
+          active={areLogsVisible}
+          value={true}
           onClick={onToggleLogsVisibility}
+          titleText="Show the TICKscript Editor & Logs Viewer"
+          disabledTitleText="Log viewing is currently disabled"
+          disabled={!areLogsEnabled}
         >
           Editor + Logs
-        </li>
-      )
-    }
-
-    return (
-      <li
-        className={areLogsVisible ? 'disabled active' : ' disabled'}
-        title="Log viewing is currently disabled"
-      >
-        Editor + Logs
-      </li>
+        </Radio.Button>
+      </Radio>
     )
   }
 }

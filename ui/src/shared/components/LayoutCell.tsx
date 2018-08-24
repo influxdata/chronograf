@@ -4,6 +4,7 @@ import _ from 'lodash'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import LayoutCellMenu from 'src/shared/components/LayoutCellMenu'
 import LayoutCellHeader from 'src/shared/components/LayoutCellHeader'
+import LayoutCellNote from 'src/shared/components/LayoutCellNote'
 import {notify} from 'src/shared/actions/notifications'
 import {notifyCSVDownloadFailed} from 'src/shared/copy/notifications'
 import download from 'src/external/download.js'
@@ -13,7 +14,9 @@ import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 
 import {Cell, CellQuery, Template} from 'src/types/'
+import {CellNoteVisibility} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
+import {CellType} from 'src/types/dashboards'
 
 interface Props {
   cell: Cell
@@ -36,18 +39,39 @@ export default class LayoutCell extends Component<Props> {
         <Authorized requiredRole={EDITOR_ROLE}>
           <LayoutCellMenu
             cell={cell}
-            queries={this.queries}
-            dataExists={!!cellData.length}
             isEditable={isEditable}
-            onDelete={onDeleteCell}
+            dataExists={!!cellData.length}
             onEdit={this.handleSummonOverlay}
             onClone={onCloneCell}
+            onDelete={onDeleteCell}
             onCSVDownload={this.handleCSVDownload}
+            queries={this.queries}
           />
         </Authorized>
-        <LayoutCellHeader cellName={this.cellName} isEditable={isEditable} />
+        <LayoutCellNote
+          visibility={cell.noteVisibility}
+          cellType={cell.type}
+          note={cell.note}
+          cellX={cell.x}
+          cellY={cell.y}
+        />
+        <LayoutCellHeader
+          cellName={this.cellName}
+          isEditable={isEditable}
+          makeSpaceForCellNote={this.makeSpaceForCellNote}
+        />
         <div className="dash-graph--container">{this.renderGraph}</div>
       </div>
+    )
+  }
+
+  private get makeSpaceForCellNote(): boolean {
+    const {cell} = this.props
+
+    return (
+      !!cell.note &&
+      cell.type !== CellType.Note &&
+      cell.noteVisibility === CellNoteVisibility.Default
     )
   }
 

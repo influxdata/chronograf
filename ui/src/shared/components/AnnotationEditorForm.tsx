@@ -2,7 +2,7 @@ import React, {PureComponent, ChangeEvent} from 'react'
 import uuid from 'uuid'
 import moment from 'moment'
 
-import {RadioButtons, ButtonShape} from 'src/reusable_ui'
+import {Radio, ButtonShape} from 'src/reusable_ui'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import AnnotationTagEditorLi from 'src/shared/components/AnnotationTagEditorLi'
 
@@ -37,7 +37,12 @@ interface State {
   text: string
   startTime: number
   endTime: number
-  tags: Array<{id: string; tagKey: string; tagValue: string}>
+  tags: Array<{
+    id: string
+    tagKey: string
+    tagValue: string
+    shouldAutoFocus: boolean
+  }>
   startTimeInput: string
   endTimeInput: string
   textError: string | null
@@ -61,6 +66,7 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
       id: uuid.v4(),
       tagKey: k,
       tagValue: v,
+      shouldAutoFocus: false,
     }))
 
     this.state = {
@@ -87,7 +93,6 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
     const {
       type,
       text,
-      tags,
       startTimeInput,
       endTimeInput,
       textError,
@@ -113,12 +118,26 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
           </div>
           <div className="form-group col-xs-6" data-test="type-group">
             <label>Type</label>
-            <RadioButtons
-              buttons={['point', 'window']}
-              activeButton={type}
-              onChange={this.handleTypeChange}
-              shape={ButtonShape.StretchToFit}
-            />
+            <Radio shape={ButtonShape.StretchToFit}>
+              <Radio.Button
+                id="annotation-editor-type--point"
+                value="point"
+                active={type === 'point'}
+                titleText="Assign a single timestamp to the Annotation"
+                onClick={this.handleTypeChange}
+              >
+                Point
+              </Radio.Button>
+              <Radio.Button
+                id="annotation-editor-type--window"
+                value="window"
+                active={type === 'window'}
+                titleText="Assign a timestamp window to the Annotation"
+                onClick={this.handleTypeChange}
+              >
+                Window
+              </Radio.Button>
+            </Radio>
           </div>
         </div>
         <div className="row">
@@ -161,15 +180,7 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
               {tagsError && <div className="error">{tagsError}</div>}
             </label>
             <div className="annotation-tag-editor">
-              {tags.map(({id, tagKey, tagValue}) => (
-                <AnnotationTagEditorLi
-                  key={id}
-                  tagKey={tagKey}
-                  tagValue={tagValue}
-                  onUpdate={this.handleUpdateTag(id)}
-                  onDelete={this.handleDeleteTag(id)}
-                />
-              ))}
+              {this.tagEditorListItems}
               <button
                 className="btn btn-sm btn-primary annotation-tag-editor--add"
                 onClick={this.handleAddTag}
@@ -190,6 +201,30 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
         </div>
       </div>
     )
+  }
+
+  private get tagEditorListItems(): JSX.Element[] {
+    const {tags} = this.state
+
+    return tags.map(({id, tagKey, tagValue, shouldAutoFocus}) => (
+      <AnnotationTagEditorLi
+        key={id}
+        tagKey={tagKey}
+        tagValue={tagValue}
+        onUpdate={this.handleUpdateTag(id)}
+        onDelete={this.handleDeleteTag(id)}
+        onKeyDown={this.onKeyDown}
+        shouldAutoFocus={shouldAutoFocus}
+      />
+    ))
+  }
+
+  private onKeyDown = (e: string): void => {
+    switch (e) {
+      case 'Enter':
+        this.handleAddTag()
+        return
+    }
   }
 
   private handleTextChange = ({
@@ -298,9 +333,18 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
   }
 
   private handleAddTag = (): void => {
-    const newTag = {id: uuid.v4(), tagKey: '', tagValue: ''}
+    const newTag = {
+      id: uuid.v4(),
+      tagKey: '',
+      tagValue: '',
+      shouldAutoFocus: true,
+    }
 
-    this.setState({tags: [...this.state.tags, newTag]}, this.setDraftAnnotation)
+    const oldTags = this.state.tags.map(tag => {
+      return {...tag, shouldAutoFocus: false}
+    })
+
+    this.setState({tags: [...oldTags, newTag]}, this.setDraftAnnotation)
   }
 
   private handleUpdateTag = (id: string) => (

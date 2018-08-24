@@ -1,13 +1,20 @@
+// Libraries
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
 
+// Components
+import {Radio, ButtonShape} from 'src/reusable_ui'
+
+// Actions
 import {updateThresholdsListType} from 'src/dashboards/actions/cellEditorOverlay'
 
+// Constants
 import {
   THRESHOLD_TYPE_TEXT,
   THRESHOLD_TYPE_BG,
 } from 'src/shared/constants/thresholds'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface PropsFromRedux {
@@ -23,53 +30,37 @@ type Props = PropsFromRedux & PropsFromParent
 @ErrorHandling
 class ThresholdsListTypeToggle extends Component<Props> {
   public render() {
-    const {containerClass} = this.props
+    const {
+      containerClass,
+      thresholdsListType,
+      handleUpdateThresholdsListType,
+    } = this.props
 
     return (
       <div className={containerClass}>
         <label>Threshold Coloring</label>
-        <ul className="nav nav-tablist nav-tablist-sm">
-          <li
-            className={this.bgTabClassName}
-            onClick={this.handleToggleThresholdsListType(THRESHOLD_TYPE_BG)}
+        <Radio shape={ButtonShape.StretchToFit}>
+          <Radio.Button
+            id="threshold-list-type--background"
+            value={THRESHOLD_TYPE_BG}
+            active={thresholdsListType === THRESHOLD_TYPE_BG}
+            onClick={handleUpdateThresholdsListType}
+            titleText="Apply coloration to cell background"
           >
             Background
-          </li>
-          <li
-            className={this.textTabClassName}
-            onClick={this.handleToggleThresholdsListType(THRESHOLD_TYPE_TEXT)}
+          </Radio.Button>
+          <Radio.Button
+            id="threshold-list-type--text"
+            value={THRESHOLD_TYPE_TEXT}
+            active={thresholdsListType === THRESHOLD_TYPE_TEXT}
+            onClick={handleUpdateThresholdsListType}
+            titleText="Apply coloration to cell text"
           >
             Text
-          </li>
-        </ul>
+          </Radio.Button>
+        </Radio>
       </div>
     )
-  }
-
-  private get bgTabClassName(): string {
-    const {thresholdsListType} = this.props
-
-    if (thresholdsListType === THRESHOLD_TYPE_BG) {
-      return 'active'
-    }
-
-    return ''
-  }
-
-  private get textTabClassName(): string {
-    const {thresholdsListType} = this.props
-
-    if (thresholdsListType === THRESHOLD_TYPE_TEXT) {
-      return 'active'
-    }
-
-    return ''
-  }
-
-  private handleToggleThresholdsListType = (newType: string) => (): void => {
-    const {handleUpdateThresholdsListType} = this.props
-
-    handleUpdateThresholdsListType(newType)
   }
 }
 
@@ -79,12 +70,10 @@ const mapStateToProps = ({
   thresholdsListType,
 })
 
-const mapDispatchToProps = dispatch => ({
-  handleUpdateThresholdsListType: bindActionCreators(
-    updateThresholdsListType,
-    dispatch
-  ),
-})
+const mapDispatchToProps = {
+  handleUpdateThresholdsListType: updateThresholdsListType,
+}
+
 export default connect(mapStateToProps, mapDispatchToProps)(
   ThresholdsListTypeToggle
 )
