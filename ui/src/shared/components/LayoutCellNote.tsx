@@ -27,6 +27,7 @@ class LayoutCellNote extends Component<Props> {
     if (
       !note ||
       note === '' ||
+      note === undefined ||
       cellType === CellType.Note ||
       visibility === CellNoteVisibility.ShowWhenNoData
     ) {
