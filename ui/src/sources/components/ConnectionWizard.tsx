@@ -13,8 +13,7 @@ import DashboardStep from 'src/sources/components/DashboardStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
 
 // Types
-import {Kapacitor, Source} from 'src/types'
-import {ToggleWizard} from 'src/types/wizard'
+import {ToggleWizard, NextReturn} from 'src/types/wizard'
 
 interface Props {
   isVisible: boolean
@@ -115,8 +114,8 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         >
           <KapacitorStep
             ref={c => (this.kapacitorStepRef = c && c.getWrappedInstance())}
-            setError={this.handleSetKapacitorError}
             source={source}
+            setError={this.handleSetKapacitorError}
             kapacitor={kapacitor}
             showNewKapacitor={showNewKapacitor}
           />
@@ -146,13 +145,15 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   }
 
   private handleSourceNext = async () => {
-    const response = await this.sourceStepRef.next()
-    this.setState({source: response.payload})
+    const response: NextReturn = await this.sourceStepRef.next()
+    this.setState({source: response.payload, sourceError: response.error})
     return response
   }
 
   private handleSetSourceError = (b: boolean) => {
+    if (this.state.sourceError !== b) {
     this.setState({sourceError: b})
+  }
   }
 
   // DashboardStep
@@ -167,15 +168,20 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
   }
 
   private handleKapacitorNext = async () => {
-    const response = await this.kapacitorStepRef.next()
-    this.setState({kapacitor: response.payload})
+    const response: NextReturn = await this.kapacitorStepRef.next()
+    this.setState({
+      kapacitor: response.payload,
+      kapacitorError: response.error,
+    })
     return response
   }
 
   private handleKapacitorPrev = () => {}
 
   private handleSetKapacitorError = (b: boolean) => {
+    if (this.state.kapacitorError !== b) {
     this.setState({kapacitorError: b})
+  }
   }
 
   // CompletionStep
@@ -183,14 +189,14 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
     return false
   }
 
-  private handleCompletionNext = () => {
+  private handleCompletionNext = (): NextReturn => {
     const {router} = this.props
     const {source} = this.state
     this.resetWizardState()
     if (source) {
       router.push(`/sources/${source.id}/manage-sources`)
     }
-    return {success: true, payload: null}
+    return {error: false, payload: null}
   }
 
   private handleCompletionPrev = () => {}
@@ -199,6 +205,11 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
     this.setState({
       source: null,
       kapacitor: null,
+      sourceError: false,
+      kapacitorError: false,
+      dashboardError: false,
+      dashboardsCreated: [],
+      hasNextOnDashboard: false,
     })
   }
 }

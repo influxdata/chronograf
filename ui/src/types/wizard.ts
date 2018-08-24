@@ -12,3 +12,8 @@ export type ToggleWizard = (
   jumpStep?: number,
   showNewKapacitor?: boolean
 ) => () => void
+
+export interface NextReturn {
+  error: boolean
+  payload: any
+}

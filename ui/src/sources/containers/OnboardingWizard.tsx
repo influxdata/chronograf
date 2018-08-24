@@ -13,7 +13,7 @@ import DashboardStep from 'src/sources/components/DashboardStep'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {Kapacitor, Source, Me} from 'src/types'
+import {NextReturn} from 'src/types/wizard'
 
 interface Props extends WithRouterProps {
   me: Me
@@ -131,12 +131,14 @@ class OnboardingWizard extends PureComponent<Props, State> {
 
   private handleSourceNext = async () => {
     const response = await this.sourceStepRef.next()
-    this.setState({source: response.payload})
+    this.setState({source: response.payload, sourceError: response.error})
     return response
   }
 
   private handleSetSourceError = (b: boolean) => {
+    if (this.state.sourceError !== b) {
     this.setState({sourceError: b})
+  }
   }
 
   // DashboardStep
@@ -159,7 +161,9 @@ class OnboardingWizard extends PureComponent<Props, State> {
   private handleKapacitorPrev = () => {}
 
   private handleSetKapacitorError = (b: boolean) => {
+    if (this.state.kapacitorError !== b) {
     this.setState({kapacitorError: b})
+  }
   }
 
   // CompletionStep
@@ -174,7 +178,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
     if (source) {
       router.push(`/sources/${source.id}/manage-sources`)
     }
-    return {success: true, payload: null}
+    return {error: false, payload: null}
   }
 
   private handleCompletionPrev = () => {}

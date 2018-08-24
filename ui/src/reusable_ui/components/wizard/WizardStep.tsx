@@ -5,13 +5,9 @@ import React, {PureComponent, ReactNode} from 'react'
 import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {NextReturn} from 'src/types/wizard'
 
 type booleanFunction = () => boolean
-
-interface NextReturn {
-  success: boolean
-  payload: any
-}
 
 export interface WizardStepProps {
   children: ReactNode
@@ -69,16 +65,16 @@ class WizardStep extends PureComponent<WizardStepProps> {
   private handleClickNext = async () => {
     const {onNext, increment, isBlockingStep} = this.props
     let payload
-    let success = true
+    let error = false
 
     if (onNext) {
       const response = await onNext()
-      success = response.success
+      error = response.error
       payload = response.payload
     }
 
     if (increment) {
-      if (!isBlockingStep || (isBlockingStep && success === true)) {
+      if (!isBlockingStep || (isBlockingStep && error === false)) {
         increment()
       }
     }
