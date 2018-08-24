@@ -33,6 +33,7 @@ import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
 // Types
 import {Source, Me} from 'src/types'
+import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
 
@@ -40,7 +41,7 @@ interface Props {
   notify: typeof notifyAction
   addSource: typeof addSourceAction
   updateSource: typeof updateSourceAction
-  setError?: (b: boolean) => void
+  setError: (b: boolean) => void
   source: Source
   onBoarding?: boolean
   me: Me
@@ -63,21 +64,19 @@ class SourceStep extends PureComponent<Props, State> {
     }
   }
 
-  public next = async () => {
+  public next = async (): Promise<NextReturn> => {
     const {source} = this.state
-    const {notify, setError} = this.props
+    const {notify} = this.props
 
     if (isNewSource(source)) {
       try {
         const sourceFromServer = await createSource(source)
         this.props.addSource(sourceFromServer)
         notify(notifySourceConnectionSucceeded(source.name))
-        setError(false)
-        return {success: true, payload: sourceFromServer}
+        return {error: false, payload: sourceFromServer}
       } catch (err) {
         notify(notifySourceCreationFailed(source.name, this.parseError(err)))
-        setError(true)
-        return {success: false, payload: null}
+        return {error: true, payload: null}
       }
     } else {
       if (this.sourceIsEdited) {
@@ -86,15 +85,13 @@ class SourceStep extends PureComponent<Props, State> {
           this.props.updateSource(sourceFromServer)
           // if the url field is blurred on a new source, the source is already created with no alert best to give a neutral success message
           notify(notifySourceConnectionSucceeded(source.name))
-          setError(false)
-          return {success: true, payload: sourceFromServer}
+          return {error: false, payload: sourceFromServer}
         } catch (err) {
           notify(notifySourceUpdateFailed(source.name, this.parseError(err)))
-          setError(true)
-          return {success: false, payload: null}
+          return {error: true, payload: null}
         }
       }
-      return {success: true, payload: source}
+      return {error: false, payload: source}
     }
   }
 
