@@ -9,20 +9,17 @@ class QueryResults extends PureComponent<Props> {
   public render() {
     const {count} = this.props
 
+    let contents = (
+      <>
+        Query returned <strong>{count} Events</strong>
+      </>
+    )
+
     if (this.isPending) {
-      return (
-        <>
-          <div className="logs-viewer--results-spinner" />
-          <label className="logs-viewer--results-text">Querying...</label>
-        </>
-      )
+      contents = <>Querying...</>
     }
 
-    return (
-      <label className="logs-viewer--results-text">
-        Query returned <strong>{count} Events</strong>
-      </label>
-    )
+    return <label className="logs-viewer--results-text">{contents}</label>
   }
 
   private get isPending(): boolean {

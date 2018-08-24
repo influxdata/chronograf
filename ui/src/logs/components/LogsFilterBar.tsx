@@ -10,11 +10,7 @@ interface Props {
 
 class LogsFilters extends PureComponent<Props> {
   public render() {
-    return (
-      <div className="logs-viewer--filter-bar">
-        <div className="logs-viewer--filters">{this.renderFilters}</div>
-      </div>
-    )
+    return <div className="logs-viewer--filter-bar">{this.renderFilters}</div>
   }
 
   private get renderFilters(): JSX.Element[] {
