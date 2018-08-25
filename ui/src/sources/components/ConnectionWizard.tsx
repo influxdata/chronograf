@@ -13,6 +13,7 @@ import DashboardStep from 'src/sources/components/DashboardStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
 
 // Types
+import {Kapacitor, Source, Protoboard} from 'src/types'
 import {ToggleWizard, NextReturn} from 'src/types/wizard'
 
 interface Props {
@@ -29,6 +30,8 @@ interface State {
   kapacitor: Kapacitor
   kapacitorError: boolean
   dashboardError: boolean
+  dashboardsCreated: Protoboard[]
+  hasNextOnDashboard: boolean
 }
 
 @ErrorHandling
@@ -54,6 +57,8 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       sourceError: false,
       kapacitorError: false,
       dashboardError: false,
+      dashboardsCreated: [],
+      hasNextOnDashboard: false,
     }
   }
 
@@ -65,8 +70,8 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       kapacitor,
       kapacitorError,
       dashboardError,
+      dashboardsCreated,
     } = this.state
-
     return (
       <WizardOverlay
         visible={isVisible}
@@ -98,8 +103,12 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           tipText="Select dashboards you would like to create:"
           isComplete={this.isDashboardComplete}
           isErrored={dashboardError}
+          onNext={this.handleDashboardNext}
         >
-          <DashboardStep />
+          <DashboardStep
+            ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
+            dashboardsCreated={dashboardsCreated}
+          />
         </WizardStep>
         <WizardStep
           title="Kapacitor Connection"
@@ -152,13 +161,24 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
 
   private handleSetSourceError = (b: boolean) => {
     if (this.state.sourceError !== b) {
-    this.setState({sourceError: b})
-  }
+      this.setState({sourceError: b})
+    }
   }
 
   // DashboardStep
   private isDashboardComplete = () => {
-    return false
+    const {hasNextOnDashboard} = this.state
+    return hasNextOnDashboard
+  }
+
+  private handleDashboardNext = async () => {
+    const response: NextReturn = await this.dashboardStepRef.next()
+    this.setState({
+      dashboardError: response.error,
+      dashboardsCreated: response.payload,
+      hasNextOnDashboard: true,
+    })
+    return response
   }
 
   // KapacitorStep
@@ -180,8 +200,8 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
 
   private handleSetKapacitorError = (b: boolean) => {
     if (this.state.kapacitorError !== b) {
-    this.setState({kapacitorError: b})
-  }
+      this.setState({kapacitorError: b})
+    }
   }
 
   // CompletionStep

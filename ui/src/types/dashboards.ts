@@ -220,8 +220,9 @@ export interface ProtoboardMetadata {
 }
 
 export interface ProtoboardData {
-  cells: object
+  cells: Array<Partial<Cell>>
 }
+
 export interface Protoboard {
   id: string
   meta: ProtoboardMetadata

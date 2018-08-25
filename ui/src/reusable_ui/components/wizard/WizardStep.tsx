@@ -7,15 +7,17 @@ import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {NextReturn} from 'src/types/wizard'
 
-type booleanFunction = () => boolean
+type BooleanFunction = () => boolean
+type NextReturnFunction = () => NextReturn
+type AsyncNextReturnFunction = () => Promise<NextReturn>
 
 export interface WizardStepProps {
   children: ReactNode
   title: string
   isComplete: () => boolean
-  isErrored?: boolean | booleanFunction
+  isErrored?: boolean | BooleanFunction
   onPrevious?: () => void
-  onNext?: () => NextReturn | Promise<NextReturn>
+  onNext: NextReturnFunction | AsyncNextReturnFunction
   isBlockingStep?: boolean
   increment?: () => void
   decrement?: () => void
@@ -29,6 +31,7 @@ export interface WizardStepProps {
 class WizardStep extends PureComponent<WizardStepProps> {
   public static defaultProps: Partial<WizardStepProps> = {
     isBlockingStep: false,
+    isErrored: false,
   }
   public render() {
     const {children, decrement, nextLabel, previousLabel, lastStep} = this.props

@@ -1,8 +1,11 @@
 // Libraries
 import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import _ from 'lodash'
 
 // APIs
 import {getProtoBoards} from 'src/sources/apis'
+import {createDashboardFromProtoboard} from 'src/dashboards/apis'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -15,8 +18,12 @@ import GridSizer from 'src/reusable_ui/components/grid_sizer/GridSizer'
 import CardSelectCard from 'src/reusable_ui/components/card_select/CardSelectCard'
 import SearchBar from 'src/hosts/components/SearchBar'
 
+// Actions
+import {notify as notifyAction} from 'src/shared/actions/notifications'
+
 // Types
 import {Protoboard} from 'src/types'
+import {NextReturn} from 'src/types/wizard'
 
 interface State {
   selected: object
@@ -24,12 +31,20 @@ interface State {
   protoboards: Protoboard[]
 }
 
+interface Props {
+  dashboardsCreated: Protoboard[]
+}
+
 @ErrorHandling
-class DashboardStep extends Component<{}, State> {
-  public constructor(props) {
+class DashboardStep extends Component<Props, State> {
+  public constructor(props: Props) {
     super(props)
+    const selected = props.dashboardsCreated.reduce(
+      (acc, d) => ({...acc, [d.id]: true}),
+      {}
+    )
     this.state = {
-      selected: {},
+      selected,
       protoboards: [],
       searchTerm: '',
     }
@@ -38,6 +53,30 @@ class DashboardStep extends Component<{}, State> {
   public async componentDidMount() {
     const protoboards = await getProtoBoards()
     this.setState({protoboards})
+  }
+
+  public next = async (): Promise<NextReturn> => {
+    const {selected, protoboards} = this.state
+    const {dashboardsCreated} = this.props
+
+    const selectedProtoboards = protoboards.filter(p => selected[p.id])
+
+    const newSelectedProtoboards = protoboards.filter(
+      p =>
+        selected[p.id] &&
+        !_.find(dashboardsCreated, d => {
+          return d.id === p.id
+        })
+    )
+
+    try {
+      newSelectedProtoboards.forEach(p => {
+        createDashboardFromProtoboard(p)
+      })
+      return {error: false, payload: selectedProtoboards}
+    } catch (err) {
+      return {error: true, payload: null}
+    }
   }
 
   public render() {
@@ -68,29 +107,29 @@ class DashboardStep extends Component<{}, State> {
       isSearchMatch(pb.meta.name, searchTerm)
     )
     return filteredProtoboards.map((protoboard, i) => {
-      const {meta} = protoboard
+      const {meta, id} = protoboard
       return (
         <CardSelectCard
-          key={`${protoboard.id}_${i}`}
-          id={meta.name}
+          key={`${id}_${i}`}
+          id={id}
           name={meta.name}
           label={meta.name}
-          checked={selected[meta.name]}
-          onClick={this.toggleChecked(meta.name)}
+          checked={selected[id]}
+          onClick={this.toggleChecked(id)}
         />
       )
     })
   }
 
-  private toggleChecked = (name: string) => () => {
+  private toggleChecked = (id: string) => () => {
     const {selected} = this.state
 
     const newSelected = selected
 
-    if (selected[name]) {
-      newSelected[name] = false
+    if (selected[id]) {
+      newSelected[id] = false
     } else {
-      newSelected[name] = true
+      newSelected[id] = true
     }
 
     this.setState({
@@ -99,4 +138,8 @@ class DashboardStep extends Component<{}, State> {
   }
 }
 
-export default DashboardStep
+const mdtp = {
+  notify: notifyAction,
+}
+
+export default connect(null, mdtp, null, {withRef: true})(DashboardStep)

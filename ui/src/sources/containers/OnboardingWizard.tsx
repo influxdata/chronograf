@@ -13,6 +13,7 @@ import DashboardStep from 'src/sources/components/DashboardStep'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+import {Kapacitor, Source, Me, Protoboard} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 interface Props extends WithRouterProps {
@@ -26,6 +27,8 @@ interface State {
   kapacitor: Kapacitor
   kapacitorError: boolean
   dashboardError: boolean
+  dashboardsCreated: Protoboard[]
+  hasNextOnDashboard: boolean
 }
 
 @ErrorHandling
@@ -44,11 +47,19 @@ class OnboardingWizard extends PureComponent<Props, State> {
       kapacitor: null,
       kapacitorError: false,
       dashboardError: false,
+      dashboardsCreated: [],
+      hasNextOnDashboard: false,
     }
   }
 
   public render() {
-    const {source, sourceError, kapacitorError, dashboardError} = this.state
+    const {
+      source,
+      sourceError,
+      kapacitorError,
+      dashboardError,
+      dashboardsCreated,
+    } = this.state
     const {me, isUsingAuth} = this.props
     return (
       <>
@@ -83,8 +94,12 @@ class OnboardingWizard extends PureComponent<Props, State> {
             tipText="Select dashboards you would like to create:"
             isComplete={this.isDashboardComplete}
             isErrored={dashboardError}
+            onNext={this.handleDashboardNext}
           >
-            <DashboardStep />
+            <DashboardStep
+              ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
+              dashboardsCreated={dashboardsCreated}
+            />
           </WizardStep>
           <WizardStep
             title="Add a Kapacitor Connection"
@@ -137,13 +152,24 @@ class OnboardingWizard extends PureComponent<Props, State> {
 
   private handleSetSourceError = (b: boolean) => {
     if (this.state.sourceError !== b) {
-    this.setState({sourceError: b})
-  }
+      this.setState({sourceError: b})
+    }
   }
 
   // DashboardStep
   private isDashboardComplete = () => {
-    return false
+    const {hasNextOnDashboard} = this.state
+    return hasNextOnDashboard
+  }
+
+  private handleDashboardNext = async () => {
+    const response: NextReturn = await this.dashboardStepRef.next()
+    this.setState({
+      dashboardError: response.error,
+      dashboardsCreated: response.payload,
+      hasNextOnDashboard: true,
+    })
+    return response
   }
 
   // KapacitorStep
@@ -162,8 +188,8 @@ class OnboardingWizard extends PureComponent<Props, State> {
 
   private handleSetKapacitorError = (b: boolean) => {
     if (this.state.kapacitorError !== b) {
-    this.setState({kapacitorError: b})
-  }
+      this.setState({kapacitorError: b})
+    }
   }
 
   // CompletionStep
