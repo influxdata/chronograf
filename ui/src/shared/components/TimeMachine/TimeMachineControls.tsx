@@ -1,7 +1,11 @@
+// Libraries
 import React, {SFC} from 'react'
 
+// Components
 import SourceSelector from 'src/dashboards/components/SourceSelector'
+import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 
+// Types
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service} from 'src/types'
@@ -15,6 +19,8 @@ interface Props {
   onChangeService: (service: Service, source: SourcesModels.Source) => void
   queries: QueriesModels.QueryConfig[]
   onSelectDynamicSource: () => void
+  timeRange: QueriesModels.TimeRange
+  updateEditorTimeRange: (timeRange: QueriesModels.TimeRange) => void
 }
 
 const TimeMachineControls: SFC<Props> = ({
@@ -23,9 +29,11 @@ const TimeMachineControls: SFC<Props> = ({
   service,
   queries,
   services,
+  timeRange,
   onChangeService,
-  isDynamicSourceSelected,
   onSelectDynamicSource,
+  isDynamicSourceSelected,
+  updateEditorTimeRange,
 }) => {
   return (
     <div className="deceo--controls">
@@ -38,6 +46,10 @@ const TimeMachineControls: SFC<Props> = ({
         onChangeService={onChangeService}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onSelectDynamicSource={onSelectDynamicSource}
+      />
+      <TimeRangeDropdown
+        onChooseTimeRange={updateEditorTimeRange}
+        selected={timeRange}
       />
     </div>
   )

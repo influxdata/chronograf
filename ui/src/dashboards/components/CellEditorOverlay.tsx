@@ -23,7 +23,7 @@ import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {Service} from 'src/types'
+import {Service, TimeRange} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
 import {
@@ -65,6 +65,7 @@ interface Props {
   queryConfigActions: QueryConfigActions
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
+  updateEditorTimeRange: (timeRange: TimeRange) => void
 }
 
 interface State {
@@ -108,6 +109,7 @@ class CellEditorOverlay extends Component<Props, State> {
       renameCell,
       addQuery,
       deleteQuery,
+      updateEditorTimeRange,
     } = this.props
 
     const {isStaticLegend} = this.state
@@ -136,6 +138,7 @@ class CellEditorOverlay extends Component<Props, State> {
           queryConfigActions={this.props.queryConfigActions}
           addQuery={addQuery}
           deleteQuery={deleteQuery}
+          updateEditorTimeRange={updateEditorTimeRange}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader

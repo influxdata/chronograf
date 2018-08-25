@@ -1,8 +1,8 @@
 import reducer, {initialState} from 'src/dashboards/reducers/cellEditorOverlay'
 
 import {
-  loadCellForCEO,
-  clearCellFromCEO,
+  loadCEO,
+  clearCEO,
   changeCellType,
   renameCell,
   updateThresholdsListColors,
@@ -21,7 +21,7 @@ import {
 } from 'src/shared/constants/thresholds'
 import {validateLineColors} from 'src/shared/constants/graphColorPalettes'
 
-import {cell, axes} from 'test/fixtures'
+import {cell, axes, timeRange} from 'test/fixtures'
 
 const defaultCell = {
   ...cell,
@@ -37,26 +37,29 @@ const defaultLineColors = validateLineColors(defaultCell.colors)
 
 describe('Dashboards.Reducers.cellEditorOverlay', () => {
   it('should show cell editor overlay', () => {
-    const actual = reducer(initialState, loadCellForCEO(defaultCell))
+    const actual = reducer(initialState, loadCEO(defaultCell, timeRange))
     const expected = {
       cell: defaultCell,
       gaugeColors: defaultGaugeColors,
       thresholdsListColors: defaultThresholdsListColors,
       thresholdsListType: defaultThresholdsListType,
       tableOptions: DEFAULT_TABLE_OPTIONS,
+      timeRange,
     }
 
     expect(actual.cell).toEqual(expected.cell)
     expect(actual.gaugeColors).toBe(expected.gaugeColors)
     expect(actual.thresholdsListColors).toBe(expected.thresholdsListColors)
     expect(actual.thresholdsListType).toBe(expected.thresholdsListType)
+    expect(actual.timeRange).toBe(expected.timeRange)
   })
 
   it('should hide cell editor overlay', () => {
-    const actual = reducer(initialState, clearCellFromCEO())
+    const actual = reducer(initialState, clearCEO())
     const expected = null
 
     expect(actual.cell).toBe(expected)
+    expect(actual.timeRange).toBe(expected)
   })
 
   it('should change the cell editor visualization type', () => {
