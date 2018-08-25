@@ -343,6 +343,7 @@ export const executeTableNewerQueryAsync = () => async (
   dispatch,
   getState: GetState
 ) => {
+  console.log('executeTableNewerQueryAsync')
   const state = getState()
 
   const startTime = getTableSelectedTime(state)
@@ -399,6 +400,7 @@ export const executeTableOlderQueryAsync = () => async (
   dispatch,
   getState: GetState
 ) => {
+  console.log('executeTableOlderQueryAsync')
   const state = getState()
 
   const time = getTableSelectedTime(state)
@@ -528,6 +530,7 @@ export const incrementQueryCount = () => ({
 })
 
 export const executeQueriesAsync = () => async dispatch => {
+  console.log('executeQueriesAsync')
   try {
     await Promise.all([
       dispatch(executeHistogramQueryAsync()),
@@ -597,6 +600,7 @@ export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
   dispatch,
   getState
 ): Promise<void> => {
+  console.log('fetchOlderLogsAsync')
   const state = getState()
   const tableQueryConfig = getTableQueryConfig(state)
   const timeRange = {lower: queryTimeEnd}
@@ -643,6 +647,7 @@ export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
   dispatch,
   getState
 ): Promise<void> => {
+  console.log('fetchNewerLogsAsync')
   const state = getState()
   const tableQueryConfig = getTableQueryConfig(state)
   const timeRange = {lower: queryTimeStart}

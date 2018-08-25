@@ -209,6 +209,7 @@ class LogsTable extends Component<Props, State> {
     if (this.headerGrid.current) {
       this.headerGrid.current.recomputeGridSize()
     }
+    console.log('LogsTable mounted')
   }
 
   public componentWillUnmount() {

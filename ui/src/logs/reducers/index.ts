@@ -116,6 +116,7 @@ const concatMoreLogs = (
   state: LogsState,
   action: ConcatMoreLogsAction
 ): LogsState => {
+  console.log('concatMoreLogs')
   const {
     series: {values},
   } = action.payload
@@ -142,6 +143,7 @@ const prependMoreLogs = (
   const {
     series: {values},
   } = action.payload
+  console.log('prependMoreLogs')
   const {tableInfiniteData} = state
   const {forward} = tableInfiniteData
   const vals = [...values, ...forward.values]
@@ -205,6 +207,7 @@ export default (state: LogsState = defaultState, action: Action) => {
     case ActionTypes.ClearRowsAdded:
       return {...state, newRowsAdded: null}
     case ActionTypes.SetTableForwardData:
+      console.log('reducer SetTableForwardData')
       return {
         ...state,
         tableInfiniteData: {
@@ -213,6 +216,7 @@ export default (state: LogsState = defaultState, action: Action) => {
         },
       }
     case ActionTypes.SetTableBackwardData:
+      console.log('reducer SetTableBackwardData')
       return {
         ...state,
         tableInfiniteData: {
