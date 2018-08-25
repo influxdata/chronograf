@@ -134,8 +134,8 @@ class LogsTable extends Component<Props, State> {
       return c.visible
     }).length
 
-    const validFitlers = getValidMessageFilters(filters)
-    const searchPattern = filtersToPattern(validFitlers)
+    const validFilters = getValidMessageFilters(filters)
+    const searchPattern = filtersToPattern(validFilters)
 
     return {
       ...state,
