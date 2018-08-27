@@ -87,7 +87,7 @@ class DashboardStep extends Component<Props, State> {
       return {error: false, payload: selectedProtoboards}
     } catch (err) {
       notify(notifyDashboardCreationFailed(countNew))
-      return {error: true, payload: null}
+      return {error: true, payload: dashboardsCreated}
     }
   }
 
