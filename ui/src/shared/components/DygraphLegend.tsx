@@ -275,9 +275,6 @@ class DygraphLegend extends PureComponent<Props, State> {
       hoverTime,
     } = this.props
 
-    // const {pageX} = this.state
-
-    // const cursorOffset = 16
     const legendHoverX = dygraph.toDomXCoord(hoverTime)
     return makeLegendStyles(graphDiv, this.legendRef, legendHoverX)
   }
