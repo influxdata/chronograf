@@ -35,6 +35,7 @@ interface RenderProps {
 interface Props {
   source: Source
   cellType?: CellType
+  manualRefresh?: number
   queries: Query[]
   timeRange: TimeRange
   children: (r: RenderProps) => JSX.Element
@@ -104,6 +105,7 @@ class TimeSeries extends Component<Props, State> {
       'inView',
       'templates',
       'cellType',
+      'manualRefresh',
     ]
 
     return (
@@ -265,13 +267,14 @@ class TimeSeries extends Component<Props, State> {
     return null
   }
 
-  private isPropsDifferent(nextProps: Props) {
-    const isSourceDifferent = !_.isEqual(this.props.source, nextProps.source)
+  private isPropsDifferent(prevProps: Props) {
+    const isSourceDifferent = !_.isEqual(this.props.source, prevProps.source)
 
     return (
-      this.props.inView !== nextProps.inView ||
-      !!this.queryDifference(this.props.queries, nextProps.queries).length ||
-      !_.isEqual(this.props.templates, nextProps.templates) ||
+      this.props.manualRefresh !== prevProps.manualRefresh ||
+      this.props.inView !== prevProps.inView ||
+      !!this.queryDifference(this.props.queries, prevProps.queries).length ||
+      !_.isEqual(this.props.templates, prevProps.templates) ||
       isSourceDifferent
     )
   }
