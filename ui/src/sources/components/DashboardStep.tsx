@@ -135,18 +135,22 @@ class DashboardStep extends Component<Props, State> {
 
   private toggleChecked = (id: string) => () => {
     const {selected} = this.state
+    const {dashboardsCreated} = this.props
 
     const newSelected = selected
+    const dashboardAlreadyCreated = dashboardsCreated.find(d => d.id === id)
 
-    if (selected[id]) {
-      newSelected[id] = false
-    } else {
-      newSelected[id] = true
+    if (!dashboardAlreadyCreated) {
+      if (selected[id]) {
+        newSelected[id] = false
+      } else {
+        newSelected[id] = true
+      }
+
+      this.setState({
+        selected: newSelected,
+      })
     }
-
-    this.setState({
-      selected: newSelected,
-    })
   }
 }
 
