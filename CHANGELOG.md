@@ -8,6 +8,7 @@
 1.  [#4241](https://github.com/influxdata/chronograf/pull/4241): Add search attributes to log viewer
 1.  [#4254](https://github.com/influxdata/chronograf/pull/4254): Add Dynamic Source option to CEO source selector
 1.  [#4257](https://github.com/influxdata/chronograf/pull/4257): Introduce cell notes & note cells
+1.  [#4287](https://github.com/influxdata/chronograf/pull/4287): Add time selector dropdown to CEO
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application

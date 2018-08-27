@@ -59,6 +59,7 @@ interface Props {
   ) => JSX.Element
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
+  updateEditorTimeRange: (timeRange: TimeRange) => void
 }
 
 interface State {
@@ -87,7 +88,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {services} = this.props
+    const {services, timeRange, updateEditorTimeRange} = this.props
     const {useDynamicSource} = this.state
     const horizontalDivisions = [
       {
@@ -121,6 +122,8 @@ class TimeMachine extends PureComponent<Props, State> {
           onChangeService={this.handleChangeService}
           onSelectDynamicSource={this.handleSelectDynamicSource}
           isDynamicSourceSelected={useDynamicSource}
+          timeRange={timeRange}
+          updateEditorTimeRange={updateEditorTimeRange}
         />
         <div className="deceo--container">
           <Threesizer

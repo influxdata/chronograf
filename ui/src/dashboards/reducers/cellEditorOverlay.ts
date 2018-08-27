@@ -24,7 +24,7 @@ import {
 import {initializeOptions} from 'src/dashboards/constants/cellEditor'
 
 // types
-import {CellType, Cell} from 'src/types'
+import {CellType, Cell, TimeRange} from 'src/types'
 import {CellQuery, ThresholdType, TableOptions} from 'src/types/dashboards'
 import {ThresholdColor, GaugeColor, LineColor} from 'src/types/colors'
 import {NewDefaultCell} from 'src/types/dashboards'
@@ -36,6 +36,7 @@ export interface CEOInitialState {
   gaugeColors: GaugeColor[]
   lineColors: LineColor[]
   queryDrafts: CellQuery[]
+  timeRange: TimeRange
 }
 
 export const initialState = {
@@ -45,12 +46,13 @@ export const initialState = {
   gaugeColors: DEFAULT_GAUGE_COLORS,
   lineColors: DEFAULT_LINE_COLORS,
   queryDrafts: null,
+  timeRange: null,
 }
 
 export default (state = initialState, action: Action): CEOInitialState => {
   switch (action.type) {
-    case ActionType.LoadCellForCEO: {
-      const {cell} = action.payload
+    case ActionType.LoadCEO: {
+      const {cell, timeRange} = action.payload
 
       const tableOptions = getDeep<TableOptions>(
         cell,
@@ -98,19 +100,22 @@ export default (state = initialState, action: Action): CEOInitialState => {
           gaugeColors,
           lineColors,
           queryDrafts,
+          timeRange,
         }
       }
       return {
         ...state,
         cell: {...cell, tableOptions},
         queryDrafts,
+        timeRange,
       }
     }
 
-    case ActionType.ClearCellFromCEO: {
+    case ActionType.ClearCEO: {
       const cell = null
+      const timeRange = null
 
-      return {...state, cell}
+      return {...state, cell, timeRange}
     }
 
     case ActionType.ChangeCellType: {
@@ -209,6 +214,12 @@ export default (state = initialState, action: Action): CEOInitialState => {
       const {queryDrafts} = action.payload
 
       return {...state, queryDrafts}
+    }
+
+    case ActionType.UpdateEditorTimeRange: {
+      const {timeRange} = action.payload
+
+      return {...state, timeRange}
     }
   }
 
