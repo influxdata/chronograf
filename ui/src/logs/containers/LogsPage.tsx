@@ -396,93 +396,97 @@ class LogsPage extends Component<Props, State> {
     const {histogramColors} = this.state
 
     return (
-      <AutoSizer>
-        {({width, height}) => (
-          <HistogramChart
-            data={histogramData}
-            width={width}
-            height={height}
-            colorScale={colorForSeverity}
-            colors={histogramColors}
-            onBarClick={this.handleBarClick}
-            sortBarGroups={this.handleSortHistogramBarGroups}
-          >
-            {({xScale, adjustedHeight, margins}) => {
-              const x = xScale(new Date(timeOption).valueOf())
-              const y1 = margins.top
-              const y2 = margins.top + adjustedHeight
-              const textSize = 11
-              const markerSize = 5
-              const labelSize = 100
+      <div className="logs-viewer--graph">
+        <AutoSizer>
+          {({width, height}) => (
+            <HistogramChart
+              data={histogramData}
+              width={width}
+              height={height}
+              colorScale={colorForSeverity}
+              colors={histogramColors}
+              onBarClick={this.handleBarClick}
+              sortBarGroups={this.handleSortHistogramBarGroups}
+            >
+              {({xScale, adjustedHeight, margins}) => {
+                const x = xScale(new Date(timeOption).valueOf())
+                const y1 = margins.top
+                const y2 = margins.top + adjustedHeight
+                const textSize = 11
+                const markerSize = 5
+                const labelSize = 100
 
-              if (timeOption === 'now') {
-                return null
-              } else {
-                const lineContainerWidth = 3
-                const lineWidth = 1
+                if (timeOption === 'now') {
+                  return null
+                } else {
+                  const lineContainerWidth = 3
+                  const lineWidth = 1
 
-                return (
-                  <>
-                    <svg
-                      width={lineContainerWidth}
-                      height={height}
-                      style={{
-                        position: 'absolute',
-                        left: `${x}px`,
-                        top: '0px',
-                        transform: 'translateX(-50%)',
-                      }}
-                    >
-                      <line
-                        x1={(lineContainerWidth - lineWidth) / 2}
-                        x2={(lineContainerWidth - lineWidth) / 2}
-                        y1={y1 + markerSize / 2}
-                        y2={y2}
-                        stroke={Greys.White}
-                        strokeWidth={`${lineWidth}`}
-                      />
-                    </svg>
-                    <svg
-                      width={x}
-                      height={textSize + textSize / 2}
-                      style={{
-                        position: 'absolute',
-                        left: `${x - markerSize - labelSize}px`,
-                      }}
-                    >
-                      <text
-                        style={{fontSize: textSize, fontWeight: 600}}
-                        x={0}
-                        y={textSize}
-                        height={textSize}
-                        fill={Greys.Sidewalk}
+                  return (
+                    <>
+                      <svg
+                        width={lineContainerWidth}
+                        height={height}
+                        style={{
+                          position: 'absolute',
+                          left: `${x}px`,
+                          top: '0px',
+                          transform: 'translateX(-50%)',
+                        }}
                       >
-                        Current Timestamp
-                      </text>
-                      <ellipse
-                        cx={labelSize + markerSize - 0.5}
-                        cy={textSize / 2 + markerSize / 2}
-                        rx={markerSize / 2}
-                        ry={markerSize / 2}
-                        fill={Greys.White}
-                      />
-                      <text
-                        style={{fontSize: textSize, fontWeight: 600}}
-                        x={labelSize + markerSize / 2 + textSize}
-                        y={textSize}
-                        height={textSize}
-                        fill={Greys.Sidewalk}
+                        <line
+                          x1={(lineContainerWidth - lineWidth) / 2}
+                          x2={(lineContainerWidth - lineWidth) / 2}
+                          y1={y1 + markerSize / 2}
+                          y2={y2}
+                          stroke={Greys.White}
+                          strokeWidth={`${lineWidth}`}
+                        />
+                      </svg>
+                      <svg
+                        width={x}
+                        height={textSize + textSize / 2}
+                        style={{
+                          position: 'absolute',
+                          left: `${x - markerSize - labelSize}px`,
+                        }}
                       >
-                        {moment(timeOption).format('YYYY-MM-DD | HH:mm:ss.SSS')}
-                      </text>
-                    </svg>
-                  </>
-                )
-              }
-            }}
-          </HistogramChart>
-        )}
-      </AutoSizer>
+                        <text
+                          style={{fontSize: textSize, fontWeight: 600}}
+                          x={0}
+                          y={textSize}
+                          height={textSize}
+                          fill={Greys.Sidewalk}
+                        >
+                          Current Timestamp
+                        </text>
+                        <ellipse
+                          cx={labelSize + markerSize - 0.5}
+                          cy={textSize / 2 + markerSize / 2}
+                          rx={markerSize / 2}
+                          ry={markerSize / 2}
+                          fill={Greys.White}
+                        />
+                        <text
+                          style={{fontSize: textSize, fontWeight: 600}}
+                          x={labelSize + markerSize / 2 + textSize}
+                          y={textSize}
+                          height={textSize}
+                          fill={Greys.Sidewalk}
+                        >
+                          {moment(timeOption).format(
+                            'YYYY-MM-DD | HH:mm:ss.SSS'
+                          )}
+                        </text>
+                      </svg>
+                    </>
+                  )
+                }
+              }}
+            </HistogramChart>
+          )}
+        </AutoSizer>
+      </div>
     )
   }
 

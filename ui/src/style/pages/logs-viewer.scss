@@ -30,8 +30,11 @@ $logs-viewer-gutter: 60px;
   align-items: center;
   flex-wrap: nowrap;
   justify-content: space-between;
+  margin-bottom: $ix-marg-b;
+}
 
-
+.logs-viewer--graph {
+  flex: 1 0 calc(100% - 38px);
 }
 
 .logs-viewer--search-bar {
