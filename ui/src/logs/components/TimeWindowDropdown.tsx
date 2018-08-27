@@ -12,7 +12,7 @@ class TimeWindowDropdown extends Component<Props> {
   public render() {
     return (
       <Dropdown
-        className="dropdown-90"
+        className="dropdown-120"
         selected={this.selected}
         onChoose={this.handleChoose}
         buttonSize="btn-sm"
@@ -28,10 +28,10 @@ class TimeWindowDropdown extends Component<Props> {
     } = this.props
 
     if (timeOption === 'now') {
-      return `- ${windowOption}`
+      return `Past ${windowOption}`
     }
 
-    return `+/- ${windowOption}`
+    return `${windowOption} Window`
   }
 
   private handleChoose = (dropdownItem): void => {

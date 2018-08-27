@@ -36,6 +36,7 @@ import {getSourcesAsync} from 'src/shared/actions/sources'
 import LogsHeader from 'src/logs/components/LogsHeader'
 import HistogramChart from 'src/shared/components/HistogramChart'
 import LogsGraphContainer from 'src/logs/components/LogsGraphContainer'
+import TimeWindowDropdown from 'src/logs/components/TimeWindowDropdown'
 import OptionsOverlay from 'src/logs/components/OptionsOverlay'
 import SearchBar from 'src/logs/components/LogsSearchBar'
 import FilterBar from 'src/logs/components/LogsFilterBar'
@@ -212,8 +213,10 @@ class LogsPage extends Component<Props, State> {
         <div className="page">
           {this.header}
           <div className="page-contents logs-viewer">
-            <QueryResults count={this.histogramTotal} queryCount={queryCount} />
-            <LogsGraphContainer>{this.chart}</LogsGraphContainer>
+            <LogsGraphContainer>
+              {this.chartControlBar}
+              {this.chart}
+            </LogsGraphContainer>
             <SearchBar onSearch={this.handleSubmitSearch} />
             <FilterBar
               filters={filters || []}
@@ -496,14 +499,11 @@ class LogsPage extends Component<Props, State> {
       currentSource,
       currentNamespaces,
       currentNamespace,
-      timeRange,
       tableTime,
     } = this.props
 
     return (
       <LogsHeader
-        timeRange={timeRange}
-        onSetTimeWindow={this.handleSetTimeWindow}
         liveUpdating={this.liveUpdatingStatus}
         availableSources={sources}
         onChooseSource={this.handleChooseSource}
@@ -518,6 +518,32 @@ class LogsPage extends Component<Props, State> {
         onChooseCustomTime={this.handleChooseCustomTime}
         onChooseRelativeTime={this.handleChooseRelativeTime}
       />
+    )
+  }
+
+  private get chartControlBar(): JSX.Element {
+    const {queryCount} = this.props
+
+    const timeRange = getDeep(this.props, 'timeRange', {
+      upper: null,
+      lower: 'now() - 1m',
+      seconds: 60,
+      windowOption: '1m',
+      timeOption: 'now',
+    })
+
+    return (
+      <div className="logs-viewer--graph-controls">
+        <QueryResults
+          count={this.histogramTotal}
+          queryCount={queryCount}
+          isInsideHistogram={true}
+        />
+        <TimeWindowDropdown
+          selectedTimeWindow={timeRange}
+          onSetTimeWindow={this.handleSetTimeWindow}
+        />
+      </div>
     )
   }
 

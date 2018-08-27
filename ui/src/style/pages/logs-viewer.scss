@@ -17,10 +17,21 @@ $logs-viewer-gutter: 60px;
 }
 
 .logs-viewer--graph-container {
-  padding: 22px $logs-viewer-gutter 10px $logs-viewer-gutter;
+  padding: $ix-marg-b $logs-viewer-gutter;
   height: $logs-viewer-graph-height;
   @include gradient-v($g2-kevlar, $g0-obsidian);
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.logs-viewer--graph-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+
+
 }
 
 .logs-viewer--search-bar {
@@ -61,9 +72,7 @@ $logs-viewer-gutter: 60px;
 
 .logs-viewer--results-text {
   margin: 0;
-  margin-top: 12px;
   margin-right: $logs-viewer-results-text-indent;
-  text-align: right;
   padding: 0;
   font-size: 13px;
   line-height: 13px;
