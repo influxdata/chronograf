@@ -9,12 +9,13 @@
 .dygraph-legend {
   background-color: $g0-obsidian;
   display: block !important;
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
   padding: 8px;
   z-index: $dygraph-legend-z;
   border-radius: 3px;
   user-select: text;
-  transform: translateX(-50%);
   @extend %drop-shadow;
 
   &.hidden {

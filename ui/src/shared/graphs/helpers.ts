@@ -1,5 +1,6 @@
 /* eslint-disable no-magic-numbers */
 import {toRGB_} from 'dygraphs/src/dygraph-utils'
+import {CSSProperties} from 'react'
 
 export const LINE_COLORS = [
   '#00C9FF',
@@ -102,64 +103,53 @@ export const barPlotter = e => {
   }
 }
 
-export const makeLegendStyles = (graph, legend, hoverTimeX) => {
-  if (!graph || !legend || hoverTimeX === null) {
+export const makeLegendStyles = (
+  graphDiv,
+  legendDiv,
+  legendMouseX
+): CSSProperties => {
+  if (!graphDiv || !legendDiv || legendMouseX === null) {
     return {}
   }
 
-  // Move the Legend on hover
-  const chronografChromeSize = 60 // Width & Height of navigation page elements
-  const graphRect = graph.getBoundingClientRect()
-  const legendRect = legend.getBoundingClientRect()
+  const graphRect = graphDiv.getBoundingClientRect()
+  const legendRect = legendDiv.getBoundingClientRect()
 
-  const graphWidth = graphRect.width + 32 // Factoring in padding from parent
-  const graphHeight = graphRect.height
-  const graphBottom = graphRect.bottom
-  const legendWidth = legendRect.width
-  const legendHeight = legendRect.height
-  const screenHeight = window.innerHeight
-  const legendMaxLeft = graphWidth - legendWidth / 2
+  const mouseX = legendMouseX > 0 ? legendMouseX : 0
+  const halfLegendWidth = legendRect.width / 2
 
-  let marginTop = 0
-  let legendLeft = hoverTimeX
+  const minimumX = 0
+  const maximumX = graphRect.width - legendRect.width
 
-  // Enforcing max & min legend offsets
-  if (hoverTimeX < legendWidth / 2) {
-    legendLeft = legendWidth / 2
-  } else if (hoverTimeX > legendMaxLeft) {
-    legendLeft = legendMaxLeft
+  const minimumY = -60
+
+  let translateX = mouseX - halfLegendWidth
+  let translateY = graphRect.height
+
+  // Enforce Left Edge of Graph
+  if (mouseX - halfLegendWidth < minimumX) {
+    translateX = 0
   }
 
-  // Disallow screen overflow of legend
-  const isLegendBottomClipped = graphBottom + legendHeight > screenHeight
-  const isLegendTopClipped = legendHeight > graphRect.top - chronografChromeSize
-  const willLegendFitLeft = hoverTimeX - chronografChromeSize > legendWidth
-
-  let legendTop = graphHeight + 8
-
-  // If legend is only clipped on the bottom, position above graph
-  if (isLegendBottomClipped && !isLegendTopClipped) {
-    legendTop = -legendHeight
-    marginTop = 7
+  // Enforce Right Edge of Graph
+  if (mouseX - halfLegendWidth >= maximumX) {
+    translateX = maximumX
   }
 
-  // If legend is clipped on top and bottom, posiition on either side of crosshair
-  if (isLegendBottomClipped && isLegendTopClipped) {
-    legendTop = 0
+  // Prevent Legend from rendering off screen
+  const rightMargin = window.innerWidth - (mouseX + graphRect.left)
+  const LEGEND_BUFFER = 14
+  if (window.innerHeight - graphRect.bottom < legendRect.height) {
+    translateX = mouseX + LEGEND_BUFFER
+    translateY = minimumY
 
-    if (willLegendFitLeft) {
-      legendLeft = hoverTimeX - legendWidth / 2
-      legendLeft -= 8
-    } else {
-      legendLeft = hoverTimeX + legendWidth / 2
-      legendLeft += 32
+    if (rightMargin < legendRect.width + LEGEND_BUFFER) {
+      translateX = mouseX - (legendRect.width + LEGEND_BUFFER)
     }
   }
 
   return {
-    left: `${legendLeft}px`,
-    top: `${legendTop}px`,
-    marginTop: `${marginTop}px`,
+    transform: `translate(${translateX}px, ${translateY}px)`,
   }
 }
 
