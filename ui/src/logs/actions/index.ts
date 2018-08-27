@@ -79,10 +79,23 @@ export enum ActionTypes {
   SetTableForwardData = 'SET_TABLE_FORWARD_DATA',
   SetTableBackwardData = 'SET_TABLE_BACKWARD_DATA',
   ClearRowsAdded = 'CLEAR_ROWS_ADDED',
+  ClearTableData = 'CLEAR_TABLE_DATA',
+  AppendOlderLogs = 'APPEND_OLDER_LOGS',
+}
+
+export interface AppendOlderLogsAction {
+  type: ActionTypes.AppendOlderLogs
+  payload: {
+    logSeries: TableData
+  }
 }
 
 export interface ClearRowsAddedAction {
   type: ActionTypes.ClearRowsAdded
+}
+
+export interface ClearTableDataAction {
+  type: ActionTypes.ClearTableData
 }
 
 export interface SetTableForwardDataAction {
@@ -258,6 +271,8 @@ export type Action =
   | SetTableForwardDataAction
   | SetTableBackwardDataAction
   | ClearRowsAddedAction
+  | ClearTableDataAction
+  | AppendOlderLogsAction
 
 const getTimeRange = (state: State): TimeRange | null =>
   getDeep<TimeRange | null>(state, 'logs.timeRange', null)
@@ -294,8 +309,19 @@ const getTableSelectedTime = (state: State): string => {
     .toISOString()
 }
 
+export const clearTableData = () => ({
+  type: ActionTypes.ClearTableData,
+})
+
 export const clearRowsAdded = () => ({
   type: ActionTypes.ClearRowsAdded,
+})
+
+export const appendOlderLogs = (logSeries: TableData) => ({
+  type: ActionTypes.AppendOlderLogs,
+  payload: {
+    logSeries,
+  },
 })
 
 export const setTableCustomTime = (time: string): SetTableCustomTimeAction => ({
@@ -343,7 +369,6 @@ export const executeTableNewerQueryAsync = () => async (
   dispatch,
   getState: GetState
 ) => {
-  console.log('executeTableNewerQueryAsync')
   const state = getState()
 
   const startTime = getTableSelectedTime(state)
@@ -400,7 +425,6 @@ export const executeTableOlderQueryAsync = () => async (
   dispatch,
   getState: GetState
 ) => {
-  console.log('executeTableOlderQueryAsync')
   const state = getState()
 
   const time = getTableSelectedTime(state)
@@ -530,7 +554,6 @@ export const incrementQueryCount = () => ({
 })
 
 export const executeQueriesAsync = () => async dispatch => {
-  console.log('executeQueriesAsync')
   try {
     await Promise.all([
       dispatch(executeHistogramQueryAsync()),
@@ -596,18 +619,15 @@ export const setTableQueryConfigAsync = () => async (
   }
 }
 
-export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
-  dispatch,
-  getState
-): Promise<void> => {
-  console.log('fetchOlderLogsAsync')
+export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
+  console.log('FETCHING ')
   const state = getState()
+  const currentLowerTime = getDeep(state, 'logs.currentLowerTime', Date.now())
+  const chunkDuration = getDeep(state, 'logs.chunkDuration', 5000)
+  const nextLowerTime = currentLowerTime - chunkDuration
+  const upper = moment(currentLowerTime).toISOString()
+  const lower = moment(nextLowerTime).toISOString()
   const tableQueryConfig = getTableQueryConfig(state)
-  const timeRange = {lower: queryTimeEnd}
-  const newQueryConfig = {
-    ...tableQueryConfig,
-    range: timeRange,
-  }
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
   const searchTerm = getSearchTerm(state)
@@ -615,19 +635,10 @@ export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const queryTimeStart = await findOlderLowerTimeBounds(
-      queryTimeEnd,
-      newQueryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
-
     const query = await buildInfiniteScrollLogQuery(
-      queryTimeStart,
-      queryTimeEnd,
-      newQueryConfig,
+      lower,
+      upper,
+      tableQueryConfig,
       filters,
       searchTerm
     )
@@ -638,16 +649,63 @@ export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
       `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
     )
 
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
-    await dispatch(ConcatMoreLogs(series))
+    const logs = getDeep(response, 'results.0.series.0', defaultTableData)
+
+    await dispatch(appendOlderLogs(logs))
   }
 }
+
+// export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
+//   dispatch,
+//   getState
+// ): Promise<void> => {
+//   console.log('fetchOlderLogsAsync')
+//   const state = getState()
+//   const tableQueryConfig = getTableQueryConfig(state)
+//   const timeRange = {lower: queryTimeEnd}
+//   const newQueryConfig = {
+//     ...tableQueryConfig,
+//     range: timeRange,
+//   }
+//   const namespace = getNamespace(state)
+//   const proxyLink = getProxyLink(state)
+//   const searchTerm = getSearchTerm(state)
+//   const filters = getFilters(state)
+//   const params = [namespace, proxyLink, tableQueryConfig]
+
+//   if (_.every(params)) {
+//     const queryTimeStart = await findOlderLowerTimeBounds(
+//       queryTimeEnd,
+//       newQueryConfig,
+//       filters,
+//       searchTerm,
+//       proxyLink,
+//       namespace
+//     )
+
+//     const query = await buildInfiniteScrollLogQuery(
+//       queryTimeStart,
+//       queryTimeEnd,
+//       newQueryConfig,
+//       filters,
+//       searchTerm
+//     )
+
+//     const response = await executeQueryAsync(
+//       proxyLink,
+//       namespace,
+//       `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
+//     )
+
+//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
+//     await dispatch(ConcatMoreLogs(series))
+//   }
+// }
 
 export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
   dispatch,
   getState
 ): Promise<void> => {
-  console.log('fetchNewerLogsAsync')
   const state = getState()
   const tableQueryConfig = getTableQueryConfig(state)
   const timeRange = {lower: queryTimeStart}
@@ -770,7 +828,7 @@ export const getLogConfigAsync = (url: string) => async (
   try {
     const {data} = await getLogConfigAJAX(url)
     const logConfig = logConfigServerToUI(data)
-    dispatch(setConfig(logConfig))
+    await dispatch(setConfig(logConfig))
   } catch (error) {
     console.error(error)
   }

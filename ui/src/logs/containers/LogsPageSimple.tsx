@@ -32,6 +32,7 @@ import {
   fetchNewerLogsAsync,
   getLogConfigAsync,
   updateLogConfigAsync,
+  clearTableData,
 } from 'src/logs/actions'
 import {getSourcesAsync} from 'src/shared/actions/sources'
 import LogsHeader from 'src/logs/components/LogsHeader'
@@ -88,7 +89,6 @@ interface Props {
   executeQueriesAsync: () => void
   setTableRelativeTime: (time: number) => void
   setTableCustomTime: (time: string) => void
-  fetchOlderLogsAsync: (queryTimeEnd: string) => Promise<void>
   fetchNewerLogsAsync: (queryTimeEnd: string) => Promise<void>
   addFilter: (filter: Filter) => void
   removeFilter: (id: string) => void
@@ -113,6 +113,7 @@ interface Props {
     custom: string
     relative: number
   }
+  fetchOlderLogsAsync: () => Promise<void>
 }
 
 interface State {
@@ -189,7 +190,8 @@ class LogsPageSimple extends Component<Props, State> {
 
   public async componentDidMount() {
     await this.props.getSources()
-    this.props.getConfig(this.logConfigLink)
+    await this.props.getConfig(this.logConfigLink)
+    console.log('Start')
 
     if (this.props.currentNamespace) {
       this.startOlderLogsFetching()
@@ -206,10 +208,6 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   public render() {
-    console.log(
-      'LogsPageSimple render with tableInfiniteData',
-      this.props.tableInfiniteData
-    )
     const {filters, queryCount, timeRange, notify} = this.props
     const {searchStatus} = this.state
 
@@ -267,6 +265,10 @@ class LogsPageSimple extends Component<Props, State> {
     console.log(
       `fetchOlderLogs: await executeQueryAsync next older window, then do the next window`
     )
+    console.log('RUNNING')
+    // setInterval(() => {
+    this.fetchOlderLogs()
+    // }, 5000)
   }
 
   private startNewerLogsFetchingInterval = () => {
@@ -291,6 +293,10 @@ class LogsPageSimple extends Component<Props, State> {
     )
   }
 
+  private fetchOlderLogs = () => {
+    console.log('FETCH OLDER')
+    this.props.fetchOlderLogsAsync()
+  }
   private fetchNewer = (time: string) => {
     // this.loadingNewer = true
     // this.props.fetchNewerLogsAsync(time)
@@ -370,7 +376,6 @@ class LogsPageSimple extends Component<Props, State> {
       columns: forwardData.columns,
       values: [...forwardData.values, ...backwardData.values],
     }
-    console.log('tableData data', data)
     return data
   }
 
@@ -645,7 +650,6 @@ class LogsPageSimple extends Component<Props, State> {
   private fetchSearchDataset = async (
     searchStatus: SearchStatus
   ): Promise<void> => {
-    console.log('fetchSearchDataset stub')
     return Promise.resolve()
     // try {
     //   this.setState({searchStatus})
@@ -656,7 +660,6 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchNewDataset() {
-    console.log('fetchNewDataset stub')
     return Promise.resolve()
     // return this.props.executeQueriesAsync()
   }
@@ -786,6 +789,7 @@ const mapDispatchToProps = {
   setTimeMarker,
   setNamespaceAsync,
   executeQueriesAsync,
+  clearTableData,
   addFilter,
   removeFilter,
   changeFilter,

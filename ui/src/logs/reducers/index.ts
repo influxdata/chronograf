@@ -11,6 +11,7 @@ import {
   ConcatMoreLogsAction,
   PrependMoreLogsAction,
   SetConfigsAction,
+  AppendOlderLogs,
 } from 'src/logs/actions'
 
 import {SeverityFormatOptions, DEFAULT_TRUNCATION} from 'src/logs/constants'
@@ -40,6 +41,10 @@ export const defaultState: LogsState = {
     windowOption: '1m',
     timeOption: 'now',
   },
+  tableInfiniteData: {
+    forward: defaultTableData,
+    backward: defaultTableData,
+  },
   currentNamespace: null,
   histogramQueryConfig: null,
   tableQueryConfig: null,
@@ -54,11 +59,21 @@ export const defaultState: LogsState = {
     isTruncated: DEFAULT_TRUNCATION,
   },
   tableTime: {},
-  tableInfiniteData: {
-    forward: defaultTableData,
-    backward: defaultTableData,
-  },
+  currentLowerTime: null,
+  currentUpperTime: null,
+  chunkDuration: 5000,
   newRowsAdded: 0,
+  tableLogs: defaultTableData,
+}
+
+const clearTableData = (state: LogsState) => {
+  return {
+    ...state,
+    tableInfiniteData: {
+      forward: defaultTableData,
+      backward: defaultTableData,
+    },
+  }
 }
 
 const removeFilter = (
@@ -116,7 +131,6 @@ const concatMoreLogs = (
   state: LogsState,
   action: ConcatMoreLogsAction
 ): LogsState => {
-  console.log('concatMoreLogs')
   const {
     series: {values},
   } = action.payload
@@ -143,7 +157,6 @@ const prependMoreLogs = (
   const {
     series: {values},
   } = action.payload
-  console.log('prependMoreLogs')
   const {tableInfiniteData} = state
   const {forward} = tableInfiniteData
   const vals = [...values, ...forward.values]
@@ -179,6 +192,22 @@ export const setConfigs = (state: LogsState, action: SetConfigsAction) => {
   return {...state, logConfig: updatedLogConfig}
 }
 
+const appendLogs = (state: LogsState, action: AppendOlderLogs) => {
+  const {tableLogs} = state
+  const {logSeries} = action.payload
+  const values = [...tableLogs.values, ...logSeries.values]
+
+  console.log(values.length)
+  console.log(_.uniqBy(values, '0').length)
+  return {
+    ...state,
+    tableLogs: {
+      columns: logSeries.columns,
+      values,
+    },
+  }
+}
+
 export default (state: LogsState = defaultState, action: Action) => {
   switch (action.type) {
     case ActionTypes.SetSource:
@@ -206,8 +235,9 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, tableData: action.payload.data}
     case ActionTypes.ClearRowsAdded:
       return {...state, newRowsAdded: null}
+    case ActionTypes.AppendOlderLogs:
+      return appendLogs(state, action)
     case ActionTypes.SetTableForwardData:
-      console.log('reducer SetTableForwardData')
       return {
         ...state,
         tableInfiniteData: {
@@ -216,7 +246,6 @@ export default (state: LogsState = defaultState, action: Action) => {
         },
       }
     case ActionTypes.SetTableBackwardData:
-      console.log('reducer SetTableBackwardData')
       return {
         ...state,
         tableInfiniteData: {
@@ -244,6 +273,8 @@ export default (state: LogsState = defaultState, action: Action) => {
       return prependMoreLogs(state, action)
     case ActionTypes.SetConfig:
       return setConfigs(state, action)
+    case ActionTypes.ClearTableData:
+      return clearTableData(state)
     default:
       return state
   }
