@@ -73,7 +73,10 @@ class RefreshingGraph extends PureComponent<Props> {
   private timeSeries: React.RefObject<TimeSeries> = React.createRef()
 
   public componentDidUpdate() {
-    if (this.props.isInCEO && this.props.type !== CellType.Note) {
+    if (!this.timeSeries.current) {
+      return
+    }
+    if (this.props.isInCEO) {
       this.timeSeries.current.forceUpdate()
     }
   }
@@ -87,6 +90,7 @@ class RefreshingGraph extends PureComponent<Props> {
       cellNote,
       timeRange,
       templates,
+      manualRefresh,
       editQueryStatus,
       cellNoteVisibility,
       grabDataForDownload,
@@ -107,6 +111,7 @@ class RefreshingGraph extends PureComponent<Props> {
     return (
       <TimeSeries
         ref={this.timeSeries}
+        manualRefresh={manualRefresh}
         source={source}
         cellType={type}
         inView={inView}
