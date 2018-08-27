@@ -3,11 +3,16 @@ import React, {PureComponent} from 'react'
 interface Props {
   count: number
   queryCount: number
+  isInsideHistogram?: boolean
 }
 
 class QueryResults extends PureComponent<Props> {
+  public static defaultProps: Partial<Props> = {
+    isInsideHistogram: false,
+  }
+
   public render() {
-    const {count} = this.props
+    const {count, isInsideHistogram} = this.props
 
     let contents = (
       <>
@@ -15,8 +20,20 @@ class QueryResults extends PureComponent<Props> {
       </>
     )
 
+    if (isInsideHistogram) {
+      contents = (
+        <>
+          Displaying <strong>{count} Events</strong> in Histogram
+        </>
+      )
+    }
+
     if (this.isPending) {
       contents = <>Querying...</>
+    }
+
+    if (this.isPending && isInsideHistogram) {
+      contents = <>Updating Histogram...</>
     }
 
     return <label className="logs-viewer--results-text">{contents}</label>
