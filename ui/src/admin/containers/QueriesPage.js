@@ -79,9 +79,9 @@ class QueriesPage extends Component {
     })
   }
 
-  handleKillQuery = id => {
+  handleKillQuery = query => {
     const {source, killQuery} = this.props
-    killQuery(source.links.proxy, id)
+    killQuery(source.links.proxy, query)
   }
 }
 

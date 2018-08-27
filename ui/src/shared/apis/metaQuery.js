@@ -24,8 +24,14 @@ export function showQueries(source, db) {
   return proxy({source, query, db})
 }
 
-export function killQuery(source, queryID) {
-  const query = `KILL QUERY ${queryID}`
+export function killQuery(source, queryID, tcpHost) {
+  let query
+
+  if (tcpHost) {
+    query = `KILL QUERY ${queryID} ON "${tcpHost}"`
+  } else {
+    query = `KILL QUERY ${queryID}`
+  }
 
   return proxy({source, query})
 }
