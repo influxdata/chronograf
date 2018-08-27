@@ -127,7 +127,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   putDashboardByID: typeof dashboardActions.putDashboardByID
   getDashboardsAsync: typeof dashboardActions.getDashboardsAsync
   addDashboardCellAsync: typeof dashboardActions.addDashboardCellAsync
-  editCellQueryStatus: typeof dashboardActions.editCellQueryStatus
+  editCellQueryStatus: () => void
   updateDashboardCell: typeof dashboardActions.updateDashboardCell
   cloneDashboardCellAsync: typeof dashboardActions.cloneDashboardCellAsync
   deleteDashboardCellAsync: typeof dashboardActions.deleteDashboardCellAsync

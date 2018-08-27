@@ -30,7 +30,6 @@ import {
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 // Actions
-import {editCellQueryStatus} from 'src/dashboards/actions'
 import {
   validateSuccess,
   fluxTimeSeriesError,
@@ -72,6 +71,29 @@ import {
   ScriptStatus,
 } from 'src/types/flux'
 import {UpdateScript} from 'src/flux/actions'
+import {
+  Axes,
+  CellType,
+  FieldOption,
+  TableOptions,
+  DecimalPlaces,
+  CellNoteVisibility,
+} from 'src/types/dashboards'
+import {ColorNumber, ColorString} from 'src/types/colors'
+
+interface VisualizationOptions {
+  type: CellType
+  axes: Axes | null
+  tableOptions: TableOptions
+  fieldOptions: FieldOption[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  note: string
+  noteVisibility: CellNoteVisibility
+  thresholdsListColors: ColorNumber[]
+  gaugeColors: ColorNumber[]
+  lineColors: ColorString[]
+}
 
 interface Props {
   fluxLinks: Links
@@ -90,7 +112,7 @@ interface Props {
   deleteQuery: typeof deleteQueryAsync
   queryConfigActions: QueryConfigActions
   notify: NotificationAction
-  editQueryStatus: typeof editCellQueryStatus
+  editQueryStatus: () => void
   updateQueryDrafts: (queryDrafts: CellQuery[]) => void
   updateEditorTimeRange: (timeRange: TimeRange) => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
@@ -98,6 +120,7 @@ interface Props {
     activeEditorTab: CEOTabs,
     onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
   ) => JSX.Element
+  visualizationOptions: VisualizationOptions
 }
 
 interface Body extends FlatBody {
@@ -255,6 +278,7 @@ class TimeMachine extends PureComponent<Props, State> {
       isInCEO,
       source,
       isStaticLegend,
+      visualizationOptions,
     } = this.props
     const {autoRefresher} = this.state
 
@@ -273,6 +297,7 @@ class TimeMachine extends PureComponent<Props, State> {
           editQueryStatus={editQueryStatus}
           staticLegend={isStaticLegend}
           isInCEO={isInCEO}
+          {...visualizationOptions}
         />
       </div>
     )

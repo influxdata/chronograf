@@ -10,7 +10,7 @@ import CEOHeader from 'src/dashboards/components/CEOHeader'
 // Utils
 import {getDeep} from 'src/utils/wrappers'
 import {buildQuery} from 'src/utils/influxql'
-import {editCellQueryStatus} from 'src/dashboards/actions'
+// import {editCellQueryStatus} from 'src/dashboards/actions'
 import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 
 // Constants
@@ -44,13 +44,27 @@ interface QueryStatus {
   status: QueriesModels.Status
 }
 
+interface VisualizationOptions {
+  type: DashboardsModels.CellType
+  axes: DashboardsModels.Axes | null
+  tableOptions: DashboardsModels.TableOptions
+  fieldOptions: DashboardsModels.FieldOption[]
+  timeFormat: string
+  decimalPlaces: DashboardsModels.DecimalPlaces
+  note: string
+  noteVisibility: DashboardsModels.CellNoteVisibility
+  thresholdsListColors: ColorsModels.ColorNumber[]
+  gaugeColors: ColorsModels.ColorNumber[]
+  lineColors: ColorsModels.ColorString[]
+}
+
 interface Props {
   fluxLinks: Links
   script: string
   sources: SourcesModels.Source[]
   services: Service[]
   notify: NotificationAction
-  editQueryStatus: typeof editCellQueryStatus
+  editQueryStatus: () => void
   onCancel: () => void
   onSave: (cell: DashboardsModels.Cell | NewDefaultCell) => void
   source: SourcesModels.Source
@@ -150,6 +164,7 @@ class CellEditorOverlay extends Component<Props, State> {
           addQuery={addQuery}
           deleteQuery={deleteQuery}
           updateEditorTimeRange={updateEditorTimeRange}
+          visualizationOptions={this.visualizationOptions}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader
@@ -182,6 +197,35 @@ class CellEditorOverlay extends Component<Props, State> {
         !!queryConfig.rawText
       )
     })
+  }
+
+  private get visualizationOptions(): VisualizationOptions {
+    const {cell, thresholdsListColors, gaugeColors, lineColors} = this.props
+
+    const {
+      type,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      note,
+      noteVisibility,
+    } = cell
+    const axes = _.get(cell, 'axes')
+
+    return {
+      type,
+      axes,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      note,
+      noteVisibility,
+      thresholdsListColors,
+      gaugeColors,
+      lineColors,
+    }
   }
 
   private onRef = (r: HTMLDivElement) => {

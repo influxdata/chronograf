@@ -1,5 +1,5 @@
 import React, {SFC} from 'react'
-import {connect} from 'react-redux'
+// import {connect} from 'react-redux'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 
@@ -31,7 +31,7 @@ interface Props {
   timeFormat: string
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
-  resizerTopHeight: number
+  resizerTopHeight?: number
   thresholdsListColors: ColorNumber[]
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
@@ -98,34 +98,34 @@ const DashVisualization: SFC<Props> = ({
   )
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {
-    thresholdsListColors,
-    gaugeColors,
-    lineColors,
-    cell: {
-      type,
-      axes,
-      tableOptions,
-      fieldOptions,
-      timeFormat,
-      decimalPlaces,
-      note,
-      noteVisibility,
-    },
-  },
-}) => ({
-  gaugeColors,
-  thresholdsListColors,
-  lineColors,
-  type,
-  axes,
-  tableOptions,
-  fieldOptions,
-  timeFormat,
-  decimalPlaces,
-  note,
-  noteVisibility,
-})
+// const mapStateToProps = ({
+//   cellEditorOverlay: {
+//     thresholdsListColors,
+//     gaugeColors,
+//     lineColors,
+//     cell: {
+//       type,
+//       axes,
+//       tableOptions,
+//       fieldOptions,
+//       timeFormat,
+//       decimalPlaces,
+//       note,
+//       noteVisibility,
+//     },
+//   },
+// }) => ({
+//   gaugeColors,
+//   thresholdsListColors,
+//   lineColors,
+//   type,
+//   axes,
+//   tableOptions,
+//   fieldOptions,
+//   timeFormat,
+//   decimalPlaces,
+//   note,
+//   noteVisibility,
+// })
 
-export default connect(mapStateToProps, null)(DashVisualization)
+export default DashVisualization
