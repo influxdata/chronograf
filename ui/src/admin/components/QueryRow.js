@@ -7,7 +7,7 @@ import {QUERIES_TABLE} from 'src/admin/constants/tableSizing'
 const QueryRow = ({query, onKill}) => {
   const {database, duration} = query
   const wrappedKill = () => {
-    onKill(query.id)
+    onKill(query)
   }
 
   return (

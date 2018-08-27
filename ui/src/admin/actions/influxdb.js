@@ -385,13 +385,13 @@ export const updateRetentionPolicyAsync = (
   }
 }
 
-export const killQueryAsync = (source, queryID) => async dispatch => {
+export const killQueryAsync = (source, query) => async dispatch => {
   // optimistic update
-  dispatch(killQuery(queryID))
+  dispatch(killQuery(query.id))
   dispatch(setQueryToKill(null))
   try {
     // kill query on server
-    await killQueryProxy(source, queryID)
+    await killQueryProxy(source, query.id, query.tcpHost)
   } catch (error) {
     dispatch(errorThrown(error))
     // TODO: handle failed killQuery
