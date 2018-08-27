@@ -21,6 +21,12 @@ import SearchBar from 'src/hosts/components/SearchBar'
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
+// Constants
+import {
+  notifyDashboardCreated,
+  notifyDashboardCreationFailed,
+} from 'src/shared/copy/notifications'
+
 // Types
 import {Protoboard} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
@@ -32,6 +38,7 @@ interface State {
 }
 
 interface Props {
+  notify: typeof notifyAction
   dashboardsCreated: Protoboard[]
 }
 
@@ -57,7 +64,7 @@ class DashboardStep extends Component<Props, State> {
 
   public next = async (): Promise<NextReturn> => {
     const {selected, protoboards} = this.state
-    const {dashboardsCreated} = this.props
+    const {dashboardsCreated, notify} = this.props
 
     const selectedProtoboards = protoboards.filter(p => selected[p.id])
 
@@ -68,13 +75,18 @@ class DashboardStep extends Component<Props, State> {
           return d.id === p.id
         })
     )
+    const countNew = newSelectedProtoboards.length
 
     try {
       newSelectedProtoboards.forEach(p => {
         createDashboardFromProtoboard(p)
       })
+      if (countNew > 0) {
+        notify(notifyDashboardCreated(countNew))
+      }
       return {error: false, payload: selectedProtoboards}
     } catch (err) {
+      notify(notifyDashboardCreationFailed(countNew))
       return {error: true, payload: null}
     }
   }
