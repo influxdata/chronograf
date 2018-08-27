@@ -1,17 +1,27 @@
+// Libraries
 import React, {PureComponent, ChangeEvent} from 'react'
 import {connect} from 'react-redux'
-
 import _ from 'lodash'
 import classnames from 'classnames'
 import uuid from 'uuid'
 
-import * as actions from 'src/dashboards/actions'
-import {SeriesLegendData} from 'src/types/dygraphs'
+// Components
 import DygraphLegendSort from 'src/shared/components/DygraphLegendSort'
 
+// Actions
+import * as actions from 'src/dashboards/actions'
+
+// Utils
 import {makeLegendStyles} from 'src/shared/graphs/helpers'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Constants
 import {NO_CELL} from 'src/shared/constants'
+
+// Types
+import {SeriesLegendData} from 'src/types/dygraphs'
 import {DygraphClass} from 'src/types'
 
 interface Props {
@@ -265,9 +275,8 @@ class DygraphLegend extends PureComponent<Props, State> {
       hoverTime,
     } = this.props
 
-    const cursorOffset = 16
-    const legendPosition = dygraph.toDomXCoord(hoverTime) + cursorOffset
-    return makeLegendStyles(graphDiv, this.legendRef, legendPosition)
+    const legendHoverX = dygraph.toDomXCoord(hoverTime)
+    return makeLegendStyles(graphDiv, this.legendRef, legendHoverX)
   }
 }
 
