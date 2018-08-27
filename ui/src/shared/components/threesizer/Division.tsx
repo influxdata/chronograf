@@ -322,7 +322,7 @@ class Division extends PureComponent<Props> {
     onMaximize(id)
   }
 
-  private calcDivisionPixels = (): number => {
+  private calcDivisionPixels = (): void => {
     const {orientation} = this.props
 
     const {clientWidth, clientHeight} = this.divisionRef.current
