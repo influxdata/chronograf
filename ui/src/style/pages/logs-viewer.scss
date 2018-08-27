@@ -58,8 +58,11 @@ $logs-viewer-gutter: 60px;
 // Search Bar
 .logs-viewer--search-input {
   flex: 1 0 0;
-  margin-right: 8px;
+  margin-right: $ix-marg-b;
   position: relative;
+}
+.logs-viewer--search-dropdown {
+  margin-right: $ix-marg-b;
 }
 
 // Filters Bar
@@ -70,7 +73,6 @@ $logs-viewer-gutter: 60px;
   padding: 0 $logs-viewer-gutter 0 ($logs-viewer-gutter + 185);
   height: $logs-viewer-filter-height;
   background-color: $g3-castle;
-  position: relative;
 }
 
 .logs-viewer--results-text {

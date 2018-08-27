@@ -205,7 +205,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   public render() {
-    const {filters, queryCount, timeRange, notify} = this.props
+    const {filters, queryCount, timeRange, notify, tableTime} = this.props
     const {searchStatus} = this.state
 
     return (
@@ -217,7 +217,13 @@ class LogsPage extends Component<Props, State> {
               {this.chartControlBar}
               {this.chart}
             </LogsGraphContainer>
-            <SearchBar onSearch={this.handleSubmitSearch} />
+            <SearchBar
+              onSearch={this.handleSubmitSearch}
+              customTime={tableTime.custom}
+              relativeTime={tableTime.relative}
+              onChooseCustomTime={this.handleChooseCustomTime}
+              onChooseRelativeTime={this.handleChooseRelativeTime}
+            />
             <FilterBar
               filters={filters || []}
               onDelete={this.handleFilterDelete}
@@ -503,7 +509,6 @@ class LogsPage extends Component<Props, State> {
       currentSource,
       currentNamespaces,
       currentNamespace,
-      tableTime,
     } = this.props
 
     return (
@@ -517,10 +522,6 @@ class LogsPage extends Component<Props, State> {
         currentNamespace={currentNamespace}
         onChangeLiveUpdatingStatus={this.handleChangeLiveUpdatingStatus}
         onShowOptionsOverlay={this.handleToggleOverlay}
-        customTime={tableTime.custom}
-        relativeTime={tableTime.relative}
-        onChooseCustomTime={this.handleChooseCustomTime}
-        onChooseRelativeTime={this.handleChooseRelativeTime}
       />
     )
   }

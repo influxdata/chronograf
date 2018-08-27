@@ -3,7 +3,6 @@ import React, {PureComponent} from 'react'
 import {Source, Namespace} from 'src/types'
 
 import Dropdown from 'src/shared/components/Dropdown'
-import PointInTimeDropDown from 'src/logs/components/PointInTimeDropDown'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
@@ -24,10 +23,6 @@ interface Props {
   liveUpdating: boolean
   onChangeLiveUpdatingStatus: () => void
   onShowOptionsOverlay: () => void
-  customTime?: string
-  relativeTime?: number
-  onChooseCustomTime: (time: string) => void
-  onChooseRelativeTime: (time: number) => void
 }
 
 class LogsHeader extends PureComponent<Props> {
@@ -56,13 +51,7 @@ class LogsHeader extends PureComponent<Props> {
   }
 
   private get optionsComponents(): JSX.Element {
-    const {
-      onShowOptionsOverlay,
-      customTime,
-      relativeTime,
-      onChooseCustomTime,
-      onChooseRelativeTime,
-    } = this.props
+    const {onShowOptionsOverlay} = this.props
 
     return (
       <>
@@ -78,12 +67,6 @@ class LogsHeader extends PureComponent<Props> {
           items={this.namespaceDropDownItems}
           selected={this.selectedNamespace}
           onChoose={this.handleChooseNamespace}
-        />
-        <PointInTimeDropDown
-          customTime={customTime}
-          relativeTime={relativeTime}
-          onChooseCustomTime={onChooseCustomTime}
-          onChooseRelativeTime={onChooseRelativeTime}
         />
         <Authorized requiredRole={EDITOR_ROLE}>
           <button

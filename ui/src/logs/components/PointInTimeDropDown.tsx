@@ -40,7 +40,10 @@ class TimeRangeDropdown extends Component<Props, State> {
 
     return (
       <ClickOutside onClickOutside={this.handleClickOutside}>
-        <div className="time-range-dropdown" style={{display: 'inline'}}>
+        <div
+          className="time-range-dropdown logs-viewer--search-dropdown"
+          style={{display: 'inline'}}
+        >
           <div className={this.dropdownClassName}>
             <div
               className="btn btn-sm btn-default dropdown-toggle"

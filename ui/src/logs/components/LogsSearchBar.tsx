@@ -1,9 +1,14 @@
 import React, {PureComponent, ChangeEvent, KeyboardEvent} from 'react'
 
 import {Input, IconFont, Button, ComponentColor} from 'src/reusable_ui'
+import PointInTimeDropDown from 'src/logs/components/PointInTimeDropDown'
 
 interface Props {
   onSearch: (value: string) => void
+  customTime?: string
+  relativeTime?: number
+  onChooseCustomTime: (time: string) => void
+  onChooseRelativeTime: (time: number) => void
 }
 
 interface State {
@@ -21,6 +26,12 @@ class LogsSearchBar extends PureComponent<Props, State> {
 
   public render() {
     const {searchTerm} = this.state
+    const {
+      customTime,
+      relativeTime,
+      onChooseCustomTime,
+      onChooseRelativeTime,
+    } = this.props
 
     return (
       <div className="logs-viewer--search-bar">
@@ -33,6 +44,12 @@ class LogsSearchBar extends PureComponent<Props, State> {
             value={searchTerm}
           />
         </div>
+        <PointInTimeDropDown
+          customTime={customTime}
+          relativeTime={relativeTime}
+          onChooseCustomTime={onChooseCustomTime}
+          onChooseRelativeTime={onChooseRelativeTime}
+        />
         <Button
           text="Search"
           color={ComponentColor.Primary}
