@@ -29,7 +29,7 @@ class GraphTypeSelector extends Component<Props> {
     return (
       <FancyScrollbar autoHide={false} className="graph-type-selector">
         <div className="graph-type-selector--container">
-          <div className={this.gridClassName}>
+          <div className="graph-type-selector--grid">
             {GRAPH_TYPES.map(graphType => (
               <div
                 key={graphType.type}
@@ -51,34 +51,6 @@ class GraphTypeSelector extends Component<Props> {
 
   private onChangeCellType = (newType: string) => (): void => {
     this.props.handleChangeCellType(newType)
-  }
-
-  private get gridClassName(): string {
-    const {parentPixels} = this.props
-
-    const breakpoint0 = 0
-    const breakpointA = 275
-    const breakpointB = 550
-    const breakpointC = 825
-    const breakpointD = 1100
-    const breakpointE = 1500
-    const breakpointF = 1800
-
-    return classnames('graph-type-selector--grid', {
-      'graph-type-selector--1-cols':
-        parentPixels >= breakpoint0 && parentPixels < breakpointA,
-      'graph-type-selector--2-cols':
-        parentPixels >= breakpointA && parentPixels < breakpointB,
-      'graph-type-selector--3-cols':
-        parentPixels >= breakpointB && parentPixels < breakpointC,
-      'graph-type-selector--4-cols':
-        parentPixels >= breakpointC && parentPixels < breakpointD,
-      'graph-type-selector--5-cols':
-        parentPixels >= breakpointD && parentPixels < breakpointE,
-      'graph-type-selector--6-cols':
-        parentPixels >= breakpointE && parentPixels < breakpointF,
-      'graph-type-selector--8-cols': parentPixels >= breakpointF,
-    })
   }
 }
 
