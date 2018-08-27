@@ -1,0 +1,29 @@
+.protoboard-icon {
+  position: relative;
+  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  svg {
+    width: 60%;
+  }
+
+  .protoboard-icon--shape {
+    fill: $c-pool;
+  }
+  
+  .protoboard-icon--text {
+    fill: $g1-raven;
+    font-family: $ix-text-font;
+    font-weight: 900;
+    font-size: 42px;
+  }
+}
+
+.card-select--active:hover,
+.card-select--active.card-select--checked {
+  .protoboard-icon--text {
+    fill: $g5-pepper;
+  }
+}
