@@ -40,6 +40,7 @@ import {
   Tag,
   TimeShift,
   ApplyFuncsToFieldArgs,
+  TimeRange,
 } from 'src/types'
 import {CEOInitialState} from 'src/dashboards/reducers/cellEditorOverlay'
 
@@ -50,8 +51,8 @@ interface State {
 type GetState = () => State
 
 export enum ActionType {
-  LoadCellForCEO = 'LOAD_CELL_FOR_CEO',
-  ClearCellFromCEO = 'CLEAR_CELL_FROM_CEO',
+  LoadCEO = 'LOAD_CEO',
+  ClearCEO = 'CLEAR_CEO',
   ChangeCellType = 'CHANGE_CELL_TYPE',
   RenameCell = 'RENAME_CELL',
   UpdateThresholdsListColors = 'UPDATE_THRESHOLDS_LIST_COLORS',
@@ -67,11 +68,12 @@ export enum ActionType {
   UpdateQueryDraft = 'UPDATE_QUERY_DRAFT',
   UpdateCellNote = 'UPDATE_CELL_NOTE',
   UpdateCellNoteVisibility = 'UPDATE_CELL_NOTE_VISIBILITY',
+  UpdateEditorTimeRange = 'UPDATE_EDITOR_TIME_RANGE',
 }
 
 export type Action =
-  | LoadCellForCEOAction
-  | ClearCellFromCEOAction
+  | LoadCEOAction
+  | ClearCEOAction
   | ChangeCellTypeAction
   | RenameCellAction
   | UpdateThresholdsListColorsAction
@@ -86,16 +88,18 @@ export type Action =
   | UpdateQueryDraftsAction
   | UpdateCellNoteAction
   | UpdateCellNoteVisibilityAction
+  | UpdateEditorTimeRangeAction
 
-export interface LoadCellForCEOAction {
-  type: ActionType.LoadCellForCEO
+export interface LoadCEOAction {
+  type: ActionType.LoadCEO
   payload: {
     cell: Cell | NewDefaultCell
+    timeRange: TimeRange
   }
 }
 
-export interface ClearCellFromCEOAction {
-  type: ActionType.ClearCellFromCEO
+export interface ClearCEOAction {
+  type: ActionType.ClearCEO
 }
 
 export interface ChangeCellTypeAction {
@@ -203,17 +207,26 @@ export interface UpdateCellNoteVisibilityAction {
   }
 }
 
-export const loadCellForCEO = (
-  cell: Cell | NewDefaultCell
-): LoadCellForCEOAction => ({
-  type: ActionType.LoadCellForCEO,
+export interface UpdateEditorTimeRangeAction {
+  type: ActionType.UpdateEditorTimeRange
+  payload: {
+    timeRange: TimeRange
+  }
+}
+
+export const loadCEO = (
+  cell: Cell | NewDefaultCell,
+  timeRange: TimeRange
+): LoadCEOAction => ({
+  type: ActionType.LoadCEO,
   payload: {
     cell,
+    timeRange,
   },
 })
 
-export const clearCellFromCEO = (): ClearCellFromCEOAction => ({
-  type: ActionType.ClearCellFromCEO,
+export const clearCEO = (): ClearCEOAction => ({
+  type: ActionType.ClearCEO,
 })
 
 export const changeCellType = (cellType: CellType): ChangeCellTypeAction => ({
@@ -322,6 +335,15 @@ export const updateFieldOptions = (
   type: ActionType.UpdateFieldOptions,
   payload: {
     fieldOptions,
+  },
+})
+
+export const updateEditorTimeRange = (
+  timeRange: TimeRange
+): UpdateEditorTimeRangeAction => ({
+  type: ActionType.UpdateEditorTimeRange,
+  payload: {
+    timeRange,
   },
 })
 

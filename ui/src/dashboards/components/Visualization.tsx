@@ -89,6 +89,7 @@ const DashVisualization: SFC<Props> = ({
           isInCEO={isInCEO}
           cellNote={note}
           cellNoteVisibility={noteVisibility}
+          timeRange={timeRange}
         />
       </div>
     </div>

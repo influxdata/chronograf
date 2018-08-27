@@ -103,11 +103,12 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   notify: NotificationsActions.PublishNotificationActionCreator
   annotationsDisplaySetting: AnnotationsDisplaySetting
   onGetAnnotationsAsync: typeof getAnnotationsAsync
-  handleLoadCellForCEO: typeof cellEditorOverlayActions.loadCellForCEO
-  handleClearCellFromCEO: typeof cellEditorOverlayActions.clearCellFromCEO
+  handleLoadCEO: typeof cellEditorOverlayActions.loadCEO
+  handleClearCEO: typeof cellEditorOverlayActions.clearCEO
   handleDismissEditingAnnotation: typeof dismissEditingAnnotation
   selectedCell: DashboardsModels.Cell
   queryDrafts: DashboardsModels.CellQuery[]
+  editorTimeRange: QueriesModels.TimeRange
   updateQueryDrafts: (queryDrafts: DashboardsModels.CellQuery[]) => void
   thresholdsListType: string
   thresholdsListColors: ColorsModels.ColorNumber[]
@@ -143,6 +144,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   chooseMeasurement: typeof queryConfigActions.chooseMeasurement
   applyFuncsToField: typeof queryConfigActions.applyFuncsToField
   toggleTagAcceptance: typeof queryConfigActions.toggleTagAcceptance
+  updateEditorTimeRange: typeof cellEditorOverlayActions.updateEditorTimeRange
 }
 
 interface State {
@@ -236,6 +238,7 @@ class DashboardPage extends Component<Props, State> {
       deleteQuery,
       timeRange,
       timeRange: {lower, upper},
+      editorTimeRange,
       renameCell,
       zoomedTimeRange,
       zoomedTimeRange: {lower: zoomedLower, upper: zoomedUpper},
@@ -257,6 +260,7 @@ class DashboardPage extends Component<Props, State> {
       handleChooseAutoRefresh,
       handleClickPresentationButton,
       toggleTemplateVariableControlBar,
+      updateEditorTimeRange,
     } = this.props
 
     const low = zoomedLower || lower
@@ -315,7 +319,8 @@ class DashboardPage extends Component<Props, State> {
             services={this.services}
             cell={selectedCell}
             queryDrafts={queryDrafts}
-            timeRange={timeRange}
+            timeRange={editorTimeRange}
+            updateEditorTimeRange={updateEditorTimeRange}
             autoRefresh={autoRefresh}
             dashboardID={dashboardID}
             queryStatus={cellQueryStatus}
@@ -511,18 +516,18 @@ class DashboardPage extends Component<Props, State> {
   private handleShowCellEditorOverlay = (
     cell: DashboardsModels.Cell | DashboardsModels.NewDefaultCell
   ): void => {
-    const {handleLoadCellForCEO} = this.props
-    handleLoadCellForCEO(cell)
+    const {handleLoadCEO, timeRange} = this.props
+    handleLoadCEO(cell, timeRange)
     this.setState({showCellEditorOverlay: true})
   }
 
   private handleHideCellEditorOverlay = () => {
-    const {handleClearCellFromCEO} = this.props
+    const {handleClearCEO} = this.props
     const WAIT_FOR_ANIMATION = 400
 
     this.setState({showCellEditorOverlay: false})
     window.setTimeout(() => {
-      handleClearCellFromCEO()
+      handleClearCEO()
     }, WAIT_FOR_ANIMATION)
   }
 
@@ -677,6 +682,7 @@ const mstp = (state, {params: {dashboardID}}) => {
       thresholdsListColors,
       gaugeColors,
       lineColors,
+      timeRange: editorTimeRange,
     },
   } = state
 
@@ -707,6 +713,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     inPresentationMode,
     selectedCell,
     queryDrafts,
+    editorTimeRange,
     thresholdsListType,
     thresholdsListColors,
     gaugeColors,
@@ -739,8 +746,8 @@ const mdtp = {
   handleClickPresentationButton: appActions.delayEnablePresentationMode,
   errorThrown: errorActions.errorThrown,
   notify: notifyActions.notify,
-  handleLoadCellForCEO: cellEditorOverlayActions.loadCellForCEO,
-  handleClearCellFromCEO: cellEditorOverlayActions.clearCellFromCEO,
+  handleLoadCEO: cellEditorOverlayActions.loadCEO,
+  handleClearCEO: cellEditorOverlayActions.clearCEO,
   onGetAnnotationsAsync: getAnnotationsAsync,
   handleDismissEditingAnnotation: dismissEditingAnnotation,
   updateQueryDraft: cellEditorOverlayActions.updateQueryDraft,
@@ -761,6 +768,7 @@ const mdtp = {
   chooseMeasurement: queryConfigActions.chooseMeasurement,
   applyFuncsToField: queryConfigActions.applyFuncsToField,
   toggleTagAcceptance: queryConfigActions.toggleTagAcceptance,
+  updateEditorTimeRange: cellEditorOverlayActions.updateEditorTimeRange,
 }
 
 export default connect(mstp, mdtp)(

@@ -382,6 +382,7 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   height: calc(100% - 60px);
   overflow: hidden;
   border-radius: 0 0 $radius $radius;
+  outline: none;
 }
 
 .deceo {
@@ -411,6 +412,7 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   height: 60px;
   padding: 0 60px;
   background-color: $g3-castle;
+  align-items: center;
 }
 
 .deceo--visualization {
