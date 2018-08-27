@@ -468,6 +468,18 @@ export const notifyDashboardDeleted = (name: string): Notification => ({
   message: `Dashboard ${name} deleted successfully.`,
 })
 
+export const notifyDashboardCreated = (count: number): Notification => ({
+  ...defaultSuccessNotification,
+  icon: 'dash-h',
+  message: `Selected dashboard${count > 1 ? 's' : ''} have been created.`,
+})
+
+export const notifyDashboardCreationFailed = (count: number): Notification => ({
+  ...defaultErrorNotification,
+  icon: 'dash-h',
+  message: `Could not create selected dashboard${count > 1 ? 's' : ''}.`,
+})
+
 export const notifyDashboardExported = (name: string): Notification => ({
   ...defaultSuccessNotification,
   icon: 'dash-h',
