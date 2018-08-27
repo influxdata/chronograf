@@ -66,6 +66,7 @@ const annotationsReducer = (
         mode: ADDING,
         isTempHovering: true,
         addingAnnotation: DEFAULT_ANNOTATION(),
+        displaySetting: AnnotationsDisplaySetting.FilterAnnotationsByTag,
       }
     }
 
