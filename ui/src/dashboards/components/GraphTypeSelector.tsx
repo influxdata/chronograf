@@ -18,7 +18,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   type: string
   handleChangeCellType: (newType: string) => void
-  parentPixels: number
 }
 
 @ErrorHandling
