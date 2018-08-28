@@ -77,8 +77,11 @@ export const createDashboard = async dashboard => {
   }
 }
 
-export const createDashboardFromProtoboard = async (protoboard: Protoboard) => {
-  const dashboard = instantiate(protoboard)
+export const createDashboardFromProtoboard = async (
+  protoboard: Protoboard,
+  source: Source
+) => {
+  const dashboard = instantiate(protoboard, source)
   try {
     return await AJAX({
       method: 'POST',

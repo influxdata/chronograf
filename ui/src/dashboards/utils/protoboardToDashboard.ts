@@ -2,7 +2,21 @@ import _ from 'lodash'
 
 import {getNextAvailablePosition} from 'src/dashboards/utils/cellGetters'
 
-import {Cell, Protoboard, Dashboard} from 'src/types'
+import {
+  Cell,
+  Protoboard,
+  Dashboard,
+  Template,
+  Source,
+  TemplateValueType,
+  TemplateType,
+} from 'src/types'
+
+interface PBQueries {
+  query: string
+  groupbys: string[]
+  label: string
+}
 
 const addNewCellToCells = (
   cells: Array<Partial<Cell>>,
@@ -34,7 +48,35 @@ const collision = (
   return !!placedCells.find(c => cell.x === c.x && cell.y === c.y)
 }
 
-export const instantiate = (protoboard: Protoboard): Partial<Dashboard> => {
+const createTemplatesForProtoboard = (): Template[] => [
+  {
+    tempVar: ':host:',
+    id: 'host',
+    type: TemplateType.TagValues,
+    label: '',
+    values: [
+      {
+        value: 'denizs-MacBook-Pro.local',
+        type: TemplateValueType.TagValue,
+        selected: true,
+        localSelected: true,
+      },
+    ],
+  },
+]
+
+const replaceQuery = (q: string, source: Source) =>
+  q
+    .replace(':db:', source.telegraf || 'telegraf')
+    .replace(':rp:', source.defaultRP || 'autogen')
+
+const replaceDbRp = (queries: PBQueries[], source: Source) =>
+  queries.map(q => ({...q, query: replaceQuery(q.query, source)}))
+
+export const instantiate = (
+  protoboard: Protoboard,
+  source: Source
+): Partial<Dashboard> => {
   const placedCells = []
   const unPlacedCells = []
 
@@ -46,11 +88,24 @@ export const instantiate = (protoboard: Protoboard): Partial<Dashboard> => {
     placedCells.push(c)
   })
 
-  const cells = _.reduce(unPlacedCells, addNewCellToCells, placedCells)
+  const cellsWithPlaces = _.reduce(
+    unPlacedCells,
+    addNewCellToCells,
+    placedCells
+  )
+
+  const templates = createTemplatesForProtoboard(source)
+
+  const cells = cellsWithPlaces.map(c => ({
+    ...c,
+    queries: replaceDbRp(c.queries, source),
+  }))
 
   const dashboard = {
     name: protoboard.meta.name,
     cells,
+    templates,
   }
+
   return dashboard
 }
