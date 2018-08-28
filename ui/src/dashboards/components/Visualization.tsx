@@ -39,6 +39,7 @@ interface Props {
   isInCEO: boolean
   note: string
   noteVisibility: CellNoteVisibility
+  manualRefresh: number
 }
 
 const DashVisualization: SFC<Props> = ({
@@ -56,6 +57,7 @@ const DashVisualization: SFC<Props> = ({
   queryConfigs,
   staticLegend,
   tableOptions,
+  manualRefresh,
   decimalPlaces,
   autoRefresher,
   noteVisibility,
@@ -92,40 +94,11 @@ const DashVisualization: SFC<Props> = ({
           cellNote={note}
           cellNoteVisibility={noteVisibility}
           timeRange={timeRange}
+          manualRefresh={manualRefresh}
         />
       </div>
     </div>
   )
 }
-
-// const mapStateToProps = ({
-//   cellEditorOverlay: {
-//     thresholdsListColors,
-//     gaugeColors,
-//     lineColors,
-//     cell: {
-//       type,
-//       axes,
-//       tableOptions,
-//       fieldOptions,
-//       timeFormat,
-//       decimalPlaces,
-//       note,
-//       noteVisibility,
-//     },
-//   },
-// }) => ({
-//   gaugeColors,
-//   thresholdsListColors,
-//   lineColors,
-//   type,
-//   axes,
-//   tableOptions,
-//   fieldOptions,
-//   timeFormat,
-//   decimalPlaces,
-//   note,
-//   noteVisibility,
-// })
 
 export default DashVisualization

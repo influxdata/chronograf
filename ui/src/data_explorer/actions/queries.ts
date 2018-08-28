@@ -25,19 +25,7 @@ import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 
 // Types
-import {ColorNumber, ColorString} from 'src/types/colors'
-import {
-  DecimalPlaces,
-  FieldOption,
-  Axes,
-  Cell,
-  CellType,
-  ThresholdType,
-  TableOptions,
-  CellQuery,
-  NewDefaultCell,
-  CellNoteVisibility,
-} from 'src/types/dashboards'
+import {CellQuery} from 'src/types/dashboards'
 import {
   Status,
   Field,
@@ -50,137 +38,28 @@ import {
 import {CEOInitialState} from 'src/dashboards/reducers/cellEditorOverlay'
 
 interface State {
-  cellEditorOverlay: CEOInitialState
+  dataExplorer: CEOInitialState
 }
 
 type GetState = () => State
 
 export enum ActionType {
-  LoadCEO = 'LOAD_CEO',
-  ClearCEO = 'CLEAR_CEO',
-  ChangeCellType = 'CHANGE_CELL_TYPE',
-  RenameCell = 'RENAME_CELL',
-  UpdateThresholdsListColors = 'UPDATE_THRESHOLDS_LIST_COLORS',
-  UpdateThresholdsListType = 'UPDATE_THRESHOLDS_LIST_TYPE',
-  UpdateGaugeColors = 'UPDATE_GAUGE_COLORS',
-  UpdateAxes = 'UPDATE_AXES',
-  UpdateTableOptions = 'UPDATE_TABLE_OPTIONS',
-  UpdateLineColors = 'UPDATE_LINE_COLORS',
-  ChangeTimeFormat = 'CHANGE_TIME_FORMAT',
-  ChangeDecimalPlaces = 'CHANGE_DECIMAL_PLACES',
-  UpdateFieldOptions = 'UPDATE_FIELD_OPTIONS',
-  UpdateQueryDrafts = 'UPDATE_QUERY_DRAFTS',
-  UpdateQueryDraft = 'UPDATE_QUERY_DRAFT',
-  UpdateCellNote = 'UPDATE_CELL_NOTE',
-  UpdateCellNoteVisibility = 'UPDATE_CELL_NOTE_VISIBILITY',
-  UpdateEditorTimeRange = 'UPDATE_EDITOR_TIME_RANGE',
+  LoadDE = 'LOAD_DE',
+  UpdateQueryDrafts = 'DE_UPDATE_QUERY_DRAFTS',
+  UpdateQueryDraft = 'DE_UPDATE_QUERY_DRAFT',
+  UpdateEditorTimeRange = 'DE_UPDATE_EDITOR_TIME_RANGE',
 }
 
 export type Action =
-  | LoadCEOAction
-  | ClearCEOAction
-  | ChangeCellTypeAction
-  | RenameCellAction
-  | UpdateThresholdsListColorsAction
-  | UpdateThresholdsListTypeAction
-  | UpdateGaugeColorsAction
-  | UpdateAxesAction
-  | UpdateTableOptionsAction
-  | UpdateLineColorsAction
-  | ChangeTimeFormatAction
-  | ChangeDecimalPlacesAction
-  | UpdateFieldOptionsAction
-  | UpdateQueryDraftsAction
-  | UpdateCellNoteAction
-  | UpdateCellNoteVisibilityAction
+  | LoadDEAction
   | UpdateEditorTimeRangeAction
+  | UpdateQueryDraftsAction
 
-export interface LoadCEOAction {
-  type: ActionType.LoadCEO
+export interface LoadDEAction {
+  type: ActionType.LoadDE
   payload: {
-    cell: Cell | NewDefaultCell
+    queries: CellQuery[]
     timeRange: TimeRange
-  }
-}
-
-export interface ClearCEOAction {
-  type: ActionType.ClearCEO
-}
-
-export interface ChangeCellTypeAction {
-  type: ActionType.ChangeCellType
-  payload: {
-    cellType: CellType
-  }
-}
-
-export interface RenameCellAction {
-  type: ActionType.RenameCell
-  payload: {
-    cellName: string
-  }
-}
-
-export interface UpdateThresholdsListColorsAction {
-  type: ActionType.UpdateThresholdsListColors
-  payload: {
-    thresholdsListColors: ColorNumber[]
-  }
-}
-
-export interface UpdateThresholdsListTypeAction {
-  type: ActionType.UpdateThresholdsListType
-  payload: {
-    thresholdsListType: ThresholdType
-  }
-}
-
-export interface UpdateGaugeColorsAction {
-  type: ActionType.UpdateGaugeColors
-  payload: {
-    gaugeColors: ColorNumber[]
-  }
-}
-
-export interface UpdateAxesAction {
-  type: ActionType.UpdateAxes
-  payload: {
-    axes: Axes
-  }
-}
-
-export interface UpdateTableOptionsAction {
-  type: ActionType.UpdateTableOptions
-  payload: {
-    tableOptions: TableOptions
-  }
-}
-
-export interface UpdateLineColorsAction {
-  type: ActionType.UpdateLineColors
-  payload: {
-    lineColors: ColorString[]
-  }
-}
-
-export interface ChangeTimeFormatAction {
-  type: ActionType.ChangeTimeFormat
-  payload: {
-    timeFormat: string
-  }
-}
-
-export interface ChangeDecimalPlacesAction {
-  type: ActionType.ChangeDecimalPlaces
-  payload: {
-    decimalPlaces: DecimalPlaces
-  }
-}
-
-export interface UpdateFieldOptionsAction {
-  type: ActionType.UpdateFieldOptions
-  payload: {
-    fieldOptions: FieldOption[]
   }
 }
 
@@ -198,20 +77,6 @@ export interface UpdateQueryDraftAction {
   }
 }
 
-export interface UpdateCellNoteAction {
-  type: ActionType.UpdateCellNote
-  payload: {
-    note: string
-  }
-}
-
-export interface UpdateCellNoteVisibilityAction {
-  type: ActionType.UpdateCellNoteVisibility
-  payload: {
-    noteVisibility: CellNoteVisibility
-  }
-}
-
 export interface UpdateEditorTimeRangeAction {
   type: ActionType.UpdateEditorTimeRange
   payload: {
@@ -219,127 +84,14 @@ export interface UpdateEditorTimeRangeAction {
   }
 }
 
-export const loadCEO = (
-  cell: Cell | NewDefaultCell,
+export const loadDE = (
+  queries: CellQuery[],
   timeRange: TimeRange
-): LoadCEOAction => ({
-  type: ActionType.LoadCEO,
+): LoadDEAction => ({
+  type: ActionType.LoadDE,
   payload: {
-    cell,
+    queries,
     timeRange,
-  },
-})
-
-export const clearCEO = (): ClearCEOAction => ({
-  type: ActionType.ClearCEO,
-})
-
-export const changeCellType = (cellType: CellType): ChangeCellTypeAction => ({
-  type: ActionType.ChangeCellType,
-  payload: {
-    cellType,
-  },
-})
-
-export const updateCellNote = (note: string): UpdateCellNoteAction => ({
-  type: ActionType.UpdateCellNote,
-  payload: {
-    note,
-  },
-})
-
-export const UpdateCellNoteVisibility = (
-  noteVisibility: CellNoteVisibility
-): UpdateCellNoteVisibilityAction => ({
-  type: ActionType.UpdateCellNoteVisibility,
-  payload: {
-    noteVisibility,
-  },
-})
-
-export const renameCell = (cellName: string): RenameCellAction => ({
-  type: ActionType.RenameCell,
-  payload: {
-    cellName,
-  },
-})
-
-export const updateThresholdsListColors = (
-  thresholdsListColors: ColorNumber[]
-): UpdateThresholdsListColorsAction => ({
-  type: ActionType.UpdateThresholdsListColors,
-  payload: {
-    thresholdsListColors,
-  },
-})
-
-export const updateThresholdsListType = (
-  thresholdsListType: ThresholdType
-): UpdateThresholdsListTypeAction => ({
-  type: ActionType.UpdateThresholdsListType,
-  payload: {
-    thresholdsListType,
-  },
-})
-
-export const updateGaugeColors = (
-  gaugeColors: ColorNumber[]
-): UpdateGaugeColorsAction => ({
-  type: ActionType.UpdateGaugeColors,
-  payload: {
-    gaugeColors,
-  },
-})
-
-export const updateAxes = (axes: Axes): UpdateAxesAction => ({
-  type: ActionType.UpdateAxes,
-  payload: {
-    axes,
-  },
-})
-
-export const updateTableOptions = (
-  tableOptions: TableOptions
-): UpdateTableOptionsAction => ({
-  type: ActionType.UpdateTableOptions,
-  payload: {
-    tableOptions,
-  },
-})
-
-export const updateLineColors = (
-  lineColors: ColorString[]
-): UpdateLineColorsAction => ({
-  type: ActionType.UpdateLineColors,
-  payload: {
-    lineColors,
-  },
-})
-
-export const changeTimeFormat = (
-  timeFormat: string
-): ChangeTimeFormatAction => ({
-  type: ActionType.ChangeTimeFormat,
-  payload: {
-    timeFormat,
-  },
-})
-
-export const changeDecimalPlaces = (
-  decimalPlaces: DecimalPlaces
-): ChangeDecimalPlacesAction => ({
-  type: ActionType.ChangeDecimalPlaces,
-  payload: {
-    decimalPlaces,
-  },
-})
-
-export const updateFieldOptions = (
-  fieldOptions: FieldOption[]
-): UpdateFieldOptionsAction => ({
-  type: ActionType.UpdateFieldOptions,
-  payload: {
-    fieldOptions,
   },
 })
 
@@ -377,7 +129,7 @@ export const addQueryAsync = (queryID: string = uuid.v4()) => async (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const newQueryDraft: CellQuery = {
@@ -395,7 +147,7 @@ export const deleteQueryAsync = (queryID: string) => async (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.filter(query => query.id !== queryID)
@@ -407,7 +159,7 @@ export const toggleFieldAsync = (queryID: string, fieldFunc: Field) => async (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -437,7 +189,7 @@ export const groupByTimeAsync = (queryID: string, time: string) => (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -464,7 +216,7 @@ export const fillAsync = (queryID: string, value: string) => (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -491,7 +243,7 @@ export const removeFuncsAsync = (queryID: string, fields: Field[]) => (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -519,7 +271,7 @@ export const applyFuncsToFieldAsync = (
   groupBy?: GroupBy
 ) => (dispatch, getState: GetState) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -550,7 +302,7 @@ export const chooseTagAsync = (queryID: string, tag: Tag) => (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -582,7 +334,7 @@ export const chooseNamespaceAsync = (
   {database, retentionPolicy}: DBRP
 ) => async (dispatch, getState: GetState) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -611,7 +363,7 @@ export const chooseMeasurementAsync = (
   measurement: string
 ) => async (dispatch, getState: GetState) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -640,7 +392,7 @@ export const groupByTagAsync = (queryID: string, tagKey: string) => async (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -666,7 +418,7 @@ export const toggleTagAcceptanceAsync = (queryID: string) => async (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -693,7 +445,7 @@ export const addInitialFieldAsync = (
   groupBy: GroupBy
 ) => async (dispatch, getState: GetState) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -719,7 +471,7 @@ export const editQueryStatus = (queryID: string, status: Status) => async (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {
@@ -745,7 +497,7 @@ export const timeShiftAsync = (queryID: string, shift: TimeShift) => async (
   getState: GetState
 ) => {
   const {
-    cellEditorOverlay: {queryDrafts},
+    dataExplorer: {queryDrafts},
   } = getState()
 
   const updatedQueryDrafts = queryDrafts.map(query => {

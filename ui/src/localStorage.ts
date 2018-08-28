@@ -52,7 +52,6 @@ export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
 
 export const saveToLocalStorage = ({
   app: {persisted},
-  dataExplorerQueryConfigs,
   timeRange,
   dataExplorer,
   dashTimeV1: {ranges},
@@ -77,7 +76,6 @@ export const saveToLocalStorage = ({
         timeRange,
         dashTimeV1,
         dataExplorer,
-        dataExplorerQueryConfigs,
         script,
         logs: {
           ...minimalLogs,

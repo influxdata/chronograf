@@ -44,11 +44,7 @@ import {CEOTabs} from 'src/dashboards/constants'
 import {builder, emptyAST} from 'src/flux/constants'
 
 // Types
-import {
-  QueryConfigActions,
-  addQueryAsync,
-  deleteQueryAsync,
-} from 'src/dashboards/actions/cellEditorOverlay'
+import {QueryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
 import {
   TimeRange,
   QueryConfig,
@@ -108,19 +104,21 @@ interface Props {
   queryDrafts: CellQuery[]
   onResetFocus: () => void
   updateScript: UpdateScript
-  addQuery: typeof addQueryAsync
-  deleteQuery: typeof deleteQueryAsync
+
   queryConfigActions: QueryConfigActions
   notify: NotificationAction
   editQueryStatus: () => void
   updateQueryDrafts: (queryDrafts: CellQuery[]) => void
-  updateEditorTimeRange: (timeRange: TimeRange) => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
   children: (
     activeEditorTab: CEOTabs,
     onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
   ) => JSX.Element
-  visualizationOptions: VisualizationOptions
+  addQuery: (queryID?: string) => void
+  deleteQuery: (queryID: string) => void
+  updateEditorTimeRange: (timeRange: TimeRange) => void
+  visualizationOptions?: VisualizationOptions
+  manualRefresh?: number
 }
 
 interface Body extends FlatBody {
@@ -219,8 +217,15 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {services, timeRange, updateEditorTimeRange, templates} = this.props
+    const {
+      services,
+      timeRange,
+      updateEditorTimeRange,
+      templates,
+      isInCEO,
+    } = this.props
     const {useDynamicSource, autoRefreshDuration} = this.state
+
     const horizontalDivisions = [
       {
         name: '',
@@ -258,6 +263,7 @@ class TimeMachine extends PureComponent<Props, State> {
           isDynamicSourceSelected={useDynamicSource}
           timeRange={timeRange}
           updateEditorTimeRange={updateEditorTimeRange}
+          isInCEO={isInCEO}
         />
         <div className="deceo--container">
           <Threesizer
@@ -279,6 +285,7 @@ class TimeMachine extends PureComponent<Props, State> {
       source,
       isStaticLegend,
       visualizationOptions,
+      manualRefresh,
     } = this.props
     const {autoRefresher} = this.state
 
@@ -297,6 +304,7 @@ class TimeMachine extends PureComponent<Props, State> {
           editQueryStatus={editQueryStatus}
           staticLegend={isStaticLegend}
           isInCEO={isInCEO}
+          manualRefresh={manualRefresh}
           {...visualizationOptions}
         />
       </div>
@@ -308,7 +316,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get editorTab() {
-    const {isStaticLegend, onToggleStaticLegend} = this.props
+    const {onResetFocus, isStaticLegend, onToggleStaticLegend} = this.props
     const {activeEditorTab} = this.state
 
     if (activeEditorTab === CEOTabs.Queries) {
@@ -323,7 +331,7 @@ class TimeMachine extends PureComponent<Props, State> {
         queryConfigs={this.queriesWorkingDraft}
         onToggleStaticLegend={onToggleStaticLegend}
         staticLegend={isStaticLegend}
-        onResetFocus={this.props.onResetFocus}
+        onResetFocus={onResetFocus}
       />
     )
   }

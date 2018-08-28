@@ -5,43 +5,64 @@ import {bindActionCreators} from 'redux'
 import {withRouter, InjectedRouter} from 'react-router'
 import {Location} from 'history'
 import qs from 'qs'
+import uuid from 'uuid'
 import _ from 'lodash'
 
 // Utils
 import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
+import {getConfig} from 'src/dashboards/utils/cellGetters'
 
 // Components
-import QueryMaker from 'src/data_explorer/components/QueryMaker'
-import Visualization from 'src/data_explorer/components/Visualization'
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
-import ResizeContainer from 'src/shared/components/ResizeContainer'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import ManualRefresh from 'src/shared/components/ManualRefresh'
-import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
-import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
-import GraphTips from 'src/shared/components/GraphTips'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboardOverlay'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
+import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
+import DEHeader from 'src/data_explorer/components/DEHeader'
 
-// Constants
-import {VIS_VIEWS, AUTO_GROUP_BY, TEMPLATES} from 'src/shared/constants'
-import {MINIMUM_HEIGHTS, INITIAL_HEIGHTS} from 'src/data_explorer/constants'
+// Actions
 import {errorThrown} from 'src/shared/actions/errors'
 import {setAutoRefresh} from 'src/shared/actions/app'
 import {getDashboardsAsync, addDashboardCellAsync} from 'src/dashboards/actions'
 import * as dataExplorerActionCreators from 'src/data_explorer/actions/view'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
+import {
+  loadDE as loadDEAction,
+  queryConfigActions as queryConfigModifiers,
+  updateQueryDrafts as updateQueryDraftsAction,
+  addQueryAsync,
+  deleteQueryAsync,
+} from 'src/data_explorer/actions/queries'
+
+// Constants
+import {
+  TEMPLATES,
+  TEMP_VAR_DASHBOARD_TIME,
+  TEMP_VAR_UPPER_DASHBOARD_TIME,
+} from 'src/shared/constants'
 import {buildRawText} from 'src/utils/influxql'
-import defaultQueryConfig from 'src/utils/defaultQueryConfig'
+// import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
 // Types
-import {Source, QueryConfig, TimeRange, Dashboard} from 'src/types'
+import {
+  Source,
+  Service,
+  TimeRange,
+  Dashboard,
+  CellQuery,
+  QueryConfig,
+  Template,
+  TemplateType,
+  TemplateValueType,
+} from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   source: Source
+  sources: Source[]
+  services: Service[]
   queryConfigs: QueryConfig[]
   queryConfigActions: any
   autoRefresh: number
@@ -57,11 +78,17 @@ interface Props {
   writeLineProtocol: () => void
   handleGetDashboards: () => Dashboard[]
   addDashboardCell: typeof addDashboardCellAsync
+  updateQueryDrafts: typeof updateQueryDraftsAction
+  loadDE: typeof loadDEAction
+  addQuery: typeof addQueryAsync
+  deleteQuery: typeof deleteQueryAsync
+  queryDrafts: CellQuery[]
 }
 
 interface State {
   isWriteFormVisible: boolean
   isSendToDashboardVisible: boolean
+  isStaticLegend: boolean
 }
 
 @ErrorHandling
@@ -72,25 +99,59 @@ export class DataExplorer extends PureComponent<Props, State> {
     this.state = {
       isWriteFormVisible: false,
       isSendToDashboardVisible: false,
+      isStaticLegend: false,
     }
   }
 
   public async componentDidMount() {
-    const {source, autoRefresh, handleGetDashboards} = this.props
+    const {
+      source,
+      loadDE,
+      timeRange,
+      dashboards,
+      autoRefresh,
+      queryDrafts,
+      handleGetDashboards,
+    } = this.props
     const {query} = qs.parse(location.search, {ignoreQueryPrefix: true})
-    if (!this.props.dashboards.length) {
-      await handleGetDashboards()
-    }
 
     GlobalAutoRefresher.poll(autoRefresh)
 
     if (query && query.length) {
-      const qc = this.props.queryConfigs[0]
-      this.props.queryConfigActions.editRawTextAsync(
-        source.links.queries,
-        qc.id,
-        query
-      )
+      if (!_.isEmpty(queryDrafts)) {
+        const matchingQueryDraft = queryDrafts.find(q => q.query === query)
+        if (matchingQueryDraft) {
+          loadDE(queryDrafts, timeRange)
+        } else {
+          const queryConfig = await getConfig(
+            source.links.queries,
+            uuid.v4(),
+            query,
+            this.templates
+          )
+          const queryDraft = {query, queryConfig, source: source.links.self}
+          loadDE([queryDraft], timeRange)
+        }
+      } else {
+        const queryConfig = await getConfig(
+          source.links.queries,
+          uuid.v4(),
+          query,
+          this.templates
+        )
+        const queryDraft = {query, queryConfig, source: source.links.self}
+        loadDE([queryDraft], timeRange)
+      }
+    } else {
+      if (!_.isEmpty(queryDrafts)) {
+        loadDE(queryDrafts, timeRange)
+      } else {
+        loadDE([], timeRange)
+      }
+    }
+
+    if (!dashboards.length) {
+      await handleGetDashboards()
     }
   }
 
@@ -103,12 +164,11 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   public componentWillReceiveProps(nextProps: Props) {
     const {router} = this.props
-    const {queryConfigs, timeRange} = nextProps
+    const {queryDrafts} = nextProps
 
-    const query = buildRawText(_.get(queryConfigs, ['0'], ''), timeRange)
+    const query = _.get(queryDrafts, '0.query', '')
     const qsCurrent = qs.parse(location.search, {ignoreQueryPrefix: true})
-
-    if (query.length && qsCurrent.query !== query) {
+    if (query && query.length && qsCurrent.query !== query) {
       const qsNew = qs.stringify({query})
       const pathname = stripPrefix(location.pathname)
       router.push(`${pathname}?${qsNew}`)
@@ -122,77 +182,150 @@ export class DataExplorer extends PureComponent<Props, State> {
   public render() {
     const {
       source,
+      sources,
+      services,
       timeRange,
-      dashboards,
       autoRefresh,
-      queryConfigs,
       manualRefresh,
-      errorThrownAction,
-      writeLineProtocol,
+      onManualRefresh,
       queryConfigActions,
-      addDashboardCell,
+      handleChooseAutoRefresh,
+      updateQueryDrafts,
+      queryDrafts,
+      addQuery,
+      deleteQuery,
     } = this.props
-
-    const {isWriteFormVisible, isSendToDashboardVisible} = this.state
+    const {isStaticLegend} = this.state
 
     return (
       <>
-        <OverlayTechnology visible={isWriteFormVisible}>
-          <WriteDataForm
-            source={source}
-            errorThrown={errorThrownAction}
-            selectedDatabase={this.selectedDatabase}
-            onClose={this.handleCloseWriteData}
-            writeLineProtocol={writeLineProtocol}
-          />
-        </OverlayTechnology>
-        <Authorized requiredRole={EDITOR_ROLE}>
-          <OverlayTechnology visible={isSendToDashboardVisible}>
-            <SendToDashboardOverlay
-              onCancel={this.toggleSendToDashboard}
-              queryConfig={this.activeQuery}
-              source={source}
-              rawText={this.rawText}
-              dashboards={dashboards}
-              addDashboardCell={addDashboardCell}
-            />
-          </OverlayTechnology>
-        </Authorized>
-        <PageHeader
-          titleText="Explore"
-          fullWidth={true}
-          optionsComponents={this.optionsComponents}
-          sourceIndicator={false}
-        />
-        <ResizeContainer
-          containerClass="page-contents"
-          minTopHeight={MINIMUM_HEIGHTS.queryMaker}
-          minBottomHeight={MINIMUM_HEIGHTS.visualization}
-          initialTopHeight={INITIAL_HEIGHTS.queryMaker}
-          initialBottomHeight={INITIAL_HEIGHTS.visualization}
-        >
-          <QueryMaker
-            source={source}
-            rawText={this.rawText}
-            actions={queryConfigActions}
-            activeQuery={this.activeQuery}
-            initialGroupByTime={AUTO_GROUP_BY}
-          />
-          <Visualization
-            source={source}
-            views={VIS_VIEWS}
-            activeQueryIndex={0}
-            timeRange={timeRange}
-            templates={TEMPLATES}
-            autoRefresh={autoRefresh}
-            queryConfigs={queryConfigs}
-            manualRefresh={manualRefresh}
-            errorThrown={errorThrownAction}
+        {this.writeDataForm}
+        {this.sendToDashboardOverlay}
+        <div className="deceo--page">
+          <TimeMachine
+            queryDrafts={queryDrafts}
             editQueryStatus={queryConfigActions.editQueryStatus}
-          />
-        </ResizeContainer>
+            templates={this.templates}
+            timeRange={timeRange}
+            autoRefresh={autoRefresh}
+            source={source}
+            onResetFocus={this.handleResetFocus}
+            isInCEO={true}
+            sources={sources}
+            services={services}
+            updateQueryDrafts={updateQueryDrafts}
+            onToggleStaticLegend={this.handleToggleStaticLegend}
+            isStaticLegend={isStaticLegend}
+            queryConfigActions={this.props.queryConfigActions}
+            addQuery={addQuery}
+            deleteQuery={deleteQuery}
+            updateEditorTimeRange={this.handleChooseTimeRange}
+            manualRefresh={manualRefresh}
+          >
+            {(activeEditorTab, onSetActiveEditorTab) => (
+              <DEHeader
+                timeRange={timeRange}
+                autoRefresh={autoRefresh}
+                activeEditorTab={activeEditorTab}
+                onManualRefresh={onManualRefresh}
+                onOpenWriteData={this.handleOpenWriteData}
+                toggleSendToDashboard={this.toggleSendToDashboard}
+                onChooseAutoRefresh={handleChooseAutoRefresh}
+                onSetActiveEditorTab={onSetActiveEditorTab}
+              />
+            )}
+          </TimeMachine>
+        </div>
       </>
     )
+  }
+
+  private get writeDataForm(): JSX.Element {
+    const {source, errorThrownAction, writeLineProtocol} = this.props
+
+    const {isWriteFormVisible} = this.state
+    return (
+      <OverlayTechnology visible={isWriteFormVisible}>
+        <WriteDataForm
+          source={source}
+          errorThrown={errorThrownAction}
+          selectedDatabase={this.selectedDatabase}
+          onClose={this.handleCloseWriteData}
+          writeLineProtocol={writeLineProtocol}
+        />
+      </OverlayTechnology>
+    )
+  }
+
+  private get sendToDashboardOverlay(): JSX.Element {
+    const {source, dashboards, addDashboardCell} = this.props
+
+    const {isSendToDashboardVisible} = this.state
+    return (
+      <Authorized requiredRole={EDITOR_ROLE}>
+        <OverlayTechnology visible={isSendToDashboardVisible}>
+          <SendToDashboardOverlay
+            onCancel={this.toggleSendToDashboard}
+            queryConfig={this.activeQueryConfig}
+            source={source}
+            rawText={this.rawText}
+            dashboards={dashboards}
+            addDashboardCell={addDashboardCell}
+          />
+        </OverlayTechnology>
+      </Authorized>
+    )
+  }
+
+  private get templates(): Template[] {
+    const {timeRange} = this.props
+
+    const low = timeRange.lower
+    const up = timeRange.upper
+    const lowerTemplateType =
+      low && low.includes(':') ? TemplateType.TimeStamp : TemplateType.Constant
+    const upperTemplateType =
+      up && up.includes(':') ? TemplateType.TimeStamp : TemplateType.Constant
+    const lowerTemplateValueType =
+      low && low.includes(':')
+        ? TemplateValueType.TimeStamp
+        : TemplateValueType.Constant
+    const upperTemplateValueType =
+      up && up.includes(':')
+        ? TemplateValueType.TimeStamp
+        : TemplateValueType.Constant
+
+    const dashboardTime: Template = {
+      id: 'dashtime',
+      tempVar: TEMP_VAR_DASHBOARD_TIME,
+      type: lowerTemplateType,
+      label: 'minimum bound on dashboard time',
+      values: [
+        {
+          value: low,
+          type: lowerTemplateValueType,
+          selected: true,
+          localSelected: true,
+        },
+      ],
+    }
+
+    const upperDashboardTime: Template = {
+      id: 'upperdashtime',
+      tempVar: TEMP_VAR_UPPER_DASHBOARD_TIME,
+      type: upperTemplateType,
+      label: 'upper bound on dashboard time',
+      values: [
+        {
+          value: up || 'now()',
+          type: upperTemplateValueType,
+          selected: true,
+          localSelected: true,
+        },
+      ],
+    }
+
+    return [...TEMPLATES, upperDashboardTime, dashboardTime]
   }
 
   private handleCloseWriteData = (): void => {
@@ -211,67 +344,38 @@ export class DataExplorer extends PureComponent<Props, State> {
     return _.get(this.props.queryConfigs, ['0', 'database'], null)
   }
 
-  private get activeQuery(): QueryConfig {
-    const {queryConfigs} = this.props
+  private get activeQueryConfig(): QueryConfig {
+    const {queryDrafts} = this.props
 
-    if (queryConfigs.length === 0) {
-      const qc = defaultQueryConfig()
-      this.props.queryConfigActions.addQuery(qc.id)
-      queryConfigs.push(qc)
-    }
+    // if (queryConfigs.length === 0) {
+    //   const qc = defaultQueryConfig()
+    //   this.props.addQuery(qc.id)
+    //   queryConfigs.push(qc)
+    // }
 
-    return queryConfigs[0]
+    return _.get(queryDrafts, 'queryConfig.0')
   }
 
   get rawText(): string {
     const {timeRange} = this.props
-    return buildRawText(this.activeQuery, timeRange)
-  }
-
-  private get optionsComponents(): JSX.Element {
-    const {
-      timeRange,
-      autoRefresh,
-      onManualRefresh,
-      handleChooseAutoRefresh,
-    } = this.props
-
-    return (
-      <>
-        <button
-          onClick={this.handleOpenWriteData}
-          data-test="write-data-button"
-          className="button button-sm button-default"
-        >
-          Write Data
-        </button>
-        <Authorized requiredRole={EDITOR_ROLE}>
-          <button
-            onClick={this.toggleSendToDashboard}
-            className="button button-sm button-success"
-          >
-            Send to Dashboard
-          </button>
-        </Authorized>
-        <GraphTips />
-        <AutoRefreshDropdown
-          selected={autoRefresh}
-          onChoose={handleChooseAutoRefresh}
-          onManualRefresh={onManualRefresh}
-        />
-        <TimeRangeDropdown
-          selected={timeRange}
-          page="DataExplorer"
-          onChooseTimeRange={this.handleChooseTimeRange}
-        />
-      </>
-    )
+    if (this.activeQueryConfig) {
+      return buildRawText(this.activeQueryConfig, timeRange)
+    }
+    return ''
   }
 
   private toggleSendToDashboard = () => {
     this.setState({
       isSendToDashboardVisible: !this.state.isSendToDashboardVisible,
     })
+  }
+
+  private handleToggleStaticLegend = (isStaticLegend: boolean): void => {
+    this.setState({isStaticLegend})
+  }
+
+  private handleResetFocus = () => {
+    return
   }
 }
 
@@ -280,19 +384,20 @@ const mapStateToProps = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer,
-    dataExplorerQueryConfigs: queryConfigs,
+    dataExplorer: {queryDrafts},
     timeRange,
     dashboardUI: {dashboards},
+    sources,
+    services,
   } = state
-  const queryConfigValues = _.values(queryConfigs)
 
   return {
     autoRefresh,
-    dataExplorer,
-    queryConfigs: queryConfigValues,
+    queryDrafts,
     timeRange,
     dashboards,
+    sources,
+    services,
   }
 }
 
@@ -305,12 +410,13 @@ const mapDispatchToProps = dispatch => {
       dispatch
     ),
     writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
-    queryConfigActions: bindActionCreators(
-      dataExplorerActionCreators,
-      dispatch
-    ),
+    queryConfigActions: bindActionCreators(queryConfigModifiers, dispatch),
     handleGetDashboards: bindActionCreators(getDashboardsAsync, dispatch),
     addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
+    loadDE: bindActionCreators(loadDEAction, dispatch),
+    updateQueryDrafts: bindActionCreators(updateQueryDraftsAction, dispatch),
+    addQuery: bindActionCreators(addQueryAsync, dispatch),
+    deleteQuery: bindActionCreators(deleteQueryAsync, dispatch),
   }
 }
 
