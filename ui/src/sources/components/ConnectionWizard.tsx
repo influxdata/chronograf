@@ -107,6 +107,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         >
           <DashboardStep
             ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
+            source={source}
             dashboardsCreated={dashboardsCreated}
           />
         </WizardStep>

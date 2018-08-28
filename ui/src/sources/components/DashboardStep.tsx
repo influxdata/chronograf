@@ -28,7 +28,7 @@ import {
 } from 'src/shared/copy/notifications'
 
 // Types
-import {Protoboard} from 'src/types'
+import {Protoboard, Source} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 interface State {
@@ -40,6 +40,7 @@ interface State {
 interface Props {
   notify: typeof notifyAction
   dashboardsCreated: Protoboard[]
+  source: Source
 }
 
 @ErrorHandling
@@ -64,7 +65,7 @@ class DashboardStep extends Component<Props, State> {
 
   public next = async (): Promise<NextReturn> => {
     const {selected, protoboards} = this.state
-    const {dashboardsCreated, notify} = this.props
+    const {dashboardsCreated, notify, source} = this.props
 
     const selectedProtoboards = protoboards.filter(p => selected[p.id])
 
@@ -79,7 +80,7 @@ class DashboardStep extends Component<Props, State> {
 
     try {
       newSelectedProtoboards.forEach(p => {
-        createDashboardFromProtoboard(p)
+        createDashboardFromProtoboard(p, source)
       })
       if (countNew > 0) {
         notify(notifyDashboardCreated(countNew))
