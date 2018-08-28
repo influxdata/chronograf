@@ -10,6 +10,14 @@
   }
 
   .protoboard-icon--shape {
+    stroke: $c-pool;
+    stroke-width: 2;
+    fill: transparent;
+  }
+
+  .protoboard-icon--text-shape {
+    stroke-width: 2;
+    stroke: $c-pool;
     fill: $c-pool;
   }
   
