@@ -90,7 +90,6 @@ interface Props {
   executeQueriesAsync: () => void
   setTableRelativeTime: (time: number) => void
   setTableCustomTime: (time: string) => void
-  fetchNewerLogsAsync: (queryTimeEnd: string) => Promise<void>
   addFilter: (filter: Filter) => void
   removeFilter: (id: string) => void
   changeFilter: (id: string, operator: string, value: string) => void
@@ -115,6 +114,7 @@ interface Props {
     relative: number
   }
   fetchOlderLogsAsync: () => Promise<void>
+  fetchNewerLogsAsync: () => Promise<void>
 }
 
 interface State {
@@ -181,10 +181,9 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   public async componentDidMount() {
-    console.log('componentDidMount')
-    const sources = await this.props.getSources()
+    await this.props.getSources()
     await this.setCurrentSource()
-    console.log('componentDidMount this.props.getConfig')
+
     await this.props.getConfig(this.logConfigLink)
 
     this.startOlderLogsFetching()
@@ -250,13 +249,12 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private setCurrentSource = async () => {
-    console.log('setCurrentSource')
     if (!this.props.currentSource && this.props.sources.length > 0) {
       const source =
         this.props.sources.find(src => {
           return src.default
         }) || this.props.sources[0]
-      console.log('setCurrentSource this.props.getSourceAndPopulateNamespaces')
+
       return await this.props.getSourceAndPopulateNamespaces(source.id)
     }
   }
@@ -270,6 +268,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private startNewerLogsFetchingInterval = () => {
+    // console.log('startNewerLogsFetchingInterval')
     if (this.interval) {
       clearInterval(this.interval)
     }
@@ -281,14 +280,14 @@ class LogsPageSimple extends Component<Props, State> {
     this.setState({liveUpdating: true})
   }
 
-  private handleNewerLogsFetchingInterval = () => {
-    this.fetchNewerLogs()
+  private handleNewerLogsFetchingInterval = async () => {
+    // console.log('handleNewerLogsFetchingInterval')
+    await this.fetchNewerLogs()
   }
 
-  private fetchNewerLogs = () => {
-    console.log(
-      `fetchNewerLogs: executeQueryAsync newest ${LOGS_FETCH_INTERVAL}ms`
-    )
+  private fetchNewerLogs = async () => {
+    // console.log('fetchNewerLogs')
+    await this.props.fetchNewerLogsAsync()
   }
 
   private fetchOlderLogs = async () => {
@@ -304,10 +303,10 @@ class LogsPageSimple extends Component<Props, State> {
       totalBackwardValues !== null &&
       totalBackwardValues < BACKWARD_VALUES_LIMIT
     ) {
-      console.log(
-        'fetchOlderLogs again, totalBackwardValues',
-        totalBackwardValues
-      )
+      // console.log(
+      //   'fetchOlderLogs again, totalBackwardValues',
+      //   totalBackwardValues
+      // )
       await this.fetchOlderLogs()
     }
   }

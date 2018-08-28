@@ -63,6 +63,7 @@ export const defaultState: LogsState = {
   },
   tableTime: {},
   nextOlderUpperBound: undefined,
+  nextNewerLowerBound: undefined,
   chunkDuration: DEFAULT_LOGS_CHUNK_DURATION_MS,
   newRowsAdded: 0,
 }
@@ -168,8 +169,15 @@ const prependMoreLogs = (
   const {tableInfiniteData} = state
   const {forward} = tableInfiniteData
   const vals = [...values, ...forward.values]
-
-  const uniqueValues = _.uniqBy(vals, '0')
+  console.log(
+    'prependMoreLogs vals.length',
+    vals.length,
+    '= backward.values.length',
+    forward.values.length,
+    '+ values.length',
+    values.length
+  )
+  const uniqueValues = _.uniqBy(vals, '0') // TODO(js): investigate this uniqBy for correct deduplication
   const newRowsAdded = uniqueValues.length - forward.values.length
 
   return {
@@ -248,8 +256,11 @@ export default (state: LogsState = defaultState, action: Action) => {
     case ActionTypes.SetTableRelativeTime:
       return {...state, tableTime: {relative: action.payload.time}}
     case ActionTypes.SetNextOlderUpperBound:
-      console.log('SetNextOlderUpperBound reducer', action.payload.upper)
+      // console.log('SetNextOlderUpperBound reducer', action.payload.upper)
       return {...state, nextOlderUpperBound: action.payload.upper}
+    case ActionTypes.SetNextNewerLowerBound:
+      // console.log('SetNextNewerLowerBound reducer', action.payload.lower)
+      return {...state, nextNewerLowerBound: action.payload.lower}
     case ActionTypes.AddFilter:
       return addFilter(state, action)
     case ActionTypes.RemoveFilter:

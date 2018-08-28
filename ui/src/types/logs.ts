@@ -52,6 +52,7 @@ export interface LogsState {
     relative?: string
   }
   newRowsAdded: number
+  nextNewerLowerBound: number
   nextOlderUpperBound: number
   chunkDuration: number
 }

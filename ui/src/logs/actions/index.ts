@@ -82,6 +82,7 @@ export enum ActionTypes {
   ClearRowsAdded = 'CLEAR_ROWS_ADDED',
   ClearTableData = 'CLEAR_TABLE_DATA',
   SetNextOlderUpperBound = 'SET_NEXT_OLDER_UPPER_BOUND',
+  SetNextNewerLowerBound = 'SET_NEXT_NEWER_LOWER_BOUND',
 }
 
 export interface ClearRowsAddedAction {
@@ -248,6 +249,13 @@ interface SetNextOlderUpperBound {
   }
 }
 
+interface SetNextNewerLowerBound {
+  type: ActionTypes.SetNextNewerLowerBound
+  payload: {
+    lower: string | undefined
+  }
+}
+
 export type Action =
   | SetSourceAction
   | SetNamespacesAction
@@ -274,6 +282,7 @@ export type Action =
   | ClearRowsAddedAction
   | ClearTableDataAction
   | SetNextOlderUpperBound
+  | SetNextNewerLowerBound
 
 const getTimeRange = (state: State): TimeRange | null =>
   getDeep<TimeRange | null>(state, 'logs.timeRange', null)
@@ -364,6 +373,13 @@ export const setNextOlderUpperBound = (
 ): SetNextOlderUpperBound => ({
   type: ActionTypes.SetNextOlderUpperBound,
   payload: {upper},
+})
+
+export const setNextNewerLowerBound = (
+  lower: string
+): SetNextNewerLowerBound => ({
+  type: ActionTypes.SetNextNewerLowerBound,
+  payload: {lower},
 })
 
 export const executeTableNewerQueryAsync = () => async (
@@ -645,9 +661,6 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
   const lower = olderLowerBound.toISOString()
   dispatch(setNextOlderUpperBound(lower))
 
-  console.log('upper', upper)
-  console.log('lower', lower)
-
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -663,6 +676,8 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
       filters,
       searchTerm
     )
+    console.log('fetchNewerLogsAsync upper', upper, 'lower', lower)
+    // console.log('fetchOlderLogsAsync query', query)
 
     const response = await executeQueryAsync(
       proxyLink,
@@ -677,6 +692,66 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
     )
 
     await dispatch(concatMoreLogs(logSeries))
+  } else {
+    throw new Error(
+      `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
+    )
+  }
+}
+
+
+export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
+  const state = getState()
+
+  const nextNewerLowerBound = getDeep<number>(
+    state,
+    'logs.nextNewerLowerBound',
+    Date.now()
+  )
+  const lower = moment(nextNewerLowerBound).toISOString()
+  const upper = moment(Date.now()).toISOString()
+  // TODO(js): get nextNewerLowerBound from upper bound time value in last results
+  // TODO(js): check if bounds are inclusive on both ends
+  // const upperForServer = 'now()'
+
+  dispatch(setNextNewerLowerBound(upper))
+
+  const tableQueryConfig = getTableQueryConfig(state)
+  const namespace = getNamespace(state)
+  const proxyLink = getProxyLink(state)
+  const searchTerm = getSearchTerm(state)
+  const filters = getFilters(state)
+  const params = [namespace, proxyLink, tableQueryConfig]
+
+  if (_.every(params)) {
+    const query = await buildInfiniteScrollLogQuery(
+      lower,
+      upper, // TODO: use 'now()' somehow
+      tableQueryConfig,
+      filters,
+      searchTerm
+    )
+    console.log('fetchNewerLogsAsync upper', upper, 'lower', lower)
+    // console.log('fetchNewerLogsAsync query', query)
+
+    const response = await executeQueryAsync(
+      proxyLink,
+      namespace,
+      `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
+    )
+
+    const logSeries = getDeep<TableData>(
+      response,
+      'results.0.series.0',
+      defaultTableData
+    )
+
+    await dispatch(
+      prependMoreLogs({
+        columns: logSeries.columns,
+        values: _.reverse(logSeries.values),
+      })
+    )
   } else {
     throw new Error(
       `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
@@ -731,56 +806,56 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
 //   }
 // }
 
-export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
-  dispatch,
-  getState
-): Promise<void> => {
-  const state = getState()
-  const tableQueryConfig = getTableQueryConfig(state)
-  const timeRange = {lower: queryTimeStart}
-  const newQueryConfig = {
-    ...tableQueryConfig,
-    range: timeRange,
-  }
-  const namespace = getNamespace(state)
-  const proxyLink = getProxyLink(state)
-  const searchTerm = getSearchTerm(state)
-  const filters = getFilters(state)
-  const params = [namespace, proxyLink, tableQueryConfig]
+// export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
+//   dispatch,
+//   getState
+// ): Promise<void> => {
+//   const state = getState()
+//   const tableQueryConfig = getTableQueryConfig(state)
+//   const timeRange = {lower: queryTimeStart}
+//   const newQueryConfig = {
+//     ...tableQueryConfig,
+//     range: timeRange,
+//   }
+//   const namespace = getNamespace(state)
+//   const proxyLink = getProxyLink(state)
+//   const searchTerm = getSearchTerm(state)
+//   const filters = getFilters(state)
+//   const params = [namespace, proxyLink, tableQueryConfig]
 
-  if (_.every(params)) {
-    const queryTimeEnd = await findNewerUpperTimeBounds(
-      queryTimeStart,
-      newQueryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
+//   if (_.every(params)) {
+//     const queryTimeEnd = await findNewerUpperTimeBounds(
+//       queryTimeStart,
+//       newQueryConfig,
+//       filters,
+//       searchTerm,
+//       proxyLink,
+//       namespace
+//     )
 
-    const query: string = await buildInfiniteScrollLogQuery(
-      queryTimeStart,
-      queryTimeEnd,
-      newQueryConfig,
-      filters,
-      searchTerm
-    )
+//     const query: string = await buildInfiniteScrollLogQuery(
+//       queryTimeStart,
+//       queryTimeEnd,
+//       newQueryConfig,
+//       filters,
+//       searchTerm
+//     )
 
-    const response = await executeQueryAsync(
-      proxyLink,
-      namespace,
-      `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
-    )
+//     const response = await executeQueryAsync(
+//       proxyLink,
+//       namespace,
+//       `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
+//     )
 
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
-    await dispatch(
-      prependMoreLogs({
-        columns: series.columns,
-        values: _.reverse(series.values),
-      })
-    )
-  }
-}
+//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
+//     await dispatch(
+//       prependMoreLogs({
+//         columns: series.columns,
+//         values: _.reverse(series.values),
+//       })
+//     )
+//   }
+// }
 
 export const concatMoreLogs = (series: TableData): ConcatMoreLogsAction => ({
   type: ActionTypes.ConcatMoreLogs,
