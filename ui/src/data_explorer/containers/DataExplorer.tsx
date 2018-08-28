@@ -324,7 +324,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       ],
     }
 
-    return [...TEMPLATES, upperDashboardTime, dashboardTime]
+    return [...TEMPLATES, dashboardTime, upperDashboardTime]
   }
 
   private handleCloseWriteData = (): void => {
