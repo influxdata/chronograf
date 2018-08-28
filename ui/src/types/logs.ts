@@ -17,6 +17,7 @@ export enum SearchStatus {
   UpdatingTimeBounds = 'UpdatingTimeBounds',
   UpdatingFilters = 'UpdatingFilters',
   Loaded = 'Loaded',
+  Clearing = 'Clearing',
 }
 
 export interface Filter {

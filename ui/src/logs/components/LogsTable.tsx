@@ -76,6 +76,7 @@ interface Props {
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
   searchStatus: SearchStatus
+  nextOlderUpperBound:
 }
 
 interface State {
@@ -89,6 +90,7 @@ interface State {
   visibleColumnsCount: number
   searchPattern: string
   infiniteLoaderQueryCount: number
+  nextOlderUpperBound: string
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -217,7 +219,7 @@ class LogsTable extends Component<Props, State> {
   }
 
   public render() {
-    const {queryCount} = this.props
+    const {queryCount, nextOlderUpperBound, searchStatus} = this.props
     const {infiniteLoaderQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
@@ -234,6 +236,8 @@ class LogsTable extends Component<Props, State> {
           <QueryResults
             count={this.rowCount()}
             queryCount={infiniteLoaderQueryCount + queryCount}
+            searchStatus={searchStatus}
+            nextOlderUpperBound={nextOlderUpperBound}
           />
         </div>
         <AutoSizer>
@@ -739,7 +743,12 @@ class LogsTable extends Component<Props, State> {
   }
 
   private get loadingStatus(): JSX.Element {
-    return <LoadingStatus status={this.props.searchStatus} />
+    return (
+      <LoadingStatus
+        status={this.props.searchStatus}
+        nextOlderUpperBound={this.props.nextOlderUpperBound}
+      />
+    )
   }
 
   private get isLoadingTableData(): boolean {

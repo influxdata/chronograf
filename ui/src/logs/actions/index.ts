@@ -382,6 +382,11 @@ export const setNextNewerLowerBound = (
   payload: {lower},
 })
 
+export const clearNextTimeBounds = () => dispatch => {
+  dispatch(setNextNewerLowerBound(undefined))
+  dispatch(setNextOlderUpperBound(undefined))
+}
+
 export const executeTableNewerQueryAsync = () => async (
   dispatch,
   getState: GetState
@@ -639,10 +644,11 @@ export const setTableQueryConfigAsync = () => async (
 export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
   const state = getState()
 
+  const time = getTableSelectedTime(state)
   const nextOlderUpperBound = getDeep<number>(
     state,
     'logs.nextOlderUpperBound',
-    Date.now()
+    time
   )
 
   const chunkDurationMs = getDeep<number>(
@@ -676,7 +682,7 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
       filters,
       searchTerm
     )
-    console.log('fetchNewerLogsAsync upper', upper, 'lower', lower)
+    // console.log('fetchOlderLogsAsync upper', upper, 'lower', lower)
     // console.log('fetchOlderLogsAsync query', query)
 
     const response = await executeQueryAsync(
@@ -699,14 +705,14 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
   }
 }
 
-
 export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
   const state = getState()
+  const time = getTableSelectedTime(state)
 
   const nextNewerLowerBound = getDeep<number>(
     state,
     'logs.nextNewerLowerBound',
-    Date.now()
+    moment(time).unix()
   )
   const lower = moment(nextNewerLowerBound).toISOString()
   const upper = moment(Date.now()).toISOString()
@@ -731,7 +737,7 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
       filters,
       searchTerm
     )
-    console.log('fetchNewerLogsAsync upper', upper, 'lower', lower)
+    // console.log('fetchNewerLogsAsync upper', upper, 'lower', lower)
     // console.log('fetchNewerLogsAsync query', query)
 
     const response = await executeQueryAsync(

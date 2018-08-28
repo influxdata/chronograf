@@ -75,6 +75,8 @@ const clearTableData = (state: LogsState) => {
       forward: defaultTableData,
       backward: defaultTableData,
     },
+    nextOlderUpperBound: undefined,
+    nextNewerLowerBound: undefined,
   }
 }
 
@@ -134,25 +136,25 @@ const concatMoreLogs = (
   action: ConcatMoreLogsAction
 ): LogsState => {
   const {
-    series: {values},
+    series: {columns, values},
   } = action.payload
   const {tableInfiniteData} = state
   const {backward} = tableInfiniteData
   const vals = [...backward.values, ...values]
-  console.log(
-    'concatMoreLogs vals.length',
-    vals.length,
-    '= backward.values.length',
-    backward.values.length,
-    '+ values.length',
-    values.length
-  )
+  // console.log(
+  //   'concatMoreLogs vals.length',
+  //   vals.length,
+  //   '= backward.values.length',
+  //   backward.values.length,
+  //   '+ values.length',
+  //   values.length
+  // )
   return {
     ...state,
     tableInfiniteData: {
       ...tableInfiniteData,
       backward: {
-        columns: backward.columns,
+        columns,
         values: vals,
       },
     },

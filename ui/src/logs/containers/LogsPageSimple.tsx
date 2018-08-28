@@ -34,6 +34,7 @@ import {
   getLogConfigAsync,
   updateLogConfigAsync,
   clearTableData,
+  clearNextTimeBounds,
 } from 'src/logs/actions'
 import {getSourcesAsync} from 'src/shared/actions/sources'
 import LogsHeader from 'src/logs/components/LogsHeader'
@@ -115,6 +116,9 @@ interface Props {
   }
   fetchOlderLogsAsync: () => Promise<void>
   fetchNewerLogsAsync: () => Promise<void>
+  clearTableData: () => void
+  clearNextTimeBounds: () => void
+  nextOlderUpperBound: string
 }
 
 interface State {
@@ -142,9 +146,11 @@ class LogsPageSimple extends Component<Props, State> {
 
     let {searchStatus} = state
 
-    if (isEmptyInfiniteData(tableInfiniteData)) {
-      searchStatus = SearchStatus.NoResults
-    } else if (searchStatus === SearchStatus.None) {
+    if (
+      searchStatus !== SearchStatus.None &&
+      searchStatus !== SearchStatus.Clearing &&
+      !isEmptyInfiniteData(tableInfiniteData)
+    ) {
       searchStatus = SearchStatus.Loaded
     }
 
@@ -186,8 +192,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     await this.props.getConfig(this.logConfigLink)
 
-    this.startOlderLogsFetching()
-    this.startNewerLogsFetchingInterval()
+    this.fetchSearchDataset(SearchStatus.Loading)
 
     // if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
     //   this.startNewerLogsFetchingInterval()
@@ -199,7 +204,13 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   public render() {
-    const {filters, queryCount, timeRange, notify} = this.props
+    const {
+      filters,
+      queryCount,
+      timeRange,
+      notify,
+      nextOlderUpperBound,
+    } = this.props
     const {searchStatus} = this.state
 
     return (
@@ -207,7 +218,12 @@ class LogsPageSimple extends Component<Props, State> {
         <div className="page">
           {this.header}
           <div className="page-contents logs-viewer">
-            <QueryResults count={this.histogramTotal} queryCount={queryCount} />
+            <QueryResults
+              count={this.histogramTotal}
+              queryCount={queryCount}
+              searchStatus={searchStatus}
+              nextOlderUpperBound={nextOlderUpperBound}
+            />
             {/* <LogsGraphContainer>{this.chart}</LogsGraphContainer> */}
             <SearchBar onSearch={this.handleSubmitSearch} />
             <FilterBar
@@ -240,6 +256,7 @@ class LogsPageSimple extends Component<Props, State> {
               notify={notify}
               searchStatus={searchStatus}
               filters={filters}
+              nextOlderUpperBound={nextOlderUpperBound}
             />
           </div>
         </div>
@@ -282,7 +299,7 @@ class LogsPageSimple extends Component<Props, State> {
 
   private handleNewerLogsFetchingInterval = async () => {
     // console.log('handleNewerLogsFetchingInterval')
-    await this.fetchNewerLogs()
+    // await this.fetchNewerLogs()
   }
 
   private fetchNewerLogs = async () => {
@@ -291,6 +308,10 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchOlderLogs = async () => {
+    if (this.state.searchStatus === SearchStatus.Clearing) {
+      return
+    }
+
     const totalBackwardValues = getDeep<number | null>(
       this.props,
       'tableInfiniteData.backward.values.length',
@@ -299,10 +320,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     await this.props.fetchOlderLogsAsync()
 
-    if (
-      totalBackwardValues !== null &&
-      totalBackwardValues < BACKWARD_VALUES_LIMIT
-    ) {
+    if (totalBackwardValues !== null && totalBackwardValues < 550) {
       // console.log(
       //   'fetchOlderLogs again, totalBackwardValues',
       //   totalBackwardValues
@@ -421,7 +439,7 @@ class LogsPageSimple extends Component<Props, State> {
       value: selection.tag,
       operator: '==',
     })
-    this.fetchNewDataset()
+    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
   private get histogramTotal(): number {
@@ -663,18 +681,16 @@ class LogsPageSimple extends Component<Props, State> {
   private fetchSearchDataset = async (
     searchStatus: SearchStatus
   ): Promise<void> => {
-    return Promise.resolve()
-    // try {
-    //   this.setState({searchStatus})
-    //   await this.fetchNewDataset()
-    // } finally {
-    //   this.setState({searchStatus: SearchStatus.Loaded})
-    // }
+    this.fetchNewDataset(searchStatus)
   }
 
-  private fetchNewDataset() {
-    return Promise.resolve()
-    // return this.props.executeQueriesAsync()
+  private fetchNewDataset(searchStatus) {
+    this.setState({searchStatus: SearchStatus.Clearing})
+    this.props.clearTableData()
+    this.props.clearNextTimeBounds()
+    this.setState({searchStatus})
+    this.startNewerLogsFetchingInterval()
+    this.startOlderLogsFetching()
   }
 
   private handleToggleOverlay = (): void => {
@@ -775,6 +791,7 @@ const mapStateToProps = ({
     logConfig,
     tableTime,
     tableInfiniteData,
+    nextOlderUpperBound,
   },
 }) => ({
   sources,
@@ -791,6 +808,7 @@ const mapStateToProps = ({
   logConfigLink: logViewer,
   tableInfiniteData,
   newRowsAdded,
+  nextOlderUpperBound,
 })
 
 const mapDispatchToProps = {
@@ -803,6 +821,7 @@ const mapDispatchToProps = {
   setNamespaceAsync,
   executeQueriesAsync,
   clearTableData,
+  clearNextTimeBounds,
   addFilter,
   removeFilter,
   changeFilter,

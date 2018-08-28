@@ -1,18 +1,24 @@
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
+import moment from 'moment'
 
 import {SearchStatus} from 'src/types/logs'
 import {LoadingMessages} from 'src/logs/constants'
 
 interface Props {
   status: SearchStatus
+  nextOlderUpperBound: string
 }
 
 class LoadingStatus extends PureComponent<Props> {
   public render() {
+    const {nextOlderUpperBound} = this.props
+
     return (
       <div className="logs-viewer--table-container generic-empty-state">
-        <h4>{this.loadingMessage}...</h4>
+        <h4>
+          {this.loadingMessage}... {moment(nextOlderUpperBound).fromNow()}
+        </h4>
         <p>{this.description}</p>
       </div>
     )
