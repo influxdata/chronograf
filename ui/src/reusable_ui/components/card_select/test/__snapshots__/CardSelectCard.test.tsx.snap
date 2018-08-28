@@ -22,8 +22,8 @@ exports[`Card Select Card matches snapshot with minimal props 1`] = `
     <div
       className="card-select--image"
     >
-      <span
-        className="card-select--placeholder icon dash-j"
+      <ProtoboardIcon
+        displayText="Card Label"
       />
     </div>
     <span

@@ -2,6 +2,7 @@
 import React, {PureComponent} from 'react'
 import classnames from 'classnames'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import ProtoboardIcon from 'src/reusable_ui/components/card_select/ProtoboardIcon'
 
 interface Props {
   id: string
@@ -66,7 +67,7 @@ class CardSelectCard extends PureComponent<Props> {
       return <img src={image} alt={`${label} icon`} />
     }
 
-    return <span className="card-select--placeholder icon dash-j" />
+    return <ProtoboardIcon displayText={label} />
   }
 
   private handleClick = e => {

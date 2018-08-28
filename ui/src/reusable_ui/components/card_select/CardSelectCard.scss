@@ -38,15 +38,11 @@
 .card-select--image {
     justify-content: center;
     max-width: 60%;
-    .card-select--placeholder {
-        color: $ix-text-default;
-        transition: color .2s ease;
-    }
+    filter: grayscale(0.80) opacity(30%);
+    transition: filter .2s ease;
     img {
-        filter: grayscale(0.80);
         width: 100%;
         height: 100%;
-        transition: filter .2s ease;
         font-size: $ix-text-base;
     }
 }
@@ -55,12 +51,7 @@
 .card-select--active.card-select--checked {
     background-color: $g5-pepper;
     .card-select--image {
-        img {
-            filter: grayscale(0);
-        }
-    }
-    .card-select--placeholder {
-        color: $c-pool;
+        filter: grayscale(0) opacity(100%);
     }
 }
 

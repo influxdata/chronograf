@@ -17,7 +17,7 @@ interface State {
 @ErrorHandling
 class GridSizer extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
-    cellWidth: 160,
+    cellWidth: 150,
     width: null,
   }
 
