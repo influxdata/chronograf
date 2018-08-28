@@ -26,7 +26,6 @@ import DEHeader from 'src/data_explorer/components/DEHeader'
 import {errorThrown} from 'src/shared/actions/errors'
 import {setAutoRefresh} from 'src/shared/actions/app'
 import {getDashboardsAsync, addDashboardCellAsync} from 'src/dashboards/actions'
-import * as dataExplorerActionCreators from 'src/data_explorer/actions/view'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {
   loadDE as loadDEAction,
@@ -34,6 +33,7 @@ import {
   updateQueryDrafts as updateQueryDraftsAction,
   addQueryAsync,
   deleteQueryAsync,
+  updateEditorTimeRange,
 } from 'src/data_explorer/actions/queries'
 
 // Constants
@@ -43,7 +43,6 @@ import {
   TEMP_VAR_UPPER_DASHBOARD_TIME,
 } from 'src/shared/constants'
 import {buildRawText} from 'src/utils/influxql'
-// import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
 // Types
 import {
@@ -346,13 +345,6 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   private get activeQueryConfig(): QueryConfig {
     const {queryDrafts} = this.props
-
-    // if (queryConfigs.length === 0) {
-    //   const qc = defaultQueryConfig()
-    //   this.props.addQuery(qc.id)
-    //   queryConfigs.push(qc)
-    // }
-
     return _.get(queryDrafts, 'queryConfig.0')
   }
 
@@ -384,8 +376,7 @@ const mapStateToProps = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer: {queryDrafts},
-    timeRange,
+    dataExplorer: {queryDrafts, timeRange},
     dashboardUI: {dashboards},
     sources,
     services,
@@ -405,10 +396,7 @@ const mapDispatchToProps = dispatch => {
   return {
     handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
     errorThrownAction: bindActionCreators(errorThrown, dispatch),
-    setTimeRange: bindActionCreators(
-      dataExplorerActionCreators.setTimeRange,
-      dispatch
-    ),
+    setTimeRange: bindActionCreators(updateEditorTimeRange, dispatch),
     writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
     queryConfigActions: bindActionCreators(queryConfigModifiers, dispatch),
     handleGetDashboards: bindActionCreators(getDashboardsAsync, dispatch),
