@@ -174,7 +174,7 @@ const prependMoreLogs = (
   console.log(
     'prependMoreLogs vals.length',
     vals.length,
-    '= backward.values.length',
+    '= forward.values.length',
     forward.values.length,
     '+ values.length',
     values.length

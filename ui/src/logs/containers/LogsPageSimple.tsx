@@ -14,7 +14,7 @@ import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 const LOGS_FETCH_INTERVAL = 5000
-const BACKWARD_VALUES_LIMIT = 20
+const BACKWARD_VALUES_LIMIT = 200
 
 import {
   setTableCustomTimeAsync,
@@ -438,7 +438,7 @@ class LogsPageSimple extends Component<Props, State> {
       value: selection.tag,
       operator: '==',
     })
-    // this.fetchSearchDataset(SearchStatus.UpdatingFilters)
+    this.fetchNewDataset(SearchStatus.UpdatingFilters)
   }
 
   private get histogramTotal(): number {
@@ -613,13 +613,13 @@ class LogsPageSimple extends Component<Props, State> {
       this.props.addFilter(filter)
     })
 
-    this.fetchSearchDataset(SearchStatus.Loading)
+    this.fetchNewDataset(SearchStatus.Loading)
   }
 
   private handleFilterDelete = (id: string): void => {
     this.props.removeFilter(id)
 
-    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
+    this.fetchNewDataset(SearchStatus.UpdatingFilters)
   }
 
   private handleFilterChange = async (
@@ -628,7 +628,7 @@ class LogsPageSimple extends Component<Props, State> {
     value: string
   ): Promise<void> => {
     this.props.changeFilter(id, operator, value)
-    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
+    this.fetchNewDataset(SearchStatus.UpdatingFilters)
   }
 
   private handleBarClick = (time: string): void => {
@@ -661,7 +661,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     this.props.setTimeRangeAsync(this.props.timeRange)
 
-    this.fetchSearchDataset(SearchStatus.UpdatingTimeBounds)
+    this.fetchNewDataset(SearchStatus.UpdatingTimeBounds)
   }
 
   private handleSetTimeWindow = async (timeWindow: TimeWindow) => {

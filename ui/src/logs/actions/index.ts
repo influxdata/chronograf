@@ -688,7 +688,7 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
-      `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
+      `${query} ORDER BY time DESC`
     )
 
     const logSeries = getDeep<TableData>(
@@ -712,7 +712,7 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
   const nextNewerLowerBound = getDeep<number>(
     state,
     'logs.nextNewerLowerBound',
-    moment(time).unix()
+    time
   )
   const lower = moment(nextNewerLowerBound).toISOString()
   const upper = moment(Date.now()).toISOString()
@@ -743,7 +743,7 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
-      `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
+      `${query} ORDER BY time DESC`
     )
 
     const logSeries = getDeep<TableData>(
@@ -751,7 +751,7 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-    console.log(logSeries.values)
+    console.log(query, logSeries.values)
     await dispatch(
       prependMoreLogs({
         columns: logSeries.columns,
