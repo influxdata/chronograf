@@ -82,7 +82,7 @@ class DatabaseListItem extends PureComponent<Props, State> {
   }
 
   private get filterAndTagList(): JSX.Element {
-    const {db, service} = this.props
+    const {db, service, notify} = this.props
     const {isOpen, searchTerm} = this.state
 
     return (
@@ -99,7 +99,13 @@ class DatabaseListItem extends PureComponent<Props, State> {
             onChange={this.onSearch}
           />
         </div>
-        <TagList db={db} service={service} tags={this.tags} filter={[]} />
+        <TagList
+          db={db}
+          service={service}
+          tags={this.tags}
+          filter={[]}
+          notify={notify}
+        />
       </div>
     )
   }

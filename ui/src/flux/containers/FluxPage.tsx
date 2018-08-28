@@ -1,22 +1,41 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
 
-import TimeMachine from 'src/flux/components/TimeMachine'
+// Components
+import FluxQueryBuilder from 'src/flux/components/FluxQueryBuilder'
 import FluxHeader from 'src/flux/components/FluxHeader'
+import TimeMachineVis from 'src/flux/components/TimeMachineVis'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import KeyboardShortcuts from 'src/shared/components/KeyboardShortcuts'
 
+// Utils
+import {
+  addNode,
+  appendJoin,
+  parseError,
+  deleteBody,
+  toggleYield,
+  deleteFuncNode,
+  getBodyToScript,
+  scriptUpToYield,
+} from 'src/flux/helpers/scriptBuilder'
+
+// Actions
 import {
   validateSuccess,
   fluxTimeSeriesError,
   fluxResponseTruncatedError,
 } from 'src/shared/copy/notifications'
-import {UpdateScript} from 'src/flux/actions'
 
+// Constants
 import {bodyNodes} from 'src/flux/helpers'
 import {getSuggestions, getAST, getTimeSeries} from 'src/flux/apis'
-import {builder, argTypes, emptyAST} from 'src/flux/constants'
+import {builder, emptyAST} from 'src/flux/constants'
+import {HANDLE_HORIZONTAL} from 'src/shared/constants'
 
+// Types
+import {UpdateScript} from 'src/flux/actions'
 import {Source, Service, Notification, FluxTable} from 'src/types'
 import {
   Suggestion,
@@ -28,11 +47,7 @@ import {
   Func,
   ScriptStatus,
 } from 'src/types/flux'
-
-interface Status {
-  type: string
-  text: string
-}
+import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
 interface Props {
   links: Links
@@ -105,26 +120,33 @@ export class FluxPage extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {suggestions, body, status} = this.state
-    const {script, service} = this.props
-
+    const {service, script} = this.props
+    const horizontalDivisions = [
+      {
+        name: '',
+        handleDisplay: 'none',
+        headerButtons: [],
+        menuOptions: [],
+        render: () => <TimeMachineVis service={service} script={script} />,
+        headerOrientation: HANDLE_HORIZONTAL,
+      },
+      {
+        name: '',
+        headerButtons: [],
+        menuOptions: [],
+        render: () => this.fluxQueryBuilder,
+        headerOrientation: HANDLE_HORIZONTAL,
+      },
+    ]
     return (
       <FluxContext.Provider value={this.getContext}>
         <KeyboardShortcuts onControlEnter={this.getTimeSeries}>
           <div className="page hosts-list-page">
             {this.header}
-            <TimeMachine
-              body={body}
-              script={script}
-              status={status}
-              service={service}
-              suggestions={suggestions}
-              onValidate={this.handleValidate}
-              onAppendFrom={this.handleAppendFrom}
-              onAppendJoin={this.handleAppendJoin}
-              onChangeScript={this.handleChangeScript}
-              onSubmitScript={this.handleSubmitScript}
-              onDeleteBody={this.handleDeleteBody}
+            <Threesizer
+              orientation={HANDLE_HORIZONTAL}
+              divisions={horizontalDivisions}
+              containerClass="page-contents"
             />
           </div>
         </KeyboardShortcuts>
@@ -171,6 +193,28 @@ export class FluxPage extends PureComponent<Props, State> {
       data: this.state.data,
       scriptUpToYield: this.handleScriptUpToYield,
     }
+  }
+
+  private get fluxQueryBuilder(): JSX.Element {
+    const {suggestions, body, status} = this.state
+    const {script, service, notify} = this.props
+    return (
+      <FluxQueryBuilder
+        body={body}
+        notify={notify}
+        script={script}
+        status={status}
+        service={service}
+        context={this.getContext}
+        suggestions={suggestions}
+        onValidate={this.handleValidate}
+        onAppendFrom={this.handleAppendFrom}
+        onAppendJoin={this.handleAppendJoin}
+        onChangeScript={this.handleChangeScript}
+        onSubmitScript={this.handleSubmitScript}
+        onDeleteBody={this.handleDeleteBody}
+      />
+    )
   }
 
   private handleSubmitScript = () => {

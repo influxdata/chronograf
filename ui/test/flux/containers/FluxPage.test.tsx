@@ -2,9 +2,9 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 import {FluxPage} from 'src/flux/containers/FluxPage'
-import TimeMachine from 'src/flux/components/TimeMachine'
 import {ActionTypes} from 'src/flux/actions'
 import {source} from 'test/resources'
+import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
 jest.mock('src/flux/apis', () => require('mocks/flux/apis'))
 
@@ -55,12 +55,12 @@ describe('Flux.Containers.FluxPage', () => {
       expect(wrapper.exists()).toBe(true)
     })
 
-    it('renders the <TimeMachine/>', () => {
+    it('renders the <Threesizer/>', () => {
       const {wrapper} = setup()
 
-      const timeMachine = wrapper.find(TimeMachine)
+      const threesizer = wrapper.find(Threesizer)
 
-      expect(timeMachine.exists()).toBe(true)
+      expect(threesizer.exists()).toBe(true)
     })
   })
 })

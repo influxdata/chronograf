@@ -40,7 +40,7 @@ const SourceSelector: SFC<Props> = ({
         sources={sources}
         allowInfluxQL={true}
         // TODO: when flux is added into CEO/DE, change to true
-        allowFlux={false}
+        allowFlux={process.env.NODE_ENV === 'development' ? true : false}
         allowDynamicSource={true}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onChangeService={onChangeService}

@@ -65,7 +65,7 @@ export default class TagListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {tagKey, db, service, filter} = this.props
+    const {tagKey, db, service, filter, notify} = this.props
     const {
       tagValues,
       searchTerm,
@@ -110,6 +110,7 @@ export default class TagListItem extends PureComponent<Props, State> {
           {!this.isLoading && (
             <TagValueList
               db={db}
+              notify={notify}
               service={service}
               values={tagValues}
               tagKey={tagKey}

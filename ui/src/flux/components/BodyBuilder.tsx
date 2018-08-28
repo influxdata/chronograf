@@ -9,11 +9,12 @@ import BodyDelete from 'src/flux/components/BodyDelete'
 import {funcNames} from 'src/flux/constants'
 
 import {Service} from 'src/types'
-import {Body, Suggestion} from 'src/types/flux'
+import {Body, Suggestion, Context} from 'src/types/flux'
 
 interface Props {
-  service: Service
   body: Body[]
+  service: Service
+  context: Context
   suggestions: Suggestion[]
   onAppendFrom: () => void
   onAppendJoin: () => void
@@ -22,7 +23,7 @@ interface Props {
 
 class BodyBuilder extends PureComponent<Props> {
   public render() {
-    const {body, onDeleteBody} = this.props
+    const {body, onDeleteBody, context} = this.props
 
     const bodybuilder = body.map((b, i) => {
       if (b.declarations.length) {
@@ -38,12 +39,13 @@ class BodyBuilder extends PureComponent<Props> {
                 </div>
                 <ExpressionNode
                   bodyID={b.id}
+                  funcs={d.funcs}
+                  context={context}
                   declarationID={d.id}
                   funcNames={this.funcNames}
-                  funcs={d.funcs}
-                  declarationsFromBody={this.declarationsFromBody}
-                  isLastBody={this.isLastBody(i)}
                   onDeleteBody={onDeleteBody}
+                  isLastBody={this.isLastBody(i)}
+                  declarationsFromBody={this.declarationsFromBody}
                 />
               </div>
             )
@@ -71,10 +73,11 @@ class BodyBuilder extends PureComponent<Props> {
           <ExpressionNode
             bodyID={b.id}
             funcs={b.funcs}
+            context={context}
             funcNames={this.funcNames}
-            declarationsFromBody={this.declarationsFromBody}
-            isLastBody={this.isLastBody(i)}
             onDeleteBody={onDeleteBody}
+            isLastBody={this.isLastBody(i)}
+            declarationsFromBody={this.declarationsFromBody}
           />
         </div>
       )

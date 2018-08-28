@@ -1,6 +1,6 @@
 import React from 'react'
 import {shallow} from 'enzyme'
-import TimeMachine from 'src/flux/components/TimeMachine'
+import FluxQueryBuilder from 'src/flux/components/FluxQueryBuilder'
 import {service} from 'test/resources'
 
 const setup = () => {
@@ -19,14 +19,14 @@ const setup = () => {
     status: {type: '', text: ''},
   }
 
-  const wrapper = shallow(<TimeMachine {...props} />)
+  const wrapper = shallow(<FluxQueryBuilder {...props} />)
 
   return {
     wrapper,
   }
 }
 
-describe('Flux.Components.TimeMachine', () => {
+describe('Flux.Components.FluxQueryBuilder', () => {
   describe('rendering', () => {
     it('renders', () => {
       const {wrapper} = setup()
