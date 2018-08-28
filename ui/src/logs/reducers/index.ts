@@ -11,10 +11,13 @@ import {
   ConcatMoreLogsAction,
   PrependMoreLogsAction,
   SetConfigsAction,
-  AppendOlderLogs,
 } from 'src/logs/actions'
 
-import {SeverityFormatOptions, DEFAULT_TRUNCATION} from 'src/logs/constants'
+import {
+  SeverityFormatOptions,
+  DEFAULT_TRUNCATION,
+  DEFAULT_LOGS_CHUNK_DURATION_MS,
+} from 'src/logs/constants'
 import {LogsState, TableData} from 'src/types/logs'
 
 const defaultTableData: TableData = {
@@ -59,11 +62,9 @@ export const defaultState: LogsState = {
     isTruncated: DEFAULT_TRUNCATION,
   },
   tableTime: {},
-  currentLowerTime: null,
-  currentUpperTime: null,
-  chunkDuration: 5000,
+  nextOlderUpperBound: undefined,
+  chunkDuration: DEFAULT_LOGS_CHUNK_DURATION_MS,
   newRowsAdded: 0,
-  tableLogs: defaultTableData,
 }
 
 const clearTableData = (state: LogsState) => {
@@ -137,7 +138,14 @@ const concatMoreLogs = (
   const {tableInfiniteData} = state
   const {backward} = tableInfiniteData
   const vals = [...backward.values, ...values]
-
+  console.log(
+    'concatMoreLogs vals.length',
+    vals.length,
+    '= backward.values.length',
+    backward.values.length,
+    '+ values.length',
+    values.length
+  )
   return {
     ...state,
     tableInfiniteData: {
@@ -192,22 +200,6 @@ export const setConfigs = (state: LogsState, action: SetConfigsAction) => {
   return {...state, logConfig: updatedLogConfig}
 }
 
-const appendLogs = (state: LogsState, action: AppendOlderLogs) => {
-  const {tableLogs} = state
-  const {logSeries} = action.payload
-  const values = [...tableLogs.values, ...logSeries.values]
-
-  console.log(values.length)
-  console.log(_.uniqBy(values, '0').length)
-  return {
-    ...state,
-    tableLogs: {
-      columns: logSeries.columns,
-      values,
-    },
-  }
-}
-
 export default (state: LogsState = defaultState, action: Action) => {
   switch (action.type) {
     case ActionTypes.SetSource:
@@ -235,8 +227,6 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, tableData: action.payload.data}
     case ActionTypes.ClearRowsAdded:
       return {...state, newRowsAdded: null}
-    case ActionTypes.AppendOlderLogs:
-      return appendLogs(state, action)
     case ActionTypes.SetTableForwardData:
       return {
         ...state,
@@ -257,6 +247,9 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, tableTime: {custom: action.payload.time}}
     case ActionTypes.SetTableRelativeTime:
       return {...state, tableTime: {relative: action.payload.time}}
+    case ActionTypes.SetNextOlderUpperBound:
+      console.log('SetNextOlderUpperBound reducer', action.payload.upper)
+      return {...state, nextOlderUpperBound: action.payload.upper}
     case ActionTypes.AddFilter:
       return addFilter(state, action)
     case ActionTypes.RemoveFilter:

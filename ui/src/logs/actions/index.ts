@@ -34,6 +34,7 @@ import {
 } from 'src/types/logs'
 
 export const INITIAL_LIMIT = 1000
+import {DEFAULT_LOGS_CHUNK_DURATION_MS} from 'src/logs/constants'
 
 const defaultTableData: TableData = {
   columns: [
@@ -80,14 +81,7 @@ export enum ActionTypes {
   SetTableBackwardData = 'SET_TABLE_BACKWARD_DATA',
   ClearRowsAdded = 'CLEAR_ROWS_ADDED',
   ClearTableData = 'CLEAR_TABLE_DATA',
-  AppendOlderLogs = 'APPEND_OLDER_LOGS',
-}
-
-export interface AppendOlderLogsAction {
-  type: ActionTypes.AppendOlderLogs
-  payload: {
-    logSeries: TableData
-  }
+  SetNextOlderUpperBound = 'SET_NEXT_OLDER_UPPER_BOUND',
 }
 
 export interface ClearRowsAddedAction {
@@ -247,6 +241,13 @@ export interface SetConfigsAction {
   }
 }
 
+interface SetNextOlderUpperBound {
+  type: ActionTypes.SetNextOlderUpperBound
+  payload: {
+    upper: string | undefined
+  }
+}
+
 export type Action =
   | SetSourceAction
   | SetNamespacesAction
@@ -272,7 +273,7 @@ export type Action =
   | SetTableBackwardDataAction
   | ClearRowsAddedAction
   | ClearTableDataAction
-  | AppendOlderLogsAction
+  | SetNextOlderUpperBound
 
 const getTimeRange = (state: State): TimeRange | null =>
   getDeep<TimeRange | null>(state, 'logs.timeRange', null)
@@ -317,13 +318,6 @@ export const clearRowsAdded = () => ({
   type: ActionTypes.ClearRowsAdded,
 })
 
-export const appendOlderLogs = (logSeries: TableData) => ({
-  type: ActionTypes.AppendOlderLogs,
-  payload: {
-    logSeries,
-  },
-})
-
 export const setTableCustomTime = (time: string): SetTableCustomTimeAction => ({
   type: ActionTypes.SetTableCustomTime,
   payload: {time},
@@ -363,6 +357,13 @@ export const setTimeMarker = (timeMarker: TimeMarker): SetTimeMarkerAction => ({
 export const setTimeBounds = (timeBounds: TimeBounds): SetTimeBoundsAction => ({
   type: ActionTypes.SetTimeBounds,
   payload: {timeBounds},
+})
+
+export const setNextOlderUpperBound = (
+  upper: string
+): SetNextOlderUpperBound => ({
+  type: ActionTypes.SetNextOlderUpperBound,
+  payload: {upper},
 })
 
 export const executeTableNewerQueryAsync = () => async (
@@ -620,13 +621,33 @@ export const setTableQueryConfigAsync = () => async (
 }
 
 export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
-  console.log('FETCHING ')
   const state = getState()
-  const currentLowerTime = getDeep(state, 'logs.currentLowerTime', Date.now())
-  const chunkDuration = getDeep(state, 'logs.chunkDuration', 5000)
-  const nextLowerTime = currentLowerTime - chunkDuration
-  const upper = moment(currentLowerTime).toISOString()
-  const lower = moment(nextLowerTime).toISOString()
+
+  const nextOlderUpperBound = getDeep<number>(
+    state,
+    'logs.nextOlderUpperBound',
+    Date.now()
+  )
+
+  const chunkDurationMs = getDeep<number>(
+    state,
+    'logs.chunkDurationMs',
+    DEFAULT_LOGS_CHUNK_DURATION_MS
+  )
+
+  const olderUpperBound = moment(nextOlderUpperBound)
+  const upper = olderUpperBound.toISOString()
+
+  const olderLowerBound = olderUpperBound.subtract(
+    chunkDurationMs,
+    'milliseconds'
+  )
+  const lower = olderLowerBound.toISOString()
+  dispatch(setNextOlderUpperBound(lower))
+
+  console.log('upper', upper)
+  console.log('lower', lower)
+
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -649,9 +670,17 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
       `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
     )
 
-    const logs = getDeep(response, 'results.0.series.0', defaultTableData)
+    const logSeries = getDeep<TableData>(
+      response,
+      'results.0.series.0',
+      defaultTableData
+    )
 
-    await dispatch(appendOlderLogs(logs))
+    await dispatch(concatMoreLogs(logSeries))
+  } else {
+    throw new Error(
+      `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
+    )
   }
 }
 
@@ -698,7 +727,7 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
 //     )
 
 //     const series = getDeep(response, 'results.0.series.0', defaultTableData)
-//     await dispatch(ConcatMoreLogs(series))
+//     await dispatch(concatMoreLogs(series))
 //   }
 // }
 
@@ -745,7 +774,7 @@ export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
 
     const series = getDeep(response, 'results.0.series.0', defaultTableData)
     await dispatch(
-      PrependMoreLogs({
+      prependMoreLogs({
         columns: series.columns,
         values: _.reverse(series.values),
       })
@@ -753,12 +782,12 @@ export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
   }
 }
 
-export const ConcatMoreLogs = (series: TableData): ConcatMoreLogsAction => ({
+export const concatMoreLogs = (series: TableData): ConcatMoreLogsAction => ({
   type: ActionTypes.ConcatMoreLogs,
   payload: {series},
 })
 
-export const PrependMoreLogs = (series: TableData): PrependMoreLogsAction => ({
+export const prependMoreLogs = (series: TableData): PrependMoreLogsAction => ({
   type: ActionTypes.PrependMoreLogs,
   payload: {series},
 })
@@ -771,8 +800,8 @@ export const setNamespaceAsync = (namespace: Namespace) => async (
     payload: {namespace},
   })
 
-  dispatch(setHistogramQueryConfigAsync())
-  dispatch(setTableQueryConfigAsync())
+  await dispatch(setHistogramQueryConfigAsync())
+  await dispatch(setTableQueryConfigAsync())
 }
 
 export const setNamespaces = (
@@ -802,9 +831,9 @@ export const populateNamespacesAsync = (
         namespace => namespace.database === source.telegraf
       )
 
-      dispatch(setNamespaceAsync(defaultNamespace))
+      await dispatch(setNamespaceAsync(defaultNamespace))
     } else {
-      dispatch(setNamespaceAsync(namespaces[0]))
+      await dispatch(setNamespaceAsync(namespaces[0]))
     }
   }
 }
@@ -818,7 +847,7 @@ export const getSourceAndPopulateNamespacesAsync = (sourceID: string) => async (
 
   if (proxyLink) {
     dispatch(setSource(source))
-    dispatch(populateNamespacesAsync(proxyLink, source))
+    await dispatch(populateNamespacesAsync(proxyLink, source))
   }
 }
 

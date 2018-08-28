@@ -52,10 +52,8 @@ export interface LogsState {
     relative?: string
   }
   newRowsAdded: number
-  currentUpperTime: number
-  currentLowerTime: number
+  nextOlderUpperBound: number
   chunkDuration: number
-  tableLogs: TableData
 }
 
 export interface LogConfig {

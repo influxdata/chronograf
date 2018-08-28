@@ -211,3 +211,5 @@ export const LoadingMessages = [
   '100% natural logs',
   'Chopping wood',
 ]
+
+export const DEFAULT_LOGS_CHUNK_DURATION_MS = 5000

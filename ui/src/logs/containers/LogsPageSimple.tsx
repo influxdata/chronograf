@@ -13,7 +13,8 @@ import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
-const NEWER_LOGS_INTERVAL = 3000
+const LOGS_FETCH_INTERVAL = 5000
+const BACKWARD_VALUES_LIMIT = 1000
 
 import {
   setTableCustomTimeAsync,
@@ -79,7 +80,7 @@ interface Props {
   currentSource: Source | null
   currentNamespaces: Namespace[]
   currentNamespace: Namespace
-  getSource: (sourceID: string) => void
+  getSourceAndPopulateNamespaces: (sourceID: string) => void
   getSources: () => void
   setTimeRangeAsync: (timeRange: TimeRange) => void
   setTimeBounds: (timeBounds: TimeBounds) => void
@@ -166,20 +167,11 @@ class LogsPageSimple extends Component<Props, State> {
     }
   }
 
-  public componentDidUpdate() {
+  public async componentDidUpdate() {
     const {router} = this.props
 
     if (!this.props.sources || this.props.sources.length === 0) {
       return router.push(`/sources/new?redirectPath=${location.pathname}`)
-    }
-
-    if (!this.props.currentSource && this.props.sources.length > 0) {
-      const source =
-        this.props.sources.find(src => {
-          return src.default
-        }) || this.props.sources[0]
-
-      this.props.getSource(source.id)
     }
 
     if (this.liveUpdatingStatus === false && this.interval) {
@@ -189,14 +181,14 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   public async componentDidMount() {
-    await this.props.getSources()
+    console.log('componentDidMount')
+    const sources = await this.props.getSources()
+    await this.setCurrentSource()
+    console.log('componentDidMount this.props.getConfig')
     await this.props.getConfig(this.logConfigLink)
-    console.log('Start')
 
-    if (this.props.currentNamespace) {
-      this.startOlderLogsFetching()
-      this.startNewerLogsFetchingInterval()
-    }
+    this.startOlderLogsFetching()
+    this.startNewerLogsFetchingInterval()
 
     // if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
     //   this.startNewerLogsFetchingInterval()
@@ -257,18 +249,24 @@ class LogsPageSimple extends Component<Props, State> {
     )
   }
 
+  private setCurrentSource = async () => {
+    console.log('setCurrentSource')
+    if (!this.props.currentSource && this.props.sources.length > 0) {
+      const source =
+        this.props.sources.find(src => {
+          return src.default
+        }) || this.props.sources[0]
+      console.log('setCurrentSource this.props.getSourceAndPopulateNamespaces')
+      return await this.props.getSourceAndPopulateNamespaces(source.id)
+    }
+  }
+
   private handleExpandMessage = () => {
     this.setState({liveUpdating: false})
   }
 
   private startOlderLogsFetching = () => {
-    console.log(
-      `fetchOlderLogs: await executeQueryAsync next older window, then do the next window`
-    )
-    console.log('RUNNING')
-    // setInterval(() => {
     this.fetchOlderLogs()
-    // }, 5000)
   }
 
   private startNewerLogsFetchingInterval = () => {
@@ -278,7 +276,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     this.interval = window.setInterval(
       this.handleNewerLogsFetchingInterval,
-      NEWER_LOGS_INTERVAL
+      LOGS_FETCH_INTERVAL
     )
     this.setState({liveUpdating: true})
   }
@@ -289,13 +287,29 @@ class LogsPageSimple extends Component<Props, State> {
 
   private fetchNewerLogs = () => {
     console.log(
-      `fetchNewerLogs: executeQueryAsync newest ${NEWER_LOGS_INTERVAL}ms`
+      `fetchNewerLogs: executeQueryAsync newest ${LOGS_FETCH_INTERVAL}ms`
     )
   }
 
-  private fetchOlderLogs = () => {
-    console.log('FETCH OLDER')
-    this.props.fetchOlderLogsAsync()
+  private fetchOlderLogs = async () => {
+    const totalBackwardValues = getDeep<number | null>(
+      this.props,
+      'tableInfiniteData.backward.values.length',
+      null
+    )
+
+    await this.props.fetchOlderLogsAsync()
+
+    if (
+      totalBackwardValues !== null &&
+      totalBackwardValues < BACKWARD_VALUES_LIMIT
+    ) {
+      console.log(
+        'fetchOlderLogs again, totalBackwardValues',
+        totalBackwardValues
+      )
+      await this.fetchOlderLogs()
+    }
   }
   private fetchNewer = (time: string) => {
     // this.loadingNewer = true
@@ -640,7 +654,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleChooseSource = (sourceID: string) => {
-    this.props.getSource(sourceID)
+    this.props.getSourceAndPopulateNamespaces(sourceID)
   }
 
   private handleChooseNamespace = (namespace: Namespace) => {
@@ -781,7 +795,7 @@ const mapStateToProps = ({
 })
 
 const mapDispatchToProps = {
-  getSource: getSourceAndPopulateNamespacesAsync,
+  getSourceAndPopulateNamespaces: getSourceAndPopulateNamespacesAsync,
   getSources: getSourcesAsync,
   setTimeRangeAsync,
   setTimeBounds,
