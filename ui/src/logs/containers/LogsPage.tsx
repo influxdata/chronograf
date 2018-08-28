@@ -36,6 +36,7 @@ import {getSourcesAsync} from 'src/shared/actions/sources'
 import LogsHeader from 'src/logs/components/LogsHeader'
 import HistogramChart from 'src/shared/components/HistogramChart'
 import LogsGraphContainer from 'src/logs/components/LogsGraphContainer'
+import TimeWindowDropdown from 'src/logs/components/TimeWindowDropdown'
 import OptionsOverlay from 'src/logs/components/OptionsOverlay'
 import SearchBar from 'src/logs/components/LogsSearchBar'
 import FilterBar from 'src/logs/components/LogsFilterBar'
@@ -204,7 +205,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   public render() {
-    const {filters, queryCount, timeRange, notify} = this.props
+    const {filters, queryCount, timeRange, notify, tableTime} = this.props
     const {searchStatus} = this.state
 
     return (
@@ -212,9 +213,17 @@ class LogsPage extends Component<Props, State> {
         <div className="page">
           {this.header}
           <div className="page-contents logs-viewer">
-            <QueryResults count={this.histogramTotal} queryCount={queryCount} />
-            <LogsGraphContainer>{this.chart}</LogsGraphContainer>
-            <SearchBar onSearch={this.handleSubmitSearch} />
+            <LogsGraphContainer>
+              {this.chartControlBar}
+              {this.chart}
+            </LogsGraphContainer>
+            <SearchBar
+              onSearch={this.handleSubmitSearch}
+              customTime={tableTime.custom}
+              relativeTime={tableTime.relative}
+              onChooseCustomTime={this.handleChooseCustomTime}
+              onChooseRelativeTime={this.handleChooseRelativeTime}
+            />
             <FilterBar
               filters={filters || []}
               onDelete={this.handleFilterDelete}
@@ -393,93 +402,97 @@ class LogsPage extends Component<Props, State> {
     const {histogramColors} = this.state
 
     return (
-      <AutoSizer>
-        {({width, height}) => (
-          <HistogramChart
-            data={histogramData}
-            width={width}
-            height={height}
-            colorScale={colorForSeverity}
-            colors={histogramColors}
-            onBarClick={this.handleBarClick}
-            sortBarGroups={this.handleSortHistogramBarGroups}
-          >
-            {({xScale, adjustedHeight, margins}) => {
-              const x = xScale(new Date(timeOption).valueOf())
-              const y1 = margins.top
-              const y2 = margins.top + adjustedHeight
-              const textSize = 11
-              const markerSize = 5
-              const labelSize = 100
+      <div className="logs-viewer--graph">
+        <AutoSizer>
+          {({width, height}) => (
+            <HistogramChart
+              data={histogramData}
+              width={width}
+              height={height}
+              colorScale={colorForSeverity}
+              colors={histogramColors}
+              onBarClick={this.handleBarClick}
+              sortBarGroups={this.handleSortHistogramBarGroups}
+            >
+              {({xScale, adjustedHeight, margins}) => {
+                const x = xScale(new Date(timeOption).valueOf())
+                const y1 = margins.top
+                const y2 = margins.top + adjustedHeight
+                const textSize = 11
+                const markerSize = 5
+                const labelSize = 100
 
-              if (timeOption === 'now') {
-                return null
-              } else {
-                const lineContainerWidth = 3
-                const lineWidth = 1
+                if (timeOption === 'now') {
+                  return null
+                } else {
+                  const lineContainerWidth = 3
+                  const lineWidth = 1
 
-                return (
-                  <>
-                    <svg
-                      width={lineContainerWidth}
-                      height={height}
-                      style={{
-                        position: 'absolute',
-                        left: `${x}px`,
-                        top: '0px',
-                        transform: 'translateX(-50%)',
-                      }}
-                    >
-                      <line
-                        x1={(lineContainerWidth - lineWidth) / 2}
-                        x2={(lineContainerWidth - lineWidth) / 2}
-                        y1={y1 + markerSize / 2}
-                        y2={y2}
-                        stroke={Greys.White}
-                        strokeWidth={`${lineWidth}`}
-                      />
-                    </svg>
-                    <svg
-                      width={x}
-                      height={textSize + textSize / 2}
-                      style={{
-                        position: 'absolute',
-                        left: `${x - markerSize - labelSize}px`,
-                      }}
-                    >
-                      <text
-                        style={{fontSize: textSize, fontWeight: 600}}
-                        x={0}
-                        y={textSize}
-                        height={textSize}
-                        fill={Greys.Sidewalk}
+                  return (
+                    <>
+                      <svg
+                        width={lineContainerWidth}
+                        height={height}
+                        style={{
+                          position: 'absolute',
+                          left: `${x}px`,
+                          top: '0px',
+                          transform: 'translateX(-50%)',
+                        }}
                       >
-                        Current Timestamp
-                      </text>
-                      <ellipse
-                        cx={labelSize + markerSize - 0.5}
-                        cy={textSize / 2 + markerSize / 2}
-                        rx={markerSize / 2}
-                        ry={markerSize / 2}
-                        fill={Greys.White}
-                      />
-                      <text
-                        style={{fontSize: textSize, fontWeight: 600}}
-                        x={labelSize + markerSize / 2 + textSize}
-                        y={textSize}
-                        height={textSize}
-                        fill={Greys.Sidewalk}
+                        <line
+                          x1={(lineContainerWidth - lineWidth) / 2}
+                          x2={(lineContainerWidth - lineWidth) / 2}
+                          y1={y1 + markerSize / 2}
+                          y2={y2}
+                          stroke={Greys.White}
+                          strokeWidth={`${lineWidth}`}
+                        />
+                      </svg>
+                      <svg
+                        width={x}
+                        height={textSize + textSize / 2}
+                        style={{
+                          position: 'absolute',
+                          left: `${x - markerSize - labelSize}px`,
+                        }}
                       >
-                        {moment(timeOption).format('YYYY-MM-DD | HH:mm:ss.SSS')}
-                      </text>
-                    </svg>
-                  </>
-                )
-              }
-            }}
-          </HistogramChart>
-        )}
-      </AutoSizer>
+                        <text
+                          style={{fontSize: textSize, fontWeight: 600}}
+                          x={0}
+                          y={textSize}
+                          height={textSize}
+                          fill={Greys.Sidewalk}
+                        >
+                          Current Timestamp
+                        </text>
+                        <ellipse
+                          cx={labelSize + markerSize - 0.5}
+                          cy={textSize / 2 + markerSize / 2}
+                          rx={markerSize / 2}
+                          ry={markerSize / 2}
+                          fill={Greys.White}
+                        />
+                        <text
+                          style={{fontSize: textSize, fontWeight: 600}}
+                          x={labelSize + markerSize / 2 + textSize}
+                          y={textSize}
+                          height={textSize}
+                          fill={Greys.Sidewalk}
+                        >
+                          {moment(timeOption).format(
+                            'YYYY-MM-DD | HH:mm:ss.SSS'
+                          )}
+                        </text>
+                      </svg>
+                    </>
+                  )
+                }
+              }}
+            </HistogramChart>
+          )}
+        </AutoSizer>
+      </div>
     )
   }
 
@@ -496,14 +509,10 @@ class LogsPage extends Component<Props, State> {
       currentSource,
       currentNamespaces,
       currentNamespace,
-      timeRange,
-      tableTime,
     } = this.props
 
     return (
       <LogsHeader
-        timeRange={timeRange}
-        onSetTimeWindow={this.handleSetTimeWindow}
         liveUpdating={this.liveUpdatingStatus}
         availableSources={sources}
         onChooseSource={this.handleChooseSource}
@@ -513,11 +522,33 @@ class LogsPage extends Component<Props, State> {
         currentNamespace={currentNamespace}
         onChangeLiveUpdatingStatus={this.handleChangeLiveUpdatingStatus}
         onShowOptionsOverlay={this.handleToggleOverlay}
-        customTime={tableTime.custom}
-        relativeTime={tableTime.relative}
-        onChooseCustomTime={this.handleChooseCustomTime}
-        onChooseRelativeTime={this.handleChooseRelativeTime}
       />
+    )
+  }
+
+  private get chartControlBar(): JSX.Element {
+    const {queryCount} = this.props
+
+    const timeRange = getDeep(this.props, 'timeRange', {
+      upper: null,
+      lower: 'now() - 1m',
+      seconds: 60,
+      windowOption: '1m',
+      timeOption: 'now',
+    })
+
+    return (
+      <div className="logs-viewer--graph-controls">
+        <QueryResults
+          count={this.histogramTotal}
+          queryCount={queryCount}
+          isInsideHistogram={true}
+        />
+        <TimeWindowDropdown
+          selectedTimeWindow={timeRange}
+          onSetTimeWindow={this.handleSetTimeWindow}
+        />
+      </div>
     )
   }
 

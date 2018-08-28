@@ -7,6 +7,10 @@ export default function extentBy<T>(
   let minItem
   let maxItem
 
+  if (collection.length === 0) {
+    return collection
+  }
+
   for (const item of collection) {
     const val = keyFn(item)
 

@@ -2,14 +2,10 @@ import _ from 'lodash'
 import React, {PureComponent} from 'react'
 import {Source, Namespace} from 'src/types'
 
-import {getDeep} from 'src/utils/wrappers'
 import Dropdown from 'src/shared/components/Dropdown'
-import PointInTimeDropDown from 'src/logs/components/PointInTimeDropDown'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
-import TimeWindowDropdown from 'src/logs/components/TimeWindowDropdown'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import {TimeRange, TimeWindow} from 'src/types/logs'
 import LiveUpdatingStatus from 'src/logs/components/LiveUpdatingStatus'
 
 interface SourceItem {
@@ -27,12 +23,6 @@ interface Props {
   liveUpdating: boolean
   onChangeLiveUpdatingStatus: () => void
   onShowOptionsOverlay: () => void
-  timeRange: TimeRange
-  onSetTimeWindow: (timeWindow: TimeWindow) => void
-  customTime?: string
-  relativeTime?: number
-  onChooseCustomTime: (time: string) => void
-  onChooseRelativeTime: (time: number) => void
 }
 
 class LogsHeader extends PureComponent<Props> {
@@ -61,22 +51,7 @@ class LogsHeader extends PureComponent<Props> {
   }
 
   private get optionsComponents(): JSX.Element {
-    const {
-      onShowOptionsOverlay,
-      onSetTimeWindow,
-      customTime,
-      relativeTime,
-      onChooseCustomTime,
-      onChooseRelativeTime,
-    } = this.props
-
-    const timeRange = getDeep(this.props, 'timeRange', {
-      upper: null,
-      lower: 'now() - 1m',
-      seconds: 60,
-      windowOption: '1m',
-      timeOption: 'now',
-    })
+    const {onShowOptionsOverlay} = this.props
 
     return (
       <>
@@ -92,16 +67,6 @@ class LogsHeader extends PureComponent<Props> {
           items={this.namespaceDropDownItems}
           selected={this.selectedNamespace}
           onChoose={this.handleChooseNamespace}
-        />
-        <PointInTimeDropDown
-          customTime={customTime}
-          relativeTime={relativeTime}
-          onChooseCustomTime={onChooseCustomTime}
-          onChooseRelativeTime={onChooseRelativeTime}
-        />
-        <TimeWindowDropdown
-          selectedTimeWindow={timeRange}
-          onSetTimeWindow={onSetTimeWindow}
         />
         <Authorized requiredRole={EDITOR_ROLE}>
           <button
