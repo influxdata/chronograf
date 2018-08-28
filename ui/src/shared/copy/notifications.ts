@@ -836,3 +836,8 @@ export const fluxResponseTruncatedError = (): Notification => {
     message: `Large response truncated to first ${APPROX_MAX_RESPONSE_MB} MB`,
   }
 }
+
+export const csvExportFailed: Notification = {
+  ...defaultErrorNotification,
+  message: 'CSV Export failed',
+}
