@@ -387,121 +387,121 @@ export const clearNextTimeBounds = () => dispatch => {
   dispatch(setNextOlderUpperBound(undefined))
 }
 
-export const executeTableNewerQueryAsync = () => async (
-  dispatch,
-  getState: GetState
-) => {
-  const state = getState()
+// export const executeTableNewerQueryAsync = () => async (
+//   dispatch,
+//   getState: GetState
+// ) => {
+//   const state = getState()
 
-  const startTime = getTableSelectedTime(state)
-  const queryConfig = getTableQueryConfig(state)
-  const namespace = getNamespace(state)
-  const proxyLink = getProxyLink(state)
-  const searchTerm = getSearchTerm(state)
-  const filters = getFilters(state)
+//   const startTime = getTableSelectedTime(state)
+//   const queryConfig = getTableQueryConfig(state)
+//   const namespace = getNamespace(state)
+//   const proxyLink = getProxyLink(state)
+//   const searchTerm = getSearchTerm(state)
+//   const filters = getFilters(state)
 
-  if (!_.every([queryConfig, startTime, namespace, proxyLink])) {
-    return
-  }
+//   if (!_.every([queryConfig, startTime, namespace, proxyLink])) {
+//     return
+//   }
 
-  try {
-    dispatch(incrementQueryCount())
+//   try {
+//     dispatch(incrementQueryCount())
 
-    const endTime = await findNewerUpperTimeBounds(
-      startTime,
-      queryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
+//     const endTime = await findNewerUpperTimeBounds(
+//       startTime,
+//       queryConfig,
+//       filters,
+//       searchTerm,
+//       proxyLink,
+//       namespace
+//     )
 
-    const query: string = await buildInfiniteScrollLogQuery(
-      startTime,
-      endTime,
-      queryConfig,
-      filters,
-      searchTerm
-    )
+//     const query: string = await buildInfiniteScrollLogQuery(
+//       startTime,
+//       endTime,
+//       queryConfig,
+//       filters,
+//       searchTerm
+//     )
 
-    const response = await executeQueryAsync(
-      proxyLink,
-      namespace,
-      `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
-    )
+//     const response = await executeQueryAsync(
+//       proxyLink,
+//       namespace,
+//       `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
+//     )
 
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
+//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
 
-    const result = {
-      columns: series.columns,
-      values: _.reverse(series.values),
-    }
+//     const result = {
+//       columns: series.columns,
+//       values: _.reverse(series.values),
+//     }
 
-    dispatch(setTableForwardData(result))
-  } finally {
-    dispatch(decrementQueryCount())
-  }
-}
+//     dispatch(setTableForwardData(result))
+//   } finally {
+//     dispatch(decrementQueryCount())
+//   }
+// }
 
-export const executeTableOlderQueryAsync = () => async (
-  dispatch,
-  getState: GetState
-) => {
-  const state = getState()
+// export const executeTableOlderQueryAsync = () => async (
+//   dispatch,
+//   getState: GetState
+// ) => {
+//   const state = getState()
 
-  const time = getTableSelectedTime(state)
-  const queryConfig = getTableQueryConfig(state)
-  const namespace = getNamespace(state)
-  const proxyLink = getProxyLink(state)
-  const searchTerm = getSearchTerm(state)
-  const filters = getFilters(state)
+//   const time = getTableSelectedTime(state)
+//   const queryConfig = getTableQueryConfig(state)
+//   const namespace = getNamespace(state)
+//   const proxyLink = getProxyLink(state)
+//   const searchTerm = getSearchTerm(state)
+//   const filters = getFilters(state)
 
-  if (!_.every([queryConfig, time, namespace, proxyLink])) {
-    return
-  }
+//   if (!_.every([queryConfig, time, namespace, proxyLink])) {
+//     return
+//   }
 
-  try {
-    dispatch(incrementQueryCount())
+//   try {
+//     dispatch(incrementQueryCount())
 
-    const lower: string = await findOlderLowerTimeBounds(
-      time,
-      queryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
+//     const lower: string = await findOlderLowerTimeBounds(
+//       time,
+//       queryConfig,
+//       filters,
+//       searchTerm,
+//       proxyLink,
+//       namespace
+//     )
 
-    const query: string = await buildInfiniteScrollLogQuery(
-      lower,
-      time,
-      queryConfig,
-      filters,
-      searchTerm
-    )
+//     const query: string = await buildInfiniteScrollLogQuery(
+//       lower,
+//       time,
+//       queryConfig,
+//       filters,
+//       searchTerm
+//     )
 
-    const response = await executeQueryAsync(
-      proxyLink,
-      namespace,
-      `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
-    )
+//     const response = await executeQueryAsync(
+//       proxyLink,
+//       namespace,
+//       `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
+//     )
 
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
+//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
 
-    dispatch(setTableBackwardData(series))
-  } finally {
-    dispatch(decrementQueryCount())
-  }
-}
+//     dispatch(setTableBackwardData(series))
+//   } finally {
+//     dispatch(decrementQueryCount())
+//   }
+// }
 
 export const setTableCustomTimeAsync = (time: string) => async dispatch => {
   await dispatch(setTableCustomTime(time))
-  await dispatch(executeTableQueryAsync())
+  // await dispatch(executeTableQueryAsync())
 }
 
 export const setTableRelativeTimeAsync = (time: number) => async dispatch => {
   await dispatch(setTableRelativeTime(time))
-  await dispatch(executeTableQueryAsync())
+  // await dispatch(executeTableQueryAsync())
 }
 
 export const changeFilter = (id: string, operator: string, value: string) => ({
@@ -529,43 +529,43 @@ const setHistogramData = (data): SetHistogramData => ({
   payload: {data},
 })
 
-export const executeHistogramQueryAsync = () => async (
-  dispatch,
-  getState: GetState
-): Promise<void> => {
-  const state = getState()
+// export const executeHistogramQueryAsync = () => async (
+//   dispatch,
+//   getState: GetState
+// ): Promise<void> => {
+//   const state = getState()
 
-  const queryConfig = getHistogramQueryConfig(state)
-  const timeRange = getTimeRange(state)
-  const namespace = getNamespace(state)
-  const proxyLink = getProxyLink(state)
-  const searchTerm = getSearchTerm(state)
-  const filters = getFilters(state)
+//   const queryConfig = getHistogramQueryConfig(state)
+//   const timeRange = getTimeRange(state)
+//   const namespace = getNamespace(state)
+//   const proxyLink = getProxyLink(state)
+//   const searchTerm = getSearchTerm(state)
+//   const filters = getFilters(state)
 
-  if (!_.every([queryConfig, timeRange, namespace, proxyLink])) {
-    return
-  }
+//   if (!_.every([queryConfig, timeRange, namespace, proxyLink])) {
+//     return
+//   }
 
-  try {
-    dispatch(incrementQueryCount())
+//   try {
+//     dispatch(incrementQueryCount())
 
-    const query = buildLogQuery(timeRange, queryConfig, filters, searchTerm)
-    const response = await executeQueryAsync(proxyLink, namespace, query)
-    const data = parseHistogramQueryResponse(response)
+//     const query = buildLogQuery(timeRange, queryConfig, filters, searchTerm)
+//     const response = await executeQueryAsync(proxyLink, namespace, query)
+//     const data = parseHistogramQueryResponse(response)
 
-    dispatch(setHistogramData(data))
-  } finally {
-    dispatch(decrementQueryCount())
-  }
-}
+//     dispatch(setHistogramData(data))
+//   } finally {
+//     dispatch(decrementQueryCount())
+//   }
+// }
 
-export const executeTableQueryAsync = () => async (dispatch): Promise<void> => {
-  await Promise.all([
-    dispatch(executeTableNewerQueryAsync()),
-    dispatch(executeTableOlderQueryAsync()),
-    dispatch(clearRowsAdded()),
-  ])
-}
+// export const executeTableQueryAsync = () => async (dispatch): Promise<void> => {
+//   await Promise.all([
+//     dispatch(executeTableNewerQueryAsync()),
+//     dispatch(executeTableOlderQueryAsync()),
+//     dispatch(clearRowsAdded()),
+//   ])
+// }
 
 export const decrementQueryCount = () => ({
   type: ActionTypes.DecrementQueryCount,
@@ -575,46 +575,46 @@ export const incrementQueryCount = () => ({
   type: ActionTypes.IncrementQueryCount,
 })
 
-export const executeQueriesAsync = () => async dispatch => {
-  try {
-    await Promise.all([
-      dispatch(executeHistogramQueryAsync()),
-      dispatch(executeTableQueryAsync()),
-    ])
-  } catch {
-    console.error('Could not make query requests')
-  }
-}
+// export const executeQueriesAsync = () => async dispatch => {
+//   try {
+//     await Promise.all([
+//       dispatch(executeHistogramQueryAsync()),
+//       dispatch(executeTableQueryAsync()),
+//     ])
+//   } catch {
+//     console.error('Could not make query requests')
+//   }
+// }
 
-export const setHistogramQueryConfigAsync = () => async (
-  dispatch,
-  getState: GetState
-): Promise<void> => {
-  const state = getState()
-  const namespace = getDeep<Namespace | null>(
-    state,
-    'logs.currentNamespace',
-    null
-  )
-  const timeRange = getDeep<TimeRange | null>(state, 'logs.timeRange', null)
+// export const setHistogramQueryConfigAsync = () => async (
+//   dispatch,
+//   getState: GetState
+// ): Promise<void> => {
+//   const state = getState()
+//   const namespace = getDeep<Namespace | null>(
+//     state,
+//     'logs.currentNamespace',
+//     null
+//   )
+//   const timeRange = getDeep<TimeRange | null>(state, 'logs.timeRange', null)
 
-  if (timeRange && namespace) {
-    const queryTimeRange = {
-      upper: timeRange.upper,
-      lower: timeRange.lower,
-      seconds: timeRange.seconds,
-    }
+//   if (timeRange && namespace) {
+//     const queryTimeRange = {
+//       upper: timeRange.upper,
+//       lower: timeRange.lower,
+//       seconds: timeRange.seconds,
+//     }
 
-    const queryConfig = buildHistogramQueryConfig(namespace, queryTimeRange)
+//     const queryConfig = buildHistogramQueryConfig(namespace, queryTimeRange)
 
-    dispatch({
-      type: ActionTypes.SetHistogramQueryConfig,
-      payload: {queryConfig},
-    })
+//     dispatch({
+//       type: ActionTypes.SetHistogramQueryConfig,
+//       payload: {queryConfig},
+//     })
 
-    dispatch(executeHistogramQueryAsync())
-  }
-}
+//     dispatch(executeHistogramQueryAsync())
+//   }
+// }
 
 export const setTableQueryConfig = (queryConfig: QueryConfig) => ({
   type: ActionTypes.SetTableQueryConfig,
@@ -637,7 +637,7 @@ export const setTableQueryConfigAsync = () => async (
     const queryConfig = buildTableQueryConfig(namespace, timeRange)
 
     dispatch(setTableQueryConfig(queryConfig))
-    dispatch(executeTableQueryAsync())
+    // dispatch(executeTableQueryAsync())
   }
 }
 
@@ -751,7 +751,7 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-
+    console.log(logSeries.values)
     await dispatch(
       prependMoreLogs({
         columns: logSeries.columns,
@@ -881,7 +881,7 @@ export const setNamespaceAsync = (namespace: Namespace) => async (
     payload: {namespace},
   })
 
-  await dispatch(setHistogramQueryConfigAsync())
+  // await dispatch(setHistogramQueryConfigAsync())
   await dispatch(setTableQueryConfigAsync())
 }
 
@@ -895,7 +895,7 @@ export const setNamespaces = (
 })
 
 export const setTimeRangeAsync = () => async (dispatch): Promise<void> => {
-  dispatch(setHistogramQueryConfigAsync())
+  // dispatch(setHistogramQueryConfigAsync())
   dispatch(setTableQueryConfigAsync())
 }
 

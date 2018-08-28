@@ -76,7 +76,7 @@ interface Props {
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
   searchStatus: SearchStatus
-  nextOlderUpperBound:
+  nextOlderUpperBound: string
 }
 
 interface State {

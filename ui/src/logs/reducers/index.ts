@@ -179,8 +179,8 @@ const prependMoreLogs = (
     '+ values.length',
     values.length
   )
-  const uniqueValues = _.uniqBy(vals, '0') // TODO(js): investigate this uniqBy for correct deduplication
-  const newRowsAdded = uniqueValues.length - forward.values.length
+  // TODO(js): make query inclusivity/exclusivity ensure no duplicate data, or otherwise filter out duplicate data by converting bound to unix timestamp
+  const newRowsAdded = vals.length - forward.values.length
 
   return {
     ...state,
@@ -189,7 +189,7 @@ const prependMoreLogs = (
       ...tableInfiniteData,
       forward: {
         columns: forward.columns,
-        values: uniqueValues,
+        values: vals,
       },
     },
   }

@@ -153,6 +153,7 @@ class LogsPage extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
+    console.log('MAKING A LOGSPAGE')
 
     this.state = {
       searchString: '',
@@ -206,7 +207,7 @@ class LogsPage extends Component<Props, State> {
   public render() {
     const {filters, queryCount, timeRange, notify} = this.props
     const {searchStatus} = this.state
-
+    console.log('RENDERING LOG PAGE.... spooky')
     return (
       <>
         <div className="page">

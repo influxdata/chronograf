@@ -14,7 +14,7 @@ import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 const LOGS_FETCH_INTERVAL = 5000
-const BACKWARD_VALUES_LIMIT = 1000
+const BACKWARD_VALUES_LIMIT = 20
 
 import {
   setTableCustomTimeAsync,
@@ -25,7 +25,7 @@ import {
   setTimeWindow,
   setTimeMarker,
   setNamespaceAsync,
-  executeQueriesAsync,
+  // executeQueriesAsync,
   addFilter,
   removeFilter,
   changeFilter,
@@ -88,7 +88,7 @@ interface Props {
   setTimeWindow: (timeWindow: TimeWindow) => void
   setTimeMarker: (timeMarker: TimeMarker) => void
   setNamespaceAsync: (namespace: Namespace) => void
-  executeQueriesAsync: () => void
+  // executeQueriesAsync: () => void
   setTableRelativeTime: (time: number) => void
   setTableCustomTime: (time: string) => void
   addFilter: (filter: Filter) => void
@@ -174,16 +174,14 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   public async componentDidUpdate() {
-    const {router} = this.props
-
-    if (!this.props.sources || this.props.sources.length === 0) {
-      return router.push(`/sources/new?redirectPath=${location.pathname}`)
-    }
-
-    if (this.liveUpdatingStatus === false && this.interval) {
-      clearInterval(this.interval)
-      this.interval = null
-    }
+    // const {router} = this.props
+    // if (!this.props.sources || this.props.sources.length === 0) {
+    //   return router.push(`/sources/new?redirectPath=${location.pathname}`)
+    // }
+    // if (this.liveUpdatingStatus === false && this.interval) {
+    //   clearInterval(this.interval)
+    //   this.interval = null
+    // }
   }
 
   public async componentDidMount() {
@@ -192,7 +190,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     await this.props.getConfig(this.logConfigLink)
 
-    this.fetchSearchDataset(SearchStatus.Loading)
+    this.fetchNewDataset(SearchStatus.Loading)
 
     // if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
     //   this.startNewerLogsFetchingInterval()
@@ -218,12 +216,12 @@ class LogsPageSimple extends Component<Props, State> {
         <div className="page">
           {this.header}
           <div className="page-contents logs-viewer">
-            <QueryResults
+            {/* <QueryResults
               count={this.histogramTotal}
               queryCount={queryCount}
               searchStatus={searchStatus}
               nextOlderUpperBound={nextOlderUpperBound}
-            />
+            /> */}
             {/* <LogsGraphContainer>{this.chart}</LogsGraphContainer> */}
             <SearchBar onSearch={this.handleSubmitSearch} />
             <FilterBar
@@ -299,7 +297,7 @@ class LogsPageSimple extends Component<Props, State> {
 
   private handleNewerLogsFetchingInterval = async () => {
     // console.log('handleNewerLogsFetchingInterval')
-    // await this.fetchNewerLogs()
+    await this.fetchNewerLogs()
   }
 
   private fetchNewerLogs = async () => {
@@ -308,10 +306,6 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchOlderLogs = async () => {
-    if (this.state.searchStatus === SearchStatus.Clearing) {
-      return
-    }
-
     const totalBackwardValues = getDeep<number | null>(
       this.props,
       'tableInfiniteData.backward.values.length',
@@ -320,7 +314,11 @@ class LogsPageSimple extends Component<Props, State> {
 
     await this.props.fetchOlderLogsAsync()
 
-    if (totalBackwardValues !== null && totalBackwardValues < 550) {
+    console.log(totalBackwardValues, this.props.nextOlderUpperBound)
+    if (
+      totalBackwardValues !== null &&
+      totalBackwardValues < BACKWARD_VALUES_LIMIT
+    ) {
       // console.log(
       //   'fetchOlderLogs again, totalBackwardValues',
       //   totalBackwardValues
@@ -328,6 +326,7 @@ class LogsPageSimple extends Component<Props, State> {
       await this.fetchOlderLogs()
     }
   }
+
   private fetchNewer = (time: string) => {
     // this.loadingNewer = true
     // this.props.fetchNewerLogsAsync(time)
@@ -439,7 +438,7 @@ class LogsPageSimple extends Component<Props, State> {
       value: selection.tag,
       operator: '==',
     })
-    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
+    // this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
   private get histogramTotal(): number {
@@ -678,11 +677,11 @@ class LogsPageSimple extends Component<Props, State> {
     this.props.setNamespaceAsync(namespace)
   }
 
-  private fetchSearchDataset = async (
-    searchStatus: SearchStatus
-  ): Promise<void> => {
-    this.fetchNewDataset(searchStatus)
-  }
+  // private fetchSearchDataset = async (
+  //   searchStatus: SearchStatus
+  // ): Promise<void> => {
+  //   // this.fetchNewDataset(searchStatus)
+  // }
 
   private fetchNewDataset(searchStatus) {
     this.setState({searchStatus: SearchStatus.Clearing})
@@ -819,7 +818,7 @@ const mapDispatchToProps = {
   setTimeWindow,
   setTimeMarker,
   setNamespaceAsync,
-  executeQueriesAsync,
+  // executeQueriesAsync,
   clearTableData,
   clearNextTimeBounds,
   addFilter,
