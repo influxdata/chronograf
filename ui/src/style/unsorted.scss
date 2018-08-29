@@ -378,8 +378,8 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
 .deceo--overlay {
   margin: 0 auto;
   position: relative;
-  width: calc(100% - 120px);
-  height: calc(100% - 60px);
+  width: calc(100% - 60px);
+  height: calc(100% - 30px);
   overflow: hidden;
   border-radius: 0 0 $radius $radius;
   outline: none;
@@ -413,6 +413,10 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   padding: 0 60px;
   background-color: $g3-castle;
   align-items: center;
+
+  .csv-export {
+    margin-right: 5px;
+  }
 }
 
 .deceo--visualization {

@@ -88,7 +88,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {services, timeRange, updateEditorTimeRange} = this.props
+    const {services, timeRange, updateEditorTimeRange, templates} = this.props
     const {useDynamicSource} = this.state
     const horizontalDivisions = [
       {
@@ -115,6 +115,7 @@ class TimeMachine extends PureComponent<Props, State> {
         {this.pageHeader}
         <TimeMachineControls
           queries={this.queriesWorkingDraft}
+          templates={templates}
           source={this.source}
           sources={this.formattedSources}
           service={this.service}
