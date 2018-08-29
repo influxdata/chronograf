@@ -9,6 +9,7 @@ import _ from 'lodash'
 
 // Utils
 import {stripPrefix} from 'src/utils/basepath'
+import {GlobalAutoRefresh} from 'src/utils/AutoRefresh'
 
 // Components
 import QueryMaker from 'src/data_explorer/components/QueryMaker'
@@ -21,7 +22,6 @@ import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/Aut
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
-import AutoRefresh from 'src/utils/AutoRefresh'
 import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboardOverlay'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 
@@ -82,7 +82,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       await handleGetDashboards()
     }
 
-    AutoRefresh.poll(autoRefresh)
+    GlobalAutoRefresh.poll(autoRefresh)
 
     if (query && query.length) {
       const qc = this.props.queryConfigs[0]
@@ -97,7 +97,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   public componentDidUpdate(prevProps: Props) {
     const {autoRefresh} = this.props
     if (autoRefresh !== prevProps.autoRefresh) {
-      AutoRefresh.poll(autoRefresh)
+      GlobalAutoRefresh.poll(autoRefresh)
     }
   }
 
@@ -116,7 +116,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   public componentWillUnmount() {
-    AutoRefresh.stopPolling()
+    GlobalAutoRefresh.stopPolling()
   }
 
   public render() {
