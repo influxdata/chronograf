@@ -10,10 +10,6 @@ import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph
 
 const workerCount = navigator.hardwareConcurrency - 1
 
-// HACK: work around parcel picking up workers and trying to inline them.
-//       This is need to allow for basepaths
-const WorkerClass = Worker
-
 class JobManager {
   private currentIndex: number = 0
   private workers: Worker[] = []
@@ -21,9 +17,7 @@ class JobManager {
 
   constructor() {
     _.times(workerCount, () => {
-      const worker = new WorkerClass(
-        [getBasepath(), 'worker', 'worker.js'].join('/')
-      )
+      const worker = new Worker('./worker.ts')
 
       worker.onmessage = this.handleMessage
       worker.onerror = this.handleError

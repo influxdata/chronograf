@@ -186,6 +186,8 @@ func NewDefaultURLPrefixer(prefix string, next http.Handler, lg chronograf.Logge
 			[]byte(`src="`),
 			[]byte(`href="`),
 			[]byte(`url(`),
+			[]byte(`new Worker("`),
+			[]byte(`new Worker('`),
 			[]byte(`data-basepath="`), // for forwarding basepath to frontend
 		},
 	}
