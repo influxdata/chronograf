@@ -722,7 +722,7 @@ class LogsPageSimple extends Component<Props, State> {
   private fetchNewDataset() {
     this.setState({backwardLogsLimit: BACKWARD_VALUES_LIMIT})
     this.startNewerLogsFetchingInterval()
-    this.startOlderLogsFetching()
+   // this.startOlderLogsFetching()
   }
 
   private handleToggleOverlay = (): void => {

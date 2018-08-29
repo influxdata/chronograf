@@ -307,6 +307,17 @@ export type Action =
   | SetNextNewerLowerBoundAction
   | SetSearchStatusAction
 
+const getBackwardTableData = (state: State): TableData =>
+  state.logs.tableInfiniteData.backward
+
+const getForwardTableData = (state: State): TableData =>
+  state.logs.tableInfiniteData.forward
+
+const combineTableData = (...tableDatas: TableData[]) => ({
+  columns: tableDatas[0].columns,
+  values: _.flatMap(tableDatas, t => t.values),
+})
+
 const getTimeRange = (state: State): TimeRange | null =>
   getDeep<TimeRange | null>(state, 'logs.timeRange', null)
 
@@ -755,6 +766,7 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
     )
   }
 }
+let counter = 0
 
 export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
   const state = getState()
@@ -835,28 +847,27 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
     if (hasNextNewerLowerBoundNeverBeenSet) {
       // first time nextNewerLowerBound is set
       dispatch(setNextNewerLowerBound(nextNewerLowerBound))
+      console.log('setNextNewerLowerBound(nextNewerLowerBound')
+      console.log('******', counter)
     } else if (isForwardCacheExpired) {
+      // const currentForward = getForwardTableData(state)
+      const currentBackward = getBackwardTableData(state)
+      const combinedBackward = combineTableData(logSeries, currentBackward)
+
+      dispatch(setTableBackwardData(combinedBackward))
+      dispatch(setTableForwardData(defaultTableData))
       dispatch(setNextNewerLowerBound(upperUTC))
-    }
-
-    // if (logSeries.values.length > 0) {
-    //   dispatch(setSearchStatus(SearchStatus.Loaded))
-    // }
-
-    if (isForwardCacheExpired) {
-      await dispatch(
-        replacePrependedLogs({
-          columns: logSeries.columns,
-          values: _.reverse(logSeries.values),
-        })
-      )
+      console.log('setTableBackwardData & setNextNewerLowerBound(upperUTC)')
+      console.log('******', ++counter)
     } else {
-      await dispatch(
-        prependMoreLogs({
+      dispatch(
+        setTableForwardData({
           columns: logSeries.columns,
-          values: _.reverse(logSeries.values),
+          values: logSeries.values,
         })
       )
+      console.log('setTableForwardData')
+      console.log('*****', counter)
     }
   } else {
     throw new Error(

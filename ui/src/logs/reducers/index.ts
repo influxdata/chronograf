@@ -165,74 +165,39 @@ const concatMoreLogs = (
   }
 }
 
-const prependMoreLogs = (
-  state: LogsState,
-  action: PrependMoreLogsAction
-): LogsState => {
-  const {
-    series: {values},
-  } = action.payload
-  const {tableInfiniteData} = state
-  const {forward} = tableInfiniteData
-  const vals = [...values, ...forward.values]
-  console.log(
-    'prependMoreLogs vals.length',
-    vals.length,
-    '= forward.values.length',
-    forward.values.length,
-    '+ values.length',
-    values.length
-  )
-  // TODO(js): make query inclusivity/exclusivity ensure no duplicate data, or otherwise filter out duplicate data by converting bound to unix timestamp
-  const newRowsAdded = vals.length - forward.values.length
+// const prependMoreLogs = (
+//   state: LogsState,
+//   action: PrependMoreLogsAction
+// ): LogsState => {
+//   const {
+//     series: {values},
+//   } = action.payload
+//   const {tableInfiniteData} = state
+//   const {forward} = tableInfiniteData
+//   const vals = [...values, ...forward.values]
+//   console.log(
+//     'prependMoreLogs vals.length',
+//     vals.length,
+//     '= forward.values.length',
+//     forward.values.length,
+//     '+ values.length',
+//     values.length
+//   )
+//   // TODO(js): make query inclusivity/exclusivity ensure no duplicate data, or otherwise filter out duplicate data by converting bound to unix timestamp
+//   const newRowsAdded = vals.length - forward.values.length
 
-  return {
-    ...state,
-    newRowsAdded,
-    tableInfiniteData: {
-      ...tableInfiniteData,
-      forward: {
-        columns: forward.columns,
-        values: vals,
-      },
-    },
-  }
-}
-
-const replacePrependedLogs = (
-  state: LogsState,
-  action: ReplacePrependedLogsAction
-): LogsState => {
-  const {
-    series: {values},
-  } = action.payload
-  const {tableInfiniteData} = state
-  const {forward} = tableInfiniteData
-  // TODO(js): filter out logs from forward that fall within range of `values`, then add `values` to that remainder
-  const vals = [...values, ...forward.values]
-  console.log(
-    'replacePrependedLogs vals.length',
-    vals.length,
-    '= forward.values.length',
-    forward.values.length,
-    '+ values.length',
-    values.length
-  )
-  // TODO(js): make query inclusivity/exclusivity ensure no duplicate data, or otherwise filter out duplicate data by converting bound to unix timestamp
-  const newRowsAdded = vals.length - forward.values.length
-
-  return {
-    ...state,
-    newRowsAdded,
-    tableInfiniteData: {
-      ...tableInfiniteData,
-      forward: {
-        columns: forward.columns,
-        values: vals,
-      },
-    },
-  }
-}
+//   return {
+//     ...state,
+//     newRowsAdded,
+//     tableInfiniteData: {
+//       ...tableInfiniteData,
+//       forward: {
+//         columns: forward.columns,
+//         values: vals,
+//       },
+//     },
+//   }
+// }
 
 export const setConfigs = (state: LogsState, action: SetConfigsAction) => {
   const {logConfig} = state
