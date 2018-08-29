@@ -45,6 +45,14 @@ const QueryMaker: SFC<Props> = ({
   initialGroupByTime,
   setActiveQueryIndex,
 }) => {
+  if (!activeQuery || !activeQuery.id) {
+    return (
+      <div className="query-maker">
+        <EmptyQuery onAddQuery={onAddQuery} />
+      </div>
+    )
+  }
+
   return (
     <div className="query-maker">
       <QueryTabList
@@ -55,29 +63,25 @@ const QueryMaker: SFC<Props> = ({
         activeQueryIndex={activeQueryIndex}
         setActiveQueryIndex={setActiveQueryIndex}
       />
-      {activeQuery && activeQuery.id ? (
-        <div className="query-maker--tab-contents">
-          <InfluxQLEditor
-            query={buildText(activeQuery)}
-            config={activeQuery}
-            onUpdate={actions.editRawTextAsync}
-            templates={templates}
-          />
-          <SchemaExplorer
-            source={source}
-            actions={actions}
-            query={activeQuery}
-            initialGroupByTime={initialGroupByTime}
-            isQuerySupportedByExplorer={_.get(
-              activeQuery,
-              'isQuerySupportedByExplorer',
-              true
-            )}
-          />
-        </div>
-      ) : (
-        <EmptyQuery onAddQuery={onAddQuery} />
-      )}
+      <div className="query-maker--tab-contents">
+        <InfluxQLEditor
+          query={buildText(activeQuery)}
+          config={activeQuery}
+          onUpdate={actions.editRawTextAsync}
+          templates={templates}
+        />
+        <SchemaExplorer
+          source={source}
+          actions={actions}
+          query={activeQuery}
+          initialGroupByTime={initialGroupByTime}
+          isQuerySupportedByExplorer={_.get(
+            activeQuery,
+            'isQuerySupportedByExplorer',
+            true
+          )}
+        />
+      </div>
     </div>
   )
 }
