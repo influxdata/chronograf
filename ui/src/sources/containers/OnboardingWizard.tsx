@@ -99,6 +99,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             <DashboardStep
               ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
               dashboardsCreated={dashboardsCreated}
+              source={source}
             />
           </WizardStep>
           <WizardStep
@@ -203,6 +204,8 @@ class OnboardingWizard extends PureComponent<Props, State> {
     this.resetWizardState()
     if (source) {
       router.push(`/sources/${source.id}/manage-sources`)
+    } else {
+      router.push(`/`)
     }
     return {error: false, payload: null}
   }
@@ -213,6 +216,11 @@ class OnboardingWizard extends PureComponent<Props, State> {
     this.setState({
       source: null,
       kapacitor: null,
+      sourceError: false,
+      kapacitorError: false,
+      dashboardError: false,
+      dashboardsCreated: [],
+      hasNextOnDashboard: false,
     })
   }
 
