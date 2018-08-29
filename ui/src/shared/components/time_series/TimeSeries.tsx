@@ -19,7 +19,7 @@ import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
-import {GlobalAutoRefresh, AutoRefresh} from 'src/utils/AutoRefresh'
+import {GlobalAutoRefresher, AutoRefresher} from 'src/utils/AutoRefresher'
 import {CellNoteVisibility} from 'src/types/dashboards'
 
 // Components
@@ -39,7 +39,7 @@ interface Props {
   queries: Query[]
   timeRange: TimeRange
   children: (r: RenderProps) => JSX.Element
-  autoRefresh?: AutoRefresh
+  autoRefresher?: AutoRefresher
   inView?: boolean
   templates?: Template[]
   editQueryStatus?: () => void
@@ -67,7 +67,7 @@ class TimeSeries extends Component<Props, State> {
   public static defaultProps = {
     inView: true,
     templates: [],
-    autoRefresh: GlobalAutoRefresh,
+    autoRefresher: GlobalAutoRefresher,
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
@@ -119,24 +119,24 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public async componentDidMount() {
-    const {autoRefresh} = this.props
+    const {autoRefresher} = this.props
 
     this.isComponentMounted = true
     this.executeQueries()
-    autoRefresh.subscribe(this.executeQueries)
+    autoRefresher.subscribe(this.executeQueries)
   }
 
   public componentWillUnmount() {
-    const {autoRefresh} = this.props
+    const {autoRefresher} = this.props
 
     this.isComponentMounted = false
-    autoRefresh.unsubscribe(this.executeQueries)
+    autoRefresher.unsubscribe(this.executeQueries)
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    if (this.props.autoRefresh !== prevProps.autoRefresh) {
-      prevProps.autoRefresh.unsubscribe(this.executeQueries)
-      this.props.autoRefresh.subscribe(this.executeQueries)
+    if (this.props.autoRefresher !== prevProps.autoRefresher) {
+      prevProps.autoRefresher.unsubscribe(this.executeQueries)
+      this.props.autoRefresher.subscribe(this.executeQueries)
     }
 
     if (!this.isPropsDifferent(prevProps)) {

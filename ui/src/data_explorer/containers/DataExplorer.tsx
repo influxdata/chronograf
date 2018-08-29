@@ -9,7 +9,7 @@ import _ from 'lodash'
 
 // Utils
 import {stripPrefix} from 'src/utils/basepath'
-import {GlobalAutoRefresh} from 'src/utils/AutoRefresh'
+import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 
 // Components
 import QueryMaker from 'src/data_explorer/components/QueryMaker'
@@ -82,7 +82,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       await handleGetDashboards()
     }
 
-    GlobalAutoRefresh.poll(autoRefresh)
+    GlobalAutoRefresher.poll(autoRefresh)
 
     if (query && query.length) {
       const qc = this.props.queryConfigs[0]
@@ -97,7 +97,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   public componentDidUpdate(prevProps: Props) {
     const {autoRefresh} = this.props
     if (autoRefresh !== prevProps.autoRefresh) {
-      GlobalAutoRefresh.poll(autoRefresh)
+      GlobalAutoRefresher.poll(autoRefresh)
     }
   }
 
@@ -116,7 +116,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   public componentWillUnmount() {
-    GlobalAutoRefresh.stopPolling()
+    GlobalAutoRefresher.stopPolling()
   }
 
   public render() {

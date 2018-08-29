@@ -37,7 +37,7 @@ import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
 import {millisecondTimeRange} from 'src/dashboards/utils/time'
 import {getDeep} from 'src/utils/wrappers'
 import {updateDashboardLinks} from 'src/dashboards/utils/dashboardSwitcherLinks'
-import {GlobalAutoRefresh} from 'src/utils/AutoRefresh'
+import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 
 // APIs
 import {loadDashboardLinks} from 'src/dashboards/apis'
@@ -179,8 +179,8 @@ class DashboardPage extends Component<Props, State> {
   public async componentDidMount() {
     const {autoRefresh} = this.props
 
-    GlobalAutoRefresh.poll(autoRefresh)
-    GlobalAutoRefresh.subscribe(this.fetchAnnotations)
+    GlobalAutoRefresher.poll(autoRefresh)
+    GlobalAutoRefresher.subscribe(this.fetchAnnotations)
 
     window.addEventListener('resize', this.handleWindowResize, true)
 
@@ -214,7 +214,7 @@ class DashboardPage extends Component<Props, State> {
     }
 
     if (autoRefresh !== prevProps.autoRefresh) {
-      GlobalAutoRefresh.poll(autoRefresh)
+      GlobalAutoRefresher.poll(autoRefresh)
     }
 
     if (
@@ -226,8 +226,8 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public componentWillUnmount() {
-    GlobalAutoRefresh.stopPolling()
-    GlobalAutoRefresh.unsubscribe(this.fetchAnnotations)
+    GlobalAutoRefresher.stopPolling()
+    GlobalAutoRefresher.unsubscribe(this.fetchAnnotations)
 
     window.removeEventListener('resize', this.handleWindowResize, true)
     this.props.handleDismissEditingAnnotation()
