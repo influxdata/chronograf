@@ -1,6 +1,6 @@
 type func = (...args: any[]) => any
 
-export class AutoRefresh {
+export class AutoRefresher {
   public subscribers: func[] = []
 
   private intervalID: NodeJS.Timer
@@ -39,7 +39,7 @@ export class AutoRefresh {
   }
 }
 
-// A global singleton, intended to be configured (via `AutoRefresh#poll`) at a
-// page level and consumed arbitrarily deep within the page's render tree
+// A global singleton, intended to be configured (via `AutoRefresher#poll`) at
+// a page level and consumed arbitrarily deep within the page's render tree
 // (usually in a `TimeSeries` component)
-export const GlobalAutoRefresh = new AutoRefresh()
+export const GlobalAutoRefresher = new AutoRefresher()
