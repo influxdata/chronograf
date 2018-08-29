@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent, ChangeEvent, CSSProperties} from 'react'
+import React, {Component, ChangeEvent, CSSProperties} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 import classnames from 'classnames'
@@ -33,7 +33,7 @@ interface Props {
   activeCellID: string
   setActiveCell: (cellID: string) => void
   onMouseEnter: () => void
-  // mouseY: number
+  onMounted?: (legend: DygraphLegend) => void
 }
 
 interface LegendData {
@@ -48,14 +48,14 @@ interface State {
   isAscending: boolean
   filterText: string
   isFilterVisible: boolean
-  legendStyles: object
   cellID: string
   mouseY: number
 }
 
 @ErrorHandling
-class DygraphLegend extends PureComponent<Props, State> {
+class DygraphLegend extends Component<Props, State> {
   private legendRef: HTMLElement | null = null
+  private mouseY: number = 0
 
   constructor(props: Props) {
     super(props)
@@ -76,10 +76,26 @@ class DygraphLegend extends PureComponent<Props, State> {
       isAscending: false,
       filterText: '',
       isFilterVisible: false,
-      legendStyles: {},
       cellID: null,
       mouseY: 0,
     }
+  }
+
+  public componentDidMount() {
+    if (this.props.onMounted) {
+      this.props.onMounted(this)
+    }
+  }
+
+  public shouldComponentUpdate(prevProps, prevState) {
+    return (
+      prevProps.hoverTime !== this.props.hoverTime ||
+      prevState.sortType !== this.state.sortType ||
+      prevState.isAscending !== this.state.isAscending ||
+      prevState.filterText !== this.state.filterText ||
+      prevState.isFilterVisible !== this.state.isFilterVisible ||
+      prevState.mouseY !== this.state.mouseY
+    )
   }
 
   public componentWillUnmount() {
@@ -93,7 +109,6 @@ class DygraphLegend extends PureComponent<Props, State> {
 
   public setMouseY(mouseY: number) {
     this.setState({mouseY})
-    console.log(mouseY)
   }
 
   public render() {

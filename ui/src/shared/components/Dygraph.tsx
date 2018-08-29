@@ -109,9 +109,8 @@ class Dygraph extends Component<Props, State> {
   private graphRef: React.RefObject<HTMLDivElement> = React.createRef<
     HTMLDivElement
   >()
-  private legendRef: React.RefObject<DygraphLegend> = React.createRef<
-    DygraphLegend
-  >()
+  private legend: DygraphLegend | null
+
   private dygraph: DygraphClass
 
   constructor(props: Props) {
@@ -274,13 +273,12 @@ class Dygraph extends Component<Props, State> {
               />
             )}
             <DygraphLegend
-              // mouseY={mouseY}
               cellID={cellID}
               dygraph={this.dygraph}
               onHide={this.handleHideLegend}
               onShow={this.handleShowLegend}
               onMouseEnter={this.handleMouseEnterLegend}
-              ref={this.legendRef}
+              onMounted={this.handleLegendMounted}
             />
             <Crosshair
               dygraph={this.dygraph}
@@ -423,9 +421,13 @@ class Dygraph extends Component<Props, State> {
     this.props.handleSetHoverTime(newTime)
   }
 
+  private handleLegendMounted = (legend: DygraphLegend) => {
+    this.legend = legend
+  }
+
   private handleTrackMouseY = (e: MouseEvent<HTMLDivElement>): void => {
-    if (this.legendRef.current) {
-      this.legendRef.current.setMouseY(e.pageY)
+    if (this.legend) {
+      this.legend.setMouseY(e.pageY)
     }
   }
 
