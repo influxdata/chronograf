@@ -106,50 +106,61 @@ export const barPlotter = e => {
 export const makeLegendStyles = (
   graphDiv,
   legendDiv,
-  legendMouseX
+  hoverTimeX,
+  pageY
 ): CSSProperties => {
-  if (!graphDiv || !legendDiv || legendMouseX === null) {
+  if (!graphDiv || !legendDiv || hoverTimeX === null || pageY === null) {
     return {}
   }
 
   const graphRect = graphDiv.getBoundingClientRect()
   const legendRect = legendDiv.getBoundingClientRect()
 
-  const mouseX = legendMouseX > 0 ? legendMouseX : 0
-  const halfLegendWidth = legendRect.width / 2
+  const LEGEND_BUFFER = 30
 
-  const minimumX = 0
-  const maximumX = graphRect.width - legendRect.width
+  const left = hoverTimeX + graphRect.left
+  const top = pageY + LEGEND_BUFFER
 
-  const minimumY = -60
+  // if (window.innerWidth - left < legendRect.width + LEGEND_BUFFER) {
+  //   left = hoverTimeX + graphRect.left - LEGEND_BUFFER - legendRect.width
+  // }
 
-  let translateX = mouseX - halfLegendWidth
-  let translateY = graphRect.height
+  // const mouseX = legendMouseX > 0 ? legendMouseX : 0
+  // const halfLegendWidth = legendRect.width / 2
 
-  // Enforce Left Edge of Graph
-  if (mouseX - halfLegendWidth < minimumX) {
-    translateX = 0
-  }
+  // const minimumX = 0
+  // const maximumX = graphRect.width - legendRect.width
 
-  // Enforce Right Edge of Graph
-  if (mouseX - halfLegendWidth >= maximumX) {
-    translateX = maximumX
-  }
+  // const minimumY = -60
 
-  // Prevent Legend from rendering off screen
-  const rightMargin = window.innerWidth - (mouseX + graphRect.left)
-  const LEGEND_BUFFER = 14
-  if (window.innerHeight - graphRect.bottom < legendRect.height) {
-    translateX = mouseX + LEGEND_BUFFER
-    translateY = minimumY
+  // let translateX = mouseX - halfLegendWidth
+  // let translateY = graphRect.height
 
-    if (rightMargin < legendRect.width + LEGEND_BUFFER) {
-      translateX = mouseX - (legendRect.width + LEGEND_BUFFER)
-    }
-  }
+  // // Enforce Left Edge of Graph
+  // if (mouseX - halfLegendWidth < minimumX) {
+  //   translateX = 0
+  // }
+
+  // // Enforce Right Edge of Graph
+  // if (mouseX - halfLegendWidth >= maximumX) {
+  //   translateX = maximumX
+  // }
+
+  // // Prevent Legend from rendering off screen
+  // const rightMargin = window.innerWidth - (mouseX + graphRect.left)
+  // const LEGEND_BUFFER = 14
+  // if (window.innerHeight - graphRect.bottom < legendRect.height) {
+  //   translateX = mouseX + LEGEND_BUFFER
+  //   translateY = minimumY
+
+  //   if (rightMargin < legendRect.width + LEGEND_BUFFER) {
+  //     translateX = mouseX - (legendRect.width + LEGEND_BUFFER)
+  //   }
+  // }
 
   return {
-    transform: `translate(${translateX}px, ${translateY}px)`,
+    left: `${left}px`,
+    top: `${top}px`,
   }
 }
 

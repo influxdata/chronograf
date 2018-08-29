@@ -78,6 +78,7 @@ interface State {
   staticLegendHeight: number
   xAxisRange: [number, number]
   isMouseInLegend: boolean
+  mouseY: number
 }
 
 @ErrorHandling
@@ -115,6 +116,7 @@ class Dygraph extends Component<Props, State> {
       staticLegendHeight: 0,
       xAxisRange: [0, 0],
       isMouseInLegend: false,
+      mouseY: 0,
     }
 
     this.graphRef = React.createRef<HTMLDivElement>()
@@ -251,7 +253,7 @@ class Dygraph extends Component<Props, State> {
   }
 
   public render() {
-    const {staticLegendHeight, xAxisRange} = this.state
+    const {staticLegendHeight, xAxisRange, mouseY} = this.state
     const {staticLegend, cellID} = this.props
 
     return (
@@ -271,6 +273,7 @@ class Dygraph extends Component<Props, State> {
               />
             )}
             <DygraphLegend
+              mouseY={mouseY}
               cellID={cellID}
               dygraph={this.dygraph}
               onHide={this.handleHideLegend}
@@ -297,6 +300,7 @@ class Dygraph extends Component<Props, State> {
           })}
         <div
           className="dygraph-child-container"
+          onMouseMove={this.handleTrackMouseY}
           ref={this.graphRef}
           style={this.dygraphStyle}
         />
@@ -405,7 +409,12 @@ class Dygraph extends Component<Props, State> {
     this.props.handleSetHoverTime(NULL_HOVER_TIME)
   }
 
+  private handleTrackMouseY = (e: MouseEvent<HTMLDivElement>): void => {
+    this.setState({mouseY: e.pageY})
+  }
+
   private handleShowLegend = (e: MouseEvent<HTMLDivElement>): void => {
+    e.stopPropagation()
     const {isMouseInLegend} = this.state
 
     if (isMouseInLegend) {

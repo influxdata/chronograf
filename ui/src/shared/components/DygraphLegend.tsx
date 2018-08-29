@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent, ChangeEvent} from 'react'
+import React, {PureComponent, ChangeEvent, CSSProperties} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 import classnames from 'classnames'
@@ -33,6 +33,7 @@ interface Props {
   activeCellID: string
   setActiveCell: (cellID: string) => void
   onMouseEnter: () => void
+  mouseY: number
 }
 
 interface LegendData {
@@ -48,7 +49,6 @@ interface State {
   filterText: string
   isFilterVisible: boolean
   legendStyles: object
-  pageX: number | null
   cellID: string
 }
 
@@ -76,7 +76,6 @@ class DygraphLegend extends PureComponent<Props, State> {
       filterText: '',
       isFilterVisible: false,
       legendStyles: {},
-      pageX: null,
       cellID: null,
     }
   }
@@ -194,7 +193,6 @@ class DygraphLegend extends PureComponent<Props, State> {
       this.props.setActiveCell(this.props.cellID)
     }
 
-    this.setState({pageX: e.pageX})
     this.props.onShow(e)
   }
 
@@ -268,15 +266,17 @@ class DygraphLegend extends PureComponent<Props, State> {
     return 'hidden'
   }
 
-  private get styles() {
+  private get styles(): CSSProperties {
     const {
       dygraph,
       dygraph: {graphDiv},
       hoverTime,
+      mouseY,
     } = this.props
 
-    const legendHoverX = dygraph.toDomXCoord(hoverTime)
-    return makeLegendStyles(graphDiv, this.legendRef, legendHoverX)
+    const hoverTimeX = dygraph.toDomXCoord(hoverTime)
+
+    return makeLegendStyles(graphDiv, this.legendRef, hoverTimeX, mouseY)
   }
 }
 

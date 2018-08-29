@@ -10,16 +10,25 @@
   background-color: $g0-obsidian;
   display: block !important;
   position: fixed;
-  top: 0;
-  left: 0;
   padding: 8px;
   z-index: $dygraph-legend-z;
   border-radius: 3px;
   user-select: text;
+  transform: translate3d(-50%, 0, 0);
   @extend %drop-shadow;
 
   &.hidden {
     display: none !important;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-bottom-color: $g0-obsidian;
   }
 }
 
