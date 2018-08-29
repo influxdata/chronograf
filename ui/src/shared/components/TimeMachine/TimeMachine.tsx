@@ -73,7 +73,7 @@ import {
 import {UpdateScript} from 'src/flux/actions'
 
 interface Props {
-  links: Links
+  fluxLinks: Links
   source: Source
   script: string
   sources: Source[]
@@ -155,7 +155,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {links, script} = this.props
+    const {fluxLinks, script} = this.props
 
     try {
       this.debouncedASTResponse(script)
@@ -164,7 +164,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }
 
     try {
-      const suggestions = await getSuggestions(links.suggestions)
+      const suggestions = await getSuggestions(fluxLinks.suggestions)
       this.setState({suggestions})
     } catch (error) {
       console.error('Could not get function suggestions: ', error)
@@ -596,7 +596,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private getASTResponse = async (script: string, update: boolean = true) => {
-    const {links} = this.props
+    const {fluxLinks} = this.props
 
     if (!script) {
       this.props.updateScript(script)
@@ -604,7 +604,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }
 
     try {
-      const ast = await getAST({url: links.ast, body: script})
+      const ast = await getAST({url: fluxLinks.ast, body: script})
 
       if (update) {
         this.props.updateScript(script)
@@ -620,12 +620,12 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private getTimeSeries = async () => {
-    const {script, links, notify} = this.props
+    const {script, fluxLinks, notify} = this.props
     if (!script) {
       return
     }
     try {
-      await getAST({url: links.ast, body: script})
+      await getAST({url: fluxLinks.ast, body: script})
     } catch (error) {
       this.setState({status: parseError(error)})
       return console.error('Could not parse AST', error)
@@ -801,10 +801,10 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private handleValidate = async () => {
-    const {links, notify, script} = this.props
+    const {fluxLinks, notify, script} = this.props
 
     try {
-      const ast = await getAST({url: links.ast, body: script})
+      const ast = await getAST({url: fluxLinks.ast, body: script})
       const body = bodyNodes(ast, this.state.suggestions)
       const status = {type: 'success', text: ''}
       notify(validateSuccess())

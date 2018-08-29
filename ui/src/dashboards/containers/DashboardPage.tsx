@@ -73,7 +73,7 @@ import {Links} from 'src/types/flux'
 import {UpdateScript} from 'src/flux/actions'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
-  links: Links
+  fluxLinks: Links
   script: string
   updateScript: UpdateScript
   source: SourcesModels.Source
@@ -235,9 +235,9 @@ class DashboardPage extends Component<Props, State> {
 
   public render() {
     const {
-      links,
       script,
       notify,
+      fluxLinks,
       updateScript,
       isUsingAuth,
       meRole,
@@ -326,7 +326,7 @@ class DashboardPage extends Component<Props, State> {
             source={source}
             sources={sources}
             notify={notify}
-            links={links}
+            fluxLinks={fluxLinks}
             script={script}
             services={this.services}
             cell={selectedCell}
@@ -720,7 +720,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     services,
     meRole,
     dashboard,
-    links: links.flux,
+    fluxLinks: links.flux,
     dashboardID: Number(dashboardID),
     timeRange,
     zoomedTimeRange,

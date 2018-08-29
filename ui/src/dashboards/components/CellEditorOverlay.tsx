@@ -45,7 +45,7 @@ interface QueryStatus {
 }
 
 interface Props {
-  links: Links
+  fluxLinks: Links
   script: string
   sources: SourcesModels.Source[]
   services: Service[]
@@ -101,7 +101,7 @@ class CellEditorOverlay extends Component<Props, State> {
 
   public render() {
     const {
-      links,
+      fluxLinks,
       script,
       notify,
       services,
@@ -132,7 +132,7 @@ class CellEditorOverlay extends Component<Props, State> {
         ref={this.onRef}
       >
         <TimeMachine
-          links={links}
+          fluxLinks={fluxLinks}
           notify={notify}
           script={script}
           queryDrafts={queryDrafts}
