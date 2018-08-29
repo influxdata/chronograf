@@ -47,20 +47,21 @@ const collision = (
   return !!placedCells.find(c => cell.x === c.x && cell.y === c.y)
 }
 
-const createTemplatesForProtoboard = (): Template[] => [
+const createTemplatesForProtoboard = (source, measurement): Template[] => [
   {
     tempVar: ':host:',
-    id: 'host',
+    id: '',
     type: TemplateType.TagValues,
     label: '',
-    values: [
-      {
-        value: 'denizs-MacBook-Pro.local',
-        type: TemplateValueType.TagValue,
-        selected: true,
-        localSelected: true,
-      },
-    ],
+    values: [],
+    query: {
+      influxql:
+        'SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:',
+      db: source.telegraf || 'telegraf',
+      measurement,
+      tagKey: 'host',
+      fieldKey: '',
+    },
   },
 ]
 
@@ -78,6 +79,7 @@ export const instantiate = (
 ): Partial<Dashboard> => {
   const placedCells = []
   const unPlacedCells = []
+  const measurement = protoboard.data.cells[0].measurement
 
   _.forEach(protoboard.data.cells, c => {
     if ((c.x === 0 && c.y === 0) || collision(c, placedCells)) {
@@ -93,7 +95,7 @@ export const instantiate = (
     placedCells
   )
 
-  const templates = createTemplatesForProtoboard(source)
+  const templates = createTemplatesForProtoboard(source, measurement)
 
   const cells = cellsWithPlaces.map(c => ({
     ...c,
