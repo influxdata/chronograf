@@ -3,3 +3,13 @@
   min-width: 100%;
   min-height: 100%;
 }
+
+.dashboard-step--filter-controls {
+  margin-bottom: $ix-marg-c;
+  padding: 0 2px;
+  box-sizing: border-box;
+  min-width: 100%;
+  display: inline-flex;
+  justify-content: flex-end;
+
+}
