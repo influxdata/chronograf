@@ -1,5 +1,6 @@
 import React, {PureComponent, Fragment} from 'react'
 
+import {FluxContext} from 'src/shared/components/TimeMachine/TimeMachine'
 import FuncSelector from 'src/flux/components/FuncSelector'
 import FuncNode from 'src/flux/components/FuncNode'
 import YieldFuncNode from 'src/flux/components/YieldFuncNode'
@@ -10,7 +11,6 @@ import {Func, Context} from 'src/types/flux'
 interface Props {
   funcs: Func[]
   bodyID: string
-  context: Context
   funcNames: any[]
   isLastBody: boolean
   declarationID?: string
@@ -36,7 +36,6 @@ class ExpressionNode extends PureComponent<Props, State> {
 
   public render() {
     const {
-      context,
       declarationID,
       bodyID,
       funcNames,
@@ -46,97 +45,105 @@ class ExpressionNode extends PureComponent<Props, State> {
     } = this.props
 
     const {nonYieldableIndexesToggled} = this.state
-    const {
-      onDeleteFuncNode,
-      onAddNode,
-      onChangeArg,
-      onGenerateScript,
-      onToggleYield,
-      service,
-      data,
-      scriptUpToYield,
-    } = context
-
-    let isAfterRange = false
-    let isAfterFilter = false
 
     return (
-      <>
-        {funcs.map((func, i) => {
-          if (func.name === 'yield') {
-            return null
-          }
+      <FluxContext.Consumer>
+        {({
+          onDeleteFuncNode,
+          onAddNode,
+          onChangeArg,
+          onGenerateScript,
+          onToggleYield,
+          service,
+          data,
+          scriptUpToYield,
+        }: Context) => {
+          let isAfterRange = false
+          let isAfterFilter = false
 
-          if (func.name === 'range') {
-            isAfterRange = true
-          }
+          return (
+            <>
+              {funcs.map((func, i) => {
+                if (func.name === 'yield') {
+                  return null
+                }
 
-          if (func.name === 'filter') {
-            isAfterFilter = true
-          }
-          const isYieldable = isAfterFilter && isAfterRange
+                if (func.name === 'range') {
+                  isAfterRange = true
+                }
 
-          const funcNode = (
-            <FuncNode
-              key={i}
-              index={i}
-              func={func}
-              funcs={funcs}
-              bodyID={bodyID}
-              service={service}
-              onChangeArg={onChangeArg}
-              onDelete={onDeleteFuncNode}
-              onToggleYield={onToggleYield}
-              isYieldable={isYieldable}
-              isYielding={this.isBeforeYielding(i)}
-              isYieldedInScript={this.isYieldNodeIndex(i + 1)}
-              declarationID={declarationID}
-              onGenerateScript={onGenerateScript}
-              declarationsFromBody={declarationsFromBody}
-              onToggleYieldWithLast={this.handleToggleYieldWithLast}
-              onDeleteBody={onDeleteBody}
-            />
+                if (func.name === 'filter') {
+                  isAfterFilter = true
+                }
+                const isYieldable = isAfterFilter && isAfterRange
+
+                const funcNode = (
+                  <FuncNode
+                    key={func.id}
+                    index={i}
+                    func={func}
+                    funcs={funcs}
+                    bodyID={bodyID}
+                    service={service}
+                    onChangeArg={onChangeArg}
+                    onDelete={onDeleteFuncNode}
+                    onToggleYield={onToggleYield}
+                    isYieldable={isYieldable}
+                    isYielding={this.isBeforeYielding(i)}
+                    isYieldedInScript={this.isYieldNodeIndex(i + 1)}
+                    declarationID={declarationID}
+                    onGenerateScript={onGenerateScript}
+                    declarationsFromBody={declarationsFromBody}
+                    onToggleYieldWithLast={this.handleToggleYieldWithLast}
+                    onDeleteBody={onDeleteBody}
+                  />
+                )
+
+                if (
+                  nonYieldableIndexesToggled[i] ||
+                  this.isYieldNodeIndex(i + 1)
+                ) {
+                  const script: string = scriptUpToYield(
+                    bodyID,
+                    declarationID,
+                    i,
+                    isYieldable
+                  )
+
+                  let yieldFunc = func
+
+                  if (this.isYieldNodeIndex(i + 1)) {
+                    yieldFunc = funcs[i + 1]
+                  }
+
+                  return (
+                    <Fragment key={`${i}-notInScript`}>
+                      {funcNode}
+                      <YieldFuncNode
+                        index={i}
+                        func={yieldFunc}
+                        data={data}
+                        script={script}
+                        bodyID={bodyID}
+                        service={service}
+                        declarationID={declarationID}
+                      />
+                    </Fragment>
+                  )
+                }
+
+                return funcNode
+              })}
+              <FuncSelector
+                bodyID={bodyID}
+                funcs={funcNames}
+                onAddNode={onAddNode}
+                declarationID={declarationID}
+              />
+            </>
           )
-
-          if (nonYieldableIndexesToggled[i] || this.isYieldNodeIndex(i + 1)) {
-            const script: string = scriptUpToYield(
-              bodyID,
-              declarationID,
-              i,
-              isYieldable
-            )
-
-            let yieldFunc = func
-
-            if (this.isYieldNodeIndex(i + 1)) {
-              yieldFunc = funcs[i + 1]
-            }
-
-            return (
-              <Fragment key={`${i}-notInScript`}>
-                {funcNode}
-                <YieldFuncNode
-                  index={i}
-                  func={yieldFunc}
-                  data={data}
-                  script={script}
-                  bodyID={bodyID}
-                  service={service}
-                  declarationID={declarationID}
-                />
-              </Fragment>
-            )
-          }
-
-          return funcNode
-        })}
-        <FuncSelector
-          bodyID={bodyID}
-          funcs={funcNames}
-          onAddNode={onAddNode}
-          declarationID={declarationID}
-        />
-      </>
+        }}
+      </FluxContext.Consumer>
     )
   }
 

@@ -205,7 +205,6 @@ export class FluxPage extends PureComponent<Props, State> {
         script={script}
         status={status}
         service={service}
-        context={this.getContext}
         suggestions={suggestions}
         onValidate={this.handleValidate}
         onAppendFrom={this.handleAppendFrom}

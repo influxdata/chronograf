@@ -10,6 +10,7 @@ const setup = () => {
     data: [],
     service,
     suggestions: [],
+    notify: () => {},
     onSubmitScript: () => {},
     onChangeScript: () => {},
     onValidate: () => {},

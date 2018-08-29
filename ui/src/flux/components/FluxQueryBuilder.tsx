@@ -12,7 +12,6 @@ import {HANDLE_VERTICAL} from 'src/shared/constants'
 
 // Types
 import {
-  Context,
   Suggestion,
   OnChangeScript,
   OnSubmitScript,
@@ -25,7 +24,6 @@ import {Service, NotificationAction} from 'src/types'
 interface Props {
   body: Body[]
   script: string
-  context: Context
   service: Service
   status: ScriptStatus
   suggestions: Suggestion[]
@@ -47,7 +45,6 @@ const FluxQueryBuilder: SFC<Props> = props => {
     body,
     notify,
     service,
-    context,
     suggestions,
     onAppendFrom,
     onDeleteBody,
@@ -91,7 +88,6 @@ const FluxQueryBuilder: SFC<Props> = props => {
       render: () => (
         <BodyBuilder
           body={body}
-          context={context}
           service={service}
           suggestions={suggestions}
           onDeleteBody={onDeleteBody}

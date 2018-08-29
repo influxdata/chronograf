@@ -359,7 +359,6 @@ class TimeMachine extends PureComponent<Props, State> {
             script={script}
             status={status}
             notify={notify}
-            context={this.getContext}
             service={this.service}
             suggestions={suggestions}
             onValidate={this.handleValidate}
