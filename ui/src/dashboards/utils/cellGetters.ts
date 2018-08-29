@@ -1,3 +1,6 @@
+// Libraries
+import _ from 'lodash'
+
 // APIs
 import {getQueryConfigAndStatus} from 'src/shared/apis'
 
@@ -15,10 +18,12 @@ import {
   DEFAULT_DURATION_MS,
   DEFAULT_PIXELS,
 } from 'src/shared/constants'
+const MAX_COLUMNS = 12
 
 // Types
 import {Cell, CellType, Dashboard, NewDefaultCell} from 'src/types/dashboards'
 import {QueryConfig, DurationRange} from 'src/types/queries'
+import {mapCells} from './importDashboardMappings'
 import {Template} from 'src/types'
 
 const getMostCommonValue = (values: number[]): number => {
@@ -45,8 +50,6 @@ export const isCellUntitled = (cellName: string): boolean => {
   return cellName === UNTITLED_GRAPH
 }
 
-const numColumns = 12
-
 const getNextAvailablePosition = (dashboard, newCell) => {
   const farthestY = dashboard.cells
     .map(cell => cell.y)
@@ -58,7 +61,7 @@ const getNextAvailablePosition = (dashboard, newCell) => {
     .reduce((a, b) => (a > b ? a : b))
   const lastCell = bottomCells.find(cell => cell.x === farthestX)
 
-  const availableSpace = numColumns - (lastCell.x + lastCell.w)
+  const availableSpace = MAX_COLUMNS - (lastCell.x + lastCell.w)
   const newCellFits = availableSpace >= newCell.w
 
   return newCellFits
@@ -109,11 +112,42 @@ export const getNewDashboardCell = (
 
 export const getClonedDashboardCell = (
   dashboard: Dashboard,
-  cloneCell: Cell
+  cellClone: Cell
 ): Cell => {
-  const {x, y} = getNextAvailablePosition(dashboard, cloneCell)
+  let x
+  let y
 
-  const name = `${cloneCell.name} (clone)`
+  // const cellCloneIsAtRightEdge = cellClone.x + cellClone.w === MAX_COLUMNS
+  const cellCloneFitsLeft = cellClone.x >= cellClone.w
+  const cellCloneFitsRight =
+    MAX_COLUMNS - cellClone.w - cellClone.x >= cellClone.w
+
+  // If cell can be cloned to the left (at the same size) then do so
+  if (cellCloneFitsLeft) {
+    console.log('cloning to left')
+    x = cellClone.x - cellClone.w
+    y = cellClone.y
+  }
+  // Otherwise clone to the right
+  else if (cellCloneFitsRight) {
+    console.log('cloning to right')
+
+    x = cellClone.x + cellClone.w
+    y = cellClone.y
+  }
+  // Clone below
+  else {
+    console.log('cloning below')
+
+    x = cellClone.x
+    y = cellClone.y + cellClone.h
+  }
+
+  const name = `${cellClone.name} (clone)`
+
+  return {...cellClone, x, y, name}
+}
+
 
   return {...cloneCell, x, y, name}
 }
