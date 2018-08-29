@@ -79,7 +79,6 @@ interface Props {
   sources: Source[]
   isInCEO: boolean
   services: Service[]
-  autoRefresh: number
   timeRange: TimeRange
   templates: Template[]
   isStaticLegend: boolean
@@ -228,7 +227,6 @@ class TimeMachine extends PureComponent<Props, State> {
       script,
       timeRange,
       templates,
-      autoRefresh,
       editQueryStatus,
       isInCEO,
       source,
@@ -245,7 +243,6 @@ class TimeMachine extends PureComponent<Props, State> {
           source={source}
           timeRange={timeRange}
           templates={templates}
-          autoRefresh={autoRefresh}
           queryConfigs={this.queriesWorkingDraft}
           editQueryStatus={editQueryStatus}
           staticLegend={isStaticLegend}

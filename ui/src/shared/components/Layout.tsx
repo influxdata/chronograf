@@ -26,7 +26,6 @@ interface Props {
   source: Source
   sources: Source[]
   host: string
-  autoRefresh: number
   isEditable: boolean
   manualRefresh: number
   onZoom: () => void
@@ -49,7 +48,6 @@ class Layout extends Component<Props> {
       sources,
       onZoom,
       timeRange,
-      autoRefresh,
       manualRefresh,
       templates,
       isEditable,
@@ -84,7 +82,6 @@ class Layout extends Component<Props> {
             decimalPlaces={cell.decimalPlaces}
             timeRange={timeRange}
             templates={templates}
-            autoRefresh={autoRefresh}
             manualRefresh={manualRefresh}
             staticLegend={IS_STATIC_LEGEND(cell.legend)}
             grabDataForDownload={this.grabDataForDownload}

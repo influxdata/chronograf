@@ -24,7 +24,6 @@ const DataExplorerVisView: SFC<Props> = ({
   source,
   queries,
   templates,
-  autoRefresh,
   manualRefresh,
   editQueryStatus,
 }) => {
@@ -53,7 +52,6 @@ const DataExplorerVisView: SFC<Props> = ({
       queries={queries}
       type={CellType.Line}
       templates={templates}
-      autoRefresh={autoRefresh}
       colors={DEFAULT_LINE_COLORS}
       manualRefresh={manualRefresh}
       editQueryStatus={editQueryStatus}

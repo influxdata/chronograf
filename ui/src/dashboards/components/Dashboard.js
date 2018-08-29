@@ -12,7 +12,6 @@ const Dashboard = ({
   onZoom,
   dashboard,
   timeRange,
-  autoRefresh,
   manualRefresh,
   onDeleteCell,
   onCloneCell,
@@ -52,7 +51,6 @@ const Dashboard = ({
             sources={sources}
             isEditable={true}
             timeRange={timeRange}
-            autoRefresh={autoRefresh}
             manualRefresh={manualRefresh}
             onDeleteCell={onDeleteCell}
             onCloneCell={onCloneCell}
@@ -103,7 +101,6 @@ Dashboard.propTypes = {
     }).isRequired,
   }).isRequired,
   sources: arrayOf(shape({})).isRequired,
-  autoRefresh: number.isRequired,
   manualRefresh: number,
   timeRange: shape({}).isRequired,
   onZoom: func,

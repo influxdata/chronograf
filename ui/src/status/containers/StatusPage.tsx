@@ -7,7 +7,6 @@ import LayoutRenderer from 'src/shared/components/LayoutRenderer'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 
 // Constants
-import {AUTOREFRESH_DEFAULT} from 'src/shared/constants'
 import {STATUS_PAGE_TIME_RANGE} from 'src/shared/data/timeRanges'
 import {fixtureStatusPageCells} from 'src/status/fixtures'
 import {
@@ -34,7 +33,6 @@ interface Props {
   source: Source
 }
 
-const autoRefresh = AUTOREFRESH_DEFAULT
 const timeRange = STATUS_PAGE_TIME_RANGE
 
 @ErrorHandling
@@ -71,7 +69,6 @@ class StatusPage extends Component<Props, State> {
                 isStatusPage={true}
                 timeRange={timeRange}
                 templates={this.templates}
-                autoRefresh={autoRefresh}
               />
             ) : (
               <span>Loading Status Page...</span>

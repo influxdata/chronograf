@@ -48,7 +48,6 @@ interface Props {
   isInCEO: boolean
   timeFormat: string
   cellHeight: number
-  autoRefresh: number
   staticLegend: boolean
   manualRefresh: number
   resizerTopHeight: number

@@ -32,7 +32,6 @@ interface Props {
   templates: Template[]
   sources: Source[]
   host: string
-  autoRefresh: number
   manualRefresh: number
   isStatusPage: boolean
   isEditable: boolean
@@ -67,7 +66,6 @@ class LayoutRenderer extends Component<Props, State> {
       templates,
       timeRange,
       isEditable,
-      autoRefresh,
       manualRefresh,
       onDeleteCell,
       onCloneCell,
@@ -116,7 +114,6 @@ class LayoutRenderer extends Component<Props, State> {
                   templates={templates}
                   timeRange={timeRange}
                   isEditable={isEditable}
-                  autoRefresh={autoRefresh}
                   onDeleteCell={onDeleteCell}
                   onCloneCell={onCloneCell}
                   manualRefresh={manualRefresh}

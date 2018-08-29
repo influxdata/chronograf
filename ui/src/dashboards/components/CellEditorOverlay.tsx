@@ -56,7 +56,6 @@ interface Props {
   source: SourcesModels.Source
   dashboardID: number
   queryStatus: QueryStatus
-  autoRefresh: number
   templates: Template[]
   timeRange: QueriesModels.TimeRange
   thresholdsListType: string
@@ -108,7 +107,6 @@ class CellEditorOverlay extends Component<Props, State> {
       onCancel,
       templates,
       timeRange,
-      autoRefresh,
       editQueryStatus,
       cell,
       queryDrafts,
@@ -140,7 +138,6 @@ class CellEditorOverlay extends Component<Props, State> {
           editQueryStatus={editQueryStatus}
           templates={templates}
           timeRange={timeRange}
-          autoRefresh={autoRefresh}
           source={source}
           onResetFocus={this.handleResetFocus}
           isInCEO={true}
