@@ -10,8 +10,16 @@ import CEOHeader from 'src/dashboards/components/CEOHeader'
 // Utils
 import {getDeep} from 'src/utils/wrappers'
 import {buildQuery} from 'src/utils/influxql'
-// import {editCellQueryStatus} from 'src/dashboards/actions'
 import {getTimeRange} from 'src/dashboards/utils/cellGetters'
+
+// Actions
+import {
+  QueryConfigActions,
+  addQueryAsync,
+  deleteQueryAsync,
+  updateEditorTimeRange as updateEditorTimeRangeAction,
+} from 'src/shared/actions/queries'
+import {editCellQueryStatus} from 'src/dashboards/actions'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
@@ -26,23 +34,12 @@ import * as SourcesModels from 'src/types/sources'
 import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
-import {
-  QueryConfigActions,
-  addQueryAsync,
-  deleteQueryAsync,
-} from 'src/dashboards/actions/cellEditorOverlay'
 import {UpdateScript} from 'src/flux/actions'
 import {Links} from 'src/types/flux'
-import {updateEditorTimeRange as updateEditorTimeRangeAction} from 'src/shared/actions/queries'
 
 const staticLegend: DashboardsModels.Legend = {
   type: 'static',
   orientation: 'bottom',
-}
-
-interface QueryStatus {
-  queryID: string
-  status: QueriesModels.Status
 }
 
 interface VisualizationOptions {
@@ -65,12 +62,13 @@ interface Props {
   sources: SourcesModels.Source[]
   services: Service[]
   notify: NotificationAction
-  editQueryStatus: () => void
+  editQueryStatus: typeof editCellQueryStatus
   onCancel: () => void
   onSave: (cell: DashboardsModels.Cell | NewDefaultCell) => void
   source: SourcesModels.Source
   dashboardID: number
-  queryStatus: QueryStatus
+  queryStatus: QueriesModels.QueryStatus
+  autoRefresh: number
   templates: Template[]
   timeRange: QueriesModels.TimeRange
   thresholdsListType: string
@@ -133,6 +131,7 @@ class CellEditorOverlay extends Component<Props, State> {
       deleteQuery,
       updateEditorTimeRange,
       updateScript,
+      queryStatus,
     } = this.props
 
     const {isStaticLegend} = this.state
@@ -166,6 +165,7 @@ class CellEditorOverlay extends Component<Props, State> {
           deleteQuery={deleteQuery}
           updateEditorTimeRange={updateEditorTimeRange}
           visualizationOptions={this.visualizationOptions}
+          queryStatus={queryStatus}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader

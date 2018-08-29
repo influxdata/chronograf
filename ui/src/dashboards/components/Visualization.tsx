@@ -8,7 +8,7 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
-import {TimeRange, QueryConfig, Axes, Template, Source} from 'src/types'
+import {TimeRange, QueryConfig, Axes, Template, Source, Status} from 'src/types'
 import {
   TableOptions,
   DecimalPlaces,
@@ -26,7 +26,7 @@ interface Props {
   timeRange: TimeRange
   autoRefresher: AutoRefresher
   queryConfigs: QueryConfig[]
-  editQueryStatus: () => void
+  editQueryStatus: (queryID: string, status: Status) => void
   tableOptions: TableOptions
   timeFormat: string
   decimalPlaces: DecimalPlaces

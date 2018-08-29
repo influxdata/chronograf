@@ -105,10 +105,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   showTemplateVariableControlBar: boolean
   toggleTemplateVariableControlBar: typeof appActions.toggleTemplateVariableControlBar
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
-  cellQueryStatus: {
-    queryID: string
-    status: object
-  }
+  cellQueryStatus: QueriesModels.QueryStatus
   errorThrown: ErrorsActions.ErrorThrownActionCreator
   meRole: string
   isUsingAuth: boolean
@@ -134,7 +131,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   putDashboardByID: typeof dashboardActions.putDashboardByID
   getDashboardsAsync: typeof dashboardActions.getDashboardsAsync
   addDashboardCellAsync: typeof dashboardActions.addDashboardCellAsync
-  editCellQueryStatus: () => void
+  editCellQueryStatus: typeof dashboardActions.editCellQueryStatus
   updateDashboardCell: typeof dashboardActions.updateDashboardCell
   cloneDashboardCellAsync: typeof dashboardActions.cloneDashboardCellAsync
   deleteDashboardCellAsync: typeof dashboardActions.deleteDashboardCellAsync

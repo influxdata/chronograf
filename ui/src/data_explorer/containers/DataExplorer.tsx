@@ -13,6 +13,9 @@ import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'
 
+// Constants
+import {timeRanges} from 'src/shared/data/timeRanges'
+
 // Components
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
@@ -27,15 +30,14 @@ import {errorThrown} from 'src/shared/actions/errors'
 import {setAutoRefresh} from 'src/shared/actions/app'
 import {getDashboardsAsync, addDashboardCellAsync} from 'src/dashboards/actions'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
-import {
-  loadDE as loadDEAction,
-  updateEditorTimeRange,
-} from 'src/data_explorer/actions/queries'
+import {loadDE as loadDEAction} from 'src/data_explorer/actions/queries'
 import {
   queryConfigActions as queryConfigModifiers,
   updateQueryDrafts as updateQueryDraftsAction,
+  updateQueryStatus as editQueryStatusAction,
   addQueryAsync,
   deleteQueryAsync,
+  updateEditorTimeRange,
 } from 'src/shared/actions/queries'
 
 // Constants
@@ -54,6 +56,7 @@ import {
   Dashboard,
   CellQuery,
   QueryConfig,
+  QueryStatus,
   Template,
   TemplateType,
   TemplateValueType,
@@ -65,7 +68,7 @@ interface Props {
   sources: Source[]
   services: Service[]
   queryConfigs: QueryConfig[]
-  queryConfigActions: any
+  queryConfigActions: typeof queryConfigModifiers
   autoRefresh: number
   handleChooseAutoRefresh: () => void
   router?: InjectedRouter
@@ -84,6 +87,8 @@ interface Props {
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
   queryDrafts: CellQuery[]
+  editQueryStatus: typeof editQueryStatusAction
+  queryStatus: QueryStatus
 }
 
 interface State {
@@ -189,12 +194,13 @@ export class DataExplorer extends PureComponent<Props, State> {
       autoRefresh,
       manualRefresh,
       onManualRefresh,
-      queryConfigActions,
+      editQueryStatus,
       handleChooseAutoRefresh,
       updateQueryDrafts,
       queryDrafts,
       addQuery,
       deleteQuery,
+      queryStatus,
     } = this.props
     const {isStaticLegend} = this.state
 
@@ -205,7 +211,7 @@ export class DataExplorer extends PureComponent<Props, State> {
         <div className="deceo--page">
           <TimeMachine
             queryDrafts={queryDrafts}
-            editQueryStatus={queryConfigActions.editQueryStatus}
+            editQueryStatus={editQueryStatus}
             templates={this.templates}
             timeRange={timeRange}
             autoRefresh={autoRefresh}
@@ -222,6 +228,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             deleteQuery={deleteQuery}
             updateEditorTimeRange={this.handleChooseTimeRange}
             manualRefresh={manualRefresh}
+            queryStatus={queryStatus}
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
@@ -279,7 +286,9 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private get templates(): Template[] {
-    const {timeRange} = this.props
+    const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
+
+    const timeRange = this.props.timeRange || {lower, upper}
 
     const low = timeRange.lower
     const up = timeRange.upper
@@ -378,7 +387,7 @@ const mapStateToProps = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer: {queryDrafts, timeRange},
+    dataExplorer: {queryDrafts, timeRange, queryStatus},
     dashboardUI: {dashboards},
     sources,
     services,
@@ -391,6 +400,7 @@ const mapStateToProps = state => {
     dashboards,
     sources,
     services,
+    queryStatus,
   }
 }
 
@@ -407,6 +417,7 @@ const mapDispatchToProps = dispatch => {
     updateQueryDrafts: bindActionCreators(updateQueryDraftsAction, dispatch),
     addQuery: bindActionCreators(addQueryAsync, dispatch),
     deleteQuery: bindActionCreators(deleteQueryAsync, dispatch),
+    editQueryStatus: bindActionCreators(editQueryStatusAction, dispatch),
   }
 }
 

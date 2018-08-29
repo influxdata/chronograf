@@ -39,6 +39,7 @@ import {
   State as CEOState,
   ActionType as CEOActionType,
 } from 'src/dashboards/actions/cellEditorOverlay'
+import {ActionType as DashboardActionType} from 'src/dashboards/actions'
 import {
   State as DEState,
   ActionType as DEActionType,
@@ -52,33 +53,21 @@ export enum QueryUpdateState {
   DE = 'dataExplorer',
 }
 
-export interface UpdateCEOQueryDraftsAction {
-  type: CEOActionType.UpdateQueryDrafts
-  payload: {queryDrafts: CellQuery[]}
-}
-export interface UpdateDEQueryDraftsAction {
-  type: DEActionType.UpdateQueryDrafts
-  payload: {queryDrafts: CellQuery[]}
-}
-
 interface UpdateQueryDraftsAction {
   type: CEOActionType.UpdateQueryDrafts | DEActionType.UpdateQueryDrafts
   payload: {queryDrafts: CellQuery[]}
 }
 
-export interface UpdateCEOEditorTimeRange {
-  type: CEOActionType.UpdateEditorTimeRange
-  payload: {timeRange: TimeRange}
-}
-
-export interface UpdateDEEditorTimeRange {
-  type: DEActionType.UpdateEditorTimeRange
-  payload: {timeRange: TimeRange}
-}
-
-interface UpdateEditorTimeRange {
+interface UpdateEditorTimeRangeAction {
   type: CEOActionType.UpdateEditorTimeRange | DEActionType.UpdateEditorTimeRange
   payload: {timeRange: TimeRange}
+}
+
+interface UpdateQueryStatusAction {
+  type:
+    | DashboardActionType.EditCellQueryStatus
+    | DEActionType.UpdateEditorTimeRange
+  payload: {queryID: string; status: Status}
 }
 
 export const updateQueryDrafts = (
@@ -94,7 +83,7 @@ export const updateQueryDrafts = (
     payload: {
       queryDrafts,
     },
-  } as UpdateCEOQueryDraftsAction
+  } as UpdateQueryDraftsAction
 }
 
 export const updateEditorTimeRange = (
@@ -110,7 +99,26 @@ export const updateEditorTimeRange = (
     payload: {
       timeRange,
     },
-  } as UpdateEditorTimeRange
+  } as UpdateEditorTimeRangeAction
+}
+
+export const updateQueryStatus = (
+  queryID,
+  status,
+  stateToUpdate: QueryUpdateState
+) => {
+  const type =
+    stateToUpdate === QueryUpdateState.CEO
+      ? DashboardActionType.EditCellQueryStatus
+      : DEActionType.UpdateQueryStatus
+
+  return {
+    type,
+    payload: {
+      queryID,
+      status,
+    },
+  } as UpdateQueryStatusAction
 }
 
 export const toggleFieldAsync = (

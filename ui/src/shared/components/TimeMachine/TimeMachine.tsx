@@ -54,6 +54,8 @@ import {
   CellQuery,
   NotificationAction,
   FluxTable,
+  QueryStatus,
+  Status,
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
 import {
@@ -107,7 +109,11 @@ interface Props {
 
   queryConfigActions: QueryConfigActions
   notify: NotificationAction
-  editQueryStatus: () => void
+  editQueryStatus: (
+    queryID: string,
+    status: Status,
+    stateToUpdate: QueryUpdateState
+  ) => void
   updateQueryDrafts: (
     queryDrafts: CellQuery[],
     stateToUpdate: QueryUpdateState
@@ -125,6 +131,7 @@ interface Props {
   ) => void
   visualizationOptions?: VisualizationOptions
   manualRefresh?: number
+  queryStatus: QueryStatus
 }
 
 interface Body extends FlatBody {
@@ -280,7 +287,6 @@ class TimeMachine extends PureComponent<Props, State> {
       script,
       timeRange,
       templates,
-      editQueryStatus,
       isInCEO,
       source,
       isStaticLegend,
@@ -301,7 +307,7 @@ class TimeMachine extends PureComponent<Props, State> {
           templates={templates}
           autoRefresher={autoRefresher}
           queryConfigs={this.queriesWorkingDraft}
-          editQueryStatus={editQueryStatus}
+          editQueryStatus={this.handleEditQueryStatus}
           staticLegend={isStaticLegend}
           isInCEO={isInCEO}
           manualRefresh={manualRefresh}
@@ -378,12 +384,22 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get queriesWorkingDraft(): QueryConfig[] {
-    const {queryDrafts} = this.props
+    const {queryDrafts, queryStatus} = this.props
 
-    return queryDrafts.map(q => ({
-      ...q.queryConfig,
-      source: this.source,
-    }))
+    return queryDrafts.map(q => {
+      if (queryStatus.queryID === q.id) {
+        return {
+          ...q.queryConfig,
+          source: this.source,
+          status: queryStatus.status,
+        }
+      }
+
+      return {
+        ...q.queryConfig,
+        source: this.source,
+      }
+    })
   }
 
   private get formattedSources(): SourceOption[] {
@@ -484,6 +500,12 @@ class TimeMachine extends PureComponent<Props, State> {
     const {updateEditorTimeRange} = this.props
 
     updateEditorTimeRange(timeRange, this.stateToUpdate)
+  }
+
+  private handleEditQueryStatus = (queryID: string, status: Status) => {
+    const {editQueryStatus} = this.props
+
+    editQueryStatus(queryID, status, this.stateToUpdate)
   }
 
   private findUserDefinedTempVarsInQuery = (

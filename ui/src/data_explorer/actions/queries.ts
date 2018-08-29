@@ -1,10 +1,10 @@
 // Types
-import {CellQuery} from 'src/types/dashboards'
-import {TimeRange} from 'src/types'
+import {TimeRange, CellQuery, Status, QueryStatus} from 'src/types'
 
 export interface DEInitialState {
   queryDrafts: CellQuery[]
   timeRange: TimeRange
+  queryStatus: QueryStatus
 }
 
 export interface State {
@@ -14,14 +14,15 @@ export interface State {
 export enum ActionType {
   LoadDE = 'LOAD_DE',
   UpdateQueryDrafts = 'DE_UPDATE_QUERY_DRAFTS',
-  UpdateQueryDraft = 'DE_UPDATE_QUERY_DRAFT',
   UpdateEditorTimeRange = 'DE_UPDATE_EDITOR_TIME_RANGE',
+  UpdateQueryStatus = 'DE_UPDATE_QUERY_STATUS',
 }
 
 export type Action =
   | LoadDEAction
   | UpdateEditorTimeRangeAction
   | UpdateQueryDraftsAction
+  | UpdateQueryStatusAction
 
 export interface LoadDEAction {
   type: ActionType.LoadDE
@@ -38,17 +39,18 @@ export interface UpdateQueryDraftsAction {
   }
 }
 
-export interface UpdateQueryDraftAction {
-  type: ActionType.UpdateQueryDraft
-  payload: {
-    queryDraft: CellQuery
-  }
-}
-
 export interface UpdateEditorTimeRangeAction {
   type: ActionType.UpdateEditorTimeRange
   payload: {
     timeRange: TimeRange
+  }
+}
+
+export interface UpdateQueryStatusAction {
+  type: ActionType.UpdateQueryStatus
+  payload: {
+    queryID: string
+    status: Status
   }
 }
 
@@ -59,15 +61,6 @@ export const loadDE = (
   type: ActionType.LoadDE,
   payload: {
     queries,
-    timeRange,
-  },
-})
-
-export const updateEditorTimeRange = (
-  timeRange: TimeRange
-): UpdateEditorTimeRangeAction => ({
-  type: ActionType.UpdateEditorTimeRange,
-  payload: {
     timeRange,
   },
 })

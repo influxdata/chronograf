@@ -8,13 +8,19 @@ import {Action, ActionType} from 'src/data_explorer/actions/queries'
 // utils
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
+// constants
+import {timeRanges} from 'src/shared/data/timeRanges'
+
 // types
 import {DEInitialState} from 'src/data_explorer/actions/queries'
 import {CellQuery} from 'src/types/dashboards'
 
-export const initialState = {
+const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
+
+export const initialState: DEInitialState = {
   queryDrafts: null,
-  timeRange: null,
+  timeRange: {lower, upper},
+  queryStatus: {queryID: null, status: null},
 }
 
 export default (state = initialState, action: Action): DEInitialState => {
@@ -58,6 +64,12 @@ export default (state = initialState, action: Action): DEInitialState => {
       const {timeRange} = action.payload
 
       return {...state, timeRange}
+    }
+
+    case ActionType.UpdateQueryStatus: {
+      const {queryID, status} = action.payload
+      const queryStatus = {queryID, status}
+      return {...state, queryStatus}
     }
   }
 
