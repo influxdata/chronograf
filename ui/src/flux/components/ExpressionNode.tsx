@@ -1,6 +1,6 @@
 import React, {PureComponent, Fragment} from 'react'
 
-import {FluxContext} from 'src/flux/containers/FluxPage'
+import {FluxContext} from 'src/shared/components/TimeMachine/TimeMachine'
 import FuncSelector from 'src/flux/components/FuncSelector'
 import FuncNode from 'src/flux/components/FuncNode'
 import YieldFuncNode from 'src/flux/components/YieldFuncNode'
@@ -9,12 +9,12 @@ import {getDeep} from 'src/utils/wrappers'
 import {Func, Context} from 'src/types/flux'
 
 interface Props {
-  funcNames: any[]
-  bodyID: string
   funcs: Func[]
+  bodyID: string
+  funcNames: any[]
+  isLastBody: boolean
   declarationID?: string
   declarationsFromBody: string[]
-  isLastBody: boolean
   onDeleteBody: (bodyID: string) => void
 }
 
@@ -79,7 +79,7 @@ class ExpressionNode extends PureComponent<Props, State> {
 
                 const funcNode = (
                   <FuncNode
-                    key={i}
+                    key={func.id}
                     index={i}
                     func={func}
                     funcs={funcs}

@@ -30,6 +30,7 @@ import {
   fetchAllFluxServicesAsync,
   FetchAllFluxServicesAsync,
 } from 'src/shared/actions/services'
+import {updateScript as updateScriptAction} from 'src/flux/actions'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
@@ -64,13 +65,17 @@ import * as ErrorsActions from 'src/types/actions/errors'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
-import * as NotificationsActions from 'src/types/actions/notifications'
 import {NewDefaultCell} from 'src/types/dashboards'
-import {Service} from 'src/types'
+import {Service, NotificationAction} from 'src/types'
 import {QueryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
+import {Links} from 'src/types/flux'
+import {UpdateScript} from 'src/flux/actions'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
+  fluxLinks: Links
+  script: string
+  updateScript: UpdateScript
   source: SourcesModels.Source
   sources: SourcesModels.Source[]
   params: {
@@ -100,7 +105,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   meRole: string
   isUsingAuth: boolean
   router: InjectedRouter
-  notify: NotificationsActions.PublishNotificationActionCreator
+  notify: NotificationAction
   annotationsDisplaySetting: AnnotationsDisplaySetting
   onGetAnnotationsAsync: typeof getAnnotationsAsync
   handleLoadCEO: typeof cellEditorOverlayActions.loadCEO
@@ -230,6 +235,10 @@ class DashboardPage extends Component<Props, State> {
 
   public render() {
     const {
+      script,
+      notify,
+      fluxLinks,
+      updateScript,
       isUsingAuth,
       meRole,
       source,
@@ -316,6 +325,9 @@ class DashboardPage extends Component<Props, State> {
           <CellEditorOverlay
             source={source}
             sources={sources}
+            notify={notify}
+            fluxLinks={fluxLinks}
+            script={script}
             services={this.services}
             cell={selectedCell}
             queryDrafts={queryDrafts}
@@ -337,6 +349,7 @@ class DashboardPage extends Component<Props, State> {
             queryConfigActions={this.queryConfigActions}
             addQuery={addQuery}
             deleteQuery={deleteQuery}
+            updateScript={updateScript}
           />
         </OverlayTechnology>
         <DashboardHeader
@@ -669,6 +682,8 @@ const mstp = (state, {params: {dashboardID}}) => {
       ephemeral: {inPresentationMode},
       persisted: {autoRefresh, showTemplateVariableControlBar},
     },
+    script,
+    links,
     annotations: {displaySetting},
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
@@ -700,10 +715,12 @@ const mstp = (state, {params: {dashboardID}}) => {
   const selectedCell = cell
 
   return {
+    script,
     sources,
     services,
     meRole,
     dashboard,
+    fluxLinks: links.flux,
     dashboardID: Number(dashboardID),
     timeRange,
     zoomedTimeRange,
@@ -724,6 +741,7 @@ const mstp = (state, {params: {dashboardID}}) => {
 }
 
 const mdtp = {
+  updateScript: updateScriptAction,
   setDashTimeV1: dashboardActions.setDashTimeV1,
   setZoomedTimeRange: dashboardActions.setZoomedTimeRange,
   updateDashboard: dashboardActions.updateDashboard,

@@ -23,7 +23,7 @@ import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {Service, TimeRange} from 'src/types'
+import {Service, TimeRange, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
 import {
@@ -31,6 +31,8 @@ import {
   addQueryAsync,
   deleteQueryAsync,
 } from 'src/dashboards/actions/cellEditorOverlay'
+import {UpdateScript} from 'src/flux/actions'
+import {Links} from 'src/types/flux'
 
 const staticLegend: DashboardsModels.Legend = {
   type: 'static',
@@ -43,8 +45,11 @@ interface QueryStatus {
 }
 
 interface Props {
+  fluxLinks: Links
+  script: string
   sources: SourcesModels.Source[]
   services: Service[]
+  notify: NotificationAction
   editQueryStatus: typeof editCellQueryStatus
   onCancel: () => void
   onSave: (cell: DashboardsModels.Cell | NewDefaultCell) => void
@@ -66,6 +71,7 @@ interface Props {
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
   updateEditorTimeRange: (timeRange: TimeRange) => void
+  updateScript: UpdateScript
 }
 
 interface State {
@@ -95,6 +101,9 @@ class CellEditorOverlay extends Component<Props, State> {
 
   public render() {
     const {
+      fluxLinks,
+      script,
+      notify,
       services,
       onCancel,
       templates,
@@ -110,6 +119,7 @@ class CellEditorOverlay extends Component<Props, State> {
       addQuery,
       deleteQuery,
       updateEditorTimeRange,
+      updateScript,
     } = this.props
 
     const {isStaticLegend} = this.state
@@ -122,7 +132,11 @@ class CellEditorOverlay extends Component<Props, State> {
         ref={this.onRef}
       >
         <TimeMachine
+          fluxLinks={fluxLinks}
+          notify={notify}
+          script={script}
           queryDrafts={queryDrafts}
+          updateScript={updateScript}
           editQueryStatus={editQueryStatus}
           templates={templates}
           timeRange={timeRange}

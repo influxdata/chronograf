@@ -12,8 +12,8 @@ import {Service} from 'src/types'
 import {Body, Suggestion} from 'src/types/flux'
 
 interface Props {
-  service: Service
   body: Body[]
+  service: Service
   suggestions: Suggestion[]
   onAppendFrom: () => void
   onAppendJoin: () => void
@@ -38,12 +38,12 @@ class BodyBuilder extends PureComponent<Props> {
                 </div>
                 <ExpressionNode
                   bodyID={b.id}
+                  funcs={d.funcs}
                   declarationID={d.id}
                   funcNames={this.funcNames}
-                  funcs={d.funcs}
-                  declarationsFromBody={this.declarationsFromBody}
-                  isLastBody={this.isLastBody(i)}
                   onDeleteBody={onDeleteBody}
+                  isLastBody={this.isLastBody(i)}
+                  declarationsFromBody={this.declarationsFromBody}
                 />
               </div>
             )
@@ -72,9 +72,9 @@ class BodyBuilder extends PureComponent<Props> {
             bodyID={b.id}
             funcs={b.funcs}
             funcNames={this.funcNames}
-            declarationsFromBody={this.declarationsFromBody}
-            isLastBody={this.isLastBody(i)}
             onDeleteBody={onDeleteBody}
+            isLastBody={this.isLastBody(i)}
+            declarationsFromBody={this.declarationsFromBody}
           />
         </div>
       )

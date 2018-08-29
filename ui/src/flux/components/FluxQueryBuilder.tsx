@@ -1,13 +1,16 @@
+// Libraries
 import React, {SFC} from 'react'
 
+// Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import BodyBuilder from 'src/flux/components/BodyBuilder'
-import TimeMachineVis from 'src/flux/components/TimeMachineVis'
 import TimeMachineEditor from 'src/flux/components/TimeMachineEditor'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
-import {HANDLE_VERTICAL, HANDLE_HORIZONTAL} from 'src/shared/constants'
+// Constants
+import {HANDLE_VERTICAL} from 'src/shared/constants'
 
+// Types
 import {
   Suggestion,
   OnChangeScript,
@@ -16,16 +19,17 @@ import {
   FlatBody,
   ScriptStatus,
 } from 'src/types/flux'
-import {Service} from 'src/types'
+import {Service, NotificationAction} from 'src/types'
 
 interface Props {
-  service: Service
-  script: string
   body: Body[]
+  script: string
+  service: Service
   status: ScriptStatus
   suggestions: Suggestion[]
-  onChangeScript: OnChangeScript
   onDeleteBody: OnDeleteBody
+  notify: NotificationAction
+  onChangeScript: OnChangeScript
   onSubmitScript: OnSubmitScript
   onAppendFrom: () => void
   onAppendJoin: () => void
@@ -36,9 +40,10 @@ interface Body extends FlatBody {
   id: string
 }
 
-const TimeMachine: SFC<Props> = props => {
+const FluxQueryBuilder: SFC<Props> = props => {
   const {
     body,
+    notify,
     service,
     suggestions,
     onAppendFrom,
@@ -95,41 +100,18 @@ const TimeMachine: SFC<Props> = props => {
       name: 'Explore',
       headerButtons: [],
       menuOptions: [],
-      render: () => <SchemaExplorer service={service} />,
+      render: () => <SchemaExplorer service={service} notify={notify} />,
       headerOrientation: HANDLE_VERTICAL,
-    },
-  ]
-
-  const horizontalDivisions = [
-    {
-      name: '',
-      handleDisplay: 'none',
-      headerButtons: [],
-      menuOptions: [],
-      render: () => <TimeMachineVis service={service} script={script} />,
-      headerOrientation: HANDLE_HORIZONTAL,
-    },
-    {
-      name: '',
-      headerButtons: [],
-      menuOptions: [],
-      render: () => (
-        <Threesizer
-          orientation={HANDLE_VERTICAL}
-          divisions={verticalDivisions}
-        />
-      ),
-      headerOrientation: HANDLE_HORIZONTAL,
     },
   ]
 
   return (
     <Threesizer
-      orientation={HANDLE_HORIZONTAL}
-      divisions={horizontalDivisions}
+      orientation={HANDLE_VERTICAL}
+      divisions={verticalDivisions}
       containerClass="page-contents"
     />
   )
 }
 
-export default TimeMachine
+export default FluxQueryBuilder

@@ -3,24 +3,45 @@ import React, {PureComponent} from 'react'
 import _ from 'lodash'
 
 // Components
+import TimeMachineVis from 'src/flux/components/TimeMachineVis'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 import Visualization from 'src/dashboards/components/Visualization'
 import InfluxQLQueryMaker from 'src/shared/components/TimeMachine/InfluxQLQueryMaker'
 import DisplayOptions from 'src/dashboards/components/DisplayOptions'
 import TimeMachineBottom from 'src/shared/components/TimeMachine/TimeMachineBottom'
 import TimeMachineControls from 'src/shared/components/TimeMachine/TimeMachineControls'
+import KeyboardShortcuts from 'src/shared/components/KeyboardShortcuts'
+import FluxQueryBuilder from 'src/flux/components/FluxQueryBuilder'
 
 // Utils
 import {getConfig} from 'src/dashboards/utils/cellGetters'
 import {getDeep} from 'src/utils/wrappers'
+import {bodyNodes} from 'src/flux/helpers'
+import {
+  addNode,
+  parseError,
+  deleteBody,
+  appendJoin,
+  toggleYield,
+  deleteFuncNode,
+  getBodyToScript,
+  scriptUpToYield,
+} from 'src/flux/helpers/scriptBuilder'
 
 // Actions
 import {editCellQueryStatus} from 'src/dashboards/actions'
+import {
+  validateSuccess,
+  fluxTimeSeriesError,
+  fluxResponseTruncatedError,
+} from 'src/shared/copy/notifications'
+import {getSuggestions, getAST, getTimeSeries} from 'src/flux/apis'
 
 // Constants
 import {HANDLE_HORIZONTAL} from 'src/shared/constants'
 import {AUTO_GROUP_BY, PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 import {CEOTabs} from 'src/dashboards/constants'
+import {builder, emptyAST} from 'src/flux/constants'
 
 // Types
 import {
@@ -35,11 +56,26 @@ import {
   Source,
   Service,
   CellQuery,
+  NotificationAction,
+  FluxTable,
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
+import {
+  Suggestion,
+  FlatBody,
+  Links,
+  InputArg,
+  Context,
+  DeleteFuncNodeArgs,
+  Func,
+  ScriptStatus,
+} from 'src/types/flux'
+import {UpdateScript} from 'src/flux/actions'
 
 interface Props {
+  fluxLinks: Links
   source: Source
+  script: string
   sources: Source[]
   isInCEO: boolean
   services: Service[]
@@ -47,30 +83,48 @@ interface Props {
   timeRange: TimeRange
   templates: Template[]
   isStaticLegend: boolean
-  queryConfigActions: QueryConfigActions
-  onResetFocus: () => void
   queryDrafts: CellQuery[]
+  onResetFocus: () => void
+  updateScript: UpdateScript
+  addQuery: typeof addQueryAsync
+  deleteQuery: typeof deleteQueryAsync
+  queryConfigActions: QueryConfigActions
+  notify: NotificationAction
   editQueryStatus: typeof editCellQueryStatus
   updateQueryDrafts: (queryDrafts: CellQuery[]) => void
+  updateEditorTimeRange: (timeRange: TimeRange) => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
   children: (
     activeEditorTab: CEOTabs,
     onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
   ) => JSX.Element
-  addQuery: typeof addQueryAsync
-  deleteQuery: typeof deleteQueryAsync
-  updateEditorTimeRange: (timeRange: TimeRange) => void
+}
+
+interface Body extends FlatBody {
+  id: string
 }
 
 interface State {
+  body: Body[]
+  script: string
+  ast: object
+  data: FluxTable[]
+  status: ScriptStatus
+  selectedSource: Source
   activeQueryIndex: number
   activeEditorTab: CEOTabs
-  selectedSource: Source
   selectedService: Service
   useDynamicSource: boolean
+  suggestions: Suggestion[]
 }
 
+type ScriptFunc = (script: string) => void
+
+export const FluxContext = React.createContext(undefined)
+
 class TimeMachine extends PureComponent<Props, State> {
+  private debouncedASTResponse: ScriptFunc
+
   constructor(props: Props) {
     super(props)
 
@@ -84,6 +138,39 @@ class TimeMachine extends PureComponent<Props, State> {
       selectedService: null,
       selectedSource: null,
       useDynamicSource,
+      data: [],
+      body: [],
+      ast: null,
+      suggestions: [],
+      status: {
+        type: 'none',
+        text: '',
+      },
+      script: '',
+    }
+
+    this.debouncedASTResponse = _.debounce(script => {
+      this.getASTResponse(script, false)
+    }, 250)
+  }
+
+  public async componentDidMount() {
+    const {fluxLinks, script} = this.props
+
+    try {
+      this.debouncedASTResponse(script)
+    } catch (error) {
+      console.error('Could not retrieve AST for script', error)
+    }
+
+    try {
+      const suggestions = await getSuggestions(fluxLinks.suggestions)
+      this.setState({suggestions})
+    } catch (error) {
+      console.error('Could not get function suggestions: ', error)
+    }
+    if (this.isFluxSource) {
+      this.getTimeSeries()
     }
   }
 
@@ -138,6 +225,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get visualization() {
     const {
+      script,
       timeRange,
       templates,
       autoRefresh,
@@ -147,6 +235,10 @@ class TimeMachine extends PureComponent<Props, State> {
       isStaticLegend,
     } = this.props
 
+    if (this.isFluxSource) {
+      const service = this.service
+      return <TimeMachineVis service={service} script={script} />
+    }
     return (
       <div className="deceo--top">
         <Visualization
@@ -168,30 +260,14 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get editorTab() {
-    const {
-      templates,
-      timeRange,
-      isStaticLegend,
-      onToggleStaticLegend,
-    } = this.props
-    const {activeQueryIndex, activeEditorTab} = this.state
+    const {isStaticLegend, onToggleStaticLegend} = this.props
+    const {activeEditorTab} = this.state
 
     if (activeEditorTab === CEOTabs.Queries) {
-      return (
-        <InfluxQLQueryMaker
-          source={this.source}
-          templates={templates}
-          queries={this.queriesWorkingDraft}
-          actions={this.queryConfigActions}
-          timeRange={timeRange}
-          onDeleteQuery={this.handleDeleteQuery}
-          onAddQuery={this.handleAddQuery}
-          activeQueryIndex={activeQueryIndex}
-          activeQuery={this.getActiveQuery()}
-          setActiveQueryIndex={this.handleSetActiveQueryIndex}
-          initialGroupByTime={AUTO_GROUP_BY}
-        />
-      )
+      if (this.isFluxSource) {
+        return this.fluxBuilder
+      }
+      return this.influxQLBuilder
     }
 
     return (
@@ -260,6 +336,62 @@ class TimeMachine extends PureComponent<Props, State> {
       ...s,
       text: `${s.name} @ ${s.url}`,
     }))
+  }
+
+  private get isFluxSource(): boolean {
+    // TODO: Update once flux is no longer a separate service
+    const {selectedService} = this.state
+    if (selectedService) {
+      return true
+    }
+    return false
+  }
+
+  private get fluxBuilder(): JSX.Element {
+    const {suggestions, body, status} = this.state
+    const {script, notify} = this.props
+
+    return (
+      <FluxContext.Provider value={this.getContext}>
+        <KeyboardShortcuts onControlEnter={this.getTimeSeries}>
+          <FluxQueryBuilder
+            body={body}
+            script={script}
+            status={status}
+            notify={notify}
+            service={this.service}
+            suggestions={suggestions}
+            onValidate={this.handleValidate}
+            onAppendFrom={this.handleAppendFrom}
+            onAppendJoin={this.handleAppendJoin}
+            onChangeScript={this.handleChangeScript}
+            onSubmitScript={this.handleSubmitScript}
+            onDeleteBody={this.handleDeleteBody}
+          />
+        </KeyboardShortcuts>
+      </FluxContext.Provider>
+    )
+  }
+
+  private get influxQLBuilder(): JSX.Element {
+    const {templates, timeRange} = this.props
+    const {activeQueryIndex} = this.state
+
+    return (
+      <InfluxQLQueryMaker
+        source={this.source}
+        templates={templates}
+        queries={this.queriesWorkingDraft}
+        actions={this.queryConfigActions}
+        timeRange={timeRange}
+        onDeleteQuery={this.handleDeleteQuery}
+        onAddQuery={this.handleAddQuery}
+        activeQueryIndex={activeQueryIndex}
+        activeQuery={this.getActiveQuery()}
+        setActiveQueryIndex={this.handleSetActiveQueryIndex}
+        initialGroupByTime={AUTO_GROUP_BY}
+      />
+    )
   }
 
   private getActiveQuery = (): QueryConfig => {
@@ -444,6 +576,243 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private handleSetActiveEditorTab = (tabName: CEOTabs): void => {
     this.setState({activeEditorTab: tabName})
+  }
+
+  // --------------- FLUX ----------------
+  private get getContext(): Context {
+    return {
+      onAddNode: this.handleAddNode,
+      onChangeArg: this.handleChangeArg,
+      onSubmitScript: this.handleSubmitScript,
+      onChangeScript: this.handleChangeScript,
+      onDeleteFuncNode: this.handleDeleteFuncNode,
+      onGenerateScript: this.handleGenerateScript,
+      onToggleYield: this.handleToggleYield,
+      service: this.service,
+      data: this.state.data,
+      scriptUpToYield: this.handleScriptUpToYield,
+    }
+  }
+
+  private getASTResponse = async (script: string, update: boolean = true) => {
+    const {fluxLinks} = this.props
+
+    if (!script) {
+      this.props.updateScript(script)
+      return this.setState({ast: emptyAST, body: []})
+    }
+
+    try {
+      const ast = await getAST({url: fluxLinks.ast, body: script})
+
+      if (update) {
+        this.props.updateScript(script)
+      }
+
+      const body = bodyNodes(ast, this.state.suggestions)
+      const status = {type: 'success', text: ''}
+      this.setState({ast, body, status})
+    } catch (error) {
+      this.setState({status: parseError(error)})
+      return console.error('Could not parse AST', error)
+    }
+  }
+
+  private getTimeSeries = async () => {
+    const {script, fluxLinks, notify} = this.props
+    if (!script) {
+      return
+    }
+    try {
+      await getAST({url: fluxLinks.ast, body: script})
+    } catch (error) {
+      this.setState({status: parseError(error)})
+      return console.error('Could not parse AST', error)
+    }
+    try {
+      const {tables, didTruncate} = await getTimeSeries(this.service, script)
+      this.setState({data: tables})
+      if (didTruncate) {
+        notify(fluxResponseTruncatedError())
+      }
+    } catch (error) {
+      this.setState({data: []})
+      notify(fluxTimeSeriesError(error))
+      console.error('Could not get timeSeries', error)
+    }
+    this.getASTResponse(script)
+  }
+
+  private handleSubmitScript = () => {
+    this.getASTResponse(this.props.script)
+  }
+
+  private handleGenerateScript = (): void => {
+    this.getASTResponse(this.bodyToScript)
+  }
+
+  private handleChangeArg = ({
+    key,
+    value,
+    generate,
+    funcID,
+    declarationID = '',
+    bodyID,
+  }: InputArg): void => {
+    const body = this.state.body.map(b => {
+      if (b.id !== bodyID) {
+        return b
+      }
+
+      if (declarationID) {
+        const declarations = b.declarations.map(d => {
+          if (d.id !== declarationID) {
+            return d
+          }
+
+          const functions = this.editFuncArgs({
+            funcs: d.funcs,
+            funcID,
+            key,
+            value,
+          })
+
+          return {...d, funcs: functions}
+        })
+
+        return {...b, declarations}
+      }
+
+      const funcs = this.editFuncArgs({
+        funcs: b.funcs,
+        funcID,
+        key,
+        value,
+      })
+
+      return {...b, funcs}
+    })
+
+    this.setState({body}, () => {
+      if (generate) {
+        this.handleGenerateScript()
+      }
+    })
+  }
+
+  private editFuncArgs = ({funcs, funcID, key, value}): Func[] => {
+    return funcs.map(f => {
+      if (f.id !== funcID) {
+        return f
+      }
+
+      const args = f.args.map(a => {
+        if (a.key === key) {
+          return {...a, value}
+        }
+
+        return a
+      })
+
+      return {...f, args}
+    })
+  }
+
+  private get bodyToScript(): string {
+    return getBodyToScript(this.state.body)
+  }
+
+  private handleAppendFrom = (): void => {
+    const {script} = this.props
+    let newScript = script.trim()
+    const from = builder.NEW_FROM
+
+    if (!newScript) {
+      this.getASTResponse(from)
+      return
+    }
+
+    newScript = `${script.trim()}\n\n${from}\n\n`
+    this.getASTResponse(newScript)
+  }
+
+  private handleAppendJoin = (): void => {
+    const {script} = this.props
+    const newScript = appendJoin(script)
+
+    this.getASTResponse(newScript)
+  }
+
+  private handleChangeScript = (script: string): void => {
+    this.debouncedASTResponse(script)
+    this.props.updateScript(script)
+  }
+
+  private handleAddNode = (
+    name: string,
+    bodyID: string,
+    declarationID: string
+  ): void => {
+    const script = addNode(name, bodyID, declarationID, this.state.body)
+
+    this.getASTResponse(script)
+  }
+
+  private handleDeleteBody = (bodyID: string): void => {
+    const script = deleteBody(bodyID, this.state.body)
+    this.getASTResponse(script)
+  }
+
+  private handleScriptUpToYield = (
+    bodyID: string,
+    declarationID: string,
+    funcNodeIndex: number,
+    isYieldable: boolean
+  ): string => {
+    return scriptUpToYield(
+      bodyID,
+      declarationID,
+      funcNodeIndex,
+      isYieldable,
+      this.state.body
+    )
+  }
+
+  private handleToggleYield = (
+    bodyID: string,
+    declarationID: string,
+    funcNodeIndex: number
+  ): void => {
+    const script = toggleYield(
+      bodyID,
+      declarationID,
+      funcNodeIndex,
+      this.state.body
+    )
+
+    this.getASTResponse(script)
+  }
+
+  private handleDeleteFuncNode = (ids: DeleteFuncNodeArgs): void => {
+    const script = deleteFuncNode(ids, this.state.body)
+
+    this.getASTResponse(script)
+  }
+
+  private handleValidate = async () => {
+    const {fluxLinks, notify, script} = this.props
+
+    try {
+      const ast = await getAST({url: fluxLinks.ast, body: script})
+      const body = bodyNodes(ast, this.state.suggestions)
+      const status = {type: 'success', text: ''}
+      notify(validateSuccess())
+
+      this.setState({ast, body, status})
+    } catch (error) {
+      this.setState({status: parseError(error)})
+      return console.error('Could not parse AST', error)
+    }
   }
 }
 
