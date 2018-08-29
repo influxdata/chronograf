@@ -2,7 +2,9 @@ import React, {SFC} from 'react'
 import {connect} from 'react-redux'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
+
 import buildQueries from 'src/utils/buildQueriesForGraphs'
+import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
@@ -22,6 +24,7 @@ interface Props {
   source: Source
   templates: Template[]
   timeRange: TimeRange
+  autoRefresher: AutoRefresher
   queryConfigs: QueryConfig[]
   editQueryStatus: () => void
   tableOptions: TableOptions
@@ -54,6 +57,7 @@ const DashVisualization: SFC<Props> = ({
   staticLegend,
   tableOptions,
   decimalPlaces,
+  autoRefresher,
   noteVisibility,
   editQueryStatus,
   resizerTopHeight,
@@ -75,6 +79,7 @@ const DashVisualization: SFC<Props> = ({
           axes={axes}
           type={type}
           tableOptions={tableOptions}
+          autoRefresher={autoRefresher}
           queries={buildQueries(queryConfigs, timeRange)}
           templates={templates}
           editQueryStatus={editQueryStatus}
