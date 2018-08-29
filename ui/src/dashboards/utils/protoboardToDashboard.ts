@@ -3,12 +3,11 @@ import _ from 'lodash'
 import {getNextAvailablePosition} from 'src/dashboards/utils/cellGetters'
 
 import {
-  Cell,
+  PBCell,
   Protoboard,
   Dashboard,
   Template,
   Source,
-  TemplateValueType,
   TemplateType,
 } from 'src/types'
 
@@ -19,9 +18,9 @@ interface PBQueries {
 }
 
 const addNewCellToCells = (
-  cells: Array<Partial<Cell>>,
-  cell: Partial<Cell>
-): Array<Partial<Cell>> => {
+  cells: Array<Partial<PBCell>>,
+  cell: Partial<PBCell>
+): Array<Partial<PBCell>> => {
   let x = 0
   let y = 0
 
@@ -42,8 +41,8 @@ const addNewCellToCells = (
 }
 
 const collision = (
-  cell: Partial<Cell>,
-  placedCells: Array<Partial<Cell>>
+  cell: Partial<PBCell>,
+  placedCells: Array<Partial<PBCell>>
 ): boolean => {
   return !!placedCells.find(c => cell.x === c.x && cell.y === c.y)
 }
