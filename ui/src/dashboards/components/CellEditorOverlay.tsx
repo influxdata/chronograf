@@ -23,7 +23,7 @@ import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {Service, TimeRange, NotificationAction} from 'src/types'
+import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
 import {
@@ -33,6 +33,7 @@ import {
 } from 'src/dashboards/actions/cellEditorOverlay'
 import {UpdateScript} from 'src/flux/actions'
 import {Links} from 'src/types/flux'
+import {updateEditorTimeRange as updateEditorTimeRangeAction} from 'src/shared/actions/queries'
 
 const staticLegend: DashboardsModels.Legend = {
   type: 'static',
@@ -83,8 +84,8 @@ interface Props {
   queryConfigActions: QueryConfigActions
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
-  updateEditorTimeRange: (timeRange: TimeRange) => void
   updateScript: UpdateScript
+  updateEditorTimeRange: typeof updateEditorTimeRangeAction
 }
 
 interface State {

@@ -13,7 +13,7 @@ import {TEMPLATE_RANGE} from 'src/tempVars/constants'
 
 // Types
 import {QueryConfig, Source, TimeRange, Template} from 'src/types'
-import {QueryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
+import {QueryConfigActions} from 'src/shared/actions/queries'
 
 const buildText = (q: QueryConfig): string =>
   q.rawText || buildQuery(TYPE_QUERY_CONFIG, q.range || TEMPLATE_RANGE, q) || ''
@@ -30,10 +30,12 @@ interface Props {
   onAddQuery: () => void
   templates: Template[]
   initialGroupByTime: string
+  isInCEO: boolean
 }
 
 const QueryMaker: SFC<Props> = ({
   source,
+  isInCEO,
   actions,
   queries,
   timeRange,
@@ -80,6 +82,7 @@ const QueryMaker: SFC<Props> = ({
             'isQuerySupportedByExplorer',
             true
           )}
+          isInCEO={isInCEO}
         />
       </div>
     </div>

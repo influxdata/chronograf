@@ -29,12 +29,14 @@ import {getDashboardsAsync, addDashboardCellAsync} from 'src/dashboards/actions'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {
   loadDE as loadDEAction,
+  updateEditorTimeRange,
+} from 'src/data_explorer/actions/queries'
+import {
   queryConfigActions as queryConfigModifiers,
   updateQueryDrafts as updateQueryDraftsAction,
   addQueryAsync,
   deleteQueryAsync,
-  updateEditorTimeRange,
-} from 'src/data_explorer/actions/queries'
+} from 'src/shared/actions/queries'
 
 // Constants
 import {
@@ -209,7 +211,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             autoRefresh={autoRefresh}
             source={source}
             onResetFocus={this.handleResetFocus}
-            isInCEO={true}
+            isInCEO={false}
             sources={sources}
             services={services}
             updateQueryDrafts={updateQueryDrafts}

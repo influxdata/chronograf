@@ -9,13 +9,8 @@ import {Action, ActionType} from 'src/data_explorer/actions/queries'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
 // types
-import {TimeRange} from 'src/types'
+import {DEInitialState} from 'src/data_explorer/actions/queries'
 import {CellQuery} from 'src/types/dashboards'
-
-export interface DEInitialState {
-  queryDrafts: CellQuery[]
-  timeRange: TimeRange
-}
 
 export const initialState = {
   queryDrafts: null,
