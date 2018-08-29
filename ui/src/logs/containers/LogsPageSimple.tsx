@@ -175,10 +175,21 @@ class LogsPageSimple extends Component<Props, State> {
     // }
     const isSearchStatusUpdated =
       prevProps.searchStatus !== this.props.searchStatus
+    const {searchStatus, tableInfiniteData} = this.props
+
+    switch (searchStatus) {
+      case SearchStatus.Clearing:
+      case SearchStatus.Paused:
+      case SearchStatus.Loaded:
+        break
+      default:
+        if (!isEmptyInfiniteData(tableInfiniteData)) {
+          this.props.setSearchStatus(SearchStatus.Loaded)
+        }
+    }
 
     if (isSearchStatusUpdated) {
-      const isPaused = this.props.searchStatus === SearchStatus.Paused
-      console.log('STATUS CHANGED', this.props.searchStatus)
+      const isPaused = searchStatus === SearchStatus.Paused
       const isReady =
         prevProps.searchStatus === SearchStatus.Cleared && !isPaused
 
@@ -317,7 +328,6 @@ class LogsPageSimple extends Component<Props, State> {
   private fetchOlderLogs = async () => {
     switch (this.props.searchStatus) {
       case SearchStatus.Clearing:
-      case SearchStatus.Paused:
       case SearchStatus.None:
         return
     }
@@ -332,13 +342,24 @@ class LogsPageSimple extends Component<Props, State> {
 
     if (
       totalBackwardValues !== null &&
-      totalBackwardValues < BACKWARD_VALUES_LIMIT
+      totalBackwardValues < this.backwardLogsLimit
     ) {
       await this.fetchOlderLogs()
     }
   }
 
   private handleFetchMore = () => {
+    console.log('FETCHING MORE TABLE LOGS')
+    const totalBackwardValues = getDeep<number | null>(
+      this.props,
+      'tableInfiniteData.backward.values.length',
+      null
+    )
+
+    if (totalBackwardValues < this.backwardLogsLimit) {
+      return
+    }
+
     const backwardLogsLimit = this.backwardLogsLimit + BACKWARD_VALUES_LIMIT
 
     this.setState({
@@ -349,6 +370,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private get backwardLogsLimit() {
+    console.log(' CURRRENT BACK LIMIT', this.state.backwardLogsLimit)
     return this.state.backwardLogsLimit
   }
 
@@ -698,6 +720,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchNewDataset() {
+    this.setState({backwardLogsLimit: BACKWARD_VALUES_LIMIT})
     this.startNewerLogsFetchingInterval()
     this.startOlderLogsFetching()
   }
@@ -782,7 +805,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private get isLiveUpdating(): boolean {
-    return this.props.searchStatus === SearchStatus.Paused
+    return this.props.searchStatus !== SearchStatus.Paused
   }
 }
 

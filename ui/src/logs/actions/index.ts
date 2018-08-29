@@ -745,9 +745,9 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-    if (logSeries.values.length > 0) {
-      dispatch(setSearchStatus(SearchStatus.Loaded))
-    }
+    // if (logSeries.values.length > 0) {
+    //   dispatch(setSearchStatus(SearchStatus.Loaded))
+    // }
     await dispatch(concatMoreLogs(logSeries))
   } else {
     throw new Error(
@@ -839,9 +839,9 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
       dispatch(setNextNewerLowerBound(upperUTC))
     }
 
-    if (logSeries.values.length > 0) {
-      dispatch(setSearchStatus(SearchStatus.Loaded))
-    }
+    // if (logSeries.values.length > 0) {
+    //   dispatch(setSearchStatus(SearchStatus.Loaded))
+    // }
 
     if (isForwardCacheExpired) {
       await dispatch(
