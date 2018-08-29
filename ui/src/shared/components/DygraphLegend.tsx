@@ -33,7 +33,7 @@ interface Props {
   activeCellID: string
   setActiveCell: (cellID: string) => void
   onMouseEnter: () => void
-  mouseY: number
+  // mouseY: number
 }
 
 interface LegendData {
@@ -50,6 +50,7 @@ interface State {
   isFilterVisible: boolean
   legendStyles: object
   cellID: string
+  mouseY: number
 }
 
 @ErrorHandling
@@ -77,6 +78,7 @@ class DygraphLegend extends PureComponent<Props, State> {
       isFilterVisible: false,
       legendStyles: {},
       cellID: null,
+      mouseY: 0,
     }
   }
 
@@ -87,6 +89,11 @@ class DygraphLegend extends PureComponent<Props, State> {
     ) {
       this.setState({filterText: ''})
     }
+  }
+
+  public setMouseY(mouseY: number) {
+    this.setState({mouseY})
+    console.log(mouseY)
   }
 
   public render() {
@@ -271,8 +278,8 @@ class DygraphLegend extends PureComponent<Props, State> {
       dygraph,
       dygraph: {graphDiv},
       hoverTime,
-      mouseY,
     } = this.props
+    const {mouseY} = this.state
 
     const hoverTimeX = dygraph.toDomXCoord(hoverTime)
 

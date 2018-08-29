@@ -78,7 +78,6 @@ interface State {
   staticLegendHeight: number
   xAxisRange: [number, number]
   isMouseInLegend: boolean
-  mouseY: number
 }
 
 @ErrorHandling
@@ -107,7 +106,12 @@ class Dygraph extends Component<Props, State> {
     underlayCallback: () => {},
   }
 
-  private graphRef: React.RefObject<HTMLDivElement>
+  private graphRef: React.RefObject<HTMLDivElement> = React.createRef<
+    HTMLDivElement
+  >()
+  private legendRef: React.RefObject<DygraphLegend> = React.createRef<
+    DygraphLegend
+  >()
   private dygraph: DygraphClass
 
   constructor(props: Props) {
@@ -116,10 +120,7 @@ class Dygraph extends Component<Props, State> {
       staticLegendHeight: 0,
       xAxisRange: [0, 0],
       isMouseInLegend: false,
-      mouseY: 0,
     }
-
-    this.graphRef = React.createRef<HTMLDivElement>()
   }
 
   public componentDidMount() {
@@ -253,7 +254,7 @@ class Dygraph extends Component<Props, State> {
   }
 
   public render() {
-    const {staticLegendHeight, xAxisRange, mouseY} = this.state
+    const {staticLegendHeight, xAxisRange} = this.state
     const {staticLegend, cellID} = this.props
 
     return (
@@ -273,12 +274,13 @@ class Dygraph extends Component<Props, State> {
               />
             )}
             <DygraphLegend
-              mouseY={mouseY}
+              // mouseY={mouseY}
               cellID={cellID}
               dygraph={this.dygraph}
               onHide={this.handleHideLegend}
               onShow={this.handleShowLegend}
               onMouseEnter={this.handleMouseEnterLegend}
+              ref={this.legendRef}
             />
             <Crosshair
               dygraph={this.dygraph}
@@ -409,10 +411,6 @@ class Dygraph extends Component<Props, State> {
     this.props.handleSetHoverTime(NULL_HOVER_TIME)
   }
 
-  private handleTrackMouseY = (e: MouseEvent<HTMLDivElement>): void => {
-    this.setState({mouseY: e.pageY})
-  }
-
   private handleShowLegend = (e: MouseEvent<HTMLDivElement>): void => {
     e.stopPropagation()
     const {isMouseInLegend} = this.state
@@ -423,6 +421,12 @@ class Dygraph extends Component<Props, State> {
 
     const newTime = this.eventToTimestamp(e)
     this.props.handleSetHoverTime(newTime)
+  }
+
+  private handleTrackMouseY = (e: MouseEvent<HTMLDivElement>): void => {
+    if (this.legendRef.current) {
+      this.legendRef.current.setMouseY(e.pageY)
+    }
   }
 
   private get labelWidth() {
