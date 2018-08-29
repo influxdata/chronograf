@@ -40,7 +40,7 @@ class CardSelectCard extends PureComponent<Props> {
             name={name}
             type="checkbox"
             value={id}
-            checked={checked}
+            defaultChecked={checked}
             disabled={disabled}
           />
           <span

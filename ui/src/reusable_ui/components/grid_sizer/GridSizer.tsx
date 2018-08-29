@@ -28,17 +28,17 @@ class GridSizer extends PureComponent<Props, State> {
     }
   }
 
+  public listener = () => {
+    _.debounce(() => this.setColumns(this.getWidth()), 250)
+  }
+
   public componentDidMount() {
     const {width} = this.props
     const widthValue = width || this.getWidth()
     this.setColumns(widthValue)
 
     if (!width) {
-      window.addEventListener(
-        'resize',
-        _.debounce(() => this.setColumns(this.getWidth()), 250),
-        false
-      )
+      window.addEventListener('resize', this.listener, false)
     }
   }
 
@@ -50,11 +50,7 @@ class GridSizer extends PureComponent<Props, State> {
   }
 
   public componentWillUnmount() {
-    window.removeEventListener(
-      'resize',
-      _.debounce(() => this.setColumns(this.getWidth()), 250),
-      false
-    )
+    window.removeEventListener('resize', this.listener, false)
   }
 
   public render() {

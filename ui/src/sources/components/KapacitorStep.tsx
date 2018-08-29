@@ -27,11 +27,12 @@ import {DEFAULT_KAPACITOR} from 'src/shared/constants'
 
 // Types
 import {Kapacitor, Source} from 'src/types'
+import {NextReturn} from 'src/types/wizard'
 
 interface Props {
   notify: typeof notifyAction
   source: Source
-  setError?: (b: boolean) => void
+  setError: (b: boolean) => void
   sources: Source[]
   onBoarding?: boolean
   kapacitor: Kapacitor
@@ -89,53 +90,48 @@ class KapacitorStep extends Component<Props, State> {
     this.state = {kapacitor}
   }
 
-  public next = async () => {
+  public next = async (): Promise<NextReturn> => {
     const {kapacitor} = this.state
-    const {notify, source, setError} = this.props
+    const {notify, source} = this.props
     if (kapacitor.id) {
       if (this.existingKapacitorHasChanged) {
         try {
           const {data} = await updateKapacitor(kapacitor)
           await this.checkKapacitorConnection(data)
-          setError(false)
           await this.fetchNewKapacitors()
           notify(notifyKapacitorUpdated())
-          return {success: true, payload: data}
+          return {error: false, payload: data}
         } catch (error) {
           console.error(error)
-          setError(true)
           notify(notifyKapacitorUpdateFailed())
-          return {success: false, payload: null}
+          return {error: true, payload: null}
         }
       }
-      return {success: true, payload: kapacitor}
+      return {error: false, payload: kapacitor}
     } else {
       try {
         const {data} = await createKapacitor(source, kapacitor)
         this.setState({kapacitor: data})
         await this.checkKapacitorConnection(data)
-        setError(false)
         await this.fetchNewKapacitors()
         notify(notifyKapacitorSuccess())
-        return {success: true, payload: data}
+        return {error: false, payload: data}
       } catch (error) {
         console.error(error)
-        setError(true)
         notify(notifyKapacitorCreateFailed())
-        return {success: false, payload: null}
+        return {error: true, payload: null}
       }
     }
   }
 
   public render() {
-    const {setError, onBoarding} = this.props
+    const {onBoarding} = this.props
     const {kapacitor} = this.state
 
     return (
       <>
         {!onBoarding && this.kapacitorDropdown}
         <KapacitorForm
-          setError={setError}
           kapacitor={kapacitor}
           onChangeInput={this.onChangeInput}
         />

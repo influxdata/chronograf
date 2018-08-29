@@ -219,9 +219,14 @@ export interface ProtoboardMetadata {
   url: string
 }
 
-export interface ProtoboardData {
-  cells: object
+export interface PBCell extends Cell {
+  measurement: string
 }
+
+export interface ProtoboardData {
+  cells: Array<Partial<PBCell>>
+}
+
 export interface Protoboard {
   id: string
   meta: ProtoboardMetadata
