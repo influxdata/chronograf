@@ -9,6 +9,7 @@
 1.  [#4254](https://github.com/influxdata/chronograf/pull/4254): Add Dynamic Source option to CEO source selector
 1.  [#4257](https://github.com/influxdata/chronograf/pull/4257): Introduce cell notes & note cells
 1.  [#4287](https://github.com/influxdata/chronograf/pull/4287): Add time selector dropdown to CEO
+1.  [#4311](https://github.com/influxdata/chronograf/pull/4311): Add Flux query editor to the Cell Editor Overlay
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
