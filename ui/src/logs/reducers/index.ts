@@ -20,7 +20,7 @@ import {
   DEFAULT_FORWARD_CHUNK_DURATION_MS,
   DEFAULT_BACKWARD_CHUNK_DURATION_MS,
 } from 'src/logs/constants'
-import {LogsState, TableData} from 'src/types/logs'
+import {LogsState, TableData, SearchStatus} from 'src/types/logs'
 
 const defaultTableData: TableData = {
   columns: [
@@ -64,6 +64,7 @@ export const defaultState: LogsState = {
     isTruncated: DEFAULT_TRUNCATION,
   },
   tableTime: {},
+  searchStatus: SearchStatus.None,
   nextOlderUpperBound: undefined,
   nextNewerLowerBound: undefined,
   forwardChunkDurationMs: DEFAULT_FORWARD_CHUNK_DURATION_MS,
@@ -275,6 +276,8 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, tableData: action.payload.data}
     case ActionTypes.ClearRowsAdded:
       return {...state, newRowsAdded: null}
+    case ActionTypes.SetSearchStatus:
+      return {...state, searchStatus: action.payload.searchStatus}
     case ActionTypes.SetTableForwardData:
       return {
         ...state,

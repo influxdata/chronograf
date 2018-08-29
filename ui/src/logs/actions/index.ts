@@ -31,6 +31,7 @@ import {
   TimeBounds,
   TimeWindow,
   TimeMarker,
+  SearchStatus,
 } from 'src/types/logs'
 
 export const INITIAL_LIMIT = 1000
@@ -88,6 +89,7 @@ export enum ActionTypes {
   ClearTableData = 'CLEAR_TABLE_DATA',
   SetNextOlderUpperBound = 'SET_NEXT_OLDER_UPPER_BOUND',
   SetNextNewerLowerBound = 'SET_NEXT_NEWER_LOWER_BOUND',
+  SetSearchStatus = 'SET_SEARCH_STATUS',
 }
 
 export interface ClearRowsAddedAction {
@@ -254,17 +256,24 @@ export interface SetConfigsAction {
   }
 }
 
-interface SetNextOlderUpperBound {
+interface SetNextOlderUpperBoundAction {
   type: ActionTypes.SetNextOlderUpperBound
   payload: {
     upper: number | undefined
   }
 }
 
-interface SetNextNewerLowerBound {
+interface SetNextNewerLowerBoundAction {
   type: ActionTypes.SetNextNewerLowerBound
   payload: {
     lower: number | undefined
+  }
+}
+
+interface SetSearchStatusAction {
+  type: ActionTypes.SetSearchStatus
+  payload: {
+    searchStatus: SearchStatus
   }
 }
 
@@ -294,8 +303,9 @@ export type Action =
   | SetTableBackwardDataAction
   | ClearRowsAddedAction
   | ClearTableDataAction
-  | SetNextOlderUpperBound
-  | SetNextNewerLowerBound
+  | SetNextOlderUpperBoundAction
+  | SetNextNewerLowerBoundAction
+  | SetSearchStatusAction
 
 const getTimeRange = (state: State): TimeRange | null =>
   getDeep<TimeRange | null>(state, 'logs.timeRange', null)
@@ -308,6 +318,9 @@ const getProxyLink = (state: State): string | null =>
 
 const getHistogramQueryConfig = (state: State): QueryConfig | null =>
   getDeep<QueryConfig | null>(state, 'logs.histogramQueryConfig', null)
+
+const getSearchStatus = (state: State): SearchStatus =>
+  getDeep<SearchStatus | null>(state, 'logs.searchStatus', null)
 
 const getTableQueryConfig = (state: State): QueryConfig | null =>
   getDeep<QueryConfig | null>(state, 'logs.tableQueryConfig', null)
@@ -384,21 +397,38 @@ export const setTimeBounds = (timeBounds: TimeBounds): SetTimeBoundsAction => ({
 
 export const setNextOlderUpperBound = (
   upper: number
-): SetNextOlderUpperBound => ({
+): SetNextOlderUpperBoundAction => ({
   type: ActionTypes.SetNextOlderUpperBound,
   payload: {upper},
 })
 
 export const setNextNewerLowerBound = (
   lower: number
-): SetNextNewerLowerBound => ({
+): SetNextNewerLowerBoundAction => ({
   type: ActionTypes.SetNextNewerLowerBound,
   payload: {lower},
+})
+
+export const setSearchStatus = (
+  searchStatus: SearchStatus
+): SetSearchStatusAction => ({
+  type: ActionTypes.SetSearchStatus,
+  payload: {searchStatus},
 })
 
 export const clearNextTimeBounds = () => dispatch => {
   dispatch(setNextNewerLowerBound(undefined))
   dispatch(setNextOlderUpperBound(undefined))
+}
+
+export const clearSearchData = (
+  searchStatus: SearchStatus
+) => async dispatch => {
+  await dispatch(setSearchStatus(SearchStatus.Clearing))
+  dispatch(clearNextTimeBounds())
+  dispatch(clearTableData())
+  await dispatch(setSearchStatus(SearchStatus.Cleared))
+  await dispatch(setSearchStatus(searchStatus))
 }
 
 // export const executeTableNewerQueryAsync = () => async (
@@ -686,7 +716,6 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
 
   // console.log('older olderUpperBound', upper)
   // console.log('older olderLowerBound', lower)
-
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -716,7 +745,9 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-
+    if (logSeries.values.length > 0) {
+      dispatch(setSearchStatus(SearchStatus.Loaded))
+    }
     await dispatch(concatMoreLogs(logSeries))
   } else {
     throw new Error(
@@ -728,6 +759,7 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
 export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
   const state = getState()
   const selectedTableTime = getTableSelectedTime(state)
+  const searchStatus = getSearchStatus(state)
 
   const nextNewerLowerBound = getDeep<number>(
     state,
@@ -805,6 +837,10 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
       dispatch(setNextNewerLowerBound(nextNewerLowerBound))
     } else if (isForwardCacheExpired) {
       dispatch(setNextNewerLowerBound(upperUTC))
+    }
+
+    if (logSeries.values.length > 0) {
+      dispatch(setSearchStatus(SearchStatus.Loaded))
     }
 
     if (isForwardCacheExpired) {

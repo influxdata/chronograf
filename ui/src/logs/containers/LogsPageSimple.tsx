@@ -14,7 +14,7 @@ import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 const LOGS_FETCH_INTERVAL = 5000
-const BACKWARD_VALUES_LIMIT = 10
+const BACKWARD_VALUES_LIMIT = 100
 
 import {
   setTableCustomTimeAsync,
@@ -35,6 +35,8 @@ import {
   updateLogConfigAsync,
   clearTableData,
   clearNextTimeBounds,
+  clearSearchData,
+  setSearchStatus,
 } from 'src/logs/actions'
 import {getSourcesAsync} from 'src/shared/actions/sources'
 import LogsHeader from 'src/logs/components/LogsHeader'
@@ -116,9 +118,10 @@ interface Props {
   }
   fetchOlderLogsAsync: () => Promise<void>
   fetchNewerLogsAsync: () => Promise<void>
-  clearTableData: () => void
-  clearNextTimeBounds: () => void
   nextOlderUpperBound: string
+  searchStatus: SearchStatus
+  clearSearchData: (searchStatus: SearchStatus) => void
+  setSearchStatus: (SearchStatus: SearchStatus) => void
 }
 
 interface State {
@@ -127,13 +130,11 @@ interface State {
   isOverlayVisible: boolean
   histogramColors: HistogramColor[]
   hasScrolled: boolean
-  searchStatus: SearchStatus
+  backwardLogsLimit: number
 }
 
 class LogsPageSimple extends Component<Props, State> {
   public static getDerivedStateFromProps(props: Props, state: State) {
-    const {tableInfiniteData} = props
-
     const severityLevelColors: SeverityLevelColor[] = _.get(
       props.logConfig,
       'severityLevelColors',
@@ -144,17 +145,7 @@ class LogsPageSimple extends Component<Props, State> {
       color: lc.color,
     }))
 
-    let {searchStatus} = state
-
-    if (
-      searchStatus !== SearchStatus.None &&
-      searchStatus !== SearchStatus.Clearing &&
-      !isEmptyInfiniteData(tableInfiniteData)
-    ) {
-      searchStatus = SearchStatus.Loaded
-    }
-
-    return {histogramColors, searchStatus}
+    return {histogramColors}
   }
 
   private interval: number
@@ -169,11 +160,11 @@ class LogsPageSimple extends Component<Props, State> {
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
-      searchStatus: SearchStatus.None,
+      backwardLogsLimit: BACKWARD_VALUES_LIMIT,
     }
   }
 
-  public async componentDidUpdate() {
+  public async componentDidUpdate(prevProps: Props) {
     // const {router} = this.props
     // if (!this.props.sources || this.props.sources.length === 0) {
     //   return router.push(`/sources/new?redirectPath=${location.pathname}`)
@@ -182,6 +173,21 @@ class LogsPageSimple extends Component<Props, State> {
     //   clearInterval(this.interval)
     //   this.interval = null
     // }
+    const isSearchStatusUpdated =
+      prevProps.searchStatus !== this.props.searchStatus
+
+    if (isSearchStatusUpdated) {
+      const isPaused = this.props.searchStatus === SearchStatus.Paused
+      console.log('STATUS CHANGED', this.props.searchStatus)
+      const isReady =
+        prevProps.searchStatus === SearchStatus.Cleared && !isPaused
+
+      if (this.isClearingSearch || isPaused) {
+        clearInterval(this.interval)
+      } else if (isReady) {
+        this.fetchNewDataset()
+      }
+    }
   }
 
   public async componentDidMount() {
@@ -190,7 +196,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     await this.props.getConfig(this.logConfigLink)
 
-    this.fetchNewDataset(SearchStatus.Loading)
+    this.updateTableData(SearchStatus.Loading)
 
     // if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
     //   this.startNewerLogsFetchingInterval()
@@ -208,8 +214,8 @@ class LogsPageSimple extends Component<Props, State> {
       timeRange,
       notify,
       nextOlderUpperBound,
+      searchStatus,
     } = this.props
-    const {searchStatus} = this.state
 
     return (
       <>
@@ -238,10 +244,8 @@ class LogsPageSimple extends Component<Props, State> {
               isScrolledToTop={false}
               isTruncated={this.isTruncated}
               onTagSelection={this.handleTagSelection}
-              fetchMore={time =>
-                Promise.resolve(console.log(`LogsTable fetchMore stub ${time}`))
-              }
-              fetchNewer={() => console.log('LogsTable fetchNewer stub')}
+              fetchMore={this.handleFetchMore}
+              fetchNewer={this.fetchNewerLogs}
               timeRange={timeRange}
               scrollToRow={this.tableScrollToRow}
               tableColumns={this.tableColumns}
@@ -296,16 +300,28 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleNewerLogsFetchingInterval = async () => {
+    switch (this.props.searchStatus) {
+      case SearchStatus.Clearing:
+      case SearchStatus.Paused:
+      case SearchStatus.None:
+        return
+    }
     // console.log('handleNewerLogsFetchingInterval')
     await this.fetchNewerLogs()
   }
 
   private fetchNewerLogs = async () => {
-    console.log('fetchNewerLogs')
     await this.props.fetchNewerLogsAsync()
   }
 
   private fetchOlderLogs = async () => {
+    switch (this.props.searchStatus) {
+      case SearchStatus.Clearing:
+      case SearchStatus.Paused:
+      case SearchStatus.None:
+        return
+    }
+
     const totalBackwardValues = getDeep<number | null>(
       this.props,
       'tableInfiniteData.backward.values.length',
@@ -314,24 +330,26 @@ class LogsPageSimple extends Component<Props, State> {
 
     await this.props.fetchOlderLogsAsync()
 
-    console.log(totalBackwardValues, this.props.nextOlderUpperBound)
     if (
       totalBackwardValues !== null &&
       totalBackwardValues < BACKWARD_VALUES_LIMIT
     ) {
-      console.log(
-        'fetchOlderLogs again, totalBackwardValues',
-        totalBackwardValues
-      )
       await this.fetchOlderLogs()
     }
   }
 
-  private fetchNewer = (time: string) => {
-    // this.loadingNewer = true
-    // this.props.fetchNewerLogsAsync(time)
-    console.log('fetchNewer stub')
-    return
+  private handleFetchMore = () => {
+    const backwardLogsLimit = this.backwardLogsLimit + BACKWARD_VALUES_LIMIT
+
+    this.setState({
+      backwardLogsLimit,
+    })
+
+    this.startOlderLogsFetching()
+  }
+
+  private get backwardLogsLimit() {
+    return this.state.backwardLogsLimit
   }
 
   private get tableScrollToRow() {
@@ -409,6 +427,10 @@ class LogsPageSimple extends Component<Props, State> {
     return data
   }
 
+  private get isClearingSearch(): boolean {
+    return this.props.searchStatus === SearchStatus.Clearing
+  }
+
   private get logConfigLink(): string {
     return this.props.logConfigLink
   }
@@ -438,7 +460,7 @@ class LogsPageSimple extends Component<Props, State> {
       value: selection.tag,
       operator: '==',
     })
-    this.fetchNewDataset(SearchStatus.UpdatingFilters)
+    this.updateTableData(SearchStatus.UpdatingFilters)
   }
 
   private get histogramTotal(): number {
@@ -566,7 +588,7 @@ class LogsPageSimple extends Component<Props, State> {
       <LogsHeader
         timeRange={timeRange}
         onSetTimeWindow={this.handleSetTimeWindow}
-        liveUpdating={this.liveUpdatingStatus}
+        liveUpdating={this.isLiveUpdating}
         availableSources={sources}
         onChooseSource={this.handleChooseSource}
         onChooseNamespace={this.handleChooseNamespace}
@@ -583,28 +605,16 @@ class LogsPageSimple extends Component<Props, State> {
     )
   }
 
-  private get liveUpdatingStatus(): boolean {
-    const {liveUpdating} = this.state
-
-    if (liveUpdating === true) {
-      return true
-    }
-
-    return false
-  }
-
   private get severityLevelColors(): SeverityLevelColor[] {
     return _.get(this.props.logConfig, 'severityLevelColors', [])
   }
 
   private handleChangeLiveUpdatingStatus = async (): Promise<void> => {
-    const {liveUpdating} = this.state
-
-    if (liveUpdating === true) {
-      this.setState({liveUpdating: false})
-      clearInterval(this.interval)
-    } else {
-      this.handleChooseRelativeTime(NOW)
+    switch (this.props.searchStatus) {
+      case SearchStatus.Paused:
+        return this.handleChooseRelativeTime(NOW)
+      default:
+        this.props.setSearchStatus(SearchStatus.Paused)
     }
   }
 
@@ -613,13 +623,13 @@ class LogsPageSimple extends Component<Props, State> {
       this.props.addFilter(filter)
     })
 
-    this.fetchNewDataset(SearchStatus.Loading)
+    this.updateTableData(SearchStatus.Loading)
   }
 
   private handleFilterDelete = (id: string): void => {
     this.props.removeFilter(id)
 
-    this.fetchNewDataset(SearchStatus.UpdatingFilters)
+    this.updateTableData(SearchStatus.UpdatingFilters)
   }
 
   private handleFilterChange = async (
@@ -628,7 +638,7 @@ class LogsPageSimple extends Component<Props, State> {
     value: string
   ): Promise<void> => {
     this.props.changeFilter(id, operator, value)
-    this.fetchNewDataset(SearchStatus.UpdatingFilters)
+    this.updateTableData(SearchStatus.UpdatingFilters)
   }
 
   private handleBarClick = (time: string): void => {
@@ -644,24 +654,24 @@ class LogsPageSimple extends Component<Props, State> {
       timeOption: null,
     })
 
-    let timeBounds: TimeBounds = {
+    const timeBounds: TimeBounds = {
       lower: `now() - ${windowOption}`,
       upper: null,
     }
 
-    if (timeOption !== 'now') {
-      const extentTimes = extentBy(this.props.histogramData, d => d.time).map(
-        d => d.time
-      )
+    // if (timeOption !== 'now') {
+    //   const extentTimes = extentBy(this.props.histogramData, d => d.time).map(
+    //     d => d.time
+    //   )
 
-      timeBounds = computeTimeBounds(extentTimes, timeOption, seconds)
-    }
+    //   timeBounds = computeTimeBounds(extentTimes, timeOption, seconds)
+    // }
 
     await this.props.setTimeBounds(timeBounds)
 
-    this.props.setTimeRangeAsync(this.props.timeRange)
+    // this.props.setTimeRangeAsync(this.props.timeRange)
 
-    this.fetchNewDataset(SearchStatus.UpdatingTimeBounds)
+    this.updateTableData(SearchStatus.UpdatingTimeBounds)
   }
 
   private handleSetTimeWindow = async (timeWindow: TimeWindow) => {
@@ -683,11 +693,11 @@ class LogsPageSimple extends Component<Props, State> {
   //   // this.fetchNewDataset(searchStatus)
   // }
 
-  private fetchNewDataset(searchStatus) {
-    this.setState({searchStatus: SearchStatus.Clearing})
-    this.props.clearTableData()
-    this.props.clearNextTimeBounds()
-    this.setState({searchStatus})
+  private updateTableData(searchStatus) {
+    this.props.clearSearchData(searchStatus)
+  }
+
+  private fetchNewDataset() {
     this.startNewerLogsFetchingInterval()
     this.startOlderLogsFetching()
   }
@@ -770,6 +780,10 @@ class LogsPageSimple extends Component<Props, State> {
   private get isTruncated(): boolean {
     return this.props.logConfig.isTruncated
   }
+
+  private get isLiveUpdating(): boolean {
+    return this.props.searchStatus === SearchStatus.Paused
+  }
 }
 
 const mapStateToProps = ({
@@ -791,6 +805,7 @@ const mapStateToProps = ({
     tableTime,
     tableInfiniteData,
     nextOlderUpperBound,
+    searchStatus,
   },
 }) => ({
   sources,
@@ -808,6 +823,7 @@ const mapStateToProps = ({
   tableInfiniteData,
   newRowsAdded,
   nextOlderUpperBound,
+  searchStatus,
 })
 
 const mapDispatchToProps = {
@@ -819,8 +835,8 @@ const mapDispatchToProps = {
   setTimeMarker,
   setNamespaceAsync,
   // executeQueriesAsync,
-  clearTableData,
-  clearNextTimeBounds,
+  clearSearchData,
+  setSearchStatus,
   addFilter,
   removeFilter,
   changeFilter,

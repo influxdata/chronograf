@@ -12,12 +12,14 @@ import {TimeRange} from 'src/types/logs'
 
 export enum SearchStatus {
   None = 'None',
+  Paused = 'Paused',
   Loading = 'Loading',
   NoResults = 'NoResults',
   UpdatingTimeBounds = 'UpdatingTimeBounds',
   UpdatingFilters = 'UpdatingFilters',
   Loaded = 'Loaded',
   Clearing = 'Clearing',
+  Cleared = 'Cleared',
 }
 
 export interface Filter {
@@ -53,6 +55,7 @@ export interface LogsState {
     relative?: string
   }
   newRowsAdded: number
+  searchStatus: SearchStatus
   nextNewerLowerBound: number
   nextOlderUpperBound: number
   forwardChunkDurationMs: number
