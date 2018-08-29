@@ -34,7 +34,11 @@ import {
 } from 'src/types/logs'
 
 export const INITIAL_LIMIT = 1000
-import {DEFAULT_LOGS_CHUNK_DURATION_MS} from 'src/logs/constants'
+import {
+  DEFAULT_FORWARD_CHUNK_DURATION_MS,
+  DEFAULT_BACKWARD_CHUNK_DURATION_MS,
+  DEFAULT_FORWARD_MAX_CHUNK_POOL_LIFE_MS,
+} from 'src/logs/constants'
 
 const defaultTableData: TableData = {
   columns: [
@@ -74,6 +78,7 @@ export enum ActionTypes {
   DecrementQueryCount = 'LOGS_DECREMENT_QUERY_COUNT',
   ConcatMoreLogs = 'LOGS_CONCAT_MORE_LOGS',
   PrependMoreLogs = 'LOGS_PREPEND_MORE_LOGS',
+  ReplacePrependedLogs = 'LOGS_REPLACE_PREPENDED_LOGS',
   SetConfig = 'SET_CONFIG',
   SetTableRelativeTime = 'SET_TABLE_RELATIVE_TIME',
   SetTableCustomTime = 'SET_TABLE_CUSTOM_TIME',
@@ -130,6 +135,13 @@ export interface ConcatMoreLogsAction {
 
 export interface PrependMoreLogsAction {
   type: ActionTypes.PrependMoreLogs
+  payload: {
+    series: TableData
+  }
+}
+
+export interface ReplacePrependedLogsAction {
+  type: ActionTypes.ReplacePrependedLogs
   payload: {
     series: TableData
   }
@@ -245,14 +257,14 @@ export interface SetConfigsAction {
 interface SetNextOlderUpperBound {
   type: ActionTypes.SetNextOlderUpperBound
   payload: {
-    upper: string | undefined
+    upper: number | undefined
   }
 }
 
 interface SetNextNewerLowerBound {
   type: ActionTypes.SetNextNewerLowerBound
   payload: {
-    lower: string | undefined
+    lower: number | undefined
   }
 }
 
@@ -274,6 +286,7 @@ export type Action =
   | IncrementQueryCountAction
   | ConcatMoreLogsAction
   | PrependMoreLogsAction
+  | ReplacePrependedLogsAction
   | SetConfigsAction
   | SetTableCustomTimeAction
   | SetTableRelativeTimeAction
@@ -305,8 +318,8 @@ const getSearchTerm = (state: State): string | null =>
 const getFilters = (state: State): Filter[] =>
   getDeep<Filter[]>(state, 'logs.filters', [])
 
-const getTableSelectedTime = (state: State): string => {
-  const custom = getDeep<string>(state, 'logs.tableTime.custom', '')
+const getTableSelectedTime = (state: State): number => {
+  const custom = getDeep<number>(state, 'logs.tableTime.custom', '')
 
   if (!_.isEmpty(custom)) {
     return custom
@@ -316,7 +329,8 @@ const getTableSelectedTime = (state: State): string => {
 
   return moment()
     .subtract(relative, 'seconds')
-    .toISOString()
+    .utc()
+    .valueOf()
 }
 
 export const clearTableData = () => ({
@@ -369,14 +383,14 @@ export const setTimeBounds = (timeBounds: TimeBounds): SetTimeBoundsAction => ({
 })
 
 export const setNextOlderUpperBound = (
-  upper: string
+  upper: number
 ): SetNextOlderUpperBound => ({
   type: ActionTypes.SetNextOlderUpperBound,
   payload: {upper},
 })
 
 export const setNextNewerLowerBound = (
-  lower: string
+  lower: number
 ): SetNextNewerLowerBound => ({
   type: ActionTypes.SetNextNewerLowerBound,
   payload: {lower},
@@ -644,28 +658,34 @@ export const setTableQueryConfigAsync = () => async (
 export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
   const state = getState()
 
-  const time = getTableSelectedTime(state)
+  const selectedTableTime = getTableSelectedTime(state)
   const nextOlderUpperBound = getDeep<number>(
     state,
     'logs.nextOlderUpperBound',
-    time
+    selectedTableTime
   )
 
-  const chunkDurationMs = getDeep<number>(
+  const backwardChunkDurationMs = getDeep<number>(
     state,
-    'logs.chunkDurationMs',
-    DEFAULT_LOGS_CHUNK_DURATION_MS
+    'logs.backwardChunkDurationMs',
+    DEFAULT_BACKWARD_CHUNK_DURATION_MS
   )
 
-  const olderUpperBound = moment(nextOlderUpperBound)
-  const upper = olderUpperBound.toISOString()
+  const upper = moment(nextOlderUpperBound).toISOString()
+  const lower = moment(upper)
+    .subtract(backwardChunkDurationMs, 'milliseconds')
+    .toISOString()
 
-  const olderLowerBound = olderUpperBound.subtract(
-    chunkDurationMs,
-    'milliseconds'
+  dispatch(
+    setNextOlderUpperBound(
+      moment(lower)
+        .utc()
+        .valueOf()
+    )
   )
-  const lower = olderLowerBound.toISOString()
-  dispatch(setNextOlderUpperBound(lower))
+
+  // console.log('older olderUpperBound', upper)
+  // console.log('older olderLowerBound', lower)
 
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
@@ -707,20 +727,45 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
 
 export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
   const state = getState()
-  const time = getTableSelectedTime(state)
+  const selectedTableTime = getTableSelectedTime(state)
 
   const nextNewerLowerBound = getDeep<number>(
     state,
     'logs.nextNewerLowerBound',
-    time
+    selectedTableTime
   )
+
+  const forwardChunkDurationMs = getDeep<number>(
+    state,
+    'logs.forwardChunkDurationMs',
+    DEFAULT_FORWARD_CHUNK_DURATION_MS
+  )
+
+  console.log('nextNewerLowerBound', nextNewerLowerBound)
+  console.log('forwardChunkDurationMs', forwardChunkDurationMs)
+
   const lower = moment(nextNewerLowerBound).toISOString()
-  const upper = moment(Date.now()).toISOString()
+  const upper = moment().toISOString()
+  const upperUTC = moment(upper)
+    .utc()
+    .valueOf()
+
+  const forwardCacheDuration = upperUTC - nextNewerLowerBound
+  const forwardMaxChunkPoolLifeMs = getDeep<number>(
+    state,
+    'logs.forwardMaxChunkPoolLifeMs',
+    DEFAULT_FORWARD_MAX_CHUNK_POOL_LIFE_MS
+  )
+  const isForwardCacheExpired = forwardCacheDuration > forwardMaxChunkPoolLifeMs
+
+  console.log('upperUTC', upperUTC)
+  console.log('lowerUTC', nextNewerLowerBound)
+  console.log('forwardCacheDuration', forwardCacheDuration)
+  console.log('isForwardCacheExpired', isForwardCacheExpired)
+
   // TODO(js): get nextNewerLowerBound from upper bound time value in last results
   // TODO(js): check if bounds are inclusive on both ends
   // const upperForServer = 'now()'
-
-  dispatch(setNextNewerLowerBound(upper))
 
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
@@ -751,13 +796,32 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-    console.log(query, logSeries.values)
-    await dispatch(
-      prependMoreLogs({
-        columns: logSeries.columns,
-        values: _.reverse(logSeries.values),
-      })
-    )
+    // console.log(query, logSeries.values)
+
+    const hasNextNewerLowerBoundNeverBeenSet =
+      forwardCacheDuration < DEFAULT_FORWARD_CHUNK_DURATION_MS
+    if (hasNextNewerLowerBoundNeverBeenSet) {
+      // first time nextNewerLowerBound is set
+      dispatch(setNextNewerLowerBound(nextNewerLowerBound))
+    } else if (isForwardCacheExpired) {
+      dispatch(setNextNewerLowerBound(upperUTC))
+    }
+
+    if (isForwardCacheExpired) {
+      await dispatch(
+        replacePrependedLogs({
+          columns: logSeries.columns,
+          values: _.reverse(logSeries.values),
+        })
+      )
+    } else {
+      await dispatch(
+        prependMoreLogs({
+          columns: logSeries.columns,
+          values: _.reverse(logSeries.values),
+        })
+      )
+    }
   } else {
     throw new Error(
       `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
@@ -870,6 +934,13 @@ export const concatMoreLogs = (series: TableData): ConcatMoreLogsAction => ({
 
 export const prependMoreLogs = (series: TableData): PrependMoreLogsAction => ({
   type: ActionTypes.PrependMoreLogs,
+  payload: {series},
+})
+
+export const replacePrependedLogs = (
+  series: TableData
+): ReplacePrependedLogsAction => ({
+  type: ActionTypes.ReplacePrependedLogs,
   payload: {series},
 })
 

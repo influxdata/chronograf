@@ -212,4 +212,6 @@ export const LoadingMessages = [
   'Chopping wood',
 ]
 
-export const DEFAULT_LOGS_CHUNK_DURATION_MS = 5000
+export const DEFAULT_FORWARD_CHUNK_DURATION_MS = 5000
+export const DEFAULT_BACKWARD_CHUNK_DURATION_MS = 5000
+export const DEFAULT_FORWARD_MAX_CHUNK_POOL_LIFE_MS = 30000

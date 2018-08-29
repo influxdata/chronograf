@@ -14,7 +14,7 @@ import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 const LOGS_FETCH_INTERVAL = 5000
-const BACKWARD_VALUES_LIMIT = 200
+const BACKWARD_VALUES_LIMIT = 10
 
 import {
   setTableCustomTimeAsync,
@@ -301,7 +301,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchNewerLogs = async () => {
-    // console.log('fetchNewerLogs')
+    console.log('fetchNewerLogs')
     await this.props.fetchNewerLogsAsync()
   }
 
@@ -319,10 +319,10 @@ class LogsPageSimple extends Component<Props, State> {
       totalBackwardValues !== null &&
       totalBackwardValues < BACKWARD_VALUES_LIMIT
     ) {
-      // console.log(
-      //   'fetchOlderLogs again, totalBackwardValues',
-      //   totalBackwardValues
-      // )
+      console.log(
+        'fetchOlderLogs again, totalBackwardValues',
+        totalBackwardValues
+      )
       await this.fetchOlderLogs()
     }
   }

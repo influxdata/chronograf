@@ -55,7 +55,8 @@ export interface LogsState {
   newRowsAdded: number
   nextNewerLowerBound: number
   nextOlderUpperBound: number
-  chunkDuration: number
+  forwardChunkDurationMs: number
+  backwardChunkDurationMs: number
 }
 
 export interface LogConfig {
