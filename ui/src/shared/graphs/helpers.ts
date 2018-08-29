@@ -115,33 +115,35 @@ export const makeLegendStyles = (
   const graphRect = graphDiv.getBoundingClientRect()
   const legendRect = legendDiv.getBoundingClientRect()
 
-  const mouseX = legendMouseX > 0 ? legendMouseX : 0
+  const normalizedLegendMouseX = legendMouseX > 0 ? legendMouseX : 0
+  const mouseX = normalizedLegendMouseX + graphRect.left
   const halfLegendWidth = legendRect.width / 2
+  const pageHeaderHeight = 60
 
-  const minimumX = 0
-  const maximumX = graphRect.width - legendRect.width
+  const minimumX = graphRect.left
+  const maximumX = graphRect.left + graphRect.width - halfLegendWidth
 
-  const minimumY = -60
+  const minimumY = graphRect.top - pageHeaderHeight
 
   let translateX = mouseX - halfLegendWidth
-  let translateY = graphRect.height
+  let translateY = graphRect.height + graphRect.top
 
   // Enforce Left Edge of Graph
   if (mouseX - halfLegendWidth < minimumX) {
-    translateX = 0
+    translateX = minimumX
   }
 
   // Enforce Right Edge of Graph
-  if (mouseX - halfLegendWidth >= maximumX) {
-    translateX = maximumX
+  if (mouseX > maximumX) {
+    translateX = maximumX - halfLegendWidth
   }
 
   // Prevent Legend from rendering off screen
   const rightMargin = window.innerWidth - (mouseX + graphRect.left)
-  const LEGEND_BUFFER = 14
+  const LEGEND_BUFFER = 12
   if (window.innerHeight - graphRect.bottom < legendRect.height) {
     translateX = mouseX + LEGEND_BUFFER
-    translateY = minimumY
+    translateY = Math.max(minimumY, pageHeaderHeight + LEGEND_BUFFER)
 
     if (rightMargin < legendRect.width + LEGEND_BUFFER) {
       translateX = mouseX - (legendRect.width + LEGEND_BUFFER)
