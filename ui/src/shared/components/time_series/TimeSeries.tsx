@@ -19,7 +19,7 @@ import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
-import AutoRefresh from 'src/utils/AutoRefresh'
+import {GlobalAutoRefresh, AutoRefresh} from 'src/utils/AutoRefresh'
 import {CellNoteVisibility} from 'src/types/dashboards'
 
 // Components
@@ -39,6 +39,7 @@ interface Props {
   queries: Query[]
   timeRange: TimeRange
   children: (r: RenderProps) => JSX.Element
+  autoRefresh?: AutoRefresh
   inView?: boolean
   templates?: Template[]
   editQueryStatus?: () => void
@@ -66,6 +67,7 @@ class TimeSeries extends Component<Props, State> {
   public static defaultProps = {
     inView: true,
     templates: [],
+    autoRefresh: GlobalAutoRefresh,
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
@@ -117,17 +119,26 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public async componentDidMount() {
+    const {autoRefresh} = this.props
+
     this.isComponentMounted = true
     this.executeQueries()
-    AutoRefresh.subscribe(this.executeQueries)
+    autoRefresh.subscribe(this.executeQueries)
   }
 
   public componentWillUnmount() {
+    const {autoRefresh} = this.props
+
     this.isComponentMounted = false
-    AutoRefresh.unsubscribe(this.executeQueries)
+    autoRefresh.unsubscribe(this.executeQueries)
   }
 
   public async componentDidUpdate(prevProps: Props) {
+    if (this.props.autoRefresh !== prevProps.autoRefresh) {
+      prevProps.autoRefresh.unsubscribe(this.executeQueries)
+      this.props.autoRefresh.subscribe(this.executeQueries)
+    }
+
     if (!this.isPropsDifferent(prevProps)) {
       return
     }
