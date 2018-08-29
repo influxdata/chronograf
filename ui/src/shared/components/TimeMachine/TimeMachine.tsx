@@ -27,6 +27,7 @@ import {
   getBodyToScript,
   scriptUpToYield,
 } from 'src/flux/helpers/scriptBuilder'
+import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 // Actions
 import {editCellQueryStatus} from 'src/dashboards/actions'
@@ -115,6 +116,8 @@ interface State {
   selectedService: Service
   useDynamicSource: boolean
   suggestions: Suggestion[]
+  autoRefresher: AutoRefresher
+  autoRefreshDuration: number // milliseconds
 }
 
 type ScriptFunc = (script: string) => void
@@ -146,6 +149,8 @@ class TimeMachine extends PureComponent<Props, State> {
         text: '',
       },
       script: '',
+      autoRefresher: new AutoRefresher(),
+      autoRefreshDuration: 0,
     }
 
     this.debouncedASTResponse = _.debounce(script => {
@@ -155,6 +160,9 @@ class TimeMachine extends PureComponent<Props, State> {
 
   public async componentDidMount() {
     const {fluxLinks, script} = this.props
+    const {autoRefresher, autoRefreshDuration} = this.state
+
+    autoRefresher.poll(autoRefreshDuration)
 
     try {
       this.debouncedASTResponse(script)
@@ -173,9 +181,23 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
+  public componentWillUnmount() {
+    const {autoRefresher} = this.state
+
+    autoRefresher.stopPolling()
+  }
+
+  public componentDidUpdate(__, prevState) {
+    const {autoRefresher, autoRefreshDuration} = this.state
+
+    if (autoRefreshDuration !== prevState.autoRefreshDuration) {
+      autoRefresher.poll(autoRefreshDuration)
+    }
+  }
+
   public render() {
     const {services, timeRange, updateEditorTimeRange, templates} = this.props
-    const {useDynamicSource} = this.state
+    const {useDynamicSource, autoRefreshDuration} = this.state
     const horizontalDivisions = [
       {
         name: '',
@@ -206,6 +228,8 @@ class TimeMachine extends PureComponent<Props, State> {
           sources={this.formattedSources}
           service={this.service}
           services={services}
+          autoRefreshDuration={autoRefreshDuration}
+          onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
           onChangeService={this.handleChangeService}
           onSelectDynamicSource={this.handleSelectDynamicSource}
           isDynamicSourceSelected={useDynamicSource}
@@ -232,6 +256,7 @@ class TimeMachine extends PureComponent<Props, State> {
       source,
       isStaticLegend,
     } = this.props
+    const {autoRefresher} = this.state
 
     if (this.isFluxSource) {
       const service = this.service
@@ -243,6 +268,7 @@ class TimeMachine extends PureComponent<Props, State> {
           source={source}
           timeRange={timeRange}
           templates={templates}
+          autoRefresher={autoRefresher}
           queryConfigs={this.queriesWorkingDraft}
           editQueryStatus={editQueryStatus}
           staticLegend={isStaticLegend}
@@ -565,6 +591,10 @@ class TimeMachine extends PureComponent<Props, State> {
 
     this.handleSetActiveQueryIndex(newIndex)
     deleteQuery(queryToDelete.id)
+  }
+
+  private handleChangeAutoRefreshDuration = (autoRefreshDuration: number) => {
+    this.setState({autoRefreshDuration})
   }
 
   private handleSetActiveQueryIndex = (activeQueryIndex): void => {

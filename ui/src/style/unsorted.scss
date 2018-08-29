@@ -414,8 +414,12 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   background-color: $g3-castle;
   align-items: center;
 
-  .csv-export {
+  .csv-export, .autorefresh-dropdown {
     margin-right: 5px;
+  }
+
+  .autorefresh-dropdown.paused .dropdown {
+    margin-right: 0;
   }
 }
 
