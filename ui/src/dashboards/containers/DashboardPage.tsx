@@ -333,7 +333,6 @@ class DashboardPage extends Component<Props, State> {
             queryDrafts={queryDrafts}
             timeRange={editorTimeRange}
             updateEditorTimeRange={updateEditorTimeRange}
-            autoRefresh={autoRefresh}
             dashboardID={dashboardID}
             queryStatus={cellQueryStatus}
             onSave={this.handleSaveEditedCell}
@@ -398,7 +397,6 @@ class DashboardPage extends Component<Props, State> {
             inView={this.inView}
             dashboard={dashboard}
             timeRange={timeRange}
-            autoRefresh={autoRefresh}
             manualRefresh={manualRefresh}
             onZoom={this.handleZoomedTimeRange}
             inPresentationMode={inPresentationMode}

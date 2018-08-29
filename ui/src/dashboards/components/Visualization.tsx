@@ -20,7 +20,6 @@ interface Props {
   axes: Axes
   type: CellType
   source: Source
-  autoRefresh: number
   templates: Template[]
   timeRange: TimeRange
   queryConfigs: QueryConfig[]
@@ -49,7 +48,6 @@ const DashVisualization: SFC<Props> = ({
   timeRange,
   lineColors,
   timeFormat,
-  autoRefresh,
   gaugeColors,
   fieldOptions,
   queryConfigs,
@@ -79,7 +77,6 @@ const DashVisualization: SFC<Props> = ({
           tableOptions={tableOptions}
           queries={buildQueries(queryConfigs, timeRange)}
           templates={templates}
-          autoRefresh={autoRefresh}
           editQueryStatus={editQueryStatus}
           resizerTopHeight={resizerTopHeight}
           staticLegend={staticLegend}

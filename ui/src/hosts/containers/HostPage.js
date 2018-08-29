@@ -106,7 +106,7 @@ class HostPage extends Component {
       return ''
     }
 
-    const {source, autoRefresh, manualRefresh} = this.props
+    const {source, manualRefresh} = this.props
 
     const autoflowLayouts = layouts.filter(layout => !!layout.autoflow)
 
@@ -162,7 +162,6 @@ class HostPage extends Component {
         cells={layoutCells}
         templates={tempVars}
         timeRange={timeRange}
-        autoRefresh={autoRefresh}
         manualRefresh={manualRefresh}
         host={this.props.params.hostID}
       />
