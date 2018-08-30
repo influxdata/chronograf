@@ -207,11 +207,9 @@ export class DataExplorer extends PureComponent<Props, State> {
       sources,
       services,
       timeRange,
-      autoRefresh,
       manualRefresh,
       onManualRefresh,
       editQueryStatus,
-      handleChooseAutoRefresh,
       updateQueryDrafts,
       queryDrafts,
       addQuery,
@@ -246,7 +244,6 @@ export class DataExplorer extends PureComponent<Props, State> {
             editQueryStatus={editQueryStatus}
             templates={this.templates}
             timeRange={timeRange}
-            autoRefresh={autoRefresh}
             source={source}
             onResetFocus={this.handleResetFocus}
             isInCEO={false}
@@ -269,12 +266,10 @@ export class DataExplorer extends PureComponent<Props, State> {
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
                 timeRange={timeRange}
-                autoRefresh={autoRefresh}
                 activeEditorTab={activeEditorTab}
                 onManualRefresh={onManualRefresh}
                 onOpenWriteData={this.handleOpenWriteData}
                 toggleSendToDashboard={this.toggleSendToDashboard}
-                onChooseAutoRefresh={handleChooseAutoRefresh}
                 onSetActiveEditorTab={onSetActiveEditorTab}
               />
             )}

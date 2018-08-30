@@ -3,7 +3,6 @@ import React, {Component} from 'react'
 
 // Components
 import {Radio, ButtonShape} from 'src/reusable_ui'
-import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import FeatureFlag from 'src/shared/components/FeatureFlag'
@@ -19,12 +18,10 @@ import {TimeRange} from 'src/types'
 
 interface Props {
   timeRange: TimeRange
-  autoRefresh: number
   activeEditorTab: CEOTabs
   onManualRefresh: () => void
   onOpenWriteData: () => void
   toggleSendToDashboard: () => void
-  onChooseAutoRefresh: () => void
   onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
 }
 
@@ -32,13 +29,10 @@ interface Props {
 class DEHeader extends Component<Props> {
   public render() {
     const {
-      autoRefresh,
       onOpenWriteData,
-      onManualRefresh,
       activeEditorTab,
       onSetActiveEditorTab,
       toggleSendToDashboard,
-      onChooseAutoRefresh,
     } = this.props
 
     return (
@@ -87,11 +81,6 @@ class DEHeader extends Component<Props> {
                 Send to Dashboard
               </button>
             </Authorized>
-            <AutoRefreshDropdown
-              selected={autoRefresh}
-              onChoose={onChooseAutoRefresh}
-              onManualRefresh={onManualRefresh}
-            />
           </div>
         </div>
       </div>
