@@ -20,6 +20,7 @@ import {
 } from 'src/shared/constants'
 const MAX_COLUMNS = 12
 
+import {log} from 'util'
 // Types
 import {Cell, CellType, Dashboard, NewDefaultCell} from 'src/types/dashboards'
 import {QueryConfig, DurationRange} from 'src/types/queries'
@@ -114,37 +115,36 @@ export const getClonedDashboardCell = (
   dashboard: Dashboard,
   cellClone: Cell
 ): Cell => {
-  let x
-  let y
-
-  // const cellCloneIsAtRightEdge = cellClone.x + cellClone.w === MAX_COLUMNS
-  const cellCloneFitsLeft = cellClone.x >= cellClone.w
-  const cellCloneFitsRight =
-    MAX_COLUMNS - cellClone.w - cellClone.x >= cellClone.w
-
-  // If cell can be cloned to the left (at the same size) then do so
-  if (cellCloneFitsLeft) {
-    x = cellClone.x - cellClone.w
-    y = cellClone.y
-  }
-  // Otherwise clone to the right
-  else if (cellCloneFitsRight) {
-    x = cellClone.x + cellClone.w
-    y = cellClone.y
-  }
-  // Clone below
-  else {
-    x = cellClone.x
-    y = cellClone.y + cellClone.h
+  if (!dashboard || !cellClone) {
+    return {}
   }
 
   const name = `${cellClone.name} (clone)`
 
-  return {...cellClone, x, y, name}
+  const cellCloneFitsLeft = cellClone.x >= cellClone.w
+  const cellCloneFitsRight =
+    MAX_COLUMNS - cellClone.w - cellClone.x >= cellClone.w
+
+  if (cellCloneFitsRight) {
+    return {...cellClone, x: cellClone.x + cellClone.w, name}
+  }
+
+  if (cellCloneFitsLeft) {
+    return {...cellClone, x: cellClone.x - cellClone.w, name}
+  }
+
+  return {...cellClone, y: cellClone.y + cellClone.h, name}
 }
 
+const incrementCloneName = (dashboard: Dashboard, cellClone: Cell): string => {
+  let cloneName = `${cellClone.name} (clone)`
+  const cellNames = dashboard.cells.map(c => c.name)
+  if (_.includes(cellNames, cloneName)) {
+    console.log('name exists, should increment')
+    cloneName = 'pineapple'
+  }
 
-  return {...cloneCell, x, y, name}
+  return cloneName
 }
 
 export const getTimeRange = (queryConfig: QueryConfig): DurationRange => {
