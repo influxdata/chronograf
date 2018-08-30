@@ -20,7 +20,6 @@ import {
 } from 'src/shared/constants'
 const MAX_COLUMNS = 12
 
-import {log} from 'util'
 // Types
 import {Cell, CellType, Dashboard, NewDefaultCell} from 'src/types/dashboards'
 import {QueryConfig, DurationRange} from 'src/types/queries'
@@ -111,15 +110,28 @@ export const getNewDashboardCell = (
   }
 }
 
+const incrementCloneName = (dashboard: Dashboard, cellName: string): string => {
+  const cellNames = dashboard.cells.map(c => c.name)
+  const numClones = cellNames.reduce(
+    (acc, name) => {
+      const cleanedName = name.replace(/\s\(clone\)/g, '')
+      const cellIsAClone = name.includes(`${cleanedName} (clone`)
+      console.log('cellName: ', name)
+      console.log('is a clone: ', cellIsAClone)
+
+      return cellIsAClone ? acc + 1 : acc
+    })
+  )
+  
+  return 'poop'
+}
+
 export const getClonedDashboardCell = (
   dashboard: Dashboard,
   cellClone: Cell
 ): Cell => {
-  if (!dashboard || !cellClone) {
-    return {}
-  }
-
-  const name = `${cellClone.name} (clone)`
+  // const name = incrementCloneName(dashboard, cellClone.name)
+  const name = 'name'
 
   const cellCloneFitsLeft = cellClone.x >= cellClone.w
   const cellCloneFitsRight =
@@ -136,16 +148,6 @@ export const getClonedDashboardCell = (
   return {...cellClone, y: cellClone.y + cellClone.h, name}
 }
 
-const incrementCloneName = (dashboard: Dashboard, cellClone: Cell): string => {
-  let cloneName = `${cellClone.name} (clone)`
-  const cellNames = dashboard.cells.map(c => c.name)
-  if (_.includes(cellNames, cloneName)) {
-    console.log('name exists, should increment')
-    cloneName = 'pineapple'
-  }
-
-  return cloneName
-}
 
 export const getTimeRange = (queryConfig: QueryConfig): DurationRange => {
   return (
