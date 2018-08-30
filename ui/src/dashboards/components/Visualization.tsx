@@ -1,5 +1,4 @@
 import React, {SFC} from 'react'
-// import {connect} from 'react-redux'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 
