@@ -68,7 +68,6 @@ interface Props {
   source: SourcesModels.Source
   dashboardID: number
   queryStatus: QueriesModels.QueryStatus
-  autoRefresh: number
   templates: Template[]
   timeRange: QueriesModels.TimeRange
   thresholdsListType: string
