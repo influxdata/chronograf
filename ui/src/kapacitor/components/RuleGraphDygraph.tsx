@@ -34,25 +34,36 @@ interface Props {
 }
 
 interface State {
-  timeSeriesToDygraphResult?: TimeSeriesToDyGraphReturnType
+  timeSeriesToDygraphResult: TimeSeriesToDyGraphReturnType | null
 }
 
 @ErrorHandling
 class RuleGraphDygraph extends Component<Props, State> {
-  public async componentWillReceiveProps(nextProps: Props) {
-    const {loading, timeSeries} = this.props
-    if (
-      loading !== nextProps.loading &&
-      nextProps.loading === RemoteDataState.Done
-    ) {
-      const result = await timeSeriesToDygraph(timeSeries, 'rule-builder')
-      this.setState({timeSeriesToDygraphResult: result})
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {timeSeriesToDygraphResult: null}
+  }
+
+  public componentDidMount() {
+    if (this.props.timeSeries) {
+      this.loadDygraphData()
+    }
+  }
+
+  public componentDidUpdate(prevProps) {
+    if (prevProps.timeSeries !== this.props.timeSeries) {
+      this.loadDygraphData()
     }
   }
 
   public render() {
     const {timeRange, rule} = this.props
     const {timeSeriesToDygraphResult} = this.state
+
+    if (!timeSeriesToDygraphResult) {
+      return null
+    }
 
     return (
       <Dygraph
@@ -71,6 +82,13 @@ class RuleGraphDygraph extends Component<Props, State> {
         handleSetHoverTime={this.props.setHoverTime}
       />
     )
+  }
+
+  private loadDygraphData = async () => {
+    const {timeSeries} = this.props
+    const result = await timeSeriesToDygraph(timeSeries, 'rule-builder')
+
+    this.setState({timeSeriesToDygraphResult: result})
   }
 
   private get containerStyle(): CSSProperties {
