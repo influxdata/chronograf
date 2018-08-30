@@ -356,10 +356,10 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   private get activeQueryConfig(): QueryConfig {
     const {queryDrafts} = this.props
-    return _.get(queryDrafts, 'queryConfig.0')
+    return _.get(queryDrafts, '0.queryConfig')
   }
 
-  get rawText(): string {
+  private get rawText(): string {
     const {timeRange} = this.props
     if (this.activeQueryConfig) {
       return buildRawText(this.activeQueryConfig, timeRange)
