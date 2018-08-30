@@ -35,7 +35,6 @@ import {builder, emptyAST} from 'src/flux/constants'
 import {HANDLE_HORIZONTAL} from 'src/shared/constants'
 
 // Types
-import {UpdateScript} from 'src/flux/actions'
 import {Source, Service, Notification, FluxTable} from 'src/types'
 import {
   Suggestion,
@@ -57,7 +56,7 @@ interface Props {
   sources: Source[]
   notify: (message: Notification) => void
   script: string
-  updateScript: UpdateScript
+  updateScript: any
   onGoToEditFlux: (service: Service) => void
   onChangeService: (service: Service, source: Source) => void
 }

@@ -1,5 +1,4 @@
 import React, {SFC} from 'react'
-import {connect} from 'react-redux'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 
@@ -8,7 +7,7 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
-import {TimeRange, QueryConfig, Axes, Template, Source} from 'src/types'
+import {TimeRange, QueryConfig, Axes, Template, Source, Status} from 'src/types'
 import {
   TableOptions,
   DecimalPlaces,
@@ -26,12 +25,12 @@ interface Props {
   timeRange: TimeRange
   autoRefresher: AutoRefresher
   queryConfigs: QueryConfig[]
-  editQueryStatus: () => void
+  editQueryStatus: (queryID: string, status: Status) => void
   tableOptions: TableOptions
   timeFormat: string
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
-  resizerTopHeight: number
+  resizerTopHeight?: number
   thresholdsListColors: ColorNumber[]
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
@@ -39,6 +38,7 @@ interface Props {
   isInCEO: boolean
   note: string
   noteVisibility: CellNoteVisibility
+  manualRefresh: number
 }
 
 const DashVisualization: SFC<Props> = ({
@@ -56,6 +56,7 @@ const DashVisualization: SFC<Props> = ({
   queryConfigs,
   staticLegend,
   tableOptions,
+  manualRefresh,
   decimalPlaces,
   autoRefresher,
   noteVisibility,
@@ -92,40 +93,11 @@ const DashVisualization: SFC<Props> = ({
           cellNote={note}
           cellNoteVisibility={noteVisibility}
           timeRange={timeRange}
+          manualRefresh={manualRefresh}
         />
       </div>
     </div>
   )
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {
-    thresholdsListColors,
-    gaugeColors,
-    lineColors,
-    cell: {
-      type,
-      axes,
-      tableOptions,
-      fieldOptions,
-      timeFormat,
-      decimalPlaces,
-      note,
-      noteVisibility,
-    },
-  },
-}) => ({
-  gaugeColors,
-  thresholdsListColors,
-  lineColors,
-  type,
-  axes,
-  tableOptions,
-  fieldOptions,
-  timeFormat,
-  decimalPlaces,
-  note,
-  noteVisibility,
-})
-
-export default connect(mapStateToProps, null)(DashVisualization)
+export default DashVisualization

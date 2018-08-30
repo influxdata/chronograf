@@ -12,10 +12,3 @@ export interface ActionUpdateScript {
 }
 
 export type UpdateScript = (script: string) => ActionUpdateScript
-
-export const updateScript = (script: string): ActionUpdateScript => {
-  return {
-    type: ActionTypes.UpdateScript,
-    payload: {script},
-  }
-}

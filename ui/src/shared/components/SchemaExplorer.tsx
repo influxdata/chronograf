@@ -8,11 +8,15 @@ import FieldList from 'src/shared/components/FieldList'
 
 // Types
 import {QueryConfig, Source} from 'src/types'
-import {QueryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
+import {QueryConfigActions, QueryUpdateState} from 'src/shared/actions/queries'
 
-const actionBinder = (id, action) => (...args) => action(id, ...args)
+const actionBinder = (id, isInCEO, action) => (...args) => {
+  const stateToUpdate = isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
+  return action(id, stateToUpdate, ...args)
+}
 
 interface Props {
+  isInCEO: boolean
   query: QueryConfig
   actions: QueryConfigActions
   source: Source
@@ -21,6 +25,7 @@ interface Props {
 }
 
 const SchemaExplorer: SFC<Props> = ({
+  isInCEO,
   query,
   source,
   initialGroupByTime,
@@ -47,29 +52,29 @@ const SchemaExplorer: SFC<Props> = ({
       <DatabaseList
         query={query}
         querySource={source}
-        onChooseNamespace={actionBinder(id, chooseNamespace)}
+        onChooseNamespace={actionBinder(id, isInCEO, chooseNamespace)}
       />
       <MeasurementList
         query={query}
         querySource={source}
-        onChooseTag={actionBinder(id, chooseTag)}
-        onGroupByTag={actionBinder(id, groupByTag)}
-        onChooseMeasurement={actionBinder(id, chooseMeasurement)}
-        onToggleTagAcceptance={actionBinder(id, toggleTagAcceptance)}
+        onChooseTag={actionBinder(id, isInCEO, chooseTag)}
+        onGroupByTag={actionBinder(id, isInCEO, groupByTag)}
+        onChooseMeasurement={actionBinder(id, isInCEO, chooseMeasurement)}
+        onToggleTagAcceptance={actionBinder(id, isInCEO, toggleTagAcceptance)}
         isQuerySupportedByExplorer={isQuerySupportedByExplorer}
       />
       <FieldList
         source={source}
         query={query}
         querySource={source}
-        onFill={actionBinder(id, fill)}
+        onFill={actionBinder(id, isInCEO, fill)}
         initialGroupByTime={initialGroupByTime}
-        onTimeShift={actionBinder(id, timeShift)}
-        removeFuncs={actionBinder(id, removeFuncs)}
-        onToggleField={actionBinder(id, toggleField)}
-        onGroupByTime={actionBinder(id, groupByTime)}
-        addInitialField={actionBinder(id, addInitialField)}
-        applyFuncsToField={actionBinder(id, applyFuncsToField)}
+        onTimeShift={actionBinder(id, isInCEO, timeShift)}
+        removeFuncs={actionBinder(id, isInCEO, removeFuncs)}
+        onToggleField={actionBinder(id, isInCEO, toggleField)}
+        onGroupByTime={actionBinder(id, isInCEO, groupByTime)}
+        addInitialField={actionBinder(id, isInCEO, addInitialField)}
+        applyFuncsToField={actionBinder(id, isInCEO, applyFuncsToField)}
         isQuerySupportedByExplorer={isQuerySupportedByExplorer}
       />
     </div>

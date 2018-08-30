@@ -30,13 +30,13 @@ import {
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 // Actions
-import {editCellQueryStatus} from 'src/dashboards/actions'
 import {
   validateSuccess,
   fluxTimeSeriesError,
   fluxResponseTruncatedError,
 } from 'src/shared/copy/notifications'
 import {getSuggestions, getAST, getTimeSeries} from 'src/flux/apis'
+import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
 
 // Constants
 import {HANDLE_HORIZONTAL} from 'src/shared/constants'
@@ -45,11 +45,7 @@ import {CEOTabs} from 'src/dashboards/constants'
 import {builder, emptyAST} from 'src/flux/constants'
 
 // Types
-import {
-  QueryConfigActions,
-  addQueryAsync,
-  deleteQueryAsync,
-} from 'src/dashboards/actions/cellEditorOverlay'
+import {QueryConfigActions, QueryUpdateState} from 'src/shared/actions/queries'
 import {
   TimeRange,
   QueryConfig,
@@ -59,6 +55,8 @@ import {
   CellQuery,
   NotificationAction,
   FluxTable,
+  QueryStatus,
+  Status,
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
 import {
@@ -71,11 +69,34 @@ import {
   Func,
   ScriptStatus,
 } from 'src/types/flux'
-import {UpdateScript} from 'src/flux/actions'
+import {
+  Axes,
+  CellType,
+  FieldOption,
+  TableOptions,
+  DecimalPlaces,
+  CellNoteVisibility,
+} from 'src/types/dashboards'
+import {ColorNumber, ColorString} from 'src/types/colors'
+
+interface VisualizationOptions {
+  type: CellType
+  axes: Axes | null
+  tableOptions: TableOptions
+  fieldOptions: FieldOption[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  note: string
+  noteVisibility: CellNoteVisibility
+  thresholdsListColors: ColorNumber[]
+  gaugeColors: ColorNumber[]
+  lineColors: ColorString[]
+}
 
 interface Props {
   fluxLinks: Links
   source: Source
+  service?: Service
   script: string
   sources: Source[]
   isInCEO: boolean
@@ -85,19 +106,33 @@ interface Props {
   isStaticLegend: boolean
   queryDrafts: CellQuery[]
   onResetFocus: () => void
-  updateScript: UpdateScript
-  addQuery: typeof addQueryAsync
-  deleteQuery: typeof deleteQueryAsync
+  updateSourceLink?: typeof updateSourceLinkAction
+  updateScript: (script: string, stateToUpdate: QueryUpdateState) => void
   queryConfigActions: QueryConfigActions
   notify: NotificationAction
-  editQueryStatus: typeof editCellQueryStatus
-  updateQueryDrafts: (queryDrafts: CellQuery[]) => void
-  updateEditorTimeRange: (timeRange: TimeRange) => void
+  editQueryStatus: (
+    queryID: string,
+    status: Status,
+    stateToUpdate: QueryUpdateState
+  ) => void
+  updateQueryDrafts: (
+    queryDrafts: CellQuery[],
+    stateToUpdate: QueryUpdateState
+  ) => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
   children: (
     activeEditorTab: CEOTabs,
     onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
   ) => JSX.Element
+  addQuery: (stateToUpdate: QueryUpdateState) => void
+  deleteQuery: (queryID: string, stateToUpdate: QueryUpdateState) => void
+  updateEditorTimeRange: (
+    timeRange: TimeRange,
+    stateToUpdate: QueryUpdateState
+  ) => void
+  visualizationOptions?: VisualizationOptions
+  manualRefresh?: number
+  queryStatus: QueryStatus
 }
 
 interface Body extends FlatBody {
@@ -196,8 +231,9 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {services, timeRange, updateEditorTimeRange, templates} = this.props
+    const {services, timeRange, templates, isInCEO} = this.props
     const {useDynamicSource, autoRefreshDuration} = this.state
+
     const horizontalDivisions = [
       {
         name: '',
@@ -234,7 +270,8 @@ class TimeMachine extends PureComponent<Props, State> {
           onSelectDynamicSource={this.handleSelectDynamicSource}
           isDynamicSourceSelected={useDynamicSource}
           timeRange={timeRange}
-          updateEditorTimeRange={updateEditorTimeRange}
+          updateEditorTimeRange={this.handleUpdateEditorTimeRange}
+          isInCEO={isInCEO}
         />
         <div className="deceo--container">
           <Threesizer
@@ -251,10 +288,11 @@ class TimeMachine extends PureComponent<Props, State> {
       script,
       timeRange,
       templates,
-      editQueryStatus,
       isInCEO,
       source,
       isStaticLegend,
+      visualizationOptions,
+      manualRefresh,
     } = this.props
     const {autoRefresher} = this.state
 
@@ -270,9 +308,11 @@ class TimeMachine extends PureComponent<Props, State> {
           templates={templates}
           autoRefresher={autoRefresher}
           queryConfigs={this.queriesWorkingDraft}
-          editQueryStatus={editQueryStatus}
+          editQueryStatus={this.handleEditQueryStatus}
           staticLegend={isStaticLegend}
           isInCEO={isInCEO}
+          manualRefresh={manualRefresh}
+          {...visualizationOptions}
         />
       </div>
     )
@@ -283,7 +323,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get editorTab() {
-    const {isStaticLegend, onToggleStaticLegend} = this.props
+    const {onResetFocus, isStaticLegend, onToggleStaticLegend} = this.props
     const {activeEditorTab} = this.state
 
     if (activeEditorTab === CEOTabs.Queries) {
@@ -298,7 +338,7 @@ class TimeMachine extends PureComponent<Props, State> {
         queryConfigs={this.queriesWorkingDraft}
         onToggleStaticLegend={onToggleStaticLegend}
         staticLegend={isStaticLegend}
-        onResetFocus={this.props.onResetFocus}
+        onResetFocus={onResetFocus}
       />
     )
   }
@@ -311,7 +351,12 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get service() {
+    const {service} = this.props
     const {selectedService} = this.state
+
+    if (service) {
+      return service
+    }
 
     return selectedService
   }
@@ -345,12 +390,25 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get queriesWorkingDraft(): QueryConfig[] {
-    const {queryDrafts} = this.props
+    const {queryDrafts, queryStatus} = this.props
 
-    return queryDrafts.map(q => ({
-      ...q.queryConfig,
-      source: this.source,
-    }))
+    if (!queryDrafts || !queryDrafts.length) {
+      return []
+    }
+    return queryDrafts.map(q => {
+      if (queryStatus.queryID === q.id) {
+        return {
+          ...q.queryConfig,
+          source: this.source,
+          status: queryStatus.status,
+        }
+      }
+
+      return {
+        ...q.queryConfig,
+        source: this.source,
+      }
+    })
   }
 
   private get formattedSources(): SourceOption[] {
@@ -363,8 +421,9 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get isFluxSource(): boolean {
     // TODO: Update once flux is no longer a separate service
+    const {service} = this.props
     const {selectedService} = this.state
-    if (selectedService) {
+    if (selectedService || service) {
       return true
     }
     return false
@@ -397,11 +456,12 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get influxQLBuilder(): JSX.Element {
-    const {templates, timeRange} = this.props
+    const {isInCEO, templates, timeRange} = this.props
     const {activeQueryIndex} = this.state
 
     return (
       <InfluxQLQueryMaker
+        isInCEO={isInCEO}
         source={this.source}
         templates={templates}
         queries={this.queriesWorkingDraft}
@@ -415,6 +475,12 @@ class TimeMachine extends PureComponent<Props, State> {
         initialGroupByTime={AUTO_GROUP_BY}
       />
     )
+  }
+
+  private get stateToUpdate(): QueryUpdateState {
+    const {isInCEO} = this.props
+
+    return isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
   }
 
   private getActiveQuery = (): QueryConfig => {
@@ -438,6 +504,18 @@ class TimeMachine extends PureComponent<Props, State> {
     }
 
     return activeQuery
+  }
+
+  private handleUpdateEditorTimeRange = (timeRange: TimeRange) => {
+    const {updateEditorTimeRange} = this.props
+
+    updateEditorTimeRange(timeRange, this.stateToUpdate)
+  }
+
+  private handleEditQueryStatus = (queryID: string, status: Status) => {
+    const {editQueryStatus} = this.props
+
+    editQueryStatus(queryID, status, this.stateToUpdate)
   }
 
   private findUserDefinedTempVarsInQuery = (
@@ -521,13 +599,13 @@ class TimeMachine extends PureComponent<Props, State> {
 
         return q
       })
-      updateQueryDrafts(nextQueries)
+      updateQueryDrafts(nextQueries, this.stateToUpdate)
     } catch (error) {
       console.error(error)
     }
   }
 
-  private updateQueryDrafts(selectedSource: Source) {
+  private updateQueryDraftsSource(selectedSource: Source) {
     const {queryDrafts, updateQueryDrafts} = this.props
 
     const queries: CellQuery[] = queryDrafts.map(q => {
@@ -539,23 +617,28 @@ class TimeMachine extends PureComponent<Props, State> {
       }
     })
 
-    updateQueryDrafts(queries)
+    updateQueryDrafts(queries, this.stateToUpdate)
   }
 
   private handleChangeService = (
     selectedService: Service,
     selectedSource: Source
   ): void => {
+    const {updateSourceLink} = this.props
     const useDynamicSource = false
 
-    this.updateQueryDrafts(selectedSource)
+    if (updateSourceLink) {
+      updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
+    }
+
+    this.updateQueryDraftsSource(selectedSource)
     this.setState({selectedService, selectedSource, useDynamicSource})
   }
 
   private handleSelectDynamicSource = (): void => {
     const useDynamicSource = true
 
-    this.updateQueryDrafts(null)
+    this.updateQueryDraftsSource(null)
     this.setState({useDynamicSource})
   }
 
@@ -563,12 +646,12 @@ class TimeMachine extends PureComponent<Props, State> {
     const {queryDrafts, addQuery} = this.props
     const newIndex = queryDrafts.length
 
-    addQuery()
+    addQuery(this.stateToUpdate)
     this.handleSetActiveQueryIndex(newIndex)
   }
 
   private handleDeleteQuery = (index: number) => {
-    const {queryDrafts, deleteQuery} = this.props
+    const {queryDrafts, deleteQuery, isInCEO} = this.props
     const queryToDelete = queryDrafts.find((__, i) => i === index)
     const activeQuery = this.getActiveQuery()
     const activeQueryIndex = queryDrafts.findIndex(
@@ -590,7 +673,9 @@ class TimeMachine extends PureComponent<Props, State> {
     }
 
     this.handleSetActiveQueryIndex(newIndex)
-    deleteQuery(queryToDelete.id)
+
+    const stateToUpdate = isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
+    deleteQuery(queryToDelete.id, stateToUpdate)
   }
 
   private handleChangeAutoRefreshDuration = (autoRefreshDuration: number) => {
@@ -621,11 +706,15 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
+  private updateScript(script: string) {
+    this.props.updateScript(script, this.stateToUpdate)
+  }
+
   private getASTResponse = async (script: string, update: boolean = true) => {
     const {fluxLinks} = this.props
 
     if (!script) {
-      this.props.updateScript(script)
+      this.updateScript(script)
       return this.setState({ast: emptyAST, body: []})
     }
 
@@ -633,7 +722,7 @@ class TimeMachine extends PureComponent<Props, State> {
       const ast = await getAST({url: fluxLinks.ast, body: script})
 
       if (update) {
-        this.props.updateScript(script)
+        this.updateScript(script)
       }
 
       const body = bodyNodes(ast, this.state.suggestions)
@@ -772,7 +861,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private handleChangeScript = (script: string): void => {
     this.debouncedASTResponse(script)
-    this.props.updateScript(script)
+    this.updateScript(script)
   }
 
   private handleAddNode = (

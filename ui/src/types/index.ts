@@ -31,6 +31,7 @@ import {
   FieldFunc,
   FuncArg,
   Namespace,
+  QueryStatus,
   Tag,
   Tags,
   TagValues,
@@ -133,4 +134,5 @@ export {
   TemplateUpdate,
   TemplateBuilderProps,
   WriteDataMode,
+  QueryStatus,
 }
