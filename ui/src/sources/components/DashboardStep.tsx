@@ -4,16 +4,23 @@ import React, {Component} from 'react'
 // APIs
 import {getProtoBoards} from 'src/sources/apis'
 
-// Components
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Utils
+import {isSearchMatch} from 'src/utils/searchMatch'
+
+// Components
 import GridSizer from 'src/reusable_ui/components/grid_sizer/GridSizer'
 import CardSelectCard from 'src/reusable_ui/components/card_select/CardSelectCard'
+import SearchBar from 'src/hosts/components/SearchBar'
 
 // Types
 import {Protoboard} from 'src/types'
 
 interface State {
   selected: object
+  searchTerm: string
   protoboards: Protoboard[]
 }
 
@@ -24,6 +31,7 @@ class DashboardStep extends Component<{}, State> {
     this.state = {
       selected: {},
       protoboards: [],
+      searchTerm: '',
     }
   }
 
@@ -37,6 +45,12 @@ class DashboardStep extends Component<{}, State> {
     if (protoboards && protoboards.length) {
       return (
         <div className="dashboard-step">
+          <div className="dashboard-step--filter-controls">
+            <SearchBar
+              placeholder="Filter by name..."
+              onSearch={this.setSearchTerm}
+            />
+          </div>
           <GridSizer>{this.dashboardCards}</GridSizer>
         </div>
       )
@@ -44,10 +58,16 @@ class DashboardStep extends Component<{}, State> {
     return <div />
   }
 
-  private get dashboardCards() {
-    const {selected, protoboards} = this.state
+  private setSearchTerm = searchTerm => {
+    this.setState({searchTerm})
+  }
 
-    return protoboards.map((protoboard, i) => {
+  private get dashboardCards() {
+    const {selected, protoboards, searchTerm} = this.state
+    const filteredProtoboards = protoboards.filter(pb =>
+      isSearchMatch(pb.meta.name, searchTerm)
+    )
+    return filteredProtoboards.map((protoboard, i) => {
       const {meta} = protoboard
       return (
         <CardSelectCard
