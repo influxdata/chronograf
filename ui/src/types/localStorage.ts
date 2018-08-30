@@ -1,4 +1,4 @@
-import {QueryConfig, TimeRange, CellQuery} from 'src/types'
+import {QueryConfig, TimeRange, CellQuery, QueryStatus} from 'src/types'
 import {LogsState} from 'src/types/logs'
 
 export interface LocalStorage {
@@ -26,6 +26,9 @@ export interface DashTimeV1 {
 export interface DataExplorer {
   queryDrafts: CellQuery[]
   timeRange: TimeRange
+  queryStatus: QueryStatus
+  script: string
+  sourceLink: string
 }
 
 export interface DataExplorerQueryConfigs {
