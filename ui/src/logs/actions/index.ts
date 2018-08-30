@@ -343,10 +343,12 @@ const getFilters = (state: State): Filter[] =>
   getDeep<Filter[]>(state, 'logs.filters', [])
 
 const getTableSelectedTime = (state: State): number => {
-  const custom = getDeep<number>(state, 'logs.tableTime.custom', '')
+  const custom = getDeep<string>(state, 'logs.tableTime.custom', '')
 
   if (!_.isEmpty(custom)) {
-    return custom
+    return moment(custom)
+      .utc()
+      .valueOf()
   }
 
   const relative = getDeep<number>(state, 'logs.tableTime.relative', 0)
