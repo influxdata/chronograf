@@ -38,7 +38,7 @@ export const INITIAL_LIMIT = 1000
 import {
   DEFAULT_FORWARD_CHUNK_DURATION_MS,
   DEFAULT_BACKWARD_CHUNK_DURATION_MS,
-  DEFAULT_FORWARD_MAX_CHUNK_POOL_LIFE_MS,
+  DEFAULT_MAX_FORWARD_BUFFER_DURATION_MS,
 } from 'src/logs/constants'
 
 const defaultTableData: TableData = {
@@ -794,18 +794,19 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
     .utc()
     .valueOf()
 
-  const forwardCacheDuration = upperUTC - nextNewerLowerBound
-  const forwardMaxChunkPoolLifeMs = getDeep<number>(
+  const currentForwardBufferDuration = upperUTC - nextNewerLowerBound
+  const maxForwardBufferDurationMs = getDeep<number>(
     state,
-    'logs.forwardMaxChunkPoolLifeMs',
-    DEFAULT_FORWARD_MAX_CHUNK_POOL_LIFE_MS
+    'logs.maxForwardBufferDurationMs',
+    DEFAULT_MAX_FORWARD_BUFFER_DURATION_MS
   )
-  const isForwardCacheExpired = forwardCacheDuration > forwardMaxChunkPoolLifeMs
+  const isMaxBufferDurationExceeded =
+    currentForwardBufferDuration > maxForwardBufferDurationMs
 
   console.log('upperUTC', upperUTC)
   console.log('lowerUTC', nextNewerLowerBound)
-  console.log('forwardCacheDuration', forwardCacheDuration)
-  console.log('isForwardCacheExpired', isForwardCacheExpired)
+  console.log('currentForwardBufferDuration', currentForwardBufferDuration)
+  console.log('isMaxBufferDurationExceeded', isMaxBufferDurationExceeded)
 
   // TODO(js): get nextNewerLowerBound from upper bound time value in last results
   // TODO(js): check if bounds are inclusive on both ends
@@ -843,13 +844,13 @@ export const fetchNewerLogsAsync = () => async (dispatch, getState) => {
     // console.log(query, logSeries.values)
 
     const hasNextNewerLowerBoundNeverBeenSet =
-      forwardCacheDuration < DEFAULT_FORWARD_CHUNK_DURATION_MS
+      currentForwardBufferDuration < DEFAULT_FORWARD_CHUNK_DURATION_MS
     if (hasNextNewerLowerBoundNeverBeenSet) {
       // first time nextNewerLowerBound is set
       dispatch(setNextNewerLowerBound(nextNewerLowerBound))
       console.log('setNextNewerLowerBound(nextNewerLowerBound')
       console.log('******', counter)
-    } else if (isForwardCacheExpired) {
+    } else if (isMaxBufferDurationExceeded) {
       // const currentForward = getForwardTableData(state)
       const currentBackward = getBackwardTableData(state)
       const combinedBackward = combineTableData(logSeries, currentBackward)
