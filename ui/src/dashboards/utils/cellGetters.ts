@@ -124,21 +124,16 @@ export const getClonedDashboardCell = (
 
   // If cell can be cloned to the left (at the same size) then do so
   if (cellCloneFitsLeft) {
-    console.log('cloning to left')
     x = cellClone.x - cellClone.w
     y = cellClone.y
   }
   // Otherwise clone to the right
   else if (cellCloneFitsRight) {
-    console.log('cloning to right')
-
     x = cellClone.x + cellClone.w
     y = cellClone.y
   }
   // Clone below
   else {
-    console.log('cloning below')
-
     x = cellClone.x
     y = cellClone.y + cellClone.h
   }
