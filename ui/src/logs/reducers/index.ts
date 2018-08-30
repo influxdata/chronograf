@@ -17,7 +17,7 @@ import {
 import {
   SeverityFormatOptions,
   DEFAULT_TRUNCATION,
-  DEFAULT_FORWARD_CHUNK_DURATION_MS,
+  DEFAULT_TAIL_CHUNK_DURATION_MS,
   DEFAULT_BACKWARD_CHUNK_DURATION_MS,
 } from 'src/logs/constants'
 import {LogsState, TableData, SearchStatus} from 'src/types/logs'
@@ -66,8 +66,8 @@ export const defaultState: LogsState = {
   tableTime: {},
   searchStatus: SearchStatus.None,
   nextOlderUpperBound: undefined,
-  nextNewerLowerBound: undefined,
-  forwardChunkDurationMs: DEFAULT_FORWARD_CHUNK_DURATION_MS,
+  nextTailLowerBound: undefined,
+  tailChunkDurationMs: DEFAULT_TAIL_CHUNK_DURATION_MS,
   backwardChunkDurationMs: DEFAULT_BACKWARD_CHUNK_DURATION_MS,
   newRowsAdded: 0,
 }
@@ -80,7 +80,7 @@ const clearTableData = (state: LogsState) => {
       backward: defaultTableData,
     },
     nextOlderUpperBound: undefined,
-    nextNewerLowerBound: undefined,
+    nextTailLowerBound: undefined,
   }
 }
 
@@ -266,9 +266,9 @@ export default (state: LogsState = defaultState, action: Action) => {
     case ActionTypes.SetNextOlderUpperBound:
       // console.log('SetNextOlderUpperBound reducer', action.payload.upper)
       return {...state, nextOlderUpperBound: action.payload.upper}
-    case ActionTypes.SetNextNewerLowerBound:
-      // console.log('SetNextNewerLowerBound reducer', action.payload.lower)
-      return {...state, nextNewerLowerBound: action.payload.lower}
+    case ActionTypes.setNextTailLowerBound:
+      // console.log('setNextTailLowerBound reducer', action.payload.lower)
+      return {...state, nextTailLowerBound: action.payload.lower}
     case ActionTypes.AddFilter:
       return addFilter(state, action)
     case ActionTypes.RemoveFilter:

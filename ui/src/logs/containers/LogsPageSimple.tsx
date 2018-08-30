@@ -13,7 +13,7 @@ import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
-const LOGS_FETCH_INTERVAL = 5000
+const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
 const BACKWARD_VALUES_LIMIT = 100
 
 import {
@@ -30,7 +30,8 @@ import {
   removeFilter,
   changeFilter,
   fetchOlderLogsAsync,
-  fetchNewerLogsAsync,
+  fetchLogsTailAsync,
+  setNextTailLowerBound,
   getLogConfigAsync,
   updateLogConfigAsync,
   clearTableData,
@@ -117,7 +118,8 @@ interface Props {
     relative: number
   }
   fetchOlderLogsAsync: () => Promise<void>
-  fetchNewerLogsAsync: () => Promise<void>
+  fetchLogsTailAsync: () => Promise<void>
+  setNextTailLowerBound: typeof setNextTailLowerBound
   nextOlderUpperBound: string
   searchStatus: SearchStatus
   clearSearchData: (searchStatus: SearchStatus) => void
@@ -256,7 +258,7 @@ class LogsPageSimple extends Component<Props, State> {
               isTruncated={this.isTruncated}
               onTagSelection={this.handleTagSelection}
               fetchMore={this.handleFetchMore}
-              fetchNewer={this.fetchNewerLogs}
+              fetchNewer={() => console.log('nuke')}
               timeRange={timeRange}
               scrollToRow={this.tableScrollToRow}
               tableColumns={this.tableColumns}
@@ -293,36 +295,39 @@ class LogsPageSimple extends Component<Props, State> {
     this.setState({liveUpdating: false})
   }
 
-  private startOlderLogsFetching = () => {
-    this.fetchOlderLogs()
-  }
-
   private startNewerLogsFetchingInterval = () => {
-    // console.log('startNewerLogsFetchingInterval')
+    console.log('startNewerLogsFetchingInterval')
     if (this.interval) {
       clearInterval(this.interval)
     }
 
+    const now = moment()
+      .utc()
+      .valueOf()
+    this.props.setNextTailLowerBound(now)
+    console.log('handleLogsTailFetchingInterval now', now)
+
     this.interval = window.setInterval(
-      this.handleNewerLogsFetchingInterval,
-      LOGS_FETCH_INTERVAL
+      this.handleLogsTailFetchingInterval,
+      DEFAULT_TAIL_CHUNK_DURATION_MS
     )
     this.setState({liveUpdating: true})
   }
 
-  private handleNewerLogsFetchingInterval = async () => {
+  // only happens on page load or on search
+  private handleLogsTailFetchingInterval = async () => {
     switch (this.props.searchStatus) {
       case SearchStatus.Clearing:
       case SearchStatus.Paused:
       case SearchStatus.None:
         return
     }
-    // console.log('handleNewerLogsFetchingInterval')
-    await this.fetchNewerLogs()
+
+    await this.fetchLogsTail()
   }
 
-  private fetchNewerLogs = async () => {
-    await this.props.fetchNewerLogsAsync()
+  private fetchLogsTail = async () => {
+    await this.props.fetchLogsTailAsync()
   }
 
   private fetchOlderLogs = async () => {
@@ -366,7 +371,7 @@ class LogsPageSimple extends Component<Props, State> {
       backwardLogsLimit,
     })
 
-    this.startOlderLogsFetching()
+    this.fetchOlderLogs()
   }
 
   private get backwardLogsLimit() {
@@ -463,15 +468,15 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleScrollToTop = () => {
-    if (!this.state.liveUpdating) {
-      this.startNewerLogsFetchingInterval()
-    }
+    // if (!this.state.liveUpdating) {
+      // this.startNewerLogsFetchingInterval()
+    // }
   }
 
   private handleVerticalScroll = () => {
-    if (this.state.liveUpdating) {
-      clearInterval(this.interval)
-    }
+    // if (this.state.liveUpdating) {
+    //   clearInterval(this.interval)
+    // }
     this.setState({liveUpdating: false, hasScrolled: true})
   }
 
@@ -720,9 +725,15 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchNewDataset() {
+    console.log('fetchNewDataset')
     this.setState({backwardLogsLimit: BACKWARD_VALUES_LIMIT})
-    this.startNewerLogsFetchingInterval()
-    this.startOlderLogsFetching()
+
+    const shouldLiveUpdate = this.props.tableTime.relative === 0
+    if (shouldLiveUpdate) {
+      this.startNewerLogsFetchingInterval()
+    }
+
+    this.fetchOlderLogs()
   }
 
   private handleToggleOverlay = (): void => {
@@ -864,7 +875,8 @@ const mapDispatchToProps = {
   removeFilter,
   changeFilter,
   fetchOlderLogsAsync,
-  fetchNewerLogsAsync,
+  fetchLogsTailAsync,
+  setNextTailLowerBound,
   setTableCustomTime: setTableCustomTimeAsync,
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,

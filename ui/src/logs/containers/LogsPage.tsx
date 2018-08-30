@@ -28,7 +28,7 @@ import {
   removeFilter,
   changeFilter,
   fetchOlderLogsAsync,
-  fetchNewerLogsAsync,
+  fetchLogsTailAsync,
   getLogConfigAsync,
   updateLogConfigAsync,
 } from 'src/logs/actions'
@@ -88,7 +88,7 @@ interface Props {
   setTableRelativeTime: (time: number) => void
   setTableCustomTime: (time: string) => void
   fetchOlderLogsAsync: (queryTimeEnd: string) => Promise<void>
-  fetchNewerLogsAsync: (queryTimeEnd: string) => Promise<void>
+  fetchLogsTailAsync: (queryTimeEnd: string) => Promise<void>
   addFilter: (filter: Filter) => void
   removeFilter: (id: string) => void
   changeFilter: (id: string, operator: string, value: string) => void
@@ -257,7 +257,7 @@ class LogsPage extends Component<Props, State> {
 
   private fetchNewer = (time: string) => {
     this.loadingNewer = true
-    this.props.fetchNewerLogsAsync(time)
+    this.props.fetchLogsTailAsync(time)
   }
 
   private get tableScrollToRow() {
@@ -759,7 +759,7 @@ const mapDispatchToProps = {
   removeFilter,
   changeFilter,
   fetchOlderLogsAsync,
-  fetchNewerLogsAsync,
+  fetchLogsTailAsync,
   setTableCustomTime: setTableCustomTimeAsync,
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,

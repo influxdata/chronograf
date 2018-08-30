@@ -56,9 +56,9 @@ export interface LogsState {
   }
   newRowsAdded: number
   searchStatus: SearchStatus
-  nextNewerLowerBound: number
+  nextTailLowerBound: number
   nextOlderUpperBound: number
-  forwardChunkDurationMs: number
+  tailChunkDurationMs: number
   backwardChunkDurationMs: number
 }
 
