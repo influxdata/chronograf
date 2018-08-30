@@ -30,7 +30,10 @@ import {errorThrown} from 'src/shared/actions/errors'
 import {setAutoRefresh} from 'src/shared/actions/app'
 import {getDashboardsAsync, addDashboardCellAsync} from 'src/dashboards/actions'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
-import {loadDE as loadDEAction} from 'src/data_explorer/actions/queries'
+import {
+  loadDE as loadDEAction,
+  updateSourceLink as updateSourceLinkAction,
+} from 'src/data_explorer/actions/queries'
 import {
   queryConfigActions as queryConfigModifiers,
   updateQueryDrafts as updateQueryDraftsAction,
@@ -72,6 +75,7 @@ interface Props {
   sources: Source[]
   services: Service[]
   queryConfigs: QueryConfig[]
+  updateSourceLink: typeof updateSourceLinkAction
   queryConfigActions: typeof queryConfigModifiers
   autoRefresh: number
   handleChooseAutoRefresh: () => void
@@ -98,6 +102,7 @@ interface Props {
   updateScript: typeof updateScriptAction
   fetchServicesAsync: typeof fetchAllFluxServicesAsync
   notify: typeof notifyAction
+  sourceLink: string
 }
 
 interface State {
@@ -216,8 +221,18 @@ export class DataExplorer extends PureComponent<Props, State> {
       updateScript,
       fluxLinks,
       notify,
+      updateSourceLink,
+      sourceLink,
     } = this.props
     const {isStaticLegend} = this.state
+
+    let service: Service = null
+
+    if (sourceLink.indexOf('services') !== -1) {
+      service = services.find(s => {
+        return s.links.self === sourceLink
+      })
+    }
 
     return (
       <>
@@ -225,6 +240,8 @@ export class DataExplorer extends PureComponent<Props, State> {
         {this.sendToDashboardOverlay}
         <div className="deceo--page">
           <TimeMachine
+            service={service}
+            updateSourceLink={updateSourceLink}
             queryDrafts={queryDrafts}
             editQueryStatus={editQueryStatus}
             templates={this.templates}
@@ -415,7 +432,7 @@ const mapStateToProps = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer: {queryDrafts, timeRange, queryStatus, script},
+    dataExplorer: {queryDrafts, timeRange, queryStatus, script, sourceLink},
     dashboardUI: {dashboards},
     sources,
     services,
@@ -432,6 +449,7 @@ const mapStateToProps = state => {
     services,
     queryStatus,
     script,
+    sourceLink,
   }
 }
 
@@ -452,6 +470,7 @@ const mapDispatchToProps = dispatch => {
     updateScript: bindActionCreators(updateScriptAction, dispatch),
     fetchServicesAsync: bindActionCreators(fetchAllFluxServicesAsync, dispatch),
     notify: bindActionCreators(notifyAction, dispatch),
+    updateSourceLink: bindActionCreators(updateSourceLinkAction, dispatch),
   }
 }
 

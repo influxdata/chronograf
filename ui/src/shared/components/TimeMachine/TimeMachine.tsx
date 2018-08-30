@@ -36,6 +36,7 @@ import {
   fluxResponseTruncatedError,
 } from 'src/shared/copy/notifications'
 import {getSuggestions, getAST, getTimeSeries} from 'src/flux/apis'
+import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
 
 // Constants
 import {HANDLE_HORIZONTAL} from 'src/shared/constants'
@@ -95,6 +96,7 @@ interface VisualizationOptions {
 interface Props {
   fluxLinks: Links
   source: Source
+  service: Service
   script: string
   sources: Source[]
   isInCEO: boolean
@@ -104,6 +106,7 @@ interface Props {
   isStaticLegend: boolean
   queryDrafts: CellQuery[]
   onResetFocus: () => void
+  updateSourceLink?: typeof updateSourceLinkAction
   updateScript: (script: string, stateToUpdate: QueryUpdateState) => void
   queryConfigActions: QueryConfigActions
   notify: NotificationAction
@@ -348,7 +351,12 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get service() {
+    const {service} = this.props
     const {selectedService} = this.state
+
+    if (service) {
+      return service
+    }
 
     return selectedService
   }
@@ -410,8 +418,9 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get isFluxSource(): boolean {
     // TODO: Update once flux is no longer a separate service
+    const {service} = this.props
     const {selectedService} = this.state
-    if (selectedService) {
+    if (selectedService || service) {
       return true
     }
     return false
@@ -593,7 +602,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
-  private updateQueryDrafts(selectedSource: Source) {
+  private updateQueryDraftsSource(selectedSource: Source) {
     const {queryDrafts, updateQueryDrafts} = this.props
 
     const queries: CellQuery[] = queryDrafts.map(q => {
@@ -612,16 +621,21 @@ class TimeMachine extends PureComponent<Props, State> {
     selectedService: Service,
     selectedSource: Source
   ): void => {
+    const {updateSourceLink} = this.props
     const useDynamicSource = false
 
-    this.updateQueryDrafts(selectedSource)
+    if (updateSourceLink) {
+      updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
+    }
+
+    this.updateQueryDraftsSource(selectedSource)
     this.setState({selectedService, selectedSource, useDynamicSource})
   }
 
   private handleSelectDynamicSource = (): void => {
     const useDynamicSource = true
 
-    this.updateQueryDrafts(null)
+    this.updateQueryDraftsSource(null)
     this.setState({useDynamicSource})
   }
 

@@ -6,6 +6,7 @@ export interface DEInitialState {
   timeRange: TimeRange
   queryStatus: QueryStatus
   script: string
+  sourceLink: string
 }
 
 export interface State {
@@ -18,6 +19,7 @@ export enum ActionType {
   UpdateEditorTimeRange = 'DE_UPDATE_EDITOR_TIME_RANGE',
   UpdateQueryStatus = 'DE_UPDATE_QUERY_STATUS',
   UpdateScript = 'DE_UPDATE_SCRIPT',
+  UpdateSourceLink = 'DE_UPDATE_SOURCE_LINK',
 }
 
 export type Action =
@@ -26,6 +28,14 @@ export type Action =
   | UpdateQueryDraftsAction
   | UpdateQueryStatusAction
   | UpdateScriptAction
+  | UpdateSourceLinkAction
+
+export interface UpdateSourceLinkAction {
+  type: ActionType.UpdateSourceLink
+  payload: {
+    sourceLink: string
+  }
+}
 
 export interface LoadDEAction {
   type: ActionType.LoadDE
@@ -72,5 +82,14 @@ export const loadDE = (
   payload: {
     queries,
     timeRange,
+  },
+})
+
+export const updateSourceLink = (
+  sourceLink: string
+): UpdateSourceLinkAction => ({
+  type: ActionType.UpdateSourceLink,
+  payload: {
+    sourceLink,
   },
 })

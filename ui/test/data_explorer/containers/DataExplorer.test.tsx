@@ -51,6 +51,13 @@ const setup = () => {
     queryDrafts: [],
     editQueryStatus: jest.fn(() => Promise.resolve()),
     queryStatus: null,
+    fluxLinks: null,
+    script: '',
+    updateScript: jest.fn(),
+    fetchServicesAsync: jest.fn(),
+    notify: jest.fn(),
+    sourceLink: '',
+    updateSourceLink: jest.fn(),
   }
 
   const wrapper = shallow(<DataExplorer {...props} />)

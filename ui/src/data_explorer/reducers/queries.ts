@@ -23,6 +23,7 @@ export const initialState: DEInitialState = {
   timeRange: {lower, upper},
   queryStatus: {queryID: null, status: null},
   script: editor.DEFAULT_SCRIPT,
+  sourceLink: '',
 }
 
 export default (state = initialState, action: Action): DEInitialState => {
@@ -78,6 +79,12 @@ export default (state = initialState, action: Action): DEInitialState => {
       const {script} = action.payload
 
       return {...state, script}
+    }
+
+    case ActionType.UpdateSourceLink: {
+      const {sourceLink} = action.payload
+
+      return {...state, sourceLink}
     }
   }
 
