@@ -5,6 +5,8 @@ import {
   notifyLoadLocalSettingsFailed,
 } from 'src/shared/copy/notifications'
 
+import {editor} from 'src/flux/constants'
+
 import {LocalStorage} from 'src/types/localStorage'
 
 const VERSION = process.env.npm_package_version
@@ -83,6 +85,7 @@ export const saveToLocalStorage = ({
               timeRange: dataExplorer.timeRange || {},
               sourceLink: dataExplorer.sourceLink || '',
               queryStatus: dataExplorer.queryStatus || {},
+              script: dataExplorer.script || editor.DEFAULT_SCRIPT,
             },
             script,
             logs: {
