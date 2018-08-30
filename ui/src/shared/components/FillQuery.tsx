@@ -27,6 +27,7 @@ interface State {
   selected: Item
   currentNumberValue: string
   resetNumberValue: string
+  value: string
 }
 
 @ErrorHandling
@@ -35,6 +36,28 @@ class FillQuery extends PureComponent<Props, State> {
     size: 'sm',
     theme: 'blue',
     value: NULL_STRING,
+  }
+
+  public static getDerivedStateFromProps(props: Props, state: State) {
+    if (state.value === props.value) {
+      return false
+    }
+
+    const isNumberValue: boolean = !isNaN(Number(props.value))
+
+    if (isNumberValue) {
+      return {
+        selected: queryFills.find(fill => fill.type === NUMBER),
+        currentNumberValue: props.value,
+        resetNumberValue: props.value,
+        value: props.value,
+      }
+    }
+
+    return {
+      selected: queryFills.find(fill => fill.type === props.value),
+      value: props.value,
+    }
   }
 
   private numberInput: HTMLElement
@@ -49,11 +72,13 @@ class FillQuery extends PureComponent<Props, State> {
           selected: queryFills.find(fill => fill.type === NUMBER),
           currentNumberValue: props.value,
           resetNumberValue: props.value,
+          value: props.value,
         }
       : {
           selected: queryFills.find(fill => fill.type === props.value),
           currentNumberValue: '0',
           resetNumberValue: '0',
+          value: props.value,
         }
   }
 
