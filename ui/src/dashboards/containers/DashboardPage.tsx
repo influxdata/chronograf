@@ -29,6 +29,7 @@ import {
   deleteQueryAsync,
   updateQueryDrafts as updateQueryDraftsAction,
   updateEditorTimeRange as updateEditorTimeRangeAction,
+  updateScript as updateScriptAction,
 } from 'src/shared/actions/queries'
 
 import * as appActions from 'src/shared/actions/app'
@@ -38,7 +39,6 @@ import {
   fetchAllFluxServicesAsync,
   FetchAllFluxServicesAsync,
 } from 'src/shared/actions/services'
-import {updateScript as updateScriptAction} from 'src/flux/actions'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'

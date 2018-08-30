@@ -10,6 +10,7 @@ import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 
 // constants
 import {timeRanges} from 'src/shared/data/timeRanges'
+import {editor} from 'src/flux/constants'
 
 // types
 import {DEInitialState} from 'src/data_explorer/actions/queries'
@@ -21,6 +22,7 @@ export const initialState: DEInitialState = {
   queryDrafts: null,
   timeRange: {lower, upper},
   queryStatus: {queryID: null, status: null},
+  script: editor.DEFAULT_SCRIPT,
 }
 
 export default (state = initialState, action: Action): DEInitialState => {
@@ -70,6 +72,12 @@ export default (state = initialState, action: Action): DEInitialState => {
       const {queryID, status} = action.payload
       const queryStatus = {queryID, status}
       return {...state, queryStatus}
+    }
+
+    case ActionType.UpdateScript: {
+      const {script} = action.payload
+
+      return {...state, script}
     }
   }
 

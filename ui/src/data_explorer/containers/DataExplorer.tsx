@@ -35,10 +35,13 @@ import {
   queryConfigActions as queryConfigModifiers,
   updateQueryDrafts as updateQueryDraftsAction,
   updateQueryStatus as editQueryStatusAction,
+  updateScript as updateScriptAction,
   addQueryAsync,
   deleteQueryAsync,
   updateEditorTimeRange,
 } from 'src/shared/actions/queries'
+import {fetchAllFluxServicesAsync} from 'src/shared/actions/services'
+import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 // Constants
 import {
@@ -62,6 +65,7 @@ import {
   TemplateValueType,
 } from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {Links} from 'src/types/flux'
 
 interface Props {
   source: Source
@@ -89,6 +93,11 @@ interface Props {
   queryDrafts: CellQuery[]
   editQueryStatus: typeof editQueryStatusAction
   queryStatus: QueryStatus
+  fluxLinks: Links
+  script: string
+  updateScript: typeof updateScriptAction
+  fetchServicesAsync: typeof fetchAllFluxServicesAsync
+  notify: typeof notifyAction
 }
 
 interface State {
@@ -159,6 +168,8 @@ export class DataExplorer extends PureComponent<Props, State> {
     if (!dashboards.length) {
       await handleGetDashboards()
     }
+
+    this.fetchFluxServices()
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -201,6 +212,10 @@ export class DataExplorer extends PureComponent<Props, State> {
       addQuery,
       deleteQuery,
       queryStatus,
+      script,
+      updateScript,
+      fluxLinks,
+      notify,
     } = this.props
     const {isStaticLegend} = this.state
 
@@ -229,6 +244,10 @@ export class DataExplorer extends PureComponent<Props, State> {
             updateEditorTimeRange={this.handleChooseTimeRange}
             manualRefresh={manualRefresh}
             queryStatus={queryStatus}
+            script={script}
+            updateScript={updateScript}
+            fluxLinks={fluxLinks}
+            notify={notify}
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
@@ -350,6 +369,15 @@ export class DataExplorer extends PureComponent<Props, State> {
     this.props.setTimeRange(timeRange)
   }
 
+  private async fetchFluxServices() {
+    const {fetchServicesAsync, sources} = this.props
+    if (!sources.length) {
+      return
+    }
+
+    await fetchServicesAsync(sources)
+  }
+
   private get selectedDatabase(): string {
     return _.get(this.props.queryConfigs, ['0', 'database'], null)
   }
@@ -387,13 +415,15 @@ const mapStateToProps = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer: {queryDrafts, timeRange, queryStatus},
+    dataExplorer: {queryDrafts, timeRange, queryStatus, script},
     dashboardUI: {dashboards},
     sources,
     services,
+    links,
   } = state
 
   return {
+    fluxLinks: links.flux,
     autoRefresh,
     queryDrafts,
     timeRange,
@@ -401,6 +431,7 @@ const mapStateToProps = state => {
     sources,
     services,
     queryStatus,
+    script,
   }
 }
 
@@ -418,6 +449,9 @@ const mapDispatchToProps = dispatch => {
     addQuery: bindActionCreators(addQueryAsync, dispatch),
     deleteQuery: bindActionCreators(deleteQueryAsync, dispatch),
     editQueryStatus: bindActionCreators(editQueryStatusAction, dispatch),
+    updateScript: bindActionCreators(updateScriptAction, dispatch),
+    fetchServicesAsync: bindActionCreators(fetchAllFluxServicesAsync, dispatch),
+    notify: bindActionCreators(notifyAction, dispatch),
   }
 }
 

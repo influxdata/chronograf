@@ -68,7 +68,6 @@ import {
   Func,
   ScriptStatus,
 } from 'src/types/flux'
-import {UpdateScript} from 'src/flux/actions'
 import {
   Axes,
   CellType,
@@ -105,8 +104,7 @@ interface Props {
   isStaticLegend: boolean
   queryDrafts: CellQuery[]
   onResetFocus: () => void
-  updateScript: UpdateScript
-
+  updateScript: (script: string, stateToUpdate: QueryUpdateState) => void
   queryConfigActions: QueryConfigActions
   notify: NotificationAction
   editQueryStatus: (
@@ -691,11 +689,15 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
+  private updateScript(script: string) {
+    this.props.updateScript(script, this.stateToUpdate)
+  }
+
   private getASTResponse = async (script: string, update: boolean = true) => {
     const {fluxLinks} = this.props
 
     if (!script) {
-      this.props.updateScript(script)
+      this.updateScript(script)
       return this.setState({ast: emptyAST, body: []})
     }
 
@@ -703,7 +705,7 @@ class TimeMachine extends PureComponent<Props, State> {
       const ast = await getAST({url: fluxLinks.ast, body: script})
 
       if (update) {
-        this.props.updateScript(script)
+        this.updateScript(script)
       }
 
       const body = bodyNodes(ast, this.state.suggestions)
@@ -842,7 +844,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private handleChangeScript = (script: string): void => {
     this.debouncedASTResponse(script)
-    this.props.updateScript(script)
+    this.updateScript(script)
   }
 
   private handleAddNode = (

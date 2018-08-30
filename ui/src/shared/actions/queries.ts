@@ -44,6 +44,7 @@ import {
   State as DEState,
   ActionType as DEActionType,
 } from 'src/data_explorer/actions/queries'
+import {ActionTypes as FluxActionType} from 'src/flux/actions'
 
 type State = CEOState & DEState
 type GetState = () => State
@@ -64,10 +65,13 @@ interface UpdateEditorTimeRangeAction {
 }
 
 interface UpdateQueryStatusAction {
-  type:
-    | DashboardActionType.EditCellQueryStatus
-    | DEActionType.UpdateEditorTimeRange
+  type: DashboardActionType.EditCellQueryStatus | DEActionType.UpdateQueryStatus
   payload: {queryID: string; status: Status}
+}
+
+interface UpdateScriptAction {
+  type: FluxActionType.UpdateScript | DEActionType.UpdateScript
+  payload: {script: string}
 }
 
 export const updateQueryDrafts = (
@@ -119,6 +123,23 @@ export const updateQueryStatus = (
       status,
     },
   } as UpdateQueryStatusAction
+}
+
+export const updateScript = (
+  script: string,
+  stateToUpdate: QueryUpdateState
+) => {
+  const type =
+    stateToUpdate === QueryUpdateState.CEO
+      ? FluxActionType.UpdateScript
+      : DEActionType.UpdateScript
+
+  return {
+    type,
+    payload: {
+      script,
+    },
+  } as UpdateScriptAction
 }
 
 export const toggleFieldAsync = (
