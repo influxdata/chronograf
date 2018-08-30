@@ -96,7 +96,7 @@ interface VisualizationOptions {
 interface Props {
   fluxLinks: Links
   source: Source
-  service: Service
+  service?: Service
   script: string
   sources: Source[]
   isInCEO: boolean
