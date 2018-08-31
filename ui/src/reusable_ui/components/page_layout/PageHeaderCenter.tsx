@@ -2,17 +2,17 @@
 import React, {Component, CSSProperties} from 'react'
 
 // Constants
-const DEFAULT_WIDTH = 200
+import {DEFAULT_PAGE_HEADER_CENTER_WIDTH} from 'src/reusable_ui/components/page_layout/constants'
 const MIN_CHILD_COUNT = 1
 
 interface Props {
   children: JSX.Element[] | JSX.Element | string | number
-  width?: number
+  widthPixels?: number
 }
 
 class PageHeaderCenter extends Component<Props> {
   public static defaultProps: Partial<Props> = {
-    width: DEFAULT_WIDTH,
+    widthPixels: DEFAULT_PAGE_HEADER_CENTER_WIDTH,
   }
 
   public render() {
@@ -38,10 +38,10 @@ class PageHeaderCenter extends Component<Props> {
   }
 
   private get styles(): CSSProperties {
-    const {width} = this.props
+    const {widthPixels} = this.props
 
     return {
-      flex: `1 0 ${width}px`,
+      flex: `1 0 ${widthPixels}px`,
     }
   }
 }

@@ -11,6 +11,9 @@ interface Props {
   children: JSX.Element[] | JSX.Element
   fullWidth?: boolean
   scrollable?: boolean
+  inPresentationMode?: boolean
+  setScrollTop?: () => void
+  className?: string
 }
 
 @ErrorHandling
@@ -18,14 +21,15 @@ class PageContents extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     fullWidth: false,
     scrollable: true,
+    inPresentationMode: false,
   }
 
   public render() {
-    const {scrollable} = this.props
+    const {scrollable, setScrollTop} = this.props
 
     if (scrollable) {
       return (
-        <FancyScrollbar className={this.className}>
+        <FancyScrollbar className={this.className} setScrollTop={setScrollTop}>
           {this.children}
         </FancyScrollbar>
       )
@@ -50,9 +54,13 @@ class PageContents extends Component<Props> {
   }
 
   private get className(): string {
-    const {fullWidth} = this.props
+    const {fullWidth, inPresentationMode, className} = this.props
 
-    return classnames('page-contents', {'full-width': fullWidth})
+    return classnames('page-contents', {
+      'full-width': fullWidth,
+      'presentation-mode': inPresentationMode,
+      [`${className}`]: className,
+    })
   }
 }
 

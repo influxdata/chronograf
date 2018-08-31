@@ -7,12 +7,12 @@ const MIN_CHILD_COUNT = 1
 
 interface Props {
   children: JSX.Element[] | JSX.Element | string | number
-  offset?: number
+  offsetPixels?: number
 }
 
 class PageHeaderLeft extends Component<Props> {
   public static defaultProps: Partial<Props> = {
-    offset: DEFAULT_OFFSET,
+    offsetPixels: DEFAULT_OFFSET,
   }
 
   public render() {
@@ -38,16 +38,16 @@ class PageHeaderLeft extends Component<Props> {
   }
 
   private get styles(): CSSProperties {
-    const {offset} = this.props
+    const {offsetPixels} = this.props
 
-    if (offset === DEFAULT_OFFSET) {
+    if (offsetPixels === DEFAULT_OFFSET) {
       return {
-        flex: `1 0 ${offset}`,
+        flex: `1 0 ${offsetPixels}`,
       }
     }
 
     return {
-      flex: `1 0 calc(100% - ${offset}px)`,
+      flex: `1 0 calc(100% - ${offsetPixels}px)`,
     }
   }
 }
