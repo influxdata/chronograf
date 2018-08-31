@@ -107,7 +107,7 @@ export const instantiate = (
     queries: replaceDbRp(c.queries, source),
   }))
 
-  const dashboard = {
+  const dashboard: Partial<Dashboard> = {
     name: protoboard.meta.name,
     cells,
     templates,
