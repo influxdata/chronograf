@@ -19,6 +19,7 @@
 
 ### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
+1.  [#4330](https://github.com/influxdata/chronograf/pull/4330): Position cloned cells adjacent to target cell
 
 ### Bug Fixes
 
