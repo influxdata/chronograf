@@ -2,7 +2,9 @@ package kapacitor
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/id"
@@ -15,6 +17,13 @@ const (
 
 	// FetchRate is the rate Paginating Kapacitor Clients will consume responses
 	FetchRate = 100
+)
+
+var (
+	skipVerifyTransport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	defaultTransport = &http.Transport{}
 )
 
 // Client communicates to kapacitor
@@ -401,10 +410,19 @@ func NewKapaClient(url, username, password string, insecureSkipVerify bool) (Kap
 		}
 	}
 
+	var transport http.RoundTripper
+
+	if insecureSkipVerify {
+		transport = skipVerifyTransport
+	} else {
+		transport = defaultTransport
+	}
+
 	clnt, err := client.New(client.Config{
 		URL:                url,
 		Credentials:        creds,
 		InsecureSkipVerify: insecureSkipVerify,
+		Transport:          transport,
 	})
 
 	if err != nil {
