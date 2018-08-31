@@ -5,7 +5,7 @@ import download from 'src/external/download'
 import _ from 'lodash'
 
 import DashboardsContents from 'src/dashboards/components/DashboardsPageContents'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 import {getDeep} from 'src/utils/wrappers'
 
 import {createDashboard} from 'src/dashboards/apis'
@@ -59,21 +59,23 @@ class DashboardsPage extends PureComponent<Props> {
     const dashboardLink = `/sources/${this.props.source.id}`
 
     return (
-      <div className="page">
-        <PageHeader titleText="Dashboards" sourceIndicator={true} />
-        <DashboardsContents
-          notify={notify}
-          source={source}
-          sources={sources}
-          dashboards={dashboards}
-          dashboardLink={dashboardLink}
-          onDeleteDashboard={this.handleDeleteDashboard}
-          onCreateDashboard={this.handleCreateDashboard}
-          onCloneDashboard={this.handleCloneDashboard}
-          onExportDashboard={this.handleExportDashboard}
-          onImportDashboard={this.handleImportDashboard}
-        />
-      </div>
+      <Page>
+        <Page.Header titleText="Dashboards" sourceIndicator={true} />
+        <Page.Contents>
+          <DashboardsContents
+            notify={notify}
+            source={source}
+            sources={sources}
+            dashboards={dashboards}
+            dashboardLink={dashboardLink}
+            onDeleteDashboard={this.handleDeleteDashboard}
+            onCreateDashboard={this.handleCreateDashboard}
+            onCloneDashboard={this.handleCloneDashboard}
+            onExportDashboard={this.handleExportDashboard}
+            onImportDashboard={this.handleImportDashboard}
+          />
+        </Page.Contents>
+      </Page>
     )
   }
 
