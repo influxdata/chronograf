@@ -1,6 +1,3 @@
-// Libraries
-import _ from 'lodash'
-
 // APIs
 import {getQueryConfigAndStatus} from 'src/shared/apis'
 
@@ -20,11 +17,9 @@ import {
 } from 'src/shared/constants'
 const MAX_COLUMNS = 12
 
-import {replace} from '../../shared/apis/query'
 // Types
 import {Cell, CellType, Dashboard, NewDefaultCell} from 'src/types/dashboards'
 import {QueryConfig, DurationRange} from 'src/types/queries'
-import {mapCells} from './importDashboardMappings'
 import {Template} from 'src/types'
 
 const getMostCommonValue = (values: number[]): number => {
