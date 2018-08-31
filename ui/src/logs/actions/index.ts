@@ -602,35 +602,35 @@ const setHistogramData = (data): SetHistogramData => ({
   payload: {data},
 })
 
-// export const executeHistogramQueryAsync = () => async (
-//   dispatch,
-//   getState: GetState
-// ): Promise<void> => {
-//   const state = getState()
+export const executeHistogramQueryAsync = () => async (
+  dispatch,
+  getState: GetState
+): Promise<void> => {
+  const state = getState()
 
-//   const queryConfig = getHistogramQueryConfig(state)
-//   const timeRange = getTimeRange(state)
-//   const namespace = getNamespace(state)
-//   const proxyLink = getProxyLink(state)
-//   const searchTerm = getSearchTerm(state)
-//   const filters = getFilters(state)
+  const queryConfig = getHistogramQueryConfig(state)
+  const timeRange = getTimeRange(state)
+  const namespace = getNamespace(state)
+  const proxyLink = getProxyLink(state)
+  const searchTerm = getSearchTerm(state)
+  const filters = getFilters(state)
 
-//   if (!_.every([queryConfig, timeRange, namespace, proxyLink])) {
-//     return
-//   }
+  if (!_.every([queryConfig, timeRange, namespace, proxyLink])) {
+    return
+  }
 
-//   try {
-//     dispatch(incrementQueryCount())
+  try {
+    dispatch(incrementQueryCount())
 
-//     const query = buildLogQuery(timeRange, queryConfig, filters, searchTerm)
-//     const response = await executeQueryAsync(proxyLink, namespace, query)
-//     const data = parseHistogramQueryResponse(response)
+    const query = buildLogQuery(timeRange, queryConfig, filters, searchTerm)
+    const response = await executeQueryAsync(proxyLink, namespace, query)
+    const data = parseHistogramQueryResponse(response)
 
-//     dispatch(setHistogramData(data))
-//   } finally {
-//     dispatch(decrementQueryCount())
-//   }
-// }
+    dispatch(setHistogramData(data))
+  } finally {
+    dispatch(decrementQueryCount())
+  }
+}
 
 // export const executeTableQueryAsync = () => async (dispatch): Promise<void> => {
 //   await Promise.all([
@@ -659,35 +659,35 @@ export const incrementQueryCount = () => ({
 //   }
 // }
 
-// export const setHistogramQueryConfigAsync = () => async (
-//   dispatch,
-//   getState: GetState
-// ): Promise<void> => {
-//   const state = getState()
-//   const namespace = getDeep<Namespace | null>(
-//     state,
-//     'logs.currentNamespace',
-//     null
-//   )
-//   const timeRange = getDeep<TimeRange | null>(state, 'logs.timeRange', null)
+export const setHistogramQueryConfigAsync = () => async (
+  dispatch,
+  getState: GetState
+): Promise<void> => {
+  const state = getState()
+  const namespace = getDeep<Namespace | null>(
+    state,
+    'logs.currentNamespace',
+    null
+  )
+  const timeRange = getDeep<TimeRange | null>(state, 'logs.timeRange', null)
 
-//   if (timeRange && namespace) {
-//     const queryTimeRange = {
-//       upper: timeRange.upper,
-//       lower: timeRange.lower,
-//       seconds: timeRange.seconds,
-//     }
+  if (timeRange && namespace) {
+    const queryTimeRange = {
+      upper: timeRange.upper,
+      lower: timeRange.lower,
+      seconds: timeRange.seconds,
+    }
 
-//     const queryConfig = buildHistogramQueryConfig(namespace, queryTimeRange)
+    const queryConfig = buildHistogramQueryConfig(namespace, queryTimeRange)
 
-//     dispatch({
-//       type: ActionTypes.SetHistogramQueryConfig,
-//       payload: {queryConfig},
-//     })
+    dispatch({
+      type: ActionTypes.SetHistogramQueryConfig,
+      payload: {queryConfig},
+    })
 
-//     dispatch(executeHistogramQueryAsync())
-//   }
-// }
+    dispatch(executeHistogramQueryAsync())
+  }
+}
 
 export const setTableQueryConfig = (queryConfig: QueryConfig) => ({
   type: ActionTypes.SetTableQueryConfig,
@@ -806,14 +806,8 @@ export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
     .add(newerChunkDurationMs, 'milliseconds')
     .toISOString()
 
-  console.log(
-    'fetchNewerChunkAsync upper',
-    upper
-  )
-  console.log(
-    'fetchNewerChunkAsync lower',
-    lower
-  )
+  console.log('fetchNewerChunkAsync upper', upper)
+  console.log('fetchNewerChunkAsync lower', lower)
 
   dispatch(
     setNextNewerUpperBound(
@@ -1079,7 +1073,7 @@ export const setNamespaceAsync = (namespace: Namespace) => async (
     payload: {namespace},
   })
 
-  // await dispatch(setHistogramQueryConfigAsync())
+  await dispatch(setHistogramQueryConfigAsync())
   await dispatch(setTableQueryConfigAsync())
 }
 
@@ -1093,7 +1087,7 @@ export const setNamespaces = (
 })
 
 export const setTimeRangeAsync = () => async (dispatch): Promise<void> => {
-  // dispatch(setHistogramQueryConfigAsync())
+  dispatch(setHistogramQueryConfigAsync())
   dispatch(setTableQueryConfigAsync())
 }
 

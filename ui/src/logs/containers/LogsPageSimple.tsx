@@ -42,6 +42,8 @@ import {
   clearNextTimeBounds,
   clearSearchData,
   setSearchStatus,
+  setHistogramQueryConfigAsync,
+  executeHistogramQueryAsync,
 } from 'src/logs/actions'
 import {getSourcesAsync} from 'src/shared/actions/sources'
 import LogsHeader from 'src/logs/components/LogsHeader'
@@ -127,6 +129,7 @@ interface Props {
   setNextTailLowerBound: typeof setNextTailLowerBound
   setNextNewerUpperBound: typeof setNextNewerUpperBound
   setNextOlderUpperBound: typeof setNextOlderUpperBound
+  executeHistogramQueryAsync: typeof executeHistogramQueryAsync
   nextOlderUpperBound: string
   searchStatus: SearchStatus
   clearSearchData: (searchStatus: SearchStatus) => void
@@ -180,10 +183,13 @@ class LogsPageSimple extends Component<Props, State> {
     // if (!this.props.sources || this.props.sources.length === 0) {
     //   return router.push(`/sources/new?redirectPath=${location.pathname}`)
     // }
-    // if (this.liveUpdatingStatus === false && this.interval) {
-    //   clearInterval(this.interval)
-    //   this.interval = null
-    // }
+    if (
+      this.isLiveUpdating === false ||
+      (this.isClearingSearch && this.interval)
+    ) {
+      clearInterval(this.interval)
+      this.interval = null
+    }
     const isSearchStatusUpdated =
       prevProps.searchStatus !== this.props.searchStatus
     const {searchStatus, tableInfiniteData} = this.props
@@ -199,11 +205,9 @@ class LogsPageSimple extends Component<Props, State> {
     }
 
     if (isSearchStatusUpdated) {
-      const isReady = prevProps.searchStatus === SearchStatus.Cleared
+      const isCleared = prevProps.searchStatus === SearchStatus.Cleared
 
-      if (this.isClearingSearch) {
-        clearInterval(this.interval)
-      } else if (isReady) {
+      if (isCleared) {
         this.fetchNewDataset()
       }
     }
@@ -220,6 +224,7 @@ class LogsPageSimple extends Component<Props, State> {
     if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
       this.startLogsTailFetchingInterval()
     }
+    await this.props.executeHistogramQueryAsync()
   }
 
   public componentWillUnmount() {
@@ -241,13 +246,13 @@ class LogsPageSimple extends Component<Props, State> {
         <div className="page">
           {this.header}
           <div className="page-contents logs-viewer">
-            {/* <QueryResults
+            <QueryResults
               count={this.histogramTotal}
               queryCount={queryCount}
               searchStatus={searchStatus}
               nextOlderUpperBound={nextOlderUpperBound}
-            /> */}
-            {/* <LogsGraphContainer>{this.chart}</LogsGraphContainer> */}
+            />
+            <LogsGraphContainer>{this.chart}</LogsGraphContainer>
             <SearchBar onSearch={this.handleSubmitSearch} />
             <FilterBar
               filters={filters || []}
@@ -330,7 +335,7 @@ class LogsPageSimple extends Component<Props, State> {
     }
 
     console.log('handleTailFetchingInterval')
-
+    this.props.executeHistogramQueryAsync()
     await this.fetchLogsTail()
   }
 
@@ -776,22 +781,22 @@ class LogsPageSimple extends Component<Props, State> {
       timeOption: null,
     })
 
-    const timeBounds: TimeBounds = {
+    let timeBounds: TimeBounds = {
       lower: `now() - ${windowOption}`,
       upper: null,
     }
 
-    // if (timeOption !== 'now') {
-    //   const extentTimes = extentBy(this.props.histogramData, d => d.time).map(
-    //     d => d.time
-    //   )
+    if (timeOption !== 'now') {
+      const extentTimes = extentBy(this.props.histogramData, d => d.time).map(
+        d => d.time
+      )
 
-    //   timeBounds = computeTimeBounds(extentTimes, timeOption, seconds)
-    // }
+      timeBounds = computeTimeBounds(extentTimes, timeOption, seconds)
+    }
 
     await this.props.setTimeBounds(timeBounds)
 
-    // this.props.setTimeRangeAsync(this.props.timeRange)
+    this.props.setTimeRangeAsync(this.props.timeRange)
 
     this.updateTableData(SearchStatus.UpdatingTimeBounds)
   }
@@ -961,7 +966,7 @@ const mapDispatchToProps = {
   setTimeWindow,
   setTimeMarker,
   setNamespaceAsync,
-  // executeQueriesAsync,
+  executeHistogramQueryAsync,
   clearSearchData,
   setSearchStatus,
   addFilter,
