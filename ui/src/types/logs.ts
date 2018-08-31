@@ -12,7 +12,6 @@ import {TimeRange} from 'src/types/logs'
 
 export enum SearchStatus {
   None = 'None',
-  Paused = 'Paused',
   Loading = 'Loading',
   NoResults = 'NoResults',
   UpdatingTimeBounds = 'UpdatingTimeBounds',

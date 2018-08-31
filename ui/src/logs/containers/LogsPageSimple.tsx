@@ -14,7 +14,7 @@ import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
-const NEWER_CHUNK_SIZE_LIMIT = 100
+const NEWER_CHUNK_SIZE_LIMIT = 20
 const OLDER_CHUNK_SIZE_LIMIT = 100
 
 import {
@@ -144,7 +144,7 @@ interface State {
 }
 
 class LogsPageSimple extends Component<Props, State> {
-  public static getDerivedStateFromProps(props: Props, state: State) {
+  public static getDerivedStateFromProps(props: Props) {
     const severityLevelColors: SeverityLevelColor[] = _.get(
       props.logConfig,
       'severityLevelColors',
@@ -190,7 +190,6 @@ class LogsPageSimple extends Component<Props, State> {
 
     switch (searchStatus) {
       case SearchStatus.Clearing:
-      case SearchStatus.Paused:
       case SearchStatus.Loaded:
         break
       default:
@@ -200,11 +199,9 @@ class LogsPageSimple extends Component<Props, State> {
     }
 
     if (isSearchStatusUpdated) {
-      const isPaused = searchStatus === SearchStatus.Paused
-      const isReady =
-        prevProps.searchStatus === SearchStatus.Cleared && !isPaused
+      const isReady = prevProps.searchStatus === SearchStatus.Cleared
 
-      if (this.isClearingSearch || isPaused) {
+      if (this.isClearingSearch) {
         clearInterval(this.interval)
       } else if (isReady) {
         this.fetchNewDataset()
@@ -220,9 +217,9 @@ class LogsPageSimple extends Component<Props, State> {
 
     this.updateTableData(SearchStatus.Loading)
 
-    // if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
-    //   this.startLogsTailFetchingInterval()
-    // }
+    if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
+      this.startLogsTailFetchingInterval()
+    }
   }
 
   public componentWillUnmount() {
@@ -320,6 +317,7 @@ class LogsPageSimple extends Component<Props, State> {
       this.handleTailFetchingInterval,
       DEFAULT_TAIL_CHUNK_DURATION_MS
     )
+
     this.setState({liveUpdating: true})
   }
 
@@ -327,10 +325,10 @@ class LogsPageSimple extends Component<Props, State> {
   private handleTailFetchingInterval = async () => {
     switch (this.props.searchStatus) {
       case SearchStatus.Clearing:
-      case SearchStatus.Paused:
       case SearchStatus.None:
         return
     }
+
     console.log('handleTailFetchingInterval')
 
     await this.fetchLogsTail()
@@ -388,6 +386,12 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleFetchNewerChunk = () => {
+    const shouldLiveUpdate = this.props.tableTime.relative === 0
+
+    if (shouldLiveUpdate) {
+      return
+    }
+
     console.log('FETCHING NEWER TABLE LOGS')
     const totalForwardValues = getDeep<number | null>(
       this.props,
@@ -395,7 +399,10 @@ class LogsPageSimple extends Component<Props, State> {
       null
     )
 
-    if (totalForwardValues < this.newerChunkSizeLimit) {
+    if (
+      totalForwardValues < this.newerChunkSizeLimit &&
+      totalForwardValues > 0
+    ) {
       return
     }
 
@@ -448,7 +455,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private get tableScrollToRow() {
-    if (this.liveUpdatingStatus === true) {
+    if (this.isLiveUpdating === true) {
       return 0
     }
 
@@ -473,6 +480,7 @@ class LogsPageSimple extends Component<Props, State> {
     this.props.setTableCustomTime(time)
     const liveUpdating = false
 
+    // this.props.setSearchStatus(SearchStatus.Paused)
     this.setState({
       hasScrolled: false,
       liveUpdating,
@@ -498,6 +506,7 @@ class LogsPageSimple extends Component<Props, State> {
     }
 
     let liveUpdating = false
+
     if (time === NOW) {
       timeOption = {timeOption: 'now'}
       liveUpdating = true
@@ -546,15 +555,21 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleScrollToTop = () => {
-    // if (!this.state.liveUpdating) {
-    // this.startLogsTailFetchingInterval()
-    // }
+    const shouldLiveUpdate = this.props.tableTime.relative === 0
+
+    if (!this.state.liveUpdating && shouldLiveUpdate) {
+      this.startLogsTailFetchingInterval()
+    } else {
+      console.log('SCROLLED TO TOP')
+      this.handleFetchNewerChunk()
+    }
   }
 
   private handleVerticalScroll = () => {
-    // if (this.state.liveUpdating) {
-    //   clearInterval(this.interval)
-    // }
+    if (this.state.liveUpdating) {
+      clearInterval(this.interval)
+    }
+    console.log('SCROLLED')
     this.setState({liveUpdating: false, hasScrolled: true})
   }
 
@@ -715,11 +730,13 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleChangeLiveUpdatingStatus = async (): Promise<void> => {
-    switch (this.props.searchStatus) {
-      case SearchStatus.Paused:
-        return this.handleChooseRelativeTime(NOW)
-      default:
-        this.props.setSearchStatus(SearchStatus.Paused)
+    const {liveUpdating} = this.state
+
+    if (liveUpdating === true) {
+      this.setState({liveUpdating: false})
+      clearInterval(this.interval)
+    } else {
+      this.handleChooseRelativeTime(NOW)
     }
   }
 
@@ -792,12 +809,6 @@ class LogsPageSimple extends Component<Props, State> {
     this.props.setNamespaceAsync(namespace)
   }
 
-  // private fetchSearchDataset = async (
-  //   searchStatus: SearchStatus
-  // ): Promise<void> => {
-  //   // this.fetchNewDataset(searchStatus)
-  // }
-
   private updateTableData(searchStatus) {
     this.props.clearSearchData(searchStatus)
   }
@@ -810,10 +821,9 @@ class LogsPageSimple extends Component<Props, State> {
     console.log('shouldLiveUpdate', shouldLiveUpdate)
     console.log('this.props.tableTime.relative', this.props.tableTime.relative)
     console.log('this.props.tableTime.custom', this.props.tableTime.custom)
-    if (shouldLiveUpdate) {
+    console.log('IS LIVE', this.state.liveUpdating)
+    if (this.state.liveUpdating) {
       this.startLogsTailFetchingInterval()
-    } else {
-      this.fetchNewerChunk()
     }
 
     this.fetchOlderChunk()
@@ -899,7 +909,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private get isLiveUpdating(): boolean {
-    return this.props.searchStatus !== SearchStatus.Paused
+    return this.state.liveUpdating
   }
 }
 
