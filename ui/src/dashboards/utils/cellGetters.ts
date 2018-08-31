@@ -20,6 +20,7 @@ import {
 } from 'src/shared/constants'
 const MAX_COLUMNS = 12
 
+import {replace} from '../../shared/apis/query'
 // Types
 import {Cell, CellType, Dashboard, NewDefaultCell} from 'src/types/dashboards'
 import {QueryConfig, DurationRange} from 'src/types/queries'
@@ -111,27 +112,43 @@ export const getNewDashboardCell = (
 }
 
 const incrementCloneName = (dashboard: Dashboard, cellName: string): string => {
-  const cellNames = dashboard.cells.map(c => c.name)
-  const numClones = cellNames.reduce(
-    (acc, name) => {
-      const cleanedName = name.replace(/\s\(clone\)/g, '')
-      const cellIsAClone = name.includes(`${cleanedName} (clone`)
-      console.log('cellName: ', name)
-      console.log('is a clone: ', cellIsAClone)
+  const rootName = cellName.replace(/\s\(clone\s(\d)+\)/g, '').replace(/\)/, '')
 
-      return cellIsAClone ? acc + 1 : acc
-    })
-  )
-  
-  return 'poop'
+  const cellNames = dashboard.cells
+    .map(c => c.name)
+    .filter(cn => cn.includes(rootName))
+
+  const highestNumberedClone = cellNames.reduce((acc, name) => {
+    if (name.match(/\(clone(\s|\d)+\)/)) {
+      const strippedName = name
+        .replace(rootName, '')
+        .replace(/\(clone/, '')
+        .replace(/\)/, '')
+
+      const cloneNumber = Number(strippedName)
+
+      return cloneNumber >= acc ? cloneNumber : acc
+    }
+
+    return acc
+  }, 0)
+
+  if (highestNumberedClone) {
+    const newCloneNumber = highestNumberedClone + 1
+    return `${cellName.replace(
+      /\(clone\s(\d)+\)/,
+      ''
+    )} (clone ${newCloneNumber})`
+  }
+
+  return `${cellName} (clone 1)`
 }
 
 export const getClonedDashboardCell = (
   dashboard: Dashboard,
   cellClone: Cell
 ): Cell => {
-  // const name = incrementCloneName(dashboard, cellClone.name)
-  const name = 'name'
+  const name = incrementCloneName(dashboard, cellClone.name)
 
   const cellCloneFitsLeft = cellClone.x >= cellClone.w
   const cellCloneFitsRight =
@@ -147,7 +164,6 @@ export const getClonedDashboardCell = (
 
   return {...cellClone, y: cellClone.y + cellClone.h, name}
 }
-
 
 export const getTimeRange = (queryConfig: QueryConfig): DurationRange => {
   return (
