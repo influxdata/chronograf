@@ -37,7 +37,7 @@ import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell, ThresholdType} from 'src/types/dashboards'
 import {UpdateScript} from 'src/flux/actions'
-import {Links} from 'src/types/flux'
+import {Links, ScriptStatus} from 'src/types/flux'
 
 const staticLegend: DashboardsModels.Legend = {
   type: 'static',
@@ -75,6 +75,8 @@ interface Props {
 
 interface State {
   isStaticLegend: boolean
+  status: ScriptStatus
+  currentService: Service
 }
 
 @ErrorHandling
@@ -89,6 +91,10 @@ class CellEditorOverlay extends Component<Props, State> {
 
     this.state = {
       isStaticLegend: IS_STATIC_LEGEND(legend),
+      status: {
+        type: 'none',
+        text: '',
+      },
     }
   }
 
@@ -151,6 +157,8 @@ class CellEditorOverlay extends Component<Props, State> {
           updateEditorTimeRange={updateEditorTimeRange}
           visualizationOptions={this.visualizationOptions}
           queryStatus={queryStatus}
+          updateScriptStatus={this.updateScriptStatus}
+          updateService={this.updateService}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader
@@ -170,6 +178,14 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private get isSaveable(): boolean {
     const {queryDrafts} = this.props
+    const {currentService, status} = this.state
+
+    const isFluxSource = _.get(currentService, 'type', '') === 'flux'
+
+    if (isFluxSource) {
+      return _.get(status, 'type', '') === 'success'
+    }
+
     return queryDrafts.every(queryDraft => {
       const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
         queryDraft,
@@ -219,6 +235,14 @@ class CellEditorOverlay extends Component<Props, State> {
       lineColors,
       thresholdsListType,
     }
+  }
+
+  private updateScriptStatus = (status: ScriptStatus): void => {
+    this.setState({status})
+  }
+
+  private updateService = (service: Service): void => {
+    this.setState({currentService: service})
   }
 
   private handleSaveCell = () => {
