@@ -10,7 +10,7 @@ exports[`Card Select Card matches snapshot with minimal props 1`] = `
     className="card-select--container"
   >
     <input
-      checked={false}
+      defaultChecked={false}
       disabled={false}
       id="card_select_card_id"
       type="checkbox"
@@ -45,7 +45,7 @@ exports[`Card Select Card with image matches snapshot when provided image source
     className="card-select--container"
   >
     <input
-      checked={false}
+      defaultChecked={false}
       disabled={false}
       id="card_select_card_id"
       type="checkbox"

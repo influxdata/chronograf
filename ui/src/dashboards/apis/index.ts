@@ -6,6 +6,7 @@ import {
   linksFromDashboards,
   updateDashboardLinks,
 } from 'src/dashboards/utils/dashboardSwitcherLinks'
+import {instantiate} from 'src/dashboards/utils/protoboardToDashboard'
 
 import {AxiosResponse} from 'axios'
 import {
@@ -14,7 +15,7 @@ import {
   LoadLinksOptions,
 } from 'src/types/apis/dashboards'
 import {DashboardSwitcherLinks} from 'src/types/dashboards'
-import {Source} from 'src/types/sources'
+import {Source, Protoboard} from 'src/types'
 
 export const getDashboards: GetDashboards = () => {
   return AJAX<DashboardsResponse>({
@@ -64,6 +65,23 @@ export const updateDashboardCell = cell => {
 }
 
 export const createDashboard = async dashboard => {
+  try {
+    return await AJAX({
+      method: 'POST',
+      resource: 'dashboards',
+      data: dashboard,
+    })
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const createDashboardFromProtoboard = async (
+  protoboard: Protoboard,
+  source: Source
+) => {
+  const dashboard = instantiate(protoboard, source)
   try {
     return await AJAX({
       method: 'POST',

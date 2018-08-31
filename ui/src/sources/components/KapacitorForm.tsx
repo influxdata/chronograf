@@ -17,7 +17,6 @@ import {Kapacitor} from 'src/types'
 
 interface Props {
   kapacitor: Kapacitor
-  setError?: (b: boolean) => void
   onChangeInput: (key: string) => (value: string | boolean) => void
 }
 
