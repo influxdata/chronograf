@@ -81,6 +81,7 @@
 
 // Left, Center, and Right pieces of the page header
 .page-header--left,
+.page-header--center,
 .page-header--right {
   display: flex;
   align-items: center;
@@ -101,6 +102,9 @@
       margin-right: 0 !important;
     }
   }
+}
+.page-header--center {
+  justify-content: center;
 }
 
 .page-header--title {

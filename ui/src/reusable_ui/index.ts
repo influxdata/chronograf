@@ -9,8 +9,6 @@ import OverlayContainer from './components/overlays/OverlayContainer'
 import OverlayHeading from './components/overlays/OverlayHeading'
 import OverlayBody from './components/overlays/OverlayBody'
 import Page from './components/page_layout/Page'
-import PageHeader from './components/page_layout/PageHeader'
-import PageHeaderTitle from './components/page_layout/PageHeaderTitle'
 import Panel, {PanelType} from './components/panel/Panel'
 import Radio from './components/radio_buttons/RadioButtons'
 import SlideToggle from './components/slide_toggle/SlideToggle'
@@ -41,8 +39,6 @@ export {
   OverlayHeading,
   OverlayBody,
   Page,
-  PageHeader,
-  PageHeaderTitle,
   Panel,
   PanelType,
   Radio,
