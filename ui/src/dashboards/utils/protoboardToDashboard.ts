@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import {getDeep} from 'src/utils/wrappers'
 
 import {getNextAvailablePosition} from 'src/dashboards/utils/cellGetters'
 
@@ -79,7 +80,11 @@ export const instantiate = (
 ): Partial<Dashboard> => {
   const placedCells = []
   const unPlacedCells = []
-  const measurement = protoboard.data.cells[0].measurement
+  const measurement = getDeep<string>(
+    protoboard,
+    'data.cells[0].measurement',
+    ''
+  )
 
   _.forEach(protoboard.data.cells, c => {
     if ((c.x === 0 && c.y === 0) || isThereCollision(c, placedCells)) {
