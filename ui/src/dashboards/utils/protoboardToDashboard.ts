@@ -40,7 +40,7 @@ const addNewCellToCells = (
   ]
 }
 
-const collision = (
+const isThereCollision = (
   cell: Partial<PBCell>,
   placedCells: Array<Partial<PBCell>>
 ): boolean => {
@@ -82,7 +82,7 @@ export const instantiate = (
   const measurement = protoboard.data.cells[0].measurement
 
   _.forEach(protoboard.data.cells, c => {
-    if ((c.x === 0 && c.y === 0) || collision(c, placedCells)) {
+    if ((c.x === 0 && c.y === 0) || isThereCollision(c, placedCells)) {
       unPlacedCells.push(c)
       return
     }
