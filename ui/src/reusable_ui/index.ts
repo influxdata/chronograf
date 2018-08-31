@@ -8,6 +8,7 @@ import OverlayTechnology from './components/overlays/OverlayTechnology'
 import OverlayContainer from './components/overlays/OverlayContainer'
 import OverlayHeading from './components/overlays/OverlayHeading'
 import OverlayBody from './components/overlays/OverlayBody'
+import Page from './components/page_layout/Page'
 import PageHeader from './components/page_layout/PageHeader'
 import PageHeaderTitle from './components/page_layout/PageHeaderTitle'
 import Panel, {PanelType} from './components/panel/Panel'
@@ -39,6 +40,7 @@ export {
   OverlayContainer,
   OverlayHeading,
   OverlayBody,
+  Page,
   PageHeader,
   PageHeaderTitle,
   Panel,
