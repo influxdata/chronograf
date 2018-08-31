@@ -7,19 +7,25 @@ interface Props {
   queryCount: number
   searchStatus: SearchStatus
   nextOlderUpperBound: string
+  nextNewerLowerBound: number
 }
 
 class QueryResults extends PureComponent<Props> {
   public render() {
-    const {count, nextOlderUpperBound} = this.props
-    const formattedTime = moment(nextOlderUpperBound).format(
+    const {count, nextOlderUpperBound, nextNewerLowerBound} = this.props
+    const formattedLowerTime = moment(nextNewerLowerBound).format(
+      'MMM D, YYYY @HH:mm:ss'
+    )
+
+    const formattedUpperTime = moment(nextOlderUpperBound).format(
       'MMM D, YYYY @HH:mm:ss'
     )
 
     let contents = (
       <>
         Query returned <strong>{count} Events</strong> <br />
-        Querying back to {formattedTime}...
+        From: <strong>{formattedLowerTime}</strong> <br />
+        To: <strong>{formattedUpperTime}</strong>...
       </>
     )
 
@@ -28,7 +34,7 @@ class QueryResults extends PureComponent<Props> {
         <>
           Querying back to
           <br />
-          {formattedTime}...
+          {formattedUpperTime}...
         </>
       )
     }

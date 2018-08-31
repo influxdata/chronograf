@@ -91,6 +91,7 @@ interface State {
   searchPattern: string
   infiniteLoaderQueryCount: number
   nextOlderUpperBound: string
+  nextOlderLowerBound: string
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -219,7 +220,12 @@ class LogsTable extends Component<Props, State> {
   }
 
   public render() {
-    const {queryCount, nextOlderUpperBound, searchStatus} = this.props
+    const {
+      queryCount,
+      nextOlderUpperBound,
+      nextOlderLowerBound,
+      searchStatus,
+    } = this.props
     const {infiniteLoaderQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
@@ -238,6 +244,7 @@ class LogsTable extends Component<Props, State> {
             queryCount={infiniteLoaderQueryCount + queryCount}
             searchStatus={searchStatus}
             nextOlderUpperBound={nextOlderUpperBound}
+            nextOlderLowerBound={nextOlderLowerBound}
           />
         </div>
         <AutoSizer>

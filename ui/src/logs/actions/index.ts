@@ -801,7 +801,7 @@ export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
     DEFAULT_NEWER_CHUNK_DURATION_MS
   )
 
-  const lower = moment(selectedTableTime).toISOString()
+  const lower = moment(nextNewerUpperBound).toISOString()
   const upper = moment(nextNewerUpperBound)
     .add(newerChunkDurationMs, 'milliseconds')
     .toISOString()
