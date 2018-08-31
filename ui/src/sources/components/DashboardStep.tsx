@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import _ from 'lodash'
 
 // APIs
-import {getProtoBoards} from 'src/sources/apis'
+import {getProtoboards} from 'src/sources/apis'
 import {createDashboardFromProtoboard} from 'src/dashboards/apis'
 
 // Decorators
@@ -12,6 +12,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Utils
 import {isSearchMatch} from 'src/utils/searchMatch'
+import {getSuggestedProtoboards} from 'src/dashboards/utils/protoboardSuggestion'
 
 // Components
 import GridSizer from 'src/reusable_ui/components/grid_sizer/GridSizer'
@@ -25,6 +26,7 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   notifyDashboardCreated,
   notifyDashboardCreationFailed,
+  notifyNoSuggestedDashboards,
 } from 'src/shared/copy/notifications'
 
 // Types
@@ -35,6 +37,7 @@ interface State {
   selected: object
   searchTerm: string
   protoboards: Protoboard[]
+  suggestedProtoboards: Protoboard[]
 }
 
 interface Props {
@@ -55,11 +58,12 @@ class DashboardStep extends Component<Props, State> {
       selected,
       protoboards: [],
       searchTerm: '',
+      suggestedProtoboards: [],
     }
   }
 
   public async componentDidMount() {
-    const protoboards = await getProtoBoards()
+    const protoboards = await getProtoboards()
     this.setState({protoboards})
   }
 
@@ -102,8 +106,15 @@ class DashboardStep extends Component<Props, State> {
               placeholder="Filter by name..."
               onSearch={this.setSearchTerm}
             />
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={this.handleSuggest}
+            >
+              Suggest dashboards
+            </button>
           </div>
-          <GridSizer>{this.dashboardCards}</GridSizer>
+          {this.suggestedDashboardCards}
+          {this.dashboardCards}
         </div>
       )
     }
@@ -115,23 +126,89 @@ class DashboardStep extends Component<Props, State> {
   }
 
   private get dashboardCards() {
-    const {selected, protoboards, searchTerm} = this.state
-    const filteredProtoboards = protoboards.filter(pb =>
+    const {selected, protoboards, suggestedProtoboards, searchTerm} = this.state
+    const filteredProtoboards = protoboards.filter(
+      pb =>
+        isSearchMatch(pb.meta.name, searchTerm) &&
+        !suggestedProtoboards.find(spb => spb.id === pb.id)
+    )
+
+    return (
+      <>
+        <GridSizer>
+          {filteredProtoboards.map((protoboard, i) => {
+            const {meta, id} = protoboard
+            return (
+              <CardSelectCard
+                key={`${id}_${i}`}
+                id={id}
+                name={meta.name}
+                label={meta.name}
+                checked={selected[id]}
+                onClick={this.toggleChecked(id)}
+              />
+            )
+          })}
+        </GridSizer>
+      </>
+    )
+  }
+
+  private get suggestedDashboardCards() {
+    const {selected, suggestedProtoboards, searchTerm} = this.state
+
+    const filteredProtoboards = suggestedProtoboards.filter(pb =>
       isSearchMatch(pb.meta.name, searchTerm)
     )
-    return filteredProtoboards.map((protoboard, i) => {
-      const {meta, id} = protoboard
-      return (
-        <CardSelectCard
-          key={`${id}_${i}`}
-          id={id}
-          name={meta.name}
-          label={meta.name}
-          checked={selected[id]}
-          onClick={this.toggleChecked(id)}
-        />
-      )
-    })
+
+    if (filteredProtoboards.length === 0) {
+      return null
+    }
+
+    return (
+      <>
+        <div className="suggestion-text">
+          Suggested Dashboards for your Source:
+        </div>
+        <GridSizer>
+          {filteredProtoboards.map((protoboard, i) => {
+            const {meta, id} = protoboard
+            return (
+              <CardSelectCard
+                key={`${id}_${i}`}
+                id={id}
+                name={meta.name}
+                label={meta.name}
+                checked={selected[id]}
+                onClick={this.toggleChecked(id)}
+              />
+            )
+          })}
+        </GridSizer>
+        <div className="suggestion-text">Other Dashboards:</div>
+      </>
+    )
+  }
+
+  private handleSuggest = async () => {
+    const {protoboards} = this.state
+    const {source, notify} = this.props
+
+    const suggestedProtoboardsList = await getSuggestedProtoboards(
+      source,
+      protoboards
+    )
+
+    if (suggestedProtoboardsList.length === 0) {
+      notify(notifyNoSuggestedDashboards())
+      return
+    }
+
+    const suggestedProtoboards = protoboards.filter(p =>
+      suggestedProtoboardsList.includes(p.meta.name)
+    )
+
+    this.setState({suggestedProtoboards})
   }
 
   private toggleChecked = (id: string) => () => {

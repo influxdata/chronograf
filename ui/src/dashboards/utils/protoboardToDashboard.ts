@@ -74,7 +74,7 @@ const replaceQuery = (q: string, source: Source) =>
 const replaceDbRp = (queries: PBQueries[], source: Source) =>
   queries.map(q => ({...q, query: replaceQuery(q.query, source)}))
 
-export const instantiate = (
+export const instantiateProtoboard = (
   protoboard: Protoboard,
   source: Source
 ): Partial<Dashboard> => {

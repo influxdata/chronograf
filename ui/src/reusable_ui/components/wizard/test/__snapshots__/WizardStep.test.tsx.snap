@@ -12,10 +12,10 @@ exports[`WizardStep matches snapshot 1`] = `
     </div>
   </div>
   <WizardButtonBar
-    nextLabel="next"
+    nextLabel="Next"
     onClickNext={[Function]}
     onClickPrevious={[Function]}
-    previousLabel="previous"
+    previousLabel="Previous"
   />
 </React.Fragment>
 `;

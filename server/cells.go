@@ -39,6 +39,9 @@ func newCellResponse(dID chronograf.DashboardID, cell chronograf.DashboardCell) 
 	// Copy to handle race condition
 	newAxes := make(map[string]chronograf.Axis, len(cell.Axes))
 	for k, v := range cell.Axes {
+		if len(v.Bounds) == 0 {
+			v.Bounds = []string{"", ""}
+		}
 		newAxes[k] = v
 	}
 

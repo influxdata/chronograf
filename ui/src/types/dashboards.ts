@@ -211,6 +211,7 @@ export type NewDefaultCell = Pick<
 export interface ProtoboardMetadata {
   name: string
   icon: string
+  measurements: string[]
   version: string
   dashboardVersion: string
   description: string

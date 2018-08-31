@@ -8,7 +8,7 @@ exports[`WizardButtonBar matches snapshot when provided minimal props 1`] = `
     className="btn btn-md btn-primary"
     onClick={[MockFunction]}
   >
-    next
+    Next
   </button>
 </div>
 `;
@@ -21,13 +21,13 @@ exports[`WizardButtonBar with decrement and last step is "true" matches snapshot
     className="btn btn-md btn-default"
     onClick={[MockFunction]}
   >
-    previous
+    Previous
   </button>
   <button
     className="btn btn-md btn-success"
     onClick={[MockFunction]}
   >
-    next
+    Next
   </button>
 </div>
 `;

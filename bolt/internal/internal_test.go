@@ -291,9 +291,8 @@ func Test_MarshalDashboard_WithLegacyBounds(t *testing.T) {
 				},
 				Axes: map[string]chronograf.Axis{
 					"y": chronograf.Axis{
-						Bounds: []string{},
-						Base:   "10",
-						Scale:  "linear",
+						Base:  "10",
+						Scale: "linear",
 					},
 				},
 				CellColors: []chronograf.CellColor{
@@ -410,9 +409,8 @@ func Test_MarshalDashboard_WithEmptyLegacyBounds(t *testing.T) {
 				},
 				Axes: map[string]chronograf.Axis{
 					"y": chronograf.Axis{
-						Bounds: []string{},
-						Base:   "10",
-						Scale:  "linear",
+						Base:  "10",
+						Scale: "linear",
 					},
 				},
 				CellColors: []chronograf.CellColor{

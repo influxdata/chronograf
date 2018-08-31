@@ -15,8 +15,8 @@ interface Props {
 @ErrorHandling
 class WizardButtonBar extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
-    nextLabel: 'next',
-    previousLabel: 'previous',
+    nextLabel: 'Next',
+    previousLabel: 'Previous',
   }
 
   public render() {

@@ -70,7 +70,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
           handleSkip={isUsingAuth ? this.gotoPurgatory : null}
         >
           <WizardStep
-            title="Add an InfluxDB Connection"
+            title="InfluxDB Connection"
             tipText=""
             isComplete={this.isSourceComplete}
             isErrored={sourceError}
@@ -103,7 +103,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             />
           </WizardStep>
           <WizardStep
-            title="Add a Kapacitor Connection"
+            title="Kapacitor Connection"
             tipText=""
             isComplete={this.isKapacitorComplete}
             isErrored={kapacitorError}
