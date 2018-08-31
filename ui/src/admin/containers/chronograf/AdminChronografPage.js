@@ -2,9 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 import SubSections from 'src/shared/components/SubSections'
-import FancyScrollbar from 'shared/components/FancyScrollbar'
 
 import UsersPage from 'src/admin/containers/chronograf/UsersPage'
 import AllUsersPage from 'src/admin/containers/chronograf/AllUsersPage'
@@ -49,9 +48,14 @@ const sections = me => [
 ]
 
 const AdminChronografPage = ({me, source, params: {tab}}) => (
-  <div className="page">
-    <PageHeader titleText="Chronograf Admin" />
-    <FancyScrollbar className="page-contents">
+  <Page>
+    <Page.Header>
+      <Page.Header.Left>
+        <Page.Title title="Chronograf Admin" />
+      </Page.Header.Left>
+      <Page.Header.Right />
+    </Page.Header>
+    <Page.Contents fullWidth={true}>
       <div className="container-fluid">
         <SubSections
           sections={sections(me)}
@@ -60,8 +64,8 @@ const AdminChronografPage = ({me, source, params: {tab}}) => (
           sourceID={source.id}
         />
       </div>
-    </FancyScrollbar>
-  </div>
+    </Page.Contents>
+  </Page>
 )
 
 const {shape, string} = PropTypes

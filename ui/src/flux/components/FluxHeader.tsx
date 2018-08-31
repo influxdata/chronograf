@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 import SourceDropdown from 'src/flux/components/SourceDropdown'
 
 import {Service, Source} from 'src/types'
@@ -20,38 +20,32 @@ class FluxHeader extends PureComponent<Props> {
   }
 
   public render() {
-    return (
-      <>
-        <PageHeader
-          titleText="Flux Editor"
-          fullWidth={true}
-          optionsComponents={this.optionsComponents}
-        />
-      </>
-    )
-  }
-
-  private get optionsComponents(): JSX.Element {
     const {service, services, source, sources, onChangeService} = this.props
+
     return (
-      <>
-        <SourceDropdown
-          source={source}
-          sources={sources}
-          services={services}
-          service={service}
-          allowInfluxQL={false}
-          allowFlux={true}
-          allowDynamicSource={false}
-          onChangeService={onChangeService}
-        />
-        <button
-          onClick={this.handleGoToEditFlux}
-          className="btn btn-sm btn-default"
-        >
-          Edit Connection
-        </button>
-      </>
+      <Page.Header fullWidth={true}>
+        <Page.Header.Left>
+          <Page.Title title="Flux Editor" />
+        </Page.Header.Left>
+        <Page.Header.Right>
+          <SourceDropdown
+            source={source}
+            sources={sources}
+            services={services}
+            service={service}
+            allowInfluxQL={false}
+            allowFlux={true}
+            allowDynamicSource={false}
+            onChangeService={onChangeService}
+          />
+          <button
+            onClick={this.handleGoToEditFlux}
+            className="btn btn-sm btn-default"
+          >
+            Edit Connection
+          </button>
+        </Page.Header.Right>
+      </Page.Header>
     )
   }
 

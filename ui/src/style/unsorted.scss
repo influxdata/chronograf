@@ -389,9 +389,8 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   margin: 0 auto;
   position: relative;
   width: 100%;
-  height: calc(100% + 60px);
+  height: 100%;
   overflow: hidden;
-  padding-top: 60px;
   border-radius: 0 0 $radius $radius;
 }
 

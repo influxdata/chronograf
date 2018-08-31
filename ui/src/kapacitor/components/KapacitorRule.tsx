@@ -3,13 +3,12 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {InjectedRouter} from 'react-router'
 
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 import NameSection from 'src/kapacitor/components/NameSection'
 import ValuesSection from 'src/kapacitor/components/ValuesSection'
 import RuleHeaderSave from 'src/kapacitor/components/RuleHeaderSave'
 import RuleHandlers from 'src/kapacitor/components/RuleHandlers'
 import RuleMessage from 'src/kapacitor/components/RuleMessage'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 import {createRule, editRule} from 'src/kapacitor/apis'
 import buildInfluxQLQuery from 'src/utils/influxql'
@@ -91,51 +90,51 @@ class KapacitorRule extends Component<Props, State> {
     const {timeRange} = this.state
 
     return (
-      <div className="page">
-        <PageHeader
-          titleText="Alert Rule Builder"
-          optionsComponents={this.optionsComponents}
-          sourceIndicator={true}
-        />
-        <FancyScrollbar className="page-contents fancy-scroll--kapacitor">
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-xs-12">
-                <div className="rule-builder">
-                  <NameSection
-                    rule={rule}
-                    defaultName={rule.name}
-                    onRuleRename={ruleActions.updateRuleName}
-                  />
-                  <ValuesSection
-                    rule={rule}
-                    source={source}
-                    timeRange={timeRange}
-                    onChooseTrigger={chooseTrigger}
-                    onAddEvery={this.handleAddEvery}
-                    onUpdateValues={updateRuleValues}
-                    query={queryConfigs[rule.queryID]}
-                    onRemoveEvery={this.handleRemoveEvery}
-                    queryConfigActions={queryConfigActions}
-                    onDeadmanChange={this.handleDeadmanChange}
-                    onRuleTypeInputChange={this.handleRuleTypeInputChange}
-                    onRuleTypeDropdownChange={this.handleRuleTypeDropdownChange}
-                    onChooseTimeRange={this.handleChooseTimeRange}
-                  />
-                  <RuleHandlers
-                    rule={rule}
-                    ruleActions={ruleActions}
-                    handlersFromConfig={handlersFromConfig}
-                    onGoToConfig={this.handleSaveToConfig}
-                    validationError={this.validationError}
-                  />
-                  <RuleMessage rule={rule} ruleActions={ruleActions} />
-                </div>
-              </div>
-            </div>
+      <Page>
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title="Alert Rule Builder" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true}>
+            <RuleHeaderSave
+              onSave={this.handleSave}
+              validationError={this.validationError}
+            />
+          </Page.Header.Right>
+        </Page.Header>
+        <Page.Contents>
+          <div className="rule-builder">
+            <NameSection
+              rule={rule}
+              defaultName={rule.name}
+              onRuleRename={ruleActions.updateRuleName}
+            />
+            <ValuesSection
+              rule={rule}
+              source={source}
+              timeRange={timeRange}
+              onChooseTrigger={chooseTrigger}
+              onAddEvery={this.handleAddEvery}
+              onUpdateValues={updateRuleValues}
+              query={queryConfigs[rule.queryID]}
+              onRemoveEvery={this.handleRemoveEvery}
+              queryConfigActions={queryConfigActions}
+              onDeadmanChange={this.handleDeadmanChange}
+              onRuleTypeInputChange={this.handleRuleTypeInputChange}
+              onRuleTypeDropdownChange={this.handleRuleTypeDropdownChange}
+              onChooseTimeRange={this.handleChooseTimeRange}
+            />
+            <RuleHandlers
+              rule={rule}
+              ruleActions={ruleActions}
+              handlersFromConfig={handlersFromConfig}
+              onGoToConfig={this.handleSaveToConfig}
+              validationError={this.validationError}
+            />
+            <RuleMessage rule={rule} ruleActions={ruleActions} />
           </div>
-        </FancyScrollbar>
-      </div>
+        </Page.Contents>
+      </Page>
     )
   }
 
@@ -269,15 +268,6 @@ class KapacitorRule extends Component<Props, State> {
   private handleDeadmanChange = ({text}: Item) => {
     const {ruleActions, rule} = this.props
     ruleActions.updateRuleValues(rule.id, rule.trigger, {period: text})
-  }
-
-  private get optionsComponents(): JSX.Element {
-    return (
-      <RuleHeaderSave
-        onSave={this.handleSave}
-        validationError={this.validationError}
-      />
-    )
   }
 }
 

@@ -2,15 +2,19 @@
 import React, {Component} from 'react'
 
 // Components
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
-import PageHeaderTitle from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
 import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import GraphTips from 'src/shared/components/GraphTips'
 import RenameDashboard from 'src/dashboards/components/rename_dashboard/RenameDashboard'
 import DashboardSwitcher from 'src/dashboards/components/DashboardSwitcher'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import {Button, ComponentColor, ButtonShape, IconFont} from 'src/reusable_ui'
+import {
+  Button,
+  ComponentColor,
+  ButtonShape,
+  IconFont,
+  Page,
+} from 'src/reusable_ui'
 
 // Types
 import * as AppActions from 'src/types/actions/app'
@@ -85,54 +89,41 @@ class DashboardHeader extends Component<Props, State> {
   }
 
   public render() {
-    const {isHidden} = this.props
-
-    return (
-      <PageHeader
-        fullWidth={true}
-        sourceIndicator={true}
-        titleComponents={this.renderPageTitle}
-        optionsComponents={this.optionsComponents}
-        inPresentationMode={isHidden}
-      />
-    )
-  }
-
-  private get renderPageTitle(): JSX.Element {
-    return (
-      <>
-        {this.dashboardSwitcher}
-        {this.dashboardTitle}
-      </>
-    )
-  }
-
-  private get optionsComponents(): JSX.Element {
-    const {handleChooseAutoRefresh, onManualRefresh, autoRefresh} = this.props
-
+    const {
+      isHidden,
+      handleChooseAutoRefresh,
+      onManualRefresh,
+      autoRefresh,
+    } = this.props
     const {selected} = this.state
 
     return (
-      <>
-        <GraphTips />
-        {this.addCellButton}
-        {this.toolButtons}
-        <AutoRefreshDropdown
-          onChoose={handleChooseAutoRefresh}
-          onManualRefresh={onManualRefresh}
-          selected={autoRefresh}
-        />
-        <TimeRangeDropdown
-          onChooseTimeRange={this.handleChooseTimeRange}
-          selected={selected}
-        />
-        <Button
-          icon={IconFont.ExpandA}
-          onClick={this.handleClickPresentationButton}
-          shape={ButtonShape.Square}
-          titleText="Enter Full-Screen Presentation Mode"
-        />
-      </>
+      <Page.Header fullWidth={true} inPresentationMode={isHidden}>
+        <Page.Header.Left>
+          {this.dashboardSwitcher}
+          {this.dashboardTitle}
+        </Page.Header.Left>
+        <Page.Header.Right showSourceIndicator={true}>
+          <GraphTips />
+          {this.addCellButton}
+          {this.toolButtons}
+          <AutoRefreshDropdown
+            onChoose={handleChooseAutoRefresh}
+            onManualRefresh={onManualRefresh}
+            selected={autoRefresh}
+          />
+          <TimeRangeDropdown
+            onChooseTimeRange={this.handleChooseTimeRange}
+            selected={selected}
+          />
+          <Button
+            icon={IconFont.ExpandA}
+            onClick={this.handleClickPresentationButton}
+            shape={ButtonShape.Square}
+            titleText="Enter Full-Screen Presentation Mode"
+          />
+        </Page.Header.Right>
+      </Page.Header>
     )
   }
 
@@ -225,9 +216,7 @@ class DashboardHeader extends Component<Props, State> {
       return (
         <Authorized
           requiredRole={EDITOR_ROLE}
-          replaceWithIfNotAuthorized={
-            <PageHeaderTitle title={activeDashboard} />
-          }
+          replaceWithIfNotAuthorized={<Page.Title title={activeDashboard} />}
         >
           <RenameDashboard
             onRename={onRenameDashboard}
@@ -237,7 +226,7 @@ class DashboardHeader extends Component<Props, State> {
       )
     }
 
-    return <PageHeaderTitle title={activeDashboard} />
+    return <Page.Title title={activeDashboard} />
   }
 }
 

@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 
 import LayoutRenderer from 'shared/components/LayoutRenderer'
-import FancyScrollbar from 'shared/components/FancyScrollbar'
 import DashboardEmpty from 'src/dashboards/components/DashboardEmpty'
+import {Page} from 'src/reusable_ui'
 
 const Dashboard = ({
   source,
@@ -36,10 +35,9 @@ const Dashboard = ({
   })
 
   return (
-    <FancyScrollbar
-      className={classnames('page-contents', {
-        'presentation-mode': inPresentationMode,
-      })}
+    <Page.Contents
+      fullWidth={true}
+      inPresentationMode={inPresentationMode}
       setScrollTop={setScrollTop}
     >
       <div className="dashboard container-fluid full-width">
@@ -62,7 +60,7 @@ const Dashboard = ({
           <DashboardEmpty dashboard={dashboard} />
         )}
       </div>
-    </FancyScrollbar>
+    </Page.Contents>
   )
 }
 

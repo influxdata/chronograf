@@ -60,7 +60,14 @@ class DashboardsPage extends PureComponent<Props> {
 
     return (
       <Page>
-        <Page.Header titleText="Dashboards" sourceIndicator={true} />
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title="Dashboards" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true}>
+            <p>bloop</p>
+          </Page.Header.Right>
+        </Page.Header>
         <Page.Contents>
           <DashboardsContents
             notify={notify}

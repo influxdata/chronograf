@@ -3,7 +3,7 @@ import React, {PureComponent} from 'react'
 import AlertsTable from 'src/alerts/components/AlertsTable'
 import NoKapacitorError from 'src/shared/components/NoKapacitorError'
 import CustomTimeRangeDropdown from 'src/shared/components/CustomTimeRangeDropdown'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {getAlerts} from 'src/alerts/apis'
@@ -85,7 +85,7 @@ class AlertsApp extends PureComponent<Props, State> {
   }
   public render() {
     const {isWidget, source} = this.props
-    const {loading} = this.state
+    const {loading, timeRange} = this.state
 
     if (loading || !source) {
       return <div className="page-spinner" />
@@ -94,31 +94,22 @@ class AlertsApp extends PureComponent<Props, State> {
     return isWidget ? (
       this.renderSubComponents()
     ) : (
-      <div className="page alert-history-page">
-        <PageHeader
-          titleText="Alert History"
-          optionsComponents={this.optionsComponents}
-          sourceIndicator={true}
-        />
-        <div className="page-contents">
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-md-12">{this.renderSubComponents()}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  private get optionsComponents(): JSX.Element {
-    const {timeRange} = this.state
-
-    return (
-      <CustomTimeRangeDropdown
-        onApplyTimeRange={this.handleApplyTime}
-        timeRange={timeRange}
-      />
+      <Page className="alert-history-page">
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title="Alert History" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true}>
+            <CustomTimeRangeDropdown
+              onApplyTimeRange={this.handleApplyTime}
+              timeRange={timeRange}
+            />
+          </Page.Header.Right>
+        </Page.Header>
+        <Page.Contents scrollable={false}>
+          {this.renderSubComponents()}
+        </Page.Contents>
+      </Page>
     )
   }
 
