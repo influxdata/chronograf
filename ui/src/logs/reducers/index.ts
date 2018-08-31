@@ -18,7 +18,8 @@ import {
   SeverityFormatOptions,
   DEFAULT_TRUNCATION,
   DEFAULT_TAIL_CHUNK_DURATION_MS,
-  DEFAULT_BACKWARD_CHUNK_DURATION_MS,
+  DEFAULT_OLDER_CHUNK_DURATION_MS,
+  DEFAULT_NEWER_CHUNK_DURATION_MS,
 } from 'src/logs/constants'
 import {LogsState, TableData, SearchStatus} from 'src/types/logs'
 
@@ -63,12 +64,17 @@ export const defaultState: LogsState = {
     severityLevelColors: [],
     isTruncated: DEFAULT_TRUNCATION,
   },
-  tableTime: {},
+  tableTime: {
+    custom: '',
+    relative: 0,
+  },
   searchStatus: SearchStatus.None,
   nextOlderUpperBound: undefined,
+  nextNewerUpperBound: undefined,
   nextTailLowerBound: undefined,
   tailChunkDurationMs: DEFAULT_TAIL_CHUNK_DURATION_MS,
-  backwardChunkDurationMs: DEFAULT_BACKWARD_CHUNK_DURATION_MS,
+  olderChunkDurationMs: DEFAULT_OLDER_CHUNK_DURATION_MS,
+  newerChunkDurationMs: DEFAULT_NEWER_CHUNK_DURATION_MS,
   newRowsAdded: 0,
 }
 
@@ -80,6 +86,7 @@ const clearTableData = (state: LogsState) => {
       backward: defaultTableData,
     },
     nextOlderUpperBound: undefined,
+    nextNewerUpperBound: undefined,
     nextTailLowerBound: undefined,
   }
 }
@@ -165,39 +172,39 @@ const concatMoreLogs = (
   }
 }
 
-// const prependMoreLogs = (
-//   state: LogsState,
-//   action: PrependMoreLogsAction
-// ): LogsState => {
-//   const {
-//     series: {values},
-//   } = action.payload
-//   const {tableInfiniteData} = state
-//   const {forward} = tableInfiniteData
-//   const vals = [...values, ...forward.values]
-//   console.log(
-//     'prependMoreLogs vals.length',
-//     vals.length,
-//     '= forward.values.length',
-//     forward.values.length,
-//     '+ values.length',
-//     values.length
-//   )
-//   // TODO(js): make query inclusivity/exclusivity ensure no duplicate data, or otherwise filter out duplicate data by converting bound to unix timestamp
-//   const newRowsAdded = vals.length - forward.values.length
+const prependMoreLogs = (
+  state: LogsState,
+  action: PrependMoreLogsAction
+): LogsState => {
+  const {
+    series: {values},
+  } = action.payload
+  const {tableInfiniteData} = state
+  const {forward} = tableInfiniteData
+  const vals = [...values, ...forward.values]
+  console.log(
+    'prependMoreLogs vals.length',
+    vals.length,
+    '= forward.values.length',
+    forward.values.length,
+    '+ values.length',
+    values.length
+  )
+  // TODO(js): make query inclusivity/exclusivity ensure no duplicate data, or otherwise filter out duplicate data by converting bound to unix timestamp
+  const newRowsAdded = vals.length - forward.values.length
 
-//   return {
-//     ...state,
-//     newRowsAdded,
-//     tableInfiniteData: {
-//       ...tableInfiniteData,
-//       forward: {
-//         columns: forward.columns,
-//         values: vals,
-//       },
-//     },
-//   }
-// }
+  return {
+    ...state,
+    newRowsAdded,
+    tableInfiniteData: {
+      ...tableInfiniteData,
+      forward: {
+        columns: forward.columns,
+        values: vals,
+      },
+    },
+  }
+}
 
 export const setConfigs = (state: LogsState, action: SetConfigsAction) => {
   const {logConfig} = state
@@ -264,10 +271,10 @@ export default (state: LogsState = defaultState, action: Action) => {
     case ActionTypes.SetTableRelativeTime:
       return {...state, tableTime: {relative: action.payload.time}}
     case ActionTypes.SetNextOlderUpperBound:
-      // console.log('SetNextOlderUpperBound reducer', action.payload.upper)
       return {...state, nextOlderUpperBound: action.payload.upper}
-    case ActionTypes.setNextTailLowerBound:
-      // console.log('setNextTailLowerBound reducer', action.payload.lower)
+    case ActionTypes.SetNextNewerUpperBound:
+      return {...state, nextNewerUpperBound: action.payload.upper}
+    case ActionTypes.SetNextTailLowerBound:
       return {...state, nextTailLowerBound: action.payload.lower}
     case ActionTypes.AddFilter:
       return addFilter(state, action)
@@ -283,8 +290,8 @@ export default (state: LogsState = defaultState, action: Action) => {
       return concatMoreLogs(state, action)
     case ActionTypes.PrependMoreLogs:
       return prependMoreLogs(state, action)
-    case ActionTypes.ReplacePrependedLogs:
-      return replacePrependedLogs(state, action)
+    // case ActionTypes.ReplacePrependedLogs:
+    //   return replacePrependedLogs(state, action)
     case ActionTypes.SetConfig:
       return setConfigs(state, action)
     case ActionTypes.ClearTableData:

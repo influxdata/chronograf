@@ -52,14 +52,16 @@ export interface LogsState {
   }
   tableTime: {
     custom?: string
-    relative?: string
+    relative?: number
   }
   newRowsAdded: number
   searchStatus: SearchStatus
-  nextTailLowerBound: number
-  nextOlderUpperBound: number
+  nextOlderUpperBound: number | undefined
+  nextNewerUpperBound: number | undefined
+  nextTailLowerBound: number | undefined
   tailChunkDurationMs: number
-  backwardChunkDurationMs: number
+  olderChunkDurationMs: number
+  newerChunkDurationMs: number
 }
 
 export interface LogConfig {

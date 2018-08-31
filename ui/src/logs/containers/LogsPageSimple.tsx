@@ -14,7 +14,8 @@ import QueryResults from 'src/logs/components/QueryResults'
 
 const NOW = 0
 const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
-const BACKWARD_VALUES_LIMIT = 100
+const NEWER_CHUNK_SIZE_LIMIT = 100
+const OLDER_CHUNK_SIZE_LIMIT = 100
 
 import {
   setTableCustomTimeAsync,
@@ -29,9 +30,12 @@ import {
   addFilter,
   removeFilter,
   changeFilter,
-  fetchOlderLogsAsync,
+  fetchOlderChunkAsync,
+  fetchNewerChunkAsync,
   fetchLogsTailAsync,
   setNextTailLowerBound,
+  setNextOlderUpperBound,
+  setNextNewerUpperBound,
   getLogConfigAsync,
   updateLogConfigAsync,
   clearTableData,
@@ -117,9 +121,12 @@ interface Props {
     custom: string
     relative: number
   }
-  fetchOlderLogsAsync: () => Promise<void>
+  fetchOlderChunkAsync: () => Promise<void>
+  fetchNewerChunkAsync: typeof fetchNewerChunkAsync
   fetchLogsTailAsync: () => Promise<void>
   setNextTailLowerBound: typeof setNextTailLowerBound
+  setNextNewerUpperBound: typeof setNextNewerUpperBound
+  setNextOlderUpperBound: typeof setNextOlderUpperBound
   nextOlderUpperBound: string
   searchStatus: SearchStatus
   clearSearchData: (searchStatus: SearchStatus) => void
@@ -132,7 +139,8 @@ interface State {
   isOverlayVisible: boolean
   histogramColors: HistogramColor[]
   hasScrolled: boolean
-  backwardLogsLimit: number
+  newerChunkSizeLimit: number
+  olderChunkSizeLimit: number
 }
 
 class LogsPageSimple extends Component<Props, State> {
@@ -162,7 +170,8 @@ class LogsPageSimple extends Component<Props, State> {
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
-      backwardLogsLimit: BACKWARD_VALUES_LIMIT,
+      newerChunkSizeLimit: NEWER_CHUNK_SIZE_LIMIT,
+      olderChunkSizeLimit: OLDER_CHUNK_SIZE_LIMIT,
     }
   }
 
@@ -212,7 +221,7 @@ class LogsPageSimple extends Component<Props, State> {
     this.updateTableData(SearchStatus.Loading)
 
     // if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
-    //   this.startNewerLogsFetchingInterval()
+    //   this.startLogsTailFetchingInterval()
     // }
   }
 
@@ -257,8 +266,8 @@ class LogsPageSimple extends Component<Props, State> {
               isScrolledToTop={false}
               isTruncated={this.isTruncated}
               onTagSelection={this.handleTagSelection}
-              fetchMore={this.handleFetchMore}
-              fetchNewer={() => console.log('nuke')}
+              fetchMore={this.handleFetchOlderChunk}
+              fetchNewer={this.handleFetchNewerChunk}
               timeRange={timeRange}
               scrollToRow={this.tableScrollToRow}
               tableColumns={this.tableColumns}
@@ -295,8 +304,8 @@ class LogsPageSimple extends Component<Props, State> {
     this.setState({liveUpdating: false})
   }
 
-  private startNewerLogsFetchingInterval = () => {
-    console.log('startNewerLogsFetchingInterval')
+  private startLogsTailFetchingInterval = () => {
+    console.log('startLogsTailFetchingInterval')
     if (this.interval) {
       clearInterval(this.interval)
     }
@@ -305,32 +314,57 @@ class LogsPageSimple extends Component<Props, State> {
       .utc()
       .valueOf()
     this.props.setNextTailLowerBound(now)
-    console.log('handleLogsTailFetchingInterval now', now)
+    console.log('handleTailFetchingInterval now', now)
 
     this.interval = window.setInterval(
-      this.handleLogsTailFetchingInterval,
+      this.handleTailFetchingInterval,
       DEFAULT_TAIL_CHUNK_DURATION_MS
     )
     this.setState({liveUpdating: true})
   }
 
   // only happens on page load or on search
-  private handleLogsTailFetchingInterval = async () => {
+  private handleTailFetchingInterval = async () => {
     switch (this.props.searchStatus) {
       case SearchStatus.Clearing:
       case SearchStatus.Paused:
       case SearchStatus.None:
         return
     }
+    console.log('handleTailFetchingInterval')
 
     await this.fetchLogsTail()
   }
 
   private fetchLogsTail = async () => {
+    console.log('fetchLogsTail')
     await this.props.fetchLogsTailAsync()
   }
 
-  private fetchOlderLogs = async () => {
+  private fetchNewerChunk = async () => {
+    switch (this.props.searchStatus) {
+      case SearchStatus.Clearing:
+      case SearchStatus.None:
+        return
+    }
+
+    const totalForwardValues = getDeep<number | null>(
+      this.props,
+      'tableInfiniteData.forward.values.length',
+      null
+    )
+
+    await this.props.fetchNewerChunkAsync()
+
+    if (
+      totalForwardValues !== null &&
+      totalForwardValues < this.newerChunkSizeLimit
+    ) {
+      await this.fetchNewerChunk()
+    }
+  }
+
+  private fetchOlderChunk = async () => {
     switch (this.props.searchStatus) {
       case SearchStatus.Clearing:
       case SearchStatus.None:
@@ -343,17 +377,47 @@ class LogsPageSimple extends Component<Props, State> {
       null
     )
 
-    await this.props.fetchOlderLogsAsync()
+    await this.props.fetchOlderChunkAsync()
 
     if (
       totalBackwardValues !== null &&
-      totalBackwardValues < this.backwardLogsLimit
+      totalBackwardValues < this.olderChunkSizeLimit
     ) {
-      await this.fetchOlderLogs()
+      await this.fetchOlderChunk()
     }
   }
 
-  private handleFetchMore = () => {
+  private handleFetchNewerChunk = () => {
+    console.log('FETCHING NEWER TABLE LOGS')
+    const totalForwardValues = getDeep<number | null>(
+      this.props,
+      'tableInfiniteData.forward.values.length',
+      null
+    )
+
+    if (totalForwardValues < this.newerChunkSizeLimit) {
+      return
+    }
+
+    const newerChunkSizeLimit =
+      this.newerChunkSizeLimit + NEWER_CHUNK_SIZE_LIMIT
+
+    this.setState({
+      newerChunkSizeLimit,
+    })
+
+    this.fetchNewerChunk()
+  }
+
+  private get newerChunkSizeLimit() {
+    console.log(
+      'CURRENT NEWER CHUNK SIZE LIMIT',
+      this.state.newerChunkSizeLimit
+    )
+    return this.state.newerChunkSizeLimit
+  }
+
+  private handleFetchOlderChunk = () => {
     console.log('FETCHING MORE TABLE LOGS')
     const totalBackwardValues = getDeep<number | null>(
       this.props,
@@ -361,22 +425,26 @@ class LogsPageSimple extends Component<Props, State> {
       null
     )
 
-    if (totalBackwardValues < this.backwardLogsLimit) {
+    if (totalBackwardValues < this.olderChunkSizeLimit) {
       return
     }
 
-    const backwardLogsLimit = this.backwardLogsLimit + BACKWARD_VALUES_LIMIT
+    const olderChunkSizeLimit =
+      this.olderChunkSizeLimit + OLDER_CHUNK_SIZE_LIMIT
 
     this.setState({
-      backwardLogsLimit,
+      olderChunkSizeLimit,
     })
 
-    this.fetchOlderLogs()
+    this.fetchOlderChunk()
   }
 
-  private get backwardLogsLimit() {
-    console.log(' CURRRENT BACK LIMIT', this.state.backwardLogsLimit)
-    return this.state.backwardLogsLimit
+  private get olderChunkSizeLimit() {
+    console.log(
+      'CURRENT OLDER CHUNK SIZE LIMIT',
+      this.state.olderChunkSizeLimit
+    )
+    return this.state.olderChunkSizeLimit
   }
 
   private get tableScrollToRow() {
@@ -400,6 +468,8 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleChooseCustomTime = async (time: string) => {
+    this.clearAllBounds()
+
     this.props.setTableCustomTime(time)
     const liveUpdating = false
 
@@ -416,6 +486,8 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleChooseRelativeTime = async (time: number) => {
+    this.clearAllBounds()
+
     this.props.setTableRelativeTime(time)
     this.setState({hasScrolled: false})
 
@@ -434,6 +506,12 @@ class LogsPageSimple extends Component<Props, State> {
     this.setState({liveUpdating})
     await this.props.setTimeMarker(timeOption)
     this.handleSetTimeBounds()
+  }
+
+  private clearAllBounds(): void {
+    this.props.setNextNewerUpperBound(undefined)
+    this.props.setNextOlderUpperBound(undefined)
+    this.props.setNextTailLowerBound(undefined)
   }
 
   private get tableData(): TableData {
@@ -469,7 +547,7 @@ class LogsPageSimple extends Component<Props, State> {
 
   private handleScrollToTop = () => {
     // if (!this.state.liveUpdating) {
-      // this.startNewerLogsFetchingInterval()
+    // this.startLogsTailFetchingInterval()
     // }
   }
 
@@ -726,14 +804,19 @@ class LogsPageSimple extends Component<Props, State> {
 
   private fetchNewDataset() {
     console.log('fetchNewDataset')
-    this.setState({backwardLogsLimit: BACKWARD_VALUES_LIMIT})
+    this.setState({olderChunkSizeLimit: OLDER_CHUNK_SIZE_LIMIT})
 
     const shouldLiveUpdate = this.props.tableTime.relative === 0
+    console.log('shouldLiveUpdate', shouldLiveUpdate)
+    console.log('this.props.tableTime.relative', this.props.tableTime.relative)
+    console.log('this.props.tableTime.custom', this.props.tableTime.custom)
     if (shouldLiveUpdate) {
-      this.startNewerLogsFetchingInterval()
+      this.startLogsTailFetchingInterval()
+    } else {
+      this.fetchNewerChunk()
     }
 
-    this.fetchOlderLogs()
+    this.fetchOlderChunk()
   }
 
   private handleToggleOverlay = (): void => {
@@ -874,9 +957,12 @@ const mapDispatchToProps = {
   addFilter,
   removeFilter,
   changeFilter,
-  fetchOlderLogsAsync,
+  fetchOlderChunkAsync,
+  fetchNewerChunkAsync,
   fetchLogsTailAsync,
   setNextTailLowerBound,
+  setNextOlderUpperBound,
+  setNextNewerUpperBound,
   setTableCustomTime: setTableCustomTimeAsync,
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,

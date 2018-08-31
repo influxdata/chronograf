@@ -58,8 +58,8 @@ interface Props {
   onScrollVertical: () => void
   onScrolledToTop: () => void
   onTagSelection: (selection: {tag: string; key: string}) => void
-  fetchMore: (time: string) => Promise<void>
-  fetchNewer: (time: string) => void
+  fetchMore: () => void
+  fetchNewer: () => void
   hasScrolled: boolean
   count: number
   timeRange: TimeRange

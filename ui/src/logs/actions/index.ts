@@ -36,8 +36,8 @@ import {
 
 export const INITIAL_LIMIT = 1000
 import {
-  DEFAULT_TAIL_CHUNK_DURATION_MS,
-  DEFAULT_BACKWARD_CHUNK_DURATION_MS,
+  DEFAULT_OLDER_CHUNK_DURATION_MS,
+  DEFAULT_NEWER_CHUNK_DURATION_MS,
   DEFAULT_MAX_TAIL_BUFFER_DURATION_MS,
 } from 'src/logs/constants'
 
@@ -88,7 +88,8 @@ export enum ActionTypes {
   ClearRowsAdded = 'CLEAR_ROWS_ADDED',
   ClearTableData = 'CLEAR_TABLE_DATA',
   SetNextOlderUpperBound = 'SET_NEXT_OLDER_UPPER_BOUND',
-  setNextTailLowerBound = 'SET_NEXT_NEWER_LOWER_BOUND',
+  SetNextNewerUpperBound = 'SET_NEXT_NEWER_UPPER_BOUND',
+  SetNextTailLowerBound = 'SET_NEXT_NEWER_LOWER_BOUND',
   SetSearchStatus = 'SET_SEARCH_STATUS',
 }
 
@@ -263,10 +264,17 @@ interface SetNextOlderUpperBoundAction {
   }
 }
 
-interface setNextTailLowerBoundAction {
-  type: ActionTypes.setNextTailLowerBound
+interface SetNextTailLowerBoundAction {
+  type: ActionTypes.SetNextTailLowerBound
   payload: {
     lower: number | undefined
+  }
+}
+
+interface SetNextNewerUpperBoundAction {
+  type: ActionTypes.SetNextNewerUpperBound
+  payload: {
+    upper: number | undefined
   }
 }
 
@@ -304,7 +312,8 @@ export type Action =
   | ClearRowsAddedAction
   | ClearTableDataAction
   | SetNextOlderUpperBoundAction
-  | setNextTailLowerBoundAction
+  | SetNextNewerUpperBoundAction
+  | SetNextTailLowerBoundAction
   | SetSearchStatusAction
 
 const getBackwardTableData = (state: State): TableData =>
@@ -415,10 +424,17 @@ export const setNextOlderUpperBound = (
   payload: {upper},
 })
 
+export const setNextNewerUpperBound = (
+  upper: number
+): SetNextNewerUpperBoundAction => ({
+  type: ActionTypes.SetNextNewerUpperBound,
+  payload: {upper},
+})
+
 export const setNextTailLowerBound = (
   lower: number
-): setNextTailLowerBoundAction => ({
-  type: ActionTypes.setNextTailLowerBound,
+): SetNextTailLowerBoundAction => ({
+  type: ActionTypes.SetNextTailLowerBound,
   payload: {lower},
 })
 
@@ -698,7 +714,7 @@ export const setTableQueryConfigAsync = () => async (
   }
 }
 
-export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
+export const fetchOlderChunkAsync = () => async (dispatch, getState) => {
   const state = getState()
 
   const selectedTableTime = getTableSelectedTime(state)
@@ -708,15 +724,15 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
     selectedTableTime
   )
 
-  const backwardChunkDurationMs = getDeep<number>(
+  const olderChunkDurationMs = getDeep<number>(
     state,
-    'logs.backwardChunkDurationMs',
-    DEFAULT_BACKWARD_CHUNK_DURATION_MS
+    'logs.olderChunkDurationMs',
+    DEFAULT_OLDER_CHUNK_DURATION_MS
   )
 
   const upper = moment(nextOlderUpperBound).toISOString()
   const lower = moment(upper)
-    .subtract(backwardChunkDurationMs, 'milliseconds')
+    .subtract(olderChunkDurationMs, 'milliseconds')
     .toISOString()
 
   dispatch(
@@ -744,8 +760,8 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
       filters,
       searchTerm
     )
-    // console.log('fetchOlderLogsAsync upper', upper, 'lower', lower)
-    // console.log('fetchOlderLogsAsync query', query)
+    // console.log('fetchOlderChunkAsync upper', upper, 'lower', lower)
+    // console.log('fetchOlderChunkAsync query', query)
 
     const response = await executeQueryAsync(
       proxyLink,
@@ -769,7 +785,86 @@ export const fetchOlderLogsAsync = () => async (dispatch, getState) => {
   }
 }
 
+export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
+  const state = getState()
+
+  const selectedTableTime = getTableSelectedTime(state)
+  const nextNewerUpperBound = getDeep<number>(
+    state,
+    'logs.nextNewerUpperBound',
+    selectedTableTime
+  )
+
+  const newerChunkDurationMs = getDeep<number>(
+    state,
+    'logs.newerChunkDurationMs',
+    DEFAULT_NEWER_CHUNK_DURATION_MS
+  )
+
+  const lower = moment(selectedTableTime).toISOString()
+  const upper = moment(nextNewerUpperBound)
+    .add(newerChunkDurationMs, 'milliseconds')
+    .toISOString()
+
+  console.log(
+    'fetchNewerChunkAsync upper',
+    upper
+  )
+  console.log(
+    'fetchNewerChunkAsync lower',
+    lower
+  )
+
+  dispatch(
+    setNextNewerUpperBound(
+      moment(upper)
+        .utc()
+        .valueOf()
+    )
+  )
+
+  const tableQueryConfig = getTableQueryConfig(state)
+  const namespace = getNamespace(state)
+  const proxyLink = getProxyLink(state)
+  const searchTerm = getSearchTerm(state)
+  const filters = getFilters(state)
+  const params = [namespace, proxyLink, tableQueryConfig]
+
+  if (_.every(params)) {
+    const query = await buildInfiniteScrollLogQuery(
+      lower,
+      upper,
+      tableQueryConfig,
+      filters,
+      searchTerm
+    )
+    // console.log('fetchOlderChunkAsync upper', upper, 'lower', lower)
+    // console.log('fetchOlderChunkAsync query', query)
+
+    const response = await executeQueryAsync(
+      proxyLink,
+      namespace,
+      `${query} ORDER BY time DESC`
+    )
+
+    const logSeries = getDeep<TableData>(
+      response,
+      'results.0.series.0',
+      defaultTableData
+    )
+    // if (logSeries.values.length > 0) {
+    //   dispatch(setSearchStatus(SearchStatus.Loaded))
+    // }
+    await dispatch(prependMoreLogs(logSeries))
+  } else {
+    throw new Error(
+      `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
+    )
+  }
+}
+
 export const fetchLogsTailAsync = () => async (dispatch, getState) => {
+  console.log('fetchLogsTailAsync')
   const state = getState()
 
   const {nextTailLowerBound} = state.logs
@@ -795,10 +890,13 @@ export const fetchLogsTailAsync = () => async (dispatch, getState) => {
   const isMaxTailBufferDurationExceeded =
     currentForwardBufferDuration >= maxTailBufferDurationMs
 
-  // console.log('upperUTC', upperUTC)
-  // console.log('lowerUTC', nextTailLowerBound)
-  // console.log('currentForwardBufferDuration', currentForwardBufferDuration)
-  // console.log('isMaxTailBufferDurationExceeded', isMaxTailBufferDurationExceeded)
+  console.log('upperUTC', upperUTC)
+  console.log('lowerUTC', nextTailLowerBound)
+  console.log('currentForwardBufferDuration', currentForwardBufferDuration)
+  console.log(
+    'isMaxTailBufferDurationExceeded',
+    isMaxTailBufferDurationExceeded
+  )
 
   // TODO(js): check if bounds are inclusive on both ends
 
@@ -966,12 +1064,12 @@ export const prependMoreLogs = (series: TableData): PrependMoreLogsAction => ({
   payload: {series},
 })
 
-export const replacePrependedLogs = (
-  series: TableData
-): ReplacePrependedLogsAction => ({
-  type: ActionTypes.ReplacePrependedLogs,
-  payload: {series},
-})
+// export const replacePrependedLogs = (
+//   series: TableData
+// ): ReplacePrependedLogsAction => ({
+//   type: ActionTypes.ReplacePrependedLogs,
+//   payload: {series},
+// })
 
 export const setNamespaceAsync = (namespace: Namespace) => async (
   dispatch
