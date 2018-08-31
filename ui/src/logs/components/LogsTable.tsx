@@ -424,9 +424,9 @@ class LogsTable extends Component<Props, State> {
   private loadMoreBelowRows = async () => {
     // Prevent multiple queries at the same time
     const {queryCount} = this.props
-    if (queryCount > 0) {
-      return
-    }
+    // if (queryCount > 0) {
+    //   return
+    // }
 
     const data = getValuesFromData(this.props.tableInfiniteData.backward)
     const forwardData = getValuesFromData(this.props.tableInfiniteData.forward)

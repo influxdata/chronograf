@@ -434,7 +434,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleFetchOlderChunk = () => {
-    console.log('FETCHING MORE TABLE LOGS')
+    console.log('HANDLE FETCHING MORE TABLE LOGS')
     const totalBackwardValues = getDeep<number | null>(
       this.props,
       'tableInfiniteData.backward.values.length',
