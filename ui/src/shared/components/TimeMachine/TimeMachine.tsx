@@ -470,7 +470,7 @@ class TimeMachine extends PureComponent<Props, State> {
         onDeleteQuery={this.handleDeleteQuery}
         onAddQuery={this.handleAddQuery}
         activeQueryIndex={activeQueryIndex}
-        activeQuery={this.getActiveQuery()}
+        activeQuery={this.activeQuery}
         setActiveQueryIndex={this.handleSetActiveQueryIndex}
         initialGroupByTime={AUTO_GROUP_BY}
       />
@@ -483,7 +483,7 @@ class TimeMachine extends PureComponent<Props, State> {
     return isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
   }
 
-  private getActiveQuery = (): QueryConfig => {
+  private get activeQuery(): QueryConfig {
     const {activeQueryIndex} = this.state
 
     const queriesWorkingDraft = this.queriesWorkingDraft
@@ -549,7 +549,7 @@ class TimeMachine extends PureComponent<Props, State> {
   private handleEditRawText = async (text: string): Promise<void> => {
     const {templates, updateQueryDrafts, queryDrafts} = this.props
 
-    const id = this.getActiveQuery().id
+    const id = this.activeQuery.id
     const url = getDeep<string>(this.source, 'links.queries', '')
 
     const userDefinedTempVarsInQuery = this.findUserDefinedTempVarsInQuery(
@@ -564,33 +564,35 @@ class TimeMachine extends PureComponent<Props, State> {
       const nextQueries = queryDrafts.map(q => {
         const {queryConfig} = q
         if (queryConfig.id === id) {
-          const isQuerySupportedByExplorer = !isUsingUserDefinedTempVars
-
-          if (isUsingUserDefinedTempVars) {
+          if (
+            isUsingUserDefinedTempVars ||
+            _.isEmpty(newQueryConfig.database)
+          ) {
             return {
               ...q,
               queryConfig: {
                 ...queryConfig,
                 rawText: text,
                 status: {loading: true},
-                isQuerySupportedByExplorer,
+                isQuerySupportedByExplorer: false,
               },
               query: text,
               text,
             }
           }
 
-          // preserve query range and groupBy
+          let groupBy = newQueryConfig.groupBy
+          if (text.indexOf(':interval:') >= 0) {
+            groupBy = queryConfig.groupBy
+          }
+
           return {
             ...q,
             queryConfig: {
               ...newQueryConfig,
               status: {loading: true},
-              rawText: text,
-              range: queryConfig.range,
-              groupBy: queryConfig.groupBy,
-              source: queryConfig.source,
-              isQuerySupportedByExplorer,
+              groupBy,
+              isQuerySupportedByExplorer: true,
             },
             query: text,
             text,
@@ -653,9 +655,9 @@ class TimeMachine extends PureComponent<Props, State> {
   private handleDeleteQuery = (index: number) => {
     const {queryDrafts, deleteQuery, isInCEO} = this.props
     const queryToDelete = queryDrafts.find((__, i) => i === index)
-    const activeQuery = this.getActiveQuery()
+    const activeQueryId = this.activeQuery.id
     const activeQueryIndex = queryDrafts.findIndex(
-      query => query.id === activeQuery.id
+      query => query.id === activeQueryId
     )
     let newIndex: number
     if (index === activeQueryIndex) {

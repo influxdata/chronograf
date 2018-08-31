@@ -91,7 +91,7 @@ interface State {
 
 @ErrorHandling
 class CellEditorOverlay extends Component<Props, State> {
-  private overlayRef: HTMLDivElement
+  private overlayRef: React.RefObject<HTMLDivElement> = React.createRef()
 
   public constructor(props: Props) {
     super(props)
@@ -105,30 +105,28 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   public componentDidMount() {
-    if (this.overlayRef) {
-      this.overlayRef.focus()
-    }
+    this.handleResetFocus()
   }
 
   public render() {
     const {
-      fluxLinks,
-      script,
-      notify,
-      services,
-      onCancel,
-      templates,
-      timeRange,
-      editQueryStatus,
+      addQuery,
       cell,
+      deleteQuery,
+      editQueryStatus,
+      fluxLinks,
+      notify,
+      onCancel,
       queryDrafts,
+      renameCell,
+      script,
+      services,
       source,
       sources,
-      updateQueryDrafts,
-      renameCell,
-      addQuery,
-      deleteQuery,
+      templates,
+      timeRange,
       updateEditorTimeRange,
+      updateQueryDrafts,
       updateScript,
       queryStatus,
     } = this.props
@@ -140,7 +138,7 @@ class CellEditorOverlay extends Component<Props, State> {
         className="deceo--overlay"
         onKeyDown={this.handleKeyDown}
         tabIndex={0}
-        ref={this.onRef}
+        ref={this.overlayRef}
       >
         <TimeMachine
           fluxLinks={fluxLinks}
@@ -228,10 +226,6 @@ class CellEditorOverlay extends Component<Props, State> {
     }
   }
 
-  private onRef = (r: HTMLDivElement) => {
-    this.overlayRef = r
-  }
-
   private handleSaveCell = () => {
     const {isStaticLegend} = this.state
     const {
@@ -304,7 +298,7 @@ class CellEditorOverlay extends Component<Props, State> {
           }
 
           e.target.blur()
-          this.overlayRef.focus()
+          this.handleResetFocus()
         }
         break
     }
@@ -315,7 +309,9 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private handleResetFocus = () => {
-    this.overlayRef.focus()
+    if (this.overlayRef.current) {
+      this.overlayRef.current.focus()
+    }
   }
 }
 
