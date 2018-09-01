@@ -1,13 +1,14 @@
+// Libraries
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
-
 import _ from 'lodash'
 import uuid from 'uuid'
 
+// Components
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import Threshold from 'src/dashboards/components/Threshold'
 import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDecimalPlaces'
 
+// Constants
 import {
   COLOR_TYPE_THRESHOLD,
   THRESHOLD_COLORS,
@@ -15,11 +16,7 @@ import {
   MIN_THRESHOLDS,
 } from 'src/shared/constants/thresholds'
 
-import {
-  changeDecimalPlaces,
-  updateGaugeColors,
-  updateAxes,
-} from 'src/dashboards/actions/cellEditorOverlay'
+// Types
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
@@ -30,9 +27,9 @@ interface Props {
   gaugeColors: ColorNumber[]
   decimalPlaces: DecimalPlaces
   onResetFocus: () => void
-  handleUpdateAxes: (a: Axes) => void
+  onUpdateAxes: (a: Axes) => void
   onUpdateDecimalPlaces: (d: DecimalPlaces) => void
-  handleUpdateGaugeColors: (d: ColorNumber[]) => void
+  onUpdateGaugeColors: (g: ColorNumber[]) => void
 }
 
 @ErrorHandling
@@ -116,7 +113,7 @@ class GaugeOptions extends PureComponent<Props> {
   }
 
   private handleAddThreshold = () => {
-    const {gaugeColors, handleUpdateGaugeColors, onResetFocus} = this.props
+    const {gaugeColors, onUpdateGaugeColors, onResetFocus} = this.props
     const sortedColors = _.sortBy(gaugeColors, color => color.value)
 
     if (sortedColors.length <= MAX_THRESHOLDS) {
@@ -145,25 +142,25 @@ class GaugeOptions extends PureComponent<Props> {
         color => color.value
       )
 
-      handleUpdateGaugeColors(updatedColors)
+      onUpdateGaugeColors(updatedColors)
     } else {
       onResetFocus()
     }
   }
 
   private handleDeleteThreshold = threshold => {
-    const {handleUpdateGaugeColors, onResetFocus} = this.props
+    const {onUpdateGaugeColors, onResetFocus} = this.props
     const gaugeColors = this.props.gaugeColors.filter(
       color => color.id !== threshold.id
     )
     const sortedColors = _.sortBy(gaugeColors, color => color.value)
 
-    handleUpdateGaugeColors(sortedColors)
+    onUpdateGaugeColors(sortedColors)
     onResetFocus()
   }
 
   private handleChooseColor = threshold => {
-    const {handleUpdateGaugeColors} = this.props
+    const {onUpdateGaugeColors} = this.props
     const gaugeColors = this.props.gaugeColors.map(
       color =>
         color.id === threshold.id
@@ -171,16 +168,16 @@ class GaugeOptions extends PureComponent<Props> {
           : color
     )
 
-    handleUpdateGaugeColors(gaugeColors)
+    onUpdateGaugeColors(gaugeColors)
   }
 
   private handleUpdateColorValue = (threshold, value) => {
-    const {handleUpdateGaugeColors} = this.props
+    const {onUpdateGaugeColors} = this.props
     const gaugeColors = this.props.gaugeColors.map(
       color => (color.id === threshold.id ? {...color, value} : color)
     )
 
-    handleUpdateGaugeColors(gaugeColors)
+    onUpdateGaugeColors(gaugeColors)
   }
 
   private handleValidateColorValue = (threshold, targetValue) => {
@@ -225,17 +222,17 @@ class GaugeOptions extends PureComponent<Props> {
   }
 
   private handleUpdatePrefix = e => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, prefix: e.target.value}}
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 
   private handleUpdateSuffix = e => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, suffix: e.target.value}}
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 
   get sortedGaugeColors() {
@@ -246,21 +243,4 @@ class GaugeOptions extends PureComponent<Props> {
   }
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {
-    gaugeColors,
-    cell: {axes, decimalPlaces},
-  },
-}) => ({
-  decimalPlaces,
-  gaugeColors,
-  axes,
-})
-
-const mapDispatchToProps = {
-  handleUpdateGaugeColors: updateGaugeColors,
-  handleUpdateAxes: updateAxes,
-  onUpdateDecimalPlaces: changeDecimalPlaces,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(GaugeOptions)
+export default GaugeOptions

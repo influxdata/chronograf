@@ -1,18 +1,11 @@
 // Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
 import classnames from 'classnames'
 
 // Components
 import {Controlled as ReactCodeMirror} from 'react-codemirror2'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {SlideToggle, ComponentSize} from 'src/reusable_ui'
-
-// Actions
-import {
-  updateCellNote,
-  UpdateCellNoteVisibility,
-} from 'src/dashboards/actions/cellEditorOverlay'
 
 // Types
 import {CellNoteVisibility} from 'src/types/dashboards'
@@ -26,8 +19,8 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   note: string
   noteVisibility: CellNoteVisibility
-  handleUpdateCellNote: (note: string) => void
-  handleUpdateCellNoteVisibility: (noteVisibility: CellNoteVisibility) => void
+  onUpdateNote: (note: string) => void
+  onUpdateNoteVisibility: (noteVisibility: CellNoteVisibility) => void
 }
 
 interface State {
@@ -92,12 +85,12 @@ class CellNoteEditor extends Component<Props, State> {
   }
 
   private handleSlideToggle = (): void => {
-    const {noteVisibility, handleUpdateCellNoteVisibility} = this.props
+    const {noteVisibility, onUpdateNoteVisibility} = this.props
 
     if (noteVisibility === CellNoteVisibility.Default) {
-      handleUpdateCellNoteVisibility(CellNoteVisibility.ShowWhenNoData)
+      onUpdateNoteVisibility(CellNoteVisibility.ShowWhenNoData)
     } else {
-      handleUpdateCellNoteVisibility(CellNoteVisibility.Default)
+      onUpdateNoteVisibility(CellNoteVisibility.Default)
     }
   }
 
@@ -106,11 +99,11 @@ class CellNoteEditor extends Component<Props, State> {
   }
 
   private handleBlur = (): void => {
-    const {handleUpdateCellNote} = this.props
+    const {onUpdateNote} = this.props
     const {noteDraft} = this.state
 
     this.setState({editorIsFocused: false})
-    handleUpdateCellNote(noteDraft)
+    onUpdateNote(noteDraft)
   }
 
   private onTouchStart = (): void => {}
@@ -126,18 +119,4 @@ class CellNoteEditor extends Component<Props, State> {
   }
 }
 
-const mstp = ({
-  cellEditorOverlay: {
-    cell: {note, noteVisibility},
-  },
-}) => ({
-  note,
-  noteVisibility,
-})
-
-const mdtp = {
-  handleUpdateCellNote: updateCellNote,
-  handleUpdateCellNoteVisibility: UpdateCellNoteVisibility,
-}
-
-export default connect(mstp, mdtp)(CellNoteEditor)
+export default CellNoteEditor

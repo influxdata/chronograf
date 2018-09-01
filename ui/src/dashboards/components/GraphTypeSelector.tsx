@@ -1,13 +1,9 @@
 // Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
 import classnames from 'classnames'
 
 // Components
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-
-// Actions
-import {changeCellType} from 'src/dashboards/actions/cellEditorOverlay'
 
 // Constants
 import {GRAPH_TYPES} from 'src/dashboards/graphics/graph'
@@ -15,9 +11,12 @@ import {GRAPH_TYPES} from 'src/dashboards/graphics/graph'
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+// Types
+import {CellType} from 'src/types/dashboards'
+
 interface Props {
   type: string
-  handleChangeCellType: (newType: string) => void
+  onUpdateVisType: (newType: CellType) => void
 }
 
 @ErrorHandling
@@ -48,21 +47,9 @@ class GraphTypeSelector extends Component<Props> {
     )
   }
 
-  private onChangeCellType = (newType: string) => (): void => {
-    this.props.handleChangeCellType(newType)
+  private onChangeCellType = (newType: CellType) => (): void => {
+    this.props.onUpdateVisType(newType)
   }
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {
-    cell: {type},
-  },
-}) => ({
-  type,
-})
-
-const mapDispatchToProps = {
-  handleChangeCellType: changeCellType,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(GraphTypeSelector)
+export default GraphTypeSelector

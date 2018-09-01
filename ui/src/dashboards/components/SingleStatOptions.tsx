@@ -1,24 +1,27 @@
+// Libraries
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
 
+// Components
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import ThresholdsList from 'src/shared/components/ThresholdsList'
 import ThresholdsListTypeToggle from 'src/shared/components/ThresholdsListTypeToggle'
 import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDecimalPlaces'
 
-import {
-  updateAxes,
-  changeDecimalPlaces,
-} from 'src/dashboards/actions/cellEditorOverlay'
+// Types
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes} from 'src/types'
-import {DecimalPlaces} from 'src/types/dashboards'
+import {DecimalPlaces, ThresholdType} from 'src/types/dashboards'
+import {ColorNumber} from 'src/types/colors'
 
 interface Props {
   axes: Axes
   decimalPlaces: DecimalPlaces
+  thresholdsListType: ThresholdType
+  thresholdsListColors: ColorNumber[]
   onResetFocus: () => void
   onUpdateAxes: (axes: Axes) => void
+  onUpdateThresholdsListColors: (c: ColorNumber[]) => void
+  onUpdateThresholdsListType: (newType: ThresholdType) => void
   onUpdateDecimalPlaces: (decimalPlaces: DecimalPlaces) => void
 }
 
@@ -31,13 +34,22 @@ class SingleStatOptions extends PureComponent<Props> {
       },
       onResetFocus,
       decimalPlaces,
+      onUpdateThresholdsListColors,
+      thresholdsListType,
+      thresholdsListColors,
+      onUpdateThresholdsListType,
     } = this.props
 
     return (
       <FancyScrollbar className="display-options" autoHide={false}>
         <div className="display-options--wrapper">
           <h5 className="display-options--header">Single Stat Controls</h5>
-          <ThresholdsList onResetFocus={onResetFocus} />
+          <ThresholdsList
+            onResetFocus={onResetFocus}
+            thresholdsListType={thresholdsListType}
+            thresholdsListColors={thresholdsListColors}
+            onUpdateThresholdsListColors={onUpdateThresholdsListColors}
+          />
           <div className="graph-options-group form-group-wrapper">
             <div className="form-group col-xs-6">
               <label>Prefix</label>
@@ -64,7 +76,11 @@ class SingleStatOptions extends PureComponent<Props> {
               isEnforced={decimalPlaces.isEnforced}
               onDecimalPlacesChange={this.handleDecimalPlacesChange}
             />
-            <ThresholdsListTypeToggle containerClass="form-group col-xs-6" />
+            <ThresholdsListTypeToggle
+              containerClass="form-group col-xs-6"
+              thresholdsListType={thresholdsListType}
+              onUpdateThresholdsListType={onUpdateThresholdsListType}
+            />
           </div>
         </div>
       </FancyScrollbar>
@@ -91,14 +107,4 @@ class SingleStatOptions extends PureComponent<Props> {
   }
 }
 
-const mstp = ({cellEditorOverlay}) => ({
-  axes: cellEditorOverlay.cell.axes,
-  decimalPlaces: cellEditorOverlay.cell.decimalPlaces,
-})
-
-const mdtp = {
-  onUpdateAxes: updateAxes,
-  onUpdateDecimalPlaces: changeDecimalPlaces,
-}
-
-export default connect(mstp, mdtp)(SingleStatOptions)
+export default SingleStatOptions

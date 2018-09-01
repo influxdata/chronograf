@@ -6,6 +6,7 @@ import buildQueries from 'src/utils/buildQueriesForGraphs'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
+import {QueryUpdateState} from 'src/shared/actions/queries'
 
 import {TimeRange, QueryConfig, Axes, Template, Source, Status} from 'src/types'
 import {
@@ -39,6 +40,7 @@ interface Props {
   note: string
   noteVisibility: CellNoteVisibility
   manualRefresh: number
+  editorLocation?: QueryUpdateState
 }
 
 const DashVisualization: SFC<Props> = ({
@@ -59,6 +61,7 @@ const DashVisualization: SFC<Props> = ({
   manualRefresh,
   decimalPlaces,
   autoRefresher,
+  editorLocation,
   noteVisibility,
   editQueryStatus,
   resizerTopHeight,
@@ -94,6 +97,7 @@ const DashVisualization: SFC<Props> = ({
           cellNoteVisibility={noteVisibility}
           timeRange={timeRange}
           manualRefresh={manualRefresh}
+          editorLocation={editorLocation}
         />
       </div>
     </div>

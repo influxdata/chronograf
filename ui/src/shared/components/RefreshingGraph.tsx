@@ -25,6 +25,7 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 import {setHoverTime} from 'src/dashboards/actions'
 
 // Types
+import {QueryUpdateState} from 'src/shared/actions/queries'
 import {ColorString} from 'src/types/colors'
 import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
 import {
@@ -62,6 +63,7 @@ interface Props {
   grabDataForDownload?: GrabDataForDownloadHandler
   cellNote: string
   cellNoteVisibility: CellNoteVisibility
+  editorLocation?: QueryUpdateState
 }
 
 class RefreshingGraph extends PureComponent<Props> {
@@ -171,6 +173,7 @@ class RefreshingGraph extends PureComponent<Props> {
       manualRefresh,
       handleSetHoverTime,
       isInCEO,
+      editorLocation,
     } = this.props
 
     return (
@@ -183,6 +186,7 @@ class RefreshingGraph extends PureComponent<Props> {
         fieldOptions={fieldOptions}
         timeFormat={timeFormat}
         decimalPlaces={decimalPlaces}
+        editorLocation={editorLocation}
         handleSetHoverTime={handleSetHoverTime}
       />
     )

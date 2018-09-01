@@ -13,7 +13,8 @@ import {
   computeFieldOptions,
   transformTableData,
 } from 'src/dashboards/utils/tableGraph'
-import {updateFieldOptions} from 'src/dashboards/actions/cellEditorOverlay'
+import {updateFieldOptions} from 'src/shared/actions/visualizations'
+import {QueryUpdateState} from 'src/shared/actions/queries'
 import {DEFAULT_TIME_FIELD} from 'src/dashboards/constants'
 import {
   ASCENDING,
@@ -61,10 +62,11 @@ interface Props {
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
   hoverTime: string
-  handleUpdateFieldOptions: (fieldOptions: FieldOption[]) => void
+  handleUpdateFieldOptions: typeof updateFieldOptions
   handleSetHoverTime: (hovertime: string) => void
   colors: ColorString
   isInCEO: boolean
+  editorLocation?: QueryUpdateState
 }
 
 interface State {
@@ -366,9 +368,9 @@ class TableGraph extends Component<Props, State> {
   }
 
   private handleUpdateFieldOptions = (fieldOptions: FieldOption[]): void => {
-    const {isInCEO, handleUpdateFieldOptions} = this.props
+    const {isInCEO, handleUpdateFieldOptions, editorLocation} = this.props
     if (isInCEO) {
-      handleUpdateFieldOptions(fieldOptions)
+      handleUpdateFieldOptions(fieldOptions, editorLocation)
     }
   }
 

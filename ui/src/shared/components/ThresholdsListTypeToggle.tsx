@@ -1,12 +1,8 @@
 // Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
 
 // Components
 import {Radio, ButtonShape} from 'src/reusable_ui'
-
-// Actions
-import {updateThresholdsListType} from 'src/dashboards/actions/cellEditorOverlay'
 
 // Constants
 import {
@@ -17,15 +13,14 @@ import {
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface PropsFromRedux {
-  thresholdsListType: string
-}
-interface PropsFromParent {
-  containerClass: string
-  handleUpdateThresholdsListType: (newType: string) => void
-}
+// Types
+import {ThresholdType} from 'src/types/dashboards'
 
-type Props = PropsFromRedux & PropsFromParent
+interface Props {
+  containerClass: string
+  thresholdsListType: ThresholdType
+  onUpdateThresholdsListType: (newType: ThresholdType) => void
+}
 
 @ErrorHandling
 class ThresholdsListTypeToggle extends Component<Props> {
@@ -33,7 +28,7 @@ class ThresholdsListTypeToggle extends Component<Props> {
     const {
       containerClass,
       thresholdsListType,
-      handleUpdateThresholdsListType,
+      onUpdateThresholdsListType,
     } = this.props
 
     return (
@@ -44,7 +39,7 @@ class ThresholdsListTypeToggle extends Component<Props> {
             id="threshold-list-type--background"
             value={THRESHOLD_TYPE_BG}
             active={thresholdsListType === THRESHOLD_TYPE_BG}
-            onClick={handleUpdateThresholdsListType}
+            onClick={onUpdateThresholdsListType}
             titleText="Apply coloration to cell background"
           >
             Background
@@ -53,7 +48,7 @@ class ThresholdsListTypeToggle extends Component<Props> {
             id="threshold-list-type--text"
             value={THRESHOLD_TYPE_TEXT}
             active={thresholdsListType === THRESHOLD_TYPE_TEXT}
-            onClick={handleUpdateThresholdsListType}
+            onClick={onUpdateThresholdsListType}
             titleText="Apply coloration to cell text"
           >
             Text
@@ -64,16 +59,4 @@ class ThresholdsListTypeToggle extends Component<Props> {
   }
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {thresholdsListType},
-}): PropsFromRedux => ({
-  thresholdsListType,
-})
-
-const mapDispatchToProps = {
-  handleUpdateThresholdsListType: updateThresholdsListType,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(
-  ThresholdsListTypeToggle
-)
+export default ThresholdsListTypeToggle

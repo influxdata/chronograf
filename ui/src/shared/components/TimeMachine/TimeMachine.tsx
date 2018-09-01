@@ -313,6 +313,7 @@ class TimeMachine extends PureComponent<Props, State> {
           staticLegend={isStaticLegend}
           isInCEO={isInCEO}
           manualRefresh={manualRefresh}
+          editorLocation={this.stateToUpdate}
           {...visualizationOptions}
         />
       </div>
@@ -340,6 +341,7 @@ class TimeMachine extends PureComponent<Props, State> {
         onToggleStaticLegend={onToggleStaticLegend}
         staticLegend={isStaticLegend}
         onResetFocus={onResetFocus}
+        stateToUpdate={this.stateToUpdate}
       />
     )
   }
