@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/influxdb/influxql"
+	"github.com/influxdata/influxql"
 )
 
 type literalJSON struct {
@@ -207,9 +207,8 @@ type VarRef struct {
 func (v *VarRef) MarshalJSON() ([]byte, error) {
 	if v.Type != influxql.Unknown {
 		return []byte(fmt.Sprintf(`{"expr": "reference", "val": "%s", "type": "%s"}`, v.Val, v.Type.String())), nil
-	} else {
-		return []byte(fmt.Sprintf(`{"expr": "reference",  "val": "%s"}`, v.Val)), nil
 	}
+	return []byte(fmt.Sprintf(`{"expr": "reference",  "val": "%s"}`, v.Val)), nil
 }
 
 type Wildcard struct {
