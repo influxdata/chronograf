@@ -10,7 +10,7 @@ export default {
       column: 91,
     },
     source:
-      'from(db: "telegraf") |> filter(fn: (r) => r["_measurement"] == "cpu") |> range(start: -1m)',
+      'from(bucket: "telegraf") |> filter(fn: (r) => r["_measurement"] == "cpu") |> range(start: -1m)',
   },
   body: [
     {
@@ -25,7 +25,7 @@ export default {
           column: 91,
         },
         source:
-          'from(db: "telegraf") |> filter(fn: (r) => r["_measurement"] == "cpu") |> range(start: -1m)',
+          'from(bucket: "telegraf") |> filter(fn: (r) => r["_measurement"] == "cpu") |> range(start: -1m)',
       },
       expression: {
         type: 'PipeExpression',
@@ -64,7 +64,7 @@ export default {
                 line: 1,
                 column: 21,
               },
-              source: 'from(db: "telegraf")',
+              source: 'from(bucket: "telegraf")',
             },
             callee: {
               type: 'Identifier',
