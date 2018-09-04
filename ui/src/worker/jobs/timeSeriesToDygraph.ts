@@ -17,11 +17,9 @@ export interface TimeSeriesToDyGraphReturnType {
 }
 
 export const timeSeriesToDygraphWork = (
-  raw: TimeSeriesServerResponse[],
-  pathname: string = ''
+  raw: TimeSeriesServerResponse[]
 ): TimeSeriesToDyGraphReturnType => {
   const isTable = false
-  const isInDataExplorer = pathname.includes('data-explorer')
   const {sortedLabels, sortedTimeSeries} = groupByTimeSeriesTransform(
     raw,
     isTable
@@ -40,11 +38,10 @@ export const timeSeriesToDygraphWork = (
   const dygraphSeries = fastReduce<Label, DygraphSeries>(
     sortedLabels,
     (acc, {label, responseIndex}) => {
-      if (!isInDataExplorer) {
-        acc[label] = {
-          axis: responseIndex === 0 ? 'y' : 'y2',
-        }
+      acc[label] = {
+        axis: responseIndex === 0 ? 'y' : 'y2',
       }
+
       return acc
     },
     {}
@@ -54,9 +51,9 @@ export const timeSeriesToDygraphWork = (
 }
 
 const timeSeriesToDygraph = async msg => {
-  const {raw, pathname} = await fetchData(msg)
+  const {raw} = await fetchData(msg)
 
-  return timeSeriesToDygraphWork(raw, pathname)
+  return timeSeriesToDygraphWork(raw)
 }
 
 export default timeSeriesToDygraph
