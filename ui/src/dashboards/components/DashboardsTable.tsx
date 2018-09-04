@@ -7,10 +7,11 @@ import ConfirmButton from 'src/shared/components/ConfirmButton'
 
 import {getDeep} from 'src/utils/wrappers'
 
-import {Dashboard, Template} from 'src/types'
+import {Dashboard, Template, RemoteDataState} from 'src/types'
 
 interface Props {
   dashboards: Dashboard[]
+  dashboardsStatus: RemoteDataState
   onDeleteDashboard: (dashboard: Dashboard) => () => void
   onCreateDashboard: () => void
   onCloneDashboard: (
@@ -24,14 +25,26 @@ class DashboardsTable extends PureComponent<Props> {
   public render() {
     const {
       dashboards,
+      dashboardsStatus,
       dashboardLink,
       onCloneDashboard,
       onDeleteDashboard,
       onExportDashboard,
     } = this.props
 
+    if (
+      dashboardsStatus === RemoteDataState.Loading ||
+      dashboardsStatus === RemoteDataState.NotStarted
+    ) {
+      return this.renderLoadingState()
+    }
+
+    if (dashboardsStatus === RemoteDataState.Error) {
+      return this.renderErrorState()
+    }
+
     if (!dashboards.length) {
-      return this.emptyStateDashboard
+      return this.renderEmptyState()
     }
 
     return (
@@ -109,22 +122,36 @@ class DashboardsTable extends PureComponent<Props> {
     return <span className="empty-string">None</span>
   }
 
-  private get emptyStateDashboard(): JSX.Element {
+  private renderLoadingState(): JSX.Element {
+    return (
+      <div className="generic-empty-state">
+        <h4>Loading dashboards...</h4>
+      </div>
+    )
+  }
+
+  private renderErrorState(): JSX.Element {
+    return (
+      <div className="generic-empty-state">
+        <h4>Unable to load dashboards</h4>
+      </div>
+    )
+  }
+
+  private renderEmptyState(): JSX.Element {
     const {onCreateDashboard} = this.props
+
     return (
       <Authorized
         requiredRole={EDITOR_ROLE}
         replaceWithIfNotAuthorized={this.unauthorizedEmptyState}
       >
         <div className="generic-empty-state">
-          <h4 style={{marginTop: '90px'}}>
-            Looks like you don’t have any dashboards
-          </h4>
+          <h4>Looks like you don’t have any dashboards</h4>
           <br />
           <button
             className="btn btn-sm btn-primary"
             onClick={onCreateDashboard}
-            style={{marginBottom: '90px'}}
           >
             <span className="icon plus" /> Create Dashboard
           </button>
