@@ -33,11 +33,11 @@ import {Source, Dashboard, RemoteDataState} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
 
-interface Props {
+export interface Props {
   source: Source
   sources: Source[]
   router: InjectedRouter
-  handleGetDashboards: () => Dashboard[]
+  handleGetDashboards: () => Promise<Dashboard[]>
   handleGetChronografVersion: () => string
   handleDeleteDashboard: (dashboard: Dashboard) => void
   handleImportDashboard: (dashboard: Dashboard) => void
@@ -51,7 +51,7 @@ interface State {
 }
 
 @ErrorHandling
-class DashboardsPage extends PureComponent<Props, State> {
+export class DashboardsPage extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
