@@ -11,8 +11,6 @@ import {
   buildLogQuery,
   buildInfiniteScrollLogQuery,
   parseHistogramQueryResponse,
-  findOlderLowerTimeBounds,
-  findNewerUpperTimeBounds,
 } from 'src/logs/utils'
 import {logConfigServerToUI, logConfigUIToServer} from 'src/logs/utils/config'
 import {getDeep} from 'src/utils/wrappers'
@@ -319,9 +317,6 @@ export type Action =
 const getBackwardTableData = (state: State): TableData =>
   state.logs.tableInfiniteData.backward
 
-const getForwardTableData = (state: State): TableData =>
-  state.logs.tableInfiniteData.forward
-
 const combineTableData = (...tableDatas: TableData[]) => ({
   columns: tableDatas[0].columns,
   values: _.flatMap(tableDatas, t => t.values),
@@ -338,9 +333,6 @@ const getProxyLink = (state: State): string | null =>
 
 const getHistogramQueryConfig = (state: State): QueryConfig | null =>
   getDeep<QueryConfig | null>(state, 'logs.histogramQueryConfig', null)
-
-const getSearchStatus = (state: State): SearchStatus =>
-  getDeep<SearchStatus | null>(state, 'logs.searchStatus', null)
 
 const getTableQueryConfig = (state: State): QueryConfig | null =>
   getDeep<QueryConfig | null>(state, 'logs.tableQueryConfig', null)
@@ -460,121 +452,13 @@ export const clearSearchData = (
   await dispatch(setSearchStatus(searchStatus))
 }
 
-// export const executeTableNewerQueryAsync = () => async (
-//   dispatch,
-//   getState: GetState
-// ) => {
-//   const state = getState()
-
-//   const startTime = getTableSelectedTime(state)
-//   const queryConfig = getTableQueryConfig(state)
-//   const namespace = getNamespace(state)
-//   const proxyLink = getProxyLink(state)
-//   const searchTerm = getSearchTerm(state)
-//   const filters = getFilters(state)
-
-//   if (!_.every([queryConfig, startTime, namespace, proxyLink])) {
-//     return
-//   }
-
-//   try {
-//     dispatch(incrementQueryCount())
-
-//     const endTime = await findNewerUpperTimeBounds(
-//       startTime,
-//       queryConfig,
-//       filters,
-//       searchTerm,
-//       proxyLink,
-//       namespace
-//     )
-
-//     const query: string = await buildInfiniteScrollLogQuery(
-//       startTime,
-//       endTime,
-//       queryConfig,
-//       filters,
-//       searchTerm
-//     )
-
-//     const response = await executeQueryAsync(
-//       proxyLink,
-//       namespace,
-//       `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
-//     )
-
-//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
-
-//     const result = {
-//       columns: series.columns,
-//       values: _.reverse(series.values),
-//     }
-
-//     dispatch(setTableForwardData(result))
-//   } finally {
-//     dispatch(decrementQueryCount())
-//   }
-// }
-
-// export const executeTableOlderQueryAsync = () => async (
-//   dispatch,
-//   getState: GetState
-// ) => {
-//   const state = getState()
-
-//   const time = getTableSelectedTime(state)
-//   const queryConfig = getTableQueryConfig(state)
-//   const namespace = getNamespace(state)
-//   const proxyLink = getProxyLink(state)
-//   const searchTerm = getSearchTerm(state)
-//   const filters = getFilters(state)
-
-//   if (!_.every([queryConfig, time, namespace, proxyLink])) {
-//     return
-//   }
-
-//   try {
-//     dispatch(incrementQueryCount())
-
-//     const lower: string = await findOlderLowerTimeBounds(
-//       time,
-//       queryConfig,
-//       filters,
-//       searchTerm,
-//       proxyLink,
-//       namespace
-//     )
-
-//     const query: string = await buildInfiniteScrollLogQuery(
-//       lower,
-//       time,
-//       queryConfig,
-//       filters,
-//       searchTerm
-//     )
-
-//     const response = await executeQueryAsync(
-//       proxyLink,
-//       namespace,
-//       `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
-//     )
-
-//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
-
-//     dispatch(setTableBackwardData(series))
-//   } finally {
-//     dispatch(decrementQueryCount())
-//   }
-// }
 
 export const setTableCustomTimeAsync = (time: string) => async dispatch => {
   await dispatch(setTableCustomTime(time))
-  // await dispatch(executeTableQueryAsync())
 }
 
 export const setTableRelativeTimeAsync = (time: number) => async dispatch => {
   await dispatch(setTableRelativeTime(time))
-  // await dispatch(executeTableQueryAsync())
 }
 
 export const changeFilter = (id: string, operator: string, value: string) => ({
@@ -632,14 +516,6 @@ export const executeHistogramQueryAsync = () => async (
   }
 }
 
-// export const executeTableQueryAsync = () => async (dispatch): Promise<void> => {
-//   await Promise.all([
-//     dispatch(executeTableNewerQueryAsync()),
-//     dispatch(executeTableOlderQueryAsync()),
-//     dispatch(clearRowsAdded()),
-//   ])
-// }
-
 export const decrementQueryCount = () => ({
   type: ActionTypes.DecrementQueryCount,
 })
@@ -647,17 +523,6 @@ export const decrementQueryCount = () => ({
 export const incrementQueryCount = () => ({
   type: ActionTypes.IncrementQueryCount,
 })
-
-// export const executeQueriesAsync = () => async dispatch => {
-//   try {
-//     await Promise.all([
-//       dispatch(executeHistogramQueryAsync()),
-//       dispatch(executeTableQueryAsync()),
-//     ])
-//   } catch {
-//     console.error('Could not make query requests')
-//   }
-// }
 
 export const setHistogramQueryConfigAsync = () => async (
   dispatch,
@@ -710,7 +575,6 @@ export const setTableQueryConfigAsync = () => async (
     const queryConfig = buildTableQueryConfig(namespace, timeRange)
 
     dispatch(setTableQueryConfig(queryConfig))
-    // dispatch(executeTableQueryAsync())
   }
 }
 
@@ -743,8 +607,6 @@ export const fetchOlderChunkAsync = () => async (dispatch, getState) => {
     )
   )
 
-  // console.log('older olderUpperBound', upper)
-  // console.log('older olderLowerBound', lower)
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -760,8 +622,6 @@ export const fetchOlderChunkAsync = () => async (dispatch, getState) => {
       filters,
       searchTerm
     )
-    // console.log('fetchOlderChunkAsync upper', upper, 'lower', lower)
-    // console.log('fetchOlderChunkAsync query', query)
 
     const response = await executeQueryAsync(
       proxyLink,
@@ -774,9 +634,7 @@ export const fetchOlderChunkAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-    // if (logSeries.values.length > 0) {
-    //   dispatch(setSearchStatus(SearchStatus.Loaded))
-    // }
+
     await dispatch(concatMoreLogs(logSeries))
   } else {
     throw new Error(
@@ -806,9 +664,6 @@ export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
     .add(newerChunkDurationMs, 'milliseconds')
     .toISOString()
 
-  console.log('fetchNewerChunkAsync upper', upper)
-  console.log('fetchNewerChunkAsync lower', lower)
-
   dispatch(
     setNextNewerUpperBound(
       moment(upper)
@@ -832,8 +687,6 @@ export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
       filters,
       searchTerm
     )
-    // console.log('fetchOlderChunkAsync upper', upper, 'lower', lower)
-    // console.log('fetchOlderChunkAsync query', query)
 
     const response = await executeQueryAsync(
       proxyLink,
@@ -846,9 +699,7 @@ export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-    // if (logSeries.values.length > 0) {
-    //   dispatch(setSearchStatus(SearchStatus.Loaded))
-    // }
+
     await dispatch(prependMoreLogs(logSeries))
   } else {
     throw new Error(
@@ -858,7 +709,6 @@ export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
 }
 
 export const fetchLogsTailAsync = () => async (dispatch, getState) => {
-  console.log('fetchLogsTailAsync')
   const state = getState()
 
   const {nextTailLowerBound} = state.logs
@@ -866,8 +716,6 @@ export const fetchLogsTailAsync = () => async (dispatch, getState) => {
   if (!nextTailLowerBound) {
     throw new Error('nextTailLowerBound is not set')
   }
-
-  // console.log('nextTailLowerBound', nextTailLowerBound)
 
   const lower = moment(nextTailLowerBound).toISOString()
   const upper = moment().toISOString()
@@ -884,16 +732,6 @@ export const fetchLogsTailAsync = () => async (dispatch, getState) => {
   const isMaxTailBufferDurationExceeded =
     currentForwardBufferDuration >= maxTailBufferDurationMs
 
-  console.log('upperUTC', upperUTC)
-  console.log('lowerUTC', nextTailLowerBound)
-  console.log('currentForwardBufferDuration', currentForwardBufferDuration)
-  console.log(
-    'isMaxTailBufferDurationExceeded',
-    isMaxTailBufferDurationExceeded
-  )
-
-  // TODO(js): check if bounds are inclusive on both ends
-
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -904,13 +742,11 @@ export const fetchLogsTailAsync = () => async (dispatch, getState) => {
   if (_.every(params)) {
     const query = await buildInfiniteScrollLogQuery(
       lower,
-      upper, // TODO: use 'now()' somehow
+      upper,
       tableQueryConfig,
       filters,
       searchTerm
     )
-    // console.log('fetchLogsTailAsync upper', upper, 'lower', lower)
-    // console.log('fetchLogsTailAsync query', query)
 
     const response = await executeQueryAsync(
       proxyLink,
@@ -923,17 +759,14 @@ export const fetchLogsTailAsync = () => async (dispatch, getState) => {
       'results.0.series.0',
       defaultTableData
     )
-    // console.log(query, logSeries.values)
 
     if (isMaxTailBufferDurationExceeded) {
-      // const currentForward = getForwardTableData(state)
       const currentBackward = getBackwardTableData(state)
       const combinedBackward = combineTableData(logSeries, currentBackward)
 
       dispatch(setTableBackwardData(combinedBackward))
       dispatch(setTableForwardData(defaultTableData))
       dispatch(setNextTailLowerBound(upperUTC))
-      // console.log('setTableBackwardData & setNextTailLowerBound(upperUTC)')
     } else {
       dispatch(
         setTableForwardData({
@@ -941,7 +774,6 @@ export const fetchLogsTailAsync = () => async (dispatch, getState) => {
           values: logSeries.values,
         })
       )
-      // console.log('setTableForwardData')
     }
   } else {
     throw new Error(
@@ -949,104 +781,6 @@ export const fetchLogsTailAsync = () => async (dispatch, getState) => {
     )
   }
 }
-
-// export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
-//   dispatch,
-//   getState
-// ): Promise<void> => {
-//   console.log('fetchOlderLogsAsync')
-//   const state = getState()
-//   const tableQueryConfig = getTableQueryConfig(state)
-//   const timeRange = {lower: queryTimeEnd}
-//   const newQueryConfig = {
-//     ...tableQueryConfig,
-//     range: timeRange,
-//   }
-//   const namespace = getNamespace(state)
-//   const proxyLink = getProxyLink(state)
-//   const searchTerm = getSearchTerm(state)
-//   const filters = getFilters(state)
-//   const params = [namespace, proxyLink, tableQueryConfig]
-
-//   if (_.every(params)) {
-//     const queryTimeStart = await findOlderLowerTimeBounds(
-//       queryTimeEnd,
-//       newQueryConfig,
-//       filters,
-//       searchTerm,
-//       proxyLink,
-//       namespace
-//     )
-
-//     const query = await buildInfiniteScrollLogQuery(
-//       queryTimeStart,
-//       queryTimeEnd,
-//       newQueryConfig,
-//       filters,
-//       searchTerm
-//     )
-
-//     const response = await executeQueryAsync(
-//       proxyLink,
-//       namespace,
-//       `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
-//     )
-
-//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
-//     await dispatch(concatMoreLogs(series))
-//   }
-// }
-
-// export const fetchLogsTailAsync = (queryTimeStart: string) => async (
-//   dispatch,
-//   getState
-// ): Promise<void> => {
-//   const state = getState()
-//   const tableQueryConfig = getTableQueryConfig(state)
-//   const timeRange = {lower: queryTimeStart}
-//   const newQueryConfig = {
-//     ...tableQueryConfig,
-//     range: timeRange,
-//   }
-//   const namespace = getNamespace(state)
-//   const proxyLink = getProxyLink(state)
-//   const searchTerm = getSearchTerm(state)
-//   const filters = getFilters(state)
-//   const params = [namespace, proxyLink, tableQueryConfig]
-
-//   if (_.every(params)) {
-//     const queryTimeEnd = await findNewerUpperTimeBounds(
-//       queryTimeStart,
-//       newQueryConfig,
-//       filters,
-//       searchTerm,
-//       proxyLink,
-//       namespace
-//     )
-
-//     const query: string = await buildInfiniteScrollLogQuery(
-//       queryTimeStart,
-//       queryTimeEnd,
-//       newQueryConfig,
-//       filters,
-//       searchTerm
-//     )
-
-//     const response = await executeQueryAsync(
-//       proxyLink,
-//       namespace,
-//       `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
-//     )
-
-//     const series = getDeep(response, 'results.0.series.0', defaultTableData)
-//     await dispatch(
-//       prependMoreLogs({
-//         columns: series.columns,
-//         values: _.reverse(series.values),
-//       })
-//     )
-//   }
-// }
 
 export const concatMoreLogs = (series: TableData): ConcatMoreLogsAction => ({
   type: ActionTypes.ConcatMoreLogs,
@@ -1057,13 +791,6 @@ export const prependMoreLogs = (series: TableData): PrependMoreLogsAction => ({
   type: ActionTypes.PrependMoreLogs,
   payload: {series},
 })
-
-// export const replacePrependedLogs = (
-//   series: TableData
-// ): ReplacePrependedLogsAction => ({
-//   type: ActionTypes.ReplacePrependedLogs,
-//   payload: {series},
-// })
 
 export const setNamespaceAsync = (namespace: Namespace) => async (
   dispatch
