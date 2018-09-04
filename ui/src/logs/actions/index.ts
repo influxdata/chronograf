@@ -598,25 +598,15 @@ export const fetchOlderChunkAsync = () => async (
     'logs.nextOlderUpperBound',
     selectedTableTime
   )
-
   const olderChunkDurationMs = getDeep<number>(
     state,
     'logs.olderChunkDurationMs',
     DEFAULT_OLDER_CHUNK_DURATION_MS
   )
-
   const upper = moment(nextOlderUpperBound).toISOString()
   const lower = moment(upper)
     .subtract(olderChunkDurationMs, 'milliseconds')
     .toISOString()
-
-  dispatch(
-    setNextOlderUpperBound(
-      moment(lower)
-        .utc()
-        .valueOf()
-    )
-  )
 
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
@@ -647,6 +637,14 @@ export const fetchOlderChunkAsync = () => async (
     )
 
     await dispatch(concatMoreLogs(logSeries))
+
+    dispatch(
+      setNextOlderUpperBound(
+        moment(lower)
+          .utc()
+          .valueOf()
+      )
+    )
   } else {
     throw new Error(
       `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
@@ -666,25 +664,15 @@ export const fetchNewerChunkAsync = () => async (
     'logs.nextNewerUpperBound',
     selectedTableTime
   )
-
   const newerChunkDurationMs = getDeep<number>(
     state,
     'logs.newerChunkDurationMs',
     DEFAULT_NEWER_CHUNK_DURATION_MS
   )
-
   const lower = moment(nextNewerUpperBound).toISOString()
   const upper = moment(nextNewerUpperBound)
     .add(newerChunkDurationMs, 'milliseconds')
     .toISOString()
-
-  dispatch(
-    setNextNewerUpperBound(
-      moment(upper)
-        .utc()
-        .valueOf()
-    )
-  )
 
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
@@ -715,6 +703,14 @@ export const fetchNewerChunkAsync = () => async (
     )
 
     await dispatch(prependMoreLogs(logSeries))
+
+    dispatch(
+      setNextNewerUpperBound(
+        moment(upper)
+          .utc()
+          .valueOf()
+      )
+    )
   } else {
     throw new Error(
       `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
