@@ -792,14 +792,9 @@ export const fetchLogsTailAsync = () => async (
 
       dispatch(setTableBackwardData(combinedBackward))
       dispatch(setTableForwardData(defaultTableData))
-      dispatch(setNextTailLowerBound(upperUTC))
+      await dispatch(setNextTailLowerBound(upperUTC))
     } else {
-      dispatch(
-        setTableForwardData({
-          columns: logSeries.columns,
-          values: logSeries.values,
-        })
-      )
+      await dispatch(setTableForwardData(logSeries))
     }
   } else {
     throw new Error(
