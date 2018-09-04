@@ -360,6 +360,43 @@ const getTableSelectedTime = (state: State): number => {
     .valueOf()
 }
 
+const getNextOlderUpperBound = (state: State): number => {
+  const selectedTableTime = getTableSelectedTime(state)
+  return getDeep<number>(state, 'logs.nextOlderUpperBound', selectedTableTime)
+}
+
+const getOlderChunkDurationMs = (state: State): number => {
+  return getDeep<number>(
+    state,
+    'logs.olderChunkDurationMs',
+    DEFAULT_OLDER_CHUNK_DURATION_MS
+  )
+}
+
+const getNextNewerUpperBound = (state: State): number => {
+  const selectedTableTime = getTableSelectedTime(state)
+  return getDeep<number>(state, 'logs.nextNewerUpperBound', selectedTableTime)
+}
+
+const getNewerChunkDurationMs = (state: State): number => {
+  return getDeep<number>(
+    state,
+    'logs.newerChunkDurationMs',
+    DEFAULT_NEWER_CHUNK_DURATION_MS
+  )
+}
+
+const getNextTailLowerBound = (state: State): number | void =>
+  state.logs.nextTailLowerBound
+
+const getMaxTailBufferDurationMs = (state: State): number => {
+  return getDeep<number>(
+    state,
+    'logs.maxTailBufferDurationMs',
+    DEFAULT_MAX_TAIL_BUFFER_DURATION_MS
+  )
+}
+
 export const clearTableData = () => ({
   type: ActionTypes.ClearTableData,
 })
@@ -592,22 +629,6 @@ export const fetchOlderChunkAsync = () => async (
 ): Promise<void> => {
   const state = getState()
 
-  const selectedTableTime = getTableSelectedTime(state)
-  const nextOlderUpperBound = getDeep<number>(
-    state,
-    'logs.nextOlderUpperBound',
-    selectedTableTime
-  )
-  const olderChunkDurationMs = getDeep<number>(
-    state,
-    'logs.olderChunkDurationMs',
-    DEFAULT_OLDER_CHUNK_DURATION_MS
-  )
-  const upper = moment(nextOlderUpperBound).toISOString()
-  const lower = moment(upper)
-    .subtract(olderChunkDurationMs, 'milliseconds')
-    .toISOString()
-
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -616,6 +637,22 @@ export const fetchOlderChunkAsync = () => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
+    const nextOlderUpperBound = getNextOlderUpperBound(state)
+    const olderChunkDurationMs = getOlderChunkDurationMs(state)
+
+    const upper = moment(nextOlderUpperBound).toISOString()
+    const lower = moment(upper)
+      .subtract(olderChunkDurationMs, 'milliseconds')
+      .toISOString()
+
+    dispatch(
+      setNextOlderUpperBound(
+        moment(lower)
+          .utc()
+          .valueOf()
+      )
+    )
+
     const query = await buildInfiniteScrollLogQuery(
       lower,
       upper,
@@ -637,14 +674,6 @@ export const fetchOlderChunkAsync = () => async (
     )
 
     await dispatch(concatMoreLogs(logSeries))
-
-    dispatch(
-      setNextOlderUpperBound(
-        moment(lower)
-          .utc()
-          .valueOf()
-      )
-    )
   } else {
     throw new Error(
       `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
@@ -658,22 +687,6 @@ export const fetchNewerChunkAsync = () => async (
 ): Promise<void> => {
   const state = getState()
 
-  const selectedTableTime = getTableSelectedTime(state)
-  const nextNewerUpperBound = getDeep<number>(
-    state,
-    'logs.nextNewerUpperBound',
-    selectedTableTime
-  )
-  const newerChunkDurationMs = getDeep<number>(
-    state,
-    'logs.newerChunkDurationMs',
-    DEFAULT_NEWER_CHUNK_DURATION_MS
-  )
-  const lower = moment(nextNewerUpperBound).toISOString()
-  const upper = moment(nextNewerUpperBound)
-    .add(newerChunkDurationMs, 'milliseconds')
-    .toISOString()
-
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -682,6 +695,22 @@ export const fetchNewerChunkAsync = () => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
+    const nextNewerUpperBound = getNextNewerUpperBound(state)
+    const newerChunkDurationMs = getNewerChunkDurationMs(state)
+
+    const lower = moment(nextNewerUpperBound).toISOString()
+    const upper = moment(nextNewerUpperBound)
+      .add(newerChunkDurationMs, 'milliseconds')
+      .toISOString()
+
+    dispatch(
+      setNextNewerUpperBound(
+        moment(upper)
+          .utc()
+          .valueOf()
+      )
+    )
+
     const query = await buildInfiniteScrollLogQuery(
       lower,
       upper,
@@ -703,14 +732,6 @@ export const fetchNewerChunkAsync = () => async (
     )
 
     await dispatch(prependMoreLogs(logSeries))
-
-    dispatch(
-      setNextNewerUpperBound(
-        moment(upper)
-          .utc()
-          .valueOf()
-      )
-    )
   } else {
     throw new Error(
       `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
@@ -728,27 +749,6 @@ export const fetchLogsTailAsync = () => async (
 ): Promise<void> => {
   const state = getState()
 
-  const {nextTailLowerBound} = state.logs
-
-  if (!nextTailLowerBound) {
-    throw new Error('nextTailLowerBound is not set')
-  }
-
-  const lower = moment(nextTailLowerBound).toISOString()
-  const upper = moment().toISOString()
-  const upperUTC = moment(upper)
-    .utc()
-    .valueOf()
-
-  const currentForwardBufferDuration = upperUTC - nextTailLowerBound
-  const maxTailBufferDurationMs = getDeep<number>(
-    state,
-    'logs.maxTailBufferDurationMs',
-    DEFAULT_MAX_TAIL_BUFFER_DURATION_MS
-  )
-  const isMaxTailBufferDurationExceeded =
-    currentForwardBufferDuration >= maxTailBufferDurationMs
-
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -757,6 +757,20 @@ export const fetchLogsTailAsync = () => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
+    const nextTailLowerBound = getNextTailLowerBound(state)
+    if (!nextTailLowerBound) {
+      throw new Error('nextTailLowerBound is not set')
+    }
+    const lower = moment(nextTailLowerBound).toISOString()
+    const upper = moment().toISOString()
+    const upperUTC = moment(upper)
+      .utc()
+      .valueOf()
+    const currentForwardBufferDuration = upperUTC - nextTailLowerBound
+    const maxTailBufferDurationMs = getMaxTailBufferDurationMs(state)
+    const isMaxTailBufferDurationExceeded =
+      currentForwardBufferDuration >= maxTailBufferDurationMs
+
     const query = await buildInfiniteScrollLogQuery(
       lower,
       upper,
