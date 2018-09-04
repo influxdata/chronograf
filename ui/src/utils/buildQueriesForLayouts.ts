@@ -90,7 +90,7 @@ export const buildQueriesForLayouts = (
   return cell.queries.map(query => {
     let queryText: string
     // Canned dashboards use an different a schema different from queryConfig.
-    if (query.queryConfig) {
+    if (_.get(query, 'queryConfig.database')) {
       const {
         queryConfig: {database, measurement, fields, shifts, rawText, range},
       } = query

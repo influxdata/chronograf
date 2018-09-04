@@ -522,7 +522,7 @@ class DashboardPage extends Component<Props, State> {
 
     if (this.isExistingCell(newCell)) {
       await this.props.updateDashboardCell(dashboard, newCell)
-    } else if (!this.isExistingCell(newCell)) {
+    } else {
       this.props.addDashboardCellAsync(dashboard, newCell)
     }
 

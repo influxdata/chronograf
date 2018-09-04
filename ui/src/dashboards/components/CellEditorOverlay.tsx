@@ -95,6 +95,7 @@ class CellEditorOverlay extends Component<Props, State> {
         type: 'none',
         text: '',
       },
+      currentService: null,
     }
   }
 
@@ -246,35 +247,48 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private handleSaveCell = () => {
-    const {isStaticLegend} = this.state
     const {
       queryDrafts,
       thresholdsListColors,
       gaugeColors,
       lineColors,
       cell,
+      script,
     } = this.props
+    const {isStaticLegend, currentService} = this.state
 
-    const queries: DashboardsModels.CellQuery[] = queryDrafts.map(q => {
-      const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
-        q,
-        'queryConfig',
-        null
-      )
-      const timeRange = getTimeRange(queryConfig)
-      const source = getDeep<string | null>(
-        queryConfig,
-        'source.links.self',
-        null
-      )
-      return {
-        ...q,
-        query:
-          queryConfig.rawText ||
-          buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig),
-        source,
-      }
-    })
+    let queries: DashboardsModels.CellQuery[]
+
+    if (_.get(currentService, 'type', '') === 'flux') {
+      queries = [
+        {
+          query: script.replace(/\s/g, ''),
+          queryConfig: null,
+          source: currentService.links.self,
+        },
+      ]
+    } else {
+      queries = queryDrafts.map(q => {
+        const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
+          q,
+          'queryConfig',
+          null
+        )
+        const timeRange = getTimeRange(queryConfig)
+        const source = getDeep<string | null>(
+          queryConfig,
+          'source.links.self',
+          null
+        )
+        return {
+          ...q,
+          query:
+            queryConfig.rawText ||
+            buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig),
+          source,
+        }
+      })
+    }
 
     const colors = getCellTypeColors({
       cellType: cell.type,

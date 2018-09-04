@@ -91,6 +91,7 @@ const renderTemplate = (query: string, template: Template): string => {
   }
 
   // Then render template variables not in regular expressions
+
   switch (type) {
     case TemplateValueType.TagKey:
     case TemplateValueType.FieldKey:

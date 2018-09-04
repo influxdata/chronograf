@@ -361,9 +361,21 @@ class TimeMachine extends PureComponent<Props, State> {
     return children(activeEditorTab, this.handleSetActiveEditorTab)
   }
 
-  private get service() {
-    const {service} = this.props
+  private get service(): Service {
+    const {service, services, queryDrafts} = this.props
     const {selectedService} = this.state
+
+    const queryDraft = _.get(queryDrafts, 0)
+    const querySource = _.get(queryDraft, 'source')
+
+    if (querySource.includes('service')) {
+      const foundService = services.find(s => {
+        return s.links.self === querySource
+      })
+      if (foundService) {
+        return foundService
+      }
+    }
 
     if (service) {
       return service
@@ -432,9 +444,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get isFluxSource(): boolean {
     // TODO: Update once flux is no longer a separate service
-    const {service} = this.props
-    const {selectedService} = this.state
-    if (selectedService || service) {
+    if (this.service) {
       return true
     }
     return false
