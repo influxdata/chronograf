@@ -555,27 +555,15 @@ $dash-graph-options-arrow: 8px;
 }
 
 /*
-  Dashboard Empty State
+  Dashboard Scoped Features
   ------------------------------------------------------
 */
 
 @import '../components/dashboard-empty';
-/*
-  Template Control Bar
-  ------------------------------------------------------
-*/
 
 @import '../components/template-control-bar';
-/*
-  Edit Template Variable
-  ------------------------------------------------------
-*/
 
 @import '../components/edit-template-variable';
-/*
-  Write Data Form
-  ------------------------------------------------------
-*/
 
 @import '../components/write-data-form';
 
