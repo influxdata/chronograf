@@ -146,7 +146,7 @@ export const getClonedDashboardCell = (
 
   const cellCloneFitsLeft = cellClone.x >= cellClone.w
   const cellCloneFitsRight =
-    MAX_COLUMNS - cellClone.w - cellClone.x >= cellClone.w
+    MAX_COLUMNS - (cellClone.w + cellClone.x) >= cellClone.w
 
   if (cellCloneFitsRight) {
     return {...cellClone, x: cellClone.x + cellClone.w, name}
