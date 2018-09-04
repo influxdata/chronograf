@@ -35,13 +35,12 @@ describe('PageHeader', () => {
     )
   }
 
-  beforeEach(() => {
-    jest.resetAllMocks()
-    wrapper = wrapperSetup()
-  })
-
   it('mounts without exploding', () => {
     expect(wrapper).toHaveLength(1)
+  })
+
+  it('matches snapshot with minimal props', () => {
+    expect(wrapper).toMatchSnapshot()
   })
 
   it('should contain matching error text if incorrect child types are passed in', done => {
@@ -55,7 +54,7 @@ describe('PageHeader', () => {
     }
   })
 
-  it('should contain matching error text if too many Header.Rights exist', done => {
+  it('should contain matching error text if too many of one header type exist', done => {
     try {
       wrapper = wrapperSetup(
         {},
@@ -69,9 +68,5 @@ describe('PageHeader', () => {
       )
       done()
     }
-  })
-
-  it('matches snapshot with minimal props', () => {
-    expect(wrapper).toMatchSnapshot()
   })
 })
