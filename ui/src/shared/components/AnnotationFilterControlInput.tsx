@@ -131,8 +131,10 @@ class AnnotationFilterControlInput extends PureComponent<Props, State> {
 
     if (key === 'Enter') {
       const {selectionIndex, filteredSuggestions} = this.state
+      const newValue =
+        filteredSuggestions[selectionIndex] || this.input.current.value
 
-      this.handleSelect(filteredSuggestions[selectionIndex])
+      this.handleSelect(newValue)
     } else if (
       key === 'ArrowDown' ||
       (ctrlKey && (key === 'j' || key === 'n')) // emacs and vim bindings
