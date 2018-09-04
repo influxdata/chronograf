@@ -660,13 +660,11 @@ export const fetchOlderChunkAsync = () => async (
       filters,
       searchTerm
     )
-
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
       `${query} ORDER BY time DESC`
     )
-
     const logSeries = getDeep<TableData>(
       response,
       'results.0.series.0',
@@ -718,13 +716,11 @@ export const fetchNewerChunkAsync = () => async (
       filters,
       searchTerm
     )
-
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
       `${query} ORDER BY time DESC`
     )
-
     const logSeries = getDeep<TableData>(
       response,
       'results.0.series.0',
@@ -763,6 +759,7 @@ export const fetchLogsTailAsync = () => async (
     }
     const lower = moment(nextTailLowerBound).toISOString()
     const upper = moment().toISOString()
+
     const upperUTC = moment(upper)
       .utc()
       .valueOf()
@@ -778,13 +775,11 @@ export const fetchLogsTailAsync = () => async (
       filters,
       searchTerm
     )
-
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
       `${query} ORDER BY time DESC`
     )
-
     const logSeries = getDeep<TableData>(
       response,
       'results.0.series.0',
