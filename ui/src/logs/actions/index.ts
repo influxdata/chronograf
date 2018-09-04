@@ -234,7 +234,7 @@ interface SetHistogramData {
   }
 }
 
-interface SetTableQueryConfig {
+interface SetTableQueryConfigAction {
   type: ActionTypes.SetTableQueryConfig
   payload: {
     queryConfig: QueryConfig
@@ -248,7 +248,7 @@ interface SetTableData {
   }
 }
 
-export interface SetConfigsAction {
+export interface SetConfigAction {
   type: ActionTypes.SetConfig
   payload: {
     logConfig: LogConfig
@@ -293,7 +293,7 @@ export type Action =
   | SetHistogramQueryConfig
   | SetHistogramData
   | SetTableData
-  | SetTableQueryConfig
+  | SetTableQueryConfigAction
   | AddFilterAction
   | RemoveFilterAction
   | ChangeFilterAction
@@ -302,7 +302,7 @@ export type Action =
   | ConcatMoreLogsAction
   | PrependMoreLogsAction
   | ReplacePrependedLogsAction
-  | SetConfigsAction
+  | SetConfigAction
   | SetTableCustomTimeAction
   | SetTableRelativeTimeAction
   | SetTableForwardDataAction
@@ -453,7 +453,6 @@ export const clearSearchData = (
   await dispatch(setSearchStatus(searchStatus))
 }
 
-
 export const setTableCustomTimeAsync = (time: string) => async dispatch => {
   await dispatch(setTableCustomTime(time))
 }
@@ -555,7 +554,9 @@ export const setHistogramQueryConfigAsync = () => async (
   }
 }
 
-export const setTableQueryConfig = (queryConfig: QueryConfig) => ({
+export const setTableQueryConfig = (
+  queryConfig: QueryConfig
+): SetTableQueryConfigAction => ({
   type: ActionTypes.SetTableQueryConfig,
   payload: {queryConfig},
 })
@@ -853,7 +854,7 @@ export const getSourceAndPopulateNamespacesAsync = (sourceID: string) => async (
 }
 
 export const getLogConfigAsync = (url: string) => async (
-  dispatch: Dispatch<SetConfigsAction>
+  dispatch: Dispatch<SetConfigAction>
 ): Promise<void> => {
   try {
     const {data} = await getLogConfigAJAX(url)
@@ -865,7 +866,7 @@ export const getLogConfigAsync = (url: string) => async (
 }
 
 export const updateLogConfigAsync = (url: string, config: LogConfig) => async (
-  dispatch: Dispatch<SetConfigsAction>
+  dispatch: Dispatch<SetConfigAction>
 ): Promise<void> => {
   try {
     const configForServer = logConfigUIToServer(config)
@@ -876,7 +877,7 @@ export const updateLogConfigAsync = (url: string, config: LogConfig) => async (
   }
 }
 
-export const setConfig = (logConfig: LogConfig): SetConfigsAction => {
+export const setConfig = (logConfig: LogConfig): SetConfigAction => {
   return {
     type: ActionTypes.SetConfig,
     payload: {

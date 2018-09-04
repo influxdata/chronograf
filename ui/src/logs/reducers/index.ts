@@ -11,7 +11,7 @@ import {
   ConcatMoreLogsAction,
   PrependMoreLogsAction,
   ReplacePrependedLogsAction,
-  SetConfigsAction,
+  SetConfigAction,
 } from 'src/logs/actions'
 
 import {
@@ -206,7 +206,7 @@ const prependMoreLogs = (
   }
 }
 
-export const setConfigs = (state: LogsState, action: SetConfigsAction) => {
+export const setConfigs = (state: LogsState, action: SetConfigAction) => {
   const {logConfig} = state
   const {
     logConfig: {tableColumns, severityFormat, severityLevelColors, isTruncated},
