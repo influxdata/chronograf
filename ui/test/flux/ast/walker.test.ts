@@ -195,11 +195,11 @@ describe('Flux.AST.Walker', () => {
           {
             type: 'PipeExpression',
             source:
-              'from(db: "telegraf") |> filter(fn: (r) => r["_measurement"] == "cpu") |> range(start: -1m)',
+              'from(bucket: "telegraf") |> filter(fn: (r) => r["_measurement"] == "cpu") |> range(start: -1m)',
             funcs: [
               {
                 name: 'from',
-                source: 'from(db: "telegraf")',
+                source: 'from(bucket: "telegraf")',
                 args: [{key: 'db', value: 'telegraf'}],
               },
               {

@@ -60,4 +60,4 @@ export const EXCLUDED_KEYS = [
 ]
 
 export const DEFAULT_SCRIPT =
-  'from(db: "pick a db")\n\t|> filter(fn: (r) => r._measurement == "your value here")\n\t|> range(start: -1m)\n\t|> yield(name: "Results")\n\n'
+  'from(bucket: "pick a bucket")\n\t|> filter(fn: (r) => r._measurement == "your value here")\n\t|> range(start: -1m)\n\t|> yield(name: "Results")\n\n'

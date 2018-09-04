@@ -247,7 +247,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
     const {searchTerm, limit} = this.state
     const response = await fetchTagValues({
       service,
-      db,
+      bucket: db,
       filter,
       tagKey,
       limit,
@@ -283,7 +283,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
     try {
       const response = await fetchTagValues({
         service,
-        db,
+        bucket: db,
         filter,
         tagKey,
         limit,

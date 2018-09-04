@@ -5,10 +5,10 @@ import {Service, SchemaFilter} from 'src/types'
 
 export const measurements = async (
   service: Service,
-  db: string
+  bucket: string
 ): Promise<any> => {
   const script = `
-    from(db:"${db}") 
+    from(bucket:"${bucket}") 
         |> range(start:-24h) 
         |> group(by:["_measurement"]) 
         |> distinct(column:"_measurement") 
@@ -20,7 +20,7 @@ export const measurements = async (
 
 export const tagKeys = async (
   service: Service,
-  db: string,
+  bucket: string,
   filter: SchemaFilter[]
 ): Promise<any> => {
   let tagKeyFilter = ''
@@ -32,8 +32,8 @@ export const tagKeys = async (
   }
 
   const script = `
-    from(db: "${db}")
-      |> range(start: -24h)
+    from(bucket: "${bucket}")
+      |> range(start: -30d)
       ${tagsetFilter(filter)}
      	|> group(none: true)
       |> keys(except:["_time", "_value", "_start", "_stop"])
@@ -46,7 +46,7 @@ export const tagKeys = async (
 
 interface TagValuesParams {
   service: Service
-  db: string
+  bucket: string
   tagKey: string
   limit: number
   filter?: SchemaFilter[]
@@ -55,7 +55,7 @@ interface TagValuesParams {
 }
 
 export const tagValues = async ({
-  db,
+  bucket,
   service,
   tagKey,
   limit,
@@ -73,7 +73,7 @@ export const tagValues = async ({
   const countFunc = count ? '|> count()' : ''
 
   const script = `
-    from(db:"${db}")
+    from(bucket:"${bucket}")
       |> range(start:-1h)
       ${regexFilter}
       ${tagsetFilter(filter)}
@@ -89,11 +89,11 @@ export const tagValues = async ({
 
 export const tagsFromMeasurement = async (
   service: Service,
-  db: string,
+  bucket: string,
   measurement: string
 ): Promise<any> => {
   const script = `
-    from(db:"${db}") 
+    from(bucket:"${bucket}") 
       |> range(start:-24h) 
       |> filter(fn:(r) => r._measurement == "${measurement}") 
       |> group() 
