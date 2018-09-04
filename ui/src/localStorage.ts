@@ -5,6 +5,8 @@ import {
   notifyLoadLocalSettingsFailed,
 } from 'src/shared/copy/notifications'
 
+import {editor} from 'src/flux/constants'
+
 import {LocalStorage} from 'src/types/localStorage'
 
 const VERSION = process.env.npm_package_version
@@ -52,7 +54,6 @@ export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
 
 export const saveToLocalStorage = ({
   app: {persisted},
-  dataExplorerQueryConfigs,
   timeRange,
   dataExplorer,
   dashTimeV1: {ranges},
@@ -71,23 +72,34 @@ export const saveToLocalStorage = ({
 
     window.localStorage.setItem(
       'state',
-      JSON.stringify({
-        ...appPersisted,
-        VERSION,
-        timeRange,
-        dashTimeV1,
-        dataExplorer,
-        dataExplorerQueryConfigs,
-        script,
-        logs: {
-          ...minimalLogs,
-          histogramData: [],
-          tableData: {},
-          queryCount: 0,
-          tableInfiniteData: minimalLogs.tableInfiniteData || {},
-          tableTime: minimalLogs.tableTime || {},
-        },
-      })
+      JSON.stringify(
+        _.omit(
+          {
+            ...appPersisted,
+            VERSION,
+            timeRange,
+            dashTimeV1,
+            dataExplorer: {
+              ...dataExplorer,
+              queryDrafts: dataExplorer.queryDrafts || [],
+              timeRange: dataExplorer.timeRange || {},
+              sourceLink: dataExplorer.sourceLink || '',
+              queryStatus: dataExplorer.queryStatus || {},
+              script: dataExplorer.script || editor.DEFAULT_SCRIPT,
+            },
+            script,
+            logs: {
+              ...minimalLogs,
+              histogramData: [],
+              tableData: {},
+              queryCount: 0,
+              tableInfiniteData: minimalLogs.tableInfiniteData || {},
+              tableTime: minimalLogs.tableTime || {},
+            },
+          },
+          'dataExplorerQueryConfigs'
+        )
+      )
     )
   } catch (err) {
     console.error('Unable to save data explorer: ', JSON.parse(err))

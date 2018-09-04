@@ -44,6 +44,7 @@ export enum TemplateType {
   Databases = 'databases',
   MetaQuery = 'influxql',
   Text = 'text',
+  TimeStamp = 'timeStamp',
 }
 
 export interface Template {

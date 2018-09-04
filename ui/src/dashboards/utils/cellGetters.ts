@@ -46,12 +46,10 @@ export const isCellUntitled = (cellName: string): boolean => {
   return cellName === UNTITLED_GRAPH
 }
 
-const getNextAvailablePosition = (dashboard, newCell) => {
-  const farthestY = dashboard.cells
-    .map(cell => cell.y)
-    .reduce((a, b) => (a > b ? a : b))
+export const getNextAvailablePosition = (cells, newCell) => {
+  const farthestY = cells.map(cell => cell.y).reduce((a, b) => (a > b ? a : b))
 
-  const bottomCells = dashboard.cells.filter(cell => cell.y === farthestY)
+  const bottomCells = cells.filter(cell => cell.y === farthestY)
   const farthestX = bottomCells
     .map(cell => cell.x)
     .reduce((a, b) => (a > b ? a : b))
@@ -97,7 +95,7 @@ export const getNewDashboardCell = (
     h: mostCommonCellHeight,
   }
 
-  const {x, y} = getNextAvailablePosition(dashboard, newCell)
+  const {x, y} = getNextAvailablePosition(dashboard.cells, newCell)
 
   return {
     ...newCell,

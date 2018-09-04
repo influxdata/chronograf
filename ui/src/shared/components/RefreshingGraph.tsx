@@ -18,6 +18,9 @@ import {
   DEFAULT_DECIMAL_PLACES,
 } from 'src/dashboards/constants'
 
+// Utils
+import {AutoRefresher} from 'src/utils/AutoRefresher'
+
 // Actions
 import {setHoverTime} from 'src/dashboards/actions'
 
@@ -48,8 +51,8 @@ interface Props {
   isInCEO: boolean
   timeFormat: string
   cellHeight: number
-  autoRefresh: number
   staticLegend: boolean
+  autoRefresher: AutoRefresher
   manualRefresh: number
   resizerTopHeight: number
   onZoom: () => void
@@ -91,6 +94,7 @@ class RefreshingGraph extends PureComponent<Props> {
       timeRange,
       templates,
       manualRefresh,
+      autoRefresher,
       editQueryStatus,
       cellNoteVisibility,
       grabDataForDownload,
@@ -111,6 +115,7 @@ class RefreshingGraph extends PureComponent<Props> {
     return (
       <TimeSeries
         ref={this.timeSeries}
+        autoRefresher={autoRefresher}
         manualRefresh={manualRefresh}
         source={source}
         cellType={type}

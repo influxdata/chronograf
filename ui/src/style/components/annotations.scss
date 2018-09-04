@@ -9,7 +9,7 @@ $active-window0: rgba($annotation-color__drag,0);
 $active-window15: rgba($annotation-color__drag,0.15);
 $active-window35: rgba($annotation-color__drag,0.35);
 
-$timestamp-font-size: 14px;
+$timestamp-font-size: 13px;
 $timestamp-font-weight: 600;
 
 .annotation {
@@ -27,11 +27,14 @@ $timestamp-font-weight: 600;
     background-color: $annotation-color__drag;
     z-index: 4;
   }
+
+  &.expanded {
+    z-index: 5;
+  }
 }
 
 .annotation-point--flag {
   position: absolute;
-  z-index: 2;
   top: -3px;
   left: -2px;
   width: 6px;
@@ -94,13 +97,12 @@ $timestamp-font-weight: 600;
   left: 50%;
   transform: translateX(-50%);
   background-color: $g0-obsidian;
-  z-index: 3;
   padding: 6px 12px;
   border-radius: 4px;
   white-space: nowrap;
   user-select: none;
   display: flex;
-  box-shadow: 0 0 10px 2px $g2-kevlar;
+  @extend %drop-shadow;
 
   &:before {
     content: '';
@@ -118,29 +120,14 @@ $timestamp-font-weight: 600;
   }
 }
 
-.annotation-tooltip--input-container {
-  flex: 1 0 0;
-  margin-bottom: 4px;
-}
-
-.annotation-tooltip--input,
-.annotation-tooltip--input-container .input-cte {
-  width: 100%;
-}
-
-.annotation-tooltip--input-container .input-cte {
-  height: 22px;
-  font-size: 12px;
-  line-height: 18px;
-  padding: 0 7px;
-
-  > span.icon {
-    right: 9px;
-  }
+.annotation-tooltip--lower {
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 .annotation-tooltip--timestamp {
-  color: $g20-white;
+  color: $c-laser;
   display: block;
   font-size: $timestamp-font-size;
   font-weight: $timestamp-font-weight;
@@ -165,21 +152,93 @@ $timestamp-font-weight: 600;
   }
 }
 
+.annotation-tooltip-text {
+  font-size: $timestamp-font-size;
+  color: $g18-cloud;
+  font-weight: $timestamp-font-weight;
+}
+
+.annotation-tag-count {
+  display: inline-flex;
+  align-content: center;
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  height: 16px;
+  line-height: 16px;
+  padding: 0 8px;
+  border-radius: 8px;
+  color: $g20-white;
+  background-color: $c-pool;
+  transition: background-color 0.25s ease, color 0.25s ease;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $c-laser;
+  }
+}
+
+.annotation-tooltip--tags {
+  width: 100%;
+  top: 100%;
+  position: absolute;
+  display: none;
+  padding-top: 4px;
+  left: 0;
+}
+
+.annotation-tag-count:hover .annotation-tooltip--tags {
+  display: flex;
+}
+
+.annotation-tooltip--tags-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: $c-pool;
+  border-radius: 4px;
+  overflow: hidden;
+  @extend %drop-shadow;
+
+  > span {
+    line-height: 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    color: $c-yeti;
+    padding: 4px 8px;
+
+    strong {
+      color: $c-neutrino;
+    }
+
+    &:hover {
+      color: $g20-white;
+      background-color: $c-laser;
+
+      strong {
+        color: $c-yeti;
+      }
+    }
+  }
+
+  &:after {
+    content: '';
+    top: -4px;
+    width: 100%;
+    height: 4px;
+    position: absolute;
+  }
+}
+
 .annotation--click-area {
   position: absolute;
   top: -8px;
   left: -7px;
   width: 16px;
   height: 16px;
-  z-index: 4;
+  z-index: 3;
   cursor: default;
-
-  &.editing {
-    left: -5px;
-    width: 12px;
-    height: calc(100% + 8px);
-    cursor: col-resize;
-  }
 }
 
 .annotation-window {

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import {TemplateValueType, TemplateType} from 'src/types'
+import {TemplateValueType, TemplateType, Template} from 'src/types'
 import {CellType} from 'src/types/dashboards'
 
 export const DEFAULT_DURATION_MS = 1000
@@ -461,7 +461,7 @@ export const intervalValuesPoints = [
   },
 ]
 
-export const interval = {
+export const interval: Template = {
   id: 'interval',
   type: TemplateType.AutoGroupBy,
   tempVar: TEMP_VAR_INTERVAL,
@@ -469,7 +469,7 @@ export const interval = {
   values: intervalValuesPoints,
 }
 
-export const TEMPLATES = [interval]
+export const TEMPLATES: Template[] = [interval]
 
 export const IS_STATIC_LEGEND = legend =>
   _.get(legend, 'type', false) === 'static'

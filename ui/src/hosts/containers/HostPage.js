@@ -20,7 +20,7 @@ import {EMPTY_LINKS} from 'src/dashboards/constants/dashboardHeader'
 
 import {setAutoRefresh, delayEnablePresentationMode} from 'shared/actions/app'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import AutoRefresh from 'src/utils/AutoRefresh'
+import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 
 @ErrorHandling
 class HostPage extends Component {
@@ -55,7 +55,7 @@ class HostPage extends Component {
     } = await getLayouts()
     const {location, autoRefresh} = this.props
 
-    AutoRefresh.poll(autoRefresh)
+    GlobalAutoRefresher.poll(autoRefresh)
 
     // fetching layouts and mappings can be done at the same time
     const {host, measurements} = await this.fetchHostsAndMeasurements(layouts)
@@ -82,12 +82,12 @@ class HostPage extends Component {
   componentDidUpdate(prevProps) {
     const {autoRefresh} = this.props
     if (prevProps.autoRefresh !== autoRefresh) {
-      AutoRefresh.poll(autoRefresh)
+      GlobalAutoRefresher.poll(autoRefresh)
     }
   }
 
   componentWillUnmount() {
-    AutoRefresh.stopPolling()
+    GlobalAutoRefresher.stopPolling()
   }
 
   handleChooseTimeRange = ({lower, upper}) => {
@@ -106,7 +106,7 @@ class HostPage extends Component {
       return ''
     }
 
-    const {source, autoRefresh, manualRefresh} = this.props
+    const {source, manualRefresh} = this.props
 
     const autoflowLayouts = layouts.filter(layout => !!layout.autoflow)
 
@@ -162,7 +162,6 @@ class HostPage extends Component {
         cells={layoutCells}
         templates={tempVars}
         timeRange={timeRange}
-        autoRefresh={autoRefresh}
         manualRefresh={manualRefresh}
         host={this.props.params.hostID}
       />

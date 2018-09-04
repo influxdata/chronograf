@@ -10,8 +10,16 @@ import CEOHeader from 'src/dashboards/components/CEOHeader'
 // Utils
 import {getDeep} from 'src/utils/wrappers'
 import {buildQuery} from 'src/utils/influxql'
-import {editCellQueryStatus} from 'src/dashboards/actions'
 import {getTimeRange} from 'src/dashboards/utils/cellGetters'
+
+// Actions
+import {
+  QueryConfigActions,
+  addQueryAsync,
+  deleteQueryAsync,
+  updateEditorTimeRange as updateEditorTimeRangeAction,
+} from 'src/shared/actions/queries'
+import {editCellQueryStatus} from 'src/dashboards/actions'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
@@ -23,14 +31,9 @@ import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {Service, TimeRange, NotificationAction} from 'src/types'
+import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
-import {
-  QueryConfigActions,
-  addQueryAsync,
-  deleteQueryAsync,
-} from 'src/dashboards/actions/cellEditorOverlay'
 import {UpdateScript} from 'src/flux/actions'
 import {Links} from 'src/types/flux'
 
@@ -39,9 +42,18 @@ const staticLegend: DashboardsModels.Legend = {
   orientation: 'bottom',
 }
 
-interface QueryStatus {
-  queryID: string
-  status: QueriesModels.Status
+interface VisualizationOptions {
+  type: DashboardsModels.CellType
+  axes: DashboardsModels.Axes | null
+  tableOptions: DashboardsModels.TableOptions
+  fieldOptions: DashboardsModels.FieldOption[]
+  timeFormat: string
+  decimalPlaces: DashboardsModels.DecimalPlaces
+  note: string
+  noteVisibility: DashboardsModels.CellNoteVisibility
+  thresholdsListColors: ColorsModels.ColorNumber[]
+  gaugeColors: ColorsModels.ColorNumber[]
+  lineColors: ColorsModels.ColorString[]
 }
 
 interface Props {
@@ -55,8 +67,7 @@ interface Props {
   onSave: (cell: DashboardsModels.Cell | NewDefaultCell) => void
   source: SourcesModels.Source
   dashboardID: number
-  queryStatus: QueryStatus
-  autoRefresh: number
+  queryStatus: QueriesModels.QueryStatus
   templates: Template[]
   timeRange: QueriesModels.TimeRange
   thresholdsListType: string
@@ -70,8 +81,8 @@ interface Props {
   queryConfigActions: QueryConfigActions
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
-  updateEditorTimeRange: (timeRange: TimeRange) => void
   updateScript: UpdateScript
+  updateEditorTimeRange: typeof updateEditorTimeRangeAction
 }
 
 interface State {
@@ -80,7 +91,7 @@ interface State {
 
 @ErrorHandling
 class CellEditorOverlay extends Component<Props, State> {
-  private overlayRef: HTMLDivElement
+  private overlayRef: React.RefObject<HTMLDivElement> = React.createRef()
 
   public constructor(props: Props) {
     super(props)
@@ -94,32 +105,30 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   public componentDidMount() {
-    if (this.overlayRef) {
-      this.overlayRef.focus()
-    }
+    this.handleResetFocus()
   }
 
   public render() {
     const {
-      fluxLinks,
-      script,
-      notify,
-      services,
-      onCancel,
-      templates,
-      timeRange,
-      autoRefresh,
-      editQueryStatus,
+      addQuery,
       cell,
+      deleteQuery,
+      editQueryStatus,
+      fluxLinks,
+      notify,
+      onCancel,
       queryDrafts,
+      renameCell,
+      script,
+      services,
       source,
       sources,
-      updateQueryDrafts,
-      renameCell,
-      addQuery,
-      deleteQuery,
+      templates,
+      timeRange,
       updateEditorTimeRange,
+      updateQueryDrafts,
       updateScript,
+      queryStatus,
     } = this.props
 
     const {isStaticLegend} = this.state
@@ -129,7 +138,7 @@ class CellEditorOverlay extends Component<Props, State> {
         className="deceo--overlay"
         onKeyDown={this.handleKeyDown}
         tabIndex={0}
-        ref={this.onRef}
+        ref={this.overlayRef}
       >
         <TimeMachine
           fluxLinks={fluxLinks}
@@ -140,7 +149,6 @@ class CellEditorOverlay extends Component<Props, State> {
           editQueryStatus={editQueryStatus}
           templates={templates}
           timeRange={timeRange}
-          autoRefresh={autoRefresh}
           source={source}
           onResetFocus={this.handleResetFocus}
           isInCEO={true}
@@ -153,6 +161,8 @@ class CellEditorOverlay extends Component<Props, State> {
           addQuery={addQuery}
           deleteQuery={deleteQuery}
           updateEditorTimeRange={updateEditorTimeRange}
+          visualizationOptions={this.visualizationOptions}
+          queryStatus={queryStatus}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader
@@ -187,8 +197,33 @@ class CellEditorOverlay extends Component<Props, State> {
     })
   }
 
-  private onRef = (r: HTMLDivElement) => {
-    this.overlayRef = r
+  private get visualizationOptions(): VisualizationOptions {
+    const {cell, thresholdsListColors, gaugeColors, lineColors} = this.props
+
+    const {
+      type,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      note,
+      noteVisibility,
+    } = cell
+    const axes = _.get(cell, 'axes')
+
+    return {
+      type,
+      axes,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      note,
+      noteVisibility,
+      thresholdsListColors,
+      gaugeColors,
+      lineColors,
+    }
   }
 
   private handleSaveCell = () => {
@@ -263,7 +298,7 @@ class CellEditorOverlay extends Component<Props, State> {
           }
 
           e.target.blur()
-          this.overlayRef.focus()
+          this.handleResetFocus()
         }
         break
     }
@@ -274,7 +309,9 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private handleResetFocus = () => {
-    this.overlayRef.focus()
+    if (this.overlayRef.current) {
+      this.overlayRef.current.focus()
+    }
   }
 }
 

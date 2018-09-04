@@ -4,14 +4,19 @@ import {Dispatch} from 'redux'
 import {proxy} from 'src/utils/queryUrlGenerator'
 import {parseMetaQuery} from 'src/tempVars/parsing'
 import {getTagFilters} from 'src/shared/selectors/annotations'
+import {getTimeRange} from 'src/dashboards/selectors'
 import {BLACKLISTED_KEYS} from 'src/shared/annotations/helpers'
+import {millisecondTimeRange} from 'src/dashboards/utils/time'
+import {notify} from 'src/shared/actions/notifications'
+import {annotationsError} from 'src/shared/copy/notifications'
+import {getDeep} from 'src/utils/wrappers'
 
 import {
   Annotation,
-  AnnotationRange,
   TagFilter,
   AnnotationsDisplaySetting,
 } from 'src/types/annotations'
+import {AnnotationState} from 'src/shared/reducers/annotations'
 
 export type Action =
   | EditingAnnotationAction
@@ -250,14 +255,20 @@ export const addAnnotationAsync = (
   annotation: Annotation
 ) => async dispatch => {
   dispatch(addAnnotation(annotation))
-  const savedAnnotation = await api.createAnnotation(createUrl, annotation)
-  dispatch(deleteAnnotation(annotation))
-  dispatch(addAnnotation(savedAnnotation))
+
+  try {
+    const savedAnnotation = await api.createAnnotation(createUrl, annotation)
+
+    dispatch(deleteAnnotation(annotation))
+    dispatch(addAnnotation(savedAnnotation))
+  } catch {
+    dispatch(deleteAnnotation(annotation))
+    dispatch(notify(annotationsError('Error saving annotation')))
+  }
 }
 
 export const getAnnotationsAsync = (
   indexUrl: string,
-  {since, until}: AnnotationRange,
   dashboardID: number
 ) => async (
   dispatch: Dispatch<SetAnnotationsAction>,
@@ -269,7 +280,10 @@ export const getAnnotationsAsync = (
     return
   }
 
+  const timeRange = getTimeRange(getState(), dashboardID)
+  const {since, until} = millisecondTimeRange(timeRange)
   const tagFilters = getTagFilters(getState(), dashboardID)
+
   const annotations = await api.getAnnotations(
     indexUrl,
     since,
@@ -283,15 +297,65 @@ export const getAnnotationsAsync = (
 export const deleteAnnotationAsync = (
   annotation: Annotation
 ) => async dispatch => {
-  await api.deleteAnnotation(annotation)
-  dispatch(deleteAnnotation(annotation))
+  try {
+    dispatch(deleteAnnotation(annotation))
+    await api.deleteAnnotation(annotation)
+  } catch {
+    dispatch(notify(annotationsError('Error deleting annotation')))
+    dispatch(addAnnotation(annotation))
+  }
 }
 
 export const updateAnnotationAsync = (
   annotation: Annotation
 ) => async dispatch => {
-  await api.updateAnnotation(annotation)
-  dispatch(updateAnnotation(annotation))
+  try {
+    await api.updateAnnotation(annotation)
+    dispatch(updateAnnotation(annotation))
+  } catch {
+    dispatch(notify(annotationsError('Error saving annotation')))
+  }
+}
+
+export const updateTagFilterAsync = (
+  indexURL: string,
+  dashboardID: number,
+  tagFilter: TagFilter
+) => async (dispatch, getState) => {
+  const state: AnnotationState = getState().annotations
+  const currentTagFilter: TagFilter | null = getDeep(
+    state,
+    `${dashboardID}.${tagFilter.id}`,
+    null
+  )
+  const isNew = !currentTagFilter
+
+  try {
+    dispatch(updateTagFilter(dashboardID, tagFilter))
+    await dispatch(getAnnotationsAsync(indexURL, dashboardID))
+  } catch {
+    dispatch(notify(annotationsError('Error saving tag filter')))
+
+    if (isNew) {
+      dispatch(deleteTagFilter(dashboardID, tagFilter))
+    } else {
+      dispatch(updateTagFilter(dashboardID, currentTagFilter))
+    }
+  }
+}
+
+export const deleteTagFilterAsync = (
+  indexURL: string,
+  dashboardID: number,
+  tagFilter: TagFilter
+) => async dispatch => {
+  try {
+    dispatch(deleteTagFilter(dashboardID, tagFilter))
+    await dispatch(getAnnotationsAsync(indexURL, dashboardID))
+  } catch {
+    dispatch(updateTagFilter(dashboardID, tagFilter))
+    dispatch(notify(annotationsError('Error deleting tag filter')))
+  }
 }
 
 export const fetchAndSetTagKeys = (source: string) => async dispatch => {

@@ -5,6 +5,7 @@ import React, {SFC} from 'react'
 import SourceSelector from 'src/dashboards/components/SourceSelector'
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import CSVExporter from 'src/shared/components/TimeMachine/CSVExporter'
+import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
 
 // Utils
 import buildQueries from 'src/utils/buildQueriesForGraphs'
@@ -15,12 +16,15 @@ import * as SourcesModels from 'src/types/sources'
 import {Service, Template} from 'src/types'
 
 interface Props {
+  isInCEO: boolean
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
   service: Service
   services: Service[]
   isDynamicSourceSelected: boolean
   onChangeService: (service: Service, source: SourcesModels.Source) => void
+  autoRefreshDuration: number
+  onChangeAutoRefreshDuration: (newDuration: number) => void
   queries: QueriesModels.QueryConfig[]
   templates: Template[]
   onSelectDynamicSource: () => void
@@ -34,13 +38,18 @@ const TimeMachineControls: SFC<Props> = ({
   service,
   queries,
   templates,
+  isInCEO,
   services,
   timeRange,
+  autoRefreshDuration,
+  onChangeAutoRefreshDuration,
   onChangeService,
   onSelectDynamicSource,
   isDynamicSourceSelected,
   updateEditorTimeRange,
 }) => {
+  const timeRangePage = isInCEO ? null : 'DataExplorer'
+
   return (
     <div className="deceo--controls">
       <SourceSelector
@@ -57,9 +66,15 @@ const TimeMachineControls: SFC<Props> = ({
         queries={buildQueries(queries, timeRange)}
         templates={templates}
       />
+      <AutoRefreshDropdown
+        selected={autoRefreshDuration}
+        onChoose={onChangeAutoRefreshDuration}
+        showManualRefresh={false}
+      />
       <TimeRangeDropdown
         onChooseTimeRange={updateEditorTimeRange}
         selected={timeRange}
+        page={timeRangePage}
       />
     </div>
   )

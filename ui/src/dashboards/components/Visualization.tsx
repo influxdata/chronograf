@@ -1,12 +1,13 @@
 import React, {SFC} from 'react'
-import {connect} from 'react-redux'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
+
 import buildQueries from 'src/utils/buildQueriesForGraphs'
+import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
-import {TimeRange, QueryConfig, Axes, Template, Source} from 'src/types'
+import {TimeRange, QueryConfig, Axes, Template, Source, Status} from 'src/types'
 import {
   TableOptions,
   DecimalPlaces,
@@ -20,16 +21,16 @@ interface Props {
   axes: Axes
   type: CellType
   source: Source
-  autoRefresh: number
   templates: Template[]
   timeRange: TimeRange
+  autoRefresher: AutoRefresher
   queryConfigs: QueryConfig[]
-  editQueryStatus: () => void
+  editQueryStatus: (queryID: string, status: Status) => void
   tableOptions: TableOptions
   timeFormat: string
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
-  resizerTopHeight: number
+  resizerTopHeight?: number
   thresholdsListColors: ColorNumber[]
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
@@ -37,6 +38,7 @@ interface Props {
   isInCEO: boolean
   note: string
   noteVisibility: CellNoteVisibility
+  manualRefresh: number
 }
 
 const DashVisualization: SFC<Props> = ({
@@ -49,13 +51,14 @@ const DashVisualization: SFC<Props> = ({
   timeRange,
   lineColors,
   timeFormat,
-  autoRefresh,
   gaugeColors,
   fieldOptions,
   queryConfigs,
   staticLegend,
   tableOptions,
+  manualRefresh,
   decimalPlaces,
+  autoRefresher,
   noteVisibility,
   editQueryStatus,
   resizerTopHeight,
@@ -77,9 +80,9 @@ const DashVisualization: SFC<Props> = ({
           axes={axes}
           type={type}
           tableOptions={tableOptions}
+          autoRefresher={autoRefresher}
           queries={buildQueries(queryConfigs, timeRange)}
           templates={templates}
-          autoRefresh={autoRefresh}
           editQueryStatus={editQueryStatus}
           resizerTopHeight={resizerTopHeight}
           staticLegend={staticLegend}
@@ -90,40 +93,11 @@ const DashVisualization: SFC<Props> = ({
           cellNote={note}
           cellNoteVisibility={noteVisibility}
           timeRange={timeRange}
+          manualRefresh={manualRefresh}
         />
       </div>
     </div>
   )
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {
-    thresholdsListColors,
-    gaugeColors,
-    lineColors,
-    cell: {
-      type,
-      axes,
-      tableOptions,
-      fieldOptions,
-      timeFormat,
-      decimalPlaces,
-      note,
-      noteVisibility,
-    },
-  },
-}) => ({
-  gaugeColors,
-  thresholdsListColors,
-  lineColors,
-  type,
-  axes,
-  tableOptions,
-  fieldOptions,
-  timeFormat,
-  decimalPlaces,
-  note,
-  noteVisibility,
-})
-
-export default connect(mapStateToProps, null)(DashVisualization)
+export default DashVisualization

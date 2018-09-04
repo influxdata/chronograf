@@ -2,6 +2,7 @@ import {LayoutCell, LayoutQuery} from './layouts'
 import {Service, NewService, ServiceLinks} from './services'
 import {Links, Organization, Role, Permission, User, Me} from './auth'
 import {
+  PBCell,
   Cell,
   CellQuery,
   Legend,
@@ -31,6 +32,7 @@ import {
   FieldFunc,
   FuncArg,
   Namespace,
+  QueryStatus,
   Tag,
   Tags,
   TagValues,
@@ -80,6 +82,7 @@ export {
   Cell,
   CellQuery,
   CellType,
+  PBCell,
   Protoboard,
   Legend,
   Status,
@@ -133,4 +136,5 @@ export {
   TemplateUpdate,
   TemplateBuilderProps,
   WriteDataMode,
+  QueryStatus,
 }

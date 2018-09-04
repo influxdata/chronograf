@@ -1,4 +1,4 @@
-import {Template, TimeRange, QueryConfig} from 'src/types'
+import {Template, TimeRange, QueryConfig, Status} from 'src/types'
 import {ColorString} from 'src/types/colors'
 
 export interface Axis {
@@ -147,7 +147,7 @@ export interface DashboardUIState {
   isEditMode: boolean
   cellQueryStatus: {
     queryID: string | null
-    status: string | null
+    status: Status
   }
   hoverTime: string
   activeCellID: string
@@ -219,9 +219,14 @@ export interface ProtoboardMetadata {
   url: string
 }
 
-export interface ProtoboardData {
-  cells: object
+export interface PBCell extends Cell {
+  measurement: string
 }
+
+export interface ProtoboardData {
+  cells: Array<Partial<PBCell>>
+}
+
 export interface Protoboard {
   id: string
   meta: ProtoboardMetadata

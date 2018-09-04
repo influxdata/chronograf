@@ -385,6 +385,16 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   outline: none;
 }
 
+.deceo--page {
+  margin: 0 auto;
+  position: relative;
+  width: 100%;
+  height: calc(100% + 60px);
+  overflow: hidden;
+  padding-top: 60px;
+  border-radius: 0 0 $radius $radius;
+}
+
 .deceo {
   display: flex;
   flex-direction: column;
@@ -414,8 +424,12 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   background-color: $g3-castle;
   align-items: center;
 
-  .csv-export {
+  .csv-export, .autorefresh-dropdown {
     margin-right: 5px;
+  }
+
+  .autorefresh-dropdown.paused .dropdown {
+    margin-right: 0;
   }
 }
 

@@ -10,10 +10,12 @@
 1.  [#4257](https://github.com/influxdata/chronograf/pull/4257): Introduce cell notes & note cells
 1.  [#4287](https://github.com/influxdata/chronograf/pull/4287): Add time selector dropdown to CEO
 1.  [#4311](https://github.com/influxdata/chronograf/pull/4311): Add Flux query editor to the Cell Editor Overlay
+1.  [#4319](https://github.com/influxdata/chronograf/pull/4319): Add Flux query editor to the Data Explorer and use same UI as CEO
+
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
-1. [#4268](https://github.com/influxdata/chronograf/pull/4268): Clear logs after searching
+1.  [#4268](https://github.com/influxdata/chronograf/pull/4268): Clear logs after searching
 1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
 
 

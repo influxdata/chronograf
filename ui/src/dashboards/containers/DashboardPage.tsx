@@ -22,7 +22,16 @@ import {
   dismissEditingAnnotation,
 } from 'src/shared/actions/annotations'
 import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOverlay'
-import {queryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
+import {
+  queryConfigActions,
+  QueryConfigActions,
+  addQueryAsync,
+  deleteQueryAsync,
+  updateQueryDrafts as updateQueryDraftsAction,
+  updateEditorTimeRange as updateEditorTimeRangeAction,
+  updateScript as updateScriptAction,
+} from 'src/shared/actions/queries'
+
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
@@ -30,14 +39,14 @@ import {
   fetchAllFluxServicesAsync,
   FetchAllFluxServicesAsync,
 } from 'src/shared/actions/services'
-import {updateScript as updateScriptAction} from 'src/flux/actions'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
-import {millisecondTimeRange} from 'src/dashboards/utils/time'
 import {getDeep} from 'src/utils/wrappers'
 import {updateDashboardLinks} from 'src/dashboards/utils/dashboardSwitcherLinks'
-import AutoRefresh from 'src/utils/AutoRefresh'
+import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
+import {getTimeRange} from 'src/dashboards/selectors'
+import {annotationsError} from 'src/shared/copy/notifications'
 
 // APIs
 import {loadDashboardLinks} from 'src/dashboards/apis'
@@ -49,7 +58,7 @@ import {
   TEMP_VAR_DASHBOARD_TIME,
   TEMP_VAR_UPPER_DASHBOARD_TIME,
 } from 'src/shared/constants'
-import {FORMAT_INFLUXQL, defaultTimeRange} from 'src/shared/data/timeRanges'
+import {FORMAT_INFLUXQL} from 'src/shared/data/timeRanges'
 import {EMPTY_LINKS} from 'src/dashboards/constants/dashboardHeader'
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
 
@@ -67,7 +76,6 @@ import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
 import {Service, NotificationAction} from 'src/types'
-import {QueryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
 import {UpdateScript} from 'src/flux/actions'
@@ -97,10 +105,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   showTemplateVariableControlBar: boolean
   toggleTemplateVariableControlBar: typeof appActions.toggleTemplateVariableControlBar
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
-  cellQueryStatus: {
-    queryID: string
-    status: object
-  }
+  cellQueryStatus: QueriesModels.QueryStatus
   errorThrown: ErrorsActions.ErrorThrownActionCreator
   meRole: string
   isUsingAuth: boolean
@@ -135,8 +140,8 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   rehydrateTemplatesAsync: typeof dashboardActions.rehydrateTemplatesAsync
   updateTemplateQueryParams: typeof dashboardActions.updateTemplateQueryParams
   updateQueryParams: typeof dashboardActions.updateQueryParams
-  addQuery: typeof cellEditorOverlayActions.addQueryAsync
-  deleteQuery: typeof cellEditorOverlayActions.deleteQueryAsync
+  addQuery: typeof addQueryAsync
+  deleteQuery: typeof deleteQueryAsync
   fill: typeof queryConfigActions.fill
   timeShift: typeof queryConfigActions.timeShift
   chooseTag: typeof queryConfigActions.chooseTag
@@ -149,7 +154,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   chooseMeasurement: typeof queryConfigActions.chooseMeasurement
   applyFuncsToField: typeof queryConfigActions.applyFuncsToField
   toggleTagAcceptance: typeof queryConfigActions.toggleTagAcceptance
-  updateEditorTimeRange: typeof cellEditorOverlayActions.updateEditorTimeRange
+  updateEditorTimeRange: typeof updateEditorTimeRangeAction
 }
 
 interface State {
@@ -179,8 +184,8 @@ class DashboardPage extends Component<Props, State> {
   public async componentDidMount() {
     const {autoRefresh} = this.props
 
-    AutoRefresh.poll(autoRefresh)
-    AutoRefresh.subscribe(this.fetchAnnotations)
+    GlobalAutoRefresher.poll(autoRefresh)
+    GlobalAutoRefresher.subscribe(this.fetchAnnotations)
 
     window.addEventListener('resize', this.handleWindowResize, true)
 
@@ -192,9 +197,13 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public fetchAnnotations = async () => {
-    const {source, timeRange, onGetAnnotationsAsync, dashboardID} = this.props
-    const rangeMs = millisecondTimeRange(timeRange)
-    await onGetAnnotationsAsync(source.links.annotations, rangeMs, dashboardID)
+    const {source, dashboardID, onGetAnnotationsAsync, notify} = this.props
+
+    try {
+      await onGetAnnotationsAsync(source.links.annotations, dashboardID)
+    } catch {
+      notify(annotationsError('Error fetching annotations'))
+    }
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -214,7 +223,7 @@ class DashboardPage extends Component<Props, State> {
     }
 
     if (autoRefresh !== prevProps.autoRefresh) {
-      AutoRefresh.poll(autoRefresh)
+      GlobalAutoRefresher.poll(autoRefresh)
     }
 
     if (
@@ -226,8 +235,8 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public componentWillUnmount() {
-    AutoRefresh.stopPolling()
-    AutoRefresh.unsubscribe(this.fetchAnnotations)
+    GlobalAutoRefresher.stopPolling()
+    GlobalAutoRefresher.unsubscribe(this.fetchAnnotations)
 
     window.removeEventListener('resize', this.handleWindowResize, true)
     this.props.handleDismissEditingAnnotation()
@@ -333,7 +342,6 @@ class DashboardPage extends Component<Props, State> {
             queryDrafts={queryDrafts}
             timeRange={editorTimeRange}
             updateEditorTimeRange={updateEditorTimeRange}
-            autoRefresh={autoRefresh}
             dashboardID={dashboardID}
             queryStatus={cellQueryStatus}
             onSave={this.handleSaveEditedCell}
@@ -384,11 +392,7 @@ class DashboardPage extends Component<Props, State> {
           )}
         {!inPresentationMode &&
           showAnnotationControls && (
-            <AnnotationControlBar
-              dashboardID={dashboardID}
-              source={source}
-              onRefreshAnnotations={this.fetchAnnotations}
-            />
+            <AnnotationControlBar dashboardID={dashboardID} source={source} />
           )}
         {dashboard ? (
           <Dashboard
@@ -398,7 +402,6 @@ class DashboardPage extends Component<Props, State> {
             inView={this.inView}
             dashboard={dashboard}
             timeRange={timeRange}
-            autoRefresh={autoRefresh}
             manualRefresh={manualRefresh}
             onZoom={this.handleZoomedTimeRange}
             inPresentationMode={inPresentationMode}
@@ -547,13 +550,7 @@ class DashboardPage extends Component<Props, State> {
   private handleChooseTimeRange = (
     timeRange: QueriesModels.TimeRange
   ): void => {
-    const {
-      dashboardID,
-      onGetAnnotationsAsync,
-      source,
-      setDashTimeV1,
-      updateQueryParams,
-    } = this.props
+    const {dashboardID, setDashTimeV1, updateQueryParams} = this.props
 
     setDashTimeV1(dashboardID, {
       ...timeRange,
@@ -565,12 +562,7 @@ class DashboardPage extends Component<Props, State> {
       upper: timeRange.upper,
     })
 
-    const annotationRange = millisecondTimeRange(timeRange)
-    onGetAnnotationsAsync(
-      source.links.annotations,
-      annotationRange,
-      dashboardID
-    )
+    this.fetchAnnotations()
   }
 
   private handleUpdatePosition = (cells: DashboardsModels.Cell[]): void => {
@@ -688,7 +680,6 @@ const mstp = (state, {params: {dashboardID}}) => {
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
     services,
-    dashTimeV1,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {
       cell,
@@ -703,10 +694,7 @@ const mstp = (state, {params: {dashboardID}}) => {
 
   const meRole = _.get(me, 'role', null)
 
-  const timeRange =
-    dashTimeV1.ranges.find(
-      r => r.dashboardID === idNormalizer(TYPE_ID, dashboardID)
-    ) || defaultTimeRange
+  const timeRange = getTimeRange(state, dashboardID)
 
   const dashboard = dashboards.find(
     d => d.id === idNormalizer(TYPE_ID, dashboardID)
@@ -768,12 +756,11 @@ const mdtp = {
   handleClearCEO: cellEditorOverlayActions.clearCEO,
   onGetAnnotationsAsync: getAnnotationsAsync,
   handleDismissEditingAnnotation: dismissEditingAnnotation,
-  updateQueryDraft: cellEditorOverlayActions.updateQueryDraft,
-  updateQueryDrafts: cellEditorOverlayActions.updateQueryDrafts,
+  updateQueryDrafts: updateQueryDraftsAction,
   fetchServicesAsync: fetchAllFluxServicesAsync,
   renameCell: cellEditorOverlayActions.renameCell,
-  addQuery: cellEditorOverlayActions.addQueryAsync,
-  deleteQuery: cellEditorOverlayActions.deleteQueryAsync,
+  addQuery: addQueryAsync,
+  deleteQuery: deleteQueryAsync,
   fill: queryConfigActions.fill,
   timeShift: queryConfigActions.timeShift,
   chooseTag: queryConfigActions.chooseTag,
@@ -786,7 +773,7 @@ const mdtp = {
   chooseMeasurement: queryConfigActions.chooseMeasurement,
   applyFuncsToField: queryConfigActions.applyFuncsToField,
   toggleTagAcceptance: queryConfigActions.toggleTagAcceptance,
-  updateEditorTimeRange: cellEditorOverlayActions.updateEditorTimeRange,
+  updateEditorTimeRange: updateEditorTimeRangeAction,
 }
 
 export default connect(mstp, mdtp)(

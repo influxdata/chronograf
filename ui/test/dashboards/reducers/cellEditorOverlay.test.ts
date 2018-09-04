@@ -1,5 +1,7 @@
+// Libraries
 import reducer, {initialState} from 'src/dashboards/reducers/cellEditorOverlay'
 
+// Actions
 import {
   loadCEO,
   clearCEO,
@@ -10,10 +12,16 @@ import {
   updateGaugeColors,
   updateLineColors,
   updateAxes,
+  Action,
 } from 'src/dashboards/actions/cellEditorOverlay'
-import {DEFAULT_TABLE_OPTIONS} from 'src/dashboards/constants'
-import {Cell} from 'src/types/dashboards'
+import {
+  updateEditorTimeRange,
+  updateQueryDrafts,
+  QueryUpdateState,
+} from 'src/shared/actions/queries'
 
+// Constants
+import {DEFAULT_TABLE_OPTIONS} from 'src/dashboards/constants'
 import {
   validateGaugeColors,
   validateThresholdsListColors,
@@ -21,7 +29,11 @@ import {
 } from 'src/shared/constants/thresholds'
 import {validateLineColors} from 'src/shared/constants/graphColorPalettes'
 
-import {cell, axes, timeRange} from 'test/fixtures'
+// Fixtures
+import {cell, axes, timeRange, query} from 'test/fixtures'
+
+// Types
+import {Cell} from 'src/types/dashboards'
 
 const defaultCell = {
   ...cell,
@@ -34,6 +46,8 @@ const defaultThresholdsListColors = validateThresholdsListColors(
 )
 const defaultGaugeColors = validateGaugeColors(defaultCell.colors)
 const defaultLineColors = validateLineColors(defaultCell.colors)
+
+let state
 
 describe('Dashboards.Reducers.cellEditorOverlay', () => {
   it('should show cell editor overlay', () => {
@@ -116,5 +130,25 @@ describe('Dashboards.Reducers.cellEditorOverlay', () => {
     const expected = defaultLineColors
 
     expect(actual.lineColors).toBe(expected)
+  })
+
+  it('it can update a query', () => {
+    state = {queryDrafts: [query]}
+    const updatedQuery = {...query, source: '/chronograf/v1/sources/12'}
+    const queries = [updatedQuery]
+    const action = updateQueryDrafts(queries, QueryUpdateState.CEO) as Action
+    const actual = reducer(state, action)
+    expect(actual.queryDrafts).toEqual([updatedQuery])
+  })
+
+  it('it can update a timeRange', () => {
+    state = {timeRange}
+    const updatedTimeRange = {...timeRange, lower: 'now() - 15m'}
+    const action = updateEditorTimeRange(
+      updatedTimeRange,
+      QueryUpdateState.CEO
+    ) as Action
+    const actual = reducer(state, action)
+    expect(actual.timeRange).toEqual(updatedTimeRange)
   })
 })

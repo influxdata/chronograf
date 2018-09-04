@@ -8,10 +8,7 @@ import EmptyFluxPage from 'src/flux/components/EmptyFluxPage'
 import {Source, Service, Notification} from 'src/types'
 import {Links} from 'src/types/flux'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {
-  updateScript as updateScriptAction,
-  UpdateScript,
-} from 'src/flux/actions'
+import {updateScript as updateScriptAction} from 'src/shared/actions/queries'
 import * as actions from 'src/shared/actions/services'
 import {getDeep} from 'src/utils/wrappers'
 
@@ -23,7 +20,7 @@ interface Props {
   children: ReactChildren
   fetchServicesAsync: actions.FetchAllFluxServicesAsync
   notify: (message: Notification) => void
-  updateScript: UpdateScript
+  updateScript: typeof updateScriptAction
   script: string
   links: Links
 }

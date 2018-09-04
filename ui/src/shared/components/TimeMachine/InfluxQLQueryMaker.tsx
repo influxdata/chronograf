@@ -13,7 +13,7 @@ import {TEMPLATE_RANGE} from 'src/tempVars/constants'
 
 // Types
 import {QueryConfig, Source, TimeRange, Template} from 'src/types'
-import {QueryConfigActions} from 'src/dashboards/actions/cellEditorOverlay'
+import {QueryConfigActions} from 'src/shared/actions/queries'
 
 const buildText = (q: QueryConfig): string =>
   q.rawText || buildQuery(TYPE_QUERY_CONFIG, q.range || TEMPLATE_RANGE, q) || ''
@@ -30,10 +30,12 @@ interface Props {
   onAddQuery: () => void
   templates: Template[]
   initialGroupByTime: string
+  isInCEO: boolean
 }
 
 const QueryMaker: SFC<Props> = ({
   source,
+  isInCEO,
   actions,
   queries,
   timeRange,
@@ -45,6 +47,14 @@ const QueryMaker: SFC<Props> = ({
   initialGroupByTime,
   setActiveQueryIndex,
 }) => {
+  if (!activeQuery || !activeQuery.id) {
+    return (
+      <div className="query-maker">
+        <EmptyQuery onAddQuery={onAddQuery} />
+      </div>
+    )
+  }
+
   return (
     <div className="query-maker">
       <QueryTabList
@@ -55,29 +65,26 @@ const QueryMaker: SFC<Props> = ({
         activeQueryIndex={activeQueryIndex}
         setActiveQueryIndex={setActiveQueryIndex}
       />
-      {activeQuery && activeQuery.id ? (
-        <div className="query-maker--tab-contents">
-          <InfluxQLEditor
-            query={buildText(activeQuery)}
-            config={activeQuery}
-            onUpdate={actions.editRawTextAsync}
-            templates={templates}
-          />
-          <SchemaExplorer
-            source={source}
-            actions={actions}
-            query={activeQuery}
-            initialGroupByTime={initialGroupByTime}
-            isQuerySupportedByExplorer={_.get(
-              activeQuery,
-              'isQuerySupportedByExplorer',
-              true
-            )}
-          />
-        </div>
-      ) : (
-        <EmptyQuery onAddQuery={onAddQuery} />
-      )}
+      <div className="query-maker--tab-contents">
+        <InfluxQLEditor
+          query={buildText(activeQuery)}
+          config={activeQuery}
+          onUpdate={actions.editRawTextAsync}
+          templates={templates}
+        />
+        <SchemaExplorer
+          source={source}
+          actions={actions}
+          query={activeQuery}
+          initialGroupByTime={initialGroupByTime}
+          isQuerySupportedByExplorer={_.get(
+            activeQuery,
+            'isQuerySupportedByExplorer',
+            true
+          )}
+          isInCEO={isInCEO}
+        />
+      </div>
     </div>
   )
 }

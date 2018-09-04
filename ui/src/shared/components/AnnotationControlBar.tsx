@@ -8,7 +8,8 @@ import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
 
 import {
   updateTagFilter,
-  deleteTagFilter,
+  updateTagFilterAsync,
+  deleteTagFilterAsync,
   fetchAndSetTagKeys,
   fetchAndSetTagValues,
 } from 'src/shared/actions/annotations'
@@ -30,8 +31,8 @@ interface Props {
   displaySetting: AnnotationsDisplaySetting
   source: Source
   onUpdateTagFilter: typeof updateTagFilter
-  onDeleteTagFilter: typeof deleteTagFilter
-  onRefreshAnnotations: () => Promise<void>
+  onUpdateTagFilterAsync: typeof updateTagFilterAsync
+  onDeleteTagFilterAsync: typeof deleteTagFilterAsync
   onGetTagKeys: typeof fetchAndSetTagKeys
   onGetTagValues: typeof fetchAndSetTagValues
 }
@@ -74,24 +75,22 @@ class AnnotationControlBar extends PureComponent<Props> {
     )
   }
 
-  private handleAddTagFilter = () => {
-    const {onUpdateTagFilter, dashboardID} = this.props
+  private handleAddTagFilter = async (): Promise<void> => {
+    const {dashboardID, onUpdateTagFilter} = this.props
 
-    onUpdateTagFilter(dashboardID, NEW_TAG_FILTER())
+    await onUpdateTagFilter(dashboardID, NEW_TAG_FILTER())
   }
 
   private handleUpdateTagFilter = async (t: TagFilter): Promise<void> => {
-    const {dashboardID, onUpdateTagFilter, onRefreshAnnotations} = this.props
+    const {source, dashboardID, onUpdateTagFilterAsync} = this.props
 
-    onUpdateTagFilter(dashboardID, t)
-    await onRefreshAnnotations()
+    await onUpdateTagFilterAsync(source.links.annotations, dashboardID, t)
   }
 
   private handleDeleteTagFilter = async (t: TagFilter): Promise<void> => {
-    const {dashboardID, onDeleteTagFilter, onRefreshAnnotations} = this.props
+    const {source, dashboardID, onDeleteTagFilterAsync} = this.props
 
-    onDeleteTagFilter(dashboardID, t)
-    await onRefreshAnnotations()
+    await onDeleteTagFilterAsync(source.links.annotations, dashboardID, t)
   }
 
   private handleGetKeySuggestions = async (): Promise<string[]> => {
@@ -133,7 +132,8 @@ const mstp = (
 
 const mdtp = {
   onUpdateTagFilter: updateTagFilter,
-  onDeleteTagFilter: deleteTagFilter,
+  onUpdateTagFilterAsync: updateTagFilterAsync,
+  onDeleteTagFilterAsync: deleteTagFilterAsync,
   onGetTagKeys: fetchAndSetTagKeys,
   onGetTagValues: fetchAndSetTagValues,
 }
