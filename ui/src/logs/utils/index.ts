@@ -208,7 +208,7 @@ export async function getQueryResultsCountForBounds(
   return getDeep<number>(result, 'results.0.series.0.values.0.1', 0)
 }
 
-export async function buildInfiniteScrollLogQuery(
+export function buildInfiniteScrollLogQuery(
   lower: string,
   upper: string,
   config: QueryConfig,

@@ -653,7 +653,7 @@ export const fetchOlderChunkAsync = () => async (
       )
     )
 
-    const query = await buildInfiniteScrollLogQuery(
+    const query = buildInfiniteScrollLogQuery(
       lower,
       upper,
       tableQueryConfig,
@@ -711,7 +711,7 @@ export const fetchNewerChunkAsync = () => async (
       )
     )
 
-    const query = await buildInfiniteScrollLogQuery(
+    const query = buildInfiniteScrollLogQuery(
       lower,
       upper,
       tableQueryConfig,
@@ -771,7 +771,7 @@ export const fetchLogsTailAsync = () => async (
     const isMaxTailBufferDurationExceeded =
       currentForwardBufferDuration >= maxTailBufferDurationMs
 
-    const query = await buildInfiniteScrollLogQuery(
+    const query = buildInfiniteScrollLogQuery(
       lower,
       upper,
       tableQueryConfig,
