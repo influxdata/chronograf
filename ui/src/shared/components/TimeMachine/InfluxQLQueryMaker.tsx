@@ -7,6 +7,7 @@ import EmptyQuery from 'src/shared/components/EmptyQuery'
 import QueryTabList from 'src/shared/components/QueryTabList'
 import InfluxQLEditor from 'src/dashboards/components/InfluxQLEditor'
 import SchemaExplorer from 'src/shared/components/SchemaExplorer'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 import {TEMPLATE_RANGE} from 'src/tempVars/constants'
@@ -56,36 +57,38 @@ const QueryMaker: SFC<Props> = ({
   }
 
   return (
-    <div className="query-maker">
-      <QueryTabList
-        queries={queries}
-        timeRange={timeRange}
-        onAddQuery={onAddQuery}
-        onDeleteQuery={onDeleteQuery}
-        activeQueryIndex={activeQueryIndex}
-        setActiveQueryIndex={setActiveQueryIndex}
-      />
-      <div className="query-maker--tab-contents">
-        <InfluxQLEditor
-          query={buildText(activeQuery)}
-          config={activeQuery}
-          onUpdate={actions.editRawTextAsync}
-          templates={templates}
+    <FancyScrollbar className="query-maker--container">
+      <div className="query-maker">
+        <QueryTabList
+          queries={queries}
+          timeRange={timeRange}
+          onAddQuery={onAddQuery}
+          onDeleteQuery={onDeleteQuery}
+          activeQueryIndex={activeQueryIndex}
+          setActiveQueryIndex={setActiveQueryIndex}
         />
-        <SchemaExplorer
-          source={source}
-          actions={actions}
-          query={activeQuery}
-          initialGroupByTime={initialGroupByTime}
-          isQuerySupportedByExplorer={_.get(
-            activeQuery,
-            'isQuerySupportedByExplorer',
-            true
-          )}
-          isInCEO={isInCEO}
-        />
+        <div className="query-maker--tab-contents">
+          <InfluxQLEditor
+            query={buildText(activeQuery)}
+            config={activeQuery}
+            onUpdate={actions.editRawTextAsync}
+            templates={templates}
+          />
+          <SchemaExplorer
+            source={source}
+            actions={actions}
+            query={activeQuery}
+            initialGroupByTime={initialGroupByTime}
+            isQuerySupportedByExplorer={_.get(
+              activeQuery,
+              'isQuerySupportedByExplorer',
+              true
+            )}
+            isInCEO={isInCEO}
+          />
+        </div>
       </div>
-    </div>
+    </FancyScrollbar>
   )
 }
 
