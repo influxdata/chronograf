@@ -220,14 +220,14 @@ interface SetTimeMarkerAction {
   }
 }
 
-interface SetHistogramQueryConfig {
+interface SetHistogramQueryConfigAction {
   type: ActionTypes.SetHistogramQueryConfig
   payload: {
     queryConfig: QueryConfig
   }
 }
 
-interface SetHistogramData {
+interface SetHistogramDataAction {
   type: ActionTypes.SetHistogramData
   payload: {
     data: object[]
@@ -290,8 +290,8 @@ export type Action =
   | SetTimeWindowAction
   | SetTimeMarkerAction
   | SetNamespaceAction
-  | SetHistogramQueryConfig
-  | SetHistogramData
+  | SetHistogramQueryConfigAction
+  | SetHistogramDataAction
   | SetTableData
   | SetTableQueryConfigAction
   | AddFilterAction
@@ -437,7 +437,13 @@ export const setSearchStatus = (
   payload: {searchStatus},
 })
 
-export const clearNextTimeBounds = () => dispatch => {
+export const clearNextTimeBounds = () => (
+  dispatch: Dispatch<
+    | SetNextTailLowerBoundAction
+    | SetNextNewerUpperBoundAction
+    | SetNextOlderUpperBoundAction
+  >
+) => {
   dispatch(setNextTailLowerBound(undefined))
   dispatch(setNextNewerUpperBound(undefined))
   dispatch(setNextOlderUpperBound(undefined))
@@ -481,7 +487,7 @@ export const removeFilter = (id: string): RemoveFilterAction => ({
   payload: {id},
 })
 
-const setHistogramData = (data): SetHistogramData => ({
+const setHistogramData = (data): SetHistogramDataAction => ({
   type: ActionTypes.SetHistogramData,
   payload: {data},
 })
@@ -580,7 +586,10 @@ export const setTableQueryConfigAsync = () => async (
   }
 }
 
-export const fetchOlderChunkAsync = () => async (dispatch, getState) => {
+export const fetchOlderChunkAsync = () => async (
+  dispatch: Dispatch<SetNextOlderUpperBoundAction | ConcatMoreLogsAction>,
+  getState: GetState
+): Promise<void> => {
   const state = getState()
 
   const selectedTableTime = getTableSelectedTime(state)
@@ -645,7 +654,10 @@ export const fetchOlderChunkAsync = () => async (dispatch, getState) => {
   }
 }
 
-export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
+export const fetchNewerChunkAsync = () => async (
+  dispatch: Dispatch<SetNextNewerUpperBoundAction | PrependMoreLogsAction>,
+  getState: GetState
+): Promise<void> => {
   const state = getState()
 
   const selectedTableTime = getTableSelectedTime(state)
@@ -710,7 +722,14 @@ export const fetchNewerChunkAsync = () => async (dispatch, getState) => {
   }
 }
 
-export const fetchLogsTailAsync = () => async (dispatch, getState) => {
+export const fetchLogsTailAsync = () => async (
+  dispatch: Dispatch<
+    | SetTableBackwardDataAction
+    | SetTableForwardDataAction
+    | SetNextTailLowerBoundAction
+  >,
+  getState: GetState
+): Promise<void> => {
   const state = getState()
 
   const {nextTailLowerBound} = state.logs
