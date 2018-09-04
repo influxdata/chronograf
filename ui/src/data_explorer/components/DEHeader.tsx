@@ -5,7 +5,6 @@ import React, {Component} from 'react'
 import {Radio, ButtonShape} from 'src/reusable_ui'
 import GraphTips from 'src/shared/components/GraphTips'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import FeatureFlag from 'src/shared/components/FeatureFlag'
 
 // Constants
 import {CEOTabs} from 'src/dashboards/constants'
@@ -40,28 +39,26 @@ class DEHeader extends Component<Props> {
         <div className="page-header--container">
           <div className="page-header--left">Explore</div>
           <div className="deceo--header-tabs">
-            <FeatureFlag>
-              <Radio shape={ButtonShape.StretchToFit}>
-                <Radio.Button
-                  id="deceo-tab-queries"
-                  titleText="Queries"
-                  value={CEOTabs.Queries}
-                  active={activeEditorTab === CEOTabs.Queries}
-                  onClick={onSetActiveEditorTab}
-                >
-                  Queries
-                </Radio.Button>
-                <Radio.Button
-                  id="deceo-tab-vis"
-                  titleText="Visualization"
-                  value={CEOTabs.Vis}
-                  active={activeEditorTab === CEOTabs.Vis}
-                  onClick={onSetActiveEditorTab}
-                >
-                  Visualization
-                </Radio.Button>
-              </Radio>
-            </FeatureFlag>
+            <Radio shape={ButtonShape.StretchToFit}>
+              <Radio.Button
+                id="deceo-tab-queries"
+                titleText="Queries"
+                value={CEOTabs.Queries}
+                active={activeEditorTab === CEOTabs.Queries}
+                onClick={onSetActiveEditorTab}
+              >
+                Queries
+              </Radio.Button>
+              <Radio.Button
+                id="deceo-tab-vis"
+                titleText="Visualization"
+                value={CEOTabs.Vis}
+                active={activeEditorTab === CEOTabs.Vis}
+                onClick={onSetActiveEditorTab}
+              >
+                Visualization
+              </Radio.Button>
+            </Radio>
           </div>
 
           <div className="page-header--right">
