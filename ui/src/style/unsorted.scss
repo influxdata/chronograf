@@ -413,14 +413,14 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background-color: $g3-castle;
+  @include gradient-v($g2-kevlar, $g0-obsidian);
 }
 
 .deceo--controls {
   display: flex;
   height: 60px;
   padding: 0 60px;
-  background-color: $g3-castle;
+  background-color: $g2-kevlar;
   align-items: center;
 
   .csv-export, .autorefresh-dropdown {
@@ -433,13 +433,15 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
 }
 
 .deceo--visualization {
-  padding: 0 (60px - 16px);
+  padding: 0 60px;
+  padding-bottom: $ix-marg-a + $ix-marg-b;
   width: 100%;
   height: 100%;
 
   .graph-container {
     top: 0;
     height: 100%;
+    border-radius: 4px;
   }
 }
 
