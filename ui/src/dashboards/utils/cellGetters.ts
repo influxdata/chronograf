@@ -15,6 +15,7 @@ import {
   DEFAULT_DURATION_MS,
   DEFAULT_PIXELS,
 } from 'src/shared/constants'
+const MAX_COLUMNS = 12
 
 // Types
 import {Cell, CellType, Dashboard, NewDefaultCell} from 'src/types/dashboards'
@@ -45,8 +46,6 @@ export const isCellUntitled = (cellName: string): boolean => {
   return cellName === UNTITLED_GRAPH
 }
 
-const numColumns = 12
-
 export const getNextAvailablePosition = (cells, newCell) => {
   const farthestY = cells.map(cell => cell.y).reduce((a, b) => (a > b ? a : b))
 
@@ -56,7 +55,7 @@ export const getNextAvailablePosition = (cells, newCell) => {
     .reduce((a, b) => (a > b ? a : b))
   const lastCell = bottomCells.find(cell => cell.x === farthestX)
 
-  const availableSpace = numColumns - (lastCell.x + lastCell.w)
+  const availableSpace = MAX_COLUMNS - (lastCell.x + lastCell.w)
   const newCellFits = availableSpace >= newCell.w
 
   return newCellFits
@@ -105,15 +104,57 @@ export const getNewDashboardCell = (
   }
 }
 
+const incrementCloneName = (cellNames: string[], cellName: string): string => {
+  const rootName = cellName.replace(/\s\(clone\s(\d)+\)/g, '').replace(/\)/, '')
+
+  const filteredNames = cellNames.filter(cn => cn.includes(rootName))
+
+  const highestNumberedClone = filteredNames.reduce((acc, name) => {
+    if (name.match(/\(clone(\s|\d)+\)/)) {
+      const strippedName = name
+        .replace(rootName, '')
+        .replace(/\(clone/, '')
+        .replace(/\)/, '')
+
+      const cloneNumber = Number(strippedName)
+
+      return cloneNumber >= acc ? cloneNumber : acc
+    }
+
+    return acc
+  }, 0)
+
+  if (highestNumberedClone) {
+    const newCloneNumber = highestNumberedClone + 1
+    return `${cellName.replace(
+      /\(clone\s(\d)+\)/,
+      ''
+    )} (clone ${newCloneNumber})`
+  }
+
+  return `${cellName} (clone 1)`
+}
+
 export const getClonedDashboardCell = (
   dashboard: Dashboard,
-  cloneCell: Cell
+  cellClone: Cell
 ): Cell => {
-  const {x, y} = getNextAvailablePosition(dashboard, cloneCell)
+  const cellNames = dashboard.cells.map(c => c.name)
+  const name = incrementCloneName(cellNames, cellClone.name)
 
-  const name = `${cloneCell.name} (clone)`
+  const cellCloneFitsLeft = cellClone.x >= cellClone.w
+  const cellCloneFitsRight =
+    MAX_COLUMNS - (cellClone.w + cellClone.x) >= cellClone.w
 
-  return {...cloneCell, x, y, name}
+  if (cellCloneFitsRight) {
+    return {...cellClone, x: cellClone.x + cellClone.w, name}
+  }
+
+  if (cellCloneFitsLeft) {
+    return {...cellClone, x: cellClone.x - cellClone.w, name}
+  }
+
+  return {...cellClone, y: cellClone.y + cellClone.h, name}
 }
 
 export const getTimeRange = (queryConfig: QueryConfig): DurationRange => {
