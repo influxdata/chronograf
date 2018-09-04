@@ -9,13 +9,14 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
 
-import {Dashboard, Source} from 'src/types'
+import {Dashboard, Source, RemoteDataState} from 'src/types'
 import {Notification} from 'src/types/notifications'
 
 interface Props {
   source: Source
   sources: Source[]
   dashboards: Dashboard[]
+  dashboardsStatus: RemoteDataState
   onDeleteDashboard: (dashboard: Dashboard) => () => void
   onCreateDashboard: () => void
   onCloneDashboard: (
@@ -50,14 +51,16 @@ class DashboardsPageContents extends Component<Props, State> {
       onCloneDashboard,
       onExportDashboard,
       dashboardLink,
+      dashboardsStatus,
     } = this.props
 
     return (
-      <div className="panel">
+      <div className="panel dashboards-page-panel">
         {this.renderPanelHeading}
         <div className="panel-body">
           <DashboardsTable
             dashboards={this.filteredDashboards}
+            dashboardsStatus={dashboardsStatus}
             onDeleteDashboard={onDeleteDashboard}
             onCreateDashboard={onCreateDashboard}
             onCloneDashboard={onCloneDashboard}

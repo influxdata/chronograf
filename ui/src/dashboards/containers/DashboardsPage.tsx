@@ -29,7 +29,7 @@ import {
   notifyDashboardExportFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Dashboard} from 'src/types'
+import {Source, Dashboard, RemoteDataState} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
 
@@ -46,16 +46,38 @@ interface Props {
   dashboards: Dashboard[]
 }
 
+interface State {
+  dashboardsStatus: RemoteDataState
+}
+
 @ErrorHandling
-class DashboardsPage extends PureComponent<Props> {
+class DashboardsPage extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {dashboardsStatus: RemoteDataState.NotStarted}
+  }
+
   public async componentDidMount() {
-    const dashboards = await this.props.handleGetDashboards()
-    const dashboardIDs = dashboards.map(d => d.id)
-    this.props.retainRangesDashTimeV1(dashboardIDs)
+    this.setState({dashboardsStatus: RemoteDataState.Loading})
+
+    let dashboards
+
+    try {
+      dashboards = await this.props.handleGetDashboards()
+
+      const dashboardIDs = dashboards.map(d => d.id)
+
+      this.props.retainRangesDashTimeV1(dashboardIDs)
+      this.setState({dashboardsStatus: RemoteDataState.Done})
+    } catch {
+      this.setState({dashboardsStatus: RemoteDataState.Error})
+    }
   }
 
   public render() {
     const {dashboards, notify, sources, source} = this.props
+    const {dashboardsStatus} = this.state
     const dashboardLink = `/sources/${this.props.source.id}`
 
     return (
@@ -64,9 +86,7 @@ class DashboardsPage extends PureComponent<Props> {
           <Page.Header.Left>
             <Page.Title title="Dashboards" />
           </Page.Header.Left>
-          <Page.Header.Right showSourceIndicator={true}>
-            <p>bloop</p>
-          </Page.Header.Right>
+          <Page.Header.Right showSourceIndicator={true} />
         </Page.Header>
         <Page.Contents>
           <DashboardsContents
@@ -74,6 +94,7 @@ class DashboardsPage extends PureComponent<Props> {
             source={source}
             sources={sources}
             dashboards={dashboards}
+            dashboardsStatus={dashboardsStatus}
             dashboardLink={dashboardLink}
             onDeleteDashboard={this.handleDeleteDashboard}
             onCreateDashboard={this.handleCreateDashboard}
