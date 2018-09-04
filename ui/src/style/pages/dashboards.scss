@@ -64,7 +64,7 @@ $dash-graph-options-arrow: 8px;
   ------------------------------------------------------
 */
 
-.cell-shell {
+%cell-styles {
   background-color: $g3-castle;
   border-radius: $radius;
   border: 2px solid $g3-castle;
@@ -73,7 +73,7 @@ $dash-graph-options-arrow: 8px;
 
 .dashboard {
   .react-grid-item {
-    @extend .cell-shell;
+    @extend %cell-styles;
   }
   .graph-empty {
     background-color: transparent;
