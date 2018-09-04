@@ -676,7 +676,7 @@ export const fetchOlderChunkAsync = () => async (
     await dispatch(concatMoreLogs(logSeries))
   } else {
     throw new Error(
-      `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
+      `Missing params required to fetch older logs. Maybe there's a race condition with setting namespaces?`
     )
   }
 }
@@ -734,7 +734,7 @@ export const fetchNewerChunkAsync = () => async (
     await dispatch(prependMoreLogs(logSeries))
   } else {
     throw new Error(
-      `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
+      `Missing params required to fetch newer logs. Maybe there's a race condition with setting namespaces?`
     )
   }
 }
@@ -808,7 +808,7 @@ export const fetchLogsTailAsync = () => async (
     }
   } else {
     throw new Error(
-      `Missing params required to fetch logs. Maybe there's a race condition with setting namespaces?`
+      `Missing params required to fetch tail logs. Maybe there's a race condition with setting namespaces?`
     )
   }
 }
