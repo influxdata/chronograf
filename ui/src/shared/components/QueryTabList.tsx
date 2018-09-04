@@ -1,5 +1,12 @@
 import React, {PureComponent} from 'react'
 import QueryMakerTab from 'src/data_explorer/components/QueryMakerTab'
+import {
+  Button,
+  ComponentSize,
+  ComponentColor,
+  ButtonShape,
+  IconFont,
+} from 'src/reusable_ui'
 import buildInfluxQLQuery from 'src/utils/influxql'
 import {QueryConfig, TimeRange} from 'src/types/queries'
 
@@ -35,12 +42,14 @@ export default class QueryTabList extends PureComponent<Props> {
             queryIndex={i}
           />
         ))}
-        <div
-          className="query-maker--new btn btn-sm btn-primary"
+        <Button
+          size={ComponentSize.ExtraSmall}
+          color={ComponentColor.Primary}
+          customClass="query-maker--new"
+          icon={IconFont.PlusSkinny}
           onClick={onAddQuery}
-        >
-          <span className="icon plus" />
-        </div>
+          shape={ButtonShape.Square}
+        />
       </div>
     )
   }

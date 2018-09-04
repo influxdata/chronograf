@@ -246,6 +246,7 @@ class TimeMachine extends PureComponent<Props, State> {
       },
       {
         name: '',
+        handlePixels: 8,
         headerButtons: [],
         menuOptions: [],
         render: () => this.editorBottom,

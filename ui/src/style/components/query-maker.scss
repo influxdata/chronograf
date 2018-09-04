@@ -19,7 +19,7 @@
 */
 $query-maker--gutter: 16px;
 
-$query-maker--tabs-height: 44px;
+$query-maker--tabs-height: 32px;
 $query-maker--tabs-header-text: $g18-cloud;
 
 $query-maker--tab-width: 340px;
@@ -74,16 +74,17 @@ $query-editor-tab-active: $g3-castle;
     Controls which query is currently being modified
 */
 
+$query-maker-tab-margin: 6px;
+
 .query-maker--tabs {
-  padding: 12px 60px;
-  padding-bottom: 0;
+  padding: 0 60px;
+  margin-top: 0;
   display: flex;
-  height: $query-maker--tabs-height + 12px;
+  height: $query-maker--tabs-height + $query-maker-tab-margin;
   align-items: center;
 }
-.query-maker--tabs > div.btn.query-maker--new {
-  margin-left: 6px;
-  padding: 0 8px !important;
+.query-maker--new {
+  margin-left: $query-maker-tab-margin;
 }
 .query-maker--new > span.icon {
   margin: 0 !important;
@@ -91,7 +92,8 @@ $query-editor-tab-active: $g3-castle;
 .query-maker--tab {
   border-radius: $radius $radius 0 0;
   height: $query-maker--tabs-height;
-  margin: 0 2px 0 0;
+  margin-top: $query-maker-tab-margin;
+  margin-right: $ix-border;
   max-width: $query-maker--tab-width;
   flex: 1 0 0;
   color: $query-maker--tab-text;
@@ -118,13 +120,13 @@ $query-editor-tab-active: $g3-castle;
   position: absolute;
 }
 .query-maker--tab > label {
-  left: 12px;
-  font-size: 14px;
-  font-weight: 600;
+  left: 10px;
+  font-size: 13px;
+  font-weight: 700;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
-  width: calc(100% - #{$query-maker--tabs-height});
+  width: calc(100% - #{$query-maker--tabs-height + $ix-marg-a});
   text-overflow: ellipsis;
   @include no-user-select();
   cursor: inherit !important;
@@ -135,7 +137,7 @@ $query-editor-tab-active: $g3-castle;
   height: 18px;
   background-color: transparent;
   display: block;
-  right: 9px;
+  right: 6px;
 
   &:before,
   &:after {
