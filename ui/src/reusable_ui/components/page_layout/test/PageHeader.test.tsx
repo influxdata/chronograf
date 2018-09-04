@@ -36,10 +36,17 @@ describe('PageHeader', () => {
   }
 
   it('mounts without exploding', () => {
+    wrapper = wrapperSetup()
     expect(wrapper).toHaveLength(1)
   })
 
   it('matches snapshot with minimal props', () => {
+    wrapper = wrapperSetup()
+    expect(wrapper).toMatchSnapshot()
+  })
+
+  it('matches snapshot in presentation mode', () => {
+    wrapper = wrapperSetup({inPresentationMode: true})
     expect(wrapper).toMatchSnapshot()
   })
 

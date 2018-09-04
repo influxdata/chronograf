@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`PageHeader matches snapshot in presentation mode 1`] = `""`;
+
 exports[`PageHeader matches snapshot with minimal props 1`] = `
 <div
   className="page-header"
