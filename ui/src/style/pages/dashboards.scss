@@ -553,20 +553,3 @@ $dash-graph-options-arrow: 8px;
     }
   }
 }
-
-/*
-  Dashboard Scoped Features
-  ------------------------------------------------------
-*/
-
-@import '../components/dashboard-empty';
-
-@import '../components/template-control-bar';
-
-@import '../components/edit-template-variable';
-
-@import '../components/write-data-form';
-
-@import '../components/annotation-control-bar';
-
-@import '../components/annotation-editor';
