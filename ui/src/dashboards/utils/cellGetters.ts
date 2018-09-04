@@ -106,14 +106,12 @@ export const getNewDashboardCell = (
   }
 }
 
-const incrementCloneName = (dashboard: Dashboard, cellName: string): string => {
+const incrementCloneName = (cellNames: string[], cellName: string): string => {
   const rootName = cellName.replace(/\s\(clone\s(\d)+\)/g, '').replace(/\)/, '')
 
-  const cellNames = dashboard.cells
-    .map(c => c.name)
-    .filter(cn => cn.includes(rootName))
+  const filteredNames = cellNames.filter(cn => cn.includes(rootName))
 
-  const highestNumberedClone = cellNames.reduce((acc, name) => {
+  const highestNumberedClone = filteredNames.reduce((acc, name) => {
     if (name.match(/\(clone(\s|\d)+\)/)) {
       const strippedName = name
         .replace(rootName, '')
@@ -143,7 +141,8 @@ export const getClonedDashboardCell = (
   dashboard: Dashboard,
   cellClone: Cell
 ): Cell => {
-  const name = incrementCloneName(dashboard, cellClone.name)
+  const cellNames = dashboard.cells.map(c => c.name)
+  const name = incrementCloneName(cellNames, cellClone.name)
 
   const cellCloneFitsLeft = cellClone.x >= cellClone.w
   const cellCloneFitsRight =
