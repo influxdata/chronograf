@@ -7,7 +7,7 @@ import _ from 'lodash'
 import HostsTable from 'src/hosts/components/HostsTable'
 import AutoRefreshDropdown from 'shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
 import ManualRefresh from 'src/shared/components/ManualRefresh'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 
 import {getCpuAndLoadForHosts, getLayouts, getAppsForHosts} from '../apis'
 import {getEnv} from 'src/shared/apis/env'
@@ -111,42 +111,37 @@ export class HostsPage extends Component {
   }
 
   render() {
-    const {source} = this.props
+    const {
+      source,
+      autoRefresh,
+      onChooseAutoRefresh,
+      onManualRefresh,
+    } = this.props
     const {hosts, hostsLoading, hostsError} = this.state
-    return (
-      <div className="page hosts-list-page">
-        <PageHeader
-          titleText="Host List"
-          optionsComponents={this.optionsComponents}
-          sourceIndicator={true}
-        />
-        <div className="page-contents">
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-md-12">
-                <HostsTable
-                  source={source}
-                  hosts={_.values(hosts)}
-                  hostsLoading={hostsLoading}
-                  hostsError={hostsError}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  get optionsComponents() {
-    const {autoRefresh, onChooseAutoRefresh, onManualRefresh} = this.props
 
     return (
-      <AutoRefreshDropdown
-        selected={autoRefresh}
-        onChoose={onChooseAutoRefresh}
-        onManualRefresh={onManualRefresh}
-      />
+      <Page className="hosts-list-page">
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title="Host List" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true}>
+            <AutoRefreshDropdown
+              selected={autoRefresh}
+              onChoose={onChooseAutoRefresh}
+              onManualRefresh={onManualRefresh}
+            />
+          </Page.Header.Right>
+        </Page.Header>
+        <Page.Contents scrollable={false}>
+          <HostsTable
+            source={source}
+            hosts={_.values(hosts)}
+            hostsLoading={hostsLoading}
+            hostsError={hostsError}
+          />
+        </Page.Contents>
+      </Page>
     )
   }
 

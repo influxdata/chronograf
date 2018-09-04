@@ -21,8 +21,16 @@
 @import 'external/codemirror';
 
 // Layout
-@import 'layout/page';
-@import 'layout/page-header';
+.chronograf-root {
+  display: flex;
+  align-items: stretch;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  color: $g17-whisper;
+}
 @import 'layout/page-subsections';
 @import 'layout/sidebar';
 @import 'layout/overlay-technology';
@@ -78,14 +86,16 @@
 @import 'src/sources/components/DashboardStep';
 @import 'src/shared/components/DygraphLegend';
 @import 'src/dashboards/components/GraphTypeSelector';
+@import '../shared/components/dropdown_auto_refresh/AutoRefreshDropdown.scss';
+@import '../dashboards/components/rename_dashboard/RenameDashboard.scss';
+@import '../logs/components/logs_message/LogsMessage';
+@import '../logs/components/expandable_message/ExpandableMessage';
+@import '../dashboards/components/import_dashboard_mappings/ImportDashboardMappings.scss';
 
 
 // Reusable UI Components
-@import '../logs/components/expandable_message/ExpandableMessage';
-@import '../logs/components/logs_message/LogsMessage';
 @import '../reusable_ui/components/panel/Panel.scss';
 @import '../reusable_ui/components/overlays/Overlay.scss';
-@import '../dashboards/components/import_dashboard_mappings/ImportDashboardMappings.scss';
 @import '../reusable_ui/components/card_select/CardSelectCard.scss';
 @import '../reusable_ui/components/card_select/ProtoboardIcon.scss';
 @import '../reusable_ui/components/grid_sizer/GridSizer.scss';
@@ -104,8 +114,7 @@
 @import '../reusable_ui/components/dropdowns/DropdownButton.scss';
 @import '../reusable_ui/components/inputs/Input.scss';
 @import '../reusable_ui/components/form_layout/Form.scss';
-@import '../dashboards/components/rename_dashboard/RenameDashboard.scss';
-@import '../shared/components/dropdown_auto_refresh/AutoRefreshDropdown.scss';
+@import '../reusable_ui/components/page_layout/Page.scss';
 
 // Pages
 @import 'pages/config-endpoints';

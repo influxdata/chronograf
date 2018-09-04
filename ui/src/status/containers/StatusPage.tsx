@@ -2,9 +2,8 @@
 import React, {Component} from 'react'
 
 // Components
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import LayoutRenderer from 'src/shared/components/LayoutRenderer'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 
 // Constants
 import {STATUS_PAGE_TIME_RANGE} from 'src/shared/data/timeRanges'
@@ -50,13 +49,14 @@ class StatusPage extends Component<Props, State> {
     const {cells} = this.state
 
     return (
-      <div className="page">
-        <PageHeader
-          titleText="Status"
-          fullWidth={true}
-          sourceIndicator={true}
-        />
-        <FancyScrollbar className="page-contents">
+      <Page>
+        <Page.Header fullWidth={true}>
+          <Page.Header.Left>
+            <Page.Title title="Status" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true} />
+        </Page.Header>
+        <Page.Contents fullWidth={true}>
           <div className="dashboard container-fluid full-width">
             {cells.length ? (
               <LayoutRenderer
@@ -74,8 +74,8 @@ class StatusPage extends Component<Props, State> {
               <span>Loading Status Page...</span>
             )}
           </div>
-        </FancyScrollbar>
-      </div>
+        </Page.Contents>
+      </Page>
     )
   }
 

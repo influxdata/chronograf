@@ -28,8 +28,7 @@ import UsersTable from 'src/admin/components/UsersTable'
 import RolesTable from 'src/admin/components/RolesTable'
 import QueriesPage from 'src/admin/containers/QueriesPage'
 import DatabaseManagerPage from 'src/admin/containers/DatabaseManagerPage'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import {Page} from 'src/reusable_ui'
 import SubSections from 'src/shared/components/SubSections'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -141,10 +140,15 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
 
   public render() {
     return (
-      <div className="page">
-        <PageHeader titleText="InfluxDB Admin" sourceIndicator={true} />
-        <FancyScrollbar className="page-contents">{this.admin}</FancyScrollbar>
-      </div>
+      <Page>
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title="InfluxDB Admin" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true} />
+        </Page.Header>
+        <Page.Contents fullWidth={true}>{this.admin}</Page.Contents>
+      </Page>
     )
   }
 

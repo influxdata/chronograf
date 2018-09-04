@@ -1,4 +1,4 @@
-import React, {PureComponent, SFC} from 'react'
+import React, {PureComponent} from 'react'
 
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
@@ -7,9 +7,8 @@ import {getActiveKapacitor} from 'src/shared/apis'
 import * as kapacitorActionCreators from '../actions/view'
 
 import KapacitorRules from 'src/kapacitor/components/KapacitorRules'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 
 import {Source, Kapacitor, AlertRule} from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -55,16 +54,29 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
     const {source, rules} = this.props
     const {hasKapacitor, loading} = this.state
     return (
-      <PageContents>
-        <KapacitorRules
-          source={source}
-          rules={rules}
-          hasKapacitor={hasKapacitor}
-          loading={loading}
-          onDelete={this.handleDeleteRule}
-          onChangeRuleStatus={this.handleRuleStatus}
-        />
-      </PageContents>
+      <Page>
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title="Manage Tasks" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true}>
+            <QuestionMarkTooltip
+              tipID="manage-tasks--tooltip"
+              tipContent="<b>Alert Rules</b> generate a TICKscript for<br/>you using our Builder UI.<br/><br/>Not all TICKscripts can be edited<br/>using the Builder."
+            />
+          </Page.Header.Right>
+        </Page.Header>
+        <Page.Contents>
+          <KapacitorRules
+            source={source}
+            rules={rules}
+            hasKapacitor={hasKapacitor}
+            loading={loading}
+            onDelete={this.handleDeleteRule}
+            onChangeRuleStatus={this.handleRuleStatus}
+          />
+        </Page.Contents>
+      </Page>
     )
   }
 
@@ -81,36 +93,6 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
     actions.updateRuleStatus(rule, status)
     actions.updateRuleStatusSuccess(rule.id, status)
   }
-}
-
-interface PageContentsProps {
-  children: JSX.Element[] | JSX.Element
-}
-
-const PageContents: SFC<PageContentsProps> = ({children}) => (
-  <div className="page">
-    <PageHeader
-      titleText="Manage Tasks"
-      optionsComponents={renderHeaderOptions()}
-      sourceIndicator={true}
-    />
-    <FancyScrollbar className="page-contents fancy-scroll--kapacitor">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-12">{children}</div>
-        </div>
-      </div>
-    </FancyScrollbar>
-  </div>
-)
-
-const renderHeaderOptions = (): JSX.Element => {
-  return (
-    <QuestionMarkTooltip
-      tipID="manage-tasks--tooltip"
-      tipContent="<b>Alert Rules</b> generate a TICKscript for<br/>you using our Builder UI.<br/><br/>Not all TICKscripts can be edited<br/>using the Builder."
-    />
-  )
 }
 
 const mapStateToProps = state => {

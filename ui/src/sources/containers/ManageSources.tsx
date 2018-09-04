@@ -6,8 +6,7 @@ import * as sourcesActions from 'src/shared/actions/sources'
 import * as servicesActions from 'src/shared/actions/services'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 import InfluxTable from 'src/sources/components/InfluxTable'
 import ConnectionWizard from 'src/sources/components/ConnectionWizard'
 
@@ -78,24 +77,27 @@ class ManageSources extends PureComponent<Props, State> {
       showNewKapacitor,
     } = this.state
     return (
-      <div className="page" id="manage-sources-page">
-        <PageHeader titleText="Configuration" sourceIndicator={true} />
-        <FancyScrollbar className="page-contents">
-          <div className="container-fluid">
-            <InfluxTable
-              source={source}
-              sources={sources}
-              services={services}
-              deleteFlux={deleteFlux}
-              deleteKapacitor={deleteKapacitor}
-              onDeleteSource={this.handleDeleteSource}
-              setActiveFlux={this.handleSetActiveFlux}
-              setActiveKapacitor={this.handleSetActiveKapacitor}
-              toggleWizard={this.toggleWizard}
-            />
-            <p className="version-number">Chronograf Version: {VERSION}</p>
-          </div>
-        </FancyScrollbar>
+      <Page>
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title="Configuration" />
+          </Page.Header.Left>
+          <Page.Header.Right showSourceIndicator={true} />
+        </Page.Header>
+        <Page.Contents>
+          <InfluxTable
+            source={source}
+            sources={sources}
+            services={services}
+            deleteFlux={deleteFlux}
+            deleteKapacitor={deleteKapacitor}
+            onDeleteSource={this.handleDeleteSource}
+            setActiveFlux={this.handleSetActiveFlux}
+            setActiveKapacitor={this.handleSetActiveKapacitor}
+            toggleWizard={this.toggleWizard}
+          />
+          <p className="version-number">Chronograf Version: {VERSION}</p>
+        </Page.Contents>
         <ConnectionWizard
           isVisible={wizardVisibility}
           toggleVisibility={this.toggleWizard}
@@ -103,7 +105,7 @@ class ManageSources extends PureComponent<Props, State> {
           jumpStep={jumpStep}
           showNewKapacitor={showNewKapacitor}
         />
-      </div>
+      </Page>
     )
   }
 

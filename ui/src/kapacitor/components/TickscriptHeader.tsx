@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 import LogsToggle from 'src/kapacitor/components/LogsToggle'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import TickscriptSave, {Task} from 'src/kapacitor/components/TickscriptSave'
@@ -18,17 +18,6 @@ interface Props {
 
 class TickscriptHeader extends Component<Props> {
   public render() {
-    return (
-      <PageHeader
-        titleText="TICKscript Editor"
-        fullWidth={true}
-        sourceIndicator={true}
-        optionsComponents={this.optionsComponents}
-      />
-    )
-  }
-
-  private get optionsComponents(): JSX.Element {
     const {
       task,
       onSave,
@@ -40,20 +29,25 @@ class TickscriptHeader extends Component<Props> {
     } = this.props
 
     return (
-      <>
-        <LogsToggle
-          areLogsEnabled={areLogsEnabled}
-          areLogsVisible={areLogsVisible}
-          onToggleLogsVisibility={onToggleLogsVisibility}
-        />
-        <TickscriptSave
-          task={task}
-          onSave={onSave}
-          unsavedChanges={unsavedChanges}
-          isNewTickscript={isNewTickscript}
-        />
-        {this.saveButton}
-      </>
+      <Page.Header fullWidth={true}>
+        <Page.Header.Left>
+          <Page.Title title="TICKscript Editor" />
+        </Page.Header.Left>
+        <Page.Header.Right showSourceIndicator={true}>
+          <LogsToggle
+            areLogsEnabled={areLogsEnabled}
+            areLogsVisible={areLogsVisible}
+            onToggleLogsVisibility={onToggleLogsVisibility}
+          />
+          <TickscriptSave
+            task={task}
+            onSave={onSave}
+            unsavedChanges={unsavedChanges}
+            isNewTickscript={isNewTickscript}
+          />
+          {this.saveButton}
+        </Page.Header.Right>
+      </Page.Header>
     )
   }
 

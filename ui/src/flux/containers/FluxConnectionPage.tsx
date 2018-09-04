@@ -4,8 +4,7 @@ import {withRouter} from 'react-router'
 
 import FluxNew from 'src/flux/components/FluxNew'
 import FluxEdit from 'src/flux/components/FluxEdit'
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
-import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+import {Page} from 'src/reusable_ui'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {getService} from 'src/shared/apis'
 import {FluxFormMode} from 'src/flux/constants/connection'
@@ -96,9 +95,14 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
 
   public render() {
     return (
-      <div className="page">
-        <PageHeader titleText={this.pageTitle} />
-        <FancyScrollbar className="page-contents">
+      <Page>
+        <Page.Header>
+          <Page.Header.Left>
+            <Page.Title title={this.pageTitle} />
+          </Page.Header.Left>
+          <Page.Header.Right />
+        </Page.Header>
+        <Page.Contents fullWidth={true}>
           <div className="container-fluid">
             <div className="row">
               <div className="col-md-8 col-md-offset-2">
@@ -108,8 +112,8 @@ export class FluxConnectionPage extends PureComponent<Props, State> {
               </div>
             </div>
           </div>
-        </FancyScrollbar>
-      </div>
+        </Page.Contents>
+      </Page>
     )
   }
 

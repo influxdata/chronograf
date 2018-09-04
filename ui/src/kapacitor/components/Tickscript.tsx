@@ -5,6 +5,7 @@ import TickscriptEditor from 'src/kapacitor/components/TickscriptEditor'
 import TickscriptEditorControls from 'src/kapacitor/components/TickscriptEditorControls'
 import TickscriptEditorConsole from 'src/kapacitor/components/TickscriptEditorConsole'
 import LogsTable from 'src/kapacitor/components/LogsTable'
+import {Page} from 'src/reusable_ui'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -47,7 +48,7 @@ class Tickscript extends PureComponent<Props> {
       onToggleLogsVisibility,
     } = this.props
     return (
-      <div className="page">
+      <Page>
         <TickscriptHeader
           task={task}
           onSave={onSave}
@@ -78,7 +79,7 @@ class Tickscript extends PureComponent<Props> {
           </div>
           {this.logsTable}
         </div>
-      </div>
+      </Page>
     )
   }
 

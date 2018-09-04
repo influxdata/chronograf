@@ -13,7 +13,7 @@ import ManualRefresh from 'src/shared/components/ManualRefresh'
 import TemplateControlBar from 'src/tempVars/components/TemplateControlBar'
 import AnnotationControlBar from 'src/shared/components/AnnotationControlBar'
 import AnnotationEditorContainer from 'src/shared/components/AnnotationEditorContainer'
-import {OverlayTechnology} from 'src/reusable_ui'
+import {OverlayTechnology, Page} from 'src/reusable_ui'
 
 // Actions
 import * as dashboardActions from 'src/dashboards/actions'
@@ -329,7 +329,7 @@ class DashboardPage extends Component<Props, State> {
     const {dashboardLinks, showAnnotationControls} = this.state
 
     return (
-      <div className="page dashboard-page">
+      <Page>
         <OverlayTechnology visible={this.showCellEditorOverlay}>
           <CellEditorOverlay
             source={source}
@@ -413,7 +413,7 @@ class DashboardPage extends Component<Props, State> {
           />
         ) : null}
         <AnnotationEditorContainer />
-      </div>
+      </Page>
     )
   }
 

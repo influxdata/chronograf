@@ -40,39 +40,35 @@ class InfluxTable extends PureComponent<Props> {
     } = this.props
 
     return (
-      <div className="row">
-        <div className="col-md-12">
-          <div className="panel">
-            <InfluxTableHeader
-              me={me}
-              source={source}
-              isUsingAuth={isUsingAuth}
-              toggleWizard={toggleWizard}
-            />
-            <div className="panel-body">
-              <table className="table v-center margin-bottom-zero table-highlight">
-                <InfluxTableHead />
-                <tbody>
-                  {sources.map(s => {
-                    return (
-                      <InfluxTableRow
-                        key={s.id}
-                        source={s}
-                        services={this.getServicesForSource(s.id)}
-                        currentSource={source}
-                        onDeleteSource={onDeleteSource}
-                        deleteKapacitor={deleteKapacitor}
-                        setActiveKapacitor={setActiveKapacitor}
-                        setActiveFlux={setActiveFlux}
-                        deleteFlux={deleteFlux}
-                        toggleWizard={toggleWizard}
-                      />
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+      <div className="panel">
+        <InfluxTableHeader
+          me={me}
+          source={source}
+          isUsingAuth={isUsingAuth}
+          toggleWizard={toggleWizard}
+        />
+        <div className="panel-body">
+          <table className="table v-center margin-bottom-zero table-highlight">
+            <InfluxTableHead />
+            <tbody>
+              {sources.map(s => {
+                return (
+                  <InfluxTableRow
+                    key={s.id}
+                    source={s}
+                    services={this.getServicesForSource(s.id)}
+                    currentSource={source}
+                    onDeleteSource={onDeleteSource}
+                    deleteKapacitor={deleteKapacitor}
+                    setActiveKapacitor={setActiveKapacitor}
+                    setActiveFlux={setActiveFlux}
+                    deleteFlux={deleteFlux}
+                    toggleWizard={toggleWizard}
+                  />
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
     )

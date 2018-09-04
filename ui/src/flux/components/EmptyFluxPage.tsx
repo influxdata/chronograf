@@ -1,23 +1,28 @@
 import React, {SFC} from 'react'
 
-import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import {Page} from 'src/reusable_ui'
 
 interface Props {
   onGoToNewService: () => void
 }
 
 const EmptyFluxPage: SFC<Props> = ({onGoToNewService}) => (
-  <div className="page">
-    <PageHeader titleText="Flux Editor" fullWidth={true} />
-    <div className="page-contents">
+  <Page>
+    <Page.Header>
+      <Page.Header.Left>
+        <Page.Title title="Flux Editor" />
+      </Page.Header.Left>
+      <Page.Header.Right />
+    </Page.Header>
+    <Page.Contents scrollable={false} fullWidth={true}>
       <div className="flux-empty">
         <p>You do not have a configured Flux source</p>
         <button className="btn btn-primary btn-md" onClick={onGoToNewService}>
           Connect to Flux
         </button>
       </div>
-    </div>
-  </div>
+    </Page.Contents>
+  </Page>
 )
 
 export default EmptyFluxPage
