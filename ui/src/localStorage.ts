@@ -5,8 +5,22 @@ import {
   notifyLoadLocalSettingsFailed,
 } from 'src/shared/copy/notifications'
 
+import {
+  DEFAULT_THRESHOLDS_LIST_COLORS,
+  DEFAULT_GAUGE_COLORS,
+} from 'src/shared/constants/thresholds'
+import {DEFAULT_LINE_COLORS} from 'src/shared/constants/graphColorPalettes'
+import {DEFAULT_AXES} from 'src/dashboards/constants/cellEditor'
+import {
+  DEFAULT_TABLE_OPTIONS,
+  DEFAULT_TIME_FORMAT,
+  DEFAULT_DECIMAL_PLACES,
+  DEFAULT_FIELD_OPTIONS,
+} from 'src/dashboards/constants'
 import {editor} from 'src/flux/constants'
 
+import {CellType} from 'src/types'
+import {ThresholdType, CellNoteVisibility} from 'src/types/dashboards'
 import {LocalStorage} from 'src/types/localStorage'
 
 const VERSION = process.env.npm_package_version
@@ -86,6 +100,22 @@ export const saveToLocalStorage = ({
               sourceLink: dataExplorer.sourceLink || '',
               queryStatus: dataExplorer.queryStatus || {},
               script: dataExplorer.script || editor.DEFAULT_SCRIPT,
+              visType: dataExplorer.visType || CellType.Line,
+              thresholdsListType:
+                dataExplorer.thresholdsListType || ThresholdType.Text,
+              thresholdsListColors:
+                dataExplorer.thresholdsListColors ||
+                DEFAULT_THRESHOLDS_LIST_COLORS,
+              gaugeColors: dataExplorer.gaugeColors || DEFAULT_GAUGE_COLORS,
+              lineColors: dataExplorer.lineColors || DEFAULT_LINE_COLORS,
+              axes: dataExplorer.axes || DEFAULT_AXES,
+              tableOptions: dataExplorer.tableOptions || DEFAULT_TABLE_OPTIONS,
+              timeFormat: dataExplorer.timeFormat || DEFAULT_TIME_FORMAT,
+              decimalPlaces:
+                dataExplorer.decimalPlaces || DEFAULT_DECIMAL_PLACES,
+              fieldOptions: dataExplorer.fieldOptions || DEFAULT_FIELD_OPTIONS,
+              noteVisibility:
+                dataExplorer.noteVisibility || CellNoteVisibility.Default,
             },
             script,
             logs: {

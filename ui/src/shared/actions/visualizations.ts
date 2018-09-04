@@ -3,6 +3,8 @@ import {QueryUpdateState} from 'src/shared/actions/queries'
 
 // Types
 import {ActionType as CEOActionType} from 'src/dashboards/actions/cellEditorOverlay'
+import {ActionType as DEActionType} from 'src/data_explorer/actions/queries'
+
 import {ColorNumber, ColorString} from 'src/types/colors'
 import {
   DecimalPlaces,
@@ -21,7 +23,7 @@ export const updateVisType = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.ChangeCellType
-      : CEOActionType.ChangeCellType
+      : DEActionType.ChangeVisualizationType
   return {
     type,
     payload: {
@@ -34,7 +36,7 @@ export const updateNote = (note: string, stateToUpdate: QueryUpdateState) => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateCellNote
-      : CEOActionType.UpdateCellNote
+      : DEActionType.UpdateCellNote
   return {
     type,
     payload: {
@@ -50,7 +52,7 @@ export const updateNoteVisibility = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateCellNoteVisibility
-      : CEOActionType.UpdateCellNoteVisibility
+      : DEActionType.UpdateCellNoteVisibility
   return {
     type,
     payload: {
@@ -66,7 +68,7 @@ export const updateThresholdsListColors = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateThresholdsListColors
-      : CEOActionType.UpdateThresholdsListColors
+      : DEActionType.UpdateThresholdsListColors
   return {
     type,
     payload: {
@@ -82,7 +84,7 @@ export const updateThresholdsListType = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateThresholdsListType
-      : CEOActionType.UpdateThresholdsListType
+      : DEActionType.UpdateThresholdsListType
   return {
     type,
     payload: {
@@ -98,7 +100,7 @@ export const updateGaugeColors = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateGaugeColors
-      : CEOActionType.UpdateGaugeColors
+      : DEActionType.UpdateGaugeColors
   return {
     type,
     payload: {
@@ -111,7 +113,7 @@ export const updateAxes = (axes: Axes, stateToUpdate: QueryUpdateState) => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateAxes
-      : CEOActionType.UpdateAxes
+      : DEActionType.UpdateAxes
   return {
     type,
     payload: {
@@ -127,7 +129,7 @@ export const updateTableOptions = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateTableOptions
-      : CEOActionType.UpdateTableOptions
+      : DEActionType.UpdateTableOptions
   return {
     type,
     payload: {
@@ -143,7 +145,7 @@ export const updateLineColors = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateLineColors
-      : CEOActionType.UpdateLineColors
+      : DEActionType.UpdateLineColors
   return {
     type,
     payload: {
@@ -159,7 +161,7 @@ export const updateTimeFormat = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.ChangeTimeFormat
-      : CEOActionType.ChangeTimeFormat
+      : DEActionType.ChangeTimeFormat
   return {
     type,
     payload: {
@@ -175,7 +177,7 @@ export const updateDecimalPlaces = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.ChangeDecimalPlaces
-      : CEOActionType.ChangeDecimalPlaces
+      : DEActionType.ChangeDecimalPlaces
   return {
     type,
     payload: {
@@ -191,7 +193,7 @@ export const updateFieldOptions = (
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateFieldOptions
-      : CEOActionType.UpdateFieldOptions
+      : DEActionType.UpdateFieldOptions
   return {
     type,
     payload: {

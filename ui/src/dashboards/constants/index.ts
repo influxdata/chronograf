@@ -54,6 +54,8 @@ export const FORMAT_OPTIONS: Array<{text: string}> = [
   {text: TIME_FORMAT_CUSTOM},
 ]
 
+export const DEFAULT_FIELD_OPTIONS = [DEFAULT_TIME_FIELD]
+
 export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   x: 0,
   y: 0,
@@ -65,7 +67,7 @@ export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   tableOptions: DEFAULT_TABLE_OPTIONS,
   timeFormat: DEFAULT_TIME_FORMAT,
   decimalPlaces: DEFAULT_DECIMAL_PLACES,
-  fieldOptions: [DEFAULT_TIME_FIELD],
+  fieldOptions: DEFAULT_FIELD_OPTIONS,
   inView: true,
   note: '',
   noteVisibility: CellNoteVisibility.Default,

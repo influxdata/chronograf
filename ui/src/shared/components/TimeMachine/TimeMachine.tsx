@@ -74,12 +74,13 @@ import {
   CellType,
   FieldOption,
   TableOptions,
+  ThresholdType,
   DecimalPlaces,
   CellNoteVisibility,
 } from 'src/types/dashboards'
 import {ColorNumber, ColorString} from 'src/types/colors'
 
-interface VisualizationOptions {
+export interface VisualizationOptions {
   type: CellType
   axes: Axes | null
   tableOptions: TableOptions
@@ -89,6 +90,7 @@ interface VisualizationOptions {
   note: string
   noteVisibility: CellNoteVisibility
   thresholdsListColors: ColorNumber[]
+  thresholdsListType: ThresholdType
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
 }
@@ -130,7 +132,7 @@ interface Props {
     timeRange: TimeRange,
     stateToUpdate: QueryUpdateState
   ) => void
-  visualizationOptions?: VisualizationOptions
+  visualizationOptions: VisualizationOptions
   manualRefresh?: number
   queryStatus: QueryStatus
 }
@@ -292,8 +294,8 @@ class TimeMachine extends PureComponent<Props, State> {
       isInCEO,
       source,
       isStaticLegend,
-      visualizationOptions,
       manualRefresh,
+      visualizationOptions,
     } = this.props
     const {autoRefresher} = this.state
 
@@ -325,7 +327,12 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get editorTab() {
-    const {onResetFocus, isStaticLegend, onToggleStaticLegend} = this.props
+    const {
+      onResetFocus,
+      isStaticLegend,
+      onToggleStaticLegend,
+      visualizationOptions,
+    } = this.props
     const {activeEditorTab} = this.state
 
     if (activeEditorTab === CEOTabs.Queries) {
@@ -342,6 +349,7 @@ class TimeMachine extends PureComponent<Props, State> {
         staticLegend={isStaticLegend}
         onResetFocus={onResetFocus}
         stateToUpdate={this.stateToUpdate}
+        {...visualizationOptions}
       />
     )
   }

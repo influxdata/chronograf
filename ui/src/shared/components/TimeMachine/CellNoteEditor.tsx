@@ -34,7 +34,7 @@ class CellNoteEditor extends Component<Props, State> {
     super(props)
 
     this.state = {
-      noteDraft: props.note,
+      noteDraft: props.note || '',
       editorIsFocused: false,
     }
   }

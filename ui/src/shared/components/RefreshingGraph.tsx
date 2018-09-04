@@ -81,7 +81,7 @@ class RefreshingGraph extends PureComponent<Props> {
     if (!this.timeSeries.current) {
       return
     }
-    if (this.props.isInCEO) {
+    if (this.props.editorLocation) {
       this.timeSeries.current.forceUpdate()
     }
   }

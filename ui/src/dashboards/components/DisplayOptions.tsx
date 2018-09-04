@@ -31,6 +31,7 @@ import {
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
 import {QueryUpdateState} from 'src/shared/actions/queries'
+import {DEFAULT_AXES} from 'src/dashboards/constants/cellEditor'
 
 // Types
 import {
@@ -46,15 +47,13 @@ import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes, Cell, QueryConfig} from 'src/types'
 import {ColorNumber} from 'src/types/colors'
+import {VisualizationOptions} from 'src/shared/components/TimeMachine/TimeMachine'
 
-interface Props {
+interface Props extends VisualizationOptions {
   cell: Cell | NewDefaultCell
   queryConfigs: QueryConfig[]
   staticLegend: boolean
   stateToUpdate: QueryUpdateState
-  CEOGaugeColors: ColorNumber[]
-  CEOThresholdsListType: ThresholdType
-  CEOThresholdsListColors: ColorNumber[]
   onResetFocus: () => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
   onUpdateDecimalPlaces: typeof updateDecimalPlaces
@@ -218,129 +217,58 @@ class DisplayOptions extends Component<Props, State> {
   }
 
   private get visType(): CellType {
-    const {cell} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return cell.type
-    }
+    const {type} = this.props
+    return type
   }
 
   private get axes(): Axes {
-    const {cell} = this.props
-
-    const defaultAxes: Axes = {
-      x: {
-        label: '',
-        prefix: '',
-        suffix: '',
-        base: '',
-        scale: '',
-        bounds: ['', ''],
-      },
-      y: {
-        label: '',
-        prefix: '',
-        suffix: '',
-        base: '',
-        scale: '',
-        bounds: ['', ''],
-      },
-      y2: {
-        label: '',
-        prefix: '',
-        suffix: '',
-        base: '',
-        scale: '',
-        bounds: ['', ''],
-      },
-    }
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return _.get(cell, 'axes', defaultAxes)
-    }
+    const {axes} = this.props
+    return axes || DEFAULT_AXES
   }
 
   private get decimalPlaces(): DecimalPlaces {
-    const {cell} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return cell.decimalPlaces
-    }
+    const {decimalPlaces} = this.props
+    return decimalPlaces
   }
 
   private get gaugeColors(): ColorNumber[] {
-    const {CEOGaugeColors} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return CEOGaugeColors
-    }
+    const {gaugeColors} = this.props
+    return gaugeColors
   }
 
   private get tableOptions(): TableOptionsInterface {
-    const {cell} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return cell.tableOptions
-    }
+    const {tableOptions} = this.props
+    return tableOptions
   }
 
   private get fieldOptions(): FieldOption[] {
-    const {cell} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return cell.fieldOptions
-    }
+    const {fieldOptions} = this.props
+    return fieldOptions
   }
 
   private get timeFormat(): string {
-    const {cell} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return cell.timeFormat
-    }
+    const {timeFormat} = this.props
+    return timeFormat
   }
 
   private get note(): string {
-    const {cell} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return cell.note
-    }
+    const {note} = this.props
+    return note || ''
   }
 
   private get noteVisibility(): CellNoteVisibility {
-    const {cell} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return cell.noteVisibility
-    }
+    const {noteVisibility} = this.props
+    return noteVisibility
   }
 
   private get thresholdListColors(): ColorNumber[] {
-    const {CEOThresholdsListColors} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return CEOThresholdsListColors
-    }
+    const {thresholdsListColors} = this.props
+    return thresholdsListColors
   }
 
   private get thresholdListType(): ThresholdType {
-    const {CEOThresholdsListType} = this.props
-
-    switch (this.stateToUpdate) {
-      case QueryUpdateState.CEO:
-        return CEOThresholdsListType
-    }
+    const {thresholdsListType} = this.props
+    return thresholdsListType
   }
 
   private get defaultYLabel(): string {
@@ -423,21 +351,6 @@ class DisplayOptions extends Component<Props, State> {
   }
 }
 
-const mstp = ({cellEditorOverlay}) => {
-  const {
-    cell,
-    gaugeColors: CEOGaugeColors,
-    thresholdsListType: CEOThresholdsListType,
-    thresholdsListColors: CEOThresholdsListColors,
-  } = cellEditorOverlay
-  return {
-    cell,
-    CEOGaugeColors,
-    CEOThresholdsListType,
-    CEOThresholdsListColors,
-  }
-}
-
 const mdtp = {
   onUpdateGaugeColors: updateGaugeColors,
   onUpdateAxes: updateAxes,
@@ -452,4 +365,4 @@ const mdtp = {
   onUpdateThresholdsListType: updateThresholdsListType,
 }
 
-export default connect(mstp, mdtp)(DisplayOptions)
+export default connect(null, mdtp)(DisplayOptions)
