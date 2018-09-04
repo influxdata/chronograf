@@ -439,6 +439,7 @@ export const setSearchStatus = (
 
 export const clearNextTimeBounds = () => dispatch => {
   dispatch(setNextTailLowerBound(undefined))
+  dispatch(setNextNewerUpperBound(undefined))
   dispatch(setNextOlderUpperBound(undefined))
 }
 
