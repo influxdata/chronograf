@@ -161,17 +161,6 @@ export const removeMeasurement = (label = '') => {
   return label.replace(measurement, '')
 }
 
-export const OPTIONS = {
-  rightGap: 0,
-  axisLineWidth: 2,
-  gridLineWidth: 1,
-  animatedZooms: true,
-  labelsSeparateLines: false,
-  hideOverlayOnMouseOut: false,
-  highlightSeriesBackgroundAlpha: 1.0,
-  highlightSeriesBackgroundColor: 'rgb(41, 41, 51)',
-}
-
 export const hasherino = (str, len) =>
   str
     .split('')

@@ -1,9 +1,10 @@
 // Libraries
 import React, {Component, CSSProperties, MouseEvent} from 'react'
 import {connect} from 'react-redux'
-import _ from 'lodash'
+import {filter, isEqual} from 'lodash'
 import NanoDate from 'nano-date'
 import ReactResizeDetector from 'react-resize-detector'
+import memoizeOne from 'memoize-one'
 
 // Components
 import D from 'src/external/dygraph'
@@ -25,7 +26,6 @@ import {
 import {buildDefaultYLabel} from 'src/shared/presenters'
 import {NULL_HOVER_TIME} from 'src/shared/constants/tableGraph'
 import {
-  OPTIONS,
   LINE_COLORS,
   LABEL_WIDTH,
   CHAR_PIXELS,
@@ -52,6 +52,22 @@ import {LineColor} from 'src/types/colors'
 
 const Dygraphs = D as Constructable<DygraphClass>
 
+const getRangeMemoizedY = memoizeOne(getRange)
+const getRangeMemoizedY2 = memoizeOne(getRange)
+
+const DEFAULT_DYGRAPH_OPTIONS = {
+  rightGap: 0,
+  axisLineWidth: 2,
+  gridLineWidth: 1,
+  colors: LINE_COLORS,
+  animatedZooms: true,
+  highlightCircleSize: 3,
+  labelsSeparateLines: false,
+  hideOverlayOnMouseOut: false,
+  highlightSeriesBackgroundAlpha: 1.0,
+  highlightSeriesBackgroundColor: 'rgb(41, 41, 51)',
+}
+
 interface Props {
   type: CellType
   cellID: string
@@ -68,7 +84,6 @@ interface Props {
   axes?: Axes
   isGraphFilled?: boolean
   staticLegend?: boolean
-  setResolution?: (w: number) => void
   onZoom?: (timeRange: TimeRange) => void
   mode?: string
   underlayCallback?: () => void
@@ -101,16 +116,17 @@ class Dygraph extends Component<Props, State> {
     isGraphFilled: true,
     onZoom: () => {},
     staticLegend: false,
-    setResolution: () => {},
     handleSetHoverTime: () => {},
     underlayCallback: () => {},
   }
 
   private graphRef: React.RefObject<HTMLDivElement>
   private dygraph: DygraphClass
+  private dygraphOptions?: dygraphs.Options
 
   constructor(props: Props) {
     super(props)
+
     this.state = {
       staticLegendHeight: 0,
       xAxisRange: [0, 0],
@@ -121,62 +137,16 @@ class Dygraph extends Component<Props, State> {
   }
 
   public componentDidMount() {
-    const {
-      type,
-      options,
-      labels,
-      axes: {y, y2},
-      isGraphFilled: fillGraph,
-      underlayCallback,
-    } = this.props
+    const options = this.collectDygraphOptions()
+    const initalOptions = {...DEFAULT_DYGRAPH_OPTIONS, ...options}
 
-    let defaultOptions = {
-      ...options,
-      labels,
-      fillGraph,
-      file: this.timeSeries,
-      ylabel: this.getLabel('y'),
-      logscale: y.scale === LOG,
-      colors: LINE_COLORS,
-      series: this.colorDygraphSeries,
-      axes: {
-        y: {
-          valueRange: this.getYRange(this.timeSeries),
-          axisLabelFormatter: (
-            yval: number,
-            __,
-            opts: (name: string) => number
-          ) => numberValueFormatter(yval, opts, y.prefix, y.suffix),
-          axisLabelWidth: this.labelWidth,
-          labelsKMB: y.base === BASE_10,
-          labelsKMG2: y.base === BASE_2,
-        },
-        y2: {
-          valueRange: getRange(this.timeSeries, y2.bounds),
-        },
-      },
-      zoomCallback: (lower: number, upper: number) =>
-        this.handleZoom(lower, upper),
-      drawCallback: () => this.handleDraw(),
-      underlayCallback,
-      highlightCircleSize: 3,
-    }
+    this.dygraph = new Dygraphs(
+      this.graphRef.current,
+      this.timeSeries,
+      initalOptions
+    )
 
-    if (type === CellType.Bar) {
-      defaultOptions = {
-        ...defaultOptions,
-        plotter: barPlotter,
-      }
-    }
-
-    this.dygraph = new Dygraphs(this.graphRef.current, this.timeSeries, {
-      ...defaultOptions,
-      ...OPTIONS,
-      ...options,
-    })
-
-    const {w} = this.dygraph.getArea()
-    this.props.setResolution(w)
+    this.dygraphOptions = options
     this.setState({xAxisRange: this.dygraph.xAxisRange()})
   }
 
@@ -188,66 +158,19 @@ class Dygraph extends Component<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    const {
-      labels,
-      axes: {y, y2},
-      options,
-      type,
-      underlayCallback,
-    } = this.props
-
     const dygraph = this.dygraph
+    const options = this.collectDygraphOptions()
+    const optionsChanged = this.haveDygraphOptionsChanged(options)
+    const timeRangeChanged = !isEqual(prevProps.timeRange, this.props.timeRange)
 
-    if (!dygraph) {
-      throw new Error(
-        'Dygraph not configured in time; this should not be possible!'
-      )
+    if (optionsChanged) {
+      dygraph.updateOptions(options)
+      this.dygraphOptions = options
     }
 
-    const timeSeries = this.timeSeries
-
-    const timeRangeChanged = !_.isEqual(
-      prevProps.timeRange,
-      this.props.timeRange
-    )
-
-    const updateOptions = {
-      ...options,
-      labels,
-      file: timeSeries,
-      logscale: y.scale === LOG,
-      ylabel: this.getLabel('y'),
-      axes: {
-        y: {
-          valueRange: this.getYRange(timeSeries),
-          axisLabelFormatter: (
-            yval: number,
-            __,
-            opts: (name: string) => number
-          ) => numberValueFormatter(yval, opts, y.prefix, y.suffix),
-          axisLabelWidth: this.labelWidth,
-          labelsKMB: y.base === BASE_10,
-          labelsKMG2: y.base === BASE_2,
-        },
-        y2: {
-          valueRange: getRange(timeSeries, y2.bounds),
-        },
-      },
-      colors: LINE_COLORS,
-      series: this.colorDygraphSeries,
-      plotter: type === CellType.Bar ? barPlotter : null,
-      underlayCallback,
+    if (dygraph.isZoomed('x') && timeRangeChanged) {
+      dygraph.resetZoom()
     }
-
-    dygraph.updateOptions(updateOptions)
-
-    if (this.dygraph.isZoomed('x') && timeRangeChanged) {
-      this.dygraph.resetZoom()
-    }
-
-    const {w} = this.dygraph.getArea()
-    this.props.setResolution(w)
-    this.resize()
   }
 
   public render() {
@@ -265,7 +188,7 @@ class Dygraph extends Component<Props, State> {
             {this.areAnnotationsVisible && (
               <Annotations
                 dygraph={this.dygraph}
-                dWidth={this.dygraph.width_}
+                dWidth={this.dygraph.getArea().w}
                 staticLegendHeight={staticLegendHeight}
                 xAxisRange={xAxisRange}
               />
@@ -311,6 +234,7 @@ class Dygraph extends Component<Props, State> {
 
   private get nestedGraph(): JSX.Element {
     const {children} = this.props
+
     if (children) {
       if (children[0]) {
         return children[0]
@@ -339,6 +263,48 @@ class Dygraph extends Component<Props, State> {
     return {...containerStyle, zIndex: 2}
   }
 
+  private get labelWidth() {
+    const {
+      axes: {y},
+    } = this.props
+
+    return (
+      LABEL_WIDTH +
+      y.prefix.length * CHAR_PIXELS +
+      y.suffix.length * CHAR_PIXELS
+    )
+  }
+
+  private get timeSeries() {
+    const {timeSeries} = this.props
+
+    // Avoid 'Can't plot empty data set' errors by falling back to a default
+    // dataset that's valid for Dygraph.
+    return timeSeries && timeSeries.length ? timeSeries : [[0]]
+  }
+
+  private get colorDygraphSeries() {
+    const {dygraphSeries, colors} = this.props
+    const numSeries = Object.keys(dygraphSeries).length
+    const dygraphSeriesKeys = Object.keys(dygraphSeries).sort()
+    const lineColors = getLineColorsHexes(colors, numSeries)
+    const coloredDygraphSeries = {}
+
+    for (const seriesName in dygraphSeries) {
+      if (dygraphSeries.hasOwnProperty(seriesName)) {
+        const series = dygraphSeries[seriesName]
+        const color = lineColors[dygraphSeriesKeys.indexOf(seriesName)]
+        coloredDygraphSeries[seriesName] = {...series, color}
+      }
+    }
+
+    return coloredDygraphSeries
+  }
+
+  private get areAnnotationsVisible() {
+    return !!this.dygraph
+  }
+
   private getYRange = (timeSeries: DygraphData): [number, number] => {
     const {
       options,
@@ -350,7 +316,7 @@ class Dygraph extends Component<Props, State> {
       return getStackedRange(y.bounds)
     }
 
-    const range = getRange(timeSeries, y.bounds, ruleValues)
+    const range = getRangeMemoizedY(timeSeries, y.bounds, ruleValues)
     const [min, max] = range
 
     // Bug in Dygraph calculates a negative range for logscale when min range is 0
@@ -382,22 +348,32 @@ class Dygraph extends Component<Props, State> {
     const {xAxisRange} = this.state
     const newXAxisRange = this.dygraph.xAxisRange()
 
-    if (!_.isEqual(xAxisRange, newXAxisRange)) {
+    if (!isEqual(xAxisRange, newXAxisRange)) {
       this.setState({xAxisRange: newXAxisRange})
     }
+  }
+
+  private formatYVal = (yval: number, __, opts: (name: string) => number) => {
+    const {
+      axes: {
+        y: {prefix, suffix},
+      },
+    } = this.props
+
+    return numberValueFormatter(yval, opts, prefix, suffix)
   }
 
   private eventToTimestamp = ({
     pageX: pxBetweenMouseAndPage,
   }: MouseEvent<HTMLDivElement>): string => {
-    const {
-      left: pxBetweenGraphAndPage,
-    } = this.graphRef.current.getBoundingClientRect()
+    const pxBetweenGraphAndPage = this.graphRef.current.getBoundingClientRect()
+      .left
     const graphXCoordinate = pxBetweenMouseAndPage - pxBetweenGraphAndPage
     const timestamp = this.dygraph.toDataXCoord(graphXCoordinate)
     const [xRangeStart] = this.dygraph.xAxisRange()
     const clamped = Math.max(xRangeStart, timestamp)
-    return `${clamped}`
+
+    return String(clamped)
   }
 
   private handleHideLegend = () => {
@@ -416,50 +392,71 @@ class Dygraph extends Component<Props, State> {
     this.props.handleSetHoverTime(newTime)
   }
 
-  private get labelWidth() {
+  private collectDygraphOptions(): dygraphs.Options {
     const {
-      axes: {y},
+      labels,
+      axes: {y, y2},
+      type,
+      underlayCallback,
+      isGraphFilled,
     } = this.props
 
-    return (
-      LABEL_WIDTH +
-      y.prefix.length * CHAR_PIXELS +
-      y.suffix.length * CHAR_PIXELS
-    )
-  }
+    const {
+      colorDygraphSeries,
+      handleDraw,
+      handleZoom,
+      timeSeries,
+      labelWidth,
+      formatYVal,
+    } = this
 
-  private get timeSeries() {
-    const {timeSeries} = this.props
-    // Avoid 'Can't plot empty data set' errors by falling back to a
-    // default dataset that's valid for Dygraph.
-    return timeSeries && timeSeries.length ? timeSeries : [[0]]
-  }
-
-  private get colorDygraphSeries() {
-    const {dygraphSeries, colors} = this.props
-    const numSeries = Object.keys(dygraphSeries).length
-    const dygraphSeriesKeys = Object.keys(dygraphSeries).sort()
-    const lineColors = getLineColorsHexes(colors, numSeries)
-
-    const coloredDygraphSeries = {}
-    for (const seriesName in dygraphSeries) {
-      if (dygraphSeries.hasOwnProperty(seriesName)) {
-        const series = dygraphSeries[seriesName]
-        const color = lineColors[dygraphSeriesKeys.indexOf(seriesName)]
-        coloredDygraphSeries[seriesName] = {...series, color}
-      }
+    const options = {
+      labels,
+      underlayCallback,
+      file: timeSeries,
+      zoomCallback: handleZoom,
+      drawCallback: handleDraw,
+      fillGraph: isGraphFilled,
+      logscale: y.scale === LOG,
+      ylabel: this.getLabel('y'),
+      series: colorDygraphSeries,
+      plotter: type === CellType.Bar ? barPlotter : null,
+      axes: {
+        y: {
+          axisLabelWidth: labelWidth,
+          labelsKMB: y.base === BASE_10,
+          labelsKMG2: y.base === BASE_2,
+          axisLabelFormatter: formatYVal,
+          valueRange: this.getYRange(timeSeries),
+        },
+        y2: {
+          valueRange: getRangeMemoizedY2(timeSeries, y2.bounds),
+        },
+      },
+      ...this.props.options,
     }
-    return coloredDygraphSeries
+
+    return options
   }
 
-  private get areAnnotationsVisible() {
-    return !!this.dygraph
+  private haveDygraphOptionsChanged(nextOptions: dygraphs.Options): boolean {
+    const options = this.dygraphOptions
+    const pred = (__, key) => key !== 'file'
+
+    // Peform a deep comparison of the current options and next options, but
+    // check the `file` property of each object by reference rather than by
+    // logical identity since it can be quite large (it contains all the time
+    // series data)
+    return (
+      !isEqual(filter(options, pred), filter(nextOptions, pred)) ||
+      options.file !== nextOptions.file
+    )
   }
 
   private getLabel = (axis: string): string => {
     const {axes, queries} = this.props
     const label = getDeep<string>(axes, `${axis}.label`, '')
-    const queryConfig = _.get(queries, ['0', 'queryConfig'], false)
+    const queryConfig = getDeep(queries, '0.queryConfig', false)
 
     if (label || !queryConfig) {
       return label
@@ -469,8 +466,6 @@ class Dygraph extends Component<Props, State> {
   }
 
   private resize = () => {
-    this.dygraph.resizeElements_()
-    this.dygraph.predraw_()
     this.dygraph.resize()
   }
 
@@ -478,7 +473,9 @@ class Dygraph extends Component<Props, State> {
     if (!date) {
       return ''
     }
+
     const nanoDate = new NanoDate(date)
+
     return nanoDate.toISOString()
   }
 
