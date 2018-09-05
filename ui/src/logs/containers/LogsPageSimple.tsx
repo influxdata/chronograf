@@ -423,7 +423,9 @@ class LogsPageSimple extends Component<Props, State> {
 
   private clearCurrentPendingChunk() {
     if (this.currentPendingChunk) {
-      this.currentPendingChunk.cancel()
+      if (!this.currentPendingChunk.isCanceled) {
+        this.currentPendingChunk.cancel()
+      }
       this.currentPendingChunk = null
     }
   }
