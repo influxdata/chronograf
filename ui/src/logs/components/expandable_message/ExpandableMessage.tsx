@@ -42,7 +42,7 @@ export class ExpandableMessage extends Component<Props, State> {
         className="expandable--message"
         ref={this.containerRef}
       >
-        <div className="expandable--text">{this.message}</div>
+        {this.message}
         {this.expandedMessage}
       </div>
     )

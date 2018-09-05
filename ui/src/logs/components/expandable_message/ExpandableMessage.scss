@@ -4,18 +4,16 @@
 */
 
 .expandable--message {
-  display: flex;
   min-height: 100%;
   min-width: 100%;
   align-items: center;
-  cursor: pointer;
+  cursor: zoom-in;
+  display: block;
   
-  .expandable--text {
+  > .logs-message {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block;
-    pointer-events: none;
   }
 }
 
