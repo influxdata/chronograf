@@ -69,6 +69,7 @@ export enum ActionTypes {
   AddFilter = 'LOGS_ADD_FILTER',
   RemoveFilter = 'LOGS_REMOVE_FILTER',
   ChangeFilter = 'LOGS_CHANGE_FILTER',
+  ClearFilters = 'LOGS_CLEAR_FILTERS',
   IncrementQueryCount = 'LOGS_INCREMENT_QUERY_COUNT',
   DecrementQueryCount = 'LOGS_DECREMENT_QUERY_COUNT',
   ConcatMoreLogs = 'LOGS_CONCAT_MORE_LOGS',
@@ -149,6 +150,10 @@ export interface ChangeFilterAction {
     operator: string
     value: string
   }
+}
+
+export interface ClearFiltersAction {
+  type: ActionTypes.ClearFilters
 }
 
 export interface RemoveFilterAction {
@@ -248,6 +253,7 @@ export type Action =
   | AddFilterAction
   | RemoveFilterAction
   | ChangeFilterAction
+  | ClearFiltersAction
   | DecrementQueryCountAction
   | IncrementQueryCountAction
   | ConcatMoreLogsAction
@@ -469,6 +475,10 @@ export const setSource = (source: Source): SetSourceAction => ({
 export const addFilter = (filter: Filter): AddFilterAction => ({
   type: ActionTypes.AddFilter,
   payload: {filter},
+})
+
+export const clearFilters = (): ClearFiltersAction => ({
+  type: ActionTypes.ClearFilters,
 })
 
 export const removeFilter = (id: string): RemoveFilterAction => ({

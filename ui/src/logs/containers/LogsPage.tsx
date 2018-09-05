@@ -27,6 +27,7 @@ import {
   addFilter,
   removeFilter,
   changeFilter,
+  clearFilters,
   fetchOlderLogsAsync,
   fetchNewerLogsAsync,
   getLogConfigAsync,
@@ -93,6 +94,7 @@ interface Props {
   addFilter: (filter: Filter) => void
   removeFilter: (id: string) => void
   changeFilter: (id: string, operator: string, value: string) => void
+  clearFilters: () => void
   getConfig: (url: string) => Promise<void>
   updateConfig: (url: string, config: LogConfig) => Promise<void>
   notify: NotificationAction
@@ -228,6 +230,7 @@ class LogsPage extends Component<Props, State> {
               filters={filters || []}
               onDelete={this.handleFilterDelete}
               onFilterChange={this.handleFilterChange}
+              onClearFilters={this.handleClearFilters}
             />
             <LogsTable
               count={this.histogramTotal}
@@ -601,6 +604,11 @@ class LogsPage extends Component<Props, State> {
     this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
+  private handleClearFilters = async (): Promise<void> => {
+    this.props.clearFilters()
+    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
+  }
+
   private handleBarClick = (time: string): void => {
     const formattedTime = moment(time).toISOString()
 
@@ -799,6 +807,7 @@ const mapDispatchToProps = {
   addFilter,
   removeFilter,
   changeFilter,
+  clearFilters,
   fetchOlderLogsAsync,
   fetchNewerLogsAsync,
   setTableCustomTime: setTableCustomTimeAsync,

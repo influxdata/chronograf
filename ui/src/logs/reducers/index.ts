@@ -80,6 +80,10 @@ const addFilter = (state: LogsState, action: AddFilterAction): LogsState => {
   return {...state, filters: [..._.get(state, 'filters', []), filter]}
 }
 
+const clearFilters = (state: LogsState): LogsState => {
+  return {...state, filters: []}
+}
+
 const changeFilter = (
   state: LogsState,
   action: ChangeFilterAction
@@ -230,6 +234,8 @@ export default (state: LogsState = defaultState, action: Action) => {
       return removeFilter(state, action)
     case ActionTypes.ChangeFilter:
       return changeFilter(state, action)
+    case ActionTypes.ClearFilters:
+      return clearFilters(state)
     case ActionTypes.IncrementQueryCount:
       return incrementQueryCount(state, action)
     case ActionTypes.DecrementQueryCount:
