@@ -1,13 +1,15 @@
 import React, {PureComponent} from 'react'
 import {Filter} from 'src/types/logs'
 import FilterBlock from 'src/logs/components/LogsFilter'
-import {Button, ComponentSize} from 'src/reusable_ui'
+import {Button, ComponentSize, Radio} from 'src/reusable_ui'
 
 interface Props {
   filters: Filter[]
   onDelete: (id: string) => void
   onClearFilters: () => void
   onFilterChange: (id: string, operator: string, value: string) => void
+  onUpdateTruncation: (isTruncated: boolean) => Promise<void>
+  isTruncated: boolean
 }
 
 class LogsFilters extends PureComponent<Props> {
@@ -16,6 +18,7 @@ class LogsFilters extends PureComponent<Props> {
       <div className="logs-viewer--filter-bar">
         <div className="logs-viewer--filters">{this.renderFilters}</div>
         {this.clearFiltersButton}
+        {this.truncationToggle}
       </div>
     )
   }
@@ -34,6 +37,33 @@ class LogsFilters extends PureComponent<Props> {
         </div>
       )
     }
+  }
+
+  private get truncationToggle(): JSX.Element {
+    const {isTruncated, onUpdateTruncation} = this.props
+
+    return (
+      <Radio>
+        <Radio.Button
+          id="logs-truncation--truncate"
+          active={isTruncated === true}
+          value={true}
+          titleText="Truncate log messages when they exceed 1 line"
+          onClick={onUpdateTruncation}
+        >
+          Truncate
+        </Radio.Button>
+        <Radio.Button
+          id="logs-truncation--multi"
+          active={isTruncated === false}
+          value={false}
+          titleText="Allow log messages to wrap text"
+          onClick={onUpdateTruncation}
+        >
+          Wrap
+        </Radio.Button>
+      </Radio>
+    )
   }
 
   private get renderFilters(): JSX.Element[] {

@@ -12,7 +12,6 @@ import {
   SeverityFormat,
   LogsTableColumn,
 } from 'src/types/logs'
-import SlideToggle from 'src/reusable_ui/components/slide_toggle/SlideToggle'
 import {DEFAULT_SEVERITY_LEVELS, SeverityLevelOptions} from 'src/logs/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -26,15 +25,12 @@ interface Props {
   onUpdateColumns: (columns: LogsTableColumn[]) => Promise<void>
   severityFormat: SeverityFormat
   onUpdateSeverityFormat: (format: SeverityFormat) => Promise<void>
-  onUpdateTruncation: (isTruncated: boolean) => Promise<void>
-  isTruncated: boolean
 }
 
 interface State {
   workingLevelColumns: SeverityLevelColor[]
   workingColumns: LogsTableColumn[]
   workingFormat: SeverityFormat
-  isWorkingTruncated: boolean
 }
 
 @ErrorHandling
@@ -46,14 +42,10 @@ class OptionsOverlay extends Component<Props, State> {
       workingLevelColumns: this.props.severityLevelColors,
       workingColumns: this.props.columns,
       workingFormat: this.props.severityFormat,
-      isWorkingTruncated: this.props.isTruncated,
     }
   }
 
   public shouldComponentUpdate(__, nextState: State) {
-    const isTruncatedDifferent =
-      nextState.isWorkingTruncated !== this.state.isWorkingTruncated
-
     const isColorsDifferent = !_.isEqual(
       nextState.workingLevelColumns,
       this.state.workingLevelColumns
@@ -67,12 +59,7 @@ class OptionsOverlay extends Component<Props, State> {
       this.state.workingColumns
     )
 
-    if (
-      isTruncatedDifferent ||
-      isColorsDifferent ||
-      isFormatDifferent ||
-      isColumnsDifferent
-    ) {
+    if (isColorsDifferent || isFormatDifferent || isColumnsDifferent) {
       return true
     }
     return false
@@ -97,7 +84,6 @@ class OptionsOverlay extends Component<Props, State> {
                 onChangeSeverityFormat={this.handleChangeSeverityFormat}
               />
             </div>
-            <div className="col-sm-7">{this.renderTruncateOption}</div>
             <div className="col-sm-7">
               <ColumnsOptions
                 columns={workingColumns}
@@ -130,57 +116,15 @@ class OptionsOverlay extends Component<Props, State> {
     )
   }
 
-  private get renderTruncateOption() {
-    const {isWorkingTruncated} = this.state
-
-    let labelMessage = 'Truncate Log Lines'
-
-    if (isWorkingTruncated) {
-      labelMessage = 'Show Log Lines'
-    }
-
-    return (
-      <>
-        <label className="form-label">{labelMessage}</label>
-        <SlideToggle
-          onChange={this.handleTruncationToggle}
-          active={isWorkingTruncated}
-        />
-      </>
-    )
-  }
-
-  private handleTruncationToggle = (): void => {
-    const {isWorkingTruncated} = this.state
-
-    this.setState({isWorkingTruncated: !isWorkingTruncated})
-  }
-
   private get isSaveDisabled(): boolean {
-    const {
-      workingLevelColumns,
-      workingColumns,
-      workingFormat,
-      isWorkingTruncated,
-    } = this.state
-    const {
-      severityLevelColors,
-      columns,
-      severityFormat,
-      isTruncated,
-    } = this.props
+    const {workingLevelColumns, workingColumns, workingFormat} = this.state
+    const {severityLevelColors, columns, severityFormat} = this.props
 
     const severityChanged = !_.isEqual(workingLevelColumns, severityLevelColors)
     const columnsChanged = !_.isEqual(workingColumns, columns)
     const formatChanged = !_.isEqual(workingFormat, severityFormat)
-    const isTruncatedChanged = isWorkingTruncated !== isTruncated
 
-    if (
-      severityChanged ||
-      columnsChanged ||
-      formatChanged ||
-      isTruncatedChanged
-    ) {
+    if (severityChanged || columnsChanged || formatChanged) {
       return false
     }
 
@@ -193,19 +137,12 @@ class OptionsOverlay extends Component<Props, State> {
       onDismissOverlay,
       onUpdateSeverityFormat,
       onUpdateColumns,
-      onUpdateTruncation,
     } = this.props
-    const {
-      workingLevelColumns,
-      workingFormat,
-      workingColumns,
-      isWorkingTruncated,
-    } = this.state
+    const {workingLevelColumns, workingFormat, workingColumns} = this.state
 
     await onUpdateSeverityFormat(workingFormat)
     await onUpdateSeverityLevels(workingLevelColumns)
     await onUpdateColumns(workingColumns)
-    await onUpdateTruncation(isWorkingTruncated)
     onDismissOverlay()
   }
 

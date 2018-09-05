@@ -231,6 +231,8 @@ class LogsPage extends Component<Props, State> {
               onDelete={this.handleFilterDelete}
               onFilterChange={this.handleFilterChange}
               onClearFilters={this.handleClearFilters}
+              onUpdateTruncation={this.handleUpdateTruncation}
+              isTruncated={this.isTruncated}
             />
             <LogsTable
               count={this.histogramTotal}
@@ -687,8 +689,6 @@ class LogsPage extends Component<Props, State> {
           onUpdateColumns={this.handleUpdateColumns}
           onUpdateSeverityFormat={this.handleUpdateSeverityFormat}
           severityFormat={this.severityFormat}
-          onUpdateTruncation={this.handleUpdateTruncation}
-          isTruncated={this.isTruncated}
         />
       </OverlayTechnology>
     )
