@@ -397,6 +397,7 @@ class DashboardPage extends Component<Props, State> {
         {dashboard ? (
           <Dashboard
             source={source}
+            services={this.services}
             sources={sources}
             setScrollTop={this.setScrollTop}
             inView={this.inView}
