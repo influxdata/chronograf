@@ -101,6 +101,7 @@ class DisplayOptions extends Component<Props, State> {
   }
 
   private get threesizerDivisions() {
+    const {type, note, noteVisibility} = this.props
     return [
       {
         name: 'Visualization Type',
@@ -108,7 +109,7 @@ class DisplayOptions extends Component<Props, State> {
         menuOptions: [],
         render: () => (
           <GraphTypeSelector
-            type={this.visType}
+            type={type}
             onUpdateVisType={this.handleUpdateVisType}
           />
         ),
@@ -127,8 +128,8 @@ class DisplayOptions extends Component<Props, State> {
         menuOptions: [],
         render: () => (
           <CellNoteEditor
-            note={this.note}
-            noteVisibility={this.noteVisibility}
+            note={note || ''}
+            noteVisibility={noteVisibility}
             onUpdateNote={this.handleUpdateNote}
             onUpdateNoteVisibility={this.handleUpdateNoteVisibility}
           />
@@ -140,22 +141,30 @@ class DisplayOptions extends Component<Props, State> {
 
   private renderOptions = (): JSX.Element => {
     const {
+      type,
+      decimalPlaces,
+      gaugeColors,
       staticLegend,
       onToggleStaticLegend,
       onResetFocus,
       queryConfigs,
+      thresholdsListType,
+      thresholdsListColors,
+      timeFormat,
+      tableOptions,
+      fieldOptions,
     } = this.props
 
     const {defaultYLabel} = this.state
 
-    switch (this.visType) {
+    switch (type) {
       case CellType.Gauge:
         return (
           <GaugeOptions
             onResetFocus={onResetFocus}
             axes={this.axes}
-            decimalPlaces={this.decimalPlaces}
-            gaugeColors={this.gaugeColors}
+            decimalPlaces={decimalPlaces}
+            gaugeColors={gaugeColors}
             onUpdateAxes={this.handleUpdateAxes}
             onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
             onUpdateGaugeColors={this.handleUpdateGaugeColors}
@@ -168,10 +177,10 @@ class DisplayOptions extends Component<Props, State> {
           <SingleStatOptions
             onResetFocus={onResetFocus}
             axes={this.axes}
-            decimalPlaces={this.decimalPlaces}
+            decimalPlaces={decimalPlaces}
             onUpdateAxes={this.handleUpdateAxes}
-            thresholdsListType={this.thresholdListType}
-            thresholdsListColors={this.thresholdListColors}
+            thresholdsListType={thresholdsListType}
+            thresholdsListColors={thresholdsListColors}
             onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
             onUpdateThresholdsListType={this.handleUpdateThresholdsListType}
             onUpdateThresholdsListColors={this.handleUpdateThresholdsListColors}
@@ -182,12 +191,12 @@ class DisplayOptions extends Component<Props, State> {
           <TableOptions
             onResetFocus={onResetFocus}
             queryConfigs={queryConfigs}
-            timeFormat={this.timeFormat}
-            tableOptions={this.tableOptions}
-            fieldOptions={this.fieldOptions}
-            decimalPlaces={this.decimalPlaces}
-            thresholdsListType={this.thresholdListType}
-            thresholdsListColors={this.thresholdListColors}
+            timeFormat={timeFormat}
+            tableOptions={tableOptions}
+            fieldOptions={fieldOptions}
+            decimalPlaces={decimalPlaces}
+            thresholdsListType={thresholdsListType}
+            thresholdsListColors={thresholdsListColors}
             onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
             onUpdateFieldOptions={this.handleUpdateFieldOptions}
             onUpdateTableOptions={this.handleUpdateTableOptions}
@@ -200,10 +209,10 @@ class DisplayOptions extends Component<Props, State> {
         return (
           <AxesOptions
             axes={this.axes}
-            type={this.visType}
+            type={type}
             staticLegend={staticLegend}
             defaultYLabel={defaultYLabel}
-            decimalPlaces={this.decimalPlaces}
+            decimalPlaces={decimalPlaces}
             onUpdateAxes={this.handleUpdateAxes}
             onToggleStaticLegend={onToggleStaticLegend}
             onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
@@ -216,59 +225,8 @@ class DisplayOptions extends Component<Props, State> {
     return this.props.stateToUpdate
   }
 
-  private get visType(): CellType {
-    const {type} = this.props
-    return type
-  }
-
   private get axes(): Axes {
-    const {axes} = this.props
-    return axes || DEFAULT_AXES
-  }
-
-  private get decimalPlaces(): DecimalPlaces {
-    const {decimalPlaces} = this.props
-    return decimalPlaces
-  }
-
-  private get gaugeColors(): ColorNumber[] {
-    const {gaugeColors} = this.props
-    return gaugeColors
-  }
-
-  private get tableOptions(): TableOptionsInterface {
-    const {tableOptions} = this.props
-    return tableOptions
-  }
-
-  private get fieldOptions(): FieldOption[] {
-    const {fieldOptions} = this.props
-    return fieldOptions
-  }
-
-  private get timeFormat(): string {
-    const {timeFormat} = this.props
-    return timeFormat
-  }
-
-  private get note(): string {
-    const {note} = this.props
-    return note || ''
-  }
-
-  private get noteVisibility(): NoteVisibility {
-    const {noteVisibility} = this.props
-    return noteVisibility
-  }
-
-  private get thresholdListColors(): ColorNumber[] {
-    const {thresholdsListColors} = this.props
-    return thresholdsListColors
-  }
-
-  private get thresholdListType(): ThresholdType {
-    const {thresholdsListType} = this.props
-    return thresholdsListType
+    return this.props.axes || DEFAULT_AXES
   }
 
   private get defaultYLabel(): string {
