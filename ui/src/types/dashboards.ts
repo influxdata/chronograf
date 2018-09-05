@@ -59,7 +59,7 @@ export interface DecimalPlaces {
   digits: number
 }
 
-export enum CellNoteVisibility {
+export enum NoteVisibility {
   Default = 'default',
   ShowWhenNoData = 'showWhenNoData',
 }
@@ -84,7 +84,7 @@ export interface Cell {
   isWidget?: boolean
   inView: boolean
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
 }
 
 export enum CellType {

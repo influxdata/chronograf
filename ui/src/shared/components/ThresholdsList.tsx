@@ -1,14 +1,16 @@
+// Libraries
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
-
 import _ from 'lodash'
 import uuid from 'uuid'
 
+// Comonents
 import Threshold from 'src/dashboards/components/Threshold'
 import ColorDropdown from 'src/shared/components/ColorDropdown'
 
-import {updateThresholdsListColors} from 'src/dashboards/actions/cellEditorOverlay'
+// Decorators
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Types
 import {ColorNumber} from 'src/types/colors'
 
 import {
@@ -18,14 +20,13 @@ import {
   MAX_THRESHOLDS,
   THRESHOLD_TYPE_BASE,
 } from 'src/shared/constants/thresholds'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   onResetFocus: () => void
-  showListHeading: boolean
+  showListHeading?: boolean
   thresholdsListType: string
   thresholdsListColors: ColorNumber[]
-  handleUpdateThresholdsListColors: (c: ColorNumber[]) => void
+  onUpdateThresholdsListColors: (c: ColorNumber[]) => void
 }
 
 @ErrorHandling
@@ -93,7 +94,7 @@ class ThresholdsList extends PureComponent<Props> {
     const {
       thresholdsListColors,
       thresholdsListType,
-      handleUpdateThresholdsListColors,
+      onUpdateThresholdsListColors,
       onResetFocus,
     } = this.props
 
@@ -124,12 +125,12 @@ class ThresholdsList extends PureComponent<Props> {
       color => color.value
     )
 
-    handleUpdateThresholdsListColors(updatedColors)
+    onUpdateThresholdsListColors(updatedColors)
     onResetFocus()
   }
 
   private handleChangeBaseColor = updatedColor => {
-    const {handleUpdateThresholdsListColors} = this.props
+    const {onUpdateThresholdsListColors} = this.props
     const {hex, name} = updatedColor
 
     const thresholdsListColors = this.props.thresholdsListColors.map(
@@ -137,22 +138,22 @@ class ThresholdsList extends PureComponent<Props> {
         color.id === THRESHOLD_TYPE_BASE ? {...color, hex, name} : color
     )
 
-    handleUpdateThresholdsListColors(thresholdsListColors)
+    onUpdateThresholdsListColors(thresholdsListColors)
   }
 
   private handleChooseColor = updatedColor => {
-    const {handleUpdateThresholdsListColors} = this.props
+    const {onUpdateThresholdsListColors} = this.props
 
     const thresholdsListColors = this.props.thresholdsListColors.map(
       color => (color.id === updatedColor.id ? updatedColor : color)
     )
 
-    handleUpdateThresholdsListColors(thresholdsListColors)
+    onUpdateThresholdsListColors(thresholdsListColors)
   }
 
   private handleDeleteThreshold = threshold => {
     const {
-      handleUpdateThresholdsListColors,
+      onUpdateThresholdsListColors,
       onResetFocus,
       thresholdsListColors,
     } = this.props
@@ -164,18 +165,18 @@ class ThresholdsList extends PureComponent<Props> {
       color => color.value
     )
 
-    handleUpdateThresholdsListColors(sortedColors)
+    onUpdateThresholdsListColors(sortedColors)
     onResetFocus()
   }
 
   private handleUpdateColorValue = (threshold, value) => {
-    const {handleUpdateThresholdsListColors} = this.props
+    const {onUpdateThresholdsListColors} = this.props
 
     const thresholdsListColors = this.props.thresholdsListColors.map(
       color => (color.id === threshold.id ? {...color, value} : color)
     )
 
-    handleUpdateThresholdsListColors(thresholdsListColors)
+    onUpdateThresholdsListColors(thresholdsListColors)
   }
 
   private handleValidateColorValue = (__, targetValue) => {
@@ -186,17 +187,4 @@ class ThresholdsList extends PureComponent<Props> {
   }
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {thresholdsListType, thresholdsListColors},
-}) => ({
-  thresholdsListType,
-  thresholdsListColors,
-})
-
-const mapDispatchToProps = dispatch => ({
-  handleUpdateThresholdsListColors: bindActionCreators(
-    updateThresholdsListColors,
-    dispatch
-  ),
-})
-export default connect(mapStateToProps, mapDispatchToProps)(ThresholdsList)
+export default ThresholdsList

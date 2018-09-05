@@ -1,16 +1,17 @@
 // Types
-import {TimeRange, CellQuery, Status, QueryStatus} from 'src/types'
-
-export interface DEInitialState {
-  queryDrafts: CellQuery[]
-  timeRange: TimeRange
-  queryStatus: QueryStatus
-  script: string
-  sourceLink: string
-}
+import {ColorNumber, ColorString} from 'src/types/colors'
+import {TimeRange, CellQuery, Status, CellType, Axes} from 'src/types'
+import {
+  DecimalPlaces,
+  FieldOption,
+  ThresholdType,
+  TableOptions,
+  NoteVisibility,
+} from 'src/types/dashboards'
+import {DEState} from 'src/types/dataExplorer'
 
 export interface State {
-  dataExplorer: DEInitialState
+  dataExplorer: DEState
 }
 
 export enum ActionType {
@@ -20,6 +21,19 @@ export enum ActionType {
   UpdateQueryStatus = 'DE_UPDATE_QUERY_STATUS',
   UpdateScript = 'DE_UPDATE_SCRIPT',
   UpdateSourceLink = 'DE_UPDATE_SOURCE_LINK',
+  ChangeVisualizationType = 'DE_CHANGE_Visualization_TYPE',
+  UpdateThresholdsListColors = 'DE_UPDATE_THRESHOLDS_LIST_COLORS',
+  UpdateThresholdsListType = 'DE_UPDATE_THRESHOLDS_LIST_TYPE',
+  UpdateGaugeColors = 'DE_UPDATE_GAUGE_COLORS',
+  UpdateAxes = 'DE_UPDATE_AXES',
+  UpdateTableOptions = 'DE_UPDATE_TABLE_OPTIONS',
+  UpdateLineColors = 'DE_UPDATE_LINE_COLORS',
+  ChangeTimeFormat = 'DE_CHANGE_TIME_FORMAT',
+  ChangeDecimalPlaces = 'DE_CHANGE_DECIMAL_PLACES',
+  UpdateFieldOptions = 'DE_UPDATE_FIELD_OPTIONS',
+  UpdateQueryDraft = 'DE_UPDATE_QUERY_DRAFT',
+  UpdateNote = 'DE_UPDATE_NOTE',
+  UpdateNoteVisibility = 'DE_UPDATE_NOTE_VISIBILITY',
 }
 
 export type Action =
@@ -29,6 +43,18 @@ export type Action =
   | UpdateQueryStatusAction
   | UpdateScriptAction
   | UpdateSourceLinkAction
+  | ChangeVisualizationTypeAction
+  | UpdateThresholdsListColorsAction
+  | UpdateThresholdsListTypeAction
+  | UpdateGaugeColorsAction
+  | UpdateAxesAction
+  | UpdateTableOptionsAction
+  | UpdateLineColorsAction
+  | ChangeTimeFormatAction
+  | ChangeDecimalPlacesAction
+  | UpdateFieldOptionsAction
+  | UpdateCellNoteAction
+  | UpdateCellNoteVisibilityAction
 
 export interface UpdateSourceLinkAction {
   type: ActionType.UpdateSourceLink
@@ -71,6 +97,90 @@ export interface UpdateScriptAction {
   type: ActionType.UpdateScript
   payload: {
     script: string
+  }
+}
+
+export interface ChangeVisualizationTypeAction {
+  type: ActionType.ChangeVisualizationType
+  payload: {
+    cellType: CellType
+  }
+}
+
+export interface UpdateThresholdsListColorsAction {
+  type: ActionType.UpdateThresholdsListColors
+  payload: {
+    thresholdsListColors: ColorNumber[]
+  }
+}
+
+export interface UpdateThresholdsListTypeAction {
+  type: ActionType.UpdateThresholdsListType
+  payload: {
+    thresholdsListType: ThresholdType
+  }
+}
+
+export interface UpdateGaugeColorsAction {
+  type: ActionType.UpdateGaugeColors
+  payload: {
+    gaugeColors: ColorNumber[]
+  }
+}
+
+export interface UpdateAxesAction {
+  type: ActionType.UpdateAxes
+  payload: {
+    axes: Axes
+  }
+}
+
+export interface UpdateTableOptionsAction {
+  type: ActionType.UpdateTableOptions
+  payload: {
+    tableOptions: TableOptions
+  }
+}
+
+export interface UpdateLineColorsAction {
+  type: ActionType.UpdateLineColors
+  payload: {
+    lineColors: ColorString[]
+  }
+}
+
+export interface ChangeTimeFormatAction {
+  type: ActionType.ChangeTimeFormat
+  payload: {
+    timeFormat: string
+  }
+}
+
+export interface ChangeDecimalPlacesAction {
+  type: ActionType.ChangeDecimalPlaces
+  payload: {
+    decimalPlaces: DecimalPlaces
+  }
+}
+
+export interface UpdateFieldOptionsAction {
+  type: ActionType.UpdateFieldOptions
+  payload: {
+    fieldOptions: FieldOption[]
+  }
+}
+
+export interface UpdateCellNoteAction {
+  type: ActionType.UpdateNote
+  payload: {
+    note: string
+  }
+}
+
+export interface UpdateCellNoteVisibilityAction {
+  type: ActionType.UpdateNoteVisibility
+  payload: {
+    noteVisibility: NoteVisibility
   }
 }
 

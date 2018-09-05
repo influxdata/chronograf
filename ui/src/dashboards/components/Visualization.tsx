@@ -6,6 +6,7 @@ import buildQueries from 'src/utils/buildQueriesForGraphs'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
+import {QueryUpdateState} from 'src/shared/actions/queries'
 
 import {TimeRange, QueryConfig, Axes, Template, Source, Status} from 'src/types'
 import {
@@ -13,7 +14,7 @@ import {
   DecimalPlaces,
   FieldOption,
   CellType,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
@@ -35,10 +36,10 @@ interface Props {
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
   staticLegend: boolean
-  isInCEO: boolean
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
   manualRefresh: number
+  editorLocation?: QueryUpdateState
 }
 
 const DashVisualization: SFC<Props> = ({
@@ -46,7 +47,6 @@ const DashVisualization: SFC<Props> = ({
   type,
   note,
   source,
-  isInCEO,
   templates,
   timeRange,
   lineColors,
@@ -59,6 +59,7 @@ const DashVisualization: SFC<Props> = ({
   manualRefresh,
   decimalPlaces,
   autoRefresher,
+  editorLocation,
   noteVisibility,
   editQueryStatus,
   resizerTopHeight,
@@ -89,11 +90,11 @@ const DashVisualization: SFC<Props> = ({
           timeFormat={timeFormat}
           decimalPlaces={decimalPlaces}
           fieldOptions={fieldOptions}
-          isInCEO={isInCEO}
           cellNote={note}
           cellNoteVisibility={noteVisibility}
           timeRange={timeRange}
           manualRefresh={manualRefresh}
+          editorLocation={editorLocation}
         />
       </div>
     </div>

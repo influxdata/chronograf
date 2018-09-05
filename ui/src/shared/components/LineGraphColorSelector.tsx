@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux'
 
 import ColorScaleDropdown from 'src/shared/components/ColorScaleDropdown'
 
-import {updateLineColors} from 'src/dashboards/actions/cellEditorOverlay'
+import {updateLineColors} from 'src/shared/actions/visualizations'
 import {ColorNumber} from 'src/types/colors'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 

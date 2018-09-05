@@ -1,7 +1,8 @@
+// Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import _ from 'lodash'
 
+// Components
 import GraphOptionsCustomizeFields from 'src/dashboards/components/GraphOptionsCustomizeFields'
 import GraphOptionsFixFirstColumn from 'src/dashboards/components/GraphOptionsFixFirstColumn'
 import GraphOptionsSortBy from 'src/dashboards/components/GraphOptionsSortBy'
@@ -9,23 +10,19 @@ import GraphOptionsTimeAxis from 'src/dashboards/components/GraphOptionsTimeAxis
 import GraphOptionsTimeFormat from 'src/dashboards/components/GraphOptionsTimeFormat'
 import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDecimalPlaces'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-
-import _ from 'lodash'
-
 import ThresholdsList from 'src/shared/components/ThresholdsList'
 import ThresholdsListTypeToggle from 'src/shared/components/ThresholdsListTypeToggle'
 
-import {
-  updateTableOptions,
-  updateFieldOptions,
-  changeTimeFormat,
-  changeDecimalPlaces,
-} from 'src/dashboards/actions/cellEditorOverlay'
+// Constants
 import {DEFAULT_TIME_FIELD} from 'src/dashboards/constants'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {DecimalPlaces} from 'src/types/dashboards'
+// Types
+import {DecimalPlaces, ThresholdType} from 'src/types/dashboards'
 import {QueryConfig} from 'src/types/queries'
+import {ColorNumber} from 'src/types/colors'
 
 interface DropdownOption {
   text: string
@@ -46,15 +43,19 @@ interface TableOptionsInterface {
 
 interface Props {
   queryConfigs: QueryConfig[]
-  handleUpdateTableOptions: (options: TableOptionsInterface) => void
-  handleUpdateFieldOptions: (fieldOptions: RenamableField[]) => void
-  handleChangeTimeFormat: (timeFormat: string) => void
-  handleChangeDecimalPlaces: (decimalPlaces: number) => void
+  onUpdateTableOptions: (options: TableOptionsInterface) => void
+  onUpdateFieldOptions: (fieldOptions: RenamableField[]) => void
+  onUpdateTimeFormat: (timeFormat: string) => void
+  onUpdateDecimalPlaces: (decimalPlaces: DecimalPlaces) => void
   tableOptions: TableOptionsInterface
   fieldOptions: RenamableField[]
   timeFormat: string
   decimalPlaces: DecimalPlaces
+  thresholdsListType: ThresholdType
+  thresholdsListColors: ColorNumber[]
   onResetFocus: () => void
+  onUpdateThresholdsListColors: (c: ColorNumber[]) => void
+  onUpdateThresholdsListType: (newType: ThresholdType) => void
 }
 
 @ErrorHandling
@@ -72,6 +73,10 @@ export class TableOptions extends Component<Props, {}> {
       onResetFocus,
       tableOptions,
       decimalPlaces,
+      onUpdateThresholdsListColors,
+      thresholdsListType,
+      thresholdsListColors,
+      onUpdateThresholdsListType,
     } = this.props
 
     const tableSortByOptions = fieldOptions.map(field => ({
@@ -112,9 +117,19 @@ export class TableOptions extends Component<Props, {}> {
             onFieldUpdate={this.handleFieldUpdate}
             moveField={this.moveField}
           />
-          <ThresholdsList showListHeading={true} onResetFocus={onResetFocus} />
+          <ThresholdsList
+            showListHeading={true}
+            onResetFocus={onResetFocus}
+            thresholdsListType={thresholdsListType}
+            thresholdsListColors={thresholdsListColors}
+            onUpdateThresholdsListColors={onUpdateThresholdsListColors}
+          />
           <div className="form-group-wrapper graph-options-group">
-            <ThresholdsListTypeToggle containerClass="form-group col-xs-6" />
+            <ThresholdsListTypeToggle
+              containerClass="form-group col-xs-6"
+              thresholdsListType={thresholdsListType}
+              onUpdateThresholdsListType={onUpdateThresholdsListType}
+            />
           </div>
         </div>
       </FancyScrollbar>
@@ -122,7 +137,7 @@ export class TableOptions extends Component<Props, {}> {
   }
 
   private moveField(dragIndex, hoverIndex) {
-    const {handleUpdateFieldOptions, fieldOptions} = this.props
+    const {onUpdateFieldOptions, fieldOptions} = this.props
 
     const draggedField = fieldOptions[dragIndex]
 
@@ -137,40 +152,40 @@ export class TableOptions extends Component<Props, {}> {
       _.slice(fieldOptionsRemoved, hoverIndex)
     )
 
-    handleUpdateFieldOptions(fieldOptionsAdded)
+    onUpdateFieldOptions(fieldOptionsAdded)
   }
 
   private handleChooseSortBy = (option: DropdownOption) => {
-    const {tableOptions, handleUpdateTableOptions, fieldOptions} = this.props
+    const {tableOptions, onUpdateTableOptions, fieldOptions} = this.props
     const sortBy = fieldOptions.find(f => f.internalName === option.key)
-    handleUpdateTableOptions({...tableOptions, sortBy})
+    onUpdateTableOptions({...tableOptions, sortBy})
   }
 
   private handleTimeFormatChange = timeFormat => {
-    const {handleChangeTimeFormat} = this.props
-    handleChangeTimeFormat(timeFormat)
+    const {onUpdateTimeFormat} = this.props
+    onUpdateTimeFormat(timeFormat)
   }
 
   private handleDecimalPlacesChange = decimalPlaces => {
-    const {handleChangeDecimalPlaces} = this.props
-    handleChangeDecimalPlaces(decimalPlaces)
+    const {onUpdateDecimalPlaces} = this.props
+    onUpdateDecimalPlaces(decimalPlaces)
   }
 
   private handleToggleVerticalTimeAxis = (verticalTimeAxis: boolean): void => {
-    const {tableOptions, handleUpdateTableOptions} = this.props
-    handleUpdateTableOptions({...tableOptions, verticalTimeAxis})
+    const {tableOptions, onUpdateTableOptions} = this.props
+    onUpdateTableOptions({...tableOptions, verticalTimeAxis})
   }
 
   private handleToggleFixFirstColumn = () => {
-    const {handleUpdateTableOptions, tableOptions} = this.props
+    const {onUpdateTableOptions, tableOptions} = this.props
     const fixFirstColumn = !tableOptions.fixFirstColumn
-    handleUpdateTableOptions({...tableOptions, fixFirstColumn})
+    onUpdateTableOptions({...tableOptions, fixFirstColumn})
   }
 
   private handleFieldUpdate = field => {
     const {
-      handleUpdateTableOptions,
-      handleUpdateFieldOptions,
+      onUpdateTableOptions,
+      onUpdateFieldOptions,
       tableOptions,
       fieldOptions,
     } = this.props
@@ -182,32 +197,14 @@ export class TableOptions extends Component<Props, {}> {
 
     if (sortBy.internalName === field.internalName) {
       const updatedSortBy = {...sortBy, displayName: field.displayName}
-      handleUpdateTableOptions({
+      onUpdateTableOptions({
         ...tableOptions,
         sortBy: updatedSortBy,
       })
     }
 
-    handleUpdateFieldOptions(updatedFieldOptions)
+    onUpdateFieldOptions(updatedFieldOptions)
   }
 }
 
-const mapStateToProps = ({
-  cellEditorOverlay: {
-    cell: {tableOptions, timeFormat, fieldOptions, decimalPlaces},
-  },
-}) => ({
-  tableOptions,
-  timeFormat,
-  fieldOptions,
-  decimalPlaces,
-})
-
-const mapDispatchToProps = dispatch => ({
-  handleUpdateTableOptions: bindActionCreators(updateTableOptions, dispatch),
-  handleUpdateFieldOptions: bindActionCreators(updateFieldOptions, dispatch),
-  handleChangeTimeFormat: bindActionCreators(changeTimeFormat, dispatch),
-  handleChangeDecimalPlaces: bindActionCreators(changeDecimalPlaces, dispatch),
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(TableOptions)
+export default TableOptions

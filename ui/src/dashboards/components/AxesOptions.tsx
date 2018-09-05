@@ -1,6 +1,5 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import {connect} from 'react-redux'
 
 // Components
 import OptIn from 'src/shared/components/OptIn'
@@ -13,12 +12,6 @@ import GraphOptionsDecimalPlaces from 'src/dashboards/components/GraphOptionsDec
 // Constants
 import {AXES_SCALE_OPTIONS} from 'src/dashboards/constants/cellEditor'
 import {GRAPH_TYPES} from 'src/dashboards/graphics/graph'
-
-// Actions
-import {
-  updateAxes,
-  changeDecimalPlaces,
-} from 'src/dashboards/actions/cellEditorOverlay'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -35,10 +28,10 @@ interface Props {
   axes: Axes
   staticLegend: boolean
   defaultYLabel: string
-  onUpdateDecimalPlaces: () => void
   decimalPlaces: DecimalPlaces
-  handleUpdateAxes: (axes: Axes) => void
+  onUpdateAxes: (axes: Axes) => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
+  onUpdateDecimalPlaces: (decimalPlaces: DecimalPlaces) => void
 }
 
 @ErrorHandling
@@ -260,7 +253,7 @@ class AxesOptions extends PureComponent<Props> {
   }
 
   private handleSetPrefixSuffix = e => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const {prefix, suffix} = e.target.form
 
     const newAxes = {
@@ -272,11 +265,11 @@ class AxesOptions extends PureComponent<Props> {
       },
     }
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 
   private handleSetYAxisBoundMin = (min: string): void => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const {
       y: {
         bounds: [, max],
@@ -286,11 +279,11 @@ class AxesOptions extends PureComponent<Props> {
     const bounds: [string, string] = [min, max]
     const newAxes = {...axes, y: {...axes.y, bounds}}
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 
   private handleSetYAxisBoundMax = (max: string): void => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const {
       y: {
         bounds: [min],
@@ -300,43 +293,29 @@ class AxesOptions extends PureComponent<Props> {
     const bounds: [string, string] = [min, max]
     const newAxes = {...axes, y: {...axes.y, bounds}}
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 
   private handleSetLabel = label => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, label}}
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 
   private handleSetScale = (scale: string): void => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, scale}}
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 
   private handleSetBase = (base: string): void => {
-    const {handleUpdateAxes, axes} = this.props
+    const {onUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, base}}
 
-    handleUpdateAxes(newAxes)
+    onUpdateAxes(newAxes)
   }
 }
 
-const mstp = ({
-  cellEditorOverlay: {
-    cell: {axes, type},
-  },
-}) => ({
-  axes,
-  type,
-})
-
-const mdtp = {
-  handleUpdateAxes: updateAxes,
-  onUpdateDecimalPlaces: changeDecimalPlaces,
-}
-
-export default connect(mstp, mdtp)(AxesOptions)
+export default AxesOptions

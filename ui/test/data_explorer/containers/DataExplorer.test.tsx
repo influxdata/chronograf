@@ -1,5 +1,6 @@
 import React from 'react'
 import {DataExplorer} from 'src/data_explorer/containers/DataExplorer'
+import {CellType} from 'src/types'
 import {shallow} from 'enzyme'
 import {source, query, timeRange} from 'test/resources'
 
@@ -58,6 +59,18 @@ const setup = () => {
     notify: jest.fn(),
     sourceLink: '',
     updateSourceLink: jest.fn(),
+    thresholdsListType: null,
+    thresholdsListColors: [],
+    gaugeColors: [],
+    lineColors: [],
+    visType: CellType.Line,
+    axes: null,
+    tableOptions: null,
+    timeFormat: '',
+    decimalPlaces: null,
+    fieldOptions: [],
+    note: '',
+    noteVisibility: null,
   }
 
   const wrapper = shallow(<DataExplorer {...props} />)

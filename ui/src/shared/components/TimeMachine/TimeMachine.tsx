@@ -74,12 +74,13 @@ import {
   CellType,
   FieldOption,
   TableOptions,
+  ThresholdType,
   DecimalPlaces,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {ColorNumber, ColorString} from 'src/types/colors'
 
-interface VisualizationOptions {
+export interface VisualizationOptions {
   type: CellType
   axes: Axes | null
   tableOptions: TableOptions
@@ -87,8 +88,9 @@ interface VisualizationOptions {
   timeFormat: string
   decimalPlaces: DecimalPlaces
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
   thresholdsListColors: ColorNumber[]
+  thresholdsListType: ThresholdType
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
 }
@@ -130,7 +132,7 @@ interface Props {
     timeRange: TimeRange,
     stateToUpdate: QueryUpdateState
   ) => void
-  visualizationOptions?: VisualizationOptions
+  visualizationOptions: VisualizationOptions
   manualRefresh?: number
   queryStatus: QueryStatus
 }
@@ -289,11 +291,10 @@ class TimeMachine extends PureComponent<Props, State> {
       script,
       timeRange,
       templates,
-      isInCEO,
       source,
       isStaticLegend,
-      visualizationOptions,
       manualRefresh,
+      visualizationOptions,
     } = this.props
     const {autoRefresher} = this.state
 
@@ -311,8 +312,8 @@ class TimeMachine extends PureComponent<Props, State> {
           queryConfigs={this.queriesWorkingDraft}
           editQueryStatus={this.handleEditQueryStatus}
           staticLegend={isStaticLegend}
-          isInCEO={isInCEO}
           manualRefresh={manualRefresh}
+          editorLocation={this.stateToUpdate}
           {...visualizationOptions}
         />
       </div>
@@ -324,7 +325,12 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get editorTab() {
-    const {onResetFocus, isStaticLegend, onToggleStaticLegend} = this.props
+    const {
+      onResetFocus,
+      isStaticLegend,
+      onToggleStaticLegend,
+      visualizationOptions,
+    } = this.props
     const {activeEditorTab} = this.state
 
     if (activeEditorTab === CEOTabs.Queries) {
@@ -340,6 +346,8 @@ class TimeMachine extends PureComponent<Props, State> {
         onToggleStaticLegend={onToggleStaticLegend}
         staticLegend={isStaticLegend}
         onResetFocus={onResetFocus}
+        stateToUpdate={this.stateToUpdate}
+        {...visualizationOptions}
       />
     )
   }

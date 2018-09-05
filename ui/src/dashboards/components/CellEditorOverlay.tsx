@@ -4,7 +4,9 @@ import _ from 'lodash'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
+import TimeMachine, {
+  VisualizationOptions,
+} from 'src/shared/components/TimeMachine/TimeMachine'
 import CEOHeader from 'src/dashboards/components/CEOHeader'
 
 // Utils
@@ -33,27 +35,13 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
-import {NewDefaultCell} from 'src/types/dashboards'
+import {NewDefaultCell, ThresholdType} from 'src/types/dashboards'
 import {UpdateScript} from 'src/flux/actions'
 import {Links} from 'src/types/flux'
 
 const staticLegend: DashboardsModels.Legend = {
   type: 'static',
   orientation: 'bottom',
-}
-
-interface VisualizationOptions {
-  type: DashboardsModels.CellType
-  axes: DashboardsModels.Axes | null
-  tableOptions: DashboardsModels.TableOptions
-  fieldOptions: DashboardsModels.FieldOption[]
-  timeFormat: string
-  decimalPlaces: DashboardsModels.DecimalPlaces
-  note: string
-  noteVisibility: DashboardsModels.CellNoteVisibility
-  thresholdsListColors: ColorsModels.ColorNumber[]
-  gaugeColors: ColorsModels.ColorNumber[]
-  lineColors: ColorsModels.ColorString[]
 }
 
 interface Props {
@@ -70,7 +58,7 @@ interface Props {
   queryStatus: QueriesModels.QueryStatus
   templates: Template[]
   timeRange: QueriesModels.TimeRange
-  thresholdsListType: string
+  thresholdsListType: ThresholdType
   thresholdsListColors: ColorsModels.ColorNumber[]
   gaugeColors: ColorsModels.ColorNumber[]
   lineColors: ColorsModels.ColorString[]
@@ -198,7 +186,13 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private get visualizationOptions(): VisualizationOptions {
-    const {cell, thresholdsListColors, gaugeColors, lineColors} = this.props
+    const {
+      cell,
+      lineColors,
+      gaugeColors,
+      thresholdsListType,
+      thresholdsListColors,
+    } = this.props
 
     const {
       type,
@@ -223,6 +217,7 @@ class CellEditorOverlay extends Component<Props, State> {
       thresholdsListColors,
       gaugeColors,
       lineColors,
+      thresholdsListType,
     }
   }
 

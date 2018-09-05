@@ -1,6 +1,5 @@
 // Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
 import classnames from 'classnames'
 
 // Components
@@ -8,14 +7,8 @@ import {Controlled as ReactCodeMirror} from 'react-codemirror2'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
-// Actions
-import {
-  updateCellNote,
-  UpdateCellNoteVisibility,
-} from 'src/dashboards/actions/cellEditorOverlay'
-
 // Types
-import {CellNoteVisibility} from 'src/types/dashboards'
+import {NoteVisibility} from 'src/types/dashboards'
 
 // Utils
 import {humanizeNote} from 'src/dashboards/utils/notes'
@@ -25,9 +18,9 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   note: string
-  noteVisibility: CellNoteVisibility
-  handleUpdateCellNote: (note: string) => void
-  handleUpdateCellNoteVisibility: (noteVisibility: CellNoteVisibility) => void
+  noteVisibility: NoteVisibility
+  onUpdateNote: (note: string) => void
+  onUpdateNoteVisibility: (noteVisibility: NoteVisibility) => void
 }
 
 interface State {
@@ -41,7 +34,7 @@ class CellNoteEditor extends Component<Props, State> {
     super(props)
 
     this.state = {
-      noteDraft: props.note,
+      noteDraft: props.note || '',
       editorIsFocused: false,
     }
   }
@@ -70,7 +63,7 @@ class CellNoteEditor extends Component<Props, State> {
             <SlideToggle
               size={ComponentSize.ExtraSmall}
               onChange={this.handleSlideToggle}
-              active={noteVisibility === CellNoteVisibility.ShowWhenNoData}
+              active={noteVisibility === NoteVisibility.ShowWhenNoData}
             />
             <label>Display note in cell when query returns no results</label>
           </div>
@@ -92,12 +85,12 @@ class CellNoteEditor extends Component<Props, State> {
   }
 
   private handleSlideToggle = (): void => {
-    const {noteVisibility, handleUpdateCellNoteVisibility} = this.props
+    const {noteVisibility, onUpdateNoteVisibility} = this.props
 
-    if (noteVisibility === CellNoteVisibility.Default) {
-      handleUpdateCellNoteVisibility(CellNoteVisibility.ShowWhenNoData)
+    if (noteVisibility === NoteVisibility.Default) {
+      onUpdateNoteVisibility(NoteVisibility.ShowWhenNoData)
     } else {
-      handleUpdateCellNoteVisibility(CellNoteVisibility.Default)
+      onUpdateNoteVisibility(NoteVisibility.Default)
     }
   }
 
@@ -106,11 +99,11 @@ class CellNoteEditor extends Component<Props, State> {
   }
 
   private handleBlur = (): void => {
-    const {handleUpdateCellNote} = this.props
+    const {onUpdateNote} = this.props
     const {noteDraft} = this.state
 
     this.setState({editorIsFocused: false})
-    handleUpdateCellNote(noteDraft)
+    onUpdateNote(noteDraft)
   }
 
   private onTouchStart = (): void => {}
@@ -126,18 +119,4 @@ class CellNoteEditor extends Component<Props, State> {
   }
 }
 
-const mstp = ({
-  cellEditorOverlay: {
-    cell: {note, noteVisibility},
-  },
-}) => ({
-  note,
-  noteVisibility,
-})
-
-const mdtp = {
-  handleUpdateCellNote: updateCellNote,
-  handleUpdateCellNoteVisibility: UpdateCellNoteVisibility,
-}
-
-export default connect(mstp, mdtp)(CellNoteEditor)
+export default CellNoteEditor

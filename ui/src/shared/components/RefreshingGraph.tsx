@@ -25,13 +25,14 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 import {setHoverTime} from 'src/dashboards/actions'
 
 // Types
+import {QueryUpdateState} from 'src/shared/actions/queries'
 import {ColorString} from 'src/types/colors'
 import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
 import {
   TableOptions,
   FieldOption,
   DecimalPlaces,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
@@ -48,7 +49,6 @@ interface Props {
   type: CellType
   cellID: string
   inView: boolean
-  isInCEO: boolean
   timeFormat: string
   cellHeight: number
   staticLegend: boolean
@@ -61,7 +61,8 @@ interface Props {
   handleSetHoverTime: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
   cellNote: string
-  cellNoteVisibility: CellNoteVisibility
+  cellNoteVisibility: NoteVisibility
+  editorLocation?: QueryUpdateState
 }
 
 class RefreshingGraph extends PureComponent<Props> {
@@ -79,7 +80,7 @@ class RefreshingGraph extends PureComponent<Props> {
     if (!this.timeSeries.current) {
       return
     }
-    if (this.props.isInCEO) {
+    if (this.props.editorLocation) {
       this.timeSeries.current.forceUpdate()
     }
   }
@@ -170,19 +171,19 @@ class RefreshingGraph extends PureComponent<Props> {
       decimalPlaces,
       manualRefresh,
       handleSetHoverTime,
-      isInCEO,
+      editorLocation,
     } = this.props
 
     return (
       <TableGraph
         data={data}
         colors={colors}
-        isInCEO={isInCEO}
         key={manualRefresh}
         tableOptions={tableOptions}
         fieldOptions={fieldOptions}
         timeFormat={timeFormat}
         decimalPlaces={decimalPlaces}
+        editorLocation={editorLocation}
         handleSetHoverTime={handleSetHoverTime}
       />
     )

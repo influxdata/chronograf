@@ -5,15 +5,17 @@ import reducer, {initialState} from 'src/dashboards/reducers/cellEditorOverlay'
 import {
   loadCEO,
   clearCEO,
-  changeCellType,
   renameCell,
+  Action,
+} from 'src/dashboards/actions/cellEditorOverlay'
+import {
+  updateVisType,
   updateThresholdsListColors,
   updateThresholdsListType,
   updateGaugeColors,
   updateLineColors,
   updateAxes,
-  Action,
-} from 'src/dashboards/actions/cellEditorOverlay'
+} from 'src/shared/actions/visualizations'
 import {
   updateEditorTimeRange,
   updateQueryDrafts,
@@ -77,7 +79,11 @@ describe('Dashboards.Reducers.cellEditorOverlay', () => {
   })
 
   it('should change the cell editor visualization type', () => {
-    const actual = reducer(initialState, changeCellType(defaultCell.type))
+    const action = updateVisType(
+      defaultCell.type,
+      QueryUpdateState.CEO
+    ) as Action
+    const actual = reducer(initialState, action)
     const expected = defaultCell.type
 
     expect(actual.cell.type).toBe(expected)
@@ -91,34 +97,41 @@ describe('Dashboards.Reducers.cellEditorOverlay', () => {
   })
 
   it('should update the cell single stat colors', () => {
-    const actual = reducer(
-      initialState,
-      updateThresholdsListColors(defaultThresholdsListColors)
-    )
+    const action = updateThresholdsListColors(
+      defaultThresholdsListColors,
+      QueryUpdateState.CEO
+    ) as Action
+    const actual = reducer(initialState, action)
     const expected = defaultThresholdsListColors
 
     expect(actual.thresholdsListColors).toBe(expected)
   })
 
   it('should toggle the single stat type', () => {
-    const actual = reducer(
-      initialState,
-      updateThresholdsListType(defaultThresholdsListType)
-    )
+    const action = updateThresholdsListType(
+      defaultThresholdsListType,
+      QueryUpdateState.CEO
+    ) as Action
+    const actual = reducer(initialState, action)
     const expected = defaultThresholdsListType
 
     expect(actual.thresholdsListType).toBe(expected)
   })
 
   it('should update the cell gauge colors', () => {
-    const actual = reducer(initialState, updateGaugeColors(defaultGaugeColors))
+    const action = updateGaugeColors(
+      defaultGaugeColors,
+      QueryUpdateState.CEO
+    ) as Action
+    const actual = reducer(initialState, action)
     const expected = defaultGaugeColors
 
     expect(actual.gaugeColors).toBe(expected)
   })
 
   it('should update the cell axes', () => {
-    const actual = reducer(initialState, updateAxes(axes))
+    const action = updateAxes(axes, QueryUpdateState.CEO) as Action
+    const actual = reducer(initialState, action)
     const expected = axes
     const actualCell = actual.cell as Cell
 
@@ -126,7 +139,11 @@ describe('Dashboards.Reducers.cellEditorOverlay', () => {
   })
 
   it('should update the cell line graph colors', () => {
-    const actual = reducer(initialState, updateLineColors(defaultLineColors))
+    const action = updateLineColors(
+      defaultLineColors,
+      QueryUpdateState.CEO
+    ) as Action
+    const actual = reducer(initialState, action)
     const expected = defaultLineColors
 
     expect(actual.lineColors).toBe(expected)

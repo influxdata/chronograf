@@ -10,7 +10,7 @@ import {
   TableOptions,
   CellQuery,
   NewDefaultCell,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {TimeRange} from 'src/types'
 import {CEOInitialState} from 'src/dashboards/reducers/cellEditorOverlay'
@@ -172,7 +172,7 @@ export interface UpdateCellNoteAction {
 export interface UpdateCellNoteVisibilityAction {
   type: ActionType.UpdateCellNoteVisibility
   payload: {
-    noteVisibility: CellNoteVisibility
+    noteVisibility: NoteVisibility
   }
 }
 
@@ -198,111 +198,9 @@ export const clearCEO = (): ClearCEOAction => ({
   type: ActionType.ClearCEO,
 })
 
-export const changeCellType = (cellType: CellType): ChangeCellTypeAction => ({
-  type: ActionType.ChangeCellType,
-  payload: {
-    cellType,
-  },
-})
-
-export const updateCellNote = (note: string): UpdateCellNoteAction => ({
-  type: ActionType.UpdateCellNote,
-  payload: {
-    note,
-  },
-})
-
-export const UpdateCellNoteVisibility = (
-  noteVisibility: CellNoteVisibility
-): UpdateCellNoteVisibilityAction => ({
-  type: ActionType.UpdateCellNoteVisibility,
-  payload: {
-    noteVisibility,
-  },
-})
-
 export const renameCell = (cellName: string): RenameCellAction => ({
   type: ActionType.RenameCell,
   payload: {
     cellName,
-  },
-})
-
-export const updateThresholdsListColors = (
-  thresholdsListColors: ColorNumber[]
-): UpdateThresholdsListColorsAction => ({
-  type: ActionType.UpdateThresholdsListColors,
-  payload: {
-    thresholdsListColors,
-  },
-})
-
-export const updateThresholdsListType = (
-  thresholdsListType: ThresholdType
-): UpdateThresholdsListTypeAction => ({
-  type: ActionType.UpdateThresholdsListType,
-  payload: {
-    thresholdsListType,
-  },
-})
-
-export const updateGaugeColors = (
-  gaugeColors: ColorNumber[]
-): UpdateGaugeColorsAction => ({
-  type: ActionType.UpdateGaugeColors,
-  payload: {
-    gaugeColors,
-  },
-})
-
-export const updateAxes = (axes: Axes): UpdateAxesAction => ({
-  type: ActionType.UpdateAxes,
-  payload: {
-    axes,
-  },
-})
-
-export const updateTableOptions = (
-  tableOptions: TableOptions
-): UpdateTableOptionsAction => ({
-  type: ActionType.UpdateTableOptions,
-  payload: {
-    tableOptions,
-  },
-})
-
-export const updateLineColors = (
-  lineColors: ColorString[]
-): UpdateLineColorsAction => ({
-  type: ActionType.UpdateLineColors,
-  payload: {
-    lineColors,
-  },
-})
-
-export const changeTimeFormat = (
-  timeFormat: string
-): ChangeTimeFormatAction => ({
-  type: ActionType.ChangeTimeFormat,
-  payload: {
-    timeFormat,
-  },
-})
-
-export const changeDecimalPlaces = (
-  decimalPlaces: DecimalPlaces
-): ChangeDecimalPlacesAction => ({
-  type: ActionType.ChangeDecimalPlaces,
-  payload: {
-    decimalPlaces,
-  },
-})
-
-export const updateFieldOptions = (
-  fieldOptions: FieldOption[]
-): UpdateFieldOptionsAction => ({
-  type: ActionType.UpdateFieldOptions,
-  payload: {
-    fieldOptions,
   },
 })

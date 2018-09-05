@@ -10,14 +10,14 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {humanizeNote} from 'src/dashboards/utils/notes'
 
 // Types
-import {CellType, CellNoteVisibility} from 'src/types/dashboards'
+import {CellType, NoteVisibility} from 'src/types/dashboards'
 
 interface Props {
   note: string
   cellX: number
   cellY: number
   cellType: CellType
-  visibility: CellNoteVisibility
+  visibility: NoteVisibility
 }
 
 class LayoutCellNote extends Component<Props> {
@@ -28,7 +28,7 @@ class LayoutCellNote extends Component<Props> {
       !note ||
       note === '' ||
       cellType === CellType.Note ||
-      visibility === CellNoteVisibility.ShowWhenNoData
+      visibility === NoteVisibility.ShowWhenNoData
     ) {
       return null
     }

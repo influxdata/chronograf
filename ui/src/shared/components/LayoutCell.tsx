@@ -14,7 +14,7 @@ import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 
 import {Cell, CellQuery, Template} from 'src/types/'
-import {CellNoteVisibility} from 'src/types/dashboards'
+import {NoteVisibility} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {CellType} from 'src/types/dashboards'
 
@@ -71,7 +71,7 @@ export default class LayoutCell extends Component<Props> {
     return (
       !!cell.note &&
       cell.type !== CellType.Note &&
-      cell.noteVisibility === CellNoteVisibility.Default
+      cell.noteVisibility === NoteVisibility.Default
     )
   }
 

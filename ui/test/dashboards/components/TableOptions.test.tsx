@@ -11,10 +11,12 @@ import ThresholdsList from 'src/shared/components/ThresholdsList'
 import ThresholdsListTypeToggle from 'src/shared/components/ThresholdsListTypeToggle'
 
 const defaultProps = {
-  handleUpdateTableOptions: () => {},
-  handleUpdateFieldOptions: () => {},
-  handleChangeTimeFormat: () => {},
-  handleChangeDecimalPlaces: () => {},
+  onUpdateTableOptions: () => {},
+  onUpdateFieldOptions: () => {},
+  onUpdateTimeFormat: () => {},
+  onUpdateDecimalPlaces: () => {},
+  onUpdateThresholdsListColors: () => {},
+  onUpdateThresholdsListType: () => {},
   onResetFocus: () => {},
   queryConfigs: [],
   tableOptions: {
@@ -28,6 +30,8 @@ const defaultProps = {
     isEnforced: true,
     digits: 2,
   },
+  thresholdsListType: null,
+  thresholdsListColors: [],
 }
 
 const setup = (override = {}) => {

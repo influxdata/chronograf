@@ -22,7 +22,9 @@ import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechno
 import ManualRefresh from 'src/shared/components/ManualRefresh'
 import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboardOverlay'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
+import TimeMachine, {
+  VisualizationOptions,
+} from 'src/shared/components/TimeMachine/TimeMachine'
 import DEHeader from 'src/data_explorer/components/DEHeader'
 
 // Actions
@@ -66,9 +68,19 @@ import {
   Template,
   TemplateType,
   TemplateValueType,
+  CellType,
+  Axes,
 } from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Links} from 'src/types/flux'
+import {ColorNumber, ColorString} from 'src/types/colors'
+import {
+  DecimalPlaces,
+  FieldOption,
+  ThresholdType,
+  TableOptions,
+  NoteVisibility,
+} from 'src/types/dashboards'
 
 interface Props {
   source: Source
@@ -103,6 +115,18 @@ interface Props {
   fetchServicesAsync: typeof fetchAllFluxServicesAsync
   notify: typeof notifyAction
   sourceLink: string
+  thresholdsListType: ThresholdType
+  thresholdsListColors: ColorNumber[]
+  gaugeColors: ColorNumber[]
+  lineColors: ColorString[]
+  visType: CellType
+  axes: Axes
+  tableOptions: TableOptions
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  fieldOptions: FieldOption[]
+  note: string
+  noteVisibility: NoteVisibility
 }
 
 interface State {
@@ -262,6 +286,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             updateScript={updateScript}
             fluxLinks={fluxLinks}
             notify={notify}
+            visualizationOptions={this.visualizationOptions}
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
@@ -407,6 +432,38 @@ export class DataExplorer extends PureComponent<Props, State> {
     return ''
   }
 
+  private get visualizationOptions(): VisualizationOptions {
+    const {
+      visType,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      note,
+      noteVisibility,
+      axes,
+      thresholdsListColors,
+      thresholdsListType,
+      gaugeColors,
+      lineColors,
+    } = this.props
+
+    return {
+      type: visType,
+      axes,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      note,
+      noteVisibility,
+      thresholdsListColors,
+      gaugeColors,
+      lineColors,
+      thresholdsListType,
+    }
+  }
+
   private toggleSendToDashboard = () => {
     this.setState({
       isSendToDashboardVisible: !this.state.isSendToDashboardVisible,
@@ -427,7 +484,25 @@ const mapStateToProps = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer: {queryDrafts, timeRange, queryStatus, script, sourceLink},
+    dataExplorer: {
+      queryDrafts,
+      timeRange,
+      queryStatus,
+      script,
+      sourceLink,
+      visType,
+      thresholdsListType,
+      thresholdsListColors,
+      gaugeColors,
+      lineColors,
+      axes,
+      tableOptions,
+      timeFormat,
+      decimalPlaces,
+      fieldOptions,
+      note,
+      noteVisibility,
+    },
     dashboardUI: {dashboards},
     sources,
     services,
@@ -445,6 +520,18 @@ const mapStateToProps = state => {
     queryStatus,
     script,
     sourceLink,
+    visType,
+    thresholdsListType,
+    thresholdsListColors,
+    gaugeColors,
+    lineColors,
+    axes,
+    tableOptions,
+    timeFormat,
+    decimalPlaces,
+    fieldOptions,
+    note,
+    noteVisibility,
   }
 }
 
