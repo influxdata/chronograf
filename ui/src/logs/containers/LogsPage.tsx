@@ -256,6 +256,7 @@ class LogsPage extends Component<Props, State> {
           </div>
         </div>
         {this.renderImportOverlay()}
+        {this.expandedMessageContainer}
       </>
     )
   }
@@ -738,6 +739,15 @@ class LogsPage extends Component<Props, State> {
 
   private get isTruncated(): boolean {
     return this.props.logConfig.isTruncated
+  }
+
+  private get expandedMessageContainer(): JSX.Element {
+    return (
+      <div
+        className="logs-viewer--expanded-message-container"
+        id="expanded-message-container"
+      />
+    )
   }
 }
 
