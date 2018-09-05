@@ -212,49 +212,6 @@ describe('timeSeriesToDygraph', () => {
     expect(actual).toEqual(expected)
   })
 
-  it('it does not use multiple axes if being used for the DataExplorer', () => {
-    const influxResponse = [
-      {
-        response: {
-          results: [
-            {
-              statement_id: 0,
-              series: [
-                {
-                  name: 'm1',
-                  columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
-                },
-              ],
-            },
-          ],
-        },
-      },
-      {
-        response: {
-          results: [
-            {
-              statement_id: 0,
-              series: [
-                {
-                  name: 'm1',
-                  columns: ['time', 'f2'],
-                  values: [[2000, 3], [4000, 4]],
-                },
-              ],
-            },
-          ],
-        },
-      },
-    ]
-
-    const actual = timeSeriesToDygraph(influxResponse)
-
-    const expected = {}
-
-    expect(actual.dygraphSeries).toEqual(expected)
-  })
-
   it('parses a raw InfluxDB response into a dygraph friendly data format', () => {
     const influxResponse = [
       {

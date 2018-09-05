@@ -32,7 +32,7 @@ import {
   TableOptions,
   FieldOption,
   DecimalPlaces,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
@@ -62,7 +62,7 @@ interface Props {
   handleSetHoverTime: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
   cellNote: string
-  cellNoteVisibility: CellNoteVisibility
+  cellNoteVisibility: NoteVisibility
   editorLocation?: QueryUpdateState
 }
 

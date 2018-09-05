@@ -10,7 +10,7 @@ import {
   TableOptions,
   CellQuery,
   NewDefaultCell,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {TimeRange} from 'src/types'
 import {CEOInitialState} from 'src/dashboards/reducers/cellEditorOverlay'
@@ -172,7 +172,7 @@ export interface UpdateCellNoteAction {
 export interface UpdateCellNoteVisibilityAction {
   type: ActionType.UpdateCellNoteVisibility
   payload: {
-    noteVisibility: CellNoteVisibility
+    noteVisibility: NoteVisibility
   }
 }
 

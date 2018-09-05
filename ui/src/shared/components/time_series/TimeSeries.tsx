@@ -20,7 +20,7 @@ import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
 import {GlobalAutoRefresher, AutoRefresher} from 'src/utils/AutoRefresher'
-import {CellNoteVisibility} from 'src/types/dashboards'
+import {NoteVisibility} from 'src/types/dashboards'
 
 // Components
 import MarkdownCell from 'src/shared/components/MarkdownCell'
@@ -45,7 +45,7 @@ interface Props {
   editQueryStatus?: () => void
   grabDataForDownload?: GrabDataForDownloadHandler
   cellNote?: string
-  cellNoteVisibility?: CellNoteVisibility
+  cellNoteVisibility?: NoteVisibility
 }
 
 interface State {
@@ -239,7 +239,7 @@ class TimeSeries extends Component<Props, State> {
     }
 
     if (!hasValues) {
-      if (cellNoteVisibility === CellNoteVisibility.ShowWhenNoData) {
+      if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
         return <MarkdownCell text={cellNote} />
       }
 

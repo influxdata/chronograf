@@ -20,7 +20,7 @@ import {
 import {editor} from 'src/flux/constants'
 
 import {CellType} from 'src/types'
-import {ThresholdType, CellNoteVisibility} from 'src/types/dashboards'
+import {ThresholdType, NoteVisibility} from 'src/types/dashboards'
 import {LocalStorage} from 'src/types/localStorage'
 
 const VERSION = process.env.npm_package_version
@@ -115,7 +115,7 @@ export const saveToLocalStorage = ({
                 dataExplorer.decimalPlaces || DEFAULT_DECIMAL_PLACES,
               fieldOptions: dataExplorer.fieldOptions || DEFAULT_FIELD_OPTIONS,
               noteVisibility:
-                dataExplorer.noteVisibility || CellNoteVisibility.Default,
+                dataExplorer.noteVisibility || NoteVisibility.Default,
             },
             script,
             logs: {

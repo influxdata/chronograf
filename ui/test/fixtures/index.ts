@@ -18,7 +18,7 @@ import {
   FieldOption,
   DecimalPlaces,
   CellType,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {LineColor, ColorNumber} from 'src/types/colors'
 import {ServerLogConfig, ServerColumn} from 'src/types/logs'
@@ -206,7 +206,7 @@ export const cell: Cell = {
   },
   inView: true,
   note: 'I am a note!',
-  noteVisibility: CellNoteVisibility.Default,
+  noteVisibility: NoteVisibility.Default,
 }
 
 export const fullTimeRange = {

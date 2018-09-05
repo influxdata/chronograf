@@ -120,7 +120,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   queryDrafts: DashboardsModels.CellQuery[]
   editorTimeRange: QueriesModels.TimeRange
   updateQueryDrafts: (queryDrafts: DashboardsModels.CellQuery[]) => void
-  thresholdsListType: string
+  thresholdsListType: DashboardsModels.ThresholdType
   thresholdsListColors: ColorsModels.ColorNumber[]
   gaugeColors: ColorsModels.ColorNumber[]
   lineColors: ColorsModels.ColorString[]

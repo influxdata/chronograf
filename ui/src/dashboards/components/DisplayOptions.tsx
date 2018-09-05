@@ -40,7 +40,7 @@ import {
   ThresholdType,
   DecimalPlaces,
   NewDefaultCell,
-  CellNoteVisibility,
+  NoteVisibility,
   TableOptions as TableOptionsInterface,
 } from 'src/types/dashboards'
 import {buildDefaultYLabel} from 'src/shared/presenters'
@@ -256,7 +256,7 @@ class DisplayOptions extends Component<Props, State> {
     return note || ''
   }
 
-  private get noteVisibility(): CellNoteVisibility {
+  private get noteVisibility(): NoteVisibility {
     const {noteVisibility} = this.props
     return noteVisibility
   }
@@ -330,9 +330,7 @@ class DisplayOptions extends Component<Props, State> {
     onUpdateNote(note, this.stateToUpdate)
   }
 
-  private handleUpdateNoteVisibility = (
-    visibility: CellNoteVisibility
-  ): void => {
+  private handleUpdateNoteVisibility = (visibility: NoteVisibility): void => {
     const {onUpdateNoteVisibility} = this.props
 
     onUpdateNoteVisibility(visibility, this.stateToUpdate)

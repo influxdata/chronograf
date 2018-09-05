@@ -76,7 +76,7 @@ import {
   TableOptions,
   ThresholdType,
   DecimalPlaces,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {ColorNumber, ColorString} from 'src/types/colors'
 
@@ -88,7 +88,7 @@ export interface VisualizationOptions {
   timeFormat: string
   decimalPlaces: DecimalPlaces
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
   thresholdsListColors: ColorNumber[]
   thresholdsListType: ThresholdType
   gaugeColors: ColorNumber[]

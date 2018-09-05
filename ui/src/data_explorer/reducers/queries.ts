@@ -27,11 +27,7 @@ import {
 // types
 import {CellType} from 'src/types'
 import {DEState} from 'src/types/dataExplorer'
-import {
-  CellQuery,
-  ThresholdType,
-  CellNoteVisibility,
-} from 'src/types/dashboards'
+import {CellQuery, ThresholdType, NoteVisibility} from 'src/types/dashboards'
 
 const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
 
@@ -52,7 +48,7 @@ export const initialState: DEState = {
   decimalPlaces: DEFAULT_DECIMAL_PLACES,
   fieldOptions: DEFAULT_FIELD_OPTIONS,
   note: '',
-  noteVisibility: CellNoteVisibility.Default,
+  noteVisibility: NoteVisibility.Default,
 }
 
 export default (state = initialState, action: Action): DEState => {
@@ -181,13 +177,13 @@ export default (state = initialState, action: Action): DEState => {
       return {...state, lineColors}
     }
 
-    case ActionType.UpdateCellNote: {
+    case ActionType.UpdateNote: {
       const {note} = action.payload
 
       return {...state, note}
     }
 
-    case ActionType.UpdateCellNoteVisibility: {
+    case ActionType.UpdateNoteVisibility: {
       const {noteVisibility} = action.payload
 
       return {...state, noteVisibility}

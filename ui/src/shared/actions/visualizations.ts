@@ -13,13 +13,103 @@ import {
   CellType,
   ThresholdType,
   TableOptions,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
+
+export interface ChangeVisualizationTypeAction {
+  type: CEOActionType.ChangeCellType | DEActionType.ChangeVisualizationType
+  payload: {
+    cellType: CellType
+  }
+}
+
+export interface UpdateThresholdsListColorsAction {
+  type:
+    | CEOActionType.UpdateThresholdsListColors
+    | DEActionType.UpdateThresholdsListColors
+  payload: {
+    thresholdsListColors: ColorNumber[]
+  }
+}
+
+export interface UpdateThresholdsListTypeAction {
+  type:
+    | CEOActionType.UpdateThresholdsListType
+    | DEActionType.UpdateThresholdsListType
+  payload: {
+    thresholdsListType: ThresholdType
+  }
+}
+
+export interface UpdateGaugeColorsAction {
+  type: CEOActionType.UpdateGaugeColors | DEActionType.UpdateGaugeColors
+  payload: {
+    gaugeColors: ColorNumber[]
+  }
+}
+
+export interface UpdateAxesAction {
+  type: CEOActionType.UpdateAxes | DEActionType.UpdateAxes
+  payload: {
+    axes: Axes
+  }
+}
+
+export interface UpdateTableOptionsAction {
+  type: CEOActionType.UpdateTableOptions | DEActionType.UpdateTableOptions
+  payload: {
+    tableOptions: TableOptions
+  }
+}
+
+export interface UpdateLineColorsAction {
+  type: CEOActionType.UpdateLineColors | DEActionType.UpdateLineColors
+  payload: {
+    lineColors: ColorString[]
+  }
+}
+
+export interface ChangeTimeFormatAction {
+  type: CEOActionType.ChangeTimeFormat | DEActionType.ChangeTimeFormat
+  payload: {
+    timeFormat: string
+  }
+}
+
+export interface ChangeDecimalPlacesAction {
+  type: CEOActionType.ChangeDecimalPlaces | DEActionType.ChangeDecimalPlaces
+  payload: {
+    decimalPlaces: DecimalPlaces
+  }
+}
+
+export interface UpdateFieldOptionsAction {
+  type: CEOActionType.UpdateFieldOptions | DEActionType.UpdateFieldOptions
+  payload: {
+    fieldOptions: FieldOption[]
+  }
+}
+
+export interface UpdateNoteAction {
+  type: CEOActionType.UpdateCellNote | DEActionType.UpdateNote
+  payload: {
+    note: string
+  }
+}
+
+export interface UpdateNoteVisibilityAction {
+  type:
+    | CEOActionType.UpdateCellNoteVisibility
+    | DEActionType.UpdateNoteVisibility
+  payload: {
+    noteVisibility: NoteVisibility
+  }
+}
 
 export const updateVisType = (
   cellType: CellType,
   stateToUpdate: QueryUpdateState
-) => {
+): ChangeVisualizationTypeAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.ChangeCellType
@@ -29,42 +119,45 @@ export const updateVisType = (
     payload: {
       cellType,
     },
-  }
+  } as ChangeVisualizationTypeAction
 }
 
-export const updateNote = (note: string, stateToUpdate: QueryUpdateState) => {
+export const updateNote = (
+  note: string,
+  stateToUpdate: QueryUpdateState
+): UpdateNoteAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateCellNote
-      : DEActionType.UpdateCellNote
+      : DEActionType.UpdateNote
   return {
     type,
     payload: {
       note,
     },
-  }
+  } as UpdateNoteAction
 }
 
 export const updateNoteVisibility = (
-  noteVisibility: CellNoteVisibility,
+  noteVisibility: NoteVisibility,
   stateToUpdate: QueryUpdateState
-) => {
+): UpdateNoteVisibilityAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateCellNoteVisibility
-      : DEActionType.UpdateCellNoteVisibility
+      : DEActionType.UpdateNoteVisibility
   return {
     type,
     payload: {
       noteVisibility,
     },
-  }
+  } as UpdateNoteVisibilityAction
 }
 
 export const updateThresholdsListColors = (
   thresholdsListColors: ColorNumber[],
   stateToUpdate: QueryUpdateState
-) => {
+): UpdateThresholdsListColorsAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateThresholdsListColors
@@ -74,13 +167,13 @@ export const updateThresholdsListColors = (
     payload: {
       thresholdsListColors,
     },
-  }
+  } as UpdateThresholdsListColorsAction
 }
 
 export const updateThresholdsListType = (
   thresholdsListType: ThresholdType,
   stateToUpdate: QueryUpdateState
-) => {
+): UpdateThresholdsListTypeAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateThresholdsListType
@@ -90,13 +183,13 @@ export const updateThresholdsListType = (
     payload: {
       thresholdsListType,
     },
-  }
+  } as UpdateThresholdsListTypeAction
 }
 
 export const updateGaugeColors = (
   gaugeColors: ColorNumber[],
   stateToUpdate: QueryUpdateState
-) => {
+): UpdateGaugeColorsAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateGaugeColors
@@ -106,10 +199,13 @@ export const updateGaugeColors = (
     payload: {
       gaugeColors,
     },
-  }
+  } as UpdateGaugeColorsAction
 }
 
-export const updateAxes = (axes: Axes, stateToUpdate: QueryUpdateState) => {
+export const updateAxes = (
+  axes: Axes,
+  stateToUpdate: QueryUpdateState
+): UpdateAxesAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateAxes
@@ -119,13 +215,13 @@ export const updateAxes = (axes: Axes, stateToUpdate: QueryUpdateState) => {
     payload: {
       axes,
     },
-  }
+  } as UpdateAxesAction
 }
 
 export const updateTableOptions = (
   tableOptions: TableOptions,
   stateToUpdate: QueryUpdateState
-) => {
+): UpdateTableOptionsAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateTableOptions
@@ -135,13 +231,13 @@ export const updateTableOptions = (
     payload: {
       tableOptions,
     },
-  }
+  } as UpdateTableOptionsAction
 }
 
 export const updateLineColors = (
   lineColors: ColorString[],
   stateToUpdate: QueryUpdateState
-) => {
+): UpdateLineColorsAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateLineColors
@@ -151,13 +247,13 @@ export const updateLineColors = (
     payload: {
       lineColors,
     },
-  }
+  } as UpdateLineColorsAction
 }
 
 export const updateTimeFormat = (
   timeFormat: string,
   stateToUpdate: QueryUpdateState
-) => {
+): ChangeTimeFormatAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.ChangeTimeFormat
@@ -167,13 +263,13 @@ export const updateTimeFormat = (
     payload: {
       timeFormat,
     },
-  }
+  } as ChangeTimeFormatAction
 }
 
 export const updateDecimalPlaces = (
   decimalPlaces: DecimalPlaces,
   stateToUpdate: QueryUpdateState
-) => {
+): ChangeDecimalPlacesAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.ChangeDecimalPlaces
@@ -183,13 +279,13 @@ export const updateDecimalPlaces = (
     payload: {
       decimalPlaces,
     },
-  }
+  } as ChangeDecimalPlacesAction
 }
 
 export const updateFieldOptions = (
   fieldOptions: FieldOption[],
   stateToUpdate: QueryUpdateState
-) => {
+): UpdateFieldOptionsAction => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
       ? CEOActionType.UpdateFieldOptions
@@ -199,5 +295,5 @@ export const updateFieldOptions = (
     payload: {
       fieldOptions,
     },
-  }
+  } as UpdateFieldOptionsAction
 }

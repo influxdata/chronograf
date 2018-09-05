@@ -6,7 +6,7 @@ import {
   FieldOption,
   ThresholdType,
   TableOptions,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {DEState} from 'src/types/dataExplorer'
 
@@ -32,8 +32,8 @@ export enum ActionType {
   ChangeDecimalPlaces = 'DE_CHANGE_DECIMAL_PLACES',
   UpdateFieldOptions = 'DE_UPDATE_FIELD_OPTIONS',
   UpdateQueryDraft = 'DE_UPDATE_QUERY_DRAFT',
-  UpdateCellNote = 'DE_UPDATE_CELL_NOTE',
-  UpdateCellNoteVisibility = 'DE_UPDATE_CELL_NOTE_VISIBILITY',
+  UpdateNote = 'DE_UPDATE_NOTE',
+  UpdateNoteVisibility = 'DE_UPDATE_NOTE_VISIBILITY',
 }
 
 export type Action =
@@ -171,16 +171,16 @@ export interface UpdateFieldOptionsAction {
 }
 
 export interface UpdateCellNoteAction {
-  type: ActionType.UpdateCellNote
+  type: ActionType.UpdateNote
   payload: {
     note: string
   }
 }
 
 export interface UpdateCellNoteVisibilityAction {
-  type: ActionType.UpdateCellNoteVisibility
+  type: ActionType.UpdateNoteVisibility
   payload: {
-    noteVisibility: CellNoteVisibility
+    noteVisibility: NoteVisibility
   }
 }
 

@@ -79,7 +79,7 @@ import {
   FieldOption,
   ThresholdType,
   TableOptions,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 
 interface Props {
@@ -126,7 +126,7 @@ interface Props {
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
 }
 
 interface State {

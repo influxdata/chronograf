@@ -8,7 +8,7 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
 // Types
-import {CellNoteVisibility} from 'src/types/dashboards'
+import {NoteVisibility} from 'src/types/dashboards'
 
 // Utils
 import {humanizeNote} from 'src/dashboards/utils/notes'
@@ -18,9 +18,9 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
   onUpdateNote: (note: string) => void
-  onUpdateNoteVisibility: (noteVisibility: CellNoteVisibility) => void
+  onUpdateNoteVisibility: (noteVisibility: NoteVisibility) => void
 }
 
 interface State {
@@ -63,7 +63,7 @@ class CellNoteEditor extends Component<Props, State> {
             <SlideToggle
               size={ComponentSize.ExtraSmall}
               onChange={this.handleSlideToggle}
-              active={noteVisibility === CellNoteVisibility.ShowWhenNoData}
+              active={noteVisibility === NoteVisibility.ShowWhenNoData}
             />
             <label>Display note in cell when query returns no results</label>
           </div>
@@ -87,10 +87,10 @@ class CellNoteEditor extends Component<Props, State> {
   private handleSlideToggle = (): void => {
     const {noteVisibility, onUpdateNoteVisibility} = this.props
 
-    if (noteVisibility === CellNoteVisibility.Default) {
-      onUpdateNoteVisibility(CellNoteVisibility.ShowWhenNoData)
+    if (noteVisibility === NoteVisibility.Default) {
+      onUpdateNoteVisibility(NoteVisibility.ShowWhenNoData)
     } else {
-      onUpdateNoteVisibility(CellNoteVisibility.Default)
+      onUpdateNoteVisibility(NoteVisibility.Default)
     }
   }
 

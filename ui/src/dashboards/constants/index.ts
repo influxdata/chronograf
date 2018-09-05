@@ -9,7 +9,7 @@ import {
   DecimalPlaces,
   SourceItemValue,
   NewDefaultCell,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 
 export const UNTITLED_GRAPH: string = 'Untitled Graph'
@@ -70,7 +70,7 @@ export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   fieldOptions: DEFAULT_FIELD_OPTIONS,
   inView: true,
   note: '',
-  noteVisibility: CellNoteVisibility.Default,
+  noteVisibility: NoteVisibility.Default,
 }
 
 interface EmptyDefaultDashboardCell {

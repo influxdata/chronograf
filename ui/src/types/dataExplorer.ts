@@ -5,7 +5,7 @@ import {
   FieldOption,
   ThresholdType,
   TableOptions,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 
 // Write Data Modes
@@ -31,5 +31,5 @@ export interface DEState {
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
 }

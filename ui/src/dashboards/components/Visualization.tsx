@@ -14,7 +14,7 @@ import {
   DecimalPlaces,
   FieldOption,
   CellType,
-  CellNoteVisibility,
+  NoteVisibility,
 } from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
@@ -38,7 +38,7 @@ interface Props {
   staticLegend: boolean
   isInCEO: boolean
   note: string
-  noteVisibility: CellNoteVisibility
+  noteVisibility: NoteVisibility
   manualRefresh: number
   editorLocation?: QueryUpdateState
 }
