@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
-import {Dropdown} from 'src/shared/components/Dropdown'
+
+import {Dropdown} from 'src/reusable_ui'
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
 import {
   FORMAT_OPTIONS,
@@ -8,10 +9,6 @@ import {
   TIME_FORMAT_TOOLTIP_LINK,
 } from 'src/dashboards/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-
-interface TimeFormatOptions {
-  text: string
-}
 
 interface Props {
   timeFormat: string
@@ -27,6 +24,7 @@ interface State {
 class GraphOptionsTimeFormat extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
+
     this.state = {
       customFormat: false,
       format: this.props.timeFormat || DEFAULT_TIME_FORMAT,
@@ -43,12 +41,12 @@ class GraphOptionsTimeFormat extends PureComponent<Props, State> {
     this.setState({format})
   }
 
-  public handleChooseFormat = (formatOption: TimeFormatOptions) => {
-    if (formatOption.text === TIME_FORMAT_CUSTOM) {
+  public handleChooseFormat = (format: string) => {
+    if (format === TIME_FORMAT_CUSTOM) {
       this.setState({customFormat: true})
     } else {
-      this.onTimeFormatChange(formatOption.text)
-      this.setState({format: formatOption.text, customFormat: false})
+      this.onTimeFormatChange(format)
+      this.setState({format, customFormat: false})
     }
   }
 
@@ -56,7 +54,7 @@ class GraphOptionsTimeFormat extends PureComponent<Props, State> {
     const {format, customFormat} = this.state
     const tipContent = `For information on formatting, see <br/><a href="#">${TIME_FORMAT_TOOLTIP_LINK}</a>`
 
-    const formatOption = FORMAT_OPTIONS.find(op => op.text === format)
+    const formatOption = FORMAT_OPTIONS.find(op => op.format === format)
     const showCustom = !formatOption || customFormat
 
     return (
@@ -73,13 +71,20 @@ class GraphOptionsTimeFormat extends PureComponent<Props, State> {
           )}
         </label>
         <Dropdown
-          items={FORMAT_OPTIONS}
-          selected={showCustom ? TIME_FORMAT_CUSTOM : format}
-          buttonColor="btn-default"
-          buttonSize="btn-sm"
-          className="dropdown-stretch"
-          onChoose={this.handleChooseFormat}
-        />
+          selectedID={showCustom ? TIME_FORMAT_CUSTOM : format}
+          onChange={this.handleChooseFormat}
+          customClass="dropdown-stretch"
+        >
+          {FORMAT_OPTIONS.map(({text, format: optionFormat}) => (
+            <Dropdown.Item
+              key={optionFormat}
+              id={optionFormat}
+              value={optionFormat}
+            >
+              {text ? text : optionFormat}
+            </Dropdown.Item>
+          ))}
+        </Dropdown>
         {showCustom && (
           <input
             type="text"
