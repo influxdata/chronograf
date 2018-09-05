@@ -68,7 +68,7 @@ $dash-graph-options-arrow: 8px;
   ------------------------------------------------------
 */
 
-.cell-shell {
+%cell-styles {
   background-color: $g3-castle;
   border-radius: $radius;
   border: 2px solid $g3-castle;
@@ -77,7 +77,7 @@ $dash-graph-options-arrow: 8px;
 
 .dashboard {
   .react-grid-item {
-    @extend .cell-shell;
+    @extend %cell-styles;
   }
   .graph-empty {
     background-color: transparent;
@@ -557,44 +557,3 @@ $dash-graph-options-arrow: 8px;
     }
   }
 }
-
-/*
-  Dashboard Empty State
-  ------------------------------------------------------
-*/
-
-@import '../components/dashboard-empty';
-/*
-  Template Control Bar
-  ------------------------------------------------------
-*/
-
-@import '../components/template-control-bar';
-/*
-  Cell Editor Overlay
-  ------------------------------------------------------
-*/
-
-@import 'cell-editor-overlay';
-/*
-  Template Variables Manager
-  ------------------------------------------------------
-*/
-
-@import '../components/template-variables-manager';
-/*
-  Edit Template Variable
-  ------------------------------------------------------
-*/
-
-@import '../components/edit-template-variable';
-/*
-  Write Data Form
-  ------------------------------------------------------
-*/
-
-@import '../components/write-data-form';
-
-@import '../components/annotation-control-bar';
-
-@import '../components/annotation-editor';

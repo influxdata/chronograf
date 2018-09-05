@@ -91,7 +91,12 @@
 @import '../logs/components/logs_message/LogsMessage';
 @import '../logs/components/expandable_message/ExpandableMessage';
 @import '../dashboards/components/import_dashboard_mappings/ImportDashboardMappings.scss';
-
+@import 'components/dashboard-empty';
+@import 'components/template-control-bar';
+@import 'components/edit-template-variable';
+@import 'components/write-data-form';
+@import 'components/annotation-control-bar';
+@import 'components/annotation-editor';
 
 // Reusable UI Components
 @import '../reusable_ui/components/panel/Panel.scss';
