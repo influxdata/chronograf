@@ -375,6 +375,7 @@ func (s *Server) Serve(ctx context.Context) error {
 		Basepath:      s.Basepath,
 		StatusFeedURL: s.StatusFeedURL,
 		CustomLinks:   s.CustomLinks,
+		PprofEnabled:  s.PprofEnabled,
 	}, service)
 
 	// Add chronograf's version header to all requests
