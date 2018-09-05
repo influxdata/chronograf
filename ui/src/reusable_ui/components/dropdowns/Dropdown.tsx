@@ -45,7 +45,6 @@ class Dropdown extends Component<Props, State> {
     buttonColor: ComponentColor.Default,
     buttonSize: ComponentSize.Small,
     status: ComponentStatus.Default,
-    widthPixels: 120,
     wrapText: false,
     maxMenuHeight: 250,
     menuColor: DropdownMenuColors.Sapphire,
@@ -64,7 +63,8 @@ class Dropdown extends Component<Props, State> {
   }
 
   public render() {
-    const width = `${this.props.widthPixels}px`
+    const {widthPixels} = this.props
+    const width = widthPixels ? `${widthPixels}px` : '100%'
 
     this.validateChildCount()
 
@@ -178,14 +178,20 @@ class Dropdown extends Component<Props, State> {
   private get menuStyle(): CSSProperties {
     const {wrapText, widthPixels} = this.props
 
-    if (wrapText) {
+    let containerWidth = '100%'
+
+    if (widthPixels) {
+      containerWidth = `${widthPixels}px`
+    }
+
+    if (wrapText && widthPixels) {
       return {
-        width: `${widthPixels}px`,
+        width: containerWidth,
       }
     }
 
     return {
-      minWidth: `${widthPixels}px`,
+      minWidth: containerWidth,
     }
   }
 
