@@ -43,15 +43,17 @@ export const DEFAULT_TABLE_OPTIONS = {
 export const DEFAULT_TIME_FORMAT: string = 'MM/DD/YYYY HH:mm:ss'
 export const TIME_FORMAT_CUSTOM: string = 'Custom'
 
-export const FORMAT_OPTIONS: Array<{text: string}> = [
-  {text: DEFAULT_TIME_FORMAT},
-  {text: 'MM/DD/YYYY HH:mm:ss.SSS'},
-  {text: 'YYYY-MM-DD HH:mm:ss'},
-  {text: 'HH:mm:ss'},
-  {text: 'HH:mm:ss.SSS'},
-  {text: 'MMMM D, YYYY HH:mm:ss'},
-  {text: 'dddd, MMMM D, YYYY HH:mm:ss'},
-  {text: TIME_FORMAT_CUSTOM},
+export const FORMAT_OPTIONS: Array<{text?: string; format: string}> = [
+  {format: DEFAULT_TIME_FORMAT},
+  {format: 'MM/DD/YYYY HH:mm:ss.SSS'},
+  {format: 'YYYY-MM-DD HH:mm:ss'},
+  {format: 'HH:mm:ss'},
+  {format: 'HH:mm:ss.SSS'},
+  {format: 'MMMM D, YYYY HH:mm:ss'},
+  {format: 'dddd, MMMM D, YYYY HH:mm:ss'},
+  {format: 'X', text: 'Unix Time'},
+  {format: 'x', text: 'Unix Time (milliseconds)'},
+  {format: TIME_FORMAT_CUSTOM},
 ]
 
 export const DEFAULT_FIELD_OPTIONS = [DEFAULT_TIME_FIELD]

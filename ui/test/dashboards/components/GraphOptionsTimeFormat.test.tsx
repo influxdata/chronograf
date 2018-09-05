@@ -3,7 +3,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 
 import GraphOptionsTimeFormat from 'src/dashboards/components/GraphOptionsTimeFormat'
-import {Dropdown} from 'src/shared/components/Dropdown'
+import {Dropdown} from 'src/reusable_ui'
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
 import {
   TIME_FORMAT_CUSTOM,
@@ -61,7 +61,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
         const label = wrapper.find('label')
         const link = label.find('a')
 
-        expect(dropdown.prop('selected')).toBe(TIME_FORMAT_CUSTOM)
+        expect(dropdown.prop('selectedID')).toBe(TIME_FORMAT_CUSTOM)
         expect(input.exists()).toBe(true)
         expect(input.prop('value')).toBe(timeFormat)
         expect(link.exists()).toBe(true)
@@ -76,7 +76,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
         it('sets the state custom format to true', () => {
           const instance = setup().instance() as GraphOptionsTimeFormat
 
-          instance.handleChooseFormat({text: TIME_FORMAT_CUSTOM})
+          instance.handleChooseFormat(TIME_FORMAT_CUSTOM)
           expect(instance.state.customFormat).toBe(true)
         })
       })
@@ -88,7 +88,7 @@ describe('Dashboards.Components.GraphOptionsTimeFormat', () => {
             onTimeFormatChange,
           }).instance() as GraphOptionsTimeFormat
 
-          instance.handleChooseFormat({text: 'blah'})
+          instance.handleChooseFormat('blah')
           expect(instance.state.customFormat).toBe(false)
           expect(onTimeFormatChange).toBeCalledWith('blah')
           expect(onTimeFormatChange).toHaveBeenCalledTimes(1)

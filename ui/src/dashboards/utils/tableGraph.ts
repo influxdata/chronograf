@@ -43,6 +43,7 @@ const calculateTimeColumnWidth = (timeFormat: string): number => {
   timeFormat = _.replace(timeFormat, 'A', 'AM')
   timeFormat = _.replace(timeFormat, 'h', '00')
   timeFormat = _.replace(timeFormat, 'X', '1522286058')
+  timeFormat = _.replace(timeFormat, 'x', '1536106867461')
 
   const width = calculateSize(timeFormat)
 
