@@ -140,7 +140,10 @@ class LogsPage extends Component<Props, State> {
 
     let {searchStatus} = state
 
-    if (isEmptyInfiniteData(tableInfiniteData)) {
+    if (
+      isEmptyInfiniteData(tableInfiniteData) &&
+      searchStatus !== SearchStatus.Loading
+    ) {
       searchStatus = SearchStatus.NoResults
     } else if (searchStatus === SearchStatus.None) {
       searchStatus = SearchStatus.Loaded
@@ -186,7 +189,7 @@ class LogsPage extends Component<Props, State> {
     this.props.getConfig(this.logConfigLink)
 
     if (this.props.currentNamespace) {
-      this.fetchNewDataset()
+      this.fetchSearchDataset(SearchStatus.Loading)
     }
 
     if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {

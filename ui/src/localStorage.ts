@@ -67,6 +67,7 @@ export const saveToLocalStorage = ({
       'tableData',
       'histogramData',
       'queryCount',
+      'tableInfiniteData',
     ])
 
     window.localStorage.setItem(
@@ -84,7 +85,7 @@ export const saveToLocalStorage = ({
           histogramData: [],
           tableData: {},
           queryCount: 0,
-          tableInfiniteData: minimalLogs.tableInfiniteData || {},
+          tableInfiniteData: {},
           tableTime: minimalLogs.tableTime || {},
         },
       })
