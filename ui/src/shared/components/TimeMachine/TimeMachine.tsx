@@ -204,18 +204,18 @@ class TimeMachine extends PureComponent<Props, State> {
     autoRefresher.poll(autoRefreshDuration)
 
     try {
-      this.debouncedASTResponse(script)
-    } catch (error) {
-      console.error('Could not retrieve AST for script', error)
-    }
-
-    try {
       const suggestions = await getSuggestions(fluxLinks.suggestions)
       this.setState({suggestions})
     } catch (error) {
       console.error('Could not get function suggestions: ', error)
     }
+
     if (this.isFluxSource) {
+      try {
+        this.debouncedASTResponse(script)
+      } catch (error) {
+        console.error('Could not retrieve AST for script', error)
+      }
       this.getTimeSeries()
     }
   }

@@ -44,7 +44,6 @@ import {
   State as DEState,
   ActionType as DEActionType,
 } from 'src/data_explorer/actions/queries'
-import {ActionTypes as FluxActionType} from 'src/flux/actions'
 
 type State = CEOState & DEState
 type GetState = () => State
@@ -70,7 +69,7 @@ interface UpdateQueryStatusAction {
 }
 
 interface UpdateScriptAction {
-  type: FluxActionType.UpdateScript | DEActionType.UpdateScript
+  type: CEOActionType.UpdateScript | DEActionType.UpdateScript
   payload: {script: string}
 }
 
@@ -131,7 +130,7 @@ export const updateScript = (
 ) => {
   const type =
     stateToUpdate === QueryUpdateState.CEO
-      ? FluxActionType.UpdateScript
+      ? CEOActionType.UpdateScript
       : DEActionType.UpdateScript
 
   return {

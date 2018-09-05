@@ -38,6 +38,7 @@ export enum ActionType {
   UpdateCellNote = 'UPDATE_CELL_NOTE',
   UpdateCellNoteVisibility = 'UPDATE_CELL_NOTE_VISIBILITY',
   UpdateEditorTimeRange = 'UPDATE_EDITOR_TIME_RANGE',
+  UpdateScript = 'UPDATE_SCRIPT',
 }
 
 export type Action =
@@ -58,6 +59,7 @@ export type Action =
   | UpdateCellNoteAction
   | UpdateCellNoteVisibilityAction
   | UpdateEditorTimeRangeAction
+  | UpdateScriptAction
 
 export interface LoadCEOAction {
   type: ActionType.LoadCEO
@@ -180,6 +182,13 @@ export interface UpdateEditorTimeRangeAction {
   type: ActionType.UpdateEditorTimeRange
   payload: {
     timeRange: TimeRange
+  }
+}
+
+export interface UpdateScriptAction {
+  type: ActionType.UpdateScript
+  payload: {
+    script: string
   }
 }
 

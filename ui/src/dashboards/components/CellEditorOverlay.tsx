@@ -20,6 +20,7 @@ import {
   addQueryAsync,
   deleteQueryAsync,
   updateEditorTimeRange as updateEditorTimeRangeAction,
+  updateScript,
 } from 'src/shared/actions/queries'
 import {editCellQueryStatus} from 'src/dashboards/actions'
 
@@ -36,7 +37,6 @@ import * as SourcesModels from 'src/types/sources'
 import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell, ThresholdType} from 'src/types/dashboards'
-import {UpdateScript} from 'src/flux/actions'
 import {Links, ScriptStatus} from 'src/types/flux'
 
 const staticLegend: DashboardsModels.Legend = {
@@ -69,7 +69,7 @@ interface Props {
   queryConfigActions: QueryConfigActions
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
-  updateScript: UpdateScript
+  updateScript: typeof updateScript
   updateEditorTimeRange: typeof updateEditorTimeRangeAction
 }
 
@@ -122,7 +122,6 @@ class CellEditorOverlay extends Component<Props, State> {
       timeRange,
       updateEditorTimeRange,
       updateQueryDrafts,
-      updateScript,
       queryStatus,
     } = this.props
 
@@ -140,7 +139,7 @@ class CellEditorOverlay extends Component<Props, State> {
           notify={notify}
           script={script}
           queryDrafts={queryDrafts}
-          updateScript={updateScript}
+          updateScript={this.props.updateScript}
           editQueryStatus={editQueryStatus}
           templates={templates}
           timeRange={timeRange}
@@ -193,6 +192,7 @@ class CellEditorOverlay extends Component<Props, State> {
         'queryConfig',
         null
       )
+
       return (
         (!!queryConfig.measurement &&
           !!queryConfig.database &&
@@ -262,7 +262,7 @@ class CellEditorOverlay extends Component<Props, State> {
     if (_.get(currentService, 'type', '') === 'flux') {
       queries = [
         {
-          query: script.replace(/\s/g, ''),
+          query: script,
           queryConfig: null,
           source: currentService.links.self,
         },

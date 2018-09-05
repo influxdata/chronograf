@@ -1,8 +1,6 @@
 import React from 'react'
 import {shallow} from 'enzyme'
-
 import {FluxPage} from 'src/flux/containers/FluxPage'
-import {ActionTypes} from 'src/flux/actions'
 import {source} from 'test/resources'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
@@ -26,7 +24,7 @@ const setup = () => {
     },
     updateScript: (script: string) => {
       return {
-        type: ActionTypes.UpdateScript,
+        type: 'UPDATE_SCRIPT',
         payload: {
           script,
         },
