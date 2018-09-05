@@ -7,7 +7,7 @@ import {LoadingMessages} from 'src/logs/constants'
 
 interface Props {
   status: SearchStatus
-  nextOlderUpperBound: string
+  nextOlderUpperBound: number
 }
 
 class LoadingStatus extends PureComponent<Props> {

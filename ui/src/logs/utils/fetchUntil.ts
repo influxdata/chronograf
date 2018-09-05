@@ -17,13 +17,20 @@ export function fetchUntil<T>(
     cancel() {
       isCanceled = true
     },
+    isCanceled,
   }
 }
 
 const fetchEachAsync = async requestsIterator => {
   for (const response of requestsIterator) {
-    await response
+    try {
+      console.log('fetchEachAsync')
+      await response
+    } catch (error) {
+      console.error(error)
+    }
   }
+  console.log('fetchEachAsync FINISHED')
 }
 
 function* fetchUnless<T>(

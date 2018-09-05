@@ -87,7 +87,7 @@ export enum ActionTypes {
   ClearTableData = 'CLEAR_TABLE_DATA',
   SetNextOlderUpperBound = 'SET_NEXT_OLDER_UPPER_BOUND',
   SetNextNewerUpperBound = 'SET_NEXT_NEWER_UPPER_BOUND',
-  SetNextTailLowerBound = 'SET_NEXT_NEWER_LOWER_BOUND',
+  SetNextTailLowerBound = 'SET_NEXT_TAIL_LOWER_BOUND',
   SetSearchStatus = 'SET_SEARCH_STATUS',
 }
 
@@ -735,7 +735,7 @@ export const fetchNewerChunkAsync = () => async (
   }
 }
 
-export const fetchLogsTailAsync = () => async (
+export const fetchTailAsync = () => async (
   dispatch: Dispatch<
     | SetTableBackwardDataAction
     | SetTableForwardDataAction
@@ -744,7 +744,7 @@ export const fetchLogsTailAsync = () => async (
   getState: GetState
 ): Promise<void> => {
   const state = getState()
-
+  
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -754,6 +754,7 @@ export const fetchLogsTailAsync = () => async (
 
   if (_.every(params)) {
     const nextTailLowerBound = getNextTailLowerBound(state)
+    console.log('fetchTailAsync nextTailLowerBound', nextTailLowerBound)
     if (!nextTailLowerBound) {
       throw new Error('nextTailLowerBound is not set')
     }

@@ -76,7 +76,9 @@ interface Props {
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
   searchStatus: SearchStatus
-  nextOlderUpperBound: string
+  nextOlderUpperBound: number | undefined
+  nextNewerLowerBound: number | undefined
+  nextTailLowerBound: number | undefined
 }
 
 interface State {
@@ -90,8 +92,6 @@ interface State {
   visibleColumnsCount: number
   searchPattern: string
   infiniteLoaderQueryCount: number
-  nextOlderUpperBound: string
-  nextOlderLowerBound: string
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -212,7 +212,6 @@ class LogsTable extends Component<Props, State> {
     if (this.headerGrid.current) {
       this.headerGrid.current.recomputeGridSize()
     }
-    console.log('LogsTable mounted')
   }
 
   public componentWillUnmount() {
@@ -223,7 +222,8 @@ class LogsTable extends Component<Props, State> {
     const {
       queryCount,
       nextOlderUpperBound,
-      nextOlderLowerBound,
+      nextNewerLowerBound,
+      nextTailLowerBound,
       searchStatus,
     } = this.props
     const {infiniteLoaderQueryCount} = this.state
@@ -243,8 +243,8 @@ class LogsTable extends Component<Props, State> {
             count={this.rowCount()}
             queryCount={infiniteLoaderQueryCount + queryCount}
             searchStatus={searchStatus}
-            nextOlderUpperBound={nextOlderUpperBound}
-            nextOlderLowerBound={nextOlderLowerBound}
+            upper={nextOlderUpperBound}
+            lower={nextNewerLowerBound || nextTailLowerBound} // works as long as the other value is cleared when switching
           />
         </div>
         <AutoSizer>
@@ -415,7 +415,7 @@ class LogsTable extends Component<Props, State> {
     try {
       this.incrementLoaderQueryCount()
       this.setState({firstQueryTime: firstTime})
-      await this.props.fetchNewer(moment(firstTime).toISOString())
+      await this.props.fetchNewer()
     } finally {
       this.decrementLoaderQueryCount()
     }
@@ -446,7 +446,7 @@ class LogsTable extends Component<Props, State> {
     try {
       this.incrementLoaderQueryCount()
       this.setState({lastQueryTime: lastTime})
-      await this.props.fetchMore(moment(lastTime).toISOString())
+      await this.props.fetchMore()
     } finally {
       this.decrementLoaderQueryCount()
     }

@@ -21,12 +21,12 @@ const MAX_FETCH_COUNT = 50
 
 const NEWER_CHUNK_OPTIONS = {
   maxFetchCount: MAX_FETCH_COUNT,
-  chunkSize: NEWER_CHUNK_SIZE_LIMIT
+  chunkSize: NEWER_CHUNK_SIZE_LIMIT,
 }
 
 const OLDER_CHUNK_OPTIONS = {
   maxFetchCount: MAX_FETCH_COUNT,
-  chunkSize: OLDER_CHUNK_SIZE_LIMIT
+  chunkSize: OLDER_CHUNK_SIZE_LIMIT,
 }
 
 import {
@@ -44,7 +44,7 @@ import {
   changeFilter,
   fetchOlderChunkAsync,
   fetchNewerChunkAsync,
-  fetchLogsTailAsync,
+  fetchTailAsync,
   setNextTailLowerBound,
   setNextOlderUpperBound,
   setNextNewerUpperBound,
@@ -138,13 +138,14 @@ interface Props {
   }
   fetchOlderChunkAsync: () => Promise<void>
   fetchNewerChunkAsync: typeof fetchNewerChunkAsync
-  fetchLogsTailAsync: () => Promise<void>
+  fetchTailAsync: () => Promise<void>
   setNextTailLowerBound: typeof setNextTailLowerBound
   setNextNewerUpperBound: typeof setNextNewerUpperBound
   setNextOlderUpperBound: typeof setNextOlderUpperBound
   executeHistogramQueryAsync: typeof executeHistogramQueryAsync
-  nextOlderUpperBound: string
-  nextNewerLowerBound: string
+  nextOlderUpperBound: number | undefined
+  nextNewerLowerBound: number | undefined
+  nextTailLowerBound: number | undefined
   searchStatus: SearchStatus
   clearSearchData: (searchStatus: SearchStatus) => void
   setSearchStatus: (SearchStatus: SearchStatus) => void
@@ -177,7 +178,8 @@ class LogsPageSimple extends Component<Props, State> {
 
   private interval: number
   private loadingNewer: boolean = false
-  private currentPendingChunk: FetchLoop
+  private currentOlderChunksGenerator: FetchLoop = null
+  private currentNewerChunksGenerator: FetchLoop = null
 
   constructor(props: Props) {
     super(props)
@@ -235,6 +237,7 @@ class LogsPageSimple extends Component<Props, State> {
       notify,
       nextOlderUpperBound,
       nextNewerLowerBound,
+      nextTailLowerBound,
       searchStatus,
     } = this.props
 
@@ -247,8 +250,8 @@ class LogsPageSimple extends Component<Props, State> {
               count={this.histogramTotal}
               queryCount={queryCount}
               searchStatus={searchStatus}
-              nextOlderUpperBound={nextOlderUpperBound}
-              nextNewerLowerBound={nextNewerLowerBound}
+              // upper={timeRangeUpper}
+              // lower={timeRangeLower}
             />
             <LogsGraphContainer>{this.chart}</LogsGraphContainer>
             <SearchBar onSearch={this.handleSubmitSearch} />
@@ -282,6 +285,7 @@ class LogsPageSimple extends Component<Props, State> {
               filters={filters}
               nextOlderUpperBound={nextOlderUpperBound}
               nextNewerLowerBound={nextNewerLowerBound}
+              nextTailLowerBound={nextTailLowerBound}
             />
           </div>
         </div>
@@ -291,7 +295,10 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleLoadingStatus() {
-    if (!this.isClearing && !isEmptyInfiniteData(this.props.tableInfiniteData)) {
+    if (
+      !this.isClearing &&
+      !isEmptyInfiniteData(this.props.tableInfiniteData)
+    ) {
       this.props.setSearchStatus(SearchStatus.Loaded)
     }
   }
@@ -312,7 +319,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private startLogsTailFetchingInterval = () => {
-    this.cancelTailingPoll()
+    this.clearTailInterval()
 
     const now = moment()
       .utc()
@@ -327,19 +334,20 @@ class LogsPageSimple extends Component<Props, State> {
     this.setState({liveUpdating: true})
   }
 
-
   // only happens on page load or on search
   private handleTailFetchingInterval = async () => {
+    console.log('handleTailFetchingInterval')
     if (this.isClearing) {
-      return 
+      return
     }
 
     this.props.executeHistogramQueryAsync()
-    await this.fetchLogsTail()
+    await this.fetchTail()
   }
 
-  private fetchLogsTail = async () => {
-    await this.props.fetchLogsTailAsync()
+  private fetchTail = async () => {
+    console.log('fetchTail')
+    await this.props.fetchTailAsync()
   }
 
   private fetchNewerChunk = async (): Promise<void> => {
@@ -373,64 +381,88 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchOlderChunk = async () => {
+    console.log('fetchOlderChunk')
     await this.props.fetchOlderChunkAsync()
   }
 
   private handleFetchOlderChunk = async () => {
-    this.clearCurrentPendingChunk()
+    console.log('handleFetchOlderChunk')
+    if (this.currentOlderChunksGenerator) {
+      return
+    }
     this.startFetchingOlder()
-
-    await this.handleCurrentChunk()
   }
-
 
   private handleFetchNewerChunk = async () => {
-    if (this.isLiveUpdating) {
-      return 
+    if (this.isLiveUpdating || this.shouldLiveUpdate) {
+      return
     }
 
-    this.clearCurrentPendingChunk()
+console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
     this.startFetchingNewer()
-
-    await this.handleCurrentChunk()
   }
 
-  private startFetchingNewer() {
-    const chunkOptions = {
-      ...OLDER_CHUNK_OPTIONS, 
-      getCurrentSize: this.totalForwardValues
+  private startFetchingNewer = async () => {
+    if (this.currentNewerChunksGenerator) {
+      return
     }
 
-    this.currentPendingChunk = fetchChunk(this.fetchNewerChunk, chunkOptions)
-  }
-
-  private startFetchingOlder() {
     const chunkOptions = {
-      ...NEWER_CHUNK_OPTIONS, 
-      getCurrentSize: this.totalBackwardValues
+      ...NEWER_CHUNK_OPTIONS,
+      getCurrentSize: this.totalForwardValues,
     }
 
-    this.currentPendingChunk = fetchChunk(this.fetchOlderChunk, chunkOptions)
-  }
+    this.currentNewerChunksGenerator = fetchChunk(
+      this.fetchNewerChunk,
+      chunkOptions
+    )
 
-  private handleCurrentChunk = async () => {
+    console.log('await this.currentNewerChunksGenerator')
     try {
-      await this.currentPendingChunk.promise
-    } finally {
-      this.clearCurrentPendingChunk()
+      await this.currentNewerChunksGenerator.promise
+    } catch (error) {
+      console.error(error)
     }
+    console.log(
+      'handleChunksGeneratorCompleted this.currentNewerChunksGenerator()'
+    )
+    if (!this.currentNewerChunksGenerator.isCanceled) {
+      console.log('* clearCurrentNewerChunksGenerator.cancel()')
+      this.currentNewerChunksGenerator.cancel()
+    }
+    this.currentNewerChunksGenerator = null
   }
 
-  private clearCurrentPendingChunk() {
-    if (this.currentPendingChunk) {
-      if (!this.currentPendingChunk.isCanceled) {
-        this.currentPendingChunk.cancel()
-      }
-      this.currentPendingChunk = null
+  private startFetchingOlder = async () => {
+    console.log('startFetchingOlder')
+
+    const chunkOptions = {
+      ...OLDER_CHUNK_OPTIONS,
+      getCurrentSize: this.totalBackwardValues,
     }
+
+    this.currentOlderChunksGenerator = fetchChunk(
+      this.fetchOlderChunk,
+      chunkOptions
+    )
+
+    console.log('handleChunksGeneratorCompleted')
+    try {
+      await this.currentOlderChunksGenerator.promise
+    } catch (error) {
+      console.error(error)
+    }
+    console.log(
+      'handleChunksGeneratorCompleted this.currentOlderChunksGenerator()'
+    )
+    if (!this.currentOlderChunksGenerator.isCanceled) {
+      console.log('* clearCurrentOlderChunksGenerator.cancel()')
+      this.currentOlderChunksGenerator.cancel()
+    }
+    this.currentOlderChunksGenerator = null
   }
 
-  private cancelTailingPoll = () => {
+  private clearTailInterval = () => {
     if (this.interval) {
       clearInterval(this.interval)
       this.interval = null
@@ -501,6 +533,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private clearAllBounds(): void {
+    console.log('clearAllBounds)')
     this.props.setNextNewerUpperBound(undefined)
     this.props.setNextOlderUpperBound(undefined)
     this.props.setNextTailLowerBound(undefined)
@@ -534,19 +567,16 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleScrollToTop = () => {
-    const shouldLiveUpdate = this.props.tableTime.relative === 0
-
-    if (!this.state.liveUpdating && shouldLiveUpdate) {
+    if (!this.isLiveUpdating && this.shouldLiveUpdate) {
       this.startLogsTailFetchingInterval()
-    } else {
-      this.handleFetchNewerChunk()
     }
   }
 
   private handleVerticalScroll = () => {
-    if (this.state.liveUpdating) {
-      this.cancelTailingPoll()
+    if (this.isLiveUpdating) {
+      this.clearTailInterval()
     }
+    console.log('handleVerticalScroll')
 
     this.setState({liveUpdating: false, hasScrolled: true})
   }
@@ -712,7 +742,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     if (liveUpdating === true) {
       this.setState({liveUpdating: false})
-      this.cancelTailingPoll()
+      this.clearTailInterval()
     } else {
       this.handleChooseRelativeTime(NOW)
     }
@@ -788,20 +818,15 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private updateTableData(searchStatus) {
-    this.clearCurrentPendingChunk()
     this.props.clearSearchData(searchStatus)
   }
 
   private fetchNewDataset() {
-    console.log('fetchNewDataset')
     this.setState({olderChunkSizeLimit: OLDER_CHUNK_SIZE_LIMIT})
 
     const shouldLiveUpdate = this.props.tableTime.relative === 0
-    console.log('shouldLiveUpdate', shouldLiveUpdate)
-    console.log('this.props.tableTime.relative', this.props.tableTime.relative)
-    console.log('this.props.tableTime.custom', this.props.tableTime.custom)
-    console.log('IS LIVE', this.state.liveUpdating)
-    if (this.state.liveUpdating) {
+    if (this.isLiveUpdating && shouldLiveUpdate) {
+      console.log('fetchNewDataset startLogsTailFetchingInterval')
       this.startLogsTailFetchingInterval()
     }
 
@@ -888,7 +913,11 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private get isLiveUpdating(): boolean {
-    return this.state.liveUpdating
+    return !!this.state.liveUpdating
+  }
+
+  private get shouldLiveUpdate(): boolean {
+    return this.props.tableTime.relative === 0
   }
 }
 
@@ -911,7 +940,8 @@ const mapStateToProps = ({
     tableTime,
     tableInfiniteData,
     nextOlderUpperBound,
-    nextNewerLowerBound
+    nextNewerLowerBound,
+    nextTailLowerBound,
     searchStatus,
   },
 }) => ({
@@ -931,6 +961,7 @@ const mapStateToProps = ({
   newRowsAdded,
   nextOlderUpperBound,
   nextNewerLowerBound,
+  nextTailLowerBound,
   searchStatus,
 })
 
@@ -950,7 +981,7 @@ const mapDispatchToProps = {
   changeFilter,
   fetchOlderChunkAsync,
   fetchNewerChunkAsync,
-  fetchLogsTailAsync,
+  fetchTailAsync,
   setNextTailLowerBound,
   setNextOlderUpperBound,
   setNextNewerUpperBound,
