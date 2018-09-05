@@ -7,6 +7,7 @@ import {AutoSizer} from 'react-virtualized'
 import {withRouter, InjectedRouter} from 'react-router'
 
 import {searchToFilters} from 'src/logs/utils/search'
+import {fetchChunk} from 'src/logs/utils/fetchChunk'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 import {Greys} from 'src/reusable_ui/types'
@@ -16,6 +17,17 @@ const NOW = 0
 const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
 const NEWER_CHUNK_SIZE_LIMIT = 20
 const OLDER_CHUNK_SIZE_LIMIT = 100
+const MAX_FETCH_COUNT = 50
+
+const NEWER_CHUNK_OPTIONS = {
+  maxFetchCount: MAX_FETCH_COUNT,
+  chunkSize: NEWER_CHUNK_SIZE_LIMIT
+}
+
+const OLDER_CHUNK_OPTIONS = {
+  maxFetchCount: MAX_FETCH_COUNT,
+  chunkSize: OLDER_CHUNK_SIZE_LIMIT
+}
 
 import {
   setTableCustomTimeAsync,
@@ -77,6 +89,7 @@ import {
   TimeMarker,
   TimeBounds,
   SearchStatus,
+  FetchLoop,
 } from 'src/types/logs'
 import {
   applyChangesToTableData,
@@ -164,6 +177,7 @@ class LogsPageSimple extends Component<Props, State> {
 
   private interval: number
   private loadingNewer: boolean = false
+  private currentPendingChunk: FetchLoop
 
   constructor(props: Props) {
     super(props)
@@ -184,33 +198,14 @@ class LogsPageSimple extends Component<Props, State> {
     // if (!this.props.sources || this.props.sources.length === 0) {
     //   return router.push(`/sources/new?redirectPath=${location.pathname}`)
     // }
-    if (
-      this.isLiveUpdating === false ||
-      (this.isClearingSearch && this.interval)
-    ) {
-      clearInterval(this.interval)
-      this.interval = null
-    }
+    this.handleLoadingStatus()
+
     const isSearchStatusUpdated =
       prevProps.searchStatus !== this.props.searchStatus
-    const {searchStatus, tableInfiniteData} = this.props
+    const isPrevSearchCleared = prevProps.searchStatus === SearchStatus.Cleared
 
-    switch (searchStatus) {
-      case SearchStatus.Clearing:
-      case SearchStatus.Loaded:
-        break
-      default:
-        if (!isEmptyInfiniteData(tableInfiniteData)) {
-          this.props.setSearchStatus(SearchStatus.Loaded)
-        }
-    }
-
-    if (isSearchStatusUpdated) {
-      const isCleared = prevProps.searchStatus === SearchStatus.Cleared
-
-      if (isCleared) {
-        this.fetchNewDataset()
-      }
+    if (isSearchStatusUpdated && isPrevSearchCleared) {
+      this.fetchNewDataset()
     }
   }
 
@@ -295,6 +290,12 @@ class LogsPageSimple extends Component<Props, State> {
     )
   }
 
+  private handleLoadingStatus() {
+    if (!this.isClearing && !isEmptyInfiniteData(this.props.tableInfiniteData)) {
+      this.props.setSearchStatus(SearchStatus.Loaded)
+    }
+  }
+
   private setCurrentSource = async () => {
     if (!this.props.currentSource && this.props.sources.length > 0) {
       const source =
@@ -311,16 +312,12 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private startLogsTailFetchingInterval = () => {
-    console.log('startLogsTailFetchingInterval')
-    if (this.interval) {
-      clearInterval(this.interval)
-    }
+    this.cancelTailingPoll()
 
     const now = moment()
       .utc()
       .valueOf()
     this.props.setNextTailLowerBound(now)
-    console.log('handleTailFetchingInterval now', now)
 
     this.interval = window.setInterval(
       this.handleTailFetchingInterval,
@@ -330,137 +327,112 @@ class LogsPageSimple extends Component<Props, State> {
     this.setState({liveUpdating: true})
   }
 
+
   // only happens on page load or on search
   private handleTailFetchingInterval = async () => {
-    switch (this.props.searchStatus) {
-      case SearchStatus.Clearing:
-      case SearchStatus.None:
-        return
+    if (this.isClearing) {
+      return 
     }
 
-    console.log('handleTailFetchingInterval')
     this.props.executeHistogramQueryAsync()
     await this.fetchLogsTail()
   }
 
   private fetchLogsTail = async () => {
-    console.log('fetchLogsTail')
     await this.props.fetchLogsTailAsync()
   }
 
-  private fetchNewerChunk = async () => {
+  private fetchNewerChunk = async (): Promise<void> => {
+    await this.props.fetchNewerChunkAsync()
+  }
+
+  private get isClearing(): boolean {
     switch (this.props.searchStatus) {
       case SearchStatus.Clearing:
       case SearchStatus.None:
-        return
+        return true
     }
 
-    const totalForwardValues = getDeep<number | null>(
+    return false
+  }
+
+  private totalForwardValues = (): number => {
+    return getDeep<number | null>(
       this.props,
       'tableInfiniteData.forward.values.length',
       null
     )
+  }
 
-    await this.props.fetchNewerChunkAsync()
-
-    if (
-      totalForwardValues !== null &&
-      totalForwardValues < this.newerChunkSizeLimit
-    ) {
-      await this.fetchNewerChunk()
-    }
+  private totalBackwardValues = (): number => {
+    return getDeep<number | null>(
+      this.props,
+      'tableInfiniteData.backward.values.length',
+      null
+    )
   }
 
   private fetchOlderChunk = async () => {
-    switch (this.props.searchStatus) {
-      case SearchStatus.Clearing:
-      case SearchStatus.None:
-        return
-    }
-
-    const totalBackwardValues = getDeep<number | null>(
-      this.props,
-      'tableInfiniteData.backward.values.length',
-      null
-    )
-
     await this.props.fetchOlderChunkAsync()
+  }
 
-    if (
-      totalBackwardValues !== null &&
-      totalBackwardValues < this.olderChunkSizeLimit
-    ) {
-      await this.fetchOlderChunk()
+  private handleFetchOlderChunk = async () => {
+    this.clearCurrentPendingChunk()
+    this.startFetchingOlder()
+
+    await this.handleCurrentChunk()
+  }
+
+
+  private handleFetchNewerChunk = async () => {
+    if (this.isLiveUpdating) {
+      return 
+    }
+
+    this.clearCurrentPendingChunk()
+    this.startFetchingNewer()
+
+    await this.handleCurrentChunk()
+  }
+
+  private startFetchingNewer() {
+    const chunkOptions = {
+      ...OLDER_CHUNK_OPTIONS, 
+      getCurrentSize: this.totalForwardValues
+    }
+
+    this.currentPendingChunk = fetchChunk(this.fetchNewerChunk, chunkOptions)
+  }
+
+  private startFetchingOlder() {
+    const chunkOptions = {
+      ...NEWER_CHUNK_OPTIONS, 
+      getCurrentSize: this.totalBackwardValues
+    }
+
+    this.currentPendingChunk = fetchChunk(this.fetchOlderChunk, chunkOptions)
+  }
+
+  private handleCurrentChunk = async () => {
+    try {
+      await this.currentPendingChunk.promise
+    } finally {
+      this.clearCurrentPendingChunk()
     }
   }
 
-  private handleFetchNewerChunk = () => {
-    const shouldLiveUpdate = this.props.tableTime.relative === 0
-
-    if (shouldLiveUpdate) {
-      return
+  private clearCurrentPendingChunk() {
+    if (this.currentPendingChunk) {
+      this.currentPendingChunk.cancel()
+      this.currentPendingChunk = null
     }
-
-    console.log('FETCHING NEWER TABLE LOGS')
-    const totalForwardValues = getDeep<number | null>(
-      this.props,
-      'tableInfiniteData.forward.values.length',
-      null
-    )
-
-    if (
-      totalForwardValues < this.newerChunkSizeLimit &&
-      totalForwardValues > 0
-    ) {
-      return
-    }
-
-    const newerChunkSizeLimit =
-      this.newerChunkSizeLimit + NEWER_CHUNK_SIZE_LIMIT
-
-    this.setState({
-      newerChunkSizeLimit,
-    })
-
-    this.fetchNewerChunk()
   }
 
-  private get newerChunkSizeLimit() {
-    console.log(
-      'CURRENT NEWER CHUNK SIZE LIMIT',
-      this.state.newerChunkSizeLimit
-    )
-    return this.state.newerChunkSizeLimit
-  }
-
-  private handleFetchOlderChunk = () => {
-    console.log('HANDLE FETCHING MORE TABLE LOGS')
-    const totalBackwardValues = getDeep<number | null>(
-      this.props,
-      'tableInfiniteData.backward.values.length',
-      null
-    )
-
-    if (totalBackwardValues < this.olderChunkSizeLimit) {
-      return
+  private cancelTailingPoll = () => {
+    if (this.interval) {
+      clearInterval(this.interval)
+      this.interval = null
     }
-
-    const olderChunkSizeLimit =
-      this.olderChunkSizeLimit + OLDER_CHUNK_SIZE_LIMIT
-
-    this.setState({
-      olderChunkSizeLimit,
-    })
-
-    this.fetchOlderChunk()
-  }
-
-  private get olderChunkSizeLimit() {
-    console.log(
-      'CURRENT OLDER CHUNK SIZE LIMIT',
-      this.state.olderChunkSizeLimit
-    )
-    return this.state.olderChunkSizeLimit
   }
 
   private get tableScrollToRow() {
@@ -550,10 +522,6 @@ class LogsPageSimple extends Component<Props, State> {
     return data
   }
 
-  private get isClearingSearch(): boolean {
-    return this.props.searchStatus === SearchStatus.Clearing
-  }
-
   private get logConfigLink(): string {
     return this.props.logConfigLink
   }
@@ -569,16 +537,15 @@ class LogsPageSimple extends Component<Props, State> {
     if (!this.state.liveUpdating && shouldLiveUpdate) {
       this.startLogsTailFetchingInterval()
     } else {
-      console.log('SCROLLED TO TOP')
       this.handleFetchNewerChunk()
     }
   }
 
   private handleVerticalScroll = () => {
     if (this.state.liveUpdating) {
-      clearInterval(this.interval)
+      this.cancelTailingPoll()
     }
-    console.log('SCROLLED')
+
     this.setState({liveUpdating: false, hasScrolled: true})
   }
 
@@ -743,7 +710,7 @@ class LogsPageSimple extends Component<Props, State> {
 
     if (liveUpdating === true) {
       this.setState({liveUpdating: false})
-      clearInterval(this.interval)
+      this.cancelTailingPoll()
     } else {
       this.handleChooseRelativeTime(NOW)
     }
@@ -819,6 +786,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private updateTableData(searchStatus) {
+    this.clearCurrentPendingChunk()
     this.props.clearSearchData(searchStatus)
   }
 
@@ -835,7 +803,7 @@ class LogsPageSimple extends Component<Props, State> {
       this.startLogsTailFetchingInterval()
     }
 
-    this.fetchOlderChunk()
+    this.handleFetchOlderChunk()
   }
 
   private handleToggleOverlay = (): void => {

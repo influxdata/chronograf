@@ -195,3 +195,8 @@ export interface MatchSection {
   type: MatchType
   text: string
 }
+
+export interface FetchLoop {
+  promise: Promise<void>
+  cancel: () => void
+}

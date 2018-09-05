@@ -394,9 +394,9 @@ class LogsTable extends Component<Props, State> {
   private loadMoreAboveRows = async () => {
     // Prevent multiple queries at the same time
     const {queryCount} = this.props
-    if (queryCount > 0) {
-      return
-    }
+    // if (queryCount > 0) {
+    //   return
+    // }
     const data = getValuesFromData(this.props.tableInfiniteData.forward)
     const backwardData = getValuesFromData(
       this.props.tableInfiniteData.backward
@@ -407,10 +407,10 @@ class LogsTable extends Component<Props, State> {
       getDeep(backwardData, '0.0', new Date().getTime())
     )
 
-    const {firstQueryTime} = this.state
-    if (firstQueryTime && firstQueryTime > firstTime) {
-      return
-    }
+    // const {firstQueryTime} = this.state
+    // if (firstQueryTime && firstQueryTime > firstTime) {
+    //   return
+    // }
 
     try {
       this.incrementLoaderQueryCount()
