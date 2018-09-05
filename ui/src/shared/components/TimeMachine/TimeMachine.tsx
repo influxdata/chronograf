@@ -291,7 +291,6 @@ class TimeMachine extends PureComponent<Props, State> {
       script,
       timeRange,
       templates,
-      isInCEO,
       source,
       isStaticLegend,
       manualRefresh,
@@ -313,7 +312,6 @@ class TimeMachine extends PureComponent<Props, State> {
           queryConfigs={this.queriesWorkingDraft}
           editQueryStatus={this.handleEditQueryStatus}
           staticLegend={isStaticLegend}
-          isInCEO={isInCEO}
           manualRefresh={manualRefresh}
           editorLocation={this.stateToUpdate}
           {...visualizationOptions}

@@ -49,7 +49,6 @@ interface Props {
   type: CellType
   cellID: string
   inView: boolean
-  isInCEO: boolean
   timeFormat: string
   cellHeight: number
   staticLegend: boolean
@@ -172,7 +171,6 @@ class RefreshingGraph extends PureComponent<Props> {
       decimalPlaces,
       manualRefresh,
       handleSetHoverTime,
-      isInCEO,
       editorLocation,
     } = this.props
 
@@ -180,7 +178,6 @@ class RefreshingGraph extends PureComponent<Props> {
       <TableGraph
         data={data}
         colors={colors}
-        isInCEO={isInCEO}
         key={manualRefresh}
         tableOptions={tableOptions}
         fieldOptions={fieldOptions}

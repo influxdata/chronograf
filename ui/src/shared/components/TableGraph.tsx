@@ -65,7 +65,6 @@ interface Props {
   handleUpdateFieldOptions: typeof updateFieldOptions
   handleSetHoverTime: (hovertime: string) => void
   colors: ColorString
-  isInCEO: boolean
   editorLocation?: QueryUpdateState
 }
 
@@ -368,8 +367,8 @@ class TableGraph extends Component<Props, State> {
   }
 
   private handleUpdateFieldOptions = (fieldOptions: FieldOption[]): void => {
-    const {isInCEO, handleUpdateFieldOptions, editorLocation} = this.props
-    if (isInCEO) {
+    const {handleUpdateFieldOptions, editorLocation} = this.props
+    if (editorLocation) {
       handleUpdateFieldOptions(fieldOptions, editorLocation)
     }
   }

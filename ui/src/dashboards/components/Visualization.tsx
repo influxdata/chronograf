@@ -36,7 +36,6 @@ interface Props {
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
   staticLegend: boolean
-  isInCEO: boolean
   note: string
   noteVisibility: NoteVisibility
   manualRefresh: number
@@ -48,7 +47,6 @@ const DashVisualization: SFC<Props> = ({
   type,
   note,
   source,
-  isInCEO,
   templates,
   timeRange,
   lineColors,
@@ -92,7 +90,6 @@ const DashVisualization: SFC<Props> = ({
           timeFormat={timeFormat}
           decimalPlaces={decimalPlaces}
           fieldOptions={fieldOptions}
-          isInCEO={isInCEO}
           cellNote={note}
           cellNoteVisibility={noteVisibility}
           timeRange={timeRange}
