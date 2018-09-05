@@ -123,15 +123,6 @@ func (s *Service) NewService(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Type != nil && req.URL != nil && *req.Type == "flux" {
-		err := pingFlux(ctx, *req.URL, req.InsecureSkipVerify)
-		if err != nil {
-			msg := fmt.Sprintf("Unable to reach flux %s: %v", *req.URL, err)
-			Error(w, http.StatusGatewayTimeout, msg, s.Logger)
-			return
-		}
-	}
-
 	srv := chronograf.Server{
 		SrcID:              srcID,
 		Name:               *req.Name,
@@ -318,15 +309,6 @@ func (s *Service) UpdateService(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Metadata != nil {
 		srv.Metadata = *req.Metadata
-	}
-
-	if srv.Type == "flux" {
-		err := pingFlux(ctx, srv.URL, srv.InsecureSkipVerify)
-		if err != nil {
-			msg := fmt.Sprintf("Unable to reach flux %s: %v", srv.URL, err)
-			Error(w, http.StatusGatewayTimeout, msg, s.Logger)
-			return
-		}
 	}
 
 	if err := s.Store.Servers(ctx).Update(ctx, srv); err != nil {
