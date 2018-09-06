@@ -510,6 +510,12 @@ class LogsPage extends Component<Props, State> {
     this.clearAllTimeBounds()
 
     this.props.setTableRelativeTime(time)
+    const relativeLowerBound = moment()
+      .subtract(time, 'seconds')
+      .utc()
+      .valueOf()
+
+    this.props.setNextNewerLowerBound(relativeLowerBound)
     this.setState({hasScrolled: false})
 
     let timeOption = {
