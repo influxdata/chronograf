@@ -2,7 +2,14 @@
    Variables
    -----------------------------------------------------------------------------
 */
-@import 'src/style/modules/influx-colors';
+
+/* Z Variables */
+
+$z--notifications: 9999;
+$z--overlays: 9990;
+$z--drag-n-drop: 5000;
+
+/* Motifs */
 
 $radius: 4px;
 $radius-small: 3px;
@@ -23,8 +30,6 @@ $ix-marg-f: 128px;
 $ix-border: 2px;
 $ix-radius: 4px;
 $ix-radius-sm: 3px;
-
-$ix-scrollbar: 14px;
 
 $ix-link-default: $c-pool;
 $ix-link-default-hover: $c-laser;
@@ -56,17 +61,7 @@ $ix-text-base-3: (ceil($ix-text-base * $ix-text-scale * $ix-text-scale * $ix-tex
 $ix-text-base-4: (ceil($ix-text-base * $ix-text-scale * $ix-text-scale * $ix-text-scale * $ix-text-scale));
 $ix-text-base-5: (ceil($ix-text-base * $ix-text-scale * $ix-text-scale * $ix-text-scale * $ix-text-scale * $ix-text-scale));
 
-$-ix-app-z: 2;
-
-$ix-sidebar-z: 10;
-$ix-sidebar-width: 60px;
-
-$ix-sidebar-drawer-max: 270px;
-
-$ix-app-heading-z: 5;
-$ix-app-heading-height: 60px;
-
-$ix-app-wrapper-z: 3;
+/* Form Element Sizing */
 
 $form-xs-height: 22px;
 $form-xs-padding: 6px;
@@ -83,10 +78,3 @@ $form-md-font: 15px;
 $form-lg-height: 46px;
 $form-lg-padding: 15px;
 $form-lg-font: 17px;
-
-// Drag & Drop
-$drag-and-drop--z-dropzone: 9000;
-$drag-and-drop--z-form: $drag-and-drop--z-dropzone + 10;
-
-// Overlays
-$overlay-dismiss--z: $drag-and-drop--z-dropzone + 10;

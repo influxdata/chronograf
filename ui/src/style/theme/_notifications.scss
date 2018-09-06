@@ -10,7 +10,7 @@ $notification-margin: 12px;
   right: $notification-margin;
   width: 360px;
   top: $chronograf-page-header-height + $notification-margin;
-  z-index: 9999;
+  z-index: $z--notifications;
 }
 
 .notification-center__presentation-mode {
