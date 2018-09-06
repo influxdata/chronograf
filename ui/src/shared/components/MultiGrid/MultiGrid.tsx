@@ -142,6 +142,12 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
     }
   }
 
+  public componentDidUpdate() {
+    if (this.topRightGrid) {
+      this.topRightGrid.forceUpdate()
+    }
+  }
+
   public render() {
     const {onScroll, ...rest} = this.props
 

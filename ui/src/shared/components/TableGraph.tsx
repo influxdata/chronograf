@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import _ from 'lodash'
 import classnames from 'classnames'
 import {connect} from 'react-redux'
@@ -9,10 +9,7 @@ import {MultiGrid, PropsMultiGrid} from 'src/shared/components/MultiGrid'
 import {bindActionCreators} from 'redux'
 import {fastReduce} from 'src/utils/fast'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
-import {
-  computeFieldOptions,
-  transformTableData,
-} from 'src/dashboards/utils/tableGraph'
+import {computeFieldOptions} from 'src/dashboards/utils/tableGraph'
 import {updateFieldOptions} from 'src/shared/actions/visualizations'
 import {QueryUpdateState} from 'src/shared/actions/queries'
 import {DEFAULT_TIME_FIELD} from 'src/dashboards/constants'
@@ -84,7 +81,7 @@ interface State {
 }
 
 @ErrorHandling
-class TableGraph extends Component<Props, State> {
+class TableGraph extends PureComponent<Props, State> {
   private gridContainer: HTMLDivElement
   private multiGrid?: MultiGrid
   private isComponentMounted: boolean = false
@@ -449,7 +446,9 @@ class TableGraph extends Component<Props, State> {
     }
   }
 
-  private handleClickFieldName = (clickedFieldName: string) => (): void => {
+  private handleClickFieldName = (
+    clickedFieldName: string
+  ) => async (): Promise<void> => {
     const {tableOptions, fieldOptions, timeFormat, decimalPlaces} = this.props
     const {data, sort} = this.state
 
@@ -460,7 +459,7 @@ class TableGraph extends Component<Props, State> {
       sort.direction = DEFAULT_SORT_DIRECTION
     }
 
-    const {transformedData, sortedTimeVals} = transformTableData(
+    const {transformedData, sortedTimeVals} = await manager.tableTransform(
       data,
       sort,
       fieldOptions,
