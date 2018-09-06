@@ -163,6 +163,7 @@ class LogsTable extends Component<Props, State> {
     }).length
 
     this.state = {
+      searchPattern: null,
       scrollTop: 0,
       scrollLeft: 0,
       currentRow: -1,
