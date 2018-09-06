@@ -248,7 +248,8 @@ class TableGraph extends Component<Props, State> {
     const {sort} = this.state
 
     let result = {}
-    if (this.hasDataChanged(nextProps.data)) {
+    const hasDataChanged = this.hasDataChanged(nextProps.data)
+    if (hasDataChanged) {
       result = await timeSeriesToTableGraph(nextProps.data)
     }
     const data = _.get(result, 'data', this.state.data)
@@ -265,7 +266,7 @@ class TableGraph extends Component<Props, State> {
     const sortedLabels = _.get(result, 'sortedLabels', this.state.sortedLabels)
     const computedFieldOptions = computeFieldOptions(fieldOptions, sortedLabels)
 
-    if (this.hasDataChanged(nextProps.data)) {
+    if (hasDataChanged) {
       this.handleUpdateFieldOptions(computedFieldOptions)
     }
 
@@ -279,7 +280,7 @@ class TableGraph extends Component<Props, State> {
     }
 
     if (
-      this.hasDataChanged(nextProps.data) ||
+      hasDataChanged ||
       _.includes(updatedProps, 'tableOptions') ||
       _.includes(updatedProps, 'fieldOptions') ||
       _.includes(updatedProps, 'timeFormat')
@@ -338,7 +339,7 @@ class TableGraph extends Component<Props, State> {
     const newUUID = _.get(data, '0.response.uuid', null)
     const oldUUID = _.get(this.props.data, '0.response.uuid', null)
 
-    return newUUID !== oldUUID
+    return newUUID !== oldUUID || !!this.props.editorLocation
   }
 
   private get fixFirstColumn(): boolean {
