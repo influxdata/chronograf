@@ -173,7 +173,7 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   private launchWizard = () => {
     const {toggleWizard, source} = this.props
     if (toggleWizard) {
-      toggleWizard(true, source, 1, true)()
+      toggleWizard(true, source, 2, true)()
     }
   }
 }
