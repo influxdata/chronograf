@@ -46,6 +46,24 @@ $logs-viewer-gutter: 60px;
   flex: 1 0 0;
   margin-right: 8px;
   position: relative;
+
+  > input.form-control {
+    padding-left: 30px;
+  }
+
+  > .icon {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translate(-50%, - 50%);
+    z-index: 1;
+    color: $g13-mist;
+    transition: color 0.25s ease;
+  }
+
+  > input.form-control:focus + .icon {
+    color: $c-pool;
+  }
 }
 
 // Filters Bar
