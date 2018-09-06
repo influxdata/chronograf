@@ -711,7 +711,6 @@ class LogsTable extends Component<Props, State> {
 
     switch (searchStatus) {
       case SearchStatus.Loaded:
-        // case SearchStatus.Paused:
         return false
       default:
         return true

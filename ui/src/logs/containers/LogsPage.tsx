@@ -481,7 +481,6 @@ class LogsPage extends Component<Props, State> {
     this.props.setTableCustomTime(time)
     const liveUpdating = false
 
-    // this.props.setSearchStatus(SearchStatus.Paused)
     this.setState({
       hasScrolled: false,
       liveUpdating,
