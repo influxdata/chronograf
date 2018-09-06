@@ -182,10 +182,11 @@ class LogsPage extends Component<Props, State> {
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    // const {router} = this.props
-    // if (!this.props.sources || this.props.sources.length === 0) {
-    //   return router.push(`/sources/new?redirectPath=${location.pathname}`)
-    // }
+    const {router} = this.props
+    if (!this.props.sources || this.props.sources.length === 0) {
+      return router.push(`/sources/new?redirectPath=${location.pathname}`)
+    }
+
     this.handleLoadingStatus()
 
     const isSearchStatusUpdated =
