@@ -560,6 +560,7 @@ class LogsPage extends Component<Props, State> {
     value: string
   ): Promise<void> => {
     this.props.changeFilter(id, operator, value)
+    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
   private handleBarClick = (time: string): void => {

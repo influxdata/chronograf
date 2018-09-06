@@ -11,6 +11,10 @@
 1. [#4268](https://github.com/influxdata/chronograf/pull/4268): Clear logs after searching
 1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
 
+
+### UI Improvements
+1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
+
 ### Bug Fixes
 
 ## v1.6.2 [unreleased]
