@@ -366,7 +366,7 @@ class TimeMachine extends PureComponent<Props, State> {
     const {selectedService} = this.state
 
     const queryDraft = _.get(queryDrafts, 0)
-    const querySource = _.get(queryDraft, 'source')
+    const querySource = _.get(queryDraft, 'source', '')
 
     if (querySource.includes('service')) {
       const foundService = services.find(s => {
