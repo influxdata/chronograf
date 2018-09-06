@@ -271,7 +271,6 @@ class TimeSeries extends Component<Props, State> {
     query: Query
   ): Promise<TimeSeriesServerResponse> => {
     const {source, templates, editQueryStatus} = this.props
-    const uuid = this.latestUUID
     const TEMP_RES = 300 // FIXME
 
     editQueryStatus(query.id, {loading: true})
@@ -282,7 +281,7 @@ class TimeSeries extends Component<Props, State> {
         query,
         templates,
         TEMP_RES,
-        uuid
+        this.latestUUID
       )
 
       const warningMessage = extractQueryWarningMessage(response)
