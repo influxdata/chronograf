@@ -396,7 +396,7 @@ class LogsPage extends Component<Props, State> {
     if (this.currentOlderChunksGenerator) {
       return
     }
-    this.startFetchingOlder()
+    await this.startFetchingOlder()
   }
 
   private handleFetchNewerChunk = async () => {
@@ -404,7 +404,7 @@ class LogsPage extends Component<Props, State> {
       return
     }
 
-    this.startFetchingNewer()
+    await this.startFetchingNewer()
   }
 
   private startFetchingNewer = async () => {
