@@ -467,10 +467,11 @@ class LogsPage extends Component<Props, State> {
       return
     }
 
-    return Math.max(
-      _.get(this.props, 'tableInfiniteData.forward.values.length', 0) - 3,
-      0
-    )
+    if (this.totalForwardValues() > 0) {
+      return Math.max(this.totalForwardValues() - 3, 0)
+    } else {
+      return Math.round(this.totalBackwardValues() / 2)
+    }
   }
 
   private handleChooseCustomTime = async (time: string) => {
