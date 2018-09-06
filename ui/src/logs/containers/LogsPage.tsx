@@ -212,7 +212,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   public componentWillUnmount() {
-    clearInterval(this.interval)
+    this.clearTailInterval()
   }
 
   public render() {
