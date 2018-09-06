@@ -13,21 +13,12 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {Greys} from 'src/reusable_ui/types'
 import QueryResults from 'src/logs/components/QueryResults'
 
-const NOW = 0
-const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
-const NEWER_CHUNK_SIZE_LIMIT = 20
-const OLDER_CHUNK_SIZE_LIMIT = 100
-const MAX_FETCH_COUNT = 50
-
-const NEWER_CHUNK_OPTIONS = {
-  maxFetchCount: MAX_FETCH_COUNT,
-  chunkSize: NEWER_CHUNK_SIZE_LIMIT,
-}
-
-const OLDER_CHUNK_OPTIONS = {
-  maxFetchCount: MAX_FETCH_COUNT,
-  chunkSize: OLDER_CHUNK_SIZE_LIMIT,
-}
+import {
+  NOW,
+  DEFAULT_TAIL_CHUNK_DURATION_MS,
+  NEWER_CHUNK_OPTIONS,
+  OLDER_CHUNK_OPTIONS,
+} from 'src/logs/constants'
 
 import {
   setTableCustomTimeAsync,
@@ -156,8 +147,6 @@ interface State {
   isOverlayVisible: boolean
   histogramColors: HistogramColor[]
   hasScrolled: boolean
-  newerChunkSizeLimit: number
-  olderChunkSizeLimit: number
 }
 
 class LogsPage extends Component<Props, State> {
@@ -189,8 +178,6 @@ class LogsPage extends Component<Props, State> {
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
-      newerChunkSizeLimit: NEWER_CHUNK_SIZE_LIMIT,
-      olderChunkSizeLimit: OLDER_CHUNK_SIZE_LIMIT,
     }
   }
 
@@ -847,8 +834,6 @@ class LogsPage extends Component<Props, State> {
   }
 
   private fetchNewDataset() {
-    this.setState({olderChunkSizeLimit: OLDER_CHUNK_SIZE_LIMIT})
-
     const shouldLiveUpdate = this.props.tableTime.relative === 0
     if (this.isLiveUpdating && shouldLiveUpdate) {
       this.startLogsTailFetchingInterval()
