@@ -834,9 +834,8 @@ class LogsPage extends Component<Props, State> {
     this.props.clearSearchData(searchStatus)
   }
 
-  private fetchNewDataset() {
-    const shouldLiveUpdate = this.props.tableTime.relative === 0
-    if (this.isLiveUpdating && shouldLiveUpdate) {
+  private fetchNewDataset = async () => {
+    if (this.isLiveUpdating && this.shouldLiveUpdate) {
       this.startLogsTailFetchingInterval()
     }
 
