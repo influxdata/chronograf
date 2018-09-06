@@ -493,7 +493,11 @@ class LogsPage extends Component<Props, State> {
 
     this.props.setTableCustomTime(time)
     const liveUpdating = false
+    const customLowerBound = moment(time)
+      .utc()
+      .valueOf()
 
+    this.props.setNextNewerLowerBound(customLowerBound)
     this.setState({
       hasScrolled: false,
       liveUpdating,
