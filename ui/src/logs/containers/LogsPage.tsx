@@ -390,7 +390,7 @@ class LogsPage extends Component<Props, State> {
     if (this.isLiveUpdating || this.shouldLiveUpdate) {
       return
     }
-
+    this.loadingNewer = true
     await this.startFetchingNewer()
   }
 
@@ -418,7 +418,7 @@ class LogsPage extends Component<Props, State> {
     if (!this.currentNewerChunksGenerator.isCanceled) {
       this.currentNewerChunksGenerator.cancel()
     }
-
+    this.loadingNewer = false
     this.currentNewerChunksGenerator = null
   }
 
