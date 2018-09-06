@@ -29,7 +29,7 @@ import {
   deleteQueryAsync,
   updateQueryDrafts as updateQueryDraftsAction,
   updateEditorTimeRange as updateEditorTimeRangeAction,
-  updateScript as updateScriptAction,
+  updateScript,
 } from 'src/shared/actions/queries'
 
 import * as appActions from 'src/shared/actions/app'
@@ -78,12 +78,11 @@ import {NewDefaultCell} from 'src/types/dashboards'
 import {Service, NotificationAction} from 'src/types'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
-import {UpdateScript} from 'src/flux/actions'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   fluxLinks: Links
   script: string
-  updateScript: UpdateScript
+  updateScript: typeof updateScript
   source: SourcesModels.Source
   sources: SourcesModels.Source[]
   params: {
@@ -247,7 +246,6 @@ class DashboardPage extends Component<Props, State> {
       script,
       notify,
       fluxLinks,
-      updateScript,
       isUsingAuth,
       meRole,
       source,
@@ -357,7 +355,7 @@ class DashboardPage extends Component<Props, State> {
             queryConfigActions={this.queryConfigActions}
             addQuery={addQuery}
             deleteQuery={deleteQuery}
-            updateScript={updateScript}
+            updateScript={this.props.updateScript}
           />
         </OverlayTechnology>
         <DashboardHeader
@@ -397,6 +395,7 @@ class DashboardPage extends Component<Props, State> {
         {dashboard ? (
           <Dashboard
             source={source}
+            services={this.services}
             sources={sources}
             setScrollTop={this.setScrollTop}
             inView={this.inView}
@@ -522,7 +521,7 @@ class DashboardPage extends Component<Props, State> {
 
     if (this.isExistingCell(newCell)) {
       await this.props.updateDashboardCell(dashboard, newCell)
-    } else if (!this.isExistingCell(newCell)) {
+    } else {
       this.props.addDashboardCellAsync(dashboard, newCell)
     }
 
@@ -674,7 +673,6 @@ const mstp = (state, {params: {dashboardID}}) => {
       ephemeral: {inPresentationMode},
       persisted: {autoRefresh, showTemplateVariableControlBar},
     },
-    script,
     links,
     annotations: {displaySetting},
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
@@ -689,6 +687,7 @@ const mstp = (state, {params: {dashboardID}}) => {
       gaugeColors,
       lineColors,
       timeRange: editorTimeRange,
+      script,
     },
   } = state
 
@@ -729,7 +728,7 @@ const mstp = (state, {params: {dashboardID}}) => {
 }
 
 const mdtp = {
-  updateScript: updateScriptAction,
+  updateScript,
   setDashTimeV1: dashboardActions.setDashTimeV1,
   setZoomedTimeRange: dashboardActions.setZoomedTimeRange,
   updateDashboard: dashboardActions.updateDashboard,

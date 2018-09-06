@@ -12,6 +12,7 @@
 1.  [#4311](https://github.com/influxdata/chronograf/pull/4311): Add Flux query editor to the Cell Editor Overlay
 1.  [#4319](https://github.com/influxdata/chronograf/pull/4319): Add Flux query editor to the Data Explorer and use same UI as CEO
 1.  [#4353](https://github.com/influxdata/chronograf/pull/4353): Add visualization options to the Data Explorer
+1.  [4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
 
 
 ### UI Improvements

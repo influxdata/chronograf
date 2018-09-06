@@ -22,6 +22,7 @@ import {
   validateLineColors,
 } from 'src/shared/constants/graphColorPalettes'
 import {initializeOptions} from 'src/dashboards/constants/cellEditor'
+import {editor} from 'src/flux/constants'
 
 // types
 import {CellType, Cell, TimeRange} from 'src/types'
@@ -37,6 +38,7 @@ export interface CEOInitialState {
   lineColors: LineColor[]
   queryDrafts: CellQuery[]
   timeRange: TimeRange
+  script: string
 }
 
 export const initialState = {
@@ -47,6 +49,21 @@ export const initialState = {
   lineColors: DEFAULT_LINE_COLORS,
   queryDrafts: null,
   timeRange: null,
+  script: editor.DEFAULT_SCRIPT,
+}
+
+const getNewQueryDrafts = (sourceLink?: string): CellQuery[] => {
+  const id = uuid.v4()
+  const newQueryConfig = {
+    ...defaultQueryConfig({id}),
+  }
+  const newQueryDraft: CellQuery = {
+    query: '',
+    queryConfig: newQueryConfig,
+    source: sourceLink || '',
+    id,
+  }
+  return [newQueryDraft]
 }
 
 export default (state = initialState, action: Action): CEOInitialState => {
@@ -60,24 +77,27 @@ export default (state = initialState, action: Action): CEOInitialState => {
         initializeOptions(CellType.Table)
       )
 
-      let queryDrafts: CellQuery[] = cell.queries.map(q => {
-        const id = uuid.v4()
-        const queryConfig = {...q.queryConfig, id}
-        return {...q, queryConfig, id}
-      })
+      // QueryDrafts corresponds to InfluxQL queries, script to Flux queries
+      // When saved, either the InfluxQL query or the script is saved to cell.queries
 
+      let queryDrafts: CellQuery[]
+      let script = editor.DEFAULT_SCRIPT
+      const sourceLink = getDeep<string>(cell, 'queries.0.source', '')
+
+      if (sourceLink.includes('service')) {
+        script = getDeep<string>(cell, 'queries.0.query', editor.DEFAULT_SCRIPT)
+
+        queryDrafts = getNewQueryDrafts(sourceLink)
+      } else {
+        queryDrafts = cell.queries.map(q => {
+          const id = uuid.v4()
+          const queryConfig = {...q.queryConfig, id}
+
+          return {...q, queryConfig, id}
+        })
+      }
       if (_.isEmpty(queryDrafts)) {
-        const id = uuid.v4()
-        const newQueryConfig = {
-          ...defaultQueryConfig({id}),
-        }
-        const newQueryDraft: CellQuery = {
-          query: '',
-          queryConfig: newQueryConfig,
-          source: '',
-          id,
-        }
-        queryDrafts = [newQueryDraft]
+        queryDrafts = getNewQueryDrafts()
       }
 
       if ((cell as Cell).colors) {
@@ -101,6 +121,7 @@ export default (state = initialState, action: Action): CEOInitialState => {
           lineColors,
           queryDrafts,
           timeRange,
+          script,
         }
       }
       return {
@@ -108,14 +129,16 @@ export default (state = initialState, action: Action): CEOInitialState => {
         cell: {...cell, tableOptions},
         queryDrafts,
         timeRange,
+        script,
       }
     }
 
     case ActionType.ClearCEO: {
       const cell = null
       const timeRange = null
+      const script = editor.DEFAULT_SCRIPT
 
-      return {...state, cell, timeRange}
+      return {...state, cell, timeRange, script}
     }
 
     case ActionType.ChangeCellType: {
@@ -220,6 +243,12 @@ export default (state = initialState, action: Action): CEOInitialState => {
       const {timeRange} = action.payload
 
       return {...state, timeRange}
+    }
+
+    case ActionType.UpdateScript: {
+      const {script} = action.payload
+
+      return {...state, script}
     }
   }
 

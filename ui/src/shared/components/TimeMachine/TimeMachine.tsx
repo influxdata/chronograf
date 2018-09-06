@@ -135,6 +135,8 @@ interface Props {
   visualizationOptions: VisualizationOptions
   manualRefresh?: number
   queryStatus: QueryStatus
+  updateScriptStatus?: (status: ScriptStatus) => void
+  updateService?: (service: Service) => void
 }
 
 interface Body extends FlatBody {
@@ -202,18 +204,18 @@ class TimeMachine extends PureComponent<Props, State> {
     autoRefresher.poll(autoRefreshDuration)
 
     try {
-      this.debouncedASTResponse(script)
-    } catch (error) {
-      console.error('Could not retrieve AST for script', error)
-    }
-
-    try {
       const suggestions = await getSuggestions(fluxLinks.suggestions)
       this.setState({suggestions})
     } catch (error) {
       console.error('Could not get function suggestions: ', error)
     }
+
     if (this.isFluxSource) {
+      try {
+        this.debouncedASTResponse(script)
+      } catch (error) {
+        console.error('Could not retrieve AST for script', error)
+      }
       this.getTimeSeries()
     }
   }
@@ -359,9 +361,21 @@ class TimeMachine extends PureComponent<Props, State> {
     return children(activeEditorTab, this.handleSetActiveEditorTab)
   }
 
-  private get service() {
-    const {service} = this.props
+  private get service(): Service {
+    const {service, services, queryDrafts} = this.props
     const {selectedService} = this.state
+
+    const queryDraft = _.get(queryDrafts, 0)
+    const querySource = _.get(queryDraft, 'source')
+
+    if (querySource.includes('service')) {
+      const foundService = services.find(s => {
+        return s.links.self === querySource
+      })
+      if (foundService) {
+        return foundService
+      }
+    }
 
     if (service) {
       return service
@@ -430,9 +444,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get isFluxSource(): boolean {
     // TODO: Update once flux is no longer a separate service
-    const {service} = this.props
-    const {selectedService} = this.state
-    if (selectedService || service) {
+    if (this.service) {
       return true
     }
     return false
@@ -635,8 +647,12 @@ class TimeMachine extends PureComponent<Props, State> {
     selectedService: Service,
     selectedSource: Source
   ): void => {
-    const {updateSourceLink} = this.props
+    const {updateSourceLink, isInCEO} = this.props
     const useDynamicSource = false
+
+    if (isInCEO) {
+      this.props.updateService(selectedService)
+    }
 
     if (updateSourceLink) {
       updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
@@ -722,7 +738,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private getASTResponse = async (script: string, update: boolean = true) => {
-    const {fluxLinks} = this.props
+    const {fluxLinks, updateScriptStatus, isInCEO} = this.props
 
     if (!script) {
       this.updateScript(script)
@@ -738,24 +754,41 @@ class TimeMachine extends PureComponent<Props, State> {
 
       const body = bodyNodes(ast, this.state.suggestions)
       const status = {type: 'success', text: ''}
+
       this.setState({ast, body, status})
+      if (isInCEO) {
+        updateScriptStatus(status)
+      }
     } catch (error) {
-      this.setState({status: parseError(error)})
+      const status = parseError(error)
+
+      this.setState({status})
+      if (isInCEO) {
+        updateScriptStatus(status)
+      }
       return console.error('Could not parse AST', error)
     }
   }
 
   private getTimeSeries = async () => {
-    const {script, fluxLinks, notify} = this.props
+    const {script, fluxLinks, notify, updateScriptStatus, isInCEO} = this.props
+
     if (!script) {
       return
     }
+
     try {
       await getAST({url: fluxLinks.ast, body: script})
     } catch (error) {
-      this.setState({status: parseError(error)})
+      const status = parseError(error)
+
+      this.setState({status})
+      if (isInCEO) {
+        updateScriptStatus(status)
+      }
       return console.error('Could not parse AST', error)
     }
+
     try {
       const {tables, didTruncate} = await getTimeSeries(this.service, script)
       this.setState({data: tables})
@@ -767,6 +800,7 @@ class TimeMachine extends PureComponent<Props, State> {
       notify(fluxTimeSeriesError(error))
       console.error('Could not get timeSeries', error)
     }
+
     this.getASTResponse(script)
   }
 
@@ -927,7 +961,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private handleValidate = async () => {
-    const {fluxLinks, notify, script} = this.props
+    const {fluxLinks, notify, script, updateScriptStatus, isInCEO} = this.props
 
     try {
       const ast = await getAST({url: fluxLinks.ast, body: script})
@@ -936,8 +970,16 @@ class TimeMachine extends PureComponent<Props, State> {
       notify(validateSuccess())
 
       this.setState({ast, body, status})
+      if (isInCEO) {
+        updateScriptStatus(status)
+      }
     } catch (error) {
-      this.setState({status: parseError(error)})
+      const status = parseError(error)
+      this.setState({status})
+
+      if (isInCEO) {
+        updateScriptStatus(status)
+      }
       return console.error('Could not parse AST', error)
     }
   }

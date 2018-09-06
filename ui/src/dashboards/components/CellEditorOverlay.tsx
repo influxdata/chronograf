@@ -20,6 +20,7 @@ import {
   addQueryAsync,
   deleteQueryAsync,
   updateEditorTimeRange as updateEditorTimeRangeAction,
+  updateScript,
 } from 'src/shared/actions/queries'
 import {editCellQueryStatus} from 'src/dashboards/actions'
 
@@ -36,8 +37,7 @@ import * as SourcesModels from 'src/types/sources'
 import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell, ThresholdType} from 'src/types/dashboards'
-import {UpdateScript} from 'src/flux/actions'
-import {Links} from 'src/types/flux'
+import {Links, ScriptStatus} from 'src/types/flux'
 
 const staticLegend: DashboardsModels.Legend = {
   type: 'static',
@@ -69,12 +69,14 @@ interface Props {
   queryConfigActions: QueryConfigActions
   addQuery: typeof addQueryAsync
   deleteQuery: typeof deleteQueryAsync
-  updateScript: UpdateScript
+  updateScript: typeof updateScript
   updateEditorTimeRange: typeof updateEditorTimeRangeAction
 }
 
 interface State {
   isStaticLegend: boolean
+  status: ScriptStatus
+  currentService: Service
 }
 
 @ErrorHandling
@@ -89,6 +91,11 @@ class CellEditorOverlay extends Component<Props, State> {
 
     this.state = {
       isStaticLegend: IS_STATIC_LEGEND(legend),
+      status: {
+        type: 'none',
+        text: '',
+      },
+      currentService: null,
     }
   }
 
@@ -115,7 +122,6 @@ class CellEditorOverlay extends Component<Props, State> {
       timeRange,
       updateEditorTimeRange,
       updateQueryDrafts,
-      updateScript,
       queryStatus,
     } = this.props
 
@@ -133,7 +139,7 @@ class CellEditorOverlay extends Component<Props, State> {
           notify={notify}
           script={script}
           queryDrafts={queryDrafts}
-          updateScript={updateScript}
+          updateScript={this.props.updateScript}
           editQueryStatus={editQueryStatus}
           templates={templates}
           timeRange={timeRange}
@@ -151,6 +157,8 @@ class CellEditorOverlay extends Component<Props, State> {
           updateEditorTimeRange={updateEditorTimeRange}
           visualizationOptions={this.visualizationOptions}
           queryStatus={queryStatus}
+          updateScriptStatus={this.updateScriptStatus}
+          updateService={this.updateService}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader
@@ -170,12 +178,21 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private get isSaveable(): boolean {
     const {queryDrafts} = this.props
+    const {currentService, status} = this.state
+
+    const isFluxSource = _.get(currentService, 'type', '') === 'flux'
+
+    if (isFluxSource) {
+      return _.get(status, 'type', '') === 'success'
+    }
+
     return queryDrafts.every(queryDraft => {
       const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
         queryDraft,
         'queryConfig',
         null
       )
+
       return (
         (!!queryConfig.measurement &&
           !!queryConfig.database &&
@@ -221,36 +238,57 @@ class CellEditorOverlay extends Component<Props, State> {
     }
   }
 
+  private updateScriptStatus = (status: ScriptStatus): void => {
+    this.setState({status})
+  }
+
+  private updateService = (service: Service): void => {
+    this.setState({currentService: service})
+  }
+
   private handleSaveCell = () => {
-    const {isStaticLegend} = this.state
     const {
       queryDrafts,
       thresholdsListColors,
       gaugeColors,
       lineColors,
       cell,
+      script,
     } = this.props
+    const {isStaticLegend, currentService} = this.state
 
-    const queries: DashboardsModels.CellQuery[] = queryDrafts.map(q => {
-      const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
-        q,
-        'queryConfig',
-        null
-      )
-      const timeRange = getTimeRange(queryConfig)
-      const source = getDeep<string | null>(
-        queryConfig,
-        'source.links.self',
-        null
-      )
-      return {
-        ...q,
-        query:
-          queryConfig.rawText ||
-          buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig),
-        source,
-      }
-    })
+    let queries: DashboardsModels.CellQuery[]
+
+    if (_.get(currentService, 'type', '') === 'flux') {
+      queries = [
+        {
+          query: script,
+          queryConfig: null,
+          source: currentService.links.self,
+        },
+      ]
+    } else {
+      queries = queryDrafts.map(q => {
+        const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
+          q,
+          'queryConfig',
+          null
+        )
+        const timeRange = getTimeRange(queryConfig)
+        const source = getDeep<string | null>(
+          queryConfig,
+          'source.links.self',
+          null
+        )
+        return {
+          ...q,
+          query:
+            queryConfig.rawText ||
+            buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig),
+          source,
+        }
+      })
+    }
 
     const colors = getCellTypeColors({
       cellType: cell.type,
