@@ -830,6 +830,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private updateTableData(searchStatus) {
+    this.clearTailInterval()
     this.props.clearSearchData(searchStatus)
   }
 
