@@ -13,11 +13,12 @@ interface Props {
 class LoadingStatus extends PureComponent<Props> {
   public render() {
     const {currentOlderLowerBound} = this.props
+    const loadingTime = moment(currentOlderLowerBound).fromNow()
 
     return (
       <div className="logs-viewer--table-container generic-empty-state">
         <h4>
-          {this.loadingMessage}... {moment(currentOlderLowerBound).fromNow()}
+          {this.loadingMessage}: ({loadingTime})
         </h4>
         <p>{this.description}</p>
       </div>
@@ -44,14 +45,15 @@ class LoadingStatus extends PureComponent<Props> {
 
   private get loadingMessage(): string {
     switch (this.props.status) {
-      case SearchStatus.Loading:
-        return 'Searching'
       case SearchStatus.UpdatingFilters:
         return 'Updating Search Filters'
       case SearchStatus.NoResults:
-        return 'No logs to display'
+        return 'No logs found'
       case SearchStatus.UpdatingTimeBounds:
         return 'Searching time bounds'
+      case SearchStatus.Loading:
+      default:
+        return 'Searching'
     }
   }
 }
