@@ -16,6 +16,7 @@ import QueryResults from 'src/logs/components/QueryResults'
 import {
   NOW,
   DEFAULT_TAIL_CHUNK_DURATION_MS,
+  DEFAULT_NEWER_CHUNK_DURATION_MS,
   NEWER_CHUNK_OPTIONS,
   OLDER_CHUNK_OPTIONS,
 } from 'src/logs/constants'
@@ -39,6 +40,7 @@ import {
   flushTailBuffer,
   clearAllTimeBounds,
   setNextTailLowerBound,
+  setNextNewerLowerBound,
   getLogConfigAsync,
   updateLogConfigAsync,
   clearSearchData,
@@ -131,6 +133,7 @@ interface Props {
   flushTailBuffer: typeof flushTailBuffer
   clearAllTimeBounds: typeof clearAllTimeBounds
   setNextTailLowerBound: typeof setNextTailLowerBound
+  setNextNewerLowerBound: typeof setNextNewerLowerBound
   executeHistogramQueryAsync: typeof executeHistogramQueryAsync
   nextOlderUpperBound: number | undefined
   nextNewerLowerBound: number | undefined
@@ -347,6 +350,16 @@ class LogsPage extends Component<Props, State> {
   }
 
   private fetchNewerChunk = async (): Promise<void> => {
+    const maxNewerFetchForward = moment()
+      .add(DEFAULT_NEWER_CHUNK_DURATION_MS, 'miliseconds')
+      .utc()
+      .valueOf()
+
+    if (this.props.nextNewerLowerBound > maxNewerFetchForward) {
+      this.props.setNextNewerLowerBound(Date.now())
+      this.currentNewerChunksGenerator.cancel()
+    }
+
     await this.props.fetchNewerChunkAsync()
   }
 
@@ -1009,6 +1022,7 @@ const mapDispatchToProps = {
   flushTailBuffer,
   clearAllTimeBounds,
   setNextTailLowerBound,
+  setNextNewerLowerBound,
   setTableCustomTime: setTableCustomTimeAsync,
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,
