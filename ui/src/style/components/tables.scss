@@ -181,20 +181,16 @@ $table-tab-scrollbar-height: 6px;
 */
 .alert-history-page,
 .hosts-list-page {
-  .page-contents > .container-fluid,
-  .page-contents > .container-fluid > .row,
-  .page-contents > .container-fluid > .row > .col-md-12,
-  .page-contents > .container-fluid > .row > .col-md-12 > .panel {
+  .container-fluid,
+  .row,
+  .col-md-12,
+  .panel,
+  .panel-body > .generic-empty-state {
     height: 100%;
   }
 
-  .col-md-12 > .panel {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    > .panel-body {flex: 1 0 0%;}
-    .generic-empty-state {height: 100%;}
+  .panel-body {
+    height: calc(100% - 90px);
   }
 }
 

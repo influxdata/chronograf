@@ -17,6 +17,7 @@ $panel-gutter: 30px;
   align-items: center;
   justify-content: space-between;
   padding: $panel-gutter 0;
+  min-height: 90px;
 }
 
 .panel-title {

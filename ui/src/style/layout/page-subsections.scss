@@ -9,16 +9,11 @@ $subsection-font: 17px;
     .panel {
         border-top-left-radius: 0;
     }
-    .panel-heading {
-        height: 60px;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
     .panel-heading + .panel-body {
         padding-top: 0;
     }
     .panel-body {
-        min-height: 500px;
+        min-height: 320px;
     }
     .panel-title {
         font-size: $subsection-font;
