@@ -221,7 +221,7 @@ export const NOW = 0
 
 const NEWER_CHUNK_SIZE_LIMIT = 100
 const OLDER_CHUNK_SIZE_LIMIT = 100
-const MAX_FETCH_COUNT = 150
+const MAX_FETCH_COUNT = 100
 
 export const NEWER_CHUNK_OPTIONS = {
   maxFetchCount: MAX_FETCH_COUNT,

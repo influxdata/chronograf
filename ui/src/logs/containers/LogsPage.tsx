@@ -840,7 +840,11 @@ class LogsPage extends Component<Props, State> {
       this.startLogsTailFetchingInterval()
     }
 
-    this.handleFetchOlderChunk()
+    await this.handleFetchOlderChunk()
+
+    if (this.totalBackwardValues() === 0 && this.totalForwardValues() === 0) {
+      this.props.setSearchStatus(SearchStatus.NoResults)
+    }
   }
 
   private handleToggleOverlay = (): void => {
