@@ -10,6 +10,14 @@
   box-sizing: border-box;
   min-width: 100%;
   display: inline-flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+}
 
+.suggestion-text{
+  font-weight: 600;
+  font-size: 14.5px;
+  line-height: 1.55em;
+  color: #a4a8b6;
+  margin-bottom: 3px;
+  margin-left: 2px; 
 }

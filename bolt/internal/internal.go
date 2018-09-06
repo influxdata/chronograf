@@ -438,23 +438,16 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 				r.Scale = "linear"
 			}
 
-			if r.Bounds != nil {
-				axes[a] = chronograf.Axis{
-					Bounds: r.Bounds,
-					Label:  r.Label,
-					Prefix: r.Prefix,
-					Suffix: r.Suffix,
-					Base:   r.Base,
-					Scale:  r.Scale,
-				}
-
-			} else {
-				axes[a] = chronograf.Axis{
-					Bounds: []string{},
-					Base:   r.Base,
-					Scale:  r.Scale,
-				}
+			axis := chronograf.Axis{
+				Bounds: r.Bounds,
+				Label:  r.Label,
+				Prefix: r.Prefix,
+				Suffix: r.Suffix,
+				Base:   r.Base,
+				Scale:  r.Scale,
 			}
+
+			axes[a] = axis
 		}
 
 		legend := chronograf.Legend{}

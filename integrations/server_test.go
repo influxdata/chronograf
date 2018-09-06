@@ -506,7 +506,7 @@ func TestServer(t *testing.T) {
       ],
       "axes": {
         "x": {
-          "bounds": [],
+          "bounds": ["",""],
           "label": "",
           "prefix": "",
           "suffix": "",
@@ -514,7 +514,7 @@ func TestServer(t *testing.T) {
           "scale": "linear"
         },
         "y": {
-          "bounds": [],
+          "bounds": ["",""],
           "label": "",
           "prefix": "",
           "suffix": "",
@@ -522,7 +522,7 @@ func TestServer(t *testing.T) {
           "scale": "linear"
         },
         "y2": {
-          "bounds": [],
+          "bounds": ["",""],
           "label": "",
           "prefix": "",
           "suffix": "",
@@ -767,7 +767,7 @@ func TestServer(t *testing.T) {
           ],
           "axes": {
             "x": {
-              "bounds": [],
+              "bounds": ["",""],
               "label": "",
               "prefix": "",
               "suffix": "",
@@ -775,7 +775,7 @@ func TestServer(t *testing.T) {
               "scale": "linear"
             },
             "y": {
-              "bounds": [],
+              "bounds": ["",""],
               "label": "",
               "prefix": "",
               "suffix": "",
@@ -783,7 +783,7 @@ func TestServer(t *testing.T) {
               "scale": "linear"
             },
             "y2": {
-              "bounds": [],
+              "bounds": ["",""],
               "label": "",
               "prefix": "",
               "suffix": "",

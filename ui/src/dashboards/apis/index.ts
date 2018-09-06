@@ -6,7 +6,7 @@ import {
   linksFromDashboards,
   updateDashboardLinks,
 } from 'src/dashboards/utils/dashboardSwitcherLinks'
-import {instantiate} from 'src/dashboards/utils/protoboardToDashboard'
+import {instantiateProtoboard} from 'src/dashboards/utils/protoboardToDashboard'
 
 import {AxiosResponse} from 'axios'
 import {
@@ -81,7 +81,7 @@ export const createDashboardFromProtoboard = async (
   protoboard: Protoboard,
   source: Source
 ) => {
-  const dashboard = instantiate(protoboard, source)
+  const dashboard = instantiateProtoboard(protoboard, source)
   try {
     return await AJAX({
       method: 'POST',

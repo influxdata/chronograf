@@ -709,14 +709,15 @@ type LayoutsStore interface {
 
 // ProtoboardMeta is the metadata of a Protoboard
 type ProtoboardMeta struct {
-	Name             string `json:"name"`
-	Icon             string `json:"icon,omitempty"`
-	Version          string `json:"version"`
-	DashboardVersion string `json:"dashboardVersion"`
-	Description      string `json:"description,omitempty"`
-	Author           string `json:"author,omitempty"`
-	License          string `json:"license,omitempty"`
-	URL              string `json:"url,omitempty"`
+	Name             string   `json:"name"`
+	Icon             string   `json:"icon,omitempty"`
+	Version          string   `json:"version"`
+	Measurements     []string `json:"measurements"`
+	DashboardVersion string   `json:"dashboardVersion"`
+	Description      string   `json:"description,omitempty"`
+	Author           string   `json:"author,omitempty"`
+	License          string   `json:"license,omitempty"`
+	URL              string   `json:"url,omitempty"`
 }
 
 // ProtoboardCell holds visual and query information for a cell
@@ -753,7 +754,7 @@ type Protoboard struct {
 type ProtoboardsStore interface {
 	// All returns all protoboards in the store
 	All(context.Context) ([]Protoboard, error)
-	// Add creates a new protoboards in the ProtoboardsStore
+	// Get returns the specified protoboard from the store
 	Get(ctx context.Context, ID string) (Protoboard, error)
 }
 

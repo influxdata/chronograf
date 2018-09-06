@@ -25,10 +25,10 @@ describe('WizardButtonBar', () => {
     expect(wrapper.find('div')).toHaveLength(1)
   })
 
-  it('renders only the "next" button if decrement is undefined', () => {
+  it('renders only the "Next" button if decrement is undefined', () => {
     const button = wrapper.find('button')
     expect(button).toHaveLength(1)
-    expect(button.props().children).toBe('next')
+    expect(button.props().children).toBe('Next')
   })
 
   it('renders a primary button if lastStep is falsy', () => {
@@ -52,10 +52,10 @@ describe('WizardButtonBar', () => {
       wrapper = shallow(<WizardButtonBar {...propsWithDecrement} />)
     })
 
-    it('renders the "previous" button if decrement is defined and lastStep is true', () => {
+    it('renders the "Previous" button if decrement is defined and lastStep is true', () => {
       const button = wrapper.find('button')
       expect(button).toHaveLength(2)
-      expect(button.at(0).props().children).toBe('previous')
+      expect(button.at(0).props().children).toBe('Previous')
     })
 
     it('renders a success button if lastStep is true', () => {
