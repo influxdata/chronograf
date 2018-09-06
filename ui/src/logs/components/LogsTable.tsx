@@ -86,8 +86,6 @@ interface State {
   currentRow: number
   currentMessageWidth: number
   isMessageVisible: boolean
-  lastQueryTime: number
-  firstQueryTime: number
   visibleColumnsCount: number
   searchPattern: string
   infiniteLoaderQueryCount: number
@@ -113,12 +111,8 @@ class LogsTable extends Component<Props, State> {
       severityFormat
     )
 
-    let lastQueryTime = _.get(state, 'lastQueryTime', null)
-    let firstQueryTime = _.get(state, 'firstQueryTime', null)
     let scrollTop = _.get(state, 'scrollTop', 0)
     if (isScrolledToTop) {
-      lastQueryTime = null
-      firstQueryTime = null
       scrollTop = 0
     }
 
@@ -143,8 +137,6 @@ class LogsTable extends Component<Props, State> {
       ...state,
       searchPattern,
       isQuerying: false,
-      lastQueryTime,
-      firstQueryTime,
       scrollTop,
       scrollLeft,
       currentRow: -1,
@@ -178,8 +170,6 @@ class LogsTable extends Component<Props, State> {
       scrollLeft: 0,
       currentRow: -1,
       currentMessageWidth: 0,
-      lastQueryTime: null,
-      firstQueryTime: null,
       infiniteLoaderQueryCount: 0,
       isMessageVisible,
       visibleColumnsCount,
@@ -385,29 +375,13 @@ class LogsTable extends Component<Props, State> {
   }
 
   private loadMoreAboveRows = async () => {
-    // Prevent multiple queries at the same time
-    // const {queryCount} = this.props
-    // if (queryCount > 0) {
-    //   return
-    // }
     const data = getValuesFromData(this.props.tableInfiniteData.forward)
     const backwardData = getValuesFromData(
       this.props.tableInfiniteData.backward
     )
-    const firstTime = getDeep(
-      data,
-      '0.0',
-      getDeep(backwardData, '0.0', new Date().getTime())
-    )
-
-    // const {firstQueryTime} = this.state
-    // if (firstQueryTime && firstQueryTime > firstTime) {
-    //   return
-    // }
 
     try {
       this.incrementLoaderQueryCount()
-      this.setState({firstQueryTime: firstTime})
       await this.props.fetchNewer()
     } finally {
       this.decrementLoaderQueryCount()
@@ -415,30 +389,11 @@ class LogsTable extends Component<Props, State> {
   }
 
   private loadMoreBelowRows = async () => {
-    // Prevent multiple queries at the same time
-    // const {queryCount} = this.props
-    // if (queryCount > 0) {
-    //   return
-    // }
-
     const data = getValuesFromData(this.props.tableInfiniteData.backward)
     const forwardData = getValuesFromData(this.props.tableInfiniteData.forward)
 
-    const lastTime = getDeep(
-      data,
-      `${data.length - 1}.0`,
-      getDeep(forwardData, `${forwardData.length - 1}.0`, new Date().getTime())
-    )
-
-    // Guard against fetching on scrolling back up then down
-    const {lastQueryTime} = this.state
-    if (lastQueryTime && lastQueryTime <= lastTime) {
-      return
-    }
-
     try {
       this.incrementLoaderQueryCount()
-      this.setState({lastQueryTime: lastTime})
       await this.props.fetchMore()
     } finally {
       this.decrementLoaderQueryCount()
