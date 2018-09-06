@@ -19,6 +19,7 @@
 1.  [#4389](https://github.com/influxdata/chronograf/pull/4389): Add regexp search for appname in log lines
 1.  [#4403](https://github.com/influxdata/chronograf/pull/4403): Add ability to toggle between Flux/InfluxQL on dynamic source in CEO
 
+1.  [#4404](https://github.com/influxdata/chronograf/pull/4404): Add loading status indicator to hosts page
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
@@ -27,9 +28,6 @@
 1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Move log message truncation controls into logs filter bar
 1.  [#4391](https://github.com/influxdata/chronograf/pull/4391): Colorize entire Single Stat cell
 1.  [#4392](https://github.com/influxdata/chronograf/pull/4392): Add log filters on left side
-
-
-### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
 1.  [#4330](https://github.com/influxdata/chronograf/pull/4330): Position cloned cells adjacent to target cell
 

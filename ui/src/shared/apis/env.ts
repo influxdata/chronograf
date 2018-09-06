@@ -10,7 +10,6 @@ export const getEnv = async url => {
       method: 'GET',
       url,
     })
-
     return data
   } catch (error) {
     console.error('Error retrieving envs: ', error)

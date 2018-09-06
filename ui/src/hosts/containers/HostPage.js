@@ -213,7 +213,7 @@ class HostPage extends Component {
     } = this.props
 
     const activeHost = {name: hostID}
-    const links = await loadHostsLinks(source, {activeHost})
+    const links = await loadHostsLinks(source, activeHost)
 
     return links
   }

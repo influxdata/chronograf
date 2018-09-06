@@ -1,4 +1,4 @@
-export const HOSTS_TABLE = {
+export const HOSTS_TABLE_SIZING = {
   colName: '40%',
   colStatus: '74px',
   colCPU: '70px',

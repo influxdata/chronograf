@@ -67,6 +67,7 @@ import {
 import {JSONFeedData} from './status'
 import {Annotation} from './annotations'
 import {WriteDataMode} from './dataExplorer'
+import {Host, Layout} from './hosts'
 
 export {
   Me,
@@ -137,4 +138,6 @@ export {
   TemplateBuilderProps,
   WriteDataMode,
   QueryStatus,
+  Host,
+  Layout,
 }
