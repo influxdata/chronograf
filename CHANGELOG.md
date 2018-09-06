@@ -1,32 +1,15 @@
-## v1.7.0 [unreleased]
+## v1.6.2 [unreleased]
 
 ### Features
-1.  [#4217](https://github.com/influxdata/chronograf/pull/4217): Add filestore backed API for protodashboards
 1.  [#4220](https://github.com/influxdata/chronograf/pull/4220): Add ability to copy expanded/untruncated log message
 1.  [#4228](https://github.com/influxdata/chronograf/pull/4228): Add close button for logs pop over
 1.  [#4241](https://github.com/influxdata/chronograf/pull/4241): Add search attributes to log viewer
 
 ### UI Improvements
-1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
+
+1. [#4225](https://github.com/influxdata/chronograf/pull/4225): Make infinite scroll UX in Log Viewer more crisp by decreasing results queried for at a time
 1. [#4268](https://github.com/influxdata/chronograf/pull/4268): Clear logs after searching
-1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
-
-
-### UI Improvements
-1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
-1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
-
-### Bug Fixes
-
-1. [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
-
-## v1.6.2 [unreleased]
-
-### Features
-
-### UI Improvements
-
-1.  [#4225](https://github.com/influxdata/chronograf/pull/4225): Make infinite scroll UX in Log Viewer more crisp by decreasing results queried for at a time
+1. [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
 
 ### Bug Fixes
 
