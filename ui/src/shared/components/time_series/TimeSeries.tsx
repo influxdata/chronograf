@@ -4,7 +4,7 @@ import _ from 'lodash'
 import uuid from 'uuid'
 
 // API
-import {fetchTimeSeries} from 'src/shared/apis/query'
+import {executeQueries} from 'src/shared/apis/query'
 
 // Types
 import {
@@ -181,7 +181,7 @@ class TimeSeries extends Component<Props, State> {
     try {
       this.latestUUID = uuid.v1()
 
-      const timeSeries = await fetchTimeSeries(
+      const timeSeries = await executeQueries(
         source,
         queries,
         TEMP_RES,

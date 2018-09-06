@@ -18,7 +18,7 @@ interface Query {
 
 type EditQueryStatusFunction = (queryID: string, status: Status) => void
 
-export const fetchTimeSeries = async (
+export const executeQueries = async (
   source: Source,
   queries: Query[],
   resolution: number,
@@ -28,18 +28,11 @@ export const fetchTimeSeries = async (
 ) =>
   Promise.all(
     queries.map(query =>
-      fetchSingleTimeSeries(
-        source,
-        query,
-        resolution,
-        templates,
-        uuid,
-        editQueryStatus
-      )
+      executeQuery(source, query, resolution, templates, uuid, editQueryStatus)
     )
   )
 
-const fetchSingleTimeSeries = async (
+const executeQuery = async (
   source: Source,
   query: Query,
   resolution: number,
