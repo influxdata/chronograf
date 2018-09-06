@@ -4,69 +4,36 @@ import {TEMP_VAR_INTERVAL, DEFAULT_DURATION_MS} from 'src/shared/constants'
 import replaceTemplates, {replaceInterval} from 'src/tempVars/utils/replace'
 import {proxy} from 'src/utils/queryUrlGenerator'
 
-import {Source, Status, Template} from 'src/types'
-import {TimeSeriesResponse, TimeSeriesSeries} from 'src/types/series'
+import {Source, Template} from 'src/types'
+import {TimeSeriesResponse} from 'src/types/series'
 
 // REVIEW: why is this different than the `Query` in src/types?
 interface Query {
   text: string
+  id: string
   database?: string
   db?: string
   rp?: string
-  id: string
 }
 
-type EditQueryStatusFunction = (queryID: string, status: Status) => void
-
-export const executeQueries = async (
-  source: Source,
-  queries: Query[],
-  resolution: number,
-  templates: Template[],
-  uuid: string,
-  editQueryStatus: EditQueryStatusFunction = editQueryStatusNoOp
-) =>
-  Promise.all(
-    queries.map(query =>
-      executeQuery(source, query, resolution, templates, uuid, editQueryStatus)
-    )
-  )
-
-const executeQuery = async (
+export const executeQuery = async (
   source: Source,
   query: Query,
   resolution: number,
   templates: Template[],
-  uuid: string,
-  editQueryStatus: EditQueryStatusFunction
-) => {
+  uuid: string
+): Promise<TimeSeriesResponse> => {
   const text = await replace(query.text, source, templates, resolution)
 
-  editQueryStatus(query.id, {loading: true})
+  const {data} = await proxy({
+    source: source.links.proxy,
+    rp: query.rp,
+    query: text,
+    db: query.db || query.database,
+    uuid,
+  })
 
-  try {
-    const {data} = await proxy({
-      source: source.links.proxy,
-      rp: query.rp,
-      query: text,
-      db: query.db || query.database,
-      uuid,
-    })
-
-    const warningMessage = extractWarningMessage(data)
-
-    if (warningMessage) {
-      editQueryStatus(query.id, {warn: warningMessage})
-    } else {
-      editQueryStatus(query.id, {success: 'Success!'})
-    }
-
-    return data
-  } catch (error) {
-    editQueryStatus(query.id, {error: extractErrorMessage(error)})
-
-    throw error
-  }
+  return data
 }
 
 export const replace = async (
@@ -83,7 +50,7 @@ export const replace = async (
 
   const durationMs = await duration(templateReplacedQuery, source)
   const replacedQuery = replaceInterval(
-    query,
+    templateReplacedQuery,
     Math.floor(resolution / 3),
     durationMs
   )
@@ -104,37 +71,3 @@ export const duration = async (
 
   return queryDuration
 }
-
-const extractWarningMessage = (data: TimeSeriesResponse): string | null => {
-  const error = getDeep<string>(data, 'results.0.error', null)
-  const series = getDeep<TimeSeriesSeries>(data, 'results.0.series', null)
-
-  if (error) {
-    return error
-  }
-
-  if (!series) {
-    return 'Your query is syntactically correct but returned no results'
-  }
-
-  return null
-}
-
-const extractErrorMessage = (errorMessage: string): string => {
-  if (!errorMessage) {
-    return 'Could not retrieve data'
-  }
-
-  const parseErrorMatch = errorMessage.match('error parsing query')
-
-  if (parseErrorMatch) {
-    return errorMessage.slice(parseErrorMatch.index)
-  }
-
-  return errorMessage
-}
-
-const editQueryStatusNoOp = () => ({
-  type: 'NOOP',
-  payload: {},
-})
