@@ -1,4 +1,4 @@
-## v1.6.2 [unreleased]
+## v1.6.2 [2018-09-06]
 
 ### Features
 1.  [#4220](https://github.com/influxdata/chronograf/pull/4220): Add ability to copy expanded/untruncated log message
@@ -14,7 +14,7 @@
 ### Bug Fixes
 
 1.  [#4231](https://github.com/influxdata/chronograf/pull/4231): Fix notifying user to press ESC to exit presentation mode
-1.  [#4338](https://github.com/influxdata/chronograf/pull/4338/files): Fix socket leaks on Alert Rule pages
+1.  [#4338](https://github.com/influxdata/chronograf/pull/4338): Fix socket leaks on Alert Rule pages
 
 ## v1.6.1 [2018-08-02]
 
