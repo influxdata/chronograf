@@ -6,6 +6,7 @@ import SourceSelector from 'src/dashboards/components/SourceSelector'
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import CSVExporter from 'src/shared/components/TimeMachine/CSVExporter'
 import AutoRefreshDropdown from 'src/shared/components/dropdown_auto_refresh/AutoRefreshDropdown'
+import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
 // Utils
 import buildQueries from 'src/utils/buildQueriesForGraphs'
@@ -14,6 +15,11 @@ import buildQueries from 'src/utils/buildQueriesForGraphs'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service, Template} from 'src/types'
+
+enum VisType {
+  Graph,
+  Table,
+}
 
 interface Props {
   isInCEO: boolean
@@ -37,10 +43,13 @@ const TimeMachineControls: SFC<Props> = ({
   sources,
   service,
   queries,
+  visType,
   templates,
   isInCEO,
   services,
   timeRange,
+  isFluxSource,
+  toggleVisType,
   autoRefreshDuration,
   onChangeAutoRefreshDuration,
   onChangeService,
@@ -62,6 +71,16 @@ const TimeMachineControls: SFC<Props> = ({
         isDynamicSourceSelected={isDynamicSourceSelected}
         onSelectDynamicSource={onSelectDynamicSource}
       />
+      {isFluxSource && (
+        <div className="time-machine-vis--raw-toggle">
+          <SlideToggle
+            active={visType === VisType.Table}
+            onChange={toggleVisType}
+            size={ComponentSize.ExtraSmall}
+          />
+          View Raw Data
+        </div>
+      )}
       <CSVExporter
         queries={buildQueries(queries, timeRange)}
         templates={templates}

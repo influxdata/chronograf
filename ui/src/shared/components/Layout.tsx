@@ -7,6 +7,7 @@ import WidgetCell from 'src/shared/components/WidgetCell'
 import LayoutCell from 'src/shared/components/LayoutCell'
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 import TimeMachineVis from 'src/flux/components/TimeMachineVis'
+import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
 // Utils
 import {buildQueriesForLayouts} from 'src/utils/buildQueriesForLayouts'
@@ -17,9 +18,14 @@ import {IS_STATIC_LEGEND} from 'src/shared/constants'
 
 // Types
 import {TimeRange, Cell, Template, Source, Service} from 'src/types'
-
+import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
+
+enum VisType {
+  Graph,
+  Table,
+}
 
 interface Props {
   cell: Cell
@@ -37,10 +43,16 @@ interface Props {
   onSummonOverlayTechnologies: () => void
 }
 
+interface State {
+  cellData: TimeSeriesServerResponse[]
+  visType: VisType
+}
+
 @ErrorHandling
-class Layout extends Component<Props> {
+class Layout extends Component<Props, State> {
   public state = {
     cellData: [],
+    visType: VisType.Graph,
   }
 
   public render() {
@@ -87,10 +99,23 @@ class Layout extends Component<Props> {
 
     if (fluxSource) {
       return (
-        <TimeMachineVis
-          service={fluxSource}
-          script={getDeep<string>(cell, 'queries.0.query', '')}
-        />
+        <>
+          <div className="time-machine-vis--header">
+            <div className="time-machine-vis--raw-toggle">
+              <SlideToggle
+                active={this.visType === VisType.Table}
+                onChange={this.toggleVisType}
+                size={ComponentSize.ExtraSmall}
+              />
+              View Raw Data
+            </div>
+          </div>
+          <TimeMachineVis
+            service={fluxSource}
+            visType={this.visType}
+            script={getDeep<string>(cell, 'queries.0.query', '')}
+          />
+        </>
       )
     }
   }
@@ -140,6 +165,17 @@ class Layout extends Component<Props> {
       return this.fluxVis
     }
     return this.influxQLVis
+  }
+
+  private get visType(): VisType {
+    return this.state.visType
+  }
+
+  private toggleVisType = (): void => {
+    const newVisType =
+      this.state.visType === VisType.Graph ? VisType.Table : VisType.Graph
+
+    this.setState({visType: newVisType})
   }
 
   private grabDataForDownload: GrabDataForDownloadHandler = cellData => {

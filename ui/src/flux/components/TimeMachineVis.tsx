@@ -3,7 +3,6 @@ import React, {PureComponent} from 'react'
 import FluxGraph from 'src/flux/components/FluxGraph'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
 import TimeMachineTables from 'src/flux/components/TimeMachineTables'
-import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
@@ -22,12 +21,12 @@ interface Props {
   script: string
   service: Service
   debouncer?: Debouncer
+  visType: VisType
 }
 
 interface State {
   data: FluxTable[]
   dataStatus: RemoteDataState
-  visType: VisType
 }
 
 class TimeMachineVis extends PureComponent<Props, State> {
@@ -40,7 +39,6 @@ class TimeMachineVis extends PureComponent<Props, State> {
     this.state = {
       data: [],
       dataStatus: RemoteDataState.NotStarted,
-      visType: VisType.Graph,
     }
   }
 
@@ -56,7 +54,8 @@ class TimeMachineVis extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {data, dataStatus, visType} = this.state
+    const {visType} = this.props
+    const {data, dataStatus} = this.state
 
     if (dataStatus === RemoteDataState.Error) {
       return (
@@ -76,16 +75,6 @@ class TimeMachineVis extends PureComponent<Props, State> {
 
     return (
       <div className="time-machine-vis">
-        <div className="time-machine-vis--header">
-          <div className="time-machine-vis--raw-toggle">
-            <SlideToggle
-              active={visType === VisType.Table}
-              onChange={this.toggleVisType}
-              size={ComponentSize.ExtraSmall}
-            />{' '}
-            View Raw Data
-          </div>
-        </div>
         {visType === VisType.Graph ? (
           <FluxGraph data={data} />
         ) : (
@@ -105,13 +94,6 @@ class TimeMachineVis extends PureComponent<Props, State> {
     } catch (e) {
       this.setState({dataStatus: RemoteDataState.Error})
     }
-  }
-
-  private toggleVisType = (): void => {
-    const visType =
-      this.state.visType === VisType.Graph ? VisType.Table : VisType.Graph
-
-    this.setState({visType})
   }
 }
 
