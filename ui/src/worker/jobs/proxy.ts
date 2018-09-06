@@ -7,7 +7,18 @@ const proxy = async msg => {
     method: 'POST',
     body: JSON.stringify({query, rp, db, uuid}),
   })
+
   const data = await response.json()
+
+  if (!response.ok) {
+    let message = 'proxy request failed'
+
+    if (data && data.message) {
+      message = data.message
+    }
+
+    return Promise.reject(message)
+  }
 
   return {data}
 }

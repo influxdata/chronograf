@@ -148,16 +148,25 @@ const handleSuccess = (
 }
 
 const handleError = (
-  error,
+  error: string,
   query: Query,
   editQueryStatus: EditQueryStatusFunction
 ): void => {
-  const message =
-    getDeep<string>(error, 'data.message', '') ||
-    getDeep<string>(error, 'message', 'Could not retrieve data')
-
-  // 400 from chrono server = fail
   editQueryStatus(query.id, {
-    error: message,
+    error: extractErrorMessage(error),
   })
+}
+
+const extractErrorMessage = (errorMessage: string): string => {
+  if (!errorMessage) {
+    return 'Could not retrieve data'
+  }
+
+  const parseErrorMatch = errorMessage.match('error parsing query')
+
+  if (parseErrorMatch) {
+    return errorMessage.slice(parseErrorMatch.index)
+  }
+
+  return errorMessage
 }
