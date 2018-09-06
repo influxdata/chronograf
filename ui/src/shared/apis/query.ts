@@ -1,6 +1,6 @@
 import {getDeep} from 'src/utils/wrappers'
 import {analyzeQueries} from 'src/shared/apis'
-import {DEFAULT_DURATION_MS} from 'src/shared/constants'
+import {TEMP_VAR_INTERVAL, DEFAULT_DURATION_MS} from 'src/shared/constants'
 import replaceTemplates, {replaceInterval} from 'src/tempVars/utils/replace'
 import {proxy} from 'src/utils/queryUrlGenerator'
 
@@ -83,6 +83,11 @@ export const replace = async (
   resolution: number
 ): Promise<string> => {
   const templateReplacedQuery = replaceTemplates(query, templates)
+
+  if (!templateReplacedQuery.includes(TEMP_VAR_INTERVAL)) {
+    return templateReplacedQuery
+  }
+
   const durationMs = await duration(templateReplacedQuery, source)
   const replacedQuery = replaceInterval(
     query,
