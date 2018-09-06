@@ -64,11 +64,11 @@ export class ExpandableMessage extends Component<Props, State> {
 
   private get expandedMessage() {
     const {expanded} = this.state
-    
+
     if (!expanded || !this.containerRef.current) {
       return null
     }
-    
+
     const portalElement = document.getElementById('expanded-message-container')
     const containerRect = this.containerRef.current.getBoundingClientRect()
     const padding = 8
