@@ -7,17 +7,17 @@ import {LoadingMessages} from 'src/logs/constants'
 
 interface Props {
   status: SearchStatus
-  nextOlderUpperBound: number
+  currentOlderLowerBound: number
 }
 
 class LoadingStatus extends PureComponent<Props> {
   public render() {
-    const {nextOlderUpperBound} = this.props
+    const {currentOlderLowerBound} = this.props
 
     return (
       <div className="logs-viewer--table-container generic-empty-state">
         <h4>
-          {this.loadingMessage}... {moment(nextOlderUpperBound).fromNow()}
+          {this.loadingMessage}... {moment(currentOlderLowerBound).fromNow()}
         </h4>
         <p>{this.description}</p>
       </div>

@@ -56,7 +56,10 @@ export interface LogsState {
   newRowsAdded: number
   searchStatus: SearchStatus
   nextOlderUpperBound: number | undefined
+  nextOlderLowerBound: number | undefined
   nextNewerUpperBound: number | undefined
+  nextNewerLowerBound: number | undefined
+  currentTailUpperBound: number | undefined
   nextTailLowerBound: number | undefined
   tailChunkDurationMs: number
   olderChunkDurationMs: number

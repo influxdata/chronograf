@@ -20,7 +20,13 @@ export const fetchChunk = <T>(
   const isDone = () => {
     const isChunkLoaded = getCurrentSize() - initialSize >= chunkSize
     const isCountMaxed = fetchCount.next().value > maxFetchCount
-    console.log('fetchChunk isDone', 'isChunkLoaded', isChunkLoaded, 'isCountMaxed', isCountMaxed)
+    console.log(
+      'fetchChunk isDone',
+      'isChunkLoaded',
+      isChunkLoaded,
+      'isCountMaxed',
+      isCountMaxed
+    )
 
     return isChunkLoaded || isCountMaxed
   }

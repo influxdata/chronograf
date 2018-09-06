@@ -45,13 +45,12 @@ import {
   fetchOlderChunkAsync,
   fetchNewerChunkAsync,
   fetchTailAsync,
+  flushTailBuffer,
+  clearAllTimeBounds,
   setNextTailLowerBound,
-  setNextOlderUpperBound,
-  setNextNewerUpperBound,
   getLogConfigAsync,
   updateLogConfigAsync,
   clearTableData,
-  clearNextTimeBounds,
   clearSearchData,
   setSearchStatus,
   setHistogramQueryConfigAsync,
@@ -136,15 +135,16 @@ interface Props {
     custom: string
     relative: number
   }
-  fetchOlderChunkAsync: () => Promise<void>
+  fetchOlderChunkAsync: typeof fetchOlderChunkAsync
   fetchNewerChunkAsync: typeof fetchNewerChunkAsync
-  fetchTailAsync: () => Promise<void>
+  fetchTailAsync: typeof fetchTailAsync
+  flushTailBuffer: typeof flushTailBuffer
+  clearAllTimeBounds: typeof clearAllTimeBounds
   setNextTailLowerBound: typeof setNextTailLowerBound
-  setNextNewerUpperBound: typeof setNextNewerUpperBound
-  setNextOlderUpperBound: typeof setNextOlderUpperBound
   executeHistogramQueryAsync: typeof executeHistogramQueryAsync
   nextOlderUpperBound: number | undefined
-  nextNewerLowerBound: number | undefined
+  currentNewerUpperBound: number | undefined
+  currentTailUpperBound: number | undefined
   nextTailLowerBound: number | undefined
   searchStatus: SearchStatus
   clearSearchData: (searchStatus: SearchStatus) => void
@@ -236,8 +236,9 @@ class LogsPageSimple extends Component<Props, State> {
       timeRange,
       notify,
       nextOlderUpperBound,
-      nextNewerLowerBound,
+      currentNewerUpperBound,
       nextTailLowerBound,
+      currentTailUpperBound,
       searchStatus,
     } = this.props
 
@@ -283,9 +284,12 @@ class LogsPageSimple extends Component<Props, State> {
               notify={notify}
               searchStatus={searchStatus}
               filters={filters}
-              nextOlderUpperBound={nextOlderUpperBound}
-              nextNewerLowerBound={nextNewerLowerBound}
-              nextTailLowerBound={nextTailLowerBound}
+              upper={
+                currentNewerUpperBound ||
+                currentTailUpperBound ||
+                nextTailLowerBound
+              }
+              lower={nextOlderUpperBound}
             />
           </div>
         </div>
@@ -319,6 +323,7 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private startLogsTailFetchingInterval = () => {
+    this.flushTailBuffer()
     this.clearTailInterval()
 
     const now = moment()
@@ -334,7 +339,6 @@ class LogsPageSimple extends Component<Props, State> {
     this.setState({liveUpdating: true})
   }
 
-  // only happens on page load or on search
   private handleTailFetchingInterval = async () => {
     console.log('handleTailFetchingInterval')
     if (this.isClearing) {
@@ -398,7 +402,7 @@ class LogsPageSimple extends Component<Props, State> {
       return
     }
 
-console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
+    console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
     this.startFetchingNewer()
   }
 
@@ -490,7 +494,7 @@ console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
   }
 
   private handleChooseCustomTime = async (time: string) => {
-    this.clearAllBounds()
+    this.clearAllTimeBounds()
 
     this.props.setTableCustomTime(time)
     const liveUpdating = false
@@ -509,7 +513,7 @@ console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
   }
 
   private handleChooseRelativeTime = async (time: number) => {
-    this.clearAllBounds()
+    this.clearAllTimeBounds()
 
     this.props.setTableRelativeTime(time)
     this.setState({hasScrolled: false})
@@ -532,11 +536,14 @@ console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
     this.handleSetTimeBounds()
   }
 
-  private clearAllBounds(): void {
-    console.log('clearAllBounds)')
-    this.props.setNextNewerUpperBound(undefined)
-    this.props.setNextOlderUpperBound(undefined)
-    this.props.setNextTailLowerBound(undefined)
+  private clearAllTimeBounds(): void {
+    console.log('clearAllTimeBounds')
+    this.props.clearAllTimeBounds()
+  }
+
+  private flushTailBuffer(): void {
+    console.log('flushTailBuffer')
+    this.props.flushTailBuffer()
   }
 
   private get tableData(): TableData {
@@ -568,6 +575,7 @@ console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
 
   private handleScrollToTop = () => {
     if (!this.isLiveUpdating && this.shouldLiveUpdate) {
+      console.log('handleScrollToTop startLogsTailFetchingInterval')
       this.startLogsTailFetchingInterval()
     }
   }
@@ -940,7 +948,8 @@ const mapStateToProps = ({
     tableTime,
     tableInfiniteData,
     nextOlderUpperBound,
-    nextNewerLowerBound,
+    currentNewerUpperBound,
+    currentTailUpperBound,
     nextTailLowerBound,
     searchStatus,
   },
@@ -960,7 +969,8 @@ const mapStateToProps = ({
   tableInfiniteData,
   newRowsAdded,
   nextOlderUpperBound,
-  nextNewerLowerBound,
+  currentNewerUpperBound,
+  currentTailUpperBound,
   nextTailLowerBound,
   searchStatus,
 })
@@ -982,9 +992,9 @@ const mapDispatchToProps = {
   fetchOlderChunkAsync,
   fetchNewerChunkAsync,
   fetchTailAsync,
+  flushTailBuffer,
+  clearAllTimeBounds,
   setNextTailLowerBound,
-  setNextOlderUpperBound,
-  setNextNewerUpperBound,
   setTableCustomTime: setTableCustomTimeAsync,
   setTableRelativeTime: setTableRelativeTimeAsync,
   getConfig: getLogConfigAsync,

@@ -1,6 +1,7 @@
 import moment from 'moment'
 import _ from 'lodash'
 import {Dispatch} from 'redux'
+import {ThunkDispatch} from 'redux-thunk'
 
 import {Source, Namespace, QueryConfig} from 'src/types'
 import {getSource} from 'src/shared/apis'
@@ -86,7 +87,10 @@ export enum ActionTypes {
   ClearRowsAdded = 'CLEAR_ROWS_ADDED',
   ClearTableData = 'CLEAR_TABLE_DATA',
   SetNextOlderUpperBound = 'SET_NEXT_OLDER_UPPER_BOUND',
+  SetNextOlderLowerBound = 'SET_NEXT_OLDER_LOWER_BOUND',
   SetNextNewerUpperBound = 'SET_NEXT_NEWER_UPPER_BOUND',
+  SetNextNewerLowerBound = 'SET_NEXT_NEWER_LOWER_BOUND',
+  SetCurrentTailUpperBound = 'SET_CURRENT_TAIL_UPPER_BOUND',
   SetNextTailLowerBound = 'SET_NEXT_TAIL_LOWER_BOUND',
   SetSearchStatus = 'SET_SEARCH_STATUS',
 }
@@ -261,18 +265,36 @@ interface SetNextOlderUpperBoundAction {
     upper: number | undefined
   }
 }
-
-interface SetNextTailLowerBoundAction {
-  type: ActionTypes.SetNextTailLowerBound
+interface SetNextOlderLowerBoundAction {
+  type: ActionTypes.SetNextOlderLowerBound
   payload: {
     lower: number | undefined
   }
 }
 
+interface SetNextNewerLowerBoundAction {
+  type: ActionTypes.SetNextNewerLowerBound
+  payload: {
+    lower: number | undefined
+  }
+}
 interface SetNextNewerUpperBoundAction {
   type: ActionTypes.SetNextNewerUpperBound
   payload: {
     upper: number | undefined
+  }
+}
+
+interface SetCurrentTailUpperBoundAction {
+  type: ActionTypes.SetCurrentTailUpperBound
+  payload: {
+    upper: number | undefined
+  }
+}
+interface SetNextTailLowerBoundAction {
+  type: ActionTypes.SetNextTailLowerBound
+  payload: {
+    lower: number | undefined
   }
 }
 
@@ -310,9 +332,15 @@ export type Action =
   | ClearRowsAddedAction
   | ClearTableDataAction
   | SetNextOlderUpperBoundAction
+  | SetNextOlderLowerBoundAction
   | SetNextNewerUpperBoundAction
+  | SetNextNewerLowerBoundAction
+  | SetCurrentTailUpperBoundAction
   | SetNextTailLowerBoundAction
   | SetSearchStatusAction
+
+const getForwardTableData = (state: State): TableData =>
+  state.logs.tableInfiniteData.forward
 
 const getBackwardTableData = (state: State): TableData =>
   state.logs.tableInfiniteData.backward
@@ -373,9 +401,9 @@ const getOlderChunkDurationMs = (state: State): number => {
   )
 }
 
-const getNextNewerUpperBound = (state: State): number => {
+const getNextNewerLowerBound = (state: State): number => {
   const selectedTableTime = getTableSelectedTime(state)
-  return getDeep<number>(state, 'logs.nextNewerUpperBound', selectedTableTime)
+  return getDeep<number>(state, 'logs.nextNewerLowerBound', selectedTableTime)
 }
 
 const getNewerChunkDurationMs = (state: State): number => {
@@ -452,6 +480,12 @@ export const setNextOlderUpperBound = (
   type: ActionTypes.SetNextOlderUpperBound,
   payload: {upper},
 })
+export const setNextOlderLowerBound = (
+  lower: number
+): SetNextOlderLowerBoundAction => ({
+  type: ActionTypes.SetNextOlderLowerBound,
+  payload: {lower},
+})
 
 export const setNextNewerUpperBound = (
   upper: number
@@ -459,7 +493,19 @@ export const setNextNewerUpperBound = (
   type: ActionTypes.SetNextNewerUpperBound,
   payload: {upper},
 })
+export const setNextNewerLowerBound = (
+  lower: number
+): SetNextNewerLowerBoundAction => ({
+  type: ActionTypes.SetNextNewerLowerBound,
+  payload: {lower},
+})
 
+export const setCurrentTailUpperBound = (
+  upper: number
+): SetCurrentTailUpperBoundAction => ({
+  type: ActionTypes.SetCurrentTailUpperBound,
+  payload: {upper},
+})
 export const setNextTailLowerBound = (
   lower: number
 ): SetNextTailLowerBoundAction => ({
@@ -474,23 +520,28 @@ export const setSearchStatus = (
   payload: {searchStatus},
 })
 
-export const clearNextTimeBounds = () => (
+export const clearAllTimeBounds = () => (
   dispatch: Dispatch<
-    | SetNextTailLowerBoundAction
-    | SetNextNewerUpperBoundAction
     | SetNextOlderUpperBoundAction
+    | SetNextOlderLowerBoundAction
+    | SetNextNewerUpperBoundAction
+    | SetNextNewerLowerBoundAction
+    | SetCurrentTailUpperBoundAction
+    | SetNextTailLowerBoundAction
   >
 ) => {
-  dispatch(setNextTailLowerBound(undefined))
-  dispatch(setNextNewerUpperBound(undefined))
   dispatch(setNextOlderUpperBound(undefined))
+  dispatch(setNextOlderLowerBound(undefined))
+  dispatch(setNextNewerUpperBound(undefined))
+  dispatch(setCurrentTailUpperBound(undefined))
+  dispatch(setNextTailLowerBound(undefined))
 }
 
 export const clearSearchData = (
   searchStatus: SearchStatus
 ) => async dispatch => {
   await dispatch(setSearchStatus(SearchStatus.Clearing))
-  dispatch(clearNextTimeBounds())
+  dispatch(clearAllTimeBounds())
   dispatch(clearTableData())
   await dispatch(setSearchStatus(SearchStatus.Cleared))
   await dispatch(setSearchStatus(searchStatus))
@@ -693,16 +744,16 @@ export const fetchNewerChunkAsync = () => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const nextNewerUpperBound = getNextNewerUpperBound(state)
+    const newerLowerBound = getNextNewerLowerBound(state)
     const newerChunkDurationMs = getNewerChunkDurationMs(state)
 
-    const lower = moment(nextNewerUpperBound).toISOString()
-    const upper = moment(nextNewerUpperBound)
+    const lower = moment(newerLowerBound).toISOString()
+    const upper = moment(newerLowerBound)
       .add(newerChunkDurationMs, 'milliseconds')
       .toISOString()
 
     dispatch(
-      setNextNewerUpperBound(
+      setNextNewerLowerBound(
         moment(upper)
           .utc()
           .valueOf()
@@ -735,16 +786,41 @@ export const fetchNewerChunkAsync = () => async (
   }
 }
 
+export const flushTailBuffer = () => (
+  dispatch: Dispatch<SetTableBackwardDataAction | SetTableForwardDataAction>,
+  getState: GetState
+) => {
+  const state = getState()
+
+  const currentTailBuffer = getForwardTableData(state)
+  const currentBackward = getBackwardTableData(state)
+  console.log(
+    'flushTailBuffer currentTailBuffer.values.length',
+    currentTailBuffer.values.length
+  )
+  console.log(
+    'flushTailBuffer currentBackward.values.length',
+    currentBackward.values.length
+  )
+  const combinedBackward = combineTableData(currentTailBuffer, currentBackward)
+
+  dispatch(setTableBackwardData(combinedBackward))
+  dispatch(setTableForwardData(defaultTableData))
+}
+
 export const fetchTailAsync = () => async (
-  dispatch: Dispatch<
-    | SetTableBackwardDataAction
-    | SetTableForwardDataAction
-    | SetNextTailLowerBoundAction
-  >,
+  dispatch:
+    | Dispatch<
+        | SetTableBackwardDataAction
+        | SetTableForwardDataAction
+        | SetNextTailLowerBoundAction
+      >
+    | ThunkDispatch<typeof flushTailBuffer>,
   getState: GetState
 ): Promise<void> => {
+  console.log('fetchTailAsync')
   const state = getState()
-  
+
   const tableQueryConfig = getTableQueryConfig(state)
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
@@ -761,14 +837,8 @@ export const fetchTailAsync = () => async (
     const lower = moment(nextTailLowerBound).toISOString()
     const upper = moment().toISOString()
 
-    const upperUTC = moment(upper)
-      .utc()
-      .valueOf()
-    const currentForwardBufferDuration = upperUTC - nextTailLowerBound
-    const maxTailBufferDurationMs = getMaxTailBufferDurationMs(state)
-    const isMaxTailBufferDurationExceeded =
-      currentForwardBufferDuration >= maxTailBufferDurationMs
-
+    console.log('fetchTailAsync lower', lower)
+    console.log('fetchTailAsync upper', upper)
     const query = buildInfiniteScrollLogQuery(
       lower,
       upper,
@@ -787,12 +857,20 @@ export const fetchTailAsync = () => async (
       defaultTableData
     )
 
-    if (isMaxTailBufferDurationExceeded) {
-      const currentBackward = getBackwardTableData(state)
-      const combinedBackward = combineTableData(logSeries, currentBackward)
+    const upperUTC = moment(upper)
+      .utc()
+      .valueOf()
 
-      dispatch(setTableBackwardData(combinedBackward))
-      dispatch(setTableForwardData(defaultTableData))
+    dispatch(setCurrentTailUpperBound(upperUTC))
+
+    const currentForwardBufferDuration = upperUTC - nextTailLowerBound
+    const maxTailBufferDurationMs = getMaxTailBufferDurationMs(state)
+    const isMaxTailBufferDurationExceeded =
+      currentForwardBufferDuration >= maxTailBufferDurationMs
+
+    if (isMaxTailBufferDurationExceeded) {
+      console.log('flush buffer')
+      dispatch(flushTailBuffer())
       await dispatch(setNextTailLowerBound(upperUTC))
     } else {
       await dispatch(setTableForwardData(logSeries))

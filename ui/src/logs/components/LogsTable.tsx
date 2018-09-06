@@ -76,9 +76,8 @@ interface Props {
   onChooseCustomTime: (time: string) => void
   notify: NotificationAction
   searchStatus: SearchStatus
-  nextOlderUpperBound: number | undefined
-  nextNewerLowerBound: number | undefined
-  nextTailLowerBound: number | undefined
+  upper: number | undefined
+  lower: number | undefined
 }
 
 interface State {
@@ -219,13 +218,7 @@ class LogsTable extends Component<Props, State> {
   }
 
   public render() {
-    const {
-      queryCount,
-      nextOlderUpperBound,
-      nextNewerLowerBound,
-      nextTailLowerBound,
-      searchStatus,
-    } = this.props
+    const {queryCount, upper, lower, searchStatus} = this.props
     const {infiniteLoaderQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
@@ -243,8 +236,8 @@ class LogsTable extends Component<Props, State> {
             count={this.rowCount()}
             queryCount={infiniteLoaderQueryCount + queryCount}
             searchStatus={searchStatus}
-            upper={nextOlderUpperBound}
-            lower={nextNewerLowerBound || nextTailLowerBound} // works as long as the other value is cleared when switching
+            upper={upper}
+            lower={lower}
           />
         </div>
         <AutoSizer>
@@ -753,7 +746,7 @@ class LogsTable extends Component<Props, State> {
     return (
       <LoadingStatus
         status={this.props.searchStatus}
-        nextOlderUpperBound={this.props.nextOlderUpperBound}
+        currentOlderLowerBound={this.props.lower}
       />
     )
   }

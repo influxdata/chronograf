@@ -60,8 +60,13 @@ class QueryResults extends PureComponent<Props> {
 
     return (
       <>
-        From: <strong>{this.formattedLowerTime}</strong> <br />
-        To: <strong>{this.formattedUpperTime}</strong>...
+        <span>
+          Newest: <strong>{this.formattedUpperTime}</strong>
+        </span>
+        <br />
+        <span>
+          Oldest: <strong>{this.formattedLowerTime}</strong>
+        </span>
       </>
     )
   }

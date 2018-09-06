@@ -70,7 +70,10 @@ export const defaultState: LogsState = {
   },
   searchStatus: SearchStatus.None,
   nextOlderUpperBound: undefined,
+  nextOlderLowerBound: undefined,
   nextNewerUpperBound: undefined,
+  nextNewerLowerBound: undefined,
+  currentTailUpperBound: undefined,
   nextTailLowerBound: undefined,
   tailChunkDurationMs: DEFAULT_TAIL_CHUNK_DURATION_MS,
   olderChunkDurationMs: DEFAULT_OLDER_CHUNK_DURATION_MS,
@@ -272,8 +275,14 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, tableTime: {relative: action.payload.time}}
     case ActionTypes.SetNextOlderUpperBound:
       return {...state, nextOlderUpperBound: action.payload.upper}
+    case ActionTypes.SetNextOlderLowerBound:
+      return {...state, nextOlderLowerBound: action.payload.lower}
     case ActionTypes.SetNextNewerUpperBound:
       return {...state, nextNewerUpperBound: action.payload.upper}
+    case ActionTypes.SetNextNewerLowerBound:
+      return {...state, nextNewerLowerBound: action.payload.lower}
+    case ActionTypes.SetCurrentTailUpperBound:
+      return {...state, currentTailUpperBound: action.payload.upper}
     case ActionTypes.SetNextTailLowerBound:
       return {...state, nextTailLowerBound: action.payload.lower}
     case ActionTypes.AddFilter:
