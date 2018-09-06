@@ -27,7 +27,7 @@ interface Props {
 export class ExpandableMessage extends Component<Props, State> {
   private containerRef: React.RefObject<HTMLDivElement>
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.containerRef = React.createRef()
     this.state = {
@@ -64,34 +64,32 @@ export class ExpandableMessage extends Component<Props, State> {
 
   private get expandedMessage() {
     const {expanded} = this.state
-    const container = document.getElementById('expanded-message-container')
-
+    
     if (!expanded || !this.containerRef.current) {
       return null
     }
+    
+    const portalElement = document.getElementById('expanded-message-container')
+    const containerRect = this.containerRef.current.getBoundingClientRect()
+    const padding = 8
 
-    if (this.containerRef.current) {
-      const containerRect = this.containerRef.current.getBoundingClientRect()
-      const padding = 8
-
-      const style = {
-        top: containerRect.top - padding,
-        left: containerRect.left - padding,
-        width: containerRect.width + padding + padding,
-        padding,
-      }
-
-      const message = (
-        <ClickOutside onClickOutside={this.handleClickOutside}>
-          <div className="expanded--message" style={style}>
-            {this.closeExpansionButton}
-            {this.message}
-          </div>
-        </ClickOutside>
-      )
-
-      return ReactDOM.createPortal(message, container)
+    const style = {
+      top: containerRect.top - padding,
+      left: containerRect.left - padding,
+      width: containerRect.width + padding + padding,
+      padding,
     }
+
+    const message = (
+      <ClickOutside onClickOutside={this.handleClickOutside}>
+        <div className="expanded--message" style={style}>
+          {this.closeExpansionButton}
+          {this.message}
+        </div>
+      </ClickOutside>
+    )
+
+    return ReactDOM.createPortal(message, portalElement)
   }
 
   private get closeExpansionButton(): JSX.Element {
