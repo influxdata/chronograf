@@ -462,3 +462,11 @@ $deceo--tab-width: 220px;
 .deceo--header-tabs {
   flex: 1 0 $deceo--tab-width;
 }
+
+.unexpected-error {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
