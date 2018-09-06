@@ -9,13 +9,9 @@ import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {getTimeSeries} from 'src/flux/apis'
 
 import {Service, FluxTable, RemoteDataState} from 'src/types'
+import {VisType} from 'src/types/flux'
 
 const FETCH_NEW_DATA_DELAY = 1000 // ms
-
-enum VisType {
-  Graph,
-  Table,
-}
 
 interface Props {
   script: string

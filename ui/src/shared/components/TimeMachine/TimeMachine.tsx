@@ -68,6 +68,7 @@ import {
   DeleteFuncNodeArgs,
   Func,
   ScriptStatus,
+  VisType,
 } from 'src/types/flux'
 import {
   Axes,
@@ -93,11 +94,6 @@ export interface VisualizationOptions {
   thresholdsListType: ThresholdType
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
-}
-
-enum VisType {
-  Graph,
-  Table,
 }
 
 interface Props {

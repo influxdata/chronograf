@@ -7,7 +7,6 @@ import WidgetCell from 'src/shared/components/WidgetCell'
 import LayoutCell from 'src/shared/components/LayoutCell'
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 import TimeMachineVis from 'src/flux/components/TimeMachineVis'
-import {SlideToggle, ComponentSize} from 'src/reusable_ui'
 
 // Utils
 import {buildQueriesForLayouts} from 'src/utils/buildQueriesForLayouts'
@@ -21,11 +20,7 @@ import {TimeRange, Cell, Template, Source, Service} from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-
-enum VisType {
-  Graph,
-  Table,
-}
+import {VisType} from 'src/types/flux'
 
 interface Props {
   cell: Cell
@@ -71,9 +66,12 @@ class Layout extends Component<Props, State> {
         cell={cell}
         cellData={cellData}
         templates={templates}
+        visType={this.visType}
         isEditable={isEditable}
         onCloneCell={onCloneCell}
         onDeleteCell={onDeleteCell}
+        isFluxSource={!!this.fluxSource}
+        toggleVisType={this.toggleVisType}
         onSummonOverlayTechnologies={onSummonOverlayTechnologies}
       >
         {this.visualization}
@@ -99,23 +97,13 @@ class Layout extends Component<Props, State> {
 
     if (fluxSource) {
       return (
-        <>
-          <div className="time-machine-vis--header">
-            <div className="time-machine-vis--raw-toggle">
-              <SlideToggle
-                active={this.visType === VisType.Table}
-                onChange={this.toggleVisType}
-                size={ComponentSize.ExtraSmall}
-              />
-              View Raw Data
-            </div>
-          </div>
+        <div className="dash-graph">
           <TimeMachineVis
             service={fluxSource}
             visType={this.visType}
             script={getDeep<string>(cell, 'queries.0.query', '')}
           />
-        </>
+        </div>
       )
     }
   }

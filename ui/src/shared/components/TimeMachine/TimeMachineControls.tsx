@@ -15,14 +15,12 @@ import buildQueries from 'src/utils/buildQueriesForGraphs'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service, Template} from 'src/types'
-
-enum VisType {
-  Graph,
-  Table,
-}
+import {VisType} from 'src/types/flux'
 
 interface Props {
   isInCEO: boolean
+  visType: VisType
+  isFluxSource: boolean
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
   service: Service
@@ -36,6 +34,7 @@ interface Props {
   onSelectDynamicSource: () => void
   timeRange: QueriesModels.TimeRange
   updateEditorTimeRange: (timeRange: QueriesModels.TimeRange) => void
+  toggleVisType: () => void
 }
 
 const TimeMachineControls: SFC<Props> = ({
