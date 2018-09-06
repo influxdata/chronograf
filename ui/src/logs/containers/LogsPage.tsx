@@ -133,7 +133,7 @@ interface Props {
   setNextTailLowerBound: typeof setNextTailLowerBound
   executeHistogramQueryAsync: typeof executeHistogramQueryAsync
   nextOlderUpperBound: number | undefined
-  currentNewerUpperBound: number | undefined
+  nextNewerLowerBound: number | undefined
   currentTailUpperBound: number | undefined
   nextTailLowerBound: number | undefined
   searchStatus: SearchStatus
@@ -222,7 +222,7 @@ class LogsPage extends Component<Props, State> {
       timeRange,
       notify,
       nextOlderUpperBound,
-      currentNewerUpperBound,
+      nextNewerLowerBound,
       nextTailLowerBound,
       currentTailUpperBound,
       searchStatus,
@@ -277,7 +277,7 @@ class LogsPage extends Component<Props, State> {
               searchStatus={searchStatus}
               filters={filters}
               upper={
-                currentNewerUpperBound ||
+                nextNewerLowerBound ||
                 currentTailUpperBound ||
                 nextTailLowerBound
               }
@@ -957,7 +957,7 @@ const mapStateToProps = ({
     tableTime,
     tableInfiniteData,
     nextOlderUpperBound,
-    currentNewerUpperBound,
+    nextNewerLowerBound,
     currentTailUpperBound,
     nextTailLowerBound,
     searchStatus,
@@ -978,7 +978,7 @@ const mapStateToProps = ({
   tableInfiniteData,
   newRowsAdded,
   nextOlderUpperBound,
-  currentNewerUpperBound,
+  nextNewerLowerBound,
   currentTailUpperBound,
   nextTailLowerBound,
   searchStatus,
