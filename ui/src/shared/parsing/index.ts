@@ -1,10 +1,10 @@
 import _ from 'lodash'
 
-import databases from 'shared/parsing/showDatabases'
-import measurements from 'shared/parsing/showMeasurements'
-import fieldKeys from 'shared/parsing/showFieldKeys'
-import tagKeys from 'shared/parsing/showTagKeys'
-import tagValues from 'shared/parsing/showTagValues'
+import databases from 'src/shared/parsing/showDatabases'
+import measurements from 'src/shared/parsing/showMeasurements'
+import fieldKeys from 'src/shared/parsing/showFieldKeys'
+import tagKeys from 'src/shared/parsing/showTagKeys'
+import tagValues from 'src/shared/parsing/showTagValues'
 import {getDeep} from 'src/utils/wrappers'
 
 import {TimeSeriesResponse} from 'src/types/series'
