@@ -19,9 +19,9 @@ interface Query {
 export const executeQuery = async (
   source: Source,
   query: Query,
-  resolution: number,
   templates: Template[],
-  uuid: string
+  resolution?: number,
+  uuid?: string
 ): Promise<TimeSeriesResponse> => {
   const text = await replace(query.text, source, templates, resolution)
 
@@ -36,7 +36,7 @@ export const executeQuery = async (
   return data
 }
 
-export const replace = async (
+const replace = async (
   query: string,
   source: Source,
   templates: Template[],

@@ -280,8 +280,8 @@ class TimeSeries extends Component<Props, State> {
       const response = await executeQuery(
         source,
         query,
-        TEMP_RES,
         templates,
+        TEMP_RES,
         uuid
       )
 

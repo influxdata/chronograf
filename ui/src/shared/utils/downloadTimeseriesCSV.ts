@@ -3,14 +3,12 @@ import moment from 'moment'
 import {unparse} from 'papaparse'
 
 // Utils
-import {proxy} from 'src/utils/queryUrlGenerator'
-import {duration} from 'src/shared/apis/query'
-import replaceTemplates, {replaceInterval} from 'src/tempVars/utils/replace'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
+import {executeQuery} from 'src/shared/apis/query'
 
 // Types
 import {Query, Template} from 'src/types'
-import {TimeSeriesServerResponse} from 'src/types/series'
+import {TimeSeriesResponse} from 'src/types/series'
 
 type CSV = Array<Array<number | string>>
 
@@ -19,7 +17,9 @@ const downloadTimeseriesCSV = async (
   templates: Template[]
 ): Promise<void> => {
   const responses = await Promise.all(
-    queries.map(query => fetchTimeseries(query, templates))
+    queries.map(query =>
+      executeQuery(query.queryConfig.source, query, templates)
+    )
   )
 
   const csv = await timeseriesToCSV(responses)
@@ -27,29 +27,11 @@ const downloadTimeseriesCSV = async (
   downloadCSV(csv, csvName())
 }
 
-const fetchTimeseries = async (
-  query: Query,
-  templates: Template[]
-): Promise<TimeSeriesServerResponse> => {
-  const source = query.queryConfig.source
-
-  let queryString = replaceTemplates(query.text, templates)
-
-  if (queryString.includes(':interval:')) {
-    const queryDuration = await duration(query.text, source)
-
-    queryString = replaceInterval(query.text, null, queryDuration)
-  }
-
-  const resp = await proxy({source: source.links.proxy, query: queryString})
-
-  return {response: resp.data}
-}
-
 const timeseriesToCSV = async (
-  responses: TimeSeriesServerResponse[]
+  responses: TimeSeriesResponse[]
 ): Promise<CSV> => {
-  const tableResponse = await timeSeriesToTableGraph(responses)
+  const wrapped = responses.map(response => ({response}))
+  const tableResponse = await timeSeriesToTableGraph(wrapped)
   const table = tableResponse.data
 
   if (!table.length) {
