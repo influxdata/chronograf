@@ -29,10 +29,10 @@
 ### Bug Fixes
 
 1. [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
-1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
+1. [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
 
 
-## v1.6.2 [unreleased]
+## v1.6.2 [2018-09-06]
 
 ### Features
 
