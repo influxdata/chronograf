@@ -53,8 +53,8 @@ $ix-text-selection-color: $g20-white;
 $ix-text-scale: 1.19;
 $ix-icon-font: 'icomoon';
 
-$ix-text-tiny: 12.5px;
-$ix-text-base: 14.5px;
+$ix-text-tiny: 12px;
+$ix-text-base: 13px;
 $ix-text-base-1: (ceil($ix-text-base * $ix-text-scale));
 $ix-text-base-2: (ceil($ix-text-base * $ix-text-scale * $ix-text-scale));
 $ix-text-base-3: (ceil($ix-text-base * $ix-text-scale * $ix-text-scale * $ix-text-scale));
