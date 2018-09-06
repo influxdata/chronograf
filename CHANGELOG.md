@@ -19,6 +19,7 @@
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
 1.  [#4268](https://github.com/influxdata/chronograf/pull/4268): Clear logs after searching
 1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
+1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Move log message truncation controls into logs filter bar
 
 
 ### UI Improvements
@@ -28,6 +29,8 @@
 ### Bug Fixes
 
 1. [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
+1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
+
 
 ## v1.6.2 [unreleased]
 

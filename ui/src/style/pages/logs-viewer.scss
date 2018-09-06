@@ -5,7 +5,7 @@
 
 $logs-viewer-graph-height: 170px;
 $logs-viewer-search-height: 46px; 
-$logs-viewer-filter-height: 42px;
+$logs-viewer-filter-height: 46px;
 $logs-viewer-results-text-indent: 33px;
 $logs-viewer-gutter: 60px;
 
@@ -75,6 +75,26 @@ $logs-viewer-gutter: 60px;
   background-color: $g3-castle;
 }
 
+.logs-viewer--filters {
+  overflow: hidden;
+  position: relative;
+
+  &:after {
+    content: '';
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 44px;
+    pointer-events: none;
+    position: absolute;
+    @include gradient-h(rgba($g3-castle, 0), $g3-castle);
+  }
+}
+
+.logs-viewer--clear-filters {
+  padding: 0 $ix-marg-b;
+}
+
 .logs-viewer--results-text {
   margin: 0;
   margin-right: $logs-viewer-results-text-indent;
@@ -137,6 +157,7 @@ $logs-viewer-gutter: 60px;
   font-weight: 500;
   font-family: $code-font;
   margin: 1px;
+  max-width: 289px;
 
   &.active,
   &:hover {
@@ -145,6 +166,13 @@ $logs-viewer-gutter: 60px;
   }
   &:hover {
     cursor: pointer;
+  }
+
+  > span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
   }
 }
 

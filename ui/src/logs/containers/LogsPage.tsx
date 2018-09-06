@@ -27,6 +27,7 @@ import {
   addFilter,
   removeFilter,
   changeFilter,
+  clearFilters,
   fetchOlderLogsAsync,
   fetchNewerLogsAsync,
   getLogConfigAsync,
@@ -93,6 +94,7 @@ interface Props {
   addFilter: (filter: Filter) => void
   removeFilter: (id: string) => void
   changeFilter: (id: string, operator: string, value: string) => void
+  clearFilters: () => void
   getConfig: (url: string) => Promise<void>
   updateConfig: (url: string, config: LogConfig) => Promise<void>
   notify: NotificationAction
@@ -231,6 +233,9 @@ class LogsPage extends Component<Props, State> {
               filters={filters || []}
               onDelete={this.handleFilterDelete}
               onFilterChange={this.handleFilterChange}
+              onClearFilters={this.handleClearFilters}
+              onUpdateTruncation={this.handleUpdateTruncation}
+              isTruncated={this.isTruncated}
             />
             <LogsTable
               count={this.histogramTotal}
@@ -259,6 +264,7 @@ class LogsPage extends Component<Props, State> {
           </div>
         </div>
         {this.renderImportOverlay()}
+        {this.expandedMessageContainer}
       </>
     )
   }
@@ -603,6 +609,11 @@ class LogsPage extends Component<Props, State> {
     this.fetchSearchDataset(SearchStatus.UpdatingFilters)
   }
 
+  private handleClearFilters = async (): Promise<void> => {
+    this.props.clearFilters()
+    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
+  }
+
   private handleBarClick = (time: string): void => {
     const formattedTime = moment(time).toISOString()
 
@@ -681,8 +692,6 @@ class LogsPage extends Component<Props, State> {
           onUpdateColumns={this.handleUpdateColumns}
           onUpdateSeverityFormat={this.handleUpdateSeverityFormat}
           severityFormat={this.severityFormat}
-          onUpdateTruncation={this.handleUpdateTruncation}
-          isTruncated={this.isTruncated}
         />
       </OverlayTechnology>
     )
@@ -742,6 +751,15 @@ class LogsPage extends Component<Props, State> {
   private get isTruncated(): boolean {
     return this.props.logConfig.isTruncated
   }
+
+  private get expandedMessageContainer(): JSX.Element {
+    return (
+      <div
+        className="logs-viewer--expanded-message-container"
+        id="expanded-message-container"
+      />
+    )
+  }
 }
 
 const mapStateToProps = ({
@@ -792,6 +810,7 @@ const mapDispatchToProps = {
   addFilter,
   removeFilter,
   changeFilter,
+  clearFilters,
   fetchOlderLogsAsync,
   fetchNewerLogsAsync,
   setTableCustomTime: setTableCustomTimeAsync,
