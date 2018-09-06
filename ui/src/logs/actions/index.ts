@@ -794,14 +794,7 @@ export const flushTailBuffer = () => (
 
   const currentTailBuffer = getForwardTableData(state)
   const currentBackward = getBackwardTableData(state)
-  console.log(
-    'flushTailBuffer currentTailBuffer.values.length',
-    currentTailBuffer.values.length
-  )
-  console.log(
-    'flushTailBuffer currentBackward.values.length',
-    currentBackward.values.length
-  )
+
   const combinedBackward = combineTableData(currentTailBuffer, currentBackward)
 
   dispatch(setTableBackwardData(combinedBackward))
@@ -818,7 +811,6 @@ export const fetchTailAsync = () => async (
     | ThunkDispatch<typeof flushTailBuffer>,
   getState: GetState
 ): Promise<void> => {
-  console.log('fetchTailAsync')
   const state = getState()
 
   const tableQueryConfig = getTableQueryConfig(state)
@@ -830,15 +822,18 @@ export const fetchTailAsync = () => async (
 
   if (_.every(params)) {
     const nextTailLowerBound = getNextTailLowerBound(state)
-    console.log('fetchTailAsync nextTailLowerBound', nextTailLowerBound)
+
     if (!nextTailLowerBound) {
       throw new Error('nextTailLowerBound is not set')
     }
     const lower = moment(nextTailLowerBound).toISOString()
     const upper = moment().toISOString()
 
-    console.log('fetchTailAsync lower', lower)
-    console.log('fetchTailAsync upper', upper)
+    const upperUTC = moment(upper)
+      .utc()
+      .valueOf()
+    dispatch(setCurrentTailUpperBound(upperUTC))
+
     const query = buildInfiniteScrollLogQuery(
       lower,
       upper,
@@ -857,19 +852,12 @@ export const fetchTailAsync = () => async (
       defaultTableData
     )
 
-    const upperUTC = moment(upper)
-      .utc()
-      .valueOf()
-
-    dispatch(setCurrentTailUpperBound(upperUTC))
-
     const currentForwardBufferDuration = upperUTC - nextTailLowerBound
     const maxTailBufferDurationMs = getMaxTailBufferDurationMs(state)
     const isMaxTailBufferDurationExceeded =
       currentForwardBufferDuration >= maxTailBufferDurationMs
 
     if (isMaxTailBufferDurationExceeded) {
-      console.log('flush buffer')
       dispatch(flushTailBuffer())
       await dispatch(setNextTailLowerBound(upperUTC))
     } else {

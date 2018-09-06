@@ -340,7 +340,6 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private handleTailFetchingInterval = async () => {
-    console.log('handleTailFetchingInterval')
     if (this.isClearing) {
       return
     }
@@ -350,7 +349,6 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchTail = async () => {
-    console.log('fetchTail')
     await this.props.fetchTailAsync()
   }
 
@@ -385,12 +383,10 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private fetchOlderChunk = async () => {
-    console.log('fetchOlderChunk')
     await this.props.fetchOlderChunkAsync()
   }
 
   private handleFetchOlderChunk = async () => {
-    console.log('handleFetchOlderChunk')
     if (this.currentOlderChunksGenerator) {
       return
     }
@@ -402,7 +398,6 @@ class LogsPageSimple extends Component<Props, State> {
       return
     }
 
-    console.log('handleFetchNewerChunk isLiveUpdating', this.isLiveUpdating)
     this.startFetchingNewer()
   }
 
@@ -421,25 +416,20 @@ class LogsPageSimple extends Component<Props, State> {
       chunkOptions
     )
 
-    console.log('await this.currentNewerChunksGenerator')
     try {
       await this.currentNewerChunksGenerator.promise
     } catch (error) {
       console.error(error)
     }
-    console.log(
-      'handleChunksGeneratorCompleted this.currentNewerChunksGenerator()'
-    )
+
     if (!this.currentNewerChunksGenerator.isCanceled) {
-      console.log('* clearCurrentNewerChunksGenerator.cancel()')
       this.currentNewerChunksGenerator.cancel()
     }
+
     this.currentNewerChunksGenerator = null
   }
 
   private startFetchingOlder = async () => {
-    console.log('startFetchingOlder')
-
     const chunkOptions = {
       ...OLDER_CHUNK_OPTIONS,
       getCurrentSize: this.totalBackwardValues,
@@ -450,19 +440,16 @@ class LogsPageSimple extends Component<Props, State> {
       chunkOptions
     )
 
-    console.log('handleChunksGeneratorCompleted')
     try {
       await this.currentOlderChunksGenerator.promise
     } catch (error) {
       console.error(error)
     }
-    console.log(
-      'handleChunksGeneratorCompleted this.currentOlderChunksGenerator()'
-    )
+
     if (!this.currentOlderChunksGenerator.isCanceled) {
-      console.log('* clearCurrentOlderChunksGenerator.cancel()')
       this.currentOlderChunksGenerator.cancel()
     }
+
     this.currentOlderChunksGenerator = null
   }
 
@@ -537,12 +524,10 @@ class LogsPageSimple extends Component<Props, State> {
   }
 
   private clearAllTimeBounds(): void {
-    console.log('clearAllTimeBounds')
     this.props.clearAllTimeBounds()
   }
 
   private flushTailBuffer(): void {
-    console.log('flushTailBuffer')
     this.props.flushTailBuffer()
   }
 
@@ -575,7 +560,6 @@ class LogsPageSimple extends Component<Props, State> {
 
   private handleScrollToTop = () => {
     if (!this.isLiveUpdating && this.shouldLiveUpdate) {
-      console.log('handleScrollToTop startLogsTailFetchingInterval')
       this.startLogsTailFetchingInterval()
     }
   }
@@ -584,7 +568,6 @@ class LogsPageSimple extends Component<Props, State> {
     if (this.isLiveUpdating) {
       this.clearTailInterval()
     }
-    console.log('handleVerticalScroll')
 
     this.setState({liveUpdating: false, hasScrolled: true})
   }
@@ -834,7 +817,6 @@ class LogsPageSimple extends Component<Props, State> {
 
     const shouldLiveUpdate = this.props.tableTime.relative === 0
     if (this.isLiveUpdating && shouldLiveUpdate) {
-      console.log('fetchNewDataset startLogsTailFetchingInterval')
       this.startLogsTailFetchingInterval()
     }
 

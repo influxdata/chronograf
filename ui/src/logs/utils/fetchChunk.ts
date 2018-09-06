@@ -11,8 +11,6 @@ export const fetchChunk = <T>(
   request: () => Promise<T>,
   chunkParams: ChunkParams
 ): FetchLoop => {
-  console.log('fetchChunk')
-
   const {getCurrentSize, maxFetchCount, chunkSize} = chunkParams
   const initialSize = getCurrentSize()
   const fetchCount = fetchCounter()
@@ -20,13 +18,6 @@ export const fetchChunk = <T>(
   const isDone = () => {
     const isChunkLoaded = getCurrentSize() - initialSize >= chunkSize
     const isCountMaxed = fetchCount.next().value > maxFetchCount
-    console.log(
-      'fetchChunk isDone',
-      'isChunkLoaded',
-      isChunkLoaded,
-      'isCountMaxed',
-      isCountMaxed
-    )
 
     return isChunkLoaded || isCountMaxed
   }

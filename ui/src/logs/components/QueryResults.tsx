@@ -53,7 +53,6 @@ class QueryResults extends PureComponent<Props> {
   }
 
   private get rangeContents(): JSX.Element {
-    console.log(this.props.upper, this.props.lower)
     if (this.props.upper === undefined || this.props.lower === undefined) {
       return null
     }

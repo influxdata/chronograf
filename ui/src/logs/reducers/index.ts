@@ -155,14 +155,7 @@ const concatMoreLogs = (
   const {tableInfiniteData} = state
   const {backward} = tableInfiniteData
   const vals = [...backward.values, ...values]
-  // console.log(
-  //   'concatMoreLogs vals.length',
-  //   vals.length,
-  //   '= backward.values.length',
-  //   backward.values.length,
-  //   '+ values.length',
-  //   values.length
-  // )
+
   return {
     ...state,
     tableInfiniteData: {
@@ -185,15 +178,7 @@ const prependMoreLogs = (
   const {tableInfiniteData} = state
   const {forward} = tableInfiniteData
   const vals = [...values, ...forward.values]
-  console.log(
-    'prependMoreLogs vals.length',
-    vals.length,
-    '= forward.values.length',
-    forward.values.length,
-    '+ values.length',
-    values.length
-  )
-  // TODO(js): make query inclusivity/exclusivity ensure no duplicate data, or otherwise filter out duplicate data by converting bound to unix timestamp
+
   const newRowsAdded = vals.length - forward.values.length
 
   return {

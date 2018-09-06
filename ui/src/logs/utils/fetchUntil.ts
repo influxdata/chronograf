@@ -24,13 +24,11 @@ export function fetchUntil<T>(
 const fetchEachAsync = async requestsIterator => {
   for (const response of requestsIterator) {
     try {
-      console.log('fetchEachAsync')
       await response
     } catch (error) {
       console.error(error)
     }
   }
-  console.log('fetchEachAsync FINISHED')
 }
 
 function* fetchUnless<T>(
