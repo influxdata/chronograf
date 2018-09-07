@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import chroma from 'chroma-js'
 import {isCellUntitled} from 'src/dashboards/utils/cellGetters'
 import {DEFAULT_CELL_BG_COLOR} from 'src/dashboards/constants'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   isEditable: boolean
@@ -12,6 +13,7 @@ interface Props {
   cellTextColor: string
 }
 
+@ErrorHandling
 class LayoutCellHeader extends Component<Props> {
   public render() {
     return (
