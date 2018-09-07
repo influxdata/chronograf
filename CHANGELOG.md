@@ -14,6 +14,10 @@
 1.  [#4353](https://github.com/influxdata/chronograf/pull/4353): Add visualization options to the Data Explorer
 1.  [#4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
 1.  [#4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
+1.  [4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
+1.  [4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
+1. [#4389](https://github.com/influxdata/chronograf/pull/4389): Add regexp search for appname in log lines
+
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
