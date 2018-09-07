@@ -3,6 +3,7 @@ import React, {SFC} from 'react'
 
 // Componentes
 import SourceDropdown from 'src/flux/components/SourceDropdown'
+import {Radio} from 'src/reusable_ui'
 
 // Types
 import * as QueriesModels from 'src/types/queries'
@@ -14,6 +15,7 @@ interface Props {
   sources: SourcesModels.SourceOption[]
   service: Service
   services: Service[]
+  isFluxSource: boolean
   queries: QueriesModels.QueryConfig[]
   isDynamicSourceSelected: boolean
   onSelectDynamicSource: () => void
@@ -26,6 +28,7 @@ const SourceSelector: SFC<Props> = ({
   service,
   services,
   queries,
+  isFluxSource,
   onChangeService,
   isDynamicSourceSelected,
   onSelectDynamicSource,
@@ -48,6 +51,26 @@ const SourceSelector: SFC<Props> = ({
         onChangeService={onChangeService}
         onSelectDynamicSource={onSelectDynamicSource}
       />
+      {isDynamicSourceSelected && (
+        <Radio>
+          <Radio.Button
+            id="flux-source"
+            titleText="Flux"
+            value="Flux"
+            active={isFluxSource}
+          >
+            Flux
+          </Radio.Button>
+          <Radio.Button
+            id="influxql-source"
+            titleText="InfluxQL"
+            value="InfluxQL"
+            active={!isFluxSource}
+          >
+            InfluxQL
+          </Radio.Button>
+        </Radio>
+      )}
     </div>
   )
 }

@@ -66,6 +66,7 @@ const TimeMachineControls: SFC<Props> = ({
         service={service}
         services={services}
         queries={queries}
+        isFluxSource={isFluxSource}
         onChangeService={onChangeService}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onSelectDynamicSource={onSelectDynamicSource}
