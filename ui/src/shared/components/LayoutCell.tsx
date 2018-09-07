@@ -192,7 +192,11 @@ export default class LayoutCell extends Component<Props> {
   }
 
   private onUpdateCellColors = (bgColor: string, textColor: string): void => {
-    this.cellBackgroundColor = bgColor
+    if (!bgColor) {
+      this.cellBackgroundColor = DEFAULT_CELL_BG_COLOR
+    } else {
+      this.cellBackgroundColor = bgColor
+    }
     this.cellTextColor = textColor
   }
 
