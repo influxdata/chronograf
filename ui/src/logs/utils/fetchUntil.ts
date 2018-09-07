@@ -35,7 +35,7 @@ function* fetchUnless<T>(
   predicate: Predicate,
   request: () => Promise<T>
 ): Iterator<Promise<T>> {
-  do {
+  while (!predicate()) {
     yield request()
-  } while (!predicate())
+  }
 }
