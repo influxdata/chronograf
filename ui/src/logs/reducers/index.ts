@@ -19,22 +19,9 @@ import {
   DEFAULT_TAIL_CHUNK_DURATION_MS,
   DEFAULT_OLDER_CHUNK_DURATION_MS,
   DEFAULT_NEWER_CHUNK_DURATION_MS,
+  defaultTableData,
 } from 'src/logs/constants'
-import {LogsState, TableData, SearchStatus} from 'src/types/logs'
-
-const defaultTableData: TableData = {
-  columns: [
-    'time',
-    'severity',
-    'timestamp',
-    'message',
-    'facility',
-    'procid',
-    'appname',
-    'host',
-  ],
-  values: [],
-}
+import {LogsState, SearchStatus} from 'src/types/logs'
 
 export const defaultState: LogsState = {
   currentSource: null,

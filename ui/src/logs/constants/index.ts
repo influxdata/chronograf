@@ -1,3 +1,5 @@
+import {TableData} from 'src/types/logs'
+
 export enum SeverityColorOptions {
   ruby = 'ruby',
   fire = 'fire',
@@ -231,4 +233,18 @@ export const NEWER_CHUNK_OPTIONS = {
 export const OLDER_CHUNK_OPTIONS = {
   maxFetchCount: MAX_FETCH_COUNT,
   chunkSize: OLDER_CHUNK_SIZE_LIMIT,
+}
+
+export const defaultTableData: TableData = {
+  columns: [
+    'time',
+    'severity',
+    'timestamp',
+    'message',
+    'facility',
+    'procid',
+    'appname',
+    'host',
+  ],
+  values: [],
 }
