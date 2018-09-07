@@ -68,6 +68,7 @@ import {
   DeleteFuncNodeArgs,
   Func,
   ScriptStatus,
+  VisType,
 } from 'src/types/flux'
 import {
   Axes,
@@ -147,6 +148,7 @@ interface State {
   body: Body[]
   script: string
   ast: object
+  visType: VisType
   data: FluxTable[]
   status: ScriptStatus
   selectedSource: Source
@@ -190,6 +192,7 @@ class TimeMachine extends PureComponent<Props, State> {
       script: '',
       autoRefresher: new AutoRefresher(),
       autoRefreshDuration: 0,
+      visType: VisType.Graph,
     }
 
     this.debouncedASTResponse = _.debounce(script => {
@@ -265,10 +268,13 @@ class TimeMachine extends PureComponent<Props, State> {
         <TimeMachineControls
           queries={this.queriesWorkingDraft}
           templates={templates}
+          visType={this.visType}
           source={this.source}
           sources={this.formattedSources}
           service={this.service}
           services={services}
+          isFluxSource={this.isFluxSource}
+          toggleVisType={this.toggleVisType}
           autoRefreshDuration={autoRefreshDuration}
           onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
           onChangeService={this.handleChangeService}
@@ -302,7 +308,13 @@ class TimeMachine extends PureComponent<Props, State> {
 
     if (this.isFluxSource) {
       const service = this.service
-      return <TimeMachineVis service={service} script={script} />
+      return (
+        <TimeMachineVis
+          service={service}
+          visType={this.visType}
+          script={script}
+        />
+      )
     }
     return (
       <div className="deceo--top">
@@ -352,6 +364,10 @@ class TimeMachine extends PureComponent<Props, State> {
         {...visualizationOptions}
       />
     )
+  }
+
+  private get visType(): VisType {
+    return this.state.visType
   }
 
   private get pageHeader(): JSX.Element {
@@ -982,6 +998,13 @@ class TimeMachine extends PureComponent<Props, State> {
       }
       return console.error('Could not parse AST', error)
     }
+  }
+
+  private toggleVisType = (): void => {
+    const newVisType =
+      this.state.visType === VisType.Graph ? VisType.Table : VisType.Graph
+
+    this.setState({visType: newVisType})
   }
 }
 

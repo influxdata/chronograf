@@ -13,6 +13,7 @@
 1.  [#4319](https://github.com/influxdata/chronograf/pull/4319): Add Flux query editor to the Data Explorer and use same UI as CEO
 1.  [#4353](https://github.com/influxdata/chronograf/pull/4353): Add visualization options to the Data Explorer
 1.  [#4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
+1.  [#4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
@@ -26,13 +27,13 @@
 1.  [#4330](https://github.com/influxdata/chronograf/pull/4330): Position cloned cells adjacent to target cell
 
 ### Bug Fixes
-
+1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
+1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
 1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
 1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
 1.  [#4388](https://github.com/influxdata/chronograf/pull/4388): Fix logs to progressively load results and provide feedback on search
 
-
-## v1.6.2 [unreleased]
+## v1.6.2 [2018-09-06]
 
 ### Features
 
