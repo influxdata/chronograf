@@ -1,3 +1,5 @@
+import {TableData} from 'src/types/logs'
+
 export enum SeverityColorOptions {
   ruby = 'ruby',
   fire = 'fire',
@@ -211,3 +213,39 @@ export const LoadingMessages = [
   '100% natural logs',
   'Chopping wood',
 ]
+
+export const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
+export const DEFAULT_MAX_TAIL_BUFFER_DURATION_MS = 30000
+
+export const DEFAULT_OLDER_CHUNK_DURATION_MS = 30000
+export const DEFAULT_NEWER_CHUNK_DURATION_MS = 30000
+
+export const NOW = 0
+
+const NEWER_CHUNK_SIZE_LIMIT = 100
+const OLDER_CHUNK_SIZE_LIMIT = 100
+const MAX_FETCH_COUNT = Infinity // never stop fetching
+
+export const NEWER_CHUNK_OPTIONS = {
+  maxFetchCount: MAX_FETCH_COUNT,
+  chunkSize: NEWER_CHUNK_SIZE_LIMIT,
+}
+
+export const OLDER_CHUNK_OPTIONS = {
+  maxFetchCount: MAX_FETCH_COUNT,
+  chunkSize: OLDER_CHUNK_SIZE_LIMIT,
+}
+
+export const defaultTableData: TableData = {
+  columns: [
+    'time',
+    'severity',
+    'timestamp',
+    'message',
+    'facility',
+    'procid',
+    'appname',
+    'host',
+  ],
+  values: [],
+}
