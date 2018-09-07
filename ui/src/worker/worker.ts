@@ -13,16 +13,20 @@ import proxy from 'src/worker/jobs/proxy'
 import get from 'src/worker/jobs/get'
 import tableTransform from 'src/worker/jobs/tableTransform'
 import validateDygraphData from 'src/worker/jobs/validateDygraphData'
+import postJSON from 'src/worker/jobs/postJSON'
+import fetchFluxData from 'src/worker/jobs/fetchFluxData'
 
 type Job = (msg: Message) => Promise<any>
 
 const jobMapping: {[key: string]: Job} = {
   GET: get,
   PROXY: proxy,
+  POSTJSON: postJSON,
   TABLETRANSFORM: tableTransform,
   TSTOTABLEGRAPH: timeSeriesToTableGraph,
   TSTODYGRAPH: timeSeriesToDygraph,
   VALIDATEDYGRAPHDATA: validateDygraphData,
+  FETCHFLUXDATA: fetchFluxData,
 }
 
 const errorJob = async (data: Message) => {
