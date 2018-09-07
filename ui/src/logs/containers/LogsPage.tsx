@@ -351,7 +351,7 @@ class LogsPage extends Component<Props, State> {
 
   private fetchNewerChunk = async (): Promise<void> => {
     const maxNewerFetchForward = moment()
-      .add(DEFAULT_NEWER_CHUNK_DURATION_MS, 'miliseconds')
+      .add(DEFAULT_NEWER_CHUNK_DURATION_MS, 'milliseconds')
       .utc()
       .valueOf()
 
@@ -804,7 +804,7 @@ class LogsPage extends Component<Props, State> {
 
   private handleClearFilters = async (): Promise<void> => {
     this.props.clearFilters()
-    this.fetchSearchDataset(SearchStatus.UpdatingFilters)
+    this.updateTableData(SearchStatus.UpdatingFilters)
   }
 
   private handleBarClick = (time: string): void => {

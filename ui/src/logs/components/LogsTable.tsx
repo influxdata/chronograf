@@ -375,11 +375,6 @@ class LogsTable extends Component<Props, State> {
   }
 
   private loadMoreAboveRows = async () => {
-    const data = getValuesFromData(this.props.tableInfiniteData.forward)
-    const backwardData = getValuesFromData(
-      this.props.tableInfiniteData.backward
-    )
-
     try {
       this.incrementLoaderQueryCount()
       await this.props.fetchNewer()
@@ -389,9 +384,6 @@ class LogsTable extends Component<Props, State> {
   }
 
   private loadMoreBelowRows = async () => {
-    const data = getValuesFromData(this.props.tableInfiniteData.backward)
-    const forwardData = getValuesFromData(this.props.tableInfiniteData.forward)
-
     try {
       this.incrementLoaderQueryCount()
       await this.props.fetchMore()
