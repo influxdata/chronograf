@@ -37,7 +37,7 @@ import {
 import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
 import {ManageSources, OnboardingWizard} from 'src/sources'
 
-import {CheckServices, FluxConnectionPage} from 'src/flux'
+import {FluxConnectionPage} from 'src/flux'
 import NotFound from 'src/shared/components/NotFound'
 
 import {getLinksAsync} from 'src/shared/actions/links'
@@ -166,7 +166,6 @@ class Root extends PureComponent<{}, State> {
               />
               <Route path="admin-influxdb/:tab" component={AdminInfluxDBPage} />
               <Route path="manage-sources" component={ManageSources} />
-              <Route path="delorean" component={CheckServices} />
             </Route>
           </Route>
           <Route path="*" component={NotFound} />
