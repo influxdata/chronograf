@@ -35,6 +35,7 @@ interface Props {
   timeRange: QueriesModels.TimeRange
   updateEditorTimeRange: (timeRange: QueriesModels.TimeRange) => void
   toggleVisType: () => void
+  toggleFlux: () => void
 }
 
 const TimeMachineControls: SFC<Props> = ({
@@ -47,6 +48,7 @@ const TimeMachineControls: SFC<Props> = ({
   isInCEO,
   services,
   timeRange,
+  toggleFlux,
   isFluxSource,
   toggleVisType,
   autoRefreshDuration,
@@ -66,6 +68,7 @@ const TimeMachineControls: SFC<Props> = ({
         service={service}
         services={services}
         queries={queries}
+        toggleFlux={toggleFlux}
         isFluxSource={isFluxSource}
         onChangeService={onChangeService}
         isDynamicSourceSelected={isDynamicSourceSelected}

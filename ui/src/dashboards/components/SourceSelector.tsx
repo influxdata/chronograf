@@ -18,6 +18,7 @@ interface Props {
   isFluxSource: boolean
   queries: QueriesModels.QueryConfig[]
   isDynamicSourceSelected: boolean
+  toggleFlux: () => void
   onSelectDynamicSource: () => void
   onChangeService: (service: Service, source: SourcesModels.Source) => void
 }
@@ -28,6 +29,7 @@ const SourceSelector: SFC<Props> = ({
   service,
   services,
   queries,
+  toggleFlux,
   isFluxSource,
   onChangeService,
   isDynamicSourceSelected,
@@ -57,6 +59,7 @@ const SourceSelector: SFC<Props> = ({
             id="flux-source"
             titleText="Flux"
             value="Flux"
+            onClick={toggleFlux}
             active={isFluxSource}
           >
             Flux
@@ -65,6 +68,7 @@ const SourceSelector: SFC<Props> = ({
             id="influxql-source"
             titleText="InfluxQL"
             value="InfluxQL"
+            onClick={toggleFlux}
             active={!isFluxSource}
           >
             InfluxQL

@@ -270,6 +270,7 @@ class TimeMachine extends PureComponent<Props, State> {
           templates={templates}
           visType={this.visType}
           source={this.source}
+          toggleFlux={this.toggleFlux}
           sources={this.formattedSources}
           service={this.service}
           services={services}
@@ -1005,6 +1006,10 @@ class TimeMachine extends PureComponent<Props, State> {
       this.state.visType === VisType.Graph ? VisType.Table : VisType.Graph
 
     this.setState({visType: newVisType})
+  }
+
+  private toggleFlux = (): void => {
+    console.log('toggling!')
   }
 }
 
