@@ -36,34 +36,34 @@ export default class LayoutCell extends Component<Props> {
 
     return (
       <>
-      <div className="dash-graph">
-        <Authorized requiredRole={EDITOR_ROLE}>
-          <LayoutCellMenu
-            cell={cell}
-            isEditable={isEditable}
-            dataExists={!!cellData.length}
-            onEdit={this.handleSummonOverlay}
-            onClone={onCloneCell}
-            onDelete={onDeleteCell}
-            onCSVDownload={this.handleCSVDownload}
-            queries={this.queries}
+        <div className="dash-graph">
+          <Authorized requiredRole={EDITOR_ROLE}>
+            <LayoutCellMenu
+              cell={cell}
+              isEditable={isEditable}
+              dataExists={!!cellData.length}
+              onEdit={this.handleSummonOverlay}
+              onClone={onCloneCell}
+              onDelete={onDeleteCell}
+              onCSVDownload={this.handleCSVDownload}
+              queries={this.queries}
+            />
+          </Authorized>
+          <LayoutCellNote
+            visibility={cell.noteVisibility}
+            cellType={cell.type}
+            note={cell.note}
+            cellX={cell.x}
+            cellY={cell.y}
           />
-        </Authorized>
-        <LayoutCellNote
-          visibility={cell.noteVisibility}
-          cellType={cell.type}
-          note={cell.note}
-          cellX={cell.x}
-          cellY={cell.y}
-        />
-        <LayoutCellHeader
-          cellName={this.cellName}
-          isEditable={isEditable}
-          makeSpaceForCellNote={this.makeSpaceForCellNote}
-        />
-        <div className="dash-graph--container">{this.renderGraph}</div>
-      </div>
-      {this.gradientBorder}
+          <LayoutCellHeader
+            cellName={this.cellName}
+            isEditable={isEditable}
+            makeSpaceForCellNote={this.makeSpaceForCellNote}
+          />
+          <div className="dash-graph--container">{this.renderGraph}</div>
+        </div>
+        {this.gradientBorder}
       </>
     )
   }
