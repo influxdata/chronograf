@@ -1,4 +1,4 @@
-import React, {Component, ReactElement} from 'react'
+import React, {Component, ReactElement, CSSProperties} from 'react'
 import _ from 'lodash'
 
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
@@ -12,6 +12,10 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {dataToCSV} from 'src/shared/parsing/dataToCSV'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
+import {
+  DEFAULT_CELL_BG_COLOR,
+  DEFAULT_CELL_TEXT_COLOR,
+} from 'src/dashboards/constants'
 
 import {Cell, CellQuery, Template} from 'src/types/'
 import {NoteVisibility} from 'src/types/dashboards'
@@ -31,12 +35,15 @@ interface Props {
 
 @ErrorHandling
 export default class LayoutCell extends Component<Props> {
+  private cellBackgroundColor: string = DEFAULT_CELL_BG_COLOR
+  private cellTextColor: string = DEFAULT_CELL_TEXT_COLOR
+
   public render() {
     const {cell, isEditable, cellData, onDeleteCell, onCloneCell} = this.props
 
     return (
       <>
-        <div className="dash-graph">
+        <div className="dash-graph" style={this.cellStyle}>
           <Authorized requiredRole={EDITOR_ROLE}>
             <LayoutCellMenu
               cell={cell}
@@ -55,11 +62,15 @@ export default class LayoutCell extends Component<Props> {
             note={cell.note}
             cellX={cell.x}
             cellY={cell.y}
+            cellBackgroundColor={this.cellBackgroundColor}
+            cellTextColor={this.cellTextColor}
           />
           <LayoutCellHeader
             cellName={this.cellName}
             isEditable={isEditable}
             makeSpaceForCellNote={this.makeSpaceForCellNote}
+            cellBackgroundColor={this.cellBackgroundColor}
+            cellTextColor={this.cellTextColor}
           />
           <div className="dash-graph--container">{this.renderGraph}</div>
         </div>
@@ -127,7 +138,10 @@ export default class LayoutCell extends Component<Props> {
 
     if (this.queries.length) {
       const child = React.Children.only(children)
-      return React.cloneElement(child, {cellID: cell.i})
+      return React.cloneElement(child, {
+        cellID: cell.i,
+        onUpdateCellColors: this.onUpdateCellColors,
+      })
     }
 
     return this.emptyGraph
@@ -175,5 +189,17 @@ export default class LayoutCell extends Component<Props> {
         <div className="dash-graph--gradient-bottom-right" />
       </div>
     )
+  }
+
+  private onUpdateCellColors = (bgColor: string, textColor: string): void => {
+    this.cellBackgroundColor = bgColor
+    this.cellTextColor = textColor
+  }
+
+  private get cellStyle(): CSSProperties {
+    return {
+      backgroundColor: this.cellBackgroundColor,
+      borderColor: this.cellBackgroundColor,
+    }
   }
 }

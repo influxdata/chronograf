@@ -20,6 +20,7 @@ interface Props {
   lineGraph: boolean
   staticLegendHeight?: number
   data: TimeSeriesServerResponse[]
+  onUpdateCellColors?: (bgColor: string, textColor: string) => void
 }
 
 @ErrorHandling
@@ -104,7 +105,7 @@ class SingleStat extends PureComponent<Props> {
   }
 
   private get coloration(): CSSProperties {
-    const {data, colors, lineGraph} = this.props
+    const {data, colors, lineGraph, onUpdateCellColors} = this.props
 
     const {lastValues, series} = getLastValues(data)
     const firstAlphabeticalSeriesName = _.sortBy(series)[0]
@@ -120,6 +121,10 @@ class SingleStat extends PureComponent<Props> {
       lastValue,
       cellType: lineGraph ? CellType.LinePlusSingleStat : CellType.SingleStat,
     })
+
+    if (onUpdateCellColors) {
+      onUpdateCellColors(bgColor, textColor)
+    }
 
     return {
       backgroundColor: bgColor,

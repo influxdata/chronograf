@@ -9,6 +9,10 @@ $dash-graph-options-arrow: 8px;
 
 $dash-graph-border-z: 4;
 $dash-graph-resizer-z: 5;
+$dash-graph-header-z: 2;
+$dash-graph-context-z: 6;
+$dash-graph-note-z: 7;
+$dash-graph-context-expanded-z: 20;
 
 /*
   Animations
@@ -75,7 +79,7 @@ $dash-graph-resizer-z: 5;
 %cell-styles {
   background-color: $g3-castle;
   border-radius: $ix-radius;
-  border: $ix-border solid $g3-castle;
+  border: 0;
   transition-property: left, top, background-color;
 }
 
@@ -94,24 +98,24 @@ $dash-graph-resizer-z: 5;
 }
 
 .dash-graph {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: nowrap;
   position: absolute;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
+  border-radius: $ix-radius;
+  border: $ix-border solid $g3-castle;
 }
 
 .dash-graph--container {
-  user-select: none !important;
-  -o-user-select: none !important;
-  -moz-user-select: none !important;
-  -webkit-user-select: none !important;
+  user-select: none;
   background-color: transparent;
-  position: absolute;
-  width: 100%;
+  position: relative;
   height: calc(100% - #{$dash-graph-heading});
-  top: $dash-graph-heading;
-  left: 0;
   padding: 0;
   .dygraph {
     position: absolute;
@@ -133,22 +137,23 @@ $dash-graph-resizer-z: 5;
 
 .dash-graph--note {
   position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  width: 30px;
-  height: 30px;
+  top: 2px;
+  left: 2px;
+  z-index: $dash-graph-note-z;
+  width: $dash-graph-heading;
+  height: $dash-graph-heading;
 }
 
 .dash-graph--note-icon {
-  top: 50%;
+  top: calc(50% - 1px);
   left: 50%;
   transform: translate(-50%, -50%);
   position: absolute;
   width: 16px;
   height: 16px;
-  color: $g9-mountain;
-  transition: color 0.25s ease;
+  color: $g20-white;
+  opacity: 0.3;
+  transition: opacity 0.25s ease;
   font-size: 14px;
 
   > .icon {
@@ -202,26 +207,60 @@ $dash-graph-resizer-z: 5;
   display: block;
 }
 .dash-graph--note:hover .dash-graph--note-icon {
-  color: $g20-white;  
+  opacity: 1;
 }
+
+$dash-graph--heading-bar-z: 1;
+$dash-graph--heading-dragger-z: $dash-graph--heading-bar-z + 1;
+$dash-graph--heading-name-z: $dash-graph--heading-dragger-z + 1;
 
 .dash-graph--heading {
   user-select: none;
   background-color: transparent;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
   height: $dash-graph-heading;
-  margin: 0;
+  margin: 2px;
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: $dash-graph-header-z;
+}
+.dash-graph--heading-bar,
+.dash-graph--heading-dragger {
+  position: absolute;
   border-radius: $radius-small;
-  transition: background-color 0.25s ease;
-  
-  &.dash-graph--heading-draggable:hover {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.dash-graph--heading-bar {
+  z-index: $dash-graph--heading-bar-z;
+  background-color: $g5-pepper;
+}
+
+.dash-graph--heading-dragger {
+  z-index: $dash-graph--heading-dragger-z;
+  @include gradient-h($c-pool, mix($c-pool, $c-comet));
+}
+
+.react-grid-item:hover {
+  .dash-graph--heading-bar {
+    opacity: 0.25;
+  }
+  .dash-graph--heading:hover .dash-graph--heading-bar {
     cursor: move;
-    background-color: $g5-pepper;
+    opacity: 0.5;
+  }
+}
+
+.react-grid-item.resizing,
+.react-grid-item.react-draggable-dragging {
+  .dash-graph--heading-bar {
+    opacity: 0;
+  }
+  .dash-graph--heading-dragger {
+    opacity: 1;
   }
 }
 
@@ -233,6 +272,7 @@ $dash-graph-resizer-z: 5;
   text-overflow: ellipsis;
   white-space: nowrap;
   position: relative;
+  z-index: $dash-graph--heading-name-z;
   font-weight: 600;
   font-size: 13px;
   height: $dash-graph-heading;
@@ -265,7 +305,7 @@ $dash-graph-resizer-z: 5;
   height: 24px;
   border-radius: 3px;
   display: flex;
-  cursor: default;
+
   > .custom-indicator,
   > .source-indicator {
     font-size: 10px;
@@ -288,28 +328,30 @@ $dash-graph-resizer-z: 5;
 }
 
 .dash-graph-context {
-  z-index: 2;
+  z-index: $dash-graph-context-z;
   position: absolute;
-  top: 0;
-  right: 3px;
+  top: $ix-border;
+  right: 3px + $ix-border;
   height: 30px;
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
   opacity: 0;
   transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
-.dash-graph:hover .dash-graph-context {
+.react-grid-item:hover .dash-graph-context {
   opacity: 1;
 }
 
 .dash-graph-context.dash-graph-context__open {
-  z-index: 20;
+  z-index: $dash-graph-context-expanded-z;
 }
 
 .dash-graph-context--buttons {
   display: flex;
+  pointer-events: all;
 }
 
 .dash-graph-context--button {
@@ -318,14 +360,15 @@ $dash-graph-resizer-z: 5;
   border-radius: 3px;
   font-size: 12px;
   position: relative;
-  color: $g11-sidewalk;
+  color: $g13-mist;
+  background-color: $g5-pepper;
   margin-right: 2px;
   transition: color 0.25s ease, background-color 0.25s ease;
   &:hover,
   &.active {
     cursor: pointer;
     color: $g20-white;
-    background-color: $g5-pepper;
+    background-color: $g7-graphite;
   }
   &:last-child {
     margin-right: 0;
@@ -516,10 +559,10 @@ $cell-gradient-border--mid: mix($cell-gradient-border--start, $cell-gradient-bor
 
 .dash-graph--gradient-border {
   position: absolute;
-  top: -$ix-border;
-  left: -$ix-border;
-  width: calc(100% + #{$ix-border * 2});
-  height: calc(100% + #{$ix-border * 2});
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 20;
   pointer-events: none;
   transition: opacity 0.25s ease;
@@ -620,22 +663,19 @@ $cell-gradient-border--mid: mix($cell-gradient-border--start, $cell-gradient-bor
 }
 
 // Resize Handle
-$react-grid-resizer--a: rgba($g3-castle, 0);
-$react-grid-resizer--b: $g3-castle;
-
 .react-grid-item .react-resizable-handle {
   background-image: none;
   cursor: nwse-resize;
   border: 15px solid transparent;
-  border-right-color: $g3-castle;
-  border-bottom-color: $g3-castle;
+  border-right-color: $g5-pepper;
+  border-bottom-color: $g5-pepper;
   border-bottom-right-radius: $ix-radius;
   z-index: $dash-graph-resizer-z;
   transition: border-color 0.25s ease, opacity 0.25s ease;
   width: 30px;
   height: 30px;
-  bottom: -$ix-border;
-  right: -$ix-border;
+  bottom: 0;
+  right: 0;
   opacity: 0;
   
   &:before,
@@ -645,7 +685,7 @@ $react-grid-resizer--b: $g3-castle;
     position: absolute;
     height: 2px;
     border-radius: 1px;
-    background-color: $g8-storm;
+    background-color: $g0-obsidian;
     transition: background-color 0.25s ease;
     transform: translate(-50%, -50%) rotate(-45deg);
     border: 0;
@@ -661,10 +701,8 @@ $react-grid-resizer--b: $g3-castle;
     left: 4px;
   }
   &:hover {
-    &:before,
-    &:after {
-      background-color: $cell-gradient-border--stop;
-    }
+    border-right-color: $cell-gradient-border--stop;
+    border-bottom-color: $cell-gradient-border--stop;
   }
 }
 
@@ -700,7 +738,6 @@ $react-grid-resizer--b: $g3-castle;
   }
 
   .dash-graph--heading {
-    background-color: $g5-pepper;
     cursor: move;
   }
 }
