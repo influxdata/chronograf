@@ -13,6 +13,7 @@ $dash-graph-header-z: 2;
 $dash-graph-context-z: 6;
 $dash-graph-note-z: 7;
 $dash-graph-context-expanded-z: 20;
+$dash-graph-interacting-z: 21;
 
 /*
   Animations
@@ -236,7 +237,7 @@ $dash-graph--heading-name-z: $dash-graph--heading-dragger-z + 1;
 
 .dash-graph--heading-bar {
   z-index: $dash-graph--heading-bar-z;
-  background-color: $g5-pepper;
+  background-color: $g6-smoke;
 }
 
 .dash-graph--heading-dragger {
@@ -667,8 +668,8 @@ $cell-gradient-border--mid: mix($cell-gradient-border--start, $cell-gradient-bor
   background-image: none;
   cursor: nwse-resize;
   border: 15px solid transparent;
-  border-right-color: $g5-pepper;
-  border-bottom-color: $g5-pepper;
+  border-right-color: $g6-smoke;
+  border-bottom-color: $g6-smoke;
   border-bottom-right-radius: $ix-radius;
   z-index: $dash-graph-resizer-z;
   transition: border-color 0.25s ease, opacity 0.25s ease;
@@ -714,9 +715,17 @@ $cell-gradient-border--mid: mix($cell-gradient-border--start, $cell-gradient-bor
 // Cell Resizing & Dragging Styles
 .react-grid-item.resizing,
 .react-grid-item.react-draggable-dragging {
-  z-index: 3;
+  z-index: $dash-graph-interacting-z;
 
   .dash-graph--gradient-border {
+    opacity: 1;
+  }
+
+  .dash-graph--name {
+    color: $g20-white;
+  }
+
+  .dash-graph-context {
     opacity: 1;
   }
 
