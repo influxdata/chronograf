@@ -323,10 +323,7 @@ class LogsPage extends Component<Props, State> {
     this.flushTailBuffer()
     this.clearTailInterval()
 
-    const now = moment()
-      .utc()
-      .valueOf()
-    this.props.setNextTailLowerBound(now)
+    this.props.setNextTailLowerBound(Date.now())
 
     this.interval = window.setInterval(
       this.handleTailFetchingInterval,
@@ -350,10 +347,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private fetchNewerChunk = async (): Promise<void> => {
-    const maxNewerFetchForward = moment()
-      .add(DEFAULT_NEWER_CHUNK_DURATION_MS, 'milliseconds')
-      .utc()
-      .valueOf()
+    const maxNewerFetchForward = Date.now() + DEFAULT_NEWER_CHUNK_DURATION_MS
 
     if (this.props.nextNewerLowerBound > maxNewerFetchForward) {
       this.props.setNextNewerLowerBound(Date.now())
@@ -493,11 +487,10 @@ class LogsPage extends Component<Props, State> {
 
     this.props.setTableCustomTime(time)
     const liveUpdating = false
-    const customLowerBound = moment(time)
-      .utc()
-      .valueOf()
 
+    const customLowerBound = Date.parse(time)
     this.props.setNextNewerLowerBound(customLowerBound)
+
     this.setState({
       hasScrolled: false,
       liveUpdating,
@@ -514,18 +507,15 @@ class LogsPage extends Component<Props, State> {
     this.clearAllTimeBounds()
 
     this.props.setTableRelativeTime(time)
-    const relativeLowerBound = moment()
-      .subtract(time, 'seconds')
-      .utc()
-      .valueOf()
 
+    const relativeLowerBound = Date.now() - time * 1000
     this.props.setNextNewerLowerBound(relativeLowerBound)
+
     this.setState({hasScrolled: false})
 
+    const timeOptionUTC = new Date(Date.now() - time * 1000).toISOString()
     let timeOption = {
-      timeOption: moment()
-        .subtract(time, 'seconds')
-        .toISOString(),
+      timeOption: timeOptionUTC,
     }
 
     let liveUpdating = false
@@ -808,8 +798,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleBarClick = (time: string): void => {
-    const formattedTime = moment(time).toISOString()
-
+    const formattedTime = new Date(Date.parse(time)).toISOString()
     this.handleChooseCustomTime(formattedTime)
   }
 
