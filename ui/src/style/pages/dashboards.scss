@@ -631,11 +631,12 @@ $react-grid-resizer--b: $g3-castle;
   border-bottom-color: $g3-castle;
   border-bottom-right-radius: $ix-radius;
   z-index: $dash-graph-resizer-z;
-  transition: border-color 0.25s ease;
+  transition: border-color 0.25s ease, opacity 0.25s ease;
   width: 30px;
   height: 30px;
   bottom: -$ix-border;
   right: -$ix-border;
+  opacity: 0;
   
   &:before,
   &:after {
@@ -665,6 +666,10 @@ $react-grid-resizer--b: $g3-castle;
       background-color: $cell-gradient-border--stop;
     }
   }
+}
+
+.react-grid-item:hover .react-resizable-handle {
+  opacity: 1;
 }
 
 
