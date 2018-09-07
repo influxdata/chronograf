@@ -921,8 +921,10 @@ export const setNamespaceAsync = (namespace: Namespace) => async (
     payload: {namespace},
   })
 
-  await dispatch(setHistogramQueryConfigAsync()) // TODO: could this await be removed?
-  await dispatch(setTableQueryConfigAsync())
+  await Promise.all([
+    dispatch(setHistogramQueryConfigAsync()),
+    dispatch(setTableQueryConfigAsync()),
+  ])
 }
 
 export const setNamespaces = (
