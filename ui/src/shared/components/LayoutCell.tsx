@@ -35,6 +35,7 @@ export default class LayoutCell extends Component<Props> {
     const {cell, isEditable, cellData, onDeleteCell, onCloneCell} = this.props
 
     return (
+      <>
       <div className="dash-graph">
         <Authorized requiredRole={EDITOR_ROLE}>
           <LayoutCellMenu
@@ -62,6 +63,8 @@ export default class LayoutCell extends Component<Props> {
         />
         <div className="dash-graph--container">{this.renderGraph}</div>
       </div>
+      {this.gradientBorder}
+      </>
     )
   }
 
@@ -161,5 +164,16 @@ export default class LayoutCell extends Component<Props> {
       notify(notifyCSVDownloadFailed())
       console.error(error)
     }
+  }
+
+  private get gradientBorder(): JSX.Element {
+    return (
+      <div className="dash-graph--gradient-border">
+        <div className="dash-graph--gradient-top-left" />
+        <div className="dash-graph--gradient-top-right" />
+        <div className="dash-graph--gradient-bottom-left" />
+        <div className="dash-graph--gradient-bottom-right" />
+      </div>
+    )
   }
 }
