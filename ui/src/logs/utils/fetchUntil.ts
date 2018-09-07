@@ -23,11 +23,7 @@ export function fetchUntil<T>(
 
 const fetchEachAsync = async requestsIterator => {
   for (const response of requestsIterator) {
-    try {
-      await response
-    } catch (error) {
-      throw error
-    }
+    await response
   }
 }
 
