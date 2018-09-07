@@ -215,9 +215,10 @@ export const LoadingMessages = [
 ]
 
 export const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
+export const DEFAULT_MAX_TAIL_BUFFER_DURATION_MS = 30000
+
 export const DEFAULT_OLDER_CHUNK_DURATION_MS = 30000
 export const DEFAULT_NEWER_CHUNK_DURATION_MS = 30000
-export const DEFAULT_MAX_TAIL_BUFFER_DURATION_MS = 30000
 
 export const NOW = 0
 
