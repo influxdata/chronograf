@@ -509,49 +509,6 @@ $dash-graph-resizer-z: 5;
   animation: gridPlaceholderPulse 3s ease-in-out infinite;
 }
 
-// Resize Handle
-.react-grid-item .react-resizable-handle {
-  background-image: none;
-  cursor: nwse-resize;
-  border: 11px solid transparent;
-  border-right-color: $g5-pepper;
-  border-bottom-color: $g5-pepper;
-  border-bottom-right-radius: $ix-radius;
-  z-index: $dash-graph-resizer-z;
-  width: 26px;
-  height: 26px;
-  bottom: -$ix-border;
-  right: -$ix-border;
-  
-  &:before,
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    height: 2px;
-    border-radius: 1px;
-    background-color: $g6-smoke;
-    transition: background-color 0.25s ease;
-    top: 50%;
-    left: 50%;
-    border: 0;
-  }
-  &:before {
-    width: 20px;
-    transform: translate(-50%, -50%) rotate(-45deg);
-  }
-  &:after {
-    width: 12px;
-    transform: translate(-3px, 2px) rotate(-45deg);
-  }
-  &:hover {
-    &:before,
-    &:after {
-      background-color: $c-comet;
-    }
-  }
-}
-
 // Gradient Borders when Dragging or Resizing a Cell
 $cell-gradient-border--start: $c-pool;
 $cell-gradient-border--stop: $c-comet;
@@ -662,6 +619,54 @@ $cell-gradient-border--mid: mix($cell-gradient-border--start, $cell-gradient-bor
   display: block;
 }
 
+// Resize Handle
+$react-grid-resizer--a: rgba($g3-castle, 0);
+$react-grid-resizer--b: $g3-castle;
+
+.react-grid-item .react-resizable-handle {
+  background-image: none;
+  cursor: nwse-resize;
+  border: 15px solid transparent;
+  border-right-color: $g3-castle;
+  border-bottom-color: $g3-castle;
+  border-bottom-right-radius: $ix-radius;
+  z-index: $dash-graph-resizer-z;
+  transition: border-color 0.25s ease;
+  width: 30px;
+  height: 30px;
+  bottom: -$ix-border;
+  right: -$ix-border;
+  
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    height: 2px;
+    border-radius: 1px;
+    background-color: $g8-storm;
+    transition: background-color 0.25s ease;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    border: 0;
+  }
+  &:before {
+    width: 12px;
+    top: 7px;
+    left: 7px;
+  }
+  &:after {
+    width: 20px;
+    top: 4px;
+    left: 4px;
+  }
+  &:hover {
+    &:before,
+    &:after {
+      background-color: $cell-gradient-border--stop;
+    }
+  }
+}
+
 
 // Cell Resizing & Dragging Styles
 .react-grid-item.resizing,
@@ -671,14 +676,14 @@ $cell-gradient-border--mid: mix($cell-gradient-border--start, $cell-gradient-bor
   .dash-graph--gradient-border {
     opacity: 1;
   }
-}
 
-// Cell Resizing Styles
-.react-grid-item.resizing {
   .react-resizable-handle {
+    border-right-color: $cell-gradient-border--stop;
+    border-bottom-color: $cell-gradient-border--stop;
+
     &:before,
     &:after {
-      background-color: $c-comet;
+      background-color: $g0-obsidian;
     }
   }
 }
