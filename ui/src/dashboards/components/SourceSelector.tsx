@@ -30,9 +30,12 @@ const SourceSelector: SFC<Props> = ({
   isDynamicSourceSelected,
   onSelectDynamicSource,
 }) => {
-  return sources.length > 1 && queries.length ? (
+  if (!sources.length || !queries.length) {
+    return <div className="source-selector" />
+  }
+
+  return (
     <div className="source-selector">
-      <h3>Source:</h3>
       <SourceDropdown
         service={service}
         services={services}
@@ -46,8 +49,6 @@ const SourceSelector: SFC<Props> = ({
         onSelectDynamicSource={onSelectDynamicSource}
       />
     </div>
-  ) : (
-    <div className="source-selector" />
   )
 }
 
