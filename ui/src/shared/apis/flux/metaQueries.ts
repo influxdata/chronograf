@@ -118,6 +118,7 @@ const proxy = async (service: Service, script: string) => {
   const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
   const data = {query: garbage, dialect}
+  let result = []
   try {
     const response = await AJAX({
       method: 'POST',
@@ -128,10 +129,12 @@ const proxy = async (service: Service, script: string) => {
       headers: {'Content-Type': 'application/json'},
     })
 
-    return response.data
+    result = response.data
   } catch (error) {
     handleError(error)
   }
+
+  return result
 }
 
 const handleError = error => {

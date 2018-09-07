@@ -24,9 +24,15 @@ export const parseResponse = (response: string): FluxTable[] => {
     return []
   }
 
-  return trimmedResponse.split(/\n\s*\n/).reduce((acc, chunk) => {
-    return [...acc, ...parseTables(chunk)]
-  }, [])
+  const responses = trimmedResponse.split(/\n\s*\n/)
+
+  let result = []
+
+  for (const chunk of responses) {
+    result = [...result, ...parseTables(chunk)]
+  }
+
+  return result
 }
 
 export const parseTables = (responseChunk: string): FluxTable[] => {

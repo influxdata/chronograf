@@ -4,25 +4,29 @@ import {FluxTable} from 'src/types'
 import {parseResponse} from 'src/shared/parsing/flux/response'
 
 const parseValuesColumn = (resp: string): string[] => {
-  const results = parseResponse(resp)
+  try {
+    const results = parseResponse(resp)
 
-  if (results.length === 0) {
-    return []
-  }
-
-  const tags = results.reduce<string[]>((acc, result: FluxTable) => {
-    const colIndex = result.data[0].findIndex(header => header === '_value')
-
-    if (colIndex === -1) {
-      return [...acc]
+    if (results.length === 0) {
+      return []
     }
 
-    const resultTags = result.data.slice(1).map(row => row[colIndex])
+    const tags = results.reduce<string[]>((acc, result: FluxTable) => {
+      const colIndex = result.data[0].findIndex(header => header === '_value')
 
-    return [...acc, ...resultTags]
-  }, [])
+      if (colIndex === -1) {
+        return [...acc]
+      }
 
-  return _.sortBy(tags, t => t.toLocaleLowerCase())
+      const resultTags = result.data.slice(1).map(row => row[colIndex])
+
+      return [...acc, ...resultTags]
+    }, [])
+
+    return _.sortBy(tags, t => t.toLocaleLowerCase())
+  } catch {
+    return []
+  }
 }
 
 export default parseValuesColumn
