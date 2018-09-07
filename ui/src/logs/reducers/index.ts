@@ -87,9 +87,6 @@ const clearTableData = (state: LogsState) => {
       forward: defaultTableData,
       backward: defaultTableData,
     },
-    nextOlderUpperBound: undefined,
-    nextNewerUpperBound: undefined,
-    nextTailLowerBound: undefined,
   }
 }
 
