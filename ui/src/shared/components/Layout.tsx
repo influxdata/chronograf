@@ -92,20 +92,44 @@ class Layout extends Component<Props, State> {
   }
 
   private get fluxVis(): JSX.Element {
-    const {cell} = this.props
+    const {cell, onZoom, timeRange, manualRefresh, templates} = this.props
+
     const fluxSource = this.fluxSource
 
-    if (fluxSource) {
-      return (
-        <div className="dash-graph">
-          <TimeMachineVis
-            service={fluxSource}
-            visType={this.visType}
-            script={getDeep<string>(cell, 'queries.0.query', '')}
-          />
-        </div>
-      )
-    }
+    return (
+      <RefreshingGraph
+        onZoom={onZoom}
+        timeFormat={cell.timeFormat}
+        axes={cell.axes}
+        type={cell.type}
+        inView={cell.inView}
+        colors={cell.colors}
+        tableOptions={cell.tableOptions}
+        fieldOptions={cell.fieldOptions}
+        decimalPlaces={cell.decimalPlaces}
+        timeRange={timeRange}
+        templates={templates}
+        manualRefresh={manualRefresh}
+        staticLegend={IS_STATIC_LEGEND(cell.legend)}
+        grabDataForDownload={this.grabDataForDownload}
+        queries={cell.queries}
+        source={fluxSource}
+        cellNote={cell.note}
+        cellNoteVisibility={cell.noteVisibility}
+      />
+    )
+
+    // if (fluxSource) {
+    //     return (
+    //       <div className="dash-graph">
+    //         <TimeMachineVis
+    //           service={fluxSource}
+    //           visType={this.visType}
+    //           script={getDeep<string>(cell, 'queries.0.query', '')}
+    //         />
+    //       </div>
+    //     )
+    //   }
   }
 
   private get influxQLVis(): JSX.Element {

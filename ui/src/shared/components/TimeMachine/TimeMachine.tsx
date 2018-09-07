@@ -3,7 +3,6 @@ import React, {PureComponent} from 'react'
 import _ from 'lodash'
 
 // Components
-import TimeMachineVis from 'src/flux/components/TimeMachineVis'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 import Visualization from 'src/dashboards/components/Visualization'
 import InfluxQLQueryMaker from 'src/shared/components/TimeMachine/InfluxQLQueryMaker'
@@ -28,6 +27,7 @@ import {
   scriptUpToYield,
 } from 'src/flux/helpers/scriptBuilder'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
+import buildQueries from 'src/utils/buildQueriesForGraphs'
 
 // Actions
 import {
@@ -57,6 +57,7 @@ import {
   FluxTable,
   QueryStatus,
   Status,
+  Query,
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
 import {
@@ -301,34 +302,22 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get visualization() {
     const {
-      script,
       timeRange,
       templates,
-      source,
       isStaticLegend,
       manualRefresh,
       visualizationOptions,
     } = this.props
     const {autoRefresher} = this.state
 
-    if (this.isFluxSource) {
-      const service = this.service
-      return (
-        <TimeMachineVis
-          service={service}
-          visType={this.visType}
-          script={script}
-        />
-      )
-    }
     return (
       <div className="deceo--top">
         <Visualization
-          source={source}
+          source={this.sourceForVis}
           timeRange={timeRange}
           templates={templates}
           autoRefresher={autoRefresher}
-          queryConfigs={this.queriesWorkingDraft}
+          queries={this.queriesForVis}
           editQueryStatus={this.handleEditQueryStatus}
           staticLegend={isStaticLegend}
           manualRefresh={manualRefresh}
@@ -534,6 +523,23 @@ class TimeMachine extends PureComponent<Props, State> {
     const {isInCEO} = this.props
 
     return isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
+  }
+
+  private get sourceForVis() {
+    if (this.isFluxSource) {
+      return this.service
+    }
+    return this.source
+  }
+
+  private get queriesForVis(): Query[] {
+    const {script, timeRange, queryDrafts} = this.props
+    const id = _.get(queryDrafts, 'id', '')
+    if (this.isFluxSource) {
+      return [{text: script, id, queryConfig: null}]
+    }
+
+    return buildQueries(this.queriesWorkingDraft, timeRange)
   }
 
   private get activeQuery(): QueryConfig {

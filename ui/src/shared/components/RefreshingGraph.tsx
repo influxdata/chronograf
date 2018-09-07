@@ -131,7 +131,7 @@ class RefreshingGraph extends PureComponent<Props> {
         cellNote={cellNote}
         cellNoteVisibility={cellNoteVisibility}
       >
-        {({timeSeries, loading}) => {
+        {({timeSeries, timeSeriesFlux, loading}) => {
           switch (type) {
             case CellType.SingleStat:
               return this.singleStat(timeSeries)
@@ -140,7 +140,7 @@ class RefreshingGraph extends PureComponent<Props> {
             case CellType.Gauge:
               return this.gauge(timeSeries)
             default:
-              return this.lineGraph(timeSeries, loading)
+              return this.lineGraph(timeSeries, timeSeriesFlux, loading)
           }
         }}
       </TimeSeries>
@@ -238,7 +238,7 @@ class RefreshingGraph extends PureComponent<Props> {
     )
   }
 
-  private lineGraph = (data, loading): JSX.Element => {
+  private lineGraph = (data, fluxData, loading): JSX.Element => {
     const {
       axes,
       type,
@@ -263,6 +263,7 @@ class RefreshingGraph extends PureComponent<Props> {
         colors={colors}
         onZoom={onZoom}
         queries={queries}
+        fluxData={fluxData}
         key={manualRefresh}
         loading={loading}
         timeRange={timeRange}

@@ -3,7 +3,13 @@ import {fetchData} from 'src/worker/utils'
 import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
 
 export default async (msg: Message) => {
-  const {url, body} = await fetchData(msg)
+  const {url, query, uuid, dialect} = await fetchData(msg)
+
+  const body = JSON.stringify({
+    query,
+    dialect: dialect || {annotations: ['group', 'datatype', 'default']},
+    uuid,
+  })
 
   const response = await fetch(url, {
     method: 'POST',
@@ -40,5 +46,5 @@ export default async (msg: Message) => {
 
   reader.cancel()
 
-  return {body: bodyString, byteLength: bytesRead}
+  return {body: bodyString, byteLength: bytesRead, uuid}
 }

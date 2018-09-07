@@ -2,13 +2,12 @@ import React, {SFC} from 'react'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 
-import buildQueries from 'src/utils/buildQueriesForGraphs'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 import {QueryUpdateState} from 'src/shared/actions/queries'
 
-import {TimeRange, QueryConfig, Axes, Template, Source, Status} from 'src/types'
+import {TimeRange, Query, Axes, Template, Source, Status} from 'src/types'
 import {
   TableOptions,
   DecimalPlaces,
@@ -25,7 +24,7 @@ interface Props {
   templates: Template[]
   timeRange: TimeRange
   autoRefresher: AutoRefresher
-  queryConfigs: QueryConfig[]
+  queries: Query[]
   editQueryStatus: (queryID: string, status: Status) => void
   tableOptions: TableOptions
   timeFormat: string
@@ -47,13 +46,13 @@ const DashVisualization: SFC<Props> = ({
   type,
   note,
   source,
+  queries,
   templates,
   timeRange,
   lineColors,
   timeFormat,
   gaugeColors,
   fieldOptions,
-  queryConfigs,
   staticLegend,
   tableOptions,
   manualRefresh,
@@ -82,7 +81,7 @@ const DashVisualization: SFC<Props> = ({
           type={type}
           tableOptions={tableOptions}
           autoRefresher={autoRefresher}
-          queries={buildQueries(queryConfigs, timeRange)}
+          queries={queries}
           templates={templates}
           editQueryStatus={editQueryStatus}
           resizerTopHeight={resizerTopHeight}

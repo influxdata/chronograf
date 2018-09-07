@@ -1,7 +1,10 @@
 import _ from 'lodash'
-import {FluxTable, DygraphValue} from 'src/types'
+import {FluxTable} from 'src/types'
+import {TimeSeriesToDyGraphReturnType} from 'src/utils/timeSeriesTransformers'
 
-export const fluxTablesToDygraph = (data: FluxTable[]): DygraphValue[][] => {
+export const fluxTablesToDygraph = (
+  data: FluxTable[]
+): TimeSeriesToDyGraphReturnType => {
   interface V {
     [time: string]: number[]
   }
@@ -30,7 +33,18 @@ export const fluxTablesToDygraph = (data: FluxTable[]): DygraphValue[][] => {
     })
   })
 
-  return _.sortBy(Object.entries(valuesForTime), ([time]) => time).map(
-    ([time, values]) => [new Date(time), ...values]
-  )
+  const timeSeries = _.sortBy(
+    Object.entries(valuesForTime),
+    ([time]) => time
+  ).map(([time, values]) => [new Date(time), ...values])
+
+  const seriesLabels = data.map(d => d.name)
+  const labels = ['time', ...seriesLabels]
+
+  const dygraphSeries = seriesLabels.reduce((acc, label) => {
+    acc[label] = {axis: 'y'}
+    return acc
+  }, {})
+
+  return {timeSeries, labels, dygraphSeries}
 }

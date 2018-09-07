@@ -5,6 +5,10 @@ import uuid from 'uuid'
 
 // API
 import {executeQuery} from 'src/shared/apis/query'
+import {
+  getTimeSeries as fetchFluxTimeSeries,
+  GetTimeSeriesResult,
+} from 'src/flux/apis'
 
 // Types
 import {
@@ -15,6 +19,7 @@ import {
   TimeRange,
   CellType,
   Status,
+  FluxTable,
 } from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
@@ -35,6 +40,7 @@ export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 
 interface RenderProps {
   timeSeries: TimeSeriesServerResponse[]
+  timeSeriesFlux: FluxTable[]
   loading: RemoteDataState
 }
 
@@ -59,6 +65,7 @@ interface State {
   loading: RemoteDataState
   isFirstFetch: boolean
   timeSeries: TimeSeriesServerResponse[]
+  timeSeriesFlux: FluxTable[]
 }
 
 const GraphLoadingDots = () => (
@@ -106,6 +113,7 @@ class TimeSeries extends Component<Props, State> {
       timeSeries: DEFAULT_TIME_SERIES,
       loading: RemoteDataState.NotStarted,
       isFirstFetch: true,
+      timeSeriesFlux: [],
     }
   }
 
@@ -119,13 +127,12 @@ class TimeSeries extends Component<Props, State> {
       'cellType',
       'manualRefresh',
     ]
-
-    return (
+    const should =
       this.state.loading !== prevState.loading ||
       _.some(list, key => {
         return !_.isEqual(this.props[key], prevProps[key])
       })
-    )
+    return should
   }
 
   public async componentDidMount() {
@@ -153,7 +160,9 @@ class TimeSeries extends Component<Props, State> {
       return
     }
 
-    this.executeQueries()
+    if (this.isComponentMounted) {
+      this.executeQueries()
+    }
   }
 
   public setIsLoading(): Promise<void> {
@@ -182,10 +191,21 @@ class TimeSeries extends Component<Props, State> {
     try {
       this.latestUUID = uuid.v1()
 
-      const timeSeries = await Promise.all(queries.map(this.executeQuery))
+      let timeSeries: TimeSeriesServerResponse[] = []
+      let timeSeriesFlux: FluxTable[] = []
+      if (this.isFluxSource) {
+        const results = await this.executeFluxQuery(queries)
+        timeSeriesFlux = results.tables
 
-      if (getDeep(timeSeries, '0.response.uuid', null) !== this.latestUUID) {
-        return
+        if (_.get(results, 'uuid') !== this.latestUUID) {
+          return
+        }
+      } else {
+        timeSeries = await Promise.all(queries.map(this.executeQuery))
+
+        if (getDeep(timeSeries, '0.response.uuid', null) !== this.latestUUID) {
+          return
+        }
       }
 
       if (!this.isComponentMounted) {
@@ -194,6 +214,7 @@ class TimeSeries extends Component<Props, State> {
 
       this.setState({
         timeSeries,
+        timeSeriesFlux,
         loading: RemoteDataState.Done,
         isFirstFetch: false,
       })
@@ -208,6 +229,7 @@ class TimeSeries extends Component<Props, State> {
 
       this.setState({
         timeSeries: [],
+        timeSeriesFlux: [],
         loading: RemoteDataState.Error,
       })
     }
@@ -215,13 +237,15 @@ class TimeSeries extends Component<Props, State> {
 
   public render() {
     const {cellNoteVisibility, cellNote} = this.props
-    const {timeSeries, loading, isFirstFetch} = this.state
+    const {timeSeries, timeSeriesFlux, loading, isFirstFetch} = this.state
 
-    const hasValues = _.some(timeSeries, s => {
-      const results = _.get(s, 'response.results', [])
-      const v = _.some(results, r => r.series)
-      return v
-    })
+    const hasValues =
+      timeSeriesFlux.length ||
+      _.some(timeSeries, s => {
+        const results = _.get(s, 'response.results', [])
+        const v = _.some(results, r => r.series)
+        return v
+      })
 
     if (isFirstFetch && loading === RemoteDataState.Loading) {
       return <div className="graph-empty">{this.spinner}</div>
@@ -242,9 +266,15 @@ class TimeSeries extends Component<Props, State> {
     return (
       <>
         {this.loadingDots}
-        {this.props.children({timeSeries, loading})}
+        {this.props.children({timeSeries, timeSeriesFlux, loading})}
       </>
     )
+  }
+
+  private get isFluxSource(): boolean {
+    const {source} = this.props
+    const sourceLink = getDeep<string>(source, 'links.self', '')
+    return sourceLink && sourceLink.includes('services')
   }
 
   private get loadingDots(): JSX.Element {
@@ -265,6 +295,17 @@ class TimeSeries extends Component<Props, State> {
     }
 
     return null
+  }
+
+  private async executeFluxQuery(
+    queries: Query[]
+  ): Promise<GetTimeSeriesResult> {
+    const {source} = this.props
+
+    const script = getDeep<string>(queries, '0.text', '')
+    const results = await fetchFluxTimeSeries(source, script, this.latestUUID)
+
+    return results
   }
 
   private executeQuery = async (

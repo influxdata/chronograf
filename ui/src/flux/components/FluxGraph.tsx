@@ -5,7 +5,6 @@ import {fluxTablesToDygraph} from 'src/shared/parsing/flux/dygraph'
 
 import Dygraph from 'src/shared/components/Dygraph'
 import {FluxTable} from 'src/types'
-import {DygraphSeries, DygraphValue} from 'src/types'
 import {DEFAULT_LINE_COLORS} from 'src/shared/constants/graphColorPalettes'
 import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
 
@@ -16,13 +15,15 @@ interface Props {
 
 class FluxGraph extends PureComponent<Props> {
   public render() {
+    const dygraphData = fluxTablesToDygraph(this.props.data)
+    const {timeSeries, labels, dygraphSeries} = dygraphData
     return (
       <Dygraph
-        labels={this.labels}
+        labels={labels}
         staticLegend={false}
-        timeSeries={this.timeSeries}
+        timeSeries={timeSeries}
         colors={DEFAULT_LINE_COLORS}
-        dygraphSeries={this.dygraphSeries}
+        dygraphSeries={dygraphSeries}
         options={this.options}
         handleSetHoverTime={this.props.setHoverTime}
       />
@@ -34,23 +35,6 @@ class FluxGraph extends PureComponent<Props> {
       axisLineColor: '#383846',
       gridLineColor: '#383846',
     }
-  }
-
-  // [time, v1, v2, null, v3]
-  // time: [v1, v2, null, v3]
-  private get timeSeries(): DygraphValue[][] {
-    return fluxTablesToDygraph(this.props.data)
-  }
-
-  private get labels(): string[] {
-    const {data} = this.props
-    const names = data.map(d => d.name)
-
-    return ['time', ...names]
-  }
-
-  private get dygraphSeries(): DygraphSeries {
-    return {}
   }
 }
 

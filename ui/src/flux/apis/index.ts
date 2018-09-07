@@ -44,29 +44,25 @@ export const getAST = async (request: ASTRequest) => {
   }
 }
 
-interface GetTimeSeriesResult {
+export interface GetTimeSeriesResult {
   didTruncate: boolean
   tables: FluxTable[]
+  uuid?: string
 }
 
 export const getTimeSeries = async (
   service: Service,
-  script: string
+  script: string,
+  uuid?: string
 ): Promise<GetTimeSeriesResult> => {
   const mark = encodeURIComponent('?')
-  const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
+  const query = script.replace(/\s/g, '') // server cannot handle whitespace
   const url = `${window.basepath}${
     service.links.proxy
   }?path=/query${mark}organization=defaultorgname`
-  const dialect = {annotations: ['group', 'datatype', 'default']}
-  const data = JSON.stringify({
-    query: garbage,
-    dialect,
-  })
-
   let responseBody: string
   let responseByteLength: number
-
+  let responseUUID: string
   try {
     // We are using the `fetch` API here since the `AJAX` utility lacks support
     // for limiting response size. The `AJAX` utility depends on
@@ -74,10 +70,14 @@ export const getTimeSeries = async (
     // seems to be broken at the moment. We might use this option instead of
     // the `fetch` API in the future, if it is ever fixed.  See
     // https://github.com/axios/axios/issues/1491.
-    const {body, byteLength} = await manager.fetchFluxData(url, data)
-
+    const {body, byteLength, uuid: id} = await manager.fetchFluxData(
+      url,
+      query,
+      uuid
+    )
     responseBody = body
     responseByteLength = byteLength
+    responseUUID = id
   } catch (error) {
     console.error('Problem fetching data', error)
 
@@ -86,10 +86,12 @@ export const getTimeSeries = async (
   }
 
   try {
-    return {
+    const response = {
       tables: parseResponse(responseBody),
       didTruncate: responseByteLength >= MAX_RESPONSE_BYTES,
+      uuid: responseUUID,
     }
+    return response
   } catch (error) {
     console.error('Could not parse response body', error)
 
