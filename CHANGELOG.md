@@ -20,6 +20,7 @@
 1.  [#4268](https://github.com/influxdata/chronograf/pull/4268): Clear logs after searching
 1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
 1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Move log message truncation controls into logs filter bar
+1.  [#4391](https://github.com/influxdata/chronograf/pull/4391): Colorize entire Single Stat cell
 
 
 ### UI Improvements
