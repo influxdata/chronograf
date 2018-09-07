@@ -78,7 +78,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         toggleVisibility={toggleVisibility}
         resetWizardState={this.resetWizardState}
         title="Connection Configuration"
-        skipLinkText="dismiss"
+        skipLinkText="Dismiss"
         maxWidth={800}
         jumpStep={jumpStep}
       >
@@ -100,7 +100,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         </WizardStep>
         <WizardStep
           title="Dashboards"
-          tipText="Select dashboards you would like to create:"
+          tipText="Select Dashboards you would like to create:"
           isComplete={this.isDashboardComplete}
           isErrored={dashboardError}
           onNext={this.handleDashboardNext}

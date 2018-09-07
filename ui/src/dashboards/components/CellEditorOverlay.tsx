@@ -275,11 +275,8 @@ class CellEditorOverlay extends Component<Props, State> {
           null
         )
         const timeRange = getTimeRange(queryConfig)
-        const source = getDeep<string | null>(
-          queryConfig,
-          'source.links.self',
-          null
-        )
+        const source = getDeep<string | null>(q, 'source', null)
+
         return {
           ...q,
           query:

@@ -77,11 +77,12 @@ class RefreshingGraph extends PureComponent<Props> {
 
   private timeSeries: React.RefObject<TimeSeries> = React.createRef()
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps) {
     if (!this.timeSeries.current) {
       return
     }
-    if (this.props.editorLocation) {
+
+    if (this.props.editorLocation && this.haveVisOptionsChanged(prevProps)) {
       this.timeSeries.current.forceUpdate()
     }
   }
@@ -144,6 +145,21 @@ class RefreshingGraph extends PureComponent<Props> {
         }}
       </TimeSeries>
     )
+  }
+
+  private haveVisOptionsChanged(prevProps: Props): boolean {
+    const visProps: string[] = [
+      'axes',
+      'colors',
+      'tableOptions',
+      'fieldOptions',
+      'decimalPlaces',
+      'timeFormat',
+    ]
+
+    const prevVisValues = _.pick(prevProps, visProps)
+    const curVisValues = _.pick(this.props, visProps)
+    return !_.isEqual(prevVisValues, curVisValues)
   }
 
   private singleStat = (data): JSX.Element => {

@@ -8,7 +8,7 @@ import React, {ComponentClass, Component} from 'react'
 class DefaultError extends Component {
   public render() {
     return (
-      <p className="error">
+      <p className="unexpected-error">
         A Chronograf error has occurred. Please report the issue&nbsp;
         <a href="https://github.com/influxdata/chronograf/issues">here</a>.
       </p>

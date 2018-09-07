@@ -471,7 +471,13 @@ export const notifyDashboardDeleted = (name: string): Notification => ({
 export const notifyDashboardCreated = (count: number): Notification => ({
   ...defaultSuccessNotification,
   icon: 'dash-h',
-  message: `Selected dashboard${count > 1 ? 's' : ''} have been created.`,
+  message: `Selected dashboard${count > 1 ? 's have' : ' has'} been created.`,
+})
+
+export const notifyNoSuggestedDashboards = (): Notification => ({
+  ...defaultErrorNotification,
+  icon: 'dash-h',
+  message: `There are no suggested dashboards for this source`,
 })
 
 export const notifyDashboardCreationFailed = (count: number): Notification => ({

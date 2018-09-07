@@ -10,7 +10,7 @@ export const getSourceHealth = async (url: string) => {
   }
 }
 
-export const getProtoBoards = async (): Promise<Protoboard[]> => {
+export const getProtoboards = async (): Promise<Protoboard[]> => {
   try {
     const {
       data: {protoboards},

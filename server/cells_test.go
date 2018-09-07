@@ -748,9 +748,15 @@ func Test_newCellResponses(t *testing.T) {
 						},
 					},
 					Axes: map[string]chronograf.Axis{
-						"x":  chronograf.Axis{},
-						"y":  chronograf.Axis{},
-						"y2": chronograf.Axis{},
+						"x": chronograf.Axis{
+							Bounds: []string{"", ""},
+						},
+						"y": chronograf.Axis{
+							Bounds: []string{"", ""},
+						},
+						"y2": chronograf.Axis{
+							Bounds: []string{"", ""},
+						},
 					},
 					Type: "line",
 					CellColors: []chronograf.CellColor{
@@ -807,9 +813,15 @@ func Test_newCellResponses(t *testing.T) {
 							},
 						},
 						Axes: map[string]chronograf.Axis{
-							"x":  {},
-							"y":  {},
-							"y2": {},
+							"x": chronograf.Axis{
+								Bounds: []string{"", ""},
+							},
+							"y": chronograf.Axis{
+								Bounds: []string{"", ""},
+							},
+							"y2": chronograf.Axis{
+								Bounds: []string{"", ""},
+							},
 						},
 						Type: "line",
 						CellColors: []chronograf.CellColor{

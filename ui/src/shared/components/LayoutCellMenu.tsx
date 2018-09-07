@@ -10,6 +10,7 @@ import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import {Cell} from 'src/types/dashboards'
 import {QueryConfig} from 'src/types/queries'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {VisType} from 'src/types/flux'
 
 interface Query {
   text?: string
@@ -25,6 +26,9 @@ interface Props {
   onDelete: (cell: Cell) => void
   onCSVDownload: () => void
   queries: Query[]
+  isFluxSource: boolean
+  visType: VisType
+  toggleVisType: () => void
 }
 
 interface State {
@@ -113,9 +117,25 @@ class LayoutCellMenu extends Component<Props, State> {
   }
 
   private get editMenuItems(): MenuItem[] {
-    const {dataExists, onCSVDownload} = this.props
+    const {
+      dataExists,
+      onCSVDownload,
+      toggleVisType,
+      visType,
+      isFluxSource,
+    } = this.props
 
-    return [
+    const visTypeItem = {
+      text: 'View Raw Data',
+      action: toggleVisType,
+      disabled: false,
+    }
+
+    if (visType === VisType.Table) {
+      visTypeItem.text = 'View Visualization'
+    }
+
+    const menuItems = [
       {
         text: 'Configure',
         action: this.handleEditCell,
@@ -127,6 +147,12 @@ class LayoutCellMenu extends Component<Props, State> {
         disabled: !dataExists,
       },
     ]
+
+    if (isFluxSource) {
+      menuItems.push(visTypeItem)
+    }
+
+    return menuItems
   }
 
   private get cloneMenuItems(): MenuItem[] {
