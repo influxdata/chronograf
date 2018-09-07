@@ -587,9 +587,11 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleSubmitSearch = async (value: string): Promise<void> => {
-    searchToFilters(value).forEach(filter => {
-      this.props.addFilter(filter)
-    })
+    searchToFilters(value)
+      .reverse()
+      .forEach(filter => {
+        this.props.addFilter(filter)
+      })
 
     this.fetchSearchDataset(SearchStatus.Loading)
   }
