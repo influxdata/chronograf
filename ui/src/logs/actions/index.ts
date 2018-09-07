@@ -1,4 +1,3 @@
-import moment from 'moment'
 import _ from 'lodash'
 import {Dispatch} from 'redux'
 import {ThunkDispatch} from 'redux-thunk'
@@ -385,17 +384,12 @@ const getTableSelectedTime = (state: State): number => {
   const custom = getDeep<string>(state, 'logs.tableTime.custom', '')
 
   if (!_.isEmpty(custom)) {
-    return moment(custom)
-      .utc()
-      .valueOf()
+    return Date.parse(custom)
   }
 
   const relative = getDeep<number>(state, 'logs.tableTime.relative', 0)
 
-  return moment()
-    .subtract(relative, 'seconds')
-    .utc()
-    .valueOf()
+  return Date.now() - relative * 1000
 }
 
 const getNextOlderUpperBound = (state: State): number => {
@@ -740,21 +734,14 @@ export const fetchOlderChunkAsync = () => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const nextOlderUpperBound = getNextOlderUpperBound(state)
+    const olderUpperBound = getNextOlderUpperBound(state)
     const olderChunkDurationMs = getOlderChunkDurationMs(state)
 
-    const upper = moment(nextOlderUpperBound).toISOString()
-    const lower = moment(upper)
-      .subtract(olderChunkDurationMs, 'milliseconds')
-      .toISOString()
+    const nextOlderUpperBound = olderUpperBound - olderChunkDurationMs
+    dispatch(setNextOlderUpperBound(nextOlderUpperBound))
 
-    dispatch(
-      setNextOlderUpperBound(
-        moment(lower)
-          .utc()
-          .valueOf()
-      )
-    )
+    const upper = new Date(olderUpperBound).toISOString()
+    const lower = new Date(nextOlderUpperBound).toISOString()
 
     const query = buildInfiniteScrollLogQuery(
       lower,
@@ -799,18 +786,11 @@ export const fetchNewerChunkAsync = () => async (
     const newerLowerBound = getNextNewerLowerBound(state)
     const newerChunkDurationMs = getNewerChunkDurationMs(state)
 
-    const lower = moment(newerLowerBound).toISOString()
-    const upper = moment(newerLowerBound)
-      .add(newerChunkDurationMs, 'milliseconds')
-      .toISOString()
+    const nextNewerLowerBound = newerLowerBound + newerChunkDurationMs
+    dispatch(setNextNewerLowerBound(nextNewerLowerBound))
 
-    dispatch(
-      setNextNewerLowerBound(
-        moment(upper)
-          .utc()
-          .valueOf()
-      )
-    )
+    const upper = new Date(nextNewerLowerBound).toISOString()
+    const lower = new Date(newerLowerBound).toISOString()
 
     const query = buildInfiniteScrollLogQuery(
       lower,
@@ -873,17 +853,15 @@ export const fetchTailAsync = () => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const nextTailLowerBound = getNextTailLowerBound(state)
+    const tailLowerBound = getNextTailLowerBound(state)
 
-    if (!nextTailLowerBound) {
-      throw new Error('nextTailLowerBound is not set')
+    if (!tailLowerBound) {
+      throw new Error('tail lower bound is not set')
     }
-    const lower = moment(nextTailLowerBound).toISOString()
-    const upper = moment().toISOString()
+    const upper = new Date().toISOString()
+    const lower = new Date(tailLowerBound).toISOString()
 
-    const upperUTC = moment(upper)
-      .utc()
-      .valueOf()
+    const upperUTC = Date.parse(upper)
     dispatch(setCurrentTailUpperBound(upperUTC))
 
     const query = buildInfiniteScrollLogQuery(
@@ -904,7 +882,7 @@ export const fetchTailAsync = () => async (
       defaultTableData
     )
 
-    const currentForwardBufferDuration = upperUTC - nextTailLowerBound
+    const currentForwardBufferDuration = upperUTC - tailLowerBound
     const maxTailBufferDurationMs = getMaxTailBufferDurationMs(state)
     const isMaxTailBufferDurationExceeded =
       currentForwardBufferDuration >= maxTailBufferDurationMs
