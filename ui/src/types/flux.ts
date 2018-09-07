@@ -174,3 +174,8 @@ export enum RemoteDataState {
   Done = 'Done',
   Error = 'Error',
 }
+
+export enum VisType {
+  Graph,
+  Table,
+}

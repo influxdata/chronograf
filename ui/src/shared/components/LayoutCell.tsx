@@ -1,6 +1,8 @@
+// Libraries
 import React, {Component, ReactElement} from 'react'
 import _ from 'lodash'
 
+// Components
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import LayoutCellMenu from 'src/shared/components/LayoutCellMenu'
 import LayoutCellHeader from 'src/shared/components/LayoutCellHeader'
@@ -13,10 +15,12 @@ import {dataToCSV} from 'src/shared/parsing/dataToCSV'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 
+// Types
 import {Cell, CellQuery, Template} from 'src/types/'
 import {NoteVisibility} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {CellType} from 'src/types/dashboards'
+import {VisType} from 'src/types/flux'
 
 interface Props {
   cell: Cell
@@ -27,12 +31,24 @@ interface Props {
   isEditable: boolean
   cellData: TimeSeriesServerResponse[]
   templates: Template[]
+  isFluxSource: boolean
+  visType: VisType
+  toggleVisType: () => void
 }
 
 @ErrorHandling
 export default class LayoutCell extends Component<Props> {
   public render() {
-    const {cell, isEditable, cellData, onDeleteCell, onCloneCell} = this.props
+    const {
+      cell,
+      isEditable,
+      cellData,
+      onDeleteCell,
+      onCloneCell,
+      visType,
+      toggleVisType,
+      isFluxSource,
+    } = this.props
 
     return (
       <div className="dash-graph">
@@ -46,6 +62,9 @@ export default class LayoutCell extends Component<Props> {
             onDelete={onDeleteCell}
             onCSVDownload={this.handleCSVDownload}
             queries={this.queries}
+            isFluxSource={isFluxSource}
+            visType={visType}
+            toggleVisType={toggleVisType}
           />
         </Authorized>
         <LayoutCellNote

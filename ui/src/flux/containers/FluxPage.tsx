@@ -45,6 +45,7 @@ import {
   DeleteFuncNodeArgs,
   Func,
   ScriptStatus,
+  VisType,
 } from 'src/types/flux'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
@@ -126,7 +127,13 @@ export class FluxPage extends PureComponent<Props, State> {
         handleDisplay: 'none',
         headerButtons: [],
         menuOptions: [],
-        render: () => <TimeMachineVis service={service} script={script} />,
+        render: () => (
+          <TimeMachineVis
+            service={service}
+            visType={VisType.Graph}
+            script={script}
+          />
+        ),
         headerOrientation: HANDLE_HORIZONTAL,
       },
       {

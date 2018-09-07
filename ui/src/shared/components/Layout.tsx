@@ -17,9 +17,10 @@ import {IS_STATIC_LEGEND} from 'src/shared/constants'
 
 // Types
 import {TimeRange, Cell, Template, Source, Service} from 'src/types'
-
+import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
+import {VisType} from 'src/types/flux'
 
 interface Props {
   cell: Cell
@@ -37,10 +38,16 @@ interface Props {
   onSummonOverlayTechnologies: () => void
 }
 
+interface State {
+  cellData: TimeSeriesServerResponse[]
+  visType: VisType
+}
+
 @ErrorHandling
-class Layout extends Component<Props> {
+class Layout extends Component<Props, State> {
   public state = {
     cellData: [],
+    visType: VisType.Graph,
   }
 
   public render() {
@@ -59,9 +66,12 @@ class Layout extends Component<Props> {
         cell={cell}
         cellData={cellData}
         templates={templates}
+        visType={this.visType}
         isEditable={isEditable}
         onCloneCell={onCloneCell}
         onDeleteCell={onDeleteCell}
+        isFluxSource={!!this.fluxSource}
+        toggleVisType={this.toggleVisType}
         onSummonOverlayTechnologies={onSummonOverlayTechnologies}
       >
         {this.visualization}
@@ -87,10 +97,13 @@ class Layout extends Component<Props> {
 
     if (fluxSource) {
       return (
-        <TimeMachineVis
-          service={fluxSource}
-          script={getDeep<string>(cell, 'queries.0.query', '')}
-        />
+        <div className="dash-graph">
+          <TimeMachineVis
+            service={fluxSource}
+            visType={this.visType}
+            script={getDeep<string>(cell, 'queries.0.query', '')}
+          />
+        </div>
       )
     }
   }
@@ -140,6 +153,17 @@ class Layout extends Component<Props> {
       return this.fluxVis
     }
     return this.influxQLVis
+  }
+
+  private get visType(): VisType {
+    return this.state.visType
+  }
+
+  private toggleVisType = (): void => {
+    const newVisType =
+      this.state.visType === VisType.Graph ? VisType.Table : VisType.Graph
+
+    this.setState({visType: newVisType})
   }
 
   private grabDataForDownload: GrabDataForDownloadHandler = cellData => {
