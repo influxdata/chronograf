@@ -422,7 +422,8 @@ const getNextTailLowerBound = (state: State): number | void =>
   state.logs.nextTailLowerBound
 
 /**
- * Gets the maximum duration a tails fetching bounds should range
+ * Gets the maximum duration that the tail buffer should accumulate
+ *  before being flushed to the 'backward' table data.
  * @param state the application state
  */
 const getMaxTailBufferDurationMs = (state: State): number => {
@@ -434,7 +435,7 @@ const getMaxTailBufferDurationMs = (state: State): number => {
 }
 
 /**
- * Sets tableInfiniteData with empty forward and backward TableData
+ * Sets tableInfiniteData with empty 'forward' and 'backward' table data.
  */
 export const clearTableData = () => ({
   type: ActionTypes.ClearTableData,
@@ -486,8 +487,8 @@ export const setTimeBounds = (timeBounds: TimeBounds): SetTimeBoundsAction => ({
 })
 
 /**
- * Sets the upper bound on the next older chunk fetch
- * @param upper the point in time to begin fetching older
+ * Sets the upper bound on the next older chunk fetch query.
+ * @param upper the point in time up until which to fetch older logs.
  */
 export const setNextOlderUpperBound = (
   upper: number
@@ -497,8 +498,9 @@ export const setNextOlderUpperBound = (
 })
 
 /**
- * Sets the lower bound on the next older chunk fetch (Not Used In fetchOlderChunkAsync)
- * @param lower the point in time fetching older searched back to
+ * Sets the lower bound on the next older chunk fetch query.
+ *  This is _not_ used in fetchOlderChunkAsync.
+ * @param lower the point in time starting from which to fetch older logs.
  */
 export const setNextOlderLowerBound = (
   lower: number
@@ -508,8 +510,9 @@ export const setNextOlderLowerBound = (
 })
 
 /**
- * Sets the upper bound on the next newer chunk fetch (Not Used In fetchNewerChunkAsync)
- * @param upper the point in time fetching newer searched up to
+ * Sets the upper bound on the next newer chunk fetch query.
+ *  This is _not_ used in fetchNewerChunkAsync.
+ * @param upper the point in time up until which to fetch newer logs.
  */
 export const setNextNewerUpperBound = (
   upper: number
@@ -519,8 +522,8 @@ export const setNextNewerUpperBound = (
 })
 
 /**
- * Sets the lower bound on the next newer chunk fetch
- * @param lower the point in time to begin fetching newer
+ * Sets the lower bound on the next newer chunk fetch query.
+ * @param lower the point in time starting from which to fetch newer logs.
  */
 export const setNextNewerLowerBound = (
   lower: number
@@ -530,8 +533,8 @@ export const setNextNewerLowerBound = (
 })
 
 /**
- * Sets the most recent time the tail fetches up to
- * @param upper the point in time the last tail fetch ended
+ * Sets the upper bound of time up until which logs were fetched for the current tail chunk.
+ * @param upper the point in time up until which the current tail was fetched.
  */
 export const setCurrentTailUpperBound = (
   upper: number
@@ -541,8 +544,8 @@ export const setCurrentTailUpperBound = (
 })
 
 /**
- * Sets the oldest time used the tail begins fetching
- * @param lower the point in time to begin a tail fetch
+ * Sets the lower bound of time on the current tail chunk fetch query.
+ * @param lower the point in time starting from which to begin the next tail fetch.
  */
 export const setNextTailLowerBound = (
   lower: number
@@ -552,8 +555,8 @@ export const setNextTailLowerBound = (
 })
 
 /**
- * Sets the search status corresponding to the fetching
- * @param searchStatus the status associated with the current search filters
+ * Sets the search status corresponding to the current fetch request.
+ * @param searchStatus the state of the current Logs Page fetch request.
  */
 export const setSearchStatus = (
   searchStatus: SearchStatus
