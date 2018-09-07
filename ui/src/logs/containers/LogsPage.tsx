@@ -798,7 +798,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleBarClick = (time: string): void => {
-    const formattedTime = new Date(Date.parse(time)).toISOString()
+    const formattedTime = new Date(time).toISOString()
     this.handleChooseCustomTime(formattedTime)
   }
 
