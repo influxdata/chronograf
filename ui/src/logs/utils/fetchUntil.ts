@@ -26,7 +26,7 @@ const fetchEachAsync = async requestsIterator => {
     try {
       await response
     } catch (error) {
-      console.error(error)
+      throw error
     }
   }
 }
