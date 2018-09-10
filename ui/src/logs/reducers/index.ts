@@ -93,7 +93,7 @@ const removeFilter = (
 const addFilter = (state: LogsState, action: AddFilterAction): LogsState => {
   const {filter} = action.payload
 
-  return {...state, filters: [..._.get(state, 'filters', []), filter]}
+  return {...state, filters: [filter, ..._.get(state, 'filters', [])]}
 }
 
 const clearFilters = (state: LogsState): LogsState => {
