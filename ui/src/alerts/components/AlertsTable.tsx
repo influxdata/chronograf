@@ -1,10 +1,10 @@
 import React, {PureComponent} from 'react'
 
 import _ from 'lodash'
-import classnames from 'classnames'
-import {Link} from 'react-router'
 import uuid from 'uuid'
+import {Link} from 'react-router'
 
+import AlertsTableRow from 'src/alerts/components/AlertsTableRow'
 import InfiniteScroll from 'src/shared/components/InfiniteScroll'
 import SearchBar from 'src/alerts/components/SearchBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -192,50 +192,11 @@ class AlertsTable extends PureComponent<Props, State> {
         <InfiniteScroll
           className="alert-history-table--tbody"
           itemHeight={25}
-          items={alerts.map(({name, level, time, host, value}) => {
-            return (
-              <div className="alert-history-table--tr" key={uuid.v4()}>
-                <div
-                  className="alert-history-table--td"
-                  style={{width: colName}}
-                >
-                  {name}
-                </div>
-                <div
-                  className={`alert-history-table--td alert-level-${level.toLowerCase()}`}
-                  style={{width: colLevel}}
-                >
-                  <span
-                    className={classnames(
-                      'table-dot',
-                      {'dot-critical': level === 'CRITICAL'},
-                      {'dot-success': level === 'OK'}
-                    )}
-                  />
-                </div>
-                <div
-                  className="alert-history-table--td"
-                  style={{width: colTime}}
-                >
-                  {new Date(Number(time)).toISOString()}
-                </div>
-                <div
-                  className="alert-history-table--td alert-history-table--host"
-                  style={{width: colHost}}
-                >
-                  <Link to={`/sources/${id}/hosts/${host}`} title={host}>
-                    {host}
-                  </Link>
-                </div>
-                <div
-                  className="alert-history-table--td"
-                  style={{width: colValue}}
-                >
-                  {value}
-                </div>
-              </div>
-            )
-          })}
+          items={alerts.map(alert => (
+            <div className="alert-history-table--tr" key={uuid.v4()}>
+              <AlertsTableRow sourceID={id} {...alert} />
+            </div>
+          ))}
         />
       </div>
     ) : (
