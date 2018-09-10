@@ -15,6 +15,7 @@ import {
   Source,
   Status,
   Service,
+  FluxTable,
 } from 'src/types'
 import {
   TableOptions,
@@ -23,6 +24,7 @@ import {
   CellType,
   NoteVisibility,
 } from 'src/types/dashboards'
+import {VisType} from 'src/types/flux'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
 interface Props {
@@ -48,6 +50,8 @@ interface Props {
   noteVisibility: NoteVisibility
   manualRefresh: number
   editorLocation?: QueryUpdateState
+  visType?: VisType
+  rawData?: FluxTable[]
 }
 
 const DashVisualization: SFC<Props> = ({
@@ -57,6 +61,8 @@ const DashVisualization: SFC<Props> = ({
   source,
   service,
   queries,
+  visType,
+  rawData,
   templates,
   timeRange,
   lineColors,
@@ -105,6 +111,8 @@ const DashVisualization: SFC<Props> = ({
           timeRange={timeRange}
           manualRefresh={manualRefresh}
           editorLocation={editorLocation}
+          visType={visType}
+          rawData={rawData}
         />
       </div>
     </div>

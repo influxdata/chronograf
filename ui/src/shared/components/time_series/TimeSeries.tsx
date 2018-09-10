@@ -58,6 +58,7 @@ interface Props {
   templates?: Template[]
   editQueryStatus?: (queryID: string, status: Status) => void
   grabDataForDownload?: GrabDataForDownloadHandler
+  grabFluxData?: (data: FluxTable[]) => void
   cellNote?: string
   cellNoteVisibility?: NoteVisibility
 }
@@ -178,7 +179,7 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public executeQueries = async () => {
-    const {inView, queries, grabDataForDownload} = this.props
+    const {inView, queries, grabDataForDownload, grabFluxData} = this.props
 
     if (!inView) {
       return
@@ -223,6 +224,9 @@ class TimeSeries extends Component<Props, State> {
 
       if (grabDataForDownload) {
         grabDataForDownload(timeSeries)
+      }
+      if (grabFluxData) {
+        grabFluxData(timeSeriesFlux)
       }
     } catch (err) {
       if (!this.isComponentMounted) {

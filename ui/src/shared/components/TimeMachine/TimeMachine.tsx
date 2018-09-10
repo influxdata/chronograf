@@ -308,7 +308,7 @@ class TimeMachine extends PureComponent<Props, State> {
       manualRefresh,
       visualizationOptions,
     } = this.props
-    const {autoRefresher} = this.state
+    const {autoRefresher, data} = this.state
 
     return (
       <div className="deceo--top">
@@ -319,6 +319,8 @@ class TimeMachine extends PureComponent<Props, State> {
           templates={templates}
           autoRefresher={autoRefresher}
           queries={this.queriesForVis}
+          visType={this.visType}
+          rawData={data}
           editQueryStatus={this.handleEditQueryStatus}
           staticLegend={isStaticLegend}
           manualRefresh={manualRefresh}

@@ -19,7 +19,7 @@ import {TimeRange, Cell, Template, Source, Service} from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-import {VisType} from 'src/types/flux'
+import {VisType, FluxTable} from 'src/types/flux'
 
 interface Props {
   cell: Cell
@@ -39,6 +39,7 @@ interface Props {
 
 interface State {
   cellData: TimeSeriesServerResponse[]
+  cellFluxData: FluxTable[]
   visType: VisType
 }
 
@@ -46,6 +47,7 @@ interface State {
 class Layout extends Component<Props, State> {
   public state = {
     cellData: [],
+    cellFluxData: [],
     visType: VisType.Graph,
   }
 
@@ -100,6 +102,7 @@ class Layout extends Component<Props, State> {
       templates,
       source,
     } = this.props
+    const {cellFluxData} = this.state
 
     return (
       <RefreshingGraph
@@ -122,6 +125,8 @@ class Layout extends Component<Props, State> {
         service={this.fluxService}
         cellNote={cell.note}
         cellNoteVisibility={cell.noteVisibility}
+        rawData={cellFluxData}
+        visType={this.visType}
       />
     )
 
@@ -170,6 +175,7 @@ class Layout extends Component<Props, State> {
         manualRefresh={manualRefresh}
         staticLegend={IS_STATIC_LEGEND(cell.legend)}
         grabDataForDownload={this.grabDataForDownload}
+        grabFluxData={this.grabFluxData}
         queries={buildQueriesForLayouts(cell, timeRange, host)}
         source={this.getSource(cell, source, sources, source)}
         cellNote={cell.note}
@@ -198,6 +204,10 @@ class Layout extends Component<Props, State> {
 
   private grabDataForDownload: GrabDataForDownloadHandler = cellData => {
     this.setState({cellData})
+  }
+
+  private grabFluxData = (cellFluxData: FluxTable[]) => {
+    this.setState({cellFluxData})
   }
 
   private getSource = (cell, source, sources, defaultSource) => {

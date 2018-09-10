@@ -10,6 +10,7 @@ import TableGraph from 'src/shared/components/TableGraph'
 import SingleStat from 'src/shared/components/SingleStat'
 import MarkdownCell from 'src/shared/components/MarkdownCell'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
+import TimeMachineTables from 'src/flux/components/TimeMachineTables'
 
 // Constants
 import {emptyGraphCopy} from 'src/shared/copy/cell'
@@ -35,6 +36,7 @@ import {
   Query,
   CellType,
   Service,
+  FluxTable,
 } from 'src/types'
 import {
   TableOptions,
@@ -43,6 +45,7 @@ import {
   NoteVisibility,
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
+import {VisType} from 'src/types/flux'
 
 interface Props {
   axes: Axes
@@ -68,7 +71,10 @@ interface Props {
   editQueryStatus: () => void
   onSetResolution: () => void
   handleSetHoverTime: () => void
+  rawData?: FluxTable[]
+  visType?: VisType
   grabDataForDownload?: GrabDataForDownloadHandler
+  grabFluxData?: (data: FluxTable[]) => void
   cellNote: string
   cellNoteVisibility: NoteVisibility
   editorLocation?: QueryUpdateState
@@ -103,9 +109,12 @@ class RefreshingGraph extends PureComponent<Props> {
       inView,
       service,
       queries,
+      visType,
+      rawData = [],
       cellNote,
       timeRange,
       templates,
+      grabFluxData,
       manualRefresh,
       autoRefresher,
       editQueryStatus,
@@ -125,6 +134,10 @@ class RefreshingGraph extends PureComponent<Props> {
       return <MarkdownCell text={cellNote} />
     }
 
+    if (visType === VisType.Table) {
+      return <TimeMachineTables data={rawData} />
+    }
+
     return (
       <TimeSeries
         ref={this.timeSeries}
@@ -139,6 +152,7 @@ class RefreshingGraph extends PureComponent<Props> {
         templates={templates}
         editQueryStatus={editQueryStatus}
         grabDataForDownload={grabDataForDownload}
+        grabFluxData={grabFluxData}
         cellNote={cellNote}
         cellNoteVisibility={cellNoteVisibility}
       >
