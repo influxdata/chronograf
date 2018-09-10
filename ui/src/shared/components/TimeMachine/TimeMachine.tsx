@@ -405,14 +405,13 @@ class TimeMachine extends PureComponent<Props, State> {
   private get source(): Source {
     const {source, sources, queryDrafts} = this.props
     const {selectedSource, useDynamicSource} = this.state
-
-    if (selectedSource) {
-      return selectedSource
-    }
-
     // return current source
     if (useDynamicSource) {
       return source
+    }
+
+    if (selectedSource) {
+      return selectedSource
     }
 
     const queryDraft = _.get(queryDrafts, 0)
