@@ -12,6 +12,7 @@ import {
 } from 'src/types/logs'
 
 const MESSAGE_KEY = 'message'
+const APP_NAME = 'appname'
 
 export const createRule = (
   part: TermPart,
@@ -97,7 +98,7 @@ const createTerm = (
 ): Term => ({
   type,
   term,
-  attribute,
+  attribute: getAttributeAliasName(attribute),
 })
 
 const createAttributeFilter = (
@@ -114,6 +115,7 @@ const createAttributeFilter = (
 const termToOp = (term: Term): Operator => {
   switch (term.attribute) {
     case MESSAGE_KEY:
+    case APP_NAME:
       return handleOpExclusion(term, Operator.LIKE, Operator.NOT_LIKE)
     default:
       return handleOpExclusion(term, Operator.EQUAL, Operator.NOT_EQUAL)
@@ -130,5 +132,20 @@ const handleOpExclusion = (
       return exclusion
     case TermType.INCLUDE:
       return inclusion
+  }
+}
+
+export const getAttributeAliasName = (name: string) => {
+  const lowerName = name.toLowerCase()
+
+  switch (lowerName) {
+    case 'ap':
+    case 'app':
+    case 'apps':
+    case 'application':
+    case 'program':
+      return APP_NAME
+    default:
+      return name
   }
 }

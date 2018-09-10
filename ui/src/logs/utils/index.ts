@@ -17,7 +17,6 @@ import {HistogramData} from 'src/types/histogram'
 import {executeQueryAsync} from 'src/logs/api'
 
 const BIN_COUNT = 30
-const SECONDS_AWAY_LIMIT = 1296000
 
 const histogramFields = [
   {
@@ -209,88 +208,7 @@ export async function getQueryResultsCountForBounds(
   return getDeep<number>(result, 'results.0.series.0.values.0.1', 0)
 }
 
-// HOW_LOW_CAN_YOU_GO is the magical cut-off point for number of results where exponential backoff will stop
-const HOW_LOW_CAN_YOU_GO = 150
-
-export async function findOlderLowerTimeBounds(
-  upper: string,
-  config: QueryConfig,
-  filters: Filter[],
-  searchTerm: string | null = null,
-  proxyLink: string,
-  namespace: Namespace
-): Promise<string> {
-  const parsedUpper = moment(upper)
-
-  let secondsBack = 5
-  let currentLower = parsedUpper.subtract(secondsBack, 'seconds')
-
-  while (true) {
-    if (secondsBack >= SECONDS_AWAY_LIMIT) {
-      break
-    }
-
-    const count = await getQueryResultsCountForBounds(
-      currentLower.toISOString(),
-      upper,
-      config,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
-
-    if (count >= HOW_LOW_CAN_YOU_GO) {
-      break
-    }
-
-    secondsBack += 2 * secondsBack
-    currentLower = parsedUpper.subtract(secondsBack, 'seconds')
-  }
-
-  return currentLower.toISOString()
-}
-
-export async function findNewerUpperTimeBounds(
-  lower: string,
-  config: QueryConfig,
-  filters: Filter[],
-  searchTerm: string | null = null,
-  proxyLink: string,
-  namespace: Namespace
-): Promise<string> {
-  const parsedLower = moment(lower)
-
-  let secondsForward = 5
-  let currentUpper = parsedLower.add(secondsForward, 'seconds')
-
-  while (true) {
-    if (secondsForward > SECONDS_AWAY_LIMIT) {
-      break
-    }
-
-    const count = await getQueryResultsCountForBounds(
-      lower,
-      currentUpper.toISOString(),
-      config,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
-
-    if (count >= HOW_LOW_CAN_YOU_GO) {
-      break
-    }
-
-    secondsForward += 2 * secondsForward
-    currentUpper = parsedLower.add(secondsForward, 'seconds')
-  }
-
-  return currentUpper.toISOString()
-}
-
-export async function buildInfiniteScrollLogQuery(
+export function buildInfiniteScrollLogQuery(
   lower: string,
   upper: string,
   config: QueryConfig,

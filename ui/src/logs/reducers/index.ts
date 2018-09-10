@@ -10,25 +10,18 @@ import {
   IncrementQueryCountAction,
   ConcatMoreLogsAction,
   PrependMoreLogsAction,
-  SetConfigsAction,
+  SetConfigAction,
 } from 'src/logs/actions'
 
-import {SeverityFormatOptions, DEFAULT_TRUNCATION} from 'src/logs/constants'
-import {LogsState, TableData} from 'src/types/logs'
-
-const defaultTableData: TableData = {
-  columns: [
-    'time',
-    'severity',
-    'timestamp',
-    'message',
-    'facility',
-    'procid',
-    'appname',
-    'host',
-  ],
-  values: [],
-}
+import {
+  SeverityFormatOptions,
+  DEFAULT_TRUNCATION,
+  DEFAULT_TAIL_CHUNK_DURATION_MS,
+  DEFAULT_OLDER_CHUNK_DURATION_MS,
+  DEFAULT_NEWER_CHUNK_DURATION_MS,
+  defaultTableData,
+} from 'src/logs/constants'
+import {LogsState, SearchStatus} from 'src/types/logs'
 
 export const defaultState: LogsState = {
   currentSource: null,
@@ -39,6 +32,10 @@ export const defaultState: LogsState = {
     seconds: 60,
     windowOption: '1m',
     timeOption: 'now',
+  },
+  tableInfiniteData: {
+    forward: defaultTableData,
+    backward: defaultTableData,
   },
   currentNamespace: null,
   histogramQueryConfig: null,
@@ -53,12 +50,31 @@ export const defaultState: LogsState = {
     severityLevelColors: [],
     isTruncated: DEFAULT_TRUNCATION,
   },
-  tableTime: {},
-  tableInfiniteData: {
-    forward: defaultTableData,
-    backward: defaultTableData,
+  tableTime: {
+    custom: '',
+    relative: 0,
   },
+  searchStatus: SearchStatus.None,
+  nextOlderUpperBound: undefined,
+  nextOlderLowerBound: undefined,
+  nextNewerUpperBound: undefined,
+  nextNewerLowerBound: undefined,
+  currentTailUpperBound: undefined,
+  nextTailLowerBound: undefined,
+  tailChunkDurationMs: DEFAULT_TAIL_CHUNK_DURATION_MS,
+  olderChunkDurationMs: DEFAULT_OLDER_CHUNK_DURATION_MS,
+  newerChunkDurationMs: DEFAULT_NEWER_CHUNK_DURATION_MS,
   newRowsAdded: 0,
+}
+
+const clearTableData = (state: LogsState) => {
+  return {
+    ...state,
+    tableInfiniteData: {
+      forward: defaultTableData,
+      backward: defaultTableData,
+    },
+  }
 }
 
 const removeFilter = (
@@ -77,7 +93,7 @@ const removeFilter = (
 const addFilter = (state: LogsState, action: AddFilterAction): LogsState => {
   const {filter} = action.payload
 
-  return {...state, filters: [..._.get(state, 'filters', []), filter]}
+  return {...state, filters: [filter, ..._.get(state, 'filters', [])]}
 }
 
 const clearFilters = (state: LogsState): LogsState => {
@@ -121,7 +137,7 @@ const concatMoreLogs = (
   action: ConcatMoreLogsAction
 ): LogsState => {
   const {
-    series: {values},
+    series: {columns, values},
   } = action.payload
   const {tableInfiniteData} = state
   const {backward} = tableInfiniteData
@@ -132,7 +148,7 @@ const concatMoreLogs = (
     tableInfiniteData: {
       ...tableInfiniteData,
       backward: {
-        columns: backward.columns,
+        columns,
         values: vals,
       },
     },
@@ -150,8 +166,7 @@ const prependMoreLogs = (
   const {forward} = tableInfiniteData
   const vals = [...values, ...forward.values]
 
-  const uniqueValues = _.uniqBy(vals, '0')
-  const newRowsAdded = uniqueValues.length - forward.values.length
+  const newRowsAdded = vals.length - forward.values.length
 
   return {
     ...state,
@@ -160,13 +175,13 @@ const prependMoreLogs = (
       ...tableInfiniteData,
       forward: {
         columns: forward.columns,
-        values: uniqueValues,
+        values: vals,
       },
     },
   }
 }
 
-export const setConfigs = (state: LogsState, action: SetConfigsAction) => {
+export const setConfigs = (state: LogsState, action: SetConfigAction) => {
   const {logConfig} = state
   const {
     logConfig: {tableColumns, severityFormat, severityLevelColors, isTruncated},
@@ -208,6 +223,8 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, tableData: action.payload.data}
     case ActionTypes.ClearRowsAdded:
       return {...state, newRowsAdded: null}
+    case ActionTypes.SetSearchStatus:
+      return {...state, searchStatus: action.payload.searchStatus}
     case ActionTypes.SetTableForwardData:
       return {
         ...state,
@@ -228,6 +245,18 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, tableTime: {custom: action.payload.time}}
     case ActionTypes.SetTableRelativeTime:
       return {...state, tableTime: {relative: action.payload.time}}
+    case ActionTypes.SetNextOlderUpperBound:
+      return {...state, nextOlderUpperBound: action.payload.upper}
+    case ActionTypes.SetNextOlderLowerBound:
+      return {...state, nextOlderLowerBound: action.payload.lower}
+    case ActionTypes.SetNextNewerUpperBound:
+      return {...state, nextNewerUpperBound: action.payload.upper}
+    case ActionTypes.SetNextNewerLowerBound:
+      return {...state, nextNewerLowerBound: action.payload.lower}
+    case ActionTypes.SetCurrentTailUpperBound:
+      return {...state, currentTailUpperBound: action.payload.upper}
+    case ActionTypes.SetNextTailLowerBound:
+      return {...state, nextTailLowerBound: action.payload.lower}
     case ActionTypes.AddFilter:
       return addFilter(state, action)
     case ActionTypes.RemoveFilter:
@@ -246,6 +275,8 @@ export default (state: LogsState = defaultState, action: Action) => {
       return prependMoreLogs(state, action)
     case ActionTypes.SetConfig:
       return setConfigs(state, action)
+    case ActionTypes.ClearTableData:
+      return clearTableData(state)
     default:
       return state
   }

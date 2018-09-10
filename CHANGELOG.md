@@ -12,7 +12,11 @@
 1.  [#4311](https://github.com/influxdata/chronograf/pull/4311): Add Flux query editor to the Cell Editor Overlay
 1.  [#4319](https://github.com/influxdata/chronograf/pull/4319): Add Flux query editor to the Data Explorer and use same UI as CEO
 1.  [#4353](https://github.com/influxdata/chronograf/pull/4353): Add visualization options to the Data Explorer
+1.  [#4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
+1.  [#4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
 1.  [4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
+1.  [4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
+1. [#4389](https://github.com/influxdata/chronograf/pull/4389): Add regexp search for appname in log lines
 
 
 ### UI Improvements
@@ -21,6 +25,7 @@
 1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
 1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Move log message truncation controls into logs filter bar
 1.  [#4391](https://github.com/influxdata/chronograf/pull/4391): Colorize entire Single Stat cell
+1.  [#4392](https://github.com/influxdata/chronograf/pull/4392): Add log filters on left side
 
 
 ### UI Improvements
@@ -28,10 +33,11 @@
 1.  [#4330](https://github.com/influxdata/chronograf/pull/4330): Position cloned cells adjacent to target cell
 
 ### Bug Fixes
-
-1. [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
-1. [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
-
+1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
+1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
+1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
+1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
+1.  [#4388](https://github.com/influxdata/chronograf/pull/4388): Fix logs to progressively load results and provide feedback on search
 
 ## v1.6.2 [2018-09-06]
 

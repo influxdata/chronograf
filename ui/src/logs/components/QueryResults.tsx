@@ -1,9 +1,16 @@
 import React, {PureComponent} from 'react'
+import moment from 'moment'
+import {SearchStatus} from 'src/types/logs'
+
+const QUERY_RESULTS_TIME_FORMAT = 'MMM D, YYYY @HH:mm:ss'
 
 interface Props {
   count: number
   queryCount: number
   isInsideHistogram?: boolean
+  searchStatus: SearchStatus
+  upper?: number | undefined
+  lower?: number | undefined
 }
 
 class QueryResults extends PureComponent<Props> {
@@ -12,36 +19,80 @@ class QueryResults extends PureComponent<Props> {
   }
 
   public render() {
-    const {count, isInsideHistogram} = this.props
+    return (
+      <label className="logs-viewer--results-text">
+        {this.isPending ? this.pendingContents : this.completedContents}
+      </label>
+    )
+  }
 
-    let contents = (
+  private get isPending(): boolean {
+    return this.props.searchStatus !== SearchStatus.Loaded
+  }
+
+  private get pendingContents(): JSX.Element {
+    if (this.props.isInsideHistogram) {
+      return <>Updating Histogram...</>
+    }
+
+    return (
       <>
-        Query returned <strong>{count} Events</strong>
+        Querying back to
+        <br />
+        {this.formattedUpperTime}...
       </>
     )
+  }
 
-    if (isInsideHistogram) {
-      contents = (
+  private get completedContents(): JSX.Element {
+    if (this.props.isInsideHistogram) {
+      return (
         <>
-          Displaying <strong>{count} Events</strong> in Histogram
+          Displaying <strong> {this.props.count} Events</strong> in Histogram
         </>
       )
     }
 
-    if (this.isPending) {
-      contents = <>Querying...</>
-    }
-
-    if (this.isPending && isInsideHistogram) {
-      contents = <>Updating Histogram...</>
-    }
-
-    return <label className="logs-viewer--results-text">{contents}</label>
+    return (
+      <>
+        {this.eventContents}
+        {this.rangeContents}
+      </>
+    )
   }
 
-  private get isPending(): boolean {
-    const {queryCount} = this.props
-    return queryCount > 0
+  private get eventContents(): JSX.Element {
+    return (
+      <>
+        Query returned <strong>{this.props.count} Events</strong> <br />
+      </>
+    )
+  }
+
+  private get rangeContents(): JSX.Element {
+    if (this.props.upper === undefined || this.props.lower === undefined) {
+      return null
+    }
+
+    return (
+      <>
+        <span>
+          Newest: <strong>{this.formattedUpperTime}</strong>
+        </span>
+        <br />
+        <span>
+          Oldest: <strong>{this.formattedLowerTime}</strong>
+        </span>
+      </>
+    )
+  }
+
+  private get formattedLowerTime(): string {
+    return moment(this.props.lower).format(QUERY_RESULTS_TIME_FORMAT)
+  }
+
+  private get formattedUpperTime(): string {
+    return moment(this.props.upper).format(QUERY_RESULTS_TIME_FORMAT)
   }
 }
 

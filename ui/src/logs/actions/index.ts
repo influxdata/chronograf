@@ -1,6 +1,6 @@
-import moment from 'moment'
 import _ from 'lodash'
 import {Dispatch} from 'redux'
+import {ThunkDispatch} from 'redux-thunk'
 
 import {Source, Namespace, QueryConfig} from 'src/types'
 import {getSource} from 'src/shared/apis'
@@ -11,8 +11,6 @@ import {
   buildLogQuery,
   buildInfiniteScrollLogQuery,
   parseHistogramQueryResponse,
-  findOlderLowerTimeBounds,
-  findNewerUpperTimeBounds,
 } from 'src/logs/utils'
 import {logConfigServerToUI, logConfigUIToServer} from 'src/logs/utils/config'
 import {getDeep} from 'src/utils/wrappers'
@@ -31,9 +29,15 @@ import {
   TimeBounds,
   TimeWindow,
   TimeMarker,
+  SearchStatus,
 } from 'src/types/logs'
 
 export const INITIAL_LIMIT = 1000
+import {
+  DEFAULT_OLDER_CHUNK_DURATION_MS,
+  DEFAULT_NEWER_CHUNK_DURATION_MS,
+  DEFAULT_MAX_TAIL_BUFFER_DURATION_MS,
+} from 'src/logs/constants'
 
 const defaultTableData: TableData = {
   columns: [
@@ -74,16 +78,29 @@ export enum ActionTypes {
   DecrementQueryCount = 'LOGS_DECREMENT_QUERY_COUNT',
   ConcatMoreLogs = 'LOGS_CONCAT_MORE_LOGS',
   PrependMoreLogs = 'LOGS_PREPEND_MORE_LOGS',
+  ReplacePrependedLogs = 'LOGS_REPLACE_PREPENDED_LOGS',
   SetConfig = 'SET_CONFIG',
   SetTableRelativeTime = 'SET_TABLE_RELATIVE_TIME',
   SetTableCustomTime = 'SET_TABLE_CUSTOM_TIME',
   SetTableForwardData = 'SET_TABLE_FORWARD_DATA',
   SetTableBackwardData = 'SET_TABLE_BACKWARD_DATA',
   ClearRowsAdded = 'CLEAR_ROWS_ADDED',
+  ClearTableData = 'CLEAR_TABLE_DATA',
+  SetNextOlderUpperBound = 'SET_NEXT_OLDER_UPPER_BOUND',
+  SetNextOlderLowerBound = 'SET_NEXT_OLDER_LOWER_BOUND',
+  SetNextNewerUpperBound = 'SET_NEXT_NEWER_UPPER_BOUND',
+  SetNextNewerLowerBound = 'SET_NEXT_NEWER_LOWER_BOUND',
+  SetCurrentTailUpperBound = 'SET_CURRENT_TAIL_UPPER_BOUND',
+  SetNextTailLowerBound = 'SET_NEXT_TAIL_LOWER_BOUND',
+  SetSearchStatus = 'SET_SEARCH_STATUS',
 }
 
 export interface ClearRowsAddedAction {
   type: ActionTypes.ClearRowsAdded
+}
+
+export interface ClearTableDataAction {
+  type: ActionTypes.ClearTableData
 }
 
 export interface SetTableForwardDataAction {
@@ -123,6 +140,13 @@ export interface ConcatMoreLogsAction {
 
 export interface PrependMoreLogsAction {
   type: ActionTypes.PrependMoreLogs
+  payload: {
+    series: TableData
+  }
+}
+
+export interface ReplacePrependedLogsAction {
+  type: ActionTypes.ReplacePrependedLogs
   payload: {
     series: TableData
   }
@@ -204,21 +228,21 @@ interface SetTimeMarkerAction {
   }
 }
 
-interface SetHistogramQueryConfig {
+interface SetHistogramQueryConfigAction {
   type: ActionTypes.SetHistogramQueryConfig
   payload: {
     queryConfig: QueryConfig
   }
 }
 
-interface SetHistogramData {
+interface SetHistogramDataAction {
   type: ActionTypes.SetHistogramData
   payload: {
     data: object[]
   }
 }
 
-interface SetTableQueryConfig {
+interface SetTableQueryConfigAction {
   type: ActionTypes.SetTableQueryConfig
   payload: {
     queryConfig: QueryConfig
@@ -232,10 +256,56 @@ interface SetTableData {
   }
 }
 
-export interface SetConfigsAction {
+export interface SetConfigAction {
   type: ActionTypes.SetConfig
   payload: {
     logConfig: LogConfig
+  }
+}
+
+interface SetNextOlderUpperBoundAction {
+  type: ActionTypes.SetNextOlderUpperBound
+  payload: {
+    upper: number | undefined
+  }
+}
+interface SetNextOlderLowerBoundAction {
+  type: ActionTypes.SetNextOlderLowerBound
+  payload: {
+    lower: number | undefined
+  }
+}
+
+interface SetNextNewerLowerBoundAction {
+  type: ActionTypes.SetNextNewerLowerBound
+  payload: {
+    lower: number | undefined
+  }
+}
+interface SetNextNewerUpperBoundAction {
+  type: ActionTypes.SetNextNewerUpperBound
+  payload: {
+    upper: number | undefined
+  }
+}
+
+interface SetCurrentTailUpperBoundAction {
+  type: ActionTypes.SetCurrentTailUpperBound
+  payload: {
+    upper: number | undefined
+  }
+}
+interface SetNextTailLowerBoundAction {
+  type: ActionTypes.SetNextTailLowerBound
+  payload: {
+    lower: number | undefined
+  }
+}
+
+interface SetSearchStatusAction {
+  type: ActionTypes.SetSearchStatus
+  payload: {
+    searchStatus: SearchStatus
   }
 }
 
@@ -246,10 +316,10 @@ export type Action =
   | SetTimeWindowAction
   | SetTimeMarkerAction
   | SetNamespaceAction
-  | SetHistogramQueryConfig
-  | SetHistogramData
+  | SetHistogramQueryConfigAction
+  | SetHistogramDataAction
   | SetTableData
-  | SetTableQueryConfig
+  | SetTableQueryConfigAction
   | AddFilterAction
   | RemoveFilterAction
   | ChangeFilterAction
@@ -258,12 +328,36 @@ export type Action =
   | IncrementQueryCountAction
   | ConcatMoreLogsAction
   | PrependMoreLogsAction
-  | SetConfigsAction
+  | ReplacePrependedLogsAction
+  | SetConfigAction
   | SetTableCustomTimeAction
   | SetTableRelativeTimeAction
   | SetTableForwardDataAction
   | SetTableBackwardDataAction
   | ClearRowsAddedAction
+  | ClearTableDataAction
+  | SetNextOlderUpperBoundAction
+  | SetNextOlderLowerBoundAction
+  | SetNextNewerUpperBoundAction
+  | SetNextNewerLowerBoundAction
+  | SetCurrentTailUpperBoundAction
+  | SetNextTailLowerBoundAction
+  | SetSearchStatusAction
+
+const getForwardTableData = (state: State): TableData =>
+  state.logs.tableInfiniteData.forward
+
+const getBackwardTableData = (state: State): TableData =>
+  state.logs.tableInfiniteData.backward
+
+/**
+ * Creates new TableData with the concatted TableData values from args of TableData
+ * @param tableDatas
+ */
+const combineTableData = (...tableDatas: TableData[]) => ({
+  columns: tableDatas[0].columns,
+  values: _.flatMap(tableDatas, t => t.values),
+})
 
 const getTimeRange = (state: State): TimeRange | null =>
   getDeep<TimeRange | null>(state, 'logs.timeRange', null)
@@ -286,19 +380,66 @@ const getSearchTerm = (state: State): string | null =>
 const getFilters = (state: State): Filter[] =>
   getDeep<Filter[]>(state, 'logs.filters', [])
 
-const getTableSelectedTime = (state: State): string => {
+const getTableSelectedTime = (state: State): number => {
   const custom = getDeep<string>(state, 'logs.tableTime.custom', '')
 
   if (!_.isEmpty(custom)) {
-    return custom
+    return Date.parse(custom)
   }
 
   const relative = getDeep<number>(state, 'logs.tableTime.relative', 0)
 
-  return moment()
-    .subtract(relative, 'seconds')
-    .toISOString()
+  return Date.now() - relative * 1000
 }
+
+const getNextOlderUpperBound = (state: State): number => {
+  const selectedTableTime = getTableSelectedTime(state)
+  return getDeep<number>(state, 'logs.nextOlderUpperBound', selectedTableTime)
+}
+
+const getOlderChunkDurationMs = (state: State): number => {
+  return getDeep<number>(
+    state,
+    'logs.olderChunkDurationMs',
+    DEFAULT_OLDER_CHUNK_DURATION_MS
+  )
+}
+
+const getNextNewerLowerBound = (state: State): number => {
+  const selectedTableTime = getTableSelectedTime(state)
+  return getDeep<number>(state, 'logs.nextNewerLowerBound', selectedTableTime)
+}
+
+const getNewerChunkDurationMs = (state: State): number => {
+  return getDeep<number>(
+    state,
+    'logs.newerChunkDurationMs',
+    DEFAULT_NEWER_CHUNK_DURATION_MS
+  )
+}
+
+const getNextTailLowerBound = (state: State): number | void =>
+  state.logs.nextTailLowerBound
+
+/**
+ * Gets the maximum duration that the tail buffer should accumulate
+ *  before being flushed to the 'backward' table data.
+ * @param state the application state
+ */
+const getMaxTailBufferDurationMs = (state: State): number => {
+  return getDeep<number>(
+    state,
+    'logs.maxTailBufferDurationMs',
+    DEFAULT_MAX_TAIL_BUFFER_DURATION_MS
+  )
+}
+
+/**
+ * Sets tableInfiniteData with empty 'forward' and 'backward' table data.
+ */
+export const clearTableData = () => ({
+  type: ActionTypes.ClearTableData,
+})
 
 export const clearRowsAdded = () => ({
   type: ActionTypes.ClearRowsAdded,
@@ -345,121 +486,118 @@ export const setTimeBounds = (timeBounds: TimeBounds): SetTimeBoundsAction => ({
   payload: {timeBounds},
 })
 
-export const executeTableNewerQueryAsync = () => async (
-  dispatch,
-  getState: GetState
+/**
+ * Sets the upper bound on the next older chunk fetch query.
+ * @param upper the point in time up until which to fetch older logs.
+ */
+export const setNextOlderUpperBound = (
+  upper: number
+): SetNextOlderUpperBoundAction => ({
+  type: ActionTypes.SetNextOlderUpperBound,
+  payload: {upper},
+})
+
+/**
+ * Sets the lower bound on the next older chunk fetch query.
+ *  This is _not_ used in fetchOlderChunkAsync.
+ * @param lower the point in time starting from which to fetch older logs.
+ */
+export const setNextOlderLowerBound = (
+  lower: number
+): SetNextOlderLowerBoundAction => ({
+  type: ActionTypes.SetNextOlderLowerBound,
+  payload: {lower},
+})
+
+/**
+ * Sets the upper bound on the next newer chunk fetch query.
+ *  This is _not_ used in fetchNewerChunkAsync.
+ * @param upper the point in time up until which to fetch newer logs.
+ */
+export const setNextNewerUpperBound = (
+  upper: number
+): SetNextNewerUpperBoundAction => ({
+  type: ActionTypes.SetNextNewerUpperBound,
+  payload: {upper},
+})
+
+/**
+ * Sets the lower bound on the next newer chunk fetch query.
+ * @param lower the point in time starting from which to fetch newer logs.
+ */
+export const setNextNewerLowerBound = (
+  lower: number
+): SetNextNewerLowerBoundAction => ({
+  type: ActionTypes.SetNextNewerLowerBound,
+  payload: {lower},
+})
+
+/**
+ * Sets the upper bound of time up until which logs were fetched for the current tail chunk.
+ * @param upper the point in time up until which the current tail was fetched.
+ */
+export const setCurrentTailUpperBound = (
+  upper: number
+): SetCurrentTailUpperBoundAction => ({
+  type: ActionTypes.SetCurrentTailUpperBound,
+  payload: {upper},
+})
+
+/**
+ * Sets the lower bound of time on the current tail chunk fetch query.
+ * @param lower the point in time starting from which to begin the next tail fetch.
+ */
+export const setNextTailLowerBound = (
+  lower: number
+): SetNextTailLowerBoundAction => ({
+  type: ActionTypes.SetNextTailLowerBound,
+  payload: {lower},
+})
+
+/**
+ * Sets the search status corresponding to the current fetch request.
+ * @param searchStatus the state of the current Logs Page fetch request.
+ */
+export const setSearchStatus = (
+  searchStatus: SearchStatus
+): SetSearchStatusAction => ({
+  type: ActionTypes.SetSearchStatus,
+  payload: {searchStatus},
+})
+
+export const clearAllTimeBounds = () => (
+  dispatch: Dispatch<
+    | SetNextOlderUpperBoundAction
+    | SetNextOlderLowerBoundAction
+    | SetNextNewerUpperBoundAction
+    | SetNextNewerLowerBoundAction
+    | SetCurrentTailUpperBoundAction
+    | SetNextTailLowerBoundAction
+  >
 ) => {
-  const state = getState()
-
-  const startTime = getTableSelectedTime(state)
-  const queryConfig = getTableQueryConfig(state)
-  const namespace = getNamespace(state)
-  const proxyLink = getProxyLink(state)
-  const searchTerm = getSearchTerm(state)
-  const filters = getFilters(state)
-
-  if (!_.every([queryConfig, startTime, namespace, proxyLink])) {
-    return
-  }
-
-  try {
-    dispatch(incrementQueryCount())
-
-    const endTime = await findNewerUpperTimeBounds(
-      startTime,
-      queryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
-
-    const query: string = await buildInfiniteScrollLogQuery(
-      startTime,
-      endTime,
-      queryConfig,
-      filters,
-      searchTerm
-    )
-
-    const response = await executeQueryAsync(
-      proxyLink,
-      namespace,
-      `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
-    )
-
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
-
-    const result = {
-      columns: series.columns,
-      values: _.reverse(series.values),
-    }
-
-    dispatch(setTableForwardData(result))
-  } finally {
-    dispatch(decrementQueryCount())
-  }
+  dispatch(setNextOlderUpperBound(undefined))
+  dispatch(setNextOlderLowerBound(undefined))
+  dispatch(setNextNewerUpperBound(undefined))
+  dispatch(setCurrentTailUpperBound(undefined))
+  dispatch(setNextTailLowerBound(undefined))
 }
 
-export const executeTableOlderQueryAsync = () => async (
-  dispatch,
-  getState: GetState
-) => {
-  const state = getState()
-
-  const time = getTableSelectedTime(state)
-  const queryConfig = getTableQueryConfig(state)
-  const namespace = getNamespace(state)
-  const proxyLink = getProxyLink(state)
-  const searchTerm = getSearchTerm(state)
-  const filters = getFilters(state)
-
-  if (!_.every([queryConfig, time, namespace, proxyLink])) {
-    return
-  }
-
-  try {
-    dispatch(incrementQueryCount())
-
-    const lower: string = await findOlderLowerTimeBounds(
-      time,
-      queryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
-
-    const query: string = await buildInfiniteScrollLogQuery(
-      lower,
-      time,
-      queryConfig,
-      filters,
-      searchTerm
-    )
-
-    const response = await executeQueryAsync(
-      proxyLink,
-      namespace,
-      `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
-    )
-
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
-
-    dispatch(setTableBackwardData(series))
-  } finally {
-    dispatch(decrementQueryCount())
-  }
+export const clearSearchData = (
+  searchStatus: SearchStatus
+) => async dispatch => {
+  await dispatch(setSearchStatus(SearchStatus.Clearing))
+  dispatch(clearAllTimeBounds())
+  dispatch(clearTableData())
+  await dispatch(setSearchStatus(SearchStatus.Cleared))
+  await dispatch(setSearchStatus(searchStatus))
 }
 
 export const setTableCustomTimeAsync = (time: string) => async dispatch => {
   await dispatch(setTableCustomTime(time))
-  await dispatch(executeTableQueryAsync())
 }
 
 export const setTableRelativeTimeAsync = (time: number) => async dispatch => {
   await dispatch(setTableRelativeTime(time))
-  await dispatch(executeTableQueryAsync())
 }
 
 export const changeFilter = (id: string, operator: string, value: string) => ({
@@ -486,7 +624,7 @@ export const removeFilter = (id: string): RemoveFilterAction => ({
   payload: {id},
 })
 
-const setHistogramData = (data): SetHistogramData => ({
+const setHistogramData = (data): SetHistogramDataAction => ({
   type: ActionTypes.SetHistogramData,
   payload: {data},
 })
@@ -521,14 +659,6 @@ export const executeHistogramQueryAsync = () => async (
   }
 }
 
-export const executeTableQueryAsync = () => async (dispatch): Promise<void> => {
-  await Promise.all([
-    dispatch(executeTableNewerQueryAsync()),
-    dispatch(executeTableOlderQueryAsync()),
-    dispatch(clearRowsAdded()),
-  ])
-}
-
 export const decrementQueryCount = () => ({
   type: ActionTypes.DecrementQueryCount,
 })
@@ -536,17 +666,6 @@ export const decrementQueryCount = () => ({
 export const incrementQueryCount = () => ({
   type: ActionTypes.IncrementQueryCount,
 })
-
-export const executeQueriesAsync = () => async dispatch => {
-  try {
-    await Promise.all([
-      dispatch(executeHistogramQueryAsync()),
-      dispatch(executeTableQueryAsync()),
-    ])
-  } catch {
-    console.error('Could not make query requests')
-  }
-}
 
 export const setHistogramQueryConfigAsync = () => async (
   dispatch,
@@ -578,7 +697,9 @@ export const setHistogramQueryConfigAsync = () => async (
   }
 }
 
-export const setTableQueryConfig = (queryConfig: QueryConfig) => ({
+export const setTableQueryConfig = (
+  queryConfig: QueryConfig
+): SetTableQueryConfigAction => ({
   type: ActionTypes.SetTableQueryConfig,
   payload: {queryConfig},
 })
@@ -599,21 +720,16 @@ export const setTableQueryConfigAsync = () => async (
     const queryConfig = buildTableQueryConfig(namespace, timeRange)
 
     dispatch(setTableQueryConfig(queryConfig))
-    dispatch(executeTableQueryAsync())
   }
 }
 
-export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
-  dispatch,
-  getState
+export const fetchOlderChunkAsync = () => async (
+  dispatch: Dispatch<SetNextOlderUpperBoundAction | ConcatMoreLogsAction>,
+  getState: GetState
 ): Promise<void> => {
   const state = getState()
+
   const tableQueryConfig = getTableQueryConfig(state)
-  const timeRange = {lower: queryTimeEnd}
-  const newQueryConfig = {
-    ...tableQueryConfig,
-    range: timeRange,
-  }
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
   const searchTerm = getSearchTerm(state)
@@ -621,45 +737,48 @@ export const fetchOlderLogsAsync = (queryTimeEnd: string) => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const queryTimeStart = await findOlderLowerTimeBounds(
-      queryTimeEnd,
-      newQueryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
+    const olderUpperBound = getNextOlderUpperBound(state)
+    const olderChunkDurationMs = getOlderChunkDurationMs(state)
 
-    const query = await buildInfiniteScrollLogQuery(
-      queryTimeStart,
-      queryTimeEnd,
-      newQueryConfig,
+    const nextOlderUpperBound = olderUpperBound - olderChunkDurationMs
+    dispatch(setNextOlderUpperBound(nextOlderUpperBound))
+
+    const upper = new Date(olderUpperBound).toISOString()
+    const lower = new Date(nextOlderUpperBound).toISOString()
+
+    const query = buildInfiniteScrollLogQuery(
+      lower,
+      upper,
+      tableQueryConfig,
       filters,
       searchTerm
     )
-
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
-      `${query} ORDER BY time DESC LIMIT ${INITIAL_LIMIT}`
+      `${query} ORDER BY time DESC`
+    )
+    const logSeries = getDeep<TableData>(
+      response,
+      'results.0.series.0',
+      defaultTableData
     )
 
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
-    await dispatch(ConcatMoreLogs(series))
+    await dispatch(concatMoreLogs(logSeries))
+  } else {
+    throw new Error(
+      `Missing params required to fetch older logs. Maybe there's a race condition with setting namespaces?`
+    )
   }
 }
 
-export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
-  dispatch,
-  getState
+export const fetchNewerChunkAsync = () => async (
+  dispatch: Dispatch<SetNextNewerLowerBoundAction | PrependMoreLogsAction>,
+  getState: GetState
 ): Promise<void> => {
   const state = getState()
+
   const tableQueryConfig = getTableQueryConfig(state)
-  const timeRange = {lower: queryTimeStart}
-  const newQueryConfig = {
-    ...tableQueryConfig,
-    range: timeRange,
-  }
   const namespace = getNamespace(state)
   const proxyLink = getProxyLink(state)
   const searchTerm = getSearchTerm(state)
@@ -667,45 +786,129 @@ export const fetchNewerLogsAsync = (queryTimeStart: string) => async (
   const params = [namespace, proxyLink, tableQueryConfig]
 
   if (_.every(params)) {
-    const queryTimeEnd = await findNewerUpperTimeBounds(
-      queryTimeStart,
-      newQueryConfig,
-      filters,
-      searchTerm,
-      proxyLink,
-      namespace
-    )
+    const newerLowerBound = getNextNewerLowerBound(state)
+    const newerChunkDurationMs = getNewerChunkDurationMs(state)
 
-    const query: string = await buildInfiniteScrollLogQuery(
-      queryTimeStart,
-      queryTimeEnd,
-      newQueryConfig,
+    const nextNewerLowerBound = newerLowerBound + newerChunkDurationMs
+    dispatch(setNextNewerLowerBound(nextNewerLowerBound))
+
+    const upper = new Date(nextNewerLowerBound).toISOString()
+    const lower = new Date(newerLowerBound).toISOString()
+
+    const query = buildInfiniteScrollLogQuery(
+      lower,
+      upper,
+      tableQueryConfig,
       filters,
       searchTerm
     )
-
     const response = await executeQueryAsync(
       proxyLink,
       namespace,
-      `${query} ORDER BY time ASC LIMIT ${INITIAL_LIMIT}`
+      `${query} ORDER BY time DESC`
+    )
+    const logSeries = getDeep<TableData>(
+      response,
+      'results.0.series.0',
+      defaultTableData
     )
 
-    const series = getDeep(response, 'results.0.series.0', defaultTableData)
-    await dispatch(
-      PrependMoreLogs({
-        columns: series.columns,
-        values: _.reverse(series.values),
-      })
+    await dispatch(prependMoreLogs(logSeries))
+  } else {
+    throw new Error(
+      `Missing params required to fetch newer logs. Maybe there's a race condition with setting namespaces?`
     )
   }
 }
 
-export const ConcatMoreLogs = (series: TableData): ConcatMoreLogsAction => ({
+export const flushTailBuffer = () => (
+  dispatch: Dispatch<SetTableBackwardDataAction | SetTableForwardDataAction>,
+  getState: GetState
+) => {
+  const state = getState()
+
+  const currentTailBuffer = getForwardTableData(state)
+  const currentBackward = getBackwardTableData(state)
+
+  const combinedBackward = combineTableData(currentTailBuffer, currentBackward)
+
+  dispatch(setTableBackwardData(combinedBackward))
+  dispatch(setTableForwardData(defaultTableData))
+}
+
+export const fetchTailAsync = () => async (
+  dispatch:
+    | Dispatch<
+        | SetTableBackwardDataAction
+        | SetTableForwardDataAction
+        | SetNextTailLowerBoundAction
+      >
+    | ThunkDispatch<typeof flushTailBuffer>,
+  getState: GetState
+): Promise<void> => {
+  const state = getState()
+
+  const tableQueryConfig = getTableQueryConfig(state)
+  const namespace = getNamespace(state)
+  const proxyLink = getProxyLink(state)
+  const searchTerm = getSearchTerm(state)
+  const filters = getFilters(state)
+  const params = [namespace, proxyLink, tableQueryConfig]
+
+  if (_.every(params)) {
+    const tailLowerBound = getNextTailLowerBound(state)
+
+    if (!tailLowerBound) {
+      throw new Error('tail lower bound is not set')
+    }
+    const upper = new Date().toISOString()
+    const lower = new Date(tailLowerBound).toISOString()
+
+    const upperUTC = Date.parse(upper)
+    dispatch(setCurrentTailUpperBound(upperUTC))
+
+    const query = buildInfiniteScrollLogQuery(
+      lower,
+      upper,
+      tableQueryConfig,
+      filters,
+      searchTerm
+    )
+    const response = await executeQueryAsync(
+      proxyLink,
+      namespace,
+      `${query} ORDER BY time DESC`
+    )
+    const logSeries = getDeep<TableData>(
+      response,
+      'results.0.series.0',
+      defaultTableData
+    )
+
+    const currentForwardBufferDuration = upperUTC - tailLowerBound
+    const maxTailBufferDurationMs = getMaxTailBufferDurationMs(state)
+    const isMaxTailBufferDurationExceeded =
+      currentForwardBufferDuration >= maxTailBufferDurationMs
+
+    if (isMaxTailBufferDurationExceeded) {
+      dispatch(flushTailBuffer())
+      await dispatch(setNextTailLowerBound(upperUTC))
+    } else {
+      await dispatch(setTableForwardData(logSeries))
+    }
+  } else {
+    throw new Error(
+      `Missing params required to fetch tail logs. Maybe there's a race condition with setting namespaces?`
+    )
+  }
+}
+
+export const concatMoreLogs = (series: TableData): ConcatMoreLogsAction => ({
   type: ActionTypes.ConcatMoreLogs,
   payload: {series},
 })
 
-export const PrependMoreLogs = (series: TableData): PrependMoreLogsAction => ({
+export const prependMoreLogs = (series: TableData): PrependMoreLogsAction => ({
   type: ActionTypes.PrependMoreLogs,
   payload: {series},
 })
@@ -718,8 +921,10 @@ export const setNamespaceAsync = (namespace: Namespace) => async (
     payload: {namespace},
   })
 
-  dispatch(setHistogramQueryConfigAsync())
-  dispatch(setTableQueryConfigAsync())
+  await Promise.all([
+    dispatch(setHistogramQueryConfigAsync()),
+    dispatch(setTableQueryConfigAsync()),
+  ])
 }
 
 export const setNamespaces = (
@@ -749,9 +954,9 @@ export const populateNamespacesAsync = (
         namespace => namespace.database === source.telegraf
       )
 
-      dispatch(setNamespaceAsync(defaultNamespace))
+      await dispatch(setNamespaceAsync(defaultNamespace))
     } else {
-      dispatch(setNamespaceAsync(namespaces[0]))
+      await dispatch(setNamespaceAsync(namespaces[0]))
     }
   }
 }
@@ -765,24 +970,24 @@ export const getSourceAndPopulateNamespacesAsync = (sourceID: string) => async (
 
   if (proxyLink) {
     dispatch(setSource(source))
-    dispatch(populateNamespacesAsync(proxyLink, source))
+    await dispatch(populateNamespacesAsync(proxyLink, source))
   }
 }
 
 export const getLogConfigAsync = (url: string) => async (
-  dispatch: Dispatch<SetConfigsAction>
+  dispatch: Dispatch<SetConfigAction>
 ): Promise<void> => {
   try {
     const {data} = await getLogConfigAJAX(url)
     const logConfig = logConfigServerToUI(data)
-    dispatch(setConfig(logConfig))
+    await dispatch(setConfig(logConfig))
   } catch (error) {
     console.error(error)
   }
 }
 
 export const updateLogConfigAsync = (url: string, config: LogConfig) => async (
-  dispatch: Dispatch<SetConfigsAction>
+  dispatch: Dispatch<SetConfigAction>
 ): Promise<void> => {
   try {
     const configForServer = logConfigUIToServer(config)
@@ -793,7 +998,7 @@ export const updateLogConfigAsync = (url: string, config: LogConfig) => async (
   }
 }
 
-export const setConfig = (logConfig: LogConfig): SetConfigsAction => {
+export const setConfig = (logConfig: LogConfig): SetConfigAction => {
   return {
     type: ActionTypes.SetConfig,
     payload: {

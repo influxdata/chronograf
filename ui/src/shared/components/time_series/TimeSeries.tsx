@@ -4,7 +4,7 @@ import _ from 'lodash'
 import uuid from 'uuid'
 
 // API
-import {fetchTimeSeries} from 'src/shared/apis/query'
+import {executeQuery} from 'src/shared/apis/query'
 
 // Types
 import {
@@ -14,13 +14,19 @@ import {
   RemoteDataState,
   TimeRange,
   CellType,
+  Status,
 } from 'src/types'
-import {TimeSeriesServerResponse, TimeSeriesResponse} from 'src/types/series'
+import {TimeSeriesServerResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
 import {GlobalAutoRefresher, AutoRefresher} from 'src/utils/AutoRefresher'
 import {NoteVisibility} from 'src/types/dashboards'
+import {getDeep} from 'src/utils/wrappers'
+import {
+  extractQueryWarningMessage,
+  extractQueryErrorMessage,
+} from 'src/shared/parsing'
 
 // Components
 import MarkdownCell from 'src/shared/components/MarkdownCell'
@@ -42,7 +48,7 @@ interface Props {
   autoRefresher?: AutoRefresher
   inView?: boolean
   templates?: Template[]
-  editQueryStatus?: () => void
+  editQueryStatus?: (queryID: string, status: Status) => void
   grabDataForDownload?: GrabDataForDownloadHandler
   cellNote?: string
   cellNoteVisibility?: NoteVisibility
@@ -68,6 +74,10 @@ class TimeSeries extends Component<Props, State> {
     inView: true,
     templates: [],
     autoRefresher: GlobalAutoRefresher,
+    editQueryStatus: () => ({
+      type: 'NOOP',
+      payload: {},
+    }),
   }
 
   public static getDerivedStateFromProps(props: Props, state: State) {
@@ -157,14 +167,7 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public executeQueries = async () => {
-    const {
-      source,
-      inView,
-      queries,
-      templates,
-      editQueryStatus,
-      grabDataForDownload,
-    } = this.props
+    const {inView, queries, grabDataForDownload} = this.props
 
     if (!inView) {
       return
@@ -176,41 +179,27 @@ class TimeSeries extends Component<Props, State> {
 
     await this.setIsLoading()
 
-    const TEMP_RES = 300
-
     try {
       this.latestUUID = uuid.v1()
 
-      const timeSeries = await fetchTimeSeries(
-        source,
-        queries,
-        TEMP_RES,
-        templates,
-        this.latestUUID,
-        editQueryStatus
-      )
+      const timeSeries = await Promise.all(queries.map(this.executeQuery))
 
-      const comparer = _.get(timeSeries, '0', {uuid: null})
-      if (comparer.uuid !== this.latestUUID) {
+      if (getDeep(timeSeries, '0.response.uuid', null) !== this.latestUUID) {
         return
       }
-
-      const newSeries = timeSeries.map((response: TimeSeriesResponse) => ({
-        response,
-      }))
 
       if (!this.isComponentMounted) {
         return
       }
 
       this.setState({
-        timeSeries: newSeries,
+        timeSeries,
         loading: RemoteDataState.Done,
         isFirstFetch: false,
       })
 
       if (grabDataForDownload) {
-        grabDataForDownload(newSeries)
+        grabDataForDownload(timeSeries)
       }
     } catch (err) {
       if (!this.isComponentMounted) {
@@ -276,6 +265,39 @@ class TimeSeries extends Component<Props, State> {
     }
 
     return null
+  }
+
+  private executeQuery = async (
+    query: Query
+  ): Promise<TimeSeriesServerResponse> => {
+    const {source, templates, editQueryStatus} = this.props
+    const TEMP_RES = 300 // FIXME
+
+    editQueryStatus(query.id, {loading: true})
+
+    try {
+      const response = await executeQuery(
+        source,
+        query,
+        templates,
+        TEMP_RES,
+        this.latestUUID
+      )
+
+      const warningMessage = extractQueryWarningMessage(response)
+
+      if (warningMessage) {
+        editQueryStatus(query.id, {warn: warningMessage})
+      } else {
+        editQueryStatus(query.id, {success: 'Success!'})
+      }
+
+      return {response}
+    } catch (error) {
+      editQueryStatus(query.id, {error: extractQueryErrorMessage(error)})
+
+      throw error
+    }
   }
 
   private isPropsDifferent(prevProps: Props) {

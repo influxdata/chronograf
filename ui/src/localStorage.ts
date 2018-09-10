@@ -18,6 +18,7 @@ import {
   DEFAULT_FIELD_OPTIONS,
 } from 'src/dashboards/constants'
 import {editor} from 'src/flux/constants'
+import {defaultTableData} from 'src/logs/constants'
 
 import {CellType} from 'src/types'
 import {ThresholdType, NoteVisibility} from 'src/types/dashboards'
@@ -124,7 +125,10 @@ export const saveToLocalStorage = ({
               histogramData: [],
               tableData: {},
               queryCount: 0,
-              tableInfiniteData: {},
+              tableInfiniteData: {
+                forward: defaultTableData,
+                backward: defaultTableData,
+              },
               tableTime: minimalLogs.tableTime || {},
             },
           },
