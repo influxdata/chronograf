@@ -201,7 +201,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {fluxLinks, script} = this.props
+    const {fluxLinks, script, updateService, isInCEO} = this.props
     const {autoRefresher, autoRefreshDuration} = this.state
 
     autoRefresher.poll(autoRefreshDuration)
@@ -216,6 +216,9 @@ class TimeMachine extends PureComponent<Props, State> {
     if (this.isFluxSource) {
       try {
         this.debouncedASTResponse(script)
+        if (isInCEO) {
+          updateService(this.service)
+        }
       } catch (error) {
         console.error('Could not retrieve AST for script', error)
       }
