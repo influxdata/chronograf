@@ -6,7 +6,6 @@ import _ from 'lodash'
 import WidgetCell from 'src/shared/components/WidgetCell'
 import LayoutCell from 'src/shared/components/LayoutCell'
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
-import TimeMachineVis from 'src/flux/components/TimeMachineVis'
 
 // Utils
 import {buildQueriesForLayouts} from 'src/utils/buildQueriesForLayouts'
@@ -70,7 +69,7 @@ class Layout extends Component<Props, State> {
         isEditable={isEditable}
         onCloneCell={onCloneCell}
         onDeleteCell={onDeleteCell}
-        isFluxSource={!!this.fluxSource}
+        isFluxSource={!!this.fluxService}
         toggleVisType={this.toggleVisType}
         onSummonOverlayTechnologies={onSummonOverlayTechnologies}
       >
@@ -79,22 +78,28 @@ class Layout extends Component<Props, State> {
     )
   }
 
-  private get fluxSource(): Service {
+  private get fluxService(): Service {
     const {services, cell} = this.props
 
     const sourceLink = getDeep<string>(cell, 'queries.0.source', '')
 
     if (services && sourceLink.includes('service')) {
-      return services.find(s => {
+      const service = services.find(s => {
         return s.links.self === sourceLink
       })
+      return service
     }
   }
 
   private get fluxVis(): JSX.Element {
-    const {cell, onZoom, timeRange, manualRefresh, templates} = this.props
-
-    const fluxSource = this.fluxSource
+    const {
+      cell,
+      onZoom,
+      timeRange,
+      manualRefresh,
+      templates,
+      source,
+    } = this.props
 
     return (
       <RefreshingGraph
@@ -113,7 +118,8 @@ class Layout extends Component<Props, State> {
         staticLegend={IS_STATIC_LEGEND(cell.legend)}
         grabDataForDownload={this.grabDataForDownload}
         queries={cell.queries}
-        source={fluxSource}
+        source={source}
+        service={this.fluxService}
         cellNote={cell.note}
         cellNoteVisibility={cell.noteVisibility}
       />
@@ -173,7 +179,7 @@ class Layout extends Component<Props, State> {
   }
 
   private get visualization(): JSX.Element {
-    if (this.fluxSource) {
+    if (this.fluxService) {
       return this.fluxVis
     }
     return this.influxQLVis

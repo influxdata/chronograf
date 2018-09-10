@@ -14,6 +14,7 @@ import {
 import {
   Template,
   Source,
+  Service,
   Query,
   RemoteDataState,
   TimeRange,
@@ -46,6 +47,7 @@ interface RenderProps {
 
 interface Props {
   source: Source
+  service?: Service
   cellType?: CellType
   manualRefresh?: number
   queries: Query[]
@@ -272,9 +274,9 @@ class TimeSeries extends Component<Props, State> {
   }
 
   private get isFluxSource(): boolean {
-    const {source} = this.props
-    const sourceLink = getDeep<string>(source, 'links.self', '')
-    return sourceLink && sourceLink.includes('services')
+    // TODO: update when flux not separate service
+    const {service} = this.props
+    return !!service
   }
 
   private get loadingDots(): JSX.Element {
@@ -300,10 +302,10 @@ class TimeSeries extends Component<Props, State> {
   private async executeFluxQuery(
     queries: Query[]
   ): Promise<GetTimeSeriesResult> {
-    const {source} = this.props
+    const {service} = this.props
 
     const script = getDeep<string>(queries, '0.text', '')
-    const results = await fetchFluxTimeSeries(source, script, this.latestUUID)
+    const results = await fetchFluxTimeSeries(service, script, this.latestUUID)
 
     return results
   }

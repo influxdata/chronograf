@@ -313,7 +313,8 @@ class TimeMachine extends PureComponent<Props, State> {
     return (
       <div className="deceo--top">
         <Visualization
-          source={this.sourceForVis}
+          source={this.source}
+          service={this.service}
           timeRange={timeRange}
           templates={templates}
           autoRefresher={autoRefresher}
@@ -525,12 +526,12 @@ class TimeMachine extends PureComponent<Props, State> {
     return isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
   }
 
-  private get sourceForVis() {
-    if (this.isFluxSource) {
-      return this.service
-    }
-    return this.source
-  }
+  // private get sourceForVis(): Source | Service {
+  //   if (this.isFluxSource) {
+  //     return this.service
+  //   }
+  //   return this.source
+  // }
 
   private get queriesForVis(): Query[] {
     const {script, timeRange, queryDrafts} = this.props

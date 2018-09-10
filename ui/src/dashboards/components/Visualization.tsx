@@ -7,7 +7,15 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 import {QueryUpdateState} from 'src/shared/actions/queries'
 
-import {TimeRange, Query, Axes, Template, Source, Status} from 'src/types'
+import {
+  TimeRange,
+  Query,
+  Axes,
+  Template,
+  Source,
+  Status,
+  Service,
+} from 'src/types'
 import {
   TableOptions,
   DecimalPlaces,
@@ -21,6 +29,7 @@ interface Props {
   axes: Axes
   type: CellType
   source: Source
+  service: Service
   templates: Template[]
   timeRange: TimeRange
   autoRefresher: AutoRefresher
@@ -46,6 +55,7 @@ const DashVisualization: SFC<Props> = ({
   type,
   note,
   source,
+  service,
   queries,
   templates,
   timeRange,
@@ -76,6 +86,7 @@ const DashVisualization: SFC<Props> = ({
       <div className="graph-container">
         <RefreshingGraph
           source={source}
+          service={service}
           colors={colors}
           axes={axes}
           type={type}

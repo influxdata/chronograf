@@ -27,7 +27,15 @@ import {setHoverTime} from 'src/dashboards/actions'
 // Types
 import {QueryUpdateState} from 'src/shared/actions/queries'
 import {ColorString} from 'src/types/colors'
-import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
+import {
+  Source,
+  Axes,
+  TimeRange,
+  Template,
+  Query,
+  CellType,
+  Service,
+} from 'src/types'
 import {
   TableOptions,
   FieldOption,
@@ -39,6 +47,7 @@ import {GrabDataForDownloadHandler} from 'src/types/layout'
 interface Props {
   axes: Axes
   source: Source
+  service: Service
   queries: Query[]
   timeRange: TimeRange
   colors: ColorString[]
@@ -92,6 +101,7 @@ class RefreshingGraph extends PureComponent<Props> {
       type,
       source,
       inView,
+      service,
       queries,
       cellNote,
       timeRange,
@@ -118,6 +128,7 @@ class RefreshingGraph extends PureComponent<Props> {
     return (
       <TimeSeries
         ref={this.timeSeries}
+        service={service}
         autoRefresher={autoRefresher}
         manualRefresh={manualRefresh}
         source={source}
