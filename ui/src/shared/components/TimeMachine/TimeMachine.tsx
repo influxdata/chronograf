@@ -528,13 +528,6 @@ class TimeMachine extends PureComponent<Props, State> {
     return isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
   }
 
-  // private get sourceForVis(): Source | Service {
-  //   if (this.isFluxSource) {
-  //     return this.service
-  //   }
-  //   return this.source
-  // }
-
   private get queriesForVis(): Query[] {
     const {script, timeRange, queryDrafts} = this.props
     const id = _.get(queryDrafts, 'id', '')

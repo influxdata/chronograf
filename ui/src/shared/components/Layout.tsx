@@ -129,18 +129,6 @@ class Layout extends Component<Props, State> {
         visType={this.visType}
       />
     )
-
-    // if (fluxSource) {
-    //     return (
-    //       <div className="dash-graph">
-    //         <TimeMachineVis
-    //           service={fluxSource}
-    //           visType={this.visType}
-    //           script={getDeep<string>(cell, 'queries.0.query', '')}
-    //         />
-    //       </div>
-    //     )
-    //   }
   }
 
   private get influxQLVis(): JSX.Element {
