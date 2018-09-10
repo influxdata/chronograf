@@ -32,8 +32,12 @@ class AlertsTableRow extends PureComponent<Props> {
     const {name} = this.props
 
     return (
-      <div className="alert-history-table--td" style={{width: colName}}>
-        {name === null ? '–' : name}
+      <div
+        className="alert-history-table--td"
+        style={{width: colName}}
+        data-test="nameCell"
+      >
+        {name === null ? <span>{'–'}</span> : <span>{name}</span>}
       </div>
     )
   }
@@ -47,9 +51,10 @@ class AlertsTableRow extends PureComponent<Props> {
           level === null ? 'null' : level.toLowerCase()
         }`}
         style={{width: colLevel}}
+        data-test="levelCell"
       >
         {level === null ? (
-          '–'
+          <span>{'–'}</span>
         ) : (
           <span
             className={classnames(
@@ -67,8 +72,16 @@ class AlertsTableRow extends PureComponent<Props> {
     const {time} = this.props
 
     return (
-      <div className="alert-history-table--td" style={{width: colTime}}>
-        {time === null ? '–' : new Date(Number(time)).toISOString()}
+      <div
+        className="alert-history-table--td"
+        style={{width: colTime}}
+        data-test="timeCell"
+      >
+        {time === null ? (
+          <span>{'–'}</span>
+        ) : (
+          <span>{new Date(Number(time)).toISOString()}</span>
+        )}
       </div>
     )
   }
@@ -80,9 +93,10 @@ class AlertsTableRow extends PureComponent<Props> {
       <div
         className="alert-history-table--td alert-history-table--host"
         style={{width: colHost}}
+        data-test="hostCell"
       >
         {host === null ? (
-          '–'
+          <span>{'–'}</span>
         ) : (
           <Link to={`/sources/${sourceID}/hosts/${host}`} title={host}>
             {host}
@@ -96,8 +110,12 @@ class AlertsTableRow extends PureComponent<Props> {
     const {value} = this.props
 
     return (
-      <div className="alert-history-table--td" style={{width: colValue}}>
-        {value === null ? '–' : value}
+      <div
+        className="alert-history-table--td"
+        style={{width: colValue}}
+        data-test="valueCell"
+      >
+        {value === null ? <span>{'–'}</span> : <span>{value}</span>}
       </div>
     )
   }
