@@ -16,6 +16,7 @@ interface Props {
   service: Service
   services: Service[]
   isFluxSource: boolean
+  sourceSupportsFlux: boolean
   queries: QueriesModels.QueryConfig[]
   isDynamicSourceSelected: boolean
   toggleFlux: () => void
@@ -32,6 +33,7 @@ const SourceSelector: SFC<Props> = ({
   toggleFlux,
   isFluxSource,
   onChangeService,
+  sourceSupportsFlux,
   isDynamicSourceSelected,
   onSelectDynamicSource,
 }) => {
@@ -53,28 +55,29 @@ const SourceSelector: SFC<Props> = ({
         onChangeService={onChangeService}
         onSelectDynamicSource={onSelectDynamicSource}
       />
-      {isDynamicSourceSelected && (
-        <Radio>
-          <Radio.Button
-            id="flux-source"
-            titleText="Flux"
-            value="Flux"
-            onClick={toggleFlux}
-            active={isFluxSource}
-          >
-            Flux
-          </Radio.Button>
-          <Radio.Button
-            id="influxql-source"
-            titleText="InfluxQL"
-            value="InfluxQL"
-            onClick={toggleFlux}
-            active={!isFluxSource}
-          >
-            InfluxQL
-          </Radio.Button>
-        </Radio>
-      )}
+      {isDynamicSourceSelected &&
+        sourceSupportsFlux && (
+          <Radio>
+            <Radio.Button
+              id="flux-source"
+              titleText="Flux"
+              value="Flux"
+              onClick={toggleFlux}
+              active={isFluxSource}
+            >
+              Flux
+            </Radio.Button>
+            <Radio.Button
+              id="influxql-source"
+              titleText="InfluxQL"
+              value="InfluxQL"
+              onClick={toggleFlux}
+              active={!isFluxSource}
+            >
+              InfluxQL
+            </Radio.Button>
+          </Radio>
+        )}
     </div>
   )
 }

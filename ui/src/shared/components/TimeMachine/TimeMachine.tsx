@@ -275,6 +275,7 @@ class TimeMachine extends PureComponent<Props, State> {
           service={this.service}
           services={services}
           isFluxSource={this.isFluxSource}
+          sourceSupportsFlux={this.sourceSupportsFlux}
           toggleVisType={this.toggleVisType}
           autoRefreshDuration={autoRefreshDuration}
           onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
@@ -462,6 +463,18 @@ class TimeMachine extends PureComponent<Props, State> {
   private get isFluxSource(): boolean {
     // TODO: Update once flux is no longer a separate service
     if (this.service) {
+      return true
+    }
+    return false
+  }
+
+  private get sourceSupportsFlux(): boolean {
+    const {services} = this.props
+    const foundFluxForSource = services.find(service => {
+      return service.sourceID === this.source.id
+    })
+
+    if (foundFluxForSource) {
       return true
     }
     return false
