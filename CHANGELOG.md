@@ -16,7 +16,8 @@
 1.  [#4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
 1.  [4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
 1.  [4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
-1. [#4389](https://github.com/influxdata/chronograf/pull/4389): Add regexp search for appname in log lines
+1.  [#4389](https://github.com/influxdata/chronograf/pull/4389): Add regexp search for appname in log lines
+1.  [#4403](https://github.com/influxdata/chronograf/pull/4403): Add ability to toggle between Flux/InfluxQL on dynamic source in CEO
 
 
 ### UI Improvements

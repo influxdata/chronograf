@@ -270,10 +270,12 @@ class TimeMachine extends PureComponent<Props, State> {
           templates={templates}
           visType={this.visType}
           source={this.source}
+          toggleFlux={this.toggleFlux}
           sources={this.formattedSources}
           service={this.service}
           services={services}
           isFluxSource={this.isFluxSource}
+          sourceSupportsFlux={this.sourceSupportsFlux}
           toggleVisType={this.toggleVisType}
           autoRefreshDuration={autoRefreshDuration}
           onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
@@ -461,6 +463,18 @@ class TimeMachine extends PureComponent<Props, State> {
   private get isFluxSource(): boolean {
     // TODO: Update once flux is no longer a separate service
     if (this.service) {
+      return true
+    }
+    return false
+  }
+
+  private get sourceSupportsFlux(): boolean {
+    const {services} = this.props
+    const foundFluxForSource = services.find(service => {
+      return service.sourceID === this.source.id
+    })
+
+    if (foundFluxForSource) {
       return true
     }
     return false
@@ -1005,6 +1019,23 @@ class TimeMachine extends PureComponent<Props, State> {
       this.state.visType === VisType.Graph ? VisType.Table : VisType.Graph
 
     this.setState({visType: newVisType})
+  }
+
+  private toggleFlux = (): void => {
+    const {services, updateService} = this.props
+
+    if (this.isFluxSource) {
+      this.setState({selectedService: null})
+      updateService(null)
+    } else {
+      const foundFluxForSource = services.find(service => {
+        return service.sourceID === this.source.id
+      })
+
+      if (foundFluxForSource) {
+        updateService(foundFluxForSource)
+      }
+    }
   }
 }
 

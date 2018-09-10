@@ -125,7 +125,7 @@ class CellEditorOverlay extends Component<Props, State> {
       queryStatus,
     } = this.props
 
-    const {isStaticLegend} = this.state
+    const {isStaticLegend, currentService} = this.state
 
     return (
       <div
@@ -147,6 +147,7 @@ class CellEditorOverlay extends Component<Props, State> {
           onResetFocus={this.handleResetFocus}
           isInCEO={true}
           sources={sources}
+          service={currentService}
           services={services}
           updateQueryDrafts={updateQueryDrafts}
           onToggleStaticLegend={this.handleToggleStaticLegend}

@@ -31,10 +31,12 @@ interface Props {
   onChangeAutoRefreshDuration: (newDuration: number) => void
   queries: QueriesModels.QueryConfig[]
   templates: Template[]
+  sourceSupportsFlux: boolean
   onSelectDynamicSource: () => void
   timeRange: QueriesModels.TimeRange
   updateEditorTimeRange: (timeRange: QueriesModels.TimeRange) => void
   toggleVisType: () => void
+  toggleFlux: () => void
 }
 
 const TimeMachineControls: SFC<Props> = ({
@@ -47,11 +49,13 @@ const TimeMachineControls: SFC<Props> = ({
   isInCEO,
   services,
   timeRange,
+  toggleFlux,
   isFluxSource,
   toggleVisType,
   autoRefreshDuration,
   onChangeAutoRefreshDuration,
   onChangeService,
+  sourceSupportsFlux,
   onSelectDynamicSource,
   isDynamicSourceSelected,
   updateEditorTimeRange,
@@ -66,6 +70,9 @@ const TimeMachineControls: SFC<Props> = ({
         service={service}
         services={services}
         queries={queries}
+        toggleFlux={toggleFlux}
+        sourceSupportsFlux={sourceSupportsFlux}
+        isFluxSource={isFluxSource}
         onChangeService={onChangeService}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onSelectDynamicSource={onSelectDynamicSource}
