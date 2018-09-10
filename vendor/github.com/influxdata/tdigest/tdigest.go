@@ -123,7 +123,7 @@ func (t *TDigest) Quantile(q float64) float64 {
 		return t.processed[0].Mean
 	}
 	index := q * t.processedWeight
-	if index < t.processed[0].Weight/2.0 {
+	if index <= t.processed[0].Weight/2.0 {
 		return t.min + 2.0*index/t.processed[0].Weight*(t.processed[0].Mean-t.min)
 	}
 

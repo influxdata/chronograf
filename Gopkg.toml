@@ -79,3 +79,7 @@ required = ["github.com/kevinburke/go-bindata","github.com/gogo/protobuf/proto",
 [[constraint]]
   name = "github.com/microcosm-cc/bluemonday"
   version = "1.0.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/influxdata/flux"

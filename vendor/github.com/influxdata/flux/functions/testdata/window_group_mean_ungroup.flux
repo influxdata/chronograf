@@ -1,0 +1,6 @@
+from(bucket:"testdb")
+  |> range(start: 2018-05-23T13:09:22.885021542Z)
+  |> window(every:1s)
+  |> group(by: ["name"])
+  |> mean()
+  |> group()

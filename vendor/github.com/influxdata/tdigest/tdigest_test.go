@@ -61,6 +61,12 @@ func TestTdigest_Quantile(t *testing.T) {
 			want:     3,
 		},
 		{
+			name:     "data in decreasing order",
+			quantile: 0.25,
+			data:     []float64{555.349107, 432.842597},
+			want:     432.842597,
+		},
+		{
 			name:     "small",
 			quantile: 0.5,
 			data:     []float64{1, 2, 3, 4, 5, 5, 4, 3, 2, 1},

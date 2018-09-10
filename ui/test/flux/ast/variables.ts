@@ -4,7 +4,7 @@ export default {
     start: {line: 1, column: 1},
     end: {line: 1, column: 61},
     source:
-      'bux = "ASDFASDFASDF"\nfoo = from(db: "foo")\t\nfrom(db: bux)\n\n\n',
+      'bux = "ASDFASDFASDF"\nfoo = from(bucket: "foo")\t\nfrom(bucket: bux)\n\n\n',
   },
   body: [
     {
@@ -43,7 +43,7 @@ export default {
       location: {
         start: {line: 2, column: 1},
         end: {line: 2, column: 22},
-        source: 'foo = from(db: "foo")',
+        source: 'foo = from(bucket: "foo")',
       },
       declarations: [
         {
@@ -62,7 +62,7 @@ export default {
             location: {
               start: {line: 2, column: 7},
               end: {line: 2, column: 22},
-              source: 'from(db: "foo")',
+              source: 'from(bucket: "foo")',
             },
             callee: {
               type: 'Identifier',
@@ -120,14 +120,14 @@ export default {
       location: {
         start: {line: 3, column: 1},
         end: {line: 3, column: 14},
-        source: 'from(db: bux)',
+        source: 'from(bucket: bux)',
       },
       expression: {
         type: 'CallExpression',
         location: {
           start: {line: 3, column: 1},
           end: {line: 3, column: 14},
-          source: 'from(db: bux)',
+          source: 'from(bucket: bux)',
         },
         callee: {
           type: 'Identifier',
