@@ -64,15 +64,15 @@ class LayoutCellHeader extends Component<Props> {
   private get headingBar(): JSX.Element {
     const {isEditable, cellBackgroundColor} = this.props
 
-    let barStyle = {}
-
-    if (cellBackgroundColor !== DEFAULT_CELL_BG_COLOR) {
-      barStyle = {
-        backgroundColor: chroma(cellBackgroundColor).brighten(),
-      }
-    }
-
     if (isEditable) {
+      let barStyle
+
+      if (cellBackgroundColor !== DEFAULT_CELL_BG_COLOR) {
+        barStyle = {
+          backgroundColor: chroma(cellBackgroundColor).brighten(),
+        }
+      }
+
       return (
         <>
           <div className="dash-graph--heading-bar" style={barStyle} />

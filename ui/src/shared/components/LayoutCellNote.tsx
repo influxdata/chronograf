@@ -60,12 +60,10 @@ class LayoutCellNote extends Component<Props> {
   private get noteIconStyle(): CSSProperties {
     const {cellBackgroundColor, cellTextColor} = this.props
 
-    if (cellBackgroundColor === DEFAULT_CELL_BG_COLOR) {
-      return {}
-    }
-
-    return {
-      color: cellTextColor,
+    if (cellBackgroundColor !== DEFAULT_CELL_BG_COLOR) {
+      return {
+        color: cellTextColor,
+      }
     }
   }
 

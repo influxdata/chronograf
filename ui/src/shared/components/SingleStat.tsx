@@ -23,11 +23,14 @@ interface Props {
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
 }
 
+const NOOP = () => {}
+
 @ErrorHandling
 class SingleStat extends PureComponent<Props> {
   public static defaultProps: Partial<Props> = {
     prefix: '',
     suffix: '',
+    onUpdateCellColors: NOOP,
   }
 
   public render() {
@@ -122,9 +125,7 @@ class SingleStat extends PureComponent<Props> {
       cellType: lineGraph ? CellType.LinePlusSingleStat : CellType.SingleStat,
     })
 
-    if (onUpdateCellColors) {
-      onUpdateCellColors(bgColor, textColor)
-    }
+    onUpdateCellColors(bgColor, textColor)
 
     return {
       backgroundColor: bgColor,
