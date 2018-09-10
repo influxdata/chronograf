@@ -189,7 +189,7 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 
   private handleBlurEditor = (): void => {
-    this.setState({focused: false})
+    this.setState({focused: false, isShowingTemplateValues: false})
     this.handleUpdate()
   }
 
