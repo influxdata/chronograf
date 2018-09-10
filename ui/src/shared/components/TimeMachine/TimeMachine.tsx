@@ -1022,7 +1022,20 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private toggleFlux = (): void => {
-    console.log('toggling!')
+    const {services, updateService} = this.props
+
+    if (this.isFluxSource) {
+      this.setState({selectedService: null})
+      updateService(null)
+    } else {
+      const foundFluxForSource = services.find(service => {
+        return service.sourceID === this.source.id
+      })
+
+      if (foundFluxForSource) {
+        updateService(foundFluxForSource)
+      }
+    }
   }
 }
 
