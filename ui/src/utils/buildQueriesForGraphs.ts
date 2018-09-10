@@ -11,6 +11,10 @@ interface Statement {
 }
 
 const buildQueries = (queryConfigs: QueryConfig[], tR: TimeRange): Query[] => {
+  if (!queryConfigs) {
+    return []
+  }
+
   const statements: Statement[] = queryConfigs.map((query: QueryConfig) => {
     const {rawText, range, id, shifts, database, measurement, fields} = query
     const timeRange: TimeRange = range || tR
