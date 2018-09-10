@@ -1,5 +1,5 @@
 // Libraries
-import React, {Component} from 'react'
+import React, {Component, CSSProperties} from 'react'
 import classnames from 'classnames'
 import Markdown from 'react-markdown'
 
@@ -8,6 +8,9 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 // Utils
 import {humanizeNote} from 'src/dashboards/utils/notes'
+
+// Constants
+import {DEFAULT_CELL_BG_COLOR} from 'src/dashboards/constants'
 
 // Types
 import {CellType, NoteVisibility} from 'src/types/dashboards'
@@ -18,6 +21,8 @@ interface Props {
   cellY: number
   cellType: CellType
   visibility: NoteVisibility
+  cellBackgroundColor: string
+  cellTextColor: string
 }
 
 class LayoutCellNote extends Component<Props> {
@@ -35,7 +40,7 @@ class LayoutCellNote extends Component<Props> {
 
     return (
       <div className="dash-graph--note">
-        <div className="dash-graph--note-icon">
+        <div className="dash-graph--note-icon" style={this.noteIconStyle}>
           <span className="icon chat" />
         </div>
         <div className={this.noteContentsClass}>
@@ -50,6 +55,16 @@ class LayoutCellNote extends Component<Props> {
         </div>
       </div>
     )
+  }
+
+  private get noteIconStyle(): CSSProperties {
+    const {cellBackgroundColor, cellTextColor} = this.props
+
+    if (cellBackgroundColor !== DEFAULT_CELL_BG_COLOR) {
+      return {
+        color: cellTextColor,
+      }
+    }
   }
 
   private get noteContentsClass(): string {

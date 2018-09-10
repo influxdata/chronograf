@@ -63,6 +63,7 @@ interface Props {
   cellNote: string
   cellNoteVisibility: NoteVisibility
   editorLocation?: QueryUpdateState
+  onUpdateCellColors?: (bgColor: string, textColor: string) => void
 }
 
 class RefreshingGraph extends PureComponent<Props> {
@@ -162,7 +163,13 @@ class RefreshingGraph extends PureComponent<Props> {
   }
 
   private singleStat = (data): JSX.Element => {
-    const {colors, cellHeight, decimalPlaces, manualRefresh} = this.props
+    const {
+      colors,
+      cellHeight,
+      decimalPlaces,
+      manualRefresh,
+      onUpdateCellColors,
+    } = this.props
 
     return (
       <SingleStat
@@ -174,6 +181,7 @@ class RefreshingGraph extends PureComponent<Props> {
         key={manualRefresh}
         cellHeight={cellHeight}
         decimalPlaces={decimalPlaces}
+        onUpdateCellColors={onUpdateCellColors}
       />
     )
   }

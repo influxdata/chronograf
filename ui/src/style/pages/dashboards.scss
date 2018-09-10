@@ -6,6 +6,15 @@
 $dash-graph-heading: 30px;
 $dash-graph-heading-context: $dash-graph-heading - 8px;
 $dash-graph-options-arrow: 8px;
+
+$dash-graph-border-z: 4;
+$dash-graph-resizer-z: 5;
+$dash-graph-header-z: 2;
+$dash-graph-context-z: 6;
+$dash-graph-note-z: 7;
+$dash-graph-context-expanded-z: 20;
+$dash-graph-interacting-z: 21;
+
 /*
   Animations
   ------------------------------------------------------
@@ -70,9 +79,9 @@ $dash-graph-options-arrow: 8px;
 
 %cell-styles {
   background-color: $g3-castle;
-  border-radius: $radius;
-  border: 2px solid $g3-castle;
-  transition-property: left, top, border-color, background-color;
+  border-radius: $ix-radius;
+  border: 0;
+  transition-property: left, top, background-color;
 }
 
 .dashboard {
@@ -90,24 +99,24 @@ $dash-graph-options-arrow: 8px;
 }
 
 .dash-graph {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: nowrap;
   position: absolute;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
+  border-radius: $ix-radius;
+  border: $ix-border solid $g3-castle;
 }
 
 .dash-graph--container {
-  user-select: none !important;
-  -o-user-select: none !important;
-  -moz-user-select: none !important;
-  -webkit-user-select: none !important;
+  user-select: none;
   background-color: transparent;
-  position: absolute;
-  width: 100%;
+  position: relative;
   height: calc(100% - #{$dash-graph-heading});
-  top: $dash-graph-heading;
-  left: 0;
   padding: 0;
   .dygraph {
     position: absolute;
@@ -129,22 +138,23 @@ $dash-graph-options-arrow: 8px;
 
 .dash-graph--note {
   position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  width: 30px;
-  height: 30px;
+  top: 2px;
+  left: 2px;
+  z-index: $dash-graph-note-z;
+  width: $dash-graph-heading;
+  height: $dash-graph-heading;
 }
 
 .dash-graph--note-icon {
-  top: 50%;
+  top: calc(50% - 1px);
   left: 50%;
   transform: translate(-50%, -50%);
   position: absolute;
   width: 16px;
   height: 16px;
-  color: $g9-mountain;
-  transition: color 0.25s ease;
+  color: $g20-white;
+  opacity: 0.3;
+  transition: opacity 0.25s ease;
   font-size: 14px;
 
   > .icon {
@@ -198,26 +208,60 @@ $dash-graph-options-arrow: 8px;
   display: block;
 }
 .dash-graph--note:hover .dash-graph--note-icon {
-  color: $g20-white;  
+  opacity: 1;
 }
+
+$dash-graph--heading-bar-z: 1;
+$dash-graph--heading-dragger-z: $dash-graph--heading-bar-z + 1;
+$dash-graph--heading-name-z: $dash-graph--heading-dragger-z + 1;
 
 .dash-graph--heading {
   user-select: none;
   background-color: transparent;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
   height: $dash-graph-heading;
-  margin: 0;
+  margin: 2px;
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: $dash-graph-header-z;
+}
+.dash-graph--heading-bar,
+.dash-graph--heading-dragger {
+  position: absolute;
   border-radius: $radius-small;
-  transition: background-color 0.25s ease;
-  
-  &.dash-graph--heading-draggable:hover {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.dash-graph--heading-bar {
+  z-index: $dash-graph--heading-bar-z;
+  background-color: $g6-smoke;
+}
+
+.dash-graph--heading-dragger {
+  z-index: $dash-graph--heading-dragger-z;
+  @include gradient-h($c-pool, mix($c-pool, $c-comet));
+}
+
+.react-grid-item:hover {
+  .dash-graph--heading-bar {
+    opacity: 0.25;
+  }
+  .dash-graph--heading:hover .dash-graph--heading-bar {
     cursor: move;
-    background-color: $g5-pepper;
+    opacity: 0.5;
+  }
+}
+
+.react-grid-item.resizing,
+.react-grid-item.react-draggable-dragging {
+  .dash-graph--heading-bar {
+    opacity: 0;
+  }
+  .dash-graph--heading-dragger {
+    opacity: 1;
   }
 }
 
@@ -229,6 +273,7 @@ $dash-graph-options-arrow: 8px;
   text-overflow: ellipsis;
   white-space: nowrap;
   position: relative;
+  z-index: $dash-graph--heading-name-z;
   font-weight: 600;
   font-size: 13px;
   height: $dash-graph-heading;
@@ -261,51 +306,47 @@ $dash-graph-options-arrow: 8px;
   height: 24px;
   border-radius: 3px;
   display: flex;
-  cursor: default;
-  > .custom-indicator,
-  > .source-indicator {
+
+  > .custom-indicator {
     font-size: 10px;
     line-height: 24px;
     padding: 0 7px;
     font-style: normal;
     font-family: $code-font;
+    font-weight: 600;
+    font-size: 12px;
     color: $c-pool;
     background-color: $g2-kevlar;
     margin-right: 2px;
     border-radius: 3px;
   }
-  > .source-indicator {
-    height: 24px;
-    > .icon {
-      font-size: 12px;
-      margin: 0;
-    }
-  }
 }
 
 .dash-graph-context {
-  z-index: 2;
+  z-index: $dash-graph-context-z;
   position: absolute;
-  top: 0;
-  right: 3px;
+  top: $ix-border;
+  right: 3px + $ix-border;
   height: 30px;
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
   opacity: 0;
   transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
-.dash-graph:hover .dash-graph-context {
+.react-grid-item:hover .dash-graph-context {
   opacity: 1;
 }
 
 .dash-graph-context.dash-graph-context__open {
-  z-index: 20;
+  z-index: $dash-graph-context-expanded-z;
 }
 
 .dash-graph-context--buttons {
   display: flex;
+  pointer-events: all;
 }
 
 .dash-graph-context--button {
@@ -314,14 +355,15 @@ $dash-graph-options-arrow: 8px;
   border-radius: 3px;
   font-size: 12px;
   position: relative;
-  color: $g11-sidewalk;
+  color: $g13-mist;
+  background-color: $g5-pepper;
   margin-right: 2px;
   transition: color 0.25s ease, background-color 0.25s ease;
   &:hover,
   &.active {
     cursor: pointer;
     color: $g20-white;
-    background-color: $g5-pepper;
+    background-color: $g7-graphite;
   }
   &:last-child {
     margin-right: 0;
@@ -479,81 +521,226 @@ $dash-graph-options-arrow: 8px;
 }
 
 /*
-  Dashboard Edit Mode
+  Interactive Styles
   ------------------------------------------------------
 */
+
+// Dragging & Resizing Placeholder
+@keyframes gridPlaceholderPulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
 
 .react-grid-placeholder {
   @include gradient-diag-down($c-pool, $c-comet);
   border: 0 !important;
-  opacity: 0.3;
+  opacity: 0.5;
   z-index: 2;
   border-radius: $radius !important;
+  animation: gridPlaceholderPulse 3s ease-in-out infinite;
 }
 
-.react-grid-item {
-  &.resizing {
-    background-color: fade-out($g3-castle, 0.09);
-    border-color: $c-pool;
-    border-image-slice: 3%;
-    border-image-repeat: initial;
-    border-image-outset: 0;
-    border-image-width: 2px;
-    border-image-source: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MTg0NjVDRkVGMEVFMTFFNkE0QjVFRTJGNEI1ODc0RDMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MTg0NjVDRkZGMEVFMTFFNkE0QjVFRTJGNEI1ODc0RDMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxODQ2NUNGQ0YwRUUxMUU2QTRCNUVFMkY0QjU4NzREMyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxODQ2NUNGREYwRUUxMUU2QTRCNUVFMkY0QjU4NzREMyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpeetfIAAAMnSURBVHja7N1PatwwFMfxJ5NlKT1DIfQKWZfSA/Q0hexDL9McoOQAPUKglwhp6dZ9Ho/HfyTZs6l+b/E1GDm27IH5oH9Pyji9//7XfLtNZt88/eT722TzlvrFseXHaXFmypuO8vd5nmW6nyeNefrKfZv7i9f75blU/NzafXvns2dV7tl8zqsnT55+9f3Xjf/xwQ9+evou+xLB+N8Ydi4AX3z/6PnvOj94AEOGMV/rB4P00J2rKTC0GNOTPne0GWEwhv1NB0YYjNPWgREHI00gYMTAOIGAEQdjuKcDIw7GXGWBEQJjrLLACIORrFBlgaHDsG2VBYYWY1VlgaHHSH3WqIOhxLB1ow6GGmPRqIMRAeMMAkYUDFuGTsDQYwxP6MCIg1Hp9oKhwih0e8FQYthuLAuM5hj1WBYYEoxUjGWBIcOwrFEHQ4qxLiFgyDFOvSww4mCM8yFghMEoDgzB0GGk2owhGBoMq5UQMDQYxRIChg4ja0PA0GLYMrgIhh7jUkLAiIExV1lghMA4GBiC0RrjNIULRhyMysAQDBVGYWAIhhJjM6cOhhpjUULAiIAxr1wEIwTGPDAEIwTGWGWBEQajHu0FQ4JRjvaCIcPIo71gSDHW0V4w5Bj5SB0MKUZxoRwYOoxsPgQMLcZqPgQMPUaxUQdDh2HVcQgYEoxUHIeAIcPIqywwpBjrKgsMOcb8f+pghMDIwu9gaDFWI3Uw9Bg2N+pgRMA497LAiIJRXf0OhgajuPodDB3G1dFeMNpgXBXtBaMdxmG0F4y2GLvRXjDaY2wGhmCoMawU7QVDh5G20V4wtBjzwBCMEBiXVx6BEQPjsJcFRluM3V4WGO0xqr0sMDQYVuplgaHDWL1YEgw9hi17WWDoMVJ1ChcMCYYVp3DBkGFUl5KCocGw6deAwIiBYUfBRTDaYmTdXjC0GFYLLoKhwSj+cAAYOgzbBhfB0GKsgotg6DGuWrkIRjuMudsLRgiMsQ0BIwzG5ZVHYMTAmKqsVzBiYPj2Z+j2PoERAmM4/2MoIfe+v4Ahx3jx5H4AefYLd37q0Y9/g9EcY/jOHz11A3v+J8AA9wisahRCWTQAAAAASUVORK5CYII=);
-    z-index: 3;
-    & > .react-resizable-handle {
-      &:before,
-      &:after {
-        background-color: $c-comet;
-      }
-    }
+// Gradient Borders when Dragging or Resizing a Cell
+$cell-gradient-border--start: $c-pool;
+$cell-gradient-border--stop: $c-comet;
+$cell-gradient-border--mid: mix($cell-gradient-border--start, $cell-gradient-border--stop);
+
+.dash-graph--gradient-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  opacity: 0;
+  z-index: $dash-graph-border-z;
+}
+
+.dash-graph--gradient-top-left,
+.dash-graph--gradient-top-right,
+.dash-graph--gradient-bottom-left,
+.dash-graph--gradient-bottom-right {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  z-index: 1;
+
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
   }
-  &.react-draggable-dragging {
-    background-color: fade-out($g3-castle, 0.09);
-    border-color: $c-pool;
-    border-image-slice: 3%;
-    border-image-repeat: initial;
-    border-image-outset: 0;
-    border-image-width: 2px;
-    border-image-source: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDY3IDc5LjE1Nzc0NywgMjAxNS8wMy8zMC0yMzo0MDo0MiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MTg0NjVDRkVGMEVFMTFFNkE0QjVFRTJGNEI1ODc0RDMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MTg0NjVDRkZGMEVFMTFFNkE0QjVFRTJGNEI1ODc0RDMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxODQ2NUNGQ0YwRUUxMUU2QTRCNUVFMkY0QjU4NzREMyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxODQ2NUNGREYwRUUxMUU2QTRCNUVFMkY0QjU4NzREMyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpeetfIAAAMnSURBVHja7N1PatwwFMfxJ5NlKT1DIfQKWZfSA/Q0hexDL9McoOQAPUKglwhp6dZ9Ho/HfyTZs6l+b/E1GDm27IH5oH9Pyji9//7XfLtNZt88/eT722TzlvrFseXHaXFmypuO8vd5nmW6nyeNefrKfZv7i9f75blU/NzafXvns2dV7tl8zqsnT55+9f3Xjf/xwQ9+evou+xLB+N8Ydi4AX3z/6PnvOj94AEOGMV/rB4P00J2rKTC0GNOTPne0GWEwhv1NB0YYjNPWgREHI00gYMTAOIGAEQdjuKcDIw7GXGWBEQJjrLLACIORrFBlgaHDsG2VBYYWY1VlgaHHSH3WqIOhxLB1ow6GGmPRqIMRAeMMAkYUDFuGTsDQYwxP6MCIg1Hp9oKhwih0e8FQYthuLAuM5hj1WBYYEoxUjGWBIcOwrFEHQ4qxLiFgyDFOvSww4mCM8yFghMEoDgzB0GGk2owhGBoMq5UQMDQYxRIChg4ja0PA0GLYMrgIhh7jUkLAiIExV1lghMA4GBiC0RrjNIULRhyMysAQDBVGYWAIhhJjM6cOhhpjUULAiIAxr1wEIwTGPDAEIwTGWGWBEQajHu0FQ4JRjvaCIcPIo71gSDHW0V4w5Bj5SB0MKUZxoRwYOoxsPgQMLcZqPgQMPUaxUQdDh2HVcQgYEoxUHIeAIcPIqywwpBjrKgsMOcb8f+pghMDIwu9gaDFWI3Uw9Bg2N+pgRMA497LAiIJRXf0OhgajuPodDB3G1dFeMNpgXBXtBaMdxmG0F4y2GLvRXjDaY2wGhmCoMawU7QVDh5G20V4wtBjzwBCMEBiXVx6BEQPjsJcFRluM3V4WGO0xqr0sMDQYVuplgaHDWL1YEgw9hi17WWDoMVJ1ChcMCYYVp3DBkGFUl5KCocGw6deAwIiBYUfBRTDaYmTdXjC0GFYLLoKhwSj+cAAYOgzbBhfB0GKsgotg6DGuWrkIRjuMudsLRgiMsQ0BIwzG5ZVHYMTAmKqsVzBiYPj2Z+j2PoERAmM4/2MoIfe+v4Ahx3jx5H4AefYLd37q0Y9/g9EcY/jOHz11A3v+J8AA9wisahRCWTQAAAAASUVORK5CYII=);
-    cursor: move;
-    &:hover {
-      cursor: move;
-    }
-    .dash-graph--heading {
-      background-color: $g5-pepper;
-      cursor: move;
-    }
+}
+
+.dash-graph--gradient-top-left {
+  z-index: 2;
+  top: 0;
+  left: 0;
+  border-top-left-radius: $ix-radius;
+  border-top: $ix-border solid $cell-gradient-border--start;
+  border-left: $ix-border solid $cell-gradient-border--start;
+
+  &:before {
+    top: -$ix-border;
+    height: $ix-border;
+    left: $ix-radius;
+    width: calc(200% - #{$ix-radius * 2});
+    @include gradient-h($cell-gradient-border--start, $cell-gradient-border--mid);
   }
-  & > .react-resizable-handle {
-    background-image: none;
-    cursor: nwse-resize;
+
+  &:after {
+    top: $ix-radius;
+    height: calc(200% - #{$ix-radius * 2});
+    left: -$ix-border;
+    width: $ix-border;
+    @include gradient-v($cell-gradient-border--start, $cell-gradient-border--mid);
+  }
+}
+
+.dash-graph--gradient-top-right {
+  top: 0;
+  right: 0;
+  border-top-right-radius: $ix-radius;
+  border-top: $ix-border solid $cell-gradient-border--mid;
+  border-right: $ix-border solid $cell-gradient-border--mid;
+}
+
+.dash-graph--gradient-bottom-left {
+  bottom: 0;
+  left: 0;
+  border-bottom-left-radius: $ix-radius;
+  border-bottom: $ix-border solid $cell-gradient-border--mid;
+  border-left: $ix-border solid $cell-gradient-border--mid;
+}
+
+.dash-graph--gradient-bottom-right {
+  z-index: 2;
+  bottom: 0;
+  right: 0;
+  border-bottom-right-radius: $ix-radius;
+  border-bottom: $ix-border solid $cell-gradient-border--stop;
+  border-right: $ix-border solid $cell-gradient-border--stop;
+
+  &:before {
+    bottom: -$ix-border;
+    height: $ix-border;
+    right: $ix-radius;
+    width: calc(200% - #{$ix-radius * 2});
+    @include gradient-h($cell-gradient-border--mid, $cell-gradient-border--stop);
+  }
+
+  &:after {
+    bottom: $ix-radius;
+    height: calc(200% - #{$ix-radius * 2});
+    right: -$ix-border;
+    width: $ix-border;
+    @include gradient-v($cell-gradient-border--mid, $cell-gradient-border--stop);
+  }
+}
+
+
+.react-grid-item .dash-graph--gradient-border {
+  display: none;
+}
+
+.react-grid-item.react-draggable .dash-graph--gradient-border,
+.react-grid-item.react-resizable .dash-graph--gradient-border {
+  display: block;
+}
+
+// Resize Handle
+.react-grid-item .react-resizable-handle {
+  background-image: none;
+  cursor: nwse-resize;
+  border: 15px solid transparent;
+  border-right-color: $g6-smoke;
+  border-bottom-color: $g6-smoke;
+  border-bottom-right-radius: $ix-radius;
+  z-index: $dash-graph-resizer-z;
+  transition: border-color 0.25s ease, opacity 0.25s ease;
+  width: 30px;
+  height: 30px;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+  
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    height: 2px;
+    border-radius: 1px;
+    background-color: $g0-obsidian;
+    transition: background-color 0.25s ease;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    border: 0;
+  }
+  &:before {
+    width: 12px;
+    top: 7px;
+    left: 7px;
+  }
+  &:after {
+    width: 20px;
+    top: 4px;
+    left: 4px;
+  }
+  &:hover {
+    border-right-color: $cell-gradient-border--stop;
+    border-bottom-color: $cell-gradient-border--stop;
+  }
+}
+
+.react-grid-item:hover .react-resizable-handle {
+  opacity: 1;
+}
+
+
+// Cell Resizing & Dragging Styles
+.react-grid-item.resizing,
+.react-grid-item.react-draggable-dragging {
+  z-index: $dash-graph-interacting-z;
+
+  .dash-graph--gradient-border {
+    opacity: 1;
+  }
+
+  .dash-graph--name {
+    color: $g20-white;
+  }
+
+  .dash-graph-context {
+    opacity: 1;
+  }
+
+  .react-resizable-handle {
+    border-right-color: $cell-gradient-border--stop;
+    border-bottom-color: $cell-gradient-border--stop;
+
     &:before,
     &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      height: 2px;
-      border-radius: 1px;
-      background-color: $g6-smoke;
-      transition: background-color 0.25s ease;
-      top: 50%;
-      left: 50%;
-      border: 0;
+      background-color: $g0-obsidian;
     }
-    &:before {
-      width: 20px;
-      transform: translate(-50%, -50%) rotate(-45deg);
-    }
-    &:after {
-      width: 12px;
-      transform: translate(-3px, 2px) rotate(-45deg);
-    }
-    &:hover {
-      &:before,
-      &:after {
-        background-color: $c-comet;
-      }
-    }
+  }
+}
+
+// Cell Dragging Styles
+.react-grid-item.react-draggable-dragging {
+  &:hover {
+    cursor: move;
+  }
+
+  .dash-graph--heading {
+    cursor: move;
   }
 }

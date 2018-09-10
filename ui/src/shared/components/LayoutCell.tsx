@@ -1,5 +1,4 @@
-// Libraries
-import React, {Component, ReactElement} from 'react'
+import React, {Component, ReactElement, CSSProperties} from 'react'
 import _ from 'lodash'
 
 // Components
@@ -14,6 +13,10 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {dataToCSV} from 'src/shared/parsing/dataToCSV'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
+import {
+  DEFAULT_CELL_BG_COLOR,
+  DEFAULT_CELL_TEXT_COLOR,
+} from 'src/dashboards/constants'
 
 // Types
 import {Cell, CellQuery, Template} from 'src/types/'
@@ -38,6 +41,9 @@ interface Props {
 
 @ErrorHandling
 export default class LayoutCell extends Component<Props> {
+  private cellBackgroundColor: string = DEFAULT_CELL_BG_COLOR
+  private cellTextColor: string = DEFAULT_CELL_TEXT_COLOR
+
   public render() {
     const {
       cell,
@@ -51,36 +57,43 @@ export default class LayoutCell extends Component<Props> {
     } = this.props
 
     return (
-      <div className="dash-graph">
-        <Authorized requiredRole={EDITOR_ROLE}>
-          <LayoutCellMenu
-            cell={cell}
-            isEditable={isEditable}
-            dataExists={!!cellData.length}
-            onEdit={this.handleSummonOverlay}
-            onClone={onCloneCell}
-            onDelete={onDeleteCell}
-            onCSVDownload={this.handleCSVDownload}
-            queries={this.queries}
-            isFluxSource={isFluxSource}
-            visType={visType}
-            toggleVisType={toggleVisType}
+      <>
+        <div className="dash-graph" style={this.cellStyle}>
+          <Authorized requiredRole={EDITOR_ROLE}>
+            <LayoutCellMenu
+              cell={cell}
+              isEditable={isEditable}
+              dataExists={!!cellData.length}
+              onEdit={this.handleSummonOverlay}
+              onClone={onCloneCell}
+              onDelete={onDeleteCell}
+              onCSVDownload={this.handleCSVDownload}
+              queries={this.queries}
+              isFluxSource={isFluxSource}
+              visType={visType}
+              toggleVisType={toggleVisType}
+            />
+          </Authorized>
+          <LayoutCellNote
+            visibility={cell.noteVisibility}
+            cellType={cell.type}
+            note={cell.note}
+            cellX={cell.x}
+            cellY={cell.y}
+            cellBackgroundColor={this.cellBackgroundColor}
+            cellTextColor={this.cellTextColor}
           />
-        </Authorized>
-        <LayoutCellNote
-          visibility={cell.noteVisibility}
-          cellType={cell.type}
-          note={cell.note}
-          cellX={cell.x}
-          cellY={cell.y}
-        />
-        <LayoutCellHeader
-          cellName={this.cellName}
-          isEditable={isEditable}
-          makeSpaceForCellNote={this.makeSpaceForCellNote}
-        />
-        <div className="dash-graph--container">{this.renderGraph}</div>
-      </div>
+          <LayoutCellHeader
+            cellName={this.cellName}
+            isEditable={isEditable}
+            makeSpaceForCellNote={this.makeSpaceForCellNote}
+            cellBackgroundColor={this.cellBackgroundColor}
+            cellTextColor={this.cellTextColor}
+          />
+          <div className="dash-graph--container">{this.renderGraph}</div>
+        </div>
+        {this.gradientBorder}
+      </>
     )
   }
 
@@ -143,7 +156,10 @@ export default class LayoutCell extends Component<Props> {
 
     if (this.queries.length) {
       const child = React.Children.only(children)
-      return React.cloneElement(child, {cellID: cell.i})
+      return React.cloneElement(child, {
+        cellID: cell.i,
+        onUpdateCellColors: this.onUpdateCellColors,
+      })
     }
 
     return this.emptyGraph
@@ -179,6 +195,29 @@ export default class LayoutCell extends Component<Props> {
     } catch (error) {
       notify(notifyCSVDownloadFailed())
       console.error(error)
+    }
+  }
+
+  private get gradientBorder(): JSX.Element {
+    return (
+      <div className="dash-graph--gradient-border">
+        <div className="dash-graph--gradient-top-left" />
+        <div className="dash-graph--gradient-top-right" />
+        <div className="dash-graph--gradient-bottom-left" />
+        <div className="dash-graph--gradient-bottom-right" />
+      </div>
+    )
+  }
+
+  private onUpdateCellColors = (bgColor: string, textColor: string): void => {
+    this.cellBackgroundColor = bgColor || DEFAULT_CELL_BG_COLOR
+    this.cellTextColor = textColor || DEFAULT_CELL_TEXT_COLOR
+  }
+
+  private get cellStyle(): CSSProperties {
+    return {
+      backgroundColor: this.cellBackgroundColor,
+      borderColor: this.cellBackgroundColor,
     }
   }
 }

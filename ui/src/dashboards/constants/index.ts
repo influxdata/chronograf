@@ -140,3 +140,6 @@ export const DYNAMIC_SOURCE_ITEM: SourceItemValue = {
   sourceInfo: DYNAMIC_SOURCE_INFO,
   importedSourceID: '',
 }
+
+export const DEFAULT_CELL_BG_COLOR = '#292933'
+export const DEFAULT_CELL_TEXT_COLOR = '#FFFFFF'
