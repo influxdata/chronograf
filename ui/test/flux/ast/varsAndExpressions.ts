@@ -4,7 +4,7 @@ export default {
     start: {line: 1, column: 1},
     end: {line: 1, column: 129},
     source:
-      'literal = "foo"\n\ntele = from(db: "telegraf")\n\t|\u003e range(start: -15m)\n\nfrom(db: "telegraf")\n\t|\u003e filter() \n\t|\u003e range(start: -15m)\n\n',
+      'literal = "foo"\n\ntele = from(bucket: "telegraf")\n\t|\u003e range(start: -15m)\n\nfrom(bucket: "telegraf")\n\t|\u003e filter() \n\t|\u003e range(start: -15m)\n\n',
   },
   body: [
     {
@@ -43,7 +43,8 @@ export default {
       location: {
         start: {line: 3, column: 1},
         end: {line: 3, column: 53},
-        source: 'tele = from(db: "telegraf")\n\t|\u003e range(start: -15m)\n\n',
+        source:
+          'tele = from(bucket: "telegraf")\n\t|\u003e range(start: -15m)\n\n',
       },
       declarations: [
         {
@@ -69,7 +70,7 @@ export default {
               location: {
                 start: {line: 3, column: 8},
                 end: {line: 3, column: 28},
-                source: 'from(db: "telegraf")',
+                source: 'from(bucket: "telegraf")',
               },
               callee: {
                 type: 'Identifier',
@@ -193,7 +194,7 @@ export default {
         start: {line: 6, column: 1},
         end: {line: 6, column: 60},
         source:
-          'from(db: "telegraf")\n\t|\u003e filter() \n\t|\u003e range(start: -15m)\n\n',
+          'from(bucket: "telegraf")\n\t|\u003e filter() \n\t|\u003e range(start: -15m)\n\n',
       },
       expression: {
         type: 'PipeExpression',
@@ -214,7 +215,7 @@ export default {
             location: {
               start: {line: 6, column: 1},
               end: {line: 6, column: 21},
-              source: 'from(db: "telegraf")',
+              source: 'from(bucket: "telegraf")',
             },
             callee: {
               type: 'Identifier',

@@ -70,7 +70,7 @@ export const MEASUREMENTS_RESPONSE = `#datatype,string,long,dateTime:RFC3339,dat
 /* 
 From the following request:
 
-    from(db: "telegraf")
+    from(bucket: "telegraf")
       |> range(start: -24h)
       |> group(none: true)
       |> keys(except:["_time","_value","_start","_stop"])

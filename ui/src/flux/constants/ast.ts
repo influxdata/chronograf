@@ -135,9 +135,9 @@ export const ast = {
                         line: 1,
                         column: 8,
                       },
-                      identifierName: 'db',
+                      identifierName: 'bucket',
                     },
-                    name: 'db',
+                    name: 'bucket',
                   },
                   value: {
                     type: 'StringLiteral',

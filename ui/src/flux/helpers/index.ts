@@ -63,7 +63,8 @@ const functions = (funcs: Func[], suggestions: Suggestion[]): Func[] => {
     }
 
     const {params, name} = suggestion
-    const args = Object.entries(params).map(([key, type]) => {
+    const filteredParams = _.omit(params, 'bucketID')
+    const args = Object.entries(filteredParams).map(([key, type]) => {
       const argWithKey = func.args.find(arg => arg.key === key)
       const value = _.get(argWithKey, 'value', '')
 

@@ -18,11 +18,11 @@ describe('Flux.AST.Walker', () => {
           const expectedWalkerBody = [
             {
               type: 'CallExpression',
-              source: 'from(db: "telegraf")',
+              source: 'from(bucket: "telegraf")',
               funcs: [
                 {
                   name: 'from',
-                  source: 'from(db: "telegraf")',
+                  source: 'from(bucket: "telegraf")',
                   args: [
                     {
                       key: 'db',
@@ -63,16 +63,16 @@ describe('Flux.AST.Walker', () => {
               const expectedWalkerBody = [
                 {
                   type: 'VariableDeclaration',
-                  source: 'tele = from(db: "telegraf")',
+                  source: 'tele = from(bucket: "telegraf")',
                   declarations: [
                     {
                       name: 'tele',
                       type: 'CallExpression',
-                      source: 'tele = from(db: "telegraf")',
+                      source: 'tele = from(bucket: "telegraf")',
                       funcs: [
                         {
                           name: 'from',
-                          source: 'from(db: "telegraf")',
+                          source: 'from(bucket: "telegraf")',
                           args: [
                             {
                               key: 'db',
@@ -121,16 +121,16 @@ describe('Flux.AST.Walker', () => {
               const expectedWalkerBody = [
                 {
                   type: 'VariableDeclaration',
-                  source: 'tele = from(db: "telegraf")',
+                  source: 'tele = from(bucket: "telegraf")',
                   declarations: [
                     {
                       name: 'tele',
                       type: 'CallExpression',
-                      source: 'tele = from(db: "telegraf")',
+                      source: 'tele = from(bucket: "telegraf")',
                       funcs: [
                         {
                           name: 'from',
-                          source: 'from(db: "telegraf")',
+                          source: 'from(bucket: "telegraf")',
                           args: [
                             {
                               key: 'db',

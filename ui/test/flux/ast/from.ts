@@ -9,7 +9,7 @@ export default {
       line: 1,
       column: 21,
     },
-    source: 'from(db: "telegraf")',
+    source: 'from(bucket: "telegraf")',
   },
   body: [
     {
@@ -23,7 +23,7 @@ export default {
           line: 1,
           column: 21,
         },
-        source: 'from(db: "telegraf")',
+        source: 'from(bucket: "telegraf")',
       },
       expression: {
         type: 'CallExpression',
@@ -36,7 +36,7 @@ export default {
             line: 1,
             column: 21,
           },
-          source: 'from(db: "telegraf")',
+          source: 'from(bucket: "telegraf")',
         },
         callee: {
           type: 'Identifier',

@@ -1,0 +1,12 @@
+#datatype,string,long,string,string,long
+#group,false,false,true,true,false
+#default,0,,,,
+,result,table,host,name,_value
+,,0,host.local,disk0,15204688
+,,0,host.local,disk0,15204894
+,,0,host.local,disk0,15205102
+,,0,host.local,disk0,15205226
+,,0,host.local,disk0,15205499
+,,0,host.local,disk0,15205755
+,,1,host.local,disk2,648
+

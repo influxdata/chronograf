@@ -45,7 +45,7 @@ export const Expression = {
   location: {
     start: {line: 1, column: 1},
     end: {line: 1, column: 28},
-    source: 'tele = from(db: "telegraf")',
+    source: 'tele = from(bucket: "telegraf")',
   },
   body: [
     {
@@ -53,7 +53,7 @@ export const Expression = {
       location: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 28},
-        source: 'tele = from(db: "telegraf")',
+        source: 'tele = from(bucket: "telegraf")',
       },
       declarations: [
         {
@@ -72,7 +72,7 @@ export const Expression = {
             location: {
               start: {line: 1, column: 8},
               end: {line: 1, column: 28},
-              source: 'from(db: "telegraf")',
+              source: 'from(bucket: "telegraf")',
             },
             callee: {
               type: 'Identifier',
@@ -221,7 +221,7 @@ export const Fork = {
   location: {
     start: {line: 1, column: 1},
     end: {line: 1, column: 42},
-    source: 'tele = from(db: "telegraf")\ntele |\u003e sum()',
+    source: 'tele = from(bucket: "telegraf")\ntele |\u003e sum()',
   },
   body: [
     {
@@ -229,7 +229,7 @@ export const Fork = {
       location: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 28},
-        source: 'tele = from(db: "telegraf")',
+        source: 'tele = from(bucket: "telegraf")',
       },
       declarations: [
         {
@@ -248,7 +248,7 @@ export const Fork = {
             location: {
               start: {line: 1, column: 8},
               end: {line: 1, column: 28},
-              source: 'from(db: "telegraf")',
+              source: 'from(bucket: "telegraf")',
             },
             callee: {
               type: 'Identifier',

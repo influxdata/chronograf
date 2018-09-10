@@ -1,0 +1,7 @@
+#datatype,string,long,string
+#group,false,false,false
+#default,0,,
+,result,table,_value
+,,0,host
+,,0,name
+
