@@ -163,9 +163,7 @@ class TimeSeries extends Component<Props, State> {
       return
     }
 
-    if (this.isComponentMounted) {
-      this.executeQueries()
-    }
+    this.executeQueries()
   }
 
   public setIsLoading(): Promise<void> {
