@@ -2,7 +2,13 @@ import {Message} from 'src/worker/types'
 import {fetchData} from 'src/worker/utils'
 import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
 
-export default async (msg: Message) => {
+interface DecodeFluxRespWithLimitResult {
+  body: string
+  byteLength: number
+  uuid?: string
+}
+
+export default async (msg: Message): Promise<DecodeFluxRespWithLimitResult> => {
   const {url, query, uuid, dialect} = await fetchData(msg)
 
   const body = JSON.stringify({

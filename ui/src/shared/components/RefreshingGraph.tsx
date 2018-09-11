@@ -37,6 +37,7 @@ import {
   CellType,
   Service,
   FluxTable,
+  RemoteDataState,
 } from 'src/types'
 import {
   TableOptions,
@@ -46,6 +47,7 @@ import {
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 import {VisType} from 'src/types/flux'
+import {TimeSeriesServerResponse} from 'src/types/series'
 
 interface Props {
   axes: Axes
@@ -263,7 +265,11 @@ class RefreshingGraph extends PureComponent<Props> {
     )
   }
 
-  private lineGraph = (influxQLData, fluxData, loading): JSX.Element => {
+  private lineGraph = (
+    influxQLData: TimeSeriesServerResponse[],
+    fluxData: FluxTable[],
+    loading: RemoteDataState
+  ): JSX.Element => {
     const {
       axes,
       type,
