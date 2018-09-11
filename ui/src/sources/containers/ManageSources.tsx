@@ -53,6 +53,7 @@ class ManageSources extends PureComponent<Props, State> {
       showNewKapacitor: null,
     }
   }
+
   public componentDidMount() {
     this.props.fetchAllServices(this.props.sources)
     this.props.sources.forEach(source => {
