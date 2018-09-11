@@ -130,12 +130,13 @@ class TimeSeries extends Component<Props, State> {
       'cellType',
       'manualRefresh',
     ]
-    const should =
+
+    return (
       this.state.loading !== prevState.loading ||
       _.some(list, key => {
         return !_.isEqual(this.props[key], prevProps[key])
       })
-    return should
+    )
   }
 
   public async componentDidMount() {

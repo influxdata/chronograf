@@ -532,7 +532,9 @@ class TimeMachine extends PureComponent<Props, State> {
     const {script, timeRange, queryDrafts} = this.props
     const id = _.get(queryDrafts, 'id', '')
     if (this.isFluxSource) {
-      return [{text: script, id, queryConfig: null}]
+      // there will only be one flux query
+      const fluxQuery: Query[] = [{text: script, id, queryConfig: null}]
+      return fluxQuery
     }
 
     return buildQueries(this.queriesWorkingDraft, timeRange)
