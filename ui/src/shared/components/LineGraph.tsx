@@ -2,7 +2,6 @@
 import React, {PureComponent, CSSProperties} from 'react'
 import Dygraph from 'src/shared/components/Dygraph'
 import {withRouter, RouteComponentProps} from 'react-router'
-import _ from 'lodash'
 
 // Components
 import SingleStat from 'src/shared/components/SingleStat'

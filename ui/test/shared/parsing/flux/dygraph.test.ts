@@ -14,7 +14,7 @@ describe('fluxTablesToDygraph', () => {
       [new Date('2018-06-01T22:27:42Z'), 2, 2, 1],
     ]
 
-    expect(actual).toEqual(expected)
+    expect(actual.timeSeries).toEqual(expected)
   })
 
   it('can parse flux tables for series of mismatched periods', () => {
@@ -27,6 +27,6 @@ describe('fluxTablesToDygraph', () => {
       [new Date('2018-06-05T17:12:35Z'), null, 11],
     ]
 
-    expect(actual).toEqual(expected)
+    expect(actual.timeSeries).toEqual(expected)
   })
 })
