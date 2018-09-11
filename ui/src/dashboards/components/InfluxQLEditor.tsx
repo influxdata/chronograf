@@ -101,6 +101,10 @@ class InfluxQLEditor extends Component<Props, State> {
     this.cancelPendingUpdates()
   }
 
+  public componentDidMount() {
+    this.handleFocusEditor()
+  }
+
   public render() {
     const {config, templates} = this.props
 
@@ -185,6 +189,7 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 
   private handleBlurEditor = (): void => {
+    this.setState({focused: false, isShowingTemplateValues: false})
     this.handleUpdate()
   }
 

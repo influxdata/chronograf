@@ -28,6 +28,10 @@
 1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Move log message truncation controls into logs filter bar
 1.  [#4391](https://github.com/influxdata/chronograf/pull/4391): Colorize entire Single Stat cell
 1.  [#4392](https://github.com/influxdata/chronograf/pull/4392): Add log filters on left side
+
+1.  [#2265](https://github.com/influxdata/chronograf/pull/2265): Autofocus dashboard query editor
+
+### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
 1.  [#4330](https://github.com/influxdata/chronograf/pull/4330): Position cloned cells adjacent to target cell
 

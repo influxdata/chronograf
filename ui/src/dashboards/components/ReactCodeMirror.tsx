@@ -109,6 +109,10 @@ class ReactCodeMirror extends PureComponent<Props, State> {
         this.hideTemplateValues()
       }
     }
+
+    if (this.props.focused && this.editor && !this.editor.hasFocus()) {
+      this.focusEditor()
+    }
   }
 
   public handleTemplateReplace = (
@@ -143,6 +147,11 @@ class ReactCodeMirror extends PureComponent<Props, State> {
     if (this.editor) {
       this.editor.setSelection(selection.end, selection.start)
     }
+  }
+
+  private focusEditor() {
+    this.props.onFocus()
+    this.editor.focus()
   }
 
   private handleMountEditor = (editor: CMEditor) => {
