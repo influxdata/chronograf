@@ -33,6 +33,7 @@ interface State {
   isShowingTemplateValues: boolean
   filteredTemplates: Template[]
   isSubmitted: boolean
+  configID: string
 }
 
 interface Props {
@@ -59,12 +60,12 @@ class InfluxQLEditor extends Component<Props, State> {
 
     // stale prop values after recent submission cause flickering
     const isRecentlySubmitted = !isSubmitted || prevState.isSubmitted
+    const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
+    const isQueryUpdated = !isRecentlySubmitted && isQueryTextChanged
 
-    if (
-      !isRecentlySubmitted &&
-      !isShowingTemplateValues &&
-      editedQueryText.trim() !== nextProps.query.trim()
-    ) {
+    const isQueryConfigChanged = nextProps.config.id !== prevState.configID
+
+    if ((isQueryUpdated && !isShowingTemplateValues) || isQueryConfigChanged) {
       return {
         ...BLURRED_EDITOR_STATE,
         selectedTemplate: {
@@ -73,6 +74,8 @@ class InfluxQLEditor extends Component<Props, State> {
         filteredTemplates: nextProps.templates,
         templatingQueryText: nextProps.query,
         editedQueryText: nextProps.query,
+        configID: nextProps.config.id,
+        focused: isQueryConfigChanged,
       }
     }
 
@@ -97,6 +100,7 @@ class InfluxQLEditor extends Component<Props, State> {
       templatingQueryText: props.query,
       editedQueryText: props.query,
       isSubmitted: true,
+      configID: props.config.id,
     }
   }
 
