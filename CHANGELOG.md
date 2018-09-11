@@ -37,6 +37,7 @@
 1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
 1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
 1.  [#4388](https://github.com/influxdata/chronograf/pull/4388): Fix logs to progressively load results and provide feedback on search
+1.  [#4408](https://github.com/influxdata/chronograf/pull/4408): Render null data point values in Alerts Table as mdashes
 
 ## v1.6.2 [2018-09-06]
 
