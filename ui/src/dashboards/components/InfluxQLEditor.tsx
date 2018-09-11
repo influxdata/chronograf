@@ -8,6 +8,7 @@ import ReactCodeMirror from 'src/dashboards/components/ReactCodeMirror'
 import TemplateDrawer from 'src/shared/components/TemplateDrawer'
 import QueryStatus from 'src/shared/components/QueryStatus'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {ActionDropdown} from 'src/reusable_ui'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -15,10 +16,17 @@ import {makeCancelable} from 'src/utils/promises'
 
 // Constants
 import {MATCH_INCOMPLETE_TEMPLATES, applyMasks} from 'src/tempVars/constants'
+import {QUERY_TEMPLATES} from 'src/data_explorer/constants'
 
 // Types
 import {Template, QueryConfig} from 'src/types'
 import {WrappedCancelablePromise} from 'src/types/promises'
+import {ComponentSize} from 'src/reusable_ui/types'
+import {
+  QueryTemplateOption,
+  QueryTemplate,
+  DropdownChildTypes,
+} from 'src/data_explorer/constants'
 
 interface TempVar {
   tempVar: string
@@ -236,7 +244,8 @@ class InfluxQLEditor extends Component<Props, State> {
     const masked = applyMasks(value)
     const matched = masked.match(MATCH_INCOMPLETE_TEMPLATES)
 
-    if (matched && !_.isEmpty(templates)) {
+    const isTemplating = matched && !_.isEmpty(templates)
+    if (isTemplating) {
       // maintain cursor poition
       const matchedVar = {tempVar: `${matched[0]}:`}
       const filteredTemplates = this.filterTemplates(matched[0])
@@ -246,7 +255,7 @@ class InfluxQLEditor extends Component<Props, State> {
       )
 
       this.setState({
-        isTemplating: true,
+        isTemplating,
         templatingQueryText: value,
         selectedTemplate,
         filteredTemplates,
@@ -255,7 +264,8 @@ class InfluxQLEditor extends Component<Props, State> {
       })
     } else {
       this.setState({
-        isTemplating: false,
+        isTemplating,
+        templatingQueryText: value,
         editedQueryText: value,
         isSubmitted,
       })
@@ -347,6 +357,10 @@ class InfluxQLEditor extends Component<Props, State> {
     })
   }
 
+  private handleChooseMetaQuery = (template: QueryTemplate): void => {
+    this.handleChange(template.query)
+  }
+
   private closeDrawer = () => {
     this.setState({
       isTemplating: false,
@@ -400,6 +414,27 @@ class InfluxQLEditor extends Component<Props, State> {
         >
           Show Template Values
         </button>
+        <ActionDropdown
+          actionText={'Query Template'}
+          children={QUERY_TEMPLATES.map(qt => {
+            if (qt.type === DropdownChildTypes.Item) {
+              return (
+                <ActionDropdown.Item
+                  key={(qt as QueryTemplate).id}
+                  id={(qt as QueryTemplate).text}
+                  value={qt}
+                >
+                  {(qt as QueryTemplate).text}
+                </ActionDropdown.Item>
+              )
+            } else if (qt.type === DropdownChildTypes.Divider) {
+              return <ActionDropdown.Divider key={qt.id} id={qt.id} />
+            }
+          })}
+          onChange={this.handleChooseMetaQuery}
+          buttonSize={ComponentSize.ExtraSmall}
+          widthPixels={127}
+        />
         <button
           className="btn btn-xs btn-primary query-editor--submit"
           onClick={this.handleUpdate}

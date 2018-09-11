@@ -31,110 +31,156 @@ export const INITIAL_HEIGHTS: InitialHeights = {
   visualization: '33.334%',
 }
 
-const SEPARATOR: string = 'SEPARATOR'
-
 export interface QueryTemplate {
+  id: string
   text: string
   query: string
+  type: DropdownChildTypes
 }
 
-export interface Separator {
-  text: string
+export interface Divider {
+  id: string
+  type: DropdownChildTypes
 }
 
-type Template = QueryTemplate | Separator
+export enum DropdownChildTypes {
+  Item = 'item',
+  Divider = 'divider',
+}
+export type QueryTemplateOption = QueryTemplate | Divider
 
-export const QUERY_TEMPLATES: Template[] = [
+export const QUERY_TEMPLATES: QueryTemplateOption[] = [
   {
+    id: 'Show Databases',
     text: 'Show Databases',
     query: 'SHOW DATABASES',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Create Database',
     text: 'Create Database',
     query: 'CREATE DATABASE "db_name"',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Drop Database',
     text: 'Drop Database',
     query: 'DROP DATABASE "db_name"',
+    type: DropdownChildTypes.Item,
   },
   {
-    text: `${SEPARATOR}`,
+    id: `1`,
+    type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Measurements',
     text: 'Show Measurements',
     query: 'SHOW MEASUREMENTS ON "db_name"',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Show Tag Keys',
     text: 'Show Tag Keys',
     query: 'SHOW TAG KEYS ON "db_name" FROM "measurement_name"',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Show Tag Values',
     text: 'Show Tag Values',
     query:
       'SHOW TAG VALUES ON "db_name" FROM "measurement_name" WITH KEY = "tag_key"',
+    type: DropdownChildTypes.Item,
   },
   {
-    text: `${SEPARATOR}`,
+    id: `2`,
+    type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Retention Policies',
     text: 'Show Retention Policies',
     query: 'SHOW RETENTION POLICIES on "db_name"',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Create Retention Policy',
     text: 'Create Retention Policy',
     query:
       'CREATE RETENTION POLICY "rp_name" ON "db_name" DURATION 30d REPLICATION 1 DEFAULT',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Drop Retention Policy',
     text: 'Drop Retention Policy',
     query: 'DROP RETENTION POLICY "rp_name" ON "db_name"',
+    type: DropdownChildTypes.Item,
   },
   {
-    text: `${SEPARATOR}`,
+    id: `3`,
+    type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Continuous Queries',
     text: 'Show Continuous Queries',
     query: 'SHOW CONTINUOUS QUERIES',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Create Continuous Query',
     text: 'Create Continuous Query',
     query:
       'CREATE CONTINUOUS QUERY "cq_name" ON "db_name" BEGIN SELECT min("field") INTO "target_measurement" FROM "current_measurement" GROUP BY time(30m) END',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Drop Continuous Query',
     text: 'Drop Continuous Query',
     query: 'DROP CONTINUOUS QUERY "cq_name" ON "db_name"',
+    type: DropdownChildTypes.Item,
   },
   {
-    text: `${SEPARATOR}`,
+    id: `4`,
+    type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Users',
     text: 'Show Users',
     query: 'SHOW USERS',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Create User',
     text: 'Create User',
     query: 'CREATE USER "username" WITH PASSWORD \'password\'',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Create Admin User',
     text: 'Create Admin User',
     query:
       'CREATE USER "username" WITH PASSWORD \'password\' WITH ALL PRIVILEGES',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Drop User',
     text: 'Drop User',
     query: 'DROP USER "username"',
+    type: DropdownChildTypes.Item,
   },
   {
-    text: `${SEPARATOR}`,
+    id: `5`,
+    type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Stats',
     text: 'Show Stats',
     query: 'SHOW STATS',
+    type: DropdownChildTypes.Item,
   },
   {
+    id: 'Show Diagnostics',
     text: 'Show Diagnostics',
     query: 'SHOW DIAGNOSTICS',
+    type: DropdownChildTypes.Item,
   },
 ]
 
