@@ -64,12 +64,6 @@ export const getTimeSeries = async (
   let responseByteLength: number
   let responseUUID: string
   try {
-    // We are using the `fetch` API here since the `AJAX` utility lacks support
-    // for limiting response size. The `AJAX` utility depends on
-    // `axios.request` which _does_ have a `maxContentLength` option, though it
-    // seems to be broken at the moment. We might use this option instead of
-    // the `fetch` API in the future, if it is ever fixed.  See
-    // https://github.com/axios/axios/issues/1491.
     const {body, byteLength, uuid: id} = await manager.fetchFluxData(
       url,
       query,
