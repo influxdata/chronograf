@@ -38,7 +38,7 @@ interface Props {
   loading: RemoteDataState
   decimalPlaces: DecimalPlaces
   fluxData: FluxTable[]
-  data: TimeSeriesServerResponse[]
+  influxQLData: TimeSeriesServerResponse[]
   cellID: string
   cellHeight: number
   staticLegend: boolean
@@ -70,8 +70,8 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
   public async componentDidMount() {
     this.isComponentMounted = true
-    const {data, fluxData} = this.props
-    await this.parseTimeSeries(data, fluxData)
+    const {influxQLData, fluxData} = this.props
+    await this.parseTimeSeries(influxQLData, fluxData)
   }
 
   public componentWillUnmount() {
@@ -91,7 +91,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
   public componentWillReceiveProps(nextProps: LineGraphProps) {
     if (nextProps.loading === RemoteDataState.Done) {
-      this.parseTimeSeries(nextProps.data, nextProps.fluxData)
+      this.parseTimeSeries(nextProps.influxQLData, nextProps.fluxData)
     }
   }
 
@@ -101,7 +101,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
     }
 
     const {
-      data,
+      influxQLData,
       axes,
       type,
       colors,
@@ -159,7 +159,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
         >
           {type === CellType.LinePlusSingleStat && (
             <SingleStat
-              data={data}
+              data={influxQLData}
               lineGraph={true}
               colors={colors}
               prefix={this.prefix}

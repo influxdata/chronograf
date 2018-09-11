@@ -40,7 +40,7 @@ import MarkdownCell from 'src/shared/components/MarkdownCell'
 export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 
 interface RenderProps {
-  timeSeries: TimeSeriesServerResponse[]
+  timeSeriesInfluxQL: TimeSeriesServerResponse[]
   timeSeriesFlux: FluxTable[]
   loading: RemoteDataState
 }
@@ -67,7 +67,7 @@ interface State {
   timeRange: TimeRange
   loading: RemoteDataState
   isFirstFetch: boolean
-  timeSeries: TimeSeriesServerResponse[]
+  timeSeriesInfluxQL: TimeSeriesServerResponse[]
   timeSeriesFlux: FluxTable[]
 }
 
@@ -113,7 +113,7 @@ class TimeSeries extends Component<Props, State> {
     super(props)
     this.state = {
       timeRange: props.timeRange,
-      timeSeries: DEFAULT_TIME_SERIES,
+      timeSeriesInfluxQL: DEFAULT_TIME_SERIES,
       loading: RemoteDataState.NotStarted,
       isFirstFetch: true,
       timeSeriesFlux: [],
@@ -186,7 +186,7 @@ class TimeSeries extends Component<Props, State> {
     }
 
     if (!queries.length) {
-      return this.setState({timeSeries: DEFAULT_TIME_SERIES})
+      return this.setState({timeSeriesInfluxQL: DEFAULT_TIME_SERIES})
     }
 
     await this.setIsLoading()
@@ -194,7 +194,7 @@ class TimeSeries extends Component<Props, State> {
     try {
       this.latestUUID = uuid.v1()
 
-      let timeSeries: TimeSeriesServerResponse[] = []
+      let timeSeriesInfluxQL: TimeSeriesServerResponse[] = []
       let timeSeriesFlux: FluxTable[] = []
       if (this.isFluxSource) {
         const results = await this.executeFluxQuery(queries)
@@ -204,9 +204,12 @@ class TimeSeries extends Component<Props, State> {
           return
         }
       } else {
-        timeSeries = await Promise.all(queries.map(this.executeQuery))
+        timeSeriesInfluxQL = await Promise.all(queries.map(this.executeQuery))
 
-        if (getDeep(timeSeries, '0.response.uuid', null) !== this.latestUUID) {
+        if (
+          getDeep(timeSeriesInfluxQL, '0.response.uuid', null) !==
+          this.latestUUID
+        ) {
           return
         }
       }
@@ -216,14 +219,14 @@ class TimeSeries extends Component<Props, State> {
       }
 
       this.setState({
-        timeSeries,
+        timeSeriesInfluxQL,
         timeSeriesFlux,
         loading: RemoteDataState.Done,
         isFirstFetch: false,
       })
 
       if (grabDataForDownload) {
-        grabDataForDownload(timeSeries)
+        grabDataForDownload(timeSeriesInfluxQL)
       }
       if (grabFluxData) {
         grabFluxData(timeSeriesFlux)
@@ -234,7 +237,7 @@ class TimeSeries extends Component<Props, State> {
       }
 
       this.setState({
-        timeSeries: [],
+        timeSeriesInfluxQL: [],
         timeSeriesFlux: [],
         loading: RemoteDataState.Error,
       })
@@ -243,11 +246,16 @@ class TimeSeries extends Component<Props, State> {
 
   public render() {
     const {cellNoteVisibility, cellNote} = this.props
-    const {timeSeries, timeSeriesFlux, loading, isFirstFetch} = this.state
+    const {
+      timeSeriesInfluxQL,
+      timeSeriesFlux,
+      loading,
+      isFirstFetch,
+    } = this.state
 
     const hasValues =
       timeSeriesFlux.length ||
-      _.some(timeSeries, s => {
+      _.some(timeSeriesInfluxQL, s => {
         const results = _.get(s, 'response.results', [])
         const v = _.some(results, r => r.series)
         return v
@@ -272,7 +280,7 @@ class TimeSeries extends Component<Props, State> {
     return (
       <>
         {this.loadingDots}
-        {this.props.children({timeSeries, timeSeriesFlux, loading})}
+        {this.props.children({timeSeriesInfluxQL, timeSeriesFlux, loading})}
       </>
     )
   }
