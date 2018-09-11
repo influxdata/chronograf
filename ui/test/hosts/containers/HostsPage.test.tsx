@@ -6,7 +6,7 @@ import HostsTable from 'src/hosts/components/HostsTable'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
 import Title from 'src/reusable_ui/components/page_layout/PageHeaderTitle'
 
-import {source} from 'test/resources'
+import {source, authLinks} from 'test/resources'
 
 jest.mock('src/hosts/apis', () => require('mocks/hosts/apis'))
 jest.mock('src/shared/apis/env', () => require('mocks/shared/apis/env'))
@@ -16,12 +16,12 @@ import {getCpuAndLoadForHosts} from 'src/hosts/apis'
 const setup = (override = {}) => {
   const props = {
     source,
-    links: {environment: ''},
+    links: authLinks,
     autoRefresh: 0,
     manualRefresh: 0,
-    onChooseAutoRefresh: () => {},
-    onManualRefresh: () => {},
-    notify: () => {},
+    onChooseAutoRefresh: jest.fn(),
+    onManualRefresh: jest.fn(),
+    notify: jest.fn(),
     ...override,
   }
 

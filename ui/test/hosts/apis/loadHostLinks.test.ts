@@ -1,4 +1,4 @@
-import {loadHostsLinks} from 'src/hosts/apis'
+import {loadHostsLinksFromNames} from 'src/hosts/apis'
 import {source} from 'test/resources'
 
 import {HostNames} from 'src/types/hosts'
@@ -19,17 +19,15 @@ describe('hosts.apis.loadHostLinks', () => {
     },
   }
 
-  const hostNamesAJAX = async () => hostNames
-
-  const options = {
-    activeHost: {
-      name: 'korok.local',
-    },
-    getHostNamesAJAX: hostNamesAJAX,
+  const activeHost = {
+    name: 'korok.local',
   }
-
   it('can load the host links', async () => {
-    const hostLinks = await loadHostsLinks(socure, options)
+    const hostLinks = await loadHostsLinksFromNames(
+      socure,
+      activeHost,
+      hostNames
+    )
 
     const expectedLinks: DashboardSwitcherLinks = {
       active: {

@@ -4,7 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare'
 import {Link} from 'react-router'
 import classnames from 'classnames'
 
-import {HOSTS_TABLE} from 'src/hosts/constants/tableSizing'
+import {HOSTS_TABLE_SIZING} from 'src/hosts/constants/tableSizing'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 @ErrorHandling
@@ -20,7 +20,7 @@ class HostRow extends Component {
   render() {
     const {host, source} = this.props
     const {name, cpu, load, apps = []} = host
-    const {colName, colStatus, colCPU, colLoad} = HOSTS_TABLE
+    const {colName, colStatus, colCPU, colLoad} = HOSTS_TABLE_SIZING
 
     return (
       <div className="hosts-table--tr">
