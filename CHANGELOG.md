@@ -18,8 +18,8 @@
 1.  [4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
 1.  [#4389](https://github.com/influxdata/chronograf/pull/4389): Add regexp search for appname in log lines
 1.  [#4403](https://github.com/influxdata/chronograf/pull/4403): Add ability to toggle between Flux/InfluxQL on dynamic source in CEO
-
 1.  [#4404](https://github.com/influxdata/chronograf/pull/4404): Add loading status indicator to hosts page
+1.  [#4422](https://github.com/influxdata/chronograf/pull/4422): Allow deep linking flux script in data explorer
 
 ### UI Improvements
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application

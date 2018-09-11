@@ -81,6 +81,7 @@ import {
   TableOptions,
   NoteVisibility,
 } from 'src/types/dashboards'
+import {QueryUpdateState} from 'src/shared/actions/queries'
 
 interface Props {
   source: Source
@@ -148,55 +149,32 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {
-      source,
-      loadDE,
-      timeRange,
-      dashboards,
-      autoRefresh,
-      queryDrafts,
-      handleGetDashboards,
-    } = this.props
-    const {query} = qs.parse(location.search, {ignoreQueryPrefix: true})
+    const {loadDE, timeRange, autoRefresh, queryDrafts} = this.props
+    const {query, script} = this.queryString
 
     GlobalAutoRefresher.poll(autoRefresh)
 
-    if (query && query.length) {
+    if (script) {
+      loadDE([], timeRange)
+    } else if (_.isEmpty(query)) {
+      let drafts = []
       if (!_.isEmpty(queryDrafts)) {
-        const matchingQueryDraft = queryDrafts.find(q => q.query === query)
-        if (matchingQueryDraft) {
-          loadDE(queryDrafts, timeRange)
-        } else {
-          const queryConfig = await getConfig(
-            source.links.queries,
-            uuid.v4(),
-            query,
-            this.templates
-          )
-          const queryDraft = {query, queryConfig, source: source.links.self}
-          loadDE([queryDraft], timeRange)
-        }
-      } else {
-        const queryConfig = await getConfig(
-          source.links.queries,
-          uuid.v4(),
-          query,
-          this.templates
-        )
-        const queryDraft = {query, queryConfig, source: source.links.self}
-        loadDE([queryDraft], timeRange)
+        drafts = queryDrafts
       }
-    } else {
-      if (!_.isEmpty(queryDrafts)) {
+      loadDE(drafts, timeRange)
+    } else if (!_.isEmpty(queryDrafts)) {
+      const matchingQueryDraft = queryDrafts.find(q => q.query === query)
+
+      if (matchingQueryDraft) {
         loadDE(queryDrafts, timeRange)
       } else {
-        loadDE([], timeRange)
+        await this.createNewQueryDraft()
       }
+    } else {
+      await this.createNewQueryDraft()
     }
 
-    if (!dashboards.length) {
-      await handleGetDashboards()
-    }
+    await this.getDashboards()
 
     this.fetchFluxServices()
   }
@@ -206,19 +184,8 @@ export class DataExplorer extends PureComponent<Props, State> {
     if (autoRefresh !== prevProps.autoRefresh) {
       GlobalAutoRefresher.poll(autoRefresh)
     }
-  }
 
-  public componentWillReceiveProps(nextProps: Props) {
-    const {router} = this.props
-    const {queryDrafts} = nextProps
-
-    const query = _.get(queryDrafts, '0.query', '')
-    const qsCurrent = qs.parse(location.search, {ignoreQueryPrefix: true})
-    if (query && query.length && qsCurrent.query !== query) {
-      const qsNew = qs.stringify({query})
-      const pathname = stripPrefix(location.pathname)
-      router.push(`${pathname}?${qsNew}`)
-    }
+    this.updateQueryStringQuery()
   }
 
   public componentWillUnmount() {
@@ -239,22 +206,11 @@ export class DataExplorer extends PureComponent<Props, State> {
       addQuery,
       deleteQuery,
       queryStatus,
-      script,
-      updateScript,
       fluxLinks,
       notify,
       updateSourceLink,
-      sourceLink,
     } = this.props
     const {isStaticLegend} = this.state
-
-    let service: Service = null
-
-    if (sourceLink.indexOf('services') !== -1) {
-      service = services.find(s => {
-        return s.links.self === sourceLink
-      })
-    }
 
     return (
       <>
@@ -262,7 +218,7 @@ export class DataExplorer extends PureComponent<Props, State> {
         {this.sendToDashboardOverlay}
         <div className="deceo--page">
           <TimeMachine
-            service={service}
+            service={this.service}
             updateSourceLink={updateSourceLink}
             queryDrafts={queryDrafts}
             editQueryStatus={editQueryStatus}
@@ -282,8 +238,8 @@ export class DataExplorer extends PureComponent<Props, State> {
             updateEditorTimeRange={this.handleChooseTimeRange}
             manualRefresh={manualRefresh}
             queryStatus={queryStatus}
-            script={script}
-            updateScript={updateScript}
+            script={this.activeScript}
+            updateScript={this.handleUpdateScript}
             fluxLinks={fluxLinks}
             notify={notify}
             visualizationOptions={this.visualizationOptions}
@@ -302,6 +258,57 @@ export class DataExplorer extends PureComponent<Props, State> {
         </div>
       </>
     )
+  }
+
+  private get shouldUpdateQueryString(): boolean {
+    const {queryDrafts} = this.props
+    const query = _.get(queryDrafts, '0.query', '')
+    const {query: existing} = this.queryString
+    const isFlux = !!this.service
+
+    return !_.isEmpty(query) && query !== existing && !isFlux
+  }
+
+  private handleUpdateScript = (
+    script: string,
+    stateToUpdate: QueryUpdateState
+  ) => {
+    const {router} = this.props
+    const pathname = stripPrefix(location.pathname)
+    const qsNew = qs.stringify({script})
+
+    router.push(`${pathname}?${qsNew}`)
+    this.props.updateScript(script, stateToUpdate)
+  }
+
+  private updateQueryStringQuery() {
+    if (!this.shouldUpdateQueryString) {
+      return
+    }
+
+    const {queryDrafts, router} = this.props
+    const query = _.get(queryDrafts, '0.query', '')
+    const qsNew = qs.stringify({query})
+    const pathname = stripPrefix(location.pathname)
+
+    router.push(`${pathname}?${qsNew}`)
+  }
+
+  private get queryString(): {query?: string; script?: string} {
+    return qs.parse(location.search, {ignoreQueryPrefix: true})
+  }
+
+  private get service(): Service {
+    const {services, sourceLink} = this.props
+    let service: Service = null
+
+    if (sourceLink.includes('services')) {
+      service = services.find(s => {
+        return s.links.self === sourceLink
+      })
+    }
+
+    return service
   }
 
   private get writeDataForm(): JSX.Element {
@@ -476,6 +483,37 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   private handleResetFocus = () => {
     return
+  }
+
+  private async createNewQueryDraft() {
+    const {source, loadDE, timeRange} = this.props
+
+    const {query} = this.queryString
+    const queryConfig = await getConfig(
+      source.links.queries,
+      uuid.v4(),
+      query,
+      this.templates
+    )
+    const queryDraft = {query, queryConfig, source: source.links.self}
+    loadDE([queryDraft], timeRange)
+  }
+
+  private async getDashboards() {
+    const {dashboards, handleGetDashboards} = this.props
+
+    if (!_.isEmpty(dashboards)) {
+      await handleGetDashboards()
+    }
+  }
+
+  private get activeScript(): string {
+    const {script} = this.queryString
+    if (script) {
+      return script
+    }
+
+    return this.props.script
   }
 }
 
