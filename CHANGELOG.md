@@ -30,6 +30,7 @@
 1.  [#4392](https://github.com/influxdata/chronograf/pull/4392): Add log filters on left side
 
 1.  [#2265](https://github.com/influxdata/chronograf/pull/2265): Autofocus dashboard query editor
+1.  [#4423](https://github.com/influxdata/chronograf/pull/4423): Fix query editor flickering on update
 
 ### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
