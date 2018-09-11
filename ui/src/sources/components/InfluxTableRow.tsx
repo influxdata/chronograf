@@ -27,6 +27,14 @@ interface Props {
 }
 
 class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
+  private connectionLink: React.RefObject<ConnectionLink> = React.createRef()
+
+  public componentDidUpdate() {
+    if (this.connectionLink.current) {
+      this.connectionLink.current.forceUpdate()
+    }
+  }
+
   public render() {
     const {
       source,
@@ -44,6 +52,7 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
         <td>{this.connectButton}</td>
         <td>
           <ConnectionLink
+            ref={this.connectionLink}
             source={source}
             currentSource={currentSource}
             toggleWizard={toggleWizard}
