@@ -79,14 +79,20 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   }
 
   public async parseTimeSeries(data, fluxData) {
-    const timeSeries = await this.convertToDygraphData(data, fluxData)
+    try {
+      const timeSeries = await this.convertToDygraphData(data, fluxData)
 
-    this.isValidData = await manager.validateDygraphData(timeSeries.timeSeries)
-    if (!this.isComponentMounted) {
-      return
+      this.isValidData = await manager.validateDygraphData(
+        timeSeries.timeSeries
+      )
+      if (!this.isComponentMounted) {
+        return
+      }
+
+      this.setState({timeSeries})
+    } catch (err) {
+      this.isValidData = false
     }
-
-    this.setState({timeSeries})
   }
 
   public componentWillReceiveProps(nextProps: LineGraphProps) {
