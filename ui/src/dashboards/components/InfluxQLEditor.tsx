@@ -56,16 +56,12 @@ const TEMPLATE_VAR = /[:]\w+[:]/g
 @ErrorHandling
 class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    const {isSubmitted, isShowingTemplateValues, editedQueryText} = prevState
-
-    // stale prop values after recent submission cause flickering
-    const isRecentlySubmitted = !isSubmitted || prevState.isSubmitted
-    const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
-    const isQueryUpdated = !isRecentlySubmitted && isQueryTextChanged
+    const {isSubmitted, editedQueryText} = prevState
 
     const isQueryConfigChanged = nextProps.config.id !== prevState.configID
+    const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
 
-    if ((isQueryUpdated && !isShowingTemplateValues) || isQueryConfigChanged) {
+    if ((isSubmitted && isQueryTextChanged) || isQueryConfigChanged) {
       return {
         ...BLURRED_EDITOR_STATE,
         selectedTemplate: {
@@ -270,15 +266,20 @@ class InfluxQLEditor extends Component<Props, State> {
     const {onUpdate} = this.props
 
     if (!this.isDisabled && !this.state.isSubmitted) {
+      const {editedQueryText} = this.state
       this.cancelPendingUpdates()
-      const update = onUpdate(this.state.editedQueryText)
+      const update = onUpdate(editedQueryText)
       const cancelableUpdate = makeCancelable(update)
 
       this.pendingUpdates = [...this.pendingUpdates, cancelableUpdate]
 
       try {
-        await cancelableUpdate
-        this.setState({isSubmitted: true})
+        await cancelableUpdate.promise
+
+        // prevent changing submitted status when edited while awaiting update
+        if (this.state.editedQueryText === editedQueryText) {
+          this.setState({isSubmitted: true})
+        }
       } catch (error) {
         if (!error.isCanceled) {
           console.error(error)
