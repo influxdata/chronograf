@@ -16,6 +16,7 @@ export enum SearchStatus {
   NoResults = 'NoResults',
   UpdatingTimeBounds = 'UpdatingTimeBounds',
   UpdatingFilters = 'UpdatingFilters',
+  UpdatingSource = 'UpdatingSource',
   Loaded = 'Loaded',
   Clearing = 'Clearing',
   Cleared = 'Cleared',

@@ -461,6 +461,18 @@ class LogsPage extends Component<Props, State> {
     }
   }
 
+  private cancelChunks() {
+    if (this.currentNewerChunksGenerator) {
+      this.currentNewerChunksGenerator.cancel()
+      this.currentNewerChunksGenerator = null
+    }
+
+    if (this.currentOlderChunksGenerator) {
+      this.currentOlderChunksGenerator.cancel()
+      this.currentOlderChunksGenerator = null
+    }
+  }
+
   private get tableScrollToRow() {
     if (this.isLiveUpdating === true) {
       return 0
@@ -836,16 +848,18 @@ class LogsPage extends Component<Props, State> {
     this.handleSetTimeBounds()
   }
 
-  private handleChooseSource = (sourceID: string) => {
-    this.props.getSourceAndPopulateNamespaces(sourceID)
+  private handleChooseSource = async (sourceID: string) => {
+    await this.props.getSourceAndPopulateNamespaces(sourceID)
+    this.updateTableData(SearchStatus.UpdatingSource)
   }
 
   private handleChooseNamespace = (namespace: Namespace) => {
     this.props.setNamespaceAsync(namespace)
   }
 
-  private updateTableData(searchStatus) {
+  private updateTableData(searchStatus: SearchStatus) {
     this.clearTailInterval()
+    this.cancelChunks()
     this.props.clearSearchData(searchStatus)
   }
 
