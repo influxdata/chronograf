@@ -20,10 +20,15 @@ import {
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+export enum DropdownMode {
+  ActionList = 'action',
+  Radio = 'radio',
+}
+
 interface Props {
   children: JSX.Element[]
   onChange: (value: any) => void
-  selectedID: string
+  selectedID?: string
   buttonColor?: ComponentColor
   buttonSize?: ComponentSize
   menuColor?: DropdownMenuColors
@@ -33,6 +38,8 @@ interface Props {
   wrapText?: boolean
   customClass?: string
   maxMenuHeight?: number
+  mode?: DropdownMode
+  titleText?: string
 }
 
 interface State {
@@ -48,6 +55,9 @@ class Dropdown extends Component<Props, State> {
     wrapText: false,
     maxMenuHeight: 250,
     menuColor: DropdownMenuColors.Sapphire,
+    mode: DropdownMode.Radio,
+    titleText: '',
+    selectedID: '',
   }
 
   public static Button = DropdownButton
@@ -67,6 +77,7 @@ class Dropdown extends Component<Props, State> {
     const width = widthPixels ? `${widthPixels}px` : '100%'
 
     this.validateChildCount()
+    this.validateMode()
 
     return (
       <ClickOutside onClickOutside={this.collapseMenu}>
@@ -107,10 +118,13 @@ class Dropdown extends Component<Props, State> {
       buttonSize,
       icon,
       children,
+      titleText,
     } = this.props
     const {expanded} = this.state
 
     const selectedChild = children.find(child => child.props.id === selectedID)
+    const dropdownLabel =
+      (selectedChild && selectedChild.props.children) || titleText
 
     return (
       <DropdownButton
@@ -120,8 +134,9 @@ class Dropdown extends Component<Props, State> {
         icon={icon}
         onClick={this.toggleMenu}
         status={status}
+        title={titleText}
       >
-        {selectedChild.props.children}
+        {dropdownLabel}
       </DropdownButton>
     )
   }
@@ -208,6 +223,18 @@ class Dropdown extends Component<Props, State> {
       throw new Error(
         'Dropdowns require at least 1 child element. We recommend using Dropdown.Item and/or Dropdown.Divider.'
       )
+    }
+  }
+
+  private validateMode = (): void => {
+    const {mode, selectedID, titleText} = this.props
+
+    if (mode === DropdownMode.ActionList && titleText === '') {
+      throw new Error('Dropdowns in ActionList mode require a titleText prop.')
+    }
+
+    if (mode === DropdownMode.Radio && selectedID === '') {
+      throw new Error('Dropdowns in Radio mode require a selectedID prop.')
     }
   }
 
