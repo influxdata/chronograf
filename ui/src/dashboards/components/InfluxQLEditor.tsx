@@ -16,15 +16,14 @@ import {makeCancelable} from 'src/utils/promises'
 
 // Constants
 import {MATCH_INCOMPLETE_TEMPLATES, applyMasks} from 'src/tempVars/constants'
-import {QUERY_TEMPLATES} from 'src/data_explorer/constants'
+import {METAQUERY_TEMPLATE_OPTIONS} from 'src/data_explorer/constants'
 
 // Types
 import {Template, QueryConfig} from 'src/types'
 import {WrappedCancelablePromise} from 'src/types/promises'
 import {ComponentSize} from 'src/reusable_ui/types'
 import {
-  QueryTemplateOption,
-  QueryTemplate,
+  MetaQueryTemplateOption,
   DropdownChildTypes,
 } from 'src/data_explorer/constants'
 
@@ -357,8 +356,8 @@ class InfluxQLEditor extends Component<Props, State> {
     })
   }
 
-  private handleChooseMetaQuery = (template: QueryTemplate): void => {
-    this.handleChange(template.query)
+  private handleChooseMetaQuery = (mqto: MetaQueryTemplateOption): void => {
+    this.handleChange(mqto.query)
   }
 
   private closeDrawer = () => {
@@ -416,19 +415,19 @@ class InfluxQLEditor extends Component<Props, State> {
         </button>
         <ActionDropdown
           actionText={'Query Template'}
-          children={QUERY_TEMPLATES.map(qt => {
-            if (qt.type === DropdownChildTypes.Item) {
+          children={METAQUERY_TEMPLATE_OPTIONS.map(mqto => {
+            if (mqto.type === DropdownChildTypes.Item) {
               return (
                 <ActionDropdown.Item
-                  key={(qt as QueryTemplate).id}
-                  id={(qt as QueryTemplate).text}
-                  value={qt}
+                  key={(mqto as MetaQueryTemplateOption).id}
+                  id={(mqto as MetaQueryTemplateOption).text}
+                  value={mqto}
                 >
-                  {(qt as QueryTemplate).text}
+                  {(mqto as MetaQueryTemplateOption).text}
                 </ActionDropdown.Item>
               )
-            } else if (qt.type === DropdownChildTypes.Divider) {
-              return <ActionDropdown.Divider key={qt.id} id={qt.id} />
+            } else if (mqto.type === DropdownChildTypes.Divider) {
+              return <ActionDropdown.Divider key={mqto.id} id={mqto.id} />
             }
           })}
           onChange={this.handleChooseMetaQuery}

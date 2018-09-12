@@ -31,7 +31,34 @@ export const INITIAL_HEIGHTS: InitialHeights = {
   visualization: '33.334%',
 }
 
-export interface QueryTemplate {
+const knownMetaQueries = {
+  showDatabases: 'SHOW DATABASES',
+  createDatabase: 'CREATE DATABASE "db_name"',
+  dropDatabase: 'DROP DATABASE "db_name"',
+  showMeasurements: 'SHOW MEASUREMENTS ON "db_name"',
+  showTagKeys: 'SHOW TAG KEYS ON "db_name" FROM "measurement_name"',
+  showTagValues:
+    'SHOW TAG VALUES ON "db_name" FROM "measurement_name" WITH KEY = "tag_key"',
+  showRetentionPolicies: 'SHOW RETENTION POLICIES on "db_name"',
+  createRetentionPolicy:
+    'CREATE RETENTION POLICY "rp_name" ON "db_name" DURATION 30d REPLICATION 1 DEFAULT',
+  dropRetentionPolicy: 'DROP RETENTION POLICY "rp_name" ON "db_name"',
+  showContinuousQueries: 'SHOW CONTINUOUS QUERIES',
+  createContinuousQuery:
+    'CREATE CONTINUOUS QUERY "cq_name" ON "db_name" BEGIN SELECT min("field") INTO "target_measurement" FROM "current_measurement" GROUP BY time(30m) END',
+  dropContinuousQuery: 'DROP CONTINUOUS QUERY "cq_name" ON "db_name"',
+  showUsers: 'SHOW USERS',
+  createUser: 'CREATE USER "username" WITH PASSWORD \'password\'',
+  createUserWithAllPrivileges:
+    'CREATE USER "username" WITH PASSWORD \'password\' WITH ALL PRIVILEGES',
+  dropUser: 'DROP USER "username"',
+  showStats: 'SHOW STATS',
+  showDiagnostics: 'SHOW DIAGNOSTICS',
+}
+
+export const knownMetaQueriesAsArray = Object.values(knownMetaQueries)
+
+export interface MetaQueryTemplateOption {
   id: string
   text: string
   query: string
@@ -47,25 +74,26 @@ export enum DropdownChildTypes {
   Item = 'item',
   Divider = 'divider',
 }
-export type QueryTemplateOption = QueryTemplate | Divider
 
-export const QUERY_TEMPLATES: QueryTemplateOption[] = [
+export const METAQUERY_TEMPLATE_OPTIONS: Array<
+  MetaQueryTemplateOption | Divider
+> = [
   {
     id: 'Show Databases',
     text: 'Show Databases',
-    query: 'SHOW DATABASES',
+    query: knownMetaQueries.showDatabases,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Database',
     text: 'Create Database',
-    query: 'CREATE DATABASE "db_name"',
+    query: knownMetaQueries.createDatabase,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop Database',
     text: 'Drop Database',
-    query: 'DROP DATABASE "db_name"',
+    query: knownMetaQueries.dropDatabase,
     type: DropdownChildTypes.Item,
   },
   {
@@ -75,20 +103,19 @@ export const QUERY_TEMPLATES: QueryTemplateOption[] = [
   {
     id: 'Show Measurements',
     text: 'Show Measurements',
-    query: 'SHOW MEASUREMENTS ON "db_name"',
+    query: knownMetaQueries.showMeasurements,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Tag Keys',
     text: 'Show Tag Keys',
-    query: 'SHOW TAG KEYS ON "db_name" FROM "measurement_name"',
+    query: knownMetaQueries.showTagKeys,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Tag Values',
     text: 'Show Tag Values',
-    query:
-      'SHOW TAG VALUES ON "db_name" FROM "measurement_name" WITH KEY = "tag_key"',
+    query: knownMetaQueries.showTagValues,
     type: DropdownChildTypes.Item,
   },
   {
@@ -98,20 +125,19 @@ export const QUERY_TEMPLATES: QueryTemplateOption[] = [
   {
     id: 'Show Retention Policies',
     text: 'Show Retention Policies',
-    query: 'SHOW RETENTION POLICIES on "db_name"',
+    query: knownMetaQueries.showRetentionPolicies,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Retention Policy',
     text: 'Create Retention Policy',
-    query:
-      'CREATE RETENTION POLICY "rp_name" ON "db_name" DURATION 30d REPLICATION 1 DEFAULT',
+    query: knownMetaQueries.createRetentionPolicy,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop Retention Policy',
     text: 'Drop Retention Policy',
-    query: 'DROP RETENTION POLICY "rp_name" ON "db_name"',
+    query: knownMetaQueries.dropRetentionPolicy,
     type: DropdownChildTypes.Item,
   },
   {
@@ -121,20 +147,19 @@ export const QUERY_TEMPLATES: QueryTemplateOption[] = [
   {
     id: 'Show Continuous Queries',
     text: 'Show Continuous Queries',
-    query: 'SHOW CONTINUOUS QUERIES',
+    query: knownMetaQueries.showContinuousQueries,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Continuous Query',
     text: 'Create Continuous Query',
-    query:
-      'CREATE CONTINUOUS QUERY "cq_name" ON "db_name" BEGIN SELECT min("field") INTO "target_measurement" FROM "current_measurement" GROUP BY time(30m) END',
+    query: knownMetaQueries.createContinuousQuery,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop Continuous Query',
     text: 'Drop Continuous Query',
-    query: 'DROP CONTINUOUS QUERY "cq_name" ON "db_name"',
+    query: knownMetaQueries.dropContinuousQuery,
     type: DropdownChildTypes.Item,
   },
   {
@@ -144,26 +169,25 @@ export const QUERY_TEMPLATES: QueryTemplateOption[] = [
   {
     id: 'Show Users',
     text: 'Show Users',
-    query: 'SHOW USERS',
+    query: knownMetaQueries.showUsers,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create User',
     text: 'Create User',
-    query: 'CREATE USER "username" WITH PASSWORD \'password\'',
+    query: knownMetaQueries.createUser,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Admin User',
     text: 'Create Admin User',
-    query:
-      'CREATE USER "username" WITH PASSWORD \'password\' WITH ALL PRIVILEGES',
+    query: knownMetaQueries.createUserWithAllPrivileges,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop User',
     text: 'Drop User',
-    query: 'DROP USER "username"',
+    query: knownMetaQueries.dropUser,
     type: DropdownChildTypes.Item,
   },
   {
@@ -173,13 +197,13 @@ export const QUERY_TEMPLATES: QueryTemplateOption[] = [
   {
     id: 'Show Stats',
     text: 'Show Stats',
-    query: 'SHOW STATS',
+    query: knownMetaQueries.showStats,
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Diagnostics',
     text: 'Show Diagnostics',
-    query: 'SHOW DIAGNOSTICS',
+    query: knownMetaQueries.showDiagnostics,
     type: DropdownChildTypes.Item,
   },
 ]
