@@ -1,7 +1,7 @@
 // Import Components
 import Button from './components/Button'
 import ActionDropdown from './components/dropdowns/ActionDropdown'
-import Dropdown from './components/dropdowns/Dropdown'
+import Dropdown, {DropdownMode} from './components/dropdowns/Dropdown'
 import MultiSelectDropdown from './components/dropdowns/MultiSelectDropdown'
 import Form from './components/form_layout/Form'
 import Input, {InputType} from './components/inputs/Input'
@@ -32,6 +32,7 @@ export {
   ActionDropdown,
   Button,
   Dropdown,
+  DropdownMode,
   MultiSelectDropdown,
   Form,
   Input,
