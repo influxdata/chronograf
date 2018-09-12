@@ -10,7 +10,6 @@ import ExpandableMessage from 'src/logs/components/expandable_message/Expandable
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
 import LoadingStatus from 'src/logs/components/loading_status/LoadingStatus'
 import {getDeep} from 'src/utils/wrappers'
-import QueryResults from 'src/logs/components/QueryResults'
 
 import {colorForSeverity} from 'src/logs/utils/colors'
 import {
@@ -63,7 +62,6 @@ interface Props {
   hasScrolled: boolean
   count: number
   timeRange: TimeRange
-  queryCount: number
   tableColumns: LogsTableColumn[]
   severityFormat: SeverityFormat
   severityLevelColors: SeverityLevelColor[]
@@ -208,8 +206,6 @@ class LogsTable extends Component<Props, State> {
   }
 
   public render() {
-    const {queryCount, upper, lower, searchStatus} = this.props
-    const {infiniteLoaderQueryCount} = this.state
     const columnCount = Math.max(getColumnsFromData(this.props.data).length, 0)
 
     if (this.isLoadingTableData) {
@@ -221,15 +217,6 @@ class LogsTable extends Component<Props, State> {
         className="logs-viewer--table-container"
         onMouseOut={this.handleMouseOut}
       >
-        <div className="logs-viewer--table-count">
-          <QueryResults
-            count={this.rowCount()}
-            queryCount={infiniteLoaderQueryCount + queryCount}
-            searchStatus={searchStatus}
-            upper={upper}
-            lower={lower}
-          />
-        </div>
         <AutoSizer>
           {({width}) => (
             <Grid

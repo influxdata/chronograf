@@ -222,7 +222,6 @@ class LogsPage extends Component<Props, State> {
   public render() {
     const {
       filters,
-      queryCount,
       timeRange,
       notify,
       nextOlderUpperBound,
@@ -259,7 +258,6 @@ class LogsPage extends Component<Props, State> {
             />
             <LogsTable
               count={this.histogramTotal}
-              queryCount={queryCount}
               data={this.tableData}
               onScrollVertical={this.handleVerticalScroll}
               onScrolledToTop={this.handleScrollToTop}
