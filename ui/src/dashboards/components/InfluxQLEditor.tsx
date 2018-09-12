@@ -414,7 +414,7 @@ class InfluxQLEditor extends Component<Props, State> {
           Show Template Values
         </button>
         <ActionDropdown
-          actionText={'Query Template'}
+          actionText={'Metaquery Templates'}
           children={METAQUERY_TEMPLATE_OPTIONS.map(mqto => {
             if (mqto.type === DropdownChildTypes.Item) {
               return (
@@ -432,7 +432,7 @@ class InfluxQLEditor extends Component<Props, State> {
           })}
           onChange={this.handleChooseMetaQuery}
           buttonSize={ComponentSize.ExtraSmall}
-          widthPixels={127}
+          widthPixels={154}
         />
         <button
           className="btn btn-xs btn-primary query-editor--submit"
