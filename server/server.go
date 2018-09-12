@@ -59,7 +59,7 @@ type Server struct {
 	Develop         bool          `short:"d" long:"develop" description:"Run server in develop mode."`
 	BoltPath        string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
 	CannedPath      string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
-	ProtoboardsPath string        `long:"protoboards-path" description:"Path to directory of protoboards (/usr/share/chronograf/protoboards) "env:"PROTOBOARDS_PATH" default:"protoboards"`
+	ProtoboardsPath string        `long:"protoboards-path" description:"Path to directory of protoboards (/usr/share/chronograf/protoboards)" env:"PROTOBOARDS_PATH" default:"protoboards"`
 	ResourcesPath   string        `long:"resources-path" description:"Path to directory of pre-canned dashboards, sources, kapacitors, and organizations (/usr/share/chronograf/resources)" env:"RESOURCES_PATH" default:"canned"`
 	TokenSecret     string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
 	JwksURL         string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
