@@ -9,8 +9,8 @@
     "url": "github:influxdata/chronograf"
   },
   "scripts": {
-    "start": "node parcel.js",
-    "build": "parcel build -d build --no-source-maps --public-url '' src/index.html",
+    "start": "GIT_SHA=$(git rev-parse HEAD) node parcel.js",
+    "build": "GIT_SHA=$(git rev-parse HEAD) parcel build -d build --no-source-maps --public-url '' src/index.html",
     "clean": "rm -rf ./build/* && rm -rf ./.cache",
     "test": "jest",
     "test:watch": "jest --watch",
