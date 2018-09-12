@@ -79,8 +79,14 @@
     max-width: $query-editor--templates-menu-width;
   }
 }
-button.btn.query-editor--submit {
-  margin-right: 4px;
+
+.query-editor--status-actions {
+  display: flex;
+  align-items: center;
+
+  > * {
+    margin-right: 4px;
+  }
 }
 
 /*

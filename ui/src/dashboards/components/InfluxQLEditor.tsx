@@ -8,7 +8,8 @@ import ReactCodeMirror from 'src/dashboards/components/ReactCodeMirror'
 import TemplateDrawer from 'src/shared/components/TemplateDrawer'
 import QueryStatus from 'src/shared/components/QueryStatus'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {ActionDropdown} from 'src/reusable_ui'
+import {ActionDropdown, ComponentStatus} from 'src/reusable_ui'
+import {Button, ComponentColor, ComponentSize} from 'src/reusable_ui'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -21,7 +22,6 @@ import {METAQUERY_TEMPLATE_OPTIONS} from 'src/data_explorer/constants'
 // Types
 import {Template, QueryConfig} from 'src/types'
 import {WrappedCancelablePromise} from 'src/types/promises'
-import {ComponentSize} from 'src/reusable_ui/types'
 import {
   MetaQueryTemplateOption,
   DropdownChildTypes,
@@ -404,15 +404,16 @@ class InfluxQLEditor extends Component<Props, State> {
     }
 
     return (
-      <>
-        <button
+      <div className="query-editor--status-actions">
+        <Button
+          size={ComponentSize.ExtraSmall}
           onClick={this.handleShowTemplateValues}
-          className="btn btn-xs btn-info query-editor--submit"
-          disabled={isTemplating || queryHasNoTempVars}
-          title={tempVarButtonTitle}
-        >
-          Show Template Values
-        </button>
+          text="Show Template Values"
+          titleText={tempVarButtonTitle}
+          status={
+            (isTemplating || queryHasNoTempVars) && ComponentStatus.Disabled
+          }
+        />
         <ActionDropdown
           actionText={'Metaquery Templates'}
           children={METAQUERY_TEMPLATE_OPTIONS.map(mqto => {
@@ -432,16 +433,16 @@ class InfluxQLEditor extends Component<Props, State> {
           })}
           onChange={this.handleChooseMetaQuery}
           buttonSize={ComponentSize.ExtraSmall}
-          widthPixels={154}
+          widthPixels={163}
         />
-        <button
-          className="btn btn-xs btn-primary query-editor--submit"
+        <Button
+          size={ComponentSize.ExtraSmall}
+          color={ComponentColor.Primary}
+          status={this.isDisabled && ComponentStatus.Disabled}
           onClick={this.handleUpdate}
-          disabled={this.isDisabled}
-        >
-          Submit Query
-        </button>
-      </>
+          text="Submit Query"
+        />
+      </div>
     )
   }
 }
