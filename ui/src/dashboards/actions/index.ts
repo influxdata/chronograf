@@ -512,7 +512,7 @@ export const deleteDashboardAsync = (dashboard: Dashboard) => async (
 
 export const addDashboardCellAsync = (
   dashboard: Dashboard,
-  cell: NewDefaultCell
+  cell: Partial<Cell>
 ) => async (dispatch: Dispatch<Action>): Promise<void> => {
   try {
     const {data} = await addDashboardCellAJAX(dashboard, cell)

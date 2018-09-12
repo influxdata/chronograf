@@ -1,4 +1,10 @@
-import {ThresholdColor, GaugeColor, LineColor} from 'src/types/colors'
+import {
+  ThresholdColor,
+  GaugeColor,
+  LineColor,
+  ColorNumber,
+  ColorString,
+} from 'src/types/colors'
 import {TimeRange, CellQuery, QueryStatus, CellType, Axes} from 'src/types'
 import {
   DecimalPlaces,
@@ -32,4 +38,19 @@ export interface DEState {
   fieldOptions: FieldOption[]
   note: string
   noteVisibility: NoteVisibility
+}
+
+export interface VisualizationOptions {
+  type: CellType
+  axes: Axes | null
+  tableOptions: TableOptions
+  fieldOptions: FieldOption[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  note: string
+  noteVisibility: NoteVisibility
+  thresholdsListColors: ColorNumber[]
+  thresholdsListType: ThresholdType
+  gaugeColors: ColorNumber[]
+  lineColors: ColorString[]
 }

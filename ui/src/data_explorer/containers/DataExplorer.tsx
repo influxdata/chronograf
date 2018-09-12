@@ -23,9 +23,7 @@ import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechno
 import ManualRefresh from 'src/shared/components/ManualRefresh'
 import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboardOverlay'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
-import TimeMachine, {
-  VisualizationOptions,
-} from 'src/shared/components/TimeMachine/TimeMachine'
+import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
 import DEHeader from 'src/data_explorer/components/DEHeader'
 
 // Actions
@@ -45,6 +43,7 @@ import {
   addQueryAsync,
   deleteQueryAsync,
   updateEditorTimeRange,
+  QueryUpdateState,
 } from 'src/shared/actions/queries'
 import {fetchAllFluxServicesAsync} from 'src/shared/actions/services'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -81,7 +80,7 @@ import {
   TableOptions,
   NoteVisibility,
 } from 'src/types/dashboards'
-import {QueryUpdateState} from 'src/shared/actions/queries'
+import {VisualizationOptions} from 'src/types/dataExplorer'
 
 interface Props {
   source: Source
@@ -331,7 +330,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   private get sendToDashboardOverlay(): JSX.Element {
     const {source, dashboards, addDashboardCell, script} = this.props
 
-    const {isSendToDashboardVisible} = this.state
+    const {isSendToDashboardVisible, isStaticLegend} = this.state
     return (
       <Authorized requiredRole={EDITOR_ROLE}>
         <OverlayTechnology visible={isSendToDashboardVisible}>
@@ -344,6 +343,8 @@ export class DataExplorer extends PureComponent<Props, State> {
             rawText={this.rawText}
             dashboards={dashboards}
             addDashboardCell={addDashboardCell}
+            visualizationOptions={this.visualizationOptions}
+            isStaticLegend={isStaticLegend}
           />
         </OverlayTechnology>
       </Authorized>

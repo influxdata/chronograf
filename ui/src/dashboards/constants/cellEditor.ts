@@ -1,6 +1,6 @@
 import {DEFAULT_TABLE_OPTIONS} from 'src/dashboards/constants'
 import {stringifyColorValues} from 'src/shared/constants/colorOperations'
-import {CellType, Axis, Axes} from 'src/types/dashboards'
+import {CellType, Axis, Axes, Legend} from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
 export const initializeOptions = (cellType: CellType) => {
@@ -75,4 +75,9 @@ export const getCellTypeColors = ({
   }
 
   return colors
+}
+
+export const STATIC_LEGEND: Legend = {
+  type: 'static',
+  orientation: 'bottom',
 }

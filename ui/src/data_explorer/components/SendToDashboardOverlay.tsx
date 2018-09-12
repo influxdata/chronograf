@@ -3,6 +3,7 @@ import React, {PureComponent} from 'react'
 
 // Utils
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
+import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
 // Components
 import {
@@ -18,11 +19,16 @@ import {
 } from 'src/reusable_ui'
 
 // Constants
+import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
+
+// Actions
 import {addDashboardCellAsync} from 'src/dashboards/actions'
 
 // Types
-import {QueryConfig, Dashboard, Source, Service} from 'src/types'
+import {QueryConfig, Dashboard, Source, Service, Cell} from 'src/types'
 import {getDeep} from 'src/utils/wrappers'
+import {VisualizationOptions} from 'src/types/dataExplorer'
+import {ColorString} from 'src/types/colors'
 
 interface Props {
   queryConfig: QueryConfig
@@ -33,6 +39,8 @@ interface Props {
   service: Service
   onCancel: () => void
   addDashboardCell: typeof addDashboardCellAsync
+  visualizationOptions: VisualizationOptions
+  isStaticLegend: boolean
 }
 
 interface State {
@@ -160,6 +168,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private sendToDashboard = async () => {
+    const {name} = this.state
     const {
       queryConfig,
       script,
@@ -168,8 +177,20 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       source,
       onCancel,
       service,
+      visualizationOptions,
+      isStaticLegend,
     } = this.props
-    const {name} = this.state
+    const {
+      type,
+      gaugeColors,
+      thresholdsListColors,
+      lineColors,
+      axes,
+      decimalPlaces,
+      timeFormat,
+      note,
+      noteVisibility,
+    } = visualizationOptions
 
     const newCellQueries = this.isFlux
       ? [
@@ -181,13 +202,30 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
         ]
       : [{queryConfig, query: rawText, source: source.links.self}]
 
+    const colors: ColorString[] = getCellTypeColors({
+      cellType: type,
+      gaugeColors,
+      thresholdsListColors,
+      lineColors,
+    })
+
+    const legend = isStaticLegend ? STATIC_LEGEND : {}
+
     await Promise.all(
       this.selectedDashboards.map(dashboard => {
         const emptyCell = getNewDashboardCell(dashboard)
-        const newCell = {
+        const newCell: Partial<Cell> = {
           ...emptyCell,
           name,
           queries: newCellQueries,
+          type,
+          axes,
+          legend,
+          colors,
+          decimalPlaces,
+          timeFormat,
+          note,
+          noteVisibility,
         }
         return addDashboardCell(dashboard, newCell)
       })
