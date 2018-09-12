@@ -40,12 +40,12 @@ class StaticLegend extends Component<Props, State> {
     }
   }
 
-  public componentDidMount = () => {
+  public componentDidMount() {
     const {height} = this.staticLegendRef.current.getBoundingClientRect()
     this.props.onUpdateHeight(height)
   }
 
-  public componentDidUpdate = prevProps => {
+  public componentDidUpdat(prevProps) {
     const {height} = this.staticLegendRef.current.getBoundingClientRect()
 
     if (prevProps.height === height) {
@@ -55,7 +55,7 @@ class StaticLegend extends Component<Props, State> {
     this.props.onUpdateHeight(height)
   }
 
-  public componentWillUnmount = () => {
+  public componentWillUnmount() {
     this.props.onUpdateHeight(0)
   }
 
