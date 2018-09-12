@@ -56,15 +56,12 @@ const TEMPLATE_VAR = /[:]\w+[:]/g
 @ErrorHandling
 class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    const {isSubmitted, isShowingTemplateValues, editedQueryText} = prevState
+    const {isSubmitted, editedQueryText} = prevState
 
     const isQueryConfigChanged = nextProps.config.id !== prevState.configID
     const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
 
-    if (
-      (isSubmitted && isQueryTextChanged && !isShowingTemplateValues) ||
-      isQueryConfigChanged
-    ) {
+    if ((isSubmitted && isQueryTextChanged) || isQueryConfigChanged) {
       return {
         ...BLURRED_EDITOR_STATE,
         selectedTemplate: {
