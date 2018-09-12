@@ -4,9 +4,7 @@ import _ from 'lodash'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import TimeMachine, {
-  VisualizationOptions,
-} from 'src/shared/components/TimeMachine/TimeMachine'
+import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
 import CEOHeader from 'src/dashboards/components/CEOHeader'
 
 // Utils
@@ -28,6 +26,7 @@ import {editCellQueryStatus} from 'src/dashboards/actions'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 import {IS_STATIC_LEGEND} from 'src/shared/constants'
+import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
 
 // Types
 import * as ColorsModels from 'src/types/colors'
@@ -38,11 +37,7 @@ import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {NewDefaultCell, ThresholdType} from 'src/types/dashboards'
 import {Links, ScriptStatus} from 'src/types/flux'
-
-const staticLegend: DashboardsModels.Legend = {
-  type: 'static',
-  orientation: 'bottom',
-}
+import {VisualizationOptions} from 'src/types/dataExplorer'
 
 interface Props {
   fluxLinks: Links
@@ -299,7 +294,7 @@ class CellEditorOverlay extends Component<Props, State> {
       ...cell,
       queries,
       colors,
-      legend: isStaticLegend ? staticLegend : {},
+      legend: isStaticLegend ? STATIC_LEGEND : {},
     }
 
     this.props.onSave(newCell)

@@ -71,31 +71,8 @@ import {
   ScriptStatus,
   VisType,
 } from 'src/types/flux'
-import {
-  Axes,
-  CellType,
-  FieldOption,
-  TableOptions,
-  ThresholdType,
-  DecimalPlaces,
-  NoteVisibility,
-} from 'src/types/dashboards'
-import {ColorNumber, ColorString} from 'src/types/colors'
 
-export interface VisualizationOptions {
-  type: CellType
-  axes: Axes | null
-  tableOptions: TableOptions
-  fieldOptions: FieldOption[]
-  timeFormat: string
-  decimalPlaces: DecimalPlaces
-  note: string
-  noteVisibility: NoteVisibility
-  thresholdsListColors: ColorNumber[]
-  thresholdsListType: ThresholdType
-  gaugeColors: ColorNumber[]
-  lineColors: ColorString[]
-}
+import {VisualizationOptions} from 'src/types/dataExplorer'
 
 interface Props {
   fluxLinks: Links

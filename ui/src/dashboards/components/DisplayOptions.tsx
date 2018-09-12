@@ -48,7 +48,7 @@ import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes, Cell, QueryConfig} from 'src/types'
 import {ColorNumber, ColorString} from 'src/types/colors'
-import {VisualizationOptions} from 'src/shared/components/TimeMachine/TimeMachine'
+import {VisualizationOptions} from 'src/types/dataExplorer'
 
 interface Props extends VisualizationOptions {
   cell: Cell | NewDefaultCell
