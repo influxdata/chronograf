@@ -441,18 +441,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     return ''
   }
 
-  private get service(): Service {
-    const {sourceLink, services} = this.props
-    let service: Service = null
-
-    if (sourceLink.indexOf('services') !== -1) {
-      service = services.find(s => {
-        return s.links.self === sourceLink
-      })
-    }
-    return service
-  }
-
   private get visualizationOptions(): VisualizationOptions {
     const {
       visType,
