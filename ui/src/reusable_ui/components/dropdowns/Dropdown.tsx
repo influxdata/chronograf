@@ -123,7 +123,8 @@ class Dropdown extends Component<Props, State> {
     const {expanded} = this.state
 
     const selectedChild = children.find(child => child.props.id === selectedID)
-    const dropdownLabel = selectedChild.props.children || titleText
+    const dropdownLabel =
+      (selectedChild && selectedChild.props.children) || titleText
 
     return (
       <DropdownButton
