@@ -8,7 +8,7 @@ import ReactCodeMirror from 'src/dashboards/components/ReactCodeMirror'
 import TemplateDrawer from 'src/shared/components/TemplateDrawer'
 import QueryStatus from 'src/shared/components/QueryStatus'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {ActionDropdown, ComponentStatus} from 'src/reusable_ui'
+import {Dropdown, DropdownMode, ComponentStatus} from 'src/reusable_ui'
 import {Button, ComponentColor, ComponentSize} from 'src/reusable_ui'
 
 // Utils
@@ -414,21 +414,22 @@ class InfluxQLEditor extends Component<Props, State> {
             (isTemplating || queryHasNoTempVars) && ComponentStatus.Disabled
           }
         />
-        <ActionDropdown
-          actionText={'Metaquery Templates'}
+        <Dropdown
+          titleText="Metaquery Templates"
+          mode={DropdownMode.ActionList}
           children={METAQUERY_TEMPLATE_OPTIONS.map(mqto => {
             if (mqto.type === DropdownChildTypes.Item) {
               return (
-                <ActionDropdown.Item
+                <Dropdown.Item
                   key={(mqto as MetaQueryTemplateOption).id}
                   id={(mqto as MetaQueryTemplateOption).text}
                   value={mqto}
                 >
                   {(mqto as MetaQueryTemplateOption).text}
-                </ActionDropdown.Item>
+                </Dropdown.Item>
               )
             } else if (mqto.type === DropdownChildTypes.Divider) {
-              return <ActionDropdown.Divider key={mqto.id} id={mqto.id} />
+              return <Dropdown.Divider key={mqto.id} id={mqto.id} />
             }
           })}
           onChange={this.handleChooseMetaQuery}
