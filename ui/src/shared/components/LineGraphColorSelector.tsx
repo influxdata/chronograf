@@ -1,16 +1,13 @@
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
 
 import ColorScaleDropdown from 'src/shared/components/ColorScaleDropdown'
 
-import {updateLineColors} from 'src/shared/actions/visualizations'
-import {ColorNumber} from 'src/types/colors'
+import {ColorString} from 'src/types/colors'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
-  lineColors: ColorNumber[]
-  handleUpdateLineColors: (colors: ColorNumber[]) => void
+  lineColors: ColorString[]
+  onUpdateLineColors: (colors: ColorString[]) => void
 }
 
 @ErrorHandling
@@ -31,21 +28,11 @@ class LineGraphColorSelector extends Component<Props> {
   }
 
   public handleSelectColors = (colorScale): void => {
-    const {handleUpdateLineColors} = this.props
+    const {onUpdateLineColors} = this.props
     const {colors} = colorScale
 
-    handleUpdateLineColors(colors)
+    onUpdateLineColors(colors)
   }
 }
 
-const mapStateToProps = ({cellEditorOverlay: {lineColors}}) => ({
-  lineColors,
-})
-
-const mapDispatchToProps = dispatch => ({
-  handleUpdateLineColors: bindActionCreators(updateLineColors, dispatch),
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(
-  LineGraphColorSelector
-)
+export default LineGraphColorSelector
