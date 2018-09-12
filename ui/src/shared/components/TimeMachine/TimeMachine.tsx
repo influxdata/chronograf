@@ -1032,13 +1032,15 @@ class TimeMachine extends PureComponent<Props, State> {
 
     if (this.isFluxSource) {
       this.setState({selectedService: null})
-      updateService(null)
+      if (updateService) {
+        updateService(null)
+      }
     } else {
       const foundFluxForSource = services.find(service => {
         return service.sourceID === this.source.id
       })
 
-      if (foundFluxForSource) {
+      if (foundFluxForSource && updateService) {
         updateService(foundFluxForSource)
       }
     }
