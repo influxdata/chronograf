@@ -19,6 +19,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 // Types
 import {Axes, CellType} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
+import {ColorString} from 'src/types/colors'
 
 const {LINEAR, LOG, BASE_2, BASE_10} = AXES_SCALE_OPTIONS
 const getInputMin = scale => (scale === LOG ? '0' : null)
@@ -28,9 +29,11 @@ interface Props {
   axes: Axes
   staticLegend: boolean
   defaultYLabel: string
+  lineColors: ColorString[]
   decimalPlaces: DecimalPlaces
   onUpdateAxes: (axes: Axes) => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
+  onUpdateLineColors: (colors: ColorString[]) => void
   onUpdateDecimalPlaces: (decimalPlaces: DecimalPlaces) => void
 }
 
@@ -63,7 +66,9 @@ class AxesOptions extends PureComponent<Props> {
         y: {bounds, label, prefix, suffix, scale},
       },
       type,
+      lineColors,
       defaultYLabel,
+      onUpdateLineColors,
     } = this.props
 
     const [min, max] = bounds
@@ -84,7 +89,10 @@ class AxesOptions extends PureComponent<Props> {
                 customPlaceholder={defaultYLabel || 'y-axis title'}
               />
             </div>
-            <LineGraphColorSelector />
+            <LineGraphColorSelector
+              onUpdateLineColors={onUpdateLineColors}
+              lineColors={lineColors}
+            />
             <div className="form-group col-sm-6">
               <label htmlFor="min">Min</label>
               <OptIn

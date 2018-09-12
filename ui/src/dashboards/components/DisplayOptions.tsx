@@ -26,6 +26,7 @@ import {
   updateNoteVisibility,
   updateThresholdsListColors,
   updateThresholdsListType,
+  updateLineColors,
 } from 'src/shared/actions/visualizations'
 
 // Constants
@@ -46,7 +47,7 @@ import {
 import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes, Cell, QueryConfig} from 'src/types'
-import {ColorNumber} from 'src/types/colors'
+import {ColorNumber, ColorString} from 'src/types/colors'
 import {VisualizationOptions} from 'src/shared/components/TimeMachine/TimeMachine'
 
 interface Props extends VisualizationOptions {
@@ -64,6 +65,7 @@ interface Props extends VisualizationOptions {
   onUpdateTimeFormat: typeof updateTimeFormat
   onUpdateVisType: typeof updateVisType
   onUpdateNote: typeof updateNote
+  onUpdateLineColors: typeof updateLineColors
   onUpdateNoteVisibility: typeof updateNoteVisibility
   onUpdateThresholdsListColors: typeof updateThresholdsListColors
   onUpdateThresholdsListType: typeof updateThresholdsListType
@@ -143,6 +145,7 @@ class DisplayOptions extends Component<Props, State> {
     const {
       type,
       decimalPlaces,
+      lineColors,
       gaugeColors,
       staticLegend,
       onToggleStaticLegend,
@@ -210,11 +213,13 @@ class DisplayOptions extends Component<Props, State> {
           <AxesOptions
             axes={this.axes}
             type={type}
+            lineColors={lineColors}
             staticLegend={staticLegend}
             defaultYLabel={defaultYLabel}
             decimalPlaces={decimalPlaces}
             onUpdateAxes={this.handleUpdateAxes}
             onToggleStaticLegend={onToggleStaticLegend}
+            onUpdateLineColors={this.handleUpdateLineColors}
             onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
           />
         )
@@ -305,6 +310,12 @@ class DisplayOptions extends Component<Props, State> {
 
     onUpdateThresholdsListType(type, this.stateToUpdate)
   }
+
+  private handleUpdateLineColors = (colors: ColorString[]): void => {
+    const {onUpdateLineColors} = this.props
+
+    onUpdateLineColors(colors, this.stateToUpdate)
+  }
 }
 
 const mdtp = {
@@ -319,6 +330,7 @@ const mdtp = {
   onUpdateNoteVisibility: updateNoteVisibility,
   onUpdateThresholdsListColors: updateThresholdsListColors,
   onUpdateThresholdsListType: updateThresholdsListType,
+  onUpdateLineColors: updateLineColors,
 }
 
 export default connect(null, mdtp)(DisplayOptions)
