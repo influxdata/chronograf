@@ -58,14 +58,13 @@ class InfluxQLEditor extends Component<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     const {isSubmitted, isShowingTemplateValues, editedQueryText} = prevState
 
-    // stale prop values after recent submission cause flickering
-    const isRecentlySubmitted = !isSubmitted || prevState.isSubmitted
-    const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
-    const isQueryUpdated = !isRecentlySubmitted && isQueryTextChanged
-
     const isQueryConfigChanged = nextProps.config.id !== prevState.configID
+    const isQueryTextChanged = editedQueryText.trim() !== nextProps.query.trim()
 
-    if ((isQueryUpdated && !isShowingTemplateValues) || isQueryConfigChanged) {
+    if (
+      (isSubmitted && isQueryTextChanged && !isShowingTemplateValues) ||
+      isQueryConfigChanged
+    ) {
       return {
         ...BLURRED_EDITOR_STATE,
         selectedTemplate: {
