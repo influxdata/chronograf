@@ -16,9 +16,9 @@ export interface DygraphAxis {
 export interface DygraphSeries {
   [x: string]: {
     axis: string
+    color?: string
   }
 }
-
 export interface PerSeriesOptions {
   /**
    * Set to either 'y1' or 'y2' to assign a series to a y-axis (primary or secondary). Must be
@@ -826,12 +826,13 @@ export declare class DygraphClass {
   public visibility(): boolean[]
 
   /**
-   * Changes the visiblity of a series.
+   * Changes the visibility of a series.
    *
    * @param {number} num the series index
    * @param {boolean} value true or false, identifying the visibility.
    */
-  public setVisibility(num: number, value: boolean): void
+
+  public setVisibility(visibilities: number | boolean[], value?: boolean): void
 
   /**
    * Update the list of annotations and redraw the chart.
