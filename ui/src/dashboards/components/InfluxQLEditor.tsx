@@ -8,6 +8,8 @@ import ReactCodeMirror from 'src/dashboards/components/ReactCodeMirror'
 import TemplateDrawer from 'src/shared/components/TemplateDrawer'
 import QueryStatus from 'src/shared/components/QueryStatus'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {Dropdown, DropdownMode, ComponentStatus} from 'src/reusable_ui'
+import {Button, ComponentColor, ComponentSize} from 'src/reusable_ui'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -15,10 +17,15 @@ import {makeCancelable} from 'src/utils/promises'
 
 // Constants
 import {MATCH_INCOMPLETE_TEMPLATES, applyMasks} from 'src/tempVars/constants'
+import {METAQUERY_TEMPLATE_OPTIONS} from 'src/data_explorer/constants'
 
 // Types
 import {Template, QueryConfig} from 'src/types'
 import {WrappedCancelablePromise} from 'src/types/promises'
+import {
+  MetaQueryTemplateOption,
+  DropdownChildTypes,
+} from 'src/data_explorer/constants'
 
 interface TempVar {
   tempVar: string
@@ -236,7 +243,8 @@ class InfluxQLEditor extends Component<Props, State> {
     const masked = applyMasks(value)
     const matched = masked.match(MATCH_INCOMPLETE_TEMPLATES)
 
-    if (matched && !_.isEmpty(templates)) {
+    const isTemplating = matched && !_.isEmpty(templates)
+    if (isTemplating) {
       // maintain cursor poition
       const matchedVar = {tempVar: `${matched[0]}:`}
       const filteredTemplates = this.filterTemplates(matched[0])
@@ -246,7 +254,7 @@ class InfluxQLEditor extends Component<Props, State> {
       )
 
       this.setState({
-        isTemplating: true,
+        isTemplating,
         templatingQueryText: value,
         selectedTemplate,
         filteredTemplates,
@@ -255,7 +263,8 @@ class InfluxQLEditor extends Component<Props, State> {
       })
     } else {
       this.setState({
-        isTemplating: false,
+        isTemplating,
+        templatingQueryText: value,
         editedQueryText: value,
         isSubmitted,
       })
@@ -347,6 +356,10 @@ class InfluxQLEditor extends Component<Props, State> {
     })
   }
 
+  private handleChooseMetaQuery = (mqto: MetaQueryTemplateOption): void => {
+    this.handleChange(mqto.query)
+  }
+
   private closeDrawer = () => {
     this.setState({
       isTemplating: false,
@@ -391,23 +404,46 @@ class InfluxQLEditor extends Component<Props, State> {
     }
 
     return (
-      <>
-        <button
+      <div className="query-editor--status-actions">
+        <Button
+          size={ComponentSize.ExtraSmall}
           onClick={this.handleShowTemplateValues}
-          className="btn btn-xs btn-info query-editor--submit"
-          disabled={isTemplating || queryHasNoTempVars}
-          title={tempVarButtonTitle}
-        >
-          Show Template Values
-        </button>
-        <button
-          className="btn btn-xs btn-primary query-editor--submit"
+          text="Show Template Values"
+          titleText={tempVarButtonTitle}
+          status={
+            (isTemplating || queryHasNoTempVars) && ComponentStatus.Disabled
+          }
+        />
+        <Dropdown
+          titleText="Metaquery Templates"
+          mode={DropdownMode.ActionList}
+          children={METAQUERY_TEMPLATE_OPTIONS.map(mqto => {
+            if (mqto.type === DropdownChildTypes.Item) {
+              return (
+                <Dropdown.Item
+                  key={(mqto as MetaQueryTemplateOption).id}
+                  id={(mqto as MetaQueryTemplateOption).text}
+                  value={mqto}
+                >
+                  {(mqto as MetaQueryTemplateOption).text}
+                </Dropdown.Item>
+              )
+            } else if (mqto.type === DropdownChildTypes.Divider) {
+              return <Dropdown.Divider key={mqto.id} id={mqto.id} />
+            }
+          })}
+          onChange={this.handleChooseMetaQuery}
+          buttonSize={ComponentSize.ExtraSmall}
+          widthPixels={163}
+        />
+        <Button
+          size={ComponentSize.ExtraSmall}
+          color={ComponentColor.Primary}
+          status={this.isDisabled && ComponentStatus.Disabled}
           onClick={this.handleUpdate}
-          disabled={this.isDisabled}
-        >
-          Submit Query
-        </button>
-      </>
+          text="Submit Query"
+        />
+      </div>
     )
   }
 }

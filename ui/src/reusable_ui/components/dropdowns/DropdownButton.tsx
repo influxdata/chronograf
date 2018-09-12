@@ -21,6 +21,7 @@ interface Props {
   color?: ComponentColor
   size?: ComponentSize
   icon?: IconFont
+  title?: string
 }
 
 @ErrorHandling
@@ -33,12 +34,13 @@ class DropdownButton extends Component<Props> {
   }
 
   public render() {
-    const {onClick, status, children} = this.props
+    const {onClick, status, children, title} = this.props
     return (
       <button
         className={this.classname}
         onClick={onClick}
         disabled={status === ComponentStatus.Disabled}
+        title={title}
       >
         {this.icon}
         <span className="dropdown--selected">{children}</span>

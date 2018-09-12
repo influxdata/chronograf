@@ -37,6 +37,7 @@
 ### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
 1.  [#4330](https://github.com/influxdata/chronograf/pull/4330): Position cloned cells adjacent to target cell
+1.  [#4433](https://github.com/influxdata/chronograf/pull/4433): Add metaquery template generator button to Explorer and Cell Editor
 1.  [#4436](https://github.com/influxdata/chronograf/pull/4436): Automatically scroll to the current measurement in the explorer
 
 ### Bug Fixes
