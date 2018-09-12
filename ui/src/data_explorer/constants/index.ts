@@ -97,7 +97,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `1`,
+    id: `mqtd-divider-1`,
     type: DropdownChildTypes.Divider,
   },
   {
@@ -119,7 +119,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `2`,
+    id: `mqtd-divider-2`,
     type: DropdownChildTypes.Divider,
   },
   {
@@ -141,7 +141,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `3`,
+    id: `mqtd-divider-3`,
     type: DropdownChildTypes.Divider,
   },
   {
@@ -163,7 +163,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `4`,
+    id: `mqtd-divider-4`,
     type: DropdownChildTypes.Divider,
   },
   {
@@ -191,7 +191,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `5`,
+    id: `mqtd-divider-5`,
     type: DropdownChildTypes.Divider,
   },
   {
