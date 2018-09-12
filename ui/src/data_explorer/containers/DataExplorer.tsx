@@ -12,6 +12,7 @@ import _ from 'lodash'
 import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'
+import {buildRawText} from 'src/utils/influxql'
 
 // Constants
 import {timeRanges} from 'src/shared/data/timeRanges'
@@ -54,7 +55,6 @@ import {
   TEMP_VAR_DASHBOARD_TIME,
   TEMP_VAR_UPPER_DASHBOARD_TIME,
 } from 'src/shared/constants'
-import {buildRawText} from 'src/utils/influxql'
 
 // Types
 import {
@@ -329,7 +329,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private get sendToDashboardOverlay(): JSX.Element {
-    const {source, dashboards, addDashboardCell} = this.props
+    const {source, dashboards, addDashboardCell, script} = this.props
 
     const {isSendToDashboardVisible} = this.state
     return (
@@ -338,7 +338,9 @@ export class DataExplorer extends PureComponent<Props, State> {
           <SendToDashboardOverlay
             onCancel={this.toggleSendToDashboard}
             queryConfig={this.activeQueryConfig}
+            script={script}
             source={source}
+            service={this.service}
             rawText={this.rawText}
             dashboards={dashboards}
             addDashboardCell={addDashboardCell}
@@ -439,6 +441,18 @@ export class DataExplorer extends PureComponent<Props, State> {
     return ''
   }
 
+  private get service(): Service {
+    const {sourceLink, services} = this.props
+    let service: Service = null
+
+    if (sourceLink.indexOf('services') !== -1) {
+      service = services.find(s => {
+        return s.links.self === sourceLink
+      })
+    }
+    return service
+  }
+
   private get visualizationOptions(): VisualizationOptions {
     const {
       visType,
@@ -517,7 +531,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 }
 
-const mapStateToProps = state => {
+const mstp = state => {
   const {
     app: {
       persisted: {autoRefresh},
@@ -573,7 +587,7 @@ const mapStateToProps = state => {
   }
 }
 
-const mapDispatchToProps = dispatch => {
+const mdtp = dispatch => {
   return {
     handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
     errorThrownAction: bindActionCreators(errorThrown, dispatch),
@@ -594,6 +608,4 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(ManualRefresh(DataExplorer))
-)
+export default connect(mstp, mdtp)(withRouter(ManualRefresh(DataExplorer)))

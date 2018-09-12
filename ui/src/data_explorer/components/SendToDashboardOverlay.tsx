@@ -21,31 +21,31 @@ import {
 import {addDashboardCellAsync} from 'src/dashboards/actions'
 
 // Types
-import {QueryConfig, Dashboard, Source} from 'src/types'
+import {QueryConfig, Dashboard, Source, Service} from 'src/types'
+import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
   queryConfig: QueryConfig
+  script: string
   dashboards: Dashboard[]
   source: Source
   rawText: string
+  service: Service
   onCancel: () => void
   addDashboardCell: typeof addDashboardCellAsync
 }
 
 interface State {
   selectedIDs: string[]
-  hasQuery: boolean
   name: string
 }
 
 class SendToDashboardOverlay extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
-    const {queryConfig} = this.props
 
     this.state = {
       selectedIDs: [],
-      hasQuery: queryConfig.fields.length !== 0,
       name: '',
     }
   }
@@ -119,6 +119,19 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     })
   }
 
+  private get hasQuery(): boolean {
+    const {queryConfig, script} = this.props
+    if (this.isFlux) {
+      return !!script.length
+    }
+    return getDeep<number>(queryConfig, 'fields.length', 0) !== 0
+  }
+
+  private get isFlux(): boolean {
+    const {service} = this.props
+    return !!service
+  }
+
   private get selectedDashboards(): Dashboard[] {
     const {dashboards} = this.props
     const {selectedIDs} = this.state
@@ -129,9 +142,13 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private get submitButtonStatus(): ComponentStatus {
-    const {hasQuery, name, selectedIDs} = this.state
+    const {name, selectedIDs} = this.state
 
-    if (!hasQuery || selectedIDs.length === 0 || name.trim().length === 0) {
+    if (
+      !this.hasQuery ||
+      selectedIDs.length === 0 ||
+      name.trim().length === 0
+    ) {
       return ComponentStatus.Disabled
     }
 
@@ -145,27 +162,37 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   private sendToDashboard = async () => {
     const {
       queryConfig,
+      script,
       addDashboardCell,
       rawText,
       source,
       onCancel,
+      service,
     } = this.props
-    const {hasQuery, name} = this.state
+    const {name} = this.state
 
-    if (hasQuery) {
-      await Promise.all(
-        this.selectedDashboards.map(dashboard => {
-          const emptyCell = getNewDashboardCell(dashboard)
-          const newCell = {
-            ...emptyCell,
-            name,
-            queries: [{queryConfig, query: rawText, source: source.links.self}],
-          }
-          return addDashboardCell(dashboard, newCell)
-        })
-      )
-      onCancel()
-    }
+    const newCellQueries = this.isFlux
+      ? [
+          {
+            queryConfig: null,
+            query: script,
+            source: service.links.self,
+          },
+        ]
+      : [{queryConfig, query: rawText, source: source.links.self}]
+
+    await Promise.all(
+      this.selectedDashboards.map(dashboard => {
+        const emptyCell = getNewDashboardCell(dashboard)
+        const newCell = {
+          ...emptyCell,
+          name,
+          queries: newCellQueries,
+        }
+        return addDashboardCell(dashboard, newCell)
+      })
+    )
+    onCancel()
   }
 }
 
