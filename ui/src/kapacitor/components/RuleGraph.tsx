@@ -64,7 +64,7 @@ class RuleGraph extends PureComponent<Props> {
                   query={this.props.query}
                   rule={rule}
                   timeRange={timeRange}
-                  timeSeries={data.timeSeries}
+                  timeSeries={data.timeSeriesInfluxQL}
                   setHoverTime={this.props.setHoverTime}
                 />
               )

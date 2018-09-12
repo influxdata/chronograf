@@ -8,6 +8,7 @@ import {
   parseResponseError,
 } from 'src/shared/parsing/flux/response'
 import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
+import {manager} from 'src/worker/JobManager'
 
 export const getSuggestions = async (url: string) => {
   try {
@@ -43,47 +44,34 @@ export const getAST = async (request: ASTRequest) => {
   }
 }
 
-interface GetTimeSeriesResult {
+export interface GetTimeSeriesResult {
   didTruncate: boolean
   tables: FluxTable[]
+  uuid?: string
 }
 
 export const getTimeSeries = async (
   service: Service,
-  script: string
+  script: string,
+  uuid?: string
 ): Promise<GetTimeSeriesResult> => {
   const mark = encodeURIComponent('?')
-  const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
+  const query = script.replace(/\s/g, '') // server cannot handle whitespace
   const url = `${window.basepath}${
     service.links.proxy
   }?path=/query${mark}organization=defaultorgname`
-  const dialect = {annotations: ['group', 'datatype', 'default']}
-  const data = JSON.stringify({
-    query: garbage,
-    dialect,
-  })
-
   let responseBody: string
   let responseByteLength: number
-
+  let responseUUID: string
   try {
-    // We are using the `fetch` API here since the `AJAX` utility lacks support
-    // for limiting response size. The `AJAX` utility depends on
-    // `axios.request` which _does_ have a `maxContentLength` option, though it
-    // seems to be broken at the moment. We might use this option instead of
-    // the `fetch` API in the future, if it is ever fixed.  See
-    // https://github.com/axios/axios/issues/1491.
-    const resp = await fetch(url, {
-      method: 'POST',
-      body: data,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const {body, byteLength} = await decodeFluxRespWithLimit(resp)
-
+    const {body, byteLength, uuid: id} = await manager.fetchFluxData(
+      url,
+      query,
+      uuid
+    )
     responseBody = body
     responseByteLength = byteLength
+    responseUUID = id
   } catch (error) {
     console.error('Problem fetching data', error)
 
@@ -92,10 +80,12 @@ export const getTimeSeries = async (
   }
 
   try {
-    return {
+    const response = {
       tables: parseResponse(responseBody),
       didTruncate: responseByteLength >= MAX_RESPONSE_BYTES,
+      uuid: responseUUID,
     }
+    return response
   } catch (error) {
     console.error('Could not parse response body', error)
 
@@ -120,44 +110,4 @@ export const updateScript = async (service: Service, script: string) => {
 
     throw error
   }
-}
-
-interface DecodeFluxRespWithLimitResult {
-  body: string
-  byteLength: number
-}
-
-const decodeFluxRespWithLimit = async (
-  resp: Response
-): Promise<DecodeFluxRespWithLimitResult> => {
-  const reader = resp.body.getReader()
-  const decoder = new TextDecoder()
-
-  let bytesRead = 0
-  let body = ''
-  let currentRead = await reader.read()
-
-  while (!currentRead.done) {
-    const currentText = decoder.decode(currentRead.value)
-
-    bytesRead += currentRead.value.byteLength
-
-    if (bytesRead >= MAX_RESPONSE_BYTES) {
-      // Discard last line since it may be partially read
-      const lines = currentText.split('\n')
-      body += lines.slice(0, lines.length - 1).join('\n')
-
-      reader.cancel()
-
-      return {body, byteLength: bytesRead}
-    } else {
-      body += currentText
-    }
-
-    currentRead = await reader.read()
-  }
-
-  reader.cancel()
-
-  return {body, byteLength: bytesRead}
 }

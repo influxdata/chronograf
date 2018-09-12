@@ -8,6 +8,12 @@ import {getBasepath} from 'src/utils/basepath'
 import {TimeSeriesToTableGraphReturnType} from 'src/worker/jobs/timeSeriesToTableGraph'
 import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph'
 
+interface DecodeFluxRespWithLimitResult {
+  body: string
+  byteLength: number
+  uuid?: string
+}
+
 const workerCount = navigator.hardwareConcurrency - 1
 
 class JobManager {
@@ -51,6 +57,19 @@ class JobManager {
       url = `${getBasepath()}${url}`
     }
     return this.publishJob('PROXY', {url, query, db, rp, uuid})
+  }
+
+  public postJSON(url, body): Promise<any> {
+    return this.publishDBJob('POSTJSON', {url, body})
+  }
+
+  public fetchFluxData(
+    url: string,
+    query: string,
+    uuid: string,
+    dialect?: {annotations: string[]}
+  ): Promise<DecodeFluxRespWithLimitResult> {
+    return this.publishDBJob('FETCHFLUXDATA', {url, query, uuid, dialect})
   }
 
   public get(url: string): Promise<any> {

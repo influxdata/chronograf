@@ -10,6 +10,7 @@ import TableGraph from 'src/shared/components/TableGraph'
 import SingleStat from 'src/shared/components/SingleStat'
 import MarkdownCell from 'src/shared/components/MarkdownCell'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
+import TimeMachineTables from 'src/flux/components/TimeMachineTables'
 
 // Constants
 import {emptyGraphCopy} from 'src/shared/copy/cell'
@@ -27,7 +28,17 @@ import {setHoverTime} from 'src/dashboards/actions'
 // Types
 import {QueryUpdateState} from 'src/shared/actions/queries'
 import {ColorString} from 'src/types/colors'
-import {Source, Axes, TimeRange, Template, Query, CellType} from 'src/types'
+import {
+  Source,
+  Axes,
+  TimeRange,
+  Template,
+  Query,
+  CellType,
+  Service,
+  FluxTable,
+  RemoteDataState,
+} from 'src/types'
 import {
   TableOptions,
   FieldOption,
@@ -35,10 +46,13 @@ import {
   NoteVisibility,
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
+import {VisType} from 'src/types/flux'
+import {TimeSeriesServerResponse} from 'src/types/series'
 
 interface Props {
   axes: Axes
   source: Source
+  service: Service
   queries: Query[]
   timeRange: TimeRange
   colors: ColorString[]
@@ -59,7 +73,10 @@ interface Props {
   editQueryStatus: () => void
   onSetResolution: () => void
   handleSetHoverTime: () => void
+  rawData?: FluxTable[]
+  visType?: VisType
   grabDataForDownload?: GrabDataForDownloadHandler
+  grabFluxData?: (data: FluxTable[]) => void
   cellNote: string
   cellNoteVisibility: NoteVisibility
   editorLocation?: QueryUpdateState
@@ -92,10 +109,14 @@ class RefreshingGraph extends PureComponent<Props> {
       type,
       source,
       inView,
+      service,
       queries,
+      visType,
+      rawData = [],
       cellNote,
       timeRange,
       templates,
+      grabFluxData,
       manualRefresh,
       autoRefresher,
       editQueryStatus,
@@ -115,9 +136,14 @@ class RefreshingGraph extends PureComponent<Props> {
       return <MarkdownCell text={cellNote} />
     }
 
+    if (visType === VisType.Table) {
+      return <TimeMachineTables data={rawData} />
+    }
+
     return (
       <TimeSeries
         ref={this.timeSeries}
+        service={service}
         autoRefresher={autoRefresher}
         manualRefresh={manualRefresh}
         source={source}
@@ -128,19 +154,20 @@ class RefreshingGraph extends PureComponent<Props> {
         templates={templates}
         editQueryStatus={editQueryStatus}
         grabDataForDownload={grabDataForDownload}
+        grabFluxData={grabFluxData}
         cellNote={cellNote}
         cellNoteVisibility={cellNoteVisibility}
       >
-        {({timeSeries, loading}) => {
+        {({timeSeriesInfluxQL, timeSeriesFlux, loading}) => {
           switch (type) {
             case CellType.SingleStat:
-              return this.singleStat(timeSeries)
+              return this.singleStat(timeSeriesInfluxQL)
             case CellType.Table:
-              return this.table(timeSeries)
+              return this.table(timeSeriesInfluxQL)
             case CellType.Gauge:
-              return this.gauge(timeSeries)
+              return this.gauge(timeSeriesInfluxQL)
             default:
-              return this.lineGraph(timeSeries, loading)
+              return this.lineGraph(timeSeriesInfluxQL, timeSeriesFlux, loading)
           }
         }}
       </TimeSeries>
@@ -238,7 +265,11 @@ class RefreshingGraph extends PureComponent<Props> {
     )
   }
 
-  private lineGraph = (data, loading): JSX.Element => {
+  private lineGraph = (
+    influxQLData: TimeSeriesServerResponse[],
+    fluxData: FluxTable[],
+    loading: RemoteDataState
+  ): JSX.Element => {
     const {
       axes,
       type,
@@ -256,13 +287,14 @@ class RefreshingGraph extends PureComponent<Props> {
 
     return (
       <LineGraph
-        data={data}
+        influxQLData={influxQLData}
         type={type}
         axes={axes}
         cellID={cellID}
         colors={colors}
         onZoom={onZoom}
         queries={queries}
+        fluxData={fluxData}
         key={manualRefresh}
         loading={loading}
         timeRange={timeRange}

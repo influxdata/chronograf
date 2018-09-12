@@ -6,7 +6,6 @@ import _ from 'lodash'
 import WidgetCell from 'src/shared/components/WidgetCell'
 import LayoutCell from 'src/shared/components/LayoutCell'
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
-import TimeMachineVis from 'src/flux/components/TimeMachineVis'
 
 // Utils
 import {buildQueriesForLayouts} from 'src/utils/buildQueriesForLayouts'
@@ -20,7 +19,7 @@ import {TimeRange, Cell, Template, Source, Service} from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-import {VisType} from 'src/types/flux'
+import {VisType, FluxTable} from 'src/types/flux'
 
 interface Props {
   cell: Cell
@@ -40,6 +39,7 @@ interface Props {
 
 interface State {
   cellData: TimeSeriesServerResponse[]
+  cellFluxData: FluxTable[]
   visType: VisType
 }
 
@@ -47,6 +47,7 @@ interface State {
 class Layout extends Component<Props, State> {
   public state = {
     cellData: [],
+    cellFluxData: [],
     visType: VisType.Graph,
   }
 
@@ -70,7 +71,7 @@ class Layout extends Component<Props, State> {
         isEditable={isEditable}
         onCloneCell={onCloneCell}
         onDeleteCell={onDeleteCell}
-        isFluxSource={!!this.fluxSource}
+        isFluxSource={!!this.fluxService}
         toggleVisType={this.toggleVisType}
         onSummonOverlayTechnologies={onSummonOverlayTechnologies}
       >
@@ -79,33 +80,55 @@ class Layout extends Component<Props, State> {
     )
   }
 
-  private get fluxSource(): Service {
+  private get fluxService(): Service {
     const {services, cell} = this.props
 
     const sourceLink = getDeep<string>(cell, 'queries.0.source', '')
 
     if (services && sourceLink.includes('service')) {
-      return services.find(s => {
+      const service = services.find(s => {
         return s.links.self === sourceLink
       })
+      return service
     }
   }
 
   private get fluxVis(): JSX.Element {
-    const {cell} = this.props
-    const fluxSource = this.fluxSource
+    const {
+      cell,
+      onZoom,
+      timeRange,
+      manualRefresh,
+      templates,
+      source,
+    } = this.props
+    const {cellFluxData} = this.state
 
-    if (fluxSource) {
-      return (
-        <div className="dash-graph">
-          <TimeMachineVis
-            service={fluxSource}
-            visType={this.visType}
-            script={getDeep<string>(cell, 'queries.0.query', '')}
-          />
-        </div>
-      )
-    }
+    return (
+      <RefreshingGraph
+        onZoom={onZoom}
+        timeFormat={cell.timeFormat}
+        axes={cell.axes}
+        type={cell.type}
+        inView={cell.inView}
+        colors={cell.colors}
+        tableOptions={cell.tableOptions}
+        fieldOptions={cell.fieldOptions}
+        decimalPlaces={cell.decimalPlaces}
+        timeRange={timeRange}
+        templates={templates}
+        manualRefresh={manualRefresh}
+        staticLegend={IS_STATIC_LEGEND(cell.legend)}
+        grabDataForDownload={this.grabDataForDownload}
+        queries={cell.queries}
+        source={source}
+        service={this.fluxService}
+        cellNote={cell.note}
+        cellNoteVisibility={cell.noteVisibility}
+        rawData={cellFluxData}
+        visType={this.visType}
+      />
+    )
   }
 
   private get influxQLVis(): JSX.Element {
@@ -140,6 +163,7 @@ class Layout extends Component<Props, State> {
         manualRefresh={manualRefresh}
         staticLegend={IS_STATIC_LEGEND(cell.legend)}
         grabDataForDownload={this.grabDataForDownload}
+        grabFluxData={this.grabFluxData}
         queries={buildQueriesForLayouts(cell, timeRange, host)}
         source={this.getSource(cell, source, sources, source)}
         cellNote={cell.note}
@@ -149,7 +173,7 @@ class Layout extends Component<Props, State> {
   }
 
   private get visualization(): JSX.Element {
-    if (this.fluxSource) {
+    if (this.fluxService) {
       return this.fluxVis
     }
     return this.influxQLVis
@@ -168,6 +192,10 @@ class Layout extends Component<Props, State> {
 
   private grabDataForDownload: GrabDataForDownloadHandler = cellData => {
     this.setState({cellData})
+  }
+
+  private grabFluxData = (cellFluxData: FluxTable[]) => {
+    this.setState({cellFluxData})
   }
 
   private getSource = (cell, source, sources, defaultSource) => {

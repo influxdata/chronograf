@@ -2,13 +2,21 @@ import React, {SFC} from 'react'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 
-import buildQueries from 'src/utils/buildQueriesForGraphs'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 import {QueryUpdateState} from 'src/shared/actions/queries'
 
-import {TimeRange, QueryConfig, Axes, Template, Source, Status} from 'src/types'
+import {
+  TimeRange,
+  Query,
+  Axes,
+  Template,
+  Source,
+  Status,
+  Service,
+  FluxTable,
+} from 'src/types'
 import {
   TableOptions,
   DecimalPlaces,
@@ -16,16 +24,18 @@ import {
   CellType,
   NoteVisibility,
 } from 'src/types/dashboards'
+import {VisType} from 'src/types/flux'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
 interface Props {
   axes: Axes
   type: CellType
   source: Source
+  service: Service
   templates: Template[]
   timeRange: TimeRange
   autoRefresher: AutoRefresher
-  queryConfigs: QueryConfig[]
+  queries: Query[]
   editQueryStatus: (queryID: string, status: Status) => void
   tableOptions: TableOptions
   timeFormat: string
@@ -40,6 +50,8 @@ interface Props {
   noteVisibility: NoteVisibility
   manualRefresh: number
   editorLocation?: QueryUpdateState
+  visType?: VisType
+  rawData?: FluxTable[]
 }
 
 const DashVisualization: SFC<Props> = ({
@@ -47,13 +59,16 @@ const DashVisualization: SFC<Props> = ({
   type,
   note,
   source,
+  service,
+  queries,
+  visType,
+  rawData,
   templates,
   timeRange,
   lineColors,
   timeFormat,
   gaugeColors,
   fieldOptions,
-  queryConfigs,
   staticLegend,
   tableOptions,
   manualRefresh,
@@ -77,12 +92,13 @@ const DashVisualization: SFC<Props> = ({
       <div className="graph-container">
         <RefreshingGraph
           source={source}
+          service={service}
           colors={colors}
           axes={axes}
           type={type}
           tableOptions={tableOptions}
           autoRefresher={autoRefresher}
-          queries={buildQueries(queryConfigs, timeRange)}
+          queries={queries}
           templates={templates}
           editQueryStatus={editQueryStatus}
           resizerTopHeight={resizerTopHeight}
@@ -95,6 +111,8 @@ const DashVisualization: SFC<Props> = ({
           timeRange={timeRange}
           manualRefresh={manualRefresh}
           editorLocation={editorLocation}
+          visType={visType}
+          rawData={rawData}
         />
       </div>
     </div>
