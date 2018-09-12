@@ -1,8 +1,9 @@
 // Libraries
 import React, {Component, MouseEvent} from 'react'
 import _ from 'lodash'
-import uuid from 'uuid'
-import classnames from 'classnames'
+
+// Components
+import StaticLegendItem from 'src/shared/components/StaticLegendItem'
 
 // Utilities
 import {removeMeasurement} from 'src/shared/graphs/helpers'
@@ -45,7 +46,7 @@ class StaticLegend extends Component<Props, State> {
     this.props.onUpdateHeight(height)
   }
 
-  public componentDidUpdat(prevProps) {
+  public componentDidUpdate(prevProps) {
     const {height} = this.staticLegendRef.current.getBoundingClientRect()
 
     if (prevProps.height === height) {
@@ -60,33 +61,45 @@ class StaticLegend extends Component<Props, State> {
   }
 
   public render() {
-    const {dygraphSeries} = this.props
     const {visibilities} = this.state
-    const labels = _.keys(dygraphSeries)
-    const colors = _.map(labels, l => dygraphSeries[l].color)
-
-    const hoverEnabled = labels.length > 1
 
     return (
       <div className="static-legend" ref={this.staticLegendRef}>
-        {_.map(labels, (v, i) => (
-          <div
-            className={this.staticLegendItemClassname(
-              visibilities,
-              i,
-              hoverEnabled
-            )}
-            key={uuid.v4()}
-            onMouseDown={this.handleClick(i)}
-          >
-            <span style={{color: colors[i]}}>{removeMeasurement(v)}</span>
-          </div>
+        {_.map(this.labels, (v, i) => (
+          <StaticLegendItem
+            index={i}
+            onMouseDown={this.handleMouseDown}
+            hoverEnabled={this.multipleLabelsExist}
+            color={this.labelColors[i]}
+            label={removeMeasurement(v)}
+            key={`static-legend--${i}-${removeMeasurement(v)}`}
+            enabled={visibilities[i]}
+          />
         ))}
       </div>
     )
   }
 
-  public handleClick = (i: number) => (e: MouseEvent<HTMLDivElement>): void => {
+  private get multipleLabelsExist(): boolean {
+    return this.labels.length > 1
+  }
+
+  private get labels(): string[] {
+    const {dygraphSeries} = this.props
+
+    return _.keys(dygraphSeries)
+  }
+
+  private get labelColors(): string[] {
+    const {dygraphSeries} = this.props
+
+    return _.map(this.labels, l => dygraphSeries[l].color)
+  }
+
+  private handleMouseDown = (
+    i: number,
+    e: MouseEvent<HTMLDivElement>
+  ): void => {
     const visibilities = this.props.dygraph.visibility()
     const clickStatus = this.state.clickStatus
 
@@ -111,14 +124,6 @@ class StaticLegend extends Component<Props, State> {
     this.setState({
       visibilities: newVisibilities,
       clickStatus: !prevClickStatus,
-    })
-  }
-
-  private staticLegendItemClassname = (visibilities, i, hoverEnabled) => {
-    return classnames('', {
-      disabled: !visibilities[i],
-      'static-legend--item': hoverEnabled,
-      'static-legend--single': !hoverEnabled,
     })
   }
 }
