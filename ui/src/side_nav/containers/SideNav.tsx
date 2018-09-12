@@ -82,7 +82,7 @@ class SideNav extends PureComponent<Props> {
           link={dataExplorerLink}
           location={location}
         >
-          <NavHeader link={dataExplorerLink} title="Data Explorer" />
+          <NavHeader link={dataExplorerLink} title="Explore" />
         </NavBlock>
         <NavBlock
           highlightWhen={['dashboards']}

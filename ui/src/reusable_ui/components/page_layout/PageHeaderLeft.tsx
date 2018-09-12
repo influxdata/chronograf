@@ -47,7 +47,7 @@ class PageHeaderLeft extends Component<Props> {
     }
 
     return {
-      flex: `1 0 calc(100% - ${offsetPixels}px)`,
+      flex: `1 0 calc(50% - ${offsetPixels}px)`,
     }
   }
 }
