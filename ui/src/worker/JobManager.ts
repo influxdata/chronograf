@@ -3,10 +3,11 @@ import idGenerator from 'uuid'
 import Deferred from 'src/worker/Deferred'
 import DB from './Database'
 import {TimeSeriesServerResponse} from 'src/types/series'
-import {DygraphValue} from 'src/types'
+import {DygraphValue, FluxTable} from 'src/types'
 import {getBasepath} from 'src/utils/basepath'
 import {TimeSeriesToTableGraphReturnType} from 'src/worker/jobs/timeSeriesToTableGraph'
 import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph'
+import {FluxTablesToDygraphResult} from 'src/worker/jobs/fluxTablesToDygraph'
 
 interface DecodeFluxRespWithLimitResult {
   body: string
@@ -90,6 +91,12 @@ class JobManager {
     pathname: string = ''
   ): Promise<TimeSeriesToDyGraphReturnType> => {
     return this.publishDBJob('TSTODYGRAPH', {raw, pathname})
+  }
+
+  public fluxTablesToDygraph = (
+    raw: FluxTable[]
+  ): Promise<FluxTablesToDygraphResult> => {
+    return this.publishDBJob('FLUXTODYGRAPH', {raw})
   }
 
   public validateDygraphData = (ts: DygraphValue[][]) => {

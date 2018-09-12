@@ -1,4 +1,4 @@
-import {fluxTablesToDygraph} from 'src/shared/parsing/flux/dygraph'
+import {fluxTablesToDygraphWork as fluxTablesToDygraph} from 'src/worker/jobs/fluxTablesToDygraph'
 import {parseResponse} from 'src/shared/parsing/flux/response'
 import {
   SIMPLE,

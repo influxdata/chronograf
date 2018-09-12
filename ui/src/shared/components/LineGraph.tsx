@@ -233,8 +233,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
     }
 
     if (fluxData.length) {
-      const {labels, dygraphsData} = await fluxTablesToDygraph(fluxData)
-      return {labels, dygraphSeries: {}, timeSeries: dygraphsData}
+      return await fluxTablesToDygraph(fluxData)
     }
   }
 }
