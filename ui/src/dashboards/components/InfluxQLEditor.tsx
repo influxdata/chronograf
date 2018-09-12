@@ -266,15 +266,20 @@ class InfluxQLEditor extends Component<Props, State> {
     const {onUpdate} = this.props
 
     if (!this.isDisabled && !this.state.isSubmitted) {
+      const {editedQueryText} = this.state
       this.cancelPendingUpdates()
-      const update = onUpdate(this.state.editedQueryText)
+      const update = onUpdate(editedQueryText)
       const cancelableUpdate = makeCancelable(update)
 
       this.pendingUpdates = [...this.pendingUpdates, cancelableUpdate]
 
       try {
         await cancelableUpdate.promise
-        this.setState({isSubmitted: true})
+
+        // prevent changing submitted status when edited while awaiting update
+        if (this.state.editedQueryText === editedQueryText) {
+          this.setState({isSubmitted: true})
+        }
       } catch (error) {
         if (!error.isCanceled) {
           console.error(error)
