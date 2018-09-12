@@ -276,7 +276,7 @@ class InfluxQLEditor extends Component<Props, State> {
       this.pendingUpdates = [...this.pendingUpdates, cancelableUpdate]
 
       try {
-        await cancelableUpdate
+        await cancelableUpdate.promise
         this.setState({isSubmitted: true})
       } catch (error) {
         if (!error.isCanceled) {
