@@ -38,7 +38,7 @@ export const notifyNewVersion = (version: string): Notification => ({
   type: 'info',
   icon: 'cubo-uniform',
   duration: INFINITE,
-  message: `Welcome to the latest Chronograf${version}. Local settings cleared.`,
+  message: `Welcome to the latest Chronograf (${version}). Local settings cleared.`,
 })
 
 export const notifyLoadLocalSettingsFailed = (error: string): Notification => ({

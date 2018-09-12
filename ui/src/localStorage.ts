@@ -25,38 +25,29 @@ import {ThresholdType, NoteVisibility} from 'src/types/dashboards'
 import {LocalStorage} from 'src/types/localStorage'
 
 const VERSION = process.env.npm_package_version
+const GIT_SHA = process.env.GIT_SHA
 
 export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
   try {
     const serializedState = localStorage.getItem('state')
-
     const state = JSON.parse(serializedState) || {}
+    const gitSHAChanged = state.GIT_SHA && state.GIT_SHA !== GIT_SHA
+    const npmVersionChanged = state.VERSION && state.VERSION !== VERSION
 
-    if (state.VERSION && state.VERSION !== VERSION) {
-      const version = VERSION ? ` (${VERSION})` : ''
+    if (npmVersionChanged || gitSHAChanged) {
+      window.localStorage.removeItem('state')
 
-      console.log(notifyNewVersion(version).message) // tslint:disable-line no-console
-      errorsQueue.push(notifyNewVersion(version))
-
-      if (!state.dashTimeV1) {
-        window.localStorage.removeItem('state')
-        return {}
+      if (npmVersionChanged) {
+        errorsQueue.push(notifyNewVersion(VERSION))
       }
 
-      const ranges = normalizer(_.get(state, ['dashTimeV1', 'ranges'], []))
-      const dashTimeV1 = {ranges}
+      console.debug('Cleared Chronograf localStorage state')
 
-      window.localStorage.setItem(
-        'state',
-        JSON.stringify({
-          dashTimeV1,
-        })
-      )
-
-      return {dashTimeV1}
+      return {}
     }
 
     delete state.VERSION
+    delete state.GIT_SHA
 
     return state
   } catch (error) {
@@ -93,6 +84,7 @@ export const saveToLocalStorage = ({
           {
             ...appPersisted,
             VERSION,
+            GIT_SHA,
             timeRange,
             dashTimeV1,
             dataExplorer: {
