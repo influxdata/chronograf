@@ -71,6 +71,7 @@ export default (state = initialState, action: Action): DEState => {
           queryConfig: newQueryConfig,
           source: '',
           id,
+          type: 'influxql',
         }
         queryDrafts = [newQueryDraft]
       }

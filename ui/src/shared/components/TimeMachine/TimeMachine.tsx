@@ -115,7 +115,6 @@ interface Props {
   manualRefresh?: number
   queryStatus: QueryStatus
   updateScriptStatus?: (status: ScriptStatus) => void
-  updateService?: (service: Service) => void
 }
 
 interface Body extends FlatBody {
@@ -179,7 +178,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {fluxLinks, script, updateService, isInCEO} = this.props
+    const {fluxLinks, script} = this.props
     const {autoRefresher, autoRefreshDuration} = this.state
 
     autoRefresher.poll(autoRefreshDuration)
@@ -194,9 +193,6 @@ class TimeMachine extends PureComponent<Props, State> {
     if (this.isFluxSource) {
       try {
         this.debouncedASTResponse(script)
-        if (isInCEO) {
-          updateService(this.service)
-        }
       } catch (error) {
         console.error('Could not retrieve AST for script', error)
       }
@@ -353,7 +349,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get service(): Service {
     const {service, services, queryDrafts} = this.props
-    const {selectedService} = this.state
+    const {selectedService, useDynamicSource} = this.state
 
     const queryDraft = _.get(queryDrafts, 0)
     const querySource = _.get(queryDraft, 'source', '')
@@ -365,6 +361,12 @@ class TimeMachine extends PureComponent<Props, State> {
       if (foundService) {
         return foundService
       }
+    }
+
+    if (useDynamicSource && this.isFluxSource) {
+      return services.find(s => {
+        return s.sourceID === this.source.id
+      })
     }
 
     if (service) {
@@ -432,15 +434,19 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get isFluxSource(): boolean {
+    const {queryDrafts} = this.props
+
     // TODO: Update once flux is no longer a separate service
-    if (this.service) {
+    if (getDeep<string>(queryDrafts, '0.type', '') === 'flux') {
       return true
     }
+
     return false
   }
 
   private get sourceSupportsFlux(): boolean {
     const {services} = this.props
+
     const foundFluxForSource = services.find(service => {
       return service.sourceID === this.source.id
     })
@@ -641,7 +647,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
-  private updateQueryDraftsSource(selectedSource: Source) {
+  private updateQueryDraftsSource(selectedSource: Source, type: string) {
     const {queryDrafts, updateQueryDrafts} = this.props
 
     const queries: CellQuery[] = queryDrafts.map(q => {
@@ -650,6 +656,7 @@ class TimeMachine extends PureComponent<Props, State> {
         ...q,
         queryConfig: {...queryConfig, source: selectedSource},
         source: getDeep<string>(selectedSource, 'links.self', ''),
+        type,
       }
     })
 
@@ -660,25 +667,23 @@ class TimeMachine extends PureComponent<Props, State> {
     selectedService: Service,
     selectedSource: Source
   ): void => {
-    const {updateSourceLink, isInCEO} = this.props
+    const {updateSourceLink} = this.props
     const useDynamicSource = false
-
-    if (isInCEO) {
-      this.props.updateService(selectedService)
-    }
 
     if (updateSourceLink) {
       updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
     }
 
-    this.updateQueryDraftsSource(selectedSource)
+    const type = selectedService ? 'flux' : 'influxql'
+    this.updateQueryDraftsSource(selectedSource, type)
     this.setState({selectedService, selectedSource, useDynamicSource})
   }
 
   private handleSelectDynamicSource = (): void => {
     const useDynamicSource = true
 
-    this.updateQueryDraftsSource(null)
+    const type = this.isFluxSource ? 'flux' : 'finluxql'
+    this.updateQueryDraftsSource(null, type)
     this.setState({useDynamicSource})
   }
 
@@ -1005,18 +1010,17 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private toggleFlux = (): void => {
-    const {services, updateService} = this.props
+    const {services} = this.props
 
     if (this.isFluxSource) {
       this.setState({selectedService: null})
-      updateService(null)
+      this.updateQueryDraftsSource(null, 'influxql')
     } else {
       const foundFluxForSource = services.find(service => {
         return service.sourceID === this.source.id
       })
-
       if (foundFluxForSource) {
-        updateService(foundFluxForSource)
+        this.updateQueryDraftsSource(null, 'flux')
       }
     }
   }

@@ -47,6 +47,7 @@ export interface CellQuery {
   source: string
   text?: string // doesn't come from server
   id?: string
+  type: string // flux or influxql
 }
 
 export interface Legend {

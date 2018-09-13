@@ -504,7 +504,13 @@ export class DataExplorer extends PureComponent<Props, State> {
       query,
       this.templates
     )
-    const queryDraft = {query, queryConfig, source: source.links.self}
+
+    const queryDraft = {
+      query,
+      queryConfig,
+      source: source.links.self,
+      type: 'influxql',
+    }
     loadDE([queryDraft], timeRange)
   }
 

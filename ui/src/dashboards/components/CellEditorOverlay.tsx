@@ -71,7 +71,6 @@ interface Props {
 interface State {
   isStaticLegend: boolean
   status: ScriptStatus
-  currentService: Service
 }
 
 @ErrorHandling
@@ -90,7 +89,6 @@ class CellEditorOverlay extends Component<Props, State> {
         type: 'none',
         text: '',
       },
-      currentService: null,
     }
   }
 
@@ -120,7 +118,7 @@ class CellEditorOverlay extends Component<Props, State> {
       queryStatus,
     } = this.props
 
-    const {isStaticLegend, currentService} = this.state
+    const {isStaticLegend} = this.state
 
     return (
       <div
@@ -142,7 +140,6 @@ class CellEditorOverlay extends Component<Props, State> {
           onResetFocus={this.handleResetFocus}
           isInCEO={true}
           sources={sources}
-          service={currentService}
           services={services}
           updateQueryDrafts={updateQueryDrafts}
           onToggleStaticLegend={this.handleToggleStaticLegend}
@@ -154,7 +151,6 @@ class CellEditorOverlay extends Component<Props, State> {
           visualizationOptions={this.visualizationOptions}
           queryStatus={queryStatus}
           updateScriptStatus={this.updateScriptStatus}
-          updateService={this.updateService}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader
@@ -174,11 +170,9 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private get isSaveable(): boolean {
     const {queryDrafts} = this.props
-    const {currentService, status} = this.state
+    const {status} = this.state
 
-    const isFluxSource = _.get(currentService, 'type', '') === 'flux'
-
-    if (isFluxSource) {
+    if (this.isFluxSource) {
       return _.get(status, 'type', '') === 'success'
     }
 
@@ -234,12 +228,17 @@ class CellEditorOverlay extends Component<Props, State> {
     }
   }
 
-  private updateScriptStatus = (status: ScriptStatus): void => {
-    this.setState({status})
+  private get isFluxSource(): boolean {
+    const {queryDrafts} = this.props
+
+    if (getDeep<string>(queryDrafts, '0.type', '') === 'flux') {
+      return true
+    }
+    return false
   }
 
-  private updateService = (service: Service): void => {
-    this.setState({currentService: service})
+  private updateScriptStatus = (status: ScriptStatus): void => {
+    this.setState({status})
   }
 
   private handleSaveCell = () => {
@@ -251,16 +250,17 @@ class CellEditorOverlay extends Component<Props, State> {
       cell,
       script,
     } = this.props
-    const {isStaticLegend, currentService} = this.state
+    const {isStaticLegend} = this.state
 
     let queries: DashboardsModels.CellQuery[]
 
-    if (_.get(currentService, 'type', '') === 'flux') {
+    if (this.isFluxSource) {
       queries = [
         {
           query: script,
           queryConfig: null,
-          source: currentService.links.self,
+          source: getDeep<string>(queryDrafts, '0.source', ''),
+          type: 'flux',
         },
       ]
     } else {
@@ -271,7 +271,7 @@ class CellEditorOverlay extends Component<Props, State> {
           null
         )
         const timeRange = getTimeRange(queryConfig)
-        const source = getDeep<string | null>(q, 'source', null)
+        const source = getDeep<string>(q, 'source', '')
 
         return {
           ...q,

@@ -62,6 +62,7 @@ const getNewQueryDrafts = (sourceLink?: string): CellQuery[] => {
     queryConfig: newQueryConfig,
     source: sourceLink || '',
     id,
+    type: 'influxql',
   }
   return [newQueryDraft]
 }
