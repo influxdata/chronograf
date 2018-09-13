@@ -9,7 +9,6 @@ import InfluxQLQueryMaker from 'src/shared/components/TimeMachine/InfluxQLQueryM
 import DisplayOptions from 'src/dashboards/components/DisplayOptions'
 import TimeMachineBottom from 'src/shared/components/TimeMachine/TimeMachineBottom'
 import TimeMachineControls from 'src/shared/components/TimeMachine/TimeMachineControls'
-import KeyboardShortcuts from 'src/shared/components/KeyboardShortcuts'
 import FluxQueryBuilder from 'src/flux/components/FluxQueryBuilder'
 
 // Utils
@@ -30,12 +29,8 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
 
 // Actions
-import {
-  validateSuccess,
-  fluxTimeSeriesError,
-  fluxResponseTruncatedError,
-} from 'src/shared/copy/notifications'
-import {getSuggestions, getAST, getTimeSeries} from 'src/flux/apis'
+import {validateSuccess} from 'src/shared/copy/notifications'
+import {getSuggestions, getAST} from 'src/flux/apis'
 import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
 
 // Constants
@@ -200,7 +195,6 @@ class TimeMachine extends PureComponent<Props, State> {
       } catch (error) {
         console.error('Could not retrieve AST for script', error)
       }
-      this.getTimeSeries()
     }
   }
 
@@ -458,22 +452,20 @@ class TimeMachine extends PureComponent<Props, State> {
 
     return (
       <FluxContext.Provider value={this.getContext}>
-        <KeyboardShortcuts onControlEnter={this.getTimeSeries}>
-          <FluxQueryBuilder
-            body={body}
-            script={script}
-            status={status}
-            notify={notify}
-            service={this.service}
-            suggestions={suggestions}
-            onValidate={this.handleValidate}
-            onAppendFrom={this.handleAppendFrom}
-            onAppendJoin={this.handleAppendJoin}
-            onChangeScript={this.handleChangeScript}
-            onSubmitScript={this.handleSubmitScript}
-            onDeleteBody={this.handleDeleteBody}
-          />
-        </KeyboardShortcuts>
+        <FluxQueryBuilder
+          body={body}
+          script={script}
+          status={status}
+          notify={notify}
+          service={this.service}
+          suggestions={suggestions}
+          onValidate={this.handleValidate}
+          onAppendFrom={this.handleAppendFrom}
+          onAppendJoin={this.handleAppendJoin}
+          onChangeScript={this.handleChangeScript}
+          onSubmitScript={this.handleSubmitScript}
+          onDeleteBody={this.handleDeleteBody}
+        />
       </FluxContext.Provider>
     )
   }
@@ -782,40 +774,6 @@ class TimeMachine extends PureComponent<Props, State> {
       }
       return console.error('Could not parse AST', error)
     }
-  }
-
-  private getTimeSeries = async () => {
-    const {script, fluxLinks, notify, updateScriptStatus, isInCEO} = this.props
-
-    if (!script) {
-      return
-    }
-
-    try {
-      await getAST({url: fluxLinks.ast, body: script})
-    } catch (error) {
-      const status = parseError(error)
-
-      this.setState({status})
-      if (isInCEO) {
-        updateScriptStatus(status)
-      }
-      return console.error('Could not parse AST', error)
-    }
-
-    try {
-      const {tables, didTruncate} = await getTimeSeries(this.service, script)
-      this.setState({data: tables})
-      if (didTruncate) {
-        notify(fluxResponseTruncatedError())
-      }
-    } catch (error) {
-      this.setState({data: []})
-      notify(fluxTimeSeriesError(error))
-      console.error('Could not get timeSeries', error)
-    }
-
-    this.getASTResponse(script)
   }
 
   private handleSubmitScript = () => {
