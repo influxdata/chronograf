@@ -28,7 +28,6 @@ import {GrabDataForDownloadHandler} from 'src/types/layout'
 // Utils
 import {GlobalAutoRefresher, AutoRefresher} from 'src/utils/AutoRefresher'
 import {NoteVisibility} from 'src/types/dashboards'
-import {getDeep} from 'src/utils/wrappers'
 import {
   extractQueryWarningMessage,
   extractQueryErrorMessage,
@@ -124,8 +123,9 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public shouldComponentUpdate(prevProps: Props, prevState: State) {
-    const list = [
+    const propKeys = [
       'source',
+      'service',
       'queries',
       'timeRange',
       'inView',
@@ -133,13 +133,17 @@ class TimeSeries extends Component<Props, State> {
       'cellType',
       'manualRefresh',
     ]
+    const stateKeys = ['loading', 'timeSeriesInfluxQL', 'timeSeriesFlux']
 
-    return (
-      this.state.loading !== prevState.loading ||
-      _.some(list, key => {
-        return !_.isEqual(this.props[key], prevProps[key])
-      })
+    const propsUpdated = propKeys.some(
+      k => !_.isEqual(this.props[k], prevProps[k])
     )
+
+    const stateUpdated = stateKeys.some(
+      k => !_.isEqual(this.state[k], prevState[k])
+    )
+
+    return propsUpdated || stateUpdated
   }
 
   public async componentDidMount() {
@@ -168,82 +172,6 @@ class TimeSeries extends Component<Props, State> {
     }
 
     this.executeQueries()
-  }
-
-  public setIsLoading(): Promise<void> {
-    return new Promise(resolve => {
-      this.setState({loading: RemoteDataState.Loading}, () => {
-        window.setTimeout(() => {
-          resolve()
-        }, 0)
-      })
-    })
-  }
-
-  public executeQueries = async () => {
-    const {inView, queries, grabDataForDownload, grabFluxData} = this.props
-
-    if (!inView) {
-      return
-    }
-
-    if (!queries.length) {
-      return this.setState({timeSeriesInfluxQL: DEFAULT_TIME_SERIES})
-    }
-
-    await this.setIsLoading()
-
-    try {
-      this.latestUUID = uuid.v1()
-
-      let timeSeriesInfluxQL: TimeSeriesServerResponse[] = []
-      let timeSeriesFlux: FluxTable[] = []
-      if (this.isFluxSource) {
-        const results = await this.executeFluxQuery(queries)
-        timeSeriesFlux = results.tables
-
-        if (_.get(results, 'uuid') !== this.latestUUID) {
-          return
-        }
-      } else {
-        timeSeriesInfluxQL = await Promise.all(queries.map(this.executeQuery))
-
-        if (
-          getDeep(timeSeriesInfluxQL, '0.response.uuid', null) !==
-          this.latestUUID
-        ) {
-          return
-        }
-      }
-
-      if (!this.isComponentMounted) {
-        return
-      }
-
-      this.setState({
-        timeSeriesInfluxQL,
-        timeSeriesFlux,
-        loading: RemoteDataState.Done,
-        isFirstFetch: false,
-      })
-
-      if (grabDataForDownload) {
-        grabDataForDownload(timeSeriesInfluxQL)
-      }
-      if (grabFluxData) {
-        grabFluxData(timeSeriesFlux)
-      }
-    } catch (err) {
-      if (!this.isComponentMounted) {
-        return
-      }
-
-      this.setState({
-        timeSeriesInfluxQL: [],
-        timeSeriesFlux: [],
-        loading: RemoteDataState.Error,
-      })
-    }
   }
 
   public render() {
@@ -313,12 +241,72 @@ class TimeSeries extends Component<Props, State> {
     return null
   }
 
-  private async executeFluxQuery(
-    queries: Query[]
-  ): Promise<GetTimeSeriesResult> {
-    const {service, onNotify} = this.props
+  private executeQueries = async () => {
+    const {inView, queries, grabDataForDownload, grabFluxData} = this.props
 
-    const script = getDeep<string>(queries, '0.text', '')
+    if (!inView) {
+      return
+    }
+
+    if (!queries.length) {
+      this.setState({
+        timeSeriesInfluxQL: DEFAULT_TIME_SERIES,
+        timeSeriesFlux: [],
+      })
+
+      return
+    }
+
+    let timeSeriesInfluxQL: TimeSeriesServerResponse[] = []
+    let timeSeriesFlux: FluxTable[] = []
+    let responseUUID: string
+
+    this.setState({loading: RemoteDataState.Loading})
+    this.latestUUID = uuid.v1()
+
+    try {
+      if (this.isFluxSource) {
+        const results = await this.executeFluxQuery()
+
+        timeSeriesFlux = results.tables
+        responseUUID = results.uuid
+      } else {
+        timeSeriesInfluxQL = await this.executeInfluxQLQueries()
+        responseUUID = _.get(timeSeriesInfluxQL, '0.response.uuid')
+      }
+
+      if (!this.isComponentMounted) {
+        return
+      }
+
+      if (responseUUID !== this.latestUUID) {
+        return
+      }
+
+      this.setState({loading: RemoteDataState.Done})
+    } catch {
+      this.setState({loading: RemoteDataState.Error})
+    }
+
+    this.setState({
+      timeSeriesInfluxQL,
+      timeSeriesFlux,
+      isFirstFetch: false,
+    })
+
+    if (grabDataForDownload) {
+      grabDataForDownload(timeSeriesInfluxQL)
+    }
+
+    if (grabFluxData) {
+      grabFluxData(timeSeriesFlux)
+    }
+  }
+
+  private executeFluxQuery = async (): Promise<GetTimeSeriesResult> => {
+    const {service, queries, onNotify} = this.props
+
+    const script: string = _.get(queries, '0.text', '')
     const results = await fetchFluxTimeSeries(service, script, this.latestUUID)
 
     if (results.didTruncate && onNotify) {
@@ -328,7 +316,18 @@ class TimeSeries extends Component<Props, State> {
     return results
   }
 
-  private executeQuery = async (
+  private executeInfluxQLQueries = async (): Promise<
+    TimeSeriesServerResponse[]
+  > => {
+    const {queries} = this.props
+    const timeSeriesInfluxQL = await Promise.all(
+      queries.map(this.executeInfluxQLQuery)
+    )
+
+    return timeSeriesInfluxQL
+  }
+
+  private executeInfluxQLQuery = async (
     query: Query
   ): Promise<TimeSeriesServerResponse> => {
     const {source, templates, editQueryStatus} = this.props
