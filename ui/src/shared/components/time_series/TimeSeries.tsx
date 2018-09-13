@@ -34,6 +34,7 @@ import {
 } from 'src/shared/parsing'
 import {notify} from 'src/shared/actions/notifications'
 import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
+import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
 // Components
 import MarkdownCell from 'src/shared/components/MarkdownCell'
@@ -81,6 +82,8 @@ const GraphLoadingDots = () => (
   </div>
 )
 
+const QUERIES_DEBOUNCE_MS = 400
+
 class TimeSeries extends Component<Props, State> {
   public static defaultProps = {
     inView: true,
@@ -110,9 +113,11 @@ class TimeSeries extends Component<Props, State> {
 
   private latestUUID: string = uuid.v1()
   private isComponentMounted: boolean = false
+  private debouncer: Debouncer = new DefaultDebouncer()
 
   constructor(props: Props) {
     super(props)
+
     this.state = {
       timeRange: props.timeRange,
       timeSeriesInfluxQL: DEFAULT_TIME_SERIES,
@@ -171,7 +176,13 @@ class TimeSeries extends Component<Props, State> {
       return
     }
 
-    this.executeQueries()
+    // Currently the TimeSeries component is being used to refetch Flux data
+    // on every keystroke in the TimeMachineEditor. We debounce calls to
+    // fetch the Flux data to a more reasonable interval. Eventually we
+    // should switch the TimeMachineEditor to refetch Flux data on an
+    // explicit save rather than a keystroke
+    this.setState({loading: RemoteDataState.Loading})
+    this.debouncer.call(this.executeQueries, QUERIES_DEBOUNCE_MS)
   }
 
   public render() {
