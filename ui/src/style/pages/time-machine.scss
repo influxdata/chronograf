@@ -93,6 +93,8 @@
   flex-wrap: none;
   width: 100%;
   height: 100%;
+  background-color: $g3-castle;
+  padding: 16px;
 }
 
 .time-machine-sidebar {
@@ -175,14 +177,16 @@
 }
 
 .time-machine-table {
-  border-left: 1px solid $g5-pepper;
-  flex: 1 0 0;
-  background-color: $g3-castle;
+  width: calc(100% - 32px);
+  border: 2px solid $g5-pepper;
+  border-radius: 3px;
   overflow: hidden;
-  border-radius: 0 0 $radius $radius;
-
+  
   &:only-child {
-    border: 0;
+    height: calc(100% - 16px);
+    top: 8px;
+    left: 16px;
+    border: 1;
   }
 }
 

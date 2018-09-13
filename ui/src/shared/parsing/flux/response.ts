@@ -51,19 +51,17 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
 
   const nonAnnotationData = Papa.parse(nonAnnotationLines).data
   const annotationData = Papa.parse(annotationLines).data
-  const headerRow = nonAnnotationData[0]
+  const headerRow: string[] = nonAnnotationData[0]
   const tableColIndex = headerRow.findIndex(h => h === 'table')
+  const timeColIndex = headerRow.findIndex(h => h === '_time')
 
-  interface TableGroup {
-    [tableId: string]: string[]
+  if (!timeColIndex) {
+    throw new Error('Could not find time Column')
   }
 
   // Group rows by their table id
-  const tablesData = Object.values(
-    _.groupBy<TableGroup[]>(
-      nonAnnotationData.slice(1),
-      row => row[tableColIndex]
-    )
+  const tablesData: Array<Array<Array<string | Date>>> = Object.values(
+    _.groupBy(nonAnnotationData.slice(1), row => row[tableColIndex])
   )
 
   const groupRow = annotationData.find(row => row[0] === '#group')
@@ -98,9 +96,15 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
       {}
     )
 
+    for (const row of tableData) {
+      row[timeColIndex] = new Date(row[timeColIndex])
+    }
+
+    const data: Array<Array<string | Date>> = [headerRow, ...tableData]
+
     return {
       id: uuid.v4(),
-      data: [[...headerRow], ...tableData],
+      data,
       name,
       groupKey,
       dataTypes,

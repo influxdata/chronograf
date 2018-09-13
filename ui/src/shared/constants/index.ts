@@ -504,3 +504,8 @@ export const MAX_SIZE = 1
 export const MIN_SIZE = 0
 
 export const QUERY_BUILDER_LIST_ITEM_HEIGHT = 28
+
+export enum DataType {
+  flux = 'flux',
+  influxQL = 'influxQL',
+}

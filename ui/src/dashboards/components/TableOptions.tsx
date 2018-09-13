@@ -14,7 +14,7 @@ import ThresholdsList from 'src/shared/components/ThresholdsList'
 import ThresholdsListTypeToggle from 'src/shared/components/ThresholdsListTypeToggle'
 
 // Constants
-import {DEFAULT_TIME_FIELD} from 'src/dashboards/constants'
+import {DEFAULT_INFLUXQL_TIME_FIELD} from 'src/dashboards/constants'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -90,7 +90,7 @@ export class TableOptions extends Component<Props, {}> {
           <h5 className="display-options--header">Table Controls</h5>
           <div className="form-group-wrapper">
             <GraphOptionsSortBy
-              selected={tableOptions.sortBy || DEFAULT_TIME_FIELD}
+              selected={tableOptions.sortBy || DEFAULT_INFLUXQL_TIME_FIELD}
               sortByOptions={tableSortByOptions}
               onChooseSortBy={this.handleChooseSortBy}
             />

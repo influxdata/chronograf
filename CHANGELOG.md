@@ -24,6 +24,7 @@
 1.  [#4445](https://github.com/influxdata/chronograf/pull/4445): Allow flux dashboard cells to be exported
 1.  [#4449](https://github.com/influxdata/chronograf/pull/4449): Add ability to use single stat graph visualizations for flux query
 1.  [#4454](https://github.com/influxdata/chronograf/pull/4454): Save log line wrap/truncate preference
+1.  [#4461](https://github.com/influxdata/chronograf/pull/4461): Add ability to use table graph visualizations for flux query
 
 
 ### UI Improvements

@@ -28,7 +28,7 @@ import {
   CellType,
   FluxTable,
 } from 'src/types'
-import {DataTypes} from 'src/shared/components/RefreshingGraph'
+import {DataType} from 'src/shared/constants'
 
 interface Props {
   axes: Axes
@@ -39,7 +39,7 @@ interface Props {
   loading: RemoteDataState
   decimalPlaces: DecimalPlaces
   data: TimeSeriesServerResponse[] | FluxTable[]
-  dataType: DataTypes
+  dataType: DataType
   cellID: string
   cellHeight: number
   staticLegend: boolean
@@ -81,7 +81,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
   public async parseTimeSeries(
     data: TimeSeriesServerResponse[] | FluxTable[],
-    dataType: DataTypes
+    dataType: DataType
   ) {
     try {
       const timeSeries = await this.convertToDygraphData(data, dataType)
@@ -230,18 +230,18 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
   private async convertToDygraphData(
     data: TimeSeriesServerResponse[] | FluxTable[],
-    dataType: DataTypes
+    dataType: DataType
   ): Promise<TimeSeriesToDyGraphReturnType> {
     const {location} = this.props
 
-    if (dataType === DataTypes.influxQL) {
+    if (dataType === DataType.influxQL) {
       return await timeSeriesToDygraph(
         data as TimeSeriesServerResponse[],
         location.pathname
       )
     }
 
-    if (dataType === DataTypes.flux) {
+    if (dataType === DataType.flux) {
       return await fluxTablesToDygraph(data as FluxTable[])
     }
   }

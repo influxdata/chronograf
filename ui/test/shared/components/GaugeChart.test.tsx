@@ -2,7 +2,7 @@ import {shallow} from 'enzyme'
 import React from 'react'
 import Gauge from 'src/shared/components/Gauge'
 import GaugeChart from 'src/shared/components/GaugeChart'
-import {DataTypes} from 'src/shared/components/RefreshingGraph'
+import {DataType} from 'src/shared/constants'
 
 const data = [
   {
@@ -31,7 +31,7 @@ const defaultProps = {
     digits: 10,
     isEnforced: false,
   },
-  dataType: DataTypes.influxQL,
+  dataType: DataType.influxQL,
 }
 
 const setup = (overrides = {}) => {

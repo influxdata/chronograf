@@ -3,9 +3,9 @@ import {fastMap, fastReduce, fastFilter} from 'src/utils/fast'
 
 import {CELL_HORIZONTAL_PADDING} from 'src/shared/constants/tableGraph'
 import {
-  DEFAULT_TIME_FIELD,
+  DEFAULT_INFLUXQL_TIME_FIELD,
+  DEFAULT_FLUX_TIME_FIELD,
   DEFAULT_TIME_FORMAT,
-  TimeField,
 } from 'src/dashboards/constants'
 import {
   Sort,
@@ -14,6 +14,7 @@ import {
   DecimalPlaces,
 } from 'src/types/dashboards'
 import {TimeSeriesValue} from 'src/types/series'
+import {DataType} from 'src/shared/constants'
 
 const calculateSize = (message: string): number => {
   return message.length * 7
@@ -81,12 +82,12 @@ const updateMaxWidths = (
       const columnLabel = topRow[c]
 
       const useTimeWidth =
-        (columnLabel === DEFAULT_TIME_FIELD.internalName &&
+        (columnLabel === DEFAULT_INFLUXQL_TIME_FIELD.internalName &&
           verticalTimeAxis &&
           !isTopRow) ||
         (!verticalTimeAxis &&
           isTopRow &&
-          topRow[0] === DEFAULT_TIME_FIELD.internalName &&
+          topRow[0] === DEFAULT_INFLUXQL_TIME_FIELD.internalName &&
           c !== 0)
 
       const currentWidth = useTimeWidth
@@ -109,21 +110,42 @@ const updateMaxWidths = (
   return maxWidths
 }
 
+export const getTimeField = (
+  fieldOptions: FieldOption[],
+  dataType: DataType
+): FieldOption => {
+  if (dataType === DataType.flux) {
+    return (
+      fieldOptions.find(
+        f => f.internalName === DEFAULT_FLUX_TIME_FIELD.internalName
+      ) || DEFAULT_FLUX_TIME_FIELD
+    )
+  }
+
+  return (
+    fieldOptions.find(
+      f => f.internalName === DEFAULT_INFLUXQL_TIME_FIELD.internalName
+    ) || DEFAULT_INFLUXQL_TIME_FIELD
+  )
+}
+
 export const computeFieldOptions = (
   existingFieldOptions: FieldOption[],
-  sortedLabels: SortedLabel[]
+  sortedLabels: SortedLabel[],
+  dataType: DataType
 ): FieldOption[] => {
-  const timeField =
-    existingFieldOptions.find(f => f.internalName === 'time') ||
-    DEFAULT_TIME_FIELD
+  const timeField = getTimeField(existingFieldOptions, dataType)
+
   let astNames = [timeField]
   sortedLabels.forEach(({label}) => {
-    const field: TimeField = {
-      internalName: label,
-      displayName: '',
-      visible: true,
+    if (label !== timeField.internalName) {
+      const field: FieldOption = {
+        internalName: label,
+        displayName: '',
+        visible: true,
+      }
+      astNames = [...astNames, field]
     }
-    astNames = [...astNames, field]
   })
 
   const intersection = existingFieldOptions.filter(f => {

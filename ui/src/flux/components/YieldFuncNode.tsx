@@ -3,20 +3,24 @@ import _ from 'lodash'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import YieldNodeVis from 'src/flux/components/YieldNodeVis'
-import {getTimeSeries} from 'src/flux/apis'
-import {getDeep} from 'src/utils/wrappers'
+import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 
-import {FluxTable, Service} from 'src/types'
+import {FluxTable, Service, Source, TimeRange, Query} from 'src/types'
 import {Func} from 'src/types/flux'
+import {VisualizationOptions} from 'src/types/dataExplorer'
 
 interface Props {
   service: Service
+  source: Source
+  timeRange: TimeRange
   data: FluxTable[]
   index: number
   bodyID: string
   func: Func
   declarationID?: string
   script: string
+  queries: Query[]
+  visualizationOptions: VisualizationOptions
 }
 
 interface State {
@@ -25,43 +29,66 @@ interface State {
 
 @ErrorHandling
 class YieldFuncNode extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props)
+  private timeSeries: React.RefObject<TimeSeries> = React.createRef()
 
-    this.state = {
-      data: [],
+  public componentDidUpdate(prevProps) {
+    if (!this.timeSeries.current) {
+      return
     }
-  }
 
-  public componentDidMount() {
-    this.getData()
-  }
-
-  public componentDidUpdate(prevProps: Props) {
-    if (prevProps.script !== this.props.script) {
-      this.getData()
+    if (this.haveVisOptionsChanged(prevProps.visualizationOptions)) {
+      this.timeSeries.current.forceUpdate()
     }
   }
 
   public render() {
-    const {func} = this.props
-    const {data} = this.state
+    const {
+      func,
+      visualizationOptions,
+      source,
+      service,
+      timeRange,
+      queries,
+    } = this.props
 
     const yieldName = _.get(func, 'args.0.value', 'result')
 
     return (
       <div className="yield-node">
         <div className="func-node--connector" />
-        <YieldNodeVis data={data} yieldName={yieldName} />
+        <TimeSeries
+          source={source}
+          service={service}
+          queries={queries}
+          timeRange={timeRange}
+        >
+          {({timeSeriesFlux}) => (
+            <YieldNodeVis
+              data={timeSeriesFlux}
+              yieldName={yieldName}
+              visualizationOptions={visualizationOptions}
+            />
+          )}
+        </TimeSeries>
       </div>
     )
   }
 
-  private getData = async (): Promise<void> => {
-    const {script, service} = this.props
-    const results = await getTimeSeries(service, script)
-    const data = getDeep<FluxTable[]>(results, 'tables', [])
-    this.setState({data})
+  private haveVisOptionsChanged(
+    visualizationOptions: VisualizationOptions
+  ): boolean {
+    const visProps: string[] = [
+      'axes',
+      'colors',
+      'tableOptions',
+      'fieldOptions',
+      'decimalPlaces',
+      'timeFormat',
+    ]
+
+    const prevVisValues = _.pick(visualizationOptions, visProps)
+    const curVisValues = _.pick(this.props.visualizationOptions, visProps)
+    return !_.isEqual(prevVisValues, curVisValues)
   }
 }
 
