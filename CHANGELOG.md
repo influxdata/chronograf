@@ -21,6 +21,7 @@
 1.  [#4404](https://github.com/influxdata/chronograf/pull/4404): Add loading status indicator to hosts page
 1.  [#4422](https://github.com/influxdata/chronograf/pull/4422): Allow deep linking flux script in data explorer
 1.  [#4410](https://github.com/influxdata/chronograf/pull/4410): Add ability to use line graph visualizations for flux query
+1.  [#4445](https://github.com/influxdata/chronograf/pull/4445): Allow flux dashboard cells to be exported
 
 
 ### UI Improvements

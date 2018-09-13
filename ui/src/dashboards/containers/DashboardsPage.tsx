@@ -8,6 +8,7 @@ import DashboardsContents from 'src/dashboards/components/DashboardsPageContents
 import {Page} from 'src/reusable_ui'
 import {getDeep} from 'src/utils/wrappers'
 
+import {mapDashboardForDownload} from 'src/dashboards/utils/export'
 import {createDashboard} from 'src/dashboards/apis'
 import {
   getDashboardsAsync,
@@ -17,6 +18,7 @@ import {
   retainRangesDashTimeV1 as retainRangesDashTimeV1Action,
 } from 'src/dashboards/actions'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
+import {fetchAllFluxServicesAsync} from 'src/shared/actions/services'
 
 import {
   NEW_DASHBOARD,
@@ -29,7 +31,7 @@ import {
   notifyDashboardExportFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Dashboard, RemoteDataState} from 'src/types'
+import {Source, Dashboard, RemoteDataState, Service} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
 
@@ -37,13 +39,16 @@ export interface Props {
   source: Source
   sources: Source[]
   router: InjectedRouter
+  dashboard: Dashboard
   handleGetDashboards: () => Promise<Dashboard[]>
   handleGetChronografVersion: () => string
   handleDeleteDashboard: (dashboard: Dashboard) => void
   handleImportDashboard: (dashboard: Dashboard) => void
   notify: (message: Notification) => void
   retainRangesDashTimeV1: (dashboardIDs: number[]) => void
+  fetchAllFluxServices: (sources: Source[]) => Promise<void>
   dashboards: Dashboard[]
+  services: Service[]
 }
 
 interface State {
@@ -65,6 +70,8 @@ export class DashboardsPage extends PureComponent<Props, State> {
 
     try {
       dashboards = await this.props.handleGetDashboards()
+
+      await this.props.fetchAllFluxServices(this.props.sources)
 
       const dashboardIDs = dashboards.map(d => d.id)
 
@@ -155,22 +162,10 @@ export class DashboardsPage extends PureComponent<Props, State> {
   private modifyDashboardForDownload = async (
     dashboard: Dashboard
   ): Promise<DashboardFile> => {
-    const {sources} = this.props
-    const sourceMappings = _.reduce(
-      sources,
-      (acc, s) => {
-        const {name, id, links} = s
-        const link = _.get(links, 'self', '')
-        acc[id] = {name, link}
-        return acc
-      },
-      {}
-    )
-    const version = await this.props.handleGetChronografVersion()
-    return {
-      meta: {chronografVersion: version, sources: sourceMappings},
-      dashboard,
-    }
+    const {sources, services, handleGetChronografVersion} = this.props
+    const version = await handleGetChronografVersion()
+
+    return mapDashboardForDownload(sources, services, dashboard, version)
   }
 
   private handleImportDashboard = async (
@@ -191,10 +186,15 @@ export class DashboardsPage extends PureComponent<Props, State> {
   }
 }
 
-const mapStateToProps = ({dashboardUI: {dashboards, dashboard}, sources}) => ({
+const mapStateToProps = ({
+  dashboardUI: {dashboards, dashboard},
+  sources,
+  services,
+}): Partial<Props> => ({
   dashboards,
   dashboard,
   sources,
+  services,
 })
 
 const mapDispatchToProps = {
@@ -204,6 +204,7 @@ const mapDispatchToProps = {
   handleImportDashboard: importDashboardAsync,
   notify: notifyAction,
   retainRangesDashTimeV1: retainRangesDashTimeV1Action,
+  fetchAllFluxServices: fetchAllFluxServicesAsync,
 }
 
 export default withRouter(
