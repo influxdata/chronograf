@@ -75,7 +75,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
-import {Service, NotificationAction} from 'src/types'
+import {Service, NotificationAction, RemoteDataState} from 'src/types'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
 
@@ -161,6 +161,7 @@ interface State {
   windowHeight: number
   selectedCell: DashboardsModels.Cell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
+  servicesStatus: RemoteDataState
   showAnnotationControls: boolean
   showCellEditorOverlay: boolean
 }
@@ -174,6 +175,7 @@ class DashboardPage extends Component<Props, State> {
       scrollTop: 0,
       selectedCell: null,
       windowHeight: window.innerHeight,
+      servicesStatus: RemoteDataState.NotStarted,
       dashboardLinks: EMPTY_LINKS,
       showAnnotationControls: false,
       showCellEditorOverlay: false,
@@ -392,7 +394,7 @@ class DashboardPage extends Component<Props, State> {
           showAnnotationControls && (
             <AnnotationControlBar dashboardID={dashboardID} source={source} />
           )}
-        {dashboard ? (
+        {this.showDashboard ? (
           <Dashboard
             source={source}
             services={this.services}
@@ -459,8 +461,18 @@ class DashboardPage extends Component<Props, State> {
     return !!selectedCell && showCellEditorOverlay
   }
 
+  private get showDashboard(): boolean {
+    const {dashboard} = this.props
+    const {servicesStatus} = this.state
+
+    const showDashboard = dashboard && servicesStatus === RemoteDataState.Done
+
+    return showDashboard
+  }
+
   private get services() {
     const {services} = this.props
+
     if (!services || !services.length) {
       return []
     }
@@ -490,11 +502,23 @@ class DashboardPage extends Component<Props, State> {
 
   private async fetchFluxServices() {
     const {fetchServicesAsync, sources} = this.props
+
     if (!sources.length) {
+      this.setState({servicesStatus: RemoteDataState.Done})
+
       return
     }
 
-    await fetchServicesAsync(sources)
+    try {
+      this.setState({servicesStatus: RemoteDataState.Loading})
+
+      await fetchServicesAsync(sources)
+
+      this.setState({servicesStatus: RemoteDataState.Done})
+    } catch {
+      // A notification is displayed to the user by the callee
+      this.setState({servicesStatus: RemoteDataState.Error})
+    }
   }
 
   private inView = (cell: DashboardsModels.Cell): boolean => {
