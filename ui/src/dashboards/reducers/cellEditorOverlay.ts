@@ -26,7 +26,12 @@ import {editor} from 'src/flux/constants'
 
 // types
 import {CellType, Cell, TimeRange} from 'src/types'
-import {CellQuery, ThresholdType, TableOptions} from 'src/types/dashboards'
+import {
+  CellQuery,
+  ThresholdType,
+  TableOptions,
+  QueryType,
+} from 'src/types/dashboards'
 import {ThresholdColor, GaugeColor, LineColor} from 'src/types/colors'
 import {NewDefaultCell} from 'src/types/dashboards'
 
@@ -85,7 +90,7 @@ export default (state = initialState, action: Action): CEOInitialState => {
       let script = editor.DEFAULT_SCRIPT
       const sourceLink = getDeep<string>(cell, 'queries.0.source', '')
 
-      if (sourceLink.includes('service')) {
+      if (getDeep<string>(cell, 'queries.0.type', '') === QueryType.Flux) {
         script = getDeep<string>(cell, 'queries.0.query', editor.DEFAULT_SCRIPT)
 
         queryDrafts = getNewQueryDrafts(sourceLink)
