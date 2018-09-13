@@ -1,26 +1,21 @@
 import React, {PureComponent} from 'react'
-import _ from 'lodash'
-import moment from 'moment'
 
 import {SearchStatus} from 'src/types/logs'
-import {LoadingMessages} from 'src/logs/constants'
+import {formatTime} from 'src/logs/utils'
 
 interface Props {
   status: SearchStatus
-  currentOlderLowerBound: number
+  lower: number
+  upper: number
 }
 
 class LoadingStatus extends PureComponent<Props> {
   public render() {
-    const {currentOlderLowerBound} = this.props
-    const loadingTime = moment(currentOlderLowerBound).fromNow()
-
     return (
       <div className="logs-viewer--table-container generic-empty-state">
         <h4>
-          {this.loadingMessage}: ({loadingTime})
+          {this.loadingMessage} {this.description}...
         </h4>
-        <p>{this.description}</p>
       </div>
     )
   }
@@ -35,12 +30,17 @@ class LoadingStatus extends PureComponent<Props> {
           </>
         )
       default:
-        return <>{this.randomLoadingDescription}</>
+        return <>{this.timeBounds}</>
     }
   }
 
-  private get randomLoadingDescription(): string {
-    return _.sample(LoadingMessages)
+  private get timeBounds(): JSX.Element {
+    return (
+      <>
+        <strong>from</strong> {formatTime(this.props.upper)} <strong>to</strong>{' '}
+        {formatTime(this.props.lower)}
+      </>
+    )
   }
 
   private get loadingMessage(): string {

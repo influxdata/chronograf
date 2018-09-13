@@ -35,6 +35,7 @@ import {
   SeverityFormatOptions,
   SeverityColorOptions,
   SeverityLevelOptions,
+  DEFAULT_TIME_FORMAT,
 } from 'src/logs/constants'
 
 import {TimeRange, NotificationAction} from 'src/types'
@@ -46,7 +47,6 @@ import {
   RowHeightHandler,
   SearchStatus,
   Filter,
-  TimeFormatOption,
 } from 'src/types/logs'
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
@@ -542,11 +542,6 @@ class LogsTable extends Component<Props, State> {
     const highlightRow = rowIndex === this.state.currentRow
 
     if (column === 'timestamp') {
-      const formattedTime = moment(
-        formattedValue as string,
-        TimeFormatOption.SLASH_YMD_TIME
-      ).format(TimeFormatOption.DEFAULT)
-
       return (
         <div
           className={classnames('logs-viewer--cell', {
@@ -561,12 +556,12 @@ class LogsTable extends Component<Props, State> {
           <div
             data-tag-key={column}
             data-tag-value={value}
-            onClick={this.handleTimestampClick(`${formattedTime}`)}
+            onClick={this.handleTimestampClick(`${formattedValue}`)}
             data-index={rowIndex}
             onMouseOver={this.handleMouseOver}
             className="logs-viewer--clickable"
           >
-            {formattedTime}
+            {formattedValue}
           </div>
         </div>
       )
@@ -662,7 +657,7 @@ class LogsTable extends Component<Props, State> {
 
   private handleTimestampClick = (time: string) => () => {
     const {onChooseCustomTime} = this.props
-    const formattedTime = moment(time, TimeFormatOption.DEFAULT).toISOString()
+    const formattedTime = moment(time, DEFAULT_TIME_FORMAT).toISOString()
     onChooseCustomTime(formattedTime)
   }
 
@@ -686,7 +681,8 @@ class LogsTable extends Component<Props, State> {
     return (
       <LoadingStatus
         status={this.props.searchStatus}
-        currentOlderLowerBound={this.props.lower}
+        lower={this.props.lower}
+        upper={this.props.upper}
       />
     )
   }

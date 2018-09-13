@@ -15,6 +15,7 @@ import {
 
 import {HistogramData} from 'src/types/histogram'
 import {executeQueryAsync} from 'src/logs/api'
+import {DEFAULT_TIME_FORMAT} from 'src/logs/constants'
 
 const BIN_COUNT = 30
 
@@ -344,4 +345,8 @@ export const parseHistogramQueryResponse = (
   }, [])
 
   return data
+}
+
+export const formatTime = (time: number): string => {
+  return moment(time).format(DEFAULT_TIME_FORMAT)
 }
