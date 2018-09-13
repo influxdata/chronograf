@@ -219,7 +219,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {services, timeRange, templates, isInCEO} = this.props
+    const {services, timeRange, templates, isInCEO, script} = this.props
     const {useDynamicSource, autoRefreshDuration} = this.state
 
     const horizontalDivisions = [
@@ -256,6 +256,7 @@ class TimeMachine extends PureComponent<Props, State> {
           service={this.service}
           services={services}
           isFluxSource={this.isFluxSource}
+          script={script}
           sourceSupportsFlux={this.sourceSupportsFlux}
           toggleVisType={this.toggleVisType}
           autoRefreshDuration={autoRefreshDuration}

@@ -2,15 +2,25 @@ import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
 import {Button, IconFont, ComponentStatus} from 'src/reusable_ui'
-import downloadTimeseriesCSV from 'src/shared/utils/downloadTimeseriesCSV'
+import {
+  downloadInfluxQLCSV,
+  downloadFluxCSV,
+} from 'src/shared/utils/downloadTimeseriesCSV'
 import {notify} from 'src/shared/actions/notifications'
 import {csvExportFailed} from 'src/shared/copy/notifications'
 
-import {Query, Template} from 'src/types'
+import {Query, Template, Service} from 'src/types'
 
 interface Props {
+  // Used for downloading an InfluxQL query
   queries: Query[]
   templates: Template[]
+
+  // Used for downloading a Flux query
+  script: string
+  service: Service
+
+  isFluxSource: boolean
   onNotify: typeof notify
 }
 
@@ -39,18 +49,34 @@ class CSVExporter extends PureComponent<Props, State> {
     )
   }
 
-  private handleClick = async () => {
-    const {queries, templates, onNotify} = this.props
+  private handleClick = async (): Promise<void> => {
+    const {isFluxSource, onNotify} = this.props
 
     this.setState({buttonStatus: ComponentStatus.Loading})
 
     try {
-      await downloadTimeseriesCSV(queries, templates)
+      if (isFluxSource) {
+        await this.downloadFluxCSV()
+      } else {
+        await this.downloadInfluxQLCSV()
+      }
     } catch {
       onNotify(csvExportFailed)
     }
 
     this.setState({buttonStatus: ComponentStatus.Default})
+  }
+
+  private downloadInfluxQLCSV = (): Promise<void> => {
+    const {queries, templates} = this.props
+
+    return downloadInfluxQLCSV(queries, templates)
+  }
+
+  private downloadFluxCSV = (): Promise<void> => {
+    const {service, script} = this.props
+
+    return downloadFluxCSV(service, script)
   }
 }
 

@@ -4,21 +4,20 @@ import {unparse} from 'papaparse'
 
 // Utils
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
-import {executeQuery} from 'src/shared/apis/query'
+import {executeQuery as executeInfluxQLQuery} from 'src/shared/apis/query'
+import {getRawTimeSeries as executeFluxQuery} from 'src/flux/apis/index'
 
 // Types
-import {Query, Template} from 'src/types'
+import {Query, Template, Service} from 'src/types'
 import {TimeSeriesResponse} from 'src/types/series'
 
-type CSV = Array<Array<number | string>>
-
-const downloadTimeseriesCSV = async (
+export const downloadInfluxQLCSV = async (
   queries: Query[],
   templates: Template[]
 ): Promise<void> => {
   const responses = await Promise.all(
     queries.map(query =>
-      executeQuery(query.queryConfig.source, query, templates)
+      executeInfluxQLQuery(query.queryConfig.source, query, templates)
     )
   )
 
@@ -27,9 +26,20 @@ const downloadTimeseriesCSV = async (
   downloadCSV(csv, csvName())
 }
 
+export const downloadFluxCSV = async (
+  service: Service,
+  script: string
+): Promise<{didTruncate: boolean}> => {
+  const {csv, didTruncate} = await executeFluxQuery(service, script)
+
+  downloadCSV(csv, csvName())
+
+  return {didTruncate}
+}
+
 const timeseriesToCSV = async (
   responses: TimeSeriesResponse[]
-): Promise<CSV> => {
+): Promise<string> => {
   const wrapped = responses.map(response => ({response}))
   const tableResponse = await timeSeriesToTableGraph(wrapped)
   const table = tableResponse.data
@@ -50,7 +60,7 @@ const timeseriesToCSV = async (
     table[i][timeIndex] = new Date(table[i][timeIndex]).toISOString()
   }
 
-  return table
+  return unparse(table)
 }
 
 const csvName = () => {
@@ -60,9 +70,8 @@ const csvName = () => {
   return `${now} Chronograf Data.csv`
 }
 
-const downloadCSV = (csv: CSV, title: string) => {
-  const text = unparse(csv)
-  const blob = new Blob([text], {type: 'text/csv'})
+const downloadCSV = (csv: string, title: string) => {
+  const blob = new Blob([csv], {type: 'text/csv'})
   const a = document.createElement('a')
 
   a.href = window.URL.createObjectURL(blob)
@@ -73,5 +82,3 @@ const downloadCSV = (csv: CSV, title: string) => {
   a.click()
   a.parentNode.removeChild(a)
 }
-
-export default downloadTimeseriesCSV

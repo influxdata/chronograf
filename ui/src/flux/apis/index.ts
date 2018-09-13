@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 import AJAX from 'src/utils/ajax'
 import {Service, FluxTable} from 'src/types'
 import {updateService} from 'src/shared/apis'
@@ -44,45 +42,66 @@ export const getAST = async (request: ASTRequest) => {
   }
 }
 
+export interface GetRawTimeSeriesResult {
+  didTruncate: boolean
+  csv: string
+  uuid?: string
+}
+
+// Returns the CSV file directly from the Flux service
+export const getRawTimeSeries = async (
+  service: Service,
+  script: string,
+  uuid?: string
+): Promise<GetRawTimeSeriesResult> => {
+  const path = encodeURIComponent(`/query?organization=defaultorgname`)
+  const url = `${window.basepath}${service.links.proxy}?path=${path}`
+
+  try {
+    const {body, byteLength, uuid: responseUUID} = await manager.fetchFluxData(
+      url,
+      script,
+      uuid
+    )
+
+    return {
+      csv: body,
+      didTruncate: byteLength >= MAX_RESPONSE_BYTES,
+      uuid: responseUUID,
+    }
+  } catch (error) {
+    console.error('Could not fetch Flux data', error)
+
+    const headerError = error.headers ? error.headers['x-incl'] : null
+    const bodyError = error.data ? error.data.message : null
+    const fallbackError = 'unknown error 🤷'
+
+    return headerError || bodyError || fallbackError
+  }
+}
+
 export interface GetTimeSeriesResult {
   didTruncate: boolean
   tables: FluxTable[]
   uuid?: string
 }
 
+// Returns a parsed representation of the CSV from the Flux service
 export const getTimeSeries = async (
   service: Service,
   script: string,
   uuid?: string
 ): Promise<GetTimeSeriesResult> => {
-  const mark = encodeURIComponent('?')
-  const query = script.replace(/\s/g, '') // server cannot handle whitespace
-  const url = `${window.basepath}${
-    service.links.proxy
-  }?path=/query${mark}organization=defaultorgname`
-  let responseBody: string
-  let responseByteLength: number
-  let responseUUID: string
-  try {
-    const {body, byteLength, uuid: id} = await manager.fetchFluxData(
-      url,
-      query,
-      uuid
-    )
-    responseBody = body
-    responseByteLength = byteLength
-    responseUUID = id
-  } catch (error) {
-    console.error('Problem fetching data', error)
-
-    throw _.get(error, 'headers.x-influx-error', false) ||
-      _.get(error, 'data.message', 'unknown error 🤷')
-  }
+  const {csv, didTruncate, uuid: responseUUID} = await getRawTimeSeries(
+    service,
+    script,
+    uuid
+  )
 
   try {
     const response = {
-      tables: parseResponse(responseBody),
-      didTruncate: responseByteLength >= MAX_RESPONSE_BYTES,
+      tables: parseResponse(csv),
+      didTruncate,
       uuid: responseUUID,
     }
     return response
@@ -90,7 +109,8 @@ export const getTimeSeries = async (
     console.error('Could not parse response body', error)
 
     return {
-      tables: parseResponseError(responseBody),
+      // REVIEW: Why is this being returned as a `FluxTable[]`?
+      tables: parseResponseError(csv),
       didTruncate: false,
     }
   }

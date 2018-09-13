@@ -25,6 +25,7 @@ interface Props {
   sources: SourcesModels.SourceOption[]
   service: Service
   services: Service[]
+  script: string
   isDynamicSourceSelected: boolean
   onChangeService: (service: Service, source: SourcesModels.Source) => void
   autoRefreshDuration: number
@@ -40,6 +41,7 @@ interface Props {
 }
 
 const TimeMachineControls: SFC<Props> = ({
+  script,
   source,
   sources,
   service,
@@ -88,6 +90,9 @@ const TimeMachineControls: SFC<Props> = ({
         </div>
       )}
       <CSVExporter
+        script={script}
+        service={service}
+        isFluxSource={isFluxSource}
         queries={buildQueries(queries, timeRange)}
         templates={templates}
       />
