@@ -1,6 +1,8 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
+import _ from 'lodash'
 
+import {TimeSeriesToDyGraphReturnType} from 'src/utils/timeSeriesTransformers'
 import {fluxTablesToDygraph} from 'src/shared/parsing/flux/dygraph'
 
 import Dygraph from 'src/shared/components/Dygraph'
@@ -13,10 +15,40 @@ interface Props {
   setHoverTime: (time: number) => void
 }
 
-class FluxGraph extends PureComponent<Props> {
+interface State {
+  timeSeries?: TimeSeriesToDyGraphReturnType
+}
+
+class FluxGraph extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {}
+  }
+
+  public async componentDidMount() {
+    await this.parseData()
+  }
+
+  public async componentDidUpdate(prevProps) {
+    const prevData = _.get(prevProps, 'data', [])
+    const newData = _.get(this.props, 'data', [])
+
+    const didDataUpdate =
+      prevData.length !== newData.length ||
+      _.get(prevData, '0.id') !== _.get(newData, '0.id')
+
+    if (didDataUpdate) {
+      await this.parseData()
+    }
+  }
+
   public render() {
-    const dygraphData = fluxTablesToDygraph(this.props.data)
-    const {timeSeries, labels, dygraphSeries} = dygraphData
+    if (!this.state.timeSeries) {
+      return <h3 className="graph-spinner" />
+    }
+
+    const {timeSeries, labels, dygraphSeries} = this.state.timeSeries
     return (
       <Dygraph
         labels={labels}
@@ -35,6 +67,11 @@ class FluxGraph extends PureComponent<Props> {
       axisLineColor: '#383846',
       gridLineColor: '#383846',
     }
+  }
+
+  private parseData = async () => {
+    const timeSeries = await fluxTablesToDygraph(this.props.data)
+    this.setState({timeSeries})
   }
 }
 

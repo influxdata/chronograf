@@ -1,50 +1,17 @@
-import _ from 'lodash'
-import {FluxTable} from 'src/types'
-import {TimeSeriesToDyGraphReturnType} from 'src/utils/timeSeriesTransformers'
+import {manager} from 'src/worker/JobManager'
+import {fastMap} from 'src/utils/fast'
 
-export const fluxTablesToDygraph = (
-  data: FluxTable[]
-): TimeSeriesToDyGraphReturnType => {
-  interface V {
-    [time: string]: number[]
-  }
+import {FluxTable, DygraphValue} from 'src/types'
+import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph'
 
-  const valuesForTime: V = {}
+export const fluxTablesToDygraph = async (
+  tables: FluxTable[]
+): Promise<TimeSeriesToDyGraphReturnType> => {
+  const {labels, dygraphsData} = await manager.fluxTablesToDygraph(tables)
+  const timeSeries = fastMap<DygraphValue[], DygraphValue[]>(
+    dygraphsData,
+    ([time, ...values]) => [new Date(time), ...values]
+  )
 
-  data.forEach(table => {
-    const header = table.data[0]
-    const timeColIndex = header.findIndex(col => col === '_time')
-
-    table.data.slice(1).forEach(row => {
-      valuesForTime[row[timeColIndex]] = Array(data.length).fill(null)
-    })
-  })
-
-  data.forEach((table, i) => {
-    const header = table.data[0]
-    const timeColIndex = header.findIndex(col => col === '_time')
-    const valueColIndex = header.findIndex(col => col === '_value')
-
-    table.data.slice(1).forEach(row => {
-      const time = row[timeColIndex]
-      const value = row[valueColIndex]
-
-      valuesForTime[time][i] = +value
-    })
-  })
-
-  const timeSeries = _.sortBy(
-    Object.entries(valuesForTime),
-    ([time]) => time
-  ).map(([time, values]) => [new Date(time), ...values])
-
-  const seriesLabels = data.map(d => d.name)
-  const labels = ['time', ...seriesLabels]
-
-  const dygraphSeries = seriesLabels.reduce((acc, label) => {
-    acc[label] = {axis: 'y'}
-    return acc
-  }, {})
-
-  return {timeSeries, labels, dygraphSeries}
+  return {labels, dygraphSeries: {}, timeSeries}
 }
