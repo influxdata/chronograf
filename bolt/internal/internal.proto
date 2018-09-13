@@ -151,15 +151,16 @@ message Cell {
 }
 
 message Query {
-	string Command            = 1; // Command is the query itself
-	string DB                 = 2; // DB the database for the query (optional)
-	string RP                 = 3; // RP is a retention policy and optional;
-	repeated string GroupBys  = 4; // GroupBys define the groups to combine in the query
-	repeated string Wheres    = 5; // Wheres define the restrictions on the query
-	string Label              = 6; // Label is the name of the Y-Axis
-	Range Range               = 7; // Range is the upper and lower bound of the Y-Axis
-	string Source             = 8; // Source is the optional URI to the data source
-	repeated TimeShift Shifts = 9; // TimeShift represents a shift to apply to an influxql query's time range
+	string Command            = 1;  // Command is the query itself
+	string DB                 = 2;  // DB the database for the query (optional)
+	string RP                 = 3;  // RP is a retention policy and optional;
+	repeated string GroupBys  = 4;  // GroupBys define the groups to combine in the query
+	repeated string Wheres    = 5;  // Wheres define the restrictions on the query
+	string Label              = 6;  // Label is the name of the Y-Axis
+	Range Range               = 7;  // Range is the upper and lower bound of the Y-Axis
+	string Source             = 8;  // Source is the optional URI to the data source
+	repeated TimeShift Shifts = 9;  // TimeShift represents a shift to apply to an influxql query's time range
+	string Type               = 10; // Type is the language used by the query (influxql or flux)
 }
 
 message TimeShift {

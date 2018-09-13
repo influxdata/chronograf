@@ -246,6 +246,7 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 				Label:   q.Label,
 				Range:   r,
 				Source:  q.Source,
+				Type:    q.Type,
 			}
 
 			shifts := make([]*TimeShift, len(q.Shifts))
@@ -389,10 +390,17 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 	for i, c := range pb.Cells {
 		queries := make([]chronograf.DashboardQuery, len(c.Queries))
 		for j, q := range c.Queries {
+			var queryType string
+			if q.Type == "" {
+				queryType = "influxql"
+			} else {
+				queryType = q.Type
+			}
 			queries[j] = chronograf.DashboardQuery{
 				Command: q.Command,
 				Label:   q.Label,
 				Source:  q.Source,
+				Type:    queryType,
 			}
 
 			if q.Range.Upper != q.Range.Lower {
