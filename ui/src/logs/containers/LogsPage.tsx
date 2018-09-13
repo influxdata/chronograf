@@ -217,6 +217,7 @@ class LogsPage extends Component<Props, State> {
 
   public componentWillUnmount() {
     this.clearTailInterval()
+    this.cancelChunks()
   }
 
   public render() {
