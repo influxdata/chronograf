@@ -22,6 +22,7 @@
 1.  [#4422](https://github.com/influxdata/chronograf/pull/4422): Allow deep linking flux script in data explorer
 1.  [#4410](https://github.com/influxdata/chronograf/pull/4410): Add ability to use line graph visualizations for flux query
 1.  [#4445](https://github.com/influxdata/chronograf/pull/4445): Allow flux dashboard cells to be exported
+1.  [#4449](https://github.com/influxdata/chronograf/pull/4449): Add ability to use single stat graph visualizations for flux query
 
 
 ### UI Improvements

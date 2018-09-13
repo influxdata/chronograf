@@ -49,6 +49,16 @@ import {GrabDataForDownloadHandler} from 'src/types/layout'
 import {VisType} from 'src/types/flux'
 import {TimeSeriesServerResponse} from 'src/types/series'
 
+interface TypeAndData {
+  dataType: DataTypes
+  data: TimeSeriesServerResponse[] | FluxTable[]
+}
+
+export enum DataTypes {
+  flux = 'flux',
+  influxQL = 'influxQL',
+}
+
 interface Props {
   axes: Axes
   source: Source
@@ -161,11 +171,11 @@ class RefreshingGraph extends PureComponent<Props> {
         {({timeSeriesInfluxQL, timeSeriesFlux, loading}) => {
           switch (type) {
             case CellType.SingleStat:
-              return this.singleStat(timeSeriesInfluxQL)
+              return this.singleStat(timeSeriesInfluxQL, timeSeriesFlux)
             case CellType.Table:
               return this.table(timeSeriesInfluxQL)
             case CellType.Gauge:
-              return this.gauge(timeSeriesInfluxQL)
+              return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
             default:
               return this.lineGraph(timeSeriesInfluxQL, timeSeriesFlux, loading)
           }
@@ -189,7 +199,10 @@ class RefreshingGraph extends PureComponent<Props> {
     return !_.isEqual(prevVisValues, curVisValues)
   }
 
-  private singleStat = (data): JSX.Element => {
+  private singleStat = (
+    influxQLData: TimeSeriesServerResponse[],
+    fluxData: FluxTable[]
+  ): JSX.Element => {
     const {
       colors,
       cellHeight,
@@ -198,8 +211,11 @@ class RefreshingGraph extends PureComponent<Props> {
       onUpdateCellColors,
     } = this.props
 
+    const {dataType, data} = this.getTypeAndData(influxQLData, fluxData)
+
     return (
       <SingleStat
+        dataType={dataType}
         data={data}
         colors={colors}
         prefix={this.prefix}
@@ -240,7 +256,10 @@ class RefreshingGraph extends PureComponent<Props> {
     )
   }
 
-  private gauge = (data): JSX.Element => {
+  private gauge = (
+    influxQLData: TimeSeriesServerResponse[],
+    fluxData: FluxTable[]
+  ): JSX.Element => {
     const {
       colors,
       cellID,
@@ -250,9 +269,12 @@ class RefreshingGraph extends PureComponent<Props> {
       resizerTopHeight,
     } = this.props
 
+    const {dataType, data} = this.getTypeAndData(influxQLData, fluxData)
+
     return (
       <GaugeChart
         data={data}
+        dataType={dataType}
         cellID={cellID}
         colors={colors}
         prefix={this.prefix}
@@ -285,18 +307,20 @@ class RefreshingGraph extends PureComponent<Props> {
       handleSetHoverTime,
     } = this.props
 
+    const {dataType, data} = this.getTypeAndData(influxQLData, fluxData)
+
     return (
       <LineGraph
-        influxQLData={influxQLData}
+        data={data}
         type={type}
         axes={axes}
         cellID={cellID}
         colors={colors}
         onZoom={onZoom}
         queries={queries}
-        fluxData={fluxData}
-        key={manualRefresh}
         loading={loading}
+        dataType={dataType}
+        key={manualRefresh}
         timeRange={timeRange}
         cellHeight={cellHeight}
         staticLegend={staticLegend}
@@ -328,6 +352,19 @@ class RefreshingGraph extends PureComponent<Props> {
   private get suffix(): string {
     const {axes} = this.props
     return _.get(axes, 'y.suffix', '')
+  }
+
+  private getTypeAndData(
+    influxQLData: TimeSeriesServerResponse[],
+    fluxData: FluxTable[]
+  ): TypeAndData {
+    if (influxQLData.length) {
+      return {dataType: DataTypes.influxQL, data: influxQLData}
+    }
+
+    if (fluxData.length) {
+      return {dataType: DataTypes.flux, data: fluxData}
+    }
   }
 }
 

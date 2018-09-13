@@ -16,6 +16,7 @@ import validateDygraphData from 'src/worker/jobs/validateDygraphData'
 import postJSON from 'src/worker/jobs/postJSON'
 import fetchFluxData from 'src/worker/jobs/fetchFluxData'
 import fluxTablesToDygraph from 'src/worker/jobs/fluxTablesToDygraph'
+import fluxTablesToSingleStat from 'src/worker/jobs/fluxTablesToSingleStat'
 
 type Job = (msg: Message) => Promise<any>
 
@@ -29,6 +30,7 @@ const jobMapping: {[key: string]: Job} = {
   VALIDATEDYGRAPHDATA: validateDygraphData,
   FETCHFLUXDATA: fetchFluxData,
   FLUXTODYGRAPH: fluxTablesToDygraph,
+  FLUXTOSINGLE: fluxTablesToSingleStat,
 }
 
 const errorJob = async (data: Message) => {

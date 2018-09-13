@@ -8,6 +8,7 @@ import {getBasepath} from 'src/utils/basepath'
 import {TimeSeriesToTableGraphReturnType} from 'src/worker/jobs/timeSeriesToTableGraph'
 import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph'
 import {FluxTablesToDygraphResult} from 'src/worker/jobs/fluxTablesToDygraph'
+import {LastValues} from 'src/worker/jobs/fluxTablesToSingleStat'
 
 interface DecodeFluxRespWithLimitResult {
   body: string
@@ -97,6 +98,10 @@ class JobManager {
     raw: FluxTable[]
   ): Promise<FluxTablesToDygraphResult> => {
     return this.publishDBJob('FLUXTODYGRAPH', {raw})
+  }
+
+  public fluxTablesToSingleStat = (raw: FluxTable[]): Promise<LastValues> => {
+    return this.publishDBJob('FLUXTOSINGLE', {raw})
   }
 
   public validateDygraphData = (ts: DygraphValue[][]) => {

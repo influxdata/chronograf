@@ -28,6 +28,7 @@ import {
   CellType,
   FluxTable,
 } from 'src/types'
+import {DataTypes} from 'src/shared/components/RefreshingGraph'
 
 interface Props {
   axes: Axes
@@ -37,8 +38,8 @@ interface Props {
   colors: ColorString[]
   loading: RemoteDataState
   decimalPlaces: DecimalPlaces
-  fluxData: FluxTable[]
-  influxQLData: TimeSeriesServerResponse[]
+  data: TimeSeriesServerResponse[] | FluxTable[]
+  dataType: DataTypes
   cellID: string
   cellHeight: number
   staticLegend: boolean
@@ -70,17 +71,20 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
   public async componentDidMount() {
     this.isComponentMounted = true
-    const {influxQLData, fluxData} = this.props
-    await this.parseTimeSeries(influxQLData, fluxData)
+    const {data, dataType} = this.props
+    await this.parseTimeSeries(data, dataType)
   }
 
   public componentWillUnmount() {
     this.isComponentMounted = false
   }
 
-  public async parseTimeSeries(data, fluxData) {
+  public async parseTimeSeries(
+    data: TimeSeriesServerResponse[] | FluxTable[],
+    dataType: DataTypes
+  ) {
     try {
-      const timeSeries = await this.convertToDygraphData(data, fluxData)
+      const timeSeries = await this.convertToDygraphData(data, dataType)
 
       this.isValidData = await manager.validateDygraphData(
         timeSeries.timeSeries
@@ -97,7 +101,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
   public componentWillReceiveProps(nextProps: LineGraphProps) {
     if (nextProps.loading === RemoteDataState.Done) {
-      this.parseTimeSeries(nextProps.influxQLData, nextProps.fluxData)
+      this.parseTimeSeries(nextProps.data, nextProps.dataType)
     }
   }
 
@@ -107,7 +111,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
     }
 
     const {
-      influxQLData,
+      data,
       axes,
       type,
       colors,
@@ -115,6 +119,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
       onZoom,
       loading,
       queries,
+      dataType,
       timeRange,
       cellHeight,
       staticLegend,
@@ -165,7 +170,8 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
         >
           {type === CellType.LinePlusSingleStat && (
             <SingleStat
-              data={influxQLData}
+              data={data}
+              dataType={dataType}
               lineGraph={true}
               colors={colors}
               prefix={this.prefix}
@@ -223,17 +229,20 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   }
 
   private async convertToDygraphData(
-    data: TimeSeriesServerResponse[],
-    fluxData: FluxTable[]
+    data: TimeSeriesServerResponse[] | FluxTable[],
+    dataType: DataTypes
   ): Promise<TimeSeriesToDyGraphReturnType> {
     const {location} = this.props
 
-    if (data.length) {
-      return await timeSeriesToDygraph(data, location.pathname)
+    if (dataType === DataTypes.influxQL) {
+      return await timeSeriesToDygraph(
+        data as TimeSeriesServerResponse[],
+        location.pathname
+      )
     }
 
-    if (fluxData.length) {
-      return await fluxTablesToDygraph(fluxData)
+    if (dataType === DataTypes.flux) {
+      return await fluxTablesToDygraph(data as FluxTable[])
     }
   }
 }
