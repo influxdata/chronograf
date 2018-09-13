@@ -11,7 +11,7 @@ import {fetchChunk} from 'src/logs/utils/fetchChunk'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 import {Greys} from 'src/reusable_ui/types'
-import QueryResults from 'src/logs/components/QueryResults'
+import HistogramResults from 'src/logs/components/HistogramResults'
 
 import {
   NOW,
@@ -81,6 +81,7 @@ import {
   TimeBounds,
   SearchStatus,
   FetchLoop,
+  TimeFormatOption,
 } from 'src/types/logs'
 import {
   applyChangesToTableData,
@@ -692,9 +693,7 @@ class LogsPage extends Component<Props, State> {
                           height={textSize}
                           fill={Greys.Sidewalk}
                         >
-                          {moment(timeOption).format(
-                            'YYYY-MM-DD | HH:mm:ss.SSS'
-                          )}
+                          {moment(timeOption).format(TimeFormatOption.DEFAULT)}
                         </text>
                       </svg>
                     </>
@@ -751,10 +750,9 @@ class LogsPage extends Component<Props, State> {
 
     return (
       <div className="logs-viewer--graph-controls">
-        <QueryResults
+        <HistogramResults
           count={this.histogramTotal}
           queryCount={queryCount}
-          isInsideHistogram={true}
           searchStatus={searchStatus}
         />
         <TimeWindowDropdown
