@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import _ from 'lodash'
 
 // Utils
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
@@ -20,9 +21,13 @@ import {
 
 // Constants
 import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
+import {NEW_EMPTY_DASHBOARD} from 'src/dashboards/constants'
 
 // Actions
 import {addDashboardCellAsync} from 'src/dashboards/actions'
+
+// APIs
+import {createDashboard} from 'src/dashboards/apis'
 
 // Types
 import {QueryConfig, Dashboard, Source, Service, Cell} from 'src/types'
@@ -47,6 +52,8 @@ interface State {
   selectedIDs: string[]
   name: string
 }
+
+const NEW_DASHBOARD_ID = 'new'
 
 class SendToDashboardOverlay extends PureComponent<Props, State> {
   constructor(props) {
@@ -114,7 +121,8 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       id: d.id.toString(),
       name: d.name,
     }))
-    return simpleArray.map(dashboard => {
+
+    const items = simpleArray.map(dashboard => {
       return (
         <MultiSelectDropdown.Item
           key={dashboard.id}
@@ -125,6 +133,20 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
         </MultiSelectDropdown.Item>
       )
     })
+
+    const newDashboardItem = (
+      <MultiSelectDropdown.Item
+        key={NEW_DASHBOARD_ID}
+        id={NEW_DASHBOARD_ID}
+        value={{id: NEW_DASHBOARD_ID, name: 'New Dashboard'}}
+      >
+        Send to a New Dashboard
+      </MultiSelectDropdown.Item>
+    )
+
+    const divider = <MultiSelectDropdown.Divider id={'divider'} />
+
+    return [newDashboardItem, divider, ...items]
   }
 
   private get hasQuery(): boolean {
@@ -163,12 +185,12 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     return ComponentStatus.Default
   }
 
-  private handleSelect = (updatedSelection: string[]) => {
-    this.setState({selectedIDs: updatedSelection})
+  private handleSelect = async (selectedIDs: string[]) => {
+    this.setState({selectedIDs})
   }
 
   private sendToDashboard = async () => {
-    const {name} = this.state
+    const {name, selectedIDs} = this.state
     const {
       queryConfig,
       script,
@@ -211,8 +233,16 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
     const legend = isStaticLegend ? STATIC_LEGEND : {}
 
+    let selectedDashboards = this.selectedDashboards
+
+    if (_.includes(selectedIDs, NEW_DASHBOARD_ID)) {
+      const {data} = await createDashboard(NEW_EMPTY_DASHBOARD)
+      const newDashboard: Dashboard = data
+      selectedDashboards = [...selectedDashboards, newDashboard]
+    }
+
     await Promise.all(
-      this.selectedDashboards.map(dashboard => {
+      selectedDashboards.map(dashboard => {
         const emptyCell = getNewDashboardCell(dashboard)
         const newCell: Partial<Cell> = {
           ...emptyCell,

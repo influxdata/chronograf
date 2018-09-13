@@ -148,7 +148,13 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {loadDE, timeRange, autoRefresh, queryDrafts} = this.props
+    const {
+      loadDE,
+      timeRange,
+      autoRefresh,
+      queryDrafts,
+      handleGetDashboards,
+    } = this.props
     const {query, script} = this.queryString
 
     GlobalAutoRefresher.poll(autoRefresh)
@@ -173,7 +179,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       await this.createNewQueryDraft()
     }
 
-    await this.getDashboards()
+    await handleGetDashboards()
 
     this.fetchFluxServices()
   }
@@ -500,14 +506,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     )
     const queryDraft = {query, queryConfig, source: source.links.self}
     loadDE([queryDraft], timeRange)
-  }
-
-  private async getDashboards() {
-    const {dashboards, handleGetDashboards} = this.props
-
-    if (!_.isEmpty(dashboards)) {
-      await handleGetDashboards()
-    }
   }
 
   private get activeScript(): string {
