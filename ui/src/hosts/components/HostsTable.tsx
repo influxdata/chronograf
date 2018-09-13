@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
+import memoize from 'memoize-one'
 
 import SearchBar from 'src/hosts/components/SearchBar'
 import HostRow from 'src/hosts/components/HostRow'
@@ -28,6 +29,17 @@ interface State {
 
 @ErrorHandling
 class HostsTable extends PureComponent<Props, State> {
+  public getSortedHosts = memoize(
+    (
+      hosts,
+      searchTerm: string,
+      sortKey: string,
+      sortDirection: SortDirection
+    ) => {
+      return this.sort(this.filter(hosts, searchTerm), sortKey, sortDirection)
+    }
+  )
+
   constructor(props: Props) {
     super(props)
 
@@ -70,8 +82,8 @@ class HostsTable extends PureComponent<Props, State> {
     }
   }
 
-  public updateSearchTerm = (term: string): void => {
-    this.setState({searchTerm: term})
+  public updateSearchTerm = (searchTerm: string): void => {
+    this.setState({searchTerm})
   }
 
   public updateSort = (key: string) => (): void => {
@@ -115,17 +127,49 @@ class HostsTable extends PureComponent<Props, State> {
 
   private get TableContents(): JSX.Element {
     const {hosts, hostsPageStatus} = this.props
-    const hostCount = hosts.length
+    const {sortKey, sortDirection, searchTerm} = this.state
+    const sortedHosts = this.getSortedHosts(
+      hosts,
+      searchTerm,
+      sortKey,
+      sortDirection
+    )
     if (hostsPageStatus === RemoteDataState.Loading) {
       return this.LoadingState
     }
     if (hostsPageStatus === RemoteDataState.Error) {
       return this.ErrorState
     }
-    if (hostCount > 0) {
-      return this.TableWithHosts
+    if (hosts.length === 0) {
+      return this.NoHostsState
     }
-    return this.TableWithNoHosts
+    if (sortedHosts.length === 0) {
+      return this.NoSortedHostsState
+    }
+    return this.TableWithHosts
+  }
+
+  private get TableWithHosts(): JSX.Element {
+    const {source, hosts} = this.props
+    const {sortKey, sortDirection, searchTerm} = this.state
+    const sortedHosts = this.getSortedHosts(
+      hosts,
+      searchTerm,
+      sortKey,
+      sortDirection
+    )
+    return (
+      <div className="hosts-table">
+        {this.HostsTableHeader}
+        <InfiniteScroll
+          items={sortedHosts.map(h => (
+            <HostRow key={h.name} host={h} sourceID={source.id} />
+          ))}
+          itemHeight={26}
+          className="hosts-table--tbody"
+        />
+      </div>
+    )
   }
 
   private get LoadingState(): JSX.Element {
@@ -140,31 +184,7 @@ class HostsTable extends PureComponent<Props, State> {
     )
   }
 
-  private get TableWithHosts(): JSX.Element {
-    const {source, hosts} = this.props
-    const {searchTerm, sortKey, sortDirection} = this.state
-
-    const sortedHosts = this.sort(
-      this.filter(hosts, searchTerm),
-      sortKey,
-      sortDirection
-    )
-
-    return (
-      <div className="hosts-table">
-        {this.HostsTableHeader}
-        <InfiniteScroll
-          items={sortedHosts.map(h => (
-            <HostRow key={h.name} host={h} source={source} />
-          ))}
-          itemHeight={26}
-          className="hosts-table--tbody"
-        />
-      </div>
-    )
-  }
-
-  private get TableWithNoHosts(): JSX.Element {
+  private get NoHostsState(): JSX.Element {
     return (
       <div className="generic-empty-state">
         <h4 style={{margin: '90px 0'}}>No Hosts found</h4>
@@ -172,20 +192,37 @@ class HostsTable extends PureComponent<Props, State> {
     )
   }
 
+  private get NoSortedHostsState(): JSX.Element {
+    return (
+      <div className="generic-empty-state">
+        <h4 style={{margin: '90px 0'}}>
+          There are no hosts that match the search criteria
+        </h4>
+      </div>
+    )
+  }
+
   private get HostsTitle(): string {
     const {hostsPageStatus, hosts} = this.props
-
+    const {sortKey, sortDirection, searchTerm} = this.state
+    const sortedHosts = this.getSortedHosts(
+      hosts,
+      searchTerm,
+      sortKey,
+      sortDirection
+    )
+    const hostsCount = sortedHosts.length
     if (hostsPageStatus === RemoteDataState.Loading) {
       return 'Loading Hosts...'
     }
-    if (hosts.length === 1) {
+    if (hostsCount === 1) {
       return `1 Host`
     }
-    return `${hosts.length} Hosts`
+    return `${hostsCount} Hosts`
   }
 
   private get HostsTableHeader(): JSX.Element {
-    const {colName, colStatus, colCPU, colLoad} = HOSTS_TABLE_SIZING
+    const {NameWidth, StatusWidth, CPUWidth, LoadWidth} = HOSTS_TABLE_SIZING
 
     return (
       <div className="hosts-table--thead">
@@ -193,7 +230,7 @@ class HostsTable extends PureComponent<Props, State> {
           <div
             onClick={this.updateSort('name')}
             className={this.sortableClasses('name')}
-            style={{width: colName}}
+            style={{width: NameWidth}}
           >
             Host
             <span className="icon caret-up" />
@@ -201,7 +238,7 @@ class HostsTable extends PureComponent<Props, State> {
           <div
             onClick={this.updateSort('deltaUptime')}
             className={this.sortableClasses('deltaUptime')}
-            style={{width: colStatus}}
+            style={{width: StatusWidth}}
           >
             Status
             <span className="icon caret-up" />
@@ -209,7 +246,7 @@ class HostsTable extends PureComponent<Props, State> {
           <div
             onClick={this.updateSort('cpu')}
             className={this.sortableClasses('cpu')}
-            style={{width: colCPU}}
+            style={{width: CPUWidth}}
           >
             CPU
             <span className="icon caret-up" />
@@ -217,7 +254,7 @@ class HostsTable extends PureComponent<Props, State> {
           <div
             onClick={this.updateSort('load')}
             className={this.sortableClasses('load')}
-            style={{width: colLoad}}
+            style={{width: LoadWidth}}
           >
             Load
             <span className="icon caret-up" />

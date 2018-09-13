@@ -1,6 +1,6 @@
 export const HOSTS_TABLE_SIZING = {
-  colName: '40%',
-  colStatus: '74px',
-  colCPU: '70px',
-  colLoad: '68px',
+  NameWidth: '40%',
+  StatusWidth: '74px',
+  CPUWidth: '70px',
+  LoadWidth: '68px',
 }
