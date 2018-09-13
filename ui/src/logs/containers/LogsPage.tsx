@@ -81,6 +81,7 @@ import {
   TimeBounds,
   SearchStatus,
   FetchLoop,
+  TimeFormatOption,
 } from 'src/types/logs'
 import {
   applyChangesToTableData,
@@ -679,9 +680,7 @@ class LogsPage extends Component<Props, State> {
                           height={textSize}
                           fill={Greys.Sidewalk}
                         >
-                          {moment(timeOption).format(
-                            'YYYY-MM-DD | HH:mm:ss.SSS'
-                          )}
+                          {moment(timeOption).format(TimeFormatOption.DEFAULT)}
                         </text>
                       </svg>
                     </>

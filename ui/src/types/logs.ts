@@ -10,6 +10,11 @@ import {FieldOption} from 'src/types/dashboards'
 import {TimeSeriesValue} from 'src/types/series'
 import {TimeRange} from 'src/types/logs'
 
+export enum TimeFormatOption {
+  DEFAULT = 'YYYY-MM-DD HH:mm:ss',
+  SLASH_YMD_TIME = 'YYYY/MM/DD HH:mm:ss',
+}
+
 export enum SearchStatus {
   None = 'None',
   Loading = 'Loading',
