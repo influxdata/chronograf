@@ -71,7 +71,7 @@ class Layout extends Component<Props, State> {
         isEditable={isEditable}
         onCloneCell={onCloneCell}
         onDeleteCell={onDeleteCell}
-        isFluxSource={!!this.fluxService}
+        isFluxSource={this.isFluxService}
         toggleVisType={this.toggleVisType}
         onSummonOverlayTechnologies={onSummonOverlayTechnologies}
       >
@@ -80,8 +80,14 @@ class Layout extends Component<Props, State> {
     )
   }
 
+  private get isFluxService(): boolean {
+    const {cell} = this.props
+    const type = getDeep<string>(cell, 'queries.0.type', '')
+    return type === 'flux'
+  }
+
   private get fluxService(): Service {
-    const {services, cell} = this.props
+    const {services, source, cell} = this.props
 
     const sourceLink = getDeep<string>(cell, 'queries.0.source', '')
 
@@ -90,6 +96,12 @@ class Layout extends Component<Props, State> {
         return s.links.self === sourceLink
       })
       return service
+    }
+
+    if (this.isFluxService) {
+      return services.find(s => {
+        return s.sourceID === source.id
+      })
     }
   }
 
@@ -173,7 +185,7 @@ class Layout extends Component<Props, State> {
   }
 
   private get visualization(): JSX.Element {
-    if (this.fluxService) {
+    if (this.isFluxService) {
       return this.fluxVis
     }
     return this.influxQLVis
