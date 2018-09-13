@@ -853,8 +853,9 @@ class LogsPage extends Component<Props, State> {
     this.updateTableData(SearchStatus.UpdatingSource)
   }
 
-  private handleChooseNamespace = (namespace: Namespace) => {
-    this.props.setNamespaceAsync(namespace)
+  private handleChooseNamespace = async (namespace: Namespace) => {
+    await this.props.setNamespaceAsync(namespace)
+    this.updateTableData(SearchStatus.UpdatingNamespace)
   }
 
   private updateTableData(searchStatus: SearchStatus) {

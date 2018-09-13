@@ -53,6 +53,8 @@ class LoadingStatus extends PureComponent<Props> {
         return 'Searching time bounds'
       case SearchStatus.UpdatingSource:
         return 'Searching updated source'
+      case SearchStatus.UpdatingNamespace:
+        return 'Searching updated namespace'
       case SearchStatus.Loading:
       default:
         return 'Searching'
