@@ -33,6 +33,8 @@ import {
   extractQueryWarningMessage,
   extractQueryErrorMessage,
 } from 'src/shared/parsing'
+import {notify} from 'src/shared/actions/notifications'
+import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
 
 // Components
 import MarkdownCell from 'src/shared/components/MarkdownCell'
@@ -61,6 +63,7 @@ interface Props {
   grabFluxData?: (data: FluxTable[]) => void
   cellNote?: string
   cellNoteVisibility?: NoteVisibility
+  onNotify?: typeof notify
 }
 
 interface State {
@@ -313,10 +316,14 @@ class TimeSeries extends Component<Props, State> {
   private async executeFluxQuery(
     queries: Query[]
   ): Promise<GetTimeSeriesResult> {
-    const {service} = this.props
+    const {service, onNotify} = this.props
 
     const script = getDeep<string>(queries, '0.text', '')
     const results = await fetchFluxTimeSeries(service, script, this.latestUUID)
+
+    if (results.didTruncate && onNotify) {
+      onNotify(fluxResponseTruncatedError())
+    }
 
     return results
   }
