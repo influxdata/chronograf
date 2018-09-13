@@ -40,6 +40,11 @@ interface CellLinks {
   self: string
 }
 
+export enum QueryType {
+  Flux = 'flux',
+  InfluxQL = 'influxql',
+}
+
 // corresponds to DashboardQuery on the backend
 export interface CellQuery {
   query: string

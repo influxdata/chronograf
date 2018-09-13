@@ -35,7 +35,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service, NotificationAction} from 'src/types'
 import {Template} from 'src/types/tempVars'
-import {NewDefaultCell, ThresholdType} from 'src/types/dashboards'
+import {NewDefaultCell, ThresholdType, QueryType} from 'src/types/dashboards'
 import {Links, ScriptStatus} from 'src/types/flux'
 import {VisualizationOptions} from 'src/types/dataExplorer'
 
@@ -231,7 +231,7 @@ class CellEditorOverlay extends Component<Props, State> {
   private get isFluxSource(): boolean {
     const {queryDrafts} = this.props
 
-    if (getDeep<string>(queryDrafts, '0.type', '') === 'flux') {
+    if (getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) {
       return true
     }
     return false
@@ -260,7 +260,7 @@ class CellEditorOverlay extends Component<Props, State> {
           query: script,
           queryConfig: null,
           source: getDeep<string>(queryDrafts, '0.source', ''),
-          type: 'flux',
+          type: QueryType.Flux,
         },
       ]
     } else {
@@ -279,6 +279,7 @@ class CellEditorOverlay extends Component<Props, State> {
             queryConfig.rawText ||
             buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig),
           source,
+          type: QueryType.InfluxQL,
         }
       })
     }

@@ -27,7 +27,12 @@ import {
 // types
 import {CellType} from 'src/types'
 import {DEState} from 'src/types/dataExplorer'
-import {CellQuery, ThresholdType, NoteVisibility} from 'src/types/dashboards'
+import {
+  CellQuery,
+  ThresholdType,
+  NoteVisibility,
+  QueryType,
+} from 'src/types/dashboards'
 
 const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
 
@@ -71,7 +76,7 @@ export default (state = initialState, action: Action): DEState => {
           queryConfig: newQueryConfig,
           source: '',
           id,
-          type: 'influxql',
+          type: QueryType.InfluxQL,
         }
         queryDrafts = [newQueryDraft]
       }

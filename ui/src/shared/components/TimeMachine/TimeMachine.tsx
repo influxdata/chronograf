@@ -58,6 +58,7 @@ import {
   QueryStatus,
   Status,
   Query,
+  QueryType,
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
 import {
@@ -435,12 +436,10 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get isFluxSource(): boolean {
     const {queryDrafts} = this.props
-
     // TODO: Update once flux is no longer a separate service
-    if (getDeep<string>(queryDrafts, '0.type', '') === 'flux') {
+    if (getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) {
       return true
     }
-
     return false
   }
 
@@ -674,7 +673,7 @@ class TimeMachine extends PureComponent<Props, State> {
       updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
     }
 
-    const type = selectedService ? 'flux' : 'influxql'
+    const type = selectedService ? QueryType.Flux : QueryType.InfluxQL
     this.updateQueryDraftsSource(selectedSource, type)
     this.setState({selectedService, selectedSource, useDynamicSource})
   }
@@ -682,7 +681,7 @@ class TimeMachine extends PureComponent<Props, State> {
   private handleSelectDynamicSource = (): void => {
     const useDynamicSource = true
 
-    const type = this.isFluxSource ? 'flux' : 'finluxql'
+    const type = this.isFluxSource ? QueryType.Flux : QueryType.InfluxQL
     this.updateQueryDraftsSource(null, type)
     this.setState({useDynamicSource})
   }
@@ -1014,13 +1013,13 @@ class TimeMachine extends PureComponent<Props, State> {
 
     if (this.isFluxSource) {
       this.setState({selectedService: null})
-      this.updateQueryDraftsSource(null, 'influxql')
+      this.updateQueryDraftsSource(null, QueryType.InfluxQL)
     } else {
       const foundFluxForSource = services.find(service => {
         return service.sourceID === this.source.id
       })
       if (foundFluxForSource) {
-        this.updateQueryDraftsSource(null, 'flux')
+        this.updateQueryDraftsSource(null, QueryType.Flux)
       }
     }
   }
