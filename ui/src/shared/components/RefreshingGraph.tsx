@@ -24,6 +24,7 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 // Actions
 import {setHoverTime} from 'src/dashboards/actions'
+import {notify} from 'src/shared/actions/notifications'
 
 // Types
 import {QueryUpdateState} from 'src/shared/actions/queries'
@@ -83,6 +84,7 @@ interface Props {
   editQueryStatus: () => void
   onSetResolution: () => void
   handleSetHoverTime: () => void
+  onNotify: typeof notify
   rawData?: FluxTable[]
   visType?: VisType
   grabDataForDownload?: GrabDataForDownloadHandler
@@ -124,6 +126,7 @@ class RefreshingGraph extends PureComponent<Props> {
       visType,
       rawData = [],
       cellNote,
+      onNotify,
       timeRange,
       templates,
       grabFluxData,
@@ -163,6 +166,7 @@ class RefreshingGraph extends PureComponent<Props> {
         timeRange={timeRange}
         templates={templates}
         editQueryStatus={editQueryStatus}
+        onNotify={onNotify}
         grabDataForDownload={grabDataForDownload}
         grabFluxData={grabFluxData}
         cellNote={cellNote}
@@ -374,6 +378,7 @@ const mapStateToProps = ({annotations: {mode}}) => ({
 
 const mdtp = {
   handleSetHoverTime: setHoverTime,
+  onNotify: notify,
 }
 
 export default connect(mapStateToProps, mdtp)(RefreshingGraph)
