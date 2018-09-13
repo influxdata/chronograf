@@ -46,11 +46,15 @@ class LoadingStatus extends PureComponent<Props> {
   private get loadingMessage(): string {
     switch (this.props.status) {
       case SearchStatus.UpdatingFilters:
-        return 'Updating Search Filters'
+        return 'Updating search filters'
       case SearchStatus.NoResults:
         return 'No logs found'
       case SearchStatus.UpdatingTimeBounds:
         return 'Searching time bounds'
+      case SearchStatus.UpdatingSource:
+        return 'Searching updated source'
+      case SearchStatus.UpdatingNamespace:
+        return 'Searching updated namespace'
       case SearchStatus.Loading:
       default:
         return 'Searching'

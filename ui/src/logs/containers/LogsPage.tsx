@@ -217,6 +217,7 @@ class LogsPage extends Component<Props, State> {
 
   public componentWillUnmount() {
     this.clearTailInterval()
+    this.cancelChunks()
   }
 
   public render() {
@@ -456,6 +457,18 @@ class LogsPage extends Component<Props, State> {
     if (this.interval) {
       clearInterval(this.interval)
       this.interval = null
+    }
+  }
+
+  private cancelChunks() {
+    if (this.currentNewerChunksGenerator) {
+      this.currentNewerChunksGenerator.cancel()
+      this.currentNewerChunksGenerator = null
+    }
+
+    if (this.currentOlderChunksGenerator) {
+      this.currentOlderChunksGenerator.cancel()
+      this.currentOlderChunksGenerator = null
     }
   }
 
@@ -834,16 +847,19 @@ class LogsPage extends Component<Props, State> {
     this.handleSetTimeBounds()
   }
 
-  private handleChooseSource = (sourceID: string) => {
-    this.props.getSourceAndPopulateNamespaces(sourceID)
+  private handleChooseSource = async (sourceID: string) => {
+    await this.props.getSourceAndPopulateNamespaces(sourceID)
+    this.updateTableData(SearchStatus.UpdatingSource)
   }
 
-  private handleChooseNamespace = (namespace: Namespace) => {
-    this.props.setNamespaceAsync(namespace)
+  private handleChooseNamespace = async (namespace: Namespace) => {
+    await this.props.setNamespaceAsync(namespace)
+    this.updateTableData(SearchStatus.UpdatingNamespace)
   }
 
-  private updateTableData(searchStatus) {
+  private updateTableData(searchStatus: SearchStatus) {
     this.clearTailInterval()
+    this.cancelChunks()
     this.props.clearSearchData(searchStatus)
   }
 
