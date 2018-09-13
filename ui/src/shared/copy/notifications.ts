@@ -840,11 +840,6 @@ export const fluxUpdated: Notification = {
   message: 'Connection Updated. Rejoice!',
 }
 
-export const fluxTimeSeriesError = (message: string): Notification => ({
-  ...defaultErrorNotification,
-  message: `Could not get data: ${message}`,
-})
-
 export const fluxResponseTruncatedError = (): Notification => {
   const BYTES_TO_MB = 1 / 1e6
   const APPROX_MAX_RESPONSE_MB = +(MAX_RESPONSE_BYTES * BYTES_TO_MB).toFixed(2)
