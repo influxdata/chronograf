@@ -2,6 +2,7 @@ import React, {PureComponent, CSSProperties} from 'react'
 import classnames from 'classnames'
 import getLastValues from 'src/shared/parsing/lastValues'
 import _ from 'lodash'
+import {manager} from 'src/worker/JobManager'
 
 import {SMALL_CELL_HEIGHT} from 'src/shared/graphs/helpers'
 import {DYGRAPH_CONTAINER_V_MARGIN} from 'src/shared/constants'
@@ -10,6 +11,8 @@ import {ColorString} from 'src/types/colors'
 import {CellType, DecimalPlaces} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {FluxTable} from 'src/types'
+import {DataTypes} from 'src/shared/components/RefreshingGraph'
 
 interface Props {
   decimalPlaces: DecimalPlaces
@@ -19,21 +22,60 @@ interface Props {
   suffix?: string
   lineGraph: boolean
   staticLegendHeight?: number
-  data: TimeSeriesServerResponse[]
+  data: TimeSeriesServerResponse[] | FluxTable[]
+  dataType: DataTypes
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
+}
+
+interface State {
+  lastValues?: {
+    values: number[]
+    series: string[]
+  }
 }
 
 const NOOP = () => {}
 
 @ErrorHandling
-class SingleStat extends PureComponent<Props> {
+class SingleStat extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     prefix: '',
     suffix: '',
     onUpdateCellColors: NOOP,
   }
 
+  private isComponentMounted: boolean
+
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {}
+  }
+
+  public async componentDidMount() {
+    this.isComponentMounted = true
+    await this.dataToLastValues()
+  }
+
+  public async componentDidUpdate(prevProps: Props) {
+    const isDataChanged =
+      prevProps.dataType !== this.props.dataType ||
+      !_.isEqual(prevProps.data, this.props.data)
+
+    if (isDataChanged) {
+      await this.dataToLastValues()
+    }
+  }
+
+  public componentWillUnmount() {
+    this.isComponentMounted = false
+  }
+
   public render() {
+    if (!this.state.lastValues) {
+      return <h3 className="graph-spinner" />
+    }
+
     return (
       <div className="single-stat" style={this.containerStyle}>
         {this.resizerBox}
@@ -54,16 +96,19 @@ class SingleStat extends PureComponent<Props> {
   }
 
   private get lastValue(): number {
-    const {data} = this.props
-    const {lastValues, series} = getLastValues(data)
-    const firstAlphabeticalSeriesName = _.sortBy(series)[0]
+    const {lastValues} = this.state
 
-    const firstAlphabeticalIndex = _.indexOf(
-      series,
-      firstAlphabeticalSeriesName
-    )
+    if (lastValues) {
+      const {values, series} = lastValues
+      const firstAlphabeticalSeriesName = _.sortBy(series)[0]
 
-    return lastValues[firstAlphabeticalIndex]
+      const firstAlphabeticalIndex = _.indexOf(
+        series,
+        firstAlphabeticalSeriesName
+      )
+
+      return values[firstAlphabeticalIndex]
+    }
   }
 
   private get roundedLastValue(): string {
@@ -108,16 +153,20 @@ class SingleStat extends PureComponent<Props> {
   }
 
   private get coloration(): CSSProperties {
-    const {data, colors, lineGraph, onUpdateCellColors} = this.props
+    const {colors, lineGraph, onUpdateCellColors} = this.props
+    const {lastValues} = this.state
 
-    const {lastValues, series} = getLastValues(data)
-    const firstAlphabeticalSeriesName = _.sortBy(series)[0]
+    let lastValue: number = 0
+    if (lastValues) {
+      const {values, series} = lastValues
+      const firstAlphabeticalSeriesName = _.sortBy(series)[0]
 
-    const firstAlphabeticalIndex = _.indexOf(
-      series,
-      firstAlphabeticalSeriesName
-    )
-    const lastValue = lastValues[firstAlphabeticalIndex]
+      const firstAlphabeticalIndex = _.indexOf(
+        series,
+        firstAlphabeticalSeriesName
+      )
+      lastValue = values[firstAlphabeticalIndex]
+    }
 
     const {bgColor, textColor} = generateThresholdsListHexs({
       colors,
@@ -169,6 +218,27 @@ class SingleStat extends PureComponent<Props> {
         </svg>
       </div>
     )
+  }
+
+  private async dataToLastValues() {
+    const {data, dataType} = this.props
+
+    try {
+      let lastValues
+      if (dataType === DataTypes.flux) {
+        lastValues = await manager.fluxTablesToSingleStat(data as FluxTable[])
+      } else if (dataType === DataTypes.influxQL) {
+        lastValues = getLastValues(data as TimeSeriesServerResponse[])
+      }
+
+      if (!this.isComponentMounted) {
+        return
+      }
+
+      this.setState({lastValues})
+    } catch (err) {
+      console.error(err)
+    }
   }
 }
 

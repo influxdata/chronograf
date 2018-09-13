@@ -2,14 +2,14 @@ import _ from 'lodash'
 import {Data} from 'src/types/dygraphs'
 import {TimeSeriesServerResponse} from 'src/types/series'
 
-interface Result {
-  lastValues: number[]
+interface LastValues {
+  values: number[]
   series: string[]
 }
 
 export default function(
   timeSeriesResponse: TimeSeriesServerResponse[] | Data | null
-): Result {
+): LastValues {
   const values = _.get(
     timeSeriesResponse,
     ['0', 'response', 'results', '0', 'series', '0', 'values'],
@@ -24,5 +24,5 @@ export default function(
 
   const lastValues = values[values.length - 1].slice(1) // remove time with slice 1
 
-  return {lastValues, series}
+  return {values: lastValues, series}
 }
