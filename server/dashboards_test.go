@@ -152,6 +152,7 @@ func TestValidDashboardRequest(t *testing.T) {
 						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
+								Type:    "influxql",
 							},
 						},
 					},
@@ -161,6 +162,7 @@ func TestValidDashboardRequest(t *testing.T) {
 						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
+								Type:    "influxql",
 							},
 						},
 					},
@@ -175,6 +177,7 @@ func TestValidDashboardRequest(t *testing.T) {
 						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
+								Type:    "influxql",
 							},
 						},
 						NoteVisibility: "default",
@@ -185,6 +188,7 @@ func TestValidDashboardRequest(t *testing.T) {
 						Queries: []chronograf.DashboardQuery{
 							{
 								Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
+								Type:    "influxql",
 							},
 						},
 						NoteVisibility: "default",
@@ -232,6 +236,7 @@ func Test_newDashboardResponse(t *testing.T) {
 										Quantity: "7",
 									},
 								},
+								Type: "flux",
 							},
 						},
 						Axes: map[string]chronograf.Axis{
@@ -250,6 +255,7 @@ func Test_newDashboardResponse(t *testing.T) {
 						H:  0,
 						Queries: []chronograf.DashboardQuery{
 							{
+								Type:    "flux",
 								Source:  "/chronograf/v1/sources/2",
 								Command: "SELECT winning_horses from grays_sports_alamanc where time > now() - 15m",
 							},
@@ -289,6 +295,7 @@ func Test_newDashboardResponse(t *testing.T) {
 											},
 										},
 									},
+									Type: "flux",
 								},
 							},
 							CellColors: []chronograf.CellColor{},
@@ -348,6 +355,7 @@ func Test_newDashboardResponse(t *testing.T) {
 											Lower: "now() - 15m",
 										},
 									},
+									Type: "flux",
 								},
 							},
 							NoteVisibility: "default",

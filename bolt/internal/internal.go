@@ -390,10 +390,8 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 	for i, c := range pb.Cells {
 		queries := make([]chronograf.DashboardQuery, len(c.Queries))
 		for j, q := range c.Queries {
-			var queryType string
-			if q.Type == "" {
-				queryType = "influxql"
-			} else {
+			queryType := "influxql"
+			if q.Type != "" {
 				queryType = q.Type
 			}
 			queries[j] = chronograf.DashboardQuery{

@@ -42,6 +42,7 @@ const (
 	ErrInvalidCellOptionsSort          = Error("cell options sortby cannot be empty'")
 	ErrInvalidCellOptionsColumns       = Error("cell options columns cannot be empty'")
 	ErrOrganizationConfigNotFound      = Error("could not find organization config")
+	ErrInvalidCellQueryType            = Error("invalid cell query type: must be 'flux' or 'influxql'")
 )
 
 // Error is a domain error encountered while processing chronograf requests
