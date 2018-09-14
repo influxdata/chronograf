@@ -79,6 +79,7 @@ import {
   ThresholdType,
   TableOptions,
   NoteVisibility,
+  QueryType,
 } from 'src/types/dashboards'
 import {VisualizationOptions} from 'src/types/dataExplorer'
 
@@ -504,7 +505,13 @@ export class DataExplorer extends PureComponent<Props, State> {
       query,
       this.templates
     )
-    const queryDraft = {query, queryConfig, source: source.links.self}
+
+    const queryDraft = {
+      query,
+      queryConfig,
+      source: source.links.self,
+      type: QueryType.InfluxQL,
+    }
     loadDE([queryDraft], timeRange)
   }
 

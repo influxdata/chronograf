@@ -418,6 +418,7 @@ func TestService_ReplaceDashboardCell(t *testing.T) {
 												Lower: "now() - 15m"},
 											Shifts: []chronograf.TimeShift{},
 										},
+										Type: "influxql",
 									},
 								},
 								Axes: map[string]chronograf.Axis{
@@ -489,7 +490,8 @@ func TestService_ReplaceDashboardCell(t *testing.T) {
 						},
 						"query":
 						  "SELECT mean(\"usage_user\") AS \"mean_usage_user\" FROM \"telegraf\".\"autogen\".\"cpu\" WHERE time > :dashboardTime: AND \"cpu\"=:cpu: GROUP BY :interval: FILL(null)",
-						"source": null
+						"source": null,
+						"type": "influxql"
 					  }
 					],
 					"axes": {
@@ -537,7 +539,7 @@ func TestService_ReplaceDashboardCell(t *testing.T) {
 					}
 				  }
 				  `))),
-			want: `{"i":"3c5c4102-fa40-4585-a8f9-917c77e37192","x":0,"y":0,"w":4,"h":4,"name":"Untitled Cell","queries":[{"query":"SELECT mean(\"usage_user\") AS \"mean_usage_user\" FROM \"telegraf\".\"autogen\".\"cpu\" WHERE time \u003e :dashboardTime: AND \"cpu\"=:cpu: GROUP BY :interval: FILL(null)","queryConfig":{"id":"3cd3eaa4-a4b8-44b3-b69e-0c7bf6b91d9e","database":"telegraf","measurement":"cpu","retentionPolicy":"autogen","fields":[{"value":"mean","type":"func","alias":"mean_usage_user","args":[{"value":"usage_user","type":"field","alias":""}]}],"tags":{"cpu":["ChristohersMBP2.lan"]},"groupBy":{"time":"2s","tags":[]},"areTagsAccepted":true,"fill":"null","rawText":"SELECT mean(\"usage_user\") AS \"mean_usage_user\" FROM \"telegraf\".\"autogen\".\"cpu\" WHERE time \u003e :dashboardTime: AND \"cpu\"=:cpu: GROUP BY :interval: FILL(null)","range":{"upper":"","lower":"now() - 15m"},"shifts":[]},"source":""}],"axes":{"x":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"","scale":""},"y":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"","scale":""},"y2":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"","scale":""}},"type":"line","colors":[{"id":"0","type":"min","hex":"#00C9FF","name":"laser","value":"0"},{"id":"1","type":"max","hex":"#9394FF","name":"comet","value":"100"}],"legend":{},"tableOptions":{"verticalTimeAxis":false,"sortBy":{"internalName":"","displayName":"","visible":false},"wrapping":"","fixFirstColumn":false},"fieldOptions":null,"timeFormat":"","decimalPlaces":{"isEnforced":false,"digits":0},"note":"","noteVisibility":"default","links":{"self":"/chronograf/v1/dashboards/1/cells/3c5c4102-fa40-4585-a8f9-917c77e37192"}}
+			want: `{"i":"3c5c4102-fa40-4585-a8f9-917c77e37192","x":0,"y":0,"w":4,"h":4,"name":"Untitled Cell","queries":[{"query":"SELECT mean(\"usage_user\") AS \"mean_usage_user\" FROM \"telegraf\".\"autogen\".\"cpu\" WHERE time \u003e :dashboardTime: AND \"cpu\"=:cpu: GROUP BY :interval: FILL(null)","queryConfig":{"id":"3cd3eaa4-a4b8-44b3-b69e-0c7bf6b91d9e","database":"telegraf","measurement":"cpu","retentionPolicy":"autogen","fields":[{"value":"mean","type":"func","alias":"mean_usage_user","args":[{"value":"usage_user","type":"field","alias":""}]}],"tags":{"cpu":["ChristohersMBP2.lan"]},"groupBy":{"time":"2s","tags":[]},"areTagsAccepted":true,"fill":"null","rawText":"SELECT mean(\"usage_user\") AS \"mean_usage_user\" FROM \"telegraf\".\"autogen\".\"cpu\" WHERE time \u003e :dashboardTime: AND \"cpu\"=:cpu: GROUP BY :interval: FILL(null)","range":{"upper":"","lower":"now() - 15m"},"shifts":[]},"source":"","type":"influxql"}],"axes":{"x":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"","scale":""},"y":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"","scale":""},"y2":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"","scale":""}},"type":"line","colors":[{"id":"0","type":"min","hex":"#00C9FF","name":"laser","value":"0"},{"id":"1","type":"max","hex":"#9394FF","name":"comet","value":"100"}],"legend":{},"tableOptions":{"verticalTimeAxis":false,"sortBy":{"internalName":"","displayName":"","visible":false},"wrapping":"","fixFirstColumn":false},"fieldOptions":null,"timeFormat":"","decimalPlaces":{"isEnforced":false,"digits":0},"note":"","noteVisibility":"default","links":{"self":"/chronograf/v1/dashboards/1/cells/3c5c4102-fa40-4585-a8f9-917c77e37192"}}
 `,
 		},
 		{
@@ -745,6 +747,7 @@ func Test_newCellResponses(t *testing.T) {
 								},
 							},
 							Source: "",
+							Type:   "influxql",
 						},
 					},
 					Axes: map[string]chronograf.Axis{
@@ -810,6 +813,7 @@ func Test_newCellResponses(t *testing.T) {
 										Lower: "now() - 15m",
 									},
 								},
+								Type: "influxql",
 							},
 						},
 						Axes: map[string]chronograf.Axis{
@@ -1059,7 +1063,7 @@ evil base
 		{
 			name: "note visibility - valid default value",
 			c: &chronograf.DashboardCell{
-				Note: "",
+				Note:           "",
 				NoteVisibility: "default",
 			},
 			want: want{
@@ -1071,7 +1075,7 @@ evil base
 		{
 			name: "note visibility - valid non-default value",
 			c: &chronograf.DashboardCell{
-				Note: "",
+				Note:           "",
 				NoteVisibility: "showWhenNoData",
 			},
 			want: want{
@@ -1083,10 +1087,10 @@ evil base
 		{
 			name: "note visibility - invalid value",
 			c: &chronograf.DashboardCell{
-				Note: "",
+				Note:           "",
 				NoteVisibility: "pineapple",
 			},
-			want: want{},
+			want:    want{},
 			wantErr: true,
 		},
 	}
@@ -1100,6 +1104,53 @@ evil base
 				if tt.c.Note != tt.want.Note || tt.c.NoteVisibility != tt.want.NoteVisibility {
 					t.Errorf("ValidateNote()\ngot = **%v**, %v\nwant = **%v**, %v", tt.c.Note, tt.c.NoteVisibility, tt.want.Note, tt.want.NoteVisibility)
 				}
+			}
+		})
+	}
+}
+
+func TestHasCorrectQueryType(t *testing.T) {
+	tests := []struct {
+		name    string
+		wantErr bool
+		c       *chronograf.DashboardCell
+	}{
+		{
+			name:    "Should error if type is not flux or influxql",
+			wantErr: true,
+			c: &chronograf.DashboardCell{
+				Queries: []chronograf.DashboardQuery{
+					{
+						Type: "howdy",
+					},
+				},
+			},
+		},
+		{
+			name: "A flux query type",
+			c: &chronograf.DashboardCell{
+				Queries: []chronograf.DashboardQuery{
+					{
+						Type: "flux",
+					},
+				},
+			},
+		},
+		{
+			name: "An influxql query type",
+			c: &chronograf.DashboardCell{
+				Queries: []chronograf.DashboardQuery{
+					{
+						Type: "influxql",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := HasCorrectQueryType(tt.c); (err != nil) != tt.wantErr {
+				t.Errorf("HasCorrectQueryType() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

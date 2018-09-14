@@ -26,7 +26,12 @@ import {editor} from 'src/flux/constants'
 
 // types
 import {CellType, Cell, TimeRange} from 'src/types'
-import {CellQuery, ThresholdType, TableOptions} from 'src/types/dashboards'
+import {
+  CellQuery,
+  ThresholdType,
+  TableOptions,
+  QueryType,
+} from 'src/types/dashboards'
 import {ThresholdColor, GaugeColor, LineColor} from 'src/types/colors'
 import {NewDefaultCell} from 'src/types/dashboards'
 
@@ -52,7 +57,7 @@ export const initialState = {
   script: editor.DEFAULT_SCRIPT,
 }
 
-const getNewQueryDrafts = (sourceLink?: string): CellQuery[] => {
+const getNewQueryDrafts = (type: string, sourceLink?: string): CellQuery[] => {
   const id = uuid.v4()
   const newQueryConfig = {
     ...defaultQueryConfig({id}),
@@ -62,6 +67,7 @@ const getNewQueryDrafts = (sourceLink?: string): CellQuery[] => {
     queryConfig: newQueryConfig,
     source: sourceLink || '',
     id,
+    type,
   }
   return [newQueryDraft]
 }
@@ -84,10 +90,10 @@ export default (state = initialState, action: Action): CEOInitialState => {
       let script = editor.DEFAULT_SCRIPT
       const sourceLink = getDeep<string>(cell, 'queries.0.source', '')
 
-      if (sourceLink.includes('service')) {
+      if (getDeep<string>(cell, 'queries.0.type', '') === QueryType.Flux) {
         script = getDeep<string>(cell, 'queries.0.query', editor.DEFAULT_SCRIPT)
 
-        queryDrafts = getNewQueryDrafts(sourceLink)
+        queryDrafts = getNewQueryDrafts(QueryType.Flux, sourceLink)
       } else {
         queryDrafts = cell.queries.map(q => {
           const id = uuid.v4()
@@ -97,7 +103,7 @@ export default (state = initialState, action: Action): CEOInitialState => {
         })
       }
       if (_.isEmpty(queryDrafts)) {
-        queryDrafts = getNewQueryDrafts()
+        queryDrafts = getNewQueryDrafts(QueryType.InfluxQL)
       }
 
       if ((cell as Cell).colors) {

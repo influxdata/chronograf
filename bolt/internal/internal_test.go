@@ -165,6 +165,7 @@ func Test_MarshalDashboard(t *testing.T) {
 						},
 						Source: "/chronograf/v1/sources/1",
 						Shifts: []chronograf.TimeShift{},
+						Type:   "influxql",
 					},
 				},
 				Axes: map[string]chronograf.Axis{
@@ -232,6 +233,7 @@ func Test_MarshalDashboard_WithLegacyBounds(t *testing.T) {
 							Upper: int64(100),
 						},
 						Shifts: []chronograf.TimeShift{},
+						Type:   "influxql",
 					},
 				},
 				Axes: map[string]chronograf.Axis{
@@ -287,6 +289,7 @@ func Test_MarshalDashboard_WithLegacyBounds(t *testing.T) {
 							Upper: int64(100),
 						},
 						Shifts: []chronograf.TimeShift{},
+						Type:   "influxql",
 					},
 				},
 				Axes: map[string]chronograf.Axis{
@@ -354,6 +357,7 @@ func Test_MarshalDashboard_WithEmptyLegacyBounds(t *testing.T) {
 							Upper: int64(100),
 						},
 						Shifts: []chronograf.TimeShift{},
+						Type:   "flux",
 					},
 				},
 				Axes: map[string]chronograf.Axis{
@@ -405,6 +409,7 @@ func Test_MarshalDashboard_WithEmptyLegacyBounds(t *testing.T) {
 							Upper: int64(100),
 						},
 						Shifts: []chronograf.TimeShift{},
+						Type:   "flux",
 					},
 				},
 				Axes: map[string]chronograf.Axis{

@@ -42,6 +42,7 @@ const (
 	ErrInvalidCellOptionsSort          = Error("cell options sortby cannot be empty'")
 	ErrInvalidCellOptionsColumns       = Error("cell options columns cannot be empty'")
 	ErrOrganizationConfigNotFound      = Error("could not find organization config")
+	ErrInvalidCellQueryType            = Error("invalid cell query type: must be 'flux' or 'influxql'")
 )
 
 // Error is a domain error encountered while processing chronograf requests
@@ -208,6 +209,7 @@ type DashboardQuery struct {
 	QueryConfig QueryConfig `json:"queryConfig,omitempty"` // QueryConfig represents the query state that is understood by the data explorer
 	Source      string      `json:"source"`                // Source is the optional URI to the data source for this queryConfig
 	Shifts      []TimeShift `json:"-"`                     // Shifts represents shifts to apply to an influxql query's time range.  Clients expect the shift to be in the generated QueryConfig
+	Type        string      `json:"type"`                  // Type represents the language the query is in (flux or influxql)
 }
 
 // TemplateQuery is used to retrieve choices for template replacement

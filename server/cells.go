@@ -35,7 +35,11 @@ func newCellResponse(dID chronograf.DashboardID, cell chronograf.DashboardCell) 
 	if cell.CellColors == nil {
 		cell.CellColors = []chronograf.CellColor{}
 	}
-
+	for i := range cell.Queries {
+		if cell.Queries[i].Type == "" {
+			cell.Queries[i].Type = "influxql"
+		}
+	}
 	// Copy to handle race condition
 	newAxes := make(map[string]chronograf.Axis, len(cell.Axes))
 	for k, v := range cell.Axes {
@@ -97,6 +101,9 @@ func ValidDashboardCellRequest(c *chronograf.DashboardCell) error {
 	if err != nil {
 		return err
 	}
+	if err = HasCorrectQueryType(c); err != nil {
+		return err
+	}
 	if err = HasCorrectColors(c); err != nil {
 		return err
 	}
@@ -152,6 +159,19 @@ func HasCorrectLegend(c *chronograf.DashboardCell) error {
 	// Remember! if we add other types, update ErrInvalidLegendType
 	if !oneOf(c.Legend.Type, "static") {
 		return chronograf.ErrInvalidLegendType
+	}
+	return nil
+}
+
+// HasCorrectQueryType ensures that all query types have a non-empty value
+func HasCorrectQueryType(c *chronograf.DashboardCell) error {
+	for i := range c.Queries {
+		if c.Queries[i].Type == "" {
+			c.Queries[i].Type = "influxql"
+		}
+		if c.Queries[i].Type != "flux" && c.Queries[i].Type != "influxql" {
+			return chronograf.ErrInvalidCellQueryType
+		}
 	}
 	return nil
 }

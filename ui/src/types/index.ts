@@ -10,6 +10,7 @@ import {
   Dashboard,
   CellType,
   Protoboard,
+  QueryType,
 } from './dashboards'
 import {
   Template,
@@ -139,4 +140,5 @@ export {
   QueryStatus,
   Host,
   Layout,
+  QueryType,
 }

@@ -40,6 +40,11 @@ interface CellLinks {
   self: string
 }
 
+export enum QueryType {
+  Flux = 'flux',
+  InfluxQL = 'influxql',
+}
+
 // corresponds to DashboardQuery on the backend
 export interface CellQuery {
   query: string
@@ -47,6 +52,7 @@ export interface CellQuery {
   source: string
   text?: string // doesn't come from server
   id?: string
+  type: string // flux or influxql
 }
 
 export interface Legend {

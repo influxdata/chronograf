@@ -19,6 +19,7 @@ import {
   DecimalPlaces,
   CellType,
   NoteVisibility,
+  QueryType,
 } from 'src/types/dashboards'
 import {LineColor, ColorNumber} from 'src/types/colors'
 import {ServerLogConfig, ServerColumn} from 'src/types/logs'
@@ -116,6 +117,7 @@ export const query: CellQuery = {
     'SELECT mean("usage_idle") AS "mean_usage_idle", mean("usage_user") AS "mean_usage_user" FROM "telegraf"."autogen"."cpu" WHERE time > :dashboardTime: GROUP BY time(:interval:) FILL(null)',
   queryConfig,
   source: '',
+  type: QueryType.InfluxQL,
 }
 
 export const axes: Axes = {
