@@ -13,6 +13,7 @@ class LoadingStatus extends PureComponent<Props> {
   public render() {
     return (
       <div className="logs-viewer--table-container generic-empty-state">
+        {this.loadingSpinner}
         <h4>
           {this.loadingMessage} {this.description}
         </h4>
@@ -32,6 +33,17 @@ class LoadingStatus extends PureComponent<Props> {
       default:
         return <>{this.timeBounds}</>
     }
+  }
+
+  private get loadingSpinner(): JSX.Element {
+    return (
+      <div className="logs-viewer--search-graphic">
+        <div className="logs-viewer--graphic-log" />
+        <div className="logs-viewer--graphic-magnifier-a">
+          <div className="logs-viewer--graphic-magnifier-b" />
+        </div>
+      </div>
+    )
   }
 
   private get timeBounds(): JSX.Element {
