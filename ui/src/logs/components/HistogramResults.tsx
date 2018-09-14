@@ -5,6 +5,7 @@ interface Props {
   count: number
   queryCount: number
   searchStatus: SearchStatus
+  windowOption: string
 }
 
 class HistogramResults extends PureComponent<Props> {
@@ -19,7 +20,7 @@ class HistogramResults extends PureComponent<Props> {
       case SearchStatus.Loaded:
         return this.completedContents
       default:
-        return <>Updating Histogram...</>
+        return <>Updating histogram...</>
     }
   }
 
@@ -32,13 +33,17 @@ class HistogramResults extends PureComponent<Props> {
 
     return (
       <>
-        Displaying <strong> {count} Events</strong> in Histogram
+        Displaying <strong> {count} events</strong> in histogram
       </>
     )
   }
 
   private get noResultsContent(): JSX.Element {
-    return <>No Histogram results. Try adjusting the window.</>
+    return (
+      <>
+        No results in past <strong>{this.props.windowOption}</strong>
+      </>
+    )
   }
 }
 
