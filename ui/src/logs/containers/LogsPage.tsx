@@ -754,6 +754,7 @@ class LogsPage extends Component<Props, State> {
           count={this.histogramTotal}
           queryCount={queryCount}
           searchStatus={searchStatus}
+          selectedTimeWindow={timeRange}
         />
         <TimeWindowDropdown
           selectedTimeWindow={timeRange}
