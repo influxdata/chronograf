@@ -1,11 +1,11 @@
 import React, {PureComponent} from 'react'
-import {SearchStatus} from 'src/types/logs'
+import {SearchStatus, TimeRange} from 'src/types/logs'
 
 interface Props {
   count: number
   queryCount: number
   searchStatus: SearchStatus
-  windowOption: string
+  selectedTimeWindow: TimeRange
 }
 
 class HistogramResults extends PureComponent<Props> {
@@ -41,9 +41,19 @@ class HistogramResults extends PureComponent<Props> {
   private get noResultsContent(): JSX.Element {
     return (
       <>
-        No results in past <strong>{this.props.windowOption}</strong>
+        No results in <strong>{this.window}</strong>
       </>
     )
+  }
+
+  private get window(): string {
+    const {timeOption, windowOption} = this.props.selectedTimeWindow
+
+    if (timeOption === 'now') {
+      return `Past ${windowOption}`
+    }
+
+    return `${windowOption} Window`
   }
 }
 
