@@ -128,7 +128,6 @@ interface State {
   activeQueryIndex: number
   activeEditorTab: CEOTabs
   selectedService: Service
-  useDynamicSource: boolean
   suggestions: Suggestion[]
   autoRefresher: AutoRefresher
   autoRefreshDuration: number // milliseconds
@@ -144,16 +143,11 @@ class TimeMachine extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    const {queryDrafts} = props
-
-    const useDynamicSource = getDeep(queryDrafts, '0.source', '') === ''
-
     this.state = {
       activeQueryIndex: 0,
       activeEditorTab: CEOTabs.Queries,
       selectedService: null,
       selectedSource: null,
-      useDynamicSource,
       data: [],
       body: [],
       ast: null,
@@ -211,7 +205,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   public render() {
     const {services, timeRange, templates, isInCEO, script} = this.props
-    const {useDynamicSource, autoRefreshDuration} = this.state
+    const {autoRefreshDuration} = this.state
 
     const horizontalDivisions = [
       {
@@ -254,7 +248,7 @@ class TimeMachine extends PureComponent<Props, State> {
           onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
           onChangeService={this.handleChangeService}
           onSelectDynamicSource={this.handleSelectDynamicSource}
-          isDynamicSourceSelected={useDynamicSource}
+          isDynamicSourceSelected={this.useDynamicSource}
           timeRange={timeRange}
           updateEditorTimeRange={this.handleUpdateEditorTimeRange}
           isInCEO={isInCEO}
@@ -345,7 +339,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get service(): Service {
     const {service, services, queryDrafts} = this.props
-    const {selectedService, useDynamicSource} = this.state
+    const {selectedService} = this.state
 
     const queryDraft = _.get(queryDrafts, 0)
     const querySource = _.get(queryDraft, 'source', '')
@@ -359,7 +353,7 @@ class TimeMachine extends PureComponent<Props, State> {
       }
     }
 
-    if (useDynamicSource && this.isFluxSource) {
+    if (this.useDynamicSource && this.isFluxSource) {
       return services.find(s => {
         return s.sourceID === this.source.id
       })
@@ -374,9 +368,9 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private get source(): Source {
     const {source, sources, queryDrafts} = this.props
-    const {selectedSource, useDynamicSource} = this.state
+    const {selectedSource} = this.state
     // return current source
-    if (useDynamicSource) {
+    if (this.useDynamicSource) {
       return source
     }
 
@@ -568,6 +562,12 @@ class TimeMachine extends PureComponent<Props, State> {
     })
   }
 
+  private get useDynamicSource(): boolean {
+    const {queryDrafts} = this.props
+
+    return getDeep(queryDrafts, '0.source', '') === ''
+  }
+
   private get queryConfigActions() {
     const {queryConfigActions} = this.props
 
@@ -660,7 +660,6 @@ class TimeMachine extends PureComponent<Props, State> {
     selectedSource: Source
   ): void => {
     const {updateSourceLink} = this.props
-    const useDynamicSource = false
 
     if (updateSourceLink) {
       updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
@@ -668,15 +667,12 @@ class TimeMachine extends PureComponent<Props, State> {
 
     const type = selectedService ? QueryType.Flux : QueryType.InfluxQL
     this.updateQueryDraftsSource(selectedSource, type)
-    this.setState({selectedService, selectedSource, useDynamicSource})
+    this.setState({selectedService, selectedSource})
   }
 
   private handleSelectDynamicSource = (): void => {
-    const useDynamicSource = true
-
     const type = this.isFluxSource ? QueryType.Flux : QueryType.InfluxQL
     this.updateQueryDraftsSource(null, type)
-    this.setState({useDynamicSource})
   }
 
   private handleAddQuery = () => {

@@ -160,9 +160,7 @@ export class DataExplorer extends PureComponent<Props, State> {
 
     GlobalAutoRefresher.poll(autoRefresh)
 
-    if (script) {
-      loadDE([], timeRange)
-    } else if (_.isEmpty(query)) {
+    if (script || _.isEmpty(query)) {
       let drafts = []
       if (!_.isEmpty(queryDrafts)) {
         drafts = queryDrafts
@@ -181,8 +179,7 @@ export class DataExplorer extends PureComponent<Props, State> {
     }
 
     await handleGetDashboards()
-
-    this.fetchFluxServices()
+    await this.fetchFluxServices()
   }
 
   public componentDidUpdate(prevProps: Props) {
