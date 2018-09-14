@@ -7,7 +7,10 @@ import {
   downloadFluxCSV,
 } from 'src/shared/utils/downloadTimeseriesCSV'
 import {notify} from 'src/shared/actions/notifications'
-import {csvExportFailed} from 'src/shared/copy/notifications'
+import {
+  csvExportFailed,
+  fluxResponseTruncatedError,
+} from 'src/shared/copy/notifications'
 
 import {Query, Template, Service} from 'src/types'
 
@@ -73,10 +76,16 @@ class CSVExporter extends PureComponent<Props, State> {
     return downloadInfluxQLCSV(queries, templates)
   }
 
-  private downloadFluxCSV = (): Promise<void> => {
-    const {service, script} = this.props
+  private downloadFluxCSV = async (): Promise<void> => {
+    const {service, script, onNotify} = this.props
 
-    return downloadFluxCSV(service, script)
+    const {didTruncate} = await downloadFluxCSV(service, script)
+
+    if (didTruncate) {
+      onNotify(fluxResponseTruncatedError())
+    }
+
+    return
   }
 }
 
