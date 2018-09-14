@@ -524,6 +524,23 @@ export const addDashboardCellAsync = (
   }
 }
 
+export const sendDashboardCellAsync = (
+  dashboard: Dashboard,
+  cell: Partial<Cell>
+) => async (
+  dispatch: Dispatch<Action>
+): Promise<{success: boolean; dashboard: Dashboard}> => {
+  try {
+    const {data} = await addDashboardCellAJAX(dashboard, cell)
+    dispatch(addDashboardCell(dashboard, data))
+    return {success: true, dashboard}
+  } catch (error) {
+    console.error(error)
+    dispatch(errorThrown(error))
+    return {success: false, dashboard}
+  }
+}
+
 export const cloneDashboardCellAsync = (
   dashboard: Dashboard,
   cell: Cell

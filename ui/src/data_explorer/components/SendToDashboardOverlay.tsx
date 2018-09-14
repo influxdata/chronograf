@@ -22,9 +22,10 @@ import {
 // Constants
 import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
 import {NEW_EMPTY_DASHBOARD} from 'src/dashboards/constants'
-
-// Actions
-import {addDashboardCellAsync} from 'src/dashboards/actions'
+import {
+  notifyCellSent,
+  notifyCellSendFailed,
+} from 'src/shared/copy/notifications'
 
 // APIs
 import {createDashboard} from 'src/dashboards/apis'
@@ -37,6 +38,7 @@ import {
   Service,
   Cell,
   QueryType,
+  Notification,
 } from 'src/types'
 import {getDeep} from 'src/utils/wrappers'
 import {VisualizationOptions} from 'src/types/dataExplorer'
@@ -50,9 +52,14 @@ interface Props {
   rawText: string
   service: Service
   onCancel: () => void
-  addDashboardCell: typeof addDashboardCellAsync
+  sendDashboardCell: (
+    dashboard: Dashboard,
+    newCell: Partial<Cell>
+  ) => Promise<{success: boolean; dashboard: Dashboard}>
   visualizationOptions: VisualizationOptions
   isStaticLegend: boolean
+  handleGetDashboards: () => Dashboard[]
+  notify: (message: Notification) => void
 }
 
 interface State {
@@ -70,6 +77,10 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       selectedIDs: [],
       name: '',
     }
+  }
+  public async componentDidMount() {
+    const {handleGetDashboards} = this.props
+    await handleGetDashboards()
   }
 
   public handleChangeName = e => {
@@ -196,12 +207,27 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     this.setState({selectedIDs})
   }
 
+  private notifyResolutions = (
+    resolved: Array<{success: boolean; dashboard: Dashboard}>,
+    cellName: string
+  ) => {
+    const {notify} = this.props
+    const failures = resolved.filter(r => r.success === false)
+    if (failures.length === 0) {
+      notify(notifyCellSent(cellName, resolved.length))
+      return
+    }
+    failures.forEach(f => {
+      notify(notifyCellSendFailed(cellName, f.dashboard.name))
+    })
+  }
+
   private sendToDashboard = async () => {
     const {name, selectedIDs} = this.state
     const {
       queryConfig,
       script,
-      addDashboardCell,
+      sendDashboardCell,
       rawText,
       source,
       onCancel,
@@ -256,7 +282,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       selectedDashboards = [...selectedDashboards, newDashboard]
     }
 
-    await Promise.all(
+    const resolved = await Promise.all(
       selectedDashboards.map(dashboard => {
         const emptyCell = getNewDashboardCell(dashboard)
         const newCell: Partial<Cell> = {
@@ -272,9 +298,10 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
           note,
           noteVisibility,
         }
-        return addDashboardCell(dashboard, newCell)
+        return sendDashboardCell(dashboard, newCell)
       })
     )
+    this.notifyResolutions(resolved, name)
     onCancel()
   }
 }

@@ -528,6 +528,31 @@ export const notifyCellAdded = (name: string): Notification => ({
   message: `Added "${name}" to dashboard.`,
 })
 
+export const notifyCellSent = (
+  cellName: string,
+  dashboardNum: number
+): Notification => {
+  const pluralizer = dashboardNum > 1 ? 's' : ''
+  return {
+    ...defaultSuccessNotification,
+    icon: 'dash-h',
+    duration: 1900,
+    message: `Added "${cellName}" to ${dashboardNum} dashboard${pluralizer}.`,
+  }
+}
+
+export const notifyCellSendFailed = (
+  cellName: string,
+  dashboardName: string
+): Notification => {
+  return {
+    ...defaultErrorNotification,
+    icon: 'dash-h',
+    duration: 1900,
+    message: `Could not add "${cellName}" to ${dashboardName}.`,
+  }
+}
+
 export const notifyCellDeleted = (name: string): Notification => ({
   ...defaultDeletionNotification,
   icon: 'dash-h',
