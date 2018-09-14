@@ -846,11 +846,13 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleChooseSource = async (sourceID: string) => {
+    this.updateTableData(SearchStatus.Cleared)
     await this.props.getSourceAndPopulateNamespaces(sourceID)
     this.updateTableData(SearchStatus.UpdatingSource)
   }
 
   private handleChooseNamespace = async (namespace: Namespace) => {
+    this.updateTableData(SearchStatus.Cleared)
     await this.props.setNamespaceAsync(namespace)
     this.updateTableData(SearchStatus.UpdatingNamespace)
   }

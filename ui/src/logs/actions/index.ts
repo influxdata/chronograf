@@ -586,6 +586,7 @@ export const clearSearchData = (
   searchStatus: SearchStatus
 ) => async dispatch => {
   await dispatch(setSearchStatus(SearchStatus.Clearing))
+  dispatch(setHistogramData([]))
   dispatch(clearAllTimeBounds())
   dispatch(clearTableData())
   await dispatch(setSearchStatus(SearchStatus.Cleared))
