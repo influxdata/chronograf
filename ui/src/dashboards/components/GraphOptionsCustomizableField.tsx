@@ -56,7 +56,8 @@ const fieldTarget = {
     }
 
     // Determine rectangle on screen
-    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect()
+    const domNode = findDOMNode(component) as Element
+    const hoverBoundingRect = domNode.getBoundingClientRect()
 
     // Get vertical middle
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
