@@ -344,6 +344,9 @@ export type Action =
   | SetNextTailLowerBoundAction
   | SetSearchStatusAction
 
+const getIsTruncated = (state: State): boolean =>
+  state.logs.logConfig.isTruncated
+
 const getForwardTableData = (state: State): TableData =>
   state.logs.tableInfiniteData.forward
 
@@ -975,11 +978,20 @@ export const getSourceAndPopulateNamespacesAsync = (sourceID: string) => async (
 }
 
 export const getLogConfigAsync = (url: string) => async (
-  dispatch: Dispatch<SetConfigAction>
+  dispatch: Dispatch<SetConfigAction>,
+  getState: GetState
 ): Promise<void> => {
+  const state = getState()
+  const isTruncated = getIsTruncated(state)
+
   try {
     const {data} = await getLogConfigAJAX(url)
-    const logConfig = logConfigServerToUI(data)
+
+    const logConfig = {
+      ...logConfigServerToUI(data),
+      isTruncated,
+    }
+
     await dispatch(setConfig(logConfig))
   } catch (error) {
     console.error(error)
