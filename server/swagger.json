@@ -5762,6 +5762,10 @@
           "format": "url",
           "description": "Optional URI for data source for this query"
         },
+        "type": {
+          "description": "The language used by the query (either influxql or flux",
+          "type": "string"
+        },
         "queryConfig": {
           "$ref": "#/definitions/QueryConfig"
         }
@@ -5780,6 +5784,7 @@
                 "query":
                   "SELECT mean(\"usage_user\") AS \"mean_usage_user\" FROM \"cpu\"",
                 "label": "%",
+                "type": "influxql",
                 "queryConfig": {
                   "database": "",
                   "measurement": "cpu",
