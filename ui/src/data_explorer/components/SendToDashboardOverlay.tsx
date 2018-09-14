@@ -30,7 +30,14 @@ import {addDashboardCellAsync} from 'src/dashboards/actions'
 import {createDashboard} from 'src/dashboards/apis'
 
 // Types
-import {QueryConfig, Dashboard, Source, Service, Cell} from 'src/types'
+import {
+  QueryConfig,
+  Dashboard,
+  Source,
+  Service,
+  Cell,
+  QueryType,
+} from 'src/types'
 import {getDeep} from 'src/utils/wrappers'
 import {VisualizationOptions} from 'src/types/dataExplorer'
 import {ColorString} from 'src/types/colors'
@@ -220,9 +227,17 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
             queryConfig: null,
             query: script,
             source: service.links.self,
+            type: QueryType.Flux,
           },
         ]
-      : [{queryConfig, query: rawText, source: source.links.self}]
+      : [
+          {
+            queryConfig,
+            query: rawText,
+            source: source.links.self,
+            type: QueryType.InfluxQL,
+          },
+        ]
 
     const colors: ColorString[] = getCellTypeColors({
       cellType: type,

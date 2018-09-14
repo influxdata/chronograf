@@ -2,7 +2,7 @@ import {DEFAULT_LINE_COLORS} from 'src/shared/constants/graphColorPalettes'
 import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
 import {NEW_DEFAULT_DASHBOARD_CELL} from 'src/dashboards/constants/index'
 import {DEFAULT_AXIS} from 'src/dashboards/constants/cellEditor'
-import {Cell, CellQuery, Axes, CellType} from 'src/types'
+import {Cell, CellQuery, Axes, CellType, QueryType} from 'src/types'
 
 const emptyQuery: CellQuery = {
   query: '',
@@ -18,6 +18,7 @@ const emptyQuery: CellQuery = {
     rawText: null,
     range: null,
   },
+  type: QueryType.InfluxQL,
 }
 
 const emptyAxes: Axes = {
@@ -45,6 +46,7 @@ export const fixtureStatusPageCells: Cell[] = [
         id: '1234',
         query: `SELECT count("value") AS "count_value" FROM "chronograf"."autogen"."alerts" WHERE time > ${TEMP_VAR_DASHBOARD_TIME} GROUP BY time(1d)`,
         source: '',
+        type: QueryType.InfluxQL,
         queryConfig: {
           database: 'chronograf',
           measurement: 'alerts',

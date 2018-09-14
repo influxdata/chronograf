@@ -34,6 +34,7 @@ import {
   ApplyFuncsToFieldArgs,
   CellQuery,
   TimeRange,
+  QueryType,
 } from 'src/types'
 import {
   State as CEOState,
@@ -508,6 +509,7 @@ export const addQueryAsync = (stateToUpdate: QueryUpdateState) => async (
     queryConfig: defaultQueryConfig({id: queryID}),
     source: '',
     id: queryID,
+    type: QueryType.InfluxQL,
   }
   const updatedQueryDrafts = [...queryDrafts, newQueryDraft]
   dispatch(updateQueryDrafts(updatedQueryDrafts, stateToUpdate))
