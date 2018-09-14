@@ -46,11 +46,10 @@ import {
   DygraphData,
   DygraphClass,
   DygraphSeries,
-  Constructable,
 } from 'src/types'
 import {LineColor} from 'src/types/colors'
 
-const Dygraphs = D as Constructable<DygraphClass>
+const Dygraphs = D as any
 
 const getRangeMemoizedY = memoizeOne(getRange)
 const getRangeMemoizedY2 = memoizeOne(getRange)

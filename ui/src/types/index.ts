@@ -50,7 +50,7 @@ import {
   SourceLinks,
   SourceAuthenticationMethod,
 } from './sources'
-import {DropdownAction, DropdownItem, Constructable} from './shared'
+import {DropdownAction, DropdownItem} from './shared'
 import {
   Notification,
   NotificationFunc,
@@ -76,7 +76,6 @@ export {
   User,
   Organization,
   Permission,
-  Constructable,
   Template,
   TemplateQuery,
   TemplateValue,
