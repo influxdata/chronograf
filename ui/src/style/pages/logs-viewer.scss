@@ -335,3 +335,11 @@ $logs-viewer-gutter: 60px;
   position: absolute;
   top: -60px;
 }
+
+.logs-viewer--searching-time {
+  text-transform: uppercase;
+  margin-top: $ix-marg-b;
+  @include gradient-h($c-laser, $c-comet);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
