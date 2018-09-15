@@ -639,7 +639,10 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
-  private updateQueryDraftsSource(selectedSource: Source, type: string) {
+  private updateQueryDraftsSource(
+    selectedSource: Source | Service,
+    type: string
+  ) {
     const {queryDrafts, updateQueryDrafts} = this.props
 
     const queries: CellQuery[] = queryDrafts.map(q => {
@@ -650,7 +653,7 @@ class TimeMachine extends PureComponent<Props, State> {
         source: getDeep<string>(selectedSource, 'links.self', ''),
         type,
       }
-    })
+    }) as CellQuery[]
 
     updateQueryDrafts(queries, this.stateToUpdate)
   }
@@ -665,8 +668,11 @@ class TimeMachine extends PureComponent<Props, State> {
       updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
     }
 
-    const type = selectedService ? QueryType.Flux : QueryType.InfluxQL
-    this.updateQueryDraftsSource(selectedSource, type)
+    if (selectedService) {
+      this.updateQueryDraftsSource(selectedService, QueryType.Flux)
+    } else {
+      this.updateQueryDraftsSource(selectedSource, QueryType.InfluxQL)
+    }
     this.setState({selectedService, selectedSource})
   }
 
