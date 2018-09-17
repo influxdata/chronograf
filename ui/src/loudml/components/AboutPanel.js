@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 const AboutTextStyle = {
     fontSize: '20px',
@@ -9,7 +10,9 @@ const AboutTextStyle = {
     color: '#eeeff2',
 }
 
-const AboutPanel = () => {
+const AboutPanel = ({
+    version,
+}) => {
     
     return (
         <div className="panel panel-solid">
@@ -18,7 +21,7 @@ const AboutPanel = () => {
             </div>
             <div className="panel-body">
                 <p style={AboutTextStyle}>
-                    You're using Loud ML 1.4 — an independent machine learning add-on designed here for InfluxData’s TICK stack.
+                    You're using Loud ML {version} — an independent machine learning add-on designed here for InfluxData’s TICK stack.
                 </p>
                 <p style={AboutTextStyle}>
                     It's plug-and-play, so you can use it for other projects too.
@@ -29,6 +32,12 @@ const AboutPanel = () => {
             </div>
         </div>
     )
+}
+
+const {string} = PropTypes
+
+AboutPanel.propTypes = {
+    version: string,
 }
 
 export default AboutPanel
