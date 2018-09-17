@@ -137,7 +137,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           isErrored={false}
           onNext={this.handleCompletionNext}
           onPrevious={this.handleCompletionPrev}
-          nextLabel="View All Connections"
+          nextLabel="Finish"
           previousLabel="Go Back"
         >
           <CompletionStep
@@ -146,6 +146,9 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         </WizardStep>
       </WizardOverlay>
     )
+  }
+  private get isSourceEdited() {
+    return !_.isEqual(this.state.source, this.props.source)
   }
 
   // SourceStep
@@ -214,7 +217,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
     const {router} = this.props
     const {source} = this.state
     this.resetWizardState()
-    if (source) {
+    if (this.isSourceEdited) {
       router.push(`/sources/${source.id}/manage-sources`)
     }
     return {error: false, payload: null}
