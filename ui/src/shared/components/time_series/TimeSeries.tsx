@@ -21,6 +21,7 @@ import {
   CellType,
   Status,
   FluxTable,
+  QueryType,
 } from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
@@ -35,6 +36,7 @@ import {
 import {notify} from 'src/shared/actions/notifications'
 import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
+import {getDeep} from 'src/utils/wrappers'
 
 // Components
 import MarkdownCell from 'src/shared/components/MarkdownCell'
@@ -186,7 +188,7 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public render() {
-    const {cellNoteVisibility, cellNote} = this.props
+    const {cellNoteVisibility, cellNote, service} = this.props
     const {
       timeSeriesInfluxQL,
       timeSeriesFlux,
@@ -211,6 +213,14 @@ class TimeSeries extends Component<Props, State> {
         return <MarkdownCell text={cellNote} />
       }
 
+      if (this.isFluxSource && !service) {
+        return (
+          <div className="graph-empty">
+            <p>The current source does not support flux</p>
+          </div>
+        )
+      }
+
       return (
         <div className="graph-empty">
           <p>No Results</p>
@@ -228,8 +238,8 @@ class TimeSeries extends Component<Props, State> {
 
   private get isFluxSource(): boolean {
     // TODO: update when flux not separate service
-    const {service} = this.props
-    return !!service
+    const {queries} = this.props
+    return getDeep<string>(queries, '0.type', '') === QueryType.Flux
   }
 
   private get loadingDots(): JSX.Element {

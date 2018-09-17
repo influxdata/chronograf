@@ -2,7 +2,7 @@ import _ from 'lodash'
 import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG, TYPE_SHIFTED} from 'src/dashboards/constants'
 
-import {Query, QueryConfig, TimeRange} from 'src/types'
+import {Query, QueryConfig, TimeRange, QueryType} from 'src/types'
 
 interface Statement {
   queryConfig: QueryConfig
@@ -45,6 +45,7 @@ const buildQueries = (queryConfigs: QueryConfig[], tR: TimeRange): Query[] => {
         text,
         id,
         queryConfig,
+        type: QueryType.InfluxQL,
       }
     })
 

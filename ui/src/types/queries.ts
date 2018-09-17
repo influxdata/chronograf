@@ -5,6 +5,7 @@ export interface Query {
   text: string
   id: string
   queryConfig: QueryConfig
+  type: string
 }
 
 export interface QueryConfig {

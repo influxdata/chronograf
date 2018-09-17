@@ -502,7 +502,9 @@ class TimeMachine extends PureComponent<Props, State> {
     const id = _.get(queryDrafts, 'id', '')
     if (this.isFluxSource) {
       // there will only be one flux query
-      const fluxQuery: Query[] = [{text: script, id, queryConfig: null}]
+      const fluxQuery: Query[] = [
+        {text: script, id, queryConfig: null, type: QueryType.Flux},
+      ]
       return fluxQuery
     }
 
