@@ -37,7 +37,7 @@ import {
 const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
 
 export const initialState: DEState = {
-  queryDrafts: null,
+  queryDrafts: [],
   timeRange: {lower, upper},
   queryStatus: {queryID: null, status: null},
   script: editor.DEFAULT_SCRIPT,

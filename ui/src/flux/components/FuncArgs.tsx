@@ -1,4 +1,4 @@
-import React, {PureComponent, ReactElement, MouseEvent} from 'react'
+import React, {PureComponent, MouseEvent} from 'react'
 import FuncArg from 'src/flux/components/FuncArg'
 import {OnChangeArg} from 'src/types/flux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -32,7 +32,6 @@ export default class FuncArgs extends PureComponent<Props> {
       <div className="func-node--editor" onClick={onStopPropagation}>
         <div className="func-node--connector" />
         <div className="func-args">{this.renderArguments}</div>
-        <div className="func-arg--buttons">{this.build}</div>
       </div>
     )
   }
@@ -135,21 +134,5 @@ export default class FuncArgs extends PureComponent<Props> {
         onGenerateScript={onGenerateScript}
       />
     )
-  }
-
-  private get build(): ReactElement<HTMLDivElement> {
-    const {func, onGenerateScript} = this.props
-    if (func.name === funcNames.FILTER) {
-      return (
-        <div
-          className="btn btn-sm btn-primary func-node--build"
-          onClick={onGenerateScript}
-        >
-          Build
-        </div>
-      )
-    }
-
-    return null
   }
 }

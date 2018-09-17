@@ -159,7 +159,7 @@ const findNext = (s: string, t: string, startIndex: number) => {
 }
 
 const replaceAll = (query: string, search: string, replacement: string) => {
-  return query.split(search).join(replacement)
+  return (query || '').split(search).join(replacement)
 }
 
 export const templateInternalReplace = (template: Template): string => {
