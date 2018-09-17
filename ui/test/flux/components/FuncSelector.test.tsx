@@ -11,6 +11,7 @@ const setup = (override = {}) => {
     bodyID: '1',
     declarationID: '2',
     onAddNode: () => {},
+    setWasFuncSelectorClicked: () => {},
     ...override,
   }
 

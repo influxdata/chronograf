@@ -23,10 +23,16 @@ interface Props {
   declarationID: string
   onChangeArg: OnChangeArg
   onGenerateScript: OnGenerateScript
+  wasFuncSelectorClicked: boolean
+  setWasFuncSelectorClicked: (val: boolean) => void
 }
 
 @ErrorHandling
 class FuncArg extends PureComponent<Props> {
+  public componentDidMount() {
+    this.props.setWasFuncSelectorClicked(false)
+  }
+
   public render() {
     const {
       argKey,
@@ -39,6 +45,7 @@ class FuncArg extends PureComponent<Props> {
       onChangeArg,
       declarationID,
       onGenerateScript,
+      wasFuncSelectorClicked,
     } = this.props
 
     if (funcName === funcNames.FROM) {
@@ -75,7 +82,7 @@ class FuncArg extends PureComponent<Props> {
             onChangeArg={onChangeArg}
             declarationID={declarationID}
             onGenerateScript={onGenerateScript}
-            autoFocus={this.isFirstArg}
+            autoFocus={wasFuncSelectorClicked && this.isFirstArg}
           />
         )
       }

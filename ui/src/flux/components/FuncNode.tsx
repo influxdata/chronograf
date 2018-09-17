@@ -34,6 +34,8 @@ interface Props {
   isYieldable: boolean
   onDeleteBody: (bodyID: string) => void
   isYieldedInScript: boolean
+  wasFuncSelectorClicked: boolean
+  setWasFuncSelectorClicked: (val: boolean) => void
 }
 
 interface State {
@@ -86,6 +88,8 @@ export default class FuncNode extends PureComponent<Props, State> {
       declarationID,
       onGenerateScript,
       declarationsFromBody,
+      wasFuncSelectorClicked,
+      setWasFuncSelectorClicked,
     } = this.props
     const {editing} = this.state
 
@@ -104,6 +108,8 @@ export default class FuncNode extends PureComponent<Props, State> {
         declarationsFromBody={declarationsFromBody}
         onStopPropagation={this.handleClickArgs}
         db={this.db}
+        wasFuncSelectorClicked={wasFuncSelectorClicked}
+        setWasFuncSelectorClicked={setWasFuncSelectorClicked}
       />
     )
   }

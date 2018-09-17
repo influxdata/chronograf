@@ -16,6 +16,8 @@ interface Props {
   declarationID?: string
   declarationsFromBody: string[]
   onDeleteBody: (bodyID: string) => void
+  wasFuncSelectorClicked: boolean
+  setWasFuncSelectorClicked: (val: boolean) => void
 }
 
 interface State {
@@ -42,6 +44,8 @@ class ExpressionNode extends PureComponent<Props, State> {
       funcs,
       declarationsFromBody,
       onDeleteBody,
+      wasFuncSelectorClicked,
+      setWasFuncSelectorClicked,
     } = this.props
 
     const {nonYieldableIndexesToggled} = this.state
@@ -96,6 +100,8 @@ class ExpressionNode extends PureComponent<Props, State> {
                     declarationsFromBody={declarationsFromBody}
                     onToggleYieldWithLast={this.handleToggleYieldWithLast}
                     onDeleteBody={onDeleteBody}
+                    wasFuncSelectorClicked={wasFuncSelectorClicked}
+                    setWasFuncSelectorClicked={setWasFuncSelectorClicked}
                   />
                 )
 
@@ -139,6 +145,7 @@ class ExpressionNode extends PureComponent<Props, State> {
                 funcs={funcNames}
                 onAddNode={onAddNode}
                 declarationID={declarationID}
+                setWasFuncSelectorClicked={setWasFuncSelectorClicked}
               />
             </>
           )
