@@ -513,7 +513,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private async createNewQueryDraft() {
-    const {source, loadDE, timeRange} = this.props
+    const {source, loadDE, timeRange, sourceLink} = this.props
 
     const {query} = this.queryString
     const queryConfig = await getConfig(
@@ -523,13 +523,25 @@ export class DataExplorer extends PureComponent<Props, State> {
       this.templates
     )
 
-    const queryDraft = {
-      query,
-      queryConfig,
-      source: source.links.self,
-      type: QueryType.InfluxQL,
+    const isFlux = !!this.service
+
+    if (isFlux) {
+      const queryDraft = {
+        query,
+        queryConfig,
+        source: sourceLink,
+        type: QueryType.Flux,
+      }
+      loadDE([queryDraft], timeRange)
+    } else {
+      const queryDraft = {
+        query,
+        queryConfig,
+        source: source.links.self,
+        type: QueryType.InfluxQL,
+      }
+      loadDE([queryDraft], timeRange)
     }
-    loadDE([queryDraft], timeRange)
   }
 
   private get activeScript(): string {
