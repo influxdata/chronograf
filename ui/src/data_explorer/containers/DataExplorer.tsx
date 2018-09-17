@@ -29,7 +29,10 @@ import DEHeader from 'src/data_explorer/components/DEHeader'
 // Actions
 import {errorThrown} from 'src/shared/actions/errors'
 import {setAutoRefresh} from 'src/shared/actions/app'
-import {getDashboardsAsync, addDashboardCellAsync} from 'src/dashboards/actions'
+import {
+  getDashboardsAsync,
+  sendDashboardCellAsync,
+} from 'src/dashboards/actions'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {
   loadDE as loadDEAction,
@@ -69,6 +72,7 @@ import {
   TemplateValueType,
   CellType,
   Axes,
+  Notification,
 } from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Links} from 'src/types/flux'
@@ -80,6 +84,7 @@ import {
   TableOptions,
   NoteVisibility,
   QueryType,
+  Cell,
 } from 'src/types/dashboards'
 import {VisualizationOptions} from 'src/types/dataExplorer'
 
@@ -102,7 +107,10 @@ interface Props {
   errorThrownAction: () => void
   writeLineProtocol: () => void
   handleGetDashboards: () => Dashboard[]
-  addDashboardCell: typeof addDashboardCellAsync
+  sendDashboardCell: (
+    dashboard: Dashboard,
+    newCell: Partial<Cell>
+  ) => Promise<{success: boolean; dashboard: Dashboard}>
   updateQueryDrafts: typeof updateQueryDraftsAction
   loadDE: typeof loadDEAction
   addQuery: typeof addQueryAsync
@@ -114,7 +122,7 @@ interface Props {
   script: string
   updateScript: typeof updateScriptAction
   fetchServicesAsync: typeof fetchAllFluxServicesAsync
-  notify: typeof notifyAction
+  notify: (message: Notification) => void
   sourceLink: string
   thresholdsListType: ThresholdType
   thresholdsListColors: ColorNumber[]
@@ -151,13 +159,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {
-      loadDE,
-      timeRange,
-      autoRefresh,
-      queryDrafts,
-      handleGetDashboards,
-    } = this.props
+    const {loadDE, timeRange, autoRefresh, queryDrafts} = this.props
     const {query, script} = this.queryString
     const isFlux = !!script
 
@@ -182,8 +184,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     } else {
       await this.createNewQueryDraft()
     }
-
-    await handleGetDashboards()
 
     GlobalAutoRefresher.poll(autoRefresh)
     this.setState({isComponentMounted: true})
@@ -343,13 +343,21 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private get sendToDashboardOverlay(): JSX.Element {
-    const {source, dashboards, addDashboardCell, script} = this.props
+    const {
+      source,
+      dashboards,
+      sendDashboardCell,
+      script,
+      handleGetDashboards,
+      notify,
+    } = this.props
 
     const {isSendToDashboardVisible, isStaticLegend} = this.state
     return (
       <Authorized requiredRole={EDITOR_ROLE}>
         <OverlayTechnology visible={isSendToDashboardVisible}>
           <SendToDashboardOverlay
+            notify={notify}
             onCancel={this.toggleSendToDashboard}
             queryConfig={this.activeQueryConfig}
             script={script}
@@ -357,7 +365,8 @@ export class DataExplorer extends PureComponent<Props, State> {
             service={this.service}
             rawText={this.rawText}
             dashboards={dashboards}
-            addDashboardCell={addDashboardCell}
+            handleGetDashboards={handleGetDashboards}
+            sendDashboardCell={sendDashboardCell}
             visualizationOptions={this.visualizationOptions}
             isStaticLegend={isStaticLegend}
           />
@@ -597,7 +606,7 @@ const mdtp = dispatch => {
     writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
     queryConfigActions: bindActionCreators(queryConfigModifiers, dispatch),
     handleGetDashboards: bindActionCreators(getDashboardsAsync, dispatch),
-    addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
+    sendDashboardCell: bindActionCreators(sendDashboardCellAsync, dispatch),
     loadDE: bindActionCreators(loadDEAction, dispatch),
     updateQueryDrafts: bindActionCreators(updateQueryDraftsAction, dispatch),
     addQuery: bindActionCreators(addQueryAsync, dispatch),

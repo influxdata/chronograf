@@ -71,6 +71,7 @@ const setup = () => {
     fieldOptions: [],
     note: '',
     noteVisibility: null,
+    sendDashboardCell: jest.fn(() => Promise.resolve()),
   }
 
   const wrapper = shallow(<DataExplorer {...props} />)
