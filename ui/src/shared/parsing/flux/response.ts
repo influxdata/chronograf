@@ -4,6 +4,8 @@ import uuid from 'uuid'
 
 import {FluxTable} from 'src/types'
 
+const GROUP_KEY_EXCLUSIONS = []
+
 export const parseResponseError = (response: string): FluxTable[] => {
   const data = Papa.parse(response.trim()).data as string[][]
 
@@ -70,7 +72,7 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
 
   // groupRow = ['#group', 'false', 'true', 'true', 'false']
   const groupKeyIndices = groupRow.reduce((acc, value, i) => {
-    if (value === 'true') {
+    if (value === 'true' && !GROUP_KEY_EXCLUSIONS.includes(headerRow[i])) {
       return [...acc, i]
     }
 
