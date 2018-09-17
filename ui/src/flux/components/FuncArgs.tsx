@@ -19,6 +19,8 @@ interface Props {
   declarationsFromBody: string[]
   onStopPropagation: (e: MouseEvent<HTMLElement>) => void
   db?: string
+  wasFuncSelectorClicked: boolean
+  setWasFuncSelectorClicked: (val: boolean) => void
 }
 
 @ErrorHandling
@@ -58,6 +60,8 @@ export default class FuncArgs extends PureComponent<Props> {
       onChangeArg,
       declarationID,
       onGenerateScript,
+      wasFuncSelectorClicked,
+      setWasFuncSelectorClicked,
     } = this.props
 
     const {name: funcName, id: funcID, args} = func
@@ -76,6 +80,8 @@ export default class FuncArgs extends PureComponent<Props> {
         onChangeArg={onChangeArg}
         declarationID={declarationID}
         onGenerateScript={onGenerateScript}
+        wasFuncSelectorClicked={wasFuncSelectorClicked}
+        setWasFuncSelectorClicked={setWasFuncSelectorClicked}
       />
     ))
   }

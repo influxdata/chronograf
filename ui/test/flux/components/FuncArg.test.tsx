@@ -16,6 +16,8 @@ const setup = () => {
     service,
     onChangeArg: () => {},
     onGenerateScript: () => {},
+    wasFuncSelectorClicked: false,
+    setWasFuncSelectorClicked: () => {},
   }
 
   const wrapper = shallow(<FuncArg {...props} />)

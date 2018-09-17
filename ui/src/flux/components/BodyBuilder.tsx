@@ -20,9 +20,22 @@ interface Props {
   onDeleteBody: (bodyID: string) => void
 }
 
-class BodyBuilder extends PureComponent<Props> {
+interface State {
+  wasFuncSelectorClicked: boolean
+}
+
+class BodyBuilder extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {
+      wasFuncSelectorClicked: false,
+    }
+  }
+
   public render() {
     const {body, onDeleteBody} = this.props
+    const {wasFuncSelectorClicked} = this.state
 
     const bodybuilder = body.map((b, i) => {
       if (b.declarations.length) {
@@ -44,6 +57,8 @@ class BodyBuilder extends PureComponent<Props> {
                   onDeleteBody={onDeleteBody}
                   isLastBody={this.isLastBody(i)}
                   declarationsFromBody={this.declarationsFromBody}
+                  wasFuncSelectorClicked={wasFuncSelectorClicked}
+                  setWasFuncSelectorClicked={this.setWasFuncSelectorClicked}
                 />
               </div>
             )
@@ -75,6 +90,8 @@ class BodyBuilder extends PureComponent<Props> {
             onDeleteBody={onDeleteBody}
             isLastBody={this.isLastBody(i)}
             declarationsFromBody={this.declarationsFromBody}
+            wasFuncSelectorClicked={wasFuncSelectorClicked}
+            setWasFuncSelectorClicked={this.setWasFuncSelectorClicked}
           />
         </div>
       )
@@ -91,6 +108,8 @@ class BodyBuilder extends PureComponent<Props> {
               onAddNode={this.handleCreateNewBody}
               funcs={this.newDeclarationFuncs}
               connectorVisible={false}
+              wasFuncSelectorClicked={wasFuncSelectorClicked}
+              setWasFuncSelectorClicked={this.setWasFuncSelectorClicked}
             />
           </div>
         </div>
@@ -138,6 +157,10 @@ class BodyBuilder extends PureComponent<Props> {
 
   private get funcNames() {
     return this.props.suggestions.map(f => f.name)
+  }
+
+  private setWasFuncSelectorClicked = (val: boolean) => {
+    this.setState({wasFuncSelectorClicked: val})
   }
 }
 

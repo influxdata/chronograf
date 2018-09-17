@@ -19,6 +19,8 @@ interface Props {
   declarationID: string
   onAddNode: OnAddNode
   connectorVisible?: boolean
+  wasFuncSelectorClicked: boolean
+  setWasFuncSelectorClicked: (val: boolean) => void
 }
 
 @ErrorHandling
@@ -58,7 +60,7 @@ export class FuncSelector extends PureComponent<Props, State> {
           ) : (
             <button
               className="btn btn-square btn-primary btn-sm flux-func--button"
-              onClick={this.handleOpenList}
+              onClick={this.handleClickOpenButton}
               tabIndex={0}
             >
               <span className="icon plus" />
@@ -157,6 +159,11 @@ export class FuncSelector extends PureComponent<Props, State> {
 
   private handleSetSelectedFunc = funcName => {
     this.setState({selectedFunc: funcName})
+  }
+
+  private handleClickOpenButton = () => {
+    this.props.setWasFuncSelectorClicked(true)
+    this.handleOpenList()
   }
 
   private handleOpenList = () => {
