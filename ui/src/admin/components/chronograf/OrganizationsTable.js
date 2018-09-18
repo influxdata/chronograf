@@ -8,7 +8,6 @@ import OrganizationsTableRow from 'src/admin/components/chronograf/Organizations
 import OrganizationsTableRowNew from 'src/admin/components/chronograf/OrganizationsTableRowNew'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class OrganizationsTable extends Component {
   constructor(props) {
     super(props)
@@ -122,4 +121,4 @@ OrganizationsTable.propTypes = {
   onRenameOrg: func.isRequired,
   onChooseDefaultRole: func.isRequired,
 }
-export default OrganizationsTable
+export default ErrorHandling(OrganizationsTable)

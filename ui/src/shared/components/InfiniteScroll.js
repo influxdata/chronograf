@@ -7,7 +7,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 const {arrayOf, number, shape, string} = PropTypes
 
-@ErrorHandling
 class InfiniteScroll extends Component {
   // Cache values from Scrollbars events that need to be independent of render
   // Should not be setState as need not trigger a re-render
@@ -132,4 +131,4 @@ InfiniteScroll.propTypes = {
   className: string,
 }
 
-export default InfiniteScroll
+export default ErrorHandling(InfiniteScroll)

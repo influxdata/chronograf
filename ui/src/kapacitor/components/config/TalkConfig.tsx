@@ -21,7 +21,7 @@ interface State {
 
 interface Props {
   config: Config
-  onSave: (properties: TalkProperties) => void
+  onSave: (properties: TalkProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

@@ -19,7 +19,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: PushoverProperties) => void
+  onSave: (properties: PushoverProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

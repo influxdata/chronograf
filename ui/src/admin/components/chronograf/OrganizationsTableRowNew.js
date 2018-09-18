@@ -8,7 +8,6 @@ import {USER_ROLES} from 'src/admin/constants/chronografAdmin'
 import {MEMBER_ROLE} from 'src/auth/Authorized'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class OrganizationsTableRowNew extends Component {
   constructor(props) {
     super(props)
@@ -102,4 +101,4 @@ OrganizationsTableRowNew.propTypes = {
   onCancelCreateOrganization: func.isRequired,
 }
 
-export default OrganizationsTableRowNew
+export default ErrorHandling(OrganizationsTableRowNew)

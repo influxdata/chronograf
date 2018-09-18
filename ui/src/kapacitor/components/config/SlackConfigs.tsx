@@ -20,7 +20,7 @@ interface Props {
     properties: SlackProperties,
     isNewConfigInSection: boolean,
     specificConfig: string
-  ) => void
+  ) => Promise<boolean>
   onDelete: (specificConfig: string) => void
   onTest: (
     e: MouseEvent<HTMLButtonElement>,

@@ -23,7 +23,6 @@ import {
   notifyChronografUserRemovedFromOrg,
 } from 'shared/copy/notifications'
 
-@ErrorHandling
 class AllUsersTable extends Component {
   constructor(props) {
     super(props)
@@ -219,4 +218,4 @@ AllUsersTable.propTypes = {
   isLoading: bool.isRequired,
 }
 
-export default AllUsersTable
+export default ErrorHandling(AllUsersTable)

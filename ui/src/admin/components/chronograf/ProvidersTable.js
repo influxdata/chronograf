@@ -6,7 +6,6 @@ import ProvidersTableRow from 'src/admin/components/chronograf/ProvidersTableRow
 import ProvidersTableRowNew from 'src/admin/components/chronograf/ProvidersTableRowNew'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class ProvidersTable extends Component {
   constructor(props) {
     super(props)
@@ -146,4 +145,4 @@ ProvidersTable.propTypes = {
   onDeleteMap: func.isRequired,
   isLoading: bool.isRequired,
 }
-export default ProvidersTable
+export default ErrorHandling(ProvidersTable)

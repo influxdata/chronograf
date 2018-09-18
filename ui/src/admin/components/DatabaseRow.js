@@ -13,7 +13,6 @@ import {DATABASE_TABLE} from 'src/admin/constants/tableSizing'
 import {notifyRetentionPolicyCantHaveEmptyFields} from 'shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class DatabaseRow extends Component {
   constructor(props) {
     super(props)
@@ -271,4 +270,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(onClickOutside(DatabaseRow))
+export default connect(null, mapDispatchToProps)(
+  onClickOutside(ErrorHandling(DatabaseRow))
+)

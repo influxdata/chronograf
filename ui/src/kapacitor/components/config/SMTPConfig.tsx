@@ -17,7 +17,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: SMTPProperties) => void
+  onSave: (properties: SMTPProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

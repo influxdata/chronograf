@@ -23,7 +23,6 @@ import {
 
 import {notify as notifyAction} from 'shared/actions/notifications'
 
-@ErrorHandling
 class QueriesPage extends Component {
   componentDidMount() {
     this.updateQueries()
@@ -113,4 +112,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(QueriesPage)
+export default connect(mapStateToProps, mapDispatchToProps)(
+  ErrorHandling(QueriesPage)
+)

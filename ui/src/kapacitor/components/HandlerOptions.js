@@ -21,7 +21,6 @@ import {
 } from 'src/kapacitor/components/handlers'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class HandlerOptions extends Component {
   constructor(props) {
     super(props)
@@ -210,4 +209,4 @@ HandlerOptions.propTypes = {
   validationError: string.isRequired,
 }
 
-export default HandlerOptions
+export default ErrorHandling(HandlerOptions)

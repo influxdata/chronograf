@@ -22,7 +22,7 @@ interface Item {
 
 interface Props {
   config: Config
-  onSave: (properties: OpsGenieProperties) => void
+  onSave: (properties: OpsGenieProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

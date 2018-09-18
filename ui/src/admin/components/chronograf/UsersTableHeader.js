@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class UsersTableHeader extends Component {
   constructor(props) {
     super(props)
@@ -55,4 +54,4 @@ UsersTableHeader.propTypes = {
   }),
 }
 
-export default UsersTableHeader
+export default ErrorHandling(UsersTableHeader)

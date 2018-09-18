@@ -20,7 +20,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: TelegramProperties) => void
+  onSave: (properties: TelegramProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

@@ -13,7 +13,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: SensuProperties) => void
+  onSave: (properties: SensuProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }
