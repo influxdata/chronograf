@@ -9,7 +9,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import UsersTable from 'src/admin/components/chronograf/UsersTable'
 
-@ErrorHandling
 class UsersPage extends PureComponent {
   constructor(props) {
     super(props)
@@ -128,4 +127,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(UsersPage)
+export default connect(mapStateToProps, mapDispatchToProps)(
+  ErrorHandling(UsersPage)
+)

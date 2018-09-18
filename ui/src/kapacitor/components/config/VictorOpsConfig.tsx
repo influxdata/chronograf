@@ -16,7 +16,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: VictorOpsProperties) => void
+  onSave: (properties: VictorOpsProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

@@ -9,7 +9,6 @@ import {notify as notifyAction} from 'shared/actions/notifications'
 import ProvidersTable from 'src/admin/components/chronograf/ProvidersTable'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class ProvidersPage extends Component {
   constructor(props) {
     super(props)
@@ -101,4 +100,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProvidersPage)
+export default connect(mapStateToProps, mapDispatchToProps)(
+  ErrorHandling(ProvidersPage)
+)

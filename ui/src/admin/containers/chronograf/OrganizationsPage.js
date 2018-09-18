@@ -9,7 +9,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import OrganizationsTable from 'src/admin/components/chronograf/OrganizationsTable'
 
-@ErrorHandling
 class OrganizationsPage extends Component {
   componentDidMount() {
     const {
@@ -132,4 +131,6 @@ const mapDispatchToProps = dispatch => ({
   getMe: bindActionCreators(getMeAsync, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrganizationsPage)
+export default connect(mapStateToProps, mapDispatchToProps)(
+  ErrorHandling(OrganizationsPage)
+)

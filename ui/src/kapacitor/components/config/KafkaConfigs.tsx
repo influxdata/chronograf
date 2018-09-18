@@ -35,7 +35,7 @@ interface Config {
 
 interface Props {
   configs: Config[]
-  onSave: (properties: KafkaProperties) => void
+  onSave: (properties: KafkaProperties) => Promise<boolean>
   onDelete: (specificConfig: string) => void
   onTest: (
     e: MouseEvent<HTMLButtonElement>,

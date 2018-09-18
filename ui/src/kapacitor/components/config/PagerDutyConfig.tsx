@@ -15,7 +15,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: PagerDutyProperties) => void
+  onSave: (properties: PagerDutyProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

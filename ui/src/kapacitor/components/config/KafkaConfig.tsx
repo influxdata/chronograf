@@ -25,7 +25,7 @@ interface Props {
     properties: KafkaProperties,
     isNewConfig: boolean,
     specificConfig: string
-  ) => void
+  ) => Promise<boolean>
   onTest: (
     event: React.MouseEvent<HTMLButtonElement>,
     specificConfigOptions: Partial<KafkaProperties>

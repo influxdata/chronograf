@@ -16,7 +16,6 @@ import {
   notifyDatabaseNameInvalid,
 } from 'shared/copy/notifications'
 
-@ErrorHandling
 class DatabaseManagerPage extends Component {
   constructor(props) {
     super(props)
@@ -182,4 +181,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(DatabaseManagerPage)
+export default connect(mapStateToProps, mapDispatchToProps)(
+  ErrorHandling(DatabaseManagerPage)
+)

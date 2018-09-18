@@ -20,7 +20,7 @@ interface Props {
     properties: SlackProperties,
     isNewConfigInSection: boolean,
     specificConfig: string
-  ) => void
+  ) => Promise<boolean>
   onTest: (
     e: MouseEvent<HTMLButtonElement>,
     specificConfigOptions: Partial<SlackProperties>

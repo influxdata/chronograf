@@ -7,7 +7,6 @@ import showRetentionPoliciesParser from 'shared/parsing/showRetentionPolicies'
 import MultiSelectDropdown from 'shared/components/MultiSelectDropdown'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class MultiSelectDBDropdown extends Component {
   constructor(props) {
     super(props)
@@ -89,4 +88,4 @@ MultiSelectDBDropdown.propTypes = {
   selectedItems: arrayOf(shape()),
 }
 
-export default MultiSelectDBDropdown
+export default ErrorHandling(MultiSelectDBDropdown)

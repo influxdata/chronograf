@@ -8,7 +8,6 @@ import InputClickToEdit from 'shared/components/InputClickToEdit'
 import {DEFAULT_MAPPING_ID} from 'src/admin/constants/chronografAdmin'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-@ErrorHandling
 class ProvidersTableRow extends Component {
   constructor(props) {
     super(props)
@@ -136,4 +135,4 @@ ProvidersTableRow.propTypes = {
   onUpdate: func.isRequired,
 }
 
-export default ProvidersTableRow
+export default ErrorHandling(ProvidersTableRow)

@@ -20,7 +20,6 @@ const {
 const nullOrganization = {id: undefined, name: 'None'}
 const nullRole = {name: '*', organization: undefined}
 
-@ErrorHandling
 class AllUsersTableRowNew extends Component {
   constructor(props) {
     super(props)
@@ -188,4 +187,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(AllUsersTableRowNew)
+export default connect(null, mapDispatchToProps)(
+  ErrorHandling(AllUsersTableRowNew)
+)

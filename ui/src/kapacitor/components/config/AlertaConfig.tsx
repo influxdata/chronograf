@@ -18,7 +18,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: AlertaProperties) => void
+  onSave: (properties: AlertaProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }

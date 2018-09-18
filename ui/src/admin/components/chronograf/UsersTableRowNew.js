@@ -12,7 +12,6 @@ import {notifyChronografUserMissingNameAndProvider} from 'shared/copy/notificati
 import {USERS_TABLE} from 'src/admin/constants/chronografTableSizing'
 import {USER_ROLES} from 'src/admin/constants/chronografAdmin'
 
-@ErrorHandling
 class UsersTableRowNew extends Component {
   constructor(props) {
     super(props)
@@ -156,4 +155,6 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(UsersTableRowNew)
+export default connect(null, mapDispatchToProps)(
+  ErrorHandling(UsersTableRowNew)
+)

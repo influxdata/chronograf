@@ -26,7 +26,6 @@ const labelText = ({localSelectedItems, isOpen, label}) => {
   return 'None'
 }
 
-@ErrorHandling
 class MultiSelectDropdown extends Component {
   constructor(props) {
     super(props)
@@ -178,4 +177,4 @@ MultiSelectDropdown.defaultProps = {
   resetStateOnReceiveProps: true,
 }
 
-export default OnClickOutside(MultiSelectDropdown)
+export default OnClickOutside(ErrorHandling(MultiSelectDropdown))

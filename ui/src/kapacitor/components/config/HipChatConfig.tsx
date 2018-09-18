@@ -19,7 +19,7 @@ interface Config {
 
 interface Props {
   config: Config
-  onSave: (properties: HipChatProperties) => void
+  onSave: (properties: HipChatProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }
