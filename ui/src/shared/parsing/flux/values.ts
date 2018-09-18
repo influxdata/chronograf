@@ -17,7 +17,7 @@ const parseValuesColumn = (resp: string): string[] => {
       return [...acc]
     }
 
-    const resultTags = result.data.slice(1).map(row => row[colIndex])
+    const resultTags = result.data.slice(1).map(row => row[colIndex] as string)
 
     return [...acc, ...resultTags]
   }, [])

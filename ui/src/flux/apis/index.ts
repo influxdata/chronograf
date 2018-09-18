@@ -7,6 +7,7 @@ import {
 } from 'src/shared/parsing/flux/response'
 import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
 import {manager} from 'src/worker/JobManager'
+import _ from 'lodash'
 
 export const getSuggestions = async (url: string) => {
   try {
@@ -98,9 +99,11 @@ export const getTimeSeries = async (
     uuid
   )
 
+  const tables = parseResponse(csv)
+
   try {
     const response = {
-      tables: parseResponse(csv),
+      tables,
       didTruncate,
       uuid: responseUUID,
     }

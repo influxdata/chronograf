@@ -12,7 +12,7 @@ import {CellType, DecimalPlaces} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {FluxTable} from 'src/types'
-import {DataTypes} from 'src/shared/components/RefreshingGraph'
+import {DataType} from 'src/shared/constants'
 
 interface Props {
   decimalPlaces: DecimalPlaces
@@ -23,7 +23,7 @@ interface Props {
   lineGraph: boolean
   staticLegendHeight?: number
   data: TimeSeriesServerResponse[] | FluxTable[]
-  dataType: DataTypes
+  dataType: DataType
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
 }
 
@@ -120,7 +120,7 @@ class SingleStat extends PureComponent<Props, State> {
 
     let roundedValue = `${this.lastValue}`
 
-    if (decimalPlaces.isEnforced) {
+    if (decimalPlaces.isEnforced && _.isNumber(this.lastValue)) {
       roundedValue = this.lastValue.toFixed(decimalPlaces.digits)
     }
 
@@ -225,9 +225,9 @@ class SingleStat extends PureComponent<Props, State> {
 
     try {
       let lastValues
-      if (dataType === DataTypes.flux) {
+      if (dataType === DataType.flux) {
         lastValues = await manager.fluxTablesToSingleStat(data as FluxTable[])
-      } else if (dataType === DataTypes.influxQL) {
+      } else if (dataType === DataType.influxQL) {
         lastValues = getLastValues(data as TimeSeriesServerResponse[])
       }
 

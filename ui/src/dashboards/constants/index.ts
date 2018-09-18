@@ -27,15 +27,22 @@ export interface TimeField {
   displayName: string
   visible: boolean
 }
-export const DEFAULT_TIME_FIELD: TimeField = {
+
+export const DEFAULT_INFLUXQL_TIME_FIELD: TimeField = {
   internalName: 'time',
+  displayName: '',
+  visible: true,
+}
+
+export const DEFAULT_FLUX_TIME_FIELD: TimeField = {
+  internalName: '_time',
   displayName: '',
   visible: true,
 }
 
 export const DEFAULT_TABLE_OPTIONS = {
   verticalTimeAxis: DEFAULT_VERTICAL_TIME_AXIS,
-  sortBy: DEFAULT_TIME_FIELD,
+  sortBy: DEFAULT_INFLUXQL_TIME_FIELD,
   wrapping: 'truncate',
   fixFirstColumn: DEFAULT_FIX_FIRST_COLUMN,
 }
@@ -56,7 +63,7 @@ export const FORMAT_OPTIONS: Array<{text?: string; format: string}> = [
   {format: TIME_FORMAT_CUSTOM},
 ]
 
-export const DEFAULT_FIELD_OPTIONS = [DEFAULT_TIME_FIELD]
+export const DEFAULT_FIELD_OPTIONS = [DEFAULT_INFLUXQL_TIME_FIELD]
 
 export const NEW_DEFAULT_DASHBOARD_CELL: NewDefaultCell = {
   x: 0,

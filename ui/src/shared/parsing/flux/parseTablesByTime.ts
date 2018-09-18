@@ -27,7 +27,7 @@ export const parseTablesByTime = (
   const nonNumericColumns = []
 
   const tablesByTime = tables.map(table => {
-    const header = table.data[0]
+    const header = table.data[0] as string[]
     const columnNames: {[k: number]: string} = {}
 
     for (let i = 0; i < header.length; i++) {
@@ -65,7 +65,7 @@ export const parseTablesByTime = (
     const result = {}
     for (let i = 1; i < table.data.length; i++) {
       const row = table.data[i]
-      const time = row[timeIndex]
+      const time = row[timeIndex].toString()
 
       result[time] = Object.entries(columnNames).reduce(
         (acc, [valueIndex, columnName]) => ({

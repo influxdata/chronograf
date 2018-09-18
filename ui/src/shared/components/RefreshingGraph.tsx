@@ -17,7 +17,9 @@ import {emptyGraphCopy} from 'src/shared/copy/cell'
 import {
   DEFAULT_TIME_FORMAT,
   DEFAULT_DECIMAL_PLACES,
+  DEFAULT_TABLE_OPTIONS,
 } from 'src/dashboards/constants'
+import {DataType} from 'src/shared/constants'
 
 // Utils
 import {AutoRefresher} from 'src/utils/AutoRefresher'
@@ -51,13 +53,8 @@ import {VisType} from 'src/types/flux'
 import {TimeSeriesServerResponse} from 'src/types/series'
 
 interface TypeAndData {
-  dataType: DataTypes
+  dataType: DataType
   data: TimeSeriesServerResponse[] | FluxTable[]
-}
-
-export enum DataTypes {
-  flux = 'flux',
-  influxQL = 'influxQL',
 }
 
 interface Props {
@@ -121,14 +118,16 @@ class RefreshingGraph extends PureComponent<Props> {
       type,
       source,
       inView,
+      colors,
+      visType,
+      rawData,
       service,
       queries,
-      visType,
-      rawData = [],
       cellNote,
       onNotify,
       timeRange,
       templates,
+      fieldOptions,
       grabFluxData,
       manualRefresh,
       autoRefresher,
@@ -149,8 +148,21 @@ class RefreshingGraph extends PureComponent<Props> {
       return <MarkdownCell text={cellNote} />
     }
 
+    const defaultFieldOptions = fieldOptions.map(f => {
+      return {...f, displayName: '', visible: true}
+    })
     if (visType === VisType.Table) {
-      return <TimeMachineTables data={rawData} />
+      return (
+        <TimeMachineTables
+          data={rawData}
+          dataType={DataType.flux}
+          tableOptions={DEFAULT_TABLE_OPTIONS}
+          timeFormat={DEFAULT_TIME_FORMAT}
+          decimalPlaces={DEFAULT_DECIMAL_PLACES}
+          fieldOptions={defaultFieldOptions}
+          colors={colors}
+        />
+      )
     }
 
     return (
@@ -177,7 +189,7 @@ class RefreshingGraph extends PureComponent<Props> {
             case CellType.SingleStat:
               return this.singleStat(timeSeriesInfluxQL, timeSeriesFlux)
             case CellType.Table:
-              return this.table(timeSeriesInfluxQL)
+              return this.table(timeSeriesInfluxQL, timeSeriesFlux)
             case CellType.Gauge:
               return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
             default:
@@ -233,7 +245,10 @@ class RefreshingGraph extends PureComponent<Props> {
     )
   }
 
-  private table = (data): JSX.Element => {
+  private table = (
+    influxQLData: TimeSeriesServerResponse[],
+    fluxData: FluxTable[]
+  ): JSX.Element => {
     const {
       colors,
       fieldOptions,
@@ -245,9 +260,28 @@ class RefreshingGraph extends PureComponent<Props> {
       editorLocation,
     } = this.props
 
+    const {dataType, data} = this.getTypeAndData(influxQLData, fluxData)
+    if (dataType === DataType.flux) {
+      return (
+        <TimeMachineTables
+          data={data as FluxTable[]}
+          dataType={dataType}
+          colors={colors}
+          key={manualRefresh}
+          tableOptions={tableOptions}
+          fieldOptions={fieldOptions}
+          timeFormat={timeFormat}
+          decimalPlaces={decimalPlaces}
+          editorLocation={editorLocation}
+          handleSetHoverTime={handleSetHoverTime}
+        />
+      )
+    }
+
     return (
       <TableGraph
         data={data}
+        dataType={dataType}
         colors={colors}
         key={manualRefresh}
         tableOptions={tableOptions}
@@ -363,11 +397,11 @@ class RefreshingGraph extends PureComponent<Props> {
     fluxData: FluxTable[]
   ): TypeAndData {
     if (influxQLData.length) {
-      return {dataType: DataTypes.influxQL, data: influxQLData}
+      return {dataType: DataType.influxQL, data: influxQLData}
     }
 
     if (fluxData.length) {
-      return {dataType: DataTypes.flux, data: fluxData}
+      return {dataType: DataType.flux, data: fluxData}
     }
   }
 }

@@ -1,4 +1,6 @@
-import {Service} from 'src/types'
+import {Service, Source, TimeRange, Query} from 'src/types'
+import {VisualizationOptions} from 'src/types/dataExplorer'
+
 // function definitions
 export type OnDeleteFuncNode = (ids: DeleteFuncNodeArgs) => void
 export type OnChangeArg = (inputArg: InputArg) => void
@@ -39,6 +41,10 @@ export interface Context {
   service: Service
   data: FluxTable[]
   scriptUpToYield: ScriptUpToYield
+  source: Source
+  timeRange: TimeRange
+  queries: Query[]
+  visualizationOptions: VisualizationOptions
 }
 
 export interface DeleteFuncNodeArgs {
@@ -157,7 +163,7 @@ export interface Links {
 export interface FluxTable {
   id: string
   name: string
-  data: string[][]
+  data: Array<Array<string | Date>>
   groupKey: {
     [columnName: string]: string
   }

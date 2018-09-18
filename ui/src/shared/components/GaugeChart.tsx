@@ -14,11 +14,11 @@ import {DecimalPlaces} from 'src/types/dashboards'
 import {ColorString} from 'src/types/colors'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {FluxTable} from 'src/types/flux'
-import {DataTypes} from 'src/shared/components/RefreshingGraph'
+import {DataType} from 'src/shared/constants'
 
 interface Props {
   data: TimeSeriesServerResponse[] | FluxTable[]
-  dataType: DataTypes
+  dataType: DataType
   decimalPlaces: DecimalPlaces
   cellID: string
   cellHeight?: number
@@ -117,9 +117,9 @@ class GaugeChart extends PureComponent<Props, State> {
 
     try {
       let lastValues
-      if (dataType === DataTypes.flux) {
+      if (dataType === DataType.flux) {
         lastValues = await manager.fluxTablesToSingleStat(data as FluxTable[])
-      } else if (dataType === DataTypes.influxQL) {
+      } else if (dataType === DataType.influxQL) {
         lastValues = getLastValues(data as TimeSeriesServerResponse[])
       }
 
