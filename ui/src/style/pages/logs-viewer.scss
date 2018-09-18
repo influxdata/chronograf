@@ -385,7 +385,8 @@ $logs-viewer-gutter: 60px;
 }
 
 .logs-viewer--graphic-log,
-.logs-viewer--graphic-magnifier-b {
+.logs-viewer--graphic-magnifier-b,
+.logs-viewer--graphic-empty {
   background-size: 100% 100%;
   background-position: center center;
   position: absolute;
@@ -413,4 +414,10 @@ $logs-viewer-gutter: 60px;
   top: 35%;
   left: 35%;
   animation: magRotateB 1.8s infinite linear;
+}
+.logs-viewer--graphic-empty {
+  background-image: url('../../assets/images/no-logs.svg');
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%,-50%);
 }

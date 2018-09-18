@@ -36,14 +36,29 @@ class LoadingStatus extends PureComponent<Props> {
   }
 
   private get loadingSpinner(): JSX.Element {
-    return (
-      <div className="logs-viewer--search-graphic">
-        <div className="logs-viewer--graphic-log" />
-        <div className="logs-viewer--graphic-magnifier-a">
-          <div className="logs-viewer--graphic-magnifier-b" />
-        </div>
-      </div>
-    )
+    switch (this.props.status) {
+      case SearchStatus.NoResults:
+        return (
+          <div className="logs-viewer--search-graphic">
+            <div className="logs-viewer--graphic-empty" />
+          </div>
+        )
+      case SearchStatus.UpdatingFilters:
+      case SearchStatus.UpdatingTimeBounds:
+      case SearchStatus.UpdatingSource:
+      case SearchStatus.UpdatingNamespace:
+      case SearchStatus.Loading:
+        return (
+          <div className="logs-viewer--search-graphic">
+            <div className="logs-viewer--graphic-log" />
+            <div className="logs-viewer--graphic-magnifier-a">
+              <div className="logs-viewer--graphic-magnifier-b" />
+            </div>
+          </div>
+        )
+      default:
+        return null
+    }
   }
 
   private get timeBounds(): JSX.Element {
