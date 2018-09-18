@@ -5,19 +5,29 @@ tslint:disable max-classes-per-file
 
 import React, {ComponentClass, Component} from 'react'
 
-class DefaultError extends Component {
+const VERSION = process.env.npm_package_version
+
+type ErrorComponentClass = ComponentClass<{error: Error} & any>
+
+class DefaultError extends Component<{error: Error}> {
   public render() {
+    const {error} = this.props
+    const {stack, message} = error
+    const finalMessage = ` Chronograf (${VERSION}) ${message}`
+    const finalStack = '```' + stack + '```'
+    const href = `https://github.com/influxdata/chronograf/issues/new?title=${finalMessage}&body=${finalStack}`
+
     return (
       <p className="unexpected-error">
         A Chronograf error has occurred. Please report the issue&nbsp;
-        <a href="https://github.com/influxdata/chronograf/issues">here</a>.
+        <a href={href}>here</a>.
       </p>
     )
   }
 }
 
 export function ErrorHandlingWith(
-  Error: ComponentClass, // Must be a class based component and not an SFC
+  Error: ErrorComponentClass, // Must be a class based component and not an SFC
   alwaysDisplay = false
 ) {
   return <P, S, T extends {new (...args: any[]): Component<P, S>}>(
@@ -29,17 +39,19 @@ export function ErrorHandlingWith(
       }
 
       private error: boolean = false
+      private err: Error = null
 
       public componentDidCatch(err, info) {
         console.error(err)
         console.warn(info)
         this.error = true
+        this.err = err
         this.forceUpdate()
       }
 
       public render() {
         if (this.error || alwaysDisplay) {
-          return <Error />
+          return <Error error={this.err} />
         }
 
         return super.render()

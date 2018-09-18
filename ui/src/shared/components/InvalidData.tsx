@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 
-class InvalidData extends PureComponent<{}> {
+class InvalidData extends PureComponent<{error?: Error}> {
   public render() {
     return (
       <div className="graph-empty">
