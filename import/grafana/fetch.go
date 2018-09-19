@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+
+	"github.com/influxdata/chronograf"
 )
 
 // FetchDashboards fetches all dashboard locations associated with a Grafana host.
@@ -38,7 +40,7 @@ func FetchDashboards(addr string) (DashboardResults, error) {
 }
 
 // FetchDashboard fetches all dashboard locations associated with a Grafana host.
-func FetchDashboard(addr string) (*Dashboard, error) {
+func FetchDashboard(addr string) (*chronograf.Dashboard, error) {
 	resp, err := http.Get(addr)
 	if err != nil {
 		return nil, nil
@@ -57,5 +59,5 @@ func FetchDashboard(addr string) (*Dashboard, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
-	return result.Dashboard, nil
+	return InitialMap(result.Dashboard), nil
 }

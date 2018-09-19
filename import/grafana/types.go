@@ -1,5 +1,7 @@
 package grafana
 
+import "github.com/influxdata/chronograf"
+
 type DashboardResults []DashboardResult
 
 // DashboardResult describes a result from using the dashboard search API.
@@ -10,6 +12,11 @@ type DashboardResult struct {
 	Type      string   `json:"type"`
 	Tags      []string `json:"tags"`
 	IsStarred bool     `json:"is_starred"`
+}
+
+type IR struct {
+	Base *Dashboard
+	To   *chronograf.Dashboard
 }
 
 type Dashboard struct {
@@ -26,6 +33,7 @@ type Row struct {
 
 type Panel struct {
 	Interval    string   `json:"interval"`
+	Datassource string   `json:"datasource"`
 	Bars        bool     `json:"bars"`
 	Lines       bool     `json:"lines"`
 	Stepped     bool     `json:"steppedLines"`
