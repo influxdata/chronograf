@@ -143,3 +143,21 @@ export const editTemplateVariables = async templateVariable => {
     throw error
   }
 }
+
+export const browseExternalDashboards = async (
+  importLink: string,
+  externalUrl: string
+) => {
+  const browseUrl = `${importLink}/grafana/browse?addr=${externalUrl}`
+
+  try {
+    const results = await AJAX({
+      method: 'GET',
+      url: browseUrl,
+    })
+    return results.data
+  } catch (error) {
+    console.error(error)
+    throw new Error('Could not find a running Grafana at that url')
+  }
+}

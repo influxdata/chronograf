@@ -49,6 +49,7 @@ export interface Props {
   fetchAllFluxServices: (sources: Source[]) => Promise<void>
   dashboards: Dashboard[]
   services: Service[]
+  importLink: string
 }
 
 interface State {
@@ -83,7 +84,7 @@ export class DashboardsPage extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {dashboards, notify, sources, source} = this.props
+    const {dashboards, notify, sources, source, importLink} = this.props
     const {dashboardsStatus} = this.state
     const dashboardLink = `/sources/${this.props.source.id}`
 
@@ -103,6 +104,7 @@ export class DashboardsPage extends PureComponent<Props, State> {
             dashboards={dashboards}
             dashboardsStatus={dashboardsStatus}
             dashboardLink={dashboardLink}
+            importLink={importLink}
             onDeleteDashboard={this.handleDeleteDashboard}
             onCreateDashboard={this.handleCreateDashboard}
             onCloneDashboard={this.handleCloneDashboard}
@@ -190,11 +192,13 @@ const mapStateToProps = ({
   dashboardUI: {dashboards, dashboard},
   sources,
   services,
+  links: {import: importLink},
 }): Partial<Props> => ({
   dashboards,
   dashboard,
   sources,
   services,
+  importLink,
 })
 
 const mapDispatchToProps = {
