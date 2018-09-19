@@ -3,15 +3,16 @@ import _ from 'lodash'
 import {getDeep} from 'src/utils/wrappers'
 
 import Container from 'src/reusable_ui/components/overlays/OverlayContainer'
-import Heading from 'src/reusable_ui/components/overlays/OverlayHeading'
 import Body from 'src/reusable_ui/components/overlays/OverlayBody'
 import DragAndDrop from 'src/shared/components/DragAndDrop'
 import ImportDashboardMappings from 'src/dashboards/components/import_dashboard_mappings/ImportDashboardMappings'
+import GrafanaImporter from 'src/dashboards/components/grafana_importer/GrafanaImporter'
 import {notifyDashboardImportFailed} from 'src/shared/copy/notifications'
 
 import {Dashboard, Cell, Source} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {ImportedSources} from 'src/types/dashboards'
+import {Radio, ButtonShape} from 'src/reusable_ui'
 
 interface Props {
   source: Source
@@ -30,8 +31,9 @@ interface State {
 }
 
 const enum ImportSteps {
-  IMPORT = 'import',
+  FILE = 'file',
   MAPPING = 'mapping',
+  GRAFANA = 'grafana',
 }
 
 class ImportDashboardOverlay extends PureComponent<Props, State> {
@@ -43,7 +45,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
       dashboard: null,
       importedSources: {},
       isImportable: false,
-      step: ImportSteps.IMPORT,
+      step: ImportSteps.FILE,
     }
   }
 
@@ -52,7 +54,11 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
 
     return (
       <Container maxWidth={800}>
-        <Heading title={this.title} onDismiss={onDismissOverlay} />
+        <div className="overlay--heading import-dashboard-header">
+          <div className="overlay--title">{this.title}</div>
+          {this.ImportModeToggle}
+          <button className="overlay--dismiss" onClick={onDismissOverlay} />
+        </div>
         <Body>{this.renderStep}</Body>
       </Container>
     )
@@ -60,10 +66,10 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
 
   private get renderStep(): JSX.Element {
     const {step, importedSources, cells} = this.state
-    const {source, sources} = this.props
+    const {source, sources, onDismissOverlay} = this.props
 
     switch (step) {
-      case ImportSteps.IMPORT:
+      case ImportSteps.FILE:
         return (
           <DragAndDrop
             submitText="Continue"
@@ -71,6 +77,8 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
             handleSubmit={this.handleContinueImport}
           />
         )
+      case ImportSteps.GRAFANA:
+        return <GrafanaImporter onDismissOverlay={onDismissOverlay} />
       case ImportSteps.MAPPING:
         return (
           <ImportDashboardMappings
@@ -84,11 +92,43 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
     }
   }
 
+  private get ImportModeToggle(): JSX.Element {
+    const {step} = this.state
+
+    if (step === ImportSteps.FILE || step === ImportSteps.GRAFANA) {
+      return (
+        <div className="import-dash-mode">
+          <Radio shape={ButtonShape.StretchToFit}>
+            <Radio.Button
+              id="import-mode-file"
+              active={step === ImportSteps.FILE}
+              titleText="Import Dashboard from a JSON File"
+              value={ImportSteps.FILE}
+              onClick={this.handleToggleImportMode}
+            >
+              From File
+            </Radio.Button>
+            <Radio.Button
+              id="import-mode-grafana"
+              active={step === ImportSteps.GRAFANA}
+              titleText="Import Dashboards from Grafana"
+              value={ImportSteps.GRAFANA}
+              onClick={this.handleToggleImportMode}
+            >
+              From Grafana
+            </Radio.Button>
+          </Radio>
+        </div>
+      )
+    }
+  }
+
   private get title(): string {
     const {step} = this.state
 
     switch (step) {
-      case ImportSteps.IMPORT:
+      case ImportSteps.FILE:
+      case ImportSteps.GRAFANA:
         return 'Import Dashboard'
 
       case ImportSteps.MAPPING:
@@ -140,6 +180,10 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
 
     onImportDashboard({...dashboard, cells})
     onDismissOverlay()
+  }
+
+  private handleToggleImportMode = (mode: ImportSteps): void => {
+    this.setState({step: mode})
   }
 }
 
