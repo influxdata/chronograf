@@ -33,6 +33,7 @@ type MuxOpts struct {
 	StatusFeedURL string            // JSON Feed URL for the client Status page News Feed
 	CustomLinks   map[string]string // Any custom external links for client's User menu
 	PprofEnabled  bool              // Mount pprof routes for profiling
+	DisableGZip   bool              // Optionally disable gzip.
 }
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
@@ -45,16 +46,20 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 		Logger:  opts.Logger,
 	})
 
-	// Prefix any URLs found in the React assets with any configured basepath
-	prefixedAssets := NewDefaultURLPrefixer(opts.Basepath, assets, opts.Logger)
+	if opts.Basepath != "" {
+		// Prefix any URLs found in the React assets with any configured basepath
+		assets = NewDefaultURLPrefixer(opts.Basepath, assets, opts.Logger)
+	}
 
 	// Compress the assets with gzip if an accepted encoding
-	compressed := gziphandler.GzipHandler(prefixedAssets)
+	if !opts.DisableGZip {
+		assets = gziphandler.GzipHandler(assets)
+	}
 
 	// The react application handles all the routing if the server does not
 	// know about the route.  This means that we never have unknown routes on
 	// the server.
-	hr.NotFound = compressed
+	hr.NotFound = assets
 
 	var router chronograf.Router = hr
 
