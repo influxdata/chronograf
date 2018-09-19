@@ -26,6 +26,7 @@ interface Props {
   onImportDashboard: (dashboard: Dashboard) => void
   notify: (message: Notification) => void
   dashboardLink: string
+  importLink: string
 }
 
 interface State {
@@ -136,7 +137,7 @@ class DashboardsPageContents extends Component<Props, State> {
   }
 
   private get renderImportOverlay(): JSX.Element {
-    const {onImportDashboard, notify, sources, source} = this.props
+    const {onImportDashboard, notify, sources, source, importLink} = this.props
     const {isOverlayVisible} = this.state
 
     return (
@@ -147,6 +148,7 @@ class DashboardsPageContents extends Component<Props, State> {
           notify={notify}
           source={source}
           sources={sources}
+          importLink={importLink}
         />
       </OverlayTechnology>
     )

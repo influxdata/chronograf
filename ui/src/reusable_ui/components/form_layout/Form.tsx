@@ -11,7 +11,7 @@ import FormFooter from 'src/reusable_ui/components/form_layout/FormFooter'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
-  children: JSX.Element[]
+  children: JSX.Element[] | JSX.Element
 }
 
 @ErrorHandling

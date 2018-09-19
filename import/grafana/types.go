@@ -6,12 +6,30 @@ import (
 	"strings"
 
 	"github.com/grafana/grafana/pkg/tsdb/influxdb"
+	"github.com/influxdata/chronograf"
 )
 
 var (
 	regexpOperatorPattern    = regexp.MustCompile(`^\/.*\/$`)
 	regexpMeasurementPattern = regexp.MustCompile(`^\/.*\/$`)
 )
+
+type DashboardResults []DashboardResult
+
+// DashboardResult describes a result from using the dashboard search API.
+type DashboardResult struct {
+	ID        int      `json:"id"`
+	Title     string   `json:"title"`
+	URI       string   `json:"uri"`
+	Type      string   `json:"type"`
+	Tags      []string `json:"tags"`
+	IsStarred bool     `json:"is_starred"`
+}
+
+type IR struct {
+	Base *Dashboard
+	To   *chronograf.Dashboard
+}
 
 type Dashboard struct {
 	Rows       []Row      `json:"rows"`
@@ -27,6 +45,7 @@ type Row struct {
 
 type Panel struct {
 	Interval    string           `json:"interval"`
+	Datassource string           `json:"datasource"`
 	Bars        bool             `json:"bars"`
 	Lines       bool             `json:"lines"`
 	Stepped     bool             `json:"steppedLines"`
