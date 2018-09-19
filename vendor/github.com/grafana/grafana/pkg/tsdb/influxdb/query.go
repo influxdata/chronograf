@@ -80,7 +80,7 @@ func (query *Query) renderTags() []string {
 }
 
 func (query *Query) renderTimeFilter(queryContext *tsdb.TsdbQuery) string {
-	return "time > :dashboardTime: and time < :upperDashboardTime"
+	return "time > :dashboardTime: and time < :upperDashboardTime:"
 }
 
 func (query *Query) renderSelectors(queryContext *tsdb.TsdbQuery) string {
