@@ -67,7 +67,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
 
   private get renderStep(): JSX.Element {
     const {step, importedSources, cells} = this.state
-    const {source, sources, onDismissOverlay, importLink} = this.props
+    const {source, sources, importLink} = this.props
 
     switch (step) {
       case ImportSteps.FILE:
@@ -81,8 +81,8 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
       case ImportSteps.GRAFANA:
         return (
           <GrafanaImporter
-            onDismissOverlay={onDismissOverlay}
             importLink={importLink}
+            onContinueGrafanaImport={this.handleContinueGrafanaImport}
           />
         )
       case ImportSteps.MAPPING:
@@ -144,6 +144,28 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
 
   private get validFileExtension(): string {
     return '.json'
+  }
+
+  private handleContinueGrafanaImport = (dashboard: Dashboard) => {
+    const cells = getDeep<Cell[]>(dashboard, 'cells', [])
+    const existingSources = {}
+    const importedSources: ImportedSources = cells.reduce((acc, c, i) => {
+      if (c.queries.length) {
+        const source = c.queries[0].source
+        if (!existingSources[source]) {
+          acc[i] = {name: source, link: source}
+          existingSources[source] = true
+        }
+
+        return acc
+      }
+    }, {})
+    this.setState({
+      cells,
+      dashboard,
+      importedSources,
+      step: ImportSteps.MAPPING,
+    })
   }
 
   private handleContinueImport = (

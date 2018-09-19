@@ -109,7 +109,7 @@ class DashboardsTable extends PureComponent<Props> {
   private getDashboardTemplates = (
     dashboard: Dashboard
   ): JSX.Element | JSX.Element[] => {
-    const templates = getDeep<Template[]>(dashboard, 'templates', [])
+    const templates = getDeep<Template[]>(dashboard, 'templates', []) || []
 
     if (templates.length) {
       return templates.map(tv => (

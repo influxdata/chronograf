@@ -4,7 +4,6 @@ import _ from 'lodash'
 
 // Components
 import {
-  Radio,
   Form,
   Input,
   ComponentStatus,
@@ -12,32 +11,32 @@ import {
   ComponentColor,
   ButtonShape,
   Columns,
-  MultiSelectDropdown,
+  Dropdown,
 } from 'src/reusable_ui'
 
 // APIS
-import {browseExternalDashboards} from 'src/dashboards/apis'
+import {
+  browseExternalDashboards,
+  getExternalDashboard,
+} from 'src/dashboards/apis'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-const enum GrafanaImportMode {
-  Browse = 'browse',
-  Specific = 'specific',
-}
+// Types
+import {Dashboard} from 'src/types'
 
 interface State {
-  mode: GrafanaImportMode
   url: string
   requestStatus: ComponentStatus
   requestMessage: string
   externalDashboards: any[]
-  selectedExternalDashboardIDs: string[]
+  selectedExternalDashboardID: string
 }
 
 interface Props {
-  onDismissOverlay: () => void
   importLink: string
+  onContinueGrafanaImport: (dashboard: Dashboard) => void
 }
 
 @ErrorHandling
@@ -46,60 +45,24 @@ class GrafanaImporter extends Component<Props, State> {
     super(props)
 
     this.state = {
-      mode: GrafanaImportMode.Browse,
       requestStatus: ComponentStatus.Default,
       requestMessage: '',
-      url: '',
+      url: 'http://localhost:3000',
       externalDashboards: [],
-      selectedExternalDashboardIDs: [],
+      selectedExternalDashboardID: '',
     }
   }
   public render() {
-    const {mode} = this.state
-
-    return (
-      <div className="grafana-importer">
-        <Radio>
-          <Radio.Button
-            id="grafana-importer--browse"
-            active={mode === GrafanaImportMode.Browse}
-            titleText="Choose dashboards to import from Grafana"
-            value={GrafanaImportMode.Browse}
-            onClick={this.handleRadioClick}
-          >
-            Browse Dashboards
-          </Radio.Button>
-          <Radio.Button
-            id="grafana-importer--specific"
-            active={mode === GrafanaImportMode.Specific}
-            titleText="Import a specific dashboard from Grafana"
-            value={GrafanaImportMode.Specific}
-            onClick={this.handleRadioClick}
-          >
-            Specific Dashboard
-          </Radio.Button>
-        </Radio>
-        {this.renderForm}
-      </div>
-    )
-  }
-
-  private handleRadioClick = (mode: GrafanaImportMode): void => {
-    this.setState({
-      mode,
-      url: '',
-      requestStatus: ComponentStatus.Default,
-      requestMessage: '',
-    })
+    return <div className="grafana-importer">{this.renderForm}</div>
   }
 
   private get submitFormButton(): JSX.Element {
-    const {requestStatus, url, selectedExternalDashboardIDs} = this.state
+    const {requestStatus, url, selectedExternalDashboardID} = this.state
 
     const buttonStatus =
       requestStatus === ComponentStatus.Valid &&
       !!url &&
-      selectedExternalDashboardIDs.length
+      selectedExternalDashboardID.length
         ? ComponentStatus.Default
         : ComponentStatus.Disabled
 
@@ -121,6 +84,15 @@ class GrafanaImporter extends Component<Props, State> {
   ): Promise<void> => {
     const {importLink} = this.props
 
+    if (!e.target.value) {
+      return
+    }
+
+    if (!_.startsWith(e.target.value, 'http://')) {
+      this.setState({requestMessage: 'URL must start with http://'})
+      return
+    }
+
     try {
       this.setState({
         requestStatus: ComponentStatus.Loading,
@@ -131,7 +103,15 @@ class GrafanaImporter extends Component<Props, State> {
         e.target.value
       )
 
-      this.setState({externalDashboards, requestStatus: ComponentStatus.Valid})
+      const selectedExternalDashboardID = !!externalDashboards.length
+        ? externalDashboards[0].id.toString()
+        : ''
+
+      this.setState({
+        externalDashboards,
+        requestStatus: ComponentStatus.Valid,
+        selectedExternalDashboardID,
+      })
     } catch (err) {
       this.setState({
         requestStatus: ComponentStatus.Error,
@@ -140,63 +120,43 @@ class GrafanaImporter extends Component<Props, State> {
     }
   }
 
-  private handleFormSubmit = (): void => {
-    const {onDismissOverlay} = this.props
-    // const {selectedExternalDashboardIDs, externalDashboards} = this.state
+  private handleFormSubmit = async (): Promise<void> => {
+    const {onContinueGrafanaImport} = this.props
 
-    // const selectedExternalDashboards = externalDashboards.filter(d =>
-    //   _.includes(selectedExternalDashboardIDs, `${d.id}`)
-    // )
+    const {selectedExternalDashboardID, externalDashboards, url} = this.state
 
-    // Start wizard here
-    // console.log(selectedExternalDashboards)
+    const selectedExternalDashboard = externalDashboards.find(d =>
+      _.includes(selectedExternalDashboardID, `${d.id}`)
+    )
 
-    onDismissOverlay()
+    const dashboard: Dashboard = await getExternalDashboard(
+      url,
+      selectedExternalDashboard.uri
+    )
+    onContinueGrafanaImport(dashboard)
   }
 
   private get renderForm(): JSX.Element {
-    const {mode, url, requestStatus, requestMessage} = this.state
-
-    if (mode === GrafanaImportMode.Browse) {
-      return (
-        <div className="row">
-          <div className="col-xs-12">
-            <Form>
-              <Form.Element
-                label="URL where Grafana is running"
-                errorMessage={requestMessage}
-              >
-                <Input
-                  value={url}
-                  placeholder="eg: http://localhost:3000"
-                  onChange={this.handleUrlChange}
-                  status={requestStatus}
-                  onBlur={this.handleBrowseBlur}
-                />
-              </Form.Element>
-              {this.dashboardsDropdown}
-              {this.submitFormButton}
-            </Form>
-          </div>
-        </div>
-      )
-    }
+    const {url, requestStatus, requestMessage} = this.state
 
     return (
       <div className="row">
         <div className="col-xs-12">
           <Form>
             <Form.Element
-              label="URL of Grafana dashboard"
+              label="URL where Grafana is running"
               errorMessage={requestMessage}
             >
               <Input
                 value={url}
-                placeholder="eg: https://grafana.com/api/dashboards/5063/revisions/5/download"
+                placeholder="eg: http://localhost:3000"
                 onChange={this.handleUrlChange}
                 status={requestStatus}
+                onBlur={this.handleBrowseBlur}
+                onKeyPress={this.handleBrowseKeyPress}
               />
             </Form.Element>
+            {this.dashboardsDropdown}
             {this.submitFormButton}
           </Form>
         </div>
@@ -208,7 +168,7 @@ class GrafanaImporter extends Component<Props, State> {
     const {
       externalDashboards,
       requestStatus,
-      selectedExternalDashboardIDs,
+      selectedExternalDashboardID,
     } = this.state
 
     if (
@@ -226,33 +186,33 @@ class GrafanaImporter extends Component<Props, State> {
       return
     }
 
-    const simpleArray = externalDashboards.map(d => ({
-      id: `${d.id}`,
-      name: d.title,
-    }))
-
     return (
-      <Form.Element label="Select dashboards to import">
-        <MultiSelectDropdown
+      <Form.Element label="Select a Dashboard to import">
+        <Dropdown
           onChange={this.handleChooseExternalDashboard}
-          selectedIDs={selectedExternalDashboardIDs}
+          selectedID={selectedExternalDashboardID}
           buttonColor={ComponentColor.Primary}
-          emptyText="None selected"
         >
-          {simpleArray.map(ed => (
-            <MultiSelectDropdown.Item id={ed.id} key={ed.id} value={ed}>
-              {ed.name}
-            </MultiSelectDropdown.Item>
+          {externalDashboards.map(ed => (
+            <Dropdown.Item id={`${ed.id}`} key={`${ed.id}`} value={`${ed.id}`}>
+              {ed.title}
+            </Dropdown.Item>
           ))}
-        </MultiSelectDropdown>
+        </Dropdown>
       </Form.Element>
     )
   }
 
+  private handleBrowseKeyPress = (e): void => {
+    if (e.key === 'Enter') {
+      e.target.blur()
+    }
+  }
+
   private handleChooseExternalDashboard = (
-    selectedExternalDashboardIDs: string[]
+    selectedExternalDashboardID: string
   ): void => {
-    this.setState({selectedExternalDashboardIDs})
+    this.setState({selectedExternalDashboardID})
   }
 
   private handleUrlChange = (e: ChangeEvent<HTMLInputElement>): void => {
