@@ -1,6 +1,7 @@
 package grafana
 
 import (
+	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/tsdb"
 	"github.com/influxdata/chronograf"
 )
@@ -44,7 +45,13 @@ func InitialMap(base *Dashboard) *chronograf.Dashboard {
 						From: "a",
 						To:   "a",
 					},
-					// Queries: []*tsdb.Query{},
+					Queries: []*tsdb.Query{
+						&tsdb.Query{
+							DataSource: &models.DataSource{
+								Database: datasource,
+							},
+						},
+					},
 				}
 				q, err := gq.Build(qc)
 				if err != nil {
