@@ -283,6 +283,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 	// Imports
 	router.GET("/chronograf/v1/import/grafana/browse", EnsureViewer(service.BrowseGrafana))
+	router.GET("/chronograf/v1/import/grafana/dashboard", EnsureViewer(service.GetGrafanaDashboard))
 
 	// Dashboards
 	router.GET("/chronograf/v1/dashboards", EnsureViewer(service.Dashboards))

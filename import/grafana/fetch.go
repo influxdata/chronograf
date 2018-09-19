@@ -36,3 +36,26 @@ func FetchDashboards(addr string) (DashboardResults, error) {
 	}
 	return results, nil
 }
+
+// FetchDashboard fetches all dashboard locations associated with a Grafana host.
+func FetchDashboard(addr string) (*Dashboard, error) {
+	resp, err := http.Get(addr)
+	if err != nil {
+		return nil, nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code %d", resp.StatusCode)
+	}
+
+	type Result struct {
+		Dashboard *Dashboard
+	}
+
+	var result *Result
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+	return result.Dashboard, nil
+}
