@@ -1,6 +1,9 @@
 package grafana
 
-import "github.com/influxdata/chronograf"
+import (
+	"github.com/grafana/grafana/pkg/tsdb"
+	"github.com/influxdata/chronograf"
+)
 
 func InitialMap(base *Dashboard) *chronograf.Dashboard {
 	to := &chronograf.Dashboard{Templates: []chronograf.Template{}}
@@ -34,13 +37,23 @@ func InitialMap(base *Dashboard) *chronograf.Dashboard {
 			} else {
 				cell.Type = "line"
 			}
-
 			datasource := panel.Datassource
 			for _, gq := range panel.Targets {
-				// TODO(edd/goller) setup cell.queries[].source
-				_ = gq
+				qc := &tsdb.TsdbQuery{
+					TimeRange: &tsdb.TimeRange{
+						From: "a",
+						To:   "a",
+					},
+					// Queries: []*tsdb.Query{},
+				}
+				q, err := gq.Build(qc)
+				if err != nil {
+					panic(err)
+				}
+
 				query := chronograf.DashboardQuery{
-					Source: datasource,
+					Source:  datasource,
+					Command: q,
 				}
 				cell.Queries = append(cell.Queries, query)
 			}
