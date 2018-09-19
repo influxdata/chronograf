@@ -1,5 +1,17 @@
 package grafana
 
+type DashboardResults []DashboardResult
+
+// DashboardResult describes a result from using the dashboard search API.
+type DashboardResult struct {
+	ID        int      `json:"id"`
+	Title     string   `json:"title"`
+	URI       string   `json:"uri"`
+	Type      string   `json:"type"`
+	Tags      []string `json:"tags"`
+	IsStarred bool     `json:"is_starred"`
+}
+
 type Dashboard struct {
 	Rows       []Row      `json:"rows"`
 	Templating Templating `json:"templating"`
