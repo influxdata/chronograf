@@ -7,8 +7,9 @@ func InitialMap(base *Dashboard) *chronograf.Dashboard {
 
 	to.Name = base.Title
 
-	width, height := 3, 4
+	height := 4
 	for y, row := range base.Rows {
+		width := 12 / len(row.Panels)
 		for x, panel := range row.Panels {
 			cell := chronograf.DashboardCell{
 				X:    int32(x * width),
