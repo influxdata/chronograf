@@ -161,3 +161,20 @@ export const browseExternalDashboards = async (
     throw new Error('Could not find a running Grafana at that url')
   }
 }
+
+export const getExternalDashboard = async (
+  linkUrl: string,
+  dashUrl: string
+) => {
+  const getUrl = `/chronograf/v1/import/grafana/dashboard?addr=${linkUrl}/api/dashboards/${dashUrl}`
+  try {
+    const results = await AJAX({
+      method: 'GET',
+      url: getUrl,
+    })
+    return results.data
+  } catch (err) {
+    console.error(err)
+    throw err
+  }
+}

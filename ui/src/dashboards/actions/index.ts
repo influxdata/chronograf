@@ -420,22 +420,22 @@ export const getChronografVersion = () => async (): Promise<string> => {
 }
 
 const removeUnselectedTemplateValues = (dashboard: Dashboard): Template[] => {
-  const templates = getDeep<Template[]>(dashboard, 'templates', []).map(
-    template => {
-      if (
-        template.type === TemplateType.CSV ||
-        template.type === TemplateType.Map
-      ) {
-        return template
-      }
+  const templates = getDeep<Template[]>(dashboard, 'templates', []) || []
 
-      const value = template.values.find(val => val.selected)
-      const values = value ? [value] : []
-
-      return {...template, values}
+  const usedTemplates = templates.map(template => {
+    if (
+      template.type === TemplateType.CSV ||
+      template.type === TemplateType.Map
+    ) {
+      return template
     }
-  )
-  return templates
+
+    const value = template.values.find(val => val.selected)
+    const values = value ? [value] : []
+
+    return {...template, values}
+  })
+  return usedTemplates
 }
 
 export const putDashboard = (dashboard: Dashboard) => async (
