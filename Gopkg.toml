@@ -83,3 +83,11 @@ required = ["github.com/kevinburke/go-bindata","github.com/gogo/protobuf/proto",
 [[constraint]]
   branch = "master"
   name = "github.com/influxdata/flux"
+
+[[constraint]]
+  name = "github.com/grafana/grafana"
+  version = "4.1.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/Unknwon/com"
