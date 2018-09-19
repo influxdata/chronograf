@@ -143,3 +143,47 @@ export const editTemplateVariables = async templateVariable => {
     throw error
   }
 }
+
+export const browseExternalDashboards = async (
+  importLink: string,
+  externalUrl: string
+) => {
+  const browseUrl = `${importLink}/grafana/browse?addr=${externalUrl}`
+
+  try {
+    // return await AJAX({
+    //   method: 'GET',
+    //   url: browseUrl,
+    // })
+
+    return [
+      {
+        id: 1,
+        title: 'yo',
+        uri: 'http://yo.com',
+        type: 'what',
+        tags: [],
+        is_starred: false,
+      },
+      {
+        id: 2,
+        title: 'huzzah',
+        uri: 'http://huzzah.com',
+        type: 'what',
+        tags: [],
+        is_starred: false,
+      },
+      {
+        id: 3,
+        title: 'wam',
+        uri: 'http://wam.com',
+        type: 'what',
+        tags: [],
+        is_starred: false,
+      },
+    ]
+  } catch (error) {
+    console.error(error)
+    throw new Error('Could not find a running Grafana at that url')
+  }
+}

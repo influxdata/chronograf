@@ -20,6 +20,7 @@ interface Props {
   onDismissOverlay: () => void
   notify: (message: Notification) => void
   onImportDashboard: (dashboard: Dashboard) => void
+  importLink: string
 }
 
 interface State {
@@ -45,7 +46,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
       dashboard: null,
       importedSources: {},
       isImportable: false,
-      step: ImportSteps.FILE,
+      step: ImportSteps.GRAFANA,
     }
   }
 
@@ -66,7 +67,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
 
   private get renderStep(): JSX.Element {
     const {step, importedSources, cells} = this.state
-    const {source, sources, onDismissOverlay} = this.props
+    const {source, sources, onDismissOverlay, importLink} = this.props
 
     switch (step) {
       case ImportSteps.FILE:
@@ -78,7 +79,12 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
           />
         )
       case ImportSteps.GRAFANA:
-        return <GrafanaImporter onDismissOverlay={onDismissOverlay} />
+        return (
+          <GrafanaImporter
+            onDismissOverlay={onDismissOverlay}
+            importLink={importLink}
+          />
+        )
       case ImportSteps.MAPPING:
         return (
           <ImportDashboardMappings

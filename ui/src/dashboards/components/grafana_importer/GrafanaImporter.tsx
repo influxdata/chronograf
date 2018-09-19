@@ -1,5 +1,6 @@
 // Libraries
 import React, {Component, ChangeEvent} from 'react'
+import _ from 'lodash'
 
 // Components
 import {
@@ -11,7 +12,11 @@ import {
   ComponentColor,
   ButtonShape,
   Columns,
+  MultiSelectDropdown,
 } from 'src/reusable_ui'
+
+// APIS
+import {browseExternalDashboards} from 'src/dashboards/apis'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -26,10 +31,13 @@ interface State {
   url: string
   requestStatus: ComponentStatus
   requestMessage: string
+  externalDashboards: any[]
+  selectedExternalDashboardIDs: string[]
 }
 
 interface Props {
   onDismissOverlay: () => void
+  importLink: string
 }
 
 @ErrorHandling
@@ -42,6 +50,8 @@ class GrafanaImporter extends Component<Props, State> {
       requestStatus: ComponentStatus.Default,
       requestMessage: '',
       url: '',
+      externalDashboards: [],
+      selectedExternalDashboardIDs: [],
     }
   }
   public render() {
@@ -84,10 +94,12 @@ class GrafanaImporter extends Component<Props, State> {
   }
 
   private get submitFormButton(): JSX.Element {
-    const {requestStatus, url} = this.state
+    const {requestStatus, url, selectedExternalDashboardIDs} = this.state
 
-    const buttonDisabled =
-      requestStatus !== ComponentStatus.Valid && !!url
+    const buttonStatus =
+      requestStatus === ComponentStatus.Valid &&
+      !!url &&
+      selectedExternalDashboardIDs.length
         ? ComponentStatus.Default
         : ComponentStatus.Disabled
 
@@ -96,7 +108,7 @@ class GrafanaImporter extends Component<Props, State> {
         <Button
           color={ComponentColor.Primary}
           text="Next"
-          status={buttonDisabled}
+          status={buttonStatus}
           shape={ButtonShape.StretchToFit}
           onClick={this.handleFormSubmit}
         />
@@ -104,11 +116,42 @@ class GrafanaImporter extends Component<Props, State> {
     )
   }
 
+  private handleBrowseBlur = async (
+    e: ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
+    const {importLink} = this.props
+
+    try {
+      this.setState({
+        requestStatus: ComponentStatus.Loading,
+        requestMessage: '',
+      })
+      const externalDashboards = await browseExternalDashboards(
+        importLink,
+        e.target.value
+      )
+
+      this.setState({externalDashboards, requestStatus: ComponentStatus.Valid})
+    } catch (err) {
+      this.setState({
+        requestStatus: ComponentStatus.Error,
+        requestMessage: err.message,
+      })
+    }
+  }
+
   private handleFormSubmit = (): void => {
     const {onDismissOverlay} = this.props
+    // const {selectedExternalDashboardIDs, externalDashboards} = this.state
+
+    // const selectedExternalDashboards = externalDashboards.filter(d =>
+    //   _.includes(selectedExternalDashboardIDs, `${d.id}`)
+    // )
+
+    // Start wizard here
+    // console.log(selectedExternalDashboards)
 
     onDismissOverlay()
-    // Start wizard here
   }
 
   private get renderForm(): JSX.Element {
@@ -128,8 +171,10 @@ class GrafanaImporter extends Component<Props, State> {
                   placeholder="eg: http://localhost:3000"
                   onChange={this.handleUrlChange}
                   status={requestStatus}
+                  onBlur={this.handleBrowseBlur}
                 />
               </Form.Element>
+              {this.dashboardsDropdown}
               {this.submitFormButton}
             </Form>
           </div>
@@ -157,6 +202,57 @@ class GrafanaImporter extends Component<Props, State> {
         </div>
       </div>
     )
+  }
+
+  private get dashboardsDropdown(): JSX.Element {
+    const {
+      externalDashboards,
+      requestStatus,
+      selectedExternalDashboardIDs,
+    } = this.state
+
+    if (
+      !externalDashboards.length &&
+      requestStatus === ComponentStatus.Loading
+    ) {
+      return (
+        <Form.Element>
+          <div>Loading...</div>
+        </Form.Element>
+      )
+    }
+
+    if (!externalDashboards.length) {
+      return
+    }
+
+    const simpleArray = externalDashboards.map(d => ({
+      id: `${d.id}`,
+      name: d.title,
+    }))
+
+    return (
+      <Form.Element label="Select dashboards to import">
+        <MultiSelectDropdown
+          onChange={this.handleChooseExternalDashboard}
+          selectedIDs={selectedExternalDashboardIDs}
+          buttonColor={ComponentColor.Primary}
+          emptyText="None selected"
+        >
+          {simpleArray.map(ed => (
+            <MultiSelectDropdown.Item id={ed.id} key={ed.id} value={ed}>
+              {ed.name}
+            </MultiSelectDropdown.Item>
+          ))}
+        </MultiSelectDropdown>
+      </Form.Element>
+    )
+  }
+
+  private handleChooseExternalDashboard = (
+    selectedExternalDashboardIDs: string[]
+  ): void => {
+    this.setState({selectedExternalDashboardIDs})
   }
 
   private handleUrlChange = (e: ChangeEvent<HTMLInputElement>): void => {
