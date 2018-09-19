@@ -3,7 +3,7 @@ package grafana
 import "github.com/influxdata/chronograf"
 
 func InitialMap(base *Dashboard) *chronograf.Dashboard {
-	to := &chronograf.Dashboard{}
+	to := &chronograf.Dashboard{Templates: []chronograf.Template{}}
 
 	to.Name = base.Title
 
