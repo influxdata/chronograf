@@ -281,6 +281,9 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.DELETE("/chronograf/v1/users/:id", EnsureSuperAdmin(rawStoreAccess(service.RemoveUser)))
 	router.PATCH("/chronograf/v1/users/:id", EnsureSuperAdmin(rawStoreAccess(service.UpdateUser)))
 
+	// Imports
+	router.GET("/chronograf/v1/import/grafana/browse", EnsureViewer(service.BrowseGrafana))
+
 	// Dashboards
 	router.GET("/chronograf/v1/dashboards", EnsureViewer(service.Dashboards))
 	router.POST("/chronograf/v1/dashboards", EnsureEditor(service.NewDashboard))
