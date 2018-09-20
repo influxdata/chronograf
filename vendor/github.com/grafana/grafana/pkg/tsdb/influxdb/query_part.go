@@ -58,7 +58,7 @@ func init() {
 	}
 	renders["stddev"] = QueryDefinition{Renderer: functionRenderer}
 	renders["time"] = QueryDefinition{
-		Renderer: functionRenderer,
+		Renderer: goller,
 		Params:   []DefinitionParameters{{Name: "interval", Type: "time"}, {Name: "offset", Type: "time"}},
 	}
 	renders["fill"] = QueryDefinition{
