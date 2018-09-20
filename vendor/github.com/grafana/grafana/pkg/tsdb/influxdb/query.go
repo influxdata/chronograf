@@ -88,7 +88,12 @@ func (query *Query) renderSelectors(queryContext *tsdb.TsdbQuery) string {
 	res := "SELECT "
 
 	var selectors []string
-	log.Printf("&&&()(*)*(*)*)()\n%+#v", query)
+	log.Printf("&&&()(*)*(*)*)()\n%+#v", queryContext)
+	if len(query.Selects) == 0 {
+		res += ":field:"
+		return res
+	}
+
 	for _, sel := range query.Selects {
 
 		stk := ""
