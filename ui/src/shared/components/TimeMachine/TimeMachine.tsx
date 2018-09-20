@@ -254,10 +254,8 @@ class TimeMachine extends PureComponent<Props, State> {
           isInCEO={isInCEO}
         />
         <div className="deceo--container">
-          <Threesizer
-            orientation={HANDLE_HORIZONTAL}
-            divisions={horizontalDivisions}
-          />
+          {this.visualization}
+          {this.editorBottom}
         </div>
       </div>
     )

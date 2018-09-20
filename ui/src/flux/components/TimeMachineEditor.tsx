@@ -20,7 +20,6 @@ interface Status {
 
 interface Props {
   script: string
-  visibility: string
   status: Status
   onChangeScript: OnChangeScript
   onSubmitScript: OnSubmitScript
@@ -49,7 +48,7 @@ class TimeMachineEditor extends PureComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps) {
-    const {status, visibility} = this.props
+    const {status} = this.props
 
     if (status.type === 'error') {
       this.makeError()
@@ -60,13 +59,13 @@ class TimeMachineEditor extends PureComponent<Props, State> {
       this.clearWidgets()
     }
 
-    if (prevProps.visibility === visibility) {
-      return
-    }
+    // if (prevProps.visibility === visibility) {
+    //   return
+    // }
 
-    if (visibility === 'visible') {
-      setTimeout(() => this.editor.refresh(), 60)
-    }
+    // if (visibility === 'visible') {
+    //   setTimeout(() => this.editor.refresh(), 60)
+    // }
   }
 
   public render() {

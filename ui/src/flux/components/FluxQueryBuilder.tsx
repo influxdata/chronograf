@@ -5,7 +5,6 @@ import React, {SFC} from 'react'
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import BodyBuilder from 'src/flux/components/BodyBuilder'
 import TimeMachineEditor from 'src/flux/components/TimeMachineEditor'
-import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
@@ -56,36 +55,20 @@ const FluxQueryBuilder: SFC<Props> = props => {
     onSubmitScript,
   } = props
 
-  const verticalDivisions = [
-    {
-      name: 'Script',
-      headerOrientation: HANDLE_VERTICAL,
-      headerButtons: [
-        <div
-          key="validate"
-          className="btn btn-default btn-xs validate--button"
-          onClick={onValidate}
-        >
-          Validate
-        </div>,
-      ],
-      menuOptions: [],
-      render: visibility => (
+  return (
+    <div className="time-machine--modes">
+      <div className="time-machine--mode">Script</div>
+      <div className="time-machine--mode-panel">
         <TimeMachineEditor
           status={status}
           script={script}
-          visibility={visibility}
           suggestions={suggestions}
           onChangeScript={onChangeScript}
           onSubmitScript={onSubmitScript}
         />
-      ),
-    },
-    {
-      name: 'Build',
-      headerButtons: [],
-      menuOptions: [],
-      render: () => (
+      </div>
+      <div className="time-machine--mode">Build</div>
+      <div className="time-machine--mode-panel">
         <BodyBuilder
           body={body}
           service={service}
@@ -94,23 +77,12 @@ const FluxQueryBuilder: SFC<Props> = props => {
           onAppendFrom={onAppendFrom}
           onAppendJoin={onAppendJoin}
         />
-      ),
-    },
-    {
-      name: 'Explore',
-      headerButtons: [],
-      menuOptions: [],
-      render: () => <SchemaExplorer service={service} notify={notify} />,
-      headerOrientation: HANDLE_VERTICAL,
-    },
-  ]
-
-  return (
-    <Threesizer
-      orientation={HANDLE_VERTICAL}
-      divisions={verticalDivisions}
-      containerClass="page-contents"
-    />
+      </div>
+      <div className="time-machine--mode">Schema</div>
+      <div className="time-machine--mode-panel">
+        <SchemaExplorer service={service} notify={notify} />
+      </div>
+    </div>
   )
 }
 

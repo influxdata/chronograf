@@ -402,23 +402,27 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
 }
 
 .deceo--container {
-  height: calc(100% - 120px);
+  height: calc(100% - 110px);
   position: relative;
 }
 
 .deceo--top {
   width: 100%;
-  height: 100%;
-  min-height: 100px;
+  height: calc(100% - 50px);
   display: flex;
   flex-direction: column;
   align-items: stretch;
   @include gradient-v($g2-kevlar, $g0-obsidian);
 }
 
+.deceo--bottom {
+  background-color: $g2-kevlar;
+  height: 50px;
+}
+
 .deceo--controls {
   display: flex;
-  height: 60px;
+  height: 50px;
   padding: 0 60px;
   background-color: $g2-kevlar;
   align-items: center;
@@ -445,10 +449,6 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   }
 }
 
-.deceo--bottom {
-  background-color: $g2-kevlar;
-  height: 100%;
-}
 
 $deceo--tab-width: 220px;
 
@@ -469,4 +469,51 @@ $deceo--tab-width: 220px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+
+.time-machine--modes {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  z-index: 500;
+}
+
+.time-machine--mode {
+  position: relative;
+  flex: 1 0 33%;
+  border-top: 2px solid $g3-castle;
+  color: $g11-sidewalk; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  text-transform: uppercase;
+  z-index: 3;
+  background-color: $g2-kevlar;
+
+  &:hover {
+    background-color: $g3-castle;
+    color: $g18-cloud;
+  }
+}
+
+.time-machine--mode-panel {
+  position: absolute;
+  width: 100%;
+  bottom: 100%;
+  left: 0px;
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  z-index: 1;
+  background-color: $g2-kevlar;
+  border-top: 2px solid $g3-castle;
+  height: 20vh;
+}
+
+.time-machine--mode:hover + .time-machine--mode-panel,
+.time-machine--mode-panel:hover {
+  transform: translateY(0);
 }
