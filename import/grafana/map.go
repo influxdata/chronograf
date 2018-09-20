@@ -24,7 +24,7 @@ func InitialMap(base *Dashboard) *chronograf.Dashboard {
 				"query": {
 					"influxql": "SHOW FIELD KEYS ON :database: FROM :measurement:",
 					"db": "_internal",
-					"measurement": "shard",
+					"measurement": "database",
 					"tagKey": "",
 					"fieldKey": ""
 				},
