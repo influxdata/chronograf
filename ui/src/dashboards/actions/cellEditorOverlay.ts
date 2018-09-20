@@ -14,6 +14,7 @@ import {
 } from 'src/types/dashboards'
 import {TimeRange} from 'src/types'
 import {CEOInitialState} from 'src/dashboards/reducers/cellEditorOverlay'
+import {GeoRequest} from 'src/types/geo'
 
 export interface State {
   cellEditorOverlay: CEOInitialState
@@ -28,6 +29,7 @@ export enum ActionType {
   UpdateThresholdsListType = 'UPDATE_THRESHOLDS_LIST_TYPE',
   UpdateGaugeColors = 'UPDATE_GAUGE_COLORS',
   UpdateAxes = 'UPDATE_AXES',
+  UpdateGeoImage = 'UPDATE_GEO_IMAGE',
   UpdateTableOptions = 'UPDATE_TABLE_OPTIONS',
   UpdateLineColors = 'UPDATE_LINE_COLORS',
   ChangeTimeFormat = 'CHANGE_TIME_FORMAT',
@@ -50,6 +52,7 @@ export type Action =
   | UpdateThresholdsListTypeAction
   | UpdateGaugeColorsAction
   | UpdateAxesAction
+  | UpdateGeoImageAction
   | UpdateTableOptionsAction
   | UpdateLineColorsAction
   | ChangeTimeFormatAction
@@ -112,6 +115,13 @@ export interface UpdateAxesAction {
   type: ActionType.UpdateAxes
   payload: {
     axes: Axes
+  }
+}
+
+export interface UpdateGeoImageAction {
+  type: ActionTypes.UpdateGeoImage
+  payload: {
+    geoRequest: GeoRequest
   }
 }
 

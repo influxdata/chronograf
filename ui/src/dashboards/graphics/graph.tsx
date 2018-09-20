@@ -1,6 +1,7 @@
 import React, {ReactElement} from 'react'
 
 import {CellType} from 'src/types/dashboards'
+import {getOrganizations} from '../../admin/apis/chronograf'
 
 type Graphic = ReactElement<HTMLDivElement>
 
@@ -14,6 +15,7 @@ interface GraphSVGs {
   [CellType.Gauge]: Graphic
   [CellType.Table]: Graphic
   [CellType.Note]: Graphic
+  [CellType.Geo]: Graphic
 }
 const GRAPH_SVGS: GraphSVGs = {
   line: (
@@ -618,6 +620,11 @@ export const GRAPH_TYPES: GraphType[] = [
   {
     type: CellType.Note,
     menuOption: 'Note',
+    graphic: GRAPH_SVGS[CellType.Note],
+  },
+  {
+    type: CellType.Geo,
+    menuOption: 'Geo',
     graphic: GRAPH_SVGS[CellType.Note],
   },
 ]

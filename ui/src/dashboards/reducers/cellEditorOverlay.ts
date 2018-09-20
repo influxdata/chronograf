@@ -43,6 +43,15 @@ export interface CEOInitialState {
   lineColors: LineColor[]
   queryDrafts: CellQuery[]
   timeRange: TimeRange
+  geo_range_x0: number
+  geo_range_x1: number
+  geo_range_y0: number
+  geo_range_y1: number
+  geo_imageUrl: string
+  geo_imageScale: number
+  geo_image_x0: number
+  geo_image_y0: number
+  geo_dot_color: string
   script: string
 }
 
@@ -54,6 +63,15 @@ export const initialState = {
   lineColors: DEFAULT_LINE_COLORS,
   queryDrafts: null,
   timeRange: null,
+  geo_range_x0: 0,
+  geo_range_x1: 90,
+  geo_range_y0: 0,
+  geo_range_y1: 180,
+  geo_imageUrl: 'https://preview.ibb.co/euqrsK/map.jpg',
+  geo_imageScale: 1.5,
+  geo_image_x0: 0,
+  geo_image_y0: 0,
+  geo_dot_color: null,
   script: editor.DEFAULT_SCRIPT,
 }
 
@@ -203,6 +221,13 @@ export default (state = initialState, action: Action): CEOInitialState => {
       const cell = {...state.cell, axes}
 
       return {...state, cell}
+    }
+
+    case ActionType.UpdateGeoImage: {
+      const {geoRequest} = action.payload
+      const obj = {}
+      obj[geoRequest.name] = geoRequest.val
+      return {...state, ...obj}
     }
 
     case ActionType.UpdateTableOptions: {

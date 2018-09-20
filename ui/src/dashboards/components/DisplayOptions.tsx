@@ -8,6 +8,7 @@ import GraphTypeSelector from 'src/dashboards/components/GraphTypeSelector'
 import GaugeOptions from 'src/dashboards/components/GaugeOptions'
 import SingleStatOptions from 'src/dashboards/components/SingleStatOptions'
 import AxesOptions from 'src/dashboards/components/AxesOptions'
+import GeoOptions from 'src/dashboards/components/GeoOptions'
 import TableOptions from 'src/dashboards/components/TableOptions'
 import NoteOptions from 'src/dashboards/components/NoteOptions'
 import CellNoteEditor from 'src/shared/components/TimeMachine/CellNoteEditor'
@@ -18,6 +19,7 @@ import {
   updateDecimalPlaces,
   updateGaugeColors,
   updateAxes,
+  updateGeoImage,
   updateTableOptions,
   updateFieldOptions,
   updateTimeFormat,
@@ -49,6 +51,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Axes, Cell, QueryConfig} from 'src/types'
 import {ColorNumber, ColorString} from 'src/types/colors'
 import {VisualizationOptions} from 'src/types/dataExplorer'
+import {GeoRequest} from 'src/types/geo'
 
 interface Props extends VisualizationOptions {
   cell: Cell | NewDefaultCell
@@ -60,6 +63,7 @@ interface Props extends VisualizationOptions {
   onUpdateDecimalPlaces: typeof updateDecimalPlaces
   onUpdateGaugeColors: typeof updateGaugeColors
   onUpdateAxes: typeof updateAxes
+  onUpdateGeoImage: typeof updateGeoImage
   onUpdateTableOptions: typeof updateTableOptions
   onUpdateFieldOptions: typeof updateFieldOptions
   onUpdateTimeFormat: typeof updateTimeFormat
@@ -208,6 +212,8 @@ class DisplayOptions extends Component<Props, State> {
             onUpdateThresholdsListType={this.handleUpdateThresholdsListType}
           />
         )
+      case CellType.Geo:
+        return <GeoOptions onUpdateGeoImage={this.handleUpdateGeoImage} />
       default:
         return (
           <AxesOptions
@@ -247,6 +253,12 @@ class DisplayOptions extends Component<Props, State> {
     const {onUpdateAxes} = this.props
 
     onUpdateAxes(axes, this.stateToUpdate)
+  }
+
+  private handleUpdateGeoImage = (geoRequest: GeoRequest): void => {
+    const {onUpdateGeoImage} = this.props
+
+    onUpdateGeoImage(geoRequest, this.stateToUpdate)
   }
 
   private handleUpdateDecimalPlaces = (decimalPlaces: DecimalPlaces): void => {
@@ -321,6 +333,7 @@ class DisplayOptions extends Component<Props, State> {
 const mdtp = {
   onUpdateGaugeColors: updateGaugeColors,
   onUpdateAxes: updateAxes,
+  onUpdateGeoImage: updateGeoImage,
   onUpdateDecimalPlaces: updateDecimalPlaces,
   onUpdateTableOptions: updateTableOptions,
   onUpdateFieldOptions: updateFieldOptions,

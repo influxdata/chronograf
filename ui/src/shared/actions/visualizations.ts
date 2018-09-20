@@ -16,6 +16,8 @@ import {
   NoteVisibility,
 } from 'src/types/dashboards'
 
+import {GeoRequest} from 'src/types/geo'
+
 export interface ChangeVisualizationTypeAction {
   type: CEOActionType.ChangeCellType | DEActionType.ChangeVisualizationType
   payload: {
@@ -52,6 +54,13 @@ export interface UpdateAxesAction {
   type: CEOActionType.UpdateAxes | DEActionType.UpdateAxes
   payload: {
     axes: Axes
+  }
+}
+
+export interface UpdateGeoImageAction {
+  type: CEOActionType.UpdateGeoImage | DEActionType.UpdateGeoImage
+  payload: {
+    geoRequest: GeoRequest
   }
 }
 
@@ -216,6 +225,22 @@ export const updateAxes = (
       axes,
     },
   } as UpdateAxesAction
+}
+
+export const updateGeoImage = (
+  geoRequest: GeoRequest,
+  stateToUpdate: QueryUpdateState
+): UpdateGeoImage => {
+  const type =
+    stateToUpdate === QueryUpdateState.CEO
+      ? CEOActionType.UpdateGeoImage
+      : DEActionType.UpdateGeoImage
+  return {
+    type,
+    payload: {
+      geoRequest,
+    },
+  } as UpdateGeoImageAction
 }
 
 export const updateTableOptions = (

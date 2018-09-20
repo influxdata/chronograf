@@ -11,6 +11,7 @@ import SingleStat from 'src/shared/components/SingleStat'
 import MarkdownCell from 'src/shared/components/MarkdownCell'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 import TimeMachineTables from 'src/flux/components/TimeMachineTables'
+import GeoGraph from 'src/shared/components/GeoGraph'
 
 // Constants
 import {emptyGraphCopy} from 'src/shared/copy/cell'
@@ -192,6 +193,8 @@ class RefreshingGraph extends PureComponent<Props> {
               return this.table(timeSeriesInfluxQL, timeSeriesFlux)
             case CellType.Gauge:
               return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
+            case CellType.Geo:
+              return this.geo(timeSeriesInfluxQL, timeSeriesFlux)
             default:
               return this.lineGraph(timeSeriesInfluxQL, timeSeriesFlux, loading)
           }
@@ -243,6 +246,15 @@ class RefreshingGraph extends PureComponent<Props> {
         onUpdateCellColors={onUpdateCellColors}
       />
     )
+  }
+
+  private geo = (
+    influxQLData: TimeSeriesServerResponse[],
+    fluxData: FluxTable[]
+  ): JSX.Element => {
+    const {dataType, data} = this.getTypeAndData(influxQLData, fluxData)
+
+    return <GeoGraph data={data} dataType={dataType} />
   }
 
   private table = (

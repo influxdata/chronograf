@@ -9,6 +9,7 @@ import {
   NoteVisibility,
 } from 'src/types/dashboards'
 import {DEState} from 'src/types/dataExplorer'
+import {GeoRequest} from 'src/types/geo'
 
 export interface State {
   dataExplorer: DEState
@@ -26,6 +27,7 @@ export enum ActionType {
   UpdateThresholdsListType = 'DE_UPDATE_THRESHOLDS_LIST_TYPE',
   UpdateGaugeColors = 'DE_UPDATE_GAUGE_COLORS',
   UpdateAxes = 'DE_UPDATE_AXES',
+  UpdateGeoImage = 'DE_UPDATE_GEO_IMAGE',
   UpdateTableOptions = 'DE_UPDATE_TABLE_OPTIONS',
   UpdateLineColors = 'DE_UPDATE_LINE_COLORS',
   ChangeTimeFormat = 'DE_CHANGE_TIME_FORMAT',
@@ -48,6 +50,7 @@ export type Action =
   | UpdateThresholdsListTypeAction
   | UpdateGaugeColorsAction
   | UpdateAxesAction
+  | UpdateGeoImageAction
   | UpdateTableOptionsAction
   | UpdateLineColorsAction
   | ChangeTimeFormatAction
@@ -132,6 +135,13 @@ export interface UpdateAxesAction {
   type: ActionType.UpdateAxes
   payload: {
     axes: Axes
+  }
+}
+
+export interface UpdateGeoImage {
+  type: ActionType.UpdateGeoImage
+  payload: {
+    geoRequest: GeoRequest
   }
 }
 
