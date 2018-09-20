@@ -24,6 +24,7 @@ import {
   deleteFuncNode,
   getBodyToScript,
   scriptUpToYield,
+  changeArg,
 } from 'src/flux/helpers/scriptBuilder'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
@@ -63,7 +64,6 @@ import {
   InputArg,
   Context,
   DeleteFuncNodeArgs,
-  Func,
   ScriptStatus,
   VisType,
 } from 'src/types/flux'
@@ -797,70 +797,14 @@ class TimeMachine extends PureComponent<Props, State> {
     this.getASTResponse(this.bodyToScript)
   }
 
-  private handleChangeArg = ({
-    key,
-    value,
-    generate,
-    funcID,
-    declarationID = '',
-    bodyID,
-  }: InputArg): void => {
-    const body = this.state.body.map(b => {
-      if (b.id !== bodyID) {
-        return b
-      }
+  private handleChangeArg = (input: InputArg): void => {
+    const {body} = this.state
+    const newBody = changeArg(input, body)
 
-      if (declarationID) {
-        const declarations = b.declarations.map(d => {
-          if (d.id !== declarationID) {
-            return d
-          }
-
-          const functions = this.editFuncArgs({
-            funcs: d.funcs,
-            funcID,
-            key,
-            value,
-          })
-
-          return {...d, funcs: functions}
-        })
-
-        return {...b, declarations}
-      }
-
-      const funcs = this.editFuncArgs({
-        funcs: b.funcs,
-        funcID,
-        key,
-        value,
-      })
-
-      return {...b, funcs}
-    })
-
-    this.setState({body}, () => {
-      if (generate) {
+    this.setState({body: newBody}, () => {
+      if (input.generate) {
         this.handleGenerateScript()
       }
-    })
-  }
-
-  private editFuncArgs = ({funcs, funcID, key, value}): Func[] => {
-    return funcs.map(f => {
-      if (f.id !== funcID) {
-        return f
-      }
-
-      const args = f.args.map(a => {
-        if (a.key === key) {
-          return {...a, value}
-        }
-
-        return a
-      })
-
-      return {...f, args}
     })
   }
 
