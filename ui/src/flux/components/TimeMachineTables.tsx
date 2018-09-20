@@ -146,7 +146,7 @@ class TimeMachineTables extends PureComponent<Props, State> {
     const {data} = this.props
 
     if (data.length && !!data[0]) {
-      return data[0].id
+      return data[0].name
     }
 
     return null
@@ -155,7 +155,7 @@ class TimeMachineTables extends PureComponent<Props, State> {
   private get selectedResult(): FluxTable {
     const filteredTables = filteredTablesMemoized(this.props.data)
 
-    return filteredTables.find(d => d.id === this.state.selectedResultID)
+    return filteredTables.find(d => d.name === this.state.selectedResultID)
   }
 }
 
