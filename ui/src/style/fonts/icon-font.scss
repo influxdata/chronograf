@@ -103,12 +103,23 @@
   &.google:before {content: "\ea88";}
   &.github:before {content: "\eab0";}
 
+  &.loudml-gradcap {
+    font-family: 'loudml' !important;
+    font-size: 21px!important;
+    top: 4px!important;
+    &:before {content: "\e900";}
+  }
   &.loudml {
     font-family: 'loudml' !important;
     font-size: 2em;
-    &:before {content: "\e900";}
+    &:before {content: "\e903";}
   }
   &.loudml-bold {
+    font-family: 'loudml' !important;
+    font-size: 2em;
+    &:before {content: "\e902";}
+  }
+  &.loudml-bold-h {
     font-family: 'loudml' !important;
     font-size: 2em;
     &:before {content: "\e901";}
