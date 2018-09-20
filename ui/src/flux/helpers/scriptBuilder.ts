@@ -19,7 +19,7 @@ interface Status {
 export const changeArg = (
   {key, value, funcID, declarationID = '', bodyID}: InputArg,
   bodies: Body[]
-) => {
+): Body[] => {
   return bodies.map(b => {
     if (b.id !== bodyID) {
       return b
