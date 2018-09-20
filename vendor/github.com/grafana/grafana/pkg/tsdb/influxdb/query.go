@@ -91,7 +91,7 @@ func (query *Query) renderSelectors(queryContext *tsdb.TsdbQuery) string {
 
 		stk := ""
 		for _, s := range *sel {
-			stk = s.Render(query, queryContext, stk)
+			stk = s.SelectRender(query, queryContext, stk)
 		}
 		selectors = append(selectors, stk)
 	}
@@ -113,7 +113,7 @@ func (query *Query) renderMeasurement() string {
 		measurement = fmt.Sprintf(`"%s"`, measurement)
 	}
 
-	return fmt.Sprintf(` FROM %s%s`, policy, measurement)
+	return fmt.Sprintf(` FROM %s.%s%s`, `"_internal"`, policy, measurement)
 }
 
 func (query *Query) renderWhereClause() string {

@@ -2,7 +2,6 @@ package influxdb
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/grafana/grafana/pkg/tsdb"
@@ -154,7 +153,10 @@ func (qp *QueryPart) Render(query *Query, queryContext *tsdb.TsdbQuery, expr str
 	if qp.Def.Renderer == nil {
 		f := renders[qp.Type]
 		qp.Def.Renderer = f.Renderer
-		log.Printf("qp\n ***%v****\n |||%v||| ", qp, qp.Def.Renderer)
 	}
+	return qp.Def.Renderer(query, queryContext, qp, expr)
+}
+
+func (qp *QueryPart) SelectRender(query *Query, queryContext *tsdb.TsdbQuery, expr string) string {
 	return qp.Def.Renderer(query, queryContext, qp, expr)
 }
