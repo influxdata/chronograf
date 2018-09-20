@@ -2,6 +2,7 @@ package influxdb
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -87,6 +88,7 @@ func (query *Query) renderSelectors(queryContext *tsdb.TsdbQuery) string {
 	res := "SELECT "
 
 	var selectors []string
+	log.Printf("&&&()(*)*(*)*)()\n%+#v", query)
 	for _, sel := range query.Selects {
 
 		stk := ""
