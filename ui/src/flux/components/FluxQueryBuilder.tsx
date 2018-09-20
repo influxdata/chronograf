@@ -88,7 +88,6 @@ const FluxQueryBuilder: SFC<Props> = props => {
       render: () => (
         <BodyBuilder
           body={body}
-          service={service}
           suggestions={suggestions}
           onDeleteBody={onDeleteBody}
           onAppendFrom={onAppendFrom}
