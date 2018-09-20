@@ -145,11 +145,10 @@ $flux-builder-yield-tabs-max-width: 400px;
   display: flex;
   align-items: center;
   margin-left: $flux-node-gap;
+  cursor: pointer !important;
 
   &:hover,
   &.active {
-    cursor: pointer !important;
-
     .func-node--preview {
       color: $g20-white;
     }
@@ -227,10 +226,10 @@ $flux-builder-yield-tabs-max-width: 400px;
 .func-node--name,
 .func-node--preview {
   font-size: 13px;
-  @include no-user-select();
   white-space: nowrap;
   transition: color 0.25s ease;
   font-weight: 600;
+  user-select: none;
 }
 
 .func-node--name {
