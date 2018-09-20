@@ -41,19 +41,16 @@ export default class FuncArgsPreview extends PureComponent<Props> {
     const {func} = this.props
     const {args} = func
 
-    return args.map((arg, i): JSX.Element => {
-      if (!arg.value) {
-        return
+    return args.filter(a => a.value).map((arg, i) => {
+      let argValue = String(arg.value)
+
+      if (arg.type === 'object') {
+        argValue = Object.entries(arg.value)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(', ')
       }
 
       const separator = i === 0 ? null : ', '
-      let argValue
-      if (arg.type === 'object') {
-        const valueMap = _.map(arg.value, (value, key) => `${key}:${value}`)
-        argValue = `{${valueMap.join(', ')}}`
-      } else {
-        argValue = `${arg.value}`
-      }
 
       return (
         <React.Fragment key={uuid.v4()}>
