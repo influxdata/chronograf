@@ -90,7 +90,7 @@ func (query *Query) renderSelectors(queryContext *tsdb.TsdbQuery) string {
 	var selectors []string
 	log.Printf("&&&()(*)*(*)*)()\n%+#v", queryContext)
 	if len(query.Selects) == 0 {
-		res += ":field:"
+		res += "max(:field:)"
 		return res
 	}
 
