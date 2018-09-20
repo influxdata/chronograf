@@ -162,3 +162,22 @@ func (qp *QueryPart) SelectRender(query *Query, queryContext *tsdb.TsdbQuery, ex
 	log.Printf("&&&&&&&&&%+#v", query)
 	return qp.Def.Renderer(query, queryContext, qp, expr)
 }
+
+func goller(query *Query, queryContext *tsdb.TsdbQuery, part *QueryPart, innerExpr string) string {
+	for i, param := range part.Params {
+		if part.Type == "time" {
+			return "time(:interval:)"
+		}
+		if part.Type == "time" && param == "auto" {
+			part.Params[i] = "$__interval"
+		}
+	}
+
+	if innerExpr != "" {
+		part.Params = append([]string{innerExpr}, part.Params...)
+	}
+
+	params := strings.Join(part.Params, ", ")
+
+	return fmt.Sprintf("%s(%s)", part.Type, params)
+}
