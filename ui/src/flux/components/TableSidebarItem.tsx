@@ -51,6 +51,6 @@ export default class TableSidebarItem extends PureComponent<Props> {
   }
 
   private handleClick = (): void => {
-    this.props.onSelect(this.props.id)
+    this.props.onSelect(this.props.name)
   }
 }
