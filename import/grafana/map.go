@@ -1,13 +1,40 @@
 package grafana
 
 import (
+	"encoding/json"
+
 	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/tsdb"
 	"github.com/influxdata/chronograf"
 )
 
 func InitialMap(base *Dashboard) *chronograf.Dashboard {
-	to := &chronograf.Dashboard{Templates: []chronograf.Template{}}
+	o := `{
+				"tempVar": ":field:",
+				"values": [
+					{
+						"value": "diskBytes",
+						"type": "fieldKey",
+						"selected": true
+					}
+				],
+				"id": "3d4521c5-ea3d-4529-bbdf-2416ac21dfb8",
+				"type": "fieldKeys",
+				"label": "",
+				"query": {
+					"influxql": "SHOW FIELD KEYS ON :database: FROM :measurement:",
+					"db": "_internal",
+					"measurement": "shard",
+					"tagKey": "",
+					"fieldKey": ""
+				},
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/templates/3d4521c5-ea3d-4529-bbdf-2416ac21dfb8"
+				}
+			}`
+	var tmpp chronograf.Template
+	json.Unmarshal([]byte(o), &tmpp)
+	to := &chronograf.Dashboard{Templates: []chronograf.Template{tmpp}}
 
 	to.Name = base.Title
 
