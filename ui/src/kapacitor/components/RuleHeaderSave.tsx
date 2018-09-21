@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip'
 
 interface Props {
   onSave: () => void
-  validationError?: string
+  validationError: string
 }
 
 const RuleHeaderSave: SFC<Props> = ({onSave, validationError}) => (

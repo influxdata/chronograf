@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import {
   Handler,
   KeyMappings,
@@ -147,8 +148,11 @@ export const RULE_MESSAGE_TEMPLATES: RuleMessageTemplate = {
   },
   tags: {
     label: '{{.Tags}}',
-    text:
-      'Map of tags. Use <code>&#123;&#123; index .Tags &quot;key&quot; &#125;&#125;</code> to get a specific tag value',
+    text: 'Map of tags.',
+  },
+  tag: {
+    label: '{{ index .Tags "value" }}',
+    text: 'A specific tag value',
   },
   level: {
     label: '{{.Level}}',
@@ -156,15 +160,26 @@ export const RULE_MESSAGE_TEMPLATES: RuleMessageTemplate = {
       'Alert Level, one of: <code>INFO</code><code>WARNING</code><code>CRITICAL</code>',
   },
   fields: {
+    label: '{{.Fields}}',
+    text: 'Map of fields',
+  },
+  field: {
     label: '{{ index .Fields "value" }}',
-    text:
-      'Map of fields. Use <code>&#123;&#123; index .Fields &quot;key&quot; &#125;&#125;</code> to get a specific field value',
+    text: 'A specific field value',
   },
   time: {
     label: '{{.Time}}',
     text: 'The time of the point that triggered the event',
   },
 }
+
+export const RULE_MESSAGE_TEMPLATE_TEXTS = _.map(RULE_MESSAGE_TEMPLATES, t => {
+  const label = t.label
+  const templateRegexp = /((?:{{)([^{}]+)(?:}}))/g // matches {{*}} where star does not contain '{' or '}'
+  const match = templateRegexp.exec(label)
+  return match[2].trim()
+})
+
 // DEFAULT_HANDLERS are empty alert templates for handlers that don't exist in the kapacitor config
 export const DEFAULT_HANDLERS: Handler[] = [
   {
