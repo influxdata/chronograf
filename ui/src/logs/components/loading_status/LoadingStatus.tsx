@@ -83,9 +83,8 @@ class LoadingStatus extends PureComponent<Props> {
       case SearchStatus.UpdatingNamespace:
         return 'Searching updated namespace...'
       case SearchStatus.Loading:
-        return 'Searching...'
       default:
-        return 'Searching'
+        return 'Searching...'
     }
   }
 }
