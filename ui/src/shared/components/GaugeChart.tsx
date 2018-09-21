@@ -5,6 +5,7 @@ import {manager} from 'src/worker/JobManager'
 
 import getLastValues from 'src/shared/parsing/lastValues'
 import Gauge from 'src/shared/components/Gauge'
+import InvalidData from 'src/shared/components/InvalidData'
 
 import {DEFAULT_GAUGE_COLORS} from 'src/shared/constants/thresholds'
 import {stringifyColorValues} from 'src/shared/constants/colorOperations'
@@ -33,6 +34,7 @@ interface State {
     values: number[]
     series: string[]
   }
+  isValidData: boolean
 }
 
 @ErrorHandling
@@ -46,7 +48,7 @@ class GaugeChart extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    this.state = {}
+    this.state = {isValidData: true}
   }
 
   public async componentDidMount() {
@@ -70,6 +72,14 @@ class GaugeChart extends PureComponent<Props, State> {
 
   public render() {
     const {colors, prefix, suffix, decimalPlaces} = this.props
+    if (!this.state.isValidData) {
+      return <InvalidData />
+    }
+
+    if (!this.state.lastValues) {
+      return <h3 className="graph-spinner" />
+    }
+
     return (
       <div className="single-stat">
         <Gauge
@@ -115,8 +125,9 @@ class GaugeChart extends PureComponent<Props, State> {
   private async dataToLastValues() {
     const {data, dataType} = this.props
 
+    let lastValues
+    let isValidData = true
     try {
-      let lastValues
       if (dataType === DataType.flux) {
         lastValues = await manager.fluxTablesToSingleStat(data as FluxTable[])
       } else if (dataType === DataType.influxQL) {
@@ -126,11 +137,10 @@ class GaugeChart extends PureComponent<Props, State> {
       if (!this.isComponentMounted) {
         return
       }
-
-      this.setState({lastValues})
     } catch (err) {
-      console.error(err)
+      isValidData = false
     }
+    this.setState({lastValues, isValidData})
   }
 }
 

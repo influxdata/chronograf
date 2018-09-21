@@ -80,15 +80,17 @@ const updateMaxWidths = (
       }
 
       const columnLabel = topRow[c]
+      const isTimeColumn =
+        columnLabel === DEFAULT_INFLUXQL_TIME_FIELD.internalName ||
+        columnLabel === DEFAULT_FLUX_TIME_FIELD.internalName
+
+      const isTimeRow =
+        topRow[0] === DEFAULT_INFLUXQL_TIME_FIELD.internalName ||
+        topRow[0] === DEFAULT_FLUX_TIME_FIELD.internalName
 
       const useTimeWidth =
-        (columnLabel === DEFAULT_INFLUXQL_TIME_FIELD.internalName &&
-          verticalTimeAxis &&
-          !isTopRow) ||
-        (!verticalTimeAxis &&
-          isTopRow &&
-          topRow[0] === DEFAULT_INFLUXQL_TIME_FIELD.internalName &&
-          c !== 0)
+        (isTimeColumn && verticalTimeAxis && !isTopRow) ||
+        (!verticalTimeAxis && isTopRow && isTimeRow && c !== 0)
 
       const currentWidth = useTimeWidth
         ? timeFormatWidth
@@ -110,23 +112,12 @@ const updateMaxWidths = (
   return maxWidths
 }
 
-export const getTimeField = (
-  fieldOptions: FieldOption[],
-  dataType: DataType
-): FieldOption => {
+export const getDefaultTimeField = (dataType: DataType): FieldOption => {
   if (dataType === DataType.flux) {
-    return (
-      fieldOptions.find(
-        f => f.internalName === DEFAULT_FLUX_TIME_FIELD.internalName
-      ) || DEFAULT_FLUX_TIME_FIELD
-    )
+    return DEFAULT_FLUX_TIME_FIELD
   }
 
-  return (
-    fieldOptions.find(
-      f => f.internalName === DEFAULT_INFLUXQL_TIME_FIELD.internalName
-    ) || DEFAULT_INFLUXQL_TIME_FIELD
-  )
+  return DEFAULT_INFLUXQL_TIME_FIELD
 }
 
 export const computeFieldOptions = (
@@ -134,18 +125,16 @@ export const computeFieldOptions = (
   sortedLabels: SortedLabel[],
   dataType: DataType
 ): FieldOption[] => {
-  const timeField = getTimeField(existingFieldOptions, dataType)
+  const defaultTimeField = getDefaultTimeField(dataType)
 
-  let astNames = [timeField]
+  let astNames = dataType === DataType.influxQL ? [defaultTimeField] : []
   sortedLabels.forEach(({label}) => {
-    if (label !== timeField.internalName) {
-      const field: FieldOption = {
-        internalName: label,
-        displayName: '',
-        visible: true,
-      }
-      astNames = [...astNames, field]
+    const field: FieldOption = {
+      internalName: label,
+      displayName: '',
+      visible: true,
     }
+    astNames = [...astNames, field]
   })
 
   const intersection = existingFieldOptions.filter(f => {
