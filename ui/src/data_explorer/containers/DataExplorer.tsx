@@ -223,7 +223,7 @@ export class DataExplorer extends PureComponent<Props, State> {
     const {isStaticLegend, isComponentMounted} = this.state
 
     if (!isComponentMounted) {
-      return <h3 className="graph-spinner" />
+      return <div className="page-spinner" />
     }
 
     return (
