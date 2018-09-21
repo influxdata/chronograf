@@ -29,18 +29,18 @@ interface ASTRequest {
 
 export const getAST = async (request: ASTRequest) => {
   const {url, body} = request
-  try {
-    const {data} = await AJAX({
-      method: 'POST',
-      url,
-      data: {body},
-    })
+  const {data, status} = await AJAX({
+    method: 'POST',
+    url,
+    data: {body},
+    validateStatus: () => true,
+  })
 
-    return data
-  } catch (error) {
-    console.error('Could not parse query', error)
-    throw error
+  if (status !== 200) {
+    throw new Error('Failed to parse query')
   }
+
+  return data
 }
 
 export interface GetRawTimeSeriesResult {

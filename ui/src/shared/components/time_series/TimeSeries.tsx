@@ -84,7 +84,7 @@ const GraphLoadingDots = () => (
   </div>
 )
 
-const QUERIES_DEBOUNCE_MS = 400
+const QUERIES_DEBOUNCE_MS = 500
 
 class TimeSeries extends Component<Props, State> {
   public static defaultProps = {

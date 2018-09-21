@@ -139,6 +139,7 @@ export const FluxContext = React.createContext(undefined)
 
 class TimeMachine extends PureComponent<Props, State> {
   private debouncedASTResponse: ScriptFunc
+  private validAST: boolean = true
 
   constructor(props: Props) {
     super(props)
@@ -156,7 +157,7 @@ class TimeMachine extends PureComponent<Props, State> {
         type: 'none',
         text: '',
       },
-      script: '',
+      script: this.props.script,
       autoRefresher: new AutoRefresher(),
       autoRefreshDuration: 0,
       visType: VisType.Graph,
@@ -164,7 +165,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
     this.debouncedASTResponse = _.debounce(script => {
       this.getASTResponse(script, false)
-    }, 250)
+    }, 500)
   }
 
   public async componentDidMount() {
@@ -446,8 +447,8 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get fluxBuilder(): JSX.Element {
-    const {suggestions, body, status} = this.state
-    const {script, notify} = this.props
+    const {suggestions, body, status, script} = this.state
+    const {notify} = this.props
 
     return (
       <FluxContext.Provider value={this.getContext}>
@@ -501,6 +502,10 @@ class TimeMachine extends PureComponent<Props, State> {
     const {script, timeRange, queryDrafts} = this.props
     const id = _.get(queryDrafts, 'id', '')
     if (this.isFluxSource) {
+      if (!this.validAST) {
+        return []
+      }
+
       // there will only be one flux query
       const fluxQuery: Query[] = [
         {text: script, id, queryConfig: null, type: QueryType.Flux},
@@ -756,12 +761,17 @@ class TimeMachine extends PureComponent<Props, State> {
     this.props.updateScript(script, this.stateToUpdate)
   }
 
-  private getASTResponse = async (script: string, update: boolean = true) => {
+  private getASTResponse = async (
+    script: string,
+    update: boolean = true
+  ): Promise<void> => {
     const {fluxLinks, updateScriptStatus, isInCEO} = this.props
+    this.setState({script})
 
     if (!script) {
       this.updateScript(script)
-      return this.setState({ast: emptyAST, body: []})
+      this.setState({ast: emptyAST, body: []})
+      this.validAST = true
     }
 
     try {
@@ -778,6 +788,8 @@ class TimeMachine extends PureComponent<Props, State> {
       if (isInCEO) {
         updateScriptStatus(status)
       }
+
+      this.validAST = true
     } catch (error) {
       const status = parseError(error)
 
@@ -785,12 +797,13 @@ class TimeMachine extends PureComponent<Props, State> {
       if (isInCEO) {
         updateScriptStatus(status)
       }
-      return console.error('Could not parse AST', error)
+
+      this.validAST = false
     }
   }
 
   private handleSubmitScript = () => {
-    this.getASTResponse(this.props.script)
+    this.getASTResponse(this.state.script)
   }
 
   private handleGenerateScript = (): void => {
@@ -833,8 +846,8 @@ class TimeMachine extends PureComponent<Props, State> {
     this.getASTResponse(newScript)
   }
 
-  private handleChangeScript = (script: string): void => {
-    this.debouncedASTResponse(script)
+  private handleChangeScript = async (script: string): Promise<void> => {
+    await this.getASTResponse(script, false)
     this.updateScript(script)
   }
 
