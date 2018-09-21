@@ -79,6 +79,7 @@ interface RequestParams {
   data?: object | string
   params?: object
   headers?: object
+  validateStatus?: (status: number) => boolean
 }
 
 async function AJAX<T = any>(
