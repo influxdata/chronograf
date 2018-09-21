@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import {AxiosResponse} from 'axios'
 import {getDeep} from 'src/utils/wrappers'
 
 import {proxy} from 'src/utils/queryUrlGenerator'
@@ -183,11 +184,15 @@ export const loadHostsLinksFromNames = async (
   return updateActiveHostLink(allLinks, activeHost)
 }
 
+interface LayoutsResponse {
+  layouts: Layout[]
+}
+
 export const getLayouts = () =>
-  AJAX<Layout>({
+  AJAX({
     method: 'GET',
     resource: 'layouts',
-  })
+  }) as Promise<AxiosResponse<LayoutsResponse>>
 
 export const getAppsForHost = async (
   proxyLink: string,

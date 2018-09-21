@@ -32,7 +32,7 @@ interface LayoutLink {
   rel: string
 }
 
-interface LayoutCell {
+export interface LayoutCell {
   x: number
   y: number
   w: number
@@ -45,7 +45,7 @@ interface LayoutCell {
   colors: string[]
 }
 
-interface LayoutQuery {
+export interface LayoutQuery {
   label: string
   query: string
 }

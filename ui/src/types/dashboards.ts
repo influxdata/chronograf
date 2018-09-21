@@ -37,7 +37,7 @@ export interface Axes {
 }
 
 interface CellLinks {
-  self: string
+  self?: string
 }
 
 export enum QueryType {
