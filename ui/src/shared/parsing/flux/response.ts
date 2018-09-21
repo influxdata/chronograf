@@ -62,7 +62,7 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
   }
 
   // Group rows by their table id
-  const tablesData: Array<Array<Array<string | Date>>> = Object.values(
+  const tablesData: Array<Array<Array<string | number>>> = Object.values(
     _.groupBy(nonAnnotationData.slice(1), row => row[tableColIndex])
   )
 
@@ -99,10 +99,10 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
     )
 
     for (const row of tableData) {
-      row[timeColIndex] = new Date(row[timeColIndex])
+      row[timeColIndex] = new Date(row[timeColIndex]).valueOf()
     }
 
-    const data: Array<Array<string | Date>> = [headerRow, ...tableData]
+    const data: Array<Array<string | number>> = [headerRow, ...tableData]
 
     return {
       id: uuid.v4(),
