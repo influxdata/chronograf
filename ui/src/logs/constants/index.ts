@@ -1,5 +1,7 @@
 import {TableData} from 'src/types/logs'
 
+export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
 export enum SeverityColorOptions {
   ruby = 'ruby',
   fire = 'fire',
@@ -206,13 +208,6 @@ export const HISTOGRAM_CENTRAL_REGION = 3 / 5
 export const HISTOGRAM_SHIFT = 1 / 5
 
 export const SECONDS_TO_MS = 1000
-
-export const LoadingMessages = [
-  'Looking for logs in all the wrong places',
-  'Rolling like a log',
-  '100% natural logs',
-  'Chopping wood',
-]
 
 export const DEFAULT_TAIL_CHUNK_DURATION_MS = 5000
 export const DEFAULT_MAX_TAIL_BUFFER_DURATION_MS = 30000

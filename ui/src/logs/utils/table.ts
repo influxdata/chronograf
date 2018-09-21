@@ -2,7 +2,7 @@ import _ from 'lodash'
 import moment from 'moment'
 import {getDeep} from 'src/utils/wrappers'
 import {TableData, LogsTableColumn, SeverityFormat} from 'src/types/logs'
-import {SeverityFormatOptions} from 'src/logs/constants'
+import {SeverityFormatOptions, DEFAULT_TIME_FORMAT} from 'src/logs/constants'
 import {
   orderTableColumns,
   filterTableColumns,
@@ -40,7 +40,7 @@ export const formatColumnValue = (
 ): string => {
   switch (column) {
     case 'timestamp':
-      return moment(+value / 1000000).format('YYYY/MM/DD HH:mm:ss')
+      return moment(+value / 1000000).format(DEFAULT_TIME_FORMAT)
     case 'procid':
     case 'host':
     case 'appname':

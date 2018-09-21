@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import uuid from 'uuid'
 import _ from 'lodash'
-import moment from 'moment'
 import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {withRouter, InjectedRouter} from 'react-router'
@@ -81,7 +80,6 @@ import {
   TimeBounds,
   SearchStatus,
   FetchLoop,
-  TimeFormatOption,
 } from 'src/types/logs'
 import {
   applyChangesToTableData,
@@ -89,6 +87,7 @@ import {
 } from 'src/logs/utils/table'
 import extentBy from 'src/utils/extentBy'
 import {computeTimeBounds} from 'src/logs/utils/timeBounds'
+import {formatTime} from 'src/logs/utils'
 
 interface Props {
   sources: Source[]
@@ -628,7 +627,8 @@ class LogsPage extends Component<Props, State> {
               sortBarGroups={this.handleSortHistogramBarGroups}
             >
               {({xScale, adjustedHeight, margins}) => {
-                const x = xScale(new Date(timeOption).valueOf())
+                const timeOptionValue = new Date(timeOption).valueOf()
+                const x = xScale(timeOptionValue)
                 const y1 = margins.top
                 const y2 = margins.top + adjustedHeight
                 const textSize = 11
@@ -693,7 +693,7 @@ class LogsPage extends Component<Props, State> {
                           height={textSize}
                           fill={Greys.Sidewalk}
                         >
-                          {moment(timeOption).format(TimeFormatOption.DEFAULT)}
+                          {formatTime(timeOptionValue)}
                         </text>
                       </svg>
                     </>

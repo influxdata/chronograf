@@ -1,26 +1,22 @@
 import React, {PureComponent} from 'react'
-import _ from 'lodash'
-import moment from 'moment'
 
 import {SearchStatus} from 'src/types/logs'
-import {LoadingMessages} from 'src/logs/constants'
+import {formatTime} from 'src/logs/utils'
 
 interface Props {
   status: SearchStatus
-  currentOlderLowerBound: number
+  lower: number
+  upper: number
 }
 
 class LoadingStatus extends PureComponent<Props> {
   public render() {
-    const {currentOlderLowerBound} = this.props
-    const loadingTime = moment(currentOlderLowerBound).fromNow()
-
     return (
       <div className="logs-viewer--table-container generic-empty-state">
+        {this.loadingSpinner}
         <h4>
-          {this.loadingMessage}: ({loadingTime})
+          {this.loadingMessage} {this.description}
         </h4>
-        <p>{this.description}</p>
       </div>
     )
   }
@@ -30,34 +26,65 @@ class LoadingStatus extends PureComponent<Props> {
       case SearchStatus.NoResults:
         return (
           <>
-            Try changing the <strong>time range</strong> or{' '}
-            <strong>removing filters</strong>
+            Try changing the <strong>Time Range</strong> or{' '}
+            <strong>Removing Filters</strong>
           </>
         )
       default:
-        return <>{this.randomLoadingDescription}</>
+        return <>{this.timeBounds}</>
     }
   }
 
-  private get randomLoadingDescription(): string {
-    return _.sample(LoadingMessages)
+  private get loadingSpinner(): JSX.Element {
+    switch (this.props.status) {
+      case SearchStatus.NoResults:
+        return (
+          <div className="logs-viewer--search-graphic">
+            <div className="logs-viewer--graphic-empty" />
+          </div>
+        )
+      case SearchStatus.UpdatingFilters:
+      case SearchStatus.UpdatingTimeBounds:
+      case SearchStatus.UpdatingSource:
+      case SearchStatus.UpdatingNamespace:
+      case SearchStatus.Loading:
+        return (
+          <div className="logs-viewer--search-graphic">
+            <div className="logs-viewer--graphic-log" />
+            <div className="logs-viewer--graphic-magnifier-a">
+              <div className="logs-viewer--graphic-magnifier-b" />
+            </div>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  private get timeBounds(): JSX.Element {
+    return (
+      <div className="logs-viewer--searching-time">
+        from <strong>{formatTime(this.props.upper)}</strong> to{' '}
+        <strong>{formatTime(this.props.lower)}</strong>
+      </div>
+    )
   }
 
   private get loadingMessage(): string {
     switch (this.props.status) {
       case SearchStatus.UpdatingFilters:
-        return 'Updating search filters'
+        return 'Updating search filters...'
       case SearchStatus.NoResults:
         return 'No logs found'
       case SearchStatus.UpdatingTimeBounds:
-        return 'Searching time bounds'
+        return 'Searching time bounds...'
       case SearchStatus.UpdatingSource:
-        return 'Searching updated source'
+        return 'Searching updated source...'
       case SearchStatus.UpdatingNamespace:
-        return 'Searching updated namespace'
+        return 'Searching updated namespace...'
       case SearchStatus.Loading:
       default:
-        return 'Searching'
+        return 'Searching...'
     }
   }
 }
