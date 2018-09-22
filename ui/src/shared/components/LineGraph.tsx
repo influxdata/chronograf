@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent, CSSProperties} from 'react'
+import _ from 'lodash'
 import Dygraph from 'src/shared/components/Dygraph'
 import {withRouter, RouteComponentProps} from 'react-router'
 
@@ -83,25 +84,30 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
     data: TimeSeriesServerResponse[] | FluxTable[],
     dataType: DataType
   ) {
+    let timeSeries
     try {
-      const timeSeries = await this.convertToDygraphData(data, dataType)
+      timeSeries = await this.convertToDygraphData(data, dataType)
 
-      this.isValidData = await manager.validateDygraphData(
-        timeSeries.timeSeries
-      )
       if (!this.isComponentMounted) {
         return
       }
-
-      this.setState({timeSeries})
+      this.isValidData = await manager.validateDygraphData(
+        timeSeries.timeSeries
+      )
     } catch (err) {
       this.isValidData = false
     }
+
+    this.setState({timeSeries})
   }
 
-  public componentWillReceiveProps(nextProps: LineGraphProps) {
-    if (nextProps.loading === RemoteDataState.Done) {
-      this.parseTimeSeries(nextProps.data, nextProps.dataType)
+  public componentDidUpdate(prevProps: LineGraphProps) {
+    const isDataChanged =
+      prevProps.data.length !== this.props.data.length ||
+      !_.isEqual(_.get(prevProps, 'data.0.id'), _.get(this.props, 'data.0.id'))
+
+    if (this.props.loading === RemoteDataState.Done && isDataChanged) {
+      this.parseTimeSeries(this.props.data, this.props.dataType)
     }
   }
 
@@ -109,7 +115,6 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
     if (!this.isValidData) {
       return <InvalidData />
     }
-
     const {
       data,
       axes,

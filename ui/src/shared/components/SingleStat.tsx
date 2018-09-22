@@ -4,6 +4,8 @@ import getLastValues from 'src/shared/parsing/lastValues'
 import _ from 'lodash'
 import {manager} from 'src/worker/JobManager'
 
+import InvalidData from 'src/shared/components/InvalidData'
+
 import {SMALL_CELL_HEIGHT} from 'src/shared/graphs/helpers'
 import {DYGRAPH_CONTAINER_V_MARGIN} from 'src/shared/constants'
 import {generateThresholdsListHexs} from 'src/shared/constants/colorOperations'
@@ -32,6 +34,7 @@ interface State {
     values: number[]
     series: string[]
   }
+  isValidData: boolean
 }
 
 const NOOP = () => {}
@@ -49,7 +52,7 @@ class SingleStat extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    this.state = {}
+    this.state = {isValidData: true}
   }
 
   public async componentDidMount() {
@@ -72,6 +75,9 @@ class SingleStat extends PureComponent<Props, State> {
   }
 
   public render() {
+    if (!this.state.isValidData) {
+      return <InvalidData />
+    }
     if (!this.state.lastValues) {
       return <h3 className="graph-spinner" />
     }
@@ -223,8 +229,9 @@ class SingleStat extends PureComponent<Props, State> {
   private async dataToLastValues() {
     const {data, dataType} = this.props
 
+    let lastValues
+    let isValidData = true
     try {
-      let lastValues
       if (dataType === DataType.flux) {
         lastValues = await manager.fluxTablesToSingleStat(data as FluxTable[])
       } else if (dataType === DataType.influxQL) {
@@ -234,11 +241,10 @@ class SingleStat extends PureComponent<Props, State> {
       if (!this.isComponentMounted) {
         return
       }
-
-      this.setState({lastValues})
     } catch (err) {
-      console.error(err)
+      isValidData = false
     }
+    this.setState({lastValues, isValidData})
   }
 }
 
