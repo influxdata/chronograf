@@ -5,6 +5,13 @@ const DEFAULT_START_OPTIONS = {
     detect_anomalies: true,
 }
 
+export const getVersion = () => {
+    return AJAX({
+        url: '/loudml/api/',
+        excludeBasepath: true,
+    })
+}
+
 export const getModels = () => {
     return AJAX({
         url: '/loudml/api/models',

@@ -22,6 +22,7 @@ import {
     createModelHook as createModelHookApi,
     deleteModelHook as deleteModelHookApi,
     getDatasources as getDatasourcesApi,
+    getVersion as getVersionApi,
 } from 'src/loudml/apis'
 import {
     modelCreated as modelCreatedAction,
@@ -32,6 +33,7 @@ import ModelTabs from 'src/loudml/components/ModelTabs'
 import FeaturesUtils from 'src/loudml/components/FeaturesUtils'
 
 import {
+    notifyErrorGettingVersion,
     notifyErrorGettingModel,
     notifyModelCreated,
     notifyModelCreationFailed,
@@ -80,6 +82,7 @@ class ModelPage extends Component {
         )
 
         const cb = this.loadDatasources
+        this.getVersion()
 
         if (name&&model) {
             // Cloned (isEditing) or in state
@@ -179,6 +182,17 @@ class ModelPage extends Component {
                 </FancyScrollbar>
             </div>
         )
+    }
+
+    getVersion = async () => {
+        const {notify} = this.props
+
+        try {
+            const {data: {version}} = await getVersionApi()
+            this.setState({version})
+        } catch (error) {
+            notify(notifyErrorGettingVersion(parseError(error)))
+        }
     }
 
     loadDatasources = async () => {
@@ -340,6 +354,7 @@ class ModelPage extends Component {
             isEditing,
             annotation,
             datasources,
+            version,
         } = this.state
 
         const datasource = datasources.find(ds => ds.name === model.default_datasource)
@@ -414,7 +429,11 @@ class ModelPage extends Component {
                 name: 'About',
                 url: 'about',
                 enabled: true,
-                component: <AboutPanel />
+                component: (
+                    <AboutPanel
+                        version={version}
+                    />
+                )
             },
         ]
         

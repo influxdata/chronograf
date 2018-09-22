@@ -14,6 +14,11 @@ const notifyError = (duration, message) => ({
     message,
 })
 
+export const notifyErrorGettingVersion = message => notifyError(
+    TEN_SECONDS,
+    `cannot get api version: ${message}`,
+)
+
 export const notifyErrorGettingModel = message => notifyError(
     TEN_SECONDS,
     `cannot get model: ${message}`,
