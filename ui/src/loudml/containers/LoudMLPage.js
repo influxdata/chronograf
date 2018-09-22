@@ -176,6 +176,9 @@ class LoudMLPage extends Component {
         const copy = {
             ...models.find(m => m.settings.name === name).settings
         }
+        // cloned model is not running!
+        delete copy.run
+        
         copy.name = `Copy of ${name}`
         copy.isEditing = true
 
