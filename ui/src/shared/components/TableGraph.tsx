@@ -467,8 +467,24 @@ class TableGraph extends PureComponent<Props, State> {
   }
 
   private get fixFirstColumn(): boolean {
-    const {tableOptions} = this.props
+    const {tableOptions, fieldOptions} = this.props
     const {fixFirstColumn = DEFAULT_FIX_FIRST_COLUMN} = tableOptions
+
+    if (fieldOptions.length === 1) {
+      return false
+    }
+
+    const visibleFields = fieldOptions.reduce((acc, f) => {
+      if (f.visible) {
+        acc += 1
+      }
+      return acc
+    }, 0)
+
+    if (visibleFields === 1) {
+      return false
+    }
+
     return fixFirstColumn
   }
 
