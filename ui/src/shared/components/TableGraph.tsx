@@ -455,14 +455,15 @@ class TableGraph extends PureComponent<Props, State> {
       return {scrollToColumn: 0, scrollToRow: -1}
     }
 
-    const firstDiff = Math.abs(Number(hoverTime) - Number(sortedTimeVals[1])) // sortedTimeVals[0] is "time"
+    const firstDiff = this.getTimeDifference(hoverTime, sortedTimeVals[1]) // sortedTimeVals[0] is "time"
+
     const hoverTimeFound = fastReduce<
       TimeSeriesValue,
       {index: number; diff: number}
     >(
       sortedTimeVals,
       (acc, currentTime, index) => {
-        const thisDiff = Math.abs(Number(hoverTime) - Number(currentTime))
+        const thisDiff = this.getTimeDifference(hoverTime, currentTime)
         if (thisDiff < acc.diff) {
           return {index, diff: thisDiff}
         }
@@ -474,6 +475,10 @@ class TableGraph extends PureComponent<Props, State> {
     const scrollToColumn = this.isVerticalTimeAxis ? -1 : hoverTimeFound.index
     const scrollToRow = this.isVerticalTimeAxis ? hoverTimeFound.index : null
     return {scrollToRow, scrollToColumn}
+  }
+
+  private getTimeDifference(hoverTime, time: string | number) {
+    return Math.abs(parseInt(hoverTime, 10) - parseInt(time as string, 10))
   }
 
   private get isVerticalTimeAxis(): boolean {
@@ -675,15 +680,19 @@ class TableGraph extends PureComponent<Props, State> {
     const fieldName =
       foundField && (foundField.displayName || foundField.internalName)
 
+    const isHighlightedRow =
+      rowIndex === parent.props.scrollToRow ||
+      (rowIndex === hoveredRowIndex && hoveredRowIndex > 0)
+
+    const isHighlightedColumn =
+      columnIndex === hoveredColumnIndex && hoveredColumnIndex > 0
+
     const cellClass = classnames('table-graph-cell', {
       'table-graph-cell__fixed-row': isFixedRow,
       'table-graph-cell__fixed-column': isFixedColumn,
       'table-graph-cell__fixed-corner': isFixedCorner,
-      'table-graph-cell__highlight-row':
-        rowIndex === parent.props.scrollToRow ||
-        (rowIndex === hoveredRowIndex && hoveredRowIndex > 0),
-      'table-graph-cell__highlight-column':
-        columnIndex === hoveredColumnIndex && hoveredColumnIndex > 0,
+      'table-graph-cell__highlight-row': isHighlightedRow,
+      'table-graph-cell__highlight-column': isHighlightedColumn,
       'table-graph-cell__numerical': isNumerical,
       'table-graph-cell__field-name': isFieldName,
       'table-graph-cell__sort-asc': isFieldName && isSorted && isAscending,

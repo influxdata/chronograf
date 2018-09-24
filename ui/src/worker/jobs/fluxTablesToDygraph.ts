@@ -32,7 +32,7 @@ export const fluxTablesToDygraphWork = (
 
   for (const table of tablesByTime) {
     for (const [date, values] of Object.entries(table)) {
-      dygraphValuesByTime[date][DATE_INDEX] = new Date(date)
+      dygraphValuesByTime[date][DATE_INDEX] = new Date(Number(date))
 
       for (const [seriesName, value] of Object.entries(values)) {
         const i = allColumnNames.indexOf(seriesName) + DATE_INDEX_OFFSET

@@ -163,7 +163,7 @@ export interface Links {
 export interface FluxTable {
   id: string
   name: string
-  data: Array<Array<string | Date>>
+  data: Array<Array<string | number>>
   groupKey: {
     [columnName: string]: string
   }
