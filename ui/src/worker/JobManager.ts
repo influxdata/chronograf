@@ -2,10 +2,12 @@ import _ from 'lodash'
 import idGenerator from 'uuid'
 import Deferred from 'src/worker/Deferred'
 import DB from './Database'
-import {TimeSeriesServerResponse} from 'src/types/series'
+import {
+  TimeSeriesServerResponse,
+  TimeSeriesToTableGraphReturnType,
+} from 'src/types/series'
 import {DygraphValue, FluxTable} from 'src/types'
 import {getBasepath} from 'src/utils/basepath'
-import {TimeSeriesToTableGraphReturnType} from 'src/worker/jobs/timeSeriesToTableGraph'
 import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph'
 import {FluxTablesToDygraphResult} from 'src/worker/jobs/fluxTablesToDygraph'
 import {LastValues} from 'src/worker/jobs/fluxTablesToSingleStat'

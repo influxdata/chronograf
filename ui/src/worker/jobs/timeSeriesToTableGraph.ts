@@ -5,19 +5,10 @@ import {
   TimeSeries,
   TimeSeriesValue,
   InfluxQLQueryType,
+  TimeSeriesToTableGraphReturnType,
+  Label,
 } from 'src/types/series'
 import {fetchData} from 'src/worker/utils'
-
-interface Label {
-  label: string
-  seriesIndex: number
-  responseIndex: number
-}
-
-export interface TimeSeriesToTableGraphReturnType {
-  data: TimeSeriesValue[][]
-  sortedLabels: Label[]
-}
 
 const timeSeriesToTableData = (
   timeSeries: TimeSeries[],
@@ -61,10 +52,13 @@ export const timeSeriesToTableGraphWork = (
   return {
     data,
     sortedLabels,
+    influxQLQueryType: queryType,
   }
 }
 
-const timeSeriesToTableGraph = async msg => {
+const timeSeriesToTableGraph = async (
+  msg
+): Promise<TimeSeriesToTableGraphReturnType> => {
   const {raw} = await fetchData(msg)
   return timeSeriesToTableGraphWork(raw)
 }

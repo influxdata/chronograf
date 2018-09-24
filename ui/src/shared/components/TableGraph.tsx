@@ -6,6 +6,7 @@ import moment from 'moment'
 
 import {ColumnSizer, SizedColumnProps, AutoSizer} from 'react-virtualized'
 import {MultiGrid, PropsMultiGrid} from 'src/shared/components/MultiGrid'
+import InvalidData from 'src/shared/components/InvalidData'
 import {bindActionCreators} from 'redux'
 import {fastReduce} from 'src/utils/fast'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
@@ -26,7 +27,11 @@ import {
 } from 'src/shared/constants/tableGraph'
 import {generateThresholdsListHexs} from 'src/shared/constants/colorOperations'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {TimeSeriesServerResponse, TimeSeriesValue} from 'src/types/series'
+import {
+  TimeSeriesServerResponse,
+  TimeSeriesValue,
+  TimeSeriesToTableGraphReturnType,
+} from 'src/types/series'
 import {ColorString} from 'src/types/colors'
 import {
   TableOptions,
@@ -56,6 +61,11 @@ interface CellRendererProps {
   style: React.CSSProperties
 }
 
+enum ErrorTypes {
+  MetaQueryCombo = 'MetaQueryCombo',
+  GeneralError = 'Error',
+}
+
 interface Props {
   data: TimeSeriesServerResponse[] | FluxTable
   dataType: DataType
@@ -83,6 +93,7 @@ interface State {
   totalColumnWidths: number
   isTimeVisible: boolean
   shouldResize: boolean
+  invalidDataError: ErrorTypes
 }
 
 @ErrorHandling
@@ -113,6 +124,7 @@ class TableGraph extends PureComponent<Props, State> {
       totalColumnWidths: 0,
       isTimeVisible: true,
       timeColumnWidth: 0,
+      invalidDataError: null,
     }
   }
 
@@ -123,6 +135,10 @@ class TableGraph extends PureComponent<Props, State> {
     const rowCount = columnCount === 0 ? 0 : transformedData.length
     const fixedColumnCount = this.fixFirstColumn && columnCount > 1 ? 1 : 0
     const {scrollToColumn, scrollToRow} = this.scrollToColRow
+
+    if (this.state.invalidDataError) {
+      return <InvalidData message={this.invalidDataMessage} />
+    }
 
     return (
       <div
@@ -219,130 +235,28 @@ class TableGraph extends PureComponent<Props, State> {
 
     const sort: Sort = {field: sortField, direction: DEFAULT_SORT_DIRECTION}
 
-    const {data: resultData, sortedLabels} = await this.getTableGraphData(
-      data,
-      dataType
-    )
-
-    const computedFieldOptions = computeFieldOptions(
-      fieldOptions,
-      sortedLabels,
-      dataType
-    )
-
-    this.handleUpdateFieldOptions(computedFieldOptions)
-
-    const {
-      transformedData,
-      sortedTimeVals,
-      columnWidths,
-    } = await manager.tableTransform(
-      resultData,
-      sort,
-      computedFieldOptions,
-      tableOptions,
-      timeFormat,
-      decimalPlaces
-    )
-
-    const isTimeVisible = _.get(this.timeField, 'visible', false)
-
-    this.setState(
-      {
-        transformedData,
-        sortedTimeVals,
-        columnWidths: columnWidths.widths,
+    try {
+      const {
         data: resultData,
         sortedLabels,
-        totalColumnWidths: columnWidths.totalWidths,
-        hoveredColumnIndex: NULL_ARRAY_INDEX,
-        hoveredRowIndex: NULL_ARRAY_INDEX,
-        sort,
-        isTimeVisible,
-      },
-      () => {
-        window.setTimeout(() => {
-          this.forceUpdate()
-        }, 0)
-      }
-    )
-  }
+        influxQLQueryType,
+      } = await this.getTableGraphData(data, dataType)
 
-  public async componentWillReceiveProps(nextProps: Props) {
-    const {sort} = this.state
+      const computedFieldOptions = computeFieldOptions(
+        fieldOptions,
+        sortedLabels,
+        dataType,
+        influxQLQueryType
+      )
 
-    let result = {}
-    const hasDataChanged = this.hasDataChanged(nextProps.data)
-    if (hasDataChanged) {
-      result = await this.getTableGraphData(nextProps.data, nextProps.dataType)
-    }
-    const data = _.get(result, 'data', this.state.data)
-
-    if (_.isEmpty(data[0])) {
-      return
-    }
-
-    const updatedProps = _.keys(_.omit(nextProps, 'data')).filter(
-      k => !_.isEqual(this.props[k], nextProps[k])
-    )
-
-    const {
-      tableOptions,
-      fieldOptions,
-      timeFormat,
-      decimalPlaces,
-      dataType,
-    } = nextProps
-
-    const sortedLabels = _.get(result, 'sortedLabels', this.state.sortedLabels)
-    const computedFieldOptions = computeFieldOptions(
-      fieldOptions,
-      sortedLabels,
-      dataType
-    )
-
-    if (hasDataChanged) {
       this.handleUpdateFieldOptions(computedFieldOptions)
-    }
 
-    let sortField = _.get(tableOptions, 'sortBy.internalName', '')
-
-    const isValidSortField = !!fieldOptions.find(
-      f => f.internalName === sortField
-    )
-
-    const defaultTimeField = getDefaultTimeField(dataType)
-
-    if (!isValidSortField) {
-      const timeField = fieldOptions.find(
-        f => f.internalName === defaultTimeField.internalName
-      )
-      sortField = _.get(
-        timeField,
-        'internalName',
-        _.get(fieldOptions, '0.internalName', '')
-      )
-    }
-
-    if (
-      _.get(this.props, 'tableOptions.sortBy.internalName', '') !== sortField
-    ) {
-      sort.direction = DEFAULT_SORT_DIRECTION
-      sort.field = sortField
-    }
-
-    if (
-      hasDataChanged ||
-      _.includes(updatedProps, 'tableOptions') ||
-      _.includes(updatedProps, 'fieldOptions') ||
-      _.includes(updatedProps, 'timeFormat')
-    ) {
       const {
         transformedData,
         sortedTimeVals,
         columnWidths,
       } = await manager.tableTransform(
-        data,
+        resultData,
         sort,
         computedFieldOptions,
         tableOptions,
@@ -350,29 +264,153 @@ class TableGraph extends PureComponent<Props, State> {
         decimalPlaces
       )
 
-      let isTimeVisible = this.state.isTimeVisible
-      if (_.includes(updatedProps, 'fieldOptions')) {
-        const timeField = _.find(nextProps.fieldOptions, f => {
-          return f.internalName === defaultTimeField.internalName
-        })
-        isTimeVisible = _.get(timeField, 'visible', false)
-      }
+      const isTimeVisible = _.get(this.timeField, 'visible', false)
 
-      if (!this.isComponentMounted) {
+      this.setState(
+        {
+          transformedData,
+          sortedTimeVals,
+          columnWidths: columnWidths.widths,
+          data: resultData,
+          sortedLabels,
+          totalColumnWidths: columnWidths.totalWidths,
+          hoveredColumnIndex: NULL_ARRAY_INDEX,
+          hoveredRowIndex: NULL_ARRAY_INDEX,
+          sort,
+          isTimeVisible,
+          invalidDataError: null,
+        },
+        () => {
+          window.setTimeout(() => {
+            this.forceUpdate()
+          }, 0)
+        }
+      )
+    } catch (e) {
+      this.handleError(e)
+    }
+  }
+
+  public async componentWillReceiveProps(nextProps: Props) {
+    const {sort} = this.state
+
+    let result: TimeSeriesToTableGraphReturnType
+    const hasDataChanged = this.hasDataChanged(nextProps.data)
+
+    try {
+      if (hasDataChanged) {
+        result = await this.getTableGraphData(
+          nextProps.data,
+          nextProps.dataType
+        )
+      }
+      const data = _.get(result, 'data', this.state.data)
+      const influxQLQueryType = _.get(result, 'influxQLQueryType', null)
+
+      if (_.isEmpty(data[0])) {
         return
       }
 
-      this.setState({
-        data,
+      const updatedProps = _.keys(_.omit(nextProps, 'data')).filter(
+        k => !_.isEqual(this.props[k], nextProps[k])
+      )
+
+      const {
+        tableOptions,
+        fieldOptions,
+        timeFormat,
+        decimalPlaces,
+        dataType,
+      } = nextProps
+
+      const sortedLabels = _.get(
+        result,
+        'sortedLabels',
+        this.state.sortedLabels
+      )
+      const computedFieldOptions = computeFieldOptions(
+        fieldOptions,
         sortedLabels,
-        transformedData,
-        sortedTimeVals,
-        sort,
-        columnWidths: columnWidths.widths,
-        totalColumnWidths: columnWidths.totalWidths,
-        isTimeVisible,
-        shouldResize: true,
-      })
+        dataType,
+        influxQLQueryType
+      )
+
+      if (hasDataChanged) {
+        this.handleUpdateFieldOptions(computedFieldOptions)
+      }
+
+      let sortField = _.get(tableOptions, 'sortBy.internalName', '')
+
+      const isValidSortField = !!fieldOptions.find(
+        f => f.internalName === sortField
+      )
+
+      const defaultTimeField = getDefaultTimeField(dataType)
+
+      if (!isValidSortField) {
+        const timeField = fieldOptions.find(
+          f => f.internalName === defaultTimeField.internalName
+        )
+        sortField = _.get(
+          timeField,
+          'internalName',
+          _.get(fieldOptions, '0.internalName', '')
+        )
+      }
+
+      if (
+        _.get(this.props, 'tableOptions.sortBy.internalName', '') !== sortField
+      ) {
+        sort.direction = DEFAULT_SORT_DIRECTION
+        sort.field = sortField
+      }
+
+      if (
+        hasDataChanged ||
+        _.includes(updatedProps, 'tableOptions') ||
+        _.includes(updatedProps, 'fieldOptions') ||
+        _.includes(updatedProps, 'timeFormat')
+      ) {
+        const {
+          transformedData,
+          sortedTimeVals,
+          columnWidths,
+        } = await manager.tableTransform(
+          data,
+          sort,
+          computedFieldOptions,
+          tableOptions,
+          timeFormat,
+          decimalPlaces
+        )
+
+        let isTimeVisible = this.state.isTimeVisible
+        if (_.includes(updatedProps, 'fieldOptions')) {
+          const timeField = _.find(nextProps.fieldOptions, f => {
+            return f.internalName === defaultTimeField.internalName
+          })
+          isTimeVisible = _.get(timeField, 'visible', false)
+        }
+
+        if (!this.isComponentMounted) {
+          return
+        }
+
+        this.setState({
+          data,
+          sortedLabels,
+          transformedData,
+          sortedTimeVals,
+          sort,
+          columnWidths: columnWidths.widths,
+          totalColumnWidths: columnWidths.totalWidths,
+          isTimeVisible,
+          shouldResize: true,
+          invalidDataError: null,
+        })
+      }
+    } catch (e) {
+      this.handleError(e)
     }
   }
 
@@ -404,6 +442,28 @@ class TableGraph extends PureComponent<Props, State> {
       _.get(this.props.data, 'id', null)
 
     return newUUID !== oldUUID || !!this.props.editorLocation
+  }
+
+  private handleError(e: Error): void {
+    let invalidDataError: ErrorTypes
+    switch (e.toString()) {
+      case 'Error: Cannot display meta and data query':
+        invalidDataError = ErrorTypes.MetaQueryCombo
+        break
+      default:
+        invalidDataError = ErrorTypes.GeneralError
+        break
+    }
+    this.setState({invalidDataError})
+  }
+
+  private get invalidDataMessage(): string {
+    switch (this.state.invalidDataError) {
+      case ErrorTypes.MetaQueryCombo:
+        return 'Cannot display data for meta queries mixed with data queries'
+      default:
+        return null
+    }
   }
 
   private get fixFirstColumn(): boolean {
@@ -729,11 +789,12 @@ class TableGraph extends PureComponent<Props, State> {
   private async getTableGraphData(
     data: TimeSeriesServerResponse[] | FluxTable,
     dataType: DataType
-  ): Promise<{data: TimeSeriesValue[][]; sortedLabels: Label[]}> {
+  ): Promise<TimeSeriesToTableGraphReturnType> {
     if (dataType === DataType.influxQL) {
       const result = await timeSeriesToTableGraph(
         data as TimeSeriesServerResponse[]
       )
+
       return result
     } else {
       const resultData = (data as FluxTable).data
@@ -746,6 +807,7 @@ class TableGraph extends PureComponent<Props, State> {
       return {data: resultData, sortedLabels} as {
         data: TimeSeriesValue[][]
         sortedLabels: Label[]
+        influxQLQueryType: null
       }
     }
   }
