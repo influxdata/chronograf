@@ -454,15 +454,15 @@ describe('timeSeriesToTableGraph', () => {
 
     const actual = timeSeriesToTableGraph(influxResponse)
     const expected = [
-      ['time', 'measurements.name'],
-      [null, 'cpu'],
-      [null, 'disk'],
-      [null, 'diskio'],
-      [null, 'mem'],
-      [null, 'processes'],
-      [null, 'swap'],
-      [null, 'syslog'],
-      [null, 'system'],
+      ['measurements.name'],
+      ['cpu'],
+      ['disk'],
+      ['diskio'],
+      ['mem'],
+      ['processes'],
+      ['swap'],
+      ['syslog'],
+      ['system'],
     ]
 
     expect(actual.data).toEqual(expected)
