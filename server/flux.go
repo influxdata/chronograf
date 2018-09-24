@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bouk/httprouter"
+	"github.com/influxdata/flux/ast"
 	_ "github.com/influxdata/flux/builtin"
 	"github.com/influxdata/flux/complete"
 	"github.com/influxdata/flux/parser"
@@ -96,6 +97,12 @@ type ASTRequest struct {
 	Body string `json:"body"`
 }
 
+type ASTResponse struct {
+	Valid bool         `json:"valid"`
+	AST   *ast.Program `json:"ast"`
+	Error string       `json:"error"`
+}
+
 func (s *Service) FluxAST(w http.ResponseWriter, r *http.Request) {
 	var request ASTRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -105,8 +112,10 @@ func (s *Service) FluxAST(w http.ResponseWriter, r *http.Request) {
 
 	ast, err := parser.NewAST(request.Body)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error(), s.Logger)
+		resp := ASTResponse{Valid: false, AST: nil, Error: err.Error()}
+		encodeJSON(w, http.StatusOK, resp, s.Logger)
+	} else {
+		resp := ASTResponse{Valid: true, AST: ast, Error: ""}
+		encodeJSON(w, http.StatusOK, resp, s.Logger)
 	}
-
-	encodeJSON(w, http.StatusOK, ast, s.Logger)
 }
