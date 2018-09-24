@@ -270,6 +270,33 @@ describe('timeSeriesToDygraph', () => {
   })
 })
 
+it('parses a single field influxQL query', () => {
+  const influxResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'm1',
+                columns: ['time', 'f1'],
+                values: [[100, 1], [3000, 3], [200, 2]],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ]
+
+  const actual = timeSeriesToTableGraph(influxResponse)
+
+  const expected = [['time', 'm1.f1'], [100, 1], [200, 2], [3000, 3]]
+
+  expect(actual.data).toEqual(expected)
+})
+
 describe('timeSeriesToTableGraph', () => {
   it('parses raw data into a nested array of data', () => {
     const influxResponse = [

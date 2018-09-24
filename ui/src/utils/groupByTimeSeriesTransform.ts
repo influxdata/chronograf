@@ -15,6 +15,7 @@ import {
   TimeSeriesValue,
   TimeSeriesSuccessfulResult,
   TimeSeries,
+  InfluxQLQueryType,
 } from 'src/types/series'
 import {getDeep} from 'src/utils/wrappers'
 
@@ -156,9 +157,16 @@ const constructSerieses = (results: Result[]): Series[] => {
 
 const constructCells = (
   serieses: Series[]
-): {cells: Cells; sortedLabels: Label[]; seriesLabels: Label[][]} => {
+): {
+  cells: Cells
+  sortedLabels: Label[]
+  seriesLabels: Label[][]
+  queryType: InfluxQLQueryType
+} => {
   let cellIndex = 0
   let labels: Label[] = []
+  let isMetaQuery = false
+  let isDataQuery = false
   const seriesLabels: Label[][] = []
   const cells: Cells = {
     label: [],
@@ -224,6 +232,7 @@ const constructCells = (
             cells.label[cellIndex] = unsortedLabels[i].label
             cells.value[cellIndex] = value
             cells.time[cellIndex] = time
+            isDataQuery = true
             cells.seriesIndex[cellIndex] = seriesIndex
             cells.responseIndex[cellIndex] = responseIndex
             cellIndex++ // eslint-disable-line no-plusplus
@@ -247,6 +256,7 @@ const constructCells = (
           cells.label[cellIndex] = label
           cells.value[cellIndex] = value
           cells.time[cellIndex] = null
+          isMetaQuery = true
           cells.seriesIndex[cellIndex] = seriesIndex
           cells.responseIndex[cellIndex] = responseIndex
           cellIndex++ // eslint-disable-line no-plusplus
@@ -255,8 +265,18 @@ const constructCells = (
     }
   )
 
+  let queryType: InfluxQLQueryType
+
+  if (isMetaQuery && isDataQuery) {
+    queryType = InfluxQLQueryType.ComboQuery
+  } else if (isMetaQuery) {
+    queryType = InfluxQLQueryType.MetaQuery
+  } else {
+    queryType = InfluxQLQueryType.DataQuery
+  }
+
   const sortedLabels = _.sortBy(labels, 'label')
-  return {cells, sortedLabels, seriesLabels}
+  return {cells, sortedLabels, seriesLabels, queryType}
 }
 
 const insertGroupByValues = (
@@ -362,10 +382,17 @@ const constructTimeSeries = (
 export const groupByTimeSeriesTransform = (
   raw: TimeSeriesServerResponse[],
   isTable: boolean
-): {sortedLabels: Label[]; sortedTimeSeries: TimeSeries[]} => {
+): {
+  sortedLabels: Label[]
+  sortedTimeSeries: TimeSeries[]
+  queryType: InfluxQLQueryType
+} => {
   const results = constructResults(raw, isTable)
   const serieses = constructSerieses(results)
-  const {cells, sortedLabels, seriesLabels} = constructCells(serieses)
+  const {cells, sortedLabels, seriesLabels, queryType} = constructCells(
+    serieses
+  )
+
   const sortedTimeSeries = constructTimeSeries(
     serieses,
     cells,
@@ -375,5 +402,6 @@ export const groupByTimeSeriesTransform = (
   return {
     sortedLabels,
     sortedTimeSeries,
+    queryType,
   }
 }

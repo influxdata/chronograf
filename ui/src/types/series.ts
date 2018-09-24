@@ -33,3 +33,9 @@ export interface TimeSeries {
   time: TimeSeriesValue
   values: TimeSeriesValue[]
 }
+
+export enum InfluxQLQueryType {
+  MetaQuery = 'MetaQuery',
+  DataQuery = 'DataQuery',
+  ComboQuery = 'CombinationQuery',
+}
