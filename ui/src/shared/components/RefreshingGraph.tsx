@@ -11,13 +11,13 @@ import SingleStat from 'src/shared/components/SingleStat'
 import MarkdownCell from 'src/shared/components/MarkdownCell'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 import TimeMachineTables from 'src/flux/components/TimeMachineTables'
+import RawFluxDataTable from 'src/shared/components/TimeMachine/RawFluxDataTable'
 
 // Constants
 import {emptyGraphCopy} from 'src/shared/copy/cell'
 import {
   DEFAULT_TIME_FORMAT,
   DEFAULT_DECIMAL_PLACES,
-  DEFAULT_TABLE_OPTIONS,
 } from 'src/dashboards/constants'
 import {DataType} from 'src/shared/constants'
 
@@ -49,7 +49,6 @@ import {
   NoteVisibility,
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-import {VisType} from 'src/types/flux'
 import {TimeSeriesServerResponse} from 'src/types/series'
 
 interface TypeAndData {
@@ -65,6 +64,7 @@ interface Props {
   timeRange: TimeRange
   colors: ColorString[]
   templates: Template[]
+  showRawFluxData?: boolean
   tableOptions: TableOptions
   fieldOptions: FieldOption[]
   decimalPlaces: DecimalPlaces
@@ -82,8 +82,6 @@ interface Props {
   onSetResolution: () => void
   handleSetHoverTime: () => void
   onNotify: typeof notify
-  rawData?: FluxTable[]
-  visType?: VisType
   grabDataForDownload?: GrabDataForDownloadHandler
   grabFluxData?: (data: FluxTable[]) => void
   cellNote: string
@@ -118,19 +116,16 @@ class RefreshingGraph extends PureComponent<Props> {
       type,
       source,
       inView,
-      colors,
-      visType,
-      rawData,
       service,
       queries,
       cellNote,
       onNotify,
       timeRange,
       templates,
-      fieldOptions,
       grabFluxData,
       manualRefresh,
       autoRefresher,
+      showRawFluxData,
       editQueryStatus,
       cellNoteVisibility,
       grabDataForDownload,
@@ -146,23 +141,6 @@ class RefreshingGraph extends PureComponent<Props> {
 
     if (type === CellType.Note) {
       return <MarkdownCell text={cellNote} />
-    }
-
-    const defaultFieldOptions = fieldOptions.map(f => {
-      return {...f, displayName: '', visible: true}
-    })
-    if (visType === VisType.Table) {
-      return (
-        <TimeMachineTables
-          data={rawData}
-          dataType={DataType.flux}
-          tableOptions={DEFAULT_TABLE_OPTIONS}
-          timeFormat={DEFAULT_TIME_FORMAT}
-          decimalPlaces={DEFAULT_DECIMAL_PLACES}
-          fieldOptions={defaultFieldOptions}
-          colors={colors}
-        />
-      )
     }
 
     return (
@@ -184,7 +162,11 @@ class RefreshingGraph extends PureComponent<Props> {
         cellNote={cellNote}
         cellNoteVisibility={cellNoteVisibility}
       >
-        {({timeSeriesInfluxQL, timeSeriesFlux, loading}) => {
+        {({timeSeriesInfluxQL, timeSeriesFlux, rawFluxData, loading}) => {
+          if (showRawFluxData) {
+            return <RawFluxDataTable csv={rawFluxData} />
+          }
+
           switch (type) {
             case CellType.SingleStat:
               return this.singleStat(timeSeriesInfluxQL, timeSeriesFlux)
@@ -208,6 +190,7 @@ class RefreshingGraph extends PureComponent<Props> {
       'fieldOptions',
       'decimalPlaces',
       'timeFormat',
+      'showRawFluxData',
     ]
 
     const prevVisValues = _.pick(prevProps, visProps)

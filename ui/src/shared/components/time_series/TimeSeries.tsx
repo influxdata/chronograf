@@ -46,6 +46,7 @@ export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 interface RenderProps {
   timeSeriesInfluxQL: TimeSeriesServerResponse[]
   timeSeriesFlux: FluxTable[]
+  rawFluxData: string
   loading: RemoteDataState
 }
 
@@ -72,6 +73,7 @@ interface State {
   timeRange: TimeRange
   loading: RemoteDataState
   isFirstFetch: boolean
+  rawFluxData: string
   timeSeriesInfluxQL: TimeSeriesServerResponse[]
   timeSeriesFlux: FluxTable[]
 }
@@ -126,6 +128,7 @@ class TimeSeries extends Component<Props, State> {
       loading: RemoteDataState.NotStarted,
       isFirstFetch: true,
       timeSeriesFlux: [],
+      rawFluxData: '',
     }
   }
 
@@ -192,6 +195,7 @@ class TimeSeries extends Component<Props, State> {
     const {
       timeSeriesInfluxQL,
       timeSeriesFlux,
+      rawFluxData,
       loading,
       isFirstFetch,
     } = this.state
@@ -231,7 +235,12 @@ class TimeSeries extends Component<Props, State> {
     return (
       <>
         {this.loadingDots}
-        {this.props.children({timeSeriesInfluxQL, timeSeriesFlux, loading})}
+        {this.props.children({
+          timeSeriesInfluxQL,
+          timeSeriesFlux,
+          rawFluxData,
+          loading,
+        })}
       </>
     )
   }
@@ -280,6 +289,7 @@ class TimeSeries extends Component<Props, State> {
 
     let timeSeriesInfluxQL: TimeSeriesServerResponse[] = []
     let timeSeriesFlux: FluxTable[] = []
+    let rawFluxData = ''
     let responseUUID: string
 
     this.setState({loading: RemoteDataState.Loading})
@@ -290,6 +300,7 @@ class TimeSeries extends Component<Props, State> {
         const results = await this.executeFluxQuery()
 
         timeSeriesFlux = results.tables
+        rawFluxData = results.csv
         responseUUID = results.uuid
       } else {
         timeSeriesInfluxQL = await this.executeInfluxQLQueries()
@@ -312,6 +323,7 @@ class TimeSeries extends Component<Props, State> {
     this.setState({
       timeSeriesInfluxQL,
       timeSeriesFlux,
+      rawFluxData,
       isFirstFetch: false,
     })
 

@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 // Components
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
-import Visualization from 'src/dashboards/components/Visualization'
+import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 import InfluxQLQueryMaker from 'src/shared/components/TimeMachine/InfluxQLQueryMaker'
 import DisplayOptions from 'src/dashboards/components/DisplayOptions'
 import TimeMachineBottom from 'src/shared/components/TimeMachine/TimeMachineBottom'
@@ -28,6 +28,7 @@ import {
 } from 'src/flux/helpers/scriptBuilder'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
+import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
 // Actions
 import {validateSuccess} from 'src/shared/copy/notifications'
@@ -65,9 +66,8 @@ import {
   Context,
   DeleteFuncNodeArgs,
   ScriptStatus,
-  VisType,
 } from 'src/types/flux'
-
+import {ColorString} from 'src/types/colors'
 import {VisualizationOptions} from 'src/types/dataExplorer'
 
 interface Props {
@@ -122,13 +122,13 @@ interface State {
   script: string
   lastScript: string
   ast: object
-  visType: VisType
   data: FluxTable[]
   status: ScriptStatus
   selectedSource: Source
   activeQueryIndex: number
   activeEditorTab: CEOTabs
   selectedService: Service
+  isViewingRawData: boolean
   suggestions: Suggestion[]
   autoRefresher: AutoRefresher
   autoRefreshDuration: number // milliseconds
@@ -162,7 +162,7 @@ class TimeMachine extends PureComponent<Props, State> {
       lastScript: '',
       autoRefresher: new AutoRefresher(),
       autoRefreshDuration: 0,
-      visType: VisType.Graph,
+      isViewingRawData: false,
     }
 
     this.debouncedASTResponse = _.debounce(script => {
@@ -208,7 +208,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
   public render() {
     const {services, timeRange, templates, isInCEO, script} = this.props
-    const {autoRefreshDuration} = this.state
+    const {autoRefreshDuration, isViewingRawData} = this.state
 
     const horizontalDivisions = [
       {
@@ -216,7 +216,7 @@ class TimeMachine extends PureComponent<Props, State> {
         handleDisplay: 'none',
         headerButtons: [],
         menuOptions: [],
-        render: () => this.visualization,
+        render: this.renderVisualization,
         headerOrientation: HANDLE_HORIZONTAL,
         size: 0.33,
       },
@@ -225,7 +225,7 @@ class TimeMachine extends PureComponent<Props, State> {
         handlePixels: 8,
         headerButtons: [],
         menuOptions: [],
-        render: () => this.editorBottom,
+        render: this.renderEditorBottom,
         headerOrientation: HANDLE_HORIZONTAL,
         size: 0.67,
       },
@@ -237,16 +237,16 @@ class TimeMachine extends PureComponent<Props, State> {
         <TimeMachineControls
           queries={this.queriesWorkingDraft}
           templates={templates}
-          visType={this.visType}
           source={this.source}
           toggleFlux={this.toggleFlux}
           sources={this.formattedSources}
           service={this.service}
           services={services}
           isFluxSource={this.isFluxSource}
+          isViewingRawData={isViewingRawData}
           script={script}
           sourceSupportsFlux={this.sourceSupportsFlux}
-          toggleVisType={this.toggleVisType}
+          toggleIsViewingRawData={this.handleToggleIsViewingRawData}
           autoRefreshDuration={autoRefreshDuration}
           onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
           onChangeService={this.handleChangeService}
@@ -266,38 +266,75 @@ class TimeMachine extends PureComponent<Props, State> {
     )
   }
 
-  private get visualization() {
+  private renderVisualization = () => {
     const {
       timeRange,
       templates,
       isStaticLegend,
       manualRefresh,
-      visualizationOptions,
+      visualizationOptions: {
+        type,
+        axes,
+        tableOptions,
+        fieldOptions,
+        timeFormat,
+        decimalPlaces,
+        note,
+        noteVisibility,
+        thresholdsListColors,
+        thresholdsListType,
+        gaugeColors,
+        lineColors,
+      },
     } = this.props
-    const {autoRefresher, data} = this.state
+    const {autoRefresher, isViewingRawData} = this.state
+
+    const colors: ColorString[] = getCellTypeColors({
+      cellType: type,
+      gaugeColors,
+      thresholdsListColors,
+      lineColors,
+    })
 
     return (
       <div className="deceo--top">
-        <Visualization
-          source={this.source}
-          service={this.service}
-          timeRange={timeRange}
-          templates={templates}
-          autoRefresher={autoRefresher}
-          queries={this.queriesForVis}
-          visType={this.visType}
-          rawData={data}
-          editQueryStatus={this.handleEditQueryStatus}
-          staticLegend={isStaticLegend}
-          manualRefresh={manualRefresh}
-          editorLocation={this.stateToUpdate}
-          {...visualizationOptions}
-        />
+        <div className="deceo--visualization">
+          <div className="graph-container">
+            <RefreshingGraph
+              source={this.source}
+              service={this.service}
+              colors={colors}
+              autoRefresher={autoRefresher}
+              queries={this.queriesForVis}
+              templates={templates}
+              editQueryStatus={this.handleEditQueryStatus}
+              staticLegend={isStaticLegend}
+              timeRange={timeRange}
+              manualRefresh={manualRefresh}
+              editorLocation={this.stateToUpdate}
+              showRawFluxData={isViewingRawData}
+              type={type}
+              axes={axes}
+              tableOptions={tableOptions}
+              fieldOptions={fieldOptions}
+              timeFormat={timeFormat}
+              decimalPlaces={decimalPlaces}
+              note={note}
+              noteVisibility={noteVisibility}
+              thresholdsListColors={thresholdsListColors}
+              thresholdsListType={thresholdsListType}
+              gaugeColors={gaugeColors}
+              lineColors={lineColors}
+              cellNote={note}
+              cellNoteVisibility={noteVisibility}
+            />
+          </div>
+        </div>
       </div>
     )
   }
 
-  private get editorBottom(): JSX.Element {
+  private renderEditorBottom = (): JSX.Element => {
     return <TimeMachineBottom>{this.editorTab}</TimeMachineBottom>
   }
 
@@ -327,10 +364,6 @@ class TimeMachine extends PureComponent<Props, State> {
         {...visualizationOptions}
       />
     )
-  }
-
-  private get visType(): VisType {
-    return this.state.visType
   }
 
   private get pageHeader(): JSX.Element {
@@ -933,11 +966,8 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
-  private toggleVisType = (): void => {
-    const newVisType =
-      this.state.visType === VisType.Graph ? VisType.Table : VisType.Graph
-
-    this.setState({visType: newVisType})
+  private handleToggleIsViewingRawData = (): void => {
+    this.setState({isViewingRawData: !this.state.isViewingRawData})
   }
 
   private toggleFlux = (): void => {
