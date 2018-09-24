@@ -15,17 +15,16 @@ import buildQueries from 'src/utils/buildQueriesForGraphs'
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Service, Template} from 'src/types'
-import {VisType} from 'src/types/flux'
 
 interface Props {
   isInCEO: boolean
-  visType: VisType
   isFluxSource: boolean
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
   service: Service
   services: Service[]
   script: string
+  isViewingRawData: boolean
   isDynamicSourceSelected: boolean
   onChangeService: (service: Service, source: SourcesModels.Source) => void
   autoRefreshDuration: number
@@ -36,8 +35,8 @@ interface Props {
   onSelectDynamicSource: () => void
   timeRange: QueriesModels.TimeRange
   updateEditorTimeRange: (timeRange: QueriesModels.TimeRange) => void
-  toggleVisType: () => void
   toggleFlux: () => void
+  toggleIsViewingRawData: () => void
 }
 
 const TimeMachineControls: SFC<Props> = ({
@@ -46,19 +45,19 @@ const TimeMachineControls: SFC<Props> = ({
   sources,
   service,
   queries,
-  visType,
   templates,
   isInCEO,
   services,
   timeRange,
   toggleFlux,
   isFluxSource,
-  toggleVisType,
+  isViewingRawData,
   autoRefreshDuration,
   onChangeAutoRefreshDuration,
   onChangeService,
   sourceSupportsFlux,
   onSelectDynamicSource,
+  toggleIsViewingRawData,
   isDynamicSourceSelected,
   updateEditorTimeRange,
 }) => {
@@ -82,8 +81,8 @@ const TimeMachineControls: SFC<Props> = ({
       {isFluxSource && (
         <div className="time-machine-vis--raw-toggle">
           <SlideToggle
-            active={visType === VisType.Table}
-            onChange={toggleVisType}
+            active={isViewingRawData}
+            onChange={toggleIsViewingRawData}
             size={ComponentSize.ExtraSmall}
           />
           View Raw Data

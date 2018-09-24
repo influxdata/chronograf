@@ -21,15 +21,25 @@ export const parseResponseError = (response: string): FluxTable[] => {
 }
 
 export const parseResponse = (response: string): FluxTable[] => {
+  const chunks = parseChunks(response)
+  const tables = chunks.reduce(
+    (acc, chunk) => [...acc, ...parseTables(chunk)],
+    []
+  )
+
+  return tables
+}
+
+const parseChunks = (response: string): string[] => {
   const trimmedResponse = response.trim()
 
   if (_.isEmpty(trimmedResponse)) {
     return []
   }
 
-  return trimmedResponse.split(/\n\s*\n/).reduce((acc, chunk) => {
-    return [...acc, ...parseTables(chunk)]
-  }, [])
+  const chunks = trimmedResponse.split(/\n\s*\n/)
+
+  return chunks
 }
 
 export const parseTables = (responseChunk: string): FluxTable[] => {
@@ -114,4 +124,27 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
   })
 
   return tables
+}
+
+interface ParseResponseRawResult {
+  data: string[][]
+  maxColumnCount: number
+}
+
+export const parseResponseRaw = (response: string): ParseResponseRawResult => {
+  const chunks = parseChunks(response)
+  const parsedChunks = chunks.map(c => Papa.parse(c).data)
+  const maxColumnCount = Math.max(...parsedChunks.map(c => c[0].length))
+  const data = []
+
+  for (let i = 0; i < parsedChunks.length; i++) {
+    if (i !== 0) {
+      // Seperate each chunk by an empty line, just like in the unparsed CSV
+      data.push([])
+    }
+
+    data.push(...parsedChunks[i])
+  }
+
+  return {data, maxColumnCount}
 }

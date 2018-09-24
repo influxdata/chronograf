@@ -84,6 +84,7 @@ export const getRawTimeSeries = async (
 export interface GetTimeSeriesResult {
   didTruncate: boolean
   tables: FluxTable[]
+  csv: string
   uuid?: string
 }
 
@@ -104,15 +105,18 @@ export const getTimeSeries = async (
   try {
     const response = {
       tables,
+      csv,
       didTruncate,
       uuid: responseUUID,
     }
+
     return response
   } catch (error) {
     console.error('Could not parse response body', error)
 
     return {
       // REVIEW: Why is this being returned as a `FluxTable[]`?
+      csv,
       tables: parseResponseError(csv),
       didTruncate: false,
     }
