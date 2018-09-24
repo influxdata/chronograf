@@ -40,7 +40,11 @@ export const getAST = async (request: ASTRequest) => {
     throw new Error('Failed to parse query')
   }
 
-  return data
+  if (!data.valid) {
+    throw new Error(data.error)
+  }
+
+  return data.ast
 }
 
 export interface GetRawTimeSeriesResult {
