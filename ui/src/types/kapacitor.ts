@@ -228,8 +228,10 @@ export interface RuleMessageTemplate {
   taskName: RuleMessage
   group: RuleMessage
   tags: RuleMessage
+  tag: RuleMessage
   level: RuleMessage
   fields: RuleMessage
+  field: RuleMessage
   time: RuleMessage
 }
 

@@ -9,6 +9,7 @@ import ValuesSection from 'src/kapacitor/components/ValuesSection'
 import RuleHeaderSave from 'src/kapacitor/components/RuleHeaderSave'
 import RuleHandlers from 'src/kapacitor/components/RuleHandlers'
 import RuleMessage from 'src/kapacitor/components/RuleMessage'
+import isValidMessage from 'src/kapacitor/utils/alertMessageValidation'
 
 import {createRule, editRule} from 'src/kapacitor/apis'
 import buildInfluxQLQuery from 'src/utils/influxql'
@@ -232,6 +233,10 @@ class KapacitorRule extends Component<Props, State> {
 
     if (!rule.values.value) {
       return notifyAlertRuleRequiresConditionValue()
+    }
+
+    if (rule.message && !isValidMessage(rule.message)) {
+      return 'Please correct template values in the alert message.'
     }
 
     return ''

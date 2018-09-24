@@ -6,7 +6,7 @@ import {LINE_COLORS_RULE_GRAPH} from 'src/shared/constants/graphColorPalettes'
 
 // Utils
 import buildQueries from 'src/utils/buildQueriesForGraphs'
-import underlayCallback from 'src/kapacitor/helpers/ruleGraphUnderlay'
+import underlayCallback from 'src/kapacitor/utils/ruleGraphUnderlay'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
 import {
