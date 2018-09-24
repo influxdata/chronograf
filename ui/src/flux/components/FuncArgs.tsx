@@ -23,8 +23,20 @@ interface Props {
   setWasFuncSelectorClicked: (val: boolean) => void
 }
 
+interface State {
+  selectedArg: string
+}
+
 @ErrorHandling
-export default class FuncArgs extends PureComponent<Props> {
+export default class FuncArgs extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {
+      selectedArg: getDeep<string>(props.func, 'args.0.key', ''),
+    }
+  }
+
   public render() {
     const {onStopPropagation} = this.props
 
@@ -68,6 +80,7 @@ export default class FuncArgs extends PureComponent<Props> {
     return args.map(({key, value, type}) => (
       <FuncArg
         key={key}
+        selectedArg={this.state.selectedArg}
         args={args}
         type={type}
         argKey={key}
@@ -77,12 +90,17 @@ export default class FuncArgs extends PureComponent<Props> {
         funcName={funcName}
         service={service}
         onChangeArg={onChangeArg}
+        onClick={this.handleArgClick}
         declarationID={declarationID}
         onGenerateScript={onGenerateScript}
         wasFuncSelectorClicked={wasFuncSelectorClicked}
         setWasFuncSelectorClicked={setWasFuncSelectorClicked}
       />
     ))
+  }
+
+  private handleArgClick = (arg: string) => {
+    this.setState({selectedArg: arg})
   }
 
   private get renderFilter(): JSX.Element {

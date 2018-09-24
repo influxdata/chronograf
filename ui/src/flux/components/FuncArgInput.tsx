@@ -10,6 +10,7 @@ interface Props {
   bodyID: string
   declarationID: string
   onChangeArg: OnChangeArg
+  onClick?: () => void
   onGenerateScript: OnGenerateScript
   autoFocus?: boolean
 }
@@ -30,6 +31,7 @@ class FuncArgInput extends PureComponent<Props> {
             value={value}
             placeholder={type}
             onChange={this.handleChange}
+            onClick={this.handleClick}
             onKeyDown={this.handleKeyDown}
             type="text"
             className="form-control input-sm"
@@ -40,6 +42,14 @@ class FuncArgInput extends PureComponent<Props> {
         </div>
       </div>
     )
+  }
+
+  private handleClick = () => {
+    const {onClick} = this.props
+
+    if (onClick) {
+      onClick()
+    }
   }
 
   private handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {

@@ -16,24 +16,13 @@ interface Props {
   onAppendFrom: () => void
   onAppendJoin: () => void
   onDeleteBody: (bodyID: string) => void
-}
-
-interface State {
   wasFuncSelectorClicked: boolean
+  setWasFuncSelectorClicked: (val: boolean) => void
 }
 
-class BodyBuilder extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      wasFuncSelectorClicked: false,
-    }
-  }
-
+class BodyBuilder extends PureComponent<Props> {
   public render() {
-    const {body, onDeleteBody} = this.props
-    const {wasFuncSelectorClicked} = this.state
+    const {body, onDeleteBody, wasFuncSelectorClicked} = this.props
 
     const bodybuilder = body.map((b, i) => {
       if (b.declarations.length) {
@@ -158,7 +147,7 @@ class BodyBuilder extends PureComponent<Props, State> {
   }
 
   private setWasFuncSelectorClicked = (val: boolean) => {
-    this.setState({wasFuncSelectorClicked: val})
+    this.props.setWasFuncSelectorClicked(val)
   }
 }
 

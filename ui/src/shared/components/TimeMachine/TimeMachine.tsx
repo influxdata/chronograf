@@ -120,6 +120,7 @@ interface Body extends FlatBody {
 interface State {
   body: Body[]
   script: string
+  lastScript: string
   ast: object
   visType: VisType
   data: FluxTable[]
@@ -158,6 +159,7 @@ class TimeMachine extends PureComponent<Props, State> {
         text: '',
       },
       script: this.props.script,
+      lastScript: '',
       autoRefresher: new AutoRefresher(),
       autoRefreshDuration: 0,
       visType: VisType.Graph,
@@ -763,10 +765,15 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private getASTResponse = async (
     script: string,
-    update: boolean = true
+    update: boolean = true,
+    force: boolean = true
   ): Promise<void> => {
+    if (script.trim() === this.state.lastScript.trim() && !force) {
+      return
+    }
+
     const {fluxLinks, updateScriptStatus, isInCEO} = this.props
-    this.setState({script})
+    this.setState({script, lastScript: script})
 
     if (!script) {
       this.updateScript(script)
@@ -803,7 +810,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private handleSubmitScript = () => {
-    this.getASTResponse(this.state.script)
+    this.getASTResponse(this.state.script, true, false)
   }
 
   private handleGenerateScript = (): void => {
