@@ -25,6 +25,8 @@ interface Props {
   onGenerateScript: OnGenerateScript
   wasFuncSelectorClicked: boolean
   setWasFuncSelectorClicked: (val: boolean) => void
+  selectedArg: string
+  onClick: (arg: string) => void
 }
 
 @ErrorHandling
@@ -79,10 +81,11 @@ class FuncArg extends PureComponent<Props> {
             argKey={argKey}
             funcID={funcID}
             bodyID={bodyID}
+            onClick={this.handleClick}
             onChangeArg={onChangeArg}
             declarationID={declarationID}
             onGenerateScript={onGenerateScript}
-            autoFocus={wasFuncSelectorClicked && this.isFirstArg}
+            autoFocus={wasFuncSelectorClicked && this.isSelectedArg}
           />
         )
       }
@@ -103,12 +106,14 @@ class FuncArg extends PureComponent<Props> {
       case argTypes.FUNCTION: {
         return (
           <FuncArgTextArea
+            autofocus={wasFuncSelectorClicked && this.isSelectedArg}
             type={type}
             value={this.value}
             argKey={argKey}
             funcID={funcID}
             bodyID={bodyID}
             onChangeArg={onChangeArg}
+            onClick={this.handleClick}
             declarationID={declarationID}
             onGenerateScript={onGenerateScript}
           />
@@ -134,6 +139,10 @@ class FuncArg extends PureComponent<Props> {
     }
   }
 
+  private handleClick = () => {
+    this.props.onClick(this.props.argKey)
+  }
+
   private get value(): string {
     return this.props.value.toString()
   }
@@ -142,12 +151,10 @@ class FuncArg extends PureComponent<Props> {
     return this.props.value === true
   }
 
-  private get isFirstArg(): boolean {
-    const {args, argKey} = this.props
+  private get isSelectedArg(): boolean {
+    const {argKey, selectedArg} = this.props
 
-    const firstArg = _.first(args)
-
-    return firstArg.key === argKey
+    return selectedArg === argKey
   }
 }
 

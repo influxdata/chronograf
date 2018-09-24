@@ -3,6 +3,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {OnChangeArg} from 'src/types/flux'
 
 interface Props {
+  autofocus?: boolean
   funcID: string
   argKey: string
   value: string
@@ -12,6 +13,7 @@ interface Props {
   onChangeArg: OnChangeArg
   onGenerateScript: () => void
   inputType?: string
+  onClick?: () => void
 }
 
 interface State {
@@ -48,10 +50,11 @@ class FuncArgTextArea extends PureComponent<Props, State> {
             name={argKey}
             value={value}
             spellCheck={false}
-            autoFocus={true}
+            autoFocus={this.props.autofocus}
             autoComplete="off"
             placeholder={type}
             ref={this.ref}
+            onClick={this.handleClick}
             onChange={this.handleChange}
             onKeyUp={this.handleKeyUp}
             style={this.textAreaStyle}
@@ -59,6 +62,14 @@ class FuncArgTextArea extends PureComponent<Props, State> {
         </div>
       </div>
     )
+  }
+
+  private handleClick = () => {
+    const {onClick} = this.props
+
+    if (onClick) {
+      onClick()
+    }
   }
 
   private get textAreaStyle() {
