@@ -395,6 +395,51 @@ describe('timeSeriesToTableGraph', () => {
 
     expect(actual.data).toEqual(expected)
   })
+
+  it('parses raw meta-query responses into table-readable format', () => {
+    const influxResponse = [
+      {
+        response: {
+          results: [
+            {
+              statement_id: 0,
+              series: [
+                {
+                  name: 'measurements',
+                  columns: ['name'],
+                  values: [
+                    ['cpu'],
+                    ['disk'],
+                    ['diskio'],
+                    ['mem'],
+                    ['processes'],
+                    ['swap'],
+                    ['syslog'],
+                    ['system'],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ]
+
+    const actual = timeSeriesToTableGraph(influxResponse)
+    const expected = [
+      ['time', 'measurements.name'],
+      [null, 'cpu'],
+      [null, 'disk'],
+      [null, 'diskio'],
+      [null, 'mem'],
+      [null, 'processes'],
+      [null, 'swap'],
+      [null, 'syslog'],
+      [null, 'system'],
+    ]
+
+    expect(actual.data).toEqual(expected)
+  })
 })
 
 describe('filterTableColumns', () => {
