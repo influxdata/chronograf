@@ -1,24 +1,16 @@
 import {fastMap} from 'src/utils/fast'
 import {manager} from 'src/worker/JobManager'
 
-import {TimeSeriesServerResponse, TimeSeriesValue} from 'src/types/series'
+import {
+  TimeSeriesServerResponse,
+  TimeSeriesToTableGraphReturnType,
+} from 'src/types/series'
 import {DygraphSeries, DygraphValue} from 'src/types'
-
-interface Label {
-  label: string
-  seriesIndex: number
-  responseIndex: number
-}
 
 export interface TimeSeriesToDyGraphReturnType {
   labels: string[]
   timeSeries: DygraphValue[][]
   dygraphSeries: DygraphSeries
-}
-
-interface TimeSeriesToTableGraphReturnType {
-  data: TimeSeriesValue[][]
-  sortedLabels: Label[]
 }
 
 export const timeSeriesToDygraph = async (

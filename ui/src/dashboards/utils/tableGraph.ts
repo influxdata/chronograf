@@ -13,7 +13,7 @@ import {
   TableOptions,
   DecimalPlaces,
 } from 'src/types/dashboards'
-import {TimeSeriesValue} from 'src/types/series'
+import {TimeSeriesValue, InfluxQLQueryType} from 'src/types/series'
 import {DataType} from 'src/shared/constants'
 
 const calculateSize = (message: string): number => {
@@ -123,11 +123,19 @@ export const getDefaultTimeField = (dataType: DataType): FieldOption => {
 export const computeFieldOptions = (
   existingFieldOptions: FieldOption[],
   sortedLabels: SortedLabel[],
-  dataType: DataType
+  dataType: DataType,
+  influxQLQueryType: InfluxQLQueryType
 ): FieldOption[] => {
   const defaultTimeField = getDefaultTimeField(dataType)
 
-  let astNames = dataType === DataType.influxQL ? [defaultTimeField] : []
+  let astNames = []
+  if (
+    dataType === DataType.influxQL &&
+    influxQLQueryType === InfluxQLQueryType.DataQuery
+  ) {
+    astNames = [defaultTimeField]
+  }
+
   sortedLabels.forEach(({label}) => {
     const field: FieldOption = {
       internalName: label,

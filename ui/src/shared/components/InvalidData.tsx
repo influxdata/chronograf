@@ -1,14 +1,24 @@
 import React, {PureComponent} from 'react'
 
-class InvalidData extends PureComponent<{error?: Error}> {
+interface Props {
+  message?: string
+}
+
+class InvalidData extends PureComponent<Props> {
   public render() {
+    return <div className="graph-empty">{this.errorMessage}</div>
+  }
+
+  private get errorMessage(): JSX.Element {
+    if (this.props.message) {
+      return <p>{this.props.message}</p>
+    }
+
     return (
-      <div className="graph-empty">
-        <p>
-          The data returned from the query can't be visualized with this graph
-          type.<br />Try updating the query or selecting a different graph type.
-        </p>
-      </div>
+      <p>
+        The data returned from the query can't be visualized with this graph
+        type.<br />Try updating the query or selecting a different graph type.
+      </p>
     )
   }
 }
