@@ -1,5 +1,4 @@
 import {Service, Source, TimeRange, Query} from 'src/types'
-import {VisualizationOptions} from 'src/types/dataExplorer'
 
 // function definitions
 export type OnDeleteFuncNode = (ids: DeleteFuncNodeArgs) => void
@@ -44,7 +43,6 @@ export interface Context {
   source: Source
   timeRange: TimeRange
   queries: Query[]
-  visualizationOptions: VisualizationOptions
 }
 
 export interface DeleteFuncNodeArgs {

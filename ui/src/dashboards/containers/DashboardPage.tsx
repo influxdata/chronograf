@@ -22,15 +22,6 @@ import {
   dismissEditingAnnotation,
 } from 'src/shared/actions/annotations'
 import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOverlay'
-import {
-  queryConfigActions,
-  QueryConfigActions,
-  addQueryAsync,
-  deleteQueryAsync,
-  updateQueryDrafts as updateQueryDraftsAction,
-  updateEditorTimeRange as updateEditorTimeRangeAction,
-  updateScript,
-} from 'src/shared/actions/queries'
 
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
@@ -68,7 +59,6 @@ import {ManualRefreshProps} from 'src/shared/components/ManualRefresh'
 import {Location} from 'history'
 import {InjectedRouter} from 'react-router'
 import * as AppActions from 'src/types/actions/app'
-import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
 import * as ErrorsActions from 'src/types/actions/errors'
 import * as QueriesModels from 'src/types/queries'
@@ -81,8 +71,6 @@ import {Links} from 'src/types/flux'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   fluxLinks: Links
-  script: string
-  updateScript: typeof updateScript
   source: SourcesModels.Source
   sources: SourcesModels.Source[]
   params: {
@@ -112,17 +100,9 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   notify: NotificationAction
   annotationsDisplaySetting: AnnotationsDisplaySetting
   onGetAnnotationsAsync: typeof getAnnotationsAsync
-  handleLoadCEO: typeof cellEditorOverlayActions.loadCEO
   handleClearCEO: typeof cellEditorOverlayActions.clearCEO
   handleDismissEditingAnnotation: typeof dismissEditingAnnotation
-  selectedCell: DashboardsModels.Cell
-  queryDrafts: DashboardsModels.CellQuery[]
   editorTimeRange: QueriesModels.TimeRange
-  updateQueryDrafts: (queryDrafts: DashboardsModels.CellQuery[]) => void
-  thresholdsListType: DashboardsModels.ThresholdType
-  thresholdsListColors: ColorsModels.ColorNumber[]
-  gaugeColors: ColorsModels.ColorNumber[]
-  lineColors: ColorsModels.ColorString[]
   setDashTimeV1: typeof dashboardActions.setDashTimeV1
   setZoomedTimeRange: typeof dashboardActions.setZoomedTimeRange
   updateDashboard: typeof dashboardActions.updateDashboard
@@ -139,27 +119,12 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   rehydrateTemplatesAsync: typeof dashboardActions.rehydrateTemplatesAsync
   updateTemplateQueryParams: typeof dashboardActions.updateTemplateQueryParams
   updateQueryParams: typeof dashboardActions.updateQueryParams
-  addQuery: typeof addQueryAsync
-  deleteQuery: typeof deleteQueryAsync
-  fill: typeof queryConfigActions.fill
-  timeShift: typeof queryConfigActions.timeShift
-  chooseTag: typeof queryConfigActions.chooseTag
-  groupByTag: typeof queryConfigActions.groupByTag
-  groupByTime: typeof queryConfigActions.groupByTime
-  toggleField: typeof queryConfigActions.toggleField
-  removeFuncs: typeof queryConfigActions.removeFuncs
-  addInitialField: typeof queryConfigActions.addInitialField
-  chooseNamespace: typeof queryConfigActions.chooseNamespace
-  chooseMeasurement: typeof queryConfigActions.chooseMeasurement
-  applyFuncsToField: typeof queryConfigActions.applyFuncsToField
-  toggleTagAcceptance: typeof queryConfigActions.toggleTagAcceptance
-  updateEditorTimeRange: typeof updateEditorTimeRangeAction
 }
 
 interface State {
   scrollTop: number
   windowHeight: number
-  selectedCell: DashboardsModels.Cell | null
+  selectedCell: DashboardsModels.Cell | DashboardsModels.NewDefaultCell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
   servicesStatus: RemoteDataState
   showAnnotationControls: boolean
@@ -245,40 +210,28 @@ class DashboardPage extends Component<Props, State> {
 
   public render() {
     const {
-      script,
       notify,
       fluxLinks,
       isUsingAuth,
       meRole,
       source,
       sources,
-      addQuery,
-      deleteQuery,
       timeRange,
       timeRange: {lower, upper},
-      editorTimeRange,
       renameCell,
       zoomedTimeRange,
       zoomedTimeRange: {lower: zoomedLower, upper: zoomedUpper},
       dashboard,
       dashboardID,
-      lineColors,
-      gaugeColors,
       autoRefresh,
-      queryDrafts,
-      selectedCell,
       manualRefresh,
       onManualRefresh,
       cellQueryStatus,
-      updateQueryDrafts,
-      thresholdsListType,
-      thresholdsListColors,
       inPresentationMode,
       showTemplateVariableControlBar,
       handleChooseAutoRefresh,
       handleClickPresentationButton,
       toggleTemplateVariableControlBar,
-      updateEditorTimeRange,
     } = this.props
 
     const low = zoomedLower || lower
@@ -326,38 +279,31 @@ class DashboardPage extends Component<Props, State> {
       templatesIncludingDashTime = []
     }
 
-    const {dashboardLinks, showAnnotationControls} = this.state
+    const {
+      dashboardLinks,
+      showAnnotationControls,
+      selectedCell,
+      showCellEditorOverlay,
+    } = this.state
 
     return (
       <Page>
-        <OverlayTechnology visible={this.showCellEditorOverlay}>
+        <OverlayTechnology visible={showCellEditorOverlay}>
           <CellEditorOverlay
             source={source}
             sources={sources}
             notify={notify}
             fluxLinks={fluxLinks}
-            script={script}
             services={this.services}
             cell={selectedCell}
-            queryDrafts={queryDrafts}
-            timeRange={editorTimeRange}
-            updateEditorTimeRange={updateEditorTimeRange}
             dashboardID={dashboardID}
             queryStatus={cellQueryStatus}
             onSave={this.handleSaveEditedCell}
             onCancel={this.handleHideCellEditorOverlay}
             templates={templatesIncludingDashTime}
             editQueryStatus={this.props.editCellQueryStatus}
-            thresholdsListType={thresholdsListType}
-            thresholdsListColors={thresholdsListColors}
-            updateQueryDrafts={updateQueryDrafts}
-            gaugeColors={gaugeColors}
-            lineColors={lineColors}
             renameCell={renameCell}
-            queryConfigActions={this.queryConfigActions}
-            addQuery={addQuery}
-            deleteQuery={deleteQuery}
-            updateScript={this.props.updateScript}
+            dashboardTimeRange={timeRange}
           />
         </OverlayTechnology>
         <DashboardHeader
@@ -422,43 +368,6 @@ class DashboardPage extends Component<Props, State> {
     dashboard: DashboardsModels.Dashboard
   ): TempVarsModels.Template[] {
     return getDeep(dashboard, 'templates', []).map(t => t.tempVar)
-  }
-
-  private get queryConfigActions(): QueryConfigActions {
-    const {
-      fill,
-      timeShift,
-      chooseTag,
-      groupByTag,
-      groupByTime,
-      toggleField,
-      removeFuncs,
-      addInitialField,
-      chooseNamespace,
-      chooseMeasurement,
-      applyFuncsToField,
-      toggleTagAcceptance,
-    } = this.props
-    return {
-      fill,
-      timeShift,
-      chooseTag,
-      groupByTag,
-      groupByTime,
-      toggleField,
-      removeFuncs,
-      addInitialField,
-      chooseNamespace,
-      chooseMeasurement,
-      applyFuncsToField,
-      toggleTagAcceptance,
-    }
-  }
-
-  private get showCellEditorOverlay(): boolean {
-    const {selectedCell} = this.props
-    const {showCellEditorOverlay} = this.state
-    return !!selectedCell && showCellEditorOverlay
   }
 
   private get showDashboard(): boolean {
@@ -552,12 +461,8 @@ class DashboardPage extends Component<Props, State> {
     this.handleHideCellEditorOverlay()
   }
 
-  private handleShowCellEditorOverlay = (
-    cell: DashboardsModels.Cell | DashboardsModels.NewDefaultCell
-  ): void => {
-    const {handleLoadCEO, timeRange} = this.props
-    handleLoadCEO(cell, timeRange)
-    this.setState({showCellEditorOverlay: true})
+  private handleShowCellEditorOverlay = (cell: DashboardsModels.Cell): void => {
+    this.setState({selectedCell: cell, showCellEditorOverlay: true})
   }
 
   private handleHideCellEditorOverlay = () => {
@@ -599,7 +504,8 @@ class DashboardPage extends Component<Props, State> {
   private handleAddCell = (): void => {
     const {dashboard} = this.props
     const emptyCell = getNewDashboardCell(dashboard)
-    this.handleShowCellEditorOverlay(emptyCell)
+
+    this.setState({selectedCell: emptyCell, showCellEditorOverlay: true})
   }
 
   private handleCloneCell = (cell: DashboardsModels.Cell): void => {
@@ -703,16 +609,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     sources,
     services,
     auth: {me, isUsingAuth},
-    cellEditorOverlay: {
-      cell,
-      queryDrafts,
-      thresholdsListType,
-      thresholdsListColors,
-      gaugeColors,
-      lineColors,
-      timeRange: editorTimeRange,
-      script,
-    },
+    cellEditorOverlay: {cell, timeRange: editorTimeRange},
   } = state
 
   const meRole = _.get(me, 'role', null)
@@ -726,7 +623,6 @@ const mstp = (state, {params: {dashboardID}}) => {
   const selectedCell = cell
 
   return {
-    script,
     sources,
     services,
     meRole,
@@ -740,19 +636,13 @@ const mstp = (state, {params: {dashboardID}}) => {
     cellQueryStatus,
     inPresentationMode,
     selectedCell,
-    queryDrafts,
     editorTimeRange,
-    thresholdsListType,
-    thresholdsListColors,
-    gaugeColors,
-    lineColors,
     showTemplateVariableControlBar,
     annotationsDisplaySetting: displaySetting,
   }
 }
 
 const mdtp = {
-  updateScript,
   setDashTimeV1: dashboardActions.setDashTimeV1,
   setZoomedTimeRange: dashboardActions.setZoomedTimeRange,
   updateDashboard: dashboardActions.updateDashboard,
@@ -775,28 +665,11 @@ const mdtp = {
   handleClickPresentationButton: appActions.delayEnablePresentationMode,
   errorThrown: errorActions.errorThrown,
   notify: notifyActions.notify,
-  handleLoadCEO: cellEditorOverlayActions.loadCEO,
   handleClearCEO: cellEditorOverlayActions.clearCEO,
   onGetAnnotationsAsync: getAnnotationsAsync,
   handleDismissEditingAnnotation: dismissEditingAnnotation,
-  updateQueryDrafts: updateQueryDraftsAction,
   fetchServicesAsync: fetchAllFluxServicesAsync,
   renameCell: cellEditorOverlayActions.renameCell,
-  addQuery: addQueryAsync,
-  deleteQuery: deleteQueryAsync,
-  fill: queryConfigActions.fill,
-  timeShift: queryConfigActions.timeShift,
-  chooseTag: queryConfigActions.chooseTag,
-  groupByTag: queryConfigActions.groupByTag,
-  groupByTime: queryConfigActions.groupByTime,
-  toggleField: queryConfigActions.toggleField,
-  removeFuncs: queryConfigActions.removeFuncs,
-  addInitialField: queryConfigActions.addInitialField,
-  chooseNamespace: queryConfigActions.chooseNamespace,
-  chooseMeasurement: queryConfigActions.chooseMeasurement,
-  applyFuncsToField: queryConfigActions.applyFuncsToField,
-  toggleTagAcceptance: queryConfigActions.toggleTagAcceptance,
-  updateEditorTimeRange: updateEditorTimeRangeAction,
 }
 
 export default connect(mstp, mdtp)(

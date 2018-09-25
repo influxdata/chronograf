@@ -6,43 +6,51 @@ import DatabaseList from 'src/shared/components/DatabaseList'
 import MeasurementList from 'src/shared/components/MeasurementList'
 import FieldList from 'src/shared/components/FieldList'
 
+// Utiles
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+
 // Types
 import {QueryConfig, Source} from 'src/types'
-import {QueryConfigActions, QueryUpdateState} from 'src/shared/actions/queries'
 
-const actionBinder = (id, isInCEO, action) => (...args) => {
-  const stateToUpdate = isInCEO ? QueryUpdateState.CEO : QueryUpdateState.DE
-  return action(id, stateToUpdate, ...args)
+const actionBinder = (id, action) => (...args) => {
+  return action(id, ...args)
 }
 
 interface Props {
-  isInCEO: boolean
   query: QueryConfig
-  actions: QueryConfigActions
   source: Source
   initialGroupByTime: string
   isQuerySupportedByExplorer?: boolean
+  onFill: TimeMachineContainer['handleFill']
+  onTimeShift: TimeMachineContainer['handleTimeShift']
+  onChooseTag: TimeMachineContainer['handleChooseTag']
+  onGroupByTag: TimeMachineContainer['handleGroupByTag']
+  onGroupByTime: TimeMachineContainer['handleGroupByTime']
+  onToggleField: TimeMachineContainer['handleToggleField']
+  onRemoveFuncs: TimeMachineContainer['handleRemoveFuncs']
+  onAddInitialField: TimeMachineContainer['handleAddInitialField']
+  onChooseNamespace: TimeMachineContainer['handleChooseNamespace']
+  onChooseMeasurement: TimeMachineContainer['handleChooseMeasurement']
+  onApplyFuncsToField: TimeMachineContainer['handleApplyFuncsToField']
+  onToggleTagAcceptance: TimeMachineContainer['handleToggleTagAcceptance']
 }
 
 const SchemaExplorer: SFC<Props> = ({
-  isInCEO,
   query,
   source,
   initialGroupByTime,
-  actions: {
-    fill,
-    timeShift,
-    chooseTag,
-    groupByTag,
-    groupByTime,
-    toggleField,
-    removeFuncs,
-    addInitialField,
-    chooseNamespace,
-    chooseMeasurement,
-    applyFuncsToField,
-    toggleTagAcceptance,
-  },
+  onFill,
+  onTimeShift,
+  onChooseTag,
+  onGroupByTag,
+  onGroupByTime,
+  onToggleField,
+  onRemoveFuncs,
+  onAddInitialField,
+  onChooseNamespace,
+  onChooseMeasurement,
+  onApplyFuncsToField,
+  onToggleTagAcceptance,
   isQuerySupportedByExplorer = true,
 }) => {
   const {id} = query
@@ -52,29 +60,29 @@ const SchemaExplorer: SFC<Props> = ({
       <DatabaseList
         query={query}
         querySource={source}
-        onChooseNamespace={actionBinder(id, isInCEO, chooseNamespace)}
+        onChooseNamespace={actionBinder(id, onChooseNamespace)}
       />
       <MeasurementList
         query={query}
         querySource={source}
-        onChooseTag={actionBinder(id, isInCEO, chooseTag)}
-        onGroupByTag={actionBinder(id, isInCEO, groupByTag)}
-        onChooseMeasurement={actionBinder(id, isInCEO, chooseMeasurement)}
-        onToggleTagAcceptance={actionBinder(id, isInCEO, toggleTagAcceptance)}
+        onChooseTag={actionBinder(id, onChooseTag)}
+        onGroupByTag={actionBinder(id, onGroupByTag)}
+        onChooseMeasurement={actionBinder(id, onChooseMeasurement)}
+        onToggleTagAcceptance={actionBinder(id, onToggleTagAcceptance)}
         isQuerySupportedByExplorer={isQuerySupportedByExplorer}
       />
       <FieldList
         source={source}
         query={query}
         querySource={source}
-        onFill={actionBinder(id, isInCEO, fill)}
+        onFill={actionBinder(id, onFill)}
         initialGroupByTime={initialGroupByTime}
-        onTimeShift={actionBinder(id, isInCEO, timeShift)}
-        removeFuncs={actionBinder(id, isInCEO, removeFuncs)}
-        onToggleField={actionBinder(id, isInCEO, toggleField)}
-        onGroupByTime={actionBinder(id, isInCEO, groupByTime)}
-        addInitialField={actionBinder(id, isInCEO, addInitialField)}
-        applyFuncsToField={actionBinder(id, isInCEO, applyFuncsToField)}
+        onTimeShift={actionBinder(id, onTimeShift)}
+        removeFuncs={actionBinder(id, onRemoveFuncs)}
+        onToggleField={actionBinder(id, onToggleField)}
+        onGroupByTime={actionBinder(id, onGroupByTime)}
+        addInitialField={actionBinder(id, onAddInitialField)}
+        applyFuncsToField={actionBinder(id, onApplyFuncsToField)}
         isQuerySupportedByExplorer={isQuerySupportedByExplorer}
       />
     </div>

@@ -1,10 +1,12 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
+import {Subscribe} from 'unstated'
 
 // Utils
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Components
 import {
@@ -44,7 +46,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {VisualizationOptions} from 'src/types/dataExplorer'
 import {ColorString} from 'src/types/colors'
 
-interface Props {
+interface PassedProps {
   queryConfig: QueryConfig
   script: string
   dashboards: Dashboard[]
@@ -56,11 +58,16 @@ interface Props {
     dashboard: Dashboard,
     newCell: Partial<Cell>
   ) => Promise<{success: boolean; dashboard: Dashboard}>
-  visualizationOptions: VisualizationOptions
   isStaticLegend: boolean
   handleGetDashboards: () => Dashboard[]
   notify: (message: Notification) => void
 }
+
+interface ConnectedProps {
+  visualizationOptions: VisualizationOptions
+}
+
+type Props = PassedProps & ConnectedProps
 
 interface State {
   selectedIDs: string[]
@@ -306,4 +313,49 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 }
 
-export default SendToDashboardOverlay
+const ConnectedSendToDashboardOverlay = (props: PassedProps) => {
+  return (
+    <Subscribe to={[TimeMachineContainer]}>
+      {(timeMachineContainer: TimeMachineContainer) => {
+        const {
+          type,
+          tableOptions,
+          fieldOptions,
+          timeFormat,
+          decimalPlaces,
+          note,
+          noteVisibility,
+          axes,
+          thresholdsListColors,
+          thresholdsListType,
+          gaugeColors,
+          lineColors,
+        } = timeMachineContainer.state
+
+        const visualizationOptions = {
+          type,
+          axes,
+          tableOptions,
+          fieldOptions,
+          timeFormat,
+          decimalPlaces,
+          note,
+          noteVisibility,
+          thresholdsListColors,
+          gaugeColors,
+          lineColors,
+          thresholdsListType,
+        }
+
+        return (
+          <SendToDashboardOverlay
+            {...props}
+            visualizationOptions={visualizationOptions}
+          />
+        )
+      }}
+    </Subscribe>
+  )
+}
+
+export default ConnectedSendToDashboardOverlay

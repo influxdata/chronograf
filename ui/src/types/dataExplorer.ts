@@ -1,11 +1,5 @@
-import {
-  ThresholdColor,
-  GaugeColor,
-  LineColor,
-  ColorNumber,
-  ColorString,
-} from 'src/types/colors'
-import {TimeRange, CellQuery, QueryStatus, CellType, Axes} from 'src/types'
+import {ColorNumber, ColorString} from 'src/types/colors'
+import {CellType, Axes, Status} from 'src/types'
 import {
   DecimalPlaces,
   FieldOption,
@@ -21,23 +15,11 @@ export enum WriteDataMode {
 }
 
 export interface DEState {
-  queryDrafts: CellQuery[]
-  timeRange: TimeRange
-  queryStatus: QueryStatus
-  script: string
   sourceLink: string
-  thresholdsListType: ThresholdType
-  thresholdsListColors: ThresholdColor[]
-  gaugeColors: GaugeColor[]
-  lineColors: LineColor[]
-  visType: CellType
-  axes: Axes
-  tableOptions: TableOptions
-  timeFormat: string
-  decimalPlaces: DecimalPlaces
-  fieldOptions: FieldOption[]
-  note: string
-  noteVisibility: NoteVisibility
+  queryStatus: {
+    queryID: string | null
+    status: Status
+  }
 }
 
 export interface VisualizationOptions {

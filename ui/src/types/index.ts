@@ -4,6 +4,7 @@ import {Links, Organization, Role, Permission, User, Me} from './auth'
 import {
   PBCell,
   Cell,
+  NewDefaultCell,
   CellQuery,
   Legend,
   Axes,
@@ -81,6 +82,7 @@ export {
   TemplateQuery,
   TemplateValue,
   Cell,
+  NewDefaultCell,
   CellQuery,
   CellType,
   PBCell,

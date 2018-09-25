@@ -53,28 +53,25 @@ export const getCellTypeColors = ({
   thresholdsListColors,
   lineColors,
 }: Color): ColorString[] => {
-  let colors: ColorString[] = []
-
   switch (cellType) {
     case CellType.Gauge: {
-      colors = stringifyColorValues(gaugeColors)
-      break
+      return stringifyColorValues(gaugeColors)
     }
     case CellType.SingleStat:
     case CellType.Table: {
-      colors = stringifyColorValues(thresholdsListColors)
-      break
+      return stringifyColorValues(thresholdsListColors)
     }
     case CellType.Bar:
     case CellType.Line:
     case CellType.LinePlusSingleStat:
     case CellType.Stacked:
     case CellType.StepPlot: {
-      colors = stringifyColorValues(lineColors)
+      return stringifyColorValues(lineColors)
+    }
+    default: {
+      return []
     }
   }
-
-  return colors
 }
 
 export const STATIC_LEGEND: Legend = {
