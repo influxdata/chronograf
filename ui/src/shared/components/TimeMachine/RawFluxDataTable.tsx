@@ -41,17 +41,26 @@ class RawFluxDataTable extends PureComponent<Props, State> {
     return (
       <div className="raw-flux-data-table">
         <AutoSizer>
-          {({width: autoWidth, height: autoHeight}) => (
-            <Grid
-              width={width ? width : autoWidth}
-              height={height ? height : autoHeight}
-              cellRenderer={this.renderCell}
-              columnCount={maxColumnCount}
-              rowCount={data.length}
-              rowHeight={ROW_HEIGHT}
-              columnWidth={Math.max(MIN_COLUMN_WIDTH, width / maxColumnCount)}
-            />
-          )}
+          {({width: autoWidth, height: autoHeight}) => {
+            const resolvedWidth = width ? width : autoWidth
+            const resolvedHeight = height ? height : autoHeight
+            const columnWidth = Math.max(
+              MIN_COLUMN_WIDTH,
+              resolvedWidth / maxColumnCount
+            )
+
+            return (
+              <Grid
+                width={resolvedWidth}
+                height={resolvedHeight}
+                cellRenderer={this.renderCell}
+                columnCount={maxColumnCount}
+                rowCount={data.length}
+                rowHeight={ROW_HEIGHT}
+                columnWidth={columnWidth}
+              />
+            )
+          }}
         </AutoSizer>
       </div>
     )
