@@ -191,6 +191,7 @@ class RefreshingGraph extends PureComponent<Props> {
       'decimalPlaces',
       'timeFormat',
       'showRawFluxData',
+      'queries',
     ]
 
     const prevVisValues = _.pick(prevProps, visProps)
