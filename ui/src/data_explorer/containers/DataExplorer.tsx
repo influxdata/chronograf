@@ -2,20 +2,20 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import {withRouter, InjectedRouter} from 'react-router'
+import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
 import {Location} from 'history'
 import qs from 'qs'
 import uuid from 'uuid'
 import _ from 'lodash'
+import {Subscribe} from 'unstated'
 
 // Utils
 import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'
 import {buildRawText} from 'src/utils/influxql'
-
-// Constants
-import {timeRanges} from 'src/shared/data/timeRanges'
+import {defaultQueryDraft} from 'src/shared/utils/timeMachine'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Components
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
@@ -34,20 +34,8 @@ import {
   sendDashboardCellAsync,
 } from 'src/dashboards/actions'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
-import {
-  loadDE as loadDEAction,
-  updateSourceLink as updateSourceLinkAction,
-} from 'src/data_explorer/actions/queries'
-import {
-  queryConfigActions as queryConfigModifiers,
-  updateQueryDrafts as updateQueryDraftsAction,
-  updateQueryStatus as editQueryStatusAction,
-  updateScript as updateScriptAction,
-  addQueryAsync,
-  deleteQueryAsync,
-  updateEditorTimeRange,
-  QueryUpdateState,
-} from 'src/shared/actions/queries'
+import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
+import {editQueryStatus as editQueryStatusAction} from 'src/data_explorer/actions/queries'
 import {fetchAllFluxServicesAsync} from 'src/shared/actions/services'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
@@ -62,45 +50,31 @@ import {
 import {
   Source,
   Service,
-  TimeRange,
   Dashboard,
-  CellQuery,
   QueryConfig,
   QueryStatus,
   Template,
   TemplateType,
   TemplateValueType,
-  CellType,
-  Axes,
   Notification,
+  Cell,
+  QueryType,
+  CellQuery,
+  TimeRange,
 } from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Links} from 'src/types/flux'
-import {ColorNumber, ColorString} from 'src/types/colors'
-import {
-  DecimalPlaces,
-  FieldOption,
-  ThresholdType,
-  TableOptions,
-  NoteVisibility,
-  QueryType,
-  Cell,
-} from 'src/types/dashboards'
-import {VisualizationOptions} from 'src/types/dataExplorer'
 
-interface Props {
+interface PassedProps {
   source: Source
   sources: Source[]
   services: Service[]
   queryConfigs: QueryConfig[]
   updateSourceLink: typeof updateSourceLinkAction
-  queryConfigActions: typeof queryConfigModifiers
   autoRefresh: number
   handleChooseAutoRefresh: () => void
   router?: InjectedRouter
   location?: Location
-  setTimeRange: (range: TimeRange) => void
-  timeRange: TimeRange
   manualRefresh: number
   dashboards: Dashboard[]
   onManualRefresh: () => void
@@ -111,32 +85,23 @@ interface Props {
     dashboard: Dashboard,
     newCell: Partial<Cell>
   ) => Promise<{success: boolean; dashboard: Dashboard}>
-  updateQueryDrafts: typeof updateQueryDraftsAction
-  loadDE: typeof loadDEAction
-  addQuery: typeof addQueryAsync
-  deleteQuery: typeof deleteQueryAsync
-  queryDrafts: CellQuery[]
   editQueryStatus: typeof editQueryStatusAction
   queryStatus: QueryStatus
   fluxLinks: Links
-  script: string
-  updateScript: typeof updateScriptAction
   fetchServicesAsync: typeof fetchAllFluxServicesAsync
   notify: (message: Notification) => void
   sourceLink: string
-  thresholdsListType: ThresholdType
-  thresholdsListColors: ColorNumber[]
-  gaugeColors: ColorNumber[]
-  lineColors: ColorString[]
-  visType: CellType
-  axes: Axes
-  tableOptions: TableOptions
-  timeFormat: string
-  decimalPlaces: DecimalPlaces
-  fieldOptions: FieldOption[]
-  note: string
-  noteVisibility: NoteVisibility
 }
+
+interface ConnectedProps {
+  queryDrafts: CellQuery[]
+  timeRange: TimeRange
+  script: string
+  onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
+  onChangeScript: TimeMachineContainer['handleChangeScript']
+}
+
+type Props = PassedProps & ConnectedProps
 
 interface State {
   isWriteFormVisible: boolean
@@ -159,31 +124,10 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {loadDE, timeRange, autoRefresh, queryDrafts} = this.props
-    const {query, script} = this.queryString
-    const isFlux = !!script
+    const {autoRefresh} = this.props
 
     await this.fetchFluxServices()
-
-    if (isFlux) {
-      this.createNewQueryDraft()
-    } else if (_.isEmpty(query)) {
-      let drafts = []
-      if (!_.isEmpty(queryDrafts)) {
-        drafts = queryDrafts
-      }
-      loadDE(drafts, timeRange)
-    } else if (!_.isEmpty(queryDrafts)) {
-      const matchingQueryDraft = queryDrafts.find(q => q.query === query)
-
-      if (matchingQueryDraft) {
-        loadDE(queryDrafts, timeRange)
-      } else {
-        await this.createNewQueryDraft()
-      }
-    } else {
-      await this.createNewQueryDraft()
-    }
+    await this.resolveQueryParams()
 
     GlobalAutoRefresher.poll(autoRefresh)
     this.setState({isComponentMounted: true})
@@ -191,11 +135,17 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   public componentDidUpdate(prevProps: Props) {
     const {autoRefresh} = this.props
+
     if (autoRefresh !== prevProps.autoRefresh) {
       GlobalAutoRefresher.poll(autoRefresh)
     }
 
-    this.updateQueryStringQuery()
+    if (
+      prevProps.location === this.props.location &&
+      this.state.isComponentMounted
+    ) {
+      this.writeQueryParams()
+    }
   }
 
   public componentWillUnmount() {
@@ -207,18 +157,14 @@ export class DataExplorer extends PureComponent<Props, State> {
       source,
       sources,
       services,
-      timeRange,
       manualRefresh,
       onManualRefresh,
       editQueryStatus,
-      updateQueryDrafts,
-      queryDrafts,
-      addQuery,
-      deleteQuery,
       queryStatus,
       fluxLinks,
       notify,
       updateSourceLink,
+      timeRange,
     } = this.props
     const {isStaticLegend, isComponentMounted} = this.state
 
@@ -234,29 +180,19 @@ export class DataExplorer extends PureComponent<Props, State> {
           <TimeMachine
             service={this.service}
             updateSourceLink={updateSourceLink}
-            queryDrafts={queryDrafts}
             editQueryStatus={editQueryStatus}
             templates={this.templates}
-            timeRange={timeRange}
             source={source}
             onResetFocus={this.handleResetFocus}
             isInCEO={false}
             sources={sources}
             services={services}
-            updateQueryDrafts={updateQueryDrafts}
             onToggleStaticLegend={this.handleToggleStaticLegend}
             isStaticLegend={isStaticLegend}
-            queryConfigActions={this.props.queryConfigActions}
-            addQuery={addQuery}
-            deleteQuery={deleteQuery}
-            updateEditorTimeRange={this.handleChooseTimeRange}
             manualRefresh={manualRefresh}
             queryStatus={queryStatus}
-            script={this.activeScript}
-            updateScript={this.handleUpdateScript}
             fluxLinks={fluxLinks}
             notify={notify}
-            visualizationOptions={this.visualizationOptions}
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
@@ -274,42 +210,79 @@ export class DataExplorer extends PureComponent<Props, State> {
     )
   }
 
-  private get shouldUpdateQueryString(): boolean {
-    const {queryDrafts} = this.props
-    const query = _.get(queryDrafts, '0.query', '')
-    const {query: existing} = this.queryString
-    const isFlux = !!this.service
+  private async resolveQueryParams() {
+    const {
+      source,
+      sourceLink,
+      queryDrafts,
+      onUpdateQueryDrafts,
+      onChangeScript,
+    } = this.props
+    const {query, script} = this.readQueryParams()
 
-    return !_.isEmpty(query) && query !== existing && !isFlux
-  }
+    if (script) {
+      const queryDraft = {...defaultQueryDraft(QueryType.Flux), query: script}
 
-  private handleUpdateScript = (
-    script: string,
-    stateToUpdate: QueryUpdateState
-  ) => {
-    const {router} = this.props
-    const pathname = stripPrefix(location.pathname)
-    const qsNew = qs.stringify({script})
-
-    router.push(`${pathname}?${qsNew}`)
-    this.props.updateScript(script, stateToUpdate)
-  }
-
-  private updateQueryStringQuery() {
-    if (!this.shouldUpdateQueryString) {
+      onUpdateQueryDrafts([queryDraft])
+      onChangeScript(script)
       return
     }
 
-    const {queryDrafts, router} = this.props
-    const query = _.get(queryDrafts, '0.query', '')
-    const qsNew = qs.stringify({query})
-    const pathname = stripPrefix(location.pathname)
+    if (query) {
+      if (queryDrafts.find(q => q.query === query)) {
+        // Has matching query draft already loaded
+        return
+      }
 
-    router.push(`${pathname}?${qsNew}`)
+      const queryConfig = await getConfig(
+        source.links.queries,
+        uuid.v4(),
+        query,
+        this.templates
+      )
+
+      const queryDraft = {
+        query,
+        queryConfig,
+        source: sourceLink,
+        type: QueryType.InfluxQL,
+      }
+
+      onUpdateQueryDrafts([queryDraft])
+      return
+    }
+
+    if (!queryDrafts.length) {
+      const queryDraft = defaultQueryDraft(QueryType.InfluxQL)
+
+      onUpdateQueryDrafts([queryDraft])
+      return
+    }
   }
 
-  private get queryString(): {query?: string; script?: string} {
-    return qs.parse(location.search, {ignoreQueryPrefix: true})
+  private readQueryParams(): {query?: string; script?: string} {
+    const {query, script} = qs.parse(location.search, {ignoreQueryPrefix: true})
+
+    return {query, script}
+  }
+
+  private writeQueryParams() {
+    const {router, queryDrafts, script} = this.props
+    const query = _.get(queryDrafts, '0.query')
+    const isFlux = _.get(queryDrafts, '0.type') === QueryType.Flux
+
+    let queryParams
+
+    if (isFlux && script) {
+      queryParams = {script}
+    } else if (!isFlux && query) {
+      queryParams = {query}
+    }
+
+    const pathname = stripPrefix(location.pathname)
+    const search = queryParams ? `?${qs.stringify(queryParams)}` : ''
+
+    router.push(pathname + search)
   }
 
   private get service(): Service {
@@ -347,9 +320,9 @@ export class DataExplorer extends PureComponent<Props, State> {
       source,
       dashboards,
       sendDashboardCell,
-      script,
       handleGetDashboards,
       notify,
+      script,
     } = this.props
 
     const {isSendToDashboardVisible, isStaticLegend} = this.state
@@ -367,7 +340,6 @@ export class DataExplorer extends PureComponent<Props, State> {
             dashboards={dashboards}
             handleGetDashboards={handleGetDashboards}
             sendDashboardCell={sendDashboardCell}
-            visualizationOptions={this.visualizationOptions}
             isStaticLegend={isStaticLegend}
           />
         </OverlayTechnology>
@@ -376,9 +348,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private get templates(): Template[] {
-    const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
-
-    const timeRange = this.props.timeRange || {lower, upper}
+    const {timeRange} = this.props
 
     const low = timeRange.lower
     const up = timeRange.upper
@@ -436,10 +406,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     this.setState({isWriteFormVisible: true})
   }
 
-  private handleChooseTimeRange = (timeRange: TimeRange): void => {
-    this.props.setTimeRange(timeRange)
-  }
-
   private async fetchFluxServices() {
     const {fetchServicesAsync, sources} = this.props
     if (!sources.length) {
@@ -455,47 +421,18 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   private get activeQueryConfig(): QueryConfig {
     const {queryDrafts} = this.props
+
     return _.get(queryDrafts, '0.queryConfig')
   }
 
   private get rawText(): string {
     const {timeRange} = this.props
+
     if (this.activeQueryConfig) {
       return buildRawText(this.activeQueryConfig, timeRange)
     }
+
     return ''
-  }
-
-  private get visualizationOptions(): VisualizationOptions {
-    const {
-      visType,
-      tableOptions,
-      fieldOptions,
-      timeFormat,
-      decimalPlaces,
-      note,
-      noteVisibility,
-      axes,
-      thresholdsListColors,
-      thresholdsListType,
-      gaugeColors,
-      lineColors,
-    } = this.props
-
-    return {
-      type: visType,
-      axes,
-      tableOptions,
-      fieldOptions,
-      timeFormat,
-      decimalPlaces,
-      note,
-      noteVisibility,
-      thresholdsListColors,
-      gaugeColors,
-      lineColors,
-      thresholdsListType,
-    }
   }
 
   private toggleSendToDashboard = () => {
@@ -511,47 +448,23 @@ export class DataExplorer extends PureComponent<Props, State> {
   private handleResetFocus = () => {
     return
   }
+}
 
-  private async createNewQueryDraft() {
-    const {source, loadDE, timeRange, sourceLink} = this.props
-
-    const {query} = this.queryString
-    const queryConfig = await getConfig(
-      source.links.queries,
-      uuid.v4(),
-      query,
-      this.templates
-    )
-
-    const isFlux = !!this.service
-
-    if (isFlux) {
-      const queryDraft = {
-        query,
-        queryConfig,
-        source: sourceLink,
-        type: QueryType.Flux,
-      }
-      loadDE([queryDraft], timeRange)
-    } else {
-      const queryDraft = {
-        query,
-        queryConfig,
-        source: source.links.self,
-        type: QueryType.InfluxQL,
-      }
-      loadDE([queryDraft], timeRange)
-    }
-  }
-
-  private get activeScript(): string {
-    const {script} = this.queryString
-    if (script) {
-      return script
-    }
-
-    return this.props.script
-  }
+const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
+  return (
+    <Subscribe to={[TimeMachineContainer]}>
+      {(timeMachineContainer: TimeMachineContainer) => (
+        <DataExplorer
+          {...props}
+          queryDrafts={timeMachineContainer.state.queryDrafts}
+          timeRange={timeMachineContainer.state.timeRange}
+          script={timeMachineContainer.state.script}
+          onChangeScript={timeMachineContainer.handleChangeScript}
+          onUpdateQueryDrafts={timeMachineContainer.handleUpdateQueryDrafts}
+        />
+      )}
+    </Subscribe>
+  )
 }
 
 const mstp = state => {
@@ -559,25 +472,7 @@ const mstp = state => {
     app: {
       persisted: {autoRefresh},
     },
-    dataExplorer: {
-      queryDrafts,
-      timeRange,
-      queryStatus,
-      script,
-      sourceLink,
-      visType,
-      thresholdsListType,
-      thresholdsListColors,
-      gaugeColors,
-      lineColors,
-      axes,
-      tableOptions,
-      timeFormat,
-      decimalPlaces,
-      fieldOptions,
-      note,
-      noteVisibility,
-    },
+    dataExplorer: {timeRange, queryStatus, sourceLink},
     dashboardUI: {dashboards},
     sources,
     services,
@@ -587,26 +482,12 @@ const mstp = state => {
   return {
     fluxLinks: links.flux,
     autoRefresh,
-    queryDrafts,
     timeRange,
     dashboards,
     sources,
     services,
     queryStatus,
-    script,
     sourceLink,
-    visType,
-    thresholdsListType,
-    thresholdsListColors,
-    gaugeColors,
-    lineColors,
-    axes,
-    tableOptions,
-    timeFormat,
-    decimalPlaces,
-    fieldOptions,
-    note,
-    noteVisibility,
   }
 }
 
@@ -614,21 +495,16 @@ const mdtp = dispatch => {
   return {
     handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
     errorThrownAction: bindActionCreators(errorThrown, dispatch),
-    setTimeRange: bindActionCreators(updateEditorTimeRange, dispatch),
     writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
-    queryConfigActions: bindActionCreators(queryConfigModifiers, dispatch),
     handleGetDashboards: bindActionCreators(getDashboardsAsync, dispatch),
     sendDashboardCell: bindActionCreators(sendDashboardCellAsync, dispatch),
-    loadDE: bindActionCreators(loadDEAction, dispatch),
-    updateQueryDrafts: bindActionCreators(updateQueryDraftsAction, dispatch),
-    addQuery: bindActionCreators(addQueryAsync, dispatch),
-    deleteQuery: bindActionCreators(deleteQueryAsync, dispatch),
     editQueryStatus: bindActionCreators(editQueryStatusAction, dispatch),
-    updateScript: bindActionCreators(updateScriptAction, dispatch),
     fetchServicesAsync: bindActionCreators(fetchAllFluxServicesAsync, dispatch),
     notify: bindActionCreators(notifyAction, dispatch),
     updateSourceLink: bindActionCreators(updateSourceLinkAction, dispatch),
   }
 }
 
-export default connect(mstp, mdtp)(withRouter(ManualRefresh(DataExplorer)))
+export default connect(mstp, mdtp)(
+  withRouter(ManualRefresh(ConnectedDataExplorer))
+)

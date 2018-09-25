@@ -17,7 +17,6 @@ import * as SourcesModels from 'src/types/sources'
 import {Service, Template} from 'src/types'
 
 interface Props {
-  isInCEO: boolean
   isFluxSource: boolean
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
@@ -46,7 +45,6 @@ const TimeMachineControls: SFC<Props> = ({
   service,
   queries,
   templates,
-  isInCEO,
   services,
   timeRange,
   toggleFlux,
@@ -61,8 +59,6 @@ const TimeMachineControls: SFC<Props> = ({
   isDynamicSourceSelected,
   updateEditorTimeRange,
 }) => {
-  const timeRangePage = isInCEO ? null : 'DataExplorer'
-
   return (
     <div className="deceo--controls">
       <SourceSelector
@@ -103,7 +99,6 @@ const TimeMachineControls: SFC<Props> = ({
       <TimeRangeDropdown
         onChooseTimeRange={updateEditorTimeRange}
         selected={timeRange}
-        page={timeRangePage}
       />
     </div>
   )

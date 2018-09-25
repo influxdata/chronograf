@@ -208,7 +208,7 @@ export const LINE_COLOR_SCALES = [
   return {name, colors, id}
 })
 
-export const validateLineColors = (
+export const getLineColors = (
   colors: LineColor[],
   numSeries = 0
 ): LineColor[] => {
@@ -228,7 +228,7 @@ export const getLineColorsHexes = (
   colors: LineColor[],
   numSeries: number
 ): string[] => {
-  const validatedColors = validateLineColors(colors, numSeries) // ensures safe defaults
+  const validatedColors = getLineColors(colors, numSeries) // ensures safe defaults
   const colorsHexArray = validatedColors.map(color => color.hex)
 
   if (numSeries === 1 || numSeries === 0) {

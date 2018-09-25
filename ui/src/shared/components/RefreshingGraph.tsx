@@ -88,6 +88,7 @@ interface Props {
   cellNoteVisibility: NoteVisibility
   editorLocation?: QueryUpdateState
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
+  onUpdateFieldOptions?: (fieldOptions: FieldOption[]) => void
 }
 
 class RefreshingGraph extends PureComponent<Props> {
@@ -242,6 +243,7 @@ class RefreshingGraph extends PureComponent<Props> {
       manualRefresh,
       handleSetHoverTime,
       editorLocation,
+      onUpdateFieldOptions,
     } = this.props
 
     const {dataType, data} = this.getTypeAndData(influxQLData, fluxData)
@@ -258,6 +260,7 @@ class RefreshingGraph extends PureComponent<Props> {
           decimalPlaces={decimalPlaces}
           editorLocation={editorLocation}
           handleSetHoverTime={handleSetHoverTime}
+          onUpdateFieldOptions={onUpdateFieldOptions}
         />
       )
     }
@@ -274,6 +277,7 @@ class RefreshingGraph extends PureComponent<Props> {
         decimalPlaces={decimalPlaces}
         editorLocation={editorLocation}
         handleSetHoverTime={handleSetHoverTime}
+        onUpdateFieldOptions={onUpdateFieldOptions}
       />
     )
   }

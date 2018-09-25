@@ -1,60 +1,17 @@
 // Types
-import {ColorNumber, ColorString} from 'src/types/colors'
-import {TimeRange, CellQuery, Status, CellType, Axes} from 'src/types'
-import {
-  DecimalPlaces,
-  FieldOption,
-  ThresholdType,
-  TableOptions,
-  NoteVisibility,
-} from 'src/types/dashboards'
 import {DEState} from 'src/types/dataExplorer'
+import {Status} from 'src/types'
 
 export interface State {
   dataExplorer: DEState
 }
 
 export enum ActionType {
-  LoadDE = 'LOAD_DE',
-  UpdateQueryDrafts = 'DE_UPDATE_QUERY_DRAFTS',
-  UpdateEditorTimeRange = 'DE_UPDATE_EDITOR_TIME_RANGE',
-  UpdateQueryStatus = 'DE_UPDATE_QUERY_STATUS',
-  UpdateScript = 'DE_UPDATE_SCRIPT',
   UpdateSourceLink = 'DE_UPDATE_SOURCE_LINK',
-  ChangeVisualizationType = 'DE_CHANGE_Visualization_TYPE',
-  UpdateThresholdsListColors = 'DE_UPDATE_THRESHOLDS_LIST_COLORS',
-  UpdateThresholdsListType = 'DE_UPDATE_THRESHOLDS_LIST_TYPE',
-  UpdateGaugeColors = 'DE_UPDATE_GAUGE_COLORS',
-  UpdateAxes = 'DE_UPDATE_AXES',
-  UpdateTableOptions = 'DE_UPDATE_TABLE_OPTIONS',
-  UpdateLineColors = 'DE_UPDATE_LINE_COLORS',
-  ChangeTimeFormat = 'DE_CHANGE_TIME_FORMAT',
-  ChangeDecimalPlaces = 'DE_CHANGE_DECIMAL_PLACES',
-  UpdateFieldOptions = 'DE_UPDATE_FIELD_OPTIONS',
-  UpdateQueryDraft = 'DE_UPDATE_QUERY_DRAFT',
-  UpdateNote = 'DE_UPDATE_NOTE',
-  UpdateNoteVisibility = 'DE_UPDATE_NOTE_VISIBILITY',
+  EditQueryStatus = 'EDIT_QUERY_STATUS',
 }
 
-export type Action =
-  | LoadDEAction
-  | UpdateEditorTimeRangeAction
-  | UpdateQueryDraftsAction
-  | UpdateQueryStatusAction
-  | UpdateScriptAction
-  | UpdateSourceLinkAction
-  | ChangeVisualizationTypeAction
-  | UpdateThresholdsListColorsAction
-  | UpdateThresholdsListTypeAction
-  | UpdateGaugeColorsAction
-  | UpdateAxesAction
-  | UpdateTableOptionsAction
-  | UpdateLineColorsAction
-  | ChangeTimeFormatAction
-  | ChangeDecimalPlacesAction
-  | UpdateFieldOptionsAction
-  | UpdateCellNoteAction
-  | UpdateCellNoteVisibilityAction
+export type Action = UpdateSourceLinkAction | EditQueryStatusAction
 
 export interface UpdateSourceLinkAction {
   type: ActionType.UpdateSourceLink
@@ -63,138 +20,6 @@ export interface UpdateSourceLinkAction {
   }
 }
 
-export interface LoadDEAction {
-  type: ActionType.LoadDE
-  payload: {
-    queries: CellQuery[]
-    timeRange: TimeRange
-  }
-}
-
-export interface UpdateQueryDraftsAction {
-  type: ActionType.UpdateQueryDrafts
-  payload: {
-    queryDrafts: CellQuery[]
-  }
-}
-
-export interface UpdateEditorTimeRangeAction {
-  type: ActionType.UpdateEditorTimeRange
-  payload: {
-    timeRange: TimeRange
-  }
-}
-
-export interface UpdateQueryStatusAction {
-  type: ActionType.UpdateQueryStatus
-  payload: {
-    queryID: string
-    status: Status
-  }
-}
-
-export interface UpdateScriptAction {
-  type: ActionType.UpdateScript
-  payload: {
-    script: string
-  }
-}
-
-export interface ChangeVisualizationTypeAction {
-  type: ActionType.ChangeVisualizationType
-  payload: {
-    cellType: CellType
-  }
-}
-
-export interface UpdateThresholdsListColorsAction {
-  type: ActionType.UpdateThresholdsListColors
-  payload: {
-    thresholdsListColors: ColorNumber[]
-  }
-}
-
-export interface UpdateThresholdsListTypeAction {
-  type: ActionType.UpdateThresholdsListType
-  payload: {
-    thresholdsListType: ThresholdType
-  }
-}
-
-export interface UpdateGaugeColorsAction {
-  type: ActionType.UpdateGaugeColors
-  payload: {
-    gaugeColors: ColorNumber[]
-  }
-}
-
-export interface UpdateAxesAction {
-  type: ActionType.UpdateAxes
-  payload: {
-    axes: Axes
-  }
-}
-
-export interface UpdateTableOptionsAction {
-  type: ActionType.UpdateTableOptions
-  payload: {
-    tableOptions: TableOptions
-  }
-}
-
-export interface UpdateLineColorsAction {
-  type: ActionType.UpdateLineColors
-  payload: {
-    lineColors: ColorString[]
-  }
-}
-
-export interface ChangeTimeFormatAction {
-  type: ActionType.ChangeTimeFormat
-  payload: {
-    timeFormat: string
-  }
-}
-
-export interface ChangeDecimalPlacesAction {
-  type: ActionType.ChangeDecimalPlaces
-  payload: {
-    decimalPlaces: DecimalPlaces
-  }
-}
-
-export interface UpdateFieldOptionsAction {
-  type: ActionType.UpdateFieldOptions
-  payload: {
-    fieldOptions: FieldOption[]
-  }
-}
-
-export interface UpdateCellNoteAction {
-  type: ActionType.UpdateNote
-  payload: {
-    note: string
-  }
-}
-
-export interface UpdateCellNoteVisibilityAction {
-  type: ActionType.UpdateNoteVisibility
-  payload: {
-    noteVisibility: NoteVisibility
-  }
-}
-
-export const loadDE = (
-  queries: CellQuery[],
-  timeRange: TimeRange
-): LoadDEAction => ({
-  type: ActionType.LoadDE,
-  payload: {
-    queries,
-    timeRange,
-  },
-})
-
 export const updateSourceLink = (
   sourceLink: string
 ): UpdateSourceLinkAction => ({
@@ -202,4 +27,20 @@ export const updateSourceLink = (
   payload: {
     sourceLink,
   },
+})
+
+interface EditQueryStatusAction {
+  type: ActionType.EditQueryStatus
+  payload: {
+    queryID: string
+    status: Status
+  }
+}
+
+export const editQueryStatus = (
+  queryID: string,
+  status: Status
+): EditQueryStatusAction => ({
+  type: ActionType.EditQueryStatus,
+  payload: {queryID, status},
 })

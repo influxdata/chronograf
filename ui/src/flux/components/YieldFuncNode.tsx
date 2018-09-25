@@ -1,15 +1,39 @@
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
+import {Subscribe} from 'unstated'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import YieldNodeVis from 'src/flux/components/YieldNodeVis'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
-import {FluxTable, Service, Source, TimeRange, Query} from 'src/types'
+import {FluxTable, Service, Source, TimeRange, Query, Axes} from 'src/types'
 import {Func} from 'src/types/flux'
-import {VisualizationOptions} from 'src/types/dataExplorer'
 
-interface Props {
+import {
+  FieldOption,
+  DecimalPlaces,
+  NoteVisibility,
+  ThresholdType,
+  TableOptions as TableOptionsInterface,
+} from 'src/types/dashboards'
+import {ColorNumber, ColorString} from 'src/types/colors'
+
+interface ConnectedProps {
+  axes: Axes | null
+  tableOptions: TableOptionsInterface
+  fieldOptions: FieldOption[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  note: string
+  noteVisibility: NoteVisibility
+  thresholdsListColors: ColorNumber[]
+  thresholdsListType: ThresholdType
+  gaugeColors: ColorNumber[]
+  lineColors: ColorString[]
+}
+
+interface PassedProps {
   service: Service
   source: Source
   timeRange: TimeRange
@@ -20,8 +44,9 @@ interface Props {
   declarationID?: string
   script: string
   queries: Query[]
-  visualizationOptions: VisualizationOptions
 }
+
+type Props = ConnectedProps & PassedProps
 
 interface State {
   data: FluxTable[]
@@ -31,12 +56,12 @@ interface State {
 class YieldFuncNode extends PureComponent<Props, State> {
   private timeSeries: React.RefObject<TimeSeries> = React.createRef()
 
-  public componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: Props) {
     if (!this.timeSeries.current) {
       return
     }
 
-    if (this.haveVisOptionsChanged(prevProps.visualizationOptions)) {
+    if (this.haveVisOptionsChanged(prevProps)) {
       this.timeSeries.current.forceUpdate()
     }
   }
@@ -44,11 +69,18 @@ class YieldFuncNode extends PureComponent<Props, State> {
   public render() {
     const {
       func,
-      visualizationOptions,
       source,
       service,
       timeRange,
       queries,
+      axes,
+      tableOptions,
+      fieldOptions,
+      timeFormat,
+      decimalPlaces,
+      thresholdsListColors,
+      gaugeColors,
+      lineColors,
     } = this.props
 
     const yieldName = _.get(func, 'args.0.value', 'result')
@@ -66,7 +98,14 @@ class YieldFuncNode extends PureComponent<Props, State> {
             <YieldNodeVis
               data={timeSeriesFlux}
               yieldName={yieldName}
-              visualizationOptions={visualizationOptions}
+              axes={axes}
+              tableOptions={tableOptions}
+              fieldOptions={fieldOptions}
+              timeFormat={timeFormat}
+              decimalPlaces={decimalPlaces}
+              thresholdsListColors={thresholdsListColors}
+              gaugeColors={gaugeColors}
+              lineColors={lineColors}
             />
           )}
         </TimeSeries>
@@ -74,22 +113,46 @@ class YieldFuncNode extends PureComponent<Props, State> {
     )
   }
 
-  private haveVisOptionsChanged(
-    visualizationOptions: VisualizationOptions
-  ): boolean {
+  private haveVisOptionsChanged(prevProps: Props): boolean {
     const visProps: string[] = [
       'axes',
-      'colors',
+      'lineColors',
+      'gaugeColors',
+      'thresholdsListColors',
+      'thresholdsListType',
       'tableOptions',
       'fieldOptions',
       'decimalPlaces',
       'timeFormat',
     ]
 
-    const prevVisValues = _.pick(visualizationOptions, visProps)
-    const curVisValues = _.pick(this.props.visualizationOptions, visProps)
+    const prevVisValues = _.pick(prevProps, visProps)
+    const curVisValues = _.pick(this.props, visProps)
     return !_.isEqual(prevVisValues, curVisValues)
   }
 }
 
-export default YieldFuncNode
+const ConnectedYieldFuncNode = (props: PassedProps) => {
+  return (
+    <Subscribe to={[TimeMachineContainer]}>
+      {(timeMachineContainer: TimeMachineContainer) => (
+        <YieldFuncNode
+          {...props}
+          axes={timeMachineContainer.state.axes}
+          tableOptions={timeMachineContainer.state.tableOptions}
+          fieldOptions={timeMachineContainer.state.fieldOptions}
+          timeFormat={timeMachineContainer.state.timeFormat}
+          decimalPlaces={timeMachineContainer.state.decimalPlaces}
+          note={timeMachineContainer.state.note}
+          noteVisibility={timeMachineContainer.state.noteVisibility}
+          thresholdsListColors={timeMachineContainer.state.thresholdsListColors}
+          thresholdsListType={timeMachineContainer.state.thresholdsListType}
+          gaugeColors={timeMachineContainer.state.gaugeColors}
+          lineColors={timeMachineContainer.state.lineColors}
+        />
+      )}
+    </Subscribe>
+  )
+}
+
+export default ConnectedYieldFuncNode

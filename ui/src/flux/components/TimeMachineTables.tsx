@@ -27,6 +27,7 @@ interface Props {
   handleSetHoverTime?: (hovertime: string) => void
   colors: ColorString[]
   editorLocation?: QueryUpdateState
+  onUpdateFieldOptions?: (fieldOptions: FieldOption[]) => void
 }
 
 interface State {
@@ -77,7 +78,9 @@ class TimeMachineTables extends PureComponent<Props, State> {
       decimalPlaces,
       editorLocation,
       handleSetHoverTime,
+      onUpdateFieldOptions,
     } = this.props
+
     return (
       <div className="time-machine-tables">
         {this.showSidebar && (
@@ -98,6 +101,7 @@ class TimeMachineTables extends PureComponent<Props, State> {
             decimalPlaces={decimalPlaces}
             editorLocation={editorLocation}
             handleSetHoverTime={handleSetHoverTime}
+            onUpdateFieldOptions={onUpdateFieldOptions}
           />
         )}
         {!this.hasResults && <NoResults />}

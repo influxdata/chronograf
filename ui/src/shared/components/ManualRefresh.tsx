@@ -1,4 +1,4 @@
-import React, {Component, ComponentClass} from 'react'
+import React, {Component, ComponentClass, StatelessComponent} from 'react'
 
 export interface ManualRefreshProps {
   manualRefresh: number
@@ -10,7 +10,9 @@ interface ManualRefreshState {
 }
 
 function ManualRefresh<P>(
-  WrappedComponent: ComponentClass<P & ManualRefreshProps>
+  WrappedComponent:
+    | ComponentClass<P & ManualRefreshProps>
+    | StatelessComponent<P & ManualRefreshProps>
 ): ComponentClass<P> {
   return class extends Component<P & ManualRefreshProps, ManualRefreshState> {
     public constructor(props: P & ManualRefreshProps) {

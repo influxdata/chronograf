@@ -7,14 +7,12 @@ import moment from 'moment'
 import {ColumnSizer, SizedColumnProps, AutoSizer} from 'react-virtualized'
 import {MultiGrid, PropsMultiGrid} from 'src/shared/components/MultiGrid'
 import InvalidData from 'src/shared/components/InvalidData'
-import {bindActionCreators} from 'redux'
 import {fastReduce} from 'src/utils/fast'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {
   computeFieldOptions,
   getDefaultTimeField,
 } from 'src/dashboards/utils/tableGraph'
-import {updateFieldOptions} from 'src/shared/actions/visualizations'
 import {QueryUpdateState} from 'src/shared/actions/queries'
 import {
   ASCENDING,
@@ -74,10 +72,10 @@ interface Props {
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
   hoverTime: string
-  handleUpdateFieldOptions: typeof updateFieldOptions
   handleSetHoverTime?: (hovertime: string) => void
   colors: ColorString[]
   editorLocation?: QueryUpdateState
+  onUpdateFieldOptions?: (fieldOptions: FieldOption[]) => void
 }
 
 interface State {
@@ -508,9 +506,10 @@ class TableGraph extends PureComponent<Props, State> {
   }
 
   private handleUpdateFieldOptions = (fieldOptions: FieldOption[]): void => {
-    const {handleUpdateFieldOptions, editorLocation} = this.props
-    if (editorLocation) {
-      handleUpdateFieldOptions(fieldOptions, editorLocation)
+    const {onUpdateFieldOptions} = this.props
+
+    if (onUpdateFieldOptions) {
+      onUpdateFieldOptions(fieldOptions)
     }
   }
 
@@ -833,8 +832,4 @@ const mstp = ({dashboardUI}) => ({
   hoverTime: dashboardUI.hoverTime,
 })
 
-const mapDispatchToProps = dispatch => ({
-  handleUpdateFieldOptions: bindActionCreators(updateFieldOptions, dispatch),
-})
-
-export default connect(mstp, mapDispatchToProps)(TableGraph)
+export default connect(mstp)(TableGraph)

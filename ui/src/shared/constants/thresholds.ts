@@ -119,7 +119,9 @@ export const DEFAULT_THRESHOLDS_LIST_COLORS = [
   },
 ]
 
-export const validateThresholdsListColors = (colors, type) => {
+export const getThresholdsListColors = colors => {
+  const type = getThresholdsListType(colors)
+
   if (!colors || colors.length === 0) {
     return DEFAULT_THRESHOLDS_LIST_COLORS
   }
@@ -159,19 +161,17 @@ export const validateThresholdsListColors = (colors, type) => {
   return containsBaseColor ? formattedColors : formattedColorsWithBase
 }
 
-export const getThresholdsListType = colors => {
+const getThresholdsListType = colors => {
   const type = _.get(colors, ['0', 'type'], false)
 
-  if (type) {
-    if (_.includes([THRESHOLD_TYPE_TEXT, THRESHOLD_TYPE_BG], type)) {
-      return type
-    }
+  if (type && _.includes([THRESHOLD_TYPE_TEXT, THRESHOLD_TYPE_BG], type)) {
+    return type
   }
 
   return THRESHOLD_TYPE_TEXT
 }
 
-export const validateGaugeColors = colors => {
+export const getGaugeColors = colors => {
   if (!colors || colors.length < MIN_THRESHOLDS) {
     return DEFAULT_GAUGE_COLORS
   }

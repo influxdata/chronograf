@@ -1,6 +1,7 @@
 // Libraries
 import React, {SFC} from 'react'
 import _ from 'lodash'
+import {Subscribe} from 'unstated'
 
 // Components
 import EmptyQuery from 'src/shared/components/EmptyQuery'
@@ -8,36 +9,52 @@ import QueryTabList from 'src/shared/components/QueryTabList'
 import InfluxQLEditor from 'src/dashboards/components/InfluxQLEditor'
 import SchemaExplorer from 'src/shared/components/SchemaExplorer'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+
+// Utils
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 import {TEMPLATE_RANGE} from 'src/tempVars/constants'
+import {AUTO_GROUP_BY} from 'src/shared/constants'
 
 // Types
 import {QueryConfig, Source, TimeRange, Template} from 'src/types'
-import {QueryConfigActions} from 'src/shared/actions/queries'
 
 const buildText = (q: QueryConfig): string =>
   q.rawText || buildQuery(TYPE_QUERY_CONFIG, q.range || TEMPLATE_RANGE, q) || ''
 
-interface Props {
+interface ConnectedProps {
+  timeRange: TimeRange
+  onFill: TimeMachineContainer['handleFill']
+  onTimeShift: TimeMachineContainer['handleTimeShift']
+  onChooseTag: TimeMachineContainer['handleChooseTag']
+  onGroupByTag: TimeMachineContainer['handleGroupByTag']
+  onGroupByTime: TimeMachineContainer['handleGroupByTime']
+  onToggleField: TimeMachineContainer['handleToggleField']
+  onRemoveFuncs: TimeMachineContainer['handleRemoveFuncs']
+  onAddInitialField: TimeMachineContainer['handleAddInitialField']
+  onChooseNamespace: TimeMachineContainer['handleChooseNamespace']
+  onChooseMeasurement: TimeMachineContainer['handleChooseMeasurement']
+  onApplyFuncsToField: TimeMachineContainer['handleApplyFuncsToField']
+  onToggleTagAcceptance: TimeMachineContainer['handleToggleTagAcceptance']
+}
+
+interface PassedProps {
   source: Source
   queries: QueryConfig[]
-  timeRange: TimeRange
-  actions: QueryConfigActions
   setActiveQueryIndex: (index: number) => void
-  onDeleteQuery: (index: number) => void
   activeQueryIndex: number
   activeQuery: QueryConfig
-  onAddQuery: () => void
   templates: Template[]
-  initialGroupByTime: string
-  isInCEO: boolean
+  onAddQuery: () => void
+  onDeleteQuery: (index: number) => void
+  onEditRawText: (text: string) => Promise<void>
 }
+
+type Props = ConnectedProps & PassedProps
 
 const QueryMaker: SFC<Props> = ({
   source,
-  isInCEO,
-  actions,
   queries,
   timeRange,
   templates,
@@ -45,8 +62,20 @@ const QueryMaker: SFC<Props> = ({
   activeQuery,
   onDeleteQuery,
   activeQueryIndex,
-  initialGroupByTime,
   setActiveQueryIndex,
+  onEditRawText,
+  onFill,
+  onTimeShift,
+  onChooseTag,
+  onGroupByTag,
+  onGroupByTime,
+  onToggleField,
+  onRemoveFuncs,
+  onAddInitialField,
+  onChooseNamespace,
+  onChooseMeasurement,
+  onApplyFuncsToField,
+  onToggleTagAcceptance,
 }) => {
   if (!activeQuery || !activeQuery.id) {
     return (
@@ -71,20 +100,30 @@ const QueryMaker: SFC<Props> = ({
           <InfluxQLEditor
             query={buildText(activeQuery)}
             config={activeQuery}
-            onUpdate={actions.editRawTextAsync}
+            onUpdate={onEditRawText}
             templates={templates}
           />
           <SchemaExplorer
             source={source}
-            actions={actions}
             query={activeQuery}
-            initialGroupByTime={initialGroupByTime}
+            initialGroupByTime={AUTO_GROUP_BY}
             isQuerySupportedByExplorer={_.get(
               activeQuery,
               'isQuerySupportedByExplorer',
               true
             )}
-            isInCEO={isInCEO}
+            onFill={onFill}
+            onTimeShift={onTimeShift}
+            onChooseTag={onChooseTag}
+            onGroupByTag={onGroupByTag}
+            onGroupByTime={onGroupByTime}
+            onToggleField={onToggleField}
+            onRemoveFuncs={onRemoveFuncs}
+            onAddInitialField={onAddInitialField}
+            onChooseNamespace={onChooseNamespace}
+            onChooseMeasurement={onChooseMeasurement}
+            onApplyFuncsToField={onApplyFuncsToField}
+            onToggleTagAcceptance={onToggleTagAcceptance}
           />
         </div>
       </div>
@@ -92,4 +131,27 @@ const QueryMaker: SFC<Props> = ({
   )
 }
 
-export default QueryMaker
+const ConnectedQueryMaker = (props: PassedProps) => (
+  <Subscribe to={[TimeMachineContainer]}>
+    {(container: TimeMachineContainer) => (
+      <QueryMaker
+        {...props}
+        timeRange={container.state.timeRange}
+        onFill={container.handleFill}
+        onTimeShift={container.handleTimeShift}
+        onChooseTag={container.handleChooseTag}
+        onGroupByTag={container.handleGroupByTag}
+        onGroupByTime={container.handleGroupByTime}
+        onToggleField={container.handleToggleField}
+        onRemoveFuncs={container.handleRemoveFuncs}
+        onAddInitialField={container.handleAddInitialField}
+        onChooseNamespace={container.handleChooseNamespace}
+        onChooseMeasurement={container.handleChooseMeasurement}
+        onApplyFuncsToField={container.handleApplyFuncsToField}
+        onToggleTagAcceptance={container.handleToggleTagAcceptance}
+      />
+    )}
+  </Subscribe>
+)
+
+export default ConnectedQueryMaker

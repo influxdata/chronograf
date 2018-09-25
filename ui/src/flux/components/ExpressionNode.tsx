@@ -61,7 +61,6 @@ class ExpressionNode extends PureComponent<Props, State> {
           service,
           data,
           scriptUpToYield,
-          visualizationOptions,
           source,
           timeRange,
           queries,
@@ -140,7 +139,6 @@ class ExpressionNode extends PureComponent<Props, State> {
                         queries={queries}
                         timeRange={timeRange}
                         declarationID={declarationID}
-                        visualizationOptions={visualizationOptions}
                       />
                     </Fragment>
                   )

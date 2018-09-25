@@ -1,3 +1,5 @@
+import {timeRanges} from 'src/shared/data/timeRanges'
+
 export const INFLUXQL_FUNCTIONS: string[] = [
   'mean',
   'median',
@@ -210,3 +212,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
 
 export const WRITE_DATA_DOCS_LINK =
   'https://docs.influxdata.com/influxdb/latest/write_protocols/line_protocol_tutorial/'
+
+export const DEFAULT_TIME_RANGE = timeRanges.find(
+  tr => tr.lower === 'now() - 1h'
+)

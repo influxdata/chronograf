@@ -1,7 +1,7 @@
 // Libraries
 import React, {Component} from 'react'
-import {connect} from 'react-redux'
 import _ from 'lodash'
+import {Subscribe} from 'unstated'
 
 // Components
 import GraphTypeSelector from 'src/dashboards/components/GraphTypeSelector'
@@ -13,21 +13,8 @@ import NoteOptions from 'src/dashboards/components/NoteOptions'
 import CellNoteEditor from 'src/shared/components/TimeMachine/CellNoteEditor'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
-// Actions
-import {
-  updateDecimalPlaces,
-  updateGaugeColors,
-  updateAxes,
-  updateTableOptions,
-  updateFieldOptions,
-  updateTimeFormat,
-  updateVisType,
-  updateNote,
-  updateNoteVisibility,
-  updateThresholdsListColors,
-  updateThresholdsListType,
-  updateLineColors,
-} from 'src/shared/actions/visualizations'
+// Utils
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
@@ -35,41 +22,54 @@ import {QueryUpdateState} from 'src/shared/actions/queries'
 import {DEFAULT_AXES} from 'src/dashboards/constants/cellEditor'
 
 // Types
-import {
-  CellType,
-  FieldOption,
-  ThresholdType,
-  DecimalPlaces,
-  NewDefaultCell,
-  NoteVisibility,
-  TableOptions as TableOptionsInterface,
-} from 'src/types/dashboards'
 import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {Axes, Cell, QueryConfig} from 'src/types'
+import {Axes, QueryConfig, CellType} from 'src/types'
+import {
+  FieldOption,
+  DecimalPlaces,
+  NoteVisibility,
+  ThresholdType,
+  TableOptions as TableOptionsInterface,
+} from 'src/types/dashboards'
 import {ColorNumber, ColorString} from 'src/types/colors'
-import {VisualizationOptions} from 'src/types/dataExplorer'
 
-interface Props extends VisualizationOptions {
-  cell: Cell | NewDefaultCell
+interface ConnectedProps {
+  type: CellType
+  axes: Axes | null
+  tableOptions: TableOptionsInterface
+  fieldOptions: FieldOption[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  note: string
+  noteVisibility: NoteVisibility
+  thresholdsListColors: ColorNumber[]
+  thresholdsListType: ThresholdType
+  gaugeColors: ColorNumber[]
+  lineColors: ColorString[]
+  onUpdateDecimalPlaces: TimeMachineContainer['handleUpdateDecimalPlaces']
+  onUpdateGaugeColors: TimeMachineContainer['handleUpdateGaugeColors']
+  onUpdateAxes: TimeMachineContainer['handleUpdateAxes']
+  onUpdateTableOptions: TimeMachineContainer['handleUpdateTableOptions']
+  onUpdateFieldOptions: TimeMachineContainer['handleUpdateFieldOptions']
+  onUpdateTimeFormat: TimeMachineContainer['handleUpdateTimeFormat']
+  onUpdateType: TimeMachineContainer['handleUpdateType']
+  onUpdateNote: TimeMachineContainer['handleUpdateNote']
+  onUpdateLineColors: TimeMachineContainer['handleUpdateLineColors']
+  onUpdateNoteVisibility: TimeMachineContainer['handleUpdateNoteVisibility']
+  onUpdateThresholdsListColors: TimeMachineContainer['handleUpdateThresholdsListColors']
+  onUpdateThresholdsListType: TimeMachineContainer['handleUpdateThresholdsListType']
+}
+
+interface PassedProps {
   queryConfigs: QueryConfig[]
   staticLegend: boolean
   stateToUpdate: QueryUpdateState
   onResetFocus: () => void
   onToggleStaticLegend: (isStaticLegend: boolean) => void
-  onUpdateDecimalPlaces: typeof updateDecimalPlaces
-  onUpdateGaugeColors: typeof updateGaugeColors
-  onUpdateAxes: typeof updateAxes
-  onUpdateTableOptions: typeof updateTableOptions
-  onUpdateFieldOptions: typeof updateFieldOptions
-  onUpdateTimeFormat: typeof updateTimeFormat
-  onUpdateVisType: typeof updateVisType
-  onUpdateNote: typeof updateNote
-  onUpdateLineColors: typeof updateLineColors
-  onUpdateNoteVisibility: typeof updateNoteVisibility
-  onUpdateThresholdsListColors: typeof updateThresholdsListColors
-  onUpdateThresholdsListType: typeof updateThresholdsListType
 }
+
+type Props = PassedProps & ConnectedProps
 
 interface State {
   defaultYLabel: string
@@ -103,17 +103,21 @@ class DisplayOptions extends Component<Props, State> {
   }
 
   private get threesizerDivisions() {
-    const {type, note, noteVisibility} = this.props
+    const {
+      type,
+      note,
+      noteVisibility,
+      onUpdateType,
+      onUpdateNote,
+      onUpdateNoteVisibility,
+    } = this.props
     return [
       {
         name: 'Visualization Type',
         headerButtons: [],
         menuOptions: [],
         render: () => (
-          <GraphTypeSelector
-            type={type}
-            onUpdateVisType={this.handleUpdateVisType}
-          />
+          <GraphTypeSelector type={type} onUpdateVisType={onUpdateType} />
         ),
         headerOrientation: HANDLE_VERTICAL,
       },
@@ -132,8 +136,8 @@ class DisplayOptions extends Component<Props, State> {
           <CellNoteEditor
             note={note || ''}
             noteVisibility={noteVisibility}
-            onUpdateNote={this.handleUpdateNote}
-            onUpdateNoteVisibility={this.handleUpdateNoteVisibility}
+            onUpdateNote={onUpdateNote}
+            onUpdateNoteVisibility={onUpdateNoteVisibility}
           />
         ),
         headerOrientation: HANDLE_VERTICAL,
@@ -156,6 +160,15 @@ class DisplayOptions extends Component<Props, State> {
       timeFormat,
       tableOptions,
       fieldOptions,
+      onUpdateAxes,
+      onUpdateDecimalPlaces,
+      onUpdateGaugeColors,
+      onUpdateThresholdsListColors,
+      onUpdateThresholdsListType,
+      onUpdateFieldOptions,
+      onUpdateLineColors,
+      onUpdateTableOptions,
+      onUpdateTimeFormat,
     } = this.props
 
     const {defaultYLabel} = this.state
@@ -168,9 +181,9 @@ class DisplayOptions extends Component<Props, State> {
             axes={this.axes}
             decimalPlaces={decimalPlaces}
             gaugeColors={gaugeColors}
-            onUpdateAxes={this.handleUpdateAxes}
-            onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
-            onUpdateGaugeColors={this.handleUpdateGaugeColors}
+            onUpdateAxes={onUpdateAxes}
+            onUpdateDecimalPlaces={onUpdateDecimalPlaces}
+            onUpdateGaugeColors={onUpdateGaugeColors}
           />
         )
       case CellType.Note:
@@ -181,12 +194,12 @@ class DisplayOptions extends Component<Props, State> {
             onResetFocus={onResetFocus}
             axes={this.axes}
             decimalPlaces={decimalPlaces}
-            onUpdateAxes={this.handleUpdateAxes}
+            onUpdateAxes={onUpdateAxes}
             thresholdsListType={thresholdsListType}
             thresholdsListColors={thresholdsListColors}
-            onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
-            onUpdateThresholdsListType={this.handleUpdateThresholdsListType}
-            onUpdateThresholdsListColors={this.handleUpdateThresholdsListColors}
+            onUpdateDecimalPlaces={onUpdateDecimalPlaces}
+            onUpdateThresholdsListType={onUpdateThresholdsListType}
+            onUpdateThresholdsListColors={onUpdateThresholdsListColors}
           />
         )
       case CellType.Table:
@@ -200,12 +213,12 @@ class DisplayOptions extends Component<Props, State> {
             decimalPlaces={decimalPlaces}
             thresholdsListType={thresholdsListType}
             thresholdsListColors={thresholdsListColors}
-            onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
-            onUpdateFieldOptions={this.handleUpdateFieldOptions}
-            onUpdateTableOptions={this.handleUpdateTableOptions}
-            onUpdateTimeFormat={this.handleUpdateTimeFormat}
-            onUpdateThresholdsListColors={this.handleUpdateThresholdsListColors}
-            onUpdateThresholdsListType={this.handleUpdateThresholdsListType}
+            onUpdateDecimalPlaces={onUpdateDecimalPlaces}
+            onUpdateFieldOptions={onUpdateFieldOptions}
+            onUpdateTableOptions={onUpdateTableOptions}
+            onUpdateTimeFormat={onUpdateTimeFormat}
+            onUpdateThresholdsListColors={onUpdateThresholdsListColors}
+            onUpdateThresholdsListType={onUpdateThresholdsListType}
           />
         )
       default:
@@ -217,17 +230,13 @@ class DisplayOptions extends Component<Props, State> {
             staticLegend={staticLegend}
             defaultYLabel={defaultYLabel}
             decimalPlaces={decimalPlaces}
-            onUpdateAxes={this.handleUpdateAxes}
+            onUpdateAxes={onUpdateAxes}
             onToggleStaticLegend={onToggleStaticLegend}
-            onUpdateLineColors={this.handleUpdateLineColors}
-            onUpdateDecimalPlaces={this.handleUpdateDecimalPlaces}
+            onUpdateLineColors={onUpdateLineColors}
+            onUpdateDecimalPlaces={onUpdateDecimalPlaces}
           />
         )
     }
-  }
-
-  private get stateToUpdate(): QueryUpdateState {
-    return this.props.stateToUpdate
   }
 
   private get axes(): Axes {
@@ -242,95 +251,50 @@ class DisplayOptions extends Component<Props, State> {
 
     return ''
   }
-
-  private handleUpdateAxes = (axes: Axes): void => {
-    const {onUpdateAxes} = this.props
-
-    onUpdateAxes(axes, this.stateToUpdate)
-  }
-
-  private handleUpdateDecimalPlaces = (decimalPlaces: DecimalPlaces): void => {
-    const {onUpdateDecimalPlaces} = this.props
-
-    onUpdateDecimalPlaces(decimalPlaces, this.stateToUpdate)
-  }
-
-  private handleUpdateGaugeColors = (gaugeColors: ColorNumber[]): void => {
-    const {onUpdateGaugeColors} = this.props
-
-    onUpdateGaugeColors(gaugeColors, this.stateToUpdate)
-  }
-
-  private handleUpdateTimeFormat = (timeFormat: string): void => {
-    const {onUpdateTimeFormat} = this.props
-
-    onUpdateTimeFormat(timeFormat, this.stateToUpdate)
-  }
-
-  private handleUpdateTableOptions = (
-    tableOptions: TableOptionsInterface
-  ): void => {
-    const {onUpdateTableOptions} = this.props
-
-    onUpdateTableOptions(tableOptions, this.stateToUpdate)
-  }
-
-  private handleUpdateFieldOptions = (fieldOptions: FieldOption[]): void => {
-    const {onUpdateFieldOptions} = this.props
-
-    onUpdateFieldOptions(fieldOptions, this.stateToUpdate)
-  }
-
-  private handleUpdateVisType = (type: CellType): void => {
-    const {onUpdateVisType} = this.props
-
-    onUpdateVisType(type, this.stateToUpdate)
-  }
-
-  private handleUpdateNote = (note: string): void => {
-    const {onUpdateNote} = this.props
-
-    onUpdateNote(note, this.stateToUpdate)
-  }
-
-  private handleUpdateNoteVisibility = (visibility: NoteVisibility): void => {
-    const {onUpdateNoteVisibility} = this.props
-
-    onUpdateNoteVisibility(visibility, this.stateToUpdate)
-  }
-
-  private handleUpdateThresholdsListColors = (colors: ColorNumber[]): void => {
-    const {onUpdateThresholdsListColors} = this.props
-
-    onUpdateThresholdsListColors(colors, this.stateToUpdate)
-  }
-
-  private handleUpdateThresholdsListType = (type: ThresholdType): void => {
-    const {onUpdateThresholdsListType} = this.props
-
-    onUpdateThresholdsListType(type, this.stateToUpdate)
-  }
-
-  private handleUpdateLineColors = (colors: ColorString[]): void => {
-    const {onUpdateLineColors} = this.props
-
-    onUpdateLineColors(colors, this.stateToUpdate)
-  }
 }
 
-const mdtp = {
-  onUpdateGaugeColors: updateGaugeColors,
-  onUpdateAxes: updateAxes,
-  onUpdateDecimalPlaces: updateDecimalPlaces,
-  onUpdateTableOptions: updateTableOptions,
-  onUpdateFieldOptions: updateFieldOptions,
-  onUpdateTimeFormat: updateTimeFormat,
-  onUpdateVisType: updateVisType,
-  onUpdateNote: updateNote,
-  onUpdateNoteVisibility: updateNoteVisibility,
-  onUpdateThresholdsListColors: updateThresholdsListColors,
-  onUpdateThresholdsListType: updateThresholdsListType,
-  onUpdateLineColors: updateLineColors,
+const ConnectedDisplayOptions = (props: PassedProps) => {
+  // TODO: Have individual display option components subscribe directly to
+  // relevant props, rather than passing them through here
+  return (
+    <Subscribe to={[TimeMachineContainer]}>
+      {(timeMachineContainer: TimeMachineContainer) => (
+        <DisplayOptions
+          {...props}
+          type={timeMachineContainer.state.type}
+          axes={timeMachineContainer.state.axes}
+          tableOptions={timeMachineContainer.state.tableOptions}
+          fieldOptions={timeMachineContainer.state.fieldOptions}
+          timeFormat={timeMachineContainer.state.timeFormat}
+          decimalPlaces={timeMachineContainer.state.decimalPlaces}
+          note={timeMachineContainer.state.note}
+          noteVisibility={timeMachineContainer.state.noteVisibility}
+          thresholdsListColors={timeMachineContainer.state.thresholdsListColors}
+          thresholdsListType={timeMachineContainer.state.thresholdsListType}
+          gaugeColors={timeMachineContainer.state.gaugeColors}
+          lineColors={timeMachineContainer.state.lineColors}
+          onUpdateType={timeMachineContainer.handleUpdateType}
+          onUpdateAxes={timeMachineContainer.handleUpdateAxes}
+          onUpdateTableOptions={timeMachineContainer.handleUpdateTableOptions}
+          onUpdateFieldOptions={timeMachineContainer.handleUpdateFieldOptions}
+          onUpdateTimeFormat={timeMachineContainer.handleUpdateTimeFormat}
+          onUpdateDecimalPlaces={timeMachineContainer.handleUpdateDecimalPlaces}
+          onUpdateNote={timeMachineContainer.handleUpdateNote}
+          onUpdateNoteVisibility={
+            timeMachineContainer.handleUpdateNoteVisibility
+          }
+          onUpdateThresholdsListColors={
+            timeMachineContainer.handleUpdateThresholdsListColors
+          }
+          onUpdateThresholdsListType={
+            timeMachineContainer.handleUpdateThresholdsListType
+          }
+          onUpdateGaugeColors={timeMachineContainer.handleUpdateGaugeColors}
+          onUpdateLineColors={timeMachineContainer.handleUpdateLineColors}
+        />
+      )}
+    </Subscribe>
+  )
 }
 
-export default connect(null, mdtp)(DisplayOptions)
+export default ConnectedDisplayOptions
