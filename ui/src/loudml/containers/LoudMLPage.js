@@ -13,6 +13,7 @@ import SearchBar from 'src/hosts/components/SearchBar'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import ModelsTable from 'src/loudml/components/ModelsTable'
+import QuestionMark from 'src/loudml/components/QuestionMark'
 
 import {
     getDashboards,
@@ -387,24 +388,6 @@ class LoudMLPage extends Component {
         }
     }
 
-    openInNewTab = url => () => {
-        const win = window.open(url, '_loudml');
-        win.focus();
-    }
-    
-    renderHeaderOptions = () => {
-        return (
-            <div className="question-mark-tooltip">
-                <div
-                    className="question-mark-tooltip--icon"
-                    onClick={this.openInNewTab('http://loudml.io')}
-                    >
-                    ?
-                </div>
-            </div>
-        )
-    }
-    
     render() {
         const {isFetching, jobs, source} = this.props
 
@@ -417,7 +400,7 @@ class LoudMLPage extends Component {
                 <PageHeader
                     titleText="Manage Machine Learning Tasks"
                     sourceIndicator={true}
-                    optionsComponents={this.renderHeaderOptions()}
+                    optionsComponents={(<QuestionMark />)}
                     />
                 <FancyScrollbar className="page-contents">
                     <div className="container-fluid">
