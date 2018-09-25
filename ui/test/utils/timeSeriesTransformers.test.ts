@@ -6,6 +6,8 @@ import {
   transformTableData,
 } from 'src/dashboards/utils/tableGraph'
 
+import {InfluxQLQueryType} from 'src/types/series'
+
 import {DEFAULT_SORT_DIRECTION} from 'src/shared/constants/tableGraph'
 import {
   DEFAULT_TIME_FORMAT,
@@ -295,6 +297,46 @@ it('parses a single field influxQL query', () => {
   const expected = [['time', 'm1.f1'], [100, 1], [200, 2], [3000, 3]]
 
   expect(actual.data).toEqual(expected)
+  expect(actual.influxQLQueryType).toEqual(InfluxQLQueryType.DataQuery)
+})
+
+it('errors when both meta query and data query response', () => {
+  const influxResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'measurements',
+                columns: ['name'],
+                values: [['cpu'], ['disk']],
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'm1',
+                columns: ['time', 'f1'],
+                values: [[100, 1], [3000, 3], [200, 2]],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ]
+
+  expect(() => timeSeriesToTableGraph(influxResponse)).toThrow()
 })
 
 describe('timeSeriesToTableGraph', () => {
@@ -466,6 +508,7 @@ describe('timeSeriesToTableGraph', () => {
     ]
 
     expect(actual.data).toEqual(expected)
+    expect(actual.influxQLQueryType).toEqual(InfluxQLQueryType.MetaQuery)
   })
 })
 
