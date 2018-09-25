@@ -104,7 +104,10 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   public componentDidUpdate(prevProps: LineGraphProps) {
     const isDataChanged =
       prevProps.data.length !== this.props.data.length ||
-      !_.isEqual(_.get(prevProps, 'data.0.id'), _.get(this.props, 'data.0.id'))
+      !_.isEqual(
+        _.get(prevProps, 'data.0.response.uuid'),
+        _.get(this.props, 'data.0.response.uuid')
+      )
 
     if (this.props.loading === RemoteDataState.Done && isDataChanged) {
       this.parseTimeSeries(this.props.data, this.props.dataType)
