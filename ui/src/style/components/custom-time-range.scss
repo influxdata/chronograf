@@ -306,7 +306,7 @@ $rd-cell-size: 30px;
   position: absolute;
   top: 0;
   right: calc(100% + 4px);
-  z-index: 4;
+  z-index: $date-picker-z;
 
   .custom-time--container {
     display: flex;
