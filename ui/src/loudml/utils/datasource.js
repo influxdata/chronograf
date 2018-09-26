@@ -1,3 +1,10 @@
 export const findSource = (sources, datasource) => {
-    return sources.find(s => s.url.match(new RegExp(datasource.addr)))
+    // remove datasource protocol
+    const loudmlHosts = datasource.addr.split('://')
+    const loudmlHost = loudmlHosts.slice(-1)[0]
+
+    return sources.find(s => {
+        const sourceDbs = s.url.split('://')
+        return sourceDbs.slice(-1)[0] === loudmlHost
+    })
 }
