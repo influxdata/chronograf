@@ -6,6 +6,7 @@ import {withRouter} from 'react-router'
 import {notify as notifyAction} from 'shared/actions/notifications'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
 import PageHeader from 'src/reusable_ui/components/page_layout/PageHeader'
+import QuestionMark from 'src/loudml/components/QuestionMark'
 
 import GeneralPanel from 'src/loudml/components/GeneralPanel'
 import ParametersPanel from 'src/loudml/components/ParametersPanel'
@@ -155,7 +156,11 @@ class ModelPage extends Component {
 
         return (
             <div className="page">
-                <PageHeader titleText={isEditing ? 'Add a new model' : 'Configure model'} sourceIndicator={true} />
+                <PageHeader
+                    titleText={isEditing ? 'Add a new model' : 'Configure model'}
+                    sourceIndicator={true}
+                    optionsComponents={(<QuestionMark />)}
+                    />
                 <FancyScrollbar className="page-contents">
                     {isLoading ? (
                         <div className="container-fluid">
