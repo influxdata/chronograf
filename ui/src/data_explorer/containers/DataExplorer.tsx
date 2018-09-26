@@ -10,6 +10,7 @@ import _ from 'lodash'
 import {Subscribe} from 'unstated'
 
 // Utils
+import {getDeep} from 'src/utils/wrappers'
 import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'
@@ -36,7 +37,7 @@ import {
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
 import {editQueryStatus as editQueryStatusAction} from 'src/data_explorer/actions/queries'
-import {fetchAllFluxServicesAsync} from 'src/shared/actions/services'
+
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
 // Constants
@@ -49,7 +50,6 @@ import {
 // Types
 import {
   Source,
-  Service,
   Dashboard,
   QueryConfig,
   QueryStatus,
@@ -68,7 +68,6 @@ import {Links} from 'src/types/flux'
 interface PassedProps {
   source: Source
   sources: Source[]
-  services: Service[]
   queryConfigs: QueryConfig[]
   updateSourceLink: typeof updateSourceLinkAction
   autoRefresh: number
@@ -88,7 +87,6 @@ interface PassedProps {
   editQueryStatus: typeof editQueryStatusAction
   queryStatus: QueryStatus
   fluxLinks: Links
-  fetchServicesAsync: typeof fetchAllFluxServicesAsync
   notify: (message: Notification) => void
   sourceLink: string
 }
@@ -126,7 +124,6 @@ export class DataExplorer extends PureComponent<Props, State> {
   public async componentDidMount() {
     const {autoRefresh} = this.props
 
-    await this.fetchFluxServices()
     await this.resolveQueryParams()
 
     GlobalAutoRefresher.poll(autoRefresh)
@@ -156,7 +153,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     const {
       source,
       sources,
-      services,
       manualRefresh,
       onManualRefresh,
       editQueryStatus,
@@ -178,7 +174,6 @@ export class DataExplorer extends PureComponent<Props, State> {
         {this.sendToDashboardOverlay}
         <div className="deceo--page">
           <TimeMachine
-            service={this.service}
             updateSourceLink={updateSourceLink}
             editQueryStatus={editQueryStatus}
             templates={this.templates}
@@ -186,7 +181,6 @@ export class DataExplorer extends PureComponent<Props, State> {
             onResetFocus={this.handleResetFocus}
             isInCEO={false}
             sources={sources}
-            services={services}
             onToggleStaticLegend={this.handleToggleStaticLegend}
             isStaticLegend={isStaticLegend}
             manualRefresh={manualRefresh}
@@ -285,19 +279,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     router.push(pathname + search)
   }
 
-  private get service(): Service {
-    const {services, sourceLink} = this.props
-    let service: Service = null
-
-    if (sourceLink.includes('services')) {
-      service = services.find(s => {
-        return s.links.self === sourceLink
-      })
-    }
-
-    return service
-  }
-
   private get writeDataForm(): JSX.Element {
     const {source, errorThrownAction, writeLineProtocol} = this.props
 
@@ -335,7 +316,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             queryConfig={this.activeQueryConfig}
             script={script}
             source={source}
-            service={this.service}
+            isFluxQuery={this.isFluxQuery}
             rawText={this.rawText}
             dashboards={dashboards}
             handleGetDashboards={handleGetDashboards}
@@ -345,6 +326,12 @@ export class DataExplorer extends PureComponent<Props, State> {
         </OverlayTechnology>
       </Authorized>
     )
+  }
+
+  private get isFluxQuery(): boolean {
+    const {queryDrafts} = this.props
+    const type = getDeep<string>(queryDrafts, '0.type', '')
+    return type === 'flux'
   }
 
   private get templates(): Template[] {
@@ -404,15 +391,6 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   private handleOpenWriteData = (): void => {
     this.setState({isWriteFormVisible: true})
-  }
-
-  private async fetchFluxServices() {
-    const {fetchServicesAsync, sources} = this.props
-    if (!sources.length) {
-      return
-    }
-
-    await fetchServicesAsync(sources)
   }
 
   private get selectedDatabase(): string {
@@ -475,7 +453,6 @@ const mstp = state => {
     dataExplorer: {timeRange, queryStatus, sourceLink},
     dashboardUI: {dashboards},
     sources,
-    services,
     links,
   } = state
 
@@ -485,7 +462,6 @@ const mstp = state => {
     timeRange,
     dashboards,
     sources,
-    services,
     queryStatus,
     sourceLink,
   }
@@ -499,7 +475,6 @@ const mdtp = dispatch => {
     handleGetDashboards: bindActionCreators(getDashboardsAsync, dispatch),
     sendDashboardCell: bindActionCreators(sendDashboardCellAsync, dispatch),
     editQueryStatus: bindActionCreators(editQueryStatusAction, dispatch),
-    fetchServicesAsync: bindActionCreators(fetchAllFluxServicesAsync, dispatch),
     notify: bindActionCreators(notifyAction, dispatch),
     updateSourceLink: bindActionCreators(updateSourceLinkAction, dispatch),
   }

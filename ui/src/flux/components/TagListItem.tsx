@@ -8,7 +8,7 @@ import React, {
 import _ from 'lodash'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
-import {Service, SchemaFilter, RemoteDataState} from 'src/types'
+import {Source, SchemaFilter, RemoteDataState} from 'src/types'
 import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
 import {explorer} from 'src/flux/constants'
 import parseValuesColumn from 'src/shared/parsing/flux/values'
@@ -25,7 +25,7 @@ import {NotificationAction} from 'src/types'
 interface Props {
   tagKey: string
   db: string
-  service: Service
+  source: Source
   filter: SchemaFilter[]
   notify: NotificationAction
 }
@@ -65,7 +65,7 @@ export default class TagListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {tagKey, db, service, filter, notify} = this.props
+    const {tagKey, db, source, filter, notify} = this.props
     const {
       tagValues,
       searchTerm,
@@ -111,7 +111,7 @@ export default class TagListItem extends PureComponent<Props, State> {
             <TagValueList
               db={db}
               notify={notify}
-              service={service}
+              source={source}
               values={tagValues}
               tagKey={tagKey}
               filter={filter}
@@ -219,18 +219,18 @@ export default class TagListItem extends PureComponent<Props, State> {
   }
 
   private getTagValues = async () => {
-    const {db, service, tagKey, filter} = this.props
+    const {db, source, tagKey, filter} = this.props
     const {searchTerm, limit} = this.state
     const response = await fetchTagValues({
-      service,
+      source,
       bucket: db,
       filter,
       tagKey,
       limit,
       searchTerm,
     })
-
-    return parseValuesColumn(response)
+    const tagValues = parseValuesColumn(response)
+    return tagValues
   }
 
   private handleClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -270,11 +270,11 @@ export default class TagListItem extends PureComponent<Props, State> {
   }
 
   private async getCount() {
-    const {service, db, filter, tagKey} = this.props
+    const {source, db, filter, tagKey} = this.props
     const {limit, searchTerm} = this.state
     try {
       const response = await fetchTagValues({
-        service,
+        source,
         bucket: db,
         filter,
         tagKey,

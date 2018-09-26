@@ -15,7 +15,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {IS_STATIC_LEGEND} from 'src/shared/constants'
 
 // Types
-import {TimeRange, Cell, Template, Source, Service} from 'src/types'
+import {TimeRange, Cell, Template, Source} from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
@@ -27,7 +27,6 @@ interface Props {
   templates: Template[]
   source: Source
   sources: Source[]
-  services?: Service[]
   host: string
   isEditable: boolean
   manualRefresh: number
@@ -71,7 +70,7 @@ class Layout extends Component<Props, State> {
         isEditable={isEditable}
         onCloneCell={onCloneCell}
         onDeleteCell={onDeleteCell}
-        isFluxSource={this.isFluxService}
+        isFluxQuery={this.isFluxQuery}
         toggleVisType={this.toggleVisType}
         onSummonOverlayTechnologies={onSummonOverlayTechnologies}
       >
@@ -80,29 +79,10 @@ class Layout extends Component<Props, State> {
     )
   }
 
-  private get isFluxService(): boolean {
+  private get isFluxQuery(): boolean {
     const {cell} = this.props
     const type = getDeep<string>(cell, 'queries.0.type', '')
     return type === 'flux'
-  }
-
-  private get fluxService(): Service {
-    const {services, source, cell} = this.props
-
-    const sourceLink = getDeep<string>(cell, 'queries.0.source', '')
-
-    if (services && sourceLink.includes('service')) {
-      const service = services.find(s => {
-        return s.links.self === sourceLink
-      })
-      return service
-    }
-
-    if (this.isFluxService) {
-      return services.find(s => {
-        return s.sourceID === source.id
-      })
-    }
   }
 
   private get fluxVis(): JSX.Element {
@@ -132,9 +112,9 @@ class Layout extends Component<Props, State> {
         manualRefresh={manualRefresh}
         staticLegend={IS_STATIC_LEGEND(cell.legend)}
         grabDataForDownload={this.grabDataForDownload}
+        grabFluxData={this.grabFluxData}
         queries={cell.queries}
         source={source}
-        service={this.fluxService}
         cellNote={cell.note}
         cellNoteVisibility={cell.noteVisibility}
         rawData={cellFluxData}
@@ -175,7 +155,6 @@ class Layout extends Component<Props, State> {
         manualRefresh={manualRefresh}
         staticLegend={IS_STATIC_LEGEND(cell.legend)}
         grabDataForDownload={this.grabDataForDownload}
-        grabFluxData={this.grabFluxData}
         queries={buildQueriesForLayouts(cell, timeRange, host)}
         source={this.getSource(cell, source, sources, source)}
         cellNote={cell.note}
@@ -185,7 +164,7 @@ class Layout extends Component<Props, State> {
   }
 
   private get visualization(): JSX.Element {
-    if (this.isFluxService) {
+    if (this.isFluxQuery) {
       return this.fluxVis
     }
     return this.influxQLVis

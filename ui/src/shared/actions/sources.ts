@@ -1,9 +1,12 @@
 import {
   deleteSource,
   getSources as getSourcesAJAX,
+  getServices as getServicesAJAX,
   getKapacitors as getKapacitorsAJAX,
   updateKapacitor as updateKapacitorAJAX,
   deleteKapacitor as deleteKapacitorAJAX,
+  createService as createServiceAJAX,
+  updateService as updateServiceAJAX,
 } from 'src/shared/apis'
 
 import {notify} from './notifications'
@@ -16,7 +19,7 @@ import {
   notifyCouldNotDeleteKapacitor,
 } from 'src/shared/copy/notifications'
 
-import {Source, Kapacitor} from 'src/types'
+import {Source, Kapacitor, Service, SourceLinks, NewService} from 'src/types'
 
 export type Action =
   | ActionLoadSources
@@ -200,14 +203,90 @@ export const deleteKapacitorAsync = (kapacitor: Kapacitor) => async (
   }
 }
 
-export const getSourcesAsync = () => async (dispatch): Promise<void> => {
+export const getSourcesAsync = () => async (dispatch): Promise<Source[]> => {
   try {
-    const {
-      data: {sources},
-    } = await getSourcesAJAX()
-    dispatch(loadSources(sources))
-    return sources
+    const {data} = await getSourcesAJAX()
+
+    const sources: Source[] = data.sources
+
+    const sourcesWithFluxLink = await Promise.all(sources.map(addSourceLink))
+
+    dispatch(loadSources(sourcesWithFluxLink))
+    return sourcesWithFluxLink
   } catch (error) {
     dispatch(errorThrown(error))
   }
+}
+
+const addSourceLink = async (source: Source): Promise<Source> => {
+  try {
+    const services = await getServicesAJAX(source.links.services)
+    const fluxServices = services.filter(s => s.type === 'flux')
+
+    let service: Service
+
+    if (validateSupportsFlux(source)) {
+      if (!fluxServices.length) {
+        service = await createFluxServiceForSource(source)
+      } else {
+        if (fluxServices[0].url !== source.url) {
+          service = await updateFluxService(source, fluxServices[0])
+        } else {
+          service = fluxServices[0]
+        }
+      }
+
+      const {links} = source
+      const linksWithFlux: SourceLinks = {...links, flux: service.links.proxy}
+
+      return {...source, links: linksWithFlux}
+    }
+
+    return source
+  } catch (err) {
+    return source
+  }
+}
+
+const createFluxServiceForSource = async (source: Source) => {
+  const {url} = source
+
+  const service: NewService = {
+    name: 'Flux',
+    url,
+    username: '',
+    insecureSkipVerify: false,
+    type: 'flux',
+    metadata: {
+      active: true,
+    },
+  }
+  const s = await createServiceAJAX(source, service)
+  return s
+}
+
+const updateFluxService = async (source: Source, service: Service) => {
+  const {url} = source
+  const updatedService = {...service, url}
+  const s = await updateServiceAJAX(updatedService)
+  return s
+}
+
+const validateSupportsFlux = (source: Source) => {
+  if (source.type !== 'influx') {
+    return false
+  }
+
+  if (source.version.toLowerCase() === 'unknown') {
+    return true
+  }
+
+  const regex = RegExp('(\\.*\\d+\\.*)+', 'g')
+  const version = regex.exec(source.version)
+  let versionNumber = 0
+  if (version && version.length) {
+    versionNumber = parseFloat(version[0])
+  }
+
+  return versionNumber >= 1.7
 }

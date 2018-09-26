@@ -1,14 +1,14 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import FluxQueryBuilder from 'src/flux/components/FluxQueryBuilder'
-import {service} from 'test/resources'
+import {source} from 'test/resources'
 
 const setup = () => {
   const props = {
     script: '',
     body: [],
     data: [],
-    service,
+    source,
     suggestions: [],
     notify: () => {},
     onSubmitScript: () => {},

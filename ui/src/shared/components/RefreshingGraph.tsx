@@ -38,7 +38,6 @@ import {
   Template,
   Query,
   CellType,
-  Service,
   FluxTable,
   RemoteDataState,
 } from 'src/types'
@@ -59,7 +58,6 @@ interface TypeAndData {
 interface Props {
   axes: Axes
   source: Source
-  service: Service
   queries: Query[]
   timeRange: TimeRange
   colors: ColorString[]
@@ -117,7 +115,6 @@ class RefreshingGraph extends PureComponent<Props> {
       type,
       source,
       inView,
-      service,
       queries,
       cellNote,
       onNotify,
@@ -147,7 +144,6 @@ class RefreshingGraph extends PureComponent<Props> {
     return (
       <TimeSeries
         ref={this.timeSeries}
-        service={service}
         autoRefresher={autoRefresher}
         manualRefresh={manualRefresh}
         source={source}

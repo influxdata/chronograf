@@ -8,7 +8,7 @@ import {executeQuery as executeInfluxQLQuery} from 'src/shared/apis/query'
 import {getRawTimeSeries as executeFluxQuery} from 'src/flux/apis/index'
 
 // Types
-import {Query, Template, Service} from 'src/types'
+import {Query, Template, Source} from 'src/types'
 import {TimeSeriesResponse} from 'src/types/series'
 
 export const downloadInfluxQLCSV = async (
@@ -27,10 +27,10 @@ export const downloadInfluxQLCSV = async (
 }
 
 export const downloadFluxCSV = async (
-  service: Service,
+  source: Source,
   script: string
 ): Promise<{didTruncate: boolean}> => {
-  const {csv, didTruncate} = await executeFluxQuery(service, script)
+  const {csv, didTruncate} = await executeFluxQuery(source, script)
 
   downloadCSV(csv, csvName())
 

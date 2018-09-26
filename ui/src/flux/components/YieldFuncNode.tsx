@@ -7,7 +7,7 @@ import YieldNodeVis from 'src/flux/components/YieldNodeVis'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
-import {FluxTable, Service, Source, TimeRange, Query, Axes} from 'src/types'
+import {FluxTable, Source, TimeRange, Query, Axes} from 'src/types'
 import {Func} from 'src/types/flux'
 
 import {
@@ -34,7 +34,6 @@ interface ConnectedProps {
 }
 
 interface PassedProps {
-  service: Service
   source: Source
   timeRange: TimeRange
   data: FluxTable[]
@@ -70,7 +69,6 @@ class YieldFuncNode extends PureComponent<Props, State> {
     const {
       func,
       source,
-      service,
       timeRange,
       queries,
       axes,
@@ -88,12 +86,7 @@ class YieldFuncNode extends PureComponent<Props, State> {
     return (
       <div className="yield-node">
         <div className="func-node--connector" />
-        <TimeSeries
-          source={source}
-          service={service}
-          queries={queries}
-          timeRange={timeRange}
-        >
+        <TimeSeries source={source} queries={queries} timeRange={timeRange}>
           {({timeSeriesFlux}) => (
             <YieldNodeVis
               data={timeSeriesFlux}

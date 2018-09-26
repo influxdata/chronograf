@@ -7,22 +7,18 @@ import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 import ConnectionLink from 'src/sources/components/ConnectionLink'
-import FluxDropdown from 'src/sources/components/FluxDropdown'
 import Button from 'src/reusable_ui/components/Button'
 
 import {ComponentColor, ComponentSize, ButtonShape} from 'src/reusable_ui/types'
-import {Source, Service, Kapacitor} from 'src/types'
+import {Source, Kapacitor} from 'src/types'
 import {ToggleWizard} from 'src/types/wizard'
 
 interface Props {
   source: Source
   currentSource: Source
-  services: Service[]
   onDeleteSource: (source: Source) => void
   setActiveKapacitor: (kapacitor: Kapacitor) => void
-  setActiveFlux: (source: Source, service: Service) => void
   deleteKapacitor: actions.DeleteKapacitor
-  deleteFlux: (fluxService: Service) => void
   toggleWizard: ToggleWizard
 }
 
@@ -38,12 +34,9 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
   public render() {
     const {
       source,
-      services,
       currentSource,
       setActiveKapacitor,
-      setActiveFlux,
       deleteKapacitor,
-      deleteFlux,
       toggleWizard,
     } = this.props
 
@@ -77,14 +70,6 @@ class InfluxTableRow extends PureComponent<Props & WithRouterProps> {
             deleteKapacitor={deleteKapacitor}
             setActiveKapacitor={setActiveKapacitor}
             toggleWizard={toggleWizard}
-          />
-        </td>
-        <td className="source-table--kapacitor">
-          <FluxDropdown
-            services={services}
-            source={source}
-            setActiveFlux={setActiveFlux}
-            deleteFlux={deleteFlux}
           />
         </td>
       </tr>

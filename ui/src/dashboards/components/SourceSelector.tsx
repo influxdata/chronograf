@@ -9,31 +9,27 @@ import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
 // Types
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {Service} from 'src/types'
+import {QueryType} from 'src/types'
 
 interface Props {
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  service: Service
-  services: Service[]
-  isFluxSource: boolean
+  isFluxSourceSelected: boolean
   sourceSupportsFlux: boolean
   queries: QueriesModels.QueryConfig[]
   isDynamicSourceSelected: boolean
   toggleFlux: () => void
   onSelectDynamicSource: () => void
-  onChangeService: (service: Service, source: SourcesModels.Source) => void
+  onChangeSource: (source: SourcesModels.Source, type: QueryType) => void
 }
 
 const SourceSelector: SFC<Props> = ({
   source,
   sources = [],
-  service,
-  services,
   queries,
   toggleFlux,
-  isFluxSource,
-  onChangeService,
+  isFluxSourceSelected,
+  onChangeSource,
   sourceSupportsFlux,
   isDynamicSourceSelected,
   onSelectDynamicSource,
@@ -42,18 +38,19 @@ const SourceSelector: SFC<Props> = ({
     return <div className="source-selector" />
   }
 
+  const type = isFluxSourceSelected ? QueryType.Flux : QueryType.InfluxQL
+
   return (
     <div className="source-selector">
       <SourceDropdown
-        service={service}
-        services={services}
         source={source}
+        type={type}
         sources={sources}
         allowInfluxQL={true}
-        allowFlux={true}
+        allowFlux={sourceSupportsFlux}
         allowDynamicSource={true}
         isDynamicSourceSelected={isDynamicSourceSelected}
-        onChangeService={onChangeService}
+        onChangeSource={onChangeSource}
         onSelectDynamicSource={onSelectDynamicSource}
       />
       {isDynamicSourceSelected && (
@@ -63,7 +60,7 @@ const SourceSelector: SFC<Props> = ({
             titleText="Flux"
             value="Flux"
             onClick={toggleFlux}
-            active={isFluxSource}
+            active={isFluxSourceSelected}
             disabled={!sourceSupportsFlux}
           >
             Flux
@@ -73,7 +70,7 @@ const SourceSelector: SFC<Props> = ({
             titleText="InfluxQL"
             value="InfluxQL"
             onClick={toggleFlux}
-            active={!isFluxSource}
+            active={!isFluxSourceSelected}
             disabled={!sourceSupportsFlux}
           >
             InfluxQL

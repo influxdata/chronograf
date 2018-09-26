@@ -50,6 +50,7 @@ export const source: Source = {
   defaultRP: '',
   links: sourceLinks,
   insecureSkipVerify: false,
+  version: 'v1.4.3',
   authentication: SourceAuthenticationMethod.Basic,
 }
 

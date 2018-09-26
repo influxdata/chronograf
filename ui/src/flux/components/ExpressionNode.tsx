@@ -58,7 +58,6 @@ class ExpressionNode extends PureComponent<Props, State> {
           onChangeArg,
           onGenerateScript,
           onToggleYield,
-          service,
           data,
           scriptUpToYield,
           source,
@@ -91,7 +90,7 @@ class ExpressionNode extends PureComponent<Props, State> {
                     func={func}
                     funcs={funcs}
                     bodyID={bodyID}
-                    service={service}
+                    source={source}
                     onChangeArg={onChangeArg}
                     onDelete={onDeleteFuncNode}
                     onToggleYield={onToggleYield}
@@ -134,7 +133,6 @@ class ExpressionNode extends PureComponent<Props, State> {
                         data={data}
                         script={script}
                         bodyID={bodyID}
-                        service={service}
                         source={source}
                         queries={queries}
                         timeRange={timeRange}

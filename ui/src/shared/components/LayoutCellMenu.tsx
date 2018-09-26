@@ -26,7 +26,7 @@ interface Props {
   onDelete: (cell: Cell) => void
   onCSVDownload: () => void
   queries: Query[]
-  isFluxSource: boolean
+  isFluxQuery: boolean
   visType: VisType
   toggleVisType: () => void
 }
@@ -122,7 +122,7 @@ class LayoutCellMenu extends Component<Props, State> {
       onCSVDownload,
       toggleVisType,
       visType,
-      isFluxSource,
+      isFluxQuery,
     } = this.props
 
     const visTypeItem = {
@@ -148,7 +148,7 @@ class LayoutCellMenu extends Component<Props, State> {
       },
     ]
 
-    if (isFluxSource) {
+    if (isFluxQuery) {
       menuItems.push(visTypeItem)
     }
 

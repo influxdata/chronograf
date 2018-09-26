@@ -1,7 +1,7 @@
 import React, {PureComponent, MouseEvent} from 'react'
 import _ from 'lodash'
 
-import {SchemaFilter, Service} from 'src/types'
+import {SchemaFilter, Source} from 'src/types'
 import {
   OnChangeArg,
   Func,
@@ -18,7 +18,7 @@ import {getDeep} from 'src/utils/wrappers'
 
 interface Props {
   db: string
-  service: Service
+  source: Source
   tags: string[]
   filter: SchemaFilter[]
   onChangeArg: OnChangeArg
@@ -130,7 +130,7 @@ export default class FilterTagList extends PureComponent<Props> {
   public render() {
     const {
       db,
-      service,
+      source,
       tags,
       filter,
       bodyID,
@@ -173,7 +173,7 @@ export default class FilterTagList extends PureComponent<Props> {
               operator={this.operator(t)}
               onChangeValue={this.handleChangeValue}
               onSetEquality={this.handleSetEquality}
-              service={service}
+              source={source}
               filter={filter}
             />
           ))}

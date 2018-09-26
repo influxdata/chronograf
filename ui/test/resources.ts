@@ -62,6 +62,7 @@ export const source: Source = {
   organization: '0',
   role: 'viewer',
   defaultRP: '',
+  version: 'v1.6.3',
   links: sourceLinks,
   authentication: SourceAuthenticationMethod.Basic,
 }

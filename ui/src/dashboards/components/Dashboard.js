@@ -20,7 +20,6 @@ const Dashboard = ({
   onSummonOverlayTechnologies,
   setScrollTop,
   inView,
-  services,
 }) => {
   const cells = dashboard.cells.map(cell => {
     const dashboardCell = {
@@ -44,7 +43,6 @@ const Dashboard = ({
       <div className="dashboard container-fluid full-width">
         {cells.length ? (
           <LayoutRenderer
-            services={services}
             cells={cells}
             onZoom={onZoom}
             source={source}
@@ -106,7 +104,6 @@ Dashboard.propTypes = {
   onZoom: func,
   setScrollTop: func,
   inView: func,
-  services: arrayOf(shape({})),
 }
 
 export default Dashboard

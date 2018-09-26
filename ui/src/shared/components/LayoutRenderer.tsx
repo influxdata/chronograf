@@ -21,13 +21,12 @@ import {
 } from 'src/shared/constants'
 
 // Types
-import {TimeRange, Cell, Template, Source, Service} from 'src/types'
+import {TimeRange, Cell, Template, Source} from 'src/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   source: Source
-  services?: Service[]
   cells: Cell[]
   timeRange: TimeRange
   templates: Template[]
@@ -63,7 +62,6 @@ class LayoutRenderer extends Component<Props, State> {
       cells,
       source,
       sources,
-      services,
       onZoom,
       templates,
       timeRange,
@@ -107,7 +105,6 @@ class LayoutRenderer extends Component<Props, State> {
                 }}
               >
                 <Layout
-                  services={services}
                   key={cell.i}
                   cell={cell}
                   host={host}

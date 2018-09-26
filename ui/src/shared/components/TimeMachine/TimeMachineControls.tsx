@@ -14,18 +14,16 @@ import buildQueries from 'src/utils/buildQueriesForGraphs'
 // Types
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {Service, Template} from 'src/types'
+import {Template, QueryType} from 'src/types'
 
 interface Props {
-  isFluxSource: boolean
+  isFluxSourceSelected: boolean
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  service: Service
-  services: Service[]
   script: string
   isViewingRawData: boolean
   isDynamicSourceSelected: boolean
-  onChangeService: (service: Service, source: SourcesModels.Source) => void
+  onChangeSource: (source: SourcesModels.Source, type: QueryType) => void
   autoRefreshDuration: number
   onChangeAutoRefreshDuration: (newDuration: number) => void
   queries: QueriesModels.QueryConfig[]
@@ -42,17 +40,15 @@ const TimeMachineControls: SFC<Props> = ({
   script,
   source,
   sources,
-  service,
   queries,
   templates,
-  services,
   timeRange,
   toggleFlux,
-  isFluxSource,
+  isFluxSourceSelected,
   isViewingRawData,
   autoRefreshDuration,
   onChangeAutoRefreshDuration,
-  onChangeService,
+  onChangeSource,
   sourceSupportsFlux,
   onSelectDynamicSource,
   toggleIsViewingRawData,
@@ -64,17 +60,15 @@ const TimeMachineControls: SFC<Props> = ({
       <SourceSelector
         source={source}
         sources={sources}
-        service={service}
-        services={services}
         queries={queries}
         toggleFlux={toggleFlux}
         sourceSupportsFlux={sourceSupportsFlux}
-        isFluxSource={isFluxSource}
-        onChangeService={onChangeService}
+        isFluxSourceSelected={isFluxSourceSelected}
+        onChangeSource={onChangeSource}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onSelectDynamicSource={onSelectDynamicSource}
       />
-      {isFluxSource && (
+      {isFluxSourceSelected && (
         <div className="time-machine-vis--raw-toggle">
           <SlideToggle
             active={isViewingRawData}
@@ -86,8 +80,8 @@ const TimeMachineControls: SFC<Props> = ({
       )}
       <CSVExporter
         script={script}
-        service={service}
-        isFluxSource={isFluxSource}
+        source={source}
+        isFluxSourceSelected={isFluxSourceSelected}
         queries={buildQueries(queries, timeRange)}
         templates={templates}
       />
