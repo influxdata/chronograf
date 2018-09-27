@@ -116,72 +116,18 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
   }
 
   public handleToggleField = (queryID: string, fieldFunc: Field) => {
-    const {queryDrafts} = this.state
-    const updatedQueryDrafts = queryDrafts.map(query => {
-      if (query.id === queryID) {
-        const nextQueryConfig = {
-          ...toggleField(query.queryConfig, fieldFunc),
-          rawText: null,
-        }
-
-        return {
-          ...query,
-          query: buildQuery(
-            TYPE_QUERY_CONFIG,
-            getTimeRange(nextQueryConfig),
-            nextQueryConfig
-          ),
-          queryConfig: nextQueryConfig,
-        }
-      }
-      return query
-    })
-
-    this.setState({queryDrafts: updatedQueryDrafts})
+    this.updateQueryDrafts(queryID, q => ({
+      ...toggleField(q, fieldFunc),
+      rawText: null,
+    }))
   }
 
   public handleGroupByTime = (queryID: string, time: string) => {
-    const {queryDrafts} = this.state
-    const updatedQueryDrafts = queryDrafts.map(query => {
-      if (query.id === queryID) {
-        const nextQueryConfig = groupByTime(query.queryConfig, time)
-
-        return {
-          ...query,
-          query: buildQuery(
-            TYPE_QUERY_CONFIG,
-            getTimeRange(nextQueryConfig),
-            nextQueryConfig
-          ),
-          queryConfig: nextQueryConfig,
-        }
-      }
-      return query
-    })
-
-    this.setState({queryDrafts: updatedQueryDrafts})
+    this.updateQueryDrafts(queryID, q => groupByTime(q, time))
   }
 
   public handleFill = (queryID: string, value: string) => {
-    const {queryDrafts} = this.state
-    const updatedQueryDrafts = queryDrafts.map(query => {
-      if (query.id === queryID) {
-        const nextQueryConfig = fill(query.queryConfig, value)
-
-        return {
-          ...query,
-          query: buildQuery(
-            TYPE_QUERY_CONFIG,
-            getTimeRange(nextQueryConfig),
-            nextQueryConfig
-          ),
-          queryConfig: nextQueryConfig,
-        }
-      }
-      return query
-    })
-
-    this.setState({queryDrafts: updatedQueryDrafts})
+    this.updateQueryDrafts(queryID, q => fill(q, value))
   }
 
   public handleRemoveFuncs = (queryID: string, fields: Field[]) => {
