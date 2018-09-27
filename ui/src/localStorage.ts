@@ -63,27 +63,25 @@ export const saveToLocalStorage = ({
 
     window.localStorage.setItem(
       'state',
-      JSON.stringify(
-        _.omit({
-          ...appPersisted,
-          VERSION,
-          GIT_SHA,
-          timeRange,
-          dashTimeV1,
-          script,
-          logs: {
-            ...minimalLogs,
-            histogramData: [],
-            tableData: {},
-            queryCount: 0,
-            tableInfiniteData: {
-              forward: defaultTableData,
-              backward: defaultTableData,
-            },
-            tableTime: minimalLogs.tableTime || {},
+      JSON.stringify({
+        ...appPersisted,
+        VERSION,
+        GIT_SHA,
+        timeRange,
+        dashTimeV1,
+        script,
+        logs: {
+          ...minimalLogs,
+          histogramData: [],
+          tableData: {},
+          queryCount: 0,
+          tableInfiniteData: {
+            forward: defaultTableData,
+            backward: defaultTableData,
           },
-        })
-      )
+          tableTime: minimalLogs.tableTime || {},
+        },
+      })
     )
   } catch (err) {
     console.error('Unable to save data explorer: ', JSON.parse(err))
