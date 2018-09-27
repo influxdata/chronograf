@@ -17,8 +17,8 @@ export const DEFAULT_MODEL = {
     span: 10,
     forecast: 5,
     type: 'timeseries',
-    min_threshold: 75,
-    max_threshold: 75,
+    min_threshold: 95,
+    max_threshold: 99,
 }
 
 export const DEFAULT_FEATURE = {
