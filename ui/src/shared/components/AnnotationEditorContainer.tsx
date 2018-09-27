@@ -7,6 +7,7 @@ import {
   setEditingAnnotation,
   updateAnnotationAsync,
   deleteAnnotationAsync,
+  setTagKeys as setTagKeysAction,
 } from 'src/shared/actions/annotations'
 import {notify} from 'src/shared/actions/notifications'
 import {notifyErrorWithAltText} from 'src/shared/copy/notifications'
@@ -18,6 +19,7 @@ interface Props {
   onSetEditingAnnotation: typeof setEditingAnnotation
   onDeleteAnnotation: typeof deleteAnnotationAsync
   onSaveAnnotation: typeof updateAnnotationAsync
+  setTagKeys: typeof setTagKeysAction
   onNotify: typeof notify
 }
 
@@ -57,10 +59,16 @@ class AnnotationEditorContainer extends PureComponent<Props> {
   }
 
   private handleSave = async (a: Annotation): Promise<void> => {
-    const {onSaveAnnotation, onSetEditingAnnotation, onNotify} = this.props
+    const {
+      onSaveAnnotation,
+      onSetEditingAnnotation,
+      onNotify,
+      setTagKeys,
+    } = this.props
 
     try {
       await onSaveAnnotation(a)
+      setTagKeys(null)
 
       onSetEditingAnnotation(null)
     } catch (e) {
@@ -92,6 +100,7 @@ const mdtp = {
   onSaveAnnotation: updateAnnotationAsync,
   onSetEditingAnnotation: setEditingAnnotation,
   onDeleteAnnotation: deleteAnnotationAsync,
+  setTagKeys: setTagKeysAction,
   onNotify: notify,
 }
 
