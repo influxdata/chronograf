@@ -34,6 +34,15 @@ const UNKNOWN_DATASOURCE_EXPLICIT_PROTOCOL = {
     addr: "http://localhost:99",
 }
 
+const DATASOURCES_NO_MATCH = [
+    {
+        addr: "localhost:80",
+    },
+    {
+        addr: "http://localhost:3276",
+    },
+]
+
 describe('Loudml.Utils.Datasource', () => {
     describe('findSource', () => {
         it('returns undefined if no explicit match', () => {
@@ -48,6 +57,15 @@ describe('Loudml.Utils.Datasource', () => {
             const sources = SOURCES
 
             expect(findSource(sources, datasource)).toBeUndefined()
+        })
+
+        it('returns undefined if no match', () => {
+            const datasources = DATASOURCES_NO_MATCH
+            const sources = SOURCES
+
+            datasources.forEach(datasource => {
+                expect(findSource(sources, datasource)).toBeUndefined()
+            });
         })
 
         it('returns source if partial match', () => {
