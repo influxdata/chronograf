@@ -444,7 +444,7 @@ func TestService_SourcesID(t *testing.T) {
 			ID:              "1",
 			wantStatusCode:  200,
 			wantContentType: "application/json",
-			wantBody: `{"id":"1","name":"","url":"","default":false,"telegraf":"telegraf","organization":"","defaultRP":"","authentication":"unknown","links":{"self":"/chronograf/v1/sources/1","kapacitors":"/chronograf/v1/sources/1/kapacitors","services":"/chronograf/v1/sources/1/services","proxy":"/chronograf/v1/sources/1/proxy","queries":"/chronograf/v1/sources/1/queries","write":"/chronograf/v1/sources/1/write","permissions":"/chronograf/v1/sources/1/permissions","users":"/chronograf/v1/sources/1/users","databases":"/chronograf/v1/sources/1/dbs","annotations":"/chronograf/v1/sources/1/annotations","health":"/chronograf/v1/sources/1/health"}}
+			wantBody: `{"id":"1","name":"","url":"","default":false,"telegraf":"telegraf","organization":"","defaultRP":"","version":"Unknown","authentication":"unknown","links":{"self":"/chronograf/v1/sources/1","kapacitors":"/chronograf/v1/sources/1/kapacitors","services":"/chronograf/v1/sources/1/services","proxy":"/chronograf/v1/sources/1/proxy","queries":"/chronograf/v1/sources/1/queries","write":"/chronograf/v1/sources/1/write","permissions":"/chronograf/v1/sources/1/permissions","users":"/chronograf/v1/sources/1/users","databases":"/chronograf/v1/sources/1/dbs","annotations":"/chronograf/v1/sources/1/annotations","health":"/chronograf/v1/sources/1/health"}}
 `,
 		},
 	}

@@ -4896,6 +4896,10 @@
             "Not used currently. Can be used to designate a minimum role required to access this source.",
           "default": "viewer"
         },
+        "version": {
+          "type": "string",
+          "description": "Version of influxDB being run, unknown if not found"
+        },
         "links": {
           "type": "object",
           "properties": {
