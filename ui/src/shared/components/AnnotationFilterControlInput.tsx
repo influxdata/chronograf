@@ -16,8 +16,6 @@ interface State {
   shouldShowAllSuggestions: boolean
 }
 
-const NUM_SUGGESTIONS = 8
-
 const lexographicOrder = (a: string, b: string) => a.localeCompare(b)
 
 class AnnotationFilterControlInput extends PureComponent<Props, State> {
@@ -31,9 +29,7 @@ class AnnotationFilterControlInput extends PureComponent<Props, State> {
       return {filteredSuggestions}
     }
 
-    filteredSuggestions = filteredSuggestions.filter(
-      (v, i) => v.includes(value) && i < NUM_SUGGESTIONS
-    )
+    filteredSuggestions = filteredSuggestions.filter(v => v.includes(value))
 
     return {filteredSuggestions}
   }
