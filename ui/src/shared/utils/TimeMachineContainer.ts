@@ -104,34 +104,34 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
   }
 
   public handleChangeScript = (script: string) => {
-    this.setState({script})
+    return this.setState({script})
   }
 
   public handleUpdateTimeRange = (timeRange: TimeRange) => {
-    this.setState({timeRange})
+    return this.setState({timeRange})
   }
 
   public handleUpdateQueryDrafts = (queryDrafts: CellQuery[]) => {
-    this.setState({queryDrafts})
+    return this.setState({queryDrafts})
   }
 
   public handleToggleField = (queryID: string, fieldFunc: Field) => {
-    this.updateQueryDrafts(queryID, q => ({
+    return this.updateQueryDrafts(queryID, q => ({
       ...toggleField(q, fieldFunc),
       rawText: null,
     }))
   }
 
   public handleGroupByTime = (queryID: string, time: string) => {
-    this.updateQueryDrafts(queryID, q => groupByTime(q, time))
+    return this.updateQueryDrafts(queryID, q => groupByTime(q, time))
   }
 
   public handleFill = (queryID: string, value: string) => {
-    this.updateQueryDrafts(queryID, q => fill(q, value))
+    return this.updateQueryDrafts(queryID, q => fill(q, value))
   }
 
   public handleRemoveFuncs = (queryID: string, fields: Field[]) => {
-    this.updateQueryDrafts(queryID, q => removeFuncs(q, fields))
+    return this.updateQueryDrafts(queryID, q => removeFuncs(q, fields))
   }
 
   public handleApplyFuncsToField = (
@@ -139,35 +139,35 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
     fieldFunc: ApplyFuncsToFieldArgs,
     groupBy?: GroupBy
   ) => {
-    this.updateQueryDrafts(queryID, q =>
+    return this.updateQueryDrafts(queryID, q =>
       applyFuncsToField(q, fieldFunc, groupBy)
     )
   }
 
   public handleChooseTag = (queryID: string, tag: Tag) => {
-    this.updateQueryDrafts(queryID, q => chooseTag(q, tag))
+    return this.updateQueryDrafts(queryID, q => chooseTag(q, tag))
   }
 
   public handleChooseNamespace = (
     queryID: string,
     options: {database: string; retentionPolicy: string}
   ) => {
-    this.updateQueryDrafts(queryID, q => chooseNamespace(q, options))
+    return this.updateQueryDrafts(queryID, q => chooseNamespace(q, options))
   }
 
   public handleChooseMeasurement = (queryID: string, measurement: string) => {
-    this.updateQueryDrafts(queryID, q => ({
+    return this.updateQueryDrafts(queryID, q => ({
       ...chooseMeasurement(q, measurement),
       rawText: q.rawText || '',
     }))
   }
 
   public handleGroupByTag = (queryID: string, tagKey: string) => {
-    this.updateQueryDrafts(queryID, q => groupByTag(q, tagKey))
+    return this.updateQueryDrafts(queryID, q => groupByTag(q, tagKey))
   }
 
   public handleToggleTagAcceptance = (queryID: string) => {
-    this.updateQueryDrafts(queryID, q => toggleTagAcceptance(q))
+    return this.updateQueryDrafts(queryID, q => toggleTagAcceptance(q))
   }
 
   public handleAddInitialField = (
@@ -175,18 +175,20 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
     field: Field,
     groupBy: GroupBy
   ) => {
-    this.updateQueryDrafts(queryID, q => addInitialField(q, field, groupBy))
+    return this.updateQueryDrafts(queryID, q =>
+      addInitialField(q, field, groupBy)
+    )
   }
 
   public handleEditQueryStatus = (queryID: string, status: Status) => {
-    this.updateQueryDrafts(queryID, q => ({...q, status}))
+    return this.updateQueryDrafts(queryID, q => ({...q, status}))
   }
 
   public handleTimeShift = (queryID: string, shift: TimeShift) => {
-    this.updateQueryDrafts(queryID, q => timeShift(q, shift))
+    return this.updateQueryDrafts(queryID, q => timeShift(q, shift))
   }
 
-  public handleAddQuery = () => {
+  public handleAddQuery = (): Promise<void> => {
     const {queryDrafts} = this.state
     const queryID = uuid.v4()
     const newQueryDraft: CellQuery = {
@@ -197,66 +199,66 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       type: QueryType.InfluxQL,
     }
 
-    this.setState({queryDrafts: [...queryDrafts, newQueryDraft]})
+    return this.setState({queryDrafts: [...queryDrafts, newQueryDraft]})
   }
 
   public handleDeleteQuery = (queryID: string) => {
     const {queryDrafts} = this.state
     const updatedQueryDrafts = queryDrafts.filter(query => query.id !== queryID)
 
-    this.setState({queryDrafts: updatedQueryDrafts})
+    return this.setState({queryDrafts: updatedQueryDrafts})
   }
 
   public handleUpdateType = (type: CellType) => {
-    this.setState({type})
+    return this.setState({type})
   }
 
   public handleUpdateNote = (note: string) => {
-    this.setState({note})
+    return this.setState({note})
   }
 
   public handleUpdateNoteVisibility = (noteVisibility: NoteVisibility) => {
-    this.setState({noteVisibility})
+    return this.setState({noteVisibility})
   }
 
   public handleUpdateThresholdsListColors = (
     thresholdsListColors: ColorNumber[]
   ) => {
-    this.setState({thresholdsListColors})
+    return this.setState({thresholdsListColors})
   }
 
   public handleUpdateThresholdsListType = (
     thresholdsListType: ThresholdType
   ) => {
-    this.setState({thresholdsListType})
+    return this.setState({thresholdsListType})
   }
 
   public handleUpdateGaugeColors = (gaugeColors: ColorNumber[]) => {
-    this.setState({gaugeColors})
+    return this.setState({gaugeColors})
   }
 
   public handleUpdateAxes = (axes: Axes) => {
-    this.setState({axes})
+    return this.setState({axes})
   }
 
   public handleUpdateTableOptions = (tableOptions: TableOptions) => {
-    this.setState({tableOptions})
+    return this.setState({tableOptions})
   }
 
   public handleUpdateLineColors = (lineColors: ColorString[]) => {
-    this.setState({lineColors})
+    return this.setState({lineColors})
   }
 
   public handleUpdateTimeFormat = (timeFormat: string) => {
-    this.setState({timeFormat})
+    return this.setState({timeFormat})
   }
 
   public handleUpdateDecimalPlaces = (decimalPlaces: DecimalPlaces) => {
-    this.setState({decimalPlaces})
+    return this.setState({decimalPlaces})
   }
 
   public handleUpdateFieldOptions = (fieldOptions: FieldOption[]) => {
-    this.setState({fieldOptions})
+    return this.setState({fieldOptions})
   }
 
   private updateQueryDrafts = (
@@ -281,6 +283,6 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       return query
     })
 
-    this.setState({queryDrafts: updatedQueryDrafts})
+    return this.setState({queryDrafts: updatedQueryDrafts})
   }
 }
