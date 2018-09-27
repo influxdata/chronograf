@@ -20,6 +20,8 @@ import {
 import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 import {buildQuery} from 'src/utils/influxql'
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
+import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
+import {setLocalStorage, getLocalStorage} from 'src/shared/utils/localStorage'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
@@ -61,6 +63,8 @@ import {
 } from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
+const LOCAL_STORAGE_DELAY_MS = 1000
+
 export interface TimeMachineState {
   script: string
   queryDrafts: CellQuery[]
@@ -80,8 +84,16 @@ export interface TimeMachineState {
 }
 
 export class TimeMachineContainer extends Container<TimeMachineState> {
-  constructor(initialState: Partial<TimeMachineState> = {}) {
+  private debouncer: Debouncer = new DefaultDebouncer()
+  private localStorageKey?: string
+
+  constructor(
+    initialState: Partial<TimeMachineState> = {},
+    localStorageKey?: string
+  ) {
     super()
+
+    const localStorageState = getLocalStorage(localStorageKey)
 
     this.state = {
       script: '',
@@ -99,20 +111,23 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       timeFormat: DEFAULT_TIME_FORMAT,
       decimalPlaces: DEFAULT_DECIMAL_PLACES,
       fieldOptions: DEFAULT_FIELD_OPTIONS,
+      ...localStorageState,
       ...initialState,
     }
+
+    this.localStorageKey = localStorageKey
   }
 
   public handleChangeScript = (script: string) => {
-    return this.setState({script})
+    return this.setAndPersistState({script})
   }
 
   public handleUpdateTimeRange = (timeRange: TimeRange) => {
-    return this.setState({timeRange})
+    return this.setAndPersistState({timeRange})
   }
 
   public handleUpdateQueryDrafts = (queryDrafts: CellQuery[]) => {
-    return this.setState({queryDrafts})
+    return this.setAndPersistState({queryDrafts})
   }
 
   public handleToggleField = (queryID: string, fieldFunc: Field) => {
@@ -199,66 +214,68 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       type: QueryType.InfluxQL,
     }
 
-    return this.setState({queryDrafts: [...queryDrafts, newQueryDraft]})
+    return this.setAndPersistState({
+      queryDrafts: [...queryDrafts, newQueryDraft],
+    })
   }
 
   public handleDeleteQuery = (queryID: string) => {
     const {queryDrafts} = this.state
     const updatedQueryDrafts = queryDrafts.filter(query => query.id !== queryID)
 
-    return this.setState({queryDrafts: updatedQueryDrafts})
+    return this.setAndPersistState({queryDrafts: updatedQueryDrafts})
   }
 
   public handleUpdateType = (type: CellType) => {
-    return this.setState({type})
+    return this.setAndPersistState({type})
   }
 
   public handleUpdateNote = (note: string) => {
-    return this.setState({note})
+    return this.setAndPersistState({note})
   }
 
   public handleUpdateNoteVisibility = (noteVisibility: NoteVisibility) => {
-    return this.setState({noteVisibility})
+    return this.setAndPersistState({noteVisibility})
   }
 
   public handleUpdateThresholdsListColors = (
     thresholdsListColors: ColorNumber[]
   ) => {
-    return this.setState({thresholdsListColors})
+    return this.setAndPersistState({thresholdsListColors})
   }
 
   public handleUpdateThresholdsListType = (
     thresholdsListType: ThresholdType
   ) => {
-    return this.setState({thresholdsListType})
+    return this.setAndPersistState({thresholdsListType})
   }
 
   public handleUpdateGaugeColors = (gaugeColors: ColorNumber[]) => {
-    return this.setState({gaugeColors})
+    return this.setAndPersistState({gaugeColors})
   }
 
   public handleUpdateAxes = (axes: Axes) => {
-    return this.setState({axes})
+    return this.setAndPersistState({axes})
   }
 
   public handleUpdateTableOptions = (tableOptions: TableOptions) => {
-    return this.setState({tableOptions})
+    return this.setAndPersistState({tableOptions})
   }
 
   public handleUpdateLineColors = (lineColors: ColorString[]) => {
-    return this.setState({lineColors})
+    return this.setAndPersistState({lineColors})
   }
 
   public handleUpdateTimeFormat = (timeFormat: string) => {
-    return this.setState({timeFormat})
+    return this.setAndPersistState({timeFormat})
   }
 
   public handleUpdateDecimalPlaces = (decimalPlaces: DecimalPlaces) => {
-    return this.setState({decimalPlaces})
+    return this.setAndPersistState({decimalPlaces})
   }
 
   public handleUpdateFieldOptions = (fieldOptions: FieldOption[]) => {
-    return this.setState({fieldOptions})
+    return this.setAndPersistState({fieldOptions})
   }
 
   private updateQueryDrafts = (
@@ -283,6 +300,18 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       return query
     })
 
-    return this.setState({queryDrafts: updatedQueryDrafts})
+    return this.setAndPersistState({queryDrafts: updatedQueryDrafts})
+  }
+
+  private setAndPersistState = (state: Partial<TimeMachineState>) => {
+    if (this.localStorageKey) {
+      this.debouncer.call(this.setLocalStorageState, LOCAL_STORAGE_DELAY_MS)
+    }
+
+    return this.setState(state)
+  }
+
+  private setLocalStorageState = () => {
+    setLocalStorage(this.localStorageKey, this.state)
   }
 }

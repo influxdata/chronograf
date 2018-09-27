@@ -6,11 +6,9 @@ import {
 } from 'src/shared/copy/notifications'
 
 import {defaultTableData} from 'src/logs/constants'
+import {VERSION, GIT_SHA} from 'src/shared/constants'
 
 import {LocalStorage} from 'src/types/localStorage'
-
-const VERSION = process.env.npm_package_version
-const GIT_SHA = process.env.GIT_SHA
 
 export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
   try {
