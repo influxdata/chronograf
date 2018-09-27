@@ -216,3 +216,5 @@ export const WRITE_DATA_DOCS_LINK =
 export const DEFAULT_TIME_RANGE = timeRanges.find(
   tr => tr.lower === 'now() - 1h'
 )
+
+export const DE_LOCAL_STORAGE_KEY = 'dataExplorer'

@@ -5,6 +5,7 @@ import DataExplorer from './DataExplorer'
 
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {DE_LOCAL_STORAGE_KEY} from 'src/data_explorer/constants'
 
 import {Source} from 'src/types'
 
@@ -19,7 +20,10 @@ class DataExplorerPage extends PureComponent<Props> {
   constructor(props: Props) {
     super(props)
 
-    this.timeMachineContainer = new TimeMachineContainer()
+    this.timeMachineContainer = new TimeMachineContainer(
+      {},
+      DE_LOCAL_STORAGE_KEY
+    )
   }
 
   public render() {
