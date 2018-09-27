@@ -243,6 +243,7 @@ type Source struct {
 	Organization       string `json:"organization"`                 // Organization is the organization ID that resource belongs to
 	Role               string `json:"role,omitempty"`               // Not Currently Used. Role is the name of the minimum role that a user must possess to access the resource.
 	DefaultRP          string `json:"defaultRP"`                    // DefaultRP is the default retention policy used in database queries to this source
+	Version            string `json:"version,omitempty"`            // Version of influxdb
 }
 
 // SourcesStore stores connection information for a `TimeSeries`

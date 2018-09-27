@@ -133,6 +133,13 @@ func (s *Service) NewSource(w http.ResponseWriter, r *http.Request) {
 		src.Telegraf = "telegraf"
 	}
 
+	dbVersion, err := s.tsdbVersion(ctx, &src)
+	if err != nil {
+		dbVersion = "Unknown"
+		s.Logger.WithField("error", err.Error()).Info("Failed to retrieve database version")
+	}
+	src.Version = dbVersion
+
 	dbType, err := s.tsdbType(ctx, &src)
 	if err != nil {
 		Error(w, http.StatusBadRequest, "Error contacting source", s.Logger)
@@ -149,6 +156,18 @@ func (s *Service) NewSource(w http.ResponseWriter, r *http.Request) {
 	res := newSourceResponse(ctx, src)
 	location(w, res.Links.Self)
 	encodeJSON(w, http.StatusCreated, res, s.Logger)
+}
+
+func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (string, error) {
+	cli := &influx.Client{
+		Logger: s.Logger,
+	}
+
+	if err := cli.Connect(ctx, src); err != nil {
+		return "", err
+	}
+	return cli.Version(ctx)
+
 }
 
 func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string, error) {
@@ -181,6 +200,13 @@ func (s *Service) Sources(w http.ResponseWriter, r *http.Request) {
 
 	sources := make([]sourceResponse, 0)
 	for _, src := range srcs {
+		dbVersion, err := s.tsdbVersion(ctx, &src)
+		if err != nil {
+			dbVersion = "Unknown"
+			s.Logger.WithField("error", err.Error()).Info("Failed to retrieve database version")
+		}
+		src.Version = dbVersion
+
 		sources = append(sources, newSourceResponse(ctx, src))
 	}
 
@@ -203,6 +229,13 @@ func (s *Service) SourcesID(w http.ResponseWriter, r *http.Request) {
 		notFound(w, id, s.Logger)
 		return
 	}
+
+	dbVersion, err := s.tsdbVersion(ctx, &src)
+	if err != nil {
+		dbVersion = "Unknown"
+		s.Logger.WithField("error", err.Error()).Info("Failed to retrieve database version")
+	}
+	src.Version = dbVersion
 
 	res := newSourceResponse(ctx, src)
 	encodeJSON(w, http.StatusOK, res, s.Logger)
@@ -356,6 +389,13 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 		invalidData(w, err, s.Logger)
 		return
 	}
+
+	dbVersion, err := s.tsdbVersion(ctx, &src)
+	if err != nil {
+		dbVersion = "Unknown"
+		s.Logger.WithField("error", err.Error()).Info("Failed to retrieve database version")
+	}
+	src.Version = dbVersion
 
 	dbType, err := s.tsdbType(ctx, &src)
 	if err != nil {
