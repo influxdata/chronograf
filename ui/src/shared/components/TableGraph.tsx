@@ -29,6 +29,7 @@ import {
   TimeSeriesServerResponse,
   TimeSeriesValue,
   TimeSeriesToTableGraphReturnType,
+  InfluxQLQueryType,
 } from 'src/types/series'
 import {ColorString} from 'src/types/colors'
 import {
@@ -83,6 +84,7 @@ interface State {
   transformedData: TimeSeriesValue[][]
   sortedTimeVals: TimeSeriesValue[]
   sortedLabels: Label[]
+  influxQLQueryType: InfluxQLQueryType
   hoveredColumnIndex: number
   hoveredRowIndex: number
   timeColumnWidth: number
@@ -115,6 +117,7 @@ class TableGraph extends PureComponent<Props, State> {
       transformedData: [[]],
       sortedTimeVals: [],
       sortedLabels: [],
+      influxQLQueryType: InfluxQLQueryType.DataQuery,
       hoveredColumnIndex: NULL_ARRAY_INDEX,
       hoveredRowIndex: NULL_ARRAY_INDEX,
       sort: {field: sortField, direction: DEFAULT_SORT_DIRECTION},
@@ -303,7 +306,11 @@ class TableGraph extends PureComponent<Props, State> {
         )
       }
       const data = _.get(result, 'data', this.state.data)
-      const influxQLQueryType = _.get(result, 'influxQLQueryType', null)
+      const influxQLQueryType = _.get(
+        result,
+        'influxQLQueryType',
+        this.state.influxQLQueryType
+      )
 
       if (_.isEmpty(data[0])) {
         return
@@ -397,6 +404,7 @@ class TableGraph extends PureComponent<Props, State> {
         this.setState({
           data,
           sortedLabels,
+          influxQLQueryType,
           transformedData,
           sortedTimeVals,
           sort,
