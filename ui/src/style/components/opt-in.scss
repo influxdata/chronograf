@@ -94,6 +94,7 @@
   border-radius: 4px 0 0 4px;
   font-family: $code-font;
   flex: 1 0 0;
+  min-width: 0;
 }
 // Right value toggled state
 .opt-in.right-toggled {
