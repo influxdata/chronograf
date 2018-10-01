@@ -333,10 +333,15 @@ class TimeSeries extends Component<Props, State> {
   }
 
   private executeFluxQuery = async (): Promise<GetTimeSeriesResult> => {
-    const {queries, onNotify, source} = this.props
+    const {queries, onNotify, source, timeRange} = this.props
 
     const script: string = _.get(queries, '0.text', '')
-    const results = await fetchFluxTimeSeries(source, script, this.latestUUID)
+    const results = await fetchFluxTimeSeries(
+      source,
+      script,
+      timeRange,
+      this.latestUUID
+    )
 
     if (results.didTruncate && onNotify) {
       onNotify(fluxResponseTruncatedError())

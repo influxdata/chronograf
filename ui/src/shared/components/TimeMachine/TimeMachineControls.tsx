@@ -84,6 +84,7 @@ const TimeMachineControls: SFC<Props> = ({
         isFluxSourceSelected={isFluxSourceSelected}
         queries={buildQueries(queries, timeRange)}
         templates={templates}
+        timeRange={timeRange}
       />
       <AutoRefreshDropdown
         selected={autoRefreshDuration}

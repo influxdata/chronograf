@@ -1,11 +1,12 @@
 import AJAX from 'src/utils/ajax'
-import {Source, FluxTable} from 'src/types'
+import {Source, FluxTable, TimeRange} from 'src/types'
 import {
   parseResponse,
   parseResponseError,
 } from 'src/shared/parsing/flux/response'
 import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
 import {manager} from 'src/worker/JobManager'
+import {addTemplatesToScript} from 'src/shared/parsing/flux/templates'
 import _ from 'lodash'
 
 export const getSuggestions = async (url: string) => {
@@ -28,6 +29,7 @@ interface ASTRequest {
 
 export const getAST = async (request: ASTRequest) => {
   const {url, body} = request
+
   const {data, status} = await AJAX({
     method: 'POST',
     url,
@@ -56,14 +58,17 @@ export interface GetRawTimeSeriesResult {
 export const getRawTimeSeries = async (
   source: Source,
   script: string,
+  timeRange: TimeRange,
   uuid?: string
 ): Promise<GetRawTimeSeriesResult> => {
   const path = encodeURIComponent(`/v2/query?organization=defaultorgname`)
   const url = `${window.basepath}${source.links.flux}?path=${path}`
+
+  const scriptWithTemplates = addTemplatesToScript(script, timeRange)
   try {
     const {body, byteLength, uuid: responseUUID} = await manager.fetchFluxData(
       url,
-      script,
+      scriptWithTemplates,
       uuid
     )
 
@@ -94,11 +99,13 @@ export interface GetTimeSeriesResult {
 export const getTimeSeries = async (
   source,
   script: string,
+  timeRange: TimeRange,
   uuid?: string
 ): Promise<GetTimeSeriesResult> => {
   const {csv, didTruncate, uuid: responseUUID} = await getRawTimeSeries(
     source,
     script,
+    timeRange,
     uuid
   )
 

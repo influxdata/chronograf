@@ -91,6 +91,7 @@ export interface Status {
 
 export interface TimeRange {
   lower: string
+  lowerFlux?: string
   upper?: string | null
   seconds?: number
   format?: string
