@@ -18,7 +18,7 @@ interface DecodeFluxRespWithLimitResult {
   uuid?: string
 }
 
-const workerCount = navigator.hardwareConcurrency - 1
+const workerCount = navigator.hardwareConcurrency - 1 || 2
 
 class JobManager {
   private currentIndex: number = 0
