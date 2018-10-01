@@ -2,19 +2,14 @@
 import {getQueryConfigAndStatus} from 'src/shared/apis'
 
 // Utils
-import replaceTemplate, {replaceInterval} from 'src/tempVars/utils/replace'
-import {getDeep} from 'src/utils/wrappers'
+import templateReplace from 'src/tempVars/utils/replace'
 
 // Constants
 import {
   UNTITLED_GRAPH,
   NEW_DEFAULT_DASHBOARD_CELL,
 } from 'src/dashboards/constants'
-import {
-  TEMP_VAR_DASHBOARD_TIME,
-  DEFAULT_DURATION_MS,
-  DEFAULT_PIXELS,
-} from 'src/shared/constants'
+import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
 const MAX_COLUMNS = 12
 
 // Types
@@ -172,30 +167,10 @@ export const getConfig = async (
   query: string,
   templates: Template[]
 ): Promise<QueryConfig> => {
-  // replace all templates but :interval:
-  query = replaceTemplate(query, templates)
-  let queries = []
-  let durationMs = DEFAULT_DURATION_MS
-
-  try {
-    // get durationMs to calculate interval
-    queries = await getQueryConfigAndStatus(url, [{query, id}])
-    durationMs = getDeep<number>(queries, '0.durationMs', DEFAULT_DURATION_MS)
-    // calc and replace :interval:
-    query = replaceInterval(query, DEFAULT_PIXELS, durationMs)
-  } catch (error) {
-    console.error(error)
-    throw error
-  }
-
-  try {
-    // fetch queryConfig for with all template variables replaced
-    queries = await getQueryConfigAndStatus(url, [{query, id}])
-  } catch (error) {
-    console.error(error)
-    throw error
-  }
-
+  const renderedQuery = templateReplace(query, templates)
+  const queries = await getQueryConfigAndStatus(url, [
+    {query: renderedQuery, id},
+  ])
   const {queryConfig} = queries.find(q => q.id === id)
 
   return queryConfig

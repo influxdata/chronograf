@@ -30,6 +30,7 @@ import {
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {analyzeQueryFailed} from 'src/shared/copy/notifications'
 
 // Actions
 import {validateSuccess} from 'src/shared/copy/notifications'
@@ -38,7 +39,6 @@ import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/acti
 
 // Constants
 import {HANDLE_HORIZONTAL} from 'src/shared/constants'
-import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 import {CEOTabs} from 'src/dashboards/constants'
 import {builder, emptyAST} from 'src/flux/constants'
 
@@ -502,16 +502,6 @@ class TimeMachine extends PureComponent<Props, State> {
       queriesWorkingDraft[0]
     )
 
-    const queryText = _.get(activeQuery, 'rawText', '')
-    const userDefinedTempVarsInQuery = this.findUserDefinedTempVarsInQuery(
-      queryText,
-      this.props.templates
-    )
-
-    if (!!userDefinedTempVarsInQuery.length) {
-      activeQuery.isQuerySupportedByExplorer = false
-    }
-
     return activeQuery
   }
 
@@ -527,93 +517,44 @@ class TimeMachine extends PureComponent<Props, State> {
     editQueryStatus(queryID, status, this.stateToUpdate)
   }
 
-  private findUserDefinedTempVarsInQuery = (
-    query: string,
-    templates: Template[]
-  ): Template[] => {
-    return templates.filter((temp: Template) => {
-      if (!query) {
-        return false
-      }
-      const isPredefinedTempVar: boolean = !!PREDEFINED_TEMP_VARS.find(
-        t => t === temp.tempVar
-      )
-      if (!isPredefinedTempVar) {
-        return query.includes(temp.tempVar)
-      }
-      return false
-    })
-  }
-
   private get useDynamicSource(): boolean {
     const {queryDrafts} = this.props
 
     return getDeep(queryDrafts, '0.source', '') === ''
   }
 
-  // The schema explorer is not built to handle user defined template variables
-  // in the query in a clear manner. If they are being used, we indicate that in
-  // the query config in order to disable the fields column down stream because
-  // at this point the query string is disconnected from the schema explorer.
   private handleEditRawText = async (text: string): Promise<void> => {
-    const {templates, onUpdateQueryDrafts, queryDrafts} = this.props
+    const {templates, onUpdateQueryDrafts, queryDrafts, notify} = this.props
+    const activeID = this.activeQuery.id
+    const url: string = _.get(this.source, 'links.queries', '')
 
-    const id = this.activeQuery.id
-    const url = getDeep<string>(this.source, 'links.queries', '')
-
-    const userDefinedTempVarsInQuery = this.findUserDefinedTempVarsInQuery(
-      text,
-      templates
-    )
-
-    const isUsingUserDefinedTempVars: boolean = !!userDefinedTempVarsInQuery.length
+    let newQueryConfig
 
     try {
-      const newQueryConfig = await getConfig(url, id, text, templates)
-      const nextQueries = queryDrafts.map(q => {
-        const {queryConfig} = q
-        if (queryConfig.id === id) {
-          if (
-            isUsingUserDefinedTempVars ||
-            _.isEmpty(newQueryConfig.database)
-          ) {
-            return {
-              ...q,
-              queryConfig: {
-                ...queryConfig,
-                rawText: text,
-                status: {loading: true},
-                isQuerySupportedByExplorer: false,
-              },
-              query: text,
-              text,
-            }
-          }
-
-          let groupBy = newQueryConfig.groupBy
-          if (text.indexOf(':interval:') >= 0) {
-            groupBy = queryConfig.groupBy
-          }
-
-          return {
-            ...q,
-            queryConfig: {
-              ...newQueryConfig,
-              status: {loading: true},
-              groupBy,
-              isQuerySupportedByExplorer: true,
-            },
-            query: text,
-            text,
-          }
-        }
-
-        return q
-      })
-      onUpdateQueryDrafts(nextQueries)
-    } catch (error) {
-      console.error(error)
+      newQueryConfig = await getConfig(url, activeID, text, templates)
+    } catch {
+      notify(analyzeQueryFailed)
+      return
     }
+
+    const updatedQueryDrafts = queryDrafts.map(query => {
+      if (query.queryConfig.id !== activeID) {
+        return query
+      }
+
+      return {
+        ...query,
+        text,
+        query: text,
+        queryConfig: {
+          ...newQueryConfig,
+          rawText: text,
+          status: {loading: true},
+        },
+      }
+    })
+
+    onUpdateQueryDrafts(updatedQueryDrafts)
   }
 
   private updateQueryDraftsSource(
