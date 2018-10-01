@@ -4,31 +4,27 @@
 */
 
 .logs-message--copy {
-    font-size: 11px;
-    text-transform: uppercase;
-    color: $c-pool;
-    display: inline-block;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    margin-left: $ix-marg-a;
+  position: absolute;
+  right: $ix-marg-a;
+  bottom: 50%;
+  transform: translateY(50%);
+  opacity: 0;
+  z-index: 20;
+}
 
-    > .icon {
-      position: relative;
-      top: -1px;
-      margin-right: $ix-marg-a;
-      display: inline-block;
-    }
+.expanded--message .logs-message--copy {
+  top: $ix-marg-a;
+  transform: none;
+}
 
-    .logs-message:hover & {
-      opacity: 1;
-    }
+.logs-message:hover {
+  color: $g20-white;
+}
 
-    &:hover {
-      color: $c-laser;
-      cursor: pointer;
-    }
-  }
-  
-  .logs-message--match {
-    color: $c-laser;
-  }
+.logs-message:hover .logs-message--copy {
+  opacity: 1;
+}
+
+.logs-message--match {
+  color: $c-laser;
+}
