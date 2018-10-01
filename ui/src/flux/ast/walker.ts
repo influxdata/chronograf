@@ -223,7 +223,11 @@ export default class Walker {
       return [{name, source}]
     }
 
-    name = currentNode.callee.name
+    if (!currentNode.callee) {
+      return []
+    }
+
+    name = _.get(currentNode, 'callee.name')
     args = currentNode.arguments
     return [{name, args, source}]
   }

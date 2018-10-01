@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React, {PureComponent} from 'react'
 import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
 import {EditorChange, LineWidget} from 'codemirror'
@@ -173,6 +174,10 @@ class TimeMachineEditor extends PureComponent<Props, State> {
       return {line: Number(lineNumber), text}
     })
 
+    if (!_.every(lineNumbers, _.isNumber)) {
+      return []
+    }
+
     return lineNumbers
   }
 
@@ -209,8 +214,8 @@ class TimeMachineEditor extends PureComponent<Props, State> {
   }
 
   private updateCode = (
-    _: IInstance,
-    __: EditorChange,
+    ___: IInstance,
+    ____: EditorChange,
     script: string
   ): void => {
     this.props.onChangeScript(script)
