@@ -1,6 +1,5 @@
 import AJAX from 'src/utils/ajax'
-import {Service, FluxTable} from 'src/types'
-import {updateService} from 'src/shared/apis'
+import {Source, FluxTable} from 'src/types'
 import {
   parseResponse,
   parseResponseError,
@@ -55,13 +54,12 @@ export interface GetRawTimeSeriesResult {
 
 // Returns the CSV file directly from the Flux service
 export const getRawTimeSeries = async (
-  service: Service,
+  source: Source,
   script: string,
   uuid?: string
 ): Promise<GetRawTimeSeriesResult> => {
-  const path = encodeURIComponent(`/query?organization=defaultorgname`)
-  const url = `${window.basepath}${service.links.proxy}?path=${path}`
-
+  const path = encodeURIComponent(`/v2/query?organization=defaultorgname`)
+  const url = `${window.basepath}${source.links.flux}?path=${path}`
   try {
     const {body, byteLength, uuid: responseUUID} = await manager.fetchFluxData(
       url,
@@ -94,12 +92,12 @@ export interface GetTimeSeriesResult {
 
 // Returns a parsed representation of the CSV from the Flux service
 export const getTimeSeries = async (
-  service: Service,
+  source,
   script: string,
   uuid?: string
 ): Promise<GetTimeSeriesResult> => {
   const {csv, didTruncate, uuid: responseUUID} = await getRawTimeSeries(
-    service,
+    source,
     script,
     uuid
   )
@@ -124,21 +122,5 @@ export const getTimeSeries = async (
       tables: parseResponseError(csv),
       didTruncate: false,
     }
-  }
-}
-
-export const updateScript = async (service: Service, script: string) => {
-  const updates = {...service, metadata: {script}}
-
-  try {
-    const response = await updateService(updates)
-    return response
-  } catch (error) {
-    if (error.data) {
-      console.error('Could not update script', error.data)
-      throw error.data
-    }
-
-    throw error
   }
 }

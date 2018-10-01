@@ -1,10 +1,10 @@
 import _ from 'lodash'
 
 import AJAX from 'src/utils/ajax'
-import {Service, SchemaFilter} from 'src/types'
+import {Source, SchemaFilter} from 'src/types'
 
 export const measurements = async (
-  service: Service,
+  source: Source,
   bucket: string
 ): Promise<any> => {
   const script = `
@@ -12,14 +12,14 @@ export const measurements = async (
         |> range(start:-24h) 
         |> group(by:["_measurement"]) 
         |> distinct(column:"_measurement") 
-        |> group()
+        |> group()s
     `
 
-  return proxy(service, script)
+  return proxy(source, script)
 }
 
 export const tagKeys = async (
-  service: Service,
+  source: Source,
   bucket: string,
   filter: SchemaFilter[]
 ): Promise<any> => {
@@ -41,11 +41,11 @@ export const tagKeys = async (
       ${tagKeyFilter}
     `
 
-  return proxy(service, script)
+  return proxy(source, script)
 }
 
 interface TagValuesParams {
-  service: Service
+  source: Source
   bucket: string
   tagKey: string
   limit: number
@@ -56,7 +56,7 @@ interface TagValuesParams {
 
 export const tagValues = async ({
   bucket,
-  service,
+  source,
   tagKey,
   limit,
   filter = [],
@@ -84,11 +84,11 @@ export const tagValues = async ({
       ${countFunc}
   `
 
-  return proxy(service, script)
+  return proxy(source, script)
 }
 
 export const tagsFromMeasurement = async (
-  service: Service,
+  source: Source,
   bucket: string,
   measurement: string
 ): Promise<any> => {
@@ -100,7 +100,7 @@ export const tagsFromMeasurement = async (
       |> keys(except:["_time","_value","_start","_stop"])
   `
 
-  return proxy(service, script)
+  return proxy(source, script)
 }
 
 const tagsetFilter = (filter: SchemaFilter[]): string => {
@@ -113,7 +113,7 @@ const tagsetFilter = (filter: SchemaFilter[]): string => {
   return `|> filter(fn: (r) => ${predicates.join(' and ')} )`
 }
 
-const proxy = async (service: Service, script: string) => {
+const proxy = async (source: Source, script: string) => {
   const mark = encodeURIComponent('?')
   const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
@@ -122,8 +122,8 @@ const proxy = async (service: Service, script: string) => {
     const response = await AJAX({
       method: 'POST',
       url: `${
-        service.links.proxy
-      }?path=/query${mark}organization=defaultorgname`,
+        source.links.flux
+      }?path=/v2/query${mark}organization=defaultorgname`,
       data,
       headers: {'Content-Type': 'application/json'},
     })

@@ -1,7 +1,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import FuncArg from 'src/flux/components/FuncArg'
-import {service} from 'test/resources'
+import {source} from 'test/resources'
 
 const setup = () => {
   const props = {
@@ -14,7 +14,7 @@ const setup = () => {
     value: '',
     type: '',
     selectedArg: '',
-    service,
+    source,
     onClick: () => {},
     onChangeArg: () => {},
     onGenerateScript: () => {},

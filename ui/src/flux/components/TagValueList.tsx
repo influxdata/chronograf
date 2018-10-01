@@ -3,13 +3,13 @@ import React, {PureComponent, MouseEvent} from 'react'
 import TagValueListItem from 'src/flux/components/TagValueListItem'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
 
-import {Service, SchemaFilter, NotificationAction} from 'src/types'
+import {Source, SchemaFilter, NotificationAction} from 'src/types'
 
 interface Props {
   db: string
   tagKey: string
   values: string[]
-  service: Service
+  source: Source
   loadMoreCount: number
   filter: SchemaFilter[]
   notify: NotificationAction
@@ -23,7 +23,7 @@ export default class TagValueList extends PureComponent<Props> {
     const {
       db,
       notify,
-      service,
+      source,
       values,
       tagKey,
       filter,
@@ -38,7 +38,7 @@ export default class TagValueList extends PureComponent<Props> {
             db={db}
             value={v}
             tagKey={tagKey}
-            service={service}
+            source={source}
             filter={filter}
             notify={notify}
           />

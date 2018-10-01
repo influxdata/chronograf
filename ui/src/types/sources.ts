@@ -29,6 +29,7 @@ export interface Source {
   text?: string // added client-side for dropdowns
   services?: Service[]
   authentication: SourceAuthenticationMethod
+  version: string
 }
 
 export interface SourceLinks {
@@ -44,6 +45,7 @@ export interface SourceLinks {
   annotations: string
   health: string
   services: string
+  flux?: string
 }
 
 export interface SourceOption extends Source {

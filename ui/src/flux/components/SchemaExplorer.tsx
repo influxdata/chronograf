@@ -2,20 +2,20 @@ import React, {PureComponent} from 'react'
 
 import DatabaseList from 'src/flux/components/DatabaseList'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-import {Service, NotificationAction} from 'src/types'
+import {Source, NotificationAction} from 'src/types'
 
 interface Props {
-  service: Service
+  source: Source
   notify: NotificationAction
 }
 
 class SchemaExplorer extends PureComponent<Props> {
   public render() {
-    const {service, notify} = this.props
+    const {source, notify} = this.props
     return (
       <div className="flux-schema-explorer">
         <FancyScrollbar>
-          <DatabaseList service={service} notify={notify} />
+          <DatabaseList source={source} notify={notify} />
         </FancyScrollbar>
       </div>
     )

@@ -37,7 +37,6 @@ import {
   QueryConfig,
   Dashboard,
   Source,
-  Service,
   Cell,
   QueryType,
   Notification,
@@ -52,7 +51,7 @@ interface PassedProps {
   dashboards: Dashboard[]
   source: Source
   rawText: string
-  service: Service
+  isFluxQuery: boolean
   onCancel: () => void
   sendDashboardCell: (
     dashboard: Dashboard,
@@ -175,16 +174,11 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private get hasQuery(): boolean {
-    const {queryConfig, script} = this.props
-    if (this.isFlux) {
+    const {queryConfig, script, isFluxQuery} = this.props
+    if (isFluxQuery) {
       return !!script.length
     }
     return getDeep<number>(queryConfig, 'fields.length', 0) !== 0
-  }
-
-  private get isFlux(): boolean {
-    const {service} = this.props
-    return !!service
   }
 
   private get selectedDashboards(): Dashboard[] {
@@ -238,9 +232,9 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       rawText,
       source,
       onCancel,
-      service,
       visualizationOptions,
       isStaticLegend,
+      isFluxQuery,
     } = this.props
     const {
       type,
@@ -254,12 +248,12 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       noteVisibility,
     } = visualizationOptions
 
-    const newCellQueries = this.isFlux
+    const newCellQueries = isFluxQuery
       ? [
           {
             queryConfig: null,
             query: script,
-            source: service.links.self,
+            source: source.links.self,
             type: QueryType.Flux,
           },
         ]

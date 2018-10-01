@@ -19,12 +19,12 @@ import {
   FlatBody,
   ScriptStatus,
 } from 'src/types/flux'
-import {Service, NotificationAction} from 'src/types'
+import {Source, NotificationAction} from 'src/types'
 
 interface Props {
   body: Body[]
   script: string
-  service: Service
+  source: Source
   status: ScriptStatus
   suggestions: Suggestion[]
   onDeleteBody: OnDeleteBody
@@ -67,7 +67,7 @@ class FluxQueryBuilder extends PureComponent<Props, State> {
     const {
       body,
       notify,
-      service,
+      source,
       suggestions,
       onAppendFrom,
       onDeleteBody,
@@ -125,7 +125,7 @@ class FluxQueryBuilder extends PureComponent<Props, State> {
         name: 'Explore',
         headerButtons: [],
         menuOptions: [],
-        render: () => <SchemaExplorer service={service} notify={notify} />,
+        render: () => <SchemaExplorer source={source} notify={notify} />,
         headerOrientation: HANDLE_VERTICAL,
       },
     ]

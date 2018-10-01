@@ -6,10 +6,10 @@ import {showDatabases} from 'src/shared/apis/metaQuery'
 import showDatabasesParser from 'src/shared/parsing/showDatabases'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {Service, NotificationAction} from 'src/types'
+import {Source, NotificationAction} from 'src/types'
 
 interface Props {
-  service: Service
+  source: Source
   notify: NotificationAction
 }
 
@@ -32,10 +32,9 @@ class DatabaseList extends PureComponent<Props, State> {
   }
 
   public async getDatabases() {
-    const {service} = this.props
-
+    const {source} = this.props
     try {
-      const {data} = await showDatabases(`${service.links.source}/proxy`)
+      const {data} = await showDatabases(source.links.proxy)
       const {databases} = showDatabasesParser(data)
       const sorted = databases.sort()
 
@@ -47,11 +46,11 @@ class DatabaseList extends PureComponent<Props, State> {
 
   public render() {
     const {databases} = this.state
-    const {service, notify} = this.props
+    const {source, notify} = this.props
 
     return databases.map(db => {
       return (
-        <DatabaseListItem key={db} db={db} service={service} notify={notify} />
+        <DatabaseListItem key={db} db={db} source={source} notify={notify} />
       )
     })
   }

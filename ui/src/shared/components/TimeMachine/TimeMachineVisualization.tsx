@@ -11,7 +11,6 @@ import {
   Axes,
   TimeRange,
   Source,
-  Service,
   Query,
   Template,
   Status,
@@ -46,7 +45,6 @@ interface ConnectedProps {
 
 interface PassedProps {
   source: Source
-  service: Service
   autoRefresher: AutoRefresher
   queries: Query[]
   templates: Template[]
@@ -73,7 +71,6 @@ const TimeMachineVisualization: SFC<Props> = props => {
         <div className="graph-container">
           <RefreshingGraph
             source={props.source}
-            service={props.service}
             colors={colors}
             autoRefresher={props.autoRefresher}
             queries={props.queries}

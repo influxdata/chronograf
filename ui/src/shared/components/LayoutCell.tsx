@@ -34,7 +34,7 @@ interface Props {
   isEditable: boolean
   cellData: TimeSeriesServerResponse[]
   templates: Template[]
-  isFluxSource: boolean
+  isFluxQuery: boolean
   visType: VisType
   toggleVisType: () => void
 }
@@ -53,7 +53,7 @@ export default class LayoutCell extends Component<Props> {
       onCloneCell,
       visType,
       toggleVisType,
-      isFluxSource,
+      isFluxQuery,
     } = this.props
 
     return (
@@ -69,7 +69,7 @@ export default class LayoutCell extends Component<Props> {
               onDelete={onDeleteCell}
               onCSVDownload={this.handleCSVDownload}
               queries={this.queries}
-              isFluxSource={isFluxSource}
+              isFluxQuery={isFluxQuery}
               visType={visType}
               toggleVisType={toggleVisType}
             />

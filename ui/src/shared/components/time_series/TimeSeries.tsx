@@ -14,7 +14,6 @@ import {
 import {
   Template,
   Source,
-  Service,
   Query,
   RemoteDataState,
   TimeRange,
@@ -52,7 +51,6 @@ interface RenderProps {
 
 interface Props {
   source: Source
-  service?: Service
   cellType?: CellType
   manualRefresh?: number
   queries: Query[]
@@ -135,7 +133,6 @@ class TimeSeries extends Component<Props, State> {
   public shouldComponentUpdate(prevProps: Props, prevState: State) {
     const propKeys = [
       'source',
-      'service',
       'queries',
       'timeRange',
       'inView',
@@ -191,7 +188,7 @@ class TimeSeries extends Component<Props, State> {
   }
 
   public render() {
-    const {cellNoteVisibility, cellNote, service} = this.props
+    const {cellNoteVisibility, cellNote, source} = this.props
     const {
       timeSeriesInfluxQL,
       timeSeriesFlux,
@@ -217,7 +214,7 @@ class TimeSeries extends Component<Props, State> {
         return <MarkdownCell text={cellNote} />
       }
 
-      if (this.isFluxSource && !service) {
+      if (this.isFluxQuery && !getDeep(source, 'links.flux', null)) {
         return (
           <div className="graph-empty">
             <p>The current source does not support flux</p>
@@ -245,8 +242,7 @@ class TimeSeries extends Component<Props, State> {
     )
   }
 
-  private get isFluxSource(): boolean {
-    // TODO: update when flux not separate service
+  private get isFluxQuery(): boolean {
     const {queries} = this.props
     return getDeep<string>(queries, '0.type', '') === QueryType.Flux
   }
@@ -296,7 +292,7 @@ class TimeSeries extends Component<Props, State> {
     this.latestUUID = uuid.v1()
 
     try {
-      if (this.isFluxSource) {
+      if (this.isFluxQuery) {
         const results = await this.executeFluxQuery()
 
         timeSeriesFlux = results.tables
@@ -337,10 +333,10 @@ class TimeSeries extends Component<Props, State> {
   }
 
   private executeFluxQuery = async (): Promise<GetTimeSeriesResult> => {
-    const {service, queries, onNotify} = this.props
+    const {queries, onNotify, source} = this.props
 
     const script: string = _.get(queries, '0.text', '')
-    const results = await fetchFluxTimeSeries(service, script, this.latestUUID)
+    const results = await fetchFluxTimeSeries(source, script, this.latestUUID)
 
     if (results.didTruncate && onNotify) {
       onNotify(fluxResponseTruncatedError())

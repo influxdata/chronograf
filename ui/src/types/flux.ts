@@ -1,4 +1,4 @@
-import {Service, Source, TimeRange, Query} from 'src/types'
+import {Source, TimeRange, Query} from 'src/types'
 
 // function definitions
 export type OnDeleteFuncNode = (ids: DeleteFuncNodeArgs) => void
@@ -37,7 +37,6 @@ export interface Context {
   onDeleteFuncNode: OnDeleteFuncNode
   onGenerateScript: OnGenerateScript
   onToggleYield: OnToggleYield
-  service: Service
   data: FluxTable[]
   scriptUpToYield: ScriptUpToYield
   source: Source

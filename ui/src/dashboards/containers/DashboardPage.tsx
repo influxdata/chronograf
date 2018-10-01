@@ -26,10 +26,6 @@ import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOver
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
-import {
-  fetchAllFluxServicesAsync,
-  FetchAllFluxServicesAsync,
-} from 'src/shared/actions/services'
 
 // Utils
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
@@ -65,7 +61,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
-import {Service, NotificationAction, RemoteDataState} from 'src/types'
+import {NotificationAction} from 'src/types'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
 
@@ -78,8 +74,6 @@ interface Props extends ManualRefreshProps, WithRouterProps {
     dashboardID: string
   }
   renameCell: (name: string) => void
-  services: Service[]
-  fetchServicesAsync: FetchAllFluxServicesAsync
   location: Location
   dashboardID: number
   dashboard: DashboardsModels.Dashboard
@@ -126,7 +120,6 @@ interface State {
   windowHeight: number
   selectedCell: DashboardsModels.Cell | DashboardsModels.NewDefaultCell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
-  servicesStatus: RemoteDataState
   showAnnotationControls: boolean
   showCellEditorOverlay: boolean
 }
@@ -140,7 +133,6 @@ class DashboardPage extends Component<Props, State> {
       scrollTop: 0,
       selectedCell: null,
       windowHeight: window.innerHeight,
-      servicesStatus: RemoteDataState.NotStarted,
       dashboardLinks: EMPTY_LINKS,
       showAnnotationControls: false,
       showCellEditorOverlay: false,
@@ -159,7 +151,6 @@ class DashboardPage extends Component<Props, State> {
 
     this.fetchAnnotations()
     this.getDashboardLinks()
-    this.fetchFluxServices()
   }
 
   public fetchAnnotations = async () => {
@@ -294,7 +285,6 @@ class DashboardPage extends Component<Props, State> {
             sources={sources}
             notify={notify}
             fluxLinks={fluxLinks}
-            services={this.services}
             cell={selectedCell}
             dashboardID={dashboardID}
             queryStatus={cellQueryStatus}
@@ -343,7 +333,6 @@ class DashboardPage extends Component<Props, State> {
         {this.showDashboard ? (
           <Dashboard
             source={source}
-            services={this.services}
             sources={sources}
             setScrollTop={this.setScrollTop}
             inView={this.inView}
@@ -372,21 +361,8 @@ class DashboardPage extends Component<Props, State> {
 
   private get showDashboard(): boolean {
     const {dashboard} = this.props
-    const {servicesStatus} = this.state
 
-    const showDashboard = dashboard && servicesStatus === RemoteDataState.Done
-
-    return showDashboard
-  }
-
-  private get services() {
-    const {services} = this.props
-
-    if (!services || !services.length) {
-      return []
-    }
-
-    return services
+    return !!dashboard
   }
 
   private handleWindowResize = (): void => {
@@ -407,27 +383,6 @@ class DashboardPage extends Component<Props, State> {
         props.dashboard
       ),
     }))
-  }
-
-  private async fetchFluxServices() {
-    const {fetchServicesAsync, sources} = this.props
-
-    if (!sources.length) {
-      this.setState({servicesStatus: RemoteDataState.Done})
-
-      return
-    }
-
-    try {
-      this.setState({servicesStatus: RemoteDataState.Loading})
-
-      await fetchServicesAsync(sources)
-
-      this.setState({servicesStatus: RemoteDataState.Done})
-    } catch {
-      // A notification is displayed to the user by the callee
-      this.setState({servicesStatus: RemoteDataState.Error})
-    }
   }
 
   private inView = (cell: DashboardsModels.Cell): boolean => {
@@ -607,7 +562,6 @@ const mstp = (state, {params: {dashboardID}}) => {
     annotations: {displaySetting},
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
-    services,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {cell, timeRange: editorTimeRange},
   } = state
@@ -624,7 +578,6 @@ const mstp = (state, {params: {dashboardID}}) => {
 
   return {
     sources,
-    services,
     meRole,
     dashboard,
     fluxLinks: links.flux,
@@ -668,7 +621,6 @@ const mdtp = {
   handleClearCEO: cellEditorOverlayActions.clearCEO,
   onGetAnnotationsAsync: getAnnotationsAsync,
   handleDismissEditingAnnotation: dismissEditingAnnotation,
-  fetchServicesAsync: fetchAllFluxServicesAsync,
   renameCell: cellEditorOverlayActions.renameCell,
 }
 

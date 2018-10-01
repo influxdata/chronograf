@@ -10,6 +10,7 @@ export const source = {
   organization: 'default',
   role: 'viewer',
   defaultRP: '',
+  version: 'v1.6.1',
   insecureSkipVerify: false,
   authentication: SourceAuthenticationMethod.Basic,
   links: {

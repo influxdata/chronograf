@@ -5,7 +5,7 @@ import showDatabasesParser from 'src/shared/parsing/showDatabases'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import {OnChangeArg} from 'src/types/flux'
-import {Service} from 'src/types'
+import {Source} from 'src/types'
 
 interface Props {
   funcID: string
@@ -14,7 +14,7 @@ interface Props {
   bodyID: string
   declarationID: string
   onChangeArg: OnChangeArg
-  service: Service
+  source: Source
 }
 
 interface State {
@@ -34,10 +34,10 @@ class FromDatabaseDropdown extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {service} = this.props
+    const {source} = this.props
 
     try {
-      const {data} = await showDatabases(`${service.links.source}/proxy`)
+      const {data} = await showDatabases(source.links.proxy)
       const {databases} = showDatabasesParser(data)
       const sorted = databases.sort()
 

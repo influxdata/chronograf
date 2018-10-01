@@ -8,25 +8,24 @@ import Dropdown from 'src/reusable_ui/components/dropdowns/Dropdown'
 import {DynamicSource} from 'src/sources/constants'
 
 // types
-import {Service, Source, ServiceLinks, SourceLinks} from 'src/types'
+import {Source, SourceLinks, QueryType} from 'src/types'
 
 interface Props {
   source: Source
-  service: Service
-  services: Service[]
+  type: QueryType
   sources: Source[]
   allowInfluxQL: boolean
   allowFlux: boolean
   allowDynamicSource: boolean
   isDynamicSourceSelected?: boolean
   onSelectDynamicSource?: () => void
-  onChangeService: (service: Service, source: Source) => void
+  onChangeSource: (source: Source, type: QueryType) => void
 }
 
 interface SourceDropdownItem {
   sourceID: string
-  serviceID?: string
-  links: ServiceLinks | SourceLinks
+  links: SourceLinks
+  type: QueryType
 }
 
 class SourceDropdown extends PureComponent<Props> {
@@ -43,12 +42,7 @@ class SourceDropdown extends PureComponent<Props> {
   }
 
   private handleSelect = (choice: SourceDropdownItem): void => {
-    const {
-      sources,
-      services,
-      onChangeService,
-      onSelectDynamicSource,
-    } = this.props
+    const {sources, onChangeSource, onSelectDynamicSource} = this.props
 
     if (choice.sourceID === DynamicSource.id && onSelectDynamicSource) {
       onSelectDynamicSource()
@@ -58,31 +52,29 @@ class SourceDropdown extends PureComponent<Props> {
     const source = sources.find(src => {
       return src.id === choice.sourceID
     })
-    const service = services.find(s => {
-      return s.id === choice.serviceID
-    })
 
-    onChangeService(service, source)
+    onChangeSource(source, choice.type)
   }
 
   private get dropdownItems(): JSX.Element[] {
     const {sources, allowFlux, allowInfluxQL, allowDynamicSource} = this.props
 
-    const sourceOptions = sources.reduce((acc, source) => {
-      let items = []
+    const sourceOptions: JSX.Element[] = sources.reduce((acc, source) => {
+      const items: JSX.Element[] = []
       if (allowFlux) {
-        items = [...items, ...this.fluxSourceItems(source)]
+        items.push(this.createSourceItem(source, QueryType.Flux))
       }
 
       if (allowInfluxQL) {
-        items = [...items, this.influxQLSourceItem(source)]
+        items.push(this.createSourceItem(source, QueryType.InfluxQL))
       }
 
       return [...acc, ...items]
     }, [])
 
     if (allowDynamicSource) {
-      return [...sourceOptions, this.dynamicSourceOption]
+      sourceOptions.push(this.dynamicSourceOption)
+      return sourceOptions
     }
 
     return sourceOptions
@@ -103,47 +95,41 @@ class SourceDropdown extends PureComponent<Props> {
     )
   }
 
-  private influxQLSourceItem(source: Source): JSX.Element {
-    const sourceDropdownItem: SourceDropdownItem = {
+  private sourceDropdownItemValue(
+    source: Source,
+    type: QueryType
+  ): SourceDropdownItem {
+    return {
       sourceID: source.id,
       links: source.links,
+      type,
+    }
+  }
+
+  private createSourceItem(source: Source, type: QueryType): JSX.Element {
+    let id = source.id
+    let sourceType = 'InfluxQL'
+
+    if (type === QueryType.Flux) {
+      id = `${source.id}-flux`
+      sourceType = 'Flux'
     }
 
     return (
-      <Dropdown.Item key={source.id} id={source.id} value={sourceDropdownItem}>
-        {`${source.name} (InfluxQL)`}
+      <Dropdown.Item
+        key={id}
+        id={id}
+        value={this.sourceDropdownItemValue(source, type)}
+      >
+        {`${source.name} (${sourceType})`}
       </Dropdown.Item>
     )
   }
 
-  private fluxSourceItems(source: Source): JSX.Element[] {
-    const {services} = this.props
-
-    const servicesForSource = services.filter(service => {
-      return service.sourceID === source.id
-    })
-    return servicesForSource.map(service => {
-      const serviceDropdownItem: SourceDropdownItem = {
-        sourceID: source.id,
-        serviceID: service.id,
-        links: service.links,
-      }
-      return (
-        <Dropdown.Item
-          key={`${source.id}-${service.id}`}
-          id={`${source.id}-${service.id}`}
-          value={serviceDropdownItem}
-        >
-          {`${source.name} / ${service.name} (flux)`}
-        </Dropdown.Item>
-      )
-    })
-  }
-
   private get selectedID(): string {
     const {
-      service,
       source,
+      type,
       allowDynamicSource,
       isDynamicSourceSelected,
     } = this.props
@@ -152,10 +138,9 @@ class SourceDropdown extends PureComponent<Props> {
       return DynamicSource.id
     }
 
-    if (service) {
-      return `${service.sourceID}-${service.id}`
+    if (type === QueryType.Flux) {
+      return `${source.id}-flux`
     }
-
     return source.id
   }
 }

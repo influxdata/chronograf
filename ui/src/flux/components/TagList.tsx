@@ -2,11 +2,11 @@ import React, {PureComponent, MouseEvent} from 'react'
 
 import TagListItem from 'src/flux/components/TagListItem'
 
-import {SchemaFilter, Service, NotificationAction} from 'src/types'
+import {SchemaFilter, Source, NotificationAction} from 'src/types'
 
 interface Props {
   db: string
-  service: Service
+  source: Source
   tags: string[]
   filter: SchemaFilter[]
   notify: NotificationAction
@@ -14,7 +14,7 @@ interface Props {
 
 export default class TagList extends PureComponent<Props> {
   public render() {
-    const {db, service, tags, filter, notify} = this.props
+    const {db, source, tags, filter, notify} = this.props
 
     if (tags.length) {
       return (
@@ -24,7 +24,7 @@ export default class TagList extends PureComponent<Props> {
               db={db}
               key={t}
               tagKey={t}
-              service={service}
+              source={source}
               filter={filter}
               notify={notify}
             />

@@ -49,7 +49,6 @@ import {
   QueryConfig,
   Template,
   Source,
-  Service,
   CellQuery,
   NotificationAction,
   FluxTable,
@@ -83,10 +82,8 @@ interface ConnectedProps {
 interface PassedProps {
   fluxLinks: Links
   source: Source
-  service?: Service
   sources: Source[]
   isInCEO: boolean
-  services: Service[]
   templates: Template[]
   isStaticLegend: boolean
   onResetFocus: () => void
@@ -121,7 +118,6 @@ interface State {
   selectedSource: Source
   activeQueryIndex: number
   activeEditorTab: CEOTabs
-  selectedService: Service
   isViewingRawData: boolean
   suggestions: Suggestion[]
   autoRefresher: AutoRefresher
@@ -144,7 +140,6 @@ class TimeMachine extends PureComponent<Props, State> {
     this.state = {
       activeQueryIndex: 0,
       activeEditorTab: CEOTabs.Queries,
-      selectedService: null,
       selectedSource: null,
       data: [],
       body: [],
@@ -179,7 +174,7 @@ class TimeMachine extends PureComponent<Props, State> {
       console.error('Could not get function suggestions: ', error)
     }
 
-    if (this.isFluxSource) {
+    if (this.isFluxSourceSelected) {
       try {
         this.debouncedASTResponse(script)
       } catch (error) {
@@ -203,7 +198,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {services, timeRange, templates, script} = this.props
+    const {timeRange, templates, script} = this.props
     const {autoRefreshDuration, isViewingRawData} = this.state
 
     const horizontalDivisions = [
@@ -236,16 +231,14 @@ class TimeMachine extends PureComponent<Props, State> {
           source={this.source}
           toggleFlux={this.toggleFlux}
           sources={this.formattedSources}
-          service={this.service}
-          services={services}
-          isFluxSource={this.isFluxSource}
+          isFluxSourceSelected={this.isFluxSourceSelected}
           isViewingRawData={isViewingRawData}
           script={script}
           sourceSupportsFlux={this.sourceSupportsFlux}
           toggleIsViewingRawData={this.handleToggleIsViewingRawData}
           autoRefreshDuration={autoRefreshDuration}
           onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
-          onChangeService={this.handleChangeService}
+          onChangeSource={this.handleChangeSource}
           onSelectDynamicSource={this.handleSelectDynamicSource}
           isDynamicSourceSelected={this.useDynamicSource}
           timeRange={timeRange}
@@ -268,7 +261,6 @@ class TimeMachine extends PureComponent<Props, State> {
     return (
       <TimeMachineVisualization
         source={this.source}
-        service={this.service}
         autoRefresher={autoRefresher}
         queries={this.queriesForVis}
         templates={templates}
@@ -290,7 +282,7 @@ class TimeMachine extends PureComponent<Props, State> {
     const {activeEditorTab} = this.state
 
     if (activeEditorTab === CEOTabs.Queries) {
-      if (this.isFluxSource) {
+      if (this.isFluxSourceSelected) {
         return this.fluxBuilder
       }
 
@@ -313,35 +305,6 @@ class TimeMachine extends PureComponent<Props, State> {
     const {activeEditorTab} = this.state
 
     return children(activeEditorTab, this.handleSetActiveEditorTab)
-  }
-
-  private get service(): Service {
-    const {service, services, queryDrafts} = this.props
-    const {selectedService} = this.state
-
-    const queryDraft = _.get(queryDrafts, 0)
-    const querySource = _.get(queryDraft, 'source', '')
-
-    if (querySource.includes('service')) {
-      const foundService = services.find(s => {
-        return s.links.self === querySource
-      })
-      if (foundService) {
-        return foundService
-      }
-    }
-
-    if (this.useDynamicSource && this.isFluxSource) {
-      return services.find(s => {
-        return s.sourceID === this.source.id
-      })
-    }
-
-    if (service) {
-      return service
-    }
-
-    return selectedService
   }
 
   private get source(): Source {
@@ -402,26 +365,16 @@ class TimeMachine extends PureComponent<Props, State> {
     }))
   }
 
-  private get isFluxSource(): boolean {
+  private get isFluxSourceSelected(): boolean {
     const {queryDrafts} = this.props
-    // TODO: Update once flux is no longer a separate service
-    if (getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) {
-      return true
-    }
-    return false
+    return (
+      !!(getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) &&
+      this.sourceSupportsFlux
+    )
   }
 
   private get sourceSupportsFlux(): boolean {
-    const {services} = this.props
-
-    const foundFluxForSource = services.find(service => {
-      return service.sourceID === this.source.id
-    })
-
-    if (foundFluxForSource) {
-      return true
-    }
-    return false
+    return !!getDeep<string>(this.source, 'links.flux', null)
   }
 
   private get fluxBuilder(): JSX.Element {
@@ -435,7 +388,7 @@ class TimeMachine extends PureComponent<Props, State> {
           script={script}
           status={status}
           notify={notify}
-          service={this.service}
+          source={this.source}
           suggestions={suggestions}
           onValidate={this.handleValidate}
           onAppendFrom={this.handleAppendFrom}
@@ -477,7 +430,7 @@ class TimeMachine extends PureComponent<Props, State> {
     const {script, timeRange, queryDrafts} = this.props
     const id = _.get(queryDrafts, 'id', '')
 
-    if (this.isFluxSource) {
+    if (this.isFluxSourceSelected) {
       if (!this.validAST) {
         return []
       }
@@ -616,10 +569,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }
   }
 
-  private updateQueryDraftsSource(
-    selectedSource: Source | Service,
-    type: string
-  ) {
+  private updateQueryDraftsSource(selectedSource: Source, type: string) {
     const {queryDrafts, onUpdateQueryDrafts} = this.props
 
     const queries: CellQuery[] = queryDrafts.map(q => {
@@ -635,26 +585,22 @@ class TimeMachine extends PureComponent<Props, State> {
     onUpdateQueryDrafts(queries)
   }
 
-  private handleChangeService = (
-    selectedService: Service,
-    selectedSource: Source
+  private handleChangeSource = (
+    selectedSource: Source,
+    type: QueryType
   ): void => {
     const {updateSourceLink} = this.props
 
     if (updateSourceLink) {
-      updateSourceLink(getDeep<string>(selectedService, 'links.self', ''))
+      updateSourceLink(getDeep<string>(selectedSource, 'links.self', ''))
     }
 
-    if (selectedService) {
-      this.updateQueryDraftsSource(selectedService, QueryType.Flux)
-    } else {
-      this.updateQueryDraftsSource(selectedSource, QueryType.InfluxQL)
-    }
-    this.setState({selectedService, selectedSource})
+    this.updateQueryDraftsSource(selectedSource, type)
+    this.setState({selectedSource})
   }
 
   private handleSelectDynamicSource = (): void => {
-    const type = this.isFluxSource ? QueryType.Flux : QueryType.InfluxQL
+    const type = this.isFluxSourceSelected ? QueryType.Flux : QueryType.InfluxQL
     this.updateQueryDraftsSource(null, type)
   }
 
@@ -716,7 +662,6 @@ class TimeMachine extends PureComponent<Props, State> {
       onDeleteFuncNode: this.handleDeleteFuncNode,
       onGenerateScript: this.handleGenerateScript,
       onToggleYield: this.handleToggleYield,
-      service: this.service,
       data: this.state.data,
       scriptUpToYield: this.handleScriptUpToYield,
       source: this.source,
@@ -904,18 +849,10 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private toggleFlux = (): void => {
-    const {services} = this.props
-
-    if (this.isFluxSource) {
-      this.setState({selectedService: null})
+    if (this.isFluxSourceSelected) {
       this.updateQueryDraftsSource(null, QueryType.InfluxQL)
     } else {
-      const foundFluxForSource = services.find(service => {
-        return service.sourceID === this.source.id
-      })
-      if (foundFluxForSource) {
-        this.updateQueryDraftsSource(null, QueryType.Flux)
-      }
+      this.updateQueryDraftsSource(null, QueryType.Flux)
     }
   }
 }

@@ -27,7 +27,7 @@ import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
 // Types
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {Service, NotificationAction, TimeRange} from 'src/types'
+import {NotificationAction, TimeRange} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {
   Cell,
@@ -41,7 +41,6 @@ import {Links, ScriptStatus} from 'src/types/flux'
 interface Props {
   fluxLinks: Links
   sources: SourcesModels.Source[]
-  services: Service[]
   notify: NotificationAction
   editQueryStatus: typeof editCellQueryStatus
   onCancel: () => void
@@ -93,7 +92,6 @@ class CellEditorOverlay extends Component<Props, State> {
       notify,
       onCancel,
       renameCell,
-      services,
       source,
       sources,
       templates,
@@ -119,7 +117,6 @@ class CellEditorOverlay extends Component<Props, State> {
             onResetFocus={this.handleResetFocus}
             isInCEO={true}
             sources={sources}
-            services={services}
             onToggleStaticLegend={this.handleToggleStaticLegend}
             isStaticLegend={isStaticLegend}
             queryStatus={queryStatus}
