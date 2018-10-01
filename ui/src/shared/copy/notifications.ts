@@ -114,6 +114,11 @@ export const notifyCSVUploadFailed = (): Notification => ({
   message: 'Please upload a .csv file',
 })
 
+export const analyzeQueryFailed: Notification = {
+  ...defaultErrorNotification,
+  message: 'Failed to analyze query.',
+}
+
 //  Hosts Page Notifications
 //  ----------------------------------------------------------------------------
 export const notifyUnableToGetHosts = (): Notification => ({
@@ -558,13 +563,6 @@ export const notifyCellDeleted = (name: string): Notification => ({
   icon: 'dash-h',
   duration: 1900,
   message: `Deleted "${name}" from dashboard.`,
-})
-
-export const notifyBuilderDisabled = (): Notification => ({
-  type: 'info',
-  icon: 'graphline',
-  duration: 7500,
-  message: `Your query contains a user-defined Template Variable. The Schema Explorer cannot render the query and is disabled.`,
 })
 
 //  Template Variables & URL Queries

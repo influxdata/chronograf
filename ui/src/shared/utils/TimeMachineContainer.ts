@@ -287,16 +287,23 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       if (query.id === queryID) {
         const nextQueryConfig = nextQueryConfigFn(query.queryConfig)
 
+        const queryText = buildQuery(
+          TYPE_QUERY_CONFIG,
+          getTimeRange(nextQueryConfig),
+          nextQueryConfig
+        )
+
         return {
           ...query,
-          query: buildQuery(
-            TYPE_QUERY_CONFIG,
-            getTimeRange(nextQueryConfig),
-            nextQueryConfig
-          ),
-          queryConfig: nextQueryConfig,
+          query: queryText,
+          text: queryText,
+          queryConfig: {
+            ...nextQueryConfig,
+            rawText: queryText,
+          },
         }
       }
+
       return query
     })
 
