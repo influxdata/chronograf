@@ -8,10 +8,19 @@ export const fluxTablesToDygraph = async (
   tables: FluxTable[]
 ): Promise<TimeSeriesToDyGraphReturnType> => {
   const {labels, dygraphsData} = await manager.fluxTablesToDygraph(tables)
+
   const timeSeries = fastMap<DygraphValue[], DygraphValue[]>(
     dygraphsData,
     ([time, ...values]) => [new Date(time), ...values]
   )
 
-  return {labels, dygraphSeries: {}, timeSeries}
+  const dygraphSeries = labels.reduce(
+    (acc, label) => ({
+      ...acc,
+      [label]: {axis: 'y'},
+    }),
+    {}
+  )
+
+  return {labels, dygraphSeries, timeSeries}
 }
