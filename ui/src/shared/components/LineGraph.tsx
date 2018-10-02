@@ -16,6 +16,7 @@ import {
 } from 'src/utils/timeSeriesTransformers'
 import {manager} from 'src/worker/JobManager'
 import {fluxTablesToDygraph} from 'src/shared/parsing/flux/dygraph'
+import {getDataUUID, hasDataChanged} from 'src/shared/graphs/helpers'
 
 // Types
 import {ColorString} from 'src/types/colors'
@@ -60,6 +61,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   public static defaultProps: Partial<LineGraphProps> = {
     staticLegend: false,
   }
+  private latestUUID: string
 
   private isComponentMounted: boolean = false
   private isValidData: boolean = true
@@ -85,12 +87,16 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
     dataType: DataType
   ) {
     let timeSeries
+    this.latestUUID = getDataUUID(data, dataType)
     try {
-      timeSeries = await this.convertToDygraphData(data, dataType)
+      const {result, uuid} = await this.convertToDygraphData(data, dataType)
 
-      if (!this.isComponentMounted) {
+      timeSeries = result
+
+      if (!this.isComponentMounted || uuid !== this.latestUUID) {
         return
       }
+
       this.isValidData = await manager.validateDygraphData(
         timeSeries.timeSeries
       )
@@ -102,12 +108,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   }
 
   public componentDidUpdate(prevProps: LineGraphProps) {
-    const isInfluxQLDataChanged =
-      _.get(prevProps, 'data.0.response.uuid') !==
-      _.get(this.props, 'data.0.response.uuid')
-    const isFluxDataChanged =
-      _.get(prevProps, 'data.0.id') !== _.get(this.props, 'data.0.id')
-    const isDataChanged = isInfluxQLDataChanged || isFluxDataChanged
+    const isDataChanged = hasDataChanged(prevProps, this.props)
 
     if (this.props.loading === RemoteDataState.Done && isDataChanged) {
       this.parseTimeSeries(this.props.data, this.props.dataType)
@@ -239,19 +240,22 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   private async convertToDygraphData(
     data: TimeSeriesServerResponse[] | FluxTable[],
     dataType: DataType
-  ): Promise<TimeSeriesToDyGraphReturnType> {
+  ): Promise<{result: TimeSeriesToDyGraphReturnType; uuid: string}> {
     const {location} = this.props
 
+    let result: TimeSeriesToDyGraphReturnType
     if (dataType === DataType.influxQL) {
-      return await timeSeriesToDygraph(
+      result = await timeSeriesToDygraph(
         data as TimeSeriesServerResponse[],
         location.pathname
       )
     }
 
     if (dataType === DataType.flux) {
-      return await fluxTablesToDygraph(data as FluxTable[])
+      result = await fluxTablesToDygraph(data as FluxTable[])
     }
+
+    return {result, uuid: getDataUUID(data, dataType)}
   }
 }
 

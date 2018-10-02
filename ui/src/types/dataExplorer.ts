@@ -36,3 +36,8 @@ export interface VisualizationOptions {
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
 }
+
+export enum QueryUpdateState {
+  CEO = 'cellEditorOverlay',
+  DE = 'dataExplorer',
+}

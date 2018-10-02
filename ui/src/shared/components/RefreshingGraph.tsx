@@ -29,7 +29,6 @@ import {setHoverTime} from 'src/dashboards/actions'
 import {notify} from 'src/shared/actions/notifications'
 
 // Types
-import {QueryUpdateState} from 'src/shared/actions/queries'
 import {ColorString} from 'src/types/colors'
 import {
   Source,
@@ -40,6 +39,7 @@ import {
   CellType,
   FluxTable,
   RemoteDataState,
+  QueryUpdateState,
 } from 'src/types'
 import {
   TableOptions,

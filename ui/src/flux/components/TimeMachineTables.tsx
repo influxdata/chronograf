@@ -12,10 +12,10 @@ import TableGraph from 'src/shared/components/TableGraph'
 import {getDeep} from 'src/utils/wrappers'
 
 // Types
-import {QueryUpdateState} from 'src/shared/actions/queries'
 import {ColorString} from 'src/types/colors'
 import {TableOptions, FieldOption, DecimalPlaces} from 'src/types/dashboards'
 import {DataType} from 'src/shared/constants'
+import {QueryUpdateState} from 'src/types'
 
 interface Props {
   data: FluxTable[]

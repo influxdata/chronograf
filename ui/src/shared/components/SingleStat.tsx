@@ -1,20 +1,31 @@
+// Libraries
 import React, {PureComponent, CSSProperties} from 'react'
 import classnames from 'classnames'
-import getLastValues from 'src/shared/parsing/lastValues'
 import _ from 'lodash'
-import {manager} from 'src/worker/JobManager'
 
+// Components
 import InvalidData from 'src/shared/components/InvalidData'
 
-import {SMALL_CELL_HEIGHT} from 'src/shared/graphs/helpers'
+// Utils
+import {manager} from 'src/worker/JobManager'
+import {
+  SMALL_CELL_HEIGHT,
+  getDataUUID,
+  hasDataChanged,
+} from 'src/shared/graphs/helpers'
+import getLastValues from 'src/shared/parsing/lastValues'
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Constants
 import {DYGRAPH_CONTAINER_V_MARGIN} from 'src/shared/constants'
 import {generateThresholdsListHexs} from 'src/shared/constants/colorOperations'
+import {DataType} from 'src/shared/constants'
+
+// types
 import {ColorString} from 'src/types/colors'
 import {CellType, DecimalPlaces} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 import {FluxTable} from 'src/types'
-import {DataType} from 'src/shared/constants'
 
 interface Props {
   decimalPlaces: DecimalPlaces
@@ -48,6 +59,7 @@ class SingleStat extends PureComponent<Props, State> {
   }
 
   private isComponentMounted: boolean
+  private lastUUID: string
 
   constructor(props: Props) {
     super(props)
@@ -57,13 +69,14 @@ class SingleStat extends PureComponent<Props, State> {
 
   public async componentDidMount() {
     this.isComponentMounted = true
+    this.lastUUID = getDataUUID(this.props.data, this.props.dataType)
+
     await this.dataToLastValues()
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    const isDataChanged =
-      prevProps.dataType !== this.props.dataType ||
-      !_.isEqual(prevProps.data, this.props.data)
+    this.lastUUID = getDataUUID(this.props.data, this.props.dataType)
+    const isDataChanged = hasDataChanged(prevProps, this.props)
 
     if (isDataChanged) {
       await this.dataToLastValues()
@@ -238,7 +251,10 @@ class SingleStat extends PureComponent<Props, State> {
         lastValues = getLastValues(data as TimeSeriesServerResponse[])
       }
 
-      if (!this.isComponentMounted) {
+      if (
+        !this.isComponentMounted ||
+        this.lastUUID !== getDataUUID(data, dataType)
+      ) {
         return
       }
     } catch (err) {

@@ -1,6 +1,18 @@
+// Libraries
+import _ from 'lodash'
 /* eslint-disable no-magic-numbers */
 import {toRGB_} from 'dygraphs/src/dygraph-utils'
 import {CSSProperties} from 'react'
+
+// Utils
+import {getDeep} from 'src/utils/wrappers'
+
+// Constants
+import {DataType} from 'src/shared/constants'
+
+// Types
+import {FluxTable, TimeRange} from 'src/types'
+import {TimeSeriesServerResponse} from 'src/types/series'
 
 export const LINE_COLORS = [
   '#00C9FF',
@@ -169,3 +181,38 @@ export const hasherino = (str, len) =>
 
 export const LABEL_WIDTH = 44
 export const CHAR_PIXELS = 7
+
+export const getDataUUID = (
+  data: TimeSeriesServerResponse[] | FluxTable[],
+  dataType: DataType
+): string => {
+  if (dataType === DataType.influxQL) {
+    return getDeep(data, '0.response.uuid', '')
+  } else {
+    return getDeep(data, '0.id', '')
+  }
+}
+
+interface DataProps {
+  data: TimeSeriesServerResponse[] | FluxTable[]
+  dataType: DataType
+  timeRange?: TimeRange
+}
+export const hasDataChanged = (
+  prevProps: DataProps,
+  newProps: DataProps
+): boolean => {
+  const isDataTypeChanged = prevProps.dataType !== newProps.dataType
+  const isDataIDsChanged = !_.isEqual(
+    getDataUUID(prevProps.data, prevProps.dataType),
+    getDataUUID(newProps.data, newProps.dataType)
+  )
+  const isTimeRangeChanged = !!_.isEqual(
+    _.get(prevProps, 'timeRange'),
+    _.get(newProps, 'timeRange')
+  )
+  const isDataChanged =
+    isDataTypeChanged || isDataIDsChanged || isTimeRangeChanged
+
+  return isDataChanged
+}

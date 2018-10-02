@@ -14,9 +14,9 @@ import {
   Query,
   Template,
   Status,
+  QueryUpdateState,
 } from 'src/types'
 import {ColorString, ColorNumber} from 'src/types/colors'
-import {QueryUpdateState} from 'src/shared/actions/queries'
 import {
   TableOptions,
   FieldOption,

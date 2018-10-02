@@ -1,8 +1,9 @@
+// Libraries
 import React, {Component} from 'react'
 import _ from 'lodash'
 
+// Constants
 import {GAUGE_SPECS} from 'src/shared/constants/gaugeSpecs'
-
 import {
   COLOR_TYPE_MIN,
   COLOR_TYPE_MAX,
@@ -10,8 +11,10 @@ import {
 } from 'src/shared/constants/thresholds'
 import {MAX_TOLOCALESTRING_VAL} from 'src/dashboards/constants'
 
+// Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+// Types
 import {ColorString} from 'src/types/colors'
 import {DecimalPlaces} from 'src/types/dashboards'
 

@@ -28,7 +28,6 @@ import {HANDLE_HORIZONTAL} from 'src/shared/constants'
 import {CEOTabs} from 'src/dashboards/constants'
 
 // Types
-import {QueryUpdateState} from 'src/shared/actions/queries'
 import {
   TimeRange,
   QueryConfig,
@@ -40,6 +39,7 @@ import {
   Status,
   Query,
   QueryType,
+  QueryUpdateState,
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
 import {Links, ScriptStatus} from 'src/types/flux'
