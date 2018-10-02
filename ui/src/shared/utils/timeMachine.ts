@@ -14,7 +14,7 @@ import {
 import {Cell, NewDefaultCell, CellQuery, QueryType} from 'src/types'
 import {TimeMachineState} from 'src/shared/utils/TimeMachineContainer'
 
-export function intialStateFromCell(
+export function initialStateFromCell(
   cell: Cell | NewDefaultCell
 ): Partial<TimeMachineState> {
   const initialState: Partial<TimeMachineState> = {

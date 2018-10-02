@@ -1,7 +1,7 @@
 // Libraries
 import React, {Component} from 'react'
 import _ from 'lodash'
-import {Provider} from 'unstated'
+import {Subscribe} from 'unstated'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -11,7 +11,6 @@ import CEOHeader from 'src/dashboards/components/CEOHeader'
 // Utils
 import {getDeep} from 'src/utils/wrappers'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
-import {intialStateFromCell} from 'src/shared/utils/timeMachine'
 
 // Actions
 import {editCellQueryStatus} from 'src/dashboards/actions'
@@ -24,7 +23,7 @@ import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
 // Types
 import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
-import {NotificationAction, TimeRange} from 'src/types'
+import {NotificationAction, TimeRange, CellType} from 'src/types'
 import {Template} from 'src/types/tempVars'
 import {
   Cell,
@@ -32,10 +31,37 @@ import {
   CellQuery,
   NewDefaultCell,
   QueryType,
+  DecimalPlaces,
+  FieldOption,
+  ThresholdType,
+  TableOptions,
+  NoteVisibility,
+  Axes,
 } from 'src/types/dashboards'
 import {Links, ScriptStatus} from 'src/types/flux'
+import {ColorString, ColorNumber} from 'src/types/colors'
 
-interface Props {
+interface ConnectedProps {
+  queryDrafts: CellQuery[]
+  timeRange: TimeRange
+  script: string
+  onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
+  onChangeScript: TimeMachineContainer['handleChangeScript']
+  type: CellType
+  axes: Axes | null
+  tableOptions: TableOptions
+  fieldOptions: FieldOption[]
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  note: string
+  noteVisibility: NoteVisibility
+  thresholdsListColors: ColorNumber[]
+  thresholdsListType: ThresholdType
+  gaugeColors: ColorNumber[]
+  lineColors: ColorString[]
+}
+
+interface PassedProps {
   fluxLinks: Links
   sources: SourcesModels.Source[]
   notify: NotificationAction
@@ -50,6 +76,8 @@ interface Props {
   dashboardTimeRange: TimeRange
 }
 
+type Props = PassedProps & ConnectedProps
+
 interface State {
   isStaticLegend: boolean
   status: ScriptStatus
@@ -59,15 +87,9 @@ interface State {
 @ErrorHandling
 class CellEditorOverlay extends Component<Props, State> {
   private overlayRef: React.RefObject<HTMLDivElement> = React.createRef()
-  private timeMachineContainer: TimeMachineContainer
 
   public constructor(props: Props) {
     super(props)
-
-    this.timeMachineContainer = new TimeMachineContainer({
-      ...intialStateFromCell(props.cell),
-      timeRange: props.dashboardTimeRange,
-    })
 
     const legend = getDeep<Legend | null>(props, 'cell.legend', null)
 
@@ -98,46 +120,44 @@ class CellEditorOverlay extends Component<Props, State> {
     const {isStaticLegend} = this.state
 
     return (
-      <Provider inject={[this.timeMachineContainer]}>
-        <div
-          className="deceo--overlay"
-          onKeyDown={this.handleKeyDown}
-          tabIndex={0}
-          ref={this.overlayRef}
+      <div
+        className="deceo--overlay"
+        onKeyDown={this.handleKeyDown}
+        tabIndex={0}
+        ref={this.overlayRef}
+      >
+        <TimeMachine
+          fluxLinks={fluxLinks}
+          notify={notify}
+          editQueryStatus={editQueryStatus}
+          templates={templates}
+          source={source}
+          onResetFocus={this.handleResetFocus}
+          isInCEO={true}
+          sources={sources}
+          onToggleStaticLegend={this.handleToggleStaticLegend}
+          isStaticLegend={isStaticLegend}
+          queryStatus={queryStatus}
+          updateScriptStatus={this.updateScriptStatus}
         >
-          <TimeMachine
-            fluxLinks={fluxLinks}
-            notify={notify}
-            editQueryStatus={editQueryStatus}
-            templates={templates}
-            source={source}
-            onResetFocus={this.handleResetFocus}
-            isInCEO={true}
-            sources={sources}
-            onToggleStaticLegend={this.handleToggleStaticLegend}
-            isStaticLegend={isStaticLegend}
-            queryStatus={queryStatus}
-            updateScriptStatus={this.updateScriptStatus}
-          >
-            {(activeEditorTab, onSetActiveEditorTab) => (
-              <CEOHeader
-                title={_.get(cell, 'name', '')}
-                renameCell={this.handleRenameCell}
-                onSave={this.handleSaveCell}
-                onCancel={onCancel}
-                activeEditorTab={activeEditorTab}
-                onSetActiveEditorTab={onSetActiveEditorTab}
-                isSaveable={this.isSaveable}
-              />
-            )}
-          </TimeMachine>
-        </div>
-      </Provider>
+          {(activeEditorTab, onSetActiveEditorTab) => (
+            <CEOHeader
+              title={_.get(cell, 'name', '')}
+              renameCell={this.handleRenameCell}
+              onSave={this.handleSaveCell}
+              onCancel={onCancel}
+              activeEditorTab={activeEditorTab}
+              onSetActiveEditorTab={onSetActiveEditorTab}
+              isSaveable={this.isSaveable}
+            />
+          )}
+        </TimeMachine>
+      </div>
     )
   }
 
   private get isSaveable(): boolean {
-    const {queryDrafts, type} = this.timeMachineContainer.state
+    const {queryDrafts, type} = this.props
     const {status} = this.state
 
     if (type === 'note') {
@@ -165,7 +185,7 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private get isFluxSource(): boolean {
-    const {queryDrafts} = this.timeMachineContainer.state
+    const {queryDrafts} = this.props
 
     if (getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) {
       return true
@@ -182,9 +202,8 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private collectCell = (): Cell | NewDefaultCell => {
-    const {cell} = this.props
-    const {isStaticLegend, draftCellName} = this.state
     const {
+      cell,
       script,
       queryDrafts,
       type,
@@ -198,7 +217,8 @@ class CellEditorOverlay extends Component<Props, State> {
       thresholdsListColors,
       gaugeColors,
       lineColors,
-    } = this.timeMachineContainer.state
+    } = this.props
+    const {isStaticLegend, draftCellName} = this.state
 
     let queries: CellQuery[] = queryDrafts
 
@@ -287,4 +307,33 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 }
 
-export default CellEditorOverlay
+const ConnectedCellEditorOverlay = (props: PassedProps) => {
+  return (
+    <Subscribe to={[TimeMachineContainer]}>
+      {(timeMachineContainer: TimeMachineContainer) => (
+        <CellEditorOverlay
+          {...props}
+          queryDrafts={timeMachineContainer.state.queryDrafts}
+          timeRange={timeMachineContainer.state.timeRange}
+          script={timeMachineContainer.state.script}
+          onChangeScript={timeMachineContainer.handleChangeScript}
+          onUpdateQueryDrafts={timeMachineContainer.handleUpdateQueryDrafts}
+          type={timeMachineContainer.state.type}
+          axes={timeMachineContainer.state.axes}
+          tableOptions={timeMachineContainer.state.tableOptions}
+          fieldOptions={timeMachineContainer.state.fieldOptions}
+          timeFormat={timeMachineContainer.state.timeFormat}
+          decimalPlaces={timeMachineContainer.state.decimalPlaces}
+          note={timeMachineContainer.state.note}
+          noteVisibility={timeMachineContainer.state.noteVisibility}
+          thresholdsListColors={timeMachineContainer.state.thresholdsListColors}
+          thresholdsListType={timeMachineContainer.state.thresholdsListType}
+          gaugeColors={timeMachineContainer.state.gaugeColors}
+          lineColors={timeMachineContainer.state.lineColors}
+        />
+      )}
+    </Subscribe>
+  )
+}
+
+export default ConnectedCellEditorOverlay
