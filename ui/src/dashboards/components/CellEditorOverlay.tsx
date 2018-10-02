@@ -10,8 +10,6 @@ import CEOHeader from 'src/dashboards/components/CEOHeader'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
-import {buildQuery} from 'src/utils/influxql'
-import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {intialStateFromCell} from 'src/shared/utils/timeMachine'
 
@@ -19,7 +17,6 @@ import {intialStateFromCell} from 'src/shared/utils/timeMachine'
 import {editCellQueryStatus} from 'src/dashboards/actions'
 
 // Constants
-import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 import {IS_STATIC_LEGEND} from 'src/shared/constants'
 import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
@@ -50,13 +47,13 @@ interface Props {
   queryStatus: QueriesModels.QueryStatus
   templates: Template[]
   cell: Cell | NewDefaultCell
-  renameCell: (name: string) => void
   dashboardTimeRange: TimeRange
 }
 
 interface State {
   isStaticLegend: boolean
   status: ScriptStatus
+  draftCellName: string
 }
 
 @ErrorHandling
@@ -77,6 +74,7 @@ class CellEditorOverlay extends Component<Props, State> {
     this.state = {
       isStaticLegend: IS_STATIC_LEGEND(legend),
       status: {type: 'none', text: ''},
+      draftCellName: props.cell.name,
     }
   }
 
@@ -91,7 +89,6 @@ class CellEditorOverlay extends Component<Props, State> {
       fluxLinks,
       notify,
       onCancel,
-      renameCell,
       source,
       sources,
       templates,
@@ -125,7 +122,7 @@ class CellEditorOverlay extends Component<Props, State> {
             {(activeEditorTab, onSetActiveEditorTab) => (
               <CEOHeader
                 title={_.get(cell, 'name', '')}
-                renameCell={renameCell}
+                renameCell={this.handleRenameCell}
                 onSave={this.handleSaveCell}
                 onCancel={onCancel}
                 activeEditorTab={activeEditorTab}
@@ -176,8 +173,13 @@ class CellEditorOverlay extends Component<Props, State> {
     this.setState({status})
   }
 
+  private handleRenameCell = (draftCellName: string): void => {
+    this.setState({draftCellName})
+  }
+
   private collectCell = (): Cell | NewDefaultCell => {
     const {cell} = this.props
+    const {isStaticLegend, draftCellName} = this.state
     const {
       script,
       queryDrafts,
@@ -193,9 +195,8 @@ class CellEditorOverlay extends Component<Props, State> {
       gaugeColors,
       lineColors,
     } = this.timeMachineContainer.state
-    const {isStaticLegend} = this.state
 
-    let queries: CellQuery[]
+    let queries: CellQuery[] = queryDrafts
 
     if (this.isFluxSource) {
       queries = [
@@ -206,25 +207,6 @@ class CellEditorOverlay extends Component<Props, State> {
           type: QueryType.Flux,
         },
       ]
-    } else {
-      queries = queryDrafts.map(q => {
-        const queryConfig = getDeep<QueriesModels.QueryConfig | null>(
-          q,
-          'queryConfig',
-          null
-        )
-        const timeRange = getTimeRange(queryConfig)
-        const source = getDeep<string>(q, 'source', '')
-
-        return {
-          ...q,
-          query:
-            queryConfig.rawText ||
-            buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig),
-          source,
-          type: QueryType.InfluxQL,
-        }
-      })
     }
 
     const colors = getCellTypeColors({
@@ -236,6 +218,7 @@ class CellEditorOverlay extends Component<Props, State> {
 
     const newCell = {
       ...cell,
+      name: draftCellName,
       queries,
       colors,
       axes,

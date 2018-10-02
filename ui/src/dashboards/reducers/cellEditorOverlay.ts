@@ -4,8 +4,6 @@ import _ from 'lodash'
 // actions
 import {Action, ActionType} from 'src/dashboards/actions/cellEditorOverlay'
 
-// constants
-
 // types
 import {Cell, TimeRange} from 'src/types'
 import {NewDefaultCell} from 'src/types/dashboards'
@@ -27,13 +25,6 @@ export default (state = initialState, action: Action): CEOInitialState => {
       const timeRange = null
 
       return {...state, cell, timeRange}
-    }
-
-    case ActionType.RenameCell: {
-      const {cellName} = action.payload
-      const cell = {...state.cell, name: cellName}
-
-      return {...state, cell}
     }
 
     case ActionType.UpdateEditorTimeRange: {
