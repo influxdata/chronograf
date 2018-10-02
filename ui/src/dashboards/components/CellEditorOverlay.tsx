@@ -137,8 +137,12 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private get isSaveable(): boolean {
-    const {queryDrafts} = this.timeMachineContainer.state
+    const {queryDrafts, type} = this.timeMachineContainer.state
     const {status} = this.state
+
+    if (type === 'note') {
+      return true
+    }
 
     if (this.isFluxSource) {
       return _.get(status, 'type', '') === 'success'
