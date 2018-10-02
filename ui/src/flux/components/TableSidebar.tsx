@@ -45,7 +45,7 @@ export default class TableSidebar extends PureComponent<Props, State> {
         )}
         <FancyScrollbar>
           <div className="time-machine-sidebar--items">
-            {this.data.map(({groupKey, id}) => {
+            {this.data.map(({groupKey, id, name}) => {
               return (
                 <TableSidebarItem
                   id={id}
