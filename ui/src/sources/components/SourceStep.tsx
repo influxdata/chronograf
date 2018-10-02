@@ -174,13 +174,19 @@ class SourceStep extends PureComponent<Props, State> {
       <div className="text-center">
         {me.role === SUPERADMIN_ROLE ? (
           <h4>
-            <strong>{me.currentOrganization.name}</strong> currently has no
-            connections
+            The organization{' '}
+            <strong>
+              <i>{me.currentOrganization.name}</i>
+            </strong>{' '}
+            currently has no connections
           </h4>
         ) : (
           <h3>
-            <strong>{me.currentOrganization.name}</strong> has no connections
-            available to <em>{me.role}s</em>
+            The organization{' '}
+            <strong>
+              <i>{me.currentOrganization.name}</i>
+            </strong>{' '}
+            has no connections available to <em>{me.role}s</em>
           </h3>
         )}
       </div>

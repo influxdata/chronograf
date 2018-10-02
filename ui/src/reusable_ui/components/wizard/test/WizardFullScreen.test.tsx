@@ -14,6 +14,7 @@ describe('WizardFullScreen', () => {
       title: undefined,
       skipLinkText: undefined,
       handleSkip: undefined,
+      isUsingAuth: false,
       ...override,
     }
 

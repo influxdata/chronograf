@@ -12,7 +12,7 @@ describe('WizardStep', () => {
       title: 'my wizard step',
       isComplete: () => true,
       isErrored: undefined,
-      isBlockingStep: undefined,
+      isSkippableStep: undefined,
       onPrevious: undefined,
       onNext: undefined,
       increment: undefined,

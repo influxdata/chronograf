@@ -32,7 +32,7 @@ describe('WizardController', () => {
       tipText: undefined,
       nextLabel: undefined,
       previousLabel: undefined,
-      isBlockingStep: undefined,
+      isSkippableStep: undefined,
       lastStep: undefined,
       ...override,
     }
