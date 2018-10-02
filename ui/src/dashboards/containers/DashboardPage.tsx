@@ -73,7 +73,6 @@ interface Props extends ManualRefreshProps, WithRouterProps {
     sourceID: string
     dashboardID: string
   }
-  renameCell: (name: string) => void
   location: Location
   dashboardID: number
   dashboard: DashboardsModels.Dashboard
@@ -209,7 +208,6 @@ class DashboardPage extends Component<Props, State> {
       sources,
       timeRange,
       timeRange: {lower, upper},
-      renameCell,
       zoomedTimeRange,
       zoomedTimeRange: {lower: zoomedLower, upper: zoomedUpper},
       dashboard,
@@ -292,7 +290,6 @@ class DashboardPage extends Component<Props, State> {
             onCancel={this.handleHideCellEditorOverlay}
             templates={templatesIncludingDashTime}
             editQueryStatus={this.props.editCellQueryStatus}
-            renameCell={renameCell}
             dashboardTimeRange={timeRange}
           />
         </OverlayTechnology>
@@ -621,7 +618,6 @@ const mdtp = {
   handleClearCEO: cellEditorOverlayActions.clearCEO,
   onGetAnnotationsAsync: getAnnotationsAsync,
   handleDismissEditingAnnotation: dismissEditingAnnotation,
-  renameCell: cellEditorOverlayActions.renameCell,
 }
 
 export default connect(mstp, mdtp)(
