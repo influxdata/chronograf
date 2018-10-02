@@ -89,7 +89,7 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
           active={operator === '!='}
           onClick={this.setEquality}
         >
-          =
+          !=
         </Radio.Button>
       </Radio>
     )
@@ -156,13 +156,9 @@ export default class FilterTagListItem extends PureComponent<Props, State> {
     )
   }
 
-  private setEquality(equal: boolean) {
-    return (e): void => {
-      e.stopPropagation()
-
-      const {tagKey} = this.props
-      this.props.onSetEquality(tagKey, equal)
-    }
+  private setEquality = (equal: boolean) => {
+    const {tagKey} = this.props
+    this.props.onSetEquality(tagKey, equal)
   }
 
   private get spinnerStyle(): CSSProperties {
