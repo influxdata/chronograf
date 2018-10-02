@@ -12,7 +12,7 @@ import {
   fluxResponseTruncatedError,
 } from 'src/shared/copy/notifications'
 
-import {Query, Template, Source} from 'src/types'
+import {Query, Template, Source, TimeRange} from 'src/types'
 
 interface Props {
   // Used for downloading an InfluxQL query
@@ -22,6 +22,7 @@ interface Props {
   // Used for downloading a Flux query
   script: string
   source: Source
+  timeRange: TimeRange
 
   isFluxSourceSelected: boolean
   onNotify: typeof notify
@@ -77,9 +78,9 @@ class CSVExporter extends PureComponent<Props, State> {
   }
 
   private downloadFluxCSV = async (): Promise<void> => {
-    const {source, script, onNotify} = this.props
+    const {source, script, onNotify, timeRange} = this.props
 
-    const {didTruncate} = await downloadFluxCSV(source, script)
+    const {didTruncate} = await downloadFluxCSV(source, script, timeRange)
 
     if (didTruncate) {
       onNotify(fluxResponseTruncatedError())
