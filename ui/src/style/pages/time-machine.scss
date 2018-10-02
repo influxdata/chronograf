@@ -98,10 +98,6 @@
 }
 
 .time-machine-sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  flex-wrap: nowrap;
   width: 25%;
   min-width: $flux-builder-yield-tabs-min-width;
   max-width: $flux-builder-yield-tabs-max-width;
@@ -120,35 +116,19 @@
 }
 
 .time-machine-sidebar--items {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
-  position: relative;
 
-  // Shadow
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: $flux-node-padding;
-    height: 100%;
-    @include gradient-h(fade-out($g2-kevlar, 1), fade-out($g2-kevlar, 0.4));
-    pointer-events: none;
-  }
 }
 
 .time-machine-sidebar-item {
   @include no-user-select();
   color: $g11-sidewalk;
-  height: 28px;
-  display: flex;
-  align-items: center;
   font-size: 12px;
   font-weight: 600;
-  padding: 0 $flux-node-padding;
+  padding: 7px $flux-node-padding;
   transition: color 0.25s ease, background-color 0.25s ease;
   white-space: nowrap;
-  overflow-x: hidden;
 
   &:hover {
     background-color: $g4-onyx;
