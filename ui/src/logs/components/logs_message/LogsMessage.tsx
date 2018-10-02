@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {PureComponent, MouseEvent} from 'react'
 
 import CopyToClipboard from 'react-copy-to-clipboard'
 
@@ -7,6 +7,7 @@ import {
   notifyCopyToClipboardFailed,
 } from 'src/shared/copy/notifications'
 import {getMatchSections} from 'src/logs/utils/matchSections'
+import {Button, IconFont, ComponentColor, ComponentSize} from 'src/reusable_ui'
 
 import {NotificationAction} from 'src/types'
 
@@ -24,10 +25,15 @@ class LogsMessage extends PureComponent<Props> {
       <div className="logs-message">
         {this.messageSections}
         <CopyToClipboard text={formattedValue} onCopy={this.handleCopyAttempt}>
-          <div className="logs-message--copy" title="copy to clipboard">
-            <span className="icon duplicate" />
-            Copy
-          </div>
+          <Button
+            size={ComponentSize.ExtraSmall}
+            color={ComponentColor.Primary}
+            customClass="logs-message--copy"
+            titleText="copy to clipboard"
+            icon={IconFont.Duplicate}
+            text="Copy"
+            onClick={this.handleClickCopy}
+          />
         </CopyToClipboard>
       </div>
     )
@@ -63,6 +69,11 @@ class LogsMessage extends PureComponent<Props> {
         {s.text}
       </span>
     ))
+  }
+
+  private handleClickCopy(e: MouseEvent<HTMLDivElement>) {
+    e.stopPropagation()
+    e.preventDefault()
   }
 }
 
