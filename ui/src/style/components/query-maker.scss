@@ -24,7 +24,7 @@
 */
 $query-maker--gutter: 16px;
 
-$query-maker--tabs-height: 32px;
+$query-maker--tabs-height: 34px;
 $query-maker--tabs-header-text: $g18-cloud;
 
 $query-maker--tab-width: 340px;
@@ -79,17 +79,17 @@ $query-editor-tab-active: $g3-castle;
     Controls which query is currently being modified
 */
 
-$query-maker-tab-margin: 6px;
+$query-maker-tab-margin: 10px;
 
 .query-maker--tabs {
-  padding: 0 60px;
-  margin-top: 0;
+  padding: 0 20px;
+  margin-top: $query-maker-tab-margin;
   display: flex;
-  height: $query-maker--tabs-height + $query-maker-tab-margin;
+  height: $query-maker--tabs-height;
   align-items: center;
 }
 .query-maker--new {
-  margin-left: $query-maker-tab-margin;
+  margin-left: 6px;
 }
 .query-maker--new > span.icon {
   margin: 0 !important;
@@ -97,7 +97,6 @@ $query-maker-tab-margin: 6px;
 .query-maker--tab {
   border-radius: $radius $radius 0 0;
   height: $query-maker--tabs-height;
-  margin-top: $query-maker-tab-margin;
   margin-right: $ix-border;
   max-width: $query-maker--tab-width;
   flex: 1 0 0;
