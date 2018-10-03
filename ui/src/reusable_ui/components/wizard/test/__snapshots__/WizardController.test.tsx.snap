@@ -32,9 +32,9 @@ exports[`WizardController with multiple children matches snapshot with two child
   <WizardStep
     decrement={null}
     increment={[Function]}
-    isBlockingStep={false}
     isComplete={[Function]}
     isErrored={false}
+    isSkippableStep={true}
     lastStep={false}
     title="wizard step 1"
   >
@@ -74,9 +74,9 @@ exports[`WizardController with multiple children with first step complete matche
   </div>
   <WizardStep
     decrement={[Function]}
-    isBlockingStep={false}
     isComplete={[Function]}
     isErrored={false}
+    isSkippableStep={true}
     lastStep={true}
     title="wizard step 2"
   >
@@ -112,9 +112,9 @@ exports[`WizardController with one child matches snapshot with one child 1`] = `
   </div>
   <WizardStep
     decrement={null}
-    isBlockingStep={false}
     isComplete={[Function]}
     isErrored={false}
+    isSkippableStep={true}
     lastStep={true}
     title="only wizard step"
   >

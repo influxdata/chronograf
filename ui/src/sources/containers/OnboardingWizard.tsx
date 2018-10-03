@@ -66,15 +66,18 @@ class OnboardingWizard extends PureComponent<Props, State> {
         <Notifications />
         <WizardFullScreen
           title={'Welcome to Influx'}
-          skipLinkText={'Switch Organizations'}
-          handleSkip={isUsingAuth ? this.gotoPurgatory : null}
+          skipLinkText={'skip'}
+          handleSkip={this.handleCompletionNext}
+          switchLinkText={'switch organizations'}
+          handleSwitch={this.resetAndGotoPurgatory}
+          isUsingAuth={isUsingAuth}
         >
           <WizardStep
             title="InfluxDB Connection"
             tipText=""
             isComplete={this.isSourceComplete}
             isErrored={sourceError}
-            isBlockingStep={true}
+            isSkippableStep={false}
             onNext={this.handleSourceNext}
             nextLabel={source ? 'Update Connection' : 'Add Connection'}
             previousLabel="Cancel"
@@ -107,7 +110,6 @@ class OnboardingWizard extends PureComponent<Props, State> {
             tipText=""
             isComplete={this.isKapacitorComplete}
             isErrored={kapacitorError}
-            isBlockingStep={true}
             onNext={this.handleKapacitorNext}
             onPrevious={this.handleKapacitorPrev}
             nextLabel="Continue"
@@ -224,8 +226,9 @@ class OnboardingWizard extends PureComponent<Props, State> {
     })
   }
 
-  private gotoPurgatory = (): void => {
+  private resetAndGotoPurgatory = (): void => {
     const {router} = this.props
+    this.resetWizardState()
     router.push('/purgatory')
   }
 }

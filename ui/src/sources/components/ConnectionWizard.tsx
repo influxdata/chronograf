@@ -87,7 +87,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           tipText=""
           isComplete={this.isSourceComplete}
           isErrored={sourceError}
-          isBlockingStep={true}
+          isSkippableStep={false}
           onNext={this.handleSourceNext}
           nextLabel={source ? 'Update Connection' : 'Add Connection'}
           previousLabel="Cancel"
@@ -116,7 +116,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           tipText=""
           isComplete={this.isKapacitorComplete}
           isErrored={kapacitorError}
-          isBlockingStep={true}
           onNext={this.handleKapacitorNext}
           onPrevious={this.handleKapacitorPrev}
           nextLabel="Continue"

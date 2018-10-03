@@ -14,6 +14,9 @@ interface Props {
   title: string
   skipLinkText?: string
   handleSkip?: () => void
+  switchLinkText?: string
+  handleSwitch?: () => void
+  isUsingAuth: boolean
 }
 
 @ErrorHandling
@@ -32,13 +35,23 @@ class WizardFullScreen extends PureComponent<Props> {
   }
 
   private get WizardController() {
-    const {children, skipLinkText, handleSkip} = this.props
+    const {
+      children,
+      skipLinkText,
+      handleSkip,
+      handleSwitch,
+      switchLinkText,
+      isUsingAuth,
+    } = this.props
 
     if (children) {
       return (
         <WizardController
           handleSkip={handleSkip}
           skipLinkText={skipLinkText}
+          handleSwitch={handleSwitch}
+          switchLinkText={switchLinkText}
+          isUsingAuth={isUsingAuth}
           jumpStep={0}
         >
           {children}

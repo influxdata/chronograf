@@ -20,6 +20,9 @@ interface Props {
   handleSkip?: () => void
   skipLinkText?: string
   jumpStep?: number
+  switchLinkText?: string
+  handleSwitch?: () => void
+  isUsingAuth: boolean
 }
 
 @ErrorHandling
@@ -78,7 +81,9 @@ class WizardController extends PureComponent<Props, State> {
 
   public render() {
     const {steps, currentStepIndex} = this.state
+    const {isUsingAuth} = this.props
     const currentChild = this.CurrentChild
+    const {isSkippableStep} = currentChild.props
     return (
       <div className="wizard-controller">
         <div className="progress-header">
@@ -91,7 +96,8 @@ class WizardController extends PureComponent<Props, State> {
           {this.tipText}
         </div>
         {currentChild}
-        {this.skipLink}
+        {isUsingAuth ? this.switchLink : null}
+        {isSkippableStep ? this.skipLink : null}
       </div>
     )
   }
@@ -172,6 +178,22 @@ class WizardController extends PureComponent<Props, State> {
           onClick={handleSkip}
         >
           {skipLinkText}
+        </button>
+      )
+    }
+    return null
+  }
+
+  private get switchLink() {
+    const {handleSwitch, switchLinkText} = this.props
+
+    if (handleSwitch) {
+      return (
+        <button
+          className="btn btn-xs btn-primary btn-link wizard-skip-link"
+          onClick={handleSwitch}
+        >
+          {switchLinkText}
         </button>
       )
     }

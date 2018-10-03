@@ -18,7 +18,7 @@ export interface WizardStepProps {
   isErrored?: boolean | BooleanFunction
   onPrevious?: () => void
   onNext: NextReturnFunction | AsyncNextReturnFunction
-  isBlockingStep?: boolean
+  isSkippableStep?: boolean
   increment?: () => void
   decrement?: () => void
   tipText?: string
@@ -30,7 +30,7 @@ export interface WizardStepProps {
 @ErrorHandling
 class WizardStep extends PureComponent<WizardStepProps> {
   public static defaultProps: Partial<WizardStepProps> = {
-    isBlockingStep: false,
+    isSkippableStep: true,
     isErrored: false,
   }
   public render() {
@@ -66,7 +66,7 @@ class WizardStep extends PureComponent<WizardStepProps> {
   }
 
   private handleClickNext = async () => {
-    const {onNext, increment, isBlockingStep} = this.props
+    const {onNext, increment, isSkippableStep} = this.props
     let payload
     let error = false
 
@@ -77,7 +77,7 @@ class WizardStep extends PureComponent<WizardStepProps> {
     }
 
     if (increment) {
-      if (!isBlockingStep || (isBlockingStep && error === false)) {
+      if (isSkippableStep || (!isSkippableStep && error === false)) {
         increment()
       }
     }
