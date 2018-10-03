@@ -128,6 +128,8 @@ interface State {
 
 @ErrorHandling
 class DashboardPage extends Component<Props, State> {
+  private timeMachineContainer: TimeMachineContainer
+
   public constructor(props: Props) {
     super(props)
 
@@ -281,18 +283,7 @@ class DashboardPage extends Component<Props, State> {
     return (
       <Page>
         <OverlayTechnology visible={showCellEditorOverlay}>
-          <Provider
-            inject={
-              this.state.selectedCell
-                ? [
-                    new TimeMachineContainer({
-                      ...initialStateFromCell(this.state.selectedCell),
-                      timeRange,
-                    }),
-                  ]
-                : null
-            }
-          >
+          <Provider inject={[this.timeMachineContainer]}>
             <CellEditorOverlay
               source={source}
               sources={sources}
@@ -430,6 +421,13 @@ class DashboardPage extends Component<Props, State> {
   }
 
   private handleShowCellEditorOverlay = (cell: DashboardsModels.Cell): void => {
+    const {timeRange} = this.props
+
+    this.timeMachineContainer = new TimeMachineContainer({
+      ...initialStateFromCell(cell),
+      timeRange,
+    })
+
     this.setState({selectedCell: cell, showCellEditorOverlay: true})
   }
 
