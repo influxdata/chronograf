@@ -43,10 +43,7 @@ import {ColorString, ColorNumber} from 'src/types/colors'
 
 interface ConnectedProps {
   queryDrafts: CellQuery[]
-  timeRange: TimeRange
   script: string
-  onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
-  onChangeScript: TimeMachineContainer['handleChangeScript']
   type: CellType
   axes: Axes | null
   tableOptions: TableOptions
@@ -314,10 +311,7 @@ const ConnectedCellEditorOverlay = (props: PassedProps) => {
         <CellEditorOverlay
           {...props}
           queryDrafts={timeMachineContainer.state.queryDrafts}
-          timeRange={timeMachineContainer.state.timeRange}
           script={timeMachineContainer.state.script}
-          onChangeScript={timeMachineContainer.handleChangeScript}
-          onUpdateQueryDrafts={timeMachineContainer.handleUpdateQueryDrafts}
           type={timeMachineContainer.state.type}
           axes={timeMachineContainer.state.axes}
           tableOptions={timeMachineContainer.state.tableOptions}
