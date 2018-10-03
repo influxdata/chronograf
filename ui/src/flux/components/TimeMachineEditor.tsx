@@ -4,7 +4,7 @@ import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
 import {EditorChange, LineWidget} from 'codemirror'
 import {ShowHintOptions} from 'src/types/codemirror'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {OnChangeScript, OnSubmitScript, Suggestion} from 'src/types/flux'
+import {OnChangeScript, Suggestion} from 'src/types/flux'
 import {EXCLUDED_KEYS} from 'src/flux/constants/editor'
 import {getSuggestions} from 'src/flux/helpers/autoComplete'
 import 'src/external/codemirror'
@@ -24,7 +24,6 @@ interface Props {
   visibility: string
   status: Status
   onChangeScript: OnChangeScript
-  onSubmitScript: OnSubmitScript
   suggestions: Suggestion[]
   setWasFuncSelectorClicked: (val: boolean) => void
 }
@@ -109,7 +108,6 @@ class TimeMachineEditor extends PureComponent<Props, State> {
 
   private handleBlur = (): void => {
     this.props.setWasFuncSelectorClicked(true)
-    this.props.onSubmitScript()
   }
 
   private makeError(): void {
@@ -168,15 +166,13 @@ class TimeMachineEditor extends PureComponent<Props, State> {
   private get statusLine(): Gutter[] {
     const {status} = this.props
     const messages = status.text.split('\n')
-    const lineNumbers = messages.map(text => {
-      const [numbers] = text.split(' ')
-      const [lineNumber] = numbers.split(':')
-      return {line: Number(lineNumber), text}
-    })
-
-    if (!_.every(lineNumbers, _.isNumber)) {
-      return []
-    }
+    const lineNumbers = messages
+      .map(text => {
+        const [numbers] = text.split(' ')
+        const [lineNumber] = numbers.split(':')
+        return {line: Number(lineNumber), text}
+      })
+      .filter(d => !isNaN(d.line))
 
     return lineNumbers
   }

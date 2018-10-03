@@ -162,6 +162,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       updateSourceLink,
       timeRange,
     } = this.props
+
     const {isStaticLegend, isComponentMounted} = this.state
 
     if (!isComponentMounted) {

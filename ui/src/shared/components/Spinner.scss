@@ -1,0 +1,17 @@
+.simple-spinner {
+  border: 2px solid rgba(51, 51, 51, 0.4);
+  border-left-color: $g7-graphite;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: pageSpinner 0.8s infinite linear;
+}
+
+@keyframes pageSpinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
