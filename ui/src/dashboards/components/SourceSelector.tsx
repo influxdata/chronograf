@@ -53,37 +53,34 @@ const SourceSelector: SFC<Props> = ({
         onChangeSource={onChangeSource}
         onSelectDynamicSource={onSelectDynamicSource}
       />
-      {isDynamicSourceSelected && (
-        <Radio>
-          <Radio.Button
-            id="flux-source"
-            titleText="Flux"
-            value="Flux"
-            onClick={toggleFlux}
-            active={isFluxSourceSelected}
-            disabled={!sourceSupportsFlux}
-          >
-            Flux
-          </Radio.Button>
-          <Radio.Button
-            id="influxql-source"
-            titleText="InfluxQL"
-            value="InfluxQL"
-            onClick={toggleFlux}
-            active={!isFluxSourceSelected}
-            disabled={!sourceSupportsFlux}
-          >
-            InfluxQL
-          </Radio.Button>
-        </Radio>
+      <Radio>
+        <Radio.Button
+          id="flux-source"
+          titleText="Flux"
+          value="Flux"
+          onClick={toggleFlux}
+          active={isFluxSourceSelected}
+          disabled={!sourceSupportsFlux}
+        >
+          Flux
+        </Radio.Button>
+        <Radio.Button
+          id="influxql-source"
+          titleText="InfluxQL"
+          value="InfluxQL"
+          onClick={toggleFlux}
+          active={!isFluxSourceSelected}
+          disabled={!sourceSupportsFlux}
+        >
+          InfluxQL
+        </Radio.Button>
+      </Radio>
+      {!sourceSupportsFlux && (
+        <QuestionMarkTooltip
+          tipID="token"
+          tipContent={`<p>The current source does not support Flux.</p>`}
+        />
       )}
-      {isDynamicSourceSelected &&
-        !sourceSupportsFlux && (
-          <QuestionMarkTooltip
-            tipID="token"
-            tipContent={`<p>The current source does not support Flux.</p>`}
-          />
-        )}
     </div>
   )
 }

@@ -12,10 +12,7 @@ import {Source, SourceLinks, QueryType} from 'src/types'
 
 interface Props {
   source: Source
-  type: QueryType
   sources: Source[]
-  allowInfluxQL: boolean
-  allowFlux: boolean
   allowDynamicSource: boolean
   isDynamicSourceSelected?: boolean
   onSelectDynamicSource?: () => void
@@ -61,13 +58,16 @@ class SourceDropdown extends PureComponent<Props> {
 
     const sourceOptions: JSX.Element[] = sources.reduce((acc, source) => {
       const items: JSX.Element[] = []
-      if (allowFlux) {
-        items.push(this.createSourceItem(source, QueryType.Flux))
-      }
 
-      if (allowInfluxQL) {
-        items.push(this.createSourceItem(source, QueryType.InfluxQL))
-      }
+      items.push(
+        <Dropdown.Item
+          key={source.id}
+          id={source.id}
+          value={this.sourceDropdownItemValue(source)}
+        >
+          {source.name}
+        </Dropdown.Item>
+      )
 
       return [...acc, ...items]
     }, [])
@@ -95,52 +95,40 @@ class SourceDropdown extends PureComponent<Props> {
     )
   }
 
-  private sourceDropdownItemValue(
-    source: Source,
-    type: QueryType
-  ): SourceDropdownItem {
+  private sourceDropdownItemValue(source: Source): SourceDropdownItem {
     return {
       sourceID: source.id,
       links: source.links,
-      type,
     }
   }
 
-  private createSourceItem(source: Source, type: QueryType): JSX.Element {
-    let id = source.id
-    let sourceType = 'InfluxQL'
+  // private createSourceItem(source: Source, type: QueryType): JSX.Element {
+  //   let id = source.id
+  //   let sourceType = 'InfluxQL'
 
-    if (type === QueryType.Flux) {
-      id = `${source.id}-flux`
-      sourceType = 'Flux'
-    }
+  //   if (type === QueryType.Flux) {
+  //     id = `${source.id}-flux`
+  //     sourceType = 'Flux'
+  //   }
 
-    return (
-      <Dropdown.Item
-        key={id}
-        id={id}
-        value={this.sourceDropdownItemValue(source, type)}
-      >
-        {`${source.name} (${sourceType})`}
-      </Dropdown.Item>
-    )
-  }
+  //   return (
+  //     <Dropdown.Item
+  //       key={id}
+  //       id={id}
+  //       value={this.sourceDropdownItemValue(source, type)}
+  //     >
+  //       {`${source.name} (${sourceType})`}
+  //     </Dropdown.Item>
+  //   )
+  // }
 
   private get selectedID(): string {
-    const {
-      source,
-      type,
-      allowDynamicSource,
-      isDynamicSourceSelected,
-    } = this.props
+    const {source, allowDynamicSource, isDynamicSourceSelected} = this.props
 
     if (allowDynamicSource && isDynamicSourceSelected) {
       return DynamicSource.id
     }
 
-    if (type === QueryType.Flux) {
-      return `${source.id}-flux`
-    }
     return source.id
   }
 }
