@@ -3,6 +3,7 @@ import React, {Component, MouseEvent} from 'react'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
 import _ from 'lodash'
+import {Provider} from 'unstated'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -28,6 +29,8 @@ import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
 
 // Utils
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {initialStateFromCell} from 'src/shared/utils/timeMachine'
 import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
 import {getDeep} from 'src/utils/wrappers'
 import {updateDashboardLinks} from 'src/dashboards/utils/dashboardSwitcherLinks'
@@ -125,6 +128,8 @@ interface State {
 
 @ErrorHandling
 class DashboardPage extends Component<Props, State> {
+  private timeMachineContainer: TimeMachineContainer
+
   public constructor(props: Props) {
     super(props)
 
@@ -278,20 +283,22 @@ class DashboardPage extends Component<Props, State> {
     return (
       <Page>
         <OverlayTechnology visible={showCellEditorOverlay}>
-          <CellEditorOverlay
-            source={source}
-            sources={sources}
-            notify={notify}
-            fluxLinks={fluxLinks}
-            cell={selectedCell}
-            dashboardID={dashboardID}
-            queryStatus={cellQueryStatus}
-            onSave={this.handleSaveEditedCell}
-            onCancel={this.handleHideCellEditorOverlay}
-            templates={templatesIncludingDashTime}
-            editQueryStatus={this.props.editCellQueryStatus}
-            dashboardTimeRange={timeRange}
-          />
+          <Provider inject={[this.timeMachineContainer]}>
+            <CellEditorOverlay
+              source={source}
+              sources={sources}
+              notify={notify}
+              fluxLinks={fluxLinks}
+              cell={selectedCell}
+              dashboardID={dashboardID}
+              queryStatus={cellQueryStatus}
+              onSave={this.handleSaveEditedCell}
+              onCancel={this.handleHideCellEditorOverlay}
+              templates={templatesIncludingDashTime}
+              editQueryStatus={this.props.editCellQueryStatus}
+              dashboardTimeRange={timeRange}
+            />
+          </Provider>
         </OverlayTechnology>
         <DashboardHeader
           dashboard={dashboard}
@@ -414,6 +421,13 @@ class DashboardPage extends Component<Props, State> {
   }
 
   private handleShowCellEditorOverlay = (cell: DashboardsModels.Cell): void => {
+    const {timeRange} = this.props
+
+    this.timeMachineContainer = new TimeMachineContainer({
+      ...initialStateFromCell(cell),
+      timeRange,
+    })
+
     this.setState({selectedCell: cell, showCellEditorOverlay: true})
   }
 
