@@ -77,7 +77,7 @@ type Props = PassedProps & ConnectedProps
 
 interface State {
   isStaticLegend: boolean
-  status: ScriptStatus
+  scriptStatus: ScriptStatus
   draftCellName: string
 }
 
@@ -92,7 +92,7 @@ class CellEditorOverlay extends Component<Props, State> {
 
     this.state = {
       isStaticLegend: IS_STATIC_LEGEND(legend),
-      status: {type: 'none', text: ''},
+      scriptStatus: {type: 'none', text: ''},
       draftCellName: props.cell.name,
     }
   }
@@ -135,7 +135,7 @@ class CellEditorOverlay extends Component<Props, State> {
           onToggleStaticLegend={this.handleToggleStaticLegend}
           isStaticLegend={isStaticLegend}
           queryStatus={queryStatus}
-          updateScriptStatus={this.updateScriptStatus}
+          onUpdateScriptStatus={this.handleUpdateScriptStatus}
         >
           {(activeEditorTab, onSetActiveEditorTab) => (
             <CEOHeader
@@ -155,14 +155,14 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private get isSaveable(): boolean {
     const {queryDrafts, type} = this.props
-    const {status} = this.state
+    const {scriptStatus} = this.state
 
     if (type === 'note') {
       return true
     }
 
     if (this.isFluxSource) {
-      return _.get(status, 'type', '') === 'success'
+      return _.get(scriptStatus, 'type', '') === 'success'
     }
 
     return queryDrafts.every(queryDraft => {
@@ -190,8 +190,8 @@ class CellEditorOverlay extends Component<Props, State> {
     return false
   }
 
-  private updateScriptStatus = (status: ScriptStatus): void => {
-    this.setState({status})
+  private handleUpdateScriptStatus = (scriptStatus: ScriptStatus): void => {
+    this.setState({scriptStatus})
   }
 
   private handleRenameCell = (draftCellName: string): void => {

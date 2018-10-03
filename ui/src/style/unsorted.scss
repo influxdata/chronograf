@@ -453,6 +453,10 @@ $deceo-spacing: 20px;
 .deceo--bottom {
   background-color: $g2-kevlar;
   height: 100%;
+
+  .simple-spinner {
+    margin-right: 10px;
+  }
 }
 
 $deceo--tab-width: 220px;

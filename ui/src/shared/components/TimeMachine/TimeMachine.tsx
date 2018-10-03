@@ -10,37 +10,22 @@ import DisplayOptions from 'src/dashboards/components/DisplayOptions'
 import TimeMachineBottom from 'src/shared/components/TimeMachine/TimeMachineBottom'
 import TimeMachineControls from 'src/shared/components/TimeMachine/TimeMachineControls'
 import TimeMachineVisualization from 'src/shared/components/TimeMachine/TimeMachineVisualization'
-import FluxQueryBuilder from 'src/flux/components/FluxQueryBuilder'
+import FluxQueryMaker from 'src/shared/components/TimeMachine/FluxQueryMaker'
 
 // Utils
 import {getConfig} from 'src/dashboards/utils/cellGetters'
 import {getDeep} from 'src/utils/wrappers'
-import {bodyNodes} from 'src/flux/helpers'
-import {
-  addNode,
-  parseError,
-  deleteBody,
-  appendJoin,
-  toggleYield,
-  deleteFuncNode,
-  getBodyToScript,
-  scriptUpToYield,
-  changeArg,
-} from 'src/flux/helpers/scriptBuilder'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {analyzeQueryFailed} from 'src/shared/copy/notifications'
 
 // Actions
-import {validateSuccess} from 'src/shared/copy/notifications'
-import {getSuggestions, getAST} from 'src/flux/apis'
 import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
 
 // Constants
 import {HANDLE_HORIZONTAL} from 'src/shared/constants'
 import {CEOTabs} from 'src/dashboards/constants'
-import {builder, emptyAST} from 'src/flux/constants'
 
 // Types
 import {QueryUpdateState} from 'src/shared/actions/queries'
@@ -51,27 +36,18 @@ import {
   Source,
   CellQuery,
   NotificationAction,
-  FluxTable,
   QueryStatus,
   Status,
   Query,
   QueryType,
 } from 'src/types'
 import {SourceOption} from 'src/types/sources'
-import {
-  Suggestion,
-  FlatBody,
-  Links,
-  InputArg,
-  Context,
-  DeleteFuncNodeArgs,
-  ScriptStatus,
-} from 'src/types/flux'
+import {Links, ScriptStatus} from 'src/types/flux'
 
 interface ConnectedProps {
   script: string
   queryDrafts: CellQuery[]
-  onChangeScript: (script: string, stateToUpdate: QueryUpdateState) => void
+  onChangeScript: (script: string) => void
   onUpdateQueryDrafts: TimeMachineContainer['handleUpdateQueryDrafts']
   onAddQuery: () => void
   onDeleteQuery: (queryID: string) => void
@@ -101,39 +77,21 @@ interface PassedProps {
   ) => JSX.Element
   manualRefresh?: number
   queryStatus: QueryStatus
-  updateScriptStatus?: (status: ScriptStatus) => void
-}
-
-interface Body extends FlatBody {
-  id: string
+  onUpdateScriptStatus?: (status: ScriptStatus) => void
 }
 
 interface State {
-  body: Body[]
-  script: string
-  lastScript: string
-  ast: object
-  data: FluxTable[]
-  status: ScriptStatus
   selectedSource: Source
   activeQueryIndex: number
   activeEditorTab: CEOTabs
   isViewingRawData: boolean
-  suggestions: Suggestion[]
   autoRefresher: AutoRefresher
   autoRefreshDuration: number // milliseconds
 }
 
-type ScriptFunc = (script: string) => void
-
-export const FluxContext = React.createContext(undefined)
-
 type Props = PassedProps & ConnectedProps
 
 class TimeMachine extends PureComponent<Props, State> {
-  private debouncedASTResponse: ScriptFunc
-  private validAST: boolean = true
-
   constructor(props: Props) {
     super(props)
 
@@ -141,46 +99,16 @@ class TimeMachine extends PureComponent<Props, State> {
       activeQueryIndex: 0,
       activeEditorTab: CEOTabs.Queries,
       selectedSource: null,
-      data: [],
-      body: [],
-      ast: null,
-      suggestions: [],
-      status: {
-        type: 'none',
-        text: '',
-      },
-      script: this.props.script,
-      lastScript: '',
       autoRefresher: new AutoRefresher(),
       autoRefreshDuration: 0,
       isViewingRawData: false,
     }
-
-    this.debouncedASTResponse = _.debounce(script => {
-      this.getASTResponse(script, false)
-    }, 500)
   }
 
   public async componentDidMount() {
-    const {fluxLinks, script} = this.props
     const {autoRefresher, autoRefreshDuration} = this.state
 
     autoRefresher.poll(autoRefreshDuration)
-
-    try {
-      const suggestions = await getSuggestions(fluxLinks.suggestions)
-      this.setState({suggestions})
-    } catch (error) {
-      console.error('Could not get function suggestions: ', error)
-    }
-
-    if (this.isFluxSelected) {
-      try {
-        this.debouncedASTResponse(script)
-      } catch (error) {
-        console.error('Could not retrieve AST for script', error)
-      }
-    }
   }
 
   public componentWillUnmount() {
@@ -378,26 +306,26 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get fluxBuilder(): JSX.Element {
-    const {suggestions, body, status, script} = this.state
-    const {notify} = this.props
+    const {
+      script,
+      onChangeScript,
+      fluxLinks,
+      onUpdateScriptStatus,
+      notify,
+      timeRange,
+    } = this.props
 
     return (
-      <FluxContext.Provider value={this.getContext}>
-        <FluxQueryBuilder
-          body={body}
-          script={script}
-          status={status}
-          notify={notify}
-          source={this.source}
-          suggestions={suggestions}
-          onValidate={this.handleValidate}
-          onAppendFrom={this.handleAppendFrom}
-          onAppendJoin={this.handleAppendJoin}
-          onChangeScript={this.handleChangeScript}
-          onSubmitScript={this.handleSubmitScript}
-          onDeleteBody={this.handleDeleteBody}
-        />
-      </FluxContext.Provider>
+      <FluxQueryMaker
+        notify={notify}
+        source={this.source}
+        script={script}
+        onChangeScript={onChangeScript}
+        timeRange={timeRange}
+        queries={this.queriesForVis}
+        links={fluxLinks}
+        onUpdateStatus={onUpdateScriptStatus}
+      />
     )
   }
 
@@ -431,10 +359,6 @@ class TimeMachine extends PureComponent<Props, State> {
     const id = _.get(queryDrafts, 'id', '')
 
     if (this.isFluxSelected) {
-      if (!this.validAST) {
-        return []
-      }
-
       // there will only be one flux query
       const fluxQuery: Query[] = [
         {text: script, id, queryConfig: null, type: QueryType.Flux},
@@ -590,199 +514,6 @@ class TimeMachine extends PureComponent<Props, State> {
 
   private handleSetActiveEditorTab = (tabName: CEOTabs): void => {
     this.setState({activeEditorTab: tabName})
-  }
-
-  // --------------- FLUX ----------------
-  private get getContext(): Context {
-    const {timeRange} = this.props
-    return {
-      onAddNode: this.handleAddNode,
-      onChangeArg: this.handleChangeArg,
-      onSubmitScript: this.handleSubmitScript,
-      onChangeScript: this.handleChangeScript,
-      onDeleteFuncNode: this.handleDeleteFuncNode,
-      onGenerateScript: this.handleGenerateScript,
-      onToggleYield: this.handleToggleYield,
-      data: this.state.data,
-      scriptUpToYield: this.handleScriptUpToYield,
-      source: this.source,
-      queries: this.queriesForVis,
-      timeRange,
-    }
-  }
-
-  private updateScript(script: string) {
-    this.props.onChangeScript(script, this.stateToUpdate)
-  }
-
-  private getASTResponse = async (
-    script: string,
-    update: boolean = true,
-    force: boolean = true
-  ): Promise<void> => {
-    if (script.trim() === this.state.lastScript.trim() && !force) {
-      return
-    }
-
-    const {fluxLinks, updateScriptStatus, isInCEO} = this.props
-    this.setState({script, lastScript: script})
-
-    if (!script) {
-      this.updateScript(script)
-      this.setState({ast: emptyAST, body: []})
-      this.validAST = true
-    }
-
-    try {
-      const ast = await getAST({url: fluxLinks.ast, body: script})
-
-      if (update) {
-        this.updateScript(script)
-      }
-
-      const body = bodyNodes(ast, this.state.suggestions)
-      const status = {type: 'success', text: ''}
-
-      this.setState({ast, body, status})
-      if (isInCEO) {
-        updateScriptStatus(status)
-      }
-
-      this.validAST = true
-    } catch (error) {
-      const status = parseError(error)
-
-      this.setState({status})
-      if (isInCEO) {
-        updateScriptStatus(status)
-      }
-
-      this.validAST = false
-    }
-  }
-
-  private handleSubmitScript = () => {
-    this.getASTResponse(this.state.script, true, false)
-  }
-
-  private handleGenerateScript = (): void => {
-    this.getASTResponse(this.bodyToScript)
-  }
-
-  private handleChangeArg = (input: InputArg): void => {
-    const {body} = this.state
-    const newBody = changeArg(input, body)
-
-    this.setState({body: newBody}, () => {
-      if (input.generate) {
-        this.handleGenerateScript()
-      }
-    })
-  }
-
-  private get bodyToScript(): string {
-    return getBodyToScript(this.state.body)
-  }
-
-  private handleAppendFrom = (): void => {
-    const {script} = this.props
-    let newScript = script.trim()
-    const from = builder.NEW_FROM
-
-    if (!newScript) {
-      this.getASTResponse(from)
-      return
-    }
-
-    newScript = `${script.trim()}\n\n${from}\n\n`
-    this.getASTResponse(newScript)
-  }
-
-  private handleAppendJoin = (): void => {
-    const {script} = this.props
-    const newScript = appendJoin(script)
-
-    this.getASTResponse(newScript)
-  }
-
-  private handleChangeScript = async (script: string): Promise<void> => {
-    await this.getASTResponse(script, false)
-    this.updateScript(script)
-  }
-
-  private handleAddNode = (
-    name: string,
-    bodyID: string,
-    declarationID: string
-  ): void => {
-    const script = addNode(name, bodyID, declarationID, this.state.body)
-
-    this.getASTResponse(script)
-  }
-
-  private handleDeleteBody = (bodyID: string): void => {
-    const script = deleteBody(bodyID, this.state.body)
-    this.getASTResponse(script)
-  }
-
-  private handleScriptUpToYield = (
-    bodyID: string,
-    declarationID: string,
-    funcNodeIndex: number,
-    isYieldable: boolean
-  ): string => {
-    return scriptUpToYield(
-      bodyID,
-      declarationID,
-      funcNodeIndex,
-      isYieldable,
-      this.state.body
-    )
-  }
-
-  private handleToggleYield = (
-    bodyID: string,
-    declarationID: string,
-    funcNodeIndex: number
-  ): void => {
-    const script = toggleYield(
-      bodyID,
-      declarationID,
-      funcNodeIndex,
-      this.state.body
-    )
-
-    this.getASTResponse(script)
-  }
-
-  private handleDeleteFuncNode = (ids: DeleteFuncNodeArgs): void => {
-    const script = deleteFuncNode(ids, this.state.body)
-
-    this.getASTResponse(script)
-  }
-
-  private handleValidate = async () => {
-    const {fluxLinks, notify, script, updateScriptStatus, isInCEO} = this.props
-
-    try {
-      const ast = await getAST({url: fluxLinks.ast, body: script})
-      const body = bodyNodes(ast, this.state.suggestions)
-      const status = {type: 'success', text: ''}
-      notify(validateSuccess())
-
-      this.setState({ast, body, status})
-      if (isInCEO) {
-        updateScriptStatus(status)
-      }
-    } catch (error) {
-      const status = parseError(error)
-      this.setState({status})
-
-      if (isInCEO) {
-        updateScriptStatus(status)
-      }
-      return console.error('Could not parse AST', error)
-    }
   }
 
   private handleToggleIsViewingRawData = (): void => {

@@ -8,21 +8,53 @@ import FuncSelector from 'src/flux/components/FuncSelector'
 import BodyDelete from 'src/flux/components/BodyDelete'
 import {funcNames} from 'src/flux/constants'
 
-import {Body, Suggestion} from 'src/types/flux'
+import {
+  Body,
+  Suggestion,
+  OnDeleteBody,
+  OnAddNode,
+  OnChangeArg,
+  OnDeleteFuncNode,
+  OnGenerateScript,
+  OnToggleYield,
+} from 'src/types/flux'
+import {FluxTable, Query, TimeRange, Source} from 'src/types'
 
 interface Props {
   body: Body[]
+  source: Source
+  data: FluxTable[]
+  queries: Query[]
+  timeRange: TimeRange
   suggestions: Suggestion[]
   onAppendFrom: () => void
   onAppendJoin: () => void
-  onDeleteBody: (bodyID: string) => void
+  onDeleteBody: OnDeleteBody
   wasFuncSelectorClicked: boolean
   setWasFuncSelectorClicked: (val: boolean) => void
+  onAddNode: OnAddNode
+  onChangeArg: OnChangeArg
+  onDeleteFuncNode: OnDeleteFuncNode
+  onGenerateScript: OnGenerateScript
+  onToggleYield: OnToggleYield
 }
 
 class BodyBuilder extends PureComponent<Props> {
   public render() {
-    const {body, onDeleteBody, wasFuncSelectorClicked} = this.props
+    const {
+      body,
+      onDeleteBody,
+      wasFuncSelectorClicked,
+      onDeleteFuncNode,
+      onAddNode,
+      onChangeArg,
+      onGenerateScript,
+      onToggleYield,
+      data,
+      timeRange,
+      source,
+      queries,
+    } = this.props
 
     const bodybuilder = body.map((b, i) => {
       if (b.declarations.length) {
@@ -37,6 +69,7 @@ class BodyBuilder extends PureComponent<Props> {
                   </div>
                 </div>
                 <ExpressionNode
+                  body={body}
                   bodyID={b.id}
                   funcs={d.funcs}
                   declarationID={d.id}
@@ -46,6 +79,15 @@ class BodyBuilder extends PureComponent<Props> {
                   declarationsFromBody={this.declarationsFromBody}
                   wasFuncSelectorClicked={wasFuncSelectorClicked}
                   setWasFuncSelectorClicked={this.setWasFuncSelectorClicked}
+                  onDeleteFuncNode={onDeleteFuncNode}
+                  onAddNode={onAddNode}
+                  onChangeArg={onChangeArg}
+                  onGenerateScript={onGenerateScript}
+                  onToggleYield={onToggleYield}
+                  data={data}
+                  source={source}
+                  timeRange={timeRange}
+                  queries={queries}
                 />
               </div>
             )
@@ -71,6 +113,7 @@ class BodyBuilder extends PureComponent<Props> {
       return (
         <div className="declaration" key={i}>
           <ExpressionNode
+            body={body}
             bodyID={b.id}
             funcs={b.funcs}
             funcNames={this.funcNames}
@@ -79,6 +122,15 @@ class BodyBuilder extends PureComponent<Props> {
             declarationsFromBody={this.declarationsFromBody}
             wasFuncSelectorClicked={wasFuncSelectorClicked}
             setWasFuncSelectorClicked={this.setWasFuncSelectorClicked}
+            onDeleteFuncNode={onDeleteFuncNode}
+            onAddNode={onAddNode}
+            onChangeArg={onChangeArg}
+            onGenerateScript={onGenerateScript}
+            onToggleYield={onToggleYield}
+            data={data}
+            source={source}
+            timeRange={timeRange}
+            queries={queries}
           />
         </div>
       )
