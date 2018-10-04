@@ -18,7 +18,6 @@ import {
   retainRangesDashTimeV1 as retainRangesDashTimeV1Action,
 } from 'src/dashboards/actions'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
-import {fetchAllFluxServicesAsync} from 'src/shared/actions/services'
 
 import {
   NEW_DASHBOARD,
@@ -31,7 +30,7 @@ import {
   notifyDashboardExportFailed,
 } from 'src/shared/copy/notifications'
 
-import {Source, Dashboard, RemoteDataState, Service} from 'src/types'
+import {Source, Dashboard, RemoteDataState} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
 
@@ -46,9 +45,7 @@ export interface Props {
   handleImportDashboard: (dashboard: Dashboard) => void
   notify: (message: Notification) => void
   retainRangesDashTimeV1: (dashboardIDs: number[]) => void
-  fetchAllFluxServices: (sources: Source[]) => Promise<void>
   dashboards: Dashboard[]
-  services: Service[]
 }
 
 interface State {
@@ -70,8 +67,6 @@ export class DashboardsPage extends PureComponent<Props, State> {
 
     try {
       dashboards = await this.props.handleGetDashboards()
-
-      await this.props.fetchAllFluxServices(this.props.sources)
 
       const dashboardIDs = dashboards.map(d => d.id)
 
@@ -162,10 +157,10 @@ export class DashboardsPage extends PureComponent<Props, State> {
   private modifyDashboardForDownload = async (
     dashboard: Dashboard
   ): Promise<DashboardFile> => {
-    const {sources, services, handleGetChronografVersion} = this.props
+    const {sources, handleGetChronografVersion} = this.props
     const version = await handleGetChronografVersion()
 
-    return mapDashboardForDownload(sources, services, dashboard, version)
+    return mapDashboardForDownload(sources, dashboard, version)
   }
 
   private handleImportDashboard = async (
@@ -189,12 +184,10 @@ export class DashboardsPage extends PureComponent<Props, State> {
 const mapStateToProps = ({
   dashboardUI: {dashboards, dashboard},
   sources,
-  services,
 }): Partial<Props> => ({
   dashboards,
   dashboard,
   sources,
-  services,
 })
 
 const mapDispatchToProps = {
@@ -204,7 +197,6 @@ const mapDispatchToProps = {
   handleImportDashboard: importDashboardAsync,
   notify: notifyAction,
   retainRangesDashTimeV1: retainRangesDashTimeV1Action,
-  fetchAllFluxServices: fetchAllFluxServicesAsync,
 }
 
 export default withRouter(
