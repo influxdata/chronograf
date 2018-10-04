@@ -16,6 +16,7 @@ import Spinner from 'src/shared/components/Spinner'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
+import {emptyAST} from 'src/flux/constants'
 
 // Utils
 import {bodyNodes} from 'src/flux/helpers'
@@ -217,25 +218,29 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   private updateBody = async () => {
     const {draftScript} = this.state
 
-    let ast
+    let ast: object
+    let draftScriptStatus: ScriptStatus
+    let bodyStatus
 
     try {
       ast = await this.restarter.perform(
         getAST({url: this.props.links.ast, body: draftScript})
       )
-    } catch (error) {
-      this.setState({
-        draftScriptStatus: parseError(error),
-        bodyStatus: RemoteDataState.Error,
-      })
 
-      return
+      draftScriptStatus = {type: 'success', text: ''}
+      bodyStatus = RemoteDataState.Done
+    } catch (error) {
+      ast = emptyAST
+      draftScriptStatus = parseError(error)
+      bodyStatus = RemoteDataState.Error
     }
 
-    const body = bodyNodes(ast, this.state.suggestions)
-    const draftScriptStatus = {type: 'success', text: ''}
-
-    this.setState({body, bodyStatus: RemoteDataState.Done, draftScriptStatus})
+    this.setState({
+      ast,
+      bodyStatus,
+      draftScriptStatus,
+      body: bodyNodes(ast, this.state.suggestions),
+    })
   }
 
   private handleGenerateScript = (): void => {
