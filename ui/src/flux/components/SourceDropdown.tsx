@@ -12,6 +12,7 @@ import {Source, SourceLinks, QueryType} from 'src/types'
 
 interface Props {
   source: Source
+  type: QueryType
   sources: Source[]
   allowDynamicSource: boolean
   isDynamicSourceSelected?: boolean
@@ -22,7 +23,6 @@ interface Props {
 interface SourceDropdownItem {
   sourceID: string
   links: SourceLinks
-  type: QueryType
 }
 
 class SourceDropdown extends PureComponent<Props> {
@@ -39,7 +39,7 @@ class SourceDropdown extends PureComponent<Props> {
   }
 
   private handleSelect = (choice: SourceDropdownItem): void => {
-    const {sources, onChangeSource, onSelectDynamicSource} = this.props
+    const {sources, onChangeSource, onSelectDynamicSource, type} = this.props
 
     if (choice.sourceID === DynamicSource.id && onSelectDynamicSource) {
       onSelectDynamicSource()
@@ -50,11 +50,11 @@ class SourceDropdown extends PureComponent<Props> {
       return src.id === choice.sourceID
     })
 
-    onChangeSource(source, choice.type)
+    onChangeSource(source, type)
   }
 
   private get dropdownItems(): JSX.Element[] {
-    const {sources, allowFlux, allowInfluxQL, allowDynamicSource} = this.props
+    const {sources, allowDynamicSource} = this.props
 
     const sourceOptions: JSX.Element[] = sources.reduce((acc, source) => {
       const items: JSX.Element[] = []
