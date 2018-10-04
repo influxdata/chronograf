@@ -1,19 +1,26 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
 import classnames from 'classnames'
 import {connect} from 'react-redux'
 import moment from 'moment'
-
 import {ColumnSizer, SizedColumnProps, AutoSizer} from 'react-virtualized'
+
+// Components
 import {MultiGrid, PropsMultiGrid} from 'src/shared/components/MultiGrid'
 import InvalidData from 'src/shared/components/InvalidData'
+
+// Utils
 import {fastReduce} from 'src/utils/fast'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {
   computeFieldOptions,
   getDefaultTimeField,
 } from 'src/dashboards/utils/tableGraph'
-import {QueryUpdateState} from 'src/shared/actions/queries'
+import {ErrorHandling} from 'src/shared/decorators/errors'
+import {manager} from 'src/worker/JobManager'
+
+// Constants
 import {
   ASCENDING,
   DESCENDING,
@@ -24,7 +31,9 @@ import {
   DEFAULT_SORT_DIRECTION,
 } from 'src/shared/constants/tableGraph'
 import {generateThresholdsListHexs} from 'src/shared/constants/colorOperations'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+import {DataType} from 'src/shared/constants'
+
+// Types
 import {
   TimeSeriesServerResponse,
   TimeSeriesValue,
@@ -38,10 +47,7 @@ import {
   DecimalPlaces,
   Sort,
 } from 'src/types/dashboards'
-import {FluxTable} from 'src/types'
-import {DataType} from 'src/shared/constants'
-
-import {manager} from 'src/worker/JobManager'
+import {FluxTable, QueryUpdateState} from 'src/types'
 
 const COLUMN_MIN_WIDTH = 100
 const ROW_HEIGHT = 30

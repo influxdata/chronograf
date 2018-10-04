@@ -18,13 +18,12 @@ import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
-import {QueryUpdateState} from 'src/shared/actions/queries'
 import {DEFAULT_AXES} from 'src/dashboards/constants/cellEditor'
 
 // Types
 import {buildDefaultYLabel} from 'src/shared/presenters'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {Axes, QueryConfig, CellType} from 'src/types'
+import {Axes, QueryConfig, CellType, QueryUpdateState} from 'src/types'
 import {
   FieldOption,
   DecimalPlaces,

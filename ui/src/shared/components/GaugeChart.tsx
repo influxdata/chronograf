@@ -1,21 +1,28 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
 
-import {manager} from 'src/worker/JobManager'
-
-import getLastValues from 'src/shared/parsing/lastValues'
+// Components
 import Gauge from 'src/shared/components/Gauge'
 import InvalidData from 'src/shared/components/InvalidData'
 
+// Utils
+import {manager} from 'src/worker/JobManager'
+import {getDataUUID, hasDataChanged} from 'src/shared/graphs/helpers'
+import getLastValues from 'src/shared/parsing/lastValues'
+import {ErrorHandling} from 'src/shared/decorators/errors'
+
+// Constants
 import {DEFAULT_GAUGE_COLORS} from 'src/shared/constants/thresholds'
 import {stringifyColorValues} from 'src/shared/constants/colorOperations'
 import {DASHBOARD_LAYOUT_ROW_HEIGHT} from 'src/shared/constants'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+import {DataType} from 'src/shared/constants'
+
+// Types
 import {DecimalPlaces} from 'src/types/dashboards'
 import {ColorString} from 'src/types/colors'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {FluxTable} from 'src/types/flux'
-import {DataType} from 'src/shared/constants'
 
 interface Props {
   data: TimeSeriesServerResponse[] | FluxTable[]
@@ -44,6 +51,7 @@ class GaugeChart extends PureComponent<Props, State> {
   }
 
   private isComponentMounted: boolean
+  private lastUUID: string
 
   constructor(props: Props) {
     super(props)
@@ -53,13 +61,15 @@ class GaugeChart extends PureComponent<Props, State> {
 
   public async componentDidMount() {
     this.isComponentMounted = true
+    this.lastUUID = getDataUUID(this.props.data, this.props.dataType)
+
     await this.dataToLastValues()
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    const isDataChanged =
-      prevProps.dataType !== this.props.dataType ||
-      !_.isEqual(prevProps.data, this.props.data)
+    const isDataChanged = hasDataChanged(prevProps, this.props)
+
+    this.lastUUID = getDataUUID(this.props.data, this.props.dataType)
 
     if (isDataChanged) {
       await this.dataToLastValues()
@@ -134,7 +144,10 @@ class GaugeChart extends PureComponent<Props, State> {
         lastValues = getLastValues(data as TimeSeriesServerResponse[])
       }
 
-      if (!this.isComponentMounted) {
+      if (
+        !this.isComponentMounted ||
+        this.lastUUID !== getDataUUID(data, dataType)
+      ) {
         return
       }
     } catch (err) {
