@@ -14,7 +14,7 @@ import {QueryType} from 'src/types'
 interface Props {
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  isFluxSourceSelected: boolean
+  isFluxSelected: boolean
   sourceSupportsFlux: boolean
   queries: QueriesModels.QueryConfig[]
   isDynamicSourceSelected: boolean
@@ -28,7 +28,7 @@ const SourceSelector: SFC<Props> = ({
   sources = [],
   queries,
   toggleFlux,
-  isFluxSourceSelected,
+  isFluxSelected,
   onChangeSource,
   sourceSupportsFlux,
   isDynamicSourceSelected,
@@ -38,7 +38,7 @@ const SourceSelector: SFC<Props> = ({
     return <div className="source-selector" />
   }
 
-  const type = isFluxSourceSelected ? QueryType.Flux : QueryType.InfluxQL
+  const type = isFluxSelected ? QueryType.Flux : QueryType.InfluxQL
 
   return (
     <div className="source-selector">
@@ -46,44 +46,39 @@ const SourceSelector: SFC<Props> = ({
         source={source}
         type={type}
         sources={sources}
-        allowInfluxQL={true}
-        allowFlux={sourceSupportsFlux}
         allowDynamicSource={true}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onChangeSource={onChangeSource}
         onSelectDynamicSource={onSelectDynamicSource}
       />
-      {isDynamicSourceSelected && (
-        <Radio>
-          <Radio.Button
-            id="flux-source"
-            titleText="Flux"
-            value="Flux"
-            onClick={toggleFlux}
-            active={isFluxSourceSelected}
-            disabled={!sourceSupportsFlux}
-          >
-            Flux
-          </Radio.Button>
-          <Radio.Button
-            id="influxql-source"
-            titleText="InfluxQL"
-            value="InfluxQL"
-            onClick={toggleFlux}
-            active={!isFluxSourceSelected}
-            disabled={!sourceSupportsFlux}
-          >
-            InfluxQL
-          </Radio.Button>
-        </Radio>
+      <Radio>
+        <Radio.Button
+          id="flux-source"
+          titleText="Flux"
+          value="Flux"
+          onClick={toggleFlux}
+          active={isFluxSelected}
+          disabled={!sourceSupportsFlux}
+        >
+          Flux
+        </Radio.Button>
+        <Radio.Button
+          id="influxql-source"
+          titleText="InfluxQL"
+          value="InfluxQL"
+          onClick={toggleFlux}
+          active={!isFluxSelected}
+          disabled={!sourceSupportsFlux}
+        >
+          InfluxQL
+        </Radio.Button>
+      </Radio>
+      {!sourceSupportsFlux && (
+        <QuestionMarkTooltip
+          tipID="token"
+          tipContent={`<p>The current source does not support Flux.</p>`}
+        />
       )}
-      {isDynamicSourceSelected &&
-        !sourceSupportsFlux && (
-          <QuestionMarkTooltip
-            tipID="token"
-            tipContent={`<p>The current source does not support Flux.</p>`}
-          />
-        )}
     </div>
   )
 }
