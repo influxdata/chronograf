@@ -46,6 +46,7 @@ import {
   TEMP_VAR_DASHBOARD_TIME,
   TEMP_VAR_UPPER_DASHBOARD_TIME,
 } from 'src/shared/constants'
+import {DE_LOCAL_STORAGE_KEY} from 'src/data_explorer/constants'
 
 // Types
 import {
@@ -97,6 +98,7 @@ interface ConnectedProps {
   script: string
   onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
   onChangeScript: TimeMachineContainer['handleChangeScript']
+  onResetTimeMachine: TimeMachineContainer['reset']
 }
 
 type Props = PassedProps & ConnectedProps
@@ -122,11 +124,14 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {autoRefresh} = this.props
+    const {autoRefresh, onResetTimeMachine} = this.props
 
     await this.resolveQueryParams()
 
+    onResetTimeMachine({}, DE_LOCAL_STORAGE_KEY)
+
     GlobalAutoRefresher.poll(autoRefresh)
+
     this.setState({isComponentMounted: true})
   }
 
@@ -440,6 +445,7 @@ const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
           script={timeMachineContainer.state.script}
           onChangeScript={timeMachineContainer.handleChangeScript}
           onUpdateQueryDrafts={timeMachineContainer.handleUpdateQueryDrafts}
+          onResetTimeMachine={timeMachineContainer.reset}
         />
       )}
     </Subscribe>
