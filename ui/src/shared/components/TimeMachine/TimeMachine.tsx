@@ -790,19 +790,12 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private toggleFlux = (): void => {
-    if (this.isFluxSelected) {
-      if (this.useDynamicSource) {
-        this.updateQueryDraftsSource(null, QueryType.InfluxQL)
-      } else {
-        this.updateQueryDraftsSource(this.source, QueryType.InfluxQL)
-      }
-    } else {
-      if (this.useDynamicSource) {
-        this.updateQueryDraftsSource(null, QueryType.Flux)
-      } else {
-        this.updateQueryDraftsSource(this.source, QueryType.Flux)
-      }
-    }
+    const newQueryType = this.isFluxSelected
+      ? QueryType.InfluxQL
+      : QueryType.Flux
+    const source = this.useDynamicSource ? null : this.source
+
+    this.updateQueryDraftsSource(source, newQueryType)
   }
 }
 

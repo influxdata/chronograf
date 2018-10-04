@@ -56,21 +56,15 @@ class SourceDropdown extends PureComponent<Props> {
   private get dropdownItems(): JSX.Element[] {
     const {sources, allowDynamicSource} = this.props
 
-    const sourceOptions: JSX.Element[] = sources.reduce((acc, source) => {
-      const items: JSX.Element[] = []
-
-      items.push(
-        <Dropdown.Item
-          key={source.id}
-          id={source.id}
-          value={this.sourceDropdownItemValue(source)}
-        >
-          {source.name}
-        </Dropdown.Item>
-      )
-
-      return [...acc, ...items]
-    }, [])
+    const sourceOptions: JSX.Element[] = sources.map(source => (
+      <Dropdown.Item
+        key={source.id}
+        id={source.id}
+        value={this.sourceDropdownItemValue(source)}
+      >
+        {source.name}
+      </Dropdown.Item>
+    ))
 
     if (allowDynamicSource) {
       sourceOptions.push(this.dynamicSourceOption)
