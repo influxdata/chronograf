@@ -12,6 +12,8 @@ import MarkdownCell from 'src/shared/components/MarkdownCell'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
 import TimeMachineTables from 'src/flux/components/TimeMachineTables'
 import RawFluxDataTable from 'src/shared/components/TimeMachine/RawFluxDataTable'
+import TableGraphTransform from 'src/shared/components/TableGraphTransform'
+import TableGraphFormat from 'src/shared/components/TableGraphFormat'
 
 // Constants
 import {emptyGraphCopy} from 'src/shared/copy/cell'
@@ -159,7 +161,7 @@ class RefreshingGraph extends PureComponent<Props> {
         cellNote={cellNote}
         cellNoteVisibility={cellNoteVisibility}
       >
-        {({timeSeriesInfluxQL, timeSeriesFlux, rawFluxData, loading}) => {
+        {({timeSeriesInfluxQL, timeSeriesFlux, rawFluxData, loading, uuid}) => {
           if (showRawFluxData) {
             return <RawFluxDataTable csv={rawFluxData} />
           }
@@ -168,7 +170,7 @@ class RefreshingGraph extends PureComponent<Props> {
             case CellType.SingleStat:
               return this.singleStat(timeSeriesInfluxQL, timeSeriesFlux)
             case CellType.Table:
-              return this.table(timeSeriesInfluxQL, timeSeriesFlux)
+              return this.table(timeSeriesInfluxQL, timeSeriesFlux, uuid)
             case CellType.Gauge:
               return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
             default:
@@ -228,7 +230,8 @@ class RefreshingGraph extends PureComponent<Props> {
 
   private table = (
     influxQLData: TimeSeriesServerResponse[],
-    fluxData: FluxTable[]
+    fluxData: FluxTable[],
+    uuid: string
   ): JSX.Element => {
     const {
       colors,
@@ -247,6 +250,7 @@ class RefreshingGraph extends PureComponent<Props> {
       return (
         <TimeMachineTables
           data={data as FluxTable[]}
+          uuid={uuid}
           dataType={dataType}
           colors={colors}
           key={manualRefresh}
@@ -262,19 +266,41 @@ class RefreshingGraph extends PureComponent<Props> {
     }
 
     return (
-      <TableGraph
-        data={data}
+      <TableGraphTransform
+        data={data as TimeSeriesServerResponse[]}
+        uuid={uuid}
         dataType={dataType}
-        colors={colors}
-        key={manualRefresh}
-        tableOptions={tableOptions}
-        fieldOptions={fieldOptions}
-        timeFormat={timeFormat}
-        decimalPlaces={decimalPlaces}
-        editorLocation={editorLocation}
-        handleSetHoverTime={handleSetHoverTime}
-        onUpdateFieldOptions={onUpdateFieldOptions}
-      />
+      >
+        {(transformedData, nextUUID) => (
+          <TableGraphFormat
+            data={transformedData}
+            uuid={nextUUID}
+            dataType={dataType}
+            tableOptions={tableOptions}
+            fieldOptions={fieldOptions}
+            timeFormat={timeFormat}
+            decimalPlaces={decimalPlaces}
+          >
+            {(formattedData, sort, computedFieldOptions, onSort) => (
+              <TableGraph
+                data={formattedData}
+                sort={sort}
+                onSort={onSort}
+                dataType={dataType}
+                colors={colors}
+                key={manualRefresh}
+                tableOptions={tableOptions}
+                fieldOptions={computedFieldOptions}
+                timeFormat={timeFormat}
+                decimalPlaces={decimalPlaces}
+                editorLocation={editorLocation}
+                handleSetHoverTime={handleSetHoverTime}
+                onUpdateFieldOptions={onUpdateFieldOptions}
+              />
+            )}
+          </TableGraphFormat>
+        )}
+      </TableGraphTransform>
     )
   }
 
