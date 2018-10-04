@@ -11,6 +11,7 @@ import {QueryType} from 'src/types'
 
 describe('TimeMachineContainer', () => {
   let initialState: Partial<TimeMachineState>
+  let container: TimeMachineContainer
 
   beforeEach(() => {
     const queryDraft1 = defaultQueryDraft(QueryType.InfluxQL)
@@ -22,10 +23,11 @@ describe('TimeMachineContainer', () => {
     queryDraft2.queryConfig.id = '2'
 
     initialState = {queryDrafts: [queryDraft1, queryDraft2]}
+    container = new TimeMachineContainer()
   })
 
   test('handleAddQuery', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     expect(container.state.queryDrafts).toHaveLength(2)
 
@@ -35,7 +37,7 @@ describe('TimeMachineContainer', () => {
   })
 
   test('handleChooseNamespace', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleChooseNamespace('1', {
       database: 'foo',
@@ -49,7 +51,7 @@ describe('TimeMachineContainer', () => {
   })
 
   test('handleChooseMeasurement', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleChooseMeasurement('1', 'foo')
 
@@ -59,7 +61,7 @@ describe('TimeMachineContainer', () => {
   })
 
   test('handleToggleField', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleToggleField('1', {value: 'a', type: 'field'})
 
@@ -93,7 +95,7 @@ describe('TimeMachineContainer', () => {
       },
     ]
 
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleApplyFuncsToField('1', {
       field: {
@@ -162,7 +164,7 @@ describe('TimeMachineContainer', () => {
       groupBy,
     })
 
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleRemoveFuncs('1', fields)
 
@@ -179,7 +181,7 @@ describe('TimeMachineContainer', () => {
         k2: ['foo'],
       }
 
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleChooseTag('1', {
         key: 'k1',
@@ -195,7 +197,7 @@ describe('TimeMachineContainer', () => {
     })
 
     test("creates a new entry if it's the first key", async () => {
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleChooseTag('1', {
         key: 'k1',
@@ -214,7 +216,7 @@ describe('TimeMachineContainer', () => {
         k1: ['v1'],
       }
 
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleChooseTag('1', {
         key: 'k1',
@@ -240,7 +242,7 @@ describe('TimeMachineContainer', () => {
         },
       })
 
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleGroupByTag('1', 'k1')
 
@@ -262,7 +264,7 @@ describe('TimeMachineContainer', () => {
         },
       })
 
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleGroupByTag('1', 'k1')
 
@@ -274,7 +276,7 @@ describe('TimeMachineContainer', () => {
   })
 
   test('handleToggleTagAcceptance', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleToggleTagAcceptance('1')
 
@@ -284,7 +286,7 @@ describe('TimeMachineContainer', () => {
   })
 
   test('handleGroupByTime', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleGroupByTime('1', '100y')
 
@@ -294,7 +296,7 @@ describe('TimeMachineContainer', () => {
   })
 
   test('handleEditQueryStatus', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
 
     await container.handleEditQueryStatus('1', {success: 'yay'})
 
@@ -305,7 +307,7 @@ describe('TimeMachineContainer', () => {
 
   describe('handleFill', () => {
     it('applies an explicit fill when group by time is used', async () => {
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleGroupByTime('1', '10s')
 
@@ -315,7 +317,7 @@ describe('TimeMachineContainer', () => {
     })
 
     it('updates fill to non-null-string non-number string value', async () => {
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleFill('1', LINEAR)
 
@@ -325,7 +327,7 @@ describe('TimeMachineContainer', () => {
     })
 
     it('updates fill to string integer value', async () => {
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleFill('1', '1337')
 
@@ -335,7 +337,7 @@ describe('TimeMachineContainer', () => {
     })
 
     it('updates fill to string float value', async () => {
-      const container = new TimeMachineContainer(initialState)
+      await container.reset(initialState)
 
       await container.handleFill('1', '1.337')
 
@@ -346,7 +348,8 @@ describe('TimeMachineContainer', () => {
   })
 
   test('handleTimeShift', async () => {
-    const container = new TimeMachineContainer(initialState)
+    await container.reset(initialState)
+
     const shift = {
       quantity: '1',
       unit: 'd',

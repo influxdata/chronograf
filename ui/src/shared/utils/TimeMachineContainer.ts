@@ -65,6 +65,24 @@ import {ColorString, ColorNumber} from 'src/types/colors'
 
 const LOCAL_STORAGE_DELAY_MS = 1000
 
+const DEFAULT_STATE = () => ({
+  script: '',
+  queryDrafts: [],
+  timeRange: DEFAULT_TIME_RANGE,
+  type: CellType.Line,
+  note: '',
+  noteVisibility: NoteVisibility.Default,
+  thresholdsListType: ThresholdType.Text,
+  thresholdsListColors: DEFAULT_THRESHOLDS_LIST_COLORS,
+  gaugeColors: DEFAULT_GAUGE_COLORS,
+  lineColors: DEFAULT_LINE_COLORS,
+  axes: DEFAULT_AXES,
+  tableOptions: DEFAULT_TABLE_OPTIONS,
+  timeFormat: DEFAULT_TIME_FORMAT,
+  decimalPlaces: DEFAULT_DECIMAL_PLACES,
+  fieldOptions: DEFAULT_FIELD_OPTIONS,
+})
+
 export interface TimeMachineState {
   script: string
   queryDrafts: CellQuery[]
@@ -84,38 +102,24 @@ export interface TimeMachineState {
 }
 
 export class TimeMachineContainer extends Container<TimeMachineState> {
+  public state: TimeMachineState = DEFAULT_STATE()
+
   private debouncer: Debouncer = new DefaultDebouncer()
   private localStorageKey?: string
 
-  constructor(
+  public reset = (
     initialState: Partial<TimeMachineState> = {},
     localStorageKey?: string
-  ) {
-    super()
-
-    const localStorageState = getLocalStorage(localStorageKey)
-
-    this.state = {
-      script: '',
-      queryDrafts: [],
-      timeRange: DEFAULT_TIME_RANGE,
-      type: CellType.Line,
-      note: '',
-      noteVisibility: NoteVisibility.Default,
-      thresholdsListType: ThresholdType.Text,
-      thresholdsListColors: DEFAULT_THRESHOLDS_LIST_COLORS,
-      gaugeColors: DEFAULT_GAUGE_COLORS,
-      lineColors: DEFAULT_LINE_COLORS,
-      axes: DEFAULT_AXES,
-      tableOptions: DEFAULT_TABLE_OPTIONS,
-      timeFormat: DEFAULT_TIME_FORMAT,
-      decimalPlaces: DEFAULT_DECIMAL_PLACES,
-      fieldOptions: DEFAULT_FIELD_OPTIONS,
-      ...localStorageState,
-      ...initialState,
-    }
+  ): Promise<void> => {
+    const localStorageState = getLocalStorage(localStorageKey) || {}
 
     this.localStorageKey = localStorageKey
+
+    return this.setAndPersistState({
+      ...DEFAULT_STATE(),
+      ...localStorageState,
+      ...initialState,
+    })
   }
 
   public handleChangeScript = (script: string) => {

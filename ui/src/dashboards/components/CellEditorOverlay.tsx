@@ -11,6 +11,7 @@ import CEOHeader from 'src/dashboards/components/CEOHeader'
 // Utils
 import {getDeep} from 'src/utils/wrappers'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {initialStateFromCell} from 'src/shared/utils/timeMachine'
 
 // Actions
 import {editCellQueryStatus} from 'src/dashboards/actions'
@@ -56,6 +57,7 @@ interface ConnectedProps {
   thresholdsListType: ThresholdType
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
+  onResetTimeMachine: TimeMachineContainer['reset']
 }
 
 interface PassedProps {
@@ -98,6 +100,13 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   public componentDidMount() {
+    const {cell, dashboardTimeRange, onResetTimeMachine} = this.props
+
+    onResetTimeMachine({
+      ...initialStateFromCell(cell),
+      timeRange: dashboardTimeRange,
+    })
+
     this.handleResetFocus()
   }
 
@@ -324,6 +333,7 @@ const ConnectedCellEditorOverlay = (props: PassedProps) => {
           thresholdsListType={timeMachineContainer.state.thresholdsListType}
           gaugeColors={timeMachineContainer.state.gaugeColors}
           lineColors={timeMachineContainer.state.lineColors}
+          onResetTimeMachine={timeMachineContainer.reset}
         />
       )}
     </Subscribe>

@@ -2,7 +2,8 @@ import 'babel-polyfill'
 
 import React, {PureComponent} from 'react'
 import {render} from 'react-dom'
-import {Provider} from 'react-redux'
+import {Provider as ReduxProvider} from 'react-redux'
+import {Provider as UnstatedProvider} from 'unstated'
 import {Router, Route, useRouterHistory} from 'react-router'
 import {createHistory} from 'history'
 import {syncHistoryWithStore} from 'react-router-redux'
@@ -122,52 +123,69 @@ class Root extends PureComponent<{}, State> {
 
   public render() {
     return this.state.ready ? (
-      <Provider store={store}>
-        <Router history={history}>
-          <Route path="/" component={UserIsAuthenticated(CheckSources)} />
-          <Route path="/login" component={UserIsNotAuthenticated(Login)} />
-          <Route path="/purgatory" component={UserIsAuthenticated(Purgatory)} />
-          <Route component={UserIsAuthenticated(App)}>
-            <Route path="/logs" component={LogsPage} />
-          </Route>
-          <Route
-            path="/sources/new"
-            component={UserIsAuthenticated(OnboardingWizard)}
-          />
-          <Route path="/sources/:sourceID" component={UserIsAuthenticated(App)}>
-            <Route component={CheckSources}>
-              <Route path="status" component={StatusPage} />
-              <Route path="hosts" component={HostsPage} />
-              <Route path="hosts/:hostID" component={HostPage} />
-              <Route
-                path="chronograf/data-explorer"
-                component={DataExplorerPage}
-              />
-              <Route path="dashboards" component={DashboardsPage} />
-              <Route path="dashboards/:dashboardID" component={DashboardPage} />
-              <Route path="alerts" component={AlertsApp} />
-              <Route path="alert-rules" component={KapacitorRulesPage} />
-              <Route path="alert-rules/:ruleID" component={KapacitorRulePage} />
-              <Route path="alert-rules/new" component={KapacitorRulePage} />
-              <Route path="tickscript/new" component={TickscriptPage} />
-              <Route path="tickscript/:ruleID" component={TickscriptPage} />
-              <Route path="kapacitors/new" component={KapacitorPage} />
-              <Route path="kapacitors/:id/edit" component={KapacitorPage} />
-              <Route
-                path="kapacitors/:id/edit:hash"
-                component={KapacitorPage}
-              />
-              <Route
-                path="admin-chronograf/:tab"
-                component={AdminChronografPage}
-              />
-              <Route path="admin-influxdb/:tab" component={AdminInfluxDBPage} />
-              <Route path="manage-sources" component={ManageSources} />
+      <ReduxProvider store={store}>
+        <UnstatedProvider>
+          <Router history={history}>
+            <Route path="/" component={UserIsAuthenticated(CheckSources)} />
+            <Route path="/login" component={UserIsNotAuthenticated(Login)} />
+            <Route
+              path="/purgatory"
+              component={UserIsAuthenticated(Purgatory)}
+            />
+            <Route component={UserIsAuthenticated(App)}>
+              <Route path="/logs" component={LogsPage} />
             </Route>
-          </Route>
-          <Route path="*" component={NotFound} />
-        </Router>
-      </Provider>
+            <Route
+              path="/sources/new"
+              component={UserIsAuthenticated(OnboardingWizard)}
+            />
+            <Route
+              path="/sources/:sourceID"
+              component={UserIsAuthenticated(App)}
+            >
+              <Route component={CheckSources}>
+                <Route path="status" component={StatusPage} />
+                <Route path="hosts" component={HostsPage} />
+                <Route path="hosts/:hostID" component={HostPage} />
+                <Route
+                  path="chronograf/data-explorer"
+                  component={DataExplorerPage}
+                />
+                <Route path="dashboards" component={DashboardsPage} />
+                <Route
+                  path="dashboards/:dashboardID"
+                  component={DashboardPage}
+                />
+                <Route path="alerts" component={AlertsApp} />
+                <Route path="alert-rules" component={KapacitorRulesPage} />
+                <Route
+                  path="alert-rules/:ruleID"
+                  component={KapacitorRulePage}
+                />
+                <Route path="alert-rules/new" component={KapacitorRulePage} />
+                <Route path="tickscript/new" component={TickscriptPage} />
+                <Route path="tickscript/:ruleID" component={TickscriptPage} />
+                <Route path="kapacitors/new" component={KapacitorPage} />
+                <Route path="kapacitors/:id/edit" component={KapacitorPage} />
+                <Route
+                  path="kapacitors/:id/edit:hash"
+                  component={KapacitorPage}
+                />
+                <Route
+                  path="admin-chronograf/:tab"
+                  component={AdminChronografPage}
+                />
+                <Route
+                  path="admin-influxdb/:tab"
+                  component={AdminInfluxDBPage}
+                />
+                <Route path="manage-sources" component={ManageSources} />
+              </Route>
+            </Route>
+            <Route path="*" component={NotFound} />
+          </Router>
+        </UnstatedProvider>
+      </ReduxProvider>
     ) : (
       <div className="page-spinner" />
     )
