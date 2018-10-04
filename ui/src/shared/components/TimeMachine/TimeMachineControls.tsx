@@ -17,7 +17,7 @@ import * as SourcesModels from 'src/types/sources'
 import {Template, QueryType} from 'src/types'
 
 interface Props {
-  isFluxSourceSelected: boolean
+  isFluxSelected: boolean
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
   script: string
@@ -44,7 +44,7 @@ const TimeMachineControls: SFC<Props> = ({
   templates,
   timeRange,
   toggleFlux,
-  isFluxSourceSelected,
+  isFluxSelected,
   isViewingRawData,
   autoRefreshDuration,
   onChangeAutoRefreshDuration,
@@ -63,12 +63,12 @@ const TimeMachineControls: SFC<Props> = ({
         queries={queries}
         toggleFlux={toggleFlux}
         sourceSupportsFlux={sourceSupportsFlux}
-        isFluxSourceSelected={isFluxSourceSelected}
+        isFluxSelected={isFluxSelected}
         onChangeSource={onChangeSource}
         isDynamicSourceSelected={isDynamicSourceSelected}
         onSelectDynamicSource={onSelectDynamicSource}
       />
-      {isFluxSourceSelected && (
+      {isFluxSelected && (
         <div className="time-machine-vis--raw-toggle">
           <SlideToggle
             active={isViewingRawData}
@@ -81,7 +81,7 @@ const TimeMachineControls: SFC<Props> = ({
       <CSVExporter
         script={script}
         source={source}
-        isFluxSourceSelected={isFluxSourceSelected}
+        isFluxSelected={isFluxSelected}
         queries={buildQueries(queries, timeRange)}
         templates={templates}
         timeRange={timeRange}

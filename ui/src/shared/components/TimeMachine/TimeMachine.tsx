@@ -174,7 +174,7 @@ class TimeMachine extends PureComponent<Props, State> {
       console.error('Could not get function suggestions: ', error)
     }
 
-    if (this.isFluxSourceSelected) {
+    if (this.isFluxSelected) {
       try {
         this.debouncedASTResponse(script)
       } catch (error) {
@@ -231,7 +231,7 @@ class TimeMachine extends PureComponent<Props, State> {
           source={this.source}
           toggleFlux={this.toggleFlux}
           sources={this.formattedSources}
-          isFluxSourceSelected={this.isFluxSourceSelected}
+          isFluxSelected={this.isFluxSelected}
           isViewingRawData={isViewingRawData}
           script={script}
           sourceSupportsFlux={this.sourceSupportsFlux}
@@ -282,7 +282,7 @@ class TimeMachine extends PureComponent<Props, State> {
     const {activeEditorTab} = this.state
 
     if (activeEditorTab === CEOTabs.Queries) {
-      if (this.isFluxSourceSelected) {
+      if (this.isFluxSelected) {
         return this.fluxBuilder
       }
 
@@ -365,7 +365,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }))
   }
 
-  private get isFluxSourceSelected(): boolean {
+  private get isFluxSelected(): boolean {
     const {queryDrafts} = this.props
     return (
       !!(getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) &&
@@ -430,7 +430,7 @@ class TimeMachine extends PureComponent<Props, State> {
     const {script, timeRange, queryDrafts} = this.props
     const id = _.get(queryDrafts, 'id', '')
 
-    if (this.isFluxSourceSelected) {
+    if (this.isFluxSelected) {
       if (!this.validAST) {
         return []
       }
@@ -541,7 +541,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private handleSelectDynamicSource = (): void => {
-    const type = this.isFluxSourceSelected ? QueryType.Flux : QueryType.InfluxQL
+    const type = this.isFluxSelected ? QueryType.Flux : QueryType.InfluxQL
     this.updateQueryDraftsSource(null, type)
   }
 
@@ -790,10 +790,18 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private toggleFlux = (): void => {
-    if (this.isFluxSourceSelected) {
-      this.updateQueryDraftsSource(null, QueryType.InfluxQL)
+    if (this.isFluxSelected) {
+      if (this.useDynamicSource) {
+        this.updateQueryDraftsSource(null, QueryType.InfluxQL)
+      } else {
+        this.updateQueryDraftsSource(this.source, QueryType.InfluxQL)
+      }
     } else {
-      this.updateQueryDraftsSource(null, QueryType.Flux)
+      if (this.useDynamicSource) {
+        this.updateQueryDraftsSource(null, QueryType.Flux)
+      } else {
+        this.updateQueryDraftsSource(this.source, QueryType.Flux)
+      }
     }
   }
 }

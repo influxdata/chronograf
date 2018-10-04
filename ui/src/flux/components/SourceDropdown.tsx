@@ -102,26 +102,6 @@ class SourceDropdown extends PureComponent<Props> {
     }
   }
 
-  // private createSourceItem(source: Source, type: QueryType): JSX.Element {
-  //   let id = source.id
-  //   let sourceType = 'InfluxQL'
-
-  //   if (type === QueryType.Flux) {
-  //     id = `${source.id}-flux`
-  //     sourceType = 'Flux'
-  //   }
-
-  //   return (
-  //     <Dropdown.Item
-  //       key={id}
-  //       id={id}
-  //       value={this.sourceDropdownItemValue(source, type)}
-  //     >
-  //       {`${source.name} (${sourceType})`}
-  //     </Dropdown.Item>
-  //   )
-  // }
-
   private get selectedID(): string {
     const {source, allowDynamicSource, isDynamicSourceSelected} = this.props
 

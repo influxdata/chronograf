@@ -24,7 +24,7 @@ interface Props {
   source: Source
   timeRange: TimeRange
 
-  isFluxSourceSelected: boolean
+  isFluxSelected: boolean
   onNotify: typeof notify
 }
 
@@ -54,12 +54,12 @@ class CSVExporter extends PureComponent<Props, State> {
   }
 
   private handleClick = async (): Promise<void> => {
-    const {isFluxSourceSelected, onNotify} = this.props
+    const {isFluxSelected, onNotify} = this.props
 
     this.setState({buttonStatus: ComponentStatus.Loading})
 
     try {
-      if (isFluxSourceSelected) {
+      if (isFluxSelected) {
         await this.downloadFluxCSV()
       } else {
         await this.downloadInfluxQLCSV()

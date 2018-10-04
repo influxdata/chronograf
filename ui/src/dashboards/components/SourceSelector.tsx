@@ -14,7 +14,7 @@ import {QueryType} from 'src/types'
 interface Props {
   source: SourcesModels.Source
   sources: SourcesModels.SourceOption[]
-  isFluxSourceSelected: boolean
+  isFluxSelected: boolean
   sourceSupportsFlux: boolean
   queries: QueriesModels.QueryConfig[]
   isDynamicSourceSelected: boolean
@@ -28,7 +28,7 @@ const SourceSelector: SFC<Props> = ({
   sources = [],
   queries,
   toggleFlux,
-  isFluxSourceSelected,
+  isFluxSelected,
   onChangeSource,
   sourceSupportsFlux,
   isDynamicSourceSelected,
@@ -38,7 +38,7 @@ const SourceSelector: SFC<Props> = ({
     return <div className="source-selector" />
   }
 
-  const type = isFluxSourceSelected ? QueryType.Flux : QueryType.InfluxQL
+  const type = isFluxSelected ? QueryType.Flux : QueryType.InfluxQL
 
   return (
     <div className="source-selector">
@@ -59,7 +59,7 @@ const SourceSelector: SFC<Props> = ({
           titleText="Flux"
           value="Flux"
           onClick={toggleFlux}
-          active={isFluxSourceSelected}
+          active={isFluxSelected}
           disabled={!sourceSupportsFlux}
         >
           Flux
@@ -69,7 +69,7 @@ const SourceSelector: SFC<Props> = ({
           titleText="InfluxQL"
           value="InfluxQL"
           onClick={toggleFlux}
-          active={!isFluxSourceSelected}
+          active={!isFluxSelected}
           disabled={!sourceSupportsFlux}
         >
           InfluxQL
