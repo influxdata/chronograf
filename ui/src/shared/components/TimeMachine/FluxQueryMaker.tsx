@@ -128,6 +128,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
           <Button
             key={0}
             text={'Submit'}
+            titleText={'Submit Flux Query (Ctrl-Enter)'}
             onClick={this.handleSubmitScript}
             size={ComponentSize.ExtraSmall}
             color={ComponentColor.Primary}
@@ -143,6 +144,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
             visibility={visibility}
             suggestions={suggestions}
             onChangeScript={this.handleChangeDraftScript}
+            onSubmitScript={this.handleSubmitScript}
           />
         ),
       },
