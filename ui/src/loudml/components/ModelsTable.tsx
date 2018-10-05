@@ -3,6 +3,7 @@ import {Link} from 'react-router'
 
 import ModelsRow from 'src/loudml/components/ModelsRow'
 import { TimeRange, Model, Job } from 'src/loudml/types/model';
+import { Dashboard } from 'src/types';
 
 interface Props {
     source: {id: string}
@@ -16,7 +17,10 @@ interface Props {
     onStopTrain: (name: string) => void
     onForecast: (name: string, timeRange: TimeRange) => void
     onStopForecast: (name: string) => void
-    onSelectModelGraph: (model: Model) => void
+    onViewDashboard: (dashboard: Dashboard) => void
+    onNewDashboard: (model: Model) => void
+    onAddToDashboard: (model: Model, dashboard: Dashboard) => void
+    dashboards: Dashboard[]
 }
 
 class ModelsTable extends PureComponent<Props, {}> {
@@ -45,7 +49,10 @@ class ModelsTable extends PureComponent<Props, {}> {
             onStopTrain,
             onForecast,
             onStopForecast,
-            onSelectModelGraph,
+            onViewDashboard,
+            onNewDashboard,
+            onAddToDashboard,
+            dashboards,
         } = this.props
     
         return (
@@ -74,7 +81,10 @@ class ModelsTable extends PureComponent<Props, {}> {
                                 onStopTrain={onStopTrain}
                                 onForecast={onForecast}
                                 onStopForecast={onStopForecast}
-                                onSelectModelGraph={onSelectModelGraph}
+                                onViewDashboard={onViewDashboard}
+                                onNewDashboard={onNewDashboard}
+                                onAddToDashboard={onAddToDashboard}
+                                dashboards={dashboards}
                             />
                         )
                     }, this)}

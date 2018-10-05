@@ -2,12 +2,13 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import OnClickOutside from 'shared/components/OnClickOutside'
+import FancyScrollbar from 'shared/components/FancyScrollbar'
 
-import {MODEL_GRAPHS} from 'src/loudml/constants/graph'
+import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
 
 import 'src/loudml/styles/graph.scss'
 
-class DashboardDropdown extends Component {
+export class DashboardDropdown extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -15,59 +16,114 @@ class DashboardDropdown extends Component {
         }
     }
 
+    render() {
+        const {isOpen} = this.state
+        const {dashboards} = this.props
+
+        return (
+            <div className={classnames(
+                'dropdown', {
+                    'table--show-on-row-hover': !isOpen,
+                    open: isOpen,
+                })}
+                onClick={this.toggleMenu}>
+                <div
+                    className="btn btn-xs btn-default dropdown-toggle dropdown-graphml"
+                >
+                    <span className="icon dash-h" />
+                    <span className="caret" />
+                </div>
+                {isOpen ? (
+                <ul className="dropdown-menu">
+                    <FancyScrollbar
+                        autoHide={false}
+                        autoHeight={true}
+                        maxHeight={DROPDOWN_MENU_MAX_HEIGHT}
+                        >
+                        {this.basicActionItem()}
+                        {dashboards.length ? (
+                            <li className="dropdown-header" data-test={'addTo'}>
+                                Add to...
+                            </li>) : null}
+                        {dashboards.map(item => (
+                            <li className="dropdown-item" key={item.id}>
+                                <a
+                                    href="#"
+                                    style={{whiteSpace: 'nowrap'}}
+                                    onClick={this.handleSelection(item)}>
+                                    <span className="icon dash-h"></span> {item.name}
+                                </a>
+                            </li>
+                        ))}
+                    </FancyScrollbar>
+                </ul>) : null}
+            </div>
+        )
+    }
+
+    basicActionItem = () => {
+        const {
+            model: {settings: {name}},
+            dashboards
+        } = this.props
+
+        const dashboard = dashboards.find(d => (d.name === name))
+        if (dashboard) {
+            return (
+                <li className="dropdown-item" data-test="view">
+                    <a href="#" onClick={this.handleView(dashboard)}>
+                        View in dashboard
+                    </a>
+                </li>
+            )
+        }
+
+        return (
+            <li className="dropdown-item" data-test="new">
+                <a href="#" onClick={this.handleNew}>
+                    New dashboard
+                </a>
+            </li>
+        )
+    }
+
     handleClickOutside() {
         this.setState({isOpen: false})
     }
 
-    handleSelection = graph => () => {
-        const {model, onChoose} = this.props
+    handleSelection = dashboard => () => {
+        const {model, onAddTo} = this.props
 
-        onChoose(model, graph)
+        onAddTo(model, dashboard)
         this.setState({isOpen: false})
     }
 
     toggleMenu = () => this.setState({isOpen: !this.state.isOpen})
 
-    render() {
-        const {isOpen} = this.state
+    handleView = dashboard => () => {
+        const {onView} = this.props
 
-        return (
-            <div className="dashboard-dropdown">
-                <div className={classnames(
-                    'dropdown', {
-                        'table--show-on-row-hover': !isOpen,
-                        open: isOpen,
-                    })}>
-                    <div
-                        className="btn btn-xs btn-default dropdown-toggle dropdown-graphml"
-                        onClick={this.toggleMenu}
-                    >
-                        <span className="icon dash-h" />
-                        <span className="caret" />
-                    </div>
-                    <ul className="dropdown-menu">
-                        {MODEL_GRAPHS.map(item => (
-                        <li className="dropdown-item" key={item.menuOption}>
-                            <a
-                                href="#"
-                                style={{whiteSpace: 'nowrap'}}
-                                onClick={this.handleSelection(item.graph)}>
-                                {item.menuOption}
-                            </a>
-                        </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        )
+        onView(dashboard)
+        this.setState({isOpen: false})
     }
+
+    handleNew = () => {
+        const {model, onNew} = this.props
+
+        onNew(model)
+        this.setState({isOpen: false})
+    }
+    
 }
 
-const {shape, func} = PropTypes
+const {shape, arrayOf, func} = PropTypes
 
 DashboardDropdown.propTypes = {
     model: shape().isRequired,
-    onChoose: func.isRequired,
+    dashboards: arrayOf(shape()),
+    onAddTo: func.isRequired,
+    onNew: func.isRequired,
+    onView: func.isRequired,
 }
 
 export default OnClickOutside(DashboardDropdown)

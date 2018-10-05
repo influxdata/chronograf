@@ -8,6 +8,7 @@ import ModelActions from 'src/loudml/components/ModelActions'
 import DashboardDropdown from 'src/loudml/components/DashboardDropdown'
 
 import 'src/loudml/styles/loudml.scss'
+import { Dashboard } from 'src/types';
 
 interface Props {    
     source: {id: string}
@@ -20,8 +21,11 @@ interface Props {
     onDelete: (name: string) => void
     onForecast: (name: string, timeRange: TimeRange) => void
     onStopForecast: (name: string) => void
-    onSelectModelGraph: (model: Model) => void
     onClone: (name: string) => void
+    onViewDashboard: (dashboard: Dashboard) => void
+    onNewDashboard: (model: Model) => void
+    onAddToDashboard: (model: Model, dashboard: Dashboard) => void
+    dashboards: Dashboard[]
 }
 
 class ModelsRow extends PureComponent<Props, {}> {
@@ -47,7 +51,10 @@ class ModelsRow extends PureComponent<Props, {}> {
             onStopTrain,
             onForecast,
             onStopForecast,
-            onSelectModelGraph,
+            onViewDashboard,
+            onNewDashboard,
+            onAddToDashboard,
+            dashboards,
         } = this.props
 
         return (
@@ -76,7 +83,10 @@ class ModelsRow extends PureComponent<Props, {}> {
                         </button>
                         <DashboardDropdown
                             model={model}
-                            onChoose={onSelectModelGraph}
+                            dashboards={dashboards}
+                            onView={onViewDashboard}
+                            onNew={onNewDashboard}
+                            onAddTo={onAddToDashboard}
                             />
                     </div>
                 </td>
