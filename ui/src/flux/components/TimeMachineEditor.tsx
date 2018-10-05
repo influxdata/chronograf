@@ -24,6 +24,7 @@ interface Props {
   visibility: string
   status: Status
   onChangeScript: OnChangeScript
+  onSubmitScript: () => void
   suggestions: Suggestion[]
   setWasFuncSelectorClicked: (val: boolean) => void
 }
@@ -185,7 +186,7 @@ class TimeMachineEditor extends PureComponent<Props, State> {
   private onTouchStart = () => {}
 
   private handleKeyUp = (__, e: KeyboardEvent) => {
-    const {ctrlKey, metaKey, key} = e
+    const {ctrlKey, key} = e
 
     if (ctrlKey && key === ' ') {
       this.showAutoComplete()
@@ -193,7 +194,12 @@ class TimeMachineEditor extends PureComponent<Props, State> {
       return
     }
 
-    if (ctrlKey || metaKey || EXCLUDED_KEYS.includes(key)) {
+    if (ctrlKey && key === 'Enter') {
+      this.props.onSubmitScript()
+      return
+    }
+
+    if (ctrlKey || EXCLUDED_KEYS.includes(key)) {
       return
     }
 
