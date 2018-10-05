@@ -9,7 +9,7 @@
 
 1.  [#6](https://github.com/regel/chronograf/pull/6): resize loud ML notification icon
 1.  [#8](https://github.com/regel/chronograf/pull/8): visit loudml.io question mark
-1.  [#12](https://github.com/regel/chronograf/issues/12): Add to dashboard : more UX options
+1.  [#21](https://github.com/regel/chronograf/pull/21): Add to dashboard : more UX options
 
 ### Bug Fixes
 
