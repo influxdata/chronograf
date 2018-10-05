@@ -473,7 +473,7 @@ export const cellSupportsAnnotations = cellType => {
     CellType.Line,
     CellType.Stacked,
     CellType.StepPlot,
-    // CellType.Error,
+    CellType.Error,
   ]
   return !!supportedTypes.find(type => type === cellType)
 }
