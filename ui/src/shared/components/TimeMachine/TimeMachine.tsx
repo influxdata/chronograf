@@ -48,6 +48,7 @@ interface ConnectedProps {
   script: string
   draftScript: string
   queryDrafts: CellQuery[]
+  timeMachineProportions: number[]
   onChangeScript: (script: string) => void
   onChangeDraftScript: (draftScript: string) => void
   onUpdateQueryDrafts: TimeMachineContainer['handleUpdateQueryDrafts']
@@ -55,6 +56,7 @@ interface ConnectedProps {
   onDeleteQuery: (queryID: string) => void
   timeRange: TimeRange
   onUpdateTimeRange: (timeRange: TimeRange) => void
+  onSetTimeMachineProportions: (fluxProportions: number[]) => void
 }
 
 interface PassedProps {
@@ -128,8 +130,15 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {timeRange, templates, script} = this.props
+    const {
+      timeRange,
+      templates,
+      script,
+      timeMachineProportions,
+      onSetTimeMachineProportions,
+    } = this.props
     const {autoRefreshDuration, isViewingRawData} = this.state
+    const [topSize, bottomSize] = timeMachineProportions
 
     const horizontalDivisions = [
       {
@@ -139,7 +148,7 @@ class TimeMachine extends PureComponent<Props, State> {
         menuOptions: [],
         render: this.renderVisualization,
         headerOrientation: HANDLE_HORIZONTAL,
-        size: 0.33,
+        size: topSize,
       },
       {
         name: '',
@@ -148,7 +157,7 @@ class TimeMachine extends PureComponent<Props, State> {
         menuOptions: [],
         render: this.renderEditorBottom,
         headerOrientation: HANDLE_HORIZONTAL,
-        size: 0.67,
+        size: bottomSize,
       },
     ]
 
@@ -179,6 +188,7 @@ class TimeMachine extends PureComponent<Props, State> {
           <Threesizer
             orientation={HANDLE_HORIZONTAL}
             divisions={horizontalDivisions}
+            onResize={onSetTimeMachineProportions}
           />
         </div>
       </div>
@@ -554,12 +564,16 @@ const ConnectedTimeMachine = (props: PassedProps) => {
             draftScript={state.draftScript}
             queryDrafts={state.queryDrafts}
             timeRange={state.timeRange}
+            timeMachineProportions={container.state.timeMachineProportions}
             onUpdateTimeRange={container.handleUpdateTimeRange}
             onChangeScript={container.handleChangeScript}
             onChangeDraftScript={container.handleUpdateDraftScript}
             onUpdateQueryDrafts={container.handleUpdateQueryDrafts}
             onAddQuery={container.handleAddQuery}
             onDeleteQuery={container.handleDeleteQuery}
+            onSetTimeMachineProportions={
+              container.handleSetTimeMachineProportions
+            }
           />
         )
       }}

@@ -1,4 +1,9 @@
-import React, {Component, ReactElement, MouseEvent, CSSProperties} from 'react'
+import React, {
+  PureComponent,
+  ReactElement,
+  MouseEvent,
+  CSSProperties,
+} from 'react'
 import classnames from 'classnames'
 import uuid from 'uuid'
 import _ from 'lodash'
@@ -6,6 +11,7 @@ import _ from 'lodash'
 import Division from 'src/shared/components/threesizer/Division'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {MenuItem} from 'src/shared/components/threesizer/DivisionMenu'
+import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
 import {
   HANDLE_NONE,
@@ -27,7 +33,14 @@ interface State {
   activeHandleID: string
   divisions: DivisionState[]
   dragDirection: string
-  dragEvent: any
+  dragEvent: DragEvent
+}
+
+interface DragEvent {
+  mouseX: number
+  mouseY: number
+  percentX: number
+  percentY: number
 }
 
 interface DivisionProps {
@@ -50,24 +63,24 @@ interface Props {
   divisions: DivisionProps[]
   orientation: string
   containerClass?: string
+  onResize: (sizes: number[]) => void
 }
 
 @ErrorHandling
-class Threesizer extends Component<Props, State> {
+class Threesizer extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     orientation: HANDLE_HORIZONTAL,
     containerClass: '',
   }
 
   private containerRef: HTMLElement
-  private percentChangeX: number = 0
-  private percentChangeY: number = 0
+  private debouncer: Debouncer = new DefaultDebouncer()
 
   constructor(props) {
     super(props)
     this.state = {
       activeHandleID: null,
-      divisions: this.initialDivisions,
+      divisions: this.divisions,
       dragEvent: initialDragEvent,
       dragDirection: '',
     }
@@ -84,43 +97,41 @@ class Threesizer extends Component<Props, State> {
   }
 
   public componentDidUpdate(__, prevState) {
-    const {dragEvent} = this.state
+    const {dragEvent, divisions} = this.state
     const {orientation} = this.props
+
+    const stateDivisionSizes = divisions.map(d => d.size)
+    const propDivisionSizes = this.props.divisions.map(d => d.size)
+
+    const updateDivisions = this.state.divisions.map((d, i) => ({
+      ...d,
+      size: this.props.divisions[i].size,
+    }))
+
+    if (!_.isEqual(propDivisionSizes, stateDivisionSizes)) {
+      this.setState({
+        divisions: updateDivisions,
+      })
+    }
 
     if (_.isEqual(dragEvent, prevState.dragEvent)) {
       return
     }
 
-    this.percentChangeX = this.pixelsToPercentX(
-      prevState.dragEvent.mouseX,
-      dragEvent.mouseX
-    )
-
-    this.percentChangeY = this.pixelsToPercentY(
-      prevState.dragEvent.mouseY,
-      dragEvent.mouseY
-    )
-
     const {percentX, percentY} = dragEvent
     const {dragEvent: prevDrag} = prevState
 
-    if (orientation === HANDLE_VERTICAL) {
-      const left = percentX < prevDrag.percentX
-
-      if (left) {
-        return this.move.left()
-      }
-
-      return this.move.right()
+    if (orientation === HANDLE_VERTICAL && percentX < prevDrag.percentX) {
+      this.move.left()
+    } else if (orientation === HANDLE_VERTICAL) {
+      this.move.right()
+    } else if (percentY < prevDrag.percentY) {
+      this.move.up()
+    } else {
+      this.move.down()
     }
 
-    const up = percentY < prevDrag.percentY
-
-    if (up) {
-      return this.move.up()
-    }
-
-    return this.move.down()
+    this.handleResize()
   }
 
   public render() {
@@ -187,16 +198,38 @@ class Threesizer extends Component<Props, State> {
     })
   }
 
-  private get initialDivisions() {
+  private get divisions() {
     const {divisions} = this.props
 
-    const size = 1 / divisions.length
-    return divisions.map(d => ({
-      ...d,
-      id: uuid.v4(),
-      size: d.size || size,
-      handlePixels: d.handlePixels || HANDLE_PIXELS,
-    }))
+    const defaultSize = 1 / divisions.length
+
+    return divisions.map(d => {
+      let size = defaultSize
+      if (d.size || d.size === 0) {
+        size = d.size
+      }
+
+      return {
+        ...d,
+        id: uuid.v4(),
+        size,
+        handlePixels: d.handlePixels || HANDLE_PIXELS,
+      }
+    })
+  }
+
+  private handleResize = () => {
+    this.debouncer.call(this.handleResizeImmediate, 100)
+  }
+
+  private handleResizeImmediate = () => {
+    const {onResize} = this.props
+
+    if (!onResize) {
+      return
+    }
+
+    onResize(this.state.divisions.map(d => d.size))
   }
 
   private handleDoubleClick = (id: string): void => {
@@ -212,15 +245,15 @@ class Threesizer extends Component<Props, State> {
       return this.equalize()
     }
 
-    const divisions = this.state.divisions.map(d => {
+    const divisionSizes = this.state.divisions.map(d => {
       if (d.id !== id) {
-        return {...d, size: 0}
+        return 0
       }
 
-      return {...d, size: 1}
+      return 1
     })
 
-    this.setState({divisions})
+    this.props.onResize(divisionSizes)
   }
 
   private handleMaximize = (id: string): void => {
@@ -269,11 +302,11 @@ class Threesizer extends Component<Props, State> {
 
   private equalize = () => {
     const denominator = this.state.divisions.length
-    const divisions = this.state.divisions.map(d => {
-      return {...d, size: 1 / denominator}
+    const divisionSizes = this.state.divisions.map(__ => {
+      return 1 / denominator
     })
 
-    this.setState({divisions})
+    this.props.onResize(divisionSizes)
   }
 
   private handleStartDrag = (activeHandleID, e: MouseEvent<HTMLElement>) => {
@@ -282,10 +315,12 @@ class Threesizer extends Component<Props, State> {
   }
 
   private handleStopDrag = () => {
-    this.setState({activeHandleID: '', dragEvent: initialDragEvent})
+    if (this.state.activeHandleID) {
+      this.setState({activeHandleID: '', dragEvent: initialDragEvent})
+    }
   }
 
-  private mousePosWithinContainer = (e: MouseEvent<HTMLElement>) => {
+  private mousePosWithinContainer = (e: MouseEvent<HTMLElement>): DragEvent => {
     const {pageY, pageX} = e
     const {top, left, width, height} = this.containerRef.getBoundingClientRect()
 
@@ -303,28 +338,6 @@ class Threesizer extends Component<Props, State> {
     }
   }
 
-  private pixelsToPercentX = (startValue, endValue) => {
-    if (!startValue || !endValue) {
-      return 0
-    }
-
-    const delta = Math.abs(startValue - endValue)
-    const {width} = this.containerRef.getBoundingClientRect()
-
-    return delta / width
-  }
-
-  private pixelsToPercentY = (startValue, endValue) => {
-    if (!startValue || !endValue) {
-      return 0
-    }
-
-    const delta = startValue - endValue
-    const {height} = this.containerRef.getBoundingClientRect()
-
-    return Math.abs(delta / height)
-  }
-
   private handleDrag = (e: MouseEvent<HTMLElement>) => {
     const {activeHandleID} = this.state
     if (!activeHandleID) {
@@ -332,6 +345,7 @@ class Threesizer extends Component<Props, State> {
     }
 
     const dragEvent = this.mousePosWithinContainer(e)
+
     this.setState({dragEvent})
   }
 
@@ -352,9 +366,12 @@ class Threesizer extends Component<Props, State> {
   }
 
   private up = activePosition => () => {
-    const divisions = this.state.divisions.map((d, i) => {
+    const {
+      dragEvent: {percentY},
+    } = this.state
+    const divisionSizes = this.state.divisions.map((d, i) => {
       if (!activePosition) {
-        return d
+        return d.size
       }
 
       const first = i === 0
@@ -364,30 +381,33 @@ class Threesizer extends Component<Props, State> {
       if (first && !before) {
         const second = this.state.divisions[1]
         if (second && second.size === 0) {
-          return {...d, size: this.shorter(d.size)}
+          return this.enforceMin(percentY)
         }
 
-        return {...d}
+        return d.size
       }
 
       if (before) {
-        return {...d, size: this.shorter(d.size)}
+        return this.enforceMin(percentY)
       }
 
       if (current) {
-        return {...d, size: this.taller(d.size)}
+        return this.enforceMax(1 - percentY)
       }
 
-      return {...d}
+      return d.size
     })
 
-    this.setState({divisions})
+    this.props.onResize(divisionSizes)
   }
 
   private left = activePosition => () => {
-    const divisions = this.state.divisions.map((d, i) => {
+    const {
+      dragEvent: {percentX},
+    } = this.state
+    const divisionSizes = this.state.divisions.map((d, i) => {
       if (!activePosition) {
-        return d
+        return d.size
       }
 
       const first = i === 0
@@ -397,38 +417,41 @@ class Threesizer extends Component<Props, State> {
       if (first && !before) {
         const second = this.state.divisions[1]
         if (second && second.size === 0) {
-          return {...d, size: this.thinner(d.size)}
+          return this.enforceMin(percentX)
         }
 
-        return {...d}
+        return d.size
       }
 
       if (before) {
-        return {...d, size: this.thinner(d.size)}
+        return this.enforceMin(percentX)
       }
 
       if (active) {
-        return {...d, size: this.fatter(d.size)}
+        return this.enforceMax(1 - percentX)
       }
 
-      return {...d}
+      return d.size
     })
 
-    this.setState({divisions})
+    this.props.onResize(divisionSizes)
   }
 
   private right = activePosition => () => {
-    const divisions = this.state.divisions.map((d, i, divs) => {
+    const {
+      dragEvent: {percentX},
+    } = this.state
+    const divisionSizes = this.state.divisions.map((d, i, divs) => {
       const before = i === activePosition - 1
       const active = i === activePosition
       const after = i === activePosition + 1
 
       if (before) {
-        return {...d, size: this.fatter(d.size)}
+        return this.enforceMax(percentX)
       }
 
       if (active) {
-        return {...d, size: this.thinner(d.size)}
+        return this.enforceMin(1 - percentX)
       }
 
       if (after) {
@@ -436,65 +459,49 @@ class Threesizer extends Component<Props, State> {
         const left = _.get(divs, leftIndex, {size: 'none'})
 
         if (left && left.size === 0) {
-          return {...d, size: this.thinner(d.size)}
+          return this.enforceMin(1 - percentX)
         }
 
-        return {...d}
+        return d.size
       }
 
-      return {...d}
+      return d.size
     })
 
-    this.setState({divisions})
+    this.props.onResize(divisionSizes)
   }
 
   private down = activePosition => () => {
-    const divisions = this.state.divisions.map((d, i, divs) => {
+    const {
+      dragEvent: {percentY},
+    } = this.state
+
+    const divisionSizes = this.state.divisions.map((d, i, divs) => {
       const before = i === activePosition - 1
       const current = i === activePosition
       const after = i === activePosition + 1
 
       if (before) {
-        return {...d, size: this.taller(d.size)}
+        return this.enforceMax(percentY)
       }
 
       if (current) {
-        return {...d, size: this.shorter(d.size)}
+        return this.enforceMin(1 - percentY)
       }
 
       if (after) {
         const above = divs[i - 1]
         if (above && above.size === 0) {
-          return {...d, size: this.shorter(d.size)}
+          return this.enforceMin(1 - percentY)
         }
 
-        return {...d}
+        return d.size
       }
 
-      return {...d}
+      return d.size
     })
 
-    this.setState({divisions})
-  }
-
-  private taller = (size: number): number => {
-    const newSize = size + this.percentChangeY
-    return this.enforceMax(newSize)
-  }
-
-  private fatter = (size: number): number => {
-    const newSize = size + this.percentChangeX
-    return this.enforceMax(newSize)
-  }
-
-  private shorter = (size: number): number => {
-    const newSize = size - this.percentChangeY
-    return this.enforceMin(newSize)
-  }
-
-  private thinner = (size: number): number => {
-    const newSize = size - this.percentChangeX
-    return this.enforceMin(newSize)
+    this.props.onResize(divisionSizes)
   }
 
   private enforceMax = (size: number): number => {

@@ -104,10 +104,12 @@ class CellEditorOverlay extends Component<Props, State> {
   public componentDidMount() {
     const {cell, dashboardTimeRange, onResetTimeMachine} = this.props
 
-    onResetTimeMachine({
+    const initialState = {
       ...initialStateFromCell(cell),
       timeRange: dashboardTimeRange,
-    })
+    }
+
+    onResetTimeMachine(initialState)
 
     this.handleResetFocus()
   }

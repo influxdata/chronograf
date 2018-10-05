@@ -86,3 +86,17 @@ export function defaultQueryDraft(
 
   return defaultDraft
 }
+
+enum TMLocalStorageKeys {
+  dataExplorer = 'dataExplorer',
+  ceo = 'cellEditorOverlay',
+}
+export function getLocalStorageKey(): TMLocalStorageKeys {
+  const location = window.location.toString()
+
+  if (location.indexOf('/dashboards/') !== -1) {
+    return TMLocalStorageKeys.ceo
+  }
+
+  return TMLocalStorageKeys.dataExplorer
+}

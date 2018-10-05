@@ -46,7 +46,6 @@ import {
   TEMP_VAR_DASHBOARD_TIME,
   TEMP_VAR_UPPER_DASHBOARD_TIME,
 } from 'src/shared/constants'
-import {DE_LOCAL_STORAGE_KEY} from 'src/data_explorer/constants'
 
 // Types
 import {
@@ -122,14 +121,14 @@ export class DataExplorer extends PureComponent<Props, State> {
       isStaticLegend: false,
       isComponentMounted: false,
     }
+
+    props.onResetTimeMachine()
   }
 
   public async componentDidMount() {
-    const {autoRefresh, onResetTimeMachine} = this.props
+    const {autoRefresh} = this.props
 
     await this.resolveQueryParams()
-
-    onResetTimeMachine({}, DE_LOCAL_STORAGE_KEY)
 
     GlobalAutoRefresher.poll(autoRefresh)
 

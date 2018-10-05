@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import {Subscribe} from 'unstated'
 
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
@@ -15,6 +16,7 @@ import {HANDLE_VERTICAL} from 'src/shared/constants'
 import {getSuggestions, getAST} from 'src/flux/apis'
 import {restartable} from 'src/shared/utils/restartable'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {parseError} from 'src/flux/helpers/scriptBuilder'
 
 // Types
@@ -24,7 +26,12 @@ import {Suggestion, Links, ScriptStatus} from 'src/types/flux'
 const CHECK_SCRIPT_DELAY = 600
 const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
 
-interface Props {
+interface ConnectedProps {
+  fluxProportions: number[]
+  onSetFluxProportions: (fluxProportions: number[]) => void
+}
+
+interface PassedProps {
   script: string
   draftScript: string
   onChangeScript: (script: string) => void
@@ -34,6 +41,8 @@ interface Props {
   links: Links
   notify: NotificationAction
 }
+
+type Props = ConnectedProps & PassedProps
 
 interface State {
   suggestions: Suggestion[]
@@ -61,13 +70,21 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {notify, source, draftScript} = this.props
-    const {suggestions, draftScriptStatus, isWizardActive} = this.state
+    const {
+      notify,
+      source,
+      draftScript,
+      fluxProportions,
+      onSetFluxProportions,
+    } = this.props
+    const {suggestions, isWizardActive, draftScriptStatus} = this.state
+
+    const [leftSize, rightSize] = fluxProportions
 
     const divisions = [
       {
         name: 'Script',
-        size: 0.66,
+        size: leftSize,
         headerOrientation: HANDLE_VERTICAL,
         headerButtons: [
           <Button
@@ -110,7 +127,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       },
       {
         name: 'Explore',
-        size: 0.34,
+        size: rightSize,
         headerButtons: [],
         menuOptions: [],
         render: () => <SchemaExplorer source={source} notify={notify} />,
@@ -129,6 +146,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
           orientation={HANDLE_VERTICAL}
           divisions={divisions}
           containerClass="page-contents"
+          onResize={onSetFluxProportions}
         />
       </FluxScriptWizard>
     )
@@ -200,4 +218,16 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 }
 
-export default FluxQueryMaker
+const ConnectedFluxQueryMaker = (props: PassedProps) => (
+  <Subscribe to={[TimeMachineContainer]}>
+    {(container: TimeMachineContainer) => (
+      <FluxQueryMaker
+        {...props}
+        fluxProportions={container.state.fluxProportions}
+        onSetFluxProportions={container.handleSetFluxProportions}
+      />
+    )}
+  </Subscribe>
+)
+
+export default ConnectedFluxQueryMaker
