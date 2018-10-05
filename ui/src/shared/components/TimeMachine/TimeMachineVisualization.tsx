@@ -87,8 +87,6 @@ const TimeMachineVisualization: SFC<Props> = props => {
             fieldOptions={props.fieldOptions}
             timeFormat={props.timeFormat}
             decimalPlaces={props.decimalPlaces}
-            thresholdsListColors={props.thresholdsListColors}
-            thresholdsListType={props.thresholdsListType}
             gaugeColors={props.gaugeColors}
             lineColors={props.lineColors}
             cellNote={props.note}
