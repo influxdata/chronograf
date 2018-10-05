@@ -15,7 +15,9 @@ class DefaultError extends Component<{error: Error}> {
     const {stack, message} = error
     const finalMessage = ` Chronograf (${VERSION}) ${message}`
     const finalStack = '```' + stack + '```'
-    const href = `https://github.com/influxdata/chronograf/issues/new?title=${finalMessage}&body=${finalStack}`
+    const href = encodeURI(
+      `https://github.com/influxdata/chronograf/issues/new?title=${finalMessage}&body=${finalStack}`
+    )
 
     return (
       <p className="unexpected-error">
