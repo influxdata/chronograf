@@ -6,6 +6,7 @@ import _ from 'lodash'
 import Division from 'src/shared/components/threesizer/Division'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {MenuItem} from 'src/shared/components/threesizer/DivisionMenu'
+import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
 import {
   HANDLE_NONE,
@@ -50,6 +51,7 @@ interface Props {
   divisions: DivisionProps[]
   orientation: string
   containerClass?: string
+  onResize?: (sizes: number[]) => void
 }
 
 @ErrorHandling
@@ -62,6 +64,7 @@ class Threesizer extends Component<Props, State> {
   private containerRef: HTMLElement
   private percentChangeX: number = 0
   private percentChangeY: number = 0
+  private debouncer: Debouncer = new DefaultDebouncer()
 
   constructor(props) {
     super(props)
@@ -104,23 +107,17 @@ class Threesizer extends Component<Props, State> {
     const {percentX, percentY} = dragEvent
     const {dragEvent: prevDrag} = prevState
 
-    if (orientation === HANDLE_VERTICAL) {
-      const left = percentX < prevDrag.percentX
-
-      if (left) {
-        return this.move.left()
-      }
-
-      return this.move.right()
+    if (orientation === HANDLE_VERTICAL && percentX < prevDrag.percentX) {
+      this.move.left()
+    } else if (orientation === HANDLE_VERTICAL) {
+      this.move.right()
+    } else if (percentY < prevDrag.percentY) {
+      this.move.up()
+    } else {
+      this.move.down()
     }
 
-    const up = percentY < prevDrag.percentY
-
-    if (up) {
-      return this.move.up()
-    }
-
-    return this.move.down()
+    this.handleResize()
   }
 
   public render() {
@@ -197,6 +194,20 @@ class Threesizer extends Component<Props, State> {
       size: d.size || size,
       handlePixels: d.handlePixels || HANDLE_PIXELS,
     }))
+  }
+
+  private handleResize = () => {
+    this.debouncer.call(this.handleResizeImmediate, 100)
+  }
+
+  private handleResizeImmediate = () => {
+    const {onResize} = this.props
+
+    if (!onResize) {
+      return
+    }
+
+    onResize(this.state.divisions.map(d => d.size))
   }
 
   private handleDoubleClick = (id: string): void => {

@@ -16,7 +16,10 @@ import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'
 import {buildRawText} from 'src/utils/influxql'
 import {defaultQueryDraft} from 'src/shared/utils/timeMachine'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  getLocalStorage,
+} from 'src/shared/utils/TimeMachineContainer'
 
 // Components
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
@@ -122,14 +125,17 @@ export class DataExplorer extends PureComponent<Props, State> {
       isStaticLegend: false,
       isComponentMounted: false,
     }
+
+    props.onResetTimeMachine(
+      getLocalStorage(DE_LOCAL_STORAGE_KEY),
+      DE_LOCAL_STORAGE_KEY
+    )
   }
 
   public async componentDidMount() {
-    const {autoRefresh, onResetTimeMachine} = this.props
+    const {autoRefresh} = this.props
 
     await this.resolveQueryParams()
-
-    onResetTimeMachine({}, DE_LOCAL_STORAGE_KEY)
 
     GlobalAutoRefresher.poll(autoRefresh)
 

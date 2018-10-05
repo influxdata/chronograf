@@ -10,7 +10,10 @@ import CEOHeader from 'src/dashboards/components/CEOHeader'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  getLocalStorage,
+} from 'src/shared/utils/TimeMachineContainer'
 import {initialStateFromCell} from 'src/shared/utils/timeMachine'
 
 // Actions
@@ -20,6 +23,7 @@ import {editCellQueryStatus} from 'src/dashboards/actions'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 import {IS_STATIC_LEGEND} from 'src/shared/constants'
 import {STATIC_LEGEND} from 'src/dashboards/constants/cellEditor'
+import {CEO_LOCAL_STORAGE_KEY} from 'src/dashboards/constants'
 
 // Types
 import * as QueriesModels from 'src/types/queries'
@@ -104,10 +108,18 @@ class CellEditorOverlay extends Component<Props, State> {
   public componentDidMount() {
     const {cell, dashboardTimeRange, onResetTimeMachine} = this.props
 
-    onResetTimeMachine({
+    const initialState = {
       ...initialStateFromCell(cell),
       timeRange: dashboardTimeRange,
-    })
+    }
+
+    const localStorageState = getLocalStorage(CEO_LOCAL_STORAGE_KEY)
+
+    if (localStorageState.fluxProportions) {
+      initialState.fluxProportions = localStorageState.fluxProportions
+    }
+
+    onResetTimeMachine(initialState, CEO_LOCAL_STORAGE_KEY)
 
     this.handleResetFocus()
   }
