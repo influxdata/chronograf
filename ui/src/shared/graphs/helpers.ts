@@ -207,10 +207,12 @@ export const hasDataChanged = (
     getDataUUID(prevProps.data, prevProps.dataType),
     getDataUUID(newProps.data, newProps.dataType)
   )
-  const isTimeRangeChanged = !!_.isEqual(
+
+  const isTimeRangeChanged = !_.isEqual(
     _.get(prevProps, 'timeRange'),
     _.get(newProps, 'timeRange')
   )
+
   const isDataChanged =
     isDataTypeChanged || isDataIDsChanged || isTimeRangeChanged
 
