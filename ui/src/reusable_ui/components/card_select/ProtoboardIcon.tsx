@@ -19,6 +19,8 @@ class ProtoboardIcon extends PureComponent<Props> {
           x="0px"
           y="0px"
           viewBox="0 0 80 65"
+          width="80px"
+          height="65px"
         >
           <rect
             className="protoboard-icon--shape"
