@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import uuid from 'uuid'
 import memoizeOne from 'memoize-one'
 
 // Components
@@ -7,6 +8,8 @@ import TableSidebar from 'src/flux/components/TableSidebar'
 import {FluxTable} from 'src/types'
 import NoResults from 'src/flux/components/NoResults'
 import TableGraph from 'src/shared/components/TableGraph'
+import TableGraphTransform from 'src/shared/components/TableGraphTransform'
+import TableGraphFormat from 'src/shared/components/TableGraphFormat'
 
 // Utils
 import {getDeep} from 'src/utils/wrappers'
@@ -19,6 +22,7 @@ import {QueryUpdateState} from 'src/types'
 
 interface Props {
   data: FluxTable[]
+  uuid: string
   dataType: DataType
   tableOptions: TableOptions
   timeFormat: string
@@ -91,18 +95,40 @@ class TimeMachineTables extends PureComponent<Props, State> {
           />
         )}
         {this.shouldShowTable && (
-          <TableGraph
+          <TableGraphTransform
             data={this.selectedResult}
             dataType={dataType}
-            colors={colors}
-            tableOptions={tableOptions}
-            fieldOptions={this.fieldOptions}
-            timeFormat={timeFormat}
-            decimalPlaces={decimalPlaces}
-            editorLocation={editorLocation}
-            handleSetHoverTime={handleSetHoverTime}
-            onUpdateFieldOptions={onUpdateFieldOptions}
-          />
+            uuid={uuid.v4()}
+          >
+            {(transformedData, nextUUID) => (
+              <TableGraphFormat
+                data={transformedData}
+                uuid={nextUUID}
+                dataType={dataType}
+                tableOptions={tableOptions}
+                timeFormat={timeFormat}
+                decimalPlaces={decimalPlaces}
+                fieldOptions={this.fieldOptions}
+              >
+                {(formattedData, sort, computedFieldOptions, onSort) => (
+                  <TableGraph
+                    data={formattedData}
+                    sort={sort}
+                    onSort={onSort}
+                    dataType={dataType}
+                    colors={colors}
+                    tableOptions={tableOptions}
+                    fieldOptions={computedFieldOptions}
+                    timeFormat={timeFormat}
+                    decimalPlaces={decimalPlaces}
+                    editorLocation={editorLocation}
+                    handleSetHoverTime={handleSetHoverTime}
+                    onUpdateFieldOptions={onUpdateFieldOptions}
+                  />
+                )}
+              </TableGraphFormat>
+            )}
+          </TableGraphTransform>
         )}
         {!this.hasResults && <NoResults />}
       </div>

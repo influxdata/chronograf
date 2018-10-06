@@ -20,7 +20,7 @@ const calculateSize = (message: string): number => {
   return message.length * 7
 }
 
-interface ColumnWidths {
+export interface ColumnWidths {
   totalWidths: number
   widths: {[x: string]: number}
 }
@@ -35,6 +35,20 @@ interface TransformTableDataReturnType {
   transformedData: TimeSeriesValue[][]
   sortedTimeVals: TimeSeriesValue[]
   columnWidths: ColumnWidths
+}
+
+export enum ErrorTypes {
+  MetaQueryCombo = 'MetaQueryCombo',
+  GeneralError = 'Error',
+}
+
+export const getInvalidDataMessage = (errorType: ErrorTypes): string => {
+  switch (errorType) {
+    case ErrorTypes.MetaQueryCombo:
+      return 'Cannot display data for meta queries mixed with data queries'
+    default:
+      return null
+  }
 }
 
 const calculateTimeColumnWidth = (timeFormat: string): number => {

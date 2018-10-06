@@ -46,6 +46,7 @@ interface RenderProps {
   timeSeriesFlux: FluxTable[]
   rawFluxData: string
   loading: RemoteDataState
+  uuid: string
 }
 
 interface Props {
@@ -73,6 +74,7 @@ interface State {
   rawFluxData: string
   timeSeriesInfluxQL: TimeSeriesServerResponse[]
   timeSeriesFlux: FluxTable[]
+  latestUUID: string
 }
 
 const GraphLoadingDots = () => (
@@ -110,7 +112,6 @@ class TimeSeries extends Component<Props, State> {
     return null
   }
 
-  private latestUUID: string = uuid.v1()
   private isComponentMounted: boolean = false
 
   constructor(props: Props) {
@@ -123,6 +124,7 @@ class TimeSeries extends Component<Props, State> {
       isFirstFetch: true,
       timeSeriesFlux: [],
       rawFluxData: '',
+      latestUUID: null,
     }
   }
 
@@ -185,7 +187,12 @@ class TimeSeries extends Component<Props, State> {
       rawFluxData,
       loading,
       isFirstFetch,
+      latestUUID,
     } = this.state
+
+    if (isFirstFetch && loading === RemoteDataState.Loading) {
+      return <div className="graph-empty">{this.spinner}</div>
+    }
 
     const hasValues =
       timeSeriesFlux.length ||
@@ -194,10 +201,6 @@ class TimeSeries extends Component<Props, State> {
         const v = _.some(results, r => r.series)
         return v
       })
-
-    if (isFirstFetch && loading === RemoteDataState.Loading) {
-      return <div className="graph-empty">{this.spinner}</div>
-    }
 
     if (!hasValues) {
       if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
@@ -227,6 +230,7 @@ class TimeSeries extends Component<Props, State> {
           timeSeriesFlux,
           rawFluxData,
           loading,
+          uuid: latestUUID,
         })}
       </>
     )
@@ -277,19 +281,20 @@ class TimeSeries extends Component<Props, State> {
     let timeSeriesFlux: FluxTable[] = []
     let rawFluxData = ''
     let responseUUID: string
+    let loading: RemoteDataState = null
 
     this.setState({loading: RemoteDataState.Loading})
-    this.latestUUID = uuid.v1()
+    const latestUUID = uuid.v1()
 
     try {
       if (this.isFluxQuery) {
-        const results = await this.executeFluxQuery()
+        const results = await this.executeFluxQuery(latestUUID)
 
         timeSeriesFlux = results.tables
         rawFluxData = results.csv
         responseUUID = results.uuid
       } else {
-        timeSeriesInfluxQL = await this.executeInfluxQLQueries()
+        timeSeriesInfluxQL = await this.executeInfluxQLQueries(latestUUID)
         responseUUID = _.get(timeSeriesInfluxQL, '0.response.uuid')
       }
 
@@ -297,13 +302,13 @@ class TimeSeries extends Component<Props, State> {
         return
       }
 
-      if (responseUUID !== this.latestUUID) {
+      if (responseUUID !== latestUUID) {
         return
       }
 
-      this.setState({loading: RemoteDataState.Done})
+      loading = RemoteDataState.Done
     } catch {
-      this.setState({loading: RemoteDataState.Error})
+      loading = RemoteDataState.Error
     }
 
     this.setState({
@@ -311,6 +316,8 @@ class TimeSeries extends Component<Props, State> {
       timeSeriesFlux,
       rawFluxData,
       isFirstFetch: false,
+      loading,
+      latestUUID,
     })
 
     if (grabDataForDownload) {
@@ -322,7 +329,9 @@ class TimeSeries extends Component<Props, State> {
     }
   }
 
-  private executeFluxQuery = async (): Promise<GetTimeSeriesResult> => {
+  private executeFluxQuery = async (
+    latestUUID: string
+  ): Promise<GetTimeSeriesResult> => {
     const {queries, onNotify, source, timeRange} = this.props
 
     const script: string = _.get(queries, '0.text', '')
@@ -330,7 +339,7 @@ class TimeSeries extends Component<Props, State> {
       source,
       script,
       timeRange,
-      this.latestUUID
+      latestUUID
     )
 
     if (results.didTruncate && onNotify) {
@@ -340,19 +349,20 @@ class TimeSeries extends Component<Props, State> {
     return results
   }
 
-  private executeInfluxQLQueries = async (): Promise<
-    TimeSeriesServerResponse[]
-  > => {
+  private executeInfluxQLQueries = async (
+    latestUUID: string
+  ): Promise<TimeSeriesServerResponse[]> => {
     const {queries} = this.props
     const timeSeriesInfluxQL = await Promise.all(
-      queries.map(this.executeInfluxQLQuery)
+      queries.map(query => this.executeInfluxQLQuery(query, latestUUID))
     )
 
     return timeSeriesInfluxQL
   }
 
   private executeInfluxQLQuery = async (
-    query: Query
+    query: Query,
+    latestUUID: string
   ): Promise<TimeSeriesServerResponse> => {
     const {source, templates, editQueryStatus} = this.props
     const TEMP_RES = 300 // FIXME
@@ -365,7 +375,7 @@ class TimeSeries extends Component<Props, State> {
         query,
         templates,
         TEMP_RES,
-        this.latestUUID
+        latestUUID
       )
 
       const warningMessage = extractQueryWarningMessage(response)

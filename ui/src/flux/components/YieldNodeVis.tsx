@@ -20,6 +20,7 @@ import {ColorNumber, ColorString} from 'src/types/colors'
 
 interface Props {
   data: FluxTable[]
+  uuid: string
   yieldName: string
   axes: Axes | null
   tableOptions: TableOptions
@@ -86,6 +87,7 @@ class YieldNodeVis extends PureComponent<Props, State> {
     const {visType} = this.state
     const {
       data,
+      uuid,
       tableOptions,
       timeFormat,
       decimalPlaces,
@@ -113,6 +115,7 @@ class YieldNodeVis extends PureComponent<Props, State> {
     return (
       <TimeMachineTables
         data={data}
+        uuid={uuid}
         dataType={DataType.flux}
         tableOptions={tableOptions}
         timeFormat={timeFormat}

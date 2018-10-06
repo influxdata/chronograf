@@ -87,9 +87,10 @@ class YieldFuncNode extends PureComponent<Props, State> {
       <div className="yield-node">
         <div className="func-node--connector" />
         <TimeSeries source={source} queries={queries} timeRange={timeRange}>
-          {({timeSeriesFlux}) => (
+          {({timeSeriesFlux, uuid}) => (
             <YieldNodeVis
               data={timeSeriesFlux}
+              uuid={uuid}
               yieldName={yieldName}
               axes={axes}
               tableOptions={tableOptions}
