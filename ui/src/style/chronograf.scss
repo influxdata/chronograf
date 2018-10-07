@@ -87,7 +87,9 @@
 @import 'components/annotation-control-bar';
 @import 'components/annotation-editor';
 @import 'src/shared/components/TimeMachine/RawFluxDataTable';
+@import 'src/shared/components/TimeMachine/FluxScriptWizard';
 @import 'src/shared/components/Spinner';
+
 
 // Reusable UI Components
 @import '../reusable_ui/components/panel/Panel.scss';

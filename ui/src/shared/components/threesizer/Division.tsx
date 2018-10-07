@@ -282,7 +282,7 @@ class Division extends PureComponent<Props> {
       return true
     }
 
-    if (!this.divisionRef || this.props.size >= 0.33) {
+    if (!this.divisionRef.current || this.props.size >= 0.33) {
       return false
     }
 

@@ -171,3 +171,30 @@
 .dropdown--menu-container .fancy-scroll--track-h {
   display: none;
 }
+
+@keyframes loading-dots {
+  0% {
+    content: "Loading "
+  }
+
+  25% {
+    content: "Loading."
+  }
+
+  50% {
+    content: "Loading.."
+  }
+
+  75% {
+    content: "Loading..."
+  }
+  
+  100% {
+    content: "Loading "
+  }
+}
+
+.dropdown--loading::after {
+  animation: 1.7s linear loading-dots infinite;
+  content: "Loading..."
+}

@@ -71,7 +71,7 @@ class TimeMachineEditor extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {script} = this.props
+    const {script, children} = this.props
 
     const options = {
       tabIndex: 1,
@@ -96,6 +96,7 @@ class TimeMachineEditor extends PureComponent<Props, State> {
           editorDidMount={this.handleMount}
           onKeyUp={this.handleKeyUp}
         />
+        {children}
       </div>
     )
   }

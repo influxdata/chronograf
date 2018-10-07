@@ -1,19 +1,3 @@
-export const emptyAST = {
-  type: 'Program',
-  location: {
-    start: {
-      line: 1,
-      column: 1,
-    },
-    end: {
-      line: 1,
-      column: 1,
-    },
-    source: '',
-  },
-  body: [],
-}
-
 export const ast = {
   type: 'File',
   start: 0,

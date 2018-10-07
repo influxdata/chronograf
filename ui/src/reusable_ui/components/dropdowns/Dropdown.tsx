@@ -123,8 +123,17 @@ class Dropdown extends Component<Props, State> {
     const {expanded} = this.state
 
     const selectedChild = children.find(child => child.props.id === selectedID)
-    const dropdownLabel =
-      (selectedChild && selectedChild.props.children) || titleText
+    const isLoading = status === ComponentStatus.Loading
+
+    let dropdownLabel
+
+    if (isLoading) {
+      dropdownLabel = <div className="dropdown--loading" />
+    } else if (selectedChild) {
+      dropdownLabel = selectedChild.props.children
+    } else {
+      dropdownLabel = titleText
+    }
 
     return (
       <DropdownButton
@@ -210,6 +219,14 @@ class Dropdown extends Component<Props, State> {
     }
   }
 
+  private get shouldHaveChildren(): boolean {
+    const {status} = this.props
+
+    return (
+      status === ComponentStatus.Default || status === ComponentStatus.Valid
+    )
+  }
+
   private handleItemClick = (value: any): void => {
     const {onChange} = this.props
     onChange(value)
@@ -219,7 +236,7 @@ class Dropdown extends Component<Props, State> {
   private validateChildCount = (): void => {
     const {children} = this.props
 
-    if (React.Children.count(children) === 0) {
+    if (this.shouldHaveChildren && React.Children.count(children) === 0) {
       throw new Error(
         'Dropdowns require at least 1 child element. We recommend using Dropdown.Item and/or Dropdown.Divider.'
       )
@@ -233,7 +250,11 @@ class Dropdown extends Component<Props, State> {
       throw new Error('Dropdowns in ActionList mode require a titleText prop.')
     }
 
-    if (mode === DropdownMode.Radio && selectedID === '') {
+    if (
+      mode === DropdownMode.Radio &&
+      this.shouldHaveChildren &&
+      selectedID === ''
+    ) {
       throw new Error('Dropdowns in Radio mode require a selectedID prop.')
     }
   }

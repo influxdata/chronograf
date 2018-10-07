@@ -135,9 +135,11 @@ class MultiSelectDropdown extends Component<Props, State> {
       _.includes(selectedIDs, child.props.id)
     )
 
-    let label: string | Array<string | JSX.Element>
+    let label
 
-    if (selectedChildren.length) {
+    if (status === ComponentStatus.Loading) {
+      label = <div className="dropdown--loading" />
+    } else if (selectedChildren.length) {
       label = selectedChildren.map((sc, i) => {
         if (i < selectedChildren.length - 1) {
           return (
@@ -238,6 +240,14 @@ class MultiSelectDropdown extends Component<Props, State> {
     }
   }
 
+  private get shouldHaveChildren(): boolean {
+    const {status} = this.props
+
+    return (
+      status === ComponentStatus.Default || status === ComponentStatus.Valid
+    )
+  }
+
   private handleItemClick = (value: any): void => {
     const {onChange, selectedIDs} = this.props
     let updatedSelection
@@ -254,7 +264,7 @@ class MultiSelectDropdown extends Component<Props, State> {
   private validateChildCount = (): void => {
     const {children} = this.props
 
-    if (React.Children.count(children) === 0) {
+    if (this.shouldHaveChildren && React.Children.count(children) === 0) {
       throw new Error(
         'Dropdowns require at least 1 child element. We recommend using Dropdown.Item and/or Dropdown.Divider.'
       )
