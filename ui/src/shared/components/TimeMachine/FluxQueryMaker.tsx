@@ -4,21 +4,16 @@ import React, {PureComponent} from 'react'
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
 import TimeMachineEditor from 'src/flux/components/TimeMachineEditor'
+import FluxScriptWizard from 'src/shared/components/TimeMachine/FluxScriptWizard'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
-import {
-  Button,
-  ComponentSize,
-  ComponentColor,
-  ComponentStatus,
-} from 'src/reusable_ui'
+import {Button, ComponentSize, ComponentColor} from 'src/reusable_ui'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
-import {emptyAST} from 'src/flux/constants'
 
 // Utils
 import {getSuggestions, getAST} from 'src/flux/apis'
-import Restarter from 'src/shared/utils/Restarter'
+import {restartable} from 'src/shared/utils/restartable'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {parseError} from 'src/flux/helpers/scriptBuilder'
 
@@ -26,7 +21,8 @@ import {parseError} from 'src/flux/helpers/scriptBuilder'
 import {NotificationAction, Source} from 'src/types'
 import {Suggestion, Links, ScriptStatus} from 'src/types/flux'
 
-const AST_DEBOUNCE_DELAY = 600
+const CHECK_SCRIPT_DELAY = 600
+const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
 
 interface Props {
   script: string
@@ -41,29 +37,27 @@ interface State {
   suggestions: Suggestion[]
   draftScript: string
   draftScriptStatus: ScriptStatus
-  ast: object
-  hasChangedScript: boolean
+  isWizardActive: boolean
 }
 
 class FluxQueryMaker extends PureComponent<Props, State> {
-  private restarter: Restarter = new Restarter()
   private debouncer: Debouncer = new DefaultDebouncer()
+  private getAST = restartable(getAST)
 
   public constructor(props: Props) {
     super(props)
 
     this.state = {
       suggestions: [],
-      ast: {},
       draftScript: props.script,
       draftScriptStatus: {type: 'none', text: ''},
-      hasChangedScript: false,
+      isWizardActive: false,
     }
   }
 
   public componentDidMount() {
     this.fetchSuggestions()
-    this.updateBody()
+    this.checkDraftScript()
   }
 
   public render() {
@@ -72,26 +66,27 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       suggestions,
       draftScript,
       draftScriptStatus,
-      hasChangedScript,
+      isWizardActive,
     } = this.state
-
-    const submitStatus = hasChangedScript
-      ? ComponentStatus.Default
-      : ComponentStatus.Disabled
 
     const divisions = [
       {
         name: 'Script',
+        size: 0.66,
         headerOrientation: HANDLE_VERTICAL,
         headerButtons: [
           <Button
             key={0}
-            text={'Submit'}
-            titleText={'Submit Flux Query (Ctrl-Enter)'}
+            text={'Script Wizard'}
+            onClick={this.handleShowWizard}
+            size={ComponentSize.ExtraSmall}
+          />,
+          <Button
+            key={1}
+            text={'Run Script'}
             onClick={this.handleSubmitScript}
             size={ComponentSize.ExtraSmall}
             color={ComponentColor.Primary}
-            status={submitStatus}
           />,
         ],
         menuOptions: [],
@@ -103,11 +98,24 @@ class FluxQueryMaker extends PureComponent<Props, State> {
             suggestions={suggestions}
             onChangeScript={this.handleChangeDraftScript}
             onSubmitScript={this.handleSubmitScript}
-          />
+          >
+            {draftScript.trim() === '' && (
+              <div className="flux-script-wizard--bg-hint">
+                <p>
+                  New to Flux? Give the{' '}
+                  <a title="Open Script Wizard" onClick={this.handleShowWizard}>
+                    Script Wizard
+                  </a>{' '}
+                  a try
+                </p>
+              </div>
+            )}
+          </TimeMachineEditor>
         ),
       },
       {
         name: 'Explore',
+        size: 0.34,
         headerButtons: [],
         menuOptions: [],
         render: () => <SchemaExplorer source={source} notify={notify} />,
@@ -116,11 +124,18 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     ]
 
     return (
-      <Threesizer
-        orientation={HANDLE_VERTICAL}
-        divisions={divisions}
-        containerClass="page-contents"
-      />
+      <FluxScriptWizard
+        source={source}
+        isWizardActive={isWizardActive}
+        onSetIsWizardActive={this.handleSetIsWizardActive}
+        onAddToScript={this.handleAddToScript}
+      >
+        <Threesizer
+          orientation={HANDLE_VERTICAL}
+          divisions={divisions}
+          containerClass="page-contents"
+        />
+      </FluxScriptWizard>
     )
   }
 
@@ -133,43 +148,49 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     if (onUpdateStatus) {
       onUpdateStatus(draftScriptStatus)
     }
+  }
 
-    this.setState({hasChangedScript: false})
+  private handleShowWizard = (): void => {
+    this.setState({isWizardActive: true})
+  }
+
+  private handleSetIsWizardActive = (isWizardActive: boolean): void => {
+    this.setState({isWizardActive})
+  }
+
+  private handleAddToScript = (draftScript): void => {
+    this.setState({draftScript}, this.handleSubmitScript)
   }
 
   private handleChangeDraftScript = async (
     draftScript: string
   ): Promise<void> => {
-    this.setState(
-      {
-        draftScript,
-        hasChangedScript: true,
-      },
-      () => this.debouncer.call(this.updateBody, AST_DEBOUNCE_DELAY)
+    this.setState({draftScript}, () =>
+      this.debouncer.call(this.checkDraftScript, CHECK_SCRIPT_DELAY)
     )
   }
 
-  private updateBody = async () => {
+  private checkDraftScript = async () => {
     const {draftScript} = this.state
 
-    let ast: object
+    if (draftScript.trim() === '') {
+      // Don't attempt to validate an empty script
+      this.setState({draftScriptStatus: VALID_SCRIPT_STATUS})
+
+      return
+    }
+
     let draftScriptStatus: ScriptStatus
 
     try {
-      ast = await this.restarter.perform(
-        getAST({url: this.props.links.ast, body: draftScript})
-      )
+      await this.getAST({url: this.props.links.ast, body: draftScript})
 
-      draftScriptStatus = {type: 'success', text: ''}
+      draftScriptStatus = VALID_SCRIPT_STATUS
     } catch (error) {
-      ast = emptyAST
       draftScriptStatus = parseError(error)
     }
 
-    this.setState({
-      ast,
-      draftScriptStatus,
-    })
+    this.setState({draftScriptStatus})
   }
 
   private fetchSuggestions = async (): Promise<void> => {

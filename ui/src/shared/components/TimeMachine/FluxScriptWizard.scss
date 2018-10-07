@@ -1,0 +1,72 @@
+.flux-script-wizard {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flux-script-wizard--children, .flux-script-wizard--backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.flux-script-wizard--backdrop {
+  background-color: rgba(28, 28, 33, 0.8); // g1-raven at 0.8 opacity
+  z-index: 100;
+}
+
+.flux-script-wizard--wizard {
+  width: 400px;
+  border-radius: 4px;
+  background-color: $g3-castle;
+  padding: 15px 15px 25px 15px;
+  z-index: 200;
+
+  .form--element {
+    margin-bottom: 15px;
+  }
+}
+
+.flux-script-wizard--wizard-header {
+  width: 100%;
+  text-align: center;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.flux-script-wizard--close {
+  cursor: pointer;
+  font-size: 34px;
+  font-weight: 100;
+  line-height: 18px;
+  position: absolute;
+  right: 30px;
+  top: 0;
+}
+
+.flux-script-wizard--bg-hint {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  user-select: none;
+
+  p {
+    font-size: 24px;
+    color: $g9-mountain;
+    position: relative;
+    left: -50%;
+    top: -45%;
+
+    a {
+      color: $g12-forge;
+      border-bottom: 1px solid $g12-forge;
+      cursor: pointer;
+    }
+  }
+}
