@@ -2,6 +2,7 @@
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
 import uuid from 'uuid'
+import memoizeOne from 'memoize-one'
 
 // Components
 import InvalidData from 'src/shared/components/InvalidData'
@@ -12,6 +13,7 @@ import {
   ErrorTypes,
   getInvalidDataMessage,
 } from 'src/dashboards/utils/tableGraph'
+import {isInluxQLDataEqual} from 'src/shared/graphs/helpers'
 
 // Types
 import {
@@ -40,6 +42,10 @@ interface State {
 
 class TableGraphTransform extends PureComponent<Props, State> {
   private isComponentMounted: boolean
+  private memoizedTimeSeriesToTableGraph = memoizeOne(
+    timeSeriesToTableGraph,
+    isInluxQLDataEqual
+  )
 
   constructor(props: Props) {
     super(props)
@@ -83,7 +89,7 @@ class TableGraphTransform extends PureComponent<Props, State> {
 
     if (dataType === DataType.influxQL) {
       try {
-        const influxQLData = await timeSeriesToTableGraph(
+        const influxQLData = await this.memoizedTimeSeriesToTableGraph(
           data as TimeSeriesServerResponse[]
         )
 

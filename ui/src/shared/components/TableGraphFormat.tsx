@@ -1,6 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
+import memoizeOne from 'memoize-one'
 
 // Utils
 import {manager} from 'src/worker/JobManager'
@@ -64,8 +65,39 @@ interface State {
   invalidDataError: ErrorTypes
 }
 
+interface FormatProperties {
+  sort?: Sort
+  fieldOptions: FieldOption[]
+  tableOptions: TableOptions
+  timeFormat: string
+  decimalPlaces: DecimalPlaces
+  uuid: string
+}
+const areFormatPropertiesEqual = (
+  prevProperties: FormatProperties,
+  newProperties: FormatProperties
+) => {
+  const formatProps = [
+    'uuid',
+    'tableOptions',
+    'fieldOptions',
+    'timeFormat',
+    'sort',
+  ]
+
+  const areEqual = formatProps.every(k =>
+    _.isEqual(prevProperties[k], newProperties[k])
+  )
+
+  return areEqual
+}
+
 class TableGraphFormat extends PureComponent<Props, State> {
   private isComponentMounted: boolean
+  private memoizedTableTransform = memoizeOne(
+    manager.tableTransform,
+    areFormatPropertiesEqual
+  )
 
   constructor(props: Props) {
     super(props)
@@ -116,16 +148,7 @@ class TableGraphFormat extends PureComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    const updatedProps = _.keys(_.omit(prevProps, 'data')).filter(
-      k => !_.isEqual(this.props[k], prevProps[k])
-    )
-
-    if (
-      this.props.uuid !== prevProps.uuid ||
-      _.includes(updatedProps, 'tableOptions') ||
-      _.includes(updatedProps, 'fieldOptions') ||
-      _.includes(updatedProps, 'timeFormat')
-    ) {
+    if (!areFormatPropertiesEqual(prevProps, this.props)) {
       this.formatData()
     }
   }
@@ -140,7 +163,7 @@ class TableGraphFormat extends PureComponent<Props, State> {
       decimalPlaces,
     } = this.props
 
-    const {sort} = this.state
+    const sort = {...this.state.sort}
 
     if (sortField === sort.field) {
       sort.direction = sort.direction === ASCENDING ? DESCENDING : ASCENDING
@@ -159,14 +182,15 @@ class TableGraphFormat extends PureComponent<Props, State> {
     )
 
     try {
-      const formattedData = await manager.tableTransform(
-        this.props.data.data,
+      const formattedData = await this.memoizedTableTransform({
+        data: this.props.data.data,
         sort,
-        computedFieldOptions,
+        fieldOptions: computedFieldOptions,
         tableOptions,
         timeFormat,
-        decimalPlaces
-      )
+        decimalPlaces,
+        uuid: latestUUID,
+      })
 
       if (!this.isComponentMounted) {
         return
@@ -184,6 +208,7 @@ class TableGraphFormat extends PureComponent<Props, State> {
       if (!this.isComponentMounted) {
         return
       }
+      console.error(err)
 
       this.setState({invalidDataError: ErrorTypes.GeneralError})
     }

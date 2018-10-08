@@ -56,9 +56,9 @@ const filterTables = (tables: FluxTable[]): FluxTable[] => {
   })
 }
 
-const filteredTablesMemoized = memoizeOne(filterTables)
-
 class TimeMachineTables extends PureComponent<Props, State> {
+  private filteredTablesMemoized = memoizeOne(filterTables)
+
   constructor(props) {
     super(props)
 
@@ -183,9 +183,12 @@ class TimeMachineTables extends PureComponent<Props, State> {
   }
 
   private get selectedResult(): FluxTable {
-    const filteredTables = filteredTablesMemoized(this.props.data)
+    const filteredTables = this.filteredTablesMemoized(this.props.data)
+    const table = filteredTables.find(
+      d => d.name === this.state.selectedResultID
+    )
 
-    return filteredTables.find(d => d.name === this.state.selectedResultID)
+    return table
   }
 }
 

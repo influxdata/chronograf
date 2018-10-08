@@ -1,6 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
+import memoizeOne from 'memoize-one'
 
 // Components
 import Gauge from 'src/shared/components/Gauge'
@@ -8,7 +9,12 @@ import InvalidData from 'src/shared/components/InvalidData'
 
 // Utils
 import {manager} from 'src/worker/JobManager'
-import {getDataUUID, hasDataChanged} from 'src/shared/graphs/helpers'
+import {
+  getDataUUID,
+  hasDataPropsChanged,
+  isFluxDataEqual,
+  isInluxQLDataEqual,
+} from 'src/shared/graphs/helpers'
 import getLastValues from 'src/shared/parsing/lastValues'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -52,6 +58,14 @@ class GaugeChart extends PureComponent<Props, State> {
 
   private isComponentMounted: boolean
   private lastUUID: string
+  private memoizedTimeSeriesToSingleStat = memoizeOne(
+    getLastValues,
+    isInluxQLDataEqual
+  )
+  private memoizedFluxTablesToSingleStat = memoizeOne(
+    manager.fluxTablesToSingleStat,
+    isFluxDataEqual
+  )
 
   constructor(props: Props) {
     super(props)
@@ -67,7 +81,7 @@ class GaugeChart extends PureComponent<Props, State> {
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    const isDataChanged = hasDataChanged(prevProps, this.props)
+    const isDataChanged = hasDataPropsChanged(prevProps, this.props)
 
     this.lastUUID = getDataUUID(this.props.data, this.props.dataType)
 
@@ -139,9 +153,13 @@ class GaugeChart extends PureComponent<Props, State> {
     let isValidData = true
     try {
       if (dataType === DataType.flux) {
-        lastValues = await manager.fluxTablesToSingleStat(data as FluxTable[])
+        lastValues = await this.memoizedFluxTablesToSingleStat(
+          data as FluxTable[]
+        )
       } else if (dataType === DataType.influxQL) {
-        lastValues = getLastValues(data as TimeSeriesServerResponse[])
+        lastValues = this.memoizedTimeSeriesToSingleStat(
+          data as TimeSeriesServerResponse[]
+        )
       }
 
       if (
