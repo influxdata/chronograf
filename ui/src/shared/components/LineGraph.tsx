@@ -3,6 +3,7 @@ import React, {PureComponent, CSSProperties} from 'react'
 import _ from 'lodash'
 import Dygraph from 'src/shared/components/Dygraph'
 import {withRouter, RouteComponentProps} from 'react-router'
+import memoizeOne from 'memoize-one'
 
 // Components
 import SingleStat from 'src/shared/components/SingleStat'
@@ -16,7 +17,12 @@ import {
 } from 'src/utils/timeSeriesTransformers'
 import {manager} from 'src/worker/JobManager'
 import {fluxTablesToDygraph} from 'src/shared/parsing/flux/dygraph'
-import {getDataUUID, hasDataChanged} from 'src/shared/graphs/helpers'
+import {
+  getDataUUID,
+  hasDataPropsChanged,
+  isFluxDataEqual,
+  isInluxQLDataEqual,
+} from 'src/shared/graphs/helpers'
 
 // Types
 import {ColorString} from 'src/types/colors'
@@ -66,6 +72,15 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   private isComponentMounted: boolean = false
   private isValidData: boolean = true
 
+  private memoizedTimeSeriesToDygraph = memoizeOne(
+    timeSeriesToDygraph,
+    isInluxQLDataEqual
+  )
+  private memoizedFluxTablesToDygraph = memoizeOne(
+    fluxTablesToDygraph,
+    isFluxDataEqual
+  )
+
   constructor(props: LineGraphProps) {
     super(props)
 
@@ -108,7 +123,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
   }
 
   public componentDidUpdate(prevProps: LineGraphProps) {
-    const isDataChanged = hasDataChanged(prevProps, this.props)
+    const isDataChanged = hasDataPropsChanged(prevProps, this.props)
 
     if (this.props.loading === RemoteDataState.Done && isDataChanged) {
       this.parseTimeSeries(this.props.data, this.props.dataType)
@@ -245,14 +260,14 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
     let result: TimeSeriesToDyGraphReturnType
     if (dataType === DataType.influxQL) {
-      result = await timeSeriesToDygraph(
+      result = await this.memoizedTimeSeriesToDygraph(
         data as TimeSeriesServerResponse[],
         location.pathname
       )
     }
 
     if (dataType === DataType.flux) {
-      result = await fluxTablesToDygraph(data as FluxTable[])
+      result = await this.memoizedFluxTablesToDygraph(data as FluxTable[])
     }
 
     return {result, uuid: getDataUUID(data, dataType)}

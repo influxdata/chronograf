@@ -2,6 +2,7 @@
 import React, {PureComponent, CSSProperties} from 'react'
 import classnames from 'classnames'
 import _ from 'lodash'
+import memoizeOne from 'memoize-one'
 
 // Components
 import InvalidData from 'src/shared/components/InvalidData'
@@ -11,7 +12,9 @@ import {manager} from 'src/worker/JobManager'
 import {
   SMALL_CELL_HEIGHT,
   getDataUUID,
-  hasDataChanged,
+  hasDataPropsChanged,
+  isFluxDataEqual,
+  isInluxQLDataEqual,
 } from 'src/shared/graphs/helpers'
 import getLastValues from 'src/shared/parsing/lastValues'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -60,6 +63,14 @@ class SingleStat extends PureComponent<Props, State> {
 
   private isComponentMounted: boolean
   private lastUUID: string
+  private memoizedTimeSeriesToSingleStat = memoizeOne(
+    getLastValues,
+    isInluxQLDataEqual
+  )
+  private memoizedFluxTablesToSingleStat = memoizeOne(
+    manager.fluxTablesToSingleStat,
+    isFluxDataEqual
+  )
 
   constructor(props: Props) {
     super(props)
@@ -76,7 +87,7 @@ class SingleStat extends PureComponent<Props, State> {
 
   public async componentDidUpdate(prevProps: Props) {
     this.lastUUID = getDataUUID(this.props.data, this.props.dataType)
-    const isDataChanged = hasDataChanged(prevProps, this.props)
+    const isDataChanged = hasDataPropsChanged(prevProps, this.props)
 
     if (isDataChanged) {
       await this.dataToLastValues()
@@ -246,9 +257,13 @@ class SingleStat extends PureComponent<Props, State> {
     let isValidData = true
     try {
       if (dataType === DataType.flux) {
-        lastValues = await manager.fluxTablesToSingleStat(data as FluxTable[])
+        lastValues = await this.memoizedFluxTablesToSingleStat(
+          data as FluxTable[]
+        )
       } else if (dataType === DataType.influxQL) {
-        lastValues = getLastValues(data as TimeSeriesServerResponse[])
+        lastValues = this.memoizedTimeSeriesToSingleStat(
+          data as TimeSeriesServerResponse[]
+        )
       }
 
       if (

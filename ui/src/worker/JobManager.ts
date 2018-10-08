@@ -7,6 +7,13 @@ import {
   TimeSeriesToTableGraphReturnType,
 } from 'src/types/series'
 import {DygraphValue, FluxTable} from 'src/types'
+import {
+  Sort,
+  FieldOption,
+  TableOptions,
+  DecimalPlaces,
+  TimeSeriesValue,
+} from 'src/types/dashboards'
 import {getBasepath} from 'src/utils/basepath'
 import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph'
 import {FluxTablesToDygraphResult} from 'src/worker/jobs/fluxTablesToDygraph'
@@ -36,23 +43,14 @@ class JobManager {
     })
   }
 
-  public async tableTransform(
-    data,
-    sort,
-    fieldOptions,
-    tableOptions,
-    timeFormat,
-    decimalPlaces
-  ): Promise<any> {
-    const payload = {
-      data,
-      sort,
-      fieldOptions,
-      tableOptions,
-      timeFormat,
-      decimalPlaces,
-    }
-
+  public tableTransform = async (payload: {
+    data: TimeSeriesValue[][]
+    sort: Sort
+    fieldOptions: FieldOption[]
+    tableOptions: TableOptions
+    timeFormat: string
+    decimalPlaces: DecimalPlaces
+  }): Promise<any> => {
     return this.publishDBJob('TABLETRANSFORM', payload)
   }
 

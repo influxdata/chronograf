@@ -187,10 +187,32 @@ export const getDataUUID = (
   dataType: DataType
 ): string => {
   if (dataType === DataType.influxQL) {
-    return getDeep(data, '0.response.uuid', '')
+    return getInfluxQLDataUUID(data as TimeSeriesServerResponse[])
   } else {
-    return getDeep(data, '0.id', '')
+    return getFluxDataUUID(data as FluxTable[])
   }
+}
+
+const getInfluxQLDataUUID = (data: TimeSeriesServerResponse[]): string => {
+  return getDeep(data, '0.response.uuid', '')
+}
+
+const getFluxDataUUID = (data: FluxTable[]): string => {
+  return getDeep(data, '0.id', '')
+}
+
+export const isFluxDataEqual = (
+  prevData: FluxTable[],
+  newData: FluxTable[]
+): boolean => {
+  return getFluxDataUUID(prevData) === getFluxDataUUID(newData)
+}
+
+export const isInluxQLDataEqual = (
+  prevData: TimeSeriesServerResponse[],
+  newData: TimeSeriesServerResponse[]
+): boolean => {
+  return getInfluxQLDataUUID(prevData) === getInfluxQLDataUUID(newData)
 }
 
 interface DataProps {
@@ -198,16 +220,14 @@ interface DataProps {
   dataType: DataType
   timeRange?: TimeRange
 }
-export const hasDataChanged = (
+export const hasDataPropsChanged = (
   prevProps: DataProps,
   newProps: DataProps
 ): boolean => {
   const isDataTypeChanged = prevProps.dataType !== newProps.dataType
-  const isDataIDsChanged = !_.isEqual(
-    getDataUUID(prevProps.data, prevProps.dataType),
+  const isDataIDsChanged =
+    getDataUUID(prevProps.data, prevProps.dataType) !==
     getDataUUID(newProps.data, newProps.dataType)
-  )
-
   const isTimeRangeChanged = !_.isEqual(
     _.get(prevProps, 'timeRange'),
     _.get(newProps, 'timeRange')
