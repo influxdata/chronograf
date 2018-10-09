@@ -258,8 +258,10 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   private handleAppendFrom = (): void => {
+    const {source} = this.props
     const {draftScript} = this.state
-    const from = builder.NEW_FROM
+
+    const from = builder.getNewFromScript(source.telegraf, source.defaultRP)
 
     let newScript
 

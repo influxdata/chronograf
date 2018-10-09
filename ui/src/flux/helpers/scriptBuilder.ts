@@ -127,10 +127,6 @@ export const appendJoin = (script: string): string => {
   return `${script.trim()}\n\n${builder.NEW_JOIN}\n\n`
 }
 
-export const appendFrom = (script: string): string => {
-  return `${script.trim()}\n\n${builder.NEW_FROM}\n\n`
-}
-
 export const addNode = (
   name: string,
   bodyID: string,
