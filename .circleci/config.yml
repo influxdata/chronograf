@@ -67,7 +67,7 @@ jobs:
             --arch all \
             --upload \
             --nightly \
-            --version=Nightly \
+            --version=nightly \
             --bucket=dl.influxdata.com/chronograf/releases
           cp build/linux/static_amd64/chronograf .
           cp build/linux/static_amd64/chronoctl .

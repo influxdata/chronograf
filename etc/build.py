@@ -724,8 +724,8 @@ def main(args):
 
     if args.nightly:
         args.version = increment_minor_version(args.version)
-        args.version = "{}~n{}".format(args.version,
-                                       datetime.utcnow().strftime("%Y%m%d%H%M"))
+        args.version = "{}~{}".format(datetime.utcnow().strftime("%Y%m%d%H%M"),
+                                      args.version)
         args.iteration = 0
 
     # Pre-build checks
