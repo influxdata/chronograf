@@ -480,7 +480,7 @@ $dash-graph--heading-name-z: $dash-graph--heading-dragger-z + 1;
 
 .graph-panel__refreshing {
   position: absolute;
-  top: -18px !important;
+  top: -1px !important;
   transform: translate(0, 0);
   right: 50%;
   transform: translateX(50%);
