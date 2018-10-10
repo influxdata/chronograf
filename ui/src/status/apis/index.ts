@@ -1,16 +1,8 @@
-import AJAX from 'src/utils/ajax'
-import {JSONFeedData} from 'src/types'
+export const fetchJSONFeed = async (url: string) => {
+  const response = await fetch(url, {
+    method: 'GET',
+    mode: 'cors',
+  })
 
-const excludeBasepath = true // don't prefix route of external link with basepath/
-
-export const fetchJSONFeed = (url: string) =>
-  AJAX<JSONFeedData>(
-    {
-      method: 'GET',
-      url,
-      // For explanation of why this header makes this work:
-      // https://stackoverflow.com/questions/22968406/how-to-skip-the-options-preflight-request-in-angularjs
-      headers: {'Content-Type': 'text/plain; charset=UTF-8'},
-    },
-    excludeBasepath // don't prefix route of external link with basepath
-  )
+  return response.json()
+}
