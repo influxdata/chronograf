@@ -157,7 +157,8 @@ class TimeMachine extends PureComponent<Props, State> {
           queries={this.queriesWorkingDraft}
           templates={templates}
           source={this.source}
-          toggleFlux={this.toggleFlux}
+          toggleFluxOn={this.toggleFluxOn}
+          toggleFluxOff={this.toggleFluxOff}
           sources={this.formattedSources}
           isFluxSelected={this.isFluxSelected}
           isViewingRawData={isViewingRawData}
@@ -520,13 +521,20 @@ class TimeMachine extends PureComponent<Props, State> {
     this.setState({isViewingRawData: !this.state.isViewingRawData})
   }
 
-  private toggleFlux = (): void => {
-    const newQueryType = this.isFluxSelected
-      ? QueryType.InfluxQL
-      : QueryType.Flux
-    const source = this.useDynamicSource ? null : this.source
+  private toggleFluxOn = (): void => {
+    if (!this.isFluxSelected) {
+      const newQueryType = QueryType.Flux
+      const source = this.useDynamicSource ? null : this.source
+      this.updateQueryDraftsSource(source, newQueryType)
+    }
+  }
 
-    this.updateQueryDraftsSource(source, newQueryType)
+  private toggleFluxOff = (): void => {
+    if (this.isFluxSelected) {
+      const newQueryType = QueryType.InfluxQL
+      const source = this.useDynamicSource ? null : this.source
+      this.updateQueryDraftsSource(source, newQueryType)
+    }
   }
 }
 
