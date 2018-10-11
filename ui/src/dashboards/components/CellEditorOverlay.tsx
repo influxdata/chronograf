@@ -164,14 +164,9 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private get isSaveable(): boolean {
     const {queryDrafts, type} = this.props
-    const {scriptStatus} = this.state
 
-    if (type === 'note') {
+    if (type === 'note' || this.isFluxQuery) {
       return true
-    }
-
-    if (this.isFluxSource) {
-      return _.get(scriptStatus, 'type', '') === 'success'
     }
 
     return queryDrafts.every(queryDraft => {
@@ -190,7 +185,7 @@ class CellEditorOverlay extends Component<Props, State> {
     })
   }
 
-  private get isFluxSource(): boolean {
+  private get isFluxQuery(): boolean {
     const {queryDrafts} = this.props
 
     if (getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) {
@@ -228,7 +223,7 @@ class CellEditorOverlay extends Component<Props, State> {
 
     let queries: CellQuery[] = queryDrafts
 
-    if (this.isFluxSource) {
+    if (this.isFluxQuery) {
       queries = [
         {
           query: script,
