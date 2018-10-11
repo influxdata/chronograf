@@ -12,10 +12,25 @@ export const measurements = async (
         |> range(start:-24h) 
         |> group(by:["_measurement"]) 
         |> distinct(column:"_measurement") 
-        |> group()s
+        |> group()
     `
 
   return proxy(source, script)
+}
+
+export const fields = async (
+  source: Source,
+  bucket: string,
+  filter: SchemaFilter[],
+  limit: number
+): Promise<any> => {
+  return await tagValues({
+    bucket,
+    source,
+    tagKey: '_field',
+    limit,
+    filter,
+  })
 }
 
 export const tagKeys = async (

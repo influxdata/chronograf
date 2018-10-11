@@ -2,11 +2,11 @@
 import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
 
 // Components
-import TagValueListItem from 'src/flux/components/TagValueListItem'
+import TagKeyListItem from 'src/flux/components/TagKeyListItem'
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 
 // apis
-import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
+import {tagKeys as fetchTagKeys} from 'src/shared/apis/flux/metaQueries'
 
 // Utils
 import parseValuesColumn from 'src/shared/parsing/flux/values'
@@ -17,49 +17,49 @@ import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
+  measurement?: string
   source: Source
-  tagKey: string
   notify: NotificationAction
-  measurement: string
 }
 
 interface State {
-  tagValues: string[]
+  tagKeys: string[]
   searchTerm: string
   loading: RemoteDataState
 }
 
 @ErrorHandling
-class TagValueList extends PureComponent<Props, State> {
+class TagKeyList extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
     this.state = {
-      tagValues: [],
+      tagKeys: [],
       searchTerm: '',
-      loading: RemoteDataState.Loading,
+      loading: RemoteDataState.NotStarted,
     }
   }
 
   public async componentDidMount() {
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const tagValues = await this.fetchTagValues()
-      this.setState({tagValues, loading: RemoteDataState.Done})
+      const tagKeys = await this.fetchTagKeys()
+      this.setState({tagKeys, loading: RemoteDataState.Done})
     } catch (error) {
       this.setState({loading: RemoteDataState.Error})
     }
   }
 
   public render() {
-    const {tagKey} = this.props
+    const {measurement} = this.props
     const {searchTerm} = this.state
+
     return (
       <>
         <div className="flux-schema--filter">
           <input
             className="form-control input-xs"
-            placeholder={`Filter within ${tagKey}`}
+            placeholder={`Filter within ${measurement || 'Tags'}`}
             type="text"
             spellCheck={false}
             autoComplete="off"
@@ -68,34 +68,34 @@ class TagValueList extends PureComponent<Props, State> {
             onChange={this.onSearch}
           />
         </div>
-        {this.tagValues}
+        {this.tagKeys}
       </>
     )
   }
 
-  private get tagValues(): JSX.Element | JSX.Element[] {
-    const {source, db, tagKey, measurement, notify} = this.props
+  private get tagKeys(): JSX.Element | JSX.Element[] {
+    const {db, source, notify, measurement} = this.props
     const {searchTerm, loading} = this.state
 
     if (loading === RemoteDataState.Loading) {
       return <LoaderSkeleton />
     }
 
+    const excludedTagKeys = ['_measurement', '_field']
     const term = searchTerm.toLocaleLowerCase()
-    const tagValues = this.state.tagValues.filter(
-      tv => tv !== '' && tv.toLocaleLowerCase().includes(term)
+    const tagKeys = this.state.tagKeys.filter(
+      tk =>
+        !excludedTagKeys.includes(tk) && tk.toLocaleLowerCase().includes(term)
     )
-
-    if (tagValues.length) {
-      return tagValues.map(tagValue => (
-        <TagValueListItem
-          source={source}
+    if (tagKeys.length) {
+      return tagKeys.map(tagKey => (
+        <TagKeyListItem
           db={db}
+          source={source}
           searchTerm={searchTerm}
-          tagValue={tagValue}
           tagKey={tagKey}
           measurement={measurement}
-          key={tagValue}
+          key={tagKey}
           notify={notify}
         />
       ))
@@ -103,29 +103,21 @@ class TagValueList extends PureComponent<Props, State> {
     return (
       <div className="flux-schema-tree flux-schema--child">
         <div className="flux-schema--item no-hover" onClick={this.handleClick}>
-          <div className="no-results">No more tag values.</div>
+          <div className="no-results">No more tag keys.</div>
         </div>
       </div>
     )
   }
 
-  private async fetchTagValues(): Promise<string[]> {
-    const {source, db, tagKey, measurement} = this.props
-    const limit = 50
-
+  private async fetchTagKeys(): Promise<string[]> {
+    const {source, db, measurement} = this.props
     const filter = measurement
       ? [{key: '_measurement', value: measurement}]
       : []
 
-    const response = await fetchTagValues({
-      source,
-      bucket: db,
-      tagKey,
-      filter,
-      limit,
-    })
-    const tagValues = parseValuesColumn(response)
-    return tagValues
+    const response = await fetchTagKeys(source, db, filter)
+    const tagKeys = parseValuesColumn(response)
+    return tagKeys
   }
 
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -139,4 +131,4 @@ class TagValueList extends PureComponent<Props, State> {
   }
 }
 
-export default TagValueList
+export default TagKeyList
