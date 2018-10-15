@@ -4,9 +4,6 @@ import {Dispatch} from 'redux'
 
 import {fetchJSONFeed as fetchJSONFeedAJAX} from 'src/status/apis'
 
-import {notify} from 'src/shared/actions/notifications'
-import {notifyJSONFeedFailed} from 'src/shared/copy/notifications'
-
 import {JSONFeedData} from 'src/types'
 
 export enum ActionTypes {
@@ -72,6 +69,5 @@ export const fetchJSONFeedAsync = (url: string) => async (
   } catch (error) {
     console.error(error)
     dispatch(fetchJSONFeedFailed())
-    dispatch(notify(notifyJSONFeedFailed(url)))
   }
 }
