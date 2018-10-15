@@ -185,6 +185,7 @@ class TimeMachineEditor extends PureComponent<Props, State> {
 
     if (ctrlKey && key === 'Enter') {
       this.props.onSubmitScript()
+
       return
     }
 

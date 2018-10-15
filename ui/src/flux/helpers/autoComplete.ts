@@ -61,6 +61,7 @@ export const EXCLUDED_KEYS = [
   'Backslash',
   'Quote',
   'Meta',
+  ' ',
 ]
 
 export const getSuggestions = (
@@ -222,6 +223,7 @@ export const getFunctionSuggestions = (
   cursorPosition: number,
   allSuggestions: Suggestion[]
 ) => {
+  const formatter = getSuggestionFormatter(currentLineText, cursorPosition)
   const trailingWhitespace = /[\w]+/
 
   let start = cursorPosition
@@ -242,19 +244,47 @@ export const getFunctionSuggestions = (
 
   // If not completing inside a current word, return list of all possible suggestions
   if (start === end) {
-    return {start, end, suggestions: allSuggestions.map(s => s.name)}
+    return {
+      start,
+      end,
+      suggestions: allSuggestions.map(({name}) => ({
+        text: formatter(name),
+        displayText: name,
+      })),
+    }
   }
 
+  // Otherwise return suggestions that contain the current word as a substring
   const currentWord = currentLineText.slice(start, end)
   const listFilter = new RegExp(`^${currentWord}`, 'i')
-
-  // Otherwise return suggestions that contain the current word as a substring
-  const names = allSuggestions.map(s => s.name)
-  const filtered = names.filter(name => name.match(listFilter))
-  const suggestions = filtered.map(displayText => ({
-    text: `${displayText}(`,
-    displayText,
-  }))
+  const suggestions = allSuggestions
+    .map(s => s.name)
+    .filter(name => name.match(listFilter))
+    .map(displayText => ({text: formatter(displayText), displayText}))
 
   return {start, end, suggestions}
+}
+
+export const getSuggestionFormatter = (
+  currentLineText: string,
+  cursorPosition: number
+) => {
+  // Get the last two characters before the cursor that are neither whitespace nor alphanumeric
+  const untilCursor = currentLineText
+    .slice(0, cursorPosition)
+    .replace(/[a-z0-0]*/gi, '')
+    .replace(/\s/g, '')
+
+  const n = untilCursor.length
+  const prevTwoChars = (untilCursor[n - 2] || '') + (untilCursor[n - 1] || '')
+
+  const formatter = (name: string) => {
+    if (prevTwoChars === '|>' || name.startsWith('from')) {
+      return name
+    }
+
+    return `|> ${name}`
+  }
+
+  return formatter
 }
