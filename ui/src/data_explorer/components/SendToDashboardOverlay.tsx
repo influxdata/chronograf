@@ -304,14 +304,18 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     let selectedDashboards = this.selectedDashboards
 
     if (this.isNewDashboardSelected) {
-      const {data} =
-        newDashboardName === ''
-          ? await createDashboard(NEW_EMPTY_DASHBOARD)
-          : await createDashboard({
-              ...NEW_EMPTY_DASHBOARD,
-              name: newDashboardName,
-            })
-      const newDashboard: Dashboard = data
+      let result
+
+      if (newDashboardName === '') {
+        result = await createDashboard(NEW_EMPTY_DASHBOARD)
+      } else {
+        result = await createDashboard({
+          ...NEW_EMPTY_DASHBOARD,
+          name: newDashboardName,
+        })
+      }
+
+      const newDashboard: Dashboard = result.data
       selectedDashboards = [...selectedDashboards, newDashboard]
     }
 
