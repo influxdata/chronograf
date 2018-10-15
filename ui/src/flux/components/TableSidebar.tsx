@@ -8,7 +8,7 @@ import TableSidebarItem from 'src/flux/components/TableSidebarItem'
 
 interface Props {
   data: FluxTable[]
-  selectedResultID: string
+  selectedResultName: string
   onSelectResult: (id: string) => void
 }
 
@@ -27,7 +27,7 @@ export default class TableSidebar extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {selectedResultID, onSelectResult} = this.props
+    const {selectedResultName, onSelectResult} = this.props
     const {searchTerm} = this.state
 
     return (
@@ -53,7 +53,7 @@ export default class TableSidebar extends PureComponent<Props, State> {
                   name={name}
                   groupKey={groupKey}
                   onSelect={onSelectResult}
-                  isSelected={id === selectedResultID}
+                  isSelected={name === selectedResultName}
                 />
               )
             })}
