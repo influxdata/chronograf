@@ -71,6 +71,7 @@ type Props = PassedProps & ConnectedProps
 interface State {
   selectedIDs: string[]
   name: string
+  newDashboardName: string
 }
 
 const NEW_DASHBOARD_ID = 'new'
@@ -82,6 +83,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     this.state = {
       selectedIDs: [],
       name: '',
+      newDashboardName: '',
     }
   }
   public async componentDidMount() {
@@ -94,9 +96,14 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     this.setState({name})
   }
 
+  public handleChangeNewDashboardName = e => {
+    const newDashboardName = e.target.value
+    this.setState({newDashboardName})
+  }
+
   public render() {
     const {onCancel} = this.props
-    const {name, selectedIDs} = this.state
+    const {name, selectedIDs, newDashboardName} = this.state
 
     const numberDashboards = selectedIDs.length > 1 ? selectedIDs.length : ''
     const pluralizer = selectedIDs.length > 1 ? 's' : ''
@@ -115,6 +122,15 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
                 {this.dropdownItems}
               </MultiSelectDropdown>
             </Form.Element>
+            {this.isNewDashboardSelected && (
+              <Form.Element label="Name new dashboard">
+                <Input
+                  value={newDashboardName}
+                  onChange={this.handleChangeNewDashboardName}
+                  placeholder={'Name new dashboard'}
+                />
+              </Form.Element>
+            )}
             <Form.Element label="Cell Name">
               <Input
                 value={name}
@@ -140,6 +156,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
   private get dropdownItems(): JSX.Element[] {
     const {dashboards} = this.props
+    const {newDashboardName} = this.state
 
     const simpleArray = dashboards.map(d => ({
       id: d.id.toString(),
@@ -162,7 +179,10 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       <MultiSelectDropdown.Item
         key={NEW_DASHBOARD_ID}
         id={NEW_DASHBOARD_ID}
-        value={{id: NEW_DASHBOARD_ID, name: 'New Dashboard'}}
+        value={{
+          id: NEW_DASHBOARD_ID,
+          name: newDashboardName,
+        }}
       >
         Send to a New Dashboard
       </MultiSelectDropdown.Item>
@@ -173,6 +193,10 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     )
 
     return [newDashboardItem, divider, ...items]
+  }
+
+  private get isNewDashboardSelected(): boolean {
+    return this.state.selectedIDs.includes(NEW_DASHBOARD_ID)
   }
 
   private get hasQuery(): boolean {
@@ -226,7 +250,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private sendToDashboard = async () => {
-    const {name, selectedIDs} = this.state
+    const {name, newDashboardName} = this.state
     const {
       queryConfig,
       script,
@@ -279,8 +303,14 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
     let selectedDashboards = this.selectedDashboards
 
-    if (_.includes(selectedIDs, NEW_DASHBOARD_ID)) {
-      const {data} = await createDashboard(NEW_EMPTY_DASHBOARD)
+    if (this.isNewDashboardSelected) {
+      const {data} =
+        newDashboardName === ''
+          ? await createDashboard(NEW_EMPTY_DASHBOARD)
+          : await createDashboard({
+              ...NEW_EMPTY_DASHBOARD,
+              name: newDashboardName,
+            })
       const newDashboard: Dashboard = data
       selectedDashboards = [...selectedDashboards, newDashboard]
     }
