@@ -283,8 +283,9 @@ class TimeSeries extends Component<Props, State> {
     let responseUUID: string
     let loading: RemoteDataState = null
 
-    this.setState({loading: RemoteDataState.Loading})
     const latestUUID = uuid.v1()
+
+    this.setState({loading: RemoteDataState.Loading, latestUUID})
 
     try {
       if (this.isFluxQuery) {
@@ -302,7 +303,7 @@ class TimeSeries extends Component<Props, State> {
         return
       }
 
-      if (responseUUID !== latestUUID) {
+      if (responseUUID !== this.state.latestUUID) {
         return
       }
 
@@ -317,7 +318,6 @@ class TimeSeries extends Component<Props, State> {
       rawFluxData,
       isFirstFetch: false,
       loading,
-      latestUUID,
     })
 
     if (grabDataForDownload) {
