@@ -20,8 +20,8 @@ describe('Flux.helpers.autoComplete', () => {
         start: 4,
         end: 6,
         suggestions: [
-          {displayText: 'filter', text: 'filter('},
-          {displayText: 'first', text: 'first('},
+          {displayText: 'filter', text: 'filter'},
+          {displayText: 'first', text: 'first'},
         ],
       }
 
@@ -39,7 +39,48 @@ describe('Flux.helpers.autoComplete', () => {
       const expected = {
         start: 4,
         end: 4,
-        suggestions: ['filter', 'first', 'baz'],
+        suggestions: [
+          {displayText: 'filter', text: 'filter'},
+          {displayText: 'first', text: 'first'},
+          {displayText: 'baz', text: 'baz'},
+        ],
+      }
+
+      expect(actual).toEqual(expected)
+    })
+
+    it('completes with a pipe if first non-whitespace on line', () => {
+      const lineText = '\t'
+      const cursorPosition = lineText.length
+      const actual = getSuggestionsHelper(
+        lineText,
+        cursorPosition,
+        ALL_SUGGESTIONS
+      )
+      const expected = {
+        start: 1,
+        end: 1,
+        suggestions: [
+          {displayText: 'filter', text: '|> filter'},
+          {displayText: 'first', text: '|> first'},
+          {displayText: 'baz', text: '|> baz'},
+        ],
+      }
+
+      expect(actual).toEqual(expected)
+    })
+
+    it('does not complete from queries with a pipe', () => {
+      const lineText = ''
+      const cursorPosition = lineText.length
+      const actual = getSuggestionsHelper(lineText, cursorPosition, [
+        {name: 'from', params: {foo: 'function', bux: 'string'}},
+      ])
+
+      const expected = {
+        start: 0,
+        end: 0,
+        suggestions: [{displayText: 'from', text: 'from'}],
       }
 
       expect(actual).toEqual(expected)
@@ -56,7 +97,11 @@ describe('Flux.helpers.autoComplete', () => {
       const expected = {
         start: 13,
         end: 13,
-        suggestions: ['filter', 'first', 'baz'],
+        suggestions: [
+          {displayText: 'filter', text: '|> filter'},
+          {displayText: 'first', text: '|> first'},
+          {displayText: 'baz', text: '|> baz'},
+        ],
       }
 
       expect(actual).toEqual(expected)
