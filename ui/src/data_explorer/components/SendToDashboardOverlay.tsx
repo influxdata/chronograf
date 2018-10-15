@@ -168,7 +168,9 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       </MultiSelectDropdown.Item>
     )
 
-    const divider = <MultiSelectDropdown.Divider id={'divider'} />
+    const divider = (
+      <MultiSelectDropdown.Divider key={'divider'} id={'divider'} />
+    )
 
     return [newDashboardItem, divider, ...items]
   }
