@@ -35,7 +35,7 @@ interface Props {
 }
 
 interface State {
-  selectedResultID: string | null
+  selectedResultName: string | null
 }
 
 const filterTables = (tables: FluxTable[]): FluxTable[] => {
@@ -63,13 +63,13 @@ class TimeMachineTables extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      selectedResultID: this.defaultResultId,
+      selectedResultName: this.defaultResultName,
     }
   }
 
   public componentDidUpdate() {
     if (!this.selectedResult) {
-      this.setState({selectedResultID: this.defaultResultId})
+      this.setState({selectedResultName: this.defaultResultName})
     }
   }
 
@@ -90,7 +90,7 @@ class TimeMachineTables extends PureComponent<Props, State> {
         {this.showSidebar && (
           <TableSidebar
             data={this.props.data}
-            selectedResultID={this.state.selectedResultID}
+            selectedResultName={this.state.selectedResultName}
             onSelectResult={this.handleSelectResult}
           />
         )}
@@ -156,8 +156,8 @@ class TimeMachineTables extends PureComponent<Props, State> {
     return fieldOptions
   }
 
-  private handleSelectResult = (selectedResultID: string): void => {
-    this.setState({selectedResultID})
+  private handleSelectResult = (selectedResultName: string): void => {
+    this.setState({selectedResultName})
   }
 
   private get showSidebar(): boolean {
@@ -172,7 +172,7 @@ class TimeMachineTables extends PureComponent<Props, State> {
     return !!this.props.data && !!this.selectedResult
   }
 
-  private get defaultResultId() {
+  private get defaultResultName() {
     const {data} = this.props
 
     if (data.length && !!data[0]) {
@@ -185,7 +185,7 @@ class TimeMachineTables extends PureComponent<Props, State> {
   private get selectedResult(): FluxTable {
     const filteredTables = this.filteredTablesMemoized(this.props.data)
     const table = filteredTables.find(
-      d => d.name === this.state.selectedResultID
+      d => d.name === this.state.selectedResultName
     )
 
     return table
