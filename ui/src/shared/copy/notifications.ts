@@ -541,7 +541,6 @@ export const notifyCellSent = (
   return {
     ...defaultSuccessNotification,
     icon: 'dash-h',
-    duration: 1900,
     message: `Added "${cellName}" to ${dashboardNum} dashboard${pluralizer}.`,
   }
 }
@@ -553,7 +552,6 @@ export const notifyCellSendFailed = (
   return {
     ...defaultErrorNotification,
     icon: 'dash-h',
-    duration: 1900,
     message: `Could not add "${cellName}" to ${dashboardName}.`,
   }
 }
