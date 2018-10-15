@@ -5,8 +5,7 @@ import {EditorChange, LineWidget} from 'codemirror'
 import {ShowHintOptions} from 'src/types/codemirror'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {OnChangeScript, Suggestion} from 'src/types/flux'
-import {EXCLUDED_KEYS} from 'src/flux/constants/editor'
-import {getSuggestions} from 'src/flux/helpers/autoComplete'
+import {getSuggestions, EXCLUDED_KEYS} from 'src/flux/helpers/autoComplete'
 import 'src/external/codemirror'
 
 interface Gutter {
