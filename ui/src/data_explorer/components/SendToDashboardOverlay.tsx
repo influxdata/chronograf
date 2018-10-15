@@ -106,13 +106,6 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
         <OverlayHeading title="Send to Dashboard" onDismiss={onCancel} />
         <OverlayBody>
           <Form>
-            <Form.Element label="Cell Name">
-              <Input
-                value={name}
-                onChange={this.handleChangeName}
-                placeholder={'Name this new cell'}
-              />
-            </Form.Element>
             <Form.Element label="Target Dashboard(s)">
               <MultiSelectDropdown
                 onChange={this.handleSelect}
@@ -121,6 +114,13 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
               >
                 {this.dropdownItems}
               </MultiSelectDropdown>
+            </Form.Element>
+            <Form.Element label="Cell Name">
+              <Input
+                value={name}
+                onChange={this.handleChangeName}
+                placeholder={'Name this new cell'}
+              />
             </Form.Element>
             <Form.Footer>
               <Button
