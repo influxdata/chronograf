@@ -1,16 +1,14 @@
-import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
+import React, {PureComponent} from 'react'
 import classnames from 'classnames'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
-import {tagKeys as fetchTagKeys} from 'src/shared/apis/flux/metaQueries'
-import parseValuesColumn from 'src/shared/parsing/flux/values'
-import TagList from 'src/flux/components/TagList'
 import {
   notifyCopyToClipboardSuccess,
   notifyCopyToClipboardFailed,
 } from 'src/shared/copy/notifications'
 
 import {Source, NotificationAction} from 'src/types'
+import SchemaItemCategories from 'src/flux/components/SchemaItemCategories'
 
 interface Props {
   db: string
@@ -20,7 +18,6 @@ interface Props {
 
 interface State {
   isOpen: boolean
-  tags: string[]
   searchTerm: string
 }
 
@@ -29,20 +26,7 @@ class DatabaseListItem extends PureComponent<Props, State> {
     super(props)
     this.state = {
       isOpen: false,
-      tags: [],
       searchTerm: '',
-    }
-  }
-
-  public async componentDidMount() {
-    const {db, source} = this.props
-
-    try {
-      const response = await fetchTagKeys(source, db, [])
-      const tags = parseValuesColumn(response)
-      this.setState({tags})
-    } catch (error) {
-      console.error(error)
     }
   }
 
@@ -64,50 +48,26 @@ class DatabaseListItem extends PureComponent<Props, State> {
             </div>
           </CopyToClipboard>
         </div>
-        {this.filterAndTagList}
+        {this.categories}
       </div>
     )
   }
 
-  private get tags(): string[] {
-    const {tags, searchTerm} = this.state
-    const term = searchTerm.toLocaleLowerCase()
-    return tags.filter(t => t.toLocaleLowerCase().includes(term))
+  private get categories(): JSX.Element {
+    const {db, source, notify} = this.props
+    const {isOpen} = this.state
+
+    return (
+      <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
+        <SchemaItemCategories db={db} source={source} notify={notify} />
+      </div>
+    )
   }
 
   private get className(): string {
     return classnames('flux-schema-tree', {
       expanded: this.state.isOpen,
     })
-  }
-
-  private get filterAndTagList(): JSX.Element {
-    const {db, source, notify} = this.props
-    const {isOpen, searchTerm} = this.state
-
-    return (
-      <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-        <div className="flux-schema--filter">
-          <input
-            className="form-control input-xs"
-            placeholder={`Filter within ${db}`}
-            type="text"
-            spellCheck={false}
-            autoComplete="off"
-            value={searchTerm}
-            onClick={this.handleInputClick}
-            onChange={this.onSearch}
-          />
-        </div>
-        <TagList
-          db={db}
-          source={source}
-          tags={this.tags}
-          filter={[]}
-          notify={notify}
-        />
-      </div>
-    )
   }
 
   private handleClickCopy = e => {
@@ -126,18 +86,8 @@ class DatabaseListItem extends PureComponent<Props, State> {
     }
   }
 
-  private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      searchTerm: e.target.value,
-    })
-  }
-
   private handleClick = () => {
     this.setState({isOpen: !this.state.isOpen})
-  }
-
-  private handleInputClick = (e: MouseEvent<HTMLInputElement>) => {
-    e.stopPropagation()
   }
 }
 

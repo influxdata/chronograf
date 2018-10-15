@@ -3,7 +3,8 @@ import React, {PureComponent} from 'react'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 // Components
-import FieldList from 'src/flux/components/FieldList'
+import TagKeyList from 'src/flux/components/TagKeyList'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Utils
 import {
@@ -16,16 +17,13 @@ import {OpenState} from 'src/flux/constants/explorer'
 
 // types
 import {Source, NotificationAction} from 'src/types'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   db: string
   source: Source
   searchTerm: string
-  tagValue: string
-  tagKey: string
-  notify: NotificationAction
   measurement: string
+  notify: NotificationAction
 }
 
 interface State {
@@ -33,7 +31,7 @@ interface State {
 }
 
 @ErrorHandling
-class TagValueListItem extends PureComponent<Props, State> {
+class MeasurementListItem extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -43,28 +41,26 @@ class TagValueListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, tagValue, tagKey, notify, measurement} = this.props
+    const {db, source, measurement, notify} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
-
-    const tag = {key: tagKey, value: tagValue}
 
     return (
       <div
         className={`flux-schema-tree flux-schema--child ${
           isOpen ? 'expanded' : ''
         }`}
-        key={tagValue}
+        key={measurement}
         onClick={this.handleItemClick}
       >
         <div className="flux-schema--item">
           <div className="flex-schema-item-group">
             <div className="flux-schema--expander" />
-            {tagValue}
-            <span className="flux-schema--type">Tag Value</span>
+            {measurement}
+            <span className="flux-schema--type">Measurement</span>
           </div>
-          <CopyToClipboard text={tagValue} onCopy={this.handleCopyAttempt}>
+          <CopyToClipboard text={measurement} onCopy={this.handleCopyAttempt}>
             <div className="flux-schema-copy" onClick={this.handleClickCopy}>
               <span className="icon duplicate" title="copy to clipboard" />
               Copy
@@ -73,10 +69,9 @@ class TagValueListItem extends PureComponent<Props, State> {
         </div>
         {!isUnopen && (
           <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-            <FieldList
+            <TagKeyList
               db={db}
               source={source}
-              tag={tag}
               notify={notify}
               measurement={measurement}
             />
@@ -84,18 +79,6 @@ class TagValueListItem extends PureComponent<Props, State> {
         )}
       </div>
     )
-  }
-
-  private handleItemClick = (e): void => {
-    e.stopPropagation()
-
-    const opened = this.state.opened
-
-    if (opened === OpenState.OPENED) {
-      this.setState({opened: OpenState.ClOSED})
-      return
-    }
-    this.setState({opened: OpenState.OPENED})
   }
 
   private handleClickCopy = (e): void => {
@@ -113,6 +96,18 @@ class TagValueListItem extends PureComponent<Props, State> {
       notify(notifyCopyToClipboardFailed(copiedText))
     }
   }
+
+  private handleItemClick = (e): void => {
+    e.stopPropagation()
+
+    const opened = this.state.opened
+
+    if (opened === OpenState.OPENED) {
+      this.setState({opened: OpenState.ClOSED})
+      return
+    }
+    this.setState({opened: OpenState.OPENED})
+  }
 }
 
-export default TagValueListItem
+export default MeasurementListItem
