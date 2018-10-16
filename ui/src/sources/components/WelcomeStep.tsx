@@ -26,8 +26,8 @@ class SourceStep extends PureComponent<Props> {
     return (
       <div className="wizard-step--bookend">
         <div className="auth-logo" />
-        <h1>Welcome to InfluxData </h1>
-        <p>Start using the InfluxData platform in a few easy steps</p>
+        <h1>Welcome to Chronograf</h1>
+        <p>Start using Chronograf in a few easy steps.</p>
       </div>
     )
   }
