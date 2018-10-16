@@ -209,7 +209,6 @@ class CellEditorOverlay extends Component<Props, State> {
       cell,
       draftScript,
       queryDrafts,
-      onChangeScript,
       type,
       axes,
       tableOptions,
@@ -227,8 +226,6 @@ class CellEditorOverlay extends Component<Props, State> {
     let queries: CellQuery[] = queryDrafts
 
     if (this.isFluxQuery) {
-      onChangeScript(draftScript)
-
       queries = [
         {
           query: draftScript,

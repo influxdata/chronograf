@@ -166,7 +166,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     const {onChangeDraftScript} = this.props
 
     await onChangeDraftScript(draftScript)
-    this.checkDraftScript()
+    this.debouncer.call(this.checkDraftScript, CHECK_SCRIPT_DELAY)
   }
 
   private checkDraftScript = async () => {
