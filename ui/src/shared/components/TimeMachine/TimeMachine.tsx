@@ -312,6 +312,7 @@ class TimeMachine extends PureComponent<Props, State> {
     const {
       script,
       onChangeScript,
+      draftScript,
       onChangeDraftScript,
       fluxLinks,
       onUpdateScriptStatus,
@@ -321,6 +322,7 @@ class TimeMachine extends PureComponent<Props, State> {
     return (
       <FluxQueryMaker
         notify={notify}
+        draftScript={draftScript}
         source={this.source}
         script={script}
         onChangeScript={onChangeScript}
@@ -549,6 +551,7 @@ const ConnectedTimeMachine = (props: PassedProps) => {
           <TimeMachine
             {...props}
             script={state.script}
+            draftScript={state.draftScript}
             queryDrafts={state.queryDrafts}
             timeRange={state.timeRange}
             onUpdateTimeRange={container.handleUpdateTimeRange}
