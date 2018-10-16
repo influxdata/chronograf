@@ -23,6 +23,7 @@ interface Props {
   script: string
   source: Source
   timeRange: TimeRange
+  fluxASTLink: string
 
   isFluxSelected: boolean
   onNotify: typeof notify
@@ -78,9 +79,14 @@ class CSVExporter extends PureComponent<Props, State> {
   }
 
   private downloadFluxCSV = async (): Promise<void> => {
-    const {source, script, onNotify, timeRange} = this.props
+    const {source, script, onNotify, timeRange, fluxASTLink} = this.props
 
-    const {didTruncate} = await downloadFluxCSV(source, script, timeRange)
+    const {didTruncate} = await downloadFluxCSV(
+      source,
+      script,
+      timeRange,
+      fluxASTLink
+    )
 
     if (didTruncate) {
       onNotify(fluxResponseTruncatedError())
@@ -90,8 +96,12 @@ class CSVExporter extends PureComponent<Props, State> {
   }
 }
 
+const mstp = state => ({
+  fluxASTLink: state.links.flux.ast,
+})
+
 const mdtp = {
   onNotify: notify,
 }
 
-export default connect(null, mdtp)(CSVExporter)
+export default connect(mstp, mdtp)(CSVExporter)

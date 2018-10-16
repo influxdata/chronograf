@@ -8,6 +8,7 @@ export const GIT_SHA = process.env.GIT_SHA
 
 export const DEFAULT_DURATION_MS = 1000
 export const DEFAULT_PIXELS = 333
+export const RESOLUTION_SCALE_FACTOR = 0.5
 
 export const NO_CELL = 'none'
 

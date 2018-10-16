@@ -288,7 +288,7 @@ describe('templates.utils.replace', () => {
   describe('replaceInterval', () => {
     it('can replace :interval:', () => {
       const query = `SELECT mean(usage_idle) from "cpu" where time > now() - 4320h group by time(:interval:)`
-      const expected = `SELECT mean(usage_idle) from "cpu" where time > now() - 4320h group by time(46702702ms)`
+      const expected = `SELECT mean(usage_idle) from "cpu" where time > now() - 4320h group by time(93405405ms)`
       const pixels = 333
       const durationMs = 15551999999
       const actual = replaceInterval(query, pixels, durationMs)
@@ -298,7 +298,7 @@ describe('templates.utils.replace', () => {
 
     it('can replace multiple intervals', () => {
       const query = `SELECT NON_NEGATIVE_DERIVATIVE(mean(usage_idle), :interval:) from "cpu" where time > now() - 4320h group by time(:interval:)`
-      const expected = `SELECT NON_NEGATIVE_DERIVATIVE(mean(usage_idle), 46702702ms) from "cpu" where time > now() - 4320h group by time(46702702ms)`
+      const expected = `SELECT NON_NEGATIVE_DERIVATIVE(mean(usage_idle), 93405405ms) from "cpu" where time > now() - 4320h group by time(93405405ms)`
 
       const pixels = 333
       const durationMs = 15551999999
@@ -338,7 +338,7 @@ describe('templates.utils.replace', () => {
         const query = `SELECT mean(usage_idle) from "cpu" WHERE time > :dashboardTime: group by time(:interval:)`
         let actual = templateReplace(query, vars)
         actual = replaceInterval(actual, pixels, durationMs)
-        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 24h group by time(259459ms)`
+        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 24h group by time(518918ms)`
 
         expect(actual).toBe(expected)
       })
@@ -373,7 +373,7 @@ describe('templates.utils.replace', () => {
         const query = `SELECT mean(usage_idle) from "cpu" WHERE time > :dashboardTime: group by time(:interval:)`
         let actual = templateReplace(query, vars)
         actual = replaceInterval(actual, pixels, durationMs)
-        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 1h group by time(94736ms)`
+        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 1h group by time(189473ms)`
 
         expect(actual).toBe(expected)
       })

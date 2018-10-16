@@ -1,11 +1,15 @@
 // Libraries
 import moment from 'moment'
 import {unparse} from 'papaparse'
+import uuid from 'uuid'
 
 // Utils
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {executeQuery as executeInfluxQLQuery} from 'src/shared/apis/query'
 import {getRawTimeSeries as executeFluxQuery} from 'src/flux/apis/index'
+
+// Constants
+import {DEFAULT_PIXELS} from 'src/shared/constants'
 
 // Types
 import {Query, Template, Source, TimeRange} from 'src/types'
@@ -29,9 +33,17 @@ export const downloadInfluxQLCSV = async (
 export const downloadFluxCSV = async (
   source: Source,
   script: string,
-  timeRange: TimeRange
+  timeRange: TimeRange,
+  fluxASTLink: string
 ): Promise<{didTruncate: boolean}> => {
-  const {csv, didTruncate} = await executeFluxQuery(source, script, timeRange)
+  const {csv, didTruncate} = await executeFluxQuery(
+    source,
+    script,
+    uuid.v4(),
+    timeRange,
+    fluxASTLink,
+    DEFAULT_PIXELS
+  )
 
   downloadCSV(csv, csvName())
 

@@ -50,6 +50,7 @@ interface Props {
   children: (r: RenderProps) => JSX.Element
   inView?: boolean
   templates?: Template[]
+  fluxASTLink?: string
   editQueryStatus?: (queryID: string, status: Status) => void
   grabDataForDownload?: GrabDataForDownloadHandler
   grabFluxData?: (data: FluxTable[]) => void
@@ -65,6 +66,8 @@ interface State {
   timeSeriesFlux: FluxTable[]
   latestUUID: string
 }
+
+const TEMP_RES = 300 // FIXME
 
 const GraphLoadingDots = () => (
   <div className="graph-panel__refreshing">
@@ -255,14 +258,16 @@ class TimeSeries extends PureComponent<Props, State> {
   private executeFluxQuery = async (
     latestUUID: string
   ): Promise<GetTimeSeriesResult> => {
-    const {queries, onNotify, source, timeRange} = this.props
+    const {queries, onNotify, source, timeRange, fluxASTLink} = this.props
 
     const script: string = _.get(queries, '0.text', '')
     const results = await fetchFluxTimeSeries(
       source,
       script,
+      latestUUID,
       timeRange,
-      latestUUID
+      fluxASTLink,
+      TEMP_RES
     )
 
     if (results.didTruncate && onNotify) {
@@ -288,7 +293,6 @@ class TimeSeries extends PureComponent<Props, State> {
     latestUUID: string
   ): Promise<TimeSeriesServerResponse> => {
     const {source, templates, editQueryStatus} = this.props
-    const TEMP_RES = 300 // FIXME
 
     editQueryStatus(query.id, {loading: true})
 

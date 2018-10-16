@@ -83,6 +83,7 @@ interface Props {
   autoRefresher: AutoRefresher
   manualRefresh: number
   resizerTopHeight: number
+  fluxASTLink: string
   onZoom: () => void
   editQueryStatus: () => void
   onSetResolution: () => void
@@ -121,6 +122,7 @@ class RefreshingGraph extends Component<Props> {
       onNotify,
       timeRange,
       templates,
+      fluxASTLink,
       grabFluxData,
       manualRefresh,
       autoRefresher,
@@ -152,6 +154,7 @@ class RefreshingGraph extends Component<Props> {
             queries={this.queries}
             timeRange={timeRange}
             templates={templates}
+            fluxASTLink={fluxASTLink}
             editQueryStatus={editQueryStatus}
             onNotify={onNotify}
             grabDataForDownload={grabDataForDownload}
@@ -469,8 +472,9 @@ class RefreshingGraph extends Component<Props> {
   }
 }
 
-const mapStateToProps = ({annotations: {mode}}) => ({
+const mapStateToProps = ({links, annotations: {mode}}) => ({
   mode,
+  fluxASTLink: links.flux.ast,
 })
 
 const mdtp = {
