@@ -8,6 +8,7 @@ import WizardStep from 'src/reusable_ui/components/wizard/WizardStep'
 import SourceStep from 'src/sources/components/SourceStep'
 import KapacitorStep from 'src/sources/components/KapacitorStep'
 import CompletionStep from 'src/sources/components/CompletionStep'
+import WelcomeStep from 'src/sources/components/WelcomeStep'
 import Notifications from 'src/shared/components/Notifications'
 import DashboardStep from 'src/sources/components/DashboardStep'
 
@@ -36,6 +37,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
   public sourceStepRef: any
   public kapacitorStepRef: any
   public completionStepRef: any
+  public welcomeStepRef: any
   public dashboardStepRef: any
 
   constructor(props) {
@@ -65,13 +67,23 @@ class OnboardingWizard extends PureComponent<Props, State> {
       <>
         <Notifications />
         <WizardFullScreen
-          title={'Welcome to Influx'}
           skipLinkText={'skip'}
           handleSkip={this.handleCompletionNext}
           switchLinkText={'switch organizations'}
           handleSwitch={this.resetAndGotoPurgatory}
           isUsingAuth={isUsingAuth}
         >
+          <WizardStep
+            title="Welcome"
+            isComplete={this.isWelcomeComplete}
+            isErrored={false}
+            nextLabel="Get Started"
+            isSkippableStep={false}
+          >
+            <WelcomeStep
+              ref={c => (this.welcomeStepRef = c && c.getWrappedInstance())}
+            />
+          </WizardStep>
           <WizardStep
             title="InfluxDB Connection"
             tipText=""
@@ -80,7 +92,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             isSkippableStep={false}
             onNext={this.handleSourceNext}
             nextLabel={source ? 'Update Connection' : 'Add Connection'}
-            previousLabel="Cancel"
+            previousLabel="Go Back"
             onPrevious={this.handleKapacitorPrev}
           >
             <SourceStep
@@ -98,6 +110,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             isComplete={this.isDashboardComplete}
             isErrored={dashboardError}
             onNext={this.handleDashboardNext}
+            previousLabel="Go Back"
           >
             <DashboardStep
               ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
@@ -127,6 +140,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             tipText=""
             isComplete={this.isCompletionComplete}
             isErrored={false}
+            isSkippableStep={false}
             onNext={this.handleCompletionNext}
             onPrevious={this.handleCompletionPrev}
             nextLabel="View All Connections"
@@ -139,6 +153,11 @@ class OnboardingWizard extends PureComponent<Props, State> {
         </WizardFullScreen>
       </>
     )
+  }
+
+  // WelcomeStep
+  private isWelcomeComplete = () => {
+    return true
   }
 
   // SourceStep

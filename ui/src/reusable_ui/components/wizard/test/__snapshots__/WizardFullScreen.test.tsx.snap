@@ -1,23 +1,39 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`WizardFullScreen matches snapshot with minimal props 1`] = `
-<SplashPage>
-  <h1
-    className="wizard-title"
-  />
+<div
+  className="wizard-splash auth-image"
+>
   <div
     className="wizard-container"
   />
-</SplashPage>
+  <p
+    className="auth-credits"
+  >
+    Powered by 
+    <span
+      className="icon cubo-uniform"
+    />
+     InfluxData
+  </p>
+</div>
 `;
 
 exports[`WizardFullScreen with children matches snapshot with children props 1`] = `
-<SplashPage>
-  <h1
-    className="wizard-title"
-  />
+<div
+  className="wizard-splash auth-image"
+>
   <div
     className="wizard-container"
   />
-</SplashPage>
+  <p
+    className="auth-credits"
+  >
+    Powered by 
+    <span
+      className="icon cubo-uniform"
+    />
+     InfluxData
+  </p>
+</div>
 `;

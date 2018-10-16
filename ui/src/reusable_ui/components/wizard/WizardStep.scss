@@ -12,7 +12,7 @@
 
 .wizard-step--child {
   padding: 0 $ix-marg-d $ix-marg-d $ix-marg-d;
-  overflow-y: scroll;
+  overflow-y: auto;
   max-height: 30vh;
   min-height: 10vh;
   position: relative;
