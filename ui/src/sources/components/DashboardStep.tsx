@@ -44,6 +44,7 @@ interface Props {
   notify: typeof notifyAction
   dashboardsCreated: Protoboard[]
   source: Source
+  countSelected: (selectedDashboards: number) => void
 }
 
 @ErrorHandling
@@ -64,7 +65,8 @@ class DashboardStep extends Component<Props, State> {
 
   public async componentDidMount() {
     const protoboards = await getProtoboards()
-    this.setState({protoboards})
+    this.props.countSelected(0)
+    this.setState({protoboards}, this.handleSuggest)
   }
 
   public next = async (): Promise<NextReturn> => {
@@ -106,12 +108,6 @@ class DashboardStep extends Component<Props, State> {
               placeholder="Filter by name..."
               onSearch={this.setSearchTerm}
             />
-            <button
-              className="btn btn-sm btn-primary"
-              onClick={this.handleSuggest}
-            >
-              Suggest dashboards
-            </button>
           </div>
           {this.suggestedDashboardCards}
           {this.dashboardCards}
@@ -194,21 +190,23 @@ class DashboardStep extends Component<Props, State> {
     const {protoboards} = this.state
     const {source, notify} = this.props
 
-    const suggestedProtoboardsList = await getSuggestedProtoboards(
-      source,
-      protoboards
-    )
+    if (source) {
+      const suggestedProtoboardsList = await getSuggestedProtoboards(
+        source,
+        protoboards
+      )
 
-    if (suggestedProtoboardsList.length === 0) {
-      notify(notifyNoSuggestedDashboards())
-      return
+      if (suggestedProtoboardsList.length === 0) {
+        notify(notifyNoSuggestedDashboards())
+        return
+      }
+
+      const suggestedProtoboards = protoboards.filter(p =>
+        suggestedProtoboardsList.includes(p.meta.name)
+      )
+
+      this.setState({suggestedProtoboards})
     }
-
-    const suggestedProtoboards = protoboards.filter(p =>
-      suggestedProtoboardsList.includes(p.meta.name)
-    )
-
-    this.setState({suggestedProtoboards})
   }
 
   private toggleChecked = (id: string) => () => {
@@ -225,10 +223,21 @@ class DashboardStep extends Component<Props, State> {
         newSelected[id] = true
       }
 
-      this.setState({
-        selected: newSelected,
-      })
+      this.setState(
+        {
+          selected: newSelected,
+        },
+        this.countSelectedDashboards
+      )
     }
+  }
+
+  private countSelectedDashboards = () => {
+    const {countSelected} = this.props
+    const {selected} = this.state
+    const selectedDashboards = _.filter(selected, v => v === true).length
+
+    countSelected(selectedDashboards)
   }
 }
 

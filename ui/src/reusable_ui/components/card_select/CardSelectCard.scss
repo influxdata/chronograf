@@ -6,7 +6,7 @@
 .card-select--card {
   min-width: 100%;
   min-height: 100%;
-  background-color: $g1-raven;
+  background-color: $g2-kevlar;
   border-radius: $radius;
   border: $ix-border solid transparent;
   transition: border-color 0.2s ease, background-color 0.2s ease;
@@ -71,7 +71,7 @@
   min-width: 100%;
   display: inline-block;
   position: absolute;
-  bottom: 5%;
+  bottom: 10%;
   font-family: $ix-text-font;
   color: $ix-text-default;
   font-size: $ix-text-base;
