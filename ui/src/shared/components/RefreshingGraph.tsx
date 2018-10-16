@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 
@@ -14,6 +14,7 @@ import TimeMachineTables from 'src/flux/components/TimeMachineTables'
 import RawFluxDataTable from 'src/shared/components/TimeMachine/RawFluxDataTable'
 import TableGraphTransform from 'src/shared/components/TableGraphTransform'
 import TableGraphFormat from 'src/shared/components/TableGraphFormat'
+import AutoRefresh from 'src/shared/components/AutoRefresh'
 
 // Constants
 import {emptyGraphCopy} from 'src/shared/copy/cell'
@@ -24,7 +25,8 @@ import {
 import {DataType} from 'src/shared/constants'
 
 // Utils
-import {AutoRefresher} from 'src/utils/AutoRefresher'
+import {AutoRefresher, GlobalAutoRefresher} from 'src/utils/AutoRefresher'
+import {getDeep} from 'src/utils/wrappers'
 
 // Actions
 import {setHoverTime} from 'src/dashboards/actions'
@@ -42,6 +44,7 @@ import {
   FluxTable,
   RemoteDataState,
   QueryUpdateState,
+  QueryType,
 } from 'src/types'
 import {
   TableOptions,
@@ -50,7 +53,10 @@ import {
   NoteVisibility,
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-import {TimeSeriesServerResponse} from 'src/types/series'
+import {
+  TimeSeriesSuccessfulResult,
+  TimeSeriesServerResponse,
+} from 'src/types/series'
 
 interface TypeAndData {
   dataType: DataType
@@ -91,25 +97,18 @@ interface Props {
   onUpdateFieldOptions?: (fieldOptions: FieldOption[]) => void
 }
 
-class RefreshingGraph extends PureComponent<Props> {
+class RefreshingGraph extends Component<Props> {
   public static defaultProps: Partial<Props> = {
     inView: true,
     manualRefresh: 0,
     staticLegend: false,
     timeFormat: DEFAULT_TIME_FORMAT,
     decimalPlaces: DEFAULT_DECIMAL_PLACES,
+    autoRefresher: GlobalAutoRefresher,
   }
 
-  private timeSeries: React.RefObject<TimeSeries> = React.createRef()
-
-  public componentDidUpdate(prevProps) {
-    if (!this.timeSeries.current) {
-      return
-    }
-
-    if (this.props.editorLocation && this.haveVisOptionsChanged(prevProps)) {
-      this.timeSeries.current.forceUpdate()
-    }
+  public shouldComponentUpdate(nextProps: Props) {
+    return this.haveVisOptionsChanged(nextProps)
   }
 
   public render() {
@@ -144,53 +143,107 @@ class RefreshingGraph extends PureComponent<Props> {
     }
 
     return (
-      <TimeSeries
-        ref={this.timeSeries}
-        autoRefresher={autoRefresher}
-        manualRefresh={manualRefresh}
-        source={source}
-        cellType={type}
-        inView={inView}
-        queries={this.queries}
-        timeRange={timeRange}
-        templates={templates}
-        editQueryStatus={editQueryStatus}
-        onNotify={onNotify}
-        grabDataForDownload={grabDataForDownload}
-        grabFluxData={grabFluxData}
-        cellNote={cellNote}
-        cellNoteVisibility={cellNoteVisibility}
-      >
-        {({timeSeriesInfluxQL, timeSeriesFlux, rawFluxData, loading, uuid}) => {
-          if (showRawFluxData) {
-            return <RawFluxDataTable csv={rawFluxData} />
-          }
+      <AutoRefresh autoRefresh={autoRefresher} manualRefresh={manualRefresh}>
+        {refreshingUUID => (
+          <TimeSeries
+            uuid={refreshingUUID}
+            source={source}
+            inView={inView}
+            queries={this.queries}
+            timeRange={timeRange}
+            templates={templates}
+            editQueryStatus={editQueryStatus}
+            onNotify={onNotify}
+            grabDataForDownload={grabDataForDownload}
+            grabFluxData={grabFluxData}
+          >
+            {({
+              timeSeriesInfluxQL,
+              timeSeriesFlux,
+              rawFluxData,
+              loading,
+              uuid,
+            }) => {
+              const hasValues =
+                timeSeriesFlux.length ||
+                _.some(timeSeriesInfluxQL, s => {
+                  const results = getDeep<TimeSeriesSuccessfulResult[]>(
+                    s,
+                    'response.results',
+                    []
+                  )
+                  const v = _.some(results, r => r.series)
+                  return v
+                })
 
-          switch (type) {
-            case CellType.SingleStat:
-              return this.singleStat(timeSeriesInfluxQL, timeSeriesFlux)
-            case CellType.Table:
-              return this.table(timeSeriesInfluxQL, timeSeriesFlux, uuid)
-            case CellType.Gauge:
-              return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
-            default:
-              return this.lineGraph(timeSeriesInfluxQL, timeSeriesFlux, loading)
-          }
-        }}
-      </TimeSeries>
+              if (!hasValues) {
+                if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
+                  return <MarkdownCell text={cellNote} />
+                }
+
+                if (
+                  this.isFluxQuery &&
+                  !getDeep<string>(source, 'links.flux', null)
+                ) {
+                  return (
+                    <div className="graph-empty">
+                      <p>The current source does not support flux</p>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div className="graph-empty">
+                    <p>No Results</p>
+                  </div>
+                )
+              }
+
+              if (showRawFluxData) {
+                return <RawFluxDataTable csv={rawFluxData} />
+              }
+
+              switch (type) {
+                case CellType.SingleStat:
+                  return this.singleStat(timeSeriesInfluxQL, timeSeriesFlux)
+                case CellType.Table:
+                  return this.table(timeSeriesInfluxQL, timeSeriesFlux, uuid)
+                case CellType.Gauge:
+                  return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
+                default:
+                  return this.lineGraph(
+                    timeSeriesInfluxQL,
+                    timeSeriesFlux,
+                    loading
+                  )
+              }
+            }}
+          </TimeSeries>
+        )}
+      </AutoRefresh>
     )
+  }
+
+  private get isFluxQuery(): boolean {
+    const {queries} = this.props
+
+    return getDeep<string>(queries, '0.type', '') === QueryType.Flux
   }
 
   private haveVisOptionsChanged(prevProps: Props): boolean {
     const visProps: string[] = [
       'axes',
       'colors',
+      'type',
       'tableOptions',
       'fieldOptions',
       'decimalPlaces',
       'timeFormat',
       'showRawFluxData',
       'queries',
+      'templates',
+      'manualRefresh',
+      'timeRange',
     ]
 
     const prevVisValues = _.pick(prevProps, visProps)

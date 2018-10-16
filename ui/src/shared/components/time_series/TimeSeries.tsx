@@ -1,8 +1,7 @@
 // Library
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import _ from 'lodash'
 import uuid from 'uuid'
-
 // API
 import {executeQuery} from 'src/shared/apis/query'
 import {
@@ -17,7 +16,6 @@ import {
   Query,
   RemoteDataState,
   TimeRange,
-  CellType,
   Status,
   FluxTable,
   QueryType,
@@ -26,8 +24,6 @@ import {TimeSeriesServerResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 // Utils
-import {GlobalAutoRefresher, AutoRefresher} from 'src/utils/AutoRefresher'
-import {NoteVisibility} from 'src/types/dashboards'
 import {
   extractQueryWarningMessage,
   extractQueryErrorMessage,
@@ -35,9 +31,6 @@ import {
 import {notify} from 'src/shared/actions/notifications'
 import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
 import {getDeep} from 'src/utils/wrappers'
-
-// Components
-import MarkdownCell from 'src/shared/components/MarkdownCell'
 
 export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 
@@ -51,19 +44,15 @@ interface RenderProps {
 
 interface Props {
   source: Source
-  cellType?: CellType
-  manualRefresh?: number
+  uuid: string
   queries: Query[]
   timeRange: TimeRange
   children: (r: RenderProps) => JSX.Element
-  autoRefresher?: AutoRefresher
   inView?: boolean
   templates?: Template[]
   editQueryStatus?: (queryID: string, status: Status) => void
   grabDataForDownload?: GrabDataForDownloadHandler
   grabFluxData?: (data: FluxTable[]) => void
-  cellNote?: string
-  cellNoteVisibility?: NoteVisibility
   onNotify?: typeof notify
 }
 
@@ -85,11 +74,10 @@ const GraphLoadingDots = () => (
   </div>
 )
 
-class TimeSeries extends Component<Props, State> {
+class TimeSeries extends PureComponent<Props, State> {
   public static defaultProps = {
     inView: true,
     templates: [],
-    autoRefresher: GlobalAutoRefresher,
     editQueryStatus: () => ({
       type: 'NOOP',
       payload: {},
@@ -112,8 +100,6 @@ class TimeSeries extends Component<Props, State> {
     return null
   }
 
-  private isComponentMounted: boolean = false
-
   constructor(props: Props) {
     super(props)
 
@@ -128,59 +114,25 @@ class TimeSeries extends Component<Props, State> {
     }
   }
 
-  public shouldComponentUpdate(prevProps: Props, prevState: State) {
-    const propKeys = [
-      'source',
-      'queries',
-      'timeRange',
-      'inView',
-      'templates',
-      'cellType',
-      'manualRefresh',
-    ]
-    const stateKeys = ['loading', 'timeSeriesInfluxQL', 'timeSeriesFlux']
-
-    const propsUpdated = propKeys.some(
-      k => !_.isEqual(this.props[k], prevProps[k])
-    )
-
-    const stateUpdated = stateKeys.some(
-      k => !_.isEqual(this.state[k], prevState[k])
-    )
-
-    return propsUpdated || stateUpdated
-  }
-
   public async componentDidMount() {
-    const {autoRefresher} = this.props
-
-    this.isComponentMounted = true
     this.executeQueries()
-    autoRefresher.subscribe(this.executeQueries)
-  }
-
-  public componentWillUnmount() {
-    const {autoRefresher} = this.props
-
-    this.isComponentMounted = false
-    autoRefresher.unsubscribe(this.executeQueries)
   }
 
   public async componentDidUpdate(prevProps: Props) {
-    if (this.props.autoRefresher !== prevProps.autoRefresher) {
-      prevProps.autoRefresher.unsubscribe(this.executeQueries)
-      this.props.autoRefresher.subscribe(this.executeQueries)
-    }
+    const prevQueries = _.map(prevProps.queries, q => q.text)
+    const currQueries = _.map(this.props.queries, q => q.text)
+    const queriesDifferent = !_.isEqual(prevQueries, currQueries)
 
-    if (!this.isPropsDifferent(prevProps)) {
-      return
+    if (
+      this.props.uuid !== prevProps.uuid ||
+      queriesDifferent ||
+      this.state.isFirstFetch
+    ) {
+      this.executeQueries()
     }
-
-    this.executeQueries()
   }
 
   public render() {
-    const {cellNoteVisibility, cellNote, source} = this.props
     const {
       timeSeriesInfluxQL,
       timeSeriesFlux,
@@ -192,34 +144,6 @@ class TimeSeries extends Component<Props, State> {
 
     if (isFirstFetch && loading === RemoteDataState.Loading) {
       return <div className="graph-empty">{this.spinner}</div>
-    }
-
-    const hasValues =
-      timeSeriesFlux.length ||
-      _.some(timeSeriesInfluxQL, s => {
-        const results = _.get(s, 'response.results', [])
-        const v = _.some(results, r => r.series)
-        return v
-      })
-
-    if (!hasValues) {
-      if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
-        return <MarkdownCell text={cellNote} />
-      }
-
-      if (this.isFluxQuery && !getDeep(source, 'links.flux', null)) {
-        return (
-          <div className="graph-empty">
-            <p>The current source does not support flux</p>
-          </div>
-        )
-      }
-
-      return (
-        <div className="graph-empty">
-          <p>No Results</p>
-        </div>
-      )
     }
 
     return (
@@ -285,7 +209,11 @@ class TimeSeries extends Component<Props, State> {
 
     const latestUUID = uuid.v1()
 
-    this.setState({loading: RemoteDataState.Loading, latestUUID})
+    this.setState({
+      loading: RemoteDataState.Loading,
+      latestUUID,
+      isFirstFetch: false,
+    })
 
     try {
       if (this.isFluxQuery) {
@@ -297,10 +225,6 @@ class TimeSeries extends Component<Props, State> {
       } else {
         timeSeriesInfluxQL = await this.executeInfluxQLQueries(latestUUID)
         responseUUID = _.get(timeSeriesInfluxQL, '0.response.uuid')
-      }
-
-      if (!this.isComponentMounted) {
-        return
       }
 
       if (responseUUID !== this.state.latestUUID) {
@@ -316,7 +240,6 @@ class TimeSeries extends Component<Props, State> {
       timeSeriesInfluxQL,
       timeSeriesFlux,
       rawFluxData,
-      isFirstFetch: false,
       loading,
     })
 
@@ -392,25 +315,6 @@ class TimeSeries extends Component<Props, State> {
 
       throw error
     }
-  }
-
-  private isPropsDifferent(prevProps: Props) {
-    const isSourceDifferent = !_.isEqual(this.props.source, prevProps.source)
-
-    return (
-      this.props.manualRefresh !== prevProps.manualRefresh ||
-      this.props.inView !== prevProps.inView ||
-      !!this.queryDifference(this.props.queries, prevProps.queries).length ||
-      !_.isEqual(this.props.templates, prevProps.templates) ||
-      isSourceDifferent
-    )
-  }
-
-  private queryDifference = (left, right) => {
-    const mapper = q => `${q.text}`
-    const l = left.map(mapper)
-    const r = right.map(mapper)
-    return _.difference(_.union(l, r), _.intersection(l, r))
   }
 }
 

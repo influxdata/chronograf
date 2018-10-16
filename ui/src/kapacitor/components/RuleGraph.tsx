@@ -16,6 +16,7 @@ import {Source, AlertRule, QueryConfig, Query, TimeRange} from 'src/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
+import uuid from 'uuid'
 
 interface Props {
   source: Source
@@ -56,6 +57,7 @@ class RuleGraph extends PureComponent<Props> {
             timeRange={timeRange}
             source={source}
             queries={this.queries}
+            uuid={uuid.v1()}
           >
             {data => {
               return (
