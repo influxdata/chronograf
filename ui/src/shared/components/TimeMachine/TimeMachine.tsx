@@ -46,8 +46,10 @@ import {Links, ScriptStatus} from 'src/types/flux'
 
 interface ConnectedProps {
   script: string
+  draftScript: string
   queryDrafts: CellQuery[]
   onChangeScript: (script: string) => void
+  onChangeDraftScript: (draftScript: string) => void
   onUpdateQueryDrafts: TimeMachineContainer['handleUpdateQueryDrafts']
   onAddQuery: () => void
   onDeleteQuery: (queryID: string) => void
@@ -310,6 +312,7 @@ class TimeMachine extends PureComponent<Props, State> {
     const {
       script,
       onChangeScript,
+      onChangeDraftScript,
       fluxLinks,
       onUpdateScriptStatus,
       notify,
@@ -321,6 +324,7 @@ class TimeMachine extends PureComponent<Props, State> {
         source={this.source}
         script={script}
         onChangeScript={onChangeScript}
+        onChangeDraftScript={onChangeDraftScript}
         links={fluxLinks}
         onUpdateStatus={onUpdateScriptStatus}
       />
@@ -549,6 +553,7 @@ const ConnectedTimeMachine = (props: PassedProps) => {
             timeRange={state.timeRange}
             onUpdateTimeRange={container.handleUpdateTimeRange}
             onChangeScript={container.handleChangeScript}
+            onChangeDraftScript={container.handleUpdateDraftScript}
             onUpdateQueryDrafts={container.handleUpdateQueryDrafts}
             onAddQuery={container.handleAddQuery}
             onDeleteQuery={container.handleDeleteQuery}

@@ -26,7 +26,9 @@ const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
 
 interface Props {
   script: string
+  draftScript: string
   onChangeScript: (script: string) => void
+  onChangeDraftScript: (draftScript: string) => void
   source: Source
   onUpdateStatus?: (status: ScriptStatus) => void
   links: Links
@@ -35,7 +37,6 @@ interface Props {
 
 interface State {
   suggestions: Suggestion[]
-  draftScript: string
   draftScriptStatus: ScriptStatus
   isWizardActive: boolean
 }
@@ -49,7 +50,6 @@ class FluxQueryMaker extends PureComponent<Props, State> {
 
     this.state = {
       suggestions: [],
-      draftScript: props.script,
       draftScriptStatus: {type: 'none', text: ''},
       isWizardActive: false,
     }
@@ -61,13 +61,8 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {notify, source} = this.props
-    const {
-      suggestions,
-      draftScript,
-      draftScriptStatus,
-      isWizardActive,
-    } = this.state
+    const {notify, source, draftScript} = this.props
+    const {suggestions, draftScriptStatus, isWizardActive} = this.state
 
     const divisions = [
       {
@@ -140,8 +135,8 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   private handleSubmitScript = () => {
-    const {onChangeScript, onUpdateStatus} = this.props
-    const {draftScript, draftScriptStatus} = this.state
+    const {onChangeScript, onUpdateStatus, draftScript} = this.props
+    const {draftScriptStatus} = this.state
 
     onChangeScript(draftScript)
 
@@ -159,19 +154,23 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   private handleAddToScript = (draftScript): void => {
-    this.setState({draftScript}, this.handleSubmitScript)
+    const {onChangeDraftScript} = this.props
+
+    onChangeDraftScript(draftScript)
+    this.handleSubmitScript()
   }
 
   private handleChangeDraftScript = async (
     draftScript: string
   ): Promise<void> => {
-    this.setState({draftScript}, () =>
-      this.debouncer.call(this.checkDraftScript, CHECK_SCRIPT_DELAY)
-    )
+    const {onChangeDraftScript} = this.props
+
+    await onChangeDraftScript(draftScript)
+    this.checkDraftScript()
   }
 
   private checkDraftScript = async () => {
-    const {draftScript} = this.state
+    const {draftScript} = this.props
 
     if (draftScript.trim() === '') {
       // Don't attempt to validate an empty script

@@ -67,6 +67,7 @@ const LOCAL_STORAGE_DELAY_MS = 1000
 
 const DEFAULT_STATE = () => ({
   script: '',
+  draftScript: '',
   queryDrafts: [],
   timeRange: DEFAULT_TIME_RANGE,
   type: CellType.Line,
@@ -85,6 +86,7 @@ const DEFAULT_STATE = () => ({
 
 export interface TimeMachineState {
   script: string
+  draftScript: string
   queryDrafts: CellQuery[]
   timeRange: TimeRange
   type: CellType
@@ -124,6 +126,10 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
   public handleChangeScript = (script: string) => {
     return this.setAndPersistState({script})
+  }
+
+  public handleUpdateDraftScript = (draftScript: string) => {
+    return this.setAndPersistState({draftScript})
   }
 
   public handleUpdateTimeRange = (timeRange: TimeRange) => {
