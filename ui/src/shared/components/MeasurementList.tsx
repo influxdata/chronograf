@@ -13,8 +13,6 @@ import MeasurementListFilter from 'src/shared/components/MeasurementListFilter'
 import MeasurementListItem from 'src/shared/components/MeasurementListItem'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {QUERY_BUILDER_LIST_ITEM_HEIGHT} from 'src/shared/constants'
-
 interface Props {
   query: QueryConfig
   querySource?: Source
@@ -30,7 +28,6 @@ interface State {
   measurements: string[]
   filterText: string
   filtered: string[]
-  activeItemTop: number | null
 }
 
 const {shape} = PropTypes
@@ -54,7 +51,6 @@ class MeasurementList extends PureComponent<Props, State> {
       filterText: '',
       filtered: [],
       measurements: [],
-      activeItemTop: null,
     }
 
     this.handleEscape = this.handleEscape.bind(this)
@@ -64,16 +60,15 @@ class MeasurementList extends PureComponent<Props, State> {
     this.handleChoosemeasurement = this.handleChoosemeasurement.bind(this)
   }
 
-  public async componentDidMount() {
+  public componentDidMount() {
     if (!this.props.query.database) {
       return
     }
 
-    await this.getMeasurements()
-    this.scrollToActiveMeasurement()
+    this.getMeasurements()
   }
 
-  public async componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps) {
     const {query, querySource} = this.props
 
     if (!query.database) {
@@ -87,8 +82,7 @@ class MeasurementList extends PureComponent<Props, State> {
       return
     }
 
-    await this.getMeasurements()
-    this.scrollToActiveMeasurement()
+    this.getMeasurements()
   }
 
   public handleFilterText(e) {
@@ -135,7 +129,7 @@ class MeasurementList extends PureComponent<Props, State> {
       isKapacitorRule,
     } = this.props
     const {database, areTagsAccepted} = query
-    const {filtered, activeItemTop} = this.state
+    const {filtered} = this.state
 
     return (
       <div className="query-builder--column">
@@ -151,7 +145,7 @@ class MeasurementList extends PureComponent<Props, State> {
         </div>
         {database ? (
           <div className="query-builder--list">
-            <FancyScrollbar scrollTop={activeItemTop}>
+            <FancyScrollbar>
               {filtered.map(measurement => (
                 <MeasurementListItem
                   query={query}
@@ -197,19 +191,6 @@ class MeasurementList extends PureComponent<Props, State> {
     } catch (err) {
       console.error(err)
     }
-  }
-
-  private scrollToActiveMeasurement() {
-    const {query} = this.props
-    const {measurements} = this.state
-
-    const activeMeasurementIndex = measurements.findIndex(
-      msmt => msmt === query.measurement
-    )
-
-    this.setState({
-      activeItemTop: activeMeasurementIndex * QUERY_BUILDER_LIST_ITEM_HEIGHT,
-    })
   }
 }
 
