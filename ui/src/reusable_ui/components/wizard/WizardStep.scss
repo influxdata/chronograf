@@ -11,9 +11,10 @@
 }
 
 .wizard-step--child {
-  padding: 0 $ix-marg-d $ix-marg-d $ix-marg-d;
+  padding: 0 $ix-marg-d $ix-marg-b $ix-marg-d;
+  margin: $ix-marg-b auto;
   overflow-y: auto;
-  max-height: 30vh;
+  max-height: 50vh;
   min-height: 10vh;
   position: relative;
   z-index: 10;
