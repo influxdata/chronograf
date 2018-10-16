@@ -32,6 +32,7 @@ interface State {
   dashboardError: boolean
   dashboardsCreated: Protoboard[]
   hasNextOnDashboard: boolean
+  selectedDashboards: number
 }
 
 @ErrorHandling
@@ -59,6 +60,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       dashboardError: false,
       dashboardsCreated: [],
       hasNextOnDashboard: false,
+      selectedDashboards: 0,
     }
   }
 
@@ -103,12 +105,15 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           tipText="Select Dashboards you would like to create:"
           isComplete={this.isDashboardComplete}
           isErrored={dashboardError}
+          nextLabel={this.dashboardNextLabel}
           onNext={this.handleDashboardNext}
+          previousLabel="Go Back"
         >
           <DashboardStep
             ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
             source={source}
             dashboardsCreated={dashboardsCreated}
+            countSelected={this.countSelected}
           />
         </WizardStep>
         <WizardStep
@@ -182,6 +187,22 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       hasNextOnDashboard: true,
     })
     return response
+  }
+
+  private countSelected = (selectedDashboards: number) => {
+    this.setState({selectedDashboards})
+  }
+
+  private get dashboardNextLabel(): string {
+    const {selectedDashboards} = this.state
+
+    if (selectedDashboards) {
+      return `Create ${selectedDashboards} Dashboard${
+        selectedDashboards > 1 ? 's' : ''
+      }`
+    }
+
+    return 'Next'
   }
 
   // KapacitorStep

@@ -65,6 +65,7 @@ class DashboardStep extends Component<Props, State> {
 
   public async componentDidMount() {
     const protoboards = await getProtoboards()
+    this.props.countSelected(0)
     this.setState({protoboards}, this.handleSuggest)
   }
 
@@ -189,21 +190,23 @@ class DashboardStep extends Component<Props, State> {
     const {protoboards} = this.state
     const {source, notify} = this.props
 
-    const suggestedProtoboardsList = await getSuggestedProtoboards(
-      source,
-      protoboards
-    )
+    if (source) {
+      const suggestedProtoboardsList = await getSuggestedProtoboards(
+        source,
+        protoboards
+      )
 
-    if (suggestedProtoboardsList.length === 0) {
-      notify(notifyNoSuggestedDashboards())
-      return
+      if (suggestedProtoboardsList.length === 0) {
+        notify(notifyNoSuggestedDashboards())
+        return
+      }
+
+      const suggestedProtoboards = protoboards.filter(p =>
+        suggestedProtoboardsList.includes(p.meta.name)
+      )
+
+      this.setState({suggestedProtoboards})
     }
-
-    const suggestedProtoboards = protoboards.filter(p =>
-      suggestedProtoboardsList.includes(p.meta.name)
-    )
-
-    this.setState({suggestedProtoboards})
   }
 
   private toggleChecked = (id: string) => () => {

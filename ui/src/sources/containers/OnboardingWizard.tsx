@@ -63,7 +63,6 @@ class OnboardingWizard extends PureComponent<Props, State> {
       kapacitorError,
       dashboardError,
       dashboardsCreated,
-      selectedDashboards,
     } = this.state
     const {me, isUsingAuth} = this.props
     return (
@@ -71,7 +70,6 @@ class OnboardingWizard extends PureComponent<Props, State> {
         <Notifications />
         <WizardFullScreen
           skipLinkText={'skip'}
-          handleSkip={this.handleCompletionNext}
           switchLinkText={'switch organizations'}
           handleSwitch={this.resetAndGotoPurgatory}
           isUsingAuth={isUsingAuth}

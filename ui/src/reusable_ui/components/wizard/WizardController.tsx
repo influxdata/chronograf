@@ -170,18 +170,16 @@ class WizardController extends PureComponent<Props, State> {
 
   private get skipLink() {
     const {handleSkip, skipLinkText} = this.props
+    const {steps} = this.state
 
-    if (handleSkip) {
-      return (
-        <button
-          className="btn btn-xs btn-primary btn-link wizard-skip-link"
-          onClick={handleSkip}
-        >
-          {skipLinkText}
-        </button>
-      )
-    }
-    return null
+    return (
+      <button
+        className="btn btn-xs btn-primary btn-link wizard-skip-link"
+        onClick={handleSkip || this.jumpToStep(steps.length - 1)}
+      >
+        {skipLinkText}
+      </button>
+    )
   }
 
   private get switchLink() {
