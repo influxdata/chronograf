@@ -64,7 +64,7 @@ class DashboardStep extends Component<Props, State> {
 
   public async componentDidMount() {
     const protoboards = await getProtoboards()
-    this.setState({protoboards})
+    this.setState({protoboards}, this.handleSuggest)
   }
 
   public next = async (): Promise<NextReturn> => {
@@ -106,12 +106,6 @@ class DashboardStep extends Component<Props, State> {
               placeholder="Filter by name..."
               onSearch={this.setSearchTerm}
             />
-            <button
-              className="btn btn-sm btn-primary"
-              onClick={this.handleSuggest}
-            >
-              Suggest dashboards
-            </button>
           </div>
           {this.suggestedDashboardCards}
           {this.dashboardCards}
