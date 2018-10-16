@@ -206,8 +206,6 @@ class OneClickML extends Component {
             interval: normalizeInterval(time),
             default_datasource: datasource,
             bucket_interval: time,
-            min_threshold: 0,
-            max_threshold: 0,
             features: { io: fields.map(
                 (field) => ({
                         name: field.alias,

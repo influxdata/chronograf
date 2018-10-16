@@ -31,7 +31,7 @@ const AnomalyPanel = ({
             </div>
             <div className="panel-body">
                 <div className="form-group col-xs-12 col-sm-6">
-                    <label htmlFor="min_threshold">Min threshold</label>
+                    <label htmlFor="min_threshold">Min threshold (0 for auto)</label>
                     <input
                         type="number"
                         name="min_threshold"
@@ -43,7 +43,7 @@ const AnomalyPanel = ({
                     />
                 </div>
                 <div className="form-group col-xs-12 col-sm-6">
-                    <label htmlFor="max_threshold">Max threshold</label>
+                    <label htmlFor="max_threshold">Max threshold (0 for auto)</label>
                     <input
                         type="number"
                         name="max_threshold"
