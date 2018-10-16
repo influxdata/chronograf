@@ -51,7 +51,7 @@ const replace = async (
   const durationMs = await duration(templateReplacedQuery, source)
   const replacedQuery = replaceInterval(
     templateReplacedQuery,
-    Math.floor(resolution / 3),
+    resolution,
     durationMs
   )
 

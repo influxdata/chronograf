@@ -10,6 +10,7 @@ import {
   TEMP_VAR_INTERVAL,
   DEFAULT_PIXELS,
   DEFAULT_DURATION_MS,
+  RESOLUTION_SCALE_FACTOR,
 } from 'src/shared/constants'
 
 function sortTemplates(templates: Template[]): Template[] {
@@ -35,8 +36,7 @@ export const replaceInterval = (
     durationMs = DEFAULT_DURATION_MS
   }
 
-  // duration / width of visualization in pixels
-  const msPerPixel = Math.floor(durationMs / pixels)
+  const msPerPixel = Math.floor(durationMs / (pixels * RESOLUTION_SCALE_FACTOR))
 
   return replaceAll(query, TEMP_VAR_INTERVAL, `${msPerPixel}ms`)
 }

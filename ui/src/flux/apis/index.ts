@@ -6,7 +6,7 @@ import {
 } from 'src/shared/parsing/flux/response'
 import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
 import {manager} from 'src/worker/JobManager'
-import {addTemplatesToScript} from 'src/shared/parsing/flux/templates'
+import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 import _ from 'lodash'
 
 export const getSuggestions = async (url: string) => {
@@ -58,17 +58,25 @@ export interface GetRawTimeSeriesResult {
 export const getRawTimeSeries = async (
   source: Source,
   script: string,
+  uuid: string,
   timeRange: TimeRange,
-  uuid?: string
+  fluxASTLink: string,
+  maxSideLength: number
 ): Promise<GetRawTimeSeriesResult> => {
   const path = encodeURIComponent(`/v2/query?organization=defaultorgname`)
   const url = `${window.basepath}${source.links.flux}?path=${path}`
 
-  const scriptWithTemplates = addTemplatesToScript(script, timeRange)
+  const renderedScript = await renderTemplatesInScript(
+    script,
+    timeRange,
+    fluxASTLink,
+    maxSideLength
+  )
+
   try {
     const {body, byteLength, uuid: responseUUID} = await manager.fetchFluxData(
       url,
-      scriptWithTemplates,
+      renderedScript,
       uuid
     )
 
@@ -99,14 +107,18 @@ export interface GetTimeSeriesResult {
 export const getTimeSeries = async (
   source,
   script: string,
+  uuid: string,
   timeRange: TimeRange,
-  uuid?: string
+  fluxASTLink: string,
+  maxSideLength: number
 ): Promise<GetTimeSeriesResult> => {
   const {csv, didTruncate, uuid: responseUUID} = await getRawTimeSeries(
     source,
     script,
+    uuid,
     timeRange,
-    uuid
+    fluxASTLink,
+    maxSideLength
   )
 
   const tables = parseResponse(csv)
