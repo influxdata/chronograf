@@ -56,17 +56,26 @@ export const parseTablesByTime = (
       allColumnNames.push(uniqueColumnName)
     }
 
-    const timeIndex = header.indexOf('_time')
+    let timeIndex = header.indexOf('_time')
 
+    let isTimeFound = true
     if (timeIndex < 0) {
-      throw new Error('Could not find time index in FluxTable')
+      timeIndex = header.indexOf('_stop')
+      isTimeFound = false
     }
 
     const result = {}
     for (let i = 1; i < table.data.length; i++) {
       const row = table.data[i]
-      const time = row[timeIndex].toString()
+      const timeValue = row[timeIndex]
+      let time = ''
 
+      if (isTimeFound) {
+        time = timeValue.toString()
+      } else {
+        // _stop and _start have values in date string format instead of number
+        time = Date.parse(timeValue as string).toString()
+      }
       result[time] = Object.entries(columnNames).reduce(
         (acc, [valueIndex, columnName]) => ({
           ...acc,
