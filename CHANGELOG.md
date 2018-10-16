@@ -56,6 +56,7 @@
 1.  [#4408](https://github.com/influxdata/chronograf/pull/4408): Render null data point values in Alerts Table as mdashes
 1.  [#4466](https://github.com/influxdata/chronograf/pull/4466): Maintain focus on Flux Editor text area when adding nodes via code
 1.  [#4479](https://github.com/influxdata/chronograf/pull/4479): Add validation to Alert Rule messages
+1.  [#4599](https://github.com/influxdata/chronograf/pull/4599): Fix search results updating race condition
 
 ## v1.6.2 [2018-09-06]
 
