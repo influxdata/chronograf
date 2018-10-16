@@ -112,11 +112,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             tipText="Select dashboards you would like to create:"
             isComplete={this.isDashboardComplete}
             isErrored={dashboardError}
-            nextLabel={
-              selectedDashboards
-                ? `Create ${selectedDashboards} Dashboards`
-                : 'Next'
-            }
+            nextLabel={this.dashboardNextLabel}
             onNext={this.handleDashboardNext}
             previousLabel="Go Back"
           >
@@ -205,6 +201,18 @@ class OnboardingWizard extends PureComponent<Props, State> {
 
   private countSelected = (selectedDashboards: number) => {
     this.setState({selectedDashboards})
+  }
+
+  private get dashboardNextLabel(): string {
+    const {selectedDashboards} = this.state
+
+    if (selectedDashboards) {
+      return `Create ${selectedDashboards} Dashboard${
+        selectedDashboards > 1 ? 's' : ''
+      }`
+    }
+
+    return 'Next'
   }
 
   // KapacitorStep
