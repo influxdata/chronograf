@@ -65,7 +65,6 @@ class OnboardingWizard extends PureComponent<Props, State> {
       <>
         <Notifications />
         <WizardFullScreen
-          title={'Welcome to Influx'}
           skipLinkText={'skip'}
           handleSkip={this.handleCompletionNext}
           switchLinkText={'switch organizations'}

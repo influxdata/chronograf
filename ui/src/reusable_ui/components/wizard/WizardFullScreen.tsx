@@ -2,7 +2,6 @@
 import React, {PureComponent, ReactElement} from 'react'
 
 // Components
-import SplashPage from 'src/shared/components/SplashPage'
 import WizardController from 'src/reusable_ui/components/wizard/WizardController'
 
 import {WizardStepProps} from 'src/reusable_ui/components/wizard/WizardStep'
@@ -11,7 +10,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
-  title: string
   skipLinkText?: string
   handleSkip?: () => void
   switchLinkText?: string
@@ -22,15 +20,13 @@ interface Props {
 @ErrorHandling
 class WizardFullScreen extends PureComponent<Props> {
   public render() {
-    const {title} = this.props
-
     return (
-      <SplashPage>
-        <>
-          <h1 className="wizard-title">{title}</h1>
-          <div className="wizard-container">{this.WizardController}</div>
-        </>
-      </SplashPage>
+      <div className="wizard-splash auth-image">
+        <div className="wizard-container">{this.WizardController}</div>
+        <p className="auth-credits">
+          Powered by <span className="icon cubo-uniform" /> InfluxData
+        </p>
+      </div>
     )
   }
 

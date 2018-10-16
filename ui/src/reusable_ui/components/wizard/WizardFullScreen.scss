@@ -3,15 +3,22 @@
   ------------------------------------------------------------------------------
 */
 
+.wizard-splash {
+  display: inline-flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 100%;
+  min-height: 100%;
+}
+
 .wizard-container {
   padding: 30px;
   display: inline-flex;
   border-radius: $radius;
+  width: 60%;
   min-width: 800px;
   max-width: 1200px;
   background-color: $g1-raven;
-}
-
-.wizard-title {
-  margin-top: $ix-marg-c;
 }

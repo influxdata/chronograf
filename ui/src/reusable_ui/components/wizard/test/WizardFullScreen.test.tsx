@@ -3,7 +3,6 @@ import {shallow} from 'enzyme'
 
 import WizardFullScreen from 'src/reusable_ui/components/wizard/WizardFullScreen'
 import WizardController from 'src/reusable_ui/components/wizard/WizardController'
-import SplashPage from 'src/shared/components/SplashPage'
 
 describe('WizardFullScreen', () => {
   let wrapper
@@ -11,7 +10,6 @@ describe('WizardFullScreen', () => {
   const wrapperSetup = (override = {}) => {
     const props = {
       children: null,
-      title: undefined,
       skipLinkText: undefined,
       handleSkip: undefined,
       isUsingAuth: false,
@@ -28,10 +26,6 @@ describe('WizardFullScreen', () => {
 
   it('mounts without exploding', () => {
     expect(wrapper).toHaveLength(1)
-  })
-
-  it('renders one SplashPage component', () => {
-    expect(wrapper.find(SplashPage)).toHaveLength(1)
   })
 
   it('renders no WizardController component', () => {
