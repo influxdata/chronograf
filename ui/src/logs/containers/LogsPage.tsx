@@ -422,9 +422,6 @@ class LogsPage extends Component<Props, State> {
       console.error(error)
     }
 
-    if (!this.currentNewerChunksGenerator.isCanceled) {
-      this.currentNewerChunksGenerator.cancel()
-    }
     this.loadingNewer = false
     this.currentNewerChunksGenerator = null
   }
@@ -446,10 +443,6 @@ class LogsPage extends Component<Props, State> {
       console.error(error)
     }
 
-    if (!this.currentOlderChunksGenerator.isCanceled) {
-      this.currentOlderChunksGenerator.cancel()
-    }
-
     this.currentOlderChunksGenerator = null
   }
 
@@ -460,16 +453,16 @@ class LogsPage extends Component<Props, State> {
     }
   }
 
-  private cancelChunks() {
-    if (this.currentNewerChunksGenerator) {
-      this.currentNewerChunksGenerator.cancel()
-      this.currentNewerChunksGenerator = null
-    }
+  private cancelChunks = async () => {
+    const cancelPendingChunks = _.compact([
+      this.currentNewerChunksGenerator,
+      this.currentOlderChunksGenerator,
+    ]).map(req => req.cancel())
 
-    if (this.currentOlderChunksGenerator) {
-      this.currentOlderChunksGenerator.cancel()
-      this.currentOlderChunksGenerator = null
-    }
+    await Promise.all(cancelPendingChunks)
+
+    this.currentNewerChunksGenerator = null
+    this.currentOlderChunksGenerator = null
   }
 
   private get tableScrollToRow() {
@@ -858,9 +851,9 @@ class LogsPage extends Component<Props, State> {
     this.updateTableData(SearchStatus.UpdatingNamespace)
   }
 
-  private updateTableData(searchStatus: SearchStatus) {
+  private updateTableData = async (searchStatus: SearchStatus) => {
     this.clearTailInterval()
-    this.cancelChunks()
+    await this.cancelChunks()
     this.props.clearSearchData(searchStatus)
   }
 
