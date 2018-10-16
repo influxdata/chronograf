@@ -685,7 +685,14 @@ export const getDashboardWithTemplatesAsync = (
   _.each(selections, (val, key) => {
     const result = _.some(
       templates,
-      temp => temp.tempVar === key && _.some(temp.values, v => v.value === val)
+      temp =>
+        temp.tempVar === key &&
+        _.some(temp.values, v => {
+          if (v.key) {
+            return v.key === val
+          }
+          return v.value === val
+        })
     )
 
     if (!result) {
