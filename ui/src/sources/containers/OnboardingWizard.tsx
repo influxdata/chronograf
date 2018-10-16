@@ -30,6 +30,7 @@ interface State {
   dashboardError: boolean
   dashboardsCreated: Protoboard[]
   hasNextOnDashboard: boolean
+  selectedDashboards: number
 }
 
 @ErrorHandling
@@ -51,6 +52,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
       dashboardError: false,
       dashboardsCreated: [],
       hasNextOnDashboard: false,
+      selectedDashboards: 0,
     }
   }
 
@@ -61,6 +63,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
       kapacitorError,
       dashboardError,
       dashboardsCreated,
+      selectedDashboards,
     } = this.state
     const {me, isUsingAuth} = this.props
     return (
@@ -109,6 +112,11 @@ class OnboardingWizard extends PureComponent<Props, State> {
             tipText="Select dashboards you would like to create:"
             isComplete={this.isDashboardComplete}
             isErrored={dashboardError}
+            nextLabel={
+              selectedDashboards
+                ? `Create ${selectedDashboards} Dashboards`
+                : 'Next'
+            }
             onNext={this.handleDashboardNext}
             previousLabel="Go Back"
           >
@@ -116,6 +124,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
               ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
               dashboardsCreated={dashboardsCreated}
               source={source}
+              countSelected={this.countSelected}
             />
           </WizardStep>
           <WizardStep
@@ -192,6 +201,10 @@ class OnboardingWizard extends PureComponent<Props, State> {
       hasNextOnDashboard: true,
     })
     return response
+  }
+
+  private countSelected = (selectedDashboards: number) => {
+    this.setState({selectedDashboards})
   }
 
   // KapacitorStep

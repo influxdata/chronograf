@@ -44,6 +44,7 @@ interface Props {
   notify: typeof notifyAction
   dashboardsCreated: Protoboard[]
   source: Source
+  countSelected: (selectedDashboards: number) => void
 }
 
 @ErrorHandling
@@ -219,10 +220,21 @@ class DashboardStep extends Component<Props, State> {
         newSelected[id] = true
       }
 
-      this.setState({
-        selected: newSelected,
-      })
+      this.setState(
+        {
+          selected: newSelected,
+        },
+        this.countSelectedDashboards
+      )
     }
+  }
+
+  private countSelectedDashboards = () => {
+    const {countSelected} = this.props
+    const {selected} = this.state
+    const selectedDashboards = _.filter(selected, v => v === true).length
+
+    countSelected(selectedDashboards)
   }
 }
 
