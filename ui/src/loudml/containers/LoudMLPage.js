@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 
-import {Link} from 'react-router'
+import {Link, withRouter} from 'react-router'
 
 import {errorThrown as errorThrownAction} from 'shared/actions/errors'
 import {notify as notifyAction} from 'shared/actions/notifications'
@@ -54,11 +54,13 @@ import {
     notifyJobStoppedFailed,
     notifyDashboardCreated,
     notifyDashboardCreationFailed,
+    notifyDashboardCellCreated,
+    notifyDashboardCellCreationFailed,
     notifyErrorGettingModelHook,
 } from 'src/loudml/actions/notifications'
 import {
-    DEFAULT_CONFIDENT_DASHBOARD,
-    DEFAULT_CONFIDENT_CELL
+    DEFAULT_ERROR_DASHBOARD,
+    DEFAULT_ERROR_CELL
 } from 'src/loudml/constants/dashboard';
 import {ANOMALY_HOOK_NAME} from 'src/loudml/constants/anomaly'
 
@@ -71,6 +73,7 @@ class LoudMLPage extends Component {
 
         this.state = {
             searchTerm: '',
+            dashboards: [],
           }      
     }
 
@@ -113,6 +116,8 @@ class LoudMLPage extends Component {
         if (isFetching && this._asyncRequest) {
             return
         }
+
+        this.getDashboards()
 
         this._asyncRequest = api.getModels()
         .then(res => {
@@ -334,62 +339,101 @@ class LoudMLPage extends Component {
         this.stopJob(name, id)
     }
 
-    createOrUpdateConfident = (dashboard, model, source, database) => {
+    createPredictionDashboard = (model, source, database) => {
         const {settings: {name}} = model
         const cellName = `${name} prediction`
         const queries = createQueryFromModel(model, source, database)
 
-        if (dashboard===undefined) {
-            // create
-            dashboard = {
-                ...DEFAULT_CONFIDENT_DASHBOARD,
-                name,
-                cells: [
-                    {
-                        ...DEFAULT_CONFIDENT_CELL,
-                        name: cellName,
-                        queries,
-                    }
-                ]
-            }
-            return createDashboard(dashboard)
+        const dashboard = {
+            ...DEFAULT_ERROR_DASHBOARD,
+            name,
+            cells: [
+                {
+                    ...DEFAULT_ERROR_CELL,
+                    name: cellName,
+                    queries,
+                }
+            ]
         }
+        return createDashboard(dashboard)
+    }
+
+    updatePredictionDashboard = (dashboard, model, source, database) => {
+        const {settings: {name}} = model
+        const cellName = `${name} prediction`
+        const queries = createQueryFromModel(model, source, database)
+
         const cell = dashboard.cells.find(item => item.name === cellName)
         if (cell===undefined) {
             return addDashboardCell(dashboard, {
-                ...DEFAULT_CONFIDENT_CELL,
+                ...DEFAULT_ERROR_CELL,
                 name: cellName,
                 queries,
             })
         }
         return updateDashboardCell({
             ...cell,
-            type: 'error',
+            type: 'error',  // force cell type for old Chronograf + Loud ML extension 1.4 release
             queries,
         })
     }
     
-    selectModelGraph = async (model) => {
+    getDashboards = async () => {
+        try {
+            const {data: {dashboards}} = await getDashboards()
+            this.setState({dashboards})
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    onViewDashboard = dashboard => {
+        const {
+            router,
+            source: {id},
+        } = this.props
+
+        router.push(`/sources/${id}/dashboards/${dashboard.id}`)
+    }
+
+    onNewDashboard = async (model) => {
         const {notify} = this.props
         const {settings} = model
         
         try {
-            const {data: {dashboards}} = await getDashboards()
-            const dashboard = dashboards.find(item => item.name === settings.name)
             const {data} = await api.getDatasources()
             const datasource = data.find(d => d.name === settings.default_datasource)
             const {data: {sources}} = await getSources()
             const source = findSource(sources, datasource)
-            await this.createOrUpdateConfident(dashboard, model, source, datasource.database)
+            await this.createPredictionDashboard(model, source, datasource.database)
             notify(notifyDashboardCreated(settings.name))
+            this.getDashboards()    // update for Dashboard dropdown
         } catch (error) {
             console.error(error)
             notify(notifyDashboardCreationFailed(settings.name, parseError(error)))
         }
     }
 
+    onAddToDashboard = async (model, dashboard) => {
+        const {notify} = this.props
+        const {settings} = model
+        
+        try {
+            const {data} = await api.getDatasources()
+            const datasource = data.find(d => d.name === settings.default_datasource)
+            const {data: {sources}} = await getSources()
+            const source = findSource(sources, datasource)
+            await this.updatePredictionDashboard(dashboard, model, source, datasource.database)
+            notify(notifyDashboardCellCreated(settings.name))
+        } catch (error) {
+            console.error(error)
+            notify(notifyDashboardCellCreationFailed(settings.name, parseError(error)))
+        }
+    }
+
     render() {
         const {isFetching, jobs, source} = this.props
+        const {dashboards} = this.state
 
         if (isFetching) {
             return <div className="page-spinner" />
@@ -410,18 +454,21 @@ class LoudMLPage extends Component {
                             {this.renderPanelHeading}
                             <div className="panel-body">
                             <ModelsTable
-                                    source={source}
-                                    models={this.filteredModels}
-                                    jobs={jobs}
-                                    onClone={this.cloneModel}
-                                    onDelete={this.deleteModel}
-                                    onStart={this.startModel}
-                                    onStop={this.stopModel}
-                                    onTrain={this.trainModel}
-                                    onStopTrain={this.stopTrain}
-                                    onForecast={this.forecastModel}
-                                    onStopForecast={this.stopForecast}
-                                    onSelectModelGraph={this.selectModelGraph}
+                                source={source}
+                                models={this.filteredModels}
+                                jobs={jobs}
+                                onClone={this.cloneModel}
+                                onDelete={this.deleteModel}
+                                onStart={this.startModel}
+                                onStop={this.stopModel}
+                                onTrain={this.trainModel}
+                                onStopTrain={this.stopTrain}
+                                onForecast={this.forecastModel}
+                                onStopForecast={this.stopForecast}
+                                onViewDashboard={this.onViewDashboard}
+                                onNewDashboard={this.onNewDashboard}
+                                onAddToDashboard={this.onAddToDashboard}
+                                dashboards={dashboards}
                                 />
                             </div>
                         </div>
@@ -528,4 +575,6 @@ const mapDispatchToProps = dispatch => ({
     errorThrown: error => dispatch(errorThrownAction(error))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoudMLPage)
+export default withRouter(
+    connect(mapStateToProps, mapDispatchToProps)(LoudMLPage)
+)

@@ -99,6 +99,13 @@ export const notifyDashboardCreationFailed = (name, message) => notifyError(
     `cannot create prediction dashboard for model '${name}': ${message}`,
 )
 
+export const notifyDashboardCellCreated = name => notifySuccess(`prediction cell for model '${name}' created`)
+
+export const notifyDashboardCellCreationFailed = (name, message) => notifyError(
+    INFINITE,
+    `cannot create prediction cell for model '${name}': ${message}`,
+)
+
 export const notifyErrorGettingDatasources = message => notifyError(
     TEN_SECONDS,
     `cannot get Loud ML datasources: ${message}`,

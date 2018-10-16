@@ -1,4 +1,4 @@
-export const DEFAULT_CONFIDENT_CELL =
+export const DEFAULT_ERROR_CELL =
     {
         "x": 0,
         "y": 0,
@@ -62,7 +62,7 @@ export const DEFAULT_CONFIDENT_CELL =
         },
     }
 
-export const DEFAULT_CONFIDENT_DASHBOARD = 
+export const DEFAULT_ERROR_DASHBOARD = 
 {
     "cells": [],
     "templates": [],
