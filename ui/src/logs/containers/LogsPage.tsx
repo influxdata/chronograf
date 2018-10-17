@@ -466,7 +466,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private get tableScrollToRow() {
-    if (this.isLiveUpdating === true) {
+    if (this.isLiveUpdating === true && !this.state.hasScrolled) {
       return 0
     }
 
