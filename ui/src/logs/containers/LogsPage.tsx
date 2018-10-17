@@ -466,7 +466,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private get tableScrollToRow() {
-    if (this.isLiveUpdating === true) {
+    if (this.isLiveUpdating === true && !this.state.hasScrolled) {
       return 0
     }
 
@@ -854,6 +854,7 @@ class LogsPage extends Component<Props, State> {
   private updateTableData = async (searchStatus: SearchStatus) => {
     this.clearTailInterval()
     await this.cancelChunks()
+    this.setState({hasScrolled: false, liveUpdating: this.shouldLiveUpdate})
     this.props.clearSearchData(searchStatus)
   }
 
