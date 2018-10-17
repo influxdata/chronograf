@@ -16,6 +16,38 @@ interface Query {
   rp?: string
 }
 
+interface QueryResult {
+  value: TimeSeriesResponse | null
+  error: any | null
+}
+
+export function executeQueries(
+  source: Source,
+  queries: Query[],
+  templates: Template[],
+  resolution?: number,
+  uuid?: string
+): Promise<QueryResult[]> {
+  return new Promise(resolve => {
+    const results = []
+
+    let counter = queries.length
+
+    for (let i = 0; i < queries.length; i++) {
+      executeQuery(source, queries[i], templates, resolution, uuid)
+        .then(result => (results[i] = {value: result, error: null}))
+        .catch(result => (results[i] = {value: null, error: result}))
+        .then(() => {
+          counter -= 1
+
+          if (counter === 0) {
+            resolve(results)
+          }
+        })
+    }
+  })
+}
+
 export const executeQuery = async (
   source: Source,
   query: Query,

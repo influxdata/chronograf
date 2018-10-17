@@ -3,7 +3,7 @@ import React, {PureComponent} from 'react'
 import _ from 'lodash'
 import uuid from 'uuid'
 // API
-import {executeQuery} from 'src/shared/apis/query'
+import {executeQueries} from 'src/shared/apis/query'
 import {
   getTimeSeries as fetchFluxTimeSeries,
   GetTimeSeriesResult,
@@ -31,6 +31,7 @@ import {
 import {notify} from 'src/shared/actions/notifications'
 import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
 import {getDeep} from 'src/utils/wrappers'
+import {restartable} from 'src/shared/utils/restartable'
 
 export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 
@@ -103,6 +104,9 @@ class TimeSeries extends PureComponent<Props, State> {
     return null
   }
 
+  private fetchFluxTimeSeries = restartable(fetchFluxTimeSeries)
+  private executeInfluxQLQueries = restartable(executeQueries)
+
   constructor(props: Props) {
     super(props)
 
@@ -165,6 +169,7 @@ class TimeSeries extends PureComponent<Props, State> {
 
   private get isFluxQuery(): boolean {
     const {queries} = this.props
+
     return getDeep<string>(queries, '0.type', '') === QueryType.Flux
   }
 
@@ -214,7 +219,6 @@ class TimeSeries extends PureComponent<Props, State> {
 
     this.setState({
       loading: RemoteDataState.Loading,
-      latestUUID,
       isFirstFetch: false,
     })
 
@@ -226,12 +230,8 @@ class TimeSeries extends PureComponent<Props, State> {
         rawFluxData = results.csv
         responseUUID = results.uuid
       } else {
-        timeSeriesInfluxQL = await this.executeInfluxQLQueries(latestUUID)
+        timeSeriesInfluxQL = await this.executeInfluxQLWithStatus(latestUUID)
         responseUUID = _.get(timeSeriesInfluxQL, '0.response.uuid')
-      }
-
-      if (responseUUID !== this.state.latestUUID) {
-        return
       }
 
       loading = RemoteDataState.Done
@@ -244,6 +244,7 @@ class TimeSeries extends PureComponent<Props, State> {
       timeSeriesFlux,
       rawFluxData,
       loading,
+      latestUUID: responseUUID,
     })
 
     if (grabDataForDownload) {
@@ -261,7 +262,7 @@ class TimeSeries extends PureComponent<Props, State> {
     const {queries, onNotify, source, timeRange, fluxASTLink} = this.props
 
     const script: string = _.get(queries, '0.text', '')
-    const results = await fetchFluxTimeSeries(
+    const results = await this.fetchFluxTimeSeries(
       source,
       script,
       latestUUID,
@@ -277,48 +278,51 @@ class TimeSeries extends PureComponent<Props, State> {
     return results
   }
 
-  private executeInfluxQLQueries = async (
+  private executeInfluxQLWithStatus = async (
     latestUUID: string
   ): Promise<TimeSeriesServerResponse[]> => {
-    const {queries} = this.props
-    const timeSeriesInfluxQL = await Promise.all(
-      queries.map(query => this.executeInfluxQLQuery(query, latestUUID))
+    const {source, templates, editQueryStatus, queries} = this.props
+
+    for (const query of queries) {
+      editQueryStatus(query.id, {loading: true})
+    }
+
+    const results = await this.executeInfluxQLQueries(
+      source,
+      queries,
+      templates,
+      TEMP_RES,
+      latestUUID
     )
 
-    return timeSeriesInfluxQL
-  }
+    for (let i = 0; i < queries.length; i++) {
+      const {value, error} = results[i]
+      const query = queries[i]
 
-  private executeInfluxQLQuery = async (
-    query: Query,
-    latestUUID: string
-  ): Promise<TimeSeriesServerResponse> => {
-    const {source, templates, editQueryStatus} = this.props
+      let queryStatus
 
-    editQueryStatus(query.id, {loading: true})
-
-    try {
-      const response = await executeQuery(
-        source,
-        query,
-        templates,
-        TEMP_RES,
-        latestUUID
-      )
-
-      const warningMessage = extractQueryWarningMessage(response)
-
-      if (warningMessage) {
-        editQueryStatus(query.id, {warn: warningMessage})
+      if (error) {
+        queryStatus = {error: extractQueryErrorMessage(error)}
       } else {
-        editQueryStatus(query.id, {success: 'Success!'})
+        const warningMessage = extractQueryWarningMessage(value)
+
+        if (warningMessage) {
+          queryStatus = {warn: warningMessage}
+        } else {
+          queryStatus = {success: 'Success!'}
+        }
       }
 
-      return {response}
-    } catch (error) {
-      editQueryStatus(query.id, {error: extractQueryErrorMessage(error)})
-
-      throw error
+      editQueryStatus(query.id, queryStatus)
     }
+
+    const validQueryResults = results
+      .filter(result => !result.error)
+      .map(result => ({
+        response: result.value,
+      }))
+
+    return validQueryResults
   }
 }
 
