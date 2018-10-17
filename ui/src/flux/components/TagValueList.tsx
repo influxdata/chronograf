@@ -21,6 +21,7 @@ interface Props {
   tagKey: string
   notify: NotificationAction
   measurement: string
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -74,7 +75,7 @@ class TagValueList extends PureComponent<Props, State> {
   }
 
   private get tagValues(): JSX.Element | JSX.Element[] {
-    const {source, db, tagKey, measurement, notify} = this.props
+    const {source, db, tagKey, measurement, notify, onAppendScript} = this.props
     const {searchTerm, loading} = this.state
 
     if (loading === RemoteDataState.Loading) {
@@ -97,6 +98,7 @@ class TagValueList extends PureComponent<Props, State> {
           measurement={measurement}
           key={tagValue}
           notify={notify}
+          onAppendScript={onAppendScript}
         />
       ))
     }

@@ -19,6 +19,7 @@ interface Props {
   db: string
   source: Source
   notify: NotificationAction
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -72,7 +73,7 @@ class TagValueList extends PureComponent<Props, State> {
   }
 
   private get measurements(): JSX.Element | JSX.Element[] {
-    const {source, db, notify} = this.props
+    const {source, db, notify, onAppendScript} = this.props
     const {searchTerm, loading} = this.state
 
     if (loading === RemoteDataState.Loading) {
@@ -91,6 +92,7 @@ class TagValueList extends PureComponent<Props, State> {
           measurement={measurement}
           key={measurement}
           notify={notify}
+          onAppendScript={onAppendScript}
         />
       ))
     }
@@ -117,7 +119,9 @@ class TagValueList extends PureComponent<Props, State> {
     })
   }
 
-  private handleClick = (e: MouseEvent<HTMLInputElement>) => {
+  private handleClick = (
+    e: MouseEvent<HTMLDivElement> | MouseEvent<HTMLInputElement>
+  ) => {
     e.stopPropagation()
   }
 }

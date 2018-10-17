@@ -24,6 +24,7 @@ interface Props {
   searchTerm: string
   measurement: string
   notify: NotificationAction
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -41,7 +42,7 @@ class MeasurementListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, measurement, notify} = this.props
+    const {db, source, measurement, notify, onAppendScript} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -60,6 +61,12 @@ class MeasurementListItem extends PureComponent<Props, State> {
             {measurement}
             <span className="flux-schema--type">Measurement</span>
           </div>
+          <button
+            className="btn btn-xs btn-primary make-filter"
+            onClick={this.handleMakeFilter}
+          >
+            Make Filter
+          </button>
           <CopyToClipboard text={measurement} onCopy={this.handleCopyAttempt}>
             <div className="flux-schema-copy" onClick={this.handleClickCopy}>
               <span className="icon duplicate" title="copy to clipboard" />
@@ -74,6 +81,7 @@ class MeasurementListItem extends PureComponent<Props, State> {
               source={source}
               notify={notify}
               measurement={measurement}
+              onAppendScript={onAppendScript}
             />
           </div>
         )}
@@ -83,6 +91,15 @@ class MeasurementListItem extends PureComponent<Props, State> {
 
   private handleClickCopy = (e): void => {
     e.stopPropagation()
+  }
+
+  private handleMakeFilter = (e): void => {
+    e.stopPropagation()
+    const {measurement, onAppendScript} = this.props
+
+    const filter = `|> filter(fn: (r) => r._measurement == "${measurement}")`
+
+    onAppendScript(filter)
   }
 
   private handleCopyAttempt = (

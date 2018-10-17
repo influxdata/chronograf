@@ -11,6 +11,7 @@ import {Source, NotificationAction} from 'src/types'
 interface Props {
   source: Source
   notify: NotificationAction
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -46,11 +47,17 @@ class DatabaseList extends PureComponent<Props, State> {
 
   public render() {
     const {databases} = this.state
-    const {source, notify} = this.props
+    const {source, notify, onAppendScript} = this.props
 
     return databases.map(db => {
       return (
-        <DatabaseListItem key={db} db={db} source={source} notify={notify} />
+        <DatabaseListItem
+          key={db}
+          db={db}
+          source={source}
+          notify={notify}
+          onAppendScript={onAppendScript}
+        />
       )
     })
   }

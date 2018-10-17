@@ -14,12 +14,13 @@ interface Props {
   source: Source
   db: string
   notify: NotificationAction
+  onAppendScript: (appendage: string) => void
 }
 
 @ErrorHandling
 class SchemaItemCategories extends PureComponent<Props> {
   public render() {
-    const {source, db, notify} = this.props
+    const {source, db, notify, onAppendScript} = this.props
 
     return (
       <>
@@ -28,18 +29,21 @@ class SchemaItemCategories extends PureComponent<Props> {
           db={db}
           type={CategoryType.Measurements}
           notify={notify}
+          onAppendScript={onAppendScript}
         />
         <SchemaItemCategory
           source={source}
           db={db}
           type={CategoryType.Tags}
           notify={notify}
+          onAppendScript={onAppendScript}
         />
         <SchemaItemCategory
           source={source}
           db={db}
           type={CategoryType.Fields}
           notify={notify}
+          onAppendScript={onAppendScript}
         />
       </>
     )

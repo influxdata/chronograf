@@ -26,6 +26,7 @@ interface Props {
   tagKey: string
   notify: NotificationAction
   measurement: string
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -43,7 +44,15 @@ class TagValueListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, tagValue, tagKey, notify, measurement} = this.props
+    const {
+      db,
+      source,
+      tagValue,
+      tagKey,
+      notify,
+      measurement,
+      onAppendScript,
+    } = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -64,6 +73,12 @@ class TagValueListItem extends PureComponent<Props, State> {
             {tagValue}
             <span className="flux-schema--type">Tag Value</span>
           </div>
+          <button
+            className="btn btn-xs btn-primary make-filter"
+            onClick={this.handleMakeFilter}
+          >
+            Make Filter
+          </button>
           <CopyToClipboard text={tagValue} onCopy={this.handleCopyAttempt}>
             <div className="flux-schema-copy" onClick={this.handleClickCopy}>
               <span className="icon duplicate" title="copy to clipboard" />
@@ -79,6 +94,7 @@ class TagValueListItem extends PureComponent<Props, State> {
               tag={tag}
               notify={notify}
               measurement={measurement}
+              onAppendScript={onAppendScript}
             />
           </div>
         )}
@@ -100,6 +116,19 @@ class TagValueListItem extends PureComponent<Props, State> {
 
   private handleClickCopy = (e): void => {
     e.stopPropagation()
+  }
+
+  private handleMakeFilter = (e): void => {
+    e.stopPropagation()
+    const {measurement, onAppendScript, tagKey, tagValue} = this.props
+
+    let filter = `|> filter(fn: (r) => (r._measurement == "${measurement}" AND r.${tagKey} == "${tagValue}"))`
+
+    if (!measurement) {
+      filter = `|> filter(fn: (r) => r.${tagKey} == "${tagValue}")`
+    }
+
+    onAppendScript(filter)
   }
 
   private handleCopyAttempt = (

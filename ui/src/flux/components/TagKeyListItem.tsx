@@ -25,6 +25,7 @@ interface Props {
   tagKey: string
   measurement?: string
   notify: NotificationAction
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -42,7 +43,7 @@ class TagKeyListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, tagKey, notify, measurement} = this.props
+    const {db, source, tagKey, notify, measurement, onAppendScript} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -76,6 +77,7 @@ class TagKeyListItem extends PureComponent<Props, State> {
               tagKey={tagKey}
               measurement={measurement}
               notify={notify}
+              onAppendScript={onAppendScript}
             />
           </div>
         )}

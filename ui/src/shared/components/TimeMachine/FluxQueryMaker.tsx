@@ -118,7 +118,13 @@ class FluxQueryMaker extends PureComponent<Props, State> {
         size: 0.34,
         headerButtons: [],
         menuOptions: [],
-        render: () => <SchemaExplorer source={source} notify={notify} />,
+        render: () => (
+          <SchemaExplorer
+            source={source}
+            notify={notify}
+            onAppendScript={this.handleAppendScript}
+          />
+        ),
         headerOrientation: HANDLE_VERTICAL,
       },
     ]
@@ -160,6 +166,12 @@ class FluxQueryMaker extends PureComponent<Props, State> {
 
   private handleAddToScript = (draftScript): void => {
     this.setState({draftScript}, this.handleSubmitScript)
+  }
+
+  private handleAppendScript = (appendage: string): void => {
+    const draftScript = `${this.state.draftScript}\n\n  ${appendage}`
+
+    this.setState({draftScript})
   }
 
   private handleChangeDraftScript = async (

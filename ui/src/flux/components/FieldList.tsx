@@ -25,6 +25,7 @@ interface Props {
   tag?: {key: string; value: string}
   measurement?: string
   notify: NotificationAction
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -102,6 +103,12 @@ class FieldList extends PureComponent<Props, State> {
               {field}
               <span className="flux-schema--type">Field</span>
             </div>
+            <button
+              className="btn btn-xs btn-primary make-filter"
+              onClick={this.handleMakeFilter(field)}
+            >
+              Make Filter
+            </button>
             <CopyToClipboard text={field} onCopy={this.handleCopyAttempt}>
               <div className="flux-schema-copy" onClick={this.handleClick}>
                 <span className="icon duplicate" title="copy to clipboard" />
@@ -148,6 +155,31 @@ class FieldList extends PureComponent<Props, State> {
 
   private handleClick = (e): void => {
     e.stopPropagation()
+  }
+
+  private handleMakeFilter = field => (e): void => {
+    e.stopPropagation()
+    const {onAppendScript, tag, measurement} = this.props
+
+    let filter = `|> filter(fn: (r) => r._field == "${field}")`
+
+    if (tag && !measurement) {
+      filter = `|> filter(fn: (r) => (r._field == "${field}" AND r.${
+        tag.key
+      } == "${tag.value}"))`
+    }
+
+    if (!tag && measurement) {
+      filter = `|> filter(fn: (r) => (r._measurement == "${measurement}" AND r._field == "${field}"))`
+    }
+
+    if (tag && measurement) {
+      filter = `|> filter(fn: (r) => (r._measurement == "${measurement}" AND r._field == "${field}" AND r.${
+        tag.key
+      } == "${tag.value}"))`
+    }
+
+    onAppendScript(filter)
   }
 
   private handleCopyAttempt = (

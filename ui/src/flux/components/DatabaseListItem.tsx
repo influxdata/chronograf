@@ -14,6 +14,7 @@ interface Props {
   db: string
   source: Source
   notify: NotificationAction
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -54,12 +55,17 @@ class DatabaseListItem extends PureComponent<Props, State> {
   }
 
   private get categories(): JSX.Element {
-    const {db, source, notify} = this.props
+    const {db, source, notify, onAppendScript} = this.props
     const {isOpen} = this.state
 
     return (
       <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-        <SchemaItemCategories db={db} source={source} notify={notify} />
+        <SchemaItemCategories
+          db={db}
+          source={source}
+          notify={notify}
+          onAppendScript={onAppendScript}
+        />
       </div>
     )
   }

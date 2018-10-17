@@ -24,6 +24,7 @@ interface Props {
   notify: NotificationAction
   db: string
   type: CategoryType
+  onAppendScript: (appendage: string) => void
 }
 
 interface State {
@@ -69,7 +70,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
   private get categoryName(): string {
     switch (this.props.type) {
       case CategoryType.Measurements:
-        return 'MEASURMENTS'
+        return 'MEASUREMENTS'
       case CategoryType.Fields:
         return 'FIELDS'
       case CategoryType.Tags:
@@ -78,16 +79,37 @@ class SchemaItemCategory extends PureComponent<Props, State> {
   }
 
   private get itemList(): JSX.Element {
-    const {type, db, source, notify} = this.props
+    const {type, db, source, notify, onAppendScript} = this.props
 
     switch (type) {
       case CategoryType.Measurements:
-        return <MeasurementList db={db} source={source} notify={notify} />
+        return (
+          <MeasurementList
+            db={db}
+            source={source}
+            notify={notify}
+            onAppendScript={onAppendScript}
+          />
+        )
 
       case CategoryType.Fields:
-        return <FieldList db={db} source={source} notify={notify} />
+        return (
+          <FieldList
+            db={db}
+            source={source}
+            notify={notify}
+            onAppendScript={onAppendScript}
+          />
+        )
       case CategoryType.Tags:
-        return <TagKeyList db={db} source={source} notify={notify} />
+        return (
+          <TagKeyList
+            db={db}
+            source={source}
+            notify={notify}
+            onAppendScript={onAppendScript}
+          />
+        )
     }
   }
 
