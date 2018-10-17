@@ -118,7 +118,6 @@ class CellEditorOverlay extends Component<Props, State> {
       editQueryStatus,
       fluxLinks,
       notify,
-      onCancel,
       source,
       sources,
       templates,
@@ -153,7 +152,7 @@ class CellEditorOverlay extends Component<Props, State> {
               title={_.get(cell, 'name', '')}
               renameCell={this.handleRenameCell}
               onSave={this.handleSaveCell}
-              onCancel={onCancel}
+              onCancel={this.handleCancel}
               activeEditorTab={activeEditorTab}
               onSetActiveEditorTab={onSetActiveEditorTab}
               isSaveable={this.isSaveable}
@@ -263,10 +262,18 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private handleSaveCell = () => {
-    const {onSave} = this.props
+    const {onSave, onResetTimeMachine} = this.props
     const cell = this.collectCell()
 
     onSave(cell)
+    onResetTimeMachine()
+  }
+
+  private handleCancel = () => {
+    const {onCancel, onResetTimeMachine} = this.props
+
+    onCancel()
+    onResetTimeMachine()
   }
 
   private handleKeyDown = e => {
