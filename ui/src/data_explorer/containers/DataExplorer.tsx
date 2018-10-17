@@ -95,6 +95,7 @@ interface PassedProps {
 interface ConnectedProps {
   queryDrafts: CellQuery[]
   timeRange: TimeRange
+  draftScript: string
   script: string
   onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
   onChangeScript: TimeMachineContainer['handleChangeScript']
@@ -309,7 +310,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       sendDashboardCell,
       handleGetDashboards,
       notify,
-      script,
+      draftScript,
     } = this.props
 
     const {isSendToDashboardVisible, isStaticLegend} = this.state
@@ -320,7 +321,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             notify={notify}
             onCancel={this.toggleSendToDashboard}
             queryConfig={this.activeQueryConfig}
-            script={script}
+            script={draftScript}
             source={source}
             isFluxQuery={this.isFluxQuery}
             rawText={this.rawText}
@@ -437,17 +438,21 @@ export class DataExplorer extends PureComponent<Props, State> {
 const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
   return (
     <Subscribe to={[TimeMachineContainer]}>
-      {(timeMachineContainer: TimeMachineContainer) => (
-        <DataExplorer
-          {...props}
-          queryDrafts={timeMachineContainer.state.queryDrafts}
-          timeRange={timeMachineContainer.state.timeRange}
-          script={timeMachineContainer.state.script}
-          onChangeScript={timeMachineContainer.handleChangeScript}
-          onUpdateQueryDrafts={timeMachineContainer.handleUpdateQueryDrafts}
-          onResetTimeMachine={timeMachineContainer.reset}
-        />
-      )}
+      {(container: TimeMachineContainer) => {
+        const {state} = container
+        return (
+          <DataExplorer
+            {...props}
+            queryDrafts={state.queryDrafts}
+            draftScript={state.draftScript}
+            timeRange={state.timeRange}
+            script={state.script}
+            onChangeScript={container.handleChangeScript}
+            onUpdateQueryDrafts={container.handleUpdateQueryDrafts}
+            onResetTimeMachine={container.reset}
+          />
+        )
+      }}
     </Subscribe>
   )
 }

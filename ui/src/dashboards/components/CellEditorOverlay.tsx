@@ -45,6 +45,8 @@ import {ColorString, ColorNumber} from 'src/types/colors'
 interface ConnectedProps {
   queryDrafts: CellQuery[]
   script: string
+  draftScript: string
+  onChangeScript: (script: string) => void
   type: CellType
   axes: Axes | null
   tableOptions: TableOptions
@@ -205,7 +207,7 @@ class CellEditorOverlay extends Component<Props, State> {
   private collectCell = (): Cell | NewDefaultCell => {
     const {
       cell,
-      script,
+      draftScript,
       queryDrafts,
       type,
       axes,
@@ -226,7 +228,7 @@ class CellEditorOverlay extends Component<Props, State> {
     if (this.isFluxQuery) {
       queries = [
         {
-          query: script,
+          query: draftScript,
           queryConfig: null,
           source: getDeep<string>(queryDrafts, '0.source', ''),
           type: QueryType.Flux,
@@ -311,26 +313,31 @@ class CellEditorOverlay extends Component<Props, State> {
 const ConnectedCellEditorOverlay = (props: PassedProps) => {
   return (
     <Subscribe to={[TimeMachineContainer]}>
-      {(timeMachineContainer: TimeMachineContainer) => (
-        <CellEditorOverlay
-          {...props}
-          queryDrafts={timeMachineContainer.state.queryDrafts}
-          script={timeMachineContainer.state.script}
-          type={timeMachineContainer.state.type}
-          axes={timeMachineContainer.state.axes}
-          tableOptions={timeMachineContainer.state.tableOptions}
-          fieldOptions={timeMachineContainer.state.fieldOptions}
-          timeFormat={timeMachineContainer.state.timeFormat}
-          decimalPlaces={timeMachineContainer.state.decimalPlaces}
-          note={timeMachineContainer.state.note}
-          noteVisibility={timeMachineContainer.state.noteVisibility}
-          thresholdsListColors={timeMachineContainer.state.thresholdsListColors}
-          thresholdsListType={timeMachineContainer.state.thresholdsListType}
-          gaugeColors={timeMachineContainer.state.gaugeColors}
-          lineColors={timeMachineContainer.state.lineColors}
-          onResetTimeMachine={timeMachineContainer.reset}
-        />
-      )}
+      {(container: TimeMachineContainer) => {
+        const {state} = container
+        return (
+          <CellEditorOverlay
+            {...props}
+            queryDrafts={state.queryDrafts}
+            script={state.script}
+            draftScript={state.draftScript}
+            onChangeScript={container.handleChangeScript}
+            type={state.type}
+            axes={state.axes}
+            tableOptions={state.tableOptions}
+            fieldOptions={state.fieldOptions}
+            timeFormat={state.timeFormat}
+            decimalPlaces={state.decimalPlaces}
+            note={state.note}
+            noteVisibility={state.noteVisibility}
+            thresholdsListColors={state.thresholdsListColors}
+            thresholdsListType={state.thresholdsListType}
+            gaugeColors={state.gaugeColors}
+            lineColors={state.lineColors}
+            onResetTimeMachine={container.reset}
+          />
+        )
+      }}
     </Subscribe>
   )
 }

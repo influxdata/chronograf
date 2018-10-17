@@ -29,6 +29,7 @@ export function initialStateFromCell(
 
   if (get(cell, 'queries.0.type') === QueryType.Flux) {
     initialState.script = get(cell, 'queries.0.query', '')
+    initialState.draftScript = get(cell, 'queries.0.query', '')
   }
 
   if (cell.tableOptions) {
