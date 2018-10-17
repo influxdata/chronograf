@@ -41,6 +41,7 @@ const GeneralPanel: SFC<Props> = ({
             <div className="form-group col-xs-12 col-sm-6">
                 <label>Data source</label>
                 <DatasourceSection
+                    name="default_datasource"
                     datasource={model.default_datasource}
                     datasources={datasources}
                     onChoose={onDatasourceChoose}
@@ -57,6 +58,17 @@ const GeneralPanel: SFC<Props> = ({
                     value={model.max_evals}
                     onChange={onInputChange}
                     placeholder="ex: 100"
+                />
+            </div>
+            <div className="form-group col-xs-12 col-sm-6">
+                <label>Data sink</label>
+                <DatasourceSection
+                    name="default_datasink"
+                    datasource={model.default_datasink}
+                    datasources={datasources}
+                    onChoose={onDatasourceChoose}
+                    buttonSize="btn-md"
+                    disabled={locked}
                 />
             </div>
         </div>

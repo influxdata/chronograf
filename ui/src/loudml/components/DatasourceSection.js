@@ -9,9 +9,10 @@ const DatasourceSection = ({
     onChoose,
     buttonSize,
     disabled,
+    name,
 }) => {
     function handleOnChoose(e) {
-        onChoose(e.text)
+        onChoose(name, e.text)
     }
 
     if (!datasources) {
@@ -20,7 +21,7 @@ const DatasourceSection = ({
 
     return (
         <Dropdown
-            name="default_datasource"
+            name={name}
             items={datasources.map(ds => ({text: ds.name}))}
             onChoose={handleOnChoose}
             selected={datasource || ''}
@@ -38,9 +39,10 @@ DatasourceSection.defaultProps = {
 const {func, string, arrayOf, shape, bool} = PropTypes
 
 DatasourceSection.propTypes = {
+    name: string.isRequired,
     datasource: string,
-    datasources: arrayOf(shape()).isRequired,
-    onChoose: func,
+    datasources: arrayOf(shape()),
+    onChoose: func.isRequired,
     buttonSize: string,
     disabled: bool.isRequired,
 }

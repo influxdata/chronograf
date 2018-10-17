@@ -7,6 +7,7 @@ export interface ModelSettings {
     run: {}
     features: Feature[]
     default_datasource: string
+    default_datasink?: string
     max_evals: number
 }
 

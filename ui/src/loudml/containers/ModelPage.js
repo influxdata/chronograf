@@ -253,11 +253,8 @@ class ModelPage extends Component {
         this.handleEdit(name, type === 'number' ? Number(value) : value)
     }
 
-    onDatasourceChoose = datasource => {
-        const {model} = this.state
-
-        model.default_datasource = datasource
-        this.setState({model})
+    onDatasourceChoose = (field, value) => {
+        this.handleEdit(field, value)
     }
 
     handleEdit = (field, value) => {
