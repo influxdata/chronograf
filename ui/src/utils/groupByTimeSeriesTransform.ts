@@ -26,7 +26,7 @@ interface Result {
 }
 
 interface Series {
-  name: string
+  name?: string
   columns: string[]
   values: TimeSeriesValue[][]
   responseIndex: number
@@ -162,6 +162,7 @@ const constructCells = (
   sortedLabels: Label[]
   seriesLabels: Label[][]
   queryType: InfluxQLQueryType
+  metaQuerySeries?: TimeSeriesValue[][]
 } => {
   let cellIndex = 0
   let labels: Label[] = []
@@ -176,6 +177,7 @@ const constructCells = (
     seriesIndex: [],
     responseIndex: [],
   }
+  let metaQuerySeries: TimeSeriesValue[][]
 
   fastForEach<Series>(
     serieses,
@@ -191,76 +193,66 @@ const constructCells = (
       },
       ind
     ) => {
-      let unsortedLabels: Label[]
-      if (isGroupBy) {
-        const labelsFromTags = fastMap<string, Label>(_.keys(tags), field => ({
-          label: `${field}`,
-          responseIndex,
-          seriesIndex,
-        }))
-        const labelsFromColumns = fastMap<string, Label>(
-          columns.slice(1),
-          field => ({
-            label: `${measurement}.${field}`,
+      if (columns.find(c => c === 'time')) {
+        let unsortedLabels: Label[]
+
+        if (isGroupBy) {
+          const labelsFromTags = fastMap<string, Label>(
+            _.keys(tags),
+            field => ({
+              label: `${field}`,
+              responseIndex,
+              seriesIndex,
+            })
+          )
+          const labelsFromColumns = fastMap<string, Label>(
+            columns.slice(1),
+            field => ({
+              label: `${measurement}.${field}`,
+              responseIndex,
+              seriesIndex,
+            })
+          )
+
+          unsortedLabels = fastConcat<Label>(labelsFromTags, labelsFromColumns)
+          seriesLabels[ind] = unsortedLabels
+          labels = _.concat(labels, unsortedLabels)
+        } else {
+          const tagSet = fastMap<string, string>(
+            _.keys(tags),
+            tag => `[${tag}=${tags[tag]}]`
+          )
+            .sort()
+            .join('')
+
+          unsortedLabels = fastMap<string, Label>(columns.slice(1), field => ({
+            label: `${measurement}.${field}${tagSet}`,
             responseIndex,
             seriesIndex,
+          }))
+          seriesLabels[ind] = unsortedLabels
+          labels = _.concat(labels, unsortedLabels)
+          fastForEach(values, vals => {
+            const [time, ...rowValues] = vals
+            fastForEach(rowValues, (value, i) => {
+              cells.label[cellIndex] = unsortedLabels[i].label
+              cells.value[cellIndex] = value
+              cells.time[cellIndex] = time
+              isDataQuery = true
+              cells.seriesIndex[cellIndex] = seriesIndex
+              cells.responseIndex[cellIndex] = responseIndex
+              cellIndex++ // eslint-disable-line no-plusplus
+            })
           })
-        )
-
-        unsortedLabels = fastConcat<Label>(labelsFromTags, labelsFromColumns)
-        seriesLabels[ind] = unsortedLabels
-        labels = _.concat(labels, unsortedLabels)
-      } else if (columns.length > 1) {
-        const tagSet = fastMap<string, string>(
-          _.keys(tags),
-          tag => `[${tag}=${tags[tag]}]`
-        )
-          .sort()
-          .join('')
-
-        unsortedLabels = fastMap<string, Label>(columns.slice(1), field => ({
-          label: `${measurement}.${field}${tagSet}`,
-          responseIndex,
-          seriesIndex,
-        }))
-        seriesLabels[ind] = unsortedLabels
-        labels = _.concat(labels, unsortedLabels)
-
-        fastForEach(values, vals => {
-          const [time, ...rowValues] = vals
-          fastForEach(rowValues, (value, i) => {
-            cells.label[cellIndex] = unsortedLabels[i].label
-            cells.value[cellIndex] = value
-            cells.time[cellIndex] = time
-            isDataQuery = true
-            cells.seriesIndex[cellIndex] = seriesIndex
-            cells.responseIndex[cellIndex] = responseIndex
-            cellIndex++ // eslint-disable-line no-plusplus
-          })
-        })
+        }
       } else {
-        const label = `${measurement}.${columns[0]}`
-        unsortedLabels = [
-          {
-            label,
-            responseIndex,
-            seriesIndex,
-          },
-        ]
-
-        seriesLabels[ind] = unsortedLabels
-        labels = _.concat(labels, unsortedLabels)
-
-        fastForEach(values, vals => {
-          const [value] = vals
-          cells.label[cellIndex] = label
-          cells.value[cellIndex] = value
-          cells.time[cellIndex] = null
-          isMetaQuery = true
-          cells.seriesIndex[cellIndex] = seriesIndex
-          cells.responseIndex[cellIndex] = responseIndex
-          cellIndex++ // eslint-disable-line no-plusplus
-        })
+        metaQuerySeries = [columns, ...values]
+        isMetaQuery = true
+        labels = columns.map(c => ({
+          label: c,
+          responseIndex,
+          seriesIndex,
+        }))
       }
     }
   )
@@ -275,8 +267,11 @@ const constructCells = (
     queryType = InfluxQLQueryType.DataQuery
   }
 
-  const sortedLabels = _.sortBy(labels, 'label')
-  return {cells, sortedLabels, seriesLabels, queryType}
+  const sortedLabels =
+    queryType === InfluxQLQueryType.MetaQuery
+      ? labels
+      : _.sortBy(labels, 'label')
+  return {cells, sortedLabels, seriesLabels, queryType, metaQuerySeries}
 }
 
 const insertGroupByValues = (
@@ -386,12 +381,26 @@ export const groupByTimeSeriesTransform = (
   sortedLabels: Label[]
   sortedTimeSeries: TimeSeries[]
   queryType: InfluxQLQueryType
+  metaQuerySeries?: TimeSeriesValue[][]
 } => {
   const results = constructResults(raw, isTable)
   const serieses = constructSerieses(results)
-  const {cells, sortedLabels, seriesLabels, queryType} = constructCells(
-    serieses
-  )
+  const {
+    cells,
+    sortedLabels,
+    seriesLabels,
+    queryType,
+    metaQuerySeries,
+  } = constructCells(serieses)
+
+  if (queryType === InfluxQLQueryType.MetaQuery) {
+    return {
+      sortedLabels,
+      sortedTimeSeries: null,
+      queryType,
+      metaQuerySeries,
+    }
+  }
 
   const sortedTimeSeries = constructTimeSeries(
     serieses,

@@ -300,6 +300,203 @@ it('parses a single field influxQL query', () => {
   expect(actual.influxQLQueryType).toEqual(InfluxQLQueryType.DataQuery)
 })
 
+it('parses a one-column meta query', () => {
+  const metaQueryResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'databases',
+                columns: ['name'],
+                values: [
+                  ['_internal'],
+                  ['telegraf'],
+                  ['chronograf'],
+                  ['hackathon'],
+                  ['crypto'],
+                ],
+              },
+            ],
+          },
+        ],
+        uuid: 'd945d2f0-d23d-11e8-ac69-63644ffc39d1',
+      },
+    },
+  ]
+
+  const expected = {
+    data: [
+      ['name'],
+      ['_internal'],
+      ['telegraf'],
+      ['chronograf'],
+      ['hackathon'],
+      ['crypto'],
+    ],
+    sortedLabels: [{label: 'name', responseIndex: 0, seriesIndex: 0}],
+    influxQLQueryType: 'MetaQuery',
+  }
+
+  const actual = timeSeriesToTableGraph(metaQueryResponse)
+
+  expect(actual).toEqual(expected)
+})
+
+it('parses a two-column meta query with different first column values', () => {
+  const metaQueryResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'syslog',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['facility_code', 'integer'],
+                  ['message', 'string'],
+                  ['procid', 'string'],
+                  ['severity_code', 'integer'],
+                  ['timestamp', 'integer'],
+                  ['version', 'integer'],
+                ],
+              },
+            ],
+          },
+        ],
+        uuid: 'a43a58e0-d23f-11e8-98ba-639f4bed0e98',
+      },
+    },
+  ]
+
+  const expected = {
+    data: [
+      ['fieldKey', 'fieldType'],
+      ['facility_code', 'integer'],
+      ['message', 'string'],
+      ['procid', 'string'],
+      ['severity_code', 'integer'],
+      ['timestamp', 'integer'],
+      ['version', 'integer'],
+    ],
+    sortedLabels: [
+      {label: 'fieldKey', responseIndex: 0, seriesIndex: 0},
+      {label: 'fieldType', responseIndex: 0, seriesIndex: 0},
+    ],
+    influxQLQueryType: 'MetaQuery',
+  }
+
+  const actual = timeSeriesToTableGraph(metaQueryResponse)
+
+  expect(actual).toEqual(expected)
+})
+
+it('parses a two-column meta query with same first column values', () => {
+  const metaQueryResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'cpu',
+                columns: ['key', 'value'],
+                values: [
+                  ['cpu', 'cpu-total'],
+                  ['cpu', 'cpu0'],
+                  ['cpu', 'cpu1'],
+                  ['cpu', 'cpu2'],
+                  ['cpu', 'cpu3'],
+                  ['cpu', 'cpu4'],
+                  ['cpu', 'cpu5'],
+                  ['cpu', 'cpu6'],
+                  ['cpu', 'cpu7'],
+                ],
+              },
+            ],
+          },
+        ],
+        uuid: '7be623a0-d240-11e8-a801-b1de38f10ec1',
+      },
+    },
+  ]
+
+  const expected = {
+    data: [
+      ['key', 'value'],
+      ['cpu', 'cpu-total'],
+      ['cpu', 'cpu0'],
+      ['cpu', 'cpu1'],
+      ['cpu', 'cpu2'],
+      ['cpu', 'cpu3'],
+      ['cpu', 'cpu4'],
+      ['cpu', 'cpu5'],
+      ['cpu', 'cpu6'],
+      ['cpu', 'cpu7'],
+    ],
+    sortedLabels: [
+      {label: 'key', responseIndex: 0, seriesIndex: 0},
+      {label: 'value', responseIndex: 0, seriesIndex: 0},
+    ],
+    influxQLQueryType: 'MetaQuery',
+  }
+
+  const actual = timeSeriesToTableGraph(metaQueryResponse)
+
+  expect(actual).toEqual(expected)
+})
+
+it('parses meta query with multiple columns', () => {
+  const metaQueryResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                columns: [
+                  'name',
+                  'duration',
+                  'shardGroupDuration',
+                  'replicaN',
+                  'default',
+                ],
+                values: [['autogen', '0s', '168h0m0s', 1, true]],
+              },
+            ],
+          },
+        ],
+        uuid: '2f0e3400-d240-11e8-8c53-9748e5c2a80a',
+      },
+    },
+  ]
+
+  const expected = {
+    data: [
+      ['name', 'duration', 'shardGroupDuration', 'replicaN', 'default'],
+      ['autogen', '0s', '168h0m0s', 1, true],
+    ],
+    sortedLabels: [
+      {label: 'name', responseIndex: 0, seriesIndex: 0},
+      {label: 'duration', responseIndex: 0, seriesIndex: 0},
+      {label: 'shardGroupDuration', responseIndex: 0, seriesIndex: 0},
+      {label: 'replicaN', responseIndex: 0, seriesIndex: 0},
+      {label: 'default', responseIndex: 0, seriesIndex: 0},
+    ],
+    influxQLQueryType: 'MetaQuery',
+  }
+
+  const actual = timeSeriesToTableGraph(metaQueryResponse)
+
+  expect(actual).toEqual(expected)
+})
+
 it('errors when both meta query and data query response', () => {
   const influxResponse = [
     {
@@ -496,7 +693,7 @@ describe('timeSeriesToTableGraph', () => {
 
     const actual = timeSeriesToTableGraph(influxResponse)
     const expected = [
-      ['measurements.name'],
+      ['name'],
       ['cpu'],
       ['disk'],
       ['diskio'],

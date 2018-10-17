@@ -18,7 +18,12 @@ const timeSeriesToTableData = (
     case InfluxQLQueryType.MetaQuery:
       return fastMap<TimeSeries, TimeSeriesValue[]>(
         timeSeries,
-        ({values}) => values
+        ({time: firstVal, values}) => {
+          if (firstVal) {
+            return [firstVal, ...values]
+          }
+          return values
+        }
       )
     case InfluxQLQueryType.DataQuery:
       return fastMap<TimeSeries, TimeSeriesValue[]>(
@@ -38,7 +43,12 @@ export const timeSeriesToTableGraphWork = (
     sortedLabels,
     sortedTimeSeries,
     queryType,
+    metaQuerySeries,
   } = groupByTimeSeriesTransform(raw, isTable)
+
+  if (queryType === InfluxQLQueryType.MetaQuery) {
+    return {data: metaQuerySeries, sortedLabels, influxQLQueryType: queryType}
+  }
 
   let labels = fastMap<Label, string>(sortedLabels, ({label}) => label)
 

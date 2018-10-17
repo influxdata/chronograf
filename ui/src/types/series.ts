@@ -1,7 +1,7 @@
 export type TimeSeriesValue = string | number | null
 
 export interface TimeSeriesSeries {
-  name: string
+  name?: string
   columns: string[]
   values: TimeSeriesValue[][]
   tags?: [{[x: string]: string}]
