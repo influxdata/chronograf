@@ -23,6 +23,7 @@ import {
   isFluxDataEqual,
   isInluxQLDataEqual,
 } from 'src/shared/graphs/helpers'
+import {getDurationInMilliseconds} from 'src/shared/parsing/flux/timeRange'
 
 // Types
 import {ColorString} from 'src/types/colors'
@@ -157,6 +158,8 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
     const {labels, timeSeries, dygraphSeries} = this.state.timeSeries
 
+    const dateWindow = this.dateWindow
+
     const options = {
       rightGap: 0,
       yRangePad: 10,
@@ -165,6 +168,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
       axisLabelWidth: 60,
       animatedZooms: true,
       drawAxesAtZero: true,
+      dateWindow,
       axisLineColor: '#383846',
       gridLineColor: '#383846',
       connectSeparatedPoints: true,
@@ -207,6 +211,41 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
         </Dygraph>
       </div>
     )
+  }
+
+  private get dateWindow(): [number, number] {
+    const {timeRange} = this.props
+    console.log('tr', timeRange)
+
+    if (timeRange.lower && timeRange.upper) {
+      return [Date.parse(timeRange.lower), Date.parse(timeRange.upper)]
+    } else if (timeRange.lowerFlux) {
+      // we have the string
+      // sep the number from the unit
+      const regexPattern = /(\d+)([a-zA-Z]+)/g
+      const unitTimes: Array<{value: number; unit: string}> = []
+      let continueLooping = true
+      const tr = '-5m10s'
+      console.log('lowerflux', tr)
+      while (continueLooping) {
+        const results = regexPattern.exec(tr)
+        if (results && results.length >= 3) {
+          const value = +results[1]
+          const unit = results[2]
+          unitTimes.push({unit, value})
+        } else {
+          continueLooping = false
+        }
+      }
+      console.log('unitTimes', unitTimes)
+      // translate that to milliseconds
+      const durationMS = getDurationInMilliseconds(unitTimes)
+      // calculate lower date in window based on that
+      const upper = Number(new Date())
+      const lower = upper - durationMS
+      return [lower, upper]
+    }
+    return [Number(new Date()) - 5000000, Number(new Date())]
   }
 
   private get isGraphFilled(): boolean {
