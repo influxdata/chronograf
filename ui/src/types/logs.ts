@@ -203,6 +203,6 @@ export interface MatchSection {
 
 export interface FetchLoop {
   promise: Promise<void>
-  cancel: () => void
+  cancelAsync: () => Promise<void>
   isCanceled: boolean
 }
