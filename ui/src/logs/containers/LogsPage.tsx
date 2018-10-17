@@ -854,6 +854,7 @@ class LogsPage extends Component<Props, State> {
   private updateTableData = async (searchStatus: SearchStatus) => {
     this.clearTailInterval()
     await this.cancelChunks()
+    this.setState({hasScrolled: false, liveUpdating: this.shouldLiveUpdate})
     this.props.clearSearchData(searchStatus)
   }
 
