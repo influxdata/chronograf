@@ -89,7 +89,7 @@ export function buildSelectStatement(config: QueryConfig): string {
   return buildSelect(config)
 }
 
-function buildFields(fieldFuncs: Field[], shift = ''): string {
+function buildFields(fieldFuncs: Field[], shift = '', useAlias = true): string {
   if (!fieldFuncs) {
     return ''
   }
@@ -98,7 +98,11 @@ function buildFields(fieldFuncs: Field[], shift = ''): string {
     .map(f => {
       switch (f.type) {
         case 'field': {
-          return f.value === '*' ? '*' : `"${f.value}"`
+          const quoted = f.value === '*' ? '*' : `"${f.value}"`
+          const aliased =
+            useAlias && f.alias ? `${quoted} AS "${f.alias}"` : quoted
+
+          return aliased
         }
         case 'wildcard': {
           return '*'
@@ -113,7 +117,7 @@ function buildFields(fieldFuncs: Field[], shift = ''): string {
           return `${f.value}`
         }
         case 'func': {
-          const args = buildFields(f.args)
+          const args = buildFields(f.args, '', false)
           const alias = f.alias ? ` AS "${f.alias}${shift}"` : ''
           return `${f.value}(${args})${alias}`
         }
