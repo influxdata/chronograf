@@ -41,6 +41,7 @@ interface RenderProps {
   rawFluxData: string
   loading: RemoteDataState
   uuid: string
+  errorMessage: string
 }
 
 interface Props {
@@ -66,6 +67,7 @@ interface State {
   timeSeriesInfluxQL: TimeSeriesServerResponse[]
   timeSeriesFlux: FluxTable[]
   latestUUID: string
+  errorMessage: string
 }
 
 const TEMP_RES = 300 // FIXME
@@ -118,6 +120,7 @@ class TimeSeries extends PureComponent<Props, State> {
       timeSeriesFlux: [],
       rawFluxData: '',
       latestUUID: null,
+      errorMessage: '',
     }
   }
 
@@ -147,6 +150,7 @@ class TimeSeries extends PureComponent<Props, State> {
       loading,
       isFirstFetch,
       latestUUID,
+      errorMessage,
     } = this.state
 
     if (isFirstFetch && loading === RemoteDataState.Loading) {
@@ -162,6 +166,7 @@ class TimeSeries extends PureComponent<Props, State> {
           rawFluxData,
           loading,
           uuid: latestUUID,
+          errorMessage,
         })}
       </>
     )
@@ -222,6 +227,8 @@ class TimeSeries extends PureComponent<Props, State> {
       isFirstFetch: false,
     })
 
+    let errorMessage = ''
+
     try {
       if (this.isFluxQuery) {
         const results = await this.executeFluxQuery(latestUUID)
@@ -235,8 +242,9 @@ class TimeSeries extends PureComponent<Props, State> {
       }
 
       loading = RemoteDataState.Done
-    } catch {
+    } catch (err) {
       loading = RemoteDataState.Error
+      errorMessage = err.toString()
     }
 
     this.setState({
@@ -245,6 +253,7 @@ class TimeSeries extends PureComponent<Props, State> {
       rawFluxData,
       loading,
       latestUUID: responseUUID,
+      errorMessage,
     })
 
     if (grabDataForDownload) {

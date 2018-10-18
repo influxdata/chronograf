@@ -184,3 +184,11 @@ export const TRUNCATED_RESPONSE = `
 #datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string,string,string,string,string
 #group,false,false,false,false,false,false,true,true,true,true,true,true,true
 #default,_result,,,,,,,,,,,,`
+
+export const ERROR =
+  'failed to create physical plan: invalid time bounds from procedure from: bounds contain zero time'
+export const ERROR_RESPONSE = `#datatype,string,string
+#group,true,true
+#default,,
+,error,reference
+,${ERROR}`

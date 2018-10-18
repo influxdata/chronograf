@@ -22,6 +22,7 @@ import {LastValues} from 'src/worker/jobs/fluxTablesToSingleStat'
 interface DecodeFluxRespWithLimitResult {
   body: string
   byteLength: number
+  ok: boolean
   uuid?: string
 }
 
