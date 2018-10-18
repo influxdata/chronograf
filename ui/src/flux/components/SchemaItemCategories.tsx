@@ -14,7 +14,7 @@ interface Props {
   source: Source
   db: string
   notify: NotificationAction
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 @ErrorHandling

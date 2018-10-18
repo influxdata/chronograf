@@ -24,7 +24,7 @@ interface Props {
   searchTerm: string
   measurement: string
   notify: NotificationAction
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 interface State {
@@ -95,11 +95,11 @@ class MeasurementListItem extends PureComponent<Props, State> {
 
   private handleMakeFilter = (e): void => {
     e.stopPropagation()
-    const {measurement, onAppendScript} = this.props
+    const {measurement, onAppendScript, db} = this.props
 
     const filter = `|> filter(fn: (r) => r._measurement == "${measurement}")`
 
-    onAppendScript(filter)
+    onAppendScript(filter, db)
   }
 
   private handleCopyAttempt = (

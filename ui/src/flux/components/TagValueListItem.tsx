@@ -26,7 +26,7 @@ interface Props {
   tagKey: string
   notify: NotificationAction
   measurement: string
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 interface State {
@@ -120,7 +120,7 @@ class TagValueListItem extends PureComponent<Props, State> {
 
   private handleMakeFilter = (e): void => {
     e.stopPropagation()
-    const {measurement, onAppendScript, tagKey, tagValue} = this.props
+    const {measurement, onAppendScript, tagKey, tagValue, db} = this.props
 
     let filter = `|> filter(fn: (r) => (r._measurement == "${measurement}" AND r.${tagKey} == "${tagValue}"))`
 
@@ -128,7 +128,7 @@ class TagValueListItem extends PureComponent<Props, State> {
       filter = `|> filter(fn: (r) => r.${tagKey} == "${tagValue}")`
     }
 
-    onAppendScript(filter)
+    onAppendScript(filter, db)
   }
 
   private handleCopyAttempt = (

@@ -25,7 +25,7 @@ interface Props {
   tagKey: string
   measurement?: string
   notify: NotificationAction
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 interface State {

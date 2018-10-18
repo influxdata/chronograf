@@ -168,10 +168,19 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     this.setState({draftScript}, this.handleSubmitScript)
   }
 
-  private handleAppendScript = (appendage: string): void => {
-    const draftScript = `${this.state.draftScript}\n\n  ${appendage}`
+  private handleAppendScript = (appendage: string, db: string): void => {
+    const {draftScript} = this.state
 
-    this.setState({draftScript})
+    let newScript = draftScript.trim()
+
+    if (!newScript) {
+      newScript = `from(bucket: "${db}/autogen")
+  |> range(start: dashboardTime)`
+    }
+
+    newScript = `${newScript}\n  ${appendage}`
+
+    this.setState({draftScript: newScript})
   }
 
   private handleChangeDraftScript = async (

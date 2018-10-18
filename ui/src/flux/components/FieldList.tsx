@@ -25,7 +25,7 @@ interface Props {
   tag?: {key: string; value: string}
   measurement?: string
   notify: NotificationAction
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 interface State {
@@ -159,7 +159,7 @@ class FieldList extends PureComponent<Props, State> {
 
   private handleMakeFilter = field => (e): void => {
     e.stopPropagation()
-    const {onAppendScript, tag, measurement} = this.props
+    const {onAppendScript, tag, measurement, db} = this.props
 
     let filter = `|> filter(fn: (r) => r._field == "${field}")`
 
@@ -179,7 +179,7 @@ class FieldList extends PureComponent<Props, State> {
       } == "${tag.value}"))`
     }
 
-    onAppendScript(filter)
+    onAppendScript(filter, db)
   }
 
   private handleCopyAttempt = (

@@ -14,7 +14,7 @@ interface Props {
   db: string
   source: Source
   notify: NotificationAction
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 interface State {

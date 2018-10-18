@@ -24,7 +24,7 @@ interface Props {
   notify: NotificationAction
   db: string
   type: CategoryType
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 interface State {

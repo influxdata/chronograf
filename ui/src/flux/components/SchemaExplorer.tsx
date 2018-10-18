@@ -7,7 +7,7 @@ import {Source, NotificationAction} from 'src/types'
 interface Props {
   source: Source
   notify: NotificationAction
-  onAppendScript: (appendage: string) => void
+  onAppendScript: (appendage: string, db: string) => void
 }
 
 class SchemaExplorer extends PureComponent<Props> {
