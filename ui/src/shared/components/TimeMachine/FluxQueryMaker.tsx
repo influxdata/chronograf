@@ -106,8 +106,9 @@ class FluxQueryMaker extends PureComponent<Props, State> {
                   <a title="Open Script Wizard" onClick={this.handleShowWizard}>
                     Script Wizard
                   </a>{' '}
-                  a try
+                  a try.
                 </p>
+                <p>Or build a new one from the Explore panel ---></p>
               </div>
             )}
           </TimeMachineEditor>
