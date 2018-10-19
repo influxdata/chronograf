@@ -51,6 +51,7 @@ export const getAST = async (request: ASTRequest) => {
 export interface GetRawTimeSeriesResult {
   didTruncate: boolean
   csv: string
+  ok: boolean
   uuid?: string
 }
 
@@ -74,15 +75,17 @@ export const getRawTimeSeries = async (
   )
 
   try {
-    const {body, byteLength, uuid: responseUUID} = await manager.fetchFluxData(
-      url,
-      renderedScript,
-      uuid
-    )
+    const {
+      body,
+      byteLength,
+      ok,
+      uuid: responseUUID,
+    } = await manager.fetchFluxData(url, renderedScript, uuid)
 
     return {
       csv: body,
       didTruncate: byteLength >= MAX_RESPONSE_BYTES,
+      ok,
       uuid: responseUUID,
     }
   } catch (error) {
@@ -112,7 +115,7 @@ export const getTimeSeries = async (
   fluxASTLink: string,
   maxSideLength: number
 ): Promise<GetTimeSeriesResult> => {
-  const {csv, didTruncate, uuid: responseUUID} = await getRawTimeSeries(
+  const {csv, didTruncate, ok, uuid: responseUUID} = await getRawTimeSeries(
     source,
     script,
     uuid,
@@ -120,6 +123,12 @@ export const getTimeSeries = async (
     fluxASTLink,
     maxSideLength
   )
+
+  if (!ok) {
+    // error will be string of {error: value}
+    const error = _.get(JSON.parse(csv), 'error', '')
+    throw new Error(error)
+  }
 
   const tables = parseResponse(csv)
 
@@ -136,7 +145,6 @@ export const getTimeSeries = async (
     console.error('Could not parse response body', error)
 
     return {
-      // REVIEW: Why is this being returned as a `FluxTable[]`?
       csv,
       tables: parseResponseError(csv),
       didTruncate: false,

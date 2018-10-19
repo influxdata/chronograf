@@ -5,6 +5,7 @@ import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
 interface DecodeFluxRespWithLimitResult {
   body: string
   byteLength: number
+  ok: boolean
   uuid?: string
 }
 
@@ -42,7 +43,7 @@ export default async (msg: Message): Promise<DecodeFluxRespWithLimitResult> => {
 
       reader.cancel()
 
-      return {body: bodyString, byteLength: bytesRead, uuid}
+      return {body: bodyString, byteLength: bytesRead, ok: response.ok, uuid}
     } else {
       bodyString += currentText
     }
@@ -52,5 +53,5 @@ export default async (msg: Message): Promise<DecodeFluxRespWithLimitResult> => {
 
   reader.cancel()
 
-  return {body: bodyString, byteLength: bytesRead, uuid}
+  return {body: bodyString, byteLength: bytesRead, ok: response.ok, uuid}
 }

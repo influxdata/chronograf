@@ -15,6 +15,7 @@ import RawFluxDataTable from 'src/shared/components/TimeMachine/RawFluxDataTable
 import TableGraphTransform from 'src/shared/components/TableGraphTransform'
 import TableGraphFormat from 'src/shared/components/TableGraphFormat'
 import AutoRefresh from 'src/shared/components/AutoRefresh'
+import InvalidData from 'src/shared/components/InvalidData'
 
 // Constants
 import {emptyGraphCopy} from 'src/shared/copy/cell'
@@ -166,6 +167,7 @@ class RefreshingGraph extends Component<Props> {
               rawFluxData,
               loading,
               uuid,
+              errorMessage,
             }) => {
               const hasValues =
                 timeSeriesFlux.length ||
@@ -180,6 +182,9 @@ class RefreshingGraph extends Component<Props> {
                 })
 
               if (!hasValues) {
+                if (errorMessage) {
+                  return <InvalidData message={errorMessage} />
+                }
                 if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
                   return <MarkdownCell text={cellNote} />
                 }

@@ -64,6 +64,11 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
   const nonAnnotationData = Papa.parse(nonAnnotationLines).data
   const annotationData = Papa.parse(annotationLines).data
   const headerRow: string[] = nonAnnotationData[0]
+
+  if (headerRow[1] === 'error' && headerRow[2] === 'reference') {
+    throw new Error(_.get(nonAnnotationData, '1.1'))
+  }
+
   const tableColIndex = headerRow.findIndex(h => h === 'table')
   const timeColIndex = headerRow.findIndex(h => h === '_time')
 

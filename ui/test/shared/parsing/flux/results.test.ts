@@ -5,6 +5,8 @@ import {
   MULTI_SCHEMA_RESPONSE,
   EXPECTED_COLUMNS,
   TRUNCATED_RESPONSE,
+  ERROR_RESPONSE,
+  ERROR,
 } from 'test/shared/parsing/flux/constants'
 
 describe('Flux results parser', () => {
@@ -44,6 +46,12 @@ describe('Flux results parser', () => {
       const actual = parseResponse(TRUNCATED_RESPONSE)
 
       expect(actual).toHaveLength(2)
+    })
+  })
+
+  describe('error responses', () => {
+    it('should throw an error if an error csv ', () => {
+      expect(() => parseResponse(ERROR_RESPONSE)).toThrowError(ERROR)
     })
   })
 })
