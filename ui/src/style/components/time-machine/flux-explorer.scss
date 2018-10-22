@@ -259,11 +259,8 @@ $flux-tree-gutter: 11px;
   color: $g11-sidewalk;
   display: inline-block;
   margin-left: 8px;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  .flux-schema--item:hover & {
-    opacity: 1;
-  }
+  opacity: .7;
+  font-style: italic;
 }
 
 .flux-schema--header {
