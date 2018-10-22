@@ -315,7 +315,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleExpandMessage = () => {
-    this.setState({liveUpdating: false})
+    this.handleVerticalScroll()
   }
 
   private startLogsTailFetchingInterval = () => {
