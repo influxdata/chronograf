@@ -1,6 +1,5 @@
 // Libraries
 import {Container} from 'unstated'
-import uuid from 'uuid'
 
 // Utils
 import {
@@ -19,9 +18,10 @@ import {
 } from 'src/utils/queryTransitions'
 import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 import {buildQuery} from 'src/utils/influxql'
-import defaultQueryConfig from 'src/utils/defaultQueryConfig'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {setLocalStorage, getLocalStorage} from 'src/shared/utils/localStorage'
+import {getDeep} from 'src/utils/wrappers'
+import {defaultQueryDraft} from 'src/shared/utils/timeMachine'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
@@ -68,7 +68,7 @@ const LOCAL_STORAGE_DELAY_MS = 1000
 const DEFAULT_STATE = () => ({
   script: '',
   draftScript: '',
-  queryDrafts: [],
+  queryDrafts: [defaultQueryDraft(QueryType.InfluxQL)],
   timeRange: DEFAULT_TIME_RANGE,
   type: CellType.Line,
   note: '',
@@ -116,12 +116,22 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
     const localStorageState = getLocalStorage(localStorageKey) || {}
 
     this.localStorageKey = localStorageKey
-
-    return this.setAndPersistState({
+    let state = {
       ...DEFAULT_STATE(),
       ...localStorageState,
       ...initialState,
-    })
+    }
+
+    if (getDeep<number>(state, 'queryDrafts.length', 0) === 0) {
+      const newEmptyQueryDraft: CellQuery = defaultQueryDraft(
+        QueryType.InfluxQL
+      )
+      const queryDrafts = [newEmptyQueryDraft]
+
+      state = {...state, queryDrafts}
+    }
+
+    return this.setAndPersistState(state)
   }
 
   public handleChangeScript = (script: string) => {
@@ -215,14 +225,7 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
   public handleAddQuery = (): Promise<void> => {
     const {queryDrafts} = this.state
-    const queryID = uuid.v4()
-    const newQueryDraft: CellQuery = {
-      query: '',
-      queryConfig: defaultQueryConfig({id: queryID}),
-      source: '',
-      id: queryID,
-      type: QueryType.InfluxQL,
-    }
+    const newQueryDraft: CellQuery = defaultQueryDraft(QueryType.InfluxQL)
 
     return this.setAndPersistState({
       queryDrafts: [...queryDrafts, newQueryDraft],
