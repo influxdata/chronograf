@@ -133,7 +133,11 @@ class RefreshingGraph extends Component<Props> {
       grabDataForDownload,
     } = this.props
 
-    if (!queries.length) {
+    const isEmptyFluxQuery =
+      _.get(queries, '0.type', '') === 'flux' &&
+      !_.get(queries, '0.text', '').trim()
+
+    if (!queries.length || isEmptyFluxQuery) {
       return (
         <div className="graph-empty">
           <p data-test="data-explorer-no-results">{emptyGraphCopy}</p>
@@ -182,7 +186,7 @@ class RefreshingGraph extends Component<Props> {
                 })
 
               if (!hasValues) {
-                if (errorMessage) {
+                if (errorMessage && _.get(queries, '0.text', '').trim()) {
                   return <InvalidData message={errorMessage} />
                 }
                 if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
