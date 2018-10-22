@@ -273,7 +273,7 @@ class TimeMachine extends PureComponent<Props, State> {
     }
 
     return queryDrafts.map(q => {
-      if (queryStatus.queryID === q.id) {
+      if (_.get(queryStatus, 'queryID', '') === q.id) {
         return {
           ...q.queryConfig,
           source: this.source,
