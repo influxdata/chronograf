@@ -24,27 +24,32 @@ class WizardProgressBar extends PureComponent<Props> {
 
   private get WizardProgress(): JSX.Element {
     const {steps, currentStepIndex, handleJump} = this.props
-    const progressBar = steps.reduce((acc, step, i) => {
+    const progressBar = steps.reduce((acc, step, index) => {
       const {stepStatus} = step
       let currentStep = ''
 
+      const isCurrentStep = index === currentStepIndex
+      const isNotErrored = stepStatus !== StepStatus.Error
+      const isAtEndOfWizard = currentStepIndex === steps.length - 1
+      const isCompleted = stepStatus === StepStatus.Complete
+      const isLastStep = index === steps.length - 1
+      const previousIsComplete =
+        steps[index - 1] && steps[index - 1].stepStatus === StepStatus.Complete
+
       // STEP STATUS
-      if (i === currentStepIndex && stepStatus !== StepStatus.Error) {
+      if (isCurrentStep && isNotErrored) {
         currentStep = 'circle-thick current'
       }
 
-      if (
-        i === steps.length - 1 &&
-        steps[i - 1].stepStatus === StepStatus.Complete
-      ) {
+      if (isLastStep && previousIsComplete) {
         currentStep = 'checkmark'
       }
 
       const stepEle = (
         <div
-          key={`stepEle${i}`}
+          key={`stepEle${index}`}
           className="wizard-progress-button"
-          onClick={handleJump(i)}
+          onClick={handleJump(index)}
         >
           <div className="wizard-progress-title">{step.title}</div>
           <span className={`icon ${currentStep || stepStatus}`} />
@@ -54,20 +59,20 @@ class WizardProgressBar extends PureComponent<Props> {
       // PROGRESS BAR CONNECTOR
       let connectorStatus = ConnectorState.None
 
-      if (i === currentStepIndex && stepStatus !== StepStatus.Error) {
+      if (isCurrentStep && isNotErrored) {
         connectorStatus = ConnectorState.Some
       }
-      if (i === steps.length - 1 || stepStatus === StepStatus.Complete) {
+
+      if (isAtEndOfWizard || isLastStep || isCompleted) {
         connectorStatus = ConnectorState.Full
       }
 
-      const connectorEle =
-        i === steps.length - 1 ? null : (
-          <ProgressConnector
-            key={`connectorEle${i}`}
-            status={connectorStatus}
-          />
-        )
+      const connectorEle = isLastStep ? null : (
+        <ProgressConnector
+          key={`connectorEle${index}`}
+          status={connectorStatus}
+        />
+      )
 
       return [...acc, stepEle, connectorEle]
     }, [])
