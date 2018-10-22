@@ -32,6 +32,10 @@
   transform: translate(-$ix-border, -$ix-border);
   font-size: 12px;
   font-family: $code-font;
+
+  &.message-wrap {
+    word-break: break-all
+  }
 }
 
 .expanded--dismiss {

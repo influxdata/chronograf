@@ -82,7 +82,7 @@ export class ExpandableMessage extends Component<Props, State> {
 
     const message = (
       <ClickOutside onClickOutside={this.handleClickOutside}>
-        <div className="expanded--message" style={style}>
+        <div className="expanded--message message-wrap" style={style}>
           {this.closeExpansionButton}
           {this.message}
         </div>
