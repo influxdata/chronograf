@@ -247,7 +247,7 @@ class LogsTable extends Component<Props, State> {
                 <FancyScrollbar
                   style={{
                     width,
-                    height,
+                    height: height - ROW_HEIGHT,
                     marginTop: `${ROW_HEIGHT}px`,
                   }}
                   setScrollTop={this.handleScrollbarScroll}
