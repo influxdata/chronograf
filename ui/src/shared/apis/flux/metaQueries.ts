@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import {get} from 'lodash'
 
 import AJAX from 'src/utils/ajax'
 import {Source, SchemaFilter} from 'src/types'
@@ -113,29 +113,27 @@ const tagsetFilter = (filter: SchemaFilter[]): string => {
 }
 
 const proxy = async (source: Source, script: string) => {
-  const mark = encodeURIComponent('?')
-  const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
-  const dialect = {annotations: ['group', 'datatype', 'default']}
-  const data = {query: garbage, dialect}
   try {
     const response = await AJAX({
       method: 'POST',
       url: `${
         source.links.flux
-      }?path=/api/v2/query${mark}organization=defaultorgname`,
-      data,
+      }?path=/api/v2/query?organization=defaultorgname`,
+      data: {
+        dialect: {annotations: ['group', 'datatype', 'default']},
+        query: script,
+      },
       headers: {'Content-Type': 'application/json'},
     })
 
     return response.data
   } catch (error) {
-    handleError(error)
+    console.error('Problem fetching flux data', error)
+
+    const headerError = get(error, 'headers.x-influx-error')
+    const bodyError = get(error, 'data.message')
+    const fallbackError = 'unknown error 🤷'
+
+    throw new Error(headerError || bodyError || fallbackError)
   }
-}
-
-const handleError = error => {
-  console.error('Problem fetching data', error)
-
-  throw _.get(error, 'headers.x-influx-error', false) ||
-    _.get(error, 'data.message', 'unknown error 🤷')
 }
