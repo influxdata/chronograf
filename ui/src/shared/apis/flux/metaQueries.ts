@@ -102,22 +102,6 @@ export const tagValues = async ({
   return proxy(source, script)
 }
 
-export const tagsFromMeasurement = async (
-  source: Source,
-  bucket: string,
-  measurement: string
-): Promise<any> => {
-  const script = `
-    from(bucket:"${bucket}") 
-      |> range(start:-24h) 
-      |> filter(fn:(r) => r._measurement == "${measurement}") 
-      |> group() 
-      |> keys(except:["_time","_value","_start","_stop"])
-  `
-
-  return proxy(source, script)
-}
-
 const tagsetFilter = (filter: SchemaFilter[]): string => {
   if (!filter.length) {
     return ''
