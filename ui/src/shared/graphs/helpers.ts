@@ -167,9 +167,9 @@ export const makeLegendStyles = (
   }
 }
 
-// globally matches anything that ends in a '.'
+// matches everything up to the first '.'
 export const removeMeasurement = (label = '') => {
-  const [measurement] = label.match(/^(.*)[.]/g) || ['']
+  const [measurement] = label.match(/^([^.])+./g) || ['']
   return label.replace(measurement, '')
 }
 
