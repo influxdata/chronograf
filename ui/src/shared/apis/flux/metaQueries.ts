@@ -138,7 +138,7 @@ const proxy = async (source: Source, script: string) => {
       method: 'POST',
       url: `${
         source.links.flux
-      }?path=/v2/query${mark}organization=defaultorgname`,
+      }?path=/api/v2/query${mark}organization=defaultorgname`,
       data,
       headers: {'Content-Type': 'application/json'},
     })

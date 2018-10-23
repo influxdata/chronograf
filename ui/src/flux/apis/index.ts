@@ -64,7 +64,7 @@ export const getRawTimeSeries = async (
   fluxASTLink: string,
   maxSideLength: number
 ): Promise<GetRawTimeSeriesResult> => {
-  const path = encodeURIComponent(`/v2/query?organization=defaultorgname`)
+  const path = encodeURIComponent(`/api/v2/query?organization=defaultorgname`)
   const url = `${window.basepath}${source.links.flux}?path=${path}`
 
   const renderedScript = await renderTemplatesInScript(
