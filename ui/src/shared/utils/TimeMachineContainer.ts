@@ -19,12 +19,15 @@ import {
 import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 import {buildQuery} from 'src/utils/influxql'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
-import {setLocalStorage, getLocalStorage} from 'src/shared/utils/localStorage'
 import {getDeep} from 'src/utils/wrappers'
-import {defaultQueryDraft} from 'src/shared/utils/timeMachine'
+import {
+  defaultQueryDraft,
+  getLocalStorageKey,
+} from 'src/shared/utils/timeMachine'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
+import {GIT_SHA} from 'src/shared/constants'
 import {
   DEFAULT_THRESHOLDS_LIST_COLORS,
   DEFAULT_GAUGE_COLORS,
@@ -82,6 +85,8 @@ const DEFAULT_STATE = () => ({
   timeFormat: DEFAULT_TIME_FORMAT,
   decimalPlaces: DEFAULT_DECIMAL_PLACES,
   fieldOptions: DEFAULT_FIELD_OPTIONS,
+  fluxProportions: [0.66, 0.34],
+  timeMachineProportions: [0.33, 0.67],
 })
 
 export interface TimeMachineState {
@@ -101,6 +106,8 @@ export interface TimeMachineState {
   thresholdsListType: ThresholdType
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
+  fluxProportions: number[]
+  timeMachineProportions: number[]
 }
 
 export class TimeMachineContainer extends Container<TimeMachineState> {
@@ -110,12 +117,12 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
   private localStorageKey?: string
 
   public reset = (
-    initialState: Partial<TimeMachineState> = {},
-    localStorageKey?: string
+    initialState: Partial<TimeMachineState> = {}
   ): Promise<void> => {
-    const localStorageState = getLocalStorage(localStorageKey) || {}
+    this.localStorageKey = getLocalStorageKey()
 
-    this.localStorageKey = localStorageKey
+    const localStorageState = getLocalStorage(this.localStorageKey) || {}
+
     let state = {
       ...DEFAULT_STATE(),
       ...localStorageState,
@@ -148,6 +155,16 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
   public handleUpdateQueryDrafts = (queryDrafts: CellQuery[]) => {
     return this.setAndPersistState({queryDrafts})
+  }
+
+  public handleSetFluxProportions = (fluxProportions: number[]) => {
+    return this.setAndPersistState({fluxProportions})
+  }
+
+  public handleSetTimeMachineProportions = (
+    timeMachineProportions: number[]
+  ) => {
+    return this.setAndPersistState({timeMachineProportions})
   }
 
   public handleToggleField = (queryID: string, fieldFunc: Field) => {
@@ -337,5 +354,25 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
   private setLocalStorageState = () => {
     setLocalStorage(this.localStorageKey, this.state)
+  }
+}
+
+export function setLocalStorage(key: string, data: TimeMachineState): void {
+  const localStorageData = {version: GIT_SHA, data}
+
+  window.localStorage.setItem(key, JSON.stringify(localStorageData))
+}
+
+export function getLocalStorage(key: string): Partial<TimeMachineState> {
+  try {
+    const {version, data} = JSON.parse(window.localStorage.getItem(key))
+
+    if (version !== GIT_SHA) {
+      return {}
+    }
+
+    return data
+  } catch {
+    return {}
   }
 }
