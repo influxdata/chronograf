@@ -19,13 +19,6 @@ import {TimeSeriesToDyGraphReturnType} from 'src/worker/jobs/timeSeriesToDygraph
 import {FluxTablesToDygraphResult} from 'src/worker/jobs/fluxTablesToDygraph'
 import {LastValues} from 'src/worker/jobs/fluxTablesToSingleStat'
 
-interface DecodeFluxRespWithLimitResult {
-  body: string
-  byteLength: number
-  ok: boolean
-  uuid?: string
-}
-
 const workerCount = navigator.hardwareConcurrency - 1 || 2
 
 class JobManager {
@@ -64,15 +57,6 @@ class JobManager {
 
   public postJSON(url, body): Promise<any> {
     return this.publishDBJob('POSTJSON', {url, body})
-  }
-
-  public fetchFluxData(
-    url: string,
-    query: string,
-    uuid: string,
-    dialect?: {annotations: string[]}
-  ): Promise<DecodeFluxRespWithLimitResult> {
-    return this.publishDBJob('FETCHFLUXDATA', {url, query, uuid, dialect})
   }
 
   public get(url: string): Promise<any> {

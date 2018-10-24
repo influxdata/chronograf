@@ -1,90 +1,127 @@
-// Libraries
-import {get} from 'lodash'
-import uuid from 'uuid'
+import Deferred from 'src/worker/Deferred'
+import {Source} from 'src/types'
 
-// Utilities
-import {parseResponse} from 'src/shared/parsing/flux/response'
-import {manager} from 'src/worker/JobManager'
+const CHECK_LIMIT_INTERVAL = 200
+const MAX_ROWS = 50000
 
-// Constants
-import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
-
-// Types
-import {Source, FluxTable} from 'src/types'
-
-export interface GetRawTimeSeriesResult {
-  didTruncate: boolean
+interface ExecuteFluxQueryResult {
   csv: string
-  ok: boolean
+  didTruncate: boolean
+  rowCount: number
   uuid?: string
 }
 
-// Returns the CSV file directly from the Flux service
-export const getRawTimeSeries = async (
+export const executeQuery = async (
   source: Source,
-  script: string,
-  requestUUID: string = uuid.v4()
-): Promise<GetRawTimeSeriesResult> => {
+  query: string,
+  uuid?: string
+): Promise<ExecuteFluxQueryResult> => {
+  // We're using `XMLHttpRequest` directly here rather than through `axios` so
+  // that we can poll the response size as it comes back. If the response size
+  // is greater than a predefined limit, we close the HTTP connection and
+  // return the partial response. We could acheive this more elegantly using
+  // `fetch` and the [Streams API][0], but the Streams API is currently behind
+  // a feature flag in Firefox.
+  //
+  // [0]: https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
+  const xhr = new XMLHttpRequest()
+  const deferred = new Deferred()
+
+  let didTruncate = false
+  let rowCount = 0
+  let rowCountIndex = 0
+
+  const countNewRows = (): number => {
+    // Don't extract this to a non-closure helper, since passing
+    // `xhr.responseText` as an argument will be expensive
+    if (!xhr.responseText) {
+      return 0
+    }
+
+    let count = 0
+
+    for (let i = rowCountIndex; i < xhr.responseText.length; i++) {
+      if (xhr.responseText[i] === '\n') {
+        count++
+      }
+    }
+
+    return count
+  }
+
+  const resolve = () => {
+    let csv = xhr.responseText
+
+    if (didTruncate) {
+      // Discard the last line in the response since it may be partially read
+      csv = csv.slice(0, csv.lastIndexOf('\n'))
+    }
+
+    rowCount += countNewRows()
+
+    const result: ExecuteFluxQueryResult = {
+      csv,
+      didTruncate,
+      rowCount,
+      uuid,
+    }
+
+    deferred.resolve(result)
+    clearTimeout(interval)
+  }
+
+  const reject = () => {
+    let bodyError
+
+    try {
+      bodyError = JSON.parse(xhr.responseText).error
+    } catch {
+      bodyError = null
+    }
+
+    const statusError = xhr.statusText
+    const fallbackError = 'failed to execute Flux query'
+
+    deferred.reject(new Error(bodyError || statusError || fallbackError))
+    clearTimeout(interval)
+  }
+
+  const interval = setInterval(() => {
+    if (!xhr.responseText) {
+      // Haven't received any data yet
+      return
+    }
+
+    rowCount += countNewRows()
+    rowCountIndex = xhr.responseText.length
+
+    if (rowCount < MAX_ROWS) {
+      return
+    }
+
+    didTruncate = true
+    resolve()
+    xhr.abort()
+  }, CHECK_LIMIT_INTERVAL)
+
+  xhr.onload = () => {
+    if (xhr.status === 200) {
+      resolve()
+    } else {
+      reject()
+    }
+  }
+
+  xhr.onerror = reject
+
   const path = encodeURIComponent(`/api/v2/query?organization=defaultorgname`)
   const url = `${window.basepath}${source.links.flux}?path=${path}`
+  const dialect = {annotations: ['group', 'datatype', 'default']}
+  const body = JSON.stringify({query, dialect})
 
-  try {
-    const {body, byteLength, ok} = await manager.fetchFluxData(
-      url,
-      script,
-      requestUUID
-    )
+  xhr.open('POST', url)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.send(body)
 
-    return {
-      csv: body,
-      didTruncate: byteLength >= MAX_RESPONSE_BYTES,
-      ok,
-      uuid: requestUUID,
-    }
-  } catch (error) {
-    console.error('Could not fetch Flux data', error)
-
-    const headerError = error.headers ? error.headers['x-incl'] : null
-    const bodyError = error.data ? error.data.message : null
-    const fallbackError = 'unknown error 🤷'
-
-    throw new Error(headerError || bodyError || fallbackError)
-  }
-}
-
-export interface GetTimeSeriesResult {
-  didTruncate: boolean
-  tables: FluxTable[]
-  csv: string
-  uuid?: string
-}
-
-// Returns a parsed representation of the CSV from the Flux service
-export const getTimeSeries = async (
-  source,
-  script: string,
-  requestUUID: string = uuid.v4()
-): Promise<GetTimeSeriesResult> => {
-  const {csv, didTruncate, ok} = await getRawTimeSeries(
-    source,
-    script,
-    requestUUID
-  )
-
-  if (!ok) {
-    // error will be string of {error: value}
-    const error = get(JSON.parse(csv), 'error', '')
-
-    throw new Error(error)
-  }
-
-  const tables = parseResponse(csv)
-  const response = {
-    tables,
-    csv,
-    didTruncate,
-    uuid: requestUUID,
-  }
-
-  return response
+  return deferred.promise
 }

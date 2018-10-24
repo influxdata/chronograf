@@ -5,7 +5,7 @@ import {unparse} from 'papaparse'
 // Utils
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {executeQuery as executeInfluxQLQuery} from 'src/shared/apis/query'
-import {getRawTimeSeries as executeFluxQuery} from 'src/shared/apis/flux/query'
+import {executeQuery as executeFluxQuery} from 'src/shared/apis/flux/query'
 import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 
 // Constants
@@ -35,7 +35,7 @@ export const downloadFluxCSV = async (
   script: string,
   timeRange: TimeRange,
   fluxASTLink: string
-): Promise<{didTruncate: boolean}> => {
+): Promise<{didTruncate: boolean; rowCount: number}> => {
   const renderedScript = await renderTemplatesInScript(
     script,
     timeRange,
@@ -43,11 +43,14 @@ export const downloadFluxCSV = async (
     DEFAULT_PIXELS
   )
 
-  const {csv, didTruncate} = await executeFluxQuery(source, renderedScript)
+  const {csv, didTruncate, rowCount} = await executeFluxQuery(
+    source,
+    renderedScript
+  )
 
   downloadCSV(csv, csvName())
 
-  return {didTruncate}
+  return {didTruncate, rowCount}
 }
 
 const timeseriesToCSV = async (
