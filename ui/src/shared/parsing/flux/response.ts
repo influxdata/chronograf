@@ -6,20 +6,6 @@ import {FluxTable} from 'src/types'
 
 const GROUP_KEY_EXCLUSIONS = []
 
-export const parseResponseError = (response: string): FluxTable[] => {
-  const data = Papa.parse(response.trim()).data as string[][]
-
-  return [
-    {
-      id: uuid.v4(),
-      name: 'Error',
-      groupKey: {},
-      dataTypes: {},
-      data,
-    },
-  ]
-}
-
 export const parseResponse = (response: string): FluxTable[] => {
   const chunks = parseChunks(response)
   const tables = chunks.reduce(

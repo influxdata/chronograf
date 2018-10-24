@@ -1,12 +1,16 @@
-import {Source, FluxTable, TimeRange} from 'src/types'
-import {
-  parseResponse,
-  parseResponseError,
-} from 'src/shared/parsing/flux/response'
-import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
+// Libraries
+import {get} from 'lodash'
+import uuid from 'uuid'
+
+// Utilities
+import {parseResponse} from 'src/shared/parsing/flux/response'
 import {manager} from 'src/worker/JobManager'
-import {renderTemplatesInScript} from 'src/flux/helpers/templates'
-import _ from 'lodash'
+
+// Constants
+import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
+
+// Types
+import {Source, FluxTable} from 'src/types'
 
 export interface GetRawTimeSeriesResult {
   didTruncate: boolean
@@ -19,34 +23,23 @@ export interface GetRawTimeSeriesResult {
 export const getRawTimeSeries = async (
   source: Source,
   script: string,
-  uuid: string,
-  timeRange: TimeRange,
-  fluxASTLink: string,
-  maxSideLength: number
+  requestUUID: string = uuid.v4()
 ): Promise<GetRawTimeSeriesResult> => {
   const path = encodeURIComponent(`/api/v2/query?organization=defaultorgname`)
   const url = `${window.basepath}${source.links.flux}?path=${path}`
 
-  const renderedScript = await renderTemplatesInScript(
-    script,
-    timeRange,
-    fluxASTLink,
-    maxSideLength
-  )
-
   try {
-    const {
-      body,
-      byteLength,
-      ok,
-      uuid: responseUUID,
-    } = await manager.fetchFluxData(url, renderedScript, uuid)
+    const {body, byteLength, ok} = await manager.fetchFluxData(
+      url,
+      script,
+      requestUUID
+    )
 
     return {
       csv: body,
       didTruncate: byteLength >= MAX_RESPONSE_BYTES,
       ok,
-      uuid: responseUUID,
+      uuid: requestUUID,
     }
   } catch (error) {
     console.error('Could not fetch Flux data', error)
@@ -55,7 +48,7 @@ export const getRawTimeSeries = async (
     const bodyError = error.data ? error.data.message : null
     const fallbackError = 'unknown error 🤷'
 
-    return headerError || bodyError || fallbackError
+    throw new Error(headerError || bodyError || fallbackError)
   }
 }
 
@@ -70,44 +63,28 @@ export interface GetTimeSeriesResult {
 export const getTimeSeries = async (
   source,
   script: string,
-  uuid: string,
-  timeRange: TimeRange,
-  fluxASTLink: string,
-  maxSideLength: number
+  requestUUID: string = uuid.v4()
 ): Promise<GetTimeSeriesResult> => {
-  const {csv, didTruncate, ok, uuid: responseUUID} = await getRawTimeSeries(
+  const {csv, didTruncate, ok} = await getRawTimeSeries(
     source,
     script,
-    uuid,
-    timeRange,
-    fluxASTLink,
-    maxSideLength
+    requestUUID
   )
 
   if (!ok) {
     // error will be string of {error: value}
-    const error = _.get(JSON.parse(csv), 'error', '')
+    const error = get(JSON.parse(csv), 'error', '')
+
     throw new Error(error)
   }
 
   const tables = parseResponse(csv)
-
-  try {
-    const response = {
-      tables,
-      csv,
-      didTruncate,
-      uuid: responseUUID,
-    }
-
-    return response
-  } catch (error) {
-    console.error('Could not parse response body', error)
-
-    return {
-      csv,
-      tables: parseResponseError(csv),
-      didTruncate: false,
-    }
+  const response = {
+    tables,
+    csv,
+    didTruncate,
+    uuid: requestUUID,
   }
+
+  return response
 }

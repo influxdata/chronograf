@@ -1,13 +1,25 @@
-// Library
+// Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
 import uuid from 'uuid'
-// API
+
+// APIs
 import {executeQueries} from 'src/shared/apis/query'
 import {
   getTimeSeries as fetchFluxTimeSeries,
   GetTimeSeriesResult,
 } from 'src/shared/apis/flux/query'
+
+// Utils
+import {
+  extractQueryWarningMessage,
+  extractQueryErrorMessage,
+} from 'src/shared/parsing'
+import {notify} from 'src/shared/actions/notifications'
+import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
+import {getDeep} from 'src/utils/wrappers'
+import {restartable} from 'src/shared/utils/restartable'
+import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 
 // Types
 import {
@@ -22,16 +34,6 @@ import {
 } from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-
-// Utils
-import {
-  extractQueryWarningMessage,
-  extractQueryErrorMessage,
-} from 'src/shared/parsing'
-import {notify} from 'src/shared/actions/notifications'
-import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
-import {getDeep} from 'src/utils/wrappers'
-import {restartable} from 'src/shared/utils/restartable'
 
 export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 
@@ -269,15 +271,19 @@ class TimeSeries extends PureComponent<Props, State> {
     latestUUID: string
   ): Promise<GetTimeSeriesResult> => {
     const {queries, onNotify, source, timeRange, fluxASTLink} = this.props
-
     const script: string = _.get(queries, '0.text', '')
-    const results = await this.fetchFluxTimeSeries(
-      source,
+
+    const renderedScript = await renderTemplatesInScript(
       script,
-      latestUUID,
       timeRange,
       fluxASTLink,
       TEMP_RES
+    )
+
+    const results = await this.fetchFluxTimeSeries(
+      source,
+      renderedScript,
+      latestUUID
     )
 
     if (results.didTruncate && onNotify) {
