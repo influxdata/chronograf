@@ -59,6 +59,12 @@ class DatabaseListItem extends PureComponent<Props, State> {
 
     return (
       <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
+        <div className={`flux-schema--filter`}>
+          <input
+            className={`form-control input-xs`}
+            placeholder={`Filter by measurment, tag, or field...`}
+          />
+        </div>
         <SchemaItemCategories db={db} source={source} notify={notify} />
       </div>
     )
