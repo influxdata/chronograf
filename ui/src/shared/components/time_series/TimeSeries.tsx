@@ -4,11 +4,8 @@ import _ from 'lodash'
 import uuid from 'uuid'
 
 // APIs
-import {executeQueries} from 'src/shared/apis/query'
-import {
-  getTimeSeries as fetchFluxTimeSeries,
-  GetTimeSeriesResult,
-} from 'src/shared/apis/flux/query'
+import {executeQueries as executeInfluxQLQueries} from 'src/shared/apis/query'
+import {executeQuery as executeFluxQuery} from 'src/shared/apis/flux/query'
 
 // Utils
 import {
@@ -20,6 +17,7 @@ import {fluxResponseTruncatedError} from 'src/shared/copy/notifications'
 import {getDeep} from 'src/utils/wrappers'
 import {restartable} from 'src/shared/utils/restartable'
 import {renderTemplatesInScript} from 'src/flux/helpers/templates'
+import {parseResponse} from 'src/shared/parsing/flux/response'
 
 // Types
 import {
@@ -108,8 +106,8 @@ class TimeSeries extends PureComponent<Props, State> {
     return null
   }
 
-  private fetchFluxTimeSeries = restartable(fetchFluxTimeSeries)
-  private executeInfluxQLQueries = restartable(executeQueries)
+  private executeFluxQuery = restartable(executeFluxQuery)
+  private executeInfluxQLQueries = restartable(executeInfluxQLQueries)
 
   constructor(props: Props) {
     super(props)
@@ -233,7 +231,7 @@ class TimeSeries extends PureComponent<Props, State> {
 
     try {
       if (this.isFluxQuery) {
-        const results = await this.executeFluxQuery(latestUUID)
+        const results = await this.executeTemplatedFluxQuery(latestUUID)
 
         timeSeriesFlux = results.tables
         rawFluxData = results.csv
@@ -267,9 +265,7 @@ class TimeSeries extends PureComponent<Props, State> {
     }
   }
 
-  private executeFluxQuery = async (
-    latestUUID: string
-  ): Promise<GetTimeSeriesResult> => {
+  private executeTemplatedFluxQuery = async (latestUUID: string) => {
     const {queries, onNotify, source, timeRange, fluxASTLink} = this.props
     const script: string = _.get(queries, '0.text', '')
 
@@ -280,17 +276,17 @@ class TimeSeries extends PureComponent<Props, State> {
       TEMP_RES
     )
 
-    const results = await this.fetchFluxTimeSeries(
+    const results = await this.executeFluxQuery(
       source,
       renderedScript,
       latestUUID
     )
 
     if (results.didTruncate && onNotify) {
-      onNotify(fluxResponseTruncatedError())
+      onNotify(fluxResponseTruncatedError(results.rowCount))
     }
 
-    return results
+    return {...results, tables: parseResponse(results.csv)}
   }
 
   private executeInfluxQLWithStatus = async (

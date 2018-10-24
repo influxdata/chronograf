@@ -14,7 +14,6 @@ import get from 'src/worker/jobs/get'
 import tableTransform from 'src/worker/jobs/tableTransform'
 import validateDygraphData from 'src/worker/jobs/validateDygraphData'
 import postJSON from 'src/worker/jobs/postJSON'
-import fetchFluxData from 'src/worker/jobs/fetchFluxData'
 import fluxTablesToDygraph from 'src/worker/jobs/fluxTablesToDygraph'
 import fluxTablesToSingleStat from 'src/worker/jobs/fluxTablesToSingleStat'
 
@@ -28,7 +27,6 @@ const jobMapping: {[key: string]: Job} = {
   TSTOTABLEGRAPH: timeSeriesToTableGraph,
   TSTODYGRAPH: timeSeriesToDygraph,
   VALIDATEDYGRAPHDATA: validateDygraphData,
-  FETCHFLUXDATA: fetchFluxData,
   FLUXTODYGRAPH: fluxTablesToDygraph,
   FLUXTOSINGLE: fluxTablesToSingleStat,
 }

@@ -30,7 +30,7 @@ export const renderTemplatesInScript = async (
     upperDashboardTime = new Date().toISOString()
   }
 
-  let rendered = `${DASHBOARD_TIME} = ${dashboardTime}\n\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}\n\n${script}`
+  let rendered = `${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}\n\n${script}`
 
   if (!script.match(INTERVAL_REGEX)) {
     return rendered
@@ -46,7 +46,7 @@ export const renderTemplatesInScript = async (
 
   const interval = duration / (maxSideLength * RESOLUTION_SCALE_FACTOR)
 
-  rendered = `${INTERVAL} = ${Math.floor(interval)}ms\n\n${rendered}`
+  rendered = `${INTERVAL} = ${Math.floor(interval)}ms\n${rendered}`
 
   return rendered
 }
