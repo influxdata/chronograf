@@ -7,7 +7,7 @@ import {executeQueries} from 'src/shared/apis/query'
 import {
   getTimeSeries as fetchFluxTimeSeries,
   GetTimeSeriesResult,
-} from 'src/flux/apis'
+} from 'src/shared/apis/flux/query'
 
 // Types
 import {

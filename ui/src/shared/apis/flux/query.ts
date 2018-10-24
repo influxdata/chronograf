@@ -1,4 +1,3 @@
-import AJAX from 'src/utils/ajax'
 import {Source, FluxTable, TimeRange} from 'src/types'
 import {
   parseResponse,
@@ -8,45 +7,6 @@ import {MAX_RESPONSE_BYTES} from 'src/flux/constants'
 import {manager} from 'src/worker/JobManager'
 import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 import _ from 'lodash'
-
-export const getSuggestions = async (url: string) => {
-  try {
-    const {data} = await AJAX({
-      url,
-    })
-
-    return data.funcs
-  } catch (error) {
-    console.error('Could not get suggestions', error)
-    throw error
-  }
-}
-
-interface ASTRequest {
-  url: string
-  body: string
-}
-
-export const getAST = async (request: ASTRequest) => {
-  const {url, body} = request
-
-  const {data, status} = await AJAX({
-    method: 'POST',
-    url,
-    data: {body},
-    validateStatus: () => true,
-  })
-
-  if (status !== 200) {
-    throw new Error('Failed to parse query')
-  }
-
-  if (!data.valid) {
-    throw new Error(data.error)
-  }
-
-  return data.ast
-}
 
 export interface GetRawTimeSeriesResult {
   didTruncate: boolean

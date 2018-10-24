@@ -1,5 +1,5 @@
 import {get, isObject, isArray} from 'lodash'
-import {getAST} from 'src/flux/apis'
+import {getAST} from 'src/shared/apis/flux/ast'
 
 export async function getMinDuration(
   astLink: string,

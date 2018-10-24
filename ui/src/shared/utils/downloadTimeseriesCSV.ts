@@ -6,7 +6,7 @@ import uuid from 'uuid'
 // Utils
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
 import {executeQuery as executeInfluxQLQuery} from 'src/shared/apis/query'
-import {getRawTimeSeries as executeFluxQuery} from 'src/flux/apis/index'
+import {getRawTimeSeries as executeFluxQuery} from 'src/shared/apis/flux/query'
 
 // Constants
 import {DEFAULT_PIXELS} from 'src/shared/constants'

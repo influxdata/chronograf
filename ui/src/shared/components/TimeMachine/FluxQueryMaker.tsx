@@ -12,7 +12,8 @@ import {Button, ComponentSize, ComponentColor} from 'src/reusable_ui'
 import {HANDLE_VERTICAL} from 'src/shared/constants'
 
 // Utils
-import {getSuggestions, getAST} from 'src/flux/apis'
+import {getSuggestions} from 'src/shared/apis/flux/suggestions'
+import {getAST} from 'src/shared/apis/flux/ast'
 import {restartable} from 'src/shared/utils/restartable'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {parseError} from 'src/flux/helpers/scriptBuilder'
