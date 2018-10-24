@@ -270,10 +270,6 @@ $logs-viewer-gutter: 60px;
   align-items: center;
   font-family: $code-font;
 
-  &.highlight {
-    color: $g20-white;
-  }
-
   &.message-wrap {
     word-break: break-all
   }
