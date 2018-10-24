@@ -9,7 +9,7 @@ export const measurements = async (
 ): Promise<any> => {
   const script = `
     from(bucket:"${bucket}") 
-        |> range(start:-24h) 
+        |> range(start:-30d) 
         |> group(by:["_measurement"]) 
         |> distinct(column:"_measurement") 
         |> group()
@@ -31,6 +31,22 @@ export const fields = async (
     limit,
     filter,
   })
+}
+
+// Fetch all the fields and their associated measurement
+export const fieldsByMeasurement = async (
+  source: Source,
+  bucket: string
+): Promise<any> => {
+  const script = `
+  from(bucket: "${bucket}")
+    |> range(start: -30d)
+    |> group(by: ["_field", "_measurement"])
+    |> distinct(column: "_field")
+    |> group(none: true)
+    |> map(fn: (r) => ({_measurement: r._measurement, _field: r._field}))
+  `
+  return proxy(source, script)
 }
 
 export const tagKeys = async (
@@ -89,7 +105,7 @@ export const tagValues = async ({
 
   const script = `
     from(bucket:"${bucket}")
-      |> range(start:-1h)
+      |> range(start:-30d)
       ${regexFilter}
       ${tagsetFilter(filter)}
       |> group(by:["${tagKey}"])
@@ -109,7 +125,7 @@ export const tagsFromMeasurement = async (
 ): Promise<any> => {
   const script = `
     from(bucket:"${bucket}") 
-      |> range(start:-24h) 
+      |> range(start:-30d) 
       |> filter(fn:(r) => r._measurement == "${measurement}") 
       |> group() 
       |> keys(except:["_time","_value","_start","_stop"])
@@ -128,7 +144,7 @@ const tagsetFilter = (filter: SchemaFilter[]): string => {
   return `|> filter(fn: (r) => ${predicates.join(' and ')} )`
 }
 
-const proxy = async (source: Source, script: string) => {
+export const proxy = async (source: Source, script: string) => {
   const mark = encodeURIComponent('?')
   const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}

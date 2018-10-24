@@ -108,6 +108,7 @@ class TagValueList extends PureComponent<Props, State> {
 
     const response = await fetchMeasurements(source, db)
     const measurements = parseValuesColumn(response)
+    console.log('fetched measurements: ', measurements)
     return measurements
   }
 
@@ -117,7 +118,7 @@ class TagValueList extends PureComponent<Props, State> {
     })
   }
 
-  private handleClick = (e: MouseEvent<HTMLInputElement>) => {
+  private handleClick = (e: MouseEvent<HTMLInputElement | HTMLDivElement>) => {
     e.stopPropagation()
   }
 }

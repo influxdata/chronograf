@@ -50,7 +50,7 @@ class DatabaseList extends PureComponent<Props, State> {
 
     return databases.map(db => {
       return (
-        <DatabaseListItem key={db} db={db} source={source} notify={notify} />
+        <DatabaseListItem db={db} key={db} source={source} notify={notify} />
       )
     })
   }

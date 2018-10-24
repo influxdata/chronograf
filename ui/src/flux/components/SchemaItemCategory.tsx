@@ -7,6 +7,10 @@ import FieldList from 'src/flux/components/FieldList'
 import TagKeyList from 'src/flux/components/TagKeyList'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+// Utils
+import {proxy} from 'src/shared/apis/flux/metaQueries'
+import {parseResponse} from 'src/shared/parsing/flux/response'
+
 // Constants
 import {OpenState} from 'src/flux/constants/explorer'
 
@@ -86,6 +90,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
 
       case CategoryType.Fields:
         return <FieldList db={db} source={source} notify={notify} />
+
       case CategoryType.Tags:
         return <TagKeyList db={db} source={source} notify={notify} />
     }
