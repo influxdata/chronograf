@@ -221,8 +221,18 @@ func newOrganizationConfig(orgID string) chronograf.OrganizationConfig {
 					},
 				},
 				{
-					Name:     "host",
+					Name:     "hostname",
 					Position: 7,
+					Encodings: []chronograf.ColumnEncoding{
+						{
+							Type:  "visibility",
+							Value: "visible",
+						},
+					},
+				},
+				{
+					Name:     "host",
+					Position: 8,
 					Encodings: []chronograf.ColumnEncoding{
 						{
 							Type:  "visibility",

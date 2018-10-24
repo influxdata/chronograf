@@ -825,7 +825,39 @@ func UnmarshalOrganizationConfig(data []byte, c *chronograf.OrganizationConfig) 
 
 	c.LogViewer.Columns = columns
 
+	ensureHostnameColumn(c)
+
 	return nil
+}
+
+// Ensures the hostname is added since it was missing in 1.6.2
+func ensureHostnameColumn(c *chronograf.OrganizationConfig) {
+	var maxPosition int32
+
+	for _, v := range c.LogViewer.Columns {
+		if v.Name == "hostname" {
+			return
+		}
+
+		if v.Position > maxPosition {
+			maxPosition = v.Position
+		}
+	}
+
+	c.LogViewer.Columns = append(c.LogViewer.Columns, newHostnameColumn(maxPosition+1))
+}
+
+func newHostnameColumn(p int32) chronograf.LogViewerColumn {
+	return chronograf.LogViewerColumn{
+		Name:     "hostname",
+		Position: p,
+		Encodings: []chronograf.ColumnEncoding{
+			{
+				Type:  "visibility",
+				Value: "visible",
+			},
+		},
+	}
 }
 
 // UnmarshalOrganizationConfigPB decodes a config from binary protobuf data.
