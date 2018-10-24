@@ -66,6 +66,11 @@ const tableFields = [
     value: 'appname',
   },
   {
+    alias: 'hostname',
+    type: 'field',
+    value: 'hostname',
+  },
+  {
     alias: 'host',
     type: 'field',
     value: 'host',

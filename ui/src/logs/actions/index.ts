@@ -37,21 +37,8 @@ import {
   DEFAULT_OLDER_CHUNK_DURATION_MS,
   DEFAULT_NEWER_CHUNK_DURATION_MS,
   DEFAULT_MAX_TAIL_BUFFER_DURATION_MS,
+  defaultTableData,
 } from 'src/logs/constants'
-
-const defaultTableData: TableData = {
-  columns: [
-    'time',
-    'severity',
-    'timestamp',
-    'message',
-    'facility',
-    'procid',
-    'appname',
-    'host',
-  ],
-  values: [],
-}
 
 interface State {
   logs: LogsState
