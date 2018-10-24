@@ -228,11 +228,10 @@ class LogsTable extends Component<Props, State> {
               rowCount={1}
               width={width}
               scrollLeft={this.state.scrollLeft}
-              onScroll={this.handleHeaderScroll}
               cellRenderer={this.headerRenderer}
               columnCount={columnCount}
               columnWidth={this.getColumnWidth}
-              style={{overflowX: 'hidden'}}
+              style={{overflow: 'hidden'}}
             />
           )}
         </AutoSizer>
@@ -264,7 +263,7 @@ class LogsTable extends Component<Props, State> {
                     )}
                     style={{
                       height: this.calculateTotalHeight(),
-                      overflowY: 'hidden',
+                      overflow: 'hidden',
                     }}
                   />
                 </FancyScrollbar>
@@ -415,9 +414,6 @@ class LogsTable extends Component<Props, State> {
       ),
     })
   }
-
-  private handleHeaderScroll = ({scrollLeft}): void =>
-    this.setState({scrollLeft})
 
   private getColumnWidth = ({index}: {index: number}): number => {
     const {severityFormat} = this.props
