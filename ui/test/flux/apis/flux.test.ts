@@ -1,4 +1,4 @@
-import {getSuggestions} from 'src/flux/apis'
+import {getSuggestions} from 'src/shared/apis/flux/suggestions'
 import AJAX from 'src/utils/ajax'
 
 jest.mock('src/utils/ajax', () => require('mocks/utils/ajax'))
