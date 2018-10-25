@@ -8,9 +8,6 @@ import {
   notifyCopyToClipboardFailed,
 } from 'src/shared/copy/notifications'
 
-// Constants
-import {OpenState} from 'src/flux/constants/explorer'
-
 // types
 import {Source, NotificationAction} from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -30,14 +27,18 @@ class TagValueListItem extends PureComponent<Props> {
   public render() {
     const {tagValue} = this.props
     return (
-      <div className={`flux-schema-tree flux-schema--child`} key={tagValue}>
+      <div
+        className={`flux-schema-tree flux-schema--child`}
+        key={tagValue}
+        onClick={this.handleClick}
+      >
         <div className="flux-schema--item">
           <div className="flex-schema-item-group">
             {tagValue}
             <span className="flux-schema--type">Tag Value</span>
           </div>
           <CopyToClipboard text={tagValue} onCopy={this.handleCopyAttempt}>
-            <div className="flux-schema-copy" onClick={this.handleClickCopy}>
+            <div className="flux-schema-copy" onClick={this.handleClick}>
               <span className="icon duplicate" title="copy to clipboard" />
               Copy
             </div>
@@ -47,7 +48,7 @@ class TagValueListItem extends PureComponent<Props> {
     )
   }
 
-  private handleClickCopy = (e): void => {
+  private handleClick = (e): void => {
     e.stopPropagation()
   }
 
