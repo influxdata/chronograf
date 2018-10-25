@@ -25,6 +25,7 @@ import {
   getColumnWidth,
   getMessageWidth,
   getColumnsFromData,
+  getMinTableWidth,
 } from 'src/logs/utils/table'
 import {
   getValidMessageFilters,
@@ -227,11 +228,10 @@ class LogsTable extends Component<Props, State> {
               rowCount={1}
               width={width}
               scrollLeft={this.state.scrollLeft}
-              onScroll={this.handleHeaderScroll}
               cellRenderer={this.headerRenderer}
               columnCount={columnCount}
               columnWidth={this.getColumnWidth}
-              style={{overflowX: 'hidden'}}
+              style={{overflow: 'hidden'}}
             />
           )}
         </AutoSizer>
@@ -246,7 +246,7 @@ class LogsTable extends Component<Props, State> {
                 <FancyScrollbar
                   style={{
                     width,
-                    height,
+                    height: height - ROW_HEIGHT,
                     marginTop: `${ROW_HEIGHT}px`,
                   }}
                   setScrollTop={this.handleScrollbarScroll}
@@ -255,7 +255,7 @@ class LogsTable extends Component<Props, State> {
                 >
                   <Grid
                     {...this.gridProperties(
-                      width,
+                      Math.max(this.minTableWidth, width),
                       height,
                       onRowsRendered,
                       columnCount,
@@ -263,7 +263,7 @@ class LogsTable extends Component<Props, State> {
                     )}
                     style={{
                       height: this.calculateTotalHeight(),
-                      overflowY: 'hidden',
+                      overflow: 'hidden',
                     }}
                   />
                 </FancyScrollbar>
@@ -284,7 +284,7 @@ class LogsTable extends Component<Props, State> {
     registerChild: (g: Grid) => void
   ) => {
     const {scrollToRow} = this.props
-    const {scrollLeft, scrollTop} = this.state
+    const {scrollTop, scrollLeft} = this.state
 
     let rowHeight: number | RowHeightHandler = ROW_HEIGHT
 
@@ -324,10 +324,11 @@ class LogsTable extends Component<Props, State> {
   private handleScrollbarScroll = (e: MouseEvent<JSX.Element>): void => {
     e.stopPropagation()
     e.preventDefault()
-    const {scrollTop} = e.target as HTMLElement
+    const {scrollTop, scrollLeft} = e.target as HTMLElement
 
     this.handleScroll({
       scrollTop,
+      scrollLeft,
     })
   }
 
@@ -413,9 +414,6 @@ class LogsTable extends Component<Props, State> {
       ),
     })
   }
-
-  private handleHeaderScroll = ({scrollLeft}): void =>
-    this.setState({scrollLeft})
 
   private getColumnWidth = ({index}: {index: number}): number => {
     const {severityFormat} = this.props
@@ -711,6 +709,14 @@ class LogsTable extends Component<Props, State> {
       <div className={className}>
         <h6>Loading more logs...</h6>
       </div>
+    )
+  }
+
+  private get minTableWidth(): number {
+    return getMinTableWidth(
+      this.props.data,
+      this.props.tableColumns,
+      this.props.severityFormat
     )
   }
 }

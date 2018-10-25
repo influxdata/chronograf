@@ -87,6 +87,7 @@ class FancyScrollbar extends Component<Props & Partial<DefaultProps>> {
         renderThumbHorizontal={this.handleMakeDiv('thumb-h')}
         renderThumbVertical={this.handleMakeDiv('thumb-v')}
         renderView={this.handleMakeDiv('view')}
+        thumbMinSize={30}
       >
         {children}
       </Scrollbars>
