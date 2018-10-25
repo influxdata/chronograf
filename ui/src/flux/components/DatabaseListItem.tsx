@@ -69,8 +69,13 @@ class DatabaseListItem extends PureComponent<Props, State> {
       return (
         <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
           <SchemaExplorerTree bucket={db} source={source} key={db}>
-            {() => (
-              <SchemaItemCategories db={db} source={source} notify={notify} />
+            {tree => (
+              <SchemaItemCategories
+                db={db}
+                source={source}
+                notify={notify}
+                categoryTree={tree}
+              />
             )}
           </SchemaExplorerTree>
         </div>

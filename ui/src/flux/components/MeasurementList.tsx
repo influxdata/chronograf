@@ -3,49 +3,31 @@ import React, {PureComponent, MouseEvent, ChangeEvent} from 'react'
 
 // Components
 import MeasurementListItem from 'src/flux/components/MeasurementListItem'
-import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
-
-// apis
-import {measurements as fetchMeasurements} from 'src/shared/apis/flux/metaQueries'
 
 // Utils
-import parseValuesColumn from 'src/shared/parsing/flux/values'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // types
-import {Source, NotificationAction, RemoteDataState} from 'src/types'
+import {Source, NotificationAction} from 'src/types'
 
 interface Props {
   db: string
   source: Source
   notify: NotificationAction
+  measurements: {[measurement: string]: string[]}
 }
 
 interface State {
   searchTerm: string
-  measurements: string[]
-  loading: RemoteDataState
 }
 
 @ErrorHandling
-class TagValueList extends PureComponent<Props, State> {
+class MeasurementsList extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
     this.state = {
-      measurements: [],
       searchTerm: '',
-      loading: RemoteDataState.NotStarted,
-    }
-  }
-
-  public async componentDidMount() {
-    this.setState({loading: RemoteDataState.Loading})
-    try {
-      const measurements = await this.fetchMeasurements()
-      this.setState({measurements, loading: RemoteDataState.Done})
-    } catch (error) {
-      this.setState({loading: RemoteDataState.Error})
     }
   }
 
@@ -73,17 +55,17 @@ class TagValueList extends PureComponent<Props, State> {
 
   private get measurements(): JSX.Element | JSX.Element[] {
     const {source, db, notify} = this.props
-    const {searchTerm, loading} = this.state
+    const {searchTerm} = this.state
 
-    if (loading === RemoteDataState.Loading) {
-      return <LoaderSkeleton />
-    }
     const term = searchTerm.toLocaleLowerCase()
-    const measurements = this.state.measurements.filter(m =>
-      m.toLocaleLowerCase().includes(term)
+    const measurements = Object.entries(this.props.measurements).filter(
+      entry => {
+        const measurement = entry[0]
+        return measurement.toLocaleLowerCase().includes(term)
+      }
     )
     if (measurements.length) {
-      return measurements.map(measurement => (
+      return measurements.map(([measurement, fields]) => (
         <MeasurementListItem
           source={source}
           db={db}
@@ -91,6 +73,7 @@ class TagValueList extends PureComponent<Props, State> {
           measurement={measurement}
           key={measurement}
           notify={notify}
+          fields={fields}
         />
       ))
     }
@@ -101,15 +84,6 @@ class TagValueList extends PureComponent<Props, State> {
         </div>
       </div>
     )
-  }
-
-  private async fetchMeasurements(): Promise<string[]> {
-    const {source, db} = this.props
-
-    const response = await fetchMeasurements(source, db)
-    const measurements = parseValuesColumn(response)
-    console.log('fetched measurements: ', measurements)
-    return measurements
   }
 
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -123,4 +97,4 @@ class TagValueList extends PureComponent<Props, State> {
   }
 }
 
-export default TagValueList
+export default MeasurementsList

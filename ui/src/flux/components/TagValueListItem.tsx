@@ -2,9 +2,6 @@
 import React, {PureComponent} from 'react'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
-// Components
-import FieldList from 'src/flux/components/FieldList'
-
 // Utils
 import {
   notifyCopyToClipboardSuccess,
@@ -43,12 +40,9 @@ class TagValueListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, tagValue, tagKey, notify, measurement} = this.props
+    const {tagValue} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
-    const isUnopen = opened === OpenState.UNOPENED
-
-    const tag = {key: tagKey, value: tagValue}
 
     return (
       <div
@@ -71,17 +65,6 @@ class TagValueListItem extends PureComponent<Props, State> {
             </div>
           </CopyToClipboard>
         </div>
-        {!isUnopen && (
-          <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-            <FieldList
-              db={db}
-              source={source}
-              tag={tag}
-              notify={notify}
-              measurement={measurement}
-            />
-          </div>
-        )}
       </div>
     )
   }

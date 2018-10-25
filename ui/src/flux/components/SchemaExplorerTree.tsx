@@ -1,10 +1,12 @@
 // Libraries
 import {PureComponent} from 'react'
+import _ from 'lodash'
 
 // Utils
 import {
   measurements as fetchMeasurementsAsync,
   fieldsByMeasurement as fetchFieldsByMeasurementAsync,
+  tagKeys as fetchTagKeysAsync,
 } from 'src/shared/apis/flux/metaQueries'
 import parseValuesColumn, {
   parseFieldsByMeasurements,
@@ -19,13 +21,20 @@ import {Source} from 'src/types'
 interface Props {
   bucket: string
   source: Source
-  children: () => JSX.Element
+  children: (tree: CategoryTree) => JSX.Element
 }
 
 interface State {
   measurements: string[]
   fields: string[]
   fieldsByMeasurements: {[measurement: string]: string[]}
+  tagKeys: string[]
+}
+
+export interface CategoryTree {
+  measurements: {[m: string]: string[]}
+  tagKeys: string[]
+  fields: string[]
 }
 
 @ErrorHandling
@@ -36,29 +45,36 @@ class SchemaExplorerTree extends PureComponent<Props, State> {
       measurements: [],
       fields: [],
       fieldsByMeasurements: {},
+      tagKeys: [],
     }
   }
 
   public async componentDidMount() {
     await this.fetchMeasurements()
     await this.fetchFields()
-    console.log('tree', this.tree)
+    await this.fetchTagKeys()
   }
 
   public render() {
-    return this.props.children()
+    return this.props.children(this.tree)
   }
 
   private async fetchMeasurements() {
     const {source, bucket} = this.props
     const measurementResults = await fetchMeasurementsAsync(source, bucket)
-    const parsedMeasurements = parseValuesColumn(measurementResults)
+    const measurements = parseValuesColumn(measurementResults)
 
-    this.setState({measurements: parsedMeasurements})
-    console.log('parsed measurements: ', parsedMeasurements)
+    this.setState({measurements})
   }
 
-  private async fetchTags() {}
+  private async fetchTagKeys() {
+    const {source, bucket} = this.props
+    const tagKeysResults = await fetchTagKeysAsync(source, bucket, [])
+
+    const tagKeys = parseValuesColumn(tagKeysResults)
+
+    this.setState({tagKeys})
+  }
 
   private async fetchFields() {
     const {source, bucket} = this.props
@@ -68,24 +84,31 @@ class SchemaExplorerTree extends PureComponent<Props, State> {
       fieldsResults
     )
 
-    this.setState({fields, fieldsByMeasurements}, () => {
-      console.log(this.state.fieldsByMeasurements)
-    })
+    this.setState({fields, fieldsByMeasurements})
   }
 
-  private get tree() {
+  private get tree(): CategoryTree {
+    const {fields, tagKeys} = this.state
+
     return {
       measurements: this.measurementsTree,
+      fields,
+      tagKeys,
     }
   }
 
   private get measurementsTree() {
-    const {measurements} = this.state
+    const {measurements, fieldsByMeasurements} = this.state
+    measurements.push('yo') // TODO: remove
+    const measurementsWithNoFields = _.difference(
+      measurements,
+      Object.keys(fieldsByMeasurements)
+    )
 
-    return measurements.reduce((acc, m) => {
-      acc[m] = 'field'
+    return measurementsWithNoFields.reduce((acc, m) => {
+      acc[m] = []
       return acc
-    }, {})
+    }, fieldsByMeasurements)
   }
 }
 

@@ -3,7 +3,7 @@ import React, {PureComponent} from 'react'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 // Components
-import TagKeyList from 'src/flux/components/TagKeyList'
+import FieldList from 'src/flux/components/FieldList'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Utils
@@ -23,6 +23,7 @@ interface Props {
   source: Source
   searchTerm: string
   measurement: string
+  fields: string[]
   notify: NotificationAction
 }
 
@@ -41,7 +42,7 @@ class MeasurementListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, measurement, notify} = this.props
+    const {db, source, measurement, fields, notify} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -69,11 +70,11 @@ class MeasurementListItem extends PureComponent<Props, State> {
         </div>
         {!isUnopen && (
           <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-            <TagKeyList
+            <FieldList
               db={db}
               source={source}
               notify={notify}
-              measurement={measurement}
+              fields={fields}
             />
           </div>
         )}

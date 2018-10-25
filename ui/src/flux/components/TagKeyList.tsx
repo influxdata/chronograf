@@ -3,29 +3,23 @@ import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
 
 // Components
 import TagKeyListItem from 'src/flux/components/TagKeyListItem'
-import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
-
-// apis
-import {tagKeys as fetchTagKeys} from 'src/shared/apis/flux/metaQueries'
 
 // Utils
-import parseValuesColumn from 'src/shared/parsing/flux/values'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // types
-import {Source, NotificationAction, RemoteDataState} from 'src/types'
+import {Source, NotificationAction} from 'src/types'
 
 interface Props {
   db: string
   measurement?: string
   source: Source
+  tagKeys: string[]
   notify: NotificationAction
 }
 
 interface State {
-  tagKeys: string[]
   searchTerm: string
-  loading: RemoteDataState
 }
 
 @ErrorHandling
@@ -34,19 +28,7 @@ class TagKeyList extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      tagKeys: [],
       searchTerm: '',
-      loading: RemoteDataState.NotStarted,
-    }
-  }
-
-  public async componentDidMount() {
-    this.setState({loading: RemoteDataState.Loading})
-    try {
-      const tagKeys = await this.fetchTagKeys()
-      this.setState({tagKeys, loading: RemoteDataState.Done})
-    } catch (error) {
-      this.setState({loading: RemoteDataState.Error})
     }
   }
 
@@ -75,15 +57,11 @@ class TagKeyList extends PureComponent<Props, State> {
 
   private get tagKeys(): JSX.Element | JSX.Element[] {
     const {db, source, notify, measurement} = this.props
-    const {searchTerm, loading} = this.state
-
-    if (loading === RemoteDataState.Loading) {
-      return <LoaderSkeleton />
-    }
+    const {searchTerm} = this.state
 
     const excludedTagKeys = ['_measurement', '_field']
     const term = searchTerm.toLocaleLowerCase()
-    const tagKeys = this.state.tagKeys.filter(
+    const tagKeys = this.props.tagKeys.filter(
       tk =>
         !excludedTagKeys.includes(tk) && tk.toLocaleLowerCase().includes(term)
     )
@@ -107,17 +85,6 @@ class TagKeyList extends PureComponent<Props, State> {
         </div>
       </div>
     )
-  }
-
-  private async fetchTagKeys(): Promise<string[]> {
-    const {source, db, measurement} = this.props
-    const filter = measurement
-      ? [{key: '_measurement', value: measurement}]
-      : []
-
-    const response = await fetchTagKeys(source, db, filter)
-    const tagKeys = parseValuesColumn(response)
-    return tagKeys
   }
 
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
