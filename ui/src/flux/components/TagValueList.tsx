@@ -4,6 +4,7 @@ import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
 // Components
 import TagValueListItem from 'src/flux/components/TagValueListItem'
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
+import LoadingSpinner from 'src/flux/components/LoadingSpinner'
 
 // apis
 import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
@@ -14,6 +15,8 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // types
 import {Source, NotificationAction, RemoteDataState} from 'src/types'
+
+const TAG_VALUES_LIMIT = 3
 
 interface Props {
   db: string
@@ -27,6 +30,9 @@ interface State {
   tagValues: string[]
   searchTerm: string
   loading: RemoteDataState
+  loadingMoreValues: RemoteDataState
+  limit: number
+  shouldShowMoreValues: boolean
 }
 
 @ErrorHandling
@@ -38,6 +44,9 @@ class TagValueList extends PureComponent<Props, State> {
       tagValues: [],
       searchTerm: '',
       loading: RemoteDataState.Loading,
+      loadingMoreValues: RemoteDataState.NotStarted,
+      limit: TAG_VALUES_LIMIT,
+      shouldShowMoreValues: true,
     }
   }
 
@@ -45,7 +54,11 @@ class TagValueList extends PureComponent<Props, State> {
     this.setState({loading: RemoteDataState.Loading})
     try {
       const tagValues = await this.fetchTagValues()
-      this.setState({tagValues, loading: RemoteDataState.Done})
+      this.setState({
+        tagValues,
+        loading: RemoteDataState.Done,
+        shouldShowMoreValues: tagValues.length >= TAG_VALUES_LIMIT,
+      })
     } catch (error) {
       this.setState({loading: RemoteDataState.Error})
     }
@@ -75,7 +88,7 @@ class TagValueList extends PureComponent<Props, State> {
 
   private get tagValues(): JSX.Element | JSX.Element[] {
     const {source, db, tagKey, measurement, notify} = this.props
-    const {searchTerm, loading} = this.state
+    const {searchTerm, loading, shouldShowMoreValues} = this.state
 
     if (loading === RemoteDataState.Loading) {
       return <LoaderSkeleton />
@@ -87,18 +100,34 @@ class TagValueList extends PureComponent<Props, State> {
     )
 
     if (tagValues.length) {
-      return tagValues.map(tagValue => (
-        <TagValueListItem
-          source={source}
-          db={db}
-          searchTerm={searchTerm}
-          tagValue={tagValue}
-          tagKey={tagKey}
-          measurement={measurement}
-          key={tagValue}
-          notify={notify}
-        />
-      ))
+      return (
+        <>
+          {tagValues.map(tagValue => (
+            <TagValueListItem
+              source={source}
+              db={db}
+              searchTerm={searchTerm}
+              tagValue={tagValue}
+              tagKey={tagKey}
+              measurement={measurement}
+              key={tagValue}
+              notify={notify}
+            />
+          ))}
+          {shouldShowMoreValues && (
+            <div className="flux-schema-tree flux-schema--child">
+              <div className="flux-schema--item no-hover">
+                <button
+                  className="btn btn-xs btn-default increase-values-limit"
+                  onClick={this.onLoadMoreValues}
+                >
+                  {this.loadMoreButtonValue}
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )
     }
     return (
       <div className="flux-schema-tree flux-schema--child">
@@ -109,10 +138,19 @@ class TagValueList extends PureComponent<Props, State> {
     )
   }
 
+  private get loadMoreButtonValue(): string | JSX.Element {
+    const {tagKey} = this.props
+    const {loadingMoreValues} = this.state
+
+    if (loadingMoreValues === RemoteDataState.Loading) {
+      return <LoadingSpinner />
+    }
+    return `Load next ${TAG_VALUES_LIMIT} values for ${tagKey}`
+  }
+
   private async fetchTagValues(): Promise<string[]> {
     const {source, db, tagKey} = this.props
-    const {searchTerm} = this.state
-    const limit = 50
+    const {searchTerm, limit} = this.state
 
     const response = await fetchTagValues({
       source,
@@ -121,6 +159,7 @@ class TagValueList extends PureComponent<Props, State> {
       limit,
       searchTerm,
     })
+
     const tagValues = parseValuesColumn(response)
     return tagValues
   }
@@ -138,6 +177,40 @@ class TagValueList extends PureComponent<Props, State> {
 
   private handleClick = (e: MouseEvent<HTMLElement>) => {
     e.stopPropagation()
+  }
+
+  private onLoadMoreValues = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    const previousTagValuesCount = this.state.tagValues.length
+
+    this.setState(
+      {
+        limit: this.state.limit + TAG_VALUES_LIMIT,
+        loadingMoreValues: RemoteDataState.Loading,
+      },
+      async () => {
+        try {
+          const tagValues = await this.fetchTagValues()
+          this.setState({
+            tagValues,
+            loading: RemoteDataState.Done,
+            loadingMoreValues: RemoteDataState.Done,
+          })
+        } catch (error) {
+          this.setState({
+            loading: RemoteDataState.Error,
+            loadingMoreValues: RemoteDataState.Error,
+          })
+        }
+
+        if (
+          this.state.tagValues.length <
+          previousTagValuesCount + TAG_VALUES_LIMIT
+        ) {
+          this.setState({shouldShowMoreValues: false})
+        }
+      }
+    )
   }
 }
 

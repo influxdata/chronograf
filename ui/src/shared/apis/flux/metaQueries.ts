@@ -94,7 +94,6 @@ export const tagValues = async ({
   count = false,
 }: TagValuesParams): Promise<any> => {
   let regexFilter = ''
-
   if (searchTerm) {
     regexFilter = `|> filter(fn: (r) => r.${tagKey} =~ /${searchTerm}/)`
   }
