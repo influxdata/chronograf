@@ -43,6 +43,7 @@ export const formatColumnValue = (
       return moment(+value / 1000000).format(DEFAULT_TIME_FORMAT)
     case 'procid':
     case 'host':
+    case 'hostname':
     case 'appname':
       return truncateText(value, column)
     case 'message':

@@ -240,6 +240,7 @@ export const defaultTableData: TableData = {
     'facility',
     'procid',
     'appname',
+    'hostname',
     'host',
   ],
   values: [],

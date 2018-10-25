@@ -2252,8 +2252,18 @@ func TestServer(t *testing.T) {
 							]
 						},
 						{
-							"name": "host",
+							"name": "hostname",
 							"position": 7,
+							"encodings": [
+								{
+									"type": "visibility",
+									"value": "visible"
+								}
+							]
+						},
+						{
+							"name": "host",
+							"position": 8,
 							"encodings": [
 								{
 									"type": "visibility",
@@ -2435,8 +2445,18 @@ func TestServer(t *testing.T) {
 						]
 					},
 					{
-						"name": "host",
+						"name": "hostname",
 						"position": 7,
+						"encodings": [
+							{
+								"type": "visibility",
+								"value": "visible"
+							}
+						]
+					},
+					{
+						"name": "host",
+						"position": 8,
 						"encodings": [
 							{
 								"type": "visibility",

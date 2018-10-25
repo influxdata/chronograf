@@ -165,8 +165,18 @@ func TestOrganizationConfig_FindOrCreate(t *testing.T) {
 								},
 							},
 							{
-								Name:     "host",
+								Name:     "hostname",
 								Position: 7,
+								Encodings: []chronograf.ColumnEncoding{
+									{
+										Type:  "visibility",
+										Value: "visible",
+									},
+								},
+							},
+							{
+								Name:     "host",
+								Position: 8,
 								Encodings: []chronograf.ColumnEncoding{
 									{
 										Type:  "visibility",
@@ -322,8 +332,18 @@ func TestOrganizationConfig_FindOrCreate(t *testing.T) {
 								},
 							},
 							{
-								Name:     "host",
+								Name:     "hostname",
 								Position: 7,
+								Encodings: []chronograf.ColumnEncoding{
+									{
+										Type:  "visibility",
+										Value: "visible",
+									},
+								},
+							},
+							{
+								Name:     "host",
+								Position: 8,
 								Encodings: []chronograf.ColumnEncoding{
 									{
 										Type:  "visibility",
@@ -488,6 +508,16 @@ func TestOrganizationConfig_FindOrCreate(t *testing.T) {
 									},
 								},
 							},
+							{
+								Name:     "hostname",
+								Position: 8,
+								Encodings: []chronograf.ColumnEncoding{
+									{
+										Type:  "visibility",
+										Value: "visible",
+									},
+								},
+							},
 						},
 					},
 				},
@@ -645,6 +675,16 @@ func TestOrganizationConfig_FindOrCreate(t *testing.T) {
 									},
 								},
 							},
+							{
+								Name:     "hostname",
+								Position: 8,
+								Encodings: []chronograf.ColumnEncoding{
+									{
+										Type:  "visibility",
+										Value: "visible",
+									},
+								},
+							},
 						},
 					},
 				},
@@ -652,37 +692,38 @@ func TestOrganizationConfig_FindOrCreate(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		client, err := NewTestClient()
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer client.Close()
-
-		s := client.OrganizationConfigStore
-
-		if tt.addFirst {
-			if err := s.Put(context.Background(), tt.wants.organizationConfig); err != nil {
+		t.Run(tt.name, func(t *testing.T) {
+			client, err := NewTestClient()
+			if err != nil {
 				t.Fatal(err)
 			}
-		}
+			defer client.Close()
 
-		got, err := s.FindOrCreate(context.Background(), tt.args.organizationID)
+			s := client.OrganizationConfigStore
 
-		if (tt.wants.err != nil) != (err != nil) {
-			t.Errorf("%q. OrganizationConfigStore.FindOrCreate() error = %v, wantErr %v", tt.name, err, tt.wants.err)
-			continue
-		}
-		if diff := cmp.Diff(got, tt.wants.organizationConfig); diff != "" {
-			t.Errorf("%q. OrganizationConfigStore.FindOrCreate():\n-got/+want\ndiff %s", tt.name, diff)
-		}
+			if tt.addFirst {
+				if err := s.Put(context.Background(), tt.wants.organizationConfig); err != nil {
+					t.Fatal(err)
+				}
+			}
 
-		d, err := s.Get(context.Background(), tt.args.organizationID)
-		if err != nil {
-			t.Errorf("%q. OrganizationConfigStore.Get(): Failed to retrieve organization config", tt.name)
-		}
-		if diff := cmp.Diff(got, d); diff != "" {
-			t.Errorf("%q. OrganizationConfigStore.Get():\n-got/+want\ndiff %s", tt.name, diff)
-		}
+			got, err := s.FindOrCreate(context.Background(), tt.args.organizationID)
+			if (tt.wants.err != nil) != (err != nil) {
+				t.Errorf("%q. OrganizationConfigStore.FindOrCreate() error = %v, wantErr %v", tt.name, err, tt.wants.err)
+				return
+			}
+			if diff := cmp.Diff(got, tt.wants.organizationConfig); diff != "" {
+				t.Errorf("%q. OrganizationConfigStore.FindOrCreate():\n-got/+want\ndiff %s", tt.name, diff)
+			}
+
+			d, err := s.Get(context.Background(), tt.args.organizationID)
+			if err != nil {
+				t.Errorf("%q. OrganizationConfigStore.Get(): Failed to retrieve organization config", tt.name)
+			}
+			if diff := cmp.Diff(got, d); diff != "" {
+				t.Errorf("%q. OrganizationConfigStore.Get():\n-got/+want\ndiff %s", tt.name, diff)
+			}
+		})
 	}
 }
 
@@ -910,6 +951,16 @@ func TestOrganizationConfig_Put(t *testing.T) {
 									},
 								},
 							},
+							{
+								Name:     "hostname",
+								Position: 8,
+								Encodings: []chronograf.ColumnEncoding{
+									{
+										Type:  "visibility",
+										Value: "visible",
+									},
+								},
+							},
 						},
 					},
 					OrganizationID: "default",
@@ -1011,8 +1062,18 @@ func TestOrganizationConfig_Put(t *testing.T) {
 								},
 							},
 							{
-								Name:     "host",
+								Name:     "hostname",
 								Position: 7,
+								Encodings: []chronograf.ColumnEncoding{
+									{
+										Type:  "visibility",
+										Value: "visible",
+									},
+								},
+							},
+							{
+								Name:     "host",
+								Position: 8,
 								Encodings: []chronograf.ColumnEncoding{
 									{
 										Type:  "visibility",
@@ -1117,8 +1178,18 @@ func TestOrganizationConfig_Put(t *testing.T) {
 								},
 							},
 							{
-								Name:     "host",
+								Name:     "hostname",
 								Position: 7,
+								Encodings: []chronograf.ColumnEncoding{
+									{
+										Type:  "visibility",
+										Value: "visible",
+									},
+								},
+							},
+							{
+								Name:     "host",
+								Position: 8,
 								Encodings: []chronograf.ColumnEncoding{
 									{
 										Type:  "visibility",
@@ -1134,27 +1205,29 @@ func TestOrganizationConfig_Put(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		client, err := NewTestClient()
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer client.Close()
+		t.Run(tt.name, func(t *testing.T) {
+			client, err := NewTestClient()
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer client.Close()
 
-		s := client.OrganizationConfigStore
-		err = s.Put(context.Background(), tt.args.organizationConfig)
-		if (tt.wants.err != nil) != (err != nil) {
-			t.Errorf("%q. OrganizationConfigStore.Put() error = %v, wantErr %v", tt.name, err, tt.wants.err)
-			continue
-		}
+			s := client.OrganizationConfigStore
+			err = s.Put(context.Background(), tt.args.organizationConfig)
+			if (tt.wants.err != nil) != (err != nil) {
+				t.Errorf("%q. OrganizationConfigStore.Put() error = %v, wantErr %v", tt.name, err, tt.wants.err)
+				return
+			}
 
-		got, _ := s.FindOrCreate(context.Background(), tt.args.organizationID)
-		if (tt.wants.err != nil) != (err != nil) {
-			t.Errorf("%q. OrganizationConfigStore.Put() error = %v, wantErr %v", tt.name, err, tt.wants.err)
-			continue
-		}
+			got, _ := s.FindOrCreate(context.Background(), tt.args.organizationID)
+			if (tt.wants.err != nil) != (err != nil) {
+				t.Errorf("%q. OrganizationConfigStore.Put() error = %v, wantErr %v", tt.name, err, tt.wants.err)
+				return
+			}
 
-		if diff := cmp.Diff(got, tt.wants.organizationConfig); diff != "" {
-			t.Errorf("%q. OrganizationConfigStore.Put():\n-got/+want\ndiff %s", tt.name, diff)
-		}
+			if diff := cmp.Diff(got, tt.wants.organizationConfig); diff != "" {
+				t.Errorf("%q. OrganizationConfigStore.Put():\n-got/+want\ndiff %s", tt.name, diff)
+			}
+		})
 	}
 }
