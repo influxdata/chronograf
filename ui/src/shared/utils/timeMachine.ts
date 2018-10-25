@@ -9,6 +9,7 @@ import {
   getThresholdsListColors,
   getGaugeColors,
 } from 'src/shared/constants/thresholds'
+import {GIT_SHA} from 'src/shared/constants'
 
 // Types
 import {Cell, NewDefaultCell, CellQuery, QueryType} from 'src/types'
@@ -87,16 +88,48 @@ export function defaultQueryDraft(
   return defaultDraft
 }
 
-enum TMLocalStorageKeys {
-  dataExplorer = 'dataExplorer',
-  ceo = 'cellEditorOverlay',
+export enum TMLocalStorageKey {
+  DataExplorer = 'dataExplorer',
+  CellEditorOverlay = 'cellEditorOverlay',
 }
-export function getLocalStorageKey(): TMLocalStorageKeys {
+
+export function getLocalStorageKey(): TMLocalStorageKey {
   const location = window.location.toString()
 
   if (location.indexOf('/dashboards/') !== -1) {
-    return TMLocalStorageKeys.ceo
+    return TMLocalStorageKey.CellEditorOverlay
   }
 
-  return TMLocalStorageKeys.dataExplorer
+  return TMLocalStorageKey.DataExplorer
+}
+
+export function getLocalStorage(
+  key: TMLocalStorageKey
+): Partial<TimeMachineState> {
+  try {
+    const {version, data} = JSON.parse(window.localStorage.getItem(key))
+
+    if (version !== GIT_SHA) {
+      return {}
+    }
+
+    if (key === TMLocalStorageKey.CellEditorOverlay) {
+      const {fluxProportions, timeMachineProportions} = data
+
+      return {fluxProportions, timeMachineProportions}
+    }
+
+    return data
+  } catch {
+    return {}
+  }
+}
+
+export function setLocalStorage(
+  key: TMLocalStorageKey,
+  data: TimeMachineState
+): void {
+  const localStorageData = {version: GIT_SHA, data}
+
+  window.localStorage.setItem(key, JSON.stringify(localStorageData))
 }

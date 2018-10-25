@@ -23,11 +23,13 @@ import {getDeep} from 'src/utils/wrappers'
 import {
   defaultQueryDraft,
   getLocalStorageKey,
+  getLocalStorage,
+  setLocalStorage,
+  TMLocalStorageKey,
 } from 'src/shared/utils/timeMachine'
 
 // Constants
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
-import {GIT_SHA} from 'src/shared/constants'
 import {
   DEFAULT_THRESHOLDS_LIST_COLORS,
   DEFAULT_GAUGE_COLORS,
@@ -114,7 +116,7 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
   public state: TimeMachineState = DEFAULT_STATE()
 
   private debouncer: Debouncer = new DefaultDebouncer()
-  private localStorageKey?: string
+  private localStorageKey?: TMLocalStorageKey
 
   public reset = (
     initialState: Partial<TimeMachineState> = {}
@@ -354,25 +356,5 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
   private setLocalStorageState = () => {
     setLocalStorage(this.localStorageKey, this.state)
-  }
-}
-
-export function setLocalStorage(key: string, data: TimeMachineState): void {
-  const localStorageData = {version: GIT_SHA, data}
-
-  window.localStorage.setItem(key, JSON.stringify(localStorageData))
-}
-
-export function getLocalStorage(key: string): Partial<TimeMachineState> {
-  try {
-    const {version, data} = JSON.parse(window.localStorage.getItem(key))
-
-    if (version !== GIT_SHA) {
-      return {}
-    }
-
-    return data
-  } catch {
-    return {}
   }
 }
