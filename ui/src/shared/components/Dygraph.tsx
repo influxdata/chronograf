@@ -161,6 +161,8 @@ class Dygraph extends Component<Props, State> {
     const options = this.collectDygraphOptions()
     const optionsChanged = this.haveDygraphOptionsChanged(options)
     const timeRangeChanged = !isEqual(prevProps.timeRange, this.props.timeRange)
+    const staticLegendChanged =
+      prevProps.staticLegend !== this.props.staticLegend
 
     if (optionsChanged) {
       dygraph.updateOptions(options)
@@ -169,6 +171,10 @@ class Dygraph extends Component<Props, State> {
 
     if (dygraph.isZoomed('x') && timeRangeChanged) {
       dygraph.resetZoom()
+    }
+
+    if (staticLegendChanged) {
+      setTimeout(this.resize, 0)
     }
   }
 
