@@ -9,7 +9,7 @@ import {executeQuery as executeFluxQuery} from 'src/shared/apis/flux/query'
 import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 
 // Constants
-import {DEFAULT_PIXELS} from 'src/shared/constants'
+import {DEFAULT_X_PIXELS} from 'src/shared/constants'
 
 // Types
 import {Query, Template, Source, TimeRange} from 'src/types'
@@ -40,7 +40,7 @@ export const downloadFluxCSV = async (
     script,
     timeRange,
     fluxASTLink,
-    DEFAULT_PIXELS
+    DEFAULT_X_PIXELS
   )
 
   const {csv, didTruncate, rowCount} = await executeFluxQuery(
