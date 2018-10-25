@@ -52,7 +52,9 @@ export const parseFieldsByMeasurements = (
 
       data.forEach(row => {
         const field = row[fieldIndex]
-        acc.fields.push(field)
+        if (!acc.fields.includes(field)) {
+          acc.fields.push(field)
+        }
 
         if (measurementIndex !== -1) {
           const measurement = row[measurementIndex]
