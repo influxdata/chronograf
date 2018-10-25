@@ -1,6 +1,8 @@
 import React, {PureComponent} from 'react'
 import {AutoSizer, Grid} from 'react-virtualized'
 
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
+
 import {parseResponseRaw} from 'src/shared/parsing/flux/response'
 
 interface Props {
@@ -15,6 +17,8 @@ interface Props {
 interface State {
   data: string[][]
   maxColumnCount: number
+  scrollLeft: number
+  scrollTop: number
 }
 
 const ROW_HEIGHT = 30
@@ -32,11 +36,11 @@ class RawFluxDataTable extends PureComponent<Props, State> {
     return {data, maxColumnCount}
   }
 
-  public state = {data: [], maxColumnCount: 0}
+  public state = {data: [], maxColumnCount: 0, scrollLeft: 0, scrollTop: 0}
 
   public render() {
     const {width, height} = this.props
-    const {data, maxColumnCount} = this.state
+    const {data, maxColumnCount, scrollTop, scrollLeft} = this.state
 
     return (
       <div className="raw-flux-data-table">
@@ -48,22 +52,51 @@ class RawFluxDataTable extends PureComponent<Props, State> {
               MIN_COLUMN_WIDTH,
               resolvedWidth / maxColumnCount
             )
+            const gridScrollWidth = columnWidth * maxColumnCount
+            const gridScrollHeight = ROW_HEIGHT * data.length
 
             return (
-              <Grid
-                width={resolvedWidth}
-                height={resolvedHeight}
-                cellRenderer={this.renderCell}
-                columnCount={maxColumnCount}
-                rowCount={data.length}
-                rowHeight={ROW_HEIGHT}
-                columnWidth={columnWidth}
-              />
+              <FancyScrollbar
+                style={{
+                  overflowY: 'hidden',
+                  width: resolvedWidth,
+                  height: resolvedHeight,
+                }}
+                autoHide={false}
+                scrollTop={scrollTop}
+                scrollLeft={scrollLeft}
+                setScrollTop={this.onScrollbarsScroll}
+              >
+                <Grid
+                  width={resolvedWidth}
+                  height={resolvedHeight}
+                  cellRenderer={this.renderCell}
+                  columnCount={maxColumnCount}
+                  rowCount={data.length}
+                  rowHeight={ROW_HEIGHT}
+                  columnWidth={columnWidth}
+                  scrollLeft={scrollLeft}
+                  scrollTop={scrollTop}
+                  style={{
+                    width: gridScrollWidth,
+                    height: gridScrollHeight,
+                  }}
+                />
+              </FancyScrollbar>
             )
           }}
         </AutoSizer>
       </div>
     )
+  }
+
+  private onScrollbarsScroll = e => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const {scrollTop, scrollLeft} = e.target as HTMLElement
+
+    this.setState({scrollLeft, scrollTop})
   }
 
   private renderCell = ({columnIndex, key, rowIndex, style}) => {
