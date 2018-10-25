@@ -60,6 +60,7 @@
 1.  [#4605](https://github.com/influxdata/chronograf/pull/4605): Fix vertical stuck vertical scroll in firefox
 1.  [#4612](https://github.com/influxdata/chronograf/pull/4612): Fix issue with disappearing alias'
 1.  [#4621](https://github.com/influxdata/chronograf/pull/4621): Fix log viewer message expansion
+1.  [#4640](https://github.com/influxdata/chronograf/pull/4640): Fix missing horizontal scrollbar
 
 ## v1.6.2 [2018-09-06]
 
