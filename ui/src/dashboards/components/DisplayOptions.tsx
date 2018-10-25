@@ -72,6 +72,7 @@ type Props = PassedProps & ConnectedProps
 
 interface State {
   defaultYLabel: string
+  proportions: number[]
 }
 
 @ErrorHandling
@@ -81,6 +82,7 @@ class DisplayOptions extends Component<Props, State> {
 
     this.state = {
       defaultYLabel: this.defaultYLabel,
+      proportions: [undefined, undefined, undefined],
     }
   }
 
@@ -97,8 +99,13 @@ class DisplayOptions extends Component<Props, State> {
       <Threesizer
         orientation={HANDLE_VERTICAL}
         divisions={this.threesizerDivisions}
+        onResize={this.handleResize}
       />
     )
+  }
+
+  private handleResize = (proportions: number[]) => {
+    this.setState({proportions})
   }
 
   private get threesizerDivisions() {
@@ -110,11 +117,16 @@ class DisplayOptions extends Component<Props, State> {
       onUpdateNote,
       onUpdateNoteVisibility,
     } = this.props
+
+    const {proportions} = this.state
+    const [leftSize, middleSize, rightSize] = proportions
+
     return [
       {
         name: 'Visualization Type',
         headerButtons: [],
         menuOptions: [],
+        size: leftSize,
         render: () => (
           <GraphTypeSelector type={type} onUpdateVisType={onUpdateType} />
         ),
@@ -124,6 +136,7 @@ class DisplayOptions extends Component<Props, State> {
         name: 'Customize',
         headerButtons: [],
         menuOptions: [],
+        size: middleSize,
         render: this.renderOptions,
         headerOrientation: HANDLE_VERTICAL,
       },
@@ -131,6 +144,7 @@ class DisplayOptions extends Component<Props, State> {
         name: 'Add a Note',
         headerButtons: [],
         menuOptions: [],
+        size: rightSize,
         render: () => (
           <CellNoteEditor
             note={note || ''}
