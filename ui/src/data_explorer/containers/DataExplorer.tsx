@@ -97,8 +97,8 @@ interface ConnectedProps {
   draftScript: string
   script: string
   onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
-  onChangeScript: TimeMachineContainer['handleChangeScript']
   onResetTimeMachine: TimeMachineContainer['reset']
+  onInitFluxScript: TimeMachineContainer['handleInitFluxScript']
 }
 
 type Props = PassedProps & ConnectedProps
@@ -216,15 +216,12 @@ export class DataExplorer extends PureComponent<Props, State> {
       sourceLink,
       queryDrafts,
       onUpdateQueryDrafts,
-      onChangeScript,
+      onInitFluxScript,
     } = this.props
     const {query, script} = this.readQueryParams()
 
     if (script) {
-      const queryDraft = {...defaultQueryDraft(QueryType.Flux), query: script}
-
-      onUpdateQueryDrafts([queryDraft])
-      onChangeScript(script)
+      onInitFluxScript(script)
       return
     }
 
@@ -446,7 +443,7 @@ const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
             draftScript={state.draftScript}
             timeRange={state.timeRange}
             script={state.script}
-            onChangeScript={container.handleChangeScript}
+            onInitFluxScript={container.handleInitFluxScript}
             onUpdateQueryDrafts={container.handleUpdateQueryDrafts}
             onResetTimeMachine={container.reset}
           />

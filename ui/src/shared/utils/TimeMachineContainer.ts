@@ -151,6 +151,16 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
     return this.setAndPersistState({draftScript})
   }
 
+  public handleInitFluxScript = (script: string) => {
+    const queryDraft = {...defaultQueryDraft(QueryType.Flux), query: script}
+
+    this.setAndPersistState({
+      script,
+      draftScript: script,
+      queryDrafts: [queryDraft],
+    })
+  }
+
   public handleUpdateTimeRange = (timeRange: TimeRange) => {
     return this.setAndPersistState({timeRange})
   }
