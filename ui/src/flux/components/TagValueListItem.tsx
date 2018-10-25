@@ -25,36 +25,14 @@ interface Props {
   measurement: string
 }
 
-interface State {
-  opened: OpenState
-}
-
 @ErrorHandling
-class TagValueListItem extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      opened: OpenState.UNOPENED,
-    }
-  }
-
+class TagValueListItem extends PureComponent<Props> {
   public render() {
     const {tagValue} = this.props
-    const {opened} = this.state
-    const isOpen = opened === OpenState.OPENED
-
     return (
-      <div
-        className={`flux-schema-tree flux-schema--child ${
-          isOpen ? 'expanded' : ''
-        }`}
-        key={tagValue}
-        onClick={this.handleItemClick}
-      >
+      <div className={`flux-schema-tree flux-schema--child`} key={tagValue}>
         <div className="flux-schema--item">
           <div className="flex-schema-item-group">
-            <div className="flux-schema--expander" />
             {tagValue}
             <span className="flux-schema--type">Tag Value</span>
           </div>
@@ -67,18 +45,6 @@ class TagValueListItem extends PureComponent<Props, State> {
         </div>
       </div>
     )
-  }
-
-  private handleItemClick = (e): void => {
-    e.stopPropagation()
-
-    const opened = this.state.opened
-
-    if (opened === OpenState.OPENED) {
-      this.setState({opened: OpenState.ClOSED})
-      return
-    }
-    this.setState({opened: OpenState.OPENED})
   }
 
   private handleClickCopy = (e): void => {
