@@ -7,8 +7,8 @@ export const VERSION = process.env.npm_package_version
 export const GIT_SHA = process.env.GIT_SHA
 
 export const DEFAULT_DURATION_MS = 1000
-export const DEFAULT_PIXELS = 333
-export const RESOLUTION_SCALE_FACTOR = 0.5
+export const DEFAULT_X_PIXELS = 700
+export const PIXELS_PER_POINT = 1
 
 export const NO_CELL = 'none'
 
@@ -458,7 +458,7 @@ export const DEFAULT_KAPACITOR = {
 
 export const intervalValuesPoints = [
   {
-    value: `${DEFAULT_PIXELS}`,
+    value: `${DEFAULT_X_PIXELS}`,
     type: TemplateValueType.Points,
     selected: true,
     localSelected: true,

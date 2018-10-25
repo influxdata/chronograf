@@ -18,6 +18,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {restartable} from 'src/shared/utils/restartable'
 import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 import {parseResponse} from 'src/shared/parsing/flux/response'
+import {DEFAULT_X_PIXELS} from 'src/shared/constants'
 
 // Types
 import {
@@ -70,7 +71,7 @@ interface State {
   errorMessage: string
 }
 
-const TEMP_RES = 300 // FIXME
+const TEMP_RES = DEFAULT_X_PIXELS // FIXME
 
 const GraphLoadingDots = () => (
   <div className="graph-panel__refreshing">

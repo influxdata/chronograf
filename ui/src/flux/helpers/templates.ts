@@ -1,10 +1,7 @@
 import {TimeRange} from 'src/types'
 import {getMinDuration} from 'src/shared/parsing/flux/durations'
-import {
-  DEFAULT_PIXELS,
-  DEFAULT_DURATION_MS,
-  RESOLUTION_SCALE_FACTOR,
-} from 'src/shared/constants'
+import {computeInterval} from 'src/tempVars/utils/replace'
+import {DEFAULT_DURATION_MS} from 'src/shared/constants'
 
 // For now we only support these template variables in Flux queries
 const DASHBOARD_TIME = 'dashboardTime'
@@ -17,7 +14,7 @@ export const renderTemplatesInScript = async (
   script: string,
   timeRange: TimeRange,
   astLink: string,
-  maxSideLength: number = DEFAULT_PIXELS
+  xPixels: number
 ): Promise<string> => {
   let dashboardTime: string
   let upperDashboardTime: string
@@ -44,9 +41,9 @@ export const renderTemplatesInScript = async (
     duration = DEFAULT_DURATION_MS
   }
 
-  const interval = duration / (maxSideLength * RESOLUTION_SCALE_FACTOR)
+  const interval = computeInterval(duration, xPixels)
 
-  rendered = `${INTERVAL} = ${Math.floor(interval)}ms\n${rendered}`
+  rendered = `${INTERVAL} = ${interval}ms\n${rendered}`
 
   return rendered
 }

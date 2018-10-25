@@ -6,39 +6,40 @@ import {
   TemplateValueType,
   TemplateValue,
 } from 'src/types/tempVars'
-import {
-  TEMP_VAR_INTERVAL,
-  DEFAULT_PIXELS,
-  DEFAULT_DURATION_MS,
-  RESOLUTION_SCALE_FACTOR,
-} from 'src/shared/constants'
+import {TEMP_VAR_INTERVAL, PIXELS_PER_POINT} from 'src/shared/constants'
 
-function sortTemplates(templates: Template[]): Template[] {
-  const graph = graphFromTemplates(templates)
+export const computeInterval = (
+  durationMs: number,
+  xPixels: number
+): number => {
+  const customPxPerPoint = +window.localStorage.PIXELS_PER_POINT
+  const pxPerPoint = !isNaN(customPxPerPoint)
+    ? customPxPerPoint
+    : PIXELS_PER_POINT
+  const msPerPoint = Math.floor(durationMs * pxPerPoint / xPixels)
 
-  return topologicalSort(graph).map(t => t.initialTemplate)
+  return msPerPoint
 }
 
 export const replaceInterval = (
   query: string,
-  pixels: number,
+  xPixels: number,
   durationMs: number
 ) => {
   if (!query.includes(TEMP_VAR_INTERVAL)) {
     return query
   }
 
-  if (!pixels) {
-    pixels = DEFAULT_PIXELS
-  }
+  const interval = computeInterval(durationMs, xPixels)
+  const renderedQuery = replaceAll(query, TEMP_VAR_INTERVAL, `${interval}ms`)
 
-  if (!durationMs) {
-    durationMs = DEFAULT_DURATION_MS
-  }
+  return renderedQuery
+}
 
-  const msPerPixel = Math.floor(durationMs / (pixels * RESOLUTION_SCALE_FACTOR))
+const sortTemplates = (templates: Template[]): Template[] => {
+  const graph = graphFromTemplates(templates)
 
-  return replaceAll(query, TEMP_VAR_INTERVAL, `${msPerPixel}ms`)
+  return topologicalSort(graph).map(t => t.initialTemplate)
 }
 
 const templateReplace = (query: string, templates: Template[]) => {
