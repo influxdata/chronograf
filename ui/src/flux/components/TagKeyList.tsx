@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
+import React, {PureComponent, MouseEvent} from 'react'
 
 // Components
 import TagKeyListItem from 'src/flux/components/TagKeyListItem'
@@ -18,12 +18,8 @@ interface Props {
   notify: NotificationAction
 }
 
-interface State {
-  searchTerm: string
-}
-
 @ErrorHandling
-class TagKeyList extends PureComponent<Props, State> {
+class TagKeyList extends PureComponent<Props> {
   constructor(props: Props) {
     super(props)
 
@@ -33,44 +29,21 @@ class TagKeyList extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {measurement} = this.props
-    const {searchTerm} = this.state
-
-    return (
-      <>
-        <div className="flux-schema--filter">
-          <input
-            className="form-control input-xs"
-            placeholder={`Filter within ${measurement || 'Tags'}`}
-            type="text"
-            spellCheck={false}
-            autoComplete="off"
-            value={searchTerm}
-            onClick={this.handleClick}
-            onChange={this.onSearch}
-          />
-        </div>
-        {this.tagKeys}
-      </>
-    )
+    return <>{this.tagKeys}</>
   }
 
   private get tagKeys(): JSX.Element | JSX.Element[] {
     const {db, source, notify, measurement} = this.props
-    const {searchTerm} = this.state
 
     const excludedTagKeys = ['_measurement', '_field']
-    const term = searchTerm.toLocaleLowerCase()
     const tagKeys = this.props.tagKeys.filter(
-      tk =>
-        !excludedTagKeys.includes(tk) && tk.toLocaleLowerCase().includes(term)
+      tk => !excludedTagKeys.includes(tk)
     )
     if (tagKeys.length) {
       return tagKeys.map(tagKey => (
         <TagKeyListItem
           db={db}
           source={source}
-          searchTerm={searchTerm}
           tagKey={tagKey}
           measurement={measurement}
           key={tagKey}
@@ -85,12 +58,6 @@ class TagKeyList extends PureComponent<Props, State> {
         </div>
       </div>
     )
-  }
-
-  private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      searchTerm: e.target.value,
-    })
   }
 
   private handleClick = (e: MouseEvent<HTMLInputElement>) => {
