@@ -41,7 +41,7 @@ class MeasurementListItem extends PureComponent<Props, State> {
     ) {
       return {...state, opened: props.opened}
     }
-    return state
+    return null
   }
   constructor(props: Props) {
     super(props)
@@ -84,6 +84,7 @@ class MeasurementListItem extends PureComponent<Props, State> {
               source={source}
               notify={notify}
               fields={fields}
+              measurement={measurement}
             />
           </div>
         )}

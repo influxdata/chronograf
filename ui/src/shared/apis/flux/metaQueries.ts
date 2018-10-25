@@ -90,7 +90,6 @@ export const tagValues = async ({
   source,
   tagKey,
   limit,
-  filter = [],
   searchTerm = '',
   count = false,
 }: TagValuesParams): Promise<any> => {
@@ -107,7 +106,6 @@ export const tagValues = async ({
     from(bucket:"${bucket}")
       |> range(start:-30d)
       ${regexFilter}
-      ${tagsetFilter(filter)}
       |> group(by:["${tagKey}"])
       |> distinct(column:"${tagKey}")
       |> group(by:["_stop","_start"])

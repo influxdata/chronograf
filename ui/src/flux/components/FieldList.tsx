@@ -2,6 +2,9 @@
 import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
+// Components
+import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
+
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {
@@ -39,18 +42,20 @@ class FieldList extends PureComponent<Props, State> {
 
     return (
       <>
-        <div className="flux-schema--filter">
-          <input
-            className="form-control input-xs"
-            placeholder={'Filter Fields'}
-            type="text"
-            spellCheck={false}
-            autoComplete="off"
-            value={searchTerm}
-            onClick={this.handleInputClick}
-            onChange={this.onSearch}
-          />
-        </div>
+        {!this.props.measurement && (
+          <div className="flux-schema--filter">
+            <input
+              className="form-control input-xs"
+              placeholder={'Filter Fields'}
+              type="text"
+              spellCheck={false}
+              autoComplete="off"
+              value={searchTerm}
+              onClick={this.handleInputClick}
+              onChange={this.onSearch}
+            />
+          </div>
+        )}
         {this.fields}
       </>
     )
@@ -58,6 +63,10 @@ class FieldList extends PureComponent<Props, State> {
 
   private get fields(): JSX.Element | JSX.Element[] {
     const {searchTerm} = this.state
+
+    if (!this.props.fields.length) {
+      return <LoaderSkeleton />
+    }
 
     const term = searchTerm.toLocaleLowerCase()
     const fields = this.props.fields.filter(f =>

@@ -99,7 +99,6 @@ class SchemaExplorerTree extends PureComponent<Props, State> {
 
   private get measurementsTree() {
     const {measurements, fieldsByMeasurements} = this.state
-    measurements.push('yo') // TODO: remove
     const measurementsWithNoFields = _.difference(
       measurements,
       Object.keys(fieldsByMeasurements)

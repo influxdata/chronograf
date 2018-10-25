@@ -3,6 +3,7 @@ import React, {PureComponent, MouseEvent, ChangeEvent} from 'react'
 
 // Components
 import MeasurementListItem from 'src/flux/components/MeasurementListItem'
+import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -63,25 +64,26 @@ class MeasurementsList extends PureComponent<Props, State> {
     const {source, db, notify} = this.props
     const {searchTerm} = this.state
 
-    const term = searchTerm.toLocaleLowerCase()
-    const measurements = Object.entries(this.props.measurements).filter(
-      entry => {
-        const measurement = entry[0]
-        const fieldsForMeasurement = entry[1]
-        const fieldsIncludesTerm = fieldsForMeasurement.find(field => {
-          return field.toLocaleLowerCase().includes(term)
-        })
+    const measurementEntries = Object.entries(this.props.measurements)
+    if (!measurementEntries.length) {
+      return <LoaderSkeleton />
+    }
 
-        return (
-          measurement.toLocaleLowerCase().includes(term) || fieldsIncludesTerm
-        )
-      }
-    )
+    const term = searchTerm.toLocaleLowerCase()
+    const measurements = measurementEntries.filter(entry => {
+      const measurement = entry[0]
+      const fieldsForMeasurement = entry[1]
+      const fieldsIncludesTerm = fieldsForMeasurement.find(field => {
+        return field.toLocaleLowerCase().includes(term)
+      })
+
+      return (
+        measurement.toLocaleLowerCase().includes(term) || fieldsIncludesTerm
+      )
+    })
 
     if (measurements.length) {
       return measurements.map(([measurement, fields]) => {
-        // if the search term !== '' and the fields contains the search term, then
-        // have the measurement start open. otherwise, unopened
         let startOpen = OpenState.UNOPENED
         let fieldsIncludesTerm = false
         const filteredFields = fields.filter(field => {

@@ -3,6 +3,7 @@ import React, {PureComponent, MouseEvent} from 'react'
 
 // Components
 import TagKeyListItem from 'src/flux/components/TagKeyListItem'
+import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -18,8 +19,12 @@ interface Props {
   notify: NotificationAction
 }
 
+interface State {
+  searchTerm: string
+}
+
 @ErrorHandling
-class TagKeyList extends PureComponent<Props> {
+class TagKeyList extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
@@ -34,6 +39,10 @@ class TagKeyList extends PureComponent<Props> {
 
   private get tagKeys(): JSX.Element | JSX.Element[] {
     const {db, source, notify, measurement} = this.props
+
+    if (!this.props.tagKeys.length) {
+      return <LoaderSkeleton />
+    }
 
     const excludedTagKeys = ['_measurement', '_field']
     const tagKeys = this.props.tagKeys.filter(
@@ -60,7 +69,7 @@ class TagKeyList extends PureComponent<Props> {
     )
   }
 
-  private handleClick = (e: MouseEvent<HTMLInputElement>) => {
+  private handleClick = (e: MouseEvent<HTMLElement>) => {
     e.stopPropagation()
   }
 }

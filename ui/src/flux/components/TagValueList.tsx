@@ -110,31 +110,33 @@ class TagValueList extends PureComponent<Props, State> {
   }
 
   private async fetchTagValues(): Promise<string[]> {
-    const {source, db, tagKey, measurement} = this.props
+    const {source, db, tagKey} = this.props
+    const {searchTerm} = this.state
     const limit = 50
-
-    const filter = measurement
-      ? [{key: '_measurement', value: measurement}]
-      : []
 
     const response = await fetchTagValues({
       source,
       bucket: db,
       tagKey,
-      filter,
       limit,
+      searchTerm,
     })
     const tagValues = parseValuesColumn(response)
     return tagValues
   }
 
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      searchTerm: e.target.value,
-    })
+    this.setState(
+      {
+        searchTerm: e.target.value,
+      },
+      () => {
+        this.fetchTagValues()
+      }
+    )
   }
 
-  private handleClick = (e: MouseEvent<HTMLInputElement>) => {
+  private handleClick = (e: MouseEvent<HTMLElement>) => {
     e.stopPropagation()
   }
 }
