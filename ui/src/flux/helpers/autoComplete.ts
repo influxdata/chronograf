@@ -152,8 +152,8 @@ const shouldCompleteParam = (currentLineText, cursorPosition) => {
   let i = cursorPosition
 
   while (i) {
-    const char = currentLineText[i]
-    const charBefore = currentLineText[i - 1]
+    const char = currentLineText[i - 1]
+    const charBefore = currentLineText[i - 2]
 
     if (char === ':' || char === '>' || char === ')') {
       return false
