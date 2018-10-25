@@ -25,6 +25,7 @@ interface Props {
   measurement: string
   fields: string[]
   notify: NotificationAction
+  opened: OpenState
 }
 
 interface State {
@@ -33,11 +34,19 @@ interface State {
 
 @ErrorHandling
 class MeasurementListItem extends PureComponent<Props, State> {
+  public static getDerivedStateFromProps(props, state) {
+    if (
+      props.opened === OpenState.OPENED &&
+      state.opened === OpenState.UNOPENED
+    ) {
+      return {...state, opened: props.opened}
+    }
+    return state
+  }
   constructor(props: Props) {
     super(props)
-
     this.state = {
-      opened: OpenState.UNOPENED,
+      opened: props.opened,
     }
   }
 

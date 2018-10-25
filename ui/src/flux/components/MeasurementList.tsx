@@ -7,7 +7,10 @@ import MeasurementListItem from 'src/flux/components/MeasurementListItem'
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-// types
+// Constants
+import {OpenState} from 'src/flux/constants/explorer'
+
+// Types
 import {Source, NotificationAction} from 'src/types'
 
 interface Props {
@@ -33,6 +36,7 @@ class MeasurementsList extends PureComponent<Props, State> {
 
   public render() {
     const {searchTerm} = this.state
+    // console.log('search term changed: ', searchTerm)
 
     return (
       <>
@@ -53,6 +57,8 @@ class MeasurementsList extends PureComponent<Props, State> {
     )
   }
 
+  // all matching children and the path in the tree that leads
+  // to them should be displayed
   private get measurements(): JSX.Element | JSX.Element[] {
     const {source, db, notify} = this.props
     const {searchTerm} = this.state
@@ -61,21 +67,47 @@ class MeasurementsList extends PureComponent<Props, State> {
     const measurements = Object.entries(this.props.measurements).filter(
       entry => {
         const measurement = entry[0]
-        return measurement.toLocaleLowerCase().includes(term)
+        const fieldsForMeasurement = entry[1]
+        const fieldsIncludesTerm = fieldsForMeasurement.find(field => {
+          return field.toLocaleLowerCase().includes(term)
+        })
+
+        return (
+          measurement.toLocaleLowerCase().includes(term) || fieldsIncludesTerm
+        )
       }
     )
+
     if (measurements.length) {
-      return measurements.map(([measurement, fields]) => (
-        <MeasurementListItem
-          source={source}
-          db={db}
-          searchTerm={searchTerm}
-          measurement={measurement}
-          key={measurement}
-          notify={notify}
-          fields={fields}
-        />
-      ))
+      return measurements.map(([measurement, fields]) => {
+        // if the search term !== '' and the fields contains the search term, then
+        // have the measurement start open. otherwise, unopened
+        let startOpen = OpenState.UNOPENED
+        let fieldsIncludesTerm = false
+        const filteredFields = fields.filter(field => {
+          if (field.toLocaleLowerCase().includes(term)) {
+            fieldsIncludesTerm = true
+            return field
+          }
+        })
+
+        if (term !== '' && fieldsIncludesTerm) {
+          startOpen = OpenState.OPENED
+        }
+
+        return (
+          <MeasurementListItem
+            source={source}
+            db={db}
+            searchTerm={searchTerm}
+            measurement={measurement}
+            key={measurement}
+            notify={notify}
+            fields={filteredFields}
+            opened={startOpen}
+          />
+        )
+      })
     }
     return (
       <div className="flux-schema-tree flux-schema--child">
