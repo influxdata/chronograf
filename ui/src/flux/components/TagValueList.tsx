@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
+import _ from 'lodash'
 
 // Components
 import TagValueListItem from 'src/flux/components/TagValueListItem'
@@ -12,11 +13,12 @@ import {tagValues as fetchTagValues} from 'src/shared/apis/flux/metaQueries'
 // Utils
 import parseValuesColumn from 'src/shared/parsing/flux/values'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 
 // types
 import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
-const TAG_VALUES_LIMIT = 3
+const TAG_VALUES_LIMIT = 25
 
 interface Props {
   db: string
@@ -37,6 +39,8 @@ interface State {
 
 @ErrorHandling
 class TagValueList extends PureComponent<Props, State> {
+  private debouncer: Debouncer = new DefaultDebouncer()
+
   constructor(props: Props) {
     super(props)
 
@@ -62,6 +66,10 @@ class TagValueList extends PureComponent<Props, State> {
     } catch (error) {
       this.setState({loading: RemoteDataState.Error})
     }
+  }
+
+  public componentWillUnmount() {
+    this.debouncer.cancelAll()
   }
 
   public render() {
@@ -148,7 +156,7 @@ class TagValueList extends PureComponent<Props, State> {
     return `Load next ${TAG_VALUES_LIMIT} values for ${tagKey}`
   }
 
-  private async fetchTagValues(): Promise<string[]> {
+  private fetchTagValues = async (): Promise<string[]> => {
     const {source, db, tagKey} = this.props
     const {searchTerm, limit} = this.state
 
@@ -170,7 +178,10 @@ class TagValueList extends PureComponent<Props, State> {
         searchTerm: e.target.value,
       },
       () => {
-        this.fetchTagValues()
+        this.debouncer.call(async () => {
+          const tagValues = await this.fetchTagValues()
+          this.setState({tagValues})
+        }, 50)
       }
     )
   }
