@@ -22,6 +22,7 @@ interface Props {
   handleDisplay?: string
   menuOptions?: MenuItem[]
   style?: CSSProperties
+  customClass?: string
   handlePixels: number
   id: string
   size: number
@@ -234,12 +235,13 @@ class Division extends PureComponent<Props> {
   }
 
   private get containerClass(): string {
-    const {orientation} = this.props
+    const {orientation, customClass} = this.props
     const isAnyHandleBeingDragged = !!this.props.activeHandleID
     return classnames('threesizer--division', {
       dragging: isAnyHandleBeingDragged,
       vertical: orientation === HANDLE_VERTICAL,
       horizontal: orientation === HANDLE_HORIZONTAL,
+      [customClass]: !!customClass,
     })
   }
 

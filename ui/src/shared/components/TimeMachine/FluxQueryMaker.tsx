@@ -94,6 +94,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       {
         name: 'Script',
         size: rightSize,
+        customClass: 'flux-query-maker--script',
         headerOrientation: HANDLE_VERTICAL,
         headerButtons: [
           <Button

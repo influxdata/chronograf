@@ -48,6 +48,7 @@ interface DivisionProps {
   handleDisplay?: string
   handlePixels?: number
   style?: CSSProperties
+  customClass?: string
   size?: number
   headerButtons?: JSX.Element[]
   menuOptions: MenuItem[]
@@ -156,6 +157,7 @@ class Threesizer extends PureComponent<Props, State> {
               style={d.style}
               offset={this.offset}
               draggable={i > 0}
+              customClass={d.customClass}
               orientation={orientation}
               handlePixels={d.handlePixels}
               handleDisplay={d.handleDisplay}
