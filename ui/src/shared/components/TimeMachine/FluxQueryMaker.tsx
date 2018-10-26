@@ -124,9 +124,13 @@ class FluxQueryMaker extends PureComponent<Props, State> {
               <div className="flux-script-wizard--bg-hint">
                 <p>
                   New to Flux? Give the{' '}
-                  <a title="Open Script Wizard" onClick={this.handleShowWizard}>
-                    Script Wizard
-                  </a>{' '}
+                  <Button
+                    text={'Script Wizard'}
+                    color={ComponentColor.Primary}
+                    titleText={'Open Script Wizard'}
+                    size={ComponentSize.Large}
+                    onClick={this.handleShowWizard}
+                  />{' '}
                   a try
                 </p>
               </div>
