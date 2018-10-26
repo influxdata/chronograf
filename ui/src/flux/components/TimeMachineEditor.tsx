@@ -192,7 +192,7 @@ class TimeMachineEditor extends PureComponent<Props, State> {
       return
     }
 
-    if (ctrlKey || EXCLUDED_KEYS.includes(key)) {
+    if (ctrlKey || EXCLUDED_KEYS.has(key)) {
       return
     }
 
@@ -201,9 +201,14 @@ class TimeMachineEditor extends PureComponent<Props, State> {
 
   private showAutoComplete() {
     const {suggestions} = this.props
+    const filteredSuggestions = getSuggestions(this.editor, suggestions)
+
+    if (!filteredSuggestions.list.length) {
+      return
+    }
 
     this.editor.showHint({
-      hint: () => getSuggestions(this.editor, suggestions),
+      hint: () => filteredSuggestions,
       completeSingle: false,
     })
   }

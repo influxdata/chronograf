@@ -3,7 +3,7 @@ import {IInstance} from 'react-codemirror2'
 import {Suggestion} from 'src/types/flux'
 import {Hints} from 'src/types/codemirror'
 
-export const EXCLUDED_KEYS = [
+export const EXCLUDED_KEYS = new Set([
   'ArrowRight',
   'ArrowLeft',
   'ArrowDown',
@@ -62,7 +62,7 @@ export const EXCLUDED_KEYS = [
   'Quote',
   'Meta',
   ' ',
-]
+])
 
 export const getSuggestions = (
   editor: IInstance,
@@ -124,7 +124,7 @@ const shouldCompleteFunction = (currentLineText, cursorPosition) => {
     const char = currentLineText[i]
     const charBefore = currentLineText[i - 1]
 
-    if (charBefore + char === pipe || char === endOfFunc) {
+    if (charBefore + char === pipe || charBefore + char === endOfFunc + ' ') {
       break
     } else if (char === startOfFunc || char === endOfParamKey) {
       return false
