@@ -547,6 +547,7 @@ class TimeMachine extends PureComponent<Props, State> {
       const newQueryType = QueryType.InfluxQL
       const source = this.useDynamicSource ? null : this.source
       this.updateQueryDraftsSource(source, newQueryType)
+      this.setState({isViewingRawData: false})
     }
   }
 }
