@@ -14,14 +14,17 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
-import {TEMPLATE_RANGE} from 'src/tempVars/constants'
 import {AUTO_GROUP_BY} from 'src/shared/constants'
+import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 
 // Types
 import {QueryConfig, Source, TimeRange, Template} from 'src/types'
 
-const buildText = (q: QueryConfig): string =>
-  q.rawText || buildQuery(TYPE_QUERY_CONFIG, q.range || TEMPLATE_RANGE, q) || ''
+const buildText = (q: QueryConfig): string => {
+  const range = getTimeRange(q)
+
+  return q.rawText || buildQuery(TYPE_QUERY_CONFIG, range, q) || ''
+}
 
 interface ConnectedProps {
   timeRange: TimeRange

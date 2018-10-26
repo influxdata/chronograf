@@ -231,14 +231,16 @@ export class DataExplorer extends PureComponent<Props, State> {
         return
       }
 
+      const id = uuid.v4()
       const queryConfig = await getConfig(
         source.links.queries,
-        uuid.v4(),
+        id,
         query,
         this.templates
       )
 
       const queryDraft = {
+        id,
         query,
         queryConfig,
         source: sourceLink,

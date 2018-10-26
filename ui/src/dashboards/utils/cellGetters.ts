@@ -9,7 +9,8 @@ import {
   UNTITLED_GRAPH,
   NEW_DEFAULT_DASHBOARD_CELL,
 } from 'src/dashboards/constants'
-import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
+import {TEMPLATE_RANGE} from 'src/tempVars/constants'
+
 const MAX_COLUMNS = 12
 
 // Types
@@ -153,12 +154,16 @@ export const getClonedDashboardCell = (
 }
 
 export const getTimeRange = (queryConfig: QueryConfig): DurationRange => {
-  return (
-    queryConfig.range || {
-      upper: null,
-      lower: TEMP_VAR_DASHBOARD_TIME,
-    }
-  )
+  const isUsingDashTime =
+    queryConfig.range &&
+    queryConfig.originalQuery &&
+    queryConfig.originalQuery.indexOf(TEMPLATE_RANGE.lower) !== -1
+
+  if (isUsingDashTime || !queryConfig.range) {
+    return TEMPLATE_RANGE
+  }
+
+  return queryConfig.range
 }
 
 export const getConfig = async (
@@ -173,5 +178,5 @@ export const getConfig = async (
   ])
   const {queryConfig} = queries.find(q => q.id === id)
 
-  return queryConfig
+  return {...queryConfig, originalQuery: query}
 }
