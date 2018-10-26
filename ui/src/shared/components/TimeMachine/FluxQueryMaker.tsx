@@ -85,7 +85,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     const divisions = [
       {
         name: 'Explore Schema',
-        size: rightSize,
+        size: leftSize,
         headerButtons: [],
         menuOptions: [],
         render: () => <SchemaExplorer source={source} notify={notify} />,
@@ -93,7 +93,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       },
       {
         name: 'Script',
-        size: leftSize,
+        size: rightSize,
         headerOrientation: HANDLE_VERTICAL,
         headerButtons: [
           <Button
