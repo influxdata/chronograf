@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {PureComponent, MouseEvent} from 'react'
 import {AutoSizer, Grid} from 'react-virtualized'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -90,11 +90,11 @@ class RawFluxDataTable extends PureComponent<Props, State> {
     )
   }
 
-  private onScrollbarsScroll = e => {
+  private onScrollbarsScroll = (e: MouseEvent<HTMLElement>) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const {scrollTop, scrollLeft} = e.target as HTMLElement
+    const {scrollTop, scrollLeft} = e.currentTarget
 
     this.setState({scrollLeft, scrollTop})
   }
