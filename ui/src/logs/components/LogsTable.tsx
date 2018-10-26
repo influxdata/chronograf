@@ -83,7 +83,6 @@ interface Props {
 interface State {
   scrollLeft: number
   scrollTop: number
-  currentRow: number
   currentMessageWidth: number
   isMessageVisible: boolean
   visibleColumnsCount: number
@@ -139,7 +138,6 @@ class LogsTable extends Component<Props, State> {
       isQuerying: false,
       scrollTop,
       scrollLeft,
-      currentRow: -1,
       currentMessageWidth,
       isMessageVisible,
       visibleColumnsCount,
@@ -168,7 +166,6 @@ class LogsTable extends Component<Props, State> {
       searchPattern: null,
       scrollTop: 0,
       scrollLeft: 0,
-      currentRow: -1,
       currentMessageWidth: 0,
       infiniteLoaderQueryCount: 0,
       isMessageVisible,
@@ -215,10 +212,7 @@ class LogsTable extends Component<Props, State> {
     }
 
     return (
-      <div
-        className="logs-viewer--table-container"
-        onMouseOut={this.handleMouseOut}
-      >
+      <div className="logs-viewer--table-container">
         <AutoSizer>
           {({width}) => (
             <Grid
@@ -521,7 +515,6 @@ class LogsTable extends Component<Props, State> {
           <div
             className={`logs-viewer--dot ${value}-severity`}
             title={value}
-            onMouseOver={this.handleMouseOver}
             data-index={rowIndex}
             style={this.severityDotStyle(colorLevel.color, colorLevel.level)}
           />
@@ -537,26 +530,20 @@ class LogsTable extends Component<Props, State> {
       formattedValue = this.renderMessage(formattedValue as string)
     }
 
-    const highlightRow = rowIndex === this.state.currentRow
-
     if (column === 'timestamp') {
       return (
         <div
-          className={classnames('logs-viewer--cell', {
-            highlight: highlightRow,
-          })}
+          className="logs-viewer--cell"
           title={`Jump to '${value}'`}
           key={key}
           style={style}
           data-index={rowIndex}
-          onMouseOver={this.handleMouseOver}
         >
           <div
             data-tag-key={column}
             data-tag-value={value}
             onClick={this.handleTimestampClick(`${formattedValue}`)}
             data-index={rowIndex}
-            onMouseOver={this.handleMouseOver}
             className="logs-viewer--clickable"
           >
             {formattedValue}
@@ -568,21 +555,17 @@ class LogsTable extends Component<Props, State> {
     if (isClickable(column)) {
       return (
         <div
-          className={classnames('logs-viewer--cell', {
-            highlight: highlightRow,
-          })}
+          className="logs-viewer--cell"
           title={`Filter by '${title}'`}
           key={key}
           style={style}
           data-index={rowIndex}
-          onMouseOver={this.handleMouseOver}
         >
           <div
             data-tag-key={column}
             data-tag-value={value}
             onClick={this.handleTagClick}
             data-index={rowIndex}
-            onMouseOver={this.handleMouseOver}
             className="logs-viewer--clickable"
           >
             {formattedValue}
@@ -596,12 +579,10 @@ class LogsTable extends Component<Props, State> {
     return (
       <div
         className={classnames(`logs-viewer--cell  ${column}--cell`, {
-          highlight: highlightRow,
           'message-wrap': wrapMessage,
         })}
         key={key}
         style={style}
-        onMouseOver={this.handleMouseOver}
         data-index={rowIndex}
       >
         {formattedValue}
@@ -647,12 +628,6 @@ class LogsTable extends Component<Props, State> {
     }
   }
 
-  private handleMouseOver = (e: MouseEvent<HTMLElement>): void => {
-    const target = e.target as HTMLElement
-    const index = target.dataset.index || target.parentElement.dataset.index
-    this.setState({currentRow: +index})
-  }
-
   private handleTimestampClick = (time: string) => () => {
     const {onChooseCustomTime} = this.props
     const formattedTime = moment(time, DEFAULT_TIME_FORMAT).toISOString()
@@ -669,10 +644,6 @@ class LogsTable extends Component<Props, State> {
     }
 
     onTagSelection(selection)
-  }
-
-  private handleMouseOut = () => {
-    this.setState({currentRow: -1})
   }
 
   private get loadingStatus(): JSX.Element {
