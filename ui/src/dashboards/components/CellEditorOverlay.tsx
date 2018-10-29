@@ -136,14 +136,14 @@ class CellEditorOverlay extends Component<Props, State> {
         ref={this.overlayRef}
       >
         <TimeMachine
-          fluxLinks={fluxLinks}
           notify={notify}
-          editQueryStatus={editQueryStatus}
-          templates={templates}
           source={source}
-          onResetFocus={this.handleResetFocus}
           isInCEO={true}
           sources={sources}
+          fluxLinks={fluxLinks}
+          templates={templates}
+          editQueryStatus={editQueryStatus}
+          onResetFocus={this.handleResetFocus}
           onToggleStaticLegend={this.handleToggleStaticLegend}
           isStaticLegend={isStaticLegend}
           queryStatus={queryStatus}

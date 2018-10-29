@@ -11,6 +11,9 @@ import TimeMachineBottom from 'src/shared/components/TimeMachine/TimeMachineBott
 import TimeMachineControls from 'src/shared/components/TimeMachine/TimeMachineControls'
 import TimeMachineVisualization from 'src/shared/components/TimeMachine/TimeMachineVisualization'
 import FluxQueryMaker from 'src/shared/components/TimeMachine/FluxQueryMaker'
+import ManualRefresh, {
+  ManualRefreshProps,
+} from 'src/shared/components/ManualRefresh'
 
 // Utils
 import {getConfig} from 'src/dashboards/utils/cellGetters'
@@ -79,7 +82,6 @@ interface PassedProps {
     activeEditorTab: CEOTabs,
     onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
   ) => JSX.Element
-  manualRefresh?: number
   queryStatus: QueryStatus
   onUpdateScriptStatus?: (status: ScriptStatus) => void
 }
@@ -93,7 +95,7 @@ interface State {
   autoRefreshDuration: number // milliseconds
 }
 
-type Props = PassedProps & ConnectedProps
+type Props = PassedProps & ConnectedProps & ManualRefreshProps
 
 class TimeMachine extends PureComponent<Props, State> {
   constructor(props: Props) {
@@ -131,9 +133,9 @@ class TimeMachine extends PureComponent<Props, State> {
 
   public render() {
     const {
+      script,
       timeRange,
       templates,
-      script,
       timeMachineProportions,
       onSetTimeMachineProportions,
     } = this.props
@@ -165,24 +167,24 @@ class TimeMachine extends PureComponent<Props, State> {
       <div className="deceo">
         {this.pageHeader}
         <TimeMachineControls
-          queries={this.queriesWorkingDraft}
-          templates={templates}
-          source={this.source}
-          toggleFluxOn={this.toggleFluxOn}
-          toggleFluxOff={this.toggleFluxOff}
-          sources={this.formattedSources}
-          isFluxSelected={this.isFluxSelected}
-          isViewingRawData={isViewingRawData}
           script={script}
-          sourceSupportsFlux={this.sourceSupportsFlux}
-          toggleIsViewingRawData={this.handleToggleIsViewingRawData}
-          autoRefreshDuration={autoRefreshDuration}
-          onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
-          onChangeSource={this.handleChangeSource}
-          onSelectDynamicSource={this.handleSelectDynamicSource}
-          isDynamicSourceSelected={this.useDynamicSource}
+          source={this.source}
+          templates={templates}
           timeRange={timeRange}
+          sources={this.formattedSources}
+          toggleFluxOn={this.toggleFluxOn}
+          queries={this.queriesWorkingDraft}
+          toggleFluxOff={this.toggleFluxOff}
+          isViewingRawData={isViewingRawData}
+          isFluxSelected={this.isFluxSelected}
+          onChangeSource={this.handleChangeSource}
+          autoRefreshDuration={autoRefreshDuration}
+          sourceSupportsFlux={this.sourceSupportsFlux}
+          isDynamicSourceSelected={this.useDynamicSource}
+          onSelectDynamicSource={this.handleSelectDynamicSource}
           updateEditorTimeRange={this.handleUpdateEditorTimeRange}
+          toggleIsViewingRawData={this.handleToggleIsViewingRawData}
+          onChangeAutoRefreshDuration={this.handleChangeAutoRefreshDuration}
         />
         <div className="deceo--container">
           <Threesizer
@@ -202,14 +204,14 @@ class TimeMachine extends PureComponent<Props, State> {
     return (
       <TimeMachineVisualization
         source={this.source}
-        autoRefresher={autoRefresher}
-        queries={this.queriesForVis}
         templates={templates}
-        onEditQueryStatus={this.handleEditQueryStatus}
+        queries={this.queriesForVis}
+        autoRefresher={autoRefresher}
         staticLegend={isStaticLegend}
         manualRefresh={manualRefresh}
         editorLocation={this.stateToUpdate}
         showRawFluxData={isViewingRawData}
+        onEditQueryStatus={this.handleEditQueryStatus}
       />
     )
   }
@@ -321,23 +323,25 @@ class TimeMachine extends PureComponent<Props, State> {
   private get fluxBuilder(): JSX.Element {
     const {
       script,
-      onChangeScript,
-      draftScript,
-      onChangeDraftScript,
-      fluxLinks,
-      onUpdateScriptStatus,
       notify,
+      fluxLinks,
+      draftScript,
+      onChangeScript,
+      onManualRefresh,
+      onChangeDraftScript,
+      onUpdateScriptStatus,
     } = this.props
 
     return (
       <FluxQueryMaker
         notify={notify}
-        draftScript={draftScript}
-        source={this.source}
         script={script}
-        onChangeScript={onChangeScript}
-        onChangeDraftScript={onChangeDraftScript}
         links={fluxLinks}
+        source={this.source}
+        draftScript={draftScript}
+        onChangeScript={onChangeScript}
+        onManualRefresh={onManualRefresh}
+        onChangeDraftScript={onChangeDraftScript}
         onUpdateStatus={onUpdateScriptStatus}
       />
     )
@@ -552,7 +556,7 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 }
 
-const ConnectedTimeMachine = (props: PassedProps) => {
+const ConnectedTimeMachine = (props: PassedProps & ManualRefreshProps) => {
   return (
     <Subscribe to={[TimeMachineContainer]}>
       {(container: TimeMachineContainer) => {
@@ -582,4 +586,4 @@ const ConnectedTimeMachine = (props: PassedProps) => {
   )
 }
 
-export default ConnectedTimeMachine
+export default ManualRefresh(ConnectedTimeMachine)

@@ -293,7 +293,10 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       ...color,
       type: thresholdsListType,
     }))
-    return this.setAndPersistState({thresholdsListType, thresholdsListColors})
+    return this.setAndPersistState({
+      thresholdsListType,
+      thresholdsListColors,
+    })
   }
 
   public handleUpdateGaugeColors = (gaugeColors: ColorNumber[]) => {
