@@ -18,6 +18,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {restartable} from 'src/shared/utils/restartable'
 import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 import {parseResponse} from 'src/shared/parsing/flux/response'
+import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {DEFAULT_X_PIXELS} from 'src/shared/constants'
 
 // Types
@@ -35,6 +36,7 @@ import {TimeSeriesServerResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 
 export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
+const EXECUTE_QUERIES_DEBOUNCE_MS = 400
 
 interface RenderProps {
   timeSeriesInfluxQL: TimeSeriesServerResponse[]
@@ -50,6 +52,7 @@ interface Props {
   uuid: string
   queries: Query[]
   timeRange: TimeRange
+  xPixels?: number
   children: (r: RenderProps) => JSX.Element
   inView?: boolean
   templates?: Template[]
@@ -71,8 +74,6 @@ interface State {
   errorMessage: string
 }
 
-const TEMP_RES = DEFAULT_X_PIXELS // FIXME
-
 const GraphLoadingDots = () => (
   <div className="graph-panel__refreshing">
     <div />
@@ -85,6 +86,7 @@ class TimeSeries extends PureComponent<Props, State> {
   public static defaultProps = {
     inView: true,
     templates: [],
+    xPixels: DEFAULT_X_PIXELS,
     editQueryStatus: () => ({
       type: 'NOOP',
       payload: {},
@@ -109,6 +111,7 @@ class TimeSeries extends PureComponent<Props, State> {
 
   private executeFluxQuery = restartable(executeFluxQuery)
   private executeInfluxQLQueries = restartable(executeInfluxQLQueries)
+  private debouncer: Debouncer = new DefaultDebouncer()
 
   constructor(props: Props) {
     super(props)
@@ -125,8 +128,12 @@ class TimeSeries extends PureComponent<Props, State> {
     }
   }
 
-  public async componentDidMount() {
+  public componentDidMount() {
     this.executeQueries()
+  }
+
+  public componentWillUnmount() {
+    this.debouncer.cancelAll()
   }
 
   public async componentDidUpdate(prevProps: Props) {
@@ -137,9 +144,10 @@ class TimeSeries extends PureComponent<Props, State> {
     if (
       this.props.uuid !== prevProps.uuid ||
       queriesDifferent ||
-      this.state.isFirstFetch
+      this.state.isFirstFetch ||
+      this.props.xPixels !== prevProps.xPixels
     ) {
-      this.executeQueries()
+      this.debouncer.call(this.executeQueries, EXECUTE_QUERIES_DEBOUNCE_MS)
     }
   }
 
@@ -267,14 +275,22 @@ class TimeSeries extends PureComponent<Props, State> {
   }
 
   private executeTemplatedFluxQuery = async (latestUUID: string) => {
-    const {queries, onNotify, source, timeRange, fluxASTLink} = this.props
+    const {
+      queries,
+      onNotify,
+      source,
+      timeRange,
+      fluxASTLink,
+      xPixels,
+    } = this.props
+
     const script: string = _.get(queries, '0.text', '')
 
     const renderedScript = await renderTemplatesInScript(
       script,
       timeRange,
       fluxASTLink,
-      TEMP_RES
+      xPixels
     )
 
     const results = await this.executeFluxQuery(
@@ -293,7 +309,7 @@ class TimeSeries extends PureComponent<Props, State> {
   private executeInfluxQLWithStatus = async (
     latestUUID: string
   ): Promise<TimeSeriesServerResponse[]> => {
-    const {source, templates, editQueryStatus, queries} = this.props
+    const {source, templates, editQueryStatus, queries, xPixels} = this.props
 
     for (const query of queries) {
       editQueryStatus(query.id, {loading: true})
@@ -303,7 +319,7 @@ class TimeSeries extends PureComponent<Props, State> {
       source,
       queries,
       templates,
-      TEMP_RES,
+      xPixels,
       latestUUID
     )
 
