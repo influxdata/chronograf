@@ -11,6 +11,10 @@ interface ExecuteFluxQueryResult {
   uuid?: string
 }
 
+interface XHRError extends Error {
+  xhr?: XMLHttpRequest
+}
+
 export const executeQuery = async (
   source: Source,
   query: string,
@@ -71,18 +75,22 @@ export const executeQuery = async (
   }
 
   const reject = () => {
-    let bodyError
+    let bodyError = null
 
     try {
       bodyError = JSON.parse(xhr.responseText).error
     } catch {
-      bodyError = null
+      if (xhr.responseText && xhr.responseText.trim() !== '') {
+        bodyError = xhr.responseText
+      }
     }
 
     const statusError = xhr.statusText
     const fallbackError = 'failed to execute Flux query'
+    const error: XHRError = new Error(bodyError || statusError || fallbackError)
+    error.xhr = xhr
 
-    deferred.reject(new Error(bodyError || statusError || fallbackError))
+    deferred.reject(error)
     clearTimeout(interval)
   }
 
