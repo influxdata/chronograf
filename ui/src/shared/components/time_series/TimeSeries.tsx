@@ -43,6 +43,7 @@ interface RenderProps {
   timeSeriesFlux: FluxTable[]
   rawFluxData: string
   loading: RemoteDataState
+  isInitialFetch: boolean
   uuid: string
   errorMessage: string
 }
@@ -64,9 +65,8 @@ interface Props {
 }
 
 interface State {
-  timeRange: TimeRange
   loading: RemoteDataState
-  isFirstFetch: boolean
+  fetchCount: number
   rawFluxData: string
   timeSeriesInfluxQL: TimeSeriesServerResponse[]
   timeSeriesFlux: FluxTable[]
@@ -93,22 +93,6 @@ class TimeSeries extends PureComponent<Props, State> {
     }),
   }
 
-  public static getDerivedStateFromProps(props: Props, state: State) {
-    const oldUpper = _.get(state, 'timeRange.upper', null)
-    const oldLower = _.get(state, 'timeRange.lower', null)
-    const newUpper = _.get(props, 'timeRange.upper', null)
-    const newLower = _.get(props, 'timeRange.lower', null)
-
-    if (oldUpper !== newUpper || oldLower !== newLower) {
-      return {
-        isFirstFetch: true,
-        timeRange: props.timeRange,
-      }
-    }
-
-    return null
-  }
-
   private executeFluxQuery = restartable(executeFluxQuery)
   private executeInfluxQLQueries = restartable(executeInfluxQLQueries)
   private debouncer: Debouncer = new DefaultDebouncer()
@@ -117,10 +101,9 @@ class TimeSeries extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      timeRange: props.timeRange,
       timeSeriesInfluxQL: DEFAULT_TIME_SERIES,
       loading: RemoteDataState.NotStarted,
-      isFirstFetch: true,
+      fetchCount: 0,
       timeSeriesFlux: [],
       rawFluxData: '',
       latestUUID: null,
@@ -141,12 +124,20 @@ class TimeSeries extends PureComponent<Props, State> {
     const currQueries = _.map(this.props.queries, q => q.text)
     const queriesDifferent = !_.isEqual(prevQueries, currQueries)
 
-    if (
-      this.props.uuid !== prevProps.uuid ||
+    const oldLower = _.get(prevProps, 'timeRange.lower')
+    const oldUpper = _.get(prevProps, 'timeRange.upper')
+    const newLower = _.get(this.props, 'timeRange.lower')
+    const newUpper = _.get(this.props, 'timeRange.upper')
+    const timeRangeChanged = oldLower !== newLower || oldUpper !== newUpper
+
+    const shouldExecuteQueries =
       queriesDifferent ||
-      this.state.isFirstFetch ||
+      timeRangeChanged ||
+      this.props.uuid !== prevProps.uuid ||
+      this.state.fetchCount === 0 ||
       this.props.xPixels !== prevProps.xPixels
-    ) {
+
+    if (shouldExecuteQueries) {
       this.debouncer.call(this.executeQueries, EXECUTE_QUERIES_DEBOUNCE_MS)
     }
   }
@@ -157,14 +148,10 @@ class TimeSeries extends PureComponent<Props, State> {
       timeSeriesFlux,
       rawFluxData,
       loading,
-      isFirstFetch,
+      fetchCount,
       latestUUID,
       errorMessage,
     } = this.state
-
-    if (isFirstFetch && loading === RemoteDataState.Loading) {
-      return <div className="graph-empty">{this.spinner}</div>
-    }
 
     return (
       <>
@@ -173,6 +160,7 @@ class TimeSeries extends PureComponent<Props, State> {
           timeSeriesInfluxQL,
           timeSeriesFlux,
           rawFluxData,
+          isInitialFetch: fetchCount === 1,
           loading,
           uuid: latestUUID,
           errorMessage,
@@ -192,16 +180,6 @@ class TimeSeries extends PureComponent<Props, State> {
 
     if (loading === RemoteDataState.Loading) {
       return <GraphLoadingDots />
-    }
-
-    return null
-  }
-
-  private get spinner(): JSX.Element {
-    const {loading} = this.state
-
-    if (loading === RemoteDataState.Loading) {
-      return <h3 className="graph-spinner" />
     }
 
     return null
@@ -233,7 +211,7 @@ class TimeSeries extends PureComponent<Props, State> {
 
     this.setState({
       loading: RemoteDataState.Loading,
-      isFirstFetch: false,
+      fetchCount: this.state.fetchCount + 1,
     })
 
     let errorMessage = ''

@@ -175,9 +175,18 @@ class RefreshingGraph extends Component<Props> {
                     timeSeriesFlux,
                     rawFluxData,
                     loading,
+                    isInitialFetch,
                     uuid,
                     errorMessage,
                   }) => {
+                    if (isInitialFetch && loading === RemoteDataState.Loading) {
+                      return (
+                        <div className="graph-empty">
+                          <h3 className="graph-spinner" />
+                        </div>
+                      )
+                    }
+
                     if (!this.hasValues(timeSeriesFlux, timeSeriesInfluxQL)) {
                       if (errorMessage && _.get(queries, '0.text', '').trim()) {
                         return <InvalidData message={errorMessage} />
