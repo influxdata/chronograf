@@ -256,7 +256,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
     return this.topGridHeight
   }
 
-  private onScrollbarsScroll = (e: React.MouseEvent<JSX.Element>) => {
+  private onScrollbarsScroll = (e: React.MouseEvent<HTMLElement>) => {
     const {scrollTop} = e.target as HTMLElement
     const {scrollLeft} = this.state
 
