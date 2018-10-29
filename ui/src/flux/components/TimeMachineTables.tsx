@@ -28,6 +28,8 @@ interface Props {
   timeFormat: string
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
+  width: number
+  height: number
   handleSetHoverTime?: (hovertime: string) => void
   colors: ColorString[]
   editorLocation?: QueryUpdateState
@@ -75,6 +77,8 @@ class TimeMachineTables extends PureComponent<Props, State> {
 
   public render() {
     const {
+      width,
+      height,
       colors,
       dataType,
       timeFormat,
@@ -86,7 +90,10 @@ class TimeMachineTables extends PureComponent<Props, State> {
     } = this.props
 
     return (
-      <div className="time-machine-tables">
+      <div
+        className="time-machine-tables"
+        style={{width: `${width}px`, height: `${height}px`}}
+      >
         {this.showSidebar && (
           <TableSidebar
             data={this.props.data}

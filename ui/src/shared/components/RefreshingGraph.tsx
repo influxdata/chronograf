@@ -2,6 +2,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import _ from 'lodash'
+import {AutoSizer} from 'react-virtualized'
 
 // Components
 import LineGraph from 'src/shared/components/LineGraph'
@@ -54,9 +55,7 @@ import {
   NoteVisibility,
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-import {
-  TimeSeriesServerResponse,
-} from 'src/types/series'
+import {TimeSeriesServerResponse} from 'src/types/series'
 
 interface TypeAndData {
   dataType: DataType
@@ -145,78 +144,103 @@ class RefreshingGraph extends Component<Props> {
     }
 
     return (
-      <AutoRefresh autoRefresh={autoRefresher} manualRefresh={manualRefresh}>
-        {refreshingUUID => (
-          <TimeSeries
-            uuid={refreshingUUID}
-            source={source}
-            inView={inView}
-            queries={this.queries}
-            timeRange={timeRange}
-            templates={templates}
-            fluxASTLink={fluxASTLink}
-            editQueryStatus={editQueryStatus}
-            onNotify={onNotify}
-            grabDataForDownload={grabDataForDownload}
-            grabFluxData={grabFluxData}
-          >
-            {({
-              timeSeriesInfluxQL,
-              timeSeriesFlux,
-              rawFluxData,
-              loading,
-              uuid,
-              errorMessage,
-            }) => {
-              if (!this.hasValues(timeSeriesFlux, timeSeriesInfluxQL)) {
-                if (errorMessage && _.get(queries, '0.text', '').trim()) {
-                  return <InvalidData message={errorMessage} />
-                }
+      <AutoSizer>
+        {({width, height}) => {
+          if (width === 0) {
+            return null
+          }
 
-                if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
-                  return <MarkdownCell text={cellNote} />
-                }
-
-                if (
-                  this.isFluxQuery &&
-                  !getDeep<string>(source, 'links.flux', null)
-                ) {
-                  return (
-                    <div className="graph-empty">
-                      <p>The current source does not support Flux</p>
-                    </div>
-                  )
-                }
-
-                return (
-                  <div className="graph-empty">
-                    <p>No Results</p>
-                  </div>
-                )
-              }
-
-              if (showRawFluxData) {
-                return <RawFluxDataTable csv={rawFluxData} />
-              }
-
-              switch (type) {
-                case CellType.SingleStat:
-                  return this.singleStat(timeSeriesInfluxQL, timeSeriesFlux)
-                case CellType.Table:
-                  return this.table(timeSeriesInfluxQL, timeSeriesFlux, uuid)
-                case CellType.Gauge:
-                  return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
-                default:
-                  return this.lineGraph(
+          return (
+            <AutoRefresh
+              autoRefresh={autoRefresher}
+              manualRefresh={manualRefresh}
+            >
+              {refreshingUUID => (
+                <TimeSeries
+                  uuid={refreshingUUID}
+                  source={source}
+                  inView={inView}
+                  queries={this.queries}
+                  timeRange={timeRange}
+                  xPixels={width}
+                  templates={templates}
+                  fluxASTLink={fluxASTLink}
+                  editQueryStatus={editQueryStatus}
+                  onNotify={onNotify}
+                  grabDataForDownload={grabDataForDownload}
+                  grabFluxData={grabFluxData}
+                >
+                  {({
                     timeSeriesInfluxQL,
                     timeSeriesFlux,
-                    loading
-                  )
-              }
-            }}
-          </TimeSeries>
-        )}
-      </AutoRefresh>
+                    rawFluxData,
+                    loading,
+                    uuid,
+                    errorMessage,
+                  }) => {
+                    if (!this.hasValues(timeSeriesFlux, timeSeriesInfluxQL)) {
+                      if (errorMessage && _.get(queries, '0.text', '').trim()) {
+                        return <InvalidData message={errorMessage} />
+                      }
+
+                      if (
+                        cellNoteVisibility === NoteVisibility.ShowWhenNoData
+                      ) {
+                        return <MarkdownCell text={cellNote} />
+                      }
+
+                      if (
+                        this.isFluxQuery &&
+                        !getDeep<string>(source, 'links.flux', null)
+                      ) {
+                        return (
+                          <div className="graph-empty">
+                            <p>The current source does not support Flux</p>
+                          </div>
+                        )
+                      }
+
+                      return (
+                        <div className="graph-empty">
+                          <p>No Results</p>
+                        </div>
+                      )
+                    }
+
+                    if (showRawFluxData) {
+                      return <RawFluxDataTable csv={rawFluxData} />
+                    }
+
+                    switch (type) {
+                      case CellType.SingleStat:
+                        return this.singleStat(
+                          timeSeriesInfluxQL,
+                          timeSeriesFlux
+                        )
+                      case CellType.Table:
+                        return this.table(
+                          timeSeriesInfluxQL,
+                          timeSeriesFlux,
+                          uuid,
+                          width,
+                          height
+                        )
+                      case CellType.Gauge:
+                        return this.gauge(timeSeriesInfluxQL, timeSeriesFlux)
+                      default:
+                        return this.lineGraph(
+                          timeSeriesInfluxQL,
+                          timeSeriesFlux,
+                          loading
+                        )
+                    }
+                  }}
+                </TimeSeries>
+              )}
+            </AutoRefresh>
+          )
+        }}
+      </AutoSizer>
     )
   }
 
@@ -297,7 +321,9 @@ class RefreshingGraph extends Component<Props> {
   private table = (
     influxQLData: TimeSeriesServerResponse[],
     fluxData: FluxTable[],
-    uuid: string
+    uuid: string,
+    width: number,
+    height: number
   ): JSX.Element => {
     const {
       colors,
@@ -319,6 +345,8 @@ class RefreshingGraph extends Component<Props> {
           uuid={uuid}
           dataType={dataType}
           colors={colors}
+          width={width}
+          height={height}
           key={manualRefresh}
           tableOptions={tableOptions}
           fieldOptions={fieldOptions}
