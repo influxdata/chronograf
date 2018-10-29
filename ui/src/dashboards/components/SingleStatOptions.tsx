@@ -58,7 +58,6 @@ class SingleStatOptions extends PureComponent<Props> {
                 placeholder="%, MPH, etc."
                 defaultValue={prefix}
                 onChange={this.handleUpdatePrefix}
-                maxLength={5}
               />
             </div>
             <div className="form-group col-xs-6">
@@ -68,7 +67,6 @@ class SingleStatOptions extends PureComponent<Props> {
                 placeholder="%, MPH, etc."
                 defaultValue={suffix}
                 onChange={this.handleUpdateSuffix}
-                maxLength={5}
               />
             </div>
             <GraphOptionsDecimalPlaces

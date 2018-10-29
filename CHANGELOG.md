@@ -40,6 +40,8 @@
 1.  [#4429](https://github.com/influxdata/chronograf/pull/4429): Fix query editor flickering on update
 1.  [#4452](https://github.com/influxdata/chronograf/pull/4452): Improve log search spinner info
 1.  [#4525](https://github.com/influxdata/chronograf/pull/4525): Move expanded log message copy button to top right
+1.  [#4665](https://github.com/influxdata/chronograf/pull/4665): Remove shadow from note cells
+1.  [#4665](https://github.com/influxdata/chronograf/pull/4665): Remove character count limit from prefix and suffix for Single Stat and Gauge cells
 
 ### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
