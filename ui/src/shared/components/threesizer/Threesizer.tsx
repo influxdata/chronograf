@@ -276,15 +276,15 @@ class Threesizer extends PureComponent<Props, State> {
       return
     }
 
-    const divisions = this.state.divisions.map(d => {
+    const divisionSizes = this.state.divisions.map(d => {
       if (d.id !== id) {
-        return {...d, size: 0}
+        return 0
       }
 
-      return {...d, size: 1}
+      return 1
     })
 
-    this.setState({divisions})
+    this.props.onResize(divisionSizes)
   }
 
   private handleMinimize = (id: string): void => {
@@ -302,15 +302,15 @@ class Threesizer extends PureComponent<Props, State> {
       size = 1 / (this.state.divisions.length - 1)
     }
 
-    const divisions = this.state.divisions.map(d => {
+    const divisionSizes = this.state.divisions.map(d => {
       if (d.id !== id) {
-        return {...d, size}
+        return size
       }
 
-      return {...d, size: 0}
+      return 0
     })
 
-    this.setState({divisions})
+    this.props.onResize(divisionSizes)
   }
 
   private equalize = () => {
