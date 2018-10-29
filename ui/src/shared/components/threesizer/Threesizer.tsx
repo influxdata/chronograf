@@ -22,7 +22,7 @@ import {
   MAX_SIZE,
 } from 'src/shared/constants/'
 
-const initialDragEvent = {
+const initialDragEvent: DragEvent = {
   percentX: 0,
   percentY: 0,
   mouseX: null,
@@ -75,6 +75,8 @@ class Threesizer extends PureComponent<Props, State> {
   }
 
   private containerRef: HTMLElement
+  private percentChangeX: number
+  private percentChangeY: number
   private debouncer: Debouncer = new DefaultDebouncer()
 
   constructor(props) {
@@ -97,7 +99,7 @@ class Threesizer extends PureComponent<Props, State> {
     document.removeEventListener('mouseleave', this.handleStopDrag)
   }
 
-  public componentDidUpdate(__, prevState) {
+  public componentDidUpdate(__, prevState: State) {
     const {dragEvent, divisions} = this.state
     const {orientation} = this.props
 
@@ -118,6 +120,15 @@ class Threesizer extends PureComponent<Props, State> {
     if (_.isEqual(dragEvent, prevState.dragEvent)) {
       return
     }
+
+    this.percentChangeX = this.percentChange(
+      prevState.dragEvent.percentX,
+      dragEvent.percentX
+    )
+    this.percentChangeY = this.percentChange(
+      prevState.dragEvent.percentY,
+      dragEvent.percentY
+    )
 
     const {percentX, percentY} = dragEvent
     const {dragEvent: prevDrag} = prevState
@@ -340,6 +351,14 @@ class Threesizer extends PureComponent<Props, State> {
     }
   }
 
+  private percentChange = (startValue, endValue) => {
+    if (!startValue || !endValue) {
+      return 0
+    }
+    const delta = Math.abs(startValue - endValue)
+    return delta
+  }
+
   private handleDrag = (e: MouseEvent<HTMLElement>) => {
     const {activeHandleID} = this.state
     if (!activeHandleID) {
@@ -368,9 +387,6 @@ class Threesizer extends PureComponent<Props, State> {
   }
 
   private up = activePosition => () => {
-    const {
-      dragEvent: {percentY},
-    } = this.state
     const divisionSizes = this.state.divisions.map((d, i) => {
       if (!activePosition) {
         return d.size
@@ -383,18 +399,18 @@ class Threesizer extends PureComponent<Props, State> {
       if (first && !before) {
         const second = this.state.divisions[1]
         if (second && second.size === 0) {
-          return this.enforceMin(percentY)
+          return this.shorter(d.size)
         }
 
         return d.size
       }
 
       if (before) {
-        return this.enforceMin(percentY)
+        return this.shorter(d.size)
       }
 
       if (current) {
-        return this.enforceMax(1 - percentY)
+        return this.taller(d.size)
       }
 
       return d.size
@@ -404,9 +420,6 @@ class Threesizer extends PureComponent<Props, State> {
   }
 
   private left = activePosition => () => {
-    const {
-      dragEvent: {percentX},
-    } = this.state
     const divisionSizes = this.state.divisions.map((d, i) => {
       if (!activePosition) {
         return d.size
@@ -419,18 +432,18 @@ class Threesizer extends PureComponent<Props, State> {
       if (first && !before) {
         const second = this.state.divisions[1]
         if (second && second.size === 0) {
-          return this.enforceMin(percentX)
+          return this.thinner(d.size)
         }
 
         return d.size
       }
 
       if (before) {
-        return this.enforceMin(percentX)
+        return this.thinner(d.size)
       }
 
       if (active) {
-        return this.enforceMax(1 - percentX)
+        return this.fatter(d.size)
       }
 
       return d.size
@@ -439,21 +452,35 @@ class Threesizer extends PureComponent<Props, State> {
     this.props.onResize(divisionSizes)
   }
 
+  private taller = (size: number): number => {
+    const newSize = size + this.percentChangeY
+    return this.enforceMax(newSize)
+  }
+  private fatter = (size: number): number => {
+    const newSize = size + this.percentChangeX
+    return this.enforceMax(newSize)
+  }
+  private shorter = (size: number): number => {
+    const newSize = size - this.percentChangeY
+    return this.enforceMin(newSize)
+  }
+  private thinner = (size: number): number => {
+    const newSize = size - this.percentChangeX
+    return this.enforceMin(newSize)
+  }
+
   private right = activePosition => () => {
-    const {
-      dragEvent: {percentX},
-    } = this.state
     const divisionSizes = this.state.divisions.map((d, i, divs) => {
       const before = i === activePosition - 1
       const active = i === activePosition
       const after = i === activePosition + 1
 
       if (before) {
-        return this.enforceMax(percentX)
+        return this.fatter(d.size)
       }
 
       if (active) {
-        return this.enforceMin(1 - percentX)
+        return this.thinner(d.size)
       }
 
       if (after) {
@@ -461,7 +488,7 @@ class Threesizer extends PureComponent<Props, State> {
         const left = _.get(divs, leftIndex, {size: 'none'})
 
         if (left && left.size === 0) {
-          return this.enforceMin(1 - percentX)
+          return this.thinner(d.size)
         }
 
         return d.size
@@ -474,27 +501,23 @@ class Threesizer extends PureComponent<Props, State> {
   }
 
   private down = activePosition => () => {
-    const {
-      dragEvent: {percentY},
-    } = this.state
-
     const divisionSizes = this.state.divisions.map((d, i, divs) => {
       const before = i === activePosition - 1
       const current = i === activePosition
       const after = i === activePosition + 1
 
       if (before) {
-        return this.enforceMax(percentY)
+        return this.taller(d.size)
       }
 
       if (current) {
-        return this.enforceMin(1 - percentY)
+        return this.shorter(d.size)
       }
 
       if (after) {
         const above = divs[i - 1]
         if (above && above.size === 0) {
-          return this.enforceMin(1 - percentY)
+          return this.shorter(d.size)
         }
 
         return d.size
