@@ -55,7 +55,6 @@ import {
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 import {
-  TimeSeriesSuccessfulResult,
   TimeSeriesServerResponse,
 } from 'src/types/series'
 
@@ -133,11 +132,7 @@ class RefreshingGraph extends Component<Props> {
       grabDataForDownload,
     } = this.props
 
-    const isEmptyFluxQuery =
-      _.get(queries, '0.type', '') === 'flux' &&
-      !_.get(queries, '0.text', '').trim()
-
-    if (!queries.length || isEmptyFluxQuery) {
+    if (this.shouldShowNoResults) {
       return (
         <div className="graph-empty">
           <p data-test="data-explorer-no-results">{emptyGraphCopy}</p>
@@ -173,22 +168,11 @@ class RefreshingGraph extends Component<Props> {
               uuid,
               errorMessage,
             }) => {
-              const hasValues =
-                timeSeriesFlux.length ||
-                _.some(timeSeriesInfluxQL, s => {
-                  const results = getDeep<TimeSeriesSuccessfulResult[]>(
-                    s,
-                    'response.results',
-                    []
-                  )
-                  const v = _.some(results, r => r.series)
-                  return v
-                })
-
-              if (!hasValues) {
+              if (!this.hasValues(timeSeriesFlux, timeSeriesInfluxQL)) {
                 if (errorMessage && _.get(queries, '0.text', '').trim()) {
                   return <InvalidData message={errorMessage} />
                 }
+
                 if (cellNoteVisibility === NoteVisibility.ShowWhenNoData) {
                   return <MarkdownCell text={cellNote} />
                 }
@@ -199,7 +183,7 @@ class RefreshingGraph extends Component<Props> {
                 ) {
                   return (
                     <div className="graph-empty">
-                      <p>The current source does not support flux</p>
+                      <p>The current source does not support Flux</p>
                     </div>
                   )
                 }
@@ -240,6 +224,23 @@ class RefreshingGraph extends Component<Props> {
     const {queries} = this.props
 
     return getDeep<string>(queries, '0.type', '') === QueryType.Flux
+  }
+
+  private get shouldShowNoResults(): boolean {
+    const {queries} = this.props
+    const isEmptyFluxQuery =
+      this.isFluxQuery && _.get(queries, '0.text', '').trim() === ''
+
+    return !queries.length || isEmptyFluxQuery
+  }
+
+  private hasValues(timeSeriesFlux, timeSeriesInfluxQL): boolean {
+    const hasFluxValues = timeSeriesFlux.length
+    const hasInfluxQLValues = timeSeriesInfluxQL.some(r =>
+      _.get(r, 'response.results.0.series')
+    )
+
+    return hasFluxValues || hasInfluxQLValues
   }
 
   private haveVisOptionsChanged(prevProps: Props): boolean {
