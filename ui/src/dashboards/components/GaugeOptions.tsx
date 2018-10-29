@@ -73,7 +73,6 @@ class GaugeOptions extends PureComponent<Props> {
                 placeholder="%, MPH, etc."
                 defaultValue={y.prefix}
                 onChange={this.handleUpdatePrefix}
-                maxLength={5}
               />
             </div>
             <div className="form-group col-xs-6">
@@ -83,7 +82,6 @@ class GaugeOptions extends PureComponent<Props> {
                 placeholder="%, MPH, etc."
                 defaultValue={y.suffix}
                 onChange={this.handleUpdateSuffix}
-                maxLength={5}
               />
             </div>
             <GraphOptionsDecimalPlaces
