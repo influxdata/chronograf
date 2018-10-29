@@ -71,7 +71,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
   private get categoryName(): string {
     switch (this.props.type) {
       case CategoryType.Measurements:
-        return 'MEASURMENTS'
+        return 'MEASUREMENTS'
       case CategoryType.Fields:
         return 'FIELDS'
       case CategoryType.Tags:
@@ -90,6 +90,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
             source={source}
             notify={notify}
             measurements={categoryTree.measurements}
+            loading={categoryTree.measurementsLoading}
           />
         )
 
@@ -100,6 +101,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
             source={source}
             notify={notify}
             fields={categoryTree.fields}
+            loading={categoryTree.fieldsLoading}
           />
         )
 
@@ -110,6 +112,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
             source={source}
             notify={notify}
             tagKeys={categoryTree.tagKeys}
+            loading={categoryTree.tagsLoading}
           />
         )
     }

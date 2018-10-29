@@ -9,7 +9,7 @@ import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
@@ -17,6 +17,7 @@ interface Props {
   source: Source
   tagKeys: string[]
   notify: NotificationAction
+  loading: RemoteDataState
 }
 
 interface State {
@@ -38,9 +39,18 @@ class TagKeyList extends PureComponent<Props, State> {
   }
 
   private get tagKeys(): JSX.Element | JSX.Element[] {
-    const {db, source, notify, measurement} = this.props
+    const {db, source, notify, measurement, loading} = this.props
 
-    if (!this.props.tagKeys.length) {
+    if (loading === RemoteDataState.Error) {
+      return (
+        <div
+          className={`flux-schema-tree flux-schema--child flux-schema-tree--error`}
+        >
+          Could not fetch tag keys
+        </div>
+      )
+    }
+    if (loading !== RemoteDataState.Done) {
       return <LoaderSkeleton />
     }
 

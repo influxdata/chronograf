@@ -13,7 +13,7 @@ import {
 } from 'src/shared/copy/notifications'
 
 // types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
@@ -21,6 +21,7 @@ interface Props {
   measurement?: string
   fields: string[]
   notify: NotificationAction
+  loading: RemoteDataState
 }
 
 interface State {
@@ -62,12 +63,21 @@ class FieldList extends PureComponent<Props, State> {
   }
 
   private get fields(): JSX.Element | JSX.Element[] {
+    const {loading} = this.props
     const {searchTerm} = this.state
 
-    if (!this.props.fields.length) {
+    if (loading === RemoteDataState.Error) {
+      return (
+        <div
+          className={`flux-schema-tree flux-schema--child flux-schema-tree--error`}
+        >
+          Could not fetch fields
+        </div>
+      )
+    }
+    if (loading !== RemoteDataState.Done) {
       return <LoaderSkeleton />
     }
-
     const term = searchTerm.toLocaleLowerCase()
     const fields = this.props.fields.filter(f =>
       f.toLocaleLowerCase().includes(term)

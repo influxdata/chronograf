@@ -12,13 +12,14 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {OpenState} from 'src/flux/constants/explorer'
 
 // Types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
   source: Source
   notify: NotificationAction
   measurements: {[measurement: string]: string[]}
+  loading: RemoteDataState
 }
 
 interface State {
@@ -37,7 +38,6 @@ class MeasurementsList extends PureComponent<Props, State> {
 
   public render() {
     const {searchTerm} = this.state
-    // console.log('search term changed: ', searchTerm)
 
     return (
       <>
@@ -61,11 +61,20 @@ class MeasurementsList extends PureComponent<Props, State> {
   // all matching children and the path in the tree that leads
   // to them should be displayed
   private get measurements(): JSX.Element | JSX.Element[] {
-    const {source, db, notify} = this.props
+    const {source, db, notify, loading} = this.props
     const {searchTerm} = this.state
-
     const measurementEntries = Object.entries(this.props.measurements)
-    if (!measurementEntries.length) {
+
+    if (loading === RemoteDataState.Error) {
+      return (
+        <div
+          className={`flux-schema-tree flux-schema--child flux-schema-tree--error`}
+        >
+          Could not fetch measurements
+        </div>
+      )
+    }
+    if (loading !== RemoteDataState.Done) {
       return <LoaderSkeleton />
     }
 
@@ -107,6 +116,7 @@ class MeasurementsList extends PureComponent<Props, State> {
             notify={notify}
             fields={filteredFields}
             opened={startOpen}
+            loading={loading}
           />
         )
       })

@@ -178,10 +178,17 @@ class TagValueList extends PureComponent<Props, State> {
         searchTerm: e.target.value,
       },
       () => {
-        this.debouncer.call(async () => {
-          const tagValues = await this.fetchTagValues()
-          this.setState({tagValues})
-        }, 50)
+        try {
+          this.debouncer.call(async () => {
+            const tagValues = await this.fetchTagValues()
+            this.setState({tagValues})
+          }, 50)
+        } catch (error) {
+          this.setState({
+            loading: RemoteDataState.Error,
+            loadingMoreValues: RemoteDataState.Error,
+          })
+        }
       }
     )
   }

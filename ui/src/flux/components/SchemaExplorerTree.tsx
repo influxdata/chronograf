@@ -1,22 +1,15 @@
 // Libraries
-import {PureComponent} from 'react'
+import React, {PureComponent} from 'react'
 import _ from 'lodash'
-
-// Utils
-import {
-  measurements as fetchMeasurementsAsync,
-  fieldsByMeasurement as fetchFieldsByMeasurementAsync,
-  tagKeys as fetchTagKeysAsync,
-} from 'src/shared/apis/flux/metaQueries'
-import parseValuesColumn, {
-  parseFieldsByMeasurements,
-} from 'src/shared/parsing/flux/values'
 
 // Components
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import FetchMeasurements from 'src/flux/components/FetchMeasurements'
+import FetchTagKeys from 'src/flux/components/FetchTagKeys'
+import FetchFields from 'src/flux/components/FetchFields'
 
 // Types
-import {Source} from 'src/types'
+import {Source, RemoteDataState} from 'src/types'
 
 interface Props {
   bucket: string
@@ -24,81 +17,74 @@ interface Props {
   children: (tree: CategoryTree) => JSX.Element
 }
 
-interface State {
-  measurements: string[]
-  fields: string[]
-  fieldsByMeasurements: {[measurement: string]: string[]}
-  tagKeys: string[]
+interface FieldsByMeasurements {
+  [measurement: string]: string[]
 }
 
 export interface CategoryTree {
   measurements: {[m: string]: string[]}
   tagKeys: string[]
   fields: string[]
+  measurementsLoading: RemoteDataState
+  tagsLoading: RemoteDataState
+  fieldsLoading: RemoteDataState
 }
 
 @ErrorHandling
-class SchemaExplorerTree extends PureComponent<Props, State> {
-  constructor(props) {
-    super(props)
-    this.state = {
-      measurements: [],
-      fields: [],
-      fieldsByMeasurements: {},
-      tagKeys: [],
-    }
-  }
-
-  public async componentDidMount() {
-    await this.fetchMeasurements()
-    await this.fetchFields()
-    await this.fetchTagKeys()
-  }
-
+class SchemaExplorerTree extends PureComponent<Props> {
   public render() {
-    return this.props.children(this.tree)
-  }
-
-  private async fetchMeasurements() {
     const {source, bucket} = this.props
-    const measurementResults = await fetchMeasurementsAsync(source, bucket)
-    const measurements = parseValuesColumn(measurementResults)
 
-    this.setState({measurements})
-  }
-
-  private async fetchTagKeys() {
-    const {source, bucket} = this.props
-    const tagKeysResults = await fetchTagKeysAsync(source, bucket, [])
-
-    const tagKeys = parseValuesColumn(tagKeysResults)
-
-    this.setState({tagKeys})
-  }
-
-  private async fetchFields() {
-    const {source, bucket} = this.props
-    const fieldsResults = await fetchFieldsByMeasurementAsync(source, bucket)
-
-    const {fields, fieldsByMeasurements} = parseFieldsByMeasurements(
-      fieldsResults
+    return (
+      <FetchMeasurements source={source} bucket={bucket}>
+        {(measurements, measurementsLoading) => (
+          <FetchTagKeys source={source} bucket={bucket}>
+            {(tagKeys, tagsLoading) => (
+              <FetchFields source={source} bucket={bucket}>
+                {(fields, fieldsByMeasurements, fieldsLoading) =>
+                  this.props.children(
+                    this.tree(
+                      measurements,
+                      tagKeys,
+                      fields,
+                      fieldsByMeasurements,
+                      measurementsLoading,
+                      tagsLoading,
+                      fieldsLoading
+                    )
+                  )
+                }
+              </FetchFields>
+            )}
+          </FetchTagKeys>
+        )}
+      </FetchMeasurements>
     )
-
-    this.setState({fields, fieldsByMeasurements})
   }
 
-  private get tree(): CategoryTree {
-    const {fields, tagKeys} = this.state
-
+  private tree(
+    measurements: string[],
+    tagKeys: string[],
+    fields: string[],
+    fieldsByMeasurements,
+    measurementsLoading: RemoteDataState,
+    tagsLoading: RemoteDataState,
+    fieldsLoading: RemoteDataState
+  ): CategoryTree {
     return {
-      measurements: this.measurementsTree,
+      measurements: this.measurementsTree(measurements, fieldsByMeasurements),
       fields,
       tagKeys,
+      measurementsLoading,
+      tagsLoading,
+      fieldsLoading,
     }
   }
 
-  private get measurementsTree() {
-    const {measurements, fieldsByMeasurements} = this.state
+  private measurementsTree(
+    measurements: string[],
+    fieldsByMeasurements: FieldsByMeasurements
+  ) {
     const measurementsWithNoFields = _.difference(
       measurements,
       Object.keys(fieldsByMeasurements)

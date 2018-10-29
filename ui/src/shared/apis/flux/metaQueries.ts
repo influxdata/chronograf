@@ -146,6 +146,7 @@ export const proxy = async (source: Source, script: string) => {
   const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
   const data = {query: garbage, dialect}
+
   try {
     const response = await AJAX({
       method: 'POST',

@@ -16,7 +16,7 @@ import {
 import {OpenState} from 'src/flux/constants/explorer'
 
 // types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
@@ -26,6 +26,7 @@ interface Props {
   fields: string[]
   notify: NotificationAction
   opened: OpenState
+  loading: RemoteDataState
 }
 
 interface State {
@@ -51,7 +52,7 @@ class MeasurementListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, measurement, fields, notify} = this.props
+    const {db, source, measurement, fields, notify, loading} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -85,6 +86,7 @@ class MeasurementListItem extends PureComponent<Props, State> {
               notify={notify}
               fields={fields}
               measurement={measurement}
+              loading={loading}
             />
           </div>
         )}
