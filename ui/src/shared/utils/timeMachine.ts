@@ -10,6 +10,7 @@ import {
   getGaugeColors,
 } from 'src/shared/constants/thresholds'
 import {GIT_SHA} from 'src/shared/constants'
+import {getTimeRange} from 'src/dashboards/utils/cellGetters'
 
 // Types
 import {Cell, NewDefaultCell, CellQuery, QueryType} from 'src/types'
@@ -66,7 +67,11 @@ function initialQueryDrafts(cell: Cell | NewDefaultCell): CellQuery[] {
 
   return queries.map(q => {
     const id = uuid.v4()
-    const queryConfig = {...q.queryConfig, id}
+    const queryConfig = {
+      ...q.queryConfig,
+      range: getTimeRange(q.queryConfig),
+      id,
+    }
 
     return {...q, queryConfig, id}
   })

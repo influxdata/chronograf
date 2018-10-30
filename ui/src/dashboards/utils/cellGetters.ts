@@ -154,16 +154,21 @@ export const getClonedDashboardCell = (
 }
 
 export const getTimeRange = (queryConfig: QueryConfig): DurationRange => {
-  const isUsingDashTime =
-    queryConfig.range &&
-    queryConfig.originalQuery &&
-    queryConfig.originalQuery.indexOf(TEMPLATE_RANGE.lower) !== -1
+  return getRangeForOriginalQuery(queryConfig.originalQuery, queryConfig.range)
+}
 
-  if (isUsingDashTime || !queryConfig.range) {
+const getRangeForOriginalQuery = (
+  originalQuery: string,
+  range: DurationRange
+): DurationRange => {
+  const isUsingDashTime =
+    range && originalQuery && originalQuery.indexOf(TEMPLATE_RANGE.lower) !== -1
+
+  if (isUsingDashTime || !range) {
     return TEMPLATE_RANGE
   }
 
-  return queryConfig.range
+  return range
 }
 
 export const getConfig = async (
@@ -177,6 +182,11 @@ export const getConfig = async (
     {query: renderedQuery, id},
   ])
   const {queryConfig} = queries.find(q => q.id === id)
+  const range = getRangeForOriginalQuery(query, queryConfig.range)
 
-  return {...queryConfig, originalQuery: query}
+  return {
+    ...queryConfig,
+    originalQuery: query,
+    range,
+  }
 }
