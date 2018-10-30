@@ -208,7 +208,13 @@ class RefreshingGraph extends Component<Props> {
                     }
 
                     if (showRawFluxData) {
-                      return <RawFluxDataTable csv={rawFluxData} />
+                      return (
+                        <RawFluxDataTable
+                          csv={rawFluxData}
+                          width={width}
+                          height={height}
+                        />
+                      )
                     }
 
                     switch (type) {

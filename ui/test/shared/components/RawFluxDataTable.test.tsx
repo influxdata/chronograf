@@ -16,9 +16,6 @@ describe('RawFluxDataTable', () => {
     )
 
     const cells = wrapper.find('.raw-flux-data-table--cell')
-    const expectedCellCount = 182 // 14 rows x 13 columns
-
-    expect(cells).toHaveLength(expectedCellCount)
 
     expect(cells.at(0).text()).toEqual('#datatype')
     expect(cells.at(14).text()).toEqual('#group')
