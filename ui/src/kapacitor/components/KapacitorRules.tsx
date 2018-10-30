@@ -1,7 +1,6 @@
 import React, {SFC} from 'react'
 import {Link} from 'react-router'
 
-import NoKapacitorError from 'src/shared/components/NoKapacitorError'
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
 import TasksTable from 'src/kapacitor/components/TasksTable'
 
@@ -10,8 +9,6 @@ import {Source, AlertRule} from 'src/types'
 interface KapacitorRulesProps {
   source: Source
   rules: AlertRule[]
-  hasKapacitor: boolean
-  loading: boolean
   onDelete: (rule: AlertRule) => void
   onChangeRuleStatus: (rule: AlertRule) => void
 }
@@ -19,35 +16,10 @@ interface KapacitorRulesProps {
 const KapacitorRules: SFC<KapacitorRulesProps> = ({
   source,
   rules,
-  hasKapacitor,
-  loading,
   onDelete,
   onChangeRuleStatus,
 }) => {
-  if (loading || !hasKapacitor) {
-    return (
-      <div>
-        <div className="panel-heading">
-          <h2 className="panel-title">Alert Rules</h2>
-          <button className="btn btn-primary btn-sm disabled" disabled={true}>
-            Create Rule
-          </button>
-        </div>
-        <div className="panel-body">
-          <div className="generic-empty-state">
-            {!hasKapacitor ? (
-              <NoKapacitorError source={source} />
-            ) : (
-              <p>Loading Rules...</p>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   const builderRules = rules.filter((r: AlertRule) => r.query)
-
   const builderHeader = `${builderRules.length} Alert Rule${
     builderRules.length === 1 ? '' : 's'
   }`

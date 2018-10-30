@@ -103,6 +103,7 @@ class KapacitorRulePage extends Component<Props, State> {
     if (!query) {
       return <div className="page-spinner" />
     }
+
     return (
       <KapacitorRule
         source={source}

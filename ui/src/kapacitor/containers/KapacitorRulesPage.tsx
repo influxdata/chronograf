@@ -1,17 +1,25 @@
+// Libraries
 import React, {PureComponent} from 'react'
-
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
+// APIs
 import {getActiveKapacitor} from 'src/shared/apis'
+
+// Actions
 import * as kapacitorActionCreators from '../actions/view'
 
+// Components
 import KapacitorRules from 'src/kapacitor/components/KapacitorRules'
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
-import {Page} from 'src/reusable_ui'
+import {Page, Spinner} from 'src/reusable_ui'
 
-import {Source, Kapacitor, AlertRule} from 'src/types'
+// Types
+import {Source, Kapacitor, AlertRule, RemoteDataState} from 'src/types'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import NoKapacitorError from 'src/shared/components/NoKapacitorError'
 
 interface Props {
   source: Source
@@ -25,8 +33,8 @@ interface Props {
 }
 
 interface State {
-  hasKapacitor: boolean
-  loading: boolean
+  kapacitor: Kapacitor
+  loading: RemoteDataState
 }
 
 @ErrorHandling
@@ -34,30 +42,30 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
     this.state = {
-      hasKapacitor: false,
-      loading: true,
+      kapacitor: null,
+      loading: RemoteDataState.NotStarted,
     }
   }
 
   public async componentDidMount() {
     const {source, actions} = this.props
+    this.setState({loading: RemoteDataState.Loading})
     const kapacitor: Kapacitor = await getActiveKapacitor(source)
+
     if (!kapacitor) {
-      return
+      return this.setState({loading: RemoteDataState.Done, kapacitor: null})
     }
 
     await actions.fetchRules(kapacitor)
-    this.setState({loading: false, hasKapacitor: !!kapacitor})
+    this.setState({loading: RemoteDataState.Done, kapacitor})
   }
 
   public render() {
-    const {source, rules} = this.props
-    const {hasKapacitor, loading} = this.state
     return (
-      <Page>
+      <Page className={this.className}>
         <Page.Header>
           <Page.Header.Left>
-            <Page.Title title="Manage Tasks" />
+            <Page.Title title={this.headerTitle} />
           </Page.Header.Left>
           <Page.Header.Right showSourceIndicator={true}>
             <QuestionMarkTooltip
@@ -67,17 +75,48 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
           </Page.Header.Right>
         </Page.Header>
         <Page.Contents>
-          <KapacitorRules
-            source={source}
-            rules={rules}
-            hasKapacitor={hasKapacitor}
-            loading={loading}
-            onDelete={this.handleDeleteRule}
-            onChangeRuleStatus={this.handleRuleStatus}
-          />
+          <Spinner loading={this.state.loading}>{this.rules}</Spinner>
         </Page.Contents>
       </Page>
     )
+  }
+
+  private get rules(): JSX.Element {
+    const {kapacitor} = this.state
+    const {source, rules} = this.props
+
+    if (!kapacitor) {
+      return <NoKapacitorError source={source} />
+    }
+
+    return (
+      <KapacitorRules
+        rules={rules}
+        source={source}
+        onDelete={this.handleDeleteRule}
+        onChangeRuleStatus={this.handleRuleStatus}
+      />
+    )
+  }
+
+  private get headerTitle(): string {
+    const {kapacitor} = this.state
+
+    if (!kapacitor) {
+      return 'Manage Tasks'
+    }
+
+    return `Manage Tasks on "${kapacitor.name}" @ ${kapacitor.url}`
+  }
+
+  private get className(): string {
+    const {kapacitor} = this.state
+
+    if (!kapacitor) {
+      return 'empty-tasks-page'
+    }
+
+    return ''
   }
 
   private handleDeleteRule = (rule: AlertRule) => {

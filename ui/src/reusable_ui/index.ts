@@ -12,6 +12,7 @@ import Page from './components/page_layout/Page'
 import Panel, {PanelType} from './components/panel/Panel'
 import Radio from './components/radio_buttons/RadioButtons'
 import SlideToggle from './components/slide_toggle/SlideToggle'
+import Spinner from './components/spinners/Spinner'
 
 // Import Types
 import {
@@ -53,4 +54,5 @@ export {
   Greys,
   IconFont,
   Columns,
+  Spinner,
 }
