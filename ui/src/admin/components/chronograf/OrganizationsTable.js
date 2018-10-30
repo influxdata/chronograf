@@ -7,6 +7,7 @@ import _ from 'lodash'
 import OrganizationsTableRow from 'src/admin/components/chronograf/OrganizationsTableRow'
 import OrganizationsTableRowNew from 'src/admin/components/chronograf/OrganizationsTableRowNew'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 class OrganizationsTable extends Component {
   constructor(props) {
@@ -55,7 +56,7 @@ class OrganizationsTable extends Component {
       return (
         <div className="panel panel-solid">
           <div className="panel-body">
-            <div className="page-spinner" />
+            <PageSpinner />
           </div>
         </div>
       )

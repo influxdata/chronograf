@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 
+import PageSpinner from 'src/shared/components/PageSpinner'
 import AlertsTable from 'src/alerts/components/AlertsTable'
 import NoKapacitorError from 'src/shared/components/NoKapacitorError'
 import CustomTimeRangeDropdown from 'src/shared/components/CustomTimeRangeDropdown'
@@ -88,7 +89,7 @@ class AlertsApp extends PureComponent<Props, State> {
     const {loading, timeRange} = this.state
 
     if (loading || !source) {
-      return <div className="page-spinner" />
+      return <PageSpinner />
     }
 
     return isWidget ? (

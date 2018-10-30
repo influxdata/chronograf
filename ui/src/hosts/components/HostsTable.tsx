@@ -5,6 +5,7 @@ import memoize from 'memoize-one'
 import SearchBar from 'src/hosts/components/SearchBar'
 import HostRow from 'src/hosts/components/HostRow'
 import InfiniteScroll from 'src/shared/components/InfiniteScroll'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {HOSTS_TABLE_SIZING} from 'src/hosts/constants/tableSizing'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -173,7 +174,7 @@ class HostsTable extends PureComponent<Props, State> {
   }
 
   private get LoadingState(): JSX.Element {
-    return <div className="page-spinner" />
+    return <PageSpinner />
   }
 
   private get ErrorState(): JSX.Element {

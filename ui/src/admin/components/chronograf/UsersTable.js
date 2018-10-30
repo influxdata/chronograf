@@ -7,6 +7,7 @@ import _ from 'lodash'
 import UsersTableHeader from 'src/admin/components/chronograf/UsersTableHeader'
 import UsersTableRowNew from 'src/admin/components/chronograf/UsersTableRowNew'
 import UsersTableRow from 'src/admin/components/chronograf/UsersTableRow'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {USERS_TABLE} from 'src/admin/constants/chronografTableSizing'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -52,7 +53,7 @@ class UsersTable extends Component {
       return (
         <div className="panel panel-solid">
           <div className="panel-body">
-            <div className="page-spinner" />
+            <PageSpinner />
           </div>
         </div>
       )

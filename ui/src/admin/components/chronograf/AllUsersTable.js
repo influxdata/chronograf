@@ -6,6 +6,7 @@ import uuid from 'uuid'
 import AllUsersTableHeader from 'src/admin/components/chronograf/AllUsersTableHeader'
 import AllUsersTableRowNew from 'src/admin/components/chronograf/AllUsersTableRowNew'
 import AllUsersTableRow from 'src/admin/components/chronograf/AllUsersTableRow'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {ALL_USERS_TABLE} from 'src/admin/constants/chronografTableSizing'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -101,7 +102,7 @@ class AllUsersTable extends Component {
       return (
         <div className="panel panel-solid">
           <div className="panel-body">
-            <div className="page-spinner" />
+            <PageSpinner />
           </div>
         </div>
       )

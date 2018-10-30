@@ -24,6 +24,7 @@ import {
   filterRoles as filterRolesAction,
 } from 'src/admin/actions/influxdb'
 
+import PageSpinner from 'src/shared/components/PageSpinner'
 import UsersTable from 'src/admin/components/UsersTable'
 import RolesTable from 'src/admin/components/RolesTable'
 import QueriesPage from 'src/admin/containers/QueriesPage'
@@ -156,7 +157,7 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
     const {source, params} = this.props
     const {loading} = this.state
     if (loading === RemoteDataState.Loading) {
-      return <div className="page-spinner" />
+      return <PageSpinner />
     }
 
     return (
