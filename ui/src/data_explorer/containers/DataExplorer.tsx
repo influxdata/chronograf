@@ -21,7 +21,6 @@ import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 // Components
 import WriteDataForm from 'src/data_explorer/components/WriteDataForm'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
-import ManualRefresh from 'src/shared/components/ManualRefresh'
 import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboardOverlay'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
@@ -158,8 +157,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     const {
       source,
       sources,
-      manualRefresh,
-      onManualRefresh,
       editQueryStatus,
       queryStatus,
       fluxLinks,
@@ -180,25 +177,23 @@ export class DataExplorer extends PureComponent<Props, State> {
         {this.sendToDashboardOverlay}
         <div className="deceo--page">
           <TimeMachine
-            updateSourceLink={updateSourceLink}
-            editQueryStatus={editQueryStatus}
-            templates={this.templates}
+            notify={notify}
             source={source}
-            onResetFocus={this.handleResetFocus}
             isInCEO={false}
             sources={sources}
-            onToggleStaticLegend={this.handleToggleStaticLegend}
-            isStaticLegend={isStaticLegend}
-            manualRefresh={manualRefresh}
-            queryStatus={queryStatus}
             fluxLinks={fluxLinks}
-            notify={notify}
+            templates={this.templates}
+            queryStatus={queryStatus}
+            isStaticLegend={isStaticLegend}
+            editQueryStatus={editQueryStatus}
+            updateSourceLink={updateSourceLink}
+            onResetFocus={this.handleResetFocus}
+            onToggleStaticLegend={this.handleToggleStaticLegend}
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
                 timeRange={timeRange}
                 activeEditorTab={activeEditorTab}
-                onManualRefresh={onManualRefresh}
                 onOpenWriteData={this.handleOpenWriteData}
                 toggleSendToDashboard={this.toggleSendToDashboard}
                 onSetActiveEditorTab={onSetActiveEditorTab}
@@ -260,7 +255,9 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private readQueryParams(): {query?: string; script?: string} {
-    const {query, script} = qs.parse(location.search, {ignoreQueryPrefix: true})
+    const {query, script} = qs.parse(location.search, {
+      ignoreQueryPrefix: true,
+    })
 
     return {query, script}
   }
@@ -490,6 +487,4 @@ const mdtp = dispatch => {
   }
 }
 
-export default connect(mstp, mdtp)(
-  withRouter(ManualRefresh(ConnectedDataExplorer))
-)
+export default connect(mstp, mdtp)(withRouter(ConnectedDataExplorer))

@@ -18,7 +18,6 @@ import {TimeRange} from 'src/types'
 interface Props {
   timeRange: TimeRange
   activeEditorTab: CEOTabs
-  onManualRefresh: () => void
   onOpenWriteData: () => void
   toggleSendToDashboard: () => void
   onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void

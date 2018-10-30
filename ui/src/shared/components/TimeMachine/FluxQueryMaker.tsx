@@ -38,6 +38,7 @@ interface PassedProps {
   onChangeScript: (script: string) => void
   onChangeDraftScript: (draftScript: string) => void
   source: Source
+  onManualRefresh: () => void
   onUpdateStatus?: (status: ScriptStatus) => void
   links: Links
   notify: NotificationAction
@@ -159,10 +160,16 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   private handleSubmitScript = () => {
-    const {onChangeScript, onUpdateStatus, draftScript} = this.props
+    const {
+      onChangeScript,
+      onUpdateStatus,
+      onManualRefresh,
+      draftScript,
+    } = this.props
     const {draftScriptStatus} = this.state
 
     onChangeScript(draftScript)
+    onManualRefresh()
 
     if (onUpdateStatus) {
       onUpdateStatus(draftScriptStatus)

@@ -55,16 +55,6 @@ const SourceSelector: SFC<Props> = ({
       />
       <Radio>
         <Radio.Button
-          id="flux-source"
-          titleText="Flux"
-          value="Flux"
-          onClick={toggleFluxOn}
-          active={isFluxSelected}
-          disabled={!sourceSupportsFlux}
-        >
-          Flux
-        </Radio.Button>
-        <Radio.Button
           id="influxql-source"
           titleText="InfluxQL"
           value="InfluxQL"
@@ -73,6 +63,16 @@ const SourceSelector: SFC<Props> = ({
           disabled={!sourceSupportsFlux}
         >
           InfluxQL
+        </Radio.Button>
+        <Radio.Button
+          id="flux-source"
+          titleText="Flux"
+          value="Flux"
+          onClick={toggleFluxOn}
+          active={isFluxSelected}
+          disabled={!sourceSupportsFlux}
+        >
+          Flux
         </Radio.Button>
       </Radio>
       {!sourceSupportsFlux && (
