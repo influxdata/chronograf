@@ -24,7 +24,6 @@ const emptyQuery: CellQuery = {
 const emptyAxes: Axes = {
   x: DEFAULT_AXIS,
   y: DEFAULT_AXIS,
-  y2: DEFAULT_AXIS,
 }
 
 export const fixtureStatusPageCells: Cell[] = [

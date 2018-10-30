@@ -15,10 +15,11 @@ export interface DygraphAxis {
 
 export interface DygraphSeries {
   [x: string]: {
-    axis: string
+    axis?: string
     color?: string
   }
 }
+
 export interface PerSeriesOptions {
   /**
    * Set to either 'y1' or 'y2' to assign a series to a y-axis (primary or secondary). Must be

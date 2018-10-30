@@ -249,6 +249,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
       height: 'calc(100% - 16px)',
       position: 'absolute',
       top: '8px',
+      left: '16px',
     }
   }
 

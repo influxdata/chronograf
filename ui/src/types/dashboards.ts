@@ -33,7 +33,6 @@ export interface Sort {
 export interface Axes {
   x: Axis
   y: Axis
-  y2?: Axis
 }
 
 interface CellLinks {
