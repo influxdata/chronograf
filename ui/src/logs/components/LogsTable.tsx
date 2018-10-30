@@ -54,7 +54,6 @@ import {INITIAL_LIMIT} from 'src/logs/actions'
 interface Props {
   filters: Filter[]
   data: TableData
-  isScrolledToTop: boolean
   isTruncated: boolean
   onScrollVertical: () => void
   onScrolledToTop: () => void
@@ -96,14 +95,7 @@ const calculateScrollTop = scrollToRow => {
 
 class LogsTable extends Component<Props, State> {
   public static getDerivedStateFromProps(props, state): State {
-    const {
-      isScrolledToTop,
-      scrollToRow,
-      data,
-      tableColumns,
-      severityFormat,
-      filters,
-    } = props
+    const {scrollToRow, data, tableColumns, severityFormat, filters} = props
     const currentMessageWidth = getMessageWidth(
       data,
       tableColumns,
@@ -111,9 +103,6 @@ class LogsTable extends Component<Props, State> {
     )
 
     let scrollTop = _.get(state, 'scrollTop', 0)
-    if (isScrolledToTop) {
-      scrollTop = 0
-    }
 
     if (_.isNumber(scrollToRow)) {
       scrollTop = calculateScrollTop(scrollToRow)
@@ -249,7 +238,7 @@ class LogsTable extends Component<Props, State> {
                 >
                   <Grid
                     {...this.gridProperties(
-                      Math.max(this.minTableWidth, width),
+                      width,
                       height,
                       onRowsRendered,
                       columnCount,
@@ -257,6 +246,7 @@ class LogsTable extends Component<Props, State> {
                     )}
                     style={{
                       height: this.calculateTotalHeight(),
+                      width: Math.max(this.minTableWidth, width),
                       overflow: 'hidden',
                     }}
                   />
@@ -295,7 +285,6 @@ class LogsTable extends Component<Props, State> {
       scrollTop,
       cellRenderer: this.cellRenderer,
       onSectionRendered: this.handleRowRender(onRowsRendered),
-      onScroll: this.handleGridScroll,
       columnCount,
       columnWidth: this.getColumnWidth,
       ref: (ref: Grid) => {
@@ -311,14 +300,10 @@ class LogsTable extends Component<Props, State> {
     return result
   }
 
-  private handleGridScroll = ({scrollLeft}) => {
-    this.handleScroll({scrollLeft})
-  }
-
   private handleScrollbarScroll = (e: MouseEvent<HTMLElement>): void => {
     e.stopPropagation()
     e.preventDefault()
-    const {scrollTop, scrollLeft} = e.target as HTMLElement
+    const {scrollTop, scrollLeft} = e.currentTarget
 
     this.handleScroll({
       scrollTop,
@@ -327,27 +312,22 @@ class LogsTable extends Component<Props, State> {
   }
 
   private handleScroll = scrollInfo => {
-    if (_.has(scrollInfo, 'scrollTop')) {
-      const {scrollTop} = scrollInfo
-      const previousTop = this.state.scrollTop
+    const {scrollTop, scrollLeft} = scrollInfo
+    const previousTop = this.state.scrollTop
+    const previousLeft = this.state.scrollLeft
 
-      this.setState({scrollTop})
-
-      if (scrollTop < 200 && scrollTop <= previousTop) {
-        this.loadMoreAboveRows()
-      }
-
-      if (scrollTop === 0) {
-        this.props.onScrolledToTop()
-      } else if (scrollTop !== previousTop) {
-        this.props.onScrollVertical()
-      }
+    if (scrollTop < 200 && scrollTop <= previousTop) {
+      this.loadMoreAboveRows()
     }
 
-    if (_.has(scrollInfo, 'scrollLeft')) {
-      const {scrollLeft} = scrollInfo
+    if (scrollTop === 0 && previousTop !== 0) {
+      this.props.onScrolledToTop()
+    } else if (scrollTop !== previousTop) {
+      this.props.onScrollVertical()
+    }
 
-      this.setState({scrollLeft})
+    if (scrollLeft !== previousLeft || scrollTop !== previousTop) {
+      this.setState({scrollLeft, scrollTop})
     }
   }
 
