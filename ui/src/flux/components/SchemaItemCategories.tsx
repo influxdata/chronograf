@@ -9,17 +9,19 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Types
 import {Source, NotificationAction} from 'src/types'
+import {CategoryTree} from 'src/flux/components/SchemaExplorerTree'
 
 interface Props {
   source: Source
   db: string
+  categoryTree: CategoryTree
   notify: NotificationAction
 }
 
 @ErrorHandling
 class SchemaItemCategories extends PureComponent<Props> {
   public render() {
-    const {source, db, notify} = this.props
+    const {source, db, categoryTree, notify} = this.props
 
     return (
       <>
@@ -27,18 +29,21 @@ class SchemaItemCategories extends PureComponent<Props> {
           source={source}
           db={db}
           type={CategoryType.Measurements}
+          categoryTree={categoryTree}
           notify={notify}
         />
         <SchemaItemCategory
           source={source}
           db={db}
           type={CategoryType.Tags}
+          categoryTree={categoryTree}
           notify={notify}
         />
         <SchemaItemCategory
           source={source}
           db={db}
           type={CategoryType.Fields}
+          categoryTree={categoryTree}
           notify={notify}
         />
       </>

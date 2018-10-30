@@ -3,7 +3,7 @@ import React, {PureComponent} from 'react'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 // Components
-import TagKeyList from 'src/flux/components/TagKeyList'
+import FieldList from 'src/flux/components/FieldList'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Utils
@@ -16,14 +16,17 @@ import {
 import {OpenState} from 'src/flux/constants/explorer'
 
 // types
-import {Source, NotificationAction} from 'src/types'
+import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
   source: Source
   searchTerm: string
   measurement: string
+  fields: string[]
   notify: NotificationAction
+  opened: OpenState
+  loading: RemoteDataState
 }
 
 interface State {
@@ -32,16 +35,24 @@ interface State {
 
 @ErrorHandling
 class MeasurementListItem extends PureComponent<Props, State> {
+  public static getDerivedStateFromProps(props, state) {
+    if (
+      props.opened === OpenState.OPENED &&
+      state.opened === OpenState.UNOPENED
+    ) {
+      return {...state, opened: props.opened}
+    }
+    return null
+  }
   constructor(props: Props) {
     super(props)
-
     this.state = {
-      opened: OpenState.UNOPENED,
+      opened: props.opened,
     }
   }
 
   public render() {
-    const {db, source, measurement, notify} = this.props
+    const {db, source, measurement, fields, notify, loading} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -69,11 +80,13 @@ class MeasurementListItem extends PureComponent<Props, State> {
         </div>
         {!isUnopen && (
           <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-            <TagKeyList
+            <FieldList
               db={db}
               source={source}
               notify={notify}
+              fields={fields}
               measurement={measurement}
+              loading={loading}
             />
           </div>
         )}

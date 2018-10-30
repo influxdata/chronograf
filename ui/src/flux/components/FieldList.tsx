@@ -5,12 +5,8 @@ import {CopyToClipboard} from 'react-copy-to-clipboard'
 // Components
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 
-// APIS
-import {fields as fetchFields} from 'src/shared/apis/flux/metaQueries'
-
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import parseValuesColumn from 'src/shared/parsing/flux/values'
 import {
   notifyCopyToClipboardSuccess,
   notifyCopyToClipboardFailed,
@@ -22,15 +18,14 @@ import {Source, NotificationAction, RemoteDataState} from 'src/types'
 interface Props {
   db: string
   source: Source
-  tag?: {key: string; value: string}
   measurement?: string
+  fields: string[]
   notify: NotificationAction
+  loading: RemoteDataState
 }
 
 interface State {
-  fields: string[]
   searchTerm: string
-  loading: RemoteDataState
 }
 
 @ErrorHandling
@@ -39,54 +34,52 @@ class FieldList extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      fields: [],
       searchTerm: '',
-      loading: RemoteDataState.NotStarted,
-    }
-  }
-
-  public async componentDidMount() {
-    this.setState({loading: RemoteDataState.Loading})
-    try {
-      const fields = await this.fetchFields()
-      this.setState({fields, loading: RemoteDataState.Done})
-    } catch (error) {
-      this.setState({loading: RemoteDataState.Error})
     }
   }
 
   public render() {
-    const {tag} = this.props
     const {searchTerm} = this.state
 
     return (
       <>
-        <div className="flux-schema--filter">
-          <input
-            className="form-control input-xs"
-            placeholder={`Filter within ${(tag && tag.value) || 'Fields'}`}
-            type="text"
-            spellCheck={false}
-            autoComplete="off"
-            value={searchTerm}
-            onClick={this.handleInputClick}
-            onChange={this.onSearch}
-          />
-        </div>
+        {!this.props.measurement && (
+          <div className="flux-schema--filter">
+            <input
+              className="form-control input-xs"
+              placeholder={'Filter Fields'}
+              type="text"
+              spellCheck={false}
+              autoComplete="off"
+              value={searchTerm}
+              onClick={this.handleInputClick}
+              onChange={this.onSearch}
+            />
+          </div>
+        )}
         {this.fields}
       </>
     )
   }
 
   private get fields(): JSX.Element | JSX.Element[] {
-    const {searchTerm, loading} = this.state
+    const {loading} = this.props
+    const {searchTerm} = this.state
 
-    if (loading === RemoteDataState.Loading) {
+    if (loading === RemoteDataState.Error) {
+      return (
+        <div
+          className={`flux-schema-tree flux-schema--child flux-schema-tree--error`}
+        >
+          Could not fetch fields
+        </div>
+      )
+    }
+    if (loading !== RemoteDataState.Done) {
       return <LoaderSkeleton />
     }
-
     const term = searchTerm.toLocaleLowerCase()
-    const fields = this.state.fields.filter(f =>
+    const fields = this.props.fields.filter(f =>
       f.toLocaleLowerCase().includes(term)
     )
 
@@ -120,30 +113,6 @@ class FieldList extends PureComponent<Props, State> {
         </div>
       </div>
     )
-  }
-
-  private async fetchFields(): Promise<string[]> {
-    const {source, db} = this.props
-
-    const filter = this.filters
-    const limit = 50
-
-    const response = await fetchFields(source, db, filter, limit)
-    const fields = parseValuesColumn(response)
-    return fields
-  }
-
-  private get filters(): Array<{value: string; key: string}> {
-    const {tag, measurement} = this.props
-    const filters = []
-    if (tag) {
-      filters.push(tag)
-    }
-    if (measurement) {
-      filters.push({key: '_measurement', value: measurement})
-    }
-
-    return filters
   }
 
   private handleClick = (e): void => {

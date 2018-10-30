@@ -5,47 +5,34 @@ import React, {PureComponent, MouseEvent, ChangeEvent} from 'react'
 import MeasurementListItem from 'src/flux/components/MeasurementListItem'
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 
-// apis
-import {measurements as fetchMeasurements} from 'src/shared/apis/flux/metaQueries'
-
 // Utils
-import parseValuesColumn from 'src/shared/parsing/flux/values'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-// types
+// Constants
+import {OpenState} from 'src/flux/constants/explorer'
+
+// Types
 import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
   source: Source
   notify: NotificationAction
+  measurements: {[measurement: string]: string[]}
+  loading: RemoteDataState
 }
 
 interface State {
   searchTerm: string
-  measurements: string[]
-  loading: RemoteDataState
 }
 
 @ErrorHandling
-class TagValueList extends PureComponent<Props, State> {
+class MeasurementsList extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props)
 
     this.state = {
-      measurements: [],
       searchTerm: '',
-      loading: RemoteDataState.NotStarted,
-    }
-  }
-
-  public async componentDidMount() {
-    this.setState({loading: RemoteDataState.Loading})
-    try {
-      const measurements = await this.fetchMeasurements()
-      this.setState({measurements, loading: RemoteDataState.Done})
-    } catch (error) {
-      this.setState({loading: RemoteDataState.Error})
     }
   }
 
@@ -71,28 +58,68 @@ class TagValueList extends PureComponent<Props, State> {
     )
   }
 
+  // all matching children and the path in the tree that leads
+  // to them should be displayed
   private get measurements(): JSX.Element | JSX.Element[] {
-    const {source, db, notify} = this.props
-    const {searchTerm, loading} = this.state
+    const {source, db, notify, loading} = this.props
+    const {searchTerm} = this.state
+    const measurementEntries = Object.entries(this.props.measurements)
 
-    if (loading === RemoteDataState.Loading) {
+    if (loading === RemoteDataState.Error) {
+      return (
+        <div
+          className={`flux-schema-tree flux-schema--child flux-schema-tree--error`}
+        >
+          Could not fetch measurements
+        </div>
+      )
+    }
+    if (loading !== RemoteDataState.Done) {
       return <LoaderSkeleton />
     }
+
     const term = searchTerm.toLocaleLowerCase()
-    const measurements = this.state.measurements.filter(m =>
-      m.toLocaleLowerCase().includes(term)
-    )
+    const measurements = measurementEntries.filter(entry => {
+      const measurement = entry[0]
+      const fieldsForMeasurement = entry[1]
+      const fieldsIncludesTerm = fieldsForMeasurement.find(field => {
+        return field.toLocaleLowerCase().includes(term)
+      })
+
+      return (
+        measurement.toLocaleLowerCase().includes(term) || fieldsIncludesTerm
+      )
+    })
+
     if (measurements.length) {
-      return measurements.map(measurement => (
-        <MeasurementListItem
-          source={source}
-          db={db}
-          searchTerm={searchTerm}
-          measurement={measurement}
-          key={measurement}
-          notify={notify}
-        />
-      ))
+      return measurements.map(([measurement, fields]) => {
+        let startOpen = OpenState.UNOPENED
+        let fieldsIncludesTerm = false
+        const filteredFields = fields.filter(field => {
+          if (field.toLocaleLowerCase().includes(term)) {
+            fieldsIncludesTerm = true
+            return field
+          }
+        })
+
+        if (term !== '' && fieldsIncludesTerm) {
+          startOpen = OpenState.OPENED
+        }
+
+        return (
+          <MeasurementListItem
+            source={source}
+            db={db}
+            searchTerm={searchTerm}
+            measurement={measurement}
+            key={measurement}
+            notify={notify}
+            fields={filteredFields}
+            opened={startOpen}
+            loading={loading}
+          />
+        )
+      })
     }
     return (
       <div className="flux-schema-tree flux-schema--child">
@@ -103,23 +130,15 @@ class TagValueList extends PureComponent<Props, State> {
     )
   }
 
-  private async fetchMeasurements(): Promise<string[]> {
-    const {source, db} = this.props
-
-    const response = await fetchMeasurements(source, db)
-    const measurements = parseValuesColumn(response)
-    return measurements
-  }
-
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
     this.setState({
       searchTerm: e.target.value,
     })
   }
 
-  private handleClick = (e: MouseEvent<HTMLInputElement>) => {
+  private handleClick = (e: MouseEvent<HTMLInputElement | HTMLDivElement>) => {
     e.stopPropagation()
   }
 }
 
-export default TagValueList
+export default MeasurementsList

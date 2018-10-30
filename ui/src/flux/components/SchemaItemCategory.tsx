@@ -12,6 +12,7 @@ import {OpenState} from 'src/flux/constants/explorer'
 
 // Types
 import {Source, NotificationAction} from 'src/types'
+import {CategoryTree} from 'src/flux/components/SchemaExplorerTree'
 
 export enum CategoryType {
   Measurements = 'measurements',
@@ -23,6 +24,7 @@ interface Props {
   source: Source
   notify: NotificationAction
   db: string
+  categoryTree: CategoryTree
   type: CategoryType
 }
 
@@ -69,7 +71,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
   private get categoryName(): string {
     switch (this.props.type) {
       case CategoryType.Measurements:
-        return 'MEASURMENTS'
+        return 'MEASUREMENTS'
       case CategoryType.Fields:
         return 'FIELDS'
       case CategoryType.Tags:
@@ -78,16 +80,41 @@ class SchemaItemCategory extends PureComponent<Props, State> {
   }
 
   private get itemList(): JSX.Element {
-    const {type, db, source, notify} = this.props
+    const {type, db, source, notify, categoryTree} = this.props
 
     switch (type) {
       case CategoryType.Measurements:
-        return <MeasurementList db={db} source={source} notify={notify} />
+        return (
+          <MeasurementList
+            db={db}
+            source={source}
+            notify={notify}
+            measurements={categoryTree.measurements}
+            loading={categoryTree.measurementsLoading}
+          />
+        )
 
       case CategoryType.Fields:
-        return <FieldList db={db} source={source} notify={notify} />
+        return (
+          <FieldList
+            db={db}
+            source={source}
+            notify={notify}
+            fields={categoryTree.fields}
+            loading={categoryTree.fieldsLoading}
+          />
+        )
+
       case CategoryType.Tags:
-        return <TagKeyList db={db} source={source} notify={notify} />
+        return (
+          <TagKeyList
+            db={db}
+            source={source}
+            notify={notify}
+            tagKeys={categoryTree.tagKeys}
+            loading={categoryTree.tagsLoading}
+          />
+        )
     }
   }
 

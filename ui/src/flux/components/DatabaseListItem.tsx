@@ -2,11 +2,17 @@ import React, {PureComponent} from 'react'
 import classnames from 'classnames'
 import {CopyToClipboard} from 'react-copy-to-clipboard'
 
+// Components
+import SchemaExplorerTree from 'src/flux/components/SchemaExplorerTree'
+
+// Constants
+import {OpenState} from 'src/flux/constants/explorer'
+
+// Types
 import {
   notifyCopyToClipboardSuccess,
   notifyCopyToClipboardFailed,
 } from 'src/shared/copy/notifications'
-
 import {Source, NotificationAction} from 'src/types'
 import SchemaItemCategories from 'src/flux/components/SchemaItemCategories'
 
@@ -17,7 +23,7 @@ interface Props {
 }
 
 interface State {
-  isOpen: boolean
+  opened: OpenState
   searchTerm: string
 }
 
@@ -25,7 +31,7 @@ class DatabaseListItem extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
     this.state = {
-      isOpen: false,
+      opened: OpenState.UNOPENED,
       searchTerm: '',
     }
   }
@@ -55,18 +61,31 @@ class DatabaseListItem extends PureComponent<Props, State> {
 
   private get categories(): JSX.Element {
     const {db, source, notify} = this.props
-    const {isOpen} = this.state
+    const {opened} = this.state
+    const isOpen = opened === OpenState.OPENED
+    const isUnopen = opened === OpenState.UNOPENED
 
-    return (
-      <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
-        <SchemaItemCategories db={db} source={source} notify={notify} />
-      </div>
-    )
+    if (!isUnopen) {
+      return (
+        <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
+          <SchemaExplorerTree bucket={db} source={source} key={db}>
+            {tree => (
+              <SchemaItemCategories
+                db={db}
+                source={source}
+                notify={notify}
+                categoryTree={tree}
+              />
+            )}
+          </SchemaExplorerTree>
+        </div>
+      )
+    }
   }
 
   private get className(): string {
     return classnames('flux-schema-tree', {
-      expanded: this.state.isOpen,
+      expanded: this.state.opened === OpenState.OPENED,
     })
   }
 
@@ -86,8 +105,16 @@ class DatabaseListItem extends PureComponent<Props, State> {
     }
   }
 
-  private handleClick = () => {
-    this.setState({isOpen: !this.state.isOpen})
+  private handleClick = (e): void => {
+    e.stopPropagation()
+
+    const opened = this.state.opened
+
+    if (opened === OpenState.OPENED) {
+      this.setState({opened: OpenState.ClOSED})
+      return
+    }
+    this.setState({opened: OpenState.OPENED})
   }
 }
 

@@ -21,7 +21,6 @@ import {Source, NotificationAction} from 'src/types'
 interface Props {
   db: string
   source: Source
-  searchTerm: string
   tagKey: string
   measurement?: string
   notify: NotificationAction

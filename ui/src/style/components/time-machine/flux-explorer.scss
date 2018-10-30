@@ -31,6 +31,10 @@ $flux-tree-gutter: 11px;
   }
 }
 
+.flux-schema-tree--error {
+  color: $c-pineapple;
+}
+
 .flux-schema--children.hidden {
   display: none;
 }
