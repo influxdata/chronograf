@@ -1,1 +1,1449 @@
-{"id":"08f856ed-60ca-41e8-8a6c-fbd1373eef56","meta":{"name":"apache","measurements":["apache"],"version":"1.0","dashboardVersion":"1.x","description":"Dashboard for the telegraf input plug-in: Apache","author":"influxdata","license":"MIT","icon":"","url":"https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache"},"data":{"cells":[{"w":4,"h":4,"name":"Apache Bytes/Second","queries":[{"query":"SELECT non_negative_derivative(max(\"BytesPerSec\")) AS \"bytes_per_sec\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"","groupbys":["\"server\""],"label":"bytes/s"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"bytes/s","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Apache - Requests/Second","queries":[{"query":"SELECT non_negative_derivative(max(\"ReqPerSec\")) AS \"req_per_sec\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"","groupbys":["\"server\""],"label":"requests/s"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"requests/s","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Apache - Total Accesses","queries":[{"query":"SELECT non_negative_derivative(max(\"TotalAccesses\")) AS \"tot_access\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"","groupbys":["\"server\""],"label":"accesses/s"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"accesses/s","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}}]}}
+{
+  "id": "5a3607d1-fc5c-445a-b73e-04578448f471",
+  "meta": {
+    "name": "apache",
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "description": "Dashboard for the telegraf input plug-in: Apache",
+    "author": "InfluxData",
+    "license": "MIT",
+    "icon": "",
+    "url": "https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache"
+  },
+  "data": {
+    "cells": [
+      {
+        "x": 0,
+        "y": 10,
+        "w": 3,
+        "h": 3,
+        "name": "Requests Per Sec",
+        "queries": [
+          {
+            "query": "SELECT last(\"ReqPerSec\") AS \"ReqPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(1s) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT last(\"ReqPerSec\") AS \"ReqPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(1s) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Number of Requests",
+            "prefix": "",
+            "suffix": " r/s",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `apache` plugin. For more information, please visit the [Telegraf Apache plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 7,
+        "name": "Apache Logs",
+        "queries": [
+          {
+            "query": "SELECT \"auth\", \"ident\", \"http_version\", \"client_ip\", \"request\", \"resp_bytes\" FROM \"telegraf\".\"autogen\".\"apache_access_log\" WHERE time > :dashboardTime: GROUP BY \"host\", \"path\", \"resp_code\", \"verb\"",
+            "queryConfig": {
+              "database": "telegraf",
+              "measurement": "apache_access_log",
+              "retentionPolicy": "autogen",
+              "fields": [
+                {"value": "auth", "type": "field", "alias": ""},
+                {"value": "ident", "type": "field", "alias": ""},
+                {"value": "http_version", "type": "field", "alias": ""},
+                {"value": "client_ip", "type": "field", "alias": ""},
+                {"value": "request", "type": "field", "alias": ""},
+                {"value": "resp_bytes", "type": "field", "alias": ""}
+              ],
+              "tags": {},
+              "groupBy": {
+                "time": "",
+                "tags": ["host", "path", "resp_code", "verb"]
+              },
+              "areTagsAccepted": false,
+              "rawText": null,
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Bytes",
+            "prefix": "",
+            "suffix": " Kb",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "table",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "Time",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "Time", "visible": true},
+          {"internalName": "host", "displayName": "Host", "visible": true},
+          {"internalName": "path", "displayName": "Path", "visible": true},
+          {"internalName": "verb", "displayName": "Verb", "visible": true},
+          {
+            "internalName": "resp_code",
+            "displayName": "Response Code",
+            "visible": true
+          },
+          {
+            "internalName": "apache_access_log.auth",
+            "displayName": "Auth",
+            "visible": true
+          },
+          {
+            "internalName": "apache_access_log.client_ip",
+            "displayName": "Client IP",
+            "visible": true
+          },
+          {
+            "internalName": "apache_access_log.http_version",
+            "displayName": "HTTP Version",
+            "visible": true
+          },
+          {
+            "internalName": "apache_access_log.ident",
+            "displayName": "Ident",
+            "visible": true
+          },
+          {
+            "internalName": "apache_access_log.request",
+            "displayName": "Request",
+            "visible": true
+          },
+          {
+            "internalName": "apache_access_log.resp_bytes",
+            "displayName": "Response Size (bytes)",
+            "visible": true
+          }
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 0},
+        "note": "To enable this graph, you will need to configure the Telegraf `logparser` plugin to read your Apache Access Logs. For more information, please visit the [Telegraf Logparser plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/logparser).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 3,
+        "y": 10,
+        "w": 9,
+        "h": 3,
+        "name": "Throughput",
+        "queries": [
+          {
+            "query": "SELECT mean(\"BytesPerReq\")/1024 AS \"AvgBytesPerReq\", mean(\"BytesPerSec\")/1024 AS \"AvgBytesPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"BytesPerReq\")/1024 AS \"AvgBytesPerReq\", mean(\"BytesPerSec\")/1024 AS \"AvgBytesPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Bytes",
+            "prefix": "",
+            "suffix": " Kb",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "base",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "873251ce-9d2c-486e-b083-157a03d63804",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "9cfd670e-1b7e-461c-b35f-ed0f71825867",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `apache` plugin. For more information, please visit the [Telegraf Apache plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 3,
+        "name": "Response Codes",
+        "queries": [
+          {
+            "query": "SELECT count(\"request\") AS \"Requests\" FROM \"telegraf\".\"autogen\".\"apache_access_log\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:), \"resp_code\" FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT count(\"request\") AS \"Requests\" FROM \"telegraf\".\"autogen\".\"apache_access_log\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:), \"resp_code\" FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Response Code Count",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "8bc9f3c1-e4ad-40ea-b681-6c1bd7b349a5",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "873251ce-9d2c-486e-b083-157a03d63804",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "9cfd670e-1b7e-461c-b35f-ed0f71825867",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `logparser` plugin to read your Apache Access Logs. For more information, please visit the [Telegraf Logparser plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/logparser).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 9,
+        "y": 8,
+        "w": 3,
+        "h": 2,
+        "name": "CPU Load",
+        "queries": [
+          {
+            "query": "SELECT mean(\"CPULoad\") AS \"CPULoad\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"CPULoad\") AS \"CPULoad\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Number of Requests",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `apache` plugin. For more information, please visit the [Telegraf Apache plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 9,
+        "y": 6,
+        "w": 3,
+        "h": 2,
+        "name": "Apache Uptime",
+        "queries": [
+          {
+            "query": "SELECT last(\"Uptime\")/60/60 AS \"Uptime\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(30s) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT last(\"Uptime\")/60/60 AS \"Uptime\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(30s) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Number of Requests",
+            "prefix": "",
+            "suffix": " h",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 1},
+        "note": "To enable this graph, you will need to configure the Telegraf `apache` plugin. For more information, please visit the [Telegraf Apache plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "w": 5,
+        "h": 4,
+        "name": "Scoreboard",
+        "queries": [
+          {
+            "query": "SELECT mean(\"scboard_closing\") AS \"Closing\", mean(\"scboard_dnslookup\") AS \"DNSLookup\", mean(\"scboard_finishing\") AS \"Finishing\", mean(\"scboard_idle_cleanup\") AS \"IdleCleanup\", mean(\"scboard_keepalive\") AS \"KeepAlive\", mean(\"scboard_logging\") AS \"Logging\", mean(\"scboard_open\") AS \"Open\", mean(\"scboard_reading\") AS \"Reading\", mean(\"scboard_sending\") AS \"Sending\", mean(\"scboard_starting\") AS \"Starting\", mean(\"scboard_waiting\") AS \"Waiting\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"scboard_closing\") AS \"Closing\", mean(\"scboard_dnslookup\") AS \"DNSLookup\", mean(\"scboard_finishing\") AS \"Finishing\", mean(\"scboard_idle_cleanup\") AS \"IdleCleanup\", mean(\"scboard_keepalive\") AS \"KeepAlive\", mean(\"scboard_logging\") AS \"Logging\", mean(\"scboard_open\") AS \"Open\", mean(\"scboard_reading\") AS \"Reading\", mean(\"scboard_sending\") AS \"Sending\", mean(\"scboard_starting\") AS \"Starting\", mean(\"scboard_waiting\") AS \"Waiting\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Number of Requests",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "7c2ec375-2941-4918-ac47-925665ddc635",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "7e6102f5-056b-411b-8e2c-b9da47da3d31",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "f60b1e2c-707b-4430-bc14-5e453343076b",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `apache` plugin. For more information, please visit the [Telegraf Apache plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "w": 4,
+        "h": 4,
+        "name": "Workers",
+        "queries": [
+          {
+            "query": "SELECT mean(\"BusyWorkers\") AS \"Busy\", mean(\"IdleWorkers\") AS \"Idle\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"BusyWorkers\") AS \"Busy\", mean(\"IdleWorkers\") AS \"Idle\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Workers",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "7c2ec375-2941-4918-ac47-925665ddc635",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "7e6102f5-056b-411b-8e2c-b9da47da3d31",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "f60b1e2c-707b-4430-bc14-5e453343076b",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `apache` plugin. For more information, please visit the [Telegraf Apache plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/apache).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 1,
+        "name": "",
+        "queries": [
+          {
+            "query": "",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Bytes",
+            "prefix": "",
+            "suffix": " MB",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "note",
+        "colors": [],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "This dashboard is designed to give you an overview of your Apache servers and includes metrics from `system`, `mem`, `diskio`, `net`, `apache` and `apache_access_log` measurements.",
+        "noteVisibility": "default"
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "w": 4,
+        "h": 3,
+        "name": "Network",
+        "queries": [
+          {
+            "query": "SELECT derivative(mean(\"bytes_recv\"),10s)/1024/1024 AS \"Received_MB\", derivative(mean(\"bytes_sent\"),10s)/1024/1024 AS \"Sent_MB\" FROM \"telegraf\".\"autogen\".\"net\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT derivative(mean(\"bytes_recv\"),10s)/1024/1024 AS \"Received_MB\", derivative(mean(\"bytes_sent\"),10s)/1024/1024 AS \"Sent_MB\" FROM \"telegraf\".\"autogen\".\"net\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Bytes",
+            "prefix": "",
+            "suffix": " MB",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "base",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "7e6102f5-056b-411b-8e2c-b9da47da3d31",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "f60b1e2c-707b-4430-bc14-5e453343076b",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `net` plugin. For more information, please visit the [Telegraf Net plugin documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/net/NET_README.md).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "w": 4,
+        "h": 3,
+        "name": "I/O",
+        "queries": [
+          {
+            "query": "SELECT derivative(mean(\"read_bytes\"),10s)/1024/1024 AS \"Reads_MB\", derivative(mean(\"write_bytes\"),10s)/1024/1024 AS \"Writes_MB\" FROM \"telegraf\".\"autogen\".\"diskio\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT derivative(mean(\"read_bytes\"),10s)/1024/1024 AS \"Reads_MB\", derivative(mean(\"write_bytes\"),10s)/1024/1024 AS \"Writes_MB\" FROM \"telegraf\".\"autogen\".\"diskio\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "I/O",
+            "prefix": "",
+            "suffix": "MB",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "base",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "7e6102f5-056b-411b-8e2c-b9da47da3d31",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "f60b1e2c-707b-4430-bc14-5e453343076b",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `diskio` plugin. For more information, please visit the [Telegraf Disk IO plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/diskio).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "w": 4,
+        "h": 3,
+        "name": "Load",
+        "queries": [
+          {
+            "query": "SELECT mean(\"load1\") AS \"Short\", mean(\"load5\") AS \"Medium\", mean(\"load15\") AS \"Long\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"load1\") AS \"Short\", mean(\"load5\") AS \"Medium\", mean(\"load15\") AS \"Long\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "base",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "7e6102f5-056b-411b-8e2c-b9da47da3d31",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "f60b1e2c-707b-4430-bc14-5e453343076b",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `system` plugin. For more information, please visit the [Telegraf System plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/system).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "w": 5,
+        "h": 2,
+        "name": "Memory Used %",
+        "queries": [
+          {
+            "query": "SELECT mean(\"used_percent\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"used_percent\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "Used Percent",
+            "prefix": "",
+            "suffix": "%",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line-plus-single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "7e6102f5-056b-411b-8e2c-b9da47da3d31",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "f60b1e2c-707b-4430-bc14-5e453343076b",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 0},
+        "note": "To enable this graph, you will need to configure the Telegraf `mem` plugin. For more information, please visit the [Telegraf Mem plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/mem).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "w": 2,
+        "h": 2,
+        "name": "RAM",
+        "queries": [
+          {
+            "query": "SELECT mean(\"total\")/1024/1024/1024 AS \"Total RAM (GB)\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"total\")/1024/1024/1024 AS \"Total RAM (GB)\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": " GB",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 0},
+        "note": "To enable this graph, you will need to configure the Telegraf `mem` plugin. For more information, please visit the [Telegraf Mem plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/mem).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "w": 2,
+        "h": 2,
+        "name": "CPUs",
+        "queries": [
+          {
+            "query": "SELECT last(\"n_cpus\") AS \"CPUs\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT last(\"n_cpus\") AS \"CPUs\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 0},
+        "note": "To enable this graph, you will need to configure the Telegraf `system` plugin. For more information, please visit the [Telegraf System plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/system).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "w": 3,
+        "h": 2,
+        "name": "System Uptime",
+        "queries": [
+          {
+            "query": "SELECT last(\"uptime\")/60/60/24 AS \"System Uptime\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT last(\"uptime\")/60/60/24 AS \"System Uptime\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": " d",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the Telegraf `system` plugin. For more information, please visit the [Telegraf System plugin documentation](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/system).",
+        "noteVisibility": "showWhenNoData"
+      }
+    ]
+  }
+}
