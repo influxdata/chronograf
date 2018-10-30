@@ -1,16 +1,9 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 // Components
 import FieldList from 'src/flux/components/FieldList'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-
-// Utils
-import {
-  notifyCopyToClipboardSuccess,
-  notifyCopyToClipboardFailed,
-} from 'src/shared/copy/notifications'
 
 // Constants
 import {OpenState} from 'src/flux/constants/explorer'
@@ -71,12 +64,6 @@ class MeasurementListItem extends PureComponent<Props, State> {
             {measurement}
             <span className="flux-schema--type">Measurement</span>
           </div>
-          <CopyToClipboard text={measurement} onCopy={this.handleCopyAttempt}>
-            <div className="flux-schema-copy" onClick={this.handleClickCopy}>
-              <span className="icon duplicate" title="copy to clipboard" />
-              Copy
-            </div>
-          </CopyToClipboard>
         </div>
         {!isUnopen && (
           <div className={`flux-schema--children ${isOpen ? '' : 'hidden'}`}>
@@ -92,22 +79,6 @@ class MeasurementListItem extends PureComponent<Props, State> {
         )}
       </div>
     )
-  }
-
-  private handleClickCopy = (e): void => {
-    e.stopPropagation()
-  }
-
-  private handleCopyAttempt = (
-    copiedText: string,
-    isSuccessful: boolean
-  ): void => {
-    const {notify} = this.props
-    if (isSuccessful) {
-      notify(notifyCopyToClipboardSuccess(copiedText))
-    } else {
-      notify(notifyCopyToClipboardFailed(copiedText))
-    }
   }
 
   private handleItemClick = (e): void => {

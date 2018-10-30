@@ -1,17 +1,11 @@
 // Libraries
 import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
-import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 // Components
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
 
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {
-  notifyCopyToClipboardSuccess,
-  notifyCopyToClipboardFailed,
-} from 'src/shared/copy/notifications'
-
 // types
 import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
@@ -95,12 +89,6 @@ class FieldList extends PureComponent<Props, State> {
               {field}
               <span className="flux-schema--type">Field</span>
             </div>
-            <CopyToClipboard text={field} onCopy={this.handleCopyAttempt}>
-              <div className="flux-schema-copy" onClick={this.handleClick}>
-                <span className="icon duplicate" title="copy to clipboard" />
-                Copy
-              </div>
-            </CopyToClipboard>
           </div>
         </div>
       ))
@@ -117,18 +105,6 @@ class FieldList extends PureComponent<Props, State> {
 
   private handleClick = (e): void => {
     e.stopPropagation()
-  }
-
-  private handleCopyAttempt = (
-    copiedText: string,
-    isSuccessful: boolean
-  ): void => {
-    const {notify} = this.props
-    if (isSuccessful) {
-      notify(notifyCopyToClipboardSuccess(copiedText))
-    } else {
-      notify(notifyCopyToClipboardFailed(copiedText))
-    }
   }
 
   private onSearch = (e: ChangeEvent<HTMLInputElement>) => {
