@@ -70,6 +70,7 @@ class FieldList extends PureComponent<Props, State> {
       return (
         <div
           className={`flux-schema-tree flux-schema--child flux-schema-tree--error`}
+          onClick={this.handleClick}
         >
           Could not fetch fields
         </div>
