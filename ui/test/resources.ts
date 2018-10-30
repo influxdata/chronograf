@@ -515,9 +515,15 @@ export const layout = {
         },
       ],
       axes: {
-        x: {bounds: [], label: '', prefix: '', suffix: '', base: '', scale: ''},
-        y: {bounds: [], label: '', prefix: '', suffix: '', base: '', scale: ''},
-        y2: {
+        x: {
+          bounds: [],
+          label: '',
+          prefix: '',
+          suffix: '',
+          base: '',
+          scale: '',
+        },
+        y: {
           bounds: [],
           label: '',
           prefix: '',
@@ -545,9 +551,15 @@ export const layout = {
         },
       ],
       axes: {
-        x: {bounds: [], label: '', prefix: '', suffix: '', base: '', scale: ''},
-        y: {bounds: [], label: '', prefix: '', suffix: '', base: '', scale: ''},
-        y2: {
+        x: {
+          bounds: [],
+          label: '',
+          prefix: '',
+          suffix: '',
+          base: '',
+          scale: '',
+        },
+        y: {
           bounds: [],
           label: '',
           prefix: '',
@@ -575,9 +587,15 @@ export const layout = {
         },
       ],
       axes: {
-        x: {bounds: [], label: '', prefix: '', suffix: '', base: '', scale: ''},
-        y: {bounds: [], label: '', prefix: '', suffix: '', base: '', scale: ''},
-        y2: {
+        x: {
+          bounds: [],
+          label: '',
+          prefix: '',
+          suffix: '',
+          base: '',
+          scale: '',
+        },
+        y: {
           bounds: [],
           label: '',
           prefix: '',

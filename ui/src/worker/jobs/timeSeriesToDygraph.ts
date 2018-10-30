@@ -37,9 +37,9 @@ export const timeSeriesToDygraphWork = (
 
   const dygraphSeries = fastReduce<Label, DygraphSeries>(
     sortedLabels,
-    (acc, {label, responseIndex}) => {
+    (acc, {label}) => {
       acc[label] = {
-        axis: responseIndex === 0 ? 'y' : 'y2',
+        axis: 'y',
       }
 
       return acc

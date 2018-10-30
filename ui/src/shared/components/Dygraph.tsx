@@ -52,7 +52,6 @@ import {LineColor} from 'src/types/colors'
 const Dygraphs = D as any
 
 const getRangeMemoizedY = memoizeOne(getRange)
-const getRangeMemoizedY2 = memoizeOne(getRange)
 
 const DEFAULT_DYGRAPH_OPTIONS = {
   rightGap: 0,
@@ -106,10 +105,6 @@ class Dygraph extends Component<Props, State> {
         bounds: [null, null],
         ...DEFAULT_AXIS,
       },
-      y2: {
-        bounds: undefined,
-        ...DEFAULT_AXIS,
-      },
     },
     containerStyle: {},
     isGraphFilled: true,
@@ -137,12 +132,12 @@ class Dygraph extends Component<Props, State> {
 
   public componentDidMount() {
     const options = this.collectDygraphOptions()
-    const initalOptions = {...DEFAULT_DYGRAPH_OPTIONS, ...options}
+    const initialOptions = {...DEFAULT_DYGRAPH_OPTIONS, ...options}
 
     this.dygraph = new Dygraphs(
       this.graphRef.current,
       this.timeSeries,
-      initalOptions
+      initialOptions
     )
 
     this.dygraphOptions = options
@@ -401,7 +396,7 @@ class Dygraph extends Component<Props, State> {
   private collectDygraphOptions(): dygraphs.Options {
     const {
       labels,
-      axes: {y, y2},
+      axes: {y},
       type,
       underlayCallback,
       isGraphFilled,
@@ -434,9 +429,6 @@ class Dygraph extends Component<Props, State> {
           labelsKMG2: y.base === BASE_2,
           axisLabelFormatter: formatYVal,
           valueRange: this.getYRange(timeSeries),
-        },
-        y2: {
-          valueRange: getRangeMemoizedY2(timeSeries, y2.bounds),
         },
       },
       ...this.props.options,

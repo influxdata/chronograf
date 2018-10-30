@@ -37,7 +37,6 @@ export const FULL_DEFAULT_AXIS: Axis = {
 export const DEFAULT_AXES: Axes = {
   x: FULL_DEFAULT_AXIS,
   y: FULL_DEFAULT_AXIS,
-  y2: FULL_DEFAULT_AXIS,
 }
 
 interface Color {

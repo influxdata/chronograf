@@ -97,69 +97,6 @@ describe('timeSeriesToDygraph', () => {
     expect(actual.timeSeries).toEqual(expected.timeSeries)
   })
 
-  it('can parse multiple responses into two axes', () => {
-    const influxResponse = [
-      {
-        response: {
-          results: [
-            {
-              statement_id: 0,
-              series: [
-                {
-                  name: 'm1',
-                  columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
-                },
-              ],
-            },
-            {
-              statement_id: 0,
-              series: [
-                {
-                  name: 'm1',
-                  columns: ['time', 'f2'],
-                  values: [[2000, 3], [4000, 4]],
-                },
-              ],
-            },
-          ],
-        },
-      },
-      {
-        response: {
-          results: [
-            {
-              statement_id: 0,
-              series: [
-                {
-                  name: 'm3',
-                  columns: ['time', 'f3'],
-                  values: [[1000, 1], [2000, 2]],
-                },
-              ],
-            },
-          ],
-        },
-      },
-    ]
-
-    const actual = timeSeriesToDygraph(influxResponse)
-
-    const expected = {
-      'm1.f1': {
-        axis: 'y',
-      },
-      'm1.f2': {
-        axis: 'y',
-      },
-      'm3.f3': {
-        axis: 'y2',
-      },
-    }
-
-    expect(actual.dygraphSeries).toEqual(expected)
-  })
-
   it('can parse multiple responses with the same field and measurement', () => {
     const influxResponse = [
       {
@@ -206,7 +143,7 @@ describe('timeSeriesToDygraph', () => {
       ],
       dygraphSeries: {
         'm1.f1': {
-          axis: 'y2',
+          axis: 'y',
         },
       },
     }
