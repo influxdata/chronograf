@@ -22,7 +22,8 @@
     "tslint": "tslint -c ./tslint.json '{src,test}/**/*.ts?(x)'",
     "tslint:fix": "tslint --fix -c ./tslint.json '{src,test}/**/*.ts?(x)'",
     "tsc": "tsc -p ./tsconfig.json --noEmit --pretty",
-    "tsc:watch": "tsc -p ./tsconfig.json --noEmit --pretty -w"
+    "tsc:watch": "tsc -p ./tsconfig.json --noEmit --pretty -w",
+    "dev": "yarn clean && yarn start"
   },
   "author": "",
   "devDependencies": {
