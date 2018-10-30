@@ -1,5 +1,6 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {PureComponent, ChangeEvent} from 'react'
+import {getDeep} from 'src/utils/wrappers'
 
 // Components
 import OptIn from 'src/shared/components/OptIn'
@@ -37,8 +38,13 @@ interface Props {
   onUpdateDecimalPlaces: (decimalPlaces: DecimalPlaces) => void
 }
 
+interface State {
+  prefix: string
+  suffix: string
+}
+
 @ErrorHandling
-class AxesOptions extends PureComponent<Props> {
+class AxesOptions extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     axes: {
       y: {
@@ -59,17 +65,25 @@ class AxesOptions extends PureComponent<Props> {
       },
     },
   }
+  constructor(props) {
+    super(props)
+    this.state = {
+      prefix: getDeep<string>(props, 'axes.y.prefix', ''),
+      suffix: getDeep<string>(props, 'axes.y.suffix', ''),
+    }
+  }
 
   public render() {
     const {
       axes: {
-        y: {bounds, label, prefix, suffix, scale},
+        y: {bounds, label, scale},
       },
       type,
       lineColors,
       defaultYLabel,
       onUpdateLineColors,
     } = this.props
+    const {prefix, suffix} = this.state
 
     const [min, max] = bounds
 
@@ -118,14 +132,14 @@ class AxesOptions extends PureComponent<Props> {
               id="prefix"
               value={prefix}
               labelText="Y-Value's Prefix"
-              onChange={this.handleSetPrefixSuffix}
+              onChange={this.handleSetPrefix}
             />
             <Input
               name="suffix"
               id="suffix"
               value={suffix}
               labelText="Y-Value's Suffix"
-              onChange={this.handleSetPrefixSuffix}
+              onChange={this.handleSetSuffix}
             />
             {this.yValuesFormatTabs}
             {this.scaleTabs}
@@ -260,20 +274,33 @@ class AxesOptions extends PureComponent<Props> {
     )
   }
 
-  private handleSetPrefixSuffix = e => {
+  private handleSetPrefix = (e: ChangeEvent<HTMLInputElement>): void => {
     const {onUpdateAxes, axes} = this.props
-    const {prefix, suffix} = e.target.form
+    const prefix = e.target.value
 
     const newAxes = {
       ...axes,
       y: {
         ...axes.y,
-        prefix: prefix.value,
-        suffix: suffix.value,
+        prefix,
       },
     }
 
-    onUpdateAxes(newAxes)
+    this.setState({prefix}, () => onUpdateAxes(newAxes))
+  }
+
+  private handleSetSuffix = (e: ChangeEvent<HTMLInputElement>): void => {
+    const {onUpdateAxes, axes} = this.props
+    const suffix = e.target.value
+
+    const newAxes = {
+      ...axes,
+      y: {
+        ...axes.y,
+        suffix,
+      },
+    }
+    this.setState({suffix}, () => onUpdateAxes(newAxes))
   }
 
   private handleSetYAxisBoundMin = (min: string): void => {
@@ -304,7 +331,7 @@ class AxesOptions extends PureComponent<Props> {
     onUpdateAxes(newAxes)
   }
 
-  private handleSetLabel = label => {
+  private handleSetLabel = (label: string): void => {
     const {onUpdateAxes, axes} = this.props
     const newAxes = {...axes, y: {...axes.y, label}}
 
