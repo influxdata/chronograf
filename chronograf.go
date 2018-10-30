@@ -725,20 +725,22 @@ type ProtoboardMeta struct {
 
 // ProtoboardCell holds visual and query information for a cell
 type ProtoboardCell struct {
-	X             int32            `json:"x"`
-	Y             int32            `json:"y"`
-	W             int32            `json:"w"`
-	H             int32            `json:"h"`
-	Name          string           `json:"name"`
-	Queries       []DashboardQuery `json:"queries"`
-	Axes          map[string]Axis  `json:"axes"`
-	Type          string           `json:"type"`
-	CellColors    []CellColor      `json:"colors"`
-	Legend        Legend           `json:"legend"`
-	TableOptions  TableOptions     `json:"tableOptions,omitempty"`
-	FieldOptions  []RenamableField `json:"fieldOptions"`
-	TimeFormat    string           `json:"timeFormat"`
-	DecimalPlaces DecimalPlaces    `json:"decimalPlaces"`
+	X              int32            `json:"x"`
+	Y              int32            `json:"y"`
+	W              int32            `json:"w"`
+	H              int32            `json:"h"`
+	Name           string           `json:"name"`
+	Queries        []DashboardQuery `json:"queries"`
+	Axes           map[string]Axis  `json:"axes"`
+	Type           string           `json:"type"`
+	CellColors     []CellColor      `json:"colors"`
+	Legend         Legend           `json:"legend"`
+	TableOptions   TableOptions     `json:"tableOptions,omitempty"`
+	FieldOptions   []RenamableField `json:"fieldOptions"`
+	TimeFormat     string           `json:"timeFormat"`
+	DecimalPlaces  DecimalPlaces    `json:"decimalPlaces"`
+	Note           string           `json:"note"`
+	NoteVisibility string           `json:"noteVisibility"`
 }
 
 // ProtoboardData is the data of a Protoboard that can be instantiated into a dashboard, including a collection of cells

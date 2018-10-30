@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import {getDeep} from 'src/utils/wrappers'
 
 import {getNextAvailablePosition} from 'src/dashboards/utils/cellGetters'
@@ -10,13 +9,9 @@ import {
   Template,
   Source,
   TemplateType,
+  CellQuery,
+  Cell,
 } from 'src/types'
-
-interface PBQueries {
-  query: string
-  groupbys: string[]
-  label: string
-}
 
 const addNewCellToCells = (
   cells: Array<Partial<PBCell>>,
@@ -39,13 +34,6 @@ const addNewCellToCells = (
       y,
     },
   ]
-}
-
-const isThereCollision = (
-  cell: Partial<PBCell>,
-  placedCells: Array<Partial<PBCell>>
-): boolean => {
-  return !!placedCells.find(c => cell.x === c.x && cell.y === c.y)
 }
 
 const createTemplatesForProtoboard = (source, measurement): Template[] => [
@@ -71,41 +59,31 @@ const replaceQuery = (q: string, source: Source) =>
     .replace(':db:', source.telegraf || 'telegraf')
     .replace(':rp:', source.defaultRP || 'autogen')
 
-const replaceDbRp = (queries: PBQueries[], source: Source) =>
+const replaceDbRp = (queries: CellQuery[], source: Source) =>
   queries.map(q => ({...q, query: replaceQuery(q.query, source)}))
 
 export const instantiateProtoboard = (
   protoboard: Protoboard,
   source: Source
 ): Partial<Dashboard> => {
-  const placedCells = []
-  const unPlacedCells = []
-  const measurement = getDeep<string>(
-    protoboard,
-    'data.cells[0].measurement',
-    ''
+  const measurement = getDeep<string>(protoboard, 'meta.measurements[0]', '')
+
+  let cellsWithPlaces = protoboard.data.cells
+
+  const isCellsUnplaced = protoboard.data.cells.every(
+    c => c.x === 0 && c.y === 0
   )
 
-  _.forEach(protoboard.data.cells, c => {
-    if ((c.x === 0 && c.y === 0) || isThereCollision(c, placedCells)) {
-      unPlacedCells.push(c)
-      return
-    }
-    placedCells.push(c)
-  })
-
-  const cellsWithPlaces = _.reduce(
-    unPlacedCells,
-    addNewCellToCells,
-    placedCells
-  )
+  if (isCellsUnplaced) {
+    cellsWithPlaces = protoboard.data.cells.reduce(addNewCellToCells, [])
+  }
 
   const templates = createTemplatesForProtoboard(source, measurement)
 
   const cells = cellsWithPlaces.map(c => ({
     ...c,
     queries: replaceDbRp(c.queries, source),
-  }))
+  })) as Cell[]
 
   const dashboard: Partial<Dashboard> = {
     name: protoboard.meta.name,
