@@ -135,6 +135,9 @@ export const parseResponseRaw = (response: string): ParseResponseRawResult => {
     }
 
     data.push(...parsedChunks[i])
+
+    // Add an empty line at the end
+    data.push([])
   }
 
   return {data, maxColumnCount}
