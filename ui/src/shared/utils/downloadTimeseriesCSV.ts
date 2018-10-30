@@ -67,13 +67,11 @@ const timeseriesToCSV = async (
   const header = table[0]
   const timeIndex = header.indexOf('time')
 
-  if (timeIndex < 0) {
-    throw new Error('could not find time index')
-  }
-
-  for (let i = 1; i < table.length; i++) {
-    // Convert times to a (somewhat) human readable ISO8601 string
-    table[i][timeIndex] = new Date(table[i][timeIndex]).toISOString()
+  if (timeIndex > -1) {
+    for (let i = 1; i < table.length; i++) {
+      // Convert times to a (somewhat) human readable ISO8601 string
+      table[i][timeIndex] = new Date(table[i][timeIndex]).toISOString()
+    }
   }
 
   return unparse(table)
