@@ -18,6 +18,8 @@ import {DYGRAPH_CONTAINER_XLABEL_MARGIN} from 'src/shared/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Annotation, DygraphClass, Source} from 'src/types'
 
+const INITIAL_X_COORD = 100
+
 interface Props {
   dygraph: DygraphClass
   source: Source
@@ -59,13 +61,18 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
       addingAnnotation: {startTime, endTime},
       staticLegendHeight,
     } = this.props
+
+    const initialTime = dygraph.toDataXCoord(INITIAL_X_COORD)
+    const resolvedStartTime = startTime ? startTime : initialTime
+    const resolvedEndTime = endTime ? endTime : initialTime
+
     const {isMouseOver} = this.state
-    const crosshairOne = Math.max(-1000, dygraph.toDomXCoord(startTime))
-    const crosshairTwo = dygraph.toDomXCoord(endTime)
+    const crosshairOne = Math.max(-1000, dygraph.toDomXCoord(resolvedStartTime))
+    const crosshairTwo = dygraph.toDomXCoord(resolvedEndTime)
     const crosshairHeight = `calc(100% - ${staticLegendHeight +
       DYGRAPH_CONTAINER_XLABEL_MARGIN}px)`
 
-    const isDragging = startTime !== endTime
+    const isDragging = resolvedStartTime !== resolvedEndTime
     const flagOneClass =
       crosshairOne < crosshairTwo
         ? 'annotation-span--left-flag dragging'
@@ -104,7 +111,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
             >
               {isMouseOver &&
                 isDragging &&
-                this.renderTimestamp(addingAnnotation.endTime)}
+                this.renderTimestamp(resolvedEndTime)}
               <div className={flagTwoClass} />
             </div>
           )}
@@ -114,7 +121,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
           >
             {isMouseOver &&
               !isDragging &&
-              this.renderTimestamp(addingAnnotation.startTime)}
+              this.renderTimestamp(resolvedStartTime)}
             <div className={isDragging ? flagOneClass : pointFlagClass} />
           </div>
         </div>
