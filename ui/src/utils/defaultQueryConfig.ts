@@ -2,6 +2,7 @@ import uuid from 'uuid'
 
 import {NULL_STRING} from 'src/shared/constants/queryFillOptions'
 import {QueryConfig} from 'src/types'
+import {TEMPLATE_RANGE} from 'src/tempVars/constants'
 
 interface DefaultQueryArgs {
   id?: string
@@ -27,6 +28,8 @@ const defaultQueryConfig = (
     status: null,
     shifts: [],
     fill: null,
+    range: TEMPLATE_RANGE,
+    originalQuery: null,
   }
 
   return isKapacitorRule ? queryConfig : {...queryConfig, fill: NULL_STRING}
