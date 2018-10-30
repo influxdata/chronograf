@@ -1,5 +1,5 @@
 import React from 'react'
-import TimeMachineEditor from 'src/flux/components/TimeMachineEditor'
+import FluxScriptEditor from 'src/flux/components/FluxScriptEditor'
 import {shallow} from 'enzyme'
 
 const setup = (override?) => {
@@ -9,7 +9,7 @@ const setup = (override?) => {
     ...override,
   }
 
-  const wrapper = shallow(<TimeMachineEditor {...props} />)
+  const wrapper = shallow(<FluxScriptEditor {...props} />)
 
   return {
     wrapper,
@@ -17,7 +17,7 @@ const setup = (override?) => {
   }
 }
 
-describe('Flux.Components.TimeMachineEditor', () => {
+describe('Flux.Components.FluxScriptEditor', () => {
   describe('rendering', () => {
     it('renders without error', () => {
       const {wrapper} = setup()

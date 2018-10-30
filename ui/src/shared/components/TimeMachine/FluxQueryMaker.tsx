@@ -4,10 +4,11 @@ import {Subscribe} from 'unstated'
 
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
-import TimeMachineEditor from 'src/flux/components/TimeMachineEditor'
+import FluxEditor from 'src/flux/components/FluxEditor'
 import FluxScriptWizard from 'src/shared/components/TimeMachine/FluxScriptWizard'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 import {Button, ComponentSize, ComponentColor} from 'src/reusable_ui'
+import FluxFunctionsToolbar from 'src/flux/components/flux_functions_toolbar/FluxFunctionsToolbar'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
@@ -81,7 +82,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     } = this.props
     const {suggestions, isWizardActive, draftScriptStatus} = this.state
 
-    const [leftSize, rightSize] = fluxProportions
+    const [leftSize, middleSize, rightSize] = fluxProportions
 
     const divisions = [
       {
@@ -94,7 +95,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       },
       {
         name: 'Script',
-        size: rightSize,
+        size: middleSize,
         customClass: 'flux-query-maker--script',
         headerOrientation: HANDLE_VERTICAL,
         headerButtons: [
@@ -114,31 +115,24 @@ class FluxQueryMaker extends PureComponent<Props, State> {
         ],
         menuOptions: [],
         render: visibility => (
-          <TimeMachineEditor
+          <FluxEditor
             status={draftScriptStatus}
             script={draftScript}
             visibility={visibility}
             suggestions={suggestions}
             onChangeScript={this.handleChangeDraftScript}
             onSubmitScript={this.handleSubmitScript}
-          >
-            {draftScript.trim() === '' && (
-              <div className="flux-script-wizard--bg-hint">
-                <p>
-                  New to Flux? Give the{' '}
-                  <Button
-                    text={'Script Wizard'}
-                    color={ComponentColor.Primary}
-                    titleText={'Open Script Wizard'}
-                    size={ComponentSize.Large}
-                    onClick={this.handleShowWizard}
-                  />{' '}
-                  a try
-                </p>
-              </div>
-            )}
-          </TimeMachineEditor>
+            onShowWizard={this.handleShowWizard}
+          />
         ),
+      },
+      {
+        name: 'Explore Functions',
+        size: rightSize,
+        headerButtons: [],
+        menuOptions: [],
+        render: () => <FluxFunctionsToolbar />,
+        headerOrientation: HANDLE_VERTICAL,
       },
     ]
 

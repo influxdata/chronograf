@@ -185,3 +185,18 @@ export enum VisType {
   Graph,
   Table,
 }
+
+export interface FluxToolbarArg {
+  name: string
+  desc: string
+  type: string
+}
+
+export interface FluxToolbarFunction {
+  name: string
+  args: FluxToolbarArg[]
+  desc: string
+  example: string
+  category: string
+  link: string
+}
