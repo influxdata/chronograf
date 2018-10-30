@@ -98,6 +98,17 @@ class TagValueList extends PureComponent<Props, State> {
     const {source, db, tagKey, measurement, notify} = this.props
     const {searchTerm, loading, shouldShowMoreValues} = this.state
 
+    if (loading === RemoteDataState.Error) {
+      return (
+        <div
+          className={`flux-schema-tree flux-schema--child flux-schema-tree--error`}
+          onClick={this.handleClick}
+        >
+          Could not fetch tag values
+        </div>
+      )
+    }
+
     if (loading === RemoteDataState.Loading) {
       return <LoaderSkeleton />
     }
