@@ -1,5 +1,6 @@
 import React, {PureComponent, MouseEvent, CSSProperties} from 'react'
-import {AutoSizer, Grid} from 'react-virtualized'
+import {Grid} from 'react-virtualized'
+import memoizeOne from 'memoize-one'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
@@ -7,70 +8,54 @@ import {parseResponseRaw} from 'src/shared/parsing/flux/response'
 
 interface Props {
   csv: string
-
-  // Used to give component explicit dimensions in testing. The component is
-  // sized automatically otherwise
-  width?: number
-  height?: number
+  width: number
+  height: number
 }
 
 interface State {
-  data: string[][]
-  maxColumnCount: number
   scrollLeft: number
   scrollTop: number
 }
 
 const ROW_HEIGHT = 30
 const MIN_COLUMN_WIDTH = 100
+const PADDING = 10
+
+const parseResponseRawMemoized = memoizeOne(parseResponseRaw)
 
 class RawFluxDataTable extends PureComponent<Props, State> {
-  public static getDerivedStateFromProps(props): Partial<State> {
-    // We are using `getDerivedStateFromProps` since this component only
-    // accepts one prop, and we want to recompute the state every time that prop
-    // changes. We can't use `memoizeOne`, since the prop is a large string and
-    // the equality check used in the `memoizeOne` helper is itself potentially
-    // quite expensive.
-    const {data, maxColumnCount} = parseResponseRaw(props.csv)
-
-    return {data, maxColumnCount}
-  }
-
-  public state = {data: [], maxColumnCount: 0, scrollLeft: 0, scrollTop: 0}
+  public state = {scrollLeft: 0, scrollTop: 0}
 
   public render() {
-    const {width, height} = this.props
+    const {width, height, csv} = this.props
     const {scrollTop, scrollLeft} = this.state
+    const {data, maxColumnCount} = parseResponseRawMemoized(csv)
+
+    const tableWidth = width - PADDING * 2
+    const tableHeight = height - PADDING * 2
 
     return (
-      <div className="raw-flux-data-table">
-        <AutoSizer>
-          {({width: autoWidth, height: autoHeight}) => {
-            const resolvedWidth = width ? width : autoWidth
-            const resolvedHeight = height ? height : autoHeight
-
-            return (
-              <FancyScrollbar
-                style={{
-                  overflowY: 'hidden',
-                  width: resolvedWidth,
-                  height: resolvedHeight,
-                }}
-                autoHide={false}
-                scrollTop={scrollTop}
-                scrollLeft={scrollLeft}
-                setScrollTop={this.onScrollbarsScroll}
-              >
-                {this.renderGrid(
-                  resolvedWidth,
-                  resolvedHeight,
-                  scrollLeft,
-                  scrollTop
-                )}
-              </FancyScrollbar>
-            )
+      <div className="raw-flux-data-table" style={{padding: `${PADDING}px`}}>
+        <FancyScrollbar
+          style={{
+            overflowY: 'hidden',
+            width: tableWidth,
+            height: tableHeight,
           }}
-        </AutoSizer>
+          autoHide={false}
+          scrollTop={scrollTop}
+          scrollLeft={scrollLeft}
+          setScrollTop={this.onScrollbarsScroll}
+        >
+          {this.renderGrid(
+            tableWidth,
+            tableHeight,
+            data,
+            maxColumnCount,
+            scrollLeft,
+            scrollTop
+          )}
+        </FancyScrollbar>
       </div>
     )
   }
@@ -78,19 +63,20 @@ class RawFluxDataTable extends PureComponent<Props, State> {
   private renderGrid(
     width: number,
     height: number,
+    data: string[][],
+    maxColumnCount: number,
     scrollLeft: number,
     scrollTop: number
   ): JSX.Element {
-    const {maxColumnCount, data} = this.state
     const rowCount = data.length
     const columnWidth = Math.max(MIN_COLUMN_WIDTH, width / maxColumnCount)
-    const style = this.gridStyle(columnWidth, rowCount)
+    const style = this.gridStyle(columnWidth, maxColumnCount, rowCount)
 
     return (
       <Grid
         width={width}
         height={height}
-        cellRenderer={this.renderCell}
+        cellRenderer={this.renderCell(data)}
         columnCount={maxColumnCount}
         rowCount={rowCount}
         rowHeight={ROW_HEIGHT}
@@ -102,8 +88,11 @@ class RawFluxDataTable extends PureComponent<Props, State> {
     )
   }
 
-  private gridStyle(columnWidth: number, rowCount: number): CSSProperties {
-    const {maxColumnCount} = this.state
+  private gridStyle(
+    columnWidth: number,
+    maxColumnCount: number,
+    rowCount: number
+  ): CSSProperties {
     const width = columnWidth * maxColumnCount
     const height = ROW_HEIGHT * rowCount
 
@@ -119,8 +108,13 @@ class RawFluxDataTable extends PureComponent<Props, State> {
     this.setState({scrollLeft, scrollTop})
   }
 
-  private renderCell = ({columnIndex, key, rowIndex, style}) => {
-    const datum = this.state.data[rowIndex][columnIndex]
+  private renderCell = (data: string[][]) => ({
+    columnIndex,
+    key,
+    rowIndex,
+    style,
+  }) => {
+    const datum = data[rowIndex][columnIndex]
 
     return (
       <div
