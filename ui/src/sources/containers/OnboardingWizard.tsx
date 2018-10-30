@@ -70,7 +70,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
         <Notifications />
         <WizardFullScreen
           skipLinkText={'skip'}
-          switchLinkText={'switch organizations'}
+          switchLinkText={'Switch Organizations'}
           handleSwitch={this.resetAndGotoPurgatory}
           isUsingAuth={isUsingAuth}
         >
