@@ -8,13 +8,13 @@ import NoKapacitorError from 'src/shared/components/NoKapacitorError'
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
 import TasksTable from 'src/kapacitor/components/TasksTable'
 
-import {source, kapacitorRules} from 'test/resources'
+import {source, kapacitorRules, kapacitor} from 'test/resources'
 
 describe('Kapacitor.Containers.KapacitorRules', () => {
   const props = {
     source,
     rules: kapacitorRules,
-    hasKapacitor: true,
+    kapacitor,
     loading: false,
     onDelete: () => {},
     onChangeRuleStatus: () => {},
@@ -52,7 +52,11 @@ describe('Kapacitor.Containers.KapacitorRules', () => {
     })
 
     it('renders NoKapacitorError if not loading and no kapacitor configured', () => {
-      const noKapacitorProps = {...props, loading: false, hasKapacitor: false}
+      const noKapacitorProps = {
+        ...props,
+        loading: false,
+        hasKapacitor: false,
+      }
       const wrapper = shallow(<KapacitorRules {...noKapacitorProps} />)
       const noKapacitorError = wrapper.find(NoKapacitorError)
       expect(noKapacitorError.length).toEqual(1)
