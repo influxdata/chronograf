@@ -73,7 +73,6 @@ $flux-tree-gutter: 11px;
 }
 
 .flux-schema--item {
-  @include no-user-select();
   position: relative;
   height: $flux-tree-indent;
   display: flex;

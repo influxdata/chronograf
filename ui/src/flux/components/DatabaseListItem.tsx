@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import classnames from 'classnames'
-import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 // Components
 import SchemaExplorerTree from 'src/flux/components/SchemaExplorerTree'
@@ -9,10 +8,6 @@ import SchemaExplorerTree from 'src/flux/components/SchemaExplorerTree'
 import {OpenState} from 'src/flux/constants/explorer'
 
 // Types
-import {
-  notifyCopyToClipboardSuccess,
-  notifyCopyToClipboardFailed,
-} from 'src/shared/copy/notifications'
 import {Source, NotificationAction} from 'src/types'
 import SchemaItemCategories from 'src/flux/components/SchemaItemCategories'
 
@@ -47,12 +42,6 @@ class DatabaseListItem extends PureComponent<Props, State> {
             {db}
             <span className="flux-schema--type">Bucket</span>
           </div>
-          <CopyToClipboard text={db} onCopy={this.handleCopyAttempt}>
-            <div className="flux-schema-copy" onClick={this.handleClickCopy}>
-              <span className="icon duplicate" title="copy to clipboard" />
-              Copy
-            </div>
-          </CopyToClipboard>
         </div>
         {this.categories}
       </div>
@@ -87,22 +76,6 @@ class DatabaseListItem extends PureComponent<Props, State> {
     return classnames('flux-schema-tree', {
       expanded: this.state.opened === OpenState.OPENED,
     })
-  }
-
-  private handleClickCopy = e => {
-    e.stopPropagation()
-  }
-
-  private handleCopyAttempt = (
-    copiedText: string,
-    isSuccessful: boolean
-  ): void => {
-    const {notify} = this.props
-    if (isSuccessful) {
-      notify(notifyCopyToClipboardSuccess(copiedText))
-    } else {
-      notify(notifyCopyToClipboardFailed(copiedText))
-    }
   }
 
   private handleClick = (e): void => {
