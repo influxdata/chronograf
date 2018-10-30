@@ -10,21 +10,18 @@
   width: 100%;
 }
 
-.wizard-step--child {
-  padding: 0 $ix-marg-d $ix-marg-b $ix-marg-d;
-  margin: $ix-marg-b auto;
-  overflow-y: auto;
-  max-height: 45vh;
-  min-height: 10vh;
-  position: relative;
-  z-index: 10;
-}
+// .wizard-step--child {
+//   padding: 0 $ix-marg-d $ix-marg-b $ix-marg-d;
+//   margin: $ix-marg-b auto;
+//   overflow-y: auto;
+//   max-height: 45vh;
+//   min-height: 10vh;
+//   position: relative;
+//   z-index: 10;
+// }
 
-.wizard-step--mask{
-  position: absolute;
-  height: $ix-marg-c;
-  min-width: 100%;
-  @include gradient-v(rgba(28, 28, 33, 0), $g1-raven);
-  bottom: 0;
-  z-index: 20;
+.wizard-step--child {
+  border-left: 2px solid $g0-obsidian;
+  border-right: 2px solid $g0-obsidian;
+  overflow: hidden; 
 }
