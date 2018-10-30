@@ -321,12 +321,13 @@ class Dygraph extends Component<Props, State> {
       return getStackedRange(y.bounds)
     }
 
-    const range = getRangeMemoizedY(timeSeries, y.bounds, ruleValues)
+    let range = getRangeMemoizedY(timeSeries, y.bounds, ruleValues)
+
     const [min, max] = range
 
     // Bug in Dygraph calculates a negative range for logscale when min range is 0
-    if (y.scale === LOG && timeSeries.length === 1 && min <= 0) {
-      return [0.1, max]
+    if (y.scale === LOG && min <= 0) {
+      range = [0.01, max]
     }
 
     return range
