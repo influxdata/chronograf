@@ -262,7 +262,6 @@ class LogsPage extends Component<Props, State> {
               data={this.tableData}
               onScrollVertical={this.handleVerticalScroll}
               onScrolledToTop={this.handleScrollToTop}
-              isScrolledToTop={false}
               isTruncated={this.isTruncated}
               onTagSelection={this.handleTagSelection}
               fetchMore={this.handleFetchOlderChunk}
@@ -576,6 +575,10 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleVerticalScroll = () => {
+    if (!this.isLiveUpdating && this.state.hasScrolled) {
+      return
+    }
+
     if (this.isLiveUpdating) {
       this.clearTailInterval()
     }
