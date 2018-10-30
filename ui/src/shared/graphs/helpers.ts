@@ -133,7 +133,10 @@ export const makeLegendStyles = (
   const pageHeaderHeight = 60
 
   const minimumX = graphRect.left
-  const maximumX = graphRect.left + graphRect.width - halfLegendWidth
+  const maximumX = Math.max(
+    graphRect.left + graphRect.width - halfLegendWidth,
+    minimumX
+  )
 
   const minimumY = graphRect.top - pageHeaderHeight
 
@@ -147,7 +150,7 @@ export const makeLegendStyles = (
 
   // Enforce Right Edge of Graph
   if (mouseX > maximumX) {
-    translateX = maximumX - halfLegendWidth
+    translateX = Math.max(maximumX - halfLegendWidth, minimumX)
   }
 
   // Prevent Legend from rendering off screen
