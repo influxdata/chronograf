@@ -4,12 +4,11 @@ import {Link} from 'react-router'
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
 import TasksTable from 'src/kapacitor/components/TasksTable'
 
-import {Source, AlertRule, Kapacitor} from 'src/types'
+import {Source, AlertRule} from 'src/types'
 
 interface KapacitorRulesProps {
   source: Source
   rules: AlertRule[]
-  kapacitor: Kapacitor
   onDelete: (rule: AlertRule) => void
   onChangeRuleStatus: (rule: AlertRule) => void
 }

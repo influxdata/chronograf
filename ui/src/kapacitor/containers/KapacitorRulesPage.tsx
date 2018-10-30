@@ -93,7 +93,6 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
       <KapacitorRules
         rules={rules}
         source={source}
-        kapacitor={kapacitor}
         onDelete={this.handleDeleteRule}
         onChangeRuleStatus={this.handleRuleStatus}
       />
