@@ -7,6 +7,8 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+import PageSpinner from 'src/shared/components/PageSpinner'
+
 import {
   isUserAuthorized,
   VIEWER_ROLE,
@@ -201,7 +203,7 @@ export class CheckSources extends Component<Props, State> {
     const currentOrganization = _.get(me, 'currentOrganization')
 
     if (isFetching || !source || (isUsingAuth && !currentOrganization)) {
-      return <div className="page-spinner" />
+      return <PageSpinner />
     }
 
     // TODO: guard against invalid resource access

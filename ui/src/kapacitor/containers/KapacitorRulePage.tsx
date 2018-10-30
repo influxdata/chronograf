@@ -3,6 +3,8 @@ import _ from 'lodash'
 import {InjectedRouter} from 'react-router'
 import {connect} from 'react-redux'
 
+import PageSpinner from 'src/shared/components/PageSpinner'
+
 import * as kapacitorRuleActionCreators from 'src/kapacitor/actions/view'
 import * as kapacitorQueryConfigActionCreators from 'src/kapacitor/actions/queryConfigs'
 
@@ -101,7 +103,7 @@ class KapacitorRulePage extends Component<Props, State> {
     const query = rule && queryConfigs[rule.queryID]
 
     if (!query) {
-      return <div className="page-spinner" />
+      return <PageSpinner />
     }
 
     return (

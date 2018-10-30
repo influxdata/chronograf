@@ -2,6 +2,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import {CheckSources} from 'src/CheckSources'
 import MockChild from 'mocks/MockChild'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {source} from 'test/resources'
 
@@ -49,7 +50,7 @@ describe('CheckSources', () => {
 
     it('renders a spinner when the component is fetching', () => {
       const {wrapper} = setup()
-      const spinner = wrapper.find('.page-spinner')
+      const spinner = wrapper.find(PageSpinner)
 
       expect(spinner.exists()).toBe(true)
     })

@@ -39,6 +39,7 @@ import {AdminChronografPage, AdminInfluxDBPage} from 'src/admin'
 import {ManageSources, OnboardingWizard} from 'src/sources'
 
 import NotFound from 'src/shared/components/NotFound'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {getLinksAsync} from 'src/shared/actions/links'
 import {getMeAsync} from 'src/shared/actions/auth'
@@ -187,7 +188,7 @@ class Root extends PureComponent<{}, State> {
         </UnstatedProvider>
       </ReduxProvider>
     ) : (
-      <div className="page-spinner" />
+      <PageSpinner />
     )
   }
 

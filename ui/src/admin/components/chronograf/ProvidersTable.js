@@ -5,6 +5,7 @@ import uuid from 'uuid'
 import ProvidersTableRow from 'src/admin/components/chronograf/ProvidersTableRow'
 import ProvidersTableRowNew from 'src/admin/components/chronograf/ProvidersTableRowNew'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 class ProvidersTable extends Component {
   constructor(props) {
@@ -47,7 +48,7 @@ class ProvidersTable extends Component {
       return (
         <div className="panel panel-solid">
           <div className="panel-body">
-            <div className="page-spinner" />
+            <PageSpinner />
           </div>
         </div>
       )

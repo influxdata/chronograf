@@ -25,6 +25,7 @@ import SendToDashboardOverlay from 'src/data_explorer/components/SendToDashboard
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
 import TimeMachine from 'src/shared/components/TimeMachine/TimeMachine'
 import DEHeader from 'src/data_explorer/components/DEHeader'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 // Actions
 import {errorThrown} from 'src/shared/actions/errors'
@@ -168,7 +169,7 @@ export class DataExplorer extends PureComponent<Props, State> {
     const {isStaticLegend, isComponentMounted} = this.state
 
     if (!isComponentMounted) {
-      return <div className="page-spinner" />
+      return <PageSpinner />
     }
 
     return (
