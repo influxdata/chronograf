@@ -137,18 +137,25 @@ export const deleteKapacitor = (kapacitor: Kapacitor) => ({
 export type RemoveAndLoadSources = (
   source: Source
 ) => (dispatch) => Promise<void>
+
 // Async action creators
 export const removeAndLoadSources = (source: Source) => async (
-  dispatch
+  dispatch,
+  getState
 ): Promise<void> => {
+  const {sources = []} = getState()
+  const filteredSources = sources.filter(s => s.id !== source.id)
+
+  dispatch(loadSources(filteredSources))
+
   try {
     try {
       await deleteSource(source)
     } catch (err) {
+      dispatch(loadSources(sources))
       // A 404 means that either a concurrent write occurred or the source
       // passed to this action creator doesn't exist (or is undefined)
       if (err.status !== HTTP_NOT_FOUND) {
-        // eslint-disable-line no-magic-numbers
         throw err
       }
     }
