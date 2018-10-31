@@ -10,7 +10,6 @@ import _ from 'lodash'
 import {Subscribe} from 'unstated'
 
 // Utils
-import {getDeep} from 'src/utils/wrappers'
 import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'

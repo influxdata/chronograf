@@ -43,6 +43,7 @@ import {Links, ScriptStatus} from 'src/types/flux'
 import {ColorString, ColorNumber} from 'src/types/colors'
 
 interface ConnectedProps {
+  queryType: QueryType
   queryDrafts: CellQuery[]
   script: string
   draftScript: string
@@ -189,12 +190,9 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private get isFluxQuery(): boolean {
-    const {queryDrafts} = this.props
+    const {queryType} = this.props
 
-    if (getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) {
-      return true
-    }
-    return false
+    return queryType === QueryType.Flux
   }
 
   private handleUpdateScriptStatus = (scriptStatus: ScriptStatus): void => {
@@ -327,6 +325,7 @@ const ConnectedCellEditorOverlay = (props: PassedProps) => {
         return (
           <CellEditorOverlay
             {...props}
+            queryType={state.queryType}
             queryDrafts={state.queryDrafts}
             script={state.script}
             draftScript={state.draftScript}

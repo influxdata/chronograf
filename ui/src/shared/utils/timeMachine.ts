@@ -24,7 +24,7 @@ export function initialStateFromCell(
   const initialState: Partial<TimeMachineState> = {
     queryDrafts,
     type: cell.type,
-    queryType: getDeep<QueryType>(queryDrafts, '0.type', QueryType.InfluxQL),
+    queryType: getDeep<QueryType>(cell, 'queries.0.type', QueryType.InfluxQL),
     fieldOptions: cell.fieldOptions,
     timeFormat: cell.timeFormat,
     decimalPlaces: cell.decimalPlaces,
@@ -65,7 +65,7 @@ function initialQueryDrafts(cell: Cell | NewDefaultCell): CellQuery[] {
   }
 
   if (cell.queries[0].type === QueryType.Flux) {
-    return [defaultQueryDraft(QueryType.Flux, cell.queries[0].source)]
+    return [defaultQueryDraft(QueryType.InfluxQL, cell.queries[0].source)]
   }
 
   return queries.map(q => {
