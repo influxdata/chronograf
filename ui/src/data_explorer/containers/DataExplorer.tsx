@@ -92,6 +92,7 @@ interface PassedProps {
 }
 
 interface ConnectedProps {
+  queryType: QueryType
   queryDrafts: CellQuery[]
   timeRange: TimeRange
   draftScript: string
@@ -264,9 +265,9 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private writeQueryParams() {
-    const {router, queryDrafts, script} = this.props
+    const {router, queryDrafts, script, queryType} = this.props
     const query = _.get(queryDrafts, '0.query')
-    const isFlux = _.get(queryDrafts, '0.type') === QueryType.Flux
+    const isFlux = queryType === QueryType.Flux
 
     let queryParams
 
@@ -319,7 +320,6 @@ export class DataExplorer extends PureComponent<Props, State> {
             queryConfig={this.activeQueryConfig}
             script={draftScript}
             source={source}
-            isFluxQuery={this.isFluxQuery}
             rawText={this.rawText}
             dashboards={dashboards}
             handleGetDashboards={handleGetDashboards}
@@ -329,12 +329,6 @@ export class DataExplorer extends PureComponent<Props, State> {
         </OverlayTechnology>
       </Authorized>
     )
-  }
-
-  private get isFluxQuery(): boolean {
-    const {queryDrafts} = this.props
-    const type = getDeep<string>(queryDrafts, '0.type', '')
-    return type === 'flux'
   }
 
   private get templates(): Template[] {
@@ -440,6 +434,7 @@ const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
           <DataExplorer
             {...props}
             queryDrafts={state.queryDrafts}
+            queryType={state.queryType}
             draftScript={state.draftScript}
             timeRange={state.timeRange}
             script={state.script}
