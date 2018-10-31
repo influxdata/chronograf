@@ -104,10 +104,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
     return (
       <div className="flux-script-wizard">
         <div className="flux-script-wizard--children">{children}</div>
-        <div
-          className="flux-script-wizard--backdrop"
-          onClick={this.handleClose}
-        />
+        <div className="flux-script-wizard--backdrop" />
         <div className="flux-script-wizard--wizard">
           <div className="flux-script-wizard--wizard-header">
             <h3>Flux Script Wizard</h3>
