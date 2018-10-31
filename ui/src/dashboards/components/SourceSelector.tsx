@@ -18,8 +18,7 @@ interface Props {
   sourceSupportsFlux: boolean
   queries: QueriesModels.QueryConfig[]
   isDynamicSourceSelected: boolean
-  toggleFluxOn: () => void
-  toggleFluxOff: () => void
+  toggleFlux: (queryType: QueryType) => void
   onSelectDynamicSource: () => void
   onChangeSource: (source: SourcesModels.Source, type: QueryType) => void
 }
@@ -28,8 +27,7 @@ const SourceSelector: SFC<Props> = ({
   source,
   sources = [],
   queries,
-  toggleFluxOn,
-  toggleFluxOff,
+  toggleFlux,
   isFluxSelected,
   onChangeSource,
   sourceSupportsFlux,
@@ -57,8 +55,8 @@ const SourceSelector: SFC<Props> = ({
         <Radio.Button
           id="influxql-source"
           titleText="InfluxQL"
-          value="InfluxQL"
-          onClick={toggleFluxOff}
+          value={QueryType.InfluxQL}
+          onClick={toggleFlux}
           active={!isFluxSelected}
           disabled={!sourceSupportsFlux}
         >
@@ -67,8 +65,8 @@ const SourceSelector: SFC<Props> = ({
         <Radio.Button
           id="flux-source"
           titleText="Flux"
-          value="Flux"
-          onClick={toggleFluxOn}
+          value={QueryType.Flux}
+          onClick={toggleFlux}
           active={isFluxSelected}
           disabled={!sourceSupportsFlux}
         >

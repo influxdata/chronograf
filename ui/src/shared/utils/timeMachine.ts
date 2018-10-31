@@ -4,6 +4,7 @@ import {get} from 'lodash'
 
 // Utils
 import defaultQueryConfig from 'src/utils/defaultQueryConfig'
+import {getDeep} from 'src/utils/wrappers'
 import {getLineColors} from 'src/shared/constants/graphColorPalettes'
 import {
   getThresholdsListColors,
@@ -19,9 +20,11 @@ import {TimeMachineState} from 'src/shared/utils/TimeMachineContainer'
 export function initialStateFromCell(
   cell: Cell | NewDefaultCell
 ): Partial<TimeMachineState> {
+  const queryDrafts = initialQueryDrafts(cell)
   const initialState: Partial<TimeMachineState> = {
-    queryDrafts: initialQueryDrafts(cell),
+    queryDrafts,
     type: cell.type,
+    queryType: getDeep<QueryType>(queryDrafts, '0.type', QueryType.InfluxQL),
     fieldOptions: cell.fieldOptions,
     timeFormat: cell.timeFormat,
     decimalPlaces: cell.decimalPlaces,

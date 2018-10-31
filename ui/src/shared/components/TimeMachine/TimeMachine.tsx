@@ -50,8 +50,10 @@ import {Links, ScriptStatus} from 'src/types/flux'
 interface ConnectedProps {
   script: string
   draftScript: string
+  queryType: QueryType
   queryDrafts: CellQuery[]
   timeMachineProportions: number[]
+  onUpdateQueryType: (queryType: QueryType) => void
   onChangeScript: (script: string) => void
   onChangeDraftScript: (draftScript: string) => void
   onUpdateQueryDrafts: TimeMachineContainer['handleUpdateQueryDrafts']
@@ -172,9 +174,8 @@ class TimeMachine extends PureComponent<Props, State> {
           templates={templates}
           timeRange={timeRange}
           sources={this.formattedSources}
-          toggleFluxOn={this.toggleFluxOn}
+          toggleFlux={this.toggleFlux}
           queries={this.queriesWorkingDraft}
-          toggleFluxOff={this.toggleFluxOff}
           isViewingRawData={isViewingRawData}
           isFluxSelected={this.isFluxSelected}
           onChangeSource={this.handleChangeSource}
@@ -309,11 +310,8 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get isFluxSelected(): boolean {
-    const {queryDrafts} = this.props
-    return (
-      !!(getDeep<string>(queryDrafts, '0.type', '') === QueryType.Flux) &&
-      this.sourceSupportsFlux
-    )
+    const {queryType} = this.props
+    return queryType === QueryType.Flux && this.sourceSupportsFlux
   }
 
   private get sourceSupportsFlux(): boolean {
@@ -538,20 +536,13 @@ class TimeMachine extends PureComponent<Props, State> {
     this.setState({isViewingRawData: !this.state.isViewingRawData})
   }
 
-  private toggleFluxOn = (): void => {
-    if (!this.isFluxSelected) {
-      const newQueryType = QueryType.Flux
-      const source = this.useDynamicSource ? null : this.source
-      this.updateQueryDraftsSource(source, newQueryType)
-    }
-  }
-
-  private toggleFluxOff = (): void => {
-    if (this.isFluxSelected) {
-      const newQueryType = QueryType.InfluxQL
-      const source = this.useDynamicSource ? null : this.source
-      this.updateQueryDraftsSource(source, newQueryType)
-      this.setState({isViewingRawData: false})
+  private toggleFlux = (type: QueryType): void => {
+    const {onUpdateQueryType} = this.props
+    const shouldUpdateType =
+      (type === QueryType.InfluxQL && this.isFluxSelected) ||
+      (type === QueryType.Flux && !this.isFluxSelected)
+    if (shouldUpdateType) {
+      onUpdateQueryType(type)
     }
   }
 }
@@ -566,10 +557,12 @@ const ConnectedTimeMachine = (props: PassedProps & ManualRefreshProps) => {
           <TimeMachine
             {...props}
             script={state.script}
+            queryType={state.queryType}
             draftScript={state.draftScript}
             queryDrafts={state.queryDrafts}
             timeRange={state.timeRange}
             timeMachineProportions={container.state.timeMachineProportions}
+            onUpdateQueryType={container.handleUpdateQueryType}
             onUpdateTimeRange={container.handleUpdateTimeRange}
             onChangeScript={container.handleChangeScript}
             onChangeDraftScript={container.handleUpdateDraftScript}

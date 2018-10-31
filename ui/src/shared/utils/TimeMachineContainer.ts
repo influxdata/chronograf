@@ -70,12 +70,13 @@ import {ColorString, ColorNumber} from 'src/types/colors'
 
 const LOCAL_STORAGE_DELAY_MS = 1000
 
-const DEFAULT_STATE = () => ({
+const DEFAULT_STATE = (): TimeMachineState => ({
   script: '',
   draftScript: '',
   queryDrafts: [defaultQueryDraft(QueryType.InfluxQL)],
   timeRange: DEFAULT_TIME_RANGE,
   type: CellType.Line,
+  queryType: QueryType.InfluxQL,
   note: '',
   noteVisibility: NoteVisibility.Default,
   thresholdsListType: ThresholdType.Text,
@@ -97,6 +98,7 @@ export interface TimeMachineState {
   queryDrafts: CellQuery[]
   timeRange: TimeRange
   type: CellType
+  queryType: QueryType
   axes: Axes | null
   tableOptions: TableOptions
   fieldOptions: FieldOption[]
@@ -141,6 +143,10 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
     }
 
     return this.setAndPersistState(state)
+  }
+
+  public handleUpdateQueryType = (queryType: QueryType) => {
+    return this.setAndPersistState({queryType})
   }
 
   public handleChangeScript = (script: string) => {

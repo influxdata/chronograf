@@ -32,8 +32,7 @@ interface Props {
   onSelectDynamicSource: () => void
   timeRange: QueriesModels.TimeRange
   updateEditorTimeRange: (timeRange: QueriesModels.TimeRange) => void
-  toggleFluxOn: () => void
-  toggleFluxOff: () => void
+  toggleFlux: (queryType: QueryType) => void
   toggleIsViewingRawData: () => void
 }
 
@@ -44,8 +43,7 @@ const TimeMachineControls: SFC<Props> = ({
   queries,
   templates,
   timeRange,
-  toggleFluxOn,
-  toggleFluxOff,
+  toggleFlux,
   isFluxSelected,
   isViewingRawData,
   autoRefreshDuration,
@@ -63,8 +61,7 @@ const TimeMachineControls: SFC<Props> = ({
         source={source}
         sources={sources}
         queries={queries}
-        toggleFluxOn={toggleFluxOn}
-        toggleFluxOff={toggleFluxOff}
+        toggleFlux={toggleFlux}
         sourceSupportsFlux={sourceSupportsFlux}
         isFluxSelected={isFluxSelected}
         onChangeSource={onChangeSource}
