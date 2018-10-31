@@ -1,3 +1,5 @@
+import {DASHBOARD_TIME, INTERVAL} from 'src/flux/helpers/templates'
+
 import {proxy} from 'src/utils/queryUrlGenerator'
 import {parseMetaQuery} from 'src/tempVars/parsing'
 
@@ -96,7 +98,8 @@ export function getDefaultDBandRP(
 export function renderScript(
   selectedBucket: string,
   selectedMeasurement: string,
-  selectedFields: string[]
+  selectedFields: string[],
+  aggFunction: string
 ): string {
   let filterPredicate = `r._measurement == "${selectedMeasurement}"`
 
@@ -109,9 +112,19 @@ export function renderScript(
   }
 
   const from = `from(bucket: "${selectedBucket}")`
-  const range = `|> range(start: -1h)`
+  const range = `|> range(start: ${DASHBOARD_TIME})`
   const filter = `|> filter(fn: (r) => ${filterPredicate})`
-  const script = [from, range, filter].join('\n  ')
+
+  let script = [from, range, filter].join('\n  ')
+
+  if (!aggFunction) {
+    return script
+  }
+
+  const window = `|> window(every: ${INTERVAL})`
+  const group = '|> group(except: ["_time", "_start", "_stop", "_value"])'
+
+  script = [script, window, aggFunction, group].join('\n  ')
 
   return script
 }

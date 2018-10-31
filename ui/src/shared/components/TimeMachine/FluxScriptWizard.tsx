@@ -25,6 +25,12 @@ import {
   DBsToRPs,
 } from 'src/shared/utils/fluxScriptWizard'
 
+// Constants
+import {
+  AGG_FUNCTIONS,
+  DEFAULT_AGG_FUNCTION,
+} from 'src/shared/constants/fluxScriptWizard'
+
 // Types
 import {RemoteDataState, Source} from 'src/types'
 
@@ -51,6 +57,7 @@ interface State {
   fields: string[]
   fieldsStatus: RemoteDataState
   selectedFields: string[] | null
+  selectedAggFunction: string | null
 }
 
 class FluxScriptWizard extends PureComponent<Props, State> {
@@ -65,6 +72,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
     fields: [],
     fieldsStatus: RemoteDataState.NotStarted,
     selectedFields: null,
+    selectedAggFunction: DEFAULT_AGG_FUNCTION.value,
   }
 
   private fetchDBsToRPs = restartable(fetchDBsToRPs)
@@ -82,6 +90,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
       fields,
       selectedMeasurement,
       selectedFields,
+      selectedAggFunction,
     } = this.state
 
     if (!isWizardActive) {
@@ -154,6 +163,18 @@ class FluxScriptWizard extends PureComponent<Props, State> {
                   ))}
                 </MultiSelectDropdown>
               </Form.Element>
+              <Form.Element label="Choose an Aggregate">
+                <Dropdown
+                  selectedID={selectedAggFunction}
+                  onChange={this.handleSelectAggFunction}
+                >
+                  {AGG_FUNCTIONS.map(({description, value}) => (
+                    <Dropdown.Item key={value} id={value} value={value}>
+                      {description}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown>
+              </Form.Element>
               <Form.Footer>
                 <Button
                   text="Insert Script"
@@ -191,7 +212,9 @@ class FluxScriptWizard extends PureComponent<Props, State> {
 
   private get bucketDropdownSelectedID(): string {
     const {selectedDB, selectedRP} = this.state
-    return formatDBwithRP(selectedDB, selectedRP)
+    const bucketDropdownSelectedID = formatDBwithRP(selectedDB, selectedRP)
+
+    return bucketDropdownSelectedID
   }
 
   private get bucketDropdownStatus(): ComponentStatus {
@@ -244,6 +267,10 @@ class FluxScriptWizard extends PureComponent<Props, State> {
     this.setState({selectedFields})
   }
 
+  private handleSelectAggFunction = (selectedAggFunction: string) => {
+    this.setState({selectedAggFunction})
+  }
+
   private handleAddToScript = () => {
     const {onSetIsWizardActive, onAddToScript} = this.props
     const {
@@ -251,12 +278,14 @@ class FluxScriptWizard extends PureComponent<Props, State> {
       selectedRP,
       selectedMeasurement,
       selectedFields,
+      selectedAggFunction,
     } = this.state
-    const selectedBucket = formatDBwithRP(selectedDB, selectedRP)
+
     const script = renderScript(
-      selectedBucket,
+      formatDBwithRP(selectedDB, selectedRP),
       selectedMeasurement,
-      selectedFields
+      selectedFields,
+      selectedAggFunction
     )
 
     onAddToScript(script)
