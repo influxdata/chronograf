@@ -124,6 +124,11 @@ class TimeSeries extends PureComponent<Props, State> {
     const currQueries = _.map(this.props.queries, q => q.text)
     const queriesDifferent = !_.isEqual(prevQueries, currQueries)
 
+    const prevTemplates = _.get(prevProps, 'templates')
+    const newTemplates = _.get(this.props, 'templates')
+    // templates includes dashTime and upperDashTime which capture zoomedTimeRange
+    const templatesDifferent = !_.isEqual(prevTemplates, newTemplates)
+
     const oldLower = _.get(prevProps, 'timeRange.lower')
     const oldUpper = _.get(prevProps, 'timeRange.upper')
     const newLower = _.get(this.props, 'timeRange.lower')
@@ -133,6 +138,7 @@ class TimeSeries extends PureComponent<Props, State> {
     const shouldExecuteQueries =
       queriesDifferent ||
       timeRangeChanged ||
+      templatesDifferent ||
       this.props.uuid !== prevProps.uuid ||
       this.state.fetchCount === 0 ||
       this.props.xPixels !== prevProps.xPixels
