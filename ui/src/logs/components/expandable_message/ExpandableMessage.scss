@@ -77,3 +77,8 @@
     cursor: pointer;
   }
 }
+
+/* TODO: Make fancyscroll more customizable */
+.expanded--message .fancy-scroll--track-h {
+  display: none;
+}
