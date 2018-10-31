@@ -222,12 +222,13 @@ class Dygraph extends Component<Props, State> {
           className="dygraph-child-container"
           ref={this.graphRef}
           style={this.dygraphStyle}
-        />
-        <ReactResizeDetector
-          handleWidth={true}
-          handleHeight={true}
-          onResize={this.resize}
-        />
+        >
+          <ReactResizeDetector
+            handleWidth={true}
+            handleHeight={true}
+            onResize={this.resize}
+          />
+        </div>
       </div>
     )
   }
