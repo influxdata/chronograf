@@ -25,11 +25,15 @@
   width: 400px;
   border-radius: 4px;
   background-color: $g3-castle;
-  padding: 15px 15px 25px 15px;
+  padding: 10px 15px;
   z-index: 200;
 
   .form--element {
     margin-bottom: 15px;
+  }
+  
+  .form--submit {
+    margin-top: 6px;
   }
 }
 
@@ -37,7 +41,7 @@
   width: 100%;
   text-align: center;
   position: relative;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .flux-script-wizard--close {

@@ -4,9 +4,9 @@ import {computeInterval} from 'src/tempVars/utils/replace'
 import {DEFAULT_DURATION_MS} from 'src/shared/constants'
 
 // For now we only support these template variables in Flux queries
-const DASHBOARD_TIME = 'dashboardTime'
-const UPPER_DASHBOARD_TIME = 'upperDashboardTime'
-const INTERVAL = 'autoInterval'
+export const DASHBOARD_TIME = 'dashboardTime'
+export const UPPER_DASHBOARD_TIME = 'upperDashboardTime'
+export const INTERVAL = 'autoInterval'
 
 const INTERVAL_REGEX = /autoInterval/g
 
