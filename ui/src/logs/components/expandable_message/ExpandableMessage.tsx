@@ -26,6 +26,8 @@ interface Props {
 
 const PADDING = 8
 const MIN_LEFT = 120
+const MIN_MESSAGE_WIDTH = 200
+const MAX_MESSAGE_HEIGHT = 200
 
 @ErrorHandling
 export class ExpandableMessage extends Component<Props, State> {
@@ -83,8 +85,8 @@ export class ExpandableMessage extends Component<Props, State> {
         notify={this.props.notify}
         onClose={this.handleClose}
         maxWidth={this.props.maxWidth}
-        minWidth={200}
-        maxHeight={100}
+        minWidth={MIN_MESSAGE_WIDTH}
+        maxHeight={MAX_MESSAGE_HEIGHT}
         padding={PADDING}
         top={top}
         left={left}

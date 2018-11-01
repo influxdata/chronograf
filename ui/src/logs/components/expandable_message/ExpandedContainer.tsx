@@ -29,8 +29,6 @@ interface State {
   scrollTop: number
 }
 
-const MIN_LEFT = 120
-
 @ErrorHandling
 export class ExpandedContainer extends Component<Props, State> {
   private initialVisibility: boolean
@@ -56,7 +54,7 @@ export class ExpandedContainer extends Component<Props, State> {
           left: this.maxLeft,
           width: this.visibleWidth,
           padding: this.props.padding,
-          maxHeight: this.maxHeight,
+          maxHeight: this.props.maxHeight,
         })}
       </ClickOutside>
     )
@@ -74,7 +72,7 @@ export class ExpandedContainer extends Component<Props, State> {
           setScrollTop={this.handleScrollbarScroll}
           scrollTop={this.state.scrollTop}
           autoHeight={true}
-          maxHeight={this.props.maxHeight}
+          maxHeight={this.maxHeight}
         >
           {this.props.children}
         </FancyScrollbar>
@@ -83,7 +81,11 @@ export class ExpandedContainer extends Component<Props, State> {
   }
 
   private get maxHeight(): number {
-    return this.props.maxHeight + 2 * this.props.padding
+    return this.props.maxHeight - this.verticalPadding
+  }
+
+  private get verticalPadding(): number {
+    return this.props.padding * 2
   }
 
   private get top(): number {
@@ -113,7 +115,7 @@ export class ExpandedContainer extends Component<Props, State> {
   }
 
   private get maxLeft(): number {
-    return Math.max(MIN_LEFT, this.props.left - this.props.padding)
+    return Math.max(this.props.minLeft, this.props.left - this.props.padding)
   }
 
   private get visibleWidth(): number {
@@ -125,7 +127,7 @@ export class ExpandedContainer extends Component<Props, State> {
   }
 
   private get remainingWidth(): number {
-    if (this.props.left > MIN_LEFT) {
+    if (this.props.left > this.props.minLeft) {
       return this.props.maxWidth - this.hiddenWidth
     } else {
       return this.props.width + this.hiddenWidth
@@ -133,7 +135,7 @@ export class ExpandedContainer extends Component<Props, State> {
   }
 
   private get hiddenWidth(): number {
-    return this.props.left - MIN_LEFT
+    return this.props.left - this.props.minLeft
   }
 
   // Table space with room for scrollbar
