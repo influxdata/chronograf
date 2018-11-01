@@ -88,7 +88,7 @@ const DEFAULT_STATE = (): TimeMachineState => ({
   timeFormat: DEFAULT_TIME_FORMAT,
   decimalPlaces: DEFAULT_DECIMAL_PLACES,
   fieldOptions: DEFAULT_FIELD_OPTIONS,
-  fluxProportions: [0.34, 0.66],
+  fluxProportions: [0.2, 0.6, 0.2],
   timeMachineProportions: [0.33, 0.67],
 })
 

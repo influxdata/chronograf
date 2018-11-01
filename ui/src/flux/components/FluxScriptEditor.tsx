@@ -40,7 +40,7 @@ interface EditorInstance extends IInstance {
 }
 
 @ErrorHandling
-class TimeMachineEditor extends PureComponent<Props, State> {
+class FluxScriptEditor extends PureComponent<Props, State> {
   private editor: EditorInstance
   private lineWidgets: Widget[] = []
 
@@ -87,7 +87,7 @@ class TimeMachineEditor extends PureComponent<Props, State> {
     }
 
     return (
-      <div className="time-machine-editor">
+      <div className="flux-script-editor">
         <ReactCodeMirror
           autoFocus={true}
           autoCursor={true}
@@ -222,4 +222,4 @@ class TimeMachineEditor extends PureComponent<Props, State> {
   }
 }
 
-export default TimeMachineEditor
+export default FluxScriptEditor
