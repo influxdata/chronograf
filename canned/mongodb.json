@@ -90,11 +90,11 @@
       "w": 4,
       "h": 4,
       "i": "5b03bef0-e5e9-4b53-b5f8-1d1b740cf5a2",
-      "name": "MongoDB – Page Faults",
+      "name": "MongoDB – Commands",
       "queries": [
         {
-          "query": "SELECT mean(page_faults_per_sec) AS page_faults_per_second FROM \":db:\".\":rp:\".\"mongodb\"",
-          "label": "faults/s",
+          "query": "SELECT mean(commands_per_sec) AS commands_per_second FROM \":db:\".\":rp:\".\"mongodb\"",
+          "label": "commands/s",
           "groupbys": [],
           "wheres": []
         }
