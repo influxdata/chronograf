@@ -15,7 +15,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {IS_STATIC_LEGEND} from 'src/shared/constants'
 
 // Types
-import {TimeRange, Cell, Template, Source} from 'src/types'
+import {TimeRange, Cell, Template, Source, QueryType} from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
@@ -99,6 +99,7 @@ class Layout extends Component<Props, State> {
     return (
       <RefreshingGraph
         onZoom={onZoom}
+        queryType={QueryType.Flux}
         timeFormat={cell.timeFormat}
         axes={cell.axes}
         type={cell.type}
@@ -142,6 +143,7 @@ class Layout extends Component<Props, State> {
     return (
       <RefreshingGraph
         onZoom={onZoom}
+        queryType={QueryType.InfluxQL}
         timeFormat={cell.timeFormat}
         axes={cell.axes}
         type={cell.type}

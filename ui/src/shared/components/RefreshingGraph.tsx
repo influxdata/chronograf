@@ -66,6 +66,7 @@ interface Props {
   axes: Axes
   source: Source
   queries: Query[]
+  queryType: QueryType
   timeRange: TimeRange
   colors: ColorString[]
   templates: Template[]
@@ -119,6 +120,7 @@ class RefreshingGraph extends Component<Props> {
       queries,
       cellNote,
       onNotify,
+      queryType,
       timeRange,
       templates,
       fluxASTLink,
@@ -216,7 +218,11 @@ class RefreshingGraph extends Component<Props> {
                       )
                     }
 
-                    if (showRawFluxData) {
+                    if (
+                      showRawFluxData &&
+                      queryType === QueryType.Flux &&
+                      !_.isEmpty(rawFluxData)
+                    ) {
                       return (
                         <RawFluxDataTable
                           csv={rawFluxData}
@@ -260,9 +266,9 @@ class RefreshingGraph extends Component<Props> {
   }
 
   private get isFluxQuery(): boolean {
-    const {queries} = this.props
+    const {queryType} = this.props
 
-    return getDeep<string>(queries, '0.type', '') === QueryType.Flux
+    return queryType === QueryType.Flux
   }
 
   private get shouldShowNoResults(): boolean {

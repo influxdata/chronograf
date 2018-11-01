@@ -51,7 +51,6 @@ interface PassedProps {
   dashboards: Dashboard[]
   source: Source
   rawText: string
-  isFluxQuery: boolean
   onCancel: () => void
   sendDashboardCell: (
     dashboard: Dashboard,
@@ -63,6 +62,7 @@ interface PassedProps {
 }
 
 interface ConnectedProps {
+  queryType: QueryType
   visualizationOptions: VisualizationOptions
 }
 
@@ -200,8 +200,8 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private get hasQuery(): boolean {
-    const {queryConfig, script, isFluxQuery} = this.props
-    if (isFluxQuery) {
+    const {queryConfig, script, queryType} = this.props
+    if (queryType === QueryType.Flux) {
       return !!script.length
     }
     return getDeep<number>(queryConfig, 'fields.length', 0) !== 0
@@ -252,6 +252,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   private sendToDashboard = async () => {
     const {name, newDashboardName} = this.state
     const {
+      queryType,
       queryConfig,
       script,
       sendDashboardCell,
@@ -260,7 +261,6 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       onCancel,
       visualizationOptions,
       isStaticLegend,
-      isFluxQuery,
     } = this.props
     const {
       type,
@@ -274,23 +274,27 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       noteVisibility,
     } = visualizationOptions
 
-    const newCellQueries = isFluxQuery
-      ? [
-          {
-            queryConfig: null,
-            query: script,
-            source: source.links.self,
-            type: QueryType.Flux,
-          },
-        ]
-      : [
-          {
-            queryConfig,
-            query: rawText,
-            source: source.links.self,
-            type: QueryType.InfluxQL,
-          },
-        ]
+    const isFluxQuery = queryType === QueryType.Flux
+
+    let newCellQueries = [
+      {
+        queryConfig,
+        query: rawText,
+        source: source.links.self,
+        type: QueryType.InfluxQL,
+      },
+    ]
+
+    if (isFluxQuery) {
+      newCellQueries = [
+        {
+          queryConfig: null,
+          query: script,
+          source: source.links.self,
+          type: QueryType.Flux,
+        },
+      ]
+    }
 
     const colors: ColorString[] = getCellTypeColors({
       cellType: type,
@@ -360,6 +364,7 @@ const ConnectedSendToDashboardOverlay = (props: PassedProps) => {
           thresholdsListType,
           gaugeColors,
           lineColors,
+          queryType,
         } = timeMachineContainer.state
 
         const visualizationOptions = {
@@ -380,6 +385,7 @@ const ConnectedSendToDashboardOverlay = (props: PassedProps) => {
         return (
           <SendToDashboardOverlay
             {...props}
+            queryType={queryType}
             visualizationOptions={visualizationOptions}
           />
         )

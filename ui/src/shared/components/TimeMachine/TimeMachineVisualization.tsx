@@ -14,6 +14,7 @@ import {
   Query,
   Template,
   Status,
+  QueryType,
   QueryUpdateState,
 } from 'src/types'
 import {ColorString, ColorNumber} from 'src/types/colors'
@@ -28,6 +29,7 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 
 interface ConnectedProps {
   timeRange: TimeRange
+  queryType: QueryType
   onUpdateFieldOptions: TimeMachineContainer['handleUpdateFieldOptions']
   type: CellType
   axes: Axes | null
@@ -72,6 +74,7 @@ const TimeMachineVisualization: SFC<Props> = props => {
           <RefreshingGraph
             source={props.source}
             colors={colors}
+            queryType={props.queryType}
             autoRefresher={props.autoRefresher}
             queries={props.queries}
             templates={props.templates}
@@ -110,6 +113,7 @@ const ConnectedTimeMachineVisualization = (props: PassedProps) => (
           timeRange={state.timeRange}
           type={state.type}
           axes={state.axes}
+          queryType={state.queryType}
           tableOptions={state.tableOptions}
           fieldOptions={state.fieldOptions}
           timeFormat={state.timeFormat}
