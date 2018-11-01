@@ -34,12 +34,14 @@ class WizardOverlay extends PureComponent<Props> {
     const {visible, title, maxWidth} = this.props
 
     return (
-      <OverlayTechnology visible={visible}>
-        <OverlayContainer maxWidth={maxWidth}>
-          <OverlayHeading title={title} />
-          <OverlayBody>{this.WizardController}</OverlayBody>
-        </OverlayContainer>
-      </OverlayTechnology>
+      <div className="wizard-overlay">
+        <OverlayTechnology visible={visible}>
+          <OverlayContainer maxWidth={maxWidth}>
+            <OverlayHeading title={title} />
+            <OverlayBody>{this.WizardController}</OverlayBody>
+          </OverlayContainer>
+        </OverlayTechnology>
+      </div>
     )
   }
 

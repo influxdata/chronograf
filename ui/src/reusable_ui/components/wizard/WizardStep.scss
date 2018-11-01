@@ -3,6 +3,7 @@
   ------------------------------------------------------------------------------
 */
 
+
 .wizard-step--container {
   position: relative;
   overflow: hidden;
@@ -20,5 +21,7 @@
   min-height: 100%;
   pointer-events: none;
   z-index: 100;
-  box-shadow: inset 0px -11px 8px -10px $g0-obsidian;
+  box-shadow: 
+    inset 0px -11px 8px -10px $g0-obsidian,
+    inset 0px 11px 8px -10px $g0-obsidian;
 }
