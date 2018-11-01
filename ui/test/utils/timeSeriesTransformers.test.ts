@@ -388,7 +388,7 @@ it('parses a two-column meta query with same first column values', () => {
   expect(actual).toEqual(expected)
 })
 
-it('parses meta query with multiple columns', () => {
+it('parses meta query with multiple columns with one series', () => {
   const metaQueryResponse = [
     {
       response: {
@@ -425,6 +425,109 @@ it('parses meta query with multiple columns', () => {
       {label: 'shardGroupDuration', responseIndex: 0, seriesIndex: 0},
       {label: 'replicaN', responseIndex: 0, seriesIndex: 0},
       {label: 'default', responseIndex: 0, seriesIndex: 0},
+    ],
+    influxQLQueryType: 'MetaQuery',
+  }
+
+  const actual = timeSeriesToTableGraph(metaQueryResponse)
+
+  expect(actual).toEqual(expected)
+})
+
+it('parses meta query with multiple columns and multiple series', () => {
+  const metaQueryResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'cpu',
+                columns: ['tagKey'],
+                values: [['cpu'], ['host']],
+              },
+              {
+                name: 'disk',
+                columns: ['tagKey'],
+                values: [['device'], ['fstype'], ['host'], ['mode'], ['path']],
+              },
+              {
+                name: 'diskio',
+                columns: ['tagKey'],
+                values: [['host'], ['name']],
+              },
+              {
+                name: 'mem',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+              {
+                name: 'processes',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+              {
+                name: 'swap',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+              {
+                name: 'syslog',
+                columns: ['tagKey'],
+                values: [
+                  ['appname'],
+                  ['facility'],
+                  ['host'],
+                  ['hostname'],
+                  ['severity'],
+                ],
+              },
+              {
+                name: 'system',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ]
+
+  const expected = {
+    data: [
+      ['measurement', 'tagKey'],
+      ['cpu', 'cpu'],
+      ['cpu', 'host'],
+      ['disk', 'device'],
+      ['disk', 'fstype'],
+      ['disk', 'host'],
+      ['disk', 'mode'],
+      ['disk', 'path'],
+      ['diskio', 'host'],
+      ['diskio', 'name'],
+      ['mem', 'host'],
+      ['processes', 'host'],
+      ['swap', 'host'],
+      ['syslog', 'appname'],
+      ['syslog', 'facility'],
+      ['syslog', 'host'],
+      ['syslog', 'hostname'],
+      ['syslog', 'severity'],
+      ['system', 'host'],
+    ],
+    sortedLabels: [
+      {
+        label: 'measurement',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+      {
+        label: 'tagKey',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
     ],
     influxQLQueryType: 'MetaQuery',
   }

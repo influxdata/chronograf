@@ -177,7 +177,7 @@ const constructCells = (
     seriesIndex: [],
     responseIndex: [],
   }
-  let metaQuerySeries: TimeSeriesValue[][]
+  let metaQuerySeries: TimeSeriesValue[][] = []
 
   fastForEach<Series>(
     serieses,
@@ -246,13 +246,34 @@ const constructCells = (
           })
         }
       } else {
-        metaQuerySeries = [columns, ...values]
         isMetaQuery = true
-        labels = columns.map(c => ({
-          label: c,
-          responseIndex,
-          seriesIndex,
-        }))
+
+        if (serieses.length === 1) {
+          labels = columns.map(c => ({
+            label: c,
+            responseIndex,
+            seriesIndex,
+          }))
+
+          metaQuerySeries = [columns, ...values]
+        } else {
+          labels = ['measurement', columns[0]].map(c => ({
+            label: c,
+            responseIndex,
+            seriesIndex,
+          }))
+
+          const [, ...vals] = metaQuerySeries
+          const allValuesForMeasurement = values.map(val => {
+            return [measurement, val[0]]
+          })
+
+          metaQuerySeries = [
+            ['measurement', columns[0]],
+            ...vals,
+            ...allValuesForMeasurement,
+          ]
+        }
       }
     }
   )
@@ -271,6 +292,7 @@ const constructCells = (
     queryType === InfluxQLQueryType.MetaQuery
       ? labels
       : _.sortBy(labels, 'label')
+
   return {cells, sortedLabels, seriesLabels, queryType, metaQuerySeries}
 }
 
