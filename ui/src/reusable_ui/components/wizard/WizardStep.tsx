@@ -3,6 +3,7 @@ import React, {PureComponent, ReactNode} from 'react'
 
 // Components
 import WizardButtonBar from 'src/reusable_ui/components/wizard/WizardButtonBar'
+import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {NextReturn} from 'src/types/wizard'
@@ -33,13 +34,23 @@ class WizardStep extends PureComponent<WizardStepProps> {
     isSkippableStep: true,
     isErrored: false,
   }
+
+  private scrollMaxHeight = window.innerHeight * 0.45
+
   public render() {
     const {children, decrement, nextLabel, previousLabel, lastStep} = this.props
 
     return (
       <>
         <div className="wizard-step--container">
-          <div className="wizard-step--child">{children}</div>
+          <div className="wizard-step--shadow" />
+          <FancyScrollbar
+            autoHide={false}
+            autoHeight={true}
+            maxHeight={this.scrollMaxHeight}
+          >
+            <div className="wizard-step--child">{children}</div>
+          </FancyScrollbar>
         </div>
         <WizardButtonBar
           decrement={decrement}

@@ -6,10 +6,21 @@ exports[`WizardStep matches snapshot 1`] = `
     className="wizard-step--container"
   >
     <div
-      className="wizard-step--child"
+      className="wizard-step--shadow"
+    />
+    <FancyScrollbar
+      autoHeight={true}
+      autoHide={false}
+      maxHeight={345.6}
+      setScrollTop={[Function]}
+      style={Object {}}
     >
-      this is a text
-    </div>
+      <div
+        className="wizard-step--child"
+      >
+        this is a text
+      </div>
+    </FancyScrollbar>
   </div>
   <WizardButtonBar
     nextLabel="Next"
