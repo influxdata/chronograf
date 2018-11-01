@@ -21,10 +21,16 @@ export function initialStateFromCell(
   cell: Cell | NewDefaultCell
 ): Partial<TimeMachineState> {
   const queryDrafts = initialQueryDrafts(cell)
+  const queryType = getDeep<QueryType>(
+    cell,
+    'queries.0.type',
+    QueryType.InfluxQL
+  )
+
   const initialState: Partial<TimeMachineState> = {
     queryDrafts,
     type: cell.type,
-    queryType: getDeep<QueryType>(cell, 'queries.0.type', QueryType.InfluxQL),
+    queryType,
     fieldOptions: cell.fieldOptions,
     timeFormat: cell.timeFormat,
     decimalPlaces: cell.decimalPlaces,
