@@ -134,6 +134,7 @@ class LogsTable extends Component<Props, State> {
     }
   }
 
+  private currentWidth: number
   private grid: Grid | null
   private headerGrid: React.RefObject<Grid>
 
@@ -151,6 +152,7 @@ class LogsTable extends Component<Props, State> {
       return c.visible
     }).length
 
+    this.currentWidth = null
     this.state = {
       searchPattern: null,
       scrollTop: 0,
@@ -267,6 +269,8 @@ class LogsTable extends Component<Props, State> {
     columnCount: number,
     registerChild: (g: Grid) => void
   ) => {
+    this.currentWidth = width
+
     const {scrollToRow} = this.props
     const {scrollTop, scrollLeft} = this.state
 
@@ -581,6 +585,7 @@ class LogsTable extends Component<Props, State> {
           formattedValue={formattedValue}
           onExpand={this.props.onExpandMessage}
           searchPattern={searchPattern}
+          maxWidth={this.currentWidth}
         />
       )
     }

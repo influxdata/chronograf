@@ -1,10 +1,10 @@
 // Libraries
-import React, {Component, MouseEvent} from 'react'
+import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 
 // Components
-import {ClickOutside} from 'src/shared/components/ClickOutside'
 import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
+import {ExpandedContainer} from 'src/logs/components/expandable_message/ExpandedContainer'
 
 // Types
 import {NotificationAction} from 'src/types'
@@ -21,7 +21,13 @@ interface Props {
   notify: NotificationAction
   onExpand?: () => void
   searchPattern: string
+  maxWidth: number
 }
+
+const PADDING = 8
+const MIN_LEFT = 120
+const MIN_MESSAGE_WIDTH = 200
+const MAX_MESSAGE_HEIGHT = 200
 
 @ErrorHandling
 export class ExpandableMessage extends Component<Props, State> {
@@ -71,37 +77,27 @@ export class ExpandableMessage extends Component<Props, State> {
 
     const portalElement = document.getElementById('expanded-message-container')
     const containerRect = this.containerRef.current.getBoundingClientRect()
-    const padding = 8
 
-    const style = {
-      top: containerRect.top - padding,
-      left: containerRect.left - padding,
-      width: containerRect.width + padding + padding,
-      padding,
-    }
+    const {top, left, width} = containerRect
 
     const message = (
-      <ClickOutside onClickOutside={this.handleClickOutside}>
-        <div className="expanded--message message-wrap" style={style}>
-          {this.closeExpansionButton}
-          {this.message}
-        </div>
-      </ClickOutside>
+      <ExpandedContainer
+        notify={this.props.notify}
+        onClose={this.handleClose}
+        maxWidth={this.props.maxWidth}
+        minWidth={MIN_MESSAGE_WIDTH}
+        maxHeight={MAX_MESSAGE_HEIGHT}
+        padding={PADDING}
+        top={top}
+        left={left}
+        minLeft={MIN_LEFT}
+        width={width}
+      >
+        {this.message}
+      </ExpandedContainer>
     )
 
     return ReactDOM.createPortal(message, portalElement)
-  }
-
-  private get closeExpansionButton(): JSX.Element {
-    return (
-      <button className="expanded--dismiss" onClick={this.handleClickDismiss} />
-    )
-  }
-
-  private handleClickDismiss = (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-
-    this.setState({expanded: false})
   }
 
   private handleClick = () => {
@@ -117,7 +113,7 @@ export class ExpandableMessage extends Component<Props, State> {
     })
   }
 
-  private handleClickOutside = () => {
+  private handleClose = () => {
     this.setState({
       expanded: false,
     })
