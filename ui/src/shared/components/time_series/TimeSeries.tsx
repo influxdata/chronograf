@@ -60,7 +60,7 @@ interface Props {
   fluxASTLink?: string
   editQueryStatus?: (queryID: string, status: Status) => void
   grabDataForDownload?: GrabDataForDownloadHandler
-  grabFluxData?: (data: FluxTable[]) => void
+  grabFluxData?: (data: string) => void
   onNotify?: typeof notify
 }
 
@@ -254,7 +254,7 @@ class TimeSeries extends PureComponent<Props, State> {
     }
 
     if (grabFluxData) {
-      grabFluxData(timeSeriesFlux)
+      grabFluxData(rawFluxData)
     }
   }
 
