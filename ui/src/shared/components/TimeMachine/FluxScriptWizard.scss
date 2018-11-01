@@ -61,16 +61,16 @@
   user-select: none;
 
   p {
-    font-size: 24px;
+    font-size: 17px;
     color: $g9-mountain;
+    text-align: center;
     position: relative;
     left: -50%;
     top: -45%;
+    min-width: 200px;
 
-    a {
-      color: $g12-forge;
-      border-bottom: 1px solid $g12-forge;
-      cursor: pointer;
+    button {
+      margin: 0 5px;
     }
   }
 }

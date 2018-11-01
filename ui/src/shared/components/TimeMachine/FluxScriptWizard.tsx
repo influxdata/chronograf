@@ -34,9 +34,10 @@ import {
 // Types
 import {RemoteDataState, Source} from 'src/types'
 
-// This constant is selected so that dropdown menus will not overflow out of
-// the `.flux-script-wizard--wizard` window
+// These constants are selected so that the dropdown menus will not overflow
+// out of the `.flux-script-wizard--wizard` window
 const DROPDOWN_MENU_HEIGHT = 110
+const LAST_DROPDOWN_MENU_HEIGHT = 70
 
 interface Props {
   source: Source
@@ -164,6 +165,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
                 <Dropdown
                   selectedID={selectedAggFunction}
                   onChange={this.handleSelectAggFunction}
+                  maxMenuHeight={LAST_DROPDOWN_MENU_HEIGHT}
                 >
                   {AGG_FUNCTIONS.map(({description, value}) => (
                     <Dropdown.Item key={value} id={value} value={value}>
