@@ -69,8 +69,8 @@ class OnboardingWizard extends PureComponent<Props, State> {
       <>
         <Notifications />
         <WizardFullScreen
-          skipLinkText={'skip'}
-          switchLinkText={'Switch Organizations'}
+          skipLinkText="skip"
+          switchLinkText="Switch Organizations"
           handleSwitch={this.resetAndGotoPurgatory}
           isUsingAuth={isUsingAuth}
         >
@@ -115,10 +115,10 @@ class OnboardingWizard extends PureComponent<Props, State> {
             previousLabel="Go Back"
           >
             <DashboardStep
-              ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
-              dashboardsCreated={dashboardsCreated}
               source={source}
               countSelected={this.countSelected}
+              dashboardsCreated={dashboardsCreated}
+              ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
             />
           </WizardStep>
           <WizardStep

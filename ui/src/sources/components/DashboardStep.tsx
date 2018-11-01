@@ -33,10 +33,14 @@ import {
 import {Protoboard, Source} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
+interface SelectedDashboard {
+  [x: string]: boolean
+}
+
 interface State {
-  selected: object
   searchTerm: string
   protoboards: Protoboard[]
+  selected: SelectedDashboard
   suggestedProtoboards: Protoboard[]
 }
 
@@ -51,12 +55,8 @@ interface Props {
 class DashboardStep extends Component<Props, State> {
   public constructor(props: Props) {
     super(props)
-    const selected = props.dashboardsCreated.reduce(
-      (acc, d) => ({...acc, [d.id]: true}),
-      {}
-    )
     this.state = {
-      selected,
+      selected: this.selected,
       protoboards: [],
       searchTerm: '',
       suggestedProtoboards: [],
@@ -119,6 +119,13 @@ class DashboardStep extends Component<Props, State> {
 
   private setSearchTerm = searchTerm => {
     this.setState({searchTerm})
+  }
+
+  private get selected(): SelectedDashboard {
+    return this.props.dashboardsCreated.reduce(
+      (acc, d) => ({...acc, [d.id]: true}),
+      {}
+    )
   }
 
   private get dashboardCards() {
