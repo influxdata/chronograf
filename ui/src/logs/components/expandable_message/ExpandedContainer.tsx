@@ -8,6 +8,9 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 // Types
 import {NotificationAction} from 'src/types'
 
+// Actions
+import {expandMessageError} from 'src/shared/copy/notifications'
+
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -42,7 +45,7 @@ export class ExpandedContainer extends Component<Props, State> {
 
   public componentDidMount() {
     if (!this.initialVisibility) {
-      this.props.onClose()
+      this.props.notify(expandMessageError(this.direction))
     }
   }
 
@@ -78,6 +81,14 @@ export class ExpandedContainer extends Component<Props, State> {
         </FancyScrollbar>
       </div>
     )
+  }
+
+  private get direction(): string {
+    if (this.props.left > this.props.minLeft) {
+      return 'right'
+    } else {
+      return 'left'
+    }
   }
 
   private get maxHeight(): number {
