@@ -880,5 +880,6 @@ export const annotationsError = (message: string): Notification => ({
 export const expandMessageError = (direction: string): Notification => ({
   ...defaultErrorNotification,
   icon: 'expand-a',
+  duration: 1500,
   message: `Message out of view, scroll ${direction} to see`,
 })
