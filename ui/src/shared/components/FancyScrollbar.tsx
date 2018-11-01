@@ -7,7 +7,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface DefaultProps {
   autoHide: boolean
   autoHeight: boolean
-  maxHeight: number | string
+  maxHeight: number
   setScrollTop: (value: React.MouseEvent<HTMLElement>) => void
   style: React.CSSProperties
 }
