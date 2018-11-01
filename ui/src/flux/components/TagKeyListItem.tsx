@@ -17,8 +17,8 @@ interface Props {
   db: string
   source: Source
   tagKey: string
-  measurement?: string
   notify: NotificationAction
+  onAddFilter?: (value: {[k: string]: string}) => void
 }
 
 interface State {
@@ -36,7 +36,7 @@ class TagKeyListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, source, tagKey, notify, measurement} = this.props
+    const {db, source, tagKey, notify} = this.props
     const {opened} = this.state
     const isOpen = opened === OpenState.OPENED
     const isUnopen = opened === OpenState.UNOPENED
@@ -50,7 +50,7 @@ class TagKeyListItem extends PureComponent<Props, State> {
         onClick={this.handleItemClick}
       >
         <div className="flux-schema--item">
-          <div className="flex-schema-item-group">
+          <div className="flex-schema-item-group flux-schema-item--expandable">
             <div className="flux-schema--expander" />
             {tagKey}
             <span className="flux-schema--type">Tag Key</span>
@@ -62,8 +62,8 @@ class TagKeyListItem extends PureComponent<Props, State> {
               db={db}
               source={source}
               tagKey={tagKey}
-              measurement={measurement}
               notify={notify}
+              onAddFilter={this.props.onAddFilter}
             />
           </div>
         )}

@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {PureComponent, MouseEvent} from 'react'
 
 // Components
 import FieldList from 'src/flux/components/FieldList'
@@ -20,6 +20,7 @@ interface Props {
   notify: NotificationAction
   opened: OpenState
   loading: RemoteDataState
+  onAddFilter?: (value: {[k: string]: string}) => void
 }
 
 interface State {
@@ -59,10 +60,16 @@ class MeasurementListItem extends PureComponent<Props, State> {
         onClick={this.handleItemClick}
       >
         <div className="flux-schema--item">
-          <div className="flex-schema-item-group">
+          <div className="flex-schema-item-group flux-schema-item--expandable">
             <div className="flux-schema--expander" />
             {measurement}
             <span className="flux-schema--type">Measurement</span>
+            <button
+              className="button button-xs button-primary"
+              onClick={this.handleAddFilter}
+            >
+              Add Filter
+            </button>
           </div>
         </div>
         {!isUnopen && (
@@ -74,11 +81,24 @@ class MeasurementListItem extends PureComponent<Props, State> {
               fields={fields}
               measurement={measurement}
               loading={loading}
+              onAddFilter={this.props.onAddFilter}
             />
           </div>
         )}
       </div>
     )
+  }
+
+  private handleAddFilter = (e: MouseEvent) => {
+    e.stopPropagation()
+
+    const {onAddFilter, measurement} = this.props
+
+    if (!onAddFilter) {
+      return
+    }
+
+    onAddFilter({_measurement: measurement})
   }
 
   private handleItemClick = (e): void => {

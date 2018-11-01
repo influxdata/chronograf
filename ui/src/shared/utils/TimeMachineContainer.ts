@@ -1,5 +1,6 @@
 // Libraries
 import {Container} from 'unstated'
+import _ from 'lodash'
 
 // Utils
 import {
@@ -149,6 +150,24 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
   public handleUpdateDraftScript = (draftScript: string) => {
     return this.setAndPersistState({draftScript})
+  }
+
+  public handleAddFilter = (db: string, filter: {[key: string]: string}) => {
+    let {draftScript} = this.state
+
+    const body = Object.entries(filter)
+      .map(([key, value]) => {
+        return `r.${key} == "${value}"`
+      })
+      .join(' and ')
+
+    if (_.isEmpty(draftScript)) {
+      draftScript = `from(bucket: "${db}")\n  |> range(start: dashboardTime)`
+    }
+
+    const newDraftScript = `${draftScript}\n  |> filter(fn: (r) => ${body})`
+
+    return this.setAndPersistState({draftScript: newDraftScript})
   }
 
   public handleInitFluxScript = (script: string) => {

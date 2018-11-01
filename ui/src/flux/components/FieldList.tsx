@@ -3,6 +3,7 @@ import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
 
 // Components
 import LoaderSkeleton from 'src/flux/components/LoaderSkeleton'
+import FieldListItem from 'src/flux/components/FieldListItem'
 
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -16,6 +17,7 @@ interface Props {
   fields: string[]
   notify: NotificationAction
   loading: RemoteDataState
+  onAddFilter?: (value: {[k: string]: string}) => void
 }
 
 interface State {
@@ -57,7 +59,7 @@ class FieldList extends PureComponent<Props, State> {
   }
 
   private get fields(): JSX.Element | JSX.Element[] {
-    const {loading} = this.props
+    const {loading, measurement, onAddFilter} = this.props
     const {searchTerm} = this.state
 
     if (loading === RemoteDataState.Error) {
@@ -80,18 +82,12 @@ class FieldList extends PureComponent<Props, State> {
 
     if (fields.length) {
       return fields.map(field => (
-        <div
-          className="flux-schema-tree flux-schema--child"
-          key={field}
-          onClick={this.handleClick}
-        >
-          <div className="flux-schema--item">
-            <div className="flex-schema-item-group">
-              {field}
-              <span className="flux-schema--type">Field</span>
-            </div>
-          </div>
-        </div>
+        <FieldListItem
+          key={`fieldlistitem-${field}`}
+          field={field}
+          measurement={measurement}
+          onAddFilter={onAddFilter}
+        />
       ))
     }
 

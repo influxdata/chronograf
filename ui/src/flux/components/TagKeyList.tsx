@@ -13,11 +13,11 @@ import {Source, NotificationAction, RemoteDataState} from 'src/types'
 
 interface Props {
   db: string
-  measurement?: string
   source: Source
   tagKeys: string[]
   notify: NotificationAction
   loading: RemoteDataState
+  onAddFilter?: (value: {[k: string]: string}) => void
 }
 
 interface State {
@@ -39,7 +39,7 @@ class TagKeyList extends PureComponent<Props, State> {
   }
 
   private get tagKeys(): JSX.Element | JSX.Element[] {
-    const {db, source, notify, measurement, loading} = this.props
+    const {db, source, notify, loading} = this.props
 
     if (loading === RemoteDataState.Error) {
       return (
@@ -65,9 +65,9 @@ class TagKeyList extends PureComponent<Props, State> {
           db={db}
           source={source}
           tagKey={tagKey}
-          measurement={measurement}
           key={tagKey}
           notify={notify}
+          onAddFilter={this.props.onAddFilter}
         />
       ))
     }
