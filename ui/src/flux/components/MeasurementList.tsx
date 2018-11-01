@@ -20,6 +20,7 @@ interface Props {
   notify: NotificationAction
   measurements: {[measurement: string]: string[]}
   loading: RemoteDataState
+  onAddFilter?: (value: {[k: string]: string}) => void
 }
 
 interface State {
@@ -118,6 +119,7 @@ class MeasurementsList extends PureComponent<Props, State> {
             fields={filteredFields}
             opened={startOpen}
             loading={loading}
+            onAddFilter={this.props.onAddFilter}
           />
         )
       })

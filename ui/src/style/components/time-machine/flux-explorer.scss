@@ -72,6 +72,12 @@ $flux-tree-gutter: 11px;
   }
 }
 
+.flux-schema-item--expandable {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 .flux-schema--item {
   position: relative;
   height: $flux-tree-indent;
@@ -92,7 +98,6 @@ $flux-tree-gutter: 11px;
   }
   &:not(.no-hover):hover {
     color: $g17-whisper;
-    cursor: pointer;
     background-color: $g4-onyx;
     .flux-schema--expander:before,
     .flux-schema--expander:after {
@@ -146,6 +151,16 @@ $flux-tree-gutter: 11px;
   display: flex;
   flex: 1 0 0;
   align-items: center;
+}
+
+.flex-schema-item-group button {
+  margin-left: 20px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+
+  .flux-schema--item:hover & {
+    opacity: 1;
+  }
 }
 
 .flux-schema-copy {

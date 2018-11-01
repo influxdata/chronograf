@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import {Subscribe} from 'unstated'
 
 // Components
 import MeasurementList from 'src/flux/components/MeasurementList'
@@ -9,6 +10,9 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Constants
 import {OpenState} from 'src/flux/constants/explorer'
+
+// Utils
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Types
 import {Source, NotificationAction} from 'src/types'
@@ -20,7 +24,11 @@ export enum CategoryType {
   Tags = 'tags',
 }
 
-interface Props {
+interface ConnectedProps {
+  onAddFilter?: (db: string, value: {[k: string]: string}) => void
+}
+
+interface PassedProps {
   source: Source
   notify: NotificationAction
   db: string
@@ -33,7 +41,10 @@ interface State {
 }
 
 @ErrorHandling
-class SchemaItemCategory extends PureComponent<Props, State> {
+class SchemaItemCategory extends PureComponent<
+  PassedProps & ConnectedProps,
+  State
+> {
   constructor(props) {
     super(props)
 
@@ -54,7 +65,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
         }`}
       >
         <div className="flux-schema--item" onClick={this.handleClick}>
-          <div className="flex-schema-item-group">
+          <div className="flex-schema-item-group flux-schema-item--expandable">
             <div className="flux-schema--expander" />
             {this.categoryName}
           </div>
@@ -91,6 +102,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
             notify={notify}
             measurements={categoryTree.measurements}
             loading={categoryTree.measurementsLoading}
+            onAddFilter={this.handleAddFilter}
           />
         )
 
@@ -102,6 +114,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
             notify={notify}
             fields={categoryTree.fields}
             loading={categoryTree.fieldsLoading}
+            onAddFilter={this.handleAddFilter}
           />
         )
 
@@ -113,6 +126,7 @@ class SchemaItemCategory extends PureComponent<Props, State> {
             notify={notify}
             tagKeys={categoryTree.tagKeys}
             loading={categoryTree.tagsLoading}
+            onAddFilter={this.handleAddFilter}
           />
         )
     }
@@ -128,6 +142,25 @@ class SchemaItemCategory extends PureComponent<Props, State> {
     }
     this.setState({opened: OpenState.OPENED})
   }
+
+  private handleAddFilter = (filter: {[key: string]: string}) => {
+    this.props.onAddFilter(this.props.db, filter)
+  }
 }
 
-export default SchemaItemCategory
+const ConnectedSchemaItemCategory = (props: PassedProps) => {
+  return (
+    <Subscribe to={[TimeMachineContainer]}>
+      {(container: TimeMachineContainer) => {
+        return (
+          <SchemaItemCategory
+            {...props}
+            onAddFilter={container.handleAddFilter}
+          />
+        )
+      }}
+    </Subscribe>
+  )
+}
+
+export default ConnectedSchemaItemCategory
