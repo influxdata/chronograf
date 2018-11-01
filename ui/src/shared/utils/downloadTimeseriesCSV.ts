@@ -89,7 +89,7 @@ const csvName = () => {
   return `${now} Chronograf Data.csv`
 }
 
-const downloadCSV = (csv: string, title: string) => {
+export const downloadCSV = (csv: string, title: string) => {
   const blob = new Blob([csv], {type: 'text/csv'})
   const a = document.createElement('a')
 

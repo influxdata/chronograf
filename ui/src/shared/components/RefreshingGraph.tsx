@@ -90,7 +90,7 @@ interface Props {
   handleSetHoverTime: () => void
   onNotify: typeof notify
   grabDataForDownload?: GrabDataForDownloadHandler
-  grabFluxData?: (data: FluxTable[]) => void
+  grabFluxData?: (data: string) => void
   cellNote: string
   cellNoteVisibility: NoteVisibility
   editorLocation?: QueryUpdateState

@@ -8,7 +8,6 @@ import LayoutCellHeader from 'src/shared/components/LayoutCellHeader'
 import LayoutCellNote from 'src/shared/components/LayoutCellNote'
 import {notify} from 'src/shared/actions/notifications'
 import {notifyCSVDownloadFailed} from 'src/shared/copy/notifications'
-import download from 'src/external/download.js'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {dataToCSV} from 'src/shared/parsing/dataToCSV'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
@@ -17,6 +16,9 @@ import {
   DEFAULT_CELL_BG_COLOR,
   DEFAULT_CELL_TEXT_COLOR,
 } from 'src/dashboards/constants'
+
+// Utils
+import {downloadCSV} from 'src/shared/utils/downloadTimeseriesCSV'
 
 // Types
 import {Cell, CellQuery, Template} from 'src/types/'
@@ -33,6 +35,7 @@ interface Props {
   onSummonOverlayTechnologies: (cell: Cell) => void
   isEditable: boolean
   cellData: TimeSeriesServerResponse[]
+  cellFluxData: string
   templates: Template[]
   isFluxQuery: boolean
   visType: VisType
@@ -49,6 +52,7 @@ export default class LayoutCell extends Component<Props> {
       cell,
       isEditable,
       cellData,
+      cellFluxData,
       onDeleteCell,
       onCloneCell,
       visType,
@@ -63,7 +67,7 @@ export default class LayoutCell extends Component<Props> {
             <LayoutCellMenu
               cell={cell}
               isEditable={isEditable}
-              dataExists={!!cellData.length}
+              dataExists={!!(cellData.length || cellFluxData.length)}
               onEdit={this.handleSummonOverlay}
               onClone={onCloneCell}
               onDelete={onDeleteCell}
@@ -186,16 +190,37 @@ export default class LayoutCell extends Component<Props> {
   }
 
   private handleCSVDownload = async (): Promise<void> => {
+    if (this.props.isFluxQuery) {
+      this.downloadFluxCSV()
+    } else {
+      this.downloadInfluxQLCSV()
+    }
+  }
+
+  private async downloadInfluxQLCSV() {
     const {cellData, cell} = this.props
-    const joinedName = cell.name.split(' ').join('_')
-    const {data} = await timeSeriesToTableGraph(cellData)
+    const name = `${cell.name.split(' ').join('_')}.csv`
+
+    let csv: string
 
     try {
-      download(dataToCSV(data as any), `${joinedName}.csv`, 'text/plain')
+      const {data} = await timeSeriesToTableGraph(cellData)
+      csv = dataToCSV(data as any)
     } catch (error) {
       notify(notifyCSVDownloadFailed())
       console.error(error)
+
+      return
     }
+
+    downloadCSV(csv, name)
+  }
+
+  private downloadFluxCSV() {
+    const {cellFluxData, cell} = this.props
+    const joinedName = cell.name.split(' ').join('_')
+
+    downloadCSV(cellFluxData, joinedName)
   }
 
   private get gradientBorder(): JSX.Element {

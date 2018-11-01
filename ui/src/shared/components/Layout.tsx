@@ -19,7 +19,7 @@ import {TimeRange, Cell, Template, Source, QueryType} from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
-import {VisType, FluxTable} from 'src/types/flux'
+import {VisType} from 'src/types/flux'
 
 interface Props {
   cell: Cell
@@ -38,7 +38,7 @@ interface Props {
 
 interface State {
   cellData: TimeSeriesServerResponse[]
-  cellFluxData: FluxTable[]
+  cellFluxData: string
   visType: VisType
 }
 
@@ -46,7 +46,7 @@ interface State {
 class Layout extends Component<Props, State> {
   public state = {
     cellData: [],
-    cellFluxData: [],
+    cellFluxData: '',
     visType: VisType.Graph,
   }
 
@@ -59,12 +59,13 @@ class Layout extends Component<Props, State> {
       onDeleteCell,
       onSummonOverlayTechnologies,
     } = this.props
-    const {cellData} = this.state
+    const {cellData, cellFluxData} = this.state
 
     return (
       <LayoutCell
         cell={cell}
         cellData={cellData}
+        cellFluxData={cellFluxData}
         templates={templates}
         visType={this.visType}
         isEditable={isEditable}
@@ -187,7 +188,7 @@ class Layout extends Component<Props, State> {
     this.setState({cellData})
   }
 
-  private grabFluxData = (cellFluxData: FluxTable[]) => {
+  private grabFluxData = (cellFluxData: string) => {
     this.setState({cellFluxData})
   }
 
