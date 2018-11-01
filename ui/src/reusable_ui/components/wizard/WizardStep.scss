@@ -6,22 +6,19 @@
 .wizard-step--container {
   position: relative;
   overflow: hidden;
-  margin: $ix-marg-b 0 0 0;
+  margin: $ix-marg-b;
   width: 100%;
 }
 
-// .wizard-step--child {
-//   padding: 0 $ix-marg-d $ix-marg-b $ix-marg-d;
-//   margin: $ix-marg-b auto;
-//   overflow-y: auto;
-//   max-height: 45vh;
-//   min-height: 10vh;
-//   position: relative;
-//   z-index: 10;
-// }
-
 .wizard-step--child {
-  border-left: 2px solid $g0-obsidian;
-  border-right: 2px solid $g0-obsidian;
-  overflow: hidden; 
+  padding: $ix-marg-c;
+}
+
+.wizard-step--shadow {
+  position: absolute;
+  min-width: 100%;
+  min-height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: inset 0px -11px 8px -10px $g0-obsidian;
 }

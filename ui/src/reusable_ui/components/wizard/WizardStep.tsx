@@ -12,6 +12,7 @@ type BooleanFunction = () => boolean
 type NextReturnFunction = () => NextReturn
 type AsyncNextReturnFunction = () => Promise<NextReturn>
 
+const SCROLL_MAX_HEIGHT = window.innerHeight * 0.45
 export interface WizardStepProps {
   children: ReactNode
   title: string
@@ -35,23 +36,20 @@ class WizardStep extends PureComponent<WizardStepProps> {
     isErrored: false,
   }
 
-  private scrollMaxHeight = window.innerHeight * 0.45
-
   public render() {
     const {children, decrement, nextLabel, previousLabel, lastStep} = this.props
 
     return (
       <>
         <div className="wizard-step--container">
-          <div className="wizard-step--child">
-            <FancyScrollbar
-              autoHide={false}
-              autoHeight={true}
-              maxHeight={this.scrollMaxHeight}
-            >
-              {children}
-            </FancyScrollbar>
-          </div>
+          {this.scrollShadow}
+          <FancyScrollbar
+            autoHide={false}
+            autoHeight={true}
+            maxHeight={SCROLL_MAX_HEIGHT}
+          >
+            <div className="wizard-step--child">{children}</div>
+          </FancyScrollbar>
         </div>
         <WizardButtonBar
           decrement={decrement}
@@ -63,6 +61,12 @@ class WizardStep extends PureComponent<WizardStepProps> {
         />
       </>
     )
+  }
+
+  private get scrollShadow(): JSX.Element {
+    if (SCROLL_MAX_HEIGHT) {
+      return <div className="wizard-step--shadow" />
+    }
   }
 
   private handleClickPrevious = async () => {
