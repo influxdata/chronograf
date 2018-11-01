@@ -274,24 +274,27 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       noteVisibility,
     } = visualizationOptions
 
-    const newCellQueries =
-      queryType === QueryType.Flux
-        ? [
-            {
-              queryConfig: null,
-              query: script,
-              source: source.links.self,
-              type: QueryType.Flux,
-            },
-          ]
-        : [
-            {
-              queryConfig,
-              query: rawText,
-              source: source.links.self,
-              type: QueryType.InfluxQL,
-            },
-          ]
+    const isFluxQuery = queryType === QueryType.Flux
+
+    let newCellQueries = [
+      {
+        queryConfig,
+        query: rawText,
+        source: source.links.self,
+        type: QueryType.InfluxQL,
+      },
+    ]
+
+    if (isFluxQuery) {
+      newCellQueries = [
+        {
+          queryConfig: null,
+          query: script,
+          source: source.links.self,
+          type: QueryType.Flux,
+        },
+      ]
+    }
 
     const colors: ColorString[] = getCellTypeColors({
       cellType: type,
