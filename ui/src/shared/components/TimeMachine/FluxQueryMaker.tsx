@@ -14,12 +14,12 @@ import FluxFunctionsToolbar from 'src/flux/components/flux_functions_toolbar/Flu
 import {HANDLE_VERTICAL} from 'src/shared/constants'
 
 // Utils
-import {getSuggestions} from 'src/shared/apis/flux/suggestions'
 import {getAST} from 'src/shared/apis/flux/ast'
 import {restartable} from 'src/shared/utils/restartable'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {parseError} from 'src/flux/helpers/scriptBuilder'
+import {getSuggestions} from 'src/flux/helpers/suggestions'
 
 // Types
 import {NotificationAction, Source} from 'src/types'
@@ -61,14 +61,13 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     super(props)
 
     this.state = {
-      suggestions: [],
+      suggestions: getSuggestions(),
       draftScriptStatus: {type: 'none', text: ''},
       isWizardActive: false,
     }
   }
 
   public componentDidMount() {
-    this.fetchSuggestions()
     this.checkDraftScript()
   }
 
@@ -215,13 +214,6 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     }
 
     this.setState({draftScriptStatus})
-  }
-
-  private fetchSuggestions = async (): Promise<void> => {
-    const {links} = this.props
-    const suggestions = await getSuggestions(links.suggestions)
-
-    this.setState({suggestions})
   }
 }
 
