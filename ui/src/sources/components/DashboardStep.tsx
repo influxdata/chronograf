@@ -65,7 +65,6 @@ class DashboardStep extends Component<Props, State> {
 
   public async componentDidMount() {
     const protoboards = await getProtoboards()
-    this.props.countSelected(0)
     this.setState({protoboards}, this.handleSuggest)
   }
 
