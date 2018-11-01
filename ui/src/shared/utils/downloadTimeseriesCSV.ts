@@ -21,7 +21,12 @@ export const downloadInfluxQLCSV = async (
 ): Promise<void> => {
   const responses = await Promise.all(
     queries.map(query =>
-      executeInfluxQLQuery(query.queryConfig.source, query, templates)
+      executeInfluxQLQuery(
+        query.queryConfig.source,
+        query,
+        templates,
+        DEFAULT_X_PIXELS
+      )
     )
   )
 

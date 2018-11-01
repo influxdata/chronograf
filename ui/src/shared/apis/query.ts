@@ -52,7 +52,7 @@ export const executeQuery = async (
   source: Source,
   query: Query,
   templates: Template[],
-  resolution?: number,
+  resolution: number,
   uuid?: string
 ): Promise<TimeSeriesResponse> => {
   const text = await replace(query.text, source, templates, resolution)
