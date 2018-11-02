@@ -154,7 +154,6 @@ class TimeSeries extends PureComponent<Props, State> {
       timeSeriesFlux,
       rawFluxData,
       loading,
-      fetchCount,
       latestUUID,
       errorMessage,
     } = this.state
@@ -166,7 +165,7 @@ class TimeSeries extends PureComponent<Props, State> {
           timeSeriesInfluxQL,
           timeSeriesFlux,
           rawFluxData,
-          isInitialFetch: fetchCount === 1,
+          isInitialFetch: this.isInitialFetch,
           loading,
           uuid: latestUUID,
           errorMessage,
@@ -181,10 +180,17 @@ class TimeSeries extends PureComponent<Props, State> {
     return getDeep<string>(queries, '0.type', '') === QueryType.Flux
   }
 
+  private get isInitialFetch(): boolean {
+    const {fetchCount} = this.state
+    const isInitialFetch = fetchCount === 1
+
+    return isInitialFetch
+  }
+
   private get loadingDots(): JSX.Element {
     const {loading} = this.state
 
-    if (loading === RemoteDataState.Loading) {
+    if (loading === RemoteDataState.Loading && !this.isInitialFetch) {
       return <GraphLoadingDots />
     }
 
