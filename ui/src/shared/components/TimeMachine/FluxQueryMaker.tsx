@@ -126,7 +126,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
         ),
       },
       {
-        name: 'Functions',
+        name: 'Flux Functions',
         size: rightSize,
         headerButtons: [],
         menuOptions: [],
