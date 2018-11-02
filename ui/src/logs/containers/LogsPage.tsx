@@ -211,7 +211,6 @@ class LogsPage extends Component<Props, State> {
 
   public async componentDidMount() {
     await this.getSources()
-
     await this.setCurrentSource()
 
     await this.props.getConfig(this.logConfigLink)
