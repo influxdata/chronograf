@@ -42,6 +42,7 @@
 1.  [#4525](https://github.com/influxdata/chronograf/pull/4525): Move expanded log message copy button to top right
 1.  [#4665](https://github.com/influxdata/chronograf/pull/4665): Remove shadow from note cells
 1.  [#4665](https://github.com/influxdata/chronograf/pull/4665): Remove character count limit from prefix and suffix for Single Stat and Gauge cells
+1.  [#4715](https://github.com/influxdata/chronograf/pull/4715): Add logs page loading spinner
 
 ### UI Improvements
 1.  [#4236](https://github.com/influxdata/chronograf/pull/4236): Add spinner when loading logs table rows
