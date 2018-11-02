@@ -95,7 +95,8 @@ class Layout extends Component<Props, State> {
       templates,
       source,
     } = this.props
-    const {cellFluxData} = this.state
+    const {cellFluxData, visType} = this.state
+    const showRawFluxData = visType === VisType.Table
 
     return (
       <RefreshingGraph
@@ -120,6 +121,7 @@ class Layout extends Component<Props, State> {
         cellNote={cell.note}
         cellNoteVisibility={cell.noteVisibility}
         rawData={cellFluxData}
+        showRawFluxData={showRawFluxData}
         visType={this.visType}
       />
     )
