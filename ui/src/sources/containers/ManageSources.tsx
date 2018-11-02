@@ -49,9 +49,7 @@ class ManageSources extends PureComponent<Props, State> {
   }
 
   public componentDidMount() {
-    this.props.sources.forEach(source => {
-      this.props.fetchKapacitors(source)
-    })
+    this.fetchKapacitors()
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -111,12 +109,21 @@ class ManageSources extends PureComponent<Props, State> {
     }
   }
 
+  private fetchKapacitors = () => {
+    this.props.sources.forEach(source => {
+      this.props.fetchKapacitors(source)
+    })
+  }
+
   private toggleWizard: ToggleWizard = (
     isVisible,
     source = null,
     jumpStep = null,
     showNewKapacitor = null
   ) => () => {
+    if (!isVisible) {
+      this.fetchKapacitors()
+    }
     this.setState({
       wizardVisibility: isVisible,
       sourceInWizard: source,

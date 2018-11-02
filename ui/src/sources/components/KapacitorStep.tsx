@@ -17,11 +17,10 @@ import {createKapacitor, updateKapacitor, pingKapacitor} from 'src/shared/apis'
 
 // Constants
 import {
-  notifyKapacitorCreateFailed,
   notifyKapacitorSuccess,
-  notifyKapacitorConnectionFailed,
   notifyKapacitorUpdated,
-  notifyKapacitorUpdateFailed,
+  notifyCouldNotConnectToUpdatedKapacitor,
+  notifyCouldNotConnectToKapacitor,
 } from 'src/shared/copy/notifications'
 import {DEFAULT_KAPACITOR} from 'src/shared/constants'
 
@@ -59,14 +58,18 @@ const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
 }
 
 const syncHostnames = (source: Source, kapacitor: Kapacitor) => {
-  if (source && source.url) {
-    const sourceURL = new URL(source.url)
-    const kapacitorURL = new URL(kapacitor.url)
-    if (sourceURL.hostname) {
-      kapacitorURL.hostname = sourceURL.hostname
-      return {...kapacitor, url: kapacitorURL.href}
+  try {
+    // new URL(input) throws error if input is not a valid url.
+    if (source && source.url) {
+      const sourceURL = new URL(source.url)
+      const kapacitorURL = new URL(kapacitor.url)
+      if (sourceURL.hostname) {
+        kapacitorURL.hostname = sourceURL.hostname
+        return {...kapacitor, url: kapacitorURL.href}
+      }
     }
-  }
+  } catch (e) {}
+
   return kapacitor
 }
 
@@ -79,10 +82,13 @@ class KapacitorStep extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    let kapacitor = getActiveKapacitor(props.source, props.sources)
+    const ActiveKapacitor = getActiveKapacitor(props.source, props.sources)
 
-    if (!kapacitor || props.showNewKapacitor) {
+    let kapacitor
+    if (props.showNewKapacitor) {
       kapacitor = DEFAULT_KAPACITOR
+    } else {
+      kapacitor = ActiveKapacitor || props.kapacitor || DEFAULT_KAPACITOR
     }
 
     kapacitor = syncHostnames(props.source, kapacitor)
@@ -93,34 +99,36 @@ class KapacitorStep extends Component<Props, State> {
   public next = async (): Promise<NextReturn> => {
     const {kapacitor} = this.state
     const {notify, source} = this.props
-    if (kapacitor.id) {
+    const kapacitorExists = kapacitor.id
+    if (kapacitorExists) {
       if (this.existingKapacitorHasChanged) {
         try {
-          const {data} = await updateKapacitor(kapacitor)
-          await this.checkKapacitorConnection(data)
+          const {data: updatedKapacitor} = await updateKapacitor(kapacitor)
           await this.fetchNewKapacitors()
+          await pingKapacitor(updatedKapacitor)
           notify(notifyKapacitorUpdated())
-          return {error: false, payload: data}
+          this.setState({kapacitor: updatedKapacitor})
+          return {error: false, payload: updatedKapacitor}
         } catch (error) {
           console.error(error)
-          notify(notifyKapacitorUpdateFailed())
+          notify(notifyCouldNotConnectToUpdatedKapacitor(kapacitor.name))
           return {error: true, payload: null}
         }
       }
       return {error: false, payload: kapacitor}
-    } else {
-      try {
-        const {data} = await createKapacitor(source, kapacitor)
-        this.setState({kapacitor: data})
-        await this.checkKapacitorConnection(data)
-        await this.fetchNewKapacitors()
-        notify(notifyKapacitorSuccess())
-        return {error: false, payload: data}
-      } catch (error) {
-        console.error(error)
-        notify(notifyKapacitorCreateFailed())
-        return {error: true, payload: null}
-      }
+    }
+
+    try {
+      const {data: newKapacitor} = await createKapacitor(source, kapacitor)
+      await this.fetchNewKapacitors()
+      await pingKapacitor(newKapacitor)
+      this.setState({kapacitor: newKapacitor})
+      notify(notifyKapacitorSuccess())
+      return {error: false, payload: newKapacitor}
+    } catch (error) {
+      console.error(error)
+      notify(notifyCouldNotConnectToKapacitor(kapacitor.name))
+      return {error: true, payload: null}
     }
   }
 
@@ -146,15 +154,6 @@ class KapacitorStep extends Component<Props, State> {
     this.setState({kapacitor: {...kapacitor, [key]: value}})
 
     setError(false)
-  }
-
-  private checkKapacitorConnection = async (kapacitor: Kapacitor) => {
-    try {
-      await pingKapacitor(kapacitor)
-    } catch (error) {
-      console.error(error)
-      this.props.notify(notifyKapacitorConnectionFailed())
-    }
   }
 
   private handleSetActiveKapacitor = (kapacitor: Kapacitor) => {
@@ -220,7 +219,7 @@ const mdtp = {
   notify: notifyAction,
   setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
   deleteKapacitor: sourcesActions.deleteKapacitorAsync,
-  fetchKapacitors: sourcesActions.fetchKapacitorsAsync,
+  fetchKapacitors: sourcesActions.fetchKapacitorsAsyncNoNotify,
 }
 
 export default connect(mstp, mdtp, null, {withRef: true})(KapacitorStep)
