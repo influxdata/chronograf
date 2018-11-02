@@ -4,6 +4,7 @@ import DivisionMenu, {
 } from 'src/shared/components/threesizer/DivisionMenu'
 
 interface Props {
+  onEqualize: () => void
   onMinimize: () => void
   onMaximize: () => void
   buttons: JSX.Element[]
@@ -35,7 +36,7 @@ class DivisionHeader extends PureComponent<Props> {
   }
 
   private get menuItems(): MenuItem[] {
-    const {onMaximize, onMinimize, menuOptions} = this.props
+    const {onEqualize, onMaximize, onMinimize, menuOptions} = this.props
     return [
       ...menuOptions,
       {
@@ -45,6 +46,10 @@ class DivisionHeader extends PureComponent<Props> {
       {
         action: onMinimize,
         text: 'Minimize',
+      },
+      {
+        action: onEqualize,
+        text: 'Reset',
       },
     ]
   }

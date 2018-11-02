@@ -36,6 +36,7 @@ interface Props {
   onDoubleClick: (id: string) => void
   onMaximize: (id: string) => void
   onMinimize: (id: string) => void
+  onEqualize: () => void
   headerButtons: JSX.Element[]
 }
 
@@ -98,7 +99,13 @@ class Division extends PureComponent<Props> {
   }
 
   private get renderHeader(): JSX.Element {
-    const {name, headerButtons, menuOptions, orientation} = this.props
+    const {
+      name,
+      headerButtons,
+      menuOptions,
+      orientation,
+      onEqualize,
+    } = this.props
 
     if (!name) {
       return null
@@ -109,6 +116,7 @@ class Division extends PureComponent<Props> {
         <DivisionHeader
           buttons={headerButtons}
           menuOptions={menuOptions}
+          onEqualize={onEqualize}
           onMinimize={this.handleMinimize}
           onMaximize={this.handleMaximize}
         />
@@ -164,6 +172,7 @@ class Division extends PureComponent<Props> {
       orientation,
       headerButtons,
       menuOptions,
+      onEqualize,
     } = this.props
 
     if (!name) {
@@ -178,6 +187,7 @@ class Division extends PureComponent<Props> {
         <DivisionHeader
           buttons={headerButtons}
           menuOptions={menuOptions}
+          onEqualize={onEqualize}
           onMinimize={this.handleMinimize}
           onMaximize={this.handleMaximize}
           name={name}

@@ -175,6 +175,7 @@ class Threesizer extends PureComponent<Props, State> {
               activeHandleID={activeHandleID}
               onMaximize={this.handleMaximize}
               onMinimize={this.handleMinimize}
+              onEqualize={this.equalize}
               headerOrientation={headerOrientation}
               onDoubleClick={this.handleDoubleClick}
               render={this.props.divisions[i].render}
