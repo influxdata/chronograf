@@ -161,7 +161,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
                   ))}
                 </MultiSelectDropdown>
               </Form.Element>
-              <Form.Element label="Choose an Aggregate">
+              <Form.Element label="Choose a Function">
                 <Dropdown
                   selectedID={selectedAggFunction}
                   onChange={this.handleSelectAggFunction}
