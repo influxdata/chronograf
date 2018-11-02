@@ -190,6 +190,11 @@ export const fetchKapacitorsAsync: FetchKapacitorsAsync = source => async dispat
   }
 }
 
+export const fetchKapacitorsAsyncNoNotify: FetchKapacitorsAsync = source => async dispatch => {
+  const kapacitors = await getKapacitorsAJAX(source)
+  dispatch(fetchKapacitors(source, kapacitors))
+}
+
 export type SetActiveKapacitorAsync = (
   kapacitor: Kapacitor
 ) => (dispatch) => Promise<void>

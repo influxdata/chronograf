@@ -26,7 +26,6 @@ class SourceStep extends PureComponent<Props> {
     return (
       <div className="wizard-step--bookend">
         <div className="auth-logo" />
-        <p>You have successfully added a Source connection and a Kapacitor. </p>
         <p>Continue to view your existing connections.</p>
       </div>
     )

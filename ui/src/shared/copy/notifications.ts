@@ -751,6 +751,20 @@ export const notifyKapacitorCreateFailed = (): Notification => ({
   message: 'There was a problem connecting to Kapacitor.',
 })
 
+export const notifyCouldNotConnectToKapacitor = (
+  kapacitorName: string
+): Notification => ({
+  ...defaultErrorNotification,
+  message: `Could not connect to ${kapacitorName}. Please check your connection parameters.`,
+})
+
+export const notifyCouldNotConnectToUpdatedKapacitor = (
+  kapacitorName: string
+): Notification => ({
+  ...defaultErrorNotification,
+  message: `Could not connect to updated ${kapacitorName}. Please check your connection parameters.`,
+})
+
 export const notifyKapacitorUpdated = (): Notification => ({
   ...defaultSuccessNotification,
   message: 'Kapacitor Connection updated successfully.',
