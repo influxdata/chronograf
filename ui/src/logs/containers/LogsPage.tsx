@@ -1,3 +1,4 @@
+// Libraries
 import React, {Component} from 'react'
 import uuid from 'uuid'
 import _ from 'lodash'
@@ -5,21 +6,34 @@ import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
 import {withRouter, InjectedRouter} from 'react-router'
 
+// Components
+import LogsHeader from 'src/logs/components/LogsHeader'
+import HistogramChart from 'src/shared/components/HistogramChart'
+import LogsGraphContainer from 'src/logs/components/LogsGraphContainer'
+import TimeWindowDropdown from 'src/logs/components/TimeWindowDropdown'
+import OptionsOverlay from 'src/logs/components/OptionsOverlay'
+import SearchBar from 'src/logs/components/LogsSearchBar'
+import FilterBar from 'src/logs/components/LogsFilterBar'
+import LogsTable from 'src/logs/components/LogsTable'
+import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
+import HistogramResults from 'src/logs/components/HistogramResults'
+import PageSpinner from 'src/shared/components/PageSpinner'
+
+// Utils
+import {getDeep} from 'src/utils/wrappers'
 import {searchToFilters} from 'src/logs/utils/search'
 import {fetchChunk} from 'src/logs/utils/fetchChunk'
-import {notify as notifyAction} from 'src/shared/actions/notifications'
-
-import {Greys} from 'src/reusable_ui/types'
-import HistogramResults from 'src/logs/components/HistogramResults'
-
+import {colorForSeverity} from 'src/logs/utils/colors'
 import {
-  NOW,
-  DEFAULT_TAIL_CHUNK_DURATION_MS,
-  DEFAULT_NEWER_CHUNK_DURATION_MS,
-  NEWER_CHUNK_OPTIONS,
-  OLDER_CHUNK_OPTIONS,
-} from 'src/logs/constants'
+  applyChangesToTableData,
+  isEmptyInfiniteData,
+} from 'src/logs/utils/table'
+import extentBy from 'src/utils/extentBy'
+import {computeTimeBounds} from 'src/logs/utils/timeBounds'
+import {formatTime} from 'src/logs/utils'
 
+// Actions
+import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   setTableCustomTimeAsync,
   setTableRelativeTimeAsync,
@@ -47,21 +61,20 @@ import {
   executeHistogramQueryAsync,
 } from 'src/logs/actions'
 import {getSourcesAsync} from 'src/shared/actions/sources'
-import LogsHeader from 'src/logs/components/LogsHeader'
-import HistogramChart from 'src/shared/components/HistogramChart'
-import LogsGraphContainer from 'src/logs/components/LogsGraphContainer'
-import TimeWindowDropdown from 'src/logs/components/TimeWindowDropdown'
-import OptionsOverlay from 'src/logs/components/OptionsOverlay'
-import SearchBar from 'src/logs/components/LogsSearchBar'
-import FilterBar from 'src/logs/components/LogsFilterBar'
-import LogsTable from 'src/logs/components/LogsTable'
-import {getDeep} from 'src/utils/wrappers'
-import {colorForSeverity} from 'src/logs/utils/colors'
-import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
+
+// Constants
+import {
+  NOW,
+  DEFAULT_TAIL_CHUNK_DURATION_MS,
+  DEFAULT_NEWER_CHUNK_DURATION_MS,
+  NEWER_CHUNK_OPTIONS,
+  OLDER_CHUNK_OPTIONS,
+} from 'src/logs/constants'
 import {SeverityFormatOptions, SEVERITY_SORTING_ORDER} from 'src/logs/constants'
 
+// Types
+import {Greys} from 'src/reusable_ui/types'
 import {Source, Namespace, NotificationAction} from 'src/types'
-
 import {
   HistogramData,
   HistogramColor,
@@ -81,13 +94,6 @@ import {
   SearchStatus,
   FetchLoop,
 } from 'src/types/logs'
-import {
-  applyChangesToTableData,
-  isEmptyInfiniteData,
-} from 'src/logs/utils/table'
-import extentBy from 'src/utils/extentBy'
-import {computeTimeBounds} from 'src/logs/utils/timeBounds'
-import {formatTime} from 'src/logs/utils'
 
 interface Props {
   sources: Source[]
@@ -232,6 +238,10 @@ class LogsPage extends Component<Props, State> {
       searchStatus,
       tableTime,
     } = this.props
+
+    if (this.isLoadingSources) {
+      return <PageSpinner />
+    }
 
     return (
       <>
@@ -965,6 +975,10 @@ class LogsPage extends Component<Props, State> {
 
   private get shouldLiveUpdate(): boolean {
     return this.props.tableTime.relative === 0
+  }
+
+  private get isLoadingSources(): boolean {
+    return this.props.sources.length === 0
   }
 }
 
