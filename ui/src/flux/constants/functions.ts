@@ -3,7 +3,7 @@ import {FluxToolbarFunction} from 'src/types/flux'
 
 export const functions: FluxToolbarFunction[] = [
   {
-    name: 'count()',
+    name: 'count',
     args: [
       {
         name: 'columns',
@@ -18,7 +18,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'covariance()',
+    name: 'covariance',
     args: [
       {
         name: 'columns',
@@ -46,7 +46,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'cumulativeSum()',
+    name: 'cumulativeSum',
     args: [
       {
         name: 'columns',
@@ -62,7 +62,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'derivative()',
+    name: 'derivative',
     args: [
       {
         name: 'unit',
@@ -95,7 +95,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'difference()',
+    name: 'difference',
     args: [
       {
         name: 'nonNegative',
@@ -116,7 +116,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'distinct()',
+    name: 'distinct',
     args: [
       {
         name: 'column',
@@ -130,7 +130,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'drop()',
+    name: 'drop',
     args: [
       {
         name: 'columns',
@@ -152,7 +152,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'duplicate()',
+    name: 'duplicate',
     args: [
       {
         name: 'column',
@@ -171,7 +171,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'filter()',
+    name: 'filter',
     args: [
       {
         name: 'fn',
@@ -187,7 +187,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'first()',
+    name: 'first',
     args: [],
     desc: 'Selects the first non-null record from an input table.',
     example: 'first()',
@@ -195,7 +195,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'from()',
+    name: 'from',
     args: [
       {
         name: 'bucket',
@@ -215,7 +215,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'fromRows()',
+    name: 'fromRows',
     args: [
       {
         name: 'bucket',
@@ -235,7 +235,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'group()',
+    name: 'group',
     args: [
       {
         name: 'by',
@@ -262,7 +262,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'histogram()',
+    name: 'histogram',
     args: [
       {
         name: 'column',
@@ -303,7 +303,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'histogramQuantile()',
+    name: 'histogramQuantile',
     args: [
       {
         name: 'quantile',
@@ -344,7 +344,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'integral()',
+    name: 'integral',
     args: [
       {
         name: 'unit',
@@ -365,7 +365,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'intervals()',
+    name: 'intervals',
     args: [
       {
         name: 'every',
@@ -404,7 +404,7 @@ export const functions: FluxToolbarFunction[] = [
     link: 'http://example.com',
   },
   {
-    name: 'join()',
+    name: 'join',
     args: [
       {
         name: 'tables',

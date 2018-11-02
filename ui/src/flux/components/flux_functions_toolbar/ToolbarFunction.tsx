@@ -51,7 +51,7 @@ class ToolbarFunction extends PureComponent<Props, State> {
       >
         {this.tooltip}
         <dd>
-          {func.name} {this.helperText}
+          {func.name}() {this.helperText}
         </dd>
       </div>
     )
