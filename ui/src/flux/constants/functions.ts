@@ -2,106 +2,119 @@
 import {FluxToolbarFunction} from 'src/types/flux'
 
 export const functions: FluxToolbarFunction[] = [
-	{
-  		name: 'count()',
-  		args: [
-    		{
-    			name: 'columns',
-    			desc: 'A list of columns on which to operate. Defaults to `["_value"]`.',
-    			type: 'Array of Strings'
-    		}
- 		],
- 		desc: 'Outputs the number of non-null records in each aggregated column.',
- 		example: 'count(columns: ["_value"])',
- 		category: 'Aggregate',
- 		link: 'http://example.com'
-	},
-	{
-  		name: 'covariance()',
-  		args: [
-    		{
-    			name: 'columns',
-    			desc: 'A list of columns on which to operate. Exactly two columns must be provided.',
-    			type: 'Array of Strings'
-    		},
-    		{
-    			name: 'pearsonr',
-    			desc: 'Indicates whether the result should be normalized to be the Pearson R coefficient',
-    			type: 'Boolean'
-    		},
-    		{
-    			name: 'valueDst',
-    			desc: 'The column into which the result will be placed. Defaults to `"_value"`.',
-    			type: 'String'
-    		}
- 		],
- 		desc: 'Computes the covariance between two columns.',
- 		example: 'covariance(columns: ["column_x", "column_y"], pearsonr: false, valueDst: "_value")',
- 		category: 'Aggregate',
- 		link: 'http://example.com'
-	},
-	{
-  		name: 'cumulativeSum()',
-  		args: [
-    		{
-    			name: 'columns',
-    			desc: 'A list of columns on which to operate. Defaults to `["_value"]`.',
-    			type: 'Array of Strings'
-    		}
- 		],
- 		desc: 'Computes a running sum for non-null records in the table. The output table schema will be the same as the input table.',
- 		example: 'cumulativeSum(columns: ["_value"])',
- 		category: 'Aggregate',
- 		link: 'http://example.com'
-	},
-	{
-  		name: 'derivative()',
-  		args: [
-    		{
-    			name: 'unit',
-    			desc: 'The time duration used when creating the derivative.',
-    			type: 'Duration'
-    		},
-    		{
-    			name: 'nonNegative',
-    			desc: 'Indicates if the derivative is allowed to be negative. When set to `true`, if a value is less than the previous value, it is assumed the previous value should have been a zero.',
-    			type: 'Boolean'
-    		},
-    		{
-    			name: 'columns',
-    			desc: 'A list of columns on which to operate. Defaults to `["_value"]`.',
-    			type: 'Array of Strings'
-    		},
-    		{
-    			name: 'timeSrc',
-    			desc: 'The column containing time values. Defaults to `"_time"`.',
-    			type: 'String'
-    		}
- 		],
- 		desc: 'Computes the rate of change per unit of time between subsequent non-null records. The output table schema will be the same as the input table.',
- 		example: 'derivative(unit: 100ms, nonNegative: false, columns: ["_value"], timeSrc: "_time")',
- 		category: 'Aggregate',
- 		link: 'http://example.com'
-	},
-	{
-  		name: 'difference()',
-  		args: [
-    		{
-    			name: 'nonNegative',
-    			desc: 'Indicates if the derivative is allowed to be negative. When set to `true`, if a value is less than the previous value, it is assumed the previous value should have been a zero.',
-    			type: 'Boolean'
-    		},
-    		{
-    			name: 'columns',
-    			desc: 'A list of columns on which to operate. Defaults to `["_value"]`.',
-    			type: 'Array of Strings'
-    		}
- 		],
- 		desc: 'Computes the difference between subsequent non-null records.',
- 		example: 'difference(nonNegative: false, columns: ["_value"])',
- 		category: 'Aggregate',
- 		link: 'http://example.com'
-	},
+  {
+    name: 'count()',
+    args: [
+      {
+        name: 'columns',
+        desc:
+          'A list of columns on which to operate. Defaults to `["_value"]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    desc: 'Outputs the number of non-null records in each aggregated column.',
+    example: 'count(columns: ["_value"])',
+    category: 'Aggregate',
+    link: 'http://example.com',
+  },
+  {
+    name: 'covariance()',
+    args: [
+      {
+        name: 'columns',
+        desc:
+          'A list of columns on which to operate. Exactly two columns must be provided.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'pearsonr',
+        desc:
+          'Indicates whether the result should be normalized to be the Pearson R coefficient',
+        type: 'Boolean',
+      },
+      {
+        name: 'valueDst',
+        desc:
+          'The column into which the result will be placed. Defaults to `"_value"`.',
+        type: 'String',
+      },
+    ],
+    desc: 'Computes the covariance between two columns.',
+    example:
+      'covariance(columns: ["column_x", "column_y"], pearsonr: false, valueDst: "_value")',
+    category: 'Aggregate',
+    link: 'http://example.com',
+  },
+  {
+    name: 'cumulativeSum()',
+    args: [
+      {
+        name: 'columns',
+        desc:
+          'A list of columns on which to operate. Defaults to `["_value"]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    desc:
+      'Computes a running sum for non-null records in the table. The output table schema will be the same as the input table.',
+    example: 'cumulativeSum(columns: ["_value"])',
+    category: 'Aggregate',
+    link: 'http://example.com',
+  },
+  {
+    name: 'derivative()',
+    args: [
+      {
+        name: 'unit',
+        desc: 'The time duration used when creating the derivative.',
+        type: 'Duration',
+      },
+      {
+        name: 'nonNegative',
+        desc:
+          'Indicates if the derivative is allowed to be negative. When set to `true`, if a value is less than the previous value, it is assumed the previous value should have been a zero.',
+        type: 'Boolean',
+      },
+      {
+        name: 'columns',
+        desc:
+          'A list of columns on which to operate. Defaults to `["_value"]`.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'timeSrc',
+        desc: 'The column containing time values. Defaults to `"_time"`.',
+        type: 'String',
+      },
+    ],
+    desc:
+      'Computes the rate of change per unit of time between subsequent non-null records. The output table schema will be the same as the input table.',
+    example:
+      'derivative(unit: 100ms, nonNegative: false, columns: ["_value"], timeSrc: "_time")',
+    category: 'Aggregate',
+    link: 'http://example.com',
+  },
+  {
+    name: 'difference()',
+    args: [
+      {
+        name: 'nonNegative',
+        desc:
+          'Indicates if the derivative is allowed to be negative. When set to `true`, if a value is less than the previous value, it is assumed the previous value should have been a zero.',
+        type: 'Boolean',
+      },
+      {
+        name: 'columns',
+        desc:
+          'A list of columns on which to operate. Defaults to `["_value"]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    desc: 'Computes the difference between subsequent non-null records.',
+    example: 'difference(nonNegative: false, columns: ["_value"])',
+    category: 'Aggregate',
+    link: 'http://example.com',
+  },
   {
     name: 'distinct()',
     args: [
