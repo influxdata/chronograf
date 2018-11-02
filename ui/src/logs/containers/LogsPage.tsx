@@ -94,6 +94,7 @@ import {
   SearchStatus,
   FetchLoop,
 } from 'src/types/logs'
+import {RemoteDataState} from 'src/types'
 
 interface Props {
   sources: Source[]
@@ -101,7 +102,7 @@ interface Props {
   currentNamespaces: Namespace[]
   currentNamespace: Namespace
   getSourceAndPopulateNamespaces: (sourceID: string) => void
-  getSources: () => void
+  getSources: typeof getSourcesAsync
   setTimeRangeAsync: (timeRange: TimeRange) => void
   setTimeBounds: (timeBounds: TimeBounds) => void
   setTimeWindow: (timeWindow: TimeWindow) => void
@@ -177,6 +178,7 @@ class LogsPage extends Component<Props, State> {
   private loadingNewer: boolean = false
   private currentOlderChunksGenerator: FetchLoop = null
   private currentNewerChunksGenerator: FetchLoop = null
+  private loadingSources: RemoteDataState = RemoteDataState.NotStarted
 
   constructor(props: Props) {
     super(props)
@@ -192,7 +194,7 @@ class LogsPage extends Component<Props, State> {
 
   public async componentDidUpdate(prevProps: Props) {
     const {router} = this.props
-    if (!this.props.sources || this.props.sources.length === 0) {
+    if (this.isSourcesEmpty) {
       return router.push(`/sources/new?redirectPath=${location.pathname}`)
     }
 
@@ -208,7 +210,8 @@ class LogsPage extends Component<Props, State> {
   }
 
   public async componentDidMount() {
-    await this.props.getSources()
+    await this.getSources()
+
     await this.setCurrentSource()
 
     await this.props.getConfig(this.logConfigLink)
@@ -956,6 +959,16 @@ class LogsPage extends Component<Props, State> {
     })
   }
 
+  private getSources = async (): Promise<void> => {
+    try {
+      this.loadingSources = RemoteDataState.Loading
+      await this.props.getSources()
+      this.loadingSources = RemoteDataState.Done
+    } catch (err) {
+      this.loadingSources = RemoteDataState.Error
+    }
+  }
+
   private get isTruncated(): boolean {
     return this.props.logConfig.isTruncated
   }
@@ -978,7 +991,21 @@ class LogsPage extends Component<Props, State> {
   }
 
   private get isLoadingSources(): boolean {
-    return this.props.sources.length === 0
+    switch (this.loadingSources) {
+      case RemoteDataState.Loading:
+      case RemoteDataState.NotStarted:
+        return true
+      default:
+        return false
+    }
+  }
+
+  private get isSourcesEmpty(): boolean {
+    if (this.isLoadingSources) {
+      return false
+    }
+
+    return !this.props.sources || this.props.sources.length === 0
   }
 }
 
