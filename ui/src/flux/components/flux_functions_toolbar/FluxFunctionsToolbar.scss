@@ -1,10 +1,15 @@
 .flux-functions-toolbar {
   height: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: $g3-castle;
 }
 
 .flux-functions-toolbar--search {
-  padding: $ix-marg-a $ix-marg-a $ix-marg-b $ix-marg-a;
+  padding: $ix-marg-a;
+  flex-shrink: 0;
+  padding-bottom: $ix-marg-a + 1px; 
+  border-bottom: $ix-border solid $g4-onyx;
   background-color: $g3-castle;
 }
 
