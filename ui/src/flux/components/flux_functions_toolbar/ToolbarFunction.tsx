@@ -47,10 +47,9 @@ class ToolbarFunction extends PureComponent<Props, State> {
         ref={r => (this.functionRef = r)}
         onMouseEnter={this.handleHover}
         onMouseLeave={this.handleStopHover}
-        onClick={this.handleClickFunction}
       >
         {this.tooltip}
-        <dd>
+        <dd onClick={this.handleClickFunction}>
           {func.name} {this.helperText}
         </dd>
       </div>

@@ -3,6 +3,11 @@
   background-color: $g3-castle;
 }
 
+.flux-functions-toolbar--search {
+  padding: $ix-marg-a $ix-marg-a $ix-marg-b $ix-marg-a;
+  background-color: $g3-castle;
+}
+
 .flux-functions-toolbar--category {
   dt, dd {
     height: 30px;
@@ -19,6 +24,7 @@
 
   dd {
     font-family: "RobotoMono", monospace;
+    cursor: pointer;
   }
 
   dd:hover, dd:active {
