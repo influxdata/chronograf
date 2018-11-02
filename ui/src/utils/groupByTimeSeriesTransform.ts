@@ -257,19 +257,25 @@ const constructCells = (
 
           metaQuerySeries = [columns, ...values]
         } else {
-          labels = ['measurement', columns[0]].map(c => ({
+          labels = columns.map(c => ({
             label: c,
             responseIndex,
             seriesIndex,
           }))
+          labels.unshift({
+            label: 'measurement',
+            responseIndex,
+            seriesIndex,
+          })
 
           const [, ...vals] = metaQuerySeries
+
           const allValuesForMeasurement = values.map(val => {
-            return [measurement, val[0]]
+            return [measurement, ...val]
           })
 
           metaQuerySeries = [
-            ['measurement', columns[0]],
+            ['measurement', ...columns],
             ...vals,
             ...allValuesForMeasurement,
           ]
