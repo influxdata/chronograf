@@ -20,10 +20,29 @@ interface Props {
   tipPosition?: {top: number; right: number}
 }
 
+interface State {
+  bottomPosition: number | null
+}
+
 const MAX_HEIGHT = 400
 
 @ErrorHandling
-class FunctionTooltip extends PureComponent<Props> {
+class FunctionTooltip extends PureComponent<Props, State> {
+  private tooltipRef: HTMLElement
+
+  public constructor(props: Props) {
+    super(props)
+    this.state = {bottomPosition: null}
+  }
+
+  public componentDidMount() {
+    const {bottom, height} = this.tooltipRef.getBoundingClientRect()
+
+    if (bottom > window.innerHeight) {
+      this.setState({bottomPosition: height / 2})
+    }
+  }
+
   public render() {
     const {
       func: {desc, args, example, link},
@@ -34,6 +53,7 @@ class FunctionTooltip extends PureComponent<Props> {
         <div
           style={this.stylePosition}
           className="flux-functions-toolbar--tooltip"
+          ref={r => (this.tooltipRef = r)}
         >
           <button
             className="flux-functions-toolbar--tooltip-dismiss"
@@ -75,9 +95,10 @@ class FunctionTooltip extends PureComponent<Props> {
     const {
       tipPosition: {top, right},
     } = this.props
+    const {bottomPosition} = this.state
 
     return {
-      top: `${Math.min(top, window.innerHeight - MAX_HEIGHT / 2 - 28)}px`,
+      bottom: `${bottomPosition || window.innerHeight - top - 15}px`,
       right: `${right + 2}px`,
     }
   }

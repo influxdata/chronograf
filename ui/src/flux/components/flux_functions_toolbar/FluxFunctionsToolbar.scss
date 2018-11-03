@@ -13,6 +13,10 @@
   background-color: $g3-castle;
 }
 
+.flux-functions-toolbar--list {
+  padding-bottom: $ix-marg-a;
+}
+
 .flux-functions-toolbar--category {
   dt, dd {
     height: 30px;
@@ -51,8 +55,7 @@
   padding-right: 8px;
   max-width: 600px;
   position: fixed;
-  margin-top: 15px;
-  transform: translateY(-50%);
+  transform: translateY(50%);
   z-index: 10;
 }
 
