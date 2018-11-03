@@ -4,9 +4,11 @@ import {timeSeriesToTableGraphWork as timeSeriesToTableGraph} from 'src/worker/j
 import {
   filterTableColumns,
   transformTableData,
+  computeFieldOptions,
 } from 'src/dashboards/utils/tableGraph'
 
 import {InfluxQLQueryType} from 'src/types/series'
+import {DataType} from 'src/shared/constants'
 
 import {DEFAULT_SORT_DIRECTION} from 'src/shared/constants/tableGraph'
 import {
@@ -1204,5 +1206,55 @@ describe('if verticalTimeAxis is false', () => {
     const expected = [['time', 2000, 3000, 1000], ['f2', 3000, 1000, 2000]]
 
     expect(actual.transformedData).toEqual(expected)
+  })
+})
+
+describe('computeFieldOptions', () => {
+  it('orders field options correctly for metaqueries', () => {
+    const existingFieldOptions = [
+      {
+        internalName: 'count',
+        displayName: '',
+        visible: true,
+      },
+    ]
+
+    const sortedLabels = [
+      {
+        label: 'measurement',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+      {
+        label: 'count',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+    ]
+
+    const dataType = DataType.influxQL
+    const influxQLQueryType = InfluxQLQueryType.MetaQuery
+
+    const actual = computeFieldOptions(
+      existingFieldOptions,
+      sortedLabels,
+      dataType,
+      influxQLQueryType
+    )
+
+    const expected = [
+      {
+        internalName: 'measurement',
+        displayName: '',
+        visible: true,
+      },
+      {
+        internalName: 'count',
+        displayName: '',
+        visible: true,
+      },
+    ]
+
+    expect(actual).toEqual(expected)
   })
 })
