@@ -28,21 +28,26 @@ class FluxFunctionsToolbar extends PureComponent<{}, State> {
       <div className="flux-functions-toolbar">
         <SearchBar onSearch={this.handleSearch} />
         <FancyScrollbar>
-          <TransformToolbarFunctions funcs={FUNCTIONS} searchTerm={searchTerm}>
-            {sortedFunctions => {
-              return Object.entries(sortedFunctions).map(
-                ([category, funcs]) => {
-                  return (
-                    <FunctionCategory
-                      key={category}
-                      category={category}
-                      funcs={funcs}
-                    />
-                  )
-                }
-              )
-            }}
-          </TransformToolbarFunctions>
+          <div className="flux-functions-toolbar--list">
+            <TransformToolbarFunctions
+              funcs={FUNCTIONS}
+              searchTerm={searchTerm}
+            >
+              {sortedFunctions => {
+                return Object.entries(sortedFunctions).map(
+                  ([category, funcs]) => {
+                    return (
+                      <FunctionCategory
+                        key={category}
+                        category={category}
+                        funcs={funcs}
+                      />
+                    )
+                  }
+                )
+              }}
+            </TransformToolbarFunctions>
+          </div>
         </FancyScrollbar>
       </div>
     )
