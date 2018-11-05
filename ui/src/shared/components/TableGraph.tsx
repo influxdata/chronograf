@@ -507,7 +507,17 @@ class TableGraph extends PureComponent<Props, State> {
         : rowIndex === this.timeFieldIndex && isFirstCol)
     const isFieldName = this.isVerticalTimeAxis ? isFirstRow : isFirstCol
     const isFixedCorner = isFirstRow && isFirstCol
-    const isNumerical = !isNaN(Number.parseFloat(cellData as string))
+
+    // Note that
+    //
+    // - `Number('')` is 0
+    // - `Number('02abc')` is NaN
+    // - `parseFloat('')` is NaN
+    // - `parseFloat('02abc')` is 2
+    //
+    // which is why there are two slightly different `isNaN` checks here
+    const isNumerical =
+      !isNaN(Number(cellData)) && !isNaN(parseFloat(cellData as string))
 
     let cellStyle: React.CSSProperties = style //tslint:disable-line
     if (
