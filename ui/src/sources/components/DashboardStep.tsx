@@ -26,7 +26,6 @@ import {notify as notifyAction} from 'src/shared/actions/notifications'
 import {
   notifyDashboardCreated,
   notifyDashboardCreationFailed,
-  notifyNoSuggestedDashboards,
 } from 'src/shared/copy/notifications'
 
 // Types
@@ -194,7 +193,7 @@ class DashboardStep extends Component<Props, State> {
 
   private handleSuggest = async () => {
     const {protoboards} = this.state
-    const {source, notify} = this.props
+    const {source} = this.props
 
     if (source) {
       const suggestedProtoboardsList = await getSuggestedProtoboards(
@@ -203,7 +202,6 @@ class DashboardStep extends Component<Props, State> {
       )
 
       if (suggestedProtoboardsList.length === 0) {
-        notify(notifyNoSuggestedDashboards())
         return
       }
 

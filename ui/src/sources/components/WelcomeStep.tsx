@@ -27,7 +27,7 @@ class SourceStep extends PureComponent<Props> {
       <div className="wizard-step--bookend">
         <div className="auth-logo" />
         <h1>Welcome to Chronograf</h1>
-        <p>Start using Chronograf in a few easy steps.</p>
+        <p>Start using Chronograf in a few easy steps</p>
       </div>
     )
   }

@@ -8,6 +8,9 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import KapacitorDropdown from 'src/sources/components/KapacitorDropdown'
 import KapacitorForm from 'src/sources/components/KapacitorForm'
 
+// Utils
+import ActiveKapacitorFromSources from 'src/kapacitor/utils/ActiveKapacitorFromSources'
+
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 import * as sourcesActions from 'src/shared/actions/sources'
@@ -45,18 +48,6 @@ interface State {
   kapacitor: Kapacitor
 }
 
-const getActiveKapacitor = (source: Source, sources: Source[]): Kapacitor => {
-  if (!source || !sources) {
-    return null
-  }
-  const ActiveSource = sources.find(s => s.id === source.id)
-  if (!ActiveSource || !ActiveSource.kapacitors) {
-    return null
-  }
-  const activeKapacitor = ActiveSource.kapacitors.find(k => k.active)
-  return activeKapacitor
-}
-
 const syncHostnames = (source: Source, kapacitor: Kapacitor) => {
   try {
     // new URL(input) throws error if input is not a valid url.
@@ -82,7 +73,10 @@ class KapacitorStep extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    const ActiveKapacitor = getActiveKapacitor(props.source, props.sources)
+    const ActiveKapacitor = ActiveKapacitorFromSources(
+      props.source,
+      props.sources
+    )
 
     let kapacitor
     if (props.showNewKapacitor) {
@@ -179,7 +173,7 @@ class KapacitorStep extends Component<Props, State> {
     const {source, sources} = this.props
     const {kapacitor} = this.state
 
-    const activeKapacitor = getActiveKapacitor(source, sources)
+    const activeKapacitor = ActiveKapacitorFromSources(source, sources)
     return !_.isEqual(activeKapacitor, kapacitor)
   }
 
