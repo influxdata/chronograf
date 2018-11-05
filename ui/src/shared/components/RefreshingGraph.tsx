@@ -320,6 +320,7 @@ class RefreshingGraph extends Component<Props> {
       cellHeight,
       decimalPlaces,
       manualRefresh,
+      onUpdateVisType,
       onUpdateCellColors,
     } = this.props
 
@@ -336,6 +337,7 @@ class RefreshingGraph extends Component<Props> {
         key={manualRefresh}
         cellHeight={cellHeight}
         decimalPlaces={decimalPlaces}
+        onUpdateVisType={onUpdateVisType}
         onUpdateCellColors={onUpdateCellColors}
       />
     )
