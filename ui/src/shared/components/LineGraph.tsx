@@ -37,6 +37,7 @@ import {
   FluxTable,
 } from 'src/types'
 import {DataType} from 'src/shared/constants'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 interface Props {
   axes: Axes
@@ -54,6 +55,7 @@ interface Props {
   onZoom: () => void
   handleSetHoverTime: () => void
   activeQueryIndex?: number
+  onUpdateVisType?: TimeMachineContainer['handleUpdateType']
 }
 
 type LineGraphProps = Props & RouteComponentProps<any, any>
@@ -132,7 +134,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
 
   public render() {
     if (!this.isValidData) {
-      return <InvalidData />
+      return <InvalidData onUpdateVisType={this.props.onUpdateVisType} />
     }
     const {
       data,
