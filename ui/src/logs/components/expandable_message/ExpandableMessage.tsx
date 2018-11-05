@@ -28,6 +28,7 @@ const PADDING = 8
 const MIN_LEFT = 120
 const MIN_MESSAGE_WIDTH = 200
 const MAX_MESSAGE_HEIGHT = 200
+const SCROLL_MARGIN = 80
 
 @ErrorHandling
 export class ExpandableMessage extends Component<Props, State> {
@@ -84,6 +85,7 @@ export class ExpandableMessage extends Component<Props, State> {
       <ExpandedContainer
         notify={this.props.notify}
         onClose={this.handleClose}
+        scrollMargin={SCROLL_MARGIN}
         maxWidth={this.props.maxWidth}
         minWidth={MIN_MESSAGE_WIDTH}
         maxHeight={MAX_MESSAGE_HEIGHT}

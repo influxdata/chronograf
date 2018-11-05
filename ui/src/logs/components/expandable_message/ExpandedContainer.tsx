@@ -14,6 +14,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   notify: NotificationAction
   onClose: () => void
+  scrollMargin: number
   maxWidth: number
   maxHeight: number
   minWidth: number
@@ -29,6 +30,13 @@ interface State {
   scrollTop: number
 }
 
+enum PinnedState {
+  Left = 'PinnedLeft',
+  Right = 'PinnedRight',
+  Center = 'PinnedCenter',
+  OnMessage = 'PinnedOnMessage',
+}
+
 @ErrorHandling
 export class ExpandedContainer extends Component<Props, State> {
   constructor(props: Props) {
@@ -40,43 +48,19 @@ export class ExpandedContainer extends Component<Props, State> {
   public render() {
     return (
       <ClickOutside onClickOutside={this.handleClickOutside}>
-        {this.renderMessage({
-          top: this.top,
-          left: this.maxLeft,
-          width: this.visibleWidth,
-          padding: this.props.padding,
-          maxHeight: this.props.maxHeight,
-        })}
+        <div className="expanded--message message-wrap" style={this.style}>
+          {this.closeExpansionButton}
+          <FancyScrollbar
+            setScrollTop={this.handleScrollbarScroll}
+            scrollTop={this.state.scrollTop}
+            autoHeight={true}
+            maxHeight={this.maxHeight}
+          >
+            {this.props.children}
+          </FancyScrollbar>
+        </div>
       </ClickOutside>
     )
-  }
-
-  private renderMessage(style: CSSProperties): JSX.Element {
-    if (style.width < this.props.minWidth) {
-      return this.props.children
-    }
-
-    return (
-      <div className="expanded--message message-wrap" style={style}>
-        {this.closeExpansionButton}
-        <FancyScrollbar
-          setScrollTop={this.handleScrollbarScroll}
-          scrollTop={this.state.scrollTop}
-          autoHeight={true}
-          maxHeight={this.maxHeight}
-        >
-          {this.props.children}
-        </FancyScrollbar>
-      </div>
-    )
-  }
-
-  private get direction(): string {
-    if (this.props.left > this.props.minLeft) {
-      return 'right'
-    } else {
-      return 'left'
-    }
   }
 
   private get maxHeight(): number {
@@ -85,10 +69,6 @@ export class ExpandedContainer extends Component<Props, State> {
 
   private get verticalPadding(): number {
     return this.props.padding * 2
-  }
-
-  private get top(): number {
-    return this.props.top - this.props.padding
   }
 
   private handleClickDismiss = (e: MouseEvent<HTMLButtonElement>) => {
@@ -109,33 +89,58 @@ export class ExpandedContainer extends Component<Props, State> {
     this.props.onClose()
   }
 
-  private get maxLeft(): number {
-    return Math.max(this.props.minLeft, this.props.left - this.props.padding)
-  }
-
-  private get visibleWidth(): number {
-    return Math.min(
-      this.remainingWidth,
-      this.maxViewableWidth,
-      this.props.width
-    )
-  }
-
-  private get remainingWidth(): number {
-    if (this.props.left > this.props.minLeft) {
-      return this.props.maxWidth - this.hiddenWidth
-    } else {
-      return this.props.width + this.hiddenWidth
+  private get style(): CSSProperties {
+    return {
+      ...this.position,
+      top: this.props.top,
+      width: this.width,
+      padding: this.props.padding,
+      maxHeight: this.props.maxHeight,
     }
   }
 
-  private get hiddenWidth(): number {
-    return this.props.left - this.props.minLeft
+  private get position(): CSSProperties {
+    switch (this.pinnedState) {
+      case PinnedState.Left:
+        return {left: this.props.minLeft}
+      case PinnedState.Right:
+        return {left: this.props.minLeft + this.props.scrollMargin}
+      case PinnedState.Center:
+        return {left: this.props.minLeft}
+      case PinnedState.OnMessage:
+        return {left: this.props.left}
+    }
   }
 
-  // Table space with room for scrollbar
-  private get maxViewableWidth(): number {
-    return this.props.maxWidth - this.props.padding
+  private get width(): number {
+    switch (this.pinnedState) {
+      case PinnedState.Left:
+      case PinnedState.Right:
+        return (
+          this.props.maxWidth - this.props.scrollMargin - this.props.padding
+        )
+      case PinnedState.Center:
+        return this.props.maxWidth - this.props.padding
+      case PinnedState.OnMessage:
+        return this.props.width
+    }
+  }
+
+  private get pinnedState(): PinnedState {
+    const isLeftOutOfView = this.props.left < this.props.minLeft
+    const isRightOfView =
+      this.props.width + this.props.left - this.props.minLeft >
+      this.props.maxWidth
+
+    if (isLeftOutOfView && isRightOfView) {
+      return PinnedState.Center
+    } else if (!isLeftOutOfView && !isRightOfView) {
+      return PinnedState.OnMessage
+    } else if (!isRightOfView) {
+      return PinnedState.Left
+    } else if (!isLeftOutOfView) {
+      return PinnedState.Right
+    }
   }
 
   private get closeExpansionButton(): JSX.Element {
