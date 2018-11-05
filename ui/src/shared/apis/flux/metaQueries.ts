@@ -66,8 +66,9 @@ export const tagKeys = async (
     from(bucket: "${bucket}")
       |> range(start: -30d)
       ${tagsetFilter(filter)}
-     	|> group(none: true)
       |> keys(except:["_time", "_value", "_start", "_stop"])
+      |> group(none: true)
+      |> distinct()
       |> map(fn: (r) => r._value)
       ${tagKeyFilter}
     `
