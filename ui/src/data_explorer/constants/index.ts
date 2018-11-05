@@ -33,37 +33,6 @@ export const INITIAL_HEIGHTS: InitialHeights = {
   visualization: '33.334%',
 }
 
-const knownMetaQueries = {
-  showDatabases: 'SHOW DATABASES',
-  createDatabase: 'CREATE DATABASE "db_name"',
-  dropDatabase: 'DROP DATABASE "db_name"',
-  showMeasurements: 'SHOW MEASUREMENTS ON "db_name"',
-  showTagKeys: 'SHOW TAG KEYS ON "db_name" FROM "measurement_name"',
-  showTagValues:
-    'SHOW TAG VALUES ON "db_name" FROM "measurement_name" WITH KEY = "tag_key"',
-  showRetentionPolicies: 'SHOW RETENTION POLICIES on "db_name"',
-  createRetentionPolicy:
-    'CREATE RETENTION POLICY "rp_name" ON "db_name" DURATION 30d REPLICATION 1 DEFAULT',
-  dropRetentionPolicy: 'DROP RETENTION POLICY "rp_name" ON "db_name"',
-  showContinuousQueries: 'SHOW CONTINUOUS QUERIES',
-  createContinuousQuery:
-    'CREATE CONTINUOUS QUERY "cq_name" ON "db_name" BEGIN SELECT min("field") INTO "target_measurement" FROM "current_measurement" GROUP BY time(30m) END',
-  dropContinuousQuery: 'DROP CONTINUOUS QUERY "cq_name" ON "db_name"',
-  showUsers: 'SHOW USERS',
-  createUser: 'CREATE USER "username" WITH PASSWORD \'password\'',
-  createUserWithAllPrivileges:
-    'CREATE USER "username" WITH PASSWORD \'password\' WITH ALL PRIVILEGES',
-  dropUser: 'DROP USER "username"',
-  showStats: 'SHOW STATS',
-  showDiagnostics: 'SHOW DIAGNOSTICS',
-  showFieldKeyCard: 'SHOW FIELD KEY CARDINALITY ON "db_name"',
-  showMeasurementCard: 'SHOW MEASUREMENT CARDINALITY ON "db_name"',
-  showSeriesCard: 'SHOW SERIES CARDINALITY ON "db_name"',
-  showTagKeyCard: 'SHOW TAG KEY CARDINALITY ON "db_name"',
-  showTagValuesCard:
-    'SHOW TAG VALUES CARDINALITY ON "db_name" WITH KEY = "tag_key"',
-}
-
 export interface MetaQueryTemplateOption {
   id: string
   text: string
@@ -87,19 +56,19 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
   {
     id: 'Show Databases',
     text: 'Show Databases',
-    query: knownMetaQueries.showDatabases,
+    query: 'SHOW DATABASES',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Database',
     text: 'Create Database',
-    query: knownMetaQueries.createDatabase,
+    query: 'CREATE DATABASE "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop Database',
     text: 'Drop Database',
-    query: knownMetaQueries.dropDatabase,
+    query: 'DROP DATABASE "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
@@ -109,19 +78,20 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
   {
     id: 'Show Measurements',
     text: 'Show Measurements',
-    query: knownMetaQueries.showMeasurements,
+    query: 'SHOW MEASUREMENTS ON "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Tag Keys',
     text: 'Show Tag Keys',
-    query: knownMetaQueries.showTagKeys,
+    query: 'SHOW TAG KEYS ON "db_name" FROM "measurement_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Tag Values',
     text: 'Show Tag Values',
-    query: knownMetaQueries.showTagValues,
+    query:
+      'SHOW TAG VALUES ON "db_name" FROM "measurement_name" WITH KEY = "tag_key"',
     type: DropdownChildTypes.Item,
   },
   {
@@ -131,31 +101,31 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
   {
     id: 'Show Field Key Cardinality',
     text: 'Show Field Key Cardinality',
-    query: knownMetaQueries.showFieldKeyCard,
+    query: 'SHOW FIELD KEY CARDINALITY ON "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Measurement Cardinality',
     text: 'Show Measurement Cardinality',
-    query: knownMetaQueries.showMeasurementCard,
+    query: 'SHOW MEASUREMENT CARDINALITY ON "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Series Cardinality',
     text: 'Show Series Cardinality',
-    query: knownMetaQueries.showSeriesCard,
+    query: 'SHOW SERIES CARDINALITY ON "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Tag Key Cardinality',
     text: 'Show Tag Key Cardinality',
-    query: knownMetaQueries.showTagKeyCard,
+    query: 'SHOW TAG KEY CARDINALITY ON "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Tag Values Cardinality',
     text: 'Show Tag Values Cardinality',
-    query: knownMetaQueries.showTagValuesCard,
+    query: 'SHOW TAG VALUES CARDINALITY ON "db_name" WITH KEY = "tag_key"',
     type: DropdownChildTypes.Item,
   },
   {
@@ -165,19 +135,20 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
   {
     id: 'Show Retention Policies',
     text: 'Show Retention Policies',
-    query: knownMetaQueries.showRetentionPolicies,
+    query: 'SHOW RETENTION POLICIES on "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Retention Policy',
     text: 'Create Retention Policy',
-    query: knownMetaQueries.createRetentionPolicy,
+    query:
+      'CREATE RETENTION POLICY "rp_name" ON "db_name" DURATION 30d REPLICATION 1 DEFAULT',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop Retention Policy',
     text: 'Drop Retention Policy',
-    query: knownMetaQueries.dropRetentionPolicy,
+    query: 'DROP RETENTION POLICY "rp_name" ON "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
@@ -187,19 +158,20 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
   {
     id: 'Show Continuous Queries',
     text: 'Show Continuous Queries',
-    query: knownMetaQueries.showContinuousQueries,
+    query: 'SHOW CONTINUOUS QUERIES',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Continuous Query',
     text: 'Create Continuous Query',
-    query: knownMetaQueries.createContinuousQuery,
+    query:
+      'CREATE CONTINUOUS QUERY "cq_name" ON "db_name" BEGIN SELECT min("field") INTO "target_measurement" FROM "current_measurement" GROUP BY time(30m) END',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop Continuous Query',
     text: 'Drop Continuous Query',
-    query: knownMetaQueries.dropContinuousQuery,
+    query: 'DROP CONTINUOUS QUERY "cq_name" ON "db_name"',
     type: DropdownChildTypes.Item,
   },
   {
@@ -209,25 +181,26 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
   {
     id: 'Show Users',
     text: 'Show Users',
-    query: knownMetaQueries.showUsers,
+    query: 'SHOW USERS',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create User',
     text: 'Create User',
-    query: knownMetaQueries.createUser,
+    query: 'CREATE USER "username" WITH PASSWORD \'password\'',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Create Admin User',
     text: 'Create Admin User',
-    query: knownMetaQueries.createUserWithAllPrivileges,
+    query:
+      'CREATE USER "username" WITH PASSWORD \'password\' WITH ALL PRIVILEGES',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Drop User',
     text: 'Drop User',
-    query: knownMetaQueries.dropUser,
+    query: 'DROP USER "username"',
     type: DropdownChildTypes.Item,
   },
   {
@@ -237,13 +210,13 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
   {
     id: 'Show Stats',
     text: 'Show Stats',
-    query: knownMetaQueries.showStats,
+    query: 'SHOW STATS',
     type: DropdownChildTypes.Item,
   },
   {
     id: 'Show Diagnostics',
     text: 'Show Diagnostics',
-    query: knownMetaQueries.showDiagnostics,
+    query: 'SHOW DIAGNOSTICS',
     type: DropdownChildTypes.Item,
   },
 ]
