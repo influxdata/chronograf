@@ -8,9 +8,6 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 // Types
 import {NotificationAction} from 'src/types'
 
-// Actions
-import {expandMessageError} from 'src/shared/copy/notifications'
-
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -34,19 +31,10 @@ interface State {
 
 @ErrorHandling
 export class ExpandedContainer extends Component<Props, State> {
-  private initialVisibility: boolean
-
   constructor(props: Props) {
     super(props)
 
-    this.initialVisibility = this.isVisible
     this.state = {scrollTop: 0}
-  }
-
-  public componentDidMount() {
-    if (!this.initialVisibility) {
-      this.props.notify(expandMessageError(this.direction))
-    }
   }
 
   public render() {
@@ -119,10 +107,6 @@ export class ExpandedContainer extends Component<Props, State> {
 
   private handleClickOutside = () => {
     this.props.onClose()
-  }
-
-  private get isVisible(): boolean {
-    return this.visibleWidth > this.props.minWidth
   }
 
   private get maxLeft(): number {
