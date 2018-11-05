@@ -22,6 +22,7 @@ interface Props {
   skipLinkText?: string
   maxWidth?: number
   jumpStep: number
+  isJumpingAllowed: boolean
 }
 
 @ErrorHandling
@@ -46,13 +47,14 @@ class WizardOverlay extends PureComponent<Props> {
   }
 
   private get WizardController() {
-    const {children, skipLinkText, jumpStep} = this.props
+    const {children, skipLinkText, jumpStep, isJumpingAllowed} = this.props
     if (children) {
       return (
         <WizardController
           skipLinkText={skipLinkText}
           handleSkip={this.handleSkip}
           jumpStep={jumpStep}
+          isJumpingAllowed={isJumpingAllowed}
         >
           {children}
         </WizardController>

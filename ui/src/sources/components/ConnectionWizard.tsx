@@ -83,6 +83,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         skipLinkText="Dismiss"
         maxWidth={800}
         jumpStep={jumpStep}
+        isJumpingAllowed={this.isSourceComplete()}
       >
         <WizardStep
           title="InfluxDB Connection"

@@ -13,6 +13,7 @@ describe('WizardFullScreen', () => {
       skipLinkText: undefined,
       handleSkip: undefined,
       isUsingAuth: false,
+      isJumpingAllowed: true,
       ...override,
     }
 

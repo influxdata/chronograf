@@ -15,6 +15,7 @@ interface Props {
   switchLinkText?: string
   handleSwitch?: () => void
   isUsingAuth: boolean
+  isJumpingAllowed: boolean
 }
 
 @ErrorHandling
@@ -38,6 +39,7 @@ class WizardFullScreen extends PureComponent<Props> {
       handleSwitch,
       switchLinkText,
       isUsingAuth,
+      isJumpingAllowed,
     } = this.props
 
     if (children) {
@@ -49,6 +51,7 @@ class WizardFullScreen extends PureComponent<Props> {
           switchLinkText={switchLinkText}
           isUsingAuth={isUsingAuth}
           jumpStep={0}
+          isJumpingAllowed={isJumpingAllowed}
         >
           {children}
         </WizardController>

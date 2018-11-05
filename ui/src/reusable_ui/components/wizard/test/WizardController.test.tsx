@@ -13,6 +13,7 @@ describe('WizardController', () => {
       children: null,
       handleSkip: undefined,
       skipLinkText: undefined,
+      isJumpingAllowed: true,
       ...override,
     }
 
