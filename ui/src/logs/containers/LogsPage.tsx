@@ -178,7 +178,7 @@ class LogsPage extends Component<Props, State> {
   private loadingNewer: boolean = false
   private currentOlderChunksGenerator: FetchLoop = null
   private currentNewerChunksGenerator: FetchLoop = null
-  private loadingSources: RemoteDataState = RemoteDataState.NotStarted
+  private loadingSourcesStatus: RemoteDataState = RemoteDataState.NotStarted
 
   constructor(props: Props) {
     super(props)
@@ -241,7 +241,7 @@ class LogsPage extends Component<Props, State> {
       tableTime,
     } = this.props
 
-    if (this.isLoadingSources) {
+    if (this.isLoadingSourcesStatus) {
       return <PageSpinner />
     }
 
@@ -960,11 +960,11 @@ class LogsPage extends Component<Props, State> {
 
   private getSources = async (): Promise<void> => {
     try {
-      this.loadingSources = RemoteDataState.Loading
+      this.loadingSourcesStatus = RemoteDataState.Loading
       await this.props.getSources()
-      this.loadingSources = RemoteDataState.Done
+      this.loadingSourcesStatus = RemoteDataState.Done
     } catch (err) {
-      this.loadingSources = RemoteDataState.Error
+      this.loadingSourcesStatus = RemoteDataState.Error
     }
   }
 
@@ -989,8 +989,8 @@ class LogsPage extends Component<Props, State> {
     return this.props.tableTime.relative === 0
   }
 
-  private get isLoadingSources(): boolean {
-    switch (this.loadingSources) {
+  private get isLoadingSourcesStatus(): boolean {
+    switch (this.loadingSourcesStatus) {
       case RemoteDataState.Loading:
       case RemoteDataState.NotStarted:
         return true
@@ -1000,7 +1000,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private get isSourcesEmpty(): boolean {
-    if (this.isLoadingSources) {
+    if (this.isLoadingSourcesStatus) {
       return false
     }
 
