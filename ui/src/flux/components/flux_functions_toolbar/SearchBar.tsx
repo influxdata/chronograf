@@ -1,6 +1,14 @@
+// Libraries
 import React, {PureComponent, ChangeEvent} from 'react'
 import _ from 'lodash'
 
+// Components
+import {Input, IconFont} from 'src/reusable_ui'
+
+// Types
+import {InputType} from 'src/reusable_ui/components/inputs/Input'
+
+// Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
@@ -28,16 +36,13 @@ class SearchBar extends PureComponent<Props, State> {
   public render() {
     return (
       <div className="flux-functions-toolbar--search">
-        <div className="search-widget">
-          <input
-            type="text"
-            className="form-control input-sm"
-            placeholder="Filter Functions..."
-            onChange={this.handleChange}
-            value={this.state.searchTerm}
-          />
-          <span className="icon search" />
-        </div>
+        <Input
+          type={InputType.Text}
+          icon={IconFont.Search}
+          placeholder="Filter Functions..."
+          onChange={this.handleChange}
+          value={this.state.searchTerm}
+        />
       </div>
     )
   }
