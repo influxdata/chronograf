@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {PureComponent, createRef} from 'react'
 import {Subscribe} from 'unstated'
 
 // Component
@@ -32,7 +32,7 @@ interface State {
 
 @ErrorHandling
 class ToolbarFunction extends PureComponent<Props, State> {
-  private functionRef: HTMLElement
+  private functionRef = createRef<HTMLDivElement>()
 
   constructor(props: Props) {
     super(props)
@@ -44,7 +44,7 @@ class ToolbarFunction extends PureComponent<Props, State> {
     return (
       <div
         className="flux-functions-toolbar--function"
-        ref={r => (this.functionRef = r)}
+        ref={this.functionRef}
         onMouseEnter={this.handleHover}
         onMouseLeave={this.handleStopHover}
       >
@@ -77,7 +77,7 @@ class ToolbarFunction extends PureComponent<Props, State> {
   }
 
   private handleHover = () => {
-    const {top, left} = this.functionRef.getBoundingClientRect()
+    const {top, left} = this.functionRef.current.getBoundingClientRect()
     const right = window.innerWidth - left
     this.setState({isActive: true, hoverPosition: {top, right}})
   }
