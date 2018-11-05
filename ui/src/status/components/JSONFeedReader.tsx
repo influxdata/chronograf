@@ -18,7 +18,6 @@ const JSONFeedReader: SFC<Props> = ({data}) =>
               url,
               title,
               author: {name},
-              image,
               content_text: contentText,
             }) => (
               <div key={id} className="newsfeed--post">
@@ -32,7 +31,6 @@ const JSONFeedReader: SFC<Props> = ({data}) =>
                   <span>by {name}</span>
                 </div>
                 <div className="newsfeed--content">
-                  {image ? <img src={image} /> : null}
                   <p>{contentText}</p>
                 </div>
               </div>
