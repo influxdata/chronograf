@@ -159,6 +159,13 @@ export const computeFieldOptions = (
     astNames = [...astNames, field]
   })
 
+  if (
+    dataType === DataType.influxQL &&
+    influxQLQueryType === InfluxQLQueryType.MetaQuery
+  ) {
+    return astNames
+  }
+
   const intersection = existingFieldOptions.filter(f => {
     return astNames.find(a => a.internalName === f.internalName)
   })

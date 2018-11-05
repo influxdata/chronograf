@@ -4,9 +4,11 @@ import {timeSeriesToTableGraphWork as timeSeriesToTableGraph} from 'src/worker/j
 import {
   filterTableColumns,
   transformTableData,
+  computeFieldOptions,
 } from 'src/dashboards/utils/tableGraph'
 
 import {InfluxQLQueryType} from 'src/types/series'
+import {DataType} from 'src/shared/constants'
 
 import {DEFAULT_SORT_DIRECTION} from 'src/shared/constants/tableGraph'
 import {
@@ -388,7 +390,7 @@ it('parses a two-column meta query with same first column values', () => {
   expect(actual).toEqual(expected)
 })
 
-it('parses meta query with multiple columns', () => {
+it('parses meta query with multiple columns with one series', () => {
   const metaQueryResponse = [
     {
       response: {
@@ -425,6 +427,331 @@ it('parses meta query with multiple columns', () => {
       {label: 'shardGroupDuration', responseIndex: 0, seriesIndex: 0},
       {label: 'replicaN', responseIndex: 0, seriesIndex: 0},
       {label: 'default', responseIndex: 0, seriesIndex: 0},
+    ],
+    influxQLQueryType: 'MetaQuery',
+  }
+
+  const actual = timeSeriesToTableGraph(metaQueryResponse)
+
+  expect(actual).toEqual(expected)
+})
+
+it('parses meta query with multiple columns and multiple series', () => {
+  const metaQueryResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'cpu',
+                columns: ['tagKey'],
+                values: [['cpu'], ['host']],
+              },
+              {
+                name: 'disk',
+                columns: ['tagKey'],
+                values: [['device'], ['fstype'], ['host'], ['mode'], ['path']],
+              },
+              {
+                name: 'diskio',
+                columns: ['tagKey'],
+                values: [['host'], ['name']],
+              },
+              {
+                name: 'mem',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+              {
+                name: 'processes',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+              {
+                name: 'swap',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+              {
+                name: 'syslog',
+                columns: ['tagKey'],
+                values: [
+                  ['appname'],
+                  ['facility'],
+                  ['host'],
+                  ['hostname'],
+                  ['severity'],
+                ],
+              },
+              {
+                name: 'system',
+                columns: ['tagKey'],
+                values: [['host']],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ]
+
+  const expected = {
+    data: [
+      ['measurement', 'tagKey'],
+      ['cpu', 'cpu'],
+      ['cpu', 'host'],
+      ['disk', 'device'],
+      ['disk', 'fstype'],
+      ['disk', 'host'],
+      ['disk', 'mode'],
+      ['disk', 'path'],
+      ['diskio', 'host'],
+      ['diskio', 'name'],
+      ['mem', 'host'],
+      ['processes', 'host'],
+      ['swap', 'host'],
+      ['syslog', 'appname'],
+      ['syslog', 'facility'],
+      ['syslog', 'host'],
+      ['syslog', 'hostname'],
+      ['syslog', 'severity'],
+      ['system', 'host'],
+    ],
+    sortedLabels: [
+      {
+        label: 'measurement',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+      {
+        label: 'tagKey',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+    ],
+    influxQLQueryType: 'MetaQuery',
+  }
+
+  const actual = timeSeriesToTableGraph(metaQueryResponse)
+
+  expect(actual).toEqual(expected)
+})
+
+it('parses a meta query with multiple columns and multiple values per column', () => {
+  const metaQueryResponse = [
+    {
+      response: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'cpu',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['usage_guest', 'float'],
+                  ['usage_guest_nice', 'float'],
+                  ['usage_idle', 'float'],
+                  ['usage_iowait', 'float'],
+                  ['usage_irq', 'float'],
+                  ['usage_nice', 'float'],
+                  ['usage_softirq', 'float'],
+                  ['usage_steal', 'float'],
+                  ['usage_system', 'float'],
+                  ['usage_user', 'float'],
+                ],
+              },
+              {
+                name: 'disk',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['free', 'integer'],
+                  ['inodes_free', 'integer'],
+                  ['inodes_total', 'integer'],
+                  ['inodes_used', 'integer'],
+                  ['total', 'integer'],
+                  ['used', 'integer'],
+                  ['used_percent', 'float'],
+                ],
+              },
+              {
+                name: 'diskio',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['io_time', 'integer'],
+                  ['iops_in_progress', 'integer'],
+                  ['read_bytes', 'integer'],
+                  ['read_time', 'integer'],
+                  ['reads', 'integer'],
+                  ['weighted_io_time', 'integer'],
+                  ['write_bytes', 'integer'],
+                  ['write_time', 'integer'],
+                  ['writes', 'integer'],
+                ],
+              },
+              {
+                name: 'mem',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['active', 'integer'],
+                  ['available', 'integer'],
+                  ['available_percent', 'float'],
+                  ['buffered', 'integer'],
+                  ['cached', 'integer'],
+                  ['free', 'integer'],
+                  ['inactive', 'integer'],
+                  ['slab', 'integer'],
+                  ['total', 'integer'],
+                  ['used', 'integer'],
+                  ['used_percent', 'float'],
+                  ['wired', 'integer'],
+                ],
+              },
+              {
+                name: 'processes',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['blocked', 'integer'],
+                  ['idle', 'integer'],
+                  ['running', 'integer'],
+                  ['sleeping', 'integer'],
+                  ['stopped', 'integer'],
+                  ['total', 'integer'],
+                  ['unknown', 'integer'],
+                  ['zombies', 'integer'],
+                ],
+              },
+              {
+                name: 'swap',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['free', 'integer'],
+                  ['in', 'integer'],
+                  ['out', 'integer'],
+                  ['total', 'integer'],
+                  ['used', 'integer'],
+                  ['used_percent', 'float'],
+                ],
+              },
+              {
+                name: 'syslog',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['facility_code', 'integer'],
+                  ['message', 'string'],
+                  ['procid', 'string'],
+                  ['severity_code', 'integer'],
+                  ['timestamp', 'integer'],
+                  ['version', 'integer'],
+                ],
+              },
+              {
+                name: 'system',
+                columns: ['fieldKey', 'fieldType'],
+                values: [
+                  ['load1', 'float'],
+                  ['load15', 'float'],
+                  ['load5', 'float'],
+                  ['n_cpus', 'integer'],
+                  ['n_users', 'integer'],
+                  ['uptime', 'integer'],
+                  ['uptime_format', 'string'],
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ]
+
+  const expected = {
+    data: [
+      ['measurement', 'fieldKey', 'fieldType'],
+      ['cpu', 'usage_guest', 'float'],
+      ['cpu', 'usage_guest_nice', 'float'],
+      ['cpu', 'usage_idle', 'float'],
+      ['cpu', 'usage_iowait', 'float'],
+      ['cpu', 'usage_irq', 'float'],
+      ['cpu', 'usage_nice', 'float'],
+      ['cpu', 'usage_softirq', 'float'],
+      ['cpu', 'usage_steal', 'float'],
+      ['cpu', 'usage_system', 'float'],
+      ['cpu', 'usage_user', 'float'],
+      ['disk', 'free', 'integer'],
+      ['disk', 'inodes_free', 'integer'],
+      ['disk', 'inodes_total', 'integer'],
+      ['disk', 'inodes_used', 'integer'],
+      ['disk', 'total', 'integer'],
+      ['disk', 'used', 'integer'],
+      ['disk', 'used_percent', 'float'],
+      ['diskio', 'io_time', 'integer'],
+      ['diskio', 'iops_in_progress', 'integer'],
+      ['diskio', 'read_bytes', 'integer'],
+      ['diskio', 'read_time', 'integer'],
+      ['diskio', 'reads', 'integer'],
+      ['diskio', 'weighted_io_time', 'integer'],
+      ['diskio', 'write_bytes', 'integer'],
+      ['diskio', 'write_time', 'integer'],
+      ['diskio', 'writes', 'integer'],
+      ['mem', 'active', 'integer'],
+      ['mem', 'available', 'integer'],
+      ['mem', 'available_percent', 'float'],
+      ['mem', 'buffered', 'integer'],
+      ['mem', 'cached', 'integer'],
+      ['mem', 'free', 'integer'],
+      ['mem', 'inactive', 'integer'],
+      ['mem', 'slab', 'integer'],
+      ['mem', 'total', 'integer'],
+      ['mem', 'used', 'integer'],
+      ['mem', 'used_percent', 'float'],
+      ['mem', 'wired', 'integer'],
+      ['processes', 'blocked', 'integer'],
+      ['processes', 'idle', 'integer'],
+      ['processes', 'running', 'integer'],
+      ['processes', 'sleeping', 'integer'],
+      ['processes', 'stopped', 'integer'],
+      ['processes', 'total', 'integer'],
+      ['processes', 'unknown', 'integer'],
+      ['processes', 'zombies', 'integer'],
+      ['swap', 'free', 'integer'],
+      ['swap', 'in', 'integer'],
+      ['swap', 'out', 'integer'],
+      ['swap', 'total', 'integer'],
+      ['swap', 'used', 'integer'],
+      ['swap', 'used_percent', 'float'],
+      ['syslog', 'facility_code', 'integer'],
+      ['syslog', 'message', 'string'],
+      ['syslog', 'procid', 'string'],
+      ['syslog', 'severity_code', 'integer'],
+      ['syslog', 'timestamp', 'integer'],
+      ['syslog', 'version', 'integer'],
+      ['system', 'load1', 'float'],
+      ['system', 'load15', 'float'],
+      ['system', 'load5', 'float'],
+      ['system', 'n_cpus', 'integer'],
+      ['system', 'n_users', 'integer'],
+      ['system', 'uptime', 'integer'],
+      ['system', 'uptime_format', 'string'],
+    ],
+    sortedLabels: [
+      {
+        label: 'measurement',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+      {
+        label: 'fieldKey',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+      {
+        label: 'fieldType',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
     ],
     influxQLQueryType: 'MetaQuery',
   }
@@ -879,5 +1206,55 @@ describe('if verticalTimeAxis is false', () => {
     const expected = [['time', 2000, 3000, 1000], ['f2', 3000, 1000, 2000]]
 
     expect(actual.transformedData).toEqual(expected)
+  })
+})
+
+describe('computeFieldOptions', () => {
+  it('orders field options correctly for metaqueries', () => {
+    const existingFieldOptions = [
+      {
+        internalName: 'count',
+        displayName: '',
+        visible: true,
+      },
+    ]
+
+    const sortedLabels = [
+      {
+        label: 'measurement',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+      {
+        label: 'count',
+        responseIndex: 0,
+        seriesIndex: 7,
+      },
+    ]
+
+    const dataType = DataType.influxQL
+    const influxQLQueryType = InfluxQLQueryType.MetaQuery
+
+    const actual = computeFieldOptions(
+      existingFieldOptions,
+      sortedLabels,
+      dataType,
+      influxQLQueryType
+    )
+
+    const expected = [
+      {
+        internalName: 'measurement',
+        displayName: '',
+        visible: true,
+      },
+      {
+        internalName: 'count',
+        displayName: '',
+        visible: true,
+      },
+    ]
+
+    expect(actual).toEqual(expected)
   })
 })
