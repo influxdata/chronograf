@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent, MouseEvent, CSSProperties} from 'react'
+import React, {PureComponent, MouseEvent, CSSProperties, createRef} from 'react'
 
 // Components
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -28,7 +28,7 @@ const MAX_HEIGHT = 400
 
 @ErrorHandling
 class FunctionTooltip extends PureComponent<Props, State> {
-  private tooltipRef: HTMLElement
+  private tooltipRef = createRef<HTMLDivElement>()
 
   public constructor(props: Props) {
     super(props)
@@ -36,7 +36,7 @@ class FunctionTooltip extends PureComponent<Props, State> {
   }
 
   public componentDidMount() {
-    const {bottom, height} = this.tooltipRef.getBoundingClientRect()
+    const {bottom, height} = this.tooltipRef.current.getBoundingClientRect()
 
     if (bottom > window.innerHeight) {
       this.setState({bottomPosition: height / 2})
@@ -53,7 +53,7 @@ class FunctionTooltip extends PureComponent<Props, State> {
         <div
           style={this.stylePosition}
           className="flux-functions-toolbar--tooltip"
-          ref={r => (this.tooltipRef = r)}
+          ref={this.tooltipRef}
         >
           <button
             className="flux-functions-toolbar--tooltip-dismiss"
