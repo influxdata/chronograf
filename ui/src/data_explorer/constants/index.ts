@@ -56,9 +56,13 @@ const knownMetaQueries = {
   dropUser: 'DROP USER "username"',
   showStats: 'SHOW STATS',
   showDiagnostics: 'SHOW DIAGNOSTICS',
+  showFieldKeyCard: 'SHOW FIELD KEY CARDINALITY ON "db_name"',
+  showMeasurementCard: 'SHOW MEASUREMENT CARDINALITY ON "db_name"',
+  showSeriesCard: 'SHOW SERIES CARDINALITY ON "db_name"',
+  showTagKeyCard: 'SHOW TAG KEY CARDINALITY ON "db_name"',
+  showTagValuesCard:
+    'SHOW TAG VALUES CARDINALITY ON "db_name" WITH KEY = "tag_key"',
 }
-
-export const knownMetaQueriesAsArray = Object.values(knownMetaQueries)
 
 export interface MetaQueryTemplateOption {
   id: string
@@ -125,6 +129,40 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Field Key Cardinality',
+    text: 'Show Field Key Cardinality',
+    query: knownMetaQueries.showFieldKeyCard,
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Measurement Cardinality',
+    text: 'Show Measurement Cardinality',
+    query: knownMetaQueries.showMeasurementCard,
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Series Cardinality',
+    text: 'Show Series Cardinality',
+    query: knownMetaQueries.showSeriesCard,
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Tag Key Cardinality',
+    text: 'Show Tag Key Cardinality',
+    query: knownMetaQueries.showTagKeyCard,
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Tag Values Cardinality',
+    text: 'Show Tag Values Cardinality',
+    query: knownMetaQueries.showTagValuesCard,
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: `mqtd-divider-3`,
+    type: DropdownChildTypes.Divider,
+  },
+  {
     id: 'Show Retention Policies',
     text: 'Show Retention Policies',
     query: knownMetaQueries.showRetentionPolicies,
@@ -143,7 +181,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `mqtd-divider-3`,
+    id: `mqtd-divider-4`,
     type: DropdownChildTypes.Divider,
   },
   {
@@ -165,7 +203,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `mqtd-divider-4`,
+    id: `mqtd-divider-5`,
     type: DropdownChildTypes.Divider,
   },
   {
@@ -193,7 +231,7 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
-    id: `mqtd-divider-5`,
+    id: `mqtd-divider-6`,
     type: DropdownChildTypes.Divider,
   },
   {
