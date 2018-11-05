@@ -11,7 +11,6 @@ import {notifyCSVDownloadFailed} from 'src/shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {dataToCSV} from 'src/shared/parsing/dataToCSV'
 import {timeSeriesToTableGraph} from 'src/utils/timeSeriesTransformers'
-import {PREDEFINED_TEMP_VARS} from 'src/shared/constants'
 import {
   DEFAULT_CELL_BG_COLOR,
   DEFAULT_CELL_TEXT_COLOR,
@@ -19,6 +18,7 @@ import {
 
 // Utils
 import {downloadCSV} from 'src/shared/utils/downloadTimeseriesCSV'
+import templateReplace from 'src/tempVars/utils/replace'
 
 // Types
 import {Cell, CellQuery, Template} from 'src/types/'
@@ -113,41 +113,13 @@ export default class LayoutCell extends Component<Props> {
 
   private get cellName(): string {
     const {
+      templates,
       cell: {name},
     } = this.props
-    return this.replaceTemplateVariables(name)
-  }
 
-  private get userDefinedTemplateVariables(): Template[] {
-    const {templates} = this.props
-    return templates.filter(temp => {
-      const isPredefinedTempVar: boolean = !!PREDEFINED_TEMP_VARS.find(
-        t => t === temp.tempVar
-      )
-      return !isPredefinedTempVar
-    })
-  }
+    const renderedCellName = templateReplace(name, templates)
 
-  private replaceTemplateVariables = (str: string): string => {
-    const isTemplated: boolean = _.get(str.match(/:/g), 'length', 0) >= 2 // tempVars are wrapped in :
-
-    if (isTemplated) {
-      const renderedString = _.reduce<Template, string>(
-        this.userDefinedTemplateVariables,
-        (acc, template) => {
-          const {tempVar} = template
-          const templateValue = template.values.find(v => v.localSelected)
-          const value = _.get(templateValue, 'value', tempVar)
-          const regex = new RegExp(tempVar, 'g')
-          return acc.replace(regex, value)
-        },
-        str
-      )
-
-      return renderedString
-    }
-
-    return str
+    return renderedCellName
   }
 
   private get queries(): CellQuery[] {
