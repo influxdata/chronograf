@@ -1,7 +1,14 @@
 import React, {PureComponent} from 'react'
 
+import {Button} from 'src/reusable_ui'
+
+import {CellType} from 'src/types'
+import {ComponentColor, ComponentSize} from 'src/reusable_ui/types'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+
 interface Props {
   message?: string
+  onUpdateVisType?: TimeMachineContainer['handleUpdateType']
 }
 
 class InvalidData extends PureComponent<Props> {
@@ -17,9 +24,24 @@ class InvalidData extends PureComponent<Props> {
     return (
       <p>
         The data returned from the query can't be visualized with this graph
-        type.<br />Try updating the query or selecting a different graph type.
+        type.<br />
+        {this.props.onUpdateVisType && (
+          <>
+            <br />
+            <Button
+              text={'Switch to Table Graph'}
+              onClick={this.handleSwitchToTableGraph}
+              color={ComponentColor.Primary}
+              size={ComponentSize.Small}
+            />
+          </>
+        )}
       </p>
     )
+  }
+
+  private handleSwitchToTableGraph = () => {
+    this.props.onUpdateVisType(CellType.Table)
   }
 }
 

@@ -31,6 +31,7 @@ interface ConnectedProps {
   timeRange: TimeRange
   queryType: QueryType
   onUpdateFieldOptions: TimeMachineContainer['handleUpdateFieldOptions']
+  onUpdateVisType: TimeMachineContainer['handleUpdateType']
   type: CellType
   axes: Axes | null
   tableOptions: TableOptions
@@ -95,6 +96,7 @@ const TimeMachineVisualization: SFC<Props> = props => {
             cellNote={props.note}
             cellNoteVisibility={props.noteVisibility}
             onUpdateFieldOptions={props.onUpdateFieldOptions}
+            onUpdateVisType={props.onUpdateVisType}
           />
         </div>
       </div>
@@ -125,6 +127,7 @@ const ConnectedTimeMachineVisualization = (props: PassedProps) => (
           note={state.note}
           noteVisibility={state.noteVisibility}
           onUpdateFieldOptions={container.handleUpdateFieldOptions}
+          onUpdateVisType={container.handleUpdateType}
         />
       )
     }}

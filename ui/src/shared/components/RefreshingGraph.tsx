@@ -56,6 +56,7 @@ import {
 } from 'src/types/dashboards'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
 import {TimeSeriesServerResponse} from 'src/types/series'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 interface TypeAndData {
   dataType: DataType
@@ -96,6 +97,7 @@ interface Props {
   editorLocation?: QueryUpdateState
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
   onUpdateFieldOptions?: (fieldOptions: FieldOption[]) => void
+  onUpdateVisType?: TimeMachineContainer['handleUpdateType']
 }
 
 class RefreshingGraph extends Component<Props> {
@@ -467,6 +469,7 @@ class RefreshingGraph extends Component<Props> {
       decimalPlaces,
       staticLegend,
       manualRefresh,
+      onUpdateVisType,
       handleSetHoverTime,
     } = this.props
 
@@ -488,6 +491,7 @@ class RefreshingGraph extends Component<Props> {
         cellHeight={cellHeight}
         staticLegend={staticLegend}
         decimalPlaces={decimalPlaces}
+        onUpdateVisType={onUpdateVisType}
         handleSetHoverTime={handleSetHoverTime}
       />
     )
