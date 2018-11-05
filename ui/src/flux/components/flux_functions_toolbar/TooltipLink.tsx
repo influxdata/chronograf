@@ -15,10 +15,11 @@ class TooltipLink extends PureComponent<Props> {
 
     return (
       <p>
-        Have questions? Read the{' '}
+        Still have questions? Check out the{' '}
         <a target="_blank" href={link}>
-          InfluxDB 2.0 Docs
+          Flux Docs
         </a>
+        .
       </p>
     )
   }
