@@ -1,6 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import {flatten} from 'lodash'
+import {flatten, isEmpty} from 'lodash'
 
 // Components
 import {
@@ -133,6 +133,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
                   status={this.measurementDropdownStatus}
                   selectedID={selectedMeasurement}
                   maxMenuHeight={DROPDOWN_MENU_HEIGHT}
+                  titleText="No Measurements Found"
                   onChange={this.handleSelectMeasurement}
                 >
                   {measurements.map(measurement => (
@@ -150,7 +151,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
                 <MultiSelectDropdown
                   status={this.fieldsDropdownStatus}
                   selectedIDs={selectedFields}
-                  emptyText={'All Fields'}
+                  emptyText={this.fieldsEmptyText}
                   maxMenuHeight={DROPDOWN_MENU_HEIGHT}
                   onChange={this.handleSelectFields}
                 >
@@ -217,37 +218,48 @@ class FluxScriptWizard extends PureComponent<Props, State> {
   }
 
   private get bucketDropdownStatus(): ComponentStatus {
-    const {dbsToRPsStatus} = this.state
-    const bucketDropdownStatus = toComponentStatus(dbsToRPsStatus)
+    const {dbsToRPs, dbsToRPsStatus} = this.state
+    const bucketDropdownStatus = toComponentStatus(dbsToRPs, dbsToRPsStatus)
 
     return bucketDropdownStatus
   }
 
   private get measurementDropdownStatus(): ComponentStatus {
-    const {measurementsStatus} = this.state
-    const measurementDropdownStatus = toComponentStatus(measurementsStatus)
+    const {measurements, measurementsStatus} = this.state
+    const measurementDropdownStatus = toComponentStatus(
+      measurements,
+      measurementsStatus
+    )
 
     return measurementDropdownStatus
   }
 
   private get fieldsDropdownStatus(): ComponentStatus {
-    const {fieldsStatus} = this.state
-    const fieldsDropdownStatus = toComponentStatus(fieldsStatus)
+    const {fields, fieldsStatus} = this.state
+    const fieldsDropdownStatus = toComponentStatus(fields, fieldsStatus)
 
     return fieldsDropdownStatus
   }
 
+  private get fieldsEmptyText(): string {
+    const {fields} = this.state
+    const fieldsEmptyText = isEmpty(fields) ? 'No Fields Found' : 'All Fields'
+
+    return fieldsEmptyText
+  }
+
   private get buttonStatus(): ComponentStatus {
-    const {dbsToRPsStatus, measurementsStatus, fieldsStatus} = this.state
-    const allDone = [dbsToRPsStatus, measurementsStatus, fieldsStatus].every(
-      s => s === RemoteDataState.Done
+    const {selectedDB, selectedRP, selectedMeasurement} = this.state
+
+    const needsSelection = [selectedDB, selectedRP, selectedMeasurement].some(
+      isEmpty
     )
 
-    if (allDone) {
-      return ComponentStatus.Default
-    }
+    const buttonStatus = needsSelection
+      ? ComponentStatus.Disabled
+      : ComponentStatus.Default
 
-    return ComponentStatus.Disabled
+    return buttonStatus
   }
 
   private handleClose = () => {

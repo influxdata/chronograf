@@ -1,3 +1,5 @@
+import {isEmpty} from 'lodash'
+
 import {DASHBOARD_TIME, INTERVAL} from 'src/flux/helpers/templates'
 
 import {proxy} from 'src/utils/queryUrlGenerator'
@@ -63,7 +65,14 @@ export function formatDBwithRP(db: string, rp: string): string {
   return `${db}/${rp}`
 }
 
-export function toComponentStatus(state: RemoteDataState): ComponentStatus {
+export function toComponentStatus(
+  data: any,
+  state: RemoteDataState
+): ComponentStatus {
+  if (isEmpty(data) && state === RemoteDataState.Done) {
+    return ComponentStatus.Disabled
+  }
+
   switch (state) {
     case RemoteDataState.NotStarted:
       return ComponentStatus.Disabled
