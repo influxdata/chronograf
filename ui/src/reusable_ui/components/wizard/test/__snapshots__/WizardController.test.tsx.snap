@@ -44,7 +44,7 @@ exports[`WizardController with multiple children matches snapshot with two child
     className="btn btn-xs btn-primary btn-link wizard-skip-link"
     onClick={[Function]}
   >
-    skip
+    Skip
   </button>
 </div>
 `;
@@ -92,7 +92,7 @@ exports[`WizardController with multiple children with first step complete matche
     className="btn btn-xs btn-primary btn-link wizard-skip-link"
     onClick={[Function]}
   >
-    skip
+    Skip
   </button>
 </div>
 `;
@@ -136,7 +136,7 @@ exports[`WizardController with one child matches snapshot with one child 1`] = `
     className="btn btn-xs btn-primary btn-link wizard-skip-link"
     onClick={[Function]}
   >
-    skip
+    Skip
   </button>
 </div>
 `;

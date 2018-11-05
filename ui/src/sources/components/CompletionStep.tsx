@@ -13,7 +13,7 @@ interface Props {
 }
 
 @ErrorHandling
-class SourceStep extends PureComponent<Props> {
+class CompletionStep extends PureComponent<Props> {
   constructor(props: Props) {
     super(props)
   }
@@ -26,7 +26,8 @@ class SourceStep extends PureComponent<Props> {
     return (
       <div className="wizard-step--bookend">
         <div className="auth-logo" />
-        <p>Continue to view your existing connections.</p>
+        <p>You have successfully configured your connection</p>
+        <p>Continue to view your connections</p>
       </div>
     )
   }
@@ -36,4 +37,4 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(null, mdtp, null, {withRef: true})(SourceStep)
+export default connect(null, mdtp, null, {withRef: true})(CompletionStep)
