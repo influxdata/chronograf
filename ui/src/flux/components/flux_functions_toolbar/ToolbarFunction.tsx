@@ -1,12 +1,8 @@
 // Libraries
-import React, {PureComponent} from 'react'
-import {Subscribe} from 'unstated'
+import React, {PureComponent, createRef} from 'react'
 
 // Component
 import FunctionTooltip from 'src/flux/components/flux_functions_toolbar/FunctionTooltip'
-
-// Utils
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Types
 import {FluxToolbarFunction} from 'src/types/flux'
@@ -14,16 +10,10 @@ import {FluxToolbarFunction} from 'src/types/flux'
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface PassedProps {
+interface Props {
   func: FluxToolbarFunction
+  onClickFunction: (s: string) => void
 }
-
-interface ConnectedProps {
-  script: string
-  onUpdateScript: (script: string) => void
-}
-
-type Props = PassedProps & ConnectedProps
 
 interface State {
   isActive: boolean
@@ -32,7 +22,7 @@ interface State {
 
 @ErrorHandling
 class ToolbarFunction extends PureComponent<Props, State> {
-  private functionRef: HTMLElement
+  private functionRef = createRef<HTMLDivElement>()
 
   constructor(props: Props) {
     super(props)
@@ -44,7 +34,7 @@ class ToolbarFunction extends PureComponent<Props, State> {
     return (
       <div
         className="flux-functions-toolbar--function"
-        ref={r => (this.functionRef = r)}
+        ref={this.functionRef}
         onMouseEnter={this.handleHover}
         onMouseLeave={this.handleStopHover}
       >
@@ -77,7 +67,7 @@ class ToolbarFunction extends PureComponent<Props, State> {
   }
 
   private handleHover = () => {
-    const {top, left} = this.functionRef.getBoundingClientRect()
+    const {top, left} = this.functionRef.current.getBoundingClientRect()
     const right = window.innerWidth - left
     this.setState({isActive: true, hoverPosition: {top, right}})
   }
@@ -87,23 +77,10 @@ class ToolbarFunction extends PureComponent<Props, State> {
   }
 
   private handleClickFunction = () => {
-    const {script, onUpdateScript, func} = this.props
+    const {func, onClickFunction} = this.props
 
-    const updatedScript = `${script}\n  |> ${func.example}`
-    onUpdateScript(updatedScript)
+    onClickFunction(func.example)
   }
 }
 
-const ConnectedFunctionsToolbarFunction = (props: PassedProps) => (
-  <Subscribe to={[TimeMachineContainer]}>
-    {(container: TimeMachineContainer) => (
-      <ToolbarFunction
-        {...props}
-        script={container.state.draftScript}
-        onUpdateScript={container.handleUpdateDraftScript}
-      />
-    )}
-  </Subscribe>
-)
-
-export default ConnectedFunctionsToolbarFunction
+export default ToolbarFunction
