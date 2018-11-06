@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-	"strings"
 	"crypto/tls"
 
 	"github.com/influxdata/chronograf/enterprise"
+	"github.com/influxdata/chronograf/flux"
 	"github.com/influxdata/chronograf/organizations"
 
 	"github.com/bouk/httprouter"
@@ -80,38 +80,18 @@ var (
 	}
 )
 
-func hasSourceFluxLink(ctx context.Context, src chronograf.Source) (bool, error) {
-	r := strings.NewReader(`from(bucket: "test/test") |> range(start:-1ns) |> limit(n:1)`)
-	req, err := http.NewRequest("POST",fmt.Sprintf("%s/api/v2/query?organization=defaultorgname",src.URL),r)
-	if err != nil {
-		return false,err
-	}
-
-	authorizer := influx.DefaultAuthorization(&src)
-	authorizer.Set(req)
-
-	hc := &http.Client{
-		Timeout: 500 * time.Millisecond,
-	}
-
-	if src.InsecureSkipVerify {
-		hc.Transport = skipVerifyTransport
-	} else {
-		hc.Transport = defaultTransport
-	}
-
-	resp, err := hc.Do(req)
+func hasFlux(ctx context.Context, src chronograf.Source) (bool, error) {
+	url, err := url.ParseRequestURI(src.URL)
 	if err != nil {
 		return false, err
 	}
 
-	defer resp.Body.Close()
-
-	if resp.StatusCode/100 != 2 {
-		return true, nil
+	cli := &flux.Client{
+		URL: url,
+		Timeout: 500 *time.Millisecond,
 	}
 
-	return false, nil
+	return cli.FluxEnabled()
 }
 
 func newSourceResponse(ctx context.Context, src chronograf.Source) sourceResponse {
@@ -145,8 +125,12 @@ func newSourceResponse(ctx context.Context, src chronograf.Source) sourceRespons
 		},
 	}
 
-	if isFluxEnabled, _ := hasSourceFluxLink(ctx, src);isFluxEnabled {
-		res.Links.Flux = res.Links.Proxy
+	// we are ignoring the error because the error state means that we'll
+	// turn off the flux querying in the frontend anyway.  Is this English?
+	// good 'nuf
+	isFluxEnabled, _ := hasFlux(ctx, src)
+	if isFluxEnabled {
+		res.Links.Flux = fmt.Sprintf("%s/%d/proxy/flux", httpAPISrcs, src.ID)
 	}
 
 	// MetaURL is currently a string, but eventually, we'd like to change it
