@@ -219,11 +219,13 @@ class Dygraph extends Component<Props, State> {
             staticLegendHeight,
           })}
         <div
+          id={`graph-ref-${cellID}`}
           className="dygraph-child-container"
           ref={this.graphRef}
           style={this.dygraphStyle}
         >
           <ReactResizeDetector
+            resizableElementId={`graph-ref-${cellID}`}
             handleWidth={true}
             handleHeight={true}
             onResize={this.resize}
