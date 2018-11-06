@@ -50,6 +50,7 @@
 1.  [#4436](https://github.com/influxdata/chronograf/pull/4436): Automatically scroll to the current measurement in the explorer
 1.  [#4659](https://github.com/influxdata/chronograf/pull/4659): Simplify Flux explorer tree and improve searching
 1.  [#4744](https://github.com/influxdata/chronograf/pull/4744): Update logs page to show missing syslog message.
+1.  [#4745](https://github.com/influxdata/chronograf/pull/4745): Fix dashboard link text casing changing quick select sort order
 
 ### Bug Fixes
 1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
