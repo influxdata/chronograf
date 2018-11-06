@@ -67,20 +67,22 @@ class DashboardSwitcher extends PureComponent<Props, State> {
   private get links(): JSX.Element[] {
     const {links, active} = this.props.dashboardLinks
 
-    return _.sortBy(links, ['text', 'key']).map(link => {
-      return (
-        <li
-          key={link.key}
-          className={classnames('dropdown-item', {
-            active: link === active,
-          })}
-        >
-          <Link to={link.to} onClick={this.handleCloseMenu}>
-            {link.text}
-          </Link>
-        </li>
-      )
-    })
+    return _.sortBy(links, ({text, key}) => [text.toLowerCase(), key]).map(
+      link => {
+        return (
+          <li
+            key={link.key}
+            className={classnames('dropdown-item', {
+              active: link === active,
+            })}
+          >
+            <Link to={link.to} onClick={this.handleCloseMenu}>
+              {link.text}
+            </Link>
+          </li>
+        )
+      }
+    )
   }
 }
 
