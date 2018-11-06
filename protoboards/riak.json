@@ -1,1 +1,300 @@
-{"id":"fe705d1d-2c53-4ba2-b107-2ef471cf8c3d","meta":{"name":"riak","measurements":["riak"],"version":"1.0","dashboardVersion":"1.x","description":"Dashboard for the telegraf input plug-in: Riak","author":"influxdata","license":"MIT","icon":"","url":"https://github.com/influxdata/telegraf/tree/master/plugins/inputs/riak"},"data":{"cells":[{"w":4,"h":4,"name":"Riak – Total Memory Bytes","queries":[{"query":"SELECT max(\"memory_total\") as memory_total_bytes FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"","groupbys":["\"nodename\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Riak – Object Byte Size","queries":[{"query":"SELECT max(\"node_get_fsm_objsize_median\") AS \"median\", max(\"node_get_fsm_objsize_100\") AS \"100th-percentile\", max(\"node_get_fsm_objsize_99\") AS \"99th-percentile\", max(\"node_get_fsm_objsize_mean\") AS \"mean\", max(\"node_get_fsm_objsize_95\") AS \"95th-percentile\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"","groupbys":["\"nodename\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Riak – Number of Siblings/Minute","queries":[{"query":"SELECT max(\"node_get_fsm_siblings_median\") AS \"median\", max(\"node_get_fsm_siblings_mean\") AS \"mean\", max(\"node_get_fsm_siblings_99\") AS \"99th-percentile\", max(\"node_get_fsm_siblings_95\") AS \"95h-percentile\", max(\"node_get_fsm_siblings_100\") AS \"100th-percentile\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"","groupbys":["\"nodename\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Riak – Latency (ms)","queries":[{"query":"SELECT max(\"node_put_fsm_time_median\") / 1000 AS \"median_put_milliseconds\", max(\"node_get_fsm_time_median\") / 1000 AS \"median_get_milliseconds\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"","groupbys":["\"nodename\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Riak – Reads and Writes/Minute","queries":[{"query":"SELECT max(\"node_puts\") AS \"puts_per_minute\", max(\"node_gets\") AS \"gets_per_minute\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"","groupbys":["\"nodename\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Riak – Active Connections","queries":[{"query":"SELECT max(\"pbc_active\") AS \"active_protobuf_connections\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"","groupbys":["\"nodename\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Riak – Read Repairs/Minute","queries":[{"query":"SELECT max(\"read_repairs\") AS \"read_repairs_per_minute\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"","groupbys":["\"nodename\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}}]}}
+{
+  "id": "fe705d1d-2c53-4ba2-b107-2ef471cf8c3d",
+  "meta": {
+    "name": "Riak",
+    "measurements": ["riak"],
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "description": "Dashboard for the telegraf input plug-in: Riak",
+    "author": "influxdata",
+    "license": "MIT",
+    "icon": "",
+    "url": "https://github.com/influxdata/telegraf/tree/master/plugins/inputs/riak"
+  },
+  "data": {
+    "cells": [
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Riak – Total Memory Bytes",
+        "queries": [
+          {
+            "query": "SELECT max(\"memory_total\") as memory_total_bytes FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"",
+            "groupbys": ["\"nodename\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Riak – Object Byte Size",
+        "queries": [
+          {
+            "query": "SELECT max(\"node_get_fsm_objsize_median\") AS \"median\", max(\"node_get_fsm_objsize_100\") AS \"100th-percentile\", max(\"node_get_fsm_objsize_99\") AS \"99th-percentile\", max(\"node_get_fsm_objsize_mean\") AS \"mean\", max(\"node_get_fsm_objsize_95\") AS \"95th-percentile\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"",
+            "groupbys": ["\"nodename\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Riak – Number of Siblings/Minute",
+        "queries": [
+          {
+            "query": "SELECT max(\"node_get_fsm_siblings_median\") AS \"median\", max(\"node_get_fsm_siblings_mean\") AS \"mean\", max(\"node_get_fsm_siblings_99\") AS \"99th-percentile\", max(\"node_get_fsm_siblings_95\") AS \"95h-percentile\", max(\"node_get_fsm_siblings_100\") AS \"100th-percentile\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"",
+            "groupbys": ["\"nodename\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Riak – Latency (ms)",
+        "queries": [
+          {
+            "query": "SELECT max(\"node_put_fsm_time_median\") / 1000 AS \"median_put_milliseconds\", max(\"node_get_fsm_time_median\") / 1000 AS \"median_get_milliseconds\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"",
+            "groupbys": ["\"nodename\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Riak – Reads and Writes/Minute",
+        "queries": [
+          {
+            "query": "SELECT max(\"node_puts\") AS \"puts_per_minute\", max(\"node_gets\") AS \"gets_per_minute\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"",
+            "groupbys": ["\"nodename\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Riak – Active Connections",
+        "queries": [
+          {
+            "query": "SELECT max(\"pbc_active\") AS \"active_protobuf_connections\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"",
+            "groupbys": ["\"nodename\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Riak – Read Repairs/Minute",
+        "queries": [
+          {
+            "query": "SELECT max(\"read_repairs\") AS \"read_repairs_per_minute\" FROM \":db:\".\":rp:\".\"riak\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"nodename\"",
+            "groupbys": ["\"nodename\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      }
+    ],
+    "templates": [
+      {
+        "tempVar": ":host:",
+        "id": "",
+        "type": "tagValues",
+        "label": "",
+        "values": [],
+        "query": {
+          "influxql": "SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:",
+          "db": "telegraf",
+          "measurement": "riak",
+          "tagKey": "host",
+          "fieldKey": ""
+        }
+      }
+    ]
+  }
+}

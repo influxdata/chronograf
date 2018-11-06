@@ -1,1 +1,186 @@
-{"id":"c09c292b-2b23-4b81-9238-b2998a03f89d","meta":{"name":"nginx","measurements":["nginx"],"version":"1.0","dashboardVersion":"1.x","description":"Dashboard for the telegraf input plug-in: NGINX","author":"influxdata","license":"MIT","icon":"","url":"https://github.com/influxdata/telegraf/tree/master/plugins/inputs/nginx"},"data":{"cells":[{"w":4,"h":4,"name":"NGINX – Client Connections","queries":[{"query":"SELECT non_negative_derivative(max(\"accepts\"), 1s) AS \"accepts\", non_negative_derivative(max(\"handled\"), 1s) AS \"handled\", non_negative_derivative(max(\"active\"), 1s) AS \"active\" FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"","groupbys":["\"server\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"NGINX – Client Errors","queries":[{"query":"SELECT non_negative_derivative(max(\"accepts\")) - non_negative_derivative(max(\"handled\")) FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"","groupbys":["\"server\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"NGINX – Client Requests","queries":[{"query":"SELECT non_negative_derivative(max(\"requests\"), 1s) AS \"requests\" FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"","groupbys":["\"server\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"NGINX – Active Client State","queries":[{"query":"SELECT non_negative_derivative(max(\"waiting\"), 1s) AS \"waiting\", non_negative_derivative(max(\"reading\"), 1s) AS \"reading\", non_negative_derivative(max(\"writing\"), 1s) AS \"writing\" FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"","groupbys":["\"server\""]}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}}]}}
+{
+  "id": "c09c292b-2b23-4b81-9238-b2998a03f89d",
+  "meta": {
+    "name": "NGINX",
+    "measurements": ["nginx"],
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "description": "Dashboard for the telegraf input plug-in: NGINX",
+    "author": "influxdata",
+    "license": "MIT",
+    "icon": "",
+    "url": "https://github.com/influxdata/telegraf/tree/master/plugins/inputs/nginx"
+  },
+  "data": {
+    "cells": [
+      {
+        "w": 4,
+        "h": 4,
+        "name": "NGINX – Client Connections",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"accepts\"), 1s) AS \"accepts\", non_negative_derivative(max(\"handled\"), 1s) AS \"handled\", non_negative_derivative(max(\"active\"), 1s) AS \"active\" FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"",
+            "groupbys": ["\"server\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "NGINX – Client Errors",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"accepts\")) - non_negative_derivative(max(\"handled\")) FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"",
+            "groupbys": ["\"server\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "NGINX – Client Requests",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"requests\"), 1s) AS \"requests\" FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"",
+            "groupbys": ["\"server\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "NGINX – Active Client State",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"waiting\"), 1s) AS \"waiting\", non_negative_derivative(max(\"reading\"), 1s) AS \"reading\", non_negative_derivative(max(\"writing\"), 1s) AS \"writing\" FROM \":db:\".\":rp:\".\"nginx\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"server\"",
+            "groupbys": ["\"server\""]
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      }
+    ],
+    "templates": [
+      {
+        "tempVar": ":host:",
+        "id": "",
+        "type": "tagValues",
+        "label": "",
+        "values": [],
+        "query": {
+          "influxql": "SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:",
+          "db": "telegraf",
+          "measurement": "nginx",
+          "tagKey": "host",
+          "fieldKey": ""
+        }
+      }
+    ]
+  }
+}

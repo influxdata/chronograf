@@ -1,1 +1,340 @@
-{"id":"4400e5a0-0504-4f1f-be4d-773ad6d3a344","meta":{"name":"consul_telemetry","measurements":["consul_consul_fsm_register","consul_memberlist_msg_alive","consul_raft_state_candidate","consul_consul_http_GET_v1_health_state__","consul_raft_state_leader","consul_serf_events"],"version":"1.0","dashboardVersion":"1.x","author":"influxdata","license":"MIT","icon":""},"data":{"cells":[{"w":4,"h":4,"name":"Consul Agent – Number of Go Routines","queries":[{"query":"SELECT max(\"value\") AS \"Go Routines\" FROM \":db:\".\":rp:\".\"consul_ip-172-31-6-247_runtime_num_goroutines\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Consul Agent – Runtime Alloc Bytes","queries":[{"query":"SELECT max(\"value\") AS \"Runtime Alloc Bytes\" FROM \":db:\".\":rp:\".\"consul_ip-172-31-6-247_runtime_alloc_bytes\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Consul Agent – Heap Objects","queries":[{"query":"SELECT max(\"value\") AS \"Heap Objects\" FROM \":db:\".\":rp:\".\"consul_ip-172-31-6-247_runtime_heap_objects\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Consul – Number of Agents","queries":[{"query":"SELECT min(\"value\") AS \"num_agents\" FROM \":db:\".\":rp:\".\"consul_memberlist_msg_alive\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)","label":"count"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"count","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Consul – Leadership Election","queries":[{"query":"SELECT max(\"value\") AS \"max_value\" FROM \":db:\".\":rp:\".\"consul_raft_state_candidate\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)","label":"count"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"count","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Consul – HTTP Request Time (ms)","queries":[{"query":"SELECT max(\"upper\") AS \"GET_health_state\" FROM \":db:\".\":rp:\".\"consul_consul_http_GET_v1_health_state__\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)","label":"ms"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"ms","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Consul – Leadership Change","queries":[{"query":"SELECT max(\"value\") as \"change\" FROM \":db:\".\":rp:\".\"consul_raft_state_leader\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)","label":"count"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"count","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"Consul – Number of serf events","queries":[{"query":"SELECT max(\"value\") AS \"serf_events\" FROM \":db:\".\":rp:\".\"consul_serf_events\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)","label":"count"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"count","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}}]}}
+{
+  "id": "4400e5a0-0504-4f1f-be4d-773ad6d3a344",
+  "meta": {
+    "name": "Consul Telemetry",
+    "measurements": [
+      "consul_consul_fsm_register",
+      "consul_memberlist_msg_alive",
+      "consul_raft_state_candidate",
+      "consul_consul_http_GET_v1_health_state__",
+      "consul_raft_state_leader",
+      "consul_serf_events"
+    ],
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "author": "influxdata",
+    "license": "MIT",
+    "icon": ""
+  },
+  "data": {
+    "cells": [
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul Agent – Number of Go Routines",
+        "queries": [
+          {
+            "query": "SELECT max(\"value\") AS \"Go Routines\" FROM \":db:\".\":rp:\".\"consul_ip-172-31-6-247_runtime_num_goroutines\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul Agent – Runtime Alloc Bytes",
+        "queries": [
+          {
+            "query": "SELECT max(\"value\") AS \"Runtime Alloc Bytes\" FROM \":db:\".\":rp:\".\"consul_ip-172-31-6-247_runtime_alloc_bytes\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul Agent – Heap Objects",
+        "queries": [
+          {
+            "query": "SELECT max(\"value\") AS \"Heap Objects\" FROM \":db:\".\":rp:\".\"consul_ip-172-31-6-247_runtime_heap_objects\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul – Number of Agents",
+        "queries": [
+          {
+            "query": "SELECT min(\"value\") AS \"num_agents\" FROM \":db:\".\":rp:\".\"consul_memberlist_msg_alive\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)",
+            "label": "count"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "count",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul – Leadership Election",
+        "queries": [
+          {
+            "query": "SELECT max(\"value\") AS \"max_value\" FROM \":db:\".\":rp:\".\"consul_raft_state_candidate\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)",
+            "label": "count"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "count",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul – HTTP Request Time (ms)",
+        "queries": [
+          {
+            "query": "SELECT max(\"upper\") AS \"GET_health_state\" FROM \":db:\".\":rp:\".\"consul_consul_http_GET_v1_health_state__\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)",
+            "label": "ms"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "ms",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul – Leadership Change",
+        "queries": [
+          {
+            "query": "SELECT max(\"value\") as \"change\" FROM \":db:\".\":rp:\".\"consul_raft_state_leader\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)",
+            "label": "count"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "count",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "Consul – Number of serf events",
+        "queries": [
+          {
+            "query": "SELECT max(\"value\") AS \"serf_events\" FROM \":db:\".\":rp:\".\"consul_serf_events\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)",
+            "label": "count"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "count",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      }
+    ],
+    "templates": [
+      {
+        "tempVar": ":host:",
+        "id": "",
+        "type": "tagValues",
+        "label": "",
+        "values": [],
+        "query": {
+          "influxql": "SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:",
+          "db": "telegraf",
+          "measurement": "consul_consul_fsm_register",
+          "tagKey": "host",
+          "fieldKey": ""
+        }
+      }
+    ]
+  }
+}

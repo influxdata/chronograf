@@ -1,1 +1,219 @@
-{"id":"c3f2fcf2-813e-4a65-988d-810fd331d159","meta":{"name":"win_system","measurements":["win_cpu","win_mem","win_net","win_system"],"version":"1.0","dashboardVersion":"1.x","description":"Dashboard for the telegraf input plug-in: win_perf_counters","author":"influxdata","license":"MIT","icon":"","url":"https://github.com/influxdata/telegraf/tree/master/plugins/inputs/win_perf_counters"},"data":{"cells":[{"w":4,"h":4,"name":"System - CPU Usage","queries":[{"query":"SELECT mean(\"Percent_Processor_Time\") AS \"percent_processor_time\" FROM \":db:\".\":rp:\".\"win_cpu\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"System - Available Bytes","queries":[{"query":"SELECT mean(\"Available_Bytes\") AS \"available_bytes\" FROM \":db:\".\":rp:\".\"win_mem\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"System - TX Bytes/Second","queries":[{"query":"SELECT mean(\"Bytes_Sent_persec\") AS \"bytes_sent\" FROM \":db:\".\":rp:\".\"win_net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"RX Bytes/Second","queries":[{"query":"SELECT mean(\"Bytes_Received_persec\") AS \"bytes_received\" FROM \":db:\".\":rp:\".\"win_net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"System - Load","queries":[{"query":"SELECT mean(\"Processor_Queue_Length\") AS \"load\" FROM \":db:\".\":rp:\".\"win_system\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}}]}}
+{
+  "id": "c3f2fcf2-813e-4a65-988d-810fd331d159",
+  "meta": {
+    "name": "Win System",
+    "measurements": ["win_cpu", "win_mem", "win_net", "win_system"],
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "description": "Dashboard for the telegraf input plug-in: win_perf_counters",
+    "author": "influxdata",
+    "license": "MIT",
+    "icon": "",
+    "url": "https://github.com/influxdata/telegraf/tree/master/plugins/inputs/win_perf_counters"
+  },
+  "data": {
+    "cells": [
+      {
+        "w": 4,
+        "h": 4,
+        "name": "System - CPU Usage",
+        "queries": [
+          {
+            "query": "SELECT mean(\"Percent_Processor_Time\") AS \"percent_processor_time\" FROM \":db:\".\":rp:\".\"win_cpu\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "System - Available Bytes",
+        "queries": [
+          {
+            "query": "SELECT mean(\"Available_Bytes\") AS \"available_bytes\" FROM \":db:\".\":rp:\".\"win_mem\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "System - TX Bytes/Second",
+        "queries": [
+          {
+            "query": "SELECT mean(\"Bytes_Sent_persec\") AS \"bytes_sent\" FROM \":db:\".\":rp:\".\"win_net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "RX Bytes/Second",
+        "queries": [
+          {
+            "query": "SELECT mean(\"Bytes_Received_persec\") AS \"bytes_received\" FROM \":db:\".\":rp:\".\"win_net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "System - Load",
+        "queries": [
+          {
+            "query": "SELECT mean(\"Processor_Queue_Length\") AS \"load\" FROM \":db:\".\":rp:\".\"win_system\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      }
+    ],
+    "templates": [
+      {
+        "tempVar": ":host:",
+        "id": "",
+        "type": "tagValues",
+        "label": "",
+        "values": [],
+        "query": {
+          "influxql": "SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:",
+          "db": "telegraf",
+          "measurement": "win_cpu",
+          "tagKey": "host",
+          "fieldKey": ""
+        }
+      }
+    ]
+  }
+}

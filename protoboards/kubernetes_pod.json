@@ -1,0 +1,791 @@
+{
+  "id": "d4cb2ded-5070-4e30-a186-ae033c562abe",
+  "meta": {
+    "name": "Kubernetes Pod",
+    "measurements": [
+      "kubernetes_node",
+      "kubernetes_pod_container",
+      "kubernetes_pod_network",
+      "kubernetes_system_container"
+    ],
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "description": "Dashboard for the telegraf input plug-in: Kubernetes. Provides visibility on a single pod.",
+    "author": "InfluxData",
+    "license": "MIT",
+    "icon": "",
+    "url": "https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes"
+  },
+  "data": {
+    "cells": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 1,
+        "name": "",
+        "queries": [
+          {
+            "query": "",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "note",
+        "colors": [],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "This dashboard gives you an overview of a Kubernetes Pod and includes metrics from `kubernetes_*` set of measurements populated by the [Telegraf Kubernetes Input Plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "default"
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "w": 4,
+        "h": 2,
+        "name": "Total Nodes",
+        "queries": [
+          {
+            "query": "SELECT count(distinct(node_name)) FROM (SELECT mean(\"cpu_usage_core_nanoseconds\") AS \"mean_cpu_usage_core_nanoseconds\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: GROUP BY time(:interval:), \"node_name\" LIMIT 1) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT count(distinct(node_name)) FROM (SELECT mean(\"cpu_usage_core_nanoseconds\") AS \"mean_cpu_usage_core_nanoseconds\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: GROUP BY time(:interval:), \"node_name\" LIMIT 1) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "w": 4,
+        "h": 2,
+        "name": "Total Containers",
+        "queries": [
+          {
+            "query": "SELECT count(distinct(container_name)) from (SELECT mean(\"cpu_usage_core_nanoseconds\") AS \"mean_cpu_usage_core_nanoseconds\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"container_name\" limit 1) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT count(distinct(container_name)) from (SELECT mean(\"cpu_usage_core_nanoseconds\") AS \"mean_cpu_usage_core_nanoseconds\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"container_name\" limit 1) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "w": 4,
+        "h": 2,
+        "name": "Total Pod Count",
+        "queries": [
+          {
+            "query": "SELECT count(distinct(pod_name)) FROM (SELECT mean(\"cpu_usage_core_nanoseconds\") AS \"mean_cpu_usage_core_nanoseconds\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\" LIMIT 1) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT count(distinct(pod_name)) FROM (SELECT mean(\"cpu_usage_core_nanoseconds\") AS \"mean_cpu_usage_core_nanoseconds\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\" LIMIT 1) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "w": 4,
+        "h": 4,
+        "name": "K8s - Pod Millicores",
+        "queries": [
+          {
+            "query": "SELECT mean(\"cpu_usage_nanocores\") / 1000000  AS \"cpu_usage_millicores\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\"",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"cpu_usage_nanocores\") / 1000000  AS \"cpu_usage_millicores\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\"",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "3a861a65-22d0-4fe2-9162-34c35e3189e6",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "738a4433-63ce-42ee-908d-a534264410c8",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "b6e4949f-e323-4a2c-816b-497fae378356",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": false,
+          "sortBy": {"internalName": "", "displayName": "", "visible": false},
+          "wrapping": "",
+          "fixFirstColumn": false
+        },
+        "fieldOptions": [],
+        "timeFormat": "",
+        "decimalPlaces": {"isEnforced": false, "digits": 0},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "w": 4,
+        "h": 4,
+        "name": "K8s - Pod Memory Bytes",
+        "queries": [
+          {
+            "query": "SELECT mean(\"memory_usage_bytes\") AS \"memory_usage_bytes\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\" FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"memory_usage_bytes\") AS \"memory_usage_bytes\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\" FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "3a861a65-22d0-4fe2-9162-34c35e3189e6",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "738a4433-63ce-42ee-908d-a534264410c8",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "b6e4949f-e323-4a2c-816b-497fae378356",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": false,
+          "sortBy": {"internalName": "", "displayName": "", "visible": false},
+          "wrapping": "",
+          "fixFirstColumn": false
+        },
+        "fieldOptions": [],
+        "timeFormat": "",
+        "decimalPlaces": {"isEnforced": false, "digits": 0},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "w": 4,
+        "h": 4,
+        "name": "K8s - Pod Memory Bytes",
+        "queries": [
+          {
+            "query": "SELECT mean(\"memory_usage_bytes\") AS \"memory_usage_bytes\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\" FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"memory_usage_bytes\") AS \"memory_usage_bytes\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_container\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\" FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "3a861a65-22d0-4fe2-9162-34c35e3189e6",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "738a4433-63ce-42ee-908d-a534264410c8",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "b6e4949f-e323-4a2c-816b-497fae378356",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": false,
+          "sortBy": {"internalName": "", "displayName": "", "visible": false},
+          "wrapping": "",
+          "fixFirstColumn": false
+        },
+        "fieldOptions": [],
+        "timeFormat": "",
+        "decimalPlaces": {"isEnforced": false, "digits": 0},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "w": 4,
+        "h": 4,
+        "name": "K8s - Pod TX Bytes/Second",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"tx_bytes\")) AS \"tx_bytes_per_second\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_network\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\"",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT non_negative_derivative(max(\"tx_bytes\")) AS \"tx_bytes_per_second\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_network\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\"",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "3a861a65-22d0-4fe2-9162-34c35e3189e6",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "738a4433-63ce-42ee-908d-a534264410c8",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "b6e4949f-e323-4a2c-816b-497fae378356",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": false,
+          "sortBy": {"internalName": "", "displayName": "", "visible": false},
+          "wrapping": "",
+          "fixFirstColumn": false
+        },
+        "fieldOptions": [],
+        "timeFormat": "",
+        "decimalPlaces": {"isEnforced": false, "digits": 0},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "w": 4,
+        "h": 4,
+        "name": "K8s - Pod RX Bytes/Second ",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"rx_bytes\")) AS \"rx_bytes_per_second\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_network\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\"",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT non_negative_derivative(max(\"rx_bytes\")) AS \"rx_bytes_per_second\" FROM \"telegraf\".\"autogen\".\"kubernetes_pod_network\" WHERE time > :dashboardTime: AND pod_name =~ /^:pod:$/ GROUP BY time(:interval:), \"pod_name\"",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "3a861a65-22d0-4fe2-9162-34c35e3189e6",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "738a4433-63ce-42ee-908d-a534264410c8",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "b6e4949f-e323-4a2c-816b-497fae378356",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": false,
+          "sortBy": {"internalName": "", "displayName": "", "visible": false},
+          "wrapping": "",
+          "fixFirstColumn": false
+        },
+        "fieldOptions": [],
+        "timeFormat": "",
+        "decimalPlaces": {"isEnforced": false, "digits": 0},
+        "note": "To enable this graph, you will need to configure the [Telegraf Kubernetes Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/kubernetes).",
+        "noteVisibility": "showWhenNoData"
+      }
+    ],
+    "templates": [
+      {
+        "tempVar": ":pod:",
+        "id": "",
+        "type": "tagValues",
+        "label": "",
+        "values": [],
+        "query": {
+          "influxql": "SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:",
+          "db": "telegraf",
+          "measurement": "kubernetes_pod_container",
+          "tagKey": "pod_name",
+          "fieldKey": ""
+        }
+      }
+    ]
+  }
+}

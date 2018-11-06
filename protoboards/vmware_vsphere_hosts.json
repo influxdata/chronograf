@@ -1,0 +1,815 @@
+{
+  "id": "50069ca2-dd09-496e-a48e-16e80313efe7",
+  "meta": {
+    "name": "VMware vSphere Hosts",
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "description": "Dashboard for the telegraf input plug-in for VMware vSphere. Shows hosts.",
+    "author": "InfluxData",
+    "license": "MIT",
+    "icon": "",
+    "url": "https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere"
+  },
+  "data": {
+    "cells": [
+      {
+        "x": 6,
+        "y": 7,
+        "w": 6,
+        "h": 4,
+        "name": "Total Disk Latency for :esxhostname:",
+        "queries": [
+          {
+            "query": "SELECT mean(\"maxTotalLatency_latest\") AS \"maxTotalLatency_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_disk\" WHERE time > :dashboardTime: AND esxhostname =~ /^:esxhostname:$/ GROUP BY time(:interval:), \"disk\" FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"maxTotalLatency_latest\") AS \"maxTotalLatency_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_disk\" WHERE time > :dashboardTime: AND esxhostname =~ /^:esxhostname:$/ GROUP BY time(:interval:), \"disk\" FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": " Kbps",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "5bb4140f-c8e9-43dc-bee3-33f37bc8cdc3",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "170f783a-42d2-42fe-8437-fec00da7e571",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "48acba73-bc30-4e77-b7ce-9d82bee64536",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "w": 6,
+        "h": 4,
+        "name": "Network Usage for :esxhostname:",
+        "queries": [
+          {
+            "query": "SELECT min(\"bytesRx_average\") AS \"min_bytesRx\", max(\"bytesRx_average\") AS \"max_bytesRx\", mean(\"bytesRx_average\") AS \"avg_bytesRx\", min(\"bytesTx_average\") AS \"min_bytesTx\", max(\"bytesTx_average\") AS \"max_bytesTx\", mean(\"bytesTx_average\") AS \"avg_bytesTx\" FROM \"telegraf\".\"autogen\".\"vsphere_host_net\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/ AND interface !~ /instance-total/ GROUP BY time(:interval:), \"interface\" FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT min(\"bytesRx_average\") AS \"min_bytesRx\", max(\"bytesRx_average\") AS \"max_bytesRx\", mean(\"bytesRx_average\") AS \"avg_bytesRx\", min(\"bytesTx_average\") AS \"min_bytesTx\", max(\"bytesTx_average\") AS \"max_bytesTx\", mean(\"bytesTx_average\") AS \"avg_bytesTx\" FROM \"telegraf\".\"autogen\".\"vsphere_host_net\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/ AND interface !~ /instance-total/ GROUP BY time(:interval:), \"interface\" FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "5bb4140f-c8e9-43dc-bee3-33f37bc8cdc3",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "170f783a-42d2-42fe-8437-fec00da7e571",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "48acba73-bc30-4e77-b7ce-9d82bee64536",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "w": 4,
+        "h": 4,
+        "name": "CPU Ready Average % for :esxhostname:",
+        "queries": [
+          {
+            "query": "SELECT mean(\"readiness_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"readiness_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "5bb4140f-c8e9-43dc-bee3-33f37bc8cdc3",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "170f783a-42d2-42fe-8437-fec00da7e571",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "48acba73-bc30-4e77-b7ce-9d82bee64536",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "w": 4,
+        "h": 4,
+        "name": "RAM Usage Average for :esxhostname:",
+        "queries": [
+          {
+            "query": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "2",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "5bb4140f-c8e9-43dc-bee3-33f37bc8cdc3",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "170f783a-42d2-42fe-8437-fec00da7e571",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "48acba73-bc30-4e77-b7ce-9d82bee64536",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "w": 4,
+        "h": 4,
+        "name": "CPU Usage Average for :esxhostname:",
+        "queries": [
+          {
+            "query": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "line",
+        "colors": [
+          {
+            "id": "5bb4140f-c8e9-43dc-bee3-33f37bc8cdc3",
+            "type": "scale",
+            "hex": "#31C0F6",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "170f783a-42d2-42fe-8437-fec00da7e571",
+            "type": "scale",
+            "hex": "#A500A5",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          },
+          {
+            "id": "48acba73-bc30-4e77-b7ce-9d82bee64536",
+            "type": "scale",
+            "hex": "#FF7E27",
+            "name": "Nineteen Eighty Four",
+            "value": "0"
+          }
+        ],
+        "legend": {"type": "static", "orientation": "bottom"},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "w": 4,
+        "h": 2,
+        "name": "RAM Usage for :esxhostname:",
+        "queries": [
+          {
+            "query": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": " GB",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "w": 4,
+        "h": 2,
+        "name": "CPU Usage for :esxhostname: ",
+        "queries": [
+          {
+            "query": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": " MHz",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "w": 4,
+        "h": 2,
+        "name": "Uptime for :esxhostname:",
+        "queries": [
+          {
+            "query": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": " days",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "single-stat",
+        "colors": [
+          {
+            "id": "base",
+            "type": "text",
+            "hex": "#00C9FF",
+            "name": "laser",
+            "value": "-1000000000000000000"
+          }
+        ],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "To enable this graph, you will need to configure the [Telegraf vSphere Input plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "showWhenNoData"
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 1,
+        "name": "",
+        "queries": [
+          {
+            "query": "",
+            "queryConfig": {
+              "database": "",
+              "measurement": "",
+              "retentionPolicy": "",
+              "fields": [],
+              "tags": {},
+              "groupBy": {"time": "", "tags": []},
+              "areTagsAccepted": false,
+              "rawText": "",
+              "range": null,
+              "shifts": null
+            },
+            "source": "",
+            "type": "influxql"
+          }
+        ],
+        "axes": {
+          "x": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          },
+          "y2": {
+            "bounds": ["", ""],
+            "label": "",
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear"
+          }
+        },
+        "type": "note",
+        "colors": [],
+        "legend": {},
+        "tableOptions": {
+          "verticalTimeAxis": true,
+          "sortBy": {
+            "internalName": "time",
+            "displayName": "",
+            "visible": true
+          },
+          "wrapping": "truncate",
+          "fixFirstColumn": true
+        },
+        "fieldOptions": [
+          {"internalName": "time", "displayName": "", "visible": true}
+        ],
+        "timeFormat": "MM/DD/YYYY HH:mm:ss",
+        "decimalPlaces": {"isEnforced": true, "digits": 2},
+        "note": "This dashboard will give you an overview of your VMware vSphere hosts and includes metrics from `vsphere_host_*` set of measurements populated by the [Telegraf vSphere Input Plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/vsphere).",
+        "noteVisibility": "default"
+      }
+    ],
+    "templates": [
+      {
+        "tempVar": ":esxhostname:",
+        "id": "",
+        "type": "tagValues",
+        "label": "",
+        "values": [],
+        "query": {
+          "influxql": "SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:",
+          "db": "telegraf",
+          "measurement": "vsphere_host_cpu",
+          "tagKey": "esxhostname",
+          "fieldKey": ""
+        }
+      }
+    ]
+  }
+}
