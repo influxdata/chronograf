@@ -73,6 +73,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
           switchLinkText="Switch Organizations"
           handleSwitch={this.resetAndGotoPurgatory}
           isUsingAuth={isUsingAuth}
+          isJumpingAllowed={this.isSourceComplete()}
         >
           <WizardStep
             title="Welcome"

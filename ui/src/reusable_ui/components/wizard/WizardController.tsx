@@ -23,6 +23,7 @@ interface Props {
   switchLinkText?: string
   handleSwitch?: () => void
   isUsingAuth: boolean
+  isJumpingAllowed: boolean
 }
 
 @ErrorHandling
@@ -119,9 +120,12 @@ class WizardController extends PureComponent<Props, State> {
   }
 
   private jumpToStep = (jumpIndex: number) => () => {
-    this.setState({
-      currentStepIndex: jumpIndex,
-    })
+    const {isJumpingAllowed} = this.props
+    if (isJumpingAllowed) {
+      this.setState({
+        currentStepIndex: jumpIndex,
+      })
+    }
   }
 
   private get CurrentChild(): JSX.Element {
