@@ -1,1 +1,592 @@
-{"id":"5debc56e-f465-4d92-b845-e3ab6e6e24ad","meta":{"name":"haproxy","measurements":["haproxy"],"version":"1.0","dashboardVersion":"1.x","description":"Dashboard for the telegraf input plug-in: HAProxy","author":"influxdata","license":"MIT","icon":"","url":"https://github.com/influxdata/telegraf/tree/master/plugins/inputs/haproxy"},"data":{"cells":[{"w":4,"h":4,"name":"HAProxy – Number of Servers","queries":[{"query":"select mean(\"active_servers\") AS active_servers, mean(\"backup_servers\") AS backup_servers FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Sum HTTP 2xx","queries":[{"query":"SELECT non_negative_derivative(last(\"http_response.2xx\"), 1s) AS \"2xx\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Sum HTTP 4xx","queries":[{"query":"SELECT non_negative_derivative(last(\"http_response.4xx\"), 1s) AS \"4xx\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Sum HTTP 5xx","queries":[{"query":"SELECT non_negative_derivative(last(\"http_response.5xx\"), 1s) AS \"5xx\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Frontend HTTP Requests/Second  ","queries":[{"query":"SELECT mean(\"req_rate\") AS \"requests_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Frontend Sessions/Second ","queries":[{"query":"SELECT non_negative_derivative(max(\"rate\")) AS \"sessions_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Frontend Session Usage %","queries":[{"query":"SELECT non_negative_derivative(max(\"scur\")) / non_negative_derivative(max(\"slim\")) * 100 AS \"session_usage_percent\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Frontend Security Denials/Second","queries":[{"query":"SELECT non_negative_derivative(max(\"dreq\")) AS \"denials_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Frontend Request Errors/Second","queries":[{"query":"SELECT non_negative_derivative(max(\"ereq\")) AS \"errors_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Frontend Bytes/Second","queries":[{"query":"SELECT non_negative_derivative(max(\"bin\")) AS \"bytes_in_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"},{"query":"SELECT non_negative_derivative(max(\"bout\")) AS \"bytes_out_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Backend Average Response Time (ms)","queries":[{"query":"SELECT max(\"rtime\") AS \"response_time\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Backend Connection Errors/Second","queries":[{"query":"SELECT non_negative_derivative(max(\"econ\")) AS \"errors_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Backend Queued Requests/Second","queries":[{"query":"SELECT non_negative_derivative(max(\"qcur\")) AS \"queued_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Backend Average Request Queue Time (ms)","queries":[{"query":"SELECT max(\"qtime\") AS \"queue_time\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}},{"w":4,"h":4,"name":"HAProxy – Backend Error Responses/Second","queries":[{"query":"SELECT max(\"eresp\") AS \"error_response_rate\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"}],"type":"line","axes":{"x":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]},"y2":{"prefix":"","suffix":"","base":"10","scale":"linear","label":"","bounds":["",""]}}}]}}
+{
+  "id": "5debc56e-f465-4d92-b845-e3ab6e6e24ad",
+  "meta": {
+    "name": "HAProxy",
+    "measurements": ["haproxy"],
+    "version": "1.0",
+    "dashboardVersion": "1.x",
+    "description": "Dashboard for the telegraf input plug-in: HAProxy",
+    "author": "influxdata",
+    "license": "MIT",
+    "icon": "",
+    "url": "https://github.com/influxdata/telegraf/tree/master/plugins/inputs/haproxy"
+  },
+  "data": {
+    "cells": [
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Number of Servers",
+        "queries": [
+          {
+            "query": "select mean(\"active_servers\") AS active_servers, mean(\"backup_servers\") AS backup_servers FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Sum HTTP 2xx",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(last(\"http_response.2xx\"), 1s) AS \"2xx\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Sum HTTP 4xx",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(last(\"http_response.4xx\"), 1s) AS \"4xx\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Sum HTTP 5xx",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(last(\"http_response.5xx\"), 1s) AS \"5xx\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Frontend HTTP Requests/Second  ",
+        "queries": [
+          {
+            "query": "SELECT mean(\"req_rate\") AS \"requests_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Frontend Sessions/Second ",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"rate\")) AS \"sessions_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Frontend Session Usage %",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"scur\")) / non_negative_derivative(max(\"slim\")) * 100 AS \"session_usage_percent\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Frontend Security Denials/Second",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"dreq\")) AS \"denials_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Frontend Request Errors/Second",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"ereq\")) AS \"errors_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Frontend Bytes/Second",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"bin\")) AS \"bytes_in_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          },
+          {
+            "query": "SELECT non_negative_derivative(max(\"bout\")) AS \"bytes_out_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Backend Average Response Time (ms)",
+        "queries": [
+          {
+            "query": "SELECT max(\"rtime\") AS \"response_time\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Backend Connection Errors/Second",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"econ\")) AS \"errors_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Backend Queued Requests/Second",
+        "queries": [
+          {
+            "query": "SELECT non_negative_derivative(max(\"qcur\")) AS \"queued_per_second\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Backend Average Request Queue Time (ms)",
+        "queries": [
+          {
+            "query": "SELECT max(\"qtime\") AS \"queue_time\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      },
+      {
+        "w": 4,
+        "h": 4,
+        "name": "HAProxy – Backend Error Responses/Second",
+        "queries": [
+          {
+            "query": "SELECT max(\"eresp\") AS \"error_response_rate\" FROM \":db:\".\":rp:\".\"haproxy\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+          }
+        ],
+        "type": "line",
+        "axes": {
+          "x": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          },
+          "y2": {
+            "prefix": "",
+            "suffix": "",
+            "base": "10",
+            "scale": "linear",
+            "label": "",
+            "bounds": ["", ""]
+          }
+        }
+      }
+    ],
+    "templates": [
+      {
+        "tempVar": ":host:",
+        "id": "",
+        "type": "tagValues",
+        "label": "",
+        "values": [],
+        "query": {
+          "influxql": "SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:",
+          "db": "telegraf",
+          "measurement": "haproxy",
+          "tagKey": "host",
+          "fieldKey": ""
+        }
+      }
+    ]
+  }
+}

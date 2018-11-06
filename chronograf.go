@@ -745,7 +745,8 @@ type ProtoboardCell struct {
 
 // ProtoboardData is the data of a Protoboard that can be instantiated into a dashboard, including a collection of cells
 type ProtoboardData struct {
-	Cells []ProtoboardCell `json:"cells"`
+	Cells     []ProtoboardCell `json:"cells"`
+	Templates []Template       `json:"templates"`
 }
 
 // Protoboard is a prototype of a dashboard that can be instantiated
