@@ -13,16 +13,23 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   category: string
   funcs: FluxToolbarFunction[]
+  onClickFunction: (s: string) => void
 }
 
 @ErrorHandling
 class FunctionCategory extends PureComponent<Props> {
   public render() {
-    const {category, funcs} = this.props
+    const {category, funcs, onClickFunction} = this.props
     return (
       <dl className="flux-functions-toolbar--category">
         <dt>{category}</dt>
-        {funcs.map(func => <ToolbarFunction key={func.name} func={func} />)}
+        {funcs.map(func => (
+          <ToolbarFunction
+            onClickFunction={onClickFunction}
+            key={func.name}
+            func={func}
+          />
+        ))}
       </dl>
     )
   }

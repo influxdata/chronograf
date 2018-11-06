@@ -1,12 +1,8 @@
 // Libraries
 import React, {PureComponent, createRef} from 'react'
-import {Subscribe} from 'unstated'
 
 // Component
 import FunctionTooltip from 'src/flux/components/flux_functions_toolbar/FunctionTooltip'
-
-// Utils
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Types
 import {FluxToolbarFunction} from 'src/types/flux'
@@ -14,16 +10,10 @@ import {FluxToolbarFunction} from 'src/types/flux'
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-interface PassedProps {
+interface Props {
   func: FluxToolbarFunction
+  onClickFunction: (s: string) => void
 }
-
-interface ConnectedProps {
-  script: string
-  onUpdateScript: (script: string) => void
-}
-
-type Props = PassedProps & ConnectedProps
 
 interface State {
   isActive: boolean
@@ -87,23 +77,10 @@ class ToolbarFunction extends PureComponent<Props, State> {
   }
 
   private handleClickFunction = () => {
-    const {script, onUpdateScript, func} = this.props
+    const {func, onClickFunction} = this.props
 
-    const updatedScript = `${script}\n  |> ${func.example}`
-    onUpdateScript(updatedScript)
+    onClickFunction(func.example)
   }
 }
 
-const ConnectedFunctionsToolbarFunction = (props: PassedProps) => (
-  <Subscribe to={[TimeMachineContainer]}>
-    {(container: TimeMachineContainer) => (
-      <ToolbarFunction
-        {...props}
-        script={container.state.draftScript}
-        onUpdateScript={container.handleUpdateDraftScript}
-      />
-    )}
-  </Subscribe>
-)
-
-export default ConnectedFunctionsToolbarFunction
+export default ToolbarFunction
