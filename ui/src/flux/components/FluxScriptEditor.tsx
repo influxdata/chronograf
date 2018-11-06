@@ -51,8 +51,12 @@ class FluxScriptEditor extends PureComponent<Props, State> {
     }
   }
 
-  public componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: Props) {
     const {status, visibility} = this.props
+
+    if (prevProps.script !== this.props.script) {
+      this.setState({script: this.props.script})
+    }
 
     if (status.type === 'error') {
       this.makeError()
