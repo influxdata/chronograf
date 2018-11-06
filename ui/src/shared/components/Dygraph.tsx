@@ -168,7 +168,7 @@ class Dygraph extends Component<Props, State> {
       dygraph.resetZoom()
     }
 
-    if (staticLegendChanged) {
+    if (staticLegendChanged || optionsChanged) {
       setTimeout(this.resize, 0)
     }
   }
@@ -466,6 +466,8 @@ class Dygraph extends Component<Props, State> {
 
   private resize = () => {
     if (this.dygraph) {
+      this.dygraph.resizeElements_()
+      this.dygraph.predraw_()
       this.dygraph.resize()
     }
   }
