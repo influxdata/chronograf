@@ -16,7 +16,7 @@ import {CellType} from 'src/types/dashboards'
 
 interface Props {
   type: string
-  onUpdateVisType: (newType: CellType) => void
+  onUpdateVisType: (newType: CellType) => Promise<void>
 }
 
 @ErrorHandling

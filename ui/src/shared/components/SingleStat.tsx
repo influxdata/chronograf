@@ -29,7 +29,6 @@ import {ColorString} from 'src/types/colors'
 import {CellType, DecimalPlaces} from 'src/types/dashboards'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {FluxTable} from 'src/types'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 interface Props {
   decimalPlaces: DecimalPlaces
@@ -42,7 +41,7 @@ interface Props {
   data: TimeSeriesServerResponse[] | FluxTable[]
   dataType: DataType
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
-  onUpdateVisType?: TimeMachineContainer['handleUpdateType']
+  onUpdateVisType?: (cell: CellType) => Promise<void>
 }
 
 interface State {
@@ -102,7 +101,7 @@ class SingleStat extends PureComponent<Props, State> {
 
   public render() {
     if (!this.state.isValidData) {
-      return <InvalidData onUpdateVisType={this.props.onUpdateVisType} />
+      return <InvalidData />
     }
     if (!this.state.lastValues) {
       return <h3 className="graph-spinner" />
@@ -146,7 +145,7 @@ class SingleStat extends PureComponent<Props, State> {
   private get roundedLastValue(): string {
     const {decimalPlaces} = this.props
 
-    if (this.lastValue === null) {
+    if (this.lastValue === null || this.lastValue === undefined) {
       return `${0}`
     }
 
@@ -266,10 +265,6 @@ class SingleStat extends PureComponent<Props, State> {
         lastValues = this.memoizedTimeSeriesToSingleStat(
           data as TimeSeriesServerResponse[]
         )
-      }
-
-      if (typeof _.get(lastValues, 'values.0', null) !== 'number') {
-        isValidData = false
       }
 
       if (
