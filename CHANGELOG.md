@@ -49,6 +49,7 @@
 1.  [#4433](https://github.com/influxdata/chronograf/pull/4433): Add metaquery template generator button to Explorer and Cell Editor
 1.  [#4436](https://github.com/influxdata/chronograf/pull/4436): Automatically scroll to the current measurement in the explorer
 1.  [#4659](https://github.com/influxdata/chronograf/pull/4659): Simplify Flux explorer tree and improve searching
+1.  [#4744](https://github.com/influxdata/chronograf/pull/4744): Update logs page to show missing syslog message.
 
 ### Bug Fixes
 1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
