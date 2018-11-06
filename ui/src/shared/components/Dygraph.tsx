@@ -465,7 +465,9 @@ class Dygraph extends Component<Props, State> {
   }
 
   private resize = () => {
-    this.dygraph.resize()
+    if (this.dygraph) {
+      this.dygraph.resize()
+    }
   }
 
   private formatTimeRange = (date: number): string => {
