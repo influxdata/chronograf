@@ -30,8 +30,8 @@ import {AutoRefresher} from 'src/utils/AutoRefresher'
 interface ConnectedProps {
   timeRange: TimeRange
   queryType: QueryType
-  onUpdateFieldOptions: TimeMachineContainer['handleUpdateFieldOptions']
-  onUpdateVisType: TimeMachineContainer['handleUpdateType']
+  onUpdateFieldOptions: (fieldOptions: FieldOption[]) => Promise<void>
+  onUpdateVisType: (type: CellType) => Promise<void>
   type: CellType
   axes: Axes | null
   tableOptions: TableOptions

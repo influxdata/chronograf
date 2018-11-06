@@ -41,6 +41,7 @@ interface Props {
   data: TimeSeriesServerResponse[] | FluxTable[]
   dataType: DataType
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
+  onUpdateVisType?: (cell: CellType) => Promise<void>
 }
 
 interface State {
@@ -144,7 +145,7 @@ class SingleStat extends PureComponent<Props, State> {
   private get roundedLastValue(): string {
     const {decimalPlaces} = this.props
 
-    if (this.lastValue === null) {
+    if (this.lastValue === null || this.lastValue === undefined) {
       return `${0}`
     }
 

@@ -37,7 +37,6 @@ import {
   FluxTable,
 } from 'src/types'
 import {DataType} from 'src/shared/constants'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 interface Props {
   axes: Axes
@@ -55,7 +54,7 @@ interface Props {
   onZoom: () => void
   handleSetHoverTime: () => void
   activeQueryIndex?: number
-  onUpdateVisType?: TimeMachineContainer['handleUpdateType']
+  onUpdateVisType?: (type: CellType) => Promise<void>
 }
 
 type LineGraphProps = Props & RouteComponentProps<any, any>

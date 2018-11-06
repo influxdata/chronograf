@@ -4,11 +4,10 @@ import {Button} from 'src/reusable_ui'
 
 import {CellType} from 'src/types'
 import {ComponentColor, ComponentSize} from 'src/reusable_ui/types'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 interface Props {
   message?: string
-  onUpdateVisType?: TimeMachineContainer['handleUpdateType']
+  onUpdateVisType?: (cell: CellType) => Promise<void>
 }
 
 class InvalidData extends PureComponent<Props> {
