@@ -53,6 +53,34 @@ func (c *Client) pingTimeout(ctx context.Context) error {
 	}
 }
 
+// FluxEnabled returns true if the server has flux querying enabled.
+func (c *Client) FluxEnabled() (bool, error) {
+	url := c.URL
+	url.Path = "/api/v2/query"
+
+	req, err := http.NewRequest("POST", url.String(), nil)
+	if err != nil {
+		return false, err
+	}
+
+	hc := &http.Client{}
+	if c.InsecureSkipVerify {
+		hc.Transport = skipVerifyTransport
+	} else {
+		hc.Transport = defaultTransport
+	}
+
+	resp, err := hc.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	// TODO(goller): add comments about why you and watts did this.
+	contentType := resp.Header.Get("Content-Type")
+	return contentType == "application/json", nil
+}
+
 func (c *Client) ping(u *url.URL) error {
 	u.Path = "ping"
 

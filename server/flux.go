@@ -1,9 +1,14 @@
 package server
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"time"
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/flux/ast"
@@ -118,4 +123,89 @@ func (s *Service) FluxAST(w http.ResponseWriter, r *http.Request) {
 		resp := ASTResponse{Valid: true, AST: ast, Error: ""}
 		encodeJSON(w, http.StatusOK, resp, s.Logger)
 	}
+}
+
+// ProxyFlux proxies requests to influxdb using the path query parameter.
+func (s *Service) ProxyFlux(w http.ResponseWriter, r *http.Request) {
+	id, err := paramID("id", r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
+		return
+	}
+
+	path := r.URL.Query().Get("path")
+	if path == "" {
+		Error(w, http.StatusUnprocessableEntity, "path query parameter required", s.Logger)
+		return
+	}
+
+	ctx := r.Context()
+	src, err := s.Store.Sources(ctx).Get(ctx, id)
+	if err != nil {
+		notFound(w, id, s.Logger)
+		return
+	}
+
+	fluxEnabled, err := hasFlux(ctx, src)
+	if err != nil {
+		msg := fmt.Sprintf("Error flux service unavailable: %v", err)
+		Error(w, http.StatusServiceUnavailable, msg, s.Logger)
+		return
+	}
+
+	if !fluxEnabled {
+		msg := fmt.Sprintf("Error flux not enabled: %v", err)
+		Error(w, http.StatusBadRequest, msg, s.Logger)
+		return
+	}
+
+	// To preserve any HTTP query arguments to the kapacitor path,
+	// we concat and parse them into u.
+	uri := singleJoiningSlash(src.URL, path)
+	u, err := url.Parse(uri)
+	if err != nil {
+		msg := fmt.Sprintf("Error parsing flux url: %v", err)
+		Error(w, http.StatusUnprocessableEntity, msg, s.Logger)
+		return
+	}
+
+	director := func(req *http.Request) {
+		// Set the Host header of the original Flux URL
+		req.Host = u.Host
+		req.URL = u
+
+		// Because we are acting as a proxy, flux needs to have the basic auth information set as
+		// a header directly
+		if src.Username != "" && src.Password != "" {
+			req.SetBasicAuth(src.Username, src.Password)
+		}
+	}
+
+	// TODO: this was copied from services we may not needs this?
+	// Without a FlushInterval the HTTP Chunked response for kapacitor logs is
+	// buffered and flushed every 30 seconds.
+	proxy := &httputil.ReverseProxy{
+		Director:      director,
+		FlushInterval: time.Second,
+	}
+
+	// The connection to kapacitor is using a self-signed certificate.
+	// This modifies uses the same values as http.DefaultTransport but specifies
+	// InsecureSkipVerify
+	if src.InsecureSkipVerify {
+		proxy.Transport = &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+				DualStack: true,
+			}).DialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+		}
+	}
+	proxy.ServeHTTP(w, r)
 }

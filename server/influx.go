@@ -82,7 +82,7 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 	if uniqueID == "" {
 		newUUID, err := (&uuid.UUID{}).Generate()
 		if err != nil {
-			Error(w, 500, "Failed to create a unique identifier", s.Logger)
+			Error(w, http.StatusInternalServerError, "Failed to create a unique identifier", s.Logger)
 			return
 		}
 		uniqueID = newUUID
