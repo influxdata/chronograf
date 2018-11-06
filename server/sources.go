@@ -6,9 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
-	"strings"
-	"crypto/tls"
 
 	"github.com/influxdata/chronograf/enterprise"
 	"github.com/influxdata/chronograf/organizations"
@@ -31,7 +28,6 @@ type sourceLinks struct {
 	Databases   string `json:"databases"`       // URL for the databases contained within this source
 	Annotations string `json:"annotations"`     // URL for the annotations of this source
 	Health      string `json:"health"`          // URL for source health
-	Flux		string `json:"flux,omitempty"`  // URL for flux if it exists
 }
 
 type sourceResponse struct {
@@ -72,48 +68,6 @@ func sourceAuthenticationMethod(ctx context.Context, src chronograf.Source) auth
 	}
 }
 
-var (
-	skipVerifyTransport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	defaultTransport = &http.Transport{
-	}
-)
-
-func hasSourceFluxLink(ctx context.Context, src chronograf.Source) (bool, error) {
-	r := strings.NewReader(`from(bucket: "test/test") |> range(start:-1ns) |> limit(n:1)`)
-	req, err := http.NewRequest("POST",fmt.Sprintf("%s/api/v2/query?organization=defaultorgname",src.URL),r)
-	if err != nil {
-		return false,err
-	}
-
-	authorizer := influx.DefaultAuthorization(&src)
-	authorizer.Set(req)
-
-	hc := &http.Client{
-		Timeout: 500 * time.Millisecond,
-	}
-
-	if src.InsecureSkipVerify {
-		hc.Transport = skipVerifyTransport
-	} else {
-		hc.Transport = defaultTransport
-	}
-
-	resp, err := hc.Do(req)
-	if err != nil {
-		return false, err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode/100 != 2 {
-		return true, nil
-	}
-
-	return false, nil
-}
-
 func newSourceResponse(ctx context.Context, src chronograf.Source) sourceResponse {
 	// If telegraf is not set, we'll set it to the default value.
 	if src.Telegraf == "" {
@@ -143,10 +97,6 @@ func newSourceResponse(ctx context.Context, src chronograf.Source) sourceRespons
 			Annotations: fmt.Sprintf("%s/%d/annotations", httpAPISrcs, src.ID),
 			Health:      fmt.Sprintf("%s/%d/health", httpAPISrcs, src.ID),
 		},
-	}
-
-	if isFluxEnabled, _ := hasSourceFluxLink(ctx, src);isFluxEnabled {
-		res.Links.Flux = res.Links.Proxy
 	}
 
 	// MetaURL is currently a string, but eventually, we'd like to change it
@@ -216,11 +166,8 @@ func (s *Service) tsdbVersion(ctx context.Context, src *chronograf.Source) (stri
 	if err := cli.Connect(ctx, src); err != nil {
 		return "", err
 	}
-
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
-
 	return cli.Version(ctx)
+
 }
 
 func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string, error) {
