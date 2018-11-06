@@ -18,6 +18,7 @@ import {
   executeQueryAsync,
   getLogConfig as getLogConfigAJAX,
   updateLogConfig as updateLogConfigAJAX,
+  getSyslogMeasurement,
 } from 'src/logs/api'
 
 import {
@@ -918,6 +919,19 @@ export const setNamespaceAsync = (namespace: Namespace) => async (
   ])
 }
 
+export const fetchNamespaceSyslogStatusAsync = (namespace: Namespace) => async (
+  dispatch: Dispatch<SetSearchStatusAction>,
+  getState: GetState
+) => {
+  const proxyLink = getProxyLink(getState())
+  const response = await getSyslogMeasurement(proxyLink, namespace)
+  const series = getDeep(response, 'results.0.series', [])
+
+  if (_.isEmpty(series)) {
+    await dispatch(setSearchStatus(SearchStatus.MeasurementMissing))
+  }
+}
+
 export const setNamespaces = (
   namespaces: Namespace[]
 ): SetNamespacesAction => ({
@@ -940,15 +954,22 @@ export const populateNamespacesAsync = (
 
   if (namespaces && namespaces.length > 0) {
     dispatch(setNamespaces(namespaces))
-    if (source && source.telegraf) {
-      const defaultNamespace = namespaces.find(
-        namespace => namespace.database === source.telegraf
-      )
 
-      await dispatch(setNamespaceAsync(defaultNamespace))
-    } else {
-      await dispatch(setNamespaceAsync(namespaces[0]))
+    let defaultNamespace: Namespace
+
+    if (source && source.telegraf) {
+      defaultNamespace = _.find(
+        namespaces,
+        ns => ns.database === source.telegraf
+      )
     }
+
+    const namespace = defaultNamespace || namespaces[0]
+
+    await Promise.all([
+      dispatch(setNamespaceAsync(namespace)),
+      dispatch(fetchNamespaceSyslogStatusAsync(namespace)),
+    ])
   }
 }
 
