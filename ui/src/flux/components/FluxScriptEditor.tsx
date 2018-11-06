@@ -32,7 +32,7 @@ interface Widget extends LineWidget {
 }
 
 interface State {
-  lineWidgets: Widget[]
+  script: string
 }
 
 interface EditorInstance extends IInstance {
@@ -44,8 +44,11 @@ class FluxScriptEditor extends PureComponent<Props, State> {
   private editor: EditorInstance
   private lineWidgets: Widget[] = []
 
-  constructor(props) {
+  public constructor(props: Props) {
     super(props)
+    this.state = {
+      script: props.script,
+    }
   }
 
   public componentDidUpdate(prevProps) {
@@ -70,7 +73,7 @@ class FluxScriptEditor extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {script, children} = this.props
+    const {children} = this.props
 
     const options = {
       tabIndex: 1,
@@ -91,9 +94,10 @@ class FluxScriptEditor extends PureComponent<Props, State> {
         <ReactCodeMirror
           autoFocus={true}
           autoCursor={true}
-          value={script}
+          value={this.state.script}
           options={options}
-          onBeforeChange={this.updateCode}
+          onBeforeChange={this.beforeChange}
+          onChange={this.updateCode}
           onTouchStart={this.onTouchStart}
           editorDidMount={this.handleMount}
           onKeyUp={this.handleKeyUp}
@@ -211,6 +215,14 @@ class FluxScriptEditor extends PureComponent<Props, State> {
       hint: () => filteredSuggestions,
       completeSingle: false,
     })
+  }
+
+  private beforeChange = (
+    ___: IInstance,
+    ____: EditorChange,
+    script: string
+  ): void => {
+    this.setState({script})
   }
 
   private updateCode = (
