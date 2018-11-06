@@ -1,4 +1,5 @@
-import React, {PureComponent} from 'react'
+import React, {PureComponent, CSSProperties} from 'react'
+import FancyScrollbar from './FancyScrollbar'
 
 import {Button} from 'src/reusable_ui'
 
@@ -18,11 +19,24 @@ class InvalidData extends PureComponent<Props> {
 
   private get errorMessage(): JSX.Element {
     if (this.props.message) {
-      return <p>{this.props.message}</p>
+      return (
+        <div className="crazy-error">
+          <span className="icon alert-triangle" />
+          <FancyScrollbar
+            className="crazy-error--scrollbox"
+            autoHeight={true}
+            maxHeight={400}
+          >
+            <p className="crazy-error--message" style={this.style}>
+              {this.props.message}
+            </p>
+          </FancyScrollbar>
+        </div>
+      )
     }
 
     return (
-      <p>
+      <p className="error-message">
         The data returned from the query can't be visualized with this graph
         type.<br />
         {this.props.onUpdateVisType && (
@@ -42,6 +56,15 @@ class InvalidData extends PureComponent<Props> {
 
   private handleSwitchToTableGraph = () => {
     this.props.onUpdateVisType(CellType.Table)
+  }
+
+  get style(): CSSProperties {
+    const {message} = this.props
+    if (message.length > 100) {
+      return {fontSize: '13px'}
+    }
+
+    return {fontSize: '17px'}
   }
 }
 
