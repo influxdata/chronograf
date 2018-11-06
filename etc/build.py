@@ -24,6 +24,7 @@ DATA_DIR = "/var/lib/chronograf"
 SCRIPT_DIR = "/usr/lib/chronograf/scripts"
 LOGROTATE_DIR = "/etc/logrotate.d"
 CANNED_DIR = "/usr/share/chronograf/canned"
+PROTOBOARDS_DIR = "/usr/share/chronograf/protoboards"
 RESOURCES_DIR = "/usr/share/chronograf/resources"
 
 INIT_SCRIPT = "etc/scripts/init.sh"
@@ -32,6 +33,7 @@ POSTINST_SCRIPT = "etc/scripts/post-install.sh"
 POSTUNINST_SCRIPT = "etc/scripts/post-uninstall.sh"
 LOGROTATE_SCRIPT = "etc/scripts/logrotate"
 CANNED_SCRIPTS = "canned/*json"
+PROTOBOARDS_SCRIPTS = "protoboards/*json"
 
 # Default AWS S3 bucket for uploads
 DEFAULT_BUCKET = "dl.influxdata.com/chronograf/artifacts"
@@ -118,6 +120,7 @@ def create_package_fs(build_root):
         SCRIPT_DIR[1:],
         LOGROTATE_DIR[1:],
         CANNED_DIR[1:],
+        PROTOBOARDS_DIR[1:],
         RESOURCES_DIR[1:]
     ]
     for d in dirs:
@@ -144,6 +147,10 @@ def package_scripts(build_root, config_only=False, windows=False):
         run("cp {} {} && chmod 644 {}".format(CANNED_SCRIPTS,
                                               os.path.join(build_root, CANNED_DIR[1:]),
                                               os.path.join(build_root, CANNED_DIR[1:], "*json")),
+            shell=True, print_output=True)
+        run("cp {} {} && chmod 644 {}".format(PROTOBOARDS_SCRIPTS,
+                                              os.path.join(build_root, PROTOBOARDS_DIR[1:]),
+                                              os.path.join(build_root, PROTOBOARDS_DIR[1:], "*json")),
             shell=True, print_output=True)
 
 def run_generate():
