@@ -231,6 +231,7 @@ export interface PBCell extends Cell {
 
 export interface ProtoboardData {
   cells: Array<Partial<PBCell>>
+  templates: Template[]
 }
 
 export interface Protoboard {

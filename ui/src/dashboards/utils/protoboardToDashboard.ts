@@ -1,4 +1,4 @@
-import {getDeep} from 'src/utils/wrappers'
+import uuid from 'uuid'
 
 import {getNextAvailablePosition} from 'src/dashboards/utils/cellGetters'
 
@@ -8,7 +8,6 @@ import {
   Dashboard,
   Template,
   Source,
-  TemplateType,
   CellQuery,
   Cell,
 } from 'src/types'
@@ -36,23 +35,12 @@ const addNewCellToCells = (
   ]
 }
 
-const createTemplatesForProtoboard = (source, measurement): Template[] => [
-  {
-    tempVar: ':host:',
-    id: '',
-    type: TemplateType.TagValues,
-    label: '',
-    values: [],
-    query: {
-      influxql:
-        'SHOW TAG VALUES ON :database: FROM :measurement: WITH KEY=:tagKey:',
-      db: source.telegraf || 'telegraf',
-      measurement,
-      tagKey: 'host',
-      fieldKey: '',
-    },
-  },
-]
+const createTemplatesForProtoboard = (pbTemplates, source): Template[] => {
+  const telegraf = source.telegraf || 'telegraf'
+  return pbTemplates.map(pbt => {
+    return {...pbt, id: uuid.v4(), query: {...pbt.query, db: telegraf}}
+  })
+}
 
 const replaceQuery = (q: string, source: Source) =>
   q
@@ -66,8 +54,6 @@ export const instantiateProtoboard = (
   protoboard: Protoboard,
   source: Source
 ): Partial<Dashboard> => {
-  const measurement = getDeep<string>(protoboard, 'meta.measurements[0]', '')
-
   let cellsWithPlaces = protoboard.data.cells
 
   const isCellsUnplaced = protoboard.data.cells.every(
@@ -78,7 +64,8 @@ export const instantiateProtoboard = (
     cellsWithPlaces = protoboard.data.cells.reduce(addNewCellToCells, [])
   }
 
-  const templates = createTemplatesForProtoboard(source, measurement)
+  const pbTemplates = protoboard.data.templates
+  const templates = createTemplatesForProtoboard(pbTemplates, source)
 
   const cells = cellsWithPlaces.map(c => ({
     ...c,
