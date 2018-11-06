@@ -1,12 +1,13 @@
 package plan
 
-type RewriteRule interface {
-	Root() ProcedureKind
-	Rewrite(*Procedure, PlanRewriter) error
-}
+// Rule is transformation rule for a query operation
+type Rule interface {
+	// The name of this rule (must be unique)
+	Name() string
 
-var rewriteRules []RewriteRule
+	// Pattern for this rule to match against
+	Pattern() Pattern
 
-func RegisterRewriteRule(r RewriteRule) {
-	rewriteRules = append(rewriteRules, r)
+	// Rewrite an operation into an equivalent one
+	Rewrite(PlanNode) (PlanNode, bool, error)
 }

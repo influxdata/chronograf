@@ -43,6 +43,48 @@ func (p *Program) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
+func (e *Extern) MarshalJSON() ([]byte, error) {
+	type Alias Extern
+	raw := struct {
+		Type string `json:"type"`
+		*Alias
+	}{
+		Type:  e.NodeType(),
+		Alias: (*Alias)(e),
+	}
+	return json.Marshal(raw)
+}
+func (e *ExternBlock) MarshalJSON() ([]byte, error) {
+	type Alias ExternBlock
+	raw := struct {
+		Type string `json:"type"`
+		*Alias
+	}{
+		Type:  e.NodeType(),
+		Alias: (*Alias)(e),
+	}
+	return json.Marshal(raw)
+}
+func (e *ExternBlock) UnmarshalJSON(data []byte) error {
+	type Alias ExternBlock
+	raw := struct {
+		*Alias
+		Node json.RawMessage `json:"node"`
+	}{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	if raw.Alias != nil {
+		*e = *(*ExternBlock)(raw.Alias)
+	}
+
+	n, err := unmarshalNode(raw.Node)
+	if err != nil {
+		return err
+	}
+	e.Node = n
+	return nil
+}
 func (s *BlockStatement) MarshalJSON() ([]byte, error) {
 	type Alias BlockStatement
 	raw := struct {
@@ -279,28 +321,8 @@ func (e *FunctionExpression) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(raw)
 }
-func (e *FunctionExpression) UnmarshalJSON(data []byte) error {
-	type Alias FunctionExpression
-	raw := struct {
-		*Alias
-		Body json.RawMessage `json:"body"`
-	}{}
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	if raw.Alias != nil {
-		*e = *(*FunctionExpression)(raw.Alias)
-	}
-
-	body, err := unmarshalNode(raw.Body)
-	if err != nil {
-		return err
-	}
-	e.Body = body
-	return nil
-}
-func (e *FunctionParam) MarshalJSON() ([]byte, error) {
-	type Alias FunctionParam
+func (e *FunctionBlock) MarshalJSON() ([]byte, error) {
+	type Alias FunctionBlock
 	raw := struct {
 		Type string `json:"type"`
 		*Alias
@@ -310,25 +332,48 @@ func (e *FunctionParam) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(raw)
 }
-func (e *FunctionParam) UnmarshalJSON(data []byte) error {
-	type Alias FunctionParam
+func (e *FunctionBlock) UnmarshalJSON(data []byte) error {
+	type Alias FunctionBlock
 	raw := struct {
 		*Alias
-		Default json.RawMessage `json:"default"`
+		Body json.RawMessage `json:"body"`
 	}{}
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
 	if raw.Alias != nil {
-		*e = *(*FunctionParam)(raw.Alias)
+		*e = *(*FunctionBlock)(raw.Alias)
 	}
 
-	def, err := unmarshalLiteral(raw.Default)
+	body, err := unmarshalNode(raw.Body)
 	if err != nil {
 		return err
 	}
-	e.Default = def
+	e.Body = body
+
 	return nil
+}
+func (e *FunctionParameters) MarshalJSON() ([]byte, error) {
+	type Alias FunctionParameters
+	raw := struct {
+		Type string `json:"type"`
+		*Alias
+	}{
+		Type:  e.NodeType(),
+		Alias: (*Alias)(e),
+	}
+	return json.Marshal(raw)
+}
+func (e *FunctionParameter) MarshalJSON() ([]byte, error) {
+	type Alias FunctionParameter
+	raw := struct {
+		Type string `json:"type"`
+		*Alias
+	}{
+		Type:  e.NodeType(),
+		Alias: (*Alias)(e),
+	}
+	return json.Marshal(raw)
 }
 func (e *BinaryExpression) MarshalJSON() ([]byte, error) {
 	type Alias BinaryExpression
@@ -803,7 +848,7 @@ func unmarshalExpression(msg json.RawMessage) (Expression, error) {
 	}
 	return e, nil
 }
-func unmarshalVariableDeclaration(msg json.RawMessage) (VariableDeclaration, error) {
+func unmarshalVariableDeclaration(msg json.RawMessage) (Node, error) {
 	if checkNullMsg(msg) {
 		return nil, nil
 	}
@@ -811,25 +856,13 @@ func unmarshalVariableDeclaration(msg json.RawMessage) (VariableDeclaration, err
 	if err != nil {
 		return nil, err
 	}
-	v, ok := n.(VariableDeclaration)
-	if !ok {
+	switch n.(type) {
+	case *ExternalVariableDeclaration,
+		*NativeVariableDeclaration:
+		return n, nil
+	default:
 		return nil, fmt.Errorf("node %q is not a variable declaration", n.NodeType())
 	}
-	return v, nil
-}
-func unmarshalLiteral(msg json.RawMessage) (Literal, error) {
-	if checkNullMsg(msg) {
-		return nil, nil
-	}
-	n, err := unmarshalNode(msg)
-	if err != nil {
-		return nil, err
-	}
-	e, ok := n.(Literal)
-	if !ok {
-		return nil, fmt.Errorf("node %q is not a literal", n.NodeType())
-	}
-	return e, nil
 }
 func unmarshalNode(msg json.RawMessage) (Node, error) {
 	if checkNullMsg(msg) {
@@ -895,8 +928,14 @@ func unmarshalNode(msg json.RawMessage) (Node, error) {
 		node = new(DurationLiteral)
 	case "DateTimeLiteral":
 		node = new(DateTimeLiteral)
-	case "ArrowFunctionExpression":
+	case "FunctionExpression":
 		node = new(FunctionExpression)
+	case "FunctionBlock":
+		node = new(FunctionBlock)
+	case "FunctionParameters":
+		node = new(FunctionParameters)
+	case "FunctionParameter":
+		node = new(FunctionParameter)
 	case "Property":
 		node = new(Property)
 	default:

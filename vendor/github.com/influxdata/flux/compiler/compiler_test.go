@@ -19,95 +19,87 @@ func init() {
 }
 
 func ValueEqual(x, y values.Value) bool {
-	if x.Type() != y.Type() {
-		return false
-	}
-	switch k := x.Type().Kind(); k {
-	case semantic.Bool:
-		return x.Bool() == y.Bool()
-	case semantic.UInt:
-		return x.UInt() == y.UInt()
-	case semantic.Int:
-		return x.Int() == y.Int()
-	case semantic.Float:
-		return x.Float() == y.Float()
-	case semantic.String:
-		return x.Str() == y.Str()
-	case semantic.Time:
-		return x.Time() == y.Time()
+	switch k := x.Type().Nature(); k {
 	case semantic.Object:
+		if x.Type() != y.Type() {
+			return false
+		}
 		return cmp.Equal(x.Object(), y.Object(), CmpOptions...)
 	default:
-		return false
+		return x.Equal(y)
 	}
 }
 
 func TestCompilationCache(t *testing.T) {
 	add := &semantic.FunctionExpression{
-		Params: []*semantic.FunctionParam{
-			{Key: &semantic.Identifier{Name: "a"}},
-			{Key: &semantic.Identifier{Name: "b"}},
-		},
-		Body: &semantic.BinaryExpression{
-			Operator: ast.AdditionOperator,
-			Left:     &semantic.IdentifierExpression{Name: "a"},
-			Right:    &semantic.IdentifierExpression{Name: "b"},
+		Block: &semantic.FunctionBlock{
+			Parameters: &semantic.FunctionParameters{
+				List: []*semantic.FunctionParameter{
+					{Key: &semantic.Identifier{Name: "a"}},
+					{Key: &semantic.Identifier{Name: "b"}},
+				},
+			},
+			Body: &semantic.BinaryExpression{
+				Operator: ast.AdditionOperator,
+				Left:     &semantic.IdentifierExpression{Name: "a"},
+				Right:    &semantic.IdentifierExpression{Name: "b"},
+			},
 		},
 	}
 	testCases := []struct {
-		name  string
-		types map[string]semantic.Type
-		scope map[string]values.Value
-		want  values.Value
+		name   string
+		inType semantic.Type
+		input  values.Object
+		want   values.Value
 	}{
 		{
 			name: "floats",
-			types: map[string]semantic.Type{
+			inType: semantic.NewObjectType(map[string]semantic.Type{
 				"a": semantic.Float,
 				"b": semantic.Float,
-			},
-			scope: map[string]values.Value{
-				"a": values.NewFloatValue(5),
-				"b": values.NewFloatValue(4),
-			},
-			want: values.NewFloatValue(9),
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"a": values.NewFloat(5),
+				"b": values.NewFloat(4),
+			}),
+			want: values.NewFloat(9),
 		},
 		{
 			name: "ints",
-			types: map[string]semantic.Type{
+			inType: semantic.NewObjectType(map[string]semantic.Type{
 				"a": semantic.Int,
 				"b": semantic.Int,
-			},
-			scope: map[string]values.Value{
-				"a": values.NewIntValue(5),
-				"b": values.NewIntValue(4),
-			},
-			want: values.NewIntValue(9),
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"a": values.NewInt(5),
+				"b": values.NewInt(4),
+			}),
+			want: values.NewInt(9),
 		},
 		{
 			name: "uints",
-			types: map[string]semantic.Type{
+			inType: semantic.NewObjectType(map[string]semantic.Type{
 				"a": semantic.UInt,
 				"b": semantic.UInt,
-			},
-			scope: map[string]values.Value{
-				"a": values.NewUIntValue(5),
-				"b": values.NewUIntValue(4),
-			},
-			want: values.NewUIntValue(9),
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"a": values.NewUInt(5),
+				"b": values.NewUInt(4),
+			}),
+			want: values.NewUInt(9),
 		},
 	}
 
 	//Reuse the same cache for all test cases
-	cache := compiler.NewCompilationCache(add, nil, nil)
+	cache := compiler.NewCompilationCache(add, nil)
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			f0, err := cache.Compile(tc.types)
+			f0, err := cache.Compile(tc.inType)
 			if err != nil {
 				t.Fatal(err)
 			}
-			f1, err := cache.Compile(tc.types)
+			f1, err := cache.Compile(tc.inType)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -115,11 +107,11 @@ func TestCompilationCache(t *testing.T) {
 				t.Errorf("unexpected new compilation result")
 			}
 
-			got0, err := f0.Eval(tc.scope)
+			got0, err := f0.Eval(tc.input)
 			if err != nil {
 				t.Fatal(err)
 			}
-			got1, err := f1.Eval(tc.scope)
+			got1, err := f1.Eval(tc.input)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -130,7 +122,6 @@ func TestCompilationCache(t *testing.T) {
 			if !cmp.Equal(got0, got1, CmpOptions...) {
 				t.Errorf("unexpected differing results -got0/+got1\n%s", cmp.Diff(got0, got1, CmpOptions...))
 			}
-
 		})
 	}
 }
@@ -139,76 +130,50 @@ func TestCompileAndEval(t *testing.T) {
 	testCases := []struct {
 		name    string
 		fn      *semantic.FunctionExpression
-		types   map[string]semantic.Type
-		scope   map[string]values.Value
+		inType  semantic.Type
+		input   values.Object
 		want    values.Value
 		wantErr bool
 	}{
 		{
 			name: "simple ident return",
 			fn: &semantic.FunctionExpression{
-				Params: []*semantic.FunctionParam{
-					{Key: &semantic.Identifier{Name: "r"}},
+				Block: &semantic.FunctionBlock{
+					Parameters: &semantic.FunctionParameters{
+						List: []*semantic.FunctionParameter{
+							{Key: &semantic.Identifier{Name: "r"}},
+						},
+					},
+					Body: &semantic.IdentifierExpression{Name: "r"},
 				},
-				Body: &semantic.IdentifierExpression{Name: "r"},
 			},
-			types: map[string]semantic.Type{
+			inType: semantic.NewObjectType(map[string]semantic.Type{
 				"r": semantic.Int,
-			},
-			scope: map[string]values.Value{
-				"r": values.NewIntValue(4),
-			},
-			want:    values.NewIntValue(4),
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"r": values.NewInt(4),
+			}),
+			want:    values.NewInt(4),
 			wantErr: false,
 		},
 		{
 			name: "call function",
+			// f = (r) => ((a,b) => a + b)(a:1, b:r)
 			fn: &semantic.FunctionExpression{
-				Params: []*semantic.FunctionParam{
-					{Key: &semantic.Identifier{Name: "r"}},
-				},
-				Body: &semantic.CallExpression{
-					Callee: &semantic.FunctionExpression{
-						Params: []*semantic.FunctionParam{
-							{Key: &semantic.Identifier{Name: "a"}, Default: &semantic.IntegerLiteral{Value: 1}},
-							{Key: &semantic.Identifier{Name: "b"}, Default: &semantic.IntegerLiteral{Value: 1}},
-						},
-						Body: &semantic.BinaryExpression{
-							Operator: ast.AdditionOperator,
-							Left:     &semantic.IdentifierExpression{Name: "a"},
-							Right:    &semantic.IdentifierExpression{Name: "b"},
+				Block: &semantic.FunctionBlock{
+					Parameters: &semantic.FunctionParameters{
+						List: []*semantic.FunctionParameter{
+							{Key: &semantic.Identifier{Name: "r"}},
 						},
 					},
-					Arguments: &semantic.ObjectExpression{
-						Properties: []*semantic.Property{
-							{Key: &semantic.Identifier{Name: "a"}, Value: &semantic.IntegerLiteral{Value: 1}},
-							{Key: &semantic.Identifier{Name: "b"}, Value: &semantic.IdentifierExpression{Name: "r"}},
-						},
-					},
-				},
-			},
-			types: map[string]semantic.Type{
-				"r": semantic.Int,
-			},
-			scope: map[string]values.Value{
-				"r": values.NewIntValue(4),
-			},
-			want:    values.NewIntValue(5),
-			wantErr: false,
-		},
-		{
-			name: "call function via identifier",
-			fn: &semantic.FunctionExpression{
-				Params: []*semantic.FunctionParam{
-					{Key: &semantic.Identifier{Name: "r"}},
-				},
-				Body: &semantic.BlockStatement{
-					Body: []semantic.Statement{
-						&semantic.NativeVariableDeclaration{
-							Identifier: &semantic.Identifier{Name: "f"}, Init: &semantic.FunctionExpression{
-								Params: []*semantic.FunctionParam{
-									{Key: &semantic.Identifier{Name: "a"}, Default: &semantic.IntegerLiteral{Value: 1}},
-									{Key: &semantic.Identifier{Name: "b"}, Default: &semantic.IntegerLiteral{Value: 1}},
+					Body: &semantic.CallExpression{
+						Callee: &semantic.FunctionExpression{
+							Block: &semantic.FunctionBlock{
+								Parameters: &semantic.FunctionParameters{
+									List: []*semantic.FunctionParameter{
+										{Key: &semantic.Identifier{Name: "a"}},
+										{Key: &semantic.Identifier{Name: "b"}},
+									},
 								},
 								Body: &semantic.BinaryExpression{
 									Operator: ast.AdditionOperator,
@@ -217,13 +182,111 @@ func TestCompileAndEval(t *testing.T) {
 								},
 							},
 						},
-						&semantic.ReturnStatement{
-							Argument: &semantic.CallExpression{
-								Callee: &semantic.IdentifierExpression{Name: "f"},
-								Arguments: &semantic.ObjectExpression{
-									Properties: []*semantic.Property{
-										{Key: &semantic.Identifier{Name: "a"}, Value: &semantic.IntegerLiteral{Value: 1}},
-										{Key: &semantic.Identifier{Name: "b"}, Value: &semantic.IdentifierExpression{Name: "r"}},
+						Arguments: &semantic.ObjectExpression{
+							Properties: []*semantic.Property{
+								{Key: &semantic.Identifier{Name: "a"}, Value: &semantic.IntegerLiteral{Value: 1}},
+								{Key: &semantic.Identifier{Name: "b"}, Value: &semantic.IdentifierExpression{Name: "r"}},
+							},
+						},
+					},
+				},
+			},
+			inType: semantic.NewObjectType(map[string]semantic.Type{
+				"r": semantic.Int,
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"r": values.NewInt(4),
+			}),
+			want:    values.NewInt(5),
+			wantErr: false,
+		},
+		{
+			name: "call function with defaults",
+			// f = (r) => ((a=0,b) => a + b)(b:r)
+			fn: &semantic.FunctionExpression{
+				Block: &semantic.FunctionBlock{
+					Parameters: &semantic.FunctionParameters{
+						List: []*semantic.FunctionParameter{
+							{Key: &semantic.Identifier{Name: "r"}},
+						},
+					},
+					Body: &semantic.CallExpression{
+						Callee: &semantic.FunctionExpression{
+							Defaults: &semantic.ObjectExpression{
+								Properties: []*semantic.Property{{
+									Key:   &semantic.Identifier{Name: "a"},
+									Value: &semantic.IntegerLiteral{Value: 0},
+								}},
+							},
+							Block: &semantic.FunctionBlock{
+								Parameters: &semantic.FunctionParameters{
+									List: []*semantic.FunctionParameter{
+										{Key: &semantic.Identifier{Name: "a"}},
+										{Key: &semantic.Identifier{Name: "b"}},
+									},
+								},
+								Body: &semantic.BinaryExpression{
+									Operator: ast.AdditionOperator,
+									Left:     &semantic.IdentifierExpression{Name: "a"},
+									Right:    &semantic.IdentifierExpression{Name: "b"},
+								},
+							},
+						},
+						Arguments: &semantic.ObjectExpression{
+							Properties: []*semantic.Property{
+								{Key: &semantic.Identifier{Name: "b"}, Value: &semantic.IdentifierExpression{Name: "r"}},
+							},
+						},
+					},
+				},
+			},
+			inType: semantic.NewObjectType(map[string]semantic.Type{
+				"r": semantic.Int,
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"r": values.NewInt(4),
+			}),
+			want:    values.NewInt(4),
+			wantErr: false,
+		},
+		{
+			name: "call function via identifier",
+			// f = (r) => {f = (a,b) => a + b return f(a:1, b:r)}
+			fn: &semantic.FunctionExpression{
+				Block: &semantic.FunctionBlock{
+					Parameters: &semantic.FunctionParameters{
+						List: []*semantic.FunctionParameter{
+							{Key: &semantic.Identifier{Name: "r"}},
+						},
+					},
+					Body: &semantic.BlockStatement{
+						Body: []semantic.Statement{
+							&semantic.NativeVariableDeclaration{
+								Identifier: &semantic.Identifier{Name: "f"},
+								Init: &semantic.FunctionExpression{
+									Block: &semantic.FunctionBlock{
+										Parameters: &semantic.FunctionParameters{
+											List: []*semantic.FunctionParameter{
+												{Key: &semantic.Identifier{Name: "a"}},
+												{Key: &semantic.Identifier{Name: "b"}},
+											},
+										},
+										Body: &semantic.BinaryExpression{
+											Operator: ast.AdditionOperator,
+											Left:     &semantic.IdentifierExpression{Name: "a"},
+											Right:    &semantic.IdentifierExpression{Name: "b"},
+										},
+									},
+								},
+							},
+							&semantic.ReturnStatement{
+								Argument: &semantic.CallExpression{
+									Callee: &semantic.IdentifierExpression{Name: "f"},
+									Arguments: &semantic.ObjectExpression{
+										Properties: []*semantic.Property{
+											{Key: &semantic.Identifier{Name: "a"}, Value: &semantic.IntegerLiteral{Value: 1}},
+											{Key: &semantic.Identifier{Name: "b"}, Value: &semantic.IdentifierExpression{Name: "r"}},
+										},
 									},
 								},
 							},
@@ -231,13 +294,73 @@ func TestCompileAndEval(t *testing.T) {
 					},
 				},
 			},
-			types: map[string]semantic.Type{
+			inType: semantic.NewObjectType(map[string]semantic.Type{
 				"r": semantic.Int,
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"r": values.NewInt(4),
+			}),
+			want:    values.NewInt(5),
+			wantErr: false,
+		},
+		{
+			name: "call function via identifier with different types",
+			// f = (r) => {i = (x) => x return i(x:i)(x:r+1)}
+			fn: &semantic.FunctionExpression{
+				Block: &semantic.FunctionBlock{
+					Parameters: &semantic.FunctionParameters{
+						List: []*semantic.FunctionParameter{
+							{Key: &semantic.Identifier{Name: "r"}},
+						},
+					},
+					Body: &semantic.BlockStatement{
+						Body: []semantic.Statement{
+							&semantic.NativeVariableDeclaration{
+								Identifier: &semantic.Identifier{Name: "i"},
+								Init: &semantic.FunctionExpression{
+									Block: &semantic.FunctionBlock{
+										Parameters: &semantic.FunctionParameters{
+											List: []*semantic.FunctionParameter{{Key: &semantic.Identifier{Name: "x"}}},
+										},
+										Body: &semantic.IdentifierExpression{Name: "x"},
+									},
+								},
+							},
+							&semantic.ReturnStatement{
+								Argument: &semantic.CallExpression{
+									Callee: &semantic.CallExpression{
+										Callee: &semantic.IdentifierExpression{Name: "i"},
+										Arguments: &semantic.ObjectExpression{
+											Properties: []*semantic.Property{
+												{Key: &semantic.Identifier{Name: "x"}, Value: &semantic.IdentifierExpression{Name: "i"}},
+											},
+										},
+									},
+									Arguments: &semantic.ObjectExpression{
+										Properties: []*semantic.Property{
+											{
+												Key: &semantic.Identifier{Name: "x"},
+												Value: &semantic.BinaryExpression{
+													Operator: ast.AdditionOperator,
+													Left:     &semantic.IdentifierExpression{Name: "r"},
+													Right:    &semantic.IntegerLiteral{Value: 1},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 			},
-			scope: map[string]values.Value{
-				"r": values.NewIntValue(4),
-			},
-			want:    values.NewIntValue(5),
+			inType: semantic.NewObjectType(map[string]semantic.Type{
+				"r": semantic.Int,
+			}),
+			input: values.NewObjectWithValues(map[string]values.Value{
+				"r": values.NewInt(4),
+			}),
+			want:    values.NewInt(5),
 			wantErr: false,
 		},
 	}
@@ -245,12 +368,12 @@ func TestCompileAndEval(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := compiler.Compile(tc.fn, tc.types, nil, nil)
+			f, err := compiler.Compile(tc.fn, tc.inType, nil)
 			if tc.wantErr != (err != nil) {
 				t.Fatalf("unexpected error %s", err)
 			}
 
-			got, err := f.Eval(tc.scope)
+			got, err := f.Eval(tc.input)
 			if tc.wantErr != (err != nil) {
 				t.Errorf("unexpected error %s", err)
 			}

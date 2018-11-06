@@ -9,10 +9,11 @@ import (
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/interpreter"
 	"github.com/influxdata/flux/semantic"
+	"github.com/influxdata/flux/values"
 )
 
 type functionType interface {
-	Params() map[string]semantic.Type
+	Signature() semantic.FunctionPolySignature
 }
 
 // FunctionSuggestion provides suggestion information about a function.
@@ -22,41 +23,40 @@ type FunctionSuggestion struct {
 
 // Completer provides methods for suggestions in Flux queries.
 type Completer struct {
-	scope        *interpreter.Scope
-	declarations semantic.DeclarationScope
+	scope *interpreter.Scope
 }
 
-// NewCompleter creates a new completer from scope and declarations.
-func NewCompleter(scope *interpreter.Scope, declarations semantic.DeclarationScope) Completer {
-	return Completer{scope: scope, declarations: declarations}
+// NewCompleter creates a new completer from scope.
+func NewCompleter(scope *interpreter.Scope) Completer {
+	return Completer{scope: scope}
 }
 
-// Names returns the slice of names of declared expressions.
+// Names returns the slice of names in scope.
 func (c Completer) Names() []string {
 	names := c.scope.Names()
 	sort.Strings(names)
 	return names
 }
 
-// Declaration returns a declaration based on the expression name, if one exists.
-func (c Completer) Declaration(name string) (semantic.VariableDeclaration, error) {
-	d, ok := c.declarations[name]
+// Value returns a value based on the expression name, if one exists.
+func (c Completer) Value(name string) (values.Value, error) {
+	v, ok := c.scope.Lookup(name)
 	if !ok {
-		return nil, errors.New("could not find declaration")
+		return nil, errors.New("could not find value")
 	}
 
-	return d, nil
+	return v, nil
 }
 
-// FunctionNames returns the names of all function declarations.
+// FunctionNames returns the names of all function.
 func (c Completer) FunctionNames() []string {
 	funcs := []string{}
 
-	for name, d := range c.declarations {
-		if isFunction(d) {
+	c.scope.Range(func(name string, v values.Value) {
+		if isFunction(v) {
 			funcs = append(funcs, name)
 		}
-	}
+	})
 
 	sort.Strings(funcs)
 
@@ -67,26 +67,26 @@ func (c Completer) FunctionNames() []string {
 func (c Completer) FunctionSuggestion(name string) (FunctionSuggestion, error) {
 	var s FunctionSuggestion
 
-	d, err := c.Declaration(name)
+	v, err := c.Value(name)
 	if err != nil {
 		return s, err
 	}
 
-	if !isFunction(d) {
+	if !isFunction(v) {
 		return s, fmt.Errorf("name ( %s ) is not a function", name)
 	}
 
-	funcType, ok := d.InitType().(functionType)
+	funcType, ok := v.PolyType().(functionType)
 	if !ok {
 		return s, errors.New("could not cast function type")
 	}
 
-	fParams := funcType.Params()
+	sig := funcType.Signature()
 
-	params := make(map[string]string, len(fParams))
+	params := make(map[string]string, len(sig.Parameters))
 
-	for k, v := range fParams {
-		params[k] = v.Kind().String()
+	for k, v := range sig.Parameters {
+		params[k] = v.Nature().String()
 	}
 
 	s = FunctionSuggestion{
@@ -96,13 +96,13 @@ func (c Completer) FunctionSuggestion(name string) (FunctionSuggestion, error) {
 	return s, nil
 }
 
-// DefaultCompleter creates a completer with builtin scope and declarations.
+// DefaultCompleter creates a completer with builtin scope
 func DefaultCompleter() Completer {
-	scope, declarations := flux.BuiltIns()
+	scope := flux.BuiltIns()
 	interpScope := interpreter.NewScopeWithValues(scope)
-	return NewCompleter(interpScope, declarations)
+	return NewCompleter(interpScope)
 }
 
-func isFunction(d semantic.VariableDeclaration) bool {
-	return d.InitType().Kind() == semantic.Function
+func isFunction(v values.Value) bool {
+	return v.PolyType().Nature() == semantic.Function
 }

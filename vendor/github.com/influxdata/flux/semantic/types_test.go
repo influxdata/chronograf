@@ -6,6 +6,12 @@ import (
 	"github.com/influxdata/flux/semantic"
 )
 
+func MustType(e semantic.Expression) semantic.Type {
+	ts, _ := semantic.InferTypes(e)
+	typ, _ := ts.TypeOf(e)
+	return typ
+}
+
 func TestTypes_Comparable(t *testing.T) {
 	testCases := []struct {
 		name string
@@ -26,57 +32,57 @@ func TestTypes_Comparable(t *testing.T) {
 		},
 		{
 			name: "equal array",
-			a: (&semantic.ArrayExpression{
+			a: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{
 					&semantic.IntegerLiteral{Value: 1},
 				},
-			}).Type(),
-			b: (&semantic.ArrayExpression{
+			}),
+			b: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{
 					&semantic.IntegerLiteral{Value: 2},
 				},
-			}).Type(),
+			}),
 			want: true,
 		},
 		{
 			name: "not equal arrays",
-			a: (&semantic.ArrayExpression{
+			a: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{
 					&semantic.IntegerLiteral{Value: 1},
 				},
-			}).Type(),
-			b: (&semantic.ArrayExpression{
+			}),
+			b: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{
 					&semantic.BooleanLiteral{Value: true},
 				},
-			}).Type(),
+			}),
 			want: false,
 		},
 		{
 			name: "not equal arrays primitive",
-			a: (&semantic.ArrayExpression{
+			a: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{
 					&semantic.IntegerLiteral{Value: 1},
 				},
-			}).Type(),
+			}),
 			b:    semantic.Int,
 			want: false,
 		},
 		{
 			name: "not equal empty array primitive",
-			a:    (&semantic.ArrayExpression{}).Type(),
+			a:    MustType(&semantic.ArrayExpression{}),
 			b:    semantic.Nil,
 			want: false,
 		},
 		{
 			name: "equal empty arrays",
-			a:    (&semantic.ArrayExpression{}).Type(),
-			b:    (&semantic.ArrayExpression{}).Type(),
+			a:    MustType(&semantic.ArrayExpression{}),
+			b:    MustType(&semantic.ArrayExpression{}),
 			want: true,
 		},
 		{
 			name: "equal arrays of arrays",
-			a: (&semantic.ArrayExpression{
+			a: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{
 					&semantic.ArrayExpression{
 						Elements: []semantic.Expression{
@@ -84,8 +90,8 @@ func TestTypes_Comparable(t *testing.T) {
 						},
 					},
 				},
-			}).Type(),
-			b: (&semantic.ArrayExpression{
+			}),
+			b: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{
 					&semantic.ArrayExpression{
 						Elements: []semantic.Expression{
@@ -93,28 +99,28 @@ func TestTypes_Comparable(t *testing.T) {
 						},
 					},
 				},
-			}).Type(),
+			}),
 			want: true,
 		},
 		{
 			name: "equal objects",
-			a: (&semantic.ObjectExpression{
+			a: MustType(&semantic.ObjectExpression{
 				Properties: []*semantic.Property{
 					{Key: &semantic.Identifier{Name: "x"}, Value: &semantic.IntegerLiteral{Value: 1}},
 					{Key: &semantic.Identifier{Name: "y"}, Value: &semantic.FloatLiteral{Value: 1}},
 				},
-			}).Type(),
-			b: (&semantic.ObjectExpression{
+			}),
+			b: MustType(&semantic.ObjectExpression{
 				Properties: []*semantic.Property{
 					{Key: &semantic.Identifier{Name: "x"}, Value: &semantic.IntegerLiteral{Value: -1}},
 					{Key: &semantic.Identifier{Name: "y"}, Value: &semantic.FloatLiteral{Value: -1}},
 				},
-			}).Type(),
+			}),
 			want: true,
 		},
 		{
 			name: "equal objects of objects",
-			a: (&semantic.ObjectExpression{
+			a: MustType(&semantic.ObjectExpression{
 				Properties: []*semantic.Property{
 					{
 						Key: &semantic.Identifier{Name: "x"},
@@ -135,8 +141,8 @@ func TestTypes_Comparable(t *testing.T) {
 						},
 					},
 				},
-			}).Type(),
-			b: (&semantic.ObjectExpression{
+			}),
+			b: MustType(&semantic.ObjectExpression{
 				Properties: []*semantic.Property{
 					{
 						Key: &semantic.Identifier{Name: "x"},
@@ -157,47 +163,47 @@ func TestTypes_Comparable(t *testing.T) {
 						},
 					},
 				},
-			}).Type(),
+			}),
 			want: true,
 		},
 		{
 			name: "equal array of objects",
-			a: (&semantic.ArrayExpression{
+			a: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{&semantic.ObjectExpression{
 					Properties: []*semantic.Property{
 						{Key: &semantic.Identifier{Name: "x"}, Value: &semantic.IntegerLiteral{Value: 1}},
 						{Key: &semantic.Identifier{Name: "y"}, Value: &semantic.FloatLiteral{Value: 1}},
 					},
 				}},
-			}).Type(),
-			b: (&semantic.ArrayExpression{
+			}),
+			b: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{&semantic.ObjectExpression{
 					Properties: []*semantic.Property{
 						{Key: &semantic.Identifier{Name: "x"}, Value: &semantic.IntegerLiteral{Value: 2}},
 						{Key: &semantic.Identifier{Name: "y"}, Value: &semantic.FloatLiteral{Value: 2}},
 					},
 				}},
-			}).Type(),
+			}),
 			want: true,
 		},
 		{
 			name: "not equal array of objects",
-			a: (&semantic.ArrayExpression{
+			a: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{&semantic.ObjectExpression{
 					Properties: []*semantic.Property{
 						{Key: &semantic.Identifier{Name: "x"}, Value: &semantic.IntegerLiteral{Value: 1}},
 						{Key: &semantic.Identifier{Name: "y"}, Value: &semantic.FloatLiteral{Value: 1}},
 					},
 				}},
-			}).Type(),
-			b: (&semantic.ArrayExpression{
+			}),
+			b: MustType(&semantic.ArrayExpression{
 				Elements: []semantic.Expression{&semantic.ObjectExpression{
 					Properties: []*semantic.Property{
 						{Key: &semantic.Identifier{Name: "w"}, Value: &semantic.IntegerLiteral{Value: 2}},
 						{Key: &semantic.Identifier{Name: "x"}, Value: &semantic.FloatLiteral{Value: 2}},
 					},
 				}},
-			}).Type(),
+			}),
 			want: false,
 		},
 	}

@@ -198,7 +198,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "regex match operators",
-			raw:  `"a" =~ /.*/ and "b" !~ /c/`,
+			raw:  `"a" =~ /.*/ and "b" !~ /c$/`,
 			want: &ast.Program{
 				Body: []ast.Statement{
 					&ast.ExpressionStatement{
@@ -212,7 +212,7 @@ func TestParse(t *testing.T) {
 							Right: &ast.BinaryExpression{
 								Operator: ast.NotRegexpMatchOperator,
 								Left:     &ast.StringLiteral{Value: "b"},
-								Right:    &ast.RegexpLiteral{Value: regexp.MustCompile("c")},
+								Right:    &ast.RegexpLiteral{Value: regexp.MustCompile("c$")},
 							},
 						},
 					},

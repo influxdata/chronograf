@@ -10,7 +10,6 @@ import (
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/mock"
 	"github.com/influxdata/flux/plan"
-	"github.com/influxdata/platform"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
@@ -33,18 +32,14 @@ func TestController_CompileQuery_Failure(t *testing.T) {
 	}
 
 	ctrl := New(Config{})
-	req := &flux.Request{
-		OrganizationID: platform.ID("a"),
-		Compiler:       compiler,
-	}
 
 	// Run the query. It should return an error.
-	if _, err := ctrl.Query(context.Background(), req); err == nil {
+	if _, err := ctrl.Query(context.Background(), compiler); err == nil {
 		t.Fatal("expected error")
 	}
 
 	// Verify the metrics say there are no queries.
-	gauge, err := ctrl.metrics.all.GetMetricWithLabelValues(req.OrganizationID.String())
+	gauge, err := ctrl.metrics.all.GetMetricWithLabelValues()
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
@@ -71,13 +66,9 @@ func TestController_EnqueueQuery_Failure(t *testing.T) {
 	}
 
 	ctrl := New(Config{})
-	req := &flux.Request{
-		OrganizationID: platform.ID("a"),
-		Compiler:       compiler,
-	}
 
 	// Run the query. It should return an error.
-	if _, err := ctrl.Query(context.Background(), req); err == nil {
+	if _, err := ctrl.Query(context.Background(), compiler); err == nil {
 		t.Fatal("expected error")
 	}
 
@@ -86,7 +77,7 @@ func TestController_EnqueueQuery_Failure(t *testing.T) {
 		"all":      ctrl.metrics.all,
 		"queueing": ctrl.metrics.queueing,
 	} {
-		gauge, err := gaugeVec.GetMetricWithLabelValues(req.OrganizationID.String())
+		gauge, err := gaugeVec.GetMetricWithLabelValues()
 		if err != nil {
 			t.Fatalf("unexpected error: %s", err)
 		}
@@ -104,19 +95,15 @@ func TestController_EnqueueQuery_Failure(t *testing.T) {
 
 func TestController_ExecuteQuery_Failure(t *testing.T) {
 	executor := mock.NewExecutor()
-	executor.ExecuteFn = func(context.Context, platform.ID, *plan.PlanSpec, *execute.Allocator) (map[string]flux.Result, error) {
+	executor.ExecuteFn = func(context.Context, *plan.PlanSpec, *execute.Allocator) (map[string]flux.Result, error) {
 		return nil, errors.New("expected")
 	}
 
 	ctrl := New(Config{})
 	ctrl.executor = executor
-	req := &flux.Request{
-		OrganizationID: platform.ID("a"),
-		Compiler:       mockCompiler,
-	}
 
 	// Run a query and then wait for it to be ready.
-	q, err := ctrl.Query(context.Background(), req)
+	q, err := ctrl.Query(context.Background(), mockCompiler)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
@@ -134,7 +121,7 @@ func TestController_ExecuteQuery_Failure(t *testing.T) {
 	q.Done()
 
 	// Verify the metrics say there are no queries.
-	gauge, err := ctrl.metrics.all.GetMetricWithLabelValues(req.OrganizationID.String())
+	gauge, err := ctrl.metrics.all.GetMetricWithLabelValues()
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
@@ -151,20 +138,16 @@ func TestController_ExecuteQuery_Failure(t *testing.T) {
 
 func TestController_CancelQuery(t *testing.T) {
 	executor := mock.NewExecutor()
-	executor.ExecuteFn = func(context.Context, platform.ID, *plan.PlanSpec, *execute.Allocator) (map[string]flux.Result, error) {
+	executor.ExecuteFn = func(context.Context, *plan.PlanSpec, *execute.Allocator) (map[string]flux.Result, error) {
 		// Return an empty result.
 		return map[string]flux.Result{}, nil
 	}
 
 	ctrl := New(Config{})
 	ctrl.executor = executor
-	req := &flux.Request{
-		OrganizationID: platform.ID("a"),
-		Compiler:       mockCompiler,
-	}
 
 	// Run a query and then wait for it to be ready.
-	q, err := ctrl.Query(context.Background(), req)
+	q, err := ctrl.Query(context.Background(), mockCompiler)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
@@ -179,7 +162,7 @@ func TestController_CancelQuery(t *testing.T) {
 	q.Done()
 
 	// Verify the metrics say there are no queries.
-	gauge, err := ctrl.metrics.all.GetMetricWithLabelValues(req.OrganizationID.String())
+	gauge, err := ctrl.metrics.all.GetMetricWithLabelValues()
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
@@ -198,20 +181,16 @@ func TestController_BlockedExecutor(t *testing.T) {
 	done := make(chan struct{})
 
 	executor := mock.NewExecutor()
-	executor.ExecuteFn = func(context.Context, platform.ID, *plan.PlanSpec, *execute.Allocator) (map[string]flux.Result, error) {
+	executor.ExecuteFn = func(context.Context, *plan.PlanSpec, *execute.Allocator) (map[string]flux.Result, error) {
 		<-done
 		return nil, nil
 	}
 
 	ctrl := New(Config{})
 	ctrl.executor = executor
-	req := &flux.Request{
-		OrganizationID: platform.ID("a"),
-		Compiler:       mockCompiler,
-	}
 
 	// Run a query that will cause the controller to stall.
-	q, err := ctrl.Query(context.Background(), req)
+	q, err := ctrl.Query(context.Background(), mockCompiler)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
@@ -234,7 +213,7 @@ func TestController_BlockedExecutor(t *testing.T) {
 		}
 	}()
 
-	if _, err := ctrl.Query(ctx, req); err == nil {
+	if _, err := ctrl.Query(ctx, mockCompiler); err == nil {
 		t.Fatal("expected error")
 	} else if got, want := err, context.Canceled; got != want {
 		t.Fatalf("unexpected error: got=%q want=%q", got, want)

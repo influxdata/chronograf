@@ -2,9 +2,9 @@ package options
 
 import (
 	"github.com/influxdata/flux"
-	"github.com/influxdata/flux/functions"
+	"github.com/influxdata/flux/functions/transformations"
 )
 
 func init() {
-	flux.RegisterBuiltInOption("now", functions.SystemTime())
+	flux.RegisterBuiltInOption("now", transformations.SystemTime())
 }

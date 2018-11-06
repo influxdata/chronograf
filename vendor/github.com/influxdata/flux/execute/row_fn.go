@@ -12,9 +12,8 @@ import (
 )
 
 type rowFn struct {
-	fn               *semantic.FunctionExpression
 	compilationCache *compiler.CompilationCache
-	scope            compiler.Scope
+	inRecord         values.Object
 
 	preparedFn compiler.Func
 
@@ -26,14 +25,14 @@ type rowFn struct {
 }
 
 func newRowFn(fn *semantic.FunctionExpression) (rowFn, error) {
-	if len(fn.Params) != 1 {
-		return rowFn{}, fmt.Errorf("function should only have a single parameter, got %d", len(fn.Params))
+	if fn.Block.Parameters != nil && len(fn.Block.Parameters.List) != 1 {
+		return rowFn{}, errors.New("function should only have a single parameter")
 	}
-	scope, decls := flux.BuiltIns()
+	scope := flux.BuiltIns()
 	return rowFn{
-		compilationCache: compiler.NewCompilationCache(fn, scope, decls),
-		scope:            make(compiler.Scope, 1),
-		recordName:       fn.Params[0].Key.Name,
+		compilationCache: compiler.NewCompilationCache(fn, scope),
+		inRecord:         values.NewObject(),
+		recordName:       fn.Block.Parameters.List[0].Key.Name,
 		references:       findColReferences(fn),
 		recordCols:       make(map[string]int),
 	}, nil
@@ -58,9 +57,11 @@ func (f *rowFn) prepare(cols []flux.ColMeta) error {
 	}
 	f.record = NewRecord(semantic.NewObjectType(propertyTypes))
 	// Compile fn for given types
-	fn, err := f.compilationCache.Compile(map[string]semantic.Type{
-		f.recordName: f.record.Type(),
-	})
+	fn, err := f.compilationCache.Compile(
+		semantic.NewObjectType(map[string]semantic.Type{
+			f.recordName: f.record.Type(),
+		}),
+	)
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func (f *rowFn) prepare(cols []flux.ColMeta) error {
 	return nil
 }
 
-func ConvertToKind(t flux.DataType) semantic.Kind {
+func ConvertToKind(t flux.ColType) semantic.Nature {
 	// TODO make this an array lookup.
 	switch t {
 	case flux.TInvalid:
@@ -90,7 +91,7 @@ func ConvertToKind(t flux.DataType) semantic.Kind {
 	}
 }
 
-func ConvertFromKind(k semantic.Kind) flux.DataType {
+func ConvertFromKind(k semantic.Nature) flux.ColType {
 	// TODO make this an array lookup.
 	switch k {
 	case semantic.Invalid:
@@ -114,10 +115,10 @@ func ConvertFromKind(k semantic.Kind) flux.DataType {
 
 func (f *rowFn) eval(row int, cr flux.ColReader) (values.Value, error) {
 	for _, r := range f.references {
-		f.record.Set(r, ValueForRow(row, f.recordCols[r], cr))
+		f.record.Set(r, ValueForRow(cr, row, f.recordCols[r]))
 	}
-	f.scope[f.recordName] = f.record
-	return f.preparedFn.Eval(f.scope)
+	f.inRecord.Set(f.recordName, f.record)
+	return f.preparedFn.Eval(f.inRecord)
 }
 
 type RowPredicateFn struct {
@@ -175,7 +176,7 @@ func (f *RowMapFn) Prepare(cols []flux.ColMeta) error {
 	if err != nil {
 		return err
 	}
-	k := f.preparedFn.Type().Kind()
+	k := f.preparedFn.Type().Nature()
 	f.isWrap = k != semantic.Object
 	if f.isWrap {
 		f.wrapObj = NewRecord(semantic.NewObjectType(map[string]semantic.Type{
@@ -204,49 +205,9 @@ func (f *RowMapFn) Eval(row int, cr flux.ColReader) (values.Object, error) {
 	return v.Object(), nil
 }
 
-func ValueForRow(i, j int, cr flux.ColReader) values.Value {
-	t := cr.Cols()[j].Type
-	switch t {
-	case flux.TString:
-		return values.NewStringValue(cr.Strings(j)[i])
-	case flux.TInt:
-		return values.NewIntValue(cr.Ints(j)[i])
-	case flux.TUInt:
-		return values.NewUIntValue(cr.UInts(j)[i])
-	case flux.TFloat:
-		return values.NewFloatValue(cr.Floats(j)[i])
-	case flux.TBool:
-		return values.NewBoolValue(cr.Bools(j)[i])
-	case flux.TTime:
-		return values.NewTimeValue(cr.Times(j)[i])
-	default:
-		PanicUnknownType(t)
-		return nil
-	}
-}
-
-func AppendValue(builder TableBuilder, j int, v values.Value) {
-	switch k := v.Type().Kind(); k {
-	case semantic.Bool:
-		builder.AppendBool(j, v.Bool())
-	case semantic.Int:
-		builder.AppendInt(j, v.Int())
-	case semantic.UInt:
-		builder.AppendUInt(j, v.UInt())
-	case semantic.Float:
-		builder.AppendFloat(j, v.Float())
-	case semantic.String:
-		builder.AppendString(j, v.Str())
-	case semantic.Time:
-		builder.AppendTime(j, v.Time())
-	default:
-		PanicUnknownType(ConvertFromKind(k))
-	}
-}
-
 func findColReferences(fn *semantic.FunctionExpression) []string {
 	v := &colReferenceVisitor{
-		recordName: fn.Params[0].Key.Name,
+		recordName: fn.Block.Parameters.List[0].Key.Name,
 	}
 	semantic.Walk(v, fn)
 	return v.refs
@@ -266,7 +227,7 @@ func (c *colReferenceVisitor) Visit(node semantic.Node) semantic.Visitor {
 	return c
 }
 
-func (c *colReferenceVisitor) Done() {}
+func (c *colReferenceVisitor) Done(semantic.Node) {}
 
 type Record struct {
 	t      semantic.Type
@@ -281,6 +242,9 @@ func NewRecord(t semantic.Type) *Record {
 }
 func (r *Record) Type() semantic.Type {
 	return r.t
+}
+func (r *Record) PolyType() semantic.PolyType {
+	return r.t.PolyType()
 }
 
 func (r *Record) Str() string {

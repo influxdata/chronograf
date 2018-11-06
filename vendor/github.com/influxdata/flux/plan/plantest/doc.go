@@ -1,2 +1,2 @@
-// Package plantest contains utilities for testing the query planning phase.
+// Package plantest contains utilities for testing each query planning phase
 package plantest

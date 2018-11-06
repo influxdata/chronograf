@@ -33,6 +33,7 @@ func ProcessTestHelper(
 			} else if wantErr == nil {
 				t.Fatalf("expected no error, got %s", err.Error())
 			}
+			return
 		} else if wantErr != nil {
 			t.Fatalf("expected error %s, got none", wantErr.Error())
 		}

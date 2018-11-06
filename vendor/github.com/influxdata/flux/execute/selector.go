@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
+	"github.com/influxdata/flux/values"
 )
 
 type selectorTransformation struct {
@@ -15,6 +17,7 @@ type selectorTransformation struct {
 }
 
 type SelectorConfig struct {
+	plan.DefaultCost
 	Column string `json:"column"`
 }
 
@@ -27,15 +30,14 @@ func (c *SelectorConfig) ReadArgs(args flux.Arguments) error {
 	return nil
 }
 
-func DefaultSelectorSignature() semantic.FunctionSignature {
-	return semantic.FunctionSignature{
-		Params: map[string]semantic.Type{
-			flux.TableParameter: flux.TableObjectType,
-			"column":            semantic.String,
-		},
-		ReturnType:   flux.TableObjectType,
-		PipeArgument: flux.TableParameter,
+// SelectorSignature returns a function signature common to all selector functions,
+// with any additional arguments.
+func SelectorSignature(args map[string]semantic.PolyType, required []string) semantic.FunctionPolySignature {
+	if args == nil {
+		args = make(map[string]semantic.PolyType)
 	}
+	args["column"] = semantic.String
+	return flux.FunctionSignature(args, required)
 }
 
 type rowSelectorTransformation struct {
@@ -97,11 +99,13 @@ func (t *selectorTransformation) Finish(id DatasetID, err error) {
 }
 
 func (t *selectorTransformation) setupBuilder(tbl flux.Table) (TableBuilder, int, error) {
-	builder, new := t.cache.TableBuilder(tbl.Key())
-	if !new {
+	builder, created := t.cache.TableBuilder(tbl.Key())
+	if !created {
 		return nil, 0, fmt.Errorf("found duplicate table with key: %v", tbl.Key())
 	}
-	AddTableCols(tbl, builder)
+	if err := AddTableCols(tbl, builder); err != nil {
+		return nil, 0, err
+	}
 
 	cols := builder.Cols()
 	valueIdx := ColIdx(t.config.Column, cols)
@@ -138,23 +142,22 @@ func (t *indexSelectorTransformation) Process(id DatasetID, tbl flux.Table) erro
 		switch valueCol.Type {
 		case flux.TBool:
 			selected := s.(DoBoolIndexSelector).DoBool(cr.Bools(valueIdx))
-			t.appendSelected(selected, builder, cr)
+			return t.appendSelected(selected, builder, cr)
 		case flux.TInt:
 			selected := s.(DoIntIndexSelector).DoInt(cr.Ints(valueIdx))
-			t.appendSelected(selected, builder, cr)
+			return t.appendSelected(selected, builder, cr)
 		case flux.TUInt:
 			selected := s.(DoUIntIndexSelector).DoUInt(cr.UInts(valueIdx))
-			t.appendSelected(selected, builder, cr)
+			return t.appendSelected(selected, builder, cr)
 		case flux.TFloat:
 			selected := s.(DoFloatIndexSelector).DoFloat(cr.Floats(valueIdx))
-			t.appendSelected(selected, builder, cr)
+			return t.appendSelected(selected, builder, cr)
 		case flux.TString:
 			selected := s.(DoStringIndexSelector).DoString(cr.Strings(valueIdx))
-			t.appendSelected(selected, builder, cr)
+			return t.appendSelected(selected, builder, cr)
 		default:
 			return fmt.Errorf("unsupported selector type %v", valueCol.Type)
 		}
-		return nil
 	})
 }
 
@@ -189,7 +192,7 @@ func (t *rowSelectorTransformation) Process(id DatasetID, tbl flux.Table) error 
 		return fmt.Errorf("invalid use of function: %T has no implementation for type %v", t.selector, valueCol.Type)
 	}
 
-	tbl.Do(func(cr flux.ColReader) error {
+	if err := tbl.Do(func(cr flux.ColReader) error {
 		switch valueCol.Type {
 		case flux.TBool:
 			rower.(DoBoolRowSelector).DoBool(cr.Bools(valueIdx), cr)
@@ -205,62 +208,39 @@ func (t *rowSelectorTransformation) Process(id DatasetID, tbl flux.Table) error 
 			return fmt.Errorf("unsupported selector type %v", valueCol.Type)
 		}
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
 	rows := rower.Rows()
-	t.appendRows(builder, rows)
+	return t.appendRows(builder, rows)
+}
+
+func (t *indexSelectorTransformation) appendSelected(selected []int, builder TableBuilder, cr flux.ColReader) error {
+	if len(selected) == 0 {
+		return nil
+	}
+	cols := builder.Cols()
+	for j := range cols {
+		for _, i := range selected {
+			if err := builder.AppendValue(j, ValueForRow(cr, i, j)); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
-func (t *indexSelectorTransformation) appendSelected(selected []int, builder TableBuilder, cr flux.ColReader) {
-	if len(selected) == 0 {
-		return
-	}
+func (t *rowSelectorTransformation) appendRows(builder TableBuilder, rows []Row) error {
 	cols := builder.Cols()
-	for j, c := range cols {
-		for _, i := range selected {
-			switch c.Type {
-			case flux.TBool:
-				builder.AppendBool(j, cr.Bools(j)[i])
-			case flux.TInt:
-				builder.AppendInt(j, cr.Ints(j)[i])
-			case flux.TUInt:
-				builder.AppendUInt(j, cr.UInts(j)[i])
-			case flux.TFloat:
-				builder.AppendFloat(j, cr.Floats(j)[i])
-			case flux.TString:
-				builder.AppendString(j, cr.Strings(j)[i])
-			case flux.TTime:
-				builder.AppendTime(j, cr.Times(j)[i])
-			default:
-				PanicUnknownType(c.Type)
-			}
-		}
-	}
-}
-
-func (t *rowSelectorTransformation) appendRows(builder TableBuilder, rows []Row) {
-	cols := builder.Cols()
-	for j, c := range cols {
+	for j := range cols {
 		for _, row := range rows {
-			v := row.Values[j]
-			switch c.Type {
-			case flux.TBool:
-				builder.AppendBool(j, v.(bool))
-			case flux.TInt:
-				builder.AppendInt(j, v.(int64))
-			case flux.TUInt:
-				builder.AppendUInt(j, v.(uint64))
-			case flux.TFloat:
-				builder.AppendFloat(j, v.(float64))
-			case flux.TString:
-				builder.AppendString(j, v.(string))
-			case flux.TTime:
-				builder.AppendTime(j, v.(Time))
-			default:
-				PanicUnknownType(c.Type)
+			v := values.New(row.Values[j])
+			if err := builder.AppendValue(j, v); err != nil {
+				return err
 			}
 		}
 	}
+	return nil
 }
 
 type IndexSelector interface {

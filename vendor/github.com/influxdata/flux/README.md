@@ -1,5 +1,7 @@
 # Flux - Influx data language
 
+[![CircleCI](https://circleci.com/gh/influxdata/flux/tree/master.svg?style=svg)](https://circleci.com/gh/influxdata/flux/tree/master)
+
 `fluxd` is an HTTP server for running **Flux** queries to one or more InfluxDB
 servers.
 
@@ -97,7 +99,7 @@ All queries begin with the function `from`. It is a source function that does no
 from(bucket: "telegraf/autogen") |> range(start: -5m)
 ```
 
-Function parameters are all keyword arguments. There are no positional arguments. The `from` function takes a single parameter: `db`. This specifies the InfluxDB database it should read from. At the moment, it is not possible to read from anything other than the default retention policy for a database. The `from` function will organize the data so that each series is its own table. That means that all transformations will happen _per series_ unless this is changed by using `group` or `window` (explained below). If you are familiar with InfluxDB 1.x, this is the opposite of InfluxQL's default behavior. InfluxQL would automatically group all series into the same table.
+Function parameters are all keyword arguments. There are no positional arguments. The `from` function takes a single parameter: `bucket`. This specifies the InfluxDB bucket that data should be read from. The `from` function will organize the data so that each series is its own table. That means that all transformations will happen _per series_ unless this is changed by using `group` or `window` (explained below). If you are familiar with InfluxDB 1.x, this is the opposite of InfluxQL's default behavior. InfluxQL would automatically group all series into the same table.
 
 Functions are separated by the `|>` operator. This operator will take the stream of tables from one function and it will send it as input to another function that takes a stream of tables as the input. In this case, the `from` function outputs a stream of tables and sends that output to the `range` function which filters out any rows from each table that are not within the specified time range. The `range` function takes two parameters: `start` and `stop`. The default `stop` time is the current time and a duration, like `-5m`, can be used to specify a relative time from the current time. That means the above query is asking for all data within the last 5 minutes.
 
@@ -183,7 +185,7 @@ It is also possible to perform math and rename the columns by using the `map` fu
 ```
 from(bucket: "telegraf/autogen") |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "cpu" and r._field == "usage_user")
-    |> map(fn: (r) => {_value: r._value / 100})
+    |> map(fn: (r) => ({_value: r._value / 100}))
 ```
 
 The function passed into map must return an object. An object is a key/value structure. By default, the `map` function will merge any columns within the grouping key into the new row so you do not have to specify all of the existing columns that you do not want to modify. If you do not want to automtaically merge those columns, you can use `mergeKey: false` as a parameter to `map`.
@@ -195,7 +197,7 @@ The function passed into map must return an object. An object is a key/value str
 A user can define their own function which can then be reused. To do this, we use the function syntax and assign it to a variable.
 
 ```
-add = (table=<-, n) => map(table: table, fn: (r) => {_value: r._value + n})
+add = (table=<-, n) => map(table: table, fn: (r) => ({_value: r._value + n}))
 from(bucket: "telegraf/autogen") |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "cpu" and r._field == "usage_user")
     |> add(n: 5)
@@ -204,7 +206,7 @@ from(bucket: "telegraf/autogen") |> range(start: -5m)
 When defining a function, default arguments can be specified by using an equals sign. In addition, a table processing function can be specified by including one parameter that takes `<-` as an input. The typical parameter name for these is `table`, but it can be any name since the pipe operator does not use a specific name. In the above example, we build a new function around the existing `map` function by passing the table to the `map` function as a parameter instead of with the pipe. If you wanted to use the pipe operator instead, the following is also valid:
 
 ```
-add = (table=<-, n) => table |> map(fn: (r) => {_value: r._value + n})
+add = (table=<-, n) => table |> map(fn: (r) => ({_value: r._value + n}))
 from(bucket: "telegraf/autogen") |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "cpu" and r._field == "usage_user")
     |> add(n: 5)

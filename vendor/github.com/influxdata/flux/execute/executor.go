@@ -9,14 +9,13 @@ import (
 
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/plan"
-	"github.com/influxdata/platform"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 type Executor interface {
-	Execute(ctx context.Context, orgID platform.ID, p *plan.PlanSpec, a *Allocator) (map[string]flux.Result, error)
+	Execute(ctx context.Context, p *plan.PlanSpec, a *Allocator) (map[string]flux.Result, error)
 }
 
 type executor struct {
@@ -39,12 +38,6 @@ type streamContext struct {
 	bounds *Bounds
 }
 
-func newStreamContext(b *Bounds) streamContext {
-	return streamContext{
-		bounds: b,
-	}
-}
-
 func (ctx streamContext) Bounds() *Bounds {
 	return ctx.bounds
 }
@@ -52,8 +45,6 @@ func (ctx streamContext) Bounds() *Bounds {
 type executionState struct {
 	p    *plan.PlanSpec
 	deps Dependencies
-
-	orgID platform.ID
 
 	alloc *Allocator
 
@@ -68,8 +59,8 @@ type executionState struct {
 	logger     *zap.Logger
 }
 
-func (e *executor) Execute(ctx context.Context, orgID platform.ID, p *plan.PlanSpec, a *Allocator) (map[string]flux.Result, error) {
-	es, err := e.createExecutionState(ctx, orgID, p, a)
+func (e *executor) Execute(ctx context.Context, p *plan.PlanSpec, a *Allocator) (map[string]flux.Result, error) {
+	es, err := e.createExecutionState(ctx, p, a)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize execute state")
 	}
@@ -85,33 +76,32 @@ func validatePlan(p *plan.PlanSpec) error {
 	return nil
 }
 
-func (e *executor) createExecutionState(ctx context.Context, orgID platform.ID, p *plan.PlanSpec, a *Allocator) (*executionState, error) {
+func (e *executor) createExecutionState(ctx context.Context, p *plan.PlanSpec, a *Allocator) (*executionState, error) {
 	if err := validatePlan(p); err != nil {
 		return nil, errors.Wrap(err, "invalid plan")
 	}
 	// Set allocation limit
 	a.Limit = p.Resources.MemoryBytesQuota
 	es := &executionState{
-		orgID:     orgID,
 		p:         p,
 		deps:      e.deps,
 		alloc:     a,
 		resources: p.Resources,
-		results:   make(map[string]flux.Result, len(p.Results)),
+		results:   make(map[string]flux.Result),
 		// TODO(nathanielc): Have the planner specify the dispatcher throughput
 		dispatcher: newPoolDispatcher(10, e.logger),
 	}
-	nodes := make(map[plan.ProcedureID]Node, len(p.Procedures))
-	for name, yield := range p.Results {
-		ds, err := es.createNode(ctx, p.Procedures[yield.ID], nodes)
-		if err != nil {
-			return nil, err
-		}
-		r := newResult(name, yield)
-		ds.AddTransformation(r)
-		es.results[name] = r
+	v := &createExecutionNodeVisitor{
+		ctx:   ctx,
+		es:    es,
+		nodes: make(map[plan.PlanNode]Node),
 	}
-	return es, nil
+
+	if err := p.BottomUpWalk(v.Visit); err != nil {
+		return nil, err
+	}
+
+	return v.es, nil
 }
 
 // DefaultTriggerSpec defines the triggering that should be used for datasets
@@ -122,76 +112,119 @@ type triggeringSpec interface {
 	TriggerSpec() flux.TriggerSpec
 }
 
-func (es *executionState) createNode(ctx context.Context, pr *plan.Procedure, nodes map[plan.ProcedureID]Node) (Node, error) {
-	// Check if we already created this node
-	if n, ok := nodes[pr.ID]; ok {
-		return n, nil
+// createExecutionNodeVisitor visits each node in a physical query plan
+// and creates a node responsible for executing that physical operation.
+type createExecutionNodeVisitor struct {
+	ctx   context.Context
+	es    *executionState
+	nodes map[plan.PlanNode]Node
+}
+
+func skipYields(pn plan.PlanNode) plan.PlanNode {
+	isYield := func(pn plan.PlanNode) bool {
+		_, ok := pn.ProcedureSpec().(plan.YieldProcedureSpec)
+		return ok
+	}
+
+	for isYield(pn) {
+		pn = pn.Predecessors()[0]
+	}
+
+	return pn
+}
+
+func nonYieldPredecessors(pn plan.PlanNode) []plan.PlanNode {
+	nodes := make([]plan.PlanNode, len(pn.Predecessors()))
+	for i, pred := range pn.Predecessors() {
+		nodes[i] = skipYields(pred)
+	}
+
+	return nodes
+}
+
+// Visit creates the node that will execute a particular plan node
+func (v *createExecutionNodeVisitor) Visit(node plan.PlanNode) error {
+	spec := node.ProcedureSpec()
+	kind := spec.Kind()
+	id := DatasetIDFromNodeID(node.ID())
+
+	if yieldSpec, ok := spec.(plan.YieldProcedureSpec); ok {
+		r := newResult(yieldSpec.YieldName())
+		v.es.results[yieldSpec.YieldName()] = r
+		v.nodes[skipYields(node)].AddTransformation(r)
+		return nil
 	}
 
 	// Add explicit stream context if bounds are set on this node
 	var streamContext streamContext
-	if pr.Bounds != nil {
+	if node.Bounds() != nil {
 		streamContext.bounds = &Bounds{
-			Start: pr.Bounds.Start,
-			Stop:  pr.Bounds.Stop,
+			Start: node.Bounds().Start,
+			Stop:  node.Bounds().Stop,
 		}
 	}
 
 	// Build execution context
 	ec := executionContext{
-		es:            es,
+		ctx:           v.ctx,
+		es:            v.es,
+		parents:       make([]DatasetID, len(node.Predecessors())),
 		streamContext: streamContext,
 	}
 
-	if len(pr.Parents) > 0 {
-		ec.parents = make([]DatasetID, len(pr.Parents))
-		for i, parentID := range pr.Parents {
-			ec.parents[i] = DatasetID(parentID)
-		}
+	for i, pred := range nonYieldPredecessors(node) {
+		ec.parents[i] = DatasetIDFromNodeID(pred.ID())
 	}
 
-	// If source create source
-	if createS, ok := procedureToSource[pr.Spec.Kind()]; ok {
-		s, err := createS(pr.Spec, DatasetID(pr.ID), ec)
+	// If node is a leaf, create a source
+	if len(node.Predecessors()) == 0 {
+		createSourceFn, ok := procedureToSource[kind]
+
+		if !ok {
+			return fmt.Errorf("unsupported source kind %v", kind)
+		}
+
+		source, err := createSourceFn(spec, id, ec)
+
 		if err != nil {
-			return nil, err
+			return err
 		}
-		es.sources = append(es.sources, s)
-		nodes[pr.ID] = s
-		return s, nil
-	}
 
-	createT, ok := procedureToTransformation[pr.Spec.Kind()]
-	if !ok {
-		return nil, fmt.Errorf("unsupported procedure %v", pr.Spec.Kind())
-	}
+		v.es.sources = append(v.es.sources, source)
+		v.nodes[node] = source
+	} else {
 
-	// Create the transformation
-	t, ds, err := createT(DatasetID(pr.ID), AccumulatingMode, pr.Spec, ec)
-	if err != nil {
-		return nil, err
-	}
-	nodes[pr.ID] = ds
+		// If node is internal, create a transformation.
+		// For each predecessor, add a transport for sending data upstream.
+		createTransformationFn, ok := procedureToTransformation[kind]
 
-	// Setup triggering
-	var ts flux.TriggerSpec = DefaultTriggerSpec
-	if t, ok := pr.Spec.(triggeringSpec); ok {
-		ts = t.TriggerSpec()
-	}
-	ds.SetTriggerSpec(ts)
+		if !ok {
+			return fmt.Errorf("unsupported procedure %v", kind)
+		}
 
-	// Recurse creating parents
-	for _, parentID := range pr.Parents {
-		parent, err := es.createNode(ctx, es.p.Procedures[parentID], nodes)
+		tr, ds, err := createTransformationFn(id, AccumulatingMode, spec, ec)
+
 		if err != nil {
-			return nil, err
+			return err
 		}
-		transport := newConescutiveTransport(es.dispatcher, t)
-		es.transports = append(es.transports, transport)
-		parent.AddTransformation(transport)
+
+		// Setup triggering
+		var ts flux.TriggerSpec = DefaultTriggerSpec
+		if t, ok := spec.(triggeringSpec); ok {
+			ts = t.TriggerSpec()
+		}
+		ds.SetTriggerSpec(ts)
+		v.nodes[node] = ds
+
+		for _, p := range nonYieldPredecessors(node) {
+			executionNode := v.nodes[p]
+			transport := newConsecutiveTransport(v.es.dispatcher, tr)
+			v.es.transports = append(v.es.transports, transport)
+			executionNode.AddTransformation(transport)
+		}
 	}
 
-	return ds, nil
+	return nil
 }
 
 func (es *executionState) abort(err error) {
@@ -248,18 +281,18 @@ func (es *executionState) do(ctx context.Context) {
 
 // Need a unique stream context per execution context
 type executionContext struct {
+	ctx           context.Context
 	es            *executionState
 	parents       []DatasetID
 	streamContext streamContext
 }
 
-// Satisfy the ExecutionContext interface
-func (ec executionContext) OrganizationID() platform.ID {
-	return ec.es.orgID
-}
-
 func resolveTime(qt flux.Time, now time.Time) Time {
 	return Time(qt.Time(now).UnixNano())
+}
+
+func (ec executionContext) Context() context.Context {
+	return ec.ctx
 }
 
 func (ec executionContext) ResolveTime(qt flux.Time) Time {
@@ -276,9 +309,6 @@ func (ec executionContext) Allocator() *Allocator {
 
 func (ec executionContext) Parents() []DatasetID {
 	return ec.parents
-}
-func (ec executionContext) ConvertID(id plan.ProcedureID) DatasetID {
-	return DatasetID(id)
 }
 
 func (ec executionContext) Dependencies() Dependencies {

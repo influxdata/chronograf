@@ -1,0 +1,13 @@
+#datatype,string,long,string
+#group,false,false,false
+#default,_result,,
+,result,table,_value
+,,0,_field
+,,0,_measurement
+,,0,host
+,,0,name
+,,0,cpu
+,,0,device
+,,0,fstype
+,,0,path
+

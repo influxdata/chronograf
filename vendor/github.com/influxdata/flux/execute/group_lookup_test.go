@@ -18,25 +18,25 @@ var (
 	key0 = execute.NewGroupKey(
 		cols,
 		[]values.Value{
-			values.NewStringValue("I"),
-			values.NewStringValue("J"),
-			values.NewStringValue("K"),
+			values.NewString("I"),
+			values.NewString("J"),
+			values.NewString("K"),
 		},
 	)
 	key1 = execute.NewGroupKey(
 		cols,
 		[]values.Value{
-			values.NewStringValue("L"),
-			values.NewStringValue("M"),
-			values.NewStringValue("N"),
+			values.NewString("L"),
+			values.NewString("M"),
+			values.NewString("N"),
 		},
 	)
 	key2 = execute.NewGroupKey(
 		cols,
 		[]values.Value{
-			values.NewStringValue("X"),
-			values.NewStringValue("Y"),
-			values.NewStringValue("Z"),
+			values.NewString("X"),
+			values.NewString("Y"),
+			values.NewString("Z"),
 		},
 	)
 )

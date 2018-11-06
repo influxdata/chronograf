@@ -16,10 +16,12 @@ func RowSelectorFuncTestHelper(t *testing.T, selector execute.RowSelector, data 
 	if valueIdx < 0 {
 		t.Fatal("no _value column found")
 	}
-	data.Do(func(cr flux.ColReader) error {
+	if err := data.Do(func(cr flux.ColReader) error {
 		s.DoFloat(cr.Floats(valueIdx), cr)
 		return nil
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 
 	got := s.Rows()
 
@@ -41,10 +43,12 @@ func RowSelectorFuncBenchmarkHelper(b *testing.B, selector execute.RowSelector, 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		s := selector.NewFloatSelector()
-		data.Do(func(cr flux.ColReader) error {
+		if err := data.Do(func(cr flux.ColReader) error {
 			s.DoFloat(cr.Floats(valueIdx), cr)
 			return nil
-		})
+		}); err != nil {
+			b.Fatal(err)
+		}
 		rows = s.Rows()
 	}
 }
@@ -58,7 +62,7 @@ func IndexSelectorFuncTestHelper(t *testing.T, selector execute.IndexSelector, d
 	if valueIdx < 0 {
 		t.Fatal("no _value column found")
 	}
-	data.Do(func(cr flux.ColReader) error {
+	if err := data.Do(func(cr flux.ColReader) error {
 		var cpy []int
 		selected := s.DoFloat(cr.Floats(valueIdx))
 		if len(selected) > 0 {
@@ -67,7 +71,9 @@ func IndexSelectorFuncTestHelper(t *testing.T, selector execute.IndexSelector, d
 		}
 		got = append(got, cpy)
 		return nil
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 
 	if !cmp.Equal(want, got) {
 		t.Errorf("unexpected value -want/+got\n%s", cmp.Diff(want, got))
@@ -86,9 +92,11 @@ func IndexSelectorFuncBenchmarkHelper(b *testing.B, selector execute.IndexSelect
 	var got [][]int
 	for n := 0; n < b.N; n++ {
 		s := selector.NewFloatSelector()
-		data.Do(func(cr flux.ColReader) error {
+		if err := data.Do(func(cr flux.ColReader) error {
 			got = append(got, s.DoFloat(cr.Floats(valueIdx)))
 			return nil
-		})
+		}); err != nil {
+			b.Fatal(err)
+		}
 	}
 }

@@ -72,14 +72,13 @@ type ResultDecoderConfig struct {
 }
 
 func (d *ResultDecoder) Decode(r io.Reader) (flux.Result, error) {
-	return newResultDecoder(r, d.c, nil)
+	return newResultDecoder(newCSVReader(r), d.c, nil)
 }
 
 // MultiResultDecoder reads multiple results from a single csv file.
 // Results are delimited by an empty line.
 type MultiResultDecoder struct {
 	c ResultDecoderConfig
-	r io.ReadCloser
 }
 
 // NewMultiResultDecoder creates a new MultiResultDecoder.
@@ -94,8 +93,9 @@ func NewMultiResultDecoder(c ResultDecoderConfig) *MultiResultDecoder {
 
 func (d *MultiResultDecoder) Decode(r io.ReadCloser) (flux.ResultIterator, error) {
 	return &resultIterator{
-		c: d.c,
-		r: r,
+		c:  d.c,
+		r:  r,
+		cr: newCSVReader(r),
 	}, nil
 }
 
@@ -103,6 +103,7 @@ func (d *MultiResultDecoder) Decode(r io.ReadCloser) (flux.ResultIterator, error
 type resultIterator struct {
 	c    ResultDecoderConfig
 	r    io.ReadCloser
+	cr   *csv.Reader
 	next *resultDecoder
 	err  error
 
@@ -115,7 +116,7 @@ func (r *resultIterator) More() bool {
 		if r.next != nil {
 			extraMeta = r.next.extraMeta
 		}
-		r.next, r.err = newResultDecoder(r.r, r.c, extraMeta)
+		r.next, r.err = newResultDecoder(r.cr, r.c, extraMeta)
 		if r.err == nil {
 			return true
 		}
@@ -151,7 +152,6 @@ func (r *resultIterator) Err() error {
 
 type resultDecoder struct {
 	id string
-	r  io.Reader
 	c  ResultDecoderConfig
 
 	cr *csv.Reader
@@ -161,11 +161,10 @@ type resultDecoder struct {
 	eof bool
 }
 
-func newResultDecoder(r io.Reader, c ResultDecoderConfig, extraMeta *tableMetadata) (*resultDecoder, error) {
+func newResultDecoder(cr *csv.Reader, c ResultDecoderConfig, extraMeta *tableMetadata) (*resultDecoder, error) {
 	d := &resultDecoder{
-		r:         r,
 		c:         c,
-		cr:        newCSVReader(r),
+		cr:        cr,
 		extraMeta: extraMeta,
 	}
 	// We need to know the result ID before we return
@@ -239,6 +238,7 @@ func (r *resultDecoder) Do(f func(flux.Table) error) error {
 		if err := f(b); err != nil {
 			return err
 		}
+		<-b.done
 		// track whether we hit the EOF
 		r.eof = b.eof
 		// track any extra line that was read
@@ -339,6 +339,21 @@ func readMetadata(r *csv.Reader, c ResultDecoderConfig, extraLine []string) (tab
 		if n != len(line) {
 			return tableMetadata{}, errors.Wrap(csv.ErrFieldCount, "failed to read header row")
 		}
+
+		if len(line) > 1 && line[1] == "error" {
+			// Read the first row and return the error.
+			line, err := r.Read()
+			if err != nil || n != len(line) {
+				if err == io.EOF {
+					err = io.ErrUnexpectedEOF
+				} else if err == nil && n != len(line) {
+					err = csv.ErrFieldCount
+				}
+				return tableMetadata{}, errors.Wrap(err, "failed to read error value")
+			}
+			return tableMetadata{}, errors.New(line[1])
+		}
+
 		labels = line[recordStartIdx:]
 	}
 
@@ -387,20 +402,16 @@ type tableDecoder struct {
 	r *csv.Reader
 	c ResultDecoderConfig
 
-	defaults []interface{}
-
 	meta tableMetadata
 
 	initialized bool
 	id          string
-	key         flux.GroupKey
-	cols        []colMeta
 
 	builder *execute.ColListTableBuilder
 
 	empty bool
 
-	more bool
+	done chan struct{}
 
 	eof       bool
 	extraLine []string
@@ -418,9 +429,12 @@ func newTable(
 		meta: meta,
 		// assume its empty until we append a record
 		empty: true,
+		done:  make(chan struct{}),
 	}
-	var err error
-	b.more, err = b.advance(extraLine)
+	more, err := b.advance(extraLine)
+	if !more {
+		close(b.done)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -438,8 +452,16 @@ func (d *tableDecoder) Do(f func(flux.ColReader) error) (err error) {
 	}
 	d.builder.ClearData()
 
-	for d.more {
-		d.more, err = d.advance(nil)
+	select {
+	case <-d.done:
+		return nil
+	default:
+	}
+
+	more := true
+	defer close(d.done)
+	for more {
+		more, err = d.advance(nil)
 		if err != nil {
 			return
 		}
@@ -549,7 +571,10 @@ func (d *tableDecoder) init(line []string) error {
 	key := execute.NewGroupKey(keyCols, keyValues)
 	d.builder = execute.NewColListTableBuilder(key, newUnlimitedAllocator())
 	for _, c := range d.meta.Cols {
-		d.builder.AddCol(c.ColMeta)
+		_, err := d.builder.AddCol(c.ColMeta)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -559,27 +584,9 @@ func (d *tableDecoder) appendRecord(record []string) error {
 	d.empty = false
 	for j, c := range d.meta.Cols {
 		if record[j] == "" && d.meta.Defaults[j] != nil {
-			switch c.Type {
-			case flux.TBool:
-				v := d.meta.Defaults[j].Bool()
-				d.builder.AppendBool(j, v)
-			case flux.TInt:
-				v := d.meta.Defaults[j].Int()
-				d.builder.AppendInt(j, v)
-			case flux.TUInt:
-				v := d.meta.Defaults[j].UInt()
-				d.builder.AppendUInt(j, v)
-			case flux.TFloat:
-				v := d.meta.Defaults[j].Float()
-				d.builder.AppendFloat(j, v)
-			case flux.TString:
-				v := d.meta.Defaults[j].Str()
-				d.builder.AppendString(j, v)
-			case flux.TTime:
-				v := d.meta.Defaults[j].Time()
-				d.builder.AppendTime(j, v)
-			default:
-				return fmt.Errorf("unsupported column type %v", c.Type)
+			v := d.meta.Defaults[j]
+			if err := d.builder.AppendValue(j, v); err != nil {
+				return err
 			}
 			continue
 		}
@@ -812,9 +819,19 @@ func (e *ResultEncoder) EncodeError(w io.Writer, err error) error {
 		writer.Write(nil)
 	}
 
-	writer.Write([]string{"error", "reference"})
+	for _, anno := range e.c.Annotations {
+		switch anno {
+		case datatypeAnnotation:
+			writer.Write([]string{commentPrefix + datatypeAnnotation, "string", "string"})
+		case groupAnnotation:
+			writer.Write([]string{commentPrefix + groupAnnotation, "true", "true"})
+		case defaultAnnotation:
+			writer.Write([]string{commentPrefix + defaultAnnotation, "", ""})
+		}
+	}
+	writer.Write([]string{"", "error", "reference"})
 	// TODO: Add referenced code
-	writer.Write([]string{err.Error(), ""})
+	writer.Write([]string{"", err.Error(), ""})
 	writer.Flush()
 	return writer.Error()
 }
@@ -943,33 +960,33 @@ func decodeValue(value string, c colMeta) (values.Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		val = values.NewBoolValue(v)
+		val = values.NewBool(v)
 	case flux.TInt:
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		val = values.NewIntValue(v)
+		val = values.NewInt(v)
 	case flux.TUInt:
 		v, err := strconv.ParseUint(value, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		val = values.NewUIntValue(v)
+		val = values.NewUInt(v)
 	case flux.TFloat:
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			return nil, err
 		}
-		val = values.NewFloatValue(v)
+		val = values.NewFloat(v)
 	case flux.TString:
-		val = values.NewStringValue(value)
+		val = values.NewString(value)
 	case flux.TTime:
 		v, err := decodeTime(value, c.fmt)
 		if err != nil {
 			return nil, err
 		}
-		val = values.NewTimeValue(v)
+		val = values.NewTime(v)
 	default:
 		return nil, fmt.Errorf("unsupported type %v", c.Type)
 	}
@@ -983,37 +1000,36 @@ func decodeValueInto(j int, c colMeta, value string, builder execute.TableBuilde
 		if err != nil {
 			return err
 		}
-		builder.AppendBool(j, v)
+		return builder.AppendBool(j, v)
 	case flux.TInt:
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			return err
 		}
-		builder.AppendInt(j, v)
+		return builder.AppendInt(j, v)
 	case flux.TUInt:
 		v, err := strconv.ParseUint(value, 10, 64)
 		if err != nil {
 			return err
 		}
-		builder.AppendUInt(j, v)
+		return builder.AppendUInt(j, v)
 	case flux.TFloat:
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			return err
 		}
-		builder.AppendFloat(j, v)
+		return builder.AppendFloat(j, v)
 	case flux.TString:
-		builder.AppendString(j, value)
+		return builder.AppendString(j, value)
 	case flux.TTime:
 		t, err := decodeTime(value, c.fmt)
 		if err != nil {
 			return err
 		}
-		builder.AppendTime(j, t)
+		return builder.AppendTime(j, t)
 	default:
 		return fmt.Errorf("unsupported type %v", c.Type)
 	}
-	return nil
 }
 
 func encodeValue(value values.Value, c colMeta) (string, error) {
@@ -1072,8 +1088,8 @@ func copyLine(line []string) []string {
 	return cpy
 }
 
-// decodeType returns the execute.DataType and any additional format description.
-func decodeType(datatype string) (t flux.DataType, desc string, err error) {
+// decodeType returns the flux.ColType and any additional format description.
+func decodeType(datatype string) (t flux.ColType, desc string, err error) {
 	split := strings.SplitN(datatype, ":", 2)
 	if len(split) > 1 {
 		desc = split[1]

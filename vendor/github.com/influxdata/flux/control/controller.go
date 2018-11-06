@@ -25,17 +25,18 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"runtime/debug"
 	"sync"
 	"time"
 
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
-	"github.com/influxdata/platform"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Controller provides a central location to manage all incoming queries.
@@ -48,12 +49,13 @@ type Controller struct {
 	queryDone     chan *Query
 	cancelRequest chan QueryID
 
-	metrics *controllerMetrics
+	metrics   *controllerMetrics
+	labelKeys []string
 
 	verbose bool
 
 	lplanner plan.LogicalPlanner
-	pplanner plan.Planner
+	pplanner plan.PhysicalPlanner
 	executor execute.Executor
 	logger   *zap.Logger
 
@@ -66,9 +68,14 @@ type Config struct {
 	ConcurrencyQuota     int
 	MemoryBytesQuota     int64
 	ExecutorDependencies execute.Dependencies
-	PlannerOptions       []plan.Option
+	PPlannerOptions      []plan.PhysicalOption
+	LPlannerOptions      []plan.LogicalOption
 	Logger               *zap.Logger
 	Verbose              bool
+	// MetricLabelKeys is a list of labels to add to the metrics produced by the controller.
+	// The value for a given key will be read off the context.
+	// The context value must be a string or an implementation of the Stringer interface.
+	MetricLabelKeys []string
 }
 
 type QueryID uint64
@@ -86,12 +93,13 @@ func New(c Config) *Controller {
 		maxConcurrency:       c.ConcurrencyQuota,
 		availableConcurrency: c.ConcurrencyQuota,
 		availableMemory:      c.MemoryBytesQuota,
-		lplanner:             plan.NewLogicalPlanner(),
-		pplanner:             plan.NewPlanner(c.PlannerOptions...),
+		lplanner:             plan.NewLogicalPlanner(c.LPlannerOptions...),
+		pplanner:             plan.NewPhysicalPlanner(c.PPlannerOptions...),
 		executor:             execute.NewExecutor(c.ExecutorDependencies, logger),
 		logger:               logger,
-		metrics:              newControllerMetrics(),
 		verbose:              c.Verbose,
+		metrics:              newControllerMetrics(c.MetricLabelKeys),
+		labelKeys:            c.MetricLabelKeys,
 	}
 	go ctrl.run()
 	return ctrl
@@ -99,9 +107,9 @@ func New(c Config) *Controller {
 
 // Query submits a query for execution returning immediately.
 // Done must be called on any returned Query objects.
-func (c *Controller) Query(ctx context.Context, req *flux.Request) (flux.Query, error) {
-	q := c.createQuery(ctx, req.OrganizationID)
-	if err := c.compileQuery(q, req.Compiler); err != nil {
+func (c *Controller) Query(ctx context.Context, compiler flux.Compiler) (flux.Query, error) {
+	q := c.createQuery(ctx, compiler.CompilerType())
+	if err := c.compileQuery(q, compiler); err != nil {
 		q.parentSpan.Finish()
 		return nil, err
 	}
@@ -112,11 +120,28 @@ func (c *Controller) Query(ctx context.Context, req *flux.Request) (flux.Query, 
 	return q, nil
 }
 
-func (c *Controller) createQuery(ctx context.Context, orgID platform.ID) *Query {
+type Stringer interface {
+	String() string
+}
+
+func (c *Controller) createQuery(ctx context.Context, ct flux.CompilerType) *Query {
 	id := c.nextID()
-	labelValues := []string{
-		orgID.String(),
+	labelValues := make([]string, len(c.labelKeys))
+	compileLabelValues := make([]string, len(c.labelKeys)+1)
+	for i, k := range c.labelKeys {
+		value := ctx.Value(k)
+		var str string
+		switch v := value.(type) {
+		case string:
+			str = v
+		case Stringer:
+			str = v.String()
+		}
+		labelValues[i] = str
+		compileLabelValues[i] = str
 	}
+	compileLabelValues[len(compileLabelValues)-1] = string(ct)
+
 	cctx, cancel := context.WithCancel(ctx)
 	parentSpan, parentCtx := StartSpanFromContext(
 		cctx,
@@ -126,16 +151,16 @@ func (c *Controller) createQuery(ctx context.Context, orgID platform.ID) *Query 
 	)
 	ready := make(chan map[string]flux.Result, 1)
 	return &Query{
-		id:          id,
-		orgID:       orgID,
-		labelValues: labelValues,
-		state:       Created,
-		c:           c,
-		now:         time.Now().UTC(),
-		ready:       ready,
-		parentCtx:   parentCtx,
-		parentSpan:  parentSpan,
-		cancel:      cancel,
+		id:                 id,
+		labelValues:        labelValues,
+		compileLabelValues: compileLabelValues,
+		state:              Created,
+		c:                  c,
+		now:                time.Now().UTC(),
+		ready:              ready,
+		parentCtx:          parentCtx,
+		parentSpan:         parentSpan,
+		cancel:             cancel,
 	}
 }
 
@@ -255,6 +280,10 @@ func (c *Controller) processQuery(q *Query) (pop bool, err error) {
 			default:
 				err = fmt.Errorf("panic: %s", e)
 			}
+			if entry := c.logger.Check(zapcore.InfoLevel, "Controller panic"); entry != nil {
+				entry.Stack = string(debug.Stack())
+				entry.Write(zap.Error(err))
+			}
 		}
 	}()
 
@@ -268,7 +297,7 @@ func (c *Controller) processQuery(q *Query) (pop bool, err error) {
 			log.Println("logical plan", plan.Formatted(lp))
 		}
 
-		p, err := c.pplanner.Plan(lp, nil)
+		p, err := c.pplanner.Plan(lp)
 		if err != nil {
 			return true, errors.Wrap(err, "failed to create physical plan")
 		}
@@ -296,7 +325,8 @@ func (c *Controller) processQuery(q *Query) (pop bool, err error) {
 			return true, errors.New("failed to transition query into executing state")
 		}
 		q.alloc = new(execute.Allocator)
-		r, err := c.executor.Execute(q.executeCtx, q.orgID, q.plan, q.alloc)
+		// TODO: pass the plan to the executor here
+		r, err := c.executor.Execute(q.executeCtx, q.plan, q.alloc)
 		if err != nil {
 			return true, errors.Wrap(err, "failed to execute query")
 		}
@@ -338,9 +368,8 @@ func (c *Controller) PrometheusCollectors() []prometheus.Collector {
 type Query struct {
 	id QueryID
 
-	orgID platform.ID
-
-	labelValues []string
+	labelValues        []string
+	compileLabelValues []string
 
 	c *Controller
 
@@ -381,10 +410,6 @@ type Query struct {
 // ID reports an ephemeral unique ID for the query.
 func (q *Query) ID() QueryID {
 	return q.id
-}
-
-func (q *Query) OrganizationID() platform.ID {
-	return q.orgID
 }
 
 func (q *Query) Spec() *flux.Spec {
@@ -549,8 +574,8 @@ func (q *Query) tryCompile() bool {
 		q.compileSpan, q.compilingCtx = StartSpanFromContext(
 			q.parentCtx,
 			"compiling",
-			q.c.metrics.compilingDur.WithLabelValues(q.labelValues...),
-			q.c.metrics.compiling.WithLabelValues(q.labelValues...),
+			q.c.metrics.compilingDur.WithLabelValues(q.compileLabelValues...),
+			q.c.metrics.compiling.WithLabelValues(q.compileLabelValues...),
 		)
 
 		q.state = Compiling
@@ -595,6 +620,9 @@ func (q *Query) tryRequeue() bool {
 		)
 
 		q.state = Requeueing
+		return true
+	} else if q.state == Requeueing {
+		// Already in the correct state.
 		return true
 	}
 	return false

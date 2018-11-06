@@ -14,18 +14,40 @@ type Position struct {
 	Column int `json:"column"` // Column is the column in the source marked by this position
 }
 
+func (p Position) String() string {
+	return fmt.Sprintf("%d:%d", p.Line, p.Column)
+}
+
+func (p Position) Less(o Position) bool {
+	if p.Line == o.Line {
+		return p.Column < o.Column
+	}
+	return p.Line < o.Line
+}
+
 // SourceLocation represents the location of a node in the AST
 type SourceLocation struct {
 	Start  Position `json:"start"`            // Start is the location in the source the node starts
 	End    Position `json:"end"`              // End is the location in the source the node ends
-	Source *string  `json:"source,omitempty"` // Source is optional raw source
+	Source string   `json:"source,omitempty"` // Source is optional raw source
+}
+
+func (l SourceLocation) String() string {
+	return fmt.Sprintf("%v-%v", l.Start, l.End)
+}
+
+func (l SourceLocation) Less(o SourceLocation) bool {
+	if l.Start == o.Start {
+		return l.End.Less(o.End)
+	}
+	return l.Start.Less(o.Start)
 }
 
 // Node represents a node in the InfluxDB abstract syntax tree.
 type Node interface {
 	node()
 	Type() string // Type property is a string that contains the variant type of the node
-	Location() *SourceLocation
+	Location() SourceLocation
 	Copy() Node
 
 	// All node must support json marshalling
@@ -71,11 +93,16 @@ type BaseNode struct {
 }
 
 // Location is the source location of the Node
-func (b *BaseNode) Location() *SourceLocation { return b.Loc }
+func (b BaseNode) Location() SourceLocation {
+	if b.Loc == nil {
+		return SourceLocation{}
+	}
+	return *b.Loc
+}
 
 // Program represents a complete program source tree
 type Program struct {
-	*BaseNode
+	BaseNode
 	Body []Statement `json:"body"`
 }
 
@@ -108,7 +135,7 @@ func (*OptionStatement) stmt()     {}
 
 // BlockStatement is a set of statements
 type BlockStatement struct {
-	*BaseNode
+	BaseNode
 	Body []Statement `json:"body"`
 }
 
@@ -130,7 +157,7 @@ func (s *BlockStatement) Copy() Node {
 
 // ExpressionStatement may consist of an expression that does not return a value and is executed solely for its side-effects.
 type ExpressionStatement struct {
-	*BaseNode
+	BaseNode
 	Expression Expression `json:"expression"`
 }
 
@@ -151,7 +178,7 @@ func (s *ExpressionStatement) Copy() Node {
 
 // ReturnStatement defines an Expression to return
 type ReturnStatement struct {
-	*BaseNode
+	BaseNode
 	Argument Expression `json:"argument"`
 }
 
@@ -171,7 +198,7 @@ func (s *ReturnStatement) Copy() Node {
 
 // OptionStatement syntactically is a single variable declaration
 type OptionStatement struct {
-	*BaseNode
+	BaseNode
 	Declaration *VariableDeclarator `json:"declaration"`
 }
 
@@ -193,7 +220,7 @@ func (s *OptionStatement) Copy() Node {
 
 // VariableDeclaration declares one or more variables using assignment
 type VariableDeclaration struct {
-	*BaseNode
+	BaseNode
 	Declarations []*VariableDeclarator `json:"declarations"`
 }
 
@@ -219,7 +246,7 @@ func (d *VariableDeclaration) Copy() Node {
 
 // VariableDeclarator represents the declaration of a variable
 type VariableDeclarator struct {
-	*BaseNode
+	BaseNode
 	ID   *Identifier `json:"id"`
 	Init Expression  `json:"init"`
 }
@@ -268,7 +295,7 @@ func (*UnsignedIntegerLiteral) expression()  {}
 
 // CallExpression represents a function all whose callee may be an Identifier or MemberExpression
 type CallExpression struct {
-	*BaseNode
+	BaseNode
 	Callee    Expression   `json:"callee"`
 	Arguments []Expression `json:"arguments,omitempty"`
 }
@@ -296,7 +323,7 @@ func (e *CallExpression) Copy() Node {
 }
 
 type PipeExpression struct {
-	*BaseNode
+	BaseNode
 	Argument Expression      `json:"argument"`
 	Call     *CallExpression `json:"call"`
 }
@@ -319,7 +346,7 @@ func (e *PipeExpression) Copy() Node {
 
 // MemberExpression represents calling a property of a CallExpression
 type MemberExpression struct {
-	*BaseNode
+	BaseNode
 	Object   Expression `json:"object"`
 	Property Expression `json:"property"`
 }
@@ -341,7 +368,7 @@ func (e *MemberExpression) Copy() Node {
 }
 
 type ArrowFunctionExpression struct {
-	*BaseNode
+	BaseNode
 	Params []*Property `json:"params"`
 	Body   Node        `json:"body"`
 }
@@ -425,7 +452,7 @@ func (o *OperatorKind) UnmarshalText(data []byte) error {
 // BinaryExpression use binary operators act on two operands in an expression.
 // BinaryExpression includes relational and arithmatic operators
 type BinaryExpression struct {
-	*BaseNode
+	BaseNode
 	Operator OperatorKind `json:"operator"`
 	Left     Expression   `json:"left"`
 	Right    Expression   `json:"right"`
@@ -449,7 +476,7 @@ func (e *BinaryExpression) Copy() Node {
 
 // UnaryExpression use operators act on a single operand in an expression.
 type UnaryExpression struct {
-	*BaseNode
+	BaseNode
 	Operator OperatorKind `json:"operator"`
 	Argument Expression   `json:"argument"`
 }
@@ -508,7 +535,7 @@ func (o *LogicalOperatorKind) UnmarshalText(data []byte) error {
 // `or` expressions compute the disjunction of two boolean expressions and return boolean values.
 // `and`` expressions compute the conjunction of two boolean expressions and return boolean values.
 type LogicalExpression struct {
-	*BaseNode
+	BaseNode
 	Operator LogicalOperatorKind `json:"operator"`
 	Left     Expression          `json:"left"`
 	Right    Expression          `json:"right"`
@@ -532,7 +559,7 @@ func (e *LogicalExpression) Copy() Node {
 
 // ArrayExpression is used to create and directly specify the elements of an array object
 type ArrayExpression struct {
-	*BaseNode
+	BaseNode
 	Elements []Expression `json:"elements"`
 }
 
@@ -558,7 +585,7 @@ func (e *ArrayExpression) Copy() Node {
 
 // ObjectExpression allows the declaration of an anonymous object within a declaration.
 type ObjectExpression struct {
-	*BaseNode
+	BaseNode
 	Properties []*Property `json:"properties"`
 }
 
@@ -585,7 +612,7 @@ func (e *ObjectExpression) Copy() Node {
 // ConditionalExpression selects one of two expressions, `Alternate` or `Consequent`
 // depending on a third, boolean, expression, `Test`.
 type ConditionalExpression struct {
-	*BaseNode
+	BaseNode
 	Test       Expression `json:"test"`
 	Alternate  Expression `json:"alternate"`
 	Consequent Expression `json:"consequent"`
@@ -610,7 +637,7 @@ func (e *ConditionalExpression) Copy() Node {
 
 // Property is the value associated with a key
 type Property struct {
-	*BaseNode
+	BaseNode
 	Key   *Identifier `json:"key"`
 	Value Expression  `json:"value"`
 }
@@ -634,7 +661,7 @@ func (*Property) Type() string { return "Property" }
 
 // Identifier represents a name that identifies a unique Node
 type Identifier struct {
-	*BaseNode
+	BaseNode
 	Name string `json:"name"`
 }
 
@@ -650,12 +677,12 @@ func (i *Identifier) Copy() Node {
 	return ni
 }
 
-// Literal are thelexical forms for literal expressions which define
-// boolean, string, integer, number, duration, datetime and field values.
+// Literal is the lexical form for a literal expression which defines
+// boolean, string, integer, number, duration, datetime or field values.
 // Literals must be coerced explicitly.
 type Literal interface {
 	Expression
-	literal()
+	literal() //lint:ignore U1000 Yes, this function is unused, but it's here to limit the implementers of the Literal interface.
 }
 
 func (*BooleanLiteral) literal()         {}
@@ -670,7 +697,7 @@ func (*UnsignedIntegerLiteral) literal() {}
 
 // PipeLiteral represents an specialized literal value, indicating the left hand value of a pipe expression.
 type PipeLiteral struct {
-	*BaseNode
+	BaseNode
 }
 
 // Type is the abstract type
@@ -687,7 +714,7 @@ func (i *PipeLiteral) Copy() Node {
 
 // StringLiteral expressions begin and end with double quote marks.
 type StringLiteral struct {
-	*BaseNode
+	BaseNode
 	Value string `json:"value"`
 }
 
@@ -704,7 +731,7 @@ func (l *StringLiteral) Copy() Node {
 
 // BooleanLiteral represent boolean values
 type BooleanLiteral struct {
-	*BaseNode
+	BaseNode
 	Value bool `json:"value"`
 }
 
@@ -722,7 +749,7 @@ func (l *BooleanLiteral) Copy() Node {
 
 // FloatLiteral  represent floating point numbers according to the double representations defined by the IEEE-754-1985
 type FloatLiteral struct {
-	*BaseNode
+	BaseNode
 	Value float64 `json:"value"`
 }
 
@@ -740,7 +767,7 @@ func (l *FloatLiteral) Copy() Node {
 
 // IntegerLiteral represent integer numbers.
 type IntegerLiteral struct {
-	*BaseNode
+	BaseNode
 	Value int64 `json:"value"`
 }
 
@@ -758,7 +785,7 @@ func (l *IntegerLiteral) Copy() Node {
 
 // UnsignedIntegerLiteral represent integer numbers.
 type UnsignedIntegerLiteral struct {
-	*BaseNode
+	BaseNode
 	Value uint64 `json:"value"`
 }
 
@@ -776,7 +803,7 @@ func (l *UnsignedIntegerLiteral) Copy() Node {
 
 // RegexpLiteral expressions begin and end with `/` and are regular expressions with syntax accepted by RE2
 type RegexpLiteral struct {
-	*BaseNode
+	BaseNode
 	Value *regexp.Regexp `json:"value"`
 }
 
@@ -803,7 +830,7 @@ type Duration struct {
 // int64 nanosecond count with syntax of golang's time.Duration
 // TODO: this may be better as a class initialization
 type DurationLiteral struct {
-	*BaseNode
+	BaseNode
 	Values []Duration `json:"values"`
 }
 
@@ -823,7 +850,7 @@ func (l *DurationLiteral) Copy() Node {
 // the syntax of golang's RFC3339 Nanosecond variant
 // TODO: this may be better as a class initialization
 type DateTimeLiteral struct {
-	*BaseNode
+	BaseNode
 	Value time.Time `json:"value"`
 }
 

@@ -1,0 +1,2 @@
+from(bucket:"test")
+  |> last()

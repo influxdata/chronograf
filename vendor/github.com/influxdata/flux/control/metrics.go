@@ -19,13 +19,11 @@ type controllerMetrics struct {
 	executingDur  *prometheus.HistogramVec
 }
 
-func newControllerMetrics() *controllerMetrics {
+func newControllerMetrics(labels []string) *controllerMetrics {
 	const (
 		namespace = "query"
 		subsystem = "control"
 	)
-
-	labels := []string{"org"}
 
 	return &controllerMetrics{
 		all: prometheus.NewGaugeVec(prometheus.GaugeOpts{
@@ -40,7 +38,7 @@ func newControllerMetrics() *controllerMetrics {
 			Subsystem: subsystem,
 			Name:      "compiling_active",
 			Help:      "Number of queries actively compiling",
-		}, labels),
+		}, append(labels, "compiler_type")),
 
 		queueing: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
@@ -84,7 +82,7 @@ func newControllerMetrics() *controllerMetrics {
 			Name:      "compiling_duration_seconds",
 			Help:      "Histogram of times spent compiling queries",
 			Buckets:   prometheus.ExponentialBuckets(1e-3, 5, 7),
-		}, labels),
+		}, append(labels, "compiler_type")),
 
 		queueingDur: prometheus.NewHistogramVec(prometheus.HistogramOpts{
 			Namespace: namespace,

@@ -15,54 +15,31 @@ import (
 
 	prompt "github.com/c-bata/go-prompt"
 	"github.com/influxdata/flux"
-	"github.com/influxdata/flux/control"
 	"github.com/influxdata/flux/execute"
-	"github.com/influxdata/flux/functions"
 	"github.com/influxdata/flux/interpreter"
+	"github.com/influxdata/flux/lang"
 	"github.com/influxdata/flux/parser"
 	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/flux/values"
-	"github.com/influxdata/platform"
-	"github.com/pkg/errors"
 )
 
 type REPL struct {
-	orgID platform.ID
-
-	interpreter  *interpreter.Interpreter
-	declarations semantic.DeclarationScope
-	c            *control.Controller
+	interpreter *interpreter.Interpreter
+	querier     Querier
 
 	cancelMu   sync.Mutex
 	cancelFunc context.CancelFunc
 }
 
-func addBuiltIn(script string, itrp *interpreter.Interpreter, declarations semantic.DeclarationScope) error {
-	astProg, err := parser.NewAST(script)
-	if err != nil {
-		return errors.Wrap(err, "failed to parse builtin")
-	}
-	semProg, err := semantic.New(astProg, declarations)
-	if err != nil {
-		return errors.Wrap(err, "failed to create semantic graph for builtin")
-	}
-
-	if err := itrp.Eval(semProg); err != nil {
-		return errors.Wrap(err, "failed to evaluate builtin")
-	}
-	return nil
+type Querier interface {
+	Query(ctx context.Context, compiler flux.Compiler) (flux.ResultIterator, error)
 }
 
-func New(c *control.Controller, orgID platform.ID) *REPL {
+func New(q Querier) *REPL {
 	itrp := flux.NewInterpreter()
-	_, decls := flux.BuiltIns()
-	addBuiltIn("run = () => yield(table:_)", itrp, decls)
-
 	return &REPL{
-		orgID:        orgID,
-		interpreter:  itrp,
-		declarations: decls,
-		c:            c,
+		interpreter: itrp,
+		querier:     q,
 	}
 }
 
@@ -131,13 +108,13 @@ func (r *REPL) completer(d prompt.Document) []prompt.Suggest {
 }
 
 func (r *REPL) Input(t string) error {
-	_, err := r.executeLine(t, false)
+	_, err := r.executeLine(t)
 	return err
 }
 
 // input processes a line of input and prints the result.
 func (r *REPL) input(t string) {
-	v, err := r.executeLine(t, true)
+	v, err := r.executeLine(t)
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else if v != nil {
@@ -147,7 +124,7 @@ func (r *REPL) input(t string) {
 
 // executeLine processes a line of input.
 // If the input evaluates to a valid value, that value is returned.
-func (r *REPL) executeLine(t string, expectYield bool) (values.Value, error) {
+func (r *REPL) executeLine(t string) (values.Value, error) {
 	if t == "" {
 		return nil, nil
 	}
@@ -165,7 +142,7 @@ func (r *REPL) executeLine(t string, expectYield bool) (values.Value, error) {
 		return nil, err
 	}
 
-	semProg, err := semantic.New(astProg, r.declarations)
+	semProg, err := semantic.New(astProg)
 	if err != nil {
 		return nil, err
 	}
@@ -177,15 +154,11 @@ func (r *REPL) executeLine(t string, expectYield bool) (values.Value, error) {
 	v := r.interpreter.Return()
 
 	// Check for yield and execute query
-	if v.Type() == flux.TableObjectType {
+	if v.Type() == flux.TableObjectMonoType {
 		t := v.(*flux.TableObject)
-		if !expectYield || (expectYield && t.Kind == functions.YieldKind) {
-			spec := flux.ToSpec(r.interpreter, t)
-			return nil, r.doQuery(spec)
-		}
+		spec := flux.ToSpec(r.interpreter, t)
+		return nil, r.doQuery(spec)
 	}
-
-	r.interpreter.SetVar("_", v)
 
 	// Print value
 	if v.Type() != semantic.Invalid {
@@ -201,35 +174,20 @@ func (r *REPL) doQuery(spec *flux.Spec) error {
 	defer cancelFunc()
 	defer r.clearCancel()
 
-	req := &flux.Request{
-		OrganizationID: r.orgID,
-		Compiler: flux.SpecCompiler{
-			Spec: spec,
-		},
+	compiler := lang.SpecCompiler{
+		Spec: spec,
 	}
 
-	q, err := r.c.Query(ctx, req)
+	results, err := r.querier.Query(ctx, compiler)
 	if err != nil {
 		return err
 	}
-	defer q.Done()
+	defer results.Cancel()
 
-	results, ok := <-q.Ready()
-	if !ok {
-		err := q.Err()
-		return err
-	}
-
-	names := make([]string, 0, len(results))
-	for name := range results {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-
-	for _, name := range names {
-		r := results[name]
-		tables := r.Tables()
-		fmt.Println("Result:", name)
+	for results.More() {
+		result := results.Next()
+		tables := result.Tables()
+		fmt.Println("Result:", result.Name())
 		err := tables.Do(func(tbl flux.Table) error {
 			_, err := execute.NewFormatter(tbl, nil).WriteTo(os.Stdout)
 			return err
@@ -238,7 +196,7 @@ func (r *REPL) doQuery(spec *flux.Spec) error {
 			return err
 		}
 	}
-	return nil
+	return results.Err()
 }
 
 func getFluxFiles(path string) ([]string, error) {

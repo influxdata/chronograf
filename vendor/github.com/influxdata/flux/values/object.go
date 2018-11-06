@@ -1,7 +1,9 @@
 package values
 
 import (
+	"fmt"
 	"regexp"
+	"strings"
 	"sync/atomic"
 
 	"github.com/influxdata/flux/semantic"
@@ -27,6 +29,33 @@ func NewObject() *object {
 		propertyTypes: make(map[string]semantic.Type),
 	}
 }
+func NewObjectWithValues(values map[string]Value) *object {
+	propertyTypes := make(map[string]semantic.Type, len(values))
+	for k, v := range values {
+		propertyTypes[k] = v.Type()
+	}
+	return &object{
+		values:        values,
+		propertyTypes: propertyTypes,
+	}
+}
+
+func (o *object) String() string {
+	b := new(strings.Builder)
+	b.WriteString("{")
+	i := 0
+	o.Range(func(k string, v Value) {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		i++
+		b.WriteString(k)
+		b.WriteString(": ")
+		fmt.Fprint(b, v)
+	})
+	b.WriteString("}")
+	return b.String()
+}
 
 func (o *object) Type() semantic.Type {
 	t := o.typ.Load()
@@ -36,6 +65,10 @@ func (o *object) Type() semantic.Type {
 	typ := semantic.NewObjectType(o.propertyTypes)
 	o.typ.Store(typ)
 	return typ
+}
+
+func (o *object) PolyType() semantic.PolyType {
+	return o.Type().PolyType()
 }
 
 func (o *object) Set(name string, v Value) {

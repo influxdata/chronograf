@@ -2,10 +2,10 @@ package plan
 
 import "fmt"
 
-// TODO(nathanielc): Add better options for formatting plans as Graphviz dot format.
 type FormatOption func(*formatter)
 
-func Formatted(p PlanReader, opts ...FormatOption) fmt.Formatter {
+// TODO(cwolff): enhance the this output to make it more useful
+func Formatted(p *PlanSpec, opts ...FormatOption) fmt.Formatter {
 	f := formatter{
 		p: p,
 	}
@@ -15,50 +15,24 @@ func Formatted(p PlanReader, opts ...FormatOption) fmt.Formatter {
 	return f
 }
 
-func UseIDs() FormatOption {
-	return func(f *formatter) {
-		f.useIDs = true
-	}
-}
-
-type PlanReader interface {
-	Do(func(*Procedure))
-	lookup(id ProcedureID) *Procedure
-}
-
 type formatter struct {
-	p      PlanReader
-	useIDs bool
+	p *PlanSpec
 }
 
 func (f formatter) Format(fs fmt.State, c rune) {
-	if c == 'v' && fs.Flag('#') {
-		fmt.Fprintf(fs, "%#v", f.p)
-		return
-	}
-	f.format(fs)
-}
-
-func (f formatter) format(fs fmt.State) {
-	fmt.Fprint(fs, "digraph PlanSpec {\n")
-	f.p.Do(func(pr *Procedure) {
-		if f.useIDs {
-			fmt.Fprintf(fs, "%s[kind=%q];\n", pr.ID, pr.Spec.Kind())
-		} else {
-			fmt.Fprintf(fs, "%s[id=%q];\n", pr.Spec.Kind(), pr.ID)
+	fmt.Fprintf(fs, "\ndigraph {\n")
+	var edges []string
+	f.p.BottomUpWalk(func(pn PlanNode) error {
+		fmt.Fprintf(fs, "  %v\n", pn.ID())
+		for _, pred := range pn.Predecessors() {
+			edges = append(edges, fmt.Sprintf("  %v -> %v", pred.ID(), pn.ID()))
 		}
-		for _, child := range pr.Children {
-			if f.useIDs {
-				fmt.Fprintf(fs, "%s->%s;\n", pr.ID, child)
-			} else {
-				c := f.p.lookup(child)
-				if c != nil {
-					fmt.Fprintf(fs, "%s->%s;\n", pr.Spec.Kind(), c.Spec.Kind())
-				} else {
-					fmt.Fprintf(fs, "%s->%s;\n", pr.Spec.Kind(), child)
-				}
-			}
-		}
+		return nil
 	})
-	fmt.Fprintln(fs, "}")
+
+	fmt.Fprintf(fs, "\n")
+	for _, e := range edges {
+		fmt.Fprintf(fs, "%v\n", e)
+	}
+	fmt.Fprintf(fs, "}\n")
 }

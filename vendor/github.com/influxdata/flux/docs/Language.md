@@ -9,7 +9,7 @@ The Flux langauage is used to construct query specifications.
 
 # Syntax
 
-The langauage syntax is defined by the platform/query/paser/flux.peg grammar.
+The langauage syntax is defined by the [SPEC](./SPEC.md).
 
 ## Keyword Arguments
 

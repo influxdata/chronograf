@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/influxdata/flux"
-	"github.com/influxdata/flux/plan"
 )
 
 // result implements both the Transformation and Result interfaces,
@@ -24,7 +23,7 @@ type resultMessage struct {
 	err   error
 }
 
-func newResult(name string, spec plan.YieldSpec) *result {
+func newResult(name string) *result {
 	return &result{
 		name: name,
 		// TODO(nathanielc): Currently this buffer needs to be big enough hold all result tables :(
@@ -82,10 +81,6 @@ func (s *result) UpdateWatermark(id DatasetID, mark Time) error {
 func (s *result) UpdateProcessingTime(id DatasetID, t Time) error {
 	//Nothing to do
 	return nil
-}
-
-func (s *result) setTrigger(Trigger) {
-	//TODO: Change interfaces so that resultSink, does not need to implement this method.
 }
 
 func (s *result) Finish(id DatasetID, err error) {

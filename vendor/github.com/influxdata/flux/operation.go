@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/influxdata/platform"
 	"github.com/pkg/errors"
 )
 
@@ -70,12 +69,6 @@ type NewOperationSpec func() OperationSpec
 type OperationSpec interface {
 	// Kind returns the kind of the operation.
 	Kind() OperationKind
-}
-
-// BucketAwareOperationSpec specifies an operation that reads or writes buckets
-type BucketAwareOperationSpec interface {
-	OperationSpec
-	BucketsAccessed() (readBuckets, writeBuckets []platform.BucketFilter)
 }
 
 // OperationID is a unique ID within a query for the operation.

@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"bytes"
 	"regexp"
 	"strconv"
 	"strings"
@@ -29,8 +30,8 @@ func toDurationSlice(durations []*singleDurationLiteral) []ast.Duration {
 
 func program(body interface{}, text []byte, pos position) (*ast.Program, error) {
 	return &ast.Program{
-		Body:     body.([]ast.Statement),
 		BaseNode: base(text, pos),
+		Body:     body.([]ast.Statement),
 	}, nil
 }
 
@@ -60,23 +61,25 @@ func optionstmt(id, expr interface{}, text []byte, pos position) (*ast.OptionSta
 	return &ast.OptionStatement{
 		BaseNode: base(text, pos),
 		Declaration: &ast.VariableDeclarator{
-			ID:   id.(*ast.Identifier),
-			Init: expr.(ast.Expression),
+			BaseNode: base(text, pos),
+			ID:       id.(*ast.Identifier),
+			Init:     expr.(ast.Expression),
 		},
 	}, nil
 }
 
 func varstmt(declaration interface{}, text []byte, pos position) (*ast.VariableDeclaration, error) {
 	return &ast.VariableDeclaration{
-		Declarations: []*ast.VariableDeclarator{declaration.(*ast.VariableDeclarator)},
 		BaseNode:     base(text, pos),
+		Declarations: []*ast.VariableDeclarator{declaration.(*ast.VariableDeclarator)},
 	}, nil
 }
 
 func vardecl(id, initializer interface{}, text []byte, pos position) (*ast.VariableDeclarator, error) {
 	return &ast.VariableDeclarator{
-		ID:   id.(*ast.Identifier),
-		Init: initializer.(ast.Expression),
+		BaseNode: base(text, pos),
+		ID:       id.(*ast.Identifier),
+		Init:     initializer.(ast.Expression),
 	}, nil
 }
 
@@ -95,8 +98,7 @@ func returnstmt(argument interface{}, text []byte, pos position) (*ast.ReturnSta
 }
 
 func pipeExprs(head, tail interface{}, text []byte, pos position) (*ast.PipeExpression, error) {
-	var arg ast.Expression
-	arg = head.(ast.Expression)
+	var arg ast.Expression = head.(ast.Expression)
 
 	var pe *ast.PipeExpression
 	for _, t := range toIfaceSlice(tail) {
@@ -387,23 +389,33 @@ func datetime(text []byte, pos position) (*ast.DateTimeLiteral, error) {
 	}, nil
 }
 
-func base(text []byte, pos position) *ast.BaseNode {
-	return &ast.BaseNode{
+func base(text []byte, pos position) ast.BaseNode {
+	lines, idx := countLines(text)
+	col := pos.col
+	if lines > 0 {
+		col = 0
+	}
+	return ast.BaseNode{
 		Loc: &ast.SourceLocation{
 			Start: ast.Position{
 				Line:   pos.line,
 				Column: pos.col,
 			},
 			End: ast.Position{
-				Line:   pos.line,
-				Column: pos.col + len(text),
+				Line:   pos.line + lines,
+				Column: col + len(text) - idx,
 			},
-			Source: source(text),
+			Source: string(text),
 		},
 	}
 }
 
-func source(text []byte) *string {
-	str := string(text)
-	return &str
+func countLines(text []byte) (int, int) {
+	count := 0
+	idx := 0
+	for i := bytes.IndexRune(text, '\n'); i >= 0; i = bytes.IndexRune(text[idx:], '\n') {
+		count++
+		idx += i + 1
+	}
+	return count, idx
 }
