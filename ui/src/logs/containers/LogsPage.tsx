@@ -49,6 +49,7 @@ import {
   clearFilters,
   fetchOlderChunkAsync,
   fetchNewerChunkAsync,
+  fetchNamespaceSyslogStatusAsync,
   fetchTailAsync,
   flushTailBuffer,
   clearAllTimeBounds,
@@ -137,6 +138,7 @@ interface Props {
   fetchOlderChunkAsync: typeof fetchOlderChunkAsync
   fetchNewerChunkAsync: typeof fetchNewerChunkAsync
   fetchTailAsync: typeof fetchTailAsync
+  fetchNamespaceSyslogStatusAsync: typeof fetchNamespaceSyslogStatusAsync
   flushTailBuffer: typeof flushTailBuffer
   clearAllTimeBounds: typeof clearAllTimeBounds
   setNextTailLowerBound: typeof setNextTailLowerBound
@@ -204,7 +206,11 @@ class LogsPage extends Component<Props, State> {
       prevProps.searchStatus !== this.props.searchStatus
     const isPrevSearchCleared = prevProps.searchStatus === SearchStatus.Cleared
 
-    if (isSearchStatusUpdated && isPrevSearchCleared) {
+    if (
+      isSearchStatusUpdated &&
+      isPrevSearchCleared &&
+      this.isMeasurementInNamespace
+    ) {
       this.fetchNewDataset()
     }
   }
@@ -215,7 +221,9 @@ class LogsPage extends Component<Props, State> {
 
     await this.props.getConfig(this.logConfigLink)
 
-    this.updateTableData(SearchStatus.Loading)
+    if (this.isMeasurementInNamespace) {
+      this.updateTableData(SearchStatus.Loading)
+    }
 
     if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
       this.startLogsTailFetchingInterval()
@@ -307,6 +315,7 @@ class LogsPage extends Component<Props, State> {
 
   private handleLoadingStatus() {
     if (
+      this.isMeasurementInNamespace &&
       !this.isClearing &&
       !isEmptyInfiniteData(this.props.tableInfiniteData)
     ) {
@@ -322,6 +331,10 @@ class LogsPage extends Component<Props, State> {
         }) || this.props.sources[0]
 
       return await this.props.getSourceAndPopulateNamespaces(source.id)
+    } else if (this.props.currentNamespace) {
+      return this.props.fetchNamespaceSyslogStatusAsync(
+        this.props.currentNamespace
+      )
     }
   }
 
@@ -857,13 +870,23 @@ class LogsPage extends Component<Props, State> {
   private handleChooseSource = async (sourceID: string) => {
     this.updateTableData(SearchStatus.Cleared)
     await this.props.getSourceAndPopulateNamespaces(sourceID)
-    this.updateTableData(SearchStatus.UpdatingSource)
+
+    if (this.isMeasurementInNamespace) {
+      this.updateTableData(SearchStatus.UpdatingSource)
+    }
   }
 
   private handleChooseNamespace = async (namespace: Namespace) => {
     this.updateTableData(SearchStatus.Cleared)
-    await this.props.setNamespaceAsync(namespace)
-    this.updateTableData(SearchStatus.UpdatingNamespace)
+
+    await Promise.all([
+      this.props.setNamespaceAsync(namespace),
+      this.props.fetchNamespaceSyslogStatusAsync(namespace),
+    ])
+
+    if (this.isMeasurementInNamespace) {
+      this.updateTableData(SearchStatus.UpdatingNamespace)
+    }
   }
 
   private updateTableData = async (searchStatus: SearchStatus) => {
@@ -879,10 +902,6 @@ class LogsPage extends Component<Props, State> {
     }
 
     await this.handleFetchOlderChunk()
-
-    if (this.totalBackwardValues() === 0 && this.totalForwardValues() === 0) {
-      this.props.setSearchStatus(SearchStatus.NoResults)
-    }
   }
 
   private handleToggleOverlay = (): void => {
@@ -1006,6 +1025,10 @@ class LogsPage extends Component<Props, State> {
 
     return !this.props.sources || this.props.sources.length === 0
   }
+
+  private get isMeasurementInNamespace(): boolean {
+    return this.props.searchStatus !== SearchStatus.MeasurementMissing
+  }
 }
 
 const mapStateToProps = ({
@@ -1072,6 +1095,7 @@ const mapDispatchToProps = {
   fetchOlderChunkAsync,
   fetchNewerChunkAsync,
   fetchTailAsync,
+  fetchNamespaceSyslogStatusAsync,
   flushTailBuffer,
   clearAllTimeBounds,
   setNextTailLowerBound,

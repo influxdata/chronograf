@@ -50,3 +50,13 @@ export const updateLogConfig = async (
     throw error
   }
 }
+
+export const getSyslogMeasurement = async (
+  proxyLink: string,
+  namespace: Namespace
+) => {
+  const query = `SHOW MEASUREMENTS ON ${
+    namespace.database
+  } WITH measurement = "syslog"`
+  return executeQueryAsync(proxyLink, namespace, query)
+}
