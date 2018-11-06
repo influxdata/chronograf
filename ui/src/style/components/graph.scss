@@ -176,8 +176,10 @@ $graph-gutter: 16px;
 /* Move this elsewhere later */
 
 .crazy-error--message {
+  padding: 0;
+  margin: 0;
   color: $g8-storm;
   line-height: 1.25em;
-  text-align: left;
+  text-align: left !important;
   user-select: text !important;
 }
