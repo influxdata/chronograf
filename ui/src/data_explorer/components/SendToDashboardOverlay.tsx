@@ -158,10 +158,15 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     const {dashboards} = this.props
     const {newDashboardName} = this.state
 
-    const simpleArray = dashboards.map(d => ({
-      id: d.id.toString(),
-      name: d.name,
-    }))
+    const simpleArray = _.sortBy(
+      dashboards.map(d => ({
+        id: d.id.toString(),
+        name: d.name,
+      })),
+      element => {
+        return element.name.toLowerCase()
+      }
+    )
 
     const items = simpleArray.map(dashboard => {
       return (
