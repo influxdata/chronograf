@@ -5,6 +5,7 @@ import (
 
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/interpreter"
+	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
 	"github.com/pkg/errors"
 )
@@ -18,28 +19,22 @@ type aggregateTransformation struct {
 }
 
 type AggregateConfig struct {
+	plan.DefaultCost
 	Columns []string `json:"columns"`
-	TimeSrc string   `json:"timeSrc"`
-	TimeDst string   `json:"timeDst"`
 }
 
 var DefaultAggregateConfig = AggregateConfig{
 	Columns: []string{DefaultValueColLabel},
-	TimeSrc: DefaultStopColLabel,
-	TimeDst: DefaultTimeColLabel,
 }
 
-func DefaultAggregateSignature() semantic.FunctionSignature {
-	return semantic.FunctionSignature{
-		Params: map[string]semantic.Type{
-			flux.TableParameter: flux.TableObjectType,
-			"columns":           semantic.NewArrayType(semantic.String),
-			"timeSrc":           semantic.String,
-			"timeDst":           semantic.String,
-		},
-		ReturnType:   flux.TableObjectType,
-		PipeArgument: flux.TableParameter,
+// AggregateSignature returns a function signature common to all aggregate functions,
+// with any additional arguments.
+func AggregateSignature(args map[string]semantic.PolyType, required []string) semantic.FunctionPolySignature {
+	if args == nil {
+		args = make(map[string]semantic.PolyType)
 	}
+	args["columns"] = semantic.NewArrayPolyType(semantic.String)
+	return flux.FunctionSignature(args, required)
 }
 
 func (c AggregateConfig) Copy() AggregateConfig {
@@ -52,22 +47,6 @@ func (c AggregateConfig) Copy() AggregateConfig {
 }
 
 func (c *AggregateConfig) ReadArgs(args flux.Arguments) error {
-	if label, ok, err := args.GetString("timeDst"); err != nil {
-		return err
-	} else if ok {
-		c.TimeDst = label
-	} else {
-		c.TimeDst = DefaultAggregateConfig.TimeDst
-	}
-
-	if timeValue, ok, err := args.GetString("timeSrc"); err != nil {
-		return err
-	} else if ok {
-		c.TimeSrc = timeValue
-	} else {
-		c.TimeSrc = DefaultAggregateConfig.TimeSrc
-	}
-
 	if cols, ok, err := args.GetArray("columns", semantic.String); err != nil {
 		return err
 	} else if ok {
@@ -103,21 +82,18 @@ func (t *aggregateTransformation) RetractTable(id DatasetID, key flux.GroupKey) 
 }
 
 func (t *aggregateTransformation) Process(id DatasetID, tbl flux.Table) error {
-	builder, new := t.cache.TableBuilder(tbl.Key())
-	if !new {
+	builder, created := t.cache.TableBuilder(tbl.Key())
+	if !created {
 		return fmt.Errorf("aggregate found duplicate table with key: %v", tbl.Key())
 	}
 
-	AddTableKeyCols(tbl.Key(), builder)
-	builder.AddCol(flux.ColMeta{
-		Label: t.config.TimeDst,
-		Type:  flux.TTime,
-	})
+	if err := AddTableKeyCols(tbl.Key(), builder); err != nil {
+		return err
+	}
 
 	builderColMap := make([]int, len(t.config.Columns))
 	tableColMap := make([]int, len(t.config.Columns))
 	aggregates := make([]ValueFunc, len(t.config.Columns))
-
 	cols := tbl.Cols()
 	for j, label := range t.config.Columns {
 		idx := -1
@@ -151,17 +127,19 @@ func (t *aggregateTransformation) Process(id DatasetID, tbl flux.Table) error {
 			return fmt.Errorf("unsupported aggregate column type %v", c.Type)
 		}
 		aggregates[j] = vf
-		builderColMap[j] = builder.AddCol(flux.ColMeta{
+
+		var err error
+		builderColMap[j], err = builder.AddCol(flux.ColMeta{
 			Label: c.Label,
 			Type:  vf.Type(),
 		})
+		if err != nil {
+			return err
+		}
 		tableColMap[j] = idx
 	}
-	if err := AppendAggregateTime(t.config.TimeSrc, t.config.TimeDst, tbl.Key(), builder); err != nil {
-		return err
-	}
 
-	tbl.Do(func(cr flux.ColReader) error {
+	if err := tbl.Do(func(cr flux.ColReader) error {
 		for j := range t.config.Columns {
 			vf := aggregates[j]
 
@@ -184,27 +162,37 @@ func (t *aggregateTransformation) Process(id DatasetID, tbl flux.Table) error {
 			}
 		}
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
 	for j, vf := range aggregates {
 		bj := builderColMap[j]
 		// Append aggregated value
 		switch vf.Type() {
 		case flux.TBool:
-			builder.AppendBool(bj, vf.(BoolValueFunc).ValueBool())
+			if err := builder.AppendBool(bj, vf.(BoolValueFunc).ValueBool()); err != nil {
+				return err
+			}
 		case flux.TInt:
-			builder.AppendInt(bj, vf.(IntValueFunc).ValueInt())
+			if err := builder.AppendInt(bj, vf.(IntValueFunc).ValueInt()); err != nil {
+				return err
+			}
 		case flux.TUInt:
-			builder.AppendUInt(bj, vf.(UIntValueFunc).ValueUInt())
+			if err := builder.AppendUInt(bj, vf.(UIntValueFunc).ValueUInt()); err != nil {
+				return err
+			}
 		case flux.TFloat:
-			builder.AppendFloat(bj, vf.(FloatValueFunc).ValueFloat())
+			if err := builder.AppendFloat(bj, vf.(FloatValueFunc).ValueFloat()); err != nil {
+				return err
+			}
 		case flux.TString:
-			builder.AppendString(bj, vf.(StringValueFunc).ValueString())
+			if err := builder.AppendString(bj, vf.(StringValueFunc).ValueString()); err != nil {
+				return err
+			}
 		}
 	}
 
-	AppendKeyValues(tbl.Key(), builder)
-
-	return nil
+	return AppendKeyValues(tbl.Key(), builder)
 }
 
 func (t *aggregateTransformation) UpdateWatermark(id DatasetID, mark Time) error {
@@ -217,29 +205,6 @@ func (t *aggregateTransformation) Finish(id DatasetID, err error) {
 	t.d.Finish(err)
 }
 
-func AppendAggregateTime(srcTime, dstTime string, key flux.GroupKey, builder TableBuilder) error {
-	srcTimeIdx := ColIdx(srcTime, key.Cols())
-	if srcTimeIdx < 0 {
-		return fmt.Errorf("timeSrc column %q does not exist", srcTime)
-	}
-	srcTimeCol := key.Cols()[srcTimeIdx]
-	if srcTimeCol.Type != flux.TTime {
-		return fmt.Errorf("timeSrc column %q does not have type time", srcTime)
-	}
-
-	dstTimeIdx := ColIdx(dstTime, builder.Cols())
-	if dstTimeIdx < 0 {
-		return fmt.Errorf("timeDst column %q does not exist", dstTime)
-	}
-	dstTimeCol := builder.Cols()[dstTimeIdx]
-	if dstTimeCol.Type != flux.TTime {
-		return fmt.Errorf("timeDst column %q does not have type time", dstTime)
-	}
-
-	builder.AppendTime(dstTimeIdx, key.ValueTime(srcTimeIdx))
-	return nil
-}
-
 type Aggregate interface {
 	NewBoolAgg() DoBoolAgg
 	NewIntAgg() DoIntAgg
@@ -249,7 +214,7 @@ type Aggregate interface {
 }
 
 type ValueFunc interface {
-	Type() flux.DataType
+	Type() flux.ColType
 }
 type DoBoolAgg interface {
 	ValueFunc

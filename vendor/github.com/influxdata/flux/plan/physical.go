@@ -3,443 +3,198 @@ package plan
 import (
 	"fmt"
 	"math"
-	"time"
-
-	"github.com/influxdata/flux/values"
-
-	"github.com/influxdata/flux"
-	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
-// DefaultYieldName is the yield name to use in cases where no explicit yield name was specified.
-const DefaultYieldName = "_result"
-
-var (
-	MinTime = values.ConvertTime(flux.MinTime.Absolute)
-	MaxTime = values.ConvertTime(flux.MaxTime.Absolute)
-)
-
-type PlanSpec struct {
-	// Now represents the relative current time of the plan.
-	Now time.Time
-	// Procedures is a set of all operations
-	Procedures map[ProcedureID]*Procedure
-	Order      []ProcedureID
-
-	// Results is a list of datasets that are the result of the plan
-	Results   map[string]YieldSpec
-	Resources flux.ResourceManagement
+// PhysicalPlanner performs transforms a logical plan to a physical plan,
+// by applying any registered physical rules.
+type PhysicalPlanner interface {
+	Plan(lplan *PlanSpec) (*PlanSpec, error)
 }
 
-// YieldSpec defines how data should be yielded.
-type YieldSpec struct {
-	ID ProcedureID
-}
-
-func (p *PlanSpec) Do(f func(pr *Procedure)) {
-	for _, id := range p.Order {
-		f(p.Procedures[id])
-	}
-}
-func (p *PlanSpec) lookup(id ProcedureID) *Procedure {
-	return p.Procedures[id]
-}
-
-type Planner interface {
-	// Plan create a plan from the logical plan and available storage.
-	Plan(p *LogicalPlanSpec, s Storage) (*PlanSpec, error)
-}
-
-type PlanRewriter interface {
-	IsolatePath(parent, child *Procedure) (*Procedure, error)
-	RemoveBranch(pr *Procedure) error
-	AddChild(parent *Procedure, childSpec ProcedureSpec)
-}
-
-type planner struct {
-	plan               *PlanSpec
-	defaultMemoryLimit int64
-
-	modified bool
-}
-
-// NewPlanner constructs a new physical planner while applying the given options.
-func NewPlanner(opts ...Option) Planner {
-	p := &planner{
+// NewPhysicalPlanner creates a new physical plan with the specified options.
+// The new plan will be configured to apply any physical rules that have been registered.
+func NewPhysicalPlanner(options ...PhysicalOption) PhysicalPlanner {
+	pp := &physicalPlanner{
+		heuristicPlanner:   newHeuristicPlanner(),
 		defaultMemoryLimit: math.MaxInt64,
 	}
-	for _, opt := range opts {
-		opt.apply(p)
+
+	rules := make([]Rule, len(ruleNameToPhysicalRule))
+	i := 0
+	for _, v := range ruleNameToPhysicalRule {
+		rules[i] = v
+		i++
 	}
-	return p
+
+	pp.addRules(rules...)
+
+	// Options may add or remove rules, so process them after we've
+	// added registered rules.
+	for _, opt := range options {
+		opt.apply(pp)
+	}
+
+	return pp
 }
 
-func resolveTime(qt flux.Time, now time.Time) values.Time {
-	return values.ConvertTime(qt.Time(now))
-}
-
-func ToBoundsSpec(bounds flux.Bounds, now time.Time) (*BoundsSpec, error) {
-	if bounds.HasZero() {
-		return nil, errors.New("bounds contain zero time")
+func (pp *physicalPlanner) Plan(spec *PlanSpec) (*PlanSpec, error) {
+	transformedSpec, err := pp.heuristicPlanner.Plan(spec)
+	if err != nil {
+		return nil, err
 	}
 
-	return &BoundsSpec{
-		Start: resolveTime(bounds.Start, now),
-		Stop:  resolveTime(bounds.Stop, now),
-	}, nil
-}
-
-// TODO: remove branches with empty bounds
-func (p *planner) Plan(lp *LogicalPlanSpec, s Storage) (*PlanSpec, error) {
-	now := lp.Now
-
-	p.plan = &PlanSpec{
-		Now:        now,
-		Procedures: make(map[ProcedureID]*Procedure, len(lp.Procedures)),
-		Order:      make([]ProcedureID, 0, len(lp.Order)),
-		Resources:  lp.Resources,
-		Results:    make(map[string]YieldSpec),
+	// Compute time bounds for nodes in the plan
+	if err := transformedSpec.BottomUpWalk(ComputeBounds); err != nil {
+		return nil, err
 	}
 
-	lp.Do(func(pr *Procedure) {
-		pr.plan = p.plan
-		p.plan.Procedures[pr.ID] = pr
-		p.plan.Order = append(p.plan.Order, pr.ID)
-	})
-
-	// Find Limit+Where+Range+Select to push down time bounds and predicate
-	var order []ProcedureID
-	p.modified = true
-	for p.modified {
-		p.modified = false
-		if cap(order) < len(p.plan.Order) {
-			order = make([]ProcedureID, len(p.plan.Order))
-		} else {
-			order = order[:len(p.plan.Order)]
-		}
-		copy(order, p.plan.Order)
-		for _, id := range order {
-			pr := p.plan.Procedures[id]
-			if pr == nil {
-				// Procedure was removed
-				continue
-			}
-			if pd, ok := pr.Spec.(PushDownProcedureSpec); ok {
-				rules := pd.PushDownRules()
-				for _, rule := range rules {
-					if remove, err := p.pushDownAndSearch(pr, rule, pd.PushDown); err != nil {
-						return nil, err
-					} else if remove {
-						if err := p.removeProcedure(pr); err != nil {
-							return nil, errors.Wrap(err, "failed to remove procedure")
-						}
-					}
-				}
-			}
+	// Ensure that the plan is valid
+	if !pp.disableValidation {
+		err = validatePhysicalPlan(transformedSpec)
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	// Apply all rewrite rules
-	p.modified = true
-	for p.modified {
-		p.modified = false
-		for _, rule := range rewriteRules {
-			kind := rule.Root()
-			p.plan.Do(func(pr *Procedure) {
-				if pr == nil {
-					// Procedure was removed
-					return
-				}
-				if pr.Spec.Kind() == kind {
-					rule.Rewrite(pr, p)
-				}
-			})
-		}
-	}
-
-	// Now that plan is complete find results and time bounds
-	var leaves []ProcedureID
-	var yields []*Procedure
-	for _, id := range p.plan.Order {
-		pr := p.plan.Procedures[id]
-
-		// The bounds of the current procedure are always the union
-		// of the bounds of any parent procedure
-		pr.DoParents(func(parent *Procedure) {
-			if parent.Bounds == nil {
-				return
-			}
-
-			if pr.Bounds != nil {
-				pr.Bounds = pr.Bounds.Union(parent.Bounds)
-			} else {
-				pr.Bounds = parent.Bounds
-			}
-		})
-
-		// If the procedure is bounded and provides its own additional bounds,
-		// the procedure's new bounds are the intersection of any bounds it inherited
-		// from its parents, and its own bounds.
-		if bounded, ok := pr.Spec.(BoundedProcedureSpec); ok {
-			convertedBounds, err := ToBoundsSpec(bounded.TimeBounds(), pr.plan.Now)
-			if err != nil {
-				return nil, errors.Wrapf(err, "invalid time bounds from procedure %s", pr.Spec.Kind())
-			}
-
-			if pr.Bounds != nil {
-				pr.Bounds = pr.Bounds.Intersect(convertedBounds)
-			} else {
-				pr.Bounds = convertedBounds
-			}
-		}
-
-		if yield, ok := pr.Spec.(YieldProcedureSpec); ok {
-			if len(pr.Parents) != 1 {
-				return nil, errors.New("yield procedures must have exactly one parent")
-			}
-
-			parent := pr.Parents[0]
-			name := yield.YieldName()
-			_, ok := p.plan.Results[name]
-			if ok {
-				return nil, fmt.Errorf("found duplicate yield name %q", name)
-			}
-			p.plan.Results[name] = YieldSpec{ID: parent}
-			yields = append(yields, pr)
-		} else if len(pr.Children) == 0 {
-			// Capture non yield leaves
-			leaves = append(leaves, pr.ID)
-		}
-	}
-
-	for _, pr := range yields {
-		// remove yield procedure
-		p.removeProcedure(pr)
-	}
-
-	if len(p.plan.Results) == 0 {
-		if len(leaves) == 1 {
-			p.plan.Results[DefaultYieldName] = YieldSpec{ID: leaves[0]}
-		} else {
-			return nil, errors.New("query must specify explicit yields when there is more than one result.")
-		}
-	}
-
-	// Check to see if any results are unbounded.
-	// Since bounds are inherited,
-	// results will be unbounded only if no bounds were provided
-	// by any parent procedure node.
-	for name, yield := range p.plan.Results {
-		if pr, ok := p.plan.Procedures[yield.ID]; ok {
-			if pr.Bounds == nil {
-				return nil, fmt.Errorf(`result '%s' is unbounded. Add a 'range' call to bound the query.`, name)
-			}
-		}
+	// Update memory quota
+	if transformedSpec.Resources.MemoryBytesQuota == 0 {
+		transformedSpec.Resources.MemoryBytesQuota = pp.defaultMemoryLimit
 	}
 
 	// Update concurrency quota
-	if p.plan.Resources.ConcurrencyQuota == 0 {
-		p.plan.Resources.ConcurrencyQuota = len(p.plan.Procedures)
-	}
-	// Update memory quota
-	if p.plan.Resources.MemoryBytesQuota == 0 {
-		p.plan.Resources.MemoryBytesQuota = p.defaultMemoryLimit
+	if transformedSpec.Resources.ConcurrencyQuota == 0 {
+		transformedSpec.Resources.ConcurrencyQuota = len(transformedSpec.Roots)
 	}
 
-	return p.plan, nil
+	return transformedSpec, nil
 }
 
-func hasKind(kind ProcedureKind, kinds []ProcedureKind) bool {
-	for _, k := range kinds {
-		if k == kind {
-			return true
+func validatePhysicalPlan(plan *PlanSpec) error {
+	err := plan.BottomUpWalk(func(pn PlanNode) error {
+		if validator, ok := pn.ProcedureSpec().(PostPhysicalValidator); ok {
+			return validator.PostPhysicalValidate(pn.ID())
 		}
-	}
-	return false
+		return nil
+	})
+	return err
 }
 
-func (p *planner) pushDownAndSearch(pr *Procedure, rule PushDownRule, do func(parent *Procedure, dup func() *Procedure)) (bool, error) {
-	matched := false
-	for _, parent := range pr.Parents {
-		pp := p.plan.Procedures[parent]
-		pk := pp.Spec.Kind()
-		if pk == rule.Root {
-			if rule.Match == nil || rule.Match(pp.Spec) {
-				isolatedParent, err := p.IsolatePath(pp, pr)
-				if err != nil {
-					return false, err
-				}
-				if pp != isolatedParent {
-					// Wait to call push down function when the duplicate is found
-					return false, nil
-				}
-				do(pp, func() *Procedure { return p.duplicate(pp, false) })
-				matched = true
-			}
-		} else if hasKind(pk, rule.Through) {
-			if _, err := p.pushDownAndSearch(pp, rule, do); err != nil {
-				return false, err
-			}
-		}
-	}
-	return matched, nil
+type physicalPlanner struct {
+	*heuristicPlanner
+	defaultMemoryLimit int64
+	disableValidation  bool
 }
 
-// IsolatePath ensures that the child is an only child of the parent.
-// The return value is the parent procedure who has an only child.
-func (p *planner) IsolatePath(parent, child *Procedure) (*Procedure, error) {
-	if len(parent.Children) == 1 {
-		return parent, nil
-	}
-	// Duplicate just this child branch
-	dup := p.duplicateChildBranch(parent, child.ID)
-	// Remove this entire branch since it has been duplicated.
-	if err := p.RemoveBranch(child); err != nil {
-		return nil, err
-	}
-	return dup, nil
+// PhysicalOption is an option to configure the behavior of the physical plan.
+type PhysicalOption interface {
+	apply(*physicalPlanner)
 }
 
-func (p *planner) AddChild(parent *Procedure, childSpec ProcedureSpec) {
-	child := &Procedure{
-		plan: p.plan,
-		ID:   ProcedureIDFromParentID(parent.ID),
-		Spec: childSpec,
-	}
-	parent.Children = append(parent.Children, child.ID)
-	child.Parents = []ProcedureID{parent.ID}
+type physicalOption func(*physicalPlanner)
 
-	p.plan.Procedures[child.ID] = child
-	p.plan.Order = insertAfter(p.plan.Order, parent.ID, child.ID)
+func (opt physicalOption) apply(p *physicalPlanner) {
+	opt(p)
 }
 
-func (p *planner) removeProcedure(pr *Procedure) error {
-	// It only makes sense to remove a procedure that has a single parent.
-	if len(pr.Parents) > 1 {
-		return errors.New("cannot remove a procedure that has more than one parent")
+// WithDefaultMemoryLimit sets the default memory limit for plans generated by the plan.
+// If the query spec explicitly sets a memory limit, that limit is used instead of the default.
+func WithDefaultMemoryLimit(memBytes int64) PhysicalOption {
+	return physicalOption(func(p *physicalPlanner) {
+		p.defaultMemoryLimit = memBytes
+	})
+}
+
+// OnlyPhysicalRules produces a physical plan option that forces only a particular set of rules to be applied.
+func OnlyPhysicalRules(rules ...Rule) PhysicalOption {
+	return physicalOption(func(pp *physicalPlanner) {
+		pp.clearRules()
+		pp.addRules(rules...)
+	})
+}
+
+func DisableValidatation() PhysicalOption {
+	return physicalOption(func(p *physicalPlanner) {
+		p.disableValidation = true
+	})
+}
+
+// PhysicalProcedureSpec is similar to its logical counterpart but must provide a method to determine cost.
+type PhysicalProcedureSpec interface {
+	Kind() ProcedureKind
+	Copy() ProcedureSpec
+	Cost(inStats []Statistics) (cost Cost, outStats Statistics)
+}
+
+// PhysicalPlanNode represents a physical operation in a plan.
+type PhysicalPlanNode struct {
+	edges
+	bounds
+	id   NodeID
+	Spec PhysicalProcedureSpec
+
+	// The attributes required from inputs to this node
+	RequiredAttrs []PhysicalAttributes
+
+	// The attributes provided to consumers of this node's output
+	OutputAttrs PhysicalAttributes
+}
+
+// ID returns a human-readable id for this plan node.
+func (ppn *PhysicalPlanNode) ID() NodeID {
+	return ppn.id
+}
+
+// ProcedureSpec returns the procedure spec for this plan node.
+func (ppn *PhysicalPlanNode) ProcedureSpec() ProcedureSpec {
+	return ppn.Spec
+}
+
+func (ppn *PhysicalPlanNode) ReplaceSpec(newSpec ProcedureSpec) error {
+	physSpec, ok := newSpec.(PhysicalProcedureSpec)
+	if !ok {
+		return fmt.Errorf("couldn't replace ProcedureSpec for physical plan node \"%v\"", ppn.ID())
 	}
 
-	p.modified = true
-	delete(p.plan.Procedures, pr.ID)
-	p.plan.Order = removeID(p.plan.Order, pr.ID)
-
-	for _, id := range pr.Parents {
-		parent := p.plan.Procedures[id]
-		parent.Children = removeID(parent.Children, pr.ID)
-		parent.Children = append(parent.Children, pr.Children...)
-	}
-	for _, id := range pr.Children {
-		child := p.plan.Procedures[id]
-		child.Parents = removeID(child.Parents, pr.ID)
-		child.Parents = append(child.Parents, pr.Parents...)
-
-		if len(pr.Parents) == 1 {
-			if pa, ok := child.Spec.(ParentAwareProcedureSpec); ok {
-				pa.ParentChanged(pr.ID, pr.Parents[0])
-			}
-		}
-	}
+	ppn.Spec = physSpec
 	return nil
 }
 
-func (p *planner) RemoveBranch(pr *Procedure) error {
-	// It only makes sense to remove a procedure that has a single parent.
-	if len(pr.Parents) > 1 {
-		return errors.New("cannot remove a branch that has more than one parent")
-	}
-	p.modified = true
-	delete(p.plan.Procedures, pr.ID)
-	p.plan.Order = removeID(p.plan.Order, pr.ID)
-
-	for _, id := range pr.Parents {
-		parent := p.plan.Procedures[id]
-		// Check that parent hasn't already been removed
-		if parent != nil {
-			parent.Children = removeID(parent.Children, pr.ID)
-		}
-	}
-
-	for _, id := range pr.Children {
-		child := p.plan.Procedures[id]
-		if err := p.RemoveBranch(child); err != nil {
-			return err
-		}
-	}
-	return nil
+// Kind returns the procedure kind for this plan node.
+func (ppn *PhysicalPlanNode) Kind() ProcedureKind {
+	return ppn.Spec.Kind()
 }
 
-func ProcedureIDForDuplicate(id ProcedureID) ProcedureID {
-	return ProcedureID(uuid.NewV5(RootUUID, id.String()))
+func (ppn *PhysicalPlanNode) ShallowCopy() PlanNode {
+	newNode := new(PhysicalPlanNode)
+	newNode.edges = ppn.edges.shallowCopy()
+	newNode.id = ppn.id + "_copy"
+	// TODO: the type assertion below... is it needed?
+	newNode.Spec = ppn.Spec.Copy().(PhysicalProcedureSpec)
+	return newNode
 }
 
-func (p *planner) duplicateChildBranch(pr *Procedure, child ProcedureID) *Procedure {
-	return p.duplicate(pr, true, child)
-}
-func (p *planner) duplicate(pr *Procedure, skipParents bool, onlyChildren ...ProcedureID) *Procedure {
-	p.modified = true
-	np := pr.Copy()
-	np.ID = ProcedureIDForDuplicate(pr.ID)
-	p.plan.Procedures[np.ID] = np
-	p.plan.Order = insertAfter(p.plan.Order, pr.ID, np.ID)
-
-	if !skipParents {
-		for _, id := range np.Parents {
-			parent := p.plan.Procedures[id]
-			parent.Children = append(parent.Children, np.ID)
-		}
-	}
-
-	newChildren := make([]ProcedureID, 0, len(np.Children))
-	for _, id := range np.Children {
-		if len(onlyChildren) > 0 && !hasID(onlyChildren, id) {
-			continue
-		}
-		child := p.plan.Procedures[id]
-		newChild := p.duplicate(child, true)
-		newChild.Parents = removeID(newChild.Parents, pr.ID)
-		newChild.Parents = append(newChild.Parents, np.ID)
-
-		newChildren = append(newChildren, newChild.ID)
-
-		if pa, ok := newChild.Spec.(ParentAwareProcedureSpec); ok {
-			pa.ParentChanged(pr.ID, np.ID)
-		}
-	}
-	np.Children = newChildren
-	return np
+// Cost provides the self-cost (i.e., does not include the cost of its predecessors) for
+// this plan node.  Caller must provide statistics of predecessors to this node.
+func (ppn *PhysicalPlanNode) Cost(inStats []Statistics) (cost Cost, outStats Statistics) {
+	return ppn.Spec.Cost(inStats)
 }
 
-func hasID(ids []ProcedureID, id ProcedureID) bool {
-	for _, i := range ids {
-		if i == id {
-			return true
-		}
-	}
-	return false
+// PhysicalAttributes encapsulates sny physical attributes of the result produced
+// by a physical plan node, such as collation, etc.
+type PhysicalAttributes struct {
 }
-func removeID(ids []ProcedureID, remove ProcedureID) []ProcedureID {
-	filtered := ids[0:0]
-	for i, id := range ids {
-		if id == remove {
-			filtered = append(filtered, ids[0:i]...)
-			filtered = append(filtered, ids[i+1:]...)
-			break
-		}
+
+// CreatePhysicalNode creates a single physical plan node from a procedure spec.
+// The newly created physical node has no incoming or outgoing edges.
+func CreatePhysicalNode(id NodeID, spec PhysicalProcedureSpec) *PhysicalPlanNode {
+	return &PhysicalPlanNode{
+		id:   id,
+		Spec: spec,
 	}
-	return filtered
 }
-func insertAfter(ids []ProcedureID, after, new ProcedureID) []ProcedureID {
-	var newIds []ProcedureID
-	for i, id := range ids {
-		if id == after {
-			newIds = append(newIds, ids[:i+1]...)
-			newIds = append(newIds, new)
-			if i+1 < len(ids) {
-				newIds = append(newIds, ids[i+1:]...)
-			}
-			break
-		}
-	}
-	return newIds
+
+// PostPhysicalValidator provides an interface that can be implemented by PhysicalProcedureSpecs for any
+// validation checks to be performed post-physical planning.
+type PostPhysicalValidator interface {
+	PostPhysicalValidate(id NodeID) error
 }

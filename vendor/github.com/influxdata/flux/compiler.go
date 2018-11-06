@@ -2,48 +2,25 @@ package flux
 
 import (
 	"context"
-	"time"
+	"fmt"
 )
 
-const (
-	FluxCompilerType = "flux"
-	SpecCompilerType = "spec"
-)
+// Compiler produces a specification for the query.
+type Compiler interface {
+	// Compile produces a specification for the query.
+	Compile(ctx context.Context) (*Spec, error)
+	CompilerType() CompilerType
+}
 
-// AddCompilerMappings adds the Flux specific compiler mappings.
-func AddCompilerMappings(mappings CompilerMappings) error {
-	if err := mappings.Add(FluxCompilerType, func() Compiler {
-		return new(FluxCompiler)
+// CompilerType is the name of a query compiler.
+type CompilerType string
+type CreateCompiler func() Compiler
+type CompilerMappings map[CompilerType]CreateCompiler
 
-	}); err != nil {
-		return err
+func (m CompilerMappings) Add(t CompilerType, c CreateCompiler) error {
+	if _, ok := m[t]; ok {
+		return fmt.Errorf("duplicate compiler mapping for %q", t)
 	}
-	return mappings.Add(SpecCompilerType, func() Compiler {
-		return new(SpecCompiler)
-	})
-}
-
-// FluxCompiler compiles a Flux script into a spec.
-type FluxCompiler struct {
-	Query string `json:"query"`
-}
-
-func (c FluxCompiler) Compile(ctx context.Context) (*Spec, error) {
-	return Compile(ctx, c.Query, time.Now())
-}
-
-func (c FluxCompiler) CompilerType() CompilerType {
-	return FluxCompilerType
-}
-
-// SpecCompiler implements Compiler by returning a known spec.
-type SpecCompiler struct {
-	Spec *Spec `json:"spec"`
-}
-
-func (c SpecCompiler) Compile(ctx context.Context) (*Spec, error) {
-	return c.Spec, nil
-}
-func (c SpecCompiler) CompilerType() CompilerType {
-	return SpecCompilerType
+	m[t] = c
+	return nil
 }

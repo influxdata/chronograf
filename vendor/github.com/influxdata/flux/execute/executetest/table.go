@@ -3,6 +3,8 @@ package executetest
 import (
 	"fmt"
 
+	"github.com/influxdata/flux/semantic"
+
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/values"
@@ -45,9 +47,9 @@ func (t *Table) Normalize() {
 			if len(t.Data) > 0 {
 				t.KeyValues[j] = t.Data[0][idx]
 			}
-			v, err := values.NewValue(t.KeyValues[j], execute.ConvertToKind(cols[j].Type))
-			if err != nil {
-				panic(err)
+			v := values.New(t.KeyValues[j])
+			if v.Type() == semantic.Invalid {
+				panic(fmt.Errorf("invalid value: %s", t.KeyValues[j]))
 			}
 			vs[j] = v
 		}
@@ -232,4 +234,9 @@ func NormalizeTables(bs []*Table) {
 	for _, b := range bs {
 		b.Key()
 	}
+}
+
+func MustCopyTable(tbl flux.Table) flux.Table {
+	cpy, _ := execute.CopyTable(tbl, UnlimitedAllocator)
+	return cpy
 }

@@ -65,7 +65,7 @@ func (w *writeToHelper) write(data []byte) {
 	w.err = err
 }
 
-var minWidthsByType = map[flux.DataType]int{
+var minWidthsByType = map[flux.ColType]int{
 	flux.TBool:    12,
 	flux.TInt:     26,
 	flux.TUInt:    27,
@@ -213,7 +213,7 @@ func (f *Formatter) writeHeaderSeparator(w *writeToHelper) {
 	w.write(eol)
 }
 
-func (f *Formatter) valueBuf(i, j int, typ flux.DataType, cr flux.ColReader) (buf []byte) {
+func (f *Formatter) valueBuf(i, j int, typ flux.ColType, cr flux.ColReader) (buf []byte) {
 	switch typ {
 	case flux.TBool:
 		buf = strconv.AppendBool(f.fmtBuf[0:0], cr.Bools(j)[i])

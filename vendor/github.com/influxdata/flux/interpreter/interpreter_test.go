@@ -16,12 +16,10 @@ import (
 
 var testScope = make(map[string]values.Value)
 var optionScope = make(map[string]values.Value)
-var testDeclarations = make(semantic.DeclarationScope)
 var optionsObject = values.NewObject()
 
 func addFunc(f *function) {
 	testScope[f.name] = f
-	testDeclarations[f.name] = semantic.NewExternalVariableDeclaration(f.name, f.t)
 }
 
 func addOption(name string, opt values.Value) {
@@ -31,38 +29,42 @@ func addOption(name string, opt values.Value) {
 func init() {
 	addFunc(&function{
 		name: "fortyTwo",
-		t: semantic.NewFunctionType(semantic.FunctionSignature{
-			ReturnType: semantic.Float,
+		t: semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+			Required: nil,
+			Return:   semantic.Float,
 		}),
 		call: func(args values.Object) (values.Value, error) {
-			return values.NewFloatValue(42.0), nil
+			return values.NewFloat(42.0), nil
 		},
 		hasSideEffect: false,
 	})
 	addFunc(&function{
 		name: "six",
-		t: semantic.NewFunctionType(semantic.FunctionSignature{
-			ReturnType: semantic.Float,
+		t: semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+			Required: nil,
+			Return:   semantic.Float,
 		}),
 		call: func(args values.Object) (values.Value, error) {
-			return values.NewFloatValue(6.0), nil
+			return values.NewFloat(6.0), nil
 		},
 		hasSideEffect: false,
 	})
 	addFunc(&function{
 		name: "nine",
-		t: semantic.NewFunctionType(semantic.FunctionSignature{
-			ReturnType: semantic.Float,
+		t: semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+			Required: nil,
+			Return:   semantic.Float,
 		}),
 		call: func(args values.Object) (values.Value, error) {
-			return values.NewFloatValue(9.0), nil
+			return values.NewFloat(9.0), nil
 		},
 		hasSideEffect: false,
 	})
 	addFunc(&function{
 		name: "fail",
-		t: semantic.NewFunctionType(semantic.FunctionSignature{
-			ReturnType: semantic.Bool,
+		t: semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+			Required: nil,
+			Return:   semantic.Bool,
 		}),
 		call: func(args values.Object) (values.Value, error) {
 			return nil, errors.New("fail")
@@ -71,9 +73,10 @@ func init() {
 	})
 	addFunc(&function{
 		name: "plusOne",
-		t: semantic.NewFunctionType(semantic.FunctionSignature{
-			Params:       map[string]semantic.Type{"x": semantic.Float},
-			ReturnType:   semantic.Float,
+		t: semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+			Parameters:   map[string]semantic.PolyType{"x": semantic.Float},
+			Required:     []string{"x"},
+			Return:       semantic.Float,
 			PipeArgument: "x",
 		}),
 		call: func(args values.Object) (values.Value, error) {
@@ -81,23 +84,24 @@ func init() {
 			if !ok {
 				return nil, errors.New("missing argument x")
 			}
-			return values.NewFloatValue(v.Float() + 1), nil
+			return values.NewFloat(v.Float() + 1), nil
 		},
 		hasSideEffect: false,
 	})
 	addFunc(&function{
 		name: "sideEffect",
-		t: semantic.NewFunctionType(semantic.FunctionSignature{
-			ReturnType: semantic.Int,
+		t: semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+			Required: nil,
+			Return:   semantic.Int,
 		}),
 		call: func(args values.Object) (values.Value, error) {
-			return values.NewIntValue(0), nil
+			return values.NewInt(0), nil
 		},
 		hasSideEffect: true,
 	})
 
-	optionsObject.Set("name", values.NewStringValue("foo"))
-	optionsObject.Set("repeat", values.NewIntValue(100))
+	optionsObject.Set("name", values.NewString("foo"))
+	optionsObject.Set("repeat", values.NewInt(100))
 
 	addOption("task", optionsObject)
 }
@@ -111,10 +115,10 @@ func TestEval(t *testing.T) {
 		want    []values.Value
 	}{
 		{
-			name:  "call function",
+			name:  "call builtin function",
 			query: "six()",
 			want: []values.Value{
-				values.NewFloatValue(6.0),
+				values.NewFloat(6.0),
 			},
 		},
 		{
@@ -135,13 +139,10 @@ func TestEval(t *testing.T) {
 		{
 			name: "reassign nested scope",
 			query: `
-			six = six()
-			six()
+			s = () => 6
+			s = s()
 			`,
 			wantErr: true,
-			want: []values.Value{
-				values.NewFloatValue(6.0),
-			},
 		},
 		{
 			name: "binary expressions",
@@ -152,9 +153,9 @@ func TestEval(t *testing.T) {
 			answer = fortyTwo() == six * nine
 			`,
 			want: []values.Value{
-				values.NewFloatValue(6),
-				values.NewFloatValue(9),
-				values.NewBoolValue(false),
+				values.NewFloat(6),
+				values.NewFloat(9),
+				values.NewBool(false),
 			},
 		},
 		{
@@ -166,34 +167,45 @@ func TestEval(t *testing.T) {
             answer = (not (fortyTwo() == six * nine)) or fail()
 			`,
 			want: []values.Value{
-				values.NewFloatValue(6.0),
-				values.NewFloatValue(9.0),
-				values.NewBoolValue(true),
+				values.NewFloat(6.0),
+				values.NewFloat(9.0),
+				values.NewBool(true),
 			},
 		},
 		{
-			name: "arrow function",
+			name: "function",
 			query: `
             plusSix = (r) => r + six()
             plusSix(r:1.0) == 7.0 or fail()
 			`,
 		},
 		{
-			name: "arrow function block",
+			name: "function block",
 			query: `
             f = (r) => {
-                r2 = r * r
-                return (r - r2) / r2
+                r1 = 1.0 + r
+                return (r + r1) / r
             }
-            f(r:2.0) == -0.5 or fail()
+            f(r:1.0) == 3.0 or fail()
 			`,
 		},
 		{
-			name: "arrow function with default param",
+			name: "function block polymorphic",
+			query: `
+            f = (r) => {
+                r2 = r * r
+                return r2 / r
+            }
+            f(r:2.0) == 2.0 or fail()
+            f(r:2) == 2 or fail()
+			`,
+		},
+		{
+			name: "function with default param",
 			query: `
             addN = (r,n=4) => r + n
             addN(r:2) == 6 or fail()
-			addN(r:3,n:1) == 4 or fail()
+            addN(r:3,n:1) == 4 or fail()
 			`,
 		},
 		{
@@ -256,6 +268,14 @@ func TestEval(t *testing.T) {
 			`,
 		},
 		{
+			name: "missing pipe",
+			query: `
+			add = (a=<-,b) => a + b
+			add(b:2) == 3 or fail()
+			`,
+			wantErr: true,
+		},
+		{
 			name: "pipe expression function",
 			query: `
 			add = (a=<-,b) => a + b
@@ -268,7 +288,7 @@ func TestEval(t *testing.T) {
 			six() |> plusOne() == 7.0 or fail()
 			`,
 			want: []values.Value{
-				values.NewBoolValue(true),
+				values.NewBool(true),
 			},
 		},
 		{
@@ -277,7 +297,7 @@ func TestEval(t *testing.T) {
 			"abba" =~ /^a.*a$/ or fail()
 			`,
 			want: []values.Value{
-				values.NewBoolValue(true),
+				values.NewBool(true),
 			},
 		},
 		{
@@ -286,7 +306,7 @@ func TestEval(t *testing.T) {
 			"abc" =~ /^a.*a$/ and fail()
 			`,
 			want: []values.Value{
-				values.NewBoolValue(false),
+				values.NewBool(false),
 			},
 		},
 		{
@@ -295,7 +315,7 @@ func TestEval(t *testing.T) {
 			"abc" !~ /^a.*a$/ or fail()
 			`,
 			want: []values.Value{
-				values.NewBoolValue(true),
+				values.NewBool(true),
 			},
 		},
 		{
@@ -304,11 +324,11 @@ func TestEval(t *testing.T) {
 			"abba" !~ /^a.*a$/ and fail()
 			`,
 			want: []values.Value{
-				values.NewBoolValue(false),
+				values.NewBool(false),
 			},
 		},
 		{
-			name: "options metadata before query",
+			name: "options metadata",
 			query: `
 			option task = {
 				name: "foo",
@@ -319,16 +339,16 @@ func TestEval(t *testing.T) {
 			`,
 			want: []values.Value{
 				optionsObject,
-				values.NewBoolValue(true),
-				values.NewBoolValue(true),
+				values.NewBool(true),
+				values.NewBool(true),
 			},
 		},
 		{
 			name:  "query with side effects",
 			query: `sideEffect() == 0 or fail()`,
 			want: []values.Value{
-				values.NewIntValue(0),
-				values.NewBoolValue(true),
+				values.NewInt(0),
+				values.NewBool(true),
 			},
 		},
 	}
@@ -340,13 +360,13 @@ func TestEval(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			graph, err := semantic.New(program, testDeclarations.Copy())
+			graph, err := semantic.New(program)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			// Create new interpreter scope for each test case
-			itrp := interpreter.NewInterpreter(optionScope, testScope)
+			itrp := interpreter.NewInterpreter(optionScope, testScope, interpreter.NewTypeScope())
 
 			err = itrp.Eval(graph)
 			if !tc.wantErr && err != nil {
@@ -361,18 +381,103 @@ func TestEval(t *testing.T) {
 	}
 
 }
+
+func TestInterpreter_MultiPhaseInterpretation(t *testing.T) {
+	testCases := []struct {
+		name     string
+		builtins []string
+		program  string
+		wantErr  bool
+	}{
+		{
+			// Evaluate two builtin functions in a single phase
+			name: "2-phase interpretation",
+			builtins: []string{
+				`
+					_highestOrLowest = (table=<-, reducer) => table |> reducer()
+					highestCurrent = (table=<-) => table |> _highestOrLowest(reducer: (table=<-) => table)
+				`,
+			},
+			program: `5 |> highestCurrent()`,
+		},
+		{
+			// Evaluate two builtin functions each in a separate phase
+			name: "3-phase interpretation",
+			builtins: []string{
+				`_highestOrLowest = (table=<-, reducer) => table |> reducer()`,
+				`highestCurrent = (table=<-) => table |> _highestOrLowest(reducer: (table=<-) => table)`,
+			},
+			program: `5 |> highestCurrent()`,
+		},
+		{
+			// Type-check function expression even though it is not called
+			// Program is correctly typed so it should not throw any type errors
+			name:     "builtin not called - no type error",
+			builtins: []string{`_highestOrLowest = (table=<-, reducer) => table |> reducer()`},
+			program:  `f = () => 5 |> _highestOrLowest(reducer: (table=<-) => table)`,
+		},
+		{
+			// Type-check function expression even though it is not called
+			// Program should not type check due to missing pipe parameter
+			name:     "builtin not called - type error",
+			builtins: []string{`_highestOrLowest = (table=<-) => table`},
+			program:  `f = () => _highestOrLowest()`,
+			wantErr:  true,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var globals map[string]values.Value
+			var err error
+
+			types := interpreter.NewTypeScope()
+
+			evaluate := func(program string, globals map[string]values.Value) (map[string]values.Value, error) {
+				ast, err := parser.NewAST(program)
+				if err != nil {
+					return nil, err
+				}
+				graph, err := semantic.New(ast)
+				if err != nil {
+					return nil, err
+				}
+				itrp := interpreter.NewInterpreter(nil, globals, types)
+				if err := itrp.Eval(graph); err != nil {
+					return nil, err
+				}
+				types = itrp.TypeScope()
+				return itrp.GlobalScope().Values(), nil
+			}
+
+			for _, builtin := range tc.builtins {
+				if globals, err = evaluate(builtin, globals); err != nil {
+					t.Fatal("evaluation of builtin failed: ", err)
+				}
+			}
+
+			if _, err = evaluate(tc.program, globals); err != nil && !tc.wantErr {
+				t.Fatal("program evaluation failed: ", err)
+			} else if err == nil && tc.wantErr {
+				t.Fatal("expected to error during program evaluation")
+			}
+		})
+	}
+}
+
 func TestResolver(t *testing.T) {
 	var got semantic.Expression
-	declarations := make(semantic.DeclarationScope)
 	f := &function{
 		name: "resolver",
-		t: semantic.NewFunctionType(semantic.FunctionSignature{
-			Params: map[string]semantic.Type{
-				"f": semantic.NewFunctionType(semantic.FunctionSignature{
-					Params: map[string]semantic.Type{"r": semantic.Int},
+		t: semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+			Parameters: map[string]semantic.PolyType{
+				"f": semantic.NewFunctionPolyType(semantic.FunctionPolySignature{
+					Parameters: map[string]semantic.PolyType{"r": semantic.Int},
+					Required:   []string{"r"},
+					Return:     semantic.Int,
 				}),
 			},
-			ReturnType: semantic.Int,
+			Required: []string{"f"},
+			Return:   semantic.Int,
 		}),
 		call: func(args values.Object) (values.Value, error) {
 			f, ok := args.Get("f")
@@ -392,8 +497,8 @@ func TestResolver(t *testing.T) {
 		},
 		hasSideEffect: false,
 	}
-	testScope[f.name] = f
-	declarations[f.name] = semantic.NewExternalVariableDeclaration(f.name, f.t)
+	scope := make(map[string]values.Value)
+	scope[f.name] = f
 
 	program, err := parser.NewAST(`
 	x = 42
@@ -403,41 +508,46 @@ func TestResolver(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	graph, err := semantic.New(program, testDeclarations)
+	graph, err := semantic.New(program)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	itrp := interpreter.NewInterpreter(optionScope, testScope)
+	itrp := interpreter.NewInterpreter(nil, scope, interpreter.NewTypeScope())
 
 	if err := itrp.Eval(graph); err != nil {
 		t.Fatal(err)
 	}
 
 	want := &semantic.FunctionExpression{
-		Params: []*semantic.FunctionParam{{Key: &semantic.Identifier{Name: "r"}}},
-		Body: &semantic.BinaryExpression{
-			Operator: ast.AdditionOperator,
-			Left:     &semantic.IdentifierExpression{Name: "r"},
-			Right:    &semantic.IntegerLiteral{Value: 42},
+		Block: &semantic.FunctionBlock{
+			Parameters: &semantic.FunctionParameters{
+				List: []*semantic.FunctionParameter{{Key: &semantic.Identifier{Name: "r"}}},
+			},
+			Body: &semantic.BinaryExpression{
+				Operator: ast.AdditionOperator,
+				Left:     &semantic.IdentifierExpression{Name: "r"},
+				Right:    &semantic.IntegerLiteral{Value: 42},
+			},
 		},
 	}
 	if !cmp.Equal(want, got, semantictest.CmpOptions...) {
 		t.Errorf("unexpected resoved function: -want/+got\n%s", cmp.Diff(want, got, semantictest.CmpOptions...))
 	}
-	if wt, gt := want.Type(), got.Type(); wt != gt {
-		t.Errorf("unexpected resoved function types: want: %v got: %v", wt, gt)
-	}
 }
 
 type function struct {
 	name          string
-	t             semantic.Type
+	t             semantic.PolyType
 	call          func(args values.Object) (values.Value, error)
 	hasSideEffect bool
 }
 
 func (f *function) Type() semantic.Type {
+	t, _ := f.t.MonoType()
+	return t
+}
+func (f *function) PolyType() semantic.PolyType {
 	return f.t
 }
 

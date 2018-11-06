@@ -1,0 +1,8 @@
+#datatype,string,long,string,string,double
+#group,false,false,true,true,false
+#default,_result,,,,
+,result,table,_field,host,_value
+,,0,usage_guest_nice,host1,8
+,,1,usage_guest_nice,host2,12
+,,2,usage_guest_nice,host3,31
+,,3,usage_guest_nice,host4,10

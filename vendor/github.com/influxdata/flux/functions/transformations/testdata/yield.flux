@@ -1,0 +1,6 @@
+from(bucket: "test")
+    |> sort()
+    |> limit(n: 3)
+    |> yield(name: "1: lowest 3")
+    |> sample(n: 2, pos: 1)
+    |> yield(name: "2: 2nd row")

@@ -16,7 +16,7 @@ func TestNames(t *testing.T) {
 	s.Set("boom", v)
 	s.Set("tick", v)
 
-	c := complete.NewCompleter(s, semantic.DeclarationScope{})
+	c := complete.NewCompleter(s)
 
 	results := c.Names()
 	expected := []string{
@@ -29,32 +29,29 @@ func TestNames(t *testing.T) {
 	}
 }
 
-func TestDeclaration(t *testing.T) {
+func TestValue(t *testing.T) {
 	name := "foo"
 	scope := interpreter.NewScope()
-	scope.Set(name, values.NewIntValue(5))
-	declarations := make(semantic.DeclarationScope)
-	declarations[name] = semantic.NewExternalVariableDeclaration(name, semantic.Int)
+	value := values.NewInt(5)
+	scope.Set(name, value)
 
-	expected := declarations[name].ID()
+	v, _ := complete.NewCompleter(scope).Value(name)
 
-	declaration, _ := complete.NewCompleter(scope, declarations).Declaration(name)
-	result := declaration.ID()
-
-	if !cmp.Equal(result, expected) {
-		t.Error(cmp.Diff(result, expected), "unexpected declaration for name")
+	if !cmp.Equal(value, v) {
+		t.Error(cmp.Diff(value, v), "unexpected value for name")
 	}
 }
 
 func TestFunctionNames(t *testing.T) {
-	d := make(semantic.DeclarationScope)
-	d["boom"] = semantic.NewExternalVariableDeclaration(
-		"boom", semantic.NewFunctionType(semantic.FunctionSignature{}))
-
-	d["noBoom"] = semantic.NewExternalVariableDeclaration("noBoom", semantic.String)
-
+	boom := values.NewFunction(
+		"boom",
+		semantic.NewFunctionType(semantic.FunctionSignature{}),
+		func(values.Object) (values.Value, error) { return nil, nil },
+		false,
+	)
 	s := interpreter.NewScope()
-	c := complete.NewCompleter(s, d)
+	s.Set("boom", boom)
+	c := complete.NewCompleter(s)
 	results := c.FunctionNames()
 
 	expected := []string{
@@ -68,20 +65,20 @@ func TestFunctionNames(t *testing.T) {
 
 func TestFunctionSuggestion(t *testing.T) {
 	name := "bar"
-	scope := interpreter.NewScope()
-	declarations := make(semantic.DeclarationScope)
-	declarations[name] = semantic.NewExternalVariableDeclaration(
+	bar := values.NewFunction(
 		name,
-		semantic.NewFunctionType(
-			semantic.FunctionSignature{
-				Params: map[string]semantic.Type{
-					"start": semantic.Time,
-					"stop":  semantic.Time,
-				},
+		semantic.NewFunctionType(semantic.FunctionSignature{
+			Parameters: map[string]semantic.Type{
+				"start": semantic.Time,
+				"stop":  semantic.Time,
 			},
-		),
+		}),
+		func(values.Object) (values.Value, error) { return nil, nil },
+		false,
 	)
-	result, _ := complete.NewCompleter(scope, declarations).FunctionSuggestion(name)
+	s := interpreter.NewScope()
+	s.Set(name, bar)
+	result, _ := complete.NewCompleter(s).FunctionSuggestion(name)
 
 	expected := complete.FunctionSuggestion{
 		Params: map[string]string{

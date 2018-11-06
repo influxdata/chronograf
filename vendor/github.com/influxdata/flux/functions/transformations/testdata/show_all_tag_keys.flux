@@ -1,0 +1,6 @@
+from(bucket:"telegraf")
+  |> range(start:2018-05-22T19:53:26Z)
+  |> keys(except: ["_time","_value","_start","_stop"])
+  |> group(none: true)
+  |> distinct()
+  |> map(fn:(r) => r._value)

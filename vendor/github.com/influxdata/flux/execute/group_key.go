@@ -23,6 +23,9 @@ func NewGroupKey(cols []flux.ColMeta, values []values.Value) flux.GroupKey {
 func (k *groupKey) Cols() []flux.ColMeta {
 	return k.cols
 }
+func (k *groupKey) Values() []values.Value {
+	return k.values
+}
 func (k *groupKey) HasCol(label string) bool {
 	return ColIdx(label, k.cols) >= 0
 }

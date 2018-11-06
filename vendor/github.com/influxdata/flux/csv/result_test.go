@@ -2,6 +2,7 @@ package csv_test
 
 import (
 	"bytes"
+	"io/ioutil"
 	"regexp"
 	"testing"
 	"time"
@@ -467,6 +468,19 @@ func TestResultDecoder(t *testing.T) {
 				}},
 			},
 		},
+		{
+			name:          "simple error message",
+			encoderConfig: csv.DefaultEncoderConfig(),
+			encoded: toCRLF(`#datatype,string,string
+#group,true,true
+#default,,
+,error,reference
+,failed to create physical plan: query must specify explicit yields when there is more than one result.,
+`),
+			result: &executetest.Result{
+				Err: errors.New("failed to create physical plan: query must specify explicit yields when there is more than one result."),
+			},
+		},
 	}
 	testCases = append(testCases, symetricalTestCases...)
 	for _, tc := range testCases {
@@ -478,6 +492,12 @@ func TestResultDecoder(t *testing.T) {
 			decoder := csv.NewResultDecoder(tc.decoderConfig)
 			result, err := decoder.Decode(bytes.NewReader(tc.encoded))
 			if err != nil {
+				if tc.result.Err != nil {
+					if got, want := tc.result.Err.Error(), err.Error(); got != want {
+						t.Error("unexpected error -want/+got", cmp.Diff(want, got))
+					}
+					return
+				}
 				t.Fatal(err)
 			}
 			got := &executetest.Result{
@@ -531,6 +551,7 @@ func TestResultEncoder(t *testing.T) {
 		})
 	}
 }
+
 func TestMultiResultEncoder(t *testing.T) {
 	testCases := []struct {
 		name    string
@@ -674,8 +695,11 @@ func TestMultiResultEncoder(t *testing.T) {
 			results: errorResultIterator{
 				Error: errors.New("test error"),
 			},
-			encoded: toCRLF(`error,reference
-test error,
+			encoded: toCRLF(`#datatype,string,string
+#group,true,true
+#default,,
+,error,reference
+,test error,
 `),
 		},
 		{
@@ -686,8 +710,11 @@ test error,
 					Err: errors.New("execution error"),
 				},
 			}),
-			encoded: toCRLF(`error,reference
-execution error,
+			encoded: toCRLF(`#datatype,string,string
+#group,true,true
+#default,,
+,error,reference
+,execution error,
 `),
 		},
 		{
@@ -743,6 +770,203 @@ execution error,
 			}
 			if g, w := n, int64(len(tc.encoded)); g != w {
 				t.Errorf("unexpected encoding count -want/+got:\n%s", cmp.Diff(w, g))
+			}
+		})
+	}
+}
+
+func TestMultiResultDecoder(t *testing.T) {
+	testCases := []struct {
+		name    string
+		config  csv.ResultDecoderConfig
+		encoded []byte
+		results []*executetest.Result
+		err     error
+	}{
+		{
+			name: "single result",
+			encoded: toCRLF(`#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,string,string,double
+#group,false,false,true,true,false,true,true,false
+#default,_result,0,2018-04-17T00:00:00Z,2018-04-17T00:05:00Z,,cpu,A,
+,result,table,_start,_stop,_time,_measurement,host,_value
+,,,,,2018-04-17T00:00:00Z,cpu,A,42.0
+,,,,,2018-04-17T00:00:01Z,cpu,A,43.0
+
+`),
+			results: []*executetest.Result{{
+				Nm: "_result",
+				Tbls: []*executetest.Table{{
+					KeyCols: []string{"_start", "_stop", "_measurement", "host"},
+					ColMeta: []flux.ColMeta{
+						{Label: "_start", Type: flux.TTime},
+						{Label: "_stop", Type: flux.TTime},
+						{Label: "_time", Type: flux.TTime},
+						{Label: "_measurement", Type: flux.TString},
+						{Label: "host", Type: flux.TString},
+						{Label: "_value", Type: flux.TFloat},
+					},
+					Data: [][]interface{}{
+						{
+							values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+							values.ConvertTime(time.Date(2018, 4, 17, 0, 5, 0, 0, time.UTC)),
+							values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+							"cpu",
+							"A",
+							42.0,
+						},
+						{
+							values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+							values.ConvertTime(time.Date(2018, 4, 17, 0, 5, 0, 0, time.UTC)),
+							values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 1, 0, time.UTC)),
+							"cpu",
+							"A",
+							43.0,
+						},
+					},
+				}},
+			}},
+		},
+		{
+			name: "two results",
+			encoded: toCRLF(`#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,string,string,double
+#group,false,false,true,true,false,true,true,false
+#default,_result,,,,,,,
+,result,table,_start,_stop,_time,_measurement,host,_value
+,,0,2018-04-17T00:00:00Z,2018-04-17T00:05:00Z,2018-04-17T00:00:00Z,cpu,A,42
+,,0,2018-04-17T00:00:00Z,2018-04-17T00:05:00Z,2018-04-17T00:00:01Z,cpu,A,43
+
+#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,string,string,double
+#group,false,false,true,true,false,true,true,false
+#default,mean,,,,,,,
+,result,table,_start,_stop,_time,_measurement,host,_value
+,,0,2018-04-17T00:00:00Z,2018-04-17T00:05:00Z,2018-04-17T00:00:00Z,cpu,A,40
+,,0,2018-04-17T00:00:00Z,2018-04-17T00:05:00Z,2018-04-17T00:00:01Z,cpu,A,40.1
+
+`),
+			results: []*executetest.Result{
+				{
+					Nm: "_result",
+					Tbls: []*executetest.Table{{
+						KeyCols: []string{"_start", "_stop", "_measurement", "host"},
+						ColMeta: []flux.ColMeta{
+							{Label: "_start", Type: flux.TTime},
+							{Label: "_stop", Type: flux.TTime},
+							{Label: "_time", Type: flux.TTime},
+							{Label: "_measurement", Type: flux.TString},
+							{Label: "host", Type: flux.TString},
+							{Label: "_value", Type: flux.TFloat},
+						},
+						Data: [][]interface{}{
+							{
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 5, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+								"cpu",
+								"A",
+								42.0,
+							},
+							{
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 5, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 1, 0, time.UTC)),
+								"cpu",
+								"A",
+								43.0,
+							},
+						},
+					}},
+				},
+				{
+					Nm: "mean",
+					Tbls: []*executetest.Table{{
+						KeyCols: []string{"_start", "_stop", "_measurement", "host"},
+						ColMeta: []flux.ColMeta{
+							{Label: "_start", Type: flux.TTime},
+							{Label: "_stop", Type: flux.TTime},
+							{Label: "_time", Type: flux.TTime},
+							{Label: "_measurement", Type: flux.TString},
+							{Label: "host", Type: flux.TString},
+							{Label: "_value", Type: flux.TFloat},
+						},
+						Data: [][]interface{}{
+							{
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 5, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+								"cpu",
+								"A",
+								40.0,
+							},
+							{
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 5, 0, 0, time.UTC)),
+								values.ConvertTime(time.Date(2018, 4, 17, 0, 0, 1, 0, time.UTC)),
+								"cpu",
+								"A",
+								40.1,
+							},
+						},
+					}},
+				},
+			},
+		},
+		{
+			name: "decodes errors",
+			encoded: toCRLF(`#datatype,string,string
+#group,true,true
+#default,,
+,error,reference
+,test error,
+`),
+			err: errors.New("test error"),
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			decoder := csv.NewMultiResultDecoder(tc.config)
+			results, err := decoder.Decode(ioutil.NopCloser(bytes.NewReader(tc.encoded)))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var got []*executetest.Result
+			for results.More() {
+				result := results.Next()
+				res := &executetest.Result{
+					Nm: result.Name(),
+				}
+				if err := result.Tables().Do(func(tbl flux.Table) error {
+					cb, err := executetest.ConvertTable(tbl)
+					if err != nil {
+						return err
+					}
+					res.Tbls = append(res.Tbls, cb)
+					return nil
+				}); err != nil {
+					t.Fatal(err)
+				}
+				res.Normalize()
+				got = append(got, res)
+			}
+
+			if err := results.Err(); err != nil {
+				if tc.err == nil {
+					t.Errorf("unexpected error: %s", tc.err)
+				} else if got, want := err.Error(), tc.err.Error(); got != want {
+					t.Error("unexpected error -want/+got", cmp.Diff(want, got))
+				}
+			} else if tc.err != nil {
+				t.Error("expected error")
+			}
+
+			// Normalize all of the tables for the test case.
+			for _, result := range tc.results {
+				result.Normalize()
+			}
+
+			if !cmp.Equal(got, tc.results) {
+				t.Error("unexpected results -want/+got", cmp.Diff(tc.results, got))
 			}
 		})
 	}

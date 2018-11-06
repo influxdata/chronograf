@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/influxdata/flux/iocounter"
+	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/flux/values"
 	"github.com/pkg/errors"
 )
@@ -35,15 +36,19 @@ type Table interface {
 	Empty() bool
 }
 
+// ColMeta contains the information about the column metadata.
 type ColMeta struct {
+	// Label is the name of the column. The label is unique per table.
 	Label string
-	Type  DataType
+	// Type is the type of the column. Only basic types are allowed.
+	Type ColType
 }
 
-type DataType int
+// ColType is the type for a column. This covers only basic data types.
+type ColType int
 
 const (
-	TInvalid DataType = iota
+	TInvalid ColType = iota
 	TBool
 	TInt
 	TUInt
@@ -52,7 +57,29 @@ const (
 	TTime
 )
 
-func (t DataType) String() string {
+// ColumnType returns the column type when given a semantic.Type.
+// It returns flux.TInvalid if the Type is not a valid column type.
+func ColumnType(typ semantic.Type) ColType {
+	switch typ.Nature() {
+	case semantic.Bool:
+		return TBool
+	case semantic.Int:
+		return TInt
+	case semantic.UInt:
+		return TUInt
+	case semantic.Float:
+		return TFloat
+	case semantic.String:
+		return TString
+	case semantic.Time:
+		return TTime
+	default:
+		return TInvalid
+	}
+}
+
+// String returns a string representation of the column type.
+func (t ColType) String() string {
 	switch t {
 	case TInvalid:
 		return "invalid"
@@ -93,6 +120,7 @@ type ColReader interface {
 
 type GroupKey interface {
 	Cols() []ColMeta
+	Values() []values.Value
 
 	HasCol(label string) bool
 	LabelValue(label string) values.Value

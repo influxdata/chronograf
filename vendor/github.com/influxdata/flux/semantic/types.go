@@ -7,18 +7,21 @@ import (
 	"hash/fnv"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 )
 
 // Type is the representation of a Flux type.
+// Type is a monomorphic, meaning that it represents a single type and is not polymorphic.
+// See PolyType for polymorphic types.
 //
 // Type values are comparable and as such can be used as map keys and directly comparison using the == operator.
 // Two types are equal if they represent identical types.
 //
-// DO NOT embed this type into other interfaces or structs as that will invalidate the comparison properties of the interface.
+// Do NOT embed this type into other interfaces or structs as that will invalidate the comparison properties of the interface.
 type Type interface {
-	// Kind returns the specific kind of this type.
-	Kind() Kind
+	// Nature returns the specific primitive description of this type.
+	Nature() Nature
 
 	// PropertyType returns the type of a given property.
 	// It panics if the type's Kind is not Object
@@ -32,27 +35,22 @@ type Type interface {
 	// It panics if the type's Kind is not Array.
 	ElementType() Type
 
-	// Params reports the parameters of a function type.
+	// FunctionSignature returns the function signature of this type.
 	// It panics if the type's Kind is not Function.
-	Params() map[string]Type
+	FunctionSignature() FunctionSignature
 
-	// PipeArgument reports the name of the argument that can be pipe into.
-	// It panics if the type's Kind is not Function.
-	PipeArgument() string
-
-	// ReturnType reports the return type of the function
-	// It panics if the type's Kind is not Function.
-	ReturnType() Type
+	PolyType() PolyType
 
 	// Types cannot be created outside of the semantic package
 	// This is needed so that we can cache type definitions.
 	typ()
 }
 
-type Kind int
+// Nature is the primitive description of a type.
+type Nature int
 
 const (
-	Invalid Kind = iota
+	Invalid Nature = iota
 	Nil
 	String
 	Int
@@ -67,7 +65,7 @@ const (
 	Function
 )
 
-var kindNames = []string{
+var natureNames = []string{
 	Invalid:  "invalid",
 	Nil:      "nil",
 	String:   "string",
@@ -83,35 +81,29 @@ var kindNames = []string{
 	Function: "function",
 }
 
-func (k Kind) String() string {
-	if int(k) < len(kindNames) {
-		return kindNames[k]
+func (n Nature) String() string {
+	if int(n) < len(natureNames) {
+		return natureNames[n]
 	}
-	return "kind" + strconv.Itoa(int(k))
+	return "nature" + strconv.Itoa(int(n))
 }
 
-func (k Kind) Kind() Kind {
-	return k
+func (n Nature) PolyType() PolyType { return n }
+func (n Nature) Nature() Nature     { return n }
+
+func (n Nature) PropertyType(name string) Type {
+	panic(fmt.Errorf("cannot get type of property %q, from kind %q", name, n))
 }
-func (k Kind) PropertyType(name string) Type {
-	panic(fmt.Errorf("cannot get type of property %q, from kind %q", name, k))
+func (n Nature) Properties() map[string]Type {
+	panic(fmt.Errorf("cannot get properties from kind %s", n))
 }
-func (k Kind) Properties() map[string]Type {
-	panic(fmt.Errorf("cannot get properties from kind %s", k))
+func (n Nature) ElementType() Type {
+	panic(fmt.Errorf("cannot get element type from kind %s", n))
 }
-func (k Kind) ElementType() Type {
-	panic(fmt.Errorf("cannot get element type from kind %s", k))
+func (n Nature) FunctionSignature() FunctionSignature {
+	panic(fmt.Errorf("cannot get function signature from kind %s", n))
 }
-func (k Kind) Params() map[string]Type {
-	panic(fmt.Errorf("cannot get parameters from kind %s", k))
-}
-func (k Kind) PipeArgument() string {
-	panic(fmt.Errorf("cannot get pipe argument name from kind %s", k))
-}
-func (k Kind) ReturnType() Type {
-	panic(fmt.Errorf("cannot get return type from kind %s", k))
-}
-func (k Kind) typ() {}
+func (n Nature) typ() {}
 
 type arrayType struct {
 	elementType Type
@@ -121,26 +113,26 @@ func (t *arrayType) String() string {
 	return fmt.Sprintf("[%v]", t.elementType)
 }
 
-func (t *arrayType) Kind() Kind {
+func (t *arrayType) Nature() Nature {
 	return Array
 }
 func (t *arrayType) PropertyType(name string) Type {
-	panic(fmt.Errorf("cannot get property type of kind %s", t.Kind()))
+	panic(fmt.Errorf("cannot get property type of kind %s", t.Nature()))
 }
 func (t *arrayType) Properties() map[string]Type {
-	panic(fmt.Errorf("cannot get properties type of kind %s", t.Kind()))
+	panic(fmt.Errorf("cannot get properties type of kind %s", t.Nature()))
 }
 func (t *arrayType) ElementType() Type {
 	return t.elementType
 }
-func (t *arrayType) Params() map[string]Type {
-	panic(fmt.Errorf("cannot get parameters from kind %s", t.Kind()))
+func (t *arrayType) FunctionSignature() FunctionSignature {
+	panic(fmt.Errorf("cannot get function signature of kind %s", t.Nature()))
 }
-func (t *arrayType) PipeArgument() string {
-	panic(fmt.Errorf("cannot get pipe argument name from kind %s", t.Kind()))
-}
-func (t *arrayType) ReturnType() Type {
-	panic(fmt.Errorf("cannot get return type of kind %s", t.Kind()))
+func (t *arrayType) PolyType() PolyType {
+	if t.elementType == nil {
+		return Invalid
+	}
+	return NewArrayPolyType(t.elementType.PolyType())
 }
 
 func (t *arrayType) typ() {}
@@ -157,15 +149,7 @@ var arrayTypeCache struct {
 	m sync.Map
 }
 
-// arrayTypeOf returns the Type for the given ArrayExpression.
-func arrayTypeOf(e *ArrayExpression) Type {
-	if len(e.Elements) == 0 {
-		return EmptyArrayType
-	}
-	et := e.Elements[0].Type()
-	return NewArrayType(et)
-}
-
+// TODO(nathanielc): Make empty array types polymorphic over element type?
 var EmptyArrayType = NewArrayType(Nil)
 
 func NewArrayType(elementType Type) Type {
@@ -200,14 +184,14 @@ func (t *objectType) String() string {
 	var buf bytes.Buffer
 	buf.Write([]byte("{"))
 	for k, prop := range t.properties {
-		fmt.Fprintf(&buf, "%s:%v,", k, prop)
+		fmt.Fprintf(&buf, "%s: %v,", k, prop)
 	}
 	buf.WriteRune('}')
 
 	return buf.String()
 }
 
-func (t *objectType) Kind() Kind {
+func (t *objectType) Nature() Nature {
 	return Object
 }
 func (t *objectType) PropertyType(name string) Type {
@@ -221,17 +205,22 @@ func (t *objectType) Properties() map[string]Type {
 	return t.properties
 }
 func (t *objectType) ElementType() Type {
-	panic(fmt.Errorf("cannot get element type of kind %s", t.Kind()))
+	panic(fmt.Errorf("cannot get element type of kind %s", t.Nature()))
 }
-func (t *objectType) Params() map[string]Type {
-	panic(fmt.Errorf("cannot get parameters from kind %s", t.Kind()))
+func (t *objectType) FunctionSignature() FunctionSignature {
+	panic(fmt.Errorf("cannot get function signature of kind %s", t.Nature()))
 }
-func (t *objectType) PipeArgument() string {
-	panic(fmt.Errorf("cannot get pipe argument name from kind %s", t.Kind()))
+func (t *objectType) PolyType() PolyType {
+	properties := make(map[string]PolyType, len(t.properties))
+	labels := make([]string, 0, len(t.properties))
+	for k, p := range t.properties {
+		properties[k] = p.PolyType()
+		labels = append(labels, k)
+	}
+
+	return NewObjectPolyType(properties, LabelSet{}, labels)
 }
-func (t *objectType) ReturnType() Type {
-	panic(fmt.Errorf("cannot get return type of kind %s", t.Kind()))
-}
+
 func (t *objectType) typ() {}
 
 func (t *objectType) equal(o *objectType) bool {
@@ -267,16 +256,6 @@ var objectTypeCache struct {
 	m sync.Map
 }
 
-// objectTypeOf returns the Type for the given ObjectExpression.
-func objectTypeOf(e *ObjectExpression) Type {
-	propertyTypes := make(map[string]Type, len(e.Properties))
-	for _, p := range e.Properties {
-		propertyTypes[p.Key.Name] = p.Value.Type()
-	}
-
-	return NewObjectType(propertyTypes)
-}
-
 var EmptyObject = NewObjectType(nil)
 
 func NewObjectType(propertyTypes map[string]Type) Type {
@@ -292,7 +271,7 @@ func NewObjectType(propertyTypes map[string]Type) Type {
 
 		// track hash of property names and kinds
 		sum.Write([]byte(p))
-		binary.Write(sum, binary.LittleEndian, t.Kind())
+		binary.Write(sum, binary.LittleEndian, int64(t.Nature()))
 	}
 
 	// Create new object type
@@ -339,139 +318,114 @@ func NewObjectType(propertyTypes map[string]Type) Type {
 }
 
 type functionType struct {
-	params       map[string]Type
-	returnType   Type
+	parameters   map[string]Type
+	required     LabelSet
+	ret          Type
 	pipeArgument string
 }
 
 func (t *functionType) String() string {
-	var buf bytes.Buffer
-	buf.Write([]byte("function("))
-	for k, param := range t.params {
-		fmt.Fprintf(&buf, "%s:%v,", k, param)
+	var builder strings.Builder
+	keys := make([]string, 0, len(t.parameters))
+	for k := range t.parameters {
+		keys = append(keys, k)
 	}
-	fmt.Fprintf(&buf, ") %v", t.returnType)
-
-	return buf.String()
+	sort.Strings(keys)
+	builder.WriteString("(")
+	for i, k := range keys {
+		if i != 0 {
+			builder.WriteString(", ")
+		}
+		if t.required.contains(k) {
+			builder.WriteString("^")
+		}
+		fmt.Fprintf(&builder, "%s: %v", k, t.parameters[k])
+	}
+	fmt.Fprintf(&builder, ") -> %v", t.ret)
+	return builder.String()
 }
 
-func (t *functionType) Kind() Kind {
+func (t *functionType) Nature() Nature {
 	return Function
 }
 func (t *functionType) PropertyType(name string) Type {
-	panic(fmt.Errorf("cannot get property type of kind %s", t.Kind()))
+	panic(fmt.Errorf("cannot get property type of kind %s", t.Nature()))
 }
 func (t *functionType) Properties() map[string]Type {
-	panic(fmt.Errorf("cannot get properties type of kind %s", t.Kind()))
+	panic(fmt.Errorf("cannot get properties type of kind %s", t.Nature()))
 }
 func (t *functionType) ElementType() Type {
-	panic(fmt.Errorf("cannot get element type of kind %s", t.Kind()))
+	panic(fmt.Errorf("cannot get element type of kind %s", t.Nature()))
 }
-func (t *functionType) Params() map[string]Type {
-	return t.params
-}
-func (t *functionType) PipeArgument() string {
-	return t.pipeArgument
-}
-func (t *functionType) ReturnType() Type {
-	return t.returnType
-}
-func (t *functionType) typ() {}
-
-func (t *functionType) equal(o *functionType) bool {
-	if t == o {
-		return true
+func (t *functionType) FunctionSignature() FunctionSignature {
+	return FunctionSignature{
+		Parameters:   t.parameters,
+		Required:     []string(t.required),
+		Return:       t.ret,
+		PipeArgument: t.pipeArgument,
 	}
+}
 
-	if t.returnType != o.returnType {
+func (a *functionType) equal(b *functionType) bool {
+	if len(a.parameters) != len(b.parameters) ||
+		a.pipeArgument != b.pipeArgument ||
+		!a.required.equal(b.required) ||
+		a.ret != b.ret {
 		return false
 	}
-
-	if len(t.params) != len(o.params) {
-		return false
-	}
-
-	for k, pt := range t.params {
-		opt, ok := o.params[k]
-		if !ok {
-			return false
-		}
-		if opt != pt {
+	for k, pA := range a.parameters {
+		pB, ok := b.parameters[k]
+		if !ok || pA != pB {
 			return false
 		}
 	}
-
 	return true
 }
 
+func (t *functionType) PolyType() PolyType {
+	parameters := make(map[string]PolyType, len(t.parameters))
+	for k, p := range t.parameters {
+		parameters[k] = p.PolyType()
+	}
+	return NewFunctionPolyType(FunctionPolySignature{
+		Parameters: parameters,
+		Required:   t.required.copy(),
+		Return:     t.ret.PolyType(),
+	})
+}
+
+func (t *functionType) typ() {}
+
 // functionTypeCache caches all *functionTypes.
-//
-// Since functionTypes are identified by their parameters and returnType,
-// a hash is computed of the param names and kinds to reduce the search space.
 var functionTypeCache struct {
 	sync.Mutex // Guards stores (but not loads) on m.
 
-	// m is a map[uint32][]*functionType keyed by the hash calculated.
+	// m is a map[Type][]*functionType keyed by the elementType of the array.
 	// Elements in m are append-only and thus safe for concurrent reading.
 	m sync.Map
 }
 
-// functionTypeOf returns the Type for the given ObjectExpression.
-func functionTypeOf(e *FunctionExpression) Type {
-	sig := FunctionSignature{}
-	sig.Params = make(map[string]Type, len(e.Params))
-	for _, p := range e.Params {
-		sig.Params[p.Key.Name] = p.Type()
-	}
-	// Determine returnType
-	switch b := e.Body.(type) {
-	case Expression:
-		sig.ReturnType = b.Type()
-	case *BlockStatement:
-		rs := b.ReturnStatement()
-		sig.ReturnType = rs.Argument.Type()
-	}
-	for _, p := range e.Params {
-		if p.Piped {
-			sig.PipeArgument = p.Key.Name
-			break
-		}
-	}
-	return NewFunctionType(sig)
-}
-
 type FunctionSignature struct {
-	Params       map[string]Type
-	ReturnType   Type
+	Parameters   map[string]Type
+	Required     []string
+	Return       Type
 	PipeArgument string
 }
 
-func NewFunctionType(sig FunctionSignature) Type {
-	paramNames := make([]string, 0, len(sig.Params))
-	for k := range sig.Params {
-		paramNames = append(paramNames, k)
-	}
-	sort.Strings(paramNames)
-
-	sum := fnv.New32a()
-	sum.Write([]byte(sig.PipeArgument))
-	for _, p := range paramNames {
-		// track hash of parameter names and kinds
-		sum.Write([]byte(p))
-		// TODO(nathanielc): Include parameter type information
-		binary.Write(sum, binary.LittleEndian, sig.Params[p].Kind())
-	}
-
-	// Create new object type
+func NewFunctionType(sig FunctionSignature) (t Type) {
 	ft := &functionType{
-		params:       sig.Params,
-		returnType:   sig.ReturnType,
+		parameters:   sig.Parameters,
+		required:     LabelSet(sig.Required).remove(sig.PipeArgument),
+		ret:          sig.Return,
 		pipeArgument: sig.PipeArgument,
 	}
-
-	// Simple linear search after hash lookup
-	h := sum.Sum32()
-	if ts, ok := functionTypeCache.m.Load(h); ok {
+	if ft.ret == nil {
+		ft.ret = Nil
+	}
+	in := NewObjectType(ft.parameters)
+	// Lookup functionType in cache by in type
+	if ts, ok := functionTypeCache.m.Load(in); ok {
+		// Search for matching function type
 		for _, t := range ts.([]*functionType) {
 			if t.equal(ft) {
 				return t
@@ -485,8 +439,9 @@ func NewFunctionType(sig FunctionSignature) Type {
 
 	// First read again while holding the lock.
 	var types []*functionType
-	if ts, ok := functionTypeCache.m.Load(h); ok {
+	if ts, ok := functionTypeCache.m.Load(in); ok {
 		types = ts.([]*functionType)
+		// Search for matching function type
 		for _, t := range types {
 			if t.equal(ft) {
 				return t
@@ -494,15 +449,6 @@ func NewFunctionType(sig FunctionSignature) Type {
 		}
 	}
 
-	// Make copy of Params since we can't trust the source is not modified
-	params := make(map[string]Type, len(ft.params))
-	for k, v := range ft.params {
-		params[k] = v
-	}
-	ft.params = params
-
-	// Still no cache entry, add it.
-	functionTypeCache.m.Store(h, append(types, ft))
-
+	functionTypeCache.m.Store(in, append(types, ft))
 	return ft
 }

@@ -2,6 +2,7 @@ package execute
 
 import (
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/plan"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -48,6 +49,10 @@ var ZeroDatasetID DatasetID
 
 func (id DatasetID) IsZero() bool {
 	return id == ZeroDatasetID
+}
+
+func DatasetIDFromNodeID(id plan.NodeID) DatasetID {
+	return DatasetID(uuid.NewV5(uuid.UUID{}, string(id)))
 }
 
 type dataset struct {

@@ -1,63 +1,123 @@
-# Planner Design
+# Query Planner and Optimizer
 
-This document lays out the design of the planner.
+This document describes the design of the Flux query planner and optimizer.
 
-## Interface
+## Plans
+--------
 
-The Planner inter is defined as:
+A Flux query plan is represented as a Directed Acyclic Graph (DAG).
+The nodes of the graph represent individual query operations to perform.
+The edges of the graph represent the flow of data from one operation to another.
+In a Flux query plan, data flows upwards from source nodes to terminal yield nodes.
+
+## Plan Nodes
+-------------
 
 ```go
-type Planner interface {
-    Plan(Query, []Storage) Plan
+type PlanNode interface {
+	// Returns an identifier for this plan node
+	ID() NodeID
+
+	// Returns the time bounds for this plan node
+	Bounds() *Bounds
+
+	// Plan nodes executed immediately before this node
+	Predecessors() []PlanNode
+
+	// Plan nodes executed immediately after this node
+	Successors() []PlanNode
+
+	// Specification of the procedure represented by this node
+	ProcedureSpec() ProcedureSpec
+
+	// Type of procedure represented by this node
+	Kind() ProcedureKind
+
+    ...
 }
 ```
 
-The planner is responsible for taking a query DAG and a set of available storage interfaces and produce a plan DAG.
+The nodes of a query represent operations.
+An operation is a transformation to apply to data in some form.
+Nodes have predecessors and successors.
+A node's predecessors are the query operations executed immediately before it.
+A node's successors are the query operations executed immediately after it.
+A node receives data directly from its predecessors.
+A node feeds data directly to its successors.
 
-## Plans
+## Planning and Optmimization
+-----------------------------
 
-Plans are created via a two step process:
+```go
+type LogicalPlanner interface {
+	Plan(*flux.Spec) (*PlanSpec, error)
+}
 
-1. Create a general plan from the query.
-2. Create a specific plan from the general plan and available storage interface.
+type PhysicalPlanner interface {
+	Plan(*PlanSpec) (*PlanSpec, error)
+}
+```
 
-The general plan specifies all the needed data frames and their lineage needed to produce the final query result.
-The specific plan specifies how the general plan will be executed, which storage interfaces will be consumed and how.
+There are two types of query plans - logical and physical.
+The nodes of a logical plan represent logical operations.
+The nodes of a physical plan represent physical operations.
+Logical operations describe _what_ happens to the data.
+Physical operations specify _how_ transformations are implemented.
 
-The general plan does not leave the scope of the Planner and is not part of the API of the planner.
-Hence the Plan type above it the specific plan.
+Logical planning occurs in two distinct phases.
+First a Flux query spec is translated directly into a logical plan.
+There is a 1-1 relationship between a query spec and a logical plan.
+Once a spec is converted to an initial logical plan, it is optimized via a set of rewrite rules.
+Each rule transforms the plan into an equivalent one that can be executed more efficiently by the query engine.
 
-## Plan DAG
+After a logical plan has been optimized, a physical planner converts it to an optimized physical plan.
+Physical plan nodes have a cost of execution associated with them.
+Hence the goal of this phase is to compute an equivalent physical plan with the smallest cost.
+During optimization equivalent plans are obtained via rewrite rules.
+These plans are enumerated with their total query costs.
+The final physical plan specifies the best algorithm (in terms of cost) to perform the query.
 
-Both the general and specific plans are represented as DAGs.
-The nodes of the DAG represent data frames to be produced, while the edges of the DAG represent the operations need to construct the data frames.
-This is inverted from the Query DAG where the nodes are operations and edges represents data sets.
+## Rewrite Rules
+----------------
 
-The leaves of the plan DAG represent sources of data and the data flows from bottom up through the tree.
-Again this is inverted from the Query DAG where data flows top down.
+```go
+type Rule interface {
+	// The name of this rule (must be unique)
+	Name() string
 
-## Data Frames
+	// Pattern for this rule to match against
+	Pattern() Pattern
 
-Data frames are a set of data and their lineage is known.
-Meaning it is known what parent data frames and operations are needed to construct the data frame.
-Using this concept of lineage allows a data frame to be reconstructed if it is loss due to node failure or if its parent data frames are modified.
+	// Rewrite an operation into an equivalent one
+	Rewrite(PlanNode) (PlanNode, bool, error)
+}
+```
 
-### Windowing
+Query plans - whether logical or physical - are transformed into equivalent plans via rewrite rules.
+A rewrite rule defines an equivalence class of queries.
+That is, for any data instance, a query expressed before and after a rewrite rule is applied will always define the same data transformation.
+This implies that an abritrary number of rewrite rules still preserves query equivalence.
 
-Data frames will specify their windowing properties. ????
+## Patterns
+-----------
 
-## Operations
+A rewrite rule specifies an operator pattern that it must match in order to perform the rewrite.
+Patterns are constructed using the `Pat(ProcedureKind, Pattern) Pattern` method.
+For example, given that we are interested in the rewrite rule that merges two consecutive filters, the pattern that this rule must match is given by the following construction.
 
-Operations are a definition of a transformation to be applied on one data frame resulting in another.
+```go
+// Any() returns a pattern that matches anything
+consecutiveFiltersPattern := Pat(FilterKind, Pat(FilterKind, Any()))
+```
 
-### Narrow vs Wide
+Therefore this rewrite rule's `Pattern()` method is defined as such.
 
-Operations are classified as either narrow or wide:
+```go
+// MergeFiltersRule merges two consecutive filter operations into a single filter operation
+type MergeFiltersRule struct {}
 
-* Narrow operations map each parent data frame to exactly one child data frame.
-    Specifically a narrow operation is a one-to-one mapping of parent to child data frames.
-* Wide operations map multiple parent data frames to multiple child data frames.
-    Specifically a wide operation is a many-to-many mapping of parent to child data frames.
-
-This distinction is necessary to precisely define the lineage of a data frame.
-
+// Pattern specifies the operator pattern ... |> filter(...) |> filter(...)
+func (rule MergeFiltersRule) Pattern() Pattern {
+	return Pat(FilterKind, Pat(FilterKind, Any()))
+}
+```

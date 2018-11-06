@@ -9,12 +9,12 @@ import (
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/execute/executetest"
-	"github.com/influxdata/flux/functions"
+	"github.com/influxdata/flux/functions/transformations"
 )
 
 func TestAggregate_Process(t *testing.T) {
-	sumAgg := new(functions.SumAgg)
-	countAgg := new(functions.CountAgg)
+	sumAgg := new(transformations.SumAgg)
+	countAgg := new(transformations.CountAgg)
 	testCases := []struct {
 		name   string
 		agg    execute.Aggregate
@@ -52,11 +52,10 @@ func TestAggregate_Process(t *testing.T) {
 				ColMeta: []flux.ColMeta{
 					{Label: "_start", Type: flux.TTime},
 					{Label: "_stop", Type: flux.TTime},
-					{Label: "_time", Type: flux.TTime},
 					{Label: "_value", Type: flux.TFloat},
 				},
 				Data: [][]interface{}{
-					{execute.Time(0), execute.Time(100), execute.Time(100), 45.0},
+					{execute.Time(0), execute.Time(100), 45.0},
 				},
 			}},
 		},
@@ -64,8 +63,6 @@ func TestAggregate_Process(t *testing.T) {
 			name: "single use start time",
 			config: execute.AggregateConfig{
 				Columns: []string{execute.DefaultValueColLabel},
-				TimeSrc: execute.DefaultStartColLabel,
-				TimeDst: execute.DefaultTimeColLabel,
 			},
 			agg: sumAgg,
 			data: []*executetest.Table{{
@@ -94,11 +91,10 @@ func TestAggregate_Process(t *testing.T) {
 				ColMeta: []flux.ColMeta{
 					{Label: "_start", Type: flux.TTime},
 					{Label: "_stop", Type: flux.TTime},
-					{Label: "_time", Type: flux.TTime},
 					{Label: "_value", Type: flux.TFloat},
 				},
 				Data: [][]interface{}{
-					{execute.Time(0), execute.Time(100), execute.Time(0), 45.0},
+					{execute.Time(0), execute.Time(100), 45.0},
 				},
 			}},
 		},
@@ -156,11 +152,10 @@ func TestAggregate_Process(t *testing.T) {
 					ColMeta: []flux.ColMeta{
 						{Label: "_start", Type: flux.TTime},
 						{Label: "_stop", Type: flux.TTime},
-						{Label: "_time", Type: flux.TTime},
 						{Label: "_value", Type: flux.TFloat},
 					},
 					Data: [][]interface{}{
-						{execute.Time(0), execute.Time(100), execute.Time(100), 45.0},
+						{execute.Time(0), execute.Time(100), 45.0},
 					},
 				},
 				{
@@ -168,11 +163,10 @@ func TestAggregate_Process(t *testing.T) {
 					ColMeta: []flux.ColMeta{
 						{Label: "_start", Type: flux.TTime},
 						{Label: "_stop", Type: flux.TTime},
-						{Label: "_time", Type: flux.TTime},
 						{Label: "_value", Type: flux.TFloat},
 					},
 					Data: [][]interface{}{
-						{execute.Time(100), execute.Time(200), execute.Time(200), 145.0},
+						{execute.Time(100), execute.Time(200), 145.0},
 					},
 				},
 			},
@@ -278,11 +272,10 @@ func TestAggregate_Process(t *testing.T) {
 						{Label: "_start", Type: flux.TTime},
 						{Label: "_stop", Type: flux.TTime},
 						{Label: "t1", Type: flux.TString},
-						{Label: "_time", Type: flux.TTime},
 						{Label: "_value", Type: flux.TFloat},
 					},
 					Data: [][]interface{}{
-						{execute.Time(0), execute.Time(100), "a", execute.Time(100), 45.0},
+						{execute.Time(0), execute.Time(100), "a", 45.0},
 					},
 				},
 				{
@@ -291,11 +284,10 @@ func TestAggregate_Process(t *testing.T) {
 						{Label: "_start", Type: flux.TTime},
 						{Label: "_stop", Type: flux.TTime},
 						{Label: "t1", Type: flux.TString},
-						{Label: "_time", Type: flux.TTime},
 						{Label: "_value", Type: flux.TFloat},
 					},
 					Data: [][]interface{}{
-						{execute.Time(100), execute.Time(200), "a", execute.Time(200), 145.0},
+						{execute.Time(100), execute.Time(200), "a", 145.0},
 					},
 				},
 				{
@@ -304,11 +296,10 @@ func TestAggregate_Process(t *testing.T) {
 						{Label: "_start", Type: flux.TTime},
 						{Label: "_stop", Type: flux.TTime},
 						{Label: "t1", Type: flux.TString},
-						{Label: "_time", Type: flux.TTime},
 						{Label: "_value", Type: flux.TFloat},
 					},
 					Data: [][]interface{}{
-						{execute.Time(0), execute.Time(100), "b", execute.Time(100), 48.0},
+						{execute.Time(0), execute.Time(100), "b", 48.0},
 					},
 				},
 				{
@@ -317,11 +308,10 @@ func TestAggregate_Process(t *testing.T) {
 						{Label: "_start", Type: flux.TTime},
 						{Label: "_stop", Type: flux.TTime},
 						{Label: "t1", Type: flux.TString},
-						{Label: "_time", Type: flux.TTime},
 						{Label: "_value", Type: flux.TFloat},
 					},
 					Data: [][]interface{}{
-						{execute.Time(100), execute.Time(200), "b", execute.Time(200), 148.0},
+						{execute.Time(100), execute.Time(200), "b", 148.0},
 					},
 				},
 			},
@@ -330,8 +320,6 @@ func TestAggregate_Process(t *testing.T) {
 			name: "multiple values",
 			config: execute.AggregateConfig{
 				Columns: []string{"x", "y"},
-				TimeSrc: execute.DefaultStopColLabel,
-				TimeDst: execute.DefaultTimeColLabel,
 			},
 			agg: sumAgg,
 			data: []*executetest.Table{{
@@ -361,12 +349,11 @@ func TestAggregate_Process(t *testing.T) {
 				ColMeta: []flux.ColMeta{
 					{Label: "_start", Type: flux.TTime},
 					{Label: "_stop", Type: flux.TTime},
-					{Label: "_time", Type: flux.TTime},
 					{Label: "x", Type: flux.TFloat},
 					{Label: "y", Type: flux.TFloat},
 				},
 				Data: [][]interface{}{
-					{execute.Time(0), execute.Time(100), execute.Time(100), 45.0, -45.0},
+					{execute.Time(0), execute.Time(100), 45.0, -45.0},
 				},
 			}},
 		},
@@ -374,8 +361,6 @@ func TestAggregate_Process(t *testing.T) {
 			name: "multiple values changing types",
 			config: execute.AggregateConfig{
 				Columns: []string{"x", "y"},
-				TimeSrc: execute.DefaultStopColLabel,
-				TimeDst: execute.DefaultTimeColLabel,
 			},
 			agg: countAgg,
 			data: []*executetest.Table{{
@@ -405,12 +390,11 @@ func TestAggregate_Process(t *testing.T) {
 				ColMeta: []flux.ColMeta{
 					{Label: "_start", Type: flux.TTime},
 					{Label: "_stop", Type: flux.TTime},
-					{Label: "_time", Type: flux.TTime},
 					{Label: "x", Type: flux.TInt},
 					{Label: "y", Type: flux.TInt},
 				},
 				Data: [][]interface{}{
-					{execute.Time(0), execute.Time(100), execute.Time(100), int64(10), int64(10)},
+					{execute.Time(0), execute.Time(100), int64(10), int64(10)},
 				},
 			}},
 		},

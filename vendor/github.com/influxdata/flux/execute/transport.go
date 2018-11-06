@@ -28,7 +28,7 @@ type consecutiveTransport struct {
 	inflight       int32
 }
 
-func newConescutiveTransport(dispatcher Dispatcher, t Transformation) *consecutiveTransport {
+func newConsecutiveTransport(dispatcher Dispatcher, t Transformation) *consecutiveTransport {
 	return &consecutiveTransport{
 		dispatcher: dispatcher,
 		t:          t,

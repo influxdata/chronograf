@@ -1,6 +1,7 @@
 package values
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/influxdata/flux/semantic"
@@ -31,8 +32,15 @@ type function struct {
 	hasSideEffect bool
 }
 
+func (f *function) String() string {
+	return fmt.Sprintf("%s()", f.name)
+}
+
 func (f *function) Type() semantic.Type {
 	return f.t
+}
+func (f *function) PolyType() semantic.PolyType {
+	return f.t.PolyType()
 }
 
 func (f *function) Str() string {
