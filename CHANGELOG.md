@@ -1,11 +1,6 @@
-## v1.7.1 [unreleased]
-
-### Features
-
-### UI Improvements
+## v1.7.1 [2018-11-07]
 
 ### Bug Fixes
-
 1. [#4758](https://github.com/influxdata/chronograf/pull/4758): Fix empty graph on alert rule creation page
 
 ## v1.7.0 [2018-11-06]
