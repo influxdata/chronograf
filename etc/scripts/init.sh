@@ -16,6 +16,7 @@ export HOST="0.0.0.0"
 export PORT="8888"
 export BOLT_PATH="/var/lib/chronograf/chronograf-v1.db"
 export CANNED_PATH="/usr/share/chronograf/canned"
+export PROTOBOARDS_PATH="/usr/share/chronograf/protoboards"
 # Options to pass to the script on startup
 . /etc/default/chronograf
 SCRIPT_OPTS="${CHRONOGRAF_OPTS}"
