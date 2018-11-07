@@ -34,6 +34,7 @@ interface Props {
   updateEditorTimeRange: (timeRange: QueriesModels.TimeRange) => void
   toggleFlux: (queryType: QueryType) => void
   toggleIsViewingRawData: () => void
+  onManualRefresh: () => void
 }
 
 const TimeMachineControls: SFC<Props> = ({
@@ -48,6 +49,7 @@ const TimeMachineControls: SFC<Props> = ({
   isViewingRawData,
   autoRefreshDuration,
   onChangeAutoRefreshDuration,
+  onManualRefresh,
   onChangeSource,
   sourceSupportsFlux,
   onSelectDynamicSource,
@@ -89,7 +91,8 @@ const TimeMachineControls: SFC<Props> = ({
       <AutoRefreshDropdown
         selected={autoRefreshDuration}
         onChoose={onChangeAutoRefreshDuration}
-        showManualRefresh={false}
+        onManualRefresh={onManualRefresh}
+        showManualRefresh={true}
       />
       <TimeRangeDropdown
         onChooseTimeRange={updateEditorTimeRange}
