@@ -95,7 +95,14 @@ const calculateScrollTop = scrollToRow => {
 
 class LogsTable extends Component<Props, State> {
   public static getDerivedStateFromProps(props, state): State {
-    const {scrollToRow, data, tableColumns, severityFormat, filters} = props
+    const {
+      scrollToRow,
+      data,
+      tableColumns,
+      severityFormat,
+      filters,
+      searchStatus,
+    } = props
     const currentMessageWidth = getMessageWidth(
       data,
       tableColumns,
@@ -103,12 +110,15 @@ class LogsTable extends Component<Props, State> {
     )
 
     let scrollTop = _.get(state, 'scrollTop', 0)
+    let scrollLeft = _.get(state, 'scrollLeft', 0)
 
     if (_.isNumber(scrollToRow)) {
       scrollTop = calculateScrollTop(scrollToRow)
     }
 
-    const scrollLeft = _.get(state, 'scrollLeft', 0)
+    if (searchStatus === SearchStatus.Clearing) {
+      scrollLeft = 0
+    }
 
     let isMessageVisible: boolean = false
     const visibleColumnsCount = props.tableColumns.filter(c => {
@@ -236,6 +246,7 @@ class LogsTable extends Component<Props, State> {
                   }}
                   setScrollTop={this.handleScrollbarScroll}
                   scrollTop={this.state.scrollTop}
+                  scrollLeft={this.state.scrollLeft}
                   autoHide={false}
                 >
                   <Grid
