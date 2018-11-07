@@ -2,21 +2,32 @@
 import React, {PureComponent, CSSProperties} from 'react'
 import {connect} from 'react-redux'
 import TimeSeries from 'src/shared/components/time_series/TimeSeries'
+import uuid from 'uuid'
 
 // Components
 import TimeRangeDropdown from 'src/shared/components/TimeRangeDropdown'
 import RuleGraphDygraph from 'src/kapacitor/components/RuleGraphDygraph'
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Utils
 import buildInfluxQLQuery from 'src/utils/influxql'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
+import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
+
+// Constants
+import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
 
 // Types
-import {Source, AlertRule, QueryConfig, Query, TimeRange} from 'src/types'
-
-import {ErrorHandling} from 'src/shared/decorators/errors'
-import {setHoverTime as setHoverTimeAction} from 'src/dashboards/actions'
-import uuid from 'uuid'
+import {
+  Source,
+  AlertRule,
+  QueryConfig,
+  Query,
+  TimeRange,
+  Template,
+  TemplateType,
+  TemplateValueType,
+} from 'src/types'
 
 interface Props {
   source: Source
@@ -57,6 +68,7 @@ class RuleGraph extends PureComponent<Props> {
             timeRange={timeRange}
             source={source}
             queries={this.queries}
+            templates={this.templates}
             uuid={uuid.v1()}
           >
             {data => {
@@ -85,6 +97,27 @@ class RuleGraph extends PureComponent<Props> {
     const {timeRange, query} = this.props
     const lower = timeRange.lower
     return buildInfluxQLQuery({lower}, query)
+  }
+
+  private get templates(): Template[] {
+    const {timeRange} = this.props
+
+    const dashboardTime = {
+      id: TEMP_VAR_DASHBOARD_TIME,
+      tempVar: TEMP_VAR_DASHBOARD_TIME,
+      type: TemplateType.Constant,
+      label: '',
+      values: [
+        {
+          value: timeRange.lower,
+          type: TemplateValueType.Constant,
+          selected: true,
+          localSelected: true,
+        },
+      ],
+    }
+
+    return [dashboardTime]
   }
 
   private get queries(): Query[] {
