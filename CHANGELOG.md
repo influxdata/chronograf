@@ -1,9 +1,3 @@
-## v1.8.0 [unreleased]
-
-### Features
-### UI Improvements
-### Bug Fixes
-
 ## v1.7.0 [2018-11-06]
 
 ### Features
