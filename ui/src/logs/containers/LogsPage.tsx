@@ -374,7 +374,7 @@ class LogsPage extends Component<Props, State> {
 
     if (this.props.nextNewerLowerBound > maxNewerFetchForward) {
       this.props.setNextNewerLowerBound(Date.now())
-      this.currentNewerChunksGenerator.cancelAsync()
+      this.currentNewerChunksGenerator.cancel()
     }
 
     await this.props.fetchNewerChunkAsync()
@@ -481,7 +481,10 @@ class LogsPage extends Component<Props, State> {
     const cancelPendingChunks = _.compact([
       this.currentNewerChunksGenerator,
       this.currentOlderChunksGenerator,
-    ]).map(req => req.cancelAsync())
+    ]).map(req => {
+      req.cancel()
+      return req.promise
+    })
 
     await Promise.all(cancelPendingChunks)
 

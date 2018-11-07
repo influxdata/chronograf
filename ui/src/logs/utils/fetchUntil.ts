@@ -11,13 +11,13 @@ export function fetchUntil<T>(
   const requests = fetchUnless(() => isCanceled || predicate(), request)
 
   const promise = fetchEachAsync(requests)
-  const cancelAsync = async () => {
+  const cancel = () => {
     isCanceled = true
-    await promise
   }
+
   return {
     promise,
-    cancelAsync,
+    cancel,
     isCanceled,
   }
 }
