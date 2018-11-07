@@ -374,7 +374,7 @@ class LogsPage extends Component<Props, State> {
 
     if (this.props.nextNewerLowerBound > maxNewerFetchForward) {
       this.props.setNextNewerLowerBound(Date.now())
-      await this.currentNewerChunksGenerator.cancelAsync()
+      this.currentNewerChunksGenerator.cancelAsync()
     }
 
     await this.props.fetchNewerChunkAsync()
