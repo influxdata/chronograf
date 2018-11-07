@@ -1,4 +1,10 @@
-## v1.7.0 [unreleased]
+## v1.8.0 [unreleased]
+
+### Features
+### UI Improvements
+### Bug Fixes
+
+## v1.7.0 [2018-11-06]
 
 ### Features
 1.  [#4217](https://github.com/influxdata/chronograf/pull/4217): Add filestore backed API for protodashboards
@@ -14,8 +20,8 @@
 1.  [#4353](https://github.com/influxdata/chronograf/pull/4353): Add visualization options to the Data Explorer
 1.  [#4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
 1.  [#4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
-1.  [4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
-1.  [4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
+1.  [#4364](https://github.com/influxdata/chronograf/pull/4364): Add ability to save a Flux query to a cell
+1.  [#4390](https://github.com/influxdata/chronograf/pull/4390): Remove Flux Page
 1.  [#4389](https://github.com/influxdata/chronograf/pull/4389): Add regexp search for appname in log lines
 1.  [#4403](https://github.com/influxdata/chronograf/pull/4403): Add ability to toggle between Flux/InfluxQL on dynamic source in CEO
 1.  [#4404](https://github.com/influxdata/chronograf/pull/4404): Add loading status indicator to hosts page
