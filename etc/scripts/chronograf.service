@@ -12,6 +12,7 @@ Environment="HOST=0.0.0.0"
 Environment="PORT=8888"
 Environment="BOLT_PATH=/var/lib/chronograf/chronograf-v1.db"
 Environment="CANNED_PATH=/usr/share/chronograf/canned"
+Environment="PROTOBOARDS_PATH=/usr/share/chronograf/protoboards"
 EnvironmentFile=-/etc/default/chronograf
 ExecStart=/usr/bin/chronograf $CHRONOGRAF_OPTS
 KillMode=control-group
