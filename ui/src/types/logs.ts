@@ -204,6 +204,6 @@ export interface MatchSection {
 
 export interface FetchLoop {
   promise: Promise<void>
-  cancelAsync: () => Promise<void>
+  cancel: () => void
   isCanceled: boolean
 }
