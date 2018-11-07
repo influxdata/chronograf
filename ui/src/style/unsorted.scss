@@ -296,7 +296,7 @@ $tick-script-overlay-margin: 30px;
   -----------------------------------------------------------------------------
 */
 .icon.download.dlcsv:before {
-  content: '\e91d';
+  content: "\e91d";
   font-weight: bold;
   color: #bec2cc;
 }
@@ -363,11 +363,9 @@ div.dropdown.dropdown-stretch > button.dropdown-toggle {
   margin-top: 4px;
 }
 
-
 .annotation-selector {
   margin-left: 4px;
 }
-
 
 $deceo-spacing: 20px;
 
@@ -428,12 +426,13 @@ $deceo-spacing: 20px;
   background-color: $g2-kevlar;
   align-items: center;
 
-  .csv-export, .autorefresh-dropdown {
+  .csv-export,
+  .autorefresh-dropdown {
     margin-right: 5px;
   }
 
   .autorefresh-dropdown.paused .dropdown {
-    margin-right: 0;
+    margin-right: 4px;
   }
 }
 

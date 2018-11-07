@@ -8,6 +8,7 @@
 
 1. [#4758](https://github.com/influxdata/chronograf/pull/4758): Fix empty graph on alert rule creation page
 1. [#4764](https://github.com/influxdata/chronograf/pull/4764): Add protoboard environment variables to build scripts
+1. [#4769](https://github.com/influxdata/chronograf/pull/4769): Show manual refresh when paused
 1. [#4768](https://github.com/influxdata/chronograf/pull/4768): Update dockerfile to include protoboards
 1. [#4772](https://github.com/influxdata/chronograf/pull/4772): Add protoboards enviroment variables to dockerfile
 1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
