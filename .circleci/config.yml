@@ -2,7 +2,10 @@ workflows:
   version: 2
   main:
     jobs:
-      - build
+      - build:
+          filters:
+            tags:
+              only: /.*/
       - deploy-nightly:
           requires:
             - build
