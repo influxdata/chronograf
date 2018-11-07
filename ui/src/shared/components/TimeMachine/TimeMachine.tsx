@@ -138,6 +138,7 @@ class TimeMachine extends PureComponent<Props, State> {
       script,
       timeRange,
       templates,
+      onManualRefresh,
       timeMachineProportions,
       onSetTimeMachineProportions,
     } = this.props
@@ -175,6 +176,7 @@ class TimeMachine extends PureComponent<Props, State> {
           timeRange={timeRange}
           sources={this.formattedSources}
           toggleFlux={this.toggleFlux}
+          onManualRefresh={onManualRefresh}
           queries={this.queriesWorkingDraft}
           isViewingRawData={isViewingRawData}
           isFluxSelected={this.isFluxSelected}
