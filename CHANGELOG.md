@@ -7,6 +7,7 @@
 ### Bug Fixes
 
 1. [#4758](https://github.com/influxdata/chronograf/pull/4758): Fix empty graph on alert rule creation page
+1. [#4764](https://github.com/influxdata/chronograf/pull/4764): Add protoboard environment variables to build scripts
 
 ## v1.7.0 [2018-11-06]
 
