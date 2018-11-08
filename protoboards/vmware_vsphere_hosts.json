@@ -20,7 +20,7 @@
         "name": "Total Disk Latency for :esxhostname:",
         "queries": [
           {
-            "query": "SELECT mean(\"maxTotalLatency_latest\") AS \"maxTotalLatency_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_disk\" WHERE time > :dashboardTime: AND esxhostname =~ /^:esxhostname:$/ GROUP BY time(:interval:), \"disk\" FILL(null)",
+            "query": "SELECT mean(\"maxTotalLatency_latest\") AS \"maxTotalLatency_latest\" FROM \":db:\".\":rp:\".\"vsphere_host_disk\" WHERE time > :dashboardTime: AND esxhostname =~ /^:esxhostname:$/ GROUP BY time(:interval:), \"disk\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -29,7 +29,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"maxTotalLatency_latest\") AS \"maxTotalLatency_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_disk\" WHERE time > :dashboardTime: AND esxhostname =~ /^:esxhostname:$/ GROUP BY time(:interval:), \"disk\" FILL(null)",
+              "rawText": "SELECT mean(\"maxTotalLatency_latest\") AS \"maxTotalLatency_latest\" FROM \":db:\".\":rp:\".\"vsphere_host_disk\" WHERE time > :dashboardTime: AND esxhostname =~ /^:esxhostname:$/ GROUP BY time(:interval:), \"disk\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -114,7 +114,7 @@
         "name": "Network Usage for :esxhostname:",
         "queries": [
           {
-            "query": "SELECT min(\"bytesRx_average\") AS \"min_bytesRx\", max(\"bytesRx_average\") AS \"max_bytesRx\", mean(\"bytesRx_average\") AS \"avg_bytesRx\", min(\"bytesTx_average\") AS \"min_bytesTx\", max(\"bytesTx_average\") AS \"max_bytesTx\", mean(\"bytesTx_average\") AS \"avg_bytesTx\" FROM \"telegraf\".\"autogen\".\"vsphere_host_net\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/ AND interface !~ /instance-total/ GROUP BY time(:interval:), \"interface\" FILL(null)",
+            "query": "SELECT min(\"bytesRx_average\") AS \"min_bytesRx\", max(\"bytesRx_average\") AS \"max_bytesRx\", mean(\"bytesRx_average\") AS \"avg_bytesRx\", min(\"bytesTx_average\") AS \"min_bytesTx\", max(\"bytesTx_average\") AS \"max_bytesTx\", mean(\"bytesTx_average\") AS \"avg_bytesTx\" FROM \":db:\".\":rp:\".\"vsphere_host_net\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/ AND interface !~ /instance-total/ GROUP BY time(:interval:), \"interface\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -123,7 +123,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT min(\"bytesRx_average\") AS \"min_bytesRx\", max(\"bytesRx_average\") AS \"max_bytesRx\", mean(\"bytesRx_average\") AS \"avg_bytesRx\", min(\"bytesTx_average\") AS \"min_bytesTx\", max(\"bytesTx_average\") AS \"max_bytesTx\", mean(\"bytesTx_average\") AS \"avg_bytesTx\" FROM \"telegraf\".\"autogen\".\"vsphere_host_net\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/ AND interface !~ /instance-total/ GROUP BY time(:interval:), \"interface\" FILL(null)",
+              "rawText": "SELECT min(\"bytesRx_average\") AS \"min_bytesRx\", max(\"bytesRx_average\") AS \"max_bytesRx\", mean(\"bytesRx_average\") AS \"avg_bytesRx\", min(\"bytesTx_average\") AS \"min_bytesTx\", max(\"bytesTx_average\") AS \"max_bytesTx\", mean(\"bytesTx_average\") AS \"avg_bytesTx\" FROM \":db:\".\":rp:\".\"vsphere_host_net\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/ AND interface !~ /instance-total/ GROUP BY time(:interval:), \"interface\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -208,7 +208,7 @@
         "name": "CPU Ready Average % for :esxhostname:",
         "queries": [
           {
-            "query": "SELECT mean(\"readiness_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+            "query": "SELECT mean(\"readiness_average\") AS \"CPU_Usage\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -217,7 +217,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"readiness_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+              "rawText": "SELECT mean(\"readiness_average\") AS \"CPU_Usage\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -302,7 +302,7 @@
         "name": "RAM Usage Average for :esxhostname:",
         "queries": [
           {
-            "query": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \":db:\".\":rp:\".\"vsphere_host_mem\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -311,7 +311,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \":db:\".\":rp:\".\"vsphere_host_mem\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -396,7 +396,7 @@
         "name": "CPU Usage Average for :esxhostname:",
         "queries": [
           {
-            "query": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+            "query": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -405,7 +405,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
+              "rawText": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime:  AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:), \"cpu\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -490,7 +490,7 @@
         "name": "RAM Usage for :esxhostname:",
         "queries": [
           {
-            "query": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \":db:\".\":rp:\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -499,7 +499,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \":db:\".\":rp:\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/  GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -570,7 +570,7 @@
         "name": "CPU Usage for :esxhostname: ",
         "queries": [
           {
-            "query": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -579,7 +579,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -650,7 +650,7 @@
         "name": "Uptime for :esxhostname:",
         "queries": [
           {
-            "query": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \":db:\".\":rp:\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -659,7 +659,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \":db:\".\":rp:\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND \"esxhostname\" =~ /^:esxhostname:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
