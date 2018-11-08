@@ -20,7 +20,7 @@
         "name": "VM Network Usage for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"usage_average\") AS \"Ready\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+            "query": "SELECT mean(\"usage_average\") AS \"Ready\" FROM \":db:\".\":rp:\".\"vsphere_vm_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -29,7 +29,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"usage_average\") AS \"Ready\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+              "rawText": "SELECT mean(\"usage_average\") AS \"Ready\" FROM \":db:\".\":rp:\".\"vsphere_vm_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -114,7 +114,7 @@
         "name": "VM CPU % Ready for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"ready_summation\") AS \"Ready\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+            "query": "SELECT mean(\"ready_summation\") AS \"Ready\" FROM \":db:\".\":rp:\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -123,7 +123,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"ready_summation\") AS \"Ready\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+              "rawText": "SELECT mean(\"ready_summation\") AS \"Ready\" FROM \":db:\".\":rp:\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -208,7 +208,7 @@
         "name": "VM Mem Usage for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"usage_average\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+            "query": "SELECT mean(\"usage_average\") AS \"Used\" FROM \":db:\".\":rp:\".\"vsphere_vm_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -217,7 +217,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"usage_average\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+              "rawText": "SELECT mean(\"usage_average\") AS \"Used\" FROM \":db:\".\":rp:\".\"vsphere_vm_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -302,7 +302,7 @@
         "name": "VM CPU Usage MHz for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"used_summation\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+            "query": "SELECT mean(\"used_summation\") AS \"Used\" FROM \":db:\".\":rp:\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -311,7 +311,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"used_summation\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
+              "rawText": "SELECT mean(\"used_summation\") AS \"Used\" FROM \":db:\".\":rp:\".\"vsphere_vm_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:), \"vmname\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -540,7 +540,7 @@
         "name": "Datastores - Usage Capacity :datastore:",
         "queries": [
           {
-            "query": "SELECT last(\"used_latest\") * (100 / last(\"capacity_latest\"))  FROM \"telegraf\".\"autogen\".\"vsphere_datastore_disk\" WHERE time > :dashboardTime: AND source =~ /^:datastore:$/ GROUP BY time(:interval:) fill(previous)",
+            "query": "SELECT last(\"used_latest\") * (100 / last(\"capacity_latest\"))  FROM \":db:\".\":rp:\".\"vsphere_datastore_disk\" WHERE time > :dashboardTime: AND source =~ /^:datastore:$/ GROUP BY time(:interval:) fill(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -549,7 +549,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"used_latest\") * (100 / last(\"capacity_latest\"))  FROM \"telegraf\".\"autogen\".\"vsphere_datastore_disk\" WHERE time > :dashboardTime: AND source =~ /^:datastore:$/ GROUP BY time(:interval:) fill(previous)",
+              "rawText": "SELECT last(\"used_latest\") * (100 / last(\"capacity_latest\"))  FROM \":db:\".\":rp:\".\"vsphere_datastore_disk\" WHERE time > :dashboardTime: AND source =~ /^:datastore:$/ GROUP BY time(:interval:) fill(previous)",
               "range": null,
               "shifts": null
             },
@@ -634,7 +634,7 @@
         "name": "Disk Throughput for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_disk\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_disk\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -643,7 +643,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_disk\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_disk\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -728,7 +728,7 @@
         "name": "Network Usage for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -737,7 +737,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"throughput_usage_average\") AS \"mean_throughput_usage\", max(\"throughput_usage_average\") AS \"max_throughput_usage\", min(\"throughput_usage_average\") AS \"min_throughput_usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_net\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -822,7 +822,7 @@
         "name": "RAM Usage for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_mem\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
+            "query": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_mem\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -831,7 +831,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_mem\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
+              "rawText": "SELECT mean(\"active_average\") AS \"RAM_Usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_mem\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -916,7 +916,7 @@
         "name": "CPU Usage for :clustername:",
         "queries": [
           {
-            "query": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_cpu\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
+            "query": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_cpu\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -925,7 +925,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \"telegraf\".\"autogen\".\"vsphere_cluster_cpu\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
+              "rawText": "SELECT mean(\"usage_average\") AS \"CPU_Usage\" FROM \":db:\".\":rp:\".\"vsphere_cluster_cpu\" WHERE time > :dashboardTime:  AND clustername =~ /^:clustername:$/  GROUP BY time(:interval:), \"clustername\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1010,7 +1010,7 @@
         "name": "RAM Usage for :clustername:",
         "queries": [
           {
-            "query": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \":db:\".\":rp:\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1019,7 +1019,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"active_average\")/1024/1024 AS \"last_active_average\" FROM \":db:\".\":rp:\".\"vsphere_host_mem\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -1090,7 +1090,7 @@
         "name": "CPU Usage for :clustername:",
         "queries": [
           {
-            "query": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1099,7 +1099,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \"telegraf\".\"autogen\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"usagemhz_average\") AS \"last_usagemhz_average\" FROM \":db:\".\":rp:\".\"vsphere_host_cpu\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -1170,7 +1170,7 @@
         "name": "Uptime for :clustername:",
         "queries": [
           {
-            "query": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \":db:\".\":rp:\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1179,7 +1179,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \"telegraf\".\"autogen\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"uptime_latest\")/60/60/24 AS \"last_uptime_latest\" FROM \":db:\".\":rp:\".\"vsphere_host_sys\" WHERE time > :dashboardTime: AND clustername =~ /^:clustername:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
