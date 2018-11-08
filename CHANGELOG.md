@@ -1,12 +1,6 @@
-## v1.7.1 [2018-11-07]
 ## v1.7.2 [2018-11-08]
 
-### Features
-
-### UI Improvements
-
 ### Bug Fixes
-
 1. [#4778](https://github.com/influxdata/chronograf/pull/4778): Remove hardcoded database/retention period from protoboards
 
 ## v1.7.1 [2018-11-07]
