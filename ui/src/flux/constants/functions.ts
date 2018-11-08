@@ -857,13 +857,13 @@ export const functions: FluxToolbarFunction[] = [
         type: 'Array of Strings',
       },
       {
-        name: 'colKey',
+        name: 'columnKey',
         desc:
           'List of columns used to pivot values onto each row identified by the rowKey.',
         type: 'Array of Strings',
       },
       {
-        name: 'valueCol',
+        name: 'valueColumn',
         desc:
           'The single column that contains the value to be moved around the pivot.',
         type: 'String',
@@ -871,7 +871,7 @@ export const functions: FluxToolbarFunction[] = [
     ],
     desc:
       'Collects values stored vertically (column-wise) in a table and aligns them horizontally (row-wise) into logical sets.',
-    example: 'pivot(rowKey:["_time"], colKey: ["_field"], valueCol: "_value")',
+    example: 'pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/pivot',
