@@ -21,7 +21,7 @@
         "name": "Requests Per Sec",
         "queries": [
           {
-            "query": "SELECT last(\"ReqPerSec\") AS \"ReqPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(1s) FILL(previous)",
+            "query": "SELECT last(\"ReqPerSec\") AS \"ReqPerSec\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(1s) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -30,7 +30,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"ReqPerSec\") AS \"ReqPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(1s) FILL(previous)",
+              "rawText": "SELECT last(\"ReqPerSec\") AS \"ReqPerSec\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(1s) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -101,7 +101,7 @@
         "name": "Apache Logs",
         "queries": [
           {
-            "query": "SELECT \"auth\", \"ident\", \"http_version\", \"client_ip\", \"request\", \"resp_bytes\" FROM \"telegraf\".\"autogen\".\"apache_access_log\" WHERE time > :dashboardTime: GROUP BY \"host\", \"path\", \"resp_code\", \"verb\"",
+            "query": "SELECT \"auth\", \"ident\", \"http_version\", \"client_ip\", \"request\", \"resp_bytes\" FROM \":db:\".\":rp:\".\"apache_access_log\" WHERE time > :dashboardTime: GROUP BY \"host\", \"path\", \"resp_code\", \"verb\"",
             "queryConfig": {
               "database": "telegraf",
               "measurement": "apache_access_log",
@@ -229,7 +229,7 @@
         "name": "Throughput",
         "queries": [
           {
-            "query": "SELECT mean(\"BytesPerReq\")/1024 AS \"AvgBytesPerReq\", mean(\"BytesPerSec\")/1024 AS \"AvgBytesPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT mean(\"BytesPerReq\")/1024 AS \"AvgBytesPerReq\", mean(\"BytesPerSec\")/1024 AS \"AvgBytesPerSec\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -238,7 +238,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"BytesPerReq\")/1024 AS \"AvgBytesPerReq\", mean(\"BytesPerSec\")/1024 AS \"AvgBytesPerSec\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT mean(\"BytesPerReq\")/1024 AS \"AvgBytesPerReq\", mean(\"BytesPerSec\")/1024 AS \"AvgBytesPerSec\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -323,7 +323,7 @@
         "name": "Response Codes",
         "queries": [
           {
-            "query": "SELECT count(\"request\") AS \"Requests\" FROM \"telegraf\".\"autogen\".\"apache_access_log\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:), \"resp_code\" FILL(null)",
+            "query": "SELECT count(\"request\") AS \"Requests\" FROM \":db:\".\":rp:\".\"apache_access_log\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:), \"resp_code\" FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -332,7 +332,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT count(\"request\") AS \"Requests\" FROM \"telegraf\".\"autogen\".\"apache_access_log\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:), \"resp_code\" FILL(null)",
+              "rawText": "SELECT count(\"request\") AS \"Requests\" FROM \":db:\".\":rp:\".\"apache_access_log\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:), \"resp_code\" FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -417,7 +417,7 @@
         "name": "CPU Load",
         "queries": [
           {
-            "query": "SELECT mean(\"CPULoad\") AS \"CPULoad\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT mean(\"CPULoad\") AS \"CPULoad\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -426,7 +426,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"CPULoad\") AS \"CPULoad\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT mean(\"CPULoad\") AS \"CPULoad\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -497,7 +497,7 @@
         "name": "Apache Uptime",
         "queries": [
           {
-            "query": "SELECT last(\"Uptime\")/60/60 AS \"Uptime\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(30s) FILL(previous)",
+            "query": "SELECT last(\"Uptime\")/60/60 AS \"Uptime\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(30s) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -506,7 +506,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"Uptime\")/60/60 AS \"Uptime\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(30s) FILL(previous)",
+              "rawText": "SELECT last(\"Uptime\")/60/60 AS \"Uptime\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(30s) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -577,7 +577,7 @@
         "name": "Scoreboard",
         "queries": [
           {
-            "query": "SELECT mean(\"scboard_closing\") AS \"Closing\", mean(\"scboard_dnslookup\") AS \"DNSLookup\", mean(\"scboard_finishing\") AS \"Finishing\", mean(\"scboard_idle_cleanup\") AS \"IdleCleanup\", mean(\"scboard_keepalive\") AS \"KeepAlive\", mean(\"scboard_logging\") AS \"Logging\", mean(\"scboard_open\") AS \"Open\", mean(\"scboard_reading\") AS \"Reading\", mean(\"scboard_sending\") AS \"Sending\", mean(\"scboard_starting\") AS \"Starting\", mean(\"scboard_waiting\") AS \"Waiting\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"scboard_closing\") AS \"Closing\", mean(\"scboard_dnslookup\") AS \"DNSLookup\", mean(\"scboard_finishing\") AS \"Finishing\", mean(\"scboard_idle_cleanup\") AS \"IdleCleanup\", mean(\"scboard_keepalive\") AS \"KeepAlive\", mean(\"scboard_logging\") AS \"Logging\", mean(\"scboard_open\") AS \"Open\", mean(\"scboard_reading\") AS \"Reading\", mean(\"scboard_sending\") AS \"Sending\", mean(\"scboard_starting\") AS \"Starting\", mean(\"scboard_waiting\") AS \"Waiting\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -586,7 +586,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"scboard_closing\") AS \"Closing\", mean(\"scboard_dnslookup\") AS \"DNSLookup\", mean(\"scboard_finishing\") AS \"Finishing\", mean(\"scboard_idle_cleanup\") AS \"IdleCleanup\", mean(\"scboard_keepalive\") AS \"KeepAlive\", mean(\"scboard_logging\") AS \"Logging\", mean(\"scboard_open\") AS \"Open\", mean(\"scboard_reading\") AS \"Reading\", mean(\"scboard_sending\") AS \"Sending\", mean(\"scboard_starting\") AS \"Starting\", mean(\"scboard_waiting\") AS \"Waiting\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"scboard_closing\") AS \"Closing\", mean(\"scboard_dnslookup\") AS \"DNSLookup\", mean(\"scboard_finishing\") AS \"Finishing\", mean(\"scboard_idle_cleanup\") AS \"IdleCleanup\", mean(\"scboard_keepalive\") AS \"KeepAlive\", mean(\"scboard_logging\") AS \"Logging\", mean(\"scboard_open\") AS \"Open\", mean(\"scboard_reading\") AS \"Reading\", mean(\"scboard_sending\") AS \"Sending\", mean(\"scboard_starting\") AS \"Starting\", mean(\"scboard_waiting\") AS \"Waiting\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -671,7 +671,7 @@
         "name": "Workers",
         "queries": [
           {
-            "query": "SELECT mean(\"BusyWorkers\") AS \"Busy\", mean(\"IdleWorkers\") AS \"Idle\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"BusyWorkers\") AS \"Busy\", mean(\"IdleWorkers\") AS \"Idle\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -680,7 +680,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"BusyWorkers\") AS \"Busy\", mean(\"IdleWorkers\") AS \"Idle\" FROM \"telegraf\".\"autogen\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"BusyWorkers\") AS \"Busy\", mean(\"IdleWorkers\") AS \"Idle\" FROM \":db:\".\":rp:\".\"apache\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -837,7 +837,7 @@
         "name": "Network",
         "queries": [
           {
-            "query": "SELECT derivative(mean(\"bytes_recv\"),10s)/1024/1024 AS \"Received_MB\", derivative(mean(\"bytes_sent\"),10s)/1024/1024 AS \"Sent_MB\" FROM \"telegraf\".\"autogen\".\"net\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT derivative(mean(\"bytes_recv\"),10s)/1024/1024 AS \"Received_MB\", derivative(mean(\"bytes_sent\"),10s)/1024/1024 AS \"Sent_MB\" FROM \":db:\".\":rp:\".\"net\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -846,7 +846,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT derivative(mean(\"bytes_recv\"),10s)/1024/1024 AS \"Received_MB\", derivative(mean(\"bytes_sent\"),10s)/1024/1024 AS \"Sent_MB\" FROM \"telegraf\".\"autogen\".\"net\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT derivative(mean(\"bytes_recv\"),10s)/1024/1024 AS \"Received_MB\", derivative(mean(\"bytes_sent\"),10s)/1024/1024 AS \"Sent_MB\" FROM \":db:\".\":rp:\".\"net\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -931,7 +931,7 @@
         "name": "I/O",
         "queries": [
           {
-            "query": "SELECT derivative(mean(\"read_bytes\"),10s)/1024/1024 AS \"Reads_MB\", derivative(mean(\"write_bytes\"),10s)/1024/1024 AS \"Writes_MB\" FROM \"telegraf\".\"autogen\".\"diskio\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT derivative(mean(\"read_bytes\"),10s)/1024/1024 AS \"Reads_MB\", derivative(mean(\"write_bytes\"),10s)/1024/1024 AS \"Writes_MB\" FROM \":db:\".\":rp:\".\"diskio\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -940,7 +940,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT derivative(mean(\"read_bytes\"),10s)/1024/1024 AS \"Reads_MB\", derivative(mean(\"write_bytes\"),10s)/1024/1024 AS \"Writes_MB\" FROM \"telegraf\".\"autogen\".\"diskio\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT derivative(mean(\"read_bytes\"),10s)/1024/1024 AS \"Reads_MB\", derivative(mean(\"write_bytes\"),10s)/1024/1024 AS \"Writes_MB\" FROM \":db:\".\":rp:\".\"diskio\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1025,7 +1025,7 @@
         "name": "Load",
         "queries": [
           {
-            "query": "SELECT mean(\"load1\") AS \"Short\", mean(\"load5\") AS \"Medium\", mean(\"load15\") AS \"Long\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"load1\") AS \"Short\", mean(\"load5\") AS \"Medium\", mean(\"load15\") AS \"Long\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1034,7 +1034,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"load1\") AS \"Short\", mean(\"load5\") AS \"Medium\", mean(\"load15\") AS \"Long\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"load1\") AS \"Short\", mean(\"load5\") AS \"Medium\", mean(\"load15\") AS \"Long\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1119,7 +1119,7 @@
         "name": "Memory Used %",
         "queries": [
           {
-            "query": "SELECT mean(\"used_percent\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT mean(\"used_percent\") AS \"Used\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1128,7 +1128,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"used_percent\") AS \"Used\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT mean(\"used_percent\") AS \"Used\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -1213,7 +1213,7 @@
         "name": "RAM",
         "queries": [
           {
-            "query": "SELECT mean(\"total\")/1024/1024/1024 AS \"Total RAM (GB)\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT mean(\"total\")/1024/1024/1024 AS \"Total RAM (GB)\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1222,7 +1222,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"total\")/1024/1024/1024 AS \"Total RAM (GB)\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT mean(\"total\")/1024/1024/1024 AS \"Total RAM (GB)\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -1293,7 +1293,7 @@
         "name": "CPUs",
         "queries": [
           {
-            "query": "SELECT last(\"n_cpus\") AS \"CPUs\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"n_cpus\") AS \"CPUs\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1302,7 +1302,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"n_cpus\") AS \"CPUs\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"n_cpus\") AS \"CPUs\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -1373,7 +1373,7 @@
         "name": "System Uptime",
         "queries": [
           {
-            "query": "SELECT last(\"uptime\")/60/60/24 AS \"System Uptime\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT last(\"uptime\")/60/60/24 AS \"System Uptime\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1382,7 +1382,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"uptime\")/60/60/24 AS \"System Uptime\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT last(\"uptime\")/60/60/24 AS \"System Uptime\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND host =~ /^:host:$/ GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },

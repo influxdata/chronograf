@@ -93,7 +93,7 @@
         "name": "InnoDB data",
         "queries": [
           {
-            "query": "SELECT mean(\"innodb_data_writes\") AS \"writes\", mean(\"innodb_data_reads\") AS \"reads\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"innodb_data_writes\") AS \"writes\", mean(\"innodb_data_reads\") AS \"reads\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -102,7 +102,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"innodb_data_writes\") AS \"writes\", mean(\"innodb_data_reads\") AS \"reads\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"innodb_data_writes\") AS \"writes\", mean(\"innodb_data_reads\") AS \"reads\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -187,7 +187,7 @@
         "name": "Open Connections",
         "queries": [
           {
-            "query": "SELECT mean(\"threads_connected\") AS \"mean_threads_connected\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT mean(\"threads_connected\") AS \"mean_threads_connected\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -196,7 +196,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"threads_connected\") AS \"mean_threads_connected\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT mean(\"threads_connected\") AS \"mean_threads_connected\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -267,7 +267,7 @@
         "name": "MySQL Connections",
         "queries": [
           {
-            "query": "SELECT mean(\"threads_connected\") AS \"open\", mean(\"threads_running\") AS \"running\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"threads_connected\") AS \"open\", mean(\"threads_running\") AS \"running\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -276,7 +276,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"threads_connected\") AS \"open\", mean(\"threads_running\") AS \"running\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"threads_connected\") AS \"open\", mean(\"threads_running\") AS \"running\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -361,7 +361,7 @@
         "name": "InnoDB buffer pool size",
         "queries": [
           {
-            "query": "SELECT (mean(\"innodb_buffer_pool_pages_total\") * mean(\"innodb_page_size\"))/1024/1024 AS \"buffer total size\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT (mean(\"innodb_buffer_pool_pages_total\") * mean(\"innodb_page_size\"))/1024/1024 AS \"buffer total size\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -370,7 +370,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT (mean(\"innodb_buffer_pool_pages_total\") * mean(\"innodb_page_size\"))/1024/1024 AS \"buffer total size\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT (mean(\"innodb_buffer_pool_pages_total\") * mean(\"innodb_page_size\"))/1024/1024 AS \"buffer total size\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -441,7 +441,7 @@
         "name": "InnoDB buffer usage",
         "queries": [
           {
-            "query": "SELECT (mean(\"innodb_buffer_pool_pages_total\") - mean(\"innodb_buffer_pool_pages_free\")) / mean(\"innodb_buffer_pool_pages_total\") * 100 AS \"mean_innodb_buffer_pool_pages_free\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT (mean(\"innodb_buffer_pool_pages_total\") - mean(\"innodb_buffer_pool_pages_free\")) / mean(\"innodb_buffer_pool_pages_total\") * 100 AS \"mean_innodb_buffer_pool_pages_free\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -450,7 +450,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT (mean(\"innodb_buffer_pool_pages_total\") - mean(\"innodb_buffer_pool_pages_free\")) / mean(\"innodb_buffer_pool_pages_total\") * 100 AS \"mean_innodb_buffer_pool_pages_free\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT (mean(\"innodb_buffer_pool_pages_total\") - mean(\"innodb_buffer_pool_pages_free\")) / mean(\"innodb_buffer_pool_pages_total\") * 100 AS \"mean_innodb_buffer_pool_pages_free\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -556,7 +556,7 @@
         "name": "MySQL queries / sec",
         "queries": [
           {
-            "query": "SELECT non_negative_derivative(mean(\"queries\"),1s) AS \"queries\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT non_negative_derivative(mean(\"queries\"),1s) AS \"queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -565,7 +565,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT non_negative_derivative(mean(\"queries\"),1s) AS \"queries\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT non_negative_derivative(mean(\"queries\"),1s) AS \"queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -650,7 +650,7 @@
         "name": "MySQL sent bytes /sec",
         "queries": [
           {
-            "query": "SELECT  non_negative_derivative(max(\"bytes_sent\"),1s) AS \"bytes sent\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT  non_negative_derivative(max(\"bytes_sent\"),1s) AS \"bytes sent\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -659,7 +659,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT  non_negative_derivative(max(\"bytes_sent\"),1s) AS \"bytes sent\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT  non_negative_derivative(max(\"bytes_sent\"),1s) AS \"bytes sent\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -744,7 +744,7 @@
         "name": "MySQL Connections/User",
         "queries": [
           {
-            "query": "SELECT mean(\"connections\") AS \"Connections\" FROM \"telegraf\".\"autogen\".\"mysql_users\" WHERE time > :dashboardTime: AND host = :host: GROUP BY time(:interval:), \"user\"",
+            "query": "SELECT mean(\"connections\") AS \"Connections\" FROM \":db:\".\":rp:\".\"mysql_users\" WHERE time > :dashboardTime: AND host = :host: GROUP BY time(:interval:), \"user\"",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -753,7 +753,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"connections\") AS \"Connections\" FROM \"telegraf\".\"autogen\".\"mysql_users\" WHERE time > :dashboardTime: AND host = :host: GROUP BY time(:interval:), \"user\"",
+              "rawText": "SELECT mean(\"connections\") AS \"Connections\" FROM \":db:\".\":rp:\".\"mysql_users\" WHERE time > :dashboardTime: AND host = :host: GROUP BY time(:interval:), \"user\"",
               "range": null,
               "shifts": null
             },
@@ -838,7 +838,7 @@
         "name": "MySQL slow queries",
         "queries": [
           {
-            "query": "SELECT mean(\"slow_queries\") AS \"mean_slow_queries\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"slow_queries\") AS \"mean_slow_queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -847,7 +847,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"slow_queries\") AS \"mean_slow_queries\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"slow_queries\") AS \"mean_slow_queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -932,7 +932,7 @@
         "name": "MySQL received bytes / sec",
         "queries": [
           {
-            "query": "SELECT non_negative_derivative(max(\"bytes_received\"),1s) AS \"bytes received\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT non_negative_derivative(max(\"bytes_received\"),1s) AS \"bytes received\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -941,7 +941,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT non_negative_derivative(max(\"bytes_received\"),1s) AS \"bytes received\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT non_negative_derivative(max(\"bytes_received\"),1s) AS \"bytes received\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1026,7 +1026,7 @@
         "name": "Network",
         "queries": [
           {
-            "query": "SELECT non_negative_derivative(max(\"bytes_recv\"), 1s) AS \"recieved\", non_negative_derivative(max(\"bytes_sent\"), 1s) AS \"sent\" FROM \"telegraf\".\"autogen\".\"net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT non_negative_derivative(max(\"bytes_recv\"), 1s) AS \"recieved\", non_negative_derivative(max(\"bytes_sent\"), 1s) AS \"sent\" FROM \":db:\".\":rp:\".\"net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1035,7 +1035,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT non_negative_derivative(max(\"bytes_recv\"), 1s) AS \"recieved\", non_negative_derivative(max(\"bytes_sent\"), 1s) AS \"sent\" FROM \"telegraf\".\"autogen\".\"net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT non_negative_derivative(max(\"bytes_recv\"), 1s) AS \"recieved\", non_negative_derivative(max(\"bytes_sent\"), 1s) AS \"sent\" FROM \":db:\".\":rp:\".\"net\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1120,7 +1120,7 @@
         "name": "Total Memory",
         "queries": [
           {
-            "query": "SELECT last(\"total\")/1024/1024/1024 AS \"last_total\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND \"host\" = :host: FILL(null)",
+            "query": "SELECT last(\"total\")/1024/1024/1024 AS \"last_total\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND \"host\" = :host: FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1129,7 +1129,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"total\")/1024/1024/1024 AS \"last_total\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND \"host\" = :host: FILL(null)",
+              "rawText": "SELECT last(\"total\")/1024/1024/1024 AS \"last_total\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND \"host\" = :host: FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1200,7 +1200,7 @@
         "name": "System Uptime",
         "queries": [
           {
-            "query": "SELECT last(\"uptime\")/86400 AS \"mean_uptime\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:  FILL(null)",
+            "query": "SELECT last(\"uptime\")/86400 AS \"mean_uptime\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:  FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1209,7 +1209,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"uptime\")/86400 AS \"mean_uptime\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:  FILL(null)",
+              "rawText": "SELECT last(\"uptime\")/86400 AS \"mean_uptime\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:  FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1285,7 +1285,7 @@
         "name": "I/O",
         "queries": [
           {
-            "query": "SELECT non_negative_derivative(max(\"read_bytes\"),1s) AS \"read bytes\", non_negative_derivative(max(\"write_bytes\"),1s) AS \"write bytes\" FROM \"telegraf\".\"autogen\".\"diskio\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT non_negative_derivative(max(\"read_bytes\"),1s) AS \"read bytes\", non_negative_derivative(max(\"write_bytes\"),1s) AS \"write bytes\" FROM \":db:\".\":rp:\".\"diskio\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1294,7 +1294,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT non_negative_derivative(max(\"read_bytes\"),1s) AS \"read bytes\", non_negative_derivative(max(\"write_bytes\"),1s) AS \"write bytes\" FROM \"telegraf\".\"autogen\".\"diskio\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT non_negative_derivative(max(\"read_bytes\"),1s) AS \"read bytes\", non_negative_derivative(max(\"write_bytes\"),1s) AS \"write bytes\" FROM \":db:\".\":rp:\".\"diskio\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1379,7 +1379,7 @@
         "name": "System Load",
         "queries": [
           {
-            "query": "SELECT mean(\"load1\") AS \"load1\", mean(\"load5\") AS \"load5\", mean(\"load15\") AS \"load15\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT mean(\"load1\") AS \"load1\", mean(\"load5\") AS \"load5\", mean(\"load15\") AS \"load15\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1388,7 +1388,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"load1\") AS \"load1\", mean(\"load5\") AS \"load5\", mean(\"load15\") AS \"load15\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT mean(\"load1\") AS \"load1\", mean(\"load5\") AS \"load5\", mean(\"load15\") AS \"load15\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -1473,7 +1473,7 @@
         "name": "nCPU",
         "queries": [
           {
-            "query": "SELECT max(\"n_cpus\") AS \"mean_n_cpus\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:",
+            "query": "SELECT max(\"n_cpus\") AS \"mean_n_cpus\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1482,7 +1482,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT max(\"n_cpus\") AS \"mean_n_cpus\" FROM \"telegraf\".\"autogen\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:",
+              "rawText": "SELECT max(\"n_cpus\") AS \"mean_n_cpus\" FROM \":db:\".\":rp:\".\"system\" WHERE time > :dashboardTime: AND \"host\" = :host:",
               "range": null,
               "shifts": null
             },
@@ -1553,7 +1553,7 @@
         "name": "MySQL uptime",
         "queries": [
           {
-            "query": "SELECT last(\"uptime\") / 86400 AS \"uptime\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE time > :dashboardTime: AND \"host\" = :host:",
+            "query": "SELECT last(\"uptime\") / 86400 AS \"uptime\" FROM \":db:\".\":rp:\".\"mysql\" WHERE time > :dashboardTime: AND \"host\" = :host:",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1562,7 +1562,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT last(\"uptime\") / 86400 AS \"uptime\" FROM \"telegraf\".\"autogen\".\"mysql\" WHERE time > :dashboardTime: AND \"host\" = :host:",
+              "rawText": "SELECT last(\"uptime\") / 86400 AS \"uptime\" FROM \":db:\".\":rp:\".\"mysql\" WHERE time > :dashboardTime: AND \"host\" = :host:",
               "range": null,
               "shifts": null
             },
@@ -1638,7 +1638,7 @@
         "name": "Memory usage",
         "queries": [
           {
-            "query": "SELECT mean(\"used_percent\") AS \"last_used_percent\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND \"host\"=:host: GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT mean(\"used_percent\") AS \"last_used_percent\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND \"host\"=:host: GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1647,7 +1647,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"used_percent\") AS \"last_used_percent\" FROM \"telegraf\".\"autogen\".\"mem\" WHERE time > :dashboardTime: AND \"host\"=:host: GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT mean(\"used_percent\") AS \"last_used_percent\" FROM \":db:\".\":rp:\".\"mem\" WHERE time > :dashboardTime: AND \"host\"=:host: GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
@@ -1732,7 +1732,7 @@
         "name": "Max Connections",
         "queries": [
           {
-            "query": "SELECT mean(\"max_connections\") AS \"mean_max_connections\" FROM \"telegraf\".\"autogen\".\"mysql_variables\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+            "query": "SELECT mean(\"max_connections\") AS \"mean_max_connections\" FROM \":db:\".\":rp:\".\"mysql_variables\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -1741,7 +1741,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"max_connections\") AS \"mean_max_connections\" FROM \"telegraf\".\"autogen\".\"mysql_variables\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
+              "rawText": "SELECT mean(\"max_connections\") AS \"mean_max_connections\" FROM \":db:\".\":rp:\".\"mysql_variables\" WHERE host = :host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(previous)",
               "range": null,
               "shifts": null
             },
