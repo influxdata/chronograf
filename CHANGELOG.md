@@ -7,6 +7,7 @@
 ### Bug Fixes
 
 1. [#4786](https://github.com/influxdata/chronograf/pull/4786): Get protoboards from multistore if not able to find from ProtoboardsPath
+1.  [#4791](https://github.com/influxdata/chronograf/pull/4791): Save fieldOptions to cells created from Data Explorer page
 
 ## v1.7.2 [2018-11-08]
 
