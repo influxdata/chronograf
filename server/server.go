@@ -18,7 +18,6 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/bolt"
-	"github.com/influxdata/chronograf/filestore"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
 	clog "github.com/influxdata/chronograf/log"
@@ -286,6 +285,7 @@ type builders struct {
 	Kapacitors    KapacitorBuilder
 	Dashboards    DashboardBuilder
 	Organizations OrganizationBuilder
+	Protoboards   ProtoboardsBuilder
 }
 
 func (s *Server) newBuilders(logger chronograf.Logger) builders {
@@ -319,6 +319,11 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 		Organizations: &MultiOrganizationBuilder{
 			Logger: logger,
 			Path:   s.ResourcesPath,
+		},
+		Protoboards: &MultiProtoboardsBuilder{
+			Logger:          logger,
+			UUID:            &idgen.UUID{},
+			ProtoboardsPath: s.ProtoboardsPath,
 		},
 	}
 }
@@ -488,7 +493,13 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	protoboards := filestore.NewProtoboards(protoboardsPath, idgen.NewTime(), logger)
+	protoboards, err := builder.Protoboards.Build()
+	if err != nil {
+		logger.
+			WithField("component", "LayoutsStore").
+			Error("Unable to construct a MultiLayoutsStore", err)
+		os.Exit(1)
+	}
 
 	return Service{
 		TimeSeriesClient: &InfluxClient{},
