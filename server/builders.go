@@ -6,6 +6,7 @@ import (
 	"github.com/influxdata/chronograf/filestore"
 	"github.com/influxdata/chronograf/memdb"
 	"github.com/influxdata/chronograf/multistore"
+	"github.com/influxdata/chronograf/protoboards"
 )
 
 // LayoutBuilder is responsible for building Layouts
@@ -41,6 +42,40 @@ func (builder *MultiLayoutBuilder) Build(db chronograf.LayoutsStore) (*multistor
 	}
 
 	return layouts, nil
+}
+
+// ProtoboardsBuilder is responsible for building Protoboards
+type ProtoboardsBuilder interface {
+	Build() (*multistore.Protoboards, error)
+}
+
+// MultiProtoboardsBuilder implements LayoutBuilder and will return a Layouts
+type MultiProtoboardsBuilder struct {
+	Logger          chronograf.Logger
+	UUID            chronograf.ID
+	ProtoboardsPath string
+}
+
+// Build will construct a Layouts of canned and db-backed personalized
+// layouts
+func (builder *MultiProtoboardsBuilder) Build() (*multistore.Protoboards, error) {
+	// These apps are those handled from a directory
+	filesystemPBs := filestore.NewProtoboards(builder.ProtoboardsPath, builder.UUID, builder.Logger)
+	// These apps are statically compiled into chronograf
+	binPBs := &protoboards.BinProtoboardsStore{
+		Logger: builder.Logger,
+	}
+	// Acts as a front-end to both the bolt layouts, filesystem layouts and binary statically compiled layouts.
+	// The idea here is that these stores form a hierarchy in which each is tried sequentially until
+	// the operation has success.  So, the database is preferred over filesystem over binary data.
+	protoboards := &multistore.Protoboards{
+		Stores: []chronograf.ProtoboardsStore{
+			filesystemPBs,
+			binPBs,
+		},
+	}
+
+	return protoboards, nil
 }
 
 // DashboardBuilder is responsible for building dashboards
