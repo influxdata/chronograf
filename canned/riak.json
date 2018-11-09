@@ -13,7 +13,7 @@
       "name": "Riak – Total Memory Bytes",
       "queries": [
         {
-          "query": "SELECT max(\"memory_total\") as memory_total_bytes FROM \":db:\".\":rp:\".\"riak\"",
+          "query": "SELECT max(\"memory_total\") AS memory_total_bytes FROM \":db:\".\":rp:\".\"riak\"",
           "groupbys": [
             "\"nodename\""
           ],

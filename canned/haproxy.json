@@ -13,7 +13,7 @@
       "name": "HAProxy – Number of Servers",
       "queries": [
         {
-          "query": "select mean(\"active_servers\") AS active_servers, mean(\"backup_servers\") AS backup_servers FROM \":db:\".\":rp:\".\"haproxy\"",
+          "query": "SELECT mean(\"active_servers\") AS active_servers, mean(\"backup_servers\") AS backup_servers FROM \":db:\".\":rp:\".\"haproxy\"",
           "groupbys": [],
           "wheres": []
         }

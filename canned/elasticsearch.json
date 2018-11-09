@@ -13,7 +13,7 @@
       "name": "ElasticSearch - Query Throughput",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(search_query_total)) as searches_per_min, non_negative_derivative(mean(search_scroll_total)) as scrolls_per_min, non_negative_derivative(mean(search_fetch_total)) as fetches_per_min, non_negative_derivative(mean(search_suggest_total)) as suggests_per_min from elasticsearch_indices",
+          "query": "SELECT non_negative_derivative(mean(search_query_total)) AS searches_per_min, non_negative_derivative(mean(search_scroll_total)) AS scrolls_per_min, non_negative_derivative(mean(search_fetch_total)) AS fetches_per_min, non_negative_derivative(mean(search_suggest_total)) AS suggests_per_min FROM elasticsearch_indices",
           "groupbys": [],
           "wheres": []
         }
@@ -28,7 +28,7 @@
       "name": "ElasticSearch - Open Connections",
       "queries": [
         {
-          "query": "select mean(current_open) from elasticsearch_http",
+          "query": "SELECT mean(current_open) FROM elasticsearch_http",
           "groupbys": [],
           "wheres": []
         }
@@ -43,7 +43,7 @@
       "name": "ElasticSearch - Query Latency",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(search_query_time_in_millis)) as mean, non_negative_derivative(median(search_query_time_in_millis)) as median, non_negative_derivative(percentile(search_query_time_in_millis, 95)) as ninety_fifth from elasticsearch_indices",
+          "query": "SELECT non_negative_derivative(mean(search_query_time_in_millis)) AS mean, non_negative_derivative(median(search_query_time_in_millis)) AS median, non_negative_derivative(percentile(search_query_time_in_millis, 95)) AS ninety_fifth FROM elasticsearch_indices",
           "groupbys": [],
           "wheres": []
         }
@@ -58,7 +58,7 @@
       "name": "ElasticSearch - Fetch Latency",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(search_fetch_time_in_millis)) as mean, non_negative_derivative(median(search_fetch_time_in_millis)) as median, non_negative_derivative(percentile(search_fetch_time_in_millis, 95)) as ninety_fifth from elasticsearch_indices",
+          "query": "SELECT non_negative_derivative(mean(search_fetch_time_in_millis)) AS mean, non_negative_derivative(median(search_fetch_time_in_millis)) AS median, non_negative_derivative(percentile(search_fetch_time_in_millis, 95)) AS ninety_fifth FROM elasticsearch_indices",
           "groupbys": [],
           "wheres": []
         }
@@ -73,7 +73,7 @@
       "name": "ElasticSearch - Suggest Latency",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(search_suggest_time_in_millis)) as mean, non_negative_derivative(median(search_suggest_time_in_millis)) as median, non_negative_derivative(percentile(search_suggest_time_in_millis, 95)) as ninety_fifth from elasticsearch_indices",
+          "query": "SELECT non_negative_derivative(mean(search_suggest_time_in_millis)) AS mean, non_negative_derivative(median(search_suggest_time_in_millis)) AS median, non_negative_derivative(percentile(search_suggest_time_in_millis, 95)) AS ninety_fifth FROM elasticsearch_indices",
           "groupbys": [],
           "wheres": []
         }
@@ -88,7 +88,7 @@
       "name": "ElasticSearch - Scroll Latency",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(search_scroll_time_in_millis)) as mean, non_negative_derivative(median(search_scroll_time_in_millis)) as median, non_negative_derivative(percentile(search_scroll_time_in_millis, 95)) as ninety_fifth from elasticsearch_indices",
+          "query": "SELECT non_negative_derivative(mean(search_scroll_time_in_millis)) AS mean, non_negative_derivative(median(search_scroll_time_in_millis)) AS median, non_negative_derivative(percentile(search_scroll_time_in_millis, 95)) AS ninety_fifth FROM elasticsearch_indices",
           "groupbys": [],
           "wheres": []
         }
@@ -103,7 +103,7 @@
       "name": "ElasticSearch - Indexing Latency",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(indexing_index_time_in_millis)) as mean from elasticsearch_indices",
+          "query": "SELECT non_negative_derivative(mean(indexing_index_time_in_millis)) AS mean FROM elasticsearch_indices",
           "groupbys": [],
           "wheres": []
         }
@@ -118,7 +118,7 @@
       "name": "ElasticSearch - JVM GC Collection Counts",
       "queries": [
         {
-          "query": "select mean(gc_collectors_old_collection_count) as old_count, mean(gc_collectors_young_collection_count) as young_count from elasticsearch_jvm",
+          "query": "SELECT mean(gc_collectors_old_collection_count) AS old_count, mean(gc_collectors_young_collection_count) AS young_count FROM elasticsearch_jvm",
           "groupbys": [],
           "wheres": []
         }
@@ -133,7 +133,7 @@
       "name": "ElasticSearch - JVM GC Latency",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(gc_collectors_old_collection_time_in_millis)) as mean_old_time, non_negative_derivative(mean(gc_collectors_young_collection_time_in_millis)) as mean_young_time from elasticsearch_jvm",
+          "query": "SELECT non_negative_derivative(mean(gc_collectors_old_collection_time_in_millis)) AS mean_old_time, non_negative_derivative(mean(gc_collectors_young_collection_time_in_millis)) AS mean_young_time FROM elasticsearch_jvm",
           "groupbys": [],
           "wheres": []
         }
@@ -148,7 +148,7 @@
       "name": "ElasticSearch - JVM Heap Usage",
       "queries": [
         {
-          "query": "select mean(mem_heap_used_percent) from elasticsearch_jvm",
+          "query": "SELECT mean(mem_heap_used_percent) FROM elasticsearch_jvm",
           "groupbys": [],
           "wheres": []
         }

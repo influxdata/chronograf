@@ -30,7 +30,7 @@
       "name": "phpfpm – Processes",
       "queries": [
         {
-          "query": "SELECT mean(\"active_processes\") as \"active\",mean(\"idle_processes\") as \"idle\"  FROM \":db:\".\":rp:\".\"phpfpm\"",
+          "query": "SELECT mean(\"active_processes\") AS \"active\",mean(\"idle_processes\") AS \"idle\"  FROM \":db:\".\":rp:\".\"phpfpm\"",
           "label": "count",
           "groupbys": [
             "\"pool\""
