@@ -61,7 +61,7 @@
       "name": "MongoDB – Reads/Writes Waiting in Queue",
       "queries": [
         {
-          "query": "SELECT max(queued_reads) AS queued_reads, max(queued_writes) as queued_writes FROM \":db:\".\":rp:\".\"mongodb\"",
+          "query": "SELECT max(queued_reads) AS queued_reads, max(queued_writes) AS queued_writes FROM \":db:\".\":rp:\".\"mongodb\"",
           "label": "count",
           "groupbys": [],
           "wheres": []
@@ -77,7 +77,7 @@
       "name": "MongoDB – Network Bytes/Second",
       "queries": [
         {
-          "query": "SELECT mean(net_in_bytes) AS net_in_bytes, mean(net_out_bytes) as net_out_bytes FROM \":db:\".\":rp:\".\"mongodb\"",
+          "query": "SELECT mean(net_in_bytes) AS net_in_bytes, mean(net_out_bytes) AS net_out_bytes FROM \":db:\".\":rp:\".\"mongodb\"",
           "label": "bytes/s",
           "groupbys": [],
           "wheres": []
@@ -109,7 +109,7 @@
       "name": "MongoDB – Memory Usage (MB)",
       "queries": [
         {
-          "query": "SELECT mean(vsize_megabytes) AS virtual_memory_megabytes, mean(resident_megabytes) as resident_memory_megabytes FROM \":db:\".\":rp:\".\"mongodb\"",
+          "query": "SELECT mean(vsize_megabytes) AS virtual_memory_megabytes, mean(resident_megabytes) AS resident_memory_megabytes FROM \":db:\".\":rp:\".\"mongodb\"",
           "label": "MB",
           "groupbys": [],
           "wheres": []

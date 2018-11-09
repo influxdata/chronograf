@@ -12,7 +12,7 @@
       "name": "Varnish - Cache Hits/Misses",
       "queries": [
         {
-          "query": "select non_negative_derivative(mean(cache_hit)) as hits, non_negative_derivative(mean(cache_miss)) as misses from varnish",
+          "query": "SELECT non_negative_derivative(mean(cache_hit)) AS hits, non_negative_derivative(mean(cache_miss)) AS misses FROM varnish",
           "groupbys": [],
           "wheres": []
         }
