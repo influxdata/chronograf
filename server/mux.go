@@ -47,8 +47,9 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	})
 
 	if opts.Basepath != "" {
+		basePath := fmt.Sprintf("%s/", opts.Basepath)
 		// Prefix any URLs found in the React assets with any configured basepath
-		assets = NewDefaultURLPrefixer(opts.Basepath, assets, opts.Logger)
+		assets = NewDefaultURLPrefixer(basePath, assets, opts.Logger)
 	}
 
 	// Compress the assets with gzip if an accepted encoding

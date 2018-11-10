@@ -6,7 +6,12 @@ export const getBasepath = () => {
     return ''
   }
 
-  return rootNode.getAttribute('data-basepath') || ''
+  let basepath = rootNode.getAttribute('data-basepath') || ''
+  if (basepath !== '') {
+    basepath = basepath.slice(0, basepath.length - 1)
+  }
+
+  return basepath
 }
 
 export const stripPrefix = (pathname, basepath = getBasepath()) => {
