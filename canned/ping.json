@@ -13,7 +13,7 @@
       "name": "Ping – Packet Loss Percent",
       "queries": [
         {
-          "query": "select max(\"percent_packet_loss\") as \"packet_loss\" from ping",
+          "query": "select max(\"percent_packet_loss\") as \"packet_loss\" from \":db:\".\":rp:\".ping",
           "groupbys": [
             "\"url\""
           ],
@@ -30,7 +30,7 @@
       "name": "Ping – Response Times (ms)",
       "queries": [
         {
-          "query": "select mean(\"average_response_ms\") as \"average\", mean(\"minimum_response_ms\") as \"min\", mean(\"maximum_response_ms\") as \"max\" from ping",
+          "query": "select mean(\"average_response_ms\") as \"average\", mean(\"minimum_response_ms\") as \"min\", mean(\"maximum_response_ms\") as \"max\" from \":db:\".\":rp:\".ping",
           "groupbys": [
             "\"url\""
           ],
