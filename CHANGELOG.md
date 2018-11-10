@@ -8,6 +8,7 @@
 
 1. [#4786](https://github.com/influxdata/chronograf/pull/4786): Get protoboards from multistore if not able to find from ProtoboardsPath
 1. [#4794](https://github.com/influxdata/chronograf/pull/4794): Handle basepath issue with missing slash
+1. [#4798](https://github.com/influxdata/chronograf/pull/4798): Fix the ping pre canned dashboard
 
 ## v1.7.2 [2018-11-08]
 
