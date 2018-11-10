@@ -3,7 +3,7 @@
   "meta": {
     "name": "Varnish",
     "measurements": ["varnish"],
-    "version": "1.0",
+    "version": "1.1",
     "dashboardVersion": "1.x",
     "description": "Dashboard for the telegraf input plug-in: Varnish",
     "author": "influxdata",
@@ -19,7 +19,7 @@
         "name": "Varnish - Cache Hits/Misses",
         "queries": [
           {
-            "query": "select non_negative_derivative(mean(cache_hit)) as hits, non_negative_derivative(mean(cache_miss)) as misses from varnish WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT non_negative_derivative(mean(cache_hit)) AS hits, non_negative_derivative(mean(cache_miss)) AS misses FROM \":db:\".\":rp:\".\"varnish\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           }
         ],
         "type": "line",
