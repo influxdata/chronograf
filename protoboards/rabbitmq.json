@@ -3,7 +3,7 @@
   "meta": {
     "name": "RabbitMQ",
     "measurements": ["rabbitmq_node"],
-    "version": "1.0",
+    "version": "1.1",
     "dashboardVersion": "1.x",
     "description": "Dashboard for the telegraf input plug-in: RabbitMQ",
     "author": "influxdata",
@@ -19,13 +19,13 @@
         "name": "RabbitMQ - Overview",
         "queries": [
           {
-            "query": "select mean(\"consumers\") AS \"consumers\" from rabbitmq_overview WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT mean(\"consumers\") AS \"consumers\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           },
           {
-            "query": "select mean(\"exchanges\") AS \"exchanges\" from rabbitmq_overview WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT mean(\"exchanges\") AS \"exchanges\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           },
           {
-            "query": "select mean(\"queues\") AS \"queues\" from rabbitmq_overview WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT mean(\"queues\") AS \"queues\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           }
         ],
         "type": "line",
@@ -62,10 +62,10 @@
         "name": "RabbitMQ - Published/Delivered per second",
         "queries": [
           {
-            "query": "select derivative(mean(\"messages_published\"), 1s) AS \"published_per_sec\" from rabbitmq_overview WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT derivative(mean(\"messages_published\"), 1s) AS \"published_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           },
           {
-            "query": "select derivative(mean(\"messages_delivered\"), 1s) AS \"delivered_per_sec\" from rabbitmq_overview WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT derivative(mean(\"messages_delivered\"), 1s) AS \"delivered_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           }
         ],
         "type": "line",
@@ -102,10 +102,10 @@
         "name": "RabbitMQ - Acked/Unacked per second",
         "queries": [
           {
-            "query": "select derivative(mean(\"messages_acked\"), 1s) AS \"acked_per_sec\" from rabbitmq_overview WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT derivative(mean(\"messages_acked\"), 1s) AS \"acked_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           },
           {
-            "query": "select derivative(mean(\"messages_unacked\"), 1s) AS \"unacked_per_sec\" from rabbitmq_overview WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
+            "query": "SELECT derivative(mean(\"messages_unacked\"), 1s) AS \"unacked_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:)"
           }
         ],
         "type": "line",

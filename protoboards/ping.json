@@ -3,7 +3,7 @@
   "meta": {
     "name": "Ping",
     "measurements": ["ping"],
-    "version": "1.0",
+    "version": "1.1",
     "dashboardVersion": "1.x",
     "description": "Dashboard for the telegraf input plug-in: Ping",
     "author": "influxdata",
@@ -19,7 +19,7 @@
         "name": "Ping – Packet Loss Percent",
         "queries": [
           {
-            "query": "select max(\"percent_packet_loss\") as \"packet_loss\" from ping WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"url\"",
+            "query": "SELECT max(\"percent_packet_loss\") AS \"packet_loss\" FROM \":db:\".\":rp:\".\"ping\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"url\"",
             "groupbys": ["\"url\""]
           }
         ],
@@ -57,7 +57,7 @@
         "name": "Ping – Response Times (ms)",
         "queries": [
           {
-            "query": "select mean(\"average_response_ms\") as \"average\", mean(\"minimum_response_ms\") as \"min\", mean(\"maximum_response_ms\") as \"max\" from ping WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"url\"",
+            "query": "SELECT mean(\"average_response_ms\") AS \"average\", mean(\"minimum_response_ms\") AS \"min\", mean(\"maximum_response_ms\") AS \"max\" FROM \":db:\".\":rp:\".\"ping\" WHERE time > :dashboardTime: AND \"host\" = :host: GROUP BY time(:interval:), \"url\"",
             "groupbys": ["\"url\""]
           }
         ],
