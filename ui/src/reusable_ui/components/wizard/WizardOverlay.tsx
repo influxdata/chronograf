@@ -38,7 +38,7 @@ class WizardOverlay extends PureComponent<Props> {
       <div className="wizard-overlay">
         <OverlayTechnology visible={visible}>
           <OverlayContainer maxWidth={maxWidth}>
-            <OverlayHeading title={title} />
+            <OverlayHeading title={title} onDismiss={this.handleSkip} />
             <OverlayBody>{this.WizardController}</OverlayBody>
           </OverlayContainer>
         </OverlayTechnology>
