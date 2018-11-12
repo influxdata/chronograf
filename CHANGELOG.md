@@ -10,6 +10,7 @@
 1. [#4794](https://github.com/influxdata/chronograf/pull/4794): Handle basepath issue with missing slash
 1. [#4798](https://github.com/influxdata/chronograf/pull/4798): Fix the ping pre canned dashboard
 1. [#4791](https://github.com/influxdata/chronograf/pull/4791): Save fieldOptions to cells created from Data Explorer page
+1. [#4806](https://github.com/influxdata/chronograf/pull/4806): Fix grouping in canned dashboard queries
 
 ## v1.7.2 [2018-11-08]
 
