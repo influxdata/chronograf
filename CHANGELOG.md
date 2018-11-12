@@ -7,7 +7,9 @@
 ### Bug Fixes
 
 1. [#4786](https://github.com/influxdata/chronograf/pull/4786): Get protoboards from multistore if not able to find from ProtoboardsPath
-1.  [#4791](https://github.com/influxdata/chronograf/pull/4791): Save fieldOptions to cells created from Data Explorer page
+1. [#4794](https://github.com/influxdata/chronograf/pull/4794): Handle basepath issue with missing slash
+1. [#4798](https://github.com/influxdata/chronograf/pull/4798): Fix the ping pre canned dashboard
+1. [#4791](https://github.com/influxdata/chronograf/pull/4791): Save fieldOptions to cells created from Data Explorer page
 
 ## v1.7.2 [2018-11-08]
 
@@ -34,6 +36,7 @@
 1. [#4772](https://github.com/influxdata/chronograf/pull/4772): Add protoboards enviroment variables to dockerfile
 1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
 1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
+1. [#4776](https://github.com/influxdata/chronograf/pull/4776): Fix flux pivot function using wrong named parameters
 
 ## v1.7.0 [2018-11-06]
 
