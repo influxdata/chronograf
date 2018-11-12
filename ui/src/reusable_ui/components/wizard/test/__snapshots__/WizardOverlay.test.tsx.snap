@@ -8,7 +8,9 @@ exports[`WizardOverlay matches snapshot with minimal props 1`] = `
     <OverlayContainer
       maxWidth={800}
     >
-      <OverlayHeading />
+      <OverlayHeading
+        onDismiss={[Function]}
+      />
       <OverlayBody />
     </OverlayContainer>
   </OverlayTechnology>
@@ -23,7 +25,9 @@ exports[`WizardOverlay with children matches snapshot with children props 1`] = 
     <OverlayContainer
       maxWidth={800}
     >
-      <OverlayHeading />
+      <OverlayHeading
+        onDismiss={[Function]}
+      />
       <OverlayBody />
     </OverlayContainer>
   </OverlayTechnology>

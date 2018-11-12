@@ -80,7 +80,6 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
         toggleVisibility={toggleVisibility}
         resetWizardState={this.resetWizardState}
         title="Connection Configuration"
-        skipLinkText="Dismiss"
         maxWidth={800}
         jumpStep={jumpStep}
         isJumpingAllowed={this.isSourceComplete()}
@@ -105,6 +104,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="Dashboards"
           tipText="Select Dashboards you would like to create:"
           isComplete={this.isDashboardComplete}
+          isSkippableStep={false}
           isErrored={dashboardError}
           nextLabel={this.dashboardNextLabel}
           onNext={this.handleDashboardNext}
@@ -121,6 +121,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="Kapacitor Connection"
           tipText=""
           isComplete={this.isKapacitorComplete}
+          isSkippableStep={false}
           isErrored={kapacitorError}
           onNext={this.handleKapacitorNext}
           onPrevious={this.handleKapacitorPrev}
@@ -139,6 +140,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="Setup Complete"
           tipText=""
           isComplete={this.isCompletionComplete}
+          isSkippableStep={false}
           isErrored={false}
           onNext={this.handleCompletionNext}
           onPrevious={this.handleCompletionPrev}
