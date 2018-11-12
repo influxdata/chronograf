@@ -169,7 +169,7 @@ class DatabaseRow extends Component {
               autoComplete="false"
             />
           </td>
-          {isRFDisplayed ? (
+          {isRFDisplayed && (
             <td style={{width: `${DATABASE_TABLE.colReplication}px`}}>
               <input
                 className="form-control input-xs"
@@ -184,7 +184,7 @@ class DatabaseRow extends Component {
                 autoComplete="false"
               />
             </td>
-          ) : null}
+          )}
           <td
             className="text-right"
             style={{width: `${DATABASE_TABLE.colDelete}px`}}

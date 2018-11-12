@@ -47,45 +47,47 @@ const DatabaseTable = ({
         onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
         isAddRPDisabled={!!database.retentionPolicies.some(rp => rp.isNew)}
       />
-      <div className="db-manager-table">
-        <table className="table v-center table-highlight">
-          <thead>
-            <tr>
-              <th style={{width: `${DATABASE_TABLE.colRetentionPolicy}px`}}>
-                Retention Policy
-              </th>
-              <th style={{width: `${DATABASE_TABLE.colDuration}px`}}>
-                Duration
-              </th>
-              {isRFDisplayed ? (
-                <th style={{width: `${DATABASE_TABLE.colReplication}px`}}>
-                  Replication Factor
+      {!database.isNew && (
+        <div className="db-manager-table">
+          <table className="table v-center table-highlight">
+            <thead>
+              <tr>
+                <th style={{width: `${DATABASE_TABLE.colRetentionPolicy}px`}}>
+                  Retention Policy
                 </th>
-              ) : null}
-              <th style={{width: `${DATABASE_TABLE.colDelete}px`}} />
-            </tr>
-          </thead>
-          <tbody>
-            {_.sortBy(database.retentionPolicies, ({name}) =>
-              name.toLowerCase()
-            ).map(rp => {
-              return (
-                <DatabaseRow
-                  key={rp.links.self}
-                  database={database}
-                  retentionPolicy={rp}
-                  onCreate={onCreateRetentionPolicy}
-                  onUpdate={onUpdateRetentionPolicy}
-                  onRemove={onRemoveRetentionPolicy}
-                  onDelete={onDeleteRetentionPolicy}
-                  isRFDisplayed={isRFDisplayed}
-                  isDeletable={database.retentionPolicies.length > 1}
-                />
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+                <th style={{width: `${DATABASE_TABLE.colDuration}px`}}>
+                  Duration
+                </th>
+                {isRFDisplayed ? (
+                  <th style={{width: `${DATABASE_TABLE.colReplication}px`}}>
+                    Replication Factor
+                  </th>
+                ) : null}
+                <th style={{width: `${DATABASE_TABLE.colDelete}px`}} />
+              </tr>
+            </thead>
+            <tbody>
+              {_.sortBy(database.retentionPolicies, ({name}) =>
+                name.toLowerCase()
+              ).map(rp => {
+                return (
+                  <DatabaseRow
+                    key={rp.links.self}
+                    database={database}
+                    retentionPolicy={rp}
+                    onCreate={onCreateRetentionPolicy}
+                    onUpdate={onUpdateRetentionPolicy}
+                    onRemove={onRemoveRetentionPolicy}
+                    onDelete={onDeleteRetentionPolicy}
+                    isRFDisplayed={isRFDisplayed}
+                    isDeletable={database.retentionPolicies.length > 1}
+                  />
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }
