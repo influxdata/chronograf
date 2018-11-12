@@ -87,11 +87,11 @@ function toCell(layoutCell: LayoutCell, source: Source): Cell {
 }
 
 function toCellQuery(layoutQuery: LayoutQuery, source: Source): CellQuery {
-  const cellQuery = {
-    query: layoutQuery.query,
+  const cellQuery: any = {
+    ...layoutQuery,
     source: source.url,
     type: 'influxql',
   }
 
-  return cellQuery as CellQuery
+  return cellQuery
 }
