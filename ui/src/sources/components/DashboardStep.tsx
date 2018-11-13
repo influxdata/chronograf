@@ -18,6 +18,7 @@ import {getSuggestedProtoboards} from 'src/dashboards/utils/protoboardSuggestion
 import GridSizer from 'src/reusable_ui/components/grid_sizer/GridSizer'
 import CardSelectCard from 'src/reusable_ui/components/card_select/CardSelectCard'
 import SearchBar from 'src/hosts/components/SearchBar'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 // Actions
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -29,7 +30,7 @@ import {
 } from 'src/shared/copy/notifications'
 
 // Types
-import {Protoboard, Source} from 'src/types'
+import {Protoboard, Source, RemoteDataState} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 interface SelectedDashboard {
@@ -41,6 +42,8 @@ interface State {
   protoboards: Protoboard[]
   selected: SelectedDashboard
   suggestedProtoboards: Protoboard[]
+  fetchingProtoboards: RemoteDataState
+  fetchingSuggested: RemoteDataState
 }
 
 interface Props {
@@ -52,6 +55,8 @@ interface Props {
 
 @ErrorHandling
 class DashboardStep extends Component<Props, State> {
+  private isComponentMounted: boolean
+
   public constructor(props: Props) {
     super(props)
     this.state = {
@@ -59,12 +64,31 @@ class DashboardStep extends Component<Props, State> {
       protoboards: [],
       searchTerm: '',
       suggestedProtoboards: [],
+      fetchingProtoboards: RemoteDataState.NotStarted,
+      fetchingSuggested: RemoteDataState.NotStarted,
     }
   }
 
   public async componentDidMount() {
-    const protoboards = await getProtoboards()
-    this.setState({protoboards}, this.handleSuggest)
+    this.isComponentMounted = true
+
+    this.setState({fetchingProtoboards: RemoteDataState.Loading})
+    try {
+      const protoboards = await getProtoboards()
+
+      if (this.isComponentMounted) {
+        this.setState({protoboards, fetchingProtoboards: RemoteDataState.Done})
+        this.handleSuggest()
+      }
+    } catch (err) {
+      if (this.isComponentMounted) {
+        this.setState({fetchingProtoboards: RemoteDataState.Error})
+      }
+    }
+  }
+
+  public componentWillUnmount() {
+    this.isComponentMounted = false
   }
 
   public next = async (): Promise<NextReturn> => {
@@ -97,7 +121,12 @@ class DashboardStep extends Component<Props, State> {
   }
 
   public render() {
-    const {protoboards} = this.state
+    const {protoboards, fetchingProtoboards} = this.state
+
+    if (fetchingProtoboards === RemoteDataState.Loading) {
+      return <PageSpinner />
+    }
+
     if (protoboards && protoboards.length) {
       return (
         <div className="dashboard-step">
@@ -112,6 +141,7 @@ class DashboardStep extends Component<Props, State> {
         </div>
       )
     }
+
     return <div />
   }
 
@@ -128,6 +158,7 @@ class DashboardStep extends Component<Props, State> {
 
   private get dashboardCards() {
     const {selected, protoboards, suggestedProtoboards, searchTerm} = this.state
+
     const filteredProtoboards = protoboards.filter(
       pb =>
         isSearchMatch(pb.meta.name, searchTerm) &&
@@ -156,7 +187,20 @@ class DashboardStep extends Component<Props, State> {
   }
 
   private get suggestedDashboardCards() {
-    const {selected, suggestedProtoboards, searchTerm} = this.state
+    const {
+      selected,
+      suggestedProtoboards,
+      searchTerm,
+      fetchingSuggested,
+    } = this.state
+
+    if (fetchingSuggested === RemoteDataState.Loading) {
+      return (
+        <div className="dashboard-step--loading">
+          <PageSpinner />
+        </div>
+      )
+    }
 
     const filteredProtoboards = suggestedProtoboards.filter(pb =>
       isSearchMatch(pb.meta.name, searchTerm)
@@ -196,20 +240,33 @@ class DashboardStep extends Component<Props, State> {
     const {source} = this.props
 
     if (source) {
-      const suggestedProtoboardsList = await getSuggestedProtoboards(
-        source,
-        protoboards
-      )
-
-      if (suggestedProtoboardsList.length === 0) {
-        return
+      if (this.isComponentMounted) {
+        this.setState({fetchingSuggested: RemoteDataState.Loading})
       }
 
-      const suggestedProtoboards = protoboards.filter(p =>
-        suggestedProtoboardsList.includes(p.meta.name)
-      )
+      try {
+        const suggestedProtoboardsList = await getSuggestedProtoboards(
+          source,
+          protoboards
+        )
 
-      this.setState({suggestedProtoboards})
+        if (suggestedProtoboardsList.length === 0) {
+          return
+        }
+
+        const suggestedProtoboards = protoboards.filter(p =>
+          suggestedProtoboardsList.includes(p.meta.name)
+        )
+
+        if (this.isComponentMounted) {
+          this.setState({
+            suggestedProtoboards,
+            fetchingSuggested: RemoteDataState.Done,
+          })
+        }
+      } catch (err) {
+        this.setState({fetchingSuggested: RemoteDataState.Error})
+      }
     }
   }
 
