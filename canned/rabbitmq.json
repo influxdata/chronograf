@@ -12,17 +12,17 @@
 					"name": "RabbitMQ - Overview",
 					"queries": [
 						{
-							"query": "select mean(\"consumers\") AS \"consumers\" from rabbitmq_overview",
+							"query": "SELECT mean(\"consumers\") AS \"consumers\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\"",
 							"groupbys": [],
 							"wheres": []
 						},
 						{
-							"query": "select mean(\"exchanges\") AS \"exchanges\" from rabbitmq_overview",
+							"query": "SELECT mean(\"exchanges\") AS \"exchanges\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\"",
 							"groupbys": [],
 							"wheres": []
 						},
 						{
-							"query": "select mean(\"queues\") AS \"queues\" from rabbitmq_overview",
+							"query": "SELECT mean(\"queues\") AS \"queues\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\"",
 							"groupbys": [],
 							"wheres": []
 						}
@@ -37,12 +37,12 @@
 					"name": "RabbitMQ - Published/Delivered per second",
 					"queries": [
 						{
-							"query": "select derivative(mean(\"messages_published\"), 1s) AS \"published_per_sec\" from rabbitmq_overview",
+							"query": "SELECT derivative(mean(\"messages_published\"), 1s) AS \"published_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\"",
 							"groupbys": [],
 							"wheres": []
 						},
 						{
-							"query": "select derivative(mean(\"messages_delivered\"), 1s) AS \"delivered_per_sec\" from rabbitmq_overview",
+							"query": "SELECT derivative(mean(\"messages_delivered\"), 1s) AS \"delivered_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\"",
 							"groupbys": [],
 							"wheres": []
 						}
@@ -57,12 +57,12 @@
 					"name": "RabbitMQ - Acked/Unacked per second",
 					"queries": [
 						{
-							"query": "select derivative(mean(\"messages_acked\"), 1s) AS \"acked_per_sec\" from rabbitmq_overview",
+							"query": "SELECT derivative(mean(\"messages_acked\"), 1s) AS \"acked_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\"",
 							"groupbys": [],
 							"wheres": []
 						},
 						{
-							"query": "select derivative(mean(\"messages_unacked\"), 1s) AS \"unacked_per_sec\" from rabbitmq_overview",
+							"query": "SELECT derivative(mean(\"messages_unacked\"), 1s) AS \"unacked_per_sec\" FROM \":db:\".\":rp:\".\"rabbitmq_overview\"",
 							"groupbys": [],
 							"wheres": []
 						}
