@@ -12,6 +12,8 @@
 1. [#4791](https://github.com/influxdata/chronograf/pull/4791): Save fieldOptions to cells created from Data Explorer page
 1. [#4806](https://github.com/influxdata/chronograf/pull/4806): Fix grouping in canned dashboard queries
 1. [#4788](https://github.com/influxdata/chronograf/pull/4788): Update canned dashboard queries so they all use database and retention policy
+1. [#4808](https://github.com/influxdata/chronograf/pull/4808): Remove dismiss text from and add x-to-dismiss to wizard overlay steps
+1. [#4796](https://github.com/influxdata/chronograf/pull/4796): Update docker, influxdb and postresql protoboards
 
 ## v1.7.2 [2018-11-08]
 
