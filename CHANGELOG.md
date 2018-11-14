@@ -1,6 +1,4 @@
-## v1.7.3 [unreleased]
-
-### Features
+## v1.7.3 [2018-11-13]
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
