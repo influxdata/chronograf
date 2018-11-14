@@ -1,7 +1,15 @@
 ## v1.7.3 [2018-11-13]
+## v1.7.4 [unreleased]
+
+### Features
+
+### Bug Fixes
+1. [4814](https://github.com/influxdata/chronograf/pull/4814): Fixes logs page getting stuck on scroll to top
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
+
+## v1.7.3 [2018-11-13]
 
 ### Bug Fixes
 
@@ -13,6 +21,13 @@
 1. [#4788](https://github.com/influxdata/chronograf/pull/4788): Update canned dashboard queries so they all use database and retention policy
 1. [#4808](https://github.com/influxdata/chronograf/pull/4808): Remove dismiss text from and add x-to-dismiss to wizard overlay steps
 1. [#4796](https://github.com/influxdata/chronograf/pull/4796): Update docker, influxdb and postresql protoboards
+
+## v1.7.2 [2018-11-08]
+
+### Features
+
+### UI Improvements
+1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
 
 ## v1.7.2 [2018-11-08]
 
