@@ -159,6 +159,7 @@ interface State {
   isOverlayVisible: boolean
   histogramColors: HistogramColor[]
   hasScrolled: boolean
+  isLoadingNewer: boolean
 }
 
 class LogsPage extends Component<Props, State> {
@@ -177,7 +178,6 @@ class LogsPage extends Component<Props, State> {
   }
 
   private interval: number
-  private loadingNewer: boolean = false
   private currentOlderChunksGenerator: FetchLoop = null
   private currentNewerChunksGenerator: FetchLoop = null
   private loadingSourcesStatus: RemoteDataState = RemoteDataState.NotStarted
@@ -186,6 +186,7 @@ class LogsPage extends Component<Props, State> {
     super(props)
 
     this.state = {
+      isLoadingNewer: false,
       searchString: '',
       liveUpdating: false,
       isOverlayVisible: false,
@@ -421,7 +422,7 @@ class LogsPage extends Component<Props, State> {
     if (this.isLiveUpdating || this.shouldLiveUpdate) {
       return
     }
-    this.loadingNewer = true
+    this.setState({isLoadingNewer: true})
     await this.startFetchingNewer()
   }
 
@@ -446,7 +447,7 @@ class LogsPage extends Component<Props, State> {
       console.error(error)
     }
 
-    this.loadingNewer = false
+    this.setState({isLoadingNewer: false})
     this.currentNewerChunksGenerator = null
   }
 
@@ -497,8 +498,7 @@ class LogsPage extends Component<Props, State> {
       return 0
     }
 
-    if (this.loadingNewer && this.props.newRowsAdded) {
-      this.loadingNewer = false
+    if (this.state.isLoadingNewer && this.props.newRowsAdded) {
       return this.props.newRowsAdded || 0
     }
 
