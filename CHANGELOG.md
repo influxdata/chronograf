@@ -9,8 +9,6 @@
 
 ## v1.7.3 [2018-11-13]
 
-## v1.7.3 [2018-11-13]
-
 ### Bug Fixes
 
 1. [#4786](https://github.com/influxdata/chronograf/pull/4786): Get protoboards from multistore if not able to find from ProtoboardsPath
