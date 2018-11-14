@@ -3,6 +3,7 @@
 ### Features
 
 ### Bug Fixes
+1. [4814](https://github.com/influxdata/chronograf/pull/4814): Fixes logs page getting stuck on scroll to top
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
