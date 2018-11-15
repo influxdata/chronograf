@@ -190,7 +190,10 @@ class RefreshingGraph extends Component<Props> {
                       )
                     }
 
-                    if (!this.hasValues(timeSeriesFlux, timeSeriesInfluxQL)) {
+                    if (
+                      !this.hasValues(timeSeriesFlux, timeSeriesInfluxQL) &&
+                      loading !== RemoteDataState.Loading
+                    ) {
                       if (errorMessage && _.get(queries, '0.text', '').trim()) {
                         return <InvalidData message={errorMessage} />
                       }
