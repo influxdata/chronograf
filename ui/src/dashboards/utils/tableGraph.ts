@@ -290,3 +290,16 @@ export const transformTableData = (
 
   return {transformedData, sortedTimeVals, columnWidths}
 }
+
+/*
+  Checks whether an input value of arbitrary type can be parsed into a
+  number. Note that there are two different `isNaN` checks, since
+
+  - `Number('')` is 0
+  - `Number('02abc')` is NaN
+  - `parseFloat('')` is NaN
+  - `parseFloat('02abc')` is 2
+
+*/
+export const isNumerical = (x: any): boolean =>
+  !isNaN(Number(x)) && !isNaN(parseFloat(x))
