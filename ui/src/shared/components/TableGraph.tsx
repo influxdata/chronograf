@@ -12,9 +12,9 @@ import {MultiGrid, PropsMultiGrid} from 'src/shared/components/MultiGrid'
 // Utils
 import {fastReduce} from 'src/utils/fast'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {getDefaultTimeField, isNumerical} from 'src/dashboards/utils/tableGraph'
 
 // Constants
-import {getDefaultTimeField} from 'src/dashboards/utils/tableGraph'
 import {
   ASCENDING,
   NULL_HOVER_TIME,
@@ -438,18 +438,17 @@ class TableGraph extends PureComponent<Props, State> {
     if (isTimeData) {
       return moment(cellData).format(timeFormat)
     }
+
     if (_.isString(cellData) && isFieldName) {
       return _.defaultTo(fieldName, '').toString()
     }
+
     if (
-      (_.isNumber(cellData) || parseFloat(cellData)) &&
+      isNumerical(cellData) &&
       decimalPlaces.isEnforced &&
       decimalPlaces.digits < 100
     ) {
-      if (_.isString(cellData)) {
-        return parseFloat(cellData).toFixed(decimalPlaces.digits)
-      }
-      return cellData.toFixed(decimalPlaces.digits)
+      return parseFloat(cellData as any).toFixed(decimalPlaces.digits)
     }
 
     return _.defaultTo(cellData, '').toString()
@@ -508,16 +507,7 @@ class TableGraph extends PureComponent<Props, State> {
     const isFieldName = this.isVerticalTimeAxis ? isFirstRow : isFirstCol
     const isFixedCorner = isFirstRow && isFirstCol
 
-    // Note that
-    //
-    // - `Number('')` is 0
-    // - `Number('02abc')` is NaN
-    // - `parseFloat('')` is NaN
-    // - `parseFloat('02abc')` is 2
-    //
-    // which is why there are two slightly different `isNaN` checks here
-    const isNumerical =
-      !isNaN(Number(cellData)) && !isNaN(parseFloat(cellData as string))
+    const cellDataIsNumerical = isNumerical(cellData)
 
     let cellStyle: React.CSSProperties = style //tslint:disable-line
     if (
@@ -525,7 +515,7 @@ class TableGraph extends PureComponent<Props, State> {
       !isFixedColumn &&
       !isFixedCorner &&
       !isTimeData &&
-      isNumerical
+      cellDataIsNumerical
     ) {
       const thresholdData = {colors, lastValue: cellData, cellType: 'table'}
       const {bgColor, textColor} = generateThresholdsListHexs(thresholdData)
@@ -556,7 +546,7 @@ class TableGraph extends PureComponent<Props, State> {
       'table-graph-cell__fixed-corner': isFixedCorner,
       'table-graph-cell__highlight-row': isHighlightedRow,
       'table-graph-cell__highlight-column': isHighlightedColumn,
-      'table-graph-cell__numerical': isNumerical,
+      'table-graph-cell__numerical': cellDataIsNumerical,
       'table-graph-cell__field-name': isFieldName,
       'table-graph-cell__sort-asc': isFieldName && isSorted && isAscending,
       'table-graph-cell__sort-desc': isFieldName && isSorted && !isAscending,
