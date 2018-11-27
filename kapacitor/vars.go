@@ -200,7 +200,7 @@ func groupBy(q *chronograf.QueryConfig) string {
 
 func idVar(q *chronograf.QueryConfig) string {
 	if len(q.GroupBy.Tags) > 0 {
-		return `name + ':{{.Group}}'`
+		return `name + '-{{.Group}}'`
 	}
 	return "name"
 }

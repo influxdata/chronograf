@@ -170,7 +170,7 @@ var whereFilter = lambda: TRUE
 
 var name = 'rule 1'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = ''
 
@@ -259,7 +259,7 @@ var whereFilter = lambda: TRUE
 
 var name = 'rule 1'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = ''
 
@@ -504,7 +504,7 @@ var whereFilter = lambda: TRUE
 
 var name = 'rule 1'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = ''
 
@@ -590,7 +590,7 @@ var whereFilter = lambda: TRUE
 
 var name = 'rule 1'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = ''
 
@@ -1354,7 +1354,7 @@ var period = 1d
 
 var name = 'myname\'s'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = ''
 
