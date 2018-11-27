@@ -138,7 +138,7 @@ var every = 30s
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
@@ -284,7 +284,7 @@ var every = 10s
 
 var name = 'haproxy'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'Haproxy monitor : {{.ID}} : {{ index .Tags "server" }} : {{ index .Tags "pxname" }} is {{ .Level }} '
 
@@ -433,7 +433,7 @@ var every = 10s
 
 var name = 'haproxy'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'Haproxy monitor : {{.ID}} : {{ index .Tags "server" }} : {{ index .Tags "pxname" }} is {{ .Level }} '
 
@@ -591,7 +591,7 @@ var every = 30s
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
@@ -751,7 +751,7 @@ var every = 30s
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
@@ -910,7 +910,7 @@ var every = 30s
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
@@ -1058,7 +1058,7 @@ var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
@@ -1212,7 +1212,7 @@ var every = 30s
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
@@ -1382,7 +1382,7 @@ var every = 30s
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
@@ -1547,7 +1547,7 @@ var period = 10m
 
 var name = 'name'
 
-var idVar = name + ':{{.Group}}'
+var idVar = name + '-{{.Group}}'
 
 var message = 'message'
 
