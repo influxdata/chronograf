@@ -121,7 +121,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           title="Kapacitor Connection"
           tipText=""
           isComplete={this.isKapacitorComplete}
-          isSkippableStep={false}
+          isSkippableStep={true}
           isErrored={kapacitorError}
           onNext={this.handleKapacitorNext}
           onPrevious={this.handleKapacitorPrev}
