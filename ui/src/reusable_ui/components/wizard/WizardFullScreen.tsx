@@ -11,7 +11,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
   skipLinkText?: string
-  handleSkip?: () => void
   switchLinkText?: string
   handleSwitch?: () => void
   isUsingAuth: boolean
@@ -35,7 +34,6 @@ class WizardFullScreen extends PureComponent<Props> {
     const {
       children,
       skipLinkText,
-      handleSkip,
       handleSwitch,
       switchLinkText,
       isUsingAuth,
@@ -45,7 +43,6 @@ class WizardFullScreen extends PureComponent<Props> {
     if (children) {
       return (
         <WizardController
-          handleSkip={handleSkip}
           skipLinkText={skipLinkText}
           handleSwitch={handleSwitch}
           switchLinkText={switchLinkText}

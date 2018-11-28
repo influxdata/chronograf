@@ -9,6 +9,7 @@
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
+1. [4845](https://github.com/influxdata/chronograf/pull/4845): Allow Kapacitor step in Connection Configuration to be skipped
 
 ## v1.7.3 [2018-11-13]
 

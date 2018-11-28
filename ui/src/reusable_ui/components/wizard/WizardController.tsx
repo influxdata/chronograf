@@ -17,7 +17,7 @@ interface State {
 
 interface Props {
   children: Array<ReactElement<WizardStepProps>>
-  handleSkip?: () => void
+  handleFinish?: () => void
   skipLinkText?: string
   jumpStep?: number
   switchLinkText?: string
@@ -129,11 +129,11 @@ class WizardController extends PureComponent<Props, State> {
   }
 
   private get CurrentChild(): JSX.Element {
-    const {children, handleSkip} = this.props
+    const {children, handleFinish} = this.props
     const {currentStepIndex, steps} = this.state
     const lastStep = currentStepIndex === steps.length - 1
 
-    const advance = lastStep ? handleSkip : this.incrementStep
+    const advance = lastStep ? handleFinish : this.incrementStep
     const retreat = currentStepIndex === 0 ? null : this.decrementStep
 
     let currentChild
@@ -173,13 +173,13 @@ class WizardController extends PureComponent<Props, State> {
   }
 
   private get skipLink() {
-    const {handleSkip, skipLinkText} = this.props
-    const {steps} = this.state
+    const {skipLinkText} = this.props
+    const {currentStepIndex} = this.state
 
     return (
       <button
         className="btn btn-xs btn-primary btn-link wizard-skip-link"
-        onClick={handleSkip || this.jumpToStep(steps.length - 1)}
+        onClick={this.jumpToStep(currentStepIndex + 1)}
       >
         {skipLinkText}
       </button>
