@@ -27,6 +27,9 @@
   background-color: $g3-castle;
   padding: 10px 15px;
   z-index: 200;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
 
   .form--element {
     margin-bottom: 15px;
@@ -44,6 +47,10 @@
   margin-bottom: 20px;
 }
 
+.flux-script-wizard--wizard-body {
+  overflow: scroll;
+}
+
 .flux-script-wizard--close {
   cursor: pointer;
   font-size: 34px;
@@ -51,7 +58,7 @@
   line-height: 18px;
   position: absolute;
   right: 30px;
-  top: 0;
+  top: 8px;
 }
 
 .flux-script-wizard--bg-hint {

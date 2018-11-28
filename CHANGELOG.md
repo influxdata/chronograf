@@ -9,7 +9,7 @@
 1. [4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
 1. [4846](https://github.com/influxdata/chronograf/pull/4846): Fix missing data and type in refreshing graph
 1. [4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
-
+1. [4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
