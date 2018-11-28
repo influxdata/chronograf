@@ -394,9 +394,9 @@ export const functions: FluxToolbarFunction[] = [
         type: 'String',
       },
       {
-        name: 'buckets',
+        name: 'bins',
         desc:
-          'A list of upper bounds to use when computing the histogram frequencies. Buckets should contain a bucket whose bound is the maximum value of the data set. This value can be set to positive infinity if no maximum is known.',
+          'A list of upper bounds to use when computing the histogram frequencies. Each element in the array should contain a float value that represents the maximum value for a bin.',
         type: 'Array of Floats',
       },
       {
@@ -409,7 +409,7 @@ export const functions: FluxToolbarFunction[] = [
     desc:
       'Approximates the cumulative distribution function of a dataset by counting data frequencies for a list of buckets.',
     example:
-      'histogram(column: "_value", upperBoundColumn: "le", countColumn: "_value", buckets: [50.0, 75.0, 90.0], normalize: false)',
+      'histogram(column: "_value", upperBoundColumn: "le", countColumn: "_value", bins: [50.0, 75.0, 90.0], normalize: false)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/histogram',
@@ -651,7 +651,7 @@ export const functions: FluxToolbarFunction[] = [
       'https://docs.influxdata.com/flux/latest/functions/transformations/limit',
   },
   {
-    name: 'linearBuckets',
+    name: 'linearBins',
     args: [
       {
         name: 'start',
@@ -660,29 +660,29 @@ export const functions: FluxToolbarFunction[] = [
       },
       {
         name: 'width',
-        desc: 'The distance between subsequent bucket values.',
+        desc: 'The distance between subsequent bin values.',
         type: 'Float',
       },
       {
         name: 'count',
-        desc: 'The number of buckets to create.',
+        desc: 'The number of bins to create.',
         type: 'Integer',
       },
       {
         name: 'infinity',
         desc:
-          'When `true`, adds an additional bucket with a value of positive infinity. Defaults to `true`.',
+          'When `true`, adds an additional bin with a value of positive infinity. Defaults to `true`.',
         type: 'Boolean',
       },
     ],
     desc: 'Generates a list of linearly separated floats.',
-    example: 'linearBuckets(start: 0.0, width: 5.0, count: 20, infinity: true)',
+    example: 'linearBins(start: 0.0, width: 5.0, count: 20, infinity: true)',
     category: 'Miscellaneous',
     link:
-      'https://docs.influxdata.com/flux/latest/functions/misc/linearbuckets',
+      'https://docs.influxdata.com/flux/latest/functions/misc/linearbins',
   },
   {
-    name: 'logarithmicBuckets',
+    name: 'logarithmicBins',
     args: [
       {
         name: 'start',
@@ -691,27 +691,27 @@ export const functions: FluxToolbarFunction[] = [
       },
       {
         name: 'factor',
-        desc: 'The multiplier applied to each subsequent bucket.',
+        desc: 'The multiplier applied to each subsequent bin.',
         type: 'Float',
       },
       {
         name: 'count',
-        desc: 'The number of buckets to create.',
+        desc: 'The number of bins to create.',
         type: 'Integer',
       },
       {
         name: 'infinity',
         desc:
-          'When `true`, adds an additional bucket with a value of positive infinity. Defaults to `true`.',
+          'When `true`, adds an additional bin with a value of positive infinity. Defaults to `true`.',
         type: 'Boolean',
       },
     ],
     desc: 'Generates a list of exponentially separated floats.',
     example:
-      'logarithmicBuckets(start: 1.0, factor: 2.0, count: 10, infinty: true)',
+      'logarithmicBins(start: 1.0, factor: 2.0, count: 10, infinty: true)',
     category: 'Miscellaneous',
     link:
-      'https://docs.influxdata.com/flux/latest/functions/misc/logarithmicbuckets',
+      'https://docs.influxdata.com/flux/latest/functions/misc/logarithmicbins',
   },
   {
     name: 'map',
