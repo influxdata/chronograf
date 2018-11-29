@@ -38,7 +38,7 @@ class WizardOverlay extends PureComponent<Props> {
       <div className="wizard-overlay">
         <OverlayTechnology visible={visible}>
           <OverlayContainer maxWidth={maxWidth}>
-            <OverlayHeading title={title} onDismiss={this.handleSkip} />
+            <OverlayHeading title={title} onDismiss={this.handleFinish} />
             <OverlayBody>{this.WizardController}</OverlayBody>
           </OverlayContainer>
         </OverlayTechnology>
@@ -52,7 +52,7 @@ class WizardOverlay extends PureComponent<Props> {
       return (
         <WizardController
           skipLinkText={skipLinkText}
-          handleSkip={this.handleSkip}
+          handleFinish={this.handleFinish}
           jumpStep={jumpStep}
           isJumpingAllowed={isJumpingAllowed}
         >
@@ -64,8 +64,9 @@ class WizardOverlay extends PureComponent<Props> {
     return null
   }
 
-  private handleSkip = () => {
+  private handleFinish = () => {
     const {toggleVisibility, resetWizardState} = this.props
+
     toggleVisibility(false)()
     resetWizardState()
   }
