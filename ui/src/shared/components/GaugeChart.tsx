@@ -1,6 +1,5 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import _ from 'lodash'
 import memoizeOne from 'memoize-one'
 
 // Components
@@ -17,6 +16,7 @@ import {
 } from 'src/shared/graphs/helpers'
 import getLastValues from 'src/shared/parsing/lastValues'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {getDeep} from 'src/utils/wrappers'
 
 // Constants
 import {DEFAULT_GAUGE_COLORS} from 'src/shared/constants/thresholds'
@@ -40,11 +40,12 @@ interface Props {
   prefix: string
   suffix: string
   resizerTopHeight?: number
+  fluxTablesToSingleStat?: typeof manager.fluxTablesToSingleStat
 }
 
 interface State {
   lastValues?: {
-    values: number[]
+    values: number[] | string[]
     series: string[]
   }
   isValidData: boolean
@@ -54,6 +55,7 @@ interface State {
 class GaugeChart extends PureComponent<Props, State> {
   public static defaultProps: Partial<Props> = {
     colors: stringifyColorValues(DEFAULT_GAUGE_COLORS),
+    fluxTablesToSingleStat: manager.fluxTablesToSingleStat,
   }
 
   private isComponentMounted: boolean
@@ -62,13 +64,16 @@ class GaugeChart extends PureComponent<Props, State> {
     getLastValues,
     isInluxQLDataEqual
   )
-  private memoizedFluxTablesToSingleStat = memoizeOne(
-    manager.fluxTablesToSingleStat,
-    isFluxDataEqual
-  )
+
+  private memoizedFluxTablesToSingleStat: typeof manager.fluxTablesToSingleStat
 
   constructor(props: Props) {
     super(props)
+
+    this.memoizedFluxTablesToSingleStat = memoizeOne(
+      props.fluxTablesToSingleStat,
+      isFluxDataEqual
+    )
 
     this.state = {isValidData: true}
   }
@@ -137,13 +142,15 @@ class GaugeChart extends PureComponent<Props, State> {
 
   private get lastValueForGauge(): number {
     const {lastValues} = this.state
-    const lastValue = _.get(lastValues, 'values.0', 0)
+    const lastValue = getDeep<number | string>(lastValues, 'values.0', 0)
 
-    if (!lastValue) {
-      return 0
+    switch (typeof lastValue) {
+      case 'number':
+      case 'string':
+        return Number(lastValue)
+      default:
+        return 0
     }
-
-    return lastValue
   }
 
   private async dataToLastValues() {

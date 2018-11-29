@@ -42,11 +42,12 @@ interface Props {
   dataType: DataType
   onUpdateCellColors?: (bgColor: string, textColor: string) => void
   onUpdateVisType?: (cell: CellType) => Promise<void>
+  fluxTablesToSingleStat?: typeof manager.fluxTablesToSingleStat
 }
 
 interface State {
   lastValues?: {
-    values: number[]
+    values: string[] | number[]
     series: string[]
   }
   isValidData: boolean
@@ -60,6 +61,7 @@ class SingleStat extends PureComponent<Props, State> {
     prefix: '',
     suffix: '',
     onUpdateCellColors: NOOP,
+    fluxTablesToSingleStat: manager.fluxTablesToSingleStat,
   }
 
   private isComponentMounted: boolean
@@ -68,13 +70,15 @@ class SingleStat extends PureComponent<Props, State> {
     getLastValues,
     isInluxQLDataEqual
   )
-  private memoizedFluxTablesToSingleStat = memoizeOne(
-    manager.fluxTablesToSingleStat,
-    isFluxDataEqual
-  )
+  private memoizedFluxTablesToSingleStat: typeof manager.fluxTablesToSingleStat
 
   constructor(props: Props) {
     super(props)
+
+    this.memoizedFluxTablesToSingleStat = memoizeOne(
+      props.fluxTablesToSingleStat,
+      isFluxDataEqual
+    )
 
     this.state = {isValidData: true}
   }
@@ -138,7 +142,7 @@ class SingleStat extends PureComponent<Props, State> {
         firstAlphabeticalSeriesName
       )
 
-      return values[firstAlphabeticalIndex]
+      return Number(values[firstAlphabeticalIndex])
     }
   }
 
@@ -196,7 +200,7 @@ class SingleStat extends PureComponent<Props, State> {
         series,
         firstAlphabeticalSeriesName
       )
-      lastValue = values[firstAlphabeticalIndex]
+      lastValue = Number(values[firstAlphabeticalIndex])
     }
 
     const {bgColor, textColor} = generateThresholdsListHexs({
