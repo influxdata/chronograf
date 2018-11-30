@@ -537,6 +537,8 @@ class RefreshingGraph extends Component<Props> {
     if (fluxData.length) {
       return {dataType: DataType.flux, data: fluxData}
     }
+
+    return {dataType: DataType.influxQL, data: []}
   }
 }
 
