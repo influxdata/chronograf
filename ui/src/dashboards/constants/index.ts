@@ -60,6 +60,7 @@ export const FORMAT_OPTIONS: Array<{text?: string; format: string}> = [
   {format: 'dddd, MMMM D, YYYY HH:mm:ss'},
   {format: 'X', text: 'Unix Time'},
   {format: 'x', text: 'Unix Time (milliseconds)'},
+  {format: 'x000000', text: 'Unix Time (nanoseconds)'}
   {format: TIME_FORMAT_CUSTOM},
 ]
 
