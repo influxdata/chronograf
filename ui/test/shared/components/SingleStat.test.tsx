@@ -1,7 +1,6 @@
 import {shallow} from 'enzyme'
 import React from 'react'
-import Gauge from 'src/shared/components/Gauge'
-import GaugeChart from 'src/shared/components/GaugeChart'
+import SingleStat from 'src/shared/components/SingleStat'
 import {DataType} from 'src/shared/constants'
 
 import {
@@ -21,6 +20,9 @@ const defaultProps = {
     isEnforced: true,
   },
   dataType: DataType.influxQL,
+  cellHeight: 10,
+  colors: [],
+  lineGraph: false,
 }
 
 const setup = (overrides = {}) => {
@@ -29,17 +31,19 @@ const setup = (overrides = {}) => {
     ...overrides,
   }
 
-  return shallow(<GaugeChart {...props} />)
+  return shallow(<SingleStat {...props} />)
 }
 
-describe('GaugeChart', () => {
+describe('SingleStat', () => {
+  const StatSelector = '.single-stat--text'
+
   describe('rendering influxQL response', () => {
     describe('when data is empty', () => {
       it('renders the correct number', () => {
         const wrapper = setup()
 
-        expect(wrapper.find(Gauge).exists()).toBe(true)
-        expect(wrapper.find(Gauge).props().gaugePosition).toBe(0)
+        expect(wrapper.find(StatSelector)).toHaveLength(1)
+        expect(wrapper.find(StatSelector).text()).toBe('0')
       })
     })
 
@@ -47,8 +51,8 @@ describe('GaugeChart', () => {
       it('renders the correct number', () => {
         const wrapper = setup({data: createInfluxQLDataValue(2)})
 
-        expect(wrapper.find(Gauge).exists()).toBe(true)
-        expect(wrapper.find(Gauge).props().gaugePosition).toBe(2)
+        expect(wrapper.find(StatSelector).exists()).toBe(true)
+        expect(wrapper.find(StatSelector).text()).toBe('2')
       })
     })
   })
@@ -58,29 +62,33 @@ describe('GaugeChart', () => {
       it('renders the correct number', () => {
         const wrapper = setup({datatype: DataType.flux, data: []})
 
-        expect(wrapper.find(Gauge).exists()).toBe(true)
-        expect(wrapper.find(Gauge).props().gaugePosition).toBe(0)
+        expect(wrapper.find(StatSelector).exists()).toBe(true)
+        expect(wrapper.find(StatSelector).text()).toBe('0')
       })
     })
 
     describe('when data has a value', () => {
       it('renders the correct number', async () => {
-        const data = createFluxDataValue('67.3901637395223')
+        const data = createFluxDataValue('9000.123456790235')
         const mockFluxToSingleStat = jest.fn(
-          fluxValueToSingleStat('67.3901637395223')
+          fluxValueToSingleStat('9000.123456790235')
         )
 
         const wrapper = await setup({
           data,
           dataType: DataType.flux,
           fluxTablesToSingleStat: mockFluxToSingleStat,
+          prefix: 'Over ',
+          suffix: ' battle power!',
         })
 
         expect(mockFluxToSingleStat).toBeCalledWith(data)
         await expect(mockFluxToSingleStat).toReturn()
         await wrapper.update()
-        expect(wrapper.find(Gauge).exists()).toBe(true)
-        expect(wrapper.find(Gauge).props().gaugePosition).toBe(67.3901637395223)
+        expect(wrapper.find(StatSelector).exists()).toBe(true)
+        expect(wrapper.find(StatSelector).text()).toBe(
+          'Over 9,000.12 battle power!'
+        )
       })
     })
   })

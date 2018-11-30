@@ -47,6 +47,7 @@ class Gauge extends Component<Props> {
 
   public render() {
     const {width, height} = this.props
+
     return (
       <canvas
         className="gauge"
@@ -366,7 +367,13 @@ class Gauge extends Component<Props> {
     const {degree, needleColor0, needleColor1} = GAUGE_SPECS
     const arcDistance = Math.PI * 1.5
 
-    const needleRotation = (gaugePosition - minValue) / (maxValue - minValue)
+    const limitedGaugePosition = Math.max(
+      Math.min(gaugePosition, maxValue),
+      minValue
+    )
+
+    const needleRotation =
+      (limitedGaugePosition - minValue) / (maxValue - minValue)
 
     const needleGradient = ctx.createLinearGradient(0, -10, 0, radius)
     needleGradient.addColorStop(0, needleColor0)
