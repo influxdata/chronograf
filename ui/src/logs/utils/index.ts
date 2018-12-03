@@ -355,3 +355,11 @@ export const parseHistogramQueryResponse = (
 export const formatTime = (time: number): string => {
   return moment(time).format(DEFAULT_TIME_FORMAT)
 }
+
+export const buildFindMeasurementQuery = (
+  namespace: Namespace,
+  measurement: string
+) =>
+  `SHOW MEASUREMENTS ON "${
+    namespace.database
+  }" WITH measurement = "${measurement}"`

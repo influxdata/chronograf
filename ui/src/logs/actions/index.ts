@@ -290,7 +290,7 @@ interface SetNextTailLowerBoundAction {
   }
 }
 
-interface SetSearchStatusAction {
+export interface SetSearchStatusAction {
   type: ActionTypes.SetSearchStatus
   payload: {
     searchStatus: SearchStatus
@@ -923,11 +923,15 @@ export const fetchNamespaceSyslogStatusAsync = (namespace: Namespace) => async (
   dispatch: Dispatch<SetSearchStatusAction>,
   getState: GetState
 ) => {
-  const proxyLink = getProxyLink(getState())
-  const response = await getSyslogMeasurement(proxyLink, namespace)
-  const series = getDeep(response, 'results.0.series', [])
+  try {
+    const proxyLink = getProxyLink(getState())
+    const response = await getSyslogMeasurement(proxyLink, namespace)
+    const series = getDeep(response, 'results.0.series', [])
 
-  if (_.isEmpty(series)) {
+    if (_.isEmpty(series)) {
+      await dispatch(setSearchStatus(SearchStatus.MeasurementMissing))
+    }
+  } catch (error) {
     await dispatch(setSearchStatus(SearchStatus.MeasurementMissing))
   }
 }
