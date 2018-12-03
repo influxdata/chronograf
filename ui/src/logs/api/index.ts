@@ -3,6 +3,7 @@ import AJAX from 'src/utils/ajax'
 import {Namespace} from 'src/types'
 import {TimeSeriesResponse} from 'src/types/series'
 import {ServerLogConfig} from 'src/types/logs'
+import {buildFindMeasurementQuery} from 'src/logs/utils'
 
 export const executeQueryAsync = async (
   proxyLink: string,
@@ -54,9 +55,7 @@ export const updateLogConfig = async (
 export const getSyslogMeasurement = async (
   proxyLink: string,
   namespace: Namespace
-) => {
-  const query = `SHOW MEASUREMENTS ON ${
-    namespace.database
-  } WITH measurement = "syslog"`
+): Promise<TimeSeriesResponse> => {
+  const query = buildFindMeasurementQuery(namespace, 'syslog')
   return executeQueryAsync(proxyLink, namespace, query)
 }
