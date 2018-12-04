@@ -87,7 +87,6 @@ interface State {
   isMessageVisible: boolean
   visibleColumnsCount: number
   searchPattern: string
-  infiniteLoaderQueryCount: number
 }
 
 const calculateScrollTop = scrollToRow => {
@@ -169,7 +168,6 @@ class LogsTable extends Component<Props, State> {
       scrollTop: 0,
       scrollLeft: 0,
       currentMessageWidth: 0,
-      infiniteLoaderQueryCount: 0,
       isMessageVisible,
       visibleColumnsCount,
     }
@@ -355,33 +353,11 @@ class LogsTable extends Component<Props, State> {
   }
 
   private loadMoreAboveRows = async () => {
-    try {
-      this.incrementLoaderQueryCount()
-      await this.props.fetchNewer()
-    } finally {
-      this.decrementLoaderQueryCount()
-    }
+    await this.props.fetchNewer()
   }
 
   private loadMoreBelowRows = async () => {
-    try {
-      this.incrementLoaderQueryCount()
-      await this.props.fetchMore()
-    } finally {
-      this.decrementLoaderQueryCount()
-    }
-  }
-
-  private incrementLoaderQueryCount() {
-    this.setState(({infiniteLoaderQueryCount}) => ({
-      infiniteLoaderQueryCount: infiniteLoaderQueryCount + 1,
-    }))
-  }
-
-  private decrementLoaderQueryCount() {
-    this.setState(({infiniteLoaderQueryCount}) => ({
-      infiniteLoaderQueryCount: infiniteLoaderQueryCount - 1,
-    }))
+    await this.props.fetchMore()
   }
 
   private rowCount = (): number => {
@@ -666,7 +642,7 @@ class LogsTable extends Component<Props, State> {
   }
 
   private get isLoadingMore(): boolean {
-    return this.state.infiniteLoaderQueryCount + this.props.queryCount > 0
+    return this.props.queryCount > 0
   }
 
   private get scrollLoadingIndicator(): JSX.Element {

@@ -444,6 +444,8 @@ class LogsPage extends Component<Props, State> {
       chunkOptions
     )
 
+    this.updateQueryCount()
+
     try {
       await this.currentNewerChunksGenerator.promise
     } catch (error) {
@@ -465,6 +467,8 @@ class LogsPage extends Component<Props, State> {
       this.fetchOlderChunk,
       chunkOptions
     )
+
+    this.updateQueryCount()
 
     try {
       await this.currentOlderChunksGenerator.promise
