@@ -27,6 +27,7 @@ import {colorForSeverity} from 'src/logs/utils/colors'
 import {
   applyChangesToTableData,
   isEmptyInfiniteData,
+  findTimeOptionRow,
 } from 'src/logs/utils/table'
 import extentBy from 'src/utils/extentBy'
 import {computeTimeBounds} from 'src/logs/utils/timeBounds'
@@ -279,6 +280,7 @@ class LogsPage extends Component<Props, State> {
               isTruncated={this.isTruncated}
             />
             <LogsTable
+              queryCount={this.queryCount}
               count={this.histogramTotal}
               data={this.tableData}
               onScrollVertical={this.handleVerticalScroll}
@@ -494,11 +496,16 @@ class LogsPage extends Component<Props, State> {
   }
 
   private get tableScrollToRow() {
+    const {
+      timeRange: {timeOption},
+    } = this.props
     if (this.isLiveUpdating === true && !this.state.hasScrolled) {
       return 0
     }
 
-    if (this.state.isLoadingNewer && this.props.newRowsAdded) {
+    if (!this.isLiveUpdating && timeOption && !this.state.hasScrolled) {
+      return findTimeOptionRow(timeOption, this.props.tableInfiniteData, 0)
+    } else if (this.state.isLoadingNewer && this.props.newRowsAdded) {
       return this.props.newRowsAdded || 0
     }
 
@@ -902,6 +909,9 @@ class LogsPage extends Component<Props, State> {
   private fetchNewDataset = async () => {
     if (this.isLiveUpdating && this.shouldLiveUpdate) {
       this.startLogsTailFetchingInterval()
+    } else if (!this.shouldLiveUpdate) {
+      this.props.executeHistogramQueryAsync()
+      this.handleFetchNewerChunk()
     }
 
     await this.handleFetchOlderChunk()
@@ -1031,6 +1041,15 @@ class LogsPage extends Component<Props, State> {
 
   private get isMeasurementInNamespace(): boolean {
     return this.props.searchStatus !== SearchStatus.MeasurementMissing
+  }
+
+  private get queryCount(): number {
+    const count = _.sumBy(
+      [this.currentNewerChunksGenerator, this.currentOlderChunksGenerator],
+      generator => Number(!!generator)
+    )
+
+    return count
   }
 }
 

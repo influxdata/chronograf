@@ -296,19 +296,19 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
           </text>
           <text
             className="x-label"
-            key=".001-287.5-388"
+            key="19:00:00-287.5-388"
             x={287.5}
             y={388}
           >
-            .001
+            19:00:00
           </text>
           <text
             className="x-label"
-            key=".002-575-388"
+            key="19:00:00-575-388"
             x={575}
             y={388}
           >
-            .002
+            19:00:00
           </text>
         </HistogramChartAxes>
       </g>

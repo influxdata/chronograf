@@ -52,6 +52,7 @@ import {
 import {INITIAL_LIMIT} from 'src/logs/actions'
 
 interface Props {
+  queryCount: number
   filters: Filter[]
   data: TableData
   isTruncated: boolean
@@ -664,7 +665,7 @@ class LogsTable extends Component<Props, State> {
   }
 
   private get isLoadingMore(): boolean {
-    return this.state.infiniteLoaderQueryCount > 0
+    return this.state.infiniteLoaderQueryCount + this.props.queryCount > 0
   }
 
   private get scrollLoadingIndicator(): JSX.Element {
