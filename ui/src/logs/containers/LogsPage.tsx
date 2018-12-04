@@ -161,6 +161,7 @@ interface State {
   histogramColors: HistogramColor[]
   hasScrolled: boolean
   isLoadingNewer: boolean
+  queryCount: number
 }
 
 class LogsPage extends Component<Props, State> {
@@ -280,7 +281,7 @@ class LogsPage extends Component<Props, State> {
               isTruncated={this.isTruncated}
             />
             <LogsTable
-              queryCount={this.queryCount}
+              queryCount={this.state.queryCount}
               count={this.histogramTotal}
               data={this.tableData}
               onScrollVertical={this.handleVerticalScroll}
@@ -451,6 +452,7 @@ class LogsPage extends Component<Props, State> {
 
     this.setState({isLoadingNewer: false})
     this.currentNewerChunksGenerator = null
+    this.updateQueryCount()
   }
 
   private startFetchingOlder = async () => {
@@ -471,6 +473,7 @@ class LogsPage extends Component<Props, State> {
     }
 
     this.currentOlderChunksGenerator = null
+    this.updateQueryCount()
   }
 
   private clearTailInterval = () => {
@@ -493,6 +496,7 @@ class LogsPage extends Component<Props, State> {
 
     this.currentNewerChunksGenerator = null
     this.currentOlderChunksGenerator = null
+    this.updateQueryCount()
   }
 
   private get tableScrollToRow() {
@@ -1043,13 +1047,15 @@ class LogsPage extends Component<Props, State> {
     return this.props.searchStatus !== SearchStatus.MeasurementMissing
   }
 
-  private get queryCount(): number {
-    const count = _.sumBy(
-      [this.currentNewerChunksGenerator, this.currentOlderChunksGenerator],
-      generator => Number(!!generator)
-    )
+  private updateQueryCount() {
+    this.setState({queryCount: this.countCurrentQueries()})
+  }
 
-    return count
+  private countCurrentQueries(): number {
+    return _.compact([
+      this.currentNewerChunksGenerator,
+      this.currentOlderChunksGenerator,
+    ]).length
   }
 }
 

@@ -303,6 +303,7 @@ class LogsTable extends Component<Props, State> {
       onSectionRendered: this.handleRowRender(onRowsRendered),
       columnCount,
       columnWidth: this.getColumnWidth,
+      overscanRowCount: 50,
       ref: (ref: Grid) => {
         registerChild(ref)
         this.grid = ref

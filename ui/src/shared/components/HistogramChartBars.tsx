@@ -77,7 +77,8 @@ const getBarGroups = ({
 
   return timeGroups.map(timeGroup => {
     const time = timeGroup[0].time
-    const x = xScale(time) - barWidth / 2
+
+    const x = xScale(time) - 3 / 2 * barWidth
     const total = _.sumBy(timeGroup, 'value')
 
     const barGroup = {
