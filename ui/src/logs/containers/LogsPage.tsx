@@ -496,7 +496,7 @@ class LogsPage extends Component<Props, State> {
 
     this.currentNewerChunksGenerator = null
     this.currentOlderChunksGenerator = null
-    this.updateQueryCount()
+    this.setState({queryCount: 0})
   }
 
   private get tableScrollToRow() {

@@ -351,71 +351,71 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
         >
           <g
             className="histogram-chart-bars--bars"
-            data-key="1-1-193.5"
-            key="1-1-193.5"
+            data-key="1-1-5.5"
+            key="1-1-5.5"
             onClick={[Function]}
             onMouseOut={[Function]}
             onMouseOver={[Function]}
           >
             <defs>
               <clipPath
-                id="histogram-chart-bars--clip-1-1-193.5"
+                id="histogram-chart-bars--clip-1-1-5.5"
               >
                 <rect
                   height={159.25}
                   rx={3}
                   ry={3}
                   width={188}
-                  x={193.5}
+                  x={5.5}
                   y={218.75}
                 />
               </clipPath>
             </defs>
             <rect
               className="histogram-chart-bars--bar"
-              clipPath="url(#histogram-chart-bars--clip-1-1-193.5)"
+              clipPath="url(#histogram-chart-bars--clip-1-1-5.5)"
               data-group="a"
               data-key="1"
               fill="#0000ff"
               height={156.25}
               key="1"
               width={188}
-              x={193.5}
+              x={5.5}
               y={218.75}
             />
           </g>
           <g
             className="histogram-chart-bars--bars"
-            data-key="2-2-481"
-            key="2-2-481"
+            data-key="2-2-293"
+            key="2-2-293"
             onClick={[Function]}
             onMouseOut={[Function]}
             onMouseOver={[Function]}
           >
             <defs>
               <clipPath
-                id="histogram-chart-bars--clip-2-2-481"
+                id="histogram-chart-bars--clip-2-2-293"
               >
                 <rect
                   height={315.5}
                   rx={3}
                   ry={3}
                   width={188}
-                  x={481}
+                  x={293}
                   y={62.5}
                 />
               </clipPath>
             </defs>
             <rect
               className="histogram-chart-bars--bar"
-              clipPath="url(#histogram-chart-bars--clip-2-2-481)"
+              clipPath="url(#histogram-chart-bars--clip-2-2-293)"
               data-group="b"
               data-key="2"
               fill="#0000ff"
               height={312.5}
               key="2"
               width={188}
-              x={481}
+              x={293}
               y={62.5}
             />
           </g>
