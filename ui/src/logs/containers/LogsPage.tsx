@@ -194,6 +194,7 @@ class LogsPage extends Component<Props, State> {
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
+      queryCount: 0,
     }
   }
 
