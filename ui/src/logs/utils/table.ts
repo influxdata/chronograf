@@ -197,3 +197,24 @@ export const isEmptyInfiniteData = (data: {
 const isEmptyTableData = (data: TableData): boolean => {
   return getDeep(data, 'values.length', 0) === 0
 }
+
+export const findTimeOptionRow = (
+  timeOption: string,
+  data: {
+    forward: TableData
+    backward: TableData
+  },
+  defaultIndex: number = 0
+): number => {
+  const {forward, backward} = data
+  const selectedTime = new Date(timeOption).valueOf()
+  const timeColumn = forward.columns.indexOf('time')
+  const tableData = [...forward.values, ...backward.values]
+  const rowIndex = tableData.findIndex(row => row[timeColumn] <= selectedTime)
+
+  if (rowIndex < 0) {
+    return defaultIndex
+  }
+
+  return rowIndex
+}

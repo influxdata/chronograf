@@ -57,6 +57,18 @@ export const saveToLocalStorage = ({
       'histogramData',
       'queryCount',
       'tableInfiniteData',
+      'newRowsAdded',
+      'searchStatus',
+      'queryCount',
+      'nextOlderUpperBound',
+      'nextOlderLowerBound',
+      'nextNewerUpperBound',
+      'nextNewerLowerBound',
+      'currentTailUpperBound',
+      'nextTailLowerBound',
+      'tailChunkDurationMs',
+      'olderChunkDurationMs',
+      'newerChunkDurationMs',
     ])
 
     window.localStorage.setItem(
