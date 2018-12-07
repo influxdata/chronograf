@@ -27,6 +27,7 @@ import {colorForSeverity} from 'src/logs/utils/colors'
 import {
   applyChangesToTableData,
   isEmptyInfiniteData,
+  findTimeOptionRow,
 } from 'src/logs/utils/table'
 import extentBy from 'src/utils/extentBy'
 import {computeTimeBounds} from 'src/logs/utils/timeBounds'
@@ -160,6 +161,7 @@ interface State {
   histogramColors: HistogramColor[]
   hasScrolled: boolean
   isLoadingNewer: boolean
+  queryCount: number
 }
 
 class LogsPage extends Component<Props, State> {
@@ -192,6 +194,7 @@ class LogsPage extends Component<Props, State> {
       isOverlayVisible: false,
       histogramColors: [],
       hasScrolled: false,
+      queryCount: 0,
     }
   }
 
@@ -279,6 +282,7 @@ class LogsPage extends Component<Props, State> {
               isTruncated={this.isTruncated}
             />
             <LogsTable
+              queryCount={this.state.queryCount}
               count={this.histogramTotal}
               data={this.tableData}
               onScrollVertical={this.handleVerticalScroll}
@@ -441,6 +445,8 @@ class LogsPage extends Component<Props, State> {
       chunkOptions
     )
 
+    this.updateQueryCount()
+
     try {
       await this.currentNewerChunksGenerator.promise
     } catch (error) {
@@ -449,6 +455,7 @@ class LogsPage extends Component<Props, State> {
 
     this.setState({isLoadingNewer: false})
     this.currentNewerChunksGenerator = null
+    this.updateQueryCount()
   }
 
   private startFetchingOlder = async () => {
@@ -462,6 +469,8 @@ class LogsPage extends Component<Props, State> {
       chunkOptions
     )
 
+    this.updateQueryCount()
+
     try {
       await this.currentOlderChunksGenerator.promise
     } catch (error) {
@@ -469,6 +478,7 @@ class LogsPage extends Component<Props, State> {
     }
 
     this.currentOlderChunksGenerator = null
+    this.updateQueryCount()
   }
 
   private clearTailInterval = () => {
@@ -491,14 +501,20 @@ class LogsPage extends Component<Props, State> {
 
     this.currentNewerChunksGenerator = null
     this.currentOlderChunksGenerator = null
+    this.setState({queryCount: 0})
   }
 
   private get tableScrollToRow() {
+    const {
+      timeRange: {timeOption},
+    } = this.props
     if (this.isLiveUpdating === true && !this.state.hasScrolled) {
       return 0
     }
 
-    if (this.state.isLoadingNewer && this.props.newRowsAdded) {
+    if (!this.isLiveUpdating && timeOption && !this.state.hasScrolled) {
+      return findTimeOptionRow(timeOption, this.props.tableInfiniteData, 0)
+    } else if (this.state.isLoadingNewer && this.props.newRowsAdded) {
       return this.props.newRowsAdded || 0
     }
 
@@ -902,6 +918,9 @@ class LogsPage extends Component<Props, State> {
   private fetchNewDataset = async () => {
     if (this.isLiveUpdating && this.shouldLiveUpdate) {
       this.startLogsTailFetchingInterval()
+    } else if (!this.shouldLiveUpdate) {
+      this.props.executeHistogramQueryAsync()
+      this.handleFetchNewerChunk()
     }
 
     await this.handleFetchOlderChunk()
@@ -1031,6 +1050,17 @@ class LogsPage extends Component<Props, State> {
 
   private get isMeasurementInNamespace(): boolean {
     return this.props.searchStatus !== SearchStatus.MeasurementMissing
+  }
+
+  private updateQueryCount() {
+    this.setState({queryCount: this.countCurrentQueries()})
+  }
+
+  private countCurrentQueries(): number {
+    return _.compact([
+      this.currentNewerChunksGenerator,
+      this.currentOlderChunksGenerator,
+    ]).length
   }
 }
 

@@ -17,15 +17,19 @@ export const computeTimeBounds = (
   const period = seconds * SECONDS_TO_MS
   const [lowerExtent] = extentTimes
 
-  if (!isValidExtent(extentTimes, period)) {
+  if (!isValidExtent(numberTimeOption, extentTimes, period)) {
     return centerTimeBounds(numberTimeOption, period)
   } else {
     return offsetTimeBounds(lowerExtent, numberTimeOption, period)
   }
 }
 
-const isValidExtent = ([t0, t1]: number[], period: number): boolean => {
-  return t1 - t0 < period
+export const isValidExtent = (
+  numberTimeOption: number,
+  [t0, t1]: number[],
+  period: number
+): boolean => {
+  return t1 - t0 < period && t0 <= numberTimeOption && t1 >= numberTimeOption
 }
 
 const centerTimeBounds = (center: number, period: number): TimeBounds => {

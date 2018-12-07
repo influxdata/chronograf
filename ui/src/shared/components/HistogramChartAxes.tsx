@@ -53,9 +53,8 @@ class HistogramChartAxes extends PureComponent<Props> {
 
   private get xTickData() {
     const {margins, xScale, width, height} = this.props
-
-    const y = height - margins.bottom + X_TICK_PADDING_TOP
     const formatTime = xScale.tickFormat()
+    const y = height - margins.bottom + X_TICK_PADDING_TOP
 
     return xScale
       .ticks(X_TICK_COUNT)
