@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import React, {PureComponent, MouseEvent} from 'react'
 import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
 import {EditorChange, LineWidget} from 'codemirror'
