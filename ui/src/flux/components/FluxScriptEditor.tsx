@@ -43,7 +43,7 @@ interface EditorInstance extends IInstance {
 class FluxScriptEditor extends PureComponent<Props, State> {
   private editor: EditorInstance
   private lineWidgets: Widget[] = []
-  private containerWidth: number
+  private containerDimensions: {width: number; height: number}
 
   public constructor(props: Props) {
     super(props)
@@ -113,13 +113,14 @@ class FluxScriptEditor extends PureComponent<Props, State> {
   }
 
   private handleMouseEnter = (e: MouseEvent<HTMLDivElement>) => {
-    const {width} = e.currentTarget.getBoundingClientRect()
+    const {width, height} = e.currentTarget.getBoundingClientRect()
+    const {width: prevWidth, height: prevHeight} = this.containerDimensions
 
-    if (width !== this.containerWidth) {
+    if (prevWidth !== width || prevHeight !== height) {
       this.editor.refresh()
     }
 
-    this.containerWidth = width
+    this.containerDimensions = {width, height}
   }
 
   private makeError(): void {
