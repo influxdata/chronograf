@@ -1,5 +1,5 @@
-/* 
-tslint:disable no-console 
+/*
+tslint:disable no-console
 tslint:disable max-classes-per-file
 */
 
@@ -14,9 +14,22 @@ class DefaultError extends Component<{error: Error}> {
     const {error} = this.props
     const {stack, message} = error
     const finalMessage = ` Chronograf (${VERSION}) ${message}`
-    const finalStack = '```' + stack + '```'
+    const mdMarker = '```'
+    const template = `
+
+What browser are you using (name and version)?
+
+What operating system are you using?
+
+Please describe what you were trying to do when you encountered this error:
+
+${mdMarker}
+${stack}
+${mdMarker}
+
+    `
     const href = encodeURI(
-      `https://github.com/influxdata/chronograf/issues/new?title=${finalMessage}&body=${finalStack}`
+      `https://github.com/influxdata/chronograf/issues/new?title=${finalMessage}&body=${template}`
     )
 
     return (
