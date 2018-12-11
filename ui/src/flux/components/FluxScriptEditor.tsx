@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, {PureComponent} from 'react'
+import React, {PureComponent, MouseEvent} from 'react'
 import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
 import {EditorChange, LineWidget} from 'codemirror'
 import {ShowHintOptions} from 'src/types/codemirror'
@@ -43,6 +43,7 @@ interface EditorInstance extends IInstance {
 class FluxScriptEditor extends PureComponent<Props, State> {
   private editor: EditorInstance
   private lineWidgets: Widget[] = []
+  private containerWidth: number
 
   public constructor(props: Props) {
     super(props)
@@ -94,7 +95,7 @@ class FluxScriptEditor extends PureComponent<Props, State> {
     }
 
     return (
-      <div className="flux-script-editor">
+      <div className="flux-script-editor" onMouseEnter={this.handleMouseEnter}>
         <ReactCodeMirror
           autoFocus={true}
           autoCursor={true}
@@ -109,6 +110,16 @@ class FluxScriptEditor extends PureComponent<Props, State> {
         {children}
       </div>
     )
+  }
+
+  private handleMouseEnter = (e: MouseEvent<HTMLDivElement>) => {
+    const {width} = e.currentTarget.getBoundingClientRect()
+
+    if (width !== this.containerWidth) {
+      this.editor.refresh()
+    }
+
+    this.containerWidth = width
   }
 
   private makeError(): void {
