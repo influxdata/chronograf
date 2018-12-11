@@ -133,6 +133,8 @@ $threesizer-shadow-stop: fade-out($g0-obsidian, 1);
 }
 
 // Header
+$threesizer-header-height: 44px;
+$threesizer-header-width: 44px;
 .threesizer--header {
   display: flex;
   align-items: center;
@@ -140,11 +142,11 @@ $threesizer-shadow-stop: fade-out($g0-obsidian, 1);
   padding: 0 11px;
   background-color: $g2-kevlar;
   .horizontal>& {
-    width: 44px;
+    width: $threesizer-header-width;
     border-right: 2px solid $g4-onyx;
   }
   .vertical>& {
-    height: 44px;
+    height: $threesizer-header-height;
     border-bottom: 2px solid $g4-onyx;
   }
 }
