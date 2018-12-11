@@ -42,7 +42,10 @@ interface EditorInstance extends IInstance {
 class FluxScriptEditor extends PureComponent<Props, State> {
   private editor: EditorInstance
   private lineWidgets: Widget[] = []
-  private containerDimensions: {width: number; height: number}
+  private containerDimensions: {width: number; height: number} = {
+    height: 0,
+    width: 0,
+  }
 
   public constructor(props: Props) {
     super(props)
