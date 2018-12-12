@@ -1,4 +1,3 @@
-## v1.7.5 [unreleased]
 ## v1.7.4 [2018-12-12]
 
 ### Features
