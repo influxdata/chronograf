@@ -11,6 +11,7 @@
 1. [4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
 1. [4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
 1. [4863](https://github.com/influxdata/chronograf/pull/4863): Update logs histogram data on click and new search
+1. [4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
 1. [4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
 1. [4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
 
