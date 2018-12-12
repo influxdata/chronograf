@@ -8,6 +8,7 @@
     - Fix momentary display of fallback notes while dashboard is loading
     - Fix issue displaying UUIDs in table cells
 1. [4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
+1. [4856](https://github.com/influxdata/chronograf/pull/4856): Fix single stat graphs decimal places when using flux
 1. [4846](https://github.com/influxdata/chronograf/pull/4846): Fix missing data and type in refreshing graph
 1. [4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
 1. [4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
@@ -53,7 +54,6 @@
 1. [#4769](https://github.com/influxdata/chronograf/pull/4769): Show manual refresh when paused
 1. [#4772](https://github.com/influxdata/chronograf/pull/4772): Add protoboards enviroment variables to dockerfile
 1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
-1. [#4772](https://github.com/influxdata/chronograf/pull/4772): Add protoboards enviroment variables to dockerfile
 1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
 
 ## v1.7.0 [2018-11-06]
