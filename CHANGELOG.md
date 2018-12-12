@@ -1,19 +1,14 @@
-## v1.7.3 [2018-11-13]
 ## v1.7.4 [unreleased]
 
 ### Features
 
 ### Bug Fixes
-1. [4814](https://github.com/influxdata/chronograf/pull/4814): Fixes logs page getting stuck on scroll to top
 1. [4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
-1. [4819](https://github.com/influxdata/chronograf/pull/4819): Fix momentary display of fallback notes while dashboard is loading
-1. [4819](https://github.com/influxdata/chronograf/pull/4819): Fix issue displaying UUIDs in table cells
+1. [4819](https://github.com/influxdata/chronograf/pull/4819):
+    - Fix momentary display of fallback notes while dashboard is loading
+    - Fix issue displaying UUIDs in table cells
 1. [4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
 1. [4846](https://github.com/influxdata/chronograf/pull/4846): Fix missing data and type in refreshing graph
-1. [4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
-
-1. [4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
-1. [4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
 1. [4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
 1. [4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
 1. [4863](https://github.com/influxdata/chronograf/pull/4863): Update logs histogram data on click and new search
