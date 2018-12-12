@@ -54,6 +54,9 @@
 
   .CodeMirror-vscrollbar,
   .CodeMirror-hscrollbar {
-    @include custom-scrollbar-round($g1-raven, $g6-smoke);
+    @include custom-scrollbar-round($g1-raven, $c-pool);
+    &::-webkit-scrollbar-thumb {
+      border-width: 5px;
+    }
   }
 }

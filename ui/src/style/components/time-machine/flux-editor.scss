@@ -33,5 +33,5 @@ height: 100%;
 }
 
 .flux-query-maker--script .threesizer--body {
-  overflow: scroll;
+  height: calc(100% - #{$threesizer-header-height});
 }
