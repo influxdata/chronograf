@@ -18,6 +18,7 @@
 1. [4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
 1. [4863](https://github.com/influxdata/chronograf/pull/4863): Update logs histogram data on click and new search
 1. [4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
+1. [4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
