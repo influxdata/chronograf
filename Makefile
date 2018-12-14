@@ -70,7 +70,7 @@ dep: .jsdep .godep
 .godep:
 ifndef GOBINDATA
 	@echo "Installing go-bindata"
-	go get -u github.com/kevinburke/go-bindata/...
+	go get -u github.com/kevinburke/go-bindata
 endif
 	@touch .godep
 
