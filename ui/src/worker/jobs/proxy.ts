@@ -1,3 +1,5 @@
+import 'isomorphic-fetch'
+
 const proxy = async msg => {
   const {
     payload: {url, query, rp, db, uuid},

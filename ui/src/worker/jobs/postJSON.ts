@@ -1,3 +1,5 @@
+import 'isomorphic-fetch'
+
 import {Message} from 'src/worker/types'
 import {fetchData} from 'src/worker/utils'
 
