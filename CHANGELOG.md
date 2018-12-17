@@ -1,4 +1,9 @@
+## v1.7.6 [unreleased]
+
+### Bug Fixes
+
 ## v1.7.5 [2018-12-14]
+
 ### Bug Fixes
 1. [4886](https://github.com/influxdata/chronograf/pull/4886): Update go, node, and alpine versions
 
