@@ -61,6 +61,59 @@ class HostPage extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
+    const {autoRefresh} = this.props
+
+    this.loadHostAndMeasurements();
+
+    GlobalAutoRefresher.poll(autoRefresh)
+  }
+
+  public async componentDidUpdate(prevProps) {
+    const {autoRefresh} = this.props
+
+    if (prevProps.autoRefresh !== autoRefresh) {
+      GlobalAutoRefresher.poll(autoRefresh)
+    }
+
+    if(this.props != prevProps){
+      this.loadHostAndMeasurements();
+    }
+  }
+
+  private async loadHostAndMeasurements(){
+    const {location, autoRefresh} = this.props
+
+    const {
+      data: {layouts},
+    } = await getLayouts()
+
+    // fetching layouts and mappings can be done at the same time
+    const {host, measurements} = await this.fetchHostsAndMeasurements(layouts)
+
+    const focusedApp = location.query.app
+
+    const filteredLayouts = layouts.filter(layout => {
+      if (focusedApp) {
+        return layout.app === focusedApp
+      }
+
+      return (
+        host.apps &&
+        host.apps.includes(layout.app) &&
+        measurements.includes(layout.measurement)
+      )
+    })
+
+    const hostLinks = await this.getHostLinks()
+
+    this.setState({layouts: filteredLayouts, hostLinks}) // eslint-disable-line react/no-did-mount-set-state
+  }
+
+  public componentWillUnmount() {
+    GlobalAutoRefresher.stopPolling()
+  }
+
+  private async loadApps(){
     const {location, autoRefresh} = this.props
 
     const {
@@ -89,18 +142,6 @@ class HostPage extends PureComponent<Props, State> {
     this.setState({layouts: filteredLayouts, hostLinks}) // eslint-disable-line react/no-did-mount-set-state
 
     GlobalAutoRefresher.poll(autoRefresh)
-  }
-
-  public componentDidUpdate(prevProps) {
-    const {autoRefresh} = this.props
-
-    if (prevProps.autoRefresh !== autoRefresh) {
-      GlobalAutoRefresher.poll(autoRefresh)
-    }
-  }
-
-  public componentWillUnmount() {
-    GlobalAutoRefresher.stopPolling()
   }
 
   public render() {
