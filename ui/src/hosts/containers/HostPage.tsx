@@ -62,9 +62,7 @@ class HostPage extends PureComponent<Props, State> {
 
   public async componentDidMount() {
     const {autoRefresh} = this.props
-
     this.loadHostAndMeasurements();
-
     GlobalAutoRefresher.poll(autoRefresh)
   }
 
