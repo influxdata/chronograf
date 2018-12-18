@@ -77,7 +77,13 @@ elif [[ -f /etc/os-release ]]; then
     source /etc/os-release
     if [[ $ID = "amzn" ]]; then
     	# Amazon Linux logic
-    	install_init
-    	install_chkconfig
+    	which systemctl &>/dev/null
+        if [[ $? -eq 0 ]]; then
+        	install_systemd
+        else
+        	# Assuming sysv
+        	install_init
+        	install_chkconfig
+        fi
     fi
 fi
