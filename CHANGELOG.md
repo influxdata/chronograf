@@ -1,3 +1,8 @@
+## v1.7.6 [unreleased]
+
+### Bug Fixes
+1. [4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
+
 ## v1.7.5 [2018-12-14]
 
 ### Bug Fixes
