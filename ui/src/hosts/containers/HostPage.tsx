@@ -113,37 +113,6 @@ class HostPage extends PureComponent<Props, State> {
     GlobalAutoRefresher.stopPolling()
   }
 
-  private async loadApps(){
-    const {location, autoRefresh} = this.props
-
-    const {
-      data: {layouts},
-    } = await getLayouts()
-
-    // fetching layouts and mappings can be done at the same time
-    const {host, measurements} = await this.fetchHostsAndMeasurements(layouts)
-
-    const focusedApp = location.query.app
-
-    const filteredLayouts = layouts.filter(layout => {
-      if (focusedApp) {
-        return layout.app === focusedApp
-      }
-
-      return (
-        host.apps &&
-        host.apps.includes(layout.app) &&
-        measurements.includes(layout.measurement)
-      )
-    })
-
-    const hostLinks = await this.getHostLinks()
-
-    this.setState({layouts: filteredLayouts, hostLinks}) // eslint-disable-line react/no-did-mount-set-state
-
-    GlobalAutoRefresher.poll(autoRefresh)
-  }
-
   public render() {
     const {
       autoRefresh,
