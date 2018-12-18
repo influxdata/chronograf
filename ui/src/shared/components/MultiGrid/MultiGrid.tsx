@@ -59,17 +59,20 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
     const maxScrollTop = (rowCount + 1) * ROW_HEIGHT - (height + ROW_HEIGHT)
     const maxRow = rowCount - Math.floor(height / ROW_HEIGHT) / 2
 
-    if (scrollTop <= 0) {
+    if (scrollTop < 0) {
       return {scrollToRow}
     }
+    if (scrollToRow > maxRow) {
+      return {scrollToRow: rowCount}
+    }
 
-    if (scrollTop > maxScrollTop || scrollToRow > maxRow) {
-      return null
+    if (scrollTop > maxScrollTop) {
+      return {scrollTop: maxScrollTop}
     }
 
     return {
       scrollToRow,
-      scrollTop: Math.max(scrollTop - height / 2, height / 2),
+      scrollTop: scrollToRow * ROW_HEIGHT - ROW_HEIGHT,
     }
   }
 
@@ -359,7 +362,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
             setScrollTop={this.onScrollbarsScroll}
           >
             <Grid
-              {..._.omit(props, ['scrollToColumn'])}
+              {..._.omit(props, ['scrollToColumn', 'scrollTop'])}
               cellRenderer={this.cellRendererBottomRightGrid}
               className={this.props.classNameBottomRightGrid}
               columnCount={Math.max(0, columnCount - fixedColumnCount)}
