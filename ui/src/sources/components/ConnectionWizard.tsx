@@ -134,6 +134,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
             setError={this.handleSetKapacitorError}
             kapacitor={kapacitor}
             showNewKapacitor={showNewKapacitor}
+            setKapacitorDraft={this.setKapacitorDraft}
           />
         </WizardStep>
         <WizardStep
@@ -221,6 +222,10 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
       kapacitorError: response.error,
     })
     return response
+  }
+
+  private setKapacitorDraft = (kapacitor: Kapacitor) => {
+    this.setState({kapacitor})
   }
 
   private handleKapacitorPrev = () => {}
