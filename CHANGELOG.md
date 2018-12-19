@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 1. [4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
+1. [4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
 
 ## v1.7.5 [2018-12-14]
 

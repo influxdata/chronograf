@@ -42,6 +42,7 @@ interface Props {
   setActiveKapacitor: sourcesActions.SetActiveKapacitor
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
   showNewKapacitor?: boolean
+  setKapacitorDraft: (kapacitor: Kapacitor) => void
 }
 
 interface State {
@@ -73,19 +74,14 @@ class KapacitorStep extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    const ActiveKapacitor = ActiveKapacitorFromSources(
-      props.source,
-      props.sources
-    )
+    const activeKapacitor =
+      ActiveKapacitorFromSources(props.source, props.sources) || props.kapacitor
 
-    let kapacitor
-    if (props.showNewKapacitor) {
-      kapacitor = DEFAULT_KAPACITOR
-    } else {
-      kapacitor = ActiveKapacitor || props.kapacitor || DEFAULT_KAPACITOR
+    let kapacitor = syncHostnames(props.source, DEFAULT_KAPACITOR)
+
+    if (!props.showNewKapacitor && activeKapacitor) {
+      kapacitor = activeKapacitor
     }
-
-    kapacitor = syncHostnames(props.source, kapacitor)
 
     this.state = {kapacitor}
   }
@@ -98,14 +94,19 @@ class KapacitorStep extends Component<Props, State> {
       if (this.existingKapacitorHasChanged) {
         try {
           const {data: updatedKapacitor} = await updateKapacitor(kapacitor)
+
           await this.fetchNewKapacitors()
           await pingKapacitor(updatedKapacitor)
+
           notify(notifyKapacitorUpdated())
+
           this.setState({kapacitor: updatedKapacitor})
+
           return {error: false, payload: updatedKapacitor}
         } catch (error) {
           console.error(error)
           notify(notifyCouldNotConnectToUpdatedKapacitor(kapacitor.name))
+
           return {error: true, payload: null}
         }
       }
@@ -114,10 +115,14 @@ class KapacitorStep extends Component<Props, State> {
 
     try {
       const {data: newKapacitor} = await createKapacitor(source, kapacitor)
+
       await this.fetchNewKapacitors()
       await pingKapacitor(newKapacitor)
+
       this.setState({kapacitor: newKapacitor})
+
       notify(notifyKapacitorSuccess())
+
       return {error: false, payload: newKapacitor}
     } catch (error) {
       console.error(error)
@@ -142,10 +147,12 @@ class KapacitorStep extends Component<Props, State> {
   }
 
   private onChangeInput = (key: string) => (value: string | boolean) => {
-    const {setError} = this.props
+    const {setError, setKapacitorDraft} = this.props
     const {kapacitor} = this.state
 
-    this.setState({kapacitor: {...kapacitor, [key]: value}})
+    this.setState({kapacitor: {...kapacitor, [key]: value}}, () => {
+      setKapacitorDraft(this.state.kapacitor)
+    })
 
     setError(false)
   }
