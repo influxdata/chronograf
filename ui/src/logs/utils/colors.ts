@@ -1,3 +1,5 @@
+import {color} from 'd3-color'
+
 import {SeverityColorValues, DEFAULT_SEVERITY_LEVELS} from 'src/logs/constants'
 
 import {ColorScale} from 'src/types/histogram'
@@ -10,7 +12,17 @@ export const colorForSeverity: ColorScale = (
 ): string => {
   return (
     SeverityColorValues[colorName] ||
-    DEFAULT_SEVERITY_LEVELS[severityLevel] ||
+    SeverityColorValues[DEFAULT_SEVERITY_LEVELS[severityLevel]] ||
     DEFAULT_COLOR_VALUE
   )
+}
+
+export const getBrighterColor = (factor: number, value?: string) => {
+  const colorValue = color(value)
+
+  if (!!colorValue) {
+    return colorValue.brighter(factor).hex()
+  }
+
+  return DEFAULT_COLOR_VALUE
 }

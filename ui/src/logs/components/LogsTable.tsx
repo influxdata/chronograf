@@ -3,7 +3,6 @@ import moment from 'moment'
 import classnames from 'classnames'
 import React, {Component, MouseEvent, CSSProperties} from 'react'
 import {Grid, AutoSizer, InfiniteLoader} from 'react-virtualized'
-import {color} from 'd3-color'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import ExpandableMessage from 'src/logs/components/expandable_message/ExpandableMessage'
@@ -11,7 +10,7 @@ import LogsMessage from 'src/logs/components/logs_message/LogsMessage'
 import LoadingStatus from 'src/logs/components/loading_status/LoadingStatus'
 import {getDeep} from 'src/utils/wrappers'
 
-import {colorForSeverity} from 'src/logs/utils/colors'
+import {colorForSeverity, getBrighterColor} from 'src/logs/utils/colors'
 import {
   ROW_HEIGHT,
   calculateRowCharWidth,
@@ -593,9 +592,7 @@ class LogsTable extends Component<Props, State> {
     level: SeverityLevelOptions
   ): CSSProperties => {
     const severityColor = colorForSeverity(colorName, level)
-    const brightSeverityColor = color(severityColor)
-      .brighter(0.5)
-      .hex()
+    const brightSeverityColor = getBrighterColor(0.5, severityColor)
 
     return {
       background: `linear-gradient(45deg, ${severityColor}, ${brightSeverityColor}`,
