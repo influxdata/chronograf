@@ -541,7 +541,13 @@ class LogsTable extends Component<Props, State> {
             data-index={rowIndex}
             className="logs-viewer--clickable"
           >
-            {formattedValue}
+            <ExpandableMessage
+              notify={this.props.notify}
+              formattedValue={formattedValue}
+              onExpand={this.props.onExpandMessage}
+              maxWidth={this.currentWidth}
+              colWidth={getColumnWidth(column)}
+            />
           </div>
         </div>
       )
@@ -610,7 +616,7 @@ class LogsTable extends Component<Props, State> {
 
   private handleTagClick = (e: MouseEvent<HTMLElement>) => {
     const {onTagSelection} = this.props
-    const target = e.target as HTMLElement
+    const target = e.currentTarget
 
     const selection = {
       tag: target.dataset.tagValue || target.parentElement.dataset.tagValue,

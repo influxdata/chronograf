@@ -17,6 +17,7 @@ interface Props {
   scrollMargin: number
   maxWidth: number
   maxHeight: number
+  minHeight: number
   minWidth: number
   minLeft: number
   width: number
@@ -56,7 +57,9 @@ export class ExpandedContainer extends Component<Props, State> {
             autoHeight={true}
             maxHeight={this.maxHeight}
           >
-            {this.props.children}
+            <div style={{minHeight: this.props.minHeight}}>
+              {this.props.children}
+            </div>
           </FancyScrollbar>
         </div>
       </ClickOutside>
@@ -94,6 +97,7 @@ export class ExpandedContainer extends Component<Props, State> {
       ...this.position,
       top: this.props.top,
       width: this.width,
+      minHeight: this.props.minHeight,
       padding: this.props.padding,
       maxHeight: this.props.maxHeight,
     }

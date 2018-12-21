@@ -14,37 +14,44 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface State {
   expanded: boolean
+  hovered: boolean
 }
 
 interface Props {
   formattedValue: string | JSX.Element
   notify: NotificationAction
   onExpand?: () => void
-  searchPattern: string
+  searchPattern?: string
   maxWidth: number
+  colWidth?: number
 }
 
 const PADDING = 8
 const MIN_LEFT = 120
 const MIN_MESSAGE_WIDTH = 200
+const MIN_MESSAGE_HEIGHT = 25
 const MAX_MESSAGE_HEIGHT = 200
 const SCROLL_MARGIN = 80
 
 @ErrorHandling
 export class ExpandableMessage extends Component<Props, State> {
   private containerRef: React.RefObject<HTMLDivElement>
+  private mouseOver: NodeJS.Timer
 
   constructor(props: Props) {
     super(props)
     this.containerRef = React.createRef()
     this.state = {
       expanded: false,
+      hovered: false,
     }
   }
 
   public render() {
     return (
       <div
+        onMouseOver={this.handleMouseOver}
+        onMouseLeave={this.handleMouseLeave}
         onClick={this.handleClick}
         className="expandable--message"
         ref={this.containerRef}
@@ -57,8 +64,12 @@ export class ExpandableMessage extends Component<Props, State> {
 
   private get message(): JSX.Element {
     const {notify, searchPattern, formattedValue} = this.props
-    const valueString = `${formattedValue}`
-    const trimmedValue = valueString.trimLeft()
+    let trimmedValue = formattedValue
+
+    if (typeof formattedValue === 'string') {
+      const valueString = `${formattedValue}`
+      trimmedValue = valueString.trimLeft()
+    }
 
     return (
       <LogsMessage
@@ -89,11 +100,12 @@ export class ExpandableMessage extends Component<Props, State> {
         maxWidth={this.props.maxWidth}
         minWidth={MIN_MESSAGE_WIDTH}
         maxHeight={MAX_MESSAGE_HEIGHT}
+        minHeight={MIN_MESSAGE_HEIGHT}
         padding={PADDING}
         top={top}
         left={left}
         minLeft={MIN_LEFT}
-        width={width}
+        width={this.props.colWidth || width}
       >
         {this.message}
       </ExpandedContainer>
@@ -102,10 +114,28 @@ export class ExpandableMessage extends Component<Props, State> {
     return ReactDOM.createPortal(message, portalElement)
   }
 
+  private handleMouseOver = () => {
+    this.setState({hovered: true})
+
+    this.mouseOver = setTimeout(() => {
+      if (this.state.hovered) {
+        // ensure clickoutside to close other popovers
+        document.body.click()
+        this.handleClick()
+      }
+    }, 1500)
+  }
+
+  private handleMouseLeave = () => {
+    clearTimeout(this.mouseOver)
+
+    if (!this.state.expanded) {
+      this.handleClose()
+    }
+  }
   private handleClick = () => {
     const {expanded} = this.state
     const {onExpand} = this.props
-
     if (!expanded && onExpand) {
       onExpand()
     }
@@ -118,6 +148,7 @@ export class ExpandableMessage extends Component<Props, State> {
   private handleClose = () => {
     this.setState({
       expanded: false,
+      hovered: false,
     })
   }
 }

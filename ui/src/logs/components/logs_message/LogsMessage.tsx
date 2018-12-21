@@ -12,7 +12,7 @@ import {Button, IconFont, ComponentColor, ComponentSize} from 'src/reusable_ui'
 import {NotificationAction} from 'src/types'
 
 interface Props {
-  formattedValue: string
+  formattedValue: React.ReactNode
   notify: NotificationAction
   searchPattern?: string
 }
@@ -55,10 +55,10 @@ class LogsMessage extends PureComponent<Props> {
     }
   }
 
-  private get messageSections(): JSX.Element[] | string {
+  private get messageSections(): React.ReactNode {
     const {searchPattern, formattedValue} = this.props
 
-    if (!searchPattern) {
+    if (!searchPattern || typeof formattedValue !== 'string') {
       return formattedValue
     }
 
