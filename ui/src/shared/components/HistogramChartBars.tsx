@@ -1,10 +1,10 @@
 import React, {PureComponent, MouseEvent} from 'react'
 import _ from 'lodash'
 import {ScaleLinear, ScaleTime} from 'd3-scale'
-import {color} from 'd3-color'
 
 import {getDeep} from 'src/utils/wrappers'
 import {clipPathUrl} from 'src/utils/svg'
+import {getBrighterColor} from 'src/logs/utils/colors'
 
 import {
   HistogramData,
@@ -99,9 +99,8 @@ const getBarGroups = ({
       const height = yScale(0) - yScale(d.value)
       const k = hoverDataKeys.includes(d.key) ? HOVER_BRIGTHEN_FACTOR : 0
       const groupColor = colors.find(c => c.group === d.group)
-      const fill = color(colorScale(_.get(groupColor, 'color', ''), d.group))
-        .brighter(k)
-        .hex()
+      const scaledColor = colorScale(_.get(groupColor, 'color', ''), d.group)
+      const fill = getBrighterColor(k, scaledColor)
 
       barGroup.bars.push({
         key: d.key,
