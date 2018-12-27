@@ -1,13 +1,14 @@
 ## v1.7.6 [unreleased]
 
 ### Bug Fixes
-1. [4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
-1. [4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
+1. [#4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
+1. [#4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
+1. [#4862](https://github.com/influxdata/chronograf/pull/4909): Fix logs intermitently show empty on first load
 
 ## v1.7.5 [2018-12-14]
 
 ### Bug Fixes
-1. [4886](https://github.com/influxdata/chronograf/pull/4886): Update go, node, and alpine versions
+1. [#4886](https://github.com/influxdata/chronograf/pull/4886): Update go, node, and alpine versions
 
 ## v1.7.4 [2018-12-12]
 
@@ -21,6 +22,10 @@
     - Fix issue displaying UUIDs in table cells
 1. [#4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
 1. [#4856](https://github.com/influxdata/chronograf/pull/4856): Fix single stat graphs decimal places when using flux
+1. [#4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
+1. [#4819](https://github.com/influxdata/chronograf/pull/4819): Fix momentary display of fallback notes while dashboard is loading
+1. [#4819](https://github.com/influxdata/chronograf/pull/4819): Fix issue displaying UUIDs in table cells
+1. [#4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
 1. [#4846](https://github.com/influxdata/chronograf/pull/4846): Fix missing data and type in refreshing graph
 1. [#4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
 1. [#4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
@@ -38,6 +43,9 @@
 1. [4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
 1. [4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
 1. [4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
+1. [#4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
+1. [#4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
+1. [#4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
