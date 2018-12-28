@@ -62,11 +62,6 @@
 1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
 1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
 1. [#4776](https://github.com/influxdata/chronograf/pull/4776): Fix flux pivot function using wrong named parameters
-1. [#4768](https://github.com/influxdata/chronograf/pull/4768): Update dockerfile to include protoboards
-1. [#4769](https://github.com/influxdata/chronograf/pull/4769): Show manual refresh when paused
-1. [#4772](https://github.com/influxdata/chronograf/pull/4772): Add protoboards enviroment variables to dockerfile
-1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
-1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
 
 ## v1.7.0 [2018-11-06]
 
