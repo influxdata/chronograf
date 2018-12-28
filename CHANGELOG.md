@@ -1,4 +1,5 @@
 ## v1.7.6 [unreleased]
+
 ### Bug Fixes
 1. [#4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
 1. [#4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
@@ -24,6 +25,8 @@
 1. [#4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
 1. [#4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
 1. [#4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
+
+
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
 1. [4845](https://github.com/influxdata/chronograf/pull/4845): Allow Kapacitor step in Connection Configuration to be skipped
