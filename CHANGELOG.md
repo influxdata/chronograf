@@ -4,7 +4,6 @@
 1. [#4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
 1. [#4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
 1. [#4862](https://github.com/influxdata/chronograf/pull/4909): Fix logs intermitently show empty on first load
-1. [#4890](https://github.com/influxdata/chronograf/pull/4890): Fix IE11 Promise is Undefined
 
 ## v1.7.5 [2018-12-14]
 ### Bug Fixes
@@ -25,7 +24,6 @@
 1. [#4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
 1. [#4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
 1. [#4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
-
 
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
