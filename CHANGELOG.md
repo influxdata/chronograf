@@ -2,9 +2,6 @@
 ## v1.7.6 [unreleased]
 1. [4890] (https://github.com/influxdata/chronograf/pull/4890): Fix IE11 Promise is Undefined
 
-### Bug Fixes
-## v1.7.5 [2018-12-14]
-
 ## v1.7.5 [2018-12-14]
 ### Bug Fixes
 1. [4886](https://github.com/influxdata/chronograf/pull/4886): Update go, node, and alpine versions
