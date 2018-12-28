@@ -1,6 +1,6 @@
-## v1.7.4 [unreleased]
-
-### Features
+## v1.7.6 [unreleased]
+### Bug Fixes
+1. https://github.com/influxdata/chronograf/pull/4890/: IE11 Promise is Undefined
 
 ### Bug Fixes
 1. [4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
