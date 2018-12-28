@@ -87,7 +87,6 @@
   align-items: center;
 }
 .page-header--left {
-  flex: 1 0 0;
   justify-content: flex-start;
   > * {
     margin: 0;
@@ -119,6 +118,9 @@
   vertical-align: middle;
   @include no-user-select();
   cursor: default;
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // TODO: Refactor this to be a part of overlay styles

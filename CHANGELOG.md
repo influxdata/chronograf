@@ -3,6 +3,29 @@
 1. https://github.com/influxdata/chronograf/pull/4890/: IE11 Promise is Undefined
 
 ### Bug Fixes
+## v1.7.5 [2018-12-14]
+
+### Bug Fixes
+1. [4886](https://github.com/influxdata/chronograf/pull/4886): Update go, node, and alpine versions
+
+## v1.7.4 [2018-12-12]
+
+### Features
+
+### Bug Fixes
+1. [#4776](https://github.com/influxdata/chronograf/pull/4776): Fix flux pivot function using wrong named parameters
+1. [#4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
+1. [#4819](https://github.com/influxdata/chronograf/pull/4819):
+    - Fix momentary display of fallback notes while dashboard is loading
+    - Fix issue displaying UUIDs in table cells
+1. [#4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
+1. [#4856](https://github.com/influxdata/chronograf/pull/4856): Fix single stat graphs decimal places when using flux
+1. [#4846](https://github.com/influxdata/chronograf/pull/4846): Fix missing data and type in refreshing graph
+1. [#4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
+1. [#4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
+1. [#4863](https://github.com/influxdata/chronograf/pull/4863): Update logs histogram data on click and new search
+1. [#4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
+1. [#4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
 1. [4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
 1. [4819](https://github.com/influxdata/chronograf/pull/4819): Fix momentary display of fallback notes while dashboard is loading
 1. [4819](https://github.com/influxdata/chronograf/pull/4819): Fix issue displaying UUIDs in table cells
@@ -15,6 +38,14 @@
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
 1. [4845](https://github.com/influxdata/chronograf/pull/4845): Allow Kapacitor step in Connection Configuration to be skipped
+1. [4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
+1. [4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
+1. [4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
+
+### UI Improvements
+1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
+1. [#4845](https://github.com/influxdata/chronograf/pull/4845): Allow Kapacitor step in Connection Configuration to be skipped
+1. [#4805](https://github.com/influxdata/chronograf/pull/4805): Remove extra save options for retention policy in db creation UI
 
 ## v1.7.3 [2018-11-13]
 
@@ -52,6 +83,11 @@
 1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
 1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
 1. [#4776](https://github.com/influxdata/chronograf/pull/4776): Fix flux pivot function using wrong named parameters
+1. [#4768](https://github.com/influxdata/chronograf/pull/4768): Update dockerfile to include protoboards
+1. [#4769](https://github.com/influxdata/chronograf/pull/4769): Show manual refresh when paused
+1. [#4772](https://github.com/influxdata/chronograf/pull/4772): Add protoboards enviroment variables to dockerfile
+1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
+1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
 
 ## v1.7.0 [2018-11-06]
 
