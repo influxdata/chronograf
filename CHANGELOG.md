@@ -1,5 +1,5 @@
-### Bug Fixes
 ## v1.7.6 [unreleased]
+### Bug Fixes
 1. [4890] (https://github.com/influxdata/chronograf/pull/4890): Fix IE11 Promise is Undefined
 
 ## v1.7.5 [2018-12-14]
