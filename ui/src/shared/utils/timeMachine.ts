@@ -128,9 +128,9 @@ export function getLocalStorage(
     }
 
     if (key === TMLocalStorageKey.CellEditorOverlay) {
-      const {fluxProportions, timeMachineProportions} = data
+      const {fluxProportions, timeMachineProportions, thresholdsListType} = data
 
-      return {fluxProportions, timeMachineProportions}
+      return {fluxProportions, timeMachineProportions, thresholdsListType}
     }
 
     return data
