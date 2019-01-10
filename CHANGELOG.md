@@ -4,6 +4,7 @@
 1. [#4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
 1. [#4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
 1. [#4862](https://github.com/influxdata/chronograf/pull/4909): Fix logs intermitently show empty on first load
+1. [#5034](https://github.com/influxdata/chronograf/pull/5034): Prevent meta node URLs from being overwritten in Connection Wizard.
 
 ## v1.7.5 [2018-12-14]
 
