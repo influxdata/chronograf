@@ -216,10 +216,10 @@ class SourceStep extends PureComponent<Props, State> {
     const {source} = this.state
     const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
     const sourceURL = new URL(sourceURLstring || DEFAULT_SOURCE.url)
-    metaserviceURL.hostname = sourceURL.hostname
 
     if (isNewSource(source)) {
       try {
+        metaserviceURL.hostname = sourceURL.hostname
         let sourceFromServer = await createSource(source)
         sourceFromServer = {...sourceFromServer, metaUrl: metaserviceURL.href}
         this.props.addSource(sourceFromServer)
