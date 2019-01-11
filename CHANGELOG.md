@@ -5,6 +5,7 @@
 1. [#4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
 1. [#4862](https://github.com/influxdata/chronograf/pull/4909): Fix logs intermitently show empty on first load
 1. [#5034](https://github.com/influxdata/chronograf/pull/5034): Prevent meta node URLs from being overwritten in Connection Wizard.
+1. [#5035](https://github.com/influxdata/chronograf/pull/5035): Update functions list for Flux 0.12
 
 ## v1.7.5 [2018-12-14]
 
