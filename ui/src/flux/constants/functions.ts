@@ -367,7 +367,7 @@ export const functions: FluxToolbarFunction[] = [
     desc: 'Retrieves data from a comma-separated value (CSV) data source.',
     example: 'from(file: "/path/to/data-file.csv")',
     category: 'Inputs',
-    link: 'https://docs.influxdata.com/flux/latest/functions/inputs/fromCSV',
+    link: 'https://docs.influxdata.com/flux/latest/functions/inputs/fromcsv',
   },
   {
     name: 'group',
@@ -878,7 +878,7 @@ export const functions: FluxToolbarFunction[] = [
       'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/lowestcurrent',
   },
   {
-    name: 'lowestMax',
+    name: 'lowestMin',
     args: [
       {
         name: 'n',
@@ -899,10 +899,10 @@ export const functions: FluxToolbarFunction[] = [
     ],
     desc:
       'Returns the bottom `n` records from all groups using the maximum of each group.',
-    example: 'lowestMax(n:10, groupColumns: ["host"])',
+    example: 'lowestMin(n:10, groupColumns: ["host"])',
     category: 'Selectors',
     link:
-      'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/lowestmax',
+      'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/lowestmin',
   },
   {
     name: 'map',
