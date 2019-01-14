@@ -165,7 +165,7 @@ func (t *mapTransformation) Process(id execute.DatasetID, tbl flux.Table) error 
 		on[c.Label] = t.mergeKey || execute.ContainsStr(keys, c.Label)
 	}
 
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		l := cr.Len()
 		for i := 0; i < l; i++ {
 			m, err := t.fn.Eval(i, cr)
@@ -215,7 +215,7 @@ func (t *mapTransformation) Process(id execute.DatasetID, tbl flux.Table) error 
 	})
 }
 
-func groupKeyForObject(i int, cr flux.ColReader, obj values.Object, on map[string]bool) flux.GroupKey {
+func groupKeyForObject(i int, cr flux.ArrowColReader, obj values.Object, on map[string]bool) flux.GroupKey {
 	cols := make([]flux.ColMeta, 0, len(on))
 	vs := make([]values.Value, 0, len(on))
 	for j, c := range cr.Cols() {
@@ -227,20 +227,7 @@ func groupKeyForObject(i int, cr flux.ColReader, obj values.Object, on map[strin
 		if ok {
 			vs = append(vs, v)
 		} else {
-			switch c.Type {
-			case flux.TBool:
-				vs = append(vs, values.NewBool(cr.Bools(j)[i]))
-			case flux.TInt:
-				vs = append(vs, values.NewInt(cr.Ints(j)[i]))
-			case flux.TUInt:
-				vs = append(vs, values.NewUInt(cr.UInts(j)[i]))
-			case flux.TFloat:
-				vs = append(vs, values.NewFloat(cr.Floats(j)[i]))
-			case flux.TString:
-				vs = append(vs, values.NewString(cr.Strings(j)[i]))
-			case flux.TTime:
-				vs = append(vs, values.NewTime(cr.Times(j)[i]))
-			}
+			vs = append(vs, execute.ValueForRowArrow(cr, i, j))
 		}
 	}
 	return execute.NewGroupKey(cols, vs)

@@ -25,14 +25,52 @@ func TestNew(t *testing.T) {
 			},
 		},
 		{
-			name: "var declaration",
+			name: "package",
+			program: &ast.Program{
+				Package: &ast.PackageClause{
+					Name: &ast.Identifier{Name: "foo"},
+				},
+			},
+			want: &semantic.Program{
+				Package: &semantic.PackageClause{
+					Name: &semantic.Identifier{Name: "foo"},
+				},
+				Body: []semantic.Statement{},
+			},
+		},
+		{
+			name: "imports",
+			program: &ast.Program{
+				Imports: []*ast.ImportDeclaration{
+					{
+						Path: &ast.StringLiteral{Value: "path/foo"},
+					},
+					{
+						Path: &ast.StringLiteral{Value: "path/bar"},
+						As:   &ast.Identifier{Name: "b"},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Imports: []*semantic.ImportDeclaration{
+					{
+						Path: &semantic.StringLiteral{Value: "path/foo"},
+					},
+					{
+						Path: &semantic.StringLiteral{Value: "path/bar"},
+						As:   &semantic.Identifier{Name: "b"},
+					},
+				},
+				Body: []semantic.Statement{},
+			},
+		},
+		{
+			name: "var assignment",
 			program: &ast.Program{
 				Body: []ast.Statement{
-					&ast.VariableDeclaration{
-						Declarations: []*ast.VariableDeclarator{{
-							ID:   &ast.Identifier{Name: "a"},
-							Init: &ast.BooleanLiteral{Value: true},
-						}},
+					&ast.VariableAssignment{
+						ID:   &ast.Identifier{Name: "a"},
+						Init: &ast.BooleanLiteral{Value: true},
 					},
 					&ast.ExpressionStatement{
 						Expression: &ast.Identifier{Name: "a"},
@@ -41,7 +79,7 @@ func TestNew(t *testing.T) {
 			},
 			want: &semantic.Program{
 				Body: []semantic.Statement{
-					&semantic.NativeVariableDeclaration{
+					&semantic.NativeVariableAssignment{
 						Identifier: &semantic.Identifier{Name: "a"},
 						Init:       &semantic.BooleanLiteral{Value: true},
 					},
@@ -52,11 +90,193 @@ func TestNew(t *testing.T) {
 			},
 		},
 		{
+			name: "object",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.ObjectExpression{
+							Properties: []*ast.Property{
+								&ast.Property{
+									Key: &ast.Identifier{
+										Name: "a",
+									},
+									Value: &ast.IntegerLiteral{
+										Value: 10,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.ObjectExpression{
+							Properties: []*semantic.Property{
+								&semantic.Property{
+									Key: &semantic.Identifier{
+										Name: "a",
+									},
+									Value: &semantic.IntegerLiteral{
+										Value: 10,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "object with string key",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.ObjectExpression{
+							Properties: []*ast.Property{
+								&ast.Property{
+									Key: &ast.StringLiteral{
+										Value: "a",
+									},
+									Value: &ast.IntegerLiteral{
+										Value: 10,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.ObjectExpression{
+							Properties: []*semantic.Property{
+								&semantic.Property{
+									Key: &semantic.StringLiteral{
+										Value: "a",
+									},
+									Value: &semantic.IntegerLiteral{
+										Value: 10,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "object with mixed keys",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.ObjectExpression{
+							Properties: []*ast.Property{
+								&ast.Property{
+									Key: &ast.StringLiteral{
+										Value: "a",
+									},
+									Value: &ast.IntegerLiteral{
+										Value: 10,
+									},
+								},
+								&ast.Property{
+									Key: &ast.Identifier{
+										Name: "b",
+									},
+									Value: &ast.IntegerLiteral{
+										Value: 11,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.ObjectExpression{
+							Properties: []*semantic.Property{
+								&semantic.Property{
+									Key: &semantic.StringLiteral{
+										Value: "a",
+									},
+									Value: &semantic.IntegerLiteral{
+										Value: 10,
+									},
+								},
+								&semantic.Property{
+									Key: &semantic.Identifier{
+										Name: "b",
+									},
+									Value: &semantic.IntegerLiteral{
+										Value: 11,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "object with implicit keys",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.ObjectExpression{
+							Properties: []*ast.Property{
+								&ast.Property{
+									Key: &ast.Identifier{
+										Name: "a",
+									},
+								},
+								&ast.Property{
+									Key: &ast.Identifier{
+										Name: "b",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.ObjectExpression{
+							Properties: []*semantic.Property{
+								&semantic.Property{
+									Key: &semantic.Identifier{
+										Name: "a",
+									},
+									Value: &semantic.IdentifierExpression{
+										Name: "a",
+									},
+								},
+								&semantic.Property{
+									Key: &semantic.Identifier{
+										Name: "b",
+									},
+									Value: &semantic.IdentifierExpression{
+										Name: "b",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "options declaration",
 			program: &ast.Program{
 				Body: []ast.Statement{
 					&ast.OptionStatement{
-						Declaration: &ast.VariableDeclarator{
+						Assignment: &ast.VariableAssignment{
 							ID: &ast.Identifier{Name: "task"},
 							Init: &ast.ObjectExpression{
 								Properties: []*ast.Property{
@@ -103,7 +323,7 @@ func TestNew(t *testing.T) {
 			want: &semantic.Program{
 				Body: []semantic.Statement{
 					&semantic.OptionStatement{
-						Declaration: &semantic.NativeVariableDeclaration{
+						Assignment: &semantic.NativeVariableAssignment{
 							Identifier: &semantic.Identifier{Name: "task"},
 							Init: &semantic.ObjectExpression{
 								Properties: []*semantic.Property{
@@ -138,21 +358,19 @@ func TestNew(t *testing.T) {
 			name: "function",
 			program: &ast.Program{
 				Body: []ast.Statement{
-					&ast.VariableDeclaration{
-						Declarations: []*ast.VariableDeclarator{{
-							ID: &ast.Identifier{Name: "f"},
-							Init: &ast.ArrowFunctionExpression{
-								Params: []*ast.Property{
-									{Key: &ast.Identifier{Name: "a"}},
-									{Key: &ast.Identifier{Name: "b"}},
-								},
-								Body: &ast.BinaryExpression{
-									Operator: ast.AdditionOperator,
-									Left:     &ast.Identifier{Name: "a"},
-									Right:    &ast.Identifier{Name: "b"},
-								},
+					&ast.VariableAssignment{
+						ID: &ast.Identifier{Name: "f"},
+						Init: &ast.FunctionExpression{
+							Params: []*ast.Property{
+								{Key: &ast.Identifier{Name: "a"}},
+								{Key: &ast.Identifier{Name: "b"}},
 							},
-						}},
+							Body: &ast.BinaryExpression{
+								Operator: ast.AdditionOperator,
+								Left:     &ast.Identifier{Name: "a"},
+								Right:    &ast.Identifier{Name: "b"},
+							},
+						},
 					},
 					&ast.ExpressionStatement{
 						Expression: &ast.CallExpression{
@@ -169,7 +387,7 @@ func TestNew(t *testing.T) {
 			},
 			want: &semantic.Program{
 				Body: []semantic.Statement{
-					&semantic.NativeVariableDeclaration{
+					&semantic.NativeVariableAssignment{
 						Identifier: &semantic.Identifier{Name: "f"},
 						Init: &semantic.FunctionExpression{
 							Block: &semantic.FunctionBlock{
@@ -202,6 +420,149 @@ func TestNew(t *testing.T) {
 									{Key: &semantic.Identifier{Name: "b"}, Value: &semantic.IntegerLiteral{Value: 3}},
 								},
 							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "index expression",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.IndexExpression{
+							Array: &ast.Identifier{Name: "a"},
+							Index: &ast.IntegerLiteral{Value: 3},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.IndexExpression{
+							Array: &semantic.IdentifierExpression{Name: "a"},
+							Index: &semantic.IntegerLiteral{Value: 3},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "nested index expression",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.IndexExpression{
+							Array: &ast.IndexExpression{
+								Array: &ast.Identifier{Name: "a"},
+								Index: &ast.IntegerLiteral{Value: 3},
+							},
+							Index: &ast.IntegerLiteral{Value: 5},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.IndexExpression{
+							Array: &semantic.IndexExpression{
+								Array: &semantic.IdentifierExpression{Name: "a"},
+								Index: &semantic.IntegerLiteral{Value: 3},
+							},
+							Index: &semantic.IntegerLiteral{Value: 5},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "access indexed object returned from function call",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.IndexExpression{
+							Array: &ast.CallExpression{
+								Callee: &ast.Identifier{Name: "f"},
+							},
+							Index: &ast.IntegerLiteral{Value: 3},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.IndexExpression{
+							Array: &semantic.CallExpression{
+								Callee:    &semantic.IdentifierExpression{Name: "f"},
+								Arguments: &semantic.ObjectExpression{},
+							},
+							Index: &semantic.IntegerLiteral{Value: 3},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "nested member expressions",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.MemberExpression{
+							Object: &ast.MemberExpression{
+								Object:   &ast.Identifier{Name: "a"},
+								Property: &ast.Identifier{Name: "b"},
+							},
+							Property: &ast.Identifier{Name: "c"},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.MemberExpression{
+							Object: &semantic.MemberExpression{
+								Object:   &semantic.IdentifierExpression{Name: "a"},
+								Property: "b",
+							},
+							Property: "c",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "member with call expression",
+			program: &ast.Program{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.MemberExpression{
+							Object: &ast.CallExpression{
+								Callee: &ast.MemberExpression{
+									Object:   &ast.Identifier{Name: "a"},
+									Property: &ast.Identifier{Name: "b"},
+								},
+							},
+							Property: &ast.Identifier{Name: "c"},
+						},
+					},
+				},
+			},
+			want: &semantic.Program{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.MemberExpression{
+							Object: &semantic.CallExpression{
+								Callee: &semantic.MemberExpression{
+									Object:   &semantic.IdentifierExpression{Name: "a"},
+									Property: "b",
+								},
+								Arguments: &semantic.ObjectExpression{},
+							},
+							Property: "c",
 						},
 					},
 				},

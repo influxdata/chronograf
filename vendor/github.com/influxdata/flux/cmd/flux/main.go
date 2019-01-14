@@ -77,7 +77,7 @@ func runHttp() {
 		q, err := querier.c.Query(ctx, pr.Compiler)
 		if err != nil {
 			log.Println("error executing query:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		defer func() {
@@ -111,10 +111,12 @@ func runHttp() {
 				hd.SetHeaders(w)
 			}
 			encoder := pr.Dialect.Encoder()
-			results := flux.NewResultIteratorFromQuery(q)
-			n, err := encoder.Encode(w, results)
+			n, err := func() (int64, error) {
+				results := flux.NewResultIteratorFromQuery(q)
+				defer results.Release()
+				return encoder.Encode(w, results)
+			}()
 			if err != nil {
-				results.Cancel()
 				if n == 0 {
 					log.Println("no results:", err)
 					// If the encoder did not write anything, we can write an error header.
@@ -139,7 +141,7 @@ func (q *Querier) Query(ctx context.Context, w io.Writer, c flux.Compiler, d flu
 		return 0, err
 	}
 	results := flux.NewResultIteratorFromQuery(qry)
-	defer results.Cancel()
+	defer results.Release()
 
 	encoder := d.Encoder()
 	return encoder.Encode(w, results)

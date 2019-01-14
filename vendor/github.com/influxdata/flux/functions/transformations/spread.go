@@ -3,6 +3,7 @@ package transformations
 import (
 	"fmt"
 
+	"github.com/apache/arrow/go/arrow/array"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
@@ -125,8 +126,8 @@ func (a *SpreadAgg) NewStringAgg() execute.DoStringAgg {
 }
 
 // DoInt searches for the min and max value of the array and caches them in the aggregate
-func (a *SpreadIntAgg) DoInt(vs []int64) {
-	for _, v := range vs {
+func (a *SpreadIntAgg) DoInt(vs *array.Int64) {
+	for _, v := range vs.Int64Values() {
 		if !a.minSet || v < a.min {
 			a.minSet = true
 			a.min = v
@@ -148,8 +149,8 @@ func (a *SpreadIntAgg) ValueInt() int64 {
 }
 
 // Do searches for the min and max value of the array and caches them in the aggregate
-func (a *SpreadUIntAgg) DoUInt(vs []uint64) {
-	for _, v := range vs {
+func (a *SpreadUIntAgg) DoUInt(vs *array.Uint64) {
+	for _, v := range vs.Uint64Values() {
 		if !a.minSet || v < a.min {
 			a.minSet = true
 			a.min = v
@@ -171,8 +172,8 @@ func (a *SpreadUIntAgg) ValueUInt() uint64 {
 }
 
 // Do searches for the min and max value of the array and caches them in the aggregate
-func (a *SpreadFloatAgg) DoFloat(vs []float64) {
-	for _, v := range vs {
+func (a *SpreadFloatAgg) DoFloat(vs *array.Float64) {
+	for _, v := range vs.Float64Values() {
 		if !a.minSet || v < a.min {
 			a.minSet = true
 			a.min = v

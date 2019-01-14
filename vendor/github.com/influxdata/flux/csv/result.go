@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +14,7 @@ import (
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/iocounter"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/values"
 	"github.com/pkg/errors"
 )
@@ -108,6 +108,7 @@ type resultIterator struct {
 	err  error
 
 	canceled bool
+	stats    flux.Statistics
 }
 
 func (r *resultIterator) More() bool {
@@ -115,6 +116,7 @@ func (r *resultIterator) More() bool {
 		var extraMeta *tableMetadata
 		if r.next != nil {
 			extraMeta = r.next.extraMeta
+			r.stats = r.stats.Add(r.next.Statistics())
 		}
 		r.next, r.err = newResultDecoder(r.cr, r.c, extraMeta)
 		if r.err == nil {
@@ -127,7 +129,7 @@ func (r *resultIterator) More() bool {
 	}
 
 	// Release the resources for this query.
-	r.Cancel()
+	r.Release()
 	return false
 }
 
@@ -135,7 +137,11 @@ func (r *resultIterator) Next() flux.Result {
 	return r.next
 }
 
-func (r *resultIterator) Cancel() {
+func (r *resultIterator) Statistics() flux.Statistics {
+	return r.stats
+}
+
+func (r *resultIterator) Release() {
 	if r.canceled {
 		return
 	}
@@ -159,6 +165,8 @@ type resultDecoder struct {
 	extraMeta *tableMetadata
 
 	eof bool
+
+	stats flux.Statistics
 }
 
 func newResultDecoder(cr *csv.Reader, c ResultDecoderConfig, extraMeta *tableMetadata) (*resultDecoder, error) {
@@ -196,6 +204,10 @@ func (r *resultDecoder) Name() string {
 
 func (r *resultDecoder) Tables() flux.TableIterator {
 	return r
+}
+
+func (r *resultDecoder) Statistics() flux.Statistics {
+	return r.stats
 }
 
 func (r *resultDecoder) Abort(error) {
@@ -246,6 +258,7 @@ func (r *resultDecoder) Do(f func(flux.Table) error) error {
 		if len(extraLine) > 0 {
 			newMeta = extraLine[annotationIdx] != ""
 		}
+		r.stats.Add(b.Statistics())
 	}
 	return nil
 }
@@ -415,6 +428,8 @@ type tableDecoder struct {
 
 	eof       bool
 	extraLine []string
+
+	stats flux.Statistics
 }
 
 func newTable(
@@ -445,10 +460,29 @@ func newTable(
 }
 
 func (d *tableDecoder) Do(f func(flux.ColReader) error) (err error) {
+	return d.do(func(table flux.Table) error {
+		return table.Do(func(cr flux.ColReader) error {
+			return f(cr)
+		})
+	})
+}
+
+func (d *tableDecoder) DoArrow(f func(flux.ArrowColReader) error) error {
+	return d.do(func(table flux.Table) error {
+		return table.DoArrow(func(cr flux.ArrowColReader) error {
+			return f(cr)
+		})
+	})
+}
+
+// TODO(jsternberg): This method can be removed and merged with DoArrow when
+// we remove the flux.ColReader and replace Do with DoArrow.
+func (d *tableDecoder) do(f func(table flux.Table) error) error {
 	// Send off first batch from first advance call.
-	err = f(d.builder.RawTable())
-	if err != nil {
-		return
+	if table, err := d.builder.Table(); err != nil {
+		return err
+	} else if err := f(table); err != nil {
+		return err
 	}
 	d.builder.ClearData()
 
@@ -461,17 +495,25 @@ func (d *tableDecoder) Do(f func(flux.ColReader) error) (err error) {
 	more := true
 	defer close(d.done)
 	for more {
+		var err error
 		more, err = d.advance(nil)
 		if err != nil {
-			return
+			return err
 		}
-		err = f(d.builder.RawTable())
+		table, err := d.builder.Table()
 		if err != nil {
-			return
+			return err
+		} else if err := f(table); err != nil {
+			return err
 		}
+		d.stats = d.stats.Add(table.Statistics())
 		d.builder.ClearData()
 	}
-	return
+	return nil
+}
+
+func (d *tableDecoder) Statistics() flux.Statistics {
+	return d.stats
 }
 
 // advance reads the csv data until the end of the table or bufSize rows have been read.
@@ -494,6 +536,7 @@ func (d *tableDecoder) advance(extraLine []string) (bool, error) {
 			}
 			line = l
 		}
+		// whatever this line is, it's not part of this table so goto DONE
 		if len(line) != d.meta.NumFields {
 			if len(line) > annotationIdx && line[annotationIdx] == "" {
 				return false, csv.ErrFieldCount
@@ -530,7 +573,15 @@ DONE:
 	// table is done
 	d.extraLine = line
 	if !d.initialized {
-		return false, errors.New("table was not initialized, missing group key data")
+		// if we found a new annotation without any data rows, then the table is empty and we
+		// init using the meta.Default column values.
+		if d.empty {
+			if err := d.init(nil); err != nil {
+				return false, err
+			}
+		} else {
+			return false, errors.New("table was not initialized, missing group key data")
+		}
 	}
 	return false, nil
 }
@@ -611,13 +662,15 @@ func (d *tableDecoder) Cols() []flux.ColMeta {
 	return d.builder.Cols()
 }
 
+// func (d *tableDecoder) Stats() flux.Statistics { return flux.Statistics{} }
+
 type colMeta struct {
 	flux.ColMeta
 	fmt string
 }
 
-func newUnlimitedAllocator() *execute.Allocator {
-	return &execute.Allocator{Limit: math.MaxInt64}
+func newUnlimitedAllocator() *memory.Allocator {
+	return &memory.Allocator{}
 }
 
 type ResultEncoder struct {

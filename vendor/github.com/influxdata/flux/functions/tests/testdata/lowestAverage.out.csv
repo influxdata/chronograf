@@ -1,0 +1,8 @@
+#datatype,string,long,string,string,double
+#group,false,false,false,false,false
+#default,_result,,,,
+,result,table,_measurement,host,_value
+,,0,DD,HostD,10
+,,0,DD,HostC,15
+,,0,CC,HostA,18
+

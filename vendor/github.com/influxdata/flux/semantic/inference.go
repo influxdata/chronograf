@@ -1,9 +1,9 @@
 package semantic
 
 // InferTypes produces a solution to type inference for a given semantic graph.
-func InferTypes(n Node) (TypeSolution, error) {
+func InferTypes(n Node, importer Importer) (TypeSolution, error) {
 	annotator := Annotate(n)
-	cs, err := GenerateConstraints(n, annotator)
+	cs, err := GenerateConstraints(n, annotator, importer)
 	if err != nil {
 		return nil, err
 	}

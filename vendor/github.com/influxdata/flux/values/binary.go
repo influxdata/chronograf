@@ -159,6 +159,11 @@ var binaryFuncLookup = map[BinaryFuncSignature]BinaryFunction{
 		r := rv.Float()
 		return NewBool(l <= r)
 	},
+	{Operator: ast.LessThanEqualOperator, Left: semantic.String, Right: semantic.String}: func(lv, rv Value) Value {
+		l := lv.Str()
+		r := rv.Str()
+		return NewBool(l <= r)
+	},
 
 	// LessThanOperator
 
@@ -211,6 +216,11 @@ var binaryFuncLookup = map[BinaryFuncSignature]BinaryFunction{
 	{Operator: ast.LessThanOperator, Left: semantic.Float, Right: semantic.Float}: func(lv, rv Value) Value {
 		l := lv.Float()
 		r := rv.Float()
+		return NewBool(l < r)
+	},
+	{Operator: ast.LessThanOperator, Left: semantic.String, Right: semantic.String}: func(lv, rv Value) Value {
+		l := lv.Str()
+		r := rv.Str()
 		return NewBool(l < r)
 	},
 
@@ -267,6 +277,11 @@ var binaryFuncLookup = map[BinaryFuncSignature]BinaryFunction{
 		r := rv.Float()
 		return NewBool(l >= r)
 	},
+	{Operator: ast.GreaterThanEqualOperator, Left: semantic.String, Right: semantic.String}: func(lv, rv Value) Value {
+		l := lv.Str()
+		r := rv.Str()
+		return NewBool(l >= r)
+	},
 
 	// GreaterThanOperator
 
@@ -319,6 +334,11 @@ var binaryFuncLookup = map[BinaryFuncSignature]BinaryFunction{
 	{Operator: ast.GreaterThanOperator, Left: semantic.Float, Right: semantic.Float}: func(lv, rv Value) Value {
 		l := lv.Float()
 		r := rv.Float()
+		return NewBool(l > r)
+	},
+	{Operator: ast.GreaterThanOperator, Left: semantic.String, Right: semantic.String}: func(lv, rv Value) Value {
+		l := lv.Str()
+		r := rv.Str()
 		return NewBool(l > r)
 	},
 

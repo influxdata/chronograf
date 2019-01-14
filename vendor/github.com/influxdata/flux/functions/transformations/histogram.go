@@ -21,7 +21,7 @@ type HistogramOpSpec struct {
 	Column           string    `json:"column"`
 	UpperBoundColumn string    `json:"upperBoundColumn"`
 	CountColumn      string    `json:"countColumn"`
-	Buckets          []float64 `json:"buckets"`
+	Bins             []float64 `json:"bins"`
 	Normalize        bool      `json:"normalize"`
 }
 
@@ -30,15 +30,16 @@ func init() {
 		map[string]semantic.PolyType{
 			"column":           semantic.String,
 			"upperBoundColumn": semantic.String,
-			"buckets":          semantic.NewArrayPolyType(semantic.Float),
+			"countColumn":      semantic.String,
+			"bins":             semantic.NewArrayPolyType(semantic.Float),
 			"normalize":        semantic.Bool,
 		},
-		[]string{"buckets"},
+		[]string{"bins"},
 	)
 
 	flux.RegisterFunction(HistogramKind, createHistogramOpSpec, histogramSignature)
-	flux.RegisterBuiltInValue("linearBuckets", linearBuckets{})
-	flux.RegisterBuiltInValue("logarithmicBuckets", logarithmicBuckets{})
+	flux.RegisterBuiltInValue("linearBins", linearBins{})
+	flux.RegisterBuiltInValue("logarithmicBins", logarithmicBins{})
 	flux.RegisterOpSpec(HistogramKind, newHistogramOp)
 	plan.RegisterProcedureSpec(HistogramKind, newHistogramProcedure, HistogramKind)
 	execute.RegisterTransformation(HistogramKind, createHistogramTransformation)
@@ -72,11 +73,11 @@ func createHistogramOpSpec(args flux.Arguments, a *flux.Administration) (flux.Op
 	} else {
 		spec.CountColumn = execute.DefaultValueColLabel
 	}
-	bucketsArry, err := args.GetRequiredArray("buckets", semantic.Float)
+	binsArry, err := args.GetRequiredArray("bins", semantic.Float)
 	if err != nil {
 		return nil, err
 	}
-	spec.Buckets, err = interpreter.ToFloatArray(bucketsArry)
+	spec.Bins, err = interpreter.ToFloatArray(binsArry)
 	if err != nil {
 		return nil, err
 	}
@@ -119,9 +120,9 @@ func (s *HistogramProcedureSpec) Kind() plan.ProcedureKind {
 func (s *HistogramProcedureSpec) Copy() plan.ProcedureSpec {
 	ns := new(HistogramProcedureSpec)
 	*ns = *s
-	if len(s.Buckets) > 0 {
-		ns.Buckets = make([]float64, len(s.Buckets))
-		copy(ns.Buckets, s.Buckets)
+	if len(s.Bins) > 0 {
+		ns.Bins = make([]float64, len(s.Bins))
+		copy(ns.Bins, s.Bins)
 	}
 	return ns
 }
@@ -145,7 +146,7 @@ type histogramTransformation struct {
 }
 
 func NewHistogramTransformation(d execute.Dataset, cache execute.TableBuilderCache, spec *HistogramProcedureSpec) *histogramTransformation {
-	sort.Float64s(spec.Buckets)
+	sort.Float64s(spec.Bins)
 	return &histogramTransformation{
 		d:     d,
 		cache: cache,
@@ -189,16 +190,16 @@ func (t *histogramTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 		return err
 	}
 	totalRows := 0.0
-	counts := make([]float64, len(t.spec.Buckets))
-	err = tbl.Do(func(cr flux.ColReader) error {
+	counts := make([]float64, len(t.spec.Bins))
+	err = tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		totalRows += float64(cr.Len())
-		for _, v := range cr.Floats(valueIdx) {
-			idx := sort.Search(len(t.spec.Buckets), func(i int) bool {
-				return v <= t.spec.Buckets[i]
+		for _, v := range cr.Floats(valueIdx).Float64Values() {
+			idx := sort.Search(len(t.spec.Bins), func(i int) bool {
+				return v <= t.spec.Bins[i]
 			})
-			if idx >= len(t.spec.Buckets) {
-				// Greater than highest bucket, or not found
-				return fmt.Errorf("found value greater than any bucket, %d %d %f %f", idx, len(t.spec.Buckets), v, t.spec.Buckets[len(t.spec.Buckets)-1])
+			if idx >= len(t.spec.Bins) {
+				// Greater than highest bin, or not found
+				return fmt.Errorf("found value greater than any bin, %d %d %f %f", idx, len(t.spec.Bins), v, t.spec.Bins[len(t.spec.Bins)-1])
 			}
 			// Increment counter
 			counts[idx]++
@@ -222,7 +223,7 @@ func (t *histogramTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 		if err := builder.AppendFloat(countIdx, count); err != nil {
 			return err
 		}
-		if err := builder.AppendFloat(boundIdx, t.spec.Buckets[i]); err != nil {
+		if err := builder.AppendFloat(boundIdx, t.spec.Bins[i]); err != nil {
 			return err
 		}
 		total += v
@@ -240,10 +241,10 @@ func (t *histogramTransformation) Finish(id execute.DatasetID, err error) {
 	t.d.Finish(err)
 }
 
-// linearBuckets is a helper function for creating buckets spaced linearly
-type linearBuckets struct{}
+// linearBins is a helper function for creating bins spaced linearly
+type linearBins struct{}
 
-var linearBucketsType = semantic.NewFunctionType(semantic.FunctionSignature{
+var linearBinsType = semantic.NewFunctionType(semantic.FunctionSignature{
 	Parameters: map[string]semantic.Type{
 		"start":    semantic.Float,
 		"width":    semantic.Float,
@@ -253,72 +254,72 @@ var linearBucketsType = semantic.NewFunctionType(semantic.FunctionSignature{
 	Required: semantic.LabelSet{"start", "width", "count"},
 	Return:   semantic.NewArrayType(semantic.Float),
 })
-var linearBucketsPolyType = linearBucketsType.PolyType()
+var linearBinsPolyType = linearBinsType.PolyType()
 
-func (b linearBuckets) Type() semantic.Type {
-	return linearBucketsType
+func (b linearBins) Type() semantic.Type {
+	return linearBinsType
 }
-func (b linearBuckets) PolyType() semantic.PolyType {
-	return linearBucketsPolyType
+func (b linearBins) PolyType() semantic.PolyType {
+	return linearBinsPolyType
 }
 
-func (b linearBuckets) Str() string {
+func (b linearBins) Str() string {
 	panic(values.UnexpectedKind(semantic.String, semantic.Function))
 }
 
-func (b linearBuckets) Int() int64 {
+func (b linearBins) Int() int64 {
 	panic(values.UnexpectedKind(semantic.Int, semantic.Function))
 }
 
-func (b linearBuckets) UInt() uint64 {
+func (b linearBins) UInt() uint64 {
 	panic(values.UnexpectedKind(semantic.UInt, semantic.Function))
 }
 
-func (b linearBuckets) Float() float64 {
+func (b linearBins) Float() float64 {
 	panic(values.UnexpectedKind(semantic.Float, semantic.Function))
 }
 
-func (b linearBuckets) Bool() bool {
+func (b linearBins) Bool() bool {
 	panic(values.UnexpectedKind(semantic.Bool, semantic.Function))
 }
 
-func (b linearBuckets) Time() values.Time {
+func (b linearBins) Time() values.Time {
 	panic(values.UnexpectedKind(semantic.Time, semantic.Function))
 }
 
-func (b linearBuckets) Duration() values.Duration {
+func (b linearBins) Duration() values.Duration {
 	panic(values.UnexpectedKind(semantic.Duration, semantic.Function))
 }
 
-func (b linearBuckets) Regexp() *regexp.Regexp {
+func (b linearBins) Regexp() *regexp.Regexp {
 	panic(values.UnexpectedKind(semantic.Regexp, semantic.Function))
 }
 
-func (b linearBuckets) Array() values.Array {
+func (b linearBins) Array() values.Array {
 	panic(values.UnexpectedKind(semantic.Array, semantic.Function))
 }
 
-func (b linearBuckets) Object() values.Object {
+func (b linearBins) Object() values.Object {
 	panic(values.UnexpectedKind(semantic.Object, semantic.Function))
 }
 
-func (b linearBuckets) Function() values.Function {
+func (b linearBins) Function() values.Function {
 	return b
 }
 
-func (b linearBuckets) Equal(rhs values.Value) bool {
+func (b linearBins) Equal(rhs values.Value) bool {
 	if b.Type() != rhs.Type() {
 		return false
 	}
-	_, ok := rhs.(linearBuckets)
+	_, ok := rhs.(linearBins)
 	return ok
 }
 
-func (b linearBuckets) HasSideEffect() bool {
+func (b linearBins) HasSideEffect() bool {
 	return false
 }
 
-func (b linearBuckets) Call(args values.Object) (values.Value, error) {
+func (b linearBins) Call(args values.Object) (values.Value, error) {
 	startV, ok := args.Get("start")
 	if !ok {
 		return nil, errors.New("start is required")
@@ -368,10 +369,10 @@ func (b linearBuckets) Call(args values.Object) (values.Value, error) {
 	return counts, nil
 }
 
-// logarithmicBuckets is a helper function for creating buckets spaced by an logarithmic factor.
-type logarithmicBuckets struct{}
+// logarithmicBins is a helper function for creating bins spaced by an logarithmic factor.
+type logarithmicBins struct{}
 
-var logarithmicBucketsType = semantic.NewFunctionType(semantic.FunctionSignature{
+var logarithmicBinsType = semantic.NewFunctionType(semantic.FunctionSignature{
 	Parameters: map[string]semantic.Type{
 		"start":    semantic.Float,
 		"factor":   semantic.Float,
@@ -381,72 +382,72 @@ var logarithmicBucketsType = semantic.NewFunctionType(semantic.FunctionSignature
 	Required: semantic.LabelSet{"start", "factor", "count"},
 	Return:   semantic.NewArrayType(semantic.Float),
 })
-var logarithmicBucketsPolyType = logarithmicBucketsType.PolyType()
+var logarithmicBinsPolyType = logarithmicBinsType.PolyType()
 
-func (b logarithmicBuckets) Type() semantic.Type {
-	return logarithmicBucketsType
+func (b logarithmicBins) Type() semantic.Type {
+	return logarithmicBinsType
 }
-func (b logarithmicBuckets) PolyType() semantic.PolyType {
-	return logarithmicBucketsPolyType
+func (b logarithmicBins) PolyType() semantic.PolyType {
+	return logarithmicBinsPolyType
 }
 
-func (b logarithmicBuckets) Str() string {
+func (b logarithmicBins) Str() string {
 	panic(values.UnexpectedKind(semantic.String, semantic.Function))
 }
 
-func (b logarithmicBuckets) Int() int64 {
+func (b logarithmicBins) Int() int64 {
 	panic(values.UnexpectedKind(semantic.Int, semantic.Function))
 }
 
-func (b logarithmicBuckets) UInt() uint64 {
+func (b logarithmicBins) UInt() uint64 {
 	panic(values.UnexpectedKind(semantic.UInt, semantic.Function))
 }
 
-func (b logarithmicBuckets) Float() float64 {
+func (b logarithmicBins) Float() float64 {
 	panic(values.UnexpectedKind(semantic.Float, semantic.Function))
 }
 
-func (b logarithmicBuckets) Bool() bool {
+func (b logarithmicBins) Bool() bool {
 	panic(values.UnexpectedKind(semantic.Bool, semantic.Function))
 }
 
-func (b logarithmicBuckets) Time() values.Time {
+func (b logarithmicBins) Time() values.Time {
 	panic(values.UnexpectedKind(semantic.Time, semantic.Function))
 }
 
-func (b logarithmicBuckets) Duration() values.Duration {
+func (b logarithmicBins) Duration() values.Duration {
 	panic(values.UnexpectedKind(semantic.Duration, semantic.Function))
 }
 
-func (b logarithmicBuckets) Regexp() *regexp.Regexp {
+func (b logarithmicBins) Regexp() *regexp.Regexp {
 	panic(values.UnexpectedKind(semantic.Regexp, semantic.Function))
 }
 
-func (b logarithmicBuckets) Array() values.Array {
+func (b logarithmicBins) Array() values.Array {
 	panic(values.UnexpectedKind(semantic.Array, semantic.Function))
 }
 
-func (b logarithmicBuckets) Object() values.Object {
+func (b logarithmicBins) Object() values.Object {
 	panic(values.UnexpectedKind(semantic.Object, semantic.Function))
 }
 
-func (b logarithmicBuckets) Function() values.Function {
+func (b logarithmicBins) Function() values.Function {
 	return b
 }
 
-func (b logarithmicBuckets) Equal(rhs values.Value) bool {
+func (b logarithmicBins) Equal(rhs values.Value) bool {
 	if b.Type() != rhs.Type() {
 		return false
 	}
-	_, ok := rhs.(logarithmicBuckets)
+	_, ok := rhs.(logarithmicBins)
 	return ok
 }
 
-func (b logarithmicBuckets) HasSideEffect() bool {
+func (b logarithmicBins) HasSideEffect() bool {
 	return false
 }
 
-func (b logarithmicBuckets) Call(args values.Object) (values.Value, error) {
+func (b logarithmicBins) Call(args values.Object) (values.Value, error) {
 	startV, ok := args.Get("start")
 	if !ok {
 		return nil, errors.New("start is required")

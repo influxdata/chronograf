@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute/executetest"
 	"github.com/influxdata/flux/functions/transformations"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/querytest"
 )
 
@@ -56,10 +58,11 @@ func TestMean_Process(t *testing.T) {
 }
 
 func BenchmarkMean(b *testing.B) {
+	data := arrow.NewFloat(NormalData, &memory.Allocator{})
 	executetest.AggFuncBenchmarkHelper(
 		b,
 		new(transformations.MeanAgg),
-		NormalData,
+		data,
 		10.00081696729983,
 	)
 }

@@ -164,9 +164,9 @@ func (o *ToHTTPOpSpec) ReadArgs(args flux.Arguments) error {
 		o.ValueColumns = append(o.ValueColumns, execute.DefaultValueColLabel)
 	} else {
 		for i := 0; i < valueColumns.Len(); i++ {
-			o.TagColumns = append(o.ValueColumns, valueColumns.Get(i).Str())
+			o.ValueColumns = append(o.ValueColumns, valueColumns.Get(i).Str())
 		}
-		sort.Strings(o.TagColumns)
+		sort.Strings(o.ValueColumns)
 	}
 
 	// TODO: get other headers working!
@@ -176,7 +176,6 @@ func (o *ToHTTPOpSpec) ReadArgs(args flux.Arguments) error {
 	}
 
 	return err
-
 }
 
 func createToHTTPOpSpec(args flux.Arguments, a *flux.Administration) (flux.OperationSpec, error) {
@@ -192,7 +191,6 @@ func createToHTTPOpSpec(args flux.Arguments, a *flux.Administration) (flux.Opera
 
 // UnmarshalJSON unmarshals and validates toHTTPOpSpec into JSON.
 func (o *ToHTTPOpSpec) UnmarshalJSON(b []byte) (err error) {
-
 	if err = json.Unmarshal(b, (*innerToHTTPOpSpec)(o)); err != nil {
 		return err
 	}
@@ -201,7 +199,7 @@ func (o *ToHTTPOpSpec) UnmarshalJSON(b []byte) (err error) {
 		return err
 	}
 	if !(u.Scheme == "https" || u.Scheme == "http" || u.Scheme == "") {
-		return fmt.Errorf("Scheme must be http or https but was %s", u.Scheme)
+		return fmt.Errorf("scheme must be http or https but was %s", u.Scheme)
 	}
 	return nil
 }
@@ -211,6 +209,7 @@ func (ToHTTPOpSpec) Kind() flux.OperationKind {
 }
 
 type ToHTTPProcedureSpec struct {
+	plan.DefaultCost
 	Spec *ToHTTPOpSpec
 }
 
@@ -274,7 +273,6 @@ func (t *ToHTTPTransformation) RetractTable(id execute.DatasetID, key flux.Group
 }
 
 func NewToHTTPTransformation(d execute.Dataset, cache execute.TableBuilderCache, spec *ToHTTPProcedureSpec) *ToHTTPTransformation {
-
 	return &ToHTTPTransformation{
 		d:     d,
 		cache: cache,
@@ -299,7 +297,6 @@ func (m *toHttpMetric) FieldList() []*protocol.Field {
 func (m *toHttpMetric) truncateTagsAndFields() {
 	m.fields = m.fields[:0]
 	m.tags = m.tags[:0]
-
 }
 
 func (m *toHttpMetric) Name() string {
@@ -309,8 +306,6 @@ func (m *toHttpMetric) Name() string {
 func (m *toHttpMetric) Time() time.Time {
 	return m.t
 }
-
-// setCols must be called after
 
 type idxType struct {
 	Idx  int
@@ -350,8 +345,11 @@ func (t *ToHTTPTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 	isValue := make([]bool, len(colMetadatas))
 
 	for i, col := range colMetadatas {
-		isValue[i] = sort.SearchStrings(t.spec.Spec.ValueColumns, col.Label) < len(t.spec.Spec.ValueColumns) && t.spec.Spec.ValueColumns[sort.SearchStrings(t.spec.Spec.ValueColumns, col.Label)] == col.Label
-		isTag[i] = sort.SearchStrings(t.spec.Spec.TagColumns, col.Label) < len(t.spec.Spec.TagColumns) && t.spec.Spec.TagColumns[sort.SearchStrings(t.spec.Spec.TagColumns, col.Label)] == col.Label
+		valIdx := sort.SearchStrings(t.spec.Spec.ValueColumns, col.Label)
+		isValue[i] = valIdx < len(t.spec.Spec.ValueColumns) && t.spec.Spec.ValueColumns[valIdx] == col.Label
+
+		tagIdx := sort.SearchStrings(t.spec.Spec.TagColumns, col.Label)
+		isTag[i] = tagIdx < len(t.spec.Spec.TagColumns) && t.spec.Spec.TagColumns[tagIdx] == col.Label
 	}
 
 	builder, new := t.cache.TableBuilder(tbl.Key())
@@ -379,7 +377,7 @@ func (t *ToHTTPTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 						m.name = er.Strings(j)[i]
 					case isTag[j]:
 						if col.Type != flux.TString {
-							return errors.New("invalid type for measurement column")
+							return errors.New("invalid type for tag column")
 						}
 						m.tags = append(m.tags, &protocol.Tag{Key: col.Label, Value: er.Strings(j)[i]})
 
@@ -424,7 +422,7 @@ func (t *ToHTTPTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 		return err
 	}
 
-	if t.spec.Spec.Timeout <= 0 {
+	if t.spec.Spec.Timeout > 0 {
 		ctx, cancel := context.WithTimeout(context.Background(), t.spec.Spec.Timeout)
 		req = req.WithContext(ctx)
 		defer cancel()
@@ -434,7 +432,6 @@ func (t *ToHTTPTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 		resp, err = newToHTTPClient().Do(req)
 	} else {
 		resp, err = toHTTPKeepAliveClient.Do(req)
-
 	}
 	if err != nil {
 		return err

@@ -9,6 +9,7 @@ import (
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/interpreter"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/flux/values"
@@ -375,7 +376,7 @@ type MergeJoinCache struct {
 	reverseLookup map[flux.GroupKey]preJoinGroupKeys
 
 	tables      map[flux.GroupKey]flux.Table
-	alloc       *execute.Allocator
+	alloc       *memory.Allocator
 	triggerSpec flux.TriggerSpec
 }
 
@@ -385,10 +386,10 @@ type streamBuffer struct {
 	ready    map[values.Value]bool
 	stale    map[flux.GroupKey]bool
 	last     values.Value
-	alloc    *execute.Allocator
+	alloc    *memory.Allocator
 }
 
-func newStreamBuffer(alloc *execute.Allocator) *streamBuffer {
+func newStreamBuffer(alloc *memory.Allocator) *streamBuffer {
 	return &streamBuffer{
 		data:     make(map[flux.GroupKey]*execute.ColListTableBuilder),
 		consumed: make(map[values.Value]int),
@@ -489,7 +490,7 @@ func (s schema) Swap(i int, j int) {
 }
 
 // NewMergeJoinCache constructs a new instance of a MergeJoinCache
-func NewMergeJoinCache(alloc *execute.Allocator, datasetIDs []execute.DatasetID, tableNames map[execute.DatasetID]string, key []string) *MergeJoinCache {
+func NewMergeJoinCache(alloc *memory.Allocator, datasetIDs []execute.DatasetID, tableNames map[execute.DatasetID]string, key []string) *MergeJoinCache {
 	// Join currently only accepts two data sources(streams) as input
 	if len(datasetIDs) != 2 {
 		panic("Join only accepts two data sources")
@@ -532,24 +533,24 @@ func (c *MergeJoinCache) Table(key flux.GroupKey) (flux.Table, error) {
 	preJoinGroupKeys, ok := c.reverseLookup[key]
 
 	if !ok {
-		return nil, fmt.Errorf("No table exists with group key: %v", key)
+		return nil, fmt.Errorf("no table exists with group key: %v", key)
 	}
 
 	if _, ok := c.tables[key]; !ok {
 
 		left := c.buffers[c.leftID].table(preJoinGroupKeys.left)
 		if left == nil {
-			return nil, fmt.Errorf("No table in left join buffer with key: %v", key)
+			return nil, fmt.Errorf("no table in left join buffer with key: %v", key)
 		}
 
 		right := c.buffers[c.rightID].table(preJoinGroupKeys.right)
 		if left == nil {
-			return nil, fmt.Errorf("No table in right join buffer with key: %v", key)
+			return nil, fmt.Errorf("no table in right join buffer with key: %v", key)
 		}
 
 		table, err := c.join(left, right)
 		if err != nil {
-			return nil, fmt.Errorf("Table with group key (%v) could not be fetched", key)
+			return nil, fmt.Errorf("table with group key (%v) could not be fetched", key)
 		}
 
 		c.tables[key] = table
@@ -822,9 +823,8 @@ func (c *MergeJoinCache) join(left, right *execute.ColListTableBuilder) (flux.Ta
 	var leftSet, rightSet subset
 	var leftKey, rightKey flux.GroupKey
 
-	leftTable, rightTable := left.RawTable(), right.RawTable()
-	leftSet, leftKey = c.advance(leftSet.Stop, leftTable)
-	rightSet, rightKey = c.advance(rightSet.Stop, rightTable)
+	leftSet, leftKey = c.advance(leftSet.Stop, left)
+	rightSet, rightKey = c.advance(rightSet.Stop, right)
 
 	keys := map[execute.DatasetID]flux.GroupKey{
 		c.leftID:  left.Key(),
@@ -849,8 +849,8 @@ func (c *MergeJoinCache) join(left, right *execute.ColListTableBuilder) (flux.Ta
 			for l := leftSet.Start; l < leftSet.Stop; l++ {
 				for r := rightSet.Start; r < rightSet.Stop; r++ {
 
-					leftRecord := leftTable.GetRow(l)
-					rightRecord := rightTable.GetRow(r)
+					leftRecord := left.GetRow(l)
+					rightRecord := right.GetRow(r)
 
 					leftRecord.Range(func(columnName string, columnVal values.Value) {
 						column := tableCol{
@@ -878,12 +878,12 @@ func (c *MergeJoinCache) join(left, right *execute.ColListTableBuilder) (flux.Ta
 					})
 				}
 			}
-			leftSet, leftKey = c.advance(leftSet.Stop, leftTable)
-			rightSet, rightKey = c.advance(rightSet.Stop, rightTable)
+			leftSet, leftKey = c.advance(leftSet.Stop, left)
+			rightSet, rightKey = c.advance(rightSet.Stop, right)
 		} else if leftKey.Less(rightKey) {
-			leftSet, leftKey = c.advance(leftSet.Stop, leftTable)
+			leftSet, leftKey = c.advance(leftSet.Stop, left)
 		} else {
-			rightSet, rightKey = c.advance(rightSet.Stop, rightTable)
+			rightSet, rightKey = c.advance(rightSet.Stop, right)
 		}
 	}
 

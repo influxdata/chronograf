@@ -19,6 +19,23 @@ func analyzeProgram(prog *ast.Program) (*Program, error) {
 		loc:  loc(prog.Location()),
 		Body: make([]Statement, len(prog.Body)),
 	}
+	pkg, err := analyzePackageClause(prog.Package)
+	if err != nil {
+		return nil, err
+	}
+	p.Package = pkg
+
+	if len(prog.Imports) > 0 {
+		p.Imports = make([]*ImportDeclaration, len(prog.Imports))
+		for i, imp := range prog.Imports {
+			n, err := analyzeImportDeclaration(imp)
+			if err != nil {
+				return nil, err
+			}
+			p.Imports[i] = n
+		}
+	}
+
 	for i, s := range prog.Body {
 		n, err := analyzeStatment(s)
 		if err != nil {
@@ -29,12 +46,48 @@ func analyzeProgram(prog *ast.Program) (*Program, error) {
 	return p, nil
 }
 
+func analyzePackageClause(pkg *ast.PackageClause) (*PackageClause, error) {
+	if pkg == nil {
+		return nil, nil
+	}
+	name, err := analyzeIdentifier(pkg.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &PackageClause{
+		loc:  loc(pkg.Location()),
+		Name: name,
+	}, nil
+}
+
+func analyzeImportDeclaration(imp *ast.ImportDeclaration) (*ImportDeclaration, error) {
+	n := &ImportDeclaration{
+		loc: loc(imp.Location()),
+	}
+	if imp.As != nil {
+		as, err := analyzeIdentifier(imp.As)
+		if err != nil {
+			return nil, err
+		}
+		n.As = as
+	}
+
+	path, err := analyzeStringLiteral(imp.Path)
+	if err != nil {
+		return nil, err
+	}
+	n.Path = path
+	return n, nil
+}
+
 func analyzeNode(n ast.Node) (Node, error) {
 	switch n := n.(type) {
 	case ast.Statement:
 		return analyzeStatment(n)
 	case ast.Expression:
 		return analyzeExpression(n)
+	case *ast.Block:
+		return analyzeBlock(n)
 	default:
 		return nil, fmt.Errorf("unsupported node %T", n)
 	}
@@ -42,27 +95,21 @@ func analyzeNode(n ast.Node) (Node, error) {
 
 func analyzeStatment(s ast.Statement) (Statement, error) {
 	switch s := s.(type) {
-	case *ast.BlockStatement:
-		return analyzeBlockStatement(s)
 	case *ast.OptionStatement:
 		return analyzeOptionStatement(s)
 	case *ast.ExpressionStatement:
 		return analyzeExpressionStatement(s)
 	case *ast.ReturnStatement:
 		return analyzeReturnStatement(s)
-	case *ast.VariableDeclaration:
-		// Expect a single declaration
-		if len(s.Declarations) != 1 {
-			return nil, fmt.Errorf("only single variable declarations are supported, found %d declarations", len(s.Declarations))
-		}
-		return analyzeVariableDeclaration(s.Declarations[0])
+	case *ast.VariableAssignment:
+		return analyzeVariableAssignment(s)
 	default:
 		return nil, fmt.Errorf("unsupported statement %T", s)
 	}
 }
 
-func analyzeBlockStatement(block *ast.BlockStatement) (*BlockStatement, error) {
-	b := &BlockStatement{
+func analyzeBlock(block *ast.Block) (*Block, error) {
+	b := &Block{
 		loc:  loc(block.Location()),
 		Body: make([]Statement, len(block.Body)),
 	}
@@ -81,13 +128,13 @@ func analyzeBlockStatement(block *ast.BlockStatement) (*BlockStatement, error) {
 }
 
 func analyzeOptionStatement(option *ast.OptionStatement) (*OptionStatement, error) {
-	declaration, err := analyzeVariableDeclaration(option.Declaration)
+	declaration, err := analyzeVariableAssignment(option.Assignment)
 	if err != nil {
 		return nil, err
 	}
 	return &OptionStatement{
-		loc:         loc(option.Location()),
-		Declaration: declaration,
+		loc:        loc(option.Location()),
+		Assignment: declaration,
 	}, nil
 }
 
@@ -113,7 +160,7 @@ func analyzeReturnStatement(ret *ast.ReturnStatement) (*ReturnStatement, error) 
 	}, nil
 }
 
-func analyzeVariableDeclaration(decl *ast.VariableDeclarator) (*NativeVariableDeclaration, error) {
+func analyzeVariableAssignment(decl *ast.VariableAssignment) (*NativeVariableAssignment, error) {
 	id, err := analyzeIdentifier(decl.ID)
 	if err != nil {
 		return nil, err
@@ -122,7 +169,7 @@ func analyzeVariableDeclaration(decl *ast.VariableDeclarator) (*NativeVariableDe
 	if err != nil {
 		return nil, err
 	}
-	vd := &NativeVariableDeclaration{
+	vd := &NativeVariableAssignment{
 		loc:        loc(decl.Location()),
 		Identifier: id,
 		Init:       init,
@@ -132,12 +179,14 @@ func analyzeVariableDeclaration(decl *ast.VariableDeclarator) (*NativeVariableDe
 
 func analyzeExpression(expr ast.Expression) (Expression, error) {
 	switch expr := expr.(type) {
-	case *ast.ArrowFunctionExpression:
-		return analyzeArrowFunctionExpression(expr)
+	case *ast.FunctionExpression:
+		return analyzeFunctionExpression(expr)
 	case *ast.CallExpression:
 		return analyzeCallExpression(expr)
 	case *ast.MemberExpression:
 		return analyzeMemberExpression(expr)
+	case *ast.IndexExpression:
+		return analyzeIndexExpression(expr)
 	case *ast.PipeExpression:
 		return analyzePipeExpression(expr)
 	case *ast.BinaryExpression:
@@ -184,7 +233,18 @@ func analyzeLiteral(lit ast.Literal) (Literal, error) {
 	}
 }
 
-func analyzeArrowFunctionExpression(arrow *ast.ArrowFunctionExpression) (*FunctionExpression, error) {
+func analyzePropertyKey(key ast.PropertyKey) (PropertyKey, error) {
+	switch key := key.(type) {
+	case *ast.Identifier:
+		return analyzeIdentifier(key)
+	case *ast.StringLiteral:
+		return analyzeStringLiteral(key)
+	default:
+		return nil, fmt.Errorf("unsupported key %T", key)
+	}
+}
+
+func analyzeFunctionExpression(arrow *ast.FunctionExpression) (*FunctionExpression, error) {
 	var parameters *FunctionParameters
 	var defaults *ObjectExpression
 	if len(arrow.Params) > 0 {
@@ -194,7 +254,11 @@ func analyzeArrowFunctionExpression(arrow *ast.ArrowFunctionExpression) (*Functi
 		}
 		parameters.List = make([]*FunctionParameter, len(arrow.Params))
 		for i, p := range arrow.Params {
-			key, err := analyzeIdentifier(p.Key)
+			ident, ok := p.Key.(*ast.Identifier)
+			if !ok {
+				return nil, fmt.Errorf("function params must be identifiers")
+			}
+			key, err := analyzeIdentifier(ident)
 			if err != nil {
 				return nil, err
 			}
@@ -295,23 +359,33 @@ func analyzeMemberExpression(member *ast.MemberExpression) (*MemberExpression, e
 	if err != nil {
 		return nil, err
 	}
-
-	var propertyName string
-	switch p := member.Property.(type) {
+	var prop string
+	switch n := member.Property.(type) {
 	case *ast.Identifier:
-		propertyName = p.Name
+		prop = n.Name
 	case *ast.StringLiteral:
-		propertyName = p.Value
-	case *ast.IntegerLiteral:
-		propertyName = strconv.FormatInt(p.Value, 10)
-	default:
-		return nil, fmt.Errorf("unsupported member property expression of type %T", member.Property)
+		prop = n.Value
 	}
-
 	return &MemberExpression{
 		loc:      loc(member.Location()),
 		Object:   obj,
-		Property: propertyName,
+		Property: prop,
+	}, nil
+}
+
+func analyzeIndexExpression(e *ast.IndexExpression) (Expression, error) {
+	array, err := analyzeExpression(e.Array)
+	if err != nil {
+		return nil, err
+	}
+	index, err := analyzeExpression(e.Index)
+	if err != nil {
+		return nil, err
+	}
+	return &IndexExpression{
+		loc:   loc(e.Location()),
+		Array: array,
+		Index: index,
 	}, nil
 }
 
@@ -418,9 +492,19 @@ func analyzeIdentifierExpression(ident *ast.Identifier) (*IdentifierExpression, 
 }
 
 func analyzeProperty(property *ast.Property) (*Property, error) {
-	key, err := analyzeIdentifier(property.Key)
+	key, err := analyzePropertyKey(property.Key)
 	if err != nil {
 		return nil, err
+	}
+	if property.Value == nil {
+		return &Property{
+			loc: loc(property.Location()),
+			Key: key,
+			Value: &IdentifierExpression{
+				loc:  loc(key.Location()),
+				Name: key.Key(),
+			},
+		}, nil
 	}
 	value, err := analyzeExpression(property.Value)
 	if err != nil {

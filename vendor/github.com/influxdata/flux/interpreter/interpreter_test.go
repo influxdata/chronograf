@@ -3,6 +3,7 @@ package interpreter_test
 import (
 	"errors"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -351,6 +352,44 @@ func TestEval(t *testing.T) {
 				values.NewBool(true),
 			},
 		},
+		{
+			name: "array index expression",
+			query: `
+				a = [1, 2, 3]
+				x = a[1]
+				x == 2 or fail()
+			`,
+		},
+		{
+			name: "array with complex index expression",
+			query: `
+				f = () => ({l: 0, m: 1, n: 2})
+				a = [1, 2, 3]
+				x = a[f().l]
+				y = a[f().m]
+				z = a[f().n]
+				x == 1 or fail()
+				y == 2 or fail()
+				z == 3 or fail()
+			`,
+		},
+		{
+			name: "invalid array index expression 1",
+			query: `
+				a = [1, 2, 3]
+				a["b"]
+			`,
+			wantErr: true,
+		},
+		{
+			name: "invalid array index expression 2",
+			query: `
+				a = [1, 2, 3]
+				f = () => "1"
+				a[f()]
+			`,
+			wantErr: true,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -368,18 +407,111 @@ func TestEval(t *testing.T) {
 			// Create new interpreter scope for each test case
 			itrp := interpreter.NewInterpreter(optionScope, testScope, interpreter.NewTypeScope())
 
-			err = itrp.Eval(graph)
+			err = itrp.Eval(graph, nil)
 			if !tc.wantErr && err != nil {
 				t.Fatal(err)
 			} else if tc.wantErr && err == nil {
 				t.Fatal("expected error")
 			}
-			if tc.want != nil && !cmp.Equal(tc.want, itrp.SideEffects(), semantictest.CmpOptions...) {
-				t.Fatalf("unexpected side effect values -want/+got: \n%s", cmp.Diff(tc.want, itrp.SideEffects(), semantictest.CmpOptions...))
+
+			if tc.want != nil && !cmp.Equal(tc.want, itrp.Package().SideEffects(), semantictest.CmpOptions...) {
+				t.Fatalf("unexpected side effect values -want/+got: \n%s", cmp.Diff(tc.want, itrp.Package().SideEffects(), semantictest.CmpOptions...))
 			}
 		})
 	}
 
+}
+
+func TestInterpreter_TypeErrors(t *testing.T) {
+	testCases := []struct {
+		name    string
+		program string
+		err     string
+	}{
+		{
+			name: "no pipe arg",
+			program: `
+				f = () => 0
+				g = () => 1 |> f()
+				`,
+			err: `function does not take a pipe argument`,
+		},
+		{
+			name: "called without pipe args",
+			program: `
+				f = (x=<-) => x
+				g = () => f()
+			`,
+			err: `function requires a pipe argument`,
+		},
+		{
+			name: "unify with different pipe args 1",
+			program: `
+				f = (x) => 0 |> x()
+				f(x: (v=<-) => v)
+				f(x: (w=<-) => w)
+			`,
+		},
+		{
+			// This program should type check.
+			// arg is any function that takes a pipe argument.
+			// arg's pipe parameter can be named anything.
+			name: "unify with different pipe args 2",
+			program: `
+				f = (arg=(x=<-) => x, w) => w |> arg()
+				f(arg: (v=<-) => v, w: 0)
+			`,
+		},
+		{
+			// This program should not type check.
+			// A function that requires a parameter named "arg" cannot unify
+			// with a function whose "arg" parameter is also a pipe parameter.
+			name: "unify pipe and non-pipe args with same name",
+			program: `
+				f = (x, y) => x(arg: y)
+				f(x: (arg=<-) => arg, y: 0)
+			`,
+			err: "function does not take a pipe argument",
+		},
+		{
+			// This program should not type check.
+			// arg is a function that must take a pipe argument. Even
+			// though arg defaults to a function that takes an input
+			// param x, if x is not a pipe param then it cannot type check.
+			name: "pipe and non-pipe parameters with the same name",
+			program: `
+				f = (arg=(x=<-) => x) => 0 |> arg()
+				g = () => f(arg: (x) => 5 + x)
+			`,
+			err: `function does not take a parameter "x"`,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ast, err := parser.NewAST(tc.program)
+			if err != nil {
+				t.Fatal(err)
+			}
+			graph, err := semantic.New(ast)
+			if err != nil {
+				t.Fatal(err)
+			}
+			itrp := interpreter.NewInterpreter(nil, nil, interpreter.NewTypeScope())
+			if err := itrp.Eval(graph, nil); err == nil {
+				if tc.err != "" {
+					t.Error("expected type error, but program executed successfully")
+				}
+			} else {
+				if tc.err == "" {
+					t.Errorf("expected zero errors, but got %v", err)
+				} else if !strings.Contains(err.Error(), "type error") {
+					t.Errorf("expected type error, but got the following: %v", err)
+				} else if !strings.Contains(err.Error(), tc.err) {
+					t.Errorf("wrong error message\n expected error message to contain: %q\n actual error message: %q\n", tc.err, err.Error())
+				}
+			}
+		})
+	}
 }
 
 func TestInterpreter_MultiPhaseInterpretation(t *testing.T) {
@@ -388,6 +520,7 @@ func TestInterpreter_MultiPhaseInterpretation(t *testing.T) {
 		builtins []string
 		program  string
 		wantErr  bool
+		want     []values.Value
 	}{
 		{
 			// Evaluate two builtin functions in a single phase
@@ -424,44 +557,52 @@ func TestInterpreter_MultiPhaseInterpretation(t *testing.T) {
 			program:  `f = () => _highestOrLowest()`,
 			wantErr:  true,
 		},
+		{
+			name:     "query function with side effects",
+			builtins: []string{`foo = () => {sideEffect() return 1}`},
+			program:  `foo()`,
+			want: []values.Value{
+				values.NewInt(0),
+				values.NewInt(1),
+			},
+		},
 	}
 	for _, tc := range testCases {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			var globals map[string]values.Value
-			var err error
-
+			optionCopy := copyScope(optionScope)
+			testScopeCopy := copyScope(testScope)
 			types := interpreter.NewTypeScope()
-
-			evaluate := func(program string, globals map[string]values.Value) (map[string]values.Value, error) {
-				ast, err := parser.NewAST(program)
-				if err != nil {
-					return nil, err
-				}
-				graph, err := semantic.New(ast)
-				if err != nil {
-					return nil, err
-				}
-				itrp := interpreter.NewInterpreter(nil, globals, types)
-				if err := itrp.Eval(graph); err != nil {
-					return nil, err
-				}
-				types = itrp.TypeScope()
-				return itrp.GlobalScope().Values(), nil
-			}
+			itrp := interpreter.NewMutableInterpreter(optionCopy, testScopeCopy, types)
 
 			for _, builtin := range tc.builtins {
-				if globals, err = evaluate(builtin, globals); err != nil {
+				if err := eval(itrp, nil, builtin); err != nil {
 					t.Fatal("evaluation of builtin failed: ", err)
 				}
 			}
 
-			if _, err = evaluate(tc.program, globals); err != nil && !tc.wantErr {
+			itrp = interpreter.NewInterpreter(optionCopy, testScopeCopy, types)
+
+			if err := eval(itrp, nil, tc.program); err != nil && !tc.wantErr {
 				t.Fatal("program evaluation failed: ", err)
 			} else if err == nil && tc.wantErr {
 				t.Fatal("expected to error during program evaluation")
 			}
+
+			if tc.want != nil && !cmp.Equal(tc.want, itrp.Package().SideEffects(), semantictest.CmpOptions...) {
+				t.Fatalf("unexpected side effect values -want/+got: \n%s", cmp.Diff(tc.want, itrp.Package().SideEffects(), semantictest.CmpOptions...))
+			}
+
 		})
 	}
+}
+
+func copyScope(scope map[string]values.Value) map[string]values.Value {
+	cpy := make(map[string]values.Value)
+	for k, v := range scope {
+		cpy[k] = v
+	}
+	return cpy
 }
 
 func TestResolver(t *testing.T) {
@@ -515,7 +656,7 @@ func TestResolver(t *testing.T) {
 
 	itrp := interpreter.NewInterpreter(nil, scope, interpreter.NewTypeScope())
 
-	if err := itrp.Eval(graph); err != nil {
+	if err := itrp.Eval(graph, nil); err != nil {
 		t.Fatal(err)
 	}
 
@@ -552,34 +693,34 @@ func (f *function) PolyType() semantic.PolyType {
 }
 
 func (f *function) Str() string {
-	panic(values.UnexpectedKind(semantic.Object, semantic.String))
+	panic(values.UnexpectedKind(semantic.Function, semantic.String))
 }
 func (f *function) Int() int64 {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Int))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Int))
 }
 func (f *function) UInt() uint64 {
-	panic(values.UnexpectedKind(semantic.Object, semantic.UInt))
+	panic(values.UnexpectedKind(semantic.Function, semantic.UInt))
 }
 func (f *function) Float() float64 {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Float))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Float))
 }
 func (f *function) Bool() bool {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Bool))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Bool))
 }
 func (f *function) Time() values.Time {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Time))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Time))
 }
 func (f *function) Duration() values.Duration {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Duration))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Duration))
 }
 func (f *function) Regexp() *regexp.Regexp {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Regexp))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Regexp))
 }
 func (f *function) Array() values.Array {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Function))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Array))
 }
 func (f *function) Object() values.Object {
-	panic(values.UnexpectedKind(semantic.Object, semantic.Object))
+	panic(values.UnexpectedKind(semantic.Function, semantic.Object))
 }
 func (f *function) Function() values.Function {
 	return f

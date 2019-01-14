@@ -19,7 +19,7 @@ func TestPlanTraversal(t *testing.T) {
 			name: "simple",
 			//        0
 			plan: plantest.PlanSpec{
-				Nodes: []plan.PlanNode{plantest.CreateLogicalMockNode("0")},
+				Nodes: []plan.PlanNode{plantest.CreatePhysicalMockNode("0")},
 			},
 			nodeIDs: []plan.NodeID{"0"},
 		},
@@ -30,8 +30,8 @@ func TestPlanTraversal(t *testing.T) {
 			//        0
 			plan: plantest.PlanSpec{
 				Nodes: []plan.PlanNode{
-					plantest.CreateLogicalMockNode("0"),
-					plantest.CreateLogicalMockNode("1"),
+					plantest.CreatePhysicalMockNode("0"),
+					plantest.CreatePhysicalMockNode("1"),
 				},
 				Edges: [][2]int{
 					{0, 1},
@@ -46,10 +46,10 @@ func TestPlanTraversal(t *testing.T) {
 			//        0    2
 			plan: plantest.PlanSpec{
 				Nodes: []plan.PlanNode{
-					plantest.CreateLogicalMockNode("0"),
-					plantest.CreateLogicalMockNode("1"),
-					plantest.CreateLogicalMockNode("2"),
-					plantest.CreateLogicalMockNode("3"),
+					plantest.CreatePhysicalMockNode("0"),
+					plantest.CreatePhysicalMockNode("1"),
+					plantest.CreatePhysicalMockNode("2"),
+					plantest.CreatePhysicalMockNode("3"),
 				},
 				Edges: [][2]int{
 					{0, 1},
@@ -67,11 +67,11 @@ func TestPlanTraversal(t *testing.T) {
 			//      0   2
 			plan: plantest.PlanSpec{
 				Nodes: []plan.PlanNode{
-					plantest.CreateLogicalMockNode("0"),
-					plantest.CreateLogicalMockNode("1"),
-					plantest.CreateLogicalMockNode("2"),
-					plantest.CreateLogicalMockNode("3"),
-					plantest.CreateLogicalMockNode("4"),
+					plantest.CreatePhysicalMockNode("0"),
+					plantest.CreatePhysicalMockNode("1"),
+					plantest.CreatePhysicalMockNode("2"),
+					plantest.CreatePhysicalMockNode("3"),
+					plantest.CreatePhysicalMockNode("4"),
 				},
 				Edges: [][2]int{
 					{0, 1},
@@ -95,14 +95,14 @@ func TestPlanTraversal(t *testing.T) {
 			//          0   2
 			plan: plantest.PlanSpec{
 				Nodes: []plan.PlanNode{
-					plantest.CreateLogicalMockNode("0"),
-					plantest.CreateLogicalMockNode("1"),
-					plantest.CreateLogicalMockNode("2"),
-					plantest.CreateLogicalMockNode("3"),
-					plantest.CreateLogicalMockNode("4"),
-					plantest.CreateLogicalMockNode("5"),
-					plantest.CreateLogicalMockNode("6"),
-					plantest.CreateLogicalMockNode("7"),
+					plantest.CreatePhysicalMockNode("0"),
+					plantest.CreatePhysicalMockNode("1"),
+					plantest.CreatePhysicalMockNode("2"),
+					plantest.CreatePhysicalMockNode("3"),
+					plantest.CreatePhysicalMockNode("4"),
+					plantest.CreatePhysicalMockNode("5"),
+					plantest.CreatePhysicalMockNode("6"),
+					plantest.CreatePhysicalMockNode("7"),
 				},
 				Edges: [][2]int{
 					{0, 1},

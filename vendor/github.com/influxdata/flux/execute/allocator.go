@@ -1,8 +1,7 @@
 package execute
 
 import (
-	"fmt"
-	"sync/atomic"
+	"github.com/influxdata/flux/memory"
 )
 
 const (
@@ -18,39 +17,17 @@ const (
 // The allocator provides methods similar to make and append, to allocate large slices of data.
 // The allocator also provides a Free method to account for when memory will be freed.
 type Allocator struct {
-	Limit          int64
-	bytesAllocated int64
-	maxAllocated   int64
-}
-
-func (a *Allocator) count(n, size int) (c int64) {
-	c = atomic.AddInt64(&a.bytesAllocated, int64(n*size))
-	for max := atomic.LoadInt64(&a.maxAllocated); c > max; max = atomic.LoadInt64(&a.maxAllocated) {
-		if atomic.CompareAndSwapInt64(&a.maxAllocated, max, c) {
-			return
-		}
-	}
-	return
+	*memory.Allocator
 }
 
 // Free informs the allocator that memory has been freed.
 func (a *Allocator) Free(n, size int) {
-	a.count(-n, size)
-}
-
-// Max reports the maximum amount of allocated memory at any point in the query.
-func (a *Allocator) Max() int64 {
-	return atomic.LoadInt64(&a.maxAllocated)
+	a.Allocator.Free(n * size)
 }
 
 func (a *Allocator) account(n, size int) {
-	if want := a.count(n, size); want > a.Limit {
-		allocated := a.count(-n, size)
-		panic(AllocError{
-			Limit:     a.Limit,
-			Allocated: allocated,
-			Wanted:    want - allocated,
-		})
+	if err := a.Allocator.Allocate(n * size); err != nil {
+		panic(err)
 	}
 }
 
@@ -241,14 +218,4 @@ func (a *Allocator) GrowTimes(slice []Time, n int) []Time {
 	diff := cap(s) - cap(slice)
 	a.account(diff, timeSize)
 	return s
-}
-
-type AllocError struct {
-	Limit     int64
-	Allocated int64
-	Wanted    int64
-}
-
-func (a AllocError) Error() string {
-	return fmt.Sprintf("allocation limit reached: limit %d, allocated: %d, wanted: %d", a.Limit, a.Allocated, a.Wanted)
 }

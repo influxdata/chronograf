@@ -3,10 +3,13 @@ package executetest
 import (
 	"testing"
 
+	"github.com/apache/arrow/go/arrow/array"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute"
+	"github.com/influxdata/flux/memory"
 )
 
 // AggFuncTestHelper splits the data in half, runs Do over each split and compares
@@ -17,9 +20,9 @@ func AggFuncTestHelper(t *testing.T, agg execute.Aggregate, data []float64, want
 	// Call Do twice, since this is possible according to the interface.
 	h := len(data) / 2
 	vf := agg.NewFloatAgg()
-	vf.DoFloat(data[:h])
+	vf.DoFloat(arrow.NewFloat(data[:h], &memory.Allocator{}))
 	if h < len(data) {
-		vf.DoFloat(data[h:])
+		vf.DoFloat(arrow.NewFloat(data[h:], &memory.Allocator{}))
 	}
 
 	var got interface{}
@@ -42,7 +45,7 @@ func AggFuncTestHelper(t *testing.T, agg execute.Aggregate, data []float64, want
 }
 
 // AggFuncBenchmarkHelper benchmarks the aggregate function over data and compares to wantValue
-func AggFuncBenchmarkHelper(b *testing.B, agg execute.Aggregate, data []float64, want interface{}) {
+func AggFuncBenchmarkHelper(b *testing.B, agg execute.Aggregate, data *array.Float64, want interface{}) {
 	b.Helper()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {

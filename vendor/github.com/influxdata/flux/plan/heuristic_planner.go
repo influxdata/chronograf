@@ -119,6 +119,11 @@ func (p *heuristicPlanner) Plan(inputPlan *PlanSpec) (*PlanSpec, error) {
 //   / \               / \
 //  D   E             D'  E'    <-- predecessors
 func updateSuccessors(plan *PlanSpec, oldNode, newNode PlanNode) {
+	// no need to update successors if the node hasn't actually changed
+	if oldNode == newNode {
+		return
+	}
+
 	newNode.ClearSuccessors()
 
 	if len(oldNode.Successors()) == 0 {

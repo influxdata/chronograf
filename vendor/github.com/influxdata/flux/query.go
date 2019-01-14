@@ -13,10 +13,11 @@ type Query interface {
 	// in which case the query should be inspected for an error using Err().
 	Ready() <-chan map[string]Result
 
-	// Done must always be called to free resources.
+	// Done must always be called to free resources. It is safe to call Done
+	// multiple times.
 	Done()
 
-	// Cancel will stop the query execution.
+	// Cancel will signal that query execution should stop.
 	// Done must still be called to free resources.
 	// It is safe to call Cancel multiple times.
 	Cancel()
@@ -53,4 +54,25 @@ type Statistics struct {
 	Concurrency int `json:"concurrency"`
 	// MaxAllocated is the maximum number of bytes the query allocated.
 	MaxAllocated int64 `json:"max_allocated"`
+
+	// ScannedValues is the number of values scanned.
+	ScannedValues int `json:"scanned_values"`
+	// ScannedBytes number of uncompressed bytes scanned.
+	ScannedBytes int `json:"scanned_bytes"`
+}
+
+// Add returns the sum of s and other.
+func (s Statistics) Add(other Statistics) Statistics {
+	return Statistics{
+		TotalDuration:   s.TotalDuration + other.TotalDuration,
+		CompileDuration: s.CompileDuration + other.CompileDuration,
+		QueueDuration:   s.QueueDuration + other.QueueDuration,
+		PlanDuration:    s.PlanDuration + other.PlanDuration,
+		RequeueDuration: s.RequeueDuration + other.RequeueDuration,
+		ExecuteDuration: s.ExecuteDuration + other.ExecuteDuration,
+		Concurrency:     s.Concurrency + other.Concurrency,
+		MaxAllocated:    s.MaxAllocated + other.MaxAllocated,
+		ScannedValues:   s.ScannedValues + other.ScannedValues,
+		ScannedBytes:    s.ScannedBytes + other.ScannedBytes,
+	}
 }

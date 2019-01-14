@@ -13,13 +13,13 @@ func Compile(f *semantic.FunctionExpression, in semantic.Type, builtins Scope) (
 	if in.Nature() != semantic.Object {
 		return nil, errors.New("function input must be an object")
 	}
-	declarations := externDeclarations(builtins)
+	declarations := externAssignments(builtins)
 	extern := &semantic.Extern{
-		Declarations: declarations,
-		Block:        &semantic.ExternBlock{Node: f},
+		Assignments: declarations,
+		Block:       &semantic.ExternBlock{Node: f},
 	}
 
-	typeSol, err := semantic.InferTypes(extern)
+	typeSol, err := semantic.InferTypes(extern, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func monoType(t semantic.Type, err error) semantic.Type {
 // compile recursively compiles semantic nodes into evaluators.
 func compile(n semantic.Node, typeSol semantic.TypeSolution, builtIns Scope, funcExprs map[string]*semantic.FunctionExpression) (Evaluator, error) {
 	switch n := n.(type) {
-	case *semantic.BlockStatement:
+	case *semantic.Block:
 		body := make([]Evaluator, len(n.Body))
 		for i, s := range n.Body {
 			node, err := compile(s, typeSol, builtIns, funcExprs)
@@ -88,7 +88,7 @@ func compile(n semantic.Node, typeSol semantic.TypeSolution, builtIns Scope, fun
 		return returnEvaluator{
 			Evaluator: node,
 		}, nil
-	case *semantic.NativeVariableDeclaration:
+	case *semantic.NativeVariableAssignment:
 		if fe, ok := n.Init.(*semantic.FunctionExpression); ok {
 			funcExprs[n.Identifier.Name] = fe
 			return &blockEvaluator{
@@ -112,8 +112,8 @@ func compile(n semantic.Node, typeSol semantic.TypeSolution, builtIns Scope, fun
 			if err != nil {
 				return nil, err
 			}
-			properties[p.Key.Name] = node
-			propertyTypes[p.Key.Name] = node.Type()
+			properties[p.Key.Key()] = node
+			propertyTypes[p.Key.Key()] = node.Type()
 		}
 		return &objEvaluator{
 			t:          semantic.NewObjectType(propertyTypes),
@@ -161,6 +161,20 @@ func compile(n semantic.Node, typeSol semantic.TypeSolution, builtIns Scope, fun
 			t:        monoType(typeSol.TypeOf(n)),
 			object:   object,
 			property: n.Property,
+		}, nil
+	case *semantic.IndexExpression:
+		arr, err := compile(n.Array, typeSol, builtIns, funcExprs)
+		if err != nil {
+			return nil, err
+		}
+		idx, err := compile(n.Index, typeSol, builtIns, funcExprs)
+		if err != nil {
+			return nil, err
+		}
+		return &arrayEvaluator{
+			t:     monoType(typeSol.TypeOf(n)),
+			array: arr,
+			index: idx,
 		}, nil
 	case *semantic.BooleanLiteral:
 		return &booleanEvaluator{
@@ -271,7 +285,7 @@ func compile(n semantic.Node, typeSol semantic.TypeSolution, builtIns Scope, fun
 			if n.Defaults != nil {
 				// Search for default value
 				for _, d := range n.Defaults.Properties {
-					if d.Key.Name == k {
+					if d.Key.Key() == k {
 						d, err := compile(d.Value, typeSol, builtIns, funcExprs)
 						if err != nil {
 							return nil, err
@@ -353,11 +367,11 @@ func CompileFnParam(fn *semantic.FunctionExpression, paramType, returnType seman
 	return compiled, paramName, nil
 }
 
-// externDeclarations produces a list of external declarations from a scope
-func externDeclarations(scope Scope) []*semantic.ExternalVariableDeclaration {
-	declarations := make([]*semantic.ExternalVariableDeclaration, 0, len(scope))
+// externAssignments produces a list of external declarations from a scope
+func externAssignments(scope Scope) []*semantic.ExternalVariableAssignment {
+	declarations := make([]*semantic.ExternalVariableAssignment, 0, len(scope))
 	for k, v := range scope {
-		declarations = append(declarations, &semantic.ExternalVariableDeclaration{
+		declarations = append(declarations, &semantic.ExternalVariableAssignment{
 			Identifier: &semantic.Identifier{Name: k},
 			ExternType: v.PolyType(),
 		})

@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/influxdata/flux/values"
-
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/compiler"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/interpreter"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
+	"github.com/influxdata/flux/values"
 )
 
 const FromGeneratorKind = "fromGenerator"
@@ -145,11 +145,11 @@ type GeneratorSource struct {
 	Start time.Time
 	Stop  time.Time
 	Count int64
-	alloc *execute.Allocator
+	alloc *memory.Allocator
 	Fn    compiler.Func
 }
 
-func NewGeneratorSource(a *execute.Allocator) *GeneratorSource {
+func NewGeneratorSource(a *memory.Allocator) *GeneratorSource {
 	return &GeneratorSource{alloc: a}
 }
 

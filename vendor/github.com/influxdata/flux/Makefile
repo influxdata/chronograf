@@ -11,7 +11,7 @@
 #    * All recursive Makefiles must support the targets: all and clean.
 #
 
-SUBDIRS = ast parser
+SUBDIRS = ast/asttest internal/scanner
 
 GO_ARGS=-tags '$(GO_TAGS)'
 
@@ -25,7 +25,6 @@ export GO_VET=env GO111MODULE=on go vet $(GO_ARGS)
 
 # List of utilities to build as part of the build process
 UTILS := \
-	bin/$(GOOS)/pigeon \
 	bin/$(GOOS)/cmpgen
 
 all: $(UTILS) $(SUBDIRS)
@@ -36,26 +35,27 @@ $(SUBDIRS): $(UTILS)
 clean: $(SUBDIRS)
 	rm -rf bin
 
-bin/$(GOOS)/pigeon: go.mod go.sum
-	$(GO_BUILD) -o $@ github.com/mna/pigeon
-
 bin/$(GOOS)/cmpgen: ./ast/asttest/cmpgen/main.go
 	$(GO_BUILD) -o $@ ./ast/asttest/cmpgen
 
 fmt: $(SOURCES_NO_VENDOR)
-	goimports -w $^
+	go fmt ./...
 
 checkfmt:
+	./etc/checkfmt.sh
+
+tidy:
 	GO111MODULE=on go mod tidy
-	@if ! git --no-pager diff --exit-code -- go.mod go.sum; then \
-		>&2 echo "modules are not tidy, please run 'go mod tidy'"; \
-		exit 1; \
-	fi
-	go fmt ./...
-	@if ! git --no-pager diff --quiet; then \
-		>&2 echo "files are not formatted, please run 'go fmt ./...'"; \
-		exit 1; \
-	fi
+
+checktidy:
+	./etc/checktidy.sh
+
+checkgenerate:
+	./etc/checkgenerate.sh
+
+staticcheck:
+	GO111MODULE=on go mod vendor # staticcheck looks in vendor for dependencies.
+	GO111MODULE=on go run honnef.co/go/tools/cmd/staticcheck ./...
 
 test:
 	$(GO_TEST) ./...
@@ -69,6 +69,25 @@ vet:
 bench:
 	$(GO_TEST) -bench=. -run=^$$ ./...
 
+release:
+	./release.sh
 
-.PHONY: all clean fmt test test-race vet bench checkfmt $(SUBDIRS)
+
+
+.PHONY: all \
+	clean \
+	fmt \
+	checkfmt \
+	tidy \
+	checktidt \
+	generate \
+	checkgenerate \
+	staticcheck \
+	test \
+	test-race \
+	vet \
+	bench \
+	checkfmt \
+	release \
+	$(SUBDIRS)
 

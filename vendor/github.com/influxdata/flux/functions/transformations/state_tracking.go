@@ -10,17 +10,18 @@ import (
 	"github.com/influxdata/flux/interpreter"
 	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
+	"github.com/influxdata/flux/values"
 	"github.com/pkg/errors"
 )
 
 const StateTrackingKind = "stateTracking"
 
 type StateTrackingOpSpec struct {
-	Fn            *semantic.FunctionExpression `json:"fn"`
-	CountLabel    string                       `json:"countLabel"`
-	DurationLabel string                       `json:"durationLabel"`
-	DurationUnit  flux.Duration                `json:"durationUnit"`
-	TimeColumn    string                       `json:"timeColumn"`
+	Fn             *semantic.FunctionExpression `json:"fn"`
+	CountColumn    string                       `json:"countColumn"`
+	DurationColumn string                       `json:"durationColumn"`
+	DurationUnit   flux.Duration                `json:"durationUnit"`
+	TimeColumn     string                       `json:"timeColumn"`
 }
 
 func init() {
@@ -33,10 +34,10 @@ func init() {
 				Required: semantic.LabelSet{"r"},
 				Return:   semantic.Bool,
 			}),
-			"countLabel":    semantic.String,
-			"durationLabel": semantic.String,
-			"durationUnit":  semantic.Duration,
-			"timeColumn":    semantic.String,
+			"countColumn":    semantic.String,
+			"durationColumn": semantic.String,
+			"durationUnit":   semantic.Duration,
+			"timeColumn":     semantic.String,
 		},
 		[]string{"fn"},
 	)
@@ -58,9 +59,9 @@ var stateTrackingBuiltin = `
 // expression evaluates as false, the value will be -1. If the expression
 // generates an error during evaluation, the point is discarded, and does not
 // affect the state count.
-stateCount = (fn, label="stateCount", tables=<-) =>
+stateCount = (fn, column="stateCount", tables=<-) =>
     tables
-        |> stateTracking(countLabel:label, fn:fn)
+        |> stateTracking(countColumn:column, fn:fn)
 
 // stateDuration computes the duration of a given state.
 // The state is defined via the function fn. For each consecutive point for
@@ -77,9 +78,9 @@ stateCount = (fn, label="stateCount", tables=<-) =>
 // state duration will be 0.
 //
 // The duration is represented as an integer in the units specified.
-stateDuration = (fn, label="stateDuration", unit=1s, tables=<-) =>
+stateDuration = (fn, column="stateDuration", unit=1s, tables=<-) =>
     tables
-        |> stateTracking(durationLabel:label, fn:fn, durationUnit:unit)
+        |> stateTracking(durationColumn:column, fn:fn, durationUnit:unit)
 `
 
 func createStateTrackingOpSpec(args flux.Arguments, a *flux.Administration) (flux.OperationSpec, error) {
@@ -102,15 +103,15 @@ func createStateTrackingOpSpec(args flux.Arguments, a *flux.Administration) (flu
 		DurationUnit: flux.Duration(time.Second),
 	}
 
-	if label, ok, err := args.GetString("countLabel"); err != nil {
+	if label, ok, err := args.GetString("countColumn"); err != nil {
 		return nil, err
 	} else if ok {
-		spec.CountLabel = label
+		spec.CountColumn = label
 	}
-	if label, ok, err := args.GetString("durationLabel"); err != nil {
+	if label, ok, err := args.GetString("durationColumn"); err != nil {
 		return nil, err
 	} else if ok {
-		spec.DurationLabel = label
+		spec.DurationColumn = label
 	}
 	if unit, ok, err := args.GetDuration("durationUnit"); err != nil {
 		return nil, err
@@ -125,7 +126,7 @@ func createStateTrackingOpSpec(args flux.Arguments, a *flux.Administration) (flu
 		spec.TimeColumn = execute.DefaultTimeColLabel
 	}
 
-	if spec.DurationLabel != "" && spec.DurationUnit <= 0 {
+	if spec.DurationColumn != "" && spec.DurationUnit <= 0 {
 		return nil, errors.New("state tracking duration unit must be greater than zero")
 	}
 	return spec, nil
@@ -142,8 +143,8 @@ func (s *StateTrackingOpSpec) Kind() flux.OperationKind {
 type StateTrackingProcedureSpec struct {
 	plan.DefaultCost
 	Fn *semantic.FunctionExpression
-	CountLabel,
-	DurationLabel string
+	CountColumn,
+	DurationColumn string
 	DurationUnit flux.Duration
 	TimeCol      string
 }
@@ -155,11 +156,11 @@ func newStateTrackingProcedure(qs flux.OperationSpec, pa plan.Administration) (p
 	}
 
 	return &StateTrackingProcedureSpec{
-		Fn:            spec.Fn,
-		CountLabel:    spec.CountLabel,
-		DurationLabel: spec.DurationLabel,
-		DurationUnit:  spec.DurationUnit,
-		TimeCol:       spec.TimeColumn,
+		Fn:             spec.Fn,
+		CountColumn:    spec.CountColumn,
+		DurationColumn: spec.DurationColumn,
+		DurationUnit:   spec.DurationUnit,
+		TimeCol:        spec.TimeColumn,
 	}, nil
 }
 
@@ -196,8 +197,8 @@ type stateTrackingTransformation struct {
 	fn *execute.RowPredicateFn
 
 	timeCol,
-	countLabel,
-	durationLabel string
+	countColumn,
+	durationColumn string
 
 	durationUnit int64
 }
@@ -208,13 +209,13 @@ func NewStateTrackingTransformation(d execute.Dataset, cache execute.TableBuilde
 		return nil, err
 	}
 	return &stateTrackingTransformation{
-		d:             d,
-		cache:         cache,
-		fn:            fn,
-		countLabel:    spec.CountLabel,
-		durationLabel: spec.DurationLabel,
-		durationUnit:  int64(spec.DurationUnit),
-		timeCol:       spec.TimeCol,
+		d:              d,
+		cache:          cache,
+		fn:             fn,
+		countColumn:    spec.CountColumn,
+		durationColumn: spec.DurationColumn,
+		durationUnit:   int64(spec.DurationUnit),
+		timeCol:        spec.TimeCol,
 	}, nil
 }
 
@@ -243,18 +244,18 @@ func (t *stateTrackingTransformation) Process(id execute.DatasetID, tbl flux.Tab
 	var countCol, durationCol = -1, -1
 
 	// Add new value columns
-	if t.countLabel != "" {
+	if t.countColumn != "" {
 		countCol, err = builder.AddCol(flux.ColMeta{
-			Label: t.countLabel,
+			Label: t.countColumn,
 			Type:  flux.TInt,
 		})
 		if err != nil {
 			return err
 		}
 	}
-	if t.durationLabel != "" {
+	if t.durationColumn != "" {
 		durationCol, err = builder.AddCol(flux.ColMeta{
-			Label: t.durationLabel,
+			Label: t.durationColumn,
 			Type:  flux.TInt,
 		})
 		if err != nil {
@@ -274,10 +275,10 @@ func (t *stateTrackingTransformation) Process(id execute.DatasetID, tbl flux.Tab
 		return fmt.Errorf("no column %q exists", t.timeCol)
 	}
 	// Append modified rows
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		l := cr.Len()
 		for i := 0; i < l; i++ {
-			tm := cr.Times(timeIdx)[i]
+			tm := values.Time(cr.Times(timeIdx).Value(i))
 			match, err := t.fn.Eval(i, cr)
 			if err != nil {
 				log.Printf("failed to evaluate state count expression: %v", err)
@@ -300,8 +301,8 @@ func (t *stateTrackingTransformation) Process(id execute.DatasetID, tbl flux.Tab
 				count++
 			}
 			colMap := make([]int, len(cr.Cols()))
-			colMap = execute.ColMap(colMap, builder, cr)
-			err = execute.AppendMappedRecordExplicit(i, cr, builder, colMap)
+			colMap = execute.ColMapArrow(colMap, builder, cr)
+			err = execute.AppendMappedRecordExplicitArrow(i, cr, builder, colMap)
 			if err != nil {
 				return err
 			}

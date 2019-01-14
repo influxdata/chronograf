@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/flux/values"
@@ -49,7 +50,7 @@ type indexSelectorTransformation struct {
 	selector IndexSelector
 }
 
-func NewRowSelectorTransformationAndDataset(id DatasetID, mode AccumulationMode, selector RowSelector, config SelectorConfig, a *Allocator) (*rowSelectorTransformation, Dataset) {
+func NewRowSelectorTransformationAndDataset(id DatasetID, mode AccumulationMode, selector RowSelector, config SelectorConfig, a *memory.Allocator) (*rowSelectorTransformation, Dataset) {
 	cache := NewTableBuilderCache(a)
 	d := NewDataset(id, mode, cache)
 	return NewRowSelectorTransformation(d, cache, selector, config), d
@@ -61,7 +62,7 @@ func NewRowSelectorTransformation(d Dataset, c TableBuilderCache, selector RowSe
 	}
 }
 
-func NewIndexSelectorTransformationAndDataset(id DatasetID, mode AccumulationMode, selector IndexSelector, config SelectorConfig, a *Allocator) (*indexSelectorTransformation, Dataset) {
+func NewIndexSelectorTransformationAndDataset(id DatasetID, mode AccumulationMode, selector IndexSelector, config SelectorConfig, a *memory.Allocator) (*indexSelectorTransformation, Dataset) {
 	cache := NewTableBuilderCache(a)
 	d := NewDataset(id, mode, cache)
 	return NewIndexSelectorTransformation(d, cache, selector, config), d

@@ -37,6 +37,7 @@ func (s *BucketsOpSpec) Kind() flux.OperationKind {
 }
 
 type BucketsProcedureSpec struct {
+	plan.DefaultCost
 }
 
 func newBucketsProcedure(qs flux.OperationSpec, pa plan.Administration) (plan.ProcedureSpec, error) {

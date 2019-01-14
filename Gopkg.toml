@@ -82,4 +82,4 @@ required = ["github.com/kevinburke/go-bindata","github.com/gogo/protobuf/proto",
 
 [[constraint]]
   name = "github.com/influxdata/flux"
-  version = "0.7.0"
+  version = "0.12.0"

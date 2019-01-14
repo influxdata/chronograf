@@ -174,17 +174,17 @@ func (t *shiftTransformation) Process(id execute.DatasetID, tbl flux.Table) erro
 		return err
 	}
 
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		for j, c := range cr.Cols() {
 			if execute.ContainsStr(t.columns, c.Label) {
 				l := cr.Len()
 				for i := 0; i < l; i++ {
-					if err := builder.AppendTime(j, cr.Times(j)[i].Add(t.shift)); err != nil {
+					if err := builder.AppendTime(j, execute.Time(cr.Times(j).Value(i)).Add(t.shift)); err != nil {
 						return err
 					}
 				}
 			} else {
-				if err := execute.AppendCol(j, j, cr, builder); err != nil {
+				if err := execute.AppendColArrow(j, j, cr, builder); err != nil {
 					return err
 				}
 			}

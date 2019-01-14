@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute/executetest"
 	"github.com/influxdata/flux/functions/transformations"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/querytest"
 )
 
@@ -66,10 +68,11 @@ func TestSkew_Process(t *testing.T) {
 }
 
 func BenchmarkSkew(b *testing.B) {
+	data := arrow.NewFloat(NormalData, &memory.Allocator{})
 	executetest.AggFuncBenchmarkHelper(
 		b,
 		new(transformations.SkewAgg),
-		NormalData,
+		data,
 		0.0032200673020400935,
 	)
 }

@@ -204,6 +204,9 @@ func (t *derivativeTransformation) Process(id execute.DatasetID, tbl flux.Table)
 	firstIdx := 1
 	return tbl.Do(func(cr flux.ColReader) error {
 		l := cr.Len()
+		if l == 0 {
+			return nil
+		}
 		for j, c := range cols {
 			d := derivatives[j]
 			switch c.Type {

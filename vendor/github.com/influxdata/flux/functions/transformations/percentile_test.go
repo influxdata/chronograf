@@ -5,9 +5,11 @@ import (
 	"testing"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/execute/executetest"
 	"github.com/influxdata/flux/functions/transformations"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/querytest"
 )
 
@@ -101,13 +103,13 @@ func TestPercentile_Process(t *testing.T) {
 			data:       NormalData,
 			percentile: 0.5,
 			exact:      true,
-			want:       9.997645059676595,
+			want:       10.000736834856248,
 		},
 		{
 			name:       "normal",
 			data:       NormalData,
 			percentile: 0.9,
-			want:       13.843815760607427,
+			want:       13.842132136909889,
 		},
 		{
 			name: "NaN",
@@ -390,13 +392,14 @@ func TestPercentileSelector_Process(t *testing.T) {
 }
 
 func BenchmarkPercentile(b *testing.B) {
+	data := arrow.NewFloat(NormalData, &memory.Allocator{})
 	executetest.AggFuncBenchmarkHelper(
 		b,
 		&transformations.PercentileAgg{
 			Quantile:    0.9,
 			Compression: 1000,
 		},
-		NormalData,
+		data,
 		13.843815760607427,
 	)
 }
