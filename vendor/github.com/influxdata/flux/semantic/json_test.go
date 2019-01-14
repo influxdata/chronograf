@@ -28,23 +28,37 @@ func TestJSONMarshal(t *testing.T) {
 					},
 				},
 			},
-			want: `{"type":"Program","body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
+			want: `{"type":"Program","package":null,"imports":null,"body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
 		},
 		{
-			name: "block statement",
-			node: &semantic.BlockStatement{
+			name: "program",
+			node: &semantic.Program{
+				Package: &semantic.PackageClause{
+					Name: &semantic.Identifier{Name: "foo"},
+				},
 				Body: []semantic.Statement{
 					&semantic.ExpressionStatement{
 						Expression: &semantic.StringLiteral{Value: "hello"},
 					},
 				},
 			},
-			want: `{"type":"BlockStatement","body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
+			want: `{"type":"Program","package":{"type":"PackageClause","name":{"type":"Identifier","name":"foo"}},"imports":null,"body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
+		},
+		{
+			name: "block",
+			node: &semantic.Block{
+				Body: []semantic.Statement{
+					&semantic.ExpressionStatement{
+						Expression: &semantic.StringLiteral{Value: "hello"},
+					},
+				},
+			},
+			want: `{"type":"Block","body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
 		},
 		{
 			name: "option statement",
 			node: &semantic.OptionStatement{
-				Declaration: &semantic.NativeVariableDeclaration{
+				Assignment: &semantic.NativeVariableAssignment{
 					Identifier: &semantic.Identifier{Name: "task"},
 					Init: &semantic.ObjectExpression{
 						Properties: []*semantic.Property{
@@ -72,7 +86,7 @@ func TestJSONMarshal(t *testing.T) {
 					},
 				},
 			},
-			want: `{"type":"OptionStatement","declaration":{"type":"NativeVariableDeclaration","identifier":{"type":"Identifier","name":"task"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"name"},"value":{"type":"StringLiteral","value":"foo"}},{"type":"Property","key":{"type":"Identifier","name":"every"},"value":{"type":"DurationLiteral","value":"1h0m0s"}},{"type":"Property","key":{"type":"Identifier","name":"delay"},"value":{"type":"DurationLiteral","value":"10m0s"}},{"type":"Property","key":{"type":"Identifier","name":"cron"},"value":{"type":"StringLiteral","value":"0 2 * * *"}},{"type":"Property","key":{"type":"Identifier","name":"retry"},"value":{"type":"IntegerLiteral","value":"5"}}]}}}`,
+			want: `{"type":"OptionStatement","assignment":{"type":"NativeVariableAssignment","identifier":{"type":"Identifier","name":"task"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"name"},"value":{"type":"StringLiteral","value":"foo"}},{"type":"Property","key":{"type":"Identifier","name":"every"},"value":{"type":"DurationLiteral","value":"1h0m0s"}},{"type":"Property","key":{"type":"Identifier","name":"delay"},"value":{"type":"DurationLiteral","value":"10m0s"}},{"type":"Property","key":{"type":"Identifier","name":"cron"},"value":{"type":"StringLiteral","value":"0 2 * * *"}},{"type":"Property","key":{"type":"Identifier","name":"retry"},"value":{"type":"IntegerLiteral","value":"5"}}]}}}`,
 		},
 		{
 			name: "expression statement",
@@ -89,12 +103,12 @@ func TestJSONMarshal(t *testing.T) {
 			want: `{"type":"ReturnStatement","argument":{"type":"StringLiteral","value":"hello"}}`,
 		},
 		{
-			name: "variable declaration",
-			node: &semantic.NativeVariableDeclaration{
+			name: "variable assignment",
+			node: &semantic.NativeVariableAssignment{
 				Identifier: &semantic.Identifier{Name: "a"},
 				Init:       &semantic.StringLiteral{Value: "hello"},
 			},
-			want: `{"type":"NativeVariableDeclaration","identifier":{"type":"Identifier","name":"a"},"init":{"type":"StringLiteral","value":"hello"}}`,
+			want: `{"type":"NativeVariableAssignment","identifier":{"type":"Identifier","name":"a"},"init":{"type":"StringLiteral","value":"hello"}}`,
 		},
 		{
 			name: "call expression",
@@ -111,6 +125,14 @@ func TestJSONMarshal(t *testing.T) {
 				Property: "hello",
 			},
 			want: `{"type":"MemberExpression","object":{"type":"IdentifierExpression","name":"a"},"property":"hello"}`,
+		},
+		{
+			name: "index expression",
+			node: &semantic.IndexExpression{
+				Array: &semantic.IdentifierExpression{Name: "a"},
+				Index: &semantic.IntegerLiteral{Value: 3},
+			},
+			want: `{"type":"IndexExpression","array":{"type":"IdentifierExpression","name":"a"},"index":{"type":"IntegerLiteral","value":"3"}}`,
 		},
 		{
 			name: "function expression",
@@ -184,6 +206,14 @@ func TestJSONMarshal(t *testing.T) {
 				Value: &semantic.StringLiteral{Value: "hello"},
 			},
 			want: `{"type":"Property","key":{"type":"Identifier","name":"a"},"value":{"type":"StringLiteral","value":"hello"}}`,
+		},
+		{
+			name: "string key property",
+			node: &semantic.Property{
+				Key:   &semantic.StringLiteral{Value: "a"},
+				Value: &semantic.StringLiteral{Value: "hello"},
+			},
+			want: `{"type":"Property","key":{"type":"StringLiteral","value":"a"},"value":{"type":"StringLiteral","value":"hello"}}`,
 		},
 		{
 			name: "identifier",

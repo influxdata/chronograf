@@ -143,7 +143,7 @@ func (t *filterTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 	}
 
 	// Append only matching rows to table
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		l := cr.Len()
 		for i := 0; i < l; i++ {
 			if pass, err := t.fn.Eval(i, cr); err != nil {
@@ -153,7 +153,7 @@ func (t *filterTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 				// No match, skipping
 				continue
 			}
-			if err := execute.AppendRecord(i, cr, builder); err != nil {
+			if err := execute.AppendRecordArrow(i, cr, builder); err != nil {
 				return err
 			}
 		}

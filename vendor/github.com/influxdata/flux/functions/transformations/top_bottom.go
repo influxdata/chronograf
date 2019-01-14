@@ -30,77 +30,77 @@ bottom = (n, columns=["_value"], tables=<-) =>
 // _highestOrLowest is a helper function, which reduces all groups into a single group by specific tags and a reducer function,
 // then it selects the highest or lowest records based on the columns and the _sortLimit function.
 // The default reducer assumes no reducing needs to be performed.
-_highestOrLowest = (n, _sortLimit, reducer, columns=["_value"], by=[], tables=<-) =>
+_highestOrLowest = (n, _sortLimit, reducer, columns=["_value"], groupColumns=[], tables=<-) =>
     tables
-        |> group(by:by)
+        |> group(columns:groupColumns)
         |> reducer()
-        |> group(none:true)
+        |> group(columns:[])
         |> _sortLimit(n:n, columns:columns)
 
 // highestMax returns the top N records from all groups using the maximum of each group.
-highestMax = (n, columns=["_value"], by=[], tables=<-) =>
+highestMax = (n, columns=["_value"], groupColumns=[], tables=<-) =>
     tables
         |> _highestOrLowest(
                 n:n,
                 columns:columns,
-                by:by,
+                groupColumns:groupColumns,
                 // TODO(nathanielc): Once max/min support selecting based on multiple columns change this to pass all columns.
                 reducer: (tables=<-) => tables |> max(column:columns[0]),
                 _sortLimit: top,
             )
 
 // highestAverage returns the top N records from all groups using the average of each group.
-highestAverage = (n, columns=["_value"], by=[], tables=<-) =>
+highestAverage = (n, columns=["_value"], groupColumns=[], tables=<-) =>
     tables
         |> _highestOrLowest(
                 n:n,
                 columns:columns,
-                by:by,
+                groupColumns:groupColumns,
                 reducer: (tables=<-) => tables |> mean(columns:[columns[0]]),
                 _sortLimit: top,
             )
 
 // highestCurrent returns the top N records from all groups using the last value of each group.
-highestCurrent = (n, columns=["_value"], by=[], tables=<-) =>
+highestCurrent = (n, columns=["_value"], groupColumns=[], tables=<-) =>
     tables
         |> _highestOrLowest(
                 n:n,
                 columns:columns,
-                by:by,
-                reducer: (tables=<-) => tables |> mean(columns:columns),
+                groupColumns:groupColumns,
+                reducer: (tables=<-) => tables |> last(column:columns[0]),
                 _sortLimit: top,
             )
 
 // lowestMin returns the bottom N records from all groups using the minimum of each group.
-lowestMin = (n, columns=["_value"], by=[], tables=<-) =>
+lowestMin = (n, columns=["_value"], groupColumns=[], tables=<-) =>
     tables
         |> _highestOrLowest(
                 n:n,
                 columns:columns,
-                by:by,
+                groupColumns:groupColumns,
                 // TODO(nathanielc): Once max/min support selecting based on multiple columns change this to pass all columns.
                 reducer: (tables=<-) => tables |> min(column:columns[0]),
                 _sortLimit: bottom,
             )
 
 // lowestAverage returns the bottom N records from all groups using the average of each group.
-lowestAverage = (n, columns=["_value"], by=[], tables=<-) =>
+lowestAverage = (n, columns=["_value"], groupColumns=[], tables=<-) =>
     tables
         |> _highestOrLowest(
                 n:n,
                 columns:columns,
-                by:by,
-                reducer: (tables=<-) => tables |> mean(columns:columns),
+                groupColumns:groupColumns,
+                reducer: (tables=<-) => tables |> mean(columns:[columns[0]]),
                 _sortLimit: bottom,
             )
 
 // lowestCurrent returns the bottom N records from all groups using the last value of each group.
-lowestCurrent = (n, columns=["_value"], by=[], tables=<-) =>
+lowestCurrent = (n, columns=["_value"], groupColumns=[], tables=<-) =>
     tables
         |> _highestOrLowest(
                 n:n,
                 columns:columns,
-                by:by,
+                groupColumns:groupColumns,
                 reducer: (tables=<-) => tables |> last(column:columns[0]),
                 _sortLimit: bottom,
             )

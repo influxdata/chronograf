@@ -27,6 +27,33 @@ func CreatePlanSpec(spec *PlanSpec) *plan.PlanSpec {
 	return createPlanSpec(spec.Nodes, spec.Edges, spec.Resources, spec.Now)
 }
 
+// Copy makes a copy of a PlanSpec.
+func (ps *PlanSpec) Copy() *PlanSpec {
+	cps := new(PlanSpec)
+
+	cps.Nodes = make([]plan.PlanNode, len(ps.Nodes))
+	for i := range ps.Nodes {
+		cps.Nodes[i] = copyNode(ps.Nodes[i])
+	}
+
+	cps.Edges = make([][2]int, len(ps.Edges))
+	copy(cps.Edges, ps.Edges)
+	cps.Resources = ps.Resources
+	cps.Now = ps.Now
+	return cps
+}
+
+func copyNode(n plan.PlanNode) plan.PlanNode {
+	var cn plan.PlanNode
+	switch n := n.(type) {
+	case *plan.LogicalPlanNode:
+		cn = plan.CreateLogicalNode(n.ID(), n.ProcedureSpec().Copy())
+	case *plan.PhysicalPlanNode:
+		cn = plan.CreatePhysicalNode(n.ID(), n.ProcedureSpec().Copy().(plan.PhysicalProcedureSpec))
+	}
+	return cn
+}
+
 func createPlanSpec(nodes []plan.PlanNode, edges [][2]int, resources flux.ResourceManagement, now time.Time) *plan.PlanSpec {
 	predecessors := make(map[plan.PlanNode][]plan.PlanNode)
 	successors := make(map[plan.PlanNode][]plan.PlanNode)

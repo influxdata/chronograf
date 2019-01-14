@@ -333,10 +333,10 @@ func (t *fixedWindowTransformation) Process(id execute.DatasetID, tbl flux.Table
 		}
 	}
 
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		l := cr.Len()
 		for i := 0; i < l; i++ {
-			tm := cr.Times(timeIdx)[i]
+			tm := values.Time(cr.Times(timeIdx).Value(i))
 			bounds := t.getWindowBounds(tm)
 
 			for _, bnds := range bounds {
@@ -362,7 +362,7 @@ func (t *fixedWindowTransformation) Process(id execute.DatasetID, tbl flux.Table
 							return err
 						}
 					default:
-						if err := builder.AppendValue(j, execute.ValueForRow(cr, i, j)); err != nil {
+						if err := builder.AppendValue(j, execute.ValueForRowArrow(cr, i, j)); err != nil {
 							return err
 						}
 					}

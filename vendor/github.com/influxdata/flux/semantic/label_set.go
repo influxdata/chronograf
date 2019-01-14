@@ -84,24 +84,12 @@ func (s LabelSet) intersect(o LabelSet) LabelSet {
 	return intersect
 }
 
-func (a LabelSet) isSuperSet(b LabelSet) bool {
-	if a.isAllLabels() {
-		return true
-	}
-	if b.isAllLabels() {
-		return false
-	}
-	for _, l := range b {
-		if !a.contains(l) {
-			return false
-		}
-	}
-	return true
-}
-
 func (a LabelSet) diff(b LabelSet) LabelSet {
 	if a.isAllLabels() {
 		return a
+	}
+	if b.isAllLabels() {
+		return nil
 	}
 	diff := make(LabelSet, 0, len(a))
 	for _, l := range a {

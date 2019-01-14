@@ -4,8 +4,10 @@ import (
 	"testing"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute/executetest"
 	"github.com/influxdata/flux/functions/transformations"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/querytest"
 )
 
@@ -32,10 +34,11 @@ func TestSpread_Process(t *testing.T) {
 }
 
 func BenchmarkSpread(b *testing.B) {
+	data := arrow.NewFloat(NormalData, &memory.Allocator{})
 	executetest.AggFuncBenchmarkHelper(
 		b,
 		new(transformations.SpreadAgg),
-		NormalData,
+		data,
 		28.227196461851847,
 	)
 }

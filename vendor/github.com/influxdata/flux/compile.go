@@ -75,7 +75,7 @@ func Eval(itrp *interpreter.Interpreter, q string) error {
 		return err
 	}
 
-	if err := itrp.Eval(semProg); err != nil {
+	if err := itrp.Eval(semProg, nil); err != nil {
 		return err
 	}
 	return nil
@@ -238,7 +238,7 @@ func evalBuiltInScripts() error {
 			return errors.Wrapf(err, "failed to create semantic graph for builtin %q", name)
 		}
 
-		if err := itrp.Eval(semProg); err != nil {
+		if err := itrp.Eval(semProg, nil); err != nil {
 			return errors.Wrapf(err, "failed to evaluate builtin %q", name)
 		}
 	}

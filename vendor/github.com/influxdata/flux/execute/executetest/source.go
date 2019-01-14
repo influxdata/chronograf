@@ -3,6 +3,7 @@ package executetest
 import (
 	"context"
 
+	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
 	uuid "github.com/satori/go.uuid"
@@ -58,6 +59,14 @@ func (src *FromProcedureSpec) Run(ctx context.Context) {
 		t.UpdateWatermark(id, max)
 		t.Finish(id, nil)
 	}
+}
+
+func (src *FromProcedureSpec) Statistics() flux.Statistics {
+	var stats flux.Statistics
+	for _, tbl := range src.data {
+		stats = stats.Add(tbl.Statistics())
+	}
+	return stats
 }
 
 func CreateFromSource(spec plan.ProcedureSpec, id execute.DatasetID, a execute.Administration) (execute.Source, error) {

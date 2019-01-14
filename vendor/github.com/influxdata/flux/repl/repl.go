@@ -147,7 +147,7 @@ func (r *REPL) executeLine(t string) (values.Value, error) {
 		return nil, err
 	}
 
-	if err := r.interpreter.Eval(semProg); err != nil {
+	if err := r.interpreter.Eval(semProg, nil); err != nil {
 		return nil, err
 	}
 
@@ -182,7 +182,7 @@ func (r *REPL) doQuery(spec *flux.Spec) error {
 	if err != nil {
 		return err
 	}
-	defer results.Cancel()
+	defer results.Release()
 
 	for results.More() {
 		result := results.Next()

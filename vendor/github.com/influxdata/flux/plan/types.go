@@ -8,8 +8,6 @@ import (
 	"github.com/influxdata/flux"
 )
 
-const DefaultYieldName = "_result"
-
 // PlanNode defines the common interface for interacting with
 // logical and physical plan nodes.
 type PlanNode interface {
@@ -65,6 +63,79 @@ func NewPlanSpec() *PlanSpec {
 func (plan *PlanSpec) Replace(root, with PlanNode) {
 	delete(plan.Roots, root)
 	plan.Roots[with] = struct{}{}
+}
+
+// CheckIntegrity checks the integrity of the plan, i.e.:
+//  - node A is predecessor of B iff B is successor of A;
+//  - there is no cycle.
+//
+// This check only detects this problem (N2 is predecessor of R, but not viceversa):
+//
+//     N1 <----> R
+//               |
+//     N2 <-------
+//
+// And this one (R is successor of N2, but not viceversa):
+//
+//     N1 <-------
+//     |         |--> R
+//     N2 --------
+//
+// But not this one, because N2 is not reachable from R (root):
+//
+//     N1 <-------
+//               |--> R
+//     N2 --------
+//
+func (plan *PlanSpec) CheckIntegrity() error {
+	sinks := make([]PlanNode, 0, len(plan.Roots))
+	for root := range plan.Roots {
+		sinks = append(sinks, root)
+	}
+	sources := make([]PlanNode, 0)
+
+	fn := func(node PlanNode) error {
+		if len(node.Predecessors()) == 0 {
+			sources = append(sources, node)
+		}
+
+		return symmetryCheck(node)
+	}
+
+	err := WalkPredecessors(sinks, fn)
+	if err != nil {
+		return err
+	}
+
+	return WalkSuccessors(sources, symmetryCheck)
+}
+
+func symmetryCheck(node PlanNode) error {
+	for _, pred := range node.Predecessors() {
+		if !isNodeInNodes(node, pred.Successors()) {
+			return fmt.Errorf("integrity violated: %s is predecessor of %s, "+
+				"but %s is not successor of %s", pred.ID(), node.ID(), node.ID(), pred.ID())
+		}
+	}
+
+	for _, succ := range node.Successors() {
+		if !isNodeInNodes(node, succ.Predecessors()) {
+			return fmt.Errorf("integrity violated: %s is successor of %s, "+
+				"but %s is not predecessor of %s`", succ.ID(), node.ID(), node.ID(), succ.ID())
+		}
+	}
+
+	return nil
+}
+
+func isNodeInNodes(node PlanNode, nodes []PlanNode) bool {
+	for _, n := range nodes {
+		if n == node {
+			return true
+		}
+	}
+
+	return false
 }
 
 // ProcedureSpec specifies a query operation
@@ -224,6 +295,33 @@ func SwapPlanNodes(top, bottom PlanNode) (PlanNode, error) {
 	bottom.AddPredecessors(newBottom)
 	bottom.ClearSuccessors()
 	return bottom, nil
+}
+
+// ReplaceNode accepts two nodes and attaches
+// all the predecessors of the old node to the new node.
+//
+//     S1   S2        S1   S2
+//       \ /
+//     oldNode   =>   newNode
+//       / \            / \
+//     P1   P2        P1   P2
+//
+// As is convention, newNode will not have any successors attached.
+// The planner will take care of this.
+func ReplaceNode(oldNode, newNode PlanNode) {
+	newNode.ClearPredecessors()
+	newNode.ClearSuccessors()
+
+	newNode.AddPredecessors(oldNode.Predecessors()...)
+	for _, pred := range newNode.Predecessors() {
+		for i, predSucc := range pred.Successors() {
+			if predSucc == oldNode {
+				pred.Successors()[i] = newNode
+			}
+		}
+	}
+
+	oldNode.ClearPredecessors()
 }
 
 type WindowSpec struct {

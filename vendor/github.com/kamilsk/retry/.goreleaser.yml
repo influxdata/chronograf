@@ -1,0 +1,49 @@
+archive:
+  files:
+  - LICENSE
+  format: tar.gz
+  format_overrides:
+  - goos:   windows
+    format: zip
+  name_template: "{{.Binary}}_{{.Version}}_{{.Os}}-{{.Arch}}"
+  replacements:
+    386:    32bit
+    amd64:  64bit
+
+    darwin:  macOS
+    linux:   Linux
+    windows: Windows
+
+brew:
+  caveats: Use `retry --help` to see detailed help message
+  commit_author:
+    name:  Kamil Samigullin
+    email: kamil@samigullin.info
+  description: Functional mechanism based on channels to perform actions repetitively until successful.
+  folder: Formula
+  github:
+    name:  homebrew-tap
+    owner: kamilsk
+  homepage: https://github.com/kamilsk/retry
+
+build:
+  binary: retry
+  env:
+  - CGO_ENABLED=0
+  goarch:
+  - 386
+  - amd64
+  goos:
+  - darwin
+  - linux
+  - windows
+  ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+  main: ./cmd/retry
+
+checksum: { name_template: checksums.txt }
+
+release:
+  draft: false
+  github:
+    name:  retry
+    owner: kamilsk

@@ -1,6 +1,7 @@
 package executetest
 
 import (
+	"math"
 	"sort"
 	"testing"
 
@@ -8,7 +9,38 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
+	"gonum.org/v1/gonum/floats"
 )
+
+// Two floating point values are considered
+// equal if they are within tol of each other.
+const tol float64 = 1e-25
+
+// The maximum number of floating point values that are allowed
+// to lie between two float64s and still be considered equal.
+const ulp uint = 2
+
+// Comparison options for floating point values.
+// NaNs are considered equal, and float64s must
+// be sufficiently close to be considered equal.
+var floatOptions = cmp.Options{
+	cmpopts.EquateNaNs(),
+	cmp.FilterValues(func(x, y float64) bool {
+		return !math.IsNaN(x) && !math.IsNaN(y)
+	}, cmp.Comparer(func(x, y float64) bool {
+		// If sufficiently close, then move on.
+		// This avoids situations close to zero.
+		if floats.EqualWithinAbs(x, y, tol) {
+			return true
+		}
+		// If not sufficiently close, both floats
+		// must be within ulp steps of each other.
+		if !floats.EqualWithinULP(x, y, ulp) {
+			return false
+		}
+		return true
+	})),
+}
 
 func ProcessTestHelper(
 	t *testing.T,
@@ -50,7 +82,7 @@ func ProcessTestHelper(
 	sort.Sort(SortedTables(got))
 	sort.Sort(SortedTables(want))
 
-	if !cmp.Equal(want, got, cmpopts.EquateNaNs()) {
+	if !cmp.Equal(want, got, floatOptions) {
 		t.Errorf("unexpected tables -want/+got\n%s", cmp.Diff(want, got))
 	}
 }

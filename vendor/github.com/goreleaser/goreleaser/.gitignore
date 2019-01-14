@@ -1,0 +1,7 @@
+dist/
+!internal/pipe/dist
+bin/
+coverage.txt
+goreleaser
+debug.test
+snap.login

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/apache/arrow/go/arrow/array"
+	arrowmath "github.com/apache/arrow/go/arrow/math"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
@@ -100,24 +102,25 @@ func (a *MeanAgg) NewStringAgg() execute.DoStringAgg {
 	return nil
 }
 
-func (a *MeanAgg) DoInt(vs []int64) {
-	a.count += float64(len(vs))
-	for _, v := range vs {
-		//TODO handle overflow
-		a.sum += float64(v)
+func (a *MeanAgg) DoInt(vs *array.Int64) {
+	// https://issues.apache.org/jira/browse/ARROW-4081
+	if vs.Len() > 0 {
+		a.count += float64(vs.Len())
+		a.sum += float64(arrowmath.Int64.Sum(vs))
 	}
 }
-func (a *MeanAgg) DoUInt(vs []uint64) {
-	a.count += float64(len(vs))
-	for _, v := range vs {
-		//TODO handle overflow
-		a.sum += float64(v)
+func (a *MeanAgg) DoUInt(vs *array.Uint64) {
+	// https://issues.apache.org/jira/browse/ARROW-4081
+	if vs.Len() > 0 {
+		a.count += float64(vs.Len())
+		a.sum += float64(arrowmath.Uint64.Sum(vs))
 	}
 }
-func (a *MeanAgg) DoFloat(vs []float64) {
-	a.count += float64(len(vs))
-	for _, v := range vs {
-		a.sum += v
+func (a *MeanAgg) DoFloat(vs *array.Float64) {
+	// https://issues.apache.org/jira/browse/ARROW-4081
+	if vs.Len() > 0 {
+		a.count += float64(vs.Len())
+		a.sum += arrowmath.Float64.Sum(vs)
 	}
 }
 func (a *MeanAgg) Type() flux.ColType {

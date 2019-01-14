@@ -3,6 +3,7 @@ package flux
 import (
 	"io"
 
+	"github.com/apache/arrow/go/arrow/array"
 	"github.com/influxdata/flux/iocounter"
 	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/flux/values"
@@ -13,10 +14,13 @@ type Result interface {
 	Name() string
 	// Tables returns a TableIterator for iterating through results
 	Tables() TableIterator
+	// Statistics returns statistics collected the processing of the result.
+	Statistics() Statistics
 }
 
 type TableIterator interface {
 	Do(f func(Table) error) error
+	Statistics() Statistics
 }
 
 type Table interface {
@@ -28,12 +32,19 @@ type Table interface {
 	// The function f will be called zero or more times.
 	Do(f func(ColReader) error) error
 
+	// DoArrow calls f to process the data contained within the table.
+	// It uses the arrow buffers.
+	DoArrow(f func(ArrowColReader) error) error
+
 	// RefCount modifies the reference count on the table by n.
 	// When the RefCount goes to zero, the table is freed.
 	RefCount(n int)
 
 	// Empty returns whether the table contains no records.
 	Empty() bool
+
+	// Stats returns collected statistics about this table during processing.
+	Statistics() Statistics
 }
 
 // ColMeta contains the information about the column metadata.
@@ -116,6 +127,24 @@ type ColReader interface {
 	Floats(j int) []float64
 	Strings(j int) []string
 	Times(j int) []values.Time
+}
+
+// ArrowColReader allows access to reading arrow buffers of column data.
+// All data the ArrowColReader exposes is guaranteed to be in memory.
+// Once an ArrowColReader goes out of scope, all slices are considered invalid.
+type ArrowColReader interface {
+	Key() GroupKey
+	// Cols returns a list of column metadata.
+	Cols() []ColMeta
+	// Len returns the length of the slices.
+	// All slices will have the same length.
+	Len() int
+	Bools(j int) *array.Boolean
+	Ints(j int) *array.Int64
+	UInts(j int) *array.Uint64
+	Floats(j int) *array.Float64
+	Strings(j int) *array.Binary
+	Times(j int) *array.Int64
 }
 
 type GroupKey interface {

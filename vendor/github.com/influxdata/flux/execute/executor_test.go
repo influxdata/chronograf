@@ -21,6 +21,8 @@ import (
 
 func init() {
 	execute.RegisterSource("from-test", executetest.CreateFromSource)
+	execute.RegisterTransformation(executetest.ToTestKind, executetest.CreateToTransformation)
+	plan.RegisterProcedureSpecWithSideEffect(executetest.ToTestKind, executetest.NewToProcedure, executetest.ToTestKind)
 }
 
 func TestExecutor_Execute(t *testing.T) {
@@ -592,6 +594,51 @@ func TestExecutor_Execute(t *testing.T) {
 					},
 					Data: [][]interface{}{
 						{execute.Time(0), execute.Time(5), 15.0},
+					},
+				}},
+			},
+		},
+		{
+			name: "terminal output function",
+			spec: &plantest.PlanSpec{
+				Nodes: []plan.PlanNode{
+					plan.CreatePhysicalNode("from-test", executetest.NewFromProcedureSpec(
+						[]*executetest.Table{&executetest.Table{
+							KeyCols: []string{"_start", "_stop"},
+							ColMeta: []flux.ColMeta{
+								{Label: "_start", Type: flux.TTime},
+								{Label: "_stop", Type: flux.TTime},
+								{Label: "_time", Type: flux.TTime},
+								{Label: "_value", Type: flux.TFloat},
+							},
+							Data: [][]interface{}{
+								{execute.Time(0), execute.Time(5), execute.Time(0), 1.0},
+								{execute.Time(0), execute.Time(5), execute.Time(1), 2.0},
+								{execute.Time(0), execute.Time(5), execute.Time(2), 3.0},
+								{execute.Time(0), execute.Time(5), execute.Time(3), 4.0},
+								{execute.Time(0), execute.Time(5), execute.Time(4), 5.0},
+							},
+						}},
+					)),
+					plan.CreatePhysicalNode("to", &executetest.ToProcedureSpec{}),
+				},
+				Edges: [][2]int{{0, 1}},
+			},
+			want: map[string][]*executetest.Table{
+				"to": []*executetest.Table{&executetest.Table{
+					KeyCols: []string{"_start", "_stop"},
+					ColMeta: []flux.ColMeta{
+						{Label: "_start", Type: flux.TTime},
+						{Label: "_stop", Type: flux.TTime},
+						{Label: "_time", Type: flux.TTime},
+						{Label: "_value", Type: flux.TFloat},
+					},
+					Data: [][]interface{}{
+						{execute.Time(0), execute.Time(5), execute.Time(0), 1.0},
+						{execute.Time(0), execute.Time(5), execute.Time(1), 2.0},
+						{execute.Time(0), execute.Time(5), execute.Time(2), 3.0},
+						{execute.Time(0), execute.Time(5), execute.Time(3), 4.0},
+						{execute.Time(0), execute.Time(5), execute.Time(4), 5.0},
 					},
 				}},
 			},

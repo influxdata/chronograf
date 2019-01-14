@@ -3,6 +3,8 @@ package transformations
 import (
 	"fmt"
 
+	"github.com/apache/arrow/go/arrow/array"
+	"github.com/apache/arrow/go/arrow/math"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
@@ -105,9 +107,10 @@ type SumIntAgg struct {
 	sum int64
 }
 
-func (a *SumIntAgg) DoInt(vs []int64) {
-	for _, v := range vs {
-		a.sum += v
+func (a *SumIntAgg) DoInt(vs *array.Int64) {
+	// https://issues.apache.org/jira/browse/ARROW-4081
+	if vs.Len() > 0 {
+		a.sum += math.Int64.Sum(vs)
 	}
 }
 func (a *SumIntAgg) Type() flux.ColType {
@@ -121,9 +124,10 @@ type SumUIntAgg struct {
 	sum uint64
 }
 
-func (a *SumUIntAgg) DoUInt(vs []uint64) {
-	for _, v := range vs {
-		a.sum += v
+func (a *SumUIntAgg) DoUInt(vs *array.Uint64) {
+	// https://issues.apache.org/jira/browse/ARROW-4081
+	if vs.Len() > 0 {
+		a.sum += math.Uint64.Sum(vs)
 	}
 }
 func (a *SumUIntAgg) Type() flux.ColType {
@@ -137,9 +141,10 @@ type SumFloatAgg struct {
 	sum float64
 }
 
-func (a *SumFloatAgg) DoFloat(vs []float64) {
-	for _, v := range vs {
-		a.sum += v
+func (a *SumFloatAgg) DoFloat(vs *array.Float64) {
+	// https://issues.apache.org/jira/browse/ARROW-4081
+	if vs.Len() > 0 {
+		a.sum += math.Float64.Sum(vs)
 	}
 }
 func (a *SumFloatAgg) Type() flux.ColType {

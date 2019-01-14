@@ -113,9 +113,9 @@ func ConvertFromKind(k semantic.Nature) flux.ColType {
 	}
 }
 
-func (f *rowFn) eval(row int, cr flux.ColReader) (values.Value, error) {
+func (f *rowFn) eval(row int, cr flux.ArrowColReader) (values.Value, error) {
 	for _, r := range f.references {
-		f.record.Set(r, ValueForRow(cr, row, f.recordCols[r]))
+		f.record.Set(r, ValueForRowArrow(cr, row, f.recordCols[r]))
 	}
 	f.inRecord.Set(f.recordName, f.record)
 	return f.preparedFn.Eval(f.inRecord)
@@ -146,7 +146,7 @@ func (f *RowPredicateFn) Prepare(cols []flux.ColMeta) error {
 	return nil
 }
 
-func (f *RowPredicateFn) Eval(row int, cr flux.ColReader) (bool, error) {
+func (f *RowPredicateFn) Eval(row int, cr flux.ArrowColReader) (bool, error) {
 	v, err := f.rowFn.eval(row, cr)
 	if err != nil {
 		return false, err
@@ -193,7 +193,7 @@ func (f *RowMapFn) Type() semantic.Type {
 	return f.preparedFn.Type()
 }
 
-func (f *RowMapFn) Eval(row int, cr flux.ColReader) (values.Object, error) {
+func (f *RowMapFn) Eval(row int, cr flux.ArrowColReader) (values.Object, error) {
 	v, err := f.rowFn.eval(row, cr)
 	if err != nil {
 		return nil, err

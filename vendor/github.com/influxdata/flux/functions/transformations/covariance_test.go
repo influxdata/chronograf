@@ -11,6 +11,10 @@ import (
 	"github.com/influxdata/flux/querytest"
 )
 
+func init() {
+	flux.FinalizeBuiltIns()
+}
+
 func TestCovariance_NewQuery(t *testing.T) {
 	tests := []querytest.NewQueryTestCase{
 		{

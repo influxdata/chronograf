@@ -1,10 +1,12 @@
 package flux
 
-import "sort"
+import (
+	"sort"
+)
 
-// ResultIterator allows iterating through all results
-// Cancel must be called to free resources.
-// ResultIterators may implement Statisticser.
+// ResultIterator allows iterating through all results synchronously.
+// A ResultIterator is not thread-safe and all of the methods are expected to be
+// called within the same goroutine. A ResultIterator may implement Statisticser.
 type ResultIterator interface {
 	// More indicates if there are more results.
 	More() bool
@@ -13,134 +15,149 @@ type ResultIterator interface {
 	// If More is false, Next panics.
 	Next() Result
 
-	// Cancel discards the remaining results.
-	// Cancel must always be called to free resources.
-	// It is safe to call Cancel multiple times.
-	Cancel()
+	// Release discards the remaining results and frees the currently used resources.
+	// It must always be called to free resources. It can be called even if there are
+	// more results. It is safe to call Release multiple times.
+	Release()
 
 	// Err reports the first error encountered.
 	// Err will not report anything unless More has returned false,
 	// or the query has been cancelled.
 	Err() error
+
+	// Statistics returns any statistics computed by the resultset.
+	Statistics() Statistics
 }
 
-// QueryResultIterator implements a ResultIterator while consuming a Query
-type QueryResultIterator struct {
-	query   Query
-	cancel  chan struct{}
-	ready   bool
-	results *MapResultIterator
+// queryResultIterator implements a ResultIterator while consuming a Query
+type queryResultIterator struct {
+	query    Query
+	released bool
+	results  ResultIterator
 }
 
-func NewResultIteratorFromQuery(q Query) *QueryResultIterator {
-	return &QueryResultIterator{
-		query:  q,
-		cancel: make(chan struct{}),
+func NewResultIteratorFromQuery(q Query) ResultIterator {
+	return &queryResultIterator{
+		query: q,
 	}
 }
 
-func (r *QueryResultIterator) More() bool {
-	if !r.ready {
-		select {
-		case <-r.cancel:
-			goto DONE
-		case results, ok := <-r.query.Ready():
-			if !ok {
-				goto DONE
-			}
-			r.ready = true
-			r.results = NewMapResultIterator(results)
+func (r *queryResultIterator) More() bool {
+	if r.released {
+		return false
+	}
+
+	if r.results == nil {
+		results, ok := <-r.query.Ready()
+		if !ok {
+			return false
 		}
+		r.results = NewMapResultIterator(results)
 	}
-	if r.results.More() {
-		return true
-	}
-
-DONE:
-	r.query.Done()
-	return false
+	return r.results.More()
 }
 
-func (r *QueryResultIterator) Next() Result {
+func (r *queryResultIterator) Next() Result {
 	return r.results.Next()
 }
 
-func (r *QueryResultIterator) Cancel() {
-	select {
-	case <-r.cancel:
-	default:
-		close(r.cancel)
+func (r *queryResultIterator) Release() {
+	r.query.Done()
+	r.released = true
+	if r.results != nil {
+		r.results.Release()
 	}
-	r.query.Cancel()
 }
 
-func (r *QueryResultIterator) Err() error {
+func (r *queryResultIterator) Err() error {
 	return r.query.Err()
 }
 
-func (r *QueryResultIterator) Statistics() Statistics {
-	return r.query.Statistics()
+func (r *queryResultIterator) Statistics() Statistics {
+	stats := r.query.Statistics()
+	if r.results != nil {
+		stats = stats.Add(r.results.Statistics())
+	}
+	return stats
 }
 
-type MapResultIterator struct {
+type mapResultIterator struct {
 	results map[string]Result
 	order   []string
 }
 
-func NewMapResultIterator(results map[string]Result) *MapResultIterator {
+func NewMapResultIterator(results map[string]Result) ResultIterator {
 	order := make([]string, 0, len(results))
 	for k := range results {
 		order = append(order, k)
 	}
 	sort.Strings(order)
-	return &MapResultIterator{
+	return &mapResultIterator{
 		results: results,
 		order:   order,
 	}
 }
 
-func (r *MapResultIterator) More() bool {
+func (r *mapResultIterator) More() bool {
 	return len(r.order) > 0
 }
 
-func (r *MapResultIterator) Next() Result {
+func (r *mapResultIterator) Next() Result {
 	next := r.order[0]
 	r.order = r.order[1:]
 	return r.results[next]
 }
 
-func (r *MapResultIterator) Cancel() {
-
+func (r *mapResultIterator) Release() {
+	r.results = nil
+	r.order = nil
 }
 
-func (r *MapResultIterator) Err() error {
+func (r *mapResultIterator) Err() error {
 	return nil
 }
 
-type SliceResultIterator struct {
+func (r *mapResultIterator) Statistics() Statistics {
+	var stats Statistics
+	for _, result := range r.results {
+		stats = stats.Add(result.Statistics())
+	}
+	return stats
+}
+
+type sliceResultIterator struct {
+	i       int
 	results []Result
 }
 
-func NewSliceResultIterator(results []Result) *SliceResultIterator {
-	return &SliceResultIterator{
+func NewSliceResultIterator(results []Result) ResultIterator {
+	return &sliceResultIterator{
 		results: results,
 	}
 }
 
-func (r *SliceResultIterator) More() bool {
-	return len(r.results) > 0
+func (r *sliceResultIterator) More() bool {
+	return r.i < len(r.results)
 }
 
-func (r *SliceResultIterator) Next() Result {
-	next := r.results[0]
-	r.results = r.results[1:]
+func (r *sliceResultIterator) Next() Result {
+	next := r.results[r.i]
+	r.i++
 	return next
 }
 
-func (r *SliceResultIterator) Cancel() {
-	r.results = nil
+func (r *sliceResultIterator) Release() {
+	r.results, r.i = nil, 0
 }
 
-func (r *SliceResultIterator) Err() error {
+func (r *sliceResultIterator) Err() error {
 	return nil
+}
+
+func (r *sliceResultIterator) Statistics() Statistics {
+	var stats Statistics
+	for _, result := range r.results {
+		stats = stats.Add(result.Statistics())
+	}
+	return stats
 }

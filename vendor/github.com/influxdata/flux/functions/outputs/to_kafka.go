@@ -175,6 +175,7 @@ func (ToKafkaOpSpec) Kind() flux.OperationKind {
 }
 
 type ToKafkaProcedureSpec struct {
+	plan.DefaultCost
 	Spec     *ToKafkaOpSpec
 	balancer kafka.Balancer
 }

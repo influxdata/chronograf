@@ -10,23 +10,150 @@ import (
 	"github.com/pkg/errors"
 )
 
+var topScope = NewScopeWithValues(map[string]values.Value{
+	"true":  values.NewBool(true),
+	"false": values.NewBool(false),
+})
+
+// Package implementation
+type packageObject struct {
+	name        string
+	scope       *Scope
+	private     map[string]bool
+	sideEffects []values.Value
+}
+
+func (p *packageObject) Name() string {
+	return p.name
+}
+
+func (p *packageObject) SideEffects() []values.Value {
+	return p.sideEffects
+}
+
+func (p *packageObject) Type() semantic.Type {
+	vals := p.scope.Values()
+	size := len(vals) - len(p.private)
+	typs := make(map[string]semantic.Type, size)
+	for k, v := range vals {
+		if !p.private[k] {
+			typs[k] = v.Type()
+		}
+	}
+	return semantic.NewObjectType(typs)
+}
+
+func (p *packageObject) PolyType() semantic.PolyType {
+	vals := p.scope.Values()
+	size := len(vals) - len(p.private)
+	typs := make(map[string]semantic.PolyType, size)
+	names := make(semantic.LabelSet, 0, size)
+	for k, v := range vals {
+		if !p.private[k] {
+			names = append(names, k)
+			typs[k] = v.PolyType()
+		}
+	}
+	return semantic.NewObjectPolyType(typs, nil, names)
+}
+
+func (p *packageObject) Get(name string) (values.Value, bool) {
+	if !p.private[name] && p.scope.Get(name) != nil {
+		return p.scope.Get(name), true
+	}
+	return nil, false
+}
+
+func (p *packageObject) Set(name string, v values.Value) {
+	p.scope.Set(name, v)
+}
+
+func (p *packageObject) Len() int {
+	return len(p.scope.Values()) - len(p.private)
+}
+
+func (p *packageObject) Range(f func(name string, v values.Value)) {
+	for k, v := range p.scope.Values() {
+		if !p.private[k] {
+			f(k, v)
+		}
+	}
+}
+
+func (p *packageObject) Str() string {
+	panic(values.UnexpectedKind(semantic.Object, semantic.String))
+}
+func (p *packageObject) Int() int64 {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Int))
+}
+func (p *packageObject) UInt() uint64 {
+	panic(values.UnexpectedKind(semantic.Object, semantic.UInt))
+}
+func (p *packageObject) Float() float64 {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Float))
+}
+func (p *packageObject) Bool() bool {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Bool))
+}
+func (p *packageObject) Time() values.Time {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Time))
+}
+func (p *packageObject) Duration() values.Duration {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Duration))
+}
+func (p *packageObject) Regexp() *regexp.Regexp {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Regexp))
+}
+func (p *packageObject) Array() values.Array {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Array))
+}
+func (p *packageObject) Object() values.Object {
+	return p
+}
+func (p *packageObject) Function() values.Function {
+	panic(values.UnexpectedKind(semantic.Object, semantic.Function))
+}
+func (p *packageObject) Equal(rhs values.Value) bool {
+	if p.Type() != rhs.Type() {
+		return false
+	}
+	r := rhs.Object()
+	if p.Len() != r.Len() {
+		return false
+	}
+	equal := true
+	p.Range(func(k string, v values.Value) {
+		val, ok := r.Get(k)
+		if !ok || !v.Equal(val) {
+			equal = false
+			return
+		}
+	})
+	return equal
+}
+
 // Interpreter used to interpret a Flux program
 type Interpreter struct {
-	values  []values.Value
 	options *Scope
 	globals *Scope
 	types   *TypeScope
+	pkg     *packageObject
 }
 
 // NewInterpreter instantiates a new Flux Interpreter whose builtin values are not mutable.
 // Options are always mutable.
 func NewInterpreter(options, builtins map[string]values.Value, types *TypeScope) *Interpreter {
-	optionScope := NewScopeWithValues(options)
+	optionScope := topScope.NestWithValues(options)
 	globalScope := optionScope.NestWithValues(builtins)
+	scriptScope := globalScope.Nest()
 	interpreter := &Interpreter{
 		options: optionScope,
-		globals: globalScope.Nest(),
+		globals: scriptScope,
 		types:   types.Nest(),
+		pkg: &packageObject{
+			scope:   scriptScope,
+			private: make(map[string]bool),
+		},
 	}
 	return interpreter
 }
@@ -34,12 +161,16 @@ func NewInterpreter(options, builtins map[string]values.Value, types *TypeScope)
 // NewMutableInterpreter instantiates a new Flux Interpreter whose builtin values are mutable.
 // Options are always mutable.
 func NewMutableInterpreter(options, builtins map[string]values.Value, types *TypeScope) *Interpreter {
-	optionScope := NewScopeWithValues(options)
+	optionScope := topScope.NestWithValues(options)
 	globalScope := optionScope.NestWithValues(builtins)
 	interpreter := &Interpreter{
 		options: optionScope,
 		globals: globalScope,
 		types:   types,
+		pkg: &packageObject{
+			scope:   globalScope,
+			private: make(map[string]bool),
+		},
 	}
 	return interpreter
 }
@@ -55,21 +186,6 @@ func (itrp *Interpreter) GlobalScope() *Scope {
 	return itrp.globals
 }
 
-// TypeScope returns the type scope of the interpreter
-func (itrp *Interpreter) TypeScope() *TypeScope {
-	return itrp.types
-}
-
-// SetVar adds a variable binding to the global scope
-func (itrp *Interpreter) SetVar(name string, val values.Value) {
-	itrp.globals.Set(name, val)
-}
-
-// SideEffects returns the evaluated expressions of a Flux program
-func (itrp *Interpreter) SideEffects() []values.Value {
-	return itrp.values
-}
-
 // Option returns a Flux option by name
 func (itrp *Interpreter) Option(name string) values.Value {
 	return itrp.options.Get(name)
@@ -80,17 +196,27 @@ func (itrp *Interpreter) SetOption(name string, val values.Value) {
 	itrp.options.Set(name, val)
 }
 
+// SideEffects returns the evaluated expressions of a Flux program
+func (itrp *Interpreter) SideEffects() []values.Value {
+	return itrp.pkg.SideEffects()
+}
+
+// Package returns the current package object
+func (itrp *Interpreter) Package() Package {
+	return itrp.pkg
+}
+
 // Eval evaluates the expressions composing a Flux program.
-func (itrp *Interpreter) Eval(program semantic.Node) error {
+func (itrp *Interpreter) Eval(program semantic.Node, importer Importer) error {
 	extern := &semantic.Extern{
-		Block:        &semantic.ExternBlock{Node: program},
-		Declarations: make([]*semantic.ExternalVariableDeclaration, 0, itrp.globals.Len()+itrp.options.Len()),
+		Block:       &semantic.ExternBlock{Node: program},
+		Assignments: make([]*semantic.ExternalVariableAssignment, 0, itrp.globals.Len()+itrp.options.Len()),
 	}
 	// Add declarations for values in scope
-	addExternalDeclarations(extern, itrp.options)
-	addExternalDeclarations(extern, itrp.globals)
+	addExternalAssignments(extern, itrp.options)
+	addExternalAssignments(extern, itrp.globals)
 
-	sol, err := semantic.InferTypes(extern)
+	sol, err := semantic.InferTypes(extern, importer)
 	if err != nil {
 		return err
 	}
@@ -103,36 +229,76 @@ func (itrp *Interpreter) Eval(program semantic.Node) error {
 			itrp.types.SetPolyType(node, polyType)
 		}
 	}), program)
-	return itrp.doRoot(program)
+	return itrp.doRoot(program, importer)
 }
 
-func (itrp *Interpreter) doRoot(node semantic.Node) error {
+func (itrp *Interpreter) doRoot(node semantic.Node, importer Importer) error {
 	switch n := node.(type) {
 	case *semantic.Program:
-		return itrp.doProgram(n)
+		return itrp.doProgram(n, importer)
 	case *semantic.Extern:
-		return itrp.doExtern(n)
+		return itrp.doExtern(n, importer)
 	default:
 		return fmt.Errorf("unsupported root node %T", node)
 	}
 }
 
-func (itrp *Interpreter) doExtern(extern *semantic.Extern) error {
+func (itrp *Interpreter) doExtern(extern *semantic.Extern, importer Importer) error {
 	// We do not care about the type declarations, they were only important for type inference.
-	return itrp.doRoot(extern.Block.Node)
+	return itrp.doRoot(extern.Block.Node, importer)
 }
 
-func (itrp *Interpreter) doProgram(program *semantic.Program) error {
-	topLevelScope := itrp.globals
+func (itrp *Interpreter) doProgram(program *semantic.Program, importer Importer) error {
+	if err := itrp.doPackage(program.Package); err != nil {
+		return err
+	}
+	for _, imp := range program.Imports {
+		if err := itrp.doImport(imp, itrp.globals, importer); err != nil {
+			return err
+		}
+	}
 	for _, stmt := range program.Body {
-		val, err := itrp.doStatement(stmt, topLevelScope)
+		val, err := itrp.doStatement(stmt, itrp.globals)
 		if err != nil {
 			return err
 		}
-		if val != nil {
-			itrp.values = append(itrp.values, val)
+		// Only in the main package are all query objects
+		// coerced into producing side effects.
+		if itrp.pkg.name == semantic.PackageMain && val != nil {
+			itrp.pkg.sideEffects = append(itrp.pkg.sideEffects, val)
 		}
 	}
+	return nil
+}
+
+func (itrp *Interpreter) doPackage(pkg *semantic.PackageClause) error {
+	packageName := semantic.PackageMain
+	if pkg != nil {
+		packageName = pkg.Name.Name
+	}
+	if itrp.pkg.name == "" {
+		itrp.pkg.name = packageName
+	}
+	if itrp.pkg.name != packageName {
+		return fmt.Errorf("unexpected package statement %s", packageName)
+	}
+	return nil
+}
+
+func (itrp *Interpreter) doImport(imp *semantic.ImportDeclaration, scope *Scope, importer Importer) error {
+	path := imp.Path.Value
+	pkg, ok := importer.ImportPackageObject(path)
+	if !ok {
+		return fmt.Errorf("invalid import path %s", path)
+	}
+	name := pkg.Name()
+	if imp.As != nil {
+		name = imp.As.Name
+	}
+	itrp.pkg.private[name] = true
+	scope.Set(name, pkg)
+	// Packages can import side effects
+	itrp.pkg.sideEffects = append(itrp.pkg.sideEffects, pkg.SideEffects()...)
 	return nil
 }
 
@@ -141,9 +307,9 @@ func (itrp *Interpreter) doStatement(stmt semantic.Statement, scope *Scope) (val
 	scope.SetReturn(values.InvalidValue)
 	switch s := stmt.(type) {
 	case *semantic.OptionStatement:
-		return itrp.doOptionStatement(s.Declaration.(*semantic.NativeVariableDeclaration), scope)
-	case *semantic.NativeVariableDeclaration:
-		return itrp.doVariableDeclaration(s, scope)
+		return itrp.doOptionStatement(s.Assignment.(*semantic.NativeVariableAssignment), scope)
+	case *semantic.NativeVariableAssignment:
+		return itrp.doVariableAssignment(s, scope)
 	case *semantic.ExpressionStatement:
 		v, err := itrp.doExpression(s.Expression, scope)
 		if err != nil {
@@ -151,23 +317,6 @@ func (itrp *Interpreter) doStatement(stmt semantic.Statement, scope *Scope) (val
 		}
 		scope.SetReturn(v)
 		return v, nil
-	case *semantic.BlockStatement:
-		nested := scope.Nest()
-		for i, stmt := range s.Body {
-			_, err := itrp.doStatement(stmt, nested)
-			if err != nil {
-				return nil, err
-			}
-			// Validate a return statement is the last statement
-			if _, ok := stmt.(*semantic.ReturnStatement); ok {
-				if i != len(s.Body)-1 {
-					return nil, errors.New("return statement is not the last statement in the block")
-				}
-			}
-		}
-		// Propgate any return value from the nested scope out. Since a return statement is
-		// always last we do not have to worry about overriding an existing return value.
-		scope.SetReturn(nested.Return())
 	case *semantic.ReturnStatement:
 		v, err := itrp.doExpression(s.Argument, scope)
 		if err != nil {
@@ -180,7 +329,7 @@ func (itrp *Interpreter) doStatement(stmt semantic.Statement, scope *Scope) (val
 	return nil, nil
 }
 
-func (itrp *Interpreter) doOptionStatement(declaration *semantic.NativeVariableDeclaration, scope *Scope) (values.Value, error) {
+func (itrp *Interpreter) doOptionStatement(declaration *semantic.NativeVariableAssignment, scope *Scope) (values.Value, error) {
 	value, err := itrp.doExpression(declaration.Init, scope)
 	if err != nil {
 		return nil, err
@@ -189,7 +338,7 @@ func (itrp *Interpreter) doOptionStatement(declaration *semantic.NativeVariableD
 	return value, nil
 }
 
-func (itrp *Interpreter) doVariableDeclaration(declaration *semantic.NativeVariableDeclaration, scope *Scope) (values.Value, error) {
+func (itrp *Interpreter) doVariableAssignment(declaration *semantic.NativeVariableAssignment, scope *Scope) (values.Value, error) {
 	value, err := itrp.doExpression(declaration.Init, scope)
 	if err != nil {
 		return nil, err
@@ -236,6 +385,16 @@ func (itrp *Interpreter) doExpression(expr semantic.Expression, scope *Scope) (v
 			return nil, fmt.Errorf("object has no property %q", e.Property)
 		}
 		return v, nil
+	case *semantic.IndexExpression:
+		arr, err := itrp.doExpression(e.Array, scope)
+		if err != nil {
+			return nil, err
+		}
+		idx, err := itrp.doExpression(e.Index, scope)
+		if err != nil {
+			return nil, err
+		}
+		return arr.Array().Get(int(idx.Int())), nil
 	case *semantic.ObjectExpression:
 		return itrp.doObject(e, scope)
 	case *semantic.UnaryExpression:
@@ -320,7 +479,7 @@ func (itrp *Interpreter) doExpression(expr semantic.Expression, scope *Scope) (v
 			return nil, fmt.Errorf("invalid logical operator %v", e.Operator)
 		}
 	case *semantic.FunctionExpression:
-		return &function{
+		return function{
 			e:     e,
 			scope: scope,
 			itrp:  itrp,
@@ -332,17 +491,15 @@ func (itrp *Interpreter) doExpression(expr semantic.Expression, scope *Scope) (v
 
 func (itrp *Interpreter) doArray(a *semantic.ArrayExpression, scope *Scope) (values.Value, error) {
 	elements := make([]values.Value, len(a.Elements))
-	elementType := semantic.EmptyArrayType.ElementType()
+	arrayType, ok := itrp.types.LookupType(a)
+	if !ok {
+		return nil, fmt.Errorf("expecting array type")
+	}
+	elementType := arrayType.ElementType()
 	for i, el := range a.Elements {
 		v, err := itrp.doExpression(el, scope)
 		if err != nil {
 			return nil, err
-		}
-		if i == 0 {
-			elementType = v.Type()
-		}
-		if elementType != v.Type() {
-			return nil, fmt.Errorf("cannot mix types in an array, found both %v and %v", elementType, v.Type())
 		}
 		elements[i] = v
 	}
@@ -356,10 +513,10 @@ func (itrp *Interpreter) doObject(m *semantic.ObjectExpression, scope *Scope) (v
 		if err != nil {
 			return nil, err
 		}
-		if _, ok := obj.Get(p.Key.Name); ok {
-			return nil, fmt.Errorf("duplicate key in object: %q", p.Key.Name)
+		if _, ok := obj.Get(p.Key.Key()); ok {
+			return nil, fmt.Errorf("duplicate key in object: %q", p.Key.Key())
 		}
-		obj.Set(p.Key.Name, v)
+		obj.Set(p.Key.Key(), v)
 	}
 	return obj, nil
 }
@@ -431,7 +588,7 @@ func (itrp *Interpreter) doCall(call *semantic.CallExpression, scope *Scope) (va
 	}
 
 	// Check if the function is an interpFunction and rebind it.
-	if af, ok := f.(*function); ok {
+	if af, ok := f.(function); ok {
 		af.itrp = itrp
 		f = af
 	}
@@ -443,7 +600,7 @@ func (itrp *Interpreter) doCall(call *semantic.CallExpression, scope *Scope) (va
 	}
 
 	if f.HasSideEffect() {
-		itrp.values = append(itrp.values, value)
+		itrp.pkg.sideEffects = append(itrp.pkg.sideEffects, value)
 	}
 
 	return value, nil
@@ -459,11 +616,11 @@ func (itrp *Interpreter) doArguments(args *semantic.ObjectExpression, scope *Sco
 		if err != nil {
 			return nil, err
 		}
-		if _, ok := obj.Get(p.Key.Name); ok {
-			return nil, fmt.Errorf("duplicate keyword parameter specified: %q", p.Key.Name)
+		if _, ok := obj.Get(p.Key.Key()); ok {
+			return nil, fmt.Errorf("duplicate keyword parameter specified: %q", p.Key.Key())
 		}
 
-		obj.Set(p.Key.Name, value)
+		obj.Set(p.Key.Key(), value)
 	}
 	if pipe != nil && pipeArgument == "" {
 		return nil, errors.New("pipe parameter value provided to function with no pipe parameter defined")
@@ -663,14 +820,14 @@ type function struct {
 	itrp *Interpreter
 }
 
-func (f *function) Type() semantic.Type {
+func (f function) Type() semantic.Type {
 	typ, ok := f.itrp.types.LookupType(f.e)
 	if !ok {
 		return semantic.Invalid
 	}
 	return typ
 }
-func (f *function) PolyType() semantic.PolyType {
+func (f function) PolyType() semantic.PolyType {
 	polyType, ok := f.itrp.types.LookupPolyType(f.e)
 	if !ok {
 		return semantic.Invalid
@@ -678,53 +835,53 @@ func (f *function) PolyType() semantic.PolyType {
 	return polyType
 }
 
-func (f *function) Str() string {
+func (f function) Str() string {
 	panic(values.UnexpectedKind(semantic.Function, semantic.String))
 }
-func (f *function) Int() int64 {
+func (f function) Int() int64 {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Int))
 }
-func (f *function) UInt() uint64 {
+func (f function) UInt() uint64 {
 	panic(values.UnexpectedKind(semantic.Function, semantic.UInt))
 }
-func (f *function) Float() float64 {
+func (f function) Float() float64 {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Float))
 }
-func (f *function) Bool() bool {
+func (f function) Bool() bool {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Bool))
 }
-func (f *function) Time() values.Time {
+func (f function) Time() values.Time {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Time))
 }
-func (f *function) Duration() values.Duration {
+func (f function) Duration() values.Duration {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Duration))
 }
-func (f *function) Regexp() *regexp.Regexp {
+func (f function) Regexp() *regexp.Regexp {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Regexp))
 }
-func (f *function) Array() values.Array {
+func (f function) Array() values.Array {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Array))
 }
-func (f *function) Object() values.Object {
+func (f function) Object() values.Object {
 	panic(values.UnexpectedKind(semantic.Function, semantic.Object))
 }
-func (f *function) Function() values.Function {
+func (f function) Function() values.Function {
 	return f
 }
-func (f *function) Equal(rhs values.Value) bool {
+func (f function) Equal(rhs values.Value) bool {
 	if f.Type() != rhs.Type() {
 		return false
 	}
-	v, ok := rhs.(*function)
-	return ok && (f == v)
+	v, ok := rhs.(function)
+	return ok && f.e == v.e && f.scope == v.scope
 }
-func (f *function) HasSideEffect() bool {
+func (f function) HasSideEffect() bool {
 	// Function definitions do not produce side effects.
 	// Only a function call expression can produce side effects.
 	return false
 }
 
-func (f *function) Call(argsObj values.Object) (values.Value, error) {
+func (f function) Call(argsObj values.Object) (values.Value, error) {
 	args := newArguments(argsObj)
 	v, err := f.doCall(args)
 	if err != nil {
@@ -735,14 +892,14 @@ func (f *function) Call(argsObj values.Object) (values.Value, error) {
 	}
 	return v, nil
 }
-func (f *function) doCall(args Arguments) (values.Value, error) {
+func (f function) doCall(args Arguments) (values.Value, error) {
 	blockScope := f.scope.Nest()
 	if f.e.Block.Parameters != nil {
 	PARAMETERS:
 		for _, p := range f.e.Block.Parameters.List {
 			if f.e.Defaults != nil {
 				for _, d := range f.e.Defaults.Properties {
-					if d.Key.Name == p.Key.Name {
+					if d.Key.Key() == p.Key.Name {
 						v, ok := args.Get(p.Key.Name)
 						if !ok {
 							// Use default value
@@ -768,12 +925,21 @@ func (f *function) doCall(args Arguments) (values.Value, error) {
 	switch n := f.e.Block.Body.(type) {
 	case semantic.Expression:
 		return f.itrp.doExpression(n, blockScope)
-	case semantic.Statement:
-		_, err := f.itrp.doStatement(n, blockScope)
-		if err != nil {
-			return nil, err
+	case *semantic.Block:
+		nested := blockScope.Nest()
+		for i, stmt := range n.Body {
+			_, err := f.itrp.doStatement(stmt, nested)
+			if err != nil {
+				return nil, err
+			}
+			// Validate a return statement is the last statement
+			if _, ok := stmt.(*semantic.ReturnStatement); ok {
+				if i != len(n.Body)-1 {
+					return nil, errors.New("return statement is not the last statement in the block")
+				}
+			}
 		}
-		v := blockScope.Return()
+		v := nested.Return()
 		if v.PolyType().Nature() == semantic.Invalid {
 			return nil, errors.New("function has no return value")
 		}
@@ -805,7 +971,7 @@ func ResolveFunction(f values.Function) (*semantic.FunctionExpression, error) {
 }
 
 // Resolve rewrites the function resolving any identifiers not listed in the function params.
-func (f *function) Resolve() (semantic.Node, error) {
+func (f function) Resolve() (semantic.Node, error) {
 	n := f.e.Copy()
 	node, err := f.resolveIdentifiers(n)
 	if err != nil {
@@ -830,7 +996,7 @@ func (f function) resolveIdentifiers(n semantic.Node) (semantic.Node, error) {
 			return nil, fmt.Errorf("name %q does not exist in scope", n.Name)
 		}
 		return resolveValue(v)
-	case *semantic.BlockStatement:
+	case *semantic.Block:
 		for i, s := range n.Body {
 			node, err := f.resolveIdentifiers(s)
 			if err != nil {
@@ -839,11 +1005,11 @@ func (f function) resolveIdentifiers(n semantic.Node) (semantic.Node, error) {
 			n.Body[i] = node.(semantic.Statement)
 		}
 	case *semantic.OptionStatement:
-		node, err := f.resolveIdentifiers(n.Declaration)
+		node, err := f.resolveIdentifiers(n.Assignment)
 		if err != nil {
 			return nil, err
 		}
-		n.Declaration = node
+		n.Assignment = node
 	case *semantic.ExpressionStatement:
 		node, err := f.resolveIdentifiers(n.Expression)
 		if err != nil {
@@ -856,7 +1022,7 @@ func (f function) resolveIdentifiers(n semantic.Node) (semantic.Node, error) {
 			return nil, err
 		}
 		n.Argument = node.(semantic.Expression)
-	case *semantic.NativeVariableDeclaration:
+	case *semantic.NativeVariableAssignment:
 		node, err := f.resolveIdentifiers(n.Init)
 		if err != nil {
 			return nil, err
@@ -1262,9 +1428,9 @@ func (a *arguments) listUnused() []string {
 	return unused
 }
 
-func addExternalDeclarations(extern *semantic.Extern, scope *Scope) {
+func addExternalAssignments(extern *semantic.Extern, scope *Scope) {
 	scope.Range(func(k string, v values.Value) {
-		extern.Declarations = append(extern.Declarations, &semantic.ExternalVariableDeclaration{
+		extern.Assignments = append(extern.Assignments, &semantic.ExternalVariableAssignment{
 			Identifier: &semantic.Identifier{Name: k},
 			ExternType: v.PolyType(),
 		})

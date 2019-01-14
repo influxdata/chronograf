@@ -31,7 +31,7 @@ func (v Annotator) Visit(node Node) Visitor {
 	case *FunctionBlock,
 		*FunctionParameter,
 		*Property,
-		*BlockStatement,
+		*Block,
 		*ReturnStatement,
 		Expression:
 		v.annotations[n] = annotation{

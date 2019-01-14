@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute/executetest"
 	"github.com/influxdata/flux/functions/transformations"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/querytest"
 )
 
@@ -56,10 +58,11 @@ func TestStddev_Process(t *testing.T) {
 }
 
 func BenchmarkStddev(b *testing.B) {
+	data := arrow.NewFloat(NormalData, &memory.Allocator{})
 	executetest.AggFuncBenchmarkHelper(
 		b,
 		new(transformations.StddevAgg),
-		NormalData,
+		data,
 		2.998926113076968,
 	)
 }

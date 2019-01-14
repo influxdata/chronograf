@@ -43,6 +43,28 @@ func (p *Program) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
+func (p *PackageClause) MarshalJSON() ([]byte, error) {
+	type Alias PackageClause
+	raw := struct {
+		Type string `json:"type"`
+		*Alias
+	}{
+		Type:  p.NodeType(),
+		Alias: (*Alias)(p),
+	}
+	return json.Marshal(raw)
+}
+func (p *ImportDeclaration) MarshalJSON() ([]byte, error) {
+	type Alias ImportDeclaration
+	raw := struct {
+		Type string `json:"type"`
+		*Alias
+	}{
+		Type:  p.NodeType(),
+		Alias: (*Alias)(p),
+	}
+	return json.Marshal(raw)
+}
 func (e *Extern) MarshalJSON() ([]byte, error) {
 	type Alias Extern
 	raw := struct {
@@ -85,8 +107,8 @@ func (e *ExternBlock) UnmarshalJSON(data []byte) error {
 	e.Node = n
 	return nil
 }
-func (s *BlockStatement) MarshalJSON() ([]byte, error) {
-	type Alias BlockStatement
+func (s *Block) MarshalJSON() ([]byte, error) {
+	type Alias Block
 	raw := struct {
 		Type string `json:"type"`
 		*Alias
@@ -96,8 +118,8 @@ func (s *BlockStatement) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(raw)
 }
-func (s *BlockStatement) UnmarshalJSON(data []byte) error {
-	type Alias BlockStatement
+func (s *Block) UnmarshalJSON(data []byte) error {
+	type Alias Block
 	raw := struct {
 		*Alias
 		Body []json.RawMessage `json:"body"`
@@ -106,7 +128,7 @@ func (s *BlockStatement) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if raw.Alias != nil {
-		*s = *(*BlockStatement)(raw.Alias)
+		*s = *(*Block)(raw.Alias)
 	}
 
 	s.Body = make([]Statement, len(raw.Body))
@@ -134,7 +156,7 @@ func (s *OptionStatement) UnmarshalJSON(data []byte) error {
 	type Alias OptionStatement
 	raw := struct {
 		*Alias
-		Declaration json.RawMessage `json:"declaration"`
+		Assignment json.RawMessage `json:"assignment"`
 	}{}
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
@@ -143,11 +165,11 @@ func (s *OptionStatement) UnmarshalJSON(data []byte) error {
 		*s = *(*OptionStatement)(raw.Alias)
 	}
 
-	e, err := unmarshalVariableDeclaration(raw.Declaration)
+	e, err := unmarshalVariableAssignment(raw.Assignment)
 	if err != nil {
 		return err
 	}
-	s.Declaration = e
+	s.Assignment = e
 	return nil
 }
 func (s *ExpressionStatement) MarshalJSON() ([]byte, error) {
@@ -212,8 +234,8 @@ func (s *ReturnStatement) UnmarshalJSON(data []byte) error {
 	s.Argument = e
 	return nil
 }
-func (d *NativeVariableDeclaration) MarshalJSON() ([]byte, error) {
-	type Alias NativeVariableDeclaration
+func (d *NativeVariableAssignment) MarshalJSON() ([]byte, error) {
+	type Alias NativeVariableAssignment
 	raw := struct {
 		Type string `json:"type"`
 		*Alias
@@ -223,8 +245,8 @@ func (d *NativeVariableDeclaration) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(raw)
 }
-func (d *NativeVariableDeclaration) UnmarshalJSON(data []byte) error {
-	type Alias NativeVariableDeclaration
+func (d *NativeVariableAssignment) UnmarshalJSON(data []byte) error {
+	type Alias NativeVariableAssignment
 	raw := struct {
 		*Alias
 		Init json.RawMessage `json:"init"`
@@ -233,7 +255,7 @@ func (d *NativeVariableDeclaration) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if raw.Alias != nil {
-		*d = *(*NativeVariableDeclaration)(raw.Alias)
+		*d = *(*NativeVariableAssignment)(raw.Alias)
 	}
 
 	e, err := unmarshalExpression(raw.Init)
@@ -243,8 +265,8 @@ func (d *NativeVariableDeclaration) UnmarshalJSON(data []byte) error {
 	d.Init = e
 	return nil
 }
-func (d *ExternalVariableDeclaration) MarshalJSON() ([]byte, error) {
-	return nil, errors.New("cannot marshal ExternalVariableDeclaration")
+func (d *ExternalVariableAssignment) MarshalJSON() ([]byte, error) {
+	return nil, errors.New("cannot marshal ExternalVariableAssignment")
 }
 func (e *CallExpression) MarshalJSON() ([]byte, error) {
 	type Alias CallExpression
@@ -308,6 +330,44 @@ func (e *MemberExpression) UnmarshalJSON(data []byte) error {
 	}
 	e.Object = object
 
+	return nil
+}
+func (e *IndexExpression) MarshalJSON() ([]byte, error) {
+	type Alias IndexExpression
+	raw := struct {
+		Type string `json:"type"`
+		*Alias
+	}{
+		Type:  e.NodeType(),
+		Alias: (*Alias)(e),
+	}
+	return json.Marshal(raw)
+}
+func (e *IndexExpression) UnmarshalJSON(data []byte) error {
+	type Alias IndexExpression
+	raw := struct {
+		*Alias
+		Array json.RawMessage `json:"array"`
+		Index json.RawMessage `json:"index"`
+	}{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	if raw.Alias != nil {
+		*e = *(*IndexExpression)(raw.Alias)
+	}
+
+	array, err := unmarshalExpression(raw.Array)
+	if err != nil {
+		return err
+	}
+	e.Array = array
+
+	index, err := unmarshalExpression(raw.Index)
+	if err != nil {
+		return err
+	}
+	e.Index = index
 	return nil
 }
 func (e *FunctionExpression) MarshalJSON() ([]byte, error) {
@@ -588,6 +648,7 @@ func (p *Property) UnmarshalJSON(data []byte) error {
 	type Alias Property
 	raw := struct {
 		*Alias
+		Key   json.RawMessage `json:"key"`
 		Value json.RawMessage `json:"value"`
 	}{}
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -596,6 +657,12 @@ func (p *Property) UnmarshalJSON(data []byte) error {
 	if raw.Alias != nil {
 		*p = *(*Property)(raw.Alias)
 	}
+
+	key, err := unmarshalPropertyKey(raw.Key)
+	if err != nil {
+		return err
+	}
+	p.Key = key
 
 	if raw.Value != nil {
 		value, err := unmarshalExpression(raw.Value)
@@ -848,7 +915,21 @@ func unmarshalExpression(msg json.RawMessage) (Expression, error) {
 	}
 	return e, nil
 }
-func unmarshalVariableDeclaration(msg json.RawMessage) (Node, error) {
+func unmarshalPropertyKey(msg json.RawMessage) (PropertyKey, error) {
+	if checkNullMsg(msg) {
+		return nil, nil
+	}
+	n, err := unmarshalNode(msg)
+	if err != nil {
+		return nil, err
+	}
+	k, ok := n.(PropertyKey)
+	if !ok {
+		return nil, fmt.Errorf("node %q is not property key", n.NodeType())
+	}
+	return k, nil
+}
+func unmarshalVariableAssignment(msg json.RawMessage) (Node, error) {
 	if checkNullMsg(msg) {
 		return nil, nil
 	}
@@ -857,8 +938,8 @@ func unmarshalVariableDeclaration(msg json.RawMessage) (Node, error) {
 		return nil, err
 	}
 	switch n.(type) {
-	case *ExternalVariableDeclaration,
-		*NativeVariableDeclaration:
+	case *ExternalVariableAssignment,
+		*NativeVariableAssignment:
 		return n, nil
 	default:
 		return nil, fmt.Errorf("node %q is not a variable declaration", n.NodeType())
@@ -882,20 +963,26 @@ func unmarshalNode(msg json.RawMessage) (Node, error) {
 	switch typ.Type {
 	case "Program":
 		node = new(Program)
-	case "BlockStatement":
-		node = new(BlockStatement)
+	case "PackageClause":
+		node = new(PackageClause)
+	case "ImportDeclaration":
+		node = new(ImportDeclaration)
+	case "Block":
+		node = new(Block)
 	case "OptionStatement":
 		node = new(OptionStatement)
 	case "ExpressionStatement":
 		node = new(ExpressionStatement)
 	case "ReturnStatement":
 		node = new(ReturnStatement)
-	case "NativeVariableDeclaration":
-		node = new(NativeVariableDeclaration)
+	case "NativeVariableAssignment":
+		node = new(NativeVariableAssignment)
 	case "CallExpression":
 		node = new(CallExpression)
 	case "MemberExpression":
 		node = new(MemberExpression)
+	case "IndexExpression":
+		node = new(IndexExpression)
 	case "BinaryExpression":
 		node = new(BinaryExpression)
 	case "UnaryExpression":

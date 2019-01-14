@@ -3,10 +3,12 @@ package executetest
 import (
 	"fmt"
 
-	"github.com/influxdata/flux/semantic"
-
+	"github.com/apache/arrow/go/arrow/array"
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute"
+	"github.com/influxdata/flux/memory"
+	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/flux/values"
 )
 
@@ -85,6 +87,65 @@ func (t *Table) Do(f func(flux.ColReader) error) error {
 	return nil
 }
 
+func (t *Table) DoArrow(f func(flux.ArrowColReader) error) error {
+	cols := make([]array.Interface, len(t.ColMeta))
+	for j, col := range t.ColMeta {
+		switch col.Type {
+		case flux.TBool:
+			b := arrow.NewBoolBuilder(&memory.Allocator{})
+			for i := range t.Data {
+				b.Append(t.Data[i][j].(bool))
+			}
+			cols[j] = b.NewBooleanArray()
+			b.Release()
+		case flux.TFloat:
+			b := arrow.NewFloatBuilder(&memory.Allocator{})
+			for i := range t.Data {
+				b.Append(t.Data[i][j].(float64))
+			}
+			cols[j] = b.NewFloat64Array()
+			b.Release()
+		case flux.TInt:
+			b := arrow.NewIntBuilder(&memory.Allocator{})
+			for i := range t.Data {
+				b.Append(t.Data[i][j].(int64))
+			}
+			cols[j] = b.NewInt64Array()
+			b.Release()
+		case flux.TString:
+			b := arrow.NewStringBuilder(&memory.Allocator{})
+			for i := range t.Data {
+				b.AppendString(t.Data[i][j].(string))
+			}
+			cols[j] = b.NewBinaryArray()
+			b.Release()
+		case flux.TTime:
+			b := arrow.NewIntBuilder(&memory.Allocator{})
+			for i := range t.Data {
+				b.Append(int64(t.Data[i][j].(values.Time)))
+			}
+			cols[j] = b.NewInt64Array()
+			b.Release()
+		case flux.TUInt:
+			b := arrow.NewUintBuilder(&memory.Allocator{})
+			for i := range t.Data {
+				b.Append(t.Data[i][j].(uint64))
+			}
+			cols[j] = b.NewUint64Array()
+			b.Release()
+		}
+	}
+
+	cr := &ArrowColReader{
+		key:  t.Key(),
+		meta: t.ColMeta,
+		cols: cols,
+	}
+	return f(cr)
+}
+
+func (t *Table) Statistics() flux.Statistics { return flux.Statistics{} }
+
 type ColReader struct {
 	key  flux.GroupKey
 	cols []flux.ColMeta
@@ -124,6 +185,51 @@ func (cr ColReader) Strings(j int) []string {
 
 func (cr ColReader) Times(j int) []execute.Time {
 	return []execute.Time{cr.row[j].(execute.Time)}
+}
+
+type ArrowColReader struct {
+	key  flux.GroupKey
+	meta []flux.ColMeta
+	cols []array.Interface
+}
+
+func (cr *ArrowColReader) Key() flux.GroupKey {
+	return cr.key
+}
+
+func (cr *ArrowColReader) Cols() []flux.ColMeta {
+	return cr.meta
+}
+
+func (cr *ArrowColReader) Len() int {
+	if len(cr.cols) == 0 {
+		return 0
+	}
+	return cr.cols[0].Len()
+}
+
+func (cr *ArrowColReader) Bools(j int) *array.Boolean {
+	return cr.cols[j].(*array.Boolean)
+}
+
+func (cr *ArrowColReader) Ints(j int) *array.Int64 {
+	return cr.cols[j].(*array.Int64)
+}
+
+func (cr *ArrowColReader) UInts(j int) *array.Uint64 {
+	return cr.cols[j].(*array.Uint64)
+}
+
+func (cr *ArrowColReader) Floats(j int) *array.Float64 {
+	return cr.cols[j].(*array.Float64)
+}
+
+func (cr *ArrowColReader) Strings(j int) *array.Binary {
+	return cr.cols[j].(*array.Binary)
+}
+
+func (cr *ArrowColReader) Times(j int) *array.Int64 {
+	return cr.cols[j].(*array.Int64)
 }
 
 func TablesFromCache(c execute.DataCache) (tables []*Table, err error) {

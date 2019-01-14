@@ -55,7 +55,7 @@ func (c compiledFn) validate(input values.Object) error {
 	}
 	for k, v := range sig.Parameters {
 		if properties[k] != v {
-			return fmt.Errorf("parameter %q has the wrong type, expected %v got %v.", k, v, properties[k])
+			return fmt.Errorf("parameter %q has the wrong type, expected %v got %v", k, v, properties[k])
 		}
 	}
 	return nil
@@ -978,6 +978,61 @@ func (e *memberEvaluator) EvalObject(scope Scope) values.Object {
 }
 func (e *memberEvaluator) EvalFunction(scope Scope) values.Function {
 	v, _ := e.object.EvalObject(scope).Get(e.property)
+	return v.Function()
+}
+
+type arrayEvaluator struct {
+	t     semantic.Type
+	array Evaluator
+	index Evaluator
+}
+
+func (e *arrayEvaluator) Type() semantic.Type {
+	return e.t
+}
+
+func (e *arrayEvaluator) EvalString(scope Scope) string {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Str()
+}
+func (e *arrayEvaluator) EvalInt(scope Scope) int64 {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Int()
+}
+func (e *arrayEvaluator) EvalUInt(scope Scope) uint64 {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.UInt()
+}
+func (e *arrayEvaluator) EvalFloat(scope Scope) float64 {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Float()
+}
+func (e *arrayEvaluator) EvalBool(scope Scope) bool {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Bool()
+}
+func (e *arrayEvaluator) EvalTime(scope Scope) values.Time {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Time()
+}
+func (e *arrayEvaluator) EvalDuration(scope Scope) values.Duration {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Duration()
+}
+func (e *arrayEvaluator) EvalRegexp(scope Scope) *regexp.Regexp {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Regexp()
+}
+func (e *arrayEvaluator) EvalArray(scope Scope) values.Array {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Array()
+}
+func (e *arrayEvaluator) EvalObject(scope Scope) values.Object {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
+	return v.Object()
+}
+func (e *arrayEvaluator) EvalFunction(scope Scope) values.Function {
+	v := e.array.EvalArray(scope).Get(int(e.index.EvalInt(scope)))
 	return v.Function()
 }
 

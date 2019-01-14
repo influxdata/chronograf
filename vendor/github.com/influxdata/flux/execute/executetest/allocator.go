@@ -1,11 +1,7 @@
 package executetest
 
 import (
-	"math"
-
-	"github.com/influxdata/flux/execute"
+	"github.com/influxdata/flux/memory"
 )
 
-var UnlimitedAllocator = &execute.Allocator{
-	Limit: math.MaxInt64,
-}
+var UnlimitedAllocator = &memory.Allocator{}

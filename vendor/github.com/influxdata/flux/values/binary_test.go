@@ -75,6 +75,12 @@ func TestBinaryOperator(t *testing.T) {
 		{lhs: 8.2, op: "<=", rhs: 4.5, want: false},
 		{lhs: 4.5, op: "<=", rhs: 4.5, want: true},
 		{lhs: 4.5, op: "<=", rhs: 8.2, want: true},
+		// string <= string
+		{lhs: "", op: "<=", rhs: "x", want: true},
+		{lhs: "x", op: "<=", rhs: "", want: false},
+		{lhs: "x", op: "<=", rhs: "x", want: true},
+		{lhs: "x", op: "<=", rhs: "a", want: false},
+		{lhs: "x", op: "<=", rhs: "abc", want: false},
 		// int < int
 		{lhs: int64(6), op: "<", rhs: int64(4), want: false},
 		{lhs: int64(4), op: "<", rhs: int64(4), want: false},
@@ -111,6 +117,12 @@ func TestBinaryOperator(t *testing.T) {
 		{lhs: 8.2, op: "<", rhs: 4.5, want: false},
 		{lhs: 4.5, op: "<", rhs: 4.5, want: false},
 		{lhs: 4.5, op: "<", rhs: 8.2, want: true},
+		// string < string
+		{lhs: "", op: "<", rhs: "x", want: true},
+		{lhs: "x", op: "<", rhs: "", want: false},
+		{lhs: "x", op: "<", rhs: "x", want: false},
+		{lhs: "x", op: "<", rhs: "a", want: false},
+		{lhs: "x", op: "<", rhs: "abc", want: false},
 		// int >= int
 		{lhs: int64(6), op: ">=", rhs: int64(4), want: true},
 		{lhs: int64(4), op: ">=", rhs: int64(4), want: true},
@@ -147,7 +159,13 @@ func TestBinaryOperator(t *testing.T) {
 		{lhs: 8.2, op: ">=", rhs: 4.5, want: true},
 		{lhs: 4.5, op: ">=", rhs: 4.5, want: true},
 		{lhs: 4.5, op: ">=", rhs: 8.2, want: false},
-		// int < int
+		// string >= string
+		{lhs: "", op: ">=", rhs: "x", want: false},
+		{lhs: "x", op: ">=", rhs: "", want: true},
+		{lhs: "x", op: ">=", rhs: "x", want: true},
+		{lhs: "x", op: ">=", rhs: "a", want: true},
+		{lhs: "x", op: ">=", rhs: "abc", want: true},
+		// int > int
 		{lhs: int64(6), op: ">", rhs: int64(4), want: true},
 		{lhs: int64(4), op: ">", rhs: int64(4), want: false},
 		{lhs: int64(4), op: ">", rhs: int64(6), want: false},
@@ -183,6 +201,12 @@ func TestBinaryOperator(t *testing.T) {
 		{lhs: 8.2, op: ">", rhs: 4.5, want: true},
 		{lhs: 4.5, op: ">", rhs: 8.2, want: false},
 		{lhs: 4.5, op: ">", rhs: 4.5, want: false},
+		// string > string
+		{lhs: "", op: ">", rhs: "x", want: false},
+		{lhs: "x", op: ">", rhs: "", want: true},
+		{lhs: "x", op: ">", rhs: "x", want: false},
+		{lhs: "x", op: ">", rhs: "a", want: true},
+		{lhs: "x", op: ">", rhs: "abc", want: true},
 		// int == int
 		{lhs: int64(4), op: "==", rhs: int64(4), want: true},
 		{lhs: int64(6), op: "==", rhs: int64(4), want: false},

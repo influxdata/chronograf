@@ -1,0 +1,5 @@
+# This file describes an image that is capabale of building Flux.
+
+FROM golang:1.11.4
+
+RUN apt-get update && apt-get install -y ruby ragel=6.9-1.1+b1

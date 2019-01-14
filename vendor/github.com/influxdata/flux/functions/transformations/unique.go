@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/arrow"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
@@ -150,50 +151,50 @@ func (t *uniqueTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 		timeUnique = make(map[execute.Time]bool)
 	}
 
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		l := cr.Len()
 		for i := 0; i < l; i++ {
 			// Check unique
 			switch col.Type {
 			case flux.TBool:
-				v := cr.Bools(colIdx)[i]
+				v := cr.Bools(colIdx).Value(i)
 				if boolUnique[v] {
 					continue
 				}
 				boolUnique[v] = true
 			case flux.TInt:
-				v := cr.Ints(colIdx)[i]
+				v := cr.Ints(colIdx).Value(i)
 				if intUnique[v] {
 					continue
 				}
 				intUnique[v] = true
 			case flux.TUInt:
-				v := cr.UInts(colIdx)[i]
+				v := cr.UInts(colIdx).Value(i)
 				if uintUnique[v] {
 					continue
 				}
 				uintUnique[v] = true
 			case flux.TFloat:
-				v := cr.Floats(colIdx)[i]
+				v := cr.Floats(colIdx).Value(i)
 				if floatUnique[v] {
 					continue
 				}
 				floatUnique[v] = true
 			case flux.TString:
-				v := cr.Strings(colIdx)[i]
+				v := cr.Strings(colIdx).ValueString(i)
 				if stringUnique[v] {
 					continue
 				}
 				stringUnique[v] = true
 			case flux.TTime:
-				v := cr.Times(colIdx)[i]
+				v := execute.Time(cr.Times(colIdx).Value(i))
 				if timeUnique[v] {
 					continue
 				}
 				timeUnique[v] = true
 			}
 
-			if err := execute.AppendRecord(i, cr, builder); err != nil {
+			if err := execute.AppendRecord(i, arrow.ColReader(cr), builder); err != nil {
 				return err
 			}
 		}

@@ -103,7 +103,7 @@ The following keywords are reserved and may not be used as identifiers:
 
 The following character sequences represent operators:
 
-    +   ==   !=   (   )
+    +   ==   !=   (   )   =>
     -   <    !~   [   ]
     *   >    =~   {   }
     /   <=   =    ,   :
@@ -144,8 +144,8 @@ It has an integer part, a decimal point, and a fractional part.
 The integer and fractional part comprise decimal digits.
 One of the integer part or the fractional part may be elided.
 
-    float_lit = decimals "." [ decimals ] |
-        "." decimals .
+    float_lit = decimals "." [ decimals ]
+              | "." decimals .
     decimals  = decimal_digit { decimal_digit } .
 
 Examples:
@@ -332,7 +332,8 @@ Regular expression literals support only the following escape sequences:
     \\   U+005c backslash
 
 
-    regexp_lit         = "/" { unicode_char | byte_value | regexp_escape_char } "/" .
+    regexp_lit         = "/" regexp_char { regexp_char } "/" .
+    regexp_char        = unicode_char | byte_value | regexp_escape_char .
     regexp_escape_char = `\` (`/` | `\`)
 
 Examples:
@@ -342,6 +343,8 @@ Examples:
     /^\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e(ZZ)?$/
     /^日本語(ZZ)?$/ // the above two lines are equivalent
     /\\xZZ/ // this becomes the literal pattern "\xZZ"
+    /a\/b\\c\d/ // escape sequences and character class shortcuts are supported
+    /(?:)/ // the empty regular expression
 
 The regular expression syntax is defined by [RE2](https://github.com/google/re2/wiki/Syntax).
 
@@ -472,12 +475,12 @@ This form of polymorphism means that these checks are performed during type infe
 
 A _block_ is a possibly empty sequence of statements within matching brace brackets.
 
-    Block = "{" StatementList "} .
+    Block         = "{" StatementList "} .
     StatementList = { Statement } .
 
 In addition to explicit blocks in the source code, there are implicit blocks:
 
-1. The _options block_ is the top-level block for all Flux programs. All option declarations are contained in this block.
+1. The _options block_ is the top-level block for all Flux programs. All option assignments are contained in this block.
 2. The _universe block_ encompasses all Flux source text aside from option statements. It is nested directly inside of the _options block_.
 3. Each package has a _package block_ containing all Flux source text for that package.
 4. Each file has a _file block_ containing all Flux source text in that file.
@@ -519,7 +522,7 @@ A variable assignment creates a variable bound to the identifier and gives it a 
 When the identifier was previously assigned within the same block the identifier now holds the new value.
 An identifier cannot change type within the same block.
 
-    VarAssignment = identifier "=" Expression
+    VariableAssignment = identifier "=" Expression
 
 Examples:
 
@@ -533,30 +536,55 @@ Examples:
 
 An expression specifies the computation of a value by applying the operators and functions to operands.
 
-#### Operands
+#### Operands and primary expressions
 
 Operands denote the elementary values in an expression.
-An operand may be a literal, identifier denoting a variable, or a parenthesized expression.
 
+Primary expressions are the operands for unary and binary expressions. 
+A primary expressions may be a literal, an identifier denoting a variable, or a parenthesized expression.
 
-TODO(nathanielc): Fill out expression details...
-PEG parsers don't understand operators precedence so it difficult to express operators in expressions with the grammar.
-We should simplify it and use the EBNF grammar.
-This requires redoing the parser in something besides PEG.
+    PrimaryExpression = identifier | Literal | "(" Expression ")" .
 
+#### Literals
 
-[IMPL#246](https://github.com/influxdata/platform/issues/246) Update parser to use formal EBNF grammar.
+Literals construct a value.
 
-#### Function literals
+    Literal = int_lit
+            | float_lit
+            | string_lit
+            | regex_lit
+            | duration_lit
+            | pipe_receive_lit
+            | ObjectLiteral
+            | ArrayLiteral
+            | FunctionLiteral .
+
+##### Object literals
+
+Object literals construct a value with the object type.
+
+    ObjectLiteral = "{" PropertyList "}" .
+    PropertyList  = [ Property { "," Property } ] .
+    Property      = identifier [ ":" Expression ]
+                  | string_lit ":" Expression .
+
+##### Array literals
+
+Array literals construct a value with the array type.
+
+    ArrayLiteral   = "[" ExpressionList "]" .
+    ExpressionList = [ Expression { "," Expression } ] .
+
+##### Function literals
 
 A function literal defines a new function with a body and parameters.
 The function body may be a block or a single expression.
 The function body must have a return statement if it is an explicit block, otherwise the expression is the return value.
 
-    FunctionLit        = FunctionParameters "=>" FunctionBody .
+    FunctionLiteral    = FunctionParameters "=>" FunctionBody .
     FunctionParameters = "(" [ ParameterList [ "," ] ] ")" .
-    ParameterList      = ParameterDecl { "," ParameterDecl } .
-    ParameterDecl      = identifier [ "=" Expression ] .
+    ParameterList      = Parameter { "," Parameter } .
+    Parameter          = identifier [ "=" Expression ] .
     FunctionBody       = Expression | Block .
 
 Examples:
@@ -585,6 +613,8 @@ Arguments must be specified using the argument name, positional arguments not su
 Argument order does not matter.
 When an argument has a default value, it is not required to be specified.
 
+    CallExpression = "(" PropertyList ")" .
+
 Examples:
 
     f(a:1, b:9.6)
@@ -599,7 +629,7 @@ Pipe expressions pass the result of the left hand expression as the _pipe argume
 Function literals specify which if any argument is the pipe argument using the _pipe literal_ as the argument's default value.
 It is an error to use a pipe expression if the function does not declare a pipe argument.
 
-    pipe_lit = "<-" .
+    pipe_receive_lit = "<-" .
 
 Examples:
 
@@ -608,28 +638,81 @@ Examples:
     baz = (y=<-) => // function body elided
     foo() |> bar() |> baz() // equivalent to baz(x:bar(y:foo()))
 
+
+#### Index expressions
+
+Index expressions access a value from an array based on a numeric index.
+
+    IndexExpression = "[" Expression "]" .
+
+#### Member expressions
+
+Member expressions access a property of an object.
+The property being accessed must be either an identifer or a string literal.
+In either case the literal value is the name of the property being accessed, the identifer is not evaluated.
+It is not possible to access an object's property using an arbitrary expression.
+
+    MemberExpression        = DotExpression  | MemberBracketExpression
+    DotExpression           = "." identifer
+    MemberBracketExpression = "[" string_lit "]" .
+
+#### Operators
+
+Operators combine operands into expressions.
+Operator precedence is encoded directly into the grammar.
+
+    Expression               = LogicalExpression .
+    LogicalExpression        = UnaryLogicalExpression
+                             | LogicalExpression LogicalOperator UnaryLogicalExpression .
+    LogicalOperator          = "and" | "or" .
+    UnaryLogicalExpression   = ComparisonExpression
+                             | UnaryLogicalOperator UnaryLogicalExpression .
+    UnaryLogicalOperator     = "not" .
+    ComparisonExpression     = MultiplicativeExpression
+                             | ComparisonExpression ComparisonOperator MultiplicativeExpression .
+    ComparisonOperator       = "==" | "!=" | "<" | "<=" | ">" | ">=" | "=~" | "!~" .
+    MultiplicativeExpression = AdditiveExpression
+                             | MultiplicativeExpression MultiplicativeOperator AdditiveExpression .
+    MultiplicativeOperator   = "*" | "/" .
+    AdditiveExpression       = PipeExpression
+                             | AdditiveExpression AdditiveOperator PipeExpression .
+    AdditiveOperator         = "+" | "-" .
+    PipeExpression           = PostfixExpression
+                             | PipeExpression PipeOperator UnaryExpression .
+    PipeOperator             = "|>" .
+    UnaryExpression          = PostfixExpression
+                             | PrefixOperator UnaryExpression .
+    PrefixOperator           = "+" | "-" .
+    PostfixExpression        = PrimaryExpression
+                             | PostfixExpression PostfixOperator .
+    PostfixOperator          = MemberExpression
+                             | CallExpression
+                             | IndexExpression .
 ### Program
 
-A Flux program is a sequence of statements defined by
+A Flux program is a sequence of statements and optionally a package clause and import declarations.
 
-    Program = [PackageStatement] [ImportList] StatementList .
-    ImportList = { ImportStatement } .
+    Program = [ PackageClause ] [ ImportList ] StatementList .
+    ImportList = { ImportDeclaration } .
 
 ### Statements
 
 A statement controls execution.
 
-    Statement = OptionStatement | VarAssignment |
-                ReturnStatement | ExpressionStatement | BlockStatment .
+    Statement = OptionStatement
+              | VariableAssignment
+              | ReturnStatement
+              | ExpressionStatement .
 
-#### Package statement
+#### Package clause
 
-    PackageStatement = "package" identifier .
-
-A package statement defines a package block.
+A package clause defines the name for the current package.
 Package names must be valid Flux identifiers.
-The package statement must be the first statement of every Flux source file.
-If a file does not declare a package statement, all identifiers in that file will belong to the special _main_ package.
+The package clause must at the begining of any Flux source file.
+When a file does not declare a package clause, all identifiers in that file will belong to the special _main_ package.
+
+    PackageClause = "package" identifier .
+
 
 [IMPL#247](https://github.com/influxdata/platform/issues/247) Add package/namespace support
 
@@ -641,14 +724,14 @@ The _main_ package is special for a few reasons:
 2. It cannot be imported
 3. All query specifications produced after evaluating the _main_ package are coerced into producing side effects
 
-#### Import statement
+#### Import declaration
 
-    ImportStatement = "import" [identifier] `"` unicode_char { unicode_char } `"`.
+    ImportDeclaration = "import" [identifier] string_lit
 
 Associated with every package is a package name and an import path.
-The import statement takes a package's import path and brings all of the identifiers defined in that package into the current scope.
-The import statment defines a namespace through which to access the imported identifiers.
-By default the identifer of this namespace is the package name unless otherwise specified.
+The import statement takes a package's import path and brings all of the identifiers defined in that package into the current scope under a namespace.
+The import statment defines the namespace through which to access the imported identifiers.
+By default the identifier of this namespace is the package name unless otherwise specified.
 For example, given a variable `x` declared in package `foo`, importing `foo` and referencing `x` would look like this:
 
 ```
@@ -666,7 +749,6 @@ bar.x
 ```
 
 A package's import path is always absolute.
-Flux does not support relative imports.
 Assigment into the namespace of an imported package is not allowed.
 A package cannot access nor modify the identifiers belonging to the imported packages of its imported packages.
 Every statement contained in an imported package is evaluated.
@@ -691,7 +773,7 @@ the `task` option to schedule a query to run periodically every hour:
 All options are designed to be completely optional and have default values to be used when not specified.
 Grammatically, an option statement is just a variable assignment preceded by the "option" keyword.
 
-    OptionStatement = "option" VarAssignment
+    OptionStatement = "option" VariableAssignment
 
 Below is a list of all options that are currently implemented in the Flux language:
 
@@ -757,103 +839,14 @@ Side effects can occur in two ways.
 
 A function produces side effects when it is explicitly declared to have side effects or when it calls a function that itself produces side effects.
 
-### Built-in functions
 
-The following functions are preassigned in the universe block.
+## Built-ins
 
-#### Functions and Operations
+Flux contains many preassigned values in the universe block.
 
-Many function's purpose is to construct an operation that will be part of a query specification.
-As a result these functions return an object that represents the specific operation being defined.
-The object is then passed into the next function and added as a parent, constructing a directed acyclic graph of operations.
-The yield function then traverses the graph of operations and produces a query specification that can be executed.
+### Time constants
 
-The following is a list of functions whose main purpose is to construct an operation.
-Details about their arguments and behavior can be found in the Operations section of this document.
-
-* count
-* covariance
-* cumulativeSum
-* derivative
-* difference
-* distinct
-* filter
-* first
-* from
-* group
-* integral
-* join
-* last
-* limit
-* map
-* max
-* mean
-* min
-* percentile
-* range
-* to
-* sample
-* set
-* shift
-* skew
-* sort
-* spread
-* stateTracking
-* stddev
-* sum
-* window
-* yield
-
-Other functions make use of existing operations to create composite operations.
-
-##### Cov
-
-Cov computes the covariance between two streams by first joining the streams and then performing the covariance operation.
-
-##### HighestMax
-
-HighestMax computes the top N records from all tables using the maximum of each table.
-
-##### HighestAverage
-
-HighestAverage computes the top N records from all tables using the average of each table.
-
-##### HighestCurrent
-
-HighestCurrent computes the top N records from all tables using the last value of each table.
-
-##### LowestMin
-
-LowestMin computes the bottom N records from all tables using the minimum of each table.
-
-##### LowestAverage
-
-LowestAverage computes the bottom N records from all tables using the average of each table.
-
-##### LowestCurrent
-
-LowestCurrent computes the bottom N records from all tables using the last value of each table.
-
-##### Pearsonr
-
-Pearsonr computes the Pearson R correlation coefficient between two streams by first joining the streams and then performing the covariance operation normalized to compute R.
-
-##### StateCount
-
-StateCount computes the number of consecutive records in a given state.
-
-##### StateDuration
-
-StateDuration computes the duration of a given state.
-
-
-##### Top/Bottom
-
-Top and Bottom sort a table and limits the table to only n records.
-
-##### Time constants
-
-###### Days of the week
+#### Days of the week
 
 Days of the week are represented as integers in the range `[0-6]`.
 The following builtin values are defined:
@@ -871,7 +864,7 @@ Saturday  = 6
 
 [IMPL#153](https://github.com/influxdata/flux/issues/153) Add Days of the Week constants
 
-###### Months of the year
+### Months of the year
 
 Months are represented as integers in the range `[1-12]`.
 The following builtin values are defined:
@@ -893,7 +886,7 @@ December  = 12
 
 [IMPL#154](https://github.com/influxdata/flux/issues/154) Add Months of the Year constants
 
-##### Time and date functions
+### Time and date functions
 
 These are builtin functions that all take a single `time` argument and return an integer.
 
@@ -914,12 +907,12 @@ These are builtin functions that all take a single `time` argument and return an
 
 [IMPL#155](https://github.com/influxdata/flux/issues/155) Implement Time and date functions 
 
-##### System Time
+### System Time
 
 The builtin function `systemTime` returns the current system time.
 All calls to `systemTime` within a single evaluation of a Flux script return the same time.
 
-#### Intervals
+### Intervals
 
 Intervals is a function that produces a set of time intervals over a range of time.
 An interval is an object with `start` and `stop` properties that correspond to the inclusive start and exclusive stop times of the time interval.
@@ -1021,7 +1014,7 @@ Examples using known start and stop dates:
 [IMPL#659](https://github.com/influxdata/platform/query/issues/659) Implement intervals function
 
 
-##### Builtin Intervals
+### Builtin Intervals
 
 The following builtin intervals exist:
 
@@ -1047,7 +1040,7 @@ The following builtin intervals exist:
     years = intervals(every:1y)
 
 
-#### FixedZone
+### FixedZone
 
 FixedZone creates a location based on a fixed time offset from UTC.
 
@@ -1085,82 +1078,16 @@ Examples:
 
 [IMPL#157](https://github.com/influxdata/flux/issues/157) Implement LoadLoacation function
 
-## Query engine
+## Data model
 
-The execution of a query is separate and distinct from the execution of Flux the language.
-The input into the query engine is a query specification.
+Flux employs a basic data model built from basic data types.
+The data model consists of tables, records, columns and streams.
 
-The output of a Flux program is a query specification, which then may be passed into the query execution engine.
+### Record
 
-### Query specification
+A record is a tuple of named values and is represented using an object type.
 
-A query specification consists of a set of operations and a set of edges between those operations.
-The operations and edges must form a directed acyclic graph (DAG).
-A query specification produces side effects when at least one of its operations produces side effects.
-
-#### Encoding
-
-The query specification may be encoded in different formats.
-An encoding must consist of three properties:
-
-* operations -  a list of operations and their specification.
-* edges - a list of edges declaring a parent child relation between operations.
-* resources - an optional set of constraints on the resources the query can consume.
-
-Each operation has three properties:
-
-* kind - kind is the name of the operation to perform.
-* id - an identifier for this operation, it must be unique per query specification.
-* spec - a set of properties that specify details of the operation.
-    These vary by the kind of operation.
-
-JSON encoding is supported and the following is an example encoding of a query:
-
-```
-from(bucket:"mydatabase/autogen") |> last()
-```
-
-```
-{
-  "operations": [
-    {
-      "kind": "from",
-      "id": "from0",
-      "spec": {
-        "db": "mydatabase"
-      }
-    },
-    {
-      "kind": "last",
-      "id": "last1",
-      "spec": {
-        "column": ""
-      }
-    }
-  ],
-  "edges": [
-    {
-      "parent": "from0",
-      "child": "last1"
-    }
-  ],
-  "resources": {
-    "priority": "high",
-    "concurrency_quota": 0,
-    "memory_bytes_quota": 0
-  }
-}
-```
-
-### Data model
-
-The data model for the query engine consists of tables, records, columns and streams.
-
-#### Record
-
-A record is a tuple of values.
-
-#### Column
+### Column
 
 A column has a label and a data type.
 
@@ -1176,7 +1103,7 @@ The available data types for a column are:
     duration a nanosecond precision duration of time
 
 
-#### Table
+### Table
 
 A table is set of records, with a common set of columns and a group key.
 
@@ -1187,34 +1114,39 @@ These common values are referred to as the group key value, and can be represent
 
 A tables schema consists of its group key, and its column's labels and types.
 
+[IMPL#463](https://github.com/influxdata/flux/issues/463) Specify the primitive types that make up stream and table types
 
-#### Stream
+### Stream of tables
 
-A stream represents a potentially unbounded dataset.
-A stream grouped into individual tables.
+A stream represents a potentially unbounded set of tables.
+A stream is grouped into individual tables using the group key.
 Within a stream each table's group key value is unique.
 
-#### Missing values
+[IMPL#463](https://github.com/influxdata/flux/issues/463) Specify the primitive types that make up stream and table types
+
+### Missing values
 
 A record may be missing a value for a specific column.
 Missing values are represented with a special _null_ value.
 The _null_ value can be of any data type.
 
-
 [IMPL#300](https://github.com/influxdata/platform/issues/300) Design how nulls behave
 
-#### Operations
+### Transformations
 
-An operation defines a transformation on a stream.
-All operations may consume a stream and always produce a new stream.
+Transformations define a change to a stream.
+Transformations may consume an input stream and always produce a new output stream.
 
-Most operations output one table for every table they receive from the input stream.
+Most transformations output one table for every table they receive from the input stream.
+Transformations that modify the group keys or values will need to regroup the tables in the output stream.
+A transformation produces side effects when it is constructed from a function that produces side effects.
 
-Operations that modify the group keys or values will need to regroup the tables in the output stream.
+Transformations are repsented using function types.
 
-An operation produces side effects when it is constructed from a function that produces side effects.
+### Built-in transformations
 
-### Built-in operations
+The following functions are preassigned in the universe block.
+These functions each define a transformation.
 
 #### From
 
@@ -1234,6 +1166,7 @@ The tables schema will include the following columns:
     the exclusive upper time bound of all records
 
 Additionally any tags on the series will be added as columns.
+The default group key for the tables is every column except `_time` and `_value`.
 
 
 From has the following properties:
@@ -1280,6 +1213,30 @@ Example:
 `from(bucket: "telegraf/autogen") |> range(start: -5m) |> yield(name:"1")`
 
 **Note:** The `yield` function produces side effects.
+
+#### AssertEquals
+
+AssertEquals is a function that will test whether two streams have identical data.  It also outputs the data from the tested stream unchanged, so that this function can be used to perform in-line tests in a query.  
+
+AssertEquals has the following properties: 
+* `name` string
+    unique name given to this assertion. 
+* `got` stream
+    the stream you are testing.  May be piped-forward from another function.  
+* `want` stream
+    A copy of the expected stream. 
+
+Example: 
+
+```
+want = from(bucket: "backup-telegraf/autogen") |> range(start: -5m)
+// in-line assertion
+from(bucket: "telegraf/autogen") |> range(start: -5m) |> assertEquals(want: want)
+
+// equivalent: 
+got = from(bucket: "telegraf/autogen") |> range(start: -5m)
+assertEquals(got: got, want: want)
+```
 
 #### Aggregate operations
 
@@ -1352,20 +1309,54 @@ Covariance has the following properties:
 Additionally exactly two columns must be provided to the `columns` property.
 
 Example:
-`from(bucket: "telegraf) |> range(start:-5m) |> covariance(columns: [/autogen"x", "y"])`
+`from(bucket: "telegraf/autogen") |> range(start:-5m) |> covariance(columns: ["x", "y"])`
+
+#### Cov
+
+Cov computes the covariance between two streams by first joining the streams and then performing the covariance operation per joined table.
+
+Cov has the following properties:
+
+* `x` stream
+    X is one of the input streams
+* `y` stream
+    Y is one of the input streams
+* `on` list of strings
+    On is the list of columns on which to join.
+* `pearsonr` bool
+    pearsonr indicates whether the result should be normalized to be the Pearson R coefficient.
+* `valueDst` string
+    valueDst is the column into which the result will be placed.
+    Defaults to `_value`.
+
+Example:
+    
+    cpu = from(bucket: "telegraf/autogen") |> range(start:-5m) |> filter(fn:(r) => r._measurement == "cpu")
+    cpu = from(bucket: "telegraf/autogen") |> range(start:-5m) |> filter(fn:(r) => r._measurement == "mem")
+    cov(x: cpu, y: mem)
+
+#### Pearsonr
+
+Pearsonr computes the Pearson R correlation coefficient bewteen two streams.
+It is defined in terms of the `cov` function:
+
+    pearsonr = (x,y,on) => cov(x:x, y:y, on:on, pearsonr:true)
 
 ##### Count
 
 Count is an aggregate operation.
 For each aggregated column, it outputs the number of non null records as an integer.
 
-Count has the following property: 
+Count has the following property:
 
 * `columns` list of string
     columns specifies a list of columns to aggregate. Defaults to `["_value"]`
 
 Example:
-`from(bucket: "telegraf/autogen") |> range(start: -5m) |> count()`
+```
+from(bucket: "telegraf/autogen") |> range(start: -5m) |> count()
+```
+
 
 ##### Integral
 
@@ -1397,12 +1388,12 @@ from(bucket: "telegraf/autogen")
 Mean is an aggregate operation.
 For each aggregated column, it outputs the mean of the non null records as a float.
 
-Mean has the following property: 
+Mean has the following property:
 
 * `columns` list of string
     columns specifies a list of columns to aggregate. Defaults to `["_value"]`
 
-Example: 
+Example:
 ```
 from(bucket:"telegraf/autogen")
     |> filter(fn: (r) => r._measurement == "mem" AND
@@ -1467,14 +1458,14 @@ from(bucket: "telegraf/autogen")
 Skew is an aggregate operation.
 For each aggregated column, it outputs the skew of the non null record as a float.
 
-Skew has the following parameter: 
+Skew has the following parameter:
 
 * `columns` list of string
     columns specifies a list of columns to aggregate. Defaults to `["_value"]`
 
 Example:
 ```
-from(bucket: "telegraf/autogen") 
+from(bucket: "telegraf/autogen")
     |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "cpu" and r._field == "usage_system")
     |> skew()
@@ -1487,14 +1478,14 @@ For each aggregated column, it outputs the difference between the min and max va
 The type of the output column depends on the type of input column: for input columns with type `uint` or `int`, the output is an `int`; for `float` input columns the output is a `float`.
 All other input types are invalid.
 
-Spread has the following parameter: 
+Spread has the following parameter:
 
 * `columns` list of string
     columns specifies a list of columns to aggregate. Defaults to `["_value"]`
 
 Example:
 ```
-from(bucket: "telegraf/autogen") 
+from(bucket: "telegraf/autogen")
     |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "cpu" and r._field == "usage_system")
     |> spread()
@@ -1504,14 +1495,14 @@ from(bucket: "telegraf/autogen")
 Stddev is an aggregate operation.
 For each aggregated column, it outputs the standard deviation of the non null record as a float.
 
-Stddev has the following parameter: 
+Stddev has the following parameter:
 
 * `columns` list of string
     columns specifies a list of columns to aggregate. Defaults to `["_value"]`
 
 Example:
 ```
-from(bucket: "telegraf/autogen") 
+from(bucket: "telegraf/autogen")
     |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "cpu" and r._field == "usage_system")
     |> stddev()
@@ -1523,14 +1514,14 @@ Stddev is an aggregate operation.
 For each aggregated column, it outputs the sum of the non null record.
 The output column type is the same as the input column type.
 
-Sum has the following parameter: 
+Sum has the following parameter:
 
 * `columns` list of string
     columns specifies a list of columns to aggregate. Defaults to `["_value"]`
 
 Example:
 ```
-from(bucket: "telegraf/autogen") 
+from(bucket: "telegraf/autogen")
     |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "cpu" and r._field == "usage_system")
     |> sum()
@@ -1615,10 +1606,10 @@ Percentile has the following properties:
 * `percentile` float
     A value between 0 and 1 indicating the desired percentile.
 * `method` string
-    percentile provides 3 methods for computation: 
-    * `estimate_tdigest`: See Percentile (Aggregate) 
-    * `exact_mean`: See Percentile (Aggregate) 
-    * `exact_selector`: a selector result that returns the data point for which at least `percentile` points are less than. 
+    percentile provides 3 methods for computation:
+    * `estimate_tdigest`: See Percentile (Aggregate).
+    * `exact_mean`: See Percentile (Aggregate).
+    * `exact_selector`: a selector result that returns the data point for which at least `percentile` points are less than.
 
 Example:
 ```
@@ -1702,11 +1693,32 @@ from(bucket:"telegraf/autogen")
                 r.service == "app-server")
 ```
 
+#### Highest/Lowest
+
+There are six highest/lowest functions that compute the top or bottom N records from all tables in a stream based on a specific aggregation method.
+
+* highestMax - computes the top N records from all tables using the maximum of each table.
+* highestAverage  - computes the top N records from all tables using the average of each table.
+* highestCurrent - computes the top N records from all tables using the last value of each table.
+* lowestMin - computes the bottom N records from all tables using the minimum of each table.
+* lowestAverage - computes the bottom N records from all tables using the average of each table.
+* lowestCurrent - computes the bottom N records from all tables using the last value of each table.
+
+All of the highest/lowest functions take the following parameters:
+
+* `n` int
+    N is the number of records to select.
+* `columns` list of strings
+    Columns is the list of columns to use when aggregating.
+    Defaults to `["_value"]`.
+* `groupColumns` list of strings
+    GroupColumns are the columns on which to group to perform the aggregation.
+
 #### Histogram
 
-Histogram approximates the cumulative distribution function of a dataset by counting data frequencies for a list of buckets.
-A bucket is defined by an upper bound where all data points that are less than or equal to the bound are counted in the bucket.
-The bucket counts are cumulative.
+Histogram approximates the cumulative distribution function of a dataset by counting data frequencies for a list of bins.
+A bin is defined by an upper bound where all data points that are less than or equal to the bound are counted in the bin.
+The bin counts are cumulative.
 
 Each input table is converted into a single output table representing a single histogram.
 The output table will have a the same group key as the input table.
@@ -1724,9 +1736,9 @@ Histogram has the following properties:
 * `countColumn` string
     CountColumn is the name of the column in which to store the histogram counts.
     Defaults to `_value`.
-* `buckets` array of floats
-    Buckets is a list of upper bounds to use when computing the histogram frequencies.
-    Buckets should contain a bucket whose bound is the maximum value of the data set, this value can be set to positive infinity if no maximum is known.
+* `bins` array of floats
+    Bins is a list of upper bounds to use when computing the histogram frequencies.
+    Each element in the array should contain a float value that represents the maximum value for a bin.
 * `normalize` bool
     Normalize when true will convert the counts into frequencies values between 0 and 1.
     Normalized histograms cannot be aggregated by summing their counts.
@@ -1735,7 +1747,7 @@ Histogram has the following properties:
 
 Example:
 
-    histogram(buckets:linearBuckets(start:0.0,width:10.0,count:10))  // compute the histogram of the data using 10 buckets from 0,10,20,...,100
+    histogram(bins:linearBins(start:0.0,width:10.0,count:10))  // compute the histogram of the data using 10 bins from 0,10,20,...,100
 
 #### HistogramQuantile
 
@@ -1780,36 +1792,36 @@ Example:
 
     histogramQuantile(quantile:0.9)  // compute the 90th quantile using histogram data.
 
-#### LinearBuckets
+##### LinearBins
 
-LinearBuckets produces a list of linearly separated floats.
+LinearBins produces a list of linearly separated floats.
 
-LinearBuckets has the following properties:
+LinearBins has the following properties:
 
 * `start` float
     Start is the first value in the returned list.
 * `width` float
-    Width is the distance between subsequent bucket values.
+    Width is the distance between subsequent bin values.
 * `count` int
-    Count is the number of buckets to create.
+    Count is the number of bins to create.
 * `inifinity` bool
-    Infinity when true adds an additional bucket with a value of positive infinity.
+    Infinity when true adds an additional bin with a value of positive infinity.
     Defaults to `true`.
 
-#### LogrithmicBuckets
+##### LogarithmicBins
 
-LogrithmicBuckets produces a list of exponentially separated floats.
+LogarithmicBins produces a list of exponentially separated floats.
 
-LogrithmicBuckets has the following properties:
+LogarithmicBins has the following properties:
 
 * `start` float
-    Start is the first value in the returned bucket list.
+    Start is the first value in the returned bin list.
 * `factor` float
-    Factor is the multiplier applied to each subsequent bucket.
+    Factor is the multiplier applied to each subsequent bin.
 * `count` int
-    Count is the number of buckets to create.
+    Count is the number of bins to create.
 * `inifinity` bool
-    Infinity when true adds an additional bucket with a value of positive infinity.
+    Infinity when true adds an additional bin with a value of positive infinity.
     Defaults to `true`.
 
 #### Limit
@@ -1908,12 +1920,14 @@ from(bucket:"telegraf/autogen")
     |> filter(fn: (r) => r._measurement == "cpu" AND
                r._field == "usage_system")
 ```
+
 #### Rename 
 
 Rename will rename specified columns in a table. 
 There are two variants: one which takes a map of old column names to new column names,
 and one which takes a mapping function. 
 If a column is renamed and is part of the group key, the column name in the group key will be updated.
+If a specified column is not present in a table an error will be thrown.
 
 Rename has the following properties: 
 * `columns` object
@@ -1970,6 +1984,7 @@ from(bucket: "telegraf/autogen")
 Keep is the inverse of drop. It will return a table containing only columns that are specified,
 ignoring all others. 
 Only columns in the group key that are also specified in `keep` will be kept in the resulting group key.
+If a specified column is not present in a table an error will be thrown.
 
 Keep has the following properties: 
 * `columns` array of strings
@@ -1998,7 +2013,9 @@ from(bucket: "telegraf/autogen")
 ```
 
 #### Duplicate 
-Duplicate will duplicate a specified column in a table
+
+Duplicate will duplicate a specified column in a table.
+If the specified column is not present in a table an error will be thrown.
 
 Duplicate has the following properties:
 
@@ -2022,8 +2039,7 @@ from(bucket: "telegraf/autogen")
 
 Set assigns a static value to each record.
 The key may modify and existing column or it may add a new column to the tables.
-If the column that is modified is part of the group key, then the output tables will be regroup as needed.
-
+If the column that is modified is part of the group key, then the output tables will be regrouped as needed.
 
 Set has the following properties:
 
@@ -2066,32 +2082,62 @@ It produces tables with new group keys based on the provided properties.
 
 Group has the following properties:
 
-*  `by` list of strings
-    Group by these specific columns.
-    Cannot be used with `except`.
-*  `except` list of strings
-    Group by all other columns except this list.
-    Cannot be used with `by`.
+*  `columns` list of strings
+    List of columns used to calculate the new group key.
+    The default is `[]`.
+*  `mode` string
+    The grouping mode, can be one of `"by"` or `"except"`.
+    The default is `"by"`.
+    
+When using `"by"` mode, the specified `columns` are the new group key.  
+When using `"except"` mode, the new group key is the difference between the columns of the table under exam
+and `columns`.  
 
-Examples:
-    group(by:["host"]) // group records by their "host" value
-    group(except:["_time", "region", "_value"]) // group records by all other columns except for _time, region, and _value
-    group(by:[]) // group all records into a single group
-    group(except:[]) // group records into all unique groups
+__Examples__
+
+_By_
 
 ```
 from(bucket: "telegraf/autogen") 
     |> range(start: -30m) 
-    |> group(by: ["host", "_measurement"])
+    |> group(columns: ["host", "_measurement"])
 ```
-All records are grouped by the "host" and "_measurement" columns. The resulting group key would be ["host, "_measurement"]
+
+Or:
+
+```
+...
+    |> group(columns: ["host", "_measurement"], mode: "by")
+```
+
+Records are grouped by the `"host"` and `"_measurement"` columns.  
+The resulting group key is `["host", "_measurement"]`, so a new table for every different `["host", "_measurement"]`
+value is created.  
+Every table in the result contains every record for some `["host", "_measurement"]` value.  
+Every record in some resulting table has the same value for the columns `"host"` and `"_measurement"`.
+
+_Except_
 
 ```
 from(bucket: "telegraf/autogen")
     |> range(start: -30m)
-    |> group(except: ["_time"])
+    |> group(columns: ["_time"], mode: "except")
 ```
-All records are grouped by the set of all columns in the table, excluding "_time". For example, if the table has columns ["_time", "host", "_measurement", "_field", "_value"] then the group key would be ["host", "_measurement", "_field", "_value"]
+
+Records are grouped by the set of all columns in the table, excluding `"_time"`.  
+For example, if the table has columns `["_time", "host", "_measurement", "_field", "_value"]` then the group key would be
+`["host", "_measurement", "_field", "_value"]`.
+
+_Single-table grouping_
+
+```
+from(bucket: "telegraf/autogen")
+    |> range(start: -30m)
+    |> group()
+```
+
+Records are grouped into a single table.  
+The group key of the resulting table is empty.
 
 #### Keys
 
@@ -2120,6 +2166,7 @@ KeyValues has the following properties:
 Additional requirements: 
 *  Only one of `keyColumns` or `fn` may be used in a single call.  
 *  All columns indicated must be of the same type. 
+*  Each input table must have all of the columns listed by the `keyColumns` parameter.
 
 ```
 from(bucket: "telegraf/autogen")
@@ -2143,6 +2190,29 @@ from(bucket: "telegraf/autogen")
     |> filter(fn: (r) => r._measurement == "cpu")
     |> keyValues(fn: filterColumns(fn: (column) => column.label =~ /usage_.*/))
 ```
+
+Examples:
+
+Given the following input table with group key `["_measurement"]`:
+
+    | _time | _measurement | _value | tagA |
+    | ----- | ------------ | ------ | ---- |
+    | 00001 | "m1"         | 1      | "a"  |
+    | 00002 | "m1"         | 2      | "b"  |
+    | 00003 | "m1"         | 3      | "c"  |
+    | 00004 | "m1"         | 4      | "b"  |
+
+`keyValues(keyColumns: ["tagA"])` produces the following table with group key ["_measurement"]:
+
+    | _measurement | _key   | _value |
+    | ------------ | ------ | ------ |
+    | "m1"         | "tagA" | "a"    |
+    | "m1"         | "tagA" | "b"    |
+    | "m1"         | "tagA" | "c"    |
+
+`keyColumns(keyColumns: ["tagB"])` produces the following error message:
+
+    received table with columns [_time, _measurement, _value, tagA] not having key columns [tagB]
 
 
 #### Window
@@ -2231,20 +2301,25 @@ If no value is found, the value is set to `null`.
 
 [IMPL#353](https://github.com/influxdata/platform/issues/353) Null defined in spec but not implemented.  
 
-#### FromRows
+#### InfluxFieldsAsCols
 
-FromRows is a special application of pivot that will automatically align fields within each measurement that have the same time stamp.
+InfluxFieldsAsCols is a special application of pivot that will automatically align fields within each measurement that have the same time stamp.
 Its definition is: 
 
 ```
-  fromRows = (bucket) => from(bucket:bucket) |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+ influxFieldsAsCols = (tables=<-) =>
+     tables
+         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
 ```
 
 Example: 
 
 ```
-fromRows(bucket:"telegraf/autogen")
-  |> range(start: 2018-05-22T19:53:26Z)
+from(bucket:"telegraf/autogen")
+  |> filter(fn: (r) => r._measurement == "cpu")
+  |> range(start: -1h)
+  |> influxFieldsAsCols()
+  |> keep(columns: ["_time", "cpu", "usage_idle", "usage_user"])
 ```
 
 #### Join
@@ -2405,6 +2480,17 @@ And this stream, `NY_Weather`, also with group key `"_field"` on both tables:
    | 0001  | "pressure" | 29.82 |
    | 0002  | "pressure" | 30.01 |
 
+#### Unique
+
+Unique returns a table with unique values in a specified column.
+In the case there are multiple rows taking on the same value in the provided column, the first row is kept and the remaining rows are discarded.
+
+Unique has the following properties:
+
+* `column` string  
+    Column that is to have unique values.  
+    Defaults to `_value`.  
+
 #### Cumulative sum
 
 Cumulative sum computes a running sum for non null records in the table.
@@ -2412,8 +2498,9 @@ The output table schema will be the same as the input table.
 
 Cumulative sum has the following properties:
 
-* `columns` list string
-    columns is a list of columns on which to operate.
+* `columns` list of strings  
+    Columns on which to operate.  
+    Defaults to `_value`.  
 
 Example:
 ```
@@ -2430,12 +2517,14 @@ Derivative computes the time based difference between subsequent non null record
 Derivative has the following properties:
 
 * `unit` duration
-    unit is the time duration to use for the result
+    unit is the time duration to use for the result.
+    Defaults to `1s`.
 * `nonNegative` bool
     nonNegative indicates if the derivative is allowed to be negative.
     If a value is encountered which is less than the previous value then it is assumed the previous value should have been a zero.
 * `columns` list strings
-    columns is a list of columns on which to compute the derivative
+    columns is a list of columns on which to compute the derivative.
+    Defaults to `["_value"]`.
 * `timeColumn` string
     timeColumn is the column name for the time values.
     Defaults to `_time`.
@@ -2458,6 +2547,7 @@ Difference has the following properties:
     If a value is encountered which is less than the previous value then it is assumed the previous value should have been a zero.
 * `columns` list strings
     columns is a list of columns on which to compute the difference.
+    Defaults to `["_value"]`.
 
 ```
 from(bucket: "telegraf/autogen")
@@ -2473,6 +2563,7 @@ Distinct has the following properties:
 
 * `column` string
     column the column on which to track unique values.
+    Defaults to `_value`.
 
 Example: 
 ```
@@ -2484,17 +2575,18 @@ from(bucket: "telegraf/autogen")
 
 #### Shift
 
-Shift add a fixed duration to time columns.
+Shift adds a fixed duration to time columns.
 The output table schema is the same as the input table.
 
 Shift has the following properties:
 
-* `shift` duration
-    shift is the amount to add to each time value.
-    May be a negative duration.
-* `columns` list of strings
-    columns is the list of all columns that should be shifted.
-    Defaults to `["_start", "_stop", "_time"]`
+* `shift` duration  
+    The amount to add to each time value.  
+    May be a negative duration.  
+* `columns` list of strings  
+    List of all columns that should be shifted.  
+    Defaults to `["_start", "_stop", "_time"]`  
+
 Example:
 ```
 from(bucket: "telegraf/autogen")
@@ -2502,6 +2594,32 @@ from(bucket: "telegraf/autogen")
 	|> shift(shift: 1000h)
 ```
 
+#### StateCount
+
+StateCount computes the number of consecutive records in a given state.
+
+StateCount has the following parameters:
+
+* `fn` function bool
+    Fn is a function that returns true when the record is in the desired state.
+* `column` string
+    Column is the name of the column to use to output the state count.
+    Defaults to `stateCount`.
+
+#### StateDuration
+
+StateDuration computes the duration of a given state.
+
+StateDuration has the following parameters:
+
+* `fn` function bool
+    Fn is a function that returns true when the record is in the desired state.
+* `column` string
+    Column is the name of the column to use to output the state value.
+    Defaults to `stateDuration`.
+* `unit` duration
+    The output duration will be a multiple of this duration.
+    Defaults to `1s`.
 
 #### To
 
@@ -2570,6 +2688,25 @@ _tag1=a hum=55.5,temp=99.9 0007
 ```
 
 **Note:** The `to` function produces side effects.
+
+#### Top/Bottom
+
+Top and Bottom sort a table and limits the table to only n records.
+
+Top and Bottom have the following parameters:
+
+* `n` int
+    N is the number of records to keep.
+* `columns` list of strings
+    Columns provides the sort order for the tables.
+
+Example:
+
+    from(bucket:"telegraf/autogen")
+        |> range(start: -5m)
+        |> filter(fn:(r) => r._measurement == "net" and r._field == "bytes_sent")
+        |> top(n:10, columns:["_value"])
+
 
 #### Type conversion operations
 

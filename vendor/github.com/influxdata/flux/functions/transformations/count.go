@@ -3,6 +3,7 @@ package transformations
 import (
 	"fmt"
 
+	"github.com/apache/arrow/go/arrow/array"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
@@ -102,20 +103,20 @@ func (a *CountAgg) NewStringAgg() execute.DoStringAgg {
 	return new(CountAgg)
 }
 
-func (a *CountAgg) DoBool(vs []bool) {
-	a.count += int64(len(vs))
+func (a *CountAgg) DoBool(vs *array.Boolean) {
+	a.count += int64(vs.Len())
 }
-func (a *CountAgg) DoUInt(vs []uint64) {
-	a.count += int64(len(vs))
+func (a *CountAgg) DoUInt(vs *array.Uint64) {
+	a.count += int64(vs.Len())
 }
-func (a *CountAgg) DoInt(vs []int64) {
-	a.count += int64(len(vs))
+func (a *CountAgg) DoInt(vs *array.Int64) {
+	a.count += int64(vs.Len())
 }
-func (a *CountAgg) DoFloat(vs []float64) {
-	a.count += int64(len(vs))
+func (a *CountAgg) DoFloat(vs *array.Float64) {
+	a.count += int64(vs.Len())
 }
-func (a *CountAgg) DoString(vs []string) {
-	a.count += int64(len(vs))
+func (a *CountAgg) DoString(vs *array.Binary) {
+	a.count += int64(vs.Len())
 }
 
 func (a *CountAgg) Type() flux.ColType {
