@@ -264,7 +264,7 @@ func TestKeyValues_Process(t *testing.T) {
 					},
 				},
 			},
-			wantErr: errors.New("no columns matched by keyColumns parameter"),
+			wantErr: errors.New("received table with columns [_time _value tag0 tag1] not having key columns [tagX tagY]"),
 		},
 	}
 	for _, tc := range testCases {

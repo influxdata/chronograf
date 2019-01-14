@@ -3,6 +3,8 @@ package transformations
 import (
 	"fmt"
 
+	"github.com/influxdata/flux/values"
+
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/plan"
@@ -139,7 +141,7 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 			return err
 		}
 		// TODO: hack required to ensure data flows downstream
-		return tbl.Do(func(flux.ColReader) error {
+		return tbl.DoArrow(func(flux.ArrowColReader) error {
 			return nil
 		})
 	}
@@ -190,7 +192,7 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 			return err
 		}
 		// TODO: hack required to ensure data flows downstream
-		return tbl.Do(func(flux.ColReader) error {
+		return tbl.DoArrow(func(flux.ArrowColReader) error {
 			return nil
 		})
 	}
@@ -219,14 +221,14 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 	}
 
 	j := execute.ColIdx(t.column, tbl.Cols())
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		l := cr.Len()
 
 		for i := 0; i < l; i++ {
 			// Check distinct
 			switch col.Type {
 			case flux.TBool:
-				v := cr.Bools(j)[i]
+				v := cr.Bools(j).Value(i)
 				if boolDistinct[v] {
 					continue
 				}
@@ -235,7 +237,7 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 					return err
 				}
 			case flux.TInt:
-				v := cr.Ints(j)[i]
+				v := cr.Ints(j).Value(i)
 				if intDistinct[v] {
 					continue
 				}
@@ -244,7 +246,7 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 					return err
 				}
 			case flux.TUInt:
-				v := cr.UInts(j)[i]
+				v := cr.UInts(j).Value(i)
 				if uintDistinct[v] {
 					continue
 				}
@@ -253,7 +255,7 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 					return err
 				}
 			case flux.TFloat:
-				v := cr.Floats(j)[i]
+				v := cr.Floats(j).Value(i)
 				if floatDistinct[v] {
 					continue
 				}
@@ -262,7 +264,7 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 					return err
 				}
 			case flux.TString:
-				v := cr.Strings(j)[i]
+				v := cr.Strings(j).ValueString(i)
 				if stringDistinct[v] {
 					continue
 				}
@@ -271,7 +273,7 @@ func (t *distinctTransformation) Process(id execute.DatasetID, tbl flux.Table) e
 					return err
 				}
 			case flux.TTime:
-				v := cr.Times(j)[i]
+				v := values.Time(cr.Times(j).Value(i))
 				if timeDistinct[v] {
 					continue
 				}

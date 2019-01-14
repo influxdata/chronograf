@@ -17,7 +17,7 @@ var (
 	}
 )
 
-// Time represents either a relavite or absolute time.
+// Time represents either a relative or absolute time.
 // If Time is its zero value then it represents a time.Time{}.
 // To represent the now time you must set IsRelative to true.
 type Time struct {
@@ -60,13 +60,13 @@ func (t *Time) UnmarshalText(data []byte) error {
 		t.IsRelative = true
 		return nil
 	}
-	t.IsRelative = false
-	t.Relative = 0
-	t.Absolute, err = time.Parse(time.RFC3339Nano, str)
+	ts, err := time.Parse(time.RFC3339Nano, str)
 	if err != nil {
 		return err
 	}
-	t.Absolute = t.Absolute.UTC()
+	t.Absolute = ts.UTC()
+	t.IsRelative = false
+	t.Relative = 0
 	return nil
 }
 

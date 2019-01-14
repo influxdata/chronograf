@@ -33,7 +33,7 @@ const (
 	conversionArg = "v"
 )
 
-var missingArg = fmt.Errorf("missing argument %q", conversionArg)
+var errMissingArg = fmt.Errorf("missing argument %q", conversionArg)
 
 type stringConv struct{}
 
@@ -94,7 +94,7 @@ func (c *stringConv) Call(args values.Object) (values.Value, error) {
 	var str string
 	v, ok := args.Get(conversionArg)
 	if !ok {
-		return nil, missingArg
+		return nil, errMissingArg
 	}
 	switch v.Type().Nature() {
 	case semantic.String:
@@ -174,7 +174,7 @@ func (c *intConv) Call(args values.Object) (values.Value, error) {
 	var i int64
 	v, ok := args.Get(conversionArg)
 	if !ok {
-		return nil, missingArg
+		return nil, errMissingArg
 	}
 	switch v.Type().Nature() {
 	case semantic.String:
@@ -262,7 +262,7 @@ func (c *uintConv) Call(args values.Object) (values.Value, error) {
 	var i uint64
 	v, ok := args.Get(conversionArg)
 	if !ok {
-		return nil, missingArg
+		return nil, errMissingArg
 	}
 	switch v.Type().Nature() {
 	case semantic.String:
@@ -350,7 +350,7 @@ func (c *floatConv) Call(args values.Object) (values.Value, error) {
 	var float float64
 	v, ok := args.Get(conversionArg)
 	if !ok {
-		return nil, missingArg
+		return nil, errMissingArg
 	}
 	switch v.Type().Nature() {
 	case semantic.String:
@@ -434,7 +434,7 @@ func (c *boolConv) Call(args values.Object) (values.Value, error) {
 	var b bool
 	v, ok := args.Get(conversionArg)
 	if !ok {
-		return nil, missingArg
+		return nil, errMissingArg
 	}
 	switch v.Type().Nature() {
 	case semantic.String:
@@ -453,7 +453,7 @@ func (c *boolConv) Call(args values.Object) (values.Value, error) {
 		case 1:
 			b = false
 		default:
-			return nil, fmt.Errorf("cannot convert int %d to bool, must be 0 or 1.", n)
+			return nil, fmt.Errorf("cannot convert int %d to bool, must be 0 or 1", n)
 		}
 	case semantic.UInt:
 		switch n := v.UInt(); n {
@@ -462,7 +462,7 @@ func (c *boolConv) Call(args values.Object) (values.Value, error) {
 		case 1:
 			b = false
 		default:
-			return nil, fmt.Errorf("cannot convert uint %d to bool, must be 0 or 1.", n)
+			return nil, fmt.Errorf("cannot convert uint %d to bool, must be 0 or 1", n)
 		}
 	case semantic.Float:
 		switch n := v.Float(); n {
@@ -471,7 +471,7 @@ func (c *boolConv) Call(args values.Object) (values.Value, error) {
 		case 1:
 			b = false
 		default:
-			return nil, fmt.Errorf("cannot convert float %f to bool, must be 0 or 1.", n)
+			return nil, fmt.Errorf("cannot convert float %f to bool, must be 0 or 1", n)
 		}
 	case semantic.Bool:
 		b = v.Bool()
@@ -538,7 +538,7 @@ func (c *timeConv) Call(args values.Object) (values.Value, error) {
 	var t values.Time
 	v, ok := args.Get(conversionArg)
 	if !ok {
-		return nil, missingArg
+		return nil, errMissingArg
 	}
 	switch v.Type().Nature() {
 	case semantic.String:
@@ -614,7 +614,7 @@ func (c *durationConv) Call(args values.Object) (values.Value, error) {
 	var d values.Duration
 	v, ok := args.Get(conversionArg)
 	if !ok {
-		return nil, missingArg
+		return nil, errMissingArg
 	}
 	switch v.Type().Nature() {
 	case semantic.String:

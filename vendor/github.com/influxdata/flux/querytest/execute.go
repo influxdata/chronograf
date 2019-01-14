@@ -7,20 +7,20 @@ import (
 
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/control"
-	"github.com/influxdata/flux/functions/inputs"
+	"github.com/influxdata/flux/control/controltest"
 )
 
 type Querier struct {
-	c *control.Controller
+	C *controltest.Controller
 }
 
 func (q *Querier) Query(ctx context.Context, w io.Writer, c flux.Compiler, d flux.Dialect) (int64, error) {
-	query, err := q.c.Query(ctx, c)
+	query, err := q.C.Query(ctx, c)
 	if err != nil {
 		return 0, err
 	}
 	results := flux.NewResultIteratorFromQuery(query)
-	defer results.Cancel()
+	defer results.Release()
 
 	encoder := d.Encoder()
 	return encoder.Encode(w, results)
@@ -32,29 +32,10 @@ func NewQuerier() *Querier {
 		MemoryBytesQuota: math.MaxInt64,
 	}
 
-	c := control.New(config)
+	// Because this is for use in test, ensure that consumers properly clean up queries.
+	c := controltest.New(control.New(config))
 
 	return &Querier{
-		c: c,
-	}
-}
-
-func ReplaceFromSpec(q *flux.Spec, csvSrc string) {
-	for _, op := range q.Operations {
-		if op.Spec.Kind() == inputs.FromKind {
-			op.Spec = &inputs.FromCSVOpSpec{
-				File: csvSrc,
-			}
-		}
-	}
-}
-
-func ReplaceFromWithFromInfluxJSONSpec(q *flux.Spec, jsonSrc string) {
-	for _, op := range q.Operations {
-		if op.Spec.Kind() == inputs.FromKind {
-			op.Spec = &inputs.FromInfluxJSONOpSpec{
-				File: jsonSrc,
-			}
-		}
+		C: c,
 	}
 }

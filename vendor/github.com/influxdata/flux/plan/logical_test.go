@@ -571,3 +571,47 @@ func TestLogicalPlanner(t *testing.T) {
 		})
 	}
 }
+
+func TestLogicalIntegrityCheckOption(t *testing.T) {
+	script := `
+from(bucket: "telegraf")
+	|> filter(fn: (r) => r._measurement == "cpu")
+	|> yield(name: "result")
+`
+
+	spec, err := compile(script, time.Unix(0, 0))
+	if err != nil {
+		t.Fatalf("could not compile flux query: %v", err)
+	}
+
+	intruder := plantest.CreateLogicalMockNode("intruder")
+	k := plan.ProcedureKind(transformations.FilterKind)
+	// no integrity check enabled, everything should go smoothly
+	planner := plan.NewLogicalPlanner(
+		plan.OnlyLogicalRules(
+			plantest.SmashPlanRule{Intruder: intruder, Kind: k},
+			plantest.CreateCycleRule{Kind: k},
+		),
+		plan.DisableIntegrityChecks(),
+	)
+	_, err = planner.Plan(spec)
+	if err != nil {
+		t.Fatalf("unexpected fail: %v", err)
+	}
+
+	// let's smash the plan
+	planner = plan.NewLogicalPlanner(
+		plan.OnlyLogicalRules(plantest.SmashPlanRule{Intruder: intruder, Kind: k}))
+	_, err = planner.Plan(spec)
+	if err == nil {
+		t.Fatal("unexpected pass")
+	}
+
+	// let's introduce a cycle
+	planner = plan.NewLogicalPlanner(
+		plan.OnlyLogicalRules(plantest.CreateCycleRule{Kind: k}))
+	_, err = planner.Plan(spec)
+	if err == nil {
+		t.Fatal("unexpected pass")
+	}
+}

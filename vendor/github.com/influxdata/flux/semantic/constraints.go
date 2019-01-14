@@ -9,34 +9,51 @@ import (
 )
 
 // GenerateConstraints walks the graph and generates constraints between type vairables provided in the annotations.
-func GenerateConstraints(node Node, annotator Annotator) (*Constraints, error) {
+func GenerateConstraints(node Node, annotator Annotator, importer Importer) (*Constraints, error) {
+	if importer == nil {
+		importer = noImporter{}
+	}
 	cg := ConstraintGenerator{
 		cs: &Constraints{
 			f:           annotator.f,
 			annotations: annotator.annotations,
 			kindConst:   make(map[Tvar][]Kind),
 		},
-		env: NewEnv(),
-		err: new(error),
+		env:      NewEnv(),
+		err:      new(error),
+		importer: importer,
 	}
 	Walk(NewScopedVisitor(cg), node)
 	//log.Println("GenerateConstraints", cg.cs)
 	return cg.cs, *cg.err
 }
 
+// Importer produces a package given an import path.
+type Importer interface {
+	Import(path string) (Package, bool)
+}
+
+type noImporter struct{}
+
+func (noImporter) Import(string) (Package, bool) {
+	return Package{}, false
+}
+
 // ConstraintGenerator implements NestingVisitor and generates constraints as it walks the graph.
 type ConstraintGenerator struct {
-	cs  *Constraints
-	env *Env
-	err *error
+	cs       *Constraints
+	env      *Env
+	err      *error
+	importer Importer
 }
 
 // Nest nests the internal type environment to obey scoping rules.
 func (v ConstraintGenerator) Nest() NestingVisitor {
 	return ConstraintGenerator{
-		cs:  v.cs,
-		env: v.env.Nest(),
-		err: v.err,
+		cs:       v.cs,
+		env:      v.env.Nest(),
+		err:      v.err,
+		importer: v.importer,
 	}
 }
 
@@ -90,37 +107,45 @@ func (v ConstraintGenerator) scheme(t PolyType) Scheme {
 func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 	nodeVar := v.cs.annotations[n].Var
 	switch n := n.(type) {
-	case *ExternalVariableDeclaration:
+	case *ImportDeclaration:
+		pkg, ok := v.importer.Import(n.Path.Value)
+		if !ok {
+			return nil, fmt.Errorf("unknown import path: %q", n.Path.Value)
+		}
+		// Do not trust imported type variables,
+		// substitute them with fresh vars.
+		t := v.freshType(pkg.Type)
+		t = v.applyKindConstraints(t)
+
+		// Determine import identifier
+		if n.As != nil {
+			pkg.Name = n.As.Name
+		}
+
+		v.constrainExistingIdent(pkg.Name, t, n.Location())
+
+		scheme := v.scheme(t)
+		v.env.Set(pkg.Name, scheme)
+		return nil, nil
+	case *ExternalVariableAssignment:
 		// Do not trust external type variables,
 		// substitute them with fresh vars.
-		ftv := n.ExternType.freeVars(nil)
-		subst := make(Substitution, len(ftv))
-		for _, tv := range ftv {
-			subst[tv] = v.cs.f.Fresh()
-		}
-		t := subst.ApplyType(n.ExternType)
-		// Check if this type knows about its kind constraints
-		if kt, ok := t.(KindConstrainter); ok {
-			tv := v.cs.f.Fresh()
-			v.cs.AddKindConst(tv, kt.KindConstraint())
-			t = tv
-		}
-		existing, ok := v.env.LocalLookup(n.Identifier.Name)
-		if ok {
-			v.cs.AddTypeConst(t, existing.T, n.Location())
-		}
+		t := v.freshType(n.ExternType)
+		t = v.applyKindConstraints(t)
+
+		v.constrainExistingIdent(n.Identifier.Name, t, n.Location())
+
 		scheme := v.scheme(t)
 		v.env.Set(n.Identifier.Name, scheme)
 		return nil, nil
-	case *NativeVariableDeclaration:
+	case *NativeVariableAssignment:
 		t, err := v.lookup(n.Init)
 		if err != nil {
 			return nil, err
 		}
-		existing, ok := v.env.LocalLookup(n.Identifier.Name)
-		if ok {
-			v.cs.AddTypeConst(t, existing.T, n.Location())
-		}
+
+		v.constrainExistingIdent(n.Identifier.Name, t, n.Location())
+
 		scheme := v.scheme(t)
 		v.env.Set(n.Identifier.Name, scheme)
 		return nil, nil
@@ -133,7 +158,7 @@ func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 		return t, nil
 	case *ReturnStatement:
 		return v.lookup(n.Argument)
-	case *BlockStatement:
+	case *Block:
 		return v.lookup(n.ReturnStatement())
 	case *BinaryExpression:
 		l, err := v.lookup(n.Left)
@@ -217,7 +242,7 @@ func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 				hasDefault := false
 				if n.Defaults != nil {
 					for _, p := range n.Defaults.Properties {
-						if p.Key.Name == param.Key.Name {
+						if p.Key.Key() == param.Key.Name {
 							hasDefault = true
 							dt, err := v.lookup(p)
 							if err != nil {
@@ -260,8 +285,8 @@ func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 			if err != nil {
 				return nil, err
 			}
-			parameters[arg.Key.Name] = t
-			required = append(required, arg.Key.Name)
+			parameters[arg.Key.Key()] = t
+			required = append(required, arg.Key.Key())
 		}
 		if n.Pipe != nil {
 			t, err := v.lookup(n.Pipe)
@@ -285,10 +310,10 @@ func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 			if err != nil {
 				return nil, err
 			}
-			properties[field.Key.Name] = t
-			upper = append(upper, field.Key.Name)
+			properties[field.Key.Key()] = t
+			upper = append(upper, field.Key.Key())
 		}
-		v.cs.AddKindConst(nodeVar, KRecord{
+		v.cs.AddKindConst(nodeVar, ObjectKind{
 			properties: properties,
 			lower:      nil,
 			upper:      upper,
@@ -306,29 +331,42 @@ func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 		if !ok {
 			return nil, errors.New("member object must be a type variable")
 		}
-		v.cs.AddKindConst(tv, KRecord{
+		v.cs.AddKindConst(tv, ObjectKind{
 			properties: map[string]PolyType{n.Property: ptv},
 			lower:      LabelSet{n.Property},
 			upper:      AllLabels(),
 		})
 		return ptv, nil
+	case *IndexExpression:
+		ptv := v.cs.f.Fresh()
+		t, err := v.lookup(n.Array)
+		if err != nil {
+			return nil, err
+		}
+		tv, ok := t.(Tvar)
+		if !ok {
+			return nil, errors.New("array must be a type variable")
+		}
+		idx, err := v.lookup(n.Index)
+		if err != nil {
+			return nil, err
+		}
+		v.cs.AddKindConst(tv, ArrayKind{ptv})
+		v.cs.AddTypeConst(idx, Int, n.Index.Location())
+		return ptv, nil
 	case *ArrayExpression:
-		at := array{typ: NewObjectPolyType(nil, nil, AllLabels())}
-		if len(n.Elements) > 0 {
-			et, err := v.lookup(n.Elements[0])
+		elt := v.cs.f.Fresh()
+		at := array{elt}
+		for _, el := range n.Elements {
+			t, err := v.lookup(el)
 			if err != nil {
 				return nil, err
 			}
-			at.typ = et
-			for _, el := range n.Elements[1:] {
-				elt, err := v.lookup(n.Elements[0])
-				if err != nil {
-					return nil, err
-				}
-				v.cs.AddTypeConst(et, elt, el.Location())
-			}
+			v.cs.AddTypeConst(t, elt, el.Location())
 		}
-		return at, nil
+		v.cs.AddKindConst(nodeVar, ArrayKind{at.typ})
+		v.cs.AddTypeConst(nodeVar, at, n.Location())
+		return nodeVar, nil
 	case *StringLiteral:
 		return String, nil
 	case *IntegerLiteral:
@@ -348,6 +386,7 @@ func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 
 	// Explictly list nodes that do not produce constraints
 	case *Program,
+		*PackageClause,
 		*Extern,
 		*ExternBlock,
 		*OptionStatement,
@@ -357,6 +396,38 @@ func (v ConstraintGenerator) typeof(n Node) (PolyType, error) {
 		return nil, nil
 	default:
 		return nil, fmt.Errorf("unsupported %T", n)
+	}
+}
+
+// freshType produces a copy of the type with all type variables replaced with fresh ones.
+func (v ConstraintGenerator) freshType(typ PolyType) PolyType {
+	ftv := typ.freeVars(nil)
+	subst := make(Substitution, len(ftv))
+	for _, tv := range ftv {
+		f := v.cs.f.Fresh()
+		for ftv.contains(f) {
+			f = v.cs.f.Fresh()
+		}
+		subst[tv] = f
+	}
+	t := subst.ApplyType(typ)
+	return t
+}
+
+func (v ConstraintGenerator) applyKindConstraints(typ PolyType) PolyType {
+	// Check if this type knows about its kind constraints
+	if kt, ok := typ.(KindConstrainter); ok {
+		tv := v.cs.f.Fresh()
+		v.cs.AddKindConst(tv, kt.KindConstraint())
+		return tv
+	}
+	return typ
+}
+
+func (v ConstraintGenerator) constrainExistingIdent(name string, typ PolyType, loc ast.SourceLocation) {
+	existing, ok := v.env.LocalLookup(name)
+	if ok {
+		v.cs.AddTypeConst(typ, existing.T, loc)
 	}
 }
 

@@ -640,8 +640,18 @@ func TestDropRenameKeep_Process(t *testing.T) {
 					{21.0, 22.0, 23.0},
 				},
 			}},
-			want:    []*executetest.Table(nil),
-			wantErr: errors.New(`drop error: column "no_exist" doesn't exist`),
+			want: []*executetest.Table{{
+				ColMeta: []flux.ColMeta{
+					{Label: "server1", Type: flux.TFloat},
+					{Label: "local", Type: flux.TFloat},
+					{Label: "server2", Type: flux.TFloat},
+				},
+				Data: [][]interface{}{
+					{1.0, 2.0, 3.0},
+					{11.0, 12.0, 13.0},
+					{21.0, 22.0, 23.0},
+				},
+			}},
 		},
 		{
 			name: "rename no exist",
@@ -867,6 +877,83 @@ func TestDropRenameKeep_Process(t *testing.T) {
 					[]values.Value{values.NewFloat(1.0)},
 				),
 			}},
+		},
+		{
+			name: "keep with changing schema",
+			spec: &transformations.SchemaMutationProcedureSpec{
+				Mutations: []transformations.SchemaMutation{
+					&transformations.KeepOpSpec{
+						Columns: []string{"a"},
+					},
+				},
+			},
+			data: []flux.Table{
+				&executetest.Table{
+					ColMeta: []flux.ColMeta{
+						{Label: "a", Type: flux.TInt},
+						{Label: "b", Type: flux.TFloat},
+						{Label: "c", Type: flux.TFloat},
+					},
+					Data: [][]interface{}{
+						{int64(1), 10.0, 3.0},
+						{int64(1), 12.0, 4.0},
+						{int64(1), 22.0, 5.0},
+					},
+					KeyCols:   []string{"a"},
+					KeyValues: []interface{}{int64(1)},
+					GroupKey: execute.NewGroupKey(
+						[]flux.ColMeta{{Label: "a", Type: flux.TInt}},
+						[]values.Value{values.NewInt(1)},
+					),
+				},
+				&executetest.Table{
+					ColMeta: []flux.ColMeta{
+						{Label: "a", Type: flux.TInt},
+						{Label: "b", Type: flux.TFloat},
+					},
+					Data: [][]interface{}{
+						{int64(2), 11.0},
+						{int64(2), 13.0},
+						{int64(2), 23.0},
+					},
+					KeyCols:   []string{"a"},
+					KeyValues: []interface{}{int64(2)},
+					GroupKey: execute.NewGroupKey(
+						[]flux.ColMeta{{Label: "a", Type: flux.TFloat}},
+						[]values.Value{values.NewInt(2)},
+					),
+				},
+			},
+			want: []*executetest.Table{
+				{
+					ColMeta: []flux.ColMeta{{Label: "a", Type: flux.TInt}},
+					Data: [][]interface{}{
+						{int64(1)},
+						{int64(1)},
+						{int64(1)},
+					},
+					KeyCols:   []string{"a"},
+					KeyValues: []interface{}{int64(1)},
+					GroupKey: execute.NewGroupKey(
+						[]flux.ColMeta{{Label: "a", Type: flux.TInt}},
+						[]values.Value{values.NewInt(1)},
+					),
+				},
+				{
+					ColMeta: []flux.ColMeta{{Label: "a", Type: flux.TInt}},
+					Data: [][]interface{}{
+						{int64(2)},
+						{int64(2)},
+						{int64(2)},
+					},
+					KeyCols:   []string{"a"},
+					KeyValues: []interface{}{int64(2)},
+					GroupKey: execute.NewGroupKey(
+						[]flux.ColMeta{{Label: "a", Type: flux.TInt}},
+						[]values.Value{values.NewInt(2)},
+					),
+				},
+			},
 		},
 	}
 

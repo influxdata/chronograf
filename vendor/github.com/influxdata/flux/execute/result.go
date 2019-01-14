@@ -16,6 +16,8 @@ type result struct {
 
 	abortErr chan error
 	aborted  chan struct{}
+
+	stats flux.Statistics
 }
 
 type resultMessage struct {
@@ -51,6 +53,8 @@ func (s *result) Process(id DatasetID, tbl flux.Table) error {
 	return nil
 }
 
+func (s *result) Statistics() flux.Statistics { return s.stats }
+
 func (s *result) Tables() flux.TableIterator {
 	return s
 }
@@ -70,6 +74,7 @@ func (s *result) Do(f func(flux.Table) error) error {
 			if err := f(msg.table); err != nil {
 				return err
 			}
+			s.stats = s.stats.Add(msg.table.Statistics())
 		}
 	}
 }

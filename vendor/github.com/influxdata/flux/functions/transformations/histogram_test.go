@@ -46,7 +46,7 @@ func TestHistogram_Process(t *testing.T) {
 				Column:           "_value",
 				UpperBoundColumn: "le",
 				CountColumn:      "_value",
-				Buckets:          []float64{0, 10, 20, 30, 40},
+				Bins:             []float64{0, 10, 20, 30, 40},
 			}},
 			data: []flux.Table{&executetest.Table{
 				KeyCols: []string{"_start", "_stop"},
@@ -92,7 +92,7 @@ func TestHistogram_Process(t *testing.T) {
 				Column:           "_value",
 				UpperBoundColumn: "le",
 				CountColumn:      "_value",
-				Buckets:          []float64{0, 10, 20, 30, 40, math.Inf(1)},
+				Bins:             []float64{0, 10, 20, 30, 40, math.Inf(1)},
 			}},
 			data: []flux.Table{&executetest.Table{
 				KeyCols: []string{"_start", "_stop"},
@@ -140,7 +140,7 @@ func TestHistogram_Process(t *testing.T) {
 				Column:           "_value",
 				UpperBoundColumn: "le",
 				CountColumn:      "_value",
-				Buckets:          []float64{0, 10, 20, 30, 40},
+				Bins:             []float64{0, 10, 20, 30, 40},
 				Normalize:        true,
 			}},
 			data: []flux.Table{&executetest.Table{
@@ -187,7 +187,7 @@ func TestHistogram_Process(t *testing.T) {
 				Column:           "_value",
 				UpperBoundColumn: "le",
 				CountColumn:      "_value",
-				Buckets:          []float64{1, 2, 4, 8, 16, 32, 64},
+				Bins:             []float64{1, 2, 4, 8, 16, 32, 64},
 			}},
 			data: []flux.Table{&executetest.Table{
 				KeyCols: []string{"_start", "_stop"},
@@ -235,7 +235,7 @@ func TestHistogram_Process(t *testing.T) {
 				Column:           "_value",
 				UpperBoundColumn: "le",
 				CountColumn:      "_value",
-				Buckets:          []float64{1, 64, 2, 4, 16, 8, 32},
+				Bins:             []float64{1, 64, 2, 4, 16, 8, 32},
 			}},
 			data: []flux.Table{&executetest.Table{
 				KeyCols: []string{"_start", "_stop"},
@@ -283,7 +283,7 @@ func TestHistogram_Process(t *testing.T) {
 				Column:           "_value",
 				UpperBoundColumn: "le",
 				CountColumn:      "_value",
-				Buckets:          []float64{1, 2, 3, 5, 8, 13, 21, 34, 55},
+				Bins:             []float64{1, 2, 3, 5, 8, 13, 21, 34, 55},
 			}},
 			data: []flux.Table{&executetest.Table{
 				KeyCols: []string{"_start", "_stop"},

@@ -1,7 +1,0 @@
-from(bucket:"testdb")
-  |> range(start: 2018-05-20T19:53:26Z)
-  |> filter(fn: (r) => r._measurement == "diskio")
-  |> keys(except:["_time", "_start", "_stop", "_field", "_measurement", "_value"])
-  |> group(none:true)
-  |> distinct(column:"_value")
-  |> yield(name:"0")

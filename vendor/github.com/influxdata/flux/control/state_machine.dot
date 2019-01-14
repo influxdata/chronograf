@@ -1,0 +1,44 @@
+strict digraph controller {
+  finished [shape=doublecircle];
+  errored [shape=doublecircle];
+  canceled [shape=doublecircle];
+
+  created -> {
+    compiling;
+  };
+
+  compiling -> {
+    queueing;
+    errored;
+  };
+
+  queueing -> {
+    planning;
+    errored;
+    canceled;
+  };
+
+  planning -> {
+    executing;
+    requeueing;
+    errored;
+    canceled;
+  };
+
+  executing -> {
+    errored;
+    canceled;
+    finished;
+  };
+
+  requeueing -> {
+    executing;
+    errored;
+    canceled;
+  };
+
+  canceled -> {
+    errored;
+    finished;
+  };
+}

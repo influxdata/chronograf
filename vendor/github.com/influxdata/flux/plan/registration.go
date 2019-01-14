@@ -65,7 +65,7 @@ func createProcedureFnsFromKind(kind flux.OperationKind) ([]CreateProcedureSpec,
 
 }
 
-func hasSideEffects(spec ProcedureSpec) bool {
+func HasSideEffect(spec ProcedureSpec) bool {
 	_, ok := createProcedureFns.sideEffectKind[spec.Kind()]
 	return ok
 }

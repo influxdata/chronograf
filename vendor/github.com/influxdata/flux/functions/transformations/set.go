@@ -156,12 +156,12 @@ func (t *setTransformation) Process(id execute.DatasetID, tbl flux.Table) error 
 		}
 	}
 	idx := execute.ColIdx(t.key, builder.Cols())
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		for j := range cr.Cols() {
 			if j == idx {
 				continue
 			}
-			if err := execute.AppendCol(j, j, cr, builder); err != nil {
+			if err := execute.AppendColArrow(j, j, cr, builder); err != nil {
 				return err
 			}
 		}

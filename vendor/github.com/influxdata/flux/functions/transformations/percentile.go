@@ -5,8 +5,10 @@ import (
 	"math"
 	"sort"
 
+	"github.com/apache/arrow/go/arrow/array"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/execute"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/tdigest"
@@ -233,8 +235,8 @@ func (a *PercentileAgg) NewStringAgg() execute.DoStringAgg {
 	return nil
 }
 
-func (a *PercentileAgg) DoFloat(vs []float64) {
-	for _, v := range vs {
+func (a *PercentileAgg) DoFloat(vs *array.Float64) {
+	for _, v := range vs.Float64Values() {
 		a.digest.Add(v, 1)
 	}
 }
@@ -289,8 +291,8 @@ func (a *ExactPercentileAgg) NewStringAgg() execute.DoStringAgg {
 	return nil
 }
 
-func (a *ExactPercentileAgg) DoFloat(vs []float64) {
-	a.data = append(a.data, vs...)
+func (a *ExactPercentileAgg) DoFloat(vs *array.Float64) {
+	a.data = append(a.data, vs.Float64Values()...)
 }
 
 func (a *ExactPercentileAgg) Type() flux.ColType {
@@ -333,10 +335,10 @@ type ExactPercentileSelectorTransformation struct {
 	d     execute.Dataset
 	cache execute.TableBuilderCache
 	spec  ExactPercentileSelectProcedureSpec
-	a     *execute.Allocator
+	a     *memory.Allocator
 }
 
-func NewExactPercentileSelectorTransformation(d execute.Dataset, cache execute.TableBuilderCache, spec *ExactPercentileSelectProcedureSpec, a *execute.Allocator) *ExactPercentileSelectorTransformation {
+func NewExactPercentileSelectorTransformation(d execute.Dataset, cache execute.TableBuilderCache, spec *ExactPercentileSelectProcedureSpec, a *memory.Allocator) *ExactPercentileSelectorTransformation {
 	if spec.SelectorConfig.Column == "" {
 		spec.SelectorConfig.Column = execute.DefaultValueColLabel
 	}
@@ -365,9 +367,9 @@ func (t *ExactPercentileSelectorTransformation) Process(id execute.DatasetID, tb
 	}
 	copyTable.Sort([]string{t.spec.Column}, false)
 
-	n := copyTable.RawTable().NRows()
+	n := copyTable.NRows()
 	index := getQuantileIndex(t.spec.Percentile, n)
-	row := copyTable.RawTable().GetRow(index)
+	row := copyTable.GetRow(index)
 
 	builder, created := t.cache.TableBuilder(tbl.Key())
 	if !created {

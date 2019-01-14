@@ -19,6 +19,7 @@ func TestInferTypes(t *testing.T) {
 		script   string
 		solution SolutionVisitor
 		wantErr  error
+		importer semantic.Importer
 	}{
 		{
 			name: "bool",
@@ -31,7 +32,7 @@ func TestInferTypes(t *testing.T) {
 		},
 		{
 			name: "bool decl",
-			node: &semantic.NativeVariableDeclaration{
+			node: &semantic.NativeVariableAssignment{
 				Identifier: &semantic.Identifier{Name: "b"},
 				Init:       &semantic.BooleanLiteral{Value: false},
 			},
@@ -45,15 +46,15 @@ func TestInferTypes(t *testing.T) {
 			name: "redeclaration",
 			node: &semantic.Program{
 				Body: []semantic.Statement{
-					&semantic.NativeVariableDeclaration{
+					&semantic.NativeVariableAssignment{
 						Identifier: &semantic.Identifier{Name: "a"},
 						Init:       &semantic.BooleanLiteral{Value: true},
 					},
-					&semantic.NativeVariableDeclaration{
+					&semantic.NativeVariableAssignment{
 						Identifier: &semantic.Identifier{Name: "a"},
 						Init:       &semantic.BooleanLiteral{Value: false},
 					},
-					&semantic.NativeVariableDeclaration{
+					&semantic.NativeVariableAssignment{
 						Identifier: &semantic.Identifier{Name: "a"},
 						Init:       &semantic.BooleanLiteral{Value: false},
 					},
@@ -178,7 +179,7 @@ f = (a,b=0) => a + b
 			name: "call function",
 			node: &semantic.Program{
 				Body: []semantic.Statement{
-					&semantic.NativeVariableDeclaration{
+					&semantic.NativeVariableAssignment{
 						Identifier: &semantic.Identifier{Name: "two"},
 						Init: &semantic.CallExpression{
 							Callee: &semantic.FunctionExpression{
@@ -332,10 +333,10 @@ identity(x:identity)(x:2)
 					})
 					switch n := node.(type) {
 					case *semantic.CallExpression:
-						switch n.Location().Start.Column {
-						case 1:
-							return outF
+						switch n.Location().End.Column {
 						case 21:
+							return outF
+						case 26:
 							return outInt
 						}
 					case *semantic.IdentifierExpression:
@@ -396,7 +397,7 @@ identity(x:identity)(x:2)
 		{
 			name: "extern",
 			node: &semantic.Extern{
-				Declarations: []*semantic.ExternalVariableDeclaration{{
+				Assignments: []*semantic.ExternalVariableAssignment{{
 					Identifier: &semantic.Identifier{Name: "foo"},
 					ExternType: semantic.Int,
 				}},
@@ -417,7 +418,7 @@ identity(x:identity)(x:2)
 		{
 			name: "extern object",
 			node: &semantic.Extern{
-				Declarations: []*semantic.ExternalVariableDeclaration{{
+				Assignments: []*semantic.ExternalVariableAssignment{{
 					Identifier: &semantic.Identifier{Name: "foo"},
 					ExternType: semantic.NewObjectPolyType(
 						map[string]semantic.PolyType{
@@ -442,6 +443,65 @@ identity(x:identity)(x:2)
 							nil,
 							semantic.LabelSet{"x"},
 						)
+					}
+					return nil
+				},
+			},
+		},
+		{
+			name: "extern type variables",
+			node: &semantic.Extern{
+				Assignments: []*semantic.ExternalVariableAssignment{
+					{
+						Identifier: &semantic.Identifier{Name: "f"},
+						ExternType: semantic.NewFunctionPolyType(
+							semantic.FunctionPolySignature{
+								Return: semantic.Tvar(3),
+							},
+						),
+					},
+					{
+						Identifier: &semantic.Identifier{Name: "g"},
+						ExternType: semantic.NewFunctionPolyType(
+							semantic.FunctionPolySignature{
+								Return: semantic.Tvar(5),
+							},
+						),
+					},
+				},
+				Block: &semantic.ExternBlock{
+					Node: &semantic.Program{
+						Body: []semantic.Statement{
+							&semantic.NativeVariableAssignment{
+								Identifier: &semantic.Identifier{Name: "a"},
+								Init:       &semantic.IdentifierExpression{Name: "f"},
+							},
+							&semantic.NativeVariableAssignment{
+								Identifier: &semantic.Identifier{Name: "b"},
+								Init:       &semantic.IdentifierExpression{Name: "g"},
+							},
+						},
+					},
+				},
+			},
+			solution: &solutionVisitor{
+				f: func(node semantic.Node) semantic.PolyType {
+					f := semantic.NewFunctionPolyType(
+						semantic.FunctionPolySignature{
+							Return: semantic.Tvar(7),
+						})
+					g := semantic.NewFunctionPolyType(
+						semantic.FunctionPolySignature{
+							Return: semantic.Tvar(8),
+						})
+					switch n := node.(type) {
+					case *semantic.IdentifierExpression:
+						switch n.Name {
+						case "f":
+							return f
+						case "g":
+							return g
+						}
 					}
 					return nil
 				},
@@ -526,7 +586,7 @@ identity(x:identity)(x:2)
 						return outInt
 					case *semantic.BinaryExpression:
 						return out
-					case *semantic.BlockStatement,
+					case *semantic.Block,
 						*semantic.ReturnStatement,
 						*semantic.CallExpression:
 						return outInt
@@ -1189,6 +1249,19 @@ name(p:device)
 			},
 		},
 		{
+			name: "structural polymorphism error",
+			script: `
+john = {name: "John", age: 30, weight: 100.0}
+jane = {name: "Jane", lastName: "Smith"}
+
+fullName = (p) => p.name + " " + p.lastName
+
+fullName(p:jane)
+fullName(p:john)
+`,
+			wantErr: errors.New(`type error 8:1-8:17: missing object properties (lastName)`),
+		},
+		{
 			name: "function with polymorphic object parameter",
 			script: `
 foo = (r) => ({
@@ -1308,9 +1381,9 @@ foo(r:{a:1.1,b:42.0})
 						return fooOut
 					case *semantic.ObjectExpression:
 						switch l, c := n.Location().Start.Line, n.Location().Start.Column; {
-						case l == 2:
+						case l == 2 && c == 8:
 							return semantic.NewEmptyObjectPolyType()
-						case l == 3:
+						case l == 2 && c == 15:
 							return fooOut
 						case l == 7 && c == 5:
 							return semantic.NewObjectPolyType(
@@ -1318,7 +1391,7 @@ foo(r:{a:1.1,b:42.0})
 								nil,
 								requiredR,
 							)
-						case l == 7 && c == 8:
+						case l == 7 && c == 7:
 							return obj1
 						case l == 8 && c == 5:
 							return semantic.NewObjectPolyType(
@@ -1326,7 +1399,7 @@ foo(r:{a:1.1,b:42.0})
 								nil,
 								requiredR,
 							)
-						case l == 8 && c == 8:
+						case l == 8 && c == 7:
 							return obj2
 						}
 					case *semantic.Property:
@@ -1416,7 +1489,7 @@ plus1(r:{_value: 2.0})
 					switch node.(type) {
 					case *semantic.FunctionBlock,
 						*semantic.FunctionParameter,
-						*semantic.BlockStatement,
+						*semantic.Block,
 						*semantic.IdentifierExpression,
 						*semantic.ReturnStatement:
 						return tv
@@ -1440,6 +1513,61 @@ plus1(r:{_value: 2.0})
 `,
 			wantErr: errors.New(`type error 2:17-2:23: type var t3 occurs in (^a: t3) -> t11 creating a cycle`),
 		},
+		{
+			name: "imports",
+			script: `
+import "foo"
+
+foo.a
+foo.b
+`,
+			importer: importer{packages: map[string]semantic.Package{
+				"foo": semantic.Package{
+					Name: "foo",
+					Type: semantic.NewObjectPolyType(
+						map[string]semantic.PolyType{
+							"a": semantic.Int,
+							"b": semantic.Int,
+							"c": semantic.String,
+						},
+						nil,
+						semantic.LabelSet{"a", "b", "c"},
+					),
+				},
+			}},
+			solution: &solutionVisitor{
+				f: func(node semantic.Node) semantic.PolyType {
+					switch n := node.(type) {
+					case *semantic.IdentifierExpression:
+						switch n.Location().Start.Line {
+						case 4:
+							return semantic.NewObjectPolyType(
+								map[string]semantic.PolyType{
+									"a": semantic.Int,
+									"b": semantic.Int,
+									"c": semantic.String,
+								},
+								semantic.LabelSet{"a"},
+								semantic.LabelSet{"a", "b", "c"},
+							)
+						case 5:
+							return semantic.NewObjectPolyType(
+								map[string]semantic.PolyType{
+									"a": semantic.Int,
+									"b": semantic.Int,
+									"c": semantic.String,
+								},
+								semantic.LabelSet{"b"},
+								semantic.LabelSet{"a", "b", "c"},
+							)
+						}
+					case *semantic.MemberExpression:
+						return semantic.Int
+					}
+					return nil
+				},
+			},
+		},
 	}
 	for _, tc := range testCases {
 		tc := tc
@@ -1455,13 +1583,31 @@ plus1(r:{_value: 2.0})
 				}
 				tc.node = node
 			}
+
+			// Add the true and false identifiers.
+			tc.node = &semantic.Extern{
+				Assignments: []*semantic.ExternalVariableAssignment{
+					{
+						Identifier: &semantic.Identifier{Name: "true"},
+						ExternType: semantic.Bool,
+					},
+					{
+						Identifier: &semantic.Identifier{Name: "false"},
+						ExternType: semantic.Bool,
+					},
+				},
+				Block: &semantic.ExternBlock{
+					Node: tc.node,
+				},
+			}
+
 			var wantSolution SolutionMap
 			if tc.solution != nil {
 				semantic.Walk(tc.solution, tc.node)
 				wantSolution = tc.solution.Solution()
 			}
 
-			ts, err := semantic.InferTypes(tc.node)
+			ts, err := semantic.InferTypes(tc.node, tc.importer)
 			if err != nil {
 				if tc.wantErr != nil {
 					if got, want := err.Error(), tc.wantErr.Error(); got != want {
@@ -1610,4 +1756,13 @@ func sortNodes(nodes []semantic.Node) {
 	sort.Slice(nodes, func(i, j int) bool {
 		return nodes[i].Location().Less(nodes[j].Location())
 	})
+}
+
+type importer struct {
+	packages map[string]semantic.Package
+}
+
+func (imp importer) Import(path string) (semantic.Package, bool) {
+	pkg, ok := imp.packages[path]
+	return pkg, ok
 }

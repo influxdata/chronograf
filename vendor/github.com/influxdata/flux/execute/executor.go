@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -15,7 +16,7 @@ import (
 )
 
 type Executor interface {
-	Execute(ctx context.Context, p *plan.PlanSpec, a *Allocator) (map[string]flux.Result, error)
+	Execute(ctx context.Context, p *plan.PlanSpec, a *memory.Allocator) (map[string]flux.Result, error)
 }
 
 type executor struct {
@@ -46,7 +47,7 @@ type executionState struct {
 	p    *plan.PlanSpec
 	deps Dependencies
 
-	alloc *Allocator
+	alloc *memory.Allocator
 
 	resources flux.ResourceManagement
 
@@ -59,7 +60,7 @@ type executionState struct {
 	logger     *zap.Logger
 }
 
-func (e *executor) Execute(ctx context.Context, p *plan.PlanSpec, a *Allocator) (map[string]flux.Result, error) {
+func (e *executor) Execute(ctx context.Context, p *plan.PlanSpec, a *memory.Allocator) (map[string]flux.Result, error) {
 	es, err := e.createExecutionState(ctx, p, a)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize execute state")
@@ -76,12 +77,12 @@ func validatePlan(p *plan.PlanSpec) error {
 	return nil
 }
 
-func (e *executor) createExecutionState(ctx context.Context, p *plan.PlanSpec, a *Allocator) (*executionState, error) {
+func (e *executor) createExecutionState(ctx context.Context, p *plan.PlanSpec, a *memory.Allocator) (*executionState, error) {
 	if err := validatePlan(p); err != nil {
 		return nil, errors.Wrap(err, "invalid plan")
 	}
 	// Set allocation limit
-	a.Limit = p.Resources.MemoryBytesQuota
+	a.Limit = &p.Resources.MemoryBytesQuota
 	es := &executionState{
 		p:         p,
 		deps:      e.deps,
@@ -222,6 +223,13 @@ func (v *createExecutionNodeVisitor) Visit(node plan.PlanNode) error {
 			v.es.transports = append(v.es.transports, transport)
 			executionNode.AddTransformation(transport)
 		}
+
+		if plan.HasSideEffect(spec) && len(node.Successors()) == 0 {
+			name := string(node.ID())
+			r := newResult(name)
+			v.es.results[name] = r
+			v.nodes[skipYields(node)].AddTransformation(r)
+		}
 	}
 
 	return nil
@@ -303,7 +311,7 @@ func (ec executionContext) StreamContext() StreamContext {
 	return ec.streamContext
 }
 
-func (ec executionContext) Allocator() *Allocator {
+func (ec executionContext) Allocator() *memory.Allocator {
 	return ec.es.alloc
 }
 

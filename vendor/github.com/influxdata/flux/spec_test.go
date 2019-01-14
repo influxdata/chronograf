@@ -320,7 +320,7 @@ func Example_overrideDefaultOptionExternally() {
 	semanticProgram, _ := semantic.New(ast)
 
 	// Evaluate program
-	err := itrp.Eval(semanticProgram)
+	err := itrp.Eval(semanticProgram, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -360,7 +360,7 @@ func Example_overrideDefaultOptionInternally() {
 	itrp.SetOption("now", newNowFunc)
 
 	// Evaluate program
-	err := itrp.Eval(semanticProgram)
+	err := itrp.Eval(semanticProgram, nil)
 	if err != nil {
 		fmt.Println(err)
 	}

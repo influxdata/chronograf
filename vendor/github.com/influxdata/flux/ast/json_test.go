@@ -27,18 +27,36 @@ func TestJSONMarshal(t *testing.T) {
 					},
 				},
 			},
-			want: `{"type":"Program","body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
+			want: `{"type":"Program","package":null,"imports":null,"body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
 		},
 		{
-			name: "block statement",
-			node: &ast.BlockStatement{
+			name: "program",
+			node: &ast.Program{
+				Package: &ast.PackageClause{
+					Name: &ast.Identifier{Name: "foo"},
+				},
+				Imports: []*ast.ImportDeclaration{{
+					As:   &ast.Identifier{Name: "b"},
+					Path: &ast.StringLiteral{Value: "path/bar"},
+				}},
 				Body: []ast.Statement{
 					&ast.ExpressionStatement{
 						Expression: &ast.StringLiteral{Value: "hello"},
 					},
 				},
 			},
-			want: `{"type":"BlockStatement","body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
+			want: `{"type":"Program","package":{"type":"PackageClause","name":{"type":"Identifier","name":"foo"}},"imports":[{"type":"ImportDeclaration","as":{"type":"Identifier","name":"b"},"path":{"type":"StringLiteral","value":"path/bar"}}],"body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
+		},
+		{
+			name: "block",
+			node: &ast.Block{
+				Body: []ast.Statement{
+					&ast.ExpressionStatement{
+						Expression: &ast.StringLiteral{Value: "hello"},
+					},
+				},
+			},
+			want: `{"type":"Block","body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}`,
 		},
 		{
 			name: "expression statement",
@@ -57,7 +75,7 @@ func TestJSONMarshal(t *testing.T) {
 		{
 			name: "option statement",
 			node: &ast.OptionStatement{
-				Declaration: &ast.VariableDeclarator{
+				Assignment: &ast.VariableAssignment{
 					ID: &ast.Identifier{Name: "task"},
 					Init: &ast.ObjectExpression{
 						Properties: []*ast.Property{
@@ -80,27 +98,15 @@ func TestJSONMarshal(t *testing.T) {
 					},
 				},
 			},
-			want: `{"type":"OptionStatement","declaration":{"type":"VariableDeclarator","id":{"type":"Identifier","name":"task"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"name"},"value":{"type":"StringLiteral","value":"foo"}},{"type":"Property","key":{"type":"Identifier","name":"every"},"value":{"type":"DurationLiteral","values":[{"magnitude":1,"unit":"h"}]}}]}}}`,
+			want: `{"type":"OptionStatement","assignment":{"type":"VariableAssignment","id":{"type":"Identifier","name":"task"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"name"},"value":{"type":"StringLiteral","value":"foo"}},{"type":"Property","key":{"type":"Identifier","name":"every"},"value":{"type":"DurationLiteral","values":[{"magnitude":1,"unit":"h"}]}}]}}}`,
 		},
 		{
-			name: "variable declaration",
-			node: &ast.VariableDeclaration{
-				Declarations: []*ast.VariableDeclarator{
-					{
-						ID:   &ast.Identifier{Name: "a"},
-						Init: &ast.StringLiteral{Value: "hello"},
-					},
-				},
-			},
-			want: `{"type":"VariableDeclaration","declarations":[{"type":"VariableDeclarator","id":{"type":"Identifier","name":"a"},"init":{"type":"StringLiteral","value":"hello"}}]}`,
-		},
-		{
-			name: "variable declarator",
-			node: &ast.VariableDeclarator{
+			name: "variable assignment",
+			node: &ast.VariableAssignment{
 				ID:   &ast.Identifier{Name: "a"},
 				Init: &ast.StringLiteral{Value: "hello"},
 			},
-			want: `{"type":"VariableDeclarator","id":{"type":"Identifier","name":"a"},"init":{"type":"StringLiteral","value":"hello"}}`,
+			want: `{"type":"VariableAssignment","id":{"type":"Identifier","name":"a"},"init":{"type":"StringLiteral","value":"hello"}}`,
 		},
 		{
 			name: "call expression",
@@ -122,20 +128,36 @@ func TestJSONMarshal(t *testing.T) {
 			want: `{"type":"PipeExpression","argument":{"type":"Identifier","name":"a"},"call":{"type":"CallExpression","callee":{"type":"Identifier","name":"a"},"arguments":[{"type":"StringLiteral","value":"hello"}]}}`,
 		},
 		{
-			name: "member expression",
+			name: "member expression with identifier",
 			node: &ast.MemberExpression{
 				Object:   &ast.Identifier{Name: "a"},
-				Property: &ast.StringLiteral{Value: "hello"},
+				Property: &ast.Identifier{Name: "b"},
 			},
-			want: `{"type":"MemberExpression","object":{"type":"Identifier","name":"a"},"property":{"type":"StringLiteral","value":"hello"}}`,
+			want: `{"type":"MemberExpression","object":{"type":"Identifier","name":"a"},"property":{"type":"Identifier","name":"b"}}`,
+		},
+		{
+			name: "member expression with string literal",
+			node: &ast.MemberExpression{
+				Object:   &ast.Identifier{Name: "a"},
+				Property: &ast.StringLiteral{Value: "b"},
+			},
+			want: `{"type":"MemberExpression","object":{"type":"Identifier","name":"a"},"property":{"type":"StringLiteral","value":"b"}}`,
+		},
+		{
+			name: "index expression",
+			node: &ast.IndexExpression{
+				Array: &ast.Identifier{Name: "a"},
+				Index: &ast.IntegerLiteral{Value: 3},
+			},
+			want: `{"type":"IndexExpression","array":{"type":"Identifier","name":"a"},"index":{"type":"IntegerLiteral","value":"3"}}`,
 		},
 		{
 			name: "arrow function expression",
-			node: &ast.ArrowFunctionExpression{
+			node: &ast.FunctionExpression{
 				Params: []*ast.Property{{Key: &ast.Identifier{Name: "a"}}},
 				Body:   &ast.StringLiteral{Value: "hello"},
 			},
-			want: `{"type":"ArrowFunctionExpression","params":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":null}],"body":{"type":"StringLiteral","value":"hello"}}`,
+			want: `{"type":"FunctionExpression","params":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":null}],"body":{"type":"StringLiteral","value":"hello"}}`,
 		},
 		{
 			name: "binary expression",
@@ -179,6 +201,25 @@ func TestJSONMarshal(t *testing.T) {
 				}},
 			},
 			want: `{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":{"type":"StringLiteral","value":"hello"}}]}`,
+		},
+		{
+			name: "object expression with string literal key",
+			node: &ast.ObjectExpression{
+				Properties: []*ast.Property{{
+					Key:   &ast.StringLiteral{Value: "a"},
+					Value: &ast.StringLiteral{Value: "hello"},
+				}},
+			},
+			want: `{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"StringLiteral","value":"a"},"value":{"type":"StringLiteral","value":"hello"}}]}`,
+		},
+		{
+			name: "object expression implicit keys",
+			node: &ast.ObjectExpression{
+				Properties: []*ast.Property{{
+					Key: &ast.Identifier{Name: "a"},
+				}},
+			},
+			want: `{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":null}]}`,
 		},
 		{
 			name: "conditional expression",

@@ -31,7 +31,7 @@ The following rules will be used to solve for the types in the above program:
 
     typeof(f) = [ typeof(a), typeof(b) ] -> typeof( f(a:1, b:2) )
 
-4. Variable Declaration Rule
+4. Variable Assigment Rule
 
     typeof(x) = typeof( f(a:1, b:2) )
 

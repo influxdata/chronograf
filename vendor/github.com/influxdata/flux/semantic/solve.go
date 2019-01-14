@@ -188,7 +188,7 @@ func unifyKindsByType(kinds map[Tvar]Kind, tv Tvar, t PolyType) (Substitution, e
 		return nil, nil
 	}
 	switch k.(type) {
-	case KRecord:
+	case ObjectKind, ArrayKind:
 		_, ok := t.(Tvar)
 		if !ok {
 			return nil, errors.New("invalid type for kind")

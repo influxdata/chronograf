@@ -24,16 +24,18 @@ func (l loc) Location() ast.SourceLocation {
 	return ast.SourceLocation(l)
 }
 
-func (*Program) node()     {}
-func (*Extern) node()      {}
-func (*ExternBlock) node() {}
+func (*Program) node()           {}
+func (*Extern) node()            {}
+func (*ExternBlock) node()       {}
+func (*Block) node()             {}
+func (*PackageClause) node()     {}
+func (*ImportDeclaration) node() {}
 
-func (*BlockStatement) node()              {}
-func (*OptionStatement) node()             {}
-func (*ExpressionStatement) node()         {}
-func (*ReturnStatement) node()             {}
-func (*NativeVariableDeclaration) node()   {}
-func (*ExternalVariableDeclaration) node() {}
+func (*OptionStatement) node()            {}
+func (*ExpressionStatement) node()        {}
+func (*ReturnStatement) node()            {}
+func (*NativeVariableAssignment) node()   {}
+func (*ExternalVariableAssignment) node() {}
 
 func (*ArrayExpression) node()       {}
 func (*FunctionExpression) node()    {}
@@ -43,6 +45,7 @@ func (*ConditionalExpression) node() {}
 func (*IdentifierExpression) node()  {}
 func (*LogicalExpression) node()     {}
 func (*MemberExpression) node()      {}
+func (*IndexExpression) node()       {}
 func (*ObjectExpression) node()      {}
 func (*UnaryExpression) node()       {}
 
@@ -67,11 +70,10 @@ type Statement interface {
 	stmt()
 }
 
-func (*BlockStatement) stmt()            {}
-func (*OptionStatement) stmt()           {}
-func (*ExpressionStatement) stmt()       {}
-func (*ReturnStatement) stmt()           {}
-func (*NativeVariableDeclaration) stmt() {}
+func (*OptionStatement) stmt()          {}
+func (*ExpressionStatement) stmt()      {}
+func (*ReturnStatement) stmt()          {}
+func (*NativeVariableAssignment) stmt() {}
 
 type Expression interface {
 	Node
@@ -91,6 +93,7 @@ func (*IdentifierExpression) expression()   {}
 func (*IntegerLiteral) expression()         {}
 func (*LogicalExpression) expression()      {}
 func (*MemberExpression) expression()       {}
+func (*IndexExpression) expression()        {}
 func (*ObjectExpression) expression()       {}
 func (*RegexpLiteral) expression()          {}
 func (*StringLiteral) expression()          {}
@@ -111,10 +114,24 @@ func (*RegexpLiteral) literal()          {}
 func (*StringLiteral) literal()          {}
 func (*UnsignedIntegerLiteral) literal() {}
 
+type PropertyKey interface {
+	Node
+	Key() string
+}
+
+func (n *Identifier) Key() string {
+	return n.Name
+}
+func (n *StringLiteral) Key() string {
+	return n.Value
+}
+
 type Program struct {
 	loc `json:"-"`
 
-	Body []Statement `json:"body"`
+	Package *PackageClause       `json:"package"`
+	Imports []*ImportDeclaration `json:"imports"`
+	Body    []Statement          `json:"body"`
 }
 
 func (*Program) NodeType() string { return "Program" }
@@ -136,23 +153,65 @@ func (p *Program) Copy() Node {
 	return np
 }
 
-type BlockStatement struct {
+type PackageClause struct {
+	loc `json:"-"`
+
+	Name *Identifier `json:"name"`
+}
+
+func (*PackageClause) NodeType() string { return "PackageClause" }
+
+func (p *PackageClause) Copy() Node {
+	if p == nil {
+		return p
+	}
+	np := new(PackageClause)
+	*np = *p
+
+	np.Name = p.Name.Copy().(*Identifier)
+
+	return np
+}
+
+type ImportDeclaration struct {
+	loc `json:"-"`
+
+	As   *Identifier    `json:"as"`
+	Path *StringLiteral `json:"path"`
+}
+
+func (*ImportDeclaration) NodeType() string { return "ImportDeclaration" }
+
+func (d *ImportDeclaration) Copy() Node {
+	if d == nil {
+		return d
+	}
+	nd := new(ImportDeclaration)
+	*nd = *d
+
+	nd.As = d.As.Copy().(*Identifier)
+	nd.Path = d.Path.Copy().(*StringLiteral)
+
+	return nd
+}
+
+type Block struct {
 	loc `json:"-"`
 
 	Body []Statement `json:"body"`
 }
 
-func (*BlockStatement) NodeType() string { return "BlockStatement" }
+func (*Block) NodeType() string { return "Block" }
 
-func (s *BlockStatement) ReturnStatement() *ReturnStatement {
+func (s *Block) ReturnStatement() *ReturnStatement {
 	return s.Body[len(s.Body)-1].(*ReturnStatement)
 }
 
-func (s *BlockStatement) Copy() Node {
+func (s *Block) Copy() Node {
 	if s == nil {
 		return s
 	}
-	ns := new(BlockStatement)
+	ns := new(Block)
 	*ns = *s
 
 	if len(s.Body) > 0 {
@@ -168,9 +227,9 @@ func (s *BlockStatement) Copy() Node {
 type OptionStatement struct {
 	loc `json:"-"`
 
-	// Declaration represents the declaration of the option.
-	// Must be one of *ExternalVariableDeclaration or *NativeVariableDeclaration.
-	Declaration Node `json:"declaration"`
+	// Assignment represents the assignment of the option.
+	// Must be one of *ExternalVariableAssignment or *NativeVariableAssignment.
+	Assignment Node `json:"assignment"`
 }
 
 func (s *OptionStatement) NodeType() string { return "OptionStatement" }
@@ -182,7 +241,7 @@ func (s *OptionStatement) Copy() Node {
 	ns := new(OptionStatement)
 	*ns = *s
 
-	ns.Declaration = s.Declaration.Copy()
+	ns.Assignment = s.Assignment.Copy()
 
 	return ns
 }
@@ -227,24 +286,24 @@ func (s *ReturnStatement) Copy() Node {
 	return ns
 }
 
-type NativeVariableDeclaration struct {
+type NativeVariableAssignment struct {
 	loc `json:"-"`
 
 	Identifier *Identifier `json:"identifier"`
 	Init       Expression  `json:"init"`
 }
 
-func (d *NativeVariableDeclaration) ID() *Identifier {
+func (d *NativeVariableAssignment) ID() *Identifier {
 	return d.Identifier
 }
 
-func (*NativeVariableDeclaration) NodeType() string { return "NativeVariableDeclaration" }
+func (*NativeVariableAssignment) NodeType() string { return "NativeVariableAssignment" }
 
-func (s *NativeVariableDeclaration) Copy() Node {
+func (s *NativeVariableAssignment) Copy() Node {
 	if s == nil {
 		return s
 	}
-	ns := new(NativeVariableDeclaration)
+	ns := new(NativeVariableAssignment)
 	*ns = *s
 
 	ns.Identifier = s.Identifier.Copy().(*Identifier)
@@ -256,12 +315,12 @@ func (s *NativeVariableDeclaration) Copy() Node {
 	return ns
 }
 
-// Extern is a node that represents a node with a set of external declarations defined.
+// Extern is a node that represents a node with a set of external assignments defined.
 type Extern struct {
 	loc `json:"-"`
 
-	Declarations []*ExternalVariableDeclaration `json:"declarations"`
-	Block        *ExternBlock                   `json:"block"`
+	Assignments []*ExternalVariableAssignment `json:"assignments"`
+	Block       *ExternBlock                  `json:"block"`
 }
 
 func (*Extern) NodeType() string { return "Extern" }
@@ -273,10 +332,10 @@ func (e *Extern) Copy() Node {
 	ne := new(Extern)
 	*ne = *e
 
-	if len(e.Declarations) > 0 {
-		ne.Declarations = make([]*ExternalVariableDeclaration, len(e.Declarations))
-		for i, d := range e.Declarations {
-			ne.Declarations[i] = d.Copy().(*ExternalVariableDeclaration)
+	if len(e.Assignments) > 0 {
+		ne.Assignments = make([]*ExternalVariableAssignment, len(e.Assignments))
+		for i, d := range e.Assignments {
+			ne.Assignments[i] = d.Copy().(*ExternalVariableAssignment)
 		}
 	}
 
@@ -285,21 +344,21 @@ func (e *Extern) Copy() Node {
 	return ne
 }
 
-// ExternalVariableDeclaration represents an externaly defined identifier and its type.
-type ExternalVariableDeclaration struct {
+// ExternalVariableAssignment represents an externaly defined identifier and its type.
+type ExternalVariableAssignment struct {
 	loc `json:"-"`
 
 	Identifier *Identifier `json:"identifier"`
 	ExternType PolyType    `json:""`
 }
 
-func (*ExternalVariableDeclaration) NodeType() string { return "ExternalVariableDeclaration" }
+func (*ExternalVariableAssignment) NodeType() string { return "ExternalVariableAssignment" }
 
-func (s *ExternalVariableDeclaration) Copy() Node {
+func (s *ExternalVariableAssignment) Copy() Node {
 	if s == nil {
 		return s
 	}
-	ns := new(ExternalVariableDeclaration)
+	ns := new(ExternalVariableAssignment)
 	*ns = *s
 
 	ns.Identifier = s.Identifier.Copy().(*Identifier)
@@ -567,6 +626,26 @@ func (e *MemberExpression) Copy() Node {
 	return ne
 }
 
+type IndexExpression struct {
+	loc `json:"-"`
+
+	Array Expression `json:"array"`
+	Index Expression `json:"index"`
+}
+
+func (*IndexExpression) NodeType() string { return "IndexExpression" }
+
+func (e *IndexExpression) Copy() Node {
+	if e == nil {
+		return e
+	}
+	ne := new(IndexExpression)
+	*ne = *e
+	ne.Array = e.Array.Copy().(Expression)
+	ne.Index = e.Index.Copy().(Expression)
+	return ne
+}
+
 type ObjectExpression struct {
 	loc `json:"-"`
 
@@ -616,7 +695,7 @@ func (e *UnaryExpression) Copy() Node {
 type Property struct {
 	loc `json:"-"`
 
-	Key   *Identifier `json:"key"`
+	Key   PropertyKey `json:"key"`
 	Value Expression  `json:"value"`
 }
 

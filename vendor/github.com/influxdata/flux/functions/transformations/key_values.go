@@ -147,7 +147,6 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 
 	// TODO: use fn to populate t.spec.keyColumns
 
-	// we'll ignore keyCol values that just don't exist in the table.
 	cols := tbl.Cols()
 	i := 0
 	keyColIndex := -1
@@ -156,7 +155,11 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 		i++
 	}
 	if keyColIndex < 1 {
-		return errors.New("no columns matched by keyColumns parameter")
+		columnNames := make([]string, len(cols))
+		for i, column := range cols {
+			columnNames[i] = column.Label
+		}
+		return fmt.Errorf("received table with columns %v not having key columns %v", columnNames, t.spec.KeyColumns)
 	}
 
 	keyColIndices := make([]int, len(t.spec.KeyColumns))
@@ -219,7 +222,7 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 		}
 	}
 
-	return tbl.Do(func(cr flux.ColReader) error {
+	return tbl.DoArrow(func(cr flux.ArrowColReader) error {
 		l := cr.Len()
 		for i := 0; i < l; i++ {
 			// Check distinct
@@ -229,7 +232,7 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 				}
 				switch keyColType {
 				case flux.TBool:
-					v := cr.Bools(rowIdx)[i]
+					v := cr.Bools(rowIdx).Value(i)
 					if t.distinct {
 						if boolDistinct[v] {
 							continue
@@ -243,7 +246,7 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 						return err
 					}
 				case flux.TInt:
-					v := cr.Ints(rowIdx)[i]
+					v := cr.Ints(rowIdx).Value(i)
 					if t.distinct {
 						if intDistinct[v] {
 							continue
@@ -257,7 +260,7 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 						return err
 					}
 				case flux.TUInt:
-					v := cr.UInts(rowIdx)[i]
+					v := cr.UInts(rowIdx).Value(i)
 					if t.distinct {
 						if uintDistinct[v] {
 							continue
@@ -271,7 +274,7 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 						return err
 					}
 				case flux.TFloat:
-					v := cr.Floats(rowIdx)[i]
+					v := cr.Floats(rowIdx).Value(i)
 					if t.distinct {
 						if floatDistinct[v] {
 							continue
@@ -285,7 +288,7 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 						return err
 					}
 				case flux.TString:
-					v := cr.Strings(rowIdx)[i]
+					v := cr.Strings(rowIdx).ValueString(i)
 					if t.distinct {
 						if stringDistinct[v] {
 							continue
@@ -299,7 +302,7 @@ func (t *keyValuesTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 						return err
 					}
 				case flux.TTime:
-					v := cr.Times(rowIdx)[i]
+					v := execute.Time(cr.Times(rowIdx).Value(i))
 					if t.distinct {
 						if timeDistinct[v] {
 							continue

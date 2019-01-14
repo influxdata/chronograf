@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.11
+      - image: nathanielc/flux-build:latest
     environment:
       GOCACHE: /tmp/go-cache
       GOPATH: /tmp/go
@@ -25,7 +25,10 @@ jobs:
             - flux-gomod-                              # Matches a new branch.
       # Run tests
       - run: make checkfmt
+      - run: make checktidy
       - run: make vet
+      - run: make staticcheck
+      - run: make checkgenerate
       - run: make test
       - save_cache:
           name: Saving GOCACHE
@@ -41,7 +44,7 @@ jobs:
           when: always
   test-race:
     docker:
-      - image: circleci/golang:1.11
+      - image: nathanielc/flux-build:latest
     environment:
       GOPATH: /tmp/go
       GO111MODULE: 'on' # must be quoted to force string type instead of boolean type

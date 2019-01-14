@@ -54,25 +54,27 @@ type Node interface {
 	json.Marshaler
 }
 
-func (*Program) node() {}
+func (*Program) node()           {}
+func (*PackageClause) node()     {}
+func (*ImportDeclaration) node() {}
 
-func (*BlockStatement) node()      {}
+func (*Block) node()               {}
 func (*ExpressionStatement) node() {}
 func (*ReturnStatement) node()     {}
 func (*OptionStatement) node()     {}
-func (*VariableDeclaration) node() {}
-func (*VariableDeclarator) node()  {}
+func (*VariableAssignment) node()  {}
 
-func (*ArrayExpression) node()         {}
-func (*ArrowFunctionExpression) node() {}
-func (*BinaryExpression) node()        {}
-func (*CallExpression) node()          {}
-func (*ConditionalExpression) node()   {}
-func (*LogicalExpression) node()       {}
-func (*MemberExpression) node()        {}
-func (*PipeExpression) node()          {}
-func (*ObjectExpression) node()        {}
-func (*UnaryExpression) node()         {}
+func (*ArrayExpression) node()       {}
+func (*FunctionExpression) node()    {}
+func (*BinaryExpression) node()      {}
+func (*CallExpression) node()        {}
+func (*ConditionalExpression) node() {}
+func (*LogicalExpression) node()     {}
+func (*MemberExpression) node()      {}
+func (*IndexExpression) node()       {}
+func (*PipeExpression) node()        {}
+func (*ObjectExpression) node()      {}
+func (*UnaryExpression) node()       {}
 
 func (*Property) node()   {}
 func (*Identifier) node() {}
@@ -103,7 +105,9 @@ func (b BaseNode) Location() SourceLocation {
 // Program represents a complete program source tree
 type Program struct {
 	BaseNode
-	Body []Statement `json:"body"`
+	Package *PackageClause       `json:"package"`
+	Imports []*ImportDeclaration `json:"imports"`
+	Body    []Statement          `json:"body"`
 }
 
 // Type is the abstract type
@@ -121,29 +125,51 @@ func (p *Program) Copy() Node {
 	return np
 }
 
-// Statement Perhaps we don't even want statements nor expression statements
-type Statement interface {
-	Node
-	stmt()
+// PackageClause defines the current package identifier.
+type PackageClause struct {
+	BaseNode
+	Name *Identifier `json:"name"`
 }
 
-func (*BlockStatement) stmt()      {}
-func (*ExpressionStatement) stmt() {}
-func (*ReturnStatement) stmt()     {}
-func (*VariableDeclaration) stmt() {}
-func (*OptionStatement) stmt()     {}
+// Type is the abstract type
+func (*PackageClause) Type() string { return "PackageClause" }
 
-// BlockStatement is a set of statements
-type BlockStatement struct {
+func (c *PackageClause) Copy() Node {
+	nc := new(PackageClause)
+	*nc = *c
+
+	nc.Name = c.Name.Copy().(*Identifier)
+	return nc
+}
+
+// ImportDeclaration declares a single import
+type ImportDeclaration struct {
+	BaseNode
+	As   *Identifier    `json:"as"`
+	Path *StringLiteral `json:"path"`
+}
+
+// Type is the abstract type
+func (*ImportDeclaration) Type() string { return "ImportDeclaration" }
+
+func (d *ImportDeclaration) Copy() Node {
+	nd := new(ImportDeclaration)
+	*nd = *d
+
+	return nd
+}
+
+// Block is a set of statements
+type Block struct {
 	BaseNode
 	Body []Statement `json:"body"`
 }
 
 // Type is the abstract type
-func (*BlockStatement) Type() string { return "BlockStatement" }
+func (*Block) Type() string { return "Block" }
 
-func (s *BlockStatement) Copy() Node {
-	ns := new(BlockStatement)
+func (s *Block) Copy() Node {
+	ns := new(Block)
 	*ns = *s
 
 	if len(s.Body) > 0 {
@@ -154,6 +180,17 @@ func (s *BlockStatement) Copy() Node {
 	}
 	return ns
 }
+
+// Statement Perhaps we don't even want statements nor expression statements
+type Statement interface {
+	Node
+	stmt()
+}
+
+func (*VariableAssignment) stmt()  {}
+func (*ExpressionStatement) stmt() {}
+func (*ReturnStatement) stmt()     {}
+func (*OptionStatement) stmt()     {}
 
 // ExpressionStatement may consist of an expression that does not return a value and is executed solely for its side-effects.
 type ExpressionStatement struct {
@@ -199,7 +236,7 @@ func (s *ReturnStatement) Copy() Node {
 // OptionStatement syntactically is a single variable declaration
 type OptionStatement struct {
 	BaseNode
-	Declaration *VariableDeclarator `json:"declaration"`
+	Assignment *VariableAssignment `json:"assignment"`
 }
 
 // Type is the abstract type
@@ -213,52 +250,26 @@ func (s *OptionStatement) Copy() Node {
 	ns := new(OptionStatement)
 	*ns = *s
 
-	ns.Declaration = s.Declaration.Copy().(*VariableDeclarator)
+	ns.Assignment = s.Assignment.Copy().(*VariableAssignment)
 
 	return ns
 }
 
-// VariableDeclaration declares one or more variables using assignment
-type VariableDeclaration struct {
-	BaseNode
-	Declarations []*VariableDeclarator `json:"declarations"`
-}
-
-// Type is the abstract type
-func (*VariableDeclaration) Type() string { return "VariableDeclaration" }
-
-func (d *VariableDeclaration) Copy() Node {
-	if d == nil {
-		return d
-	}
-	nd := new(VariableDeclaration)
-	*nd = *d
-
-	if len(d.Declarations) > 0 {
-		nd.Declarations = make([]*VariableDeclarator, len(d.Declarations))
-		for i, decl := range d.Declarations {
-			nd.Declarations[i] = decl.Copy().(*VariableDeclarator)
-		}
-	}
-
-	return nd
-}
-
-// VariableDeclarator represents the declaration of a variable
-type VariableDeclarator struct {
+// VariableAssignment represents the declaration of a variable
+type VariableAssignment struct {
 	BaseNode
 	ID   *Identifier `json:"id"`
 	Init Expression  `json:"init"`
 }
 
 // Type is the abstract type
-func (*VariableDeclarator) Type() string { return "VariableDeclarator" }
+func (*VariableAssignment) Type() string { return "VariableAssignment" }
 
-func (d *VariableDeclarator) Copy() Node {
+func (d *VariableAssignment) Copy() Node {
 	if d == nil {
 		return d
 	}
-	nd := new(VariableDeclarator)
+	nd := new(VariableAssignment)
 	*nd = *d
 
 	nd.Init = d.Init.Copy().(Expression)
@@ -272,26 +283,27 @@ type Expression interface {
 	expression()
 }
 
-func (*ArrayExpression) expression()         {}
-func (*ArrowFunctionExpression) expression() {}
-func (*BinaryExpression) expression()        {}
-func (*BooleanLiteral) expression()          {}
-func (*CallExpression) expression()          {}
-func (*ConditionalExpression) expression()   {}
-func (*DateTimeLiteral) expression()         {}
-func (*DurationLiteral) expression()         {}
-func (*FloatLiteral) expression()            {}
-func (*Identifier) expression()              {}
-func (*IntegerLiteral) expression()          {}
-func (*LogicalExpression) expression()       {}
-func (*MemberExpression) expression()        {}
-func (*ObjectExpression) expression()        {}
-func (*PipeExpression) expression()          {}
-func (*PipeLiteral) expression()             {}
-func (*RegexpLiteral) expression()           {}
-func (*StringLiteral) expression()           {}
-func (*UnaryExpression) expression()         {}
-func (*UnsignedIntegerLiteral) expression()  {}
+func (*ArrayExpression) expression()        {}
+func (*FunctionExpression) expression()     {}
+func (*BinaryExpression) expression()       {}
+func (*BooleanLiteral) expression()         {}
+func (*CallExpression) expression()         {}
+func (*ConditionalExpression) expression()  {}
+func (*DateTimeLiteral) expression()        {}
+func (*DurationLiteral) expression()        {}
+func (*FloatLiteral) expression()           {}
+func (*Identifier) expression()             {}
+func (*IntegerLiteral) expression()         {}
+func (*LogicalExpression) expression()      {}
+func (*MemberExpression) expression()       {}
+func (*IndexExpression) expression()        {}
+func (*ObjectExpression) expression()       {}
+func (*PipeExpression) expression()         {}
+func (*PipeLiteral) expression()            {}
+func (*RegexpLiteral) expression()          {}
+func (*StringLiteral) expression()          {}
+func (*UnaryExpression) expression()        {}
+func (*UnsignedIntegerLiteral) expression() {}
 
 // CallExpression represents a function all whose callee may be an Identifier or MemberExpression
 type CallExpression struct {
@@ -367,20 +379,40 @@ func (e *MemberExpression) Copy() Node {
 	return ne
 }
 
-type ArrowFunctionExpression struct {
+// IndexExpression represents indexing into an array
+type IndexExpression struct {
+	BaseNode
+	Array Expression `json:"array"`
+	Index Expression `json:"index"`
+}
+
+func (*IndexExpression) Type() string { return "IndexExpression" }
+
+func (e *IndexExpression) Copy() Node {
+	if e == nil {
+		return e
+	}
+	ne := new(IndexExpression)
+	*ne = *e
+	ne.Array = e.Array.Copy().(Expression)
+	ne.Index = e.Index.Copy().(Expression)
+	return ne
+}
+
+type FunctionExpression struct {
 	BaseNode
 	Params []*Property `json:"params"`
 	Body   Node        `json:"body"`
 }
 
 // Type is the abstract type
-func (*ArrowFunctionExpression) Type() string { return "ArrowFunctionExpression" }
+func (*FunctionExpression) Type() string { return "FunctionExpression" }
 
-func (e *ArrowFunctionExpression) Copy() Node {
+func (e *FunctionExpression) Copy() Node {
 	if e == nil {
 		return e
 	}
-	ne := new(ArrowFunctionExpression)
+	ne := new(FunctionExpression)
 	*ne = *e
 
 	if len(e.Params) > 0 {
@@ -635,10 +667,17 @@ func (e *ConditionalExpression) Copy() Node {
 	return ne
 }
 
-// Property is the value associated with a key
+// PropertyKey represents an object key
+type PropertyKey interface {
+	Node
+	Key() string
+}
+
+// Property is the value associated with a key.
+// A property's key can be either an identifier or string literal.
 type Property struct {
 	BaseNode
-	Key   *Identifier `json:"key"`
+	Key   PropertyKey `json:"key"`
 	Value Expression  `json:"value"`
 }
 
@@ -663,6 +702,11 @@ func (*Property) Type() string { return "Property" }
 type Identifier struct {
 	BaseNode
 	Name string `json:"name"`
+}
+
+// Identifiers are valid object keys
+func (i *Identifier) Key() string {
+	return i.Name
 }
 
 // Type is the abstract type
@@ -715,7 +759,13 @@ func (i *PipeLiteral) Copy() Node {
 // StringLiteral expressions begin and end with double quote marks.
 type StringLiteral struct {
 	BaseNode
+	// Value is the unescaped value of the string literal
 	Value string `json:"value"`
+}
+
+// StringLiterals are valid object keys
+func (l *StringLiteral) Key() string {
+	return l.Value
 }
 
 func (*StringLiteral) Type() string { return "StringLiteral" }

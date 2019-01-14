@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/influxdata/flux"
+	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
 )
 
@@ -27,7 +28,7 @@ type Administration interface {
 
 	ResolveTime(qt flux.Time) Time
 	StreamContext() StreamContext
-	Allocator() *Allocator
+	Allocator() *memory.Allocator
 	Parents() []DatasetID
 
 	Dependencies() Dependencies

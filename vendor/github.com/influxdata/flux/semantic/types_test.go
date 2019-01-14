@@ -7,7 +7,7 @@ import (
 )
 
 func MustType(e semantic.Expression) semantic.Type {
-	ts, _ := semantic.InferTypes(e)
+	ts, _ := semantic.InferTypes(e, nil)
 	typ, _ := ts.TypeOf(e)
 	return typ
 }

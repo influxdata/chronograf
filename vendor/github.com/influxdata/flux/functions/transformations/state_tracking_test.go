@@ -14,13 +14,13 @@ import (
 )
 
 func TestStateTrackingOperation_Marshaling(t *testing.T) {
-	data := []byte(`{"id":"id","kind":"stateTracking","spec":{"countLabel":"c","durationLabel":"d","durationUnit":"1m"}}`)
+	data := []byte(`{"id":"id","kind":"stateTracking","spec":{"countColumn":"c","durationColumn":"d","durationUnit":"1m"}}`)
 	op := &flux.Operation{
 		ID: "id",
 		Spec: &transformations.StateTrackingOpSpec{
-			CountLabel:    "c",
-			DurationLabel: "d",
-			DurationUnit:  flux.Duration(time.Minute),
+			CountColumn:    "c",
+			DurationColumn: "d",
+			DurationUnit:   flux.Duration(time.Minute),
 		},
 	}
 	querytest.OperationMarshalingTestHelper(t, data, op)
@@ -51,11 +51,11 @@ func TestStateTracking_Process(t *testing.T) {
 		{
 			name: "one table",
 			spec: &transformations.StateTrackingProcedureSpec{
-				CountLabel:    "count",
-				DurationLabel: "duration",
-				DurationUnit:  1,
-				Fn:            gt5,
-				TimeCol:       "_time",
+				CountColumn:    "count",
+				DurationColumn: "duration",
+				DurationUnit:   1,
+				Fn:             gt5,
+				TimeCol:        "_time",
 			},
 			data: []flux.Table{&executetest.Table{
 				ColMeta: []flux.ColMeta{
@@ -91,10 +91,10 @@ func TestStateTracking_Process(t *testing.T) {
 		{
 			name: "only duration",
 			spec: &transformations.StateTrackingProcedureSpec{
-				DurationLabel: "duration",
-				DurationUnit:  1,
-				Fn:            gt5,
-				TimeCol:       "_time",
+				DurationColumn: "duration",
+				DurationUnit:   1,
+				Fn:             gt5,
+				TimeCol:        "_time",
 			},
 			data: []flux.Table{&executetest.Table{
 				ColMeta: []flux.ColMeta{
@@ -129,9 +129,9 @@ func TestStateTracking_Process(t *testing.T) {
 		{
 			name: "only count",
 			spec: &transformations.StateTrackingProcedureSpec{
-				CountLabel: "count",
-				Fn:         gt5,
-				TimeCol:    "_time",
+				CountColumn: "count",
+				Fn:          gt5,
+				TimeCol:     "_time",
 			},
 			data: []flux.Table{&executetest.Table{
 				ColMeta: []flux.ColMeta{

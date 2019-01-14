@@ -1,15 +1,14 @@
 package transformations_test
 
 import (
-	"math/rand"
 	"time"
 
-	"github.com/gonum/stat/distuv"
 	"github.com/influxdata/flux"
-	_ "github.com/influxdata/flux/builtin"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/execute/executetest"
 	"github.com/influxdata/flux/values"
+	"golang.org/x/exp/rand"
+	"gonum.org/v1/gonum/stat/distuv"
 )
 
 const (
@@ -28,9 +27,9 @@ var NormalTable flux.Table
 
 func init() {
 	dist := distuv.Normal{
-		Mu:     Mu,
-		Sigma:  Sigma,
-		Source: rand.New(rand.NewSource(seed)),
+		Mu:    Mu,
+		Sigma: Sigma,
+		Src:   rand.New(rand.NewSource(seed)),
 	}
 	NormalData = make([]float64, N)
 	for i := range NormalData {
