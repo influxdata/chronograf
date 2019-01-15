@@ -178,7 +178,7 @@ By default, chronograf runs on port `8888`.
 To get started right away with Docker, you can pull down our latest release:
 
 ```sh
-docker pull chronograf:1.7.3
+docker pull chronograf:1.7.6
 ```
 
 ### From Source
