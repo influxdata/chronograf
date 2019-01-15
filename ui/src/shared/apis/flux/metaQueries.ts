@@ -10,7 +10,7 @@ export const measurements = async (
   const script = `
     from(bucket:"${bucket}") 
         |> range(start:-30d) 
-        |> group(by:["_measurement"]) 
+        |> group(columns:["_measurement"], mode: "by")
         |> distinct(column:"_measurement") 
         |> group()
     `
@@ -41,9 +41,9 @@ export const fieldsByMeasurement = async (
   const script = `
   from(bucket: "${bucket}")
     |> range(start: -30d)
-    |> group(by: ["_field", "_measurement"])
+    |> group(columns: ["_field", "_measurement"], mode: "by")
     |> distinct(column: "_field")
-    |> group(none: true)
+    |> group()
     |> map(fn: (r) => ({_measurement: r._measurement, _field: r._field}))
   `
   return proxy(source, script)
@@ -67,7 +67,7 @@ export const tagKeys = async (
       |> range(start: -30d)
       ${tagsetFilter(filter)}
       |> keys(except:["_time", "_value", "_start", "_stop"])
-      |> group(none: true)
+      |> group()
       |> distinct()
       |> map(fn: (r) => r._value)
       ${tagKeyFilter}
@@ -106,9 +106,9 @@ export const tagValues = async ({
     from(bucket:"${bucket}")
       |> range(start:-30d)
       ${regexFilter}
-      |> group(by:["${tagKey}"])
+      |> group(columns:["${tagKey}"], mode: "by")
       |> distinct(column:"${tagKey}")
-      |> group(by:["_stop","_start"])
+      |> group(columns:["_stop","_start"], mode: "by")
       ${limitFunc}
       ${countFunc}
   `
