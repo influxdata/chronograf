@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/bouk/httprouter"
+	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/flux/ast"
 	_ "github.com/influxdata/flux/builtin"
 	"github.com/influxdata/flux/complete"
@@ -174,11 +175,9 @@ func (s *Service) ProxyFlux(w http.ResponseWriter, r *http.Request) {
 		req.Host = u.Host
 		req.URL = u
 
-		// Because we are acting as a proxy, flux needs to have the basic auth information set as
-		// a header directly
-		if src.Username != "" && src.Password != "" {
-			req.SetBasicAuth(src.Username, src.Password)
-		}
+		// Use authorization method based on whether it is OSS or Enterprise
+		auth := influx.DefaultAuthorization(&src)
+		auth.Set(req)
 	}
 
 	// TODO: this was copied from services we may not needs this?
