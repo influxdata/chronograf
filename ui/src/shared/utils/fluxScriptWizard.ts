@@ -131,7 +131,8 @@ export function renderScript(
   }
 
   const window = `|> window(every: ${INTERVAL})`
-  const group = '|> group(except: ["_time", "_start", "_stop", "_value"])'
+  const group =
+    '|> group(columns: ["_time", "_start", "_stop", "_value"], mode: "except")'
 
   script = [script, window, aggFunction, group].join('\n  ')
 
