@@ -33,6 +33,12 @@ export const functions: FluxToolbarFunction[] = [
           'The "time destination" column to which time is copied for the aggregate record. Defaults to `"_time"`.',
         type: 'String',
       },
+      {
+        name: 'createEmpty',
+        desc:
+          'For windows without data, this will create an empty window and fill it with a `null` aggregate value.',
+        type: 'Boolean',
+      },
     ],
     desc: 'Applies an aggregate function to fixed windows of time.',
     example: 'aggregateWindow(every: 1m, fn: mean)',
@@ -95,6 +101,22 @@ export const functions: FluxToolbarFunction[] = [
     link: 'https://docs.influxdata.com/flux/latest/functions/inputs/buckets',
   },
   {
+    name: 'columns',
+    args: [
+      {
+        name: 'column',
+        desc:
+          'The name of the output column in which to store the column labels.',
+        type: 'String',
+      },
+    ],
+    desc: 'Lists the column labels of input tables.',
+    example: 'columns(column: "_value")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/functions/transformations/columns',
+  },
+  {
     name: 'count',
     args: [
       {
@@ -104,7 +126,7 @@ export const functions: FluxToolbarFunction[] = [
         type: 'Array of Strings',
       },
     ],
-    desc: 'Outputs the number of non-null records in each aggregated column.',
+    desc: 'Outputs the number of records in each aggregated column.',
     example: 'count(columns: ["_value"])',
     category: 'Aggregates',
     link:
@@ -210,15 +232,15 @@ export const functions: FluxToolbarFunction[] = [
         type: 'Array of Strings',
       },
       {
-        name: 'timeSrc',
-        desc: 'The column containing time values. Defaults to `"_time"`.',
+        name: 'timeColumn',
+        desc: 'The column name for the time values. Defaults to `"_time"`.',
         type: 'String',
       },
     ],
     desc:
       'Computes the rate of change per unit of time between subsequent non-null records. The output table schema will be the same as the input table.',
     example:
-      'derivative(unit: 100ms, nonNegative: false, columns: ["_value"], timeSrc: "_time")',
+      'derivative(unit: 1s, nonNegative: true, columns: ["_value"], timeColumn: "_time")',
     category: 'Aggregates',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/aggregates/derivative',
@@ -239,7 +261,7 @@ export const functions: FluxToolbarFunction[] = [
         type: 'Array of Strings',
       },
     ],
-    desc: 'Computes the difference between subsequent non-null records.',
+    desc: 'Computes the difference between subsequent records.',
     example: 'difference(nonNegative: false, columns: ["_value"])',
     category: 'Aggregates',
     link:
@@ -302,6 +324,34 @@ export const functions: FluxToolbarFunction[] = [
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/duplicate',
+  },
+  {
+    name: 'fill',
+    args: [
+      {
+        name: 'column',
+        desc:
+          'The column in which to replace null values. Defaults to `"_value"`.',
+        type: 'String',
+      },
+      {
+        name: 'value',
+        desc: 'The constant value to use in place of nulls.',
+        type: 'Value type of `column`',
+      },
+      {
+        name: 'usePrevious',
+        desc:
+          'When `true`, assigns the value set in the previous non-null row.',
+        type: 'Boolean',
+      },
+    ],
+    desc:
+      'replaces all null values in an input stream and replace them with a non-null value.',
+    example: 'fill(column: "_value", usePrevious: true)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/functions/transformations/fill',
   },
   {
     name: 'filter',
@@ -525,15 +575,15 @@ export const functions: FluxToolbarFunction[] = [
         type: 'Float',
       },
       {
-        name: 'upperBoundColumn',
-        desc:
-          'The name of the column in which to store the histogram\'s upper bounds. The count column type must be float. Defaults to `"le"`.',
-        type: 'String',
-      },
-      {
         name: 'countColumn',
         desc:
           'The name of the column in which to store the histogram counts. The count column type must be float. Defaults to `"_value"`.',
+        type: 'String',
+      },
+      {
+        name: 'upperBoundColumn',
+        desc:
+          'The name of the column in which to store the histogram\'s upper bounds. The count column type must be float. Defaults to `"le"`.',
         type: 'String',
       },
       {
@@ -628,13 +678,7 @@ export const functions: FluxToolbarFunction[] = [
         type: 'Duration',
       },
       {
-        name: 'columns',
-        desc:
-          'A list of columns on which to operate. Defaults to `["_value"]`.',
-        type: 'Array of Strings',
-      },
-      {
-        name: 'fn',
+        name: 'filter',
         desc:
           'A function that accepts an interval object and returns a boolean value. Each potential interval is passed to the filter function. When the function returns false, that interval is excluded from the set of intervals. Defaults to include all intervals.',
         type: 'Function',
@@ -685,7 +729,7 @@ export const functions: FluxToolbarFunction[] = [
       {
         name: 'fn',
         desc:
-          'A function which takes a column name as a parameter and returns a boolean indicating whether or not the column should be removed from the table. Cannot be used with `columns`.',
+          'A predicate function which takes a column name as a parameter and returns a boolean indicating whether or not the column should be removed from the table. Cannot be used with `columns`.',
         type: 'Function',
       },
     ],
@@ -700,15 +744,15 @@ export const functions: FluxToolbarFunction[] = [
     name: 'keys',
     args: [
       {
-        name: 'except',
+        name: 'column',
         desc:
-          'Exclude the specified column names in the output. Defaults to `["_time", "_value"]`.',
-        type: 'Array of Strings',
+          'Column is the name of the output column to store the group key labels. Defaults to `_value`.',
+        type: 'String',
       },
     ],
     desc:
-      "Returns a table with the input table's group key columns, plus a `_value` column containing the names of the input table's columns.",
-    example: 'keys(except: ["_time", "_value"])',
+      "Outputs the group key of input tables. For each input table, it outputs a table with the same group key columns, plus a _value column containing the labels of the input table's group key.",
+    example: 'keys(column: "_value")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/keys',
@@ -717,7 +761,7 @@ export const functions: FluxToolbarFunction[] = [
     name: 'keyValues',
     args: [
       {
-        name: 'keyCols',
+        name: 'keyColumns',
         desc:
           'A list of columns from which values are extracted. All columns indicated must be of the same type.',
         type: 'Array of Strings',
@@ -731,7 +775,7 @@ export const functions: FluxToolbarFunction[] = [
     ],
     desc:
       "Returns a table with the input table's group key plus two columns, `_key` and `_value`, that correspond to unique column + value pairs from the input table.",
-    example: 'keyValues(keyCols: ["usage_idle", "usage_user"])',
+    example: 'keyValues(keyColumns: ["usage_idle", "usage_user"])',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/keyvalues',
@@ -753,10 +797,16 @@ export const functions: FluxToolbarFunction[] = [
         desc: 'The maximum number of records to output.',
         type: 'Integer',
       },
+      {
+        name: 'offset',
+        desc:
+          'The number of records to skip per table before limiting to n. Defaults to 0.',
+        type: 'Integer',
+      },
     ],
     desc:
-      'Limits the number of records in output tables to a fixed number `n`. If the input table has less than `n` records, all records are be output.',
-    example: 'limit(n:10)',
+      'Limits the number of records in output tables to a fixed number `n` records after the `offset`. If the input table has less than `n` records, all records are be output.',
+    example: 'limit(n:10, offset: 0)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/limit',
@@ -1097,12 +1147,12 @@ export const functions: FluxToolbarFunction[] = [
         name: 'columns',
         desc:
           'A map of columns to rename and their corresponding new names. Cannot be used with `fn`.',
-        type: 'Map',
+        type: 'Object',
       },
       {
         name: 'fn',
         desc:
-          'A function which takes a single string parameter (the old column name) and returns a string representing the new column name. Cannot be used with `columns`.',
+          'A function mapping between old and new column names. Cannot be used with `columns`.',
         type: 'Function',
       },
     ],
@@ -1124,7 +1174,7 @@ export const functions: FluxToolbarFunction[] = [
       {
         name: 'pos',
         desc:
-          'The position offset from the start of results where sampling begins. `pos` must be less than `n`. If `pos` is less than 0, a random offset is used. Defaults to -1 (random offset).',
+          'The position offset from the start of results where sampling begins. `pos` must be less than `n`. If `pos` is less than 0, a random offset is used. Defaults to `-1` (random offset).',
         type: 'Integer',
       },
     ],
