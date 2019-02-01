@@ -136,7 +136,7 @@ option.
 ## Versions
 
 The most recent version of Chronograf is
-[v1.7.3](https://www.influxdata.com/downloads/).
+[v1.7.7](https://www.influxdata.com/downloads/).
 
 Spotted a bug or have a feature request? Please open
 [an issue](https://github.com/influxdata/chronograf/issues/new)!
@@ -156,7 +156,7 @@ The Chronograf team has identified and is working on the following issues:
 ## Installation
 
 Check out the
-[INSTALLATION](https://docs.influxdata.com/chronograf/v1.7/introduction/installation/)
+[INSTALLATION](https://docs.influxdata.com/chronograf/latest/introduction/installation/)
 guide to get up and running with Chronograf with as little configuration and
 code as possible.
 
@@ -178,7 +178,7 @@ By default, chronograf runs on port `8888`.
 To get started right away with Docker, you can pull down our latest release:
 
 ```sh
-docker pull chronograf:1.7.0
+docker pull chronograf:latest
 ```
 
 ### From Source
@@ -204,17 +204,17 @@ docker pull chronograf:1.7.0
 
 ## Documentation
 
-[Getting Started](https://docs.influxdata.com/chronograf/v1.7/introduction/getting-started/)
+[Getting Started](https://docs.influxdata.com/chronograf/latest/introduction/getting-started/)
 will get you up and running with Chronograf with as little configuration and
 code as possible. See our
-[guides](https://docs.influxdata.com/chronograf/v1.7/guides/) to get familiar
+[guides](https://docs.influxdata.com/chronograf/latest/guides/) to get familiar
 with Chronograf's main features.
 
 Documentation for Telegraf, InfluxDB, and Kapacitor are available at
 https://docs.influxdata.com/.
 
 Chronograf uses
-[swagger](https://swagger.io/specification://swagger.io/specification/) to
+[swagger](https://swagger.io/specification) to
 document its REST interfaces. To reach the documentation, run the server and go
 to the `/docs` for example at http://localhost:8888/docs
 
