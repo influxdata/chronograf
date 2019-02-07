@@ -6,10 +6,12 @@
 
 ## v1.7.7 [2018-01-16]
 
+## v1.7.7 [2019-01-16]
+
 ### Bug Fixes
 1. [#5045](https://github.com/influxdata/chronograf/pull/5045): Use JWT in enterprise for authentication in flux
 
-## v1.7.6 [2018-01-14]
+## v1.7.6 [2019-01-14]
 
 ### Bug Fixes
 1. [#4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
