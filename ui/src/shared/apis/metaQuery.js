@@ -10,9 +10,14 @@ export const showDatabases = async source => {
 export const showRetentionPolicies = async (source, databases) => {
   let query
   if (Array.isArray(databases)) {
-    query = databases.map(db => `SHOW RETENTION POLICIES ON "${db}"`).join(';')
+    query = databases
+      .map(db => `SHOW RETENTION POLICIES ON "${_.escape(db)}"`)
+      .join(';')
   } else {
-    query = `SHOW RETENTION POLICIES ON "${databases}"`
+    const dbs = _.split(databases, ',')
+      .map(d => `${_.escape(d)}`)
+      .join(',')
+    query = `SHOW RETENTION POLICIES ON "${dbs}"`
   }
 
   return await proxy({source, query})
@@ -49,7 +54,7 @@ export const showTagKeys = async ({
   measurement,
 }) => {
   const rp = _.toString(retentionPolicy)
-  const query = `SHOW TAG KEYS FROM "${rp}"."${measurement}"`
+  const query = `SHOW TAG KEYS FROM "${rp}"."${_.escape(measurement)}"`
   return await proxy({source, db: database, rp: retentionPolicy, query})
 }
 
@@ -62,10 +67,12 @@ export const showTagValues = async ({
 }) => {
   const keys = tagKeys
     .sort()
-    .map(k => `"${k}"`)
+    .map(k => `"${_.escape(k)}"`)
     .join(', ')
   const rp = _.toString(retentionPolicy)
-  const query = `SHOW TAG VALUES FROM "${rp}"."${measurement}" WITH KEY IN (${keys})`
+  const query = `SHOW TAG VALUES FROM "${rp}"."${_.escape(
+    measurement
+  )}" WITH KEY IN (${keys})`
 
   return await proxy({source, db: database, rp: retentionPolicy, query})
 }
@@ -84,7 +91,9 @@ export function createRetentionPolicy({
   replicationFactor,
   clusterID,
 }) {
-  const statement = `CREATE RETENTION POLICY "${rpName}" ON "${database}" DURATION ${duration} REPLICATION ${replicationFactor}`
+  const statement = `CREATE RETENTION POLICY "${rpName}" ON "${_.escape(
+    database
+  )}" DURATION ${duration} REPLICATION ${replicationFactor}`
   const url = buildInfluxUrl({host, statement})
 
   return proxy(url, clusterID)
