@@ -265,22 +265,14 @@ class TimeSeries extends PureComponent<Props, State> {
   }
 
   private executeTemplatedFluxQuery = async (latestUUID: string) => {
-    const {
-      queries,
-      onNotify,
-      source,
-      timeRange,
-      fluxASTLink,
-      xPixels,
-    } = this.props
+    const {queries, onNotify, source, timeRange, fluxASTLink} = this.props
 
     const script: string = _.get(queries, '0.text', '')
 
     const renderedScript = await renderTemplatesInScript(
       script,
       timeRange,
-      fluxASTLink,
-      xPixels
+      fluxASTLink
     )
 
     const results = await this.executeFluxQuery(
@@ -299,7 +291,7 @@ class TimeSeries extends PureComponent<Props, State> {
   private executeInfluxQLWithStatus = async (
     latestUUID: string
   ): Promise<TimeSeriesServerResponse[]> => {
-    const {source, templates, editQueryStatus, queries, xPixels} = this.props
+    const {source, templates, editQueryStatus, queries} = this.props
 
     for (const query of queries) {
       editQueryStatus(query.id, {loading: true})
@@ -309,7 +301,6 @@ class TimeSeries extends PureComponent<Props, State> {
       source,
       queries,
       templates,
-      xPixels,
       latestUUID
     )
 

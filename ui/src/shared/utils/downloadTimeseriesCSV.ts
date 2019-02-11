@@ -8,9 +8,6 @@ import {executeQuery as executeInfluxQLQuery} from 'src/shared/apis/query'
 import {executeQuery as executeFluxQuery} from 'src/shared/apis/flux/query'
 import {renderTemplatesInScript} from 'src/flux/helpers/templates'
 
-// Constants
-import {DEFAULT_X_PIXELS} from 'src/shared/constants'
-
 // Types
 import {Query, Template, Source, TimeRange} from 'src/types'
 import {TimeSeriesResponse} from 'src/types/series'
@@ -21,12 +18,7 @@ export const downloadInfluxQLCSV = async (
 ): Promise<void> => {
   const responses = await Promise.all(
     queries.map(query =>
-      executeInfluxQLQuery(
-        query.queryConfig.source,
-        query,
-        templates,
-        DEFAULT_X_PIXELS
-      )
+      executeInfluxQLQuery(query.queryConfig.source, query, templates)
     )
   )
 
@@ -44,8 +36,7 @@ export const downloadFluxCSV = async (
   const renderedScript = await renderTemplatesInScript(
     script,
     timeRange,
-    fluxASTLink,
-    DEFAULT_X_PIXELS
+    fluxASTLink
   )
 
   const {csv, didTruncate, rowCount} = await executeFluxQuery(

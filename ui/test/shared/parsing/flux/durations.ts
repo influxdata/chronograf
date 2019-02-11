@@ -161,7 +161,7 @@ const AST_2 = {
       },
       declarations: [
         {
-          type: 'VariableDeclarator',
+          type: 'VariableAssignment',
           id: {
             type: 'Identifier',
             location: {
