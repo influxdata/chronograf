@@ -1,4 +1,5 @@
 import {DecimalPlaces} from 'src/types/dashboards'
+import {isNumerical} from 'src/dashboards/utils/tableGraph'
 import {isFinite} from 'lodash'
 
 export const isTruncatedNumber = <T>(
@@ -21,4 +22,24 @@ export const toFixed = (
   }
 
   return value.toFixed(digits)
+}
+
+export const toValueInRange = (
+  stringValue: string,
+  min: string,
+  max: string
+): string => {
+  if (!isNumerical(stringValue)) {
+    return min
+  }
+
+  const value = +parseFloat(stringValue).toFixed(0)
+
+  if (value < +min) {
+    return min
+  } else if (value > +max) {
+    return max
+  } else {
+    return `${value}`
+  }
 }

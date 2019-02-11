@@ -1,4 +1,8 @@
-import {isTruncatedNumber, toFixed} from 'src/shared/utils/decimalPlaces'
+import {
+  isTruncatedNumber,
+  toFixed,
+  toValueInRange,
+} from 'src/shared/utils/decimalPlaces'
 
 describe('decimalPlaces', () => {
   const digits = (d: number) => ({isEnforced: true, digits: d})
@@ -25,6 +29,26 @@ describe('decimalPlaces', () => {
       expect(isTruncatedNumber(Infinity, digits(0))).toBe(false)
       expect(isTruncatedNumber(-Infinity, digits(0))).toBe(false)
       expect(isTruncatedNumber(-NaN, digits(0))).toBe(false)
+    })
+  })
+
+  describe('.toValueInRange', () => {
+    it('can return an integer value when provided a float', () => {
+      expect(toValueInRange('1.2', '0', '10')).toBe('1')
+    })
+
+    it('can enforce the min', () => {
+      expect(toValueInRange('1', '5', '10')).toBe('5')
+    })
+
+    it('can enforce the max', () => {
+      expect(toValueInRange('11', '-5', '0')).toBe('0')
+    })
+
+    it('can default to min', () => {
+      expect(toValueInRange('', '9999', '10000')).toBe('9999')
+      expect(toValueInRange('----', '9999', '10000')).toBe('9999')
+      expect(toValueInRange('-++++', '9999', '10000')).toBe('9999')
     })
   })
 })
