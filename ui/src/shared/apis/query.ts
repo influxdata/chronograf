@@ -25,7 +25,6 @@ export function executeQueries(
   source: Source,
   queries: Query[],
   templates: Template[],
-  resolution?: number,
   uuid?: string
 ): Promise<QueryResult[]> {
   return new Promise(resolve => {
@@ -34,7 +33,7 @@ export function executeQueries(
     let counter = queries.length
 
     for (let i = 0; i < queries.length; i++) {
-      executeQuery(source, queries[i], templates, resolution, uuid)
+      executeQuery(source, queries[i], templates, uuid)
         .then(result => (results[i] = {value: result, error: null}))
         .catch(result => (results[i] = {value: null, error: result}))
         .then(() => {
@@ -52,10 +51,9 @@ export const executeQuery = async (
   source: Source,
   query: Query,
   templates: Template[],
-  resolution: number,
   uuid?: string
 ): Promise<TimeSeriesResponse> => {
-  const text = await replace(query.text, source, templates, resolution)
+  const text = await replace(query.text, source, templates)
 
   const {data} = await proxy({
     source: source.links.proxy,
@@ -71,8 +69,7 @@ export const executeQuery = async (
 const replace = async (
   query: string,
   source: Source,
-  templates: Template[],
-  resolution: number
+  templates: Template[]
 ): Promise<string> => {
   const templateReplacedQuery = replaceTemplates(query, templates)
 
@@ -81,11 +78,7 @@ const replace = async (
   }
 
   const durationMs = await duration(templateReplacedQuery, source)
-  const replacedQuery = replaceInterval(
-    templateReplacedQuery,
-    resolution,
-    durationMs
-  )
+  const replacedQuery = replaceInterval(templateReplacedQuery, durationMs)
 
   return replacedQuery
 }
