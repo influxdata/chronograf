@@ -18,6 +18,7 @@ import {
 } from 'src/shared/graphs/helpers'
 import getLastValues from 'src/shared/parsing/lastValues'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {isTruncatedNumber, toFixed} from 'src/shared/utils/decimalPlaces'
 
 // Constants
 import {DYGRAPH_CONTAINER_V_MARGIN} from 'src/shared/constants'
@@ -155,8 +156,8 @@ class SingleStat extends PureComponent<Props, State> {
 
     let roundedValue = `${this.lastValue}`
 
-    if (decimalPlaces.isEnforced && _.isNumber(this.lastValue)) {
-      roundedValue = this.lastValue.toFixed(decimalPlaces.digits)
+    if (isTruncatedNumber(this.lastValue, decimalPlaces)) {
+      roundedValue = toFixed(this.lastValue, decimalPlaces)
     }
 
     return this.formatToLocale(+roundedValue)

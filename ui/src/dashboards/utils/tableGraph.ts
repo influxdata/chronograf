@@ -15,6 +15,7 @@ import {
 } from 'src/types/dashboards'
 import {TimeSeriesValue, InfluxQLQueryType} from 'src/types/series'
 import {DataType} from 'src/shared/constants'
+import {isTruncatedNumber, toFixed} from 'src/shared/utils/decimalPlaces'
 
 const calculateSize = (message: string): number => {
   return message.length * 7
@@ -89,8 +90,8 @@ const updateMaxWidths = (
       let colValue = `${col}`
       if (foundField && foundField.displayName) {
         colValue = foundField.displayName
-      } else if (_.isNumber(col) && decimalPlaces.isEnforced) {
-        colValue = col.toFixed(decimalPlaces.digits)
+      } else if (isTruncatedNumber(col, decimalPlaces)) {
+        colValue = toFixed(col, decimalPlaces)
       }
 
       const columnLabel = topRow[c]
@@ -301,5 +302,18 @@ export const transformTableData = (
   - `parseFloat('02abc')` is 2
 
 */
-export const isNumerical = (x: any): boolean =>
-  !isNaN(Number(x)) && !isNaN(parseFloat(x))
+export const isNumerical = <T>(x: T | string): x is string =>
+  !isNaN(Number(x)) && !isNaN(parseFloat(x as string))
+
+export const formatNumericCell = (
+  cellData: string,
+  decimalPlaces: DecimalPlaces
+) => {
+  const cellValue = parseFloat(cellData)
+
+  if (isTruncatedNumber(cellValue, decimalPlaces)) {
+    return toFixed(cellValue, decimalPlaces)
+  }
+
+  return `${cellValue}`
+}
