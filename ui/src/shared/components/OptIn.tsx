@@ -6,6 +6,8 @@ import uuid from 'uuid'
 import ClickOutsideInput from 'src/shared/components/ClickOutsideInput'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+import {toValueInRange} from 'src/shared/utils/decimalPlaces'
+
 interface Props {
   min?: string
   max?: string
@@ -123,10 +125,18 @@ export default class OptIn extends Component<Props, State> {
     this.useCustomValue()
   }
 
+  // Typing into number inputs does not enforce min/max
   private handleChangeCustomValue = (
     e: ChangeEvent<HTMLInputElement>
   ): void => {
-    this.setCustomValue(e.target.value)
+    const {min, max} = this.props
+    const {value} = e.target
+
+    if (value === '') {
+      this.setCustomValue('')
+    } else {
+      this.setCustomValue(toValueInRange(value, min, max))
+    }
   }
 
   private handleKeyDownCustomValueInput = (

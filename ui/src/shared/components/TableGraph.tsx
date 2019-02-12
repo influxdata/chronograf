@@ -12,7 +12,11 @@ import {MultiGrid, PropsMultiGrid} from 'src/shared/components/MultiGrid'
 // Utils
 import {fastReduce} from 'src/utils/fast'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {getDefaultTimeField, isNumerical} from 'src/dashboards/utils/tableGraph'
+import {
+  getDefaultTimeField,
+  isNumerical,
+  formatNumericCell,
+} from 'src/dashboards/utils/tableGraph'
 
 // Constants
 import {
@@ -443,12 +447,8 @@ class TableGraph extends PureComponent<Props, State> {
       return _.defaultTo(fieldName, '').toString()
     }
 
-    if (
-      isNumerical(cellData) &&
-      decimalPlaces.isEnforced &&
-      decimalPlaces.digits < 100
-    ) {
-      return parseFloat(cellData as any).toFixed(decimalPlaces.digits)
+    if (isNumerical(cellData)) {
+      return formatNumericCell(cellData, decimalPlaces)
     }
 
     return _.defaultTo(cellData, '').toString()
