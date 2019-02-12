@@ -141,7 +141,9 @@ class KapacitorDropdown extends PureComponent<Props & WithRouterProps> {
   }
 
   private get activeKapacitor(): Kapacitor {
-    return this.props.kapacitors.find(k => k.active)
+    const {kapacitors} = this.props
+
+    return kapacitors.find(k => k.active) || kapacitors[0]
   }
 
   private get selected(): string {
