@@ -22,7 +22,7 @@ import {Axes, CellType} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
 import {ColorString} from 'src/types/colors'
 
-const {LINEAR, LOG, BASE_2, BASE_10} = AXES_SCALE_OPTIONS
+const {LINEAR, LOG, BASE_2, BASE_10, BASE_RAW} = AXES_SCALE_OPTIONS
 const getInputMin = scale => (scale === LOG ? '0' : null)
 
 interface Props {
@@ -228,8 +228,8 @@ class AxesOptions extends PureComponent<Props, State> {
         <Radio shape={ButtonShape.StretchToFit}>
           <Radio.Button
             id="y-values-format-tab--raw"
-            value=""
-            active={base === ''}
+            value={BASE_RAW}
+            active={base === '' || base === BASE_RAW}
             titleText="Don't format values"
             onClick={this.handleSetBase}
           >

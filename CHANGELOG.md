@@ -2,6 +2,7 @@
 ### Bug Fixes
 1. [#5068](https://github.com/influxdata/chronograf/pull/5068): Escape injected meta query values
 1. [#5073](https://github.com/influxdata/chronograf/pull/5073): Fix out of range decimal places
+1. [#5076](https://github.com/influxdata/chronograf/pull/5076): Stop raw yaxis format from getting updated to 10
 
 ## v1.7.7 [2018-01-16]
 

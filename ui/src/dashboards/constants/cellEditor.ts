@@ -17,6 +17,7 @@ export const AXES_SCALE_OPTIONS = {
   LOG: 'log',
   BASE_2: '2',
   BASE_10: '10',
+  BASE_RAW: 'raw',
 }
 
 type DefaultAxis = Pick<Axis, Exclude<keyof Axis, 'bounds'>>
