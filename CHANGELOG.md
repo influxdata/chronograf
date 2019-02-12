@@ -1,8 +1,9 @@
 ## v1.7.8 [2019-02-08]
 ### Bug Fixes
 1. [#5068](https://github.com/influxdata/chronograf/pull/5068): Escape injected meta query values
+1. [#5073](https://github.com/influxdata/chronograf/pull/5073): Fix out of range decimal places
 
-## v1.7.7 [2019-01-16]
+## v1.7.7 [2018-01-16]
 
 ### Bug Fixes
 1. [#5045](https://github.com/influxdata/chronograf/pull/5045): Use JWT in enterprise for authentication in flux
