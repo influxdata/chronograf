@@ -79,21 +79,6 @@ func TestServerStore(t *testing.T) {
 		t.Fatalf("server 1 update error: got %v, expected %v", src.Organization, "1234")
 	}
 
-	// Attempt to make two active sources
-	srcs[0].Active = true
-	srcs[1].Active = true
-	if err := s.Update(ctx, srcs[0]); err != nil {
-		t.Fatal(err)
-	} else if err := s.Update(ctx, srcs[1]); err != nil {
-		t.Fatal(err)
-	}
-
-	if actual, err := s.Get(ctx, srcs[0].ID); err != nil {
-		t.Fatal(err)
-	} else if actual.Active == true {
-		t.Fatal("Able to set two active servers when only one should be permitted")
-	}
-
 	// Delete an server.
 	if err := s.Delete(ctx, srcs[0]); err != nil {
 		t.Fatal(err)
