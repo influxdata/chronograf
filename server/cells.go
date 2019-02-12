@@ -121,7 +121,7 @@ func HasCorrectAxes(c *chronograf.DashboardCell) error {
 			return chronograf.ErrInvalidAxis
 		}
 
-		if !oneOf(axis.Base, "10", "2", "") {
+		if !oneOf(axis.Base, "10", "2", "", "raw") {
 			return chronograf.ErrInvalidAxis
 		}
 	}
