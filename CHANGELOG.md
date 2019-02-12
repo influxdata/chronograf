@@ -10,7 +10,7 @@
 
 ## v1.7.7 [2018-01-16]
 
-## v1.7.7 [2019-01-16]
+## v1.7.7 [2018-01-16]
 
 ### Bug Fixes
 1. [#5045](https://github.com/influxdata/chronograf/pull/5045): Use JWT in enterprise for authentication in flux
