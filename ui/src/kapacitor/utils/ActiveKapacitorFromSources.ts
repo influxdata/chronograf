@@ -13,7 +13,8 @@ const ActiveKapacitorFromSources = (
     return null
   }
 
-  return ActiveSource.kapacitors.find(k => k.active)
+  const {kapacitors} = ActiveSource
+  return kapacitors.find(k => k.active) || kapacitors[0]
 }
 
 export default ActiveKapacitorFromSources
