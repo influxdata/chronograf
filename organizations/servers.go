@@ -51,14 +51,20 @@ func (s *ServersStore) All(ctx context.Context) ([]chronograf.Server, error) {
 
 // Add creates a new Server in the ServersStore with server.Organization set to be the
 // organization from the server store.
-func (s *ServersStore) Add(ctx context.Context, d chronograf.Server) (chronograf.Server, error) {
+func (s *ServersStore) Add(ctx context.Context, src chronograf.Server) (chronograf.Server, error) {
 	err := validOrganization(ctx)
 	if err != nil {
 		return chronograf.Server{}, err
 	}
 
-	d.Organization = s.organization
-	return s.store.Add(ctx, d)
+	// make the newly added source "active"
+	if err := s.resetActiveServer(ctx); err != nil {
+		return chronograf.Server{}, err
+	}
+	src.Active = true
+
+	src.Organization = s.organization
+	return s.store.Add(ctx, src)
 }
 
 // Delete the server from ServersStore
@@ -96,16 +102,41 @@ func (s *ServersStore) Get(ctx context.Context, id int) (chronograf.Server, erro
 }
 
 // Update the server in ServersStore.
-func (s *ServersStore) Update(ctx context.Context, d chronograf.Server) error {
+func (s *ServersStore) Update(ctx context.Context, src chronograf.Server) error {
 	err := validOrganization(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.store.Get(ctx, d.ID)
+	_, err = s.store.Get(ctx, src.ID)
 	if err != nil {
 		return err
 	}
 
-	return s.store.Update(ctx, d)
+	// only one server can be active at a time
+	if src.Active {
+		if err := s.resetActiveServer(ctx); err != nil {
+			return err
+		}
+	}
+
+	return s.store.Update(ctx, src)
+}
+
+// resetActiveServer unsets the Active flag on all sources
+func (s *ServersStore) resetActiveServer(ctx context.Context) error {
+	srcs, err := s.All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, other := range srcs {
+		if other.Active {
+			other.Active = false
+			if err := s.store.Update(ctx, other); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

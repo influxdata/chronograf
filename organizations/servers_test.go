@@ -123,6 +123,9 @@ func TestServers_Add(t *testing.T) {
 							Organization: "1337",
 						}, nil
 					},
+					AllF: func(ctx context.Context) ([]chronograf.Server, error) {
+						return []chronograf.Server{}, nil
+					},
 				},
 			},
 			args: args{
@@ -301,6 +304,9 @@ func TestServers_Update(t *testing.T) {
 							Name:         "doody",
 							Organization: "1337",
 						}, nil
+					},
+					AllF: func(ctx context.Context) ([]chronograf.Server, error) {
+						return []chronograf.Server{}, nil
 					},
 				},
 			},
