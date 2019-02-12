@@ -5,6 +5,7 @@
 1. [#5076](https://github.com/influxdata/chronograf/pull/5076): Stop raw yaxis format from getting updated to 10
 1. [#5077](https://github.com/influxdata/chronograf/pull/5077): Correct autoInterval calculations
 1. [#5079](https://github.com/influxdata/chronograf/pull/5079): Fix multiple organizations not showing configured kapacitors
+1. [#5078](https://github.com/influxdata/chronograf/pull/5078): Fix the inability to edit kapacitor info in the onboarding wizard
 
 ## v1.7.7 [2018-01-16]
 
