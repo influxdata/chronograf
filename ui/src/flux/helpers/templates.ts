@@ -13,8 +13,7 @@ const INTERVAL_REGEX = /autoInterval/g
 export const renderTemplatesInScript = async (
   script: string,
   timeRange: TimeRange,
-  astLink: string,
-  xPixels: number
+  astLink: string
 ): Promise<string> => {
   let dashboardTime: string
   let upperDashboardTime: string
@@ -27,7 +26,7 @@ export const renderTemplatesInScript = async (
     upperDashboardTime = new Date().toISOString()
   }
 
-  let rendered = `${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}\n\n${script}`
+  let rendered = `\n${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}\n\n${script}`
 
   if (!script.match(INTERVAL_REGEX)) {
     return rendered
@@ -38,10 +37,11 @@ export const renderTemplatesInScript = async (
   try {
     duration = await getMinDuration(astLink, rendered)
   } catch (error) {
+    console.error(error)
     duration = DEFAULT_DURATION_MS
   }
 
-  const interval = computeInterval(duration, xPixels)
+  const interval = computeInterval(duration)
 
   rendered = `${INTERVAL} = ${interval}ms\n${rendered}`
 

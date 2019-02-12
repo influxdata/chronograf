@@ -12,7 +12,6 @@ import replaceTemplates, {replaceInterval} from 'src/tempVars/utils/replace'
 import {duration} from 'src/shared/apis/query'
 
 import {applyMasks, insertTempVar, unMask} from 'src/tempVars/constants'
-import {DEFAULT_X_PIXELS} from 'src/shared/constants'
 
 import {Template, QueryConfig} from 'src/types'
 import {EditorChange, EditorConfiguration, Position} from 'codemirror'
@@ -334,7 +333,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
     const query = replaceTemplates(value, templates)
     const durationMs = await duration(query, config.source)
 
-    return replaceInterval(':interval:', DEFAULT_X_PIXELS, durationMs)
+    return replaceInterval(':interval:', durationMs)
   }
 
   private getTemplateTokens() {

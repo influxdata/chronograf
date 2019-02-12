@@ -288,21 +288,19 @@ describe('templates.utils.replace', () => {
   describe('replaceInterval', () => {
     it('can replace :interval:', () => {
       const query = `SELECT mean(usage_idle) from "cpu" where time > now() - 4320h group by time(:interval:)`
-      const expected = `SELECT mean(usage_idle) from "cpu" where time > now() - 4320h group by time(46702702ms)`
-      const pixels = 333
+      const expected = `SELECT mean(usage_idle) from "cpu" where time > now() - 4320h group by time(43200000ms)`
       const durationMs = 15551999999
-      const actual = replaceInterval(query, pixels, durationMs)
+      const actual = replaceInterval(query, durationMs)
 
       expect(actual).toBe(expected)
     })
 
     it('can replace multiple intervals', () => {
       const query = `SELECT NON_NEGATIVE_DERIVATIVE(mean(usage_idle), :interval:) from "cpu" where time > now() - 4320h group by time(:interval:)`
-      const expected = `SELECT NON_NEGATIVE_DERIVATIVE(mean(usage_idle), 46702702ms) from "cpu" where time > now() - 4320h group by time(46702702ms)`
+      const expected = `SELECT NON_NEGATIVE_DERIVATIVE(mean(usage_idle), 43200000ms) from "cpu" where time > now() - 4320h group by time(43200000ms)`
 
-      const pixels = 333
       const durationMs = 15551999999
-      const actual = replaceInterval(query, pixels, durationMs)
+      const actual = replaceInterval(query, durationMs)
 
       expect(actual).toBe(expected)
     })
@@ -333,12 +331,11 @@ describe('templates.utils.replace', () => {
           },
         ]
 
-        const pixels = 333
         const durationMs = 86399999
         const query = `SELECT mean(usage_idle) from "cpu" WHERE time > :dashboardTime: group by time(:interval:)`
         let actual = templateReplace(query, vars)
-        actual = replaceInterval(actual, pixels, durationMs)
-        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 24h group by time(259459ms)`
+        actual = replaceInterval(actual, durationMs)
+        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 24h group by time(240000ms)`
 
         expect(actual).toBe(expected)
       })
@@ -368,12 +365,11 @@ describe('templates.utils.replace', () => {
           },
         ]
 
-        const pixels = 38
         const durationMs = 3599999
         const query = `SELECT mean(usage_idle) from "cpu" WHERE time > :dashboardTime: group by time(:interval:)`
         let actual = templateReplace(query, vars)
-        actual = replaceInterval(actual, pixels, durationMs)
-        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 1h group by time(94736ms)`
+        actual = replaceInterval(actual, durationMs)
+        const expected = `SELECT mean(usage_idle) from "cpu" WHERE time > now() - 1h group by time(10000ms)`
 
         expect(actual).toBe(expected)
       })
@@ -382,7 +378,7 @@ describe('templates.utils.replace', () => {
     describe('with no :interval: present', () => {
       it('returns the query', () => {
         const expected = `SELECT mean(usage_idle) FROM "cpu" WHERE time > :dashboardTime: GROUP BY time(20ms)`
-        const actual = replaceInterval(expected, 10, 20000)
+        const actual = replaceInterval(expected, 20000)
 
         expect(actual).toBe(expected)
       })

@@ -6,31 +6,19 @@ import {
   TemplateValueType,
   TemplateValue,
 } from 'src/types/tempVars'
-import {TEMP_VAR_INTERVAL, PIXELS_PER_POINT} from 'src/shared/constants'
+import {TEMP_VAR_INTERVAL} from 'src/shared/constants'
+const DESIRED_POINTS_PER_GRAPH = 360
 
-export const computeInterval = (
-  durationMs: number,
-  xPixels: number
-): number => {
-  const customPxPerPoint = +window.localStorage.PIXELS_PER_POINT
-  const pxPerPoint = !isNaN(customPxPerPoint)
-    ? customPxPerPoint
-    : PIXELS_PER_POINT
-  const msPerPoint = Math.floor(durationMs * pxPerPoint / xPixels)
-
-  return msPerPoint
+export const computeInterval = (durationMs: number): number => {
+  return Math.round(durationMs / DESIRED_POINTS_PER_GRAPH)
 }
 
-export const replaceInterval = (
-  query: string,
-  xPixels: number,
-  durationMs: number
-) => {
+export const replaceInterval = (query: string, durationMs: number) => {
   if (!query.includes(TEMP_VAR_INTERVAL)) {
     return query
   }
 
-  const interval = computeInterval(durationMs, xPixels)
+  const interval = computeInterval(durationMs)
   const renderedQuery = replaceAll(query, TEMP_VAR_INTERVAL, `${interval}ms`)
 
   return renderedQuery

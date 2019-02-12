@@ -197,7 +197,7 @@ function durationDuration(durationLiteral: DurationLiteral): number {
 function resolveDeclaration(ast: any, name: string): RangeCallPropertyValue {
   const isDeclarator = node => {
     return (
-      get(node, 'type') === 'VariableDeclarator' &&
+      get(node, 'type') === 'VariableAssignment' &&
       get(node, 'id.name') === name
     )
   }
