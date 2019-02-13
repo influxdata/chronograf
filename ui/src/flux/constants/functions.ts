@@ -1532,18 +1532,18 @@ export const functions: FluxToolbarFunction[] = [
         type: 'Function',
       },
       {
-        name: 'timeCol',
+        name: 'timeColumn',
         desc: 'The column containing time. Defaults to `"_time"`.',
         type: 'String',
       },
       {
-        name: 'startCol',
+        name: 'startColumn',
         desc:
           'The column containing the window start time. Defaults to `"_start"`.',
         type: 'String',
       },
       {
-        name: 'stopCol',
+        name: 'stopColumn',
         desc:
           'The column containing the window stop time. Defaults to `"_stop"`.',
         type: 'String',
@@ -1552,7 +1552,7 @@ export const functions: FluxToolbarFunction[] = [
     desc:
       'Groups records based on a time value. New columns are added to uniquely identify each window. Those columns are added to the group key of the output tables. A single input record will be placed into zero or more output tables, depending on the specific windowing function.',
     example:
-      'window(every: 5m, period: 5m, offset: 12h, timeCol: "_time", startCol: "_start", stopCol: "_stop")',
+      'window(every: 5m, period: 5m, offset: 12h, timeColumn: "_time", startColumn: "_start", stopColumn: "_stop")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/window',
