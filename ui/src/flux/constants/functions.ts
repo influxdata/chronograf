@@ -365,7 +365,7 @@ export const functions: FluxToolbarFunction[] = [
       },
     ],
     desc: 'Retrieves data from a comma-separated value (CSV) data source.',
-    example: 'from(file: "/path/to/data-file.csv")',
+    example: 'fromCSV(file: "/path/to/data-file.csv")',
     category: 'Inputs',
     link: 'https://docs.influxdata.com/flux/latest/functions/inputs/fromcsv',
   },
