@@ -42,7 +42,7 @@ interface Props {
   setActiveKapacitor: sourcesActions.SetActiveKapacitor
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
   showNewKapacitor?: boolean
-  setKapacitorDraft: (kapacitor: Kapacitor) => void
+  setKapacitorDraft?: (kapacitor: Kapacitor) => void
 }
 
 interface State {
@@ -151,7 +151,9 @@ class KapacitorStep extends Component<Props, State> {
     const {kapacitor} = this.state
 
     this.setState({kapacitor: {...kapacitor, [key]: value}}, () => {
-      setKapacitorDraft(this.state.kapacitor)
+      if (setKapacitorDraft) {
+        setKapacitorDraft(this.state.kapacitor)
+      }
     })
 
     setError(false)
