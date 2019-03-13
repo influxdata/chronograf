@@ -171,6 +171,14 @@ export const RULE_MESSAGE_TEMPLATES: RuleMessageTemplate = {
     label: '{{.Time}}',
     text: 'The time of the point that triggered the event',
   },
+  else: {
+    label: '{{else}}',
+    text: 'Start of else block',
+  },
+  end: {
+    label: '{{end}}',
+    text: 'End of block',
+  },
 }
 
 export const RULE_MESSAGE_TEMPLATE_TEXTS = _.map(RULE_MESSAGE_TEMPLATES, t => {
