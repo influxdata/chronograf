@@ -233,6 +233,8 @@ export interface RuleMessageTemplate {
   fields: RuleMessage
   field: RuleMessage
   time: RuleMessage
+  else: RuleMessage
+  end: RuleMessage
 }
 
 export interface RuleMessage {
