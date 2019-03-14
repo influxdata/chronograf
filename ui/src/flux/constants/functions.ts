@@ -1,7 +1,47 @@
 // Types
 import {FluxToolbarFunction} from 'src/types/flux'
 
-export const functions: FluxToolbarFunction[] = [
+export const FROM: FluxToolbarFunction = {
+  name: 'from',
+  args: [
+    {
+      name: 'bucket',
+      desc: 'The name of the bucket to query.',
+      type: 'String',
+    },
+    {
+      name: 'bucketID',
+      desc: 'The string-encoded ID of the bucket to query.',
+      type: 'String',
+    },
+  ],
+  desc:
+    'Used to retrieve data from an InfluxDB data source. It returns a stream of tables from the specified bucket. Each unique series is contained within its own table. Each record in the table represents a single point in the series.',
+  example: 'from(bucket: "telegraf/autogen")',
+  category: 'Inputs',
+  link:
+    'https://v2.docs.influxdata.com/v2.0/reference/flux/functions/inputs/from',
+}
+
+export const UNION: FluxToolbarFunction = {
+  name: 'union',
+  args: [
+    {
+      name: 'tables',
+      desc:
+        'Specifies the streams to union together. There must be at least two streams.',
+      type: 'Array of Strings',
+    },
+  ],
+  desc:
+    'Concatenates two or more input streams into a single output stream. The output schemas of the `union()` function is the union of all input schemas. A sort operation may be added if a specific sort order is needed.',
+  example: 'union(tables: [table1, table2])',
+  category: 'Transformations',
+  link:
+    'https://v2.docs.influxdata.com/v2.0/reference/flux/functions/transformations/union',
+}
+
+export const FUNCTIONS: FluxToolbarFunction[] = [
   {
     name: 'aggregateWindow',
     args: [
@@ -329,26 +369,7 @@ export const functions: FluxToolbarFunction[] = [
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/first',
   },
-  {
-    name: 'from',
-    args: [
-      {
-        name: 'bucket',
-        desc: 'The name of the bucket to query.',
-        type: 'String',
-      },
-      {
-        name: 'bucketID',
-        desc: 'The string-encoded ID of the bucket to query.',
-        type: 'String',
-      },
-    ],
-    desc:
-      'Used to retrieve data from an InfluxDB data source. It returns a stream of tables from the specified bucket. Each unique series is contained within its own table. Each record in the table represents a single point in the series.',
-    example: 'from(bucket: "telegraf/autogen")',
-    category: 'Inputs',
-    link: 'https://docs.influxdata.com/flux/latest/functions/inputs/from',
-  },
+  FROM,
   {
     name: 'fromCSV',
     args: [
@@ -1473,23 +1494,7 @@ export const functions: FluxToolbarFunction[] = [
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/type-conversions/touint',
   },
-  {
-    name: 'union',
-    args: [
-      {
-        name: 'tables',
-        desc:
-          'Specifies the streams to union together. There must be at least two streams.',
-        type: 'Array of Strings',
-      },
-    ],
-    desc:
-      'Concatenates two or more input streams into a single output stream. The output schemas of the `union()` function is the union of all input schemas. A sort operation may be added if a specific sort order is needed.',
-    example: 'union(tables: ["table1", "table2"])',
-    category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/functions/transformations/union',
-  },
+  UNION,
   {
     name: 'unique',
     args: [
