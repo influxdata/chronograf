@@ -129,12 +129,14 @@ export default class OptIn extends Component<Props, State> {
   private handleChangeCustomValue = (
     e: ChangeEvent<HTMLInputElement>
   ): void => {
-    const {min, max} = this.props
+    const {min, max, type} = this.props
     const {value} = e.target
 
     if (value === '') {
       this.setCustomValue('')
-    } else {
+    } else if (type === 'text') {
+      this.setCustomValue(value)
+    } else if (type === 'number') {
       this.setCustomValue(toValueInRange(value, min, max))
     }
   }

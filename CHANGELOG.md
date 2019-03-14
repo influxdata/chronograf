@@ -7,6 +7,7 @@
 1. [#5079](https://github.com/influxdata/chronograf/pull/5079): Fix multiple organizations not showing configured kapacitors
 1. [#5078](https://github.com/influxdata/chronograf/pull/5078): Fix the inability to edit kapacitor info in the onboarding wizard
 1. [#5083](https://github.com/influxdata/chronograf/pull/5083): Fix the column names in the Window function example
+1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
 
 ## v1.7.7 [2018-01-16]
 
