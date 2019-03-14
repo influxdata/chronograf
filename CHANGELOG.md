@@ -1,3 +1,8 @@
+## v1.7.9 [unreleased]
+### Bug Fixes
+1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
+1. [#5111](https://github.com/influxdata/chronograf/pull/5111): Stop scrollbars from covering text in flux editor
+
 ## v1.7.8 [2019-02-08]
 ### Bug Fixes
 1. [#5068](https://github.com/influxdata/chronograf/pull/5068): Escape injected meta query values
@@ -7,7 +12,6 @@
 1. [#5079](https://github.com/influxdata/chronograf/pull/5079): Fix multiple organizations not showing configured kapacitors
 1. [#5078](https://github.com/influxdata/chronograf/pull/5078): Fix the inability to edit kapacitor info in the onboarding wizard
 1. [#5083](https://github.com/influxdata/chronograf/pull/5083): Fix the column names in the Window function example
-1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
 
 ## v1.7.7 [2018-01-16]
 
