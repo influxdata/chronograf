@@ -9,7 +9,7 @@ import SearchBar from 'src/flux/components/flux_functions_toolbar/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 // Constants
-import {functions as FUNCTIONS} from 'src/flux/constants'
+import {FUNCTIONS, FROM, UNION} from 'src/flux/constants/functions'
 
 // Utils
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
@@ -67,11 +67,21 @@ class FluxFunctionsToolbar extends PureComponent<ConnectedProps, State> {
     this.setState({searchTerm})
   }
 
-  private handleUpdateScript = (funcExample: string) => {
+  private handleUpdateScript = (funcName: string, funcExample: string) => {
     const {script, onUpdateScript} = this.props
 
-    const updatedScript = `${script}\n  |> ${funcExample}`
-    onUpdateScript(updatedScript)
+    switch (funcName) {
+      case FROM.name: {
+        onUpdateScript(`${script}\n${funcExample}`)
+        return
+      }
+      case UNION.name: {
+        onUpdateScript(`${script.trimRight()}\n\n${funcExample}`)
+        return
+      }
+      default:
+        onUpdateScript(`${script}\n  |> ${funcExample}`)
+    }
   }
 }
 
