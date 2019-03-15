@@ -9,7 +9,7 @@ import SearchBar from 'src/flux/components/flux_functions_toolbar/SearchBar'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 // Constants
-import {FUNCTIONS, FROM, UNION} from 'src/flux/constants/functions'
+import {FUNCTIONS} from 'src/flux/constants/functions'
 
 // Utils
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
@@ -17,20 +17,28 @@ import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+interface PassedProps {
+  onInsertFluxFunction: (functionName: string, text: string) => void
+}
+
 interface ConnectedProps {
   script: string
   onUpdateScript: (script: string) => void
 }
 
+type Props = PassedProps & ConnectedProps
+
 interface State {
   searchTerm: string
 }
+
 @ErrorHandling
-class FluxFunctionsToolbar extends PureComponent<ConnectedProps, State> {
-  public constructor(props) {
+class FluxFunctionsToolbar extends PureComponent<Props, State> {
+  public constructor(props: Props) {
     super(props)
     this.state = {searchTerm: ''}
   }
+
   public render() {
     const {searchTerm} = this.state
     return (
@@ -50,7 +58,7 @@ class FluxFunctionsToolbar extends PureComponent<ConnectedProps, State> {
                         key={category}
                         category={category}
                         funcs={funcs}
-                        onClickFunction={this.handleUpdateScript}
+                        onClickFunction={this.handleClickFunction}
                       />
                     )
                   }
@@ -63,32 +71,23 @@ class FluxFunctionsToolbar extends PureComponent<ConnectedProps, State> {
     )
   }
 
+  private handleClickFunction = (
+    fluxFunction: string,
+    funcExample: string
+  ): void => {
+    this.props.onInsertFluxFunction(fluxFunction, funcExample)
+  }
+
   private handleSearch = (searchTerm: string): void => {
     this.setState({searchTerm})
   }
-
-  private handleUpdateScript = (funcName: string, funcExample: string) => {
-    const {script, onUpdateScript} = this.props
-
-    switch (funcName) {
-      case FROM.name: {
-        onUpdateScript(`${script}\n${funcExample}`)
-        return
-      }
-      case UNION.name: {
-        onUpdateScript(`${script.trimRight()}\n\n${funcExample}`)
-        return
-      }
-      default:
-        onUpdateScript(`${script}\n  |> ${funcExample}`)
-    }
-  }
 }
 
-const ConnectedFluxFunctionsToolbar = () => (
+const ConnectedFluxFunctionsToolbar = (props: PassedProps) => (
   <Subscribe to={[TimeMachineContainer]}>
     {(container: TimeMachineContainer) => (
       <FluxFunctionsToolbar
+        {...props}
         script={container.state.draftScript}
         onUpdateScript={container.handleUpdateDraftScript}
       />

@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import {Position} from 'codemirror'
 
 // Components
 import FluxScriptEditor from 'src/flux/components/FluxScriptEditor'
@@ -16,6 +17,7 @@ interface Props {
   onChangeScript: (draftScript: string) => void
   onSubmitScript: () => void
   onShowWizard: () => void
+  onCursorChange?: (position: Position) => void
 }
 
 class FluxEditor extends PureComponent<Props> {
@@ -28,6 +30,7 @@ class FluxEditor extends PureComponent<Props> {
       onChangeScript,
       onSubmitScript,
       onShowWizard,
+      onCursorChange,
     } = this.props
 
     return (
@@ -39,6 +42,7 @@ class FluxEditor extends PureComponent<Props> {
           suggestions={suggestions}
           onChangeScript={onChangeScript}
           onSubmitScript={onSubmitScript}
+          onCursorChange={onCursorChange}
         >
           {script.trim() === '' && (
             <div className="flux-script-wizard--bg-hint">

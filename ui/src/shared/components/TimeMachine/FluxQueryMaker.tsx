@@ -1,6 +1,7 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {Subscribe} from 'unstated'
+import {Position} from 'codemirror'
 
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
@@ -20,6 +21,7 @@ import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
 import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {parseError} from 'src/flux/helpers/scriptBuilder'
 import {getSuggestions} from 'src/flux/helpers/suggestions'
+import {insertFluxFunction} from 'src/flux/helpers/scriptInsertion'
 
 // Types
 import {NotificationAction, Source} from 'src/types'
@@ -56,6 +58,7 @@ interface State {
 class FluxQueryMaker extends PureComponent<Props, State> {
   private debouncer: Debouncer = new DefaultDebouncer()
   private getAST = restartable(getAST)
+  private cursorPosition: Position
 
   public constructor(props: Props) {
     super(props)
@@ -122,6 +125,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
             onChangeScript={this.handleChangeDraftScript}
             onSubmitScript={this.handleSubmitScript}
             onShowWizard={this.handleShowWizard}
+            onCursorChange={this.handleCursorPosition}
           />
         ),
       },
@@ -130,7 +134,11 @@ class FluxQueryMaker extends PureComponent<Props, State> {
         size: rightSize,
         headerButtons: [],
         menuOptions: [],
-        render: () => <FluxFunctionsToolbar />,
+        render: () => (
+          <FluxFunctionsToolbar
+            onInsertFluxFunction={this.handleInsertFluxFunction}
+          />
+        ),
         headerOrientation: HANDLE_VERTICAL,
       },
     ]
@@ -150,6 +158,28 @@ class FluxQueryMaker extends PureComponent<Props, State> {
         />
       </FluxScriptWizard>
     )
+  }
+
+  private handleCursorPosition = (position: Position): void => {
+    this.cursorPosition = position
+  }
+
+  private handleInsertFluxFunction = async (
+    functionName: string,
+    fluxFunction: string
+  ): Promise<void> => {
+    const {draftScript} = this.props
+    const {line} = this.cursorPosition
+
+    const {updatedScript, cursorPosition} = insertFluxFunction(
+      line,
+      draftScript,
+      functionName,
+      fluxFunction
+    )
+    await this.handleChangeDraftScript(updatedScript)
+
+    this.handleCursorPosition(cursorPosition)
   }
 
   private handleSubmitScript = () => {
