@@ -1,6 +1,6 @@
 import React, {PureComponent, MouseEvent} from 'react'
 import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
-import {EditorChange, LineWidget} from 'codemirror'
+import {EditorChange, LineWidget, Position} from 'codemirror'
 import {ShowHintOptions} from 'src/types/codemirror'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {OnChangeScript, Suggestion} from 'src/types/flux'
@@ -24,6 +24,7 @@ interface Props {
   onChangeScript: OnChangeScript
   onSubmitScript: () => void
   suggestions: Suggestion[]
+  onCursorChange?: (position: Position) => void
 }
 
 interface Widget extends LineWidget {
@@ -32,6 +33,7 @@ interface Widget extends LineWidget {
 
 interface State {
   script: string
+  cursorPosition: Position
 }
 
 interface EditorInstance extends IInstance {
@@ -51,6 +53,7 @@ class FluxScriptEditor extends PureComponent<Props, State> {
     super(props)
     this.state = {
       script: props.script,
+      cursorPosition: null,
     }
   }
 
@@ -108,10 +111,19 @@ class FluxScriptEditor extends PureComponent<Props, State> {
           onTouchStart={this.onTouchStart}
           editorDidMount={this.handleMount}
           onKeyUp={this.handleKeyUp}
+          onCursor={this.handleCursorChange}
         />
         {children}
       </div>
     )
+  }
+
+  private handleCursorChange = (__: IInstance, position: Position) => {
+    const {onCursorChange} = this.props
+
+    if (onCursorChange) {
+      onCursorChange(position)
+    }
   }
 
   private handleMouseEnter = (e: MouseEvent<HTMLDivElement>) => {
