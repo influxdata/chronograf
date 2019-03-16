@@ -58,7 +58,7 @@ interface State {
 class FluxQueryMaker extends PureComponent<Props, State> {
   private debouncer: Debouncer = new DefaultDebouncer()
   private getAST = restartable(getAST)
-  private cursorPosition: Position
+  private cursorPosition: Position = {line: 0, ch: 0}
 
   public constructor(props: Props) {
     super(props)
