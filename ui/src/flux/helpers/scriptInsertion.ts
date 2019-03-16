@@ -37,21 +37,36 @@ const getInsertLineNumber = (
   return currentLineNumber + 1
 }
 
-const formatFunctionForInsert = (funcName: string, fluxFunction: string) => {
+const functionRequiresNewLine = (funcName: string): boolean => {
   switch (funcName) {
     case FROM.name:
     case UNION.name: {
-      return `\n${fluxFunction}`
+      return true
     }
     default:
-      return `  |> ${fluxFunction}`
+      return false
   }
 }
 
-const getCursorPosition = (insertLineNumber, formattedFunction): Position => {
-  const endOfLine = formattedFunction.length - 1
+const formatFunctionForInsert = (funcName: string, fluxFunction: string) => {
+  if (functionRequiresNewLine(funcName)) {
+    return `\n${fluxFunction}`
+  }
 
-  return {line: insertLineNumber, ch: endOfLine}
+  return `  |> ${fluxFunction}`
+}
+
+const getCursorPosition = (
+  insertLineNumber,
+  formattedFunction,
+  funcName
+): Position => {
+  const ch = formattedFunction.length - 1
+  const line = functionRequiresNewLine(funcName)
+    ? insertLineNumber + 1
+    : insertLineNumber
+
+  return {line, ch}
 }
 
 export const insertFluxFunction = (
@@ -75,7 +90,8 @@ export const insertFluxFunction = (
 
   const updatedCursorPosition = getCursorPosition(
     insertLineNumber,
-    formattedFunction
+    formattedFunction,
+    functionName
   )
 
   return {updatedScript, cursorPosition: updatedCursorPosition}
