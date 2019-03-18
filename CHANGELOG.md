@@ -1,9 +1,10 @@
 ## v1.7.9 [unreleased]
 ### Bug Fixes
-1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
+1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options
 1. [#5111](https://github.com/influxdata/chronograf/pull/5111): Stop scrollbars from covering text in flux editor
 1. [#5114](https://github.com/influxdata/chronograf/pull/5114): Insert flux function near cursor in flux editor
 1. [#5118](https://github.com/influxdata/chronograf/pull/5118): Fix double quoting of map template values
+1. [#5107](https://github.com/influxdata/chronograf/pull/5107): Fix unhandled templates in kapacitor rules
 
 ## v1.7.8 [2019-02-08]
 ### Bug Fixes
