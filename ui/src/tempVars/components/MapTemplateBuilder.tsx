@@ -1,10 +1,8 @@
 import React, {PureComponent, ChangeEvent} from 'react'
-import {getDeep} from 'src/utils/wrappers'
-import Papa from 'papaparse'
-import _ from 'lodash'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
+import {csvToMap, mapToCSV} from 'src/tempVars/utils'
 import TemplatePreviewList from 'src/tempVars/components/TemplatePreviewList'
 import DragAndDrop from 'src/shared/components/DragAndDrop'
 import {
@@ -12,8 +10,7 @@ import {
   notifyInvalidMapType,
 } from 'src/shared/copy/notifications'
 
-import {TemplateBuilderProps, TemplateValueType} from 'src/types'
-import {trimAndRemoveQuotes} from 'src/tempVars/utils'
+import {TemplateBuilderProps} from 'src/types'
 
 interface State {
   templateValuesString: string
@@ -23,11 +20,7 @@ interface State {
 class MapTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   public constructor(props: TemplateBuilderProps) {
     super(props)
-    const templateValues = props.template.values.map(v => v.value)
-    const templateKeys = props.template.values.map(v => v.key)
-    const templateValuesString = templateKeys
-      .map((v, i) => `${v}, ${templateValues[i]}`)
-      .join('\n')
+    const templateValuesString = mapToCSV(props.template.values)
 
     this.state = {
       templateValuesString,
@@ -120,38 +113,13 @@ class MapTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
 
   private constructValuesFromString(templateValuesString: string) {
     const {notify} = this.props
-    const trimmed = _.trimEnd(templateValuesString, '\n')
-    const parsedTVS = Papa.parse(trimmed)
-    const templateValuesData = getDeep<string[][]>(parsedTVS, 'data', [[]])
 
-    if (templateValuesData.length === 0) {
-      return
+    const {errors, values} = csvToMap(templateValuesString)
+
+    if (errors.length > 0) {
+      notify(notifyInvalidMapType())
     }
 
-    let arrayOfKeys = []
-    let values = []
-    _.forEach(templateValuesData, arr => {
-      if (arr.length === 2 || (arr.length === 3 && arr[2] === '')) {
-        const key = trimAndRemoveQuotes(arr[0])
-        const value = trimAndRemoveQuotes(arr[1])
-
-        if (!arrayOfKeys.includes(key) && key !== '') {
-          values = [
-            ...values,
-            {
-              type: TemplateValueType.Map,
-              value,
-              key,
-              selected: false,
-              localSelected: false,
-            },
-          ]
-          arrayOfKeys = [...arrayOfKeys, key]
-        }
-      } else {
-        notify(notifyInvalidMapType())
-      }
-    })
     return values
   }
 }
