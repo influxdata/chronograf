@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import {getDeep} from 'src/utils/wrappers'
 import Papa from 'papaparse'
 
 import {TEMPLATE_VARIABLE_TYPES} from 'src/tempVars/constants'
@@ -168,10 +167,16 @@ export const getLocalSelectedValue = (template: Template): string | null => {
   return null
 }
 
-export const csvToMap = (csv: string, onInvalidMapType: () => void) => {
+interface MapResult {
+  values: TemplateValue[]
+  errors: string[]
+}
+
+export const csvToMap = (csv: string): MapResult => {
+  let errors = []
   const trimmed = _.trimEnd(csv, '\n')
   const parsedTVS = Papa.parse(trimmed)
-  const templateValuesData = getDeep<string[][]>(parsedTVS, 'data', [[]])
+  const templateValuesData: string[][] = _.get(parsedTVS, 'data', [[]])
 
   if (templateValuesData.length === 0) {
     return
@@ -179,7 +184,7 @@ export const csvToMap = (csv: string, onInvalidMapType: () => void) => {
 
   let arrayOfKeys = []
   let values = []
-  _.forEach(templateValuesData, arr => {
+  for (const arr of templateValuesData) {
     if (arr.length === 2 || (arr.length === 3 && arr[2] === '')) {
       const key = trimAndRemoveQuotes(arr[0])
       const value = trimAndRemoveQuotes(arr[1])
@@ -198,11 +203,11 @@ export const csvToMap = (csv: string, onInvalidMapType: () => void) => {
         arrayOfKeys = [...arrayOfKeys, key]
       }
     } else {
-      onInvalidMapType()
+      errors = [...errors, arr[0]]
     }
-  })
+  }
 
-  return values
+  return {values, errors}
 }
 
 export const mapToCSV = (values: TemplateValue[]): string =>

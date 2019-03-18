@@ -114,7 +114,13 @@ class MapTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
   private constructValuesFromString(templateValuesString: string) {
     const {notify} = this.props
 
-    return csvToMap(templateValuesString, () => notify(notifyInvalidMapType()))
+    const {errors, values} =  csvToMap(templateValuesString)
+
+    if (errors.length > 0) {
+      notify(notifyInvalidMapType())
+    }
+
+    return values
   }
 }
 

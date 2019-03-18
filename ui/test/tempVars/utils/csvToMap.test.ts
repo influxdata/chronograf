@@ -15,7 +15,7 @@ describe('MapVars', () => {
     it('can parse key values', () => {
       const csv = 'a,1\nb,2\nc,3\n'
 
-      const actual = csvToMap(csv, jest.fn())
+      const {values: actual} = csvToMap(csv)
       expect(actual).toEqual([
         {
           ...mapDefaults,
@@ -35,10 +35,30 @@ describe('MapVars', () => {
       ])
     })
 
+    it('records invalid keys', () => {
+      const csv = 'a,1,2\nb,2\nc,3\n'
+
+      const {values: actual, errors} = csvToMap(csv)
+      expect(actual).toEqual([
+        {
+          ...mapDefaults,
+          key: 'b',
+          value: '2',
+        },
+        {
+          ...mapDefaults,
+          key: 'c',
+          value: '3',
+        },
+      ])
+
+      expect(errors).toEqual(['a'])
+    })
+
     it('can parse single quoted values', () => {
       const csv = `a,'1'\nb,'2'\nc,'3'\n`
 
-      const actual = csvToMap(csv, jest.fn())
+      const {values: actual} = csvToMap(csv)
       expect(actual).toEqual([
         {
           ...mapDefaults,
@@ -61,7 +81,7 @@ describe('MapVars', () => {
     it('can parse single quoted values with commas and spaces', () => {
       const csv = `a,"'1, 2'"\nb,"'2, 3'"\nc,"'3, 4'"\n`
 
-      const actual = csvToMap(csv, jest.fn())
+      const {values: actual} = csvToMap(csv)
       expect(actual).toEqual([
         {
           ...mapDefaults,
@@ -84,7 +104,7 @@ describe('MapVars', () => {
     it('can parse double quoted values', () => {
       const csv = `a,"1"\nb,"2"\nc,"3"\n`
 
-      const actual = csvToMap(csv, jest.fn())
+      const {values: actual} = csvToMap(csv)
       expect(actual).toEqual([
         {
           ...mapDefaults,
@@ -107,7 +127,8 @@ describe('MapVars', () => {
     it('can parse double quoted values with commas', () => {
       const csv = `a,"1, 2"\nb,"2, 3"\nc,"3, 4"\n`
 
-      const actual = csvToMap(csv, jest.fn())
+      const {values: actual} = csvToMap(csv)
+
       expect(actual).toEqual([
         {
           ...mapDefaults,
