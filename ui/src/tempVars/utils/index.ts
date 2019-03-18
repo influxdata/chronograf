@@ -1,3 +1,7 @@
+import _ from 'lodash'
+import {getDeep} from 'src/utils/wrappers'
+import Papa from 'papaparse'
+
 import {TEMPLATE_VARIABLE_TYPES} from 'src/tempVars/constants'
 import {
   Template,
@@ -163,3 +167,43 @@ export const getLocalSelectedValue = (template: Template): string | null => {
 
   return null
 }
+
+export const csvToMap = (csv: string, onInvalidMapType: () => void) => {
+  const trimmed = _.trimEnd(csv, '\n')
+  const parsedTVS = Papa.parse(trimmed)
+  const templateValuesData = getDeep<string[][]>(parsedTVS, 'data', [[]])
+
+  if (templateValuesData.length === 0) {
+    return
+  }
+
+  let arrayOfKeys = []
+  let values = []
+  _.forEach(templateValuesData, arr => {
+    if (arr.length === 2 || (arr.length === 3 && arr[2] === '')) {
+      const key = trimAndRemoveQuotes(arr[0])
+      const value = trimAndRemoveQuotes(arr[1])
+
+      if (!arrayOfKeys.includes(key) && key !== '') {
+        values = [
+          ...values,
+          {
+            type: TemplateValueType.Map,
+            value,
+            key,
+            selected: false,
+            localSelected: false,
+          },
+        ]
+        arrayOfKeys = [...arrayOfKeys, key]
+      }
+    } else {
+      onInvalidMapType()
+    }
+  })
+
+  return values
+}
+
+export const mapToCSV = (values: TemplateValue[]): string =>
+  values.map(v => `${v.key},"${v.value}"`).join('\n')
