@@ -112,7 +112,7 @@ class TableGraph extends PureComponent<Props, State> {
     const columnCount = _.get(transformedData, ['0', 'length'], 0)
     const rowCount = columnCount === 0 ? 0 : transformedData.length
     const fixedColumnCount = this.fixFirstColumn && columnCount > 1 ? 1 : 0
-    const {scrollToColumn, scrollToRow} = this.scrollToColRow
+    const {scrollToColumn, scrollToRow, externalScroll} = this.scrollToColRow
 
     return (
       <div
@@ -148,6 +148,7 @@ class TableGraph extends PureComponent<Props, State> {
                     fixedRowCount={1}
                     cellRenderer={this.cellRenderer}
                     classNameBottomRightGrid="table-graph--scroll-window"
+                    externalScroll={externalScroll}
                   />
                 )}
               </ColumnSizer>
@@ -319,13 +320,20 @@ class TableGraph extends PureComponent<Props, State> {
   private get scrollToColRow(): {
     scrollToRow: number | null
     scrollToColumn: number | null
+    externalScroll: boolean
   } {
     const {sortedTimeVals, hoveredColumnIndex, isTimeVisible} = this.state
     const {hoverTime} = this.props
     const hoveringThisTable = hoveredColumnIndex !== NULL_ARRAY_INDEX
     const notHovering = hoverTime === NULL_HOVER_TIME
+    const hoveringOtherCell = !notHovering && !hoveringThisTable
+
     if (this.isEmpty || notHovering || hoveringThisTable || !isTimeVisible) {
-      return {scrollToColumn: 0, scrollToRow: -1}
+      return {
+        scrollToColumn: 0,
+        scrollToRow: -1,
+        externalScroll: hoveringOtherCell,
+      }
     }
 
     const firstDiff = this.getTimeDifference(hoverTime, sortedTimeVals[1]) // sortedTimeVals[0] is "time"
@@ -347,7 +355,7 @@ class TableGraph extends PureComponent<Props, State> {
 
     const scrollToColumn = this.isVerticalTimeAxis ? -1 : hoverTimeFound.index
     const scrollToRow = this.isVerticalTimeAxis ? hoverTimeFound.index : null
-    return {scrollToRow, scrollToColumn}
+    return {scrollToRow, scrollToColumn, externalScroll: hoveringOtherCell}
   }
 
   private getTimeDifference(hoverTime, time: string | number) {
