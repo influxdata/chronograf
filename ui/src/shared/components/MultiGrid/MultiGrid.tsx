@@ -26,6 +26,7 @@ export interface PropsMultiGrid {
   onScroll?: (arg: object) => {}
   cellRenderer?: (arg: object) => JSX.Element
   onMount?: (mg: MultiGrid) => void
+  externalScroll: boolean
 }
 
 interface State {
@@ -55,13 +56,17 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
   public static getDerivedStateFromProps(nextProps: PropsMultiGrid) {
     const {scrollToRow, rowCount, height} = nextProps
+
     const scrollTop = scrollToRow * ROW_HEIGHT
     const maxScrollTop = (rowCount + 1) * ROW_HEIGHT - (height + ROW_HEIGHT)
-    const maxRow = rowCount - Math.floor(height / ROW_HEIGHT) / 2
+    const visibleRowsCount = Math.floor(height / ROW_HEIGHT)
+    const maxRow = rowCount - visibleRowsCount / 2
 
+    // hovering on this grid
     if (scrollTop < 0) {
       return {scrollToRow}
     }
+
     if (scrollToRow > maxRow) {
       return {scrollToRow: rowCount}
     }
@@ -70,9 +75,10 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
       return {scrollTop: maxScrollTop}
     }
 
+    // hovering on another cell
     return {
-      scrollToRow,
-      scrollTop: scrollToRow * ROW_HEIGHT - ROW_HEIGHT,
+      scrollToRow: scrollToRow - 1,
+      scrollTop: Math.max(scrollToRow * ROW_HEIGHT - ROW_HEIGHT, 0),
     }
   }
 
@@ -273,8 +279,12 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
   }
 
   private onScroll = scrollInfo => {
-    const {onScroll} = this.props
+    const {onScroll, externalScroll} = this.props
     const {scrollLeft, scrollTop} = scrollInfo
+
+    if (externalScroll) {
+      return
+    }
 
     this.setState({scrollLeft, scrollTop})
 
@@ -347,6 +357,11 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
     const leftWidth = this.getLeftGridWidth(props)
 
+    let passingProps = _.omit(props, ['scrollToColumn'])
+    if (props.externalScroll) {
+      passingProps = _.omit(props, ['scrollToColumn', 'scrollTop'])
+    }
+
     return (
       <AutoSizer>
         {({width, height}) => (
@@ -362,7 +377,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
             setScrollTop={this.onScrollbarsScroll}
           >
             <Grid
-              {..._.omit(props, ['scrollToColumn', 'scrollTop'])}
+              {...passingProps}
               cellRenderer={this.cellRendererBottomRightGrid}
               className={this.props.classNameBottomRightGrid}
               columnCount={Math.max(0, columnCount - fixedColumnCount)}
