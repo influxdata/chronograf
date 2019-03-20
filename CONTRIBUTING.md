@@ -13,7 +13,7 @@ Before you file an issue, please search existing issues in case it has already b
 Remember the golden rule of bug reports: **The easier you make it for us to reproduce the problem, the faster it will get fixed.**
 If you have never written a bug report before, or if you want to brush up on your bug reporting skills, we recommend reading [Simon Tatham's essay "How to Report Bugs Effectively."](http://www.chiark.greenend.org.uk/~sgtatham/bugs.html)
 
-Please note that issues are _not the place to file general questions_ such as "How do I use Chronograf?" Questions of this nature should be sent to the [InfluxDB Google Group](https://groups.google.com/forum/#!forum/influxdb), not filed as issues. Issues like this will be closed.
+Please note that issues are _not the place to file general questions_ such as "How do I use Chronograf?" Questions of this nature should be sent to the [InfluxData Community Site](https://community.influxdata.com), not filed as issues. Issues like this will be closed.
 
 ## Feature requests
 
