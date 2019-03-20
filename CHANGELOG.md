@@ -5,6 +5,7 @@
 1. [#5114](https://github.com/influxdata/chronograf/pull/5114): Insert flux function near cursor in flux editor
 1. [#5118](https://github.com/influxdata/chronograf/pull/5118): Fix double quoting of map template values
 1. [#5107](https://github.com/influxdata/chronograf/pull/5107): Fix unhandled templates in kapacitor rules
+1. [#5128](https://github.com/influxdata/chronograf/pull/5128): Fix disappearing data when scrolling a table
 
 ## v1.7.8 [2019-02-08]
 ### Bug Fixes
