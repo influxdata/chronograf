@@ -1,4 +1,7 @@
-## v1.7.9 [unreleased]
+## v1.7.10 [unreleased]
+### Bug Fixes
+
+## v1.7.9 [2019-03-20]
 ### Bug Fixes
 1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
 1. [#5111](https://github.com/influxdata/chronograf/pull/5111): Stop scrollbars from covering text in flux editor
