@@ -1,8 +1,0 @@
-#datatype,string,long,string,string,double
-#group,false,false,true,true,false
-#default,_result,,,,
-,result,table,_measurement,_field,_value
-,,0,Sgf,DlXwgrw,0.3057387969724791
-,,1,Sgf,GxUPYq1,0.7564084754909545
-,,2,Sgf,qaOnnQc,0.6793279546139146
-

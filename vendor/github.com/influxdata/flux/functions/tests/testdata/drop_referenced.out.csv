@@ -1,5 +1,0 @@
-#datatype,string,string
-#group,true,true
-#default,,
-,error,reference
-,"function references unknown column ""_field""",

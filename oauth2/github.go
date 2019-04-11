@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
@@ -138,12 +139,13 @@ func isMember(requiredOrgs []string, userOrgs []*github.Organization) bool {
 func getOrganizations(client *github.Client, log chronograf.Logger) ([]*github.Organization, error) {
 	// Get all pages of results
 	var allOrgs []*github.Organization
+	ctx := context.Background()
 	for {
 		opt := &github.ListOptions{
 			PerPage: 10,
 		}
 		// Get the organizations for the current authenticated user.
-		orgs, resp, err := client.Organizations.List("", opt)
+		orgs, resp, err := client.Organizations.List(ctx, "", opt)
 		if err != nil {
 			logResponseError(log, resp, err)
 			return nil, err
@@ -159,7 +161,8 @@ func getOrganizations(client *github.Client, log chronograf.Logger) ([]*github.O
 
 // getPrimaryEmail gets the primary email account for the authenticated user.
 func getPrimaryEmail(client *github.Client, log chronograf.Logger) (string, error) {
-	emails, resp, err := client.Users.ListEmails(nil)
+	ctx := context.Background()
+	emails, resp, err := client.Users.ListEmails(ctx, nil)
 	if err != nil {
 		logResponseError(log, resp, err)
 		return "", err
