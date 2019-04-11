@@ -1,6 +1,0 @@
-topic: cpu
-id: other
-kind: slack
-match: changed() == TRUE
-options:
-  channel: '#alerts'

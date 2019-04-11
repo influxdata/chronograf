@@ -12,6 +12,7 @@ unexport LDFLAGS
 LDFLAGS=-ldflags "-s -X main.version=${VERSION} -X main.commit=${COMMIT}"
 BINARY=chronograf
 CTLBINARY=chronoctl
+GO111MODULE=on
 
 .DEFAULT_GOAL := all
 
@@ -20,8 +21,8 @@ all: dep build
 build: assets ${BINARY}
 
 ${BINARY}: $(SOURCES) .bindata .jsdep .godep
-	go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
-	go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
+	GO111MODULE=on go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
+	GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
 
 define CHRONOGIRAFFE
              ._ o o
@@ -38,7 +39,7 @@ chronogiraffe: ${BINARY}
 	@echo "$$CHRONOGIRAFFE"
 
 docker-${BINARY}: $(SOURCES)
-	CGO_ENABLED=0 GOOS=linux go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
+	CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
 		./cmd/chronograf/main.go
 
 docker: dep assets docker-${BINARY}
@@ -71,6 +72,7 @@ dep: .jsdep .godep
 ifndef GOBINDATA
 	@echo "Installing go-bindata"
 	go get -u github.com/kevinburke/go-bindata/go-bindata
+	GO111MODULE=on go get
 endif
 	@touch .godep
 
@@ -85,15 +87,15 @@ endif
 gen: internal.pb.go
 
 internal.pb.go: bolt/internal/internal.proto
-	go generate -x ./bolt/internal
+	GO111MODULE=on go generate -x ./bolt/internal
 
 test: jstest gotest gotestrace lint-ci
 
 gotest:
-	go test -timeout 10s ./...
+	GO111MODULE=on go test -timeout 10s ./...
 
 gotestrace:
-	go test -race ./...
+	GO111MODULE=on go test -race ./...
 
 jstest:
 	cd ui && yarn test --runInBand
