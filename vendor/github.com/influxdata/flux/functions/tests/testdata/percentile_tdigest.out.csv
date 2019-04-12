@@ -1,6 +1,0 @@
-#datatype,string,long,string,string,double
-#group,false,false,true,true,false
-#default,_result,,,,
-,result,table,_measurement,_field,_value
-,,0,SOYcRk,NC7N,29.50336437998469
-

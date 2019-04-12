@@ -1,8 +1,0 @@
-#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,long,string,string,string
-#group,false,false,false,false,false,false,false,false,false
-#default,_result,,,,,,,,
-,result,table,_start,_stop,_time,_value,_field,_measurement,host
-,,0,2018-11-07T00:00:00Z,2018-11-08T00:00:00Z,2018-11-07T11:00:00Z,50,B,CC,HostD
-,,0,2018-11-07T00:00:00Z,2018-11-08T00:00:00Z,2018-11-07T05:00:00Z,33,A,CC,HostB
-,,0,2018-11-07T00:00:00Z,2018-11-08T00:00:00Z,2018-11-07T02:00:00Z,30,A,BB,HostA
-

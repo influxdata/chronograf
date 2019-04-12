@@ -1,3 +1,0 @@
-project_name: &anchor_name This string will appear as the value of two keys.
-build:
-  binary: *anchor_name

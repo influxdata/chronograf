@@ -12,10 +12,10 @@ import (
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/ast"
 	_ "github.com/influxdata/flux/builtin"
 	"github.com/influxdata/flux/complete"
-	"github.com/influxdata/flux/parser"
 )
 
 // Params are params
@@ -105,7 +105,7 @@ type ASTRequest struct {
 
 type ASTResponse struct {
 	Valid bool         `json:"valid"`
-	AST   *ast.Program `json:"ast"`
+	AST   *ast.Package `json:"ast"`
 	Error string       `json:"error"`
 }
 
@@ -116,14 +116,17 @@ func (s *Service) FluxAST(w http.ResponseWriter, r *http.Request) {
 		invalidJSON(w, s.Logger)
 	}
 
-	ast, err := parser.NewAST(request.Body)
+	parsed, err := flux.Parse(request.Body)
+
 	if err != nil {
-		resp := ASTResponse{Valid: false, AST: nil, Error: err.Error()}
-		encodeJSON(w, http.StatusOK, resp, s.Logger)
+		msg := err.Error()
+		resp := ASTResponse{Valid: true, AST: nil, Error: msg}
+		encodeJSON(w, http.StatusBadRequest, resp, s.Logger)
 	} else {
-		resp := ASTResponse{Valid: true, AST: ast, Error: ""}
+		resp := ASTResponse{Valid: true, AST: parsed, Error: ""}
 		encodeJSON(w, http.StatusOK, resp, s.Logger)
 	}
+
 }
 
 // ProxyFlux proxies requests to influxdb using the path query parameter.

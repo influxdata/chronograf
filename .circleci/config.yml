@@ -31,7 +31,8 @@ version: 2
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20181214
+      DOCKER_TAG: chronograf-20190411
+      GO111MODULE: "ON"
     machine: true
     steps:
       - checkout
@@ -53,7 +54,8 @@ jobs:
 
   deploy-nightly:
     environment:
-      DOCKER_TAG: chronograf-20181214
+      DOCKER_TAG: chronograf-20190411
+      GO111MODULE: "ON"
     machine: true
     steps:
       - attach_workspace:
@@ -80,7 +82,8 @@ jobs:
 
   deploy-pre-release:
     environment:
-      DOCKER_TAG: chronograf-20181214
+      DOCKER_TAG: chronograf-20190411
+      GO111MODULE: "ON"
     machine: true
     steps:
       - attach_workspace:
@@ -109,7 +112,8 @@ jobs:
 
   deploy-release:
     environment:
-      DOCKER_TAG: chronograf-20181214
+      DOCKER_TAG: chronograf-20190411
+      GO111MODULE: "ON"
     machine: true
     steps:
       - attach_workspace:
