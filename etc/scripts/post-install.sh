@@ -33,13 +33,6 @@ if [[ $? -ne 0 ]]; then
     useradd --system -U -M chronograf -s /bin/false -d $DATA_DIR
 fi
 
-test -d $LOG_DIR || mkdir -p $DATA_DIR
-test -d $DATA_DIR || mkdir -p $DATA_DIR
-chown -R -L chronograf:chronograf $LOG_DIR
-chown -R -L chronograf:chronograf $DATA_DIR
-chmod 755 $LOG_DIR
-chmod 755 $DATA_DIR
-
 # Remove legacy symlink, if it exists
 if [[ -L /etc/init.d/chronograf ]]; then
     rm -f /etc/init.d/chronograf
@@ -63,6 +56,17 @@ if [[ -f /etc/redhat-release ]]; then
     fi
 elif [[ -f /etc/debian_version ]]; then
     # Debian/Ubuntu logic
+
+    # Ownership for RH-based platforms is set in build.py via the `rmp-attr` option.
+    # We perform ownership change only for Debian-based systems.
+    # Moving these lines out of this if statement would make `rmp -V` fail after installation.
+    test -d $LOG_DIR || mkdir -p $DATA_DIR
+    test -d $DATA_DIR || mkdir -p $DATA_DIR
+    chown -R -L chronograf:chronograf $LOG_DIR
+    chown -R -L chronograf:chronograf $DATA_DIR
+    chmod 755 $LOG_DIR
+    chmod 755 $DATA_DIR
+
     which systemctl &>/dev/null
     if [[ $? -eq 0 ]]; then
     	install_systemd
