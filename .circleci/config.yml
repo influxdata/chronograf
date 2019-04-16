@@ -31,7 +31,7 @@ version: 2
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20190411
+      DOCKER_TAG: chronograf-20190416
       GO111MODULE: "ON"
     machine: true
     steps:
@@ -54,7 +54,7 @@ jobs:
 
   deploy-nightly:
     environment:
-      DOCKER_TAG: chronograf-20190411
+      DOCKER_TAG: chronograf-20190416
       GO111MODULE: "ON"
     machine: true
     steps:
@@ -82,7 +82,7 @@ jobs:
 
   deploy-pre-release:
     environment:
-      DOCKER_TAG: chronograf-20190411
+      DOCKER_TAG: chronograf-20190416
       GO111MODULE: "ON"
     machine: true
     steps:
@@ -112,7 +112,7 @@ jobs:
 
   deploy-release:
     environment:
-      DOCKER_TAG: chronograf-20190411
+      DOCKER_TAG: chronograf-20190416
       GO111MODULE: "ON"
     machine: true
     steps:
