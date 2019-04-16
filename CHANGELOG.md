@@ -1,6 +1,11 @@
 ## v1.7.9 [unreleased]
 ### Bug Fixes
 1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options
+1. [#5149](https://github.com/influxdata/chronograf/pull/5149): Fix Cell editor visualization not using ceo time range
+
+## v1.7.9 [2019-03-20]
+### Bug Fixes
+1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
 1. [#5111](https://github.com/influxdata/chronograf/pull/5111): Stop scrollbars from covering text in flux editor
 1. [#5114](https://github.com/influxdata/chronograf/pull/5114): Insert flux function near cursor in flux editor
 1. [#5118](https://github.com/influxdata/chronograf/pull/5118): Fix double quoting of map template values
