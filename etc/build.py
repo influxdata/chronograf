@@ -500,7 +500,7 @@ def build(version=None,
                 return False
         if platform == 'windows':
             target = target + '.exe'
-        build_command += "go build -o {} ".format(os.path.join(outdir, target))
+        build_command += " GO111MODULES=on go build -o {} ".format(os.path.join(outdir, target))
         if race:
             build_command += "-race "
         if len(tags) > 0:
