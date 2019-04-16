@@ -39,12 +39,7 @@ import {annotationsError} from 'src/shared/copy/notifications'
 import {loadDashboardLinks} from 'src/dashboards/apis'
 
 // Constants
-import {
-  interval,
-  DASHBOARD_LAYOUT_ROW_HEIGHT,
-  TEMP_VAR_DASHBOARD_TIME,
-  TEMP_VAR_UPPER_DASHBOARD_TIME,
-} from 'src/shared/constants'
+import {interval, DASHBOARD_LAYOUT_ROW_HEIGHT} from 'src/shared/constants'
 import {FORMAT_INFLUXQL} from 'src/shared/data/timeRanges'
 import {EMPTY_LINKS} from 'src/dashboards/constants/dashboardHeader'
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
@@ -64,6 +59,7 @@ import {NewDefaultCell} from 'src/types/dashboards'
 import {NotificationAction} from 'src/types'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
+import {createTimeRangeTemplates} from 'src/shared/utils/templates'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   fluxLinks: Links
@@ -207,9 +203,7 @@ class DashboardPage extends Component<Props, State> {
       source,
       sources,
       timeRange,
-      timeRange: {lower, upper},
       zoomedTimeRange,
-      zoomedTimeRange: {lower: zoomedLower, upper: zoomedUpper},
       dashboard,
       dashboardID,
       autoRefresh,
@@ -223,38 +217,10 @@ class DashboardPage extends Component<Props, State> {
       toggleTemplateVariableControlBar,
     } = this.props
 
-    const low = zoomedLower || lower
-    const up = zoomedUpper || upper
-
-    const lowerType = low && low.includes(':') ? 'timeStamp' : 'constant'
-    const upperType = up && up.includes(':') ? 'timeStamp' : 'constant'
-    const dashboardTime = {
-      id: 'dashtime',
-      tempVar: TEMP_VAR_DASHBOARD_TIME,
-      type: lowerType,
-      values: [
-        {
-          value: low,
-          type: lowerType,
-          selected: true,
-          localSelected: true,
-        },
-      ],
-    }
-
-    const upperDashboardTime = {
-      id: 'upperdashtime',
-      tempVar: TEMP_VAR_UPPER_DASHBOARD_TIME,
-      type: upperType,
-      values: [
-        {
-          value: up || 'now()',
-          type: upperType,
-          selected: true,
-          localSelected: true,
-        },
-      ],
-    }
+    const {dashboardTime, upperDashboardTime} = createTimeRangeTemplates(
+      timeRange,
+      zoomedTimeRange
+    )
 
     let templatesIncludingDashTime
     if (dashboard) {
@@ -288,7 +254,7 @@ class DashboardPage extends Component<Props, State> {
             queryStatus={cellQueryStatus}
             onSave={this.handleSaveEditedCell}
             onCancel={this.handleHideCellEditorOverlay}
-            templates={templatesIncludingDashTime}
+            dashboardTemplates={_.get(dashboard, 'templates', [])}
             editQueryStatus={this.props.editCellQueryStatus}
             dashboardTimeRange={timeRange}
           />

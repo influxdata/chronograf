@@ -41,6 +41,7 @@ import {
 } from 'src/types/dashboards'
 import {Links, ScriptStatus} from 'src/types/flux'
 import {ColorString, ColorNumber} from 'src/types/colors'
+import {createTimeRangeTemplates} from 'src/shared/utils/templates'
 
 interface ConnectedProps {
   queryType: QueryType
@@ -61,6 +62,7 @@ interface ConnectedProps {
   gaugeColors: ColorNumber[]
   lineColors: ColorString[]
   onResetTimeMachine: TimeMachineContainer['reset']
+  ceoTimeRange: TimeRange
 }
 
 interface PassedProps {
@@ -73,7 +75,7 @@ interface PassedProps {
   source: SourcesModels.Source
   dashboardID: number
   queryStatus: QueriesModels.QueryStatus
-  templates: Template[]
+  dashboardTemplates: Template[]
   cell: Cell | NewDefaultCell
   dashboardTimeRange: TimeRange
 }
@@ -123,7 +125,6 @@ class CellEditorOverlay extends Component<Props, State> {
       notify,
       source,
       sources,
-      templates,
       queryStatus,
     } = this.props
 
@@ -142,7 +143,7 @@ class CellEditorOverlay extends Component<Props, State> {
           isInCEO={true}
           sources={sources}
           fluxLinks={fluxLinks}
-          templates={templates}
+          templates={this.ceoTemplates}
           editQueryStatus={editQueryStatus}
           onResetFocus={this.handleResetFocus}
           onToggleStaticLegend={this.handleToggleStaticLegend}
@@ -164,6 +165,16 @@ class CellEditorOverlay extends Component<Props, State> {
         </TimeMachine>
       </div>
     )
+  }
+
+  private get ceoTemplates() {
+    const {dashboardTemplates, ceoTimeRange} = this.props
+    const {dashboardTime, upperDashboardTime} = createTimeRangeTemplates(
+      ceoTimeRange
+    )
+    return [...dashboardTemplates, dashboardTime, upperDashboardTime]
+
+    return dashboardTemplates
   }
 
   private get isSaveable(): boolean {
@@ -343,6 +354,7 @@ const ConnectedCellEditorOverlay = (props: PassedProps) => {
             gaugeColors={state.gaugeColors}
             lineColors={state.lineColors}
             onResetTimeMachine={container.reset}
+            ceoTimeRange={state.timeRange}
           />
         )
       }}

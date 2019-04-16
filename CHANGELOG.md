@@ -1,5 +1,6 @@
 ## v1.7.10 [unreleased]
 ### Bug Fixes
+1. [#5149](https://github.com/influxdata/chronograf/pull/5149): Fix Cell editor visualization not using ceo time range
 
 ## v1.7.9 [2019-03-20]
 ### Bug Fixes
