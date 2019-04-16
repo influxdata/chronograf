@@ -1,7 +1,8 @@
 import {TimeRange} from 'src/types'
-import {getMinDuration} from 'src/shared/parsing/flux/durations'
 import {computeInterval} from 'src/tempVars/utils/replace'
 import {DEFAULT_DURATION_MS} from 'src/shared/constants'
+import {extractImports} from 'src/shared/parsing/flux/extractImports'
+import {getMinDuration} from 'src/shared/parsing/flux/durations'
 
 // For now we only support these template variables in Flux queries
 export const DASHBOARD_TIME = 'dashboardTime'
@@ -26,10 +27,13 @@ export const renderTemplatesInScript = async (
     upperDashboardTime = new Date().toISOString()
   }
 
-  let rendered = `\n${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}\n\n${script}`
+  const {imports, body} = await extractImports(astLink, script)
+
+  let variables = `${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}`
+  let rendered = `${variables}\n\n${body}`
 
   if (!script.match(INTERVAL_REGEX)) {
-    return rendered
+    return `${imports}\n${rendered}`
   }
 
   let duration: number
@@ -42,8 +46,9 @@ export const renderTemplatesInScript = async (
   }
 
   const interval = computeInterval(duration)
+  variables += `\n${INTERVAL} = ${interval}ms`
 
-  rendered = `${INTERVAL} = ${interval}ms\n${rendered}`
+  rendered = `${imports}\n${variables}\n${rendered}`
 
   return rendered
 }
