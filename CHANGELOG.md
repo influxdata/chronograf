@@ -1,7 +1,16 @@
 ## v1.7.9 [unreleased]
+## v1.7.11 [Unreleased]
+### Bug Fixes
+### Features
+
+## v1.7.10 [2019-04-16]
 ### Bug Fixes
 1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options
 1. [#5149](https://github.com/influxdata/chronograf/pull/5149): Fix Cell editor visualization not using ceo time range
+1. [#5148](https://github.com/influxdata/chronograf/pull/5148): Fixed an issue where imports were not working in Flux scripts
+
+### Features
+1. [#5150](https://github.com/influxdata/chronograf/pull/5150): Updated the UI to work with the latest Flux version
 
 ## v1.7.9 [2019-03-20]
 ### Bug Fixes
