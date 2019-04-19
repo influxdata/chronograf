@@ -18,6 +18,8 @@ import json
 
 # Packaging variables
 PACKAGE_NAME = "chronograf"
+USER = "chronograf"
+GROUP = "chronograf"
 INSTALL_ROOT_DIR = "/usr/bin"
 LOG_DIR = "/var/log/chronograf"
 DATA_DIR = "/var/lib/chronograf"
@@ -61,6 +63,8 @@ fpm_common_args = "-f -s dir --log error \
 --maintainer {} \
 --directories {} \
 --directories {} \
+--rpm-attr 755,{},{}:{} \
+--rpm-attr 755,{},{}:{} \
 --description \"{}\"".format(
      VENDOR,
      PACKAGE_URL,
@@ -70,6 +74,8 @@ fpm_common_args = "-f -s dir --log error \
      MAINTAINER,
      LOG_DIR,
      DATA_DIR,
+     USER, GROUP, LOG_DIR,
+     USER, GROUP, DATA_DIR,
      DESCRIPTION)
 
 for f in CONFIGURATION_FILES:
