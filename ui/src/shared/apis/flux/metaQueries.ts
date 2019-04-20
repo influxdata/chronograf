@@ -66,7 +66,8 @@ export const tagKeys = async (
     from(bucket: "${bucket}")
       |> range(start: -30d)
       ${tagsetFilter(filter)}
-      |> keys(except:["_time", "_value", "_start", "_stop"])
+      |> keys()
+      |> keep(columns: ["_value"])
       |> group()
       |> distinct()
       |> map(fn: (r) => r._value)
@@ -126,7 +127,8 @@ export const tagsFromMeasurement = async (
       |> range(start:-30d) 
       |> filter(fn:(r) => r._measurement == "${measurement}") 
       |> group() 
-      |> keys(except:["_time","_value","_start","_stop"])
+      |> keys()
+      |> keep(columns: ["_value"])
   `
 
   return proxy(source, script)
