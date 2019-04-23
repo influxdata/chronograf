@@ -1,5 +1,6 @@
 ## v1.7.11 [Unreleased]
 ### Bug Fixes
+1. [#5154](https://github.com/influxdata/chronograf/pull/5154): Fix fetching tag keys in flux builder
 ### Features
 
 ## v1.7.10 [2019-04-16]
