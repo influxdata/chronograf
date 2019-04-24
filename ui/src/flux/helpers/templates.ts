@@ -29,13 +29,6 @@ export const renderTemplatesInScript = async (
 
   const {imports, body} = await extractImports(astLink, script)
 
-  if (
-    body.match(`${UPPER_DASHBOARD_TIME} =`) ||
-    body.match(`${DASHBOARD_TIME} =`)
-  ) {
-    return `${imports}\n${body}`
-  }
-
   let variables = `${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}`
   let rendered = `${variables}\n\n${body}`
 
@@ -55,7 +48,7 @@ export const renderTemplatesInScript = async (
   const interval = computeInterval(duration)
   variables += `\n${INTERVAL} = ${interval}ms`
 
-  rendered = `${imports}\n${variables}\n${rendered}`
+  rendered = `${imports}\n${variables}\n${body}`
 
   return rendered
 }
