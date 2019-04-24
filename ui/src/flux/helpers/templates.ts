@@ -48,7 +48,7 @@ export const renderTemplatesInScript = async (
   const interval = computeInterval(duration)
   variables += `\n${INTERVAL} = ${interval}ms`
 
-  rendered = `${imports}\n${variables}\n${rendered}`
+  rendered = `${imports}\n${variables}\n${body}`
 
   return rendered
 }
