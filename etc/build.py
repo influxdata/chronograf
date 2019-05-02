@@ -31,6 +31,7 @@ RESOURCES_DIR = "/usr/share/chronograf/resources"
 
 INIT_SCRIPT = "etc/scripts/init.sh"
 SYSTEMD_SCRIPT = "etc/scripts/chronograf.service"
+PREINST_SCRIPT = "etc/scripts/pre-install.sh"
 POSTINST_SCRIPT = "etc/scripts/post-install.sh"
 POSTUNINST_SCRIPT = "etc/scripts/post-uninstall.sh"
 LOGROTATE_SCRIPT = "etc/scripts/logrotate"
@@ -57,6 +58,7 @@ optional_prereqs = [ 'fpm', 'rpmbuild', 'gpg' ]
 fpm_common_args = "-f -s dir --log error \
 --vendor {} \
 --url {} \
+--before-install {} \
 --after-install {} \
 --after-remove {} \
 --license {} \
@@ -68,6 +70,7 @@ fpm_common_args = "-f -s dir --log error \
 --description \"{}\"".format(
      VENDOR,
      PACKAGE_URL,
+     PREINST_SCRIPT,
      POSTINST_SCRIPT,
      POSTUNINST_SCRIPT,
      PACKAGE_LICENSE,

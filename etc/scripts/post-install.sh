@@ -28,11 +28,6 @@ function install_chkconfig {
     chkconfig --add chronograf
 }
 
-id chronograf &>/dev/null
-if [[ $? -ne 0 ]]; then
-    useradd --system -U -M chronograf -s /bin/false -d $DATA_DIR
-fi
-
 # Remove legacy symlink, if it exists
 if [[ -L /etc/init.d/chronograf ]]; then
     rm -f /etc/init.d/chronograf
