@@ -11,6 +11,9 @@ export interface DygraphAxis {
   suffix: string
   base: string
   scale: string
+  // sup test
+  tradingHours1: [string, string]
+  tradingHours2: [string, string]
 }
 
 export interface DygraphSeries {

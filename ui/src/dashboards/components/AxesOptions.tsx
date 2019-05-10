@@ -18,7 +18,7 @@ import {GRAPH_TYPES} from 'src/dashboards/graphics/graph'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Types
-import {Axes, CellType} from 'src/types'
+import {Axes} from 'src/types'
 import {DecimalPlaces} from 'src/types/dashboards'
 import {ColorString} from 'src/types/colors'
 
@@ -49,16 +49,22 @@ class AxesOptions extends PureComponent<Props, State> {
     axes: {
       y: {
         bounds: ['', ''],
+        // sup test
+        tradingHours1: ['', ''],
+        tradingHours2: ['', ''],
         prefix: '',
-        suffix: '',
+        suffix: '%',
         base: BASE_10,
         scale: LINEAR,
         label: '',
       },
       x: {
         bounds: ['', ''],
+        // sup test
+        tradingHours1: ['', ''],
+        tradingHours2: ['', ''],
         prefix: '',
-        suffix: '',
+        suffix: '%',
         base: BASE_10,
         scale: LINEAR,
         label: '',
@@ -76,6 +82,7 @@ class AxesOptions extends PureComponent<Props, State> {
   public render() {
     const {
       axes: {
+        x: {tradingHours1},
         y: {bounds, label, scale},
       },
       type,
@@ -86,6 +93,15 @@ class AxesOptions extends PureComponent<Props, State> {
     const {prefix, suffix} = this.state
 
     const [min, max] = bounds
+    // sup test
+    let temp
+    if (typeof tradingHours1 === 'undefined'){
+      temp = ['','']
+    }else
+    {
+      temp = tradingHours1
+    } 
+    const [tradingHoursStart1, tradingHoursEnd1] = temp
 
     const {menuOption} = GRAPH_TYPES.find(graph => graph.type === type)
 
@@ -145,6 +161,25 @@ class AxesOptions extends PureComponent<Props, State> {
             {this.scaleTabs}
             {this.decimalPlaces}
             {this.staticLegendTabs}
+            <div className="form-group col-sm-6">
+              <label htmlFor="TradingHoursStart1">TradingHours Start1</label>
+              <OptIn
+                customPlaceholder={'tradingHoursStart1'}
+                customValue={tradingHoursStart1}
+                onSetValue={this.handleSetXAxisTradingHoursStart1}
+                type="time"
+              />
+            </div>
+            <div className="form-group col-sm-6">
+              <label htmlFor="TradingHoursEnd1">TradingHours End1</label>
+              <OptIn
+                customPlaceholder={'tradingHoursEnd1'}
+              customValue={tradingHoursEnd1}
+              onSetValue={this.handleSetYAxisBoundMin}
+              type="time"
+              // min={getInputMin(scale)}
+              />
+            </div>
           </form>
         </div>
       </FancyScrollbar>
@@ -259,11 +294,11 @@ class AxesOptions extends PureComponent<Props, State> {
   }
 
   private get decimalPlaces(): JSX.Element {
-    const {onUpdateDecimalPlaces, decimalPlaces, type} = this.props
+    const {onUpdateDecimalPlaces, decimalPlaces} = this.props
 
-    if (type !== CellType.LinePlusSingleStat) {
-      return null
-    }
+    // if (type !== CellType.LinePlusSingleStat) {
+    //   return null
+    // }
 
     return (
       <GraphOptionsDecimalPlaces
@@ -305,6 +340,7 @@ class AxesOptions extends PureComponent<Props, State> {
 
   private handleSetYAxisBoundMin = (min: string): void => {
     const {onUpdateAxes, axes} = this.props
+    console.log('s3',min)
     const {
       y: {
         bounds: [, max],
@@ -328,6 +364,28 @@ class AxesOptions extends PureComponent<Props, State> {
     const bounds: [string, string] = [min, max]
     const newAxes = {...axes, y: {...axes.y, bounds}}
 
+    onUpdateAxes(newAxes)
+  }
+  // sup test
+  private handleSetXAxisTradingHoursStart1 = (
+    tradingHoursStart1: string
+  ): void => {
+    // tslint:disable-next-line:no-console
+    console.log('s1',tradingHoursStart1)
+    const {onUpdateAxes, axes} = this.props
+    console.log('s2',tradingHoursStart1,axes)
+    const {
+      x: {
+        tradingHours1: [, tradingHoursEnd1],
+      },
+    } = this.props.axes
+    // tslint:disable-next-line:no-console
+    console.log('s2',tradingHoursStart1)
+    const tradingHours1: [string, string] = [
+      tradingHoursStart1,
+      tradingHoursEnd1,
+    ]
+    const newAxes = {x: {...axes.x, tradingHours1}, ...axes}
     onUpdateAxes(newAxes)
   }
 

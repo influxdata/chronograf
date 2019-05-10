@@ -275,6 +275,8 @@ Dygraph.prototype.findClosestPoint = function(domX, domY) {
       dx = point.canvasx - domX
       dy = point.canvasy - domY
 
+      
+
       xdist = dx * dx
       ydist = dy * dy
 
@@ -359,12 +361,11 @@ Dygraph.Plugins.Crosshair = (function() {
       ctx.beginPath()
 
       var canvasx = Math.floor(e.dygraph.selPoints_[0].canvasx) + 0.5 // crisper rendering
-
+      //console.log(canvasx)
       if (this.direction_ === 'vertical' || this.direction_ === 'both') {
         ctx.moveTo(canvasx, 0)
         ctx.lineTo(canvasx, height)
       }
-
       if (this.direction_ === 'horizontal' || this.direction_ === 'both') {
         for (var i = 0; i < e.dygraph.selPoints_.length; i++) {
           var canvasy = Math.floor(e.dygraph.selPoints_[i].canvasy) + 0.5 // crisper rendering

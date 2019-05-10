@@ -139,6 +139,9 @@ export default class OptIn extends Component<Props, State> {
     } else if (type === 'number') {
       this.setCustomValue(toValueInRange(value, min, max))
     }
+    else if (type === 'time') {
+      this.setCustomValue(value)
+    }
   }
 
   private handleKeyDownCustomValueInput = (

@@ -5,6 +5,7 @@ import Dygraph from 'src/shared/components/Dygraph'
 import {withRouter, RouteComponentProps} from 'react-router'
 import memoizeOne from 'memoize-one'
 
+
 // Components
 import SingleStat from 'src/shared/components/SingleStat'
 import {ErrorHandlingWith} from 'src/shared/decorators/errors'
@@ -119,7 +120,6 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
     } catch (err) {
       this.isValidData = false
     }
-
     this.setState({timeSeries})
   }
 
@@ -192,6 +192,7 @@ class LineGraph extends PureComponent<LineGraphProps, State> {
           isGraphFilled={this.isGraphFilled}
           containerStyle={this.containerStyle}
           handleSetHoverTime={handleSetHoverTime}
+          decimalPlaces={decimalPlaces}
         >
           {type === CellType.LinePlusSingleStat && (
             <SingleStat

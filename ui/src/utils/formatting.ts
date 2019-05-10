@@ -60,6 +60,10 @@ export const numberValueFormatter = (
 
   const kmb = opts('labelsKMB')
   const kmg2 = opts('labelsKMG2')
+  // sup % * 100
+  if (suffix === '%') {
+    x = x * 100
+  }
 
   let label
 

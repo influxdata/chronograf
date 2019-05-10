@@ -142,7 +142,6 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
       state = {...state, queryDrafts}
     }
-
     return this.setAndPersistState(state)
   }
 

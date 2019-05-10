@@ -288,7 +288,14 @@ class Gauge extends Component<Props> {
       if (i > 3) {
         ctx.textAlign = 'left'
       }
-      const labelText = `${prefix}${gaugeValues[i]}${suffix}`
+      // sup
+      let labelTextTemp
+      if (suffix === '%'){
+        labelTextTemp = `${prefix}${gaugeValues[i] * 100}${suffix}`
+      }else{
+        labelTextTemp = `${prefix}${gaugeValues[i]}${suffix}`
+      }
+      const labelText = labelTextTemp
 
       ctx.rotate(startDegree)
       ctx.rotate(i * arcIncrement)
@@ -312,8 +319,14 @@ class Gauge extends Component<Props> {
     ctx.fillStyle = valueColor
     ctx.textBaseline = 'middle'
     ctx.textAlign = 'center'
-
-    const valueString = this.valueToString(gaugePosition)
+    // sup
+    let temp
+    if (suffix === '%') {
+      temp = gaugePosition * 100
+    } else {
+      temp = gaugePosition
+    }
+    const valueString = this.valueToString(temp)
 
     const textY = radius
     const textContent = `${prefix}${valueString}${suffix}`

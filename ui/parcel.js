@@ -21,7 +21,7 @@ const proxyMiddleware = proxy('/chronograf/v1', {
 })
 
 const bundler = new Bundler('src/index.html', {outDir: './build/'})
-const port = Number(process.env.PORT || 8080)
+const port = Number(process.env.PORT || 1111)
 const app = express()
 
 console.log(`Serving on http://localhost:${port}`)

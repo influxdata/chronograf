@@ -5,6 +5,7 @@ import {filter, isEqual} from 'lodash'
 import NanoDate from 'nano-date'
 import ReactResizeDetector from 'react-resize-detector'
 import memoizeOne from 'memoize-one'
+import format from 'date-fns/format'
 
 // Components
 import D from 'src/external/dygraph'
@@ -35,6 +36,8 @@ import {getLineColorsHexes} from 'src/shared/constants/graphColorPalettes'
 const {LOG, BASE_10, BASE_2} = AXES_SCALE_OPTIONS
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
+// 加入自定义legend小数点精度
+import {DecimalPlaces} from 'src/types/dashboards'
 
 // Types
 import {
@@ -48,6 +51,7 @@ import {
   DygraphSeries,
 } from 'src/types'
 import {LineColor} from 'src/types/colors'
+
 
 const Dygraphs = D as any
 
@@ -85,6 +89,8 @@ interface Props {
   onZoom?: (timeRange: TimeRange) => void
   mode?: string
   underlayCallback?: () => void
+  // 增加精度sup
+  decimalPlaces: DecimalPlaces
 }
 
 interface State {
@@ -99,10 +105,14 @@ class Dygraph extends Component<Props, State> {
     axes: {
       x: {
         bounds: [null, null],
+        tradingHours1: [null,null],
+        tradingHours2: [null,null],
         ...DEFAULT_AXIS,
       },
       y: {
         bounds: [null, null],
+        tradingHours1: [null,null],
+        tradingHours2: [null,null],
         ...DEFAULT_AXIS,
       },
     },
@@ -175,7 +185,13 @@ class Dygraph extends Component<Props, State> {
 
   public render() {
     const {staticLegendHeight, xAxisRange} = this.state
-    const {staticLegend, cellID} = this.props
+    // sup
+    const {staticLegend, cellID,decimalPlaces} = this.props
+    const {
+      axes: {
+        y: {prefix, suffix},
+      },
+    } = this.props
 
     return (
       <div
@@ -199,6 +215,9 @@ class Dygraph extends Component<Props, State> {
               onHide={this.handleHideLegend}
               onShow={this.handleShowLegend}
               onMouseEnter={this.handleMouseEnterLegend}
+              decimalPlaces={decimalPlaces}
+              suffix={suffix}
+              prefix={prefix}
             />
             <Crosshair
               dygraph={this.dygraph}
@@ -280,9 +299,13 @@ class Dygraph extends Component<Props, State> {
 
   private get timeSeries() {
     const {timeSeries} = this.props
-
     // Avoid 'Can't plot empty data set' errors by falling back to a default
     // dataset that's valid for Dygraph.
+    // for (let i = 0; i < timeSeries.length; i++) {
+    //   const d = timeSeries[i][0]
+    //   // tslint:disable-next-line:no-console
+    //   console.log(format(d, 'YYYY-MM-DD HH:mm:ss'),Date.parse(d.toString()))
+    // }
     return timeSeries && timeSeries.length ? timeSeries : [[0]]
   }
 
@@ -351,7 +374,6 @@ class Dygraph extends Component<Props, State> {
 
     const {xAxisRange} = this.state
     const newXAxisRange = this.dygraph.xAxisRange()
-
     if (!isEqual(xAxisRange, newXAxisRange)) {
       this.setState({xAxisRange: newXAxisRange})
     }
@@ -376,7 +398,7 @@ class Dygraph extends Component<Props, State> {
     const timestamp = this.dygraph.toDataXCoord(graphXCoordinate)
     const [xRangeStart] = this.dygraph.xAxisRange()
     const clamped = Math.max(xRangeStart, timestamp)
-
+    //console.log('sup',format(xRangeStart, 'YYYY-MM-DD HH:mm:ss'),format(timestamp, 'YYYY-MM-DD HH:mm:ss'))
     return String(clamped)
   }
 
@@ -436,7 +458,7 @@ class Dygraph extends Component<Props, State> {
       },
       ...this.props.options,
     }
-
+    // console.log('sup',options)
     return options
   }
 

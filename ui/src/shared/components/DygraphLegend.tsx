@@ -24,6 +24,10 @@ import {NO_CELL} from 'src/shared/constants'
 import {SeriesLegendData} from 'src/types/dygraphs'
 import {DygraphClass} from 'src/types'
 
+// 加入自定义legend小数点精度
+import {DecimalPlaces} from 'src/types/dashboards'
+import {toFixed} from 'src/shared/utils/decimalPlaces'
+
 interface Props {
   hoverTime: number
   dygraph: DygraphClass
@@ -33,6 +37,10 @@ interface Props {
   activeCellID: string
   setActiveCell: (cellID: string) => void
   onMouseEnter: () => void
+  // sup 增加精度 以及对百分号的判断
+  decimalPlaces: DecimalPlaces
+  suffix: string
+  prefix: string
 }
 
 interface LegendData {
@@ -93,6 +101,9 @@ class DygraphLegend extends PureComponent<Props, State> {
   public render() {
     const {onMouseEnter} = this.props
     const {legend, filterText, isAscending, isFilterVisible} = this.state
+    // sup
+    const {decimalPlaces} = this.props
+    const {prefix,suffix} = this.props
 
     return (
       <div
@@ -139,14 +150,24 @@ class DygraphLegend extends PureComponent<Props, State> {
           />
         )}
         <div className="dygraph-legend--contents">
-          {this.filtered.map(({label, color, yHTML, isHighlighted}) => {
+          {this.filtered.map(({label, color, y, isHighlighted}) => {
+            // sup
+            let yString = ''
+            if (suffix === '%') {
+              yString = toFixed(y * 100, decimalPlaces)
+            } else {
+              yString = toFixed(y, decimalPlaces)
+            }
+            yString = this.formatToLocale(+yString)
+            yString = `${prefix}${yString}${suffix}`
+
             const seriesClass = isHighlighted
               ? 'dygraph-legend--row highlight'
               : 'dygraph-legend--row'
             return (
               <div key={uuid.v4()} className={seriesClass}>
                 <span style={{color}}>{label}</span>
-                <figure>{yHTML || 'no value'}</figure>
+                <figure>{yString || 'no value'}</figure>
               </div>
             )
           })}
@@ -216,6 +237,12 @@ class DygraphLegend extends PureComponent<Props, State> {
 
     this.setState({legend})
     return ''
+  }
+
+  // sup
+  private formatToLocale(n: number): string {
+    const maximumFractionDigits = 20
+    return n.toLocaleString(undefined, {maximumFractionDigits})
   }
 
   private unhighlightCallback = (e: MouseEvent) => {
@@ -288,5 +315,6 @@ const mapStateToProps = ({dashboardUI}) => ({
   activeCellID: dashboardUI.activeCellID,
   hoverTime: +dashboardUI.hoverTime,
 })
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(DygraphLegend)
