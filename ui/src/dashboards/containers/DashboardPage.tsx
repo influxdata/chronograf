@@ -108,6 +108,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   rehydrateTemplatesAsync: typeof dashboardActions.rehydrateTemplatesAsync
   updateTemplateQueryParams: typeof dashboardActions.updateTemplateQueryParams
   updateQueryParams: typeof dashboardActions.updateQueryParams
+  updateTimeRangeQueryParams: typeof dashboardActions.updateTimeRangeQueryParams
 }
 
 interface State {
@@ -396,16 +397,16 @@ class DashboardPage extends Component<Props, State> {
   private handleChooseTimeRange = (
     timeRange: QueriesModels.TimeRange
   ): void => {
-    const {dashboardID, setDashTimeV1, updateQueryParams} = this.props
+    const {dashboardID, setDashTimeV1, updateTimeRangeQueryParams} = this.props
+
+    updateTimeRangeQueryParams({
+      lower: timeRange.lower,
+      upper: timeRange.upper,
+    })
 
     setDashTimeV1(dashboardID, {
       ...timeRange,
       format: FORMAT_INFLUXQL,
-    })
-
-    updateQueryParams({
-      lower: timeRange.lower,
-      upper: timeRange.upper,
     })
 
     this.fetchAnnotations()
@@ -577,6 +578,7 @@ const mdtp = {
   rehydrateTemplatesAsync: dashboardActions.rehydrateTemplatesAsync,
   updateTemplateQueryParams: dashboardActions.updateTemplateQueryParams,
   updateQueryParams: dashboardActions.updateQueryParams,
+  updateTimeRangeQueryParams: dashboardActions.updateTimeRangeQueryParams,
   handleChooseAutoRefresh: appActions.setAutoRefresh,
   handleClickPresentationButton: appActions.delayEnablePresentationMode,
   errorThrown: errorActions.errorThrown,
