@@ -1,4 +1,4 @@
-import {replace, RouterAction} from 'react-router-redux'
+import {replace, RouterAction, push} from 'react-router-redux'
 import _ from 'lodash'
 import qs from 'qs'
 import {Dispatch} from 'redux'
@@ -361,6 +361,33 @@ export const setActiveCell = (activeCellID: string): SetActiveCellAction => ({
   type: ActionType.SetActiveCell,
   payload: {activeCellID},
 })
+
+export const updateTimeRangeQueryParams = (
+  updatedQueryParams: object
+): RouterAction => {
+  const {search, pathname} = window.location
+  const strippedPathname = stripPrefix(pathname)
+
+  const parsed = _.omit(qs.parse(search, {ignoreQueryPrefix: true}), [
+    'lower',
+    'upper',
+    'zoomedLower',
+    'zoomedUpper',
+  ])
+
+  const newQueryParams = _.pickBy(
+    {
+      ...parsed,
+      ...updatedQueryParams,
+    },
+    v => !!v
+  )
+
+  const newSearch = qs.stringify(newQueryParams)
+  const newLocation = {pathname: strippedPathname, search: `?${newSearch}`}
+
+  return push(newLocation)
+}
 
 export const updateQueryParams = (updatedQueryParams: object): RouterAction => {
   const {search, pathname} = window.location
