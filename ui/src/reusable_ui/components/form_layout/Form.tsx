@@ -29,7 +29,9 @@ class Form extends Component<Props> {
   ]
 
   public static ValidChildNames: string = _.map(Form.ValidChildTypes, valid => {
-    const name = valid.displayName.split('Form').pop()
+    const name = _.get(valid, 'displayName', '')
+      .split('Form')
+      .pop()
 
     return `<Form.${name}>`
   }).join(', ')
