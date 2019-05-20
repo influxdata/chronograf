@@ -171,7 +171,9 @@ export default class LayoutCell extends Component<Props> {
 
   private async downloadInfluxQLCSV() {
     const {cellData, cell} = this.props
-    const name = `${cell.name.split(' ').join('_')}.csv`
+    const name = `${_.get(cell, 'name', '')
+      .split(' ')
+      .join('_')}.csv`
 
     let csv: string
 
@@ -190,7 +192,9 @@ export default class LayoutCell extends Component<Props> {
 
   private downloadFluxCSV() {
     const {cellFluxData, cell} = this.props
-    const joinedName = cell.name.split(' ').join('_')
+    const joinedName = _.get(cell, 'name', '')
+      .split(' ')
+      .join('_')
 
     downloadCSV(cellFluxData, joinedName)
   }
