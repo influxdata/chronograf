@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React, {PureComponent, MouseEvent} from 'react'
 import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
 import {EditorChange, LineWidget, Position} from 'codemirror'
@@ -192,11 +193,12 @@ class FluxScriptEditor extends PureComponent<Props, State> {
 
   private get statusLine(): Gutter[] {
     const {status} = this.props
-    const messages = status.text.split('\n')
+    const messages = _.get(status, 'text', '').split('\n')
     const lineNumbers = messages
       .map(text => {
         const [numbers] = text.split(' ')
         const [lineNumber] = numbers.split(':')
+
         return {line: Number(lineNumber), text}
       })
       .filter(d => !isNaN(d.line))

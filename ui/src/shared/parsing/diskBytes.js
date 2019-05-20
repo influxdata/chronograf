@@ -38,7 +38,7 @@ export function diskBytesFromShardForDatabase(response) {
   }
 
   const shardData = results.series.reduce((data, series) => {
-    const pathParts = series.tags.path.split('/')
+    const pathParts = _.get(series, 'tags.path', '').split('/')
     const shardID = pathParts[pathParts.length - 1]
     const diskUsage = series.values[0][series.columns.indexOf('last')]
     const nodeID = series.tags.nodeID
