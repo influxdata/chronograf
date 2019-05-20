@@ -23,7 +23,7 @@ import {DecimalPlaces} from 'src/types/dashboards'
 import {ColorString} from 'src/types/colors'
 
 const {LINEAR, LOG, BASE_2, BASE_10, BASE_RAW} = AXES_SCALE_OPTIONS
-const getInputMin = scale => (scale === LOG ? '0' : null)
+const getInputMin = () => (-Infinity).toString()
 
 interface Props {
   type: string
@@ -76,7 +76,7 @@ class AxesOptions extends PureComponent<Props, State> {
   public render() {
     const {
       axes: {
-        y: {bounds, label, scale},
+        y: {bounds, label},
       },
       type,
       lineColors,
@@ -114,7 +114,7 @@ class AxesOptions extends PureComponent<Props, State> {
                 customValue={min}
                 onSetValue={this.handleSetYAxisBoundMin}
                 type="number"
-                min={getInputMin(scale)}
+                min={getInputMin()}
               />
             </div>
             <div className="form-group col-sm-6">
@@ -124,7 +124,7 @@ class AxesOptions extends PureComponent<Props, State> {
                 customValue={max}
                 onSetValue={this.handleSetYAxisBoundMax}
                 type="number"
-                min={getInputMin(scale)}
+                min={getInputMin()}
               />
             </div>
             <Input
