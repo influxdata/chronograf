@@ -62,8 +62,9 @@ func (c *Client) FluxEnabled() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-
-	hc := &http.Client{}
+	hc := &http.Client{
+		Timeout: c.Timeout,
+	}
 	if c.InsecureSkipVerify {
 		hc.Transport = skipVerifyTransport
 	} else {
