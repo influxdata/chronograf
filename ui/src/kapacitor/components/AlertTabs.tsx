@@ -155,16 +155,8 @@ class AlertTabs extends PureComponent<Props, State> {
 
     const pagerDutyDeprecationMessage: JSX.Element = (
       <div>
-        PagerDuty v1 is being{' '}
-        {
-          <a
-            href="https://v2.developer.pagerduty.com/docs/v1-rest-api-decommissioning-faq"
-            target="_blank"
-          >
-            deprecated
-          </a>
-        }
-        . Please update your Kapacitor and configure PagerDuty v2.
+        InfluxData will be deprecating the use of PagerDuty v1. Please update
+        your Kapacitor and configure PagerDuty v2.
       </div>
     )
 
