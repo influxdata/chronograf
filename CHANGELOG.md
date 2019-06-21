@@ -1,7 +1,14 @@
 ## v1.7.12 [2019-06-20]
 ### Bug Fixes
 1. [#5208](https://github.com/influxdata/chronograf/pull/5208): Clarify wording of PagerDuty v1 deprecation message
+1. [#5198](https://github.com/influxdata/chronograf/pull/5198): Requesting info from an unavailable source no longer causes the page to hang
+1. [#5171](https://github.com/influxdata/chronograf/pull/5171): Create chronograf user before CentOS installation
+1. [#5183](https://github.com/influxdata/chronograf/pull/5183): Add support for web workers in IE11
+1. [#5184](https://github.com/influxdata/chronograf/pull/5184): Properly update query time bounds when zooming in on a dashboard
+1. [#5139](https://github.com/influxdata/chronograf/pull/5139): Fix an issue where Flux responses weren't parsed correctly
 
+### Features
+1. [#5187](https://github.com/influxdata/chronograf/pull/5187): Allow negative numbers for configured y-axis minimums
 
 ## v1.7.11 [2019-04-23]
 ### Bug Fixes
