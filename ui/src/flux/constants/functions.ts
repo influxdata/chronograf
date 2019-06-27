@@ -942,7 +942,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       },
     ],
     desc: 'Applies a function to each record in the input tables.',
-    example: 'map(fn: (r) => r._value * r._value), mergeKey: true)',
+    example: 'map(fn: (r) => r._value * r._value, mergeKey: true)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/map',
