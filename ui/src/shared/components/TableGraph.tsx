@@ -176,9 +176,7 @@ class TableGraph extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {
-      fieldOptions,
-    } = this.props
+    const {fieldOptions} = this.props
 
     window.addEventListener('resize', this.handleResize)
 
@@ -319,9 +317,9 @@ class TableGraph extends PureComponent<Props, State> {
     externalScroll: boolean
   } {
     const {
-      data: { sortedTimeVals },
+      data: {sortedTimeVals},
     } = this.props
-    const { hoveredColumnIndex, isTimeVisible} = this.state
+    const {hoveredColumnIndex, isTimeVisible} = this.state
     const {hoverTime} = this.props
     const hoveringThisTable = hoveredColumnIndex !== NULL_ARRAY_INDEX
     const notHovering = hoverTime === NULL_HOVER_TIME
@@ -373,9 +371,9 @@ class TableGraph extends PureComponent<Props, State> {
     const {dataset} = e.target as HTMLElement
     const {handleSetHoverTime} = this.props
     const {
-      data: { sortedTimeVals },
+      data: {sortedTimeVals},
     } = this.props
-    const { isTimeVisible} = this.state
+    const {isTimeVisible} = this.state
     if (this.isVerticalTimeAxis && +dataset.rowIndex === 0) {
       return
     }
