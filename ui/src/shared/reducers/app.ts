@@ -5,6 +5,7 @@ import {
   SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
 } from 'src/shared/constants'
 import {ActionTypes, Action} from 'src/types/actions/app'
+import {TimeZones} from 'src/types'
 
 interface State {
   ephemeral: {
@@ -13,6 +14,7 @@ interface State {
   persisted: {
     autoRefresh: number
     showTemplateVariableControlBar: boolean
+    timeZone: TimeZones
   }
 }
 
@@ -23,6 +25,7 @@ const initialState: State = {
   persisted: {
     autoRefresh: AUTOREFRESH_DEFAULT,
     showTemplateVariableControlBar: SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT,
+    timeZone: TimeZones.Local,
   },
 }
 
@@ -72,6 +75,15 @@ const appPersistedReducer = (
       return {
         ...state,
         showTemplateVariableControlBar: update,
+      }
+    }
+
+    case ActionTypes.SetTimeZone: {
+      const {timeZone} = action.payload
+
+      return {
+        ...state,
+        timeZone,
       }
     }
 

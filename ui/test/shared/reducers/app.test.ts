@@ -4,7 +4,10 @@ import {
   disablePresentationMode,
   setAutoRefresh,
   toggleTemplateVariableControlBar,
+  setTimeZone,
 } from 'src/shared/actions/app'
+
+import {TimeZones} from 'src/types'
 
 describe('Shared.Reducers.appReducer', () => {
   const initialState = {
@@ -12,6 +15,7 @@ describe('Shared.Reducers.appReducer', () => {
       inPresentationMode: false,
     },
     persisted: {
+      timeZone: TimeZones.Local,
       autoRefresh: 0,
       showTemplateVariableControlBar: false,
     },
@@ -46,5 +50,11 @@ describe('Shared.Reducers.appReducer', () => {
     )
 
     expect(reducedState.persisted.showTemplateVariableControlBar).toBe(true)
+  })
+
+  it('should handle SET_TIME_ZONE', () => {
+    const state = appReducer(initialState, setTimeZone(TimeZones.UTC))
+
+    expect(state.persisted.timeZone).toBe(TimeZones.UTC)
   })
 })
