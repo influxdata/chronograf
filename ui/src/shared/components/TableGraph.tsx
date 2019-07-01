@@ -76,7 +76,6 @@ interface Props {
 }
 
 interface State {
-  sortedTimeVals: TimeSeriesValue[]
   sortedLabels: Label[]
   hoveredColumnIndex: number
   hoveredRowIndex: number
@@ -95,7 +94,6 @@ class TableGraph extends PureComponent<Props, State> {
 
     this.state = {
       shouldResize: false,
-      sortedTimeVals: [],
       sortedLabels: [],
       hoveredColumnIndex: NULL_ARRAY_INDEX,
       hoveredRowIndex: NULL_ARRAY_INDEX,
@@ -178,10 +176,7 @@ class TableGraph extends PureComponent<Props, State> {
   }
 
   public async componentDidMount() {
-    const {
-      data: {sortedTimeVals},
-      fieldOptions,
-    } = this.props
+    const {fieldOptions} = this.props
 
     window.addEventListener('resize', this.handleResize)
 
@@ -191,7 +186,6 @@ class TableGraph extends PureComponent<Props, State> {
 
     this.setState(
       {
-        sortedTimeVals,
         hoveredColumnIndex: NULL_ARRAY_INDEX,
         hoveredRowIndex: NULL_ARRAY_INDEX,
         isTimeVisible,
@@ -322,7 +316,10 @@ class TableGraph extends PureComponent<Props, State> {
     scrollToColumn: number | null
     externalScroll: boolean
   } {
-    const {sortedTimeVals, hoveredColumnIndex, isTimeVisible} = this.state
+    const {
+      data: {sortedTimeVals},
+    } = this.props
+    const {hoveredColumnIndex, isTimeVisible} = this.state
     const {hoverTime} = this.props
     const hoveringThisTable = hoveredColumnIndex !== NULL_ARRAY_INDEX
     const notHovering = hoverTime === NULL_HOVER_TIME
@@ -373,7 +370,10 @@ class TableGraph extends PureComponent<Props, State> {
   private handleHover = (e: React.MouseEvent<HTMLElement>) => {
     const {dataset} = e.target as HTMLElement
     const {handleSetHoverTime} = this.props
-    const {sortedTimeVals, isTimeVisible} = this.state
+    const {
+      data: {sortedTimeVals},
+    } = this.props
+    const {isTimeVisible} = this.state
     if (this.isVerticalTimeAxis && +dataset.rowIndex === 0) {
       return
     }

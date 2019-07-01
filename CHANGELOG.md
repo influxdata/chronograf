@@ -1,3 +1,9 @@
+## v1.7.13
+### Bug Fixes
+1. [#5217](https://github.com/influxdata/chronograf/pull/5217): Fix scroll to row bug on table graphs
+
+### Features
+
 ## v1.7.12 [2019-06-20]
 ### Bug Fixes
 1. [#5208](https://github.com/influxdata/chronograf/pull/5208): Clarify wording of PagerDuty v1 deprecation message
