@@ -4,6 +4,9 @@ import {Link} from 'react-router'
 
 import {shallow} from 'enzyme'
 
+// Types
+import {TimeZones} from 'src/types'
+
 const alertsTableRowProps = {
   sourceID: '3',
   name: 'No Dog Can Be',
@@ -11,6 +14,7 @@ const alertsTableRowProps = {
   time: Date.now().toString(),
   host: 'Ada Island',
   value: '1337',
+  timeZone: TimeZones.UTC,
 }
 
 const setup = (override = {}) => {

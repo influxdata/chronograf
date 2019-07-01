@@ -22,17 +22,12 @@ import {
 import {
   Source,
   Template,
-  Cell,
   TemplateType,
   TemplateValueType,
   TimeZones,
 } from 'src/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
-
-interface State {
-  cells: Cell[]
-}
 
 interface OwnProps {
   source: Source
@@ -48,18 +43,10 @@ const timeRange = STATUS_PAGE_TIME_RANGE
 type Props = StateProps & OwnProps
 
 @ErrorHandling
-class StatusPage extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      cells: fixtureStatusPageCells,
-    }
-  }
-
+class StatusPage extends Component<Props> {
   public render() {
     const {source, onSetTimeZone, timeZone} = this.props
-    const {cells} = this.state
+    const cells = fixtureStatusPageCells
 
     return (
       <Page>
