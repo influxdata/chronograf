@@ -85,7 +85,6 @@ class AlertsApp extends PureComponent<Props, State> {
     }
   }
 
-
   public render() {
     const {isWidget, source} = this.props
     const {loading, timeRange} = this.state

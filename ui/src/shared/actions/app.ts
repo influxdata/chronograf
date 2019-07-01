@@ -53,5 +53,5 @@ export const setTimeZone = (timeZone: TimeZones) => ({
   type: ActionTypes.SetTimeZone,
   payload: {
     timeZone,
-  }
+  },
 })

@@ -212,7 +212,7 @@ class AlertsTable extends PureComponent<Props, State> {
           itemHeight={25}
           items={alerts.map(alert => (
             <div className="alert-history-table--tr" key={uuid.v4()}>
-              <AlertsTableRow sourceID={id} {...alert} timeZone={timeZone}/>
+              <AlertsTableRow sourceID={id} {...alert} timeZone={timeZone} />
             </div>
           ))}
         />
@@ -255,7 +255,7 @@ class AlertsTable extends PureComponent<Props, State> {
 }
 
 const mstp = ({app}) => ({
-  timeZone: app.persisted.timeZone
+  timeZone: app.persisted.timeZone,
 })
 
 export default connect(mstp, null)(AlertsTable)

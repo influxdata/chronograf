@@ -7,7 +7,7 @@ export enum ActionTypes {
   SetAutoRefresh = 'SET_AUTOREFRESH',
   ToggleTemplateVariableControlBar = 'TOGGLE_TEMPLATE_VARIABLE_CONTROL_BAR',
   Noop = 'NOOP',
-  SetTimeZone = 'SET_TIME_ZONE'
+  SetTimeZone = 'SET_TIME_ZONE',
 }
 
 export type Action =

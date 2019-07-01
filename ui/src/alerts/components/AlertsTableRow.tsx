@@ -81,7 +81,7 @@ class AlertsTableRow extends PureComponent<Props> {
         style={{width: colTime}}
         data-test="timeCell"
       >
-          <span>{this.formattedTime}</span>
+        <span>{this.formattedTime}</span>
       </div>
     )
   }
@@ -97,7 +97,7 @@ class AlertsTableRow extends PureComponent<Props> {
       return new Date(Number(time)).toISOString()
     }
 
-    return moment(Date.now()).format("YYYY-MM-DDTHH:mm:ss.SSS")
+    return moment(Date.now()).format('YYYY-MM-DDTHH:mm:ss.SSS')
   }
 
   private get hostCell(): JSX.Element {

@@ -46,6 +46,7 @@ import {
   DygraphData,
   DygraphClass,
   DygraphSeries,
+  TimeZones,
 } from 'src/types'
 import {LineColor} from 'src/types/colors'
 
@@ -85,6 +86,7 @@ interface Props {
   onZoom?: (timeRange: TimeRange) => void
   mode?: string
   underlayCallback?: () => void
+  timeZone: TimeZones
 }
 
 interface State {
@@ -403,6 +405,7 @@ class Dygraph extends Component<Props, State> {
       type,
       underlayCallback,
       isGraphFilled,
+      timeZone,
     } = this.props
 
     const {
@@ -434,6 +437,7 @@ class Dygraph extends Component<Props, State> {
           valueRange: this.getYRange(timeSeries),
         },
       },
+      labelsUTC: timeZone === TimeZones.UTC,
       ...this.props.options,
     }
 
@@ -493,8 +497,9 @@ class Dygraph extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = ({annotations: {mode}}) => ({
+const mstp = ({annotations: {mode}, app}) => ({
   mode,
+  timeZone: app.persisted.timeZone,
 })
 
-export default connect(mapStateToProps, null)(Dygraph)
+export default connect(mstp, null)(Dygraph)

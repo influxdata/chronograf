@@ -75,7 +75,7 @@ export const saveToLocalStorage = ({
       JSON.stringify({
         app: {
           ...app,
-          persisted: app.persisted
+          persisted: app.persisted,
         },
         VERSION,
         GIT_SHA,

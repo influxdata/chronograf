@@ -54,8 +54,8 @@ class StatusPage extends Component<Props> {
           <Page.Header.Left>
             <Page.Title title="Status" />
           </Page.Header.Left>
-          <Page.Header.Right showSourceIndicator={true} >
-            <TimeZoneToggle onSetTimeZone={onSetTimeZone} timeZone={timeZone}/>
+          <Page.Header.Right showSourceIndicator={true}>
+            <TimeZoneToggle onSetTimeZone={onSetTimeZone} timeZone={timeZone} />
           </Page.Header.Right>
         </Page.Header>
         <Page.Contents fullWidth={true}>
@@ -121,7 +121,7 @@ const mstp = ({app}) => ({
 })
 
 const mdtp = {
-  onSetTimeZone: appActions.setTimeZone
+  onSetTimeZone: appActions.setTimeZone,
 }
 
 export default connect(mstp, mdtp)(StatusPage)
