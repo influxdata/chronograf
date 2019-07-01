@@ -1,9 +1,14 @@
 // Libraries
 import React, {Component} from 'react'
+import {connect} from 'react-redux'
 
 // Components
 import LayoutRenderer from 'src/shared/components/LayoutRenderer'
 import {Page} from 'src/reusable_ui'
+import TimeZoneToggle from 'src/shared/components/time_zones/TimeZoneToggle'
+
+// Actions
+import * as appActions from 'src/shared/actions/app'
 
 // Constants
 import {STATUS_PAGE_TIME_RANGE} from 'src/shared/data/timeRanges'
@@ -20,6 +25,7 @@ import {
   Cell,
   TemplateType,
   TemplateValueType,
+  TimeZones,
 } from 'src/types'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -28,11 +34,18 @@ interface State {
   cells: Cell[]
 }
 
-interface Props {
+interface OwnProps {
   source: Source
 }
 
+interface StateProps {
+  timeZone: TimeZones
+  onSetTimeZone: typeof appActions.setTimeZone
+}
+
 const timeRange = STATUS_PAGE_TIME_RANGE
+
+type Props = StateProps & OwnProps
 
 @ErrorHandling
 class StatusPage extends Component<Props, State> {
@@ -45,7 +58,7 @@ class StatusPage extends Component<Props, State> {
   }
 
   public render() {
-    const {source} = this.props
+    const {source, onSetTimeZone, timeZone} = this.props
     const {cells} = this.state
 
     return (
@@ -54,7 +67,9 @@ class StatusPage extends Component<Props, State> {
           <Page.Header.Left>
             <Page.Title title="Status" />
           </Page.Header.Left>
-          <Page.Header.Right showSourceIndicator={true} />
+          <Page.Header.Right showSourceIndicator={true} >
+            <TimeZoneToggle onSetTimeZone={onSetTimeZone} timeZone={timeZone}/>
+          </Page.Header.Right>
         </Page.Header>
         <Page.Contents fullWidth={true}>
           <div className="dashboard container-fluid full-width">
@@ -114,4 +129,12 @@ class StatusPage extends Component<Props, State> {
   }
 }
 
-export default StatusPage
+const mstp = ({app}) => ({
+  timeZone: app.persisted.timeZone,
+})
+
+const mdtp = {
+  onSetTimeZone: appActions.setTimeZone
+}
+
+export default connect(mstp, mdtp)(StatusPage)
