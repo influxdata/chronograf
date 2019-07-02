@@ -1,7 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
 import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
 import {Location} from 'history'
 import qs from 'qs'
@@ -36,6 +35,7 @@ import {
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
 import {editQueryStatus as editQueryStatusAction} from 'src/data_explorer/actions/queries'
+import {setTimeZone as setTimeZoneAction} from 'src/shared/actions/app'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
@@ -88,6 +88,7 @@ interface PassedProps {
   fluxLinks: Links
   notify: (message: Notification) => void
   sourceLink: string
+  onSetTimeZone: typeof setTimeZoneAction
 }
 
 interface ConnectedProps {
@@ -157,13 +158,15 @@ export class DataExplorer extends PureComponent<Props, State> {
   public render() {
     const {
       source,
-      sources,
-      editQueryStatus,
-      queryStatus,
-      fluxLinks,
       notify,
-      updateSourceLink,
+      sources,
+      timeZone,
       timeRange,
+      fluxLinks,
+      queryStatus,
+      editQueryStatus,
+      updateSourceLink,
+      onSetTimeZone,
     } = this.props
 
     const {isStaticLegend, isComponentMounted} = this.state
@@ -194,6 +197,8 @@ export class DataExplorer extends PureComponent<Props, State> {
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
                 timeRange={timeRange}
+                timeZone={timeZone}
+                onSetTimeZone={onSetTimeZone}
                 activeEditorTab={activeEditorTab}
                 onOpenWriteData={this.handleOpenWriteData}
                 toggleSendToDashboard={this.toggleSendToDashboard}
@@ -450,7 +455,7 @@ const ConnectedDataExplorer = (props: PassedProps & WithRouterProps) => {
 const mstp = state => {
   const {
     app: {
-      persisted: {autoRefresh},
+      persisted: {autoRefresh, timeZone},
     },
     dataExplorer: {timeRange, queryStatus, sourceLink},
     dashboardUI: {dashboards},
@@ -459,6 +464,7 @@ const mstp = state => {
   } = state
 
   return {
+    timeZone,
     fluxLinks: links.flux,
     autoRefresh,
     timeRange,
@@ -469,17 +475,16 @@ const mstp = state => {
   }
 }
 
-const mdtp = dispatch => {
-  return {
-    handleChooseAutoRefresh: bindActionCreators(setAutoRefresh, dispatch),
-    errorThrownAction: bindActionCreators(errorThrown, dispatch),
-    writeLineProtocol: bindActionCreators(writeLineProtocolAsync, dispatch),
-    handleGetDashboards: bindActionCreators(getDashboardsAsync, dispatch),
-    sendDashboardCell: bindActionCreators(sendDashboardCellAsync, dispatch),
-    editQueryStatus: bindActionCreators(editQueryStatusAction, dispatch),
-    notify: bindActionCreators(notifyAction, dispatch),
-    updateSourceLink: bindActionCreators(updateSourceLinkAction, dispatch),
-  }
+const mdtp = {
+  handleChooseAutoRefresh: setAutoRefresh,
+  errorThrownAction: errorThrown,
+  writeLineProtocol: writeLineProtocolAsync,
+  handleGetDashboards: getDashboardsAsync,
+  sendDashboardCell: sendDashboardCellAsync,
+  editQueryStatus: editQueryStatusAction,
+  notify: notifyAction,
+  updateSourceLink: updateSourceLinkAction,
+  onSetTimeZone: setTimeZoneAction,
 }
 
 export default connect(mstp, mdtp)(withRouter(ConnectedDataExplorer))
