@@ -97,7 +97,7 @@ class AlertsTableRow extends PureComponent<Props> {
       return new Date(Number(time)).toISOString()
     }
 
-    return moment(Date.now()).format('YYYY-MM-DDTHH:mm:ss.SSS')
+    return moment(Number(time)).format('YYYY-MM-DDTHH:mm:ss.SSS')
   }
 
   private get hostCell(): JSX.Element {
