@@ -1,9 +1,14 @@
+// Libraries
 import React, {PureComponent} from 'react'
 import {Link} from 'react-router'
-
 import classnames from 'classnames'
+import moment from 'moment'
 
+// Constants
 import {ALERTS_TABLE} from 'src/alerts/constants/tableSizing'
+
+// Types
+import {TimeZones} from 'src/types'
 
 interface Props {
   sourceID: string
@@ -12,6 +17,7 @@ interface Props {
   time: string | null
   host: string | null
   value: string | null
+  timeZone: TimeZones
 }
 
 const {colName, colLevel, colTime, colHost, colValue} = ALERTS_TABLE
@@ -69,21 +75,29 @@ class AlertsTableRow extends PureComponent<Props> {
   }
 
   private get timeCell(): JSX.Element {
-    const {time} = this.props
-
     return (
       <div
         className="alert-history-table--td"
         style={{width: colTime}}
         data-test="timeCell"
       >
-        {time === null ? (
-          <span>{'–'}</span>
-        ) : (
-          <span>{new Date(Number(time)).toISOString()}</span>
-        )}
+        <span>{this.formattedTime}</span>
       </div>
     )
+  }
+
+  private get formattedTime(): string {
+    const {time, timeZone} = this.props
+
+    if (time === null) {
+      return '–'
+    }
+
+    if (timeZone === TimeZones.UTC) {
+      return new Date(Number(time)).toISOString()
+    }
+
+    return moment(Number(time)).format('YYYY-MM-DDTHH:mm:ss.SSS')
   }
 
   private get hostCell(): JSX.Element {

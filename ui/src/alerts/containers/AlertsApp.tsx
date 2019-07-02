@@ -84,6 +84,7 @@ class AlertsApp extends PureComponent<Props, State> {
       this.fetchAlerts()
     }
   }
+
   public render() {
     const {isWidget, source} = this.props
     const {loading, timeRange} = this.state
@@ -169,14 +170,14 @@ class AlertsApp extends PureComponent<Props, State> {
 
   private renderSubComponents = (): JSX.Element => {
     const {source, isWidget, limit} = this.props
-    const {isAlertsMaxedOut, alerts} = this.state
+    const {isAlertsMaxedOut, alerts, hasKapacitor} = this.state
 
-    return this.state.hasKapacitor ? (
+    return hasKapacitor ? (
       <AlertsTable
-        source={source}
-        alerts={this.state.alerts}
-        shouldNotBeFilterable={isWidget}
         limit={limit}
+        source={source}
+        alerts={alerts}
+        shouldNotBeFilterable={isWidget}
         onGetMoreAlerts={this.handleGetMoreAlerts}
         isAlertsMaxedOut={isAlertsMaxedOut}
         alertsCount={alerts.length}

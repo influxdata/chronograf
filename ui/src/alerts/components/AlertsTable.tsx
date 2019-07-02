@@ -1,24 +1,34 @@
+// Components
 import React, {PureComponent} from 'react'
+import {connect} from 'react-redux'
 
+// Libraries
 import _ from 'lodash'
 import uuid from 'uuid'
 import {Link} from 'react-router'
 
+// Components
 import AlertsTableRow from 'src/alerts/components/AlertsTableRow'
 import InfiniteScroll from 'src/shared/components/InfiniteScroll'
 import SearchBar from 'src/alerts/components/SearchBar'
-import {ErrorHandling} from 'src/shared/decorators/errors'
 
+// Constants
 import {ALERTS_TABLE} from 'src/alerts/constants/tableSizing'
+
+// Types
 import {Alert} from 'src/types/alerts'
-import {Source} from 'src/types'
+import {Source, TimeZones} from 'src/types'
+
+// Decorators
+import {ErrorHandling} from 'src/shared/decorators/errors'
 
 enum Direction {
   ASC = 'asc',
   DESC = 'desc',
   NONE = 'none',
 }
-interface Props {
+
+interface OwnProps {
   alerts: Alert[]
   source: Source
   shouldNotBeFilterable: boolean
@@ -27,12 +37,19 @@ interface Props {
   alertsCount: number
   onGetMoreAlerts: () => void
 }
+
+interface StateProps {
+  timeZone: TimeZones
+}
+
 interface State {
   searchTerm: string
   filteredAlerts: Alert[]
   sortDirection: Direction
   sortKey: string
 }
+
+type Props = OwnProps & StateProps
 
 @ErrorHandling
 class AlertsTable extends PureComponent<Props, State> {
@@ -143,6 +160,7 @@ class AlertsTable extends PureComponent<Props, State> {
   private renderTable(): JSX.Element {
     const {
       source: {id},
+      timeZone,
     } = this.props
     const alerts = this.sort(
       this.state.filteredAlerts,
@@ -172,7 +190,7 @@ class AlertsTable extends PureComponent<Props, State> {
             className={this.sortableClasses('time')}
             style={{width: colTime}}
           >
-            Time <span className="icon caret-up" />
+            Time ({timeZone})<span className="icon caret-up" />
           </div>
           <div
             onClick={this.changeSort('host')}
@@ -194,7 +212,7 @@ class AlertsTable extends PureComponent<Props, State> {
           itemHeight={25}
           items={alerts.map(alert => (
             <div className="alert-history-table--tr" key={uuid.v4()}>
-              <AlertsTableRow sourceID={id} {...alert} />
+              <AlertsTableRow sourceID={id} {...alert} timeZone={timeZone} />
             </div>
           ))}
         />
@@ -236,4 +254,8 @@ class AlertsTable extends PureComponent<Props, State> {
   }
 }
 
-export default AlertsTable
+const mstp = ({app}) => ({
+  timeZone: app.persisted.timeZone,
+})
+
+export default connect(mstp, null)(AlertsTable)
