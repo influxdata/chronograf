@@ -1,4 +1,4 @@
-import {TimeRange} from 'src/types'
+import {TimeRange, TimeZones} from 'src/types'
 import {LogsState} from 'src/types/logs'
 
 export interface LocalStorage {
@@ -34,4 +34,5 @@ interface DashboardTimeRange {
 
 interface Persisted {
   autoRefresh: number
+  timeZones: TimeZones
 }

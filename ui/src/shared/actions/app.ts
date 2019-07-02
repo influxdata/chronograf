@@ -4,6 +4,7 @@ import {notify} from 'src/shared/actions/notifications'
 import {notifyPresentationMode} from 'src/shared/copy/notifications'
 
 import {Dispatch} from 'redux'
+import {TimeZones} from 'src/types'
 
 import {
   ActionTypes,
@@ -46,4 +47,11 @@ export const setAutoRefresh: SetAutoRefreshActionCreator = (
 
 export const toggleTemplateVariableControlBar = (): ToggleTemplateVariableControlBarAction => ({
   type: ActionTypes.ToggleTemplateVariableControlBar,
+})
+
+export const setTimeZone = (timeZone: TimeZones) => ({
+  type: ActionTypes.SetTimeZone,
+  payload: {
+    timeZone,
+  },
 })
