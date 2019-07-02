@@ -60,17 +60,19 @@ const timeseriesToCSV = async (
     throw new Error('no results')
   }
 
-  const header = table[0]
-  const timeIndex = header.indexOf('time')
+  const tableHeader = table[0]
+  const tableData = table.slice(1)
+
+  const timeIndex = tableHeader.indexOf('time')
 
   if (timeIndex > -1) {
-    for (let i = 1; i < table.length; i++) {
+    for (let i = 0; i < tableData.length; i++) {
       // Convert times to a (somewhat) human readable ISO8601 string
-      table[i][timeIndex] = new Date(table[i][timeIndex]).toISOString()
+      tableData[i][timeIndex] = new Date(tableData[i][timeIndex]).toISOString()
     }
   }
 
-  return unparse(table)
+  return unparse({data: tableData, fields: tableHeader}, {quotes: true})
 }
 
 const csvName = () => {
