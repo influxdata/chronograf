@@ -196,13 +196,13 @@ export class DataExplorer extends PureComponent<Props, State> {
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader
-                timeRange={timeRange}
                 timeZone={timeZone}
+                timeRange={timeRange}
                 onSetTimeZone={onSetTimeZone}
                 activeEditorTab={activeEditorTab}
                 onOpenWriteData={this.handleOpenWriteData}
-                toggleSendToDashboard={this.toggleSendToDashboard}
                 onSetActiveEditorTab={onSetActiveEditorTab}
+                toggleSendToDashboard={this.toggleSendToDashboard}
               />
             )}
           </TimeMachine>
