@@ -122,7 +122,7 @@ export const modeTickscript = {
     // Rules are matched in the order in which they appear, so there is
     // no ambiguity between this one and the one above
     {
-      regex: /(?:var|return|if|for|while|else|do|this|stream|batch|influxql|lambda)/,
+      regex: /(?:var|return|dbrp|if|for|while|else|do|this|stream|batch|influxql|lambda)/,
       token: 'keyword',
     },
     {
