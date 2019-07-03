@@ -104,13 +104,16 @@ export const modeTickscript = {
   // The start state contains the rules that are intially used
   start: [
     // The regex matches the token, the token property contains the type
+    // A next property will cause the mode to move to a different state
     {
-      regex: /"(?:[^\\]|\\.)*?(?:"|$)/,
+      regex: /"/,
       token: 'string.double',
+      next: 'stringdouble',
     },
     {
-      regex: /'(?:[^\\]|\\.)*?(?:'|$)/,
+      regex: /'/,
       token: 'string.single',
+      next: 'stringsingle',
     },
     {
       regex: /(function)(\s+)([A-Za-z][\w]*)/,
@@ -138,12 +141,6 @@ export const modeTickscript = {
       regex: /\/(?:[^\\]|\\.)*?\//,
       token: 'variable-3',
     },
-    // A next property will cause the mode to move to a different state
-    {
-      regex: /\/\*/,
-      token: 'comment',
-      next: 'comment',
-    },
     {
       regex: /AND|OR|[-~+\/*=<>!]+/,
       token: 'operator',
@@ -153,16 +150,26 @@ export const modeTickscript = {
       token: 'variable',
     },
   ],
-  // The multi-line comment state.
-  comment: [
+  stringdouble: [
     {
-      regex: /.*?\*\//,
-      token: 'comment',
+      regex: /"/,
+      token: 'string.double',
       next: 'start',
     },
     {
-      regex: /.*/,
-      token: 'comment',
+      regex: /[^"]/,
+      token: 'string.double',
+    },
+  ],
+  stringsingle: [
+    {
+      regex: /'/,
+      token: 'string.single',
+      next: 'start',
+    },
+    {
+      regex: /[^']/,
+      token: 'string.single',
     },
   ],
   // The meta property contains global information about the mode. It
@@ -170,7 +177,6 @@ export const modeTickscript = {
   // all modes, and also directives like dontIndentStates, which are
   // specific to simple modes.
   meta: {
-    dontIndentStates: ['comment'],
     lineComment: '//',
   },
 }
