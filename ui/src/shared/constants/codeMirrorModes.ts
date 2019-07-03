@@ -123,7 +123,7 @@ export const modeTickscript = {
       token: 'keyword',
     },
     {
-      regex: /true|false|null|undefined|TRUE|FALSE/,
+      regex: /TRUE|FALSE/,
       token: 'atom',
     },
     {
