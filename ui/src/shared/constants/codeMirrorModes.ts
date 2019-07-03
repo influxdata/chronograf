@@ -113,7 +113,7 @@ export const modeTickscript = {
       token: 'string.single',
     },
     {
-      regex: /(function)(\s+)([a-z$][\w$]*)/,
+      regex: /(function)(\s+)([A-Za-z][\w]*)/,
       token: ['keyword', null, 'variable-2'],
     },
     // Rules are matched in the order in which they appear, so there is
@@ -149,7 +149,7 @@ export const modeTickscript = {
       token: 'operator',
     },
     {
-      regex: /[a-z$][\w$]*/,
+      regex: /[A-Za-z][\w$]*/,
       token: 'variable',
     },
   ],
