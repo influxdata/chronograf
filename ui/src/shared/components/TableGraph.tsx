@@ -38,7 +38,7 @@ import {
   DecimalPlaces,
   Sort,
 } from 'src/types/dashboards'
-import {QueryUpdateState} from 'src/types'
+import {QueryUpdateState, TimeZones} from 'src/types'
 
 import {FormattedTableData} from 'src/shared/components/TableGraphFormat'
 
@@ -66,6 +66,7 @@ interface Props {
   dataType: DataType
   tableOptions: TableOptions
   timeFormat: string
+  timeZone: TimeZones
   decimalPlaces: DecimalPlaces
   fieldOptions: FieldOption[]
   hoverTime: string
@@ -132,21 +133,21 @@ class TableGraph extends PureComponent<Props, State> {
                   registerChild,
                 }: SizedColumnProps) => (
                   <MultiGrid
-                    onMount={this.handleMultiGridMount}
+                    height={height}
+                    fixedRowCount={1}
                     ref={registerChild}
+                    rowCount={rowCount}
+                    width={adjustedWidth}
+                    rowHeight={ROW_HEIGHT}
                     columnCount={columnCount}
-                    columnWidth={this.calculateColumnWidth(columnWidth)}
                     scrollToRow={scrollToRow}
                     scrollToColumn={scrollToColumn}
-                    rowCount={rowCount}
-                    rowHeight={ROW_HEIGHT}
-                    height={height}
-                    width={adjustedWidth}
-                    fixedColumnCount={fixedColumnCount}
-                    fixedRowCount={1}
-                    cellRenderer={this.cellRenderer}
-                    classNameBottomRightGrid="table-graph--scroll-window"
                     externalScroll={externalScroll}
+                    cellRenderer={this.cellRenderer}
+                    onMount={this.handleMultiGridMount}
+                    fixedColumnCount={fixedColumnCount}
+                    classNameBottomRightGrid="table-graph--scroll-window"
+                    columnWidth={this.calculateColumnWidth(columnWidth)}
                   />
                 )}
               </ColumnSizer>
@@ -445,9 +446,15 @@ class TableGraph extends PureComponent<Props, State> {
     isTimeData: boolean,
     isFieldName: boolean
   ): string => {
-    const {timeFormat, decimalPlaces} = this.props
+    const {timeFormat, timeZone, decimalPlaces} = this.props
 
     if (isTimeData) {
+      if (timeZone === TimeZones.UTC) {
+        return moment(cellData)
+          .utc()
+          .format(timeFormat)
+      }
+
       return moment(cellData).format(timeFormat)
     }
 
@@ -588,8 +595,9 @@ class TableGraph extends PureComponent<Props, State> {
   }
 }
 
-const mstp = ({dashboardUI}) => ({
+const mstp = ({dashboardUI, app}) => ({
   hoverTime: dashboardUI.hoverTime,
+  timeZone: app.persisted.timeZone,
 })
 
 export default connect(mstp)(TableGraph)

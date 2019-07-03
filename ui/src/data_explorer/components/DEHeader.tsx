@@ -5,6 +5,7 @@ import React, {Component} from 'react'
 import {Page, Radio, ButtonShape} from 'src/reusable_ui'
 import GraphTips from 'src/shared/components/GraphTips'
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
+import TimeZoneToggle from 'src/shared/components/time_zones/TimeZoneToggle'
 
 // Constants
 import {CEOTabs} from 'src/dashboards/constants'
@@ -13,11 +14,14 @@ import {CEOTabs} from 'src/dashboards/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 // Types
-import {TimeRange} from 'src/types'
+import {TimeRange, TimeZones} from 'src/types'
+import {setTimeZone} from 'src/shared/actions/app'
 
 interface Props {
+  timeZone: TimeZones
   timeRange: TimeRange
   activeEditorTab: CEOTabs
+  onSetTimeZone: typeof setTimeZone
   onOpenWriteData: () => void
   toggleSendToDashboard: () => void
   onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
@@ -27,6 +31,8 @@ interface Props {
 class DEHeader extends Component<Props> {
   public render() {
     const {
+      timeZone,
+      onSetTimeZone,
       onOpenWriteData,
       activeEditorTab,
       onSetActiveEditorTab,
@@ -62,6 +68,7 @@ class DEHeader extends Component<Props> {
         </Page.Header.Center>
         <Page.Header.Right>
           <GraphTips />
+          <TimeZoneToggle timeZone={timeZone} onSetTimeZone={onSetTimeZone} />
           <button
             onClick={onOpenWriteData}
             data-test="write-data-button"
