@@ -145,7 +145,7 @@ export const modeTickscript = {
       next: 'comment',
     },
     {
-      regex: /[-+\/*=<>!]+/,
+      regex: /AND|OR|[-~+\/*=<>!]+/,
       token: 'operator',
     },
     {
