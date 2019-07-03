@@ -60,6 +60,7 @@ import {
   QueryType,
   CellQuery,
   TimeRange,
+  TimeZones,
 } from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Links} from 'src/types/flux'
@@ -89,12 +90,14 @@ interface PassedProps {
   notify: (message: Notification) => void
   sourceLink: string
   onSetTimeZone: typeof setTimeZoneAction
+  timeZone: TimeZones
 }
 
 interface ConnectedProps {
   queryType: QueryType
   queryDrafts: CellQuery[]
   timeRange: TimeRange
+  timeZone: TimeZones
   draftScript: string
   script: string
   onUpdateQueryDrafts: (queryDrafts: CellQuery[]) => void
