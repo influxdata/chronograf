@@ -149,7 +149,7 @@ export const modeTickscript = {
       token: 'operator',
     },
     {
-      regex: /[A-Za-z][\w$]*/,
+      regex: /[@]?[A-Za-z][\w$]*/,
       token: 'variable',
     },
   ],
