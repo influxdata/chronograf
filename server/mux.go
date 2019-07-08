@@ -338,8 +338,8 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 	router.GET("/chronograf/v1/env", EnsureViewer(service.Environment))
 
-	// Go text template string parsing helper
-	router.GET("/chronograf/v1/text_template", EnsureViewer(service.ValidateTextTemplate))
+	// Validates go templates for the js client
+	router.POST("/chronograf/v1/validate_text_templates", EnsureViewer(service.ValidateTextTemplate))
 
 	/// V2 Cells
 	router.GET("/chronograf/v2/cells", EnsureViewer(service.CellsV2))
