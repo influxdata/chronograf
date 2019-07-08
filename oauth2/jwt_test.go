@@ -193,7 +193,7 @@ func TestGetClaims(t *testing.T) {
 			TokenString:  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IllEQlVocWRXa3NLWGRHdVgwc3l0amFVdXhoQSIsImtpZCI6IllEQlVocWRXa3NLWGRHdVgwc3l0amFVdXhoQSJ9.eyJhdWQiOiJjaHJvbm9ncmFmIiwiaXNzIjoiaHR0cHM6Ly9kc3RjaW1hYWQxcC5kc3QtaXRzLmRlL2FkZnMiLCJpYXQiOjE1MTMxNjU4ODksImV4cCI6MTUxMzE2OTQ4OSwiYXV0aF90aW1lIjoxNTEzMTY1ODg4LCJzdWIiOiJlWVYzamRsZE55RlkxcUZGSDRvQWRCdkRGZmJWZm51RzI5SGlIa1N1andrPSIsInVwbiI6ImJzY0Bkc3QtaXRzLmRlIiwidW5pcXVlX25hbWUiOiJEU1RcXGJzYyIsInNpZCI6IlMtMS01LTIxLTI1MDUxNTEzOTgtMjY2MTAyODEwOS0zNzU0MjY1ODIwLTExMDQifQ.nK51Ui4XN45SVul9igNaKFQd-F63BNstBzW-T5LBVm_ANHCEHyP3_88C3ffkkQIi3PxYacRJGtfswP35ws7YJUcNp-GoGZARqz62NpMtbQyhos6mCaVXwPoxPbrZx4AkMQgxkZwJcOzceX7mpjcT3kCth30chN3lkhzSjGrXe4ZDOAV25liS-dsdBiqDiaTB91sS534GM76qJQxFUs51oSbYTRdCN1VJ0XopMcasfVDzFrtSbyvEIVXlpKK2HplnhheqF4QHrM_3cjV_NGRr3tYLe-AGTdDXKWlJD1GDz1ECXeMGQHPoz3U8cqNsFLYBstIlCgfnBWgWsPZSvJPJUg",
 			JwksDocument: "",
 			Iat:          int64(1513165889),
-			Err:          errors.New("unexpected end of JSON input"),
+			Err:          errors.New("failed to unmarshal JWK: EOF"),
 		},
 		{
 			Name: "Invalid Token",
