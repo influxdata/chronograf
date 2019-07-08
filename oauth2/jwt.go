@@ -2,15 +2,11 @@ package oauth2
 
 import (
 	"context"
-	"crypto/x509"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"time"
 
 	gojwt "github.com/dgrijalva/jwt-go"
+	"github.com/lestrrat-go/jwx/jwk"
 )
 
 // Ensure JWT conforms to the Tokenizer interface
@@ -124,43 +120,27 @@ func (j *JWT) KeyFuncRS256(token *gojwt.Token) (interface{}, error) {
 		return nil, fmt.Errorf("JWKSURL not specified, cannot validate RS256 signature")
 	}
 
-	rr, err := http.Get(j.Jwksurl)
-	if err != nil {
-		return nil, err
-	}
-	defer rr.Body.Close()
-	body, err := ioutil.ReadAll(rr.Body)
+	set, err := jwk.Fetch(j.Jwksurl)
 	if err != nil {
 		return nil, err
 	}
 
-	// parse json to struct
-	var jwks JWKS
-	if err := json.Unmarshal([]byte(body), &jwks); err != nil {
-		return nil, err
+	kid, ok := token.Header["kid"].(string)
+	if !ok {
+		return nil, fmt.Errorf("could not convert JWT header kid to string")
 	}
 
-	// extract cert when kid and alg match
-	var certPkix []byte
-	for _, jwk := range jwks.Keys {
-		if token.Header["kid"] == jwk.Kid {
-			// FIXME: optionally walk the key chain, see rfc7517 section 4.7
-			certPkix, err = base64.StdEncoding.DecodeString(jwk.X5c[0])
-			if err != nil {
-				return nil, fmt.Errorf("base64 decode error for JWK kid %v", token.Header["kid"])
-			}
-		}
-	}
-	if certPkix == nil {
-		return nil, fmt.Errorf("no signing key found for kid %v", token.Header["kid"])
+	keys := set.LookupKeyID(kid)
+	if len(keys) == 0 {
+		return nil, fmt.Errorf("no JWK found with kid %s", kid)
 	}
 
-	// parse certificate (from PKIX format) and return signing key
-	cert, err := x509.ParseCertificate(certPkix)
+	key, err := keys[0].Materialize()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read JWK public key: %s", err)
 	}
-	return cert.PublicKey, nil
+
+	return key, nil
 }
 
 // ValidClaims validates a token with StandardClaims
