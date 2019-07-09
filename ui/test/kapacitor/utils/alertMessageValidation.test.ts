@@ -59,24 +59,6 @@ describe('kapacitor.utils.alertMessageValidation', () => {
 
       expect(isValid).toEqual(true)
     })
-
-    it('rejects message with invalid template', () => {
-      const isValid = isValidMessage('{{ I am invalid}}')
-
-      expect(isValid).toEqual(false)
-    })
-
-    it('rejects message containing template with missing closing bracket', () => {
-      const isValid = isValidMessage('{{ index .Tags "value" } {{.Name}}')
-
-      expect(isValid).toEqual(false)
-    })
-
-    it('rejects message containing non-matching brackets', () => {
-      const isValid = isValidMessage('{{ index .Tags "value"  {{.Name}}')
-
-      expect(isValid).toEqual(false)
-    })
   })
 
   describe('isValidTemplate', () => {
