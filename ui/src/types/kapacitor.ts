@@ -1,6 +1,19 @@
 import {QueryConfig} from './'
 import {AlertTypes} from 'src/kapacitor/constants'
 
+export enum ValidationState {
+  NotStarted = 'Not Started',
+  Success = 'Success',
+  Error = 'Error',
+  Validating = 'Validating',
+}
+
+export enum TypingStatus {
+  NotStarted = 'Not Started',
+  Started = 'Started',
+  Done = 'Done',
+}
+
 export interface Kapacitor {
   id?: string
   url: string

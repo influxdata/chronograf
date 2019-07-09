@@ -1,6 +1,5 @@
 import {
   isValidMessage,
-  mismatchedBrackets,
   isValidTemplate,
 } from 'src/kapacitor/utils/alertMessageValidation'
 import {RULE_MESSAGE_TEMPLATE_TEXTS} from 'src/kapacitor/constants'
@@ -59,47 +58,6 @@ describe('kapacitor.utils.alertMessageValidation', () => {
       )
 
       expect(isValid).toEqual(true)
-    })
-
-    it('rejects message with invalid template', () => {
-      const isValid = isValidMessage('{{ I am invalid}}')
-
-      expect(isValid).toEqual(false)
-    })
-
-    it('rejects message containing template with missing closing bracket', () => {
-      const isValid = isValidMessage('{{ index .Tags "value" } {{.Name}}')
-
-      expect(isValid).toEqual(false)
-    })
-
-    it('rejects message containing non-matching brackets', () => {
-      const isValid = isValidMessage('{{ index .Tags "value"  {{.Name}}')
-
-      expect(isValid).toEqual(false)
-    })
-  })
-
-  describe('mismatchedBrackets', () => {
-    it('String containing matched brackets is not mismatched', () => {
-      const isMismatched = mismatchedBrackets('{{}}')
-
-      expect(isMismatched).toEqual(false)
-    })
-    it('String containing matched brackets and other characters is not mismatched', () => {
-      const isMismatched = mismatchedBrackets('asdf{{asdfaasdas}}asdfa')
-
-      expect(isMismatched).toEqual(false)
-    })
-    it('String containing unmatched brackets is mismatched', () => {
-      const isMismatched = mismatchedBrackets('{{}')
-
-      expect(isMismatched).toEqual(true)
-    })
-    it('String containing unmatched brackets and other characters is mismatched', () => {
-      const isMismatched = mismatchedBrackets('asdf{{as}asdfa)')
-
-      expect(isMismatched).toEqual(true)
     })
   })
 

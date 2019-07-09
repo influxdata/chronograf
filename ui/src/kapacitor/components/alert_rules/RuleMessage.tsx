@@ -1,7 +1,7 @@
 import React, {Component, ChangeEvent} from 'react'
 
-import RuleMessageText from 'src/kapacitor/components/RuleMessageText'
-import RuleMessageTemplates from 'src/kapacitor/components/RuleMessageTemplates'
+import RuleMessageText from 'src/kapacitor/components/alert_rules/RuleMessageText'
+import RuleMessageTemplates from 'src/kapacitor/components/alert_rules/RuleMessageTemplates'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {AlertRule} from 'src/types'
@@ -26,7 +26,7 @@ class RuleMessage extends Component<Props> {
         <h3 className="rule-section--heading">Message</h3>
         <div className="rule-section--body">
           <RuleMessageText
-            rule={rule}
+            message={rule.message}
             updateMessage={this.handleChangeMessage}
           />
           <RuleMessageTemplates
