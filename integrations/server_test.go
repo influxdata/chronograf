@@ -2886,7 +2886,8 @@ func TestServer(t *testing.T) {
     "ast": "/chronograf/v1/flux/ast",
     "self": "/chronograf/v1/flux",
     "suggestions": "/chronograf/v1/flux/suggestions"
-  }
+  },
+  "validateTextTemplates":"chronograf/v1/validate_text_templates"
 }
 `,
 			},
@@ -2981,7 +2982,8 @@ func TestServer(t *testing.T) {
     "ast": "/chronograf/v1/flux/ast",
     "self": "/chronograf/v1/flux",
     "suggestions": "/chronograf/v1/flux/suggestions"
-  }
+  },
+  "validateTextTemplates":"chronograf/v1/validate_text_templates"
 }
 `,
 			},
