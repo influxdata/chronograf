@@ -8,8 +8,22 @@ import SplashPage from 'shared/components/SplashPage'
 
 const VERSION = process.env.npm_package_version
 
-const Login = ({authData: {auth}}) => {
-  if (auth.isAuthLoading) {
+const Login = props => {
+  const {
+    authData: {
+      auth: {links, isAuthLoading},
+    },
+  } = props
+
+  if (isAuthLoading) {
+    return <PageSpinner />
+  }
+
+  const redirectTo = links && links.length === 1 && links[0].login
+
+  if (redirectTo) {
+    window.location.href = redirectTo
+
     return <PageSpinner />
   }
 
@@ -21,8 +35,8 @@ const Login = ({authData: {auth}}) => {
         <p>
           <strong>{VERSION}</strong> / Time-Series Data Visualization
         </p>
-        {auth.links &&
-          auth.links.map(({name, login, label}) => (
+        {links &&
+          links.map(({name, login, label}) => (
             <a key={name} className="btn btn-primary" href={login}>
               <span className={`icon ${name}`} />
               Log in with {label}
