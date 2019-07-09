@@ -1,0 +1,32 @@
+/*
+  Loading Spinner
+  ------------------------------------------------------------------------------
+*/
+
+@keyframes LoadingSpinner {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.loading-spinner--container {
+  display: inline-block;
+  position: relative;
+}
+
+.loading-spinner--circle {
+  pointer-events: none;
+  border: $ix-border solid rgba($g20-white, 0.25);
+  border-right-color: $g20-white;
+  border-radius: 50%;
+  animation-duration: 0.85s;
+  animation-name: LoadingSpinner;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}

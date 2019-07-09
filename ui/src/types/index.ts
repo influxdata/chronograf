@@ -1,4 +1,5 @@
 export * from './app'
+export * from 'src/types/kapacitor'
 import {LayoutCell, LayoutQuery} from './layouts'
 import {Service, NewService, ServiceLinks} from './services'
 import {Links, Organization, Role, Permission, User, Me} from './auth'
@@ -40,13 +41,6 @@ import {
   Tags,
   TagValues,
 } from './queries'
-import {
-  AlertRule,
-  Kapacitor,
-  Task,
-  RuleValues,
-  AlertRuleType,
-} from './kapacitor'
 import {
   NewSource,
   Source,
@@ -102,9 +96,6 @@ export {
   Tag,
   Tags,
   TagValues,
-  AlertRule,
-  AlertRuleType,
-  Kapacitor,
   NewSource,
   Source,
   SourceLinks,
@@ -112,8 +103,6 @@ export {
   DropdownAction,
   DropdownItem,
   TimeRange,
-  Task,
-  RuleValues,
   DygraphData,
   DygraphSeries,
   DygraphValue,

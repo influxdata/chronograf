@@ -49,6 +49,7 @@ type getRoutesResponse struct {
 	ExternalLinks      getExternalLinksResponse           `json:"external"`         // All external links for the client to use
 	OrganizationConfig getOrganizationConfigLinksResponse `json:"orgConfig"`        // Location of the organization config endpoint
 	Flux               getFluxLinksResponse               `json:"flux"`
+	ValidTextTemplates string                             `json:"validateTextTemplates"` // Location of the valid text templates endpoint
 }
 
 // AllRoutes is a handler that returns all links to resources in Chronograf server, as well as
@@ -111,6 +112,7 @@ func (a *AllRoutes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			AST:         "/chronograf/v1/flux/ast",
 			Suggestions: "/chronograf/v1/flux/suggestions",
 		},
+		ValidTextTemplates: "chronograf/v1/validate_text_templates",
 	}
 
 	// The JSON response will have no field present for the LogoutLink if there is no logout link.

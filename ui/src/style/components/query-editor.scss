@@ -58,18 +58,30 @@
   font-size: 12px;
   font-family: $code-font;
 
-  span.icon {
+  span.icon,
+  .loading-spinner--container {
     margin-right: 5px;
   }
+
+  .loading-spinner--container {
+    top: 2px;
+  }
+
   /* Error State */
-  &.query-status-output--error { color: $query-editor--status-error; }
+  &.query-status-output--error {
+    color: $query-editor--status-error;
+  }
   /* Warning State */
-  &.query-status-output--warning { color: $query-editor--status-warning; }
+  &.query-status-output--warning {
+    color: $query-editor--status-warning;
+  }
   /* Success State */
-  &.query-status-output--success { color: $query-editor--status-success; }
+  &.query-status-output--success {
+    color: $query-editor--status-success;
+  }
 }
 .dropdown.query-editor--templates {
-  margin: 0 4px 0 0 ;
+  margin: 0 4px 0 0;
 
   .dropdown-menu {
     left: initial;
@@ -172,9 +184,7 @@
   color: $c-comet;
   border-radius: $radius-small;
   cursor: pointer;
-  transition:
-    color 0.25s ease,
-    background-color 0.25s ease;
+  transition: color 0.25s ease, background-color 0.25s ease;
 
   /* Selected State */
   &.template-drawer--selected {
@@ -183,7 +193,7 @@
   }
 
   .divider {
-    background: linear-gradient(to right, #00C9FF 0%, #22ADF6 100%);
+    background: linear-gradient(to right, #00c9ff 0%, #22adf6 100%);
   }
 }
 
@@ -202,7 +212,7 @@
 
   &:before,
   &:after {
-    content: '';
+    content: "";
     position: absolute;
     width: 14px;
     height: 3px;

@@ -301,6 +301,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/chronograf/v1/dashboards/:id/cells/:cid", EnsureViewer(service.DashboardCellID))
 	router.DELETE("/chronograf/v1/dashboards/:id/cells/:cid", EnsureEditor(service.RemoveDashboardCell))
 	router.PUT("/chronograf/v1/dashboards/:id/cells/:cid", EnsureEditor(service.ReplaceDashboardCell))
+
 	// Dashboard Templates
 	router.GET("/chronograf/v1/dashboards/:id/templates", EnsureViewer(service.Templates))
 	router.POST("/chronograf/v1/dashboards/:id/templates", EnsureEditor(service.NewTemplate))
@@ -336,6 +337,9 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.PUT("/chronograf/v1/org_config/logviewer", EnsureEditor(service.ReplaceOrganizationLogViewerConfig))
 
 	router.GET("/chronograf/v1/env", EnsureViewer(service.Environment))
+
+	// Validates go templates for the js client
+	router.POST("/chronograf/v1/validate_text_templates", EnsureViewer(service.ValidateTextTemplate))
 
 	/// V2 Cells
 	router.GET("/chronograf/v2/cells", EnsureViewer(service.CellsV2))
