@@ -49,7 +49,7 @@ type getRoutesResponse struct {
 	ExternalLinks      getExternalLinksResponse           `json:"external"`         // All external links for the client to use
 	OrganizationConfig getOrganizationConfigLinksResponse `json:"orgConfig"`        // Location of the organization config endpoint
 	Flux               getFluxLinksResponse               `json:"flux"`
-	ValidTextTemplates string                             `json:"validTextTemplates"` // Location of the valid text templates endpoint
+	ValidTextTemplates string                             `json:"validateTextTemplates"` // Location of the valid text templates endpoint
 }
 
 // AllRoutes is a handler that returns all links to resources in Chronograf server, as well as
