@@ -16,7 +16,7 @@ var _ Mux = &AuthMux{}
 const TenMinutes = 10 * time.Minute
 
 // NewAuthMux constructs a Mux handler that checks a cookie against the authenticator
-func NewAuthMux(p Provider, a Authenticator, t Tokenizer, basepath string, l chronograf.Logger, UseIDToken bool) *AuthMux {
+func NewAuthMux(p Provider, a Authenticator, t Tokenizer, basepath string, l chronograf.Logger, UseIDToken bool, LoginHint string) *AuthMux {
 	return &AuthMux{
 		Provider:   p,
 		Auth:       a,
@@ -26,6 +26,7 @@ func NewAuthMux(p Provider, a Authenticator, t Tokenizer, basepath string, l chr
 		Now:        DefaultNowTime,
 		Logger:     l,
 		UseIDToken: UseIDToken,
+		LoginHint:  LoginHint,
 	}
 }
 
@@ -43,6 +44,7 @@ type AuthMux struct {
 	FailureURL string            // FailureURL is redirect location after authorization failure
 	Now        func() time.Time  // Now returns the current time (for testing)
 	UseIDToken bool              // UseIDToken enables OpenID id_token support
+	LoginHint  string            // LoginHint will be included as a parameter during authentication if non-nil
 }
 
 // Login uses a Cookie with a random string as the state validation method.  JWTs are
@@ -79,7 +81,13 @@ func (j *AuthMux) Login() http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		url := conf.AuthCodeURL(string(token), oauth2.AccessTypeOnline)
+
+		urlOpts := []oauth2.AuthCodeOption{oauth2.AccessTypeOnline}
+		if j.LoginHint != "" {
+			urlOpts = append(urlOpts, oauth2.SetAuthURLParam("login_hint", j.LoginHint))
+		}
+		url := conf.AuthCodeURL(string(token), urlOpts...)
+
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	})
 }

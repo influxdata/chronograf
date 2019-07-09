@@ -53,7 +53,7 @@ func setupMuxTest(response interface{}, selector func(*AuthMux) http.Handler) (*
 
 	useidtoken := false
 
-	jm := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken)
+	jm := NewAuthMux(mp, auth, mt, "", clog.New(clog.ParseLevel("debug")), useidtoken, "")
 	ts := httptest.NewServer(selector(jm))
 	jar, _ := cookiejar.New(nil)
 	hc := http.Client{
