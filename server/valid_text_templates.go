@@ -11,11 +11,6 @@ type ValidTextTemplateRequest struct {
 	Template string `json:"template"`
 }
 
-// ValidTextTemplateResponse is the response for template validation
-type ValidTextTemplateResponse struct {
-	Valid string `json:"valid"`
-}
-
 // ValidateTextTemplate will validate the template string
 func (s *Service) ValidateTextTemplate(w http.ResponseWriter, r *http.Request) {
 	var req ValidTextTemplateRequest
@@ -30,9 +25,5 @@ func (s *Service) ValidateTextTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := ValidTextTemplateResponse{
-		Valid: "nice template",
-	}
-
-	encodeJSON(w, http.StatusOK, res, s.Logger)
+	w.WriteHeader(http.StatusNoContent)
 }
