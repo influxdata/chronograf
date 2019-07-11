@@ -30,6 +30,10 @@ const Dashboard = ({
       ...q,
       database: q.db,
       text: q.query,
+      queryConfig: {
+        ...q.queryConfig,
+        rawText: q.query,
+      },
     }))
     return dashboardCell
   })
