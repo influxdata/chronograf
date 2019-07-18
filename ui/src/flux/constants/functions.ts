@@ -738,7 +738,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     name: 'keyValues',
     args: [
       {
-        name: 'keyCols',
+        name: 'keyColumns',
         desc:
           'A list of columns from which values are extracted. All columns indicated must be of the same type.',
         type: 'Array of Strings',
@@ -752,7 +752,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     desc:
       "Returns a table with the input table's group key plus two columns, `_key` and `_value`, that correspond to unique column + value pairs from the input table.",
-    example: 'keyValues(keyCols: ["usage_idle", "usage_user"])',
+    example: 'keyValues(keyColumns: ["usage_idle", "usage_user"])',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/functions/transformations/keyvalues',
