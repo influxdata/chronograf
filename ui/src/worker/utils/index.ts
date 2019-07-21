@@ -16,7 +16,7 @@ export const fetchData = async (msg: Message): Promise<any> => {
 }
 
 export const error = (msg: Message, err: Error) => {
-  const id = uuid.v1()
+  const id = uuid.v4()
 
   postMessage({
     id,
@@ -27,7 +27,7 @@ export const error = (msg: Message, err: Error) => {
 }
 
 export const success = async (msg: Message, payload: any) => {
-  const id = uuid.v1()
+  const id = uuid.v4()
 
   await DB.put(id, payload)
 
