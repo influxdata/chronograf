@@ -69,7 +69,7 @@ class RuleGraph extends PureComponent<Props> {
             source={source}
             queries={this.queries}
             templates={this.templates}
-            uuid={uuid.v1()}
+            uuid={uuid.v4()}
           >
             {data => {
               return (
