@@ -219,7 +219,7 @@ class TimeSeries extends PureComponent<Props, State> {
     let responseUUID: string
     let loading: RemoteDataState = null
 
-    const latestUUID = uuid.v1()
+    const latestUUID = uuid.v4()
 
     this.setState({
       loading: RemoteDataState.Loading,
