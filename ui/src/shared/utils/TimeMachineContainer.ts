@@ -1,6 +1,6 @@
 // Libraries
 import {Container} from 'unstated'
-import _ from 'lodash'
+import _, {get} from 'lodash'
 
 // Utils
 import {
@@ -142,6 +142,26 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
       state = {...state, queryDrafts}
     }
+
+    // prevents "DROP" or "DELETE" queries from being persisted.
+    const savable = get(state, 'queryDrafts', []).filter(({query, type}) => {
+      if (type !== 'influxql') {
+        return true
+      }
+
+      const queries = query.split(';')
+      let isSavable = true
+      for (let i = 0; i <= queries.length; i++) {
+        const qs = get(queries, `${i}`, '').toLocaleLowerCase()
+        if (qs.startsWith('drop') || qs.startsWith('delete')) {
+          isSavable = false
+        }
+      }
+
+      return isSavable
+    })
+
+    state = {...state, queryDrafts: savable}
 
     return this.setAndPersistState(state)
   }
