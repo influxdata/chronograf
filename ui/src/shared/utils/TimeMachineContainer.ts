@@ -1,6 +1,6 @@
 // Libraries
 import {Container} from 'unstated'
-import _, {get} from 'lodash'
+import _ from 'lodash'
 
 // Utils
 import {
@@ -144,22 +144,24 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
     }
 
     // prevents "DROP" or "DELETE" queries from being persisted.
-    const savable = get(state, 'queryDrafts', []).filter(({query, type}) => {
-      if (type !== 'influxql') {
-        return true
-      }
-
-      const queries = query.split(';')
-      let isSavable = true
-      for (let i = 0; i <= queries.length; i++) {
-        const qs = get(queries, `${i}`, '').toLocaleLowerCase()
-        if (qs.startsWith('drop') || qs.startsWith('delete')) {
-          isSavable = false
+    const savable = getDeep<CellQuery[]>(state, 'queryDrafts', []).filter(
+      ({query, type}) => {
+        if (type !== 'influxql') {
+          return true
         }
-      }
 
-      return isSavable
-    })
+        const queries = query.split(';')
+        let isSavable = true
+        for (let i = 0; i <= queries.length; i++) {
+          const qs = getDeep<string>(queries, `${i}`, '').toLocaleLowerCase()
+          if (qs.startsWith('drop') || qs.startsWith('delete')) {
+            isSavable = false
+          }
+        }
+
+        return isSavable
+      }
+    )
 
     state = {...state, queryDrafts: savable}
 
