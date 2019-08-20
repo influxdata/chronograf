@@ -5,6 +5,177 @@
 1. [#5225](https://github.com/influxdata/chronograf/pull/5225): Fix tickscript editor syntax coloring
 1. [#5227](https://github.com/influxdata/chronograf/pull/5227): Fix Fix JWK check when using login_id
 1. [#5249](https://github.com/influxdata/chronograf/pull/5249): Fix dashboard typos
+## v1.7.14
+
+### Bug Fixes
+
+### Features
+
+## v1.7.13 [2019-08-20]
+
+### Bug Fixes
+
+1. [#5217](https://github.com/influxdata/chronograf/pull/5217): Fix scroll to row bug on table graphs
+1. [#5170](https://github.com/influxdata/chronograf/pull/5170): Wrap inline commas in quotes to distinguish from csv delimiters
+1. [#5225](https://github.com/influxdata/chronograf/pull/5225): Fix tickscript editor syntax coloring
+1. [#5227](https://github.com/influxdata/chronograf/pull/5227): Fix Fix JWK check when using login_id
+1. [#5249](https://github.com/influxdata/chronograf/pull/5249): Fix dashboard typos
+1. [#5220](https://github.com/influxdata/chronograf/pull/5220): Configure papaparse to distinguish inline vs delimiter commas
+1. [#5225](https://github.com/influxdata/chronograf/pull/5225): Fix TICKScript editor coloring for boolean literals
+1. [#5227](https://github.com/influxdata/chronograf/pull/5227): Fix JWK signing key check
+1. [#5228](https://github.com/influxdata/chronograf/pull/5228): Fix alert rule message text template parsing
+1. [#5131](https://github.com/influxdata/chronograf/pull/5131): Fix erroneous query manipulation
+1. [#5244](https://github.com/influxdata/chronograf/pull/5244): Fix group by database for numSeries and numMeasurement queries in canned dashboards
+1. [#5248](https://github.com/influxdata/chronograf/pull/5248): Update axios and lodash dependenies with known vulnerabilities
+1. [#5249](https://github.com/influxdata/chronograf/pull/5249): Fix dashboard typos in protoboard queries
+1. [#5258](https://github.com/influxdata/chronograf/pull/5258): Fix repeating last command in Data Explore window when multiple tabs are open
+
+### Features
+
+1. [#5218](https://github.com/influxdata/chronograf/pull/5218): Add toggle for UTL and local time
+1. [#5222](https://github.com/influxdata/chronograf/pull/5222): Add time zone selector to data explorer
+1. [#5224](https://github.com/influxdata/chronograf/pull/5224): Add time zone toggle
+1. [#5229](https://github.com/influxdata/chronograf/pull/5224): Add Login Hint and redirect to OAuth provider automatically
+
+## v1.7.12 [2019-06-20]
+
+### Bug Fixes
+
+1. [#5208](https://github.com/influxdata/chronograf/pull/5208): Clarify wording of PagerDuty v1 deprecation message
+1. [#5198](https://github.com/influxdata/chronograf/pull/5198): Requesting info from an unavailable source no longer causes the page to hang
+1. [#5171](https://github.com/influxdata/chronograf/pull/5171): Create chronograf user before CentOS installation
+1. [#5183](https://github.com/influxdata/chronograf/pull/5183): Add support for web workers in IE11
+1. [#5184](https://github.com/influxdata/chronograf/pull/5184): Properly update query time bounds when zooming in on a dashboard
+1. [#5139](https://github.com/influxdata/chronograf/pull/5139): Fix an issue where Flux responses weren't parsed correctly
+
+### Features
+
+1. [#5187](https://github.com/influxdata/chronograf/pull/5187): Allow negative numbers for configured y-axis minimums
+
+## v1.7.11 [2019-04-23]
+
+### Bug Fixes
+
+1. [#5154](https://github.com/influxdata/chronograf/pull/5154): Fix fetching tag keys in flux builder
+
+### Features
+
+## v1.7.10 [2019-04-16]
+
+### Bug Fixes
+
+1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options
+1. [#5149](https://github.com/influxdata/chronograf/pull/5149): Fix Cell editor visualization not using ceo time range
+1. [#5148](https://github.com/influxdata/chronograf/pull/5148): Fixed an issue where imports were not working in Flux scripts
+
+### Features
+
+1. [#5150](https://github.com/influxdata/chronograf/pull/5150): Updated the UI to work with the latest Flux version
+
+## v1.7.9 [2019-03-20]
+
+### Bug Fixes
+
+1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
+1. [#5111](https://github.com/influxdata/chronograf/pull/5111): Stop scrollbars from covering text in flux editor
+1. [#5114](https://github.com/influxdata/chronograf/pull/5114): Insert flux function near cursor in flux editor
+1. [#5118](https://github.com/influxdata/chronograf/pull/5118): Fix double quoting of map template values
+1. [#5107](https://github.com/influxdata/chronograf/pull/5107): Fix unhandled templates in kapacitor rules
+1. [#5128](https://github.com/influxdata/chronograf/pull/5128): Fix disappearing data when scrolling a table
+
+## v1.7.8 [2019-02-08]
+
+### Bug Fixes
+
+1. [#5068](https://github.com/influxdata/chronograf/pull/5068): Escape injected meta query values
+1. [#5073](https://github.com/influxdata/chronograf/pull/5073): Fix out of range decimal places
+1. [#5076](https://github.com/influxdata/chronograf/pull/5076): Stop raw yaxis format from getting updated to 10
+1. [#5077](https://github.com/influxdata/chronograf/pull/5077): Correct autoInterval calculations
+1. [#5079](https://github.com/influxdata/chronograf/pull/5079): Fix multiple organizations not showing configured kapacitors
+1. [#5078](https://github.com/influxdata/chronograf/pull/5078): Fix the inability to edit kapacitor info in the onboarding wizard
+1. [#5083](https://github.com/influxdata/chronograf/pull/5083): Fix the column names in the Window function example
+1. [#5110](https://github.com/influxdata/chronograf/pull/5110): Fix the input for line controls in visualization options.
+
+## v1.7.7 [2018-01-16]
+
+### Bug Fixes
+
+1. [#5045](https://github.com/influxdata/chronograf/pull/5045): Use JWT in enterprise for authentication in flux
+
+## v1.7.6 [2019-01-14]
+
+### Bug Fixes
+
+1. [#4895](https://github.com/influxdata/chronograf/pull/4895): Properly set scroll to row for table graph
+1. [#4906](https://github.com/influxdata/chronograf/pull/4906): Prevent Kapacitor URLs from being overwritten in Connection Wizard.
+1. [#4862](https://github.com/influxdata/chronograf/pull/4909): Fix logs intermitently show empty on first load
+1. [#5034](https://github.com/influxdata/chronograf/pull/5034): Prevent meta node URLs from being overwritten in Connection Wizard.
+1. [#5035](https://github.com/influxdata/chronograf/pull/5035): Update functions list for Flux 0.12
+
+## v1.7.5 [2018-12-14]
+
+### Bug Fixes
+
+1. [#4886](https://github.com/influxdata/chronograf/pull/4886): Update go, node, and alpine versions
+
+## v1.7.4 [2018-12-12]
+
+### Features
+
+### Bug Fixes
+
+1. [#4776](https://github.com/influxdata/chronograf/pull/4776): Fix flux pivot function using wrong named parameters
+1. [#4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
+1. [#4819](https://github.com/influxdata/chronograf/pull/4819):
+   - Fix momentary display of fallback notes while dashboard is loading
+   - Fix issue displaying UUIDs in table cells
+1. [#4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
+1. [#4856](https://github.com/influxdata/chronograf/pull/4856): Fix single stat graphs decimal places when using flux
+1. [#4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
+1. [#4819](https://github.com/influxdata/chronograf/pull/4819): Fix momentary display of fallback notes while dashboard is loading
+1. [#4819](https://github.com/influxdata/chronograf/pull/4819): Fix issue displaying UUIDs in table cells
+1. [#4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
+1. [#4846](https://github.com/influxdata/chronograf/pull/4846): Fix missing data and type in refreshing graph
+1. [#4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
+1. [#4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
+1. [#4863](https://github.com/influxdata/chronograf/pull/4863): Update logs histogram data on click and new search
+1. [#4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
+1. [#4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
+1. [4814](https://github.com/influxdata/chronograf/pull/4814): Fix logs page getting stuck on scroll to top
+1. [4819](https://github.com/influxdata/chronograf/pull/4819): Fix momentary display of fallback notes while dashboard is loading
+1. [4819](https://github.com/influxdata/chronograf/pull/4819): Fix issue displaying UUIDs in table cells
+1. [4854](https://github.com/influxdata/chronograf/pull/4854): Update functions list for Flux 0.7.1
+1. [4846](https://github.com/influxdata/chronograf/pull/4846): Fix missing data and type in refreshing graph
+1. [4861](https://github.com/influxdata/chronograf/pull/4861): Fix logs stuck in loading state
+1. [4847](https://github.com/influxdata/chronograf/pull/4847): Improve display of Flux Wizard on small screens
+1. [4863](https://github.com/influxdata/chronograf/pull/4863): Update logs histogram data on click and new search
+1. [4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
+1. [4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
+1. [4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
+1. [#4872](https://github.com/influxdata/chronograf/pull/4872): Prevent cell renaming widget from pushing other header elements offscreen
+1. [#4877](https://github.com/influxdata/chronograf/pull/4877): Fix flux editor scrollbars
+1. [#4840](https://github.com/influxdata/chronograf/pull/4840): Use valid characters for sensu ids
+
+### UI Improvements
+
+1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
+1. [#4845](https://github.com/influxdata/chronograf/pull/4845): Allow Kapacitor step in Connection Configuration to be skipped
+1. [#4805](https://github.com/influxdata/chronograf/pull/4805): Remove extra save options for retention policy in db creation UI
+
+## v1.7.3 [2018-11-13]
+
+### Bug Fixes
+
+1. [#4786](https://github.com/influxdata/chronograf/pull/4786): Get protoboards from multistore if not able to find from ProtoboardsPath
+1. [#4794](https://github.com/influxdata/chronograf/pull/4794): Handle basepath issue with missing slash
+1. [#4798](https://github.com/influxdata/chronograf/pull/4798): Fix the ping pre canned dashboard
+1. [#4791](https://github.com/influxdata/chronograf/pull/4791): Save fieldOptions to cells created from Data Explorer page
+1. [#4806](https://github.com/influxdata/chronograf/pull/4806): Fix grouping in canned dashboard queries
+1. [#4788](https://github.com/influxdata/chronograf/pull/4788): Update canned dashboard queries so they all use database and retention policy
+1. [#4808](https://github.com/influxdata/chronograf/pull/4808): Remove dismiss text from and add x-to-dismiss to wizard overlay steps
+1. [#4796](https://github.com/influxdata/chronograf/pull/4796): Update docker, influxdb and postresql protoboards
+
+## v1.7.2 [2018-11-08]
 
 ### Features
 
@@ -106,12 +277,24 @@
 
 ### Features
 
+
 ### UI Improvements
 1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
 
 ## v1.7.2 [2018-11-08]
 
 ### Bug Fixes
+1. [#4778](https://github.com/influxdata/chronograf/pull/4778): Remove hardcoded database/retention period from protoboards
+
+## v1.7.1 [2018-11-07]
+
+
+1. [#4809](https://github.com/influxdata/chronograf/pull/4809): Add loading spinners while fetching protoboards
+
+## v1.7.2 [2018-11-08]
+
+### Bug Fixes
+
 1. [#4778](https://github.com/influxdata/chronograf/pull/4778): Remove hardcoded database/retention period from protoboards
 
 ## v1.7.1 [2018-11-07]
@@ -126,9 +309,18 @@
 1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
 1. [#4776](https://github.com/influxdata/chronograf/pull/4776): Fix flux pivot function using wrong named parameters
 
+1. [#4758](https://github.com/influxdata/chronograf/pull/4758): Fix empty graph on alert rule creation page
+1. [#4764](https://github.com/influxdata/chronograf/pull/4764): Add protoboard environment variables to build scripts
+1. [#4768](https://github.com/influxdata/chronograf/pull/4768): Update dockerfile to include protoboards
+1. [#4769](https://github.com/influxdata/chronograf/pull/4769): Show manual refresh when paused
+1. [#4772](https://github.com/influxdata/chronograf/pull/4772): Add protoboards enviroment variables to dockerfile
+1. [#4767](https://github.com/influxdata/chronograf/pull/4767): Fix scroll loading indicator not hiding in logs
+1. [#4763](https://github.com/influxdata/chronograf/pull/4763): Fix log columns not rendering
+
 ## v1.7.0 [2018-11-06]
 
 ### Features
+
 1.  [#4217](https://github.com/influxdata/chronograf/pull/4217): Add filestore backed API for protodashboards
 1.  [#4220](https://github.com/influxdata/chronograf/pull/4220): Add ability to copy expanded/untruncated log message
 1.  [#4228](https://github.com/influxdata/chronograf/pull/4228): Add close button for logs pop over
@@ -156,6 +348,7 @@
 1.  [#4470](https://github.com/influxdata/chronograf/pull/4470): Add option to disable gzip compression
 
 ### UI Improvements
+
 1.  [#4227](https://github.com/influxdata/chronograf/pull/4227): Redesign Cell Editor Overlay for reuse in other parts of application
 1.  [#4268](https://github.com/influxdata/chronograf/pull/4268): Clear logs after searching
 1.  [#4253](https://github.com/influxdata/chronograf/pull/4253): Add search expression highlighting to log lines
@@ -179,6 +372,7 @@
 1.  [#4745](https://github.com/influxdata/chronograf/pull/4745): Fix dashboard link text casing changing quick select sort order
 
 ### Bug Fixes
+
 1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
 1.  [#4363](https://github.com/influxdata/chronograf/pull/4363): Position expanded log messages above logs table
 1.  [#4272](https://github.com/influxdata/chronograf/pull/4272): Fix logs loading description not displaying
@@ -197,9 +391,11 @@
 ## v1.6.2 [2018-09-06]
 
 ### UI Improvements
+
 1.  [#4225](https://github.com/influxdata/chronograf/pull/4225): Make infinite scroll UX in Log Viewer more crisp by decreasing results queried for at a time
 
 ### Bug Fixes
+
 1.  [#4231](https://github.com/influxdata/chronograf/pull/4231): Fix notifying user to press ESC to exit presentation mode
 1.  [#4234](https://github.com/influxdata/chronograf/pull/4234): Fix persisting whether or not template variable control bar is open
 1.  [#4235](https://github.com/influxdata/chronograf/pull/4235): Fix Submit Query button in Data Explorer to correctly return results
@@ -1030,10 +1226,10 @@ In versions 1.3.1+, installing a new version of Chronograf automatically clears 
 1.  [#1137](https://github.com/influxdata/chronograf/pull/1137): Clarify Kapacitor alert configuration for HipChat
 1.  [#1136](https://github.com/influxdata/chronograf/pull/1136): Remove series highlighting in line graphs
 1.  [#1124](https://github.com/influxdata/chronograf/pull/1124): Polish UI:
-    * Polish dashboard cell drag interaction
-    * Use Hover-To-Reveal UI pattern in all tables
-    * Clarify source Indicator & Graph Tips
-    * Improve DB Management page UI
+    - Polish dashboard cell drag interaction
+    - Use Hover-To-Reveal UI pattern in all tables
+    - Clarify source Indicator & Graph Tips
+    - Improve DB Management page UI
 1.  [#1187](https://github.com/influxdata/chronograf/pull/1187): Replace kill query confirmation modal with confirm buttons
 1.  [#1185](https://github.com/influxdata/chronograf/pull/1185): Alphabetically sort databases and retention policies on the admin page
 1.  [#1199](https://github.com/influxdata/chronograf/pull/1199): Move rename cell functionality to cell dropdown menu
@@ -1131,15 +1327,15 @@ In versions 1.3.1+, installing a new version of Chronograf automatically clears 
 3.  [#853](https://github.com/influxdata/chronograf/issues/853): Update builds to use yarn over npm install
 4.  [#860](https://github.com/influxdata/chronograf/issues/860): Add gzip encoding and caching of static assets to server
 5.  [#864](https://github.com/influxdata/chronograf/issues/864): Add support to Kapacitor rule alert configuration for:
-    * HTTP
-    * TCP
-    * Exec
-    * SMTP
-    * Alerta
+    - HTTP
+    - TCP
+    - Exec
+    - SMTP
+    - Alerta
 
 ### UI Improvements
 1.  [#822](https://github.com/influxdata/chronograf/issues/822): Simplify and improve the layout of the Data Explorer
-    * The Data Explorer's intention and purpose has always been the ad hoc and ephemeral exploration of your schema and data.
+    - The Data Explorer's intention and purpose has always been the ad hoc and ephemeral exploration of your schema and data.
       The concept of `Exploration` sessions and `Panels` betrayed this initial intention. The DE turned into a "poor man's"
       dashboarding tool. In turn, this introduced complexity in the code and the UI. In the future if I want to save, manipulate,
       and view multiple visualizations this will be done more efficiently and effectively in our dashboarding solution.

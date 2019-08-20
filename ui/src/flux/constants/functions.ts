@@ -926,6 +926,87 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/lowestmin',
   },
   {
+    name: 'lowestAverage',
+    args: [
+      {
+        name: 'n',
+        desc: 'Number of records to return.',
+        type: 'Integer',
+      },
+      {
+        name: 'columns',
+        desc: 'List of columns by which to sort. Default is `["_value"]`.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'groupColumns',
+        desc:
+          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    desc:
+      'Returns the bottom `n` records from all groups using the average of each group.',
+    example: 'lowestAverage(n:10, groupColumns: ["host"])',
+    category: 'Selectors',
+    link:
+      'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/lowestaverage',
+  },
+  {
+    name: 'lowestCurrent',
+    args: [
+      {
+        name: 'n',
+        desc: 'Number of records to return.',
+        type: 'Integer',
+      },
+      {
+        name: 'columns',
+        desc: 'List of columns by which to sort. Default is `["_value"]`.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'groupColumns',
+        desc:
+          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    desc:
+      'Returns the bottom `n` records from all groups using the last value of each group.',
+    example: 'lowestCurrent(n:10, groupColumns: ["host"])',
+    category: 'Selectors',
+    link:
+      'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/lowestcurrent',
+  },
+  {
+    name: 'lowestMin',
+    args: [
+      {
+        name: 'n',
+        desc: 'Number of records to return.',
+        type: 'Integer',
+      },
+      {
+        name: 'columns',
+        desc: 'List of columns by which to sort. Default is `["_value"]`.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'groupColumns',
+        desc:
+          'The columns on which to group before performing the aggregation. Default is `[]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    desc:
+      'Returns the bottom `n` records from all groups using the maximum of each group.',
+    example: 'lowestMin(n:10, groupColumns: ["host"])',
+    category: 'Selectors',
+    link:
+      'https://docs.influxdata.com/flux/latest/functions/transformations/selectors/lowestmin',
+  },
+  {
     name: 'map',
     args: [
       {
