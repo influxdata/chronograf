@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5265](https://github.com/influxdata/chronograf/pull/5265): fix github org pagination when user has > 10 orgs
+
 ### Features
 
 ## v1.7.13 [2019-08-20]
