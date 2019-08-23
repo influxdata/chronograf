@@ -1,10 +1,3 @@
-## v1.7.13
-### Bug Fixes
-1. [#5217](https://github.com/influxdata/chronograf/pull/5217): Fix scroll to row bug on table graphs
-1. [#5170](https://github.com/influxdata/chronograf/pull/5170): Wrap inline commas in quotes to distinguish from csv delimiters
-1. [#5225](https://github.com/influxdata/chronograf/pull/5225): Fix tickscript editor syntax coloring
-1. [#5227](https://github.com/influxdata/chronograf/pull/5227): Fix Fix JWK check when using login_id
-1. [#5249](https://github.com/influxdata/chronograf/pull/5249): Fix dashboard typos
 ## v1.7.14
 
 ### Bug Fixes
