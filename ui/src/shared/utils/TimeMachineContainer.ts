@@ -150,6 +150,10 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
           return true
         }
 
+        if (!query) {
+          return true
+        }
+
         const queries = query.split(';')
         let isSavable = true
         for (let i = 0; i <= queries.length; i++) {
