@@ -2,6 +2,9 @@
 
 ### Bug Fixes
 
+1. [#5263](https://github.com/influxdata/chronograf/pull/5263): Fix DataExplorer crashing due to empty query
+1. [#5166](https://github.com/influxdata/chronograf/pull/5266): Fix styles in Kapacitor alert config page
+
 ### Features
 
 ## v1.7.13 [2019-08-20]
