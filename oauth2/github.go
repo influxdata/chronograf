@@ -140,10 +140,10 @@ func getOrganizations(client *github.Client, log chronograf.Logger) ([]*github.O
 	// Get all pages of results
 	var allOrgs []*github.Organization
 	ctx := context.Background()
+	opt := &github.ListOptions{
+		PerPage: 10,
+	}
 	for {
-		opt := &github.ListOptions{
-			PerPage: 10,
-		}
 		// Get the organizations for the current authenticated user.
 		orgs, resp, err := client.Organizations.List(ctx, "", opt)
 		if err != nil {
