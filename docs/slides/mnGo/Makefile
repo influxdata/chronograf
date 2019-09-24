@@ -2,7 +2,6 @@
 
 VERSION ?= $(shell git describe --always --tags)
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
-GDM := $(shell command -v gdm 2> /dev/null)
 GOBINDATA := $(shell go list -f {{.Root}}  github.com/kevinburke/go-bindata 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
 
@@ -20,7 +19,7 @@ build: assets ${BINARY}
 
 dev: dep dev-assets ${BINARY}
 
-${BINARY}: $(SOURCES) .bindata .jsdep .godep
+${BINARY}: $(SOURCES) .bindata .jsdep
 	go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
 
 docker-${BINARY}: $(SOURCES)
@@ -54,19 +53,7 @@ canned/bin_gen.go: canned/*.json
 	cd ui && npm run build:dev
 	@touch .dev-jssrc
 
-dep: .jsdep .godep
-
-.godep: Godeps
-ifndef GDM
-	@echo "Installing GDM"
-	go get github.com/sparrc/gdm
-endif
-ifndef GOBINDATA
-	@echo "Installing go-bindata"
-	go get -u github.com/kevinburke/go-bindata/...
-endif
-	gdm restore
-	@touch .godep
+dep: .jsdep
 
 .jsdep: ui/yarn.lock
 ifndef YARN
@@ -101,7 +88,7 @@ clean:
 	cd ui && npm run clean
 	cd ui && rm -rf node_modules
 	rm -f dist/dist_gen.go canned/bin_gen.go server/swagger_gen.go
-	@rm -f .godep .jsdep .jssrc .dev-jssrc .bindata
+	@rm -f .jsdep .jssrc .dev-jssrc .bindata
 
 continuous:
 	while true; do if fswatch -r --one-event .; then echo "#-> Starting build: `date`"; make dev; pkill chronograf; ./chronograf -d --log-level=debug & echo "#-> Build complete."; fi; sleep 0.5; done
