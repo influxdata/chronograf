@@ -2547,7 +2547,7 @@
             "in": "body",
             "description": "Configuration options for new dashboard",
             "schema": {
-              "$ref": "#/definitions/Dashboard"
+              "$ref": "#/definitions/DashboardCreate"
             }
           }
         ],
@@ -5668,6 +5668,56 @@
             "$ref": "#/definitions/Dashboard"
           }
         }
+      }
+    },
+    "DashboardCreate": {
+      "type": "object",
+      "properties": {
+        "cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Cell"
+          }
+        },
+        "name": {
+          "description": "the user-facing name of the dashboard",
+          "type": "string"
+        }
+      },
+      "example": {
+        "cells": [
+          {
+            "x": 5,
+            "y": 5,
+            "w": 4,
+            "h": 4,
+            "name": "usage_user",
+            "queries": [
+              {
+                "query": "SELECT mean(\"usage_user\") AS \"usage_user\" FROM \"cpu\"",
+                "db": "telegraf",
+                "label": "%"
+              }
+            ],
+            "type": "line"
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 4,
+            "h": 4,
+            "name": "usage_system",
+            "queries": [
+              {
+                "query": "SELECT mean(\"usage_system\") AS \"usage_system\" FROM \"cpu\"",
+                "db": "telegraf",
+                "label": "%"
+              }
+            ],
+            "type": "line"
+          }
+        ],
+        "name": "lalalalala"
       }
     },
     "Dashboard": {
