@@ -1,9 +1,9 @@
-## v1.7.14
 ## v1.7.15
 
 ### Bug Fixes
 
 1. [#5265](https://github.com/influxdata/chronograf/pull/5265): fix github org pagination when user has > 10 orgs
+1. [#5306](https://github.com/influxdata/chronograf/pull/5306): making http requests on https server results in http 400
 
 ### Features
 

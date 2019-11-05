@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM ubuntu:bionic
 
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     apt-transport-https \
@@ -20,18 +20,18 @@ RUN pip install boto requests python-jose --upgrade
 RUN gem install fpm
 
 # Install node
-ENV NODE_VERSION v10.14.2
+ENV NODE_VERSION v12.13.0
 RUN wget -q https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz; \
    tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C / --strip-components=1; \
    rm -f node-${NODE_VERSION}-linux-x64.tar.gz
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list &&  \
-    apt-get update && sudo apt-get install yarn
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&  \
+    apt-get update -y && apt-get install yarn -y
 
 # Install go
 ENV GOPATH /root/go
-ENV GO_VERSION 1.12
+ENV GO_VERSION 1.12.10
 ENV GO_ARCH amd64
 ENV GO111MODULES ON
 RUN wget https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz; \
