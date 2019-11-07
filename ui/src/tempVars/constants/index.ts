@@ -1,7 +1,10 @@
 import uuid from 'uuid'
 
 import {TimeRange} from 'src/types/queries'
-import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
+import {
+  TEMP_VAR_DASHBOARD_TIME,
+  TEMP_VAR_UPPER_DASHBOARD_TIME,
+} from 'src/shared/constants'
 import {Template, TemplateType, TemplateValueType} from 'src/types'
 
 interface TemplateTypesListItem {
@@ -216,7 +219,7 @@ export const unMask = query => {
   return query.replace(/😸/g, ':')
 }
 export const TEMPLATE_RANGE: TimeRange = {
-  upper: null,
+  upper: TEMP_VAR_UPPER_DASHBOARD_TIME,
   lower: TEMP_VAR_DASHBOARD_TIME,
 }
 
