@@ -16,9 +16,10 @@ import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {FluxToolbarFunction} from 'src/types/flux'
 
 interface PassedProps {
-  onInsertFluxFunction: (functionName: string, text: string) => void
+  onInsertFluxFunction: (fluxFunction: FluxToolbarFunction) => void
 }
 
 interface ConnectedProps {
@@ -71,11 +72,8 @@ class FluxFunctionsToolbar extends PureComponent<Props, State> {
     )
   }
 
-  private handleClickFunction = (
-    fluxFunction: string,
-    funcExample: string
-  ): void => {
-    this.props.onInsertFluxFunction(fluxFunction, funcExample)
+  private handleClickFunction = (fluxFunction: FluxToolbarFunction): void => {
+    this.props.onInsertFluxFunction(fluxFunction)
   }
 
   private handleSearch = (searchTerm: string): void => {

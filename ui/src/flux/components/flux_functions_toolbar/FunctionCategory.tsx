@@ -13,7 +13,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 interface Props {
   category: string
   funcs: FluxToolbarFunction[]
-  onClickFunction: (funcName: string, funcExample: string) => void
+  onClickFunction: (funcName: FluxToolbarFunction) => void
 }
 
 @ErrorHandling

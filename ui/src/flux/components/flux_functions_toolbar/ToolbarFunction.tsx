@@ -12,7 +12,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   func: FluxToolbarFunction
-  onClickFunction: (funcName: string, funcExample: string) => void
+  onClickFunction: (func: FluxToolbarFunction) => void
 }
 
 interface State {
@@ -79,7 +79,7 @@ class ToolbarFunction extends PureComponent<Props, State> {
   private handleClickFunction = () => {
     const {func, onClickFunction} = this.props
 
-    onClickFunction(func.name, func.example)
+    onClickFunction(func)
   }
 }
 
