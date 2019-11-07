@@ -8,6 +8,8 @@ export enum ActionTypes {
   ToggleTemplateVariableControlBar = 'TOGGLE_TEMPLATE_VARIABLE_CONTROL_BAR',
   Noop = 'NOOP',
   SetTimeZone = 'SET_TIME_ZONE',
+  SetTelegrafSystemInterval = 'SET_TELEGRAF_SYSTEM_INTERVAL',
+  SetHostPageDisplayStatus = 'SET_HOST_PAGE_DISPLAY_STATUS',
 }
 
 export type Action =
@@ -16,6 +18,8 @@ export type Action =
   | SetAutoRefreshAction
   | ToggleTemplateVariableControlBarAction
   | SetTimeZoneAction
+  | SetTelegrafSystemIntervalAction
+  | SetHostPageDisplayStatusAction
 
 export type EnablePresentationModeActionCreator = () => EnablePresentationModeAction
 
@@ -52,5 +56,19 @@ export interface SetTimeZoneAction {
   type: ActionTypes.SetTimeZone
   payload: {
     timeZone: TimeZones
+  }
+}
+
+export interface SetTelegrafSystemIntervalAction {
+  type: ActionTypes.SetTelegrafSystemInterval
+  payload: {
+    telegrafSystemInterval: string
+  }
+}
+
+export interface SetHostPageDisplayStatusAction {
+  type: ActionTypes.SetHostPageDisplayStatus
+  payload: {
+    hostPageDisabled: boolean
   }
 }

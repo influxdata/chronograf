@@ -35,7 +35,7 @@ func TestEnvironment(t *testing.T) {
 			wants: wants{
 				statusCode:  200,
 				contentType: "application/json",
-				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"1m0s"}`,
+				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"1m0s","hostPageDisabled":false}`,
 			},
 		},
 	}

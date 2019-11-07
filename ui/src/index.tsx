@@ -43,10 +43,12 @@ import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {getLinksAsync} from 'src/shared/actions/links'
 import {getMeAsync} from 'src/shared/actions/auth'
-
 import {disablePresentationMode} from 'src/shared/actions/app'
 import {errorThrown} from 'src/shared/actions/errors'
 import {notify} from 'src/shared/actions/notifications'
+import {setHostPageDisplayStatus} from 'src/shared/actions/env'
+
+import {getEnv} from 'src/shared/apis/env'
 
 import 'src/style/chronograf.scss'
 
@@ -90,6 +92,15 @@ window.addEventListener('keyup', event => {
 
 const history = syncHistoryWithStore(browserHistory, store)
 
+const populateEnv = async url => {
+  try {
+    const envVars = await getEnv(url)
+    dispatch(setHostPageDisplayStatus(envVars.hostPageDisabled))
+  } catch (error) {
+    console.error('Error fetching envVars', error)
+  }
+}
+
 interface State {
   ready: boolean
 }
@@ -112,6 +123,7 @@ class Root extends PureComponent<{}, State> {
     try {
       await this.getLinks()
       await this.checkAuth()
+      await populateEnv(store.getState().links.environment)
       this.setState({ready: true})
     } catch (error) {
       dispatch(errorThrown(error))
@@ -123,6 +135,9 @@ class Root extends PureComponent<{}, State> {
   }
 
   public render() {
+    // renaming this to make it easier to reason about
+    const hostPageIsEnabled = !store.getState().env.hostPageDisabled
+
     return this.state.ready ? (
       <ReduxProvider store={store}>
         <UnstatedProvider>
@@ -146,8 +161,12 @@ class Root extends PureComponent<{}, State> {
             >
               <Route component={CheckSources}>
                 <Route path="status" component={StatusPage} />
-                <Route path="hosts" component={HostsPage} />
-                <Route path="hosts/:hostID" component={HostPage} />
+                {hostPageIsEnabled && (
+                  <>
+                    <Route path="hosts" component={HostsPage} />
+                    <Route path="hosts/:hostID" component={HostPage} />
+                  </>
+                )}
                 <Route
                   path="chronograf/data-explorer"
                   component={DataExplorerPage}

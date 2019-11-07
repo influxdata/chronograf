@@ -13,6 +13,7 @@
 1. [#5352](https://github.com/influxdata/chronograf/pull/5352): Add etcd as an alternate backend store
 1. [#5367](https://github.com/influxdata/chronograf/pull/5367): Template variables can now select their source database
 1. [#5362](https://github.com/influxdata/chronograf/pull/5362): Add migrate command to chronoctl
+1. [#5308](https://github.com/influxdata/chronograf/pull/5308): The hosts page can be disabled by setting the new environment variable `HOST_PAGE_DISABLED` to `true`, or by passing in `--host-page-disabled` or `-H` flags
 
 ### Other
 

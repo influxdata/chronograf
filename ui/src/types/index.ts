@@ -66,9 +66,11 @@ import {JSONFeedData} from './status'
 import {Annotation} from './annotations'
 import {WriteDataMode, QueryUpdateState} from './dataExplorer'
 import {Host, Layout} from './hosts'
+import {Env} from './env'
 
 export {
   Me,
+  Env,
   Links,
   Role,
   User,
