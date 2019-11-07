@@ -144,15 +144,17 @@ export function buildWhereClause({
     timeClauses.push(`time < ${upper}`)
   }
 
-  // If a tag key has more than one value, * e.g. cpu=cpu1, cpu=cpu2, combine
-  // them with OR instead of AND for the final query.
+  // If a tag key has more than one tag value and areTagsAccepted is true
+  // join the tag key with OR (i.e. cpu=cpu1 OR cpu=cpu2)
+  // otherwise
+  // join the tag key with an AND (i.e. cpu!=cpu1 AND cpu!=cpu2)
+  // we do this because cpu!=cpu1 AND cpu!=cpu2 excludes no data
   const tagClauses = _.keys(tags).map(k => {
     const operator = areTagsAccepted ? '=' : '!='
+    const cond = areTagsAccepted ? ' OR ' : ' AND '
 
     if (tags[k].length > 1) {
-      const joinedOnOr = tags[k]
-        .map(v => `"${k}"${operator}'${v}'`)
-        .join(' OR ')
+      const joinedOnOr = tags[k].map(v => `"${k}"${operator}'${v}'`).join(cond)
       return `(${joinedOnOr})`
     }
 
