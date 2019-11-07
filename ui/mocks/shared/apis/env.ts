@@ -1,1 +1,2 @@
-export const getEnv = () => Promise.resolve({telegrafSystemInterval: '1m0s'})
+export const getEnv = () =>
+  Promise.resolve({telegrafSystemInterval: '1m0s', hostPageDisabled: false})

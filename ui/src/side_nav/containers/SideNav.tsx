@@ -17,7 +17,7 @@ import {DEFAULT_HOME_PAGE} from 'src/shared/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {Params, Location, Links, Me} from 'src/types/sideNav'
-import {Source} from 'src/types'
+import {Env, Source} from 'src/types'
 
 interface Props {
   sources: Source[]
@@ -28,6 +28,7 @@ interface Props {
   logoutLink?: string
   links?: Links
   me: Me
+  env: Env
 }
 
 @ErrorHandling
@@ -45,6 +46,7 @@ class SideNav extends PureComponent<Props> {
       logoutLink,
       links,
       me,
+      env,
       sources = [],
     } = this.props
 
@@ -55,6 +57,8 @@ class SideNav extends PureComponent<Props> {
     const dataExplorerLink = `${sourcePrefix}/chronograf/data-explorer`
 
     const isDefaultPage = location.split('/').includes(DEFAULT_HOME_PAGE)
+
+    const hostPageIsEnabled = !env.hostPageDisabled
 
     return isHidden ? null : (
       <nav className="sidebar">
@@ -68,14 +72,16 @@ class SideNav extends PureComponent<Props> {
             <span className="sidebar--icon icon cubo-uniform" />
           </Link>
         </div>
-        <NavBlock
-          highlightWhen={['hosts']}
-          icon="eye"
-          link={`${sourcePrefix}/hosts`}
-          location={location}
-        >
-          <NavHeader link={`${sourcePrefix}/hosts`} title="Host List" />
-        </NavBlock>
+        {hostPageIsEnabled && (
+          <NavBlock
+            highlightWhen={['hosts']}
+            icon="eye"
+            link={`${sourcePrefix}/hosts`}
+            location={location}
+          >
+            <NavHeader link={`${sourcePrefix}/hosts`} title="Host List" />
+          </NavBlock>
+        )}
         <NavBlock
           highlightWhen={['data-explorer']}
           icon="graphline-2"
@@ -163,14 +169,14 @@ class SideNav extends PureComponent<Props> {
             title="Configuration"
           />
         </NavBlock>
-        {isUsingAuth ? (
+        {isUsingAuth && (
           <UserNavBlock
             logoutLink={logoutLink}
             links={links}
             me={me}
             sourcePrefix={sourcePrefix}
           />
-        ) : null}
+        )}
       </nav>
     )
   }
@@ -183,12 +189,14 @@ const mapStateToProps = ({
     ephemeral: {inPresentationMode},
   },
   links,
+  env,
 }) => ({
   sources,
   isHidden: inPresentationMode,
   isUsingAuth,
   logoutLink,
   links,
+  env,
   me,
 })
 

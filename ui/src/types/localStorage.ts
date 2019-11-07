@@ -8,6 +8,8 @@ export interface LocalStorage {
   timeRange: TimeRange
   script: string
   logs: LogsState
+  telegrafSystemInterval: string
+  hostPageDisabled: boolean
 }
 
 export type VERSION = string

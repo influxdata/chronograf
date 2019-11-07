@@ -9,6 +9,7 @@ import (
 type envResponse struct {
 	Links                  selfLinks `json:"links"`
 	TelegrafSystemInterval string    `json:"telegrafSystemInterval"`
+	HostPageDisabled       bool      `json:"hostPageDisabled"`
 }
 
 func newEnvResponse(env chronograf.Environment) *envResponse {
@@ -17,6 +18,7 @@ func newEnvResponse(env chronograf.Environment) *envResponse {
 			Self: "/chronograf/v1/env",
 		},
 		TelegrafSystemInterval: env.TelegrafSystemInterval.String(),
+		HostPageDisabled:       env.HostPageDisabled,
 	}
 }
 
