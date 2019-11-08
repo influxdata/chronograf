@@ -2,6 +2,7 @@ import {Position} from 'codemirror'
 
 // Constants
 import {FROM, UNION} from 'src/flux/constants/functions'
+import {FluxToolbarFunction} from 'src/types/flux'
 
 const rejoinScript = (scriptLines: string[]): string => {
   return scriptLines.join('\n')
@@ -14,7 +15,6 @@ const insertAtLine = (
   insertOnSameLine?: boolean
 ): string => {
   const front = scriptLines.slice(0, lineNumber)
-
   const backStartIndex = insertOnSameLine ? lineNumber + 1 : lineNumber
   const back = scriptLines.slice(backStartIndex)
 
@@ -57,9 +57,9 @@ const formatFunctionForInsert = (funcName: string, fluxFunction: string) => {
 }
 
 const getCursorPosition = (
-  insertLineNumber,
-  formattedFunction,
-  funcName
+  insertLineNumber: number,
+  formattedFunction: string,
+  funcName: string
 ): Position => {
   const ch = formattedFunction.length - 1
   const line = functionRequiresNewLine(funcName)
@@ -69,30 +69,50 @@ const getCursorPosition = (
   return {line, ch}
 }
 
+const genImport = (script: string, funcPackage: string) => {
+  const importStatement = `import "${funcPackage}"`
+
+  if (!funcPackage || script.includes(importStatement)) {
+    return ''
+  }
+
+  return importStatement
+}
+
 export const insertFluxFunction = (
   currentLineNumber: number,
   currentScript: string,
-  functionName: string,
-  fluxFunction: string
+  func: FluxToolbarFunction
 ): {updatedScript: string; cursorPosition: Position} => {
+  const {name, example} = func
+
   const scriptLines = currentScript.split('\n')
-  const insertLineNumber = getInsertLineNumber(currentLineNumber, scriptLines)
+
+  let insertLineNumber = getInsertLineNumber(currentLineNumber, scriptLines)
+
   const insertOnSameLine = currentLineNumber === insertLineNumber
 
-  const formattedFunction = formatFunctionForInsert(functionName, fluxFunction)
+  const formattedFunction = formatFunctionForInsert(name, example)
 
-  const updatedScript = insertAtLine(
+  let nextScript = insertAtLine(
     insertLineNumber,
     scriptLines,
     formattedFunction,
     insertOnSameLine
   )
 
-  const updatedCursorPosition = getCursorPosition(
+  const importStatement = genImport(nextScript, func.package)
+
+  if (importStatement) {
+    nextScript = `${importStatement}\n${nextScript}`
+    insertLineNumber += 1
+  }
+
+  const nextCursorPos = getCursorPosition(
     insertLineNumber,
     formattedFunction,
-    functionName
+    name
   )
 
-  return {updatedScript, cursorPosition: updatedCursorPosition}
+  return {updatedScript: nextScript, cursorPosition: nextCursorPos}
 }

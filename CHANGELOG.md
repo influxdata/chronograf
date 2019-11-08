@@ -5,6 +5,7 @@
 1. [#5265](https://github.com/influxdata/chronograf/pull/5265): fix github org pagination when user has > 10 orgs
 1. [#5306](https://github.com/influxdata/chronograf/pull/5306): making http requests on https server results in http 400
 1. [#5305](https://github.com/influxdata/chronograf/pull/5305): Upgrade to flux v0.50.2
+1. [#5310](https://github.com/influxdata/chronograf/pull/5310): Update the flux functions list for Flux v0.50.2
 1. [#5309](https://github.com/influxdata/chronograf/pull/5309): fix date range picker in data explorer
 
 ### Features

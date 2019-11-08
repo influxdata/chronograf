@@ -25,7 +25,12 @@ import {insertFluxFunction} from 'src/flux/helpers/scriptInsertion'
 
 // Types
 import {NotificationAction, Source} from 'src/types'
-import {Suggestion, Links, ScriptStatus} from 'src/types/flux'
+import {
+  Suggestion,
+  Links,
+  ScriptStatus,
+  FluxToolbarFunction,
+} from 'src/types/flux'
 
 const CHECK_SCRIPT_DELAY = 600
 const VALID_SCRIPT_STATUS = {type: 'success', text: ''}
@@ -165,8 +170,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   private handleInsertFluxFunction = async (
-    functionName: string,
-    fluxFunction: string
+    fluxFunction: FluxToolbarFunction
   ): Promise<void> => {
     const {draftScript} = this.props
     const {line} = this.cursorPosition
@@ -174,7 +178,6 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     const {updatedScript, cursorPosition} = insertFluxFunction(
       line,
       draftScript,
-      functionName,
       fluxFunction
     )
     await this.handleChangeDraftScript(updatedScript)
