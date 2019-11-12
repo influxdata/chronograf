@@ -1,7 +1,14 @@
-## v1.7.15
+## v1.7.16
 
 ### Bug Fixes
 
+### Features
+
+## v1.7.15 [2019-11-12]
+
+### Bug Fixes
+
+1. [#5295](https://github.com/influxdata/chronograf/pull/5295): remove optional id in  create dashboard swagger
 1. [#5265](https://github.com/influxdata/chronograf/pull/5265): fix github org pagination when user has > 10 orgs
 1. [#5306](https://github.com/influxdata/chronograf/pull/5306): making http requests on https server results in http 400
 1. [#5305](https://github.com/influxdata/chronograf/pull/5305): Upgrade to flux v0.50.2
