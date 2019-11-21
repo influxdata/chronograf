@@ -1,5 +1,10 @@
 ## v1.7.15
 
+### Features
+1. [5324](https://github.com/influxdata/chronograf/pull/5324): Pin to latest minor go version; make Docker build process more robust
+
+## v1.7.15
+
 ### Bug Fixes
 
 1. [#5265](https://github.com/influxdata/chronograf/pull/5265): fix github org pagination when user has > 10 orgs
