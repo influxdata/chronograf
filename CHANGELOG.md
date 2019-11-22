@@ -1,3 +1,11 @@
+## v1.7.16
+
+### Bug Fixes
+
+1. [#5265](https://github.com/influxdata/chronograf/pull/5323): fix(schema-explorer): update the flux schema explorer to use v1 package
+
+### Features
+
 ## v1.7.15
 
 ### Features
