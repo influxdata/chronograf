@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 1. [#5265](https://github.com/influxdata/chronograf/pull/5323): fix(schema-explorer): update the flux schema explorer to use v1 package
+1. [5326](https://github.com/influxdata/chronograf/pull/5326): fix(ui): use a fallback label for y-axis if it's available
 
 ### Features
 
