@@ -1,7 +1,10 @@
 package kapacitor
 
-import "testing"
-import "github.com/influxdata/chronograf"
+import (
+	"testing"
+
+	"github.com/influxdata/chronograf"
+)
 
 func TestValidateAlert(t *testing.T) {
 	tests := []struct {
@@ -36,6 +39,16 @@ func Test_validateTick(t *testing.T) {
 		{
 			name:    "Valid Script",
 			script:  "stream|from()",
+			wantErr: false,
+		},
+		{
+			name:    "Valid stream Script with batch string",
+			script:  "stream|from().database('batch')",
+			wantErr: false,
+		},
+		{
+			name:    "Valid batch Script",
+			script:  "batch|query('select * from bar')",
 			wantErr: false,
 		},
 		{
