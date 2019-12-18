@@ -38,9 +38,13 @@ func validateTick(script chronograf.TICKScript) error {
 	return err
 }
 
+func isBatchTask(script string) bool {
+	return strings.Contains(script, "batch ") || strings.Contains(script, "batch|") || strings.Contains(script, "batch\n")
+}
+
 func newPipeline(script chronograf.TICKScript) (*pipeline.Pipeline, error) {
 	edge := pipeline.StreamEdge
-	if strings.Contains(string(script), "batch") {
+	if isBatchTask(string(script)) {
 		edge = pipeline.BatchEdge
 	}
 
