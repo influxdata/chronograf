@@ -48,6 +48,37 @@ func TestConvert(t *testing.T) {
 			},
 		},
 		{
+			name:     "Test upperDashboardTime",
+			influxQL: `SELECT "usage_idle", "usage_guest_nice", "usage_system", "usage_guest" FROM "telegraf"."autogen"."cpu" WHERE time > :dashboardTime: AND time < :upperDashboardTime:`,
+			want: chronograf.QueryConfig{
+				Database:        "telegraf",
+				Measurement:     "cpu",
+				RetentionPolicy: "autogen",
+				Fields: []chronograf.Field{
+					chronograf.Field{
+						Value: "usage_idle",
+						Type:  "field",
+					},
+					chronograf.Field{
+						Value: "usage_guest_nice",
+						Type:  "field",
+					},
+					chronograf.Field{
+						Value: "usage_system",
+						Type:  "field",
+					},
+					chronograf.Field{
+						Value: "usage_guest",
+						Type:  "field",
+					},
+				},
+				Tags: map[string][]string{},
+				GroupBy: chronograf.GroupBy{
+					Tags: []string{},
+				},
+			},
+		},
+		{
 			name:     "Test field function order",
 			influxQL: `SELECT mean("usage_idle"), median("usage_idle"), count("usage_guest_nice"), mean("usage_guest_nice") FROM "telegraf"."autogen"."cpu" WHERE time > :dashboardTime:`,
 			want: chronograf.QueryConfig{

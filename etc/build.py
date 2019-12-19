@@ -189,7 +189,7 @@ def go_get(branch, update=False, no_uncommitted=False):
     if local_changes() and no_uncommitted:
         logging.error("There are uncommitted changes in the current directory.")
         return False
-    run("make dep", shell=True, print_output=True)
+    run("make dep -B", shell=True, print_output=True)
     end_time = datetime.utcnow()
     logging.info("Time taken: {}s".format((end_time - start_time).total_seconds()))
     return True

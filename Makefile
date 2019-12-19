@@ -58,7 +58,7 @@ server/swagger_gen.go: server/swagger.json
 
 canned/bin_gen.go: canned/*.json
 	go generate -x ./canned
-	
+
 protoboards/bin_gen.go: protoboards/*.json
 	go generate -x ./protoboards
 
@@ -78,7 +78,7 @@ endif
 
 .jsdep: ui/yarn.lock
 ifndef YARN
-	$(error Please install yarn 0.19.1+)
+	$(error Please install yarn 1.19.1+)
 else
 	cd ui && yarn --no-progress --no-emoji
 	@touch .jsdep
