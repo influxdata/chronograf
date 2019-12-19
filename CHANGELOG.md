@@ -1,12 +1,17 @@
-## v1.7.16
-## v1.7.16
+## v1.7.17
 
 ### Bug Fixes
 
-1. [#5265](https://github.com/influxdata/chronograf/pull/5323): fix(schema-explorer): update the flux schema explorer to use v1 package
-1. [#5326](https://github.com/influxdata/chronograf/pull/5326): fix(ui): use a fallback label for y-axis if it's available
-1. [#5334](https://github.com/influxdata/chronograf/pull/5334): fix(influx): allow upperDashboardTime when generating query config
-1. [#5335](https://github.com/influxdata/chronograf/pull/5335): fix(kapacitor): use better heuristic than string contains `batch` when creating tasks
+### Features
+
+## v1.7.16 [2019-12-18]
+
+### Bug Fixes
+
+1. [#5265](https://github.com/influxdata/chronograf/pull/5323): Update the flux schema explorer to use v1 package
+1. [#5326](https://github.com/influxdata/chronograf/pull/5326): Use a fallback label for y-axis if it's available
+1. [#5334](https://github.com/influxdata/chronograf/pull/5334): Allow `:upperDashboardTime:` when generating query config
+1. [#5335](https://github.com/influxdata/chronograf/pull/5335): Use better heuristic than string contains `batch` when creating tasks
 
 ### Features
 
@@ -26,7 +31,7 @@
 
 ### Bug Fixes
 
-1. [#5295](https://github.com/influxdata/chronograf/pull/5295): remove optional id in  create dashboard swagger
+1. [#5295](https://github.com/influxdata/chronograf/pull/5295): remove optional id in create dashboard swagger
 1. [#5265](https://github.com/influxdata/chronograf/pull/5265): fix github org pagination when user has > 10 orgs
 1. [#5306](https://github.com/influxdata/chronograf/pull/5306): making http requests on https server results in http 400
 1. [#5305](https://github.com/influxdata/chronograf/pull/5305): Upgrade to flux v0.50.2
