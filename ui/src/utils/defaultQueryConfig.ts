@@ -28,7 +28,7 @@ const defaultQueryConfig = (
     status: null,
     shifts: [],
     fill: null,
-    range: TEMPLATE_RANGE,
+    range: isKapacitorRule ? {...TEMPLATE_RANGE, upper: null} : TEMPLATE_RANGE,
     originalQuery: null,
   }
 
