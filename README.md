@@ -135,8 +135,7 @@ option.
 
 ## Versions
 
-The most recent version of Chronograf is
-[v1.7.11](https://www.influxdata.com/downloads/).
+Find the most recent version of Chronograf [here](https://www.influxdata.com/downloads/).
 
 Spotted a bug or have a feature request? Please open
 [an issue](https://github.com/influxdata/chronograf/issues/new)!
