@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5340](https://github.com/influxdata/chronograf/pull/5340): Allow logging out when using Oauth
+
 ### Features
 
 ## v1.7.16 [2019-12-18]
