@@ -17,9 +17,9 @@ import (
 	"time"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/bolt"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/kv/bolt"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 	client "github.com/influxdata/usage-client/v1"
@@ -249,7 +249,7 @@ func (s *Server) useTLS() bool {
 	return s.Cert != ""
 }
 
-// NewListener will an http or https listener depending useTLS()
+// NewListener will return an http or https listener depending useTLS().
 func (s *Server) NewListener() (net.Listener, error) {
 	addr := net.JoinHostPort(s.Host, strconv.Itoa(s.Port))
 	if !s.useTLS() {
@@ -273,10 +273,10 @@ func (s *Server) NewListener() (net.Listener, error) {
 	listener, err := tls.Listen("tcp", addr, &tls.Config{
 		Certificates: []tls.Certificate{cert},
 	})
-
 	if err != nil {
 		return nil, err
 	}
+
 	return listener, nil
 }
 
@@ -330,16 +330,17 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 }
 
 // Serve starts and runs the chronograf server
-func (s *Server) Serve(ctx context.Context) error {
+func (s *Server) Serve(ctx context.Context) {
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
-	_, err := NewCustomLinks(s.CustomLinks)
+	customLinks, err := NewCustomLinks(s.CustomLinks)
 	if err != nil {
 		logger.
 			WithField("component", "server").
 			WithField("CustomLink", "invalid").
 			Error(err)
-		return err
+		return
 	}
+
 	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), s.ProtoboardsPath, logger, s.useAuth())
 	service.SuperAdminProviderGroups = superAdminProviderGroups{
 		auth0: s.Auth0SuperAdminOrg,
@@ -347,12 +348,13 @@ func (s *Server) Serve(ctx context.Context) error {
 	service.Env = chronograf.Environment{
 		TelegrafSystemInterval: s.TelegrafSystemInterval,
 	}
+
 	if err := service.HandleNewSources(ctx, s.NewSources); err != nil {
 		logger.
 			WithField("component", "server").
 			WithField("new-sources", "invalid").
 			Error(err)
-		return err
+		return
 	}
 
 	if !validBasepath(s.Basepath) {
@@ -361,7 +363,7 @@ func (s *Server) Serve(ctx context.Context) error {
 			WithField("component", "server").
 			WithField("basepath", "invalid").
 			Error(err)
-		return err
+		return
 	}
 
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){}
@@ -381,17 +383,17 @@ func (s *Server) Serve(ctx context.Context) error {
 		ProviderFuncs: providerFuncs,
 		Basepath:      s.Basepath,
 		StatusFeedURL: s.StatusFeedURL,
-		CustomLinks:   s.CustomLinks,
+		CustomLinks:   customLinks,
 		PprofEnabled:  s.PprofEnabled,
 		DisableGZip:   s.DisableGZip,
 	}, service)
 
 	// Add chronograf's version header to all requests
-	s.handler = Version(s.BuildInfo.Version, s.handler)
+	s.handler = version(s.BuildInfo.Version, s.handler)
 
 	if s.useTLS() {
 		// Add HSTS to instruct all browsers to change from http to https
-		s.handler = HSTS(s.handler)
+		s.handler = hsts(s.handler)
 	}
 
 	listener, err := s.NewListener()
@@ -399,7 +401,7 @@ func (s *Server) Serve(ctx context.Context) error {
 		logger.
 			WithField("component", "server").
 			Error(err)
-		return err
+		return
 	}
 	s.Listener = listener
 
@@ -434,14 +436,12 @@ func (s *Server) Serve(ctx context.Context) error {
 		logger.
 			WithField("component", "server").
 			Error(err)
-		return err
+		return
 	}
 
 	logger.
 		WithField("component", "server").
 		Info("Stopped serving chronograf at ", scheme, "://", s.Listener.Addr())
-
-	return nil
 }
 
 func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, protoboardsPath string, logger chronograf.Logger, useAuth bool) Service {

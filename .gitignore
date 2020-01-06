@@ -2,6 +2,7 @@
 ui/reports/
 build/
 backup/
+vendor/
 .vscode/
 
 # Binaries

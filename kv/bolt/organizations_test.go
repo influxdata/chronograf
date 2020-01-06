@@ -7,7 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/bolt"
+	"github.com/influxdata/chronograf/kv/bolt"
 	"github.com/influxdata/chronograf/roles"
 )
 

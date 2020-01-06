@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/influxdata/chronograf"
@@ -39,12 +39,9 @@ func main() {
 	}
 
 	if srv.ShowVersion {
-		log.Printf("Chronograf %s (git: %s)\n", version, commit)
+		fmt.Printf("Chronograf %s (git: %s)\n", version, commit)
 		os.Exit(0)
 	}
 
-	ctx := context.Background()
-	if err := srv.Serve(ctx); err != nil {
-		log.Fatalln(err)
-	}
+	srv.Serve(context.Background())
 }

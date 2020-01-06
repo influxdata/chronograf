@@ -6,7 +6,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/bolt/internal"
+	"github.com/influxdata/chronograf/kv/bolt/internal"
 )
 
 // Ensure UsersStore implements chronograf.UsersStore.

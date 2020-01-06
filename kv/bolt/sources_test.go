@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/bolt"
+	"github.com/influxdata/chronograf/kv/bolt"
 )
 
 // Ensure an SourceStore can store, retrieve, update, and delete sources.
