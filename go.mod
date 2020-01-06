@@ -18,7 +18,6 @@ require (
 	github.com/influxdata/kapacitor v1.5.0
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/kevinburke/go-bindata v3.16.0+incompatible // indirect
 	github.com/lestrrat-go/jwx v0.9.0
 	github.com/mattn/go-zglob v0.0.1 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.1
@@ -26,7 +25,6 @@ require (
 	github.com/segmentio/kafka-go v0.2.0 // indirect
 	github.com/sergi/go-diff v1.0.0
 	github.com/stretchr/testify v1.4.0
-	github.com/tylerb/graceful v1.2.15
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	google.golang.org/api v0.7.0

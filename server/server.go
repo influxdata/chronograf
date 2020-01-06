@@ -24,7 +24,6 @@ import (
 	"github.com/influxdata/chronograf/oauth2"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
-	"github.com/tylerb/graceful"
 )
 
 var (
@@ -410,15 +409,12 @@ func (s *Server) Serve(ctx context.Context) {
 	defer w.Close()
 	stdLog := log.New(w, "", 0)
 
-	// TODO: Remove graceful when changing to go 1.8
-	httpServer := &graceful.Server{
-		Server: &http.Server{
-			ErrorLog: stdLog,
-			Handler:  s.handler,
-		},
-		Logger:       stdLog,
-		TCPKeepAlive: 5 * time.Second,
+	httpServer := &http.Server{
+		ErrorLog:    stdLog,
+		Handler:     s.handler,
+		IdleTimeout: 5 * time.Second,
 	}
+
 	httpServer.SetKeepAlivesEnabled(true)
 
 	if !s.ReportingDisabled {
@@ -540,7 +536,7 @@ func reportUsageStats(bi chronograf.BuildInfo, logger chronograf.Logger) {
 		WithField("freq", "24h").
 		WithField("stats", "os,arch,version,cluster_id,uptime")
 	l.Info("Reporting usage stats")
-	_, _ = reporter.Save(clientUsage(values))
+	reporter.Save(clientUsage(values))
 
 	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
