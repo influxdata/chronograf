@@ -1,14 +1,12 @@
 package server
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/flux"
 )
 
 type postServiceRequest struct {
@@ -319,16 +317,4 @@ func (s *Service) UpdateService(w http.ResponseWriter, r *http.Request) {
 
 	res := newService(srv)
 	encodeJSON(w, http.StatusOK, res, s.Logger)
-}
-
-func pingFlux(ctx context.Context, address string, insecureSkipVerify bool) error {
-	url, err := url.ParseRequestURI(address)
-	if err != nil {
-		return fmt.Errorf("invalid service URI: %v", err)
-	}
-	client := &flux.Client{
-		URL:                url,
-		InsecureSkipVerify: insecureSkipVerify,
-	}
-	return client.Ping(ctx)
 }
