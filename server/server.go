@@ -17,9 +17,9 @@ import (
 	"time"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/bolt"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/kv/bolt"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 	client "github.com/influxdata/usage-client/v1"

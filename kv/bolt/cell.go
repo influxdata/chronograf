@@ -6,11 +6,12 @@ import (
 	"strconv"
 
 	"github.com/boltdb/bolt"
-	"github.com/influxdata/chronograf/v2"
+	platform "github.com/influxdata/chronograf/v2"
 )
 
 var (
-	cellBucket = []byte("cellsv2")
+	cellBucket                      = []byte("cellsv2")
+	_          platform.CellService = &Client{}
 )
 
 func (c *Client) initializeCells(ctx context.Context, tx *bolt.Tx) error {

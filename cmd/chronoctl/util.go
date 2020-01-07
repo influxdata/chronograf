@@ -9,7 +9,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/bolt"
+	"github.com/influxdata/chronograf/kv/bolt"
 	"github.com/influxdata/chronograf/mocks"
 )
 
