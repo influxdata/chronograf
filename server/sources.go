@@ -11,7 +11,6 @@ import (
 
 	"github.com/influxdata/chronograf/enterprise"
 	"github.com/influxdata/chronograf/flux"
-	"github.com/influxdata/chronograf/organizations"
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
@@ -481,80 +480,6 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	}
 	if len(url.Scheme) == 0 {
 		return fmt.Errorf("Invalid URL; no URL scheme defined")
-	}
-
-	return nil
-}
-
-// HandleNewSources parses and persists new sources passed in via server flag
-func (s *Service) HandleNewSources(ctx context.Context, input string) error {
-	if input == "" {
-		return nil
-	}
-
-	s.Logger.Error("--new-sources is deprecated and will be removed in a future version.")
-
-	var srcsKaps []struct {
-		Source    chronograf.Source `json:"influxdb"`
-		Kapacitor chronograf.Server `json:"kapacitor"`
-	}
-	if err := json.Unmarshal([]byte(input), &srcsKaps); err != nil {
-		s.Logger.
-			WithField("component", "server").
-			WithField("NewSources", "invalid").
-			Error(err)
-		return err
-	}
-
-	ctx = context.WithValue(ctx, organizations.ContextKey, "default")
-	defaultOrg, err := s.Store.Organizations(ctx).DefaultOrganization(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, sk := range srcsKaps {
-		if err := ValidSourceRequest(&sk.Source, defaultOrg.ID); err != nil {
-			return err
-		}
-		// Add any new sources and kapacitors as specified via server flag
-		if err := s.newSourceKapacitor(ctx, sk.Source, sk.Kapacitor); err != nil {
-			// Continue with server run even if adding NewSource fails
-			s.Logger.
-				WithField("component", "server").
-				WithField("NewSource", "invalid").
-				Error(err)
-			return err
-		}
-	}
-	return nil
-}
-
-// newSourceKapacitor adds sources to BoltDB idempotently by name, as well as respective kapacitors
-func (s *Service) newSourceKapacitor(ctx context.Context, src chronograf.Source, kapa chronograf.Server) error {
-	srcs, err := s.Store.Sources(ctx).All(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, source := range srcs {
-		// If source already exists, do nothing
-		if source.Name == src.Name {
-			s.Logger.
-				WithField("component", "server").
-				WithField("NewSource", source.Name).
-				Info("Source already exists")
-			return nil
-		}
-	}
-
-	src, err = s.Store.Sources(ctx).Add(ctx, src)
-	if err != nil {
-		return err
-	}
-
-	kapa.SrcID = src.ID
-	if _, err := s.Store.Servers(ctx).Add(ctx, kapa); err != nil {
-		return err
 	}
 
 	return nil
