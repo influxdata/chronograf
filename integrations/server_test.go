@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-
 	"net/http"
 	"testing"
 	"time"
@@ -3021,7 +3020,7 @@ func TestServer(t *testing.T) {
 				Version: "pre-1.4.0.0",
 				Commit:  "",
 			}
-			_ = boltdb.Open(ctx, logger, build)
+			boltdb.Open(ctx, logger, build)
 
 			if tt.fields.Config != nil {
 				if err := boltdb.ConfigStore.Update(ctx, tt.fields.Config); err != nil {
@@ -3173,8 +3172,6 @@ func TestServer(t *testing.T) {
 					tt.wants.body,
 				)
 			}
-
-			tt.args.server.Listener.Close()
 		})
 	}
 }

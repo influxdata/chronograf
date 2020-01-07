@@ -102,8 +102,6 @@ type Server struct {
 	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
 	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
 	BuildInfo         chronograf.BuildInfo
-	Listener          net.Listener
-	handler           http.Handler
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() bool) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -364,7 +362,7 @@ func (s *Server) Serve(ctx context.Context) {
 		provide(s.auth0OAuth(logger, auth)),
 	}
 
-	s.handler = NewMux(MuxOpts{
+	handler := NewMux(MuxOpts{
 		Develop:       s.Develop,
 		Auth:          auth,
 		Logger:        logger,
@@ -378,21 +376,12 @@ func (s *Server) Serve(ctx context.Context) {
 	}, service)
 
 	// Add chronograf's version header to all requests
-	s.handler = version(s.BuildInfo.Version, s.handler)
+	handler = version(s.BuildInfo.Version, handler)
 
 	if s.useTLS() {
 		// Add HSTS to instruct all browsers to change from http to https
-		s.handler = hsts(s.handler)
+		handler = hsts(handler)
 	}
-
-	listener, err := s.NewListener()
-	if err != nil {
-		logger.
-			WithField("component", "server").
-			Error(err)
-		return
-	}
-	s.Listener = listener
 
 	// Using a log writer for http server logging
 	w := logger.Writer()
@@ -401,7 +390,7 @@ func (s *Server) Serve(ctx context.Context) {
 
 	httpServer := &http.Server{
 		ErrorLog:    stdLog,
-		Handler:     s.handler,
+		Handler:     handler,
 		IdleTimeout: 5 * time.Second,
 	}
 
@@ -414,11 +403,21 @@ func (s *Server) Serve(ctx context.Context) {
 	if s.useTLS() {
 		scheme = "https"
 	}
+
+	listener, err := s.NewListener()
+	if err != nil {
+		logger.
+			WithField("component", "server").
+			Error(err)
+		return
+	}
+	defer listener.Close()
+
 	logger.
 		WithField("component", "server").
-		Info("Serving chronograf at ", scheme, "://", s.Listener.Addr())
+		Info("Serving chronograf at ", scheme, "://", listener.Addr())
 
-	if err := httpServer.Serve(s.Listener); err != nil {
+	if err := httpServer.Serve(listener); err != nil {
 		logger.
 			WithField("component", "server").
 			Error(err)
@@ -427,7 +426,7 @@ func (s *Server) Serve(ctx context.Context) {
 
 	logger.
 		WithField("component", "server").
-		Info("Stopped serving chronograf at ", scheme, "://", s.Listener.Addr())
+		Info("Stopped serving chronograf at ", scheme, "://", listener.Addr())
 }
 
 func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, protoboardsPath string, logger chronograf.Logger, useAuth bool) Service {
