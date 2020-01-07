@@ -12,8 +12,8 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/NYTimes/gziphandler"
-	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf" // When julienschmidt/httprouter v2 w/ context is out, switch
+	"github.com/bouk/httprouter" // When julienschmidt/httprouter v2 w/ context is out, switch
+	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/roles"
 )

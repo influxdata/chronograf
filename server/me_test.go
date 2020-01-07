@@ -295,7 +295,7 @@ func TestService_Me(t *testing.T) {
 					},
 					AllF: func(ctx context.Context) ([]chronograf.Organization, error) {
 						return []chronograf.Organization{
-							chronograf.Organization{
+							{
 								ID:          "0",
 								Name:        "The Gnarly Default",
 								DefaultRole: roles.ViewerRoleName,
@@ -375,7 +375,7 @@ func TestService_Me(t *testing.T) {
 					},
 					AllF: func(ctx context.Context) ([]chronograf.Organization, error) {
 						return []chronograf.Organization{
-							chronograf.Organization{
+							{
 								ID:          "0",
 								Name:        "The Gnarly Default",
 								DefaultRole: roles.ViewerRoleName,
@@ -455,7 +455,7 @@ func TestService_Me(t *testing.T) {
 					},
 					AllF: func(ctx context.Context) ([]chronograf.Organization, error) {
 						return []chronograf.Organization{
-							chronograf.Organization{
+							{
 								ID:          "0",
 								Name:        "The Gnarly Default",
 								DefaultRole: roles.ViewerRoleName,
@@ -525,7 +525,7 @@ func TestService_Me(t *testing.T) {
 					},
 					AllF: func(ctx context.Context) ([]chronograf.Organization, error) {
 						return []chronograf.Organization{
-							chronograf.Organization{
+							{
 								ID:          "0",
 								Name:        "The Bad Place",
 								DefaultRole: roles.ViewerRoleName,

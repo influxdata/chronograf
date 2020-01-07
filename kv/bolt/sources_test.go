@@ -20,7 +20,7 @@ func TestSourceStore(t *testing.T) {
 	s := c.SourcesStore
 
 	srcs := []chronograf.Source{
-		chronograf.Source{
+		{
 			Name:         "Of Truth",
 			Type:         "influx",
 			Username:     "marty",
@@ -30,7 +30,7 @@ func TestSourceStore(t *testing.T) {
 			Organization: "1337",
 			DefaultRP:    "pineapple",
 		},
-		chronograf.Source{
+		{
 			Name:         "HipToBeSquare",
 			Type:         "influx",
 			Username:     "calvinklein",
@@ -39,7 +39,7 @@ func TestSourceStore(t *testing.T) {
 			Default:      true,
 			Organization: "1337",
 		},
-		chronograf.Source{
+		{
 			Name:               "HipToBeSquare",
 			Type:               "influx",
 			Username:           "calvinklein",

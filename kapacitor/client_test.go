@@ -117,13 +117,13 @@ func TestClient_All(t *testing.T) {
 			},
 			listTasksOptions: &client.ListTasksOptions{},
 			resTasks: []client.Task{
-				client.Task{
+				{
 					ID:     "howdy",
 					Status: client.Enabled,
 				},
 			},
 			want: map[string]*Task{
-				"howdy": &Task{
+				"howdy": {
 					ID: "howdy",
 
 					HrefOutput: "/kapacitor/v1/tasks/howdy/output",
@@ -148,7 +148,7 @@ func TestClient_All(t *testing.T) {
 			},
 			listTasksOptions: &client.ListTasksOptions{},
 			resTasks: []client.Task{
-				client.Task{
+				{
 					ID:     "rule 1",
 					Status: client.Enabled,
 					Type:   client.StreamTask,
@@ -231,7 +231,7 @@ trigger
 				},
 			},
 			want: map[string]*Task{
-				"rule 1": &Task{
+				"rule 1": {
 					ID: "rule 1",
 
 					HrefOutput: "/kapacitor/v1/tasks/rule 1/output",

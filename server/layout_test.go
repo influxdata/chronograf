@@ -37,7 +37,7 @@ func Test_Layouts(t *testing.T) {
 				Measurement: "influxdb",
 			},
 			[]chronograf.Layout{
-				chronograf.Layout{
+				{
 					ID:          "d20a21c8-69f1-4780-90fe-e69f5e4d138c",
 					Application: "influxdb",
 					Measurement: "influxdb",
@@ -54,12 +54,12 @@ func Test_Layouts(t *testing.T) {
 				Measurement: "influxdb",
 			},
 			[]chronograf.Layout{
-				chronograf.Layout{
+				{
 					ID:          "d20a21c8-69f1-4780-90fe-e69f5e4d138c",
 					Application: "influxdb",
 					Measurement: "influxdb",
 				},
-				chronograf.Layout{
+				{
 					ID:          "b020101b-ea6b-4c8c-9f0e-db0ba501f4ef",
 					Application: "chronograf",
 					Measurement: "chronograf",
@@ -84,13 +84,13 @@ func Test_Layouts(t *testing.T) {
 						Name:       "A Graph",
 						CellColors: []chronograf.CellColor{},
 						Axes: map[string]chronograf.Axis{
-							"x": chronograf.Axis{
+							"x": {
 								Bounds: []string{},
 							},
-							"y": chronograf.Axis{
+							"y": {
 								Bounds: []string{},
 							},
-							"y2": chronograf.Axis{
+							"y2": {
 								Bounds: []string{},
 							},
 						},
@@ -98,7 +98,7 @@ func Test_Layouts(t *testing.T) {
 				},
 			},
 			[]chronograf.Layout{
-				chronograf.Layout{
+				{
 					ID:          "d20a21c8-69f1-4780-90fe-e69f5e4d138c",
 					Application: "influxdb",
 					Measurement: "influxdb",

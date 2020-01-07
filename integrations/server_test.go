@@ -2020,7 +2020,7 @@ func TestServer(t *testing.T) {
 					},
 				},
 				Mappings: []chronograf.Mapping{
-					chronograf.Mapping{
+					{
 						ID:                   "1",
 						Organization:         "1",
 						Provider:             "*",

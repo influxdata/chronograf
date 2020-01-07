@@ -19,7 +19,7 @@ func TestServerStore(t *testing.T) {
 	s := c.ServersStore
 
 	srcs := []chronograf.Server{
-		chronograf.Server{
+		{
 			Name:               "Of Truth",
 			SrcID:              10,
 			Username:           "marty",
@@ -29,7 +29,7 @@ func TestServerStore(t *testing.T) {
 			Organization:       "133",
 			InsecureSkipVerify: true,
 		},
-		chronograf.Server{
+		{
 			Name:               "HipToBeSquare",
 			SrcID:              12,
 			Username:           "calvinklein",

@@ -1943,7 +1943,7 @@ func TestService_SourceRoles(t *testing.T) {
 						return &mocks.RolesStore{
 							AllF: func(ctx context.Context) ([]chronograf.Role, error) {
 								return []chronograf.Role{
-									chronograf.Role{
+									{
 										Name: "biffsgang",
 										Permissions: chronograf.Permissions{
 											{

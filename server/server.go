@@ -355,14 +355,14 @@ func (s *Server) Serve(ctx context.Context) {
 		return
 	}
 
-	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){}
-
 	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration)
-	providerFuncs = append(providerFuncs, provide(s.githubOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.googleOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.herokuOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.genericOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.auth0OAuth(logger, auth)))
+	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){
+		provide(s.githubOAuth(logger, auth)),
+		provide(s.googleOAuth(logger, auth)),
+		provide(s.herokuOAuth(logger, auth)),
+		provide(s.genericOAuth(logger, auth)),
+		provide(s.auth0OAuth(logger, auth)),
+	}
 
 	s.handler = NewMux(MuxOpts{
 		Develop:       s.Develop,
