@@ -25,6 +25,7 @@ type superAdminProviderGroups struct {
 }
 
 // TimeSeriesClient returns the correct client for a time series database.
+// todo(glinton): should this be always reconnecting?
 type TimeSeriesClient interface {
 	New(chronograf.Source, chronograf.Logger) (chronograf.TimeSeries, error)
 }

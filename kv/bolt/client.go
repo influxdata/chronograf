@@ -119,17 +119,7 @@ func (c *Client) OrganizationConfigStore() chronograf.OrganizationConfigStore {
 }
 
 // Option to change behavior of Open()
-type Option interface {
-	Backup() bool
-}
-
-// Backup tells Open to perform a backup prior to initialization
-type Backup struct{}
-
-// Backup returns true
-func (b Backup) Backup() bool {
-	return true
-}
+type Option interface{}
 
 // Open / create boltDB file.
 func (c *Client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...Option) error {
@@ -146,17 +136,15 @@ func (c *Client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...O
 	}
 	c.db = db
 
-	for _, opt := range opts {
-		if opt.Backup() {
-			if err = c.backup(ctx, build); err != nil {
-				return fmt.Errorf(ErrUnableToBackup, err)
-			}
-		}
+	// The test to backup was always 'true' so remove it and just run it.
+	if err = c.backup(ctx, build); err != nil {
+		return fmt.Errorf(ErrUnableToBackup, err)
 	}
 
 	if err = c.initialize(ctx); err != nil {
 		return fmt.Errorf(ErrUnableToInitialize, err)
 	}
+
 	if err = c.migrate(ctx, build); err != nil {
 		return fmt.Errorf(ErrUnableToMigrate, err)
 	}
@@ -326,8 +314,4 @@ func (c *Client) backup(ctx context.Context, build chronograf.BuildInfo) error {
 	c.logger.Info("Moving to version ", build.Version)
 
 	return c.copy(ctx, lastBuild.Version)
-}
-
-func bucket(b []byte, org string) []byte {
-	return []byte(path.Join(string(b), org))
 }

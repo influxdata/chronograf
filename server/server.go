@@ -19,7 +19,7 @@ import (
 	"github.com/influxdata/chronograf"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
-	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/influxdata/chronograf/kv"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 	client "github.com/influxdata/usage-client/v1"
@@ -340,7 +340,7 @@ func (s *Server) Serve(ctx context.Context) error {
 			Error(err)
 		return err
 	}
-	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), s.ProtoboardsPath, logger, s.useAuth())
+	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), logger, s.useAuth())
 	service.SuperAdminProviderGroups = superAdminProviderGroups{
 		auth0: s.Auth0SuperAdminOrg,
 	}
@@ -444,16 +444,9 @@ func (s *Server) Serve(ctx context.Context) error {
 	return nil
 }
 
-func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, protoboardsPath string, logger chronograf.Logger, useAuth bool) Service {
-	db := bolt.NewClient(boltPath, logger)
-
-	// todo: obfuscate bolt.Backup{} option inside kv. don't pass anything here, or really expose anything.
-	if err := db.Open(ctx, buildInfo, bolt.Backup{}); err != nil {
-		logger.
-			WithField("component", "boltstore").
-			Error(err)
-		os.Exit(1)
-	}
+// todo: add etcd connection details as arg.
+func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, logger chronograf.Logger, useAuth bool) Service {
+	db, err := kv.NewClient(ctx, boltPath, logger, buildInfo)
 
 	layouts, err := builder.Layouts.Build(db.LayoutsStore())
 	if err != nil {

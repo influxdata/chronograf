@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	platform "github.com/influxdata/chronograf/v2"
 )
 
 // General errors.
@@ -923,8 +925,6 @@ type Environment struct {
 
 // KVClient defines what each kv store should be capable of.
 type KVClient interface {
-	// BuildStore returns the kv's BuildStore type.
-	BuildStore() BuildStore
 	// SourcesStore returns the kv's SourcesStore type.
 	SourcesStore() SourcesStore
 	// ServersStore returns the kv's ServersStore type.
@@ -943,4 +943,6 @@ type KVClient interface {
 	MappingsStore() MappingsStore
 	// OrganizationConfigStore returns the kv's OrganizationConfigStore type.
 	OrganizationConfigStore() OrganizationConfigStore
+	platform.CellService
+	platform.DashboardService
 }
