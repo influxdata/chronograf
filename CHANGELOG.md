@@ -1,5 +1,9 @@
 ## v1.8.0
 
+### Bug Fixes
+
+1. [#5345](https://github.com/influxdata/chronograf/pull/5345): Log Viewer uses a default if the mapped severity doesn't exist
+
 ## v1.7.17 [2020-01-08]
 
 ### Bug Fixes

@@ -481,7 +481,9 @@ class LogsTable extends Component<Props, State> {
 
     if (column === 'severity' && isDotNeeded) {
       title = value
-      const colorLevel = severityLevelColors.find(lc => lc.level === value)
+      const colorLevel =
+        severityLevelColors.find(lc => lc.level === value) ||
+        severityLevelColors[0]
       formattedValue = (
         <>
           <div
