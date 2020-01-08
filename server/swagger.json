@@ -3,7 +3,7 @@
   "info": {
     "title": "Chronograf",
     "description": "API endpoints for Chronograf",
-    "version": "1.7.16"
+    "version": "1.7.17"
   },
   "schemes": ["http"],
   "basePath": "/chronograf/v1",
