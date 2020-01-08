@@ -445,17 +445,17 @@ func (s *Server) Serve(ctx context.Context) error {
 }
 
 func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, protoboardsPath string, logger chronograf.Logger, useAuth bool) Service {
-	db := bolt.NewClient()
-	db.Path = boltPath
+	db := bolt.NewClient(boltPath, logger)
 
-	if err := db.Open(ctx, logger, buildInfo, bolt.WithBackup()); err != nil {
+	// todo: obfuscate bolt.Backup{} option inside kv. don't pass anything here, or really expose anything.
+	if err := db.Open(ctx, buildInfo, bolt.Backup{}); err != nil {
 		logger.
 			WithField("component", "boltstore").
 			Error(err)
 		os.Exit(1)
 	}
 
-	layouts, err := builder.Layouts.Build(db.LayoutsStore)
+	layouts, err := builder.Layouts.Build(db.LayoutsStore())
 	if err != nil {
 		logger.
 			WithField("component", "LayoutsStore").
@@ -463,14 +463,14 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	dashboards, err := builder.Dashboards.Build(db.DashboardsStore)
+	dashboards, err := builder.Dashboards.Build(db.DashboardsStore())
 	if err != nil {
 		logger.
 			WithField("component", "DashboardsStore").
 			Error("Unable to construct a MultiDashboardsStore", err)
 		os.Exit(1)
 	}
-	sources, err := builder.Sources.Build(db.SourcesStore)
+	sources, err := builder.Sources.Build(db.SourcesStore())
 	if err != nil {
 		logger.
 			WithField("component", "SourcesStore").
@@ -478,7 +478,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	kapacitors, err := builder.Kapacitors.Build(db.ServersStore)
+	kapacitors, err := builder.Kapacitors.Build(db.ServersStore())
 	if err != nil {
 		logger.
 			WithField("component", "KapacitorStore").
@@ -486,7 +486,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	organizations, err := builder.Organizations.Build(db.OrganizationsStore)
+	organizations, err := builder.Organizations.Build(db.OrganizationsStore())
 	if err != nil {
 		logger.
 			WithField("component", "OrganizationsStore").
@@ -511,10 +511,10 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 			ServersStore:            kapacitors,
 			OrganizationsStore:      organizations,
 			ProtoboardsStore:        protoboards,
-			UsersStore:              db.UsersStore,
-			ConfigStore:             db.ConfigStore,
-			MappingsStore:           db.MappingsStore,
-			OrganizationConfigStore: db.OrganizationConfigStore,
+			UsersStore:              db.UsersStore(),
+			ConfigStore:             db.ConfigStore(),
+			MappingsStore:           db.MappingsStore(),
+			OrganizationConfigStore: db.OrganizationConfigStore(),
 			CellService:             db,
 		},
 		Logger:    logger,

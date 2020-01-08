@@ -63,7 +63,7 @@ func TestUsersStore_GetWithID(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.UsersStore
+		s := client.UsersStore()
 		if tt.addFirst {
 			tt.args.usr, err = s.Add(tt.args.ctx, tt.args.usr)
 			if err != nil {
@@ -132,7 +132,7 @@ func TestUsersStore_GetWithNameProviderScheme(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.UsersStore
+		s := client.UsersStore()
 		if tt.addFirst {
 			tt.args.usr, err = s.Add(tt.args.ctx, tt.args.usr)
 			if err != nil {
@@ -162,7 +162,7 @@ func TestUsersStore_GetInvalid(t *testing.T) {
 	}
 	defer client.Close()
 
-	s := client.UsersStore
+	s := client.UsersStore()
 
 	_, err = s.Get(context.Background(), chronograf.UserQuery{})
 	if err == nil {
@@ -234,7 +234,7 @@ func TestUsersStore_Add(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.UsersStore
+		s := client.UsersStore()
 		if tt.args.addFirst {
 			_, _ = s.Add(tt.args.ctx, tt.args.u)
 		}
@@ -297,7 +297,7 @@ func TestUsersStore_Delete(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.UsersStore
+		s := client.UsersStore()
 
 		if tt.addFirst {
 			tt.args.user, _ = s.Add(tt.args.ctx, tt.args.user)
@@ -394,7 +394,7 @@ func TestUsersStore_Update(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.UsersStore
+		s := client.UsersStore()
 
 		if tt.addFirst {
 			tt.args.usr, err = s.Add(tt.args.ctx, tt.args.usr)
@@ -483,7 +483,7 @@ func TestUsersStore_All(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.UsersStore
+		s := client.UsersStore()
 
 		if tt.addFirst {
 			for _, u := range tt.want {
@@ -549,7 +549,7 @@ func TestUsersStore_Num(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.UsersStore
+		s := client.UsersStore()
 
 		for _, u := range tt.users {
 			s.Add(tt.ctx, &u)

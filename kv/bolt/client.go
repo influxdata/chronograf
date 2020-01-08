@@ -24,47 +24,98 @@ const (
 	ErrUnableToMigrate = "Unable to migrate boltdb:  %v"
 )
 
+var _ chronograf.KVClient = (*Client)(nil)
+
 // Client is a client for the boltDB data store.
 type Client struct {
-	Path      string
-	db        *bolt.DB
-	logger    chronograf.Logger
-	isNew     bool
-	Now       func() time.Time
-	LayoutIDs chronograf.ID
+	path   string
+	db     *bolt.DB
+	logger chronograf.Logger
+	isNew  bool
+	Now    func() time.Time
 
-	BuildStore              *BuildStore
-	SourcesStore            *SourcesStore
-	ServersStore            *ServersStore
-	LayoutsStore            *LayoutsStore
-	DashboardsStore         *DashboardsStore
-	UsersStore              *UsersStore
-	OrganizationsStore      *OrganizationsStore
-	ConfigStore             *ConfigStore
-	MappingsStore           *MappingsStore
-	OrganizationConfigStore *OrganizationConfigStore
+	buildStore              *BuildStore
+	sourcesStore            *SourcesStore
+	serversStore            *ServersStore
+	layoutsStore            *LayoutsStore
+	dashboardsStore         *DashboardsStore
+	usersStore              *UsersStore
+	organizationsStore      *OrganizationsStore
+	configStore             *ConfigStore
+	mappingsStore           *MappingsStore
+	organizationConfigStore *OrganizationConfigStore
 }
 
 // NewClient initializes all stores
-func NewClient() *Client {
-	c := &Client{Now: time.Now}
-	c.BuildStore = &BuildStore{client: c}
-	c.SourcesStore = &SourcesStore{client: c}
-	c.ServersStore = &ServersStore{client: c}
-	c.LayoutsStore = &LayoutsStore{
-		client: c,
-		IDs:    &id.UUID{},
+func NewClient(path string, logger chronograf.Logger) *Client {
+	c := &Client{
+		logger: logger,
+		path:   path,
+		Now:    time.Now,
 	}
-	c.DashboardsStore = &DashboardsStore{
-		client: c,
-		IDs:    &id.UUID{},
-	}
-	c.UsersStore = &UsersStore{client: c}
-	c.OrganizationsStore = &OrganizationsStore{client: c}
-	c.ConfigStore = &ConfigStore{client: c}
-	c.MappingsStore = &MappingsStore{client: c}
-	c.OrganizationConfigStore = &OrganizationConfigStore{client: c}
+
+	c.buildStore = &BuildStore{client: c}
+	c.sourcesStore = &SourcesStore{client: c}
+	c.serversStore = &ServersStore{client: c}
+	c.layoutsStore = &LayoutsStore{client: c, IDs: &id.UUID{}}
+	c.dashboardsStore = &DashboardsStore{client: c, IDs: &id.UUID{}}
+	c.usersStore = &UsersStore{client: c}
+	c.organizationsStore = &OrganizationsStore{client: c}
+	c.configStore = &ConfigStore{client: c}
+	c.mappingsStore = &MappingsStore{client: c}
+	c.organizationConfigStore = &OrganizationConfigStore{client: c}
+
 	return c
+}
+
+// BuildStore returns a BuildStore that uses the bolt client.
+func (c *Client) BuildStore() chronograf.BuildStore {
+	return c.buildStore
+}
+
+// SourcesStore returns a SourcesStore that uses the bolt client.
+func (c *Client) SourcesStore() chronograf.SourcesStore {
+	return c.sourcesStore
+}
+
+// ServersStore returns a ServersStore that uses the bolt client.
+func (c *Client) ServersStore() chronograf.ServersStore {
+	return c.serversStore
+}
+
+// LayoutsStore returns a LayoutsStore that uses the bolt client.
+func (c *Client) LayoutsStore() chronograf.LayoutsStore {
+	return c.layoutsStore
+}
+
+// DashboardsStore returns a DashboardsStore that uses the bolt client.
+func (c *Client) DashboardsStore() chronograf.DashboardsStore {
+	return c.dashboardsStore
+}
+
+// UsersStore returns a UsersStore that uses the bolt client.
+func (c *Client) UsersStore() chronograf.UsersStore {
+	return c.usersStore
+}
+
+// OrganizationsStore returns a OrganizationsStore that uses the bolt client.
+func (c *Client) OrganizationsStore() chronograf.OrganizationsStore {
+	return c.organizationsStore
+}
+
+// ConfigStore returns a ConfigStore that uses the bolt client.
+func (c *Client) ConfigStore() chronograf.ConfigStore {
+	return c.configStore
+}
+
+// MappingsStore returns a MappingsStore that uses the bolt client.
+func (c *Client) MappingsStore() chronograf.MappingsStore {
+	return c.mappingsStore
+}
+
+// OrganizationConfigStore returns a OrganizationConfigStore that uses the bolt client.
+func (c *Client) OrganizationConfigStore() chronograf.OrganizationConfigStore {
+	return c.organizationConfigStore
 }
 
 // Option to change behavior of Open()
@@ -72,14 +123,8 @@ type Option interface {
 	Backup() bool
 }
 
-// WithBackup returns a Backup
-func WithBackup() Option {
-	return Backup{}
-}
-
 // Backup tells Open to perform a backup prior to initialization
-type Backup struct {
-}
+type Backup struct{}
 
 // Backup returns true
 func (b Backup) Backup() bool {
@@ -87,20 +132,19 @@ func (b Backup) Backup() bool {
 }
 
 // Open / create boltDB file.
-func (c *Client) Open(ctx context.Context, logger chronograf.Logger, build chronograf.BuildInfo, opts ...Option) error {
-	if _, err := os.Stat(c.Path); os.IsNotExist(err) {
+func (c *Client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...Option) error {
+	if _, err := os.Stat(c.path); os.IsNotExist(err) {
 		c.isNew = true
 	} else if err != nil {
 		return err
 	}
 
 	// Open database file.
-	db, err := bolt.Open(c.Path, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(c.path, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return fmt.Errorf(ErrUnableToOpen, err)
 	}
 	c.db = db
-	c.logger = logger
 
 	for _, opt := range opts {
 		if opt.Backup() {
@@ -183,31 +227,31 @@ func (c *Client) initialize(ctx context.Context) error {
 func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error {
 	if c.db != nil {
 		// Runtime migrations
-		if err := c.OrganizationsStore.Migrate(ctx); err != nil {
+		if err := c.organizationsStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.SourcesStore.Migrate(ctx); err != nil {
+		if err := c.sourcesStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.ServersStore.Migrate(ctx); err != nil {
+		if err := c.serversStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.LayoutsStore.Migrate(ctx); err != nil {
+		if err := c.layoutsStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.DashboardsStore.Migrate(ctx); err != nil {
+		if err := c.dashboardsStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.ConfigStore.Migrate(ctx); err != nil {
+		if err := c.configStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.BuildStore.Migrate(ctx, build); err != nil {
+		if err := c.buildStore.Migrate(ctx, build); err != nil {
 			return err
 		}
-		if err := c.MappingsStore.Migrate(ctx); err != nil {
+		if err := c.mappingsStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.OrganizationConfigStore.Migrate(ctx); err != nil {
+		if err := c.organizationConfigStore.Migrate(ctx); err != nil {
 			return err
 		}
 
@@ -226,7 +270,7 @@ func (c *Client) Close() error {
 
 // copy creates a copy of the database in toFile
 func (c *Client) copy(ctx context.Context, version string) error {
-	backupDir := path.Join(path.Dir(c.Path), "backup")
+	backupDir := path.Join(path.Dir(c.path), "backup")
 	if _, err := os.Stat(backupDir); os.IsNotExist(err) {
 		if err = os.Mkdir(backupDir, 0700); err != nil {
 			return err
@@ -235,13 +279,13 @@ func (c *Client) copy(ctx context.Context, version string) error {
 		return err
 	}
 
-	fromFile, err := os.Open(c.Path)
+	fromFile, err := os.Open(c.path)
 	if err != nil {
 		return err
 	}
 	defer fromFile.Close()
 
-	toName := fmt.Sprintf("%s.%s", path.Base(c.Path), version)
+	toName := fmt.Sprintf("%s.%s", path.Base(c.path), version)
 	toPath := path.Join(backupDir, toName)
 	toFile, err := os.OpenFile(toPath, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
@@ -264,7 +308,7 @@ func (c *Client) copy(ctx context.Context, version string) error {
 // - If we are on the same version, don't create a backup
 // - If the version has changed, create a backup and store the current version
 func (c *Client) backup(ctx context.Context, build chronograf.BuildInfo) error {
-	lastBuild, err := c.BuildStore.Get(ctx)
+	lastBuild, err := c.buildStore.Get(ctx)
 	if err != nil {
 		return err
 	}

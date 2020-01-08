@@ -82,7 +82,7 @@ func TestDashboardsStore_Add(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.DashboardsStore
+		s := client.DashboardsStore()
 		if tt.args.addFirst {
 			_, _ = s.Add(tt.args.ctx, *tt.args.dashboard)
 		}

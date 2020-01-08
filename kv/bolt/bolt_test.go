@@ -18,6 +18,7 @@ var TestNow = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 // TestClient wraps *bolt.Client.
 type TestClient struct {
 	*bolt.Client
+	path string
 }
 
 // NewTestClient creates new *bolt.Client with a set time and temp path.
@@ -29,9 +30,9 @@ func NewTestClient() (*TestClient, error) {
 	f.Close()
 
 	c := &TestClient{
-		Client: bolt.NewClient(),
+		Client: bolt.NewClient(f.Name(), mocks.NewLogger()),
+		path:   f.Name(),
 	}
-	c.Path = f.Name()
 	c.Now = func() time.Time { return TestNow }
 
 	build := chronograf.BuildInfo{
@@ -39,12 +40,12 @@ func NewTestClient() (*TestClient, error) {
 		Commit:  "commit",
 	}
 
-	c.Open(context.TODO(), mocks.NewLogger(), build)
+	c.Open(context.TODO(), build)
 
 	return c, nil
 }
 
 func (c *TestClient) Close() error {
-	defer os.Remove(c.Path)
+	defer os.Remove(c.path)
 	return c.Client.Close()
 }

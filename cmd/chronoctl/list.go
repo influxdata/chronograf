@@ -18,7 +18,7 @@ func (l *ListCommand) Execute(args []string) error {
 	defer c.Close()
 
 	ctx := context.Background()
-	users, err := c.UsersStore.All(ctx)
+	users, err := c.UsersStore().All(ctx)
 	if err != nil {
 		return err
 	}

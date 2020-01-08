@@ -14,13 +14,10 @@ import (
 )
 
 func NewBoltClient(path string) (*bolt.Client, error) {
-	c := bolt.NewClient()
-	c.Path = path
+	c := bolt.NewClient(path, mocks.NewLogger())
+	bi := chronograf.BuildInfo{}
 
-	ctx := context.Background()
-	logger := mocks.NewLogger()
-	var bi chronograf.BuildInfo
-	if err := c.Open(ctx, logger, bi); err != nil {
+	if err := c.Open(context.Background(), bi); err != nil {
 		return nil, err
 	}
 

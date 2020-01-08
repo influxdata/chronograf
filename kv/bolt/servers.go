@@ -26,7 +26,7 @@ func (s *ServersStore) Migrate(ctx context.Context) error {
 		return err
 	}
 
-	defaultOrg, err := s.client.OrganizationsStore.DefaultOrganization(ctx)
+	defaultOrg, err := s.client.organizationsStore.DefaultOrganization(ctx)
 	if err != nil {
 		return err
 	}

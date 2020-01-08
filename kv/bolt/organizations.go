@@ -161,7 +161,7 @@ func (s *OrganizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 	// set on the context.
 	ctx = context.WithValue(ctx, organizations.ContextKey, o.ID)
 
-	sourcesStore := organizations.NewSourcesStore(s.client.SourcesStore, o.ID)
+	sourcesStore := organizations.NewSourcesStore(s.client.sourcesStore, o.ID)
 	sources, err := sourcesStore.All(ctx)
 	if err != nil {
 		return err
@@ -172,7 +172,7 @@ func (s *OrganizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 		}
 	}
 
-	serversStore := organizations.NewServersStore(s.client.ServersStore, o.ID)
+	serversStore := organizations.NewServersStore(s.client.serversStore, o.ID)
 	servers, err := serversStore.All(ctx)
 	if err != nil {
 		return err
@@ -183,7 +183,7 @@ func (s *OrganizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 		}
 	}
 
-	dashboardsStore := organizations.NewDashboardsStore(s.client.DashboardsStore, o.ID)
+	dashboardsStore := organizations.NewDashboardsStore(s.client.dashboardsStore, o.ID)
 	dashboards, err := dashboardsStore.All(ctx)
 	if err != nil {
 		return err
@@ -194,7 +194,7 @@ func (s *OrganizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 		}
 	}
 
-	usersStore := organizations.NewUsersStore(s.client.UsersStore, o.ID)
+	usersStore := organizations.NewUsersStore(s.client.usersStore, o.ID)
 	users, err := usersStore.All(ctx)
 	if err != nil {
 		return err
@@ -205,13 +205,13 @@ func (s *OrganizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 		}
 	}
 
-	mappings, err := s.client.MappingsStore.All(ctx)
+	mappings, err := s.client.mappingsStore.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, mapping := range mappings {
 		if mapping.Organization == o.ID {
-			if err := s.client.MappingsStore.Delete(ctx, &mapping); err != nil {
+			if err := s.client.mappingsStore.Delete(ctx, &mapping); err != nil {
 				return err
 			}
 		}

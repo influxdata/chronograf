@@ -24,21 +24,6 @@ func (s *OrganizationConfigStore) Migrate(ctx context.Context) error {
 	return nil
 }
 
-// Get retrieves an OrganizationConfig from the store
-func (s *OrganizationConfigStore) Get(ctx context.Context, orgID string) (*chronograf.OrganizationConfig, error) {
-	var c chronograf.OrganizationConfig
-
-	err := s.client.db.View(func(tx *bolt.Tx) error {
-		return s.get(ctx, tx, orgID, &c)
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &c, nil
-}
-
 func (s *OrganizationConfigStore) get(ctx context.Context, tx *bolt.Tx, orgID string, c *chronograf.OrganizationConfig) error {
 	v := tx.Bucket(OrganizationConfigBucket).Get([]byte(orgID))
 	if len(v) == 0 {

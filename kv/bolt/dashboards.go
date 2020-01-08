@@ -13,7 +13,7 @@ import (
 var _ chronograf.DashboardsStore = &DashboardsStore{}
 
 // DashboardsBucket is the bolt bucket dashboards are stored in
-var DashboardsBucket = []byte("Dashoard")
+var DashboardsBucket = []byte("Dashoard") // todo: make sure etcd implementation has correct spelling
 
 // DashboardsStore is the bolt implementation of storing dashboards
 type DashboardsStore struct {
@@ -58,7 +58,7 @@ func (d *DashboardsStore) Migrate(ctx context.Context) error {
 		return nil
 	}
 
-	defaultOrg, err := d.client.OrganizationsStore.DefaultOrganization(ctx)
+	defaultOrg, err := d.client.organizationsStore.DefaultOrganization(ctx)
 	if err != nil {
 		return err
 	}

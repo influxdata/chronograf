@@ -920,3 +920,27 @@ type BuildStore interface {
 type Environment struct {
 	TelegrafSystemInterval time.Duration `json:"telegrafSystemInterval"`
 }
+
+// KVClient defines what each kv store should be capable of.
+type KVClient interface {
+	// BuildStore returns the kv's BuildStore type.
+	BuildStore() BuildStore
+	// SourcesStore returns the kv's SourcesStore type.
+	SourcesStore() SourcesStore
+	// ServersStore returns the kv's ServersStore type.
+	ServersStore() ServersStore
+	// LayoutsStore returns the kv's LayoutsStore type.
+	LayoutsStore() LayoutsStore
+	// DashboardsStore returns the kv's DashboardsStore type.
+	DashboardsStore() DashboardsStore
+	// UsersStore returns the kv's UsersStore type.
+	UsersStore() UsersStore
+	// OrganizationsStore returns the kv's OrganizationsStore type.
+	OrganizationsStore() OrganizationsStore
+	// ConfigStore returns the kv's ConfigStore type.
+	ConfigStore() ConfigStore
+	// MappingsStore returns the kv's MappingsStore type.
+	MappingsStore() MappingsStore
+	// OrganizationConfigStore returns the kv's OrganizationConfigStore type.
+	OrganizationConfigStore() OrganizationConfigStore
+}
