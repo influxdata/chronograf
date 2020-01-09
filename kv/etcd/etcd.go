@@ -11,7 +11,6 @@ import (
 	conc "github.com/coreos/etcd/clientv3/concurrency"
 	"github.com/influxdata/chronograf"
 	platform "github.com/influxdata/chronograf/v2"
-	"github.com/sony/gobreaker"
 )
 
 var _ chronograf.KVClient = (*Client)(nil)
@@ -174,23 +173,14 @@ func newEtcdClient(c Config, l chronograf.Logger) *client {
 	return &client{
 		config: c,
 		logger: l,
-		breaker: gobreaker.NewCircuitBreaker(gobreaker.Settings{
-			Name:    "etcd",
-			Timeout: time.Minute,
-			ReadyToTrip: func(counts gobreaker.Counts) bool {
-				return counts.ConsecutiveFailures > 5
-			},
-		}),
 	}
 }
 
 // client wraps the etcd client with circuit breaker
 type client struct {
 	config Config
-
-	breaker *gobreaker.CircuitBreaker
-	logger  chronograf.Logger
-	client  *clientv3.Client
+	logger chronograf.Logger
+	client *clientv3.Client
 }
 
 // Open opens the connection to the etcd server. If client.client is non nil
@@ -261,30 +251,21 @@ func (c *client) recoverCallback(callback func(stm conc.STM) error, cstm conc.ST
 }
 
 func (c *client) Get(ctx context.Context, key string, opts ...clientv3.OpOption) (*clientv3.GetResponse, error) {
-	resp, err := c.breaker.Execute(func() (interface{}, error) {
-		ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-		defer cancel()
-		return c.client.Get(ctx, key, opts...)
-	})
-	return resp.(*clientv3.GetResponse), err
+	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
+	defer cancel()
+	return c.client.Get(ctx, key, opts...)
 }
 
 func (c *client) Put(ctx context.Context, key, val string, opts ...clientv3.OpOption) (*clientv3.PutResponse, error) {
-	resp, err := c.breaker.Execute(func() (interface{}, error) {
-		ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-		defer cancel()
-		return c.client.Put(ctx, key, val, opts...)
-	})
-	return resp.(*clientv3.PutResponse), err
+	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
+	defer cancel()
+	return c.client.Put(ctx, key, val, opts...)
 }
 
 func (c *client) Delete(ctx context.Context, key string, opts ...clientv3.OpOption) (*clientv3.DeleteResponse, error) {
-	resp, err := c.breaker.Execute(func() (interface{}, error) {
-		ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-		defer cancel()
-		return c.client.Delete(ctx, key, opts...)
-	})
-	return resp.(*clientv3.DeleteResponse), err
+	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
+	defer cancel()
+	return c.client.Delete(ctx, key, opts...)
 }
 
 func (c *client) Watch(ctx context.Context, key string, opts ...clientv3.OpOption) (ch clientv3.WatchChan) {
@@ -292,31 +273,22 @@ func (c *client) Watch(ctx context.Context, key string, opts ...clientv3.OpOptio
 }
 
 func (c *client) Grant(ctx context.Context, ttl int64) (*clientv3.LeaseGrantResponse, error) {
-	resp, err := c.breaker.Execute(func() (interface{}, error) {
-		ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-		defer cancel()
-		return c.client.Grant(ctx, ttl)
-	})
-	return resp.(*clientv3.LeaseGrantResponse), err
+	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
+	defer cancel()
+	return c.client.Grant(ctx, ttl)
 }
 
 func (c *client) Revoke(ctx context.Context, lease clientv3.LeaseID) (*clientv3.LeaseRevokeResponse, error) {
-	resp, err := c.breaker.Execute(func() (interface{}, error) {
-		ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-		defer cancel()
-		return c.client.Revoke(ctx, lease)
-	})
-	return resp.(*clientv3.LeaseRevokeResponse), err
+	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
+	defer cancel()
+	return c.client.Revoke(ctx, lease)
 }
 
 // KeepAliveOnce sets the new expiration time for a lease to its original length.
 func (c *client) KeepAliveOnce(ctx context.Context, lease clientv3.LeaseID) (*clientv3.LeaseKeepAliveResponse, error) {
-	resp, err := c.breaker.Execute(func() (interface{}, error) {
-		ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-		defer cancel()
-		return c.client.KeepAliveOnce(ctx, lease)
-	})
-	return resp.(*clientv3.LeaseKeepAliveResponse), err
+	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
+	defer cancel()
+	return c.client.KeepAliveOnce(ctx, lease)
 }
 
 func (c *client) Close() error {
@@ -324,51 +296,3 @@ func (c *client) Close() error {
 	c.client.Close()
 	return nil
 }
-
-// func (c *client) Txn(ctx context.Context) clientv3.Txn {
-// 	txn := &txnBreaker{
-// 		client: c,
-// 		ctx:    ctx,
-// 	}
-// 	return txn
-// }
-
-// // txnBreaker implements clientv3.Txn while using a circuit breaker
-// type txnBreaker struct {
-// 	client *client
-// 	ctx    context.Context
-
-// 	ifs   []clientv3.Cmp
-// 	thens []clientv3.Op
-// 	elses []clientv3.Op
-// }
-
-// func (t *txnBreaker) If(cs ...clientv3.Cmp) clientv3.Txn {
-// 	t.ifs = cs
-// 	return t
-// }
-
-// func (t *txnBreaker) Then(ops ...clientv3.Op) clientv3.Txn {
-// 	t.thens = ops
-// 	return t
-// }
-
-// func (t *txnBreaker) Else(ops ...clientv3.Op) clientv3.Txn {
-// 	t.elses = ops
-// 	return t
-// }
-
-// func (t *txnBreaker) Commit() (*clientv3.TxnResponse, error) {
-// 	resp, err := t.client.breaker.Execute(func() (interface{}, error) {
-// 		ctx, cancel := context.WithTimeout(t.ctx, t.client.config.RequestTimeout)
-// 		defer cancel()
-// 		txn := t.client.client.Txn(ctx)
-// 		resp, err := txn.
-// 			If(t.ifs...).
-// 			Then(t.thens...).
-// 			Else(t.elses...).
-// 			Commit()
-// 		return resp, err
-// 	})
-// 	return resp, err
-// }
