@@ -1,3 +1,4 @@
+// Libraries
 import React, {
   PureComponent,
   ComponentClass,
@@ -5,23 +6,26 @@ import React, {
   KeyboardEvent,
 } from 'react'
 import {connect} from 'react-redux'
-import _ from 'lodash'
+import _, {get} from 'lodash'
 
+// Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
-import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
-import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
-import Dropdown from 'src/shared/components/Dropdown'
-import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {getDeep} from 'src/utils/wrappers'
-import {notify as notifyActionCreator} from 'src/shared/actions/notifications'
-
 import {formatTempVar} from 'src/tempVars/utils'
 import {
   reconcileSelectedAndLocalSelectedValues,
   pickSelected,
 } from 'src/dashboards/utils/tempVars'
 
+// Actions
+import {notify as notifyActionCreator} from 'src/shared/actions/notifications'
+
+// Components
+import ConfirmButton from 'src/shared/components/ConfirmButton'
+import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
+import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
+import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
+import Dropdown from 'src/shared/components/Dropdown'
 import DatabasesTemplateBuilder from 'src/tempVars/components/DatabasesTemplateBuilder'
 import CSVTemplateBuilder from 'src/tempVars/components/CSVTemplateBuilder'
 import MapTemplateBuilder from 'src/tempVars/components/MapTemplateBuilder'
@@ -31,7 +35,9 @@ import TagKeysTemplateBuilder from 'src/tempVars/components/TagKeysTemplateBuild
 import TagValuesTemplateBuilder from 'src/tempVars/components/TagValuesTemplateBuilder'
 import MetaQueryTemplateBuilder from 'src/tempVars/components/MetaQueryTemplateBuilder'
 import TextTemplateBuilder from 'src/tempVars/components/TextTemplateBuilder'
+import SourceDropdown from 'src/flux/components/SourceDropdown'
 
+// Types
 import {
   Template,
   TemplateType,
@@ -40,7 +46,10 @@ import {
   Source,
   RemoteDataState,
   Notification,
+  QueryType,
 } from 'src/types'
+
+// Constants
 import {
   TEMPLATE_TYPES_LIST,
   DEFAULT_TEMPLATES,
@@ -53,11 +62,13 @@ interface Props {
   template?: Template
   templates: Template[]
   source: Source
+  sources: Source[]
   onCancel: () => void
   onCreate?: (template: Template) => Promise<any>
   onUpdate?: (template: Template) => Promise<any>
   onDelete?: () => Promise<any>
   notify: (n: Notification) => void
+  isDynamicSourceSelected: boolean
 }
 
 interface State {
@@ -65,6 +76,8 @@ interface State {
   isNew: boolean
   savingStatus: RemoteDataState
   deletingStatus: RemoteDataState
+  isDynamicSourceSelected: boolean
+  selectedSource: Source
 }
 
 const TEMPLATE_BUILDERS = {
@@ -85,10 +98,11 @@ const DEFAULT_TEMPLATE = DEFAULT_TEMPLATES[TemplateType.Databases]
 class TemplateVariableEditor extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
-
     const defaultState = {
       savingStatus: RemoteDataState.NotStarted,
       deletingStatus: RemoteDataState.NotStarted,
+      isDynamicSourceSelected: props.isDynamicSourceSelected,
+      selectedSource: props.selectedSource,
     }
 
     const {template} = this.props
@@ -109,10 +123,14 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {source, onCancel, notify, templates} = this.props
-    const {nextTemplate, isNew} = this.state
+    const {source, sources, onCancel, notify, templates} = this.props
+    const {
+      isDynamicSourceSelected,
+      selectedSource,
+      nextTemplate,
+      isNew,
+    } = this.state
     const TemplateBuilder = this.templateBuilder
-
     return (
       <OverlayContainer maxWidth={650}>
         <OverlayHeading title={this.title}>
@@ -136,7 +154,19 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
         </OverlayHeading>
         <OverlayBody>
           <div className="faux-form">
-            <div className="form-group col-sm-6">
+            <div className="form-group col-sm-4">
+              <label>Data Source</label>
+              <SourceDropdown
+                onSelectDynamicSource={this.onSelectDynamicSource}
+                sources={sources}
+                source={selectedSource}
+                isDynamicSourceSelected={isDynamicSourceSelected}
+                onChangeSource={this.handleOnChangeSource}
+                allowDynamicSource={true}
+                type={QueryType.InfluxQL}
+              />
+            </div>
+            <div className="form-group col-sm-4">
               <label>Name</label>
               <input
                 type="text"
@@ -148,7 +178,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
                 spellCheck={false}
               />
             </div>
-            <div className="form-group col-sm-6">
+            <div className="form-group col-sm-4">
               <label>Type</label>
               <Dropdown
                 items={TEMPLATE_TYPES_LIST}
@@ -291,7 +321,16 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
       return
     }
     const {onUpdate, onCreate, notify} = this.props
-    const {nextTemplate, isNew} = this.state
+    const {
+      nextTemplate,
+      isNew,
+      isDynamicSourceSelected,
+      selectedSource,
+    } = this.state
+    nextTemplate.sourceID = '0' // setting to 0 b/c an empty string returns an unparseable json error from the BE
+    if (isDynamicSourceSelected === false) {
+      nextTemplate.sourceID = selectedSource.id
+    }
 
     nextTemplate.tempVar = formatTempVar(nextTemplate.tempVar)
 
@@ -373,6 +412,14 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
     return 'Save'
   }
 
+  private onSelectDynamicSource = () => {
+    this.setState({isDynamicSourceSelected: true})
+  }
+
+  private handleOnChangeSource = (source: Source) => {
+    this.setState({isDynamicSourceSelected: false, selectedSource: source})
+  }
+
   private handleDelete = (): void => {
     const {onDelete} = this.props
 
@@ -384,6 +431,21 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
   }
 }
 
-const mapDispatchToProps = {notify: notifyActionCreator}
+const mapDispatchToProps = {
+  notify: notifyActionCreator,
+}
 
-export default connect(null, mapDispatchToProps)(TemplateVariableEditor)
+const mstp = (state, props) => {
+  const {sources} = state
+  const sourceID = get(props, 'template.sourceID', '0')
+  const selectedSource = sources.find(source => source.id === sourceID)
+  const isDynamicSourceSelected =
+    selectedSource === undefined || sourceID === '0'
+  return {
+    sources,
+    isDynamicSourceSelected,
+    selectedSource,
+  }
+}
+
+export default connect(mstp, mapDispatchToProps)(TemplateVariableEditor)

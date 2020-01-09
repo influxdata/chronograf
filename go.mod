@@ -17,6 +17,7 @@ require (
 	github.com/influxdata/kapacitor v1.5.3
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
+	github.com/kevinburke/go-bindata v3.16.0+incompatible // indirect
 	github.com/lestrrat-go/jwx v0.9.0
 	github.com/mattn/go-isatty v0.0.11 // indirect
 	github.com/mattn/go-zglob v0.0.1 // indirect
