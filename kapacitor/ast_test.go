@@ -122,10 +122,10 @@ func TestReverse(t *testing.T) {
 						Tags: []string{"host", "cluster_id"},
 					},
 					Tags: map[string][]string{
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
@@ -231,8 +231,8 @@ func TestReverse(t *testing.T) {
 						},
 					},
 					Tags: map[string][]string{
-						"cpu":  []string{"cpu_total"},
-						"host": []string{"acc-0eabc309-eu-west-1-data-3", "prod"},
+						"cpu":  {"cpu_total"},
+						"host": {"acc-0eabc309-eu-west-1-data-3", "prod"},
 					},
 					GroupBy: chronograf.GroupBy{
 						Time: "10m0s",
@@ -629,11 +629,11 @@ func TestReverse(t *testing.T) {
 						},
 					},
 					Tags: map[string][]string{
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
 					},
@@ -766,11 +766,11 @@ func TestReverse(t *testing.T) {
 						},
 					},
 					Tags: map[string][]string{
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
 					},
@@ -903,11 +903,11 @@ func TestReverse(t *testing.T) {
 						},
 					},
 					Tags: map[string][]string{
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
 					},
@@ -1022,11 +1022,11 @@ func TestReverse(t *testing.T) {
 						},
 					},
 					Tags: map[string][]string{
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
 					},
@@ -1169,11 +1169,11 @@ trigger
 						},
 					},
 					Tags: map[string][]string{
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
 					},
@@ -1317,11 +1317,11 @@ trigger
 						},
 					},
 					Tags: map[string][]string{
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
 					},
@@ -1431,11 +1431,11 @@ trigger
 					Measurement:     "cpu",
 					RetentionPolicy: "autogen",
 					Tags: map[string][]string{
-						"host": []string{
+						"host": {
 							"acc-0eabc309-eu-west-1-data-3",
 							"prod",
 						},
-						"cpu": []string{
+						"cpu": {
 							"cpu_total",
 						},
 					},

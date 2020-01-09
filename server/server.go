@@ -24,7 +24,6 @@ import (
 	"github.com/influxdata/chronograf/oauth2"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
-	"github.com/tylerb/graceful"
 )
 
 var (
@@ -53,8 +52,6 @@ type Server struct {
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
 	KapacitorPassword string `long:"kapacitor-password" description:"Password of your Kapacitor instance" env:"KAPACITOR_PASSWORD"`
-
-	NewSources string `long:"new-sources" description:"Config for adding a new InfluxDB source and Kapacitor server, in JSON as an array of objects, and surrounded by single quotes. E.g. --new-sources='[{\"influxdb\":{\"name\":\"Influx 1\",\"username\":\"user1\",\"password\":\"pass1\",\"url\":\"http://localhost:8086\",\"metaUrl\":\"http://metaurl.com\",\"type\":\"influx-enterprise\",\"insecureSkipVerify\":false,\"default\":true,\"telegraf\":\"telegraf\",\"sharedSecret\":\"cubeapples\"},\"kapacitor\":{\"name\":\"Kapa 1\",\"url\":\"http://localhost:9092\",\"active\":true}}]'" env:"NEW_SOURCES" hidden:"true"`
 
 	Develop         bool          `short:"d" long:"develop" description:"Run server in develop mode."`
 	BoltPath        string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
@@ -105,8 +102,6 @@ type Server struct {
 	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
 	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
 	BuildInfo         chronograf.BuildInfo
-	Listener          net.Listener
-	handler           http.Handler
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() bool) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -249,7 +244,7 @@ func (s *Server) useTLS() bool {
 	return s.Cert != ""
 }
 
-// NewListener will an http or https listener depending useTLS()
+// NewListener will return an http or https listener depending useTLS().
 func (s *Server) NewListener() (net.Listener, error) {
 	addr := net.JoinHostPort(s.Host, strconv.Itoa(s.Port))
 	if !s.useTLS() {
@@ -273,10 +268,10 @@ func (s *Server) NewListener() (net.Listener, error) {
 	listener, err := tls.Listen("tcp", addr, &tls.Config{
 		Certificates: []tls.Certificate{cert},
 	})
-
 	if err != nil {
 		return nil, err
 	}
+
 	return listener, nil
 }
 
@@ -330,15 +325,15 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 }
 
 // Serve starts and runs the chronograf server
-func (s *Server) Serve(ctx context.Context) error {
+func (s *Server) Serve(ctx context.Context) {
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
-	_, err := NewCustomLinks(s.CustomLinks)
+	customLinks, err := NewCustomLinks(s.CustomLinks)
 	if err != nil {
 		logger.
 			WithField("component", "server").
 			WithField("CustomLink", "invalid").
 			Error(err)
-		return err
+		return
 	}
 	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), logger, s.useAuth())
 	service.SuperAdminProviderGroups = superAdminProviderGroups{
@@ -347,13 +342,6 @@ func (s *Server) Serve(ctx context.Context) error {
 	service.Env = chronograf.Environment{
 		TelegrafSystemInterval: s.TelegrafSystemInterval,
 	}
-	if err := service.HandleNewSources(ctx, s.NewSources); err != nil {
-		logger.
-			WithField("component", "server").
-			WithField("new-sources", "invalid").
-			Error(err)
-		return err
-	}
 
 	if !validBasepath(s.Basepath) {
 		err := fmt.Errorf("Invalid basepath, must follow format \"/mybasepath\"")
@@ -361,19 +349,19 @@ func (s *Server) Serve(ctx context.Context) error {
 			WithField("component", "server").
 			WithField("basepath", "invalid").
 			Error(err)
-		return err
+		return
 	}
 
-	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){}
-
 	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration)
-	providerFuncs = append(providerFuncs, provide(s.githubOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.googleOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.herokuOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.genericOAuth(logger, auth)))
-	providerFuncs = append(providerFuncs, provide(s.auth0OAuth(logger, auth)))
+	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){
+		provide(s.githubOAuth(logger, auth)),
+		provide(s.googleOAuth(logger, auth)),
+		provide(s.herokuOAuth(logger, auth)),
+		provide(s.genericOAuth(logger, auth)),
+		provide(s.auth0OAuth(logger, auth)),
+	}
 
-	s.handler = NewMux(MuxOpts{
+	handler := NewMux(MuxOpts{
 		Develop:       s.Develop,
 		Auth:          auth,
 		Logger:        logger,
@@ -381,42 +369,30 @@ func (s *Server) Serve(ctx context.Context) error {
 		ProviderFuncs: providerFuncs,
 		Basepath:      s.Basepath,
 		StatusFeedURL: s.StatusFeedURL,
-		CustomLinks:   s.CustomLinks,
+		CustomLinks:   customLinks,
 		PprofEnabled:  s.PprofEnabled,
 		DisableGZip:   s.DisableGZip,
 	}, service)
 
 	// Add chronograf's version header to all requests
-	s.handler = Version(s.BuildInfo.Version, s.handler)
+	handler = version(s.BuildInfo.Version, handler)
 
 	if s.useTLS() {
 		// Add HSTS to instruct all browsers to change from http to https
-		s.handler = HSTS(s.handler)
+		handler = hsts(handler)
 	}
-
-	listener, err := s.NewListener()
-	if err != nil {
-		logger.
-			WithField("component", "server").
-			Error(err)
-		return err
-	}
-	s.Listener = listener
 
 	// Using a log writer for http server logging
 	w := logger.Writer()
 	defer w.Close()
 	stdLog := log.New(w, "", 0)
 
-	// TODO: Remove graceful when changing to go 1.8
-	httpServer := &graceful.Server{
-		Server: &http.Server{
-			ErrorLog: stdLog,
-			Handler:  s.handler,
-		},
-		Logger:       stdLog,
-		TCPKeepAlive: 5 * time.Second,
+	httpServer := &http.Server{
+		ErrorLog:    stdLog,
+		Handler:     handler,
+		IdleTimeout: 5 * time.Second,
 	}
+
 	httpServer.SetKeepAlivesEnabled(true)
 
 	if !s.ReportingDisabled {
@@ -426,22 +402,30 @@ func (s *Server) Serve(ctx context.Context) error {
 	if s.useTLS() {
 		scheme = "https"
 	}
-	logger.
-		WithField("component", "server").
-		Info("Serving chronograf at ", scheme, "://", s.Listener.Addr())
 
-	if err := httpServer.Serve(s.Listener); err != nil {
+	listener, err := s.NewListener()
+	if err != nil {
 		logger.
 			WithField("component", "server").
 			Error(err)
-		return err
+		return
+	}
+	defer listener.Close()
+
+	logger.
+		WithField("component", "server").
+		Info("Serving chronograf at ", scheme, "://", listener.Addr())
+
+	if err := httpServer.Serve(listener); err != nil {
+		logger.
+			WithField("component", "server").
+			Error(err)
+		return
 	}
 
 	logger.
 		WithField("component", "server").
-		Info("Stopped serving chronograf at ", scheme, "://", s.Listener.Addr())
-
-	return nil
+		Info("Stopped serving chronograf at ", scheme, "://", listener.Addr())
 }
 
 // todo: add etcd connection details as arg.
@@ -533,7 +517,7 @@ func reportUsageStats(bi chronograf.BuildInfo, logger chronograf.Logger) {
 		WithField("freq", "24h").
 		WithField("stats", "os,arch,version,cluster_id,uptime")
 	l.Info("Reporting usage stats")
-	_, _ = reporter.Save(clientUsage(values))
+	reporter.Save(clientUsage(values))
 
 	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
@@ -556,7 +540,8 @@ func clientUsage(values client.Values) *client.Usage {
 	}
 }
 
+var re = regexp.MustCompile(`(\/{1}[\w-]+)+`)
+
 func validBasepath(basepath string) bool {
-	re := regexp.MustCompile(`(\/{1}[\w-]+)+`)
 	return re.ReplaceAllLiteralString(basepath, "") == ""
 }

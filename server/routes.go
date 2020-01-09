@@ -60,18 +60,12 @@ type AllRoutes struct {
 	AuthRoutes   []AuthRoute                            // Location of all auth routes. If no auth, this can be empty.
 	LogoutLink   string                                 // Location of the logout route for all auth routes. If no auth, this can be empty.
 	StatusFeed   string                                 // External link to the JSON Feed for the News Feed on the client's Status Page
-	CustomLinks  map[string]string                      // Custom external links for client's User menu, as passed in via CLI/ENV
+	CustomLinks  []CustomLink                           // Custom external links for client's User menu, as passed in via CLI/ENV
 	Logger       chronograf.Logger
 }
 
 // serveHTTP returns all top level routes and external links within chronograf
 func (a *AllRoutes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	customLinks, err := NewCustomLinks(a.CustomLinks)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error(), a.Logger)
-		return
-	}
-
 	org := "default"
 	if a.GetPrincipal != nil {
 		// If there is a principal, use the organization to populate the users routes
@@ -105,7 +99,7 @@ func (a *AllRoutes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Auth: make([]AuthRoute, len(a.AuthRoutes)), // We want to return at least an empty array, rather than null
 		ExternalLinks: getExternalLinksResponse{
 			StatusFeed:  &a.StatusFeed,
-			CustomLinks: customLinks,
+			CustomLinks: a.CustomLinks,
 		},
 		Flux: getFluxLinksResponse{
 			Self:        "/chronograf/v1/flux",

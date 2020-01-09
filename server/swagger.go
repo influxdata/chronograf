@@ -15,6 +15,6 @@ func Spec() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(swagger)
+		w.Write(swagger)
 	})
 }

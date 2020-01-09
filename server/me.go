@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"sort"
 
 	"golang.org/x/net/context"
@@ -43,7 +44,7 @@ func newMeResponse(usr *chronograf.User, org string) meResponse {
 	name := "me"
 	if usr != nil {
 		base = fmt.Sprintf("/chronograf/v1/organizations/%s/users", org)
-		name = PathEscape(fmt.Sprintf("%d", usr.ID))
+		name = url.PathEscape(fmt.Sprintf("%d", usr.ID))
 	}
 
 	return meResponse{
@@ -378,7 +379,7 @@ func (s *Service) usersOrganizations(ctx context.Context, u *chronograf.User) ([
 	}
 
 	orgs := []chronograf.Organization{}
-	for orgID, _ := range orgIDs {
+	for orgID := range orgIDs {
 		org, err := s.Store.Organizations(ctx).Get(ctx, chronograf.OrganizationQuery{ID: &orgID})
 
 		// There can be race conditions between deleting a organization and the me query

@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf/v2"
+	platform "github.com/influxdata/chronograf/v2"
 )
 
 type cellV2Links struct {

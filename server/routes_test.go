@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/influxdata/chronograf/log"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAllRoutes(t *testing.T) {
@@ -85,9 +86,12 @@ func TestAllRoutesWithAuth(t *testing.T) {
 
 func TestAllRoutesWithExternalLinks(t *testing.T) {
 	statusFeedURL := "http://pineapple.life/feed.json"
-	customLinks := map[string]string{
+
+	customLinks, err := NewCustomLinks(map[string]string{
 		"cubeapple": "https://cube.apple",
-	}
+	})
+	require.NoError(t, err)
+
 	logger := log.New(log.DebugLevel)
 	handler := &AllRoutes{
 		StatusFeed:  statusFeedURL,
