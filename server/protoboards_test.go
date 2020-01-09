@@ -45,7 +45,7 @@ func Test_Protoboards(t *testing.T) {
 				contentType: "application/json",
 				body:        `{"protoboards":[{"id":"1","meta":{"name":"protodashboard 1","icon":"http://example.com/icon.png","version":"1.2.3","measurements":["m1","m2"],"dashboardVersion":"1.7.0","description":"this is great","author":"Chronogiraffe","license":"Apache-2.0","url":"http://example.com"},"data":{"cells":[{"x":0,"y":0,"w":0,"h":0,"name":"","queries":null,"axes":null,"type":"","colors":null,"legend":{},"tableOptions":{"verticalTimeAxis":false,"sortBy":{"internalName":"","displayName":"","visible":false},"wrapping":"","fixFirstColumn":false},"fieldOptions":null,"timeFormat":"","decimalPlaces":{"isEnforced":false,"digits":0},"note":"","noteVisibility":""}],"templates":[{"tempVar":"","values":null,"id":"","type":"","label":""}]},"links":{"self":"/chronograf/v1/protoboards/1"}},{"id":"2","meta":{"name":"protodashboard 2","icon":"http://example.com/icon.png","version":"1.2.3","measurements":["m1","m2"],"dashboardVersion":"1.7.0","description":"this is great","author":"Chronogiraffe","license":"Apache-2.0","url":"http://example.com"},"data":{"cells":[{"x":8,"y":0,"w":3,"h":5,"name":"Untitled Cell","queries":[{"query":"SELECT mean(\"usage_steal\") AS \"mean_usage_steal\", mean(\"usage_system\") AS \"mean_usage_system\" FROM \"telegraf\".\"autogen\".\"cpu\" WHERE time \u003e :dashboardTime: AND \"host\"='denizs-MacBook-Pro.local' GROUP BY time(:interval:) FILL(null)","queryConfig":{"database":"telegraf","measurement":"cpu","retentionPolicy":"autogen","fields":[{"value":"mean","type":"func","alias":"mean_usage_steal","args":[{"value":"usage_steal","type":"field","alias":""}]},{"value":"mean","type":"func","alias":"mean_usage_system","args":[{"value":"usage_steal","type":"field","alias":""}]}],"tags":{"host":["denizs-MacBook-Pro.local"]},"groupBy":{"time":"auto","tags":[]},"areTagsAccepted":true,"fill":"null","rawText":null,"range":null,"shifts":null},"source":"","type":"influxql"}],"axes":{"x":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"10","scale":"linear"},"y":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"10","scale":"linear"},"y2":{"bounds":["",""],"label":"","prefix":"","suffix":"","base":"10","scale":"linear"}},"type":"line","colors":[],"legend":{},"tableOptions":{"verticalTimeAxis":false,"sortBy":{"internalName":"","displayName":"","visible":false},"wrapping":"","fixFirstColumn":false},"fieldOptions":[],"timeFormat":"","decimalPlaces":{"isEnforced":true,"digits":2},"note":"","noteVisibility":""}],"templates":null},"links":{"self":"/chronograf/v1/protoboards/2"}}]}`},
 			arg: []chronograf.Protoboard{
-				chronograf.Protoboard{
+				{
 					ID: "1",
 					Meta: chronograf.ProtoboardMeta{
 						Name:             "protodashboard 1",
@@ -58,18 +58,18 @@ func Test_Protoboards(t *testing.T) {
 						License:          "Apache-2.0",
 						URL:              "http://example.com",
 					},
-					Data: chronograf.ProtoboardData{Cells: []chronograf.ProtoboardCell{chronograf.ProtoboardCell{}}, Templates: []chronograf.Template{chronograf.Template{}}}},
-				chronograf.Protoboard{
+					Data: chronograf.ProtoboardData{Cells: []chronograf.ProtoboardCell{{}}, Templates: []chronograf.Template{{}}}},
+				{
 					ID:   "2",
 					Meta: chronograf.ProtoboardMeta{Name: "protodashboard 2", Measurements: []string{"m1", "m2"}, Icon: "http://example.com/icon.png", Version: "1.2.3", DashboardVersion: "1.7.0", Description: "this is great", Author: "Chronogiraffe", License: "Apache-2.0", URL: "http://example.com"},
-					Data: chronograf.ProtoboardData{Cells: []chronograf.ProtoboardCell{chronograf.ProtoboardCell{
+					Data: chronograf.ProtoboardData{Cells: []chronograf.ProtoboardCell{{
 						X:    8,
 						Y:    0,
 						W:    3,
 						H:    5,
 						Name: "Untitled Cell",
 						Axes: map[string]chronograf.Axis{
-							"x": chronograf.Axis{
+							"x": {
 								Bounds: []string{"", ""},
 								Label:  "",
 								Prefix: "",
@@ -77,7 +77,7 @@ func Test_Protoboards(t *testing.T) {
 								Base:   "10",
 								Scale:  "linear",
 							},
-							"y": chronograf.Axis{
+							"y": {
 								Bounds: []string{"", ""},
 								Label:  "",
 								Prefix: "",
@@ -85,7 +85,7 @@ func Test_Protoboards(t *testing.T) {
 								Base:   "10",
 								Scale:  "linear",
 							},
-							"y2": chronograf.Axis{
+							"y2": {
 								Bounds: []string{"", ""},
 								Label:  "",
 								Prefix: "",
@@ -119,7 +119,7 @@ func Test_Protoboards(t *testing.T) {
 						Note:           "",
 						NoteVisibility: "",
 						Queries: []chronograf.DashboardQuery{
-							chronograf.DashboardQuery{
+							{
 								Command: "SELECT mean(\"usage_steal\") AS \"mean_usage_steal\", mean(\"usage_system\") AS \"mean_usage_system\" FROM \"telegraf\".\"autogen\".\"cpu\" WHERE time > :dashboardTime: AND \"host\"='denizs-MacBook-Pro.local' GROUP BY time(:interval:) FILL(null)",
 								Label:   "",
 								QueryConfig: chronograf.QueryConfig{
@@ -128,24 +128,24 @@ func Test_Protoboards(t *testing.T) {
 									Measurement:     "cpu",
 									RetentionPolicy: "autogen",
 									Fields: []chronograf.Field{
-										chronograf.Field{
+										{
 											Value: "mean",
 											Type:  "func",
 											Alias: "mean_usage_steal",
 											Args: []chronograf.Field{
-												chronograf.Field{
+												{
 													Value: "usage_steal",
 													Type:  "field",
 													Alias: "",
 												},
 											},
 										},
-										chronograf.Field{
+										{
 											Value: "mean",
 											Type:  "func",
 											Alias: "mean_usage_system",
 											Args: []chronograf.Field{
-												chronograf.Field{
+												{
 													Value: "usage_steal",
 													Type:  "field",
 													Alias: "",
@@ -154,7 +154,7 @@ func Test_Protoboards(t *testing.T) {
 										},
 									},
 									Tags: map[string][]string{
-										"host": []string{
+										"host": {
 											"denizs-MacBook-Pro.local",
 										},
 									},

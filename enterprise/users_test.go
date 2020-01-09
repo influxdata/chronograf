@@ -97,7 +97,7 @@ func TestClient_Add(t *testing.T) {
 					},
 					userRoles: func(ctx context.Context) (map[string]enterprise.Roles, error) {
 						return map[string]enterprise.Roles{
-							"marty": enterprise.Roles{
+							"marty": {
 								Roles: []enterprise.Role{
 									{
 										Name: "admin",
@@ -309,7 +309,7 @@ func TestClient_Get(t *testing.T) {
 					},
 					userRoles: func(ctx context.Context) (map[string]enterprise.Roles, error) {
 						return map[string]enterprise.Roles{
-							"marty": enterprise.Roles{
+							"marty": {
 								Roles: []enterprise.Role{
 									{
 										Name: "timetravels",

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 	"strings"
@@ -11,8 +12,8 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/NYTimes/gziphandler"
-	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf" // When julienschmidt/httprouter v2 w/ context is out, switch
+	"github.com/bouk/httprouter" // When julienschmidt/httprouter v2 w/ context is out, switch
+	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/roles"
 )
@@ -30,10 +31,10 @@ type MuxOpts struct {
 	UseAuth       bool                 // UseAuth turns on Github OAuth and JWT
 	Auth          oauth2.Authenticator // Auth is used to authenticate and authorize
 	ProviderFuncs []func(func(oauth2.Provider, oauth2.Mux))
-	StatusFeedURL string            // JSON Feed URL for the client Status page News Feed
-	CustomLinks   map[string]string // Any custom external links for client's User menu
-	PprofEnabled  bool              // Mount pprof routes for profiling
-	DisableGZip   bool              // Optionally disable gzip.
+	StatusFeedURL string       // JSON Feed URL for the client Status page News Feed
+	CustomLinks   []CustomLink // Any custom external links for client's User menu
+	PprofEnabled  bool         // Mount pprof routes for profiling
+	DisableGZip   bool         // Optionally disable gzip.
 }
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
@@ -380,7 +381,7 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 		allRoutes.LogoutLink = path.Join(opts.Basepath, "/oauth/logout")
 
 		// Create middleware that redirects to the appropriate provider logout
-		router.GET("/oauth/logout", Logout("/", opts.Basepath, allRoutes.AuthRoutes))
+		router.GET("/oauth/logout", logout("/", opts.Basepath, allRoutes.AuthRoutes))
 		out = Logger(opts.Logger, FlushingHandler(auth))
 	} else {
 		out = Logger(opts.Logger, FlushingHandler(router))
@@ -394,7 +395,7 @@ func AuthAPI(opts MuxOpts, router chronograf.Router) (http.Handler, AuthRoutes) 
 	routes := AuthRoutes{}
 	for _, pf := range opts.ProviderFuncs {
 		pf(func(p oauth2.Provider, m oauth2.Mux) {
-			urlName := PathEscape(strings.ToLower(p.Name()))
+			urlName := url.PathEscape(strings.ToLower(p.Name()))
 
 			loginPath := path.Join("/oauth", urlName, "login")
 			logoutPath := path.Join("/oauth", urlName, "logout")

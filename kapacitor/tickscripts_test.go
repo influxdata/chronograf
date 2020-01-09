@@ -42,11 +42,11 @@ func TestGenerate(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -97,11 +97,11 @@ func TestThreshold(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -550,11 +550,11 @@ func TestThresholdDetail(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -710,11 +710,11 @@ func TestThresholdInsideRange(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -869,11 +869,11 @@ func TestThresholdOutsideRange(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -1021,11 +1021,11 @@ func TestThresholdNoAggregate(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -1171,11 +1171,11 @@ func TestRelative(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -1341,11 +1341,11 @@ func TestRelativeChange(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},
@@ -1508,11 +1508,11 @@ func TestDeadman(t *testing.T) {
 				},
 			},
 			Tags: map[string][]string{
-				"host": []string{
+				"host": {
 					"acc-0eabc309-eu-west-1-data-3",
 					"prod",
 				},
-				"cpu": []string{
+				"cpu": {
 					"cpu_total",
 				},
 			},

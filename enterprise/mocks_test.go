@@ -23,7 +23,7 @@ func NewMockControlClient(addr string) *ControlClient {
 	return &ControlClient{
 		Cluster: &enterprise.Cluster{
 			DataNodes: []enterprise.DataNode{
-				enterprise.DataNode{
+				{
 					HTTPAddr: addr,
 				},
 			},

@@ -88,6 +88,8 @@ type WhereFilter struct {
 	Operator  string              // Operator is == or !=
 }
 
+var re = regexp.MustCompile(`(?U)"(.*)"\s+(==|!=)\s+'(.*)'`)
+
 func varWhereFilter(vars map[string]tick.Var) (WhereFilter, bool) {
 	// All chronograf TICKScripts have whereFilters.
 	v, ok := vars["whereFilter"]
@@ -112,7 +114,6 @@ func varWhereFilter(vars map[string]tick.Var) (WhereFilter, bool) {
 
 	opSet := map[string]struct{}{} // All ops must be the same b/c queryConfig
 	// Otherwise the lambda function will be several "tag" op 'value' expressions.
-	var re = regexp.MustCompile(`(?U)"(.*)"\s+(==|!=)\s+'(.*)'`)
 	for _, match := range re.FindAllStringSubmatch(lambda, -1) {
 		tag, op, value := match[1], match[2], match[3]
 		opSet[op] = struct{}{}
@@ -281,11 +282,15 @@ type FieldFunc struct {
 	Func  string
 }
 
+var (
+	effRe1 = regexp.MustCompile(`(?Um)\|(\w+)\('(.*)'\)\s*\.as\('value'\)`)
+	effRe2 = regexp.MustCompile(`(?Um)\|eval\(lambda: "(.*)"\)\s*\.as\('value'\)`)
+)
+
 func extractFieldFunc(script chronograf.TICKScript) FieldFunc {
 	// If the TICKScript is relative or threshold alert with an aggregate
 	// then the aggregate function and field is in the form |func('field').as('value')
-	var re = regexp.MustCompile(`(?Um)\|(\w+)\('(.*)'\)\s*\.as\('value'\)`)
-	for _, match := range re.FindAllStringSubmatch(string(script), -1) {
+	for _, match := range effRe1.FindAllStringSubmatch(string(script), -1) {
 		fn, field := match[1], match[2]
 		return FieldFunc{
 			Field: field,
@@ -295,8 +300,7 @@ func extractFieldFunc(script chronograf.TICKScript) FieldFunc {
 
 	// If the alert does not have an aggregate then the the value function will
 	// be this form: |eval(lambda: "%s").as('value')
-	re = regexp.MustCompile(`(?Um)\|eval\(lambda: "(.*)"\)\s*\.as\('value'\)`)
-	for _, match := range re.FindAllStringSubmatch(string(script), -1) {
+	for _, match := range effRe2.FindAllStringSubmatch(string(script), -1) {
 		field := match[1]
 		return FieldFunc{
 			Field: field,
@@ -311,11 +315,15 @@ type CritCondition struct {
 	Operators []string
 }
 
+var (
+	ecRe1 = regexp.MustCompile(`(?Um)\.crit\(lambda:\s+"value"\s+(.*)\s+crit\)`)
+	ecRe2 = regexp.MustCompile(`(?Um)\.crit\(lambda:\s+"value"\s+(.*)\s+lower\s+(.*)\s+"value"\s+(.*)\s+upper\)`)
+)
+
 func extractCrit(script chronograf.TICKScript) CritCondition {
 	// Threshold and relative alerts have the form .crit(lambda: "value" op crit)
 	// Threshold range alerts have the form .crit(lambda: "value" op lower op "value" op upper)
-	var re = regexp.MustCompile(`(?Um)\.crit\(lambda:\s+"value"\s+(.*)\s+crit\)`)
-	for _, match := range re.FindAllStringSubmatch(string(script), -1) {
+	for _, match := range ecRe1.FindAllStringSubmatch(string(script), -1) {
 		op := match[1]
 		return CritCondition{
 			Operators: []string{
@@ -323,8 +331,8 @@ func extractCrit(script chronograf.TICKScript) CritCondition {
 			},
 		}
 	}
-	re = regexp.MustCompile(`(?Um)\.crit\(lambda:\s+"value"\s+(.*)\s+lower\s+(.*)\s+"value"\s+(.*)\s+upper\)`)
-	for _, match := range re.FindAllStringSubmatch(string(script), -1) {
+
+	for _, match := range ecRe2.FindAllStringSubmatch(string(script), -1) {
 		lower, compound, upper := match[1], match[2], match[3]
 		return CritCondition{
 			Operators: []string{
