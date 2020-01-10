@@ -435,7 +435,7 @@ const mapDispatchToProps = {
   notify: notifyActionCreator,
 }
 
-const mstp = (state, props) => {
+const mapStateToProps = (state, props) => {
   const {sources} = state
   const sourceID = get(props, 'template.sourceID', '0')
   const selectedSource = sources.find(source => source.id === sourceID)
@@ -448,4 +448,7 @@ const mstp = (state, props) => {
   }
 }
 
-export default connect(mstp, mapDispatchToProps)(TemplateVariableEditor)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TemplateVariableEditor)
