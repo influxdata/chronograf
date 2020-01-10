@@ -164,6 +164,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
                 onChangeSource={this.handleOnChangeSource}
                 allowDynamicSource={true}
                 type={QueryType.InfluxQL}
+                widthPixels={0}
               />
             </div>
             <div className="form-group col-sm-4">
@@ -328,7 +329,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
       selectedSource,
     } = this.state
     nextTemplate.sourceID = '0' // setting to 0 b/c an empty string returns an unparseable json error from the BE
-    if (isDynamicSourceSelected === false) {
+    if (!isDynamicSourceSelected) {
       nextTemplate.sourceID = selectedSource.id
     }
 

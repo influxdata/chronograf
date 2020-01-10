@@ -32,7 +32,7 @@ class SourceDropdown extends PureComponent<Props> {
       <Dropdown
         onChange={this.handleSelect}
         selectedID={this.selectedID}
-        widthPixels={this.widthPixels}
+        widthPixels={this.props.widthPixels}
       >
         {this.dropdownItems}
       </Dropdown>
@@ -52,11 +52,6 @@ class SourceDropdown extends PureComponent<Props> {
     })
 
     onChangeSource(source, type)
-  }
-
-  private get widthPixels(): number {
-    const {widthPixels} = this.props
-    return widthPixels ? widthPixels : 0
   }
 
   private get dropdownItems(): JSX.Element[] {
