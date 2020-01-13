@@ -3,12 +3,10 @@ package etcd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
-	conc "github.com/coreos/etcd/clientv3/concurrency"
 	"github.com/influxdata/chronograf"
 	platform "github.com/influxdata/chronograf/v2"
 )
@@ -29,6 +27,8 @@ type Client struct {
 	configStore             chronograf.ConfigStore
 	mappingsStore           chronograf.MappingsStore
 	organizationConfigStore chronograf.OrganizationConfigStore
+
+	etcd *clientv3.Client
 }
 
 // NewClient initializes all stores
@@ -86,33 +86,6 @@ func (c *Client) OrganizationConfigStore() chronograf.OrganizationConfigStore {
 	return c.organizationConfigStore
 }
 
-// FindCellByID returns a single cell by ID.
-func (c *Client) FindCellByID(ctx context.Context, id platform.ID) (*platform.Cell, error) {
-	return nil, nil
-}
-
-// FindCells returns a list of cells that match filter and the total count of matching cells.
-// Additional options provide pagination & sorting.
-func (c *Client) FindCells(ctx context.Context, filter platform.CellFilter) ([]*platform.Cell, int, error) {
-	return nil, 0, nil
-}
-
-// CreateCell creates a new cell and sets b.ID with the new identifier.
-func (c *Client) CreateCell(ctx context.Context, b *platform.Cell) error {
-	return nil
-}
-
-// UpdateCell updates a single cell with changeset.
-// Returns the new cell state after update.
-func (c *Client) UpdateCell(ctx context.Context, id platform.ID, upd platform.CellUpdate) (*platform.Cell, error) {
-	return nil, nil
-}
-
-// DeleteCell removes a cell by ID.
-func (c *Client) DeleteCell(ctx context.Context, id platform.ID) error {
-	return nil
-}
-
 // FindDashboardByID returns a single dashboard by ID.
 func (c *Client) FindDashboardByID(ctx context.Context, id platform.ID) (*platform.Dashboard, error) {
 	return nil, nil
@@ -141,9 +114,6 @@ func (c *Client) DeleteDashboard(ctx context.Context, id platform.ID) error {
 }
 
 const (
-	// OpPrefix is op prefix for etcd.
-	OpPrefix = "etcd/"
-
 	// DefaultDialTimeout is the default dial timeout for the etc client.
 	DefaultDialTimeout = 5 * time.Second
 
@@ -225,74 +195,4 @@ var WithDialTimeout = func(d time.Duration) ConnectionOption {
 		c.DialTimeout = d
 		return nil
 	}
-}
-
-// Apply execute the operations defined by the callback transactionally.
-//
-// Operations, intended as a set of reads and writes provided by the callback STM parameter, will occur atomically.
-// It ensurs the consistency of the data on which it operates.
-// Finaly, it forwards the errors returned from the callback.
-func (c *client) Apply(ctx context.Context, callback func(stm conc.STM) error) (err error) {
-	_, err = conc.NewSTM(c.client, func(cstm conc.STM) error {
-		return c.recoverCallback(callback, cstm)
-	}, conc.WithAbortContext(ctx))
-	return err
-}
-
-func (c *client) recoverCallback(callback func(stm conc.STM) error, cstm conc.STM) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.New("unknown internal transaction error")
-			c.logger.Error("panic while in STM")
-		}
-	}()
-	err = callback(cstm)
-	return err
-}
-
-func (c *client) Get(ctx context.Context, key string, opts ...clientv3.OpOption) (*clientv3.GetResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-	defer cancel()
-	return c.client.Get(ctx, key, opts...)
-}
-
-func (c *client) Put(ctx context.Context, key, val string, opts ...clientv3.OpOption) (*clientv3.PutResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-	defer cancel()
-	return c.client.Put(ctx, key, val, opts...)
-}
-
-func (c *client) Delete(ctx context.Context, key string, opts ...clientv3.OpOption) (*clientv3.DeleteResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-	defer cancel()
-	return c.client.Delete(ctx, key, opts...)
-}
-
-func (c *client) Watch(ctx context.Context, key string, opts ...clientv3.OpOption) (ch clientv3.WatchChan) {
-	return c.client.Watch(ctx, key, opts...)
-}
-
-func (c *client) Grant(ctx context.Context, ttl int64) (*clientv3.LeaseGrantResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-	defer cancel()
-	return c.client.Grant(ctx, ttl)
-}
-
-func (c *client) Revoke(ctx context.Context, lease clientv3.LeaseID) (*clientv3.LeaseRevokeResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-	defer cancel()
-	return c.client.Revoke(ctx, lease)
-}
-
-// KeepAliveOnce sets the new expiration time for a lease to its original length.
-func (c *client) KeepAliveOnce(ctx context.Context, lease clientv3.LeaseID) (*clientv3.LeaseKeepAliveResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.config.RequestTimeout)
-	defer cancel()
-	return c.client.KeepAliveOnce(ctx, lease)
-}
-
-func (c *client) Close() error {
-	// etcd client _always_ returns an error, we won't
-	c.client.Close()
-	return nil
 }
