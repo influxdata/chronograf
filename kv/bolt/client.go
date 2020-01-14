@@ -89,10 +89,6 @@ func (c *Client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...O
 		return fmt.Errorf(ErrUnableToInitialize, err)
 	}
 
-	if err = c.migrate(ctx, build); err != nil {
-		return fmt.Errorf(ErrUnableToMigrate, err)
-	}
-
 	return nil
 }
 
@@ -116,7 +112,7 @@ func (c *Client) Update(ctx context.Context, fn func(tx kv.Tx) error) error {
 	})
 }
 
-// s a light wrapper around a boltdb transaction. It implements kv.Tx.
+// Tx is a light wrapper around a boltdb transaction. It implements kv.Tx.
 type Tx struct {
 	tx  *bolt.Tx
 	ctx context.Context
@@ -170,6 +166,7 @@ func (b *Bucket) Delete(key []byte) error {
 	return b.bucket.Delete(key)
 }
 
+// NextSequence calls NextSequence on the bolt bucket.
 func (b *Bucket) NextSequence() (uint64, error) {
 	return b.bucket.NextSequence()
 }
@@ -306,10 +303,6 @@ func (c *Cursor) Err() error {
 // initialize creates Buckets that are missing
 func (c *Client) initialize(ctx context.Context) error {
 	if err := c.db.Update(func(tx *bolt.Tx) error {
-		// Always create SchemaVersions bucket.
-		if _, err := tx.CreateBucketIfNotExists(SchemaVersionBucket); err != nil {
-			return err
-		}
 		// Always create Config bucket.
 		if _, err := tx.CreateBucketIfNotExists(ConfigBucket); err != nil {
 			return err
@@ -326,6 +319,7 @@ func (c *Client) initialize(ctx context.Context) error {
 	return nil
 }
 
+/*
 // migrate moves data from an old schema to a new schema in each Store
 func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error {
 	if c.db != nil {
@@ -340,7 +334,7 @@ func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error 
 	}
 	return nil
 }
-
+*/
 // Close the connection to the bolt database
 func (c *Client) Close() error {
 	if c.db != nil {

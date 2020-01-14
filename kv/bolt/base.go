@@ -1,5 +1,6 @@
 package bolt
 
+/*
 import (
 	"time"
 
@@ -90,3 +91,4 @@ func MigrateAll(client *Client) error {
 var migrations = []Migration{
 	changeIntervalToDuration,
 }
+*/

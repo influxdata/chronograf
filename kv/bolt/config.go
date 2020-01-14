@@ -26,33 +26,23 @@ type ConfigStore struct {
 	client *Client
 }
 
-func (s *ConfigStore) Migrate(ctx context.Context) error {
-	if _, err := s.Get(ctx); err != nil {
-		return s.Initialize(ctx)
-	}
-	return nil
-}
-
-func (s *ConfigStore) Initialize(ctx context.Context) error {
-	cfg := chronograf.Config{
-		Auth: chronograf.AuthConfig{
-			SuperAdminNewUsers: false,
-		},
-	}
-	return s.Update(ctx, &cfg)
-}
-
 func (s *ConfigStore) Get(ctx context.Context) (*chronograf.Config, error) {
 	var cfg chronograf.Config
 	err := s.client.db.View(func(tx *bolt.Tx) error {
 		v := tx.Bucket(ConfigBucket).Get(configID)
 		if v == nil {
-			return chronograf.ErrConfigNotFound
+			cfg = chronograf.Config{
+				Auth: chronograf.AuthConfig{
+					SuperAdminNewUsers: false,
+				},
+			}
+			return nil
 		}
 		return internal.UnmarshalConfig(v, &cfg)
 	})
 
 	if err != nil {
+		fmt.Println("ASADFSADFSADF")
 		return nil, err
 	}
 	return &cfg, nil

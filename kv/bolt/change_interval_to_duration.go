@@ -1,5 +1,6 @@
 package bolt
 
+/*
 import (
 	"errors"
 	"log"
@@ -75,12 +76,14 @@ func up(db *bolt.DB) error {
 func down(db *bolt.DB) error {
 	return nil
 }
+*/
 
 /*
 	Import protobuf types and bucket names that are pertinent to this migration.
 	This isolates the migration from the codebase, and prevents a future change
 	to a type definition from invalidating the migration functions.
 */
+/*
 var dashboardBucket = []byte("Dashoard")
 
 type Source struct {
@@ -1426,3 +1429,4 @@ var fileDescriptorInternal = []byte{
 	0xfc, 0xcd, 0xbf, 0xf3, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xda, 0x7c, 0x0d, 0xab, 0xf8, 0x0f,
 	0x00, 0x00,
 }
+*/
