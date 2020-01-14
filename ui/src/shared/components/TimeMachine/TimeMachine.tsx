@@ -145,7 +145,6 @@ class TimeMachine extends PureComponent<Props, State> {
       timeMachineProportions,
       onSetTimeMachineProportions,
     } = this.props
-    console.log('TM.render: this.props', this.props, 'this.state', this.state)
     const {autoRefreshDuration, isViewingRawData} = this.state
     const [topSize, bottomSize] = timeMachineProportions
 

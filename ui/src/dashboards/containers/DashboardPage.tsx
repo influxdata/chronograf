@@ -43,7 +43,9 @@ import {interval, DASHBOARD_LAYOUT_ROW_HEIGHT} from 'src/shared/constants'
 import {FORMAT_INFLUXQL} from 'src/shared/data/timeRanges'
 import {EMPTY_LINKS} from 'src/dashboards/constants/dashboardHeader'
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
-import {AutoRefreshOption} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
+import autoRefreshOptions, {
+  AutoRefreshOption,
+} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
 
 // Types
 import {WithRouterProps} from 'react-router'
@@ -76,7 +78,6 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   dashboardID: number
   dashboard: DashboardsModels.Dashboard
   dashboards: DashboardsModels.Dashboard[]
-  handleChooseAutoRefresh: AppActions.SetAutoRefreshActionCreator
   autoRefresh: number
   refreshRate: number
   timeRange: QueriesModels.TimeRange
@@ -141,7 +142,14 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public async componentDidMount() {
-    const {refreshRate} = this.props
+    const {refreshRate, updateQueryParams} = this.props
+    const match = autoRefreshOptions.find(r => r.milliseconds === refreshRate)
+
+    if (match) {
+      updateQueryParams({
+        refresh: match.label,
+      })
+    }
 
     GlobalAutoRefresher.poll(refreshRate)
     GlobalAutoRefresher.subscribe(this.fetchAnnotations)
@@ -165,10 +173,16 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    const {dashboard, refreshRate, annotationsDisplaySetting} = this.props
+    const {
+      dashboard,
+      refreshRate,
+      updateQueryParams,
+      annotationsDisplaySetting,
+    } = this.props
 
     const prevPath = getDeep(prevProps.location, 'pathname', null)
     const thisPath = getDeep(this.props.location, 'pathname', null)
+    const match = autoRefreshOptions.find(r => r.milliseconds === refreshRate)
 
     const templates = this.parseTempVar(dashboard)
     const prevTemplates = this.parseTempVar(prevProps.dashboard)
@@ -178,6 +192,11 @@ class DashboardPage extends Component<Props, State> {
 
     if ((prevPath && thisPath && prevPath !== thisPath) || isTemplateDeleted) {
       this.getDashboard()
+      if (match) {
+        updateQueryParams({
+          refresh: match.label,
+        })
+      }
     }
 
     if (refreshRate !== prevProps.refreshRate) {
@@ -220,7 +239,6 @@ class DashboardPage extends Component<Props, State> {
       cellQueryStatus,
       inPresentationMode,
       showTemplateVariableControlBar,
-      handleChooseAutoRefresh,
       handleClickPresentationButton,
       toggleTemplateVariableControlBar,
     } = this.props
@@ -407,11 +425,11 @@ class DashboardPage extends Component<Props, State> {
   private handleChooseAutoRefresh = (
     autoRefreshOption: AutoRefreshOption
   ): void => {
-    const {dashboardID, setDashRefresh, handleChooseAutoRefresh, updateQueryParams} = this.props
+    const {dashboardID, setDashRefresh, updateQueryParams} = this.props
     const {label, milliseconds} = autoRefreshOption
 
     updateQueryParams({
-      refresh: label
+      refresh: label,
     })
 
     setDashRefresh(dashboardID, milliseconds)
@@ -606,7 +624,6 @@ const mdtp = {
   updateTemplateQueryParams: dashboardActions.updateTemplateQueryParams,
   updateQueryParams: dashboardActions.updateQueryParams,
   updateTimeRangeQueryParams: dashboardActions.updateTimeRangeQueryParams,
-  handleChooseAutoRefresh: appActions.setAutoRefresh,
   handleClickPresentationButton: appActions.delayEnablePresentationMode,
   errorThrown: errorActions.errorThrown,
   notify: notifyActions.notify,

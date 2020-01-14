@@ -106,7 +106,12 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   public componentDidMount() {
-    const {cell, dashboardTimeRange, dashboardRefresh, onResetTimeMachine} = this.props
+    const {
+      cell,
+      dashboardTimeRange,
+      dashboardRefresh,
+      onResetTimeMachine,
+    } = this.props
 
     const initialState = {
       ...initialStateFromCell(cell),

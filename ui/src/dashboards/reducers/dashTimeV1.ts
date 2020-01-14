@@ -1,15 +1,11 @@
 import {unionBy} from 'lodash'
 
-import {TimeRange, RefreshRate} from 'src/types'
+import {TimeRange} from 'src/types'
+import {Refresh} from 'src/types/localStorage'
 import {Action, ActionType} from 'src/dashboards/actions'
 
 interface Range extends TimeRange {
   dashboardID: number
-}
-
-interface Refresh {
-  dashboardID: number
-  refreshRate: RefreshRate
 }
 
 export interface State {

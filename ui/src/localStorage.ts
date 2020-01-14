@@ -50,7 +50,10 @@ export const saveToLocalStorage = ({
   script,
 }: LocalStorage): void => {
   try {
-    const dashTimeV1 = {ranges: dashBoardTimeNormalizer(ranges), refreshes: dashBoardRefreshNormalizer(refreshes)}
+    const dashTimeV1 = {
+      ranges: dashBoardTimeNormalizer(ranges),
+      refreshes: dashBoardRefreshNormalizer(refreshes),
+    }
 
     const minimalLogs = _.omit(logs, [
       'tableData',

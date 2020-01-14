@@ -104,6 +104,7 @@ export {
   DropdownAction,
   DropdownItem,
   TimeRange,
+  RefreshRate,
   DygraphData,
   DygraphSeries,
   DygraphValue,

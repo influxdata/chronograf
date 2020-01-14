@@ -15,7 +15,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   selected: number
-  onChoose: (milliseconds: number) => void
+  onChoose: (autoRefreshOption: AutoRefreshOption) => void
   showManualRefresh?: boolean
   onManualRefresh?: () => void
 }

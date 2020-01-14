@@ -43,13 +43,14 @@ import {
   RemoteDataState,
   Host,
   Layout,
+  RefreshRate,
 } from 'src/types'
 
 interface Props extends ManualRefreshProps {
   source: Source
   links: Links
   autoRefresh: number
-  onChooseAutoRefresh: () => void
+  onChooseAutoRefresh: (milliseconds: RefreshRate) => void
   notify: NotificationAction
 }
 
@@ -74,6 +75,7 @@ export class HostsPage extends PureComponent<Props, State> {
       hostsPageStatus: RemoteDataState.NotStarted,
       layouts: [],
     }
+    this.handleChooseAutoRefresh = this.handleChooseAutoRefresh.bind(this)
   }
 
   public async componentDidMount() {
@@ -134,11 +136,7 @@ export class HostsPage extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {
-      source,
-      autoRefresh,
-      onManualRefresh,
-    } = this.props
+    const {source, autoRefresh, onManualRefresh} = this.props
     const {hostsObject, hostsPageStatus} = this.state
     return (
       <Page className="hosts-list-page">
@@ -149,7 +147,7 @@ export class HostsPage extends PureComponent<Props, State> {
           <Page.Header.Right showSourceIndicator={true}>
             <AutoRefreshDropdown
               selected={autoRefresh}
-              onChoose={(option) => this.handleChooseAutoRefresh(option)}
+              onChoose={this.handleChooseAutoRefresh}
               onManualRefresh={onManualRefresh}
             />
           </Page.Header.Right>

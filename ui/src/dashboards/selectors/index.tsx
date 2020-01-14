@@ -8,9 +8,13 @@ export const getTimeRange = (state: {dashTimeV1: DashTimeState}, dashboardID) =>
     r => r.dashboardID === idNormalizer(TYPE_ID, dashboardID)
   ) || DEFAULT_TIME_RANGE
 
-export const getRefreshRate = (state: {dashTimeV1: DashTimeState}, dashboardID) => {
-  const {refreshRate = DASHBOARD_REFRESH_DEFAULT} = state.dashTimeV1.refreshes.find(
-    refr => refr.dashboardID === idNormalizer(TYPE_ID, dashboardID)
-  ) || {}
+export const getRefreshRate = (
+  state: {dashTimeV1: DashTimeState},
+  dashboardID
+) => {
+  const {refreshRate = DASHBOARD_REFRESH_DEFAULT} =
+    state.dashTimeV1.refreshes.find(
+      refr => refr.dashboardID === idNormalizer(TYPE_ID, dashboardID)
+    ) || {}
   return refreshRate
 }

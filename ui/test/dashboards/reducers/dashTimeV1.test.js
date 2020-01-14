@@ -9,7 +9,7 @@ describe('Dashboards.Reducers.DashTimeV1', () => {
   it('can load initial state', () => {
     const noopAction = () => ({type: 'NOOP'})
     const actual = reducer(emptyState, noopAction)
-    const expected = {ranges: []}
+    const expected = {ranges: [], refreshes: []}
 
     expect(actual).toEqual(expected)
   })
