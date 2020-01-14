@@ -9,6 +9,8 @@ import (
 	// "github.com/influxdata/chronograf/kv/etcd"
 )
 
+var _ chronograf.KVClient = (*Service)(nil)
+
 var (
 	cellBucket               = []byte("cellsv2")
 	configBucket             = []byte("ConfigV1")
@@ -158,6 +160,10 @@ func u64tob(v uint64) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, v)
 	return b
+}
+
+func (s *Service) ConfigStore() chronograf.ConfigStore {
+	return &configStore{client: s}
 }
 
 func (s *Service) DashboardsStore() chronograf.DashboardsStore {

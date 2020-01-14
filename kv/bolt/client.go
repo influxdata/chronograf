@@ -34,8 +34,7 @@ type client struct {
 	isNew  bool
 	Now    func() time.Time
 
-	buildStore  *buildStore
-	configStore *configStore
+	buildStore *buildStore
 }
 
 // NewClient initializes bolt client implementing the kv.Store interface.
@@ -47,14 +46,8 @@ func NewClient(path string, logger chronograf.Logger) *client {
 	}
 
 	c.buildStore = &buildStore{client: c}
-	c.configStore = &configStore{client: c}
 
 	return c
-}
-
-// ConfigStore returns a ConfigStore that uses the bolt client.
-func (c *client) ConfigStore() chronograf.ConfigStore {
-	return c.configStore
 }
 
 // Option to change behavior of Open()
@@ -305,10 +298,6 @@ func (c *Cursor) Err() error {
 // initialize creates Buckets that are missing
 func (c *client) initialize(ctx context.Context) error {
 	if err := c.db.Update(func(tx *bolt.Tx) error {
-		// Always create Config bucket.
-		if _, err := tx.CreateBucketIfNotExists(configBucket); err != nil {
-			return err
-		}
 		// Always create Build bucket.
 		if _, err := tx.CreateBucketIfNotExists(buildBucket); err != nil {
 			return err

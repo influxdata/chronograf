@@ -1,4 +1,4 @@
-package bolt_test
+package kv_test
 
 import (
 	"context"

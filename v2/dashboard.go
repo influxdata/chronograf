@@ -1,5 +1,7 @@
 package platform
 
+// todo: utilize or remove as dashboardv2 stuff is tested but not used.
+
 import (
 	"context"
 	"fmt"

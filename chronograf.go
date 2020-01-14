@@ -923,24 +923,23 @@ type Environment struct {
 
 // KVClient defines what each kv store should be capable of.
 type KVClient interface {
-	// SourcesStore returns the kv's SourcesStore type.
-	SourcesStore() SourcesStore
-	// ServersStore returns the kv's ServersStore type.
-	ServersStore() ServersStore
-	// LayoutsStore returns the kv's LayoutsStore type.
-	LayoutsStore() LayoutsStore
-	// DashboardsStore returns the kv's DashboardsStore type.
-	DashboardsStore() DashboardsStore
-	// UsersStore returns the kv's UsersStore type.
-	UsersStore() UsersStore
-	// OrganizationsStore returns the kv's OrganizationsStore type.
-	OrganizationsStore() OrganizationsStore
 	// ConfigStore returns the kv's ConfigStore type.
 	ConfigStore() ConfigStore
+	// DashboardsStore returns the kv's DashboardsStore type.
+	DashboardsStore() DashboardsStore
+	// LayoutsStore returns the kv's LayoutsStore type.
+	LayoutsStore() LayoutsStore
 	// MappingsStore returns the kv's MappingsStore type.
 	MappingsStore() MappingsStore
 	// OrganizationConfigStore returns the kv's OrganizationConfigStore type.
 	OrganizationConfigStore() OrganizationConfigStore
+	// OrganizationsStore returns the kv's OrganizationsStore type.
+	OrganizationsStore() OrganizationsStore
+	// ServersStore returns the kv's ServersStore type.
+	ServersStore() ServersStore
+	// SourcesStore returns the kv's SourcesStore type.
+	SourcesStore() SourcesStore
+	// UsersStore returns the kv's UsersStore type.
+	UsersStore() UsersStore
 	platform.CellService
-	platform.DashboardService
 }
