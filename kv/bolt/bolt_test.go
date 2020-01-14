@@ -23,10 +23,10 @@ type TestClient struct {
 }
 
 // NewTestClient creates new *bolt.Client with a set time and temp path.
-func NewTestClient() (*TestClient, chronograf.ConfigStore, error) {
+func NewTestClient() (*TestClient, error) {
 	f, err := ioutil.TempFile("", "chronograf-bolt-")
 	if err != nil {
-		return nil, nil, errors.New("unable to open temporary boltdb file")
+		return nil, errors.New("unable to open temporary boltdb file")
 	}
 	f.Close()
 
@@ -45,10 +45,10 @@ func NewTestClient() (*TestClient, chronograf.ConfigStore, error) {
 
 	err = b.Open(context.TODO(), build)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return c, b.ConfigStore(), nil
+	return c, nil
 }
 
 func (c *TestClient) Close() error {

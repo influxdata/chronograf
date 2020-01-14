@@ -5,8 +5,7 @@ import (
 	"encoding/binary"
 
 	"github.com/influxdata/chronograf"
-	// "github.com/influxdata/chronograf/kv/bolt"
-	// "github.com/influxdata/chronograf/kv/etcd"
+	"github.com/influxdata/chronograf/id"
 )
 
 var _ chronograf.KVClient = (*Service)(nil)
@@ -117,6 +116,9 @@ func NewService(log chronograf.Logger, kv Store) *Service {
 	s.kv.Update(ctx, func(tx Tx) error {
 		return s.initialize(ctx, tx)
 	})
+
+	s.OrganizationsStore().CreateDefault(ctx)
+
 	return s
 }
 
@@ -167,11 +169,11 @@ func (s *Service) ConfigStore() chronograf.ConfigStore {
 }
 
 func (s *Service) DashboardsStore() chronograf.DashboardsStore {
-	return &dashboardsStore{client: s}
+	return &dashboardsStore{client: s, IDs: &id.UUID{}}
 }
 
 func (s *Service) LayoutsStore() chronograf.LayoutsStore {
-	return &layoutsStore{client: s}
+	return &layoutsStore{client: s, IDs: &id.UUID{}}
 }
 
 func (s *Service) MappingsStore() chronograf.MappingsStore {
