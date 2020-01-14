@@ -23,6 +23,7 @@ func (l *AddCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	svc := NewService(c)
 	defer c.Close()
 
 	q := chronograf.UserQuery{
@@ -87,7 +88,7 @@ OrgLoop:
 		orgQuery := chronograf.OrganizationQuery{
 			ID: &org,
 		}
-		o, err := c.OrganizationsStore().Get(ctx, orgQuery)
+		o, err := svc.OrganizationsStore().Get(ctx, orgQuery)
 		if err != nil {
 			return err
 		}

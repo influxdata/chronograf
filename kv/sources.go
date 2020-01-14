@@ -1,25 +1,21 @@
-package bolt
+package kv
 
 import (
 	"context"
 
-	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv/internal"
 )
 
-// Ensure SourcesStore implements chronograf.SourcesStore.
-var _ chronograf.SourcesStore = &SourcesStore{}
+// Ensure sourcesStore implements chronograf.SourcesStore.
+var _ chronograf.SourcesStore = &sourcesStore{}
 
-// SourcesBucket is the bolt bucket used to store source information
-var SourcesBucket = []byte("Sources")
-
-// SourcesStore is a bolt implementation to store time-series source information.
-type SourcesStore struct {
-	client *Client
+// sourcesStore is a bolt implementation to store time-series source information.
+type sourcesStore struct {
+	client *Service
 }
 
-// func (s *SourcesStore) Migrate(ctx context.Context) error {
+// func (s *sourcesStore) Migrate(ctx context.Context) error {
 // 	sources, err := s.All(ctx)
 // 	if err != nil {
 // 		return err
@@ -46,9 +42,9 @@ type SourcesStore struct {
 // }
 
 // All returns all known sources
-func (s *SourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
+func (s *sourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
 	var srcs []chronograf.Source
-	if err := s.client.db.View(func(tx *bolt.Tx) error {
+	if err := s.client.kv.View(ctx, func(tx Tx) error {
 		var err error
 		srcs, err = s.all(ctx, tx)
 		if err != nil {
@@ -64,7 +60,7 @@ func (s *SourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
 }
 
 // Add creates a new Source in the SourceStore.
-func (s *SourcesStore) Add(ctx context.Context, src chronograf.Source) (chronograf.Source, error) {
+func (s *sourcesStore) Add(ctx context.Context, src chronograf.Source) (chronograf.Source, error) {
 
 	// force first source added to be default
 	if srcs, err := s.All(ctx); err != nil {
@@ -73,7 +69,7 @@ func (s *SourcesStore) Add(ctx context.Context, src chronograf.Source) (chronogr
 		src.Default = true
 	}
 
-	if err := s.client.db.Update(func(tx *bolt.Tx) error {
+	if err := s.client.kv.Update(ctx, func(tx Tx) error {
 		return s.add(ctx, &src, tx)
 	}); err != nil {
 		return chronograf.Source{}, err
@@ -82,9 +78,9 @@ func (s *SourcesStore) Add(ctx context.Context, src chronograf.Source) (chronogr
 	return src, nil
 }
 
-// Delete removes the Source from the SourcesStore
-func (s *SourcesStore) Delete(ctx context.Context, src chronograf.Source) error {
-	if err := s.client.db.Update(func(tx *bolt.Tx) error {
+// Delete removes the Source from the sourcesStore
+func (s *sourcesStore) Delete(ctx context.Context, src chronograf.Source) error {
+	if err := s.client.kv.Update(ctx, func(tx Tx) error {
 		if err := s.setRandomDefault(ctx, src, tx); err != nil {
 			return err
 		}
@@ -97,9 +93,9 @@ func (s *SourcesStore) Delete(ctx context.Context, src chronograf.Source) error 
 }
 
 // Get returns a Source if the id exists.
-func (s *SourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
+func (s *sourcesStore) Get(ctx context.Context, id int) (chronograf.Source, error) {
 	var src chronograf.Source
-	if err := s.client.db.View(func(tx *bolt.Tx) error {
+	if err := s.client.kv.View(ctx, func(tx Tx) error {
 		var err error
 		src, err = s.get(ctx, id, tx)
 		if err != nil {
@@ -114,8 +110,8 @@ func (s *SourcesStore) Get(ctx context.Context, id int) (chronograf.Source, erro
 }
 
 // Update a Source
-func (s *SourcesStore) Update(ctx context.Context, src chronograf.Source) error {
-	if err := s.client.db.Update(func(tx *bolt.Tx) error {
+func (s *sourcesStore) Update(ctx context.Context, src chronograf.Source) error {
+	if err := s.client.kv.Update(ctx, func(tx Tx) error {
 		return s.update(ctx, src, tx)
 	}); err != nil {
 		return err
@@ -124,9 +120,9 @@ func (s *SourcesStore) Update(ctx context.Context, src chronograf.Source) error 
 	return nil
 }
 
-func (s *SourcesStore) all(ctx context.Context, tx *bolt.Tx) ([]chronograf.Source, error) {
+func (s *sourcesStore) all(ctx context.Context, tx Tx) ([]chronograf.Source, error) {
 	var srcs []chronograf.Source
-	if err := tx.Bucket(SourcesBucket).ForEach(func(k, v []byte) error {
+	if err := tx.Bucket(sourcesBucket).ForEach(func(k, v []byte) error {
 		var src chronograf.Source
 		if err := internal.UnmarshalSource(v, &src); err != nil {
 			return err
@@ -139,8 +135,8 @@ func (s *SourcesStore) all(ctx context.Context, tx *bolt.Tx) ([]chronograf.Sourc
 	return srcs, nil
 }
 
-func (s *SourcesStore) add(ctx context.Context, src *chronograf.Source, tx *bolt.Tx) error {
-	b := tx.Bucket(SourcesBucket)
+func (s *sourcesStore) add(ctx context.Context, src *chronograf.Source, tx Tx) error {
+	b := tx.Bucket(sourcesBucket)
 	seq, err := b.NextSequence()
 	if err != nil {
 		return err
@@ -161,16 +157,16 @@ func (s *SourcesStore) add(ctx context.Context, src *chronograf.Source, tx *bolt
 	return nil
 }
 
-func (s *SourcesStore) delete(ctx context.Context, src chronograf.Source, tx *bolt.Tx) error {
-	if err := tx.Bucket(SourcesBucket).Delete(itob(src.ID)); err != nil {
+func (s *sourcesStore) delete(ctx context.Context, src chronograf.Source, tx Tx) error {
+	if err := tx.Bucket(sourcesBucket).Delete(itob(src.ID)); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *SourcesStore) get(ctx context.Context, id int, tx *bolt.Tx) (chronograf.Source, error) {
+func (s *sourcesStore) get(ctx context.Context, id int, tx Tx) (chronograf.Source, error) {
 	var src chronograf.Source
-	if v := tx.Bucket(SourcesBucket).Get(itob(id)); v == nil {
+	if v, err := tx.Bucket(sourcesBucket).Get(itob(id)); v == nil || err != nil {
 		return src, chronograf.ErrSourceNotFound
 	} else if err := internal.UnmarshalSource(v, &src); err != nil {
 		return src, err
@@ -178,10 +174,10 @@ func (s *SourcesStore) get(ctx context.Context, id int, tx *bolt.Tx) (chronograf
 	return src, nil
 }
 
-func (s *SourcesStore) update(ctx context.Context, src chronograf.Source, tx *bolt.Tx) error {
+func (s *sourcesStore) update(ctx context.Context, src chronograf.Source, tx Tx) error {
 	// Get an existing soource with the same ID.
-	b := tx.Bucket(SourcesBucket)
-	if v := b.Get(itob(src.ID)); v == nil {
+	b := tx.Bucket(sourcesBucket)
+	if v, err := b.Get(itob(src.ID)); v == nil || err != nil {
 		return chronograf.ErrSourceNotFound
 	}
 
@@ -200,8 +196,8 @@ func (s *SourcesStore) update(ctx context.Context, src chronograf.Source, tx *bo
 }
 
 // resetDefaultSource unsets the Default flag on all sources
-func (s *SourcesStore) resetDefaultSource(ctx context.Context, tx *bolt.Tx) error {
-	b := tx.Bucket(SourcesBucket)
+func (s *sourcesStore) resetDefaultSource(ctx context.Context, tx Tx) error {
+	b := tx.Bucket(sourcesBucket)
 	srcs, err := s.all(ctx, tx)
 	if err != nil {
 		return err
@@ -224,7 +220,7 @@ func (s *SourcesStore) resetDefaultSource(ctx context.Context, tx *bolt.Tx) erro
 // chronograf.Source and set it as the default source. If no other sources are
 // available, the provided source will be set to the default source if is not
 // already. It assumes that the provided chronograf.Source has been persisted.
-func (s *SourcesStore) setRandomDefault(ctx context.Context, src chronograf.Source, tx *bolt.Tx) error {
+func (s *sourcesStore) setRandomDefault(ctx context.Context, src chronograf.Source, tx Tx) error {
 	// Check if requested source is the current default
 	if target, err := s.get(ctx, src.ID, tx); err != nil {
 		return err

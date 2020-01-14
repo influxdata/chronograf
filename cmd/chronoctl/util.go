@@ -9,6 +9,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/kv/bolt"
 	"github.com/influxdata/chronograf/mocks"
 )
@@ -22,6 +23,10 @@ func NewBoltClient(path string) (*bolt.Client, error) {
 	}
 
 	return c, nil
+}
+
+func NewService(s kv.Store) *kv.Service {
+	return kv.NewService(mocks.NewLogger(), s)
 }
 
 func NewTabWriter() *tabwriter.Writer {

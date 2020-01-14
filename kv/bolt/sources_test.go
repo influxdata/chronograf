@@ -1,5 +1,6 @@
 package bolt_test
 
+/*
 import (
 	"context"
 	"reflect"
@@ -194,3 +195,4 @@ func mustAddSource(t *testing.T, s chronograf.SourcesStore, src chronograf.Sourc
 		return src
 	}
 }
+*/

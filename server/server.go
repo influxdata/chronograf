@@ -479,7 +479,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	sources, err := builder.Sources.Build(db.SourcesStore())
+	sources, err := builder.Sources.Build(svc.SourcesStore())
 	if err != nil {
 		logger.
 			WithField("component", "SourcesStore").

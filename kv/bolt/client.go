@@ -34,10 +34,9 @@ type Client struct {
 	isNew  bool
 	Now    func() time.Time
 
-	buildStore   *BuildStore
-	sourcesStore *SourcesStore
-	usersStore   *UsersStore
-	configStore  *ConfigStore
+	buildStore  *BuildStore
+	usersStore  *UsersStore
+	configStore *ConfigStore
 }
 
 // NewClient initializes all stores
@@ -49,7 +48,6 @@ func NewClient(path string, logger chronograf.Logger) *Client {
 	}
 
 	c.buildStore = &BuildStore{client: c}
-	c.sourcesStore = &SourcesStore{client: c}
 	c.usersStore = &UsersStore{client: c}
 	c.configStore = &ConfigStore{client: c}
 
@@ -59,11 +57,6 @@ func NewClient(path string, logger chronograf.Logger) *Client {
 // BuildStore returns a BuildStore that uses the bolt client.
 func (c *Client) BuildStore() chronograf.BuildStore {
 	return c.buildStore
-}
-
-// SourcesStore returns a SourcesStore that uses the bolt client.
-func (c *Client) SourcesStore() chronograf.SourcesStore {
-	return c.sourcesStore
 }
 
 // UsersStore returns a UsersStore that uses the bolt client.
@@ -324,10 +317,6 @@ func (c *Client) initialize(ctx context.Context) error {
 		if _, err := tx.CreateBucketIfNotExists(SchemaVersionBucket); err != nil {
 			return err
 		}
-		// Always create Sources bucket.
-		if _, err := tx.CreateBucketIfNotExists(SourcesBucket); err != nil {
-			return err
-		}
 		// Always create Users bucket.
 		if _, err := tx.CreateBucketIfNotExists(UsersBucket); err != nil {
 			return err
@@ -352,9 +341,6 @@ func (c *Client) initialize(ctx context.Context) error {
 func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error {
 	if c.db != nil {
 		// Runtime migrations
-		// if err := c.sourcesStore.Migrate(ctx); err != nil {
-		// 	return err
-		// }
 		if err := c.configStore.Migrate(ctx); err != nil {
 			return err
 		}
