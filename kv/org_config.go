@@ -11,7 +11,7 @@ import (
 // Ensure organizationConfigStore implements chronograf.OrganizationConfigStore.
 var _ chronograf.OrganizationConfigStore = &organizationConfigStore{}
 
-// organizationConfigStore uses bolt to store and retrieve organization configurations
+// organizationConfigStore uses a kv to store and retrieve organization configurations.
 type organizationConfigStore struct {
 	client *Service
 }

@@ -463,15 +463,15 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	sources, err := builder.Sources.Build(db.SourcesStore())
+	organizations, err := builder.Organizations.Build(svc.OrganizationsStore())
 	if err != nil {
 		logger.
-			WithField("component", "SourcesStore").
-			Error("Unable to construct a MultiSourcesStore", err)
+			WithField("component", "OrganizationsStore").
+			Error("Unable to construct a MultiOrganizationStore", err)
 		os.Exit(1)
 	}
 
-	kapacitors, err := builder.Kapacitors.Build(db.ServersStore())
+	kapacitors, err := builder.Kapacitors.Build(svc.ServersStore())
 	if err != nil {
 		logger.
 			WithField("component", "KapacitorStore").
@@ -479,11 +479,11 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	organizations, err := builder.Organizations.Build(svc.OrganizationsStore())
+	sources, err := builder.Sources.Build(db.SourcesStore())
 	if err != nil {
 		logger.
-			WithField("component", "OrganizationsStore").
-			Error("Unable to construct a MultiOrganizationStore", err)
+			WithField("component", "SourcesStore").
+			Error("Unable to construct a MultiSourcesStore", err)
 		os.Exit(1)
 	}
 

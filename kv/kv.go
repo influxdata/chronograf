@@ -2,6 +2,7 @@ package kv
 
 import (
 	"context"
+	"encoding/binary"
 
 	"github.com/influxdata/chronograf"
 	// "github.com/influxdata/chronograf/kv/bolt"
@@ -16,6 +17,7 @@ var (
 	mappingsBucket           = []byte("MappingsV1")
 	organizationConfigBucket = []byte("OrganizationConfigV1")
 	organizationsBucket      = []byte("OrganizationsV1")
+	serversBucket            = []byte("Servers")
 )
 
 // Store is an interface for a generic key value store. It is modeled after
@@ -115,6 +117,7 @@ func (s *Service) initialize(ctx context.Context, tx Tx) error {
 		mappingsBucket,
 		organizationConfigBucket,
 		organizationsBucket,
+		serversBucket,
 	}
 
 	for i := range buckets {
@@ -124,6 +127,20 @@ func (s *Service) initialize(ctx context.Context, tx Tx) error {
 	}
 
 	return nil
+}
+
+// itob returns an 8-byte big endian representation of v.
+func itob(v int) []byte {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, uint64(v))
+	return b
+}
+
+// u64tob returns an 8-byte big endian representation of v.
+func u64tob(v uint64) []byte {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, v)
+	return b
 }
 
 func (s *Service) DashboardsStore() chronograf.DashboardsStore {
@@ -144,4 +161,8 @@ func (s *Service) OrganizationConfigStore() chronograf.OrganizationConfigStore {
 
 func (s *Service) OrganizationsStore() chronograf.OrganizationsStore {
 	return &organizationsStore{client: s}
+}
+
+func (s *Service) ServersStore() chronograf.ServersStore {
+	return &serversStore{client: s}
 }

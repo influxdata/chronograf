@@ -24,7 +24,7 @@ const (
 	DefaultOrganizationRole string = "member"
 )
 
-// organizationsStore uses bolt to store and retrieve Organizations
+// organizationsStore uses a kv to store and retrieve Organizations
 type organizationsStore struct {
 	client *Service
 }
