@@ -1,6 +1,7 @@
 // Package etcd provides a means to store chronograf related data in an etcd cluster.
 package etcd
 
+/*
 import (
 	"context"
 	"fmt"
@@ -196,3 +197,4 @@ var WithDialTimeout = func(d time.Duration) ConnectionOption {
 		return nil
 	}
 }
+*/

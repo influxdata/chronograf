@@ -1,5 +1,6 @@
 package etcd
 
+/*
 import (
 	"context"
 
@@ -15,16 +16,10 @@ type KVStore struct {
 }
 
 // NewKVStore creates an instance of a KVStore.
-func NewKVStore(c Config, l *zap.Logger) *KVStore {
+func NewKVStore(c Config, l chronograf.Logger) *KVStore {
 	return &KVStore{
 		client: newEtcdClient(c, l),
 	}
-}
-
-// WithEtcdClient sets the etcd client for the KVStore. It is
-// predominately used for testing.
-func (s *KVStore) WithEtcdClient(c *clientv3.Client) {
-	s.client.WithEtcdClient(c)
 }
 
 // Open opens the backing etcd client.
@@ -71,7 +66,7 @@ func (c *client) Apply(ctx context.Context, callback func(stm conc.STM) error) e
 	return err
 }
 
-func (c *client) recoverCallback(callback func(stm conc.STM) (error, stm conc.STM) (err error) {
+func (c *client) recoverCallback(callback func(stm conc.STM) (error, stm conc.STM)) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = errors.New("unknown internal transaction error")
@@ -81,7 +76,6 @@ func (c *client) recoverCallback(callback func(stm conc.STM) (error, stm conc.ST
 	err = callback(stm)
 	return err
 }
-
 
 // // Check checks to ensure we can connect to etcd and etcd is healthy
 // func (s *KVStore) Check(ctx context.Context) check.Response {
@@ -178,3 +172,4 @@ func (b *Bucket) encodeKey(key []byte) string {
 	k = append(k, key...)
 	return string(k)
 }
+*/

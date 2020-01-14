@@ -21,59 +21,59 @@ type DashboardsStore struct {
 	IDs    chronograf.ID
 }
 
-// AddIDs is a migration function that adds ID information to existing dashboards
-func (d *DashboardsStore) AddIDs(ctx context.Context, boards []chronograf.Dashboard) error {
-	for _, board := range boards {
-		update := false
-		for i, cell := range board.Cells {
-			// If there are is no id set, we generate one and update the dashboard
-			if cell.ID == "" {
-				id, err := d.IDs.Generate()
-				if err != nil {
-					return err
-				}
-				cell.ID = id
-				board.Cells[i] = cell
-				update = true
-			}
-		}
-		if !update {
-			continue
-		}
-		if err := d.Update(ctx, board); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// // AddIDs is a migration function that adds ID information to existing dashboards
+// func (d *DashboardsStore) AddIDs(ctx context.Context, boards []chronograf.Dashboard) error {
+// 	for _, board := range boards {
+// 		update := false
+// 		for i, cell := range board.Cells {
+// 			// If there are is no id set, we generate one and update the dashboard
+// 			if cell.ID == "" {
+// 				id, err := d.IDs.Generate()
+// 				if err != nil {
+// 					return err
+// 				}
+// 				cell.ID = id
+// 				board.Cells[i] = cell
+// 				update = true
+// 			}
+// 		}
+// 		if !update {
+// 			continue
+// 		}
+// 		if err := d.Update(ctx, board); err != nil {
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
 
-// Migrate updates the dashboards at runtime
-func (d *DashboardsStore) Migrate(ctx context.Context) error {
-	// 1. Add UUIDs to cells without one
-	boards, err := d.All(ctx)
-	if err != nil {
-		return err
-	}
-	if err := d.AddIDs(ctx, boards); err != nil {
-		return nil
-	}
+// // Migrate updates the dashboards at runtime
+// func (d *DashboardsStore) Migrate(ctx context.Context) error {
+// 	// 1. Add UUIDs to cells without one
+// 	boards, err := d.All(ctx)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if err := d.AddIDs(ctx, boards); err != nil {
+// 		return nil
+// 	}
 
-	defaultOrg, err := d.client.organizationsStore.DefaultOrganization(ctx)
-	if err != nil {
-		return err
-	}
+// 	defaultOrg, err := d.client.organizationsStore.DefaultOrganization(ctx)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	for _, board := range boards {
-		if board.Organization == "" {
-			board.Organization = defaultOrg.ID
-			if err := d.Update(ctx, board); err != nil {
-				return nil
-			}
-		}
-	}
+// 	for _, board := range boards {
+// 		if board.Organization == "" {
+// 			board.Organization = defaultOrg.ID
+// 			if err := d.Update(ctx, board); err != nil {
+// 				return nil
+// 			}
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // All returns all known dashboards
 func (d *DashboardsStore) All(ctx context.Context) ([]chronograf.Dashboard, error) {
