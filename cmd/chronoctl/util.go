@@ -11,22 +11,16 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/kv/bolt"
-	"github.com/influxdata/chronograf/mocks"
 )
 
 func NewBoltClient(path string) (kv.Store, error) {
-	c := bolt.NewClient(path, mocks.NewLogger())
-	bi := chronograf.BuildInfo{}
-
-	if err := c.Open(context.Background(), bi); err != nil {
-		return nil, err
-	}
-
-	return c, nil
+	return bolt.NewClient(context.TODO(),
+		bolt.WithPath(path),
+	)
 }
 
-func NewService(s kv.Store) *kv.Service {
-	return kv.NewService(mocks.NewLogger(), s)
+func NewService(s kv.Store) (*kv.Service, error) {
+	return kv.NewService(context.TODO(), s)
 }
 
 func NewTabWriter() *tabwriter.Writer {

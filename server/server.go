@@ -436,15 +436,21 @@ func (s *Server) Serve(ctx context.Context) {
 // todo: add etcd connection details as arg.
 // todo: return error. make chronograf error type that has fields and error. .Error() will logger.Error print it.
 func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, logger chronograf.Logger, useAuth bool) Service {
-	db := bolt.NewClient(boltPath, logger)
-	err := db.Open(ctx, buildInfo)
-	// db, err := bolt.NewClient(ctx, boltPath, logger, buildInfo)
+	db, err := bolt.NewClient(ctx,
+		bolt.WithPath(boltPath),
+		bolt.WithLogger(logger),
+		bolt.WithBuildInfo(buildInfo),
+	)
 	if err != nil {
 		logger.Error("Unable to create bolt client", err)
 		os.Exit(1)
 	}
 
-	svc := kv.NewService(logger, db)
+	svc, err := kv.NewService(ctx, db, kv.WithLogger(logger))
+	if err != nil {
+		logger.Error("Unable to create kv service", err)
+		os.Exit(1)
+	}
 
 	dashboards, err := builder.Dashboards.Build(svc.DashboardsStore())
 	if err != nil {

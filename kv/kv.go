@@ -6,6 +6,7 @@ import (
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/id"
+	"github.com/influxdata/chronograf/mocks"
 )
 
 var _ chronograf.KVClient = (*Service)(nil)
@@ -105,21 +106,37 @@ type Service struct {
 	log chronograf.Logger
 }
 
+// Option to change behavior of Open()
+type Option func(s *Service) error
+
+// WithLogger allows setting the logger on the kv service.
+func WithLogger(logger chronograf.Logger) Option {
+	return func(s *Service) error {
+		s.log = logger
+		return nil
+	}
+}
+
 // NewService returns an instance of a Service.
-func NewService(log chronograf.Logger, kv Store) *Service {
+func NewService(ctx context.Context, kv Store, opts ...Option) (*Service, error) {
 	s := &Service{
-		log: log,
+		log: mocks.NewLogger(),
 		kv:  kv,
 	}
 
-	ctx := context.TODO()
-	s.kv.Update(ctx, func(tx Tx) error {
+	for i := range opts {
+		if err := opts[i](s); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := s.kv.Update(ctx, func(tx Tx) error {
 		return s.initialize(ctx, tx)
-	})
+	}); err != nil {
+		return nil, err
+	}
 
-	s.OrganizationsStore().CreateDefault(ctx)
-
-	return s
+	return s, s.OrganizationsStore().CreateDefault(ctx)
 }
 
 // Close closes the service's kv store.

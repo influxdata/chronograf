@@ -17,6 +17,11 @@ var buildBucket = []byte("Build")
 // buildKey is the constant key used in the bolt bucket
 var buildKey = []byte("build")
 
+var defaultBuildInfo = chronograf.BuildInfo{
+	Version: "1.8.0",
+	Commit:  "",
+}
+
 // buildStore is a bolt implementation to store Chronograf build information
 type buildStore struct {
 	client *client
@@ -42,15 +47,11 @@ func (s *buildStore) Get(ctx context.Context) (chronograf.BuildInfo, error) {
 // getBuildInfo retrieves the current build, falling back to a default when missing
 func getBuildInfo(ctx context.Context, tx *bolt.Tx) (chronograf.BuildInfo, error) {
 	var build chronograf.BuildInfo
-	defaultBuild := chronograf.BuildInfo{
-		Version: "1.8.0",
-		Commit:  "",
-	}
 
 	if bucket := tx.Bucket(buildBucket); bucket == nil {
-		return defaultBuild, nil
+		return defaultBuildInfo, nil
 	} else if v := bucket.Get(buildKey); v == nil {
-		return defaultBuild, nil
+		return defaultBuildInfo, nil
 	} else if err := internal.UnmarshalBuild(v, &build); err != nil {
 		return build, err
 	}

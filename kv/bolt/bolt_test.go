@@ -10,7 +10,6 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/kv/bolt"
-	"github.com/influxdata/chronograf/mocks"
 )
 
 // TestNow is a set time for testing.
@@ -30,25 +29,25 @@ func NewTestClient() (*TestClient, error) {
 	}
 	f.Close()
 
-	b := bolt.NewClient(f.Name(), mocks.NewLogger())
-	b.Now = func() time.Time { return TestNow }
-
-	c := &TestClient{
-		Client: b,
-		path:   f.Name(),
-	}
-
 	build := chronograf.BuildInfo{
 		Version: "version",
 		Commit:  "commit",
 	}
 
-	err = b.Open(context.TODO(), build)
+	ctx := context.TODO()
+	b, err := bolt.NewClient(ctx,
+		bolt.WithPath(f.Name()),
+		bolt.WithNow(func() time.Time { return TestNow }),
+		bolt.WithBuildInfo(build),
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c, nil
+	return &TestClient{
+		Client: b,
+		path:   f.Name(),
+	}, nil
 }
 
 func (c *TestClient) Close() error {

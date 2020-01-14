@@ -24,7 +24,11 @@ func (l *AddCommand) Execute(args []string) error {
 		return err
 	}
 	defer c.Close()
-	svc := NewService(c)
+
+	svc, err := NewService(c)
+	if err != nil {
+		return err
+	}
 
 	q := chronograf.UserQuery{
 		Name:     &l.Username,

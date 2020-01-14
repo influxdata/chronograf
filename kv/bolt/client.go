@@ -11,6 +11,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
+	"github.com/influxdata/chronograf/mocks"
 )
 
 const (
@@ -24,37 +25,81 @@ const (
 	ErrUnableToUpdate = "Unable to store new version in boltdb:  %v"
 )
 
-var _ kv.Store = (*client)(nil)
+var (
+	// Ensure client implements kv.Store interface.
+	_ kv.Store = (*client)(nil)
+	// Default boltdb path (from server/server.go).
+	defaultBoltPath = "chronograf-v1.db"
+)
 
 // client is a client for the boltDB data store.
 type client struct {
-	path   string
-	db     *bolt.DB
-	logger chronograf.Logger
-	isNew  bool
-	Now    func() time.Time
-
+	buildInfo  chronograf.BuildInfo
 	buildStore *buildStore
+	db         *bolt.DB
+	isNew      bool
+	logger     chronograf.Logger
+	now        func() time.Time
+	path       string
 }
 
 // NewClient initializes bolt client implementing the kv.Store interface.
-func NewClient(path string, logger chronograf.Logger) *client {
+func NewClient(ctx context.Context, opts ...Option) (*client, error) {
 	c := &client{
-		logger: logger,
-		path:   path,
-		Now:    time.Now,
+		buildInfo: defaultBuildInfo,
+		path:      defaultBoltPath,
+		logger:    mocks.NewLogger(),
+		now:       time.Now,
+	}
+
+	for i := range opts {
+		if err := opts[i](c); err != nil {
+			return nil, err
+		}
 	}
 
 	c.buildStore = &buildStore{client: c}
 
-	return c
+	return c, c.open(ctx)
 }
 
 // Option to change behavior of Open()
-type Option interface{}
+type Option func(c *client) error
 
-// Open / create boltDB file.
-func (c *client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...Option) error {
+// WithBuildInfo allows for setting this chronograf's build info.
+func WithBuildInfo(bi chronograf.BuildInfo) Option {
+	return func(c *client) error {
+		c.buildInfo = bi
+		return nil
+	}
+}
+
+// WithLogger allows for setting this chronograf's logger.
+func WithLogger(logger chronograf.Logger) Option {
+	return func(c *client) error {
+		c.logger = logger
+		return nil
+	}
+}
+
+// WithPath sets the path to the boltdb.
+func WithPath(path string) Option {
+	return func(c *client) error {
+		c.path = path
+		return nil
+	}
+}
+
+// WithNow sets the function to use for the current time.
+func WithNow(fn func() time.Time) Option {
+	return func(c *client) error {
+		c.now = fn
+		return nil
+	}
+}
+
+// Open opens or creates the boltDB file.
+func (c *client) open(ctx context.Context) error {
 	if _, err := os.Stat(c.path); os.IsNotExist(err) {
 		c.isNew = true
 	} else if err != nil {
@@ -73,12 +118,12 @@ func (c *client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...O
 	}
 
 	if !c.isNew {
-		if lastBuild, err := c.buildStore.Get(ctx); err == nil && lastBuild.Version != build.Version {
-			if err = c.backup(ctx, lastBuild, build); err != nil {
+		if lastBuild, err := c.buildStore.Get(ctx); err == nil && lastBuild.Version != c.buildInfo.Version {
+			if err = c.backup(ctx, lastBuild, c.buildInfo); err != nil {
 				return fmt.Errorf(ErrUnableToBackup, err)
 			}
 
-			if err = c.buildStore.Update(ctx, build); err != nil {
+			if err = c.buildStore.Update(ctx, c.buildInfo); err != nil {
 				return fmt.Errorf(ErrUnableToUpdate, err)
 			}
 		}
