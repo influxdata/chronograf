@@ -38,7 +38,7 @@ func (s *buildStore) Get(ctx context.Context) (chronograf.BuildInfo, error) {
 		}
 		return nil
 	}); err != nil {
-		return chronograf.BuildInfo{}, err
+		return build, err
 	}
 
 	return build, nil

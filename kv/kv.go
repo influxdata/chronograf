@@ -181,38 +181,47 @@ func u64tob(v uint64) []byte {
 	return b
 }
 
+// ConfigStore returns a chronograf.ConfigStore.
 func (s *Service) ConfigStore() chronograf.ConfigStore {
 	return &configStore{client: s}
 }
 
+// DashboardsStore returns a chronograf.DashboardsStore.
 func (s *Service) DashboardsStore() chronograf.DashboardsStore {
 	return &dashboardsStore{client: s, IDs: &id.UUID{}}
 }
 
+// LayoutsStore returns a chronograf.LayoutsStore.
 func (s *Service) LayoutsStore() chronograf.LayoutsStore {
 	return &layoutsStore{client: s, IDs: &id.UUID{}}
 }
 
+// MappingsStore returns a chronograf.MappingsStore.
 func (s *Service) MappingsStore() chronograf.MappingsStore {
 	return &mappingsStore{client: s}
 }
 
+// OrganizationConfigStore returns a chronograf.OrganizationConfigStore.
 func (s *Service) OrganizationConfigStore() chronograf.OrganizationConfigStore {
 	return &organizationConfigStore{client: s}
 }
 
+// OrganizationsStore returns a chronograf.OrganizationsStore.
 func (s *Service) OrganizationsStore() chronograf.OrganizationsStore {
 	return &organizationsStore{client: s}
 }
 
+// ServersStore returns a chronograf.ServersStore.
 func (s *Service) ServersStore() chronograf.ServersStore {
 	return &serversStore{client: s}
 }
 
+// SourcesStore returns a chronograf.SourcesStore.
 func (s *Service) SourcesStore() chronograf.SourcesStore {
 	return &sourcesStore{client: s}
 }
 
+// UsersStore returns a chronograf.UsersStore.
 func (s *Service) UsersStore() chronograf.UsersStore {
 	return &usersStore{client: s}
 }
