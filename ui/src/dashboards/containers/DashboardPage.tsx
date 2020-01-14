@@ -143,15 +143,36 @@ class DashboardPage extends Component<Props, State> {
 
   public async componentDidMount() {
     const {refreshRate, updateQueryParams} = this.props
-    const match = autoRefreshOptions.find(r => r.milliseconds === refreshRate)
+    const {location: {search = ''} = {}} = window
+    const urlSelectedRefresh = search.match(/refresh=([^&#]*)/i)
+    let pollRefreshRate = refreshRate
+    let localStorageRefresh
 
-    if (match) {
+    if (urlSelectedRefresh) {
+      const option = autoRefreshOptions.find(
+        r => r.label.toLowerCase() === urlSelectedRefresh[1].toLowerCase()
+      )
+      if (option) {
+        this.handleChooseAutoRefresh(option)
+        pollRefreshRate = option.milliseconds
+      } else {
+        localStorageRefresh = autoRefreshOptions.find(
+          r => r.milliseconds === refreshRate
+        )
+      }
+    } else {
+      localStorageRefresh = autoRefreshOptions.find(
+        r => r.milliseconds === refreshRate
+      )
+    }
+
+    if (localStorageRefresh) {
       updateQueryParams({
-        refresh: match.label,
+        refresh: localStorageRefresh.label,
       })
     }
 
-    GlobalAutoRefresher.poll(refreshRate)
+    GlobalAutoRefresher.poll(pollRefreshRate)
     GlobalAutoRefresher.subscribe(this.fetchAnnotations)
 
     window.addEventListener('resize', this.handleWindowResize, true)
@@ -182,7 +203,9 @@ class DashboardPage extends Component<Props, State> {
 
     const prevPath = getDeep(prevProps.location, 'pathname', null)
     const thisPath = getDeep(this.props.location, 'pathname', null)
-    const match = autoRefreshOptions.find(r => r.milliseconds === refreshRate)
+    const localStorageRefresh = autoRefreshOptions.find(
+      r => r.milliseconds === refreshRate
+    )
 
     const templates = this.parseTempVar(dashboard)
     const prevTemplates = this.parseTempVar(prevProps.dashboard)
@@ -192,9 +215,9 @@ class DashboardPage extends Component<Props, State> {
 
     if ((prevPath && thisPath && prevPath !== thisPath) || isTemplateDeleted) {
       this.getDashboard()
-      if (match) {
+      if (localStorageRefresh) {
         updateQueryParams({
-          refresh: match.label,
+          refresh: localStorageRefresh.label,
         })
       }
     }
