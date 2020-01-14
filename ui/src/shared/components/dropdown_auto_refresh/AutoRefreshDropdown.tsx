@@ -70,9 +70,7 @@ class AutoRefreshDropdown extends Component<Props> {
     autoRefreshOption: AutoRefreshOption
   ): void => {
     const {onChoose} = this.props
-    const {milliseconds} = autoRefreshOption
-
-    onChoose(milliseconds)
+    onChoose(autoRefreshOption)
   }
 
   private get isPaused(): boolean {

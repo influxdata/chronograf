@@ -14,6 +14,7 @@ import {
   CellType,
   Protoboard,
   QueryType,
+  RefreshRate,
 } from './dashboards'
 import {
   Template,

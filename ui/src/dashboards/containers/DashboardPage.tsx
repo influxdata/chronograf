@@ -32,7 +32,7 @@ import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
 import {getDeep} from 'src/utils/wrappers'
 import {updateDashboardLinks} from 'src/dashboards/utils/dashboardSwitcherLinks'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
-import {getTimeRange} from 'src/dashboards/selectors'
+import {getTimeRange, getRefreshRate} from 'src/dashboards/selectors'
 import {annotationsError} from 'src/shared/copy/notifications'
 
 // APIs
@@ -43,6 +43,7 @@ import {interval, DASHBOARD_LAYOUT_ROW_HEIGHT} from 'src/shared/constants'
 import {FORMAT_INFLUXQL} from 'src/shared/data/timeRanges'
 import {EMPTY_LINKS} from 'src/dashboards/constants/dashboardHeader'
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
+import {AutoRefreshOption} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
 
 // Types
 import {WithRouterProps} from 'react-router'
@@ -77,6 +78,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   dashboards: DashboardsModels.Dashboard[]
   handleChooseAutoRefresh: AppActions.SetAutoRefreshActionCreator
   autoRefresh: number
+  refreshRate: number
   timeRange: QueriesModels.TimeRange
   zoomedTimeRange: QueriesModels.TimeRange
   inPresentationMode: boolean
@@ -95,6 +97,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   handleDismissEditingAnnotation: typeof dismissEditingAnnotation
   editorTimeRange: QueriesModels.TimeRange
   setDashTimeV1: typeof dashboardActions.setDashTimeV1
+  setDashRefresh: typeof dashboardActions.setDashRefresh
   setZoomedTimeRange: typeof dashboardActions.setZoomedTimeRange
   updateDashboard: typeof dashboardActions.updateDashboard
   putDashboard: typeof dashboardActions.putDashboard
@@ -138,9 +141,9 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public async componentDidMount() {
-    const {autoRefresh} = this.props
+    const {refreshRate} = this.props
 
-    GlobalAutoRefresher.poll(autoRefresh)
+    GlobalAutoRefresher.poll(refreshRate)
     GlobalAutoRefresher.subscribe(this.fetchAnnotations)
 
     window.addEventListener('resize', this.handleWindowResize, true)
@@ -162,7 +165,7 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    const {dashboard, autoRefresh, annotationsDisplaySetting} = this.props
+    const {dashboard, refreshRate, annotationsDisplaySetting} = this.props
 
     const prevPath = getDeep(prevProps.location, 'pathname', null)
     const thisPath = getDeep(this.props.location, 'pathname', null)
@@ -177,8 +180,8 @@ class DashboardPage extends Component<Props, State> {
       this.getDashboard()
     }
 
-    if (autoRefresh !== prevProps.autoRefresh) {
-      GlobalAutoRefresher.poll(autoRefresh)
+    if (refreshRate !== prevProps.refreshRate) {
+      GlobalAutoRefresher.poll(refreshRate)
     }
 
     if (
@@ -211,7 +214,7 @@ class DashboardPage extends Component<Props, State> {
       zoomedTimeRange,
       dashboard,
       dashboardID,
-      autoRefresh,
+      refreshRate,
       manualRefresh,
       onManualRefresh,
       cellQueryStatus,
@@ -262,6 +265,7 @@ class DashboardPage extends Component<Props, State> {
             dashboardTemplates={_.get(dashboard, 'templates', [])}
             editQueryStatus={this.props.editCellQueryStatus}
             dashboardTimeRange={timeRange}
+            dashboardRefresh={refreshRate}
           />
         </OverlayTechnology>
         <DashboardHeader
@@ -269,7 +273,7 @@ class DashboardPage extends Component<Props, State> {
           timeRange={timeRange}
           timeZone={timeZone}
           onSetTimeZone={setTimeZone}
-          autoRefresh={autoRefresh}
+          autoRefresh={refreshRate}
           isHidden={inPresentationMode}
           onAddCell={this.handleAddCell}
           onManualRefresh={onManualRefresh}
@@ -279,7 +283,7 @@ class DashboardPage extends Component<Props, State> {
           activeDashboard={dashboard ? dashboard.name : ''}
           showAnnotationControls={showAnnotationControls}
           showTempVarControls={showTemplateVariableControlBar}
-          handleChooseAutoRefresh={handleChooseAutoRefresh}
+          handleChooseAutoRefresh={this.handleChooseAutoRefresh}
           handleChooseTimeRange={this.handleChooseTimeRange}
           onToggleShowTempVarControls={toggleTemplateVariableControlBar}
           onToggleShowAnnotationControls={this.toggleAnnotationControls}
@@ -398,6 +402,19 @@ class DashboardPage extends Component<Props, State> {
     window.setTimeout(() => {
       handleClearCEO()
     }, WAIT_FOR_ANIMATION)
+  }
+
+  private handleChooseAutoRefresh = (
+    autoRefreshOption: AutoRefreshOption
+  ): void => {
+    const {dashboardID, setDashRefresh, handleChooseAutoRefresh, updateQueryParams} = this.props
+    const {label, milliseconds} = autoRefreshOption
+
+    updateQueryParams({
+      refresh: label
+    })
+
+    setDashRefresh(dashboardID, milliseconds)
   }
 
   private handleChooseTimeRange = (
@@ -539,6 +556,7 @@ const mstp = (state, {params: {dashboardID}}) => {
   const meRole = _.get(me, 'role', null)
 
   const timeRange = getTimeRange(state, dashboardID)
+  const refreshRate = getRefreshRate(state, dashboardID)
 
   const dashboard = dashboards.find(
     d => d.id === idNormalizer(TYPE_ID, dashboardID)
@@ -554,6 +572,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     fluxLinks: links.flux,
     dashboardID: Number(dashboardID),
     timeRange,
+    refreshRate,
     zoomedTimeRange,
     autoRefresh,
     isUsingAuth,
@@ -568,6 +587,7 @@ const mstp = (state, {params: {dashboardID}}) => {
 
 const mdtp = {
   setDashTimeV1: dashboardActions.setDashTimeV1,
+  setDashRefresh: dashboardActions.setDashRefresh,
   setZoomedTimeRange: dashboardActions.setZoomedTimeRange,
   updateDashboard: dashboardActions.updateDashboard,
   putDashboard: dashboardActions.putDashboard,

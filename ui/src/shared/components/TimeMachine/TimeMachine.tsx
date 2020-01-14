@@ -29,10 +29,12 @@ import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/acti
 // Constants
 import {HANDLE_HORIZONTAL} from 'src/shared/constants'
 import {CEOTabs} from 'src/dashboards/constants'
+import {AutoRefreshOption} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
 
 // Types
 import {
   TimeRange,
+  RefreshRate,
   QueryConfig,
   Template,
   Source,
@@ -86,6 +88,7 @@ interface PassedProps {
   ) => JSX.Element
   queryStatus: QueryStatus
   onUpdateScriptStatus?: (status: ScriptStatus) => void
+  refresh: RefreshRate
 }
 
 interface State {
@@ -108,7 +111,7 @@ class TimeMachine extends PureComponent<Props, State> {
       activeEditorTab: CEOTabs.Queries,
       selectedSource: null,
       autoRefresher: new AutoRefresher(),
-      autoRefreshDuration: 0,
+      autoRefreshDuration: props.refresh,
       isViewingRawData: false,
     }
   }
@@ -142,6 +145,7 @@ class TimeMachine extends PureComponent<Props, State> {
       timeMachineProportions,
       onSetTimeMachineProportions,
     } = this.props
+    console.log('TM.render: this.props', this.props, 'this.state', this.state)
     const {autoRefreshDuration, isViewingRawData} = this.state
     const [topSize, bottomSize] = timeMachineProportions
 
@@ -522,8 +526,11 @@ class TimeMachine extends PureComponent<Props, State> {
     onDeleteQuery(queryToDelete.id)
   }
 
-  private handleChangeAutoRefreshDuration = (autoRefreshDuration: number) => {
-    this.setState({autoRefreshDuration})
+  private handleChangeAutoRefreshDuration = (
+    autoRefreshOption: AutoRefreshOption
+  ): void => {
+    const {milliseconds} = autoRefreshOption
+    this.setState({autoRefreshDuration: milliseconds})
   }
 
   private handleSetActiveQueryIndex = (activeQueryIndex): void => {
@@ -563,6 +570,7 @@ const ConnectedTimeMachine = (props: PassedProps & ManualRefreshProps) => {
             draftScript={state.draftScript}
             queryDrafts={state.queryDrafts}
             timeRange={state.timeRange}
+            refresh={props.refresh}
             timeMachineProportions={container.state.timeMachineProportions}
             onUpdateQueryType={container.handleUpdateQueryType}
             onUpdateTimeRange={container.handleUpdateTimeRange}

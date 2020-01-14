@@ -170,6 +170,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       editQueryStatus,
       updateSourceLink,
       onSetTimeZone,
+      autoRefresh,
     } = this.props
 
     const {isStaticLegend, isComponentMounted} = this.state
@@ -196,6 +197,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             updateSourceLink={updateSourceLink}
             onResetFocus={this.handleResetFocus}
             onToggleStaticLegend={this.handleToggleStaticLegend}
+            refresh={autoRefresh}
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
               <DEHeader

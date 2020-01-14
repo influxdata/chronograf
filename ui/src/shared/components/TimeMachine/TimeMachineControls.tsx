@@ -16,6 +16,9 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import {Template, QueryType} from 'src/types'
 
+// Constants
+import {AutoRefreshOption} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
+
 interface Props {
   isFluxSelected: boolean
   source: SourcesModels.Source
@@ -25,7 +28,7 @@ interface Props {
   isDynamicSourceSelected: boolean
   onChangeSource: (source: SourcesModels.Source, type: QueryType) => void
   autoRefreshDuration: number
-  onChangeAutoRefreshDuration: (newDuration: number) => void
+  onChangeAutoRefreshDuration: (autoRefreshOption: AutoRefreshOption) => void
   queries: QueriesModels.QueryConfig[]
   templates: Template[]
   sourceSupportsFlux: boolean

@@ -127,11 +127,16 @@ export class HostsPage extends PureComponent<Props, State> {
     this.intervalID = null
   }
 
+  public handleChooseAutoRefresh(option) {
+    const {onChooseAutoRefresh} = this.props
+    const {milliseconds} = option
+    onChooseAutoRefresh(milliseconds)
+  }
+
   public render() {
     const {
       source,
       autoRefresh,
-      onChooseAutoRefresh,
       onManualRefresh,
     } = this.props
     const {hostsObject, hostsPageStatus} = this.state
@@ -144,7 +149,7 @@ export class HostsPage extends PureComponent<Props, State> {
           <Page.Header.Right showSourceIndicator={true}>
             <AutoRefreshDropdown
               selected={autoRefresh}
-              onChoose={onChooseAutoRefresh}
+              onChoose={(option) => this.handleChooseAutoRefresh(option)}
               onManualRefresh={onManualRefresh}
             />
           </Page.Header.Right>

@@ -1,18 +1,25 @@
-import _ from 'lodash'
+import {unionBy} from 'lodash'
 
-import {TimeRange} from 'src/types'
+import {TimeRange, RefreshRate} from 'src/types'
 import {Action, ActionType} from 'src/dashboards/actions'
 
 interface Range extends TimeRange {
   dashboardID: number
 }
 
+interface Refresh {
+  dashboardID: number
+  refreshRate: RefreshRate
+}
+
 export interface State {
   ranges: Range[]
+  refreshes: Refresh[]
 }
 
 const initialState: State = {
   ranges: [],
+  refreshes: [],
 }
 
 export default (state: State = initialState, action: Action) => {
@@ -32,12 +39,28 @@ export default (state: State = initialState, action: Action) => {
       return {...state, ranges}
     }
 
+    case ActionType.RetainDashboardRefresh: {
+      const {dashboardIDs} = action.payload
+      const refreshes = state.refreshes.filter(r =>
+        dashboardIDs.includes(r.dashboardID)
+      )
+      return {...state, refreshes}
+    }
+
     case ActionType.SetDashboardTimeV1: {
       const {dashboardID, timeRange} = action.payload
       const newTimeRange = [{dashboardID, ...timeRange}]
-      const ranges = _.unionBy(newTimeRange, state.ranges, 'dashboardID')
+      const ranges = unionBy(newTimeRange, state.ranges, 'dashboardID')
 
       return {...state, ranges}
+    }
+
+    case ActionType.SetDashboardRefresh: {
+      const {dashboardID, refreshRate} = action.payload
+      const newRefresh = [{dashboardID, refreshRate}]
+      const refreshes = unionBy(newRefresh, state.refreshes, 'dashboardID')
+
+      return {...state, refreshes}
     }
   }
 
