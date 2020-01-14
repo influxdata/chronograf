@@ -447,7 +447,15 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 
 	svc := kv.NewService(logger, db)
 
-	layouts, err := builder.Layouts.Build(db.LayoutsStore())
+	dashboards, err := builder.Dashboards.Build(svc.DashboardsStore())
+	if err != nil {
+		logger.
+			WithField("component", "DashboardsStore").
+			Error("Unable to construct a MultiDashboardsStore", err)
+		os.Exit(1)
+	}
+
+	layouts, err := builder.Layouts.Build(svc.LayoutsStore())
 	if err != nil {
 		logger.
 			WithField("component", "LayoutsStore").
@@ -455,13 +463,6 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	dashboards, err := builder.Dashboards.Build(db.DashboardsStore())
-	if err != nil {
-		logger.
-			WithField("component", "DashboardsStore").
-			Error("Unable to construct a MultiDashboardsStore", err)
-		os.Exit(1)
-	}
 	sources, err := builder.Sources.Build(db.SourcesStore())
 	if err != nil {
 		logger.

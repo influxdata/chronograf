@@ -183,16 +183,16 @@ func (s *OrganizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 		}
 	}
 
-	dashboardsStore := organizations.NewDashboardsStore(s.client.dashboardsStore, o.ID)
-	dashboards, err := dashboardsStore.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, dashboard := range dashboards {
-		if err := dashboardsStore.Delete(ctx, dashboard); err != nil {
-			return err
-		}
-	}
+	// dashboardsStore := organizations.NewDashboardsStore(s.client.dashboardsStore, o.ID)
+	// dashboards, err := dashboardsStore.All(ctx)
+	// if err != nil {
+	// 	return err
+	// }
+	// for _, dashboard := range dashboards {
+	// 	if err := dashboardsStore.Delete(ctx, dashboard); err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	usersStore := organizations.NewUsersStore(s.client.usersStore, o.ID)
 	users, err := usersStore.All(ctx)

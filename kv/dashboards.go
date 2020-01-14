@@ -8,17 +8,17 @@ import (
 	"github.com/influxdata/chronograf/kv/internal"
 )
 
-// Ensure DashboardsStore implements chronograf.DashboardsStore.
-var _ chronograf.DashboardsStore = &DashboardsStore{}
+// Ensure dashboardsStore implements chronograf.DashboardsStore.
+var _ chronograf.DashboardsStore = &dashboardsStore{}
 
-// DashboardsStore is the bolt implementation of storing dashboards
-type DashboardsStore struct {
+// dashboardsStore is the bolt implementation of storing dashboards
+type dashboardsStore struct {
 	client *Service
 	IDs    chronograf.ID
 }
 
 // All returns all known dashboards
-func (d *DashboardsStore) All(ctx context.Context) ([]chronograf.Dashboard, error) {
+func (d *dashboardsStore) All(ctx context.Context) ([]chronograf.Dashboard, error) {
 	var srcs []chronograf.Dashboard
 	if err := d.client.kv.View(ctx, func(tx Tx) error {
 		if err := tx.Bucket(dashboardsBucket).ForEach(func(k, v []byte) error {
@@ -39,8 +39,8 @@ func (d *DashboardsStore) All(ctx context.Context) ([]chronograf.Dashboard, erro
 	return srcs, nil
 }
 
-// Add creates a new Dashboard in the DashboardsStore
-func (d *DashboardsStore) Add(ctx context.Context, src chronograf.Dashboard) (chronograf.Dashboard, error) {
+// Add creates a new Dashboard in the dashboardsStore
+func (d *dashboardsStore) Add(ctx context.Context, src chronograf.Dashboard) (chronograf.Dashboard, error) {
 	if err := d.client.kv.Update(ctx, func(tx Tx) error {
 		b := tx.Bucket(dashboardsBucket)
 		id, _ := b.NextSequence()
@@ -69,7 +69,7 @@ func (d *DashboardsStore) Add(ctx context.Context, src chronograf.Dashboard) (ch
 }
 
 // Get returns a Dashboard if the id exists.
-func (d *DashboardsStore) Get(ctx context.Context, id chronograf.DashboardID) (chronograf.Dashboard, error) {
+func (d *dashboardsStore) Get(ctx context.Context, id chronograf.DashboardID) (chronograf.Dashboard, error) {
 	var src chronograf.Dashboard
 	if err := d.client.kv.View(ctx, func(tx Tx) error {
 		strID := strconv.Itoa(int(id))
@@ -86,8 +86,8 @@ func (d *DashboardsStore) Get(ctx context.Context, id chronograf.DashboardID) (c
 	return src, nil
 }
 
-// Delete the dashboard from DashboardsStore
-func (d *DashboardsStore) Delete(ctx context.Context, dash chronograf.Dashboard) error {
+// Delete the dashboard from dashboardsStore
+func (d *dashboardsStore) Delete(ctx context.Context, dash chronograf.Dashboard) error {
 	if err := d.client.kv.Update(ctx, func(tx Tx) error {
 		strID := strconv.Itoa(int(dash.ID))
 		if err := tx.Bucket(dashboardsBucket).Delete([]byte(strID)); err != nil {
@@ -101,8 +101,8 @@ func (d *DashboardsStore) Delete(ctx context.Context, dash chronograf.Dashboard)
 	return nil
 }
 
-// Update the dashboard in DashboardsStore
-func (d *DashboardsStore) Update(ctx context.Context, dash chronograf.Dashboard) error {
+// Update the dashboard in dashboardsStore
+func (d *dashboardsStore) Update(ctx context.Context, dash chronograf.Dashboard) error {
 	if err := d.client.kv.Update(ctx, func(tx Tx) error {
 		// Get an existing dashboard with the same ID.
 		b := tx.Bucket(dashboardsBucket)

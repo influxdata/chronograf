@@ -12,6 +12,7 @@ var (
 	cellBucket       = []byte("cellsv2")
 	configBucket     = []byte("ConfigV1")
 	dashboardsBucket = []byte("Dashoard") // keep spelling for backwards compat
+	layoutsBucket    = []byte("Layout")
 )
 
 // Store is an interface for a generic key value store. It is modeled after
@@ -103,7 +104,7 @@ func NewService(log chronograf.Logger, kv Store) *Service {
 }
 
 func (s *Service) initialize(ctx context.Context, tx Tx) error {
-	buckets := [][]byte{cellBucket, configBucket, dashboardsBucket}
+	buckets := [][]byte{cellBucket, configBucket, dashboardsBucket, layoutsBucket}
 
 	for i := range buckets {
 		if _, err := tx.CreateBucketIfNotExists(buckets[i]); err != nil {
@@ -112,4 +113,12 @@ func (s *Service) initialize(ctx context.Context, tx Tx) error {
 	}
 
 	return nil
+}
+
+func (s *Service) DashboardsStore() chronograf.DashboardsStore {
+	return &dashboardsStore{client: s}
+}
+
+func (s *Service) LayoutsStore() chronograf.LayoutsStore {
+	return &layoutsStore{client: s}
 }

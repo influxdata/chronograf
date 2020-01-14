@@ -10,7 +10,6 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/kv"
 )
 
@@ -38,8 +37,6 @@ type Client struct {
 	buildStore              *BuildStore
 	sourcesStore            *SourcesStore
 	serversStore            *ServersStore
-	layoutsStore            *LayoutsStore
-	dashboardsStore         *DashboardsStore
 	usersStore              *UsersStore
 	organizationsStore      *OrganizationsStore
 	configStore             *ConfigStore
@@ -58,8 +55,6 @@ func NewClient(path string, logger chronograf.Logger) *Client {
 	c.buildStore = &BuildStore{client: c}
 	c.sourcesStore = &SourcesStore{client: c}
 	c.serversStore = &ServersStore{client: c}
-	c.layoutsStore = &LayoutsStore{client: c, IDs: &id.UUID{}}
-	c.dashboardsStore = &DashboardsStore{client: c, IDs: &id.UUID{}}
 	c.usersStore = &UsersStore{client: c}
 	c.organizationsStore = &OrganizationsStore{client: c}
 	c.configStore = &ConfigStore{client: c}
@@ -82,16 +77,6 @@ func (c *Client) SourcesStore() chronograf.SourcesStore {
 // ServersStore returns a ServersStore that uses the bolt client.
 func (c *Client) ServersStore() chronograf.ServersStore {
 	return c.serversStore
-}
-
-// LayoutsStore returns a LayoutsStore that uses the bolt client.
-func (c *Client) LayoutsStore() chronograf.LayoutsStore {
-	return c.layoutsStore
-}
-
-// DashboardsStore returns a DashboardsStore that uses the bolt client.
-func (c *Client) DashboardsStore() chronograf.DashboardsStore {
-	return c.dashboardsStore
 }
 
 // UsersStore returns a UsersStore that uses the bolt client.
@@ -379,14 +364,6 @@ func (c *Client) initialize(ctx context.Context) error {
 		if _, err := tx.CreateBucketIfNotExists(ServersBucket); err != nil {
 			return err
 		}
-		// Always create Layouts bucket.
-		if _, err := tx.CreateBucketIfNotExists(LayoutsBucket); err != nil {
-			return err
-		}
-		// Always create Dashboards bucket.
-		if _, err := tx.CreateBucketIfNotExists(DashboardsBucket); err != nil {
-			return err
-		}
 		// Always create Users bucket.
 		if _, err := tx.CreateBucketIfNotExists(UsersBucket); err != nil {
 			return err
@@ -432,12 +409,6 @@ func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error 
 		if err := c.serversStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.layoutsStore.Migrate(ctx); err != nil {
-			return err
-		}
-		// if err := c.dashboardsStore.Migrate(ctx); err != nil {
-		// 	return err
-		// }
 		if err := c.configStore.Migrate(ctx); err != nil {
 			return err
 		}
