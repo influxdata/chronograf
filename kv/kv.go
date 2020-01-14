@@ -30,6 +30,8 @@ type Store interface {
 	View(context.Context, func(Tx) error) error
 	// Update opens up a transaction that will mutate data.
 	Update(context.Context, func(Tx) error) error
+	// Close closes the connection to the db.
+	Close() error
 }
 
 // Tx is a transaction in the store.

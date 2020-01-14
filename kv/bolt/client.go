@@ -20,45 +20,40 @@ const (
 	ErrUnableToBackup = "Unable to backup your database prior to migrations:  %v"
 	// ErrUnableToInitialize means we couldn't create missing Buckets (maybe a timeout)
 	ErrUnableToInitialize = "Unable to boot boltdb:  %v"
-	// ErrUnableToMigrate means we had an issue changing the db schema
-	ErrUnableToMigrate = "Unable to migrate boltdb:  %v"
+	// ErrUnableToUpdate means we had an issue changing the db schema
+	ErrUnableToUpdate = "Unable to store new version in boltdb:  %v"
 )
 
-// var _ chronograf.KVClient = (*Client)(nil)
+var _ kv.Store = (*client)(nil)
 
-// Client is a client for the boltDB data store.
-type Client struct {
+// client is a client for the boltDB data store.
+type client struct {
 	path   string
 	db     *bolt.DB
 	logger chronograf.Logger
 	isNew  bool
 	Now    func() time.Time
 
-	buildStore  *BuildStore
-	configStore *ConfigStore
+	buildStore  *buildStore
+	configStore *configStore
 }
 
-// NewClient initializes all stores
-func NewClient(path string, logger chronograf.Logger) *Client {
-	c := &Client{
+// NewClient initializes bolt client implementing the kv.Store interface.
+func NewClient(path string, logger chronograf.Logger) *client {
+	c := &client{
 		logger: logger,
 		path:   path,
 		Now:    time.Now,
 	}
 
-	c.buildStore = &BuildStore{client: c}
-	c.configStore = &ConfigStore{client: c}
+	c.buildStore = &buildStore{client: c}
+	c.configStore = &configStore{client: c}
 
 	return c
 }
 
-// BuildStore returns a BuildStore that uses the bolt client.
-func (c *Client) BuildStore() chronograf.BuildStore {
-	return c.buildStore
-}
-
 // ConfigStore returns a ConfigStore that uses the bolt client.
-func (c *Client) ConfigStore() chronograf.ConfigStore {
+func (c *client) ConfigStore() chronograf.ConfigStore {
 	return c.configStore
 }
 
@@ -66,7 +61,7 @@ func (c *Client) ConfigStore() chronograf.ConfigStore {
 type Option interface{}
 
 // Open / create boltDB file.
-func (c *Client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...Option) error {
+func (c *client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...Option) error {
 	if _, err := os.Stat(c.path); os.IsNotExist(err) {
 		c.isNew = true
 	} else if err != nil {
@@ -80,20 +75,27 @@ func (c *Client) Open(ctx context.Context, build chronograf.BuildInfo, opts ...O
 	}
 	c.db = db
 
-	// The test to backup was always 'true' so remove it and just run it.
-	if err = c.backup(ctx, build); err != nil {
-		return fmt.Errorf(ErrUnableToBackup, err)
-	}
-
 	if err = c.initialize(ctx); err != nil {
 		return fmt.Errorf(ErrUnableToInitialize, err)
+	}
+
+	if !c.isNew {
+		if lastBuild, err := c.buildStore.Get(ctx); err == nil && lastBuild.Version != build.Version {
+			if err = c.backup(ctx, lastBuild, build); err != nil {
+				return fmt.Errorf(ErrUnableToBackup, err)
+			}
+
+			if err = c.buildStore.Update(ctx, build); err != nil {
+				return fmt.Errorf(ErrUnableToUpdate, err)
+			}
+		}
 	}
 
 	return nil
 }
 
 // View opens up a view transaction against the store.
-func (c *Client) View(ctx context.Context, fn func(tx kv.Tx) error) error {
+func (c *client) View(ctx context.Context, fn func(tx kv.Tx) error) error {
 	return c.db.View(func(tx *bolt.Tx) error {
 		return fn(&Tx{
 			tx:  tx,
@@ -103,7 +105,7 @@ func (c *Client) View(ctx context.Context, fn func(tx kv.Tx) error) error {
 }
 
 // Update opens up an update transaction against the store.
-func (c *Client) Update(ctx context.Context, fn func(tx kv.Tx) error) error {
+func (c *client) Update(ctx context.Context, fn func(tx kv.Tx) error) error {
 	return c.db.Update(func(tx *bolt.Tx) error {
 		return fn(&Tx{
 			tx:  tx,
@@ -301,14 +303,14 @@ func (c *Cursor) Err() error {
 }
 
 // initialize creates Buckets that are missing
-func (c *Client) initialize(ctx context.Context) error {
+func (c *client) initialize(ctx context.Context) error {
 	if err := c.db.Update(func(tx *bolt.Tx) error {
 		// Always create Config bucket.
-		if _, err := tx.CreateBucketIfNotExists(ConfigBucket); err != nil {
+		if _, err := tx.CreateBucketIfNotExists(configBucket); err != nil {
 			return err
 		}
 		// Always create Build bucket.
-		if _, err := tx.CreateBucketIfNotExists(BuildBucket); err != nil {
+		if _, err := tx.CreateBucketIfNotExists(buildBucket); err != nil {
 			return err
 		}
 		return nil
@@ -319,32 +321,29 @@ func (c *Client) initialize(ctx context.Context) error {
 	return nil
 }
 
-/*
-// migrate moves data from an old schema to a new schema in each Store
-func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error {
-	if c.db != nil {
-		// Runtime migrations
-		if err := c.configStore.Migrate(ctx); err != nil {
-			return err
-		}
-		if err := c.buildStore.Migrate(ctx, build); err != nil {
-			return err
-		}
-		MigrateAll(c)
-	}
-	return nil
-}
-*/
 // Close the connection to the bolt database
-func (c *Client) Close() error {
+func (c *client) Close() error {
 	if c.db != nil {
 		return c.db.Close()
 	}
 	return nil
 }
 
+// backup makes a copy of the database to the backup/ directory, if necessary:
+// - If this is a fresh install, don't create a backup and store the current version
+// - If we are on the same version, don't create a backup
+// - If the version has changed, create a backup and store the current version
+func (c *client) backup(ctx context.Context, lastBuild, build chronograf.BuildInfo) error {
+	// The database was pre-existing, and the version has changed
+	// and so create a backup
+	c.logger.Info("Moving from version ", lastBuild.Version)
+	c.logger.Info("Moving to version ", build.Version)
+
+	return c.copy(ctx, lastBuild.Version)
+}
+
 // copy creates a copy of the database in toFile
-func (c *Client) copy(ctx context.Context, version string) error {
+func (c *client) copy(ctx context.Context, version string) error {
 	backupDir := path.Join(path.Dir(c.path), "backup")
 	if _, err := os.Stat(backupDir); os.IsNotExist(err) {
 		if err = os.Mkdir(backupDir, 0700); err != nil {
@@ -376,29 +375,4 @@ func (c *Client) copy(ctx context.Context, version string) error {
 	c.logger.Info("Successfully created ", toPath)
 
 	return nil
-}
-
-// backup makes a copy of the database to the backup/ directory, if necessary:
-// - If this is a fresh install, don't create a backup and store the current version
-// - If we are on the same version, don't create a backup
-// - If the version has changed, create a backup and store the current version
-func (c *Client) backup(ctx context.Context, build chronograf.BuildInfo) error {
-	lastBuild, err := c.buildStore.Get(ctx)
-	if err != nil {
-		return err
-	}
-	if lastBuild.Version == build.Version {
-		return nil
-	}
-	if c.isNew {
-		return nil
-	}
-
-	// The database was pre-existing, and the version has changed
-	// and so create a backup
-
-	c.logger.Info("Moving from version ", lastBuild.Version)
-	c.logger.Info("Moving to version ", build.Version)
-
-	return c.copy(ctx, lastBuild.Version)
 }

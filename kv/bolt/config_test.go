@@ -30,13 +30,12 @@ func TestConfig_Get(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		client, err := NewTestClient()
+		client, s, err := NewTestClient()
 		if err != nil {
 			t.Fatal(err)
 		}
 		defer client.Close()
 
-		s := client.ConfigStore()
 		got, err := s.Get(context.Background())
 		if (tt.wants.err != nil) != (err != nil) {
 			fmt.Println(got, err)
@@ -81,13 +80,12 @@ func TestConfig_Update(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		client, err := NewTestClient()
+		client, s, err := NewTestClient()
 		if err != nil {
 			t.Fatal(err)
 		}
 		defer client.Close()
 
-		s := client.ConfigStore()
 		err = s.Update(context.Background(), tt.args.config)
 		if (tt.wants.err != nil) != (err != nil) {
 			t.Errorf("%q. ConfigStore.Get() error = %v, wantErr %v", tt.name, err, tt.wants.err)

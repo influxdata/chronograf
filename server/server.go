@@ -436,7 +436,6 @@ func (s *Server) Serve(ctx context.Context) {
 // todo: add etcd connection details as arg.
 // todo: return error. make chronograf error type that has fields and error. .Error() will logger.Error print it.
 func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, logger chronograf.Logger, useAuth bool) Service {
-
 	db := bolt.NewClient(boltPath, logger)
 	err := db.Open(ctx, buildInfo)
 	// db, err := bolt.NewClient(ctx, boltPath, logger, buildInfo)

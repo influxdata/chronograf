@@ -11,25 +11,25 @@ import (
 	"github.com/influxdata/chronograf/kv/internal"
 )
 
-// Ensure ConfigStore implements chronograf.ConfigStore.
-var _ chronograf.ConfigStore = &ConfigStore{}
+// Ensure configStore implements chronograf.ConfigStore.
+var _ chronograf.ConfigStore = &configStore{}
 
-// ConfigBucket is used to store chronograf application state
-var ConfigBucket = []byte("ConfigV1")
+// configBucket is used to store chronograf application state
+var configBucket = []byte("ConfigV1")
 
 // configID is the boltDB key where the configuration object is stored
 var configID = []byte("config/v1")
 
-// ConfigStore uses bolt to store and retrieve global
+// configStore uses bolt to store and retrieve global
 // application configuration
-type ConfigStore struct {
-	client *Client
+type configStore struct {
+	client *client
 }
 
-func (s *ConfigStore) Get(ctx context.Context) (*chronograf.Config, error) {
+func (s *configStore) Get(ctx context.Context) (*chronograf.Config, error) {
 	var cfg chronograf.Config
 	err := s.client.db.View(func(tx *bolt.Tx) error {
-		v := tx.Bucket(ConfigBucket).Get(configID)
+		v := tx.Bucket(configBucket).Get(configID)
 		if v == nil {
 			cfg = chronograf.Config{
 				Auth: chronograf.AuthConfig{
@@ -40,22 +40,17 @@ func (s *ConfigStore) Get(ctx context.Context) (*chronograf.Config, error) {
 		}
 		return internal.UnmarshalConfig(v, &cfg)
 	})
-
-	if err != nil {
-		fmt.Println("ASADFSADFSADF")
-		return nil, err
-	}
-	return &cfg, nil
+	return &cfg, err
 }
 
-func (s *ConfigStore) Update(ctx context.Context, cfg *chronograf.Config) error {
+func (s *configStore) Update(ctx context.Context, cfg *chronograf.Config) error {
 	if cfg == nil {
 		return fmt.Errorf("config provided was nil")
 	}
 	return s.client.db.Update(func(tx *bolt.Tx) error {
 		if v, err := internal.MarshalConfig(cfg); err != nil {
 			return err
-		} else if err := tx.Bucket(ConfigBucket).Put(configID, v); err != nil {
+		} else if err := tx.Bucket(configBucket).Put(configID, v); err != nil {
 			return err
 		}
 		return nil

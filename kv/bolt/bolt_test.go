@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/kv/bolt"
 	"github.com/influxdata/chronograf/mocks"
 )
@@ -17,32 +18,37 @@ var TestNow = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 // TestClient wraps *bolt.Client.
 type TestClient struct {
-	*bolt.Client
-	path string
+	Client kv.Store
+	path   string
 }
 
 // NewTestClient creates new *bolt.Client with a set time and temp path.
-func NewTestClient() (*TestClient, error) {
+func NewTestClient() (*TestClient, chronograf.ConfigStore, error) {
 	f, err := ioutil.TempFile("", "chronograf-bolt-")
 	if err != nil {
-		return nil, errors.New("unable to open temporary boltdb file")
+		return nil, nil, errors.New("unable to open temporary boltdb file")
 	}
 	f.Close()
 
+	b := bolt.NewClient(f.Name(), mocks.NewLogger())
+	b.Now = func() time.Time { return TestNow }
+
 	c := &TestClient{
-		Client: bolt.NewClient(f.Name(), mocks.NewLogger()),
+		Client: b,
 		path:   f.Name(),
 	}
-	c.Now = func() time.Time { return TestNow }
 
 	build := chronograf.BuildInfo{
 		Version: "version",
 		Commit:  "commit",
 	}
 
-	c.Open(context.TODO(), build)
+	err = b.Open(context.TODO(), build)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return c, nil
+	return c, b.ConfigStore(), nil
 }
 
 func (c *TestClient) Close() error {

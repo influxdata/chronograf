@@ -14,7 +14,7 @@ import (
 	"github.com/influxdata/chronograf/mocks"
 )
 
-func NewBoltClient(path string) (*bolt.Client, error) {
+func NewBoltClient(path string) (kv.Store, error) {
 	c := bolt.NewClient(path, mocks.NewLogger())
 	bi := chronograf.BuildInfo{}
 
