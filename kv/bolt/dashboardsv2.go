@@ -1,19 +1,16 @@
 package bolt
 
-import (
+/* import (
 	"context"
-	"encoding/json"
-	"strconv"
 
 	"github.com/boltdb/bolt"
-	platform "github.com/influxdata/chronograf/v2"
 )
 
 var (
 	dashboardV2Bucket = []byte("dashboardsv3")
 )
 
-var _ platform.DashboardService = (*Client)(nil)
+// var _ platform.DashboardService = (*Client)(nil)
 
 func (c *Client) initializeDashboards(ctx context.Context, tx *bolt.Tx) error {
 	if _, err := tx.CreateBucketIfNotExists([]byte(dashboardV2Bucket)); err != nil {
@@ -21,7 +18,8 @@ func (c *Client) initializeDashboards(ctx context.Context, tx *bolt.Tx) error {
 	}
 	return nil
 }
-
+*/
+/*
 // FindDashboardByID retrieves a dashboard by id.
 func (c *Client) FindDashboardByID(ctx context.Context, id platform.ID) (*platform.Dashboard, error) {
 	var d *platform.Dashboard
@@ -240,3 +238,4 @@ func (c *Client) deleteDashboard(ctx context.Context, tx *bolt.Tx, id platform.I
 	}
 	return tx.Bucket(dashboardV2Bucket).Delete([]byte(id))
 }
+*/

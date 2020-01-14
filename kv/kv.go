@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	cellBucket   = []byte("cellsv2")
-	configBucket = []byte("ConfigV1")
+	cellBucket       = []byte("cellsv2")
+	configBucket     = []byte("ConfigV1")
+	dashboardsBucket = []byte("Dashoard") // keep spelling for backwards compat
 )
 
 // Store is an interface for a generic key value store. It is modeled after
@@ -54,6 +55,11 @@ type Bucket interface {
 	ForwardCursor(seek []byte /* , opts ...CursorOption */) (ForwardCursor, error)
 	// NextSequence returns a unique id for the bucket.
 	NextSequence() (uint64, error)
+	// ForEach executes a function for each key/value pair in a bucket.
+	// If the provided function returns an error then the iteration is stopped and
+	// the error is returned to the caller. The provided function must not modify
+	// the bucket; this will result in undefined behavior.
+	ForEach(fn func(k, v []byte) error) error
 }
 
 // Cursor is an abstraction for iterating/ranging through data. A concrete implementation
@@ -97,7 +103,7 @@ func NewService(log chronograf.Logger, kv Store) *Service {
 }
 
 func (s *Service) initialize(ctx context.Context, tx Tx) error {
-	buckets := [][]byte{cellBucket, configBucket}
+	buckets := [][]byte{cellBucket, configBucket, dashboardsBucket}
 
 	for i := range buckets {
 		if _, err := tx.CreateBucketIfNotExists(buckets[i]); err != nil {
