@@ -506,7 +506,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 			ProtoboardsStore:        protoboards,
 			UsersStore:              db.UsersStore(),
 			ConfigStore:             db.ConfigStore(),
-			MappingsStore:           db.MappingsStore(),
+			MappingsStore:           svc.MappingsStore(),
 			OrganizationConfigStore: db.OrganizationConfigStore(),
 			CellService:             svc,
 		},

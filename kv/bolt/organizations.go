@@ -45,13 +45,6 @@ func (s *OrganizationsStore) CreateDefault(ctx context.Context) error {
 		DefaultRole: DefaultOrganizationRole,
 	}
 
-	m := chronograf.Mapping{
-		ID:                   string(DefaultOrganizationID),
-		Organization:         string(DefaultOrganizationID),
-		Provider:             chronograf.MappingWildcard,
-		Scheme:               chronograf.MappingWildcard,
-		ProviderOrganization: chronograf.MappingWildcard,
-	}
 	return s.client.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(OrganizationsBucket)
 		v := b.Get(DefaultOrganizationID)
@@ -64,16 +57,24 @@ func (s *OrganizationsStore) CreateDefault(ctx context.Context) error {
 			return err
 		}
 
-		b = tx.Bucket(MappingsBucket)
-		v = b.Get(DefaultOrganizationID)
-		if v != nil {
-			return nil
-		}
-		if v, err := internal.MarshalMapping(&m); err != nil {
-			return err
-		} else if err := b.Put(DefaultOrganizationID, v); err != nil {
-			return err
-		}
+		// m := chronograf.Mapping{
+		// 	ID:                   string(DefaultOrganizationID),
+		// 	Organization:         string(DefaultOrganizationID),
+		// 	Provider:             chronograf.MappingWildcard,
+		// 	Scheme:               chronograf.MappingWildcard,
+		// 	ProviderOrganization: chronograf.MappingWildcard,
+		// }
+
+		// b = tx.Bucket(MappingsBucket)
+		// v = b.Get(DefaultOrganizationID)
+		// if v != nil {
+		// 	return nil
+		// }
+		// if v, err := internal.MarshalMapping(&m); err != nil {
+		// 	return err
+		// } else if err := b.Put(DefaultOrganizationID, v); err != nil {
+		// 	return err
+		// }
 
 		return nil
 	})
@@ -205,17 +206,17 @@ func (s *OrganizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 		}
 	}
 
-	mappings, err := s.client.mappingsStore.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, mapping := range mappings {
-		if mapping.Organization == o.ID {
-			if err := s.client.mappingsStore.Delete(ctx, &mapping); err != nil {
-				return err
-			}
-		}
-	}
+	// mappings, err := s.client.mappingsStore.All(ctx)
+	// if err != nil {
+	// 	return err
+	// }
+	// for _, mapping := range mappings {
+	// 	if mapping.Organization == o.ID {
+	// 		if err := s.client.mappingsStore.Delete(ctx, &mapping); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 
 	return nil
 }
