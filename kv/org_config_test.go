@@ -1,6 +1,5 @@
-package bolt_test
+package kv_test
 
-/*
 import (
 	"context"
 	"testing"
@@ -1224,4 +1223,3 @@ func TestOrganizationConfig_Put(t *testing.T) {
 		})
 	}
 }
-*/

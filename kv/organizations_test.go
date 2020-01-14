@@ -1,6 +1,5 @@
-package bolt_test
+package kv_test
 
-/*
 import (
 	"context"
 	"testing"
@@ -8,7 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/roles"
 )
 
@@ -188,8 +187,8 @@ func TestOrganizationsStore_All(t *testing.T) {
 					DefaultRole: roles.EditorRoleName,
 				},
 				{
-					Name:        bolt.DefaultOrganizationName,
-					DefaultRole: bolt.DefaultOrganizationRole,
+					Name:        kv.DefaultOrganizationName,
+					DefaultRole: kv.DefaultOrganizationRole,
 				},
 			},
 			addFirst: true,
@@ -618,9 +617,9 @@ func TestOrganizationsStore_DefaultOrganization(t *testing.T) {
 				ctx: context.Background(),
 			},
 			want: &chronograf.Organization{
-				ID:          string(bolt.DefaultOrganizationID),
-				Name:        bolt.DefaultOrganizationName,
-				DefaultRole: bolt.DefaultOrganizationRole,
+				ID:          string(kv.DefaultOrganizationID),
+				Name:        kv.DefaultOrganizationName,
+				DefaultRole: kv.DefaultOrganizationRole,
 			},
 			wantErr: false,
 		},
@@ -655,4 +654,3 @@ func TestOrganizationsStore_DefaultOrganization(t *testing.T) {
 		}
 	}
 }
-*/

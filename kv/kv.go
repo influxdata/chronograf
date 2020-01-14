@@ -106,10 +106,21 @@ type Service struct {
 
 // NewService returns an instance of a Service.
 func NewService(log chronograf.Logger, kv Store) *Service {
-	return &Service{
+	s := &Service{
 		log: log,
 		kv:  kv,
 	}
+
+	ctx := context.TODO()
+	s.kv.Update(ctx, func(tx Tx) error {
+		return s.initialize(ctx, tx)
+	})
+	return s
+}
+
+// Close closes the service's kv store.
+func (s *Service) Close() error {
+	return s.kv.Close()
 }
 
 func (s *Service) initialize(ctx context.Context, tx Tx) error {

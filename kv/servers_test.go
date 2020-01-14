@@ -1,6 +1,5 @@
-package bolt_test
+package kv_test
 
-/*
 import (
 	"context"
 	"reflect"
@@ -98,4 +97,3 @@ func TestServerStore(t *testing.T) {
 		t.Fatalf("After delete All returned incorrect server; got %v, expected %v", bsrcs[0], srcs[1])
 	}
 }
-*/
