@@ -5,7 +5,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/bolt/internal"
+	"github.com/influxdata/chronograf/kv/internal"
 	"github.com/influxdata/chronograf/roles"
 )
 

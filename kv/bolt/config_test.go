@@ -2,6 +2,7 @@ package bolt_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -38,6 +39,7 @@ func TestConfig_Get(t *testing.T) {
 		s := client.ConfigStore()
 		got, err := s.Get(context.Background())
 		if (tt.wants.err != nil) != (err != nil) {
+			fmt.Println(got, err)
 			t.Errorf("%q. ConfigStore.Get() error = %v, wantErr %v", tt.name, err, tt.wants.err)
 			continue
 		}

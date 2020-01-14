@@ -20,6 +20,7 @@ import (
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
 	"github.com/influxdata/chronograf/kv"
+	"github.com/influxdata/chronograf/kv/bolt"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
 	client "github.com/influxdata/usage-client/v1"
@@ -435,7 +436,16 @@ func (s *Server) Serve(ctx context.Context) {
 // todo: add etcd connection details as arg.
 // todo: return error. make chronograf error type that has fields and error. .Error() will logger.Error print it.
 func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, logger chronograf.Logger, useAuth bool) Service {
-	db, err := kv.NewClient(ctx, boltPath, logger, buildInfo)
+
+	db := bolt.NewClient(boltPath, logger)
+	err := db.Open(ctx, buildInfo)
+	// db, err := bolt.NewClient(ctx, boltPath, logger, buildInfo)
+	if err != nil {
+		logger.Error("Unable to create bolt client", err)
+		os.Exit(1)
+	}
+
+	svc := kv.NewService(logger, db)
 
 	layouts, err := builder.Layouts.Build(db.LayoutsStore())
 	if err != nil {
@@ -497,7 +507,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 			ConfigStore:             db.ConfigStore(),
 			MappingsStore:           db.MappingsStore(),
 			OrganizationConfigStore: db.OrganizationConfigStore(),
-			CellService:             db,
+			CellService:             svc,
 		},
 		Logger:    logger,
 		UseAuth:   useAuth,

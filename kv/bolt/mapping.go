@@ -6,7 +6,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/bolt/internal"
+	"github.com/influxdata/chronograf/kv/internal"
 )
 
 // Ensure MappingsStore implements chronograf.MappingsStore.
