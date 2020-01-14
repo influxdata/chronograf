@@ -11,8 +11,9 @@ const dashrefresh = (refreshes) => {
     }
 
     const {dashboardID, refreshRate} = r
+    const isTypeOfRefreshRate = !refreshRate || typeof refreshRate === 'number'
 
-    if (typeof dashboardID !== 'number' || !(!refreshRate || typeof refreshRate === 'number')) {
+    if (typeof dashboardID !== 'number' || !isTypeOfRefreshRate) {
       return false
     }
     return true

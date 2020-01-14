@@ -59,7 +59,7 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import {NewDefaultCell} from 'src/types/dashboards'
-import {NotificationAction, TimeZones} from 'src/types'
+import {NotificationAction, TimeZones, RefreshRate} from 'src/types'
 import {AnnotationsDisplaySetting} from 'src/types/annotations'
 import {Links} from 'src/types/flux'
 import {createTimeRangeTemplates} from 'src/shared/utils/templates'
@@ -79,7 +79,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   dashboard: DashboardsModels.Dashboard
   dashboards: DashboardsModels.Dashboard[]
   autoRefresh: number
-  refreshRate: number
+  refreshRate: RefreshRate
   timeRange: QueriesModels.TimeRange
   zoomedTimeRange: QueriesModels.TimeRange
   inPresentationMode: boolean
@@ -143,6 +143,8 @@ class DashboardPage extends Component<Props, State> {
 
   public async componentDidMount() {
     const {refreshRate, updateQueryParams} = this.props
+    const compareOptionToRefreshRate = (r: AutoRefreshOption) =>
+      r.milliseconds === refreshRate
     const {location: {search = ''} = {}} = window
     const urlSelectedRefresh = search.match(/refresh=([^&#]*)/i)
     let pollRefreshRate = refreshRate
@@ -157,13 +159,11 @@ class DashboardPage extends Component<Props, State> {
         pollRefreshRate = option.milliseconds
       } else {
         localStorageRefresh = autoRefreshOptions.find(
-          r => r.milliseconds === refreshRate
+          compareOptionToRefreshRate
         )
       }
     } else {
-      localStorageRefresh = autoRefreshOptions.find(
-        r => r.milliseconds === refreshRate
-      )
+      localStorageRefresh = autoRefreshOptions.find(compareOptionToRefreshRate)
     }
 
     if (localStorageRefresh) {
