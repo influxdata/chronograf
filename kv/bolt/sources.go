@@ -6,7 +6,6 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv/internal"
-	"github.com/influxdata/chronograf/roles"
 )
 
 // Ensure SourcesStore implements chronograf.SourcesStore.
@@ -20,31 +19,31 @@ type SourcesStore struct {
 	client *Client
 }
 
-func (s *SourcesStore) Migrate(ctx context.Context) error {
-	sources, err := s.All(ctx)
-	if err != nil {
-		return err
-	}
+// func (s *SourcesStore) Migrate(ctx context.Context) error {
+// 	sources, err := s.All(ctx)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	defaultOrg, err := s.client.organizationsStore.DefaultOrganization(ctx)
-	if err != nil {
-		return err
-	}
+// 	defaultOrg, err := s.client.organizationsStore.DefaultOrganization(ctx)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	for _, source := range sources {
-		if source.Organization == "" {
-			source.Organization = defaultOrg.ID
-		}
-		if source.Role == "" {
-			source.Role = roles.ViewerRoleName
-		}
-		if err := s.Update(ctx, source); err != nil {
-			return nil
-		}
-	}
+// 	for _, source := range sources {
+// 		if source.Organization == "" {
+// 			source.Organization = defaultOrg.ID
+// 		}
+// 		if source.Role == "" {
+// 			source.Role = roles.ViewerRoleName
+// 		}
+// 		if err := s.Update(ctx, source); err != nil {
+// 			return nil
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // All returns all known sources
 func (s *SourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {

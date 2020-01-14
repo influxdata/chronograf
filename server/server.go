@@ -479,7 +479,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	organizations, err := builder.Organizations.Build(db.OrganizationsStore())
+	organizations, err := builder.Organizations.Build(svc.OrganizationsStore())
 	if err != nil {
 		logger.
 			WithField("component", "OrganizationsStore").

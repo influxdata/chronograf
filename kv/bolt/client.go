@@ -34,12 +34,11 @@ type Client struct {
 	isNew  bool
 	Now    func() time.Time
 
-	buildStore         *BuildStore
-	sourcesStore       *SourcesStore
-	serversStore       *ServersStore
-	usersStore         *UsersStore
-	organizationsStore *OrganizationsStore
-	configStore        *ConfigStore
+	buildStore   *BuildStore
+	sourcesStore *SourcesStore
+	serversStore *ServersStore
+	usersStore   *UsersStore
+	configStore  *ConfigStore
 }
 
 // NewClient initializes all stores
@@ -54,7 +53,6 @@ func NewClient(path string, logger chronograf.Logger) *Client {
 	c.sourcesStore = &SourcesStore{client: c}
 	c.serversStore = &ServersStore{client: c}
 	c.usersStore = &UsersStore{client: c}
-	c.organizationsStore = &OrganizationsStore{client: c}
 	c.configStore = &ConfigStore{client: c}
 
 	return c
@@ -78,11 +76,6 @@ func (c *Client) ServersStore() chronograf.ServersStore {
 // UsersStore returns a UsersStore that uses the bolt client.
 func (c *Client) UsersStore() chronograf.UsersStore {
 	return c.usersStore
-}
-
-// OrganizationsStore returns a OrganizationsStore that uses the bolt client.
-func (c *Client) OrganizationsStore() chronograf.OrganizationsStore {
-	return c.organizationsStore
 }
 
 // ConfigStore returns a ConfigStore that uses the bolt client.
@@ -338,10 +331,6 @@ func (c *Client) initialize(ctx context.Context) error {
 		if _, err := tx.CreateBucketIfNotExists(SchemaVersionBucket); err != nil {
 			return err
 		}
-		// Always create Organizations bucket.
-		if _, err := tx.CreateBucketIfNotExists(OrganizationsBucket); err != nil {
-			return err
-		}
 		// Always create Sources bucket.
 		if _, err := tx.CreateBucketIfNotExists(SourcesBucket); err != nil {
 			return err
@@ -374,15 +363,12 @@ func (c *Client) initialize(ctx context.Context) error {
 func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error {
 	if c.db != nil {
 		// Runtime migrations
-		if err := c.organizationsStore.Migrate(ctx); err != nil {
-			return err
-		}
-		if err := c.sourcesStore.Migrate(ctx); err != nil {
-			return err
-		}
-		if err := c.serversStore.Migrate(ctx); err != nil {
-			return err
-		}
+		// if err := c.sourcesStore.Migrate(ctx); err != nil {
+		// 	return err
+		// }
+		// if err := c.serversStore.Migrate(ctx); err != nil {
+		// 	return err
+		// }
 		if err := c.configStore.Migrate(ctx); err != nil {
 			return err
 		}

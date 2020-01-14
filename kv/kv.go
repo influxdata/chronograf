@@ -15,6 +15,7 @@ var (
 	layoutsBucket            = []byte("Layout")
 	mappingsBucket           = []byte("MappingsV1")
 	organizationConfigBucket = []byte("OrganizationConfigV1")
+	organizationsBucket      = []byte("OrganizationsV1")
 )
 
 // Store is an interface for a generic key value store. It is modeled after
@@ -113,6 +114,7 @@ func (s *Service) initialize(ctx context.Context, tx Tx) error {
 		layoutsBucket,
 		mappingsBucket,
 		organizationConfigBucket,
+		organizationsBucket,
 	}
 
 	for i := range buckets {
@@ -138,4 +140,8 @@ func (s *Service) MappingsStore() chronograf.MappingsStore {
 
 func (s *Service) OrganizationConfigStore() chronograf.OrganizationConfigStore {
 	return &organizationConfigStore{client: s}
+}
+
+func (s *Service) OrganizationsStore() chronograf.OrganizationsStore {
+	return &organizationsStore{client: s}
 }
