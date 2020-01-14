@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	cellBucket = []byte("cellsv2")
+	cellBucket   = []byte("cellsv2")
+	configBucket = []byte("ConfigV1")
 )
 
 // Store is an interface for a generic key value store. It is modeled after
@@ -96,7 +97,7 @@ func NewService(log chronograf.Logger, kv Store) *Service {
 }
 
 func (s *Service) initialize(ctx context.Context, tx Tx) error {
-	buckets := [][]byte{cellBucket}
+	buckets := [][]byte{cellBucket, configBucket}
 
 	for i := range buckets {
 		if _, err := tx.CreateBucketIfNotExists(buckets[i]); err != nil {

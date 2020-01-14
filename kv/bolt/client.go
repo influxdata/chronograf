@@ -199,10 +199,10 @@ func (c *Client) initialize(ctx context.Context) error {
 		if _, err := tx.CreateBucketIfNotExists(OrganizationConfigBucket); err != nil {
 			return err
 		}
-		// Always create Cells bucket.
-		if err := c.initializeCells(ctx, tx); err != nil {
-			return err
-		}
+		// // Always create Cells bucket.
+		// if err := c.initializeCells(ctx, tx); err != nil {
+		// 	return err
+		// }
 		return nil
 	}); err != nil {
 		return err
@@ -230,9 +230,9 @@ func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error 
 		if err := c.dashboardsStore.Migrate(ctx); err != nil {
 			return err
 		}
-		if err := c.configStore.Migrate(ctx); err != nil {
-			return err
-		}
+		// if err := c.configStore.Migrate(ctx); err != nil {
+		// 	return err
+		// }
 		if err := c.buildStore.Migrate(ctx, build); err != nil {
 			return err
 		}

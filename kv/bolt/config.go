@@ -1,3 +1,5 @@
+// todo: is it preferred to keep configStore in bolt so each instance of
+// chronograf doesn't overwrite it's config into the bucket/hardcoded id?
 package bolt
 
 import (

@@ -8,6 +8,7 @@ import (
 	platform "github.com/influxdata/chronograf/v2"
 )
 
+// Ensure Service implements Platform.CellService.
 var _ platform.CellService = &Service{}
 
 // FindCellByID returns a single cell by ID.
