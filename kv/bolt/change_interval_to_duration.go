@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"errors"
 	"log"
 	"strings"
 
@@ -26,10 +27,13 @@ func updateDashboard(board *Dashboard) {
 	}
 }
 
-var up = func(db *bolt.DB) error {
+func up(db *bolt.DB) error {
 	// For each dashboard
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(dashboardBucket)
+		if bucket == nil {
+			return errors.New("'Dashoard' bucket not found")
+		}
 		err := bucket.ForEach(func(id, data []byte) error {
 			board := &Dashboard{}
 
@@ -68,7 +72,7 @@ var up = func(db *bolt.DB) error {
 	return nil
 }
 
-var down = func(db *bolt.DB) error {
+func down(db *bolt.DB) error {
 	return nil
 }
 

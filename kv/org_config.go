@@ -1,41 +1,33 @@
-package bolt
+package kv
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv/internal"
 )
 
-// Ensure OrganizationConfigStore implements chronograf.OrganizationConfigStore.
-var _ chronograf.OrganizationConfigStore = &OrganizationConfigStore{}
+// Ensure organizationConfigStore implements chronograf.OrganizationConfigStore.
+var _ chronograf.OrganizationConfigStore = &organizationConfigStore{}
 
-// OrganizationConfigBucket is used to store chronograf organization configurations
-var OrganizationConfigBucket = []byte("OrganizationConfigV1")
-
-// OrganizationConfigStore uses bolt to store and retrieve organization configurations
-type OrganizationConfigStore struct {
-	client *Client
+// organizationConfigStore uses bolt to store and retrieve organization configurations
+type organizationConfigStore struct {
+	client *Service
 }
 
-func (s *OrganizationConfigStore) Migrate(ctx context.Context) error {
-	return nil
-}
-
-func (s *OrganizationConfigStore) get(ctx context.Context, tx *bolt.Tx, orgID string, c *chronograf.OrganizationConfig) error {
-	v := tx.Bucket(OrganizationConfigBucket).Get([]byte(orgID))
-	if len(v) == 0 {
+func (s *organizationConfigStore) get(ctx context.Context, tx Tx, orgID string, c *chronograf.OrganizationConfig) error {
+	v, err := tx.Bucket(organizationConfigBucket).Get([]byte(orgID))
+	if len(v) == 0 || err != nil {
 		return chronograf.ErrOrganizationConfigNotFound
 	}
 	return internal.UnmarshalOrganizationConfig(v, c)
 }
 
 // FindOrCreate gets an OrganizationConfig from the store or creates one if none exists for this organization
-func (s *OrganizationConfigStore) FindOrCreate(ctx context.Context, orgID string) (*chronograf.OrganizationConfig, error) {
+func (s *organizationConfigStore) FindOrCreate(ctx context.Context, orgID string) (*chronograf.OrganizationConfig, error) {
 	var c chronograf.OrganizationConfig
-	err := s.client.db.Update(func(tx *bolt.Tx) error {
+	err := s.client.kv.Update(ctx, func(tx Tx) error {
 		err := s.get(ctx, tx, orgID, &c)
 		if err == chronograf.ErrOrganizationConfigNotFound {
 			c = newOrganizationConfig(orgID)
@@ -51,19 +43,19 @@ func (s *OrganizationConfigStore) FindOrCreate(ctx context.Context, orgID string
 }
 
 // Put replaces the OrganizationConfig in the store
-func (s *OrganizationConfigStore) Put(ctx context.Context, c *chronograf.OrganizationConfig) error {
-	return s.client.db.Update(func(tx *bolt.Tx) error {
+func (s *organizationConfigStore) Put(ctx context.Context, c *chronograf.OrganizationConfig) error {
+	return s.client.kv.Update(ctx, func(tx Tx) error {
 		return s.put(ctx, tx, c)
 	})
 }
 
-func (s *OrganizationConfigStore) put(ctx context.Context, tx *bolt.Tx, c *chronograf.OrganizationConfig) error {
+func (s *organizationConfigStore) put(ctx context.Context, tx Tx, c *chronograf.OrganizationConfig) error {
 	if c == nil {
 		return fmt.Errorf("config provided was nil")
 	}
 	if v, err := internal.MarshalOrganizationConfig(c); err != nil {
 		return err
-	} else if err := tx.Bucket(OrganizationConfigBucket).Put([]byte(c.OrganizationID), v); err != nil {
+	} else if err := tx.Bucket(organizationConfigBucket).Put([]byte(c.OrganizationID), v); err != nil {
 		return err
 	}
 	return nil

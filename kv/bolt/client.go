@@ -34,13 +34,12 @@ type Client struct {
 	isNew  bool
 	Now    func() time.Time
 
-	buildStore              *BuildStore
-	sourcesStore            *SourcesStore
-	serversStore            *ServersStore
-	usersStore              *UsersStore
-	organizationsStore      *OrganizationsStore
-	configStore             *ConfigStore
-	organizationConfigStore *OrganizationConfigStore
+	buildStore         *BuildStore
+	sourcesStore       *SourcesStore
+	serversStore       *ServersStore
+	usersStore         *UsersStore
+	organizationsStore *OrganizationsStore
+	configStore        *ConfigStore
 }
 
 // NewClient initializes all stores
@@ -57,7 +56,6 @@ func NewClient(path string, logger chronograf.Logger) *Client {
 	c.usersStore = &UsersStore{client: c}
 	c.organizationsStore = &OrganizationsStore{client: c}
 	c.configStore = &ConfigStore{client: c}
-	c.organizationConfigStore = &OrganizationConfigStore{client: c}
 
 	return c
 }
@@ -90,11 +88,6 @@ func (c *Client) OrganizationsStore() chronograf.OrganizationsStore {
 // ConfigStore returns a ConfigStore that uses the bolt client.
 func (c *Client) ConfigStore() chronograf.ConfigStore {
 	return c.configStore
-}
-
-// OrganizationConfigStore returns a OrganizationConfigStore that uses the bolt client.
-func (c *Client) OrganizationConfigStore() chronograf.OrganizationConfigStore {
-	return c.organizationConfigStore
 }
 
 // Option to change behavior of Open()
@@ -369,14 +362,6 @@ func (c *Client) initialize(ctx context.Context) error {
 		if _, err := tx.CreateBucketIfNotExists(BuildBucket); err != nil {
 			return err
 		}
-		// Always create OrganizationConfig bucket.
-		if _, err := tx.CreateBucketIfNotExists(OrganizationConfigBucket); err != nil {
-			return err
-		}
-		// // Always create Cells bucket.
-		// if err := c.initializeCells(ctx, tx); err != nil {
-		// 	return err
-		// }
 		return nil
 	}); err != nil {
 		return err
@@ -404,10 +389,6 @@ func (c *Client) migrate(ctx context.Context, build chronograf.BuildInfo) error 
 		if err := c.buildStore.Migrate(ctx, build); err != nil {
 			return err
 		}
-		if err := c.organizationConfigStore.Migrate(ctx); err != nil {
-			return err
-		}
-
 		MigrateAll(c)
 	}
 	return nil
