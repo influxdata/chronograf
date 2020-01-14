@@ -23,8 +23,8 @@ func (l *AddCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	svc := NewService(c)
 	defer c.Close()
+	svc := NewService(c)
 
 	q := chronograf.UserQuery{
 		Name:     &l.Username,
@@ -38,7 +38,7 @@ func (l *AddCommand) Execute(args []string) error {
 
 	ctx := context.Background()
 
-	user, err := c.UsersStore().Get(ctx, q)
+	user, err := svc.UsersStore().Get(ctx, q)
 	if err != nil && err != chronograf.ErrUserNotFound {
 		return err
 	} else if err == chronograf.ErrUserNotFound {
@@ -55,7 +55,7 @@ func (l *AddCommand) Execute(args []string) error {
 			SuperAdmin: true,
 		}
 
-		user, err = c.UsersStore().Add(ctx, user)
+		user, err = svc.UsersStore().Add(ctx, user)
 		if err != nil {
 			return err
 		}
@@ -69,7 +69,7 @@ func (l *AddCommand) Execute(args []string) error {
 				},
 			}
 		}
-		if err = c.UsersStore().Update(ctx, user); err != nil {
+		if err = svc.UsersStore().Update(ctx, user); err != nil {
 			return err
 		}
 	}
@@ -101,7 +101,7 @@ OrgLoop:
 	}
 
 	user.Roles = append(user.Roles, roles...)
-	if err = c.UsersStore().Update(ctx, user); err != nil {
+	if err = svc.UsersStore().Update(ctx, user); err != nil {
 		return err
 	}
 

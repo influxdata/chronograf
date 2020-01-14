@@ -19,6 +19,7 @@ var (
 	organizationsBucket      = []byte("OrganizationsV1")
 	serversBucket            = []byte("Servers")
 	sourcesBucket            = []byte("Sources")
+	usersBucket              = []byte("UsersV2")
 )
 
 // Store is an interface for a generic key value store. It is modeled after
@@ -120,6 +121,7 @@ func (s *Service) initialize(ctx context.Context, tx Tx) error {
 		organizationsBucket,
 		serversBucket,
 		sourcesBucket,
+		usersBucket,
 	}
 
 	for i := range buckets {
@@ -171,4 +173,8 @@ func (s *Service) ServersStore() chronograf.ServersStore {
 
 func (s *Service) SourcesStore() chronograf.SourcesStore {
 	return &sourcesStore{client: s}
+}
+
+func (s *Service) UsersStore() chronograf.UsersStore {
+	return &usersStore{client: s}
 }

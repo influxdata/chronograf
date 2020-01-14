@@ -504,7 +504,7 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 			ServersStore:            kapacitors,
 			OrganizationsStore:      organizations,
 			ProtoboardsStore:        protoboards,
-			UsersStore:              db.UsersStore(),
+			UsersStore:              svc.UsersStore(),
 			ConfigStore:             db.ConfigStore(),
 			MappingsStore:           svc.MappingsStore(),
 			OrganizationConfigStore: svc.OrganizationConfigStore(),

@@ -1,5 +1,6 @@
 package bolt_test
 
+/*
 import (
 	"context"
 	"testing"
@@ -564,3 +565,4 @@ func TestUsersStore_Num(t *testing.T) {
 		}
 	}
 }
+*/

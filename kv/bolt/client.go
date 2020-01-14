@@ -35,7 +35,6 @@ type Client struct {
 	Now    func() time.Time
 
 	buildStore  *BuildStore
-	usersStore  *UsersStore
 	configStore *ConfigStore
 }
 
@@ -48,7 +47,6 @@ func NewClient(path string, logger chronograf.Logger) *Client {
 	}
 
 	c.buildStore = &BuildStore{client: c}
-	c.usersStore = &UsersStore{client: c}
 	c.configStore = &ConfigStore{client: c}
 
 	return c
@@ -57,11 +55,6 @@ func NewClient(path string, logger chronograf.Logger) *Client {
 // BuildStore returns a BuildStore that uses the bolt client.
 func (c *Client) BuildStore() chronograf.BuildStore {
 	return c.buildStore
-}
-
-// UsersStore returns a UsersStore that uses the bolt client.
-func (c *Client) UsersStore() chronograf.UsersStore {
-	return c.usersStore
 }
 
 // ConfigStore returns a ConfigStore that uses the bolt client.
@@ -315,10 +308,6 @@ func (c *Client) initialize(ctx context.Context) error {
 	if err := c.db.Update(func(tx *bolt.Tx) error {
 		// Always create SchemaVersions bucket.
 		if _, err := tx.CreateBucketIfNotExists(SchemaVersionBucket); err != nil {
-			return err
-		}
-		// Always create Users bucket.
-		if _, err := tx.CreateBucketIfNotExists(UsersBucket); err != nil {
 			return err
 		}
 		// Always create Config bucket.
