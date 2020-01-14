@@ -104,7 +104,7 @@ class HostPage extends PureComponent<Props, State> {
     GlobalAutoRefresher.stopPolling()
   }
 
-  public handleChooseAutoRefresh = option => {
+  public handleChooseAutoRefresh(option) {
     const {handleChooseTimeRange} = this.props
     const {milliseconds} = option
     handleChooseTimeRange(milliseconds)
