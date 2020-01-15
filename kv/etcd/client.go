@@ -108,6 +108,15 @@ func WithLogger(logger chronograf.Logger) Option {
 	}
 }
 
+// WithLogin allows for setting the username and password to connect to the etcd cluster.
+func WithLogin(u, p string) Option {
+	return func(c *client) error {
+		c.config.Username = u
+		c.config.Password = p
+		return nil
+	}
+}
+
 // Close closes the backing etcd client.
 func (c *client) Close() error {
 	return c.db.Close()
@@ -116,6 +125,9 @@ func (c *client) Close() error {
 // View opens up a view transaction against the database. This operation
 // likely does not need to be an STM.
 func (c *client) View(ctx context.Context, fn func(kv.Tx) error) error {
+	ctx, cancel := context.WithTimeout(ctx, c.requestTimeout)
+	defer cancel()
+
 	return c.Apply(ctx, func(m concurrency.STM) error {
 		return fn(&Tx{
 			m:        m,
@@ -130,6 +142,9 @@ func (c *client) View(ctx context.Context, fn func(kv.Tx) error) error {
 // is not supported with etcd STMs. This might be an issue, we should consider
 // if this functionality works for us.
 func (c *client) Update(ctx context.Context, fn func(kv.Tx) error) error {
+	ctx, cancel := context.WithTimeout(ctx, c.requestTimeout)
+	defer cancel()
+
 	return c.Apply(ctx, func(m concurrency.STM) error {
 		return fn(&Tx{
 			m:        m,

@@ -39,8 +39,8 @@ func (s *organizationsStore) CreateDefault(ctx context.Context) error {
 
 	return s.client.kv.Update(ctx, func(tx Tx) error {
 		b := tx.Bucket(organizationsBucket)
-		v, err := b.Get(DefaultOrganizationID)
-		if v != nil || err != nil {
+		v, _ := b.Get(DefaultOrganizationID)
+		if v != nil {
 			return nil
 		}
 		if v, err := internal.MarshalOrganization(&o); err != nil {
@@ -49,20 +49,18 @@ func (s *organizationsStore) CreateDefault(ctx context.Context) error {
 			return err
 		}
 
-		m := chronograf.Mapping{
-			ID:                   string(DefaultOrganizationID),
-			Organization:         string(DefaultOrganizationID),
-			Provider:             chronograf.MappingWildcard,
-			Scheme:               chronograf.MappingWildcard,
-			ProviderOrganization: chronograf.MappingWildcard,
-		}
-
 		b = tx.Bucket(mappingsBucket)
 		v, _ = b.Get(DefaultOrganizationID)
 		if v != nil {
 			return nil
 		}
-		if v, err := internal.MarshalMapping(&m); err != nil {
+		if v, err := internal.MarshalMapping(&chronograf.Mapping{
+			ID:                   string(DefaultOrganizationID),
+			Organization:         string(DefaultOrganizationID),
+			Provider:             chronograf.MappingWildcard,
+			Scheme:               chronograf.MappingWildcard,
+			ProviderOrganization: chronograf.MappingWildcard,
+		}); err != nil {
 			return err
 		} else if err := b.Put(DefaultOrganizationID, v); err != nil {
 			return err
