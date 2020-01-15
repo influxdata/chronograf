@@ -119,13 +119,13 @@ page.
 ### TLS/HTTPS Support
 
 See
-[Chronograf with TLS](https://github.com/influxdata/chronograf/blob/master/docs/tls.md)
+[Chronograf with TLS](https://docs.influxdata.com/chronograf/latest/administration/managing-security/)
 for more information.
 
 ### OAuth Login
 
 See
-[Chronograf with OAuth 2.0](https://github.com/influxdata/chronograf/blob/master/docs/auth.md)
+[Chronograf with OAuth 2.0](https://docs.influxdata.com/chronograf/latest/administration/managing-security/#oauth-2-0-providers-with-jwt-tokens)
 for more information.
 
 ### Advanced Routing
@@ -141,7 +141,7 @@ Spotted a bug or have a feature request? Please open
 [an issue](https://github.com/influxdata/chronograf/issues/new)!
 
 ### Known Issues
-
+<!-- todo: is this still an issue -->
 The Chronograf team has identified and is working on the following issues:
 
 * Chronograf requires users to run Telegraf's
@@ -149,7 +149,7 @@ The Chronograf team has identified and is working on the following issues:
   and
   [system](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/system/SYSTEM_README.md)
   plugins to ensure that all Apps appear on the
-  [HOST LIST](https://github.com/influxdata/chronograf/blob/master/docs/GETTING_STARTED.md#host-list)
+  [HOST LIST](https://docs.influxdata.com/chronograf/latest/introduction/getting-started/#infrastructure-monitoring)
   page.
 
 ## Installation
