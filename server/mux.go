@@ -342,23 +342,6 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	// Validates go templates for the js client
 	router.POST("/chronograf/v1/validate_text_templates", EnsureViewer(service.ValidateTextTemplate))
 
-	// todo(glinton): remove cell/dashboardv2 stuff as these aren't actually integrated anywhere.
-	/// V2 Cells
-	router.GET("/chronograf/v2/cells", EnsureViewer(service.CellsV2))
-	router.POST("/chronograf/v2/cells", EnsureEditor(service.NewCellV2))
-
-	router.GET("/chronograf/v2/cells/:id", EnsureViewer(service.CellIDV2))
-	router.DELETE("/chronograf/v2/cells/:id", EnsureEditor(service.RemoveCellV2))
-	router.PATCH("/chronograf/v2/cells/:id", EnsureEditor(service.UpdateCellV2))
-
-	// V2 Dashboards
-	router.GET("/chronograf/v2/dashboards", EnsureViewer(service.DashboardsV2))
-	router.POST("/chronograf/v2/dashboards", EnsureEditor(service.NewDashboardV2))
-
-	router.GET("/chronograf/v2/dashboards/:id", EnsureViewer(service.DashboardIDV2))
-	router.DELETE("/chronograf/v2/dashboards/:id", EnsureEditor(service.RemoveDashboardV2))
-	router.PATCH("/chronograf/v2/dashboards/:id", EnsureEditor(service.UpdateDashboardV2))
-
 	allRoutes := &AllRoutes{
 		Logger:      opts.Logger,
 		StatusFeed:  opts.StatusFeedURL,

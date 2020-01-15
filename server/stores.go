@@ -7,7 +7,6 @@ import (
 	"github.com/influxdata/chronograf/noop"
 	"github.com/influxdata/chronograf/organizations"
 	"github.com/influxdata/chronograf/roles"
-	platform "github.com/influxdata/chronograf/v2"
 )
 
 // hasOrganizationContext retrieves organization specified on context
@@ -94,8 +93,6 @@ type DataStore interface {
 	Dashboards(ctx context.Context) chronograf.DashboardsStore
 	Config(ctx context.Context) chronograf.ConfigStore
 	OrganizationConfig(ctx context.Context) chronograf.OrganizationConfigStore
-	Cells(ctx context.Context) platform.CellService
-	DashboardsV2(ctx context.Context) platform.DashboardService
 }
 
 // ensure that Store implements a DataStore
@@ -113,8 +110,6 @@ type Store struct {
 	OrganizationsStore      chronograf.OrganizationsStore
 	ConfigStore             chronograf.ConfigStore
 	OrganizationConfigStore chronograf.OrganizationConfigStore
-	CellService             platform.CellService
-	DashboardService        platform.DashboardService
 }
 
 // Sources returns a noop.SourcesStore if the context has no organization specified
@@ -228,14 +223,4 @@ func (s *Store) Mappings(ctx context.Context) chronograf.MappingsStore {
 		return s.MappingsStore
 	}
 	return &noop.MappingsStore{}
-}
-
-// Cells returns the underlying CellService.
-func (s *Store) Cells(ctx context.Context) platform.CellService {
-	return s.CellService
-}
-
-// DashboardsV2 returns the underlying DashboardsService.
-func (s *Store) DashboardsV2(ctx context.Context) platform.DashboardService {
-	return s.DashboardService
 }
