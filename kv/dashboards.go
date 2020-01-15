@@ -88,17 +88,9 @@ func (d *dashboardsStore) Get(ctx context.Context, id chronograf.DashboardID) (c
 
 // Delete the dashboard from dashboardsStore
 func (d *dashboardsStore) Delete(ctx context.Context, dash chronograf.Dashboard) error {
-	if err := d.client.kv.Update(ctx, func(tx Tx) error {
-		strID := strconv.Itoa(int(dash.ID))
-		if err := tx.Bucket(dashboardsBucket).Delete([]byte(strID)); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
+	return d.client.kv.Update(ctx, func(tx Tx) error {
+		return tx.Bucket(dashboardsBucket).Delete([]byte(strconv.Itoa(int(dash.ID))))
+	})
 }
 
 // Update the dashboard in dashboardsStore

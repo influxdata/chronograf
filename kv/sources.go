@@ -15,32 +15,6 @@ type sourcesStore struct {
 	client *Service
 }
 
-// func (s *sourcesStore) Migrate(ctx context.Context) error {
-// 	sources, err := s.All(ctx)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	defaultOrg, err := s.client.organizationsStore.DefaultOrganization(ctx)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	for _, source := range sources {
-// 		if source.Organization == "" {
-// 			source.Organization = defaultOrg.ID
-// 		}
-// 		if source.Role == "" {
-// 			source.Role = roles.ViewerRoleName
-// 		}
-// 		if err := s.Update(ctx, source); err != nil {
-// 			return nil
-// 		}
-// 	}
-
-// 	return nil
-// }
-
 // All returns all known sources
 func (s *sourcesStore) All(ctx context.Context) ([]chronograf.Source, error) {
 	var srcs []chronograf.Source
