@@ -6,8 +6,6 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	platform "github.com/influxdata/chronograf/v2"
 )
 
 // General errors.
@@ -941,5 +939,4 @@ type KVClient interface {
 	SourcesStore() SourcesStore
 	// UsersStore returns the kv's UsersStore type.
 	UsersStore() UsersStore
-	platform.CellService
 }

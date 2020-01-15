@@ -531,7 +531,6 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 			ConfigStore:             svc.ConfigStore(),
 			MappingsStore:           svc.MappingsStore(),
 			OrganizationConfigStore: svc.OrganizationConfigStore(),
-			CellService:             svc,
 		},
 		Logger:    logger,
 		UseAuth:   useAuth,
