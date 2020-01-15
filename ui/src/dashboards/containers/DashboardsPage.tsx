@@ -16,6 +16,7 @@ import {
   getChronografVersion,
   importDashboardAsync,
   retainRangesDashTimeV1 as retainRangesDashTimeV1Action,
+  retainDashRefresh as retainDashRefreshAction,
 } from 'src/dashboards/actions'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
@@ -45,6 +46,7 @@ export interface Props {
   handleImportDashboard: (dashboard: Dashboard) => void
   notify: (message: Notification) => void
   retainRangesDashTimeV1: (dashboardIDs: number[]) => void
+  retainDashRefresh: (dashboardIDs: number[]) => void
   dashboards: Dashboard[]
 }
 
@@ -71,6 +73,7 @@ export class DashboardsPage extends PureComponent<Props, State> {
       const dashboardIDs = dashboards.map(d => d.id)
 
       this.props.retainRangesDashTimeV1(dashboardIDs)
+      this.props.retainDashRefresh(dashboardIDs)
       this.setState({dashboardsStatus: RemoteDataState.Done})
     } catch {
       this.setState({dashboardsStatus: RemoteDataState.Error})
@@ -197,6 +200,7 @@ const mapDispatchToProps = {
   handleImportDashboard: importDashboardAsync,
   notify: notifyAction,
   retainRangesDashTimeV1: retainRangesDashTimeV1Action,
+  retainDashRefresh: retainDashRefreshAction,
 }
 
 export default withRouter(

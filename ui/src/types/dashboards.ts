@@ -239,3 +239,5 @@ export interface Protoboard {
   meta: ProtoboardMetadata
   data: ProtoboardData
 }
+
+export type RefreshRate = number | null | undefined

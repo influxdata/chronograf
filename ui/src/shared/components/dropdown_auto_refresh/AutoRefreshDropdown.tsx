@@ -15,7 +15,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   selected: number
-  onChoose: (milliseconds: number) => void
+  onChoose: (autoRefreshOption: AutoRefreshOption) => void
   showManualRefresh?: boolean
   onManualRefresh?: () => void
 }
@@ -70,9 +70,7 @@ class AutoRefreshDropdown extends Component<Props> {
     autoRefreshOption: AutoRefreshOption
   ): void => {
     const {onChoose} = this.props
-    const {milliseconds} = autoRefreshOption
-
-    onChoose(milliseconds)
+    onChoose(autoRefreshOption)
   }
 
   private get isPaused(): boolean {

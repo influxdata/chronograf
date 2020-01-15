@@ -1,4 +1,4 @@
-import {TimeRange, TimeZones} from 'src/types'
+import {TimeRange, TimeZones, RefreshRate} from 'src/types'
 import {LogsState} from 'src/types/logs'
 
 export interface LocalStorage {
@@ -19,6 +19,12 @@ export interface App {
 
 export interface DashTimeV1 {
   ranges: DashboardTimeRange[]
+  refreshes: Refresh[]
+}
+
+export interface Refresh {
+  dashboardID: number
+  refreshRate: RefreshRate
 }
 
 interface DashboardTimeRange {

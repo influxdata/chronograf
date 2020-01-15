@@ -14,6 +14,7 @@ import {
   CellType,
   Protoboard,
   QueryType,
+  RefreshRate,
 } from './dashboards'
 import {
   Template,
@@ -103,6 +104,7 @@ export {
   DropdownAction,
   DropdownItem,
   TimeRange,
+  RefreshRate,
   DygraphData,
   DygraphSeries,
   DygraphValue,

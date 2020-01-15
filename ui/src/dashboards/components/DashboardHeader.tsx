@@ -26,6 +26,9 @@ import {setTimeZone} from 'src/shared/actions/app'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import TimeZoneToggle from 'src/shared/components/time_zones/TimeZoneToggle'
 
+// Constants
+import {AutoRefreshOption} from 'src/shared/components/dropdown_auto_refresh/autoRefreshOptions'
+
 interface State {
   selected: QueriesModels.TimeRange
 }
@@ -38,7 +41,7 @@ interface Props {
   onSetTimeZone: typeof setTimeZone
   autoRefresh: number
   handleChooseTimeRange: (timeRange: QueriesModels.TimeRange) => void
-  handleChooseAutoRefresh: AppActions.SetAutoRefreshActionCreator
+  handleChooseAutoRefresh: (autoRefreshOption: AutoRefreshOption) => void
   onManualRefresh: () => void
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   onAddCell: () => void

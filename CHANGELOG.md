@@ -4,6 +4,10 @@
 
 1. [#5345](https://github.com/influxdata/chronograf/pull/5345): Log Viewer uses a default if the mapped severity doesn't exist
 
+### Features
+
+1. [#5348](https://github.com/influxdata/chronograf/pull/5348): Add query parameter for dashboard auto refresh
+
 ## v1.7.17 [2020-01-08]
 
 ### Bug Fixes
@@ -27,7 +31,7 @@
 
 ### Features
 
-1. [5324](https://github.com/influxdata/chronograf/pull/5324): Pin to latest minor go version; make Docker build process more robust
+1. [#5324](https://github.com/influxdata/chronograf/pull/5324): Pin to latest minor go version; make Docker build process more robust
 
 ## v1.7.15
 
