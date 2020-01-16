@@ -39,47 +39,6 @@ func (s *layoutsStore) All(ctx context.Context) ([]chronograf.Layout, error) {
 
 }
 
-// Add creates a new Layout in the layoutsStore.
-func (s *layoutsStore) Add(ctx context.Context, src chronograf.Layout) (chronograf.Layout, error) {
-	if err := s.client.kv.Update(ctx, func(tx Tx) error {
-		b := tx.Bucket(layoutsBucket)
-		id, err := s.IDs.Generate()
-		if err != nil {
-			return err
-		}
-
-		src.ID = id
-		if v, err := internal.MarshalLayout(src); err != nil {
-			return err
-		} else if err := b.Put([]byte(src.ID), v); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		return chronograf.Layout{}, err
-	}
-
-	return src, nil
-}
-
-// Delete removes the Layout from the layoutsStore
-func (s *layoutsStore) Delete(ctx context.Context, src chronograf.Layout) error {
-	_, err := s.Get(ctx, src.ID)
-	if err != nil {
-		return err
-	}
-	if err := s.client.kv.Update(ctx, func(tx Tx) error {
-		if err := tx.Bucket(layoutsBucket).Delete([]byte(src.ID)); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Get returns a Layout if the id exists.
 func (s *layoutsStore) Get(ctx context.Context, id string) (chronograf.Layout, error) {
 	var src chronograf.Layout
@@ -95,26 +54,4 @@ func (s *layoutsStore) Get(ctx context.Context, id string) (chronograf.Layout, e
 	}
 
 	return src, nil
-}
-
-// Update a Layout
-func (s *layoutsStore) Update(ctx context.Context, src chronograf.Layout) error {
-	if err := s.client.kv.Update(ctx, func(tx Tx) error {
-		// Get an existing layout with the same ID.
-		b := tx.Bucket(layoutsBucket)
-		if v, err := b.Get([]byte(src.ID)); v == nil || err != nil {
-			return chronograf.ErrLayoutNotFound
-		}
-
-		if v, err := internal.MarshalLayout(src); err != nil {
-			return err
-		} else if err := b.Put([]byte(src.ID), v); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -2,7 +2,6 @@ package multistore
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/influxdata/chronograf"
 )
@@ -54,19 +53,4 @@ func (s *Protoboards) Get(ctx context.Context, ID string) (chronograf.Protoboard
 		}
 	}
 	return chronograf.Protoboard{}, err
-}
-
-// Add creates a new protoboard in the protoboardsStore.
-func (s *Protoboards) Add(ctx context.Context, protoboard chronograf.Protoboard) (chronograf.Protoboard, error) {
-	return chronograf.Protoboard{}, fmt.Errorf("Add to multistore/protoboards not supported")
-}
-
-// Delete the protoboard from the store.
-func (s *Protoboards) Delete(ctx context.Context, protoboard chronograf.Protoboard) error {
-	return fmt.Errorf("Delete to multistore/protoboards not supported")
-}
-
-// Update the protoboard in the store.
-func (s *Protoboards) Update(ctx context.Context, protoboard chronograf.Protoboard) error {
-	return fmt.Errorf("Update to multistore/protoboards not supported")
 }

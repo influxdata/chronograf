@@ -55,109 +55,6 @@ func TestAll(t *testing.T) {
 	}
 }
 
-func TestAdd(t *testing.T) {
-	t.Parallel()
-	var tests = []struct {
-		Existing   []chronograf.Layout
-		Add        chronograf.Layout
-		ExpectedID string
-		Err        error
-	}{
-		{
-			Existing: []chronograf.Layout{
-				{ID: "1",
-					Application: "howdy",
-				},
-				{ID: "2",
-					Application: "doody",
-				},
-			},
-			Add: chronograf.Layout{
-				Application: "newbie",
-			},
-			ExpectedID: "3",
-			Err:        nil,
-		},
-		{
-			Existing: []chronograf.Layout{},
-			Add: chronograf.Layout{
-				Application: "newbie",
-			},
-			ExpectedID: "1",
-			Err:        nil,
-		},
-		{
-			Existing: nil,
-			Add: chronograf.Layout{
-				Application: "newbie",
-			},
-			ExpectedID: "",
-			Err:        errors.New("Error"),
-		},
-	}
-	for i, test := range tests {
-		apps, _ := MockApps(test.Existing, test.Err)
-		layout, err := apps.Add(context.Background(), test.Add)
-		if err != test.Err {
-			t.Errorf("Test %d: apps add error expected: %v; actual: %v", i, test.Err, err)
-		}
-
-		if layout.ID != test.ExpectedID {
-			t.Errorf("Test %d: Layout ID should be equal; expected %s; actual %s", i, test.ExpectedID, layout.ID)
-		}
-	}
-}
-
-func TestDelete(t *testing.T) {
-	t.Parallel()
-	var tests = []struct {
-		Existing []chronograf.Layout
-		DeleteID string
-		Expected map[string]chronograf.Layout
-		Err      error
-	}{
-		{
-			Existing: []chronograf.Layout{
-				{ID: "1",
-					Application: "howdy",
-				},
-				{ID: "2",
-					Application: "doody",
-				},
-			},
-			DeleteID: "1",
-			Expected: map[string]chronograf.Layout{
-				"dir/2.json": {ID: "2",
-					Application: "doody",
-				},
-			},
-			Err: nil,
-		},
-		{
-			Existing: []chronograf.Layout{},
-			DeleteID: "1",
-			Expected: map[string]chronograf.Layout{},
-			Err:      chronograf.ErrLayoutNotFound,
-		},
-		{
-			Existing: nil,
-			DeleteID: "1",
-			Expected: map[string]chronograf.Layout{},
-			Err:      errors.New("Error"),
-		},
-	}
-	for i, test := range tests {
-		apps, actual := MockApps(test.Existing, test.Err)
-		err := apps.Delete(context.Background(), chronograf.Layout{ID: test.DeleteID})
-		if err != test.Err {
-			t.Errorf("Test %d: apps delete error expected: %v; actual: %v", i, test.Err, err)
-		}
-		if !reflect.DeepEqual(*actual, test.Expected) {
-			t.Errorf("Test %d: Layouts should be equal; expected %v; actual %v", i, test.Expected, actual)
-		}
-	}
-}
-
 func TestGet(t *testing.T) {
 	t.Parallel()
 	var tests = []struct {
@@ -203,68 +100,6 @@ func TestGet(t *testing.T) {
 		}
 		if !reflect.DeepEqual(layout, test.Expected) {
 			t.Errorf("Test %d: Layouts should be equal; expected %v; actual %v", i, test.Expected, layout)
-		}
-	}
-}
-
-func TestUpdate(t *testing.T) {
-	t.Parallel()
-	var tests = []struct {
-		Existing []chronograf.Layout
-		Update   chronograf.Layout
-		Expected map[string]chronograf.Layout
-		Err      error
-	}{
-		{
-			Existing: []chronograf.Layout{
-				{ID: "1",
-					Application: "howdy",
-				},
-				{ID: "2",
-					Application: "doody",
-				},
-			},
-			Update: chronograf.Layout{
-				ID:          "1",
-				Application: "hello",
-				Measurement: "measurement",
-			},
-			Expected: map[string]chronograf.Layout{
-				"dir/1.json": {ID: "1",
-					Application: "hello",
-					Measurement: "measurement",
-				},
-				"dir/2.json": {ID: "2",
-					Application: "doody",
-				},
-			},
-			Err: nil,
-		},
-		{
-			Existing: []chronograf.Layout{},
-			Update: chronograf.Layout{
-				ID: "1",
-			},
-			Expected: map[string]chronograf.Layout{},
-			Err:      chronograf.ErrLayoutNotFound,
-		},
-		{
-			Existing: nil,
-			Update: chronograf.Layout{
-				ID: "1",
-			},
-			Expected: map[string]chronograf.Layout{},
-			Err:      chronograf.ErrLayoutNotFound,
-		},
-	}
-	for i, test := range tests {
-		apps, actual := MockApps(test.Existing, test.Err)
-		err := apps.Update(context.Background(), test.Update)
-		if err != test.Err {
-			t.Errorf("Test %d: Layouts get error expected: %v; actual: %v", i, test.Err, err)
-		}
-		if !reflect.DeepEqual(*actual, test.Expected) {
-			t.Errorf("Test %d: Layouts should be equal; expected %v; actual %v", i, test.Expected, actual)
 		}
 	}
 }
@@ -321,7 +156,7 @@ func MockApps(existing []chronograf.Layout, expected error) (filestore.Apps, *ma
 	for _, l := range existing {
 		layouts[fileName(dir, l)] = l
 	}
-	load := func(file string) (chronograf.Layout, error) {
+	loadLayout := func(file string) (chronograf.Layout, error) {
 		if expected != nil {
 			return chronograf.Layout{}, expected
 		}
@@ -331,14 +166,6 @@ func MockApps(existing []chronograf.Layout, expected error) (filestore.Apps, *ma
 			return chronograf.Layout{}, chronograf.ErrLayoutNotFound
 		}
 		return l, nil
-	}
-
-	create := func(file string, layout chronograf.Layout) error {
-		if expected != nil {
-			return expected
-		}
-		layouts[file] = layout
-		return nil
 	}
 
 	readDir := func(dirname string) ([]os.FileInfo, error) {
@@ -353,27 +180,17 @@ func MockApps(existing []chronograf.Layout, expected error) (filestore.Apps, *ma
 		return info, nil
 	}
 
-	remove := func(name string) error {
-		if expected != nil {
-			return expected
-		}
-		if _, ok := layouts[name]; !ok {
-			return chronograf.ErrLayoutNotFound
-		}
-		delete(layouts, name)
-		return nil
-	}
-
 	return filestore.Apps{
-		Dir:      dir,
-		Load:     load,
-		Filename: fileName,
-		Create:   create,
-		ReadDir:  readDir,
-		Remove:   remove,
+		Dir:     dir,
+		Load:    loadLayout,
+		ReadDir: readDir,
 		IDs: &MockID{
 			id: len(existing),
 		},
 		Logger: clog.New(clog.ParseLevel("debug")),
 	}, &layouts
+}
+
+type apps struct {
+	filestore.Apps
 }

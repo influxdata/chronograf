@@ -39,7 +39,6 @@ type client struct {
 	db         *bolt.DB
 	isNew      bool
 	logger     chronograf.Logger
-	now        func() time.Time
 	path       string
 }
 
@@ -49,7 +48,6 @@ func NewClient(ctx context.Context, opts ...Option) (*client, error) {
 		buildInfo: defaultBuildInfo,
 		path:      defaultBoltPath,
 		logger:    mocks.NewLogger(),
-		now:       time.Now,
 	}
 
 	for i := range opts {
@@ -86,14 +84,6 @@ func WithLogger(logger chronograf.Logger) Option {
 func WithPath(path string) Option {
 	return func(c *client) error {
 		c.path = path
-		return nil
-	}
-}
-
-// WithNow sets the function to use for the current time.
-func WithNow(fn func() time.Time) Option {
-	return func(c *client) error {
-		c.now = fn
 		return nil
 	}
 }

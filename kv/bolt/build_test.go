@@ -6,14 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/influxdata/chronograf"
 )
-
-// TestNow is a set time for testing.
-var TestNow = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 // TestClient wraps *bolt.Client.
 type TestClient struct {
@@ -32,7 +28,6 @@ func NewTestClient() (*TestClient, error) {
 	ctx := context.TODO()
 	b, err := NewClient(ctx,
 		WithPath(f.Name()),
-		WithNow(func() time.Time { return TestNow }),
 	)
 	if err != nil {
 		return nil, err

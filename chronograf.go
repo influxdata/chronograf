@@ -700,14 +700,8 @@ type Layout struct {
 type LayoutsStore interface {
 	// All returns all dashboards in the store
 	All(context.Context) ([]Layout, error)
-	// Add creates a new dashboard in the LayoutsStore
-	Add(context.Context, Layout) (Layout, error)
-	// Delete the dashboard from the store
-	Delete(context.Context, Layout) error
 	// Get retrieves Layout if `ID` exists
 	Get(ctx context.Context, ID string) (Layout, error)
-	// Update the dashboard in the store.
-	Update(context.Context, Layout) error
 }
 
 // ProtoboardMeta is the metadata of a Protoboard
