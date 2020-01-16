@@ -42,32 +42,6 @@ func (s *Layouts) All(ctx context.Context) ([]chronograf.Layout, error) {
 	return all, nil
 }
 
-// Add creates a new dashboard in the LayoutsStore.  Tries each store sequentially until success.
-func (s *Layouts) Add(ctx context.Context, layout chronograf.Layout) (chronograf.Layout, error) {
-	var err error
-	for _, store := range s.Stores {
-		var l chronograf.Layout
-		l, err = store.Add(ctx, layout)
-		if err == nil {
-			return l, nil
-		}
-	}
-	return chronograf.Layout{}, err
-}
-
-// Delete the dashboard from the store.  Searches through all stores to find Layout and
-// then deletes from that store.
-func (s *Layouts) Delete(ctx context.Context, layout chronograf.Layout) error {
-	var err error
-	for _, store := range s.Stores {
-		err = store.Delete(ctx, layout)
-		if err == nil {
-			return nil
-		}
-	}
-	return err
-}
-
 // Get retrieves Layout if `ID` exists.  Searches through each store sequentially until success.
 func (s *Layouts) Get(ctx context.Context, ID string) (chronograf.Layout, error) {
 	var err error
@@ -79,16 +53,4 @@ func (s *Layouts) Get(ctx context.Context, ID string) (chronograf.Layout, error)
 		}
 	}
 	return chronograf.Layout{}, err
-}
-
-// Update the dashboard in the store.  Searches through each store sequentially until success.
-func (s *Layouts) Update(ctx context.Context, layout chronograf.Layout) error {
-	var err error
-	for _, store := range s.Stores {
-		err = store.Update(ctx, layout)
-		if err == nil {
-			return nil
-		}
-	}
-	return err
 }

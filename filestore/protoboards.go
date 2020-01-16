@@ -13,6 +13,9 @@ import (
 // ProtoboardExt is the the file extension searched for in the directory for protoboard files
 const ProtoboardExt = ".json"
 
+// Verify Protoboards implements protoboardStore interface.
+var _ chronograf.ProtoboardsStore = (*Protoboards)(nil)
+
 // Protoboards are instantiable JSON representation of dashbards.  Implements ProtoboardsStore.
 type Protoboards struct {
 	Dir     string                                      // Dir is the directory containing protoboard json definitions

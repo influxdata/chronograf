@@ -125,5 +125,4 @@ func (multi *OrganizationsStore) DefaultOrganization(ctx context.Context) (*chro
 		errors = append(errors, err.Error())
 	}
 	return nil, fmt.Errorf("Unknown error while getting default organization: %s", strings.Join(errors, " "))
-
 }

@@ -1,3 +1,9 @@
+// Package memdb provides a transient layer to store the InfluxDB and Kapacitor
+// configured via flags at Chronograf start.
+// Caution should be taken when editing resources generated from cli flags,
+// especially in a distributed environment as unexpected behavior may occur.
+// Instead, it is suggested that chronograf be restarted to pick up the new
+// flag/evar changes.
 package memdb
 
 import (
