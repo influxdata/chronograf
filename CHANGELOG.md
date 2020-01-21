@@ -7,6 +7,11 @@
 ### Features
 
 1. [#5348](https://github.com/influxdata/chronograf/pull/5348): Add query parameter for dashboard auto refresh
+1. [#5352](https://github.com/influxdata/chronograf/pull/5352): Add etcd as an alternate backend store
+
+### Other
+
+1. [#5349](https://github.com/influxdata/chronograf/pull/5349): Removed migration logic for directly upgrading from Chronograf 1.3.x.
 
 ## v1.7.17 [2020-01-08]
 
