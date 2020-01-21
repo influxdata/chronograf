@@ -46,8 +46,7 @@ func (d *dashboardsStore) Add(ctx context.Context, src chronograf.Dashboard) (ch
 		id, _ := b.NextSequence()
 
 		src.ID = chronograf.DashboardID(id)
-		// TODO: use FormatInt
-		strID := strconv.Itoa(int(id))
+		strID := strconv.FormatUint(id, 10)
 		for i, cell := range src.Cells {
 			cid, err := d.IDs.Generate()
 			if err != nil {
