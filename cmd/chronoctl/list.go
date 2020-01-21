@@ -17,8 +17,13 @@ func (l *ListCommand) Execute(args []string) error {
 	}
 	defer c.Close()
 
+	svc, err := NewService(c)
+	if err != nil {
+		return err
+	}
+
 	ctx := context.Background()
-	users, err := c.UsersStore.All(ctx)
+	users, err := svc.UsersStore().All(ctx)
 	if err != nil {
 		return err
 	}

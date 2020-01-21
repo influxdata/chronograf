@@ -1,4 +1,4 @@
-package bolt_test
+package kv_test
 
 import (
 	"context"
@@ -699,7 +699,7 @@ func TestOrganizationConfig_FindOrCreate(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.OrganizationConfigStore
+			s := client.OrganizationConfigStore()
 
 			if tt.addFirst {
 				if err := s.Put(context.Background(), tt.wants.organizationConfig); err != nil {
@@ -714,14 +714,6 @@ func TestOrganizationConfig_FindOrCreate(t *testing.T) {
 			}
 			if diff := cmp.Diff(got, tt.wants.organizationConfig); diff != "" {
 				t.Errorf("%q. OrganizationConfigStore.FindOrCreate():\n-got/+want\ndiff %s", tt.name, diff)
-			}
-
-			d, err := s.Get(context.Background(), tt.args.organizationID)
-			if err != nil {
-				t.Errorf("%q. OrganizationConfigStore.Get(): Failed to retrieve organization config", tt.name)
-			}
-			if diff := cmp.Diff(got, d); diff != "" {
-				t.Errorf("%q. OrganizationConfigStore.Get():\n-got/+want\ndiff %s", tt.name, diff)
 			}
 		})
 	}
@@ -1212,7 +1204,7 @@ func TestOrganizationConfig_Put(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.OrganizationConfigStore
+			s := client.OrganizationConfigStore()
 			err = s.Put(context.Background(), tt.args.organizationConfig)
 			if (tt.wants.err != nil) != (err != nil) {
 				t.Errorf("%q. OrganizationConfigStore.Put() error = %v, wantErr %v", tt.name, err, tt.wants.err)

@@ -1,4 +1,4 @@
-package bolt_test
+package kv_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/roles"
 )
 
@@ -59,7 +59,7 @@ func TestOrganizationsStore_GetWithName(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.OrganizationsStore
+			s := client.OrganizationsStore()
 			if tt.addFirst {
 				tt.args.org, err = s.Add(tt.args.ctx, tt.args.org)
 				if err != nil {
@@ -127,7 +127,7 @@ func TestOrganizationsStore_GetWithID(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.OrganizationsStore
+			s := client.OrganizationsStore()
 			if tt.addFirst {
 				tt.args.org, err = s.Add(tt.args.ctx, tt.args.org)
 				if err != nil {
@@ -187,8 +187,8 @@ func TestOrganizationsStore_All(t *testing.T) {
 					DefaultRole: roles.EditorRoleName,
 				},
 				{
-					Name:        bolt.DefaultOrganizationName,
-					DefaultRole: bolt.DefaultOrganizationRole,
+					Name:        kv.DefaultOrganizationName,
+					DefaultRole: kv.DefaultOrganizationRole,
 				},
 			},
 			addFirst: true,
@@ -203,7 +203,7 @@ func TestOrganizationsStore_All(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.OrganizationsStore
+			s := client.OrganizationsStore()
 			if tt.addFirst {
 				for _, org := range tt.args.orgs {
 					_, err = s.Add(tt.args.ctx, &org)
@@ -395,7 +395,7 @@ func TestOrganizationsStore_Update(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.OrganizationsStore
+		s := client.OrganizationsStore()
 
 		for _, org := range tt.fields.orgs {
 			_, err = s.Add(tt.args.ctx, &org)
@@ -473,7 +473,7 @@ func TestOrganizationStore_Delete(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.OrganizationsStore
+		s := client.OrganizationsStore()
 
 		if tt.addFirst {
 			tt.args.org, _ = s.Add(tt.args.ctx, tt.args.org)
@@ -508,7 +508,7 @@ func TestOrganizationStore_DeleteDefaultOrg(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.OrganizationsStore
+		s := client.OrganizationsStore()
 
 		defaultOrg, err := s.DefaultOrganization(tt.args.ctx)
 		if err != nil {
@@ -560,7 +560,7 @@ func TestOrganizationsStore_Add(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.OrganizationsStore
+		s := client.OrganizationsStore()
 
 		for _, org := range tt.fields.orgs {
 			_, err = s.Add(tt.args.ctx, &org)
@@ -617,9 +617,9 @@ func TestOrganizationsStore_DefaultOrganization(t *testing.T) {
 				ctx: context.Background(),
 			},
 			want: &chronograf.Organization{
-				ID:          string(bolt.DefaultOrganizationID),
-				Name:        bolt.DefaultOrganizationName,
-				DefaultRole: bolt.DefaultOrganizationRole,
+				ID:          string(kv.DefaultOrganizationID),
+				Name:        kv.DefaultOrganizationName,
+				DefaultRole: kv.DefaultOrganizationRole,
 			},
 			wantErr: false,
 		},
@@ -630,7 +630,7 @@ func TestOrganizationsStore_DefaultOrganization(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer client.Close()
-		s := client.OrganizationsStore
+		s := client.OrganizationsStore()
 
 		for _, org := range tt.fields.orgs {
 			_, err = s.Add(tt.args.ctx, &org)

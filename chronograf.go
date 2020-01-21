@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	platform "github.com/influxdata/chronograf/v2"
 )
 
 // General errors.
@@ -861,8 +863,6 @@ type AuthConfig struct {
 
 // ConfigStore is the storage and retrieval of global application Config
 type ConfigStore interface {
-	// Initialize creates the initial configuration
-	Initialize(context.Context) error
 	// Get retrieves the whole Config from the ConfigStore
 	Get(context.Context) (*Config, error)
 	// Update updates the whole Config in the ConfigStore
@@ -919,4 +919,27 @@ type BuildStore interface {
 // that were set on the server
 type Environment struct {
 	TelegrafSystemInterval time.Duration `json:"telegrafSystemInterval"`
+}
+
+// KVClient defines what each kv store should be capable of.
+type KVClient interface {
+	// ConfigStore returns the kv's ConfigStore type.
+	ConfigStore() ConfigStore
+	// DashboardsStore returns the kv's DashboardsStore type.
+	DashboardsStore() DashboardsStore
+	// LayoutsStore returns the kv's LayoutsStore type.
+	LayoutsStore() LayoutsStore
+	// MappingsStore returns the kv's MappingsStore type.
+	MappingsStore() MappingsStore
+	// OrganizationConfigStore returns the kv's OrganizationConfigStore type.
+	OrganizationConfigStore() OrganizationConfigStore
+	// OrganizationsStore returns the kv's OrganizationsStore type.
+	OrganizationsStore() OrganizationsStore
+	// ServersStore returns the kv's ServersStore type.
+	ServersStore() ServersStore
+	// SourcesStore returns the kv's SourcesStore type.
+	SourcesStore() SourcesStore
+	// UsersStore returns the kv's UsersStore type.
+	UsersStore() UsersStore
+	platform.CellService
 }

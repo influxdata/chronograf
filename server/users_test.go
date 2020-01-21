@@ -17,6 +17,28 @@ import (
 	"github.com/influxdata/chronograf/roles"
 )
 
+var (
+	// MemberRole is the role for a user who can only perform No operations.
+	MemberRole = chronograf.Role{
+		Name: roles.MemberRoleName,
+	}
+
+	// ViewerRole is the role for a user who can only perform READ operations on Dashboards, Rules, Sources, and Servers,
+	ViewerRole = chronograf.Role{
+		Name: roles.ViewerRoleName,
+	}
+
+	// EditorRole is the role for a user who can perform READ and WRITE operations on Dashboards, Rules, Sources, and Servers.
+	EditorRole = chronograf.Role{
+		Name: roles.EditorRoleName,
+	}
+
+	// AdminRole is the role for a user who can perform READ and WRITE operations on Dashboards, Rules, Sources, Servers, and Users
+	AdminRole = chronograf.Role{
+		Name: roles.AdminRoleName,
+	}
+)
+
 func TestService_UserID(t *testing.T) {
 	type fields struct {
 		UsersStore chronograf.UsersStore
@@ -57,7 +79,7 @@ func TestService_UserID(t *testing.T) {
 								Provider: "google",
 								Scheme:   "oauth2",
 								Roles: []chronograf.Role{
-									roles.ViewerRole,
+									ViewerRole,
 								},
 							}, nil
 						default:
@@ -891,7 +913,7 @@ func TestService_UpdateUser(t *testing.T) {
 								Provider: "github",
 								Scheme:   "oauth2",
 								Roles: []chronograf.Role{
-									roles.EditorRole,
+									EditorRole,
 								},
 							}, nil
 						default:
@@ -950,7 +972,7 @@ func TestService_UpdateUser(t *testing.T) {
 								Provider: "github",
 								Scheme:   "oauth2",
 								Roles: []chronograf.Role{
-									roles.EditorRole,
+									EditorRole,
 								},
 							}, nil
 						default:
@@ -1227,7 +1249,7 @@ func TestService_UpdateUser(t *testing.T) {
 								Provider: "github",
 								Scheme:   "oauth2",
 								Roles: []chronograf.Role{
-									roles.EditorRole,
+									EditorRole,
 								},
 							}, nil
 						default:
@@ -1296,7 +1318,7 @@ func TestService_UpdateUser(t *testing.T) {
 								Provider: "github",
 								Scheme:   "oauth2",
 								Roles: []chronograf.Role{
-									roles.EditorRole,
+									EditorRole,
 								},
 							}, nil
 						default:
@@ -1412,7 +1434,7 @@ func TestService_Users(t *testing.T) {
 								Provider: "google",
 								Scheme:   "oauth2",
 								Roles: []chronograf.Role{
-									roles.EditorRole,
+									EditorRole,
 								},
 							},
 							{
@@ -1456,7 +1478,7 @@ func TestService_Users(t *testing.T) {
 								Provider: "google",
 								Scheme:   "oauth2",
 								Roles: []chronograf.Role{
-									roles.EditorRole,
+									EditorRole,
 								},
 							},
 						}, nil

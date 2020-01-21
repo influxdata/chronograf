@@ -1,4 +1,4 @@
-package bolt_test
+package kv_test
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/bolt"
 )
 
 // Ensure an SourceStore can store, retrieve, update, and delete sources.
@@ -17,7 +16,7 @@ func TestSourceStore(t *testing.T) {
 	}
 	defer c.Close()
 
-	s := c.SourcesStore
+	s := c.SourcesStore()
 
 	srcs := []chronograf.Source{
 		{
@@ -179,14 +178,14 @@ func TestSourceStore(t *testing.T) {
 	}
 }
 
-func mustUpdateSource(t *testing.T, s *bolt.SourcesStore, src chronograf.Source) {
+func mustUpdateSource(t *testing.T, s chronograf.SourcesStore, src chronograf.Source) {
 	ctx := context.Background()
 	if err := s.Update(ctx, src); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func mustAddSource(t *testing.T, s *bolt.SourcesStore, src chronograf.Source) chronograf.Source {
+func mustAddSource(t *testing.T, s chronograf.SourcesStore, src chronograf.Source) chronograf.Source {
 	ctx := context.Background()
 	if src, err := s.Add(ctx, src); err != nil {
 		t.Fatal(err)

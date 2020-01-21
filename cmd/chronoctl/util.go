@@ -9,22 +9,18 @@ import (
 	"text/tabwriter"
 
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/kv/bolt"
-	"github.com/influxdata/chronograf/mocks"
 )
 
-func NewBoltClient(path string) (*bolt.Client, error) {
-	c := bolt.NewClient()
-	c.Path = path
+func NewBoltClient(path string) (kv.Store, error) {
+	return bolt.NewClient(context.TODO(),
+		bolt.WithPath(path),
+	)
+}
 
-	ctx := context.Background()
-	logger := mocks.NewLogger()
-	var bi chronograf.BuildInfo
-	if err := c.Open(ctx, logger, bi); err != nil {
-		return nil, err
-	}
-
-	return c, nil
+func NewService(s kv.Store) (*kv.Service, error) {
+	return kv.NewService(context.TODO(), s)
 }
 
 func NewTabWriter() *tabwriter.Writer {

@@ -1,4 +1,4 @@
-package bolt_test
+package kv_test
 
 import (
 	"context"
@@ -79,7 +79,7 @@ func TestMappingStore_Add(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.MappingsStore
+			s := client.MappingsStore()
 			ctx := context.Background()
 
 			for _, mapping := range tt.fields.mappings {
@@ -162,7 +162,7 @@ func TestMappingStore_All(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.MappingsStore
+			s := client.MappingsStore()
 			ctx := context.Background()
 
 			for _, mapping := range tt.fields.mappings {
@@ -273,7 +273,7 @@ func TestMappingStore_Delete(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.MappingsStore
+			s := client.MappingsStore()
 			ctx := context.Background()
 
 			for _, mapping := range tt.fields.mappings {
@@ -375,7 +375,7 @@ func TestMappingStore_Get(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.MappingsStore
+			s := client.MappingsStore()
 			ctx := context.Background()
 
 			for _, mapping := range tt.fields.mappings {
@@ -461,7 +461,7 @@ func TestMappingStore_Update(t *testing.T) {
 			}
 			defer client.Close()
 
-			s := client.MappingsStore
+			s := client.MappingsStore()
 			ctx := context.Background()
 
 			for _, mapping := range tt.fields.mappings {

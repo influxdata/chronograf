@@ -1,4 +1,4 @@
-package bolt_test
+package kv_test
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func TestServerStore(t *testing.T) {
 	}
 	defer c.Close()
 
-	s := c.ServersStore
+	s := c.ServersStore()
 
 	srcs := []chronograf.Server{
 		{

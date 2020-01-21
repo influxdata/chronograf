@@ -1,7 +1,8 @@
-package bolt_test
+package kv_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -35,9 +36,9 @@ func TestConfig_Get(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.ConfigStore
-		got, err := s.Get(context.Background())
+		got, err := client.ConfigStore().Get(context.Background())
 		if (tt.wants.err != nil) != (err != nil) {
+			fmt.Println(got, err)
 			t.Errorf("%q. ConfigStore.Get() error = %v, wantErr %v", tt.name, err, tt.wants.err)
 			continue
 		}
@@ -85,14 +86,13 @@ func TestConfig_Update(t *testing.T) {
 		}
 		defer client.Close()
 
-		s := client.ConfigStore
-		err = s.Update(context.Background(), tt.args.config)
+		err = client.ConfigStore().Update(context.Background(), tt.args.config)
 		if (tt.wants.err != nil) != (err != nil) {
 			t.Errorf("%q. ConfigStore.Get() error = %v, wantErr %v", tt.name, err, tt.wants.err)
 			continue
 		}
 
-		got, _ := s.Get(context.Background())
+		got, _ := client.ConfigStore().Get(context.Background())
 		if (tt.wants.err != nil) != (err != nil) {
 			t.Errorf("%q. ConfigStore.Get() error = %v, wantErr %v", tt.name, err, tt.wants.err)
 			continue

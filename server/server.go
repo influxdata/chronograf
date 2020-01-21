@@ -19,6 +19,7 @@ import (
 	"github.com/influxdata/chronograf"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/kv/bolt"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
@@ -67,6 +68,10 @@ type Server struct {
 	GithubClientID     string   `short:"i" long:"github-client-id" description:"Github Client ID for OAuth 2 support" env:"GH_CLIENT_ID"`
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
 	GithubOrgs         []string `short:"o" long:"github-organization" description:"Github organization user is required to have active membership" env:"GH_ORGS" env-delim:","`
+
+	// EtcdUsername     string   `short:"i" long:"github-client-id" description:"Github Client ID for OAuth 2 support" env:"GH_CLIENT_ID"`
+	// EtcdPassword string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
+	// EtcdEndpoints         []string `short:"o" long:"github-organization" description:"Github organization user is required to have active membership" env:"GH_ORGS" env-delim:","`
 
 	GoogleClientID     string   `long:"google-client-id" description:"Google Client ID for OAuth 2 support" env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string   `long:"google-client-secret" description:"Google Client Secret for OAuth 2 support" env:"GOOGLE_CLIENT_SECRET"`
@@ -335,8 +340,7 @@ func (s *Server) Serve(ctx context.Context) {
 			Error(err)
 		return
 	}
-
-	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), s.ProtoboardsPath, logger, s.useAuth())
+	service := openService(ctx, s.BuildInfo, s.BoltPath, s.newBuilders(logger), logger, s.useAuth())
 	service.SuperAdminProviderGroups = superAdminProviderGroups{
 		auth0: s.Auth0SuperAdminOrg,
 	}
@@ -429,18 +433,34 @@ func (s *Server) Serve(ctx context.Context) {
 		Info("Stopped serving chronograf at ", scheme, "://", listener.Addr())
 }
 
-func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, protoboardsPath string, logger chronograf.Logger, useAuth bool) Service {
-	db := bolt.NewClient()
-	db.Path = boltPath
-
-	if err := db.Open(ctx, logger, buildInfo, bolt.WithBackup()); err != nil {
-		logger.
-			WithField("component", "boltstore").
-			Error(err)
+// todo: add etcd connection details as arg.
+// todo: return error. make chronograf error type that has fields and error. .Error() will logger.Error print it.
+func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath string, builder builders, logger chronograf.Logger, useAuth bool) Service {
+	db, err := bolt.NewClient(ctx,
+		bolt.WithPath(boltPath),
+		bolt.WithLogger(logger),
+		bolt.WithBuildInfo(buildInfo),
+	)
+	if err != nil {
+		logger.Error("Unable to create bolt client", err)
 		os.Exit(1)
 	}
 
-	layouts, err := builder.Layouts.Build(db.LayoutsStore)
+	svc, err := kv.NewService(ctx, db, kv.WithLogger(logger))
+	if err != nil {
+		logger.Error("Unable to create kv service", err)
+		os.Exit(1)
+	}
+
+	dashboards, err := builder.Dashboards.Build(svc.DashboardsStore())
+	if err != nil {
+		logger.
+			WithField("component", "DashboardsStore").
+			Error("Unable to construct a MultiDashboardsStore", err)
+		os.Exit(1)
+	}
+
+	layouts, err := builder.Layouts.Build(svc.LayoutsStore())
 	if err != nil {
 		logger.
 			WithField("component", "LayoutsStore").
@@ -448,22 +468,15 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	dashboards, err := builder.Dashboards.Build(db.DashboardsStore)
+	organizations, err := builder.Organizations.Build(svc.OrganizationsStore())
 	if err != nil {
 		logger.
-			WithField("component", "DashboardsStore").
-			Error("Unable to construct a MultiDashboardsStore", err)
-		os.Exit(1)
-	}
-	sources, err := builder.Sources.Build(db.SourcesStore)
-	if err != nil {
-		logger.
-			WithField("component", "SourcesStore").
-			Error("Unable to construct a MultiSourcesStore", err)
+			WithField("component", "OrganizationsStore").
+			Error("Unable to construct a MultiOrganizationStore", err)
 		os.Exit(1)
 	}
 
-	kapacitors, err := builder.Kapacitors.Build(db.ServersStore)
+	kapacitors, err := builder.Kapacitors.Build(svc.ServersStore())
 	if err != nil {
 		logger.
 			WithField("component", "KapacitorStore").
@@ -471,11 +484,11 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 		os.Exit(1)
 	}
 
-	organizations, err := builder.Organizations.Build(db.OrganizationsStore)
+	sources, err := builder.Sources.Build(svc.SourcesStore())
 	if err != nil {
 		logger.
-			WithField("component", "OrganizationsStore").
-			Error("Unable to construct a MultiOrganizationStore", err)
+			WithField("component", "SourcesStore").
+			Error("Unable to construct a MultiSourcesStore", err)
 		os.Exit(1)
 	}
 
@@ -496,11 +509,11 @@ func openService(ctx context.Context, buildInfo chronograf.BuildInfo, boltPath s
 			ServersStore:            kapacitors,
 			OrganizationsStore:      organizations,
 			ProtoboardsStore:        protoboards,
-			UsersStore:              db.UsersStore,
-			ConfigStore:             db.ConfigStore,
-			MappingsStore:           db.MappingsStore,
-			OrganizationConfigStore: db.OrganizationConfigStore,
-			CellService:             db,
+			UsersStore:              svc.UsersStore(),
+			ConfigStore:             svc.ConfigStore(),
+			MappingsStore:           svc.MappingsStore(),
+			OrganizationConfigStore: svc.OrganizationConfigStore(),
+			CellService:             svc,
 		},
 		Logger:    logger,
 		UseAuth:   useAuth,

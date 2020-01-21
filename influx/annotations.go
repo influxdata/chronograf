@@ -9,9 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/chronograf/id"
-
 	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/id"
 )
 
 const (

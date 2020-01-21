@@ -37,7 +37,6 @@ func (s *OrganizationConfigStore) FindOrCreate(ctx context.Context, orgID string
 	}
 
 	return oc, nil
-
 }
 
 // Put the OrganizationConfig in OrganizationConfigStore.
