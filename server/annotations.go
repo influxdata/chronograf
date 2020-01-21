@@ -382,7 +382,6 @@ type updateAnnotationRequest struct {
 	Tags      chronograf.AnnotationTags `json:"tags"`
 }
 
-// TODO: make sure that endtime is after starttime
 func (u *updateAnnotationRequest) UnmarshalJSON(data []byte) error {
 	type Alias updateAnnotationRequest
 	aux := &struct {
@@ -414,7 +413,11 @@ func (u *updateAnnotationRequest) UnmarshalJSON(data []byte) error {
 
 	// Update must have at least one field set
 	if u.StartTime == nil && u.EndTime == nil && u.Text == nil {
-		return fmt.Errorf("update request must have at least one field")
+		return errors.New("update request must have at least one field")
+	}
+
+	if u.StartTime != nil && u.EndTime != nil && u.StartTime.After(*u.EndTime) {
+		return errors.New("endTime must be after startTime")
 	}
 
 	return nil
