@@ -201,6 +201,10 @@ docker pull chronograf:latest
     go install github.com/influxdata/chronograf/cmd/chronograf
     ```
 
+### Upgrading
+
+In order to upgrade from a Chronograf older than 1.4.0 (<=1.3.10) to 1.8 or newer, you must first upgrade to any version between 1.4.0 and the newest 1.7.x version.
+
 ## Documentation
 
 [Getting Started](https://docs.influxdata.com/chronograf/latest/introduction/getting-started/)
