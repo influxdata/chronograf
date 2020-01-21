@@ -4,8 +4,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/influxdata/chronograf"
+	"github.com/sirupsen/logrus"
 )
 
 // Level type

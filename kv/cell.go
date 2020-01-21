@@ -1,5 +1,8 @@
 package kv
 
+// todo: this isn't tested because it isn't really used*.
+// *there are api routes that use this, but it doesn't integrate with anything.
+
 import (
 	"context"
 	"encoding/json"

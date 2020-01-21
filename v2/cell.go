@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+// todo: remove as cellv2 stuff is not used.
+
 // ErrCellNotFound is the error for a missing cell.
 const ErrCellNotFound = Error("cell not found")
 
