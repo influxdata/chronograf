@@ -8,6 +8,7 @@ import (
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/influxdata/chronograf/mocks"
 )
 
 // NewTestClient creates new *bolt.Client with a set time and temp path.
@@ -32,5 +33,5 @@ func NewTestClient() (*kv.Service, error) {
 		return nil, err
 	}
 
-	return kv.NewService(ctx, b)
+	return kv.NewService(ctx, b, kv.WithLogger(mocks.NewLogger()))
 }
