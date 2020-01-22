@@ -5,12 +5,10 @@ import (
 	"context"
 	"errors"
 	"math/rand"
-	"sort"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/clientv3/concurrency"
-	"github.com/coreos/etcd/mvcc/mvccpb"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/mocks"
@@ -24,11 +22,17 @@ const (
 	DefaultRequestTimeout = 5 * time.Second
 	// DefaultCacheTimeout is the default timeout for a health check when waiting for a response from the cache.
 	DefaultCacheTimeout = 2 * time.Second
+	// DefaultEndpoint is the default etcd endpoint.
+	DefaultEndpoint = "localhost:2379"
 )
 
-var _ kv.Store = (*client)(nil)
+var (
+	_ kv.Store  = (*client)(nil)
+	_ kv.Tx     = (*Tx)(nil)
+	_ kv.Bucket = (*Bucket)(nil)
 
-var generator *snowflake.Generator
+	generator *snowflake.Generator
+)
 
 func init() {
 	generator = snowflake.New(rand.Intn(1023))
@@ -47,7 +51,7 @@ func NewClient(ctx context.Context, opts ...Option) (*client, error) {
 	c := &client{
 		logger: mocks.NewLogger(),
 		config: clientv3.Config{
-			Endpoints:   []string{"localhost:2379"},
+			Endpoints:   []string{DefaultEndpoint},
 			DialTimeout: DefaultDialTimeout,
 		},
 		requestTimeout: DefaultRequestTimeout,
@@ -189,16 +193,6 @@ type Tx struct {
 	writable bool
 }
 
-// Context returns the context from the transaction.
-func (t *Tx) Context() context.Context {
-	return t.ctx
-}
-
-// WithContext sets the provided context on transaction.
-func (t *Tx) WithContext(ctx context.Context) {
-	t.ctx = ctx
-}
-
 // Bucket creates a bucket struct with the provided bucket.
 func (t *Tx) Bucket(b []byte) kv.Bucket {
 	return &Bucket{
@@ -265,16 +259,6 @@ func (b *Bucket) encodeKey(key []byte) string {
 	return string(k)
 }
 
-// Cursor retrieves all keys from the bucket and creates a static cursor from them.
-func (b *Bucket) Cursor() (kv.Cursor, error) {
-	ps, err := b.getAll(string(b.prefix))
-	if err != nil {
-		return nil, err
-	}
-	// This creates a cursor from a static set of items
-	return NewStaticCursor(ps), nil
-}
-
 // Pair is a struct for key value pairs.
 type Pair struct {
 	Key   []byte
@@ -325,146 +309,4 @@ func (b *Bucket) getAll(prefix string) ([]Pair, error) {
 	}
 
 	return ps, nil
-}
-
-// ForwardCursor retrieves all keys from the bucket and creates a static cursor from them.
-func (b *Bucket) ForwardCursor(seek []byte) (kv.ForwardCursor, error) {
-	ctx := context.Background()
-
-	kvs, err := fetch(ctx, b.tx.client, string(b.prefix), seek)
-	if err != nil {
-		return nil, err
-	}
-
-	cursor := &ForwardCursor{
-		kvs:    kvs,
-		prefix: append(b.prefix, '/'),
-	}
-
-	return cursor, nil
-}
-
-// ForwardCursor is a directional cursor.
-// It has a single Next method for iteration which goes over a range response from etcd.
-type ForwardCursor struct {
-	kvs    []*mvccpb.KeyValue
-	prefix []byte
-
-	n      int
-	closed bool
-}
-
-// Next returns the next key/value pair in the cursor.
-func (f *ForwardCursor) Next() ([]byte, []byte) {
-	if f.closed || f.n >= len(f.kvs) {
-		return nil, nil
-	}
-
-	kv := f.kvs[f.n]
-
-	f.n++
-
-	return bytes.TrimPrefix(kv.Key, f.prefix), kv.Value
-}
-
-// Err returns nil as no errors can occur during iteration.
-func (f *ForwardCursor) Err() error {
-	return nil
-}
-
-// Close marks the cursor as closed if it hasn't already been closed.
-func (f *ForwardCursor) Close() error {
-	if f.closed {
-		return nil
-	}
-
-	f.closed = true
-
-	return nil
-}
-
-func fetch(ctx context.Context, client *client, prefix string, seek []byte) ([]*mvccpb.KeyValue, error) {
-	var (
-		rnge     = clientv3.WithFromKey()
-		sort     = clientv3.SortAscend
-		startKey = prefix + "/" + string(seek)
-	)
-
-	r, err := client.db.Get(ctx, startKey,
-		clientv3.WithSort(clientv3.SortByKey, sort),
-		rnge,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.Kvs, nil
-}
-
-// staticCursor implements the Cursor interface for a slice of
-// static key value pairs.
-type staticCursor struct {
-	idx   int
-	pairs []Pair
-}
-
-// NewStaticCursor returns an instance of a StaticCursor. It
-// destructively sorts the provided pairs to be in key ascending order.
-func NewStaticCursor(pairs []Pair) kv.Cursor {
-	sort.Slice(pairs, func(i, j int) bool {
-		return bytes.Compare(pairs[i].Key, pairs[j].Key) < 0
-	})
-	return &staticCursor{
-		pairs: pairs,
-	}
-}
-
-// Seek searches the slice for the first key with the provided prefix.
-func (c *staticCursor) Seek(prefix []byte) ([]byte, []byte) {
-	// TODO: do binary search for prefix since pairs are ordered.
-	for i, pair := range c.pairs {
-		if bytes.HasPrefix(pair.Key, prefix) {
-			c.idx = i
-			return pair.Key, pair.Value
-		}
-	}
-
-	return nil, nil
-}
-
-func (c *staticCursor) getValueAtIndex(delta int) ([]byte, []byte) {
-	idx := c.idx + delta
-	if idx < 0 {
-		return nil, nil
-	}
-
-	if idx >= len(c.pairs) {
-		return nil, nil
-	}
-
-	c.idx = idx
-
-	pair := c.pairs[c.idx]
-
-	return pair.Key, pair.Value
-}
-
-// First retrieves the first element in the cursor.
-func (c *staticCursor) First() ([]byte, []byte) {
-	return c.getValueAtIndex(-c.idx)
-}
-
-// Last retrieves the last element in the cursor.
-func (c *staticCursor) Last() ([]byte, []byte) {
-	return c.getValueAtIndex(len(c.pairs) - 1 - c.idx)
-}
-
-// Next retrieves the next entry in the cursor.
-func (c *staticCursor) Next() ([]byte, []byte) {
-	return c.getValueAtIndex(1)
-}
-
-// Prev retrieves the previous entry in the cursor.
-func (c *staticCursor) Prev() ([]byte, []byte) {
-	return c.getValueAtIndex(-1)
 }

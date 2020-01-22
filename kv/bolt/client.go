@@ -23,13 +23,15 @@ const (
 	ErrUnableToInitialize = "Unable to boot boltdb:  %v"
 	// ErrUnableToUpdate means we had an issue changing the db schema
 	ErrUnableToUpdate = "Unable to store new version in boltdb:  %v"
+	// Default boltdb path (from server/server.go).
+	defaultBoltPath = "chronograf-v1.db"
 )
 
 var (
 	// Ensure client implements kv.Store interface.
-	_ kv.Store = (*client)(nil)
-	// Default boltdb path (from server/server.go).
-	defaultBoltPath = "chronograf-v1.db"
+	_ kv.Store  = (*client)(nil)
+	_ kv.Tx     = (*Tx)(nil)
+	_ kv.Bucket = (*Bucket)(nil)
 )
 
 // client is a client for the boltDB data store.
@@ -148,16 +150,6 @@ type Tx struct {
 	ctx context.Context
 }
 
-// Context returns the context for the transaction.
-func (tx *Tx) Context() context.Context {
-	return tx.ctx
-}
-
-// WithContext sets the context for the transaction.
-func (tx *Tx) WithContext(ctx context.Context) {
-	tx.ctx = ctx
-}
-
 // CreateBucketIfNotExists creates a bucket with the provided byte slice.
 func (tx *Tx) CreateBucketIfNotExists(b []byte) (kv.Bucket, error) {
 	bkt, err := tx.tx.CreateBucketIfNotExists(b)
@@ -201,133 +193,12 @@ func (b *Bucket) NextSequence() (uint64, error) {
 	return b.bucket.NextSequence()
 }
 
-// ForwardCursor retrieves a cursor for iterating through the entries
-// in the key value store in a given direction (ascending / descending).
-func (b *Bucket) ForwardCursor(seek []byte) (kv.ForwardCursor, error) {
-	var (
-		cursor     = b.bucket.Cursor()
-		key, value = cursor.Seek(seek)
-	)
-
-	return &Cursor{
-		cursor: cursor,
-		key:    key,
-		value:  value,
-	}, nil
-}
-
-// Cursor retrieves a cursor for iterating through the entries
-// in the key value store.
-func (b *Bucket) Cursor() (kv.Cursor, error) {
-	return &Cursor{
-		cursor: b.bucket.Cursor(),
-	}, nil
-}
-
 // ForEach executes a function for each key/value pair in a bucket.
 // If the provided function returns an error then the iteration is stopped and
 // the error is returned to the caller. The provided function must not modify
 // the bucket; this will result in undefined behavior.
 func (b *Bucket) ForEach(fn func(k, v []byte) error) error {
 	return b.bucket.ForEach(fn)
-}
-
-// Cursor is a struct for iterating through the entries
-// in the key value store.
-type Cursor struct {
-	cursor *bolt.Cursor
-
-	// previously seeked key/value
-	key, value []byte
-
-	closed bool
-}
-
-// Close sets the closed to closed
-func (c *Cursor) Close() error {
-	c.closed = true
-
-	return nil
-}
-
-// Seek seeks for the first key that matches the prefix provided.
-func (c *Cursor) Seek(prefix []byte) ([]byte, []byte) {
-	if c.closed {
-		return nil, nil
-	}
-
-	k, v := c.cursor.Seek(prefix)
-	if len(k) == 0 && len(v) == 0 {
-		return nil, nil
-	}
-	return k, v
-}
-
-// First retrieves the first key value pair in the bucket.
-func (c *Cursor) First() ([]byte, []byte) {
-	if c.closed {
-		return nil, nil
-	}
-
-	k, v := c.cursor.First()
-	if len(k) == 0 && len(v) == 0 {
-		return nil, nil
-	}
-	return k, v
-}
-
-// Last retrieves the last key value pair in the bucket.
-func (c *Cursor) Last() ([]byte, []byte) {
-	if c.closed {
-		return nil, nil
-	}
-
-	k, v := c.cursor.Last()
-	if len(k) == 0 && len(v) == 0 {
-		return nil, nil
-	}
-	return k, v
-}
-
-// Next retrieves the next key in the bucket.
-func (c *Cursor) Next() (k []byte, v []byte) {
-	if c.closed {
-		return nil, nil
-	}
-	// get and unset previously seeked values if they exist
-	k, v, c.key, c.value = c.key, c.value, nil, nil
-	if len(k) > 0 && len(v) > 0 {
-		return
-	}
-
-	k, v = c.cursor.Next()
-	if len(k) == 0 && len(v) == 0 {
-		return nil, nil
-	}
-	return k, v
-}
-
-// Prev retrieves the previous key in the bucket.
-func (c *Cursor) Prev() (k []byte, v []byte) {
-	if c.closed {
-		return nil, nil
-	}
-	// get and unset previously seeked values if they exist
-	k, v, c.key, c.value = c.key, c.value, nil, nil
-	if len(k) > 0 && len(v) > 0 {
-		return
-	}
-
-	k, v = c.cursor.Prev()
-	if len(k) == 0 && len(v) == 0 {
-		return nil, nil
-	}
-	return k, v
-}
-
-// Err always returns nil as nothing can go wrong™ during iteration
-func (c *Cursor) Err() error {
-	return nil
 }
 
 // initialize creates Buckets that are missing
