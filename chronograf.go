@@ -919,8 +919,6 @@ type KVClient interface {
 	ConfigStore() ConfigStore
 	// DashboardsStore returns the kv's DashboardsStore type.
 	DashboardsStore() DashboardsStore
-	// LayoutsStore returns the kv's LayoutsStore type.
-	LayoutsStore() LayoutsStore
 	// MappingsStore returns the kv's MappingsStore type.
 	MappingsStore() MappingsStore
 	// OrganizationConfigStore returns the kv's OrganizationConfigStore type.

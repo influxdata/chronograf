@@ -11,7 +11,7 @@ import (
 
 // LayoutBuilder is responsible for building Layouts
 type LayoutBuilder interface {
-	Build(chronograf.LayoutsStore) (*multistore.Layouts, error)
+	Build() (*multistore.Layouts, error)
 }
 
 // MultiLayoutBuilder implements LayoutBuilder and will return a Layouts
@@ -21,9 +21,8 @@ type MultiLayoutBuilder struct {
 	CannedPath string
 }
 
-// Build will construct a Layouts of canned and db-backed personalized
-// layouts
-func (builder *MultiLayoutBuilder) Build(db chronograf.LayoutsStore) (*multistore.Layouts, error) {
+// Build will construct a Layouts of canned personalized layouts.
+func (builder *MultiLayoutBuilder) Build() (*multistore.Layouts, error) {
 	// These apps are those handled from a directory
 	apps := filestore.NewApps(builder.CannedPath, builder.UUID, builder.Logger)
 	// These apps are statically compiled into chronograf
@@ -35,7 +34,6 @@ func (builder *MultiLayoutBuilder) Build(db chronograf.LayoutsStore) (*multistor
 	// the operation has success.  So, the database is preferred over filesystem over binary data.
 	layouts := &multistore.Layouts{
 		Stores: []chronograf.LayoutsStore{
-			db,
 			apps,
 			binApps,
 		},

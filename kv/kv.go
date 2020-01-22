@@ -15,7 +15,6 @@ var (
 	cellBucket               = []byte("cellsv2")
 	configBucket             = []byte("ConfigV1")
 	dashboardsBucket         = []byte("Dashoard") // keep spelling for backwards compat
-	layoutsBucket            = []byte("Layout")
 	mappingsBucket           = []byte("MappingsV1")
 	organizationConfigBucket = []byte("OrganizationConfigV1")
 	organizationsBucket      = []byte("OrganizationsV1")
@@ -149,7 +148,6 @@ func (s *Service) initialize(ctx context.Context, tx Tx) error {
 		cellBucket,
 		configBucket,
 		dashboardsBucket,
-		layoutsBucket,
 		mappingsBucket,
 		organizationConfigBucket,
 		organizationsBucket,
@@ -189,11 +187,6 @@ func (s *Service) ConfigStore() chronograf.ConfigStore {
 // DashboardsStore returns a chronograf.DashboardsStore.
 func (s *Service) DashboardsStore() chronograf.DashboardsStore {
 	return &dashboardsStore{client: s, IDs: &id.UUID{}}
-}
-
-// LayoutsStore returns a chronograf.LayoutsStore.
-func (s *Service) LayoutsStore() chronograf.LayoutsStore {
-	return &layoutsStore{client: s, IDs: &id.UUID{}}
 }
 
 // MappingsStore returns a chronograf.MappingsStore.

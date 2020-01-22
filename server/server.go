@@ -478,14 +478,6 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 		os.Exit(1)
 	}
 
-	layouts, err := builder.Layouts.Build(svc.LayoutsStore())
-	if err != nil {
-		logger.
-			WithField("component", "LayoutsStore").
-			Error("Unable to construct a MultiLayoutsStore", err)
-		os.Exit(1)
-	}
-
 	organizations, err := builder.Organizations.Build(svc.OrganizationsStore())
 	if err != nil {
 		logger.
@@ -511,6 +503,14 @@ func openService(ctx context.Context, db kv.Store, builder builders, logger chro
 	}
 
 	protoboards, err := builder.Protoboards.Build()
+	if err != nil {
+		logger.
+			WithField("component", "Protoboards").
+			Error("Unable to construct a MultiLayoutsStore", err)
+		os.Exit(1)
+	}
+
+	layouts, err := builder.Layouts.Build()
 	if err != nil {
 		logger.
 			WithField("component", "LayoutsStore").
