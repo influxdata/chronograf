@@ -39,10 +39,6 @@ type Store interface {
 type Tx interface {
 	// Bucket creates and returns bucket, b.
 	Bucket(b []byte) Bucket
-	// Context returns the context associated with this Tx.
-	Context() context.Context
-	// WithContext associates a context with this Tx.
-	WithContext(ctx context.Context)
 	// CreateBucketIfNotExists creates a new bucket if it doesn't already exist.
 	// Returns an error if the bucket name is blank, or if the bucket name is too long.
 	// The bucket instance is only valid for the lifetime of the transaction.
@@ -58,12 +54,6 @@ type Bucket interface {
 	Put(key, value []byte) error
 	// Delete should error if the transaction it was called in is not writable.
 	Delete(key []byte) error
-	// Cursor returns a cursor at the beginning of this bucket optionally
-	// using the provided hints to improve performance.
-	Cursor( /* hints ...CursorHint */ ) (Cursor, error)
-	// ForwardCursor returns a forward cursor from the seek position provided.
-	// Other options can be supplied to provide direction and hints.
-	ForwardCursor(seek []byte /* , opts ...CursorOption */) (ForwardCursor, error)
 	// NextSequence returns a unique id for the bucket.
 	NextSequence() (uint64, error)
 	// ForEach executes a function for each key/value pair in a bucket.
@@ -71,32 +61,6 @@ type Bucket interface {
 	// the error is returned to the caller. The provided function must not modify
 	// the bucket; this will result in undefined behavior.
 	ForEach(fn func(k, v []byte) error) error
-}
-
-// Cursor is an abstraction for iterating/ranging through data. A concrete implementation
-// of a cursor can be found in cursor.go.
-type Cursor interface {
-	// Seek moves the cursor forward until reaching prefix in the key name.
-	Seek(prefix []byte) (k []byte, v []byte)
-	// First moves the cursor to the first key in the bucket.
-	First() (k []byte, v []byte)
-	// Last moves the cursor to the last key in the bucket.
-	Last() (k []byte, v []byte)
-	// Next moves the cursor to the next key in the bucket.
-	Next() (k []byte, v []byte)
-	// Prev moves the cursor to the prev key in the bucket.
-	Prev() (k []byte, v []byte)
-}
-
-// ForwardCursor is an abstraction for interacting/ranging through data in one direction.
-type ForwardCursor interface {
-	// Next moves the cursor to the next key in the bucket.
-	Next() (k, v []byte)
-	// Err returns non-nil if an error occurred during cursor iteration.
-	// This should always be checked after Next returns a nil key/value.
-	Err() error
-	// Close is reponsible for freeing any resources created by the cursor.
-	Close() error
 }
 
 // Service is the struct that chronograf services are implemented on.
