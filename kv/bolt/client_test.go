@@ -1,13 +1,11 @@
-package etcd
+package bolt
 
 import (
 	"context"
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
-	"github.com/coreos/etcd/embed"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/mocks"
@@ -15,47 +13,33 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	_, err := NewClient(context.TODO(),
-		WithEndpoints([]string{"localhost:2"}),
-		WithDialTimeout(time.Second*5),
-		WithRequestTimeout(time.Second*5),
+	f, err := ioutil.TempFile("", "chronograf-bolt-")
+	require.NoError(t, err)
+	f.Close()
+
+	c, err := NewClient(context.TODO(),
+		WithBuildInfo(chronograf.BuildInfo{
+			Version: "1.8.0-test",
+			Commit:  "testing",
+		}),
+		WithPath(f.Name()),
 		WithLogger(mocks.NewLogger()),
-		WithLogin("user", "pass"),
 	)
-	require.Error(t, err)
+	require.NoError(t, err)
+	os.RemoveAll(f.Name())
+	c.Close()
 }
 
 func NewService(t *testing.T) (chronograf.KVClient, func()) {
-	dir, err := ioutil.TempDir("", "etcd.test")
+	c, err := NewTestClient()
 	require.NoError(t, err)
 
-	cfg := embed.NewConfig()
-	cfg.Dir = dir
-
-	e, err := embed.StartEtcd(cfg)
-	require.NoError(t, err)
-	select {
-	case <-e.Server.ReadyNotify():
-		break
-	case <-time.After(20 * time.Second):
-		t.Fatal("etcd took too long to start")
-	}
-
-	endpoints := []string{}
-	for i := range cfg.LPUrls {
-		endpoints = append(endpoints, cfg.LPUrls[i].String())
-	}
-
-	c, err := NewClient(context.TODO(), WithEndpoints(endpoints))
-	require.NoError(t, err)
-
-	s, err := kv.NewService(context.TODO(), c)
+	s, err := kv.NewService(context.TODO(), c.Client)
 	require.NoError(t, err)
 
 	return s, func() {
-		e.Close()
-		os.RemoveAll(cfg.Dir)
 		c.Close()
+		s.Close()
 	}
 }
 
