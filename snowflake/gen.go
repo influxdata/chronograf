@@ -25,11 +25,13 @@ const (
 	timeMask     = ^(-1 << timeBits)
 )
 
+// Generator defines a snowflake generator structure.
 type Generator struct {
 	state   uint64
 	machine uint64
 }
 
+// New creates a new generator.
 func New(machineID int) *Generator {
 	if machineID < 0 || machineID > serverMax {
 		panic(fmt.Errorf("invalid machine id; must be 0 ≤ id < %d", serverMax))
@@ -40,10 +42,12 @@ func New(machineID int) *Generator {
 	}
 }
 
+// MachineID returns the machine's ID.
 func (g *Generator) MachineID() int {
 	return int(g.machine >> serverShift)
 }
 
+// Next generates and returns a universally unique uint64.
 func (g *Generator) Next() uint64 {
 	var state uint64
 
@@ -95,12 +99,14 @@ func (g *Generator) Next() uint64 {
 	return state | g.machine
 }
 
+// NextString generates and returns a universally unique uint64 as a string.
 func (g *Generator) NextString() string {
 	var s [11]byte
 	encode(&s, g.Next())
 	return string(s[:])
 }
 
+// AppendNext appends the byte slice of a unique uint64 to s.
 func (g *Generator) AppendNext(s *[11]byte) {
 	encode(s, g.Next())
 }
