@@ -183,13 +183,13 @@ export const setEditingAnnotation = (
 interface UpdateTagFilterAction {
   type: 'UPDATE_TAG_FILTER'
   payload: {
-    dashboardID: number
+    dashboardID: string
     tagFilter: TagFilter
   }
 }
 
 export const updateTagFilter = (
-  dashboardID: number,
+  dashboardID: string,
   tagFilter: TagFilter
 ): UpdateTagFilterAction => ({
   type: 'UPDATE_TAG_FILTER',
@@ -199,13 +199,13 @@ export const updateTagFilter = (
 interface DeleteTagFilterAction {
   type: 'DELETE_TAG_FILTER'
   payload: {
-    dashboardID: number
+    dashboardID: string
     tagFilter: TagFilter
   }
 }
 
 export const deleteTagFilter = (
-  dashboardID: number,
+  dashboardID: string,
   tagFilter: TagFilter
 ): DeleteTagFilterAction => ({
   type: 'DELETE_TAG_FILTER',
@@ -269,7 +269,7 @@ export const addAnnotationAsync = (
 
 export const getAnnotationsAsync = (
   indexUrl: string,
-  dashboardID: number
+  dashboardID: string
 ) => async (
   dispatch: Dispatch<SetAnnotationsAction>,
   getState
@@ -319,7 +319,7 @@ export const updateAnnotationAsync = (
 
 export const updateTagFilterAsync = (
   indexURL: string,
-  dashboardID: number,
+  dashboardID: string,
   tagFilter: TagFilter
 ) => async (dispatch, getState) => {
   const state: AnnotationState = getState().annotations
@@ -346,7 +346,7 @@ export const updateTagFilterAsync = (
 
 export const deleteTagFilterAsync = (
   indexURL: string,
-  dashboardID: number,
+  dashboardID: string,
   tagFilter: TagFilter
 ) => async dispatch => {
   try {

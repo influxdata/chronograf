@@ -2,7 +2,8 @@ package kv
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"strconv"
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv/internal"
@@ -107,7 +108,7 @@ func (s *organizationsStore) Add(ctx context.Context, o *chronograf.Organization
 		if err != nil {
 			return err
 		}
-		o.ID = fmt.Sprintf("%d", seq)
+		o.ID = strconv.FormatUint(seq, 10)
 
 		v, err := internal.MarshalOrganization(o)
 		if err != nil {
@@ -275,7 +276,7 @@ func (s *organizationsStore) Get(ctx context.Context, q chronograf.OrganizationQ
 
 		return org, nil
 	}
-	return nil, fmt.Errorf("must specify either ID, or Name in OrganizationQuery")
+	return nil, errors.New("must specify either ID, or Name in OrganizationQuery")
 }
 
 // Update the organization in organizationsStore

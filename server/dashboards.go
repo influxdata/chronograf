@@ -15,7 +15,7 @@ type dashboardLinks struct {
 }
 
 type dashboardResponse struct {
-	ID           chronograf.DashboardID  `json:"id"`
+	ID           chronograf.DashboardID  `json:"id,string"`
 	Cells        []dashboardCellResponse `json:"cells"`
 	Templates    []templateResponse      `json:"templates"`
 	Name         string                  `json:"name"`

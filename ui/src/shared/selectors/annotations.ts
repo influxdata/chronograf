@@ -27,7 +27,7 @@ export const getSelectedAnnotations = createSelector(
 
 const getTagFiltersById = (
   state: {annotations: AnnotationState},
-  dashboardID: number
+  dashboardID: string
 ) => state.annotations.tagFilters[dashboardID]
 
 export const getTagFilters = createSelector(

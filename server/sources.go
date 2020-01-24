@@ -40,7 +40,7 @@ type sourceResponse struct {
 }
 
 type authenticationResponse struct {
-	ID                   int
+	ID                   int `json:"id,string"`
 	AuthenticationMethod string
 }
 

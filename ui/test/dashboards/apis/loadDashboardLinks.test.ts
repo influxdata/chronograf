@@ -6,20 +6,20 @@ describe('dashboards.apis.loadDashboardLinks', () => {
 
   const activeDashboard = {
     ...dashboard,
-    id: 9001,
+    id: '9001',
     name: 'Low Dash',
   }
 
   const dashboards = [
     {
       ...dashboard,
-      id: 123,
+      id: '123',
       name: 'Test Dashboard',
     },
     activeDashboard,
     {
       ...dashboard,
-      id: 2282,
+      id: '2282',
       name: 'Sample Dash',
     },
   ]
