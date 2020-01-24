@@ -43,7 +43,10 @@ func (d *dashboardsStore) All(ctx context.Context) ([]chronograf.Dashboard, erro
 func (d *dashboardsStore) Add(ctx context.Context, src chronograf.Dashboard) (chronograf.Dashboard, error) {
 	if err := d.client.kv.Update(ctx, func(tx Tx) error {
 		b := tx.Bucket(dashboardsBucket)
-		id, _ := b.NextSequence()
+		id, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
 
 		src.ID = chronograf.DashboardID(id)
 		strID := strconv.FormatUint(id, 10)

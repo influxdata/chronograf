@@ -96,7 +96,7 @@ type EmptyDefaultDashboard = Pick<
   cells: EmptyDefaultDashboardCell[]
 }
 export const EMPTY_DASHBOARD: EmptyDefaultDashboard = {
-  id: 0,
+  id: '0',
   name: '',
   cells: [
     {

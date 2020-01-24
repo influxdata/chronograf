@@ -22,7 +22,7 @@ import {TagFilter, AnnotationsDisplaySetting} from 'src/types/annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
 
 interface Props {
-  dashboardID: number
+  dashboardID: string
   tagFilters: TagFilter[]
   tagKeys?: string[]
   tagValues: {
@@ -122,7 +122,7 @@ class AnnotationControlBar extends PureComponent<Props> {
 
 const mstp = (
   state: {annotations: AnnotationState},
-  ownProps: {dashboardID: number}
+  ownProps: {dashboardID: string}
 ): Partial<Props> => {
   const {tagKeys, tagValues, displaySetting} = state.annotations
   const tagFilters = getTagFilters(state, ownProps.dashboardID)

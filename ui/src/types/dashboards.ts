@@ -114,7 +114,7 @@ interface DashboardLinks {
 }
 
 export interface Dashboard {
-  id: number
+  id: string
   cells: Cell[]
   templates: Template[]
   name: string
@@ -123,7 +123,7 @@ export interface Dashboard {
 }
 
 export interface DashboardName {
-  id: number
+  id: string
   name: string
   link: string
 }

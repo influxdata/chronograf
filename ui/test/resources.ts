@@ -660,7 +660,7 @@ export const template: Template = {
 }
 
 export const dashboard: Dashboard = {
-  id: 1,
+  id: '1',
   cells: [],
   name: 'd1',
   templates: [],

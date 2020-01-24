@@ -41,8 +41,6 @@ import {
 
 import {getDeep} from 'src/utils/wrappers'
 
-import idNormalizer, {TYPE_ID} from 'src/normalizers/id'
-
 import {DEFAULT_TIME_RANGE} from 'src/shared/data/timeRanges'
 
 // Types
@@ -86,7 +84,7 @@ interface LoadDashboardsAction {
   type: ActionType.LoadDashboards
   payload: {
     dashboards: Dashboard[]
-    dashboardID: number
+    dashboardID: string
   }
 }
 
@@ -188,7 +186,7 @@ interface EditCellQueryStatusAction {
 interface TemplateVariableLocalSelectedAction {
   type: ActionType.TemplateVariableLocalSelected
   payload: {
-    dashboardID: number
+    dashboardID: string
     templateID: string
     value: TemplateValue
   }
@@ -218,7 +216,7 @@ interface SetActiveCellAction {
 interface SetDashTimeV1Action {
   type: ActionType.SetDashboardTimeV1
   payload: {
-    dashboardID: number
+    dashboardID: string
     timeRange: TimeRange
   }
 }
@@ -226,7 +224,7 @@ interface SetDashTimeV1Action {
 interface SetDashRefreshAction {
   type: ActionType.SetDashboardRefresh
   payload: {
-    dashboardID: number
+    dashboardID: string
     refreshRate: RefreshRate
   }
 }
@@ -255,7 +253,7 @@ export type Action =
 
 export const loadDashboards = (
   dashboards: Dashboard[],
-  dashboardID?: number
+  dashboardID?: string
 ): LoadDashboardsAction => ({
   type: ActionType.LoadDashboards,
   payload: {
@@ -270,7 +268,7 @@ export const loadDashboard = (dashboard: Dashboard): LoadDashboardAction => ({
 })
 
 export const setDashTimeV1 = (
-  dashboardID: number,
+  dashboardID: string,
   timeRange: TimeRange
 ): SetDashTimeV1Action => ({
   type: ActionType.SetDashboardTimeV1,
@@ -278,7 +276,7 @@ export const setDashTimeV1 = (
 })
 
 export const setDashRefresh = (
-  dashboardID: number,
+  dashboardID: string,
   refreshRate: RefreshRate
 ): SetDashRefreshAction => ({
   type: ActionType.SetDashboardRefresh,
@@ -372,7 +370,7 @@ export const editCellQueryStatus = (
 })
 
 export const templateVariableLocalSelected = (
-  dashboardID: number,
+  dashboardID: string,
   templateID: string,
   value: TemplateValue
 ): TemplateVariableLocalSelectedAction => ({
@@ -442,9 +440,9 @@ export const updateQueryParams = (updatedQueryParams: object): RouterAction => {
   return replace(newLocation)
 }
 
-const getDashboard = (state, dashboardId: number): Dashboard => {
+const getDashboard = (state, dashboardId: string): Dashboard => {
   const dashboard = state.dashboardUI.dashboards.find(
-    d => d.id === +dashboardId
+    d => d.id === dashboardId
   )
 
   if (!dashboard) {
@@ -527,7 +525,7 @@ export const putDashboard = (dashboard: Dashboard) => async (
   }
 }
 
-export const putDashboardByID = (dashboardID: number) => async (
+export const putDashboardByID = (dashboardID: string) => async (
   dispatch: Dispatch<Action>,
   getState
 ): Promise<void> => {
@@ -675,7 +673,7 @@ export const importDashboardAsync = (dashboard: Dashboard) => async (
   }
 }
 
-const updateTimeRangeFromQueryParams = (dashboardID: number) => (
+const updateTimeRangeFromQueryParams = (dashboardID: string) => (
   dispatch: Dispatch<Action>,
   getState
 ): void => {
@@ -698,7 +696,7 @@ const updateTimeRangeFromQueryParams = (dashboardID: number) => (
 
   if (!validatedTimeRange.lower) {
     const dashboardTimeRange = dashTimeV1.ranges.find(
-      r => r.dashboardID === idNormalizer(TYPE_ID, dashboardID)
+      r => r.dashboardID === dashboardID
     )
 
     validatedTimeRange = dashboardTimeRange || DEFAULT_TIME_RANGE
@@ -734,7 +732,7 @@ const updateTimeRangeFromQueryParams = (dashboardID: number) => (
 }
 
 export const getDashboardWithTemplatesAsync = (
-  dashboardId: number,
+  dashboardId: string,
   source: Source
 ) => async (dispatch): Promise<void> => {
   let dashboard: Dashboard
@@ -780,7 +778,7 @@ export const getDashboardWithTemplatesAsync = (
 }
 
 export const rehydrateTemplatesAsync = (
-  dashboardId: number,
+  dashboardId: string,
   source: Source
 ) => async (dispatch, getState): Promise<void> => {
   const dashboard = getDashboard(getState(), dashboardId)
@@ -793,7 +791,7 @@ export const rehydrateTemplatesAsync = (
   dispatch(updateTemplateQueryParams(dashboardId))
 }
 
-export const updateTemplateQueryParams = (dashboardId: number) => (
+export const updateTemplateQueryParams = (dashboardId: string) => (
   dispatch: Dispatch<Action>,
   getState
 ): void => {

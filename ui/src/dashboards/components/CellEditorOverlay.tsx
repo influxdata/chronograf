@@ -73,7 +73,7 @@ interface PassedProps {
   onCancel: () => void
   onSave: (cell: Cell | NewDefaultCell) => void
   source: SourcesModels.Source
-  dashboardID: number
+  dashboardID: string
   queryStatus: QueriesModels.QueryStatus
   dashboardTemplates: Template[]
   cell: Cell | NewDefaultCell

@@ -8,3 +8,4 @@ log/
 .tern-project
 yarn-error.log
 .cache/
+build/

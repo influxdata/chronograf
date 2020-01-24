@@ -5,7 +5,7 @@ import {Refresh} from 'src/types/localStorage'
 import {Action, ActionType} from 'src/dashboards/actions'
 
 interface Range extends TimeRange {
-  dashboardID: number
+  dashboardID: string
 }
 
 export interface State {

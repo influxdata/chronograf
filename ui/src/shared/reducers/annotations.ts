@@ -25,7 +25,7 @@ export interface AnnotationState {
     [tagKey: string]: string[]
   }
   tagFilters: {
-    [dashboardID: number]: {
+    [dashboardID: string]: {
       [tagFilterID: string]: TagFilter
     }
   }

@@ -23,12 +23,12 @@ export interface DashTimeV1 {
 }
 
 export interface Refresh {
-  dashboardID: number
+  dashboardID: string
   refreshRate: RefreshRate
 }
 
 interface DashboardTimeRange {
-  dashboardID: number
+  dashboardID: string
   defaultGroupBy: string
   format: string
   inputValue: string

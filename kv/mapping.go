@@ -2,7 +2,7 @@ package kv
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv/internal"
@@ -24,7 +24,7 @@ func (s *mappingsStore) Add(ctx context.Context, o *chronograf.Mapping) (*chrono
 		if err != nil {
 			return err
 		}
-		o.ID = fmt.Sprintf("%d", seq)
+		o.ID = strconv.FormatUint(seq, 10)
 
 		v, err := internal.MarshalMapping(o)
 		if err != nil {
