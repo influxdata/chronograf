@@ -2,9 +2,11 @@ package chronograf
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -589,6 +591,32 @@ type Dashboard struct {
 	Templates    []Template      `json:"templates"`
 	Name         string          `json:"name"`
 	Organization string          `json:"organization"` // Organization is the organization ID that resource belongs to
+}
+
+// UnmarshalJSON unmarshals a string ID into a DashboardID (int).
+//
+// todo: ensure compatibility with existing stored dashboards.
+func (d *Dashboard) UnmarshalJSON(data []byte) error {
+	type Alias Dashboard
+
+	aux := &struct {
+		ID string `json:"id"`
+		*Alias
+	}{
+		Alias: (*Alias)(d),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	ID, err := strconv.ParseInt(aux.ID, 10, 64)
+	if err != nil {
+		return err
+	}
+	d.ID = DashboardID(ID)
+
+	return nil
 }
 
 // Axis represents the visible extents of a visualization
