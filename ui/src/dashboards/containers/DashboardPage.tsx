@@ -598,9 +598,7 @@ const mstp = (state, {params: {dashboardID}}) => {
   const timeRange = getTimeRange(state, dashboardID)
   const refreshRate = getRefreshRate(state, dashboardID)
 
-  const dashboard = dashboards.find(
-    d => d.id === dashboardID
-  )
+  const dashboard = dashboards.find(d => d.id === dashboardID)
 
   const selectedCell = cell
 
@@ -610,7 +608,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     timeZone,
     dashboard,
     fluxLinks: links.flux,
-    dashboardID: dashboardID,
+    dashboardID: {dashboardID},
     timeRange,
     refreshRate,
     zoomedTimeRange,

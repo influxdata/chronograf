@@ -53,7 +53,7 @@ class AnnotationTagsDropdown extends PureComponent<Props> {
       filterType: TagFilterType.Equals,
     }
 
-    onUpdateTagFilterAsync(annotationsIndexURL, +dashboardID, newTagFilter)
+    onUpdateTagFilterAsync(annotationsIndexURL, dashboardID, newTagFilter)
   }
 }
 
