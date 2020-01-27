@@ -53,7 +53,7 @@ const d1 = {
   templates,
 }
 
-const d2 = {...dashboard, id: 2, cells: [], name: 'd2', templates: []}
+const d2 = {...dashboard, id: '2', cells: [], name: 'd2', templates: []}
 const dashboards = [d1, d2]
 
 describe('DataExplorer.Reducers.UI', () => {
