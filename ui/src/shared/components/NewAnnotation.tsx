@@ -236,7 +236,7 @@ const mstp = (state, ownProps) => {
 
   // The new annotation will be created with tags derived from the current
   // dashboard's tag filters
-  const annotationTags = getTagsFromTagFilters(state, +dashboardID)
+  const annotationTags = getTagsFromTagFilters(state, dashboardID)
 
   return {annotationTags}
 }

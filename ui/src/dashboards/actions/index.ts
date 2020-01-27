@@ -441,9 +441,7 @@ export const updateQueryParams = (updatedQueryParams: object): RouterAction => {
 }
 
 const getDashboard = (state, dashboardId: string): Dashboard => {
-  const dashboard = state.dashboardUI.dashboards.find(
-    d => d.id === dashboardId
-  )
+  const dashboard = state.dashboardUI.dashboards.find(d => d.id === dashboardId)
 
   if (!dashboard) {
     throw new Error(`Could not find dashboard with id '${dashboardId}'`)
