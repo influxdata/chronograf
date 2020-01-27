@@ -11,7 +11,7 @@ describe('dashboards.utils.dashboardSwitcherLinks', () => {
     const dashboards = [
       {
         ...dashboard,
-        id: 123,
+        id: '123',
         name: 'Test Dashboard',
       },
     ]
@@ -49,7 +49,7 @@ describe('dashboards.utils.dashboardSwitcherLinks', () => {
 
     const activeDashboard = {
       ...dashboard,
-      id: 123,
+      id: '123',
       name: 'Test Dashboard',
     }
 
@@ -78,7 +78,7 @@ describe('dashboards.utils.dashboardSwitcherLinks', () => {
 
     const staleDashboard = {
       ...dashboard,
-      id: 3000,
+      id: '3000',
       name: 'Stale Dashboard Name',
     }
 
