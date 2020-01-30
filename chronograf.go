@@ -600,7 +600,7 @@ func (d *Dashboard) UnmarshalJSON(data []byte) error {
 	type Alias Dashboard
 
 	aux := &struct {
-		ID string `json:"id"`
+		ID *string `json:"id,omitempty"`
 		*Alias
 	}{
 		Alias: (*Alias)(d),
@@ -610,11 +610,13 @@ func (d *Dashboard) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	ID, err := strconv.ParseInt(aux.ID, 10, 64)
-	if err != nil {
-		return err
+	if aux.ID != nil {
+		ID, err := strconv.ParseInt(*aux.ID, 10, 64)
+		if err != nil {
+			return err
+		}
+		d.ID = DashboardID(ID)
 	}
-	d.ID = DashboardID(ID)
 
 	return nil
 }

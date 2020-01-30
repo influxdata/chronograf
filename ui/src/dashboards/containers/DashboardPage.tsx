@@ -608,7 +608,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     timeZone,
     dashboard,
     fluxLinks: links.flux,
-    dashboardID: {dashboardID},
+    dashboardID,
     timeRange,
     refreshRate,
     zoomedTimeRange,
