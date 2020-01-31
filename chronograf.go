@@ -594,8 +594,6 @@ type Dashboard struct {
 }
 
 // UnmarshalJSON unmarshals a string ID into a DashboardID (int).
-//
-// todo: ensure compatibility with existing stored dashboards.
 func (d *Dashboard) UnmarshalJSON(data []byte) error {
 	type Alias Dashboard
 

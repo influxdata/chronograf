@@ -12,7 +12,7 @@ import (
 
 // Build flags
 var (
-	version = ""
+	version = "1.8.0"
 	commit  = ""
 )
 

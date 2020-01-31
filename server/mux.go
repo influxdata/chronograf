@@ -146,6 +146,9 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 	router.GET("/swagger.json", Spec())
 	router.GET("/docs", Redoc("/swagger.json"))
 
+	/* Health */
+	router.GET("/ping", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
+
 	/* API */
 	// Organizations
 	router.GET("/chronograf/v1/organizations", EnsureAdmin(service.Organizations))
