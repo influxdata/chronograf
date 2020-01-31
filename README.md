@@ -205,6 +205,10 @@ docker pull chronograf:latest
 
 In order to upgrade from a Chronograf older than 1.4.0 (<=1.3.10) to 1.8 or newer, you must first upgrade to any version between 1.4.0 and the newest 1.7.x version.
 
+### Compatibility
+
+Chronograf 1.8 introduces a breaking change in the dashboards API (`/chronograf/v1/dashboards`) which may affect certain clients. The `id` previously was being returned as an integer. Since javascript can't cleanly handle numbers with more than 16 digits (`console.log(12345678901234567890)` yields `12345678901234567000`), integer ids have been exposed as strings. As with other resource ids, they will remain stored internally as integers, so no database migration is required.
+
 ## Documentation
 
 [Getting Started](https://docs.influxdata.com/chronograf/latest/introduction/getting-started/)

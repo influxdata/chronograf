@@ -1,6 +1,10 @@
 .PHONY: assets dep clean test gotest gotestrace jstest run run-dev ctags
 
-VERSION = 1.7.11
+ifeq ($(OS), Windows_NT)
+	VERSION := $(shell git describe --exact-match --tags 2>nil)
+else
+	VERSION := $(shell git describe --exact-match --tags 2>/dev/null)
+endif
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
 GOBINDATA := $(shell go list -f {{.Root}}  github.com/kevinburke/go-bindata 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
@@ -9,7 +13,11 @@ SOURCES := $(shell find . -name '*.go' ! -name '*_gen.go' -not -path "./vendor/*
 UISOURCES := $(shell find ui -type f -not \( -path ui/build/\* -o -path ui/node_modules/\* -prune \) )
 
 unexport LDFLAGS
-LDFLAGS=-ldflags "-s -X main.version=${VERSION} -X main.commit=${COMMIT}"
+LDFLAGS=-ldflags "-s -X main.commit=${COMMIT}"
+ifdef VERSION
+	LDFLAGS += -X main.version=$(VERSION)
+endif
+
 BINARY=chronograf
 CTLBINARY=chronoctl
 GO111MODULE=on
