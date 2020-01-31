@@ -70,7 +70,7 @@ type Server struct {
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
 	GithubOrgs         []string `short:"o" long:"github-organization" description:"Github organization user is required to have active membership" env:"GH_ORGS" env-delim:","`
 
-	EtcdEndpoints      []string      `short:"e" long:"etcd-endpoints" description:"List of etcd endpoints" env:"ETCD_HOSTS" env-delim:","`
+	EtcdEndpoints      []string      `short:"e" long:"etcd-endpoints" description:"List of etcd endpoints" env:"ETCD_ENDPOINTS" env-delim:","`
 	EtcdUsername       string        `long:"etcd-username" description:"Username to log into etcd." env:"ETCD_USERNAME"`
 	EtcdPassword       string        `long:"etcd-password" description:"Password to log into etcd." env:"ETCD_PASSWORD"`
 	EtcdDialTimeout    time.Duration `long:"etcd-dial-timeout" default:"-1s" description:"Total time to wait before timing out while connecting to etcd endpoints. 0 means no timeout. " env:"ETCD_DIAL_TIMEOUT"`
