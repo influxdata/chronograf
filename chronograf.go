@@ -917,6 +917,8 @@ type ColumnEncoding struct {
 
 // OrganizationConfigStore is the storage and retrieval of organization Configs
 type OrganizationConfigStore interface {
+	// All lists all org configs in the OrganizationConfigStore
+	All(ctx context.Context) ([]OrganizationConfig, error)
 	// FindOrCreate gets an existing OrganizationConfig and creates one if none exists
 	FindOrCreate(ctx context.Context, orgID string) (*OrganizationConfig, error)
 	// Put replaces the whole organization config in the OrganizationConfigStore
