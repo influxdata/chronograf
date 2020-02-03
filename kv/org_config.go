@@ -16,6 +16,33 @@ type organizationConfigStore struct {
 	client *Service
 }
 
+// All returns all known organization configurations.
+func (s *organizationConfigStore) All(ctx context.Context) ([]chronograf.OrganizationConfig, error) {
+	var orgCfgs []chronograf.OrganizationConfig
+	err := s.each(ctx, func(o *chronograf.OrganizationConfig) {
+		orgCfgs = append(orgCfgs, *o)
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return orgCfgs, nil
+}
+
+func (s *organizationConfigStore) each(ctx context.Context, fn func(*chronograf.OrganizationConfig)) error {
+	return s.client.kv.View(ctx, func(tx Tx) error {
+		return tx.Bucket(organizationConfigBucket).ForEach(func(k, v []byte) error {
+			var orgCfg chronograf.OrganizationConfig
+			if err := internal.UnmarshalOrganizationConfig(v, &orgCfg); err != nil {
+				return err
+			}
+			fn(&orgCfg)
+			return nil
+		})
+	})
+}
+
 func (s *organizationConfigStore) get(ctx context.Context, tx Tx, orgID string, c *chronograf.OrganizationConfig) error {
 	v, err := tx.Bucket(organizationConfigBucket).Get([]byte(orgID))
 	if len(v) == 0 || err != nil {

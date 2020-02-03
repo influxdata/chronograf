@@ -31,12 +31,17 @@ func (s *OrganizationConfigStore) FindOrCreate(ctx context.Context, orgID string
 		return nil, err
 	}
 
-	oc, err := s.store.FindOrCreate(ctx, orgID)
+	return s.store.FindOrCreate(ctx, orgID)
+}
+
+// All returns all organization configs from the store.
+func (s *OrganizationConfigStore) All(ctx context.Context) ([]chronograf.OrganizationConfig, error) {
+	var err = validOrganization(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return oc, nil
+	return s.store.All(ctx)
 }
 
 // Put the OrganizationConfig in OrganizationConfigStore.
