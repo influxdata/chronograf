@@ -207,7 +207,7 @@ In order to upgrade from a Chronograf older than 1.4.0 (<=1.3.10) to 1.8 or newe
 
 ### Compatibility
 
-Chronograf 1.8 introduces a breaking change in the dashboards API (`/chronograf/v1/dashboards`) which may affect certain clients. The `id` previously was being returned as an integer. Since javascript can't cleanly handle numbers with more than 16 digits (`console.log(12345678901234567890)` yields `12345678901234567000`), integer ids have been exposed as strings. As with other resource ids, they will remain stored internally as integers, so no database migration is required.
+Chronograf 1.8 introduces a breaking change in the dashboards API (`/chronograf/v1/dashboards`) which may affect certain clients. The `id` previously was being returned as an integer. Since javascript can't cleanly handle numbers with more than 16 digits (`console.log(12345678901234567890)` yields `12345678901234567000`), integer ids have been exposed as strings. As with other resource ids, they will remain stored internally as integers, so no database migration is required. If using `.dashboard` files to pre-populate available dashboards, those files should be updated and the `id` should be converted to a string value.
 
 ## Documentation
 

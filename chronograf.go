@@ -599,7 +599,7 @@ func (d *Dashboard) UnmarshalJSON(data []byte) error {
 	type Alias Dashboard
 
 	aux := &struct {
-		ID *string `json:"id,omitempty"`
+		ID interface{} `json:"id,omitempty"`
 		*Alias
 	}{
 		Alias: (*Alias)(d),
@@ -610,11 +610,27 @@ func (d *Dashboard) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.ID != nil {
-		ID, err := strconv.ParseInt(*aux.ID, 10, 64)
-		if err != nil {
-			return err
+		// Allows backwards compatibility with filestore `.dashboard` files.
+		switch id := aux.ID.(type) {
+		case int:
+			d.ID = DashboardID(id)
+		case int32:
+			d.ID = DashboardID(id)
+		case int64:
+			d.ID = DashboardID(id)
+		case float32:
+			d.ID = DashboardID(id)
+		case float64:
+			d.ID = DashboardID(id)
+		case string:
+			ID, err := strconv.ParseInt(id, 10, 64)
+			if err != nil {
+				return err
+			}
+			d.ID = DashboardID(ID)
+		default:
+			return fmt.Errorf("invalid id type %T", id)
 		}
-		d.ID = DashboardID(ID)
 	}
 
 	return nil
