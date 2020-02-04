@@ -22,14 +22,17 @@ func init() {
 
 type migrateCommand struct {
 	From string `short:"f" long:"from" description:"Full path to boltDB file or etcd (e.g. 'bolt:///path/to/chronograf-v1.db' or 'etcd://user:pass@localhost:2379" default:"chronograf-v1.db"`
-	To   string `short:"t" long:"to" description:"Full path to boltDB file or etcd (e.g. 'bolt:///path/to/chronograf-v1.db' or 'etcd://user:pass@localhost:2379" default:"etcd://localhost:2379"`
+	To   string `short:"t" long:"to" description:"Full path to boltDB file or etcd (e.g. 'bolt:///path/to/chronograf-v1.db' or 'etcd://user:pass@localhost:2379"`
 }
 
 func (m *migrateCommand) Execute(args []string) error {
-	fmt.Printf("Performing non-idempotent db migration from %q to %q...\n", m.From, m.To)
 	if m.From == m.To {
 		errExit(errors.New("Cannot migrate to original source"))
 	}
+	if m.From == "" || m.To == "" {
+		errExit(errors.New("Both 'to' and 'from' must be defined in order to migrate."))
+	}
+	fmt.Printf("Performing non-idempotent db migration from %q to %q...\n", m.From, m.To)
 
 	ctx := context.TODO()
 
