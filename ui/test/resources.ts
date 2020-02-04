@@ -482,7 +482,7 @@ export const authLinks = {
   dashboards: '/chronograf/v1/dashboards',
   environment: '/chronograf/v1/env',
   external: {
-    statusFeed: 'https://www.influxdata.com/feed/json',
+    statusFeed: 'https://influxdata.com/feed/json',
   },
   layouts: '/chronograf/v1/layouts',
   logout: '/oauth/logout',
