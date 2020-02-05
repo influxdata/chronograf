@@ -382,7 +382,7 @@ describe('hydrateTemplates', () => {
       },
     }
 
-    const result = await hydrateTemplates(templates, {fetcher: fakeFetcher})
+    const result = await hydrateTemplates(templates, [], {fetcher: fakeFetcher})
 
     expect(result.find(t => t.id === 'a').values).toContainEqual({
       value: 'success',

@@ -8,6 +8,7 @@
 
 1. [#5348](https://github.com/influxdata/chronograf/pull/5348): Add query parameter for dashboard auto refresh
 1. [#5352](https://github.com/influxdata/chronograf/pull/5352): Add etcd as an alternate backend store
+1. [#5367](https://github.com/influxdata/chronograf/pull/5367): Template variables can now select their source database
 
 ### Other
 
