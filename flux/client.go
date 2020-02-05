@@ -77,7 +77,9 @@ func (c *Client) FluxEnabled() (bool, error) {
 	}
 	defer resp.Body.Close()
 
-	// TODO(goller): add comments about why you and watts did this.
+	// When flux is enabled, the response has 'Content-Type' set to 'application/json' and a body
+	// of `{"error":"mime: no media type"}`. Otherwise it is 'text/plain; charset=utf-8' with
+	// `Flux query service disabled.` in the body.
 	contentType := resp.Header.Get("Content-Type")
 	return contentType == "application/json", nil
 }
