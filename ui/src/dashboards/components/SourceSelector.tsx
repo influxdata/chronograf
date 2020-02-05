@@ -50,6 +50,7 @@ const SourceSelector: SFC<Props> = ({
         isDynamicSourceSelected={isDynamicSourceSelected}
         onChangeSource={onChangeSource}
         onSelectDynamicSource={onSelectDynamicSource}
+        widthPixels={250}
       />
       <Radio>
         <Radio.Button

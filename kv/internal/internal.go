@@ -354,11 +354,12 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 		}
 
 		template := &Template{
-			ID:      string(t.ID),
-			TempVar: t.Var,
-			Values:  vals,
-			Type:    t.Type,
-			Label:   t.Label,
+			ID:       string(t.ID),
+			TempVar:  t.Var,
+			Values:   vals,
+			Type:     t.Type,
+			Label:    t.Label,
+			SourceID: int64(t.SourceID),
 		}
 		if t.Query != nil {
 			template.Query = &TemplateQuery{
@@ -544,8 +545,9 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 				Var:    t.TempVar,
 				Values: vals,
 			},
-			Type:  t.Type,
-			Label: t.Label,
+			Type:     t.Type,
+			Label:    t.Label,
+			SourceID: int(t.SourceID),
 		}
 
 		if t.Query != nil {

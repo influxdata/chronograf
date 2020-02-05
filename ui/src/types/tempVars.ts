@@ -54,6 +54,7 @@ export interface Template {
   type: TemplateType
   label: string
   query?: TemplateQuery
+  sourceID?: string
 }
 
 export interface TemplateUpdate {

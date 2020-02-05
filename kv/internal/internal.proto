@@ -97,6 +97,7 @@ message Template {
 	string type                   = 4; // Type can be fieldKeys, tagKeys, tagValues, CSV, constant, query, measurements, databases
 	string label                  = 5; // Label is a user-facing description of the Template
 	TemplateQuery query           = 6; // Query is used to generate the choices for a template
+	int64 sourceID                = 7; // Source is the id of the data source
 }
 
 message TemplateValue {
@@ -233,7 +234,7 @@ message LogViewerColumn {
 	repeated ColumnEncoding Encodings                = 3; // Encodings is the array of encoded properties associated with a log viewer column
 }
 
-message ColumnEncoding {	
+message ColumnEncoding {
 	string Type                        = 1; // Type is the purpose of the encoding, for example: severity color
 	string Value                       = 2; // Value is what the encoding corresponds to
 	string Name                        = 3; // Name is the optional encoding name

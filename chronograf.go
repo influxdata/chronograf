@@ -183,10 +183,11 @@ type TemplateID string
 // Template represents a series of choices to replace TemplateVars within InfluxQL
 type Template struct {
 	TemplateVar
-	ID    TemplateID     `json:"id"`              // ID is the unique ID associated with this template
-	Type  string         `json:"type"`            // Type can be fieldKeys, tagKeys, tagValues, csv, constant, measurements, databases, map, influxql, text
-	Label string         `json:"label"`           // Label is a user-facing description of the Template
-	Query *TemplateQuery `json:"query,omitempty"` // Query is used to generate the choices for a template
+	ID       TemplateID     `json:"id"`              // ID is the unique ID associated with this template
+	Type     string         `json:"type"`            // Type can be fieldKeys, tagKeys, tagValues, csv, constant, measurements, databases, map, influxql, text
+	Label    string         `json:"label"`           // Label is a user-facing description of the Template
+	Query    *TemplateQuery `json:"query,omitempty"` // Query is used to generate the choices for a template
+	SourceID int            `json:"sourceID,string"` // Source is the id of the data source
 }
 
 // Query retrieves a Response from a TimeSeries.

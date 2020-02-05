@@ -7,7 +7,7 @@ import templateReplace, {
 
 import {resolveValues} from 'src/tempVars/utils'
 
-import {Template, RemoteDataState} from 'src/types'
+import {Source, Template, RemoteDataState} from 'src/types'
 
 type TemplateName = string
 
@@ -240,6 +240,7 @@ export async function hydrateTemplate(
 
 export async function hydrateTemplates(
   templates: Template[],
+  sources: Source[],
   hydrateOptions: HydrateTemplateOptions
 ) {
   const graph = graphFromTemplates(templates)
@@ -251,10 +252,17 @@ export async function hydrateTemplates(
 
     node.status = RemoteDataState.Loading
 
+    const templateSource = sources.find(
+      s => s.id === node.initialTemplate.sourceID
+    )
+    const proxyUrl = templateSource
+      ? templateSource.links.proxy
+      : hydrateOptions.proxyUrl
+
     node.hydratedTemplate = await hydrateTemplate(
       node.initialTemplate,
       resolvedTemplates,
-      hydrateOptions
+      {...hydrateOptions, proxyUrl}
     )
 
     node.status = RemoteDataState.Done
