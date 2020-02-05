@@ -13,7 +13,7 @@
       "name": "phpfpm – Accepted Connections",
       "queries": [
         {
-          "query": "SELECT non_negative_derivative(mean(\"accepted_conn\"),1s) FROM \":db:\".\":rp:\".\"phpfpm\"",
+          "query": "SELECT non_negative_derivative(mean(\"accepted_conn\"), 1s) FROM \":db:\".\":rp:\".\"phpfpm\"",
           "label": "count",
           "groupbys": [
             "\"pool\""
@@ -47,7 +47,7 @@
       "name": "phpfpm – Slow Requests",
       "queries": [
         {
-          "query": "SELECT non_negative_derivative(mean(\"slow_requests\"),1s) FROM \":db:\".\":rp:\".\"phpfpm\"",
+          "query": "SELECT non_negative_derivative(mean(\"slow_requests\"), 1s) FROM \":db:\".\":rp:\".\"phpfpm\"",
           "label": "count",
           "groupbys": [
             "\"pool\""
