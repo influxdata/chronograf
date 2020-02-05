@@ -21,17 +21,15 @@ type Dashboards struct {
 	Dir     string                                      // Dir is the directory containing the dashboards.
 	ReadDir func(dirname string) ([]os.FileInfo, error) // ReadDir reads the directory named by dirname and returns a list of directory entries sorted by filename.
 	Remove  func(name string) error                     // Remove file
-	IDs     chronograf.ID                               // IDs generate unique ids for new dashboards
 	Logger  chronograf.Logger
 }
 
 // NewDashboards constructs a dashboard store wrapping a file system directory
-func NewDashboards(dir string, ids chronograf.ID, logger chronograf.Logger) chronograf.DashboardsStore {
+func NewDashboards(dir string, logger chronograf.Logger) chronograf.DashboardsStore {
 	return &Dashboards{
 		Dir:     dir,
 		ReadDir: ioutil.ReadDir,
 		Remove:  os.Remove,
-		IDs:     ids,
 		Logger:  logger,
 	}
 }
