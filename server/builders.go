@@ -91,7 +91,7 @@ type MultiDashboardBuilder struct {
 // Build will construct a Dashboard store of filesystem and db-backed dashboards
 func (builder *MultiDashboardBuilder) Build(db chronograf.DashboardsStore) (*multistore.DashboardsStore, error) {
 	// These dashboards are those handled from a directory
-	files := filestore.NewDashboards(builder.Path, builder.ID, builder.Logger)
+	files := filestore.NewDashboards(builder.Path, builder.Logger)
 	// Acts as a front-end to both the bolt dashboard and filesystem dashboards.
 	// The idea here is that these stores form a hierarchy in which each is tried sequentially until
 	// the operation has success.  So, the database is preferred over filesystem
