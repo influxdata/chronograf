@@ -85,8 +85,9 @@ func hasFlux(ctx context.Context, src chronograf.Source) (bool, error) {
 	}
 
 	cli := &flux.Client{
-		URL:     url,
-		Timeout: 500 * time.Millisecond,
+		URL:                url,
+		InsecureSkipVerify: src.InsecureSkipVerify,
+		Timeout:            500 * time.Millisecond,
 	}
 
 	return cli.FluxEnabled()
