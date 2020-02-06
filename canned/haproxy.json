@@ -88,7 +88,7 @@
       "name": "HAProxy – Frontend Sessions/Second ",
       "queries": [
         {
-          "query": "SELECT non_negative_derivative(max(\"rate\")) AS \"sessions_per_second\" FROM \":db:\".\":rp:\".\"haproxy\"",
+          "query": "SELECT non_negative_derivative(max(\"rate\"), 1s) AS \"sessions_per_second\" FROM \":db:\".\":rp:\".\"haproxy\"",
           "groupbys": [],
           "wheres": []
         }
@@ -118,7 +118,7 @@
       "name": "HAProxy – Frontend Security Denials/Second",
       "queries": [
         {
-          "query": "SELECT non_negative_derivative(max(\"dreq\")) AS \"denials_per_second\" FROM \":db:\".\":rp:\".\"haproxy\"",
+          "query": "SELECT non_negative_derivative(max(\"dreq\"), 1s) AS \"denials_per_second\" FROM \":db:\".\":rp:\".\"haproxy\"",
           "groupbys": [],
           "wheres": []
         }
