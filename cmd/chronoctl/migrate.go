@@ -32,27 +32,30 @@ func (m *migrateCommand) Execute(args []string) error {
 	if m.From == "" || m.To == "" {
 		errExit(errors.New("Both 'to' and 'from' must be defined in order to migrate."))
 	}
-	fmt.Printf("Performing non-idempotent db migration from %q to %q...\n", m.From, m.To)
-	fmt.Println("NOTICE: New IDs will be generated for each resource.")
 
 	ctx := context.TODO()
 
-	datas, err := getData(ctx, m.From)
+	uFrom, err := url.Parse(m.From)
 	errExit(err)
 
-	errExit(saveData(ctx, m.To, datas))
+	uTo, err := url.Parse(m.To)
+	errExit(err)
+
+	datas, err := getData(ctx, uFrom)
+	errExit(err)
+
+	fmt.Printf("Performing non-idempotent db migration from %q to %q...\n", m.From, m.To)
+	fmt.Println("NOTICE: New IDs will be generated for each resource.")
+
+	errExit(saveData(ctx, uTo, datas))
 
 	fmt.Println("Migration successful!")
 	return nil
 }
 
-func openService(ctx context.Context, s string) (*kv.Service, error) {
-	u, err := url.Parse(s)
-	if err != nil {
-		return nil, err
-	}
-
+func openService(ctx context.Context, u *url.URL) (*kv.Service, error) {
 	var db kv.Store
+	var err error
 
 	switch u.Scheme {
 	case "bolt", "boltdb", "":
@@ -82,8 +85,16 @@ func openService(ctx context.Context, s string) (*kv.Service, error) {
 	return kv.NewService(ctx, db)
 }
 
-func getData(ctx context.Context, fromURI string) (*datas, error) {
-	from, err := openService(ctx, fromURI)
+func getData(ctx context.Context, fromURL *url.URL) (*datas, error) {
+	switch fromURL.Scheme {
+	case "bolt", "boltdb", "":
+		_, err := os.Stat(fromURL.Path)
+		if os.IsNotExist(err) {
+			return nil, err
+		}
+	}
+
+	from, err := openService(ctx, fromURL)
 	if err != nil {
 		return nil, err
 	}
@@ -141,10 +152,10 @@ func getData(ctx context.Context, fromURI string) (*datas, error) {
 	}, nil
 }
 
-func saveData(ctx context.Context, t string, datas *datas) error {
-	to, err := openService(ctx, t)
+func saveData(ctx context.Context, toURL *url.URL, datas *datas) error {
+	to, err := openService(ctx, toURL)
 	if err != nil {
-		return fmt.Errorf("failed to open service '%s': %s", t, err)
+		return fmt.Errorf("failed to open service '%s': %s", toURL.String(), err)
 	}
 	defer to.Close()
 
