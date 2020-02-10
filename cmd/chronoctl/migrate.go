@@ -32,13 +32,14 @@ func (m *migrateCommand) Execute(args []string) error {
 	if m.From == "" || m.To == "" {
 		errExit(errors.New("Both 'to' and 'from' must be defined in order to migrate."))
 	}
-	fmt.Printf("Performing non-idempotent db migration from %q to %q...\n", m.From, m.To)
-	fmt.Println("NOTICE: New IDs will be generated for each resource.")
 
 	ctx := context.TODO()
 
 	datas, err := getData(ctx, m.From)
 	errExit(err)
+
+	fmt.Printf("Performing non-idempotent db migration from %q to %q...\n", m.From, m.To)
+	fmt.Println("NOTICE: New IDs will be generated for each resource.")
 
 	errExit(saveData(ctx, m.To, datas))
 
@@ -46,7 +47,7 @@ func (m *migrateCommand) Execute(args []string) error {
 	return nil
 }
 
-func openService(ctx context.Context, s string) (*kv.Service, error) {
+func openService(ctx context.Context, s string, errOnMissing bool) (*kv.Service, error) {
 	u, err := url.Parse(s)
 	if err != nil {
 		return nil, err
@@ -58,6 +59,13 @@ func openService(ctx context.Context, s string) (*kv.Service, error) {
 	case "bolt", "boltdb", "":
 		if u.Host != "" {
 			return nil, errors.New("ambiguous uri")
+		}
+
+		if errOnMissing {
+			_, err := os.Stat(u.Path)
+			if os.IsNotExist(err) {
+				return nil, err
+			}
 		}
 
 		db, err = bolt.NewClient(ctx,
@@ -83,7 +91,7 @@ func openService(ctx context.Context, s string) (*kv.Service, error) {
 }
 
 func getData(ctx context.Context, fromURI string) (*datas, error) {
-	from, err := openService(ctx, fromURI)
+	from, err := openService(ctx, fromURI, true)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +150,7 @@ func getData(ctx context.Context, fromURI string) (*datas, error) {
 }
 
 func saveData(ctx context.Context, t string, datas *datas) error {
-	to, err := openService(ctx, t)
+	to, err := openService(ctx, t, false)
 	if err != nil {
 		return fmt.Errorf("failed to open service '%s': %s", t, err)
 	}
