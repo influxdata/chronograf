@@ -33,6 +33,7 @@ func (m *migrateCommand) Execute(args []string) error {
 		errExit(errors.New("Both 'to' and 'from' must be defined in order to migrate."))
 	}
 	fmt.Printf("Performing non-idempotent db migration from %q to %q...\n", m.From, m.To)
+	fmt.Println("NOTICE: New IDs will be generated for each resource.")
 
 	ctx := context.TODO()
 
