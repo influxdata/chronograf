@@ -3,12 +3,16 @@
 ### Bug Fixes
 
 1. [#5345](https://github.com/influxdata/chronograf/pull/5345): Log Viewer uses a default if the mapped severity doesn't exist
+1. [#5366](https://github.com/influxdata/chronograf/pull/5366): Pass insecure cert settings to flux client
+1. [#5368](https://github.com/influxdata/chronograf/pull/5368): Update `non_negative_derivative` calls to use 1s
+1. [#5363](https://github.com/influxdata/chronograf/pull/5363): Work around upstream CORS issue for news feed
 
 ### Features
 
 1. [#5348](https://github.com/influxdata/chronograf/pull/5348): Add query parameter for dashboard auto refresh
 1. [#5352](https://github.com/influxdata/chronograf/pull/5352): Add etcd as an alternate backend store
 1. [#5367](https://github.com/influxdata/chronograf/pull/5367): Template variables can now select their source database
+1. [#5362](https://github.com/influxdata/chronograf/pull/5362): Add migrate command to chronoctl
 
 ### Other
 
