@@ -1,12 +1,12 @@
-.PHONY: assets dep clean test gotest gotestrace jstest run run-dev ctags
-
 ifeq ($(OS), Windows_NT)
 	VERSION := $(shell git describe --exact-match --tags 2>nil)
+	GOBINDATA := $(shell go-bindata.exe --version 2>nil)
 else
 	VERSION := $(shell git describe --exact-match --tags 2>/dev/null)
+	GOBINDATA := $(shell which go-bindata 2> /dev/null)
 endif
+
 COMMIT ?= $(shell git rev-parse --short=8 HEAD)
-GOBINDATA := $(shell go list -f {{.Root}}  github.com/kevinburke/go-bindata 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
 
 SOURCES := $(shell find . -name '*.go' ! -name '*_gen.go' -not -path "./vendor/*" )
@@ -23,6 +23,8 @@ CTLBINARY=chronoctl
 GO111MODULE=on
 
 .DEFAULT_GOAL := all
+
+.PHONY: assets dep clean test gotest gotestrace jstest run run-dev ctags
 
 all: dep build
 
