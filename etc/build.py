@@ -320,7 +320,7 @@ def get_system_arch():
         arch = "amd64"
     elif arch == "386":
         arch = "i386"
-    elif arch == "aarch64"
+    elif arch == "aarch64":
         arch = "arm64"
     elif 'arm' in arch:
         # Prevent uname from reporting full ARM arch (eg 'armv7l')
@@ -494,7 +494,7 @@ def build(version=None,
         fullarch = arch
         if arch == "i386" or arch == "i686":
             arch = "386"
-        elif arch == "arm64" or arch == "aarch64"
+        elif arch == "arm64" or arch == "aarch64":
             arch = "arm64"
         elif "arm" in arch:
             arch = "arm"
@@ -506,7 +506,7 @@ def build(version=None,
             elif fullarch == "armhf" or fullarch == "arm":
                 build_command += "GOARM=6 "
             elif fullarch == "arm64":
-                pass. # No GOARM for arm64
+                pass # No GOARM for arm64
             else:
                 logging.error("Invalid ARM architecture specified: {}".format(arch))
                 logging.error("Please specify either 'armel', 'armhf', or 'arm64'.")
