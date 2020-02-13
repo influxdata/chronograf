@@ -14,7 +14,7 @@
 1. [#5367](https://github.com/influxdata/chronograf/pull/5367): Template variables can now select their source database
 1. [#5362](https://github.com/influxdata/chronograf/pull/5362): Add migrate command to chronoctl
 1. [#5308](https://github.com/influxdata/chronograf/pull/5308): The hosts page can be disabled by setting the new environment variable `HOST_PAGE_DISABLED` to `true`, or by passing in `--host-page-disabled` or `-H` flags
-1. [#5380](https://github.com/influxdata/chronograf/pull/5380): Add flag to redirect OAuth login page to OAuth IdP
+1. [#5380](https://github.com/influxdata/chronograf/pull/5380): Add ability to redirect OAuth login page to OAuth IdP via flag `--redir-auth-login` or environmtent variable `REDIR_AUTH_LOGIN`
 1. [#5383](https://github.com/influxdata/chronograf/pull/5383): Add support for 64-bit arm processors
 
 ### Other
