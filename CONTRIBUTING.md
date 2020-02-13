@@ -43,6 +43,12 @@ To assist in review for the PR, please add the following to your pull request co
 If you are going to be contributing back to Chronograf please take a second to sign our CLA, which can be found
 [on our website](https://influxdata.com/community/cla/).
 
+## Installing & Using Node
+
+You'll need to install Node 10.13.0 to run the frontend chronograf application.
+
+* [Install Node 10.13.0 LTS](https://nodejs.org/en/blog/release/v10.13.0/)
+
 ## Installing & Using Yarn
 
 You'll need to install Yarn to manage the frontend (JavaScript) dependencies.
@@ -53,7 +59,7 @@ To add a dependency via Yarn, for example, run `yarn add <dependency>` from with
 
 ## Installing Go
 
-Chronograf requires Go 1.10 or higher.
+Chronograf requires Go 1.13 or higher.
 
 ## Installing & Using Dep
 
