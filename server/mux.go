@@ -29,6 +29,7 @@ type MuxOpts struct {
 	Develop       bool                 // Develop loads assets from filesystem instead of bindata
 	Basepath      string               // URL path prefix under which all chronograf routes will be mounted
 	UseAuth       bool                 // UseAuth turns on Github OAuth and JWT
+	RedirAuth     string               // RedirAuth specifies which auth to redirect login.
 	Auth          oauth2.Authenticator // Auth is used to authenticate and authorize
 	ProviderFuncs []func(func(oauth2.Provider, oauth2.Mux))
 	StatusFeedURL string       // JSON Feed URL for the client Status page News Feed
@@ -392,8 +393,9 @@ func AuthAPI(opts MuxOpts, router chronograf.Router) (http.Handler, AuthRoutes) 
 			router.Handler("GET", logoutPath, m.Logout())
 			router.Handler("GET", callbackPath, m.Callback())
 			routes = append(routes, AuthRoute{
-				Name:  p.Name(),
-				Label: strings.Title(p.Name()),
+				Name:          p.Name(),
+				Label:         strings.Title(p.Name()),
+				RedirectLogin: p.Name() == opts.RedirAuth,
 				// AuthRoutes are content served to the page. When Basepath is set, it
 				// says that all content served to the page will be prefixed with the
 				// basepath. Since these routes are consumed by JS, it will need the

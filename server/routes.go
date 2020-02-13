@@ -10,11 +10,12 @@ import (
 
 // AuthRoute are the routes for each type of OAuth2 provider
 type AuthRoute struct {
-	Name     string `json:"name"`     // Name uniquely identifies the provider
-	Label    string `json:"label"`    // Label is a user-facing string to present in the UI
-	Login    string `json:"login"`    // Login is the route to the login redirect path
-	Logout   string `json:"logout"`   // Logout is the route to the logout redirect path
-	Callback string `json:"callback"` // Callback is the route the provider calls to exchange the code/state
+	Name          string `json:"name"`          // Name uniquely identifies the provider
+	Label         string `json:"label"`         // Label is a user-facing string to present in the UI
+	Login         string `json:"login"`         // Login is the route to the login redirect path
+	Logout        string `json:"logout"`        // Logout is the route to the logout redirect path
+	Callback      string `json:"callback"`      // Callback is the route the provider calls to exchange the code/state
+	RedirectLogin bool   `json:"redirectLogin"` // RedirectLogin tells the ui to redirect to this auth's login.
 }
 
 // AuthRoutes contains all OAuth2 provider routes.
