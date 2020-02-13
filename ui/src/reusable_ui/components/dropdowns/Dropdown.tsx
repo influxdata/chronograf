@@ -40,7 +40,7 @@ interface Props {
   maxMenuHeight?: number
   mode?: DropdownMode
   titleText?: string
-  zIndex?: number | string
+  zIndex?: string
 }
 
 interface State {
@@ -59,7 +59,7 @@ class Dropdown extends Component<Props, State> {
     mode: DropdownMode.Radio,
     titleText: '',
     selectedID: '',
-    zIndex: 'auto'
+    zIndex: 'auto',
   }
 
   public static Button = DropdownButton
@@ -77,7 +77,7 @@ class Dropdown extends Component<Props, State> {
   public render() {
     const {widthPixels, zIndex} = this.props
     const width = widthPixels ? `${widthPixels}px` : '100%'
-    const style = {width, zIndex}
+    const style = {width, zIndex} as React.CSSProperties
 
     this.validateChildCount()
     this.validateMode()
