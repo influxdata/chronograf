@@ -19,6 +19,7 @@ interface Props {
   onSelectDynamicSource?: () => void
   onChangeSource: (source: Source, type: QueryType) => void
   widthPixels?: number
+  zIndex?: number
 }
 
 interface SourceDropdownItem {
@@ -33,6 +34,7 @@ class SourceDropdown extends PureComponent<Props> {
         onChange={this.handleSelect}
         selectedID={this.selectedID}
         widthPixels={this.props.widthPixels}
+        zIndex={this.props.zIndex}
       >
         {this.dropdownItems}
       </Dropdown>

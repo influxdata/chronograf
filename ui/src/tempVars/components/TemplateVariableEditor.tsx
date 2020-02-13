@@ -168,6 +168,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
                 allowDynamicSource={true}
                 type={QueryType.InfluxQL}
                 widthPixels={0}
+                zIndex={9999}
               />
             </div>
             <div className="form-group col-sm-4">
