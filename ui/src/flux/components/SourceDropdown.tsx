@@ -19,7 +19,7 @@ interface Props {
   onSelectDynamicSource?: () => void
   onChangeSource: (source: Source, type: QueryType) => void
   widthPixels?: number
-  zIndex?: number
+  zIndex?: string
 }
 
 interface SourceDropdownItem {

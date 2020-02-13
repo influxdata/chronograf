@@ -98,6 +98,9 @@ const DEFAULT_SOURCE_DATABASE_ID = '0'
 
 @ErrorHandling
 class TemplateVariableEditor extends PureComponent<Props, State> {
+  // See comment in source changing handler functions at the bottom of the file
+  private key = +new Date()
+
   constructor(props) {
     super(props)
     const defaultState = {
@@ -168,7 +171,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
                 allowDynamicSource={true}
                 type={QueryType.InfluxQL}
                 widthPixels={0}
-                zIndex={9999}
+                zIndex={'9999'}
               />
             </div>
             <div className="form-group col-sm-4">
@@ -194,6 +197,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
               />
             </div>
             <TemplateBuilder
+              key={this.key}
               template={nextTemplate}
               templates={templates}
               source={selectedSource}
@@ -419,20 +423,25 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
     return 'Save'
   }
 
-  // When we change the source database here and below, we want to reset the template complete
   private handleSelectDynamicSource = () => {
     this.setState({
       isDynamicSourceSelected: true,
-      nextTemplate: DEFAULT_TEMPLATE(),
     })
+    // Changing this key to be the current timestamp then passing it to the current templateBuilder
+    // forces a re-mount, which re-runs its query, which gets the proper data when we change the source.
+    // A bit of a hack, sorry.
+    this.key = +new Date()
   }
 
   private handleChangeSource = (source: Source) => {
     this.setState({
       isDynamicSourceSelected: false,
       selectedSource: source,
-      nextTemplate: DEFAULT_TEMPLATE(),
     })
+    // Changing this key to be the current timestamp then passing it to the current templateBuilder
+    // forces a re-mount, which re-runs its query, which gets the proper data when we change the source.
+    // A bit of a hack, sorry.
+    this.key = +new Date()
   }
 
   private handleDelete = (): void => {
