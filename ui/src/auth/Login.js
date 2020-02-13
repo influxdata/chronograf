@@ -9,7 +9,7 @@ import SplashPage from 'shared/components/SplashPage'
 const VERSION = process.env.npm_package_version
 
 const Login = ({authData: {auth}}) => {
-  if (auth.links && auth.links.length===1 && auth.links[0].name === "auth0") {
+  if (auth.links && auth.links.length===1 && auth.links[0].redirectLogin) {
     window.location.href = auth.links[0].login
   }
 

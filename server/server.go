@@ -101,6 +101,8 @@ type Server struct {
 	Auth0Organizations []string `long:"auth0-organizations" description:"Auth0 organizations permitted to access Chronograf (comma separated)" env:"AUTH0_ORGS" env-delim:","`
 	Auth0SuperAdminOrg string   `long:"auth0-superadmin-org" description:"Auth0 organization from which users are automatically granted SuperAdmin status" env:"AUTH0_SUPERADMIN_ORG"`
 
+	RedirAuth string `long:"redir-auth-login" description:"Automatically redirect login to specified OAuth provider." env:"REDIR_AUTH_LOGIN"`
+
 	StatusFeedURL          string            `long:"status-feed-url" description:"URL of a JSON Feed to display as a News Feed on the client Status page." default:"https://influxdata.com/feed/json" env:"STATUS_FEED_URL"`
 	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/influxdata/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/influxdata/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
 	TelegrafSystemInterval time.Duration     `long:"telegraf-system-interval" default:"1m" description:"Duration used in the GROUP BY time interval for the hosts list" env:"TELEGRAF_SYSTEM_INTERVAL"`
@@ -403,6 +405,7 @@ func (s *Server) Serve(ctx context.Context) {
 		Auth:          auth,
 		Logger:        logger,
 		UseAuth:       s.useAuth(),
+		RedirAuth:     s.RedirAuth,
 		ProviderFuncs: providerFuncs,
 		Basepath:      s.Basepath,
 		StatusFeedURL: s.StatusFeedURL,
