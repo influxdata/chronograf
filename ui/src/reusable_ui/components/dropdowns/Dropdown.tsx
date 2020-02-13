@@ -40,6 +40,7 @@ interface Props {
   maxMenuHeight?: number
   mode?: DropdownMode
   titleText?: string
+  zIndex?: number | string
 }
 
 interface State {
@@ -58,6 +59,7 @@ class Dropdown extends Component<Props, State> {
     mode: DropdownMode.Radio,
     titleText: '',
     selectedID: '',
+    zIndex: 'auto'
   }
 
   public static Button = DropdownButton
@@ -73,15 +75,16 @@ class Dropdown extends Component<Props, State> {
   }
 
   public render() {
-    const {widthPixels} = this.props
+    const {widthPixels, zIndex} = this.props
     const width = widthPixels ? `${widthPixels}px` : '100%'
+    const style = {width, zIndex}
 
     this.validateChildCount()
     this.validateMode()
 
     return (
       <ClickOutside onClickOutside={this.collapseMenu}>
-        <div className={this.containerClassName} style={{width}}>
+        <div className={this.containerClassName} style={style}>
           {this.button}
           {this.menuItems}
         </div>
