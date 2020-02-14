@@ -6,7 +6,7 @@ import React, {
   KeyboardEvent,
 } from 'react'
 import {connect} from 'react-redux'
-import {get, isEmpty} from 'lodash'
+import {isEmpty} from 'lodash'
 
 // Utils
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -94,12 +94,20 @@ const TEMPLATE_BUILDERS = {
 
 const DEFAULT_TEMPLATE = DEFAULT_TEMPLATES[TemplateType.Databases]
 
-const DEFAULT_SOURCE_DATABASE_ID = '0'
+const getDefaultSourceDatabaseId = (sources: Source[]): string => {
+  let sourceId = '0'
+  sources.forEach(source => {
+    if (source.default) {
+      sourceId = source.id
+    }
+  })
+  return sourceId
+}
 
 @ErrorHandling
 class TemplateVariableEditor extends PureComponent<Props, State> {
   // See comment in source changing handler functions at the bottom of the file
-  private key = +new Date()
+  private key: number = +new Date()
 
   constructor(props) {
     super(props)
@@ -329,7 +337,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
     if (!this.canSave) {
       return
     }
-    const {onUpdate, onCreate, notify} = this.props
+    const {onUpdate, onCreate, notify, sources} = this.props
     const {
       nextTemplate,
       isNew,
@@ -337,7 +345,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
       selectedSource,
     } = this.state
 
-    nextTemplate.sourceID = DEFAULT_SOURCE_DATABASE_ID
+    nextTemplate.sourceID = getDefaultSourceDatabaseId(sources)
 
     if (!isDynamicSourceSelected) {
       nextTemplate.sourceID = selectedSource.id
@@ -461,10 +469,19 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state, props) => {
   const {sources} = state
-  const sourceID = get(props, 'template.sourceID', DEFAULT_SOURCE_DATABASE_ID)
+  const defaultSourceDatabaseId = getDefaultSourceDatabaseId(sources)
+  let sourceID = defaultSourceDatabaseId
+
+  // if props.template exists, we're loading a source, otherwise we're creating one
+  if (props.template) {
+    sourceID = props.template.sourceID
+  }
+
   const selectedSource = sources.find(source => source.id === sourceID)
-  const isDynamicSourceSelected =
-    selectedSource === undefined || sourceID === DEFAULT_SOURCE_DATABASE_ID
+  // Only show the dynamic source label when creating a new template variable.
+  // This is related to https://github.com/influxdata/chronograf/issues/5391
+  const isDynamicSourceSelected = false
+
   return {
     sources,
     isDynamicSourceSelected,
