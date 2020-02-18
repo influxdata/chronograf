@@ -97,7 +97,7 @@ message Template {
 	string type                   = 4; // Type can be fieldKeys, tagKeys, tagValues, CSV, constant, query, measurements, databases
 	string label                  = 5; // Label is a user-facing description of the Template
 	TemplateQuery query           = 6; // Query is used to generate the choices for a template
-	int64 sourceID                = 7; // Source is the id of the data source
+	string sourceID               = 7; // Source is the id of the data source
 }
 
 message TemplateValue {

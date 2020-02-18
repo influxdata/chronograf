@@ -251,10 +251,10 @@ export async function hydrateTemplates(
       .map(t => t.hydratedTemplate)
 
     node.status = RemoteDataState.Loading
+    const {initialTemplate} = node
 
-    const templateSource = sources.find(
-      s => s.id === node.initialTemplate.sourceID
-    )
+    const templateSource = sources.find(s => s.id === initialTemplate.sourceID)
+
     const proxyUrl = templateSource
       ? templateSource.links.proxy
       : hydrateOptions.proxyUrl

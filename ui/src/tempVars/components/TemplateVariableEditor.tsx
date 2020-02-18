@@ -6,6 +6,7 @@ import React, {
   KeyboardEvent,
 } from 'react'
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 import {isEmpty} from 'lodash'
 
 // Utils
@@ -94,15 +95,7 @@ const TEMPLATE_BUILDERS = {
 
 const DEFAULT_TEMPLATE = DEFAULT_TEMPLATES[TemplateType.Databases]
 
-const getDefaultSourceDatabaseId = (sources: Source[]): string => {
-  let sourceId = '0'
-  sources.forEach(source => {
-    if (source.default) {
-      sourceId = source.id
-    }
-  })
-  return sourceId
-}
+const DYNAMIC_SOURCE_DATABASE_ID = 'dynamic'
 
 @ErrorHandling
 class TemplateVariableEditor extends PureComponent<Props, State> {
@@ -111,11 +104,26 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
 
   constructor(props) {
     super(props)
+
+    let sourceID = DYNAMIC_SOURCE_DATABASE_ID
+
+    // If props.template exists, we're loading a source. If it doesn't, we're creating one
+    if (props.template && props.template.sourceID) {
+      sourceID = props.template.sourceID
+    }
+
+    const isDynamicSourceSelected = sourceID === DYNAMIC_SOURCE_DATABASE_ID
+
+    const selectedSource = isDynamicSourceSelected
+      ? // The source id of the current dynamic source is available as a url param
+        props.sources.find(source => source.id === props.params.sourceID)
+      : props.sources.find(source => source.id === sourceID)
+
     const defaultState = {
       savingStatus: RemoteDataState.NotStarted,
       deletingStatus: RemoteDataState.NotStarted,
-      isDynamicSourceSelected: props.isDynamicSourceSelected,
-      selectedSource: props.selectedSource,
+      isDynamicSourceSelected,
+      selectedSource,
     }
 
     const {template} = this.props
@@ -337,7 +345,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
     if (!this.canSave) {
       return
     }
-    const {onUpdate, onCreate, notify, sources} = this.props
+    const {onUpdate, onCreate, notify} = this.props
     const {
       nextTemplate,
       isNew,
@@ -345,7 +353,7 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
       selectedSource,
     } = this.state
 
-    nextTemplate.sourceID = getDefaultSourceDatabaseId(sources)
+    nextTemplate.sourceID = DYNAMIC_SOURCE_DATABASE_ID
 
     if (!isDynamicSourceSelected) {
       nextTemplate.sourceID = selectedSource.id
@@ -467,28 +475,14 @@ const mapDispatchToProps = {
   notify: notifyActionCreator,
 }
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = state => {
   const {sources} = state
-  const defaultSourceDatabaseId = getDefaultSourceDatabaseId(sources)
-  let sourceID = defaultSourceDatabaseId
-
-  // if props.template exists, we're loading a source, otherwise we're creating one
-  if (props.template) {
-    sourceID = props.template.sourceID
-  }
-
-  const selectedSource = sources.find(source => source.id === sourceID)
-  // Only show the dynamic source label when creating a new template variable.
-  // This is related to https://github.com/influxdata/chronograf/issues/5391
-  const isDynamicSourceSelected = false
 
   return {
     sources,
-    isDynamicSourceSelected,
-    selectedSource,
   }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(
-  TemplateVariableEditor
+  withRouter(TemplateVariableEditor)
 )

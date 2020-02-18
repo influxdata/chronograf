@@ -359,7 +359,7 @@ func MarshalDashboard(d chronograf.Dashboard) ([]byte, error) {
 			Values:   vals,
 			Type:     t.Type,
 			Label:    t.Label,
-			SourceID: int64(t.SourceID),
+			SourceID: t.SourceID,
 		}
 		if t.Query != nil {
 			template.Query = &TemplateQuery{
@@ -528,6 +528,7 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 	}
 
 	templates := make([]chronograf.Template, len(pb.Templates))
+
 	for i, t := range pb.Templates {
 		vals := make([]chronograf.TemplateValue, len(t.Values))
 		for j, v := range t.Values {
@@ -547,7 +548,11 @@ func UnmarshalDashboard(data []byte, d *chronograf.Dashboard) error {
 			},
 			Type:     t.Type,
 			Label:    t.Label,
-			SourceID: int(t.SourceID),
+			SourceID: t.SourceID,
+		}
+
+		if t.SourceID == "" {
+			template.SourceID = "dynamic"
 		}
 
 		if t.Query != nil {

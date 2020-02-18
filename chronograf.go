@@ -187,7 +187,7 @@ type Template struct {
 	Type     string         `json:"type"`            // Type can be fieldKeys, tagKeys, tagValues, csv, constant, measurements, databases, map, influxql, text
 	Label    string         `json:"label"`           // Label is a user-facing description of the Template
 	Query    *TemplateQuery `json:"query,omitempty"` // Query is used to generate the choices for a template
-	SourceID int            `json:"sourceID,string"` // Source is the id of the data source
+	SourceID string         `json:"sourceID"`        // Source is the id of the data source
 }
 
 // Query retrieves a Response from a TimeSeries.
