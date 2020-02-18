@@ -1,20 +1,28 @@
-## v1.8.0
+## v1.8.1
+
+### Bug Fixes
+
+### Features
+
+### Other
+
+## v1.8.0 [2020-02-18]
 
 ### Bug Fixes
 
 1. [#5345](https://github.com/influxdata/chronograf/pull/5345): Log Viewer uses a default if the mapped severity doesn't exist
-1. [#5366](https://github.com/influxdata/chronograf/pull/5366): Pass insecure cert settings to flux client
-1. [#5368](https://github.com/influxdata/chronograf/pull/5368): Update `non_negative_derivative` calls to use 1s
-1. [#5363](https://github.com/influxdata/chronograf/pull/5363): Work around upstream CORS issue for news feed
+1. [#5366](https://github.com/influxdata/chronograf/pull/5366): Insecure cert settings are now passed to the flux client
+1. [#5368](https://github.com/influxdata/chronograf/pull/5368): Queries using `non_negative_derivative` calls now correctly use 1s
+1. [#5363](https://github.com/influxdata/chronograf/pull/5363): Fix minor CORS issue for news feed
 
 ### Features
 
-1. [#5348](https://github.com/influxdata/chronograf/pull/5348): Add query parameter for dashboard auto refresh
-1. [#5352](https://github.com/influxdata/chronograf/pull/5352): Add etcd as an alternate backend store
+1. [#5348](https://github.com/influxdata/chronograf/pull/5348): A a query parameter can now control the dashboard auto refresh rate, `refresh`
+1. [#5352](https://github.com/influxdata/chronograf/pull/5352): etcd is now able to be used as an alternate backend store
 1. [#5367](https://github.com/influxdata/chronograf/pull/5367): Template variables can now select their source database
-1. [#5362](https://github.com/influxdata/chronograf/pull/5362): Add migrate command to chronoctl
+1. [#5362](https://github.com/influxdata/chronograf/pull/5362): chronoctl now supports Migrate
 1. [#5308](https://github.com/influxdata/chronograf/pull/5308): The hosts page can be disabled by setting the new environment variable `HOST_PAGE_DISABLED` to `true`, or by passing in `--host-page-disabled` or `-H` flags
-1. [#5380](https://github.com/influxdata/chronograf/pull/5380): Add ability to redirect OAuth login page to OAuth IdP via flag `--redir-auth-login` or environmtent variable `REDIR_AUTH_LOGIN`
+1. [#5380](https://github.com/influxdata/chronograf/pull/5380): OAuth logins can be redirected from the login page to OAuth IdP via flag `--redir-auth-login` or environmtent variable `REDIR_AUTH_LOGIN`
 1. [#5383](https://github.com/influxdata/chronograf/pull/5383): Add support for 64-bit arm processors
 
 ### Other
