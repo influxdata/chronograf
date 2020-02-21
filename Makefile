@@ -13,10 +13,11 @@ SOURCES := $(shell find . -name '*.go' ! -name '*_gen.go' -not -path "./vendor/*
 UISOURCES := $(shell find ui -type f -not \( -path ui/build/\* -o -path ui/node_modules/\* -prune \) )
 
 unexport LDFLAGS
-LDFLAGS=-ldflags "-s -X main.commit=${COMMIT}"
 ifdef VERSION
-	LDFLAGS += -X main.version=$(VERSION)
+	TMP_BUILD_VERSION = -X main.version=$(VERSION)
 endif
+LDFLAGS=-ldflags "-s -X main.commit=${COMMIT} ${TMP_BUILD_VERSION}"
+unexport TMP_BUILD_VERSION
 
 BINARY=chronograf
 CTLBINARY=chronoctl
