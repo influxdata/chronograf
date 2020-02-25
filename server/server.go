@@ -2,8 +2,13 @@ package server
 
 import (
 	"context"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net"
@@ -102,6 +107,9 @@ type Server struct {
 	Auth0SuperAdminOrg string   `long:"auth0-superadmin-org" description:"Auth0 organization from which users are automatically granted SuperAdmin status" env:"AUTH0_SUPERADMIN_ORG"`
 
 	RedirAuth string `long:"redir-auth-login" description:"Automatically redirect login to specified OAuth provider." env:"REDIR_AUTH_LOGIN"`
+
+	PubKey     string         `long:"pub-key" description:"Public key for super admin?? authorization?" env:"PUB_KEY"`
+	PubKeyFile flags.Filename `long:"pub-key-file" description:"File location of public key for super admin?? authorization?" env:"PUB_KEY_FILE"`
 
 	StatusFeedURL          string            `long:"status-feed-url" description:"URL of a JSON Feed to display as a News Feed on the client Status page." default:"https://influxdata.com/feed/json" env:"STATUS_FEED_URL"`
 	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/influxdata/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/influxdata/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
@@ -335,6 +343,47 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 	}
 }
 
+var publicKey *rsa.PublicKey // pubKey is for the simple super admin jwt-esque check.
+
+// Set the public key preferring from file, if set.
+func (s *Server) setPubkey() error {
+	pubKey := []byte(s.PubKey)
+
+	if fil := s.PubKeyFile; fil != "" {
+		key, err := ioutil.ReadFile(string(s.PubKeyFile))
+		if err != nil {
+			return err
+		}
+		pubKey = key
+	}
+
+	if len(pubKey) == 0 {
+		return nil
+	}
+
+	block, _ := pem.Decode(pubKey)
+	if block == nil {
+		return errors.New("no key found")
+	}
+
+	switch block.Type {
+	case "PUBLIC KEY":
+		key, err := x509.ParsePKIXPublicKey(block.Bytes)
+		if err != nil {
+			return err
+		}
+		pKey, ok := key.(*rsa.PublicKey)
+		if !ok {
+			return errors.New("expected RSA public key")
+		}
+		publicKey = pKey
+	default:
+		return fmt.Errorf("unsupported key type %q", block.Type)
+	}
+
+	return nil
+}
+
 // Serve starts and runs the chronograf server
 func (s *Server) Serve(ctx context.Context) {
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
@@ -345,6 +394,12 @@ func (s *Server) Serve(ctx context.Context) {
 			WithField("CustomLink", "invalid").
 			Error(err)
 		return
+	}
+
+	err = s.setPubkey()
+	if err != nil {
+		logger.Error("Unable to set public key ", err)
+		os.Exit(1)
 	}
 
 	var db kv.Store
