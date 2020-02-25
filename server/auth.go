@@ -7,7 +7,10 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/organizations"
@@ -33,7 +36,7 @@ func AuthorizedToken(auth oauth2.Authenticator, logger chronograf.Logger, next h
 			WithField("method", r.Method).
 			WithField("url", r.URL)
 
-		if validSignature(log, r.Header.Get("message"), r.Header.Get("signature")) {
+		if validSignature(log, r.Header.Get("Authorization")) {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -91,17 +94,49 @@ func RawStoreAccess(logger chronograf.Logger, next http.HandlerFunc) http.Handle
 	}
 }
 
+// nonce returns an nonce message to be signed.
+func nonce(expires time.Duration) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Expires", msgLastSet.Add(expires).Format(time.RFC1123))
+
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte(signerMessage))
+	}
+}
+
+var (
+	signerMessage = uuid.New().String() // signerMessage is the message to sign with the superadmin user's private key.
+	msgLastSet    = time.Now()
+)
+
+func rotateSuperAdminNonce(ctx context.Context, expires time.Duration) {
+	tick := time.NewTicker(expires)
+	defer tick.Stop()
+
+	for {
+		select {
+		case <-tick.C:
+			msgLastSet = time.Now()
+			signerMessage = uuid.New().String()
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
 // validSignature validates the message was signed with the private key corresponding
 // to the public key given to chronograf on start. Ideally, we would provide the
 // message to be signed to the user in another call. This would allow old signature/msg
 // pairs to be "expired".
-func validSignature(log chronograf.Logger, msg, sig string) bool {
-	if publicKey == nil || msg == "" || sig == "" {
+func validSignature(log chronograf.Logger, authHeader string) bool {
+	if publicKey == nil || authHeader == "" {
 		return false
 	}
 
+	sig := strings.TrimSpace(strings.TrimPrefix(authHeader, "CHRONOGRAF-SHA256"))
+
 	h := crypto.SHA256.New()
-	h.Write([]byte(msg))
+	h.Write([]byte(signerMessage))
 	d := h.Sum(nil)
 
 	data, err := base64.StdEncoding.DecodeString(sig)
@@ -147,7 +182,7 @@ func AuthorizedUser(
 			return
 		}
 
-		if validSignature(log, r.Header.Get("message"), r.Header.Get("signature")) {
+		if validSignature(log, r.Header.Get("Authorization")) {
 			// If there is super admin auth, then set the organization id to be the deault org id on context
 			// so that calls like hasOrganizationContext as used in Organization Config service
 			// method OrganizationConfig can successfully get the organization id

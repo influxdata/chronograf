@@ -108,8 +108,9 @@ type Server struct {
 
 	RedirAuth string `long:"redir-auth-login" description:"Automatically redirect login to specified OAuth provider." env:"REDIR_AUTH_LOGIN"`
 
-	PubKey     string         `long:"pub-key" description:"Public key for super admin?? authorization?" env:"PUB_KEY"`
-	PubKeyFile flags.Filename `long:"pub-key-file" description:"File location of public key for super admin?? authorization?" env:"PUB_KEY_FILE"`
+	PubKey          string         `long:"pub-key" description:"Public key for super admin?? authorization?" env:"PUB_KEY"`
+	PubKeyFile      flags.Filename `long:"pub-key-file" description:"File location of public key for super admin?? authorization?" env:"PUB_KEY_FILE"`
+	NonceExpiration time.Duration  `long:"nonce-expiration" default:"10m" description:"Duration in which a signed nonce is valid. Used to authenticate superadmin via token." env:"NONCE_EXPIRATION"`
 
 	StatusFeedURL          string            `long:"status-feed-url" description:"URL of a JSON Feed to display as a News Feed on the client Status page." default:"https://influxdata.com/feed/json" env:"STATUS_FEED_URL"`
 	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/influxdata/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/influxdata/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
@@ -386,6 +387,8 @@ func (s *Server) setPubkey() error {
 
 // Serve starts and runs the chronograf server
 func (s *Server) Serve(ctx context.Context) {
+	go rotateSuperAdminNonce(ctx, s.NonceExpiration)
+
 	logger := clog.New(clog.ParseLevel(s.LogLevel))
 	customLinks, err := NewCustomLinks(s.CustomLinks)
 	if err != nil {
@@ -467,6 +470,7 @@ func (s *Server) Serve(ctx context.Context) {
 		CustomLinks:   customLinks,
 		PprofEnabled:  s.PprofEnabled,
 		DisableGZip:   s.DisableGZip,
+		nonceExpire:   s.NonceExpiration,
 	}, service)
 
 	// Add chronograf's version header to all requests
