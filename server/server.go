@@ -108,9 +108,9 @@ type Server struct {
 
 	RedirAuth string `long:"redir-auth-login" description:"Automatically redirect login to specified OAuth provider." env:"REDIR_AUTH_LOGIN"`
 
-	PubKey          string         `long:"pub-key" description:"Public key for super admin?? authorization?" env:"PUB_KEY"`
-	PubKeyFile      flags.Filename `long:"pub-key-file" description:"File location of public key for super admin?? authorization?" env:"PUB_KEY_FILE"`
-	NonceExpiration time.Duration  `long:"nonce-expiration" default:"10m" description:"Duration in which a signed nonce is valid. Used to authenticate superadmin via token." env:"NONCE_EXPIRATION"`
+	PubKey          string         `long:"pub-key" description:"Public key or superadmin token authentication" env:"PUB_KEY"`
+	PubKeyFile      flags.Filename `long:"pub-key-file" description:"File location of public key for superadmin token authentication." env:"PUB_KEY_FILE"`
+	NonceExpiration time.Duration  `long:"nonce-expiration" default:"10m" description:"Duration in which a signed nonce is valid. Used for superadmin token authentication." env:"NONCE_EXPIRATION"`
 
 	StatusFeedURL          string            `long:"status-feed-url" description:"URL of a JSON Feed to display as a News Feed on the client Status page." default:"https://influxdata.com/feed/json" env:"STATUS_FEED_URL"`
 	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/influxdata/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/influxdata/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
@@ -365,24 +365,13 @@ func (s *Server) setPubkey() error {
 	block, _ := pem.Decode(pubKey)
 	if block == nil {
 		return errors.New("no key found")
-	}
-
-	switch block.Type {
-	case "PUBLIC KEY":
-		key, err := x509.ParsePKIXPublicKey(block.Bytes)
-		if err != nil {
-			return err
-		}
-		pKey, ok := key.(*rsa.PublicKey)
-		if !ok {
-			return errors.New("expected RSA public key")
-		}
-		publicKey = pKey
-	default:
+	} else if block.Type != "PUBLIC KEY" {
 		return fmt.Errorf("unsupported key type %q", block.Type)
 	}
 
-	return nil
+	var err error
+	publicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
+	return err
 }
 
 // Serve starts and runs the chronograf server
