@@ -49,19 +49,19 @@ func (t *tokenCommand) Execute(args []string) error {
 
 func parsePrivKey(privKeyFile string) (*rsa.PrivateKey, error) {
 	if privKeyFile == "" {
-		errExit(errors.New("No private key file specified"))
+		return nil, errors.New("No private key file specified")
 	}
 
 	pemBytes, err := ioutil.ReadFile(string(privKeyFile))
 	if err != nil {
-		errExit(fmt.Errorf("Failed to read file: %s", err.Error()))
+		return nil, fmt.Errorf("Failed to read file: %s", err.Error())
 	}
 
 	block, _ := pem.Decode(pemBytes)
 	if block == nil {
-		errExit(errors.New("No PEM formatted key found"))
+		return nil, errors.New("No PEM formatted key found")
 	} else if block.Type != "RSA PRIVATE KEY" {
-		errExit(fmt.Errorf("Unsupported key type %q", block.Type))
+		return nil, fmt.Errorf("Unsupported key type %q", block.Type)
 	}
 
 	return x509.ParsePKCS1PrivateKey(block.Bytes)
@@ -70,12 +70,12 @@ func parsePrivKey(privKeyFile string) (*rsa.PrivateKey, error) {
 func getNonceMsg(url string) ([]byte, error) {
 	req, err := http.NewRequest("GET", url+"/nonce", nil)
 	if err != nil {
-		errExit(fmt.Errorf("Failed to create request: %s", err.Error()))
+		return nil, fmt.Errorf("Failed to create request: %s", err.Error())
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		errExit(fmt.Errorf("Failed to get nonce: %s", err.Error()))
+		return nil, fmt.Errorf("Failed to get nonce: %s", err.Error())
 	}
 	defer resp.Body.Close()
 
