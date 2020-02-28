@@ -141,17 +141,17 @@ func validSignature(log chronograf.Logger, authHeader string) bool {
 
 	data, err := base64.StdEncoding.DecodeString(sig)
 	if err != nil {
-		log.Error("Failed to base64 decode signature")
+		log.Debug("Failed to base64 decode signature")
 		return false
 	}
 
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, d, data)
 	if err != nil {
-		log.Error("Failed to verify signature: ", err)
+		log.Debug("Failed to verify signature: ", err)
 		return false
 	}
 
-	return err == nil
+	return true
 }
 
 // AuthorizedUser extracts the user name and provider from context. If the

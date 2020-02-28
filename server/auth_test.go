@@ -2,6 +2,10 @@ package server
 
 import (
 	"context"
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,6 +17,7 @@ import (
 	"github.com/influxdata/chronograf/mocks"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/roles"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAuthorizedToken(t *testing.T) {
@@ -63,6 +68,7 @@ func TestAuthorizedToken(t *testing.T) {
 		}
 	}
 }
+
 func TestAuthorizedUser(t *testing.T) {
 	type fields struct {
 		UsersStore         chronograf.UsersStore
@@ -70,10 +76,11 @@ func TestAuthorizedUser(t *testing.T) {
 		Logger             chronograf.Logger
 	}
 	type args struct {
-		principal *oauth2.Principal
-		scheme    string
-		useAuth   bool
-		role      string
+		principal  *oauth2.Principal
+		scheme     string
+		useAuth    bool
+		role       string
+		authHeader string
 	}
 	tests := []struct {
 		name                   string
@@ -85,6 +92,29 @@ func TestAuthorizedUser(t *testing.T) {
 		hasServerContext       bool
 		authorized             bool
 	}{
+		{
+			name: "Use superadmin token",
+			fields: fields{
+				UsersStore: &mocks.UsersStore{},
+				OrganizationsStore: &mocks.OrganizationsStore{
+					DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+						return &chronograf.Organization{
+							ID: "0",
+						}, nil
+					},
+				},
+				Logger: clog.New(clog.DebugLevel),
+			},
+			args: args{
+				useAuth:    true,
+				authHeader: genToken(t),
+			},
+			hasOrganizationContext: true,
+			hasSuperAdminContext:   false,
+			hasRoleContext:         false,
+			hasServerContext:       true,
+			authorized:             true,
+		},
 		{
 			name: "Not using auth",
 			fields: fields{
@@ -1800,6 +1830,9 @@ func TestAuthorizedUser(t *testing.T) {
 				"http://any.url", // can be any valid URL as we are bypassing mux
 				nil,
 			)
+			if tt.args.authHeader != "" {
+				r.Header.Set("Authorization", tt.args.authHeader)
+			}
 			if tt.args.principal == nil {
 				r = r.WithContext(context.WithValue(r.Context(), oauth2.PrincipalKey, nil))
 			} else {
@@ -1945,7 +1978,28 @@ func TestRawStoreAccess(t *testing.T) {
 			if hasServerCtx != tt.wants.hasServerContext {
 				t.Errorf("%q. RawStoreAccess().Context().Server = %v, expected %v", tt.name, hasServerCtx, tt.wants.hasServerContext)
 			}
-
 		})
 	}
+}
+
+func TestValidSignature(t *testing.T) {
+	require.True(t, validSignature(mocks.NewLogger(), genToken(t)))
+}
+
+func genToken(t *testing.T) string {
+	key, err := rsa.GenerateKey(rand.Reader, 1024)
+	require.NoError(t, err)
+
+	signerMessage = "abc123"
+	sha256 := crypto.SHA256
+	h := sha256.New()
+	h.Write([]byte(signerMessage))
+	d := h.Sum(nil)
+
+	x, err := rsa.SignPKCS1v15(rand.Reader, key, sha256, d)
+	require.NoError(t, err)
+
+	publicKey = key.Public().(*rsa.PublicKey)
+
+	return base64.StdEncoding.EncodeToString(x)
 }
