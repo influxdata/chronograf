@@ -18,7 +18,7 @@ require (
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/go-cmp v0.3.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/google/uuid v1.1.1 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/goreleaser/goreleaser v0.97.0 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0 // indirect

@@ -2,9 +2,15 @@ package server
 
 import (
 	"context"
+	"crypto"
+	"crypto/rsa"
+	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/oauth2"
 	"github.com/influxdata/chronograf/organizations"
@@ -29,6 +35,11 @@ func AuthorizedToken(auth oauth2.Authenticator, logger chronograf.Logger, next h
 			WithField("remote_addr", r.RemoteAddr).
 			WithField("method", r.Method).
 			WithField("url", r.URL)
+
+		if validSignature(log, r.Header.Get("Authorization")) {
+			next.ServeHTTP(w, r)
+			return
+		}
 
 		ctx := r.Context()
 		// We do not check the authorization of the principal.  Those
@@ -83,6 +94,66 @@ func RawStoreAccess(logger chronograf.Logger, next http.HandlerFunc) http.Handle
 	}
 }
 
+// nonce returns an nonce message to be signed.
+func nonce(expires time.Duration) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Expires", msgLastSet.Add(expires).Format(time.RFC1123))
+
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte(signerMessage))
+	}
+}
+
+var (
+	signerMessage = uuid.New().String() // signerMessage is the message to sign with the superadmin user's private key.
+	msgLastSet    = time.Now()
+)
+
+func rotateSuperAdminNonce(ctx context.Context, expires time.Duration) {
+	tick := time.NewTicker(expires)
+	defer tick.Stop()
+
+	for {
+		select {
+		case <-tick.C:
+			msgLastSet = time.Now()
+			signerMessage = uuid.New().String()
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+// validSignature validates the message was signed with the private key corresponding
+// to the public key given to chronograf on start. Ideally, we would provide the
+// message to be signed to the user in another call. This would allow old signature/msg
+// pairs to be "expired".
+func validSignature(log chronograf.Logger, authHeader string) bool {
+	if publicKey == nil || authHeader == "" {
+		return false
+	}
+
+	sig := strings.TrimSpace(strings.TrimPrefix(authHeader, "CHRONOGRAF-SHA256"))
+
+	h := crypto.SHA256.New()
+	h.Write([]byte(signerMessage))
+	d := h.Sum(nil)
+
+	data, err := base64.StdEncoding.DecodeString(sig)
+	if err != nil {
+		log.Debug("Failed to base64 decode signature")
+		return false
+	}
+
+	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, d, data)
+	if err != nil {
+		log.Debug("Failed to verify signature: ", err)
+		return false
+	}
+
+	return true
+}
+
 // AuthorizedUser extracts the user name and provider from context. If the
 // user and provider can be found on the context, we look up the user by their
 // name and provider. If the user is found, we verify that the user has at at
@@ -108,6 +179,18 @@ func AuthorizedUser(
 		if err != nil {
 			log.Error(fmt.Sprintf("Failed to retrieve the default organization: %v", err))
 			Error(w, http.StatusForbidden, "User is not authorized", logger)
+			return
+		}
+
+		if validSignature(log, r.Header.Get("Authorization")) {
+			// If there is super admin auth, then set the organization id to be the deault org id on context
+			// so that calls like hasOrganizationContext as used in Organization Config service
+			// method OrganizationConfig can successfully get the organization id
+			ctx = context.WithValue(ctx, organizations.ContextKey, defaultOrg.ID)
+
+			// And if there is super admin auth, then give the user raw access to the DataStore
+			r = r.WithContext(serverContext(ctx))
+			next(w, r)
 			return
 		}
 

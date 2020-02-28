@@ -8,6 +8,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	_ "net/http/pprof"
 
@@ -36,6 +37,7 @@ type MuxOpts struct {
 	CustomLinks   []CustomLink // Any custom external links for client's User menu
 	PprofEnabled  bool         // Mount pprof routes for profiling
 	DisableGZip   bool         // Optionally disable gzip.
+	nonceExpire   time.Duration
 }
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
@@ -149,6 +151,9 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 	/* Health */
 	router.GET("/ping", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
+
+	/* Auth */
+	router.GET("/nonce", nonce(opts.nonceExpire))
 
 	/* API */
 	// Organizations
