@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
@@ -17,14 +18,15 @@ import (
 
 func init() {
 	parser.AddCommand("token",
-		"Get current token for superadmin user (if configured)",
+		"Get current token for a superadmin user (chronograf must be started with a public key)",
 		"Token gets and signs the nonce, providing an expiring token to use in the header: 'Authorization: CHRONOGRAF-SHA256 xxx'",
 		&tokenCommand{})
 }
 
 type tokenCommand struct {
 	ChronoURL   string         `long:"chronograf-url" default:"http://localhost:8888" description:"Chronograf's URL." env:"CHRONOGRAF_URL"`
-	PrivKeyFile flags.Filename `long:"priv-key-file" description:"File location of private key for superadmin token authentication." env:"PRIV_KEY_FILE"`
+	SkipVerify  bool           `long:"skip-verify" short:"k" default:"false" description:"Don't verify TLS cert at endpoint (allows self-signed certs)."`
+	PrivKeyFile flags.Filename `long:"priv-key-file" description:"File location of private key (corresponding to the public key chronograf was started with) for superadmin token authentication." env:"PRIV_KEY_FILE"`
 }
 
 func (t *tokenCommand) Execute(args []string) error {
@@ -33,7 +35,7 @@ func (t *tokenCommand) Execute(args []string) error {
 		errExit(fmt.Errorf("Failed to parse RSA key: %s", err.Error()))
 	}
 
-	msg, err := getNonceMsg(t.ChronoURL)
+	msg, err := getNonceMsg(t.ChronoURL, t.SkipVerify)
 	if err != nil {
 		errExit(err)
 	}
@@ -67,13 +69,19 @@ func parsePrivKey(privKeyFile string) (*rsa.PrivateKey, error) {
 	return x509.ParsePKCS1PrivateKey(block.Bytes)
 }
 
-func getNonceMsg(url string) ([]byte, error) {
+func getNonceMsg(url string, insecureSkipVerify bool) ([]byte, error) {
 	req, err := http.NewRequest("GET", url+"/nonce", nil)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create request: %s", err.Error())
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	hc := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecureSkipVerify},
+		},
+	}
+
+	resp, err := hc.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get nonce: %s", err.Error())
 	}
