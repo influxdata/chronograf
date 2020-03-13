@@ -1,3 +1,6 @@
+interface Authors {
+  name: string
+}
 interface JSONFeedDataItem {
   id: string
   url: string
@@ -6,9 +9,7 @@ interface JSONFeedDataItem {
   date_published: string
   date_modified: string
   image: string
-  author: {
-    name: string
-  }
+  authors: Authors[]
 }
 
 export interface JSONFeedData {
