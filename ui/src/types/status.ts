@@ -1,6 +1,7 @@
 interface Authors {
   name: string
 }
+
 interface JSONFeedDataItem {
   id: string
   url: string

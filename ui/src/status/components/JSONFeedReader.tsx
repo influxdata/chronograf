@@ -29,7 +29,9 @@ const JSONFeedReader: SFC<Props> = ({data}) =>
                   <a href={url} target="_blank">
                     <h6>{title}</h6>
                   </a>
-                  <span>by {authors.map(author => author.name).join(" & ")}</span>
+                  <span>
+                    by {authors.map(author => author.name).join(' & ')}
+                  </span>
                 </div>
                 <div className="newsfeed--content">
                   {image ? <img src={image} /> : null}
