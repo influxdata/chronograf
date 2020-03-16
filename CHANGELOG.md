@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5426](https://github.com/influxdata/chronograf/pull/5426): Update Flux functions for latest Flux version.
+
 ### Features
 
 ### Other
