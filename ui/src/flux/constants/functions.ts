@@ -218,7 +218,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: '',
     desc: 'Applies an aggregate function to fixed windows of time.',
-    example: 'aggregateWindow(every: v.windowPeriod, fn: mean)',
+    example: 'aggregateWindow(every: 1m, fn: mean)',
     category: 'Aggregates',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/aggregatewindow/',
@@ -5253,7 +5253,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: '',
     desc:
       'Groups records based on a time value. New columns are added to uniquely identify each window. Those columns are added to the group key of the output tables. A single input record will be placed into zero or more output tables, depending on the specific windowing function.',
-    example: 'window(every: v.windowPeriod)',
+    example: 'window(every: 1m)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/window/',
