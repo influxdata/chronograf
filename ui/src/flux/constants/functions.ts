@@ -17,10 +17,9 @@ export const FROM: FluxToolbarFunction = {
   package: '',
   desc:
     'Used to retrieve data from an InfluxDB data source. It returns a stream of tables from the specified bucket. Each unique series is contained within its own table. Each record in the table represents a single point in the series.',
-  example: 'from(bucket: "example-bucket")',
+  example: 'from(bucket: "db/rp")',
   category: 'Inputs',
-  link:
-    'https://docs.influxdata.com/flux/latest/stdlib/built-in/inputs/from/',
+  link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/inputs/from/',
 }
 
 export const RANGE: FluxToolbarFunction = {
@@ -127,8 +126,7 @@ export const STRINGS_TITLE: FluxToolbarFunction = {
   desc: 'Converts a string to title case.',
   example: 'strings.title(v: r._value)',
   category: 'Transformations',
-  link:
-    'https://docs.influxdata.com/flux/latest/stdlib/strings/title/',
+  link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/title/',
 }
 
 export const STRINGS_TRIM: FluxToolbarFunction = {
@@ -150,8 +148,7 @@ export const STRINGS_TRIM: FluxToolbarFunction = {
   desc: 'Removes specified leading and trailing characters from a string.',
   example: 'strings.trim(v: r._value, cutset: "_")',
   category: 'Transformations',
-  link:
-    'https://docs.influxdata.com/flux/latest/stdlib/strings/trim/',
+  link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trim/',
 }
 
 export const FUNCTIONS: FluxToolbarFunction[] = [
@@ -517,8 +514,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the hour of a specified time. Results range from `[0-23]`.',
     example: 'date.hour(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/hour/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/hour/',
   },
   {
     name: 'date.microsecond',
@@ -534,8 +530,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the microsecond of a specified time. Results range from `[1-999999]`.',
     example: 'date.microsecond(t: 2019-07-17T12:05:21.012934584Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/microsecond/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/microsecond/',
   },
   {
     name: 'date.millisecond',
@@ -551,8 +546,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the millisecond of a specified time. Results range from `[1-999]`.',
     example: 'date.millisecond(t: 2019-07-17T12:05:21.012934584Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/millisecond/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/millisecond/',
   },
   {
     name: 'date.minute',
@@ -568,8 +562,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the minute of a specified time. Results range from `[0-59]`.',
     example: 'date.minute(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/minute/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/minute/',
   },
   {
     name: 'date.month',
@@ -584,8 +577,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the month of a specified time. Results range from `[1-12]`.',
     example: 'date.month(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/month/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/month/',
   },
   {
     name: 'date.monthDay',
@@ -601,8 +593,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the day of the month for a specified time. Results range from `[1-31]`.',
     example: 'date.monthDay(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/monthday/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/monthday/',
   },
   {
     name: 'date.nanosecond',
@@ -618,8 +609,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the nanosecond of a specified time. Results range from `[1-999999999]`.',
     example: 'date.nanosecond(t: 2019-07-17T12:05:21.012934584Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/nanosecond/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/nanosecond/',
   },
   {
     name: 'date.quarter',
@@ -635,8 +625,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the quarter of the year for a specified time. Results range from `[1-4]`.',
     example: 'date.quarter(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/quarter/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/quarter/',
   },
   {
     name: 'date.second',
@@ -652,8 +641,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the second of a specified time. Results range from `[0-59]`.',
     example: 'date.second(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/second/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/second/',
   },
   {
     name: 'date.truncate',
@@ -675,8 +663,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Truncates the time to a specified unit. Results range from `[0-59]`.',
     example: 'date.truncate(t: 2019-07-17T12:05:21.012Z, unit: 1s)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/truncate/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/truncate/',
   },
   {
     name: 'date.week',
@@ -692,8 +679,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the ISO week of the year for a specified time. Results range from `[1-53]`.',
     example: 'date.week(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/week/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/week/',
   },
   {
     name: 'date.weekDay',
@@ -709,8 +695,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the day of the week for a specified time. Results range from `[0-6]`.',
     example: 'date.weekDay(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/weekday/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/weekday/',
   },
   {
     name: 'date.year',
@@ -725,8 +710,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the year of a specified time.',
     example: 'date.year(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/year/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/year/',
   },
   {
     name: 'date.yearDay',
@@ -742,8 +726,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the day of the year for a specified time. Results include leap days and range from `[1-366]`.',
     example: 'date.yearDay(t: 2019-07-17T12:05:21.012Z)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/date/yearday/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/date/yearday/',
   },
   {
     name: 'derivative',
@@ -947,8 +930,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     example:
       'experimental.group(columns: ["host", "_measurement"], mode: "extend")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/group/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/group/',
   },
   {
     name: 'experimental.objectKeys',
@@ -979,8 +961,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Sets multiple static column values on all records.',
     example: 'experimental.set(o: {column1: "value1", column2: "value2"})',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/set/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/set/',
   },
   {
     name: 'experimental.subDuration',
@@ -1035,10 +1016,9 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'experimental',
     desc:
       'Writes data to an InfluxDB v2.0 bucket, but in a different structure than the built-in `to()` function.',
-    example: 'experimental.to(bucket: "example-bucket", org: "example-org")',
+    example: 'experimental.to(bucket: "db/rp", org: "example-org")',
     category: 'Outputs',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/experimental/to/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/to/',
   },
   {
     name: 'elapsed',
@@ -1721,8 +1701,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     example:
       'http.post(url: "http://localhost:9999/", headers: {x:"a", y:"b"}, data: bytes(v: "body"))',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/http/post/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/http/post/',
   },
   {
     name: 'increase',
@@ -1822,8 +1801,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Converts a value into JSON bytes.',
     example: 'json.encode(v: r._value)',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/json/encode/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/json/encode/',
   },
   {
     name: 'kaufmansAMA',
@@ -2159,8 +2137,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the arccosine of x in radians.',
     example: 'math.acos(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/acos/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/acos/',
   },
   {
     name: 'math.acosh',
@@ -2175,8 +2152,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the inverse hyperbolic cosine of x.',
     example: 'math.acosh(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/acosh/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/acosh/',
   },
   {
     name: 'math.asin',
@@ -2192,8 +2168,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the arcsine of x in radians.',
     example: 'math.asin(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/asin/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/asin/',
   },
   {
     name: 'math.asinh',
@@ -2208,8 +2183,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the inverse hyperbolic sine of x.',
     example: 'math.asinh(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/asinh/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/asinh/',
   },
   {
     name: 'math.atan',
@@ -2224,8 +2198,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the arctangent of x in radians.',
     example: 'math.atan(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/atan/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/atan/',
   },
   {
     name: 'math.atan2',
@@ -2246,8 +2219,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the arc tangent of y/x, using the signs of the two to determine the quadrant of the return value.',
     example: 'math.atan2(y: r.y_coord, x: r.x_coord)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/atan2/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/atan2/',
   },
   {
     name: 'math.atanh',
@@ -2263,8 +2235,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the inverse hyperbolic tangent of x.',
     example: 'math.atanh(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/atanh/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/atanh/',
   },
   {
     name: 'math.cbrt',
@@ -2279,8 +2250,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the cube root of x.',
     example: 'math.cbrt(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/cbrt/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/cbrt/',
   },
   {
     name: 'math.ceil',
@@ -2295,8 +2265,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the least integer value greater than or equal to x.',
     example: 'math.ceil(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/ceil/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/ceil/',
   },
   {
     name: 'math.copysign',
@@ -2316,8 +2285,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns a value with the magnitude of x and the sign of y.',
     example: 'math.copysign(x: r._magnitude, r._sign)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/copysign/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/copysign/',
   },
   {
     name: 'math.cos',
@@ -2347,8 +2315,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the hyperbolic cosine of x.',
     example: 'math.cosh(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/cosh/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/cosh/',
   },
   {
     name: 'math.dim',
@@ -2398,8 +2365,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the complementary error function of x.',
     example: 'math.erfc(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/erfc/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/erfc/',
   },
   {
     name: 'math.erfcinv',
@@ -2415,8 +2381,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the inverse of `math.erfc()`.',
     example: 'math.erfcinv(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/erfcinv/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/erfcinv/',
   },
   {
     name: 'math.erfinv',
@@ -2432,8 +2397,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the inverse error function of x.',
     example: 'math.erfinv(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/erfinv/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/erfinv/',
   },
   {
     name: 'math.exp',
@@ -2463,8 +2427,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the base-2 exponential of x (`2**x`).',
     example: 'math.exp2(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/exp2/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/exp2/',
   },
   {
     name: 'math.expm1',
@@ -2479,8 +2442,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the base-e exponential of x minus 1 (`e**x - 1`).',
     example: 'math.expm1(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/expm1/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/expm1/',
   },
   {
     name: 'math.float64bits',
@@ -2496,8 +2458,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the IEEE 754 binary representation of f, with the sign bit of f and the result in the same bit position.',
     example: 'math.float64bits(f: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/float64bits/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/float64bits/',
   },
   MATH_FLOOR,
   {
@@ -2513,8 +2474,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Breaks f into a normalized fraction and an integral power of two.',
     example: 'math.frexp(f: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/frexp/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/frexp/',
   },
   {
     name: 'math.gamma',
@@ -2529,8 +2489,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the Gamma function of x.',
     example: 'math.gamma(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/gamma/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/gamma/',
   },
   {
     name: 'math.hypot',
@@ -2551,8 +2510,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the square root of `p*p + q*q`, taking care to avoid overflow and underflow.',
     example: 'math.hypot(p: r.opp, p: r.adj)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/hypot/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/hypot/',
   },
   {
     name: 'math.ilogb',
@@ -2567,8 +2525,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the binary exponent of x as an integer.',
     example: 'math.ilogb(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/ilogb/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/ilogb/',
   },
   {
     name: 'math.isInf',
@@ -2588,8 +2545,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Reports whether f is an infinity, according to sign.',
     example: 'math.isInf(f: r._value, sign: r.sign)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/isinf/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/isinf/',
   },
   {
     name: 'math.isNaN',
@@ -2604,8 +2560,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Reports whether f is an IEEE 754 NaN value.',
     example: 'math.isNaN(f: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/isnan/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/isnan/',
   },
   {
     name: 'math.j0',
@@ -2675,8 +2630,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns `frac × 2**exp`. It is the inverse of `math.frexp()`.',
     example: 'math.ldexp(frac: r.frac, exp: r.exp)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/ldexp/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/ldexp/',
   },
   {
     name: 'math.lgamma',
@@ -2692,8 +2646,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the natural logarithm and sign (-1 or +1) of `math.gamma(x:x)`.',
     example: 'math.lgamma(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/lgamma/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/lgamma/',
   },
   {
     name: 'math.log',
@@ -2723,8 +2676,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the natural logarithm of 1 plus its argument x.',
     example: 'math.log1p(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/log1p/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/log1p/',
   },
   {
     name: 'math.log2',
@@ -2739,8 +2691,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the binary logarithm of x.',
     example: 'math.log2(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/log2/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/log2/',
   },
   {
     name: 'math.logb',
@@ -2755,8 +2706,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the binary exponent of x.',
     example: 'math.logb(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/logb/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/logb/',
   },
   {
     name: 'math.mInf',
@@ -2772,8 +2722,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns positive infinity if `sign >= 0`, negative infinity if `sign < 0`.',
     example: 'math.mInf(sign: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/minf/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/minf/',
   },
   {
     name: 'math.mMax',
@@ -2793,8 +2742,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the larger of x or y.',
     example: 'math.mMax(x: r.x_value, y: r.y_value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/mmax/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/mmax/',
   },
   {
     name: 'math.mMin',
@@ -2814,8 +2762,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the smaller of x or y.',
     example: 'math.mMin(x: r.x_value, y: r.y_value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/mmin/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/mmin/',
   },
   {
     name: 'math.mod',
@@ -2851,8 +2798,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns integer and fractional floating-point numbers that sum to f. Both values have the same sign as f.',
     example: 'math.modf(f: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/modf/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/modf/',
   },
   {
     name: 'math.NaN',
@@ -2881,8 +2827,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the next representable float value after x towards y.',
     example: 'math.nextafter(x: r.x_value, y: r.y_value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/nextafter/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/nextafter/',
   },
   {
     name: 'math.pow',
@@ -2917,8 +2862,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the base-10 exponential of n, `10**n`.',
     example: 'math.pow10(n: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/pow10/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/pow10/',
   },
   {
     name: 'math.remainder',
@@ -2938,8 +2882,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the IEEE 754 floating-point remainder of `x / y`.',
     example: 'math.remainder(x: r.numerator, y: r.denominator)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/remainder/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/remainder/',
   },
   {
     name: 'math.round',
@@ -2954,8 +2897,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the nearest integer, rounding half away from zero.',
     example: 'math.round(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/round/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/round/',
   },
   {
     name: 'math.roundtoeven',
@@ -2970,8 +2912,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the nearest integer, rounding ties to even.',
     example: 'math.roundtoeven(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/roundtoeven/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/roundtoeven/',
   },
   {
     name: 'math.signbit',
@@ -2986,8 +2927,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Reports whether x is negative or negative zero.',
     example: 'math.signbit(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/signbit/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/signbit/',
   },
   {
     name: 'math.sin',
@@ -3017,8 +2957,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the values of `math.sin(x:x)` and `math.cos(x:x)`.',
     example: 'math.sincos(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/sincos/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/sincos/',
   },
   {
     name: 'math.sinh',
@@ -3033,8 +2972,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the hyperbolic sine of x.',
     example: 'math.sinh(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/sinh/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/sinh/',
   },
   {
     name: 'math.sqrt',
@@ -3049,8 +2987,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the square root of x.',
     example: 'math.sqrt(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/sqrt/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/sqrt/',
   },
   {
     name: 'math.tan',
@@ -3080,8 +3017,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the hyperbolic tangent of x.',
     example: 'math.tanh(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/tanh/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/tanh/',
   },
   {
     name: 'math.trunc',
@@ -3096,8 +3032,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the integer value of x.',
     example: 'math.trunc(x: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/math/trunc/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/math/trunc/',
   },
   {
     name: 'math.y0',
@@ -3476,8 +3411,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'experimental/query',
     desc: 'Returns all data from a specified bucket within given time bounds.',
-    example:
-      'query.fromRange(bucket: "example-bucket", start: v.timeRangeStart)',
+    example: 'query.fromRange(bucket: "db/rp", start: v.timeRangeStart)',
     category: 'Inputs',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/fromrange/',
@@ -3520,7 +3454,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc:
       'Queries data from a specified bucket within given time bounds, filters data by measurement, field, and optional predicate expressions.',
     example:
-      'query.inBucket(bucket: "example-bucket", start: v.timeRangeStart, measurement: "measurement_name", fields: ["field_name"], predicate: (r) => r.host == "host1")',
+      'query.inBucket(bucket: "db/rp", start: v.timeRangeStart, measurement: "measurement_name", fields: ["field_name"], predicate: (r) => r.host == "host1")',
     category: 'Inputs',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/inbucket/',
@@ -3564,8 +3498,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Parses a string into a regular expression and returns a regexp object.',
     example: 'regexp.compile(v: "[a-zA-Z]")',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/compile/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/compile/',
   },
   {
     name: 'regexp.findString',
@@ -3585,8 +3518,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the left-most regular expression match in a string.',
     example: 'regexp.findString(r: /foo.?/, v: "seafood fool")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/findstring/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/findstring/',
   },
   {
     name: 'regexp.findStringIndex',
@@ -3623,8 +3555,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the source string used to compile a regular expression.',
     example: 'regexp.getString(r: /[a-zA-Z]/)',
     category: 'Type Conversions',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/getstring/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/getstring/',
   },
   {
     name: 'regexp.matchRegexpString',
@@ -3661,8 +3592,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Escapes all regular expression metacharacters inside of a string.',
     example: 'regexp.quoteMeta(v: ".+*?()|[]{}^$")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/quotemeta/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/quotemeta/',
   },
   {
     name: 'regexp.replaceAllString',
@@ -3715,8 +3645,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Splits a string into substrings separated by regular expression matches and returns an array of `i` substrings between matches.',
     example: 'regexp.splitRegexp(r: /a*/, v: "abaabaccadaaae", i: 5)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/regexp/splitregexp/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/regexp/splitregexp/',
   },
   {
     name: 'relativeStrengthIndex',
@@ -3771,8 +3700,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the current Flux version.',
     example: 'runtime.version()',
     category: 'Miscellaneous',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/runtime/version/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/runtime/version/',
   },
   {
     name: 'sample',
@@ -3809,8 +3737,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Retrieves a secret from the InfluxDB secret store.',
     example: 'secrets.get(key: "KEY_NAME")',
     category: 'Miscellaneous',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/secrets/get/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/secrets/get/',
   },
   {
     name: 'set',
@@ -3868,8 +3795,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Delays execution by a specified duration.',
     example: 'sleep(duration: 5s)',
     category: 'Miscellaneous',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/misc/sleep/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/misc/sleep/',
   },
   {
     name: 'sort',
@@ -4082,8 +4008,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Compares the lexicographical order of two strings.',
     example: 'strings.compare(v: "a", t: "b")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/compare/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/compare/',
   },
   {
     name: 'strings.containsAny',
@@ -4104,8 +4029,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Reports whether a specified string contains characters from another string.',
     example: 'strings.containsAny(v: "abc", chars: "and")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/containsany/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/containsany/',
   },
   {
     name: 'strings.containsStr',
@@ -4125,8 +4049,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Reports whether a string contains a specified substring.',
     example: 'strings.containsStr(v: "This and that", substr: "and")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/containsstr/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/containsstr/',
   },
   {
     name: 'strings.countStr',
@@ -4147,8 +4070,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Counts the number of non-overlapping instances of a substring appears in a string.',
     example: 'strings.countStr(v: "Hello mellow fellow", substr: "ello")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/countstr/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/countstr/',
   },
   {
     name: 'strings.equalFold',
@@ -4169,8 +4091,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Reports whether two UTF-8 strings are equal under Unicode case-folding.',
     example: 'strings.equalFold(v: "Go", t: "go")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/equalfold/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/equalfold/',
   },
   {
     name: 'strings.hasPrefix',
@@ -4190,8 +4111,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Indicates if a string begins with a specified prefix.',
     example: 'strings.hasPrefix(v: "go gopher", t: "go")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/hasprefix/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/hasprefix/',
   },
   {
     name: 'strings.hasSuffix',
@@ -4211,8 +4131,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Indicates if a string ends with a specified suffix.',
     example: 'strings.hasPrefix(v: "gopher go", t: "go")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/hassuffix/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/hassuffix/',
   },
   {
     name: 'strings.index',
@@ -4233,8 +4152,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the index of the first instance of a substring in a string. If the substring is not present, it returns `-1`.',
     example: 'strings.index(v: "go gopher", substr: "go")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/index-func/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/index-func/',
   },
   {
     name: 'strings.indexAny',
@@ -4255,8 +4173,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the index of the first instance of specified characters in a string. If none of the specified characters are present, it returns -1.',
     example: 'strings.indexAny(v: "chicken", chars: "aeiouy")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/indexany/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/indexany/',
   },
   {
     name: 'strings.isDigit',
@@ -4271,8 +4188,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Tests if a single-character string is a digit (0-9).',
     example: 'strings.isDigit(v: "7")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/isdigit/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/isdigit/',
   },
   {
     name: 'strings.isLetter',
@@ -4287,8 +4203,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Tests if a single-character string is a letter (a-z, A-Z).',
     example: 'strings.isLetter(v: "A")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/isletter/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/isletter/',
   },
   {
     name: 'strings.isLower',
@@ -4303,8 +4218,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Tests if a single-character string is lowercase.',
     example: 'strings.isLower(v: "a")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/islower/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/islower/',
   },
   {
     name: 'strings.isUpper',
@@ -4319,8 +4233,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Tests if a single-character string is uppercase.',
     example: 'strings.isUpper(v: "A")',
     category: 'Tests',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/isupper/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/isupper/',
   },
   {
     name: 'strings.joinStr',
@@ -4341,8 +4254,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Concatenates elements of a string array into a single string using a specified separator.',
     example: 'strings.joinStr(arr: ["a", "b", "c"], v: ",")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/joinstr/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/joinstr/',
   },
   {
     name: 'strings.lastIndex',
@@ -4363,8 +4275,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Returns the index of the last instance of a substring in a string. If the substring is not present, the function returns -1.',
     example: 'strings.lastIndex(v: "go gopher", t: "go")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/lastindex/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/lastindex/',
   },
   {
     name: 'strings.lastIndexAny',
@@ -4406,8 +4317,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns a string consisting of `i` copies of a specified string.',
     example: 'strings.repeat(v: "ha", i: 3)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/repeat/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/repeat/',
   },
   {
     name: 'strings.replace',
@@ -4438,8 +4348,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Replaces the first `i` non-overlapping instances of a substring with a specified replacement.',
     example: 'strings.replace(v: "oink oink oink", t: "oink", u: "moo", i: 2)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/replace/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/replace/',
   },
   {
     name: 'strings.replaceAll',
@@ -4465,8 +4374,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Replaces all non-overlapping instances of a substring with a specified replacement.',
     example: 'strings.replaceAll(v: "oink oink oink", t: "oink", u: "moo")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/replaceall/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/replaceall/',
   },
   {
     name: 'strings.split',
@@ -4487,8 +4395,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Splits a string on a specified separator and returns an array of substrings.',
     example: 'strings.split(v: "a flux of foxes", t: " ")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/split/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/split/',
   },
   {
     name: 'strings.splitAfter',
@@ -4509,8 +4416,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Splits a string after a specified separator and returns an array of substrings.',
     example: 'strings.splitAfter(v: "a flux of foxes", t: " ")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/splitafter/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/splitafter/',
   },
   {
     name: 'strings.splitAfterN',
@@ -4536,8 +4442,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Splits a string after a specified separator and returns an array of `i` substrings.',
     example: 'strings.splitAfterN(v: "a flux of foxes", t: " ", i: 2)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/splitaftern/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/splitaftern/',
   },
   {
     name: 'strings.splitN',
@@ -4563,8 +4468,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Splits a string on a specified separator and returns an array of `i` substrings.',
     example: 'strings.splitN(v: "a flux of foxes", t: " ", i: 2)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/splitn/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/splitn/',
   },
   {
     name: 'strings.strlen',
@@ -4579,8 +4483,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the length of a string.',
     example: 'strings.strlen(v: "a flux of foxes")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/strlen/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/strlen/',
   },
   {
     name: 'strings.substring',
@@ -4605,8 +4508,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns a substring based on start and end parameters.',
     example: 'strings.substring(v: "influx", start: 0, end: 3)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/substring/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/substring/',
   },
   STRINGS_TITLE,
   {
@@ -4622,8 +4524,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Converts a string to lower case.',
     example: 'strings.toLower(v: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/tolower/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/tolower/',
   },
   {
     name: 'strings.toTitle',
@@ -4638,8 +4539,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Converts all characters in a string to title case.',
     example: 'strings.toTitle(v: "a flux of foxes")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/totitle/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/totitle/',
   },
   {
     name: 'strings.toUpper',
@@ -4654,8 +4554,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Converts a string to upper case.',
     example: 'strings.toUpper(v: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/toupper/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/toupper/',
   },
   STRINGS_TRIM,
   {
@@ -4676,8 +4575,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Removes specified leading characters from a string.',
     example: 'strings.trimLeft(v: ".abc", cutset: ".")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/trimleft/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimleft/',
   },
   {
     name: 'strings.trimPrefix',
@@ -4698,8 +4596,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Removes a prefix from a string. Strings that do not start with the prefix are returned unchanged.',
     example: 'strings.trimPrefix(v: r._value, prefix: "abc_")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/trimprefix/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimprefix/',
   },
   {
     name: 'strings.trimRight',
@@ -4719,8 +4616,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Removes specified trailing characters from a string.',
     example: 'strings.trimRight(v: "abc.", cutset: ".")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/trimright/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimright/',
   },
   {
     name: 'strings.trimSpace',
@@ -4735,8 +4631,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Removes leading and trailing spaces from a string.',
     example: 'strings.trimSpace(v: r._value)',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/trimspace/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimspace/',
   },
   {
     name: 'strings.trimSuffix',
@@ -4757,8 +4652,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'Removes a suffix from a string. Strings that do not end with the suffix are returned unchanged.',
     example: 'strings.trimSuffix(v: r._value, suffix: "_123")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/strings/trimsuffix/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/strings/trimsuffix/',
   },
   {
     name: 'sum',
@@ -4783,8 +4677,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Returns the current system time.',
     example: 'system.time()',
     category: 'Miscellaneous',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/system/time/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/system/time/',
   },
   {
     name: 'tableFind',
@@ -4833,8 +4726,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Tests if an input stream is empty.',
     example: 'testing.assertEmpty()',
     category: 'Test',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/testing/assertempty/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/testing/assertempty/',
   },
   {
     name: 'testing.assertEquals',
@@ -4880,8 +4772,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     desc: 'Produces a diff between two streams.',
     example: 'testing.assertEquals(got: got, want: want)',
     category: 'Test',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/testing/diff/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/testing/diff/',
   },
   {
     name: 'time',
@@ -5010,10 +4901,9 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: '',
     desc: 'The `to()` function writes data to an InfluxDB v2.0 bucket.',
-    example: 'to(bucket: "example-bucket", org: "example-org")',
+    example: 'to(bucket: "db/rp", org: "example-org")',
     category: 'Outputs',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/built-in/outputs/to/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/outputs/to/',
   },
   {
     name: 'toBool',
@@ -5207,8 +5097,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of tag keys for a specific measurement.',
-    example:
-      'v1.measurementTagKeys(bucket: "example-bucket", measurement: "mem")',
+    example: 'v1.measurementTagKeys(bucket: "db/rp", measurement: "mem")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurementtagkeys/',
@@ -5236,7 +5125,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of tag values for a specific measurement.',
     example:
-      'v1.measurementTagValues(bucket: "example-bucket", measurement: "mem", tag: "host")',
+      'v1.measurementTagValues(bucket: "db/rp", measurement: "mem", tag: "host")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurementtagvalues/',
@@ -5252,7 +5141,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of measurements in a specific bucket.',
-    example: 'v1.measurements(bucket: "example-bucket")',
+    example: 'v1.measurements(bucket: "db/rp")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurements/',
@@ -5280,10 +5169,9 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of tag keys for all series that match the predicate.',
-    example: 'v1.tagKeys(bucket: "example-bucket")',
+    example: 'v1.tagKeys(bucket: "db/rp")',
     category: 'Transformations',
-    link:
-      'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/tagkeys/',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/tagkeys/',
   },
   {
     name: 'v1.tagValues',
@@ -5313,7 +5201,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of unique values for a given tag.',
-    example: 'v1.tagValues(bucket: "example-bucket")',
+    example: 'v1.tagValues(bucket: "db/rp")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/tagvalues/',
