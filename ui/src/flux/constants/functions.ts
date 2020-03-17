@@ -479,9 +479,25 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'csv',
     desc: 'Retrieves data from a comma-separated value (CSV) data source.',
-    example: 'csv.from(file: "/path/to/data-file.csv")',
+    example: 'csv.from(csv: csvData)',
     category: 'Inputs',
     link: 'https://docs.influxdata.com/flux/latest/stdlib/csv/from/',
+  },
+  {
+    name: 'csv.from',
+    args: [
+      {
+        name: 'url',
+        desc: 'The URL to retrieve annotated CSV from.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/csv',
+    desc: 'Retrieves annotated CSV data from a URL.',
+    example: 'csv.from(url: "http://example.com/data.csv")',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/csv/from/',
   },
   {
     name: 'cumulativeSum',
