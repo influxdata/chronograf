@@ -1,4 +1,3 @@
-// Types
 import {FluxToolbarFunction} from 'src/types/flux'
 
 export const FROM: FluxToolbarFunction = {
@@ -18,7 +17,7 @@ export const FROM: FluxToolbarFunction = {
   package: '',
   desc:
     'Used to retrieve data from an InfluxDB data source. It returns a stream of tables from the specified bucket. Each unique series is contained within its own table. Each record in the table represents a single point in the series.',
-  example: 'from(bucket: "telegraf/autogen")',
+  example: 'from(bucket: "db/rp")',
   category: 'Inputs',
   link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/inputs/from/',
 }
@@ -29,12 +28,12 @@ export const RANGE: FluxToolbarFunction = {
     {
       name: 'start',
       desc: 'The earliest time to include in results.',
-      type: 'Duration',
+      type: 'Duration | Time',
     },
     {
       name: 'stop',
       desc: 'The latest time to include in results. Defaults to `now()`.',
-      type: 'Duration',
+      type: 'Duration | Time',
     },
   ],
   package: '',
@@ -153,6 +152,33 @@ export const STRINGS_TRIM: FluxToolbarFunction = {
 }
 
 export const FUNCTIONS: FluxToolbarFunction[] = [
+  {
+    name: 'aggregate.rate',
+    args: [
+      {
+        name: 'every',
+        desc: 'Duration of windows.',
+        type: 'Duration',
+      },
+      {
+        name: 'groupColumns',
+        desc: 'List of columns to group by. Defaults to [].',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'unit',
+        desc:
+          'Time duration to use when calculating the rate. Defaults to `1s`.',
+        type: 'Array of Strings',
+      },
+    ],
+    package: 'experimental/aggregate',
+    desc: 'Calculates the range of change per windows of time.',
+    example: 'aggregate.rate(every: 1m, unit: 1s)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/aggregate/rate/',
+  },
   {
     name: 'aggregateWindow',
     args: [
@@ -453,9 +479,25 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'csv',
     desc: 'Retrieves data from a comma-separated value (CSV) data source.',
-    example: 'csv.from(file: "/path/to/data-file.csv")',
+    example: 'csv.from(csv: csvData)',
     category: 'Inputs',
     link: 'https://docs.influxdata.com/flux/latest/stdlib/csv/from/',
+  },
+  {
+    name: 'csv.from',
+    args: [
+      {
+        name: 'url',
+        desc: 'The URL to retrieve annotated CSV from.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/csv',
+    desc: 'Retrieves annotated CSV data from a URL.',
+    example: 'csv.from(url: "http://example.com/data.csv")',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/csv/from/',
   },
   {
     name: 'cumulativeSum',
@@ -990,7 +1032,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'experimental',
     desc:
       'Writes data to an InfluxDB v2.0 bucket, but in a different structure than the built-in `to()` function.',
-    example: 'experimental.to(bucket: "example-bucket", org: "example-org")',
+    example: 'experimental.to(bucket: "db/rp", org: "example-org")',
     category: 'Outputs',
     link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/to/',
   },
@@ -1076,6 +1118,12 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
           'A single argument function that evaluates true or false. Records are passed to the function. Those that evaluate to true are included in the output tables.',
         type: 'Function',
       },
+      {
+        name: 'onEmpty',
+        desc:
+          'Defines the behavior for empty tables. Potential values are `keep` and `drop`. Defaults to `drop`.',
+        type: 'String',
+      },
     ],
     package: '',
     desc:
@@ -1112,6 +1160,210 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/type-conversions/float/',
   },
   FROM,
+  {
+    name: 'geo.asTracks',
+    args: [
+      {
+        name: 'groupBy',
+        desc: 'Columns to group by. They should uniquely identify each track.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'orderBy',
+        desc: 'Columns to order results by.',
+        type: 'Array of Strings',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Groups geo-temporal data into tracks (sequential, related data points).',
+    example: 'geo.asTracks(groupBy: ["id","tid"], orderBy: ["_time"])',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/astracks/',
+  },
+  {
+    name: 'geo.filterRows',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region containing the desired data points.',
+        type: 'Object',
+      },
+      {
+        name: 'minSize',
+        desc:
+          'Minimum number of cells that cover the specified region. Default is `24`',
+        type: 'Integer',
+      },
+      {
+        name: 'maxSize',
+        desc:
+          'Maximum number of cells that cover the specified region. Default is `-1`.',
+        type: 'Object',
+      },
+      {
+        name: 'level',
+        desc: 'S2 cell level of grid cells. Default is `-1`',
+        type: 'Integer',
+      },
+      {
+        name: 's2CellIDLevel',
+        desc: 'S2 Cell level used in `s2_cell_id` tag. Default is `-1`.',
+        type: 'Integer',
+      },
+      {
+        name: 'correlationKey',
+        desc:
+          'List of columns used to uniquely identify a row for output. Default is `["_time"]`.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'strict',
+        desc: 'Enable strict geographic data filtering. Default is `true`',
+        type: 'Boolean',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Filters data by a specified geographic region with the option of strict filtering.',
+    example:
+      'geo.filterRows(region: {lat: 37.7858229, lon: -122.4058124, radius: 20.0}, strict: true)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/filterrows/',
+  },
+  {
+    name: 'geo.gridFilter',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region containing the desired data points.',
+        type: 'Object',
+      },
+      {
+        name: 'minSize',
+        desc:
+          'Minimum number of cells that cover the specified region. Default is `24`',
+        type: 'Integer',
+      },
+      {
+        name: 'maxSize',
+        desc:
+          'Maximum number of cells that cover the specified region. Default is `-1`.',
+        type: 'Object',
+      },
+      {
+        name: 'level',
+        desc: 'S2 cell level of grid cells. Default is `-1`',
+        type: 'Integer',
+      },
+      {
+        name: 's2CellIDLevel',
+        desc: 'S2 Cell level used in `s2_cell_id` tag. Default is `-1`.',
+        type: 'Integer',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Filters data by a specified geographic region using S2 geometry grid cells.',
+    example:
+      'geo.gridFilter(region: {lat: 37.7858229, lon: -122.4058124, radius: 20.0})',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/gridfilter/',
+  },
+  {
+    name: 'geo.groupByArea',
+    args: [
+      {
+        name: 'newColumn',
+        desc:
+          'Name of the new column that stores the unique identifier for a geographic area.',
+        type: 'String',
+      },
+      {
+        name: 'level',
+        desc:
+          'S2 Cell level used to determine the size of each geographic area.',
+        type: 'Integer',
+      },
+      {
+        name: 's2cellIDLevel',
+        desc: 'S2 Cell level used in `s2_cell_id` tag. Default is `-1`.',
+        type: 'Integer',
+      },
+    ],
+    package: 'experimental/geo',
+    desc: 'Groups rows by geographic area using S2 geometry grid cells.',
+    example: 'geo.groupByArea(newColumn: "geoArea", level: 10)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/groupbyarea/',
+  },
+  {
+    name: 'geo.s2CellIDToken',
+    args: [
+      {
+        name: 'point',
+        desc:
+          'Longitude and latitude in decimal degrees (WGS 84) to use when generating the S2 cell ID token. Object must contain `lat` and `lon` properties.',
+        type: 'Object',
+      },
+      {
+        name: 'token',
+        desc: 'S2 cell ID token to update.',
+        type: 'String',
+      },
+      {
+        name: 'level',
+        desc: 'S2 cell level to use when generating the S2 cell ID token.',
+        type: 'Integer',
+      },
+    ],
+    package: 'experimental/geo',
+    desc: 'Returns an S2 cell ID token.',
+    example:
+      'geo.s2CellIDToken(point: {lat: 37.7858229, lon: -122.4058124}, level: 10)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/s2cellidtoken/',
+  },
+  {
+    name: 'geo.strictFilter',
+    args: [
+      {
+        name: 'region',
+        desc: 'Region containing the desired data points.',
+        type: 'Object',
+      },
+    ],
+    package: 'experimental/geo',
+    desc: 'Filters data by latitude and longitude in a specified region.',
+    example:
+      'geo.strictFilter(region: {lat: 37.7858229, lon: -122.4058124, radius: 20.0})',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/strictfilter/',
+  },
+  {
+    name: 'geo.toRows',
+    args: [
+      {
+        name: 'correlationKey',
+        desc:
+          'List of columns used to uniquely identify a row for output. Default is `["_time"]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Pivots geo-temporal data into row-wise sets based on time and other correlation columns.',
+    example: 'geo.toRows(correlationKey: ["_time"])',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/torows/',
+  },
   {
     name: 'getColumn',
     args: [
@@ -1413,6 +1665,61 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/hourselection/',
   },
   {
+    name: 'http.get',
+    args: [
+      {
+        name: 'url',
+        desc: 'The URL to send the GET request to.',
+        type: 'String',
+      },
+      {
+        name: 'headers',
+        desc: 'Headers to include with the GET request.',
+        type: 'Object',
+      },
+      {
+        name: 'timeout',
+        desc: 'Timeout for the GET request. Default is `30s`.',
+        type: 'Duration',
+      },
+    ],
+    package: 'experimental/http',
+    desc:
+      'Submits an HTTP GET request to the specified URL and returns the HTTP status code, response body, and response headers.',
+    example:
+      'http.get(url: "https://v2.docs.influxdata.com/v2.0/", headers: {foo: "bar"})',
+    category: 'Miscellaneous',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/http/get/',
+  },
+  {
+    name: 'http.post',
+    args: [
+      {
+        name: 'url',
+        desc: 'The URL to POST to.',
+        type: 'String',
+      },
+      {
+        name: 'headers',
+        desc: 'Headers to include with the POST request.',
+        type: 'Object',
+      },
+      {
+        name: 'data',
+        desc: 'The data body to include with the POST request.',
+        type: 'Bytes',
+      },
+    ],
+    package: 'http',
+    desc:
+      'Submits an HTTP POST request to the specified URL with headers and data and returns the HTTP status code.',
+    example:
+      'http.post(url: "http://localhost:9999/", headers: {x:"a", y:"b"}, data: bytes(v: "body"))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/http/post/',
+  },
+  {
     name: 'increase',
     args: [
       {
@@ -1626,6 +1933,22 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     category: 'Selectors',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/selectors/last/',
+  },
+  {
+    name: 'length',
+    args: [
+      {
+        name: 'arr',
+        desc: 'The array to evaluate.',
+        type: 'Array',
+      },
+    ],
+    package: '',
+    desc: 'Returns the number of items in an array.',
+    example: 'length(arr: ["john"])',
+    category: 'Miscellaneous',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/built-in/misc/length/',
   },
   {
     name: 'limit',
@@ -3051,6 +3374,107 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/aggregates/quantile/',
   },
+  {
+    name: 'query.filterFields',
+    args: [
+      {
+        name: 'fields',
+        desc: 'Fields to filter by.',
+        type: 'Array of Strings',
+      },
+    ],
+    package: 'experimental/query',
+    desc: 'Filters input data by field.',
+    example: 'query.filterFields(fields: ["field_name"])',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/filterfields/',
+  },
+  {
+    name: 'query.filterMeasurement',
+    args: [
+      {
+        name: 'measurement',
+        desc: 'Measurement to filter by.',
+        type: 'String',
+      },
+    ],
+    package: 'experimental/query',
+    desc: 'Filters input data by measurement.',
+    example: 'query.filterMeasurement(measurement: "measurement_name")',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/filtermeasurement/',
+  },
+  {
+    name: 'query.fromRange',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Name of the bucket to query.',
+        type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'The earliest time to include in results.',
+        type: 'Duration | Time',
+      },
+      {
+        name: 'stop',
+        desc: 'The latest time to include in results. Defaults to `now()`.',
+        type: 'Duration | Time',
+      },
+    ],
+    package: 'experimental/query',
+    desc: 'Returns all data from a specified bucket within given time bounds.',
+    example: 'query.fromRange(bucket: "db/rp", start: v.timeRangeStart)',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/fromrange/',
+  },
+  {
+    name: 'query.inBucket',
+    args: [
+      {
+        name: 'bucket',
+        desc: 'Name of the bucket to query.',
+        type: 'String',
+      },
+      {
+        name: 'start',
+        desc: 'The earliest time to include in results.',
+        type: 'Duration | Time',
+      },
+      {
+        name: 'stop',
+        desc: 'The latest time to include in results. Defaults to `now()`.',
+        type: 'Duration | Time',
+      },
+      {
+        name: 'measurement',
+        desc: 'Measurement to filter by.',
+        type: 'String',
+      },
+      {
+        name: 'fields',
+        desc: 'Fields to filter by.',
+        type: 'Array of Strings',
+      },
+      {
+        name: 'predicate',
+        desc: 'A single argument function that evaluates true or false.',
+        type: 'Function',
+      },
+    ],
+    package: 'experimental/query',
+    desc:
+      'Queries data from a specified bucket within given time bounds, filters data by measurement, field, and optional predicate expressions.',
+    example:
+      'query.inBucket(bucket: "db/rp", start: v.timeRangeStart, measurement: "measurement_name", fields: ["field_name"], predicate: (r) => r.host == "host1")',
+    category: 'Inputs',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/query/inbucket/',
+  },
   RANGE,
   {
     name: 'reduce',
@@ -3474,6 +3898,12 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
         name: 'table',
         desc: 'The destination table.',
         type: 'String',
+      },
+      {
+        name: 'batchSize',
+        desc:
+          'The number of parameters or columns that can be queued within each call to `Exec`. Defaults to `10000`.',
+        type: 'Integer',
       },
     ],
     package: 'sql',
@@ -4487,7 +4917,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: '',
     desc: 'The `to()` function writes data to an InfluxDB v2.0 bucket.',
-    example: 'to(bucket:"my-bucket", org:"my-org")',
+    example: 'to(bucket: "db/rp", org: "example-org")',
     category: 'Outputs',
     link: 'https://docs.influxdata.com/flux/latest/stdlib/built-in/outputs/to/',
   },
@@ -4683,8 +5113,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of tag keys for a specific measurement.',
-    example:
-      'v1.measurementTagKeys(bucket: "telegraf/autogen", measurement: "mem")',
+    example: 'v1.measurementTagKeys(bucket: "db/rp", measurement: "mem")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurementtagkeys/',
@@ -4712,7 +5141,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of tag values for a specific measurement.',
     example:
-      'v1.measurementTagValues(bucket: "telegraf/autogen", measurement: "mem", tag: "host")',
+      'v1.measurementTagValues(bucket: "db/rp", measurement: "mem", tag: "host")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurementtagvalues/',
@@ -4728,7 +5157,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of measurements in a specific bucket.',
-    example: 'v1.measurements(bucket: "telegraf/autogen")',
+    example: 'v1.measurements(bucket: "db/rp")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/measurements/',
@@ -4751,12 +5180,12 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
         name: 'start',
         desc:
           'Specifies the oldest time to be included in the results. Defaults to `-30d`.',
-        type: 'Duration, Time',
+        type: 'Duration | Time',
       },
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of tag keys for all series that match the predicate.',
-    example: 'v1.tagKeys(bucket: "telegraf/autogen")',
+    example: 'v1.tagKeys(bucket: "db/rp")',
     category: 'Transformations',
     link: 'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/tagkeys/',
   },
@@ -4783,12 +5212,12 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
         name: 'start',
         desc:
           'Specifies the oldest time to be included in the results. Defaults to `-30d`.',
-        type: 'Duration, Time',
+        type: 'Duration | Time',
       },
     ],
     package: 'influxdata/influxdb/v1',
     desc: 'Returns a list of unique values for a given tag.',
-    example: 'v1.tagValues(bucket: "telegraf/autogen")',
+    example: 'v1.tagValues(bucket: "db/rp")',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/influxdb-v1/tagvalues/',
@@ -4840,8 +5269,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: '',
     desc:
       'Groups records based on a time value. New columns are added to uniquely identify each window. Those columns are added to the group key of the output tables. A single input record will be placed into zero or more output tables, depending on the specific windowing function.',
-    example:
-      'window(every: 5m, period: 5m, offset: 12h, timeColumn: "_time", startColumn: "_start", stopColumn: "_stop")',
+    example: 'window(every: 1m)',
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/transformations/window/',
