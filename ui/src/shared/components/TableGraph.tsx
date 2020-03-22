@@ -147,7 +147,7 @@ class TableGraph extends PureComponent<Props, State> {
                     onMount={this.handleMultiGridMount}
                     fixedColumnCount={fixedColumnCount}
                     classNameBottomRightGrid="table-graph--scroll-window"
-                    columnWidth={this.calculateColumnWidth(columnWidth)}
+                    columnWidth={this.calculateColumnWidth(columnWidth, adjustedWidth)}
                   />
                 )}
               </ColumnSizer>
@@ -287,16 +287,6 @@ class TableGraph extends PureComponent<Props, State> {
     return this.columnCount
   }
 
-  private get tableWidth(): number {
-    let tableWidth = 0
-
-    if (this.gridContainer && this.gridContainer.clientWidth) {
-      tableWidth = this.gridContainer.clientWidth
-    }
-
-    return tableWidth
-  }
-
   private handleUpdateFieldOptions = (fieldOptions: FieldOption[]): void => {
     const {onUpdateFieldOptions} = this.props
 
@@ -406,7 +396,9 @@ class TableGraph extends PureComponent<Props, State> {
     this.props.onSort(clickedFieldName)
   }
 
-  private calculateColumnWidth = (columnSizerWidth: number) => (column: {
+  // adjustedWidth is the size of the table
+  // columnSizerWidth is the size of the table / the amount of columns
+  private calculateColumnWidth = (columnSizerWidth: number, adjustedWidth: number) => (column: {
     index: number
   }): number => {
     const {index} = column
@@ -422,11 +414,17 @@ class TableGraph extends PureComponent<Props, State> {
 
     const original = columnWidths[columnLabel]
 
+    if (original > adjustedWidth) {
+      // if the original calculated size of the column is greater than the table size
+      // use the table size - half the average column size to determine the size of the column
+      return adjustedWidth - (columnSizerWidth / 2)
+    }
+
     if (this.fixFirstColumn && index === 0) {
       return original
     }
 
-    if (this.tableWidth <= totalColumnWidths) {
+    if (adjustedWidth <= totalColumnWidths) {
       return original
     }
 
@@ -434,7 +432,7 @@ class TableGraph extends PureComponent<Props, State> {
       return columnSizerWidth
     }
 
-    const difference = this.tableWidth - totalColumnWidths
+    const difference = adjustedWidth - totalColumnWidths
     const increment = difference / this.computedColumnCount
 
     return original + increment
