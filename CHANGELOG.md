@@ -1,3 +1,13 @@
+## v1.8.2
+
+### Bug Fixes
+
+1. [#5429](https://github.com/influxdata/chronograf/pull/5429): Updated Table results to output formatted strings rather than as single-line values
+
+### Features
+
+### Other
+
 ## v1.8.1
 
 ### Bug Fixes

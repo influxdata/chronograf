@@ -87,7 +87,6 @@ interface State {
 
 @ErrorHandling
 class TableGraph extends PureComponent<Props, State> {
-  private gridContainer: HTMLDivElement
   private multiGrid?: MultiGrid
 
   constructor(props: Props) {
@@ -116,7 +115,6 @@ class TableGraph extends PureComponent<Props, State> {
     return (
       <div
         className={this.tableContainerClassName}
-        ref={gridContainer => (this.gridContainer = gridContainer)}
         onMouseLeave={this.handleMouseLeave}
       >
         {rowCount > 0 && (
@@ -147,7 +145,10 @@ class TableGraph extends PureComponent<Props, State> {
                     onMount={this.handleMultiGridMount}
                     fixedColumnCount={fixedColumnCount}
                     classNameBottomRightGrid="table-graph--scroll-window"
-                    columnWidth={this.calculateColumnWidth(columnWidth, adjustedWidth)}
+                    columnWidth={this.calculateColumnWidth(
+                      columnWidth,
+                      adjustedWidth
+                    )}
                   />
                 )}
               </ColumnSizer>
@@ -398,9 +399,10 @@ class TableGraph extends PureComponent<Props, State> {
 
   // adjustedWidth is the size of the table
   // columnSizerWidth is the size of the table / the amount of columns
-  private calculateColumnWidth = (columnSizerWidth: number, adjustedWidth: number) => (column: {
-    index: number
-  }): number => {
+  private calculateColumnWidth = (
+    columnSizerWidth: number,
+    adjustedWidth: number
+  ) => (column: {index: number}): number => {
     const {index} = column
 
     const {
@@ -417,7 +419,7 @@ class TableGraph extends PureComponent<Props, State> {
     if (original > adjustedWidth) {
       // if the original calculated size of the column is greater than the table size
       // use the table size - half the average column size to determine the size of the column
-      return adjustedWidth - (columnSizerWidth / 2)
+      return adjustedWidth - columnSizerWidth / 2
     }
 
     if (this.fixFirstColumn && index === 0) {
