@@ -14,6 +14,19 @@
   overflow: hidden;
 }
 
+// removes default styling for scrollbar
+.table-graph-cell::-webkit-scrollbar-track {
+  border: none;
+}
+
+.table-graph-cell::-webkit-scrollbar {
+  width: 0;
+}
+
+.table-graph-cell::-webkit-scrollbar-thumb {
+  border: none;
+}
+
 .table-graph-cell {
   user-select: text !important;
   -o-user-select: text !important;
@@ -25,9 +38,9 @@
   font-weight: 500;
   color: $g12-forge;
   border: 1px solid $g5-pepper;
+  overflow-y: scroll;
   white-space: pre-line;
   text-overflow: ellipsis;
-  overflow-y: scroll;
 
   &__highlight-row {
     background-color: rgba(255, 255, 255, 0.2);

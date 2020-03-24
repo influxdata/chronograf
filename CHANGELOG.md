@@ -1,18 +1,9 @@
-## v1.8.2
-
-### Bug Fixes
-
-1. [#5429](https://github.com/influxdata/chronograf/pull/5429): Updated Table results to output formatted strings rather than as single-line values
-
-### Features
-
-### Other
-
 ## v1.8.1
 
 ### Bug Fixes
 
 1. [#5426](https://github.com/influxdata/chronograf/pull/5426): Update Flux functions for latest Flux version.
+1. [#5429](https://github.com/influxdata/chronograf/pull/5429): Updated Table results to output formatted strings rather than as single-line values
 
 ### Features
 
