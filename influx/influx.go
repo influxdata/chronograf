@@ -221,6 +221,13 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 		return "", "", err
 	}
 
+	if c.Authorizer != nil {
+		err = c.Authorizer.Set(req)
+		if err != nil {
+			return "", "", err
+		}
+	}
+
 	hc := &http.Client{}
 	if c.InsecureSkipVerify {
 		hc.Transport = skipVerifyTransport
