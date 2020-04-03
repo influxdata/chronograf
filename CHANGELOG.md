@@ -3,6 +3,7 @@
 ### Bug Fixes
 1. [#5456](https://github.com/influxdata/chronograf/pull/5456): Fixed missing `token` subcommand
 1. [#5458](https://github.com/influxdata/chronograf/pull/5458): Don't start with partial oauth configuration
+1. [#5459](https://github.com/influxdata/chronograf/pull/5459): Extend oauth JWT timeout to match cookie lifespan
 
 ### Features
 
