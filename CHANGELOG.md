@@ -4,8 +4,10 @@
 
 1. [#5426](https://github.com/influxdata/chronograf/pull/5426): Update Flux functions for latest Flux version.
 1. [#5429](https://github.com/influxdata/chronograf/pull/5429): Updated Table results to output formatted strings rather than as single-line values
+1. [#5420](https://github.com/influxdata/chronograf/pull/5420): Handle change to news feed data structure
 
 ### Features
+1. [#5400](https://github.com/influxdata/chronograf/pull/5400): Add ability to directly authenticate single superadmin user against the api
 
 ### Other
 
