@@ -396,10 +396,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
               scrollToRow={scrollToRow - fixedRowCount}
               style={{
                 overflowY: 'hidden',
-                height: Math.max(
-                  calculatedRowCount * ROW_HEIGHT + SCROLLBAR_SIZE_BUFFER,
-                  height
-                ),
+                height: Math.max(calculatedRowCount * ROW_HEIGHT, height),
               }}
               width={width - leftWidth}
             />
