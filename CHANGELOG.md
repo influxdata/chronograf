@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-1. [#5442](https://github.com/influxdata/chronograf/pull/5442): Updated table rendering styles to make table rows deterministic
+1. [#5442](https://github.com/influxdata/chronograf/pull/5442): Updated table rendering styles to make table rows consistent
 
 ### Features
 
