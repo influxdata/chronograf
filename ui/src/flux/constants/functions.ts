@@ -378,7 +378,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: '',
     desc: 'Tests whether a value is a member of a set.',
     example: 'contains(value: 1, set: [1,2,3])',
-    category: 'Test',
+    category: 'Tests',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/built-in/tests/contains/',
   },
@@ -949,6 +949,34 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/group/',
   },
   {
+    name: 'experimental.join',
+    args: [
+      {
+        name: 'left',
+        desc: 'First of two streams of tables to join.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'right',
+        desc: 'Second of two streams of tables to join.',
+        type: 'Stream of tables',
+      },
+      {
+        name: 'fn',
+        desc:
+          'A function that maps new output rows using left and right input rows.',
+        type: 'Function',
+      },
+    ],
+    package: 'experimental',
+    desc:
+      'Joins two streams of tables on the group key and _time column. Use the fn parameter to map output tables.',
+    example:
+      'experimental.join(left: left, right: right, fn: (left, right) => ({left with lv: left._value, rv: right._value }))',
+    category: 'Transformations',
+    link: 'https://docs.influxdata.com/flux/latest/stdlib/experimental/join/',
+  },
+  {
     name: 'experimental.objectKeys',
     args: [
       {
@@ -1328,6 +1356,40 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     category: 'Transformations',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/s2cellidtoken/',
+  },
+  {
+    name: 'geo.shapeData',
+    args: [
+      {
+        name: 'latField',
+        desc: 'Name of existing latitude field.',
+        type: 'String',
+      },
+      {
+        name: 'lonField',
+        desc: 'Name of existing longitude field.',
+        type: 'String',
+      },
+      {
+        name: 'level',
+        desc: 'S2 cell level to use when generating the S2 cell ID token.',
+        type: 'Integer',
+      },
+      {
+        name: 'correlationKey',
+        desc:
+          'List of columns used to uniquely identify a row for output. Default is `["_time"]`.',
+        type: 'Array of Strings',
+      },
+    ],
+    package: 'experimental/geo',
+    desc:
+      'Renames existing latitude and longitude fields to `lat` and `lon` and adds an `s2_cell_id` tag.',
+    example:
+      'geo.shapeData(latField: "latitude", lonField: "longitude", level: 10)',
+    category: 'Transformations',
+    link:
+      'https://docs.influxdata.com/flux/latest/stdlib/experimental/geo/shapedata/',
   },
   {
     name: 'geo.strictFilter',
@@ -4741,7 +4803,7 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
     package: 'testing',
     desc: 'Tests if an input stream is empty.',
     example: 'testing.assertEmpty()',
-    category: 'Test',
+    category: 'Tests',
     link: 'https://docs.influxdata.com/flux/latest/stdlib/testing/assertempty/',
   },
   {
@@ -4755,18 +4817,18 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'got',
         desc: 'The stream containing data to test.',
-        type: 'Obscflect',
+        type: 'Stream of tables',
       },
       {
         name: 'want',
         desc: 'The stream that contains the expected data to test against.',
-        type: 'Object',
+        type: 'Stream of tables',
       },
     ],
     package: 'testing',
     desc: 'Tests whether two streams have identical data.',
     example: 'testing.assertEquals(got: got, want: want)',
-    category: 'Test',
+    category: 'Tests',
     link:
       'https://docs.influxdata.com/flux/latest/stdlib/testing/assertequals/',
   },
@@ -4776,18 +4838,18 @@ export const FUNCTIONS: FluxToolbarFunction[] = [
       {
         name: 'got',
         desc: 'The stream containing data to test.',
-        type: 'Obscflect',
+        type: 'Stream of tables',
       },
       {
         name: 'want',
         desc: 'The stream that contains the expected data to test against.',
-        type: 'Object',
+        type: 'Stream of tables',
       },
     ],
     package: 'testing',
     desc: 'Produces a diff between two streams.',
     example: 'testing.assertEquals(got: got, want: want)',
-    category: 'Test',
+    category: 'Tests',
     link: 'https://docs.influxdata.com/flux/latest/stdlib/testing/diff/',
   },
   {
