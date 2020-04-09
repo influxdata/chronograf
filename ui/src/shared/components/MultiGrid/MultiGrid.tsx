@@ -305,11 +305,11 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
     return (
       <AutoSizer>
-        {({width}) => (
+        {({width, height}) => (
           <FancyScrollbar
             style={{
               width,
-              height: this.props.height,
+              height: this.props.height - ROW_HEIGHT,
             }}
             autoHide={true}
             scrollTop={this.state.scrollTop}
@@ -322,15 +322,17 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
               cellRenderer={this.cellRendererBottomLeftGrid}
               className={this.props.classNameBottomLeftGrid}
               columnCount={fixedColumnCount}
-              height={this.props.height}
+              height={height}
               ref={this.bottomLeftGridRef}
               rowCount={calculatedRowCount}
-              rowHeight={this.props.height}
+              rowHeight={this.getCalculatedRowHeight(
+                height,
+                calculatedRowCount
+              )}
               columnWidth={columnWidth}
               style={{
                 overflowY: 'hidden',
-                height: this.props.height,
-                position: 'absolute',
+                height: Math.max(calculatedRowCount * ROW_HEIGHT, height),
               }}
               tabIndex={null}
               width={width}
@@ -364,12 +366,12 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
     return (
       <AutoSizer>
-        {({width}) => (
+        {({width, height}) => (
           <FancyScrollbar
             style={{
               marginLeft: leftWidth,
               width: this.props.width - leftWidth,
-              height: this.props.height,
+              height: this.props.height - ROW_HEIGHT,
             }}
             autoHide={true}
             scrollTop={scrollTop}
@@ -383,15 +385,18 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
               columnCount={Math.max(0, columnCount - fixedColumnCount)}
               columnWidth={this.columnWidthRightGrid}
               overscanRowCount={100}
-              height={this.props.height}
+              height={height}
               ref={this.bottomRightGridRef}
               onScroll={this.onGridScroll}
               rowCount={calculatedRowCount}
-              rowHeight={this.props.height}
+              rowHeight={this.getCalculatedRowHeight(
+                height,
+                calculatedRowCount
+              )}
               scrollToRow={scrollToRow - fixedRowCount}
               style={{
                 overflowY: 'hidden',
-                height: SCROLLBAR_SIZE_BUFFER + ROW_HEIGHT + this.props.height,
+                height: Math.max(calculatedRowCount * ROW_HEIGHT, height),
               }}
               width={width - leftWidth}
             />
@@ -399,6 +404,15 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
         )}
       </AutoSizer>
     )
+  }
+
+  private getCalculatedRowHeight = (
+    height: number,
+    calculatedRowCount: number
+  ): number => {
+    const calculatedRowHeight =
+      calculatedRowCount !== 0 ? height / calculatedRowCount : 0
+    return Math.max(calculatedRowHeight, ROW_HEIGHT)
   }
 
   private renderTopLeftGrid(props) {
