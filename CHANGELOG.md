@@ -6,6 +6,8 @@
 
 ### Features
 
+1. [5446](https://github.com/influxdata/chronograf/pull/5446): Update to [Flux v0.65.0](https://github.com/influxdata/flux/releases/tag/v0.65.0)
+
 ### Other
 
 ## v1.8.1 [2020-04-06]
