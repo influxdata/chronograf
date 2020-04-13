@@ -1,12 +1,20 @@
-## v1.8.2
+## v1.8.3
 
 ### Bug Fixes
 
-1. [#5442](https://github.com/influxdata/chronograf/pull/5442): Updated table rendering styles to make table rows consistent
+### Features
+
+### Other
+
+## v1.8.2 [2020-04-13]
+
+### Bug Fixes
+
+1. [#5442](https://github.com/influxdata/chronograf/pull/5442): Fixed table rendering bug introduced in 1.8.1
 
 ### Features
 
-1. [5446](https://github.com/influxdata/chronograf/pull/5446): Update to [Flux v0.65.0](https://github.com/influxdata/flux/releases/tag/v0.65.0)
+1. [#5446](https://github.com/influxdata/chronograf/pull/5446): Update to [Flux v0.65.0](https://github.com/influxdata/flux/releases/tag/v0.65.0)
 
 ### Other
 
