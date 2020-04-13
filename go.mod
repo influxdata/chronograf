@@ -24,7 +24,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
-	github.com/influxdata/flux v0.50.2
+	github.com/influxdata/flux v0.65.0
 	github.com/influxdata/influxdb v1.1.5
 	github.com/influxdata/kapacitor v1.5.3
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
