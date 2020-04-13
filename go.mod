@@ -2,7 +2,6 @@ module github.com/influxdata/chronograf
 
 require (
 	github.com/NYTimes/gziphandler v1.1.1
-	github.com/aws/aws-sdk-go v1.27.1 // indirect
 	github.com/boltdb/bolt v1.3.1
 	github.com/bouk/httprouter v0.0.0-20160817010721-ee8b3818a7f5
 	github.com/coreos/bbolt v1.3.3 // indirect
@@ -18,8 +17,8 @@ require (
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/go-cmp v0.3.0
 	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/uuid v1.1.1
-	github.com/goreleaser/goreleaser v0.97.0 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
@@ -31,10 +30,7 @@ require (
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jonboulle/clockwork v0.1.0 // indirect
 	github.com/lestrrat-go/jwx v0.9.0
-	github.com/mattn/go-isatty v0.0.11 // indirect
-	github.com/mattn/go-zglob v0.0.1 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
-	github.com/satori/go.uuid v1.2.0
 	github.com/segmentio/kafka-go v0.3.4 // indirect
 	github.com/sergi/go-diff v1.1.0
 	github.com/sirupsen/logrus v1.4.2

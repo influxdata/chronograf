@@ -2,7 +2,7 @@ package id
 
 import (
 	"github.com/influxdata/chronograf"
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 var _ chronograf.ID = &UUID{}
@@ -12,5 +12,5 @@ type UUID struct{}
 
 // Generate creates a UUID v4 string
 func (i *UUID) Generate() (string, error) {
-	return uuid.NewV4().String(), nil
+	return uuid.New().String(), nil
 }
