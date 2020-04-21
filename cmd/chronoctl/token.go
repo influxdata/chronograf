@@ -25,7 +25,7 @@ func init() {
 
 type tokenCommand struct {
 	ChronoURL   string         `long:"chronograf-url" default:"http://localhost:8888" description:"Chronograf's URL." env:"CHRONOGRAF_URL"`
-	SkipVerify  bool           `long:"skip-verify" short:"k" default:"false" description:"Don't verify TLS cert at endpoint (allows self-signed certs)."`
+	SkipVerify  bool           `long:"skip-verify" short:"k" description:"Don't verify TLS cert at endpoint (allows self-signed certs)."`
 	PrivKeyFile flags.Filename `long:"priv-key-file" description:"File location of private key (corresponding to the public key chronograf was started with) for superadmin token authentication." env:"PRIV_KEY_FILE"`
 }
 

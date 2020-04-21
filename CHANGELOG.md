@@ -1,6 +1,7 @@
 ## v1.8.3
 
 ### Bug Fixes
+1. [#5456](https://github.com/influxdata/chronograf/pull/5456): Fixed missing `token` subcommand
 
 ### Features
 
