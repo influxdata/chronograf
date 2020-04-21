@@ -138,6 +138,13 @@ func TestValidAuth(t *testing.T) {
 			},
 			err: "missing Google oauth setting[s]: token secret, client secret, public url",
 		},
+		{
+			desc: "test invalid config (only token)",
+			s: &Server{
+				TokenSecret: "abc123",
+			},
+			err: "token secret without oauth config is invalid",
+		},
 	}
 
 	for _, test := range tests {

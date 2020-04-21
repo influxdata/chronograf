@@ -251,9 +251,8 @@ func (s *Server) UseGenericOAuth2() error {
 		s.GenericClientSecret != "" && s.GenericAuthURL != "" &&
 		s.GenericTokenURL != "":
 		return nil
-	case s.GenericClientID == "" &&
-		s.GenericClientSecret == "" && s.GenericAuthURL == "" &&
-		s.GenericTokenURL == "":
+	case s.GenericClientID == "" && s.GenericClientSecret == "" &&
+		s.GenericAuthURL == "" && s.GenericTokenURL == "":
 		return errNoAuth
 	}
 
@@ -416,6 +415,10 @@ func (s *Server) validateAuth() error {
 		if err := useAuths[i](); err != nil && err != errNoAuth {
 			errs = append(errs, err.Error())
 		}
+	}
+
+	if !s.useAuth() && s.TokenSecret != "" {
+		errs = append(errs, "token secret without oauth config is invalid")
 	}
 
 	if len(errs) == 0 {
