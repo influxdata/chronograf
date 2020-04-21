@@ -138,10 +138,9 @@ func provide(p oauth2.Provider, m oauth2.Mux, ok func() error) func(func(oauth2.
 func (s *Server) UseGithub() error {
 	errMsg := []string{}
 
-	switch {
-	case s.TokenSecret != "" && s.GithubClientID != "" && s.GithubClientSecret != "":
+	if s.TokenSecret != "" && s.GithubClientID != "" && s.GithubClientSecret != "" {
 		return nil
-	case s.GithubClientID == "" && s.GithubClientSecret == "":
+	} else if s.GithubClientID == "" && s.GithubClientSecret == "" {
 		return errNoAuth
 	}
 
@@ -165,10 +164,9 @@ func (s *Server) UseGithub() error {
 func (s *Server) UseGoogle() error {
 	errMsg := []string{}
 
-	switch {
-	case s.TokenSecret != "" && s.GoogleClientID != "" && s.GoogleClientSecret != "" && s.PublicURL != "":
+	if s.TokenSecret != "" && s.GoogleClientID != "" && s.GoogleClientSecret != "" && s.PublicURL != "" {
 		return nil
-	case s.GoogleClientID == "" && s.GoogleClientSecret == "" && s.PublicURL == "":
+	} else if s.GoogleClientID == "" && s.GoogleClientSecret == "" && s.PublicURL == "" {
 		return errNoAuth
 	}
 
@@ -195,10 +193,9 @@ func (s *Server) UseGoogle() error {
 func (s *Server) UseHeroku() error {
 	errMsg := []string{}
 
-	switch {
-	case s.TokenSecret != "" && s.HerokuClientID != "" && s.HerokuSecret != "":
+	if s.TokenSecret != "" && s.HerokuClientID != "" && s.HerokuSecret != "" {
 		return nil
-	case s.HerokuClientID == "" && s.HerokuSecret == "":
+	} else if s.HerokuClientID == "" && s.HerokuSecret == "" {
 		return errNoAuth
 	}
 
@@ -222,10 +219,9 @@ func (s *Server) UseHeroku() error {
 func (s *Server) UseAuth0() error {
 	errMsg := []string{}
 
-	switch {
-	case s.Auth0ClientID != "" && s.Auth0ClientSecret != "":
+	if s.Auth0ClientID != "" && s.Auth0ClientSecret != "" {
 		return nil
-	case s.Auth0ClientID == "" && s.Auth0ClientSecret == "":
+	} else if s.Auth0ClientID == "" && s.Auth0ClientSecret == "" {
 		return errNoAuth
 	}
 
@@ -246,13 +242,12 @@ func (s *Server) UseAuth0() error {
 func (s *Server) UseGenericOAuth2() error {
 	errMsg := []string{}
 
-	switch {
-	case s.TokenSecret != "" && s.GenericClientID != "" &&
+	if s.TokenSecret != "" && s.GenericClientID != "" &&
 		s.GenericClientSecret != "" && s.GenericAuthURL != "" &&
-		s.GenericTokenURL != "":
+		s.GenericTokenURL != "" {
 		return nil
-	case s.GenericClientID == "" && s.GenericClientSecret == "" &&
-		s.GenericAuthURL == "" && s.GenericTokenURL == "":
+	} else if s.GenericClientID == "" && s.GenericClientSecret == "" &&
+		s.GenericAuthURL == "" && s.GenericTokenURL == "" {
 		return errNoAuth
 	}
 
