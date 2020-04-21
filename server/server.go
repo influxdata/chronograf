@@ -92,15 +92,17 @@ type Server struct {
 	HerokuSecret        string   `long:"heroku-secret" description:"Heroku Secret for OAuth 2 support" env:"HEROKU_SECRET"`
 	HerokuOrganizations []string `long:"heroku-organization" description:"Heroku Organization Memberships a user is required to have for access to Chronograf (comma separated)" env:"HEROKU_ORGS" env-delim:","`
 
-	GenericName         string   `long:"generic-name" description:"Generic OAuth2 name presented on the login page"  env:"GENERIC_NAME"`
-	GenericClientID     string   `long:"generic-client-id" description:"Generic OAuth2 Client ID. Can be used own OAuth2 service."  env:"GENERIC_CLIENT_ID"`
-	GenericClientSecret string   `long:"generic-client-secret" description:"Generic OAuth2 Client Secret" env:"GENERIC_CLIENT_SECRET"`
-	GenericScopes       []string `long:"generic-scopes" description:"Scopes requested by provider of web client." default:"user:email" env:"GENERIC_SCOPES" env-delim:","`
-	GenericDomains      []string `long:"generic-domains" description:"Email domain users' email address to have (example.com)" env:"GENERIC_DOMAINS" env-delim:","`
-	GenericAuthURL      string   `long:"generic-auth-url" description:"OAuth 2.0 provider's authorization endpoint URL" env:"GENERIC_AUTH_URL"`
-	GenericTokenURL     string   `long:"generic-token-url" description:"OAuth 2.0 provider's token endpoint URL" env:"GENERIC_TOKEN_URL"`
-	GenericAPIURL       string   `long:"generic-api-url" description:"URL that returns OpenID UserInfo compatible information." env:"GENERIC_API_URL"`
-	GenericAPIKey       string   `long:"generic-api-key" description:"JSON lookup key into OpenID UserInfo. (Azure should be userPrincipalName)" default:"email" env:"GENERIC_API_KEY"`
+	GenericName         string         `long:"generic-name" description:"Generic OAuth2 name presented on the login page"  env:"GENERIC_NAME"`
+	GenericClientID     string         `long:"generic-client-id" description:"Generic OAuth2 Client ID. Can be used own OAuth2 service."  env:"GENERIC_CLIENT_ID"`
+	GenericClientSecret string         `long:"generic-client-secret" description:"Generic OAuth2 Client Secret" env:"GENERIC_CLIENT_SECRET"`
+	GenericScopes       []string       `long:"generic-scopes" description:"Scopes requested by provider of web client." default:"user:email" env:"GENERIC_SCOPES" env-delim:","`
+	GenericDomains      []string       `long:"generic-domains" description:"Email domain users' email address to have (example.com)" env:"GENERIC_DOMAINS" env-delim:","`
+	GenericAuthURL      string         `long:"generic-auth-url" description:"OAuth 2.0 provider's authorization endpoint URL" env:"GENERIC_AUTH_URL"`
+	GenericTokenURL     string         `long:"generic-token-url" description:"OAuth 2.0 provider's token endpoint URL" env:"GENERIC_TOKEN_URL"`
+	GenericAPIURL       string         `long:"generic-api-url" description:"URL that returns OpenID UserInfo compatible information." env:"GENERIC_API_URL"`
+	GenericAPIKey       string         `long:"generic-api-key" description:"JSON lookup key into OpenID UserInfo. (Azure should be userPrincipalName)" default:"email" env:"GENERIC_API_KEY"`
+	GenericInsecure     bool           `long:"generic-insecure" description:"Whether or not to verify auth-url's tls certificates."`
+	GenericRootCA       flags.Filename `long:"generic-root-ca" description:"File location of root ca cert for generic oauth tls verification."`
 
 	Auth0Domain        string   `long:"auth0-domain" description:"Subdomain of auth0.com used for Auth0 OAuth2 authentication" env:"AUTH0_DOMAIN"`
 	Auth0ClientID      string   `long:"auth0-client-id" description:"Auth0 Client ID for OAuth2 support" env:"AUTH0_CLIENT_ID"`
@@ -124,6 +126,8 @@ type Server struct {
 	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
 	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
 	BuildInfo         chronograf.BuildInfo
+
+	oauthClient http.Client
 }
 
 func provide(p oauth2.Provider, m oauth2.Mux, ok func() error) func(func(oauth2.Provider, oauth2.Mux)) {
@@ -273,6 +277,26 @@ func (s *Server) UseGenericOAuth2() error {
 	return nil
 }
 
+// getCerts gets the read certs from rootPath to the systemCerts.
+func getCerts(rootPath string) (*x509.CertPool, error) {
+	if rootPath == "" {
+		return nil, nil
+	}
+
+	certPool, err := x509.SystemCertPool()
+	if err != nil {
+		return nil, fmt.Errorf("error using system cert pool: %s", err.Error())
+	}
+
+	certs, err := ioutil.ReadFile(rootPath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading generic root ca: %s", err.Error())
+	}
+
+	certPool.AppendCertsFromPEM(certs)
+	return certPool, nil
+}
+
 func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() error) {
 	gh := oauth2.Github{
 		ClientID:     s.GithubClientID,
@@ -281,7 +305,7 @@ func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Logger:       logger,
 	}
 	jwt := oauth2.NewJWT(s.TokenSecret, s.JwksURL)
-	ghMux := oauth2.NewAuthMux(&gh, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint)
+	ghMux := oauth2.NewAuthMux(&gh, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint, &s.oauthClient)
 	return &gh, ghMux, s.UseGithub
 }
 
@@ -295,7 +319,7 @@ func (s *Server) googleOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Logger:       logger,
 	}
 	jwt := oauth2.NewJWT(s.TokenSecret, s.JwksURL)
-	goMux := oauth2.NewAuthMux(&google, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint)
+	goMux := oauth2.NewAuthMux(&google, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint, &s.oauthClient)
 	return &google, goMux, s.UseGoogle
 }
 
@@ -307,7 +331,7 @@ func (s *Server) herokuOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		Logger:        logger,
 	}
 	jwt := oauth2.NewJWT(s.TokenSecret, s.JwksURL)
-	hMux := oauth2.NewAuthMux(&heroku, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint)
+	hMux := oauth2.NewAuthMux(&heroku, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint, &s.oauthClient)
 	return &heroku, hMux, s.UseHeroku
 }
 
@@ -326,7 +350,7 @@ func (s *Server) genericOAuth(logger chronograf.Logger, auth oauth2.Authenticato
 		Logger:         logger,
 	}
 	jwt := oauth2.NewJWT(s.TokenSecret, s.JwksURL)
-	genMux := oauth2.NewAuthMux(&gen, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint)
+	genMux := oauth2.NewAuthMux(&gen, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint, &s.oauthClient)
 	return &gen, genMux, s.UseGenericOAuth2
 }
 
@@ -342,7 +366,7 @@ func (s *Server) auth0OAuth(logger chronograf.Logger, auth oauth2.Authenticator)
 	auth0, err := oauth2.NewAuth0(s.Auth0Domain, s.Auth0ClientID, s.Auth0ClientSecret, redirectURL.String(), s.Auth0Organizations, logger)
 
 	jwt := oauth2.NewJWT(s.TokenSecret, s.JwksURL)
-	genMux := oauth2.NewAuthMux(&auth0, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint)
+	genMux := oauth2.NewAuthMux(&auth0, auth, jwt, s.Basepath, logger, s.UseIDToken, s.LoginHint, &s.oauthClient)
 
 	if err != nil {
 		logger.Error("Error parsing Auth0 domain: err:", err)
@@ -607,6 +631,21 @@ func (s *Server) Serve(ctx context.Context) {
 			WithField("basepath", "invalid").
 			Error(fmt.Errorf("Failed to validate Oauth settings: %s", err))
 		return
+	}
+
+	certs, err := getCerts(string(s.GenericRootCA))
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	s.oauthClient = http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: s.GenericInsecure,
+				RootCAs:            certs,
+			},
+		},
 	}
 
 	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration)
