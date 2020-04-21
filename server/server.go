@@ -19,6 +19,7 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -35,6 +36,7 @@ import (
 
 var (
 	startTime time.Time
+	errNoAuth = errors.New("no auth configured")
 )
 
 func init() {
@@ -124,42 +126,154 @@ type Server struct {
 	BuildInfo         chronograf.BuildInfo
 }
 
-func provide(p oauth2.Provider, m oauth2.Mux, ok func() bool) func(func(oauth2.Provider, oauth2.Mux)) {
+func provide(p oauth2.Provider, m oauth2.Mux, ok func() error) func(func(oauth2.Provider, oauth2.Mux)) {
 	return func(configure func(oauth2.Provider, oauth2.Mux)) {
-		if ok() {
+		if err := ok(); err == nil {
 			configure(p, m)
 		}
 	}
 }
 
 // UseGithub validates the CLI parameters to enable github oauth support
-func (s *Server) UseGithub() bool {
-	return s.TokenSecret != "" && s.GithubClientID != "" && s.GithubClientSecret != ""
+func (s *Server) UseGithub() error {
+	errMsg := []string{}
+
+	if s.TokenSecret != "" && s.GithubClientID != "" && s.GithubClientSecret != "" {
+		return nil
+	} else if s.GithubClientID == "" && s.GithubClientSecret == "" {
+		return errNoAuth
+	}
+
+	if s.TokenSecret == "" {
+		errMsg = append(errMsg, "token secret")
+	}
+	if s.GithubClientID == "" {
+		errMsg = append(errMsg, "client id")
+	}
+	if s.GithubClientSecret == "" {
+		errMsg = append(errMsg, "client secret")
+	}
+	if errMsg != nil {
+		return fmt.Errorf("missing Github oauth setting[s]: %s", strings.Join(errMsg, ", "))
+	}
+
+	return nil
 }
 
 // UseGoogle validates the CLI parameters to enable google oauth support
-func (s *Server) UseGoogle() bool {
-	return s.TokenSecret != "" && s.GoogleClientID != "" && s.GoogleClientSecret != "" && s.PublicURL != ""
+func (s *Server) UseGoogle() error {
+	errMsg := []string{}
+
+	if s.TokenSecret != "" && s.GoogleClientID != "" && s.GoogleClientSecret != "" && s.PublicURL != "" {
+		return nil
+	} else if s.GoogleClientID == "" && s.GoogleClientSecret == "" && s.PublicURL == "" {
+		return errNoAuth
+	}
+
+	if s.TokenSecret == "" {
+		errMsg = append(errMsg, "token secret")
+	}
+	if s.GoogleClientID == "" {
+		errMsg = append(errMsg, "client id")
+	}
+	if s.GoogleClientSecret == "" {
+		errMsg = append(errMsg, "client secret")
+	}
+	if s.PublicURL == "" {
+		errMsg = append(errMsg, "public url")
+	}
+	if errMsg != nil {
+		return fmt.Errorf("missing Google oauth setting[s]: %s", strings.Join(errMsg, ", "))
+	}
+
+	return nil
 }
 
 // UseHeroku validates the CLI parameters to enable heroku oauth support
-func (s *Server) UseHeroku() bool {
-	return s.TokenSecret != "" && s.HerokuClientID != "" && s.HerokuSecret != ""
+func (s *Server) UseHeroku() error {
+	errMsg := []string{}
+
+	if s.TokenSecret != "" && s.HerokuClientID != "" && s.HerokuSecret != "" {
+		return nil
+	} else if s.HerokuClientID == "" && s.HerokuSecret == "" {
+		return errNoAuth
+	}
+
+	if s.TokenSecret == "" {
+		errMsg = append(errMsg, "token secret")
+	}
+	if s.HerokuClientID == "" {
+		errMsg = append(errMsg, "client id")
+	}
+	if s.HerokuSecret == "" {
+		errMsg = append(errMsg, "client secret")
+	}
+	if errMsg != nil {
+		return fmt.Errorf("missing Heroku oauth setting[s]: %s", strings.Join(errMsg, ", "))
+	}
+
+	return nil
 }
 
 // UseAuth0 validates the CLI parameters to enable Auth0 oauth support
-func (s *Server) UseAuth0() bool {
-	return s.Auth0ClientID != "" && s.Auth0ClientSecret != ""
+func (s *Server) UseAuth0() error {
+	errMsg := []string{}
+
+	if s.Auth0ClientID != "" && s.Auth0ClientSecret != "" {
+		return nil
+	} else if s.Auth0ClientID == "" && s.Auth0ClientSecret == "" {
+		return errNoAuth
+	}
+
+	if s.Auth0ClientID == "" {
+		errMsg = append(errMsg, "client id")
+	}
+	if s.Auth0ClientSecret == "" {
+		errMsg = append(errMsg, "client secret")
+	}
+	if errMsg != nil {
+		return fmt.Errorf("missing Auth0 oauth setting[s]: %s", strings.Join(errMsg, ", "))
+	}
+
+	return nil
 }
 
 // UseGenericOAuth2 validates the CLI parameters to enable generic oauth support
-func (s *Server) UseGenericOAuth2() bool {
-	return s.TokenSecret != "" && s.GenericClientID != "" &&
+func (s *Server) UseGenericOAuth2() error {
+	errMsg := []string{}
+
+	if s.TokenSecret != "" && s.GenericClientID != "" &&
 		s.GenericClientSecret != "" && s.GenericAuthURL != "" &&
-		s.GenericTokenURL != ""
+		s.GenericTokenURL != "" {
+		return nil
+	} else if s.GenericClientID == "" && s.GenericClientSecret == "" &&
+		s.GenericAuthURL == "" && s.GenericTokenURL == "" {
+		return errNoAuth
+	}
+
+	if s.TokenSecret == "" {
+		errMsg = append(errMsg, "token secret")
+	}
+	if s.GenericClientID == "" {
+		errMsg = append(errMsg, "client id")
+	}
+	if s.GenericClientSecret == "" {
+		errMsg = append(errMsg, "client secret")
+	}
+	if s.GenericAuthURL == "" {
+		errMsg = append(errMsg, "auth url")
+	}
+	if s.GenericTokenURL == "" {
+		errMsg = append(errMsg, "token url")
+	}
+	if errMsg != nil {
+		return fmt.Errorf("missing Generic oauth setting[s]: %s", strings.Join(errMsg, ", "))
+	}
+
+	return nil
 }
 
-func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() bool) {
+func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() error) {
 	gh := oauth2.Github{
 		ClientID:     s.GithubClientID,
 		ClientSecret: s.GithubClientSecret,
@@ -171,7 +285,7 @@ func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 	return &gh, ghMux, s.UseGithub
 }
 
-func (s *Server) googleOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() bool) {
+func (s *Server) googleOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() error) {
 	redirectURL := s.PublicURL + s.Basepath + "/oauth/google/callback"
 	google := oauth2.Google{
 		ClientID:     s.GoogleClientID,
@@ -185,7 +299,7 @@ func (s *Server) googleOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 	return &google, goMux, s.UseGoogle
 }
 
-func (s *Server) herokuOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() bool) {
+func (s *Server) herokuOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() error) {
 	heroku := oauth2.Heroku{
 		ClientID:      s.HerokuClientID,
 		ClientSecret:  s.HerokuSecret,
@@ -197,7 +311,7 @@ func (s *Server) herokuOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 	return &heroku, hMux, s.UseHeroku
 }
 
-func (s *Server) genericOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() bool) {
+func (s *Server) genericOAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() error) {
 	gen := oauth2.Generic{
 		PageName:       s.GenericName,
 		ClientID:       s.GenericClientID,
@@ -216,12 +330,12 @@ func (s *Server) genericOAuth(logger chronograf.Logger, auth oauth2.Authenticato
 	return &gen, genMux, s.UseGenericOAuth2
 }
 
-func (s *Server) auth0OAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() bool) {
+func (s *Server) auth0OAuth(logger chronograf.Logger, auth oauth2.Authenticator) (oauth2.Provider, oauth2.Mux, func() error) {
 	redirectPath := path.Join(s.Basepath, "oauth", "auth0", "callback")
 	redirectURL, err := url.Parse(s.PublicURL)
 	if err != nil {
 		logger.Error("Error parsing public URL: err:", err)
-		return &oauth2.Auth0{}, &oauth2.AuthMux{}, func() bool { return false }
+		return &oauth2.Auth0{}, &oauth2.AuthMux{}, func() error { return fmt.Errorf("failed to parse public URL: %s", err.Error()) }
 	}
 	redirectURL.Path = redirectPath
 
@@ -232,7 +346,7 @@ func (s *Server) auth0OAuth(logger chronograf.Logger, auth oauth2.Authenticator)
 
 	if err != nil {
 		logger.Error("Error parsing Auth0 domain: err:", err)
-		return &auth0, genMux, func() bool { return false }
+		return &auth0, genMux, func() error { return fmt.Errorf("failed to parse Auth0 domain: %s", err.Error()) }
 	}
 	return &auth0, genMux, s.UseAuth0
 }
@@ -257,7 +371,56 @@ func (s *Server) genericRedirectURL() string {
 }
 
 func (s *Server) useAuth() bool {
-	return s.UseGithub() || s.UseGoogle() || s.UseHeroku() || s.UseGenericOAuth2() || s.UseAuth0()
+	useAuths := []func() error{
+		s.UseGithub,
+		s.UseGoogle,
+		s.UseHeroku,
+		s.UseGenericOAuth2,
+		s.UseAuth0,
+	}
+
+	var err error
+	for i := range useAuths {
+		switch err = useAuths[i](); err {
+		case nil:
+			return true
+		case errNoAuth:
+			continue
+		default:
+			// If there was an attempt to configure authentication,
+			// chronograf should not disable authentication.
+			return true
+		}
+	}
+
+	return false
+}
+
+func (s *Server) validateAuth() error {
+	useAuths := []func() error{
+		s.UseGithub,
+		s.UseGoogle,
+		s.UseHeroku,
+		s.UseGenericOAuth2,
+		s.UseAuth0,
+	}
+
+	var errs []string
+	for i := range useAuths {
+		if err := useAuths[i](); err != nil && err != errNoAuth {
+			errs = append(errs, err.Error())
+		}
+	}
+
+	if !s.useAuth() && s.TokenSecret != "" {
+		errs = append(errs, "token secret without oauth config is invalid")
+	}
+
+	if len(errs) == 0 {
+		return nil
+	}
+
+	return errors.New(strings.Join(errs, "; "))
 }
 
 func (s *Server) useTLS() bool {
@@ -435,6 +598,14 @@ func (s *Server) Serve(ctx context.Context) {
 			WithField("component", "server").
 			WithField("basepath", "invalid").
 			Error(err)
+		return
+	}
+
+	if err = s.validateAuth(); err != nil {
+		logger.
+			WithField("component", "server").
+			WithField("basepath", "invalid").
+			Error(fmt.Errorf("Failed to validate Oauth settings: %s", err))
 		return
 	}
 
