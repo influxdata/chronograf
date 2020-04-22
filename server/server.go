@@ -8,6 +8,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -101,8 +102,8 @@ type Server struct {
 	GenericTokenURL     string         `long:"generic-token-url" description:"OAuth 2.0 provider's token endpoint URL" env:"GENERIC_TOKEN_URL"`
 	GenericAPIURL       string         `long:"generic-api-url" description:"URL that returns OpenID UserInfo compatible information." env:"GENERIC_API_URL"`
 	GenericAPIKey       string         `long:"generic-api-key" description:"JSON lookup key into OpenID UserInfo. (Azure should be userPrincipalName)" default:"email" env:"GENERIC_API_KEY"`
-	GenericInsecure     bool           `long:"generic-insecure" description:"Whether or not to verify auth-url's tls certificates."`
-	GenericRootCA       flags.Filename `long:"generic-root-ca" description:"File location of root ca cert for generic oauth tls verification."`
+	GenericInsecure     bool           `long:"generic-insecure" description:"Whether or not to verify auth-url's tls certificates." env:"GENERIC_INSECURE"`
+	GenericRootCA       flags.Filename `long:"generic-root-ca" description:"File location of root ca cert for generic oauth tls verification." env:"GENERIC_ROOT_CA"`
 
 	Auth0Domain        string   `long:"auth0-domain" description:"Subdomain of auth0.com used for Auth0 OAuth2 authentication" env:"AUTH0_DOMAIN"`
 	Auth0ClientID      string   `long:"auth0-client-id" description:"Auth0 Client ID for OAuth2 support" env:"AUTH0_CLIENT_ID"`
@@ -283,17 +284,31 @@ func getCerts(rootPath string) (*x509.CertPool, error) {
 		return nil, nil
 	}
 
+	f, err := os.Open(rootPath)
+	if err != nil {
+		return nil, err
+	}
+
+	defer f.Close()
+	return processCerts(f)
+}
+
+func processCerts(rootReader io.Reader) (*x509.CertPool, error) {
 	certPool, err := x509.SystemCertPool()
 	if err != nil {
 		return nil, fmt.Errorf("error using system cert pool: %s", err.Error())
 	}
 
-	certs, err := ioutil.ReadFile(rootPath)
+	certs, err := ioutil.ReadAll(rootReader)
 	if err != nil {
 		return nil, fmt.Errorf("error reading generic root ca: %s", err.Error())
 	}
 
-	certPool.AppendCertsFromPEM(certs)
+	ok := certPool.AppendCertsFromPEM(certs)
+	if !ok {
+		return nil, errors.New("error appending cert from root ca")
+	}
+
 	return certPool, nil
 }
 

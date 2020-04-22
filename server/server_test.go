@@ -1,13 +1,18 @@
 package server
 
 import (
+	"bytes"
 	"context"
+	"crypto/tls"
+	"encoding/pem"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/bouk/httprouter"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // WithContext is a helper function to cut down on boilerplate in server test files
@@ -150,5 +155,55 @@ func TestValidAuth(t *testing.T) {
 	for _, test := range tests {
 		err := test.s.validateAuth()
 		assert.Equal(t, test.err, fmt.Sprintf("%v", err), test.desc)
+	}
+}
+
+func TestProcessCerts(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	tcrt := ts.Certificate()
+	require.True(t, tcrt != nil)
+
+	pool, err := processCerts(bytes.NewReader(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: tcrt.Raw})))
+	require.NoError(t, err)
+
+	tests := []struct {
+		tc  http.Client
+		err bool
+	}{
+		{
+			tc:  http.Client{},
+			err: true,
+		},
+		{
+			tc: http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
+				},
+			},
+		},
+		{
+			tc: http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{
+						RootCAs: pool,
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		_, err := test.tc.Get(ts.URL)
+		assert.Equal(t, test.err, err != nil)
+		if test.err {
+			t.Log(err)
+			continue
+		}
 	}
 }
