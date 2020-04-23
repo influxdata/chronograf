@@ -6,6 +6,7 @@
 1. [#5459](https://github.com/influxdata/chronograf/pull/5459): Extend oauth JWT timeout to match cookie lifespan
 
 ### Features
+1. [#5461](https://github.com/influxdata/chronograf/pull/5461): add ability to ignore or verify custom oauth certs
 
 ### Other
 
