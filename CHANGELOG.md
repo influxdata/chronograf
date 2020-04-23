@@ -1,12 +1,20 @@
-## v1.8.3
+## v1.8.4
+
+### Bug Fixes
+
+### Features
+
+### Other
+
+## v1.8.3 [2020-04-23]
 
 ### Bug Fixes
 1. [#5456](https://github.com/influxdata/chronograf/pull/5456): Fixed missing `token` subcommand
-1. [#5458](https://github.com/influxdata/chronograf/pull/5458): Don't start with partial oauth configuration
-1. [#5459](https://github.com/influxdata/chronograf/pull/5459): Extend oauth JWT timeout to match cookie lifespan
+1. [#5458](https://github.com/influxdata/chronograf/pull/5458): Incomplete OAuth configurations now throw errors listing missing components
+1. [#5459](https://github.com/influxdata/chronograf/pull/5459): Extend OAuth JWT timeout to match cookie lifespan
 
 ### Features
-1. [#5461](https://github.com/influxdata/chronograf/pull/5461): add ability to ignore or verify custom oauth certs
+1. [#5461](https://github.com/influxdata/chronograf/pull/5461): Added ability to ignore or verify custom OAuth certs
 
 ### Other
 
