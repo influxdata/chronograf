@@ -56,11 +56,11 @@ func (c *cookie) Validate(ctx context.Context, r *http.Request) (Principal, erro
 	return c.Tokens.ValidPrincipal(ctx, Token(cookie.Value), c.Lifespan)
 }
 
-// Extend will extend the lifetime of the Token by the Lifespan time.  Assumes
+// Extend will extend the lifetime of the Token by the Inactivity time.  Assumes
 // Principal is already valid.
 func (c *cookie) Extend(ctx context.Context, w http.ResponseWriter, p Principal) (Principal, error) {
-	// Refresh the token by extending its life another Lifespan duration
-	p, err := c.Tokens.ExtendedPrincipal(ctx, p, c.Lifespan)
+	// Refresh the token by extending its life another Inactivity duration
+	p, err := c.Tokens.ExtendedPrincipal(ctx, p, c.Inactivity)
 	if err != nil {
 		return Principal{}, ErrAuthentication
 	}
@@ -85,10 +85,10 @@ func (c *cookie) Extend(ctx context.Context, w http.ResponseWriter, p Principal)
 // a token with cookie.Duration of life to be stored as the cookie's value.
 func (c *cookie) Authorize(ctx context.Context, w http.ResponseWriter, p Principal) error {
 	// Principal will be issued at Now() and will expire
-	// c.Lifespan into the future
+	// c.Inactivity into the future
 	now := c.Now()
 	p.IssuedAt = now
-	p.ExpiresAt = now.Add(c.Lifespan)
+	p.ExpiresAt = now.Add(c.Inactivity)
 
 	token, err := c.Tokens.Create(ctx, p)
 	if err != nil {
