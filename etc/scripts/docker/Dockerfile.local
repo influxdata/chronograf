@@ -1,0 +1,23 @@
+FROM golang:1.13-stretch AS build
+
+# Install nodejs
+RUN \
+  curl -L https://nodejs.org/download/release/v10.20.1/node-v10.20.1-linux-x64.tar.gz \
+  | tar -C /usr/local/ --strip 1 -zxf - \
+  && npm install -g yarn
+
+# Get deps when they are updated
+COPY go.mod go.sum Makefile /go/src/github.com/influxdata/chronograf/
+WORKDIR /go/src/github.com/influxdata/chronograf/
+RUN go mod download
+
+# Build chronograf when updated
+COPY . /go/src/github.com/influxdata/chronograf/
+WORKDIR /go/src/github.com/influxdata/chronograf/
+RUN make clean && make
+
+# Build smaller image
+FROM debian:stretch-slim
+COPY --from=build /go/src/github.com/influxdata/chronograf/chronograf /bin/chronograf
+COPY --from=build /go/src/github.com/influxdata/chronograf/chronoctl /bin/chronoctl
+CMD [ "/bin/chronograf" ]

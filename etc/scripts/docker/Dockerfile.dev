@@ -1,0 +1,7 @@
+FROM golang:1.13-stretch AS build
+
+# Install nodejs
+RUN \
+  curl -L https://nodejs.org/download/release/v10.20.1/node-v10.20.1-linux-x64.tar.gz \
+  | tar -C /usr/local/ --strip 1 -zxf - \
+  && npm install -g yarn

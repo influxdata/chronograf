@@ -25,7 +25,7 @@ GO111MODULE=on
 
 .DEFAULT_GOAL := all
 
-.PHONY: assets dep clean test gotest gotestrace jstest run run-dev ctags
+.PHONY: assets dep clean test gotest gotestrace jstest run run-dev ctags clean-ui clean-go local-docker dev-docker run-dev-docker
 
 all: dep build
 
@@ -130,6 +130,25 @@ clean:
 	cd ui && rm -rf node_modules
 	rm -f dist/dist_gen.go canned/bin_gen.go protoboards/bin_gen.go server/swagger_gen.go
 	@rm -f .godep .jsdep .jssrc .bindata
+
+clean-ui:
+	cd ui && yarn run clean
+	cd ui && rm -rf node_modules
+	rm -f dist/dist_gen.go canned/bin_gen.go protoboards/bin_gen.go server/swagger_gen.go
+	@rm -f .godep .jsdep .jssrc .bindata
+
+clean-go:
+	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
+
+local-docker:
+	docker build -t chronograf:local -f ./etc/scripts/docker/Dockerfile.local .
+
+dev-docker:
+	docker build -t chronograf-dev:local -f ./etc/scripts/docker/Dockerfile.dev .
+
+# provides environment with supported versions of go, node, and yarn with code mounted inside.
+run-dev-docker: dev-docker
+	docker run -v $PWD:/go/src/chronograf chronograf-dev:local /bin/bash
 
 ctags:
 	ctags -R --languages="Go" --exclude=.git --exclude=ui .

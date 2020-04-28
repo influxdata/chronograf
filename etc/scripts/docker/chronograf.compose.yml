@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  chronograf:
+    depends_on:
+      - influxdb
+    image: chronograf:local
+    ports:
+      - "8888:8888"
+  influxdb:
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+  telegraf:
+    image: telegraf:latest
+    depends_on:
+      - influxdb
+    volumes:
+      - $PWD/etc/scripts/docker/telegraf.conf:/telegraf.conf
+    command:
+      - '--config=/telegraf.conf'
