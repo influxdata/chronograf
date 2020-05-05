@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5475](https://github.com/influxdata/chronograf/pull/5475): Fix public-url generic oauth configuration issue
+
 ### Features
 
 ### Other
