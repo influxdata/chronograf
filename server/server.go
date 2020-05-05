@@ -171,7 +171,7 @@ func (s *Server) UseGoogle() error {
 
 	if s.TokenSecret != "" && s.GoogleClientID != "" && s.GoogleClientSecret != "" && s.PublicURL != "" {
 		return nil
-	} else if s.GoogleClientID == "" && s.GoogleClientSecret == "" && s.PublicURL == "" {
+	} else if s.GoogleClientID == "" && s.GoogleClientSecret == "" {
 		return errNoAuth
 	}
 
