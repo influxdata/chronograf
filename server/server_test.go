@@ -150,11 +150,36 @@ func TestValidAuth(t *testing.T) {
 			},
 			err: "token secret without oauth config is invalid",
 		},
+		{
+			desc: "test valid generic config",
+			s: &Server{
+				TokenSecret:         "abc123",
+				GenericClientID:     "abc123",
+				GenericClientSecret: "abc123",
+				GenericAuthURL:      "abc123",
+				GenericTokenURL:     "abc123",
+			},
+			err: "<nil>",
+		},
+		{
+			desc: "test valid generic config with public url",
+			s: &Server{
+				TokenSecret:         "abc123",
+				GenericClientID:     "abc123",
+				GenericClientSecret: "abc123",
+				GenericAuthURL:      "abc123",
+				GenericTokenURL:     "abc123",
+				PublicURL:           "abc123",
+			},
+			err: "<nil>",
+		},
 	}
 
 	for _, test := range tests {
-		err := test.s.validateAuth()
-		assert.Equal(t, test.err, fmt.Sprintf("%v", err), test.desc)
+		t.Run(test.desc, func(t *testing.T) {
+			err := test.s.validateAuth()
+			assert.Equal(t, test.err, fmt.Sprintf("%v", err), test.desc)
+		})
 	}
 }
 
