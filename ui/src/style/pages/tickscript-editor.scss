@@ -78,6 +78,12 @@ $tickscript-controls-height: 60px;
 .tickscript-editor {
   height: calc(100% - #{$tickscript-controls-height * 3.25});
 }
+.page.tickscript-editor-page {
+  // The default page layout (flex) does not work well on FireFox, the height of tickscript-editor grows
+  // with 20+ lines, see #5494. Since the heights and widths of all elements in this page are set,
+  // changing to block layout fixes it.   
+  display: block;
+}
 
 /*
     Toggle for displaying Logs
