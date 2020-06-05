@@ -48,7 +48,7 @@ class Tickscript extends PureComponent<Props> {
       onToggleLogsVisibility,
     } = this.props
     return (
-      <Page>
+      <Page className="tickscript-editor-page">
         <TickscriptHeader
           task={task}
           onSave={onSave}
