@@ -1,8 +1,18 @@
 import _ from 'lodash'
 import {RULE_MESSAGE_TEMPLATE_TEXTS} from 'src/kapacitor/constants'
 
+// the following template variables must also pass validation, see #5492
+// they are not that much common to be part of RULE_MESSAGE_TEMPLATE_TEXTS
+const EXTRA_MESSAGE_VARIABLES = ['.Time.Unix', '.Time.UnixNano']
+
 export const isValidTemplate = (template: string): boolean => {
-  const exactMatch = !!_.find(RULE_MESSAGE_TEMPLATE_TEXTS, t => t === template)
+  if (
+    !!_.find(RULE_MESSAGE_TEMPLATE_TEXTS, t => t === template) ||
+    !!_.find(EXTRA_MESSAGE_VARIABLES, t => t === template)
+  ) {
+    return true
+  }
+
   const fieldsRegex = /(index .Fields ".+")/
   const tagsRegex = /(index .Tags ".+")/
   const ifRegex = /(if .+)/
@@ -10,15 +20,14 @@ export const isValidTemplate = (template: string): boolean => {
   const blockRegex = /(block .+)/
   const withRegex = /(with .+)/
 
-  const fuzzyMatch =
+  return (
     fieldsRegex.test(template) ||
     tagsRegex.test(template) ||
     ifRegex.test(template) ||
     rangeRegex.test(template) ||
     blockRegex.test(template) ||
     withRegex.test(template)
-
-  return exactMatch || fuzzyMatch
+  )
 }
 
 export const isValidMessage = (message: string): boolean => {
