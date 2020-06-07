@@ -1,8 +1,10 @@
 package server_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -278,4 +280,193 @@ func Test_KapacitorRulesGet(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Test_KapacitorActivation tests that activation of one kapacitor make other kapacitors inactive
+func Test_KapacitorActivation(t *testing.T) {
+	// setup mock service and test logger
+	sourceId := 1
+	sourceIdStr := strconv.FormatInt(int64(sourceId), 10)
+	kapacitors := make([]chronograf.Server, 0, 5)
+	testLogger := mocks.TestLogger{}
+	svc := &server.Service{
+		Store: &mocks.Store{
+			SourcesStore: &mocks.SourcesStore{
+				GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					return chronograf.Source{
+						ID:                 sourceId,
+						InsecureSkipVerify: true,
+					}, nil
+				},
+			},
+			ServersStore: &mocks.ServersStore{
+				GetF: func(ctx context.Context, ID int) (chronograf.Server, error) {
+					for _, item := range kapacitors {
+						if item.ID == ID {
+							return item, nil
+						}
+					}
+					return chronograf.Server{}, errors.New("Not Found")
+				},
+				AllF: func(ctx context.Context) ([]chronograf.Server, error) {
+					return kapacitors, nil
+				},
+				AddF: func(ctx context.Context, svr chronograf.Server) (chronograf.Server, error) {
+					for _, item := range kapacitors {
+						if item.ID == svr.ID {
+							return chronograf.Server{}, errors.New("Already Exists")
+						}
+					}
+					svr.ID = len(kapacitors) + 1
+					kapacitors = append(kapacitors, svr)
+					return svr, nil
+				},
+				UpdateF: func(ctx context.Context, svr chronograf.Server) error {
+					for i, item := range kapacitors {
+						if item.ID == svr.ID {
+							kapacitors[i] = svr
+							return nil
+						}
+					}
+					return errors.New("Not Found")
+				},
+			},
+			OrganizationsStore: &mocks.OrganizationsStore{
+				AllF: func(ctx context.Context) ([]chronograf.Organization, error) {
+					return nil, errors.New("No Organizations")
+				},
+				DefaultOrganizationF: func(ctx context.Context) (*chronograf.Organization, error) {
+					return &chronograf.Organization{
+						ID:   "0",
+						Name: "Default",
+					}, nil
+				},
+			},
+		},
+		Logger: &testLogger,
+	}
+
+	newKapacitor := func(t *testing.T, active bool) int {
+		// setup request and response recorder
+		id := len(kapacitors) + 1
+		kapacitor := chronograf.Server{
+			ID:     id,
+			Active: active,
+			SrcID:  sourceId,
+			Name:   strconv.Itoa(id),
+			URL:    "http://test/" + strconv.Itoa(id),
+		}
+		requestBody, _ := json.Marshal(kapacitor)
+		req := httptest.NewRequest("POST", "/chronograf/v1/sources/"+sourceIdStr+"/kapacitors", bytes.NewReader(requestBody))
+		rr := httptest.NewRecorder()
+		// setup context and request params
+		bg := context.Background()
+		params := httprouter.Params{
+			{
+				Key:   "id",
+				Value: sourceIdStr,
+			},
+		}
+		ctx := httprouter.WithParams(bg, params)
+		req = req.WithContext(ctx)
+
+		svc.NewKapacitor(rr, req)
+		if rr.Result().StatusCode/100 != 2 {
+			t.Fatalf("unable to create kapacitor #%d", id)
+		}
+		return id
+	}
+	updateKapacitor := func(t *testing.T, id int, active bool) {
+		// setup request and response recorder
+		kapacitor := chronograf.Server{
+			ID:     id,
+			Active: active,
+			SrcID:  sourceId,
+			Name:   strconv.Itoa(id),
+			URL:    "http://test/" + strconv.Itoa(id),
+		}
+		requestBody, _ := json.Marshal(kapacitor)
+		kid := strconv.Itoa(id)
+		req := httptest.NewRequest("PATCH", "/chronograf/v1/sources/"+sourceIdStr+"/kapacitors/"+kid, bytes.NewReader(requestBody))
+		rr := httptest.NewRecorder()
+		// setup context and request params
+		bg := context.Background()
+		params := httprouter.Params{
+			{
+				Key:   "id",
+				Value: sourceIdStr,
+			},
+			{
+				Key:   "kid",
+				Value: kid,
+			},
+		}
+		ctx := httprouter.WithParams(bg, params)
+		req = req.WithContext(ctx)
+
+		svc.UpdateKapacitor(rr, req)
+		if rr.Result().StatusCode/100 != 2 {
+			t.Fatalf("unable to update kapacitor #%d", id)
+		}
+	}
+	// checks that the expected kapacitor (ID) is active , -1 if there is none, -2 if there are more
+	assertActiveKapacitor := func(t *testing.T, name string, expected int) {
+		// setup request and response recorder
+		req := httptest.NewRequest("GET", "/chronograf/v1/sources/"+sourceIdStr+"/kapacitors", strings.NewReader(""))
+		rr := httptest.NewRecorder()
+		// setup context and request params
+		bg := context.Background()
+		params := httprouter.Params{
+			{
+				Key:   "id",
+				Value: sourceIdStr,
+			},
+		}
+		ctx := httprouter.WithParams(bg, params)
+		req = req.WithContext(ctx)
+
+		// invoke KapacitorRulesGet endpoint
+		svc.Kapacitors(rr, req)
+		type kapacitor struct {
+			ID     int  `json:"id,string"` // Unique identifier representing a kapacitor instance.
+			Active bool `json:"active"`
+		}
+		type kapacitors struct {
+			Kapacitors []kapacitor `json:"kapacitors"`
+		}
+		responseData := kapacitors{}
+		resp := rr.Result()
+		err := json.NewDecoder(resp.Body).Decode(&responseData)
+		retVal := -1
+
+		if err == nil {
+			for _, kapacitor := range responseData.Kapacitors {
+				if kapacitor.Active {
+					if retVal != -1 {
+						t.Fatalf("%s - more active kapacitors detected!", name)
+						return
+					}
+					retVal = kapacitor.ID
+				}
+			}
+		}
+		if expected != retVal {
+			t.Fatalf("%s - expected active kapacitor %d, received %d", name, expected, retVal)
+		}
+	}
+
+	// test expectation when creating/activating/deactivating kapacitors
+	newKapacitor(t, false)
+	assertActiveKapacitor(t, "create inactive #1", -1) // no kapacitor is now active
+	id2 := newKapacitor(t, true)
+	assertActiveKapacitor(t, "create active #2", id2)
+	id3 := newKapacitor(t, false)
+	assertActiveKapacitor(t, "create inactive #3", id2)
+	updateKapacitor(t, id2, false)
+	assertActiveKapacitor(t, "deactivate current #2", -1) // no kapacitor is now active
+	id4 := newKapacitor(t, true)
+	assertActiveKapacitor(t, "create active #4", id4)
+	updateKapacitor(t, id3, true)
+	assertActiveKapacitor(t, "activate #3", id3)
+
 }
