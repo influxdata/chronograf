@@ -5,11 +5,11 @@ import _ from 'lodash'
 import TasksTable from 'src/kapacitor/components/TasksTable'
 import {TaskRow} from 'src/kapacitor/components/TasksTable'
 
-import {source, kapacitorRules} from 'test/resources'
+import {kapacitorRules} from 'test/resources'
 
 const setup = (override = {}) => {
   const props = {
-    source,
+    kapacitorLink: '/sources/1/kapacitors/1',
     tasks: kapacitorRules,
     onDelete: () => {},
     onChangeRuleStatus: () => {},

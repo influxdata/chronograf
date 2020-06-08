@@ -6,7 +6,7 @@ import uuid from 'uuid'
 import Tickscript from 'src/kapacitor/components/Tickscript'
 import * as kapactiorActionCreators from 'src/kapacitor/actions/view'
 import * as errorActionCreators from 'src/shared/actions/errors'
-import {getActiveKapacitor} from 'src/shared/apis'
+import {getActiveKapacitor, getKapacitor} from 'src/shared/apis'
 import {getLogStreamByRuleID, pingKapacitorVersion} from 'src/kapacitor/apis'
 import {notify as notifyAction} from 'src/shared/actions/notifications'
 
@@ -59,6 +59,7 @@ interface KapacitorActions {
 
 interface Params {
   ruleID: string
+  kid?: string // kapacitor id
 }
 
 interface Props {
@@ -121,10 +122,15 @@ export class TickscriptPage extends PureComponent<Props, State> {
       source,
       errorActions,
       kapacitorActions,
-      params: {ruleID},
+      params: {ruleID, kid},
     } = this.props
 
-    const kapacitor = await getActiveKapacitor(source)
+    let kapacitor: Kapacitor
+    if (kid) {
+      kapacitor = await getActiveKapacitor(source)
+    } else {
+      kapacitor = await getKapacitor(source, kid)
+    }
     if (!kapacitor) {
       errorActions.errorThrown(notifyKapacitorNotFound())
     }
@@ -216,6 +222,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
       source: {id: sourceID},
       router,
     } = this.props
+    const {kapacitor} = this.state
 
     try {
       const response = await this.persist()
@@ -231,7 +238,10 @@ export class TickscriptPage extends PureComponent<Props, State> {
         this.setState({unsavedChanges: false, consoleMessage: ''})
       }
 
-      router.push(`/sources/${sourceID}/tickscript/${response.id}`)
+      router.push(
+        // prettier-ignore
+        `/sources/${sourceID}/kapacitors/${kapacitor.id}/tickscripts/${response.id}`
+      )
     } catch (error) {
       console.error(error)
       throw error

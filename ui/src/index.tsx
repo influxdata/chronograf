@@ -179,12 +179,17 @@ class Root extends PureComponent<{}, State> {
                 <Route path="alerts" component={AlertsApp} />
                 <Route path="alert-rules" component={KapacitorRulesPage} />
                 <Route
+                  path="kapacitors/:kid/alert-rules/:ruleID" // ruleID can be "new"
+                  component={KapacitorRulePage}
+                />
+                <Route
                   path="alert-rules/:ruleID"
                   component={KapacitorRulePage}
                 />
-                <Route path="alert-rules/new" component={KapacitorRulePage} />
-                <Route path="tickscript/new" component={TickscriptPage} />
-                <Route path="tickscript/:ruleID" component={TickscriptPage} />
+                <Route
+                  path="kapacitors/:kid/tickscripts/:ruleID" // ruleID can be "new"
+                  component={TickscriptPage}
+                />
                 <Route path="kapacitors/new" component={KapacitorPage} />
                 <Route path="kapacitors/:id/edit" component={KapacitorPage} />
                 <Route

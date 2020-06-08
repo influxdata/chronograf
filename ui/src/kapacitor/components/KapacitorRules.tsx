@@ -4,10 +4,11 @@ import {Link} from 'react-router'
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
 import TasksTable from 'src/kapacitor/components/TasksTable'
 
-import {Source, AlertRule} from 'src/types'
+import {Source, AlertRule, Kapacitor} from 'src/types'
 
 interface KapacitorRulesProps {
   source: Source
+  kapacitor: Kapacitor
   rules: AlertRule[]
   onDelete: (rule: AlertRule) => void
   onChangeRuleStatus: (rule: AlertRule) => void
@@ -15,6 +16,7 @@ interface KapacitorRulesProps {
 
 const KapacitorRules: SFC<KapacitorRulesProps> = ({
   source,
+  kapacitor,
   rules,
   onDelete,
   onChangeRuleStatus,
@@ -26,6 +28,7 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
   const scriptsHeader = `${rules.length} TICKscript${
     rules.length === 1 ? '' : 's'
   }`
+  const kapacitorLink = `/sources/${source.id}/kapacitors/${kapacitor.id}`
 
   return (
     <div>
@@ -33,7 +36,7 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
         <div className="panel-heading">
           <h2 className="panel-title">{builderHeader}</h2>
           <Link
-            to={`/sources/${source.id}/alert-rules/new`}
+            to={`${kapacitorLink}/alert-rules/new`}
             className="btn btn-sm btn-primary"
             style={{marginRight: '4px'}}
           >
@@ -42,7 +45,7 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
         </div>
         <div className="panel-body">
           <KapacitorRulesTable
-            source={source}
+            kapacitorLink={kapacitorLink}
             rules={builderRules}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
@@ -53,7 +56,7 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
         <div className="panel-heading">
           <h2 className="panel-title">{scriptsHeader}</h2>
           <Link
-            to={`/sources/${source.id}/tickscript/new`}
+            to={`${kapacitorLink}/tickscripts/new`}
             className="btn btn-sm btn-success"
             style={{marginRight: '4px'}}
           >
@@ -62,7 +65,7 @@ const KapacitorRules: SFC<KapacitorRulesProps> = ({
         </div>
         <div className="panel-body">
           <TasksTable
-            source={source}
+            kapacitorLink={kapacitorLink}
             tasks={rules}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
