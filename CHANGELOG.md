@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 1. [#5475](https://github.com/influxdata/chronograf/pull/5475): Fix public-url generic oauth configuration issue
+1. [#5512](https://github.com/influxdata/chronograf/pull/5512): Fix crash when starting Chronograf built by Go 1.14 on Windows
 
 ### Features
 

@@ -33,7 +33,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/segmentio/kafka-go v0.3.4 // indirect
 	github.com/sergi/go-diff v1.1.0
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.6.0
 	github.com/soheilhy/cmux v0.1.4 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
