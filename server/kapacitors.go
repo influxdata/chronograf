@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
@@ -332,20 +333,22 @@ func (s *Service) deactivateOtherKapacitors(ctx context.Context, srcID int, ID i
 	if err != nil {
 		return errors.New("error loading kapacitors for deactivation")
 	}
+	var deactivationErrors []string = nil
 	var deactivationError error = nil
 	for _, srv := range mrSrvs {
 		if srv.SrcID == srcID && srv.Type == "" && srv.ID != ID {
 			if srv.Active {
 				srv.Active = false
 				if err := serversStore.Update(ctx, srv); err != nil {
-					if deactivationError == nil {
-						deactivationError = err
-						continue
-					}
-					fmt.Errorf("%w\n%v", deactivationError, err)
+					deactivationErrors = append(deactivationErrors, err.Error())
+					deactivationError = err
+					continue
 				}
 			}
 		}
+	}
+	if len(deactivationErrors) > 1 {
+		return fmt.Errorf(strings.Join(deactivationErrors, "\n"))
 	}
 	return deactivationError
 }
