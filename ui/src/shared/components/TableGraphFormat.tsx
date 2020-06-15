@@ -167,7 +167,8 @@ class TableGraphFormat extends PureComponent<Props, State> {
 
     if (sortField === sort.field) {
       sort.direction = sort.direction === ASCENDING ? DESCENDING : ASCENDING
-    } else {
+    } else if (sortField !== undefined) {
+      // setup sort unless the data are refreshed
       sort.field = sortField || this.sortField
       sort.direction = DEFAULT_SORT_DIRECTION
     }
