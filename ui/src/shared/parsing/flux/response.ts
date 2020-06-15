@@ -23,7 +23,8 @@ const parseChunks = (response: string): string[] => {
     return []
   }
 
-  const chunks = trimmedResponse.split(/\n\s*\n/)
+  // some influxDB versions (docker v1.8.0) return \r\n as a new line separator
+  const chunks = trimmedResponse.split(/\r?\n\s*\n/)
 
   return chunks
 }
