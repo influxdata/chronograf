@@ -113,7 +113,7 @@ func (s *Service) NewKapacitor(w http.ResponseWriter, r *http.Request) {
 
 	if srv.Active {
 		// make sure that there is at most one active kapacitor
-		err := s.activateKapacitor(ctx, srcID, srv.ID)
+		err := s.deactivateOtherKapacitors(ctx, srcID, srv.ID)
 		if err != nil {
 			Error(w, http.StatusInternalServerError, err.Error(), s.Logger)
 			return
@@ -314,7 +314,7 @@ func (s *Service) UpdateKapacitor(w http.ResponseWriter, r *http.Request) {
 
 	if activateKapacitor {
 		// make sure that there is at most one active kapacitor
-		err := s.activateKapacitor(ctx, srcID, id)
+		err := s.deactivateOtherKapacitors(ctx, srcID, id)
 		if err != nil {
 			Error(w, http.StatusInternalServerError, err.Error(), s.Logger)
 			return
@@ -325,12 +325,12 @@ func (s *Service) UpdateKapacitor(w http.ResponseWriter, r *http.Request) {
 	encodeJSON(w, http.StatusOK, res, s.Logger)
 }
 
-// activateKapacitor deactivates all other kapacitors excluding the one with supplied ID
-func (s *Service) activateKapacitor(ctx context.Context, srcID int, ID int) error {
+// deactivateOtherKapacitors deactivates all kapacitors excluding the one with supplied ID
+func (s *Service) deactivateOtherKapacitors(ctx context.Context, srcID int, ID int) error {
 	serversStore := s.Store.Servers(ctx)
 	mrSrvs, err := serversStore.All(ctx)
 	if err != nil {
-		return errors.New("Error loading kapacitors for deactivation")
+		return errors.New("error loading kapacitors for deactivation")
 	}
 	var deactivationError error = nil
 	for _, srv := range mrSrvs {
@@ -338,7 +338,11 @@ func (s *Service) activateKapacitor(ctx context.Context, srcID int, ID int) erro
 			if srv.Active {
 				srv.Active = false
 				if err := serversStore.Update(ctx, srv); err != nil {
-					deactivationError = err
+					if deactivationError == nil {
+						deactivationError = err
+						continue
+					}
+					fmt.Errorf("%w\n%v", deactivationError, err)
 				}
 			}
 		}
