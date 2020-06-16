@@ -67,6 +67,11 @@ describe('kapacitor.utils.alertMessageValidation', () => {
 
       expect(isValid).toEqual(true)
     })
+    it('is True for for .Time.Unix (#5492)', () => {
+      const isValid = isValidTemplate('.Time.Unix')
+
+      expect(isValid).toEqual(true)
+    })
 
     it('is False for a jibberish input', () => {
       const isValid = isValidTemplate('laslkj;owaiu0294u,mxn')
