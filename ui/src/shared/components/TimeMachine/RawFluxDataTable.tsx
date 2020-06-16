@@ -69,7 +69,10 @@ class RawFluxDataTable extends PureComponent<Props, State> {
     scrollTop: number
   ): JSX.Element {
     const rowCount = data.length
-    const columnWidth = Math.max(MIN_COLUMN_WIDTH, width / maxColumnCount)
+    const columnWidth =
+      maxColumnCount > 0
+        ? Math.max(MIN_COLUMN_WIDTH, width / maxColumnCount)
+        : MIN_COLUMN_WIDTH
     const style = this.gridStyle(columnWidth, maxColumnCount, rowCount)
 
     return (
