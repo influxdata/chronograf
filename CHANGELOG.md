@@ -4,6 +4,10 @@
 
 1. [#5475](https://github.com/influxdata/chronograf/pull/5475): Fix public-url generic oauth configuration issue
 1. [#5512](https://github.com/influxdata/chronograf/pull/5512): Fix crash when starting Chronograf built by Go 1.14 on Windows
+1. [#5513](https://github.com/influxdata/chronograf/pull/5513): Keep dashboard's table sorting stable on data refresh
+1. [#5503](https://github.com/influxdata/chronograf/pull/5503): Repair tick script editor scrolling on Firefox
+1. [#5506](https://github.com/influxdata/chronograf/pull/5506): Parse flux CSV results in a way to support existing dockerized 1.8.0 InfluxDB
+1. [#5492](https://github.com/influxdata/chronograf/pull/5492): Support `.Time.Unix` in alert message validation
 
 ### Features
 
