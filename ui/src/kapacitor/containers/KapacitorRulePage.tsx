@@ -9,7 +9,11 @@ import * as kapacitorRuleActionCreators from 'src/kapacitor/actions/view'
 import * as kapacitorQueryConfigActionCreators from 'src/kapacitor/actions/queryConfigs'
 
 import {bindActionCreators} from 'redux'
-import {getActiveKapacitor, getKapacitorConfig} from 'src/shared/apis/index'
+import {
+  getActiveKapacitor,
+  getKapacitorConfig,
+  getKapacitor,
+} from 'src/shared/apis/index'
 import {DEFAULT_RULE_ID} from 'src/kapacitor/constants'
 import KapacitorRule from 'src/kapacitor/components/KapacitorRule'
 import parseHandlersFromConfig from 'src/shared/parsing/parseHandlersFromConfig'
@@ -35,6 +39,7 @@ import {
 
 interface Params {
   ruleID: string
+  kid?: string
 }
 
 interface Props {
@@ -72,8 +77,12 @@ class KapacitorRulePage extends Component<Props, State> {
     } else {
       ruleActions.fetchRule(source, params.ruleID)
     }
-
-    const kapacitor = await getActiveKapacitor(this.props.source)
+    let kapacitor: Kapacitor
+    if (params.kid) {
+      kapacitor = await getKapacitor(this.props.source, params.kid)
+    } else {
+      kapacitor = await getActiveKapacitor(source)
+    }
     if (!kapacitor) {
       return notify(notifyCouldNotFindKapacitor())
     }

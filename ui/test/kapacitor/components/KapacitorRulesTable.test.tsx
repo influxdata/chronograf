@@ -4,12 +4,12 @@ import {shallow} from 'enzyme'
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
 import {RuleRow} from 'src/kapacitor/components/KapacitorRulesTable'
 
-import {source, kapacitorRules} from 'test/resources'
+import {kapacitorRules} from 'test/resources'
 
 describe('Kapacitor.Components.KapacitorRulesTable', () => {
   describe('rendering', () => {
     const props = {
-      source,
+      kapacitorLink: '/sources/1/kapacitors/1',
       rules: kapacitorRules,
       onDelete: () => {},
       onChangeRuleStatus: () => {},
@@ -25,7 +25,7 @@ describe('Kapacitor.Components.KapacitorRulesTable', () => {
 
 describe('Kapacitor.Containers.KapacitorRulesTable.RuleRow', () => {
   const props = {
-    source,
+    editLink: '/sources/1/kapacitors/1/alert-rules/1',
     rule: kapacitorRules[0],
     onDelete: () => {},
     onChangeRuleStatus: jest.fn(),

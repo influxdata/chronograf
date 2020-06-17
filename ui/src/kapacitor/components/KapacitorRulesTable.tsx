@@ -3,7 +3,7 @@ import {Link} from 'react-router'
 import _ from 'lodash'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-import {AlertRule, Source} from 'src/types'
+import {AlertRule} from 'src/types'
 
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {parseAlertNodeList} from 'src/shared/parsing/parseHandlersFromRule'
@@ -19,21 +19,21 @@ const {
 
 interface KapacitorRulesTableProps {
   rules: AlertRule[]
-  source: Source
+  kapacitorLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
 }
 
 interface RuleRowProps {
   rule: AlertRule
-  source: Source
+  editLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
 }
 
 const KapacitorRulesTable: SFC<KapacitorRulesTableProps> = ({
   rules,
-  source,
+  kapacitorLink,
   onChangeRuleStatus,
   onDelete,
 }) => (
@@ -56,7 +56,7 @@ const KapacitorRulesTable: SFC<KapacitorRulesTableProps> = ({
           <RuleRow
             key={rule.id}
             rule={rule}
-            source={source}
+            editLink={`${kapacitorLink}/alert-rules/${rule.id}`}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
           />
@@ -90,14 +90,12 @@ export class RuleRow extends PureComponent<RuleRowProps> {
   }
 
   public render() {
-    const {rule, source} = this.props
+    const {rule, editLink} = this.props
 
     return (
       <tr key={rule.id}>
         <td style={{minWidth: colName}}>
-          <Link to={`/sources/${source.id}/alert-rules/${rule.id}`}>
-            {rule.name}
-          </Link>
+          <Link to={editLink}>{rule.name}</Link>
         </td>
         <td style={{width: colTrigger, textTransform: 'capitalize'}}>
           {rule.trigger}

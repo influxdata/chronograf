@@ -1,10 +1,13 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/bouk/httprouter"
 	"github.com/influxdata/chronograf"
@@ -107,6 +110,15 @@ func (s *Service) NewKapacitor(w http.ResponseWriter, r *http.Request) {
 		msg := fmt.Errorf("Error storing kapacitor %v: %v", req, err)
 		unknownErrorWithMessage(w, msg, s.Logger)
 		return
+	}
+
+	if srv.Active {
+		// make sure that there is at most one active kapacitor
+		err := s.deactivateOtherKapacitors(ctx, srcID, srv.ID)
+		if err != nil {
+			Error(w, http.StatusInternalServerError, err.Error(), s.Logger)
+			return
+		}
 	}
 
 	res := newKapacitor(srv)
@@ -273,6 +285,7 @@ func (s *Service) UpdateKapacitor(w http.ResponseWriter, r *http.Request) {
 		invalidData(w, err, s.Logger)
 		return
 	}
+	activateKapacitor := false
 
 	if req.Name != nil {
 		srv.Name = *req.Name
@@ -290,6 +303,7 @@ func (s *Service) UpdateKapacitor(w http.ResponseWriter, r *http.Request) {
 		srv.InsecureSkipVerify = *req.InsecureSkipVerify
 	}
 	if req.Active != nil {
+		activateKapacitor = *req.Active
 		srv.Active = *req.Active
 	}
 
@@ -299,8 +313,44 @@ func (s *Service) UpdateKapacitor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if activateKapacitor {
+		// make sure that there is at most one active kapacitor
+		err := s.deactivateOtherKapacitors(ctx, srcID, id)
+		if err != nil {
+			Error(w, http.StatusInternalServerError, err.Error(), s.Logger)
+			return
+		}
+	}
+
 	res := newKapacitor(srv)
 	encodeJSON(w, http.StatusOK, res, s.Logger)
+}
+
+// deactivateOtherKapacitors deactivates all kapacitors excluding the one with supplied ID
+func (s *Service) deactivateOtherKapacitors(ctx context.Context, srcID int, ID int) error {
+	serversStore := s.Store.Servers(ctx)
+	mrSrvs, err := serversStore.All(ctx)
+	if err != nil {
+		return errors.New("error loading kapacitors for deactivation")
+	}
+	var deactivationErrors []string = nil
+	var deactivationError error = nil
+	for _, srv := range mrSrvs {
+		if srv.SrcID == srcID && srv.Type == "" && srv.ID != ID {
+			if srv.Active {
+				srv.Active = false
+				if err := serversStore.Update(ctx, srv); err != nil {
+					deactivationErrors = append(deactivationErrors, err.Error())
+					deactivationError = err
+					continue
+				}
+			}
+		}
+	}
+	if len(deactivationErrors) > 1 {
+		return fmt.Errorf(strings.Join(deactivationErrors, "\n"))
+	}
+	return deactivationError
 }
 
 // KapacitorRulesPost proxies POST to kapacitor

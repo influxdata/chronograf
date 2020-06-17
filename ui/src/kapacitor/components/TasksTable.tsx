@@ -2,7 +2,7 @@ import React, {PureComponent, SFC} from 'react'
 import {Link} from 'react-router'
 import _ from 'lodash'
 
-import {AlertRule, Source} from 'src/types'
+import {AlertRule} from 'src/types'
 
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {TASKS_TABLE} from 'src/kapacitor/constants/tableSizing'
@@ -10,21 +10,21 @@ const {colName, colType, colEnabled, colActions} = TASKS_TABLE
 
 interface TasksTableProps {
   tasks: AlertRule[]
-  source: Source
+  kapacitorLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
 }
 
 interface TaskRowProps {
   task: AlertRule
-  source: Source
+  editLink: string
   onChangeRuleStatus: (rule: AlertRule) => void
   onDelete: (rule: AlertRule) => void
 }
 
 const TasksTable: SFC<TasksTableProps> = ({
   tasks,
-  source,
+  kapacitorLink,
   onDelete,
   onChangeRuleStatus,
 }) => (
@@ -45,7 +45,7 @@ const TasksTable: SFC<TasksTableProps> = ({
           <TaskRow
             key={task.id}
             task={task}
-            source={source}
+            editLink={`${kapacitorLink}/tickscripts/${task.id}`}
             onDelete={onDelete}
             onChangeRuleStatus={onChangeRuleStatus}
           />
@@ -57,15 +57,12 @@ const TasksTable: SFC<TasksTableProps> = ({
 
 export class TaskRow extends PureComponent<TaskRowProps> {
   public render() {
-    const {task, source} = this.props
+    const {task, editLink} = this.props
 
     return (
       <tr key={task.id}>
         <td style={{minWidth: colName}}>
-          <Link
-            className="link-success"
-            to={`/sources/${source.id}/tickscript/${task.id}`}
-          >
+          <Link className="link-success" to={editLink}>
             {task.name}
           </Link>
         </td>
