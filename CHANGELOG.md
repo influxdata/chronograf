@@ -9,6 +9,7 @@
 1. [#5506](https://github.com/influxdata/chronograf/pull/5506): Parse flux CSV results in a way to support existing dockerized 1.8.0 InfluxDB
 1. [#5492](https://github.com/influxdata/chronograf/pull/5492): Support `.Time.Unix` in alert message validation
 1. [#5514](https://github.com/influxdata/chronograf/pull/5514): Error when viewing flux raw data after edit
+1. [#5505](https://github.com/influxdata/chronograf/pull/5505): Repair management of kapacitor rules and tick scripts
 
 ### Features
 
