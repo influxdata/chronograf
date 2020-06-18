@@ -126,7 +126,10 @@ interface ParseResponseRawResult {
 export const parseResponseRaw = (response: string): ParseResponseRawResult => {
   const chunks = parseChunks(response)
   const parsedChunks = chunks.map(c => Papa.parse(c).data)
-  const maxColumnCount = Math.max(...parsedChunks.map(c => c[0].length))
+  const maxColumnCount =
+    parsedChunks.length > 0
+      ? Math.max(...parsedChunks.map(c => c[0].length))
+      : 0
   const data = []
 
   for (let i = 0; i < parsedChunks.length; i++) {
