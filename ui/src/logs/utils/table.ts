@@ -180,8 +180,8 @@ export const applyChangesToTableData = (
   const timeColumnIndex = _.indexOf(columns, 'time')
   const timestampColumnIndex = _.indexOf(columns, 'timestamp')
   if (timeColumnIndex >= 0 && timestampColumnIndex >= 0) {
-    // modify existing data to save memory  
-    (values as TimeSeriesValue[][]).forEach(row => {
+    // modify existing data to save memory
+    ;(values as TimeSeriesValue[][]).forEach(row => {
       if (row[timestampColumnIndex] === null) {
         row[timestampColumnIndex] = (row[timeColumnIndex] as number) * 1000000
       }
