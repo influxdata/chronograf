@@ -85,8 +85,8 @@ interface State {
   shouldResize: boolean
 }
 
-// When error occurs in TableGraph, it has to be wrapped into 'table-graph-container'
-// to become visible to the user, because of <AutoSizer> element used in renderring
+// A TableGraph error message has to be wrapped into 'table-graph-container'
+// to be visible to the user, the same way as the table data is.
 export class TableGraphError extends PureComponent<{error: Error}> {
   public render() {
     return (
