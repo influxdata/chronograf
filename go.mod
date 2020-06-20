@@ -55,4 +55,10 @@ require (
 
 replace github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
 
+// avoid dependency error: https://gonum.org/v1/gonum?go-get=1 (status code 404)
+replace gonum.org/v1/gonum v0.0.0-20181121035319-3f7ecaa7e8ca => github.com/gonum/gonum v0.0.0-20181121035319-3f7ecaa7e8ca
+
+// avoid dependency error: https://gonum.org/v1/netlib?go-get=1 (status code 404)
+replace gonum.org/v1/netlib v0.0.0-20181029234149-ec6d1f5cefe6 => github.com/gonum/netlib v0.0.0-20181029234149-ec6d1f5cefe6
+
 go 1.13
