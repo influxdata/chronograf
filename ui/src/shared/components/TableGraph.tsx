@@ -11,7 +11,7 @@ import {MultiGrid, PropsMultiGrid} from 'src/shared/components/MultiGrid'
 
 // Utils
 import {fastReduce} from 'src/utils/fast'
-import {ErrorHandling} from 'src/shared/decorators/errors'
+import {ErrorHandlingWith, DefaultError} from 'src/shared/decorators/errors'
 import {
   getDefaultTimeField,
   isNumerical,
@@ -85,7 +85,19 @@ interface State {
   shouldResize: boolean
 }
 
-@ErrorHandling
+// When error occurs in TableGraph, it has to be wrapped into 'table-graph-container'
+// to become visible to the user, because of <AutoSizer> element used in renderring
+export class TableGraphError extends PureComponent<{error: Error}> {
+  public render() {
+    return (
+      <div className="table-graph-container">
+        <DefaultError error={this.props.error} />
+      </div>
+    )
+  }
+}
+
+@ErrorHandlingWith(TableGraphError)
 class TableGraph extends PureComponent<Props, State> {
   private multiGrid?: MultiGrid
 
