@@ -174,14 +174,14 @@ export const applyChangesToTableData = (
   tableColumns: LogsTableColumn[]
 ): TableData => {
   const columns = _.get(tableData, 'columns', [])
-  const values = _.get(tableData, 'values', [])
+  const values: TimeSeriesValue[][] = _.get(tableData, 'values', [])
 
   // #5472 fallback to timestamp when time is not defined
   const timeColumnIndex = _.indexOf(columns, 'time')
   const timestampColumnIndex = _.indexOf(columns, 'timestamp')
   if (timeColumnIndex >= 0 && timestampColumnIndex >= 0) {
     // modify existing data to save memory
-    ;(values as TimeSeriesValue[][]).forEach(row => {
+    values.forEach(row => {
       if (row[timestampColumnIndex] === null) {
         row[timestampColumnIndex] = (row[timeColumnIndex] as number) * 1000000
       }
