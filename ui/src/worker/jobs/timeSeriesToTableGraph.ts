@@ -51,8 +51,7 @@ export const timeSeriesToTableGraphWork = (
   }
 
   // #5347 rename columns of the same name
-  const uniqueLabels: Record<string, boolean> = {}
-  sortedLabels.forEach(l => {
+  sortedLabels.reduce((uniqueLabels, l) => {
     if (uniqueLabels[l.label]) {
       const origLabel = l.label
       let i = 2
@@ -62,7 +61,8 @@ export const timeSeriesToTableGraphWork = (
       l.label = origLabel + '_' + i
     }
     uniqueLabels[l.label] = true
-  })
+    return uniqueLabels
+  }, {})
 
   let labels = fastMap<Label, string>(sortedLabels, ({label}) => label)
 
