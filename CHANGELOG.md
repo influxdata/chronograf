@@ -10,6 +10,9 @@
 1. [#5492](https://github.com/influxdata/chronograf/pull/5492): Support `.Time.Unix` in alert message validation
 1. [#5514](https://github.com/influxdata/chronograf/pull/5514): Error when viewing flux raw data after edit
 1. [#5505](https://github.com/influxdata/chronograf/pull/5505): Repair management of kapacitor rules and tick scripts
+1. [#5521](https://github.com/influxdata/chronograf/pull/5521): Avoid undefined error when dashboard is not ready yet
+1. [#5516](https://github.com/influxdata/chronograf/pull/5516): Fall back to point timestamp in log viewer
+1. [#5517](https://github.com/influxdata/chronograf/pull/5517): Add global functions and string trimmming to alert message validation
 
 ### Features
 
