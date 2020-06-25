@@ -13,6 +13,7 @@
 1. [#5521](https://github.com/influxdata/chronograf/pull/5521): Avoid undefined error when dashboard is not ready yet
 1. [#5516](https://github.com/influxdata/chronograf/pull/5516): Fall back to point timestamp in log viewer
 1. [#5517](https://github.com/influxdata/chronograf/pull/5517): Add global functions and string trimmming to alert message validation
+1. [#5519](https://github.com/influxdata/chronograf/pull/5519): Merge query results with unique column names
 
 ### Features
 
