@@ -10,6 +10,8 @@
 1. [#5492](https://github.com/influxdata/chronograf/pull/5492): Support `.Time.Unix` in alert message validation
 1. [#5514](https://github.com/influxdata/chronograf/pull/5514): Error when viewing flux raw data after edit
 1. [#5505](https://github.com/influxdata/chronograf/pull/5505): Repair management of kapacitor rules and tick scripts
+1. [#5522](https://github.com/influxdata/chronograf/pull/5522): Prevent exit presentation mode when zooming out
+
 
 ### Features
 
