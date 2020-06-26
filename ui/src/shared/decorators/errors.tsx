@@ -9,7 +9,7 @@ const VERSION = process.env.npm_package_version
 
 type ErrorComponentClass = ComponentClass<{error: Error} & any>
 
-class DefaultError extends Component<{error: Error}> {
+export class DefaultError extends Component<{error: Error}> {
   public render() {
     const {error} = this.props
     const {stack, message} = error

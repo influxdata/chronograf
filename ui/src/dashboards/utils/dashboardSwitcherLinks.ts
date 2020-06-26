@@ -27,6 +27,10 @@ export const updateDashboardLinks = (
 ) => {
   const {active} = dashboardLinks
 
+  if (!activeDashboard) {
+    return {...dashboardLinks, active: null}
+  }
+
   if (!active || active.key !== String(activeDashboard.id)) {
     return updateActiveDashboardLink(dashboardLinks, activeDashboard)
   }
@@ -38,10 +42,6 @@ const updateActiveDashboardLink = (
   dashboardLinks: DashboardSwitcherLinks,
   dashboard: Dashboard
 ) => {
-  if (!dashboard) {
-    return {...dashboardLinks, active: null}
-  }
-
   const active = dashboardLinks.links.find(
     link => link.key === String(dashboard.id)
   )

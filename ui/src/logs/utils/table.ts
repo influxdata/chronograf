@@ -7,6 +7,7 @@ import {
   orderTableColumns,
   filterTableColumns,
 } from 'src/dashboards/utils/tableGraph'
+import {TimeSeriesValue} from 'src/types/series'
 
 export const ROW_HEIGHT = 18
 const CHAR_WIDTH = 9
@@ -173,9 +174,21 @@ export const applyChangesToTableData = (
   tableColumns: LogsTableColumn[]
 ): TableData => {
   const columns = _.get(tableData, 'columns', [])
-  const values = _.get(tableData, 'values', [])
-  const data = [columns, ...values]
+  const values: TimeSeriesValue[][] = _.get(tableData, 'values', [])
 
+  // #5472 fallback to timestamp when time is not defined
+  const timeColumnIndex = _.indexOf(columns, 'time')
+  const timestampColumnIndex = _.indexOf(columns, 'timestamp')
+  if (timeColumnIndex >= 0 && timestampColumnIndex >= 0) {
+    // modify existing data to save memory
+    values.forEach(row => {
+      if (row[timestampColumnIndex] === null) {
+        row[timestampColumnIndex] = (row[timeColumnIndex] as number) * 1000000
+      }
+    })
+  }
+
+  const data = [columns, ...values]
   const filteredData = filterTableColumns(data, tableColumns)
   const orderedData = orderTableColumns(filteredData, tableColumns)
   const updatedColumns: string[] = _.get(orderedData, '0', [])

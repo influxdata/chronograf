@@ -50,6 +50,20 @@ export const timeSeriesToTableGraphWork = (
     return {data: metaQuerySeries, sortedLabels, influxQLQueryType: queryType}
   }
 
+  // #5347 rename columns of the same name
+  sortedLabels.reduce((uniqueLabels, l) => {
+    if (uniqueLabels[l.label]) {
+      const origLabel = l.label
+      let i = 2
+      while (uniqueLabels[origLabel + '_' + i]) {
+        i++
+      }
+      l.label = origLabel + '_' + i
+    }
+    uniqueLabels[l.label] = true
+    return uniqueLabels
+  }, {})
+
   let labels = fastMap<Label, string>(sortedLabels, ({label}) => label)
 
   if (queryType === InfluxQLQueryType.DataQuery) {

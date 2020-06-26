@@ -59,6 +59,16 @@ describe('kapacitor.utils.alertMessageValidation', () => {
 
       expect(isValid).toEqual(true)
     })
+    ;[
+      'CI ID = {{ with (index .Tags "ci_id") }}{{ . }}{{ else }}Unknown{{ end }}',
+      'CI ID = {{ if (index .Tags "ci_id") }}{{ index .Tags "ci_id" }}{{ else -}} Unknown {{- end }}',
+      '# of Tags = {{ len .Tags }}',
+    ].forEach(m => {
+      it(`#5343 accepts message '${m}'`, () => {
+        const isValid = isValidMessage(m)
+        expect(isValid).toEqual(true)
+      })
+    })
   })
 
   describe('isValidTemplate', () => {
@@ -69,6 +79,11 @@ describe('kapacitor.utils.alertMessageValidation', () => {
     })
     it('is True for for .Time.Unix (#5492)', () => {
       const isValid = isValidTemplate('.Time.Unix')
+
+      expect(isValid).toEqual(true)
+    })
+    it('is True for for len .Tags (#5343)', () => {
+      const isValid = isValidTemplate('len .Tags')
 
       expect(isValid).toEqual(true)
     })
