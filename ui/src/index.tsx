@@ -5,7 +5,7 @@ import {render} from 'react-dom'
 import {Provider as ReduxProvider} from 'react-redux'
 import {Provider as UnstatedProvider} from 'unstated'
 import {Router, Route, useRouterHistory} from 'react-router'
-import {createHistory} from 'history'
+import {createHistory, Pathname} from 'history'
 import {syncHistoryWithStore} from 'react-router-redux'
 import {bindActionCreators} from 'redux'
 
@@ -78,8 +78,15 @@ const browserHistory = useRouterHistory(createHistory)({
 const store = configureStore(loadLocalStorage(errorsQueue), browserHistory)
 const {dispatch} = store
 
-browserHistory.listen(() => {
-  dispatch(disablePresentationMode())
+// pathname of last location change
+let lastPathname: Pathname
+
+browserHistory.listen(location => {
+  // disable presentation mode only if pathname changes, #5382
+  if (lastPathname !== location.pathname) {
+    dispatch(disablePresentationMode())
+    lastPathname = location.pathname
+  }
 })
 
 window.addEventListener('keyup', event => {
