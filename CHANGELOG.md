@@ -39,6 +39,9 @@
 1. [#5519](https://github.com/influxdata/chronograf/pull/5519): Merge query results with unique column names
 1. [#5524](https://github.com/influxdata/chronograf/pull/5524): Avoid exiting presentation mode when zooming out
 1. [#5529](https://github.com/influxdata/chronograf/pull/5529): Avoid duplication of `csv.from` in functions list
+1. [#5524](https://github.com/influxdata/chronograf/pull/5524): Prevent exiting presentation mode when zooming out
+1. [#5529](https://github.com/influxdata/chronograf/pull/5529): Multiplication of `csv.from` in functions list
+1. [#5532](https://github.com/influxdata/chronograf/pull/5532): Fix UI compilation on newer NodeJS versions
 
 ### Features
 
