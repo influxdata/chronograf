@@ -15,6 +15,7 @@
 1. [#5517](https://github.com/influxdata/chronograf/pull/5517): Add global functions and string trimmming to alert message validation
 1. [#5519](https://github.com/influxdata/chronograf/pull/5519): Merge query results with unique column names
 1. [#5524](https://github.com/influxdata/chronograf/pull/5524): Prevent exiting presentation mode when zooming out
+1. [#5529](https://github.com/influxdata/chronograf/pull/5529): Multiplication of `csv.from` in functions list
 
 ### Features
 
