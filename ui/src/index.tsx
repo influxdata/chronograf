@@ -85,8 +85,8 @@ browserHistory.listen(location => {
   // disable presentation mode only if pathname changes, #5382
   if (lastPathname !== location.pathname) {
     dispatch(disablePresentationMode())
+    lastPathname = location.pathname
   }
-  lastPathname = location.pathname
 })
 
 window.addEventListener('keyup', event => {
