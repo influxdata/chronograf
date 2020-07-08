@@ -1,4 +1,12 @@
-## v1.8.5
+## v1.8.6
+
+### Bug Fixes
+
+### Features
+
+### Other
+
+## v1.8.5 [2020-07-08]
 
 ### Bug Fixes
 
@@ -7,15 +15,15 @@
 1. [#5513](https://github.com/influxdata/chronograf/pull/5513): Keep dashboard's table sorting stable on data refresh
 1. [#5503](https://github.com/influxdata/chronograf/pull/5503): Repair tick script editor scrolling on Firefox
 1. [#5506](https://github.com/influxdata/chronograf/pull/5506): Parse flux CSV results in a way to support existing dockerized 1.8.0 InfluxDB
-1. [#5492](https://github.com/influxdata/chronograf/pull/5492): Support `.Time.Unix` in alert message validation
+1. [#5504](https://github.com/influxdata/chronograf/pull/5504): Support `.Time.Unix` in alert message validation
 1. [#5514](https://github.com/influxdata/chronograf/pull/5514): Error when viewing flux raw data after edit
 1. [#5505](https://github.com/influxdata/chronograf/pull/5505): Repair management of kapacitor rules and tick scripts
 1. [#5521](https://github.com/influxdata/chronograf/pull/5521): Avoid undefined error when dashboard is not ready yet
-1. [#5516](https://github.com/influxdata/chronograf/pull/5516): Fall back to point timestamp in log viewer
-1. [#5517](https://github.com/influxdata/chronograf/pull/5517): Add global functions and string trimmming to alert message validation
+1. [#5517](https://github.com/influxdata/chronograf/pull/5517): Fall back to point timestamp in log viewer
+1. [#5516](https://github.com/influxdata/chronograf/pull/5516): Add global functions and string trimmming to alert message validation
 1. [#5519](https://github.com/influxdata/chronograf/pull/5519): Merge query results with unique column names
-1. [#5524](https://github.com/influxdata/chronograf/pull/5524): Prevent exiting presentation mode when zooming out
-1. [#5529](https://github.com/influxdata/chronograf/pull/5529): Multiplication of `csv.from` in functions list
+1. [#5524](https://github.com/influxdata/chronograf/pull/5524): Avoid exiting presentation mode when zooming out
+1. [#5529](https://github.com/influxdata/chronograf/pull/5529): Avoid duplication of `csv.from` in functions list
 
 ### Features
 
