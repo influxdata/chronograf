@@ -195,10 +195,7 @@ describe('buildInfluxQLQuery', () => {
         database: 'db1',
         retentionPolicy: 'rp1',
         measurement: 'm0',
-        fields: [
-          {value: 'f0', type: 'field'},
-          {value: 'f1', type: 'field'},
-        ],
+        fields: [{value: 'f0', type: 'field'}, {value: 'f1', type: 'field'}],
       })
       timeBounds = {upper: "'2015-02-24T00:00:00Z'"}
     })
@@ -335,7 +332,7 @@ describe('buildInfluxQLQuery', () => {
 
   describe('build query', () => {
     it('builds an influxql relative time bound query', () => {
-      const config = mergeConfig({
+      const queryConfig = mergeConfig({
         database: 'db1',
         measurement: 'm1',
         retentionPolicy: 'rp1',
@@ -346,12 +343,12 @@ describe('buildInfluxQLQuery', () => {
       const timeRange = {upper: null, lower: 'now() - 15m'}
       const expected =
         'SELECT "f1" FROM "db1"."rp1"."m1" WHERE time > now() - 15m GROUP BY time(10m) FILL(null)'
-      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, config)
+      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig)
 
       expect(actual).toBe(expected)
     })
     it('builds an influxql with escaped tag value', () => {
-      const config = mergeConfig({
+      const queryConfig = mergeConfig({
         database: 'db1',
         measurement: 'm1',
         retentionPolicy: 'rp1',
@@ -361,12 +358,12 @@ describe('buildInfluxQLQuery', () => {
 
       const timeRange = {lower: ''}
       const expected = `SELECT "f1" FROM "db1"."rp1"."m1" WHERE "t1"='pavel\\'s'`
-      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, config)
+      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig)
 
       expect(actual).toBe(expected)
     })
     it('builds an influxql with escaped tag values', () => {
-      const config = mergeConfig({
+      const queryConfig = mergeConfig({
         database: 'db1',
         measurement: 'm1',
         retentionPolicy: 'rp1',
@@ -376,7 +373,7 @@ describe('buildInfluxQLQuery', () => {
 
       const timeRange = {lower: ''}
       const expected = `SELECT "f1" FROM "db1"."rp1"."m1" WHERE ("t1"='pavel\\'s' OR "t1"='o\\'harry\\'s' OR "t1"='a')`
-      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, config)
+      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig)
 
       expect(actual).toBe(expected)
     })
