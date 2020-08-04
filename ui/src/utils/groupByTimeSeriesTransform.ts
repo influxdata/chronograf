@@ -404,7 +404,7 @@ const constructTimeSeries = (
     timeSeries[existingRowIndex].values[valueIndex] = value
   }
 
-  // change all undefined values to null
+  // change all undefined values to null, these values were not set
   timeSeries.forEach(x => {
     for (let i = 0; i < x.values.length; i++) {
       if (x.values[i] === undefined) {
