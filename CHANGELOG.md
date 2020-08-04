@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5554](https://github.com/influxdata/chronograf/pull/5554): Escape tag values in query builder.
+
 ### Features
 
 ### Other
