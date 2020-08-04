@@ -43,7 +43,7 @@ class LogItemKapacitorPoint extends PureComponent<Props> {
         <div className="logs-table--scrollbox">
           {sortedObjKeys.map(objKey => (
             <div key={objKey} className="logs-table--key-value">
-              {objKey}: <span>{object[objKey]}</span>
+              {objKey}: <span>{String(object[objKey])}</span>
             </div>
           ))}
         </div>
