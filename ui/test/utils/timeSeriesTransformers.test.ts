@@ -971,6 +971,44 @@ describe('timeSeriesToTableGraph', () => {
     expect(actual.data).toEqual(expected)
     expect(actual.influxQLQueryType).toEqual(InfluxQLQueryType.MetaQuery)
   })
+  it('returns all table results even with duplicate time rows #5502', () => {
+    const influxResponse = [
+      {
+        response: {
+          results: [
+            {
+              statement_id: 0,
+              series: [
+                {
+                  name: 'mem',
+                  columns: ['time', 'host', 'val'],
+                  values: [
+                    [1000, 'a', 1],
+                    [1000, 'b', 2],
+                    [2000, 'b', 3],
+                    [2000, 'c', 4],
+                  ],
+                },
+              ],
+            },
+          ],
+          uuid: '8cb3862f-aacf-4c3a-990f-4479de00ff99',
+        },
+      },
+    ]
+
+    const actual = timeSeriesToTableGraph(influxResponse)
+    const expected = [
+      ['time', 'mem.host', 'mem.val'],
+      [1000, 'a', 1],
+      [1000, 'b', 2],
+      [2000, 'b', 3],
+      [2000, 'c', 4],
+    ]
+
+    expect(actual.data).toEqual(expected)
+    expect(actual.influxQLQueryType).toEqual(InfluxQLQueryType.DataQuery)
+  })
 })
 
 describe('filterTableColumns', () => {
