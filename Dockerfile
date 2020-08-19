@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.12
 MAINTAINER Chris Goller <chris@influxdb.com>
 
 ENV PROTOBOARDS_PATH /usr/share/chronograf/protoboards
