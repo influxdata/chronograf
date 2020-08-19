@@ -7,6 +7,7 @@
 ### Other
 
 1. [#5560](https://github.com/influxdata/chronograf/pull/5560): Upgrade Dockerfile to use Alpine 3.12
+1. [#5552] (https://github.com/influxdata/chronograf/pull/5552): Make MySQL protoboard more useful by using derivatives for counter values
 
 ## v1.8.5 [2020-07-08]
 
