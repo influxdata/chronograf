@@ -93,7 +93,7 @@
         "name": "InnoDB data",
         "queries": [
           {
-            "query": "SELECT mean(\"innodb_data_writes\") AS \"writes\", mean(\"innodb_data_reads\") AS \"reads\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT non_negative_derivative(mean(\"innodb_data_writes\")) AS \"writes\", non_negative_derivative(mean(\"innodb_data_reads\")) AS \"reads\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -102,7 +102,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"innodb_data_writes\") AS \"writes\", mean(\"innodb_data_reads\") AS \"reads\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT non_negative_derivative(mean(\"innodb_data_writes\")) AS \"writes\", non_negative_derivative(mean(\"innodb_data_reads\")) AS \"reads\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host =:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },
@@ -838,7 +838,7 @@
         "name": "MySQL slow queries",
         "queries": [
           {
-            "query": "SELECT mean(\"slow_queries\") AS \"mean_slow_queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+            "query": "SELECT non_negative_derivative(mean(\"slow_queries\")) AS \"slow_queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
             "queryConfig": {
               "database": "",
               "measurement": "",
@@ -847,7 +847,7 @@
               "tags": {},
               "groupBy": {"time": "", "tags": []},
               "areTagsAccepted": false,
-              "rawText": "SELECT mean(\"slow_queries\") AS \"mean_slow_queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
+              "rawText": "SELECT non_negative_derivative(mean(\"slow_queries\")) AS \"slow_queries\" FROM \":db:\".\":rp:\".\"mysql\" WHERE host=:host: AND time > :dashboardTime: GROUP BY time(:interval:) FILL(null)",
               "range": null,
               "shifts": null
             },

@@ -6153,7 +6153,7 @@
         "me": "/chronograf/v1/me",
         "dashboards": "/chronograf/v1/dashboards",
         "external": {
-          "statusFeed": "http://news.influxdata.com/feed.json",
+          "statusFeed": "https://www.influxdata.com/feed/json",
           "custom": [
             {
               "name": "InfluxData",
