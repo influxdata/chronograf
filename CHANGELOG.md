@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+1. [#5554](https://github.com/influxdata/chronograf/pull/5554): Escape tag values in query builder.
 1. [#5551](https://github.com/influxdata/chronograf/pull/5551): Sort namespaces by database and retention policy.
 
 ### Features

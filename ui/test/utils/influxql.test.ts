@@ -331,21 +331,49 @@ describe('buildInfluxQLQuery', () => {
   })
 
   describe('build query', () => {
-    beforeEach(() => {
-      config = mergeConfig({
+    it('builds an influxql relative time bound query', () => {
+      const queryConfig = mergeConfig({
         database: 'db1',
         measurement: 'm1',
         retentionPolicy: 'rp1',
         fields: [{value: 'f1', type: 'field'}],
         groupBy: {time: '10m', tags: []},
       })
-    })
 
-    it('builds an influxql relative time bound query', () => {
       const timeRange = {upper: null, lower: 'now() - 15m'}
       const expected =
         'SELECT "f1" FROM "db1"."rp1"."m1" WHERE time > now() - 15m GROUP BY time(10m) FILL(null)'
-      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, config)
+      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig)
+
+      expect(actual).toBe(expected)
+    })
+    it('builds an influxql with escaped tag value', () => {
+      const queryConfig = mergeConfig({
+        database: 'db1',
+        measurement: 'm1',
+        retentionPolicy: 'rp1',
+        tags: {t1: ["pavel's"]},
+        fields: [{value: 'f1', type: 'field'}],
+      })
+
+      const timeRange = {lower: ''}
+      const expected = `SELECT "f1" FROM "db1"."rp1"."m1" WHERE "t1"='pavel\\'s'`
+      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig)
+
+      expect(actual).toBe(expected)
+    })
+    it('builds an influxql with escaped tag values', () => {
+      const queryConfig = mergeConfig({
+        database: 'db1',
+        measurement: 'm1',
+        retentionPolicy: 'rp1',
+        tags: {t1: ["pavel's", "o'harry's", 'a']},
+        fields: [{value: 'f1', type: 'field'}],
+      })
+
+      const timeRange = {lower: ''}
+      const expected = `SELECT "f1" FROM "db1"."rp1"."m1" WHERE ("t1"='pavel\\'s' OR "t1"='o\\'harry\\'s' OR "t1"='a')`
+      const actual = buildQuery(TYPE_QUERY_CONFIG, timeRange, queryConfig)
 
       expect(actual).toBe(expected)
     })

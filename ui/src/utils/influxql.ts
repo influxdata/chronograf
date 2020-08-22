@@ -154,11 +154,13 @@ export function buildWhereClause({
     const cond = areTagsAccepted ? ' OR ' : ' AND '
 
     if (tags[k].length > 1) {
-      const joinedOnOr = tags[k].map(v => `"${k}"${operator}'${v}'`).join(cond)
+      const joinedOnOr = tags[k]
+        .map(v => `"${k}"${operator}'${v.replace(/'/g, "\\'")}'`)
+        .join(cond)
       return `(${joinedOnOr})`
     }
 
-    return `"${k}"${operator}'${tags[k]}'`
+    return `"${k}"${operator}'${tags[k].map(v => v.replace(/'/g, "\\'"))}'`
   })
 
   const subClauses = timeClauses.concat(tagClauses)
