@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5551](https://github.com/influxdata/chronograf/pull/5551): Sort namespaces by database and retention policy.
+
 ### Features
 
 ### Other

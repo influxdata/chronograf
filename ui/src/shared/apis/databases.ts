@@ -44,9 +44,7 @@ export const getDatabasesWithRetentionPolicies = async (
     const {databases} = showDatabasesParser(data)
     const namespaces = await getRetentionPolices(proxy, databases)
 
-    const sorted = _.sortBy(namespaces, ({database}: Namespace) =>
-      database.toLowerCase()
-    )
+    const sorted = _.sortBy(namespaces, ['database', 'retentionPolicy'])
 
     return sorted
   } catch (err) {
