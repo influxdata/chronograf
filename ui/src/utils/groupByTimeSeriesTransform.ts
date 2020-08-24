@@ -343,10 +343,9 @@ const constructTimeSeries = (
   serieses: Series[],
   cells: Cells,
   sortedLabels: Label[],
-  seriesLabels: Label[][]
+  seriesLabels: Label[][],
+  allowDuplicateTime = false
 ): TimeSeries[] => {
-  const nullArray: TimeSeriesValue[] = Array(sortedLabels.length).fill(null)
-
   const labelsToValueIndex = fastReduce<Label, {[x: string]: number}>(
     sortedLabels,
     (acc, {label, responseIndex, seriesIndex}, i) => {
@@ -382,22 +381,37 @@ const constructTimeSeries = (
     }
 
     existingRowIndex = tsMemo[time]
+    const valueIndex = labelsToValueIndex[label + responseIndex + seriesIndex]
 
     // avoid memoizing null time columns for meta queries
-    if (existingRowIndex === undefined || time === null) {
+    // + optionally create a duplicate entry if it would overwrite existing
+    if (
+      existingRowIndex === undefined ||
+      time === null ||
+      (allowDuplicateTime &&
+        existingRowIndex !== undefined &&
+        timeSeries[existingRowIndex].values[valueIndex] !== undefined)
+    ) {
       timeSeries.push({
         time,
-        values: fastCloneArray(nullArray),
+        values: new Array(sortedLabels.length),
       })
 
       existingRowIndex = timeSeries.length - 1
       tsMemo[time] = existingRowIndex
     }
 
-    timeSeries[existingRowIndex].values[
-      labelsToValueIndex[label + responseIndex + seriesIndex]
-    ] = value
+    timeSeries[existingRowIndex].values[valueIndex] = value
   }
+
+  // change all undefined values to null, these values were not set
+  timeSeries.forEach(x => {
+    for (let i = 0; i < x.values.length; i++) {
+      if (x.values[i] === undefined) {
+        x.values[i] = null
+      }
+    }
+  })
 
   return _.sortBy(timeSeries, 'time')
 }
@@ -434,7 +448,8 @@ export const groupByTimeSeriesTransform = (
     serieses,
     cells,
     sortedLabels,
-    seriesLabels
+    seriesLabels,
+    isTable
   )
   return {
     sortedLabels,
