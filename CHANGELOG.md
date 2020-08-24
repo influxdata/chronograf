@@ -6,6 +6,7 @@
 1. [#5551](https://github.com/influxdata/chronograf/pull/5551): Sort namespaces by database and retention policy.
 1. [#5556](https://github.com/influxdata/chronograf/pull/5556): Make MySQL protoboard more useful by using derivatives for counter values.
 1. [#5536](https://github.com/influxdata/chronograf/pull/5536): Add HTTP security headers.
+1. [#5553](https://github.com/influxdata/chronograf/pull/5553): Show all query results in table view.
 1. [#5555](https://github.com/influxdata/chronograf/pull/5555): Show also boolean field/tag values in tickscript editor logs.
 
 ### Other
