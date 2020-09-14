@@ -218,6 +218,14 @@ func saveData(ctx context.Context, toURL *url.URL, datas *datas) error {
 	}
 	fmt.Printf("  Saved %d sources.\n", len(datas.sources))
 
+	for _, user := range datas.users {
+		_, err = to.UsersStore().Add(ctx, &user)
+		if err != nil {
+			return fmt.Errorf("failed to add to UsersStore: %s", err)
+		}
+	}
+	fmt.Printf("  Saved %d users.\n", len(datas.users))
+
 	return nil
 }
 
