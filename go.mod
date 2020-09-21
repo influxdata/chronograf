@@ -2,6 +2,7 @@ module github.com/influxdata/chronograf
 
 require (
 	github.com/NYTimes/gziphandler v1.1.1
+	github.com/abbot/go-http-auth v0.4.0
 	github.com/boltdb/bolt v1.3.1
 	github.com/bouk/httprouter v0.0.0-20160817010721-ee8b3818a7f5
 	github.com/coreos/bbolt v1.3.3 // indirect

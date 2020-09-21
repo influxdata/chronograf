@@ -4,7 +4,11 @@
 
 ### Features
 
+1. [#5577](https://github.com/influxdata/chronograf/pull/5577): Allow to configure HTTP basic access authentication.
+
 ### Other
+
+1. [#5574](https://github.com/influxdata/chronograf/pull/5574): Migrate also users.
 
 ## v1.8.6 [2020-08-26]
 

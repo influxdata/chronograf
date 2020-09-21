@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	basicAuth "github.com/abbot/go-http-auth"
 	"github.com/influxdata/chronograf"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
@@ -127,6 +128,9 @@ type Server struct {
 	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
 	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
 	BuildInfo         chronograf.BuildInfo
+
+	BasicAuthRealm    string         `long:"basic-auth-realm" default:"Chronograf" description:"User visible basic authentication realm" env:"BASICAUTH_REALM"`
+	BasicAuthHtpasswd flags.Filename `long:"htpasswd" description:"File location of .htpasswd file, turns on HTTP basic authentication when specified." env:"HTPASSWD"`
 
 	oauthClient http.Client
 }
@@ -672,6 +676,19 @@ func (s *Server) Serve(ctx context.Context) {
 		provide(s.auth0OAuth(logger, auth)),
 	}
 
+	var basicAuthenticator *basicAuth.BasicAuth
+	if !s.useAuth() && len(s.BasicAuthHtpasswd) > 0 {
+		logger.
+			WithField("component", "server").
+			WithField("realm", s.BasicAuthRealm).
+			WithField("htpasswd", s.BasicAuthHtpasswd).
+			Info("Configuring HTTP basic authentication")
+		basicAuthenticator = basicAuth.NewBasicAuthenticator(
+			s.BasicAuthRealm,
+			basicAuth.HtpasswdFileProvider(string(s.BasicAuthHtpasswd)),
+		)
+	}
+
 	handler := NewMux(MuxOpts{
 		Develop:       s.Develop,
 		Auth:          auth,
@@ -685,6 +702,7 @@ func (s *Server) Serve(ctx context.Context) {
 		PprofEnabled:  s.PprofEnabled,
 		DisableGZip:   s.DisableGZip,
 		nonceExpire:   s.NonceExpiration,
+		BasicAuth:     basicAuthenticator,
 	}, service)
 
 	// Add chronograf's version header to all requests
