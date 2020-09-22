@@ -20,10 +20,12 @@ RUN pip install boto requests python-jose --upgrade
 RUN gem install fpm
 
 # Install node
-ENV NODE_VERSION v12.13.0
+ENV NODE_VERSION v12.18.4
 RUN wget -q https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz; \
-   tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C / --strip-components=1; \
+   mkdir /usr/local/node; \
+   tar -xvf node-${NODE_VERSION}-linux-x64.tar.gz -C /usr/local/node --strip-components=1; \
    rm -f node-${NODE_VERSION}-linux-x64.tar.gz
+ENV PATH=/usr/local/node/bin:$PATH
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&  \
