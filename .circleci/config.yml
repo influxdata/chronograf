@@ -29,12 +29,11 @@ workflows:
             tags:
               only: /^[0-9]+(\.[0-9]+)*$/
 
-
 version: 2
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20191121
+      DOCKER_TAG: chronograf-20200922
       GO111MODULE: "ON"
     machine: true
     steps:
@@ -57,7 +56,7 @@ jobs:
 
   deploy-nightly:
     environment:
-      DOCKER_TAG: chronograf-20191121
+      DOCKER_TAG: chronograf-20200922
       GO111MODULE: "ON"
     machine: true
     steps:
@@ -85,7 +84,7 @@ jobs:
 
   deploy-pre-release:
     environment:
-      DOCKER_TAG: chronograf-20191121
+      DOCKER_TAG: chronograf-20200922
       GO111MODULE: "ON"
     machine: true
     steps:
@@ -115,7 +114,7 @@ jobs:
 
   deploy-release:
     environment:
-      DOCKER_TAG: chronograf-20191121
+      DOCKER_TAG: chronograf-20200922
       GO111MODULE: "ON"
     machine: true
     steps:
