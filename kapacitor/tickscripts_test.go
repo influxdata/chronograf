@@ -130,7 +130,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var period = 10m
 
@@ -276,7 +276,7 @@ var measurement = 'haproxy'
 
 var groupBy = ['pxname']
 
-var whereFilter = lambda: TRUE
+var whereFilter = lambda: isPresent("status")
 
 var period = 10s
 
@@ -425,7 +425,7 @@ var measurement = 'haproxy'
 
 var groupBy = ['pxname']
 
-var whereFilter = lambda: TRUE
+var whereFilter = lambda: isPresent("status")
 
 var period = 10s
 
@@ -583,7 +583,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var period = 10m
 
@@ -743,7 +743,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var period = 10m
 
@@ -902,7 +902,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var period = 10m
 
@@ -1054,7 +1054,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var name = 'name'
 
@@ -1204,7 +1204,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var period = 10m
 
@@ -1374,7 +1374,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var period = 10m
 
@@ -1541,7 +1541,7 @@ var measurement = 'cpu'
 
 var groupBy = ['host', 'cluster_id']
 
-var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod')
+var whereFilter = lambda: ("cpu" == 'cpu_total') AND ("host" == 'acc-0eabc309-eu-west-1-data-3' OR "host" == 'prod') AND isPresent("usage_user")
 
 var period = 10m
 

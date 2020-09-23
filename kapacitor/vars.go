@@ -247,6 +247,21 @@ func whereFilter(q *chronograf.QueryConfig) string {
 			}
 			outer = append(outer, "("+strings.Join(inner, " OR ")+")")
 		}
+
+		// add isPresent filters, see https://github.com/influxdata/chronograf/issues/5566
+		var appendFields func(fields []chronograf.Field)
+		appendFields = func(fields []chronograf.Field) {
+			for _, field := range fields {
+				if field.Type == "field" {
+					outer = append(outer, fmt.Sprintf(`isPresent("%v")`, field.Value))
+				} else {
+					// use function arguments
+					appendFields(field.Args)
+				}
+			}
+		}
+		appendFields(q.Fields)
+
 		if len(outer) > 0 {
 			sort.Strings(outer)
 			return "lambda: " + strings.Join(outer, " AND ")

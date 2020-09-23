@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5580](https://github.com/influxdata/chronograf/pull/5580): Add 'isPresent' filter to rule tickscript.
+
 ### Features
 
 ### Other
