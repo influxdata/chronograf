@@ -319,6 +319,7 @@ export interface AlertaProperties {
   environment: string
   origin: string
   token: string
+  'token-prefix': string
   url: string
   enabled: boolean
 }

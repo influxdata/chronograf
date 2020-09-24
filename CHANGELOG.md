@@ -4,6 +4,8 @@
 
 ### Features
 
+1. [#5584](https://github.com/influxdata/chronograf/pull/5584): Allow to set token-prefix in Alerta configuration.
+
 ### Other
 
 ## v1.8.6 [2020-08-26]
