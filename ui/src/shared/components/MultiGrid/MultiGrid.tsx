@@ -5,6 +5,7 @@ import {Grid, AutoSizer} from 'react-virtualized'
 
 const SCROLLBAR_SIZE_BUFFER = 20
 const ROW_HEIGHT = 30
+const VSCROLLBAR_WIDTH = 12
 
 type HeightWidthFunction = (arg: {index: number}) => number
 
@@ -305,40 +306,49 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
     return (
       <AutoSizer>
-        {({width, height}) => (
-          <FancyScrollbar
-            style={{
-              width,
-              height: this.props.height - ROW_HEIGHT,
-            }}
-            autoHide={true}
-            scrollTop={this.state.scrollTop}
-            scrollLeft={this.state.scrollLeft}
-            setScrollTop={this.onScrollbarsScroll}
-          >
-            <Grid
-              {...props}
-              scrollToRow={scrollToRow}
-              cellRenderer={this.cellRendererBottomLeftGrid}
-              className={this.props.classNameBottomLeftGrid}
-              columnCount={fixedColumnCount}
-              height={height}
-              ref={this.bottomLeftGridRef}
-              rowCount={calculatedRowCount}
-              rowHeight={this.getCalculatedRowHeight(
-                height,
-                calculatedRowCount
-              )}
-              columnWidth={columnWidth}
+        {({width, height}) => {
+          // limit the visible width of fixed columns
+          // for the vertical scrollbar to appear in this area
+          const leftGridWidth = this.getLeftGridWidth(props)
+          width = Math.min(width, leftGridWidth)
+          return (
+            <FancyScrollbar
               style={{
-                overflowY: 'hidden',
-                height: Math.max(calculatedRowCount * ROW_HEIGHT, height),
+                width,
+                height: this.props.height - ROW_HEIGHT,
               }}
-              tabIndex={null}
-              width={width}
-            />
-          </FancyScrollbar>
-        )}
+              autoHide={true}
+              scrollTop={this.state.scrollTop}
+              scrollLeft={this.state.scrollLeft}
+              setScrollTop={this.onScrollbarsScroll}
+            >
+              <Grid
+                {...props}
+                scrollToRow={scrollToRow}
+                cellRenderer={this.cellRendererBottomLeftGrid}
+                className={this.props.classNameBottomLeftGrid}
+                columnCount={fixedColumnCount}
+                height={height}
+                ref={this.bottomLeftGridRef}
+                rowCount={calculatedRowCount}
+                rowHeight={this.getCalculatedRowHeight(
+                  height,
+                  calculatedRowCount
+                )}
+                columnWidth={columnWidth}
+                style={{
+                  overflowY: 'hidden',
+                  height: Math.max(
+                    calculatedRowCount * ROW_HEIGHT + SCROLLBAR_SIZE_BUFFER,
+                    height
+                  ),
+                }}
+                tabIndex={null}
+                width={leftGridWidth}
+              />
+            </FancyScrollbar>
+          )
+        }}
       </AutoSizer>
     )
   }
@@ -366,45 +376,60 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
 
     return (
       <AutoSizer>
-        {({width, height}) => (
-          <FancyScrollbar
-            style={{
-              marginLeft: leftWidth,
-              width: this.props.width - leftWidth,
-              height: this.props.height - ROW_HEIGHT,
-            }}
-            autoHide={true}
-            scrollTop={scrollTop}
-            scrollLeft={scrollLeft}
-            setScrollTop={this.onScrollbarsScroll}
-          >
-            <Grid
-              {...passingProps}
-              cellRenderer={this.cellRendererBottomRightGrid}
-              className={this.props.classNameBottomRightGrid}
-              columnCount={Math.max(0, columnCount - fixedColumnCount)}
-              columnWidth={this.columnWidthRightGrid}
-              overscanRowCount={100}
-              height={height}
-              ref={this.bottomRightGridRef}
-              onScroll={this.onGridScroll}
-              rowCount={calculatedRowCount}
-              rowHeight={this.getCalculatedRowHeight(
-                height,
-                calculatedRowCount
-              )}
-              scrollToRow={scrollToRow - fixedRowCount}
+        {({width, height}) => {
+          const scrollPaneHeight =
+            calculatedRowCount * ROW_HEIGHT + SCROLLBAR_SIZE_BUFFER
+          const verticalScrollbarWidth =
+            scrollPaneHeight <= height ? 0 : VSCROLLBAR_WIDTH
+          const lastColumnIndex = columnCount - fixedColumnCount - 1
+          let columnWidth = this.columnWidthRightGrid
+          if (verticalScrollbarWidth !== 0) {
+            // adjust the last column so that the vertical scrollbar
+            // is not placed over the contents of the column
+            columnWidth = params => {
+              const colWidth = this.columnWidthRightGrid(params)
+              return params.index === lastColumnIndex
+                ? colWidth - verticalScrollbarWidth
+                : colWidth
+            }
+          }
+          return (
+            <FancyScrollbar
               style={{
-                overflowY: 'hidden',
-                height: Math.max(
-                  calculatedRowCount * ROW_HEIGHT + SCROLLBAR_SIZE_BUFFER,
-                  height
-                ),
+                marginLeft: leftWidth,
+                width: this.props.width - leftWidth,
+                height: this.props.height - ROW_HEIGHT,
               }}
-              width={width - leftWidth}
-            />
-          </FancyScrollbar>
-        )}
+              autoHide={verticalScrollbarWidth === 0} // always show vertical scrollbar when rows overflow
+              scrollTop={scrollTop}
+              scrollLeft={scrollLeft}
+              setScrollTop={this.onScrollbarsScroll}
+            >
+              <Grid
+                {...passingProps}
+                cellRenderer={this.cellRendererBottomRightGrid}
+                className={this.props.classNameBottomRightGrid}
+                columnCount={Math.max(0, lastColumnIndex + 1)}
+                columnWidth={columnWidth}
+                overscanRowCount={100}
+                height={height}
+                ref={this.bottomRightGridRef}
+                onScroll={this.onGridScroll}
+                rowCount={calculatedRowCount}
+                rowHeight={this.getCalculatedRowHeight(
+                  height,
+                  calculatedRowCount
+                )}
+                scrollToRow={scrollToRow - fixedRowCount}
+                style={{
+                  overflowY: 'hidden',
+                  height: Math.max(scrollPaneHeight, height),
+                }}
+                width={width - leftWidth - verticalScrollbarWidth}
+              />
+            </FancyScrollbar>
+          )
+        }}
       </AutoSizer>
     )
   }
