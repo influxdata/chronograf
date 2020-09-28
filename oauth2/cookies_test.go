@@ -3,7 +3,6 @@ package oauth2
 import (
 	"context"
 	"fmt"
-	gojwt "github.com/dgrijalva/jwt-go"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	gojwt "github.com/dgrijalva/jwt-go"
 )
 
 type MockTokenizer struct {
@@ -20,6 +21,10 @@ type MockTokenizer struct {
 	CreateErr error
 	ExtendErr error
 }
+
+const (
+	defaultInactivityDuration = 5 * time.Minute
+)
 
 func (m *MockTokenizer) ValidPrincipal(ctx context.Context, token Token, duration time.Duration) (Principal, error) {
 	return m.Principal, m.ValidErr
@@ -134,7 +139,7 @@ func TestCookieValidate(t *testing.T) {
 		cook := cookie{
 			Name:       test.Lookup,
 			Lifespan:   1 * time.Second,
-			Inactivity: DefaultInactivityDuration,
+			Inactivity: defaultInactivityDuration,
 			Now: func() time.Time {
 				return time.Unix(0, 0)
 			},
@@ -157,24 +162,24 @@ func TestCookieValidate(t *testing.T) {
 }
 
 func TestNewCookieJWT(t *testing.T) {
-	auth := NewCookieJWT("secret", 2*time.Second)
+	auth := NewCookieJWT("secret", 2*time.Second, defaultInactivityDuration)
 	if cookie, ok := auth.(*cookie); !ok {
 		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
 	} else if cookie.Inactivity != time.Second {
 		t.Errorf("NewCookieJWT() inactivity was not two seconds: %s", cookie.Inactivity)
 	}
 
-	auth = NewCookieJWT("secret", time.Hour)
+	auth = NewCookieJWT("secret", time.Hour, defaultInactivityDuration)
 	if cookie, ok := auth.(*cookie); !ok {
 		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
-	} else if cookie.Inactivity != DefaultInactivityDuration {
+	} else if cookie.Inactivity != defaultInactivityDuration {
 		t.Errorf("NewCookieJWT() inactivity was not five minutes: %s", cookie.Inactivity)
 	}
 
-	auth = NewCookieJWT("secret", 0)
+	auth = NewCookieJWT("secret", 0, defaultInactivityDuration)
 	if cookie, ok := auth.(*cookie); !ok {
 		t.Errorf("NewCookieJWT() did not create cookie Authenticator")
-	} else if cookie.Inactivity != DefaultInactivityDuration {
+	} else if cookie.Inactivity != defaultInactivityDuration {
 		t.Errorf("NewCookieJWT() inactivity was not five minutes: %s", cookie.Inactivity)
 	}
 }

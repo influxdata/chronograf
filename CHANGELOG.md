@@ -5,6 +5,7 @@
 ### Features
 
 1. [#5577](https://github.com/influxdata/chronograf/pull/5577): Allow to configure HTTP basic access authentication.
+1. [#5585](https://github.com/influxdata/chronograf/pull/5585): Make session inactivity duration configurable.
 
 ### Other
 
