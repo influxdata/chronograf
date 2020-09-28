@@ -64,16 +64,17 @@ type Server struct {
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
 	KapacitorPassword string `long:"kapacitor-password" description:"Password of your Kapacitor instance" env:"KAPACITOR_PASSWORD"`
 
-	Develop         bool          `short:"d" long:"develop" description:"Run server in develop mode."`
-	BoltPath        string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
-	CannedPath      string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
-	ProtoboardsPath string        `long:"protoboards-path" description:"Path to directory of protoboards (/usr/share/chronograf/protoboards)" env:"PROTOBOARDS_PATH" default:"protoboards"`
-	ResourcesPath   string        `long:"resources-path" description:"Path to directory of pre-canned dashboards, sources, kapacitors, and organizations (/usr/share/chronograf/resources)" env:"RESOURCES_PATH" default:"canned"`
-	TokenSecret     string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
-	JwksURL         string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
-	UseIDToken      bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
-	LoginHint       string        `long:"login-hint" description:"OpenID login_hint paramter to passed to authorization server during authentication" env:"LOGIN_HINT"`
-	AuthDuration    time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
+	Develop            bool          `short:"d" long:"develop" description:"Run server in develop mode."`
+	BoltPath           string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
+	CannedPath         string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
+	ProtoboardsPath    string        `long:"protoboards-path" description:"Path to directory of protoboards (/usr/share/chronograf/protoboards)" env:"PROTOBOARDS_PATH" default:"protoboards"`
+	ResourcesPath      string        `long:"resources-path" description:"Path to directory of pre-canned dashboards, sources, kapacitors, and organizations (/usr/share/chronograf/resources)" env:"RESOURCES_PATH" default:"canned"`
+	TokenSecret        string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
+	JwksURL            string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
+	UseIDToken         bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
+	LoginHint          string        `long:"login-hint" description:"OpenID login_hint paramter to passed to authorization server during authentication" env:"LOGIN_HINT"`
+	AuthDuration       time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
+	InactivityDuration time.Duration `long:"inactivity-duration" default:"5m" description:"Duration for which a token is valid without any new activity." env:"INACTIVITY_DURATION"`
 
 	GithubClientID     string   `short:"i" long:"github-client-id" description:"Github Client ID for OAuth 2 support" env:"GH_CLIENT_ID"`
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
@@ -667,7 +668,7 @@ func (s *Server) Serve(ctx context.Context) {
 		},
 	}
 
-	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration)
+	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration, s.InactivityDuration)
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){
 		provide(s.githubOAuth(logger, auth)),
 		provide(s.googleOAuth(logger, auth)),

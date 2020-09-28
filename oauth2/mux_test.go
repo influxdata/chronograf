@@ -46,7 +46,7 @@ func setupMuxTest(response interface{}, selector func(*AuthMux) http.Handler) (*
 	auth := &cookie{
 		Name:       DefaultCookieName,
 		Lifespan:   1 * time.Hour,
-		Inactivity: DefaultInactivityDuration,
+		Inactivity: defaultInactivityDuration,
 		Now:        now,
 		Tokens:     mt,
 	}
