@@ -5,6 +5,7 @@ _What was the problem?_
 _What was the solution?_
 
   - [ ] CHANGELOG.md updated with a link to the PR (not the Issue)
+  - [ ] [Well-formatted commit messages](https://www.conventionalcommits.org/en/v1.0.0-beta.3/)
   - [ ] Rebased/mergeable
   - [ ] Tests pass
   - [ ] Any changes to `etc/Dockerfile_build` have been pushed to DockerHub, and the changes have been added to `.circleci/config.yml`
