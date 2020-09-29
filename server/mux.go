@@ -10,9 +10,10 @@ import (
 	"strings"
 	"time"
 
-	_ "net/http/pprof"
+	_ "net/http/pprof" // required for /debug/pprof endpoint
 
 	"github.com/NYTimes/gziphandler"
+	basicAuth "github.com/abbot/go-http-auth"
 	"github.com/bouk/httprouter" // When julienschmidt/httprouter v2 w/ context is out, switch
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/oauth2"
@@ -38,6 +39,7 @@ type MuxOpts struct {
 	PprofEnabled  bool         // Mount pprof routes for profiling
 	DisableGZip   bool         // Optionally disable gzip.
 	nonceExpire   time.Duration
+	BasicAuth     *basicAuth.BasicAuth // HTTP basic authentication provider
 }
 
 // NewMux attaches all the route handlers; handler returned servers chronograf.
@@ -375,10 +377,13 @@ func NewMux(opts MuxOpts, service Service) http.Handler {
 
 		// Create middleware that redirects to the appropriate provider logout
 		router.GET("/oauth/logout", logout("/", opts.Basepath, allRoutes.AuthRoutes))
-		out = Logger(opts.Logger, FlushingHandler(auth))
+		out = auth
+	} else if opts.BasicAuth != nil {
+		out = BasicAuthWrapper(router, opts.BasicAuth)
 	} else {
-		out = Logger(opts.Logger, FlushingHandler(router))
+		out = router
 	}
+	out = Logger(opts.Logger, FlushingHandler(out))
 
 	return out
 }
@@ -425,6 +430,14 @@ func AuthAPI(opts MuxOpts, router chronograf.Router) (http.Handler, AuthRoutes) 
 		}
 		router.ServeHTTP(w, r)
 	}), routes
+}
+
+// BasicAuthWrapper returns http handlers that wraps the supplied handler with HTTP Basic authentication
+func BasicAuthWrapper(router chronograf.Router, auth *basicAuth.BasicAuth) http.Handler {
+	return auth.Wrap(func(response http.ResponseWriter, authRequest *basicAuth.AuthenticatedRequest) {
+		router.ServeHTTP(response, &authRequest.Request)
+	})
+
 }
 
 func encodeJSON(w http.ResponseWriter, status int, v interface{}, logger chronograf.Logger) {

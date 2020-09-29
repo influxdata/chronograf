@@ -406,7 +406,7 @@ export const HTTP_FORBIDDEN = 403
 export const HTTP_NOT_FOUND = 404
 
 export const AUTOREFRESH_DEFAULT = 0 // in milliseconds
-export const DASHBOARD_REFRESH_DEFAULT = 10000 // in milliseconds
+export const DASHBOARD_REFRESH_DEFAULT = 0 // in milliseconds
 export const SHOW_TEMP_VAR_CONTROL_BAR_DEFAULT = false
 
 export const GRAPH = 'graph'

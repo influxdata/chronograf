@@ -9,8 +9,6 @@ import (
 const (
 	// DefaultCookieName is the name of the stored cookie
 	DefaultCookieName = "session"
-	// DefaultInactivityDuration is the duration a token is valid without any new activity
-	DefaultInactivityDuration = 5 * time.Minute
 )
 
 var _ Authenticator = &cookie{}
@@ -25,8 +23,7 @@ type cookie struct {
 }
 
 // NewCookieJWT creates an Authenticator that uses cookies for auth
-func NewCookieJWT(secret string, lifespan time.Duration) Authenticator {
-	inactivity := DefaultInactivityDuration
+func NewCookieJWT(secret string, lifespan, inactivity time.Duration) Authenticator {
 	// Server interprets a token duration longer than the cookie lifespan as
 	// a token that was issued by a server with a longer auth-duration and is
 	// thus invalid, as a security precaution. So, inactivity must be set to
