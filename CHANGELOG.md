@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5579](https://github.com/influxdata/chronograf/pull/5579): Disable default dashboard auto refresh.
+
 ### Features
 
 1. [#5577](https://github.com/influxdata/chronograf/pull/5577): Allow to configure HTTP basic access authentication.
