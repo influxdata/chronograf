@@ -45,9 +45,9 @@ If you are going to be contributing back to Chronograf please take a second to s
 
 ## Installing & Using Node
 
-You'll need to install Node 10.13.0 to run the frontend chronograf application.
+You'll need to install Node 12 to run the frontend chronograf application.
 
-* [Install Node 10.13.0 LTS](https://nodejs.org/en/blog/release/v10.13.0/)
+* [Install Node 12](https://nodejs.org/en/about/releases/)
 
 ## Installing & Using Yarn
 

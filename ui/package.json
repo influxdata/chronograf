@@ -81,7 +81,7 @@
     "jest-runner-tslint": "^1.0.4",
     "jsdom": "^9.0.0",
     "node-sass": "^4.13.0",
-    "parcel": "^1.10.1",
+    "parcel": "^1.12.4",
     "prettier": "1.12.1",
     "sass": "^1.26.3",
     "ts-jest": "^23.10.3",
