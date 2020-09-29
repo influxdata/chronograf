@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	basicAuth "github.com/abbot/go-http-auth"
 	"github.com/influxdata/chronograf"
 	idgen "github.com/influxdata/chronograf/id"
 	"github.com/influxdata/chronograf/influx"
@@ -63,16 +64,17 @@ type Server struct {
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
 	KapacitorPassword string `long:"kapacitor-password" description:"Password of your Kapacitor instance" env:"KAPACITOR_PASSWORD"`
 
-	Develop         bool          `short:"d" long:"develop" description:"Run server in develop mode."`
-	BoltPath        string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
-	CannedPath      string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
-	ProtoboardsPath string        `long:"protoboards-path" description:"Path to directory of protoboards (/usr/share/chronograf/protoboards)" env:"PROTOBOARDS_PATH" default:"protoboards"`
-	ResourcesPath   string        `long:"resources-path" description:"Path to directory of pre-canned dashboards, sources, kapacitors, and organizations (/usr/share/chronograf/resources)" env:"RESOURCES_PATH" default:"canned"`
-	TokenSecret     string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
-	JwksURL         string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
-	UseIDToken      bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
-	LoginHint       string        `long:"login-hint" description:"OpenID login_hint paramter to passed to authorization server during authentication" env:"LOGIN_HINT"`
-	AuthDuration    time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
+	Develop            bool          `short:"d" long:"develop" description:"Run server in develop mode."`
+	BoltPath           string        `short:"b" long:"bolt-path" description:"Full path to boltDB file (e.g. './chronograf-v1.db')" env:"BOLT_PATH" default:"chronograf-v1.db"`
+	CannedPath         string        `short:"c" long:"canned-path" description:"Path to directory of pre-canned application layouts (/usr/share/chronograf/canned)" env:"CANNED_PATH" default:"canned"`
+	ProtoboardsPath    string        `long:"protoboards-path" description:"Path to directory of protoboards (/usr/share/chronograf/protoboards)" env:"PROTOBOARDS_PATH" default:"protoboards"`
+	ResourcesPath      string        `long:"resources-path" description:"Path to directory of pre-canned dashboards, sources, kapacitors, and organizations (/usr/share/chronograf/resources)" env:"RESOURCES_PATH" default:"canned"`
+	TokenSecret        string        `short:"t" long:"token-secret" description:"Secret to sign tokens" env:"TOKEN_SECRET"`
+	JwksURL            string        `long:"jwks-url" description:"URL that returns OpenID Key Discovery JWKS document." env:"JWKS_URL"`
+	UseIDToken         bool          `long:"use-id-token" description:"Enable id_token processing." env:"USE_ID_TOKEN"`
+	LoginHint          string        `long:"login-hint" description:"OpenID login_hint paramter to passed to authorization server during authentication" env:"LOGIN_HINT"`
+	AuthDuration       time.Duration `long:"auth-duration" default:"720h" description:"Total duration of cookie life for authentication (in hours). 0 means authentication expires on browser close." env:"AUTH_DURATION"`
+	InactivityDuration time.Duration `long:"inactivity-duration" default:"5m" description:"Duration for which a token is valid without any new activity." env:"INACTIVITY_DURATION"`
 
 	GithubClientID     string   `short:"i" long:"github-client-id" description:"Github Client ID for OAuth 2 support" env:"GH_CLIENT_ID"`
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
@@ -127,6 +129,9 @@ type Server struct {
 	Basepath          string `short:"p" long:"basepath" description:"A URL path prefix under which all chronograf routes will be mounted. (Note: PREFIX_ROUTES has been deprecated. Now, if basepath is set, all routes will be prefixed with it.)" env:"BASE_PATH"`
 	ShowVersion       bool   `short:"v" long:"version" description:"Show Chronograf version info"`
 	BuildInfo         chronograf.BuildInfo
+
+	BasicAuthRealm    string         `long:"basic-auth-realm" default:"Chronograf" description:"User visible basic authentication realm" env:"BASICAUTH_REALM"`
+	BasicAuthHtpasswd flags.Filename `long:"htpasswd" description:"File location of .htpasswd file, turns on HTTP basic authentication when specified." env:"HTPASSWD"`
 
 	oauthClient http.Client
 }
@@ -663,13 +668,26 @@ func (s *Server) Serve(ctx context.Context) {
 		},
 	}
 
-	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration)
+	auth := oauth2.NewCookieJWT(s.TokenSecret, s.AuthDuration, s.InactivityDuration)
 	providerFuncs := []func(func(oauth2.Provider, oauth2.Mux)){
 		provide(s.githubOAuth(logger, auth)),
 		provide(s.googleOAuth(logger, auth)),
 		provide(s.herokuOAuth(logger, auth)),
 		provide(s.genericOAuth(logger, auth)),
 		provide(s.auth0OAuth(logger, auth)),
+	}
+
+	var basicAuthenticator *basicAuth.BasicAuth
+	if !s.useAuth() && len(s.BasicAuthHtpasswd) > 0 {
+		logger.
+			WithField("component", "server").
+			WithField("realm", s.BasicAuthRealm).
+			WithField("htpasswd", s.BasicAuthHtpasswd).
+			Info("Configuring HTTP basic authentication")
+		basicAuthenticator = basicAuth.NewBasicAuthenticator(
+			s.BasicAuthRealm,
+			basicAuth.HtpasswdFileProvider(string(s.BasicAuthHtpasswd)),
+		)
 	}
 
 	handler := NewMux(MuxOpts{
@@ -685,6 +703,7 @@ func (s *Server) Serve(ctx context.Context) {
 		PprofEnabled:  s.PprofEnabled,
 		DisableGZip:   s.DisableGZip,
 		nonceExpire:   s.NonceExpiration,
+		BasicAuth:     basicAuthenticator,
 	}, service)
 
 	// Add chronograf's version header to all requests
