@@ -108,7 +108,9 @@ func varWhereFilter(vars map[string]tick.Var) (WhereFilter, bool) {
 	lambda := value.ExpressionString()
 	// Chronograf TICKScripts use lambda: TRUE as a pass-throug where clause
 	// if the script does not have a where clause set.
-	if lambda == "TRUE" {
+	// isPresent(fieldName) is also used since chronograf 1.8.7 in place of TRUE
+	// https://github.com/influxdata/chronograf/issues/5566
+	if lambda == "TRUE" || strings.HasPrefix(lambda, "isPresent") {
 		return WhereFilter{}, true
 	}
 
@@ -212,7 +214,7 @@ func extractCommonVars(vars map[string]tick.Var) (CommonVars, error) {
 	}
 	res.GroupBy = groups
 
-	// All chronograf TICKScripts must have a whereFitler.  Could be empty.
+	// All chronograf TICKScripts must have a whereFilter.  Could be empty.
 	res.Filter, ok = varWhereFilter(vars)
 	if !ok {
 		return CommonVars{}, ErrNotChronoTickscript
