@@ -11,6 +11,7 @@ interface Config {
     environment: string
     origin: string
     token: boolean
+    'token-prefix': string
     url: string
     enabled: boolean
   }
@@ -33,6 +34,7 @@ class AlertaConfig extends PureComponent<Props, State> {
   private environment: HTMLInputElement
   private origin: HTMLInputElement
   private token: HTMLInputElement
+  private tokenPrefix: HTMLInputElement
   private url: HTMLInputElement
 
   constructor(props) {
@@ -44,7 +46,13 @@ class AlertaConfig extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {environment, origin, token, url} = this.props.config.options
+    const {
+      environment,
+      origin,
+      token,
+      url,
+      'token-prefix': tokenPrefix,
+    } = this.props.config.options
     const {testEnabled, enabled} = this.state
 
     return (
@@ -81,6 +89,18 @@ class AlertaConfig extends PureComponent<Props, State> {
             refFunc={this.handleTokenRef}
             disableTest={this.disableTest}
             isFormEditing={!testEnabled}
+          />
+        </div>
+
+        <div className="form-group col-xs-12">
+          <label htmlFor="token-prefix">Token Prefix</label>
+          <input
+            className="form-control"
+            id="token-prefix"
+            type="text"
+            ref={r => (this.tokenPrefix = r)}
+            defaultValue={tokenPrefix || ''}
+            onChange={this.disableTest}
           />
         </div>
 
@@ -142,6 +162,7 @@ class AlertaConfig extends PureComponent<Props, State> {
       environment: this.environment.value,
       origin: this.origin.value,
       token: this.token.value,
+      'token-prefix': this.tokenPrefix.value,
       url: this.url.value,
       enabled: this.state.enabled,
     }
