@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+1. [#5582](https://github.com/influxdata/chronograf/pull/5582): Make vertical scroll bar visible when rows overflow in TableGraph.
 1. [#5579](https://github.com/influxdata/chronograf/pull/5579): Disable default dashboard auto refresh.
 
 ### Features

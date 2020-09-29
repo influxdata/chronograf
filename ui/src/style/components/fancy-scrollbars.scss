@@ -17,7 +17,7 @@ $scrollbar-color-b: $c-comet;
 }
 /* Horizontal Scrollbar Styles */
 .fancy-scroll--track-h {
-  padding: ($scrollbar-track-size - $scrollbar-thumb-size) / 2;
+  padding: ($scrollbar-track-size - $scrollbar-thumb-size) / 6;
   width: 100%;
   height: $scrollbar-track-size !important;
   bottom: 0;
@@ -30,7 +30,7 @@ $scrollbar-color-b: $c-comet;
 }
 /* Vertical Scrollbar Styles */
 .fancy-scroll--track-v {
-  padding: ($scrollbar-track-size - $scrollbar-thumb-size) / 2;
+  padding: ($scrollbar-track-size - $scrollbar-thumb-size) / 6;
   width: $scrollbar-track-size !important;
   height: 100%;
   top: 0;
