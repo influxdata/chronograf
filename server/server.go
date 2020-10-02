@@ -133,6 +133,10 @@ type Server struct {
 	BasicAuthRealm    string         `long:"basic-auth-realm" default:"Chronograf" description:"User visible basic authentication realm" env:"BASICAUTH_REALM"`
 	BasicAuthHtpasswd flags.Filename `long:"htpasswd" description:"File location of .htpasswd file, turns on HTTP basic authentication when specified." env:"HTPASSWD"`
 
+	TLSCiphers    string `long:"tls-ciphers" description:"Comma-separated list of cipher suites to use. Use 'help' cipher to print available ciphers." env:"TLS_CIPHERS"`
+	TLSMinVersion string `long:"tls-min-version" description:"Minimum version of the TLS protocol that will be negotiated." default:"1.2" env:"TLS_MIN_VERSION"`
+	TLSMaxVersion string `long:"tls-max-version" description:"Maximum version of the TLS protocol that will be negotiated." env:"TLS_MAX_VERSION"`
+
 	oauthClient http.Client
 }
 
@@ -482,19 +486,18 @@ func (s *Server) NewListener() (net.Listener, error) {
 		return listener, nil
 	}
 
-	// If no key specified, therefore, we assume it is in the cert
-	if s.Key == "" {
-		s.Key = s.Cert
-	}
-
-	cert, err := tls.LoadX509KeyPair(string(s.Cert), string(s.Key))
+	tlsConfig, err := createTLSConfig(tlsServerOptions{
+		Cert:       string(s.Cert),
+		Key:        string(s.Key),
+		Ciphers:    strings.Split(s.TLSCiphers, ","),
+		MinVersion: s.TLSMinVersion,
+		MaxVersion: s.TLSMaxVersion,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	listener, err := tls.Listen("tcp", addr, &tls.Config{
-		Certificates: []tls.Certificate{cert},
-	})
+	listener, err := tls.Listen("tcp", addr, tlsConfig)
 	if err != nil {
 		return nil, err
 	}
