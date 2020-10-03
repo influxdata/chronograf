@@ -70,7 +70,6 @@ func Test_createTLSConfig(t *testing.T) {
 					tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
 				},
 				PreferServerCipherSuites: true,
-				CurvePreferences:         defaultCurvePreferences,
 			},
 		},
 		{

@@ -13,11 +13,11 @@ type tlsServerOptions struct {
 	Cert string
 	// Key contains Path to private key associated with given certificate.
 	Key string
-	// Ciphers contains list of os supported ciphers, no ciphers means use default
+	// Ciphers is a preference list of supported ciphers, empty list means default
 	Ciphers []string
-	// MinVersion is "1.0", "1.1", "1.2" or "1.3"
+	// MinVersion of TLS to be negotiated with the client  ("1.0", "1.1" ...), no value means no minimum.
 	MinVersion string
-	// MaxVersion is a version greater than MinVersion
+	// MaxVersion of TLS to be negotiated with the client, no value means no maximum.
 	MaxVersion string
 }
 
@@ -58,8 +58,6 @@ var versionsMap = map[string]uint16{
 	"1.3": tls.VersionTLS13,
 }
 
-var defaultCurvePreferences = []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256}
-
 func createTLSConfig(o tlsServerOptions) (out *tls.Config, err error) {
 	// load key pair
 	if o.Cert == "" {
@@ -94,8 +92,6 @@ func createTLSConfig(o tlsServerOptions) (out *tls.Config, err error) {
 					cipherName, availableKeys(ciphersMap))
 			}
 			out.CipherSuites = append(out.CipherSuites, cipher)
-			// ssllabs: use custom CURVE preferences to increase key exchange security
-			out.CurvePreferences = append([]tls.CurveID(nil), defaultCurvePreferences...)
 		}
 		out.PreferServerCipherSuites = true
 	}
