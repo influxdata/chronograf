@@ -114,7 +114,7 @@
     "memoize-one": "^4.0.2",
     "moment": "^2.13.0",
     "nano-date": "^2.0.1",
-    "papaparse": "^4.4.0",
+    "papaparse": "^5.3.0",
     "prop-types": "^15.6.1",
     "qs": "^6.5.2",
     "react": "^16.8.6",
