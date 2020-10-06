@@ -1,4 +1,12 @@
-## v1.8.7
+## v1.8.8
+
+### Bug Fixes
+
+### Features
+
+### Other
+
+## v1.8.7 [2020-10-06]
 
 ### Bug Fixes
 
