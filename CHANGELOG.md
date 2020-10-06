@@ -2,17 +2,24 @@
 
 ### Bug Fixes
 
-1. [#5582](https://github.com/influxdata/chronograf/pull/5582): Make vertical scroll bar visible when rows overflow in TableGraph.
-1. [#5580](https://github.com/influxdata/chronograf/pull/5580): Add 'isPresent' filter to rule tickscript.
 1. [#5579](https://github.com/influxdata/chronograf/pull/5579): Disable default dashboard auto refresh.
 1. [#5574](https://github.com/influxdata/chronograf/pull/5574): Migrate also users.
+1. [#5580](https://github.com/influxdata/chronograf/pull/5580): Add 'isPresent' filter to rule tickscript.
+1. [#5582](https://github.com/influxdata/chronograf/pull/5582): Make vertical scroll bar visible when rows overflow in TableGraph.
 1. [#5592](https://github.com/influxdata/chronograf/pull/5592): Upgrade papaparse to 5.3.0.
 
 ### Features
 
-1. [#5585](https://github.com/influxdata/chronograf/pull/5585): Make session inactivity duration configurable.
-1. [#5584](https://github.com/influxdata/chronograf/pull/5584): Allow to set token-prefix in Alerta configuration.
 1. [#5577](https://github.com/influxdata/chronograf/pull/5577): Allow to configure HTTP basic access authentication.
+1. [#5584](https://github.com/influxdata/chronograf/pull/5584): Allow to set token-prefix in Alerta configuration.
+1. [#5585](https://github.com/influxdata/chronograf/pull/5585): Make session inactivity duration configurable.
+1. [#5591](https://github.com/influxdata/chronograf/pull/5591): Allow to configure TLS ciphers and versions.
+
+### Breaking Changes
+
+1. [#5591](https://github.com/influxdata/chronograf/pull/5591): TLS1.2 is by default a minimum negotiated TLS version
+   when setting up chronograf HTTPS server. If you have clients that require older TLS version, use `--tls-min-version=1.1`
+   option or `TLS_MIN_VERSION=1.1` environment variable to start chronograf.
 
 ### Other
 
