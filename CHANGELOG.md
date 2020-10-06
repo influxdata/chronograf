@@ -6,6 +6,7 @@
 1. [#5580](https://github.com/influxdata/chronograf/pull/5580): Add 'isPresent' filter to rule tickscript.
 1. [#5579](https://github.com/influxdata/chronograf/pull/5579): Disable default dashboard auto refresh.
 1. [#5574](https://github.com/influxdata/chronograf/pull/5574): Migrate also users.
+1. [#5592](https://github.com/influxdata/chronograf/pull/5592): Upgrade papaparse to 5.3.0.
 
 ### Features
 
