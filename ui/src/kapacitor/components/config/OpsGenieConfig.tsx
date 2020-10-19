@@ -13,6 +13,7 @@ interface Config {
     teams: string[]
     recipients: string[]
     enabled: boolean
+    recovery_action?: string // available in OpsGenie2
   }
 }
 
@@ -25,6 +26,7 @@ interface Props {
   onSave: (properties: OpsGenieProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
+  v2?: true
 }
 
 interface State {
@@ -37,6 +39,8 @@ interface State {
 @ErrorHandling
 class OpsGenieConfig extends PureComponent<Props, State> {
   private apiKey: HTMLInputElement
+  private recoveryActionNotes: HTMLInputElement
+  private recoveryActionClose: HTMLInputElement
 
   constructor(props) {
     super(props)
@@ -54,6 +58,7 @@ class OpsGenieConfig extends PureComponent<Props, State> {
   public render() {
     const {options} = this.props.config
     const apiKey = options['api-key']
+    const recoveryAction = options.recovery_action
     const {testEnabled, enabled} = this.state
 
     return (
@@ -83,6 +88,41 @@ class OpsGenieConfig extends PureComponent<Props, State> {
           tags={this.currentRecipientsForTags}
           disableTest={this.disableTest}
         />
+        {this.props.v2 ? (
+          <div className="form-group col-xs-12">
+            <label htmlFor="parseMode">Select recovery action</label>
+            <div className="form-control-static">
+              <div className="radio-item">
+                <input
+                  id="recoveryAction_notes"
+                  type="radio"
+                  name="recoveryAction"
+                  value="notes"
+                  defaultChecked={recoveryAction !== 'close'}
+                  ref={r => (this.recoveryActionNotes = r)}
+                  onChange={this.disableTest}
+                />
+                <label htmlFor="recoveryAction_notes">
+                  Add a note to the alert
+                </label>
+              </div>
+              <div className="radio-item">
+                <input
+                  id="recoveryAction_close"
+                  type="radio"
+                  name="recoveryAction"
+                  value="close"
+                  defaultChecked={recoveryAction === 'close'}
+                  ref={r => (this.recoveryActionClose = r)}
+                  onChange={this.disableTest}
+                />
+                <label htmlFor="recoveryAction_close">Close the alert</label>
+              </div>
+            </div>
+          </div>
+        ) : (
+          undefined
+        )}
 
         <div className="form-group col-xs-12">
           <div className="form-control-static">
@@ -141,6 +181,13 @@ class OpsGenieConfig extends PureComponent<Props, State> {
       teams: this.state.currentTeams,
       recipients: this.state.currentRecipients,
       enabled: this.state.enabled,
+    }
+    if (this.props.v2) {
+      if (this.recoveryActionNotes.checked) {
+        properties.recovery_action = 'notes'
+      } else if (this.recoveryActionClose.checked) {
+        properties.recovery_action = 'close'
+      }
     }
 
     const success = await this.props.onSave(properties)
