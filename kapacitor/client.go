@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/id"
@@ -68,6 +69,8 @@ type Task struct {
 	TICKScript chronograf.TICKScript // TICKScript is the running script
 }
 
+var reTaskName = regexp.MustCompile(`[\r\n]*var[ \t]+name[ \t]+=[ \t]+'([^']+)'`)
+
 // NewTask creates a task from a kapacitor client task
 func NewTask(task *client.Task) *Task {
 	dbrps := make([]chronograf.DBRP, len(task.DBRPs))
@@ -79,8 +82,13 @@ func NewTask(task *client.Task) *Task {
 	script := chronograf.TICKScript(task.TICKscript)
 	rule, err := Reverse(script)
 	if err != nil {
+		// try to parse Name from a line such as: `var name = 'Rule Name'
+		name := task.ID
+		if matches := reTaskName.FindStringSubmatch(task.TICKscript); matches != nil {
+			name = matches[1]
+		}
 		rule = chronograf.AlertRule{
-			Name:  task.ID,
+			Name:  name,
 			Query: nil,
 		}
 	}

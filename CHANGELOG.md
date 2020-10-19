@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5596](https://github.com/influxdata/chronograf/pull/5596): Show rule name from tickscript.
+
 ### Features
 
 ### Other
