@@ -7,9 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/influxdata/chronograf"
 )
@@ -19,12 +21,50 @@ var _ chronograf.TSDBStatus = &Client{}
 var _ chronograf.Databases = &Client{}
 
 // Shared transports for all clients to prevent leaking connections
-var (
-	skipVerifyTransport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+var skipVerifyTransport *http.Transport
+var defaultTransport *http.Transport
+
+// CreateTransport create a new transport
+func CreateTransport(skipVerify bool) *http.Transport {
+	var transport *http.Transport
+	if cloneable, ok := http.DefaultTransport.(interface{ Clone() *http.Transport }); ok {
+		transport = cloneable.Clone() // available since go1.13
+	} else {
+		// This uses the same values as http.DefaultTransport
+		transport = &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+				DualStack: true,
+			}).DialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+		}
 	}
-	defaultTransport = &http.Transport{}
-)
+	if skipVerify {
+		if transport.TLSClientConfig == nil {
+			transport.TLSClientConfig = &tls.Config{}
+		}
+		transport.TLSClientConfig.InsecureSkipVerify = true
+	}
+	return transport
+}
+
+// SharedTransport returns a shared transport with requested TLS InsecureSkipVerify value
+func SharedTransport(skipVerify bool) *http.Transport {
+	if skipVerify {
+		return skipVerifyTransport
+	}
+	return defaultTransport
+}
+
+func init() {
+	skipVerifyTransport = CreateTransport(true)
+	defaultTransport = CreateTransport(false)
+}
 
 // Client is a device for retrieving time series data from an InfluxDB instance
 type Client struct {
@@ -80,11 +120,7 @@ func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, err
 	}
 
 	hc := &http.Client{}
-	if c.InsecureSkipVerify {
-		hc.Transport = skipVerifyTransport
-	} else {
-		hc.Transport = defaultTransport
-	}
+	hc.Transport = SharedTransport(c.InsecureSkipVerify)
 	resp, err := hc.Do(req)
 	if err != nil {
 		return nil, err
@@ -229,11 +265,7 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 	}
 
 	hc := &http.Client{}
-	if c.InsecureSkipVerify {
-		hc.Transport = skipVerifyTransport
-	} else {
-		hc.Transport = defaultTransport
-	}
+	hc.Transport = SharedTransport(c.InsecureSkipVerify)
 
 	resp, err := hc.Do(req)
 	if err != nil {
@@ -327,11 +359,7 @@ func (c *Client) write(ctx context.Context, u *url.URL, db, rp, lp string) error
 	req.URL.RawQuery = params.Encode()
 
 	hc := &http.Client{}
-	if c.InsecureSkipVerify {
-		hc.Transport = skipVerifyTransport
-	} else {
-		hc.Transport = defaultTransport
-	}
+	hc.Transport = SharedTransport(c.InsecureSkipVerify)
 
 	errChan := make(chan (error))
 	go func() {
