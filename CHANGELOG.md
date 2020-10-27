@@ -7,6 +7,7 @@
 1. [#5598](https://github.com/influxdata/chronograf/pull/5598): Repair TICKscript editor scrolling.
 1. [#5600](https://github.com/influxdata/chronograf/pull/5600): Apply default timeouts in server connections.
 1. [#5603](https://github.com/influxdata/chronograf/pull/5603): Respect selected time zone in range picker.
+1. [#5604](https://github.com/influxdata/chronograf/pull/5604): Export CSV with a time column formatted according to selected time zone.
 
 ### Features
 
