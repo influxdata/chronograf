@@ -2,10 +2,13 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import rome from 'rome'
 import moment from 'moment'
+import {connect} from 'react-redux'
+import _ from 'lodash'
 
 import {formatTimeRange} from 'shared/utils/time'
 import shortcuts from 'shared/data/timeRangeShortcuts'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {TimeZones} from 'src/types'
 const dateFormat = 'YYYY-MM-DD HH:mm'
 
 class CustomTimeRange extends Component {
@@ -49,15 +52,15 @@ class CustomTimeRange extends Component {
   componentWillReceiveProps(nextProps) {
     const {lower, upper} = nextProps.timeRange
     if (lower) {
-      const formattedLower = this._formatTimeRange(lower)
-      this.lowerCal.setValue(this._formatTimeRange(lower))
-      this.lower.value = formattedLower
+      const momentVal = this._toMoment(lower)
+      this.lowerCal.setValue(momentVal)
+      this.lower.value = momentVal.format(dateFormat)
     }
 
     if (upper) {
-      const formattedUpper = this._formatTimeRange(upper)
-      this.upperCal.setValue(this._formatTimeRange(upper))
-      this.upper.value = formattedUpper
+      const momentVal = this._toMoment(upper)
+      this.upperCal.setValue(momentVal)
+      this.upper.value = momentVal.format(dateFormat)
     }
   }
 
@@ -65,10 +68,17 @@ class CustomTimeRange extends Component {
     const {upper, lower} = this.props.timeRange
 
     if (upper || lower) {
-      return this._formatTimeRange(time)
+      return this._toMoment(time)
     }
 
-    return moment(new Date()).format(dateFormat)
+    return this.timeZoned(moment())
+  }
+
+  timeZoned = (momentVal) => {
+    if (this.props.timeZone === TimeZones.UTC) {
+      return momentVal.utc()
+    }
+    return momentVal
   }
 
   handleRefreshCals = () => {
@@ -87,19 +97,35 @@ class CustomTimeRange extends Component {
   /*
    * Upper and lower time ranges are passed in with single quotes as part of
    * the string literal, i.e. "'2015-09-23T18:00:00.000Z'".  Remove them
-   * before passing the string to be parsed.
+   * before passing the string to be parsed. Additionally, return the moment 
+   * in the timeZone so that it is formatted well.
    */
-  _formatTimeRange = timeRange => {
-    return formatTimeRange(timeRange)
+  _toMoment = timeRange => {
+    const strVal = formatTimeRange(timeRange)
+    const retVal = moment(strVal, dateFormat)
+    if (this.props.timeZone === TimeZones.UTC) {
+      retVal.utc()
+    }
+    return retVal
   }
 
   handleClick = () => {
     const {onApplyTimeRange, onClose} = this.props
     const {isNow} = this.state
 
-    const lower = this.lowerCal.getDate().toISOString()
-    const upper = this.upperCal.getDate().toISOString()
-
+    const lowerMoment = this.lowerCal.getMoment()
+    const upperMoment = this.upperCal.getMoment()
+    if (this.props.timeZone === TimeZones.UTC){
+      // rome calendar does not respect that UTC moment was set
+      if (!lowerMoment.creationData().isUTC){
+        lowerMoment.utc(true)
+      }
+      if (!upperMoment.creationData().isUTC){
+        upperMoment.utc(true)
+      }
+    }
+    const lower = lowerMoment.toDate().toISOString()
+    const upper = upperMoment.toDate().toISOString()
     if (isNow) {
       onApplyTimeRange({lower, upper: 'now()'})
     } else {
@@ -114,31 +140,31 @@ class CustomTimeRange extends Component {
   handleTimeRangeShortcut = shortcut => {
     return () => {
       let lower
-      const upper = moment()
+      const upper = this.timeZoned(moment())
 
       switch (shortcut) {
         case 'pastWeek': {
-          lower = moment().subtract(1, 'week')
+          lower = moment(upper).subtract(1, 'week')
           break
         }
         case 'pastMonth': {
-          lower = moment().subtract(1, 'month')
+          lower = moment(upper).subtract(1, 'month')
           break
         }
         case 'pastYear': {
-          lower = moment().subtract(1, 'year')
+          lower = moment(upper).subtract(1, 'year')
           break
         }
         case 'thisWeek': {
-          lower = moment().startOf('week')
+          lower = moment(upper).startOf('week')
           break
         }
         case 'thisMonth': {
-          lower = moment().startOf('month')
+          lower = moment(upper).startOf('month')
           break
         }
         case 'thisYear': {
-          lower = moment().startOf('year')
+          lower = moment(upper).startOf('year')
           break
         }
       }
@@ -242,6 +268,9 @@ CustomTimeRange.propTypes = {
   timeInterval: number,
   onClose: func,
   page: string,
+  timeZone: string,
 }
-
-export default ErrorHandling(CustomTimeRange)
+const mstp = state => ({
+  timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
+})
+export default ErrorHandling(connect(mstp)(CustomTimeRange))

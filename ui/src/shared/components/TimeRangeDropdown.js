@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import moment from 'moment'
+import {connect} from 'react-redux'
+import _ from 'lodash'
 
 import OnClickOutside from 'shared/components/OnClickOutside'
 import FancyScrollbar from 'shared/components/FancyScrollbar'
@@ -10,10 +12,17 @@ import CustomTimeRangeOverlay from 'shared/components/CustomTimeRangeOverlay'
 import {timeRanges} from 'shared/data/timeRanges'
 import {DROPDOWN_MENU_MAX_HEIGHT} from 'shared/constants/index'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import {TimeZones} from 'src/types'
 
 const dateFormat = 'YYYY-MM-DD HH:mm'
 const emptyTime = {lower: '', upper: ''}
-const format = t => moment(t.replace(/\'/g, '')).format(dateFormat)
+const format = (t, timeZone) => {
+  const m = moment(t.replace(/\'/g, ''))
+  if (timeZone === TimeZones.UTC) {
+    m.utc()
+  }
+  return m.format(dateFormat)
+}
 
 class TimeRangeDropdown extends Component {
   constructor(props) {
@@ -34,10 +43,10 @@ class TimeRangeDropdown extends Component {
   findTimeRangeInputValue = ({upper, lower}) => {
     if (upper && lower) {
       if (upper === 'now()') {
-        return `${format(lower)} - Now`
+        return `${format(lower, this.props.timeZone)} - Now`
       }
 
-      return `${format(lower)} - ${format(upper)}`
+      return `${format(lower, this.props.timeZone)} - ${format(upper, this.props.timeZone)}`
     }
 
     const selected = timeRanges.find(range => range.lower === lower)
@@ -169,6 +178,10 @@ TimeRangeDropdown.propTypes = {
   onChooseTimeRange: func.isRequired,
   preventCustomTimeRange: bool,
   page: string,
+  timeZone: string,
 }
 
-export default OnClickOutside(ErrorHandling(TimeRangeDropdown))
+const mstp = state => ({
+  timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
+})
+export default OnClickOutside(ErrorHandling(connect(mstp)(TimeRangeDropdown)))
