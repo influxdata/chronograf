@@ -1,14 +1,14 @@
 package server
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/influxdata/chronograf/influx"
 )
 
 // Proxy proxies requests to services using the path query parameter.
@@ -67,24 +67,8 @@ func (s *Service) Proxy(w http.ResponseWriter, r *http.Request) {
 		FlushInterval: time.Second,
 	}
 
-	// The connection to kapacitor is using a self-signed certificate.
-	// This modifies uses the same values as http.DefaultTransport but specifies
-	// InsecureSkipVerify
-	if srv.InsecureSkipVerify {
-		proxy.Transport = &http.Transport{
-			Proxy: http.ProxyFromEnvironment,
-			DialContext: (&net.Dialer{
-				Timeout:   30 * time.Second,
-				KeepAlive: 30 * time.Second,
-				DualStack: true,
-			}).DialContext,
-			MaxIdleConns:          100,
-			IdleConnTimeout:       90 * time.Second,
-			TLSHandshakeTimeout:   10 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
-			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
-		}
-	}
+	// The connection to kapacitor might use a self-signed certificate, that's why srv.InsecureSkipVerify
+	proxy.Transport = influx.SharedTransport(srv.InsecureSkipVerify)
 	proxy.ServeHTTP(w, r)
 }
 
