@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 1. [#5596](https://github.com/influxdata/chronograf/pull/5596): Show rule name from tickscript.
+1. [#5597](https://github.com/influxdata/chronograf/pull/5597): Do not truncate dashboard name with lots of room.
 
 ### Features
 
