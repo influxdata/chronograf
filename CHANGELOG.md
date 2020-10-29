@@ -4,6 +4,8 @@
 
 ### Features
 
+1. [#5595](https://github.com/influxdata/chronograf/pull/5595): Allow to select recovery action in OpsGenie2 configuration.
+
 ### Other
 
 ## v1.8.7 [2020-10-06]

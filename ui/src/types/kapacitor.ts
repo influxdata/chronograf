@@ -350,6 +350,7 @@ export interface OpsGenieProperties {
   teams: string[]
   recipients: string[]
   enabled: boolean
+  recovery_action?: 'notes' | 'close' // available in OpsGenie2
 }
 
 export interface PagerDutyProperties {

@@ -282,6 +282,7 @@ class AlertTabs extends PureComponent<Props, State> {
               configSections,
               AlertTypes.opsgenie2
             )}
+            v2={true}
           />
         )
       case AlertTypes.pagerduty:
