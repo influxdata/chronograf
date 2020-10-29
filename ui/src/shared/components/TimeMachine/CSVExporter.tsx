@@ -12,7 +12,7 @@ import {
   fluxResponseTruncatedError,
 } from 'src/shared/copy/notifications'
 
-import {Query, Template, Source, TimeRange} from 'src/types'
+import {Query, Template, Source, TimeRange, TimeZones} from 'src/types'
 
 interface Props {
   // Used for downloading an InfluxQL query
@@ -27,6 +27,7 @@ interface Props {
 
   isFluxSelected: boolean
   onNotify: typeof notify
+  timeZone?: TimeZones
 }
 
 interface State {
@@ -73,9 +74,9 @@ class CSVExporter extends PureComponent<Props, State> {
   }
 
   private downloadInfluxQLCSV = (): Promise<void> => {
-    const {queries, templates} = this.props
+    const {queries, templates, timeZone} = this.props
 
-    return downloadInfluxQLCSV(queries, templates)
+    return downloadInfluxQLCSV(queries, templates, timeZone)
   }
 
   private downloadFluxCSV = async (): Promise<void> => {
@@ -98,6 +99,7 @@ class CSVExporter extends PureComponent<Props, State> {
 
 const mstp = state => ({
   fluxASTLink: state.links.flux.ast,
+  timeZone: state.app.persisted.timeZone,
 })
 
 const mdtp = {
