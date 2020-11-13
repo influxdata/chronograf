@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/bouk/httprouter"
@@ -135,7 +136,7 @@ func Test_ValidSourceRequest(t *testing.T) {
 				},
 			},
 			wants: wants{
-				err: fmt.Errorf("invalid source URI: parse im a bad url: invalid URI for request"),
+				err: fmt.Errorf("invalid source URI: parse"), // im a bad url: invalid URI for request
 			},
 		},
 	}
@@ -150,6 +151,12 @@ func Test_ValidSourceRequest(t *testing.T) {
 				return
 			}
 			if err.Error() != tt.wants.err.Error() {
+				if err != nil && tt.wants.err != nil {
+					if strings.HasPrefix(err.Error(), tt.wants.err.Error()) {
+						// error messages vary between go versions, but they have the same prefixes
+						return
+					}
+				}
 				t.Errorf("%q. ValidSourceRequest() = %q, want %q", tt.name, err, tt.wants.err)
 			}
 		})

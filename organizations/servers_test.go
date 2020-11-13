@@ -79,6 +79,9 @@ func TestServers_All(t *testing.T) {
 	}
 	for _, tt := range tests {
 		s := organizations.NewServersStore(tt.fields.ServersStore, tt.args.organization)
+		if tt.args.ctx == nil {
+			tt.args.ctx = context.Background() // required since go 1.15, see https://github.com/golang/go/issues/40737
+		}
 		tt.args.ctx = context.WithValue(tt.args.ctx, organizations.ContextKey, tt.args.organization)
 		gots, err := s.All(tt.args.ctx)
 		if (err != nil) != tt.wantErr {

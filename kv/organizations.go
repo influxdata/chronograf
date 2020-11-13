@@ -154,6 +154,9 @@ func (s *organizationsStore) Delete(ctx context.Context, o *chronograf.Organizat
 
 	// Each of the associated organization stores expects organization to be
 	// set on the context.
+	if ctx == nil {
+		ctx = context.Background() // context could be possible nil before go 1.15, see https://github.com/golang/go/issues/40737
+	}
 	ctx = context.WithValue(ctx, organizations.ContextKey, o.ID)
 
 	sourcesStore := organizations.NewSourcesStore(s.client.SourcesStore(), o.ID)
