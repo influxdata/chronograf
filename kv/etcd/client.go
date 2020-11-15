@@ -3,6 +3,7 @@ package etcd
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"errors"
 	"math/rand"
 	"time"
@@ -125,6 +126,16 @@ func WithLogin(u, p string) Option {
 	return func(c *client) error {
 		c.config.Username = u
 		c.config.Password = p
+		return nil
+	}
+}
+
+// WithTLS allows set TLS config.
+func WithTLS(tlsConfig *tls.Config) Option {
+	return func(c *client) error {
+		if tlsConfig != nil {
+			c.config.TLS = tlsConfig
+		}
 		return nil
 	}
 }
