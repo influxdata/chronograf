@@ -36,6 +36,8 @@ import {Source, Me} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
+const isSourceV2 = (source: Partial<Source>) =>
+  !source.version || source.version.startsWith('2.')
 
 interface Props {
   notify: typeof notifyAction
@@ -98,6 +100,8 @@ class SourceStep extends PureComponent<Props, State> {
   public render() {
     const {source} = this.state
     const {isUsingAuth, onBoarding} = this.props
+    const sourceIsV2 = isSourceV2(source)
+
     return (
       <>
         {isUsingAuth && onBoarding && this.authIndicator}
@@ -115,12 +119,12 @@ class SourceStep extends PureComponent<Props, State> {
         />
         <WizardTextInput
           value={source.username}
-          label="Username"
+          label={sourceIsV2 ? 'Organization' : 'Username'}
           onChange={this.onChangeInput('username')}
         />
         <WizardTextInput
           value={source.password}
-          label="Password"
+          label={sourceIsV2 ? 'Token' : 'Password'}
           placeholder={this.passwordPlaceholder}
           type="password"
           onChange={this.onChangeInput('password')}
