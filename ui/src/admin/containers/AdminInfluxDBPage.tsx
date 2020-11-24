@@ -160,6 +160,14 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
       return <PageSpinner />
     }
 
+    if (!source.version || source.version.startsWith('2')) {
+      return (
+        <div className="container-fluid">
+          These functions are not available for the currently selected InfluxDB
+          Connection.
+        </div>
+      )
+    }
     return (
       <div className="container-fluid">
         <SubSections
