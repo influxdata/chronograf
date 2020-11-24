@@ -135,6 +135,125 @@ func TestReverse(t *testing.T) {
 			},
 		},
 		{
+			name: "simple stream tickscript - negative tags",
+			script: chronograf.TICKScript(`
+														var name = 'name'
+														var triggerType = 'threshold'
+														var every = 30s
+														var period = 10m
+														var groupBy = ['host', 'cluster_id']
+														var db = 'telegraf'
+														var rp = 'autogen'
+														var measurement = 'cpu'
+														var message = 'message'
+														var details = 'details'
+														var crit = 90
+														var idVar = name + ':{{.Group}}'
+														var idTag = 'alertID'
+														var levelTag = 'level'
+														var messageField = 'message'
+														var durationField = 'duration'
+														var whereFilter = lambda: ("cpu" != 'cpu_total') AND ("host" != 'acc-0eabc309-eu-west-1-data-3' AND "host" != 'prod')
+
+														var data = stream
+														|from()
+															.database(db)
+															.retentionPolicy(rp)
+															.measurement(measurement)
+														|window()
+															.period(period)
+															.every(every)
+															.align()
+														|mean('usage_user')
+															.as('value')
+														var trigger = data
+														|alert()
+															.crit(lambda: "value" > crit)
+															.stateChangesOnly()
+															.message(message)
+															.id(idVar)
+															.idTag(idTag)
+															.levelTag(levelTag)
+															.messageField(messageField)
+															.durationField(durationField)
+															.slack()
+															.victorOps()
+															.email('howdy@howdy.com', 'doody@doody.com')
+															.log('/tmp/alerts.log')
+															.post('http://backin.tm')
+															.endpoint('myendpoint')
+															.header('key', 'value')
+															`),
+
+			want: chronograf.AlertRule{
+				Name:    "name",
+				Trigger: "threshold",
+				AlertNodes: chronograf.AlertNodes{
+					IsStateChangesOnly: true,
+					Slack: []*chronograf.Slack{
+						{},
+					},
+					VictorOps: []*chronograf.VictorOps{
+						{},
+					},
+					Email: []*chronograf.Email{
+						{
+							To: []string{"howdy@howdy.com", "doody@doody.com"},
+						},
+					},
+					Log: []*chronograf.Log{
+						{
+							FilePath: "/tmp/alerts.log",
+						},
+					},
+					Posts: []*chronograf.Post{
+						{
+							URL:     "http://backin.tm",
+							Headers: map[string]string{"key": "value"},
+						},
+					},
+				},
+				TriggerValues: chronograf.TriggerValues{
+					Operator: "greater than",
+					Value:    "90",
+				},
+				Every:   "30s",
+				Message: "message",
+				Details: "details",
+				Query: &chronograf.QueryConfig{
+					Database:        "telegraf",
+					RetentionPolicy: "autogen",
+					Measurement:     "cpu",
+					Fields: []chronograf.Field{
+						{
+							Value: "mean",
+							Args: []chronograf.Field{
+								{
+									Value: "usage_user",
+									Type:  "field",
+								},
+							},
+							Type: "func",
+						},
+					},
+					GroupBy: chronograf.GroupBy{
+						Time: "10m0s",
+						Tags: []string{"host", "cluster_id"},
+					},
+					Tags: map[string][]string{
+						"cpu": {
+							"cpu_total",
+						},
+						"host": {
+							"acc-0eabc309-eu-west-1-data-3",
+							"prod",
+						},
+					},
+					AreTagsAccepted: false,
+				},
+			},
+		},
+		{
 			name: "Test Threshold",
 			script: `var db = 'telegraf'
 
