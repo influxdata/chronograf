@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coreos/etcd/embed"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/mocks"
 	"github.com/stretchr/testify/require"
+	"go.etcd.io/etcd/embed"
 )
 
 func TestNewClient(t *testing.T) {
