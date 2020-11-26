@@ -3,9 +3,9 @@ package bolt
 import (
 	"context"
 
-	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv/internal"
+	bolt "go.etcd.io/bbolt"
 )
 
 // Ensure buildStore struct implements chronograf.BuildStore interface.
