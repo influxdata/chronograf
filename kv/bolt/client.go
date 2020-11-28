@@ -8,10 +8,10 @@ import (
 	"path"
 	"time"
 
-	"github.com/boltdb/bolt"
 	"github.com/influxdata/chronograf"
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/mocks"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

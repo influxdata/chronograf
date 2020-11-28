@@ -1,7 +1,7 @@
 ### Go
 * github.com/NYTimes/gziphandler [APACHE-2.0](https://github.com/NYTimes/gziphandler/blob/master/LICENSE.md)
 * github.com/sirupsen/logrus [MIT](https://github.com/sirupsen/logrus/blob/master/LICENSE)
-* github.com/boltdb/bolt [MIT](https://github.com/boltdb/bolt/blob/master/LICENSE)
+* github.com/etcd-io/bbolt [MIT](https://github.com/etcd-io/bbolt/blob/master/LICENSE)
 * github.com/bouk/httprouter [BSD](https://github.com/bouk/httprouter/blob/master/LICENSE)
 * github.com/dgrijalva/jwt-go [MIT](https://github.com/dgrijalva/jwt-go/blob/master/LICENSE)
 * github.com/elazarl/go-bindata-assetfs [BSD](https://github.com/elazarl/go-bindata-assetfs/blob/master/LICENSE)

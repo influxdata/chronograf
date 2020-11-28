@@ -26,5 +26,8 @@ func hasServerContext(ctx context.Context) bool {
 }
 
 func serverContext(ctx context.Context) context.Context {
+	if ctx == nil {
+		ctx = context.Background() // context could be possible nil before go 1.15, see https://github.com/golang/go/issues/40737
+	}
 	return context.WithValue(ctx, ServerContextKey, true)
 }

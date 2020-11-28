@@ -107,7 +107,7 @@ func Test_MountableRouter_PrefixesPuts(t *testing.T) {
 	ts := httptest.NewServer(mr)
 	defer ts.Close()
 
-	req := httptest.NewRequest(http.MethodPut, ts.URL+"/chronograf/doc", strings.NewReader(expected))
+	req, _ := http.NewRequest(http.MethodPut, ts.URL+"/chronograf/doc", strings.NewReader(expected))
 	req.Header.Set("Content-Type", "text/plain; charset=utf-8")
 	req.Header.Set("Content-Length", fmt.Sprintf("%d", len(expected)))
 	req.RequestURI = ""

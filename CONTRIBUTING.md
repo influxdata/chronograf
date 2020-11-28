@@ -45,9 +45,9 @@ If you are going to be contributing back to Chronograf please take a second to s
 
 ## Installing & Using Node
 
-You'll need to install Node 12 to run the frontend chronograf application.
+You'll need to install Node 14 to run the frontend chronograf application.
 
-* [Install Node 12](https://nodejs.org/en/about/releases/)
+* [Install Node 14](https://nodejs.org/en/about/releases/)
 
 ## Installing & Using Yarn
 
@@ -59,7 +59,7 @@ To add a dependency via Yarn, for example, run `yarn add <dependency>` from with
 
 ## Installing Go
 
-Chronograf requires Go 1.13 or higher.
+Chronograf requires Go 1.15 or higher.
 
 ## Installing & Using Dep
 
