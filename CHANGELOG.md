@@ -2,9 +2,21 @@
 
 ### Bug Fixes
 
+1. [#5611](https://github.com/influxdata/chronograf/pull/5611): Avoid blinking "No Results" dashboard cells upon refresh.
+1. [#5613](https://github.com/influxdata/chronograf/pull/5613): Warn about unsupported query in alert rule.
+1. [#5616](https://github.com/influxdata/chronograf/pull/5616): AND not-equal conditions in the generated tickscript where filter.
+1. [#5618](https://github.com/influxdata/chronograf/pull/5618): Disable InfluxDB admin page if administration is not possible.
+1. [#5619](https://github.com/influxdata/chronograf/pull/5619): Use token authentication against InfluxDB v2 sources.
+
+
 ### Features
 
+1. [#5612](https://github.com/influxdata/chronograf/pull/5612): Allow to configure etcd with client certificate.
+1. [#5619](https://github.com/influxdata/chronograf/pull/5619): Support flux in InfluxDB v2 sources.
+
 ### Other
+
+1. [#5610](https://github.com/influxdata/chronograf/pull/5610): Upgrade golang to 1.15.5, node to 14 LTS.
 
 ## v1.8.8 [2020-11-04]
 
