@@ -148,11 +148,23 @@ class SourceStep extends PureComponent<Props, State> {
         )}
         {!onBoarding && (
           <WizardCheckbox
+            halfWidth
             isChecked={source.default}
-            text={'Make this the default connection'}
+            text={'Default connection'}
             onChange={this.onChangeInput('default')}
           />
         )}
+        <WizardCheckbox
+          halfWidth={!onBoarding}
+          isChecked={sourceIsV2}
+          text={'InfluxDB v2'}
+          onChange={() =>
+            this.setState({
+              source: {...source, version: sourceIsV2 ? '1.x' : '2.x'},
+            })
+          }
+        />
+
         {this.isHTTPS && (
           <WizardCheckbox
             isChecked={source.insecureSkipVerify}
