@@ -93,7 +93,7 @@ async function AJAX<T = any>(
     headers = {},
   }: RequestParams,
   excludeBasepath = false
-): Promise<(T | T & {links: object}) | AxiosResponse<T>> {
+): Promise<(T | (T & {links: object})) | AxiosResponse<T>> {
   try {
     url = addBasepath(url, excludeBasepath)
 
@@ -117,7 +117,11 @@ async function AJAX<T = any>(
     return links ? generateResponseWithLinks(response, links) : response
   } catch (error) {
     const {response} = error
-    throw links ? generateResponseWithLinks(response, links) : response // eslint-disable-line no-throw-literal
+    if (response) {
+      throw links ? generateResponseWithLinks(response, links) : response // eslint-disable-line no-throw-literal
+    } else {
+      throw error
+    }
   }
 }
 
