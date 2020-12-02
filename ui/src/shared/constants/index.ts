@@ -446,6 +446,7 @@ export const DEFAULT_SOURCE = {
   telegraf: 'telegraf',
   insecureSkipVerify: false,
   metaUrl: 'http://localhost:8091',
+  version: '1.x',
 }
 
 export const DEFAULT_KAPACITOR = {

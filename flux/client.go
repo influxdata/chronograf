@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -77,11 +78,13 @@ func (c *Client) FluxEnabled() (bool, error) {
 	}
 	defer resp.Body.Close()
 
-	// When flux is enabled, the response has 'Content-Type' set to 'application/json' and a body
+	contentType := resp.Header.Get("Content-Type")
+	// 1.x: When flux is enabled, the response has 'Content-Type' set to 'application/json' and a body
 	// of `{"error":"mime: no media type"}`. Otherwise it is 'text/plain; charset=utf-8' with
 	// `Flux query service disabled.` in the body.
-	contentType := resp.Header.Get("Content-Type")
-	return contentType == "application/json", nil
+	// 2.x: Flux is always enabled, the 401 response with 'application/json; charset=utf-8' content type and body
+	// {"code":"unauthorized","message":"unauthorized access"} is received
+	return strings.HasPrefix(contentType, "application/json"), nil
 }
 
 func (c *Client) ping(u *url.URL) error {

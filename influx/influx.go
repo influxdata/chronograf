@@ -293,6 +293,10 @@ func (c *Client) ping(u *url.URL) (string, string, error) {
 	} else if strings.Contains(version, "relay") {
 		return version, chronograf.InfluxRelay, nil
 	}
+	// older InfluxDB instances might have version 'v1.x.x'
+	if strings.HasPrefix(version, "v") {
+		version = version[1:]
+	}
 
 	return version, chronograf.InfluxDB, nil
 }

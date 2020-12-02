@@ -176,6 +176,11 @@ func (s *Service) ProxyFlux(w http.ResponseWriter, r *http.Request) {
 	director := func(req *http.Request) {
 		// Set the Host header of the original Flux URL
 		req.Host = u.Host
+		// Add v2-required org parameter
+		query := u.Query()
+		query.Add("org", src.Username) // v2 organization name is stored as v1 username
+		u.RawQuery = query.Encode()
+		// Set URL
 		req.URL = u
 
 		// Use authorization method based on whether it is OSS or Enterprise

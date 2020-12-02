@@ -3,6 +3,7 @@ package influx
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -21,18 +22,28 @@ type NoAuthorization struct{}
 // Set does not add authorization
 func (n *NoAuthorization) Set(req *http.Request) error { return nil }
 
-// DefaultAuthorization creates either a shared JWT builder, basic auth or Noop
+// DefaultAuthorization creates either a shared JWT builder, basic auth or Noop or Token authentication
 func DefaultAuthorization(src *chronograf.Source) Authorizer {
-	// Optionally, add the shared secret JWT token creation
-	if src.Username != "" && src.SharedSecret != "" {
-		return &BearerJWT{
-			Username:     src.Username,
-			SharedSecret: src.SharedSecret,
+	// Token authentication for InfluxDB v2
+	if (src.Version == "" || strings.HasPrefix(src.Version, "2.")) && src.Password != "" {
+		return &TokenAuth{
+			Token: src.Password,
 		}
-	} else if src.Username != "" && src.Password != "" {
-		return &BasicAuth{
-			Username: src.Username,
-			Password: src.Password,
+	}
+	if src.Username != "" {
+		// Optionally, add the shared secret JWT token creation
+		if src.SharedSecret != "" {
+			return &BearerJWT{
+				Username:     src.Username,
+				SharedSecret: src.SharedSecret,
+			}
+		}
+		// use standard basic authentication
+		if src.Password != "" {
+			return &BasicAuth{
+				Username: src.Username,
+				Password: src.Password,
+			}
 		}
 	}
 	return &NoAuthorization{}
@@ -47,6 +58,18 @@ type BasicAuth struct {
 // Set adds the basic auth headers to the request
 func (b *BasicAuth) Set(r *http.Request) error {
 	r.SetBasicAuth(b.Username, b.Password)
+	return nil
+}
+
+// TokenAuth adds Authorization: Token to the request header
+type TokenAuth struct {
+	Token string
+}
+
+// Set adds the token authentication to the request
+func (a *TokenAuth) Set(r *http.Request) error {
+	fmt.Println("setting up token " + a.Token)
+	r.Header.Set("Authorization", "Token "+a.Token)
 	return nil
 }
 
