@@ -7,7 +7,7 @@
 1. [#5616](https://github.com/influxdata/chronograf/pull/5616): AND not-equal conditions in the generated tickscript where filter.
 1. [#5618](https://github.com/influxdata/chronograf/pull/5618): Disable InfluxDB admin page if administration is not possible.
 1. [#5619](https://github.com/influxdata/chronograf/pull/5619): Use token authentication against InfluxDB v2 sources.
-
+1. [#5622](https://github.com/influxdata/chronograf/pull/5622): Avoid blank screen on Windows.
 
 ### Features
 
