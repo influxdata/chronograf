@@ -106,7 +106,7 @@ func varWhereFilter(vars map[string]tick.Var) (WhereFilter, bool) {
 	}
 
 	lambda := value.ExpressionString()
-	// Chronograf TICKScripts use lambda: TRUE as a pass-throug where clause
+	// Chronograf TICKScripts use lambda: TRUE as a pass-through where clause
 	// if the script does not have a where clause set.
 	// isPresent(fieldName) is also used since chronograf 1.8.7 in place of TRUE
 	// https://github.com/influxdata/chronograf/issues/5566
