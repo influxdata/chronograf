@@ -5,6 +5,7 @@ package dist
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 )
@@ -81,6 +82,11 @@ func (b *BindataAssets) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		if err := b.addCacheHeaders(name, w); err != nil {
 			return nil, err
+		}
+		// https://github.com/influxdata/chronograf/issues/5565
+		// workaround wrong .js content-type on windows
+		if strings.HasSuffix(name, ".js") {
+			w.Header().Set("Content-Type", "text/javascript")
 		}
 		return octets, nil
 	}
