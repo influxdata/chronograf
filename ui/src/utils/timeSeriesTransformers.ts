@@ -11,6 +11,7 @@ export interface TimeSeriesToDyGraphReturnType {
   labels: string[]
   timeSeries: DygraphValue[][]
   dygraphSeries: DygraphSeries
+  unsupportedValue?: any
 }
 
 export const timeSeriesToDygraph = async (
@@ -19,12 +20,18 @@ export const timeSeriesToDygraph = async (
 ): Promise<TimeSeriesToDyGraphReturnType> => {
   const result = await manager.timeSeriesToDygraph(raw, pathname)
   const {timeSeries} = result
+  let unsupportedValue: any
   const newTimeSeries = fastMap<DygraphValue[], DygraphValue[]>(
     timeSeries,
-    ([time, ...values]) => [new Date(time), ...values]
+    ([time, ...values]) => {
+      if (unsupportedValue === undefined) {
+        unsupportedValue = values.find(x => x !== null && typeof x !== 'number')
+      }
+      return [new Date(time), ...values]
+    }
   )
 
-  return {...result, timeSeries: newTimeSeries}
+  return {...result, timeSeries: newTimeSeries, unsupportedValue}
 }
 
 export const timeSeriesToTableGraph = async (
