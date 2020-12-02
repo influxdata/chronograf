@@ -109,21 +109,21 @@ interface DurationBinaryExpression {
 }
 
 export function allRangeTimes(ast: any): Array<[number, number]> {
-  return findNodes(isRangeNode, ast).map(node => rangeTimes(ast, node))
+  const now = Date.now()
+  return findNodes(isRangeNode, ast).map(node => rangeTimes(ast, node, now))
 }
 
 /*
   Given a `range` call in an AST, reports the `start` and `stop` arguments the
   the call as absolute instants in time. If the `start` or `stop` argument is a
-  relative duration literal, it is interpreted as relative to the current
-  instant (`Date.now()`).
+  relative duration literal, it is interpreted as relative to now (`Date.now()`).
 */
 function rangeTimes(
   ast: any,
-  rangeNode: RangeCallExpression
+  rangeNode: RangeCallExpression,
+  now: number
 ): [number, number] {
   const properties = rangeNode.arguments[0].properties
-  const now = Date.now()
 
   // The `start` argument is required
   const startProperty = properties.find(p => p.key.name === 'start')
