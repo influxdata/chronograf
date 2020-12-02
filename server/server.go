@@ -80,11 +80,13 @@ type Server struct {
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
 	GithubOrgs         []string `short:"o" long:"github-organization" description:"Github organization user is required to have active membership" env:"GH_ORGS" env-delim:","`
 
-	EtcdEndpoints      []string      `short:"e" long:"etcd-endpoints" description:"List of etcd endpoints" env:"ETCD_ENDPOINTS" env-delim:","`
-	EtcdUsername       string        `long:"etcd-username" description:"Username to log into etcd." env:"ETCD_USERNAME"`
-	EtcdPassword       string        `long:"etcd-password" description:"Password to log into etcd." env:"ETCD_PASSWORD"`
-	EtcdDialTimeout    time.Duration `long:"etcd-dial-timeout" default:"-1s" description:"Total time to wait before timing out while connecting to etcd endpoints. 0 means no timeout. " env:"ETCD_DIAL_TIMEOUT"`
-	EtcdRequestTimeout time.Duration `long:"etcd-request-timeout" default:"-1s" description:"Total time to wait before timing out the etcd view or update. 0 means no timeout." env:"ETCD_REQUEST_TIMEOUT"`
+	EtcdEndpoints      []string       `short:"e" long:"etcd-endpoints" description:"List of etcd endpoints" env:"ETCD_ENDPOINTS" env-delim:","`
+	EtcdUsername       string         `long:"etcd-username" description:"Username to log into etcd." env:"ETCD_USERNAME"`
+	EtcdPassword       string         `long:"etcd-password" description:"Password to log into etcd." env:"ETCD_PASSWORD"`
+	EtcdDialTimeout    time.Duration  `long:"etcd-dial-timeout" default:"-1s" description:"Total time to wait before timing out while connecting to etcd endpoints. 0 means no timeout. " env:"ETCD_DIAL_TIMEOUT"`
+	EtcdRequestTimeout time.Duration  `long:"etcd-request-timeout" default:"-1s" description:"Total time to wait before timing out the etcd view or update. 0 means no timeout." env:"ETCD_REQUEST_TIMEOUT"`
+	EtcdCert           flags.Filename `long:"etcd-cert" description:"Path to PEM encoded TLS public key certificate. " env:"ETCD_CERTIFICATE"`
+	EtcdKey            flags.Filename `long:"etcd-key" description:"Path to private key associated with given certificate. " env:"ETCD_PRIVATE_KEY"`
 
 	GoogleClientID     string   `long:"google-client-id" description:"Google Client ID for OAuth 2 support" env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string   `long:"google-client-secret" description:"Google Client Secret for OAuth 2 support" env:"GOOGLE_CLIENT_SECRET"`
@@ -486,7 +488,7 @@ func (s *Server) NewListener() (net.Listener, error) {
 		return listener, nil
 	}
 
-	tlsConfig, err := createTLSConfig(tlsServerOptions{
+	tlsConfig, err := createTLSConfig(tlsOptions{
 		Cert:       string(s.Cert),
 		Key:        string(s.Key),
 		Ciphers:    strings.Split(s.TLSCiphers, ","),
@@ -617,12 +619,25 @@ func (s *Server) Serve(ctx context.Context) {
 		}
 
 	} else {
+		var tlsConfig *tls.Config
+		if s.EtcdCert != "" {
+			tlsConfig, err = createTLSConfig(tlsOptions{
+				Cert: string(s.EtcdCert),
+				Key:  string(s.EtcdKey),
+			})
+			if err != nil {
+				logger.Error("Unable to create TLS configuration for etcd client", err)
+				os.Exit(1)
+			}
+		}
+
 		db, err = etcd.NewClient(ctx,
 			etcd.WithEndpoints(s.EtcdEndpoints),
 			etcd.WithLogin(s.EtcdUsername, s.EtcdPassword),
 			etcd.WithRequestTimeout(s.EtcdRequestTimeout),
 			etcd.WithDialTimeout(s.EtcdDialTimeout),
 			etcd.WithLogger(logger),
+			etcd.WithTLS(tlsConfig),
 		)
 		if err != nil {
 			logger.Error("Unable to create etcd client", err)

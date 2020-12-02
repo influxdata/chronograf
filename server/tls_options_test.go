@@ -11,25 +11,25 @@ import (
 func Test_createTLSConfig(t *testing.T) {
 	var tests = []struct {
 		name string
-		in   tlsServerOptions
+		in   tlsOptions
 		out  *tls.Config
 		err  string
 	}{
 		{
 			name: "empty options",
-			in:   tlsServerOptions{},
+			in:   tlsOptions{},
 			err:  "no TLS certificate specified",
 		},
 		{
 			name: "missing key",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert: "tls_options_test.cert",
 			},
 			err: "private key",
 		},
 		{
 			name: "cert and key",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 			},
@@ -37,7 +37,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "minVersion",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MinVersion: "1.1",
@@ -46,7 +46,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "maxVersion",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MaxVersion: "1.2",
@@ -55,7 +55,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "ciphers",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -74,7 +74,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "help on ciphers",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -85,7 +85,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown cipher",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -96,7 +96,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown minVersion",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MinVersion: "0.9",
@@ -105,7 +105,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown maxVersion",
-			in: tlsServerOptions{
+			in: tlsOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MaxVersion: "f1",
