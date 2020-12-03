@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import {RemoteDataState} from 'src/types'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
@@ -8,7 +8,10 @@ interface Props {
   children: JSX.Element
 }
 
-const DropdownLoadingPlaceholder: SFC<Props> = ({children, rds}) => {
+const DropdownLoadingPlaceholder: FunctionComponent<Props> = ({
+  children,
+  rds,
+}) => {
   if (rds === RemoteDataState.Loading) {
     return (
       <div className="dropdown-placeholder">

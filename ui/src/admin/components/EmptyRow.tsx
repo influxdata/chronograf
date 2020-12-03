@@ -1,9 +1,9 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 interface Props {
   tableName: string
 }
-const EmptyRow: SFC<Props> = ({tableName}) => (
+const EmptyRow: FunctionComponent<Props> = ({tableName}) => (
   <tr className="table-empty-state">
     <th colSpan={5}>
       <p>

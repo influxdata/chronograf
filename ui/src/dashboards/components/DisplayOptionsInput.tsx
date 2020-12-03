@@ -1,4 +1,4 @@
-import React, {SFC, ChangeEvent} from 'react'
+import React, {FunctionComponent, ChangeEvent} from 'react'
 
 interface Props {
   name: string
@@ -10,7 +10,7 @@ interface Props {
   placeholder?: string
 }
 
-const DisplayOptionsInput: SFC<Props> = ({
+const DisplayOptionsInput: FunctionComponent<Props> = ({
   id,
   name,
   value,

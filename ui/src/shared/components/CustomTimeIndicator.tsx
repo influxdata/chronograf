@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import _ from 'lodash'
 
 import {TEMP_VAR_DASHBOARD_TIME} from 'src/shared/constants'
@@ -13,7 +13,7 @@ interface Props {
   queries: Query[]
 }
 
-const CustomTimeIndicator: SFC<Props> = ({queries}) => {
+const CustomTimeIndicator: FunctionComponent<Props> = ({queries}) => {
   const q = queries.find(
     query =>
       _.get(query, 'text', '').includes(TEMP_VAR_DASHBOARD_TIME) === false

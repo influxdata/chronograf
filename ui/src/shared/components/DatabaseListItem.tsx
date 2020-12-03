@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import classnames from 'classnames'
 
@@ -10,7 +10,7 @@ export interface DatabaseListItemProps {
   onChooseNamespace: (namespace: Namespace) => () => void
 }
 
-const DatabaseListItem: SFC<DatabaseListItemProps> = ({
+const DatabaseListItem: FunctionComponent<DatabaseListItemProps> = ({
   isActive,
   namespace,
   namespace: {database, retentionPolicy},

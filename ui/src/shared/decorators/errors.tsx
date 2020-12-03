@@ -42,7 +42,7 @@ ${mdMarker}
 }
 
 export function ErrorHandlingWith(
-  Error: ErrorComponentClass, // Must be a class based component and not an SFC
+  Error: ErrorComponentClass, // Must be a class based component and not an FunctionComponent
   alwaysDisplay = false
 ) {
   return <P, S, T extends {new (...args: any[]): Component<P, S>}>(

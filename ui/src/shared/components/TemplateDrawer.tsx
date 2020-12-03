@@ -1,4 +1,4 @@
-import React, {SFC, MouseEvent} from 'react'
+import React, {FunctionComponent, MouseEvent} from 'react'
 import OnClickOutside from 'react-onclickoutside'
 import classnames from 'classnames'
 
@@ -14,7 +14,7 @@ interface Props {
     template: Template
   ) => (e: MouseEvent<HTMLDivElement>) => void
 }
-const TemplateDrawer: SFC<Props> = ({
+const TemplateDrawer: FunctionComponent<Props> = ({
   templates,
   selected,
   onMouseOverTempVar,

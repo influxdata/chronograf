@@ -1,6 +1,6 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
-const NoteOptions: SFC = () => (
+const NoteOptions: FunctionComponent = () => (
   <div className="note-options---panel">
     <div className="note-options--text">
       <p>

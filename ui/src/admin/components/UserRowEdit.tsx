@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import UserEditName from 'src/admin/components/UserEditName'
 import UserNewPassword from 'src/admin/components/UserNewPassword'
 import ConfirmOrCancel from 'src/shared/components/ConfirmOrCancel'
@@ -15,7 +15,7 @@ interface UserRowEditProps {
   hasRoles: boolean
 }
 
-const UserRowEdit: SFC<UserRowEditProps> = ({
+const UserRowEdit: FunctionComponent<UserRowEditProps> = ({
   user,
   onEdit,
   onSave,

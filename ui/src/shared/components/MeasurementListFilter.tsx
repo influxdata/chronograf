@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 interface Props {
   filterText: string
@@ -6,7 +6,7 @@ interface Props {
   onFilterText: (e: React.InputHTMLAttributes<HTMLInputElement>) => void
 }
 
-const MeasurementListFilter: SFC<Props> = ({
+const MeasurementListFilter: FunctionComponent<Props> = ({
   onEscape,
   onFilterText,
   filterText,

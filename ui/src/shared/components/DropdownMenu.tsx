@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {Link} from 'react-router'
 
 import classnames from 'classnames'
@@ -26,7 +26,7 @@ interface AddNew {
   handler?: () => void
 }
 
-const AddNewButton: SFC<AddNew> = ({url, text, handler}) => {
+const AddNewButton: FunctionComponent<AddNew> = ({url, text, handler}) => {
   if (handler) {
     return (
       <li className="multi-select--apply">
@@ -69,7 +69,7 @@ interface Props {
   highlightedItemIndex?: number
 }
 
-const DropdownMenu: SFC<Props> = ({
+const DropdownMenu: FunctionComponent<Props> = ({
   items,
   addNew,
   actions,
@@ -128,7 +128,7 @@ interface DropdownMenuEmptyProps {
   menuClass: string
 }
 
-export const DropdownMenuEmpty: SFC<DropdownMenuEmptyProps> = ({
+export const DropdownMenuEmpty: FunctionComponent<DropdownMenuEmptyProps> = ({
   useAutoComplete,
   menuClass,
 }) => (

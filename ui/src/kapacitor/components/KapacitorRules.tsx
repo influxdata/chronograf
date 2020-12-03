@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {Link} from 'react-router'
 
 import KapacitorRulesTable from 'src/kapacitor/components/KapacitorRulesTable'
@@ -14,7 +14,7 @@ interface KapacitorRulesProps {
   onChangeRuleStatus: (rule: AlertRule) => void
 }
 
-const KapacitorRules: SFC<KapacitorRulesProps> = ({
+const KapacitorRules: FunctionComponent<KapacitorRulesProps> = ({
   source,
   kapacitor,
   rules,

@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import ReactTooltip from 'react-tooltip'
 
 interface Props {
@@ -6,7 +6,10 @@ interface Props {
   validationError: string
 }
 
-const RuleHeaderSave: SFC<Props> = ({onSave, validationError}) => (
+const RuleHeaderSave: FunctionComponent<Props> = ({
+  onSave,
+  validationError,
+}) => (
   <>
     {validationError ? (
       <button

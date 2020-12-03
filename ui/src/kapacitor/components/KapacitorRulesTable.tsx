@@ -1,4 +1,4 @@
-import React, {PureComponent, SFC} from 'react'
+import React, {PureComponent, FunctionComponent} from 'react'
 import {Link} from 'react-router'
 import _ from 'lodash'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -31,7 +31,7 @@ interface RuleRowProps {
   onDelete: (rule: AlertRule) => void
 }
 
-const KapacitorRulesTable: SFC<KapacitorRulesTableProps> = ({
+const KapacitorRulesTable: FunctionComponent<KapacitorRulesTableProps> = ({
   rules,
   kapacitorLink,
   onChangeRuleStatus,

@@ -1,11 +1,11 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 interface Props {
   consoleMessage: string
   unsavedChanges: boolean
 }
 
-const TickscriptEditorConsole: SFC<Props> = ({
+const TickscriptEditorConsole: FunctionComponent<Props> = ({
   consoleMessage,
   unsavedChanges,
 }) => {

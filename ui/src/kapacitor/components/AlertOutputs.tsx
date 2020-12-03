@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import AlertTabs from 'src/kapacitor/components/AlertTabs'
 
@@ -12,7 +12,7 @@ interface AlertOutputProps {
   notify: (message: Notification | NotificationFunc) => void
 }
 
-const AlertOutputs: SFC<AlertOutputProps> = ({
+const AlertOutputs: FunctionComponent<AlertOutputProps> = ({
   hash,
   exists,
   source,

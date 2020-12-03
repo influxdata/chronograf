@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {connect} from 'react-redux'
 
 import {Dropdown} from 'src/reusable_ui'
@@ -15,7 +15,7 @@ interface Props {
 
 const DROPDOWN_WIDTH = 210
 
-const AnnotationsDisplaySettingDropdown: SFC<Props> = ({
+const AnnotationsDisplaySettingDropdown: FunctionComponent<Props> = ({
   displaySetting,
   onSetDisplaySetting,
 }) => {

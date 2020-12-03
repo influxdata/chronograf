@@ -1,11 +1,11 @@
-import {SFC} from 'react'
+import {FunctionComponent} from 'react'
 
 interface Props {
   name?: string
   children?: any
 }
 
-const FeatureFlag: SFC<Props> = props => {
+const FeatureFlag: FunctionComponent<Props> = props => {
   if (process.env.NODE_ENV === 'development') {
     return props.children
   }

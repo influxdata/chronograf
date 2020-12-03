@@ -1,10 +1,10 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 interface Props {
   onAddQuery: () => void
 }
 
-const EmptyQueryState: SFC<Props> = ({onAddQuery}) => (
+const EmptyQueryState: FunctionComponent<Props> = ({onAddQuery}) => (
   <div className="query-maker--empty">
     <h5>This Graph has no Queries</h5>
     <br />

@@ -1,5 +1,5 @@
 // Libraries
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 // Components
 import {Radio, ButtonShape} from 'src/reusable_ui'
@@ -9,7 +9,7 @@ interface GraphOptionsTimeAxisProps {
   onToggleVerticalTimeAxis: (vertical: boolean) => void
 }
 
-const GraphOptionsTimeAxis: SFC<GraphOptionsTimeAxisProps> = ({
+const GraphOptionsTimeAxis: FunctionComponent<GraphOptionsTimeAxisProps> = ({
   verticalTimeAxis,
   onToggleVerticalTimeAxis,
 }) => (

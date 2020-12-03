@@ -1,4 +1,4 @@
-import React, {PureComponent, ReactElement, SFC} from 'react'
+import React, {PureComponent, ReactElement, FunctionComponent} from 'react'
 
 import classnames from 'classnames'
 
@@ -10,7 +10,7 @@ interface TabProps {
   isConfigured?: boolean
 }
 
-export const Tab: SFC<TabProps> = ({
+export const Tab: FunctionComponent<TabProps> = ({
   children,
   onClick,
   isDisabled,
@@ -35,7 +35,7 @@ interface TabListProps {
   customClass?: string
 }
 
-export const TabList: SFC<TabListProps> = ({
+export const TabList: FunctionComponent<TabListProps> = ({
   children,
   activeIndex,
   onActivate,
@@ -68,7 +68,7 @@ interface TabPanelsProps {
   customClass?: string
 }
 
-export const TabPanels: SFC<TabPanelsProps> = ({
+export const TabPanels: FunctionComponent<TabPanelsProps> = ({
   children,
   activeIndex,
   customClass,
@@ -81,7 +81,7 @@ interface TabPanelProps {
   children: JSX.Element[] | JSX.Element
 }
 
-export const TabPanel: SFC<TabPanelProps> = ({children}) => (
+export const TabPanel: FunctionComponent<TabPanelProps> = ({children}) => (
   <div>{children}</div>
 )
 

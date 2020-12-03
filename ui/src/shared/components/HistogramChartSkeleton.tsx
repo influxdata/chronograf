@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import _ from 'lodash'
 
 import {Margins} from 'src/types/histogram'
@@ -11,7 +11,7 @@ interface Props {
   margins: Margins
 }
 
-const HistogramChartSkeleton: SFC<Props> = props => {
+const HistogramChartSkeleton: FunctionComponent<Props> = props => {
   const {margins, width, height} = props
 
   const spacing = (height - margins.top - margins.bottom) / NUM_TICKS

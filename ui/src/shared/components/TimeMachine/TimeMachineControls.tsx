@@ -1,5 +1,5 @@
 // Libraries
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 // Components
 import SourceSelector from 'src/dashboards/components/SourceSelector'
@@ -40,7 +40,7 @@ interface Props {
   onManualRefresh: () => void
 }
 
-const TimeMachineControls: SFC<Props> = ({
+const TimeMachineControls: FunctionComponent<Props> = ({
   script,
   source,
   sources,

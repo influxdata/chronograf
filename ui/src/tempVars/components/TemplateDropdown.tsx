@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import Dropdown from 'src/shared/components/Dropdown'
 
@@ -9,7 +9,7 @@ interface Props {
   onPickValue: (v: TemplateValue) => void
 }
 
-const TemplateDropdown: SFC<Props> = props => {
+const TemplateDropdown: FunctionComponent<Props> = props => {
   const {template, onPickValue} = props
 
   const dropdownItems = template.values.map(value => {

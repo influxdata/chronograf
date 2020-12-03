@@ -1,4 +1,4 @@
-import React, {SFC, ChangeEvent, KeyboardEvent} from 'react'
+import React, {FunctionComponent, ChangeEvent, KeyboardEvent} from 'react'
 
 type OnFilterChangeHandler = (e: ChangeEvent<HTMLInputElement>) => void
 type OnFilterKeyPress = (e: KeyboardEvent<HTMLInputElement>) => void
@@ -9,7 +9,7 @@ interface Props {
   onFilterKeyPress: OnFilterKeyPress
 }
 
-const FuncSelectorInput: SFC<Props> = ({
+const FuncSelectorInput: FunctionComponent<Props> = ({
   searchTerm,
   onFilterChange,
   onFilterKeyPress,
