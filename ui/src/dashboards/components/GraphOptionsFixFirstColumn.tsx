@@ -1,11 +1,11 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 interface Props {
   fixed: boolean
   onToggleFixFirstColumn: () => void
 }
 
-const GraphOptionsFixFirstColumn: SFC<Props> = ({
+const GraphOptionsFixFirstColumn: FunctionComponent<Props> = ({
   fixed,
   onToggleFixFirstColumn,
 }) => (

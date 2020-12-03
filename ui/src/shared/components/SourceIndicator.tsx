@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import _ from 'lodash'
 import uuid from 'uuid'
 
@@ -18,7 +18,7 @@ const getTooltipText = (source: Source, sourceOverride: Source): string => {
   return `<h1>Connected to Source:</h1><p><code>${sourceName} @ ${sourceUrl}</code></p>`
 }
 
-const SourceIndicator: SFC<Props> = ({sourceOverride}) => {
+const SourceIndicator: FunctionComponent<Props> = ({sourceOverride}) => {
   const uuidTooltip: string = uuid.v4()
 
   return (

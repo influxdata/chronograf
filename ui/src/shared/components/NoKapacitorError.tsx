@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {Link} from 'react-router'
 
 import Authorized, {EDITOR_ROLE} from 'src/auth/Authorized'
@@ -9,7 +9,7 @@ interface Props {
   }
 }
 
-const NoKapacitorError: SFC<Props> = ({source}) => {
+const NoKapacitorError: FunctionComponent<Props> = ({source}) => {
   const path = `/sources/${source.id}/kapacitors/new`
   return (
     <div className="graph-empty">

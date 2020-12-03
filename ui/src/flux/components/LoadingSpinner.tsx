@@ -1,10 +1,10 @@
-import React, {SFC, CSSProperties} from 'react'
+import React, {FunctionComponent, CSSProperties} from 'react'
 
 interface Props {
   style?: CSSProperties
 }
 
-const LoadingSpinner: SFC<Props> = ({style}) => {
+const LoadingSpinner: FunctionComponent<Props> = ({style}) => {
   return (
     <div className="loading-spinner" style={style}>
       <div className="spinner">

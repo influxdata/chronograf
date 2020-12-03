@@ -1,5 +1,5 @@
 // Libraries
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 // Components
 import DatabaseList from 'src/shared/components/DatabaseList'
@@ -35,7 +35,7 @@ interface Props {
   onToggleTagAcceptance: TimeMachineContainer['handleToggleTagAcceptance']
 }
 
-const SchemaExplorer: SFC<Props> = ({
+const SchemaExplorer: FunctionComponent<Props> = ({
   query,
   source,
   initialGroupByTime,

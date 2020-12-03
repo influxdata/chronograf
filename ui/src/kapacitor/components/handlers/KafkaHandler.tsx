@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import HandlerInput from 'src/kapacitor/components/HandlerInput'
 import HandlerEmpty from 'src/kapacitor/components/HandlerEmpty'
@@ -29,7 +29,7 @@ interface Props {
   validationError: string
 }
 
-const KafkaHandler: SFC<Props> = ({
+const KafkaHandler: FunctionComponent<Props> = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,

@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {Subscribe} from 'unstated'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
@@ -60,7 +60,7 @@ interface PassedProps {
 
 type Props = PassedProps & ConnectedProps
 
-const TimeMachineVisualization: SFC<Props> = props => {
+const TimeMachineVisualization: FunctionComponent<Props> = props => {
   const colors: ColorString[] = getCellTypeColors({
     cellType: props.type,
     gaugeColors: props.gaugeColors,

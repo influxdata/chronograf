@@ -1,4 +1,4 @@
-import React, {PureComponent, SFC} from 'react'
+import React, {PureComponent, FunctionComponent} from 'react'
 import {Link} from 'react-router'
 import _ from 'lodash'
 
@@ -22,7 +22,7 @@ interface TaskRowProps {
   onDelete: (rule: AlertRule) => void
 }
 
-const TasksTable: SFC<TasksTableProps> = ({
+const TasksTable: FunctionComponent<TasksTableProps> = ({
   tasks,
   kapacitorLink,
   onDelete,

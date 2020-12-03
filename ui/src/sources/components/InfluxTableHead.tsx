@@ -1,10 +1,10 @@
-import React, {SFC, ReactElement} from 'react'
+import React, {FunctionComponent, ReactElement} from 'react'
 
 import QuestionMarkTooltip from 'src/shared/components/QuestionMarkTooltip'
 
 import {KAPACITOR_TOOLTIP_COPY} from 'src/sources/constants'
 
-const InfluxTableHead: SFC<{}> = (): ReactElement<
+const InfluxTableHead: FunctionComponent<{}> = (): ReactElement<
   HTMLTableHeaderCellElement
 > => {
   return (

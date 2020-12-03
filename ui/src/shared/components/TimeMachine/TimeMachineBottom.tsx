@@ -1,10 +1,10 @@
-import React, {ReactNode, SFC} from 'react'
+import React, {ReactNode, FunctionComponent} from 'react'
 
 interface Props {
   children: ReactNode
 }
 
-const TimeMachineBottom: SFC<Props> = ({children}) => (
+const TimeMachineBottom: FunctionComponent<Props> = ({children}) => (
   <div className="deceo--bottom">{children}</div>
 )
 

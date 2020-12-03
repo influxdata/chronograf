@@ -18,6 +18,7 @@
 
 1. [#5610](https://github.com/influxdata/chronograf/pull/5610): Upgrade golang to 1.15.5, node to 14 LTS.
 1. [#5624](https://github.com/influxdata/chronograf/pull/5624): Repair possible millisecond differences in duration computation.
+1. [#5626](https://github.com/influxdata/chronograf/pull/5626): Remove deprecated React SFC type.
 
 ## v1.8.8 [2020-11-04]
 

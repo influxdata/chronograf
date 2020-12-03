@@ -1,4 +1,4 @@
-import React, {SFC, MouseEvent, CSSProperties} from 'react'
+import React, {FunctionComponent, MouseEvent, CSSProperties} from 'react'
 import _ from 'lodash'
 
 const handleClick = (e: MouseEvent<HTMLDivElement>): void => {
@@ -11,7 +11,7 @@ const randomSize = (): CSSProperties => {
   return {width: `${width}px`}
 }
 
-const LoaderSkeleton: SFC = () => {
+const LoaderSkeleton: FunctionComponent = () => {
   return (
     <>
       <div

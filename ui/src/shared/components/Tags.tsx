@@ -1,4 +1,4 @@
-import React, {PureComponent, SFC} from 'react'
+import React, {PureComponent, FunctionComponent} from 'react'
 import TagsAddButton from 'src/shared/components/TagsAddButton'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import uuid from 'uuid'
@@ -17,7 +17,7 @@ interface TagsProps {
   addMenuChoose?: (item: Item) => void
 }
 
-const Tags: SFC<TagsProps> = ({
+const Tags: FunctionComponent<TagsProps> = ({
   tags,
   onDeleteTag,
   addMenuItems,

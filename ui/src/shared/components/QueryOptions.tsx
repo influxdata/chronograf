@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import {GroupBy, TimeShift} from 'src/types'
 
@@ -17,7 +17,7 @@ interface Props {
   isDisabled: boolean
 }
 
-const QueryOptions: SFC<Props> = ({
+const QueryOptions: FunctionComponent<Props> = ({
   fill,
   shift,
   onFill,

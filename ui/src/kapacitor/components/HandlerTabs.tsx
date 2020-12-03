@@ -1,4 +1,4 @@
-import React, {SFC, MouseEvent} from 'react'
+import React, {FunctionComponent, MouseEvent} from 'react'
 import classnames from 'classnames'
 import uuid from 'uuid'
 
@@ -19,7 +19,7 @@ interface Props {
   ) => (event: MouseEvent<HTMLButtonElement>) => void
 }
 
-const HandlerTabs: SFC<Props> = ({
+const HandlerTabs: FunctionComponent<Props> = ({
   handlersOnThisAlert,
   selectedHandler,
   handleChooseHandler,

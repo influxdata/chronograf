@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import AlertsApp from 'src/alerts/containers/AlertsApp'
 import NewsFeed from 'src/status/components/NewsFeed'
@@ -15,7 +15,7 @@ interface Props {
   source: Source
 }
 
-const WidgetCell: SFC<Props> = ({cell, source, timeRange}) => {
+const WidgetCell: FunctionComponent<Props> = ({cell, source, timeRange}) => {
   switch (cell.type) {
     case 'alerts': {
       return (

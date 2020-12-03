@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {connect} from 'react-redux'
 
 import {Button, ComponentColor, IconFont} from 'src/reusable_ui'
@@ -16,7 +16,7 @@ interface Props {
   onDismissAddingAnnotation: typeof dismissAddingAnnotation
 }
 
-const AddAnnotationToggle: SFC<Props> = props => {
+const AddAnnotationToggle: FunctionComponent<Props> = props => {
   const {
     isAddingAnnotation,
     onAddingAnnotation,

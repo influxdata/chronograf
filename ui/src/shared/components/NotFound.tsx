@@ -1,6 +1,6 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
-const NotFound: SFC = () => (
+const NotFound: FunctionComponent = () => (
   <div className="container-fluid">
     <div className="panel">
       <div className="panel-heading text-center">

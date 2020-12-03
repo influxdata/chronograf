@@ -1,6 +1,6 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
-const PageSpinner: SFC<{}> = () => {
+const PageSpinner: FunctionComponent<{}> = () => {
   return (
     <div className="page-spinner-container">
       <div className="page-spinner" />

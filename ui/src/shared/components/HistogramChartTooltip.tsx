@@ -1,4 +1,4 @@
-import React, {SFC, CSSProperties} from 'react'
+import React, {FunctionComponent, CSSProperties} from 'react'
 import _ from 'lodash'
 
 import {HoverData, ColorScale, HistogramColor} from 'src/types/histogram'
@@ -9,7 +9,7 @@ interface Props {
   colors: HistogramColor[]
 }
 
-const HistogramChartTooltip: SFC<Props> = props => {
+const HistogramChartTooltip: FunctionComponent<Props> = props => {
   const {colorScale, colors} = props
   const {data, x, y, anchor = 'left'} = props.data
 

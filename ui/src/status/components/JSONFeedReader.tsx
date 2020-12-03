@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {JSONFeedData} from 'src/types'
 
 import moment from 'moment'
@@ -7,7 +7,7 @@ interface Props {
   data: JSONFeedData
 }
 
-const JSONFeedReader: SFC<Props> = ({data}) =>
+const JSONFeedReader: FunctionComponent<Props> = ({data}) =>
   data && data.items ? (
     <div className="newsfeed">
       {data.items

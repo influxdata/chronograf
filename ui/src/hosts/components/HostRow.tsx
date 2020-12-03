@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {Link} from 'react-router'
 import classnames from 'classnames'
 
@@ -10,7 +10,7 @@ interface Props {
   host: Host
 }
 
-const HostRow: SFC<Props> = ({host, sourceID}) => {
+const HostRow: FunctionComponent<Props> = ({host, sourceID}) => {
   const {name, cpu, load, apps = []} = host
   const {NameWidth, StatusWidth, CPUWidth, LoadWidth} = HOSTS_TABLE_SIZING
 

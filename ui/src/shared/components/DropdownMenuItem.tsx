@@ -1,4 +1,4 @@
-import React, {SFC, MouseEvent} from 'react'
+import React, {FunctionComponent, MouseEvent} from 'react'
 
 import _ from 'lodash'
 import classnames from 'classnames'
@@ -28,7 +28,7 @@ interface ItemProps {
   onAction?: OnActionHandler
 }
 
-const DropdownMenuItem: SFC<ItemProps> = ({
+const DropdownMenuItem: FunctionComponent<ItemProps> = ({
   item,
   highlightedItemIndex,
   onSelection,

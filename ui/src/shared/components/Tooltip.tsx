@@ -1,11 +1,11 @@
-import React, {SFC, ReactElement} from 'react'
+import React, {FunctionComponent, ReactElement} from 'react'
 import ReactTooltip from 'react-tooltip'
 
 interface Props {
   tip: string
   children: ReactElement<any>
 }
-const Tooltip: SFC<Props> = ({tip, children}) => (
+const Tooltip: FunctionComponent<Props> = ({tip, children}) => (
   <div>
     <div data-tip={tip}>{children}</div>
     <ReactTooltip

@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import {PERIODS} from 'src/kapacitor/constants'
 import Dropdown from 'src/shared/components/Dropdown'
@@ -18,7 +18,7 @@ interface Props {
   onChange: (item: Item) => void
 }
 
-const Deadman: SFC<Props> = ({rule, onChange}) => (
+const Deadman: FunctionComponent<Props> = ({rule, onChange}) => (
   <div className="rule-section--row rule-section--row-first rule-section--row-last">
     <p>Send Alert if Data is missing for</p>
     <Dropdown

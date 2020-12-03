@@ -1,4 +1,4 @@
-import React, {SFC, MouseEvent} from 'react'
+import React, {FunctionComponent, MouseEvent} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment'
 import classnames from 'classnames'
@@ -12,7 +12,7 @@ interface TimeStampProps {
   time: number
 }
 
-const TimeStamp: SFC<TimeStampProps> = ({time}) => (
+const TimeStamp: FunctionComponent<TimeStampProps> = ({time}) => (
   <div className="annotation-tooltip--timestamp">
     {`${moment(time).format('YYYY/MM/DD HH:mm:ss.SS')}`}
   </div>
@@ -31,7 +31,7 @@ interface Props {
   onSetEditingAnnotation: typeof setEditingAnnotation
 }
 
-const AnnotationTooltip: SFC<Props> = props => {
+const AnnotationTooltip: FunctionComponent<Props> = props => {
   const {
     annotation,
     onMouseLeave,

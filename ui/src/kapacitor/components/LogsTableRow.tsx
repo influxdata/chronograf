@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import LogItemSession from 'src/kapacitor/components/LogItemSession'
 import LogItemHTTP from 'src/kapacitor/components/LogItemHTTP'
@@ -14,7 +14,7 @@ interface Props {
   logItem: LogItem
 }
 
-const LogsTableRow: SFC<Props> = ({logItem}) => {
+const LogsTableRow: FunctionComponent<Props> = ({logItem}) => {
   if (logItem.service === 'sessions') {
     return <LogItemSession logItem={logItem} />
   }

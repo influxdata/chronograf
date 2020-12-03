@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import classnames from 'classnames'
 
 const disabledClass = (disabled: boolean) => (disabled ? ' disabled' : '')
@@ -12,7 +12,7 @@ interface Props {
   disabled: boolean
 }
 
-const DropdownHead: SFC<Props> = ({
+const DropdownHead: FunctionComponent<Props> = ({
   iconName,
   selected,
   buttonSize,

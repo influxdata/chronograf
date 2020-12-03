@@ -1,4 +1,4 @@
-import React, {PureComponent, SFC} from 'react'
+import React, {PureComponent, FunctionComponent} from 'react'
 
 import classnames from 'classnames'
 
@@ -34,7 +34,7 @@ interface ConfirmOrCancelProps {
   cancelTitle?: string
 }
 
-export const Confirm: SFC<ConfirmProps> = ({
+export const Confirm: FunctionComponent<ConfirmProps> = ({
   buttonSize,
   isDisabled,
   onConfirm,
@@ -57,7 +57,7 @@ export const Confirm: SFC<ConfirmProps> = ({
   </button>
 )
 
-export const Cancel: SFC<CancelProps> = ({
+export const Cancel: FunctionComponent<CancelProps> = ({
   buttonSize,
   onCancel,
   icon,

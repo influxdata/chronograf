@@ -1,10 +1,10 @@
-import React, {SFC, ReactElement} from 'react'
+import React, {FunctionComponent, ReactElement} from 'react'
 
 interface Props {
   children: ReactElement<any>
 }
 
-const SplashPage: SFC<Props> = ({children}) => (
+const SplashPage: FunctionComponent<Props> = ({children}) => (
   <div className="auth-page">
     <div className="auth-box">
       <div className="auth-logo" />

@@ -1,5 +1,5 @@
 // Libraries
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 // Components
 import SourceDropdown from 'src/flux/components/SourceDropdown'
@@ -23,7 +23,7 @@ interface Props {
   onChangeSource: (source: SourcesModels.Source, type: QueryType) => void
 }
 
-const SourceSelector: SFC<Props> = ({
+const SourceSelector: FunctionComponent<Props> = ({
   source,
   sources = [],
   queries,

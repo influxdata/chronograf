@@ -1,5 +1,5 @@
 // Libraries
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import _ from 'lodash'
 import {Subscribe} from 'unstated'
 
@@ -53,7 +53,7 @@ interface PassedProps {
 
 type Props = ConnectedProps & PassedProps
 
-const QueryMaker: SFC<Props> = ({
+const QueryMaker: FunctionComponent<Props> = ({
   source,
   queries,
   timeRange,

@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import Dropdown from 'src/shared/components/Dropdown'
 import {TIME_SHIFTS} from 'src/shared/constants/timeShift'
@@ -10,7 +10,7 @@ interface Props {
   isDisabled: boolean
 }
 
-const TimeShiftDropdown: SFC<Props> = ({
+const TimeShiftDropdown: FunctionComponent<Props> = ({
   selected,
   onChooseTimeShift,
   isDisabled,

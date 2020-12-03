@@ -1,4 +1,9 @@
-import React, {PureComponent, SFC, ReactNode, ReactElement} from 'react'
+import React, {
+  PureComponent,
+  FunctionComponent,
+  ReactNode,
+  ReactElement,
+} from 'react'
 import {Link} from 'react-router'
 import classnames from 'classnames'
 import _ from 'lodash'
@@ -11,7 +16,7 @@ interface NavListItemProps {
   children?: ReactNode
 }
 
-const NavListItem: SFC<NavListItemProps> = ({
+const NavListItem: FunctionComponent<NavListItemProps> = ({
   link,
   children,
   location,
@@ -43,7 +48,11 @@ interface NavHeaderProps {
   useAnchor?: string
 }
 
-const NavHeader: SFC<NavHeaderProps> = ({link, title, useAnchor}) => {
+const NavHeader: FunctionComponent<NavHeaderProps> = ({
+  link,
+  title,
+  useAnchor,
+}) => {
   // Some nav items, such as Logout, need to hit an external link rather
   // than simply route to an internal page. Anchor tags serve that purpose.
   return useAnchor ? (

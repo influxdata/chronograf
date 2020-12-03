@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import classnames from 'classnames'
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
   top?: string
 }
 
-const ResizeHandle: SFC<Props> = ({
+const ResizeHandle: FunctionComponent<Props> = ({
   onHandleStartDrag,
   isDragging,
   theme,

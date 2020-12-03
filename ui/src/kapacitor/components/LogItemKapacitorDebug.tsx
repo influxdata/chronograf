@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import {LogItem} from 'src/types/kapacitor'
 
@@ -6,7 +6,7 @@ interface Props {
   logItem: LogItem
 }
 
-const LogItemKapacitorDebug: SFC<Props> = ({logItem}) => (
+const LogItemKapacitorDebug: FunctionComponent<Props> = ({logItem}) => (
   <div className="logs-table--row">
     <div className="logs-table--divider">
       <div className={`logs-table--level ${logItem.lvl}`} />

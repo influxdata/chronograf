@@ -1,4 +1,4 @@
-import React, {SFC, ChangeEvent} from 'react'
+import React, {FunctionComponent, ChangeEvent} from 'react'
 import {Kapacitor} from 'src/types'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
 
@@ -7,7 +7,7 @@ interface Props {
   onCheckboxChange: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
-const KapacitorFormSkipVerify: SFC<Props> = ({
+const KapacitorFormSkipVerify: FunctionComponent<Props> = ({
   kapacitor: {insecureSkipVerify},
   onCheckboxChange,
 }) => {

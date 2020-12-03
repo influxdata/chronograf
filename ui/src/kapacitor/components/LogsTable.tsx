@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import LogsTableRow from 'src/kapacitor/components/LogsTableRow'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -11,7 +11,7 @@ interface Props {
   logs: LogItem[]
 }
 
-const LogsTable: SFC<Props> = ({logs}) => (
+const LogsTable: FunctionComponent<Props> = ({logs}) => (
   <div className="logs-table">
     <div className="logs-table--header">
       {`${numLogsToRender} Most Recent Logs`}

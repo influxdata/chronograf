@@ -1,4 +1,4 @@
-import React, {SFC, ChangeEvent} from 'react'
+import React, {FunctionComponent, ChangeEvent} from 'react'
 
 import {CHANGES, RELATIVE_OPERATORS, SHIFTS} from 'src/kapacitor/constants'
 import Dropdown from 'src/shared/components/Dropdown'
@@ -21,7 +21,7 @@ interface Props {
   rule: AlertRule
 }
 
-const Relative: SFC<Props> = ({
+const Relative: FunctionComponent<Props> = ({
   onRuleTypeInputChange,
   onDropdownChange,
   rule: {

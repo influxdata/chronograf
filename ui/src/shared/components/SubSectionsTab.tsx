@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import {PageSection} from 'src/types/shared'
 
 interface TabProps {
@@ -7,7 +7,7 @@ interface TabProps {
   activeSection: string
 }
 
-const SubSectionsTab: SFC<TabProps> = ({
+const SubSectionsTab: FunctionComponent<TabProps> = ({
   handleClick,
   section,
   activeSection,

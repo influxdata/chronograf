@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 
 import AnnotationPoint from 'src/shared/components/AnnotationPoint'
 import AnnotationSpan from 'src/shared/components/AnnotationSpan'
@@ -14,7 +14,7 @@ interface Props {
   staticLegendHeight: number
 }
 
-const Annotation: SFC<Props> = ({
+const Annotation: FunctionComponent<Props> = ({
   mode,
   dygraph,
   dWidth,

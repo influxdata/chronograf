@@ -1,4 +1,4 @@
-import React, {ChangeEvent, SFC} from 'react'
+import React, {ChangeEvent, FunctionComponent} from 'react'
 
 interface Props {
   name: string
@@ -11,7 +11,7 @@ interface Props {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
-const KapacitorFormInput: SFC<Props> = ({
+const KapacitorFormInput: FunctionComponent<Props> = ({
   name,
   label,
   value,

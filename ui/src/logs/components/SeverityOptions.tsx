@@ -1,4 +1,4 @@
-import React, {SFC} from 'react'
+import React, {FunctionComponent} from 'react'
 import uuid from 'uuid'
 import ColorDropdown from 'src/logs/components/ColorDropdown'
 import SeverityColumnFormat from 'src/logs/components/SeverityColumnFormat'
@@ -15,7 +15,7 @@ interface Props {
   onChangeSeverityFormat: (format: SeverityFormat) => void
 }
 
-const SeverityConfig: SFC<Props> = ({
+const SeverityConfig: FunctionComponent<Props> = ({
   severityLevelColors,
   onReset,
   onChangeSeverityLevel,
