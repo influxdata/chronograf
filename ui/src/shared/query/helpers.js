@@ -6,7 +6,7 @@ import {
   RELATIVE_LOWER,
   RELATIVE_UPPER,
 } from 'shared/constants/timeRange'
-const now = /^now/
+const now = /^now|^:/ // ether now() or variable reference (':dashboardTime:') is present
 
 export const timeRangeType = ({upper, lower, type}) => {
   if (!upper && !lower) {
@@ -16,9 +16,16 @@ export const timeRangeType = ({upper, lower, type}) => {
   if (type && type !== INFLUXQL) {
     return INVALID
   }
-
-  const isUpperValid = moment(new Date(upper)).isValid()
-  const isLowerValid = moment(new Date(lower)).isValid()
+  const isUpperValid =
+    upper !== null &&
+    upper !== undefined &&
+    upper !== '' &&
+    (upper === ':upperDashboardTime:' || moment(new Date(upper)).isValid())
+  const isLowerValid =
+    lower !== null &&
+    lower !== undefined &&
+    lower !== '' &&
+    (lower === ':dashboardTime:' || moment(new Date(lower)).isValid())
 
   // {lower: <Date>, upper: <Date>}
   if (isLowerValid && isUpperValid) {
