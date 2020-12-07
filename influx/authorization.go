@@ -67,7 +67,6 @@ type TokenAuth struct {
 
 // Set adds the token authentication to the request
 func (a *TokenAuth) Set(r *http.Request) error {
-	fmt.Println("setting up token " + a.Token)
 	r.Header.Set("Authorization", "Token "+a.Token)
 	return nil
 }
