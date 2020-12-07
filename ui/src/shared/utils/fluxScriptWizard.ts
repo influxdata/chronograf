@@ -62,7 +62,7 @@ export async function fetchFields(
 }
 
 export function formatDBwithRP(db: string, rp: string): string {
-  return `${db}/${rp}`
+  return rp ? `${db}/${rp}` : `${db}`
 }
 
 export function toComponentStatus(

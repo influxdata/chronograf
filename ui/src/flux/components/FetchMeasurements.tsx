@@ -19,6 +19,14 @@ interface State {
   loading: RemoteDataState
 }
 
+export async function fetchFluxMeasurements(
+  source: Source,
+  bucket: string
+): Promise<string[]> {
+  const measurementResults = await fetchMeasurementsAsync(source, bucket)
+  return parseValuesColumn(measurementResults)
+}
+
 class FetchMeasurements extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
@@ -39,8 +47,7 @@ class FetchMeasurements extends PureComponent<Props, State> {
     const {source, bucket} = this.props
     this.setState({loading: RemoteDataState.Loading})
     try {
-      const measurementResults = await fetchMeasurementsAsync(source, bucket)
-      const measurements = parseValuesColumn(measurementResults)
+      const measurements = await fetchFluxMeasurements(source, bucket)
       this.setState({measurements, loading: RemoteDataState.Done})
     } catch (error) {
       this.setState({loading: RemoteDataState.Error})

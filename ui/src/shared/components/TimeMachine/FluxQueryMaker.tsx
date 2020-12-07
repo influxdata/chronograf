@@ -12,7 +12,7 @@ import {Button, ComponentSize, ComponentColor} from 'src/reusable_ui'
 import FluxFunctionsToolbar from 'src/flux/components/flux_functions_toolbar/FluxFunctionsToolbar'
 
 // Constants
-import {HANDLE_VERTICAL} from 'src/shared/constants'
+import {HANDLE_VERTICAL, SOURCE_TYPE_INFLUX_V2} from 'src/shared/constants'
 
 // Utils
 import {getAST} from 'src/shared/apis/flux/ast'
@@ -90,6 +90,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
     const {suggestions, isWizardActive, draftScriptStatus} = this.state
 
     const [leftSize, middleSize, rightSize] = fluxProportions
+    const v2 = source.type === SOURCE_TYPE_INFLUX_V2
 
     const divisions = [
       {
@@ -97,7 +98,9 @@ class FluxQueryMaker extends PureComponent<Props, State> {
         size: leftSize,
         headerButtons: [],
         menuOptions: [],
-        render: () => <SchemaExplorer source={source} notify={notify} />,
+        render: () => (
+          <SchemaExplorer source={source} notify={notify} v2={v2} />
+        ),
         headerOrientation: HANDLE_VERTICAL,
       },
       {
@@ -152,6 +155,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       <FluxScriptWizard
         source={source}
         isWizardActive={isWizardActive}
+        v2={v2}
         onSetIsWizardActive={this.handleSetIsWizardActive}
         onAddToScript={this.handleAddToScript}
       >
