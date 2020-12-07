@@ -95,6 +95,8 @@ const (
 	InfluxEnterprise = "influx-enterprise"
 	// InfluxRelay is the basic HA layer over InfluxDB
 	InfluxRelay = "influx-relay"
+	// InfluxDBv2 is influx DB 2.x with Token authentication
+	InfluxDBv2 = "influx-v2"
 )
 
 // TSDBStatus represents the current status of a time series database

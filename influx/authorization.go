@@ -3,7 +3,6 @@ package influx
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -24,8 +23,8 @@ func (n *NoAuthorization) Set(req *http.Request) error { return nil }
 
 // DefaultAuthorization creates either a shared JWT builder, basic auth or Noop or Token authentication
 func DefaultAuthorization(src *chronograf.Source) Authorizer {
-	// Token authentication for InfluxDB v2
-	if (src.Version == "" || strings.HasPrefix(src.Version, "2.")) && src.Password != "" {
+	// Token authentication for InfluxDB-v2
+	if src.Type == chronograf.InfluxDBv2 {
 		return &TokenAuth{
 			Token: src.Password,
 		}
