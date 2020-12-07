@@ -82,7 +82,7 @@ var (
 func hasFlux(ctx context.Context, src chronograf.Source) (bool, error) {
 	// flux is always available in v2 version, but it requires v2 Token authentication (distinguished by Type)
 	// and a non-empty Organization (stored in Username)
-	if src.Version == "" || strings.HasPrefix(src.Version, "2.") {
+	if src.Version == "" /* v2 OSS reports no version */ || strings.HasPrefix(src.Version, "2.") {
 		return src.Type == chronograf.InfluxDBv2 && src.Username != "", nil
 	}
 

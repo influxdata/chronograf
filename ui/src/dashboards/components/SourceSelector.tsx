@@ -23,6 +23,14 @@ interface Props {
   onChangeSource: (source: SourcesModels.Source, type: QueryType) => void
 }
 
+function fluxDisabledTooltip(source: SourcesModels.Source): string {
+  // if source is version 2, recommend InfluxDB v2 authentication
+  if (!source.version || source.version.startsWith('2.')) {
+    return 'To enable Flux modify the connection to use InfluxDB v2 Auth with an organization and a token.'
+  }
+  return 'The current source does not support Flux.'
+}
+
 const SourceSelector: FunctionComponent<Props> = ({
   source,
   sources = [],
@@ -77,7 +85,7 @@ const SourceSelector: FunctionComponent<Props> = ({
       {!sourceSupportsFlux && (
         <QuestionMarkTooltip
           tipID="token"
-          tipContent={`<p>The current source does not support Flux.</p>`}
+          tipContent={`<p>${fluxDisabledTooltip(source)}</p>`}
         />
       )}
     </div>

@@ -233,7 +233,7 @@ class SourceStep extends PureComponent<Props, State> {
       source: {
         ...source,
         type: v2 ? SOURCE_TYPE_INFLUX_V2 : SOURCE_TYPE_INFLUX_V1,
-        version: v2 ? '2.x' : '1.x'
+        version: v2 ? '2.x' : '1.x',
       },
     })
   }
