@@ -113,6 +113,9 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
   }
   public async componentDidMount() {
     const {source, loadUsers, loadRoles, loadPermissions} = this.props
+    if (!source.version || source.version.startsWith('2')) {
+      return
+    }
 
     this.setState({loading: RemoteDataState.Loading})
 
