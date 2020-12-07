@@ -40,7 +40,7 @@ import {Source, Me} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
-const isSourceV2 = (source: Partial<Source>) =>
+const isV2Auth = (source: Partial<Source>) =>
   source.type && source.type === SOURCE_TYPE_INFLUX_V2
 
 interface Props {
@@ -104,7 +104,7 @@ class SourceStep extends PureComponent<Props, State> {
   public render() {
     const {source} = this.state
     const {isUsingAuth, onBoarding} = this.props
-    const sourceIsV2 = isSourceV2(source)
+    const sourceIsV2 = isV2Auth(source)
 
     return (
       <>
