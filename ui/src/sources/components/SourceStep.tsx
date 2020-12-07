@@ -28,7 +28,11 @@ import {
   notifySourceConnectionSucceeded,
 } from 'src/shared/copy/notifications'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
-import {DEFAULT_SOURCE} from 'src/shared/constants'
+import {
+  DEFAULT_SOURCE,
+  SOURCE_TYPE_INFLUX_V2,
+  SOURCE_TYPE_INFLUX_V1,
+} from 'src/shared/constants'
 import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
 // Types
@@ -37,7 +41,7 @@ import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
 const isSourceV2 = (source: Partial<Source>) =>
-  !source.version || source.version.startsWith('2.')
+  source.type && source.type === SOURCE_TYPE_INFLUX_V2
 
 interface Props {
   notify: typeof notifyAction
@@ -157,7 +161,7 @@ class SourceStep extends PureComponent<Props, State> {
         <WizardCheckbox
           halfWidth={!onBoarding}
           isChecked={sourceIsV2}
-          text={'InfluxDB v2'}
+          text={'InfluxDB v2 Auth'}
           onChange={this.changeVersion}
         />
 
@@ -226,7 +230,11 @@ class SourceStep extends PureComponent<Props, State> {
   private changeVersion = (v2: boolean) => {
     const {source} = this.state
     this.setState({
-      source: {...source, version: v2 ? '2.x' : '1.x'},
+      source: {
+        ...source,
+        type: v2 ? SOURCE_TYPE_INFLUX_V2 : SOURCE_TYPE_INFLUX_V1,
+        version: v2 ? '2.x' : '1.x'
+      },
     })
   }
 
