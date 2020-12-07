@@ -178,7 +178,7 @@ func (s *Service) ProxyFlux(w http.ResponseWriter, r *http.Request) {
 		req.Host = u.Host
 		// Add v2-required org parameter
 		query := u.Query()
-		query.Add("org", src.Username) // v2 organization name is stored as v1 username
+		query.Add("org", src.Username) // v2 organization name is stored in username
 		u.RawQuery = query.Encode()
 		// Set URL
 		req.URL = u

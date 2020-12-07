@@ -467,9 +467,12 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 	if s.URL == "" {
 		return fmt.Errorf("url required")
 	}
-	// Type must be influx or influx-enterprise
+	// Validate Type
 	if s.Type != "" {
-		if s.Type != chronograf.InfluxDB && s.Type != chronograf.InfluxDBv2 && s.Type != chronograf.InfluxEnterprise && s.Type != chronograf.InfluxRelay {
+		if s.Type != chronograf.InfluxDB &&
+			s.Type != chronograf.InfluxDBv2 &&
+			s.Type != chronograf.InfluxEnterprise &&
+			s.Type != chronograf.InfluxRelay {
 			return fmt.Errorf("invalid source type %s", s.Type)
 		}
 	}
