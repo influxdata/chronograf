@@ -162,7 +162,7 @@ class SourceStep extends PureComponent<Props, State> {
           halfWidth={!onBoarding}
           isChecked={sourceIsV2}
           text={'InfluxDB v2 Auth'}
-          onChange={this.changeVersion}
+          onChange={this.changeAuth}
         />
 
         {this.isHTTPS && (
@@ -227,11 +227,13 @@ class SourceStep extends PureComponent<Props, State> {
     this.setState({source: {...source, [key]: value}})
     setError(false)
   }
-  private changeVersion = (v2: boolean) => {
+  private changeAuth = (v2: boolean) => {
     const {source} = this.state
     this.setState({
       source: {
         ...source,
+        username: '',
+        password: '',
         type: v2 ? SOURCE_TYPE_INFLUX_V2 : SOURCE_TYPE_INFLUX_V1,
         version: v2 ? '2.x' : '1.x',
       },
