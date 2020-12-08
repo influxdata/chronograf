@@ -6,6 +6,13 @@
 
 ### Other
 
+## v1.8.9.1 
+
+### Features
+
+1. [#5631](https://github.com/influxdata/chronograf/pull/5631): Support flux schema explorer in InfluxDB v2 sources.
+1. [#5631](https://github.com/influxdata/chronograf/pull/5631): Let user specify InfluxDB v2 authentication.
+
 ## v1.8.9 [2020-12-04]
 
 ### Bug Fixes
@@ -22,6 +29,8 @@
 
 1. [#5612](https://github.com/influxdata/chronograf/pull/5612): Allow to configure etcd with client certificate.
 1. [#5619](https://github.com/influxdata/chronograf/pull/5619): Support flux in InfluxDB v2 sources.
+1. [#5631](https://github.com/influxdata/chronograf/pull/5631): Support flux schema explorer in InfluxDB v2 sources.
+1. [#5631](https://github.com/influxdata/chronograf/pull/5631): Let user specify InfluxDB v2 authentication.
 
 ### Other
 
