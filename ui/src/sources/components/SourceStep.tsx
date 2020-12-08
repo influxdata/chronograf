@@ -28,7 +28,11 @@ import {
   notifySourceConnectionSucceeded,
 } from 'src/shared/copy/notifications'
 import {insecureSkipVerifyText} from 'src/shared/copy/tooltipText'
-import {DEFAULT_SOURCE} from 'src/shared/constants'
+import {
+  DEFAULT_SOURCE,
+  SOURCE_TYPE_INFLUX_V2,
+  SOURCE_TYPE_INFLUX_V1,
+} from 'src/shared/constants'
 import {SUPERADMIN_ROLE} from 'src/auth/Authorized'
 
 // Types
@@ -36,8 +40,8 @@ import {Source, Me} from 'src/types'
 import {NextReturn} from 'src/types/wizard'
 
 const isNewSource = (source: Partial<Source>) => !source.id
-const isSourceV2 = (source: Partial<Source>) =>
-  !source.version || source.version.startsWith('2.')
+const isV2Auth = (source: Partial<Source>) =>
+  source.type && source.type === SOURCE_TYPE_INFLUX_V2
 
 interface Props {
   notify: typeof notifyAction
@@ -100,7 +104,7 @@ class SourceStep extends PureComponent<Props, State> {
   public render() {
     const {source} = this.state
     const {isUsingAuth, onBoarding} = this.props
-    const sourceIsV2 = isSourceV2(source)
+    const sourceIsV2 = isV2Auth(source)
 
     return (
       <>
@@ -157,8 +161,8 @@ class SourceStep extends PureComponent<Props, State> {
         <WizardCheckbox
           halfWidth={!onBoarding}
           isChecked={sourceIsV2}
-          text={'InfluxDB v2'}
-          onChange={this.changeVersion}
+          text={'InfluxDB v2 Auth'}
+          onChange={this.changeAuth}
         />
 
         {this.isHTTPS && (
@@ -223,10 +227,16 @@ class SourceStep extends PureComponent<Props, State> {
     this.setState({source: {...source, [key]: value}})
     setError(false)
   }
-  private changeVersion = (v2: boolean) => {
+  private changeAuth = (v2: boolean) => {
     const {source} = this.state
     this.setState({
-      source: {...source, version: v2 ? '2.x' : '1.x'},
+      source: {
+        ...source,
+        username: '',
+        password: '',
+        type: v2 ? SOURCE_TYPE_INFLUX_V2 : SOURCE_TYPE_INFLUX_V1,
+        version: v2 ? '2.x' : '1.x',
+      },
     })
   }
 

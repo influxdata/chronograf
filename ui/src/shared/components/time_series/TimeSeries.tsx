@@ -34,6 +34,7 @@ import {
 } from 'src/types'
 import {TimeSeriesServerResponse} from 'src/types/series'
 import {GrabDataForDownloadHandler} from 'src/types/layout'
+import {parseError} from 'src/flux/helpers/scriptBuilder'
 
 export const DEFAULT_TIME_SERIES = [{response: {results: []}}]
 const EXECUTE_QUERIES_DEBOUNCE_MS = 400
@@ -243,7 +244,8 @@ class TimeSeries extends PureComponent<Props, State> {
       loading = RemoteDataState.Done
     } catch (err) {
       loading = RemoteDataState.Error
-      errorMessage = err.toString()
+      errorMessage = parseError(err).text
+      console.trace(err, errorMessage)
     }
 
     this.setState({

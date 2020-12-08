@@ -113,6 +113,10 @@ export class AdminInfluxDBPage extends PureComponent<Props, State> {
   }
   public async componentDidMount() {
     const {source, loadUsers, loadRoles, loadPermissions} = this.props
+    if (!source.version || source.version.startsWith('2')) {
+      // administration is not possible for v2 type
+      return
+    }
 
     this.setState({loading: RemoteDataState.Loading})
 

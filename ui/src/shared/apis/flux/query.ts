@@ -78,7 +78,11 @@ export const executeQuery = async (
     let bodyError = null
 
     try {
-      bodyError = JSON.parse(xhr.responseText).error
+      const json = JSON.parse(xhr.responseText)
+      bodyError = json.error
+      if (!bodyError && json.code && json.message) {
+        bodyError = json.code + ':\n' + json.message
+      }
     } catch {
       if (xhr.responseText && xhr.responseText.trim() !== '') {
         bodyError = xhr.responseText

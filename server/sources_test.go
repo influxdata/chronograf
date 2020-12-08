@@ -118,6 +118,39 @@ func Test_ValidSourceRequest(t *testing.T) {
 			},
 		},
 		{
+			name: "support InfluxDBv2 type",
+			args: args{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv2,
+					Username:           "organization",
+					Password:           "pwd",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+			wants: wants{
+				source: &chronograf.Source{
+					ID:                 1,
+					Name:               "I'm a really great source",
+					Type:               chronograf.InfluxDBv2,
+					Username:           "organization",
+					Password:           "pwd",
+					SharedSecret:       "supersecret",
+					URL:                "http://www.any.url.com",
+					MetaURL:            "http://www.so.meta.com",
+					InsecureSkipVerify: true,
+					Default:            true,
+					Telegraf:           "telegraf",
+				},
+			},
+		},
+		{
 			name: "bad url",
 			args: args{
 				source: &chronograf.Source{
