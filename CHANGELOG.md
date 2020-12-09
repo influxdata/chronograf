@@ -12,6 +12,7 @@
 
 1. [#5631](https://github.com/influxdata/chronograf/pull/5631): Support flux schema explorer in InfluxDB v2 sources.
 1. [#5631](https://github.com/influxdata/chronograf/pull/5631): Let user specify InfluxDB v2 authentication.
+1. [#5634](https://github.com/influxdata/chronograf/pull/5634): Validate credentials before creating/updating InfluxDB sources.
 
 ## v1.8.9 [2020-12-04]
 
