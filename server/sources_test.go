@@ -409,8 +409,13 @@ func TestService_UpdateSource(t *testing.T) {
 			Logger: tt.fields.Logger,
 		}
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusNoContent)
-			w.Header().Set("X-Influxdb-Build", "ENT")
+			if r.URL.Path == "/query" {
+				w.WriteHeader(http.StatusOK) // credentials
+			} else {
+				w.WriteHeader(http.StatusNoContent)
+				w.Header().Set("X-Influxdb-Build", "ENT")
+			}
+			w.Write(([]byte)("{}"))
 		}))
 		defer ts.Close()
 

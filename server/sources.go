@@ -181,6 +181,11 @@ func (s *Service) NewSource(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := s.validateCredentials(ctx, &src); err != nil {
+		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+		return
+	}
+
 	src.Type = dbType
 	if src, err = s.Store.Sources(ctx).Add(ctx, src); err != nil {
 		msg := fmt.Errorf("Error storing source %v: %v", src, err)
@@ -237,6 +242,17 @@ func (s *Service) tsdbType(ctx context.Context, src *chronograf.Source) (string,
 	defer cancel()
 
 	return cli.Type(ctx)
+}
+
+func (s *Service) validateCredentials(ctx context.Context, src *chronograf.Source) error {
+	cli := &influx.Client{
+		Logger: s.Logger,
+	}
+	if err := cli.Connect(ctx, src); err != nil {
+		return err
+	}
+
+	return cli.ValidateAuth(ctx, src)
 }
 
 type getSourcesResponse struct {
@@ -449,6 +465,11 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	src.Type = dbType
+
+	if err := s.validateCredentials(ctx, &src); err != nil {
+		Error(w, http.StatusBadRequest, err.Error(), s.Logger)
+		return
+	}
 
 	if err := s.Store.Sources(ctx).Update(ctx, src); err != nil {
 		msg := fmt.Sprintf("Error updating source ID %d", id)

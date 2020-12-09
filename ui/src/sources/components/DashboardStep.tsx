@@ -251,6 +251,11 @@ class DashboardStep extends Component<Props, State> {
         )
 
         if (suggestedProtoboardsList.length === 0) {
+          if (this.isComponentMounted) {
+            this.setState({
+              fetchingSuggested: RemoteDataState.Done,
+            })
+          }
           return
         }
 
