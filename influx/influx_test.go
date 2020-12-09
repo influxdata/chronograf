@@ -574,7 +574,7 @@ func Test_Influx_ValidateAuth_V1(t *testing.T) {
 		t.Errorf("Expected client error '%v' to contain server-sent error message", err)
 	}
 	if called == false {
-		t.Error("Expected http request to Influx but there was none")
+		t.Error("Expected http request to InfluxDB but there was none")
 	}
 }
 
@@ -614,6 +614,6 @@ func Test_Influx_ValidateAuth_V2(t *testing.T) {
 		t.Errorf("Expected client error '%v' to contain server-sent error message", err)
 	}
 	if called == false {
-		t.Error("Expected http request to Influx but there was none")
+		t.Error("Expected http request to InfluxDB but there was none")
 	}
 }
