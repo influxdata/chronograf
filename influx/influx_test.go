@@ -2,6 +2,7 @@ package influx_test
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -533,5 +534,86 @@ func TestClient_write(t *testing.T) {
 				t.Errorf("Client.write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func Test_Influx_ValidateAuth_V1(t *testing.T) {
+	t.Parallel()
+	called := false
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte(`{"error":"v1authfailed"}`))
+		called = true
+		if path := r.URL.Path; path != "/query" {
+			t.Error("Expected the path to contain `/query` but was: ", path)
+		}
+		expectedAuth := "Basic " + base64.StdEncoding.EncodeToString(([]byte)("my-user:my-pwd"))
+		if auth := r.Header.Get("Authorization"); auth != expectedAuth {
+			t.Errorf("Expected Authorization '%v' but was: %v", expectedAuth, auth)
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+
+	source := &chronograf.Source{
+		URL:      ts.URL,
+		Username: "my-user",
+		Password: "my-pwd",
+	}
+
+	client.Connect(context.Background(), source)
+	err = client.ValidateAuth(context.Background(), &chronograf.Source{})
+	if err == nil {
+		t.Fatal("Expected error but nil")
+	}
+	if !strings.Contains(err.Error(), "v1authfailed") {
+		t.Errorf("Expected client error '%v' to contain server-sent error message", err)
+	}
+	if called == false {
+		t.Error("Expected http request to Influx but there was none")
+	}
+}
+
+func Test_Influx_ValidateAuth_V2(t *testing.T) {
+	t.Parallel()
+	called := false
+	ts := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte(`{"message":"v2authfailed"}`))
+		called = true
+		if auth := r.Header.Get("Authorization"); auth != "Token my-token" {
+			t.Error("Expected Authorization 'Token my-token' but was: ", auth)
+		}
+		if path := r.URL.Path; path != "/api/v2/query" {
+			t.Error("Expected the path to contain `api/v2/query` but was: ", path)
+		}
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ts.URL, log.New(log.DebugLevel))
+	if err != nil {
+		t.Fatal("Unexpected error initializing client: err:", err)
+	}
+	source := &chronograf.Source{
+		URL:      ts.URL,
+		Type:     chronograf.InfluxDBv2,
+		Username: "my-org",
+		Password: "my-token",
+	}
+
+	client.Connect(context.Background(), source)
+	err = client.ValidateAuth(context.Background(), source)
+	if err == nil {
+		t.Fatal("Expected error but nil")
+	}
+	if !strings.Contains(err.Error(), "v2authfailed") {
+		t.Errorf("Expected client error '%v' to contain server-sent error message", err)
+	}
+	if called == false {
+		t.Error("Expected http request to Influx but there was none")
 	}
 }

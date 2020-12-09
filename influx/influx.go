@@ -76,14 +76,22 @@ type Client struct {
 
 // Response is a partial JSON decoded InfluxQL response used
 // to check for some errors
-type Response struct {
+type responseType struct {
 	Results json.RawMessage
-	Err     string `json:"error,omitempty"`
+	Err     string `json:"error,omitempty"`   //v1 error message
+	V2Err   string `json:"message,omitempty"` //v2 error message
 }
 
 // MarshalJSON returns the raw results bytes from the response
-func (r Response) MarshalJSON() ([]byte, error) {
+func (r responseType) MarshalJSON() ([]byte, error) {
 	return r.Results, nil
+}
+
+func (r *responseType) Error() string {
+	if r.Err != "" {
+		return r.Err
+	}
+	return r.V2Err
 }
 
 func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, error) {
@@ -127,12 +135,12 @@ func (c *Client) query(u *url.URL, q chronograf.Query) (chronograf.Response, err
 	}
 	defer resp.Body.Close()
 
-	var response Response
+	var response responseType
 	dec := json.NewDecoder(resp.Body)
 	decErr := dec.Decode(&response)
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, response.Err)
+		return nil, fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, response.Error())
 	}
 
 	// ignore this error if we got an invalid status code
@@ -182,6 +190,75 @@ func (c *Client) Query(ctx context.Context, q chronograf.Query) (chronograf.Resp
 	case <-ctx.Done():
 		return nil, chronograf.ErrUpstreamTimeout
 	}
+}
+
+// ValidateAuth returns error when an authenticated communication with the source fails
+func (c *Client) ValidateAuth(ctx context.Context, src *chronograf.Source) error {
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+
+	if src.Type == chronograf.InfluxDBv2 {
+		return c.validateAuthFlux(ctx, src)
+	}
+	// v1: use InfluxQL
+	if _, err := c.Query(ctx, chronograf.Query{Command: "SHOW DATABASES"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// validateAuthFlux uses Flux query to validate token authentication
+func (c *Client) validateAuthFlux(ctx context.Context, src *chronograf.Source) error {
+	u, err := url.Parse(c.URL.String())
+	if err != nil {
+		return err
+	}
+	u.Path = "api/v2/query"
+	command := "buckets()"
+	req, err := http.NewRequest("POST", u.String(), strings.NewReader(command))
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/vnd.flux")
+	logs := c.Logger.
+		WithField("component", "proxy").
+		WithField("host", req.Host).
+		WithField("command", command).
+		WithField("org", src.Username)
+	logs.Debug("api/v2/query")
+
+	params := req.URL.Query()
+	params.Set("org", src.Username) // org is stored in Username
+	req.URL.RawQuery = params.Encode()
+
+	if c.Authorizer != nil {
+		if err := c.Authorizer.Set(req); err != nil {
+			logs.Error("Error setting authorization header ", err)
+			return err
+		}
+	}
+
+	hc := &http.Client{}
+	hc.Transport = SharedTransport(c.InsecureSkipVerify)
+	resp, err := hc.Do(req)
+	if err != nil {
+		if err == context.DeadlineExceeded || err == context.Canceled {
+			return chronograf.ErrUpstreamTimeout
+		}
+		return err
+	}
+	defer resp.Body.Close()
+
+	var response responseType
+
+	if resp.StatusCode != http.StatusOK {
+		dec := json.NewDecoder(resp.Body)
+		dec.Decode(&response)
+		return fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, response.Error())
+	}
+
+	return nil
 }
 
 // Connect caches the URL and optional Bearer Authorization for the data source
@@ -379,7 +456,7 @@ func (c *Client) write(ctx context.Context, u *url.URL, db, rp, lp string) error
 		}
 		defer resp.Body.Close()
 
-		var response Response
+		var response responseType
 		dec := json.NewDecoder(resp.Body)
 		err = dec.Decode(&response)
 		if err != nil && err.Error() != "EOF" {
