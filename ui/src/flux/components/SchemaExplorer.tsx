@@ -16,7 +16,7 @@ class SchemaExplorer extends PureComponent<Props> {
     return (
       <div className="flux-schema-explorer">
         <FancyScrollbar>
-          <DatabaseList source={source} notify={notify} v2={v2} />
+          <DatabaseList source={source} notify={notify} />
         </FancyScrollbar>
       </div>
     )
