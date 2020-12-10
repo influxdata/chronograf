@@ -2,9 +2,6 @@ import React, {PureComponent} from 'react'
 
 import DatabaseListItem from 'src/flux/components/DatabaseListItem'
 
-import {showDatabases} from 'src/shared/apis/metaQuery'
-import showDatabasesParser from 'src/shared/parsing/showDatabases'
-
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {Source, NotificationAction} from 'src/types'
 import {executeQuery} from 'src/shared/apis/flux/query'
@@ -13,7 +10,6 @@ import {parseResponse} from 'src/shared/parsing/flux/response'
 interface Props {
   source: Source
   notify: NotificationAction
-  v2?: boolean
 }
 
 export async function getBuckets(source: Source): Promise<string[]> {
@@ -51,16 +47,10 @@ class DatabaseList extends PureComponent<Props, State> {
   }
 
   public async getDatabases() {
-    const {source, v2} = this.props
+    const {source} = this.props
     try {
-      if (v2) {
-        const buckets = await getBuckets(source)
-        this.setState({databases: buckets})
-      } else {
-        const {data} = await showDatabases(source.links.proxy)
-        const {databases} = showDatabasesParser(data)
-        this.setState({databases: databases.sort()})
-      }
+      const buckets = await getBuckets(source)
+      this.setState({databases: buckets})
     } catch (err) {
       console.error(err)
     }

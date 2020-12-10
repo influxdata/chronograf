@@ -13,11 +13,7 @@ import {
 } from 'src/reusable_ui'
 
 // Utils
-import {restartable} from 'src/shared/utils/restartable'
 import {
-  fetchDBsToRPs,
-  fetchMeasurements,
-  fetchFields,
   formatDBwithRP,
   toComponentStatus,
   renderScript,
@@ -49,7 +45,6 @@ interface Props {
   isWizardActive: boolean
   onSetIsWizardActive: (isWizardActive: boolean) => void
   onAddToScript: (script: string) => void
-  v2?: boolean
 }
 
 interface State {
@@ -80,10 +75,6 @@ class FluxScriptWizard extends PureComponent<Props, State> {
     selectedFields: null,
     selectedAggFunction: DEFAULT_AGG_FUNCTION.value,
   }
-
-  private fetchDBsToRPs = restartable(fetchDBsToRPs)
-  private fetchMeasurements = restartable(fetchMeasurements)
-  private fetchFields = restartable(fetchFields)
 
   public render() {
     const {children, isWizardActive} = this.props
@@ -308,7 +299,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
   }
 
   private fetchAndSetDBsToRPs = async () => {
-    const {source, v2} = this.props
+    const {source} = this.props
 
     this.setState({
       dbsToRPs: {},
@@ -326,15 +317,11 @@ class FluxScriptWizard extends PureComponent<Props, State> {
     let dbsToRPs
 
     try {
-      if (v2) {
-        const buckets = await getBuckets(source)
-        dbsToRPs = buckets.reduce((acc, db) => {
-          acc[db] = ['']
-          return acc
-        }, {})
-      } else {
-        dbsToRPs = await this.fetchDBsToRPs(source.links.proxy)
-      }
+      const buckets = await getBuckets(source)
+      dbsToRPs = buckets.reduce((acc, db) => {
+        acc[db] = ['']
+        return acc
+      }, {})
     } catch {
       this.setState({dbsToRPsStatus: RemoteDataState.Error})
 
@@ -355,7 +342,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
   }
 
   private fetchAndSetMeasurements = async () => {
-    const {source, v2} = this.props
+    const {source} = this.props
     const {selectedDB} = this.state
 
     this.setState({
@@ -374,14 +361,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
     let measurements
 
     try {
-      if (v2) {
-        measurements = await fetchFluxMeasurements(source, selectedDB)
-      } else {
-        measurements = await this.fetchMeasurements(
-          source.links.proxy,
-          selectedDB
-        )
-      }
+      measurements = await fetchFluxMeasurements(source, selectedDB)
     } catch {
       this.setState({
         measurements: [],
@@ -403,7 +383,7 @@ class FluxScriptWizard extends PureComponent<Props, State> {
   }
 
   private fetchAndSetFields = async () => {
-    const {source, v2} = this.props
+    const {source} = this.props
     const {selectedDB, selectedMeasurement} = this.state
 
     this.setState({
@@ -415,17 +395,9 @@ class FluxScriptWizard extends PureComponent<Props, State> {
     let fields
 
     try {
-      if (v2) {
-        const fieldsResults = await fieldsByMeasurement(source, selectedDB)
-        const {fieldsByMeasurements} = parseFieldsByMeasurements(fieldsResults)
-        fields = fieldsByMeasurements[selectedMeasurement] || []
-      } else {
-        fields = await this.fetchFields(
-          source.links.proxy,
-          selectedDB,
-          selectedMeasurement
-        )
-      }
+      const fieldsResults = await fieldsByMeasurement(source, selectedDB)
+      const {fieldsByMeasurements} = parseFieldsByMeasurements(fieldsResults)
+      fields = fieldsByMeasurements[selectedMeasurement] || []
     } catch {
       this.setState({
         fields: [],
