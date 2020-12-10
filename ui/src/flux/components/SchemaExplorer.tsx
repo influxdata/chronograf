@@ -7,12 +7,11 @@ import {Source, NotificationAction} from 'src/types'
 interface Props {
   source: Source
   notify: NotificationAction
-  v2?: boolean
 }
 
 class SchemaExplorer extends PureComponent<Props> {
   public render() {
-    const {source, notify, v2} = this.props
+    const {source, notify} = this.props
     return (
       <div className="flux-schema-explorer">
         <FancyScrollbar>
