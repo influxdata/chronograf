@@ -121,7 +121,7 @@ type Server struct {
 	PubKeyFile      flags.Filename `long:"pub-key-file" description:"File location of public key for superadmin token authentication." env:"PUB_KEY_FILE"`
 	NonceExpiration time.Duration  `long:"nonce-expiration" default:"10m" description:"Duration in which a signed nonce is valid. Used for superadmin token authentication." env:"NONCE_EXPIRATION"`
 
-	StatusFeedURL          string            `long:"status-feed-url" description:"URL of a JSON Feed to display as a News Feed on the client Status page." default:"https://influxdata.com/feed/json" env:"STATUS_FEED_URL"`
+	StatusFeedURL          string            `long:"status-feed-url" description:"URL of a JSON Feed to display as a News Feed on the client Status page." default:"https://www.influxdata.com/feed/json" env:"STATUS_FEED_URL"`
 	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/influxdata/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/influxdata/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
 	TelegrafSystemInterval time.Duration     `long:"telegraf-system-interval" default:"1m" description:"Duration used in the GROUP BY time interval for the hosts list" env:"TELEGRAF_SYSTEM_INTERVAL"`
 
