@@ -1,6 +1,8 @@
-## v1.8.10
+## v1.8.10 [unreleased]
 
 ### Bug Fixes
+
+1. [#56391](https://github.com/influxdata/chronograf/pull/5639): Fix News Feed. Remove URL which causes redirect.
 
 ### Features
 
