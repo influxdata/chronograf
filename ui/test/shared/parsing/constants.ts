@@ -387,7 +387,7 @@ export const config = {
     links: [],
   },
   external: {
-    statusFeed: 'https://influxdata.com/feed/json',
+    statusFeed: 'https://www.influxdata.com/feed/json',
   },
   meLink: '/chronograf/v1/me',
 }
@@ -858,7 +858,7 @@ export const emptyConfig = {
     links: [],
   },
   external: {
-    statusFeed: 'https://influxdata.com/feed/json',
+    statusFeed: 'https://www.influxdata.com/feed/json',
   },
   meLink: '/chronograf/v1/me',
 }
