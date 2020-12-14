@@ -183,6 +183,7 @@ class LogsPage extends Component<Props, State> {
   private currentOlderChunksGenerator: FetchLoop = null
   private currentNewerChunksGenerator: FetchLoop = null
   private loadingSourcesStatus: RemoteDataState = RemoteDataState.NotStarted
+  private isComponentMounted: boolean = true
 
   constructor(props: Props) {
     super(props)
@@ -220,22 +221,26 @@ class LogsPage extends Component<Props, State> {
   }
 
   public async componentDidMount() {
+    this.isComponentMounted = true
     await this.getSources()
     await this.setCurrentSource()
 
     await this.props.getConfig(this.logConfigLink)
 
-    if (this.isMeasurementInNamespace) {
+    if (this.isComponentMounted && this.isMeasurementInNamespace) {
       this.updateTableData(SearchStatus.Loading)
     }
 
     if (getDeep<string>(this.props, 'timeRange.timeOption', '') === 'now') {
       this.startLogsTailFetchingInterval()
     }
-    await this.props.executeHistogramQueryAsync()
+    if (this.isComponentMounted) {
+      await this.props.executeHistogramQueryAsync()
+    }
   }
 
   public componentWillUnmount() {
+    this.isComponentMounted = false
     this.clearTailInterval()
     this.cancelChunks()
   }
@@ -350,6 +355,9 @@ class LogsPage extends Component<Props, State> {
   private startLogsTailFetchingInterval = () => {
     this.flushTailBuffer()
     this.clearTailInterval()
+    if (!this.isComponentMounted) {
+      return false
+    }
 
     this.props.setNextTailLowerBound(Date.now())
 
@@ -362,7 +370,7 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleTailFetchingInterval = async () => {
-    if (this.isClearing) {
+    if (this.isClearing || !this.isComponentMounted) {
       return
     }
 
@@ -371,10 +379,16 @@ class LogsPage extends Component<Props, State> {
   }
 
   private fetchTail = async () => {
+    if (!this.isComponentMounted) {
+      return
+    }
     await this.props.fetchTailAsync()
   }
 
   private fetchNewerChunk = async (): Promise<void> => {
+    if (!this.isComponentMounted) {
+      return
+    }
     const maxNewerFetchForward = Date.now() + DEFAULT_NEWER_CHUNK_DURATION_MS
 
     if (this.props.nextNewerLowerBound > maxNewerFetchForward) {
@@ -382,6 +396,9 @@ class LogsPage extends Component<Props, State> {
       this.currentNewerChunksGenerator.cancel()
     }
 
+    if (!this.isComponentMounted) {
+      return
+    }
     await this.props.fetchNewerChunkAsync()
   }
 
@@ -412,10 +429,16 @@ class LogsPage extends Component<Props, State> {
   }
 
   private fetchOlderChunk = async () => {
+    if (!this.isComponentMounted) {
+      return
+    }
     await this.props.fetchOlderChunkAsync()
   }
 
   private handleFetchOlderChunk = async () => {
+    if (!this.isComponentMounted) {
+      return
+    }
     if (this.currentOlderChunksGenerator) {
       return
     }
@@ -423,6 +446,9 @@ class LogsPage extends Component<Props, State> {
   }
 
   private handleFetchNewerChunk = async () => {
+    if (!this.isComponentMounted) {
+      return
+    }
     if (this.isLiveUpdating || this.shouldLiveUpdate) {
       return
     }
@@ -431,6 +457,9 @@ class LogsPage extends Component<Props, State> {
   }
 
   private startFetchingNewer = async () => {
+    if (!this.isComponentMounted) {
+      return
+    }
     if (this.currentNewerChunksGenerator) {
       return
     }
@@ -453,6 +482,9 @@ class LogsPage extends Component<Props, State> {
       console.error(error)
     }
 
+    if (!this.isComponentMounted) {
+      return
+    }
     this.setState({isLoadingNewer: false})
     this.currentNewerChunksGenerator = null
     this.updateQueryCount()
@@ -464,11 +496,17 @@ class LogsPage extends Component<Props, State> {
       getCurrentSize: this.totalBackwardValues,
     }
 
+    if (!this.isComponentMounted) {
+      return
+    }
     this.currentOlderChunksGenerator = fetchChunk(
       this.fetchOlderChunk,
       chunkOptions
     )
 
+    if (!this.isComponentMounted) {
+      return
+    }
     this.updateQueryCount()
 
     try {
@@ -478,6 +516,9 @@ class LogsPage extends Component<Props, State> {
     }
 
     this.currentOlderChunksGenerator = null
+    if (!this.isComponentMounted) {
+      return
+    }
     this.updateQueryCount()
   }
 
@@ -501,6 +542,9 @@ class LogsPage extends Component<Props, State> {
 
     this.currentNewerChunksGenerator = null
     this.currentOlderChunksGenerator = null
+    if (!this.isComponentMounted) {
+      return
+    }
     this.setState({queryCount: 0})
   }
 
@@ -538,11 +582,17 @@ class LogsPage extends Component<Props, State> {
     const customLowerBound = Date.parse(time)
     this.props.setNextNewerLowerBound(customLowerBound)
 
+    if (!this.isComponentMounted) {
+      return
+    }
     this.setState({
       hasScrolled: false,
       liveUpdating,
     })
 
+    if (!this.isComponentMounted) {
+      return
+    }
     await this.props.setTimeMarker({
       timeOption: time,
     })
@@ -558,6 +608,9 @@ class LogsPage extends Component<Props, State> {
     const relativeLowerBound = Date.now() - time * 1000
     this.props.setNextNewerLowerBound(relativeLowerBound)
 
+    if (!this.isComponentMounted) {
+      return
+    }
     this.setState({hasScrolled: false})
 
     const timeOptionUTC = new Date(Date.now() - time * 1000).toISOString()
