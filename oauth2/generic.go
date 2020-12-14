@@ -217,7 +217,7 @@ func (g *Generic) primaryEmail(emails []*UserEmail) (string, error) {
 	for _, m := range emails {
 		if m != nil && m.Email != nil &&
 			((m.Primary != nil && *m.Primary) || (m.IsPrimary != nil && *m.IsPrimary)) &&
-			((m.Verified != nil && *m.Verified) || (m.IsConfirmed != nil && *m.IsConfirmed)) {
+			((m.Verified != nil) || (m.IsConfirmed != nil)) {
 			return *m.Email, nil
 		}
 	}

@@ -198,3 +198,66 @@ func TestGenericPrincipalIDDomain(t *testing.T) {
 		t.Fatal("Retrieved email was not as expected. Want:", want, "Got:", got)
 	}
 }
+
+func TestGenericPrincipalIDDomain_BitBucket(t *testing.T) {
+	// Test of https://github.com/influxdata/chronograf/issues/5399
+	t.Parallel()
+	emailsResponse := `{
+		"pagelen": 10,
+		"values": [
+			{
+				"is_primary": true,
+				"is_confirmed": true,
+				"type": "email",
+				"email": "pavel.zavora@xyz.io",
+				"links": {
+					"self": {
+						"href": "https://api.bitbucket.org/2.0/user/emails/pavel.zavora@xyz.io"
+					}
+				}
+			}
+		],
+		"page": 1,
+		"size": 1
+	}`
+
+	mockAPI := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			enc := json.NewEncoder(rw)
+			rw.WriteHeader(http.StatusOK)
+			_ = enc.Encode(struct{}{})
+			return
+		}
+		if r.URL.Path == "/emails" {
+			rw.WriteHeader(http.StatusOK)
+			rw.Write([]byte(emailsResponse))
+			return
+		}
+
+		rw.WriteHeader(http.StatusNotFound)
+	}))
+	defer mockAPI.Close()
+
+	logger := clog.New(clog.ParseLevel("debug"))
+	prov := oauth2.Generic{
+		Logger:  logger,
+		Domains: []string{"xyz.io"},
+	}
+	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
+	if err != nil {
+		t.Fatal("Error initializing TestTripper: err:", err)
+	}
+
+	tc := &http.Client{
+		Transport: tt,
+	}
+
+	got, err := prov.PrincipalID(tc)
+	if err != nil {
+		t.Fatal("Unexpected error while retrieiving PrincipalID: err:", err)
+	}
+	want := "pavel.zavora@xyz.io"
+	if got != want {
+		t.Fatal("Retrieved email was not as expected. Want:", want, "Got:", got)
+	}
+}
