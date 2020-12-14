@@ -1,9 +1,11 @@
 package oauth2
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -163,6 +165,14 @@ type UserEmail struct {
 	Email    *string `json:"email,omitempty"`
 	Primary  *bool   `json:"primary,omitempty"`
 	Verified *bool   `json:"verified,omitempty"`
+	// support also indicators sent by bitbucket
+	IsPrimary   *bool `json:"is_primary,omitempty"`
+	IsConfirmed *bool `json:"is_confirmed,omitempty"`
+}
+
+// WrappedUserEmails represents (bitbucket's) structure that wraps email addresses in a values field
+type WrappedUserEmails struct {
+	Emails []*UserEmail `json:"values,omitempty"`
 }
 
 // getPrimaryEmail gets the private email account for the authenticated user.
@@ -173,10 +183,26 @@ func (g *Generic) getPrimaryEmail(client *http.Client) (string, error) {
 		return "", err
 	}
 	defer r.Body.Close()
-
-	emails := []*UserEmail{}
-	if err = json.NewDecoder(r.Body).Decode(&emails); err != nil {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 		return "", err
+	}
+	if len(body) == 0 {
+		return "", errors.New("No response body from /emails")
+	}
+	emails := []*UserEmail{}
+	if body[0] == '[' {
+		// array of UserEmail
+		if err = json.NewDecoder(bytes.NewReader(body)).Decode(&emails); err != nil {
+			return "", err
+		}
+	} else if body[0] == '{' {
+		// a struct with values that contain []*UserEmail{}
+		wrapped := WrappedUserEmails{}
+		if err = json.NewDecoder(bytes.NewReader(body)).Decode(&wrapped); err != nil {
+			return "", err
+		}
+		emails = wrapped.Emails
 	}
 
 	email, err := g.primaryEmail(emails)
@@ -189,7 +215,9 @@ func (g *Generic) getPrimaryEmail(client *http.Client) (string, error) {
 
 func (g *Generic) primaryEmail(emails []*UserEmail) (string, error) {
 	for _, m := range emails {
-		if m != nil && m.Primary != nil && m.Verified != nil && m.Email != nil {
+		if m != nil && m.Email != nil &&
+			((m.Primary != nil && *m.Primary) || (m.IsPrimary != nil && *m.IsPrimary)) &&
+			((m.Verified != nil && *m.Verified) || (m.IsConfirmed != nil && *m.IsConfirmed)) {
 			return *m.Email, nil
 		}
 	}
