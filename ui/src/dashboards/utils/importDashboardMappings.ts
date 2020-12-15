@@ -8,7 +8,7 @@ import {getDeep} from 'src/utils/wrappers'
 import {DYNAMIC_SOURCE, DYNAMIC_SOURCE_INFO} from 'src/dashboards/constants'
 
 // Types
-import {CellQuery, Cell, Source} from 'src/types'
+import {CellQuery, Cell, Source, Template} from 'src/types'
 import {
   CellInfo,
   SourceInfo,
@@ -22,7 +22,8 @@ const REGEX_SOURCE_ID = /sources\/(\d+)/g
 export const createSourceMappings = (
   source,
   cells,
-  importedSources
+  importedSources,
+  variables: Template[] = []
 ): {sourcesCells: SourcesCells; sourceMappings: SourceMappings} => {
   let sourcesCells: SourcesCells = {}
   const sourceMappings: SourceMappings = {}
@@ -66,6 +67,13 @@ export const createSourceMappings = (
     },
     sourcesCells
   )
+  // add sources also for variables
+  variables.forEach(v => {
+    if (v.sourceID && !sourceMappings[v.sourceID]) {
+      sourceMappings[v.sourceID] = sourceInfo
+      sourcesCells[v.sourceID] = []
+    }
+  })
 
   if (cellsWithNoSource.length) {
     sourcesCells[DYNAMIC_SOURCE] = cellsWithNoSource

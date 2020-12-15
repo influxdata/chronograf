@@ -17,7 +17,7 @@ import {
 import {DYNAMIC_SOURCE, DYNAMIC_SOURCE_ITEM} from 'src/dashboards/constants'
 
 // Types
-import {Source, Cell} from 'src/types'
+import {Source, Cell, Template} from 'src/types'
 import {
   SourcesCells,
   SourceMappings,
@@ -30,7 +30,8 @@ interface Props {
   source: Source
   sources: Source[]
   importedSources: ImportedSources
-  onSubmit: (cells: Cell[]) => void
+  variables: Template[]
+  onSubmit: (cells: Cell[], mappings: SourceMappings) => void
 }
 
 interface State {
@@ -45,7 +46,7 @@ class ImportDashboardMappings extends Component<Props, State> {
   }
 
   public componentDidMount() {
-    const {cells, importedSources, source} = this.props
+    const {cells, importedSources, source, variables} = this.props
 
     if (_.isEmpty(cells)) {
       return
@@ -54,7 +55,8 @@ class ImportDashboardMappings extends Component<Props, State> {
     const {sourcesCells, sourceMappings} = createSourceMappings(
       source,
       cells,
-      importedSources
+      importedSources,
+      variables
     )
 
     this.setState({sourcesCells, sourceMappings})
@@ -154,10 +156,8 @@ class ImportDashboardMappings extends Component<Props, State> {
 
   private getRow(sourceName: string, sourceID: string): JSX.Element {
     let sourceLabel = `${sourceName} (${sourceID})`
-    let description = 'Cells that use this Source:'
     if (sourceID === DYNAMIC_SOURCE) {
       sourceLabel = sourceName
-      description = 'Cells using Dynamic Source:'
     }
     return (
       <tr key={sourceID}>
@@ -165,8 +165,8 @@ class ImportDashboardMappings extends Component<Props, State> {
           <div className="dash-map--source" data-test="source-label">
             {sourceLabel}
           </div>
-          <div className="dash-map--header">{description}</div>
           {this.getCellsForSource(sourceID)}
+          {this.getVariablesForSource(sourceID)}
         </td>
         <td className="dash-map--table-cell dash-map--table-center">
           {this.arrow}
@@ -225,16 +225,45 @@ class ImportDashboardMappings extends Component<Props, State> {
     return sources[0].name
   }
 
-  private getCellsForSource(sourceID: string): JSX.Element[] {
+  private getCellsForSource(sourceID: string): JSX.Element {
     const {sourcesCells} = this.state
 
-    return _.map(sourcesCells[sourceID], c => {
+    if (sourcesCells[sourceID].length) {
       return (
-        <div className="dash-map--cell" key={c.id}>
-          {c.name}
-        </div>
+        <>
+          <div className="dash-map--header">Cells that use this Source:</div>
+          {_.map(sourcesCells[sourceID], c => {
+            return (
+              <div className="dash-map--cell" key={c.id}>
+                {c.name}
+              </div>
+            )
+          })}
+        </>
       )
-    })
+    }
+  }
+  private getVariablesForSource(sourceID: string): JSX.Element | undefined {
+    const {variables} = this.props
+    const sourceVariables = variables.filter(x => x.sourceID === sourceID)
+
+    if (sourceVariables.length) {
+      return (
+        <>
+          <div className="dash-map--header">
+            Variables that use this source:
+          </div>
+
+          {_.map(sourceVariables, v => {
+            return (
+              <div className="dash-map--cell" key={`var-${v.id}`}>
+                {v.tempVar}
+              </div>
+            )
+          })}
+        </>
+      )
+    }
   }
 
   private handleChooseDropdown = (item: SourceItemValue): void => {
@@ -250,7 +279,7 @@ class ImportDashboardMappings extends Component<Props, State> {
 
     const mappedCells = mapCells(cells, sourceMappings, importedSources)
 
-    onSubmit(mappedCells)
+    onSubmit(mappedCells, sourceMappings)
   }
 }
 

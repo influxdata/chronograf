@@ -9,9 +9,9 @@ import DragAndDrop from 'src/shared/components/DragAndDrop'
 import ImportDashboardMappings from 'src/dashboards/components/import_dashboard_mappings/ImportDashboardMappings'
 import {notifyDashboardImportFailed} from 'src/shared/copy/notifications'
 
-import {Dashboard, Cell, Source} from 'src/types'
+import {Dashboard, Cell, Source, Template} from 'src/types'
 import {Notification} from 'src/types/notifications'
-import {ImportedSources} from 'src/types/dashboards'
+import {ImportedSources, SourceMappings} from 'src/types/dashboards'
 
 interface Props {
   source: Source
@@ -59,7 +59,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private get renderStep(): JSX.Element {
-    const {step, importedSources, cells} = this.state
+    const {step, importedSources, cells, dashboard} = this.state
     const {source, sources} = this.props
 
     switch (step) {
@@ -78,6 +78,7 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
             source={source}
             sources={sources}
             importedSources={importedSources}
+            variables={dashboard.templates || []}
             onSubmit={this.handleUploadDashboard}
           />
         )
@@ -117,6 +118,19 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
       if (!_.isEmpty(dashboard)) {
         const cells = getDeep<Cell[]>(dashboard, 'cells', [])
         const importedSources = getDeep<ImportedSources>(meta, 'sources', {})
+        const templates = (dashboard.templates || []) as Template[]
+        templates.forEach(t => {
+          if (
+            t.sourceID &&
+            t.sourceID !== 'dynamic' &&
+            !importedSources[t.sourceID]
+          ) {
+            importedSources[t.sourceID] = {
+              name: `Variable source ${t.sourceID}`,
+              link: `/chronograf/v1/sources/${t.sourceID}`,
+            }
+          }
+        })
         this.setState({
           cells,
           dashboard,
@@ -133,12 +147,23 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
     }
   }
 
-  private handleUploadDashboard = (cells: Cell[]): void => {
+  private handleUploadDashboard = (
+    cells: Cell[],
+    mappings: SourceMappings
+  ): void => {
     const {dashboard} = this.state
 
     const {onImportDashboard, onDismissOverlay} = this.props
+    const templates = (dashboard.templates || []).map(x => {
+      if (!x.sourceID) {
+        return x
+      } else {
+        const mapping = mappings[x.sourceID]
+        return {...x, sourceID: mapping ? mapping.id : undefined}
+      }
+    })
 
-    onImportDashboard({...dashboard, cells})
+    onImportDashboard({...dashboard, cells, templates})
     onDismissOverlay()
   }
 }

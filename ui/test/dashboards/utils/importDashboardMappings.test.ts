@@ -7,10 +7,11 @@ import {
 } from 'src/dashboards/utils/importDashboardMappings'
 
 // fixtures
-import {source, cell, query} from 'test/fixtures'
+import {source, cell, query, template} from 'test/fixtures'
 
 // constants
 import {DYNAMIC_SOURCE, DYNAMIC_SOURCE_INFO} from 'src/dashboards/constants'
+import {Template} from 'src/types'
 
 describe('Dashboards.Utils.importDashboardMappings', () => {
   describe('createSourceMappings', () => {
@@ -149,6 +150,53 @@ describe('Dashboards.Utils.importDashboardMappings', () => {
         importedSources
       )
       expect(sourceMappings).toEqual(expected)
+    })
+    it('maps also imported variables', () => {
+      const currentSource = {...source, id: 11, name: 'MY SOURCE'}
+      const sourceLink1 = '/chronograf/v1/sources/1'
+      const cellName1 = 'Cell 1'
+      const cellID1 = '1'
+      const queryWithSource1 = {...query, source: sourceLink1}
+      const cellWithSource1 = {
+        ...cell,
+        name: cellName1,
+        queries: [queryWithSource1],
+        i: cellID1,
+      }
+      const cells = [cellWithSource1]
+      const importedSources = {
+        1: {name: 'Source 1', link: sourceLink1},
+      }
+      const sourceInfo = {
+        name: currentSource.name,
+        id: currentSource.id,
+        link: currentSource.links.self,
+      }
+      const variables: Template[] = [
+        {
+          ...template,
+          sourceID: undefined,
+        },
+        {
+          ...template,
+          id: 'var2',
+          sourceID: '2',
+        },
+      ]
+
+      const expectedMapping = {
+        1: sourceInfo,
+        2: sourceInfo,
+      }
+
+      const {sourcesCells, sourceMappings} = createSourceMappings(
+        currentSource,
+        cells,
+        importedSources,
+        variables
+      )
+      expect(sourceMappings).toEqual(expectedMapping)
+      expect(sourcesCells[2]).toEqual([])
     })
   })
 

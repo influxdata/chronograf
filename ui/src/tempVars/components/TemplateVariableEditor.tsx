@@ -113,8 +113,9 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
       sourceID = props.template.sourceID
       selectedSource = props.sources.find(source => source.id === sourceID)
       if (!selectedSource) {
+        const v = props.template.tempVar
         console.error(
-          `Template for tempVar '${props.template.tempVar}' uses source '${sourceID}' that does not exist. Using dynamic source.`
+          `Variable '${v}' uses source '${sourceID}' that does not exist.`
         )
         sourceID = DYNAMIC_SOURCE_DATABASE_ID
       }
@@ -482,11 +483,11 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
   }
 }
 
-const mapDispatchToProps = {
+const mdtp = {
   notify: notifyActionCreator,
 }
 
-const mapStateToProps = state => {
+const mstp = state => {
   const {sources} = state
 
   return {
@@ -494,7 +495,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(TemplateVariableEditor))
+export default connect(mstp, mdtp)(withRouter(TemplateVariableEditor))
