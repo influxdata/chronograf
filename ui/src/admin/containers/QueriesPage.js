@@ -51,10 +51,17 @@ class QueriesPage extends Component {
 
       const fetches = databases.map(db => showQueries(source.links.proxy, db))
 
-      Promise.all(fetches).then(queryResponses => {
+      Promise.allSettled(fetches).then(results => {
         const allQueries = []
-        queryResponses.forEach(queryResponse => {
-          const result = showQueriesParser(queryResponse.data)
+        results.forEach((settledResponse, i) => {
+          if (!settledResponse.value) {
+            console.error(
+              `Unable to show queries for '${databases[i]}': `,
+              settledResponse.reason
+            )
+            return
+          }
+          const result = showQueriesParser(settledResponse.value.data)
           if (result.errors.length) {
             result.errors.forEach(message =>
               notify(notifyQueriesError(message))
@@ -112,6 +119,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  ErrorHandling(QueriesPage)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ErrorHandling(QueriesPage))
