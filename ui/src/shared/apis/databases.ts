@@ -10,9 +10,8 @@ const getRetentionPolices = async (proxy, databases) => {
   let results = []
 
   for (let i = 0; i < databases.length; i++) {
+    const database = databases[i]
     try {
-      const database = databases[i]
-
       const {
         data: {results: rps},
       } = await showRetentionPolicies(proxy, database)
@@ -29,7 +28,7 @@ const getRetentionPolices = async (proxy, databases) => {
         results = [...results, ...dbrp]
       }
     } catch (e) {
-      console.error(e)
+      console.error(`Unable to show retention policies on ${database}`, e)
     }
   }
 

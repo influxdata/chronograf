@@ -56,7 +56,7 @@ class QueriesPage extends Component {
         results.forEach((settledResponse, i) => {
           if (!settledResponse.value) {
             console.error(
-              `Unable to show queries for '${databases[i]}': `,
+              `Unable to show queries on '${databases[i]}': `,
               settledResponse.reason
             )
             return
