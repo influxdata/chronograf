@@ -41,7 +41,6 @@ import {
   QueryType,
   Notification,
 } from 'src/types'
-import {getDeep} from 'src/utils/wrappers'
 import {VisualizationOptions} from 'src/types/dataExplorer'
 import {ColorString} from 'src/types/colors'
 
@@ -205,11 +204,11 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private get hasQuery(): boolean {
-    const {queryConfig, script, queryType} = this.props
+    const {rawText, script, queryType} = this.props
     if (queryType === QueryType.Flux) {
       return !!script.length
     }
-    return getDeep<number>(queryConfig, 'fields.length', 0) !== 0
+    return !!rawText.length
   }
 
   private get selectedDashboards(): Dashboard[] {
