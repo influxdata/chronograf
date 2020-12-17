@@ -54,6 +54,14 @@ export const source: Source = {
   authentication: SourceAuthenticationMethod.Basic,
 }
 
+export const template: Template = {
+  id: '1',
+  label: 'var',
+  tempVar: ':var:',
+  type: TemplateType.Constant,
+  values: [],
+}
+
 export const service: Service = {
   id: '1',
   sourceID: '1',

@@ -105,19 +105,31 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
-    let sourceID = DYNAMIC_SOURCE_DATABASE_ID
+    let sourceID: string
+    let selectedSource: Source
 
     // If props.template exists, we're loading a source. If it doesn't, we're creating one
     if (props.template && props.template.sourceID) {
       sourceID = props.template.sourceID
+      selectedSource = props.sources.find(source => source.id === sourceID)
+      if (!selectedSource) {
+        const v = props.template.tempVar
+        console.error(
+          `Variable '${v}' uses source '${sourceID}' that does not exist.`
+        )
+        sourceID = DYNAMIC_SOURCE_DATABASE_ID
+      }
+    } else {
+      sourceID = DYNAMIC_SOURCE_DATABASE_ID
     }
 
     const isDynamicSourceSelected = sourceID === DYNAMIC_SOURCE_DATABASE_ID
-
-    const selectedSource = isDynamicSourceSelected
-      ? // The source id of the current dynamic source is available as a url param
-        props.sources.find(source => source.id === props.params.sourceID)
-      : props.sources.find(source => source.id === sourceID)
+    if (!selectedSource) {
+      // The source id of the current dynamic source is available as a url param
+      selectedSource = props.sources.find(
+        source => source.id === props.params.sourceID
+      )
+    }
 
     const defaultState = {
       savingStatus: RemoteDataState.NotStarted,
@@ -471,11 +483,11 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
   }
 }
 
-const mapDispatchToProps = {
+const mdtp = {
   notify: notifyActionCreator,
 }
 
-const mapStateToProps = state => {
+const mstp = state => {
   const {sources} = state
 
   return {
@@ -483,6 +495,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(TemplateVariableEditor)
-)
+export default connect(mstp, mdtp)(withRouter(TemplateVariableEditor))

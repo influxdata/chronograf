@@ -11,6 +11,7 @@ const setup = (override = {}) => {
     sources: [source],
     importedSources: {},
     onSubmit: () => {},
+    variables: [],
     ...override,
   }
 
