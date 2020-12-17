@@ -130,14 +130,19 @@ func (h *Service) GetDatabases(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dbs := make([]dbResponse, len(databases))
-	for i, d := range databases {
+	dbs := make([]dbResponse, 0, len(databases))
+	for _, d := range databases {
 		rps, err := h.allRPs(ctx, dbsvc, srcID, d.Name)
 		if err != nil {
-			Error(w, http.StatusBadRequest, err.Error(), h.Logger)
-			return
+			// https://github.com/influxdata/chronograf/issues/5531
+			// ignore the database if it can be shown, but retention policies cannot be listed
+			h.Logger.
+				WithField("component", "server").
+				WithField("db", d.Name).
+				Error("Unable to get retention policies: ", err.Error())
+			continue
 		}
-		dbs[i] = newDBResponse(srcID, d.Name, rps)
+		dbs = append(dbs, newDBResponse(srcID, d.Name, rps))
 	}
 
 	res := dbsResponse{
@@ -390,25 +395,25 @@ func (h *Service) UpdateRetentionPolicy(w http.ResponseWriter, r *http.Request) 
 }
 
 // DropRetentionPolicy removes a retention policy from a database
-func (s *Service) DropRetentionPolicy(w http.ResponseWriter, r *http.Request) {
+func (h *Service) DropRetentionPolicy(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	srcID, err := paramID("id", r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error(), s.Logger)
+		Error(w, http.StatusUnprocessableEntity, err.Error(), h.Logger)
 		return
 	}
 
-	src, err := s.Store.Sources(ctx).Get(ctx, srcID)
+	src, err := h.Store.Sources(ctx).Get(ctx, srcID)
 	if err != nil {
-		notFound(w, srcID, s.Logger)
+		notFound(w, srcID, h.Logger)
 		return
 	}
 
-	dbsvc := s.Databases
+	dbsvc := h.Databases
 	if err = dbsvc.Connect(ctx, &src); err != nil {
 		msg := fmt.Sprintf("Unable to connect to source %d: %v", srcID, err)
-		Error(w, http.StatusBadRequest, msg, s.Logger)
+		Error(w, http.StatusBadRequest, msg, h.Logger)
 		return
 	}
 
@@ -416,7 +421,7 @@ func (s *Service) DropRetentionPolicy(w http.ResponseWriter, r *http.Request) {
 	rp := httprouter.GetParamFromContext(ctx, "rp")
 	dropErr := dbsvc.DropRP(ctx, db, rp)
 	if dropErr != nil {
-		Error(w, http.StatusBadRequest, dropErr.Error(), s.Logger)
+		Error(w, http.StatusBadRequest, dropErr.Error(), h.Logger)
 		return
 	}
 
