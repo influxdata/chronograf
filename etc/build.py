@@ -482,6 +482,7 @@ def build(version=None,
     for target, path in targets.items():
         logging.info("Building target: {}".format(target))
         build_command = ""
+        build_command_last_options = ""
 
         # Handle static binary output
         if static is True or "static_" in arch:
@@ -489,6 +490,7 @@ def build(version=None,
                 static = True
                 arch = arch.replace("static_", "")
             build_command += "CGO_ENABLED=0 "
+            build_command_last_options += "-a -installsuffix cgo "
 
         # Handle variations in architecture output
         fullarch = arch
@@ -503,8 +505,12 @@ def build(version=None,
         if "arm" in fullarch:
             if fullarch == "armel":
                 build_command += "GOARM=5 "
+                # required because of https://github.com/influxdata/chronograf/issues/5405
+                build_command_last_options += "-installsuffix armv5 "
             elif fullarch == "armhf" or fullarch == "arm":
                 build_command += "GOARM=6 "
+                # required because of https://github.com/influxdata/chronograf/issues/5405
+                build_command_last_options += "-installsuffix armv6 "
             elif fullarch == "arm64":
                 pass # No GOARM for arm64
             else:
@@ -518,24 +524,13 @@ def build(version=None,
             build_command += "-race "
         if len(tags) > 0:
             build_command += "-tags {} ".format(','.join(tags))
-        if "1.4" in get_go_version():
-            if static:
-                build_command += "-ldflags=\"-s -X main.version {} -X main.commit {}\" ".format(version,
-                                                                                                get_current_commit())
-            else:
-                build_command += "-ldflags=\"-X main.version {} -X main.commit {}\" ".format(version,
-                                                                                             get_current_commit())
-
-        else:
-            # Starting with Go 1.5, the linker flag arguments changed to 'name=value' from 'name value'
-            if static:
-                build_command += "-ldflags=\"-s -X main.version={} -X main.commit={}\" ".format(version,
-                                                                                                get_current_commit())
-            else:
-                build_command += "-ldflags=\"-X main.version={} -X main.commit={}\" ".format(version,
-                                                                                             get_current_commit())
         if static:
-            build_command += "-a -installsuffix cgo "
+            build_command += "-ldflags=\"-s -X main.version={} -X main.commit={}\" ".format(version,
+                                                                                            get_current_commit())
+        else:
+            build_command += "-ldflags=\"-X main.version={} -X main.commit={}\" ".format(version,
+                                                                                            get_current_commit())
+        build_command += build_command_last_options
         build_command += path
         start_time = datetime.utcnow()
         run(build_command, shell=True, print_output=True)
