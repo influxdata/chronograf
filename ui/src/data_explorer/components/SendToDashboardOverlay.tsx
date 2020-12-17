@@ -111,43 +111,60 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       <OverlayContainer>
         <OverlayHeading title="Send to Dashboard" onDismiss={onCancel} />
         <OverlayBody>
-          <Form>
-            <Form.Element label="Target Dashboard(s)">
-              <MultiSelectDropdown
-                onChange={this.handleSelect}
-                selectedIDs={this.state.selectedIDs}
-                emptyText="Choose at least 1 dashboard"
-              >
-                {this.dropdownItems}
-              </MultiSelectDropdown>
-            </Form.Element>
-            {this.isNewDashboardSelected && (
-              <Form.Element label="Name new dashboard">
+          {this.hasQuery() ? (
+            <Form>
+              <Form.Element label="Target Dashboard(s)">
+                <MultiSelectDropdown
+                  onChange={this.handleSelect}
+                  selectedIDs={this.state.selectedIDs}
+                  emptyText="Choose at least 1 dashboard"
+                >
+                  {this.dropdownItems}
+                </MultiSelectDropdown>
+              </Form.Element>
+              {this.isNewDashboardSelected && (
+                <Form.Element label="Name new dashboard">
+                  <Input
+                    value={newDashboardName}
+                    onChange={this.handleChangeNewDashboardName}
+                    placeholder={'Name new dashboard'}
+                  />
+                </Form.Element>
+              )}
+              <Form.Element label="Cell Name">
                 <Input
-                  value={newDashboardName}
-                  onChange={this.handleChangeNewDashboardName}
-                  placeholder={'Name new dashboard'}
+                  value={name}
+                  onChange={this.handleChangeName}
+                  placeholder={'Name this new cell'}
                 />
               </Form.Element>
-            )}
-            <Form.Element label="Cell Name">
-              <Input
-                value={name}
-                onChange={this.handleChangeName}
-                placeholder={'Name this new cell'}
-              />
-            </Form.Element>
-            <Form.Footer>
-              <Button
-                color={ComponentColor.Success}
-                text={`Send to ${numberDashboards} Dashboard${pluralizer}`}
-                titleText="Must choose at least 1 dashboard and set a name"
-                status={this.submitButtonStatus}
-                onClick={this.sendToDashboard}
-              />
-              <Button text="Cancel" onClick={onCancel} />
-            </Form.Footer>
-          </Form>
+              <Form.Footer>
+                <Button
+                  color={ComponentColor.Success}
+                  text={`Send to ${numberDashboards} Dashboard${pluralizer}`}
+                  titleText="Must choose at least 1 dashboard and set a name"
+                  status={this.submitButtonStatus}
+                  onClick={this.sendToDashboard}
+                />
+                <Button text="Cancel" onClick={onCancel} />
+              </Form.Footer>
+            </Form>
+          ) : (
+            <Form>
+              <Form.Element>
+                <div className="text-center">
+                  No
+                  {this.props.queryType === QueryType.Flux
+                    ? ' script '
+                    : ' query '}
+                  specified!
+                </div>
+              </Form.Element>
+              <Form.Footer>
+                <Button text="Back" onClick={onCancel} />
+              </Form.Footer>
+            </Form>
+          )}
         </OverlayBody>
       </OverlayContainer>
     )
@@ -203,12 +220,12 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     return this.state.selectedIDs.includes(NEW_DASHBOARD_ID)
   }
 
-  private get hasQuery(): boolean {
+  private hasQuery(): boolean {
     const {rawText, script, queryType} = this.props
     if (queryType === QueryType.Flux) {
-      return !!script.length
+      return script && !!script.trim()
     }
-    return !!rawText.length
+    return rawText && !!rawText.trim()
   }
 
   private get selectedDashboards(): Dashboard[] {
@@ -223,11 +240,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   private get submitButtonStatus(): ComponentStatus {
     const {name, selectedIDs} = this.state
 
-    if (
-      !this.hasQuery ||
-      selectedIDs.length === 0 ||
-      name.trim().length === 0
-    ) {
+    if (selectedIDs.length === 0 || name.trim().length === 0) {
       return ComponentStatus.Disabled
     }
 
