@@ -214,14 +214,21 @@ func (g *Generic) getPrimaryEmail(client *http.Client) (string, error) {
 }
 
 func (g *Generic) primaryEmail(emails []*UserEmail) (string, error) {
+	var email string
 	for _, m := range emails {
-		if m != nil && m.Email != nil &&
-			((m.Primary != nil && *m.Primary) || (m.IsPrimary != nil && *m.IsPrimary)) &&
-			((m.Verified != nil) || (m.IsConfirmed != nil)) {
-			return *m.Email, nil
+		if m != nil && m.Email != nil && ((m.Verified != nil) || (m.IsConfirmed != nil)) {
+			if email != "" {
+				email = *m.Email
+			}
+			if (m.Primary != nil && *m.Primary) || (m.IsPrimary != nil && *m.IsPrimary) {
+				return *m.Email, nil
+			}
 		}
 	}
-	return "", errors.New("No primary email address")
+	if email == "" {
+		return "", errors.New("No primary email address")
+	}
+	return email, nil
 }
 
 // ofDomain makes sure that the email is in one of the required domains

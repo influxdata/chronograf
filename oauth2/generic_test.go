@@ -202,6 +202,8 @@ func TestGenericPrincipalIDDomain(t *testing.T) {
 func TestGenericPrincipalIDDomain_BitBucket(t *testing.T) {
 	// Test of https://github.com/influxdata/chronograf/issues/5399
 	t.Parallel()
+	expectedGroup := "xyz.io"
+	expectedPrincipalID := "pavel.zavora@xyz.io"
 	emailsResponse := `{
 		"pagelen": 10,
 		"values": [
@@ -241,7 +243,7 @@ func TestGenericPrincipalIDDomain_BitBucket(t *testing.T) {
 	logger := clog.New(clog.ParseLevel("debug"))
 	prov := oauth2.Generic{
 		Logger:  logger,
-		Domains: []string{"xyz.io"},
+		Domains: []string{expectedGroup},
 	}
 	tt, err := oauth2.NewTestTripper(logger, mockAPI, http.DefaultTransport)
 	if err != nil {
@@ -256,8 +258,16 @@ func TestGenericPrincipalIDDomain_BitBucket(t *testing.T) {
 	if err != nil {
 		t.Fatal("Unexpected error while retrieiving PrincipalID: err:", err)
 	}
-	want := "pavel.zavora@xyz.io"
-	if got != want {
-		t.Fatal("Retrieved email was not as expected. Want:", want, "Got:", got)
+	if got != expectedPrincipalID {
+		t.Fatal("Retrieved email was not as expected. Want:", expectedPrincipalID, "Got:", got)
 	}
+
+	group, err := prov.Group(tc)
+	if err != nil {
+		t.Fatal("Unexpected error while retrieiving PrincipalID: err:", err)
+	}
+	if group != expectedGroup {
+		t.Fatal("Retrieved group was not as expected. Want:", expectedGroup, "Got:", group)
+	}
+
 }
