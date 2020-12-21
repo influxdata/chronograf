@@ -309,8 +309,8 @@ class LogsPage extends Component<Props, State> {
               searchStatus={searchStatus}
               filters={filters}
               upper={
-                nextNewerLowerBound ||
                 currentTailUpperBound ||
+                nextNewerLowerBound ||
                 nextTailLowerBound
               }
               lower={nextOlderUpperBound}
