@@ -12,7 +12,12 @@ export const fetchChunk = <T>(
   request: () => Promise<T>,
   chunkParams: ChunkParams
 ): FetchLoop => {
-  const {getCurrentSize, maxFetchCount, maxNoChangeFetchCount, chunkSize} = chunkParams
+  const {
+    getCurrentSize,
+    maxFetchCount,
+    maxNoChangeFetchCount,
+    chunkSize,
+  } = chunkParams
   const initialSize = getCurrentSize()
   const fetchCount = fetchCounter()
   let lastSize = initialSize
@@ -23,10 +28,10 @@ export const fetchChunk = <T>(
     const isChunkLoaded = size - initialSize >= chunkSize
     const isCountMaxed = cycle > maxFetchCount
     if ((cycle + 1) % maxNoChangeFetchCount === 0) {
-       if (lastSize - size > 0) {
-         lastSize = size
-       }
-       return true
+      if (lastSize - size > 0) {
+        lastSize = size
+      }
+      return true
     }
 
     return isChunkLoaded || isCountMaxed
