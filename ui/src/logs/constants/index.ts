@@ -220,14 +220,17 @@ export const NOW = 0
 const NEWER_CHUNK_SIZE_LIMIT = 100
 const OLDER_CHUNK_SIZE_LIMIT = 100
 const MAX_FETCH_COUNT = Infinity // never stop fetching
+const MAX_NO_CHANGE_FETCH_COUNT = 10 // but stop after no data are received after a few attempts
 
 export const NEWER_CHUNK_OPTIONS = {
   maxFetchCount: MAX_FETCH_COUNT,
+  maxNoChangeFetchCount: MAX_NO_CHANGE_FETCH_COUNT,
   chunkSize: NEWER_CHUNK_SIZE_LIMIT,
 }
 
 export const OLDER_CHUNK_OPTIONS = {
   maxFetchCount: MAX_FETCH_COUNT,
+  maxNoChangeFetchCount: MAX_NO_CHANGE_FETCH_COUNT,
   chunkSize: OLDER_CHUNK_SIZE_LIMIT,
 }
 
