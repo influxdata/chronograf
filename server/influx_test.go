@@ -3,13 +3,16 @@ package server
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/bouk/httprouter"
 
+	"github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/mocks"
 
 	"github.com/influxdata/chronograf"
@@ -114,5 +117,102 @@ func TestService_Influx(t *testing.T) {
 			t.Errorf("%q. Influx() =\ngot  ***%v***\nwant ***%v***\n", tt.name, string(body), tt.want.Body)
 		}
 
+	}
+}
+
+// TestService_Influx_UseCommand test preprocessing of use command
+func TestService_Influx_UseCommand(t *testing.T) {
+	tests := []struct {
+		name string
+		db   string
+		rp   string
+	}{
+		{
+			name: "/* no command */",
+		},
+		{
+			name: "USE mydb",
+			db:   "mydb",
+		},
+		{
+			name: "USE mydb.myrp",
+			db:   "mydb",
+			rp:   "myrp",
+		},
+		{
+			name: `use "mydb"`,
+			db:   "mydb",
+		},
+		{
+			name: `use "mydb.myrp"`,
+			db:   "mydb.myrp",
+		},
+		{
+			name: `USE "mydb"."myrp"`,
+			db:   "mydb",
+			rp:   "myrp",
+		},
+	}
+
+	h := &Service{
+		Store: &mocks.Store{
+			SourcesStore: &mocks.SourcesStore{
+				GetF: func(ctx context.Context, ID int) (chronograf.Source, error) {
+					return chronograf.Source{
+						ID:  1337,
+						URL: "http://any.url",
+					}, nil
+				},
+			},
+		},
+		TimeSeriesClient: &mocks.TimeSeries{
+			ConnectF: func(ctx context.Context, src *chronograf.Source) error {
+				return nil
+			},
+			QueryF: func(ctx context.Context, query chronograf.Query) (chronograf.Response, error) {
+				return mocks.NewResponse(
+						fmt.Sprintf(`{"db":"%s","rp":"%s"}`, query.DB, query.RP),
+						nil,
+					),
+					nil
+			},
+		},
+		Logger: log.New(log.ErrorLevel),
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			prefixCommand := strings.ReplaceAll(tt.name, "\"", "\\\"")
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(
+				"POST",
+				"http://any.url",
+				ioutil.NopCloser(
+					bytes.NewReader([]byte(
+						`{"uuid": "tst", "query":"`+prefixCommand+` ; DROP MEASUREMENT test"}`,
+					)),
+				),
+			)
+			r = r.WithContext(httprouter.WithParams(
+				context.Background(),
+				httprouter.Params{
+					{
+						Key:   "id",
+						Value: "1",
+					},
+				},
+			))
+
+			h.Influx(w, r)
+
+			resp := w.Result()
+			body, _ := ioutil.ReadAll(resp.Body)
+
+			want := fmt.Sprintf(`{"results":{"db":"%s","rp":"%s"},"uuid":"tst"}`, tt.db, tt.rp)
+			got := strings.TrimSpace(string(body))
+			if got != want {
+				t.Errorf("%q. Influx() =\ngot  ***%v***\nwant ***%v***\n", tt.name, got, want)
+			}
+
+		})
 	}
 }
