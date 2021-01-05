@@ -2,6 +2,7 @@ import AJAX from 'src/utils/ajax'
 import {AlertTypes} from 'src/kapacitor/constants'
 import {Kapacitor, Source, Service, NewService, QueryConfig} from 'src/types'
 import {SpecificConfigOptions} from 'src/types/kapacitor'
+import {Method} from 'axios'
 
 export const getSources = () => {
   return AJAX({
@@ -129,7 +130,7 @@ export const getKapacitors = async (source: Source): Promise<Kapacitor[]> => {
 
 export const deleteKapacitor = async (kapacitor: Kapacitor): Promise<void> => {
   try {
-    return await AJAX({
+    await AJAX({
       method: 'DELETE',
       url: kapacitor.links.self,
     })
@@ -209,7 +210,7 @@ export const updateKapacitorConfigSection = (
   const path = `/kapacitor/v1/config/${section}/${config}`
 
   const params = {
-    method: 'POST',
+    method: 'POST' as Method,
     url: kapacitor.links.proxy,
     params: {
       path,
@@ -339,7 +340,7 @@ export const deleteKapacitorTask = (kapacitor: Kapacitor, id) => {
 
 export const kapacitorProxy = (
   kapacitor: Kapacitor,
-  method: string,
+  method: Method,
   path,
   body?
 ) => {

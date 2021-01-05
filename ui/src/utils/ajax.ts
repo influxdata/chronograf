@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from 'axios'
+import axios, {AxiosResponse, Method} from 'axios'
 
 let links
 export const setAJAXLinks = ({updatedLinks}): void => {
@@ -75,7 +75,7 @@ interface RequestParams {
   url?: string | string[]
   resource?: string
   id?: string
-  method?: string
+  method?: Method
   data?: object | string
   params?: object
   headers?: object
