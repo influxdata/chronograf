@@ -1,6 +1,23 @@
+import {Field} from 'src/types'
 import {TableData} from 'src/types/logs'
 
 export const DEFAULT_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
+/** name of a column to carry nanosecond fraction of timestamp */
+export const TIMESTAMP_NSINMS = '_timestamp_nsinms'
+/**
+ * "_timestamp_nsinms" field is added to query to know nanosecond fraction
+ * after millis, which is lost during JSON deserialization to number
+ */
+export const FIELD_TIMESTAMP_NSINMS: Field = {
+  type: 'infixfunc',
+  value: '%',
+  alias: TIMESTAMP_NSINMS,
+  args: [
+    {type: 'field', value: 'timestamp'},
+    {type: 'integer', value: '1000000'},
+  ],
+}
 
 export enum SeverityColorOptions {
   ruby = 'ruby',
