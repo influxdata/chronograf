@@ -160,7 +160,7 @@ const prependMoreLogs = (
   action: PrependMoreLogsAction
 ): LogsState => {
   const {
-    series: {values},
+    series: {columns, values},
   } = action.payload
   const {tableInfiniteData} = state
   const {forward} = tableInfiniteData
@@ -174,7 +174,7 @@ const prependMoreLogs = (
     tableInfiniteData: {
       ...tableInfiniteData,
       forward: {
-        columns: forward.columns,
+        columns,
         values: vals,
       },
     },
