@@ -10,6 +10,13 @@ export interface AutoRefreshOption {
   type: AutoRefreshOptionType
 }
 
+export const autoRefreshOptionPaused: AutoRefreshOption = {
+  id: 'auto-refresh-paused',
+  milliseconds: 0,
+  label: 'Paused',
+  type: AutoRefreshOptionType.Option,
+}
+
 const autoRefreshOptions: AutoRefreshOption[] = [
   {
     id: 'auto-refresh-header',
@@ -17,12 +24,7 @@ const autoRefreshOptions: AutoRefreshOption[] = [
     label: 'Refresh',
     type: AutoRefreshOptionType.Header,
   },
-  {
-    id: 'auto-refresh-paused',
-    milliseconds: 0,
-    label: 'Paused',
-    type: AutoRefreshOptionType.Option,
-  },
+  autoRefreshOptionPaused,
   {
     id: 'auto-refresh-5s',
     milliseconds: 5000,
