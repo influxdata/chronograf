@@ -48,7 +48,7 @@ interface Props {
   onUpdate: (text: string) => Promise<void>
   config: QueryConfig
   templates: Template[]
-  onMetaQuerySelected?: () => void
+  onMetaQuerySelected: () => void
 }
 
 const FIRST_TEMP_VAR = '0.tempVar'
