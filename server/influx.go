@@ -1,13 +1,16 @@
 package server
 
 import (
+	"bytes"
 	"crypto/tls"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -66,6 +69,8 @@ func (s *Service) Influx(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// inspect request command to specify additional request parameters
+	setupQueryFromCommand(&req)
 	response, err := ts.Query(ctx, req)
 	if err != nil {
 		if err == chronograf.ErrUpstreamTimeout {
@@ -152,4 +157,30 @@ func (s *Service) Write(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proxy.ServeHTTP(w, r)
+}
+
+// setupQueryFromCommand set query parameters from its command
+func setupQueryFromCommand(req *chronograf.Query) {
+	// allow to set active database with USE command, examples:
+	//  use mydb
+	//  use "mydb"
+	//  USE "mydb"."myrp"
+	//  use "mydb.myrp"
+	//  use mydb.myrp
+	if strings.HasPrefix(req.Command, "use ") || strings.HasPrefix(req.Command, "USE ") {
+		if nextCommand := strings.IndexRune(req.Command, ';'); nextCommand > 4 {
+			dbSpec := strings.TrimSpace(req.Command[4:nextCommand])
+			dbSpecReader := csv.NewReader(bytes.NewReader(([]byte)(dbSpec)))
+			dbSpecReader.Comma = '.'
+			if dbrp, err := dbSpecReader.Read(); err == nil {
+				if len(dbrp) > 0 {
+					req.DB = dbrp[0]
+				}
+				if len(dbrp) > 1 {
+					req.RP = dbrp[1]
+				}
+				req.Command = strings.TrimSpace(req.Command[nextCommand+1:])
+			}
+		}
+	}
 }

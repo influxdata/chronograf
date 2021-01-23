@@ -49,6 +49,7 @@ interface PassedProps {
   onAddQuery: () => void
   onDeleteQuery: (index: number) => void
   onEditRawText: (text: string) => Promise<void>
+  onMetaQuerySelected: () => void
 }
 
 type Props = ConnectedProps & PassedProps
@@ -76,6 +77,7 @@ const QueryMaker: FunctionComponent<Props> = ({
   onChooseMeasurement,
   onApplyFuncsToField,
   onToggleTagAcceptance,
+  onMetaQuerySelected,
 }) => {
   if (!activeQuery || !activeQuery.id) {
     return (
@@ -102,6 +104,7 @@ const QueryMaker: FunctionComponent<Props> = ({
             config={activeQuery}
             onUpdate={onEditRawText}
             templates={templates}
+            onMetaQuerySelected={onMetaQuerySelected}
           />
           <SchemaExplorer
             source={source}

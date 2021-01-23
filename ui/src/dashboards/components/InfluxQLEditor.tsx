@@ -48,6 +48,7 @@ interface Props {
   onUpdate: (text: string) => Promise<void>
   config: QueryConfig
   templates: Template[]
+  onMetaQuerySelected: () => void
 }
 
 const FIRST_TEMP_VAR = '0.tempVar'
@@ -357,6 +358,9 @@ class InfluxQLEditor extends Component<Props, State> {
   }
 
   private handleChooseMetaQuery = (mqto: MetaQueryTemplateOption): void => {
+    if (this.props.onMetaQuerySelected) {
+      this.props.onMetaQuerySelected()
+    }
     this.handleChange(mqto.query)
   }
 

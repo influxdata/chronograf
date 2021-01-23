@@ -208,6 +208,30 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Drop Measurement',
+    text: 'Drop Measurement',
+    query: 'USE "db_name"; DROP MEASUREMENT "measurement_name"',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Drop Series',
+    text: 'Drop Series',
+    query:
+      'USE "db_name"; DROP SERIES FROM "measurement_name" WHERE "tag" = \'value\'',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Delete',
+    text: 'Delete',
+    query:
+      'USE "db_name"; DELETE FROM "measurement_name" WHERE "tag" = \'value\' AND time < \'2020-01-01\'',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: `mqtd-divider-7`,
+    type: DropdownChildTypes.Divider,
+  },
+  {
     id: 'Show Stats',
     text: 'Show Stats',
     query: 'SHOW STATS',
