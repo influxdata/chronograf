@@ -2,7 +2,11 @@ import _ from 'lodash'
 import moment from 'moment'
 import {getDeep} from 'src/utils/wrappers'
 import {TableData, LogsTableColumn, SeverityFormat} from 'src/types/logs'
-import {SeverityFormatOptions, DEFAULT_TIME_FORMAT} from 'src/logs/constants'
+import {
+  SeverityFormatOptions,
+  DEFAULT_TIME_FORMAT,
+  TIMESTAMP_NSINMS,
+} from 'src/logs/constants'
 import {
   orderTableColumns,
   filterTableColumns,
@@ -179,11 +183,16 @@ export const applyChangesToTableData = (
   // #5472 fallback to timestamp when time is not defined
   const timeColumnIndex = _.indexOf(columns, 'time')
   const timestampColumnIndex = _.indexOf(columns, 'timestamp')
+  const timestampNsInMsColumnIndex = _.indexOf(columns, TIMESTAMP_NSINMS)
   if (timeColumnIndex >= 0 && timestampColumnIndex >= 0) {
     // modify existing data to save memory
     values.forEach(row => {
       if (row[timestampColumnIndex] === null) {
         row[timestampColumnIndex] = (row[timeColumnIndex] as number) * 1000000
+      } else if (timestampNsInMsColumnIndex >= 0) {
+        const ms = Math.floor((row[timestampColumnIndex] as number) / 1000000)
+        const ns = String(row[timestampNsInMsColumnIndex]).padStart(6, '0')
+        row[timestampColumnIndex] = `${ms}${ns}`
       }
     })
   }

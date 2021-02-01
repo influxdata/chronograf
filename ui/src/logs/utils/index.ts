@@ -15,7 +15,7 @@ import {
 
 import {HistogramData} from 'src/types/histogram'
 import {executeQueryAsync} from 'src/logs/api'
-import {DEFAULT_TIME_FORMAT} from 'src/logs/constants'
+import {DEFAULT_TIME_FORMAT, FIELD_TIMESTAMP_NSINMS} from 'src/logs/constants'
 
 const BIN_COUNT = 30
 
@@ -159,7 +159,7 @@ export function buildInfiniteScrollWhereClause({
   return ` WHERE ${subClauses.join(' AND ')}`
 }
 
-export function buildGeneralLogQuery(
+function buildGeneralLogQuery(
   condition: string,
   config: QueryConfig,
   filters: Filter[],
@@ -229,6 +229,9 @@ export function buildInfiniteScrollLogQuery(
     tags,
     areTagsAccepted,
   })
+  // add extra "_timestamp_ns" field to be able to know precise nanosecond time
+  // with full precision that is lost during JSON deserialization to number
+  config = {...config, fields: [...config.fields, FIELD_TIMESTAMP_NSINMS]}
 
   return buildGeneralLogQuery(condition, config, filters, searchTerm)
 }

@@ -51,7 +51,7 @@ export function buildSelect(
   }
 
   const rpSegment = retentionPolicy ? `"${retentionPolicy}"` : ''
-  const fieldsClause = buildFields(fields, shift)
+  const fieldsClause = buildFields(fields, shift).join(', ')
   const fullyQualifiedMeasurement = `"${database}".${rpSegment}."${measurement}"`
   const statement = `SELECT ${fieldsClause} FROM ${fullyQualifiedMeasurement}`
   return statement
@@ -89,41 +89,48 @@ export function buildSelectStatement(config: QueryConfig): string {
   return buildSelect(config)
 }
 
-function buildFields(fieldFuncs: Field[], shift = '', useAlias = true): string {
+function buildFields(
+  fieldFuncs: Field[],
+  shift = '',
+  useAlias = true
+): string[] {
   if (!fieldFuncs) {
-    return ''
+    return []
   }
 
-  return fieldFuncs
-    .map(f => {
-      switch (f.type) {
-        case 'field': {
-          const quoted = f.value === '*' ? '*' : `"${f.value}"`
-          const aliased =
-            useAlias && f.alias ? `${quoted} AS "${f.alias}"` : quoted
+  return fieldFuncs.map(f => {
+    switch (f.type) {
+      case 'field': {
+        const quoted = f.value === '*' ? '*' : `"${f.value}"`
+        const aliased =
+          useAlias && f.alias ? `${quoted} AS "${f.alias}"` : quoted
 
-          return aliased
-        }
-        case 'wildcard': {
-          return '*'
-        }
-        case 'regex': {
-          return `/${f.value}/`
-        }
-        case 'number': {
-          return `${f.value}`
-        }
-        case 'integer': {
-          return `${f.value}`
-        }
-        case 'func': {
-          const args = buildFields(f.args, '', false)
-          const alias = f.alias ? ` AS "${f.alias}${shift}"` : ''
-          return `${f.value}(${args})${alias}`
-        }
+        return aliased
       }
-    })
-    .join(', ')
+      case 'wildcard': {
+        return '*'
+      }
+      case 'regex': {
+        return `/${f.value}/`
+      }
+      case 'number': {
+        return `${f.value}`
+      }
+      case 'integer': {
+        return `${f.value}`
+      }
+      case 'func': {
+        const args = buildFields(f.args, '', false)
+        const alias = f.alias ? ` AS "${f.alias}${shift}"` : ''
+        return `${f.value}(${args.join(', ')})${alias}`
+      }
+      case 'infixfunc': {
+        const args = buildFields(f.args, '', false)
+        const alias = f.alias ? ` AS "${f.alias}"` : ''
+        return `${args[0]}${f.value}${args[1]}${alias}`
+      }
+    }
+  })
 }
 
 export function buildWhereClause({
