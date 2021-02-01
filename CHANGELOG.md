@@ -5,7 +5,7 @@
 1. [#5640](https://github.com/influxdata/chronograf/pull/5640): Repair ARM v5 build.
 1. [#5641](https://github.com/influxdata/chronograf/pull/5641): Stop async executions on unmounted LogsPage.
 1. [#5643](https://github.com/influxdata/chronograf/pull/5643): Support bitbucket in generic OAUTH.
-1. [#5646](https://github.com/influxdata/chronograf/pull/5646): Repair bashboard import to remap also sources in variables.
+1. [#5646](https://github.com/influxdata/chronograf/pull/5646): Repair dashboard import to remap also sources in variables.
 1. [#5642](https://github.com/influxdata/chronograf/pull/5642): Ignore databases that cannot be read.
 1. [#5648](https://github.com/influxdata/chronograf/pull/5648): Improve Send to Dashboard from Data Explorer page.
 1. [#5649](https://github.com/influxdata/chronograf/pull/5649): Avoid endless networking loop in Log Viewer.
