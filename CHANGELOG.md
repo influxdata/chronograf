@@ -2,9 +2,22 @@
 
 ### Bug Fixes
 
+1. [#5640](https://github.com/influxdata/chronograf/pull/5640): Repair ARM v5 build.
+1. [#5641](https://github.com/influxdata/chronograf/pull/5641): Stop async executions on unmounted LogsPage.
+1. [#5643](https://github.com/influxdata/chronograf/pull/5643): Support bitbucket in generic OAUTH.
+1. [#5646](https://github.com/influxdata/chronograf/pull/5646): Repair dashboard import to remap also sources in variables.
+1. [#5642](https://github.com/influxdata/chronograf/pull/5642): Ignore databases that cannot be read.
+1. [#5648](https://github.com/influxdata/chronograf/pull/5648): Improve Send to Dashboard from Data Explorer page.
+1. [#5649](https://github.com/influxdata/chronograf/pull/5649): Avoid endless networking loop in Log Viewer.
+1. [#5656](https://github.com/influxdata/chronograf/pull/5649): Show timestamp with full nanosecond precision in Log Viewer.
+
 ### Features
 
+1. [#5652](https://github.com/influxdata/chronograf/pull/5652): Allow to set active database for InfluxQL commands.
+
 ### Other
+
+1. [#5655](https://github.com/influxdata/chronograf/pull/5655): Upgrade axios to 0.21.1.
 
 ## v1.8.9.1 [2020-12-10]
 
