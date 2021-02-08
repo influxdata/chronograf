@@ -1,4 +1,12 @@
-## v1.8.10
+## v1.9.0
+
+### Bug Fixes
+
+### Features
+
+### Other
+
+## v1.8.10 [2021-02-08]
 
 ### Bug Fixes
 
@@ -9,7 +17,7 @@
 1. [#5642](https://github.com/influxdata/chronograf/pull/5642): Ignore databases that cannot be read.
 1. [#5648](https://github.com/influxdata/chronograf/pull/5648): Improve Send to Dashboard from Data Explorer page.
 1. [#5649](https://github.com/influxdata/chronograf/pull/5649): Avoid endless networking loop in Log Viewer.
-1. [#5656](https://github.com/influxdata/chronograf/pull/5649): Show timestamp with full nanosecond precision in Log Viewer.
+1. [#5656](https://github.com/influxdata/chronograf/pull/5656): Show timestamp with full nanosecond precision in Log Viewer.
 
 ### Features
 
