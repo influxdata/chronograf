@@ -2,8 +2,11 @@ package server
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"sort"
 	"strings"
 )
@@ -19,6 +22,8 @@ type tlsOptions struct {
 	MinVersion string
 	// MaxVersion of TLS to be negotiated with the client, no value means no maximum.
 	MaxVersion string
+	// CACerts contains Path to CA certificates
+	CACerts string
 }
 
 var ciphersMap = map[string]uint16{
@@ -74,6 +79,26 @@ func createTLSConfig(o tlsOptions) (out *tls.Config, err error) {
 	}
 	out = new(tls.Config)
 	out.Certificates = []tls.Certificate{cert}
+
+	// CA certs
+	if o.CACerts != "" {
+		f, err := os.Open(o.CACerts)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		certPool := x509.NewCertPool()
+		certs, err := ioutil.ReadAll(f)
+		if err != nil {
+			return nil, fmt.Errorf("error reading CA certificates: %s", err.Error())
+		}
+
+		ok := certPool.AppendCertsFromPEM(certs)
+		if !ok {
+			return nil, fmt.Errorf("error appending CA certificates from %s", o.CACerts)
+		}
+		out.RootCAs = certPool
+	}
 
 	// ciphers
 	if len(o.Ciphers) > 0 {

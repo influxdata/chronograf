@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"testing"
 
@@ -112,6 +113,33 @@ func Test_createTLSConfig(t *testing.T) {
 			},
 			err: `unknown maximum TLS version: "f1". available versions: 1.0, `, // + + other versions follow
 		},
+		{
+			name: "custom ca certs",
+			in: tlsOptions{
+				Cert:    "tls_options_test.cert",
+				Key:     "tls_options_test.key",
+				CACerts: "tls_options_test.cert",
+			},
+			out: &tls.Config{}, // certificates are compared
+		},
+		{
+			name: "unknown ca certs",
+			in: tlsOptions{
+				Cert:    "tls_options_test.cert",
+				Key:     "tls_options_test.key",
+				CACerts: "tls_options_test2.cert",
+			},
+			err: "open tls_options_test2.cert: no such file or directory",
+		},
+		{
+			name: "unsupported ca certs",
+			in: tlsOptions{
+				Cert:    "tls_options_test.cert",
+				Key:     "tls_options_test.key",
+				CACerts: "tls_options_test.key",
+			},
+			err: "error appending CA certificates from tls_options_test.key",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -119,7 +147,13 @@ func Test_createTLSConfig(t *testing.T) {
 			if test.err == "" {
 				require.Nil(t, err)
 				require.NotNil(t, config.Certificates)
+				if test.in.CACerts != "" {
+					require.NotNil(t, config.RootCAs)
+					x509Cert, _ := x509.ParseCertificate(config.Certificates[0].Certificate[0])
+					require.Equal(t, config.RootCAs.Subjects()[0], x509Cert.RawSubject)
+				}
 				config.Certificates = nil // we don't want to compare certificates
+				config.RootCAs = nil      // and also root CA certs
 				require.Equal(t, test.out, config)
 			} else {
 				require.NotNil(t, err)
