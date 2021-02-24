@@ -11,7 +11,8 @@ import (
 	"strings"
 )
 
-type tlsOptions struct {
+// TLSOptions specifies several key options that create TLS Configuration
+type TLSOptions struct {
 	// Cert contains path to PEM encoded public key certificate
 	Cert string
 	// Key contains Path to private key associated with given certificate.
@@ -64,7 +65,7 @@ var versionsMap = map[string]uint16{
 }
 
 // CreateTLSConfig creates TLS configuration out of specific TLS
-func CreateTLSConfig(o tlsOptions) (out *tls.Config, err error) {
+func CreateTLSConfig(o TLSOptions) (out *tls.Config, err error) {
 	// load key pair
 	if o.Cert == "" {
 		return nil, errors.New("no TLS certificate specified")
