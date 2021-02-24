@@ -70,11 +70,7 @@ func openService(ctx context.Context, u *url.URL) (*kv.Service, error) {
 			return nil, fmt.Errorf("unable to create bolt client: %s", err)
 		}
 	case "etcd":
-		pw, _ := u.User.Password()
-		db, err = etcd.NewClient(ctx,
-			etcd.WithEndpoints([]string{u.Host}),
-			etcd.WithLogin(u.User.Username(), pw),
-		)
+		db, err = etcd.NewClient(ctx, etcd.WithURL(u))
 		if err != nil {
 			return nil, fmt.Errorf("unable to create etcd client: %s", err)
 		}
