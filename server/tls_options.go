@@ -67,7 +67,6 @@ func createTLSConfig(o tlsOptions) (out *tls.Config, err error) {
 	// load key pair
 	if o.Cert == "" {
 		return nil, errors.New("no TLS certificate specified")
-
 	}
 	key := o.Key
 	if key == "" {
