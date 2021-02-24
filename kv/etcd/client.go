@@ -174,18 +174,18 @@ func WithURL(u *url.URL) Option {
 			default:
 				return fmt.Errorf("query parameter '%s' in '%s', supported parameter names are: cert, key, ca", key, u.String())
 			}
-			if cert != "" || cacerts != "" {
-				tlsConfig, err := config.CreateTLSConfig(config.TLSOptions{
-					Cert:         cert,
-					Key:          certKey,
-					CACerts:      cacerts,
-					CertOptional: true,
-				})
-				if err != nil {
-					return err
-				}
-				c.config.TLS = tlsConfig
+		}
+		if cert != "" || cacerts != "" {
+			tlsConfig, err := config.CreateTLSConfig(config.TLSOptions{
+				Cert:         cert,
+				Key:          certKey,
+				CACerts:      cacerts,
+				CertOptional: true,
+			})
+			if err != nil {
+				return err
 			}
+			c.config.TLS = tlsConfig
 		}
 		return nil
 	}

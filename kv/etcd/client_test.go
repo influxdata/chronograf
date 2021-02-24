@@ -129,6 +129,14 @@ func Test_WithURL(t *testing.T) {
 				Password:  "b",
 			},
 		},
+		{
+			url: parse("etcd://a:b@1.2.3.4:5555?ca=test.crt&cert=test.crt&key=test.key"),
+			config: clientv3.Config{
+				Endpoints: []string{"1.2.3.4:5555"},
+				Username:  "a",
+				Password:  "b",
+			},
+		},
 	}
 
 	for _, test := range tests {
