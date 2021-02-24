@@ -30,7 +30,7 @@ func (m *migrateCommand) Execute(args []string) error {
 		errExit(errors.New("Cannot migrate to original source"))
 	}
 	if m.From == "" || m.To == "" {
-		errExit(errors.New("Both 'to' and 'from' must be defined in order to migrate."))
+		errExit(errors.New("both 'to' and 'from' must be defined in order to migrate"))
 	}
 
 	ctx := context.TODO()
