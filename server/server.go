@@ -488,7 +488,7 @@ func (s *Server) NewListener() (net.Listener, error) {
 		return listener, nil
 	}
 
-	tlsConfig, err := createTLSConfig(tlsOptions{
+	tlsConfig, err := CreateTLSConfig(tlsOptions{
 		Cert:       string(s.Cert),
 		Key:        string(s.Key),
 		Ciphers:    strings.Split(s.TLSCiphers, ","),
@@ -621,7 +621,7 @@ func (s *Server) Serve(ctx context.Context) {
 	} else {
 		var tlsConfig *tls.Config
 		if s.EtcdCert != "" {
-			tlsConfig, err = createTLSConfig(tlsOptions{
+			tlsConfig, err = CreateTLSConfig(tlsOptions{
 				Cert: string(s.EtcdCert),
 				Key:  string(s.EtcdKey),
 			})

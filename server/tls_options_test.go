@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_createTLSConfig(t *testing.T) {
+func Test_CreateTLSConfig(t *testing.T) {
 	var tests = []struct {
 		name string
 		in   tlsOptions
@@ -143,7 +143,7 @@ func Test_createTLSConfig(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			config, err := createTLSConfig(test.in)
+			config, err := CreateTLSConfig(test.in)
 			if test.err == "" {
 				require.Nil(t, err)
 				require.NotNil(t, config.Certificates)
