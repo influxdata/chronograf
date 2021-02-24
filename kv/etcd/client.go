@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"math/rand"
+	"net/url"
 	"time"
 
 	"github.com/influxdata/chronograf"
@@ -135,6 +136,21 @@ func WithTLS(tlsConfig *tls.Config) Option {
 	return func(c *client) error {
 		if tlsConfig != nil {
 			c.config.TLS = tlsConfig
+		}
+		return nil
+	}
+}
+
+// WithURL allows setting host name, user + password and tls.Config from url like
+// "etcd://user:pass@localhost:2379?cert=path_cert&key=path_to_key&cacerts=path_to_certs"
+func WithURL(u *url.URL) Option {
+	return func(c *client) error {
+		if err := WithEndpoints([]string{u.Host})(c); err != nil {
+			return err
+		}
+		pw, _ := u.User.Password()
+		if err := WithLogin(u.User.Username(), pw)(c); err != nil {
+			return err
 		}
 		return nil
 	}
