@@ -22,6 +22,11 @@ func Test_CreateTLSConfig(t *testing.T) {
 			err:  "no TLS certificate specified",
 		},
 		{
+			name: "certificate optional",
+			in:   TLSOptions{CertOptional: true},
+			out:  &tls.Config{},
+		},
+		{
 			name: "missing key",
 			in: TLSOptions{
 				Cert: "tls_options_test.cert",
@@ -33,6 +38,15 @@ func Test_CreateTLSConfig(t *testing.T) {
 			in: TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
+			},
+			out: &tls.Config{}, // certificates are not compared, they only must exist
+		},
+		{
+			name: "cert and key (certOptional)",
+			in: TLSOptions{
+				Cert:         "tls_options_test.cert",
+				Key:          "tls_options_test.key",
+				CertOptional: true,
 			},
 			out: &tls.Config{}, // certificates are not compared, they only must exist
 		},
@@ -146,7 +160,9 @@ func Test_CreateTLSConfig(t *testing.T) {
 			config, err := CreateTLSConfig(test.in)
 			if test.err == "" {
 				require.Nil(t, err)
-				require.NotNil(t, config.Certificates)
+				if !test.in.CertOptional {
+					require.NotNil(t, config.Certificates)
+				}
 				if test.in.CACerts != "" {
 					require.NotNil(t, config.RootCAs)
 					x509Cert, _ := x509.ParseCertificate(config.Certificates[0].Certificate[0])

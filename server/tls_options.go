@@ -25,6 +25,8 @@ type TLSOptions struct {
 	MaxVersion string
 	// CACerts contains Path to CA certificates
 	CACerts string
+	// CertOptional controls whether Cert is optional or not
+	CertOptional bool
 }
 
 var ciphersMap = map[string]uint16{
@@ -67,19 +69,21 @@ var versionsMap = map[string]uint16{
 // CreateTLSConfig creates TLS configuration out of specific TLS
 func CreateTLSConfig(o TLSOptions) (out *tls.Config, err error) {
 	// load key pair
-	if o.Cert == "" {
+	if o.Cert == "" && !o.CertOptional {
 		return nil, errors.New("no TLS certificate specified")
 	}
 	key := o.Key
 	if key == "" {
 		key = o.Cert // If no key is specified, we assume it is in the cert
 	}
-	cert, err := tls.LoadX509KeyPair(o.Cert, key)
-	if err != nil {
-		return nil, err
-	}
 	out = new(tls.Config)
-	out.Certificates = []tls.Certificate{cert}
+	if o.Cert != "" {
+		cert, err := tls.LoadX509KeyPair(o.Cert, key)
+		if err != nil {
+			return nil, err
+		}
+		out.Certificates = []tls.Certificate{cert}
+	}
 
 	// CA certs
 	if o.CACerts != "" {
