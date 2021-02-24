@@ -1,4 +1,4 @@
-package server
+package config_test
 
 import (
 	"crypto/tls"
@@ -6,36 +6,37 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/influxdata/chronograf/server/config"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_CreateTLSConfig(t *testing.T) {
 	var tests = []struct {
 		name string
-		in   TLSOptions
+		in   config.TLSOptions
 		out  *tls.Config
 		err  string
 	}{
 		{
 			name: "empty options",
-			in:   TLSOptions{},
+			in:   config.TLSOptions{},
 			err:  "no TLS certificate specified",
 		},
 		{
 			name: "certificate optional",
-			in:   TLSOptions{CertOptional: true},
+			in:   config.TLSOptions{CertOptional: true},
 			out:  &tls.Config{},
 		},
 		{
 			name: "missing key",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 			},
 			err: "private key",
 		},
 		{
 			name: "cert and key",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 			},
@@ -43,7 +44,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "cert and key (certOptional)",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:         "tls_options_test.cert",
 				Key:          "tls_options_test.key",
 				CertOptional: true,
@@ -52,7 +53,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "minVersion",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MinVersion: "1.1",
@@ -61,7 +62,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "maxVersion",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MaxVersion: "1.2",
@@ -70,7 +71,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "ciphers",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -89,7 +90,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "help on ciphers",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -100,7 +101,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown cipher",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -111,7 +112,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown minVersion",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MinVersion: "0.9",
@@ -120,7 +121,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown maxVersion",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MaxVersion: "f1",
@@ -129,7 +130,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "custom ca certs",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:    "tls_options_test.cert",
 				Key:     "tls_options_test.key",
 				CACerts: "tls_options_test.cert",
@@ -138,7 +139,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown ca certs",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:    "tls_options_test.cert",
 				Key:     "tls_options_test.key",
 				CACerts: "tls_options_test2.cert",
@@ -147,7 +148,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unsupported ca certs",
-			in: TLSOptions{
+			in: config.TLSOptions{
 				Cert:    "tls_options_test.cert",
 				Key:     "tls_options_test.key",
 				CACerts: "tls_options_test.key",
@@ -157,7 +158,7 @@ func Test_CreateTLSConfig(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			config, err := CreateTLSConfig(test.in)
+			config, err := config.CreateTLSConfig(test.in)
 			if test.err == "" {
 				require.Nil(t, err)
 				if !test.in.CertOptional {

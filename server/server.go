@@ -32,6 +32,7 @@ import (
 	"github.com/influxdata/chronograf/kv/etcd"
 	clog "github.com/influxdata/chronograf/log"
 	"github.com/influxdata/chronograf/oauth2"
+	"github.com/influxdata/chronograf/server/config"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
 )
@@ -488,7 +489,7 @@ func (s *Server) NewListener() (net.Listener, error) {
 		return listener, nil
 	}
 
-	tlsConfig, err := CreateTLSConfig(TLSOptions{
+	tlsConfig, err := config.CreateTLSConfig(config.TLSOptions{
 		Cert:       string(s.Cert),
 		Key:        string(s.Key),
 		Ciphers:    strings.Split(s.TLSCiphers, ","),
@@ -621,7 +622,7 @@ func (s *Server) Serve(ctx context.Context) {
 	} else {
 		var tlsConfig *tls.Config
 		if s.EtcdCert != "" {
-			tlsConfig, err = CreateTLSConfig(TLSOptions{
+			tlsConfig, err = config.CreateTLSConfig(config.TLSOptions{
 				Cert: string(s.EtcdCert),
 				Key:  string(s.EtcdKey),
 			})
