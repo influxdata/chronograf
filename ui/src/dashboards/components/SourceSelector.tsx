@@ -28,7 +28,9 @@ function fluxDisabledTooltip(source: SourcesModels.Source): string {
   if (!source.version || source.version.startsWith('2.')) {
     return 'To enable Flux modify the connection to use InfluxDB v2 Auth with an organization and a token.'
   }
-  return 'The current source does not support Flux.'
+  return `The current source does not support Flux.<br>
+  See <a href="https://docs.influxdata.com/influxdb/v1.8/flux/installation/" 
+  target="_blank">https://docs.influxdata.com/influxdb/v1.8/flux/installation/</a>`
 }
 
 const SourceSelector: FunctionComponent<Props> = ({
@@ -68,6 +70,7 @@ const SourceSelector: FunctionComponent<Props> = ({
           onClick={toggleFlux}
           active={!isFluxSelected}
           disabled={!sourceSupportsFlux}
+          disabledTitleText=""
         >
           InfluxQL
         </Radio.Button>
