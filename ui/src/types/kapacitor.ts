@@ -89,7 +89,7 @@ interface AlertNodes {
   opsGenie: OpsGenie[]
   opsGenie2?: OpsGenie[]
   talk: Talk[]
-  serviceNow: ServiceNow
+  serviceNow?: ServiceNow[]
 }
 
 interface Headers {
@@ -142,7 +142,7 @@ interface VictorOps {
 // ServiceNow alert options
 interface ServiceNow {
   node: string
-  type: string
+  _type: string // type name is reserved, it is remap on post/put/get to _type
   resource: string
   metricName: string
   messageKey: string
@@ -274,6 +274,7 @@ export interface KeyMappings {
   pagerduty2: string
   smtp: string
   victorops: string
+  servicenow: string
 }
 
 export interface FieldsFromConfigAlerts {

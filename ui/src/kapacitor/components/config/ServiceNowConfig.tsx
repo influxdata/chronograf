@@ -33,8 +33,6 @@ class SensuConfig extends PureComponent<Props, State> {
   private username: HTMLInputElement
   private password: HTMLInputElement
 
-  private handlePasswordRef = (r: HTMLInputElement) => (this.password = r)
-
   constructor(props) {
     super(props)
     this.state = {
@@ -127,6 +125,8 @@ class SensuConfig extends PureComponent<Props, State> {
       </form>
     )
   }
+
+  private handlePasswordRef = (r: HTMLInputElement) => (this.password = r)
 
   private handleEnabledChange = (e: ChangeEvent<HTMLInputElement>) => {
     this.setState({enabled: e.target.checked})

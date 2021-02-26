@@ -214,6 +214,7 @@ export const MAP_KEYS_FROM_CONFIG: KeyMappings = {
   pagerduty2: 'pagerDuty2',
   smtp: 'email',
   victorops: 'victorOps',
+  servicenow: 'serviceNow',
 }
 
 // ALERTS_FROM_CONFIG the array of fields to accept from Kapacitor Config
@@ -305,10 +306,11 @@ export const HANDLERS_TO_RULE_THEM_ALL: FieldsFromAllAlerts = {
   // snmpTrap: ['trapOid', 'data'], // [oid/type/value]
   serviceNow: [
     'node',
-    'type',
+    'snType',
     'resource',
-    'metricName',
-    'messageKey',
+    'metric_name',
+    'message_key',
     'source',
+    '_type', // serviceNow type, remapped from type on the wire
   ],
 }
