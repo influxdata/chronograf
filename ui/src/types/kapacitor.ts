@@ -89,6 +89,7 @@ interface AlertNodes {
   opsGenie: OpsGenie[]
   opsGenie2?: OpsGenie[]
   talk: Talk[]
+  serviceNow: ServiceNow
 }
 
 interface Headers {
@@ -136,6 +137,16 @@ interface Email {
 // VictorOps sends alerts to the victorops.com service
 interface VictorOps {
   routingKey: string
+}
+
+// ServiceNow alert options
+interface ServiceNow {
+  node: string
+  type: string
+  resource: string
+  metricName: string
+  messageKey: string
+  source: string
 }
 
 // PagerDuty sends alerts to the pagerduty.com service
@@ -280,6 +291,7 @@ export interface FieldsFromConfigAlerts {
   talk: string[]
   telegram: string[]
   victorOps: string[]
+  serviceNow: string[]
 }
 
 export interface FieldsFromAllAlerts extends FieldsFromConfigAlerts {
@@ -417,6 +429,14 @@ export interface VictorOpsProperties {
   enabled: boolean
 }
 
+export interface ServiceNowProperties {
+  url: string
+  source: string
+  username: string
+  password: string
+  enabled: boolean
+}
+
 export type ServiceProperties =
   | AlertaProperties
   | HipChatProperties
@@ -431,6 +451,7 @@ export type ServiceProperties =
   | TalkProperties
   | TelegramProperties
   | VictorOpsProperties
+  | ServiceNowProperties
 
 export type SpecificConfigOptions = Partial<SlackProperties>
 
