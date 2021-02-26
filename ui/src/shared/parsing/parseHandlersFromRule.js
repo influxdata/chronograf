@@ -46,7 +46,7 @@ export const parseAlertNodeList = rule => {
   const nodeList = _.transform(
     rule.alertNodes,
     (acc, v, k) => {
-      if (k in HANDLERS_TO_RULE_THEM_ALL && v.length > 0) {
+      if (k in HANDLERS_TO_RULE_THEM_ALL && v && v.length > 0) {
         let alerts
         switch (k) {
           case AlertTypes.slack:
