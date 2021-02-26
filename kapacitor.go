@@ -4,26 +4,27 @@ import "encoding/json"
 
 // AlertNodes defines all possible kapacitor interactions with an alert.
 type AlertNodes struct {
-	IsStateChangesOnly bool         `json:"stateChangesOnly"` // IsStateChangesOnly will only send alerts on state changes.
-	UseFlapping        bool         `json:"useFlapping"`      // UseFlapping enables flapping detection. Flapping occurs when a service or host changes state too frequently, resulting in a storm of problem and recovery notification
-	Posts              []*Post      `json:"post"`             // HTTPPost  will post the JSON alert data to the specified URLs.
-	TCPs               []*TCP       `json:"tcp"`              // TCP  will send the JSON alert data to the specified endpoint via TCP.
-	Email              []*Email     `json:"email"`            // Email  will send alert data to the specified emails.
-	Exec               []*Exec      `json:"exec"`             // Exec  will run shell commandss when an alert triggers
-	Log                []*Log       `json:"log"`              // Log  will log JSON alert data to files in JSON lines format.
-	VictorOps          []*VictorOps `json:"victorOps"`        // VictorOps  will send alert to all VictorOps
-	PagerDuty          []*PagerDuty `json:"pagerDuty"`        // PagerDuty  will send alert to all PagerDuty
-	PagerDuty2         []*PagerDuty `json:"pagerDuty2"`       // PagerDuty2  will send alert to  PagerDuty v2
-	Pushover           []*Pushover  `json:"pushover"`         // Pushover  will send alert to all Pushover
-	Sensu              []*Sensu     `json:"sensu"`            // Sensu  will send alert to all Sensu
-	Slack              []*Slack     `json:"slack"`            // Slack  will send alert to Slack
-	Telegram           []*Telegram  `json:"telegram"`         // Telegram  will send alert to all Telegram
-	HipChat            []*HipChat   `json:"hipChat"`          // HipChat  will send alert to all HipChat
-	Alerta             []*Alerta    `json:"alerta"`           // Alerta  will send alert to all Alerta
-	OpsGenie           []*OpsGenie  `json:"opsGenie"`         // OpsGenie  will send alert to all OpsGenie
-	OpsGenie2          []*OpsGenie  `json:"opsGenie2"`        // OpsGenie2  will send alert to all OpsGenie v2
-	Talk               []*Talk      `json:"talk"`             // Talk will send alert to all Talk
-	Kafka              []*Kafka     `json:"kafka"`            // Kafka will send alert to all Kafka
+	IsStateChangesOnly bool          `json:"stateChangesOnly"` // IsStateChangesOnly will only send alerts on state changes.
+	UseFlapping        bool          `json:"useFlapping"`      // UseFlapping enables flapping detection. Flapping occurs when a service or host changes state too frequently, resulting in a storm of problem and recovery notification
+	Posts              []*Post       `json:"post"`             // HTTPPost  will post the JSON alert data to the specified URLs.
+	TCPs               []*TCP        `json:"tcp"`              // TCP  will send the JSON alert data to the specified endpoint via TCP.
+	Email              []*Email      `json:"email"`            // Email  will send alert data to the specified emails.
+	Exec               []*Exec       `json:"exec"`             // Exec  will run shell commandss when an alert triggers
+	Log                []*Log        `json:"log"`              // Log  will log JSON alert data to files in JSON lines format.
+	VictorOps          []*VictorOps  `json:"victorOps"`        // VictorOps  will send alert to all VictorOps
+	PagerDuty          []*PagerDuty  `json:"pagerDuty"`        // PagerDuty  will send alert to all PagerDuty
+	PagerDuty2         []*PagerDuty  `json:"pagerDuty2"`       // PagerDuty2  will send alert to  PagerDuty v2
+	Pushover           []*Pushover   `json:"pushover"`         // Pushover  will send alert to all Pushover
+	Sensu              []*Sensu      `json:"sensu"`            // Sensu  will send alert to all Sensu
+	Slack              []*Slack      `json:"slack"`            // Slack  will send alert to Slack
+	Telegram           []*Telegram   `json:"telegram"`         // Telegram  will send alert to all Telegram
+	HipChat            []*HipChat    `json:"hipChat"`          // HipChat  will send alert to all HipChat
+	Alerta             []*Alerta     `json:"alerta"`           // Alerta  will send alert to all Alerta
+	OpsGenie           []*OpsGenie   `json:"opsGenie"`         // OpsGenie  will send alert to all OpsGenie
+	OpsGenie2          []*OpsGenie   `json:"opsGenie2"`        // OpsGenie2  will send alert to all OpsGenie v2
+	Talk               []*Talk       `json:"talk"`             // Talk will send alert to all Talk
+	Kafka              []*Kafka      `json:"kafka"`            // Kafka will send alert to all Kafka
+	ServiceNow         []*ServiceNow `json:"serviceNow"`       // ServiceNow alert options
 }
 
 // Post will POST alerts to a destination URL
@@ -142,6 +143,16 @@ type Kafka struct {
 	Cluster  string `json:"cluster"`
 	Topic    string `json:"kafka-topic"`
 	Template string `json:"template"`
+}
+
+// ServiceNow properties
+type ServiceNow struct {
+	Source     string `json:"source"`
+	Node       string `json:"node"`
+	Type       string `json:"type"`
+	Resource   string `json:"resource"`
+	MetricName string `json:"metric_name"`
+	MessageKey string `json:"message_key"`
 }
 
 // MarshalJSON converts AlertNodes to JSON

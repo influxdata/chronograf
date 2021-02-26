@@ -19,7 +19,17 @@ func AlertServices(rule chronograf.AlertRule) (string, error) {
 	}
 
 	if err := ValidateAlert(node); err != nil {
-		return "", err
+		// workaround for not-yet released fix https://github.com/influxdata/kapacitor/pull/2488
+		// it can be deleted once kapacitor 1.5.9+ is released
+		// can be simply: return "", err
+		if !strings.Contains(err.Error(), `property "servicenow"`) {
+			return "", err
+		}
+		// no method or property "servicenow" on *pipeline.AlertNode
+		node = strings.Replace(node, ".servicenow()", ".serviceNow()", 1)
+		if err2 := ValidateAlert(node); err2 != nil {
+			return "", err
+		}
 	}
 	return node, nil
 }
