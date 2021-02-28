@@ -4517,7 +4517,8 @@
               "smtp",
               "talk",
               "telegram",
-              "tcp"
+              "tcp",
+              "serviceNow"
             ]
           }
         },
