@@ -9,12 +9,14 @@ const outRule = rule => {
     rule.values.value = Math.min(value, rangeValue).toString()
     rule.values.rangeValue = Math.max(value, rangeValue).toString()
   }
-  // remap serviceNow '_type' to 'type' that could not be used
+  // remap serviceNow from '_type' back to 'type', see getRule/getRules
   if (Array.isArray(get(rule, ['alertNodes', 'serviceNow']))) {
     rule = cloneDeep(rule)
-    rule.alertNodes.serviceNow = rule.alertNodes.serviceNow.map(
-      val => ({...val, type: val._type, _type: undefined})
-    )
+    rule.alertNodes.serviceNow = rule.alertNodes.serviceNow.map(val => ({
+      ...val,
+      type: val._type,
+      _type: undefined,
+    }))
   }
 
   return rule
@@ -38,9 +40,11 @@ export const getRules = kapacitor => {
     if (Array.isArray(rules)) {
       rules.forEach(rule => {
         if (Array.isArray(rule.alertNodes.serviceNow)) {
-          rule.alertNodes.serviceNow = rule.alertNodes.serviceNow.map(
-            val => ({...val, _type: val.type, type: undefined})
-          )
+          rule.alertNodes.serviceNow.forEach(x => {
+            if (x.type !== undefined) {
+              x._type = x.type
+            }
+          })
         }
       })
     }
