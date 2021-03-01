@@ -4,6 +4,9 @@
 
 ### Features
 
+1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Event Handler configuration UI.
+1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Alert Handler configuration UI.
+
 ### Other
 
 ## v1.8.10 [2021-02-08]
