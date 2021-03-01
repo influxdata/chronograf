@@ -143,11 +143,12 @@ export const proxy = async (source: Source, script: string) => {
   const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
   const data = {query: garbage, dialect}
+  const base = source.links.flux
 
   try {
     const response = await AJAX({
       method: 'POST',
-      url: `${source.links.flux}?path=/api/v2/query${mark}organization=defaultorgname`,
+      url: `${base}?path=/api/v2/query${mark}organization=defaultorgname`,
       data,
       headers: {'Content-Type': 'application/json'},
     })
