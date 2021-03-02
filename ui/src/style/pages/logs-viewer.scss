@@ -4,7 +4,7 @@
 */
 
 $logs-viewer-graph-height: 170px;
-$logs-viewer-search-height: 46px; 
+$logs-viewer-search-height: 46px;
 $logs-viewer-filter-height: 40px;
 $logs-viewer-results-text-indent: 33px;
 $logs-viewer-gutter: 60px;
@@ -53,6 +53,13 @@ $logs-viewer-gutter: 60px;
       $logs-viewer-filter-height}
   );
   background-color: $g3-castle;
+}
+.logs-viewer--table-only {
+  .logs-viewer--table-container {
+    height: calc(
+      100% - #{$logs-viewer-search-height + $logs-viewer-filter-height}
+    );
+  }
 }
 
 // Search Bar
@@ -111,7 +118,6 @@ $logs-viewer-gutter: 60px;
     font-weight: 900;
   }
 }
-
 
 @keyframes resultsSpinner {
   0% {
@@ -271,7 +277,7 @@ $logs-viewer-gutter: 60px;
   font-family: $code-font;
 
   &.message-wrap {
-    word-break: break-all
+    word-break: break-all;
   }
 }
 .logs-viewer--cell-header {
@@ -342,16 +348,16 @@ $logs-viewer-gutter: 60px;
 
 @keyframes magnifier {
   0% {
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
   }
   25% {
-    transform: translate(0%,-50%);
+    transform: translate(0%, -50%);
   }
   75% {
-    transform: translate(-100%,-50%);
+    transform: translate(-100%, -50%);
   }
   100% {
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -366,10 +372,10 @@ $logs-viewer-gutter: 60px;
 
 @keyframes magRotateB {
   0% {
-    transform: translate(-50%,-50%) rotate(0deg);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
   100% {
-    transform: translate(-50%,-50%) rotate(-360deg);
+    transform: translate(-50%, -50%) rotate(-360deg);
   }
 }
 
@@ -401,7 +407,7 @@ $logs-viewer-gutter: 60px;
   background-image: url('../../assets/images/log.svg');
   width: 50px;
   height: 50px;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
 }
 .logs-viewer--graphic-magnifier-b {
   background-image: url('../../assets/images/magnifier.svg');
@@ -415,5 +421,5 @@ $logs-viewer-gutter: 60px;
   background-image: url('../../assets/images/no-logs.svg');
   width: 60px;
   height: 60px;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
 }

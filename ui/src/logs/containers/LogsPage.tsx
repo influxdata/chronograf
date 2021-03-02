@@ -4,7 +4,7 @@ import uuid from 'uuid'
 import _ from 'lodash'
 import {connect} from 'react-redux'
 import {AutoSizer} from 'react-virtualized'
-import {withRouter, InjectedRouter} from 'react-router'
+import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
 
 // Components
 import LogsHeader from 'src/logs/components/LogsHeader'
@@ -98,7 +98,7 @@ import {
 } from 'src/types/logs'
 import {RemoteDataState} from 'src/types'
 
-interface Props {
+interface Props extends WithRouterProps {
   sources: Source[]
   currentSource: Source | null
   currentNamespaces: Namespace[]
@@ -256,21 +256,34 @@ class LogsPage extends Component<Props, State> {
       currentTailUpperBound,
       searchStatus,
       tableTime,
+      location: {
+        query: {table},
+      },
     } = this.props
 
     if (this.isLoadingSourcesStatus) {
       return <PageSpinner />
     }
 
+    const hideGraph = table !== undefined
+
     return (
       <>
         <div className="page">
           {this.header}
-          <div className="page-contents logs-viewer">
-            <LogsGraphContainer>
-              {this.chartControlBar}
-              {this.chart}
-            </LogsGraphContainer>
+          <div
+            className={`page-contents logs-viewer ${
+              hideGraph ? 'logs-viewer--table-only' : ''
+            }`}
+          >
+            {hideGraph ? (
+              undefined
+            ) : (
+              <LogsGraphContainer>
+                {this.chartControlBar}
+                {this.chart}
+              </LogsGraphContainer>
+            )}
             <SearchBar
               onSearch={this.handleSubmitSearch}
               customTime={tableTime.custom}
