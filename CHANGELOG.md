@@ -13,6 +13,7 @@
 1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to specify trusted CA certificate for ETCD connections.
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Event Handler configuration UI.
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Alert Handler configuration UI.
+1. [#5640](https://github.com/influxdata/chronograf/pull/5640): Allow to hide/show histogram in Log Viewer.
 
 ### Other
 
