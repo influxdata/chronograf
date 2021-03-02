@@ -142,7 +142,7 @@ interface VictorOps {
 // ServiceNow alert options
 interface ServiceNow {
   node: string
-  _type: string // type name is reserved, it is remap on post/put/get to _type
+  _type: string // mapped from kapacitor `type`, type property is reserved
   resource: string
   metricName: string
   messageKey: string
