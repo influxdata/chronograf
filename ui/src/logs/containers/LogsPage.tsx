@@ -301,6 +301,8 @@ class LogsPage extends Component<Props, State> {
               onClearFilters={this.handleClearFilters}
               onUpdateTruncation={this.handleUpdateTruncation}
               isTruncated={this.isTruncated}
+              isHistogramHidden={isHistogramHidden}
+              onShowHistogram={this.handleShowHistogram}
             />
             <LogsTable
               queryCount={this.state.queryCount}
@@ -865,10 +867,19 @@ class LogsPage extends Component<Props, State> {
           searchStatus={searchStatus}
           selectedTimeWindow={timeRange}
         />
-        <TimeWindowDropdown
-          selectedTimeWindow={timeRange}
-          onSetTimeWindow={this.handleSetTimeWindow}
-        />
+        <div className="page-header--right">
+          <button
+            className="btn btn-sm btn-square btn-default"
+            onClick={this.handleHideHistogram}
+            title="Hide Histogram"
+          >
+            <span className="icon eye-closed" />
+          </button>
+          <TimeWindowDropdown
+            selectedTimeWindow={timeRange}
+            onSetTimeWindow={this.handleSetTimeWindow}
+          />
+        </div>
       </div>
     )
   }
@@ -1001,9 +1012,12 @@ class LogsPage extends Component<Props, State> {
   private handleShowHistogram = (): void => {
     this.setState({isHistogramHidden: false, isOverlayVisible: false})
   }
+  private handleHideHistogram = (): void => {
+    this.setState({isHistogramHidden: true})
+  }
 
   private renderImportOverlay = (): JSX.Element => {
-    const {isOverlayVisible, isHistogramHidden} = this.state
+    const {isOverlayVisible} = this.state
 
     return (
       <OverlayTechnology visible={isOverlayVisible}>
@@ -1013,8 +1027,6 @@ class LogsPage extends Component<Props, State> {
           onDismissOverlay={this.handleToggleOverlay}
           columns={this.tableColumns}
           severityFormat={this.severityFormat}
-          histogramHidden={isHistogramHidden}
-          onShowHistogram={this.handleShowHistogram}
         />
       </OverlayTechnology>
     )

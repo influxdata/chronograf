@@ -25,8 +25,6 @@ interface Props {
   onDismissOverlay: () => void
   columns: LogsTableColumn[]
   severityFormat: SeverityFormat
-  histogramHidden: boolean
-  onShowHistogram: () => void
 }
 
 interface State {
@@ -99,17 +97,10 @@ class OptionsOverlay extends Component<Props, State> {
   }
 
   private get overlayActionButtons(): JSX.Element {
-    const {onDismissOverlay, onShowHistogram, histogramHidden} = this.props
+    const {onDismissOverlay} = this.props
 
     return (
       <div className="btn-group--right">
-        {histogramHidden ? (
-          <button className="btn btn-sm btn-info" onClick={onShowHistogram}>
-            Show Histogram
-          </button>
-        ) : (
-          undefined
-        )}
         <button className="btn btn-sm btn-default" onClick={onDismissOverlay}>
           Cancel
         </button>
