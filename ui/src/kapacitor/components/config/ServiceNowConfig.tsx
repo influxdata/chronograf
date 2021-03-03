@@ -27,7 +27,7 @@ interface State {
 }
 
 @ErrorHandling
-class SensuConfig extends PureComponent<Props, State> {
+class ServiceNowConfig extends PureComponent<Props, State> {
   private url: HTMLInputElement
   private source: HTMLInputElement
   private username: HTMLInputElement
@@ -155,4 +155,4 @@ class SensuConfig extends PureComponent<Props, State> {
   }
 }
 
-export default SensuConfig
+export default ServiceNowConfig
