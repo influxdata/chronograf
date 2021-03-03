@@ -18,7 +18,11 @@ export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
     const gitSHAChanged = state.GIT_SHA && state.GIT_SHA !== GIT_SHA
     const npmVersionChanged = state.VERSION && state.VERSION !== VERSION
 
-    if (npmVersionChanged || gitSHAChanged) {
+    if (
+      npmVersionChanged ||
+      gitSHAChanged ||
+      window.location.search === '?clearLocalStorage'
+    ) {
       window.localStorage.removeItem('state')
 
       if (npmVersionChanged) {
