@@ -54,6 +54,7 @@ interface HandlerKind {
   exec?: number
   log?: number
   separator?: number
+  servicenow?: number
 }
 
 interface State {
@@ -91,7 +92,10 @@ class RuleHandlers extends PureComponent<Props, State> {
     const {handlersOnThisAlert, selectedHandler} = this.state
 
     const allHandlers: Handler[] = [...DEFAULT_HANDLERS, ...handlersFromConfig]
-    const mappedHandlers: HandlerWithText[] = this.mapWithNicknames(allHandlers)
+    const mappedHandlers: HandlerWithText[] = _.sortBy(
+      this.mapWithNicknames(allHandlers),
+      'text'
+    )
 
     const mappedHandlersOnThisAlert: HandlerWithText[] = this.mapWithNicknames(
       handlersOnThisAlert

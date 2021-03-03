@@ -33,6 +33,7 @@ import {
   VictorOpsConfig,
   SlackConfigs,
   KafkaConfigs,
+  ServiceNowConfig,
 } from './config'
 
 import {
@@ -387,6 +388,21 @@ class AlertTabs extends PureComponent<Props, State> {
             enabled={this.getConfigEnabled(
               configSections,
               AlertTypes.victorops
+            )}
+          />
+        )
+      case AlertTypes.servicenow:
+        return (
+          <ServiceNowConfig
+            onSave={this.handleSaveConfig(AlertTypes.servicenow)}
+            config={this.getSectionElement(
+              configSections,
+              AlertTypes.servicenow
+            )}
+            onTest={this.handleTestConfig(AlertTypes.servicenow)}
+            enabled={this.getConfigEnabled(
+              configSections,
+              AlertTypes.servicenow
             )}
           />
         )

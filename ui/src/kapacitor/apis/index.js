@@ -1,11 +1,22 @@
 import AJAX from 'utils/ajax'
+import {cloneDeep, get} from 'lodash'
 
-const rangeRule = rule => {
+const outRule = rule => {
+  // fit into range
   const {value, rangeValue, operator} = rule.values
 
   if (operator === 'inside range' || operator === 'outside range') {
     rule.values.value = Math.min(value, rangeValue).toString()
     rule.values.rangeValue = Math.max(value, rangeValue).toString()
+  }
+  // remap serviceNow from '_type' back to 'type', see getRule/getRules
+  if (Array.isArray(get(rule, ['alertNodes', 'serviceNow']))) {
+    rule = cloneDeep(rule)
+    rule.alertNodes.serviceNow = rule.alertNodes.serviceNow.map(val => ({
+      ...val,
+      type: val._type,
+      _type: undefined,
+    }))
   }
 
   return rule
@@ -15,7 +26,7 @@ export const createRule = (kapacitor, rule) => {
   return AJAX({
     method: 'POST',
     url: kapacitor.links.rules,
-    data: rangeRule(rule),
+    data: outRule(rule),
   })
 }
 
@@ -23,15 +34,40 @@ export const getRules = kapacitor => {
   return AJAX({
     method: 'GET',
     url: kapacitor.links.rules,
+  }).then(response => {
+    // remap serviceNow 'type' to '_type', it conflicts with UI property
+    const rules = get(response, ['data', 'rules'])
+    if (Array.isArray(rules)) {
+      rules.forEach(rule => {
+        if (Array.isArray(rule.alertNodes.serviceNow)) {
+          rule.alertNodes.serviceNow.forEach(x => {
+            if (x.type !== undefined) {
+              x._type = x.type
+            }
+          })
+        }
+      })
+    }
+    return response
   })
 }
 
 export const getRule = async (kapacitor, ruleID) => {
   try {
-    return await AJAX({
+    const response = await AJAX({
       method: 'GET',
       url: `${kapacitor.links.rules}/${ruleID}`,
     })
+    // remap serviceNow 'type' to '_type', it conflicts with UI property
+    const serviceNow = get(response, ['data', 'alertNodes', 'serviceNow'])
+    if (Array.isArray(serviceNow)) {
+      serviceNow.forEach(x => {
+        if (x.type !== undefined) {
+          x._type = x.type
+        }
+      })
+    }
+    return response
   } catch (error) {
     console.error(error)
     throw error
@@ -42,7 +78,7 @@ export const editRule = rule => {
   return AJAX({
     method: 'PUT',
     url: rule.links.self,
-    data: rangeRule(rule),
+    data: outRule(rule),
   })
 }
 
@@ -122,9 +158,7 @@ export const getLogStream = kapacitor => {
 export const getLogStreamByRuleID = (kapacitor, ruleID) => {
   // axios doesn't support the chunked transfer encoding response kapacitor uses for logs
   // AJAX adds basepath, but we need to supply it directly to fetch
-  const url = `${
-    kapacitor.links.proxy
-  }?path=/kapacitor/v1preview/logs?task=${ruleID}`
+  const url = `${kapacitor.links.proxy}?path=/kapacitor/v1preview/logs?task=${ruleID}`
   const basepath = window.basepath || ''
 
   return fetch(`${basepath}${url}`, {

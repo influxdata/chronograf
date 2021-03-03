@@ -32,6 +32,7 @@ export enum AlertTypes {
   tcp = 'tcp',
   exec = 'exec',
   log = 'log',
+  servicenow = 'servicenow',
 }
 
 export enum AlertDisplayText {
@@ -49,6 +50,7 @@ export enum AlertDisplayText {
   talk = 'Talk',
   telegram = 'Telegram',
   victorops = 'VictorOps',
+  servicenow = 'ServiceNow',
 }
 
 export const SupportedServices: string[] = [
@@ -61,6 +63,7 @@ export const SupportedServices: string[] = [
   'pagerduty2',
   'pushover',
   'sensu',
+  'servicenow',
   'slack',
   'smtp',
   'talk',
@@ -211,6 +214,7 @@ export const MAP_KEYS_FROM_CONFIG: KeyMappings = {
   pagerduty2: 'pagerDuty2',
   smtp: 'email',
   victorops: 'victorOps',
+  servicenow: 'serviceNow',
 }
 
 // ALERTS_FROM_CONFIG the array of fields to accept from Kapacitor Config
@@ -238,6 +242,7 @@ export const ALERTS_FROM_CONFIG: FieldsFromConfigAlerts = {
   // snmpTrap: ['trapOid', 'data'], // [oid/type/value]
   // influxdb:[],
   // mqtt:[]
+  serviceNow: ['url', 'source', 'username', 'password'],
 }
 
 export const MAP_FIELD_KEYS_FROM_CONFIG: ConfigKeyMaps = {
@@ -262,6 +267,7 @@ export const MAP_FIELD_KEYS_FROM_CONFIG: ConfigKeyMaps = {
   // snmpTrap: {},
   // influxd: {},
   // mqtt: {}
+  serviceNow: {},
 }
 
 // HANDLERS_TO_RULE returns array of fields that may be updated for each alert on rule.
@@ -298,4 +304,13 @@ export const HANDLERS_TO_RULE_THEM_ALL: FieldsFromAllAlerts = {
   exec: ['command'],
   log: ['filePath'],
   // snmpTrap: ['trapOid', 'data'], // [oid/type/value]
+  serviceNow: [
+    'node',
+    'snType',
+    'resource',
+    'metric_name',
+    'message_key',
+    'source',
+    '_type', // serviceNow type, remapped from type on the wire
+  ],
 }

@@ -18,6 +18,7 @@ import {
   TalkHandler,
   TelegramHandler,
   VictoropsHandler,
+  ServiceNowHandler,
 } from 'src/kapacitor/components/handlers'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -189,6 +190,15 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('victorops')}
+            validationError={validationError}
+          />
+        )
+      case 'serviceNow':
+        return (
+          <ServiceNowHandler
+            selectedHandler={selectedHandler}
+            handleModifyHandler={handleModifyHandler}
+            onGoToConfig={onGoToConfig('servicenow')}
             validationError={validationError}
           />
         )

@@ -15,6 +15,7 @@ import EmailHandler from './EmailHandler'
 import TalkHandler from './TalkHandler'
 import TelegramHandler from './TelegramHandler'
 import VictoropsHandler from './VictoropsHandler'
+import ServiceNowHandler from './ServiceNowHandler'
 
 export {
   PostHandler,
@@ -34,4 +35,5 @@ export {
   TalkHandler,
   TelegramHandler,
   VictoropsHandler,
+  ServiceNowHandler,
 }
