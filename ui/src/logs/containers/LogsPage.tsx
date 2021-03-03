@@ -61,6 +61,7 @@ import {
   clearSearchData,
   setSearchStatus,
   executeHistogramQueryAsync,
+  populateNamespacesAsync,
 } from 'src/logs/actions'
 import {getSourcesAsync} from 'src/shared/actions/sources'
 
@@ -140,6 +141,7 @@ interface Props {
   fetchNewerChunkAsync: typeof fetchNewerChunkAsync
   fetchTailAsync: typeof fetchTailAsync
   fetchNamespaceSyslogStatusAsync: typeof fetchNamespaceSyslogStatusAsync
+  populateNamespacesAsync: typeof populateNamespacesAsync
   flushTailBuffer: typeof flushTailBuffer
   clearAllTimeBounds: typeof clearAllTimeBounds
   setNextTailLowerBound: typeof setNextTailLowerBound
@@ -340,9 +342,10 @@ class LogsPage extends Component<Props, State> {
           return src.default
         }) || this.props.sources[0]
 
-      return await this.props.getSourceAndPopulateNamespaces(source.id)
+      return this.props.getSourceAndPopulateNamespaces(source.id)
     } else if (this.props.currentNamespace) {
-      return this.props.fetchNamespaceSyslogStatusAsync(
+      return this.props.populateNamespacesAsync(
+        this.props.currentSource,
         this.props.currentNamespace
       )
     }
@@ -1191,6 +1194,7 @@ const mapDispatchToProps = {
   getConfig: getLogConfigAsync,
   updateConfig: updateLogConfigAsync,
   notify: notifyAction,
+  populateNamespacesAsync,
 }
 
 export default withRouter(
