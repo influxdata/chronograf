@@ -89,6 +89,7 @@ interface AlertNodes {
   opsGenie2?: OpsGenie[]
   talk: Talk[]
   serviceNow?: ServiceNow[]
+  bigPanda?: BigPanda[]
 }
 
 interface Headers {
@@ -146,6 +147,13 @@ interface ServiceNow {
   metricName: string
   messageKey: string
   source: string
+}
+
+// BigPanda alert options
+interface BigPanda {
+  'app-key': string
+  'primary-property': string
+  'secondary-property': string
 }
 
 // PagerDuty sends alerts to the pagerduty.com service
@@ -285,6 +293,7 @@ export interface FieldsFromConfigAlerts {
   telegram: string[]
   victorOps: string[]
   serviceNow: string[]
+  bigPanda: string[]
 }
 
 export interface FieldsFromAllAlerts extends FieldsFromConfigAlerts {
@@ -424,6 +433,14 @@ export interface ServiceNowProperties {
   enabled: boolean
 }
 
+export interface BigPandaProperties {
+  url: string
+  token: string
+  'app-key': string
+  'insecure-skip-verify': boolean
+  enabled: boolean
+}
+
 export type ServiceProperties =
   | AlertaProperties
   | KafkaProperties
@@ -438,6 +455,7 @@ export type ServiceProperties =
   | TelegramProperties
   | VictorOpsProperties
   | ServiceNowProperties
+  | BigPandaProperties
 
 export type SpecificConfigOptions = Partial<SlackProperties & KafkaProperties>
 

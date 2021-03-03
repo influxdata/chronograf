@@ -13,6 +13,7 @@ import VictorOpsConfig from './VictorOpsConfig'
 import SlackConfigs from './SlackConfigs'
 import KafkaConfigs from './KafkaConfigs'
 import ServiceNowConfig from './ServiceNowConfig'
+import BigPandaConfig from './BigPandaConfig'
 
 export {
   AlertaConfig,
@@ -30,4 +31,5 @@ export {
   SlackConfigs,
   KafkaConfigs,
   ServiceNowConfig,
+  BigPandaConfig,
 }

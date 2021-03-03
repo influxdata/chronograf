@@ -32,6 +32,7 @@ export enum AlertTypes {
   exec = 'exec',
   log = 'log',
   servicenow = 'servicenow',
+  bigpanda = 'bigpanda',
 }
 
 export enum AlertDisplayText {
@@ -49,10 +50,12 @@ export enum AlertDisplayText {
   telegram = 'Telegram',
   victorops = 'VictorOps',
   servicenow = 'ServiceNow',
+  bigpanda = 'BigPanda',
 }
 
 export const SupportedServices: string[] = [
   'alerta',
+  'bigpanda',
   'kafka',
   'opsgenie',
   'opsgenie2',
@@ -238,6 +241,7 @@ export const ALERTS_FROM_CONFIG: FieldsFromConfigAlerts = {
   // influxdb:[],
   // mqtt:[]
   serviceNow: ['url', 'source', 'username', 'password'],
+  bigPanda: ['app-key'],
 }
 
 export const MAP_FIELD_KEYS_FROM_CONFIG: ConfigKeyMaps = {
@@ -262,6 +266,7 @@ export const MAP_FIELD_KEYS_FROM_CONFIG: ConfigKeyMaps = {
   // influxd: {},
   // mqtt: {}
   serviceNow: {},
+  bigPanda: {},
 }
 
 // HANDLERS_TO_RULE returns array of fields that may be updated for each alert on rule.
@@ -299,11 +304,11 @@ export const HANDLERS_TO_RULE_THEM_ALL: FieldsFromAllAlerts = {
   // snmpTrap: ['trapOid', 'data'], // [oid/type/value]
   serviceNow: [
     'node',
-    'snType',
     'resource',
     'metric_name',
     'message_key',
     'source',
     '_type', // serviceNow type, remapped from type on the wire
   ],
+  bigPanda: ['app-key', 'primary-property', 'secondary-property'],
 }
