@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+1. [#5677](https://github.com/influxdata/chronograf/pull/5677): Open event handler configuration specified in URL hash.
+
 ### Features
 
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Event Handler configuration UI.

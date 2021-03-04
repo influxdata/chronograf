@@ -600,7 +600,7 @@ class AlertTabs extends PureComponent<Props, State> {
   }
 
   private getInitialIndex = (hash: string): number => {
-    const index = _.indexOf(_.keys(SupportedServices), _.replace(hash, '#', ''))
+    const index = _.indexOf(SupportedServices, _.replace(hash, '#', ''))
     return index >= 0 ? index : 0
   }
 
