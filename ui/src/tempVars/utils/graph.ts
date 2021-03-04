@@ -126,7 +126,7 @@ export function graphFromTemplates(templates: Template[]): TemplateGraph {
 
 export function topologicalSort(nodes: TemplateGraph): TemplateGraph {
   const acc = []
-  const seen = new Set()
+  const seen = new Set<TemplateNode>()
 
   for (const node of nodes) {
     if (!seen.has(node)) {
