@@ -1,43 +1,59 @@
-package server
+package config_test
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"testing"
 
+	"github.com/influxdata/chronograf/server/config"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_createTLSConfig(t *testing.T) {
+func Test_CreateTLSConfig(t *testing.T) {
 	var tests = []struct {
 		name string
-		in   tlsOptions
+		in   config.TLSOptions
 		out  *tls.Config
 		err  string
 	}{
 		{
 			name: "empty options",
-			in:   tlsOptions{},
+			in:   config.TLSOptions{},
 			err:  "no TLS certificate specified",
 		},
 		{
+			name: "certificate optional",
+			in:   config.TLSOptions{CertOptional: true},
+			out:  &tls.Config{},
+		},
+		{
 			name: "missing key",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 			},
 			err: "private key",
 		},
 		{
 			name: "cert and key",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 			},
 			out: &tls.Config{}, // certificates are not compared, they only must exist
 		},
 		{
+			name: "cert and key (certOptional)",
+			in: config.TLSOptions{
+				Cert:         "tls_options_test.cert",
+				Key:          "tls_options_test.key",
+				CertOptional: true,
+			},
+			out: &tls.Config{}, // certificates are not compared, they only must exist
+		},
+		{
 			name: "minVersion",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MinVersion: "1.1",
@@ -46,7 +62,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "maxVersion",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MaxVersion: "1.2",
@@ -55,7 +71,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "ciphers",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -74,7 +90,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "help on ciphers",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -85,7 +101,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown cipher",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert: "tls_options_test.cert",
 				Key:  "tls_options_test.key",
 				Ciphers: []string{
@@ -96,7 +112,7 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown minVersion",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MinVersion: "0.9",
@@ -105,21 +121,56 @@ func Test_createTLSConfig(t *testing.T) {
 		},
 		{
 			name: "unknown maxVersion",
-			in: tlsOptions{
+			in: config.TLSOptions{
 				Cert:       "tls_options_test.cert",
 				Key:        "tls_options_test.key",
 				MaxVersion: "f1",
 			},
 			err: `unknown maximum TLS version: "f1". available versions: 1.0, `, // + + other versions follow
 		},
+		{
+			name: "custom ca certs",
+			in: config.TLSOptions{
+				Cert:    "tls_options_test.cert",
+				Key:     "tls_options_test.key",
+				CACerts: "tls_options_test.cert",
+			},
+			out: &tls.Config{}, // certificates are compared
+		},
+		{
+			name: "unknown ca certs",
+			in: config.TLSOptions{
+				Cert:    "tls_options_test.cert",
+				Key:     "tls_options_test.key",
+				CACerts: "tls_options_test2.cert",
+			},
+			err: "open tls_options_test2.cert: no such file or directory",
+		},
+		{
+			name: "unsupported ca certs",
+			in: config.TLSOptions{
+				Cert:    "tls_options_test.cert",
+				Key:     "tls_options_test.key",
+				CACerts: "tls_options_test.key",
+			},
+			err: "error appending CA certificates from tls_options_test.key",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			config, err := createTLSConfig(test.in)
+			config, err := config.CreateTLSConfig(test.in)
 			if test.err == "" {
 				require.Nil(t, err)
-				require.NotNil(t, config.Certificates)
+				if !test.in.CertOptional {
+					require.NotNil(t, config.Certificates)
+				}
+				if test.in.CACerts != "" {
+					require.NotNil(t, config.RootCAs)
+					x509Cert, _ := x509.ParseCertificate(config.Certificates[0].Certificate[0])
+					require.Equal(t, config.RootCAs.Subjects()[0], x509Cert.RawSubject)
+				}
 				config.Certificates = nil // we don't want to compare certificates
+				config.RootCAs = nil      // and also root CA certs
 				require.Equal(t, test.out, config)
 			} else {
 				require.NotNil(t, err)

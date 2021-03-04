@@ -2,7 +2,9 @@ package etcd
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -11,6 +13,7 @@ import (
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/mocks"
 	"github.com/stretchr/testify/require"
+	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/embed"
 )
 
@@ -78,4 +81,84 @@ func TestEtcd(t *testing.T) {
 	require.Equal(t, "test", srcs[0].Name)
 
 	require.NoError(t, s.SourcesStore().Delete(ctx, src))
+}
+
+func Test_WithURL(t *testing.T) {
+	parse := func(val string) *url.URL {
+		url, err := url.Parse(val)
+		if err != nil {
+			require.NoError(t, err)
+		}
+		return url
+	}
+
+	var tests = []struct {
+		url    *url.URL
+		config clientv3.Config
+		err    string
+	}{
+		{
+			url: parse("etcd://u:p@127.0.0.1:2379"),
+			config: clientv3.Config{
+				Endpoints: []string{"127.0.0.1:2379"},
+				Username:  "u",
+				Password:  "p",
+			},
+		},
+		{
+			url: parse("etcds://u:p@127.0.0.1:2379"),
+			config: clientv3.Config{
+				Endpoints: []string{"https://127.0.0.1:2379"},
+				Username:  "u",
+				Password:  "p",
+			},
+		},
+		{
+			url: parse("etcd://u:p@127.0.0.1:2379?ca=a&ca=b"),
+			err: "query parameter 'ca' can appear at most once",
+		},
+		{
+			url: parse("etcd://u:p@127.0.0.1:2379?cert=a&key=b&ca=c"),
+			err: "no such file or directory",
+		},
+		{
+			url: parse("etcd://a:b@1.2.3.4:5555?ca=test.crt&key=test.key&cert=test.crt"),
+			config: clientv3.Config{
+				Endpoints: []string{"1.2.3.4:5555"},
+				Username:  "a",
+				Password:  "b",
+			},
+		},
+		{
+			url: parse("etcd://a:b@1.2.3.4:5555?ca=test.crt&cert=test.crt&key=test.key"),
+			config: clientv3.Config{
+				Endpoints: []string{"1.2.3.4:5555"},
+				Username:  "a",
+				Password:  "b",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.url.String(), func(t *testing.T) {
+			c := &client{}
+			err := WithURL(test.url)(c)
+			if test.err == "" {
+				require.NoError(t, err)
+				tlsConfig := c.config.TLS
+				c.config.TLS = nil
+				require.Equal(t, c.config, test.config)
+				if test.url.Query().Get("ca") != "" {
+					require.NotNil(t, tlsConfig.RootCAs)
+				}
+				if test.url.Query().Get("cert") != "" {
+					require.Equal(t, len(tlsConfig.Certificates), 1)
+				}
+			} else {
+				require.NotNil(t, err)
+				// Contains is used, because nested exceptions can evolve with go versions
+				require.Contains(t, fmt.Sprintf("%v", err), test.err)
+			}
+		})
+	}
 }

@@ -1,14 +1,18 @@
-package server
+package config
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"sort"
 	"strings"
 )
 
-type tlsOptions struct {
+// TLSOptions specifies several key options that create TLS Configuration
+type TLSOptions struct {
 	// Cert contains path to PEM encoded public key certificate
 	Cert string
 	// Key contains Path to private key associated with given certificate.
@@ -19,6 +23,10 @@ type tlsOptions struct {
 	MinVersion string
 	// MaxVersion of TLS to be negotiated with the client, no value means no maximum.
 	MaxVersion string
+	// CACerts contains Path to CA certificates
+	CACerts string
+	// CertOptional controls whether Cert is optional or not
+	CertOptional bool
 }
 
 var ciphersMap = map[string]uint16{
@@ -58,22 +66,44 @@ var versionsMap = map[string]uint16{
 	"1.3": tls.VersionTLS13,
 }
 
-func createTLSConfig(o tlsOptions) (out *tls.Config, err error) {
+// CreateTLSConfig creates TLS configuration out of specific TLS
+func CreateTLSConfig(o TLSOptions) (out *tls.Config, err error) {
 	// load key pair
-	if o.Cert == "" {
+	if o.Cert == "" && !o.CertOptional {
 		return nil, errors.New("no TLS certificate specified")
-
 	}
 	key := o.Key
 	if key == "" {
 		key = o.Cert // If no key is specified, we assume it is in the cert
 	}
-	cert, err := tls.LoadX509KeyPair(o.Cert, key)
-	if err != nil {
-		return nil, err
-	}
 	out = new(tls.Config)
-	out.Certificates = []tls.Certificate{cert}
+	if o.Cert != "" {
+		cert, err := tls.LoadX509KeyPair(o.Cert, key)
+		if err != nil {
+			return nil, err
+		}
+		out.Certificates = []tls.Certificate{cert}
+	}
+
+	// CA certs
+	if o.CACerts != "" {
+		f, err := os.Open(o.CACerts)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		certPool := x509.NewCertPool()
+		certs, err := ioutil.ReadAll(f)
+		if err != nil {
+			return nil, fmt.Errorf("error reading CA certificates: %s", err.Error())
+		}
+
+		ok := certPool.AppendCertsFromPEM(certs)
+		if !ok {
+			return nil, fmt.Errorf("error appending CA certificates from %s", o.CACerts)
+		}
+		out.RootCAs = certPool
+	}
 
 	// ciphers
 	if len(o.Ciphers) > 0 {

@@ -6,6 +6,8 @@
 
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Event Handler configuration UI.
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Alert Handler configuration UI.
+1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to migrate data to ectd over HTTPS.
+1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to specify trusted CA certificate for ETCD connections.
 
 ### Other
 
