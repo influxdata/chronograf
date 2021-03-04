@@ -53,7 +53,7 @@ export const sortColumns = (columns: ServerColumn[]): ServerColumn[] => {
 
 export const columnServerToUI = (column: ServerColumn): LogsTableColumn => {
   const internalName = column.name
-  const encodings: LogsTableColumn = column.encodings.reduce(
+  const encodings: LogsTableColumn = column.encodings.reduce<LogsTableColumn>(
     (acc, e) => {
       if (
         e.type === EncodingTypes.visibility &&
