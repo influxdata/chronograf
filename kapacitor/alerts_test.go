@@ -9,6 +9,7 @@ import (
 func TestAlertServices(t *testing.T) {
 	tests := []struct {
 		name    string
+		skip    string
 		rule    chronograf.AlertRule
 		want    chronograf.TICKScript
 		wantErr bool
@@ -165,24 +166,48 @@ func TestAlertServices(t *testing.T) {
         .messageKey('f')
 `,
 		},
+		{
+			name: "Test BigPanda",
+			skip: "Does not work fine with kapacitor 1.5.8 (https://github.com/influxdata/kapacitor/pull/#2491)",
+			rule: chronograf.AlertRule{
+				AlertNodes: chronograf.AlertNodes{
+					BigPanda: []*chronograf.BigPanda{{
+						AppKey:            "a",
+						PrimaryProperty:   "b",
+						SecondaryProperty: "c",
+					}},
+				},
+			},
+			want: `alert()
+        .bigPanda()
+        .appKey('a')
+        .primaryProperty('b')
+        .secondaryProperty('c')
+`,
+		},
 	}
 	for _, tt := range tests {
-		got, err := AlertServices(tt.rule)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. AlertServices() error = %v, wantErr %v", tt.name, err, tt.wantErr)
-			continue
-		}
-		if tt.wantErr {
-			continue
-		}
-		formatted, err := formatTick("alert()" + got)
-		if err != nil {
-			t.Errorf("%q. formatTick() error = %v", tt.name, err)
-			continue
-		}
-		if formatted != tt.want {
-			t.Errorf("%q. AlertServices() = %v, want %v", tt.name, formatted, tt.want)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.skip != "" {
+				t.Skip(tt.skip)
+			}
+			got, err := AlertServices(tt.rule)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("%q. AlertServices() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+				return
+			}
+			if tt.wantErr {
+				return
+			}
+			formatted, err := formatTick("alert()" + got)
+			if err != nil {
+				t.Errorf("%q. formatTick() error = %v", tt.name, err)
+				return
+			}
+			if formatted != tt.want {
+				t.Errorf("%q. AlertServices() = %v, want %v", tt.name, formatted, tt.want)
+			}
+		})
 	}
 }
 
