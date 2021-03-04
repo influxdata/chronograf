@@ -24,6 +24,8 @@ interface State {
   searchTerm: string
 }
 
+const excludedTagKeys = ['_measurement', '_field', '_start', '_stop']
+
 @ErrorHandling
 class TagKeyList extends PureComponent<Props, State> {
   constructor(props: Props) {
@@ -55,7 +57,6 @@ class TagKeyList extends PureComponent<Props, State> {
       return <LoaderSkeleton />
     }
 
-    const excludedTagKeys = ['_measurement', '_field']
     const tagKeys = this.props.tagKeys.filter(
       tk => !excludedTagKeys.includes(tk)
     )
