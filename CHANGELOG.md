@@ -11,6 +11,8 @@
 
 ### Other
 
+1. [#5673](https://github.com/influxdata/chronograf/pull/5673): Add documentation link when 1.8 flux is not installed.
+
 ## v1.8.10 [2021-02-08]
 
 ### Bug Fixes

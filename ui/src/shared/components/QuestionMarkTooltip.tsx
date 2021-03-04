@@ -12,6 +12,8 @@ const QuestionMarkTooltip: FunctionComponent<Props> = ({tipID, tipContent}) => (
       className="question-mark-tooltip--icon"
       data-for={`${tipID}-tooltip`}
       data-tip={tipContent}
+      data-delay-hide="100"
+      data-delay-show="50"
     >
       ?
     </div>
