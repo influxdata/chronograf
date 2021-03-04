@@ -34,7 +34,7 @@ export function getDependencyNames(template: Template): TemplateName[] {
     return getDependencyNamesHelper(template.query.influxql)
   }
 
-  const names = new Set()
+  const names = new Set<string>()
 
   for (const {value} of template.values) {
     for (const name of getDependencyNamesHelper(value)) {
@@ -126,7 +126,7 @@ export function graphFromTemplates(templates: Template[]): TemplateGraph {
 
 export function topologicalSort(nodes: TemplateGraph): TemplateGraph {
   const acc = []
-  const seen = new Set()
+  const seen = new Set<TemplateNode>()
 
   for (const node of nodes) {
     if (!seen.has(node)) {
