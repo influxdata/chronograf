@@ -24,6 +24,11 @@ export const timeSeriesToDygraphWork = (
     raw,
     isTable
   )
+  // InfluxQL metaquery has no sortedTimeSeries and therefore cannot
+  // be ever processed
+  if (!sortedTimeSeries) {
+    return null
+  }
 
   const labels = [
     'time',

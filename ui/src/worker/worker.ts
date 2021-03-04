@@ -45,7 +45,11 @@ onmessage = async (workerMessage: WorkerMessage) => {
     success(data, result)
   } catch (e) {
     const {type, id} = data
-    console.error(`Worker job (type=${type} id=${id}) failed`, e)
+    console.error(
+      `Worker job (type=${type} id=${id}) failed`,
+      e,
+      JSON.stringify(workerMessage)
+    )
     error(data, e)
   }
 }
