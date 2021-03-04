@@ -88,6 +88,7 @@ type Server struct {
 	EtcdRequestTimeout time.Duration  `long:"etcd-request-timeout" default:"-1s" description:"Total time to wait before timing out the etcd view or update. 0 means no timeout." env:"ETCD_REQUEST_TIMEOUT"`
 	EtcdCert           flags.Filename `long:"etcd-cert" description:"Path to PEM encoded TLS public key certificate. " env:"ETCD_CERTIFICATE"`
 	EtcdKey            flags.Filename `long:"etcd-key" description:"Path to private key associated with given certificate. " env:"ETCD_PRIVATE_KEY"`
+	EtcdRootCA         flags.Filename `long:"etcd-root-ca" description:"File location of root CA cert for TLS verification." env:"ETCD_ROOT_CA"`
 
 	GoogleClientID     string   `long:"google-client-id" description:"Google Client ID for OAuth 2 support" env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string   `long:"google-client-secret" description:"Google Client Secret for OAuth 2 support" env:"GOOGLE_CLIENT_SECRET"`
@@ -623,8 +624,9 @@ func (s *Server) Serve(ctx context.Context) {
 		var tlsConfig *tls.Config
 		if s.EtcdCert != "" {
 			tlsConfig, err = config.CreateTLSConfig(config.TLSOptions{
-				Cert: string(s.EtcdCert),
-				Key:  string(s.EtcdKey),
+				Cert:    string(s.EtcdCert),
+				Key:     string(s.EtcdKey),
+				CACerts: string(s.EtcdRootCA),
 			})
 			if err != nil {
 				logger.Error("Unable to create TLS configuration for etcd client", err)
