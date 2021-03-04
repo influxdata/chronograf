@@ -24,6 +24,7 @@ type AlertNodes struct {
 	Talk               []*Talk       `json:"talk"`             // Talk will send alert to all Talk
 	Kafka              []*Kafka      `json:"kafka"`            // Kafka will send alert to all Kafka
 	ServiceNow         []*ServiceNow `json:"serviceNow"`       // ServiceNow alert options
+	BigPanda           []*BigPanda   `json:"bigPanda"`         // BigPanda alert options
 }
 
 // Post will POST alerts to a destination URL
@@ -146,6 +147,13 @@ type ServiceNow struct {
 	Resource   string `json:"resource"`
 	MetricName string `json:"metric_name"`
 	MessageKey string `json:"message_key"`
+}
+
+// BigPanda properties
+type BigPanda struct {
+	AppKey            string `json:"app-key"`
+	PrimaryProperty   string `json:"primary-property"`
+	SecondaryProperty string `json:"secondary-property"`
 }
 
 // MarshalJSON converts AlertNodes to JSON
