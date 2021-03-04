@@ -60,6 +60,7 @@ const parseHandlersFromConfig = config => {
       return _.get(MAP_FIELD_KEYS_FROM_CONFIG[h.type], k, k)
     })
   })
+  console.log(config, allHandlers, mappedHandlers, allowedHandlers, pickedHandlers, fieldKeyMappedHandlers)
 
   return fieldKeyMappedHandlers
 }

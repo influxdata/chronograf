@@ -214,6 +214,7 @@ export const MAP_KEYS_FROM_CONFIG: KeyMappings = {
   smtp: 'email',
   victorops: 'victorOps',
   servicenow: 'serviceNow',
+  bigpanda: 'bigPanda',
 }
 
 // ALERTS_FROM_CONFIG the array of fields to accept from Kapacitor Config
