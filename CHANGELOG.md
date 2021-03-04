@@ -7,6 +7,7 @@
 1. [#5679](https://github.com/influxdata/chronograf/pull/5679): Dispose log stream when tickscript editor page is closed.
 1. [#5680](https://github.com/influxdata/chronograf/pull/5680): Generate correct flux property expressions.
 1. [#5683](https://github.com/influxdata/chronograf/pull/5683): Repair stale database list in Log Viewer.
+1. [#5686](https://github.com/influxdata/chronograf/pull/5686): Exclude `_start` and `_stop` tags.
 
 ### Features
 
