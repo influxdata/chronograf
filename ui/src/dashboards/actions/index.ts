@@ -658,7 +658,7 @@ export const importDashboardAsync = (dashboard: Dashboard) => async (
 
     dispatch(loadDashboards(dashboards))
 
-    dispatch(notify(notifyDashboardImported(name)))
+    dispatch(notify(notifyDashboardImported()))
   } catch (error) {
     const errorMessage = _.get(
       error,

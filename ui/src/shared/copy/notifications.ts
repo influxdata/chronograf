@@ -500,10 +500,10 @@ export const notifyDashboardExportFailed = (
   message: `Failed to export Dashboard ${name}: ${errorMessage}.`,
 })
 
-export const notifyDashboardImported = (name: string): Notification => ({
+export const notifyDashboardImported = (): Notification => ({
   ...defaultSuccessNotification,
   icon: 'dash-h',
-  message: `Dashboard ${name} imported successfully.`,
+  message: `Dashboard imported successfully.`,
 })
 
 export const notifyDashboardImportFailed = (
