@@ -4,6 +4,7 @@
 
 1. [#5677](https://github.com/influxdata/chronograf/pull/5677): Open event handler configuration specified in URL hash.
 1. [#5678](https://github.com/influxdata/chronograf/pull/5678): Do not log error during line visualization of meta query results.
+1. [#5679](https://github.com/influxdata/chronograf/pull/5679): Dispose log stream when Tickscript editor page is closed.
 
 ### Features
 
