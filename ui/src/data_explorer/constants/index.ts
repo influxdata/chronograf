@@ -99,6 +99,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Field Keys',
+    text: 'Show Field Keys',
+    query: 'SHOW FIELD KEYS ON "db_name"',
+    type: DropdownChildTypes.Item,
+  },
+  {
     id: 'Show Field Key Cardinality',
     text: 'Show Field Key Cardinality',
     query: 'SHOW FIELD KEY CARDINALITY ON "db_name"',
