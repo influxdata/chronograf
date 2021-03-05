@@ -250,6 +250,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
+    id: 'Explain Analyze',
+    text: 'Explain Analyze',
+    query: 'EXPLAIN ANALYZE SELECT * FROM "db_name"."rp_name"."measurement"',
+    type: DropdownChildTypes.Item,
+  },
+  {
     id: `mqtd-divider-8`,
     type: DropdownChildTypes.Divider,
   },
