@@ -4,15 +4,15 @@
 
 1. [#5677](https://github.com/influxdata/chronograf/pull/5677): Open event handler configuration specified in URL hash.
 1. [#5678](https://github.com/influxdata/chronograf/pull/5678): Do not log error during line visualization of meta query results.
-1. [#5679](https://github.com/influxdata/chronograf/pull/5679): Dispose log stream when Tickscript editor page is closed.
+1. [#5679](https://github.com/influxdata/chronograf/pull/5679): Dispose log stream when tickscript editor page is closed.
 1. [#5680](https://github.com/influxdata/chronograf/pull/5680): Generate correct flux property expressions.
 
 ### Features
 
+1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to migrate data to ECTCD over HTTPS.
+1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to specify trusted CA certificate for ETCD connections.
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Event Handler configuration UI.
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Alert Handler configuration UI.
-1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to migrate data to ectd over HTTPS.
-1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to specify trusted CA certificate for ETCD connections.
 
 ### Other
 
