@@ -10,6 +10,8 @@ interface Props {
   onFilterChange: (id: string, operator: string, value: string) => void
   onUpdateTruncation: (isTruncated: boolean) => Promise<void>
   isTruncated: boolean
+  isHistogramHidden: boolean
+  onShowHistogram: () => void
 }
 
 class LogsFilters extends PureComponent<Props> {
@@ -40,29 +42,47 @@ class LogsFilters extends PureComponent<Props> {
   }
 
   private get truncationToggle(): JSX.Element {
-    const {isTruncated, onUpdateTruncation} = this.props
+    const {
+      isTruncated,
+      onUpdateTruncation,
+      isHistogramHidden,
+      onShowHistogram,
+    } = this.props
 
     return (
-      <Radio>
-        <Radio.Button
-          id="logs-truncation--truncate"
-          active={isTruncated === true}
-          value={true}
-          titleText="Truncate log messages when they exceed 1 line"
-          onClick={onUpdateTruncation}
-        >
-          Truncate
-        </Radio.Button>
-        <Radio.Button
-          id="logs-truncation--multi"
-          active={isTruncated === false}
-          value={false}
-          titleText="Allow log messages to wrap text"
-          onClick={onUpdateTruncation}
-        >
-          Wrap
-        </Radio.Button>
-      </Radio>
+      <div className="page-header--right">
+        {isHistogramHidden ? (
+          <button
+            className="btn btn-sm btn-square btn-default"
+            onClick={onShowHistogram}
+            title="Show Histogram"
+          >
+            <span className="icon bar-chart" />
+          </button>
+        ) : (
+          undefined
+        )}
+        <Radio>
+          <Radio.Button
+            id="logs-truncation--truncate"
+            active={isTruncated === true}
+            value={true}
+            titleText="Truncate log messages when they exceed 1 line"
+            onClick={onUpdateTruncation}
+          >
+            Truncate
+          </Radio.Button>
+          <Radio.Button
+            id="logs-truncation--multi"
+            active={isTruncated === false}
+            value={false}
+            titleText="Allow log messages to wrap text"
+            onClick={onUpdateTruncation}
+          >
+            Wrap
+          </Radio.Button>
+        </Radio>
+      </div>
     )
   }
 

@@ -17,14 +17,14 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   severityLevelColors: SeverityLevelColor[]
-  onUpdateSeverityLevels: (
-    severityLevelColors: SeverityLevelColor[]
+  onUpdate: (
+    severityLevelColors: SeverityLevelColor[],
+    severityFormat: SeverityFormat,
+    tableColumns: LogsTableColumn[]
   ) => Promise<void>
   onDismissOverlay: () => void
   columns: LogsTableColumn[]
-  onUpdateColumns: (columns: LogsTableColumn[]) => Promise<void>
   severityFormat: SeverityFormat
-  onUpdateSeverityFormat: (format: SeverityFormat) => Promise<void>
 }
 
 interface State {
@@ -67,7 +67,6 @@ class OptionsOverlay extends Component<Props, State> {
 
   public render() {
     const {workingLevelColumns, workingColumns, workingFormat} = this.state
-
     return (
       <Container maxWidth={800}>
         <Heading title="Configure Log Viewer">
@@ -132,17 +131,10 @@ class OptionsOverlay extends Component<Props, State> {
   }
 
   private handleSave = async () => {
-    const {
-      onUpdateSeverityLevels,
-      onDismissOverlay,
-      onUpdateSeverityFormat,
-      onUpdateColumns,
-    } = this.props
+    const {onUpdate, onDismissOverlay} = this.props
     const {workingLevelColumns, workingFormat, workingColumns} = this.state
 
-    await onUpdateSeverityFormat(workingFormat)
-    await onUpdateSeverityLevels(workingLevelColumns)
-    await onUpdateColumns(workingColumns)
+    await onUpdate(workingLevelColumns, workingFormat, workingColumns)
     onDismissOverlay()
   }
 
