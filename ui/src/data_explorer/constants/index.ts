@@ -255,6 +255,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     query: 'SHOW SUBSCRIPTIONS',
     type: DropdownChildTypes.Item,
   },
+  {
+    id: 'Show Queries',
+    text: 'Show Queries',
+    query: 'SHOW QUERIES',
+    type: DropdownChildTypes.Item,
+  },
 ]
 
 export const WRITE_DATA_DOCS_LINK =
