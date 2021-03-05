@@ -249,6 +249,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     query: 'SHOW DIAGNOSTICS',
     type: DropdownChildTypes.Item,
   },
+  {
+    id: 'Show Subscriptions',
+    text: 'Show Subscriptions',
+    query: 'SHOW SUBSCRIPTIONS',
+    type: DropdownChildTypes.Item,
+  },
 ]
 
 export const WRITE_DATA_DOCS_LINK =
