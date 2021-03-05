@@ -273,6 +273,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     query: 'SHOW SHARDS',
     type: DropdownChildTypes.Item,
   },
+  {
+    id: 'Show Shard Groups',
+    text: 'Show Shard Groups',
+    query: 'SHOW SHARD GROUPS',
+    type: DropdownChildTypes.Item,
+  },
 ]
 
 export const WRITE_DATA_DOCS_LINK =
