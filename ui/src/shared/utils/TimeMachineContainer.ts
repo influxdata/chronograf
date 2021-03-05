@@ -68,6 +68,7 @@ import {
   Axes,
 } from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
+import recordProperty from 'src/flux/helpers/recordProperty'
 
 const LOCAL_STORAGE_DELAY_MS = 1000
 
@@ -189,7 +190,7 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
     const body = Object.entries(filter)
       .map(([key, value]) => {
-        return `r.${key} == "${value}"`
+        return `${recordProperty(key)} == "${value}"`
       })
       .join(' and ')
 

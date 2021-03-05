@@ -2,6 +2,7 @@ import _ from 'lodash'
 
 import AJAX from 'src/utils/ajax'
 import {Source, SchemaFilter} from 'src/types'
+import recordProperty from 'src/flux/helpers/recordProperty'
 
 export const measurements = async (
   source: Source,
@@ -94,7 +95,9 @@ export const tagValues = async ({
 }: TagValuesParams): Promise<any> => {
   let regexFilter = ''
   if (searchTerm) {
-    regexFilter = `|> filter(fn: (r) => r.${tagKey} =~ /${searchTerm}/)`
+    regexFilter = `|> filter(fn: (r) => ${recordProperty(
+      tagKey
+    )} =~ /${searchTerm}/)`
   }
 
   const limitFunc = count ? '' : `|> limit(n:${limit})`
@@ -140,13 +143,12 @@ export const proxy = async (source: Source, script: string) => {
   const garbage = script.replace(/\s/g, '') // server cannot handle whitespace
   const dialect = {annotations: ['group', 'datatype', 'default']}
   const data = {query: garbage, dialect}
+  const base = source.links.flux
 
   try {
     const response = await AJAX({
       method: 'POST',
-      url: `${
-        source.links.flux
-      }?path=/api/v2/query${mark}organization=defaultorgname`,
+      url: `${base}?path=/api/v2/query${mark}organization=defaultorgname`,
       data,
       headers: {'Content-Type': 'application/json'},
     })
