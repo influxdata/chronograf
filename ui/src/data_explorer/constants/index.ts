@@ -191,6 +191,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
+    id: 'Show Grants',
+    text: 'Show Grants',
+    query: 'SHOW GRANTS FOR "username"',
+    type: DropdownChildTypes.Item,
+  },
+  {
     id: 'Create User',
     text: 'Create User',
     query: 'CREATE USER "username" WITH PASSWORD \'password\'',
