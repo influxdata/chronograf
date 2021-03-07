@@ -69,6 +69,7 @@ import {
 } from 'src/types/dashboards'
 import {ColorString, ColorNumber} from 'src/types/colors'
 import recordProperty from 'src/flux/helpers/recordProperty'
+import {TIMERANGE_START} from 'src/flux/helpers/templates'
 
 const LOCAL_STORAGE_DELAY_MS = 1000
 
@@ -195,7 +196,7 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       .join(' and ')
 
     if (_.isEmpty(draftScript)) {
-      draftScript = `from(bucket: "${db}")\n  |> range(start: dashboardTime)`
+      draftScript = `from(bucket: "${db}")\n  |> range(start: ${TIMERANGE_START})`
     }
 
     const newDraftScript = `${draftScript}\n  |> filter(fn: (r) => ${body})`
