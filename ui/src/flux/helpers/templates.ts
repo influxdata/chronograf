@@ -11,9 +11,40 @@ export const WINDOW_PERIOD = 'v.windowPeriod'
 
 const INTERVAL_REGEX = /autoInterval|v\.windowPeriod/g
 
-function templateVariables(templates: Template[]) {
-  // TODO implement variables
-  return templates ? '' : ' '
+function templateVariableValue(template: Template): string {
+  let value = ''
+  if (template.values.length) {
+    for (const tmplVal of template.values) {
+      if (tmplVal.localSelected) {
+        value = tmplVal.value
+        break
+      }
+      if (tmplVal.selected) {
+        value = tmplVal.value
+      }
+    }
+  }
+  return `"${value}"`
+}
+function templateVariables(templates: Template[]): string {
+  const extras = (templates || [])
+    .filter(
+      x =>
+        x.id !== 'dashtime' &&
+        x.id !== 'upperdashtime' &&
+        x.id !== 'interval' &&
+        x.tempVar.startsWith(':') &&
+        x.tempVar.endsWith(':') &&
+        x.values
+    )
+    .map(t => {
+      return ` "${t.tempVar.substring(
+        1,
+        t.tempVar.length - 1
+      )}" : ${templateVariableValue(t)} `
+    }, '')
+
+  return extras.length ? `${extras.join(',')} ,` : ''
 }
 
 function fluxVariables(
