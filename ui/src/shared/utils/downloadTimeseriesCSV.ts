@@ -32,11 +32,13 @@ export const downloadFluxCSV = async (
   source: Source,
   script: string,
   timeRange: TimeRange,
+  templates: Template[],
   fluxASTLink: string
 ): Promise<{didTruncate: boolean; rowCount: number}> => {
   const renderedScript = await renderTemplatesInScript(
     script,
     timeRange,
+    templates,
     fluxASTLink
   )
 

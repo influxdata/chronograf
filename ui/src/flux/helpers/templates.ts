@@ -1,4 +1,4 @@
-import {TimeRange} from 'src/types'
+import {Template, TimeRange} from 'src/types'
 import {computeInterval} from 'src/tempVars/utils/replace'
 import {DEFAULT_DURATION_MS} from 'src/shared/constants'
 import {extractImports} from 'src/shared/parsing/flux/extractImports'
@@ -11,21 +11,28 @@ export const WINDOW_PERIOD = 'v.windowPeriod'
 
 const INTERVAL_REGEX = /autoInterval|v\.windowPeriod/g
 
+function templateVariables(templates: Template[]) {
+  // TODO implement variables
+  return templates ? '' : ' '
+}
+
 function fluxVariables(
   lower: string,
   upper: string,
+  extraVars: string,
   interval?: number
 ): string {
   // dashboardTime, upperDashboardTime and autoInterval are added for bacward compatibility with 1.8.x
   if (interval) {
-    return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nautoInterval = ${interval}ms\nv = { timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime , windowPeriod: autoInterval }`
+    return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nautoInterval = ${interval}ms\nv = {${extraVars} timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime , windowPeriod: autoInterval }`
   }
-  return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nv = { timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }`
+  return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nv = {${extraVars} timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }`
 }
 
 export const renderTemplatesInScript = async (
   script: string,
   timeRange: TimeRange,
+  templates: Template[],
   astLink: string
 ): Promise<string> => {
   let dashboardTime: string
@@ -41,7 +48,8 @@ export const renderTemplatesInScript = async (
 
   const {imports, body} = await extractImports(astLink, script)
 
-  let variables = fluxVariables(dashboardTime, upperDashboardTime)
+  const extraVars = templateVariables(templates)
+  let variables = fluxVariables(dashboardTime, upperDashboardTime, extraVars)
   let rendered = `${variables}\n\n${body}`
 
   if (!script.match(INTERVAL_REGEX)) {
@@ -58,7 +66,12 @@ export const renderTemplatesInScript = async (
   }
 
   const interval = computeInterval(duration)
-  variables = fluxVariables(dashboardTime, upperDashboardTime, interval)
+  variables = fluxVariables(
+    dashboardTime,
+    upperDashboardTime,
+    extraVars,
+    interval
+  )
 
   rendered = `${imports}\n\n${variables}\n\n${body}`
 
