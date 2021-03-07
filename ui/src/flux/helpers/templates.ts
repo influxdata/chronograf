@@ -4,12 +4,24 @@ import {DEFAULT_DURATION_MS} from 'src/shared/constants'
 import {extractImports} from 'src/shared/parsing/flux/extractImports'
 import {getMinDuration} from 'src/shared/parsing/flux/durations'
 
-// For now we only support these template variables in Flux queries
-export const DASHBOARD_TIME = 'dashboardTime'
-export const UPPER_DASHBOARD_TIME = 'upperDashboardTime'
-export const INTERVAL = 'autoInterval'
+// template variables used since 1.9 (compatible with v2)
+export const TIMERANGE_START = 'v.timeRangeStart'
+export const TIMERANGE_STOP = 'v.timeRangeStop'
+export const WINDOW_PERIOD = 'v.windowPeriod'
 
-const INTERVAL_REGEX = /autoInterval/g
+const INTERVAL_REGEX = /autoInterval|v\.windowPeriod/g
+
+function fluxVariables(
+  lower: string,
+  upper: string,
+  interval?: number
+): string {
+  // dashboardTime, upperDashboardTime and autoInterval are added for bacward compatibility with 1.8.x
+  if (interval) {
+    return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nautoInterval = ${interval}ms\nv = { timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime , windowPeriod: autoInterval }`
+  }
+  return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nv = { timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }`
+}
 
 export const renderTemplatesInScript = async (
   script: string,
@@ -29,11 +41,11 @@ export const renderTemplatesInScript = async (
 
   const {imports, body} = await extractImports(astLink, script)
 
-  let variables = `${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}`
+  let variables = fluxVariables(dashboardTime, upperDashboardTime)
   let rendered = `${variables}\n\n${body}`
 
   if (!script.match(INTERVAL_REGEX)) {
-    return `${imports}\n${rendered}`
+    return `${imports}\n\n${rendered}`
   }
 
   let duration: number
@@ -46,9 +58,9 @@ export const renderTemplatesInScript = async (
   }
 
   const interval = computeInterval(duration)
-  variables += `\n${INTERVAL} = ${interval}ms`
+  variables = fluxVariables(dashboardTime, upperDashboardTime, interval)
 
-  rendered = `${imports}\n${variables}\n${body}`
+  rendered = `${imports}\n\n${variables}\n\n${body}`
 
   return rendered
 }
