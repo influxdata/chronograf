@@ -32,7 +32,7 @@ class OrganizationsTable extends Component {
     this.setState({isCreatingOrganization: false})
   }
 
-  handleCreateOrganization = organization => {
+  handleCreateOrganization = (organization) => {
     const {onCreateOrg} = this.props
     onCreateOrg(organization)
     this.setState({isCreatingOrganization: false})
@@ -88,7 +88,7 @@ class OrganizationsTable extends Component {
               onCancelCreateOrganization={this.handleCancelCreateOrganization}
             />
           ) : null}
-          {organizations.map(org => (
+          {organizations.map((org) => (
             <OrganizationsTableRow
               key={uuid.v4()}
               organization={org}

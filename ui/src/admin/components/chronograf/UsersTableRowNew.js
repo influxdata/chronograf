@@ -24,7 +24,7 @@ class UsersTableRowNew extends Component {
     }
   }
 
-  handleInputChange = fieldName => e => {
+  handleInputChange = (fieldName) => (e) => {
     this.setState({[fieldName]: e.target.value.trim()})
   }
 
@@ -48,15 +48,15 @@ class UsersTableRowNew extends Component {
     onBlur()
   }
 
-  handleInputFocus = e => {
+  handleInputFocus = (e) => {
     e.target.select()
   }
 
-  handleSelectRole = newRole => {
+  handleSelectRole = (newRole) => {
     this.setState({role: newRole.text})
   }
 
-  handleKeyDown = e => {
+  handleKeyDown = (e) => {
     const {name, provider} = this.state
     const preventCreate = !name || !provider
 
@@ -77,7 +77,7 @@ class UsersTableRowNew extends Component {
     const {onBlur} = this.props
     const {name, provider, scheme, role} = this.state
 
-    const dropdownRolesItems = USER_ROLES.map(r => ({...r, text: r.name}))
+    const dropdownRolesItems = USER_ROLES.map((r) => ({...r, text: r.name}))
     const preventCreate = !name || !provider
 
     return (
@@ -151,10 +151,11 @@ UsersTableRowNew.propTypes = {
   notify: func.isRequired,
 }
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(
-  ErrorHandling(UsersTableRowNew)
-)
+export default connect(
+  null,
+  mapDispatchToProps
+)(ErrorHandling(UsersTableRowNew))

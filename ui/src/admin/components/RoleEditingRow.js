@@ -9,16 +9,16 @@ class RoleEditingRow extends Component {
     super(props)
   }
 
-  handleKeyPress = role => {
-    return e => {
+  handleKeyPress = (role) => {
+    return (e) => {
       if (e.key === 'Enter') {
         this.props.onSave(role)
       }
     }
   }
 
-  handleEdit = role => {
-    return e => {
+  handleEdit = (role) => {
+    return (e) => {
       this.props.onEdit(role, {[e.target.name]: e.target.value})
     }
   }

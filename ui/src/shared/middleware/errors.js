@@ -22,7 +22,7 @@ const actionsAllowedDuringBlackout = [
 const notificationsBlackoutDuration = 5000
 let allowNotifications = true // eslint-disable-line
 
-const errorsMiddleware = store => next => action => {
+const errorsMiddleware = (store) => (next) => (action) => {
   const {
     auth: {me},
   } = store.getState()
@@ -81,7 +81,7 @@ const errorsMiddleware = store => next => action => {
   // AJAX requests pre-auth expiration and whose response returns post-logout
   if (
     me === null &&
-    !actionsAllowedDuringBlackout.some(allowedAction =>
+    !actionsAllowedDuringBlackout.some((allowedAction) =>
       action.type.includes(allowedAction)
     )
   ) {

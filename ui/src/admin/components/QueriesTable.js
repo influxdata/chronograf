@@ -20,7 +20,7 @@ const QueriesTable = ({queries, onKillQuery}) => (
             </tr>
           </thead>
           <tbody>
-            {queries.map(q => (
+            {queries.map((q) => (
               <QueryRow key={q.id} query={q} onKill={onKillQuery} />
             ))}
           </tbody>

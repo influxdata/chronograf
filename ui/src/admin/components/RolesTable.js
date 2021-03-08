@@ -38,8 +38,8 @@ const RolesTable = ({
         <tbody>
           {roles.length ? (
             roles
-              .filter(r => !r.hidden)
-              .map(role => (
+              .filter((r) => !r.hidden)
+              .map((role) => (
                 <RoleRow
                   key={role.links.self}
                   allUsers={allUsers}

@@ -5,17 +5,17 @@ import {
   MAP_KEYS_FROM_CONFIG,
 } from 'src/kapacitor/constants'
 
-const getElementOptions = section => {
+const getElementOptions = (section) => {
   const elements = _.get(section, 'elements', [])
 
   if (elements.length === 0) {
     return {}
   }
 
-  return _.map(elements, element => _.get(element, 'options', {}))
+  return _.map(elements, (element) => _.get(element, 'options', {}))
 }
 
-const parseHandlersFromConfig = config => {
+const parseHandlersFromConfig = (config) => {
   const {
     data: {sections},
   } = config
@@ -26,7 +26,7 @@ const parseHandlersFromConfig = config => {
       const options = getElementOptions(v)
       const type = _.get(MAP_KEYS_FROM_CONFIG, k, k)
 
-      _.forEach(options, option => {
+      _.forEach(options, (option) => {
         acc.push({
           // fill type with handler names in rule
           type,
@@ -46,16 +46,16 @@ const parseHandlersFromConfig = config => {
   // filter out any handlers from config that are not allowed
   const allowedHandlers = _.filter(
     mappedHandlers,
-    h => h.type in ALERTS_FROM_CONFIG
+    (h) => h.type in ALERTS_FROM_CONFIG
   )
 
   // filter out any fields of handlers that are not allowed
-  const pickedHandlers = _.map(allowedHandlers, h => {
+  const pickedHandlers = _.map(allowedHandlers, (h) => {
     return _.pick(h, ['type', 'enabled', ...ALERTS_FROM_CONFIG[h.type]])
   })
 
   // map field names from config to field names in rule
-  const fieldKeyMappedHandlers = _.map(pickedHandlers, h => {
+  const fieldKeyMappedHandlers = _.map(pickedHandlers, (h) => {
     return _.mapKeys(h, (v, k) => {
       return _.get(MAP_FIELD_KEYS_FROM_CONFIG[h.type], k, k)
     })

@@ -21,7 +21,9 @@ export default function parseShowMeasurements(response) {
 
     const series = result.series[0]
     const measurementNameIndex = series.columns.indexOf('name')
-    const measurements = series.values.map(value => value[measurementNameIndex])
+    const measurements = series.values.map(
+      (value) => value[measurementNameIndex]
+    )
 
     measurementSets.push({
       index,

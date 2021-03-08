@@ -46,10 +46,13 @@ class TimeRangeDropdown extends Component {
         return `${format(lower, this.props.timeZone)} - Now`
       }
 
-      return `${format(lower, this.props.timeZone)} - ${format(upper, this.props.timeZone)}`
+      return `${format(lower, this.props.timeZone)} - ${format(
+        upper,
+        this.props.timeZone
+      )}`
     }
 
-    const selected = timeRanges.find(range => range.lower === lower)
+    const selected = timeRanges.find((range) => range.lower === lower)
     return selected ? selected.inputValue : 'Custom'
   }
 
@@ -57,7 +60,7 @@ class TimeRangeDropdown extends Component {
     this.setState({isOpen: false})
   }
 
-  handleSelection = timeRange => () => {
+  handleSelection = (timeRange) => () => {
     this.setState({customTimeRange: emptyTime, isOpen: false}, () => {
       window.setTimeout(() => {
         this.props.onChooseTimeRange(timeRange)
@@ -73,7 +76,7 @@ class TimeRangeDropdown extends Component {
     this.setState({isCustomTimeRangeOpen: true})
   }
 
-  handleApplyCustomTimeRange = customTimeRange => {
+  handleApplyCustomTimeRange = (customTimeRange) => {
     this.props.onChooseTimeRange({...customTimeRange})
     this.setState({customTimeRange, isOpen: false})
   }
@@ -137,7 +140,7 @@ class TimeRangeDropdown extends Component {
               <li className="dropdown-header">
                 {preventCustomTimeRange ? '' : 'Relative '}Time
               </li>
-              {timeRanges.map(item => {
+              {timeRanges.map((item) => {
                 return (
                   <li className="dropdown-item" key={item.menuOption}>
                     <a href="#" onClick={this.handleSelection(item)}>
@@ -181,7 +184,7 @@ TimeRangeDropdown.propTypes = {
   timeZone: string,
 }
 
-const mstp = state => ({
+const mstp = (state) => ({
   timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
 })
 export default OnClickOutside(ErrorHandling(connect(mstp)(TimeRangeDropdown)))

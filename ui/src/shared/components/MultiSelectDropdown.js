@@ -11,7 +11,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 const labelText = ({localSelectedItems, isOpen, label}) => {
   if (localSelectedItems.length) {
-    return localSelectedItems.map(s => s.name).join(', ')
+    return localSelectedItems.map((s) => s.name).join(', ')
   }
 
   if (label) {
@@ -51,7 +51,7 @@ class MultiSelectDropdown extends Component {
     this.setState({localSelectedItems: nextProps.selectedItems})
   }
 
-  toggleMenu = e => {
+  toggleMenu = (e) => {
     e.stopPropagation()
     this.setState({isOpen: !this.state.isOpen})
   }
@@ -64,7 +64,7 @@ class MultiSelectDropdown extends Component {
 
     let nextItems
     if (this.isSelected(item)) {
-      nextItems = localSelectedItems.filter(i => i.name !== item.name)
+      nextItems = localSelectedItems.filter((i) => i.name !== item.name)
     } else {
       nextItems = [...localSelectedItems, item]
     }
@@ -80,7 +80,7 @@ class MultiSelectDropdown extends Component {
     return !!this.state.localSelectedItems.find(({name}) => name === item.name)
   }
 
-  handleApply = e => {
+  handleApply = (e) => {
     e.stopPropagation()
 
     this.setState({isOpen: false})

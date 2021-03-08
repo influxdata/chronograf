@@ -2,7 +2,7 @@ import _ from 'lodash'
 import moment from 'moment'
 import {map} from 'fast.js'
 
-export const formatDate = timestamp =>
+export const formatDate = (timestamp) =>
   moment(timestamp).format('M/D/YYYY h:mm:ss.SSSSSSSSS A')
 
 export const dataToCSV = ([titleRow, ...valueRows]) => {
@@ -21,6 +21,6 @@ export const dataToCSV = ([titleRow, ...valueRows]) => {
     return `${titlesString}\n${valuesString}`
   }
   const allRows = [titleRow, ...valueRows]
-  const allRowsStringArray = map(allRows, r => r.join(','))
+  const allRowsStringArray = map(allRows, (r) => r.join(','))
   return allRowsStringArray.join('\n')
 }

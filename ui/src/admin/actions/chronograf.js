@@ -44,7 +44,7 @@ export const loadOrganizations = ({organizations}) => ({
   },
 })
 
-export const addUser = user => ({
+export const addUser = (user) => ({
   type: 'CHRONOGRAF_ADD_USER',
   payload: {
     user,
@@ -67,14 +67,14 @@ export const syncUser = (staleUser, syncedUser) => ({
   },
 })
 
-export const removeUser = user => ({
+export const removeUser = (user) => ({
   type: 'CHRONOGRAF_REMOVE_USER',
   payload: {
     user,
   },
 })
 
-export const addOrganization = organization => ({
+export const addOrganization = (organization) => ({
   type: 'CHRONOGRAF_ADD_ORGANIZATION',
   payload: {
     organization,
@@ -97,7 +97,7 @@ export const syncOrganization = (staleOrganization, syncedOrganization) => ({
   },
 })
 
-export const removeOrganization = organization => ({
+export const removeOrganization = (organization) => ({
   type: 'CHRONOGRAF_REMOVE_ORGANIZATION',
   payload: {
     organization,
@@ -119,14 +119,14 @@ export const updateMapping = (staleMapping, updatedMapping) => ({
   },
 })
 
-export const addMapping = mapping => ({
+export const addMapping = (mapping) => ({
   type: 'CHRONOGRAF_ADD_MAPPING',
   payload: {
     mapping,
   },
 })
 
-export const removeMapping = mapping => ({
+export const removeMapping = (mapping) => ({
   type: 'CHRONOGRAF_REMOVE_MAPPING',
   payload: {
     mapping,
@@ -134,7 +134,7 @@ export const removeMapping = mapping => ({
 })
 
 // async actions (thunks)
-export const loadUsersAsync = url => async dispatch => {
+export const loadUsersAsync = (url) => async (dispatch) => {
   try {
     const {data} = await getUsersAJAX(url)
     dispatch(loadUsers(data))
@@ -143,7 +143,7 @@ export const loadUsersAsync = url => async dispatch => {
   }
 }
 
-export const loadOrganizationsAsync = url => async dispatch => {
+export const loadOrganizationsAsync = (url) => async (dispatch) => {
   try {
     const {data} = await getOrganizationsAJAX(url)
     dispatch(loadOrganizations(data))
@@ -152,7 +152,7 @@ export const loadOrganizationsAsync = url => async dispatch => {
   }
 }
 
-export const loadMappingsAsync = () => async dispatch => {
+export const loadMappingsAsync = () => async (dispatch) => {
   try {
     const {data} = await getMappingsAJAX()
     dispatch(loadMappings(data))
@@ -161,7 +161,7 @@ export const loadMappingsAsync = () => async dispatch => {
   }
 }
 
-export const createMappingAsync = (url, mapping) => async dispatch => {
+export const createMappingAsync = (url, mapping) => async (dispatch) => {
   const mappingWithTempId = {...mapping, _tempID: uuid.v4()}
   dispatch(addMapping(mappingWithTempId))
   try {
@@ -179,7 +179,7 @@ export const createMappingAsync = (url, mapping) => async dispatch => {
   }
 }
 
-export const deleteMappingAsync = mapping => async dispatch => {
+export const deleteMappingAsync = (mapping) => async (dispatch) => {
   dispatch(removeMapping(mapping))
   try {
     await deleteMappingAJAX(mapping)
@@ -190,10 +190,9 @@ export const deleteMappingAsync = mapping => async dispatch => {
   }
 }
 
-export const updateMappingAsync = (
-  staleMapping,
-  updatedMapping
-) => async dispatch => {
+export const updateMappingAsync = (staleMapping, updatedMapping) => async (
+  dispatch
+) => {
   dispatch(updateMapping(staleMapping, updatedMapping))
   try {
     await updateMappingAJAX(updatedMapping)
@@ -203,7 +202,7 @@ export const updateMappingAsync = (
   }
 }
 
-export const createUserAsync = (url, user) => async dispatch => {
+export const createUserAsync = (url, user) => async (dispatch) => {
   // temp uuid is added to be able to disambiguate a created user that has the
   // same scheme, provider, and name as an existing user
   const userWithTempID = {...user, _tempID: uuid.v4()}
@@ -221,11 +220,9 @@ export const createUserAsync = (url, user) => async dispatch => {
   }
 }
 
-export const updateUserAsync = (
-  user,
-  updatedUser,
-  successMessage
-) => async dispatch => {
+export const updateUserAsync = (user, updatedUser, successMessage) => async (
+  dispatch
+) => {
   dispatch(updateUser(user, updatedUser))
   try {
     // currently the request will be rejected if name, provider, or scheme, or
@@ -249,10 +246,9 @@ export const updateUserAsync = (
   }
 }
 
-export const deleteUserAsync = (
-  user,
-  {isAbsoluteDelete} = {}
-) => async dispatch => {
+export const deleteUserAsync = (user, {isAbsoluteDelete} = {}) => async (
+  dispatch
+) => {
   dispatch(removeUser(user))
   try {
     await deleteUserAJAX(user)
@@ -263,10 +259,9 @@ export const deleteUserAsync = (
   }
 }
 
-export const createOrganizationAsync = (
-  url,
-  organization
-) => async dispatch => {
+export const createOrganizationAsync = (url, organization) => async (
+  dispatch
+) => {
   // temp uuid is added to be able to disambiguate a created organization with
   // the same name as an existing organization
   const organizationWithTempID = {...organization, _tempID: uuid.v4()}
@@ -290,7 +285,7 @@ export const createOrganizationAsync = (
 export const updateOrganizationAsync = (
   organization,
   updatedOrganization
-) => async dispatch => {
+) => async (dispatch) => {
   dispatch(renameOrganization(organization, updatedOrganization.name))
   try {
     const {data} = await updateOrganizationAJAX(updatedOrganization)
@@ -303,7 +298,7 @@ export const updateOrganizationAsync = (
   }
 }
 
-export const deleteOrganizationAsync = organization => async dispatch => {
+export const deleteOrganizationAsync = (organization) => async (dispatch) => {
   dispatch(removeOrganization(organization))
   try {
     await deleteOrganizationAJAX(organization)

@@ -5,7 +5,7 @@ const dashrefresh = (refreshes) => {
     return []
   }
 
-  const normalized = refreshes.filter(r => {
+  const normalized = refreshes.filter((r) => {
     if (!isObject(r)) {
       return false
     }

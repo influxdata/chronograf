@@ -1,11 +1,11 @@
 import _ from 'lodash'
 
-const dashtime = ranges => {
+const dashtime = (ranges) => {
   if (!Array.isArray(ranges)) {
     return []
   }
 
-  const normalized = ranges.filter(r => {
+  const normalized = ranges.filter((r) => {
     if (!_.isObject(r)) {
       return false
     }
@@ -29,7 +29,7 @@ const dashtime = ranges => {
       return false
     }
 
-    const isCorrectType = bound =>
+    const isCorrectType = (bound) =>
       _.isString(bound) || _.isNull(bound) || _.isInteger(bound)
 
     if (!isCorrectType(lower) || !isCorrectType(upper)) {

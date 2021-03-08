@@ -11,7 +11,7 @@ import {saveToLocalStorage} from '../localStorage'
  */
 
 export default function persistState() {
-  return next => (reducer, initialState, enhancer) => {
+  return (next) => (reducer, initialState, enhancer) => {
     const store = next(reducer, initialState, enhancer)
     const throttleMs = 1000
 

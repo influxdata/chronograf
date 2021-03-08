@@ -30,7 +30,7 @@ class ProvidersPage extends Component {
     this.setState({isLoading: false})
   }
 
-  handleCreateMap = mapping => {
+  handleCreateMap = (mapping) => {
     this.props.actions.createMappingAsync(this.props.links.mappings, mapping)
   }
 
@@ -38,7 +38,7 @@ class ProvidersPage extends Component {
     this.props.actions.updateMappingAsync(staleMap, updatedMap)
   }
 
-  handleDeleteMap = mapping => {
+  handleDeleteMap = (mapping) => {
     this.props.actions.deleteMappingAsync(mapping)
   }
 
@@ -95,11 +95,12 @@ const mapStateToProps = ({
   mappings,
 })
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(adminChronografActionCreators, dispatch),
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  ErrorHandling(ProvidersPage)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ErrorHandling(ProvidersPage))

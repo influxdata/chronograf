@@ -4,7 +4,7 @@ import {fieldWalk} from 'src/shared/reducers/helpers/fields'
 import {PERMISSIONS} from 'shared/constants'
 
 export function buildRoles(roles) {
-  return roles.map(role => {
+  return roles.map((role) => {
     return Object.assign({}, role, {
       permissions: buildPermissionsWithResources(role.permissions),
       users: role.users || [],
@@ -15,7 +15,7 @@ export function buildRoles(roles) {
 function buildPermissionsWithResources(rawPermissions) {
   const nextPermissions = {}
   _.each(rawPermissions, (permissions, resource) => {
-    permissions.forEach(p => {
+    permissions.forEach((p) => {
       if (nextPermissions[p]) {
         nextPermissions[p].push(resource)
       } else {
@@ -92,7 +92,7 @@ export function buildPermission(permissionName, resources) {
 }
 
 export function buildClusterAccounts(users = [], roles = []) {
-  return users.map(user => {
+  return users.map((user) => {
     return Object.assign({}, user, {
       roles: getRolesForUser(roles, user),
       permissions: buildPermissionsWithResources(user.permissions),
@@ -101,7 +101,7 @@ export function buildClusterAccounts(users = [], roles = []) {
 }
 
 function getRolesForUser(roles, user) {
-  const userRoles = roles.filter(role => {
+  const userRoles = roles.filter((role) => {
     if (!role.users) {
       return false
     }
@@ -111,7 +111,7 @@ function getRolesForUser(roles, user) {
   return buildRoles(userRoles)
 }
 
-export const buildDefaultYLabel = queryConfig => {
+export const buildDefaultYLabel = (queryConfig) => {
   const {measurement} = queryConfig
   const fields = _.get(queryConfig, ['fields', '0'], [])
   const isEmpty = !measurement && !fields.length
@@ -120,7 +120,7 @@ export const buildDefaultYLabel = queryConfig => {
     return ''
   }
 
-  const walkZerothArgs = f => {
+  const walkZerothArgs = (f) => {
     if (f.type === 'field') {
       return f.value
     }

@@ -18,7 +18,7 @@ class OrganizationsPage extends Component {
     loadOrganizationsAsync(links.organizations)
   }
 
-  handleCreateOrganization = async organization => {
+  handleCreateOrganization = async (organization) => {
     const {
       links,
       actionsAdmin: {createOrganizationAsync},
@@ -35,7 +35,7 @@ class OrganizationsPage extends Component {
     this.refreshMe()
   }
 
-  handleDeleteOrganization = organization => {
+  handleDeleteOrganization = (organization) => {
     const {
       actionsAdmin: {deleteOrganizationAsync},
     } = this.props
@@ -61,7 +61,7 @@ class OrganizationsPage extends Component {
     const {meCurrentOrganization, organizations, me} = this.props
 
     const organization = organizations.find(
-      o => o.id === meCurrentOrganization.id
+      (o) => o.id === meCurrentOrganization.id
     )
 
     return (
@@ -126,11 +126,12 @@ const mapStateToProps = ({
   me,
 })
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   actionsAdmin: bindActionCreators(adminChronografActionCreators, dispatch),
   getMe: bindActionCreators(getMeAsync, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  ErrorHandling(OrganizationsPage)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ErrorHandling(OrganizationsPage))

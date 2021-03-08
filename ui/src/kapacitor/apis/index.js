@@ -1,7 +1,7 @@
 import AJAX from 'utils/ajax'
 import {cloneDeep, get} from 'lodash'
 
-const outRule = rule => {
+const outRule = (rule) => {
   // fit into range
   const {value, rangeValue, operator} = rule.values
 
@@ -12,7 +12,7 @@ const outRule = rule => {
   // remap serviceNow from '_type' back to 'type', see getRule/getRules
   if (Array.isArray(get(rule, ['alertNodes', 'serviceNow']))) {
     rule = cloneDeep(rule)
-    rule.alertNodes.serviceNow = rule.alertNodes.serviceNow.map(val => ({
+    rule.alertNodes.serviceNow = rule.alertNodes.serviceNow.map((val) => ({
       ...val,
       type: val._type,
       _type: undefined,
@@ -30,17 +30,17 @@ export const createRule = (kapacitor, rule) => {
   })
 }
 
-export const getRules = kapacitor => {
+export const getRules = (kapacitor) => {
   return AJAX({
     method: 'GET',
     url: kapacitor.links.rules,
-  }).then(response => {
+  }).then((response) => {
     // remap serviceNow 'type' to '_type', it conflicts with UI property
     const rules = get(response, ['data', 'rules'])
     if (Array.isArray(rules)) {
-      rules.forEach(rule => {
+      rules.forEach((rule) => {
         if (Array.isArray(rule.alertNodes.serviceNow)) {
-          rule.alertNodes.serviceNow.forEach(x => {
+          rule.alertNodes.serviceNow.forEach((x) => {
             if (x.type !== undefined) {
               x._type = x.type
             }
@@ -61,7 +61,7 @@ export const getRule = async (kapacitor, ruleID) => {
     // remap serviceNow 'type' to '_type', it conflicts with UI property
     const serviceNow = get(response, ['data', 'alertNodes', 'serviceNow'])
     if (Array.isArray(serviceNow)) {
-      serviceNow.forEach(x => {
+      serviceNow.forEach((x) => {
         if (x.type !== undefined) {
           x._type = x.type
         }
@@ -74,7 +74,7 @@ export const getRule = async (kapacitor, ruleID) => {
   }
 }
 
-export const editRule = rule => {
+export const editRule = (rule) => {
   return AJAX({
     method: 'PUT',
     url: rule.links.self,
@@ -82,7 +82,7 @@ export const editRule = rule => {
   })
 }
 
-export const deleteRule = rule => {
+export const deleteRule = (rule) => {
   return AJAX({
     method: 'DELETE',
     url: rule.links.self,
@@ -156,7 +156,7 @@ export const getLogStreamByRuleID = (kapacitor, ruleID, signal) => {
   })
 }
 
-export const pingKapacitorVersion = async kapacitor => {
+export const pingKapacitorVersion = async (kapacitor) => {
   try {
     const result = await AJAX({
       method: 'GET',

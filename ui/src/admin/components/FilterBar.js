@@ -11,7 +11,7 @@ class FilterBar extends Component {
     }
   }
 
-  handleText = e => {
+  handleText = (e) => {
     this.setState(
       {filterText: e.target.value},
       this.props.onFilter(e.target.value)
@@ -24,7 +24,7 @@ class FilterBar extends Component {
 
   render() {
     const {type, isEditing, onClickCreate} = this.props
-    const placeholderText = type.replace(/\w\S*/g, function(txt) {
+    const placeholderText = type.replace(/\w\S*/g, function (txt) {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     })
     return (

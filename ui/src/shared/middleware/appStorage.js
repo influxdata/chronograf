@@ -4,8 +4,8 @@
 export default function makeAppStorage(localStorage) {
   return () => {
     // eslint-disable-line no-unused-vars
-    return next => {
-      return action => {
+    return (next) => {
+      return (action) => {
         if (action.meta && action.meta.appStorage) {
           const stuffToStore = action.meta.appStorage
           if (Array.isArray(stuffToStore)) {

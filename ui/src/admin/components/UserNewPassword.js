@@ -5,16 +5,16 @@ import {USERS_TABLE} from 'src/admin/constants/tableSizing'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 class UserNewPassword extends Component {
-  handleKeyPress = user => {
-    return e => {
+  handleKeyPress = (user) => {
+    return (e) => {
       if (e.key === 'Enter') {
         this.props.onSave(user)
       }
     }
   }
 
-  handleEdit = user => {
-    return e => {
+  handleEdit = (user) => {
+    return (e) => {
       this.props.onEdit(user, {[e.target.name]: e.target.value})
     }
   }

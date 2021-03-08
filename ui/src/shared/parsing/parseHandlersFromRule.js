@@ -12,10 +12,10 @@ export const parseHandlersFromRule = (rule, handlersFromConfig) => {
   _.forEach(handlersFromRule, (v, alertKind) => {
     const thisAlertFromConfig = _.find(
       handlersFromConfig,
-      h => h.type === alertKind
+      (h) => h.type === alertKind
     )
 
-    _.forEach(v, alertOptions => {
+    _.forEach(v, (alertOptions) => {
       const count = _.get(handlersOfKind, alertKind, 0) + 1
       handlersOfKind[alertKind] = count
 
@@ -42,7 +42,7 @@ export const parseHandlersFromRule = (rule, handlersFromConfig) => {
   return {handlersOnThisAlert, selectedHandler, handlersOfKind}
 }
 
-export const parseAlertNodeList = rule => {
+export const parseAlertNodeList = (rule) => {
   const nodeList = _.transform(
     rule.alertNodes,
     (acc, v, k) => {
@@ -52,21 +52,21 @@ export const parseAlertNodeList = rule => {
           case AlertTypes.slack:
             alerts = _.uniqBy(
               v,
-              alert => _.get(alert, 'workspace') || 'default'
+              (alert) => _.get(alert, 'workspace') || 'default'
             )
 
             acc.push(
-              ..._.map(alerts, alert => {
+              ..._.map(alerts, (alert) => {
                 const nickname = _.get(alert, 'workspace') || 'default'
                 return `${k} (${nickname})`
               })
             )
             break
           case AlertTypes.kafka:
-            alerts = _.uniqBy(v, alert => _.get(alert, 'cluster'))
+            alerts = _.uniqBy(v, (alert) => _.get(alert, 'cluster'))
 
             acc.push(
-              ..._.map(alerts, alert => {
+              ..._.map(alerts, (alert) => {
                 const nickname = _.get(alert, 'cluster')
                 return `${k} (${nickname})`
               })

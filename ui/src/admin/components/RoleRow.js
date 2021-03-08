@@ -72,8 +72,8 @@ const RoleRow = ({
       <td>
         {allPermissions && allPermissions.length ? (
           <MultiSelectDropdown
-            items={allPermissions.map(name => ({name}))}
-            selectedItems={perms.map(name => ({name}))}
+            items={allPermissions.map((name) => ({name}))}
+            selectedItems={perms.map((name) => ({name}))}
             label={perms.length ? '' : 'Select Permissions'}
             onApply={handleUpdatePermissions}
             buttonSize="btn-xs"

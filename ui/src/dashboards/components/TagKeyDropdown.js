@@ -35,7 +35,7 @@ class TagKeyDropdown extends Component {
     const {tagKey, onSelectTagKey} = this.props
     return (
       <Dropdown
-        items={tagKeys.map(text => ({text}))}
+        items={tagKeys.map((text) => ({text}))}
         selected={tagKey || 'Select Tag Key'}
         onChoose={onSelectTagKey}
         onClick={this.handleStartEdit}

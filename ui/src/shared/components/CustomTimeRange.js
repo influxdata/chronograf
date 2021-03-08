@@ -64,7 +64,7 @@ class CustomTimeRange extends Component {
     }
   }
 
-  getInitialDate = time => {
+  getInitialDate = (time) => {
     const {upper, lower} = this.props.timeRange
 
     if (upper || lower) {
@@ -97,10 +97,10 @@ class CustomTimeRange extends Component {
   /*
    * Upper and lower time ranges are passed in with single quotes as part of
    * the string literal, i.e. "'2015-09-23T18:00:00.000Z'".  Remove them
-   * before passing the string to be parsed. Additionally, return the moment 
+   * before passing the string to be parsed. Additionally, return the moment
    * in the timeZone so that it is formatted well.
    */
-  _toMoment = timeRange => {
+  _toMoment = (timeRange) => {
     const strVal = formatTimeRange(timeRange)
     const retVal = moment(strVal, dateFormat)
     if (this.props.timeZone === TimeZones.UTC) {
@@ -115,12 +115,12 @@ class CustomTimeRange extends Component {
 
     const lowerMoment = this.lowerCal.getMoment()
     const upperMoment = this.upperCal.getMoment()
-    if (this.props.timeZone === TimeZones.UTC){
+    if (this.props.timeZone === TimeZones.UTC) {
       // rome calendar does not respect that UTC moment was set
-      if (!lowerMoment.creationData().isUTC){
+      if (!lowerMoment.creationData().isUTC) {
         lowerMoment.utc(true)
       }
-      if (!upperMoment.creationData().isUTC){
+      if (!upperMoment.creationData().isUTC) {
         upperMoment.utc(true)
       }
     }
@@ -137,7 +137,7 @@ class CustomTimeRange extends Component {
     }
   }
 
-  handleTimeRangeShortcut = shortcut => {
+  handleTimeRangeShortcut = (shortcut) => {
     return () => {
       let lower
       const upper = this.timeZoned(moment())
@@ -202,18 +202,18 @@ class CustomTimeRange extends Component {
           <div className="custom-time--dates" onClick={this.handleRefreshCals}>
             <div
               className="custom-time--lower-container"
-              ref={r => (this.lowerContainer = r)}
+              ref={(r) => (this.lowerContainer = r)}
             >
               <input
                 className="custom-time--lower form-control input-sm"
-                ref={r => (this.lower = r)}
+                ref={(r) => (this.lower = r)}
                 placeholder="from"
                 onKeyUp={this.handleRefreshCals}
               />
             </div>
             <div
               className="custom-time--upper-container"
-              ref={r => (this.upperContainer = r)}
+              ref={(r) => (this.upperContainer = r)}
               disabled={isNow}
             >
               {isNowDisplayed ? (
@@ -228,7 +228,7 @@ class CustomTimeRange extends Component {
               ) : null}
               <input
                 className="custom-time--upper form-control input-sm"
-                ref={r => (this.upper = r)}
+                ref={(r) => (this.upper = r)}
                 placeholder="to"
                 onKeyUp={this.handleRefreshCals}
                 disabled={isNow}
@@ -270,7 +270,7 @@ CustomTimeRange.propTypes = {
   page: string,
   timeZone: string,
 }
-const mstp = state => ({
+const mstp = (state) => ({
   timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
 })
 export default ErrorHandling(connect(mstp)(CustomTimeRange))
