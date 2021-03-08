@@ -24,10 +24,7 @@ describe('AnnotationFilterControl', () => {
     const wrapper = mount(<AnnotationFilterControl {...props} />)
 
     // Focusing the input triggers fetching suggestions
-    wrapper
-      .find('.suggestion-input--input')
-      .at(0)
-      .simulate('focus')
+    wrapper.find('.suggestion-input--input').at(0).simulate('focus')
 
     // Give component a chance to read resolved suggestion promise
     await new Promise(res => setTimeout(res, 50))
@@ -65,17 +62,10 @@ describe('AnnotationFilterControl', () => {
     const wrapper = mount(<AnnotationFilterControl {...props} />)
 
     expect(
-      wrapper
-        .find('button')
-        .at(1)
-        .find('.button-icon')
-        .hasClass('trash')
+      wrapper.find('button').at(1).find('.button-icon').hasClass('trash')
     ).toBe(true)
 
-    wrapper
-      .find('.suggestion-input--input')
-      .at(1)
-      .simulate('focus')
+    wrapper.find('.suggestion-input--input').at(1).simulate('focus')
 
     const saveButton = wrapper.find('button').at(1)
 

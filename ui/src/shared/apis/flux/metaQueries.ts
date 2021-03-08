@@ -162,6 +162,8 @@ export const proxy = async (source: Source, script: string) => {
 const handleError = error => {
   console.error('Problem fetching data', error)
 
-  throw _.get(error, 'headers.x-influx-error', false) ||
+  throw (
+    _.get(error, 'headers.x-influx-error', false) ||
     _.get(error, 'data.message', 'unknown error 🤷')
+  )
 }

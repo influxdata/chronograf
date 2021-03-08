@@ -17,12 +17,8 @@ interface State {
 @ErrorHandling
 class CustomSingularTime extends Component<Props, State> {
   private calendar?: any
-  private containerRef: React.RefObject<HTMLDivElement> = React.createRef<
-    HTMLDivElement
-  >()
-  private inputRef: React.RefObject<HTMLInputElement> = React.createRef<
-    HTMLInputElement
-  >()
+  private containerRef: React.RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>()
+  private inputRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>()
 
   constructor(props: Props) {
     super(props)

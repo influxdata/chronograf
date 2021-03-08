@@ -27,10 +27,7 @@ export const isInvalidMetaQuery = (metaQuery: string): boolean =>
   !getMetaQueryPrefix(metaQuery)
 
 const getMetaQueryPrefix = (metaQuery: string): string | null => {
-  const words = metaQuery
-    .trim()
-    .toUpperCase()
-    .split(' ')
+  const words = metaQuery.trim().toUpperCase().split(' ')
   const firstTwoWords = words.slice(0, 2).join(' ')
   const firstThreeWords = words.slice(0, 3).join(' ')
 

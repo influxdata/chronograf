@@ -120,9 +120,7 @@ class OpsGenieConfig extends PureComponent<Props, State> {
               </div>
             </div>
           </div>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
 
         <div className="form-group col-xs-12">
           <div className="form-control-static">

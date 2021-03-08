@@ -118,11 +118,7 @@ describe('AnnotationEditorForm', () => {
       expect(tagsError.text()).toEqual('Tag keys must be unique')
       expect(getDraftAnnotation()).toEqual(null)
 
-      wrapper
-        .find(AnnotationTagEditorLi)
-        .at(2)
-        .find('button')
-        .simulate('click')
+      wrapper.find(AnnotationTagEditorLi).at(2).find('button').simulate('click')
 
       tagsError = wrapper.find('[data-test="tags-group"] .error')
 

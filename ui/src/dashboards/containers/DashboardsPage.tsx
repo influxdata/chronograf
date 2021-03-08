@@ -121,9 +121,9 @@ export class DashboardsPage extends PureComponent<Props, State> {
     push(`/sources/${id}/dashboards/${data.id}`)
   }
 
-  private handleCloneDashboard = (dashboard: Dashboard) => async (): Promise<
-    void
-  > => {
+  private handleCloneDashboard = (
+    dashboard: Dashboard
+  ) => async (): Promise<void> => {
     const {
       source: {id},
       router: {push},
@@ -139,9 +139,9 @@ export class DashboardsPage extends PureComponent<Props, State> {
     this.props.handleDeleteDashboard(dashboard)
   }
 
-  private handleExportDashboard = (dashboard: Dashboard) => async (): Promise<
-    void
-  > => {
+  private handleExportDashboard = (
+    dashboard: Dashboard
+  ) => async (): Promise<void> => {
     const dashboardForDownload = await this.modifyDashboardForDownload(
       dashboard
     )

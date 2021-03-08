@@ -59,9 +59,7 @@ class LogsFilters extends PureComponent<Props> {
           >
             <span className="icon bar-chart" />
           </button>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
         <Radio>
           <Radio.Button
             id="logs-truncation--truncate"

@@ -60,8 +60,9 @@ class Crosshair extends PureComponent<Props> {
   }
 
   private get crosshairHeight(): string {
-    return `calc(100% - ${this.props.staticLegendHeight +
-      DYGRAPH_CONTAINER_XLABEL_MARGIN}px)`
+    return `calc(100% - ${
+      this.props.staticLegendHeight + DYGRAPH_CONTAINER_XLABEL_MARGIN
+    }px)`
   }
 }
 

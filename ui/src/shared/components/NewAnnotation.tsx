@@ -69,8 +69,9 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
     const {isMouseOver} = this.state
     const crosshairOne = Math.max(-1000, dygraph.toDomXCoord(resolvedStartTime))
     const crosshairTwo = dygraph.toDomXCoord(resolvedEndTime)
-    const crosshairHeight = `calc(100% - ${staticLegendHeight +
-      DYGRAPH_CONTAINER_XLABEL_MARGIN}px)`
+    const crosshairHeight = `calc(100% - ${
+      staticLegendHeight + DYGRAPH_CONTAINER_XLABEL_MARGIN
+    }px)`
 
     const isDragging = resolvedStartTime !== resolvedEndTime
     const flagOneClass =

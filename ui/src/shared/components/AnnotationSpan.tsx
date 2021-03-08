@@ -159,9 +159,11 @@ class AnnotationSpan extends Component<Props, State> {
 
     const markerStyles = {
       left: `${dygraph.toDomXCoord(startTime) + DYGRAPH_CONTAINER_H_MARGIN}px`,
-      height: `calc(100% - ${staticLegendHeight +
+      height: `calc(100% - ${
+        staticLegendHeight +
         DYGRAPH_CONTAINER_XLABEL_MARGIN +
-        DYGRAPH_CONTAINER_V_MARGIN * 2}px)`,
+        DYGRAPH_CONTAINER_V_MARGIN * 2
+      }px)`,
     }
 
     return (
@@ -212,9 +214,11 @@ class AnnotationSpan extends Component<Props, State> {
 
     const markerStyles = {
       left: `${dygraph.toDomXCoord(endTime) + DYGRAPH_CONTAINER_H_MARGIN}px`,
-      height: `calc(100% - ${staticLegendHeight +
+      height: `calc(100% - ${
+        staticLegendHeight +
         DYGRAPH_CONTAINER_XLABEL_MARGIN +
-        DYGRAPH_CONTAINER_V_MARGIN * 2}px)`,
+        DYGRAPH_CONTAINER_V_MARGIN * 2
+      }px)`,
     }
 
     return (

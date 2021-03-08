@@ -34,7 +34,7 @@ import Dygraph from 'dygraphs/src-es5/dygraph'
  * The `range` option has no effect unless `zoom` is true (the default).
  */
 
-var synchronize = function(/* dygraphs..., opts */) {
+var synchronize = function (/* dygraphs..., opts */) {
   if (arguments.length === 0) {
     throw 'Invalid invocation of Dygraph.synchronize(). Need >= 1 argument.'
   }
@@ -48,7 +48,7 @@ var synchronize = function(/* dygraphs..., opts */) {
   var dygraphs = []
   var prevCallbacks = []
 
-  var parseOpts = function(obj) {
+  var parseOpts = function (obj) {
     if (!(obj instanceof Object)) {
       throw 'Last argument must be either Dygraph or Object.'
     } else {
@@ -69,8 +69,10 @@ var synchronize = function(/* dygraphs..., opts */) {
       }
     }
     if (i < arguments.length - 1) {
-      throw 'Invalid invocation of Dygraph.synchronize(). ' +
+      throw (
+        'Invalid invocation of Dygraph.synchronize(). ' +
         'All but the last argument must be Dygraph objects.'
+      )
     } else if (i == arguments.length - 1) {
       parseOpts(arguments[arguments.length - 1])
     }
@@ -82,23 +84,29 @@ var synchronize = function(/* dygraphs..., opts */) {
     if (arguments.length == 2) {
       parseOpts(arguments[1])
     } else if (arguments.length > 2) {
-      throw 'Invalid invocation of Dygraph.synchronize(). ' +
+      throw (
+        'Invalid invocation of Dygraph.synchronize(). ' +
         'Expected two arguments: array and optional options argument.'
+      )
     } // otherwise arguments.length == 1, which is fine.
   } else {
-    throw 'Invalid invocation of Dygraph.synchronize(). ' +
+    throw (
+      'Invalid invocation of Dygraph.synchronize(). ' +
       'First parameter must be either Dygraph or list of Dygraphs.'
+    )
   }
 
   if (dygraphs.length < 2) {
-    throw 'Invalid invocation of Dygraph.synchronize(). ' +
+    throw (
+      'Invalid invocation of Dygraph.synchronize(). ' +
       'Need two or more dygraphs to synchronize.'
+    )
   }
 
   var readycount = dygraphs.length
   for (var i = 0; i < dygraphs.length; i++) {
     var g = dygraphs[i]
-    g.ready(function() {
+    g.ready(function () {
       if (--readycount == 0) {
         // store original callbacks
         var callBackTypes = [
@@ -130,7 +138,7 @@ var synchronize = function(/* dygraphs..., opts */) {
   }
 
   return {
-    detach: function() {
+    detach: function () {
       for (var i = 0; i < dygraphs.length; i++) {
         var g = dygraphs[i]
         if (opts.zoom) {
@@ -167,7 +175,7 @@ function attachZoomHandlers(gs, syncOpts, prevCallbacks) {
     var g = gs[i]
     g.updateOptions(
       {
-        drawCallback: function(me, initial) {
+        drawCallback: function (me, initial) {
           if (block || initial) return
           block = true
           // In the original code, the following assignment was originally
@@ -209,7 +217,7 @@ function attachSelectionHandlers(gs, prevCallbacks) {
 
     g.updateOptions(
       {
-        highlightCallback: function(event, x, points, row, seriesName) {
+        highlightCallback: function (event, x, points, row, seriesName) {
           if (block) return
           block = true
           var me = this
@@ -227,7 +235,7 @@ function attachSelectionHandlers(gs, prevCallbacks) {
           }
           block = false
         },
-        unhighlightCallback: function(event) {
+        unhighlightCallback: function (event) {
           if (block) return
           block = true
           var me = this
@@ -257,7 +265,7 @@ function isValidPoint(p, opt_allowNaNY) {
   return true
 }
 
-Dygraph.prototype.findClosestPoint = function(domX, domY) {
+Dygraph.prototype.findClosestPoint = function (domX, domY) {
   if (Dygraph.VERSION !== '2.0.0') {
     console.error(
       `Dygraph version changed to ${Dygraph.VERSION} - re-copy findClosestPoint`
@@ -303,7 +311,7 @@ Dygraph.prototype.findClosestPoint = function(domX, domY) {
 
 Dygraph.synchronize = synchronize
 
-Dygraph.Plugins.Crosshair = (function() {
+Dygraph.Plugins.Crosshair = (function () {
   'use strict'
   /**
    * Creates the crosshair
@@ -311,13 +319,13 @@ Dygraph.Plugins.Crosshair = (function() {
    * @constructor
    */
 
-  var crosshair = function(opt_options) {
+  var crosshair = function (opt_options) {
     this.canvas_ = document.createElement('canvas')
     opt_options = opt_options || {}
     this.direction_ = opt_options.direction || null
   }
 
-  crosshair.prototype.toString = function() {
+  crosshair.prototype.toString = function () {
     return 'Crosshair Plugin'
   }
 
@@ -325,7 +333,7 @@ Dygraph.Plugins.Crosshair = (function() {
    * @param {Dygraph} g Graph instance.
    * @return {object.<string, function(ev)>} Mapping of event names to callbacks.
    */
-  crosshair.prototype.activate = function(g) {
+  crosshair.prototype.activate = function (g) {
     g.graphDiv.appendChild(this.canvas_)
 
     return {
@@ -334,7 +342,7 @@ Dygraph.Plugins.Crosshair = (function() {
     }
   }
 
-  crosshair.prototype.select = function(e) {
+  crosshair.prototype.select = function (e) {
     if (this.direction_ === null) {
       return
     }
@@ -378,12 +386,12 @@ Dygraph.Plugins.Crosshair = (function() {
     }
   }
 
-  crosshair.prototype.deselect = function(e) {
+  crosshair.prototype.deselect = function (e) {
     var ctx = this.canvas_.getContext('2d')
     ctx.clearRect(0, 0, this.canvas_.width, this.canvas_.height)
   }
 
-  crosshair.prototype.destroy = function() {
+  crosshair.prototype.destroy = function () {
     this.canvas_ = null
   }
 

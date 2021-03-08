@@ -31,9 +31,11 @@ const windowDimensions = (
     Math.min(windowStartXCoord, windowEndXCoord) + DYGRAPH_CONTAINER_H_MARGIN
 
   const height = staticLegendHeight
-    ? `calc(100% - ${staticLegendHeight +
+    ? `calc(100% - ${
+        staticLegendHeight +
         DYGRAPH_CONTAINER_XLABEL_MARGIN +
-        DYGRAPH_CONTAINER_V_MARGIN * 2}px)`
+        DYGRAPH_CONTAINER_V_MARGIN * 2
+      }px)`
     : 'calc(100% - 36px)'
 
   return {

@@ -100,9 +100,7 @@ export const numberValueFormatter = (
       }
     }
     if (kmg2) {
-      const xParts = String(x.toExponential())
-        .split('e-')
-        .map(Number)
+      const xParts = String(x.toExponential()).split('e-').map(Number)
       if (xParts.length === 2 && xParts[1] >= 3 && xParts[1] <= 24) {
         if (xParts[1] % 3 > 0) {
           label = roundNum(xParts[0] / pow(10, xParts[1] % 3), digits)
