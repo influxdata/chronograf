@@ -1,1 +1,3 @@
-ui/tsconfig.json
+{
+  "extends": "./ui/tsconfig"
+}
