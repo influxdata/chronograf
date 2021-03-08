@@ -749,8 +749,7 @@ export const getDashboardWithTemplatesAsync = (
 
   const selections = templateSelectionsFromQueryParams()
 
-  let templates
-  templates = await hydrateTemplates(dashboard.templates, sources, {
+  const templates = await hydrateTemplates(dashboard.templates, sources, {
     proxyUrl: source.links.proxy,
     selections,
   })
