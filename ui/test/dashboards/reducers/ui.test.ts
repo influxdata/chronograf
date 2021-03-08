@@ -68,7 +68,7 @@ describe('DataExplorer.Reducers.UI', () => {
 
   it('can delete a dashboard', () => {
     const actual = reducer({...initialState, dashboards}, deleteDashboard(d1))
-    const expected = dashboards.filter(dash => dash.id !== d1.id)
+    const expected = dashboards.filter((dash) => dash.id !== d1.id)
 
     expect(actual.dashboards).toEqual(expected)
   })

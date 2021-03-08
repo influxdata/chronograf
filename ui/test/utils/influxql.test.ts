@@ -195,7 +195,10 @@ describe('buildInfluxQLQuery', () => {
         database: 'db1',
         retentionPolicy: 'rp1',
         measurement: 'm0',
-        fields: [{value: 'f0', type: 'field'}, {value: 'f1', type: 'field'}],
+        fields: [
+          {value: 'f0', type: 'field'},
+          {value: 'f1', type: 'field'},
+        ],
       })
       timeBounds = {upper: "'2015-02-24T00:00:00Z'"}
     })

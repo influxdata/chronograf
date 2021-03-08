@@ -11,13 +11,19 @@ describe('parseHistogramQueryResponse', () => {
               name: 'syslog',
               tags: {severity: 'debug'},
               columns: ['time', 'count'],
-              values: [[1530129062000, 0], [1530129093000, 0]],
+              values: [
+                [1530129062000, 0],
+                [1530129093000, 0],
+              ],
             },
             {
               name: 'syslog',
               tags: {severity: 'err'},
               columns: ['time', 'count'],
-              values: [[1530129062000, 0], [1530129093000, 0]],
+              values: [
+                [1530129062000, 0],
+                [1530129093000, 0],
+              ],
             },
           ],
         },

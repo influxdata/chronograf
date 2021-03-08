@@ -2,10 +2,10 @@ import ActiveKapacitorFromSources from 'src/kapacitor/utils/ActiveKapacitorFromS
 import {source, kapacitor} from 'mocks/dummy'
 
 describe('ActiveKapacitorFromSources', () => {
-  const createSource = attrs => ({...source, ...attrs})
-  const createKapacitor = attrs => ({...kapacitor, ...attrs})
+  const createSource = (attrs) => ({...source, ...attrs})
+  const createKapacitor = (attrs) => ({...kapacitor, ...attrs})
 
-  const setup = overrides => {
+  const setup = (overrides) => {
     const activeSource = createSource({id: 1, ...overrides})
 
     const sources = [

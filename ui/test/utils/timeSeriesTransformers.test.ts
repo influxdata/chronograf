@@ -28,7 +28,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'm1',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -38,7 +41,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'm1',
                   columns: ['time', 'f2'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -80,7 +86,11 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'm1',
                   columns: ['time', 'f1'],
-                  values: [[100, 1], [3000, 3], [200, 2]],
+                  values: [
+                    [100, 1],
+                    [3000, 3],
+                    [200, 2],
+                  ],
                 },
               ],
             },
@@ -93,7 +103,11 @@ describe('timeSeriesToDygraph', () => {
 
     const expected = {
       labels: ['time', 'm1.f1'],
-      timeSeries: [[new Date(100), 1], [new Date(200), 2], [new Date(3000), 3]],
+      timeSeries: [
+        [new Date(100), 1],
+        [new Date(200), 2],
+        [new Date(3000), 3],
+      ],
     }
 
     expect(actual.timeSeries).toEqual(expected.timeSeries)
@@ -110,7 +124,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'm1',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -126,7 +143,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'm1',
                   columns: ['time', 'f1'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -164,7 +184,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'mb',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -174,7 +197,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'ma',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -184,7 +210,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'mc',
                   columns: ['time', 'f2'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -194,7 +223,10 @@ describe('timeSeriesToDygraph', () => {
                 {
                   name: 'mc',
                   columns: ['time', 'f1'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -222,7 +254,11 @@ it('parses a single field influxQL query', () => {
               {
                 name: 'm1',
                 columns: ['time', 'f1'],
-                values: [[100, 1], [3000, 3], [200, 2]],
+                values: [
+                  [100, 1],
+                  [3000, 3],
+                  [200, 2],
+                ],
               },
             ],
           },
@@ -233,7 +269,12 @@ it('parses a single field influxQL query', () => {
 
   const actual = timeSeriesToTableGraph(influxResponse)
 
-  const expected = [['time', 'm1.f1'], [100, 1], [200, 2], [3000, 3]]
+  const expected = [
+    ['time', 'm1.f1'],
+    [100, 1],
+    [200, 2],
+    [3000, 3],
+  ]
 
   expect(actual.data).toEqual(expected)
   expect(actual.influxQLQueryType).toEqual(InfluxQLQueryType.DataQuery)
@@ -788,7 +829,11 @@ it('errors when both meta query and data query response', () => {
               {
                 name: 'm1',
                 columns: ['time', 'f1'],
-                values: [[100, 1], [3000, 3], [200, 2]],
+                values: [
+                  [100, 1],
+                  [3000, 3],
+                  [200, 2],
+                ],
               },
             ],
           },
@@ -812,7 +857,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'mb',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -822,7 +870,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'ma',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -832,7 +883,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'mc',
                   columns: ['time', 'f2'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -842,7 +896,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'mc',
                   columns: ['time', 'f1'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -873,7 +930,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'mb',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -883,7 +943,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'ma',
                   columns: ['time', 'f1'],
-                  values: [[1000, 1], [2000, 2]],
+                  values: [
+                    [1000, 1],
+                    [2000, 2],
+                  ],
                 },
               ],
             },
@@ -893,7 +956,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'mc',
                   columns: ['time', 'f2'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -903,7 +969,10 @@ describe('timeSeriesToTableGraph', () => {
                 {
                   name: 'mc',
                   columns: ['time', 'f1'],
-                  values: [[2000, 3], [4000, 4]],
+                  values: [
+                    [2000, 3],
+                    [4000, 4],
+                  ],
                 },
               ],
             },
@@ -1124,7 +1193,12 @@ describe('transformTableData', () => {
       decimalPlaces
     )
 
-    const expected = [['time', 'f2'], [1000, 2000], [2000, 3000], [3000, 1000]]
+    const expected = [
+      ['time', 'f2'],
+      [1000, 2000],
+      [2000, 3000],
+      [3000, 1000],
+    ]
 
     expect(actual.transformedData).toEqual(expected)
   })
@@ -1161,7 +1235,12 @@ describe('transformTableData', () => {
       decimalPlaces
     )
 
-    const expected = [['time', 'f2'], [2000, 3000], [3000, 1000], [1000, 2000]]
+    const expected = [
+      ['time', 'f2'],
+      [2000, 3000],
+      [3000, 1000],
+      [1000, 2000],
+    ]
 
     expect(actual.transformedData).toEqual(expected)
   })
@@ -1241,7 +1320,10 @@ describe('if verticalTimeAxis is false', () => {
       decimalPlaces
     )
 
-    const expected = [['time', 2000, 3000, 1000], ['f2', 3000, 1000, 2000]]
+    const expected = [
+      ['time', 2000, 3000, 1000],
+      ['f2', 3000, 1000, 2000],
+    ]
 
     expect(actual.transformedData).toEqual(expected)
   })
