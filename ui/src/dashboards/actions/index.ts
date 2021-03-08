@@ -685,9 +685,9 @@ const updateTimeRangeFromQueryParams = (dashboardID: string) => (
     upper: queryParams.upper as string | undefined,
   }
 
-  const zoomedTimeRangeFromQueries = {
-    lower: queryParams.zoomedLower,
-    upper: queryParams.zoomedUpper,
+  const zoomedTimeRangeFromQueries: TimeRange = {
+    lower: queryParams.zoomedLower as string | undefined,
+    upper: queryParams.zoomedUpper as string | undefined,
   }
 
   let validatedTimeRange = validTimeRange(timeRangeFromQueries)
