@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/ban-types */
 import _ from 'lodash'
 import {Dispatch} from 'redux'
 import {ThunkDispatch} from 'redux-thunk'
