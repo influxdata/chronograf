@@ -350,7 +350,7 @@ class InfluxQLEditor extends Component<Props, State> {
     this.setState({isShowingTemplateValues: false, focused: true})
   }
 
-  private handleShowTemplateValues = async (): Promise<void> => {
+  private handleShowTemplateValues = (): void => {
     this.setState({
       isShowingTemplateValues: true,
     })
@@ -420,7 +420,11 @@ class InfluxQLEditor extends Component<Props, State> {
         <Dropdown
           titleText="Metaquery Templates"
           mode={DropdownMode.ActionList}
-          children={METAQUERY_TEMPLATE_OPTIONS.map(mqto => {
+          onChange={this.handleChooseMetaQuery}
+          buttonSize={ComponentSize.ExtraSmall}
+          widthPixels={163}
+        >
+          {METAQUERY_TEMPLATE_OPTIONS.map(mqto => {
             if (mqto.type === DropdownChildTypes.Item) {
               return (
                 <Dropdown.Item
@@ -435,10 +439,7 @@ class InfluxQLEditor extends Component<Props, State> {
               return <Dropdown.Divider key={mqto.id} id={mqto.id} />
             }
           })}
-          onChange={this.handleChooseMetaQuery}
-          buttonSize={ComponentSize.ExtraSmall}
-          widthPixels={163}
-        />
+        </Dropdown>
         <Button
           size={ComponentSize.ExtraSmall}
           color={ComponentColor.Primary}
