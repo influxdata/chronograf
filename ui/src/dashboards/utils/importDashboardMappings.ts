@@ -47,7 +47,7 @@ export const createSourceMappings = (
 
       let importedSourceID = _.findKey(
         importedSources,
-        is => is.link === sourceLink
+        (is) => is.link === sourceLink
       )
       if (!importedSourceID) {
         const sourceLinkSID = getSourceIDFromLink(sourceLink)
@@ -68,7 +68,7 @@ export const createSourceMappings = (
     sourcesCells
   )
   // add sources also for variables
-  variables.forEach(v => {
+  variables.forEach((v) => {
     if (v.sourceID && !sourceMappings[v.sourceID]) {
       sourceMappings[v.sourceID] = sourceInfo
       sourcesCells[v.sourceID] = []
@@ -88,7 +88,7 @@ export const mapCells = (
   sourceMappings: SourceMappings,
   importedSources: ImportedSources
 ): Cell[] => {
-  const mappedCells = cells.map(c => {
+  const mappedCells = cells.map((c) => {
     const query = getDeep<CellQuery>(c, 'queries.0', null)
     if (_.isEmpty(query)) {
       return c
@@ -101,7 +101,7 @@ export const mapCells = (
 
     let importedSourceID = _.findKey(
       importedSources,
-      is => is.link === sourceLink
+      (is) => is.link === sourceLink
     )
     if (!importedSourceID) {
       const sourceLinkSID = getSourceIDFromLink(sourceLink)
@@ -128,7 +128,7 @@ export const mapQueriesInCell = (
   const mappedSourceLink = sourceMappings[sourceID].link
   let queries = getDeep<CellQuery[]>(cell, 'queries', [])
   if (queries.length) {
-    queries = queries.map(q => {
+    queries = queries.map((q) => {
       return {...q, source: mappedSourceLink}
     })
   }

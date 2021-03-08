@@ -11,18 +11,20 @@ const parseValuesColumn = (resp: string): string[] => {
   }
 
   const tags = results.reduce<string[]>((acc, result: FluxTable) => {
-    const colIndex = result.data[0].findIndex(header => header === '_value')
+    const colIndex = result.data[0].findIndex((header) => header === '_value')
 
     if (colIndex === -1) {
       return [...acc]
     }
 
-    const resultTags = result.data.slice(1).map(row => row[colIndex] as string)
+    const resultTags = result.data
+      .slice(1)
+      .map((row) => row[colIndex] as string)
 
     return [...acc, ...resultTags]
   }, [])
 
-  return _.sortBy(tags, t => t.toLocaleLowerCase())
+  return _.sortBy(tags, (t) => t.toLocaleLowerCase())
 }
 
 export const parseFieldsByMeasurements = (
@@ -39,9 +41,11 @@ export const parseFieldsByMeasurements = (
 
   return results.reduce(
     (acc, result: FluxTable) => {
-      const fieldIndex = result.data[0].findIndex(header => header === '_field')
+      const fieldIndex = result.data[0].findIndex(
+        (header) => header === '_field'
+      )
       const measurementIndex = result.data[0].findIndex(
-        header => header === '_measurement'
+        (header) => header === '_measurement'
       )
 
       if (fieldIndex === -1) {
@@ -50,7 +54,7 @@ export const parseFieldsByMeasurements = (
 
       const data = result.data.slice(1)
 
-      data.forEach(row => {
+      data.forEach((row) => {
         const field = row[fieldIndex]
         if (!acc.fields.includes(field)) {
           acc.fields.push(field)

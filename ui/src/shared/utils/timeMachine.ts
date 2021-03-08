@@ -74,7 +74,7 @@ function initialQueryDrafts(cell: Cell | NewDefaultCell): CellQuery[] {
     return [defaultQueryDraft(QueryType.InfluxQL, cell.queries[0].source)]
   }
 
-  return queries.map(q => {
+  return queries.map((q) => {
     const id = uuid.v4()
     const queryConfig = {
       ...q.queryConfig,

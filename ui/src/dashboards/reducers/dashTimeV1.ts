@@ -22,7 +22,7 @@ export default (state: State = initialState, action: Action) => {
   switch (action.type) {
     case ActionType.DeleteDashboard: {
       const {dashboard} = action.payload
-      const ranges = state.ranges.filter(r => r.dashboardID !== dashboard.id)
+      const ranges = state.ranges.filter((r) => r.dashboardID !== dashboard.id)
 
       return {...state, ranges}
     }
@@ -36,7 +36,7 @@ export default (state: State = initialState, action: Action) => {
           return accum
         }, dashboardIDsHash)
       }
-      const ranges = state.ranges.filter(r => dashboardIDsHash[r.dashboardID])
+      const ranges = state.ranges.filter((r) => dashboardIDsHash[r.dashboardID])
       return {...state, ranges}
     }
 
@@ -50,7 +50,7 @@ export default (state: State = initialState, action: Action) => {
         }, dashboardIDsHash)
       }
       const refreshes = state.refreshes.filter(
-        r => dashboardIDsHash[r.dashboardID]
+        (r) => dashboardIDsHash[r.dashboardID]
       )
       return {...state, refreshes}
     }

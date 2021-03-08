@@ -98,7 +98,7 @@ function buildFields(
     return []
   }
 
-  return fieldFuncs.map(f => {
+  return fieldFuncs.map((f) => {
     switch (f.type) {
       case 'field': {
         const quoted = f.value === '*' ? '*' : `"${f.value}"`
@@ -156,18 +156,18 @@ export function buildWhereClause({
   // otherwise
   // join the tag key with an AND (i.e. cpu!=cpu1 AND cpu!=cpu2)
   // we do this because cpu!=cpu1 AND cpu!=cpu2 excludes no data
-  const tagClauses = _.keys(tags).map(k => {
+  const tagClauses = _.keys(tags).map((k) => {
     const operator = areTagsAccepted ? '=' : '!='
     const cond = areTagsAccepted ? ' OR ' : ' AND '
 
     if (tags[k].length > 1) {
       const joinedOnOr = tags[k]
-        .map(v => `"${k}"${operator}'${v.replace(/'/g, "\\'")}'`)
+        .map((v) => `"${k}"${operator}'${v.replace(/'/g, "\\'")}'`)
         .join(cond)
       return `(${joinedOnOr})`
     }
 
-    return `"${k}"${operator}'${tags[k].map(v => v.replace(/'/g, "\\'"))}'`
+    return `"${k}"${operator}'${tags[k].map((v) => v.replace(/'/g, "\\'"))}'`
   })
 
   const subClauses = timeClauses.concat(tagClauses)
@@ -197,7 +197,7 @@ function buildGroupByTags(groupBy: GroupBy): string {
     return ''
   }
 
-  const tags = groupBy.tags.map(t => `"${t}"`).join(', ')
+  const tags = groupBy.tags.map((t) => `"${t}"`).join(', ')
 
   if (groupBy.time) {
     return `, ${tags}`

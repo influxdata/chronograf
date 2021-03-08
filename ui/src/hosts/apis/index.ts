@@ -76,9 +76,9 @@ export const getCpuAndLoadForHosts = async (
   const winUptimeSeries = getDeep<Series[]>(data, 'results.[5].series', [])
   const allHostsSeries = getDeep<Series[]>(data, 'results.[6].series', [])
 
-  allHostsSeries.forEach(s => {
-    const hostnameIndex = s.columns.findIndex(col => col === 'value')
-    s.values.forEach(v => {
+  allHostsSeries.forEach((s) => {
+    const hostnameIndex = s.columns.findIndex((col) => col === 'value')
+    s.values.forEach((v) => {
       const hostname = v[hostnameIndex]
       hosts[hostname] = {
         ...EmptyHost,
@@ -87,8 +87,8 @@ export const getCpuAndLoadForHosts = async (
     })
   })
 
-  cpuSeries.forEach(s => {
-    const meanIndex = s.columns.findIndex(col => col === 'mean')
+  cpuSeries.forEach((s) => {
+    const meanIndex = s.columns.findIndex((col) => col === 'mean')
     hosts[s.tags.host] = {
       ...EmptyHost,
       name: s.tags.host,
@@ -96,35 +96,37 @@ export const getCpuAndLoadForHosts = async (
     }
   })
 
-  loadSeries.forEach(s => {
-    const meanIndex = s.columns.findIndex(col => col === 'mean')
+  loadSeries.forEach((s) => {
+    const meanIndex = s.columns.findIndex((col) => col === 'mean')
     hosts[s.tags.host].load =
       Math.round(Number(s.values[0][meanIndex]) * precision) / precision
   })
 
-  uptimeSeries.forEach(s => {
-    const uptimeIndex = s.columns.findIndex(col => col === 'deltaUptime')
+  uptimeSeries.forEach((s) => {
+    const uptimeIndex = s.columns.findIndex((col) => col === 'deltaUptime')
     hosts[s.tags.host].deltaUptime = Number(
       s.values[s.values.length - 1][uptimeIndex]
     )
   })
 
-  winCPUSeries.forEach(s => {
-    const meanIndex = s.columns.findIndex(col => col === 'mean')
+  winCPUSeries.forEach((s) => {
+    const meanIndex = s.columns.findIndex((col) => col === 'mean')
     hosts[s.tags.host] = {
       name: s.tags.host,
       cpu: Math.round(Number(s.values[0][meanIndex]) * precision) / precision,
     }
   })
 
-  winLoadSeries.forEach(s => {
-    const meanIndex = s.columns.findIndex(col => col === 'mean')
+  winLoadSeries.forEach((s) => {
+    const meanIndex = s.columns.findIndex((col) => col === 'mean')
     hosts[s.tags.host].load =
       Math.round(Number(s.values[0][meanIndex]) * precision) / precision
   })
 
-  winUptimeSeries.forEach(s => {
-    const winUptimeIndex = s.columns.findIndex(col => col === 'winDeltaUptime')
+  winUptimeSeries.forEach((s) => {
+    const winUptimeIndex = s.columns.findIndex(
+      (col) => col === 'winDeltaUptime'
+    )
     hosts[s.tags.host].winDeltaUptime = Number(
       s.values[s.values.length - 1][winUptimeIndex]
     )
@@ -149,9 +151,9 @@ const getAllHosts = async (source: Source): Promise<HostNames> => {
     const hosts: HostNames = {}
     const allHostsSeries = getDeep<Series[]>(data, 'results[0].series', [])
 
-    allHostsSeries.forEach(s => {
-      const hostnameIndex = s.columns.findIndex(col => col === 'value')
-      s.values.forEach(v => {
+    allHostsSeries.forEach((s) => {
+      const hostnameIndex = s.columns.findIndex((col) => col === 'value')
+      s.values.forEach((v) => {
         const hostname = v[hostnameIndex]
         hosts[hostname] = {
           name: hostname,
@@ -200,9 +202,9 @@ export const getAppsForHost = async (
   appLayouts: Layout[],
   telegrafDB: string
 ) => {
-  const measurements = appLayouts.map(m => `^${m.measurement}$`).join('|')
+  const measurements = appLayouts.map((m) => `^${m.measurement}$`).join('|')
   const measurementsToApps = _.zipObject(
-    appLayouts.map(m => m.measurement),
+    appLayouts.map((m) => m.measurement),
     appLayouts.map(({app}) => app)
   )
 
@@ -216,7 +218,7 @@ export const getAppsForHost = async (
 
   const allSeries = getDeep<string[][]>(data, 'results.0.series.0.values', [])
 
-  allSeries.forEach(series => {
+  allSeries.forEach((series) => {
     const seriesObj = parseSeries(series[0])
     const measurement = seriesObj.measurement
 
@@ -234,9 +236,9 @@ export const getAppsForHosts = async (
   appLayouts: Layout[],
   telegrafDB: string
 ): Promise<HostsObject> => {
-  const measurements = appLayouts.map(m => `^${m.measurement}$`).join('|')
+  const measurements = appLayouts.map((m) => `^${m.measurement}$`).join('|')
   const measurementsToApps = _.zipObject(
-    appLayouts.map(m => m.measurement),
+    appLayouts.map((m) => m.measurement),
     appLayouts.map(({app}) => app)
   )
 
@@ -253,7 +255,7 @@ export const getAppsForHosts = async (
     []
   )
 
-  allSeries.forEach(series => {
+  allSeries.forEach((series) => {
     const seriesObj = parseSeries(series[0])
     const measurement = seriesObj.measurement
     const host = getDeep<string>(seriesObj, 'tags.host', '')
@@ -293,7 +295,7 @@ export const getMeasurementsForHost = async (
   }
 
   const values = getDeep<string[][]>(data, 'results.[0].series.[0].values', [])
-  const measurements = values.map(m => {
+  const measurements = values.map((m) => {
     return m[0]
   })
   return measurements

@@ -84,7 +84,7 @@ const removeFilter = (
   const {id} = action.payload
   const filters = _.filter(
     _.get(state, 'filters', []),
-    filter => filter.id !== id
+    (filter) => filter.id !== id
   )
 
   return {...state, filters}
@@ -106,7 +106,7 @@ const changeFilter = (
 ): LogsState => {
   const {id, operator, value} = action.payload
 
-  const mappedFilters = _.map(_.get(state, 'filters', []), f => {
+  const mappedFilters = _.map(_.get(state, 'filters', []), (f) => {
     if (f.id === id) {
       return {...f, operator, value}
     }

@@ -97,5 +97,5 @@ export const DEFAULT_TIME_RANGE = {
 }
 
 export const STATUS_PAGE_TIME_RANGE = timeRanges.find(
-  tr => tr.lower === nowMinus30d
+  (tr) => tr.lower === nowMinus30d
 )

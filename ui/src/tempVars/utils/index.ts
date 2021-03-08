@@ -9,14 +9,14 @@ import {
   TemplateValueType,
 } from 'src/types'
 
-export const trimAndRemoveQuotes = elt => {
+export const trimAndRemoveQuotes = (elt) => {
   const trimmed = elt.trim()
   const dequoted = trimmed.replace(/(^")|("$)/g, '')
 
   return dequoted
 }
 
-export const formatTempVar = name =>
+export const formatTempVar = (name) =>
   `:${name.replace(/:/g, '').replace(/\s/g, '')}:`
 
 export const resolveValues = (
@@ -39,9 +39,7 @@ export const resolveValues = (
       return newTemplateValueQuery(template, newValues, hopefullySelectedValue)
     default:
       throw new Error(
-        `TemplateValue resolution for TemplateType ${
-          template.type
-        } not implemented`
+        `TemplateValue resolution for TemplateType ${template.type} not implemented`
       )
   }
 }
@@ -75,7 +73,7 @@ const newTemplateValueQuery = (
     localSelectedValue = selectedValue
   }
 
-  return newValues.map(value => {
+  return newValues.map((value) => {
     return {
       type,
       value,
@@ -93,27 +91,27 @@ const newTemplateValueConstant = (
     return []
   }
 
-  let selectedValue = template.values.find(v => v.selected)
+  let selectedValue = template.values.find((v) => v.selected)
 
   if (!selectedValue) {
     selectedValue = template.values[0]
   }
 
-  let localSelectedValue = template.values.find(v => {
+  let localSelectedValue = template.values.find((v) => {
     return template.type === TemplateType.Map
       ? v.key === hopefullySelectedValue
       : v.value === hopefullySelectedValue
   })
 
   if (!localSelectedValue) {
-    localSelectedValue = template.values.find(v => v.localSelected)
+    localSelectedValue = template.values.find((v) => v.localSelected)
   }
 
   if (!localSelectedValue) {
     localSelectedValue = selectedValue
   }
 
-  return template.values.map(v => ({
+  return template.values.map((v) => ({
     ...v,
     selected: v.value === selectedValue.value,
     localSelected: v.value === localSelectedValue.value,
@@ -148,7 +146,7 @@ const newTemplateValueText = (
 }
 
 export const getSelectedValue = (template: Template): string | null => {
-  const selected = template.values.find(v => v.selected)
+  const selected = template.values.find((v) => v.selected)
 
   if (selected) {
     return selected.value
@@ -158,7 +156,7 @@ export const getSelectedValue = (template: Template): string | null => {
 }
 
 export const getLocalSelectedValue = (template: Template): string | null => {
-  const selected = template.values.find(v => v.localSelected)
+  const selected = template.values.find((v) => v.localSelected)
 
   if (selected) {
     return selected.value
@@ -211,4 +209,4 @@ export const csvToMap = (csv: string): MapResult => {
 }
 
 export const mapToCSV = (values: TemplateValue[]): string =>
-  values.map(v => `${v.key},"${v.value}"`).join('\n')
+  values.map((v) => `${v.key},"${v.value}"`).join('\n')

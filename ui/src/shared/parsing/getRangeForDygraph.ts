@@ -4,7 +4,7 @@ import {RuleValues} from 'src/types'
 const ADD_FACTOR = 1.1
 const SUB_FACTOR = 0.9
 
-const checkNumeric = num => (isFinite(num) ? num : null)
+const checkNumeric = (num) => (isFinite(num) ? num : null)
 
 const considerEmpty = (userNumber, num) => {
   if (userNumber) {
@@ -29,10 +29,10 @@ const getRange = (
   const userMin = checkNumeric(uMin)
   const userMax = checkNumeric(uMax)
 
-  const addPad = bigNum => bigNum.times(ADD_FACTOR).toNumber()
-  const subPad = bigNum => bigNum.times(SUB_FACTOR).toNumber()
+  const addPad = (bigNum) => bigNum.times(ADD_FACTOR).toNumber()
+  const subPad = (bigNum) => bigNum.times(SUB_FACTOR).toNumber()
 
-  const pad = v => {
+  const pad = (v) => {
     if (v === null || v === '' || !isFinite(v)) {
       return null
     }
@@ -95,7 +95,7 @@ const getRange = (
   return [min, max]
 }
 
-const coerceToNum = str => (str ? +str : null)
+const coerceToNum = (str) => (str ? +str : null)
 export const getStackedRange = (bounds = [null, null]): [number, number] => [
   coerceToNum(bounds[0]),
   coerceToNum(bounds[1]),

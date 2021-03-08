@@ -399,7 +399,7 @@ export const editRawTextAsync = (
         query: text,
       },
     ])
-    const config = queries.find(q => q.id === id)
+    const config = queries.find((q) => q.id === id)
     dispatch(updateQueryConfig(config.queryConfig))
   } catch (error) {
     dispatch(errorThrown(error))

@@ -22,8 +22,8 @@ const GLOBAL_FUNCTIONS = [
 
 export const isValidTemplate = (template: string): boolean => {
   if (
-    !!_.find(RULE_MESSAGE_TEMPLATE_TEXTS, t => t === template) ||
-    !!_.find(EXTRA_MESSAGE_VARIABLES, t => t === template)
+    !!_.find(RULE_MESSAGE_TEMPLATE_TEXTS, (t) => t === template) ||
+    !!_.find(EXTRA_MESSAGE_VARIABLES, (t) => t === template)
   ) {
     return true
   }
@@ -49,7 +49,7 @@ export const isValidTemplate = (template: string): boolean => {
   // check if we have a prefix that we can remove
   const validPrefix = _.find(
     GLOBAL_FUNCTIONS,
-    t =>
+    (t) =>
       template.startsWith(t) &&
       template.length > t.length &&
       /\s/.test(template[t.length])
@@ -77,7 +77,7 @@ export const isValidMessage = (message: string): boolean => {
     match = templateRegexp.exec(message)
   }
 
-  const isValid = _.every(matches, m => isValidTemplate(m))
+  const isValid = _.every(matches, (m) => isValidTemplate(m))
 
   return isValid
 }

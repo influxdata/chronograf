@@ -37,7 +37,7 @@ const addNewCellToCells = (
 
 const createTemplatesForProtoboard = (pbTemplates, source): Template[] => {
   const telegraf = source.telegraf || 'telegraf'
-  return pbTemplates.map(pbt => {
+  return pbTemplates.map((pbt) => {
     return {...pbt, id: uuid.v4(), query: {...pbt.query, db: telegraf}}
   })
 }
@@ -48,7 +48,7 @@ const replaceQuery = (q: string, source: Source) =>
     .replace(':rp:', source.defaultRP || 'autogen')
 
 const replaceDbRp = (queries: CellQuery[], source: Source) =>
-  queries.map(q => ({...q, query: replaceQuery(q.query, source)}))
+  queries.map((q) => ({...q, query: replaceQuery(q.query, source)}))
 
 export const instantiateProtoboard = (
   protoboard: Protoboard,
@@ -57,7 +57,7 @@ export const instantiateProtoboard = (
   let cellsWithPlaces = protoboard.data.cells
 
   const isCellsUnplaced = protoboard.data.cells.every(
-    c => c.x === 0 && c.y === 0
+    (c) => c.x === 0 && c.y === 0
   )
 
   if (isCellsUnplaced) {
@@ -67,7 +67,7 @@ export const instantiateProtoboard = (
   const pbTemplates = protoboard.data.templates
   const templates = createTemplatesForProtoboard(pbTemplates, source)
 
-  const cells = cellsWithPlaces.map(c => ({
+  const cells = cellsWithPlaces.map((c) => ({
     ...c,
     queries: replaceDbRp(c.queries, source),
   })) as Cell[]

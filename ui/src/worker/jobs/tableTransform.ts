@@ -1,7 +1,7 @@
 import {fetchData} from 'src/worker/utils'
 import {transformTableData} from 'src/dashboards/utils/tableGraph'
 
-const tableTransform = async msg => {
+const tableTransform = async (msg) => {
   const dbResult = await fetchData(msg)
 
   const {

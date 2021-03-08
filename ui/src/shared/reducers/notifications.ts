@@ -18,7 +18,7 @@ export const notifications = (state = initialState, action: Action) => {
 
     case 'DISMISS_NOTIFICATION': {
       const {id} = action.payload
-      return state.filter(n => n.id !== id)
+      return state.filter((n) => n.id !== id)
     }
   }
 

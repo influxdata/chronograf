@@ -25,7 +25,9 @@ export const timeSeriesToDygraph = async (
     timeSeries,
     ([time, ...values]) => {
       if (unsupportedValue === undefined) {
-        unsupportedValue = values.find(x => x !== null && typeof x !== 'number')
+        unsupportedValue = values.find(
+          (x) => x !== null && typeof x !== 'number'
+        )
       }
       return [new Date(time), ...values]
     }

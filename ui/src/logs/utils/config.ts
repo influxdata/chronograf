@@ -30,7 +30,7 @@ export const logConfigServerToUI = (
 
   let severityFormat: SeverityFormatOptions
   let severityLevelColors: SeverityLevelColor[]
-  const convertedColumns = sortedColumns.map(c => {
+  const convertedColumns = sortedColumns.map((c) => {
     if (c.name === 'severity') {
       severityFormat = getFormatFromColumn(c)
       severityLevelColors = getLevelColorsFromColumn(c)
@@ -48,7 +48,7 @@ export const logConfigServerToUI = (
 }
 
 export const sortColumns = (columns: ServerColumn[]): ServerColumn[] => {
-  return _.sortBy(columns, c => c.position)
+  return _.sortBy(columns, (c) => c.position)
 }
 
 export const columnServerToUI = (column: ServerColumn): LogsTableColumn => {
@@ -76,7 +76,7 @@ export const getFormatFromColumn = (
   let hasText = false
   let hasIcon = false
 
-  column.encodings.forEach(e => {
+  column.encodings.forEach((e) => {
     if (e.type === EncodingTypes.label) {
       if (e.value === EncodingLabelOptions.icon) {
         hasIcon = true
@@ -99,8 +99,8 @@ export const getFormatFromColumn = (
 export const getLevelColorsFromColumn = (
   column: ServerColumn
 ): SeverityLevelColor[] => {
-  const colors = column.encodings.filter(e => e.type === EncodingTypes.color)
-  return colors.map(c => {
+  const colors = column.encodings.filter((e) => e.type === EncodingTypes.color)
+  return colors.map((c) => {
     const level: SeverityLevelOptions = SeverityLevelOptions[c.name]
     const color: SeverityColorOptions = SeverityColorOptions[c.value]
     return {level, color}

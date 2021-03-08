@@ -347,7 +347,7 @@ const getBackwardTableData = (state: State): TableData =>
  */
 const combineTableData = (...tableDatas: TableData[]) => ({
   columns: tableDatas[0].columns,
-  values: _.flatMap(tableDatas, t => t.values),
+  values: _.flatMap(tableDatas, (t) => t.values),
 })
 
 const getTimeRange = (state: State): TimeRange | null =>
@@ -573,9 +573,9 @@ export const clearAllTimeBounds = () => (
   dispatch(setNextTailLowerBound(undefined))
 }
 
-export const clearSearchData = (
-  searchStatus: SearchStatus
-) => async dispatch => {
+export const clearSearchData = (searchStatus: SearchStatus) => async (
+  dispatch
+) => {
   await dispatch(setSearchStatus(SearchStatus.Clearing))
   dispatch(setHistogramData([]))
   dispatch(clearAllTimeBounds())
@@ -584,11 +584,11 @@ export const clearSearchData = (
   await dispatch(setSearchStatus(searchStatus))
 }
 
-export const setTableCustomTimeAsync = (time: string) => async dispatch => {
+export const setTableCustomTimeAsync = (time: string) => async (dispatch) => {
   await dispatch(setTableCustomTime(time))
 }
 
-export const setTableRelativeTimeAsync = (time: number) => async dispatch => {
+export const setTableRelativeTimeAsync = (time: number) => async (dispatch) => {
   await dispatch(setTableRelativeTime(time))
 }
 
@@ -966,7 +966,7 @@ export const populateNamespacesAsync = (
       if (currentNamespace) {
         defaultNamespace = _.find(
           namespaces,
-          ns =>
+          (ns) =>
             ns.database === currentNamespace.database &&
             ns.retentionPolicy === currentNamespace.retentionPolicy
         )
@@ -974,7 +974,7 @@ export const populateNamespacesAsync = (
       if (!defaultNamespace && source.telegraf) {
         defaultNamespace = _.find(
           namespaces,
-          ns => ns.database === source.telegraf
+          (ns) => ns.database === source.telegraf
         )
       }
     }

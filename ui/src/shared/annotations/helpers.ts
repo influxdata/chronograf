@@ -32,7 +32,7 @@ export const visibleAnnotations = (
     return []
   }
 
-  return annotations.filter(a => {
+  return annotations.filter((a) => {
     if (a.startTime === null || a.endTime === null) {
       return false
     }

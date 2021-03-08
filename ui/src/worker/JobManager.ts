@@ -93,7 +93,7 @@ class JobManager {
     return this.publishDBJob('VALIDATEDYGRAPHDATA', ts)
   }
 
-  private handleMessage = async msg => {
+  private handleMessage = async (msg) => {
     const {data} = msg
     const deferred = this.jobs[data.origin]
     if (deferred) {
@@ -117,7 +117,7 @@ class JobManager {
     }
   }
 
-  private handleError = err => {
+  private handleError = (err) => {
     console.error(err)
   }
 

@@ -27,15 +27,15 @@ export function executeQueries(
   templates: Template[],
   uuid?: string
 ): Promise<QueryResult[]> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const results = []
 
     let counter = queries.length
 
     for (let i = 0; i < queries.length; i++) {
       executeQuery(source, queries[i], templates, uuid)
-        .then(result => (results[i] = {value: result, error: null}))
-        .catch(result => (results[i] = {value: null, error: result}))
+        .then((result) => (results[i] = {value: result, error: null}))
+        .catch((result) => (results[i] = {value: null, error: result}))
         .then(() => {
           counter -= 1
 

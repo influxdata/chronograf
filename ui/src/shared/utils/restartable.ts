@@ -2,7 +2,7 @@ import Deferred from 'src/worker/Deferred'
 
 export function restartable<T extends any[], V>(
   f: (...args: T) => Promise<V>
-): ((...args: T) => Promise<V>) {
+): (...args: T) => Promise<V> {
   let deferred: Deferred
   let id: number = 0
 

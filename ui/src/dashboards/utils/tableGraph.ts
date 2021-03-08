@@ -84,7 +84,7 @@ const updateMaxWidths = (
 
       const foundField =
         isLabel && _.isString(col)
-          ? fieldOptions.find(field => field.internalName === col)
+          ? fieldOptions.find((field) => field.internalName === col)
           : null
 
       let colValue = `${col}`
@@ -167,12 +167,12 @@ export const computeFieldOptions = (
     return astNames
   }
 
-  const intersection = existingFieldOptions.filter(f => {
-    return astNames.find(a => a.internalName === f.internalName)
+  const intersection = existingFieldOptions.filter((f) => {
+    return astNames.find((a) => a.internalName === f.internalName)
   })
 
-  const newFields = astNames.filter(a => {
-    return !existingFieldOptions.find(f => f.internalName === a.internalName)
+  const newFields = astNames.filter((a) => {
+    return !existingFieldOptions.find((f) => f.internalName === a.internalName)
   })
 
   return [...intersection, ...newFields]
@@ -218,7 +218,7 @@ export const filterTableColumns = (
       return fastFilter<TimeSeriesValue>(row, (col, j) => {
         if (i === 0) {
           const foundField = fieldOptions.find(
-            field => field.internalName === col
+            (field) => field.internalName === col
           )
           visibility[j] = foundField ? foundField.visible : true
         }
@@ -233,13 +233,13 @@ export const orderTableColumns = (
   data: TimeSeriesValue[][],
   fieldOptions: FieldOption[]
 ): TimeSeriesValue[][] => {
-  const fieldsSortOrder = fieldOptions.map(fieldOption => {
-    return _.findIndex(data[0], dataLabel => {
+  const fieldsSortOrder = fieldOptions.map((fieldOption) => {
+    return _.findIndex(data[0], (dataLabel) => {
       return dataLabel === fieldOption.internalName
     })
   })
 
-  const filteredFieldSortOrder = fieldsSortOrder.filter(f => f !== -1)
+  const filteredFieldSortOrder = fieldsSortOrder.filter((f) => f !== -1)
 
   const orderedData = fastMap<TimeSeriesValue[], TimeSeriesValue[]>(
     data,

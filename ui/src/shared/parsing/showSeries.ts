@@ -18,7 +18,7 @@ const parseShowSeries = (response): ParseShowSeriesResponse => {
     return {errors: [], series: []}
   }
 
-  const series = seriesValues.map(s => s[0])
+  const series = seriesValues.map((s) => s[0])
 
   return {series, errors: []}
 }

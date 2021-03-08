@@ -12,7 +12,7 @@ const PAGE_WIDTH = 12
 
 export function getCells(layouts: Layout[], source: Source): Cell[] {
   const layoutCells = getLayoutCells(layouts)
-  const cells = layoutCells.map(d => toCell(d, source))
+  const cells = layoutCells.map((d) => toCell(d, source))
 
   return cells
 }
@@ -22,13 +22,13 @@ function getLayoutCells(layouts: Layout[]): LayoutCell[] {
     return []
   }
 
-  const autoflowLayouts = layouts.filter(l => !!l.autoflow)
-  const autoflowCells = flatten(autoflowLayouts.map(l => l.cells))
+  const autoflowLayouts = layouts.filter((l) => !!l.autoflow)
+  const autoflowCells = flatten(autoflowLayouts.map((l) => l.cells))
 
-  const staticLayouts = layouts.filter(layout => !layout.autoflow)
+  const staticLayouts = layouts.filter((layout) => !layout.autoflow)
   const cellGroups = [
     autoPositionCells(autoflowCells),
-    ...staticLayouts.map(layout => layout.cells),
+    ...staticLayouts.map((layout) => layout.cells),
   ]
 
   const cells = translateCellGroups(cellGroups)
@@ -39,7 +39,7 @@ function getLayoutCells(layouts: Layout[]): LayoutCell[] {
 function autoPositionCells(cells: LayoutCell[]): LayoutCell[] {
   return cells.reduce((acc, cell, i) => {
     const x = (i * CELL_WIDTH) % PAGE_WIDTH
-    const y = Math.floor(i * CELL_WIDTH / PAGE_WIDTH) * CELL_HEIGHT
+    const y = Math.floor((i * CELL_WIDTH) / PAGE_WIDTH) * CELL_HEIGHT
     const newCell = {...cell, w: CELL_WIDTH, h: CELL_HEIGHT, x, y}
 
     return [...acc, newCell]
@@ -71,7 +71,7 @@ function translateCellGroups(groups: LayoutCell[][]): LayoutCell[] {
 }
 
 function toCell(layoutCell: LayoutCell, source: Source): Cell {
-  const queries = layoutCell.queries.map(d => toCellQuery(d, source))
+  const queries = layoutCell.queries.map((d) => toCellQuery(d, source))
 
   const cell = {
     ...NEW_DEFAULT_DASHBOARD_CELL,

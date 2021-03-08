@@ -12,9 +12,9 @@ const sourcesReducer = (state = initialState, action: Action): Source[] => {
 
     case 'SOURCE_UPDATED': {
       const {source} = action.payload
-      const updatedIndex = state.findIndex(s => s.id === source.id)
+      const updatedIndex = state.findIndex((s) => s.id === source.id)
       const updatedSources = source.default
-        ? state.map(s => {
+        ? state.map((s) => {
             s.default = false
             return s
           })
@@ -26,7 +26,7 @@ const sourcesReducer = (state = initialState, action: Action): Source[] => {
     case 'SOURCE_ADDED': {
       const {source} = action.payload
       const updatedSources = source.default
-        ? state.map(s => {
+        ? state.map((s) => {
             s.default = false
             return s
           })
@@ -36,7 +36,7 @@ const sourcesReducer = (state = initialState, action: Action): Source[] => {
 
     case 'LOAD_KAPACITORS': {
       const {source, kapacitors} = action.payload
-      const sourceIndex = state.findIndex(s => s.id === source.id)
+      const sourceIndex = state.findIndex((s) => s.id === source.id)
       const updatedSources = _.cloneDeep(state)
       if (updatedSources[sourceIndex]) {
         updatedSources[sourceIndex].kapacitors = kapacitors
@@ -47,7 +47,7 @@ const sourcesReducer = (state = initialState, action: Action): Source[] => {
     case 'SET_ACTIVE_KAPACITOR': {
       const {kapacitor} = action.payload
       const updatedSources = _.cloneDeep(state)
-      updatedSources.forEach(source => {
+      updatedSources.forEach((source) => {
         source.kapacitors.forEach((k, i) => {
           source.kapacitors[i].active = k.id === kapacitor.id
         })
@@ -58,10 +58,10 @@ const sourcesReducer = (state = initialState, action: Action): Source[] => {
     case 'DELETE_KAPACITOR': {
       const {kapacitor} = action.payload
       const updatedSources = _.cloneDeep(state)
-      updatedSources.forEach(source => {
+      updatedSources.forEach((source) => {
         const index = _.findIndex<Kapacitor>(
           source.kapacitors,
-          k => k.id === kapacitor.id
+          (k) => k.id === kapacitor.id
         )
 
         if (index >= 0) {

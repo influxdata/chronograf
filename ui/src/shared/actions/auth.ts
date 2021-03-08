@@ -154,7 +154,7 @@ export const meChangeOrganizationAsync = (
   try {
     const {data: me, auth, logoutLink} = await updateMeAJAX(url, organization)
     const currentRole = me.roles.find(
-      r => r.organization === me.currentOrganization.id
+      (r) => r.organization === me.currentOrganization.id
     )
     dispatch(
       notify(

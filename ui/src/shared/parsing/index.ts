@@ -11,7 +11,7 @@ import {TimeSeriesResponse} from 'src/types/series'
 
 const parsers = {
   databases,
-  measurements: data => {
+  measurements: (data) => {
     const {errors, measurementSets} = measurements(data)
     return {
       errors,

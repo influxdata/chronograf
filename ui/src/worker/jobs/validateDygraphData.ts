@@ -7,7 +7,7 @@ import {Message} from 'src/worker/types'
 const validateDygraphData = async (msg: Message): Promise<boolean> => {
   const ts: DygraphValue[][] = await fetchData(msg)
 
-  return _.every(ts, r =>
+  return _.every(ts, (r) =>
     _.every(
       r,
       (v: any, i: number) =>

@@ -104,7 +104,7 @@ export const getActiveKapacitor = async (
       method: 'GET',
     })
 
-    const activeKapacitor = data.kapacitors.find(k => k.active)
+    const activeKapacitor = data.kapacitors.find((k) => k.active)
     return activeKapacitor || data.kapacitors[0]
   } catch (error) {
     console.error(error)
@@ -278,7 +278,7 @@ export const testAlertOutput = async (
     const {
       data: {services},
     } = await kapacitorProxy(kapacitor, 'GET', '/kapacitor/v1/service-tests')
-    const service = services.find(s => s.name === outputName)
+    const service = services.find((s) => s.name === outputName)
 
     let body = {}
     if (options) {

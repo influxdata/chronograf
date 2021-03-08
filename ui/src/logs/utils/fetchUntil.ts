@@ -22,7 +22,7 @@ export function fetchUntil<T>(
   }
 }
 
-const fetchEachAsync = async requestsIterator => {
+const fetchEachAsync = async (requestsIterator) => {
   for (const response of requestsIterator) {
     await response
   }

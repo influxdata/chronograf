@@ -43,13 +43,15 @@ export const isCellUntitled = (cellName: string): boolean => {
 }
 
 export const getNextAvailablePosition = (cells, newCell) => {
-  const farthestY = cells.map(cell => cell.y).reduce((a, b) => (a > b ? a : b))
-
-  const bottomCells = cells.filter(cell => cell.y === farthestY)
-  const farthestX = bottomCells
-    .map(cell => cell.x)
+  const farthestY = cells
+    .map((cell) => cell.y)
     .reduce((a, b) => (a > b ? a : b))
-  const lastCell = bottomCells.find(cell => cell.x === farthestX)
+
+  const bottomCells = cells.filter((cell) => cell.y === farthestY)
+  const farthestX = bottomCells
+    .map((cell) => cell.x)
+    .reduce((a, b) => (a > b ? a : b))
+  const lastCell = bottomCells.find((cell) => cell.x === farthestX)
 
   const availableSpace = MAX_COLUMNS - (lastCell.x + lastCell.w)
   const newCellFits = availableSpace >= newCell.w
@@ -79,8 +81,8 @@ export const getNewDashboardCell = (
     return typedCell
   }
 
-  const existingCellWidths = dashboard.cells.map(cell => cell.w)
-  const existingCellHeights = dashboard.cells.map(cell => cell.h)
+  const existingCellWidths = dashboard.cells.map((cell) => cell.w)
+  const existingCellHeights = dashboard.cells.map((cell) => cell.h)
 
   const mostCommonCellWidth = getMostCommonValue(existingCellWidths)
   const mostCommonCellHeight = getMostCommonValue(existingCellHeights)
@@ -103,7 +105,7 @@ export const getNewDashboardCell = (
 const incrementCloneName = (cellNames: string[], cellName: string): string => {
   const rootName = cellName.replace(/\s\(clone\s(\d)+\)/g, '').replace(/\)/, '')
 
-  const filteredNames = cellNames.filter(cn => cn.includes(rootName))
+  const filteredNames = cellNames.filter((cn) => cn.includes(rootName))
 
   const highestNumberedClone = filteredNames.reduce((acc, name) => {
     if (name.match(/\(clone(\s|\d)+\)/)) {
@@ -135,7 +137,7 @@ export const getClonedDashboardCell = (
   dashboard: Dashboard,
   cellClone: Cell
 ): Cell => {
-  const cellNames = dashboard.cells.map(c => c.name)
+  const cellNames = dashboard.cells.map((c) => c.name)
   const name = incrementCloneName(cellNames, cellClone.name)
 
   const cellCloneFitsLeft = cellClone.x >= cellClone.w
@@ -181,7 +183,7 @@ export const getConfig = async (
   const queries = await getQueryConfigAndStatus(url, [
     {query: renderedQuery, id},
   ])
-  const {queryConfig} = queries.find(q => q.id === id)
+  const {queryConfig} = queries.find((q) => q.id === id)
   const range = getRangeForOriginalQuery(query, queryConfig.range)
 
   return {

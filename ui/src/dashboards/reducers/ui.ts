@@ -6,7 +6,7 @@ import {Action, ActionType} from 'src/dashboards/actions'
 
 import {TemplateType} from 'src/types/tempVars'
 
-const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
+const {lower, upper} = timeRanges.find((tr) => tr.lower === 'now() - 1h')
 
 export const initialState: DashboardUIState = {
   dashboards: [],
@@ -54,8 +54,8 @@ export default (
     case ActionType.UpdateDashboard: {
       const {dashboard} = action.payload
       const newState = {
-        dashboards: state.dashboards.map(
-          d => (d.id === dashboard.id ? dashboard : d)
+        dashboards: state.dashboards.map((d) =>
+          d.id === dashboard.id ? dashboard : d
         ),
       }
       return {...state, ...newState}
@@ -72,7 +72,7 @@ export default (
     case ActionType.DeleteDashboard: {
       const {dashboard} = action.payload
       const newState = {
-        dashboards: state.dashboards.filter(d => d.id !== dashboard.id),
+        dashboards: state.dashboards.filter((d) => d.id !== dashboard.id),
       }
 
       return {...state, ...newState}
@@ -92,8 +92,8 @@ export default (
 
       const newCells = [cell, ...dashboard.cells]
       const newDashboard = {...dashboard, cells: newCells}
-      const newDashboards = dashboards.map(
-        d => (d.id === dashboard.id ? newDashboard : d)
+      const newDashboards = dashboards.map((d) =>
+        d.id === dashboard.id ? newDashboard : d
       )
       const newState = {dashboards: newDashboards}
 
@@ -104,15 +104,15 @@ export default (
       const {dashboard, cell} = action.payload
 
       const newCells = dashboard.cells.filter(
-        c => !(c.x === cell.x && c.y === cell.y)
+        (c) => !(c.x === cell.x && c.y === cell.y)
       )
       const newDashboard = {
         ...dashboard,
         cells: newCells,
       }
       const newState = {
-        dashboards: state.dashboards.map(
-          d => (d.id === dashboard.id ? newDashboard : d)
+        dashboards: state.dashboards.map((d) =>
+          d.id === dashboard.id ? newDashboard : d
         ),
       }
 
@@ -124,14 +124,14 @@ export default (
 
       const newDashboard = {
         ...dashboard,
-        cells: dashboard.cells.map(
-          c => (c.x === cell.x && c.y === cell.y ? cell : c)
+        cells: dashboard.cells.map((c) =>
+          c.x === cell.x && c.y === cell.y ? cell : c
         ),
       }
 
       const newState = {
-        dashboards: state.dashboards.map(
-          d => (d.id === dashboard.id ? newDashboard : d)
+        dashboards: state.dashboards.map((d) =>
+          d.id === dashboard.id ? newDashboard : d
         ),
       }
 
@@ -147,12 +147,12 @@ export default (
     case ActionType.TemplateVariableLocalSelected: {
       const {dashboardID, templateID, value: newValue} = action.payload
 
-      const dashboards = state.dashboards.map(dashboard => {
+      const dashboards = state.dashboards.map((dashboard) => {
         if (dashboard.id !== dashboardID) {
           return dashboard
         }
 
-        const templates = dashboard.templates.map(template => {
+        const templates = dashboard.templates.map((template) => {
           if (template.id !== templateID) {
             return template
           }
@@ -161,7 +161,7 @@ export default (
           if (template.type === TemplateType.Text) {
             values = [newValue]
           } else {
-            values = template.values.map(value => {
+            values = template.values.map((value) => {
               const localSelected = value.value === newValue.value
 
               return {...value, localSelected}
@@ -180,11 +180,11 @@ export default (
     case ActionType.UpdateTemplates: {
       const {templates: updatedTemplates} = action.payload
 
-      const dashboards = state.dashboards.map(dashboard => {
+      const dashboards = state.dashboards.map((dashboard) => {
         const templates = dashboard.templates.reduce(
           (acc, existingTemplate) => {
             const updatedTemplate = updatedTemplates.find(
-              t => t.id === existingTemplate.id
+              (t) => t.id === existingTemplate.id
             )
 
             if (updatedTemplate) {

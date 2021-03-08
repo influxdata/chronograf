@@ -11,7 +11,7 @@ export const linksFromHosts = (
   hostNames: HostNames,
   source: Source
 ): DashboardSwitcherLinks => {
-  const links = Object.values(hostNames).map(h => {
+  const links = Object.values(hostNames).map((h) => {
     return {
       key: h.name,
       text: h.name,
@@ -26,7 +26,7 @@ export const updateActiveHostLink = (
   hostLinks: DashboardSwitcherLinks,
   host: HostName
 ): DashboardSwitcherLinks => {
-  const active = hostLinks.links.find(link => link.key === host.name)
+  const active = hostLinks.links.find((link) => link.key === host.name)
 
   return {...hostLinks, active}
 }

@@ -26,7 +26,7 @@ export const parseTablesByTime = (
   const allColumnNames = []
   const nonNumericColumns = []
 
-  const tablesByTime = tables.map(table => {
+  const tablesByTime = tables.map((table) => {
     const header = table.data[0] as string[]
     const columnNames: {[k: number]: string} = {}
 

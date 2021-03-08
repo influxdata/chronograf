@@ -207,7 +207,7 @@ export const RESERVED_TEMPLATE_NAMES = [
 
 export const MATCH_INCOMPLETE_TEMPLATES = /:[\w-]*/g
 
-export const applyMasks = query => {
+export const applyMasks = (query) => {
   const matchWholeTemplates = /:([\w-]*):/g
   const maskForWholeTemplates = '😸$1😸'
   return query.replace(matchWholeTemplates, maskForWholeTemplates)
@@ -215,7 +215,7 @@ export const applyMasks = query => {
 export const insertTempVar = (query, tempVar) => {
   return query.replace(MATCH_INCOMPLETE_TEMPLATES, tempVar)
 }
-export const unMask = query => {
+export const unMask = (query) => {
   return query.replace(/😸/g, ':')
 }
 export const TEMPLATE_RANGE: TimeRange = {
@@ -227,9 +227,7 @@ interface PreviewListDimensions {
   [index: string]: number
 }
 
-export const TEMPLATE_PREVIEW_LIST_DIMENSIONS: Readonly<
-  PreviewListDimensions
-> = {
+export const TEMPLATE_PREVIEW_LIST_DIMENSIONS: Readonly<PreviewListDimensions> = {
   RESULTS_TO_DISPLAY: 9,
   LI_HEIGHT: 28,
   LI_MARGIN_BOTTOM: 2,

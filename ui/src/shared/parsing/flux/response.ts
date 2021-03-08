@@ -32,10 +32,10 @@ const parseChunks = (response: string): string[] => {
 export const parseTables = (responseChunk: string): FluxTable[] => {
   const lines = responseChunk.split('\n')
   const annotationLines: string = lines
-    .filter(line => line.startsWith('#'))
+    .filter((line) => line.startsWith('#'))
     .join('\n')
   const nonAnnotationLines: string = lines
-    .filter(line => !line.startsWith('#'))
+    .filter((line) => !line.startsWith('#'))
     .join('\n')
 
   if (_.isEmpty(annotationLines)) {
@@ -56,8 +56,8 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
     throw new Error(_.get(nonAnnotationData, '1.1'))
   }
 
-  const tableColIndex = headerRow.findIndex(h => h === 'table')
-  const timeColIndex = headerRow.findIndex(h => h === '_time')
+  const tableColIndex = headerRow.findIndex((h) => h === 'table')
+  const timeColIndex = headerRow.findIndex((h) => h === '_time')
 
   if (!timeColIndex) {
     throw new Error('Could not find time Column')
@@ -65,12 +65,12 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
 
   // Group rows by their table id
   const tablesData: Array<Array<Array<string | number>>> = Object.values(
-    _.groupBy(nonAnnotationData.slice(1), row => row[tableColIndex])
+    _.groupBy(nonAnnotationData.slice(1), (row) => row[tableColIndex])
   )
 
-  const groupRow = annotationData.find(row => row[0] === '#group')
-  const defaultsRow = annotationData.find(row => row[0] === '#default')
-  const dataTypeRow = annotationData.find(row => row[0] === '#datatype')
+  const groupRow = annotationData.find((row) => row[0] === '#group')
+  const defaultsRow = annotationData.find((row) => row[0] === '#default')
+  const dataTypeRow = annotationData.find((row) => row[0] === '#datatype')
 
   // groupRow = ['#group', 'false', 'true', 'true', 'false']
   const groupKeyIndices = groupRow.reduce((acc, value, i) => {
@@ -81,7 +81,7 @@ export const parseTables = (responseChunk: string): FluxTable[] => {
     return acc
   }, [])
 
-  const tables = tablesData.map(tableData => {
+  const tables = tablesData.map((tableData) => {
     const dataRow = _.get(tableData, '0', defaultsRow)
     const groupKey = groupKeyIndices.reduce((acc, i) => {
       return {...acc, [headerRow[i]]: _.get(dataRow, i, '')}
@@ -125,10 +125,10 @@ interface ParseResponseRawResult {
 
 export const parseResponseRaw = (response: string): ParseResponseRawResult => {
   const chunks = parseChunks(response)
-  const parsedChunks = chunks.map(c => Papa.parse(c).data)
+  const parsedChunks = chunks.map((c) => Papa.parse(c).data)
   const maxColumnCount =
     parsedChunks.length > 0
-      ? Math.max(...parsedChunks.map(c => c[0].length))
+      ? Math.max(...parsedChunks.map((c) => c[0].length))
       : 0
   const data = []
 

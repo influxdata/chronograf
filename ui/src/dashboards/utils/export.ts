@@ -17,7 +17,7 @@ export const mapSourcesForDownload = (originalSources: Source[]) =>
   )
 
 export const mapQueriesToSources = (queries: CellQuery[]) => {
-  return queries.map(query => {
+  return queries.map((query) => {
     return {
       ...query,
       source: query.source,
@@ -26,7 +26,7 @@ export const mapQueriesToSources = (queries: CellQuery[]) => {
 }
 
 export const mapCellsToSources = (cells: Cell[]) => {
-  return cells.map(cell => {
+  return cells.map((cell) => {
     const {queries} = cell
 
     return {
