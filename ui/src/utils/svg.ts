@@ -1,4 +1,4 @@
-export const clipPathUrl = (elementId) => {
+export const clipPathUrl = elementId => {
   // Other SVG elements are often referenced in SVG attributes like `clip-path`
   // and `mask` using a url, e.g.
   //

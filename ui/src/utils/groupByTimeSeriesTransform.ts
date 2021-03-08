@@ -66,7 +66,7 @@ const flattenGroupBySeries = (
   const accumulatedValues = fastReduce<TimeSeriesSeries, TimeSeriesValue[][]>(
     seriesArray,
     (acc, s) => {
-      const tagsToAdd: string[] = tagsKeys.map((tk) => s.tags[tk])
+      const tagsToAdd: string[] = tagsKeys.map(tk => s.tags[tk])
       const values = s.values
       const newValues = values.map(([first, ...rest]) => [
         first,
@@ -111,7 +111,7 @@ const constructResults = (
       )
 
       const successfulResults = results.filter(
-        (r) => 'series' in r && !('error' in r)
+        r => 'series' in r && !('error' in r)
       ) as TimeSeriesSuccessfulResult[]
 
       const tagsFromResults: {[x: string]: string} = _.get(
@@ -131,7 +131,7 @@ const constructResults = (
 
       const noGroupBySeries = fastMap<TimeSeriesSuccessfulResult, Result>(
         successfulResults,
-        (r) => ({
+        r => ({
           ...r,
           responseIndex: index,
         })
@@ -193,13 +193,13 @@ const constructCells = (
       },
       ind
     ) => {
-      if (columns.find((c) => c === 'time')) {
+      if (columns.find(c => c === 'time')) {
         let unsortedLabels: Label[]
 
         if (isGroupBy) {
           const labelsFromTags = fastMap<string, Label>(
             _.keys(tags),
-            (field) => ({
+            field => ({
               label: `${field}`,
               responseIndex,
               seriesIndex,
@@ -207,7 +207,7 @@ const constructCells = (
           )
           const labelsFromColumns = fastMap<string, Label>(
             columns.slice(1),
-            (field) => ({
+            field => ({
               label: `${measurement}.${field}`,
               responseIndex,
               seriesIndex,
@@ -220,22 +220,19 @@ const constructCells = (
         } else {
           const tagSet = fastMap<string, string>(
             _.keys(tags),
-            (tag) => `[${tag}=${tags[tag]}]`
+            tag => `[${tag}=${tags[tag]}]`
           )
             .sort()
             .join('')
 
-          unsortedLabels = fastMap<string, Label>(
-            columns.slice(1),
-            (field) => ({
-              label: `${measurement}.${field}${tagSet}`,
-              responseIndex,
-              seriesIndex,
-            })
-          )
+          unsortedLabels = fastMap<string, Label>(columns.slice(1), field => ({
+            label: `${measurement}.${field}${tagSet}`,
+            responseIndex,
+            seriesIndex,
+          }))
           seriesLabels[ind] = unsortedLabels
           labels = _.concat(labels, unsortedLabels)
-          fastForEach(values, (vals) => {
+          fastForEach(values, vals => {
             const [time, ...rowValues] = vals
             fastForEach(rowValues, (value, i) => {
               cells.label[cellIndex] = unsortedLabels[i].label
@@ -252,7 +249,7 @@ const constructCells = (
         isMetaQuery = true
 
         if (serieses.length === 1) {
-          labels = columns.map((c) => ({
+          labels = columns.map(c => ({
             label: c,
             responseIndex,
             seriesIndex,
@@ -260,7 +257,7 @@ const constructCells = (
 
           metaQuerySeries = [columns, ...values]
         } else {
-          labels = columns.map((c) => ({
+          labels = columns.map(c => ({
             label: c,
             responseIndex,
             seriesIndex,
@@ -273,7 +270,7 @@ const constructCells = (
 
           const [, ...vals] = metaQuerySeries
 
-          const allValuesForMeasurement = values.map((val) => {
+          const allValuesForMeasurement = values.map(val => {
             return [measurement, ...val]
           })
 
@@ -408,7 +405,7 @@ const constructTimeSeries = (
   }
 
   // change all undefined values to null, these values were not set
-  timeSeries.forEach((x) => {
+  timeSeries.forEach(x => {
     for (let i = 0; i < x.values.length; i++) {
       if (x.values[i] === undefined) {
         x.values[i] = null

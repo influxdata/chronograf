@@ -119,7 +119,7 @@ export const DEFAULT_THRESHOLDS_LIST_COLORS = [
   },
 ]
 
-export const getThresholdsListColors = (colors) => {
+export const getThresholdsListColors = colors => {
   const type = getThresholdsListType(colors)
 
   if (!colors || colors.length === 0) {
@@ -143,7 +143,7 @@ export const getThresholdsListColors = (colors) => {
 
   let containsBaseColor = false
 
-  const formattedColors = colors.map((color) => {
+  const formattedColors = colors.map(color => {
     if (color.id === THRESHOLD_TYPE_BASE) {
       // Check for existance of base color
       containsBaseColor = true
@@ -161,7 +161,7 @@ export const getThresholdsListColors = (colors) => {
   return containsBaseColor ? formattedColors : formattedColorsWithBase
 }
 
-const getThresholdsListType = (colors) => {
+const getThresholdsListType = colors => {
   const type = _.get(colors, ['0', 'type'], false)
 
   if (type && _.includes([THRESHOLD_TYPE_TEXT, THRESHOLD_TYPE_BG], type)) {
@@ -171,7 +171,7 @@ const getThresholdsListType = (colors) => {
   return THRESHOLD_TYPE_TEXT
 }
 
-export const getGaugeColors = (colors) => {
+export const getGaugeColors = colors => {
   if (!colors || colors.length < MIN_THRESHOLDS) {
     return DEFAULT_GAUGE_COLORS
   }
@@ -192,8 +192,8 @@ export const getGaugeColors = (colors) => {
   }
 
   // Gauge colors should have a type of min, any number of thresholds, and a max
-  const formattedColors = _.sortBy(colors, (color) => Number(color.value)).map(
-    (color) => ({
+  const formattedColors = _.sortBy(colors, color => Number(color.value)).map(
+    color => ({
       ...color,
       value: Number(color.value),
       type: COLOR_TYPE_THRESHOLD,
@@ -206,6 +206,6 @@ export const getGaugeColors = (colors) => {
   return formattedColors
 }
 
-export const stringifyColorValues = (colors) => {
-  return colors.map((color) => ({...color, value: `${color.value}`}))
+export const stringifyColorValues = colors => {
+  return colors.map(color => ({...color, value: `${color.value}`}))
 }

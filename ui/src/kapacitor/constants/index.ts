@@ -184,15 +184,12 @@ export const RULE_MESSAGE_TEMPLATES: RuleMessageTemplate = {
   },
 }
 
-export const RULE_MESSAGE_TEMPLATE_TEXTS = _.map(
-  RULE_MESSAGE_TEMPLATES,
-  (t) => {
-    const label = t.label
-    const templateRegexp = /((?:{{)([^{}]+)(?:}}))/g // matches {{*}} where star does not contain '{' or '}'
-    const match = templateRegexp.exec(label)
-    return match[2].trim()
-  }
-)
+export const RULE_MESSAGE_TEMPLATE_TEXTS = _.map(RULE_MESSAGE_TEMPLATES, t => {
+  const label = t.label
+  const templateRegexp = /((?:{{)([^{}]+)(?:}}))/g // matches {{*}} where star does not contain '{' or '}'
+  const match = templateRegexp.exec(label)
+  return match[2].trim()
+})
 
 // DEFAULT_HANDLERS are empty alert templates for handlers that don't exist in the kapacitor config
 export const DEFAULT_HANDLERS: Handler[] = [

@@ -16,13 +16,13 @@ const servicesReducer = (state = initialState, action: Action): Service[] => {
 
     case 'DELETE_SERVICE': {
       const {service} = action.payload
-      const services = state.filter((s) => s.id !== service.id)
+      const services = state.filter(s => s.id !== service.id)
       return services
     }
 
     case 'UPDATE_SERVICE': {
       const {service} = action.payload
-      const newState = state.map((s) => {
+      const newState = state.map(s => {
         if (s.id === service.id) {
           return {...s, ...service}
         }
@@ -36,13 +36,13 @@ const servicesReducer = (state = initialState, action: Action): Service[] => {
     case 'SET_ACTIVE_SERVICE': {
       const {source, service} = action.payload
       let otherServices = []
-      const currentServices = state.filter((s) => {
+      const currentServices = state.filter(s => {
         if (s.sourceID !== source.id) {
           otherServices = [...otherServices, s]
         }
         return s.sourceID === source.id
       })
-      const updatedServices = currentServices.map((s) => {
+      const updatedServices = currentServices.map(s => {
         if (s.sourceID === source.id) {
           const metadata = {active: s.id === service.id}
           s.metadata = metadata

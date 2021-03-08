@@ -20,7 +20,7 @@ const getRetentionPolices = async (proxy, databases) => {
         const rp = rps[j]
         const {retentionPolicies} = showRetentionPoliciesParser(rp)
 
-        const dbrp = retentionPolicies.map((r) => ({
+        const dbrp = retentionPolicies.map(r => ({
           database,
           retentionPolicy: r.name,
         }))

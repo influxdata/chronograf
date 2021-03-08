@@ -145,7 +145,7 @@ export const removeAndLoadSources = (source: Source) => async (
   getState
 ): Promise<void> => {
   const {sources = []} = getState()
-  const filteredSources = sources.filter((s) => s.id !== source.id)
+  const filteredSources = sources.filter(s => s.id !== source.id)
 
   dispatch(loadSources(filteredSources))
 
@@ -174,9 +174,7 @@ export type FetchKapacitorsAsync = (
   source: Source
 ) => (dispatch) => Promise<void>
 
-export const fetchKapacitorsAsync: FetchKapacitorsAsync = (source) => async (
-  dispatch
-) => {
+export const fetchKapacitorsAsync: FetchKapacitorsAsync = source => async dispatch => {
   try {
     const kapacitors = await getKapacitorsAJAX(source)
     dispatch(fetchKapacitors(source, kapacitors))
@@ -185,9 +183,7 @@ export const fetchKapacitorsAsync: FetchKapacitorsAsync = (source) => async (
   }
 }
 
-export const fetchKapacitorsAsyncNoNotify: FetchKapacitorsAsync = (
-  source
-) => async (dispatch) => {
+export const fetchKapacitorsAsyncNoNotify: FetchKapacitorsAsync = source => async dispatch => {
   const kapacitors = await getKapacitorsAJAX(source)
   dispatch(fetchKapacitors(source, kapacitors))
 }

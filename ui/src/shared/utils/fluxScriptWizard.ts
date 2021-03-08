@@ -18,7 +18,7 @@ export async function fetchDBsToRPs(proxyLink: string): Promise<DBsToRPs> {
   const dbs = parseMetaQuery(dbsQuery, dbsResp.data).sort()
 
   const rpsQuery = dbs
-    .map((db) => `SHOW RETENTION POLICIES ON "${db}"`)
+    .map(db => `SHOW RETENTION POLICIES ON "${db}"`)
     .join('; ')
 
   const rpsResp = await proxy({source: proxyLink, query: rpsQuery})
@@ -26,7 +26,7 @@ export async function fetchDBsToRPs(proxyLink: string): Promise<DBsToRPs> {
   const dbsToRPs: DBsToRPs = dbs.reduce((acc, db, i) => {
     const series = rpsResp.data.results[i].series[0]
     const namesIndex = series.columns.indexOf('name')
-    const rpNames = series.values.map((row) => row[namesIndex])
+    const rpNames = series.values.map(row => row[namesIndex])
 
     return {...acc, [db]: rpNames}
   }, {})
@@ -114,7 +114,7 @@ export function renderScript(
 
   if (selectedFields.length) {
     const fieldsPredicate = selectedFields
-      .map((f) => `r._field == "${f}"`)
+      .map(f => `r._field == "${f}"`)
       .join(' or ')
 
     filterPredicate += ` and (${fieldsPredicate})`

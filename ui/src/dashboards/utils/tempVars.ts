@@ -23,7 +23,7 @@ export const templateSelectionsFromTemplates = (
 ): TemplateSelections => {
   return templates.reduce((acc, template) => {
     const tempVar = stripTempVar(template.tempVar)
-    const selection = template.values.find((t) => t.localSelected)
+    const selection = template.values.find(t => t.localSelected)
 
     if (!selection) {
       return acc
@@ -39,7 +39,7 @@ export const stripTempVar = (tempVarName: string): string =>
   tempVarName.substr(1, tempVarName.length - 2)
 
 const makeSelected = (template: Template, value: string): Template => {
-  const found = template.values.find((v) => v.value === value)
+  const found = template.values.find(v => v.value === value)
 
   let valueToChoose
   if (found) {
@@ -48,7 +48,7 @@ const makeSelected = (template: Template, value: string): Template => {
     valueToChoose = getDeep<string>(template, 'values.0.value', '')
   }
 
-  const valuesWithSelected = template.values.map((v) => {
+  const valuesWithSelected = template.values.map(v => {
     if (v.value === valueToChoose) {
       return {...v, selected: true}
     } else {
@@ -69,8 +69,8 @@ export const makeLocalSelected = (
   template: Template,
   value: string
 ): Template => {
-  const found = template.values.find((v) => v.value === value)
-  const selectedValue = template.values.find((v) => v.selected)
+  const found = template.values.find(v => v.value === value)
+  const selectedValue = template.values.find(v => v.selected)
 
   let valueToChoose: string
   if (found) {
@@ -81,7 +81,7 @@ export const makeLocalSelected = (
     valueToChoose = getDeep<string>(template, 'values.0.value', '')
   }
 
-  const valuesWithLocalSelected = template.values.map((v) => {
+  const valuesWithLocalSelected = template.values.map(v => {
     if (v.value === valueToChoose) {
       return {...v, localSelected: true}
     } else {
@@ -96,8 +96,8 @@ export const reconcileSelectedAndLocalSelectedValues = (
   nextTemplate: Template,
   nextNextTemplate: Template
 ): Template => {
-  const localSelectedValue = nextTemplate.values.find((v) => v.localSelected)
-  const selectedValue = nextTemplate.values.find((v) => v.selected)
+  const localSelectedValue = nextTemplate.values.find(v => v.localSelected)
+  const selectedValue = nextTemplate.values.find(v => v.selected)
   const templateWithLocalSelected = makeSelected(
     nextNextTemplate,
     getDeep<string>(selectedValue, 'value', '')

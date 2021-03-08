@@ -64,8 +64,8 @@ export const addAppsToHosts = async (
   const measurementsList: string[] = []
   const measurementsToProtoboards = {}
 
-  _.forEach(protoboards, (pb) => {
-    _.forEach(pb.meta.measurements, (m) => {
+  _.forEach(protoboards, pb => {
+    _.forEach(pb.meta.measurements, m => {
       measurementsToProtoboards[m] = pb.meta.name
       measurementsList.push(m)
     })
@@ -77,7 +77,7 @@ export const addAppsToHosts = async (
 
   const allSeries = await getAllSeries(source, joinedMeasurements)
 
-  allSeries.forEach((series) => {
+  allSeries.forEach(series => {
     const {measurement, host} = parseSeries(series)
     if (!newHosts[host]) {
       return
@@ -110,9 +110,9 @@ export const getHosts = async (source: Source): Promise<Hosts> => {
     ['data', 'results', '0', 'series'],
     []
   )
-  allHostsSeries.forEach((s) => {
-    const hostnameIndex = s.columns.findIndex((col) => col === 'value')
-    s.values.forEach((v) => {
+  allHostsSeries.forEach(s => {
+    const hostnameIndex = s.columns.findIndex(col => col === 'value')
+    s.values.forEach(v => {
       const hostname = v[hostnameIndex]
       hosts[hostname] = {}
     })

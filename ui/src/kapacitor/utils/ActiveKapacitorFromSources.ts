@@ -8,13 +8,13 @@ const ActiveKapacitorFromSources = (
     return null
   }
 
-  const ActiveSource = sources.find((s) => s.id === source.id)
+  const ActiveSource = sources.find(s => s.id === source.id)
   if (!ActiveSource || !ActiveSource.kapacitors) {
     return null
   }
 
   const {kapacitors} = ActiveSource
-  return kapacitors.find((k) => k.active) || kapacitors[0]
+  return kapacitors.find(k => k.active) || kapacitors[0]
 }
 
 export default ActiveKapacitorFromSources

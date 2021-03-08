@@ -27,7 +27,7 @@ export const replaceInterval = (query: string, durationMs: number) => {
 const sortTemplates = (templates: Template[]): Template[] => {
   const graph = graphFromTemplates(templates)
 
-  return topologicalSort(graph).map((t) => t.initialTemplate)
+  return topologicalSort(graph).map(t => t.initialTemplate)
 }
 
 const templateReplace = (query: string, templates: Template[]) => {
@@ -49,10 +49,10 @@ const renderTemplate = (query: string, template: Template): string => {
   }
 
   const localSelectedTemplateValue: TemplateValue = template.values.find(
-    (v) => v.localSelected
+    v => v.localSelected
   )
   const selectedTemplateValue: TemplateValue = template.values.find(
-    (v) => v.selected
+    v => v.selected
   )
 
   const templateValue = localSelectedTemplateValue || selectedTemplateValue

@@ -18,7 +18,7 @@ export const downloadInfluxQLCSV = async (
   timeZone: TimeZones = TimeZones.UTC
 ): Promise<void> => {
   const responses = await Promise.all(
-    queries.map((query) =>
+    queries.map(query =>
       executeInfluxQLQuery(query.queryConfig.source, query, templates)
     )
   )
@@ -54,7 +54,7 @@ const timeseriesToCSV = async (
   responses: TimeSeriesResponse[],
   timeZone: TimeZones
 ): Promise<string> => {
-  const wrapped = responses.map((response) => ({response}))
+  const wrapped = responses.map(response => ({response}))
   const tableResponse = await timeSeriesToTableGraph(wrapped)
   const table = tableResponse.data
 

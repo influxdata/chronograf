@@ -23,14 +23,14 @@ export function getMinDurationFromAST(ast: any) {
   // 4. Take the minimum duration
   //
   const times = allRangeTimes(ast)
-  const starts = times.map((t) => t[0])
-  const stops = times.map((t) => t[1])
-  const crossProduct = starts.map((start) => stops.map((stop) => [start, stop]))
+  const starts = times.map(t => t[0])
+  const stops = times.map(t => t[1])
+  const crossProduct = starts.map(start => stops.map(stop => [start, stop]))
 
   const durations = []
     .concat(...crossProduct)
     .map(([start, stop]) => stop - start)
-    .filter((d) => d > 0)
+    .filter(d => d > 0)
 
   const result = Math.min(...durations)
 
@@ -110,7 +110,7 @@ interface DurationBinaryExpression {
 
 export function allRangeTimes(ast: any): Array<[number, number]> {
   const now = Date.now()
-  return findNodes(isRangeNode, ast).map((node) => rangeTimes(ast, node, now))
+  return findNodes(isRangeNode, ast).map(node => rangeTimes(ast, node, now))
 }
 
 /*
@@ -126,11 +126,11 @@ function rangeTimes(
   const properties = rangeNode.arguments[0].properties
 
   // The `start` argument is required
-  const startProperty = properties.find((p) => p.key.name === 'start')
+  const startProperty = properties.find(p => p.key.name === 'start')
   const start = propertyTime(ast, startProperty.value, now)
 
   // The `end` argument to a `range` call is optional, and defaults to now
-  const endProperty = properties.find((p) => p.key.name === 'stop')
+  const endProperty = properties.find(p => p.key.name === 'stop')
   const end = endProperty ? propertyTime(ast, endProperty.value, now) : now
 
   if (isNaN(start) || isNaN(end)) {
@@ -195,7 +195,7 @@ function durationDuration(durationLiteral: DurationLiteral): number {
   given `name`.
 */
 function resolveDeclaration(ast: any, name: string): RangeCallPropertyValue {
-  const isDeclarator = (node) => {
+  const isDeclarator = node => {
     return (
       get(node, 'type') === 'VariableAssignment' &&
       get(node, 'id.name') === name

@@ -58,7 +58,7 @@ export const fetchJSONFeedAsync = (url: string) => async (
       // decode HTML entities from response text
       const decodedData = {
         ...data,
-        items: data.items.map((item) => {
+        items: data.items.map(item => {
           item.title = he.decode(item.title)
           item.content_text = he.decode(item.content_text)
           return item

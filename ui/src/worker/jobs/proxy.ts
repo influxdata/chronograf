@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const proxy = async (msg) => {
+const proxy = async msg => {
   const {
     payload: {url, query, rp, db, uuid},
   } = msg

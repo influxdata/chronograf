@@ -481,12 +481,12 @@ export const interval: Template = {
 
 export const TEMPLATES: Template[] = [interval]
 
-export const IS_STATIC_LEGEND = (legend) =>
+export const IS_STATIC_LEGEND = legend =>
   _.get(legend, 'type', false) === 'static'
 
 export const linksLink = '/chronograf/v1'
 
-export const cellSupportsAnnotations = (cellType) => {
+export const cellSupportsAnnotations = cellType => {
   const supportedTypes = [
     CellType.Line,
     CellType.Bar,
@@ -494,7 +494,7 @@ export const cellSupportsAnnotations = (cellType) => {
     CellType.Stacked,
     CellType.StepPlot,
   ]
-  return !!supportedTypes.find((type) => type === cellType)
+  return !!supportedTypes.find(type => type === cellType)
 }
 
 export const NOTIFICATION_TRANSITION = 250

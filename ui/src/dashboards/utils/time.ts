@@ -37,7 +37,7 @@ export const millisecondTimeRange = ({
 const nullTimeRange: TimeRange = {lower: null, upper: null}
 
 const validRelativeTimeRange = (timeRange: TimeRange): TimeRange => {
-  const validatedTimeRange = timeRanges.find((t) => t.lower === timeRange.lower)
+  const validatedTimeRange = timeRanges.find(t => t.lower === timeRange.lower)
 
   if (validatedTimeRange) {
     return validatedTimeRange

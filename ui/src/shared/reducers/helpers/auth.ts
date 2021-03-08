@@ -5,7 +5,7 @@ import {Me} from 'src/types/auth'
 
 export const getMeRole = (me: Me): string => {
   const currentRoleOrg = me.roles.find(
-    (role) => me.currentOrganization.id === role.organization
+    role => me.currentOrganization.id === role.organization
   )
   const currentRole = _.get(currentRoleOrg, 'name', MEMBER_ROLE)
 

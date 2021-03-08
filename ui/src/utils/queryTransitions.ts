@@ -88,7 +88,7 @@ export const toggleField = (
 ): QueryConfig => {
   const {fields = [], groupBy} = query
   const isSelected = hasField(value, fields)
-  const newFuncs = fields.filter((f) => f.type === 'func')
+  const newFuncs = fields.filter(f => f.type === 'func')
 
   if (isSelected) {
     // if list is all fields, remove that field
@@ -165,7 +165,7 @@ export const applyFuncsToField = (
     if (f.type === 'field') {
       return [
         ...acc,
-        funcs.map((func) => {
+        funcs.map(func => {
           const {value, type} = func
           const args = [{value: f.value, type: 'field'}]
           const alias = func.alias ? func.alias : `${func.value}_${f.value}`
@@ -180,12 +180,12 @@ export const applyFuncsToField = (
       ]
     }
 
-    const fieldToChange = f.args.find((a) => a.value === field.value)
+    const fieldToChange = f.args.find(a => a.value === field.value)
     // Apply new funcs to field
     if (fieldToChange) {
       const newFuncs = funcs.reduce((acc2, func) => {
         const funcsToChange = getFuncsByFieldName(fieldToChange.value, acc)
-        const dup = funcsToChange.find((a) => a.value === func.value)
+        const dup = funcsToChange.find(a => a.value === func.value)
 
         if (dup) {
           return acc2

@@ -38,7 +38,7 @@ export const loadDashboardLinks = async (
   return dashboardLinks
 }
 
-export const getDashboard = async (dashboardID) => {
+export const getDashboard = async dashboardID => {
   try {
     const url = `/chronograf/v1/dashboards/${dashboardID}`
     return manager.get(url)
@@ -48,7 +48,7 @@ export const getDashboard = async (dashboardID) => {
   }
 }
 
-export const updateDashboard = (dashboard) => {
+export const updateDashboard = dashboard => {
   return AJAX({
     method: 'PUT',
     url: dashboard.links.self,
@@ -56,7 +56,7 @@ export const updateDashboard = (dashboard) => {
   })
 }
 
-export const updateDashboardCell = (cell) => {
+export const updateDashboardCell = cell => {
   return AJAX({
     method: 'PUT',
     url: cell.links.self,
@@ -64,7 +64,7 @@ export const updateDashboardCell = (cell) => {
   })
 }
 
-export const createDashboard = async (dashboard) => {
+export const createDashboard = async dashboard => {
   try {
     return await AJAX({
       method: 'POST',
@@ -94,7 +94,7 @@ export const createDashboardFromProtoboard = async (
   }
 }
 
-export const deleteDashboard = async (dashboard) => {
+export const deleteDashboard = async dashboard => {
   try {
     return await AJAX({
       method: 'DELETE',
@@ -119,7 +119,7 @@ export const addDashboardCell = async (dashboard, cell) => {
   }
 }
 
-export const deleteDashboardCell = async (cell) => {
+export const deleteDashboardCell = async cell => {
   try {
     return await AJAX({
       method: 'DELETE',
@@ -131,7 +131,7 @@ export const deleteDashboardCell = async (cell) => {
   }
 }
 
-export const editTemplateVariables = async (templateVariable) => {
+export const editTemplateVariables = async templateVariable => {
   try {
     return await AJAX({
       method: 'PUT',

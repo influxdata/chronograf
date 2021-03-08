@@ -1,7 +1,7 @@
 import {timeRanges} from 'src/shared/data/timeRanges'
 import {TimeRange} from 'src/types'
 
-const {lower, upper} = timeRanges.find((tr) => tr.lower === 'now() - 1h')
+const {lower, upper} = timeRanges.find(tr => tr.lower === 'now() - 1h')
 
 const initialState = {
   upper,

@@ -138,12 +138,12 @@ export function buildInfiniteScrollWhereClause({
     timeClauses.push(`time < '${upper}'`)
   }
 
-  const tagClauses = _.keys(tags).map((k) => {
+  const tagClauses = _.keys(tags).map(k => {
     const operator = areTagsAccepted ? '=' : '!='
 
     if (tags[k].length > 1) {
       const joinedOnOr = tags[k]
-        .map((v) => `"${k}"${operator}'${v}'`)
+        .map(v => `"${k}"${operator}'${v}'`)
         .join(' OR ')
       return `(${joinedOnOr})`
     }
@@ -330,14 +330,14 @@ export const parseHistogramQueryResponse = (
       return acc
     }
 
-    const timeColIndex = current.columns.findIndex((v) => v === 'time')
-    const countColIndex = current.columns.findIndex((v) => v === 'count')
+    const timeColIndex = current.columns.findIndex(v => v === 'time')
+    const countColIndex = current.columns.findIndex(v => v === 'count')
 
     if (timeColIndex < 0 || countColIndex < 0) {
       return acc
     }
 
-    const vs = current.values.map((v) => {
+    const vs = current.values.map(v => {
       const time = v[timeColIndex]
       const value = v[countColIndex]
 

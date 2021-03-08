@@ -50,9 +50,7 @@ export const searchToFilters = (searchTerm: string): Filter[] => {
 }
 
 const termsToFilters = (terms: Term[]): Filter[] => {
-  return terms.map((t) =>
-    createAttributeFilter(t.attribute, t.term, termToOp(t))
-  )
+  return terms.map(t => createAttributeFilter(t.attribute, t.term, termToOp(t)))
 }
 
 const extractTerms = (searchTerms: string, rules: TermRule[]): Term[] => {
@@ -81,7 +79,7 @@ const eatSpaces = (text: string): string => {
 }
 
 const readToken = (text: string, rules: TermRule[]): TokenLiteralMatch => {
-  const rule = rules.find((r) => text.match(new RegExp(r.pattern)) !== null)
+  const rule = rules.find(r => text.match(new RegExp(r.pattern)) !== null)
 
   const term = new RegExp(rule.pattern).exec(text)
   const literal = term[3]

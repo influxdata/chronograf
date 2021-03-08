@@ -55,7 +55,7 @@ export const timeSeriesToDygraphWork = (
   return {labels, timeSeries, dygraphSeries}
 }
 
-const timeSeriesToDygraph = async (msg) => {
+const timeSeriesToDygraph = async msg => {
   const {raw} = await fetchData(msg)
 
   return timeSeriesToDygraphWork(raw)

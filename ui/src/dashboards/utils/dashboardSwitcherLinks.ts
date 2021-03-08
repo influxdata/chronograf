@@ -10,7 +10,7 @@ export const linksFromDashboards = (
   dashboards: Dashboard[],
   source: Source
 ): DashboardSwitcherLinks => {
-  const links = dashboards.map((d) => {
+  const links = dashboards.map(d => {
     return {
       key: String(d.id),
       text: d.name,
@@ -43,7 +43,7 @@ const updateActiveDashboardLink = (
   dashboard: Dashboard
 ) => {
   const active = dashboardLinks.links.find(
-    (link) => link.key === String(dashboard.id)
+    link => link.key === String(dashboard.id)
   )
 
   return {...dashboardLinks, active}
@@ -56,7 +56,7 @@ const updateActiveDashboardLinkName = (
   const {name} = dashboard
   let {active} = dashboardLinks
 
-  const links = dashboardLinks.links.map((link) => {
+  const links = dashboardLinks.links.map(link => {
     if (link.key === String(dashboard.id)) {
       active = {...link, text: name}
 

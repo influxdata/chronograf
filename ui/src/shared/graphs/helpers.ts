@@ -32,7 +32,7 @@ export const LINE_COLORS = [
 
 export const SMALL_CELL_HEIGHT = 2
 
-export const darkenColor = (colorStr) => {
+export const darkenColor = colorStr => {
   // Defined in dygraph-utils.js
   const color = toRGB(colorStr)
   color.r = Math.floor((255 + color.r) / 2)
@@ -42,7 +42,7 @@ export const darkenColor = (colorStr) => {
 }
 
 // Bar Graph code below is adapted from http://dygraphs.com/tests/plotters.html
-export const barPlotter = (e) => {
+export const barPlotter = e => {
   // We need to handle all the series simultaneously.
   if (e.seriesIndex !== 0) {
     return
@@ -179,7 +179,7 @@ export const removeMeasurement = (label = '') => {
 export const hasherino = (str, len) =>
   str
     .split('')
-    .map((char) => char.charCodeAt(0))
+    .map(char => char.charCodeAt(0))
     .reduce((hash, code) => hash + code, 0) % len
 
 export const LABEL_WIDTH = 44

@@ -45,7 +45,7 @@ export const filtersToPattern = (filters: Filter[]): string => {
     return null
   }
 
-  const values = filters.map((f) => f.value).join('|')
+  const values = filters.map(f => f.value).join('|')
 
   return `^(.*?)(${values})(.*)`
 }

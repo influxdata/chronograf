@@ -258,9 +258,9 @@ export const getFunctionSuggestions = (
   const currentWord = currentLineText.slice(start, end)
   const listFilter = new RegExp(`^${currentWord}`, 'i')
   const suggestions = allSuggestions
-    .map((s) => s.name)
-    .filter((name) => name.match(listFilter))
-    .map((displayText) => ({text: formatter(displayText), displayText}))
+    .map(s => s.name)
+    .filter(name => name.match(listFilter))
+    .map(displayText => ({text: formatter(displayText), displayText}))
 
   return {start, end, suggestions}
 }

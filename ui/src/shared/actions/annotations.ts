@@ -253,7 +253,7 @@ export const setDisplaySetting = (
 export const addAnnotationAsync = (
   createUrl: string,
   annotation: Annotation
-) => async (dispatch) => {
+) => async dispatch => {
   dispatch(addAnnotation(annotation))
 
   try {
@@ -294,9 +294,9 @@ export const getAnnotationsAsync = (
   dispatch(setAnnotations(annotations))
 }
 
-export const deleteAnnotationAsync = (annotation: Annotation) => async (
-  dispatch
-) => {
+export const deleteAnnotationAsync = (
+  annotation: Annotation
+) => async dispatch => {
   try {
     dispatch(deleteAnnotation(annotation))
     await api.deleteAnnotation(annotation)
@@ -306,9 +306,9 @@ export const deleteAnnotationAsync = (annotation: Annotation) => async (
   }
 }
 
-export const updateAnnotationAsync = (annotation: Annotation) => async (
-  dispatch
-) => {
+export const updateAnnotationAsync = (
+  annotation: Annotation
+) => async dispatch => {
   try {
     await api.updateAnnotation(annotation)
     dispatch(updateAnnotation(annotation))
@@ -348,7 +348,7 @@ export const deleteTagFilterAsync = (
   indexURL: string,
   dashboardID: string,
   tagFilter: TagFilter
-) => async (dispatch) => {
+) => async dispatch => {
   try {
     dispatch(deleteTagFilter(dashboardID, tagFilter))
     await dispatch(getAnnotationsAsync(indexURL, dashboardID))
@@ -358,19 +358,20 @@ export const deleteTagFilterAsync = (
   }
 }
 
-export const fetchAndSetTagKeys = (source: string) => async (dispatch) => {
+export const fetchAndSetTagKeys = (source: string) => async dispatch => {
   const query = 'SHOW TAG KEYS ON chronograf FROM annotations'
   const resp = await proxy({query, source})
   const tagKeys = parseMetaQuery(query, resp.data).filter(
-    (keys) => !BLACKLISTED_KEYS.includes(keys)
+    keys => !BLACKLISTED_KEYS.includes(keys)
   )
 
   dispatch(setTagKeys(tagKeys))
 }
 
-export const fetchAndSetTagValues = (source: string, tagKey: string) => async (
-  dispatch
-) => {
+export const fetchAndSetTagValues = (
+  source: string,
+  tagKey: string
+) => async dispatch => {
   const query = `SHOW TAG VALUES ON chronograf FROM annotations WITH KEY = "${tagKey}"`
   const resp = await proxy({query, source})
   const tagValues = parseMetaQuery(query, resp.data)

@@ -25,7 +25,7 @@ interface Area {
   h: number
 }
 
-const underlayCallback = (rule) => (
+const underlayCallback = rule => (
   canvas: CanvasRenderingContext2D,
   area: Area,
   dygraph: Dygraph

@@ -68,7 +68,7 @@ export const header = (
     return ''
   }
 
-  const headerOption = _.find(headerOptions, (h) => h.internalName === key)
+  const headerOption = _.find(headerOptions, h => h.internalName === key)
   return _.get(headerOption, 'displayName') || _.capitalize(key)
 }
 
@@ -124,7 +124,7 @@ export const getFixedColumnsTotalWidth = (
   const columns = getColumnsFromData(data)
 
   return columns.reduce((acc, col) => {
-    const colConfig = tableColumns.find((c) => c.internalName === col)
+    const colConfig = tableColumns.find(c => c.internalName === col)
     const isColVisible = colConfig && colConfig.visible
     if (col === 'message' || col === 'time' || !isColVisible) {
       return acc
@@ -186,7 +186,7 @@ export const applyChangesToTableData = (
   const timestampNsInMsColumnIndex = _.indexOf(columns, TIMESTAMP_NSINMS)
   if (timeColumnIndex >= 0 && timestampColumnIndex >= 0) {
     // modify existing data to save memory
-    values.forEach((row) => {
+    values.forEach(row => {
       if (row[timestampColumnIndex] === null) {
         row[timestampColumnIndex] = (row[timeColumnIndex] as number) * 1000000
       } else if (timestampNsInMsColumnIndex >= 0) {
@@ -232,7 +232,7 @@ export const findTimeOptionRow = (
   const selectedTime = new Date(timeOption).valueOf()
   const timeColumn = forward.columns.indexOf('time')
   const tableData = [...forward.values, ...backward.values]
-  const rowIndex = tableData.findIndex((row) => row[timeColumn] <= selectedTime)
+  const rowIndex = tableData.findIndex(row => row[timeColumn] <= selectedTime)
 
   if (rowIndex < 0) {
     return defaultIndex

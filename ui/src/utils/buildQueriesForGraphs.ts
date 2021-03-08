@@ -25,8 +25,8 @@ const buildQueries = (queryConfigs: QueryConfig[], tR: TimeRange): Query[] => {
 
     if (shifts && shifts.length && isParsable) {
       const shiftedQueries: string[] = shifts
-        .filter((s) => s.unit)
-        .map((s) => buildQuery(TYPE_SHIFTED, timeRange, query, s))
+        .filter(s => s.unit)
+        .map(s => buildQuery(TYPE_SHIFTED, timeRange, query, s))
 
       return {
         text: `${text};${shiftedQueries.join(';')}`,
@@ -39,7 +39,7 @@ const buildQueries = (queryConfigs: QueryConfig[], tR: TimeRange): Query[] => {
   })
 
   const queries: Query[] = statements
-    .filter((s) => s.text !== null)
+    .filter(s => s.text !== null)
     .map(({queryConfig, text, id}) => {
       return {
         text,

@@ -5,7 +5,7 @@ const DEFAULT_ENVS = {
   hostPageDisabled: false,
 }
 
-export const getEnv = async (url) => {
+export const getEnv = async url => {
   try {
     const {data} = await AJAX({
       method: 'GET',

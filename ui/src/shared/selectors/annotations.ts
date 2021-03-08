@@ -21,7 +21,7 @@ export const getSelectedAnnotations = createSelector(
       return []
     }
 
-    return Object.values<Annotation>(annotationsById).filter((a) => !!a)
+    return Object.values<Annotation>(annotationsById).filter(a => !!a)
   }
 )
 
@@ -32,16 +32,16 @@ const getTagFiltersById = (
 
 export const getTagFilters = createSelector(
   getTagFiltersById,
-  (tagFiltersById) => {
-    return Object.values(tagFiltersById || {}).filter((v) => !!v)
+  tagFiltersById => {
+    return Object.values(tagFiltersById || {}).filter(v => !!v)
   }
 )
 
 export const getTagsFromTagFilters = createSelector(
   getTagFilters,
-  (tagFilters) => {
+  tagFilters => {
     return tagFilters
-      .filter((t) => t.filterType === TagFilterType.Equals)
+      .filter(t => t.filterType === TagFilterType.Equals)
       .reduce(
         (acc, t) => ({
           ...acc,

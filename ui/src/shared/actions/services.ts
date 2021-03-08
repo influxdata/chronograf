@@ -133,11 +133,11 @@ export type FetchAllFluxServicesAsync = (
   sources: Source[]
 ) => (dispatch) => Promise<void>
 
-export const fetchAllFluxServicesAsync: FetchAllFluxServicesAsync = (
-  sources
-) => async (dispatch): Promise<void> => {
+export const fetchAllFluxServicesAsync: FetchAllFluxServicesAsync = sources => async (
+  dispatch
+): Promise<void> => {
   const allServicesForSources: Array<Promise<Service[]>> = sources.map(
-    async (source) => {
+    async source => {
       try {
         return getServicesAJAX(source.links.services)
       } catch (err) {
@@ -149,7 +149,7 @@ export const fetchAllFluxServicesAsync: FetchAllFluxServicesAsync = (
   try {
     const sourceServices = await Promise.all(allServicesForSources)
     const flat = sourceServices.reduce((acc, cur) => {
-      return [...acc, ...cur.filter((s) => s.type === 'flux')]
+      return [...acc, ...cur.filter(s => s.type === 'flux')]
     })
     dispatch(loadServices(flat))
   } catch (err) {
@@ -162,12 +162,12 @@ export const fetchAllFluxServicesAsync: FetchAllFluxServicesAsync = (
 export type FetchFluxServicesForSourceAsync = (
   source: Source
 ) => (dispatch) => Promise<void>
-export const fetchFluxServicesForSourceAsync: FetchFluxServicesForSourceAsync = (
-  source
-) => async (dispatch): Promise<void> => {
+export const fetchFluxServicesForSourceAsync: FetchFluxServicesForSourceAsync = source => async (
+  dispatch
+): Promise<void> => {
   try {
     const services = await getServicesAJAX(source.links.services)
-    const fluxServices = services.filter((s) => s.type === 'flux')
+    const fluxServices = services.filter(s => s.type === 'flux')
     dispatch(loadServices(fluxServices))
   } catch (err) {
     console.error(err.data)

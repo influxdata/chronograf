@@ -413,7 +413,7 @@ export const updateTimeRangeQueryParams = (
       ...parsed,
       ...updatedQueryParams,
     },
-    (v) => !!v
+    v => !!v
   )
 
   const newSearch = qs.stringify(newQueryParams)
@@ -431,7 +431,7 @@ export const updateQueryParams = (updatedQueryParams: object): RouterAction => {
       ...qs.parse(search, {ignoreQueryPrefix: true}),
       ...updatedQueryParams,
     },
-    (v) => !!v
+    v => !!v
   )
 
   const newSearch = qs.stringify(newQueryParams)
@@ -441,9 +441,7 @@ export const updateQueryParams = (updatedQueryParams: object): RouterAction => {
 }
 
 const getDashboard = (state, dashboardId: string): Dashboard => {
-  const dashboard = state.dashboardUI.dashboards.find(
-    (d) => d.id === dashboardId
-  )
+  const dashboard = state.dashboardUI.dashboards.find(d => d.id === dashboardId)
 
   if (!dashboard) {
     throw new Error(`Could not find dashboard with id '${dashboardId}'`)
@@ -481,7 +479,7 @@ export const getChronografVersion = () => async (): Promise<string> => {
 
 const removeUnselectedTemplateValues = (dashboard: Dashboard): Template[] => {
   const templates = getDeep<Template[]>(dashboard, 'templates', []).map(
-    (template) => {
+    template => {
       if (
         template.type === TemplateType.CSV ||
         template.type === TemplateType.Map
@@ -489,7 +487,7 @@ const removeUnselectedTemplateValues = (dashboard: Dashboard): Template[] => {
         return template
       }
 
-      const value = template.values.find((val) => val.selected)
+      const value = template.values.find(val => val.selected)
       const values = value ? [value] : []
 
       return {...template, values}
@@ -696,7 +694,7 @@ const updateTimeRangeFromQueryParams = (dashboardID: string) => (
 
   if (!validatedTimeRange.lower) {
     const dashboardTimeRange = dashTimeV1.ranges.find(
-      (r) => r.dashboardID === dashboardID
+      r => r.dashboardID === dashboardID
     )
 
     validatedTimeRange = dashboardTimeRange || DEFAULT_TIME_RANGE
@@ -758,9 +756,9 @@ export const getDashboardWithTemplatesAsync = (
   _.each(selections, (val, key) => {
     const result = _.some(
       templates,
-      (temp) =>
+      temp =>
         temp.tempVar === key &&
-        _.some(temp.values, (v) => {
+        _.some(temp.values, v => {
           if (v.key) {
             return v.key === val
           }
