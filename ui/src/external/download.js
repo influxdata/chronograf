@@ -84,7 +84,7 @@ const download = (data, strFileName, strMimeType) => {
 
     if (!winMode) {
       // force a mime that will download:
-      url = `data:${url.replace(/^data:([\w\/\-\+]+)/, defaultMime)}`
+      url = `data:${url.replace(/^data:([\w/\-+]+)/, defaultMime)}`
     }
     f.src = url
     setTimeout(function() {
@@ -93,7 +93,7 @@ const download = (data, strFileName, strMimeType) => {
   } // end saver
 
   // go ahead and download dataURLs right away
-  if (/^data\:[\w+\-]+\/[\w+\-]+[,;]/.test(payload)) {
+  if (/^data:[\w+-]+\/[\w+-]+[,;]/.test(payload)) {
     if (payload.length > 1024 * 1024 * 1.999 && myBlob !== toString) {
       payload = dataUrlToBlob(myBlob, payload)
       mimeType = payload.type || defaultMime

@@ -17,7 +17,7 @@ import {TimeZones} from 'src/types'
 const dateFormat = 'YYYY-MM-DD HH:mm'
 const emptyTime = {lower: '', upper: ''}
 const format = (t, timeZone) => {
-  const m = moment(t.replace(/\'/g, ''))
+  const m = moment(t.replace(/'/g, ''))
   if (timeZone === TimeZones.UTC) {
     m.utc()
   }
