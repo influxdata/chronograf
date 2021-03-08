@@ -30,7 +30,8 @@
     "es6": true
   },
   "globals": {
-    "expect": true
+    "expect": true,
+    "JSX": true
   },
   "ignorePatterns": [
     "node_modules/*",
@@ -149,6 +150,7 @@
     "no-unused-expressions": 2,
     "no-useless-call": 2,
     "no-useless-concat": 2,
+    "no-useless-escape": "off",
     "no-void": 2,
     "no-warning-comments": 0,
     "no-with": 2,
@@ -160,7 +162,7 @@
     "no-delete-var": 2,
     "no-label-var": 2,
     "no-shadow-restricted-names": 2,
-    "no-shadow": 2,
+    "no-shadow": 0,
     "no-undef-init": 2,
     "no-undef": 2,
     "no-unused-vars": "off",
@@ -346,6 +348,7 @@
         }
     ],
     "@typescript-eslint/type-annotation-spacing": "off",
+    "@typescript-eslint/unbound-method": "off",
     "@typescript-eslint/unified-signatures": "error"
 }
 }

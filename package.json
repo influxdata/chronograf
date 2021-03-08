@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "@influxdata/influx",
+  "description": "InfluxDB 2.0 client",
+  "workspaces": {
+    "packages": [
+      "ui"
+    ]
+  },
+  "scripts": {
+  },
+  "homepage": "https://github.com/influxdata/chronograf",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/influxdata/chronograf"
+  },
+  "keywords": [
+    "influxdb",
+    "influxdata"
+  ],
+  "author": {
+    "name": "InfluxData"
+  },
+  "license": "MIT"
+}
