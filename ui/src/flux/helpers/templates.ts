@@ -27,6 +27,7 @@ function templateVariableValue(template: Template): string {
   return `"${value}"`
 }
 function templateVariables(templates: Template[]): string {
+  console.log(JSON.stringify(templates, null, 2))
   const extras = (templates || [])
     .filter(
       x =>
@@ -73,7 +74,7 @@ export const renderTemplatesInScript = async (
     dashboardTime = timeRange.lower
     upperDashboardTime = timeRange.upper
   } else {
-    dashboardTime = timeRange.lowerFlux || '1h'
+    dashboardTime = timeRange.lowerFlux || '-1h'
     upperDashboardTime = new Date().toISOString()
   }
 
