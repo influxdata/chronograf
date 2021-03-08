@@ -1,6 +1,6 @@
 import React, {FunctionComponent} from 'react'
 
-const PageSpinner: FunctionComponent<{}> = () => {
+const PageSpinner: FunctionComponent<Record<string, never>> = () => {
   return (
     <div className="page-spinner-container">
       <div className="page-spinner" />
