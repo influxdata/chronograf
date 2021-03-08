@@ -587,9 +587,8 @@ class LogsPage extends Component<Props, State> {
 
     if (this.totalForwardValues() > 0) {
       return Math.max(this.totalForwardValues() - 3, 0)
-    } else {
-      return Math.round(this.totalBackwardValues() / 2)
     }
+    return Math.round(this.totalBackwardValues() / 2)
   }
 
   private handleChooseCustomTime = async (time: string) => {
@@ -749,68 +748,67 @@ class LogsPage extends Component<Props, State> {
 
                 if (timeOption === 'now') {
                   return null
-                } else {
-                  const lineContainerWidth = 3
-                  const lineWidth = 1
-
-                  return (
-                    <>
-                      <svg
-                        width={lineContainerWidth}
-                        height={height}
-                        style={{
-                          position: 'absolute',
-                          left: `${x}px`,
-                          top: '0px',
-                          transform: 'translateX(-50%)',
-                        }}
-                      >
-                        <line
-                          x1={(lineContainerWidth - lineWidth) / 2}
-                          x2={(lineContainerWidth - lineWidth) / 2}
-                          y1={y1 + markerSize / 2}
-                          y2={y2}
-                          stroke={Greys.White}
-                          strokeWidth={`${lineWidth}`}
-                        />
-                      </svg>
-                      <svg
-                        width={x}
-                        height={textSize + textSize / 2}
-                        style={{
-                          position: 'absolute',
-                          left: `${x - markerSize - labelSize}px`,
-                        }}
-                      >
-                        <text
-                          style={{fontSize: textSize, fontWeight: 600}}
-                          x={0}
-                          y={textSize}
-                          height={textSize}
-                          fill={Greys.Sidewalk}
-                        >
-                          Current Timestamp
-                        </text>
-                        <ellipse
-                          cx={labelSize + markerSize - 0.5}
-                          cy={textSize / 2 + markerSize / 2}
-                          rx={markerSize / 2}
-                          ry={markerSize / 2}
-                          fill={Greys.White}
-                        />
-                        <text
-                          style={{fontSize: textSize, fontWeight: 600}}
-                          x={labelSize + markerSize / 2 + textSize}
-                          y={textSize}
-                          height={textSize}
-                          fill={Greys.Sidewalk}
-                        >
-                          {formatTime(timeOptionValue)}
-                        </text>
-                      </svg>
-                    </>
-                  )
                 }
+                const lineContainerWidth = 3
+                const lineWidth = 1
+
+                return (
+                  <>
+                    <svg
+                      width={lineContainerWidth}
+                      height={height}
+                      style={{
+                        position: 'absolute',
+                        left: `${x}px`,
+                        top: '0px',
+                        transform: 'translateX(-50%)',
+                      }}
+                    >
+                      <line
+                        x1={(lineContainerWidth - lineWidth) / 2}
+                        x2={(lineContainerWidth - lineWidth) / 2}
+                        y1={y1 + markerSize / 2}
+                        y2={y2}
+                        stroke={Greys.White}
+                        strokeWidth={`${lineWidth}`}
+                      />
+                    </svg>
+                    <svg
+                      width={x}
+                      height={textSize + textSize / 2}
+                      style={{
+                        position: 'absolute',
+                        left: `${x - markerSize - labelSize}px`,
+                      }}
+                    >
+                      <text
+                        style={{fontSize: textSize, fontWeight: 600}}
+                        x={0}
+                        y={textSize}
+                        height={textSize}
+                        fill={Greys.Sidewalk}
+                      >
+                        Current Timestamp
+                      </text>
+                      <ellipse
+                        cx={labelSize + markerSize - 0.5}
+                        cy={textSize / 2 + markerSize / 2}
+                        rx={markerSize / 2}
+                        ry={markerSize / 2}
+                        fill={Greys.White}
+                      />
+                      <text
+                        style={{fontSize: textSize, fontWeight: 600}}
+                        x={labelSize + markerSize / 2 + textSize}
+                        y={textSize}
+                        height={textSize}
+                        fill={Greys.Sidewalk}
+                      >
+                        {formatTime(timeOptionValue)}
+                      </text>
+                    </svg>
+                  </>
+                )
               }}
             </HistogramChart>
           )}

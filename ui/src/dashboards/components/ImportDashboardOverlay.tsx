@@ -157,10 +157,9 @@ class ImportDashboardOverlay extends PureComponent<Props, State> {
     const templates = (dashboard.templates || []).map(x => {
       if (!x.sourceID) {
         return x
-      } else {
-        const mapping = mappings[x.sourceID]
-        return {...x, sourceID: mapping ? mapping.id : undefined}
       }
+      const mapping = mappings[x.sourceID]
+      return {...x, sourceID: mapping ? mapping.id : undefined}
     })
 
     onImportDashboard({...dashboard, cells, templates})

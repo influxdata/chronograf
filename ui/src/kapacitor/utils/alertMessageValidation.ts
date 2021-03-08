@@ -54,7 +54,7 @@ export const isValidTemplate = (template: string): boolean => {
       template.length > t.length &&
       /\s/.test(template[t.length])
   )
-  if (!!validPrefix) {
+  if (validPrefix) {
     return isValidTemplate(template.substring(validPrefix.length + 1).trim())
   }
   return false

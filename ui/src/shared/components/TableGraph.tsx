@@ -534,7 +534,7 @@ class TableGraph extends PureComponent<Props, State> {
 
     const cellDataIsNumerical = isNumerical(cellData)
 
-    let cellStyle: React.CSSProperties = style //tslint:disable-line
+    let cellStyle: React.CSSProperties = style // tslint:disable-line
     if (
       !isFixedRow &&
       !isFixedColumn &&

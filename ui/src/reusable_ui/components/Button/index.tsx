@@ -46,7 +46,7 @@ class Button extends Component<Props> {
         disabled={this.disabled}
         onClick={onClick}
         title={titleText || text}
-        tabIndex={!!tabIndex ? tabIndex : 0}
+        tabIndex={tabIndex ? tabIndex : 0}
       >
         {this.icon}
         {this.text}

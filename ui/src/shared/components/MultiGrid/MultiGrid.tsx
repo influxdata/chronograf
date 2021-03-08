@@ -209,16 +209,15 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
           }}
         />
       )
-    } else {
-      return cellRenderer({
-        ...rest,
-        style: {
-          ...rest.style,
-        },
-        parent: this,
-        rowIndex: rowIndex + fixedRowCount,
-      })
     }
+    return cellRenderer({
+      ...rest,
+      style: {
+        ...rest.style,
+      },
+      parent: this,
+      rowIndex: rowIndex + fixedRowCount,
+    })
   }
 
   private getLeftGridWidth(props: PropsMultiGrid) {
@@ -585,13 +584,12 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
           }}
         />
       )
-    } else {
-      return cellRenderer({
-        ...rest,
-        columnIndex: columnIndex + fixedColumnCount,
-        parent: this,
-      })
     }
+    return cellRenderer({
+      ...rest,
+      columnIndex: columnIndex + fixedColumnCount,
+      parent: this,
+    })
   }
 
   private columnWidthRightGrid = ({index}) => {

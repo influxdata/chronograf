@@ -321,9 +321,8 @@ class InfluxQLEditor extends Component<Props, State> {
 
     if (found) {
       return found
-    } else {
-      return getDeep<TempVar>(filteredTemplates, '0', defaultVar)
     }
+    return getDeep<TempVar>(filteredTemplates, '0', defaultVar)
   }
 
   private handleKeyDownEditor = (e: KeyboardEvent): void => {

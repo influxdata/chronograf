@@ -42,7 +42,7 @@ export const getAnnotations = async (
 ) => {
   let paramedUrl = `${url}?since=${encodeURIComponent(msToRFCString(since))}`
 
-  if (!!until) {
+  if (until) {
     paramedUrl += `&until=${encodeURIComponent(msToRFCString(until))}`
   }
 

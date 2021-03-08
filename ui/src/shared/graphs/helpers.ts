@@ -191,9 +191,8 @@ export const getDataUUID = (
 ): string => {
   if (dataType === DataType.influxQL) {
     return getInfluxQLDataUUID(data as TimeSeriesServerResponse[])
-  } else {
-    return getFluxDataUUID(data as FluxTable[])
   }
+  return getFluxDataUUID(data as FluxTable[])
 }
 
 const getInfluxQLDataUUID = (data: TimeSeriesServerResponse[]): string => {

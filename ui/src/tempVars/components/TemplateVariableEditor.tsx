@@ -296,9 +296,8 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
     const nextValues = values.map(v => {
       if (v.value === selected.value) {
         return {...v, selected: true}
-      } else {
-        return {...v, selected: false}
       }
+      return {...v, selected: false}
     })
 
     this.setState({nextTemplate: {...nextTemplate, values: nextValues}})

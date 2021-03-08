@@ -20,7 +20,7 @@ export const colorForSeverity: ColorScale = (
 export const getBrighterColor = (factor: number, value?: string) => {
   const colorValue = color(value)
 
-  if (!!colorValue) {
+  if (colorValue) {
     return colorValue.brighter(factor).hex()
   }
 

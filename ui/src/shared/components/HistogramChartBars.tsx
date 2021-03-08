@@ -71,7 +71,7 @@ const getBarGroups = ({
 
   let hoverDataKeys = []
 
-  if (!!hoverData) {
+  if (hoverData) {
     hoverDataKeys = hoverData.data.map(h => h.key)
   }
 

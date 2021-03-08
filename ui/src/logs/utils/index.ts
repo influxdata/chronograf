@@ -107,9 +107,8 @@ const operatorMapping = (operator: string): string => {
 const valueMapping = (operator: string, value): string => {
   if (operator === '=~' || operator === '!~') {
     return `${new RegExp(value)}`
-  } else {
-    return `'${value}'`
   }
+  return `'${value}'`
 }
 
 export const filtersClause = (filters: Filter[]): string => {
@@ -269,9 +268,8 @@ const computeSeconds = (range: TimeRange) => {
     return moment().unix() - moment(lower).unix()
   } else if (upper && lower) {
     return moment(upper).unix() - moment(lower).unix()
-  } else {
-    return 120
   }
+  return 120
 }
 
 const createGroupBy = (range: TimeRange) => {
