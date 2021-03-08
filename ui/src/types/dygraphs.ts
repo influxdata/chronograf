@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 export type DygraphData = number[][]
 
 export type Data = string | DygraphData | google.visualization.DataTable
