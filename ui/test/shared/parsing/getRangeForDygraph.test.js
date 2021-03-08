@@ -9,7 +9,11 @@ const kapacitor = {value: null, rangeValue: null, operator: null}
 
 describe('getRangeForDygraphSpec', () => {
   it('gets the range for one timeSeries', () => {
-    const timeSeries = [[date, min], [date, mid], [date, max]]
+    const timeSeries = [
+      [date, min],
+      [date, mid],
+      [date, max],
+    ]
     const actual = getRange(timeSeries)
     const expected = [min, max]
 
@@ -17,7 +21,11 @@ describe('getRangeForDygraphSpec', () => {
   })
 
   it('does not get range when a range is provided', () => {
-    const timeSeries = [[date, min], [date, max], [date, mid]]
+    const timeSeries = [
+      [date, min],
+      [date, max],
+      [date, mid],
+    ]
     const providedRange = ['0', '4']
     const actual = getRange(timeSeries, providedRange)
 
@@ -25,7 +33,11 @@ describe('getRangeForDygraphSpec', () => {
   })
 
   it('gets the range for multiple timeSeries', () => {
-    const timeSeries = [[date, null, min], [date, max, mid], [date, null, mid]]
+    const timeSeries = [
+      [date, null, min],
+      [date, max, mid],
+      [date, null, mid],
+    ]
     const actual = getRange(timeSeries)
     const expected = [min, max]
 
@@ -34,7 +46,11 @@ describe('getRangeForDygraphSpec', () => {
 
   describe('if min and max are equal', () => {
     it('it sets min to 0 if they are positive', () => {
-      const timeSeries = [[date, max], [date, max], [date, max]]
+      const timeSeries = [
+        [date, max],
+        [date, max],
+        [date, max],
+      ]
       const actual = getRange(timeSeries)
       const expected = [0, max]
 
@@ -42,7 +58,11 @@ describe('getRangeForDygraphSpec', () => {
     })
 
     it('it sets max to 0 if they are negative', () => {
-      const timeSeries = [[date, negMax], [date, negMax], [date, negMax]]
+      const timeSeries = [
+        [date, negMax],
+        [date, negMax],
+        [date, negMax],
+      ]
       const actual = getRange(timeSeries)
       const expected = [negMax, 0]
 
@@ -51,7 +71,11 @@ describe('getRangeForDygraphSpec', () => {
   })
 
   describe('when user provides a Kapacitor rule value', () => {
-    const timeSeries = [[date, max], [date, mid], [date, min]]
+    const timeSeries = [
+      [date, max],
+      [date, mid],
+      [date, min],
+    ]
 
     it('can pad positive values', () => {
       const [actualMin, actualMax] = getRange(timeSeries, undefined, {
@@ -89,7 +113,11 @@ describe('getRangeForDygraphSpec', () => {
   })
 
   describe('when user provides a Kapacitor rule rangeValue', () => {
-    const timeSeries = [[date, max], [date, min], [date, mid]]
+    const timeSeries = [
+      [date, max],
+      [date, min],
+      [date, mid],
+    ]
 
     it('can pad positive values', () => {
       const [actualMin, actualMax] = getRange(timeSeries, undefined, {

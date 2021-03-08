@@ -19,7 +19,7 @@ describe('Reducers.Helpers.Fields', () => {
       {value: 'fn1', type: 'func', args: [{value: 'f2', type: 'field'}]},
       {value: 'fn2', type: 'func', args: [{value: 'f2', type: 'field'}]},
     ]
-    const actual = fieldWalk(fields, f => _.get(f, 'value'))
+    const actual = fieldWalk(fields, (f) => _.get(f, 'value'))
     expect(actual).toEqual(['fn1', 'f1', 'f2', 'fn1', 'f2', 'fn2', 'f2'])
   })
 

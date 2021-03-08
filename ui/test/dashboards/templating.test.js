@@ -1,6 +1,6 @@
 import {applyMasks, insertTempVar, unMask} from 'src/tempVars/constants'
 
-const masquerade = query => {
+const masquerade = (query) => {
   const masked = applyMasks(query)
   const inserted = insertTempVar(masked, ':REPLACED:')
   const unmasked = unMask(inserted)

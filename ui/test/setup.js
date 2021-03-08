@@ -4,7 +4,7 @@ import React from 'react'
 import Adapter from 'enzyme-adapter-react-16'
 
 window.indexedDB = require('fake-indexeddb')
-window.Worker = function() {}
+window.Worker = function () {}
 
 configure({
   adapter: new Adapter(),

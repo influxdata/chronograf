@@ -187,7 +187,7 @@ describe('Components.Shared.Dropdown', () => {
 
     describe('handleSelection', () => {
       it('it calls onChoose with the item provided', () => {
-        const onChoose = jest.fn(item => item)
+        const onChoose = jest.fn((item) => item)
         const {dropdown} = setup({onChoose})
 
         dropdown.simulate('click')
@@ -237,7 +237,7 @@ describe('Components.Shared.Dropdown', () => {
         })
 
         it('fires onChoose with the items at the highlighted index', () => {
-          const onChoose = jest.fn(item => item)
+          const onChoose = jest.fn((item) => item)
           const highlightedItemIndex = 1
           const {dropdown} = setup({items, onChoose})
           dropdown.setState({highlightedItemIndex})
