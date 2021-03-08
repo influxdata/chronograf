@@ -6,6 +6,11 @@
       "babel",
       "jest"
    ],
+   "settings": {
+      "react": {
+         "version": "16.8"
+      }
+   },
    "extends": [
       "eslint:recommended",
       "plugin:prettier/recommended"
