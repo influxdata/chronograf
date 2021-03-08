@@ -25,7 +25,7 @@ export default function rules(state = {}, action) {
 
     case 'LOAD_RULES': {
       const theRules = action.payload.rules
-      const ruleIDs = theRules.map((r) => r.id)
+      const ruleIDs = theRules.map(r => r.id)
       return _.zipObject(ruleIDs, theRules)
     }
 
@@ -79,7 +79,7 @@ export default function rules(state = {}, action) {
     case 'UPDATE_RULE_ALERT_NODES': {
       const {ruleID, alerts} = action.payload
       const alertNodesByType = {}
-      _.forEach(alerts, (h) => {
+      _.forEach(alerts, h => {
         if (h.enabled) {
           if (h.type === 'post') {
             if (h.url === '') {

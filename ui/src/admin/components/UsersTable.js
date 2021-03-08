@@ -42,8 +42,8 @@ const UsersTable = ({
         <tbody>
           {users.length ? (
             users
-              .filter((u) => !u.hidden)
-              .map((user) => (
+              .filter(u => !u.hidden)
+              .map(user => (
                 <UserRow
                   key={user.links.self}
                   user={user}

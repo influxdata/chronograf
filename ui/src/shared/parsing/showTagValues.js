@@ -11,7 +11,7 @@ export default function parseShowTagValues(response) {
 
   const tags = {}
   ;(result.series || []).forEach(({columns, values}) => {
-    values.forEach((v) => {
+    values.forEach(v => {
       const tagKey = v[columns.indexOf('key')]
       const tagValue = v[columns.indexOf('value')]
 

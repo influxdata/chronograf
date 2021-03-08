@@ -1,11 +1,11 @@
 import {isObject} from 'lodash'
 
-const dashrefresh = (refreshes) => {
+const dashrefresh = refreshes => {
   if (!Array.isArray(refreshes)) {
     return []
   }
 
-  const normalized = refreshes.filter((r) => {
+  const normalized = refreshes.filter(r => {
     if (!isObject(r)) {
       return false
     }

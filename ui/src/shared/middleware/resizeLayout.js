@@ -1,5 +1,5 @@
 // Trigger resize event to relayout the React Layout plugin
-export const resizeLayout = () => (next) => (action) => {
+export const resizeLayout = () => next => action => {
   next(action)
 
   if (

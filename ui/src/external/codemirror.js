@@ -10,13 +10,13 @@ import 'codemirror/addon/hint/show-hint'
 /* eslint-disable */
 const CodeMirror = require('codemirror')
 
-CodeMirror.defineSimpleMode = function (name, states) {
-  CodeMirror.defineMode(name, function (config) {
+CodeMirror.defineSimpleMode = function(name, states) {
+  CodeMirror.defineMode(name, function(config) {
     return CodeMirror.simpleMode(config, states)
   })
 }
 
-CodeMirror.simpleMode = function (config, states) {
+CodeMirror.simpleMode = function(config, states) {
   ensureState(states, 'start')
   const states_ = {},
     meta = states.meta || {}
@@ -92,7 +92,7 @@ CodeMirror.simpleMode = function (config, states) {
   return mode
 }
 
-CodeMirror.defineOption('placeholder', '', function (cm, val, old) {
+CodeMirror.defineOption('placeholder', '', function(cm, val, old) {
   var prev = old && old != CodeMirror.Init
   if (val && !prev) {
     cm.on('blur', onBlur)
@@ -198,7 +198,7 @@ function Rule(data, states) {
 }
 
 function tokenFunction(states, config) {
-  return function (stream, state) {
+  return function(stream, state) {
     if (state.pending) {
       const pend = state.pending.shift()
       if (state.pending.length === 0) {
@@ -343,7 +343,7 @@ function indexOf(val, arr) {
 }
 
 function indentFunction(states, meta) {
-  return function (state, textAfter, line) {
+  return function(state, textAfter, line) {
     if (state.local && state.local.mode.indent) {
       return state.local.mode.indent(state.localState, textAfter, line)
     }

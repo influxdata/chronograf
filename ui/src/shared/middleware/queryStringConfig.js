@@ -3,7 +3,7 @@ import qs from 'qs'
 
 import {enablePresentationMode} from 'src/shared/actions/app'
 
-export const queryStringConfig = () => (dispatch) => (action) => {
+export const queryStringConfig = () => dispatch => action => {
   dispatch(action)
 
   const urlQueryParams = qs.parse(window.location.search, {

@@ -76,7 +76,7 @@ export const shiftTimeRange = (timeRange, shift) => {
   }
 }
 
-const getMomentUnit = (unit) => {
+const getMomentUnit = unit => {
   switch (unit) {
     case 'ms': {
       return 'milliseconds' // (1 thousandth of a second)

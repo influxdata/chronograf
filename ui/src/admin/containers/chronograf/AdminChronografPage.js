@@ -16,7 +16,7 @@ import {
   SUPERADMIN_ROLE,
 } from 'src/auth/Authorized'
 
-const sections = (me) => [
+const sections = me => [
   {
     url: 'current-organization',
     name: 'Current Org',

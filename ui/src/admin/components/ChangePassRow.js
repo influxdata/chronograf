@@ -25,21 +25,21 @@ class ChangePassRow extends Component {
     this.setState({showForm: false})
   }
 
-  handleSubmit = (user) => {
+  handleSubmit = user => {
     this.props.onApply(user)
     this.setState({showForm: false})
   }
 
-  handleKeyPress = (user) => {
-    return (e) => {
+  handleKeyPress = user => {
+    return e => {
       if (e.key === 'Enter') {
         this.handleSubmit(user)
       }
     }
   }
 
-  handleEdit = (user) => {
-    return (e) => {
+  handleEdit = user => {
+    return e => {
       this.props.onEdit(user, {[e.target.name]: e.target.value})
     }
   }

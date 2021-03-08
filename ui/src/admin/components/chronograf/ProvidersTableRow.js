@@ -22,16 +22,16 @@ class ProvidersTableRow extends Component {
     onDelete(mapping)
   }
 
-  handleUpdateMapping = (changes) => {
+  handleUpdateMapping = changes => {
     const {onUpdate, mapping} = this.props
     const newState = {...mapping, ...changes}
     this.setState(newState)
     onUpdate(mapping, newState)
   }
 
-  handleChangeProvider = (provider) => this.handleUpdateMapping({provider})
+  handleChangeProvider = provider => this.handleUpdateMapping({provider})
 
-  handleChangeProviderOrg = (providerOrganization) =>
+  handleChangeProviderOrg = providerOrganization =>
     this.handleUpdateMapping({providerOrganization})
 
   handleChooseOrganization = ({id: organizationId}) =>
@@ -49,8 +49,8 @@ class ProvidersTableRow extends Component {
     } = this.state
     const {organizations, mapping, schemes, rowIndex} = this.props
 
-    const selectedOrg = organizations.find((o) => o.id === organizationId)
-    const orgDropdownItems = organizations.map((role) => ({
+    const selectedOrg = organizations.find(o => o.id === organizationId)
+    const orgDropdownItems = organizations.map(role => ({
       ...role,
       text: role.name,
     }))

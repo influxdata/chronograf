@@ -22,7 +22,7 @@ import {
   notifyTickscriptUpdateFailed,
 } from 'shared/copy/notifications'
 
-const loadQuery = (query) => ({
+const loadQuery = query => ({
   type: 'KAPA_LOAD_QUERY',
   payload: {
     query,
@@ -30,8 +30,8 @@ const loadQuery = (query) => ({
 })
 
 export function fetchRule(source, ruleID) {
-  return (dispatch) => {
-    getActiveKapacitor(source).then((kapacitor) => {
+  return dispatch => {
+    getActiveKapacitor(source).then(kapacitor => {
       getRuleAJAX(kapacitor, ruleID).then(({data: rule}) => {
         dispatch({
           type: 'LOAD_RULE',
@@ -45,14 +45,14 @@ export function fetchRule(source, ruleID) {
   }
 }
 
-const addQuery = (queryID) => ({
+const addQuery = queryID => ({
   type: 'KAPA_ADD_QUERY',
   payload: {
     queryID,
   },
 })
 
-export const getRule = (kapacitor, ruleID) => async (dispatch) => {
+export const getRule = (kapacitor, ruleID) => async dispatch => {
   try {
     const {data: rule} = await getRuleAJAX(kapacitor, ruleID)
 
@@ -78,7 +78,7 @@ export const getRule = (kapacitor, ruleID) => async (dispatch) => {
 }
 
 export const loadDefaultRule = () => {
-  return (dispatch) => {
+  return dispatch => {
     const queryID = uuid.v4()
     dispatch({
       type: 'LOAD_DEFAULT_RULE',
@@ -90,7 +90,7 @@ export const loadDefaultRule = () => {
   }
 }
 
-export const fetchRules = (kapacitor) => async (dispatch) => {
+export const fetchRules = kapacitor => async dispatch => {
   try {
     const {
       data: {rules},
@@ -117,7 +117,7 @@ export const addEvery = (ruleID, frequency) => ({
   },
 })
 
-export const removeEvery = (ruleID) => ({
+export const removeEvery = ruleID => ({
   type: 'REMOVE_EVERY',
   payload: {
     ruleID,
@@ -164,7 +164,7 @@ export const updateRuleName = (ruleID, name) => ({
   },
 })
 
-export const deleteRuleSuccess = (ruleID) => ({
+export const deleteRuleSuccess = ruleID => ({
   type: 'DELETE_RULE_SUCCESS',
   payload: {
     ruleID,
@@ -179,7 +179,7 @@ export const updateRuleStatusSuccess = (ruleID, status) => ({
   },
 })
 
-export const deleteRule = (rule) => (dispatch) => {
+export const deleteRule = rule => dispatch => {
   deleteRuleAPI(rule)
     .then(() => {
       dispatch(deleteRuleSuccess(rule.id))
@@ -190,7 +190,7 @@ export const deleteRule = (rule) => (dispatch) => {
     })
 }
 
-export const updateRuleStatus = (rule, status) => (dispatch) => {
+export const updateRuleStatus = (rule, status) => dispatch => {
   updateRuleStatusAPI(rule, status)
     .then(() => {
       dispatch(notify(notifyAlertRuleStatusUpdated(rule.name, status)))
@@ -200,7 +200,7 @@ export const updateRuleStatus = (rule, status) => (dispatch) => {
     })
 }
 
-export const createTask = (kapacitor, task) => async (dispatch) => {
+export const createTask = (kapacitor, task) => async dispatch => {
   try {
     const {data} = await createTaskAJAX(kapacitor, task)
     dispatch(notify(notifyTickScriptCreated()))
@@ -215,9 +215,12 @@ export const createTask = (kapacitor, task) => async (dispatch) => {
   }
 }
 
-export const updateTask = (kapacitor, task, ruleID, sourceID) => async (
-  dispatch
-) => {
+export const updateTask = (
+  kapacitor,
+  task,
+  ruleID,
+  sourceID
+) => async dispatch => {
   try {
     const {data} = await updateTaskAJAX(kapacitor, task, ruleID, sourceID)
     dispatch(notify(notifyTickscriptUpdated()))

@@ -45,7 +45,7 @@ const DatabaseTable = ({
         onAddRetentionPolicy={onAddRetentionPolicy}
         onDeleteRetentionPolicy={onDeleteRetentionPolicy}
         onDatabaseDeleteConfirm={onDatabaseDeleteConfirm}
-        isAddRPDisabled={!!database.retentionPolicies.some((rp) => rp.isNew)}
+        isAddRPDisabled={!!database.retentionPolicies.some(rp => rp.isNew)}
       />
       {!database.isNew && (
         <div className="db-manager-table">
@@ -69,7 +69,7 @@ const DatabaseTable = ({
             <tbody>
               {_.sortBy(database.retentionPolicies, ({name}) =>
                 name.toLowerCase()
-              ).map((rp) => {
+              ).map(rp => {
                 return (
                   <DatabaseRow
                     key={rp.links.self}

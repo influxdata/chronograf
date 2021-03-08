@@ -180,7 +180,7 @@ EditHeader.propTypes = {
   isRFDisplayed: bool,
 }
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 

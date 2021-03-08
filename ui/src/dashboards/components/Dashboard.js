@@ -21,12 +21,12 @@ const Dashboard = ({
   setScrollTop,
   inView,
 }) => {
-  const cells = dashboard.cells.map((cell) => {
+  const cells = dashboard.cells.map(cell => {
     const dashboardCell = {
       ...cell,
       inView: inView(cell),
     }
-    dashboardCell.queries = dashboardCell.queries.map((q) => ({
+    dashboardCell.queries = dashboardCell.queries.map(q => ({
       ...q,
       database: q.db,
       text: q.query,

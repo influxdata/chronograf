@@ -32,7 +32,7 @@ class MeasurementDropdown extends Component {
     const {measurement, onSelectMeasurement, onStartEdit} = this.props
     return (
       <Dropdown
-        items={measurements.map((text) => ({text}))}
+        items={measurements.map(text => ({text}))}
         selected={measurement || 'Select Measurement'}
         onChoose={onSelectMeasurement}
         onClick={onStartEdit}

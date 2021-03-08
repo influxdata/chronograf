@@ -2,7 +2,7 @@ import AJAX from 'src/utils/ajax'
 import _ from 'lodash'
 import {buildInfluxUrl, proxy} from 'utils/queryUrlGenerator'
 
-export const showDatabases = async (source) => {
+export const showDatabases = async source => {
   const query = 'SHOW DATABASES'
   return await proxy({source, query})
 }
@@ -11,11 +11,11 @@ export const showRetentionPolicies = async (source, databases) => {
   let query
   if (Array.isArray(databases)) {
     query = databases
-      .map((db) => `SHOW RETENTION POLICIES ON "${_.escape(db)}"`)
+      .map(db => `SHOW RETENTION POLICIES ON "${_.escape(db)}"`)
       .join(';')
   } else {
     const dbs = _.split(databases, ',')
-      .map((d) => `${_.escape(d)}`)
+      .map(d => `${_.escape(d)}`)
       .join(',')
     query = `SHOW RETENTION POLICIES ON "${dbs}"`
   }
@@ -67,7 +67,7 @@ export const showTagValues = async ({
 }) => {
   const keys = tagKeys
     .sort()
-    .map((k) => `"${_.escape(k)}"`)
+    .map(k => `"${_.escape(k)}"`)
     .join(', ')
   const rp = _.toString(retentionPolicy)
   const query = `SHOW TAG VALUES FROM "${rp}"."${_.escape(

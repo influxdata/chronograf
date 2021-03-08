@@ -5,9 +5,9 @@ export const minDropdownWidth = 120
 export const maxDropdownWidth = 330
 export const dropdownPadding = 30
 
-const valueLength = (a) => _.size(a.value)
+const valueLength = a => _.size(a.value)
 
-export const calculateDropdownWidth = (values) => {
+export const calculateDropdownWidth = values => {
   if (!values || !values.length) {
     return minDropdownWidth
   }

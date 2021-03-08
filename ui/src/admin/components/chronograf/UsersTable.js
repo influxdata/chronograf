@@ -27,11 +27,11 @@ class UsersTable extends Component {
     )
   }
 
-  handleChangeUserRole = (user, currentRole) => (newRole) => {
+  handleChangeUserRole = (user, currentRole) => newRole => {
     this.props.onUpdateUserRole(user, currentRole, newRole)
   }
 
-  handleDeleteUser = (user) => {
+  handleDeleteUser = user => {
     this.props.onDeleteUser(user)
   }
 
@@ -88,7 +88,7 @@ class UsersTable extends Component {
                 />
               ) : null}
               {users.length ? (
-                users.map((user) => (
+                users.map(user => (
                   <UsersTableRow
                     user={user}
                     key={uuid.v4()}

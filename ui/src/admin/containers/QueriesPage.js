@@ -42,16 +42,16 @@ class QueriesPage extends Component {
 
   updateQueries = () => {
     const {source, notify, loadQueries} = this.props
-    showDatabases(source.links.proxy).then((resp) => {
+    showDatabases(source.links.proxy).then(resp => {
       const {databases, errors} = showDatabasesParser(resp.data)
       if (errors.length) {
-        errors.forEach((message) => notify(notifyQueriesError(message)))
+        errors.forEach(message => notify(notifyQueriesError(message)))
         return
       }
 
-      const fetches = databases.map((db) => showQueries(source.links.proxy, db))
+      const fetches = databases.map(db => showQueries(source.links.proxy, db))
 
-      Promise.allSettled(fetches).then((results) => {
+      Promise.allSettled(fetches).then(results => {
         const allQueries = []
         results.forEach((settledResponse, i) => {
           if (!settledResponse.value) {
@@ -63,7 +63,7 @@ class QueriesPage extends Component {
           }
           const result = showQueriesParser(settledResponse.value.data)
           if (result.errors.length) {
-            result.errors.forEach((message) =>
+            result.errors.forEach(message =>
               notify(notifyQueriesError(message))
             )
           }
@@ -71,12 +71,12 @@ class QueriesPage extends Component {
           allQueries.push(...result.queries)
         })
 
-        const queries = uniqBy(flatten(allQueries), (q) => q.id)
+        const queries = uniqBy(flatten(allQueries), q => q.id)
 
         // sorting queries by magnitude, so generally longer queries will appear atop the list
         const sortedQueries = queries.sort((a, b) => {
-          const aTime = TIMES.find((t) => a.duration.match(t.test))
-          const bTime = TIMES.find((t) => b.duration.match(t.test))
+          const aTime = TIMES.find(t => a.duration.match(t.test))
+          const bTime = TIMES.find(t => b.duration.match(t.test))
           return +aTime.magnitude <= +bTime.magnitude
         })
 
@@ -85,7 +85,7 @@ class QueriesPage extends Component {
     })
   }
 
-  handleKillQuery = (query) => {
+  handleKillQuery = query => {
     const {source, killQuery} = this.props
     killQuery(source.links.proxy, query)
   }
@@ -112,7 +112,7 @@ const mapStateToProps = ({adminInfluxDB: {queries, queryIDToKill}}) => ({
   queryIDToKill,
 })
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   loadQueries: bindActionCreators(loadQueriesAction, dispatch),
   setQueryToKill: bindActionCreators(setQueryToKillAction, dispatch),
   killQuery: bindActionCreators(killQueryAsync, dispatch),

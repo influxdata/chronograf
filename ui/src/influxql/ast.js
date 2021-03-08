@@ -23,7 +23,7 @@ const exprStr = ({expr, val, type}) => {
   }
 }
 
-const recurse = (root) => {
+const recurse = root => {
   const {expr} = root
 
   if (expr === 'binary') {
@@ -40,7 +40,7 @@ const recurse = (root) => {
   return exprStr(root)
 }
 
-export const toString = (ast) => {
+export const toString = ast => {
   const {fields, sources, condition, groupBy, orderbys, limits} = ast
 
   const strs = ['SELECT']

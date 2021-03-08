@@ -29,7 +29,7 @@ const download = (data, strFileName, strMimeType) => {
   let payload = data
   let url = !strFileName && !strMimeType && payload
   const anchor = document.createElement('a')
-  const toString = (a) => `${a}`
+  const toString = a => `${a}`
   let myBlob = _window.Blob || _window.MozBlob || _window.WebKitBlob || toString
   let fileName = strFileName || 'download'
   let reader
@@ -37,17 +37,20 @@ const download = (data, strFileName, strMimeType) => {
 
   if (url && url.length < 2048) {
     // if no filename and no mime, assume a url was passed as the only argument
-    fileName = url.split('/').pop().split('?')[0]
+    fileName = url
+      .split('/')
+      .pop()
+      .split('?')[0]
     anchor.href = url // assign href prop to temp anchor
     if (anchor.href.indexOf(url) !== -1) {
       // if the browser determines that it's a potentially valid url path:
       const ajax = new XMLHttpRequest()
       ajax.open('GET', url, true)
       ajax.responseType = 'blob'
-      ajax.onload = function (e) {
+      ajax.onload = function(e) {
         download(e.target.response, fileName, defaultMime)
       }
-      setTimeout(function () {
+      setTimeout(function() {
         ajax.send()
       }, 0) // allows setting custom ajax headers using the return:
       return ajax
@@ -63,11 +66,11 @@ const download = (data, strFileName, strMimeType) => {
       anchor.innerHTML = 'downloading...'
       anchor.style.display = 'none'
       document.body.appendChild(anchor)
-      setTimeout(function () {
+      setTimeout(function() {
         anchor.click()
         document.body.removeChild(anchor)
         if (winMode === true) {
-          setTimeout(function () {
+          setTimeout(function() {
             _window.URL.revokeObjectURL(anchor.href)
           }, 250)
         }
@@ -84,7 +87,7 @@ const download = (data, strFileName, strMimeType) => {
       url = `data:${url.replace(/^data:([\w/\-+]+)/, defaultMime)}`
     }
     f.src = url
-    setTimeout(function () {
+    setTimeout(function() {
       document.body.removeChild(f)
     }, 333)
   } // end saver
@@ -126,7 +129,7 @@ const download = (data, strFileName, strMimeType) => {
 
     // Blob but not URL support:
     reader = new FileReader()
-    reader.onload = function () {
+    reader.onload = function() {
       saver(this.result)
     }
     reader.readAsDataURL(blob)

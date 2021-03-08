@@ -11,11 +11,11 @@ import SplashPage from 'shared/components/SplashPage'
 import PurgatoryAuthItem from 'src/auth/PurgatoryAuthItem'
 
 const getRoleNameByOrgID = (id, roles) => {
-  const role = roles.find((r) => r.organization === id)
+  const role = roles.find(r => r.organization === id)
   return (role && role.name) || 'ghost'
 }
 
-const handleClickLogin = (props) => (organization) => async (e) => {
+const handleClickLogin = props => organization => async e => {
   e.preventDefault()
   const {router, links, meChangeOrganization} = props
 
@@ -49,7 +49,7 @@ class Purgatory extends Component {
       superAdmin,
     } = me
 
-    const rolesAndOrgs = organizations.map((organization) => ({
+    const rolesAndOrgs = organizations.map(organization => ({
       organization,
       role: getRoleNameByOrgID(organization.id, roles),
       currentOrganization: organization.id === currentOrganization.id,
@@ -141,7 +141,7 @@ const mapStateToProps = ({links, auth: {me, logoutLink}}) => ({
   me,
 })
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   meChangeOrganization: bindActionCreators(meChangeOrganizationAsync, dispatch),
 })
 

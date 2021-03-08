@@ -33,7 +33,7 @@ class AllUsersTable extends Component {
     }
   }
 
-  handleUpdateAuthConfig = (fieldName) => (updatedValue) => {
+  handleUpdateAuthConfig = fieldName => updatedValue => {
     const {
       actionsConfig: {updateAuthConfigAsync},
       authConfig,
@@ -46,7 +46,7 @@ class AllUsersTable extends Component {
     updateAuthConfigAsync(links.config.auth, authConfig, updatedAuthConfig)
   }
 
-  handleAddToOrganization = (user) => (organization) => {
+  handleAddToOrganization = user => organization => {
     // '*' tells the server to fill in the current defaultRole of that org
     const newRoles = user.roles.concat({
       organization: organization.id,
@@ -59,12 +59,12 @@ class AllUsersTable extends Component {
     )
   }
 
-  handleRemoveFromOrganization = (user) => (role) => {
+  handleRemoveFromOrganization = user => role => {
     const newRoles = user.roles.filter(
-      (r) => r.organization !== role.organization
+      r => r.organization !== role.organization
     )
     const {name} = this.props.organizations.find(
-      (o) => o.id === role.organization
+      o => o.id === role.organization
     )
     this.props.onUpdateUserRoles(
       user,
@@ -73,7 +73,7 @@ class AllUsersTable extends Component {
     )
   }
 
-  handleChangeSuperAdmin = (user) => {
+  handleChangeSuperAdmin = user => {
     const newStatus = !user.superAdmin
     this.props.onUpdateUserSuperAdmin(user, newStatus)
   }
@@ -138,7 +138,7 @@ class AllUsersTable extends Component {
             </thead>
             <tbody>
               {users.length ? (
-                users.map((user) => (
+                users.map(user => (
                   <AllUsersTableRow
                     user={user}
                     key={uuid.v4()}

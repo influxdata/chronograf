@@ -11,7 +11,7 @@ export default function enhanceWithClickOutside(WrappedComponent) {
       document.removeEventListener('click', this.handleClickOutside, true)
     }
 
-    handleClickOutside = (e) => {
+    handleClickOutside = e => {
       const domNode = ReactDOM.findDOMNode(this)
       if (
         (!domNode || !domNode.contains(e.target)) &&
@@ -25,7 +25,7 @@ export default function enhanceWithClickOutside(WrappedComponent) {
       return (
         <WrappedComponent
           {...this.props}
-          ref={(ref) => (this.wrappedComponent = ref)}
+          ref={ref => (this.wrappedComponent = ref)}
         />
       )
     }

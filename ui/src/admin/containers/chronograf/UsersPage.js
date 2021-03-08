@@ -18,7 +18,7 @@ class UsersPage extends PureComponent {
     }
   }
 
-  handleCreateUser = (user) => {
+  handleCreateUser = user => {
     const {
       links,
       actions: {createUserAsync},
@@ -31,7 +31,7 @@ class UsersPage extends PureComponent {
       actions: {updateUserAsync},
     } = this.props
     const updatedRole = {...currentRole, name}
-    const newRoles = user.roles.map((r) =>
+    const newRoles = user.roles.map(r =>
       r.organization === currentRole.organization ? updatedRole : r
     )
     updateUserAsync(
@@ -41,7 +41,7 @@ class UsersPage extends PureComponent {
     )
   }
 
-  handleDeleteUser = (user) => {
+  handleDeleteUser = user => {
     const {
       actions: {deleteUserAsync},
     } = this.props
@@ -75,7 +75,7 @@ class UsersPage extends PureComponent {
     const {isLoading} = this.state
 
     const organization = organizations.find(
-      (o) => o.id === meCurrentOrganization.id
+      o => o.id === meCurrentOrganization.id
     )
 
     return (
@@ -122,7 +122,7 @@ const mapStateToProps = ({links, adminChronograf: {organizations, users}}) => ({
   users,
 })
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(adminChronografActionCreators, dispatch),
   notify: bindActionCreators(notifyAction, dispatch),
 })

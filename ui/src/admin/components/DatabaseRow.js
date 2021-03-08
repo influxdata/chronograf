@@ -71,7 +71,7 @@ class DatabaseRow extends Component {
     this.handleEndEdit()
   }
 
-  handleKeyDown = (e) => {
+  handleKeyDown = e => {
     const {key} = e
     const {retentionPolicy, database, onRemove} = this.props
 
@@ -146,7 +146,7 @@ class DatabaseRow extends Component {
                 defaultValue={name}
                 placeholder="Name this RP"
                 onKeyDown={this.handleKeyDown}
-                ref={(r) => (this.name = r)}
+                ref={r => (this.name = r)}
                 autoFocus={true}
                 spellCheck={false}
                 autoComplete="false"
@@ -163,7 +163,7 @@ class DatabaseRow extends Component {
               defaultValue={formattedDuration}
               placeholder="INF, 1h30m, 1d, etc"
               onKeyDown={this.handleKeyDown}
-              ref={(r) => (this.duration = r)}
+              ref={r => (this.duration = r)}
               autoFocus={!isNew}
               spellCheck={false}
               autoComplete="false"
@@ -179,7 +179,7 @@ class DatabaseRow extends Component {
                 defaultValue={replication || 1}
                 placeholder="# of Nodes"
                 onKeyDown={this.handleKeyDown}
-                ref={(r) => (this.replication = r)}
+                ref={r => (this.replication = r)}
                 spellCheck={false}
                 autoComplete="false"
               />
@@ -266,7 +266,7 @@ DatabaseRow.propTypes = {
   isRFDisplayed: bool,
 }
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 

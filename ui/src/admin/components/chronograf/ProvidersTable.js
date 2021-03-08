@@ -23,7 +23,7 @@ class ProvidersTable extends Component {
     this.setState({isCreatingMap: false})
   }
 
-  handleCreateMap = (newMap) => {
+  handleCreateMap = newMap => {
     this.props.onCreateMap(newMap)
     this.setState({isCreatingMap: false})
   }

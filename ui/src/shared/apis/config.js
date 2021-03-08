@@ -1,6 +1,6 @@
 import AJAX from 'src/utils/ajax'
 
-export const getAuthConfig = async (url) => {
+export const getAuthConfig = async url => {
   try {
     return await AJAX({
       method: 'GET',
