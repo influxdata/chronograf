@@ -5,6 +5,9 @@ export async function getMinDuration(
   astLink: string,
   fluxQuery: string
 ): Promise<number> {
+  if (!astLink) {
+    return 600_000
+  }
   const ast = await getAST({url: astLink, body: fluxQuery})
   const result = getMinDurationFromAST(ast)
 

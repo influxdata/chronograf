@@ -4,6 +4,9 @@ export const extractImports = async (
   url: string,
   query: string
 ): Promise<{imports: string; body: string}> => {
+  if (!url) {
+    return {imports: '', body: query}
+  }
   const ast = await getAST({url, body: query})
   const {imports, body} = ast.files[0]
   const importStatements = (imports || [])
