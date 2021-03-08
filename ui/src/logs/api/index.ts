@@ -10,18 +10,14 @@ export const executeQueryAsync = async (
   namespace: Namespace,
   query: string
 ): Promise<TimeSeriesResponse> => {
-  try {
-    const {data} = await proxy({
-      source: proxyLink,
-      db: namespace.database,
-      rp: namespace.retentionPolicy,
-      query,
-    })
+  const {data} = await proxy({
+    source: proxyLink,
+    db: namespace.database,
+    rp: namespace.retentionPolicy,
+    query,
+  })
 
-    return data
-  } catch (error) {
-    throw error
-  }
+  return data
 }
 
 export const getLogConfig = async (url: string) => {
