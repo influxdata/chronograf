@@ -63,7 +63,7 @@ describe('kapacitor.utils.alertMessageValidation', () => {
       'CI ID = {{ with (index .Tags "ci_id") }}{{ . }}{{ else }}Unknown{{ end }}',
       'CI ID = {{ if (index .Tags "ci_id") }}{{ index .Tags "ci_id" }}{{ else -}} Unknown {{- end }}',
       '# of Tags = {{ len .Tags }}',
-    ].forEach((m) => {
+    ].forEach(m => {
       it(`#5343 accepts message '${m}'`, () => {
         const isValid = isValidMessage(m)
         expect(isValid).toEqual(true)

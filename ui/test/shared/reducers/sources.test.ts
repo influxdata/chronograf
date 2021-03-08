@@ -34,7 +34,7 @@ describe('Shared.Reducers.sources', () => {
         })
       )
 
-      expect(state.filter((s) => s.default).length).toBe(1)
+      expect(state.filter(s => s.default).length).toBe(1)
     })
 
     it('can correctly show default sources when updating a source', () => {

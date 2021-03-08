@@ -122,11 +122,11 @@ describe('topologicalSort', () => {
     ]
 
     const graph = graphFromTemplates(templates)
-    const a = graph.find((n) => n.initialTemplate.id === 'a')
-    const b = graph.find((n) => n.initialTemplate.id === 'b')
-    const c = graph.find((n) => n.initialTemplate.id === 'c')
-    const d = graph.find((n) => n.initialTemplate.id === 'd')
-    const e = graph.find((n) => n.initialTemplate.id === 'e')
+    const a = graph.find(n => n.initialTemplate.id === 'a')
+    const b = graph.find(n => n.initialTemplate.id === 'b')
+    const c = graph.find(n => n.initialTemplate.id === 'c')
+    const d = graph.find(n => n.initialTemplate.id === 'd')
+    const e = graph.find(n => n.initialTemplate.id === 'e')
 
     const sorted = topologicalSort(graph)
 
@@ -247,15 +247,15 @@ describe('graphFromTemplates', () => {
     ]
 
     const graph = graphFromTemplates(templates)
-    const a = graph.find((n) => n.initialTemplate === templates[0])
-    const b = graph.find((n) => n.initialTemplate === templates[1])
-    const c = graph.find((n) => n.initialTemplate === templates[2])
-    const d = graph.find((n) => n.initialTemplate === templates[3])
-    const e = graph.find((n) => n.initialTemplate === templates[4])
-    const f = graph.find((n) => n.initialTemplate === templates[5])
-    const g = graph.find((n) => n.initialTemplate === templates[6])
-    const h = graph.find((n) => n.initialTemplate === templates[7])
-    const i = graph.find((n) => n.initialTemplate === templates[8])
+    const a = graph.find(n => n.initialTemplate === templates[0])
+    const b = graph.find(n => n.initialTemplate === templates[1])
+    const c = graph.find(n => n.initialTemplate === templates[2])
+    const d = graph.find(n => n.initialTemplate === templates[3])
+    const e = graph.find(n => n.initialTemplate === templates[4])
+    const f = graph.find(n => n.initialTemplate === templates[5])
+    const g = graph.find(n => n.initialTemplate === templates[6])
+    const h = graph.find(n => n.initialTemplate === templates[7])
+    const i = graph.find(n => n.initialTemplate === templates[8])
 
     expect(new Set(a.parents)).toEqual(new Set([]))
     expect(new Set(a.children)).toEqual(new Set([b, c]))
@@ -384,7 +384,7 @@ describe('hydrateTemplates', () => {
 
     const result = await hydrateTemplates(templates, [], {fetcher: fakeFetcher})
 
-    expect(result.find((t) => t.id === 'a').values).toContainEqual({
+    expect(result.find(t => t.id === 'a').values).toContainEqual({
       value: 'success',
       type: TemplateValueType.MetaQuery,
       selected: true,
