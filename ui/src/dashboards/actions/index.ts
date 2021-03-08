@@ -396,7 +396,7 @@ export const setActiveCell = (activeCellID: string): SetActiveCellAction => ({
 })
 
 export const updateTimeRangeQueryParams = (
-  updatedQueryParams: object
+  updatedQueryParams: Record<string, unknown>
 ): RouterAction => {
   const {search, pathname} = window.location
   const strippedPathname = stripPrefix(pathname)
@@ -422,7 +422,9 @@ export const updateTimeRangeQueryParams = (
   return push(newLocation)
 }
 
-export const updateQueryParams = (updatedQueryParams: object): RouterAction => {
+export const updateQueryParams = (
+  updatedQueryParams: Record<string, unknown>
+): RouterAction => {
   const {search, pathname} = window.location
   const strippedPathname = stripPrefix(pathname)
 
