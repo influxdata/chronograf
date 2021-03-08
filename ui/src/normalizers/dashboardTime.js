@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import _ from 'lodash'
 
 const dashtime = (ranges) => {
