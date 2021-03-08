@@ -245,6 +245,7 @@ class TimeSeries extends PureComponent<Props, State> {
     } catch (err) {
       loading = RemoteDataState.Error
       errorMessage = parseError(err).text
+      // eslint-disable-next-line no-console
       console.trace(err, errorMessage)
     }
 

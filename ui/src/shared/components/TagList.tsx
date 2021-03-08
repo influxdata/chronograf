@@ -30,6 +30,7 @@ interface Props {
 }
 
 interface State {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   tags: {}
 }
 
