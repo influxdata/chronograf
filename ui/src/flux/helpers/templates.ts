@@ -27,7 +27,6 @@ function templateVariableValue(template: Template): string {
   return `"${value}"`
 }
 function templateVariables(templates: Template[]): string {
-  console.log(JSON.stringify(templates, null, 2))
   const extras = (templates || [])
     .filter(
       x =>
