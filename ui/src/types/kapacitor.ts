@@ -474,7 +474,7 @@ export interface LogItem {
   username?: string
   host?: string
   duration?: string
-  tag?: object
-  field?: object
+  tag?: Record<string, unknown>
+  field?: Record<string, unknown>
   cluster?: string
 }
