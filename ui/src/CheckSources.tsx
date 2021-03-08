@@ -41,7 +41,7 @@ interface Params {
 }
 
 interface Props {
-  getSources: () => void
+  getSources: () => Promise<void>
   sources: Source[]
   children: ReactElement<any>
   params: Params
