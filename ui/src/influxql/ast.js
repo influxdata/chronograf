@@ -47,6 +47,7 @@ export const toString = (ast) => {
 
   // SELECT
   const flds = []
+  // eslint-disable-next-line no-unused-vars
   for (const field of fields) {
     const {column, alias} = field
     const result = recurse(column)
@@ -58,6 +59,7 @@ export const toString = (ast) => {
   if (sources.length) {
     strs.push('FROM')
     const srcs = []
+    // eslint-disable-next-line no-unused-vars
     for (const source of sources) {
       // TODO subquery (type)
       const {database, retentionPolicy, name} = source
