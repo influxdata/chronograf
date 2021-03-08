@@ -1753,14 +1753,53 @@ const AST_8 = {
   ],
 }
 
-// prettier-ignore
-export const AST_TESTS = [
-  ['basic relative query'                               , 'from(bucket: "b") |> range(start: -1m)'                                                          , 1000 * 60                , AST_1],
-  ['query with start time assigned to variable'         , 'foo = -1m\n\nfrom(bucket: "b") |> range(start: foo)'                                             , 1000 * 60                , AST_2],
-  ['query with relative start and stop times'           , 'from(bucket: "b") |> range(start: -1h, stop: -3m)'                                               , 1000 * 60 * 57           , AST_3],
-  ['query with absolute start and stop times'           , 'from(bucket: "b") |> range(start: 2010-01-01T00:00:00Z, stop: 2010-01-02T00:00:00Z)'             , 1000 * 60 * 60 * 24      , AST_4],
-  ['query with duration literal added to absolute time' , 'from(bucket: "b") |> range(start: 2010-01-01T00:00:00Z + 1h, stop: 2010-01-02T00:00:00Z)'        , 1000 * 60 * 60 * 23      , AST_5],
-  ['query with two range calls'                         , 'from(bucket: "b") |> range(start: -1m)\nfrom(bucket: "b") |> range(start: -2m) '                 , 1000 * 60                , AST_6],
-  ['query with two large ranges overlapping slightly'   , 'from(bucket: "b") |> range(start: -200d, stop: -100d)\nfrom(bucket: "b") |> range(start: -101d)' , 1000 * 60 * 60 * 24      , AST_7],
-  ['query with three nonoverlapping ranges'             , 'range(start: -3s, stop: -2s)\nrange(start: -2s, stop: -1s)\nrange(start: -1s)'                   , 1000                     , AST_8]
+export const AST_TESTS: Array<[string, string, number, any]> = [
+  [
+    'basic relative query',
+    'from(bucket: "b") |> range(start: -1m)',
+    1000 * 60,
+    AST_1,
+  ],
+  [
+    'query with start time assigned to variable',
+    'foo = -1m\n\nfrom(bucket: "b") |> range(start: foo)',
+    1000 * 60,
+    AST_2,
+  ],
+  [
+    'query with relative start and stop times',
+    'from(bucket: "b") |> range(start: -1h, stop: -3m)',
+    1000 * 60 * 57,
+    AST_3,
+  ],
+  [
+    'query with absolute start and stop times',
+    'from(bucket: "b") |> range(start: 2010-01-01T00:00:00Z, stop: 2010-01-02T00:00:00Z)',
+    1000 * 60 * 60 * 24,
+    AST_4,
+  ],
+  [
+    'query with duration literal added to absolute time',
+    'from(bucket: "b") |> range(start: 2010-01-01T00:00:00Z + 1h, stop: 2010-01-02T00:00:00Z)',
+    1000 * 60 * 60 * 23,
+    AST_5,
+  ],
+  [
+    'query with two range calls',
+    'from(bucket: "b") |> range(start: -1m)\nfrom(bucket: "b") |> range(start: -2m) ',
+    1000 * 60,
+    AST_6,
+  ],
+  [
+    'query with two large ranges overlapping slightly',
+    'from(bucket: "b") |> range(start: -200d, stop: -100d)\nfrom(bucket: "b") |> range(start: -101d)',
+    1000 * 60 * 60 * 24,
+    AST_7,
+  ],
+  [
+    'query with three nonoverlapping ranges',
+    'range(start: -3s, stop: -2s)\nrange(start: -2s, stop: -1s)\nrange(start: -1s)',
+    1000,
+    AST_8,
+  ],
 ]
