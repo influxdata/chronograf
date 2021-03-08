@@ -49,7 +49,7 @@ const getRange = (
   const points = [...timeSeries, [null, pad(value)], [null, pad(rangeValue)]]
 
   const range = points.reduce(
-    // tslint:disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     ([min, max] = [], series) => {
       for (let i = 1; i < series.length; i++) {
         const val = series[i]
