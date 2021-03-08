@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 // Libraries
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
