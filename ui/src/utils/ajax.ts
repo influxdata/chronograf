@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import axios, {AxiosResponse, Method} from 'axios'
 
 let links

@@ -112,7 +112,7 @@ interface State {
   ready: boolean
 }
 
-class Root extends PureComponent<{}, State> {
+class Root extends PureComponent<Record<string, never>, State> {
   private getLinks = bindActionCreators(getLinksAsync, dispatch)
   private getMe = bindActionCreators(getMeAsync, dispatch)
   private heartbeatTimer: number
