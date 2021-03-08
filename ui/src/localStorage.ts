@@ -11,7 +11,9 @@ import {VERSION, GIT_SHA} from 'src/shared/constants'
 
 import {LocalStorage} from 'src/types/localStorage'
 
-export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
+export const loadLocalStorage = (
+  errorsQueue: any[]
+): LocalStorage | Record<string, never> => {
   try {
     const serializedState = localStorage.getItem('state')
     const state = JSON.parse(serializedState) || {}
