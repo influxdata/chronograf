@@ -1,6 +1,3 @@
-// libraries
-import _ from 'lodash'
-
 // actions
 import {Action, ActionType} from 'src/dashboards/actions/cellEditorOverlay'
 
