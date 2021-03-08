@@ -232,11 +232,11 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
           />
           <line
             className="y-tick"
-            key="1-25-625-223.75"
+            key="1-25-625-223.74999999999997"
             x1={25}
             x2={625}
-            y1={223.75}
-            y2={223.75}
+            y1={223.74999999999997}
+            y2={223.74999999999997}
           />
           <line
             className="y-tick"
@@ -248,11 +248,11 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
           />
           <line
             className="y-tick"
-            key="2-25-625-67.5"
+            key="2-25-625-67.49999999999999"
             x1={25}
             x2={625}
-            y1={67.5}
-            y2={67.5}
+            y1={67.49999999999999}
+            y2={67.49999999999999}
           />
           <text
             className="y-label"
@@ -272,9 +272,9 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
           </text>
           <text
             className="y-label"
-            key="1-25-625-223.75"
+            key="1-25-625-223.74999999999997"
             x={18}
-            y={223.75}
+            y={223.74999999999997}
           >
             1
           </text>
@@ -288,9 +288,9 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
           </text>
           <text
             className="y-label"
-            key="2-25-625-67.5"
+            key="2-25-625-67.49999999999999"
             x={18}
-            y={67.5}
+            y={67.49999999999999}
           >
             2
           </text>
@@ -362,12 +362,12 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
                 id="histogram-chart-bars--clip-1-1-193.5"
               >
                 <rect
-                  height={159.25}
+                  height={159.25000000000003}
                   rx={3}
                   ry={3}
                   width={188}
                   x={193.5}
-                  y={218.75}
+                  y={218.74999999999997}
                 />
               </clipPath>
             </defs>
@@ -377,11 +377,11 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
               data-group="a"
               data-key="1"
               fill="#0000ff"
-              height={156.25}
+              height={156.25000000000003}
               key="1"
               width={188}
               x={193.5}
-              y={218.75}
+              y={218.74999999999997}
             />
           </g>
           <g
@@ -402,7 +402,7 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
                   ry={3}
                   width={188}
                   x={481}
-                  y={62.5}
+                  y={62.499999999999986}
                 />
               </clipPath>
             </defs>
@@ -416,7 +416,7 @@ exports[`HistogramChart displays the visualization with bars if nonempty data is
               key="2"
               width={188}
               x={481}
-              y={62.5}
+              y={62.499999999999986}
             />
           </g>
         </HistogramChartBars>
