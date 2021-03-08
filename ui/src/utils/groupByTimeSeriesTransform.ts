@@ -32,7 +32,7 @@ interface Series {
   responseIndex: number
   seriesIndex: number
   isGroupBy?: boolean
-  tags?: [{[x: string]: string}]
+  tags?: {[x: string]: string}
   tagsKeys?: string[]
 }
 
