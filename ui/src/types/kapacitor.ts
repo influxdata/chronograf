@@ -219,7 +219,8 @@ interface OpsGenie {
 }
 
 // Talk sends alerts to Jane Talk (https://jianliao.com/site)
-interface Talk {} // tslint:disable-line
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface Talk {}
 
 // TriggerValues specifies the alerting logic for a specific trigger type
 interface TriggerValues {
@@ -326,6 +327,7 @@ export type ConfigKeyMaps =
   | PushoverConfigKeyMap
   | TelegramConfigKeyMap
   | VictorOpsConfigKeyMap
+  // eslint-disable-next-line @typescript-eslint/ban-types
   | {}
 
 export interface AlertaProperties {
