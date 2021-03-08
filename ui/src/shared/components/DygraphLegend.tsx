@@ -47,7 +47,7 @@ interface State {
   isAscending: boolean
   filterText: string
   isFilterVisible: boolean
-  legendStyles: object
+  legendStyles: Record<string, unknown>
   pageX: number | null
   cellID: string
 }
