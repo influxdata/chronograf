@@ -110,10 +110,12 @@ const Header = ({
     </div>
   )
 
+  // eslint-disable-next-line no-prototype-builtins
+  const hasDeletCode = database.hasOwnProperty('deleteCode')
   return (
     <div className="db-manager-header">
       <h4>{database.name}</h4>
-      {database.hasOwnProperty('deleteCode') ? deleteConfirmation : buttons}
+      { hasDeletCode ? deleteConfirmation : buttons}
     </div>
   )
 }
