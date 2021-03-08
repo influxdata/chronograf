@@ -11,9 +11,9 @@ describe('AdminInfluxDBPage', () => {
     const props = {
       source,
       addUser: () => {},
-      loadUsers: () => {},
-      loadRoles: () => {},
-      loadPermissions: () => {},
+      loadUsers: async () => {},
+      loadRoles: async () => {},
+      loadPermissions: async () => {},
       notify: () => {},
       params: {tab: ''},
       users: [],
