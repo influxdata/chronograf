@@ -3,5 +3,5 @@
   "trailingComma": "es5",
   "bracketSpacing": false,
   "semi": false,
-  "arrowParens": "always"
+  "arrowParens": "avoid"
 }
