@@ -45,8 +45,8 @@ class DashboardEmpty extends Component<Props> {
     return (
       <div className="dashboard-empty">
         <p>
-          This Dashboard doesn't have any <strong>Cells</strong>,<br />why not
-          add one?
+          This Dashboard doesn't have any <strong>Cells</strong>,<br />
+          why not add one?
         </p>
         <Authorized requiredRole={EDITOR_ROLE}>
           <div className="dashboard-empty--menu">

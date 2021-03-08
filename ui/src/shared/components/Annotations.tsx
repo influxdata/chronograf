@@ -46,23 +46,22 @@ class Annotations extends Component<Props> {
     } = this.props
     return (
       <div className="annotations-container">
-        {mode === ADDING &&
-          addingAnnotation && (
-            <SourceContext.Consumer>
-              {(source: Source) => (
-                <NewAnnotation
-                  dygraph={dygraph}
-                  source={source}
-                  isTempHovering={isTempHovering}
-                  addingAnnotation={addingAnnotation}
-                  staticLegendHeight={staticLegendHeight}
-                  onAddingAnnotationSuccess={handleAddingAnnotationSuccess}
-                  onMouseEnterTempAnnotation={handleMouseEnterTempAnnotation}
-                  onMouseLeaveTempAnnotation={handleMouseLeaveTempAnnotation}
-                />
-              )}
-            </SourceContext.Consumer>
-          )}
+        {mode === ADDING && addingAnnotation && (
+          <SourceContext.Consumer>
+            {(source: Source) => (
+              <NewAnnotation
+                dygraph={dygraph}
+                source={source}
+                isTempHovering={isTempHovering}
+                addingAnnotation={addingAnnotation}
+                staticLegendHeight={staticLegendHeight}
+                onAddingAnnotationSuccess={handleAddingAnnotationSuccess}
+                onMouseEnterTempAnnotation={handleMouseEnterTempAnnotation}
+                onMouseLeaveTempAnnotation={handleMouseLeaveTempAnnotation}
+              />
+            )}
+          </SourceContext.Consumer>
+        )}
         {annotations.map(a => (
           <AnnotationComponent
             key={a.id}

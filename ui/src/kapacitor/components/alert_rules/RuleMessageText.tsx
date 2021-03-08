@@ -32,12 +32,9 @@ const RuleMessageText: FunctionComponent<Props> = ({
 }) => {
   const [typingStatus, setTypingStatus] = useState(TypingStatus.NotStarted)
   const validation = useMessageValidation(typingStatus, message)
-  const typingDone = useCallback(
-    () => {
-      setTypingStatus(TypingStatus.Done)
-    },
-    [setTypingStatus]
-  )
+  const typingDone = useCallback(() => {
+    setTypingStatus(TypingStatus.Done)
+  }, [setTypingStatus])
 
   const onKeyUp = () => {
     const waitForEndTypingMs = 500

@@ -62,21 +62,20 @@ class MeasurementListItem extends PureComponent<Props, State> {
             <div className="query-builder--caret icon caret-right" />
             {measurement}
           </span>
-          {this.shouldShow &&
-            numTagsActive >= 1 && (
-              <div
-                className={classnames('flip-toggle', {
-                  flipped: areTagsAccepted,
-                  disabled: !isQuerySupportedByExplorer,
-                })}
-                onClick={this.handleAcceptReject}
-              >
-                <div className="flip-toggle--container">
-                  <div className="flip-toggle--front">!=</div>
-                  <div className="flip-toggle--back">=</div>
-                </div>
+          {this.shouldShow && numTagsActive >= 1 && (
+            <div
+              className={classnames('flip-toggle', {
+                flipped: areTagsAccepted,
+                disabled: !isQuerySupportedByExplorer,
+              })}
+              onClick={this.handleAcceptReject}
+            >
+              <div className="flip-toggle--container">
+                <div className="flip-toggle--front">!=</div>
+                <div className="flip-toggle--back">=</div>
               </div>
-            )}
+            </div>
+          )}
         </div>
         {this.shouldShow && (
           <TagList

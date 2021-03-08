@@ -128,8 +128,6 @@ export default class ColorScaleDropdown extends Component<Props, State> {
   }
 
   private generateGradientStyle = (colors): CSSProperties => ({
-    background: `linear-gradient(to right, ${colors[0].hex} 0%,${
-      colors[1].hex
-    } 50%,${colors[2].hex} 100%)`,
+    background: `linear-gradient(to right, ${colors[0].hex} 0%,${colors[1].hex} 50%,${colors[2].hex} 100%)`,
   })
 }

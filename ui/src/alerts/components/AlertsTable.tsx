@@ -231,7 +231,8 @@ class AlertsTable extends PureComponent<Props, State> {
     return shouldNotBeFilterable ? (
       <div className="graph-empty">
         <p>
-          Learn how to configure your first <strong>Rule</strong> in<br />
+          Learn how to configure your first <strong>Rule</strong> in
+          <br />
           the <em>Getting Started</em> guide
         </p>
       </div>

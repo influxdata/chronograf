@@ -30,7 +30,7 @@ const RuleMessageTextArea: FunctionComponent<Props> = ({
       spellCheck={false}
       onChange={onChange}
       className={className}
-      placeholder="Example: {{ .ID }} is {{ .Level }} value: {{ index .Fields &quot;value&quot; }}"
+      placeholder='Example: {{ .ID }} is {{ .Level }} value: {{ index .Fields "value" }}'
     />
   )
 }

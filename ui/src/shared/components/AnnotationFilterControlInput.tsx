@@ -65,9 +65,7 @@ class AnnotationFilterControlInput extends PureComponent<Props, State> {
           onKeyUp={this.handleKeyUp}
         />
         <div
-          className={`suggestion-input--suggestions dropdown-menu ${
-            this.suggestionsClass
-          }`}
+          className={`suggestion-input--suggestions dropdown-menu ${this.suggestionsClass}`}
         >
           {this.suggestionDropdownItems}
         </div>

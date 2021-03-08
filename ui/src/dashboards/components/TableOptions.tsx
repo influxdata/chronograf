@@ -191,8 +191,8 @@ export class TableOptions extends Component<Props, {}> {
     } = this.props
     const {sortBy} = tableOptions
 
-    const updatedFieldOptions = fieldOptions.map(
-      f => (f.internalName === field.internalName ? field : f)
+    const updatedFieldOptions = fieldOptions.map(f =>
+      f.internalName === field.internalName ? field : f
     )
 
     if (sortBy.internalName === field.internalName) {

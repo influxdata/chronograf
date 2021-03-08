@@ -10,9 +10,9 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 interface Props {
   funcs: FluxToolbarFunction[]
-  children: (
-    sortedFunctions: {[category: string]: FluxToolbarFunction[]}
-  ) => JSX.Element | JSX.Element[]
+  children: (sortedFunctions: {
+    [category: string]: FluxToolbarFunction[]
+  }) => JSX.Element | JSX.Element[]
   searchTerm?: string
 }
 
