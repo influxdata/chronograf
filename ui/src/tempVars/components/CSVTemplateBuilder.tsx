@@ -58,9 +58,8 @@ class CSVTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
         </div>
         <div className="form-group col-xs-12 temp-builder--results">
           <p className="temp-builder--validation">
-            CSV contains <strong>{template.values.length}</strong> value{
-              pluralizer
-            }
+            CSV contains <strong>{template.values.length}</strong> value
+            {pluralizer}
           </p>
           {template.values.length > 0 && (
             <TemplatePreviewList
@@ -121,14 +120,16 @@ class CSVTemplateBuilder extends PureComponent<TemplateBuilderProps, State> {
     )
 
     // check for too many errors in papa parse response
-    const nextValues = templateValues.map((value: string): TemplateValue => {
-      return {
-        type: TemplateValueType.CSV,
-        value,
-        selected: false,
-        localSelected: false,
+    const nextValues = templateValues.map(
+      (value: string): TemplateValue => {
+        return {
+          type: TemplateValueType.CSV,
+          value,
+          selected: false,
+          localSelected: false,
+        }
       }
-    })
+    )
 
     return nextValues
   }

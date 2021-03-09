@@ -177,7 +177,10 @@ describe('Chronograf.Reducers.Kapacitor.queryConfigs', () => {
 
       const action = applyFuncsToField(queryID, {
         field: {value: 'f1', type: 'field'},
-        funcs: [{value: 'fn3', type: 'func'}, {value: 'fn4', type: 'func'}],
+        funcs: [
+          {value: 'fn3', type: 'func'},
+          {value: 'fn4', type: 'func'},
+        ],
       })
 
       const nextState = reducer(initialState, action)

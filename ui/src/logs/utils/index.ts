@@ -16,6 +16,7 @@ import {
 import {HistogramData} from 'src/types/histogram'
 import {executeQueryAsync} from 'src/logs/api'
 import {DEFAULT_TIME_FORMAT, FIELD_TIMESTAMP_NSINMS} from 'src/logs/constants'
+import {TimeSeriesResponse} from 'src/types/series'
 
 const BIN_COUNT = 30
 
@@ -107,9 +108,8 @@ const operatorMapping = (operator: string): string => {
 const valueMapping = (operator: string, value): string => {
   if (operator === '=~' || operator === '!~') {
     return `${new RegExp(value)}`
-  } else {
-    return `'${value}'`
   }
+  return `'${value}'`
 }
 
 export const filtersClause = (filters: Filter[]): string => {
@@ -269,9 +269,8 @@ const computeSeconds = (range: TimeRange) => {
     return moment().unix() - moment(lower).unix()
   } else if (upper && lower) {
     return moment(upper).unix() - moment(lower).unix()
-  } else {
-    return 120
   }
+  return 120
 }
 
 const createGroupBy = (range: TimeRange) => {
@@ -320,7 +319,7 @@ export const buildTableQueryConfig = (
 }
 
 export const parseHistogramQueryResponse = (
-  response: object
+  response: TimeSeriesResponse
 ): HistogramData => {
   const series = getDeep<any[]>(response, 'results.0.series', [])
   const data = series.reduce((acc, current) => {
@@ -363,6 +362,4 @@ export const buildFindMeasurementQuery = (
   namespace: Namespace,
   measurement: string
 ) =>
-  `SHOW MEASUREMENTS ON "${
-    namespace.database
-  }" WITH measurement = "${measurement}"`
+  `SHOW MEASUREMENTS ON "${namespace.database}" WITH measurement = "${measurement}"`

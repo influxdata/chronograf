@@ -105,7 +105,8 @@ class ProvidersTable extends Component {
           <div className="panel-body">
             <div className="generic-empty-state">
               <h4 style={{margin: '50px 0'}}>
-                Looks like you have no mappings<br />
+                Looks like you have no mappings
+                <br />
                 New users will not be able to sign up automatically
               </h4>
               <button

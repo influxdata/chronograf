@@ -91,9 +91,8 @@ export const getFormatFromColumn = (
     return SeverityFormatOptions.dotText
   } else if (hasText) {
     return SeverityFormatOptions.text
-  } else {
-    return SeverityFormatOptions.dot
   }
+  return SeverityFormatOptions.dot
 }
 
 export const getLevelColorsFromColumn = (

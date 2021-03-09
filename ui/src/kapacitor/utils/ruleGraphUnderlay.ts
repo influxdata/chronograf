@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import {ThresholdOperators} from 'src/kapacitor/constants'
 
 const HIGHLIGHT = 'rgba(78, 216, 160, 0.3)'
@@ -56,13 +57,13 @@ const underlayCallback = rule => (
       break
     }
 
-    case ThresholdOperators.LessThan: {
-      const width =
-        theOnePercent * (dygraph.yAxisRange()[1] - dygraph.yAxisRange()[0])
-      highlightStart = +value - width
-      highlightEnd = +value + width
-      break
-    }
+    // case ThresholdOperators.LessThan: {
+    //   const width =
+    //     theOnePercent * (dygraph.yAxisRange()[1] - dygraph.yAxisRange()[0])
+    //   highlightStart = +value - width
+    //   highlightEnd = +value + width
+    //   break
+    // }
 
     case ThresholdOperators.NotEqualTo: {
       const width =

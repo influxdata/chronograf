@@ -4,7 +4,7 @@ export interface TimeSeriesSeries {
   name?: string
   columns: string[]
   values: TimeSeriesValue[][]
-  tags?: [{[x: string]: string}]
+  tags?: {[x: string]: string}
 }
 
 export type TimeSeriesResult =

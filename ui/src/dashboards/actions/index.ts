@@ -396,7 +396,7 @@ export const setActiveCell = (activeCellID: string): SetActiveCellAction => ({
 })
 
 export const updateTimeRangeQueryParams = (
-  updatedQueryParams: object
+  updatedQueryParams: Record<string, unknown>
 ): RouterAction => {
   const {search, pathname} = window.location
   const strippedPathname = stripPrefix(pathname)
@@ -422,7 +422,9 @@ export const updateTimeRangeQueryParams = (
   return push(newLocation)
 }
 
-export const updateQueryParams = (updatedQueryParams: object): RouterAction => {
+export const updateQueryParams = (
+  updatedQueryParams: Record<string, unknown>
+): RouterAction => {
   const {search, pathname} = window.location
   const strippedPathname = stripPrefix(pathname)
 
@@ -680,14 +682,14 @@ const updateTimeRangeFromQueryParams = (dashboardID: string) => (
     ignoreQueryPrefix: true,
   })
 
-  const timeRangeFromQueries = {
-    lower: queryParams.lower,
-    upper: queryParams.upper,
+  const timeRangeFromQueries: TimeRange = {
+    lower: queryParams.lower as string | undefined,
+    upper: queryParams.upper as string | undefined,
   }
 
-  const zoomedTimeRangeFromQueries = {
-    lower: queryParams.zoomedLower,
-    upper: queryParams.zoomedUpper,
+  const zoomedTimeRangeFromQueries: TimeRange = {
+    lower: queryParams.zoomedLower as string | undefined,
+    upper: queryParams.zoomedUpper as string | undefined,
   }
 
   let validatedTimeRange = validTimeRange(timeRangeFromQueries)
@@ -747,8 +749,7 @@ export const getDashboardWithTemplatesAsync = (
 
   const selections = templateSelectionsFromQueryParams()
 
-  let templates
-  templates = await hydrateTemplates(dashboard.templates, sources, {
+  const templates = await hydrateTemplates(dashboard.templates, sources, {
     proxyUrl: source.links.proxy,
     selections,
   })

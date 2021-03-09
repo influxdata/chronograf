@@ -11,7 +11,9 @@ import {VERSION, GIT_SHA} from 'src/shared/constants'
 
 import {LocalStorage} from 'src/types/localStorage'
 
-export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
+export const loadLocalStorage = (
+  errorsQueue: any[]
+): LocalStorage | Record<string, never> => {
   try {
     const serializedState = localStorage.getItem('state')
     const state = JSON.parse(serializedState) || {}
@@ -29,6 +31,7 @@ export const loadLocalStorage = (errorsQueue: any[]): LocalStorage | {} => {
         errorsQueue.push(notifyNewVersion(VERSION))
       }
 
+      // eslint-disable-next-line no-console
       console.debug('Cleared Chronograf localStorage state')
 
       return {}

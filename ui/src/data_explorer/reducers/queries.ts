@@ -1,6 +1,3 @@
-// Libraries
-import _ from 'lodash'
-
 // Actions
 import {Action, ActionType} from 'src/data_explorer/actions/queries'
 

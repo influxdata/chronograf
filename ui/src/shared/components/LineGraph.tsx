@@ -1,6 +1,5 @@
 // Libraries
 import React, {PureComponent, CSSProperties} from 'react'
-import _ from 'lodash'
 import Dygraph from 'src/shared/components/Dygraph'
 import {withRouter, RouteComponentProps} from 'react-router'
 import memoizeOne from 'memoize-one'

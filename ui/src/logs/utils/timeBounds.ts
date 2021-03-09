@@ -19,9 +19,8 @@ export const computeTimeBounds = (
 
   if (!isValidExtent(numberTimeOption, extentTimes, period)) {
     return centerTimeBounds(numberTimeOption, period)
-  } else {
-    return offsetTimeBounds(lowerExtent, numberTimeOption, period)
   }
+  return offsetTimeBounds(lowerExtent, numberTimeOption, period)
 }
 
 export const isValidExtent = (
@@ -75,7 +74,6 @@ const doubleStepOffset = ({
 
   if (Math.abs(x) < HISTOGRAM_CENTRAL_REGION / 2) {
     return 0
-  } else {
-    return maxOffset * Math.sign(x)
   }
+  return maxOffset * Math.sign(x)
 }

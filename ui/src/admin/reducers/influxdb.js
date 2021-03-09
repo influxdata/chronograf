@@ -65,17 +65,16 @@ const adminInfluxDB = (state = initialState, action) => {
 
     case 'INFLUXDB_ADD_RETENTION_POLICY': {
       const {database} = action.payload
-      const databases = state.databases.map(
-        db =>
-          db.links.self === database.links.self
-            ? {
-                ...database,
-                retentionPolicies: [
-                  {...NEW_EMPTY_RP},
-                  ...database.retentionPolicies,
-                ],
-              }
-            : db
+      const databases = state.databases.map(db =>
+        db.links.self === database.links.self
+          ? {
+              ...database,
+              retentionPolicies: [
+                {...NEW_EMPTY_RP},
+                ...database.retentionPolicies,
+              ],
+            }
+          : db
       )
 
       return {...state, databases}
@@ -84,8 +83,8 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_SYNC_USER': {
       const {staleUser, syncedUser} = action.payload
       const newState = {
-        users: state.users.map(
-          u => (u.links.self === staleUser.links.self ? {...syncedUser} : u)
+        users: state.users.map(u =>
+          u.links.self === staleUser.links.self ? {...syncedUser} : u
         ),
       }
       return {...state, ...newState}
@@ -94,8 +93,8 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_SYNC_ROLE': {
       const {staleRole, syncedRole} = action.payload
       const newState = {
-        roles: state.roles.map(
-          r => (r.links.self === staleRole.links.self ? {...syncedRole} : r)
+        roles: state.roles.map(r =>
+          r.links.self === staleRole.links.self ? {...syncedRole} : r
         ),
       }
       return {...state, ...newState}
@@ -104,8 +103,8 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_SYNC_DATABASE': {
       const {stale, synced} = action.payload
       const newState = {
-        databases: state.databases.map(
-          db => (db.links.self === stale.links.self ? {...synced} : db)
+        databases: state.databases.map(db =>
+          db.links.self === stale.links.self ? {...synced} : db
         ),
       }
 
@@ -115,17 +114,15 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_SYNC_RETENTION_POLICY': {
       const {database, stale, synced} = action.payload
       const newState = {
-        databases: state.databases.map(
-          db =>
-            db.links.self === database.links.self
-              ? {
-                  ...db,
-                  retentionPolicies: db.retentionPolicies.map(
-                    rp =>
-                      rp.links.self === stale.links.self ? {...synced} : rp
-                  ),
-                }
-              : db
+        databases: state.databases.map(db =>
+          db.links.self === database.links.self
+            ? {
+                ...db,
+                retentionPolicies: db.retentionPolicies.map(rp =>
+                  rp.links.self === stale.links.self ? {...synced} : rp
+                ),
+              }
+            : db
         ),
       }
 
@@ -135,8 +132,8 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_EDIT_USER': {
       const {user, updates} = action.payload
       const newState = {
-        users: state.users.map(
-          u => (u.links.self === user.links.self ? {...u, ...updates} : u)
+        users: state.users.map(u =>
+          u.links.self === user.links.self ? {...u, ...updates} : u
         ),
       }
       return {...state, ...newState}
@@ -145,8 +142,8 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_EDIT_ROLE': {
       const {role, updates} = action.payload
       const newState = {
-        roles: state.roles.map(
-          r => (r.links.self === role.links.self ? {...r, ...updates} : r)
+        roles: state.roles.map(r =>
+          r.links.self === role.links.self ? {...r, ...updates} : r
         ),
       }
       return {...state, ...newState}
@@ -155,9 +152,8 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_EDIT_DATABASE': {
       const {database, updates} = action.payload
       const newState = {
-        databases: state.databases.map(
-          db =>
-            db.links.self === database.links.self ? {...db, ...updates} : db
+        databases: state.databases.map(db =>
+          db.links.self === database.links.self ? {...db, ...updates} : db
         ),
       }
 
@@ -168,19 +164,17 @@ const adminInfluxDB = (state = initialState, action) => {
       const {database, retentionPolicy, updates} = action.payload
 
       const newState = {
-        databases: state.databases.map(
-          db =>
-            db.links.self === database.links.self
-              ? {
-                  ...db,
-                  retentionPolicies: db.retentionPolicies.map(
-                    rp =>
-                      rp.links.self === retentionPolicy.links.self
-                        ? {...rp, ...updates}
-                        : rp
-                  ),
-                }
-              : db
+        databases: state.databases.map(db =>
+          db.links.self === database.links.self
+            ? {
+                ...db,
+                retentionPolicies: db.retentionPolicies.map(rp =>
+                  rp.links.self === retentionPolicy.links.self
+                    ? {...rp, ...updates}
+                    : rp
+                ),
+              }
+            : db
         ),
       }
 
@@ -191,19 +185,17 @@ const adminInfluxDB = (state = initialState, action) => {
       const {database, retentionPolicy} = action.payload
 
       const newState = {
-        databases: state.databases.map(
-          db =>
-            db.links.self === database.links.self
-              ? {
-                  ...db,
-                  retentionPolicies: db.retentionPolicies.map(
-                    rp =>
-                      rp.links.self === retentionPolicy.links.self
-                        ? {...rp, ...retentionPolicy}
-                        : rp
-                  ),
-                }
-              : db
+        databases: state.databases.map(db =>
+          db.links.self === database.links.self
+            ? {
+                ...db,
+                retentionPolicies: db.retentionPolicies.map(rp =>
+                  rp.links.self === retentionPolicy.links.self
+                    ? {...rp, ...retentionPolicy}
+                    : rp
+                ),
+              }
+            : db
         ),
       }
 
@@ -242,16 +234,15 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_REMOVE_RETENTION_POLICY': {
       const {database, retentionPolicy} = action.payload
       const newState = {
-        databases: state.databases.map(
-          db =>
-            db.links.self === database.links.self
-              ? {
-                  ...db,
-                  retentionPolicies: db.retentionPolicies.filter(
-                    rp => rp.links.self !== retentionPolicy.links.self
-                  ),
-                }
-              : db
+        databases: state.databases.map(db =>
+          db.links.self === database.links.self
+            ? {
+                ...db,
+                retentionPolicies: db.retentionPolicies.filter(
+                  rp => rp.links.self !== retentionPolicy.links.self
+                ),
+              }
+            : db
         ),
       }
 
@@ -261,9 +252,8 @@ const adminInfluxDB = (state = initialState, action) => {
     case 'INFLUXDB_ADD_DATABASE_DELETE_CODE': {
       const {database} = action.payload
       const newState = {
-        databases: state.databases.map(
-          db =>
-            db.links.self === database.links.self ? {...db, deleteCode: ''} : db
+        databases: state.databases.map(db =>
+          db.links.self === database.links.self ? {...db, deleteCode: ''} : db
         ),
       }
 
@@ -275,8 +265,8 @@ const adminInfluxDB = (state = initialState, action) => {
       delete database.deleteCode
 
       const newState = {
-        databases: state.databases.map(
-          db => (db.links.self === database.links.self ? {...database} : db)
+        databases: state.databases.map(db =>
+          db.links.self === database.links.self ? {...database} : db
         ),
       }
 

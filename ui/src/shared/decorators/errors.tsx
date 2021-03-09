@@ -45,7 +45,7 @@ export function ErrorHandlingWith(
   Error: ErrorComponentClass, // Must be a class based component and not an FunctionComponent
   alwaysDisplay = false
 ) {
-  return <P, S, T extends {new (...args: any[]): Component<P, S>}>(
+  return <P, S, T extends new (...args: any[]) => Component<P, S>>(
     constructor: T
   ) => {
     class Wrapped extends constructor {

@@ -393,7 +393,7 @@ class LogsTable extends Component<Props, State> {
     switch (column) {
       case 'message':
         return currentMessageWidth
-      default:
+      default: {
         let columnKey = column
         if (column === 'severity') {
           columnKey = `${column}_${severityFormat}`
@@ -404,6 +404,7 @@ class LogsTable extends Component<Props, State> {
           return width + inc
         }
         return width
+      }
     }
   }
 

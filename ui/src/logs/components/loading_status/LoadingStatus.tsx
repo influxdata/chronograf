@@ -94,7 +94,8 @@ class LoadingStatus extends PureComponent<Props> {
         return (
           <>
             The selected database does not have a <strong>syslog</strong>{' '}
-            measurement...<br />
+            measurement...
+            <br />
           </>
         )
       case SearchStatus.Loading:

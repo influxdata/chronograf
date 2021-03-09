@@ -13,18 +13,19 @@ class DefaultDebouncer implements Debouncer {
     this.timers = {}
   }
 
-  public call(f, ms) {
-    const timer = this.timers[f]
+  public call(f: F, ms: number) {
+    const key = f.toString()
+    const timer = this.timers[key]
 
     if (timer) {
       clearTimeout(timer)
     }
 
-    this.timers[f] = setTimeout(f, ms)
+    this.timers[key] = setTimeout(f, ms)
   }
 
-  public cancel(f) {
-    const timer = this.timers[f]
+  public cancel(f: F) {
+    const timer = this.timers[f.toString()]
 
     if (timer) {
       clearTimeout(timer)

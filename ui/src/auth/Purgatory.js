@@ -145,6 +145,7 @@ const mapDispatchToProps = dispatch => ({
   meChangeOrganization: bindActionCreators(meChangeOrganizationAsync, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(Purgatory)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(Purgatory))

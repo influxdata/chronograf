@@ -74,7 +74,8 @@ class DashboardsTable extends PureComponent<Props> {
                     className="btn btn-xs btn-default table--show-on-row-hover"
                     onClick={onExportDashboard(dashboard)}
                   >
-                    <span className="icon export" />Export
+                    <span className="icon export" />
+                    Export
                   </button>
                 </Authorized>
                 <Authorized

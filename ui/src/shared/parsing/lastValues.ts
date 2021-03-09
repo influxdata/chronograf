@@ -7,7 +7,7 @@ interface LastValues {
   series: string[]
 }
 
-export default function(
+export default function (
   timeSeriesResponse: TimeSeriesServerResponse[] | Data | null
 ): LastValues {
   const values = _.get(

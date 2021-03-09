@@ -39,7 +39,7 @@ function getLayoutCells(layouts: Layout[]): LayoutCell[] {
 function autoPositionCells(cells: LayoutCell[]): LayoutCell[] {
   return cells.reduce((acc, cell, i) => {
     const x = (i * CELL_WIDTH) % PAGE_WIDTH
-    const y = Math.floor(i * CELL_WIDTH / PAGE_WIDTH) * CELL_HEIGHT
+    const y = Math.floor((i * CELL_WIDTH) / PAGE_WIDTH) * CELL_HEIGHT
     const newCell = {...cell, w: CELL_WIDTH, h: CELL_HEIGHT, x, y}
 
     return [...acc, newCell]

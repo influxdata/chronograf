@@ -191,7 +191,7 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
   public async fetch(query) {
     const cached = this.cache[this.proxyUrl][query]
 
-    if (!!cached) {
+    if (cached) {
       return Promise.resolve([...cached])
     }
 

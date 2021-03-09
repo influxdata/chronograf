@@ -187,11 +187,10 @@ class Dropdown extends Component<Props, State> {
                   return (
                     <DropdownDivider {...child.props} key={child.props.id} />
                   )
-                } else {
-                  throw new Error(
-                    'Expected children of type <Dropdown.Item /> or <Dropdown.Divider />'
-                  )
                 }
+                throw new Error(
+                  'Expected children of type <Dropdown.Item /> or <Dropdown.Divider />'
+                )
               })}
             </div>
           </FancyScrollbar>

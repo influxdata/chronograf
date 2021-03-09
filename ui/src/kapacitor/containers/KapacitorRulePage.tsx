@@ -55,7 +55,7 @@ interface Props {
 
 interface State {
   handlersFromConfig: any[]
-  kapacitor: Kapacitor | {}
+  kapacitor: Kapacitor | Record<string, never>
 }
 
 @ErrorHandling

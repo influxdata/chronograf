@@ -219,7 +219,8 @@ interface OpsGenie {
 }
 
 // Talk sends alerts to Jane Talk (https://jianliao.com/site)
-interface Talk {} // tslint:disable-line
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface Talk {}
 
 // TriggerValues specifies the alerting logic for a specific trigger type
 interface TriggerValues {
@@ -326,6 +327,7 @@ export type ConfigKeyMaps =
   | PushoverConfigKeyMap
   | TelegramConfigKeyMap
   | VictorOpsConfigKeyMap
+  // eslint-disable-next-line @typescript-eslint/ban-types
   | {}
 
 export interface AlertaProperties {
@@ -454,7 +456,7 @@ export type ServiceProperties =
   | VictorOpsProperties
   | ServiceNowProperties
 
-export type SpecificConfigOptions = Partial<SlackProperties>
+export type SpecificConfigOptions = Partial<SlackProperties & KafkaProperties>
 
 export interface RuleValues {
   value?: string | null
@@ -474,7 +476,7 @@ export interface LogItem {
   username?: string
   host?: string
   duration?: string
-  tag?: object
-  field?: object
+  tag?: Record<string, unknown>
+  field?: Record<string, unknown>
   cluster?: string
 }

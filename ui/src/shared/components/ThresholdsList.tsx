@@ -60,32 +60,31 @@ class ThresholdsList extends PureComponent<Props> {
         >
           <span className="icon plus" /> Add Threshold
         </button>
-        {this.sortedColors.map(
-          color =>
-            color.id === THRESHOLD_TYPE_BASE ? (
-              <div className="threshold-item" key={uuid.v4()}>
-                <div className="threshold-item--label">Base Color</div>
-                <ColorDropdown
-                  colors={THRESHOLD_COLORS}
-                  selected={color}
-                  onChoose={this.handleChangeBaseColor}
-                  stretchToFit={true}
-                />
-              </div>
-            ) : (
-              <Threshold
-                visualizationType="single-stat"
-                threshold={color}
-                key={uuid.v4()}
-                onChooseColor={this.handleChooseColor}
-                onValidateColorValue={this.handleValidateColorValue}
-                onUpdateColorValue={this.handleUpdateColorValue}
-                onDeleteThreshold={this.handleDeleteThreshold}
-                disableMaxColor={false}
-                isMin={false}
-                isMax={false}
+        {this.sortedColors.map(color =>
+          color.id === THRESHOLD_TYPE_BASE ? (
+            <div className="threshold-item" key={uuid.v4()}>
+              <div className="threshold-item--label">Base Color</div>
+              <ColorDropdown
+                colors={THRESHOLD_COLORS}
+                selected={color}
+                onChoose={this.handleChangeBaseColor}
+                stretchToFit={true}
               />
-            )
+            </div>
+          ) : (
+            <Threshold
+              visualizationType="single-stat"
+              threshold={color}
+              key={uuid.v4()}
+              onChooseColor={this.handleChooseColor}
+              onValidateColorValue={this.handleValidateColorValue}
+              onUpdateColorValue={this.handleUpdateColorValue}
+              onDeleteThreshold={this.handleDeleteThreshold}
+              disableMaxColor={false}
+              isMin={false}
+              isMax={false}
+            />
+          )
         )}
       </div>
     )
@@ -133,9 +132,8 @@ class ThresholdsList extends PureComponent<Props> {
     const {onUpdateThresholdsListColors} = this.props
     const {hex, name} = updatedColor
 
-    const thresholdsListColors = this.props.thresholdsListColors.map(
-      color =>
-        color.id === THRESHOLD_TYPE_BASE ? {...color, hex, name} : color
+    const thresholdsListColors = this.props.thresholdsListColors.map(color =>
+      color.id === THRESHOLD_TYPE_BASE ? {...color, hex, name} : color
     )
 
     onUpdateThresholdsListColors(thresholdsListColors)
@@ -144,8 +142,8 @@ class ThresholdsList extends PureComponent<Props> {
   private handleChooseColor = updatedColor => {
     const {onUpdateThresholdsListColors} = this.props
 
-    const thresholdsListColors = this.props.thresholdsListColors.map(
-      color => (color.id === updatedColor.id ? updatedColor : color)
+    const thresholdsListColors = this.props.thresholdsListColors.map(color =>
+      color.id === updatedColor.id ? updatedColor : color
     )
 
     onUpdateThresholdsListColors(thresholdsListColors)
@@ -172,8 +170,8 @@ class ThresholdsList extends PureComponent<Props> {
   private handleUpdateColorValue = (threshold, value) => {
     const {onUpdateThresholdsListColors} = this.props
 
-    const thresholdsListColors = this.props.thresholdsListColors.map(
-      color => (color.id === threshold.id ? {...color, value} : color)
+    const thresholdsListColors = this.props.thresholdsListColors.map(color =>
+      color.id === threshold.id ? {...color, value} : color
     )
 
     onUpdateThresholdsListColors(thresholdsListColors)

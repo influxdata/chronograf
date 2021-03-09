@@ -6,8 +6,8 @@ module.exports = {
         'build',
         '<rootDir>/node_modules/(?!(jest-test))',
       ],
-      modulePaths: ['<rootDir>', '<rootDir>/node_modules/'],
-      moduleDirectories: ['src'],
+      modulePaths: ['<rootDir>', '<rootDir>/..'],
+      moduleDirectories: ['src', 'node_modules'],
       setupFiles: ['<rootDir>/test/setup.js'],
       transform: {
         '^.+\\.tsx?$': 'ts-jest',

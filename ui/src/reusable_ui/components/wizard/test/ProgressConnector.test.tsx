@@ -7,17 +7,11 @@ import {ConnectorState} from 'src/reusable_ui/constants/wizard'
 describe('Progress Connector', () => {
   let wrapper
 
-  const expectedWithoutStatus = `wizard-progress-connector wizard-progress-connector--${
-    ConnectorState.None
-  }`
+  const expectedWithoutStatus = `wizard-progress-connector wizard-progress-connector--${ConnectorState.None}`
 
-  const expectedWithStatusSome = `wizard-progress-connector wizard-progress-connector--${
-    ConnectorState.Some
-  }`
+  const expectedWithStatusSome = `wizard-progress-connector wizard-progress-connector--${ConnectorState.Some}`
 
-  const expectedWithStatusAll = `wizard-progress-connector wizard-progress-connector--${
-    ConnectorState.Full
-  }`
+  const expectedWithStatusAll = `wizard-progress-connector wizard-progress-connector--${ConnectorState.Full}`
 
   describe('without Props', () => {
     const props = {

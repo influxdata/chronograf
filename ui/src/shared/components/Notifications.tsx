@@ -18,7 +18,9 @@ class Notifications extends PureComponent<Props> {
 
     return (
       <div className={this.className}>
-        {notifications.map(n => <Notification key={n.id} notification={n} />)}
+        {notifications.map(n => (
+          <Notification key={n.id} notification={n} />
+        ))}
       </div>
     )
   }

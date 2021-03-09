@@ -227,9 +227,7 @@ interface PreviewListDimensions {
   [index: string]: number
 }
 
-export const TEMPLATE_PREVIEW_LIST_DIMENSIONS: Readonly<
-  PreviewListDimensions
-> = {
+export const TEMPLATE_PREVIEW_LIST_DIMENSIONS: Readonly<PreviewListDimensions> = {
   RESULTS_TO_DISPLAY: 9,
   LI_HEIGHT: 28,
   LI_MARGIN_BOTTOM: 2,

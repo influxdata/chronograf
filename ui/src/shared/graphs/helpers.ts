@@ -68,7 +68,7 @@ export const barPlotter = e => {
 
   // calculate bar width using some graphics math while
   // ensuring a bar is never smaller than one px, so it is always rendered
-  const barWidth = Math.max(Math.floor(2.0 / 3.0 * minSep), 1.0)
+  const barWidth = Math.max(Math.floor((2.0 / 3.0) * minSep), 1.0)
 
   const fillColors = []
   const strokeColors = g.getColors()
@@ -191,9 +191,8 @@ export const getDataUUID = (
 ): string => {
   if (dataType === DataType.influxQL) {
     return getInfluxQLDataUUID(data as TimeSeriesServerResponse[])
-  } else {
-    return getFluxDataUUID(data as FluxTable[])
   }
+  return getFluxDataUUID(data as FluxTable[])
 }
 
 const getInfluxQLDataUUID = (data: TimeSeriesServerResponse[]): string => {

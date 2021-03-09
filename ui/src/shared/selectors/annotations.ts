@@ -40,12 +40,14 @@ export const getTagFilters = createSelector(
 export const getTagsFromTagFilters = createSelector(
   getTagFilters,
   tagFilters => {
-    return tagFilters.filter(t => t.filterType === TagFilterType.Equals).reduce(
-      (acc, t) => ({
-        ...acc,
-        [t.tagKey]: t.tagValue,
-      }),
-      {}
-    )
+    return tagFilters
+      .filter(t => t.filterType === TagFilterType.Equals)
+      .reduce(
+        (acc, t) => ({
+          ...acc,
+          [t.tagKey]: t.tagValue,
+        }),
+        {}
+      )
   }
 )

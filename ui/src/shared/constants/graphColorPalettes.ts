@@ -237,8 +237,5 @@ export const getLineColorsHexes = (
   if (numSeries === 2) {
     return [colorsHexArray[0], colorsHexArray[1]]
   }
-  return chroma
-    .scale(colorsHexArray)
-    .mode('lch')
-    .colors(numSeries)
+  return chroma.scale(colorsHexArray).mode('lch').colors(numSeries)
 }

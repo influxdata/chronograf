@@ -187,6 +187,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(null, mapDispatchToProps)(
-  ErrorHandling(AllUsersTableRowNew)
-)
+export default connect(
+  null,
+  mapDispatchToProps
+)(ErrorHandling(AllUsersTableRowNew))

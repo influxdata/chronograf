@@ -154,7 +154,7 @@ function propertyTime(
       return Date.parse(value.value)
     case 'Identifier':
       return propertyTime(ast, resolveDeclaration(ast, value.name), now)
-    case 'BinaryExpression':
+    case 'BinaryExpression': {
       const leftTime = Date.parse(value.left.value)
       const rightDuration = durationDuration(value.right)
 
@@ -164,6 +164,7 @@ function propertyTime(
         case '-':
           return leftTime - rightDuration
       }
+    }
   }
 }
 

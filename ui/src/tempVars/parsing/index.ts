@@ -27,10 +27,7 @@ export const isInvalidMetaQuery = (metaQuery: string): boolean =>
   !getMetaQueryPrefix(metaQuery)
 
 const getMetaQueryPrefix = (metaQuery: string): string | null => {
-  const words = metaQuery
-    .trim()
-    .toUpperCase()
-    .split(' ')
+  const words = metaQuery.trim().toUpperCase().split(' ')
   const firstTwoWords = words.slice(0, 2).join(' ')
   const firstThreeWords = words.slice(0, 3).join(' ')
 
@@ -61,7 +58,7 @@ const EXTRACTORS = {
   'SHOW DATABASES': parsed => parsed.databases,
   'SHOW FIELD KEYS': parsed => {
     const {fieldSets} = parsed
-    const fieldSetsValues = Object.values(fieldSets) as string[]
+    const fieldSetsValues: unknown[][] = Object.values(fieldSets)
 
     return fieldSetsValues.reduce((acc, current) => [...acc, ...current], [])
   },
@@ -76,7 +73,7 @@ const EXTRACTORS = {
   'SHOW TAG KEYS': parsed => parsed.tagKeys,
   'SHOW TAG VALUES': parsed => {
     const {tags} = parsed
-    const tagsValues = Object.values(tags) as string[]
+    const tagsValues: unknown[][] = Object.values(tags)
 
     return tagsValues.reduce((acc, current) => [...acc, ...current], [])
   },

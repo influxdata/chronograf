@@ -49,62 +49,42 @@ export const getDbsAndRps = async url => {
 }
 
 export const createUser = async (url, user) => {
-  try {
-    return await AJAX({
-      method: 'POST',
-      url,
-      data: user,
-    })
-  } catch (error) {
-    throw error
-  }
+  return await AJAX({
+    method: 'POST',
+    url,
+    data: user,
+  })
 }
 
 export const createRole = async (url, role) => {
-  try {
-    return await AJAX({
-      method: 'POST',
-      url,
-      data: role,
-    })
-  } catch (error) {
-    throw error
-  }
+  return await AJAX({
+    method: 'POST',
+    url,
+    data: role,
+  })
 }
 
 export const createDatabase = async (url, database) => {
-  try {
-    return await AJAX({
-      method: 'POST',
-      url,
-      data: database,
-    })
-  } catch (error) {
-    throw error
-  }
+  return await AJAX({
+    method: 'POST',
+    url,
+    data: database,
+  })
 }
 
 export const createRetentionPolicy = async (url, retentionPolicy) => {
-  try {
-    return await AJAX({
-      method: 'POST',
-      url,
-      data: retentionPolicy,
-    })
-  } catch (error) {
-    throw error
-  }
+  return await AJAX({
+    method: 'POST',
+    url,
+    data: retentionPolicy,
+  })
 }
 
 export const deleteRetentionPolicy = async url => {
-  try {
-    return await AJAX({
-      method: 'DELETE',
-      url,
-    })
-  } catch (error) {
-    throw error
-  }
+  return await AJAX({
+    method: 'DELETE',
+    url,
+  })
 }
 
 export const deleteRole = async url => {

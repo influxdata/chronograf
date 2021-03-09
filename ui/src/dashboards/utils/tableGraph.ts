@@ -258,7 +258,9 @@ export const sortTableData = (
   const dataValues = _.drop(data, 1)
   const sortedData = [
     data[0],
-    ..._.orderBy<TimeSeriesValue[][]>(dataValues, sortIndex, [sort.direction]),
+    ..._.orderBy<TimeSeriesValue[][]>(dataValues, sortIndex, [
+      sort.direction as 'desc' | 'asc',
+    ]),
   ] as TimeSeriesValue[][]
   const sortedTimeVals = fastMap<TimeSeriesValue[], TimeSeriesValue>(
     sortedData,

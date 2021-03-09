@@ -39,9 +39,7 @@ class Panel extends Component<Props> {
   public static ValidChildNames: string = _.map(
     Panel.ValidChildTypes,
     child => {
-      const name = _.get(child, 'displayName', '')
-        .split('Panel')
-        .pop()
+      const name = _.get(child, 'displayName', '').split('Panel').pop()
 
       return `<Panel.${name}>`
     }

@@ -17,7 +17,7 @@ import {TimeZones} from 'src/types'
 const dateFormat = 'YYYY-MM-DD HH:mm'
 const emptyTime = {lower: '', upper: ''}
 const format = (t, timeZone) => {
-  const m = moment(t.replace(/\'/g, ''))
+  const m = moment(t.replace(/'/g, ''))
   if (timeZone === TimeZones.UTC) {
     m.utc()
   }
@@ -46,7 +46,10 @@ class TimeRangeDropdown extends Component {
         return `${format(lower, this.props.timeZone)} - Now`
       }
 
-      return `${format(lower, this.props.timeZone)} - ${format(upper, this.props.timeZone)}`
+      return `${format(lower, this.props.timeZone)} - ${format(
+        upper,
+        this.props.timeZone
+      )}`
     }
 
     const selected = timeRanges.find(range => range.lower === lower)

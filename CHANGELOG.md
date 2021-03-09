@@ -21,6 +21,7 @@
 
 1. [#5673](https://github.com/influxdata/chronograf/pull/5673): Add documentation link when 1.8 flux is not installed.
 1. [#5685](https://github.com/influxdata/chronograf/pull/5685): Upgrade UI to TypeScript 4.2.2.
+1. [#5690](https://github.com/influxdata/chronograf/pull/5690): Upgrade dependencies, use eslint for typescript.
 
 ## v1.8.10 [2021-02-08]
 

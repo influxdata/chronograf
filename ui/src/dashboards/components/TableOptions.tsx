@@ -59,7 +59,7 @@ interface Props {
 }
 
 @ErrorHandling
-export class TableOptions extends Component<Props, {}> {
+export class TableOptions extends Component<Props, Record<string, never>> {
   constructor(props) {
     super(props)
     this.moveField = this.moveField.bind(this)
@@ -191,8 +191,8 @@ export class TableOptions extends Component<Props, {}> {
     } = this.props
     const {sortBy} = tableOptions
 
-    const updatedFieldOptions = fieldOptions.map(
-      f => (f.internalName === field.internalName ? field : f)
+    const updatedFieldOptions = fieldOptions.map(f =>
+      f.internalName === field.internalName ? field : f
     )
 
     if (sortBy.internalName === field.internalName) {

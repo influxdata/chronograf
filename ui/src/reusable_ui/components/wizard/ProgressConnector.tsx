@@ -17,8 +17,9 @@ class ProgressConnector extends PureComponent<Props> {
 
     return (
       <span
-        className={`wizard-progress-connector wizard-progress-connector--${status ||
-          ConnectorState.None}`}
+        className={`wizard-progress-connector wizard-progress-connector--${
+          status || ConnectorState.None
+        }`}
       />
     )
   }

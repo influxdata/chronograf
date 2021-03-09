@@ -13,7 +13,12 @@ describe('formatDate', () => {
 
 describe('dataToCSV', () => {
   it('parses data, an array of arrays, to a csv string', () => {
-    const data = [[1, 2], [3, 4], [5, 6], [7, 8]]
+    const data = [
+      [1, 2],
+      [3, 4],
+      [5, 6],
+      [7, 8],
+    ]
     const returned = dataToCSV(data)
     const expected = `1,2\n3,4\n5,6\n7,8`
 

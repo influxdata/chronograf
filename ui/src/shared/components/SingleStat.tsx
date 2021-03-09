@@ -171,8 +171,9 @@ class SingleStat extends PureComponent<Props, State> {
   private get containerStyle(): CSSProperties {
     const {staticLegendHeight} = this.props
 
-    const height = `calc(100% - ${staticLegendHeight +
-      DYGRAPH_CONTAINER_V_MARGIN * 2}px)`
+    const height = `calc(100% - ${
+      staticLegendHeight + DYGRAPH_CONTAINER_V_MARGIN * 2
+    }px)`
 
     const {backgroundColor} = this.coloration
 

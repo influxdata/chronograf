@@ -54,8 +54,8 @@ export default (
     case ActionType.UpdateDashboard: {
       const {dashboard} = action.payload
       const newState = {
-        dashboards: state.dashboards.map(
-          d => (d.id === dashboard.id ? dashboard : d)
+        dashboards: state.dashboards.map(d =>
+          d.id === dashboard.id ? dashboard : d
         ),
       }
       return {...state, ...newState}
@@ -92,8 +92,8 @@ export default (
 
       const newCells = [cell, ...dashboard.cells]
       const newDashboard = {...dashboard, cells: newCells}
-      const newDashboards = dashboards.map(
-        d => (d.id === dashboard.id ? newDashboard : d)
+      const newDashboards = dashboards.map(d =>
+        d.id === dashboard.id ? newDashboard : d
       )
       const newState = {dashboards: newDashboards}
 
@@ -111,8 +111,8 @@ export default (
         cells: newCells,
       }
       const newState = {
-        dashboards: state.dashboards.map(
-          d => (d.id === dashboard.id ? newDashboard : d)
+        dashboards: state.dashboards.map(d =>
+          d.id === dashboard.id ? newDashboard : d
         ),
       }
 
@@ -124,14 +124,14 @@ export default (
 
       const newDashboard = {
         ...dashboard,
-        cells: dashboard.cells.map(
-          c => (c.x === cell.x && c.y === cell.y ? cell : c)
+        cells: dashboard.cells.map(c =>
+          c.x === cell.x && c.y === cell.y ? cell : c
         ),
       }
 
       const newState = {
-        dashboards: state.dashboards.map(
-          d => (d.id === dashboard.id ? newDashboard : d)
+        dashboards: state.dashboards.map(d =>
+          d.id === dashboard.id ? newDashboard : d
         ),
       }
 

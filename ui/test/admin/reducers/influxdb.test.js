@@ -339,7 +339,10 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     const actual = reducer(state, filterRoles(text))
     const expected = {
-      roles: [{...r1, hidden: false}, {...r2, hidden: true}],
+      roles: [
+        {...r1, hidden: false},
+        {...r2, hidden: true},
+      ],
     }
 
     expect(actual.roles).toEqual(expected.roles)
@@ -354,7 +357,10 @@ describe('Admin.InfluxDB.Reducers', () => {
 
     const actual = reducer(state, filterUsers(text))
     const expected = {
-      users: [{...u1, hidden: true}, {...u2, hidden: false}],
+      users: [
+        {...u1, hidden: true},
+        {...u2, hidden: false},
+      ],
     }
 
     expect(actual.users).toEqual(expected.users)

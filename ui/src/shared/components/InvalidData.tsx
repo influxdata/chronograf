@@ -23,7 +23,8 @@ class InvalidData extends PureComponent<Props> {
     return (
       <p>
         The data returned from the query can't be visualized with this graph
-        type.<br />
+        type.
+        <br />
         {this.props.onUpdateVisType && (
           <>
             <br />

@@ -25,42 +25,39 @@ export const useMessageValidation = (
   // state is the current state of go template parsing
   const [state, setValidationState] = useState(ValidationState.NotStarted)
 
-  useEffect(
-    () => {
-      const validate = async () => {
-        if (typingStatus === TypingStatus.Started) {
-          setValidationState(ValidationState.Validating)
-          setValidationText(messageValidating)
-        }
-
-        if (typingStatus === TypingStatus.Done) {
-          try {
-            await validateTextTemplate(
-              '/chronograf/v1/validate_text_templates',
-              ruleMessage
-            )
-
-            const matchesVars = isValidMessage(ruleMessage)
-
-            if (matchesVars) {
-              setValidationText(messageValid)
-              setValidationState(ValidationState.Success)
-            } else {
-              setValidationText(messageInvalid)
-              setValidationState(ValidationState.Error)
-            }
-          } catch (error) {
-            const errorMessage = get(error, 'data.message', messageInvalid)
-            setValidationText(errorMessage)
-            setValidationState(ValidationState.Error)
-          }
-        }
+  useEffect(() => {
+    const validate = async () => {
+      if (typingStatus === TypingStatus.Started) {
+        setValidationState(ValidationState.Validating)
+        setValidationText(messageValidating)
       }
 
-      validate()
-    },
-    [typingStatus]
-  )
+      if (typingStatus === TypingStatus.Done) {
+        try {
+          await validateTextTemplate(
+            '/chronograf/v1/validate_text_templates',
+            ruleMessage
+          )
+
+          const matchesVars = isValidMessage(ruleMessage)
+
+          if (matchesVars) {
+            setValidationText(messageValid)
+            setValidationState(ValidationState.Success)
+          } else {
+            setValidationText(messageInvalid)
+            setValidationState(ValidationState.Error)
+          }
+        } catch (error) {
+          const errorMessage = get(error, 'data.message', messageInvalid)
+          setValidationText(errorMessage)
+          setValidationState(ValidationState.Error)
+        }
+      }
+    }
+
+    validate()
+  }, [typingStatus])
 
   return {text, state}
 }

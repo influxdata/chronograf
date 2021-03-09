@@ -5,6 +5,7 @@ export const makeCancelable = <T>(
 ): WrappedCancelablePromise<T> => {
   let isCanceled = false
 
+  // eslint-disable-next-line no-async-promise-executor
   const wrappedPromise = new Promise<T>(async (resolve, reject) => {
     try {
       const value = await promise

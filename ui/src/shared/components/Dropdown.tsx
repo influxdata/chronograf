@@ -9,6 +9,7 @@ import DropdownHead from 'src/shared/components/DropdownHead'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {DropdownItem, DropdownAction} from 'src/types'
+import {CSSProperties} from 'react'
 
 interface AddNew {
   url?: string
@@ -31,7 +32,7 @@ interface Props {
   menuLabel?: string
   menuClass?: string
   useAutoComplete?: boolean
-  toggleStyle?: object
+  toggleStyle?: CSSProperties
   disabled?: boolean
   tabIndex?: number
 }

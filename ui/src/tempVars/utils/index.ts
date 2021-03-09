@@ -39,9 +39,7 @@ export const resolveValues = (
       return newTemplateValueQuery(template, newValues, hopefullySelectedValue)
     default:
       throw new Error(
-        `TemplateValue resolution for TemplateType ${
-          template.type
-        } not implemented`
+        `TemplateValue resolution for TemplateType ${template.type} not implemented`
       )
   }
 }
@@ -124,7 +122,7 @@ const newTemplateValueText = (
   template: Template,
   hopefullySelectedValue?: string
 ) => {
-  if (!!hopefullySelectedValue) {
+  if (hopefullySelectedValue) {
     return [
       {
         value: hopefullySelectedValue,
@@ -135,16 +133,15 @@ const newTemplateValueText = (
     ]
   } else if (template.values.length) {
     return [{...template.values[0], localSelected: true}]
-  } else {
-    return [
-      {
-        value: '',
-        type: TemplateValueType.Constant,
-        localSelected: true,
-        selected: false,
-      },
-    ]
   }
+  return [
+    {
+      value: '',
+      type: TemplateValueType.Constant,
+      localSelected: true,
+      selected: false,
+    },
+  ]
 }
 
 export const getSelectedValue = (template: Template): string | null => {

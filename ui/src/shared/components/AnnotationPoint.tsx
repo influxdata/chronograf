@@ -140,12 +140,16 @@ class AnnotationPoint extends Component<Props, State> {
   private get markerStyle(): CSSProperties {
     const {annotation, dygraph, staticLegendHeight} = this.props
 
-    const left = `${dygraph.toDomXCoord(Number(annotation.startTime)) +
-      DYGRAPH_CONTAINER_H_MARGIN}px`
+    const left = `${
+      dygraph.toDomXCoord(Number(annotation.startTime)) +
+      DYGRAPH_CONTAINER_H_MARGIN
+    }px`
 
-    const height = `calc(100% - ${staticLegendHeight +
+    const height = `calc(100% - ${
+      staticLegendHeight +
       DYGRAPH_CONTAINER_XLABEL_MARGIN +
-      DYGRAPH_CONTAINER_V_MARGIN * 2}px)`
+      DYGRAPH_CONTAINER_V_MARGIN * 2
+    }px)`
 
     return {
       left,

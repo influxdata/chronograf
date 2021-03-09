@@ -18,8 +18,9 @@ class GettingStarted extends Component {
           <div className="getting-started--cell">
             <p>
               <strong>Install the TICK Stack</strong>
-              <br />Save some time and use this handy tool to install the rest
-              of the stack:
+              <br />
+              Save some time and use this handy tool to install the rest of the
+              stack:
             </p>
             <p>
               <a href="https://github.com/influxdata/sandbox" target="_blank">
@@ -85,7 +86,8 @@ class GettingStarted extends Component {
               on our&nbsp;
               <a href="https://community.influxdata.com/" target="_blank">
                 Community Forum
-              </a>.
+              </a>
+              .
             </p>
           </div>
         </div>

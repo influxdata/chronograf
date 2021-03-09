@@ -33,6 +33,7 @@ interface TaskResponse {
 }
 
 interface ErrorActions {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   errorThrown: (notify: string | object) => void
 }
 
@@ -217,9 +218,8 @@ export class TickscriptPage extends PureComponent<Props, State> {
   private async persist(): Promise<TaskResponse> {
     if (this.isEditing) {
       return await this.updateTask()
-    } else {
-      return await this.createTask()
     }
+    return await this.createTask()
   }
 
   private handleSave = async () => {

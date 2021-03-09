@@ -11,7 +11,8 @@ const SplashPage: FunctionComponent<Props> = ({children}) => (
       {children}
     </div>
     <p className="auth-credits">
-      Made by <span className="icon cubo-uniform" />InfluxData
+      Made by <span className="icon cubo-uniform" />
+      InfluxData
     </p>
     <div className="auth-image" />
   </div>

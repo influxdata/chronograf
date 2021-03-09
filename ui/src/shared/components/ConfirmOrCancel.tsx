@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import OnClickOutside from 'src/shared/components/OnClickOutside'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
-type Item = object | string
+type Item = Record<string, unknown> | string
 
 interface ConfirmProps {
   buttonSize: string
@@ -76,7 +76,10 @@ export const Cancel: FunctionComponent<CancelProps> = ({
 )
 
 @ErrorHandling
-class ConfirmOrCancel extends PureComponent<ConfirmOrCancelProps, {}> {
+class ConfirmOrCancel extends PureComponent<
+  ConfirmOrCancelProps,
+  Record<string, never>
+> {
   public static defaultProps: Partial<ConfirmOrCancelProps> = {
     buttonSize: 'btn-sm',
     confirmTitle: 'Save',

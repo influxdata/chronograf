@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "chronograf",
+  "description": "",
+  "workspaces": {
+    "packages": [
+      "ui"
+    ]
+  },
+  "scripts": {
+  },
+  "homepage": "https://github.com/influxdata/chronograf",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/influxdata/chronograf"
+  },
+  "keywords": [
+    "influxdb",
+    "influxdata"
+  ],
+  "author": {
+    "name": "InfluxData"
+  },
+  "license": "AGPL-3.0"
+}

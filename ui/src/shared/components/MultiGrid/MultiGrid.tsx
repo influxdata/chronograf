@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import * as React from 'react'
 import _ from 'lodash'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -209,22 +210,21 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
           }}
         />
       )
-    } else {
-      return cellRenderer({
-        ...rest,
-        style: {
-          ...rest.style,
-        },
-        parent: this,
-        rowIndex: rowIndex + fixedRowCount,
-      })
     }
+    return cellRenderer({
+      ...rest,
+      style: {
+        ...rest.style,
+      },
+      parent: this,
+      rowIndex: rowIndex + fixedRowCount,
+    })
   }
 
   private getLeftGridWidth(props: PropsMultiGrid) {
     const {fixedColumnCount, columnWidth} = props
 
-    if (this.leftGridWidth == null) {
+    if (this.leftGridWidth === null) {
       if (typeof columnWidth === 'function') {
         let leftGridWidth = 0
 
@@ -249,7 +249,7 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
   private getTopGridHeight(props: PropsMultiGrid) {
     const {fixedRowCount, rowHeight} = props
 
-    if (this.topGridHeight == null) {
+    if (this.topGridHeight === null) {
       if (typeof rowHeight === 'function') {
         let topGridHeight = 0
 
@@ -585,13 +585,12 @@ class MultiGrid extends React.PureComponent<PropsMultiGrid, State> {
           }}
         />
       )
-    } else {
-      return cellRenderer({
-        ...rest,
-        columnIndex: columnIndex + fixedColumnCount,
-        parent: this,
-      })
     }
+    return cellRenderer({
+      ...rest,
+      columnIndex: columnIndex + fixedColumnCount,
+      parent: this,
+    })
   }
 
   private columnWidthRightGrid = ({index}) => {

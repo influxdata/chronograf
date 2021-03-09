@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Libraries
 import React, {Component, CSSProperties, MouseEvent} from 'react'
 import {connect} from 'react-redux'
@@ -74,7 +75,7 @@ interface Props {
   timeSeries: DygraphData
   labels: string[]
   options: dygraphs.Options
-  containerStyle: object // TODO
+  containerStyle: Record<string, unknown>
   dygraphSeries: DygraphSeries
   timeRange: TimeRange
   colors: LineColor[]
@@ -296,6 +297,7 @@ class Dygraph extends Component<Props, State> {
     const coloredDygraphSeries = {}
 
     for (const seriesName in dygraphSeries) {
+      // eslint-disable-next-line no-prototype-builtins
       if (dygraphSeries.hasOwnProperty(seriesName)) {
         const series = dygraphSeries[seriesName]
         const color = lineColors[dygraphSeriesKeys.indexOf(seriesName)]

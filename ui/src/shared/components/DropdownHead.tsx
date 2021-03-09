@@ -1,5 +1,6 @@
 import React, {FunctionComponent} from 'react'
 import classnames from 'classnames'
+import {CSSProperties} from 'react'
 
 const disabledClass = (disabled: boolean) => (disabled ? ' disabled' : '')
 
@@ -7,7 +8,7 @@ interface Props {
   iconName: string
   selected: string
   buttonSize: string
-  toggleStyle: object
+  toggleStyle: CSSProperties
   buttonColor: string
   disabled: boolean
 }

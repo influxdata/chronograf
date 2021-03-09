@@ -159,11 +159,10 @@ class GaugeOptions extends PureComponent<Props> {
 
   private handleChooseColor = threshold => {
     const {onUpdateGaugeColors} = this.props
-    const gaugeColors = this.props.gaugeColors.map(
-      color =>
-        color.id === threshold.id
-          ? {...color, hex: threshold.hex, name: threshold.name}
-          : color
+    const gaugeColors = this.props.gaugeColors.map(color =>
+      color.id === threshold.id
+        ? {...color, hex: threshold.hex, name: threshold.name}
+        : color
     )
 
     onUpdateGaugeColors(gaugeColors)
@@ -171,8 +170,8 @@ class GaugeOptions extends PureComponent<Props> {
 
   private handleUpdateColorValue = (threshold, value) => {
     const {onUpdateGaugeColors} = this.props
-    const gaugeColors = this.props.gaugeColors.map(
-      color => (color.id === threshold.id ? {...color, value} : color)
+    const gaugeColors = this.props.gaugeColors.map(color =>
+      color.id === threshold.id ? {...color, value} : color
     )
 
     onUpdateGaugeColors(gaugeColors)

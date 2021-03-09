@@ -41,7 +41,7 @@ interface Params {
 }
 
 interface Props {
-  getSources: () => void
+  getSources: () => Promise<void>
   sources: Source[]
   children: ReactElement<any>
   params: Params
@@ -227,6 +227,7 @@ const mapDispatchToProps = dispatch => ({
   notify: bindActionCreators(notifyAction, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-  withRouter(CheckSources)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(CheckSources))

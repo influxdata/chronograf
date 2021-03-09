@@ -15,9 +15,8 @@ function parseRGBA(rgbStr) {
 
   if (bits[4]) {
     return {r, g, b, a: parseFloat(bits[4])}
-  } else {
-    return {r, g, b}
   }
+  return {r, g, b}
 }
 
 export function toRGB(colorStr) {

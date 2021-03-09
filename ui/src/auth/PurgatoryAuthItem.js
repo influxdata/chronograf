@@ -24,7 +24,9 @@ const PurgatoryAuthItem = ({roleAndOrg, onClickLogin, superAdmin}) => (
       </button>
     ) : (
       <span className="auth--list-blocked">
-        Contact your Admin<br />for access
+        Contact your Admin
+        <br />
+        for access
       </span>
     )}
   </div>

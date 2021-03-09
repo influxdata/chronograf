@@ -316,7 +316,7 @@ class Threesizer extends PureComponent<Props, State> {
 
   private equalize = () => {
     const denominator = this.state.divisions.length
-    const divisionSizes = this.state.divisions.map(__ => {
+    const divisionSizes = this.state.divisions.map(() => {
       return 1 / denominator
     })
 

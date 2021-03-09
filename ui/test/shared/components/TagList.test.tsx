@@ -17,7 +17,9 @@ const setup = (override = {}) => {
     ...override,
   }
 
-  TagList.prototype.getTags = jest.fn(() => Promise.resolve)
+  TagList.prototype.getTags = (jest.fn(
+    () => Promise.resolve
+  ) as unknown) as () => Promise<void>
   const wrapper = shallow(<TagList {...props} />, {context: {source}})
   const instance = wrapper.instance() as TagList
 

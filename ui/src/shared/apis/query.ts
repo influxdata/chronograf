@@ -36,6 +36,7 @@ export function executeQueries(
       executeQuery(source, queries[i], templates, uuid)
         .then(result => (results[i] = {value: result, error: null}))
         .catch(result => (results[i] = {value: null, error: result}))
+        // eslint-disable-next-line no-loop-func
         .then(() => {
           counter -= 1
 

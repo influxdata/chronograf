@@ -4,11 +4,17 @@ describe('Logs.Utils.Table', () => {
   const infiniteTableData = {
     forward: {
       columns: ['time', 'noise'],
-      values: [[8, 'beep'], [7, 'boop']],
+      values: [
+        [8, 'beep'],
+        [7, 'boop'],
+      ],
     },
     backward: {
       columns: ['time', 'noise'],
-      values: [[6, 'bloop'], [5, 'bleep']],
+      values: [
+        [6, 'bloop'],
+        [5, 'bleep'],
+      ],
     },
   }
 

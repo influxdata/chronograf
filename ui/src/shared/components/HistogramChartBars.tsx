@@ -71,7 +71,7 @@ const getBarGroups = ({
 
   let hoverDataKeys = []
 
-  if (!!hoverData) {
+  if (hoverData) {
     hoverDataKeys = hoverData.data.map(h => h.key)
   }
 
@@ -119,25 +119,6 @@ const getBarGroups = ({
   })
 }
 
-interface BarGroup {
-  key: string
-  clip: {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
-  bars: Array<{
-    key: string
-    group: string
-    x: number
-    y: number
-    width: number
-    height: number
-    fill: string
-  }>
-  data: HistogramData
-}
 interface Props {
   width: number
   height: number

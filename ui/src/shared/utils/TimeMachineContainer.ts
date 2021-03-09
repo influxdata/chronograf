@@ -378,7 +378,7 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
 
   private updateQueryDrafts = (
     queryID: string,
-    nextQueryConfigFn: ((q: QueryConfig) => QueryConfig)
+    nextQueryConfigFn: (q: QueryConfig) => QueryConfig
   ) => {
     const {queryDrafts} = this.state
     const updatedQueryDrafts = queryDrafts.map(query => {

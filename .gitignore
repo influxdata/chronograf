@@ -4,6 +4,7 @@ build/
 backup/
 vendor/
 .vscode/
+node_modules/
 
 # Binaries
 /chronograf

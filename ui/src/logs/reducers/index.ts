@@ -6,8 +6,6 @@ import {
   RemoveFilterAction,
   AddFilterAction,
   ChangeFilterAction,
-  DecrementQueryCountAction,
-  IncrementQueryCountAction,
   ConcatMoreLogsAction,
   PrependMoreLogsAction,
   SetConfigAction,
@@ -116,18 +114,12 @@ const changeFilter = (
   return {...state, filters: mappedFilters}
 }
 
-const decrementQueryCount = (
-  state: LogsState,
-  __: DecrementQueryCountAction
-) => {
+const decrementQueryCount = (state: LogsState) => {
   const {queryCount} = state
   return {...state, queryCount: Math.max(queryCount - 1, 0)}
 }
 
-const incrementQueryCount = (
-  state: LogsState,
-  __: IncrementQueryCountAction
-) => {
+const incrementQueryCount = (state: LogsState) => {
   const {queryCount} = state
   return {...state, queryCount: queryCount + 1}
 }
@@ -202,15 +194,18 @@ export default (state: LogsState = defaultState, action: Action) => {
       return {...state, currentSource: action.payload.source}
     case ActionTypes.SetNamespaces:
       return {...state, currentNamespaces: action.payload.namespaces}
-    case ActionTypes.SetTimeBounds:
+    case ActionTypes.SetTimeBounds: {
       const {upper, lower} = action.payload.timeBounds
       return {...state, timeRange: {...state.timeRange, upper, lower}}
-    case ActionTypes.SetTimeWindow:
+    }
+    case ActionTypes.SetTimeWindow: {
       const {windowOption, seconds} = action.payload.timeWindow
       return {...state, timeRange: {...state.timeRange, windowOption, seconds}}
-    case ActionTypes.SetTimeMarker:
+    }
+    case ActionTypes.SetTimeMarker: {
       const {timeOption} = action.payload.timeMarker
       return {...state, timeRange: {...state.timeRange, timeOption}}
+    }
     case ActionTypes.SetNamespace:
       return {...state, currentNamespace: action.payload.namespace}
     case ActionTypes.SetHistogramQueryConfig:
@@ -266,9 +261,9 @@ export default (state: LogsState = defaultState, action: Action) => {
     case ActionTypes.ClearFilters:
       return clearFilters(state)
     case ActionTypes.IncrementQueryCount:
-      return incrementQueryCount(state, action)
+      return incrementQueryCount(state)
     case ActionTypes.DecrementQueryCount:
-      return decrementQueryCount(state, action)
+      return decrementQueryCount(state)
     case ActionTypes.ConcatMoreLogs:
       return concatMoreLogs(state, action)
     case ActionTypes.PrependMoreLogs:

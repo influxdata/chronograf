@@ -1,6 +1,6 @@
 import {isObject} from 'lodash'
 
-const dashrefresh = (refreshes) => {
+const dashrefresh = refreshes => {
   if (!Array.isArray(refreshes)) {
     return []
   }

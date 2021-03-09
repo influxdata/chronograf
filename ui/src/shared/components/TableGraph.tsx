@@ -462,9 +462,7 @@ class TableGraph extends PureComponent<Props, State> {
 
     if (isTimeData) {
       if (timeZone === TimeZones.UTC) {
-        return moment(cellData)
-          .utc()
-          .format(timeFormat)
+        return moment(cellData).utc().format(timeFormat)
       }
 
       return moment(cellData).format(timeFormat)
@@ -536,7 +534,7 @@ class TableGraph extends PureComponent<Props, State> {
 
     const cellDataIsNumerical = isNumerical(cellData)
 
-    let cellStyle: React.CSSProperties = style //tslint:disable-line
+    let cellStyle: React.CSSProperties = style // tslint:disable-line
     if (
       !isFixedRow &&
       !isFixedColumn &&

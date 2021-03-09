@@ -28,8 +28,8 @@ const adminChronograf = (state = initialState, action) => {
       const {user, updatedUser} = action.payload
       return {
         ...state,
-        users: state.users.map(
-          u => (u.links.self === user.links.self ? {...updatedUser} : u)
+        users: state.users.map(u =>
+          u.links.self === user.links.self ? {...updatedUser} : u
         ),
       }
     }
@@ -51,8 +51,8 @@ const adminChronograf = (state = initialState, action) => {
         // stale user does not necessarily have links, so uniqueness is on name,
         // provider, & scheme, except for a created users that is a duplicate
         // of an existing user, in which case a temp uuid is used to match
-        users: state.users.filter(
-          u => (user._tempID ? u._tempID !== user._tempID : u.id !== user.id)
+        users: state.users.filter(u =>
+          user._tempID ? u._tempID !== user._tempID : u.id !== user.id
         ),
       }
     }
@@ -69,9 +69,8 @@ const adminChronograf = (state = initialState, action) => {
       const {organization, newName} = action.payload
       return {
         ...state,
-        organizations: state.organizations.map(
-          o =>
-            o.links.self === organization.links.self ? {...o, name: newName} : o
+        organizations: state.organizations.map(o =>
+          o.links.self === organization.links.self ? {...o, name: newName} : o
         ),
       }
     }
@@ -80,8 +79,8 @@ const adminChronograf = (state = initialState, action) => {
       const {staleOrganization, syncedOrganization} = action.payload
       return {
         ...state,
-        organizations: state.organizations.map(
-          o => (o.name === staleOrganization.name ? {...syncedOrganization} : o)
+        organizations: state.organizations.map(o =>
+          o.name === staleOrganization.name ? {...syncedOrganization} : o
         ),
       }
     }
@@ -90,11 +89,10 @@ const adminChronograf = (state = initialState, action) => {
       const {organization} = action.payload
       return {
         ...state,
-        organizations: state.organizations.filter(
-          o =>
-            organization._tempID
-              ? o._tempID !== organization._tempID
-              : o.id !== organization.id
+        organizations: state.organizations.filter(o =>
+          organization._tempID
+            ? o._tempID !== organization._tempID
+            : o.id !== organization.id
         ),
       }
     }
@@ -129,11 +127,8 @@ const adminChronograf = (state = initialState, action) => {
       const {mapping} = action.payload
       return {
         ...state,
-        mappings: state.mappings.filter(
-          m =>
-            mapping._tempID
-              ? m._tempID !== mapping._tempID
-              : m.id !== mapping.id
+        mappings: state.mappings.filter(m =>
+          mapping._tempID ? m._tempID !== mapping._tempID : m.id !== mapping.id
         ),
       }
     }

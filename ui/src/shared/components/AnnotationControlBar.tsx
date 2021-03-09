@@ -96,7 +96,7 @@ class AnnotationControlBar extends PureComponent<Props> {
   private handleGetKeySuggestions = async (): Promise<string[]> => {
     const {tagKeys, onGetTagKeys, source} = this.props
 
-    if (!!tagKeys) {
+    if (tagKeys) {
       return tagKeys
     }
 
@@ -110,7 +110,7 @@ class AnnotationControlBar extends PureComponent<Props> {
   ): Promise<string[]> => {
     const {tagValues, onGetTagValues, source} = this.props
 
-    if (!!tagValues[tagKey]) {
+    if (tagValues[tagKey]) {
       return tagValues[tagKey]
     }
 

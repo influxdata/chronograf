@@ -51,9 +51,8 @@ const makeSelected = (template: Template, value: string): Template => {
   const valuesWithSelected = template.values.map(v => {
     if (v.value === valueToChoose) {
       return {...v, selected: true}
-    } else {
-      return {...v, selected: false}
     }
+    return {...v, selected: false}
   })
 
   return {...template, values: valuesWithSelected}
@@ -84,9 +83,8 @@ export const makeLocalSelected = (
   const valuesWithLocalSelected = template.values.map(v => {
     if (v.value === valueToChoose) {
       return {...v, localSelected: true}
-    } else {
-      return {...v, localSelected: false}
     }
+    return {...v, localSelected: false}
   })
 
   return {...template, values: valuesWithLocalSelected}

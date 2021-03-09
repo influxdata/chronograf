@@ -1,6 +1,5 @@
 // Libraries
 import React, {PureComponent, ChangeEvent, MouseEvent} from 'react'
-import _ from 'lodash'
 
 // Components
 import TagValueListItem from 'src/flux/components/TagValueListItem'
@@ -217,6 +216,7 @@ class TagValueList extends PureComponent<Props, State> {
         limit: this.state.limit + TAG_VALUES_LIMIT,
         loadingMoreValues: RemoteDataState.Loading,
       },
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async () => {
         try {
           const tagValues = await this.fetchTagValues()

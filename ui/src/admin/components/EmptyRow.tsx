@@ -7,7 +7,8 @@ const EmptyRow: FunctionComponent<Props> = ({tableName}) => (
   <tr className="table-empty-state">
     <th colSpan={5}>
       <p>
-        You don't have any {tableName},<br />why not create one?
+        You don't have any {tableName},<br />
+        why not create one?
       </p>
     </th>
   </tr>
