@@ -87,7 +87,7 @@ ifndef GOBINDATA
 endif
 	@touch .godep
 
-.jsdep: ui/yarn.lock
+.jsdep: ./yarn.lock
 ifndef YARN
 	$(error Please install yarn 1.19.1+)
 else
