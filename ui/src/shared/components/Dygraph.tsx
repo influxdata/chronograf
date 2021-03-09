@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Libraries
 import React, {Component, CSSProperties, MouseEvent} from 'react'
 import {connect} from 'react-redux'
@@ -74,7 +75,7 @@ interface Props {
   timeSeries: DygraphData
   labels: string[]
   options: dygraphs.Options
-  containerStyle: object // TODO
+  containerStyle: Record<string, unknown>
   dygraphSeries: DygraphSeries
   timeRange: TimeRange
   colors: LineColor[]
