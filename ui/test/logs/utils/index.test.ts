@@ -1,8 +1,9 @@
 import {parseHistogramQueryResponse} from 'src/logs/utils'
+import {TimeSeriesResponse, TimeSeriesSuccessfulResult} from 'src/types/series'
 
 describe('parseHistogramQueryResponse', () => {
   test('it parses a nonempty response correctly', () => {
-    const NONEMPTY_RESPONSE = {
+    const NONEMPTY_RESPONSE: TimeSeriesResponse = {
       results: [
         {
           statement_id: 0,
@@ -63,7 +64,9 @@ describe('parseHistogramQueryResponse', () => {
   })
 
   test('it parses an empty response correctly', () => {
-    const EMPTY_RESPONSE = {results: [{statement_id: 0}]}
+    const EMPTY_RESPONSE: TimeSeriesResponse = {
+      results: [{statement_id: 0} as TimeSeriesSuccessfulResult],
+    }
     const expected = []
     const actual = parseHistogramQueryResponse(EMPTY_RESPONSE)
 

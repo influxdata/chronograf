@@ -16,6 +16,7 @@ import {
 import {HistogramData} from 'src/types/histogram'
 import {executeQueryAsync} from 'src/logs/api'
 import {DEFAULT_TIME_FORMAT, FIELD_TIMESTAMP_NSINMS} from 'src/logs/constants'
+import {TimeSeriesResponse} from 'src/types/series'
 
 const BIN_COUNT = 30
 
@@ -318,7 +319,7 @@ export const buildTableQueryConfig = (
 }
 
 export const parseHistogramQueryResponse = (
-  response: Record<string, unknown>
+  response: TimeSeriesResponse
 ): HistogramData => {
   const series = getDeep<any[]>(response, 'results.0.series', [])
   const data = series.reduce((acc, current) => {
