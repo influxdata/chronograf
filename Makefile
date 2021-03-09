@@ -115,7 +115,7 @@ lint:
 	cd ui && yarn run lint
 
 lint-ci:
-	cd ui && yarn run eslint && yarn run tslint && yarn run tsc # fail fast for ci process
+	cd ui && yarn run eslint && yarn run tsc # fail fast for ci process
 
 run: ${BINARY}
 	./chronograf
