@@ -318,7 +318,7 @@ export const buildTableQueryConfig = (
 }
 
 export const parseHistogramQueryResponse = (
-  response: object
+  response: Record<string, unknown>
 ): HistogramData => {
   const series = getDeep<any[]>(response, 'results.0.series', [])
   const data = series.reduce((acc, current) => {
