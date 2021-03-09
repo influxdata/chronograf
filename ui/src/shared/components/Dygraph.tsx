@@ -297,6 +297,7 @@ class Dygraph extends Component<Props, State> {
     const coloredDygraphSeries = {}
 
     for (const seriesName in dygraphSeries) {
+      // eslint-disable-next-line no-prototype-builtins
       if (dygraphSeries.hasOwnProperty(seriesName)) {
         const series = dygraphSeries[seriesName]
         const color = lineColors[dygraphSeriesKeys.indexOf(seriesName)]
