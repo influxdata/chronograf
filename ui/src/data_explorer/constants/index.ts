@@ -99,6 +99,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Show Field Keys',
+    text: 'Show Field Keys',
+    query: 'SHOW FIELD KEYS ON "db_name"',
+    type: DropdownChildTypes.Item,
+  },
+  {
     id: 'Show Field Key Cardinality',
     text: 'Show Field Key Cardinality',
     query: 'SHOW FIELD KEY CARDINALITY ON "db_name"',
@@ -185,6 +191,12 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Item,
   },
   {
+    id: 'Show Grants',
+    text: 'Show Grants',
+    query: 'SHOW GRANTS FOR "username"',
+    type: DropdownChildTypes.Item,
+  },
+  {
     id: 'Create User',
     text: 'Create User',
     query: 'CREATE USER "username" WITH PASSWORD \'password\'',
@@ -232,6 +244,22 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     type: DropdownChildTypes.Divider,
   },
   {
+    id: 'Explain',
+    text: 'Explain',
+    query: 'EXPLAIN SELECT * FROM "db_name"."rp_name"."measurement"',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Explain Analyze',
+    text: 'Explain Analyze',
+    query: 'EXPLAIN ANALYZE SELECT * FROM "db_name"."rp_name"."measurement"',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: `mqtd-divider-8`,
+    type: DropdownChildTypes.Divider,
+  },
+  {
     id: 'Show Stats',
     text: 'Show Stats',
     query: 'SHOW STATS',
@@ -241,6 +269,30 @@ export const METAQUERY_TEMPLATE_OPTIONS: Array<
     id: 'Show Diagnostics',
     text: 'Show Diagnostics',
     query: 'SHOW DIAGNOSTICS',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Subscriptions',
+    text: 'Show Subscriptions',
+    query: 'SHOW SUBSCRIPTIONS',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Queries',
+    text: 'Show Queries',
+    query: 'SHOW QUERIES',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Shards',
+    text: 'Show Shards',
+    query: 'SHOW SHARDS',
+    type: DropdownChildTypes.Item,
+  },
+  {
+    id: 'Show Shard Groups',
+    text: 'Show Shard Groups',
+    query: 'SHOW SHARD GROUPS',
     type: DropdownChildTypes.Item,
   },
 ]
