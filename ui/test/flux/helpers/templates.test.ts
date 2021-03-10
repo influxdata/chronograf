@@ -199,7 +199,7 @@ const allTemplateTypes: Template[] = [
     tempVar: ':text:',
     values: [
       {
-        value: 'someText',
+        value: '${"',
         type: TemplateValueType.Constant,
         localSelected: false,
         selected: true,
@@ -265,7 +265,7 @@ describe('Flux.helpers.renderTemplatesInScript', () => {
     let expected =
       '\n\ndashboardTime = -1h\nupperDashboardTime = 2021-03-08T06:32:31.335Z\n'
     expected +=
-      'v = { "databaseVar" : "_internal" , "measurements" : "test" , "fieldKeys" : "val" , "tagKeys" : "hostname" , "tagVals" : "692282f44bd3" , "csv" : "b" , "map" : "2" , "customMetaQuery" : "_internal" , "text" : "someText"  , timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }'
+      'v = { "databaseVar" : "_internal" , "measurements" : "test" , "fieldKeys" : "val" , "tagKeys" : "hostname" , "tagVals" : "692282f44bd3" , "csv" : "b" , "map" : "2" , "customMetaQuery" : "_internal" , "text" : "\\${\\""  , timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }'
     expected += '\n\nbuckets()'
     expect(actual).toEqual(expected)
   })
@@ -279,7 +279,7 @@ describe('Flux.helpers.renderTemplatesInScript', () => {
     let expected =
       '\n\ndashboardTime = -1h\nupperDashboardTime = 2021-03-08T06:32:31.335Z\nautoInterval = 1667ms\n'
     expected +=
-      'v = { "databaseVar" : "_internal" , "measurements" : "test" , "fieldKeys" : "val" , "tagKeys" : "hostname" , "tagVals" : "692282f44bd3" , "csv" : "b" , "map" : "2" , "customMetaQuery" : "_internal" , "text" : "someText"  , timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime , windowPeriod: autoInterval }'
+      'v = { "databaseVar" : "_internal" , "measurements" : "test" , "fieldKeys" : "val" , "tagKeys" : "hostname" , "tagVals" : "692282f44bd3" , "csv" : "b" , "map" : "2" , "customMetaQuery" : "_internal" , "text" : "\\${\\""  , timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime , windowPeriod: autoInterval }'
     expected +=
       '\n\nfrom(bucket: "a") |> range(start: 0) |> aggregateWindow(every: v.windowPeriod, fn: mean)'
     expect(actual).toEqual(expected)

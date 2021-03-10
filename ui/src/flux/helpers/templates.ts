@@ -3,6 +3,7 @@ import {computeInterval} from 'src/tempVars/utils/replace'
 import {DEFAULT_DURATION_MS} from 'src/shared/constants'
 import {extractImports} from 'src/shared/parsing/flux/extractImports'
 import {getMinDuration} from 'src/shared/parsing/flux/durations'
+import fluxString from './fluxString'
 
 // template variables used since 1.9 (compatible with v2)
 export const TIMERANGE_START = 'v.timeRangeStart'
@@ -24,7 +25,7 @@ function templateVariableValue(template: Template): string {
       }
     }
   }
-  return `"${value}"`
+  return fluxString(value)
 }
 function templateVariables(templates: Template[]): string {
   const extras = (templates || [])
