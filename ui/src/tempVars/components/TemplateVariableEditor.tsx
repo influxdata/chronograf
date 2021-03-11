@@ -113,8 +113,8 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
     // If props.template exists, we're loading a source. If it doesn't, we're creating one
     if (props.template && props.template.sourceID) {
       sourceID = props.template.sourceID
-      selectedSource = props.sources.find(source => source.id === sourceID)
-      if (!selectedSource) {
+      selectedSource = props.sources.find((s: Source) => s.id === sourceID)
+      if (!selectedSource && sourceID !== DYNAMIC_SOURCE_DATABASE_ID) {
         const v = props.template.tempVar
         console.error(
           `Variable '${v}' uses source '${sourceID}' that does not exist.`
