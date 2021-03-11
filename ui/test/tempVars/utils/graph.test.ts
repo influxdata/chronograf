@@ -391,24 +391,25 @@ describe('hydrateTemplates', () => {
       },
     ]
 
+    const fakeResults = (query: string): Promise<string[]> => {
+      const results = {
+        'query for b': ['selected b value'],
+        'query for c': ['selected c value'],
+        'query for a depending on selected b value and selected c value': [
+          'success',
+        ],
+      }
+
+      const queryResults = results[query]
+
+      if (!queryResults) {
+        throw new Error('Ran unexpected query')
+      }
+
+      return Promise.resolve(queryResults)
+    }
     const fakeFetcher: TemplateQueryFetcher = {
-      fetch(query) {
-        const results = {
-          'query for b': ['selected b value'],
-          'query for c': ['selected c value'],
-          'query for a depending on selected b value and selected c value': [
-            'success',
-          ],
-        }
-
-        const queryResults = results[query]
-
-        if (!queryResults) {
-          throw new Error('Ran unexpected query')
-        }
-
-        return Promise.resolve(queryResults)
-      },
+      fetch: fakeResults,
     }
 
     const result = await hydrateTemplates(templates, [], {fetcher: fakeFetcher})

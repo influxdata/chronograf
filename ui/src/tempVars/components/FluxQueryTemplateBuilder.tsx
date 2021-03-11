@@ -115,7 +115,7 @@ class FluxQueryTemplateBuilder extends PureComponent<
       }
 
       const nextTemplate = await hydrateTemplate(templateWithQuery, templates, {
-        proxyUrl: source.links.flux,
+        source,
       })
 
       this.setState({fluxScriptResultsStatus: RemoteDataState.Done})

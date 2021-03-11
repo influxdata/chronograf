@@ -127,7 +127,7 @@ class CustomMetaQueryTemplateBuilder extends PureComponent<
       }
 
       const nextTemplate = await hydrateTemplate(templateWithQuery, templates, {
-        proxyUrl: source.links.proxy,
+        source,
       })
 
       this.setState({metaQueryResultsStatus: RemoteDataState.Done})

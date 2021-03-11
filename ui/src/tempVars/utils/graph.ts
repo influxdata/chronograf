@@ -22,7 +22,7 @@ interface TemplateNode {
 type TemplateGraph = TemplateNode[]
 
 export interface TemplateQueryFetcher {
-  fetch: (query: string, url: string) => Promise<string[]>
+  fetch: (query: string, source: Source, flux: boolean) => Promise<string[]>
 }
 
 interface Selections {
@@ -187,7 +187,16 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
     this.cache = {}
   }
 
-  public async fetch(query: string, proxyURL: string) {
+  public async fetch(
+    query: string,
+    source: Source,
+    flux: boolean
+  ): Promise<string[]> {
+    const proxyURL = flux ? source.links.flux : source.links.proxy
+    if (!proxyURL) {
+      return []
+    }
+
     if (!this.cache[proxyURL]) {
       this.cache[proxyURL] = {}
     }
@@ -198,8 +207,8 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
     }
 
     let values: string[]
-    if (this.proxyUrl.endsWith('flux')) {
-      values = []
+    if (flux) {
+      values = [] // TODO implement
     } else {
       const response = await proxy({source: this.proxyUrl, query})
       values = parseMetaQuery(query, response.data)
@@ -215,14 +224,14 @@ const defaultFetcher = new CachingTemplateQueryFetcher()
 
 interface HydrateTemplateOptions {
   selections?: Selections
-  proxyUrl?: string
+  source?: Source
   fetcher?: TemplateQueryFetcher
 }
 
 export async function hydrateTemplate(
   template: Template,
   templates: Template[],
-  {proxyUrl, fetcher = defaultFetcher, selections = {}}: HydrateTemplateOptions
+  {source, fetcher = defaultFetcher, selections = {}}: HydrateTemplateOptions
 ): Promise<Template> {
   let newValues: string[]
 
@@ -232,7 +241,11 @@ export async function hydrateTemplate(
       templates
     )
 
-    newValues = await fetcher.fetch(renderedQuery, proxyUrl)
+    newValues = await fetcher.fetch(
+      renderedQuery,
+      source,
+      !!template.query.flux
+    )
   }
 
   const selection = selections[template.tempVar]
@@ -258,14 +271,12 @@ export async function hydrateTemplates(
 
     const templateSource = sources.find(s => s.id === initialTemplate.sourceID)
 
-    const proxyUrl = templateSource
-      ? templateSource.links.proxy
-      : hydrateOptions.proxyUrl
+    const source = templateSource ? templateSource : hydrateOptions.source
 
     node.hydratedTemplate = await hydrateTemplate(
       node.initialTemplate,
       resolvedTemplates,
-      {...hydrateOptions, proxyUrl}
+      {...hydrateOptions, source}
     )
 
     node.status = RemoteDataState.Done
