@@ -4501,7 +4501,6 @@
               "alerta",
               "post",
               "http",
-              "hipchat",
               "kafka",
               "opsgenie",
               "opsgenie2",

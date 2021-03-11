@@ -18,7 +18,6 @@ type AlertNodes struct {
 	Sensu              []*Sensu      `json:"sensu"`            // Sensu  will send alert to all Sensu
 	Slack              []*Slack      `json:"slack"`            // Slack  will send alert to Slack
 	Telegram           []*Telegram   `json:"telegram"`         // Telegram  will send alert to all Telegram
-	HipChat            []*HipChat    `json:"hipChat"`          // HipChat  will send alert to all HipChat
 	Alerta             []*Alerta     `json:"alerta"`           // Alerta  will send alert to all Alerta
 	OpsGenie           []*OpsGenie   `json:"opsGenie"`         // OpsGenie  will send alert to all OpsGenie
 	OpsGenie2          []*OpsGenie   `json:"opsGenie2"`        // OpsGenie2  will send alert to all OpsGenie v2
@@ -73,12 +72,6 @@ type VictorOps struct {
 // PagerDuty sends alerts to the pagerduty.com service
 type PagerDuty struct {
 	ServiceKey string `json:"serviceKey"` // ServiceKey is the GUID of one of the "Generic API" integrations
-}
-
-// HipChat sends alerts to stride.com
-type HipChat struct {
-	Room  string `json:"room"`  // Room is the HipChat room to post messages.
-	Token string `json:"token"` // Token is the HipChat authentication token.
 }
 
 // Sensu sends alerts to sensu or sensuapp.org
