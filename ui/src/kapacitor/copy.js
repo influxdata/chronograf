@@ -1,8 +1,3 @@
-// HipChat
-const hipchatTokenLink =
-  'https://docs.influxdata.com/kapacitor/latest/guides/event-handler-setup/#hipchat-api-access-token'
-export const HIPCHAT_TOKEN_TIP = `<p>Need help creating a token?<br/>Check out <a href='${hipchatTokenLink}' target='_blank'>these steps</a>.</p>`
-
 // Pushover
 const pushoverDocsLink =
   'https://docs.influxdata.com/kapacitor/latest/nodes/alert_node/#pushover'

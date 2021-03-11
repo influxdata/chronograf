@@ -32,7 +32,6 @@ interface Props {
 
 interface HandlerKind {
   alerta?: number
-  hipchat?: number
   httppost?: number
   influxdb?: number
   kafka?: number
