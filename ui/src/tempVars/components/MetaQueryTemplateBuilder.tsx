@@ -3,7 +3,7 @@ import _ from 'lodash'
 import {getDeep} from 'src/utils/wrappers'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import TemplateMetaQueryPreview from 'src/tempVars/components/TemplateMetaQueryPreview'
+import TemplateMetaQueryPreview from './TemplateMetaQueryPreview'
 import {hydrateTemplate} from 'src/tempVars/utils/graph'
 import {isInvalidMetaQuery} from 'src/tempVars/parsing'
 
