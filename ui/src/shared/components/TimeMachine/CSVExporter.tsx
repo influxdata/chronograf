@@ -80,12 +80,20 @@ class CSVExporter extends PureComponent<Props, State> {
   }
 
   private downloadFluxCSV = async (): Promise<void> => {
-    const {source, script, onNotify, timeRange, fluxASTLink} = this.props
+    const {
+      source,
+      script,
+      onNotify,
+      timeRange,
+      fluxASTLink,
+      templates,
+    } = this.props
 
     const {didTruncate, rowCount} = await downloadFluxCSV(
       source,
       script,
       timeRange,
+      templates,
       fluxASTLink
     )
 

@@ -268,13 +268,21 @@ class TimeSeries extends PureComponent<Props, State> {
   }
 
   private executeTemplatedFluxQuery = async (latestUUID: string) => {
-    const {queries, onNotify, source, timeRange, fluxASTLink} = this.props
+    const {
+      queries,
+      onNotify,
+      source,
+      timeRange,
+      fluxASTLink,
+      templates,
+    } = this.props
 
     const script: string = _.get(queries, '0.text', '')
 
     const renderedScript = await renderTemplatesInScript(
       script,
       timeRange,
+      templates,
       fluxASTLink
     )
 

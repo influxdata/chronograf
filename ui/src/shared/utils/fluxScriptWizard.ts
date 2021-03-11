@@ -1,6 +1,6 @@
 import {isEmpty} from 'lodash'
 
-import {DASHBOARD_TIME, INTERVAL} from 'src/flux/helpers/templates'
+import {TIMERANGE_START, WINDOW_PERIOD} from 'src/flux/helpers/templates'
 
 import {proxy} from 'src/utils/queryUrlGenerator'
 import {parseMetaQuery} from 'src/tempVars/parsing'
@@ -121,7 +121,7 @@ export function renderScript(
   }
 
   const from = `from(bucket: "${selectedBucket}")`
-  const range = `|> range(start: ${DASHBOARD_TIME})`
+  const range = `|> range(start: ${TIMERANGE_START})`
   const filter = `|> filter(fn: (r) => ${filterPredicate})`
 
   let script = [from, range, filter].join('\n  ')
@@ -130,7 +130,7 @@ export function renderScript(
     return script
   }
 
-  const window = `|> window(every: ${INTERVAL})`
+  const window = `|> window(every: ${WINDOW_PERIOD})`
   const group =
     '|> group(columns: ["_time", "_start", "_stop", "_value"], mode: "except")'
 

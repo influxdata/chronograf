@@ -1,19 +1,70 @@
-import {TimeRange} from 'src/types'
+import {Template, TimeRange} from 'src/types'
 import {computeInterval} from 'src/tempVars/utils/replace'
 import {DEFAULT_DURATION_MS} from 'src/shared/constants'
 import {extractImports} from 'src/shared/parsing/flux/extractImports'
 import {getMinDuration} from 'src/shared/parsing/flux/durations'
+import fluxString from './fluxString'
 
-// For now we only support these template variables in Flux queries
-export const DASHBOARD_TIME = 'dashboardTime'
-export const UPPER_DASHBOARD_TIME = 'upperDashboardTime'
-export const INTERVAL = 'autoInterval'
+// template variables used since 1.9 (compatible with v2)
+export const TIMERANGE_START = 'v.timeRangeStart'
+export const TIMERANGE_STOP = 'v.timeRangeStop'
+export const WINDOW_PERIOD = 'v.windowPeriod'
 
-const INTERVAL_REGEX = /autoInterval/g
+const INTERVAL_REGEX = /autoInterval|v\.windowPeriod/g
+
+function templateVariableValue(template: Template): string {
+  let value = ''
+  if (template.values.length) {
+    for (const tmplVal of template.values) {
+      if (tmplVal.localSelected) {
+        value = tmplVal.value
+        break
+      }
+      if (tmplVal.selected) {
+        value = tmplVal.value
+      }
+    }
+  }
+  return fluxString(value)
+}
+function templateVariables(templates: Template[]): string {
+  const extras = (templates || [])
+    .filter(
+      x =>
+        x.id !== 'dashtime' &&
+        x.id !== 'upperdashtime' &&
+        x.id !== 'interval' &&
+        x.tempVar.startsWith(':') &&
+        x.tempVar.endsWith(':') &&
+        x.values
+    )
+    .map(t => {
+      return ` "${t.tempVar.substring(
+        1,
+        t.tempVar.length - 1
+      )}" : ${templateVariableValue(t)} `
+    }, '')
+
+  return extras.length ? `${extras.join(',')} ,` : ''
+}
+
+function fluxVariables(
+  lower: string,
+  upper: string,
+  extraVars: string,
+  interval?: number
+): string {
+  // dashboardTime, upperDashboardTime and autoInterval are added for bacward compatibility with 1.8.x
+  if (interval) {
+    return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nautoInterval = ${interval}ms\nv = {${extraVars} timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime , windowPeriod: autoInterval }`
+  }
+  return `dashboardTime = ${lower}\nupperDashboardTime = ${upper}\nv = {${extraVars} timeRangeStart: dashboardTime , timeRangeStop: upperDashboardTime }`
+}
 
 export const renderTemplatesInScript = async (
   script: string,
   timeRange: TimeRange,
+  templates: Template[],
   astLink: string
 ): Promise<string> => {
   let dashboardTime: string
@@ -23,17 +74,18 @@ export const renderTemplatesInScript = async (
     dashboardTime = timeRange.lower
     upperDashboardTime = timeRange.upper
   } else {
-    dashboardTime = timeRange.lowerFlux || '1h'
+    dashboardTime = timeRange.lowerFlux || '-1h'
     upperDashboardTime = new Date().toISOString()
   }
 
   const {imports, body} = await extractImports(astLink, script)
 
-  let variables = `${DASHBOARD_TIME} = ${dashboardTime}\n${UPPER_DASHBOARD_TIME} = ${upperDashboardTime}`
+  const extraVars = templateVariables(templates)
+  let variables = fluxVariables(dashboardTime, upperDashboardTime, extraVars)
   let rendered = `${variables}\n\n${body}`
 
   if (!script.match(INTERVAL_REGEX)) {
-    return `${imports}\n${rendered}`
+    return `${imports}\n\n${rendered}`
   }
 
   let duration: number
@@ -46,9 +98,14 @@ export const renderTemplatesInScript = async (
   }
 
   const interval = computeInterval(duration)
-  variables += `\n${INTERVAL} = ${interval}ms`
+  variables = fluxVariables(
+    dashboardTime,
+    upperDashboardTime,
+    extraVars,
+    interval
+  )
 
-  rendered = `${imports}\n${variables}\n${body}`
+  rendered = `${imports}\n\n${variables}\n\n${body}`
 
   return rendered
 }
