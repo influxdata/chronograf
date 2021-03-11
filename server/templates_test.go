@@ -61,6 +61,13 @@ func TestValidTemplateRequest(t *testing.T) {
 			},
 		},
 		{
+			name:    "No query set",
+			wantErr: true,
+			template: &chronograf.Template{
+				Type: "flux",
+			},
+		},
+		{
 			name: "Valid Map type",
 			template: &chronograf.Template{
 				Type: "map",
