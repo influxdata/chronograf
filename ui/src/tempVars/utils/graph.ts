@@ -30,8 +30,13 @@ interface Selections {
 }
 
 export function getDependencyNames(template: Template): TemplateName[] {
-  if (template.query && template.query.influxql) {
-    return getDependencyNamesHelper(template.query.influxql)
+  if (template.query) {
+    if (template.query.influxql) {
+      return getDependencyNamesHelper(template.query.influxql)
+    }
+    if (template.query.flux) {
+      return getDependencyNamesHelper(template.query.flux)
+    }
   }
 
   const names = new Set<string>()
@@ -52,21 +57,29 @@ function getDependencyNamesHelper(s: string): TemplateName[] {
   let name = ''
 
   for (const c of s) {
-    if (!inName && c === ':') {
+    if (inName) {
+      if (c === ':') {
+        inName = false
+        name += ':'
+        names.push(name)
+        name = ''
+      } else if (c === '\n' || (c === ' ' && name.length === 1)) {
+        // names cannot start with space or contain a new line,
+        // this is especially required for flux, where ':'
+        // separates parameter names and record values
+        inName = false
+        continue
+      } else {
+        name += c
+      }
+    } else if (c === ':') {
       inName = true
       name = ':'
-    } else if (inName && c === ':') {
-      inName = false
-      name += ':'
-      names.push(name)
-      name = ''
-    } else if (inName && c !== ':') {
-      name += c
     }
   }
 
   if (inName) {
-    throw new Error(`malformed template variable string \`${s}\``)
+    throw new Error(`malformed template variable string \`${name}\``)
   }
 
   return names
@@ -223,7 +236,7 @@ export async function hydrateTemplate(
 ): Promise<Template> {
   let newValues: string[]
 
-  if (template.query && template.query.influxql) {
+  if (template.query && (template.query.influxql || template.query.flux)) {
     const renderedQuery = templateReplace(
       templateInternalReplace(template),
       templates

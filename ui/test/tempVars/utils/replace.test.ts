@@ -459,15 +459,20 @@ describe('templates.utils.replace', () => {
         {
           id: 'b865afa5-f54c-49a8-adfa-9435450bac3a',
           tempVar: ':host:',
-          type: TemplateType.MetaQuery,
+          type: TemplateType.FluxQuery,
           label: '',
           query: {
-            influxql:
-              'SHOW TAG VALUES ON "telegraf" FROM "cpu" WITH KEY = "host"',
+            flux: `import "influxdata/influxdb/schema"
+              schema.tagValues(
+                bucket: "example-bucket",
+                tag: "host",
+                predicate: (r) => true,
+                start: -30d
+              )`,
           },
           values: [
             {
-              type: TemplateValueType.MetaQuery,
+              type: TemplateValueType.FluxQuery,
               value: 'myhost.local',
               selected: true,
               localSelected: true,

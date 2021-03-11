@@ -30,6 +30,24 @@ describe('getDependencyNames', () => {
     expect(new Set(actual)).toEqual(new Set(expected))
   })
 
+  test('can extract template dependency names from flux backed template', () => {
+    const template = {
+      id: '',
+      label: '',
+      tempVar: '',
+      type: TemplateType.FluxQuery,
+      query: {
+        flux: `from(bucket: ":foo:").range(start: 0).filter(fn: (r) => r.:bar: == ":baz:")`,
+      },
+      values: [],
+    }
+
+    const expected = [':foo:', ':bar:', ':baz:']
+    const actual = getDependencyNames(template)
+
+    expect(new Set(actual)).toEqual(new Set(expected))
+  })
+
   test('can extract template dependency names from a non-query backed template', () => {
     const template = {
       id: '',
@@ -103,9 +121,9 @@ describe('topologicalSort', () => {
         id: 'd',
         label: '',
         tempVar: ':d:',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         query: {
-          influxql: ':e:',
+          flux: ':e:',
         },
         values: [],
       },
@@ -226,11 +244,11 @@ describe('graphFromTemplates', () => {
       },
       {
         id: 'h',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         label: '',
         tempVar: ':h:',
         query: {
-          influxql: ':i:',
+          flux: ':i:',
         },
         values: [],
       },
@@ -299,9 +317,19 @@ describe('graphFromTemplates', () => {
       },
       {
         id: 'b',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         label: '',
         tempVar: ':b:',
+        query: {
+          flux: ':c:',
+        },
+        values: [],
+      },
+      {
+        id: 'c',
+        type: TemplateType.MetaQuery,
+        label: '',
+        tempVar: ':c:',
         query: {
           influxql: ':a:',
         },
@@ -345,16 +373,16 @@ describe('hydrateTemplates', () => {
       },
       {
         id: 'c',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         label: '',
         tempVar: ':c:',
         query: {
-          influxql: 'query for c',
+          flux: 'query for c',
         },
         values: [
           {
             value: 'selected c value',
-            type: TemplateValueType.MetaQuery,
+            type: TemplateValueType.FluxQuery,
             selected: true,
             localSelected: true,
           },

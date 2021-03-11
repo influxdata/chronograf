@@ -12,6 +12,7 @@ export enum TemplateValueType {
   Points = 'points',
   Constant = 'constant',
   MetaQuery = 'influxql',
+  FluxQuery = 'flux',
   TimeStamp = 'timeStamp',
 }
 
@@ -30,6 +31,7 @@ export interface TemplateQuery {
   tagKey?: string
   fieldKey?: string
   influxql?: string
+  flux?: string
 }
 
 export enum TemplateType {
@@ -43,6 +45,7 @@ export enum TemplateType {
   Map = 'map',
   Databases = 'databases',
   MetaQuery = 'influxql',
+  FluxQuery = 'flux',
   Text = 'text',
   TimeStamp = 'timeStamp',
 }
