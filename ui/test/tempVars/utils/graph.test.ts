@@ -2,6 +2,7 @@ import {
   getDependencyNames,
   graphFromTemplates,
   hydrateTemplates,
+  TemplateQueryFetcher,
   topologicalSort,
 } from 'src/tempVars/utils/graph'
 
@@ -390,7 +391,7 @@ describe('hydrateTemplates', () => {
       },
     ]
 
-    const fakeFetcher = {
+    const fakeFetcher: TemplateQueryFetcher = {
       fetch(query) {
         const results = {
           'query for b': ['selected b value'],

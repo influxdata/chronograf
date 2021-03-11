@@ -21,8 +21,8 @@ interface TemplateNode {
 
 type TemplateGraph = TemplateNode[]
 
-interface TemplateQueryFetcher {
-  fetch: (query: string) => Promise<string[]>
+export interface TemplateQueryFetcher {
+  fetch: (query: string, url: string) => Promise<string[]>
 }
 
 interface Selections {
@@ -187,31 +187,25 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
     this.cache = {}
   }
 
-  public setProxyUrl(proxyUrl: string): CachingTemplateQueryFetcher {
-    if (!proxyUrl) {
-      throw new Error('Must supply proxyUrl')
+  public async fetch(query: string, proxyURL: string) {
+    if (!this.cache[proxyURL]) {
+      this.cache[proxyURL] = {}
     }
-
-    this.proxyUrl = proxyUrl
-
-    if (!this.cache[proxyUrl]) {
-      this.cache[proxyUrl] = {}
-    }
-
-    return this
-  }
-
-  public async fetch(query) {
-    const cached = this.cache[this.proxyUrl][query]
+    const cached = this.cache[proxyURL][query]
 
     if (cached) {
       return Promise.resolve([...cached])
     }
 
-    const response = await proxy({source: this.proxyUrl, query})
-    const values = parseMetaQuery(query, response.data)
+    let values: string[]
+    if (this.proxyUrl.endsWith('flux')) {
+      values = []
+    } else {
+      const response = await proxy({source: this.proxyUrl, query})
+      values = parseMetaQuery(query, response.data)
+    }
 
-    this.cache[this.proxyUrl][query] = values
+    this.cache[proxyURL][query] = values
 
     return [...values]
   }
@@ -228,11 +222,7 @@ interface HydrateTemplateOptions {
 export async function hydrateTemplate(
   template: Template,
   templates: Template[],
-  {
-    proxyUrl,
-    fetcher = defaultFetcher.setProxyUrl(proxyUrl),
-    selections = {},
-  }: HydrateTemplateOptions
+  {proxyUrl, fetcher = defaultFetcher, selections = {}}: HydrateTemplateOptions
 ): Promise<Template> {
   let newValues: string[]
 
@@ -242,7 +232,7 @@ export async function hydrateTemplate(
       templates
     )
 
-    newValues = await fetcher.fetch(renderedQuery)
+    newValues = await fetcher.fetch(renderedQuery, proxyUrl)
   }
 
   const selection = selections[template.tempVar]
