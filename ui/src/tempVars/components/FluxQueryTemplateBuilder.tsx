@@ -34,7 +34,7 @@ class FluxQueryTemplateBuilder extends PureComponent<
   constructor(props: TemplateBuilderProps) {
     super(props)
 
-    const fluxScript = getDeep<string>(props.template, 'query.influxql', '')
+    const fluxScript = getDeep<string>(props.template, 'query.flux', '')
 
     this.state = {
       fluxScript,
@@ -111,7 +111,7 @@ class FluxQueryTemplateBuilder extends PureComponent<
     try {
       const templateWithQuery = {
         ...template,
-        query: {influxql: fluxScript},
+        query: {flux: fluxScript},
       }
 
       const nextTemplate = await hydrateTemplate(templateWithQuery, templates, {
