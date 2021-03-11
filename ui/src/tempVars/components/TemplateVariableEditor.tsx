@@ -57,6 +57,7 @@ import {
   RESERVED_TEMPLATE_NAMES,
 } from 'src/tempVars/constants'
 import {FIVE_SECONDS} from 'src/shared/constants/index'
+import FluxQueryTemplateBuilder from './FluxQueryTemplateBuilder'
 
 interface Props {
   // We will assume we are creating a new template if none is passed in
@@ -90,6 +91,7 @@ const TEMPLATE_BUILDERS = {
   [TemplateType.TagKeys]: TagKeysTemplateBuilder,
   [TemplateType.TagValues]: TagValuesTemplateBuilder,
   [TemplateType.MetaQuery]: MetaQueryTemplateBuilder,
+  [TemplateType.FluxQuery]: FluxQueryTemplateBuilder,
   [TemplateType.Text]: TextTemplateBuilder,
 }
 
