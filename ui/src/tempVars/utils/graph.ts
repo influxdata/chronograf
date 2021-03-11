@@ -24,7 +24,12 @@ interface TemplateNode {
 type TemplateGraph = TemplateNode[]
 
 export interface TemplateQueryFetcher {
-  fetch: (query: string, source: Source, flux: boolean) => Promise<string[]>
+  fetch: (
+    query: string,
+    source: Source,
+    flux: boolean,
+    warnFn?: (string) => void
+  ) => Promise<string[]>
 }
 
 interface Selections {
@@ -192,11 +197,19 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
   public async fetch(
     query: string,
     source: Source,
-    flux: boolean
+    flux: boolean,
+    warnFn?: (string) => void
   ): Promise<string[]> {
+    function warn(msg: string) {
+      if (warnFn) {
+        warnFn(msg)
+      } else {
+        console.warn(msg)
+      }
+    }
     const proxyURL = flux ? source.links.flux : source.links.proxy
     if (!proxyURL) {
-      console.warn('flux is not available for source:', source)
+      warn('Flux endpoint is not available!')
       return []
     }
 
@@ -217,10 +230,7 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
         return []
       }
       if (tables.length > 1) {
-        console.warn(
-          'flux variable query returns more tables, but only the first is used!',
-          query
-        )
+        warn('More tables are returned, but only the first is used!')
       }
       const data = tables[0].data
       if (data.length > 1) {
@@ -228,10 +238,8 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
         if (valueIndex > 0) {
           values = data.slice(1).map(arr => String(arr[valueIndex]))
         } else {
-          console.warn(
-            'flux variable query returns a table with no _value column!',
-            query
-          )
+          warn('No _value column found!')
+          return []
         }
       }
     } else {
@@ -251,12 +259,18 @@ interface HydrateTemplateOptions {
   selections?: Selections
   source?: Source
   fetcher?: TemplateQueryFetcher
+  warnFn?: (warning: string) => void
 }
 
 export async function hydrateTemplate(
   template: Template,
   templates: Template[],
-  {source, fetcher = defaultFetcher, selections = {}}: HydrateTemplateOptions
+  {
+    source,
+    fetcher = defaultFetcher,
+    selections = {},
+    warnFn,
+  }: HydrateTemplateOptions
 ): Promise<Template> {
   let newValues: string[]
 
@@ -269,7 +283,8 @@ export async function hydrateTemplate(
     newValues = await fetcher.fetch(
       renderedQuery,
       source,
-      !!template.query.flux
+      !!template.query.flux,
+      warnFn
     )
   }
 
