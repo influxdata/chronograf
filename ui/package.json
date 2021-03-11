@@ -21,7 +21,8 @@
     "eslint:fix": "eslint src --fix",
     "tsc": "tsc -p ./tsconfig.json --noEmit --pretty",
     "tsc:watch": "tsc -p ./tsconfig.json --noEmit --pretty -w",
-    "dev": "yarn clean && yarn start"
+    "dev": "yarn clean && yarn start",
+    "postinstall": "echo \"\" > ../node_modules/go.mod"
   },
   "author": "",
   "devDependencies": {
