@@ -8,6 +8,8 @@ import templateReplace, {
 import {resolveValues} from 'src/tempVars/utils'
 
 import {Source, Template, RemoteDataState} from 'src/types'
+import {executeQuery} from 'src/shared/apis/flux/query'
+import {parseResponse} from 'src/shared/parsing/flux/response'
 
 type TemplateName = string
 
@@ -194,6 +196,7 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
   ): Promise<string[]> {
     const proxyURL = flux ? source.links.flux : source.links.proxy
     if (!proxyURL) {
+      console.warn('flux is not available for source:', source)
       return []
     }
 
@@ -208,7 +211,29 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
 
     let values: string[]
     if (flux) {
-      values = [] // TODO implement
+      const response = await executeQuery(source, query)
+      const tables = parseResponse(response.csv)
+      if (tables.length === 0) {
+        return []
+      }
+      if (tables.length > 1) {
+        console.warn(
+          'flux variable query returns more tables, but only the first is used!',
+          query
+        )
+      }
+      const data = tables[0].data
+      if (data.length > 1) {
+        const valueIndex = data[0].indexOf('_value')
+        if (valueIndex > 0) {
+          values = data.slice(1).map(arr => String(arr[valueIndex]))
+        } else {
+          console.warn(
+            'flux variable query returns a table with no _value column!',
+            query
+          )
+        }
+      }
     } else {
       const response = await proxy({source: this.proxyUrl, query})
       values = parseMetaQuery(query, response.data)
