@@ -114,6 +114,7 @@ message TemplateQuery {
 	string measurement      = 4; // Measurement is the optinally selected measurement for the query
 	string tag_key          = 5; // TagKey is the optionally selected tag key for the query
 	string field_key        = 6; // FieldKey is the optionally selected field key for the query
+	string flux             = 7; // Flux script content 
 }
 
 message Server {
