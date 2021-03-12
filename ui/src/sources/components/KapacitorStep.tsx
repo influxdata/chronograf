@@ -226,4 +226,4 @@ const mdtp = {
   fetchKapacitors: sourcesActions.fetchKapacitorsAsyncNoNotify,
 }
 
-export default connect(mstp, mdtp, null, {withRef: true})(KapacitorStep)
+export default connect(mstp, mdtp, null, {forwardRef: true})(KapacitorStep)

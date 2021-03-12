@@ -291,4 +291,4 @@ const mdtp = {
   updateSource: updateSourceAction,
 }
 
-export default connect(null, mdtp, null, {withRef: true})(SourceStep)
+export default connect(null, mdtp, null, {forwardRef: true})(SourceStep)
