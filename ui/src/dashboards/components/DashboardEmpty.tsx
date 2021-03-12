@@ -22,12 +22,7 @@ interface Props {
   addDashboardCell: (dashboard: Dashboard, cell?: Cell | NewDefaultCell) => void
 }
 
-const mapDispatchToProps = dispatch => ({
-  addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
-})
-
 @ErrorHandling
-@connect(null, mapDispatchToProps)
 class DashboardEmpty extends Component<Props> {
   constructor(props) {
     super(props)
@@ -68,4 +63,9 @@ class DashboardEmpty extends Component<Props> {
   }
 }
 
-export default DashboardEmpty
+const mapDispatchToProps = dispatch => ({
+  addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
+})
+
+
+export default connect(null, mapDispatchToProps)(DashboardEmpty)

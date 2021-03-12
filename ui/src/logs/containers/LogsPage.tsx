@@ -281,7 +281,9 @@ class LogsPage extends Component<Props, State> {
               isHistogramHidden ? 'logs-viewer--table-only' : ''
             }`}
           >
-            {isHistogramHidden ? undefined : (
+            {isHistogramHidden ? (
+              undefined
+            ) : (
               <LogsGraphContainer>
                 {this.chartControlBar}
                 {this.chart}
@@ -1208,6 +1210,7 @@ const mapDispatchToProps = {
   populateNamespacesAsync,
 }
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(LogsPage)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(LogsPage))

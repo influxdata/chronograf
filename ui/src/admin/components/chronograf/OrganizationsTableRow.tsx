@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import {withRouter, InjectedRouter} from 'react-router'
+import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
 
 import _ from 'lodash'
 
@@ -22,7 +22,7 @@ interface CurrentOrganization {
   id: string
 }
 
-interface Props {
+interface Props extends WithRouterProps {
   organization: Organization
   currentOrganization: CurrentOrganization
   onDelete: (Organization) => void
@@ -120,6 +120,7 @@ const mapStateToProps = ({links}) => ({
   links,
 })
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(OrganizationsTableRow)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(OrganizationsTableRow))
