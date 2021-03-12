@@ -67,5 +67,4 @@ const mapDispatchToProps = dispatch => ({
   addDashboardCell: bindActionCreators(addDashboardCellAsync, dispatch),
 })
 
-
 export default connect(null, mapDispatchToProps)(DashboardEmpty)

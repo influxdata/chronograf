@@ -281,9 +281,7 @@ class LogsPage extends Component<Props, State> {
               isHistogramHidden ? 'logs-viewer--table-only' : ''
             }`}
           >
-            {isHistogramHidden ? (
-              undefined
-            ) : (
+            {isHistogramHidden ? undefined : (
               <LogsGraphContainer>
                 {this.chartControlBar}
                 {this.chart}
