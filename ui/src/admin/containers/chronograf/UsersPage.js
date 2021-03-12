@@ -48,7 +48,7 @@ class UsersPage extends PureComponent {
     deleteUserAsync(user, {isAbsoluteDelete: false})
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const {
       links,
       actions: {loadOrganizationsAsync, loadUsersAsync},

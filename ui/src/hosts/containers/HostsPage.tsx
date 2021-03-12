@@ -104,7 +104,7 @@ export class HostsPage extends PureComponent<Props, State> {
     this.setState({layouts})
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  public UNSAFE_componentWillReceiveProps(nextProps: Props) {
     const {layouts} = this.state
     if (layouts) {
       if (this.props.manualRefresh !== nextProps.manualRefresh) {

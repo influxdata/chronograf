@@ -20,7 +20,7 @@ class SearchBar extends PureComponent<Props, State> {
     }
   }
 
-  public componentWillMount() {
+  public UNSAFE_componentWillMount() {
     const waitPeriod = 300
     this.handleSearch = _.debounce(this.handleSearch, waitPeriod)
   }

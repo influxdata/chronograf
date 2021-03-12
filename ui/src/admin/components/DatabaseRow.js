@@ -21,7 +21,7 @@ class DatabaseRow extends Component {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.retentionPolicy.isNew) {
       this.setState({isEditing: true})
     }

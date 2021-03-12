@@ -24,7 +24,7 @@ const handleClickLogin = props => organization => async e => {
 }
 
 class Purgatory extends Component {
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     const {router, me} = this.props
 
     if (me === null) {

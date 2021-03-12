@@ -49,7 +49,7 @@ class CustomTimeRange extends Component {
     this.upperCal.show()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {lower, upper} = nextProps.timeRange
     if (lower) {
       const momentVal = this._toMoment(lower)

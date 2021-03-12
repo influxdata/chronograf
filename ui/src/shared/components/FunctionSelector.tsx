@@ -24,7 +24,7 @@ class FunctionSelector extends PureComponent<Props, State> {
     }
   }
 
-  public componentWillUpdate(nextProps) {
+  public UNSAFE_componentWillUpdate(nextProps) {
     if (!_.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
       this.setState({localSelectedItems: nextProps.selectedItems})
     }

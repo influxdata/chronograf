@@ -64,7 +64,7 @@ export class AllUsersPage extends PureComponent<Props, State> {
     getAuthConfigAsync(links.config.auth)
   }
 
-  public async componentWillMount() {
+  public async UNSAFE_componentWillMount() {
     const {
       links,
       actionsAdmin: {loadOrganizationsAsync, loadUsersAsync},

@@ -22,7 +22,7 @@ class RedactedInput extends PureComponent<Props, State> {
     }
   }
 
-  public componentWillReceiveProps(nextProps) {
+  public UNSAFE_componentWillReceiveProps(nextProps) {
     if (!nextProps.isFormEditing) {
       this.setState({editing: false})
     }

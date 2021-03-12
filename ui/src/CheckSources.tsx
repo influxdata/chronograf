@@ -85,7 +85,7 @@ export class CheckSources extends Component<Props, State> {
     return {source: sources.find(s => s.id === params.sourceID)}
   }
 
-  public async componentWillMount() {
+  public async UNSAFE_componentWillMount() {
     const {
       router,
       auth: {isUsingAuth, me},
@@ -112,7 +112,7 @@ export class CheckSources extends Component<Props, State> {
     return true
   }
 
-  public async componentWillUpdate(nextProps, nextState) {
+  public async UNSAFE_componentWillUpdate(nextProps, nextState) {
     const {
       router,
       location,
