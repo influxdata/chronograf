@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import React, {PureComponent, MouseEvent} from 'react'
-import {Controlled as ReactCodeMirror, IInstance} from 'react-codemirror2'
+import {Controlled as ReactCodeMirror} from 'react-codemirror2'
+import {Editor as CMEditor} from 'codemirror'
 import {EditorChange, LineWidget, Position} from 'codemirror'
 import {ShowHintOptions} from 'src/types/codemirror'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -37,7 +38,7 @@ interface State {
   cursorPosition: Position
 }
 
-interface EditorInstance extends IInstance {
+interface EditorInstance extends CMEditor {
   showHint: (options?: ShowHintOptions) => void
 }
 
@@ -98,12 +99,12 @@ class FluxScriptEditor extends PureComponent<Props, State> {
       theme: 'time-machine',
       completeSingle: false,
       gutters: ['error-gutter'],
+      autoFocus: true,
     }
 
     return (
       <div className="flux-script-editor" onMouseEnter={this.handleMouseEnter}>
         <ReactCodeMirror
-          autoFocus={true}
           autoCursor={true}
           value={this.state.script}
           options={options}
@@ -119,7 +120,7 @@ class FluxScriptEditor extends PureComponent<Props, State> {
     )
   }
 
-  private handleCursorChange = (__: IInstance, position: Position) => {
+  private handleCursorChange = (__: CMEditor, position: Position) => {
     const {onCursorChange} = this.props
 
     if (onCursorChange) {
@@ -242,7 +243,6 @@ class FluxScriptEditor extends PureComponent<Props, State> {
     if (!filteredSuggestions.list.length) {
       return
     }
-
     this.editor.showHint({
       hint: () => filteredSuggestions,
       completeSingle: false,
@@ -250,7 +250,7 @@ class FluxScriptEditor extends PureComponent<Props, State> {
   }
 
   private beforeChange = (
-    ___: IInstance,
+    ___: CMEditor,
     ____: EditorChange,
     script: string
   ): void => {
@@ -258,7 +258,7 @@ class FluxScriptEditor extends PureComponent<Props, State> {
   }
 
   private updateCode = (
-    ___: IInstance,
+    ___: CMEditor,
     ____: EditorChange,
     script: string
   ): void => {
