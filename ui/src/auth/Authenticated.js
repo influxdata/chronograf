@@ -1,23 +1,27 @@
-import {replace} from 'react-router-redux'
-import {UserAuthWrapper} from 'redux-auth-wrapper'
+import {routerActions} from 'react-router-redux'
 import PageSpinner from 'src/shared/components/PageSpinner'
+import {connectedReduxRedirect} from 'redux-auth-wrapper/history3/redirect'
+import locationHelperBuilder from 'redux-auth-wrapper/history3/locationHelper'
 
-export const UserIsAuthenticated = UserAuthWrapper({
-  authSelector: ({auth}) => ({auth}),
-  authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
-  LoadingComponent: PageSpinner,
-  redirectAction: replace,
+const locationHelper = locationHelperBuilder({})
+
+export const UserIsAuthenticated = connectedReduxRedirect({
+  redirectPath: '/login',
+  AuthenticatingComponent: PageSpinner,
   wrapperDisplayName: 'UserIsAuthenticated',
-  predicate: ({auth: {me, isMeLoading}}) => !isMeLoading && me !== null,
+  redirectAction: routerActions.replace,
+  authenticatedSelector: ({auth: {me, isMeLoading}}) =>
+    !isMeLoading && me !== null,
+  authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
 })
 
-export const UserIsNotAuthenticated = UserAuthWrapper({
-  authSelector: ({auth}) => ({auth}),
-  authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
-  LoadingComponent: PageSpinner,
-  redirectAction: replace,
+export const UserIsNotAuthenticated = connectedReduxRedirect({
+  redirectPath: (state, ownProps) =>
+    locationHelper.getRedirectQueryParam(ownProps) || '/',
   wrapperDisplayName: 'UserIsNotAuthenticated',
-  predicate: ({auth: {me, isMeLoading}}) => !isMeLoading && me === null,
-  failureRedirectPath: () => '/',
-  allowRedirectBack: false,
+  authenticatedSelector: ({auth: {me, isMeLoading}}) =>
+    !isMeLoading && me === null,
+  authenticatingSelector: ({auth: {isMeLoading}}) => isMeLoading,
+  AuthenticatingComponent: PageSpinner,
+  redirectAction: routerActions.replace,
 })
