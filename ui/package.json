@@ -117,7 +117,7 @@
     "qs": "^6.5.2",
     "react": "^16.8.6",
     "react-addons-shallow-compare": "^15.0.2",
-    "react-codemirror2": "^4.2.1",
+    "react-codemirror2": "^7.2.1",
     "react-copy-to-clipboard": "^5.0.1",
     "react-custom-scrollbars": "^4.1.1",
     "react-dimensions": "^1.2.0",
