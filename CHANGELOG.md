@@ -18,6 +18,7 @@
 1. [#5681](https://github.com/influxdata/chronograf/pull/5681): Allow to hide/show histogram in Log Viewer.
 1. [#5687](https://github.com/influxdata/chronograf/pull/5687): Add more meta query templates to Explore UI.
 1. [#5688](https://github.com/influxdata/chronograf/pull/5688): Add UI variables to flux query execution.
+1. [#5697](https://github.com/influxdata/chronograf/pull/5697): Allow to define dashboard variables using flux.
 
 ### Other
 

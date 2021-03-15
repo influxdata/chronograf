@@ -2,6 +2,7 @@ import {
   getDependencyNames,
   graphFromTemplates,
   hydrateTemplates,
+  TemplateQueryFetcher,
   topologicalSort,
 } from 'src/tempVars/utils/graph'
 
@@ -25,6 +26,24 @@ describe('getDependencyNames', () => {
     }
 
     const expected = [':foo:', ':bar:', ':baz:', ':yo:']
+    const actual = getDependencyNames(template)
+
+    expect(new Set(actual)).toEqual(new Set(expected))
+  })
+
+  test('can extract template dependency names from flux backed template', () => {
+    const template = {
+      id: '',
+      label: '',
+      tempVar: '',
+      type: TemplateType.FluxQuery,
+      query: {
+        flux: `from(bucket: ":foo:").range(start: 0).filter(fn: (r) => r.:bar: == ":baz:")`,
+      },
+      values: [],
+    }
+
+    const expected = [':foo:', ':bar:', ':baz:']
     const actual = getDependencyNames(template)
 
     expect(new Set(actual)).toEqual(new Set(expected))
@@ -103,9 +122,9 @@ describe('topologicalSort', () => {
         id: 'd',
         label: '',
         tempVar: ':d:',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         query: {
-          influxql: ':e:',
+          flux: ':e:',
         },
         values: [],
       },
@@ -226,11 +245,11 @@ describe('graphFromTemplates', () => {
       },
       {
         id: 'h',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         label: '',
         tempVar: ':h:',
         query: {
-          influxql: ':i:',
+          flux: ':i:',
         },
         values: [],
       },
@@ -299,9 +318,19 @@ describe('graphFromTemplates', () => {
       },
       {
         id: 'b',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         label: '',
         tempVar: ':b:',
+        query: {
+          flux: ':c:',
+        },
+        values: [],
+      },
+      {
+        id: 'c',
+        type: TemplateType.MetaQuery,
+        label: '',
+        tempVar: ':c:',
         query: {
           influxql: ':a:',
         },
@@ -345,16 +374,16 @@ describe('hydrateTemplates', () => {
       },
       {
         id: 'c',
-        type: TemplateType.MetaQuery,
+        type: TemplateType.FluxQuery,
         label: '',
         tempVar: ':c:',
         query: {
-          influxql: 'query for c',
+          flux: 'query for c',
         },
         values: [
           {
             value: 'selected c value',
-            type: TemplateValueType.MetaQuery,
+            type: TemplateValueType.FluxQuery,
             selected: true,
             localSelected: true,
           },
@@ -362,24 +391,25 @@ describe('hydrateTemplates', () => {
       },
     ]
 
-    const fakeFetcher = {
-      fetch(query) {
-        const results = {
-          'query for b': ['selected b value'],
-          'query for c': ['selected c value'],
-          'query for a depending on selected b value and selected c value': [
-            'success',
-          ],
-        }
+    const fakeResults = (query: string): Promise<string[]> => {
+      const results = {
+        'query for b': ['selected b value'],
+        'query for c': ['selected c value'],
+        'query for a depending on selected b value and selected c value': [
+          'success',
+        ],
+      }
 
-        const queryResults = results[query]
+      const queryResults = results[query]
 
-        if (!queryResults) {
-          throw new Error('Ran unexpected query')
-        }
+      if (!queryResults) {
+        throw new Error('Ran unexpected query')
+      }
 
-        return Promise.resolve(queryResults)
-      },
+      return Promise.resolve(queryResults)
+    }
+    const fakeFetcher: TemplateQueryFetcher = {
+      fetch: fakeResults,
     }
 
     const result = await hydrateTemplates(templates, [], {fetcher: fakeFetcher})

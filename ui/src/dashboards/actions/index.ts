@@ -750,7 +750,7 @@ export const getDashboardWithTemplatesAsync = (
   const selections = templateSelectionsFromQueryParams()
 
   const templates = await hydrateTemplates(dashboard.templates, sources, {
-    proxyUrl: source.links.proxy,
+    source,
     selections,
   })
 
@@ -785,7 +785,7 @@ export const rehydrateTemplatesAsync = (
   const dashboard = getDashboard(getState(), dashboardId)
 
   const templates = await hydrateTemplates(dashboard.templates, sources, {
-    proxyUrl: source.links.proxy,
+    source,
   })
 
   dispatch(updateTemplates(templates))

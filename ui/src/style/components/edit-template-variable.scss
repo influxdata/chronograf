@@ -46,6 +46,10 @@
   font-family: $code-font;
 }
 
+textarea.temp-builder--flux {
+  height: 100px;
+}
+
 @keyframes pulse {
   0% {
     color: $g19-ghost;

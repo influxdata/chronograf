@@ -93,6 +93,7 @@ const renderTemplate = (query: string, template: Template): string => {
     case TemplateValueType.CSV:
     case TemplateValueType.Constant:
     case TemplateValueType.MetaQuery:
+    case TemplateValueType.FluxQuery:
     case TemplateValueType.Map:
       return replaceAll(q, tempVar, value)
     default:
@@ -152,16 +153,19 @@ const replaceAll = (query: string, search: string, replacement: string) => {
 }
 
 export const templateInternalReplace = (template: Template): string => {
-  const {influxql, db, measurement, tagKey} = template.query
-
   if (template.type === TemplateType.MetaQuery) {
     // A custom meta query template may reference other templates whose names
     // conflict with the `database`, `measurement` and `tagKey` fields stored
     // within a template's `query` object. Since these fields are always empty
     // for a custom meta query template, we do not attempt to replace them
-    return influxql
+    return template.query.influxql
+  }
+  if (template.type === TemplateType.FluxQuery) {
+    // return flux query as-is
+    return template.query.flux
   }
 
+  const {influxql, db, measurement, tagKey} = template.query
   return influxql
     .replace(':database:', `"${db}"`)
     .replace(':measurement:', `"${measurement}"`)

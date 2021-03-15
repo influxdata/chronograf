@@ -8,6 +8,8 @@ import templateReplace, {
 import {resolveValues} from 'src/tempVars/utils'
 
 import {Source, Template, RemoteDataState} from 'src/types'
+import {executeQuery} from 'src/shared/apis/flux/query'
+import {parseResponse} from 'src/shared/parsing/flux/response'
 
 type TemplateName = string
 
@@ -21,8 +23,13 @@ interface TemplateNode {
 
 type TemplateGraph = TemplateNode[]
 
-interface TemplateQueryFetcher {
-  fetch: (query: string) => Promise<string[]>
+export interface TemplateQueryFetcher {
+  fetch: (
+    query: string,
+    source: Source,
+    flux: boolean,
+    warnFn?: (string) => void
+  ) => Promise<string[]>
 }
 
 interface Selections {
@@ -30,8 +37,13 @@ interface Selections {
 }
 
 export function getDependencyNames(template: Template): TemplateName[] {
-  if (template.query && template.query.influxql) {
-    return getDependencyNamesHelper(template.query.influxql)
+  if (template.query) {
+    if (template.query.influxql) {
+      return getDependencyNamesHelper(template.query.influxql)
+    }
+    if (template.query.flux) {
+      return getDependencyNamesHelper(template.query.flux)
+    }
   }
 
   const names = new Set<string>()
@@ -52,21 +64,29 @@ function getDependencyNamesHelper(s: string): TemplateName[] {
   let name = ''
 
   for (const c of s) {
-    if (!inName && c === ':') {
+    if (inName) {
+      if (c === ':') {
+        inName = false
+        name += ':'
+        names.push(name)
+        name = ''
+      } else if (c === '\n' || (c === ' ' && name.length === 1)) {
+        // names cannot start with space or contain a new line,
+        // this is especially required for flux, where ':'
+        // separates parameter names and record values
+        inName = false
+        continue
+      } else {
+        name += c
+      }
+    } else if (c === ':') {
       inName = true
       name = ':'
-    } else if (inName && c === ':') {
-      inName = false
-      name += ':'
-      names.push(name)
-      name = ''
-    } else if (inName && c !== ':') {
-      name += c
     }
   }
 
   if (inName) {
-    throw new Error(`malformed template variable string \`${s}\``)
+    throw new Error(`malformed template variable string \`${name}\``)
   }
 
   return names
@@ -174,31 +194,60 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
     this.cache = {}
   }
 
-  public setProxyUrl(proxyUrl: string): CachingTemplateQueryFetcher {
-    if (!proxyUrl) {
-      throw new Error('Must supply proxyUrl')
+  public async fetch(
+    query: string,
+    source: Source,
+    flux: boolean,
+    warnFn?: (string) => void
+  ): Promise<string[]> {
+    function warn(msg: string) {
+      if (warnFn) {
+        warnFn(msg)
+      } else {
+        console.warn(msg)
+      }
+    }
+    const proxyURL = flux ? source.links.flux : source.links.proxy
+    if (!proxyURL) {
+      warn('Flux endpoint is not available!')
+      return []
     }
 
-    this.proxyUrl = proxyUrl
-
-    if (!this.cache[proxyUrl]) {
-      this.cache[proxyUrl] = {}
+    if (!this.cache[proxyURL]) {
+      this.cache[proxyURL] = {}
     }
-
-    return this
-  }
-
-  public async fetch(query) {
-    const cached = this.cache[this.proxyUrl][query]
+    const cached = this.cache[proxyURL][query]
 
     if (cached) {
       return Promise.resolve([...cached])
     }
 
-    const response = await proxy({source: this.proxyUrl, query})
-    const values = parseMetaQuery(query, response.data)
+    let values: string[]
+    if (flux) {
+      const response = await executeQuery(source, query)
+      const tables = parseResponse(response.csv)
+      if (tables.length === 0) {
+        return []
+      }
+      if (tables.length > 1) {
+        warn('More tables are returned, but only the first is used!')
+      }
+      const data = tables[0].data
+      if (data.length > 1) {
+        const valueIndex = data[0].indexOf('_value')
+        if (valueIndex > 0) {
+          values = data.slice(1).map(arr => String(arr[valueIndex]))
+        } else {
+          warn('No _value column found!')
+          return []
+        }
+      }
+    } else {
+      const response = await proxy({source: this.proxyUrl, query})
+      values = parseMetaQuery(query, response.data)
+    }
 
-    this.cache[this.proxyUrl][query] = values
+    this.cache[proxyURL][query] = values
 
     return [...values]
   }
@@ -208,28 +257,35 @@ const defaultFetcher = new CachingTemplateQueryFetcher()
 
 interface HydrateTemplateOptions {
   selections?: Selections
-  proxyUrl?: string
+  source?: Source
   fetcher?: TemplateQueryFetcher
+  warnFn?: (warning: string) => void
 }
 
 export async function hydrateTemplate(
   template: Template,
   templates: Template[],
   {
-    proxyUrl,
-    fetcher = defaultFetcher.setProxyUrl(proxyUrl),
+    source,
+    fetcher = defaultFetcher,
     selections = {},
+    warnFn,
   }: HydrateTemplateOptions
 ): Promise<Template> {
   let newValues: string[]
 
-  if (template.query && template.query.influxql) {
+  if (template.query && (template.query.influxql || template.query.flux)) {
     const renderedQuery = templateReplace(
       templateInternalReplace(template),
       templates
     )
 
-    newValues = await fetcher.fetch(renderedQuery)
+    newValues = await fetcher.fetch(
+      renderedQuery,
+      source,
+      !!template.query.flux,
+      warnFn
+    )
   }
 
   const selection = selections[template.tempVar]
@@ -255,14 +311,12 @@ export async function hydrateTemplates(
 
     const templateSource = sources.find(s => s.id === initialTemplate.sourceID)
 
-    const proxyUrl = templateSource
-      ? templateSource.links.proxy
-      : hydrateOptions.proxyUrl
+    const source = templateSource ? templateSource : hydrateOptions.source
 
     node.hydratedTemplate = await hydrateTemplate(
       node.initialTemplate,
       resolvedTemplates,
-      {...hydrateOptions, proxyUrl}
+      {...hydrateOptions, source}
     )
 
     node.status = RemoteDataState.Done

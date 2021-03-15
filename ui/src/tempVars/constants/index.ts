@@ -42,8 +42,12 @@ export const TEMPLATE_TYPES_LIST: TemplateTypesListItem[] = [
     type: TemplateType.Map,
   },
   {
-    text: 'Custom Meta Query',
+    text: 'InfluxQL Meta Query',
     type: TemplateType.MetaQuery,
+  },
+  {
+    text: 'Flux Query',
+    type: TemplateType.FluxQuery,
   },
   {
     text: 'Text',
@@ -60,6 +64,7 @@ export const TEMPLATE_VARIABLE_TYPES = {
   [TemplateType.TagKeys]: TemplateValueType.TagKey,
   [TemplateType.TagValues]: TemplateValueType.TagValue,
   [TemplateType.MetaQuery]: TemplateValueType.MetaQuery,
+  [TemplateType.FluxQuery]: TemplateValueType.FluxQuery,
   [TemplateType.Text]: TemplateValueType.Constant,
 }
 
@@ -174,6 +179,18 @@ export const DEFAULT_TEMPLATES: DefaultTemplates = {
       label: '',
       query: {
         influxql: '',
+      },
+    }
+  },
+  [TemplateType.FluxQuery]: () => {
+    return {
+      id: uuid.v4(),
+      tempVar: ':my-flux-query:',
+      values: [],
+      type: TemplateType.FluxQuery,
+      label: '',
+      query: {
+        flux: '',
       },
     }
   },
