@@ -1,12 +1,14 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
-import {Subscribe} from 'unstated'
 
 // Utils
 import {getNewDashboardCell} from 'src/dashboards/utils/cellGetters'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 
 // Components
 import {
@@ -368,7 +370,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
 const ConnectedSendToDashboardOverlay = (props: PassedProps) => {
   return (
-    <Subscribe to={[TimeMachineContainer]}>
+    <TimeMachineContextConsumer>
       {(timeMachineContainer: TimeMachineContainer) => {
         const {
           type,
@@ -409,7 +411,7 @@ const ConnectedSendToDashboardOverlay = (props: PassedProps) => {
           />
         )
       }}
-    </Subscribe>
+    </TimeMachineContextConsumer>
   )
 }
 

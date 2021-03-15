@@ -1,6 +1,5 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import {Subscribe} from 'unstated'
 
 // Components
 import MeasurementList from 'src/flux/components/MeasurementList'
@@ -12,7 +11,10 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {OpenState} from 'src/flux/constants/explorer'
 
 // Utils
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 
 // Types
 import {Source, NotificationAction} from 'src/types'
@@ -150,7 +152,7 @@ class SchemaItemCategory extends PureComponent<
 
 const ConnectedSchemaItemCategory = (props: PassedProps) => {
   return (
-    <Subscribe to={[TimeMachineContainer]}>
+    <TimeMachineContextConsumer>
       {(container: TimeMachineContainer) => {
         return (
           <SchemaItemCategory
@@ -159,7 +161,7 @@ const ConnectedSchemaItemCategory = (props: PassedProps) => {
           />
         )
       }}
-    </Subscribe>
+    </TimeMachineContextConsumer>
   )
 }
 

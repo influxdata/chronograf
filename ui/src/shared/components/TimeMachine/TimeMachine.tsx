@@ -1,7 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
 import _ from 'lodash'
-import {Subscribe} from 'unstated'
 
 // Components
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
@@ -20,7 +19,10 @@ import {getConfig} from 'src/dashboards/utils/cellGetters'
 import {getDeep} from 'src/utils/wrappers'
 import {AutoRefresher} from 'src/utils/AutoRefresher'
 import buildQueries from 'src/utils/buildQueriesForGraphs'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 import {analyzeQueryFailed} from 'src/shared/copy/notifications'
 
 // Actions
@@ -561,7 +563,7 @@ class TimeMachine extends PureComponent<Props, State> {
 
 const ConnectedTimeMachine = (props: PassedProps & ManualRefreshProps) => {
   return (
-    <Subscribe to={[TimeMachineContainer]}>
+    <TimeMachineContextConsumer>
       {(container: TimeMachineContainer) => {
         const {state} = container
 
@@ -588,7 +590,7 @@ const ConnectedTimeMachine = (props: PassedProps & ManualRefreshProps) => {
           />
         )
       }}
-    </Subscribe>
+    </TimeMachineContextConsumer>
   )
 }
 

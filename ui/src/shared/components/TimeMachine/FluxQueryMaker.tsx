@@ -1,6 +1,5 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import {Subscribe} from 'unstated'
 import {Position} from 'codemirror'
 
 // Components
@@ -18,7 +17,10 @@ import {HANDLE_VERTICAL} from 'src/shared/constants'
 import {getAST} from 'src/shared/apis/flux/ast'
 import {restartable} from 'src/shared/utils/restartable'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 import {parseError} from 'src/flux/helpers/scriptBuilder'
 import {getSuggestions} from 'src/flux/helpers/suggestions'
 import {insertFluxFunction} from 'src/flux/helpers/scriptInsertion'
@@ -251,7 +253,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
 }
 
 const ConnectedFluxQueryMaker = (props: PassedProps) => (
-  <Subscribe to={[TimeMachineContainer]}>
+  <TimeMachineContextConsumer>
     {(container: TimeMachineContainer) => (
       <FluxQueryMaker
         {...props}
@@ -259,7 +261,7 @@ const ConnectedFluxQueryMaker = (props: PassedProps) => (
         onSetFluxProportions={container.handleSetFluxProportions}
       />
     )}
-  </Subscribe>
+  </TimeMachineContextConsumer>
 )
 
 export default ConnectedFluxQueryMaker
