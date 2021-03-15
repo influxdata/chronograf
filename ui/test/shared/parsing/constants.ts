@@ -29,29 +29,6 @@ export const config = {
           },
         ],
       },
-      hipchat: {
-        link: {
-          rel: 'self',
-          href: '/kapacitor/v1/config/hipchat',
-        },
-        elements: [
-          {
-            link: {
-              rel: 'self',
-              href: '/kapacitor/v1/config/hipchat/',
-            },
-            options: {
-              enabled: true,
-              global: false,
-              room: 'hipchat',
-              'state-changes-only': false,
-              token: true,
-              url: 'https://hipchat.hipchat.com/v2/room',
-            },
-            redacted: ['token'],
-          },
-        ],
-      },
       influxdb: {
         link: {
           rel: 'self',
@@ -401,13 +378,6 @@ export const configResponse = [
     token: true,
   },
   {
-    type: 'hipChat',
-    enabled: true,
-    url: 'https://hipchat.hipchat.com/v2/room',
-    room: 'hipchat',
-    token: true,
-  },
-  {
     type: 'opsGenie',
     enabled: true,
     'api-key': true,
@@ -494,29 +464,6 @@ export const emptyConfig = {
               origin: '',
               token: false,
               'token-prefix': '',
-              url: '',
-            },
-            redacted: ['token'],
-          },
-        ],
-      },
-      hipchat: {
-        link: {
-          rel: 'self',
-          href: '/kapacitor/v1/config/hipchat',
-        },
-        elements: [
-          {
-            link: {
-              rel: 'self',
-              href: '/kapacitor/v1/config/hipchat/',
-            },
-            options: {
-              enabled: false,
-              global: false,
-              room: '',
-              'state-changes-only': false,
-              token: false,
               url: '',
             },
             redacted: ['token'],
@@ -872,13 +819,6 @@ export const emptyConfigResponse = [
     token: false,
   },
   {
-    type: 'hipChat',
-    enabled: false,
-    url: '',
-    room: '',
-    token: false,
-  },
-  {
     type: 'opsGenie',
     enabled: false,
     'api-key': false,
@@ -963,13 +903,6 @@ export const handlersfromConfig = [
     enabled: true,
     environment: 'alerta',
     origin: 'alerta',
-    token: true,
-  },
-  {
-    type: 'hipChat',
-    enabled: true,
-    url: 'https://hipchat.hipchat.com/v2/room',
-    room: 'hipchat',
     token: true,
   },
   {
@@ -1122,13 +1055,6 @@ export const handlersOnThisAlertExpected = [
   },
   {
     enabled: true,
-    room: 'room',
-    token: '',
-    alias: 'hipChat-1',
-    type: 'hipChat',
-  },
-  {
-    enabled: true,
     token: '',
     resource: 'alerta',
     event: 'alerta',
@@ -1181,7 +1107,6 @@ export const handlersOfKindExpected = {
   sensu: 1,
   slack: 1,
   telegram: 1,
-  hipChat: 1,
   alerta: 1,
   opsGenie: 2,
   talk: 1,
@@ -1190,7 +1115,7 @@ export const handlersOfKindExpected = {
 export const rule = {
   id: 'chronograf-v1-8e3ba5df-f5ca-4cf4-848e-7e4a4acde86e',
   tickscript:
-    "var db = 'telegraf'\n\nvar rp = 'autogen'\n\nvar measurement = 'cpu'\n\nvar groupBy = []\n\nvar whereFilter = lambda: (\"host\" == 'denizs-MacBook-Pro.local')\n\nvar name = 'Untitled Rule'\n\nvar idVar = name + ':{{.Group}}'\n\nvar message = ''\n\nvar idTag = 'alertID'\n\nvar levelTag = 'level'\n\nvar messageField = 'message'\n\nvar durationField = 'duration'\n\nvar outputDB = 'chronograf'\n\nvar outputRP = 'autogen'\n\nvar outputMeasurement = 'alerts'\n\nvar triggerType = 'threshold'\n\nvar details = 'lkajsd;fl'\n\nvar crit = 30\n\nvar data = stream\n    |from()\n        .database(db)\n        .retentionPolicy(rp)\n        .measurement(measurement)\n        .groupBy(groupBy)\n        .where(whereFilter)\n    |eval(lambda: \"usage_system\")\n        .as('value')\n\nvar trigger = data\n    |alert()\n        .crit(lambda: \"value\" > crit)\n        .stateChangesOnly()\n        .message(message)\n        .id(idVar)\n        .idTag(idTag)\n        .levelTag(levelTag)\n        .messageField(messageField)\n        .durationField(durationField)\n        .details(details)\n        .post('http://example.com')\n        .header('key', 'val')\n        .tcp('exampleendpoint.com:8082')\n        .email()\n        .to('bob@domain.com')\n        .email()\n        .to('asdfsdf')\n        .exec('command', 'arg')\n        .log('/tmp/log')\n        .victorOps()\n        .routingKey('victoropsasdf')\n        .pagerDuty()\n        .pushover()\n        .device('asdf')\n        .title('asdf')\n        .sound('asdf')\n        .sensu()\n        .source('Kapacitor')\n        .handlers('asdf')\n        .slack()\n        .channel('slack')\n        .username('asdf')\n        .iconEmoji('asdf')\n        .telegram()\n        .chatId('telegram')\n        .parseMode('Markdown')\n        .hipChat()\n        .room('room')\n        .alerta()\n        .resource('alerta')\n        .event('alerta')\n        .environment('alerta')\n        .group('alerta')\n        .value('alerta')\n        .origin('alerta')\n        .services('alerta')\n        .opsGenie()\n        .teams('team')\n        .recipients('recip')\n        .opsGenie()\n        .teams('team')\n        .recipients('team')\n        .talk()\n\ntrigger\n    |eval(lambda: float(\"value\"))\n        .as('value')\n        .keep()\n    |influxDBOut()\n        .create()\n        .database(outputDB)\n        .retentionPolicy(outputRP)\n        .measurement(outputMeasurement)\n        .tag('alertName', name)\n        .tag('triggerType', triggerType)\n\ntrigger\n    |httpOut('output')\n",
+    "var db = 'telegraf'\n\nvar rp = 'autogen'\n\nvar measurement = 'cpu'\n\nvar groupBy = []\n\nvar whereFilter = lambda: (\"host\" == 'denizs-MacBook-Pro.local')\n\nvar name = 'Untitled Rule'\n\nvar idVar = name + ':{{.Group}}'\n\nvar message = ''\n\nvar idTag = 'alertID'\n\nvar levelTag = 'level'\n\nvar messageField = 'message'\n\nvar durationField = 'duration'\n\nvar outputDB = 'chronograf'\n\nvar outputRP = 'autogen'\n\nvar outputMeasurement = 'alerts'\n\nvar triggerType = 'threshold'\n\nvar details = 'lkajsd;fl'\n\nvar crit = 30\n\nvar data = stream\n    |from()\n        .database(db)\n        .retentionPolicy(rp)\n        .measurement(measurement)\n        .groupBy(groupBy)\n        .where(whereFilter)\n    |eval(lambda: \"usage_system\")\n        .as('value')\n\nvar trigger = data\n    |alert()\n        .crit(lambda: \"value\" > crit)\n        .stateChangesOnly()\n        .message(message)\n        .id(idVar)\n        .idTag(idTag)\n        .levelTag(levelTag)\n        .messageField(messageField)\n        .durationField(durationField)\n        .details(details)\n        .post('http://example.com')\n        .header('key', 'val')\n        .tcp('exampleendpoint.com:8082')\n        .email()\n        .to('bob@domain.com')\n        .email()\n        .to('asdfsdf')\n        .exec('command', 'arg')\n        .log('/tmp/log')\n        .victorOps()\n        .routingKey('victoropsasdf')\n        .pagerDuty()\n        .pushover()\n        .device('asdf')\n        .title('asdf')\n        .sound('asdf')\n        .sensu()\n        .source('Kapacitor')\n        .handlers('asdf')\n        .slack()\n        .channel('slack')\n        .username('asdf')\n        .iconEmoji('asdf')\n        .telegram()\n        .chatId('telegram')\n        .parseMode('Markdown')\n        .alerta()\n        .resource('alerta')\n        .event('alerta')\n        .environment('alerta')\n        .group('alerta')\n        .value('alerta')\n        .origin('alerta')\n        .services('alerta')\n        .opsGenie()\n        .teams('team')\n        .recipients('recip')\n        .opsGenie()\n        .teams('team')\n        .recipients('team')\n        .talk()\n\ntrigger\n    |eval(lambda: float(\"value\"))\n        .as('value')\n        .keep()\n    |influxDBOut()\n        .create()\n        .database(outputDB)\n        .retentionPolicy(outputRP)\n        .measurement(outputMeasurement)\n        .tag('alertName', name)\n        .tag('triggerType', triggerType)\n\ntrigger\n    |httpOut('output')\n",
   query: {
     id: 'chronograf-v1-8e3ba5df-f5ca-4cf4-848e-7e4a4acde86e',
     database: 'telegraf',
@@ -1292,12 +1217,6 @@ export const rule = {
         parseMode: 'Markdown',
         disableWebPagePreview: false,
         disableNotification: false,
-      },
-    ],
-    hipChat: [
-      {
-        room: 'room',
-        token: '',
       },
     ],
     alerta: [

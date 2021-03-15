@@ -93,7 +93,6 @@ alert tracking.
   to:
   * [Alerta](https://docs.influxdata.com/kapacitor/latest/nodes/alert_node/#alerta)
   * [Exec](https://docs.influxdata.com/kapacitor/latest/nodes/alert_node/#exec)
-  * [HipChat](https://docs.influxdata.com/kapacitor/latest/nodes/alert_node/#hipchat)
   * [HTTP/Post](https://docs.influxdata.com/kapacitor/latest/nodes/alert_node/#post)
   * [OpsGenie](https://docs.influxdata.com/kapacitor/latest/nodes/alert_node/#opsgenie)
   * [PagerDuty](https://docs.influxdata.com/kapacitor/latest/nodes/alert_node/#pagerduty)

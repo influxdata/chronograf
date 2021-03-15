@@ -129,7 +129,6 @@ func Test_KapacitorRulesGet(t *testing.T) {
 						Sensu:      []*chronograf.Sensu{},
 						Slack:      []*chronograf.Slack{},
 						Telegram:   []*chronograf.Telegram{},
-						HipChat:    []*chronograf.HipChat{},
 						Alerta:     []*chronograf.Alerta{},
 						OpsGenie:   []*chronograf.OpsGenie{},
 						OpsGenie2:  []*chronograf.OpsGenie{},

@@ -1,5 +1,4 @@
 import AlertaConfig from './AlertaConfig'
-import HipChatConfig from './HipChatConfig'
 import KafkaConfig from './KafkaConfig'
 import OpsGenieConfig from './OpsGenieConfig'
 import PagerDutyConfig from './PagerDutyConfig'
@@ -17,7 +16,6 @@ import ServiceNowConfig from './ServiceNowConfig'
 
 export {
   AlertaConfig,
-  HipChatConfig,
   KafkaConfig,
   OpsGenieConfig,
   PagerDutyConfig,

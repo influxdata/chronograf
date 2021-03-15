@@ -48,7 +48,7 @@ describe('Kapacitor.Components.TasksTable', () => {
 
     describe('checkbox', () => {
       it('has the correct htmlFor its label', () => {
-        const task = kapacitorRules[3]
+        const task = kapacitorRules[2]
         const tasks = [task]
         const {wrapper} = setup({tasks})
 
@@ -63,7 +63,7 @@ describe('Kapacitor.Components.TasksTable', () => {
 
   describe('user interaction', () => {
     it('calls onChangeRuleStatus when checkbox is effectively clicked', () => {
-      const task = kapacitorRules[3]
+      const task = kapacitorRules[2]
       const tasks = [task]
       const onChangeRuleStatus = jest.fn()
 
@@ -74,7 +74,7 @@ describe('Kapacitor.Components.TasksTable', () => {
       checkbox.simulate('change')
 
       expect(onChangeRuleStatus).toHaveBeenCalledTimes(1)
-      expect(onChangeRuleStatus).toHaveBeenCalledWith(kapacitorRules[3])
+      expect(onChangeRuleStatus).toHaveBeenCalledWith(kapacitorRules[2])
     })
   })
 })

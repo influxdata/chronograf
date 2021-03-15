@@ -459,10 +459,6 @@ func newAlertResponse(task *kapa.Task, srcID, kapaID int) *alertResponse {
 		}
 	}
 
-	if res.AlertNodes.HipChat == nil {
-		res.AlertNodes.HipChat = []*chronograf.HipChat{}
-	}
-
 	if res.AlertNodes.Kafka == nil {
 		res.AlertNodes.Kafka = []*chronograf.Kafka{}
 	}
