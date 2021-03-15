@@ -3,7 +3,6 @@ import 'babel-polyfill'
 import React, {PureComponent} from 'react'
 import {render} from 'react-dom'
 import {Provider as ReduxProvider} from 'react-redux'
-import {Provider as UnstatedProvider} from 'unstated'
 import {Router, Route, useRouterHistory} from 'react-router'
 import {createHistory, Pathname} from 'history'
 import {syncHistoryWithStore} from 'react-router-redux'
@@ -47,6 +46,7 @@ import {disablePresentationMode} from 'src/shared/actions/app'
 import {errorThrown} from 'src/shared/actions/errors'
 import {notify} from 'src/shared/actions/notifications'
 import {setHostPageDisplayStatus} from 'src/shared/actions/env'
+import {TimeMachineContextProvider} from 'src/shared/utils/TimeMachineContext'
 
 import {getEnv} from 'src/shared/apis/env'
 
@@ -147,7 +147,7 @@ class Root extends PureComponent<Record<string, never>, State> {
 
     return this.state.ready ? (
       <ReduxProvider store={store}>
-        <UnstatedProvider>
+        <TimeMachineContextProvider>
           <Router history={history}>
             <Route path="/" component={UserIsAuthenticated(CheckSources)} />
             <Route path="/login" component={UserIsNotAuthenticated(Login)} />
@@ -216,7 +216,7 @@ class Root extends PureComponent<Record<string, never>, State> {
             </Route>
             <Route path="*" component={NotFound} />
           </Router>
-        </UnstatedProvider>
+        </TimeMachineContextProvider>
       </ReduxProvider>
     ) : (
       <PageSpinner />
