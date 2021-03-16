@@ -25,6 +25,7 @@ import {
   getFieldName,
 } from 'src/shared/reducers/helpers/fields'
 import {ErrorHandling} from 'src/shared/decorators/errors'
+import QueryBuilderFilter from './QueryBuilderFilter'
 
 interface GroupByOption extends GroupBy {
   menuOption: string
@@ -56,6 +57,7 @@ interface Props {
 }
 
 interface State {
+  filterText: string
   fields: Field[]
 }
 
@@ -69,6 +71,7 @@ class FieldList extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
     this.state = {
+      filterText: '',
       fields: [],
     }
   }
@@ -132,7 +135,13 @@ class FieldList extends PureComponent<Props, State> {
               onGroupByTime={this.handleGroupByTime}
               isDisabled={isDisabled}
             />
-          ) : null}
+          ) : (
+            <QueryBuilderFilter
+              filterText={this.state.filterText}
+              onEscape={this.handleEscapeFilter}
+              onFilterText={this.handleFilterText}
+            ></QueryBuilderFilter>
+          )}
         </div>
         {noDBorMeas ? (
           <div className="query-builder--list-empty">
@@ -142,40 +151,83 @@ class FieldList extends PureComponent<Props, State> {
           </div>
         ) : (
           <div className="query-builder--list">
-            <FancyScrollbar>
-              {this.state.fields.map((fieldFunc, i) => {
-                const selectedFields = getFieldsWithName(
-                  fieldFunc.value,
-                  fields
-                )
-                const fieldName = getFieldName(fieldFunc)
-                const funcs: FieldFunc[] = getFuncsByFieldName(
-                  fieldFunc.value,
-                  fields
-                )
-                const fieldFuncs = selectedFields.length
-                  ? selectedFields
-                  : [fieldFunc]
+            <div>
+              <FancyScrollbar>
+                {this.state.fields.map((fieldFunc, i) => {
+                  const selectedFields = getFieldsWithName(
+                    fieldFunc.value,
+                    fields
+                  )
+                  const fieldName = getFieldName(fieldFunc)
+                  if (
+                    this.state.filterText &&
+                    !selectedFields.length &&
+                    !fieldName
+                      .toLowerCase()
+                      .includes(this.state.filterText.toLowerCase())
+                  ) {
+                    // do not render the item unless it is selected or matches filter
+                    return
+                  }
 
-                return (
-                  <FieldListItem
-                    key={i}
-                    onToggleField={this.handleToggleField}
-                    onApplyFuncsToField={this.handleApplyFuncs}
-                    isSelected={!!selectedFields.length}
-                    fieldName={fieldName}
-                    fieldFuncs={fieldFuncs}
-                    funcs={functionNames(funcs)}
-                    isKapacitorRule={isKapacitorRule}
-                    isDisabled={isDisabled}
-                  />
-                )
-              })}
-            </FancyScrollbar>
+                  const funcs: FieldFunc[] = getFuncsByFieldName(
+                    fieldFunc.value,
+                    fields
+                  )
+                  const fieldFuncs = selectedFields.length
+                    ? selectedFields
+                    : [fieldFunc]
+
+                  return (
+                    <FieldListItem
+                      key={i}
+                      onToggleField={this.handleToggleField}
+                      onApplyFuncsToField={this.handleApplyFuncs}
+                      isSelected={!!selectedFields.length}
+                      fieldName={fieldName}
+                      fieldFuncs={fieldFuncs}
+                      funcs={functionNames(funcs)}
+                      isKapacitorRule={isKapacitorRule}
+                      isDisabled={isDisabled}
+                    />
+                  )
+                })}
+              </FancyScrollbar>
+            </div>
           </div>
         )}
+        {hasAggregates ? (
+          <div
+            className="query-builder--heading"
+            style={{backgroundColor: 'transparent'}}
+          >
+            <QueryBuilderFilter
+              filterText={this.state.filterText}
+              onEscape={this.handleEscapeFilter}
+              onFilterText={this.handleFilterText}
+            ></QueryBuilderFilter>
+          </div>
+        ) : undefined}
       </div>
     )
+  }
+
+  private handleFilterText = (e: React.FormEvent<HTMLInputElement>) => {
+    e.stopPropagation()
+    const filterText = e.currentTarget.value
+    this.setState({
+      filterText,
+    })
+  }
+  private handleEscapeFilter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Escape') {
+      return
+    }
+
+    e.stopPropagation()
+    this.setState({
+      filterText: '',
+    })
   }
 
   private handleGroupByTime = (groupBy: GroupByOption): void => {
