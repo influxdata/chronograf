@@ -9,7 +9,7 @@ import showMeasurementsParser from 'src/shared/parsing/showMeasurements'
 import {QueryConfig, Source, Tag} from 'src/types'
 
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
-import MeasurementListFilter from 'src/shared/components/MeasurementListFilter'
+import QueryBuilderFilter from 'src/shared/components/QueryBuilderFilter'
 import MeasurementListItem from 'src/shared/components/MeasurementListItem'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -136,7 +136,7 @@ class MeasurementList extends PureComponent<Props, State> {
         <div className="query-builder--heading">
           <span>Measurements & Tags</span>
           {database && (
-            <MeasurementListFilter
+            <QueryBuilderFilter
               onEscape={this.handleEscape}
               onFilterText={this.handleFilterText}
               filterText={this.state.filterText}

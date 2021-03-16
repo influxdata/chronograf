@@ -6,7 +6,7 @@ interface Props {
   onFilterText: (e: React.InputHTMLAttributes<HTMLInputElement>) => void
 }
 
-const MeasurementListFilter: FunctionComponent<Props> = ({
+const QueryBuilderFilter: FunctionComponent<Props> = ({
   onEscape,
   onFilterText,
   filterText,
@@ -26,4 +26,4 @@ const MeasurementListFilter: FunctionComponent<Props> = ({
   </div>
 )
 
-export default MeasurementListFilter
+export default QueryBuilderFilter

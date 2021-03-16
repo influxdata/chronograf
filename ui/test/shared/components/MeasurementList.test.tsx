@@ -1,7 +1,7 @@
 import {shallow} from 'enzyme'
 import React from 'react'
 import MeasurementList from 'src/shared/components/MeasurementList'
-import MeasurementListFilter from 'src/shared/components/MeasurementListFilter'
+import QueryBuilderFilter from 'src/shared/components/QueryBuilderFilter'
 import MeasurementListItem from 'src/shared/components/MeasurementListItem'
 import {query, source} from 'test/resources'
 
@@ -55,7 +55,7 @@ describe('Shared.Components.MeasurementList', () => {
 
       it('renders <MeasurementListFilter/> to the page', () => {
         const {wrapper} = setup()
-        const filter = wrapper.find(MeasurementListFilter)
+        const filter = wrapper.find(QueryBuilderFilter)
 
         expect(filter.exists()).toBe(true)
       })
@@ -69,7 +69,7 @@ describe('Shared.Components.MeasurementList', () => {
       const event = {target: {value: 'f'}, stopPropagation: () => {}}
       wrapper.setState({filtered: measurements, measurements})
 
-      const filter = wrapper.find(MeasurementListFilter)
+      const filter = wrapper.find(QueryBuilderFilter)
       const input = filter.dive().find('input')
       input.simulate('change', event)
       wrapper.update()
