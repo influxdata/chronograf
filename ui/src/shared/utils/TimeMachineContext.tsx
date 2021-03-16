@@ -20,10 +20,13 @@ export const TimeMachineContextConsumer = ({children}: Props) => {
   }
   return children(container)
 }
+
 export const TimeMachineContextProvider: React.FC = ({children}) => {
   const [state, setState] = useState(container.state)
   container.state = state
-  container.setState = setState as (s: Partial<TimeMachineState>) => void
+  container.setState = function (s: Partial<TimeMachineState>) {
+    setState((previous: TimeMachineState) => ({...previous, ...s}))
+  }
   return (
     <TimeMachineContext.Provider value={state}>
       {children}
