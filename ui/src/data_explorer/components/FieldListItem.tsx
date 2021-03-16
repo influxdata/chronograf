@@ -1,6 +1,5 @@
 import React, {PureComponent, MouseEvent} from 'react'
 import classnames from 'classnames'
-import _ from 'lodash'
 
 import FunctionSelector from 'src/shared/components/FunctionSelector'
 import {ErrorHandling} from 'src/shared/decorators/errors'
