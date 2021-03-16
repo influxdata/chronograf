@@ -3,12 +3,12 @@ import classnames from 'classnames'
 import _ from 'lodash'
 
 import FunctionSelector from 'src/shared/components/FunctionSelector'
-import {firstFieldName} from 'src/shared/reducers/helpers/fields'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {ApplyFuncsToFieldArgs, Field, FieldFunc, FuncArg} from 'src/types'
 
 interface Props {
+  fieldName: string
   fieldFuncs: FieldFunc[]
   isSelected: boolean
   onToggleField: (field: Field) => void
@@ -32,9 +32,14 @@ class FieldListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {isKapacitorRule, isSelected, funcs, isDisabled} = this.props
+    const {
+      isKapacitorRule,
+      isSelected,
+      fieldName,
+      funcs,
+      isDisabled,
+    } = this.props
     const {isOpen} = this.state
-    const fieldName = this.getFieldName()
 
     let fieldFuncsLabel
     const num = funcs.length
@@ -104,16 +109,14 @@ class FieldListItem extends PureComponent<Props, State> {
   }
 
   private handleToggleField = (): void => {
-    const {onToggleField} = this.props
-    const value = this.getFieldName()
+    const {onToggleField, fieldName} = this.props
 
-    onToggleField({value, type: 'field'})
+    onToggleField({value: fieldName, type: 'field'})
     this.close()
   }
 
   private handleApplyFunctions = (selectedFuncs: string[]) => {
-    const {onApplyFuncsToField} = this.props
-    const fieldName = this.getFieldName()
+    const {onApplyFuncsToField, fieldName} = this.props
     const field: Field = {value: fieldName, type: 'field'}
 
     onApplyFuncsToField({
@@ -127,15 +130,6 @@ class FieldListItem extends PureComponent<Props, State> {
     value,
     type: 'func',
   })
-
-  private getFieldName = (): string => {
-    const {fieldFuncs} = this.props
-    const fieldFunc = _.head(fieldFuncs)
-
-    return _.get(fieldFunc, 'type') === 'field'
-      ? _.get(fieldFunc, 'value')
-      : firstFieldName(_.get(fieldFunc, 'args'))
-  }
 }
 
 export default FieldListItem
