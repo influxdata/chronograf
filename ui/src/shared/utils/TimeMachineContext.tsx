@@ -21,11 +21,18 @@ export const TimeMachineContextConsumer = ({children}: Props) => {
   return children(container)
 }
 
+// optimization only
+let lastSetState: unknown
+
 export const TimeMachineContextProvider: React.FC = ({children}) => {
   const [state, setState] = useState(container.state)
   container.state = state
-  container.setState = function (s: Partial<TimeMachineState>) {
-    setState((previous: TimeMachineState) => ({...previous, ...s}))
+  if (setState !== lastSetState) {
+    // setState is stable in React, so this should be executed at most once
+    container.setState = function (s: Partial<TimeMachineState>) {
+      setState((previous: TimeMachineState) => ({...previous, ...s}))
+    }
+    lastSetState = setState
   }
   return (
     <TimeMachineContext.Provider value={state}>
