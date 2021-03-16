@@ -129,7 +129,7 @@ class AlertTabs extends PureComponent<Props, State> {
     }
   }
 
-  public componentWillReceiveProps(nextProps) {
+  public UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.kapacitor.url !== nextProps.kapacitor.url) {
       this.refreshKapacitorConfig(nextProps.kapacitor)
     }

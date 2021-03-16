@@ -1,7 +1,6 @@
 // Libraries
 import React, {FunctionComponent} from 'react'
 import _ from 'lodash'
-import {Subscribe} from 'unstated'
 
 // Components
 import EmptyQuery from 'src/shared/components/EmptyQuery'
@@ -11,7 +10,10 @@ import SchemaExplorer from 'src/shared/components/SchemaExplorer'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 
 // Utils
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 import {buildQuery} from 'src/utils/influxql'
 import {TYPE_QUERY_CONFIG} from 'src/dashboards/constants'
 import {AUTO_GROUP_BY} from 'src/shared/constants'
@@ -135,7 +137,7 @@ const QueryMaker: FunctionComponent<Props> = ({
 }
 
 const ConnectedQueryMaker = (props: PassedProps) => (
-  <Subscribe to={[TimeMachineContainer]}>
+  <TimeMachineContextConsumer>
     {(container: TimeMachineContainer) => (
       <QueryMaker
         {...props}
@@ -154,7 +156,7 @@ const ConnectedQueryMaker = (props: PassedProps) => (
         onToggleTagAcceptance={container.handleToggleTagAcceptance}
       />
     )}
-  </Subscribe>
+  </TimeMachineContextConsumer>
 )
 
 export default ConnectedQueryMaker

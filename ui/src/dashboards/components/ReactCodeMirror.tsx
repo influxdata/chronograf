@@ -2,7 +2,8 @@
 import React, {PureComponent} from 'react'
 import classnames from 'classnames'
 import _ from 'lodash'
-import {Controlled, IInstance as CMEditor} from 'react-codemirror2'
+import {Controlled} from 'react-codemirror2'
+import {Editor as CMEditor} from 'codemirror'
 
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {createMarkerElement} from 'src/dashboards/utils/influxQLEditor'
@@ -50,6 +51,7 @@ const CODE_MIRROR_OPTIONS: CodeMirror.EditorConfiguration = {
   lineNumbers: false,
   theme: 'influxql',
   lineWrapping: true,
+  autofocus: true,
 }
 
 interface EditorToken {
@@ -82,7 +84,6 @@ class ReactCodeMirror extends PureComponent<Props, State> {
     return (
       <div className={this.queryCodeClassName}>
         <Controlled
-          autoFocus={true}
           autoCursor={true}
           options={this.options}
           onTouchStart={NOOP}
@@ -145,7 +146,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
     )
 
     if (this.editor) {
-      this.editor.setSelection(selection.end, selection.start)
+      this.editor.getDoc().setSelection(selection.end, selection.start)
     }
   }
 
@@ -298,7 +299,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
 
         const replacedWith: HTMLElement = createMarkerElement(tempVar, value)
 
-        return this.editor.markText(start, end, {replacedWith})
+        return this.editor.getDoc().markText(start, end, {replacedWith})
       }
     })
 
@@ -323,7 +324,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
         durationValue
       )
 
-      return this.editor.markText(start, end, {replacedWith})
+      return this.editor.getDoc().markText(start, end, {replacedWith})
     })
   }
 
@@ -347,7 +348,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
       return
     }
 
-    const lineCount = this.editor.lineCount()
+    const lineCount = this.editor.getDoc().lineCount()
     return _.times(lineCount, line => {
       const tokens = this.editor.getLineTokens(line)
 
@@ -368,7 +369,7 @@ class ReactCodeMirror extends PureComponent<Props, State> {
   ): Selection {
     // unicode safe template start index lookup
     const startIndex = Array.from(maskedText).indexOf(':')
-    const position = this.editor.posFromIndex(startIndex)
+    const position = this.editor.getDoc().posFromIndex(startIndex)
     const enterModifier = replaceWholeTemplate ? 1 : 0
 
     const charStart = 1 + startIndex

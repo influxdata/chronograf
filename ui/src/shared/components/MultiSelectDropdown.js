@@ -40,7 +40,7 @@ class MultiSelectDropdown extends Component {
     this.setState({isOpen: false})
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (
       !this.props.resetStateOnReceiveProps ||
       !_.isEqual(this.props.selectedItems, nextProps.selectedItems)

@@ -311,4 +311,4 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(null, mdtp, null, {withRef: true})(DashboardStep)
+export default connect(null, mdtp, null, {forwardRef: true})(DashboardStep)

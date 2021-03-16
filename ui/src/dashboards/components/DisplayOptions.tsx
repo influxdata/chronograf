@@ -1,7 +1,6 @@
 // Libraries
 import React, {Component} from 'react'
 import _ from 'lodash'
-import {Subscribe} from 'unstated'
 
 // Components
 import GraphTypeSelector from 'src/dashboards/components/GraphTypeSelector'
@@ -14,7 +13,10 @@ import CellNoteEditor from 'src/shared/components/TimeMachine/CellNoteEditor'
 import Threesizer from 'src/shared/components/threesizer/Threesizer'
 
 // Utils
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 
 // Constants
 import {HANDLE_VERTICAL} from 'src/shared/constants'
@@ -270,7 +272,7 @@ const ConnectedDisplayOptions = (props: PassedProps) => {
   // TODO: Have individual display option components subscribe directly to
   // relevant props, rather than passing them through here
   return (
-    <Subscribe to={[TimeMachineContainer]}>
+    <TimeMachineContextConsumer>
       {(timeMachineContainer: TimeMachineContainer) => (
         <DisplayOptions
           {...props}
@@ -306,7 +308,7 @@ const ConnectedDisplayOptions = (props: PassedProps) => {
           onUpdateLineColors={timeMachineContainer.handleUpdateLineColors}
         />
       )}
-    </Subscribe>
+    </TimeMachineContextConsumer>
   )
 }
 

@@ -82,9 +82,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             nextLabel="Get Started"
             isSkippableStep={false}
           >
-            <WelcomeStep
-              ref={c => (this.welcomeStepRef = c && c.getWrappedInstance())}
-            />
+            <WelcomeStep ref={c => (this.welcomeStepRef = c)} />
           </WizardStep>
           <WizardStep
             title="InfluxDB Connection"
@@ -98,7 +96,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             onPrevious={this.handleKapacitorPrev}
           >
             <SourceStep
-              ref={c => (this.sourceStepRef = c && c.getWrappedInstance())}
+              ref={c => (this.sourceStepRef = c)}
               setError={this.handleSetSourceError}
               source={source}
               onBoarding={true}
@@ -119,7 +117,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
               source={source}
               countSelected={this.countSelected}
               dashboardsCreated={dashboardsCreated}
-              ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
+              ref={c => (this.dashboardStepRef = c)}
             />
           </WizardStep>
           <WizardStep
@@ -133,7 +131,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             previousLabel="Go Back"
           >
             <KapacitorStep
-              ref={c => (this.kapacitorStepRef = c && c.getWrappedInstance())}
+              ref={c => (this.kapacitorStepRef = c)}
               setError={this.handleSetKapacitorError}
               source={source}
               onBoarding={true}
@@ -150,9 +148,7 @@ class OnboardingWizard extends PureComponent<Props, State> {
             nextLabel="View All Connections"
             previousLabel="Go Back"
           >
-            <CompletionStep
-              ref={c => (this.completionStepRef = c && c.getWrappedInstance())}
-            />
+            <CompletionStep ref={c => (this.completionStepRef = c)} />
           </WizardStep>
         </WizardFullScreen>
       </>

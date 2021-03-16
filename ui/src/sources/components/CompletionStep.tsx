@@ -37,4 +37,4 @@ const mdtp = {
   notify: notifyAction,
 }
 
-export default connect(null, mdtp, null, {withRef: true})(CompletionStep)
+export default connect(null, mdtp, null, {forwardRef: true})(CompletionStep)

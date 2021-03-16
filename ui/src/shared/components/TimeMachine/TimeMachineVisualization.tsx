@@ -1,9 +1,11 @@
 import React, {FunctionComponent} from 'react'
-import {Subscribe} from 'unstated'
 
 import RefreshingGraph from 'src/shared/components/RefreshingGraph'
 
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 import {getCellTypeColors} from 'src/dashboards/constants/cellEditor'
 
 import {
@@ -105,7 +107,7 @@ const TimeMachineVisualization: FunctionComponent<Props> = props => {
 }
 
 const ConnectedTimeMachineVisualization = (props: PassedProps) => (
-  <Subscribe to={[TimeMachineContainer]}>
+  <TimeMachineContextConsumer>
     {(container: TimeMachineContainer) => {
       const {state} = container
 
@@ -131,7 +133,7 @@ const ConnectedTimeMachineVisualization = (props: PassedProps) => (
         />
       )
     }}
-  </Subscribe>
+  </TimeMachineContextConsumer>
 )
 
 export default ConnectedTimeMachineVisualization

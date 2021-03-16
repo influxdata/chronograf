@@ -1,6 +1,5 @@
 // Libraries
 import React, {PureComponent} from 'react'
-import {Subscribe} from 'unstated'
 
 // Components
 import TransformToolbarFunctions from 'src/flux/components/flux_functions_toolbar/TransformToolbarFunctions'
@@ -12,7 +11,10 @@ import FancyScrollbar from 'src/shared/components/FancyScrollbar'
 import {FUNCTIONS} from 'src/flux/constants/functions'
 
 // Utils
-import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
+import {
+  TimeMachineContainer,
+  TimeMachineContextConsumer,
+} from 'src/shared/utils/TimeMachineContext'
 
 // Decorators
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -82,7 +84,7 @@ class FluxFunctionsToolbar extends PureComponent<Props, State> {
 }
 
 const ConnectedFluxFunctionsToolbar = (props: PassedProps) => (
-  <Subscribe to={[TimeMachineContainer]}>
+  <TimeMachineContextConsumer>
     {(container: TimeMachineContainer) => (
       <FluxFunctionsToolbar
         {...props}
@@ -90,7 +92,7 @@ const ConnectedFluxFunctionsToolbar = (props: PassedProps) => (
         onUpdateScript={container.handleUpdateDraftScript}
       />
     )}
-  </Subscribe>
+  </TimeMachineContextConsumer>
 )
 
 export default ConnectedFluxFunctionsToolbar

@@ -1,5 +1,4 @@
 // Libraries
-import {Container} from 'unstated'
 import _ from 'lodash'
 
 // Utils
@@ -117,8 +116,11 @@ export interface TimeMachineState {
   timeMachineProportions: number[]
 }
 
-export class TimeMachineContainer extends Container<TimeMachineState> {
+export class TimeMachineContainer {
   public state: TimeMachineState = DEFAULT_STATE()
+  public setState(state: Partial<TimeMachineState>) {
+    this.state = {...this.state, ...state}
+  }
 
   private debouncer: Debouncer = new DefaultDebouncer()
   private localStorageKey?: TMLocalStorageKey
@@ -414,7 +416,8 @@ export class TimeMachineContainer extends Container<TimeMachineState> {
       this.debouncer.call(this.setLocalStorageState, LOCAL_STORAGE_DELAY_MS)
     }
 
-    return this.setState(state)
+    this.setState(state)
+    return Promise.resolve()
   }
 
   private setLocalStorageState = () => {

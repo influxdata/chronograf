@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {withRouter, InjectedRouter} from 'react-router'
+import {withRouter, InjectedRouter, WithRouterProps} from 'react-router'
 import {connect} from 'react-redux'
 import download from 'src/external/download'
 import _ from 'lodash'
@@ -35,7 +35,7 @@ import {Source, Dashboard, RemoteDataState} from 'src/types'
 import {Notification} from 'src/types/notifications'
 import {DashboardFile, Cell} from 'src/types/dashboards'
 
-export interface Props {
+export interface Props extends WithRouterProps {
   source: Source
   sources: Source[]
   router: InjectedRouter
@@ -203,6 +203,7 @@ const mapDispatchToProps = {
   retainDashRefresh: retainDashRefreshAction,
 }
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(DashboardsPage)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(DashboardsPage))

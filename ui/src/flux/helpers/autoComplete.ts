@@ -1,4 +1,4 @@
-import {IInstance} from 'react-codemirror2'
+import {Editor as CMEditor} from 'codemirror'
 
 import {Suggestion} from 'src/types/flux'
 import {Hints} from 'src/types/codemirror'
@@ -65,12 +65,12 @@ export const EXCLUDED_KEYS = new Set([
 ])
 
 export const getSuggestions = (
-  editor: IInstance,
+  editor: CMEditor,
   allSuggestions: Suggestion[]
 ): Hints => {
-  const cursor = editor.getCursor()
+  const cursor = editor.getDoc().getCursor()
   const currentLineNumber = cursor.line
-  const currentLineText = editor.getLine(cursor.line)
+  const currentLineText = editor.getDoc().getLine(cursor.line)
   const cursorPosition = cursor.ch
 
   const {start, end, suggestions} = getSuggestionsHelper(

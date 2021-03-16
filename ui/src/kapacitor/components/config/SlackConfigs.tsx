@@ -43,7 +43,7 @@ class SlackConfigs extends PureComponent<Props, State> {
     }
   }
 
-  public componentWillReceiveProps(nextProps) {
+  public UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({configs: nextProps.configs})
   }
 

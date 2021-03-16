@@ -19,6 +19,12 @@ const proxyMiddleware = proxy('/chronograf/v1', {
   changeOrigin: true,
   onError: handleProxyError,
 })
+const proxyMiddlewareOAuth = proxy('/oauth', {
+  target: 'http://localhost:8888',
+  logLevel: 'silent',
+  changeOrigin: true,
+  onError: handleProxyError,
+})
 
 const bundler = new Bundler('src/index.html', {outDir: './build/'})
 const port = Number(process.env.PORT || 8080)
@@ -27,5 +33,6 @@ const app = express()
 console.log(`Serving on http://localhost:${port}`)
 
 app.use(proxyMiddleware)
+app.use(proxyMiddlewareOAuth)
 app.use(bundler.middleware())
 app.listen(port)

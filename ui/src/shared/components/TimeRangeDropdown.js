@@ -187,4 +187,4 @@ TimeRangeDropdown.propTypes = {
 const mstp = state => ({
   timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
 })
-export default OnClickOutside(ErrorHandling(connect(mstp)(TimeRangeDropdown)))
+export default connect(mstp)(OnClickOutside(ErrorHandling(TimeRangeDropdown)))

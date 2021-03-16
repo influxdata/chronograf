@@ -95,7 +95,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           previousLabel="Cancel"
         >
           <SourceStep
-            ref={c => (this.sourceStepRef = c && c.getWrappedInstance())}
+            ref={c => (this.sourceStepRef = c)}
             setError={this.handleSetSourceError}
             source={source}
           />
@@ -111,7 +111,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           previousLabel="Go Back"
         >
           <DashboardStep
-            ref={c => (this.dashboardStepRef = c && c.getWrappedInstance())}
+            ref={c => (this.dashboardStepRef = c)}
             source={source}
             dashboardsCreated={dashboardsCreated}
             countSelected={this.countSelected}
@@ -129,7 +129,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           previousLabel="Go Back"
         >
           <KapacitorStep
-            ref={c => (this.kapacitorStepRef = c && c.getWrappedInstance())}
+            ref={c => (this.kapacitorStepRef = c)}
             source={source}
             setError={this.handleSetKapacitorError}
             kapacitor={kapacitor}
@@ -148,9 +148,7 @@ class ConnectionWizard extends PureComponent<Props & WithRouterProps, State> {
           nextLabel="Finish"
           previousLabel="Go Back"
         >
-          <CompletionStep
-            ref={c => (this.completionStepRef = c && c.getWrappedInstance())}
-          />
+          <CompletionStep ref={c => (this.completionStepRef = c)} />
         </WizardStep>
       </WizardOverlay>
     )

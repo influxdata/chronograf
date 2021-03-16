@@ -86,7 +86,7 @@ class InfiniteScroll extends Component {
     window.removeEventListener('resize', this.handleResize, true)
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
+  UNSAFE_componentWillReceiveProps(nextProps, nextState) {
     // Updates values if new items are added
     this.windowing(nextProps, nextState)
   }

@@ -30,7 +30,7 @@ class SearchBar extends PureComponent<Props, State> {
     }
   }
 
-  public componentWillMount() {
+  public UNSAFE_componentWillMount() {
     this.debouncedHandleSearch = _.debounce(this.handleSearch, 50)
   }
 

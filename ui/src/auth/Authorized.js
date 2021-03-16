@@ -36,7 +36,7 @@ export const isUserAuthorized = (meRole, requiredRole) => {
 }
 
 class Authorized extends Component {
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     const {router, me} = this.props
 
     if (me === null) {

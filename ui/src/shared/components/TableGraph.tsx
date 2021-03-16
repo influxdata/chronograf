@@ -212,7 +212,7 @@ class TableGraph extends PureComponent<Props, State> {
     )
   }
 
-  public async componentWillReceiveProps(nextProps: Props) {
+  public async UNSAFE_componentWillReceiveProps(nextProps: Props) {
     const {dataType} = nextProps
 
     const defaultTimeField = getDefaultTimeField(dataType)

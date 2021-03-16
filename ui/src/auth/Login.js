@@ -5,10 +5,11 @@ import Notifications from 'shared/components/Notifications'
 
 import PageSpinner from 'src/shared/components/PageSpinner'
 import SplashPage from 'shared/components/SplashPage'
+import {connect} from 'react-redux'
 
 const VERSION = process.env.npm_package_version
 
-const Login = ({authData: {auth}}) => {
+const Login = ({auth}) => {
   if (
     Array.isArray(auth.links) &&
     auth.links.length === 1 &&
@@ -41,17 +42,15 @@ const Login = ({authData: {auth}}) => {
   )
 }
 
-const {array, bool, shape, string} = PropTypes
+const {array, bool, shape} = PropTypes
 
 Login.propTypes = {
-  authData: shape({
+  auth: shape({
     me: shape(),
     links: array,
     isLoading: bool,
   }),
-  location: shape({
-    pathname: string,
-  }),
 }
 
-export default Login
+const mapStateToProps = ({auth}) => ({auth})
+export default connect(mapStateToProps, null)(Login)

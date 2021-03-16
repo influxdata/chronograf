@@ -49,7 +49,7 @@ class CustomTimeRange extends Component {
     this.upperCal.show()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {lower, upper} = nextProps.timeRange
     if (lower) {
       const momentVal = this._toMoment(lower)
@@ -273,4 +273,4 @@ CustomTimeRange.propTypes = {
 const mstp = state => ({
   timeZone: _.get(state, ['app', 'persisted', 'timeZone']),
 })
-export default ErrorHandling(connect(mstp)(CustomTimeRange))
+export default connect(mstp)(ErrorHandling(CustomTimeRange))

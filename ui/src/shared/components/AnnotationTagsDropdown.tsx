@@ -74,4 +74,4 @@ const mdtp = {
   onUpdateTagFilterAsync: updateTagFilterAsync,
 }
 
-export default withRouter(connect(mstp, mdtp)(AnnotationTagsDropdown))
+export default connect(mstp, mdtp)(withRouter(AnnotationTagsDropdown))

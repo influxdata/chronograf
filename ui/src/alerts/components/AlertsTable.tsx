@@ -64,7 +64,7 @@ class AlertsTable extends PureComponent<Props, State> {
     }
   }
 
-  public componentWillReceiveProps(newProps) {
+  public UNSAFE_componentWillReceiveProps(newProps) {
     this.filterAlerts(this.state.searchTerm, newProps.alerts)
   }
 
