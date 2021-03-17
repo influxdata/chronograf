@@ -20,6 +20,7 @@
 1. [#5688](https://github.com/influxdata/chronograf/pull/5688): Add UI variables to flux query execution.
 1. [#5697](https://github.com/influxdata/chronograf/pull/5697): Allow to define dashboard variables using flux.
 1. [#5700](https://github.com/influxdata/chronograf/pull/5700): Remove HipChat alerts.
+1. [#5704](https://github.com/influxdata/chronograf/pull/5704): Allow to filter fields in Query Builder UI.
 
 ### Other
 
