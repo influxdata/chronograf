@@ -9,3 +9,6 @@ log/
 yarn-error.log
 .cache/
 build/
+cypress/screenshots
+cypress/videos
+/cypress-jsunit-results.xml
