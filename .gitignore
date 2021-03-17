@@ -4,6 +4,7 @@ build/
 backup/
 vendor/
 .vscode/
+.idea/
 node_modules/
 
 # Binaries
