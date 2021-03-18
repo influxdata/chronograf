@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -20,9 +21,18 @@ import (
 // Shared transports for all clients to prevent leaking connections
 var (
 	skipVerifyTransport = &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	defaultTransport = &http.Transport{}
+	defaultTransport = &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+	}
 )
 
 type client interface {
