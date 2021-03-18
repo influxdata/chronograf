@@ -474,7 +474,6 @@ func (m *MetaClient) Post(ctx context.Context, path string, action interface{}, 
 }
 
 type defaultClient struct {
-	Leader             string
 	InsecureSkipVerify bool
 }
 
@@ -487,11 +486,6 @@ func (d *defaultClient) Do(URL *url.URL, path, method string, authorizer influx.
 
 	URL.Path = path
 	URL.RawQuery = p.Encode()
-	if d.Leader == "" {
-		d.Leader = URL.Host
-	} else if d.Leader != URL.Host {
-		URL.Host = d.Leader
-	}
 
 	req, err := http.NewRequest(method, URL.String(), body)
 	if err != nil {
@@ -552,7 +546,6 @@ func (d *defaultClient) AuthedCheckRedirect(req *http.Request, via []*http.Reque
 	if auth, ok := via[0].Header[preserve]; ok {
 		req.Header[preserve] = auth
 	}
-	d.Leader = req.URL.Host
 	return nil
 }
 
