@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -71,13 +70,6 @@ func sourceAuthenticationMethod(ctx context.Context, src chronograf.Source) auth
 		return authenticationResponse{ID: src.ID, AuthenticationMethod: "unknown"}
 	}
 }
-
-var (
-	skipVerifyTransport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	defaultTransport = &http.Transport{}
-)
 
 func hasFlux(ctx context.Context, src chronograf.Source) (bool, error) {
 	// flux is always available in v2 version, but it requires v2 Token authentication (distinguished by Type)
