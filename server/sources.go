@@ -187,10 +187,13 @@ func (s *Service) NewSource(w http.ResponseWriter, r *http.Request) {
 	}
 
 	src.Type = dbType
-	if src, err = s.Store.Sources(ctx).Add(ctx, src); err != nil {
-		msg := fmt.Errorf("Error storing source %v: %v", src, err)
-		unknownErrorWithMessage(w, msg, s.Logger)
-		return
+	// persist unless it is a dry-run
+	if _, dryRun := r.URL.Query()["dryRun"]; !dryRun {
+		if src, err = s.Store.Sources(ctx).Add(ctx, src); err != nil {
+			msg := fmt.Errorf("Error storing source %v: %v", src, err)
+			unknownErrorWithMessage(w, msg, s.Logger)
+			return
+		}
 	}
 
 	res := newSourceResponse(ctx, src)
@@ -471,10 +474,13 @@ func (s *Service) UpdateSource(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.Store.Sources(ctx).Update(ctx, src); err != nil {
-		msg := fmt.Sprintf("Error updating source ID %d", id)
-		Error(w, http.StatusInternalServerError, msg, s.Logger)
-		return
+	// persist unless it is a dry-run
+	if _, dryRun := r.URL.Query()["dryRun"]; !dryRun {
+		if err := s.Store.Sources(ctx).Update(ctx, src); err != nil {
+			msg := fmt.Sprintf("Error updating source ID %d", id)
+			Error(w, http.StatusInternalServerError, msg, s.Logger)
+			return
+		}
 	}
 	encodeJSON(w, http.StatusOK, newSourceResponse(context.Background(), src), s.Logger)
 }
