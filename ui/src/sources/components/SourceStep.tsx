@@ -243,15 +243,11 @@ class SourceStep extends PureComponent<Props, State> {
     })
   }
 
-  private handleSubmitUrl = async (url: string) => {
-    return await this.detectServerType({url})
-  }
-  private handleSubmitUsername = async (username: string) => {
-    return await this.detectServerType({username})
-  }
-  private handleSubmitPassword = async (password: string) => {
-    return await this.detectServerType({password})
-  }
+  private handleSubmitUrl = (url: string) => this.detectServerType({url})
+  private handleSubmitUsername = (username: string) =>
+    this.detectServerType({username})
+  private handleSubmitPassword = (password: string) =>
+    this.detectServerType({password})
 
   private detectServerType = async (changedField: Partial<Source>) => {
     const source = {...this.state.source, ...changedField}
