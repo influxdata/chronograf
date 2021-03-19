@@ -27,6 +27,7 @@
 1. [#5685](https://github.com/influxdata/chronograf/pull/5685): Upgrade UI to TypeScript 4.2.2.
 1. [#5690](https://github.com/influxdata/chronograf/pull/5690): Upgrade dependencies, use eslint for typescript.
 1. [#5701](https://github.com/influxdata/chronograf/pull/5690): Fix unsafe React lifecycle functions.
+1. [#5706](https://github.com/influxdata/chronograf/pull/5706): Improve communication with InfluxDB Enterprise.
 
 ## v1.8.10 [2021-02-08]
 

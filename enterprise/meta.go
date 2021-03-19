@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -20,9 +21,18 @@ import (
 // Shared transports for all clients to prevent leaking connections
 var (
 	skipVerifyTransport = &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	defaultTransport = &http.Transport{}
+	defaultTransport = &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+	}
 )
 
 type client interface {
@@ -147,7 +157,7 @@ func (m *MetaClient) User(ctx context.Context, name string) (*User, error) {
 	for _, user := range users.Users {
 		return &user, nil
 	}
-	return nil, fmt.Errorf("No user found")
+	return nil, fmt.Errorf("no user found")
 }
 
 // CreateUser adds a user to Influx Enterprise
@@ -279,7 +289,7 @@ func (m *MetaClient) Role(ctx context.Context, name string) (*Role, error) {
 	for _, role := range roles.Roles {
 		return &role, nil
 	}
-	return nil, fmt.Errorf("No role found")
+	return nil, fmt.Errorf("no role found")
 }
 
 // CreateRole adds a role to Influx Enterprise
@@ -464,7 +474,6 @@ func (m *MetaClient) Post(ctx context.Context, path string, action interface{}, 
 }
 
 type defaultClient struct {
-	Leader             string
 	InsecureSkipVerify bool
 }
 
@@ -477,11 +486,6 @@ func (d *defaultClient) Do(URL *url.URL, path, method string, authorizer influx.
 
 	URL.Path = path
 	URL.RawQuery = p.Encode()
-	if d.Leader == "" {
-		d.Leader = URL.Host
-	} else if d.Leader != URL.Host {
-		URL.Host = d.Leader
-	}
 
 	req, err := http.NewRequest(method, URL.String(), body)
 	if err != nil {
@@ -542,7 +546,6 @@ func (d *defaultClient) AuthedCheckRedirect(req *http.Request, via []*http.Reque
 	if auth, ok := via[0].Header[preserve]; ok {
 		req.Header[preserve] = auth
 	}
-	d.Leader = req.URL.Host
 	return nil
 }
 
