@@ -700,7 +700,7 @@ func TestService_NewSourceUser(t *testing.T) {
 			ID:              "BAD",
 			wantStatus:      http.StatusUnprocessableEntity,
 			wantContentType: "application/json",
-			wantBody:        `{"code":422,"message":"Username required"}`,
+			wantBody:        `{"code":422,"message":"username required"}`,
 		},
 		{
 			name: "Bad JSON",
@@ -1333,7 +1333,7 @@ func TestService_UpdateSourceUser(t *testing.T) {
 			UID:             "marty",
 			wantStatus:      http.StatusUnprocessableEntity,
 			wantContentType: "application/json",
-			wantBody:        `{"code":422,"message":"No fields to update"}`,
+			wantBody:        `{"code":422,"message":"no fields to update"}`,
 		},
 	}
 	for _, tt := range tests {
