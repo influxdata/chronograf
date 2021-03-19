@@ -513,7 +513,7 @@ func ValidSourceRequest(s *chronograf.Source, defaultOrgID string) error {
 		return fmt.Errorf("invalid source URI: %v", err)
 	}
 	if len(url.Scheme) == 0 {
-		return fmt.Errorf("Invalid URL; no URL scheme defined")
+		return fmt.Errorf("invalid URL; no URL scheme defined")
 	}
 
 	return nil
@@ -741,10 +741,10 @@ type sourceUserRequest struct {
 
 func (r *sourceUserRequest) ValidCreate() error {
 	if r.Username == "" {
-		return fmt.Errorf("Username required")
+		return fmt.Errorf("username required")
 	}
 	if r.Password == "" {
-		return fmt.Errorf("Password required")
+		return fmt.Errorf("password required")
 	}
 	return validPermissions(&r.Permissions)
 }
@@ -755,7 +755,7 @@ type sourceUsersResponse struct {
 
 func (r *sourceUserRequest) ValidUpdate() error {
 	if r.Password == "" && r.Permissions == nil && r.Roles == nil {
-		return fmt.Errorf("No fields to update")
+		return fmt.Errorf("no fields to update")
 	}
 	return validPermissions(&r.Permissions)
 }
@@ -996,7 +996,7 @@ func (r *sourceRoleRequest) ValidCreate() error {
 	}
 	for _, user := range r.Users {
 		if user.Name == "" {
-			return fmt.Errorf("Username required")
+			return fmt.Errorf("username required")
 		}
 	}
 	return validPermissions(&r.Permissions)
@@ -1004,11 +1004,11 @@ func (r *sourceRoleRequest) ValidCreate() error {
 
 func (r *sourceRoleRequest) ValidUpdate() error {
 	if len(r.Name) > 254 {
-		return fmt.Errorf("Username too long; must be less than 254 characters")
+		return fmt.Errorf("username too long; must be less than 254 characters")
 	}
 	for _, user := range r.Users {
 		if user.Name == "" {
-			return fmt.Errorf("Username required")
+			return fmt.Errorf("username required")
 		}
 	}
 	return validPermissions(&r.Permissions)
