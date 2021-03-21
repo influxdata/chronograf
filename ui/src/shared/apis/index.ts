@@ -22,25 +22,29 @@ export const getSource = async (id: string): Promise<Source> => {
 }
 
 export const createSource = async (
-  attributes: Partial<Source>
+  attributes: Partial<Source>,
+  params: Record<string, string> = {}
 ): Promise<Source> => {
   const {data: source} = await AJAX({
     url: null,
     resource: 'sources',
     method: 'POST',
     data: attributes,
+    params,
   })
 
   return source
 }
 
 export const updateSource = async (
-  newSource: Partial<Source>
+  newSource: Partial<Source>,
+  params: Record<string, string> = {}
 ): Promise<Source> => {
   const {data: source} = await AJAX({
     url: newSource.links.self,
     method: 'PATCH',
     data: newSource,
+    params,
   })
 
   return source

@@ -126,6 +126,7 @@ class SourceStep extends PureComponent<Props, State> {
           value={source.username}
           label={sourceIsV2 ? 'Organization' : 'Username'}
           onChange={this.onChangeInput('username')}
+          onSubmit={this.handleSubmitUsername}
         />
         <WizardTextInput
           value={source.password}
@@ -133,6 +134,7 @@ class SourceStep extends PureComponent<Props, State> {
           placeholder={this.passwordPlaceholder}
           type="password"
           onChange={this.onChangeInput('password')}
+          onSubmit={this.handleSubmitPassword}
         />
         <WizardTextInput
           value={source.telegraf}
@@ -241,28 +243,30 @@ class SourceStep extends PureComponent<Props, State> {
     })
   }
 
-  private handleSubmitUrl = async (sourceURLstring: string) => {
-    const {source} = this.state
+  private handleSubmitUrl = (url: string) => this.detectServerType({url})
+  private handleSubmitUsername = (username: string) =>
+    this.detectServerType({username})
+  private handleSubmitPassword = (password: string) =>
+    this.detectServerType({password})
+
+  private detectServerType = async (changedField: Partial<Source>) => {
+    const source = {...this.state.source, ...changedField}
     const metaserviceURL = new URL(source.metaUrl || DEFAULT_SOURCE.metaUrl)
-    const sourceURL = new URL(sourceURLstring || DEFAULT_SOURCE.url)
+    const sourceURL = new URL(source.url || DEFAULT_SOURCE.url)
 
     if (isNewSource(source)) {
       try {
         metaserviceURL.hostname = sourceURL.hostname
-        let sourceFromServer = await createSource(source)
-        sourceFromServer = {...sourceFromServer, metaUrl: metaserviceURL.href}
-        this.props.addSource(sourceFromServer)
+        const {type} = await createSource(source, {dryRun: ''})
         this.setState({
-          source: sourceFromServer,
+          source: {...this.state.source, type, metaUrl: metaserviceURL.href},
         })
       } catch (err) {}
     } else {
       try {
-        let sourceFromServer = await updateSource(source)
-        sourceFromServer = {...sourceFromServer, metaUrl: metaserviceURL.href}
-        this.props.updateSource(sourceFromServer)
+        const {type} = await updateSource(source, {dryRun: ''})
         this.setState({
-          source: sourceFromServer,
+          source: {...this.state.source, type},
         })
       } catch (err) {}
     }
