@@ -2,7 +2,10 @@ package oauth2
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"io"
 
 	"golang.org/x/oauth2"
 )
@@ -19,6 +22,10 @@ type CodeExchange interface {
 
 // default implementation
 var simpleTokenExchange CodeExchange = &CodeExchangeCSRF{}
+
+func NewCodeExchange(withPKCE bool) CodeExchange {
+	return simpleTokenExchange
+}
 
 // CodeExchangeCSRF prevents CSRF attacks during retrieval of OAuth token
 // by using a signed random state in the exchange with authorization server.
@@ -76,4 +83,13 @@ func (p *CodeExchangeCSRF) ExchangeCodeForToken(ctx context.Context, state, code
 	}
 
 	return conf.Exchange(ctx, code)
+}
+
+func randomString(length int) string {
+	k := make([]byte, length)
+	if _, err := io.ReadFull(rand.Reader, k); err != nil {
+		return ""
+	}
+	// use the simplest encoding that is also required by PKCE
+	return base64.RawURLEncoding.EncodeToString(k)
 }
