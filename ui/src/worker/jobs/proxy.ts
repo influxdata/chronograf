@@ -11,7 +11,13 @@ const proxy = async msg => {
 
     return {data}
   } catch (e) {
-    console.error(e)
+    console.error(
+      e.message,
+      '; response:',
+      e.response?.data,
+      '; request:',
+      body
+    )
     return Promise.reject(e.message)
   }
 }

@@ -33,8 +33,8 @@ interface State {
   limit: number
   limitMultiplier: number
   isAlertsMaxedOut: boolean
+  error?: unknown
 }
-
 @ErrorHandling
 class AlertsApp extends PureComponent<Props, State> {
   constructor(props) {
@@ -68,15 +68,19 @@ class AlertsApp extends PureComponent<Props, State> {
     AJAX({
       url: source.links.kapacitors,
       method: 'GET',
-    }).then(({data}) => {
-      if (data.kapacitors[0]) {
-        this.setState({hasKapacitor: true})
-
-        this.fetchAlerts()
-      } else {
-        this.setState({loading: false})
-      }
     })
+      .then(({data}) => {
+        if (data.kapacitors[0]) {
+          this.setState({hasKapacitor: true})
+
+          this.fetchAlerts()
+        } else {
+          this.setState({loading: false})
+        }
+      })
+      .catch(e => {
+        this.setState({loading: false, error: e})
+      })
   }
 
   public componentDidUpdate(__, prevState) {
@@ -120,46 +124,60 @@ class AlertsApp extends PureComponent<Props, State> {
       this.props.source.links.proxy,
       this.state.timeRange,
       this.state.limit * this.state.limitMultiplier
-    ).then(resp => {
-      const results = []
+    )
+      .then(resp => {
+        const results = []
 
-      const alertSeries = _.get(resp, ['data', 'results', '0', 'series'], [])
-      if (alertSeries.length === 0) {
-        this.setState({loading: false, alerts: []})
-        return
-      }
+        const alertSeries = _.get(resp, ['data', 'results', '0', 'series'], [])
+        if (alertSeries.length === 0) {
+          this.setState({loading: false, alerts: []})
+          return
+        }
 
-      const timeIndex = alertSeries[0].columns.findIndex(col => col === 'time')
-      const hostIndex = alertSeries[0].columns.findIndex(col => col === 'host')
-      const valueIndex = alertSeries[0].columns.findIndex(
-        col => col === 'value'
-      )
-      const levelIndex = alertSeries[0].columns.findIndex(
-        col => col === 'level'
-      )
-      const nameIndex = alertSeries[0].columns.findIndex(
-        col => col === 'alertName'
-      )
+        const timeIndex = alertSeries[0].columns.findIndex(
+          col => col === 'time'
+        )
+        const hostIndex = alertSeries[0].columns.findIndex(
+          col => col === 'host'
+        )
+        const valueIndex = alertSeries[0].columns.findIndex(
+          col => col === 'value'
+        )
+        const levelIndex = alertSeries[0].columns.findIndex(
+          col => col === 'level'
+        )
+        const nameIndex = alertSeries[0].columns.findIndex(
+          col => col === 'alertName'
+        )
 
-      alertSeries[0].values.forEach(s => {
-        results.push({
-          time: `${s[timeIndex]}`,
-          host: s[hostIndex],
-          value: `${s[valueIndex]}`,
-          level: s[levelIndex],
-          name: `${s[nameIndex]}`,
+        alertSeries[0].values.forEach(s => {
+          results.push({
+            time: `${s[timeIndex]}`,
+            host: s[hostIndex],
+            value: `${s[valueIndex]}`,
+            level: s[levelIndex],
+            name: `${s[nameIndex]}`,
+          })
+        })
+
+        // TODO: factor these setStates out to make a pure function and implement true limit & offset
+        this.setState({
+          error: false,
+          loading: false,
+          alerts: results,
+          // this.state.alerts.length === results.length ||
+          isAlertsMaxedOut:
+            results.length !== this.props.limit * this.state.limitMultiplier,
         })
       })
-
-      // TODO: factor these setStates out to make a pure function and implement true limit & offset
-      this.setState({
-        loading: false,
-        alerts: results,
-        // this.state.alerts.length === results.length ||
-        isAlertsMaxedOut:
-          results.length !== this.props.limit * this.state.limitMultiplier,
+      .catch(e => {
+        this.setState({
+          error: e,
+          loading: false,
+          alerts: [],
+          isAlertsMaxedOut: false,
+        })
       })
-    })
   }
 
   private handleGetMoreAlerts = (): void => {
@@ -170,7 +188,15 @@ class AlertsApp extends PureComponent<Props, State> {
 
   private renderSubComponents = (): JSX.Element => {
     const {source, isWidget, limit} = this.props
-    const {isAlertsMaxedOut, alerts, hasKapacitor} = this.state
+    const {isAlertsMaxedOut, alerts, hasKapacitor, error} = this.state
+    if (error) {
+      return (
+        <>
+          <div>{error.toString()}</div>
+          <div>Check console logs.</div>
+        </>
+      )
+    }
 
     return hasKapacitor ? (
       <AlertsTable

@@ -9,6 +9,7 @@
 1. [#5683](https://github.com/influxdata/chronograf/pull/5683): Repair stale database list in Log Viewer.
 1. [#5686](https://github.com/influxdata/chronograf/pull/5686): Exclude `_start` and `_stop` tags.
 1. [#5708](https://github.com/influxdata/chronograf/pull/5708): Improve detection of server type in Connection Wizard.
+1. [#5711](https://github.com/influxdata/chronograf/pull/5711): Add error handling to Alert History page.
 
 ### Features
 
