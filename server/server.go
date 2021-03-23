@@ -662,7 +662,7 @@ func (s *Server) Serve(ctx context.Context) {
 	}
 
 	if !validBasepath(s.Basepath) {
-		err := fmt.Errorf("Invalid basepath, must follow format \"/mybasepath\"")
+		err := fmt.Errorf("invalid basepath, must follow format \"/mybasepath\"")
 		logger.
 			WithField("component", "server").
 			WithField("basepath", "invalid").
@@ -674,7 +674,7 @@ func (s *Server) Serve(ctx context.Context) {
 		logger.
 			WithField("component", "server").
 			WithField("basepath", "invalid").
-			Error(fmt.Errorf("Failed to validate Oauth settings: %s", err))
+			Error(fmt.Errorf("failed to validate Oauth settings: %s", err))
 		return
 	}
 
