@@ -11,10 +11,11 @@ import {
 export const writeLineProtocolAsync = (
   source: Source,
   db: string,
-  data: string
+  data: string,
+  precision?: string
 ) => async (dispatch): Promise<void> => {
   try {
-    await writeLineProtocolAJAX(source, db, data)
+    await writeLineProtocolAJAX(source, db, data, precision)
     dispatch(notify(notifyDataWritten()))
   } catch (response) {
     dispatch(notify(notifyDataWriteFailed(response.data.error)))
