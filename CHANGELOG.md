@@ -34,6 +34,13 @@
 1. [#5701](https://github.com/influxdata/chronograf/pull/5690): Fix unsafe React lifecycle functions.
 1. [#5706](https://github.com/influxdata/chronograf/pull/5706): Improve communication with InfluxDB Enterprise.
 
+### Breaking Changes
+
+1. [#5710](https://github.com/influxdata/chronograf/pull/5710): OAuth integrations newly use OAuth PKCE (RFC7636) 
+to provide a more secure OAuth token exchange. Google, Azure, Octa, Auth0, Gitlab (and more) integrations already 
+support OAuth PKCE. PKCE enablement should have no effect on the communication with authorization servers that 
+don't support it yet (such as Github, Bitbucket). PKCE can be turned off with `OAUTH_NO_PKCE=true` environment variable.
+
 ## v1.8.10 [2021-02-08]
 
 ### Bug Fixes
