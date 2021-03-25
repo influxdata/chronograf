@@ -39,7 +39,8 @@
 1. [#5710](https://github.com/influxdata/chronograf/pull/5710): OAuth integrations newly use OAuth PKCE (RFC7636) 
 to provide a more secure OAuth token exchange. Google, Azure, Octa, Auth0, Gitlab (and more) integrations already 
 support OAuth PKCE. PKCE enablement should have no effect on the communication with authorization servers that 
-don't support it yet (such as Github, Bitbucket). PKCE can be turned off with `OAUTH_NO_PKCE=true` environment variable.
+don't support it yet (such as Github, Bitbucket). PKCE can be eventually turned off with `OAUTH_NO_PKCE=true` 
+environment variable.
 
 ## v1.8.10 [2021-02-08]
 
