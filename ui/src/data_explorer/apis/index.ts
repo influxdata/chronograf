@@ -4,11 +4,11 @@ import {Source} from 'src/types'
 export const writeLineProtocol = async (
   source: Source,
   db: string,
-  data: string
+  data: string,
+  precision?: string
 ): Promise<void> => {
-  await AJAX({
-    url: `${source.links.write}?db=${db}`,
-    method: 'POST',
-    data,
-  })
+  const url = `${source.links.write}?db=${db}&precision=${
+    precision ? precision : 'ns'
+  }`
+  await AJAX({url, method: 'POST', data})
 }

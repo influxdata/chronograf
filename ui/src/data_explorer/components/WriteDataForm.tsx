@@ -22,7 +22,12 @@ interface Props {
   selectedDatabase: string
   onClose: () => void
   errorThrown: () => void
-  writeLineProtocol: (source: Source, database: string, content: string) => void
+  writeLineProtocol: (
+    source: Source,
+    database: string,
+    content: string,
+    precision?: string
+  ) => void
 }
 
 interface State {
@@ -34,6 +39,7 @@ interface State {
   mode: WriteDataMode
   dragClass: string
   isUploading: boolean
+  precision: string
 }
 
 @ErrorHandling
@@ -51,6 +57,7 @@ class WriteDataForm extends PureComponent<Props, State> {
       mode: WriteDataMode.File,
       dragClass: 'drag-none',
       isUploading: false,
+      precision: 'ns',
     }
   }
 
@@ -74,6 +81,7 @@ class WriteDataForm extends PureComponent<Props, State> {
             onClose={onClose}
             errorThrown={errorThrown}
             onToggleMode={this.handleToggleMode}
+            handlePrecisionChange={this.handlePrecisionChange}
             handleSelectDatabase={this.handleSelectDatabase}
           />
           <WriteDataBody
@@ -94,6 +102,9 @@ class WriteDataForm extends PureComponent<Props, State> {
   private handleToggleMode = (mode: WriteDataMode): void => {
     this.setState({mode})
   }
+  private handlePrecisionChange = (precision: string): void => {
+    this.setState({precision})
+  }
 
   private handleSelectDatabase = (item: DropdownItem): void => {
     this.setState({selectedDatabase: item.text})
@@ -109,7 +120,13 @@ class WriteDataForm extends PureComponent<Props, State> {
 
   private handleSubmit = async () => {
     const {onClose, source, writeLineProtocol} = this.props
-    const {inputContent, uploadContent, selectedDatabase, mode} = this.state
+    const {
+      inputContent,
+      uploadContent,
+      selectedDatabase,
+      mode,
+      precision,
+    } = this.state
     let content = inputContent
 
     if (mode === WriteDataMode.File) {
@@ -118,7 +135,7 @@ class WriteDataForm extends PureComponent<Props, State> {
     this.setState({isUploading: true})
 
     try {
-      await writeLineProtocol(source, selectedDatabase, content)
+      await writeLineProtocol(source, selectedDatabase, content, precision)
       this.setState({isUploading: false})
       onClose()
       window.location.reload()
