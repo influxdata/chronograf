@@ -87,3 +87,10 @@ export const removeField = (fieldName, fields) => {
     return [...acc, f]
   }, [])
 }
+
+// Gets field name out of the field func supplied
+export function getFieldName(fieldFunc) {
+  return _.get(fieldFunc, 'type') === 'field'
+    ? _.get(fieldFunc, 'value')
+    : firstFieldName(_.get(fieldFunc, 'args'))
+}
