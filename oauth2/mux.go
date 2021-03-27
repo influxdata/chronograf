@@ -1,13 +1,11 @@
 package oauth2
 
 import (
-	"context"
 	"net/http"
 	"path"
 	"time"
 
 	"github.com/influxdata/chronograf"
-	"golang.org/x/oauth2"
 )
 
 // Check to ensure AuthMux is an oauth2.Mux
@@ -17,17 +15,25 @@ var _ Mux = &AuthMux{}
 const TenMinutes = 10 * time.Minute
 
 // NewAuthMux constructs a Mux handler that checks a cookie against the authenticator
-func NewAuthMux(p Provider, a Authenticator, t Tokenizer, basepath string, l chronograf.Logger, UseIDToken bool, LoginHint string, client *http.Client) *AuthMux {
+func NewAuthMux(p Provider, a Authenticator, t Tokenizer,
+	basepath string, l chronograf.Logger,
+	UseIDToken bool, LoginHint string,
+	client *http.Client, codeExchange CodeExchange,
+) *AuthMux {
+	if codeExchange == nil {
+		codeExchange = simpleTokenExchange
+	}
 	mux := &AuthMux{
-		Provider:   p,
-		Auth:       a,
-		Tokens:     t,
-		SuccessURL: path.Join(basepath, "/"),
-		FailureURL: path.Join(basepath, "/login"),
-		Now:        DefaultNowTime,
-		Logger:     l,
-		UseIDToken: UseIDToken,
-		LoginHint:  LoginHint,
+		Provider:     p,
+		Auth:         a,
+		Tokens:       t,
+		SuccessURL:   path.Join(basepath, "/"),
+		FailureURL:   path.Join(basepath, "/login"),
+		Now:          DefaultNowTime,
+		Logger:       l,
+		UseIDToken:   UseIDToken,
+		LoginHint:    LoginHint,
+		CodeExchange: codeExchange,
 	}
 
 	if client != nil {
@@ -43,42 +49,23 @@ func NewAuthMux(p Provider, a Authenticator, t Tokenizer, basepath string, l chr
 // Chronograf instance as long as the Authenticator has no external
 // dependencies (e.g. on a Database).
 type AuthMux struct {
-	Provider   Provider          // Provider is the OAuth2 service
-	Auth       Authenticator     // Auth is used to Authorize after successful OAuth2 callback and Expire on Logout
-	Tokens     Tokenizer         // Tokens is used to create and validate OAuth2 "state"
-	Logger     chronograf.Logger // Logger is used to give some more information about the OAuth2 process
-	SuccessURL string            // SuccessURL is redirect location after successful authorization
-	FailureURL string            // FailureURL is redirect location after authorization failure
-	Now        func() time.Time  // Now returns the current time (for testing)
-	UseIDToken bool              // UseIDToken enables OpenID id_token support
-	LoginHint  string            // LoginHint will be included as a parameter during authentication if non-nil
-	client     *http.Client      // client is the http client used in oauth exchange.
+	Provider     Provider          // Provider is the OAuth2 service
+	Auth         Authenticator     // Auth is used to Authorize after successful OAuth2 callback and Expire on Logout
+	Tokens       Tokenizer         // Tokens is used to create and validate OAuth2 "state"
+	Logger       chronograf.Logger // Logger is used to give some more information about the OAuth2 process
+	SuccessURL   string            // SuccessURL is redirect location after successful authorization
+	FailureURL   string            // FailureURL is redirect location after authorization failure
+	Now          func() time.Time  // Now returns the current time (for testing)
+	UseIDToken   bool              // UseIDToken enables OpenID id_token support
+	LoginHint    string            // LoginHint will be included as a parameter during authentication if non-nil
+	client       *http.Client      // client is the http client used in oauth exchange.
+	CodeExchange CodeExchange      // helps with CSRF in exchange of token for authorization code
 }
 
-// Login uses a Cookie with a random string as the state validation method.  JWTs are
-// a good choice here for encoding because they can be validated without
-// storing state. Login returns a handler that redirects to the providers OAuth login.
+// Login returns a handler that redirects to the providers OAuth login.
 func (j *AuthMux) Login() http.Handler {
-	conf := j.Provider.Config()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// We are creating a token with an encoded random string to prevent CSRF attacks
-		// This token will be validated during the OAuth callback.
-		// We'll give our users 10 minutes from this point to type in their
-		// oauth2 provider's password.
-		// If the callback is not received within 10 minutes, then authorization will fail.
-		csrf := randomString(32) // 32 is not important... just long
-		now := j.Now()
-
-		// This token will be valid for 10 minutes.  Any chronograf server will
-		// be able to validate this token.
-		p := Principal{
-			Subject:   csrf,
-			IssuedAt:  now,
-			ExpiresAt: now.Add(TenMinutes),
-		}
-		token, err := j.Tokens.Create(r.Context(), p)
-
-		// This is likely an internal server error
+		url, err := j.CodeExchange.AuthCodeURL(r.Context(), j)
 		if err != nil {
 			j.Logger.
 				WithField("component", "auth").
@@ -89,13 +76,6 @@ func (j *AuthMux) Login() http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		urlOpts := []oauth2.AuthCodeOption{oauth2.AccessTypeOnline}
-		if j.LoginHint != "" {
-			urlOpts = append(urlOpts, oauth2.SetAuthURLParam("login_hint", j.LoginHint))
-		}
-		url := conf.AuthCodeURL(string(token), urlOpts...)
-
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	})
 }
@@ -114,27 +94,9 @@ func (j *AuthMux) Callback() http.Handler {
 			WithField("url", r.URL)
 
 		state := r.FormValue("state")
-		// Check if the OAuth state token is valid to prevent CSRF
-		// The state variable we set is actually a token.  We'll check
-		// if the token is valid.  We don't need to know anything
-		// about the contents of the principal only that it hasn't expired.
-		if _, err := j.Tokens.ValidPrincipal(r.Context(), Token(state), TenMinutes); err != nil {
-			log.Error("Invalid OAuth state received: ", err.Error())
-			http.Redirect(w, r, j.FailureURL, http.StatusTemporaryRedirect)
-			return
-		}
-
-		// Exchange the code back with the provider to the the token
-		conf := j.Provider.Config()
 		code := r.FormValue("code")
 
-		// Use http client with transport options.
-		ctx := r.Context()
-		if j.client != nil {
-			ctx = context.WithValue(r.Context(), oauth2.HTTPClient, j.client)
-		}
-
-		token, err := conf.Exchange(ctx, code)
+		token, err := j.CodeExchange.ExchangeCodeForToken(r.Context(), state, code, j)
 		if err != nil {
 			log.Error("Unable to exchange code for token ", err.Error())
 			http.Redirect(w, r, j.FailureURL, http.StatusTemporaryRedirect)
@@ -182,7 +144,7 @@ func (j *AuthMux) Callback() http.Handler {
 			}
 		} else {
 			// otherwise perform an additional lookup
-			oauthClient := conf.Client(r.Context(), token)
+			oauthClient := j.Provider.Config().Client(r.Context(), token)
 			// Using the token get the principal identifier from the provider
 			id, err = j.Provider.PrincipalID(oauthClient)
 			if err != nil {

@@ -2,10 +2,7 @@ package oauth2
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
-	"io"
 	"net/http"
 	"strings"
 
@@ -104,14 +101,6 @@ func (g *Github) Group(provider *http.Client) (string, error) {
 	}
 
 	return strings.Join(groups, ","), nil
-}
-
-func randomString(length int) string {
-	k := make([]byte, length)
-	if _, err := io.ReadFull(rand.Reader, k); err != nil {
-		return ""
-	}
-	return base64.StdEncoding.EncodeToString(k)
 }
 
 func logResponseError(log chronograf.Logger, resp *github.Response, err error) {
