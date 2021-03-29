@@ -80,6 +80,7 @@ type Server struct {
 	GithubClientID     string   `short:"i" long:"github-client-id" description:"Github Client ID for OAuth 2 support" env:"GH_CLIENT_ID"`
 	GithubClientSecret string   `short:"s" long:"github-client-secret" description:"Github Client Secret for OAuth 2 support" env:"GH_CLIENT_SECRET"`
 	GithubOrgs         []string `short:"o" long:"github-organization" description:"Github organization user is required to have active membership" env:"GH_ORGS" env-delim:","`
+	GithubURL          string   `long:"github-url" description:"Github base URL must be specified for Github Enterprise." default:"https://github.com" env:"GH_URL"`
 
 	EtcdEndpoints      []string       `short:"e" long:"etcd-endpoints" description:"List of etcd endpoints" env:"ETCD_ENDPOINTS" env-delim:","`
 	EtcdUsername       string         `long:"etcd-username" description:"Username to log into etcd." env:"ETCD_USERNAME"`
@@ -334,6 +335,7 @@ func (s *Server) githubOAuth(logger chronograf.Logger, auth oauth2.Authenticator
 		ClientID:     s.GithubClientID,
 		ClientSecret: s.GithubClientSecret,
 		Orgs:         s.GithubOrgs,
+		BaseURL:      s.GithubURL,
 		Logger:       logger,
 	}
 	jwt := oauth2.NewJWT(s.TokenSecret, s.JwksURL)
