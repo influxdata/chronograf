@@ -657,7 +657,4 @@ const mdtp = {
   setTimeZone: appActions.setTimeZone,
 }
 
-export default connect(
-  mstp,
-  mdtp
-)(ManualRefresh(withRouter<Props>(DashboardPage)))
+export default withRouter(connect(mstp, mdtp)(ManualRefresh(DashboardPage)))
