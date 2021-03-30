@@ -1,20 +1,10 @@
 ## v1.9.0
 
-### Bug Fixes
-
-1. [#5677](https://github.com/influxdata/chronograf/pull/5677): Open event handler configuration specified in URL hash.
-1. [#5678](https://github.com/influxdata/chronograf/pull/5678): Do not log error during line visualization of meta query results.
-1. [#5679](https://github.com/influxdata/chronograf/pull/5679): Dispose log stream when tickscript editor page is closed.
-1. [#5680](https://github.com/influxdata/chronograf/pull/5680): Generate correct flux property expressions.
-1. [#5683](https://github.com/influxdata/chronograf/pull/5683): Repair stale database list in Log Viewer.
-1. [#5686](https://github.com/influxdata/chronograf/pull/5686): Exclude `_start` and `_stop` tags.
-1. [#5708](https://github.com/influxdata/chronograf/pull/5708): Improve detection of server type in Connection Wizard.
-1. [#5711](https://github.com/influxdata/chronograf/pull/5711): Add error handling to Alert History page.
-
 ### Features
 
 1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to migrate data to ETCD over HTTPS.
 1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to specify trusted CA certificate for ETCD connections.
+1. [#5673](https://github.com/influxdata/chronograf/pull/5673): Add documentation link when 1.8 flux is not installed.
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Event Handler configuration UI.
 1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Alert Handler configuration UI.
 1. [#5681](https://github.com/influxdata/chronograf/pull/5681): Allow to hide/show histogram in Log Viewer.
@@ -27,9 +17,20 @@
 1. [#5710](https://github.com/influxdata/chronograf/pull/5710): Add PKCE to OAuth integrations.
 1. [#5713](https://github.com/influxdata/chronograf/pull/5710): Support GitHub Enterprise in the existing GitHub OAuth integration.
 
+### Bug Fixes
+
+1. [#5677](https://github.com/influxdata/chronograf/pull/5677): Open event handler configuration specified in URL hash.
+1. [#5678](https://github.com/influxdata/chronograf/pull/5678): Do not log error during line visualization of meta query results.
+1. [#5679](https://github.com/influxdata/chronograf/pull/5679): Dispose log stream when tickscript editor page is closed.
+1. [#5680](https://github.com/influxdata/chronograf/pull/5680): Generate correct flux property expressions.
+1. [#5683](https://github.com/influxdata/chronograf/pull/5683): Repair stale database list in Log Viewer.
+1. [#5686](https://github.com/influxdata/chronograf/pull/5686): Exclude `_start` and `_stop` tags.
+1. [#5708](https://github.com/influxdata/chronograf/pull/5708): Improve detection of server type in Connection Wizard.
+1. [#5711](https://github.com/influxdata/chronograf/pull/5711): Add error handling to Alert History page.
+1. [#5716](https://github.com/influxdata/chronograf/pull/5716): Do not fetch tag values when no measurement tags are available.
+
 ### Other
 
-1. [#5673](https://github.com/influxdata/chronograf/pull/5673): Add documentation link when 1.8 flux is not installed.
 1. [#5685](https://github.com/influxdata/chronograf/pull/5685): Upgrade UI to TypeScript 4.2.2.
 1. [#5690](https://github.com/influxdata/chronograf/pull/5690): Upgrade dependencies, use eslint for typescript.
 1. [#5701](https://github.com/influxdata/chronograf/pull/5690): Fix unsafe React lifecycle functions.
