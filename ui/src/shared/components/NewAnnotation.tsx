@@ -250,4 +250,4 @@ const mdtp = {
   onMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
 }
 
-export default connect(mstp, mdtp)(withRouter(NewAnnotation))
+export default withRouter(connect(mstp, mdtp)(NewAnnotation))

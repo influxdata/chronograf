@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {withRouter, WithRouterProps} from 'react-router'
 
 import AnnotationComponent from 'src/shared/components/Annotation'
 import NewAnnotation from 'src/shared/components/NewAnnotation'
@@ -29,7 +28,7 @@ interface Props {
 }
 
 @ErrorHandling
-class Annotations extends Component<Props & WithRouterProps> {
+class Annotations extends Component<Props> {
   public render() {
     const {
       mode,
@@ -94,4 +93,4 @@ const mstp = (state, props) => {
   }
 }
 
-export default connect(mstp)(withRouter(Annotations))
+export default connect(mstp)(Annotations)
