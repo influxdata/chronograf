@@ -1,6 +1,7 @@
 import AJAX from 'src/utils/ajax'
 import _ from 'lodash'
 import {buildInfluxUrl, proxy} from 'utils/queryUrlGenerator'
+import uuid from 'uuid'
 
 export const showDatabases = async source => {
   const query = 'SHOW DATABASES'
@@ -65,6 +66,26 @@ export const showTagValues = async ({
   measurement,
   tagKeys,
 }) => {
+  if (!tagKeys || !tagKeys.length) {
+    // return empty response when no tag keys are supplied
+    return {
+      data: {
+        results: [
+          {
+            statement_id: 0,
+            series: [
+              {
+                name: 'empty',
+                columns: ['key', 'value'],
+                values: [],
+              },
+            ],
+          },
+        ],
+        uuid: uuid.v4(),
+      },
+    }
+  }
   const keys = tagKeys
     .sort()
     .map(k => `"${_.escape(k)}"`)
