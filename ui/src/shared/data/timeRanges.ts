@@ -75,15 +75,15 @@ export const timeRanges: TimeRangeOption[] = [
     upper: null,
     menuOption: 'Past 7d',
   },
-  {
-    defaultGroupBy: '6h',
-    seconds: 2592000,
-    inputValue: 'Past 30d',
-    lower: nowMinus30d,
-    lowerFlux: '-30d',
-    upper: null,
-    menuOption: 'Past 30d',
-  },
+  // {
+  //   defaultGroupBy: '6h',
+  //   seconds: 2592000,
+  //   inputValue: 'Past 30d',
+  //   lower: nowMinus30d,
+  //   lowerFlux: '-30d',
+  //   upper: null,
+  //   menuOption: 'Past 30d',
+  // },
 ]
 
 export const FORMAT_INFLUXQL = 'influxql'

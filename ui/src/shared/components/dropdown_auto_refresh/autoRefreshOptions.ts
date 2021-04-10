@@ -31,24 +31,24 @@ const autoRefreshOptions: AutoRefreshOption[] = [
     label: '5s',
     type: AutoRefreshOptionType.Option,
   },
-  {
-    id: 'auto-refresh-10s',
-    milliseconds: 10000,
-    label: '10s',
-    type: AutoRefreshOptionType.Option,
-  },
-  {
-    id: 'auto-refresh-15s',
-    milliseconds: 15000,
-    label: '15s',
-    type: AutoRefreshOptionType.Option,
-  },
-  {
-    id: 'auto-refresh-30s',
-    milliseconds: 30000,
-    label: '30s',
-    type: AutoRefreshOptionType.Option,
-  },
+  // {
+  //   id: 'auto-refresh-10s',
+  //   milliseconds: 10000,
+  //   label: '10s',
+  //   type: AutoRefreshOptionType.Option,
+  // },
+  // {
+  //   id: 'auto-refresh-15s',
+  //   milliseconds: 15000,
+  //   label: '15s',
+  //   type: AutoRefreshOptionType.Option,
+  // },
+  // {
+  //   id: 'auto-refresh-30s',
+  //   milliseconds: 30000,
+  //   label: '30s',
+  //   type: AutoRefreshOptionType.Option,
+  // },
   {
     id: 'auto-refresh-60s',
     milliseconds: 60000,
