@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/internal"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv/internal"
 )
 
 // Ensure organizationConfigStore implements chronograf.OrganizationConfigStore.

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 	"github.com/influxdata/kapacitor/pipeline"
 	"github.com/influxdata/kapacitor/tick"
 	"github.com/influxdata/kapacitor/tick/ast"
@@ -109,7 +109,7 @@ func varWhereFilter(vars map[string]tick.Var) (WhereFilter, bool) {
 	// Chronograf TICKScripts use lambda: TRUE as a pass-through where clause
 	// if the script does not have a where clause set.
 	// isPresent(fieldName) is also used since chronograf 1.8.7 in place of TRUE
-	// https://github.com/influxdata/chronograf/issues/5566
+	// https://github.com/hws522/chronograf/issues/5566
 	if lambda == "TRUE" || strings.HasPrefix(lambda, "isPresent") {
 		return WhereFilter{}, true
 	}

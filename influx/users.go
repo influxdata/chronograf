@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 // Add a new User in InfluxDB

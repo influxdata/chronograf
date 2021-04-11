@@ -3,7 +3,7 @@ package kapacitor
 import (
 	"fmt"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 // Data returns the tickscript data section for querying

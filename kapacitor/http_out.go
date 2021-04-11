@@ -3,7 +3,7 @@ package kapacitor
 import (
 	"fmt"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 // HTTPEndpoint is the default location of the tickscript output

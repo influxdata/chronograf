@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 //go:generate protoc --gogo_out=. internal.proto

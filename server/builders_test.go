@@ -3,7 +3,7 @@ package server_test
 import (
 	"testing"
 
-	"github.com/influxdata/chronograf/server"
+	"github.com/hws522/chronograf/server"
 )
 
 func TestLayoutBuilder(t *testing.T) {

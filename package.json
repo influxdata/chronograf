@@ -10,10 +10,10 @@
   "scripts": {
     "postinstall": "echo \"\" > node_modules/go.mod"
   },
-  "homepage": "https://github.com/influxdata/chronograf",
+  "homepage": "https://github.com/hws522/chronograf",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/influxdata/chronograf"
+    "url": "git+https://github.com/hws522/chronograf"
   },
   "keywords": [
     "influxdb",

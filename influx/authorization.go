@@ -6,7 +6,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 // Authorizer adds optional authorization header to request

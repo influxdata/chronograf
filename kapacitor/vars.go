@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 var (
@@ -250,7 +250,7 @@ func whereFilter(q *chronograf.QueryConfig) string {
 			outer = append(outer, "("+strings.Join(inner, combineOperators)+")")
 		}
 
-		// add isPresent filters, see https://github.com/influxdata/chronograf/issues/5566
+		// add isPresent filters, see https://github.com/hws522/chronograf/issues/5566
 		var appendFields func(fields []chronograf.Field)
 		appendFields = func(fields []chronograf.Field) {
 			for _, field := range fields {

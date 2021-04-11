@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 func TestConvert(t *testing.T) {

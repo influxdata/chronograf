@@ -5,7 +5,7 @@ provides the tools to visualize your monitoring data and easily create alerting
 and automation rules.
 
 <p align="left">
-  <img src="https://github.com/influxdata/chronograf/blob/master/docs/images/overview-readme.png"/>
+  <img src="https://github.com/hws522/chronograf/blob/master/docs/images/overview-readme.png"/>
 </p>
 
 ## Features
@@ -19,7 +19,7 @@ and automation rules.
 ### Dashboard Templates
 
 Chronograf's
-[pre-canned dashboards](https://github.com/influxdata/chronograf/tree/master/canned)
+[pre-canned dashboards](https://github.com/hws522/chronograf/tree/master/canned)
 for the supported [Telegraf](https://github.com/influxdata/telegraf) input
 plugins. Currently, Chronograf offers dashboard templates for the following
 Telegraf input plugins:
@@ -137,7 +137,7 @@ option.
 Find the most recent version of Chronograf [here](https://www.influxdata.com/downloads/).
 
 Spotted a bug or have a feature request? Please open
-[an issue](https://github.com/influxdata/chronograf/issues/new)!
+[an issue](https://github.com/hws522/chronograf/issues/new)!
 
 ### Known Issues
 <!-- todo: is this still an issue -->
@@ -191,13 +191,13 @@ docker pull chronograf:latest
 1. [Setup your GOPATH](https://golang.org/doc/code.html#GOPATH)
 1. Build the Chronograf package:
     ```bash
-    go get github.com/influxdata/chronograf
-    cd $GOPATH/src/github.com/influxdata/chronograf
+    go get github.com/hws522/chronograf
+    cd $GOPATH/src/github.com/hws522/chronograf
     make
     ```
 1. Install the newly built Chronograf package:
     ```bash
-    go install github.com/influxdata/chronograf/cmd/chronograf
+    go install github.com/hws522/chronograf/cmd/chronograf
     ```
 
 ### Upgrading

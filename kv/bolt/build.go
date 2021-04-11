@@ -3,8 +3,8 @@ package bolt
 import (
 	"context"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/internal"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv/internal"
 	bolt "go.etcd.io/bbolt"
 )
 

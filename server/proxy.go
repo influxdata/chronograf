@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/chronograf/influx"
+	"github.com/hws522/chronograf/influx"
 )
 
 // Proxy proxies requests to services using the path query parameter.

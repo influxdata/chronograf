@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf"
-	idgen "github.com/influxdata/chronograf/id"
+	"github.com/hws522/chronograf"
+	idgen "github.com/hws522/chronograf/id"
 )
 
 // ValidTemplateRequest checks if the request sent to the server is the correct format.

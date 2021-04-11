@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 var _ chronograf.TimeSeries = &Client{}

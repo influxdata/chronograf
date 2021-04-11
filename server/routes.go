@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/oauth2"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/oauth2"
 )
 
 // AuthRoute are the routes for each type of OAuth2 provider

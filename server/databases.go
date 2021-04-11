@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 const (
@@ -134,7 +134,7 @@ func (h *Service) GetDatabases(w http.ResponseWriter, r *http.Request) {
 	for _, d := range databases {
 		rps, err := h.allRPs(ctx, dbsvc, srcID, d.Name)
 		if err != nil {
-			// https://github.com/influxdata/chronograf/issues/5531
+			// https://github.com/hws522/chronograf/issues/5531
 			// ignore the database if it can be shown, but retention policies cannot be listed
 			h.Logger.
 				WithField("component", "server").

@@ -14,8 +14,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/influx"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/influx"
 )
 
 // Shared transports for all clients to prevent leaking connections

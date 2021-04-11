@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/oauth2"
-	"github.com/influxdata/chronograf/organizations"
-	"github.com/influxdata/chronograf/roles"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/oauth2"
+	"github.com/hws522/chronograf/organizations"
+	"github.com/hws522/chronograf/roles"
 )
 
 // HasAuthorizedToken extracts the token from a request and validates it using the authenticator.
@@ -278,7 +278,7 @@ func AuthorizedUser(
 
 		if hasAuthorizedRole(u, role) {
 			if len(u.Roles) != 1 {
-				msg := `User %d has too many role in organization. User: %#v.Please report this log at https://github.com/influxdata/chronograf/issues/new"`
+				msg := `User %d has too many role in organization. User: %#v.Please report this log at https://github.com/hws522/chronograf/issues/new"`
 				log.Error(fmt.Sprint(msg, u.ID, u))
 				unknownErrorWithMessage(w, fmt.Errorf("please have administrator check logs and report error"), logger)
 				return

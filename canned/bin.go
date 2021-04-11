@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 //go:generate go-bindata -o bin_gen.go -ignore README|apps|.sh|go -pkg canned .

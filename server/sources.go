@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/chronograf/enterprise"
-	"github.com/influxdata/chronograf/flux"
+	"github.com/hws522/chronograf/enterprise"
+	"github.com/hws522/chronograf/flux"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/influx"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/influx"
 )
 
 type sourceLinks struct {

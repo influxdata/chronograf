@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/oauth2"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/oauth2"
 )
 
 func (s *Service) mapPrincipalToSuperAdmin(p oauth2.Principal) bool {

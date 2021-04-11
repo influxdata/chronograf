@@ -29,7 +29,7 @@ ${mdMarker}
 
     `
     const href = encodeURI(
-      `https://github.com/influxdata/chronograf/issues/new?title=${finalMessage}&body=${template}`
+      `https://github.com/hws522/chronograf/issues/new?title=${finalMessage}&body=${template}`
     )
 
     return (

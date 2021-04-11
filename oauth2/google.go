@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 
 	"golang.org/x/oauth2"
 	goauth2 "google.golang.org/api/oauth2/v2"

@@ -12,10 +12,10 @@ import (
 	"time"
 
 	gojwt "github.com/dgrijalva/jwt-go"
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/influx"
-	"github.com/influxdata/chronograf/log"
-	"github.com/influxdata/chronograf/mocks"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/influx"
+	"github.com/hws522/chronograf/log"
+	"github.com/hws522/chronograf/mocks"
 )
 
 // NewClient initializes an HTTP Client for InfluxDB.

@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/influx"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/influx"
 	"github.com/influxdata/influxdb/influxql"
 )
 

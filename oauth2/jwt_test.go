@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/influxdata/chronograf/oauth2"
+	"github.com/hws522/chronograf/oauth2"
 )
 
 func TestAuthenticate(t *testing.T) {

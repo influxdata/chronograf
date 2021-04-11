@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/log"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/log"
 )
 
 func TestEnvironment(t *testing.T) {

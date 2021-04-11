@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf"
-	kapa "github.com/influxdata/chronograf/kapacitor"
+	"github.com/hws522/chronograf"
+	kapa "github.com/hws522/chronograf/kapacitor"
 )
 
 type postKapacitorRequest struct {

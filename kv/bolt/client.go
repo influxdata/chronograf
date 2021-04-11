@@ -8,9 +8,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv"
-	"github.com/influxdata/chronograf/mocks"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv"
+	"github.com/hws522/chronograf/mocks"
 	bolt "go.etcd.io/bbolt"
 )
 

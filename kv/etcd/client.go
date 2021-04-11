@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv"
-	"github.com/influxdata/chronograf/mocks"
-	"github.com/influxdata/chronograf/server/config"
-	"github.com/influxdata/chronograf/snowflake"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv"
+	"github.com/hws522/chronograf/mocks"
+	"github.com/hws522/chronograf/server/config"
+	"github.com/hws522/chronograf/snowflake"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/clientv3/concurrency"
 )

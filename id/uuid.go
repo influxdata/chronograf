@@ -1,8 +1,8 @@
 package id
 
 import (
-	"github.com/influxdata/chronograf"
 	"github.com/google/uuid"
+	"github.com/hws522/chronograf"
 )
 
 var _ chronograf.ID = &UUID{}

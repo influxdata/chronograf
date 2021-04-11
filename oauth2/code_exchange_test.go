@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	clog "github.com/influxdata/chronograf/log"
+	clog "github.com/hws522/chronograf/log"
 	"github.com/stretchr/testify/require"
 )
 

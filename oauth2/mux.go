@@ -5,7 +5,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 // Check to ensure AuthMux is an oauth2.Mux

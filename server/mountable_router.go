@@ -4,7 +4,7 @@ import (
 	"net/http"
 	libpath "path"
 
-	"github.com/influxdata/chronograf"
+	"github.com/hws522/chronograf"
 )
 
 var _ chronograf.Router = &MountableRouter{}

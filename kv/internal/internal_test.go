@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/internal"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv/internal"
 )
 
 func TestMarshalSource(t *testing.T) {

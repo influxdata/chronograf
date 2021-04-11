@@ -14,8 +14,8 @@ import (
 
 	"github.com/bouk/httprouter"
 	"github.com/google/go-cmp/cmp"
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/mocks"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/mocks"
 )
 
 func Test_Cells_CorrectAxis(t *testing.T) {

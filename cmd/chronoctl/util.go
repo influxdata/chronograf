@@ -8,9 +8,9 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv"
-	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv"
+	"github.com/hws522/chronograf/kv/bolt"
 )
 
 func NewBoltClient(path string) (kv.Store, error) {

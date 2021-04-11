@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/id"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/id"
 	client "github.com/influxdata/kapacitor/client/v1"
 )
 

@@ -15,7 +15,7 @@ Thank you for reporting a bug in Chronograf.
     * https://community.influxdata.com/
 * Please check whether the bug can be reproduced with the latest release.
 * The fastest way to fix a bug is to open a Pull Request.
-    * https://github.com/influxdata/chronograf/pulls
+    * https://github.com/hws522/chronograf/pulls
 
 -->
 

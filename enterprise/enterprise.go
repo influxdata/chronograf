@@ -7,8 +7,8 @@ import (
 
 	"context"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/influx"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/influx"
 )
 
 var _ chronograf.TimeSeries = &Client{}

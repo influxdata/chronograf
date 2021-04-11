@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf/influx"
+	"github.com/hws522/chronograf/influx"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/ast"
 	_ "github.com/influxdata/flux/builtin"

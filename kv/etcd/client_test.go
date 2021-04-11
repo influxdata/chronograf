@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv"
-	"github.com/influxdata/chronograf/mocks"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv"
+	"github.com/hws522/chronograf/mocks"
 	"github.com/stretchr/testify/require"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/embed"

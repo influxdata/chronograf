@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/kv/internal"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/kv/internal"
 )
 
 // Ensure dashboardsStore implements chronograf.DashboardsStore.

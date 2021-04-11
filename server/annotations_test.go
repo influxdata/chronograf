@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/bouk/httprouter"
-	"github.com/influxdata/chronograf"
-	"github.com/influxdata/chronograf/mocks"
+	"github.com/hws522/chronograf"
+	"github.com/hws522/chronograf/mocks"
 )
 
 var mockStore = &mocks.Store{
