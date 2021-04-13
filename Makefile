@@ -50,7 +50,7 @@ chronogiraffe: ${BINARY}
 	@echo "$$CHRONOGIRAFFE"
 
 docker-${BINARY}: $(SOURCES)
-	CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
 		./cmd/chronograf/main.go
 
 docker: dep assets docker-${BINARY}
