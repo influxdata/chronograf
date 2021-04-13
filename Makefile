@@ -32,8 +32,10 @@ all: dep build
 build: assets ${BINARY}
 
 ${BINARY}: $(SOURCES) .bindata .jsdep .godep
-	GOOS=windows GO111MODULE=on go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
-	GOOS=windows GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
+	# GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
+	GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o chronograf.exe ./cmd/chronograf/main.go
+	# GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
+	GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
 
 define CHRONOGIRAFFE
              ._ o o
@@ -50,7 +52,7 @@ chronogiraffe: ${BINARY}
 	@echo "$$CHRONOGIRAFFE"
 
 docker-${BINARY}: $(SOURCES)
-	CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 GO111MODULE=on go build -installsuffix cgo -o ${BINARY} ${LDFLAGS} \
 		./cmd/chronograf/main.go
 
 docker: dep assets docker-${BINARY}
