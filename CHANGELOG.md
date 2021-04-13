@@ -28,7 +28,7 @@
 1. [#5708](https://github.com/influxdata/chronograf/pull/5708): Improve detection of server type in Connection Wizard.
 1. [#5711](https://github.com/influxdata/chronograf/pull/5711): Add error handling to Alert History page.
 1. [#5716](https://github.com/influxdata/chronograf/pull/5716): Do not fetch tag values when no measurement tags are available.
-
+1. [#5722](https://github.com/influxdata/chronograf/pull/5722): Filter out roles with unknown organization reference.
 ### Other
 
 1. [#5685](https://github.com/influxdata/chronograf/pull/5685): Upgrade UI to TypeScript 4.2.2.
