@@ -1008,6 +1008,81 @@ func TestService_UpdateUser(t *testing.T) {
 			wantBody:        `{"code":422,"message":"duplicate organization \"1\" in roles"}`,
 		},
 		{
+			name: "Update chronograf user roles also removes existing roles that reference unknown organization",
+			fields: fields{
+				Logger: log.New(log.DebugLevel),
+				OrganizationsStore: &mocks.OrganizationsStore{
+					GetF: func(ctx context.Context, q chronograf.OrganizationQuery) (*chronograf.Organization, error) {
+						switch *q.ID {
+						case "1":
+							return &chronograf.Organization{
+								ID:          "1",
+								Name:        "org",
+								DefaultRole: roles.ViewerRoleName,
+							}, nil
+						}
+						return nil, chronograf.ErrOrganizationNotFound
+					},
+				},
+				UsersStore: &mocks.UsersStore{
+					UpdateF: func(ctx context.Context, user *chronograf.User) error {
+						return nil
+					},
+					GetF: func(ctx context.Context, q chronograf.UserQuery) (*chronograf.User, error) {
+						switch *q.ID {
+						case 1336:
+							return &chronograf.User{
+								ID:       1336,
+								Name:     "bobbetta",
+								Provider: "github",
+								Scheme:   "oauth2",
+								Roles: []chronograf.Role{
+									{
+										Organization: "orphan",
+										Name:         EditorRole.Name,
+									},
+								},
+							}, nil
+						default:
+							return nil, fmt.Errorf("User with ID %d not found", *q.ID)
+						}
+					},
+				},
+			},
+			args: args{
+				w: httptest.NewRecorder(),
+				r: httptest.NewRequest(
+					"PATCH",
+					"http://any.url",
+					nil,
+				),
+				userKeyUser: &chronograf.User{
+					ID:         0,
+					Name:       "coolUser",
+					Provider:   "github",
+					Scheme:     "oauth2",
+					SuperAdmin: false,
+				},
+				user: &userRequest{
+					ID: 1336,
+					Roles: []chronograf.Role{
+						{
+							Organization: "orphan",
+							Name:         EditorRole.Name,
+						},
+						{
+							Name:         roles.AdminRoleName,
+							Organization: "1",
+						},
+					},
+				},
+			},
+			id:              "1336",
+			wantStatus:      http.StatusOK,
+			wantContentType: "application/json",
+			wantBody:        `{"id":"1336","superAdmin":false,"name":"bobbetta","provider":"github","scheme":"oauth2","links":{"self":"/chronograf/v1/users/1336"},"roles":[{"name":"admin","organization":"1"}]}`,
+		},
+		{
 			name: "SuperAdmin modifying their own SuperAdmin Status - user missing from context",
 			fields: fields{
 				Logger: log.New(log.DebugLevel),
