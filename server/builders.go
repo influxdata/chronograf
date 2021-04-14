@@ -138,6 +138,7 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 				Password: fs.InfluxDBPassword,
 				URL:      fs.InfluxDBURL,
 				Default:  true,
+				Version:  "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
 			}}
 		stores = append([]chronograf.SourcesStore{influxStore}, stores...)
 	}
