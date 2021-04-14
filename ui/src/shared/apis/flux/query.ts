@@ -127,7 +127,7 @@ export const executeQuery = async (
   xhr.onerror = reject
 
   const path = encodeURIComponent(`/api/v2/query?organization=defaultorgname`)
-  const url = `${window.basepath}${source.links.flux}?path=${path}`
+  const url = `${window.basepath}${source.links.flux}?version=${source.version}&path=${path}`
   const dialect = {annotations: ['group', 'datatype', 'default']}
   const body = JSON.stringify({query, dialect})
 
