@@ -46,7 +46,7 @@ func (s *Service) Flux(w http.ResponseWriter, r *http.Request) {
 	httpAPIFlux := "/chronograf/v1/flux"
 	res := fluxResponse{
 		Links: fluxLinks{
-			Self:        fmt.Sprintf("%s", httpAPIFlux),
+			Self:        httpAPIFlux,
 			Suggestions: fmt.Sprintf("%s/suggestions", httpAPIFlux),
 		},
 	}
