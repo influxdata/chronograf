@@ -177,7 +177,8 @@ func (s *Service) NewUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.validRoles(serverCtx, req.Roles); err != nil {
+	roles, err := s.validRoles(serverCtx, req.Roles, []chronograf.Role{})
+	if err != nil {
 		invalidData(w, err, s.Logger)
 		return
 	}
@@ -186,7 +187,7 @@ func (s *Service) NewUser(w http.ResponseWriter, r *http.Request) {
 		Name:     req.Name,
 		Provider: req.Provider,
 		Scheme:   req.Scheme,
-		Roles:    req.Roles,
+		Roles:    roles,
 	}
 
 	if cfg.Auth.SuperAdminNewUsers {
@@ -261,13 +262,13 @@ func (s *Service) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	serverCtx := serverContext(ctx)
-	if err := s.validRoles(serverCtx, req.Roles); err != nil {
+	roles, err := s.validRoles(serverCtx, req.Roles, u.Roles)
+	if err != nil {
 		invalidData(w, err, s.Logger)
 		return
 	}
 
-	// ValidUpdate should ensure that req.Roles is not nil
-	u.Roles = req.Roles
+	u.Roles = roles
 
 	// If the request contains a name, it must be the same as the
 	// one on the user. This is particularly useful to the front-end
@@ -362,18 +363,32 @@ func setSuperAdmin(ctx context.Context, req userRequest, user *chronograf.User) 
 	return nil
 }
 
-func (s *Service) validRoles(ctx context.Context, rs []chronograf.Role) error {
+func (s *Service) validRoles(ctx context.Context, rs []chronograf.Role, existing []chronograf.Role) ([]chronograf.Role, error) {
+	// validates that newly added roles reference existing organization
+	// and remove existing roles that reference organization that does not exist
+	// https://github.com/influxdata/chronograf/pull/5722
+	validRoles := make([]chronograf.Role, 0, len(existing))
+	existingOrgs := make(map[string]struct{})
+	for _, role := range existing {
+		existingOrgs[role.Organization] = struct{}{}
+	}
 	for i, role := range rs {
-		// verify that the organization exists
+		_, orgAlreadyUsed := existingOrgs[role.Organization]
 		org, err := s.Store.Organizations(ctx).Get(ctx, chronograf.OrganizationQuery{ID: &role.Organization})
-		if err != nil {
-			return err
+		if err != nil && !orgAlreadyUsed {
+			return nil, err
 		}
 		if role.Name == roles.WildcardRoleName {
+			if err != nil {
+				return nil, err
+			}
 			role.Name = org.DefaultRole
 			rs[i] = role
 		}
+		if err != chronograf.ErrOrganizationNotFound {
+			validRoles = append(validRoles, role)
+		}
 	}
 
-	return nil
+	return validRoles, nil
 }

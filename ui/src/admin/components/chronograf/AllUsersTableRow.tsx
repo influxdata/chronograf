@@ -132,10 +132,12 @@ export default class AllUsersTableRow extends Component<Props> {
   }
 
   private get userOrganizationTags() {
-    return this.userRoles.map((role: Role) => ({
-      ...role,
-      name: this.findOrganizationByRole(role).name,
-    }))
+    return this.userRoles
+      .map((role: Role) => ({
+        ...role,
+        name: this.findOrganizationByRole(role)?.name,
+      }))
+      .filter(x => x.name !== undefined)
   }
 
   private findOrganizationByRole(role: Role): Organization | null {

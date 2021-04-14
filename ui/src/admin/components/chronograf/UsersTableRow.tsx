@@ -48,7 +48,7 @@ class UsersTableRow extends PureComponent<Props> {
           <span className="chronograf-user--role">
             <Dropdown
               items={this.rolesDropdownItems}
-              selected={this.currentRole.name}
+              selected={this.currentRole?.name}
               onChoose={onChangeUserRole(user, this.currentRole)}
               buttonColor="btn-primary"
               buttonSize="btn-xs"
