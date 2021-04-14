@@ -29,7 +29,7 @@
 1. [#5711](https://github.com/influxdata/chronograf/pull/5711): Add error handling to Alert History page.
 1. [#5716](https://github.com/influxdata/chronograf/pull/5716): Do not fetch tag values when no measurement tags are available.
 1. [#5722](https://github.com/influxdata/chronograf/pull/5722): Filter out roles with unknown organization reference.
-1. [#5724](https://github.com/influxdata/chronograf/pull/5724): Enforce detection of flux when InfluxDB is passed via CLI.
+1. [#5724](https://github.com/influxdata/chronograf/pull/5724): Detect actual flux support in flux proxy.
 
 ### Other
 
