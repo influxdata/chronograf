@@ -137,7 +137,8 @@ func (s *Service) ProxyFlux(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := r.URL.Query().Get("path")
+	query := r.URL.Query()
+	path := query.Get("path")
 	if path == "" {
 		Error(w, http.StatusUnprocessableEntity, "path query parameter required", s.Logger)
 		return
@@ -148,6 +149,12 @@ func (s *Service) ProxyFlux(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		notFound(w, id, s.Logger)
 		return
+	}
+	version := query.Get("version")
+	if version != "" {
+		// the client knows the actual version of the source, the sources
+		// return from the server always go live to re-fetch their versions
+		src.Version = version
 	}
 
 	fluxEnabled, err := hasFlux(ctx, src)
