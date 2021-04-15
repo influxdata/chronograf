@@ -21,6 +21,8 @@ import {
   filterUsers,
   addDatabaseDeleteCode,
   removeDatabaseDeleteCode,
+  loadQueries,
+  setQueriesSort,
 } from 'src/admin/actions/influxdb'
 
 import {
@@ -374,5 +376,73 @@ describe('Admin.InfluxDB.Reducers', () => {
     }
 
     expect(actual.permissions).toEqual(expected.permissions)
+  })
+
+  describe('Queries', () => {
+    it('it sorts queries by time descending OOTB', () => {
+      const queries = [
+        {id: 1, database: 'a', duration: '11µs'},
+        {id: 2, database: 'b', duration: '36µs'},
+      ]
+      const actual = reducer(undefined, loadQueries(queries))
+      expect(actual.queriesSort).toEqual('-time')
+      expect(actual.queries).toHaveLength(2)
+      expect(actual.queries[0].id).toEqual(2)
+      expect(actual.queries[1].id).toEqual(1)
+    })
+    it('it sorts queries by database', () => {
+      const queries = [
+        {id: 2, database: 'b', duration: '36µs'},
+        {id: 1, database: 'a', duration: '11µs'},
+      ]
+      let actual = reducer(undefined, loadQueries(queries))
+      actual = reducer(actual, setQueriesSort('+database'))
+      expect(actual.queriesSort).toEqual('+database')
+      expect(actual.queries).toHaveLength(2)
+      expect(actual.queries[0].id).toEqual(1)
+      expect(actual.queries[1].id).toEqual(2)
+      actual = reducer(actual, setQueriesSort('-database'))
+      expect(actual.queriesSort).toEqual('-database')
+      expect(actual.queries).toHaveLength(2)
+      expect(actual.queries[0].id).toEqual(2)
+      expect(actual.queries[1].id).toEqual(1)
+      const queries2 = [
+        {id: 3, database: 'c', duration: '36µs'},
+        {id: 1, database: 'x', duration: '11µs'},
+        {id: 2, database: 'd', duration: '12µs'},
+      ]
+      actual = reducer(actual, loadQueries(queries2))
+      expect(actual.queries).toHaveLength(3)
+      expect(actual.queries[0].id).toEqual(3)
+      expect(actual.queries[1].id).toEqual(2)
+      expect(actual.queries[2].id).toEqual(1)
+    })
+    it('it sorts queries by time', () => {
+      const queries = [
+        {id: 2, database: 'b', duration: '36µs'},
+        {id: 1, database: 'a', duration: '11µs'},
+      ]
+      let actual = reducer(undefined, loadQueries(queries))
+      actual = reducer(actual, setQueriesSort('+time'))
+      expect(actual.queriesSort).toEqual('+time')
+      expect(actual.queries).toHaveLength(2)
+      expect(actual.queries[0].id).toEqual(1)
+      expect(actual.queries[1].id).toEqual(2)
+      actual = reducer(actual, setQueriesSort('-time'))
+      expect(actual.queriesSort).toEqual('-time')
+      expect(actual.queries).toHaveLength(2)
+      expect(actual.queries[0].id).toEqual(2)
+      expect(actual.queries[1].id).toEqual(1)
+      const queries2 = [
+        {id: 3, database: 'c', duration: '36µs'},
+        {id: 1, database: 'x', duration: '11µs'},
+        {id: 2, database: 'd', duration: '12µs'},
+      ]
+      actual = reducer(actual, loadQueries(queries2))
+      expect(actual.queries).toHaveLength(3)
+      expect(actual.queries[0].id).toEqual(3)
+      expect(actual.queries[1].id).toEqual(2)
+      expect(actual.queries[2].id).toEqual(1)
+    })
   })
 })
