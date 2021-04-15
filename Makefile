@@ -32,10 +32,10 @@ all: dep build
 build: assets ${BINARY}
 
 ${BINARY}: $(SOURCES) .bindata .jsdep .godep
-	#GO111MODULE=on go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
-	GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o chronograf.exe ./cmd/chronograf/main.go
-	#GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
-	GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
+	GO111MODULE=on go build -o ${BINARY} ${LDFLAGS} ./cmd/chronograf/main.go
+	#GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o chronograf.exe ./cmd/chronograf/main.go
+	GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
+	#GOOS=windows GOARCH=amd64 GO111MODULE=on go build -o ${CTLBINARY} ${LDFLAGS} ./cmd/chronoctl
 
 define CHRONOGIRAFFE
              ._ o o
