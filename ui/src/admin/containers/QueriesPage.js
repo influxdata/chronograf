@@ -11,7 +11,7 @@ import {showDatabases, showQueries} from 'shared/apis/metaQuery'
 import QueriesTable from 'src/admin/components/QueriesTable'
 import showDatabasesParser from 'shared/parsing/showDatabases'
 import showQueriesParser from 'shared/parsing/showQueries'
-import {TIMES} from 'src/admin/constants'
+import {parseDuration, compareDurations} from 'src/utils/influxDuration'
 import {notifyQueriesError} from 'shared/copy/notifications'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -72,12 +72,12 @@ class QueriesPage extends Component {
         })
 
         const queries = uniqBy(flatten(allQueries), q => q.id)
+        // parse durations so that they can be compared
+        queries.forEach(x => (x._pd = parseDuration(x.duration)))
 
         // sorting queries by magnitude, so generally longer queries will appear atop the list
         const sortedQueries = queries.sort((a, b) => {
-          const aTime = TIMES.find(t => a.duration.match(t.test))
-          const bTime = TIMES.find(t => b.duration.match(t.test))
-          return +aTime.magnitude <= +bTime.magnitude
+          return -compareDurations(a._pd, b._pd)
         })
 
         loadQueries(sortedQueries)
