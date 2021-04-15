@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/binary"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/id"
-	"github.com/hws522/chronograf/mocks"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/id"
+	"github.com/influxdata/chronograf/mocks"
 )
 
 var _ chronograf.KVClient = (*Service)(nil)

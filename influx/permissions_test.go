@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 func TestDifference(t *testing.T) {

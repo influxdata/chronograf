@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 type dashboardLinks struct {

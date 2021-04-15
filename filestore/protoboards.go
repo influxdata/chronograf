@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // ProtoboardExt is the the file extension searched for in the directory for protoboard files

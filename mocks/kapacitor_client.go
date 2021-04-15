@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"github.com/hws522/chronograf/kapacitor"
+	"github.com/influxdata/chronograf/kapacitor"
 	client "github.com/influxdata/kapacitor/client/v1"
 )
 

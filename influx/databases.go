@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // AllDB returns all databases from within Influx

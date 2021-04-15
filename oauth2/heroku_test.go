@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	clog "github.com/hws522/chronograf/log"
-	"github.com/hws522/chronograf/oauth2"
+	clog "github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/oauth2"
 )
 
 func Test_Heroku_PrincipalID_ExtractsEmailAddress(t *testing.T) {

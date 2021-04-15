@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // Store is a server.DataStore

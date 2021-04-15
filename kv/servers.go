@@ -3,8 +3,8 @@ package kv
 import (
 	"context"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/kv/internal"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv/internal"
 )
 
 // Ensure serversStore implements chronograf.ServersStore.

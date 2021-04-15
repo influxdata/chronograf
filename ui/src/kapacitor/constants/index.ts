@@ -89,7 +89,7 @@ export const defaultRuleConfigs = {
 
 export const defaultEveryFrequency: string = '30s'
 
-// constants taken from https://github.com/hws522/chronograf/blob/870dbc72d1a8b784eaacad5eeea79fc54968b656/kapacitor/operators.go#L13
+// constants taken from https://github.com/influxdata/chronograf/blob/870dbc72d1a8b784eaacad5eeea79fc54968b656/kapacitor/operators.go#L13
 export const EQUAL_TO: string = 'equal to'
 export const LESS_THAN: string = 'less than'
 export const GREATER_THAN: string = 'greater than'

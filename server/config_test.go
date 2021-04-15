@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/log"
-	"github.com/hws522/chronograf/mocks"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/mocks"
 )
 
 func TestConfig(t *testing.T) {

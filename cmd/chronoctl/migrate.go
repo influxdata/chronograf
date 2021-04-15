@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/kv"
-	"github.com/hws522/chronograf/kv/bolt"
-	"github.com/hws522/chronograf/kv/etcd"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv"
+	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/influxdata/chronograf/kv/etcd"
 )
 
 func init() {

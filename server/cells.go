@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/bouk/httprouter"
-	"github.com/hws522/chronograf"
-	idgen "github.com/hws522/chronograf/id"
+	"github.com/influxdata/chronograf"
+	idgen "github.com/influxdata/chronograf/id"
 	"github.com/microcosm-cc/bluemonday"
 )
 

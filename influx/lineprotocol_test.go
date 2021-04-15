@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 func Test_toLineProtocol(t *testing.T) {

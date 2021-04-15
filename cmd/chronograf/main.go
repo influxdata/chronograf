@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/server"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/server"
 	flags "github.com/jessevdk/go-flags"
 )
 

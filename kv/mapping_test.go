@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 var mappingCmpOptions = cmp.Options{

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/url"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/enterprise"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/enterprise"
 )
 
 type ControlClient struct {

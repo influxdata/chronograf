@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 	"golang.org/x/oauth2"
 	ogh "golang.org/x/oauth2/github"
 )

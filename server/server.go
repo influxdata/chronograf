@@ -24,15 +24,15 @@ import (
 	"time"
 
 	basicAuth "github.com/abbot/go-http-auth"
-	"github.com/hws522/chronograf"
-	idgen "github.com/hws522/chronograf/id"
-	"github.com/hws522/chronograf/influx"
-	"github.com/hws522/chronograf/kv"
-	"github.com/hws522/chronograf/kv/bolt"
-	"github.com/hws522/chronograf/kv/etcd"
-	clog "github.com/hws522/chronograf/log"
-	"github.com/hws522/chronograf/oauth2"
-	"github.com/hws522/chronograf/server/config"
+	"github.com/influxdata/chronograf"
+	idgen "github.com/influxdata/chronograf/id"
+	"github.com/influxdata/chronograf/influx"
+	"github.com/influxdata/chronograf/kv"
+	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/influxdata/chronograf/kv/etcd"
+	clog "github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/oauth2"
+	"github.com/influxdata/chronograf/server/config"
 	client "github.com/influxdata/usage-client/v1"
 	flags "github.com/jessevdk/go-flags"
 )
@@ -126,7 +126,7 @@ type Server struct {
 	NonceExpiration time.Duration  `long:"nonce-expiration" default:"10m" description:"Duration in which a signed nonce is valid. Used for superadmin token authentication." env:"NONCE_EXPIRATION"`
 
 	StatusFeedURL          string            `long:"status-feed-url" description:"URL of a JSON Feed to display as a News Feed on the client Status page." default:"https://influxdata.com/feed/json" env:"STATUS_FEED_URL"`
-	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/hws522/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/hws522/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
+	CustomLinks            map[string]string `long:"custom-link" description:"Custom link to be added to the client User menu. Multiple links can be added by using multiple of the same flag with different 'name:url' values, or as an environment variable with comma-separated 'name:url' values. E.g. via flags: '--custom-link=InfluxData:https://www.influxdata.com --custom-link=Chronograf:https://github.com/influxdata/chronograf'. E.g. via environment variable: 'export CUSTOM_LINKS=InfluxData:https://www.influxdata.com,Chronograf:https://github.com/influxdata/chronograf'" env:"CUSTOM_LINKS" env-delim:","`
 	TelegrafSystemInterval time.Duration     `long:"telegraf-system-interval" default:"1m" description:"Duration used in the GROUP BY time interval for the hosts list" env:"TELEGRAF_SYSTEM_INTERVAL"`
 
 	HostPageDisabled  bool   `short:"H" long:"host-page-disabled" description:"Disable the host list page" env:"HOST_PAGE_DISABLED"`

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // Shared transports for all clients to prevent leaking connections.

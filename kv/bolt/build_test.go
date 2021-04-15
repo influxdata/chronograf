@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // TestClient wraps *bolt.Client.

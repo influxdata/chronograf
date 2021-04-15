@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // ConfigStore stores global application configuration

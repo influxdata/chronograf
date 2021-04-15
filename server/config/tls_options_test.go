@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hws522/chronograf/server/config"
+	"github.com/influxdata/chronograf/server/config"
 	"github.com/stretchr/testify/require"
 )
 

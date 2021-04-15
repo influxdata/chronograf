@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hws522/chronograf/log"
+	"github.com/influxdata/chronograf/log"
 	"github.com/stretchr/testify/require"
 )
 

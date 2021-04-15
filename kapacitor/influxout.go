@@ -3,7 +3,7 @@ package kapacitor
 import (
 	"fmt"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // InfluxOut creates a kapacitor influxDBOut node to write alert data to Database, RP, Measurement.

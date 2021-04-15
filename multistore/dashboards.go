@@ -3,7 +3,7 @@ package multistore
 import (
 	"context"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // Ensure DashboardsStore implements chronograf.DashboardsStore.

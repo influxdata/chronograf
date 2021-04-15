@@ -1,25 +1,24 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 <!--
 
-Thank you for reporting a bug in Chronograf. 
+Thank you for reporting a bug in Chronograf.
 
 * Please ask usage questions on the Chronograf Community site.
     * https://community.influxdata.com/
 * Please check whether the bug can be reproduced with the latest release.
 * The fastest way to fix a bug is to open a Pull Request.
-    * https://github.com/hws522/chronograf/pulls
+    * https://github.com/influxdata/chronograf/pulls
 
 -->
 
-__Steps to reproduce:__
+**Steps to reproduce:**
 List the minimal actions needed to reproduce the behavior.
 
 1. ...
@@ -28,21 +27,21 @@ List the minimal actions needed to reproduce the behavior.
 
 If applicable, add screenshots to help explain your problem.
 
-__Expected behavior:__
+**Expected behavior:**
 Describe what you expected to happen.
 
-__Actual behavior:__
+**Actual behavior:**
 Describe What actually happened.
 
-__Environment info:__
+**Environment info:**
 
-* Chronograf version: 
-* Other relevant environment details: OS type and version, browser type and version, InfluxDB version ...
+- Chronograf version:
+- Other relevant environment details: OS type and version, browser type and version, InfluxDB version ...
 
-__Config:__
+**Config:**
 Copy any non-default config values here or attach the full config as a gist or file.
 
 <!-- The following sections are only required if relevant. -->
 
-__Logs:__
+**Logs:**
 Include a snippet of errors in the log.

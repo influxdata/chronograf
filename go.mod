@@ -1,4 +1,4 @@
-module github.com/hws522/chronograf
+module github.com/influxdata/chronograf
 
 go 1.15
 

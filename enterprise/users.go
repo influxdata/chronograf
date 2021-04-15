@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // UserStore uses a control client operate on Influx Enterprise users

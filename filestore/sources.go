@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // SrcExt is the the file extension searched for in the directory for source files

@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/kv"
-	"github.com/hws522/chronograf/mocks"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv"
+	"github.com/influxdata/chronograf/mocks"
 	"github.com/stretchr/testify/require"
 )
 

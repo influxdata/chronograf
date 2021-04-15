@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 func TestInterfaceImplementation(t *testing.T) {

@@ -464,7 +464,7 @@ class Dygraph extends Component<Props, State> {
     const {axes, labels, queries} = this.props
 
     // if label comes back as '', use the y axis label from props.labels, if it exists
-    // see https://github.com/hws522/chronograf/issues/5314
+    // see https://github.com/influxdata/chronograf/issues/5314
     const fallbackLabel = labels[1] || ''
     const label = getDeep<string>(axes, `${axis}.label`, '') || fallbackLabel
     const queryConfig = getDeep(queries, '0.queryConfig', false)

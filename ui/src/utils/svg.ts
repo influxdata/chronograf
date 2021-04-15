@@ -12,7 +12,7 @@ export const clipPathUrl = elementId => {
   // dynamically on the client to evade the server asset rewriting.
   //
   // [0]: https://docs.influxdata.com/chronograf/v1.6/administration/config-options/#chronograf-service-options
-  // [1]: https://github.com/hws522/chronograf/pull/3402
+  // [1]: https://github.com/influxdata/chronograf/pull/3402
   const leftParen = String.fromCharCode(40)
 
   return `url${leftParen}#${elementId})`

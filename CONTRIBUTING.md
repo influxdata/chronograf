@@ -4,11 +4,11 @@
 
 Before you file an issue, please search existing issues in case it has already been filed, or perhaps even fixed. If you file an issue, please include the following.
 
-* Full details of your operating system (or distribution) e.g. 64-bit Ubuntu 14.04.
-* The version of Chronograf you are running
-* Whether you installed it using a pre-built package, or built it from source.
-* A small test case, if applicable, that demonstrates the issues.
-* A screenshot, when appropriate, to demonstrate any issues that are related to the UI
+- Full details of your operating system (or distribution) e.g. 64-bit Ubuntu 14.04.
+- The version of Chronograf you are running
+- Whether you installed it using a pre-built package, or built it from source.
+- A small test case, if applicable, that demonstrates the issues.
+- A screenshot, when appropriate, to demonstrate any issues that are related to the UI
 
 Remember the golden rule of bug reports: **The easier you make it for us to reproduce the problem, the faster it will get fixed.**
 If you have never written a bug report before, or if you want to brush up on your bug reporting skills, we recommend reading [Simon Tatham's essay "How to Report Bugs Effectively."](http://www.chiark.greenend.org.uk/~sgtatham/bugs.html)
@@ -32,10 +32,10 @@ There will usually be some back and forth as we finalize the change, but once th
 To assist in review for the PR, please add the following to your pull request comment:
 
 ```md
-* [ ] CHANGELOG.md updated
-* [ ] Rebased/mergable
-* [ ] Tests pass
-* [ ] Sign [CLA](https://influxdata.com/community/cla/) (if not already signed)
+- [ ] CHANGELOG.md updated
+- [ ] Rebased/mergable
+- [ ] Tests pass
+- [ ] Sign [CLA](https://influxdata.com/community/cla/) (if not already signed)
 ```
 
 ## Signing the CLA
@@ -47,13 +47,13 @@ If you are going to be contributing back to Chronograf please take a second to s
 
 You'll need to install Node 14 to run the frontend chronograf application.
 
-* [Install Node 14](https://nodejs.org/en/about/releases/)
+- [Install Node 14](https://nodejs.org/en/about/releases/)
 
 ## Installing & Using Yarn
 
 You'll need to install Yarn to manage the frontend (JavaScript) dependencies.
 
-* [Install Yarn](https://yarnpkg.com/en/docs/install)
+- [Install Yarn](https://yarnpkg.com/en/docs/install)
 
 To add a dependency via Yarn, for example, run `yarn add <dependency>` from within the `/chronograf/ui` directory.
 
@@ -65,7 +65,7 @@ Chronograf requires Go 1.15 or higher.
 
 You'll need to install Dep to manage the backend (Go) dependencies.
 
-* [Install Dep](https://github.com/golang/dep)
+- [Install Dep](https://github.com/golang/dep)
 
 To add a dependency via Dep, for example, run `dep ensure -add <dependency>` from within the `/chronograf` directory. _Note that as of this writing, `dep ensure` will modify many extraneous vendor files, so you'll need to run `dep prune` to clean this up before committing your changes. Apparently, the next version of `dep` will take care of this step for you._
 
@@ -74,7 +74,7 @@ To add a dependency via Dep, for example, run `dep ensure -add <dependency>` fro
 Go has the ability to import remote packages via revision control systems with the `go get` command. To ensure that you can retrieve any remote package, be sure to install the following rcs software to your system.
 Currently the project only depends on `git`.
 
-* [Install Git](http://git-scm.com/book/en/Getting-Started-Installing-Git)
+- [Install Git](http://git-scm.com/book/en/Getting-Started-Installing-Git)
 
 ## Getting the source
 
@@ -83,7 +83,7 @@ Setup the project structure and fetch the repo like so:
 ```bash
   mkdir $HOME/go
   export GOPATH=$HOME/go
-  go get github.com/hws522/chronograf
+  go get github.com/influxdata/chronograf
 ```
 
 You can add the line `export GOPATH=$HOME/go` to your bash/zsh file to be set for every shell instead of having to manually run it everytime.
@@ -106,7 +106,7 @@ Retaining the directory structure `$GOPATH/src/github.com/influxdata` is necessa
 Make sure you have `go` and `yarn` installed and the project structure as shown above. We provide a `Makefile` to get up and running quickly, so all you'll need to do is run the following:
 
 ```bash
-  cd $GOPATH/src/github.com/hws522/chronograf
+  cd $GOPATH/src/github.com/influxdata/chronograf
   make
 ```
 
@@ -115,10 +115,10 @@ The binaries will be located in `$GOPATH/bin`.
 To run the tests, execute the following command:
 
 ```bash
-  cd $GOPATH/src/github.com/hws522/chronograf
+  cd $GOPATH/src/github.com/influxdata/chronograf
   make test
 ```
 
 ## Continuous Integration testing
 
-Chronograf uses CircleCI for continuous integration testing. To see how the code is built and tested, check out [this file](https://github.com/hws522/chronograf/blob/master/Makefile). It closely follows the build and test process outlined above. You can see the exact version of Go Chronograf uses for testing by consulting that file.
+Chronograf uses CircleCI for continuous integration testing. To see how the code is built and tested, check out [this file](https://github.com/influxdata/chronograf/blob/master/Makefile). It closely follows the build and test process outlined above. You can see the exact version of Go Chronograf uses for testing by consulting that file.

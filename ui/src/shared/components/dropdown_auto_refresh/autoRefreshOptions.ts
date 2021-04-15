@@ -26,12 +26,6 @@ const autoRefreshOptions: AutoRefreshOption[] = [
   },
   autoRefreshOptionPaused,
   {
-    id: 'auto-refresh-100ms',
-    milliseconds: 100,
-    label: '100ms',
-    type: AutoRefreshOptionType.Option,
-  },
-  {
     id: 'auto-refresh-500ms',
     milliseconds: 500,
     label: '500ms',

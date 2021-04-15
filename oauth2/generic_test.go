@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	clog "github.com/hws522/chronograf/log"
-	"github.com/hws522/chronograf/oauth2"
+	clog "github.com/influxdata/chronograf/log"
+	"github.com/influxdata/chronograf/oauth2"
 )
 
 func TestGenericGroup_withNotEmail(t *testing.T) {
@@ -200,7 +200,7 @@ func TestGenericPrincipalIDDomain(t *testing.T) {
 }
 
 func TestGenericPrincipalIDDomain_BitBucket(t *testing.T) {
-	// Test of https://github.com/hws522/chronograf/issues/5399
+	// Test of https://github.com/influxdata/chronograf/issues/5399
 	t.Parallel()
 	expectedGroup := "xyz.io"
 	expectedPrincipalID := "pavel.zavora@xyz.io"

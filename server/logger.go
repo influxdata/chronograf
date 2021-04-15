@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // statusWriterFlusher captures the status header of an http.ResponseWriter

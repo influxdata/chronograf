@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hws522/chronograf/mocks"
-	"github.com/hws522/chronograf/server"
+	"github.com/influxdata/chronograf/mocks"
+	"github.com/influxdata/chronograf/server"
 )
 
 var prefixerTests = []struct {

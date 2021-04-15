@@ -5,9 +5,9 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/kv/internal"
-	"github.com/hws522/chronograf/organizations"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv/internal"
+	"github.com/influxdata/chronograf/organizations"
 )
 
 // Ensure organizationsStore implements chronograf.OrganizationsStore.

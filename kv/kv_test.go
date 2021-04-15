@@ -5,10 +5,10 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/kv"
-	"github.com/hws522/chronograf/kv/bolt"
-	"github.com/hws522/chronograf/mocks"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv"
+	"github.com/influxdata/chronograf/kv/bolt"
+	"github.com/influxdata/chronograf/mocks"
 )
 
 // NewTestClient creates new *bolt.Client with a set time and temp path.

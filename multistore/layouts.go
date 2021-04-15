@@ -3,7 +3,7 @@ package multistore
 import (
 	"context"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // Layouts is a LayoutsStore that contains multiple LayoutsStores

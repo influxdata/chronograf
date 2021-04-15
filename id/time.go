@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // tm generates an id based on current time

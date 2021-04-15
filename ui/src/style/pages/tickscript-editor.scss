@@ -14,7 +14,7 @@ $tickscript-controls-height: 60px;
 .tickscript-console,
 .tickscript-editor {
   // cannot use 100%, since it does not work in FireFox
-  // see https://github.com/hws522/chronograf/issues/5037
+  // see https://github.com/influxdata/chronograf/issues/5037
   width: calc(100vw - 60px);
 }
 .tickscript-console,

@@ -13,9 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hws522/chronograf"
-	uuid "github.com/hws522/chronograf/id"
-	"github.com/hws522/chronograf/influx"
+	"github.com/influxdata/chronograf"
+	uuid "github.com/influxdata/chronograf/id"
+	"github.com/influxdata/chronograf/influx"
 )
 
 // ValidInfluxRequest checks if queries specify a command.

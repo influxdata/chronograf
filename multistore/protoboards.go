@@ -3,7 +3,7 @@ package multistore
 import (
 	"context"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // Protoboards is a ProtoboardsStore that contains multiple ProtoboardsStores

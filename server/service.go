@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/enterprise"
-	"github.com/hws522/chronograf/influx"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/enterprise"
+	"github.com/influxdata/chronograf/influx"
 )
 
 // Service handles REST calls to the persistence

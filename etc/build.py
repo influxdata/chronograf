@@ -46,7 +46,7 @@ CONFIGURATION_FILES = [
 ]
 
 PACKAGE_LICENSE = "AGPLv3"
-PACKAGE_URL = "https://github.com/hws522/chronograf"
+PACKAGE_URL = "https://github.com/influxdata/chronograf"
 MAINTAINER = "contact@influxdb.com"
 VENDOR = "InfluxData"
 DESCRIPTION = "Open source monitoring and visualization UI for the entire TICK stack."
@@ -505,11 +505,11 @@ def build(version=None,
         if "arm" in fullarch:
             if fullarch == "armel":
                 build_command += "GOARM=5 "
-                # required because of https://github.com/hws522/chronograf/issues/5405
+                # required because of https://github.com/influxdata/chronograf/issues/5405
                 build_command_last_options += "-installsuffix armv5 "
             elif fullarch == "armhf" or fullarch == "arm":
                 build_command += "GOARM=6 "
-                # required because of https://github.com/hws522/chronograf/issues/5405
+                # required because of https://github.com/influxdata/chronograf/issues/5405
                 build_command_last_options += "-installsuffix armv6 "
             elif fullarch == "arm64":
                 pass # No GOARM for arm64

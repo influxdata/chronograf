@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/mocks"
-	"github.com/hws522/chronograf/organizations"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/mocks"
+	"github.com/influxdata/chronograf/organizations"
 )
 
 // IgnoreFields is used because ID cannot be predicted reliably

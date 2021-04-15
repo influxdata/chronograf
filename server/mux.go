@@ -15,9 +15,9 @@ import (
 	"github.com/NYTimes/gziphandler"
 	basicAuth "github.com/abbot/go-http-auth"
 	"github.com/bouk/httprouter" // When julienschmidt/httprouter v2 w/ context is out, switch
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/oauth2"
-	"github.com/hws522/chronograf/roles"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/oauth2"
+	"github.com/influxdata/chronograf/roles"
 )
 
 const (

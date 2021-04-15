@@ -10,7 +10,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hws522/chronograf"
+	"github.com/influxdata/chronograf"
 )
 
 // Ensure KapacitorStore implements chronograf.ServersStore.

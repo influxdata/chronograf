@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/bouk/httprouter"
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/mocks"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/mocks"
 )
 
 func TestService_Queries(t *testing.T) {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hws522/chronograf"
-	"github.com/hws522/chronograf/kv/internal"
+	"github.com/influxdata/chronograf"
+	"github.com/influxdata/chronograf/kv/internal"
 )
 
 // Ensure usersStore implements chronograf.UsersStore.
