@@ -115,6 +115,8 @@ type MultiSourceBuilder struct {
 	InfluxDBURL      string
 	InfluxDBUsername string
 	InfluxDBPassword string
+	InfluxDBOrg      string
+	InfluxDBToken    string
 
 	Logger chronograf.Logger
 	ID     chronograf.ID
@@ -129,13 +131,26 @@ func (fs *MultiSourceBuilder) Build(db chronograf.SourcesStore) (*multistore.Sou
 	stores := []chronograf.SourcesStore{db, files}
 
 	if fs.InfluxDBURL != "" {
+		var influxdbType, username, password string
+		if fs.InfluxDBOrg == "" || fs.InfluxDBToken == "" {
+			// v1 InfluxDB
+			username = fs.InfluxDBUsername
+			password = fs.InfluxDBPassword
+			influxdbType = chronograf.InfluxDB
+		} else {
+			// v2 InfluxDB
+			username = fs.InfluxDBOrg
+			password = fs.InfluxDBToken
+			influxdbType = chronograf.InfluxDBv2
+		}
+
 		influxStore := &memdb.SourcesStore{
 			Source: &chronograf.Source{
 				ID:       0,
 				Name:     fs.InfluxDBURL,
-				Type:     chronograf.InfluxDB,
-				Username: fs.InfluxDBUsername,
-				Password: fs.InfluxDBPassword,
+				Type:     influxdbType,
+				Username: username,
+				Password: password,
 				URL:      fs.InfluxDBURL,
 				Default:  true,
 				Version:  "unknown", // a real version is re-fetched at runtime; use "unknown" version as a fallback, empty version would imply OSS 2.x
