@@ -1,7 +1,7 @@
 import {
   parseDuration,
   InfluxDuration,
-  durationComparator,
+  compareDurations,
 } from 'src/utils/influxDuration'
 describe('InfluxDuration', () => {
   describe('parseDuration', () => {
@@ -57,24 +57,24 @@ describe('InfluxDuration', () => {
       })
     })
   })
-  describe('durationComparator', () => {
+  describe('compareDurations', () => {
     const units = ['w', 'd', 'h', 'm', 's', 'ms', 'u', 'ns']
     it('compares simple durations', () => {
       units.forEach(unit => {
         const x = parseDuration(`1${unit}`)
         const y = parseDuration(`2${unit}`)
-        expect(durationComparator(x, x)).toEqual(0)
-        expect(durationComparator(x, y)).toBeLessThan(0)
-        expect(durationComparator(y, x)).toBeGreaterThan(0)
+        expect(compareDurations(x, x)).toEqual(0)
+        expect(compareDurations(x, y)).toBeLessThan(0)
+        expect(compareDurations(y, x)).toBeGreaterThan(0)
       })
     })
     it('compares 3-unit durations', () => {
       units.slice(0, 5).forEach(unit => {
         const x = parseDuration(`1${unit}2u3ns`)
         const y = parseDuration(`1${unit}2u14ns`)
-        expect(durationComparator(x, x)).toEqual(0)
-        expect(durationComparator(x, y)).toBeLessThan(0)
-        expect(durationComparator(y, x)).toBeGreaterThan(0)
+        expect(compareDurations(x, x)).toEqual(0)
+        expect(compareDurations(x, y)).toBeLessThan(0)
+        expect(compareDurations(y, x)).toBeGreaterThan(0)
       })
     })
   })

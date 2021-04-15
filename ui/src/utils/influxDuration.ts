@@ -46,12 +46,9 @@ export function parseDuration(duration: string): InfluxDuration {
 }
 
 /**
- * DurationComparator implements sort comparator for InfluxDuration instances.
+ * CompareDurations implements sort comparator for InfluxDuration instances.
  */
-export function durationComparator(
-  a: InfluxDuration,
-  b: InfluxDuration
-): number {
+export function compareDurations(a: InfluxDuration, b: InfluxDuration): number {
   let i = 0
   for (; i < 8; i++) {
     if (a[i] !== b[i]) {
