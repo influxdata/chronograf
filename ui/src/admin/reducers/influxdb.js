@@ -24,13 +24,13 @@ const querySorters = {
   '+database'(queries) {
     queries.forEach(x => (x._pd = parseDuration(x.duration)))
     return queries.sort((a, b) => {
-      return compareDurations(a._pd, b._pd)
+      return a.database.localeCompare(b.database)
     })
   },
   '-database'(queries) {
     queries.forEach(x => (x._pd = parseDuration(x.duration)))
     return queries.sort((a, b) => {
-      return -compareDurations(a._pd, b._pd)
+      return -a.database.localeCompare(b.database)
     })
   },
 }

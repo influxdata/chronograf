@@ -392,8 +392,8 @@ describe('Admin.InfluxDB.Reducers', () => {
     })
     it('it sorts queries by database', () => {
       const queries = [
-        {id: 2, database: 'b', duration: '36µs'},
-        {id: 1, database: 'a', duration: '11µs'},
+        {id: 2, database: 'b', duration: '16µs'},
+        {id: 1, database: 'a', duration: '21µs'},
       ]
       let actual = reducer(undefined, loadQueries(queries))
       actual = reducer(actual, setQueriesSort('+database'))
@@ -407,15 +407,15 @@ describe('Admin.InfluxDB.Reducers', () => {
       expect(actual.queries[0].id).toEqual(2)
       expect(actual.queries[1].id).toEqual(1)
       const queries2 = [
-        {id: 3, database: 'c', duration: '36µs'},
+        {id: 3, database: 'c', duration: '26µs'},
         {id: 1, database: 'x', duration: '11µs'},
-        {id: 2, database: 'd', duration: '12µs'},
+        {id: 2, database: 'd', duration: '22µs'},
       ]
       actual = reducer(actual, loadQueries(queries2))
       expect(actual.queries).toHaveLength(3)
-      expect(actual.queries[0].id).toEqual(3)
+      expect(actual.queries[0].id).toEqual(1)
       expect(actual.queries[1].id).toEqual(2)
-      expect(actual.queries[2].id).toEqual(1)
+      expect(actual.queries[2].id).toEqual(3)
     })
     it('it sorts queries by time', () => {
       const queries = [
