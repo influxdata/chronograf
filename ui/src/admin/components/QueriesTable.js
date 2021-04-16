@@ -5,8 +5,8 @@ import QueryRow from 'src/admin/components/QueryRow'
 import {QUERIES_TABLE} from 'src/admin/constants/tableSizing'
 
 const QueriesTable = ({queries, queriesSort, changeSort, onKillQuery}) => {
-  let timeSortClass = ''
-  let dbSortClass = ''
+  let timeSortClass = 'col--sort-next-desc'
+  let dbSortClass = 'col--sort-next-asc'
   let newTimeSort = '-time'
   let newDBSort = '+database'
   switch (queriesSort) {

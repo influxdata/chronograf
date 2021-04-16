@@ -55,17 +55,23 @@ table > thead > tr > th.admin-table--left-offset {
     top: 50%;
     right: 6px;
     opacity: 0;
+    transform: translateY(-50%);
     transition: opacity 0.25s ease, color 0.25s ease, transform 0.25s ease;
   }
 }
 
-.admin-table > thead > tr > th.col--sortable.col--sort-asc:after {
+.admin-table > thead > tr > th.col--sortable.col--sort-asc:after,
+.admin-table > thead > tr > th.col--sortable.col--sort-next-asc:hover:after {
   transform: translateY(-50%) rotate(180deg);
   opacity: 1;
 }
-.admin-table > thead > tr > th.col--sortable.col--sort-desc:after {
+.admin-table > thead > tr > th.col--sortable.col--sort-desc:after,
+.admin-table > thead > tr > th.col--sortable.col--sort-next-desc:hover:after {
   transform: translateY(-50%) rotate(0deg);
   opacity: 1;
+}
+.admin-table > thead > tr > th.col--sortable.col--sort-next-asc:after {
+  transform: translateY(-50%) rotate(180deg);
 }
 
 table > tbody > tr.admin-table--edit-row,
