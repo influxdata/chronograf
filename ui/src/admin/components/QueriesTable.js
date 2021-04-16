@@ -28,39 +28,33 @@ const QueriesTable = ({queries, queriesSort, changeSort, onKillQuery}) => {
       break
   }
   return (
-    <div>
-      <div className="panel panel-solid">
-        <div className="panel-body">
-          <table className="table v-center admin-table table-highlight">
-            <thead>
-              <tr>
-                <th
-                  style={{width: `${QUERIES_TABLE.colDatabase}px`}}
-                  className={`col--sortable ${dbSortClass}`}
-                  onClick={() => changeSort(newDBSort)}
-                >
-                  <div>Database</div>
-                </th>
-                <th>Query</th>
-                <th
-                  style={{width: `${QUERIES_TABLE.colRunning}px`}}
-                  className={`col--sortable ${timeSortClass}`}
-                  onClick={() => changeSort(newTimeSort)}
-                >
-                  Running
-                </th>
-                <th style={{width: `${QUERIES_TABLE.colKillQuery}px`}} />
-              </tr>
-            </thead>
-            <tbody>
-              {queries.map(q => (
-                <QueryRow key={q.id} query={q} onKill={onKillQuery} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <table className="table v-center admin-table table-highlight">
+      <thead>
+        <tr>
+          <th
+            style={{width: `${QUERIES_TABLE.colDatabase}px`}}
+            className={`col--sortable ${dbSortClass}`}
+            onClick={() => changeSort(newDBSort)}
+          >
+            <div>Database</div>
+          </th>
+          <th>Query</th>
+          <th
+            style={{width: `${QUERIES_TABLE.colRunning}px`}}
+            className={`col--sortable ${timeSortClass}`}
+            onClick={() => changeSort(newTimeSort)}
+          >
+            Running
+          </th>
+          <th style={{width: `${QUERIES_TABLE.colKillQuery}px`}} />
+        </tr>
+      </thead>
+      <tbody>
+        {queries.map(q => (
+          <QueryRow key={q.id} query={q} onKill={onKillQuery} />
+        ))}
+      </tbody>
+    </table>
   )
 }
 
