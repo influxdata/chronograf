@@ -41,6 +41,33 @@ table > thead > tr > th.admin-table--left-offset {
   padding-left: 15px;
 }
 
+.admin-table > thead > tr > th.col--sort-asc,
+.admin-table > thead > tr > th.col--sort-desc {
+  color: #22adf6;
+}
+.admin-table > thead > tr > th.col--sortable {
+  position: absolute;
+  &:after {
+    font-family: 'icomoon';
+    content: '\e902';
+    font-size: 13px;
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    opacity: 0;
+    transition: opacity 0.25s ease, color 0.25s ease, transform 0.25s ease;
+  }
+}
+
+.admin-table > thead > tr > th.col--sortable.col--sort-asc:after {
+  transform: translateY(-50%) rotate(180deg);
+  opacity: 1;
+}
+.admin-table > thead > tr > th.col--sortable.col--sort-desc:after {
+  transform: translateY(-50%) rotate(0deg);
+  opacity: 1;
+}
+
 table > tbody > tr.admin-table--edit-row,
 table > tbody > tr.admin-table--edit-row:hover,
 table.table-highlight > tbody > tr.admin-table--edit-row,

@@ -5,25 +5,25 @@ import QueryRow from 'src/admin/components/QueryRow'
 import {QUERIES_TABLE} from 'src/admin/constants/tableSizing'
 
 const QueriesTable = ({queries, queriesSort, changeSort, onKillQuery}) => {
-  let currentTimeSort = ''
-  let currentDBSort = ''
+  let timeSortClass = ''
+  let dbSortClass = ''
   let newTimeSort = '-time'
   let newDBSort = '+database'
   switch (queriesSort) {
     case '-time':
-      currentTimeSort = 'desc'
+      timeSortClass = 'col--sort-desc'
       newTimeSort = '+time'
       break
     case '+time':
-      currentTimeSort = 'asc'
+      timeSortClass = 'col--sort-asc'
       newTimeSort = '-time'
       break
     case '-database':
-      currentDBSort = 'desc'
+      dbSortClass = 'col--sort-desc'
       newDBSort = '+database'
       break
     case '+database':
-      currentDBSort = 'asc'
+      dbSortClass = 'col--sort-asc'
       newDBSort = '-database'
       break
   }
@@ -36,16 +36,18 @@ const QueriesTable = ({queries, queriesSort, changeSort, onKillQuery}) => {
               <tr>
                 <th
                   style={{width: `${QUERIES_TABLE.colDatabase}px`}}
+                  className={`col--sortable ${dbSortClass}`}
                   onClick={() => changeSort(newDBSort)}
                 >
-                  Database {currentDBSort}
+                  <div>Database</div>
                 </th>
                 <th>Query</th>
                 <th
                   style={{width: `${QUERIES_TABLE.colRunning}px`}}
+                  className={`col--sortable ${timeSortClass}`}
                   onClick={() => changeSort(newTimeSort)}
                 >
-                  Running {currentTimeSort}
+                  Running
                 </th>
                 <th style={{width: `${QUERIES_TABLE.colKillQuery}px`}} />
               </tr>
