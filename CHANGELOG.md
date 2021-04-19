@@ -17,7 +17,6 @@
 1. [#5710](https://github.com/influxdata/chronograf/pull/5710): Add PKCE to OAuth integrations.
 1. [#5713](https://github.com/influxdata/chronograf/pull/5713): Support GitHub Enterprise in the existing GitHub OAuth integration.
 1. [#5728](https://github.com/influxdata/chronograf/pull/5728): Improve InfluxDB Admin | Queries page.
-1. [#5713](https://github.com/influxdata/chronograf/pull/5710): Support GitHub Enterprise in the existing GitHub OAuth integration.
 1. [#5726](https://github.com/influxdata/chronograf/pull/5726): Allow to setup InfluxDB v2 connection from chronograf command-line.
 
 ### Bug Fixes
