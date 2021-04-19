@@ -15,7 +15,7 @@
 1. [#5704](https://github.com/influxdata/chronograf/pull/5704): Allow to filter fields in Query Builder UI.
 1. [#5712](https://github.com/influxdata/chronograf/pull/5712): Allow to change write precission.
 1. [#5710](https://github.com/influxdata/chronograf/pull/5710): Add PKCE to OAuth integrations.
-1. [#5713](https://github.com/influxdata/chronograf/pull/5710): Support GitHub Enterprise in the existing GitHub OAuth integration.
+1. [#5713](https://github.com/influxdata/chronograf/pull/5713): Support GitHub Enterprise in the existing GitHub OAuth integration.
 
 ### Bug Fixes
 
