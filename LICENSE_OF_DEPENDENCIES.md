@@ -1,4 +1,5 @@
 ### Go
+
 * cloud.google.com/go [Apache-2.0](https://github.com/googleapis/google-cloud-go/blob/master/LICENSE)
 * github.com/BurntSushi/toml [MIT](https://github.com/BurntSushi/toml/blob/master/COPYING)
 * github.com/abbot/go-http-auth [Apache-2.0](https://github.com/abbot/go-http-auth/blob/master/LICENSE)
@@ -80,7 +81,9 @@
 * honnef.co/go/tools/lint [BSD-3-Clause](https://github.com/dominikh/go-tools/blob/master/LICENSE)
 * honnef.co/go/tools/ssa [BSD-3-Clause](https://github.com/dominikh/go-tools/blob/master/LICENSE)
 * sigs.k8s.io/yaml [MIT](https://github.com/kubernetes-sigs/yaml/blob/master/LICENSE)
+
 ### Javascript
+
 * @babel/code-frame 7.12.13 [MIT](https://github.com/babel/babel.git)
 * @babel/code-frame 7.12.11 [MIT](https://github.com/babel/babel.git)
 * @babel/code-frame 7.0.0 [MIT](https://github.com/babel/babel/tree/master/packages/babel-code-frame)
