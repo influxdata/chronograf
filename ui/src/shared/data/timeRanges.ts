@@ -5,6 +5,15 @@ const nowMinus30d = 'now() - 30d'
 export const timeRanges: TimeRangeOption[] = [
   {
     defaultGroupBy: '10s',
+    seconds: 60,
+    inputValue: 'Past 1m',
+    lower: 'now() - 1m',
+    lowerFlux: '-1m',
+    upper: null,
+    menuOption: 'Past 1m',
+  },
+  {
+    defaultGroupBy: '10s',
     seconds: 300,
     inputValue: 'Past 5m',
     lower: 'now() - 5m',
