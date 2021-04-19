@@ -6,12 +6,45 @@ import {
   NEW_EMPTY_RP,
 } from 'src/admin/constants'
 import uuid from 'uuid'
+import {parseDuration, compareDurations} from 'src/utils/influxDuration'
+
+const querySorters = {
+  '+time'(queries) {
+    queries.forEach(x => (x._pd = parseDuration(x.duration)))
+    return queries.sort((a, b) => {
+      return compareDurations(a._pd, b._pd)
+    })
+  },
+  '-time'(queries) {
+    queries.forEach(x => (x._pd = parseDuration(x.duration)))
+    return queries.sort((a, b) => {
+      return -compareDurations(a._pd, b._pd)
+    })
+  },
+  '+database'(queries) {
+    queries.forEach(x => (x._pd = parseDuration(x.duration)))
+    return queries.sort((a, b) => {
+      return a.database.localeCompare(b.database)
+    })
+  },
+  '-database'(queries) {
+    queries.forEach(x => (x._pd = parseDuration(x.duration)))
+    return queries.sort((a, b) => {
+      return -a.database.localeCompare(b.database)
+    })
+  },
+}
+const identity = x => x
+function sortQueries(queries, queriesSort) {
+  return (querySorters[queriesSort] || identity)(queries)
+}
 
 const initialState = {
   users: [],
   roles: [],
   permissions: [],
   queries: [],
+  queriesSort: '-time',
   queryIDToKill: null,
   databases: [],
 }
@@ -274,7 +307,18 @@ const adminInfluxDB = (state = initialState, action) => {
     }
 
     case 'INFLUXDB_LOAD_QUERIES': {
-      return {...state, ...action.payload}
+      return {
+        ...state,
+        queries: sortQueries(action.payload.queries, state.queriesSort),
+      }
+    }
+    case 'INFLUXDB_SET_QUERIES_SORT': {
+      const queriesSort = action.payload.queriesSort
+      return {
+        ...state,
+        queriesSort,
+        queries: sortQueries(state.queries, queriesSort),
+      }
     }
 
     case 'INFLUXDB_FILTER_USERS': {

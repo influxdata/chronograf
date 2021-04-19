@@ -177,7 +177,13 @@ export const setQueryToKill = queryIDToKill => ({
 export const loadQueries = queries => ({
   type: 'INFLUXDB_LOAD_QUERIES',
   payload: {
-    queries,
+    queries: [...queries],
+  },
+})
+export const setQueriesSort = queriesSort => ({
+  type: 'INFLUXDB_SET_QUERIES_SORT',
+  payload: {
+    queriesSort,
   },
 })
 
