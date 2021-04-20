@@ -38,6 +38,7 @@
 1. [#5690](https://github.com/influxdata/chronograf/pull/5690): Upgrade dependencies, use eslint for typescript.
 1. [#5701](https://github.com/influxdata/chronograf/pull/5690): Fix unsafe React lifecycle functions.
 1. [#5706](https://github.com/influxdata/chronograf/pull/5706): Improve communication with InfluxDB Enterprise.
+1. [#5730](https://github.com/influxdata/chronograf/pull/5730): Update license of dependencies.
 
 ### Breaking Changes
 
