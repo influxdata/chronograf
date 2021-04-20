@@ -55,6 +55,7 @@ import 'src/style/chronograf.scss'
 import {HEARTBEAT_INTERVAL} from 'src/shared/constants'
 
 import * as ErrorsModels from 'src/types/errors'
+import {setCustomAutoRefreshOptions} from './shared/components/dropdown_auto_refresh/autoRefreshOptions'
 
 const errorsQueue = []
 
@@ -103,6 +104,7 @@ const populateEnv = async url => {
   try {
     const envVars = await getEnv(url)
     dispatch(setHostPageDisplayStatus(envVars.hostPageDisabled))
+    setCustomAutoRefreshOptions(envVars.customAutoRefresh)
   } catch (error) {
     console.error('Error fetching envVars', error)
   }
