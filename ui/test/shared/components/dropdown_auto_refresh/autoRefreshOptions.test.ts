@@ -67,7 +67,7 @@ describe('setCustomAutoRefreshOptions', () => {
     ])
   })
   it('returns sorted auto-refresh options with more customizations', () => {
-    setCustomAutoRefreshOptions('500ms=500,12s=12000,5m=300000')
+    setCustomAutoRefreshOptions('500ms=500;12s=12000;5m=300000')
     const newOpts = getAutoRefreshOptions()
     expect(newOpts).toEqual([
       {
@@ -132,9 +132,9 @@ describe('setCustomAutoRefreshOptions', () => {
     const origConsoleWarn = console.warn
     console.warn = () => (warnings += 1)
     try {
-      setCustomAutoRefreshOptions(' 12s=12000, ,a=, b=10')
+      setCustomAutoRefreshOptions(' 12s=12000;; ;a=; b=10')
       const newOpts = getAutoRefreshOptions()
-      expect(warnings).toBe(3) // '','a=','b=10'
+      expect(warnings).toBe(3) // ' ','a=','b=10'
       expect(newOpts).toEqual([
         {
           id: 'auto-refresh-header',
@@ -187,7 +187,7 @@ describe('setCustomAutoRefreshOptions', () => {
   it('removes all custom auto refresh intervals with empty spec', () => {
     // setting empty spec reset customizations
     const origSize = getAutoRefreshOptions().length
-    setCustomAutoRefreshOptions('12s=12000,5m=300000')
+    setCustomAutoRefreshOptions('12s=12000;5m=300000')
     const opts1 = getAutoRefreshOptions()
     expect(opts1.length).toBe(origSize + 2)
     setCustomAutoRefreshOptions('')

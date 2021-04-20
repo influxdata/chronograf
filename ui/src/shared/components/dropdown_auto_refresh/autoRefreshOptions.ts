@@ -65,7 +65,7 @@ export function setCustomAutoRefreshOptions(customSpec: string | undefined) {
   }
   const [header, paused, ...otherDefault] = defaultAutoRefreshOptions
   const customOptions: AutoRefreshOption[] = customSpec
-    .split(',')
+    .split(';')
     .reduce((acc, singleSpec) => {
       if (!singleSpec) {
         return acc // ignore empty values
