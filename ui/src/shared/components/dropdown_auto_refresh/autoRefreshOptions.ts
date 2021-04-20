@@ -17,7 +17,7 @@ export const autoRefreshOptionPaused: AutoRefreshOption = {
   type: AutoRefreshOptionType.Option,
 }
 
-let autoRefreshOptions: AutoRefreshOption[] = [
+const defaultAutoRefreshOptions: AutoRefreshOption[] = [
   {
     id: 'auto-refresh-header',
     milliseconds: 9999,
@@ -56,22 +56,27 @@ let autoRefreshOptions: AutoRefreshOption[] = [
     type: AutoRefreshOptionType.Option,
   },
 ]
+let autoRefreshOptions = [...defaultAutoRefreshOptions]
 
 /** setCustomAutoRefreshOptions allows to set custom auto-refresh options */
 export function setCustomAutoRefreshOptions(customSpec: string | undefined) {
-  if (!customSpec) {
+  if (customSpec === undefined) {
     return
   }
-  // 1st filter all custom options
-  autoRefreshOptions = autoRefreshOptions.filter(x => x.id.startsWith('custom'))
-  const [header, paused, ...other] = autoRefreshOptions
+  const [header, paused, ...otherDefault] = defaultAutoRefreshOptions
   const customOptions: AutoRefreshOption[] = customSpec
     .split(',')
     .reduce((acc, singleSpec) => {
+      if (!singleSpec) {
+        return acc // ignore empty values
+      }
       try {
-        const [a, b] = singleSpec.split['=']
+        const [a, b] = singleSpec.split('=')
         const label = a.trim()
         const milliseconds = parseInt(b, 10)
+        if (!(milliseconds >= 100)) {
+          throw new Error('Miliseconds is not a positive number >= 100')
+        }
         acc.push({
           id: `custom-refresh-${label}`,
           milliseconds,
@@ -80,16 +85,16 @@ export function setCustomAutoRefreshOptions(customSpec: string | undefined) {
         })
       } catch (e) {
         console.warn(
-          'Unable to parse custom autoRefreshOption, it should have format `label=milliseconds`',
-          e
+          `Ignoring custom autoRefreshOption "${singleSpec}", it must have format label=milliseconds !, e
+          }`
         )
       }
       return acc
     }, [] as AutoRefreshOption[])
-  return [
+  autoRefreshOptions = [
     header,
     paused,
-    [...other, ...customOptions].sort(
+    ...[...otherDefault, ...customOptions].sort(
       (a, b) => a.milliseconds - b.milliseconds
     ),
   ]
