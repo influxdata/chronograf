@@ -60,6 +60,8 @@ type Server struct {
 	InfluxDBURL      string `long:"influxdb-url" description:"Location of your InfluxDB instance" env:"INFLUXDB_URL"`
 	InfluxDBUsername string `long:"influxdb-username" description:"Username for your InfluxDB instance" env:"INFLUXDB_USERNAME"`
 	InfluxDBPassword string `long:"influxdb-password" description:"Password for your InfluxDB instance" env:"INFLUXDB_PASSWORD"`
+	InfluxDBOrg      string `long:"influxdb-org" description:"Organization for your InfluxDB v2 instance" env:"INFLUXDB_ORG"`
+	InfluxDBToken    string `long:"influxdb-token" description:"Token for your InfluxDB v2 instance" env:"INFLUXDB_TOKEN"`
 
 	KapacitorURL      string `long:"kapacitor-url" description:"Location of your Kapacitor instance" env:"KAPACITOR_URL"`
 	KapacitorUsername string `long:"kapacitor-username" description:"Username of your Kapacitor instance" env:"KAPACITOR_USERNAME"`
@@ -540,6 +542,8 @@ func (s *Server) newBuilders(logger chronograf.Logger) builders {
 			InfluxDBURL:      s.InfluxDBURL,
 			InfluxDBUsername: s.InfluxDBUsername,
 			InfluxDBPassword: s.InfluxDBPassword,
+			InfluxDBOrg:      s.InfluxDBOrg,
+			InfluxDBToken:    s.InfluxDBToken,
 			Logger:           logger,
 			ID:               idgen.NewTime(),
 			Path:             s.ResourcesPath,
