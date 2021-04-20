@@ -962,6 +962,7 @@ type BuildStore interface {
 type Environment struct {
 	TelegrafSystemInterval time.Duration `json:"telegrafSystemInterval"`
 	HostPageDisabled       bool          `json:"HostPageDisabled"`
+	CustomAutoRefresh      string        `json:"customAutoRefresh,omitempty"`
 }
 
 // KVClient defines what each kv store should be capable of.

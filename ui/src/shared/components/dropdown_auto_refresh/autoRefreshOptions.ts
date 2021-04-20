@@ -17,7 +17,7 @@ export const autoRefreshOptionPaused: AutoRefreshOption = {
   type: AutoRefreshOptionType.Option,
 }
 
-const autoRefreshOptions: AutoRefreshOption[] = [
+const defaultAutoRefreshOptions: AutoRefreshOption[] = [
   {
     id: 'auto-refresh-header',
     milliseconds: 9999,
@@ -56,5 +56,50 @@ const autoRefreshOptions: AutoRefreshOption[] = [
     type: AutoRefreshOptionType.Option,
   },
 ]
+let autoRefreshOptions = [...defaultAutoRefreshOptions]
 
-export default autoRefreshOptions
+/** setCustomAutoRefreshOptions allows to set custom auto-refresh options */
+export function setCustomAutoRefreshOptions(customSpec: string | undefined) {
+  if (customSpec === undefined) {
+    return
+  }
+  const [header, paused, ...otherDefault] = defaultAutoRefreshOptions
+  const customOptions: AutoRefreshOption[] = customSpec
+    .split(';')
+    .reduce((acc, singleSpec) => {
+      if (!singleSpec) {
+        return acc // ignore empty values
+      }
+      try {
+        const [a, b] = singleSpec.split('=')
+        const label = a.trim()
+        const milliseconds = parseInt(b, 10)
+        if (!(milliseconds >= 100)) {
+          throw new Error('Miliseconds is not a positive number >= 100')
+        }
+        acc.push({
+          id: `custom-refresh-${label}`,
+          milliseconds,
+          label,
+          type: AutoRefreshOptionType.Option,
+        })
+      } catch (e) {
+        console.warn(
+          `Ignoring custom autoRefreshOption "${singleSpec}", it must have format label=milliseconds !, e
+          }`
+        )
+      }
+      return acc
+    }, [] as AutoRefreshOption[])
+  autoRefreshOptions = [
+    header,
+    paused,
+    ...[...otherDefault, ...customOptions].sort(
+      (a, b) => a.milliseconds - b.milliseconds
+    ),
+  ]
+}
+
+export function getAutoRefreshOptions(): AutoRefreshOption[] {
+  return autoRefreshOptions
+}

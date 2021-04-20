@@ -38,6 +38,20 @@ func TestEnvironment(t *testing.T) {
 				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"1m0s","hostPageDisabled":false}`,
 			},
 		},
+		{
+			name: "Get environment with CustomAutoRefresh",
+			fields: fields{
+				Environment: chronograf.Environment{
+					TelegrafSystemInterval: 2 * time.Minute,
+					CustomAutoRefresh:      "500ms=500",
+				},
+			},
+			wants: wants{
+				statusCode:  200,
+				contentType: "application/json",
+				body:        `{"links":{"self":"/chronograf/v1/env"},"telegrafSystemInterval":"2m0s","hostPageDisabled":false,"customAutoRefresh": "500ms=500"}`,
+			},
+		},
 	}
 
 	for _, tt := range tests {
