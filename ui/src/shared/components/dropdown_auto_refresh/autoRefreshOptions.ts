@@ -17,7 +17,7 @@ export const autoRefreshOptionPaused: AutoRefreshOption = {
   type: AutoRefreshOptionType.Option,
 }
 
-const autoRefreshOptions: AutoRefreshOption[] = [
+let autoRefreshOptions: AutoRefreshOption[] = [
   {
     id: 'auto-refresh-header',
     milliseconds: 9999,
@@ -57,4 +57,44 @@ const autoRefreshOptions: AutoRefreshOption[] = [
   },
 ]
 
-export default autoRefreshOptions
+/** setCustomAutoRefreshOptions allows to set custom auto-refresh options */
+export function setCustomAutoRefreshOptions(customSpec: string | undefined) {
+  if (!customSpec) {
+    return
+  }
+  // 1st filter all custom options
+  autoRefreshOptions = autoRefreshOptions.filter(x => x.id.startsWith('custom'))
+  const [header, paused, ...other] = autoRefreshOptions
+  const customOptions: AutoRefreshOption[] = customSpec
+    .split(',')
+    .reduce((acc, singleSpec) => {
+      try {
+        const [a, b] = singleSpec.split['=']
+        const label = a.trim()
+        const milliseconds = parseInt(b, 10)
+        acc.push({
+          id: `custom-refresh-${label}`,
+          milliseconds,
+          label,
+          type: AutoRefreshOptionType.Option,
+        })
+      } catch (e) {
+        console.warn(
+          'Unable to parse custom autoRefreshOption, it should have format `label=milliseconds`',
+          e
+        )
+      }
+      return acc
+    }, [] as AutoRefreshOption[])
+  return [
+    header,
+    paused,
+    [...other, ...customOptions].sort(
+      (a, b) => a.milliseconds - b.milliseconds
+    ),
+  ]
+}
+
+export function getAutoRefreshOptions(): AutoRefreshOption[] {
+  return autoRefreshOptions
+}
