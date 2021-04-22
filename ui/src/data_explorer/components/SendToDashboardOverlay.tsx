@@ -320,7 +320,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
     const isFluxQuery = queryType === QueryType.Flux
 
-    let newCellQueries
+    let newCellQueries: CellQuery[]
 
     if (isFluxQuery) {
       newCellQueries = [
