@@ -11,7 +11,6 @@ import _ from 'lodash'
 import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'
-import {buildRawText} from 'src/utils/influxql'
 import {defaultQueryDraft} from 'src/shared/utils/timeMachine'
 import {
   TimeMachineContainer,
@@ -321,21 +320,22 @@ export class DataExplorer extends PureComponent<Props, State> {
       sendDashboardCell,
       handleGetDashboards,
       notify,
-      draftScript,
     } = this.props
 
-    const {isSendToDashboardVisible, isStaticLegend} = this.state
+    const {
+      isSendToDashboardVisible,
+      isStaticLegend,
+      activeQueryIndex,
+    } = this.state
     return (
       <Authorized requiredRole={EDITOR_ROLE}>
         <OverlayTechnology visible={isSendToDashboardVisible}>
           <SendToDashboardOverlay
             notify={notify}
             onCancel={this.toggleSendToDashboard}
-            queryConfig={this.activeQueryConfig}
-            script={draftScript}
             source={source}
-            rawText={this.rawText}
             dashboards={dashboards}
+            activeQueryIndex={activeQueryIndex}
             handleGetDashboards={handleGetDashboards}
             sendDashboardCell={sendDashboardCell}
             isStaticLegend={isStaticLegend}
@@ -406,28 +406,6 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   private get selectedDatabase(): string {
     return _.get(this.props.queryConfigs, ['0', 'database'], null)
-  }
-
-  private get activeQueryConfig(): QueryConfig {
-    const {queryDrafts} = this.props
-    if (queryDrafts === undefined || queryDrafts.length === 0) {
-      return undefined
-    }
-    const {activeQueryIndex} = this.state
-    if (activeQueryIndex < queryDrafts.length) {
-      return queryDrafts[activeQueryIndex].queryConfig
-    }
-    return queryDrafts[0].queryConfig
-  }
-
-  private get rawText(): string {
-    const {timeRange} = this.props
-
-    if (this.activeQueryConfig) {
-      return buildRawText(this.activeQueryConfig, timeRange)
-    }
-
-    return ''
   }
 
   private toggleSendToDashboard = () => {
