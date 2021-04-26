@@ -9,7 +9,6 @@ import (
 func TestAlertServices(t *testing.T) {
 	tests := []struct {
 		name    string
-		skip    string
 		rule    chronograf.AlertRule
 		want    chronograf.TICKScript
 		wantErr bool
@@ -168,7 +167,6 @@ func TestAlertServices(t *testing.T) {
 		},
 		{
 			name: "Test BigPanda",
-			skip: "Does not work fine with kapacitor 1.5.8 (https://github.com/influxdata/kapacitor/pull/#2491)",
 			rule: chronograf.AlertRule{
 				AlertNodes: chronograf.AlertNodes{
 					BigPanda: []*chronograf.BigPanda{{
@@ -188,9 +186,6 @@ func TestAlertServices(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip != "" {
-				t.Skip(tt.skip)
-			}
 			got, err := AlertServices(tt.rule)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("%q. AlertServices() error = %v, wantErr %v", tt.name, err, tt.wantErr)
