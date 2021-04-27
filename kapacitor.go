@@ -160,8 +160,6 @@ type BigPanda struct {
 // Teams properties
 type Teams struct {
 	ChannelURL string `json:"channel-url"` // override configuration
-	Team       string `json:"team"`
-	Channel    string `json:"channel"`
 }
 
 // MarshalJSON converts AlertNodes to JSON

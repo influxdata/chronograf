@@ -190,8 +190,6 @@ func TestAlertServices(t *testing.T) {
 			rule: chronograf.AlertRule{
 				AlertNodes: chronograf.AlertNodes{
 					Teams: []*chronograf.Teams{{
-						Team:       "teams.microsoft.com/team/",
-						Channel:    "#channel",
 						ChannelURL: "https://outlook.office.com/webhook/...",
 					}},
 				},
@@ -199,8 +197,6 @@ func TestAlertServices(t *testing.T) {
 			want: `alert()
         .teams()
         .channelURL('https://outlook.office.com/webhook/...')
-        .team('teams.microsoft.com/team/')
-        .channel('#channel')
 `,
 		},
 	}
