@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {ChangeEvent, PureComponent} from 'react'
 import _ from 'lodash'
 
 // Utils
@@ -9,6 +9,7 @@ import {
   TimeMachineContainer,
   TimeMachineContextConsumer,
 } from 'src/shared/utils/TimeMachineContext'
+import {buildRawText} from 'src/utils/influxql'
 
 // Components
 import {
@@ -37,6 +38,8 @@ import {createDashboard} from 'src/dashboards/apis'
 // Types
 import {
   QueryConfig,
+  CellQuery,
+  TimeRange,
   Dashboard,
   Source,
   Cell,
@@ -47,11 +50,8 @@ import {VisualizationOptions} from 'src/types/dataExplorer'
 import {ColorString} from 'src/types/colors'
 
 interface PassedProps {
-  queryConfig: QueryConfig
-  script: string
   dashboards: Dashboard[]
   source: Source
-  rawText: string
   onCancel: () => void
   sendDashboardCell: (
     dashboard: Dashboard,
@@ -60,11 +60,15 @@ interface PassedProps {
   isStaticLegend: boolean
   handleGetDashboards: () => Dashboard[]
   notify: (message: Notification) => void
+  activeQueryIndex: number
 }
 
 interface ConnectedProps {
   queryType: QueryType
+  queryDrafts: CellQuery[]
+  timeRange: TimeRange
   visualizationOptions: VisualizationOptions
+  script: string // flux script
 }
 
 type Props = PassedProps & ConnectedProps
@@ -73,6 +77,7 @@ interface State {
   selectedIDs: string[]
   name: string
   newDashboardName: string
+  sendAllQueries: boolean
 }
 
 const NEW_DASHBOARD_ID = 'new'
@@ -85,7 +90,18 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
       selectedIDs: [],
       name: '',
       newDashboardName: '',
+      sendAllQueries: false,
     }
+  }
+  private onSendAllQueriesCheckChange = (
+    val: ChangeEvent<HTMLInputElement>
+  ): void => {
+    this.setState({sendAllQueries: val.target.checked})
+  }
+  private onSendActiveQueriesCheckChange = (
+    val: ChangeEvent<HTMLInputElement>
+  ): void => {
+    this.setState({sendAllQueries: !val.target.checked})
   }
   public async componentDidMount() {
     const {handleGetDashboards} = this.props
@@ -103,11 +119,13 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {onCancel} = this.props
-    const {name, selectedIDs, newDashboardName} = this.state
+    const {onCancel, queryDrafts, queryType} = this.props
+    const {name, selectedIDs, newDashboardName, sendAllQueries} = this.state
 
     const numberDashboards = selectedIDs.length > 1 ? selectedIDs.length : ''
     const pluralizer = selectedIDs.length > 1 ? 's' : ''
+    const multipleQueries =
+      queryType === QueryType.InfluxQL && queryDrafts.length > 1
 
     return (
       <OverlayContainer>
@@ -140,6 +158,46 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
                   placeholder={'Name this new cell'}
                 />
               </Form.Element>
+              {multipleQueries && (
+                <Form.Element label="Queries">
+                  <div className="form-group col-xs-12">
+                    <div className="form-control-static">
+                      <div className="radio-item">
+                        <input
+                          id="active_query_option"
+                          type="radio"
+                          name="queriesRadio"
+                          value="active"
+                          checked={!sendAllQueries}
+                          onChange={this.onSendActiveQueriesCheckChange}
+                        />
+                        <label
+                          htmlFor="active_query_option"
+                          title="Query from the selected tab"
+                        >
+                          Active Query
+                        </label>
+                      </div>
+                      <div className="radio-item">
+                        <input
+                          id="all_queries_option"
+                          type="radio"
+                          name="queriesRadio"
+                          value="all"
+                          checked={sendAllQueries}
+                          onChange={this.onSendAllQueriesCheckChange}
+                        />
+                        <label
+                          htmlFor="all_queries_option"
+                          title="Queries from all tabs"
+                        >
+                          All Queries
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </Form.Element>
+              )}
               <Form.Footer>
                 <Button
                   color={ComponentColor.Success}
@@ -222,11 +280,33 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
     return this.state.selectedIDs.includes(NEW_DASHBOARD_ID)
   }
 
+  private get activeQueryConfig(): QueryConfig {
+    const {queryDrafts, activeQueryIndex} = this.props
+    if (queryDrafts === undefined || queryDrafts.length === 0) {
+      return undefined
+    }
+    if (activeQueryIndex < queryDrafts.length) {
+      return queryDrafts[activeQueryIndex].queryConfig
+    }
+    return queryDrafts[0].queryConfig
+  }
+
+  private rawText = (queryConfig: QueryConfig | undefined): string => {
+    const {timeRange} = this.props
+
+    if (queryConfig) {
+      return buildRawText(queryConfig, timeRange)
+    }
+
+    return ''
+  }
+
   private hasQuery(): boolean {
-    const {rawText, script, queryType} = this.props
+    const {script, queryType} = this.props
     if (queryType === QueryType.Flux) {
       return script && !!script.trim()
     }
+    const rawText = this.rawText(this.activeQueryConfig)
     return rawText && !!rawText.trim()
   }
 
@@ -269,17 +349,16 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
   }
 
   private sendToDashboard = async () => {
-    const {name, newDashboardName} = this.state
+    const {name, newDashboardName, sendAllQueries} = this.state
     const {
       queryType,
-      queryConfig,
       script,
       sendDashboardCell,
-      rawText,
       source,
       onCancel,
       visualizationOptions,
       isStaticLegend,
+      queryDrafts,
     } = this.props
     const {
       type,
@@ -296,14 +375,7 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
 
     const isFluxQuery = queryType === QueryType.Flux
 
-    let newCellQueries = [
-      {
-        queryConfig,
-        query: rawText,
-        source: source.links.self,
-        type: QueryType.InfluxQL,
-      },
-    ]
+    let newCellQueries: CellQuery[]
 
     if (isFluxQuery) {
       newCellQueries = [
@@ -314,6 +386,25 @@ class SendToDashboardOverlay extends PureComponent<Props, State> {
           type: QueryType.Flux,
         },
       ]
+    } else {
+      const createInfluxQLCellQuery = (queryConfig: QueryConfig): CellQuery => {
+        const rawText = this.rawText(queryConfig)
+        return {
+          queryConfig,
+          query: rawText,
+          source: source.links.self,
+          type: QueryType.InfluxQL,
+        }
+      }
+      // InfluxQL
+      if (sendAllQueries) {
+        newCellQueries = queryDrafts.reduce((acc, val) => {
+          acc.push(createInfluxQLCellQuery(val.queryConfig))
+          return acc
+        }, [])
+      } else {
+        newCellQueries = [createInfluxQLCellQuery(this.activeQueryConfig)]
+      }
     }
 
     const colors: ColorString[] = getCellTypeColors({
@@ -386,6 +477,9 @@ const ConnectedSendToDashboardOverlay = (props: PassedProps) => {
           gaugeColors,
           lineColors,
           queryType,
+          queryDrafts,
+          timeRange,
+          draftScript,
         } = timeMachineContainer.state
 
         const visualizationOptions = {
@@ -407,6 +501,9 @@ const ConnectedSendToDashboardOverlay = (props: PassedProps) => {
           <SendToDashboardOverlay
             {...props}
             queryType={queryType}
+            queryDrafts={queryDrafts}
+            timeRange={timeRange}
+            script={draftScript}
             visualizationOptions={visualizationOptions}
           />
         )

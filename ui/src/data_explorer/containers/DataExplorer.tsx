@@ -11,7 +11,6 @@ import _ from 'lodash'
 import {stripPrefix} from 'src/utils/basepath'
 import {GlobalAutoRefresher} from 'src/utils/AutoRefresher'
 import {getConfig} from 'src/dashboards/utils/cellGetters'
-import {buildRawText} from 'src/utils/influxql'
 import {defaultQueryDraft} from 'src/shared/utils/timeMachine'
 import {
   TimeMachineContainer,
@@ -114,6 +113,7 @@ interface State {
   isSendToDashboardVisible: boolean
   isStaticLegend: boolean
   isComponentMounted: boolean
+  activeQueryIndex: number
 }
 
 @ErrorHandling
@@ -126,6 +126,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       isSendToDashboardVisible: false,
       isStaticLegend: false,
       isComponentMounted: false,
+      activeQueryIndex: 0,
     }
 
     props.onResetTimeMachine()
@@ -199,6 +200,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             updateSourceLink={updateSourceLink}
             onResetFocus={this.handleResetFocus}
             onToggleStaticLegend={this.handleToggleStaticLegend}
+            onActiveQueryIndexChange={this.onActiveQueryIndexChange}
             refresh={autoRefresh}
           >
             {(activeEditorTab, onSetActiveEditorTab) => (
@@ -318,21 +320,22 @@ export class DataExplorer extends PureComponent<Props, State> {
       sendDashboardCell,
       handleGetDashboards,
       notify,
-      draftScript,
     } = this.props
 
-    const {isSendToDashboardVisible, isStaticLegend} = this.state
+    const {
+      isSendToDashboardVisible,
+      isStaticLegend,
+      activeQueryIndex,
+    } = this.state
     return (
       <Authorized requiredRole={EDITOR_ROLE}>
         <OverlayTechnology visible={isSendToDashboardVisible}>
           <SendToDashboardOverlay
             notify={notify}
             onCancel={this.toggleSendToDashboard}
-            queryConfig={this.activeQueryConfig}
-            script={draftScript}
             source={source}
-            rawText={this.rawText}
             dashboards={dashboards}
+            activeQueryIndex={activeQueryIndex}
             handleGetDashboards={handleGetDashboards}
             sendDashboardCell={sendDashboardCell}
             isStaticLegend={isStaticLegend}
@@ -405,22 +408,6 @@ export class DataExplorer extends PureComponent<Props, State> {
     return _.get(this.props.queryConfigs, ['0', 'database'], null)
   }
 
-  private get activeQueryConfig(): QueryConfig {
-    const {queryDrafts} = this.props
-
-    return _.get(queryDrafts, '0.queryConfig')
-  }
-
-  private get rawText(): string {
-    const {timeRange} = this.props
-
-    if (this.activeQueryConfig) {
-      return buildRawText(this.activeQueryConfig, timeRange)
-    }
-
-    return ''
-  }
-
   private toggleSendToDashboard = () => {
     this.setState({
       isSendToDashboardVisible: !this.state.isSendToDashboardVisible,
@@ -429,6 +416,10 @@ export class DataExplorer extends PureComponent<Props, State> {
 
   private handleToggleStaticLegend = (isStaticLegend: boolean): void => {
     this.setState({isStaticLegend})
+  }
+
+  private onActiveQueryIndexChange = (activeQueryIndex: number): void => {
+    this.setState({activeQueryIndex})
   }
 
   private handleResetFocus = () => {
