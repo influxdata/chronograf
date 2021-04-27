@@ -25,6 +25,7 @@ type AlertNodes struct {
 	Kafka              []*Kafka      `json:"kafka"`            // Kafka will send alert to all Kafka
 	ServiceNow         []*ServiceNow `json:"serviceNow"`       // ServiceNow alert options
 	BigPanda           []*BigPanda   `json:"bigPanda"`         // BigPanda alert options
+	Teams              []*Teams      `json:"teams"`            // Teams alert options
 }
 
 // Post will POST alerts to a destination URL
@@ -154,6 +155,13 @@ type BigPanda struct {
 	AppKey            string `json:"app-key"`
 	PrimaryProperty   string `json:"primary-property"`
 	SecondaryProperty string `json:"secondary-property"`
+}
+
+// Teams properties
+type Teams struct {
+	ChannelURL string `json:"channel-url"` // override configuration
+	Team       string `json:"team"`
+	Channel    string `json:"channel"`
 }
 
 // MarshalJSON converts AlertNodes to JSON
