@@ -4517,7 +4517,8 @@
               "talk",
               "telegram",
               "tcp",
-              "serviceNow"
+              "serviceNow",
+              "bigPanda"
             ]
           }
         },

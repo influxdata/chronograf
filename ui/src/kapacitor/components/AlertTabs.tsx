@@ -33,6 +33,7 @@ import {
   SlackConfigs,
   KafkaConfigs,
   ServiceNowConfig,
+  BigPandaConfig,
 } from './config'
 
 import {
@@ -393,6 +394,15 @@ class AlertTabs extends PureComponent<Props, State> {
               configSections,
               AlertTypes.servicenow
             )}
+          />
+        )
+      case AlertTypes.bigpanda:
+        return (
+          <BigPandaConfig
+            onSave={this.handleSaveConfig(AlertTypes.bigpanda)}
+            config={this.getSectionElement(configSections, AlertTypes.bigpanda)}
+            onTest={this.handleTestConfig(AlertTypes.bigpanda)}
+            enabled={this.getConfigEnabled(configSections, AlertTypes.bigpanda)}
           />
         )
     }

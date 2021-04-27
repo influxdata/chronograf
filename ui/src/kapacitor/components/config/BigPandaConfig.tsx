@@ -1,22 +1,21 @@
 import _ from 'lodash'
 import React, {PureComponent, ChangeEvent} from 'react'
 import {ErrorHandling} from 'src/shared/decorators/errors'
-import {ServiceNowProperties} from 'src/types/kapacitor'
+import {BigPandaProperties} from 'src/types/kapacitor'
 import RedactedInput from './RedactedInput'
 
 interface Config {
   options: {
     url: string
-    source: string
-    username: string
-    password: boolean
-    enabled: boolean
+    token: boolean
+    'app-key': string
+    'insecure-skip-verify': boolean
   }
 }
 
 interface Props {
   config: Config
-  onSave: (properties: ServiceNowProperties) => Promise<boolean>
+  onSave: (properties: BigPandaProperties) => Promise<boolean>
   onTest: (event: React.MouseEvent<HTMLButtonElement>) => void
   enabled: boolean
 }
@@ -27,11 +26,11 @@ interface State {
 }
 
 @ErrorHandling
-class ServiceNowConfig extends PureComponent<Props, State> {
+class BigPandaConfig extends PureComponent<Props, State> {
   private url: HTMLInputElement
-  private source: HTMLInputElement
-  private username: HTMLInputElement
-  private password: HTMLInputElement
+  private token: HTMLInputElement
+  private appKey: HTMLInputElement
+  private insecureSkipVerify: HTMLInputElement
 
   constructor(props) {
     super(props)
@@ -42,7 +41,12 @@ class ServiceNowConfig extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {source, url, username, password} = this.props.config.options
+    const {
+      url,
+      token,
+      'app-key': appKey,
+      'insecure-skip-verify': insecureSkipVerify,
+    } = this.props.config.options
     const {testEnabled, enabled} = this.state
 
     return (
@@ -54,42 +58,44 @@ class ServiceNowConfig extends PureComponent<Props, State> {
             id="url"
             type="text"
             ref={r => (this.url = r)}
-            defaultValue={url || ''}
+            defaultValue={url || 'https://api.bigpanda.io/data/v2/alerts'}
             onChange={this.disableTest}
           />
         </div>
         <div className="form-group col-xs-12">
-          <label htmlFor="source">Source</label>
+          <label htmlFor="address">Token</label>
+          <RedactedInput
+            defaultValue={token}
+            id="token"
+            refFunc={this.handleTokenRef}
+            disableTest={this.disableTest}
+            isFormEditing={!testEnabled}
+          />
+        </div>
+        <div className="form-group col-xs-12">
+          <label htmlFor="source">Application Key</label>
           <input
             className="form-control"
-            id="source"
+            id="app-key"
             type="text"
-            ref={r => (this.source = r)}
-            defaultValue={source || ''}
+            ref={r => (this.appKey = r)}
+            placeholder="ex: My_Application_Key"
+            defaultValue={appKey || ''}
             onChange={this.disableTest}
           />
         </div>
 
-        <div className="form-group col-xs-12 col-md-6">
-          <label htmlFor="address">Username</label>
-          <input
-            className="form-control"
-            id="username"
-            type="text"
-            ref={r => (this.username = r)}
-            defaultValue={username || ''}
-            onChange={this.disableTest}
-          />
-        </div>
-        <div className="form-group col-xs-12 col-md-6">
-          <label htmlFor="address">Password</label>
-          <RedactedInput
-            defaultValue={password}
-            id="password"
-            refFunc={this.handlePasswordRef}
-            disableTest={this.disableTest}
-            isFormEditing={!testEnabled}
-          />
+        <div className="form-group col-xs-12">
+          <div className="form-control-static">
+            <input
+              id="insecureSkipVerify"
+              type="checkbox"
+              defaultChecked={insecureSkipVerify}
+              ref={r => (this.insecureSkipVerify = r)}
+              onChange={this.disableTest}
+            />
+            <label htmlFor="insecureSkipVerify">Insecure Skip Verify</label>
+          </div>
         </div>
 
         <div className="form-group col-xs-12">
@@ -126,7 +132,7 @@ class ServiceNowConfig extends PureComponent<Props, State> {
     )
   }
 
-  private handlePasswordRef = (r: HTMLInputElement) => (this.password = r)
+  private handleTokenRef = (r: HTMLInputElement) => (this.token = r)
 
   private handleEnabledChange = (e: ChangeEvent<HTMLInputElement>) => {
     this.setState({enabled: e.target.checked})
@@ -136,11 +142,11 @@ class ServiceNowConfig extends PureComponent<Props, State> {
   private handleSubmit = async e => {
     e.preventDefault()
 
-    const properties: ServiceNowProperties = {
+    const properties: BigPandaProperties = {
       url: this.url.value,
-      source: this.source.value,
-      username: this.username.value,
-      password: this.password.value,
+      token: this.token.value,
+      'app-key': this.appKey.value,
+      'insecure-skip-verify': this.insecureSkipVerify.checked,
       enabled: this.state.enabled,
     }
 
@@ -155,4 +161,4 @@ class ServiceNowConfig extends PureComponent<Props, State> {
   }
 }
 
-export default ServiceNowConfig
+export default BigPandaConfig

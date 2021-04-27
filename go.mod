@@ -10,7 +10,7 @@ require (
 	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7 // indirect
-	github.com/google/go-cmp v0.4.0
+	github.com/google/go-cmp v0.5.4
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/uuid v1.1.1
@@ -19,7 +19,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.12.1 // indirect
 	github.com/influxdata/flux v0.65.0
 	github.com/influxdata/influxdb v1.1.5
-	github.com/influxdata/kapacitor v1.5.8
+	github.com/influxdata/kapacitor v1.5.9
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/kevinburke/go-bindata v3.22.0+incompatible // indirect
@@ -35,7 +35,7 @@ require (
 	go.uber.org/multierr v1.4.0 // indirect
 	go.uber.org/zap v1.13.0 // indirect
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
-	golang.org/x/net v0.0.0-20201006153459-a7d1128ccaa0
+	golang.org/x/net v0.0.0-20201021035429-f5854403a974
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/tools v0.0.0-20200107050322-53017a39ae36 // indirect
 	google.golang.org/api v0.15.0

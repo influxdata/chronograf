@@ -5,8 +5,8 @@
 1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to migrate data to ETCD over HTTPS.
 1. [#5672](https://github.com/influxdata/chronograf/pull/5672): Allow to specify trusted CA certificate for ETCD connections.
 1. [#5673](https://github.com/influxdata/chronograf/pull/5673): Add documentation link when 1.8 flux is not installed.
-1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Event Handler configuration UI.
-1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow Alert Handler configuration UI.
+1. [#5675](https://github.com/influxdata/chronograf/pull/5675): Add ServiceNow configuration and alert UI.
+1. [#5682](https://github.com/influxdata/chronograf/pull/5682): Add BigPanda configuration and alert UI.
 1. [#5681](https://github.com/influxdata/chronograf/pull/5681): Allow to hide/show histogram in Log Viewer.
 1. [#5687](https://github.com/influxdata/chronograf/pull/5687): Add more meta query templates to Explore UI.
 1. [#5688](https://github.com/influxdata/chronograf/pull/5688): Add UI variables to flux query execution.
