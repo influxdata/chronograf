@@ -14,6 +14,7 @@ import SlackConfigs from './SlackConfigs'
 import KafkaConfigs from './KafkaConfigs'
 import ServiceNowConfig from './ServiceNowConfig'
 import BigPandaConfig from './BigPandaConfig'
+import TeamsConfig from './TeamsConfig'
 
 export {
   AlertaConfig,
@@ -32,4 +33,5 @@ export {
   KafkaConfigs,
   ServiceNowConfig,
   BigPandaConfig,
+  TeamsConfig,
 }
