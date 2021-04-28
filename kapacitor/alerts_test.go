@@ -186,7 +186,7 @@ func TestAlertServices(t *testing.T) {
 		},
 		{
 			name: "Test Teams",
-			skip: "Parsing is not implemented yet in the kapactior pipeline!",
+			skip: "Parsing is not implemented properly in the kapacitor, fixed by https://github.com/influxdata/kapacitor/pull/2542!",
 			rule: chronograf.AlertRule{
 				AlertNodes: chronograf.AlertNodes{
 					Teams: []*chronograf.Teams{{
