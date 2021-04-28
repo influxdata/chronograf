@@ -90,6 +90,7 @@ interface AlertNodes {
   talk: Talk[]
   serviceNow?: ServiceNow[]
   bigPanda?: BigPanda[]
+  teams?: Teams[]
 }
 
 interface Headers {
