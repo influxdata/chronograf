@@ -51,6 +51,7 @@ export enum AlertDisplayText {
   victorops = 'VictorOps',
   servicenow = 'ServiceNow',
   bigpanda = 'BigPanda',
+  teams = 'Teams',
 }
 
 export const SupportedServices: string[] = [
@@ -67,6 +68,7 @@ export const SupportedServices: string[] = [
   'slack',
   'smtp',
   'talk',
+  'teams',
   'telegram',
   'victorops',
 ]
@@ -215,6 +217,7 @@ export const MAP_KEYS_FROM_CONFIG: KeyMappings = {
   victorops: 'victorOps',
   servicenow: 'serviceNow',
   bigpanda: 'bigPanda',
+  teams: 'teams',
 }
 
 // ALERTS_FROM_CONFIG the array of fields to accept from Kapacitor Config
@@ -243,6 +246,7 @@ export const ALERTS_FROM_CONFIG: FieldsFromConfigAlerts = {
   // mqtt:[]
   serviceNow: ['url', 'source', 'username', 'password'],
   bigPanda: ['app-key'],
+  teams: ['channel-url'],
 }
 
 export const MAP_FIELD_KEYS_FROM_CONFIG: ConfigKeyMaps = {
@@ -268,6 +272,7 @@ export const MAP_FIELD_KEYS_FROM_CONFIG: ConfigKeyMaps = {
   // mqtt: {}
   serviceNow: {},
   bigPanda: {},
+  teams: {},
 }
 
 // HANDLERS_TO_RULE returns array of fields that may be updated for each alert on rule.
@@ -312,4 +317,5 @@ export const HANDLERS_TO_RULE_THEM_ALL: FieldsFromAllAlerts = {
     '_type', // serviceNow type, remapped from type on the wire
   ],
   bigPanda: ['app-key', 'primary-property', 'secondary-property'],
+  teams: ['channel-url'],
 }
