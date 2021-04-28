@@ -33,6 +33,7 @@ export enum AlertTypes {
   log = 'log',
   servicenow = 'servicenow',
   bigpanda = 'bigpanda',
+  teams = 'teams',
 }
 
 export enum AlertDisplayText {

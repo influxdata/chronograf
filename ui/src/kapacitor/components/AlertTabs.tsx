@@ -34,6 +34,7 @@ import {
   KafkaConfigs,
   ServiceNowConfig,
   BigPandaConfig,
+  TeamsConfig,
 } from './config'
 
 import {
@@ -93,6 +94,8 @@ interface Sections {
   talk: Section
   telegram: Section
   victorops: Section
+  bipanda: Section
+  teams: Section
 }
 
 interface Props {
@@ -403,6 +406,15 @@ class AlertTabs extends PureComponent<Props, State> {
             config={this.getSectionElement(configSections, AlertTypes.bigpanda)}
             onTest={this.handleTestConfig(AlertTypes.bigpanda)}
             enabled={this.getConfigEnabled(configSections, AlertTypes.bigpanda)}
+          />
+        )
+      case AlertTypes.teams:
+        return (
+          <TeamsConfig
+            onSave={this.handleSaveConfig(AlertTypes.teams)}
+            config={this.getSectionElement(configSections, AlertTypes.teams)}
+            onTest={this.handleTestConfig(AlertTypes.teams)}
+            enabled={this.getConfigEnabled(configSections, AlertTypes.teams)}
           />
         )
     }
