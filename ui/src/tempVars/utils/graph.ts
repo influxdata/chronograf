@@ -196,15 +196,8 @@ class CachingTemplateQueryFetcher implements TemplateQueryFetcher {
     query: string,
     source: Source,
     flux: boolean,
-    warnFn?: (string) => void
+    warn: (s: string) => void = console.warn
   ): Promise<string[]> {
-    function warn(msg: string) {
-      if (warnFn) {
-        warnFn(msg)
-      } else {
-        console.warn(msg)
-      }
-    }
     const proxyURL = flux ? source.links.flux : source.links.proxy
     if (!proxyURL) {
       warn(`${flux ? 'Flux' : 'Proxy'} endpoint is not available!`)
