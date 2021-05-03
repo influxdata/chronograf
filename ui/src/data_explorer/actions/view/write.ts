@@ -18,7 +18,11 @@ export const writeLineProtocolAsync = (
     await writeLineProtocolAJAX(source, db, data, precision)
     dispatch(notify(notifyDataWritten()))
   } catch (response) {
-    dispatch(notify(notifyDataWriteFailed(response.data.error)))
+    dispatch(
+      notify(
+        notifyDataWriteFailed(response.data?.error || response.data?.message)
+      )
+    )
     throw response
   }
 }
