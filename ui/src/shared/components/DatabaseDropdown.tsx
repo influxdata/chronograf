@@ -102,7 +102,9 @@ class DatabaseDropdown extends Component<Props, State> {
         return
       }
     }
-    const nonSystemDatabases = databases.filter(name => name !== '_internal')
+    const nonSystemDatabases = databases.filter(
+      name => !name.startsWith('_internal')
+    )
 
     this.setState({
       databases: nonSystemDatabases,
