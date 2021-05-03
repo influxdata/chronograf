@@ -150,7 +150,7 @@ class WriteDataForm extends PureComponent<Props, State> {
       window.location.reload()
     } catch (error) {
       this.setState({isUploading: false})
-      console.error(error.data.error)
+      console.error(error.data)
     }
   }
 
