@@ -22,11 +22,13 @@ interface Props {
   selectedDatabase: string
   onClose: () => void
   errorThrown: () => void
+  useV2: boolean
   writeLineProtocol: (
     source: Source,
     database: string,
     content: string,
-    precision?: string
+    precision?: string,
+    useV2?: boolean
   ) => void
 }
 
@@ -62,7 +64,7 @@ class WriteDataForm extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {onClose, errorThrown, source} = this.props
+    const {onClose, errorThrown, source, useV2} = this.props
     const {dragClass} = this.state
 
     return (
@@ -81,6 +83,7 @@ class WriteDataForm extends PureComponent<Props, State> {
             onClose={onClose}
             errorThrown={errorThrown}
             onToggleMode={this.handleToggleMode}
+            useBuckets={useV2}
             handlePrecisionChange={this.handlePrecisionChange}
             handleSelectDatabase={this.handleSelectDatabase}
           />
@@ -119,7 +122,7 @@ class WriteDataForm extends PureComponent<Props, State> {
   }
 
   private handleSubmit = async () => {
-    const {onClose, source, writeLineProtocol} = this.props
+    const {onClose, source, writeLineProtocol, useV2} = this.props
     const {
       inputContent,
       uploadContent,
@@ -135,7 +138,13 @@ class WriteDataForm extends PureComponent<Props, State> {
     this.setState({isUploading: true})
 
     try {
-      await writeLineProtocol(source, selectedDatabase, content, precision)
+      await writeLineProtocol(
+        source,
+        selectedDatabase,
+        content,
+        precision,
+        useV2
+      )
       this.setState({isUploading: false})
       onClose()
       window.location.reload()

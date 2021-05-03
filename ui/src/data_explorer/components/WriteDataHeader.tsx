@@ -15,6 +15,7 @@ interface Props {
   onClose: () => void
   mode: string
   source: Source
+  useBuckets: boolean
 }
 
 class WriteDataHeader extends PureComponent<Props> {
@@ -26,6 +27,7 @@ class WriteDataHeader extends PureComponent<Props> {
       onClose,
       source,
       precision,
+      useBuckets,
     } = this.props
 
     return (
@@ -36,6 +38,7 @@ class WriteDataHeader extends PureComponent<Props> {
             source={source}
             onSelectDatabase={handleSelectDatabase}
             database={selectedDatabase}
+            useBuckets={useBuckets}
             onErrorThrown={errorThrown}
           />
           {this.modeSelector}
