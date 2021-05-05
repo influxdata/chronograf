@@ -33,6 +33,7 @@ export interface QueryStatus {
   queryID: string
   status: Status
 }
+export type QueryStatuses = Record<string, Status>
 
 export interface Field {
   value: string

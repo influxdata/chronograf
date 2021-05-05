@@ -7,6 +7,7 @@ import {
   TableOptions,
   NoteVisibility,
 } from 'src/types/dashboards'
+import {QueryStatuses} from './queries'
 
 // Write Data Modes
 export enum WriteDataMode {
@@ -20,7 +21,7 @@ export interface DEState {
     queryID: string | null
     status: Status
   }
-  queryStatuses: Record<string, Status>
+  queryStatuses: QueryStatuses
 }
 
 export interface VisualizationOptions {
