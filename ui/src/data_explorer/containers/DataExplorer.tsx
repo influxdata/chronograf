@@ -55,7 +55,7 @@ import {
   Source,
   Dashboard,
   QueryConfig,
-  QueryStatus,
+  QueryStatuses,
   Template,
   TemplateType,
   TemplateValueType,
@@ -90,7 +90,7 @@ interface PassedProps {
   ) => Promise<{success: boolean; dashboard: Dashboard}>
   editQueryStatus: typeof editQueryStatusAction
   resetQueryStatuses: typeof resetQueryStatusesAction
-  queryStatus: QueryStatus
+  queryStatuses: QueryStatuses
   fluxLinks: Links
   notify: (message: Notification) => void
   sourceLink: string
@@ -174,7 +174,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       timeZone,
       timeRange,
       fluxLinks,
-      queryStatus,
+      queryStatuses,
       editQueryStatus,
       updateSourceLink,
       onSetTimeZone,
@@ -199,7 +199,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             sources={sources}
             fluxLinks={fluxLinks}
             templates={this.templates}
-            queryStatus={queryStatus}
+            queryStatuses={queryStatuses}
             isStaticLegend={isStaticLegend}
             editQueryStatus={editQueryStatus}
             updateSourceLink={updateSourceLink}
@@ -461,7 +461,7 @@ const mstp = state => {
     app: {
       persisted: {autoRefresh, timeZone},
     },
-    dataExplorer: {timeRange, queryStatus, sourceLink},
+    dataExplorer: {timeRange, queryStatuses, sourceLink},
     dashboardUI: {dashboards},
     sources,
     links,
@@ -474,7 +474,7 @@ const mstp = state => {
     timeRange,
     dashboards,
     sources,
-    queryStatus,
+    queryStatuses,
     sourceLink,
   }
 }

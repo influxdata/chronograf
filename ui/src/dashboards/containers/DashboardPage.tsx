@@ -86,7 +86,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   showTemplateVariableControlBar: boolean
   toggleTemplateVariableControlBar: typeof appActions.toggleTemplateVariableControlBar
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
-  cellQueryStatus: QueriesModels.QueryStatus
+  cellQueryStatuses: QueriesModels.QueryStatuses
   errorThrown: ErrorsActions.ErrorThrownActionCreator
   meRole: string
   isUsingAuth: boolean
@@ -260,7 +260,7 @@ class DashboardPage extends Component<Props, State> {
       refreshRate,
       manualRefresh,
       onManualRefresh,
-      cellQueryStatus,
+      cellQueryStatuses,
       inPresentationMode,
       showTemplateVariableControlBar,
       handleClickPresentationButton,
@@ -301,7 +301,7 @@ class DashboardPage extends Component<Props, State> {
             fluxLinks={fluxLinks}
             cell={selectedCell}
             dashboardID={dashboardID}
-            queryStatus={cellQueryStatus}
+            queryStatuses={cellQueryStatuses}
             onSave={this.handleSaveEditedCell}
             onCancel={this.handleHideCellEditorOverlay}
             dashboardTemplates={_.get(dashboard, 'templates', [])}
@@ -593,7 +593,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     },
     links,
     annotations: {displaySetting},
-    dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
+    dashboardUI: {dashboards, cellQueryStatuses, zoomedTimeRange},
     sources,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {cell, timeRange: editorTimeRange},
@@ -620,7 +620,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     zoomedTimeRange,
     autoRefresh,
     isUsingAuth,
-    cellQueryStatus,
+    cellQueryStatuses,
     inPresentationMode,
     selectedCell,
     editorTimeRange,

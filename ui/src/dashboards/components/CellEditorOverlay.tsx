@@ -76,7 +76,7 @@ interface PassedProps {
   onSave: (cell: Cell | NewDefaultCell) => void
   source: SourcesModels.Source
   dashboardID: string
-  queryStatus: QueriesModels.QueryStatus
+  queryStatuses: QueriesModels.QueryStatuses
   dashboardTemplates: Template[]
   cell: Cell | NewDefaultCell
   dashboardTimeRange: TimeRange
@@ -134,7 +134,7 @@ class CellEditorOverlay extends Component<Props, State> {
       notify,
       source,
       sources,
-      queryStatus,
+      queryStatuses,
       dashboardRefresh,
     } = this.props
 
@@ -158,7 +158,7 @@ class CellEditorOverlay extends Component<Props, State> {
           onResetFocus={this.handleResetFocus}
           onToggleStaticLegend={this.handleToggleStaticLegend}
           isStaticLegend={isStaticLegend}
-          queryStatus={queryStatus}
+          queryStatuses={queryStatuses}
           onUpdateScriptStatus={this.handleUpdateScriptStatus}
           refresh={dashboardRefresh}
         >
