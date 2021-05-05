@@ -35,7 +35,10 @@ import {
 } from 'src/dashboards/actions'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
-import {editQueryStatus as editQueryStatusAction} from 'src/data_explorer/actions/queries'
+import {
+  editQueryStatus as editQueryStatusAction,
+  resetQueryStatuses as resetQueryStatusesAction,
+} from 'src/data_explorer/actions/queries'
 import {setTimeZone as setTimeZoneAction} from 'src/shared/actions/app'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -86,6 +89,7 @@ interface PassedProps {
     newCell: Partial<Cell>
   ) => Promise<{success: boolean; dashboard: Dashboard}>
   editQueryStatus: typeof editQueryStatusAction
+  resetQueryStatuses: typeof resetQueryStatusesAction
   queryStatus: QueryStatus
   fluxLinks: Links
   notify: (message: Notification) => void
@@ -128,6 +132,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       isComponentMounted: false,
       activeQueryIndex: 0,
     }
+    props.resetQueryStatuses()
 
     props.onResetTimeMachine()
   }
@@ -481,6 +486,7 @@ const mdtp = {
   handleGetDashboards: getDashboardsAsync,
   sendDashboardCell: sendDashboardCellAsync,
   editQueryStatus: editQueryStatusAction,
+  resetQueryStatuses: resetQueryStatusesAction,
   notify: notifyAction,
   updateSourceLink: updateSourceLinkAction,
   onSetTimeZone: setTimeZoneAction,
