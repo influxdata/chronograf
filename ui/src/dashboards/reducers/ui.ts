@@ -13,7 +13,7 @@ export const initialState: DashboardUIState = {
   timeRange: {lower, upper},
   zoomedTimeRange: {lower: null, upper: null},
   isEditMode: false,
-  cellQueryStatus: {queryID: null, status: null},
+  cellQueryStatuses: {},
   hoverTime: NULL_HOVER_TIME,
   activeCellID: '',
 }
@@ -29,14 +29,14 @@ export default (
         dashboards,
       }
 
-      return {...state, ...newState}
+      return {...state, ...newState, cellQueryStatuses: {}}
     }
 
     case ActionType.LoadDashboard: {
       const {dashboard} = action.payload
       const newDashboards = _.unionBy([dashboard], state.dashboards, 'id')
 
-      return {...state, dashboards: newDashboards}
+      return {...state, dashboards: newDashboards, cellQueryStatuses: {}}
     }
 
     case ActionType.SetDashboardTimeRange: {
@@ -140,8 +140,12 @@ export default (
 
     case ActionType.EditCellQueryStatus: {
       const {queryID, status} = action.payload
+      const {cellQueryStatuses} = state
 
-      return {...state, cellQueryStatus: {queryID, status}}
+      return {
+        ...state,
+        cellQueryStatuses: {...cellQueryStatuses, [queryID]: status},
+      }
     }
 
     case ActionType.TemplateVariableLocalSelected: {

@@ -6,7 +6,6 @@ import {DEState} from 'src/types/dataExplorer'
 
 export const initialState: DEState = {
   sourceLink: '',
-  queryStatus: {queryID: null, status: null},
   queryStatuses: {},
 }
 
@@ -23,7 +22,6 @@ export default (state = initialState, action: Action): DEState => {
       const {queryStatuses} = state
       return {
         ...state,
-        queryStatus: {queryID, status},
         queryStatuses: {...queryStatuses, [queryID]: status},
       }
     }
@@ -31,7 +29,6 @@ export default (state = initialState, action: Action): DEState => {
       return {
         ...state,
         queryStatuses: {},
-        queryStatus: {queryID: null, status: null},
       }
     }
   }
