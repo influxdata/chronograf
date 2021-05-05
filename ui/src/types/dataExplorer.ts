@@ -20,6 +20,7 @@ export interface DEState {
     queryID: string | null
     status: Status
   }
+  queryStatuses: Record<string, Status>
 }
 
 export interface VisualizationOptions {
