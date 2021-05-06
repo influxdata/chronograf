@@ -8,7 +8,7 @@ export interface State {
 
 export enum ActionType {
   UpdateSourceLink = 'DE_UPDATE_SOURCE_LINK',
-  EditQueryStatus = 'EDIT_QUERY_STATUS',
+  EditQueryStatus = 'DE_EDIT_QUERY_STATUS',
   ResetQueryStatuses = 'DE_RESET_STATUSES',
 }
 
