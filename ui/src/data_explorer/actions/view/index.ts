@@ -5,7 +5,6 @@ import {getQueryConfigAndStatus} from 'src/shared/apis'
 import {errorThrown} from 'src/shared/actions/errors'
 import {
   QueryConfig,
-  Status,
   Field,
   GroupBy,
   Tag,
@@ -35,7 +34,6 @@ export type Action =
   | ActionToggleTagAcceptance
   | ActionToggleField
   | ActionGroupByTag
-  | ActionEditQueryStatus
   | ActionAddInitialField
 
 export interface ActionAddQuery {
@@ -345,25 +343,6 @@ export const addInitialField = (
     queryID,
     field,
     groupBy,
-  },
-})
-
-interface ActionEditQueryStatus {
-  type: 'DE_EDIT_QUERY_STATUS'
-  payload: {
-    queryID: string
-    status: Status
-  }
-}
-
-export const editQueryStatus = (
-  queryID: string,
-  status: Status
-): ActionEditQueryStatus => ({
-  type: 'DE_EDIT_QUERY_STATUS',
-  payload: {
-    queryID,
-    status,
   },
 })
 
