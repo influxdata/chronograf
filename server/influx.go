@@ -120,8 +120,19 @@ func (s *Service) Write(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusUnprocessableEntity, msg, s.Logger)
 		return
 	}
-	u.Path = "/write"
-	u.RawQuery = r.URL.RawQuery
+	query := r.URL.Query()
+	version := query.Get("v")
+	query.Del("v")
+	if strings.HasPrefix(version, "2") {
+		u.Path = "/api/v2/write"
+		// v2 organization name is stored in username (org does not matter against v1)
+		query.Set("org", src.Username)
+		query.Set("bucket", query.Get("db"))
+		query.Del("db")
+	} else {
+		u.Path = "/write"
+	}
+	u.RawQuery = query.Encode()
 
 	director := func(req *http.Request) {
 		// Set the Host header of the original source URL

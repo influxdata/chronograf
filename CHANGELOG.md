@@ -20,6 +20,7 @@
 1. [#5726](https://github.com/influxdata/chronograf/pull/5726): Allow to setup InfluxDB v2 connection from chronograf command-line.
 1. [#5735](https://github.com/influxdata/chronograf/pull/5735): Allow to add custom auto-refresh intervals.
 1. [#5737](https://github.com/influxdata/chronograf/pull/5737): Allow to send multiple queries to dashboard.
+1. [#5746](https://github.com/influxdata/chronograf/pull/5746): Write to buckets when Flux tab is selected.
 
 ### Bug Fixes
 

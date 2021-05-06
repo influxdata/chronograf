@@ -297,7 +297,7 @@ export class DataExplorer extends PureComponent<Props, State> {
   }
 
   private get writeDataForm(): JSX.Element {
-    const {source, errorThrownAction, writeLineProtocol} = this.props
+    const {source, errorThrownAction, writeLineProtocol, queryType} = this.props
 
     const {isWriteFormVisible} = this.state
     return (
@@ -308,6 +308,7 @@ export class DataExplorer extends PureComponent<Props, State> {
           selectedDatabase={this.selectedDatabase}
           onClose={this.handleCloseWriteData}
           writeLineProtocol={writeLineProtocol}
+          useV2={queryType === 'flux'}
         />
       </OverlayTechnology>
     )
