@@ -1,5 +1,5 @@
 import {ColorNumber, ColorString} from 'src/types/colors'
-import {CellType, Axes, Status} from 'src/types'
+import {CellType, Axes, QueryStatuses} from 'src/types'
 import {
   DecimalPlaces,
   FieldOption,
@@ -16,10 +16,7 @@ export enum WriteDataMode {
 
 export interface DEState {
   sourceLink: string
-  queryStatus: {
-    queryID: string | null
-    status: Status
-  }
+  queryStatuses: QueryStatuses
 }
 
 export interface VisualizationOptions {

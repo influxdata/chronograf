@@ -1,4 +1,4 @@
-import {Template, TimeRange, QueryConfig, Status} from 'src/types'
+import {Template, TimeRange, QueryConfig, QueryStatuses} from 'src/types'
 import {ColorString} from 'src/types/colors'
 
 export interface Axis {
@@ -150,10 +150,7 @@ export interface DashboardUIState {
   timeRange: TimeRange
   zoomedTimeRange: TimeRange
   isEditMode: boolean
-  cellQueryStatus: {
-    queryID: string | null
-    status: Status
-  }
+  cellQueryStatuses: QueryStatuses
   hoverTime: string
   activeCellID: string
 }

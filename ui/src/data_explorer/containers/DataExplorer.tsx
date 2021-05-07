@@ -35,7 +35,10 @@ import {
 } from 'src/dashboards/actions'
 import {writeLineProtocolAsync} from 'src/data_explorer/actions/view/write'
 import {updateSourceLink as updateSourceLinkAction} from 'src/data_explorer/actions/queries'
-import {editQueryStatus as editQueryStatusAction} from 'src/data_explorer/actions/queries'
+import {
+  editQueryStatus as editQueryStatusAction,
+  resetQueryStatuses as resetQueryStatusesAction,
+} from 'src/data_explorer/actions/queries'
 import {setTimeZone as setTimeZoneAction} from 'src/shared/actions/app'
 
 import {notify as notifyAction} from 'src/shared/actions/notifications'
@@ -52,7 +55,7 @@ import {
   Source,
   Dashboard,
   QueryConfig,
-  QueryStatus,
+  QueryStatuses,
   Template,
   TemplateType,
   TemplateValueType,
@@ -86,7 +89,8 @@ interface PassedProps {
     newCell: Partial<Cell>
   ) => Promise<{success: boolean; dashboard: Dashboard}>
   editQueryStatus: typeof editQueryStatusAction
-  queryStatus: QueryStatus
+  resetQueryStatuses: typeof resetQueryStatusesAction
+  queryStatuses: QueryStatuses
   fluxLinks: Links
   notify: (message: Notification) => void
   sourceLink: string
@@ -128,6 +132,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       isComponentMounted: false,
       activeQueryIndex: 0,
     }
+    props.resetQueryStatuses()
 
     props.onResetTimeMachine()
   }
@@ -169,7 +174,7 @@ export class DataExplorer extends PureComponent<Props, State> {
       timeZone,
       timeRange,
       fluxLinks,
-      queryStatus,
+      queryStatuses,
       editQueryStatus,
       updateSourceLink,
       onSetTimeZone,
@@ -194,7 +199,7 @@ export class DataExplorer extends PureComponent<Props, State> {
             sources={sources}
             fluxLinks={fluxLinks}
             templates={this.templates}
-            queryStatus={queryStatus}
+            queryStatuses={queryStatuses}
             isStaticLegend={isStaticLegend}
             editQueryStatus={editQueryStatus}
             updateSourceLink={updateSourceLink}
@@ -456,7 +461,7 @@ const mstp = state => {
     app: {
       persisted: {autoRefresh, timeZone},
     },
-    dataExplorer: {timeRange, queryStatus, sourceLink},
+    dataExplorer: {timeRange, queryStatuses, sourceLink},
     dashboardUI: {dashboards},
     sources,
     links,
@@ -469,7 +474,7 @@ const mstp = state => {
     timeRange,
     dashboards,
     sources,
-    queryStatus,
+    queryStatuses,
     sourceLink,
   }
 }
@@ -481,6 +486,7 @@ const mdtp = {
   handleGetDashboards: getDashboardsAsync,
   sendDashboardCell: sendDashboardCellAsync,
   editQueryStatus: editQueryStatusAction,
+  resetQueryStatuses: resetQueryStatusesAction,
   notify: notifyAction,
   updateSourceLink: updateSourceLinkAction,
   onSetTimeZone: setTimeZoneAction,

@@ -6,7 +6,7 @@ import {DEState} from 'src/types/dataExplorer'
 
 export const initialState: DEState = {
   sourceLink: '',
-  queryStatus: {queryID: null, status: null},
+  queryStatuses: {},
 }
 
 export default (state = initialState, action: Action): DEState => {
@@ -19,8 +19,17 @@ export default (state = initialState, action: Action): DEState => {
 
     case ActionType.EditQueryStatus: {
       const {queryID, status} = action.payload
-
-      return {...state, queryStatus: {queryID, status}}
+      const {queryStatuses} = state
+      return {
+        ...state,
+        queryStatuses: {...queryStatuses, [queryID]: status},
+      }
+    }
+    case ActionType.ResetQueryStatuses: {
+      return {
+        ...state,
+        queryStatuses: {},
+      }
     }
   }
 

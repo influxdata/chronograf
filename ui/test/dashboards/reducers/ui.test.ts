@@ -14,6 +14,8 @@ import {
   templateVariableLocalSelected,
   setActiveCell,
   updateTemplates,
+  editCellQueryStatus,
+  loadDashboard,
 } from 'src/dashboards/actions'
 
 let state
@@ -210,6 +212,38 @@ describe('DataExplorer.Reducers.UI', () => {
       expect(result.dashboards[0].templates).toContainEqual(
         thisState.dashboards[0].templates[2]
       )
+    })
+  })
+  describe('EDIT_CELL_QUERY_STATUS', () => {
+    it('can edit cell query status', () => {
+      let actual = reducer(
+        initialState,
+        editCellQueryStatus('query-id1', {success: 'yes'})
+      )
+      expect(actual.cellQueryStatuses).toEqual({'query-id1': {success: 'yes'}})
+      actual = reducer(actual, editCellQueryStatus('query-id2', {error: 'no'}))
+      expect(actual.cellQueryStatuses).toEqual({
+        'query-id1': {success: 'yes'},
+        'query-id2': {error: 'no'},
+      })
+    })
+    it('resets query status on dashboards load', () => {
+      let actual = reducer(
+        initialState,
+        editCellQueryStatus('query-id1', {success: 'yes'})
+      )
+      expect(actual.cellQueryStatuses).toEqual({'query-id1': {success: 'yes'}})
+      actual = reducer(actual, loadDashboards(dashboards, d1.id))
+      expect(actual.cellQueryStatuses).toEqual({})
+    })
+    it('resets query status on dashboard load', () => {
+      let actual = reducer(
+        initialState,
+        editCellQueryStatus('query-id1', {success: 'yes'})
+      )
+      expect(actual.cellQueryStatuses).toEqual({'query-id1': {success: 'yes'}})
+      actual = reducer(actual, loadDashboard(d1))
+      expect(actual.cellQueryStatuses).toEqual({})
     })
   })
 })

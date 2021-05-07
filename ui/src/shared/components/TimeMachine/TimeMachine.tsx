@@ -45,7 +45,7 @@ import {
   Source,
   CellQuery,
   NotificationAction,
-  QueryStatus,
+  QueryStatuses,
   Status,
   Query,
   QueryType,
@@ -91,7 +91,7 @@ interface PassedProps {
     activeEditorTab: CEOTabs,
     onSetActiveEditorTab: (activeEditorTab: CEOTabs) => void
   ) => JSX.Element
-  queryStatus: QueryStatus
+  queryStatuses: QueryStatuses
   onUpdateScriptStatus?: (status: ScriptStatus) => void
   onActiveQueryIndexChange?: (activeQueryIndex: number) => void
   refresh: RefreshRate
@@ -290,26 +290,17 @@ class TimeMachine extends PureComponent<Props, State> {
   }
 
   private get queriesWorkingDraft(): QueryConfig[] {
-    const {queryDrafts, queryStatus} = this.props
+    const {queryDrafts, queryStatuses} = this.props
 
     if (!queryDrafts || !queryDrafts.length) {
       return []
     }
 
-    return queryDrafts.map(q => {
-      if (queryStatus.queryID === q.id) {
-        return {
-          ...q.queryConfig,
-          source: this.source,
-          status: queryStatus.status,
-        }
-      }
-
-      return {
-        ...q.queryConfig,
-        source: this.source,
-      }
-    })
+    return queryDrafts.map(q => ({
+      ...q.queryConfig,
+      source: this.source,
+      status: queryStatuses[String(q.id)],
+    }))
   }
 
   private get formattedSources(): SourceOption[] {

@@ -8,10 +8,14 @@ export interface State {
 
 export enum ActionType {
   UpdateSourceLink = 'DE_UPDATE_SOURCE_LINK',
-  EditQueryStatus = 'EDIT_QUERY_STATUS',
+  EditQueryStatus = 'DE_EDIT_QUERY_STATUS',
+  ResetQueryStatuses = 'DE_RESET_STATUSES',
 }
 
-export type Action = UpdateSourceLinkAction | EditQueryStatusAction
+export type Action =
+  | UpdateSourceLinkAction
+  | EditQueryStatusAction
+  | ResetQueryStatusesAction
 
 export interface UpdateSourceLinkAction {
   type: ActionType.UpdateSourceLink
@@ -43,4 +47,12 @@ export const editQueryStatus = (
 ): EditQueryStatusAction => ({
   type: ActionType.EditQueryStatus,
   payload: {queryID, status},
+})
+
+interface ResetQueryStatusesAction {
+  type: ActionType.ResetQueryStatuses
+}
+
+export const resetQueryStatuses = (): ResetQueryStatusesAction => ({
+  type: ActionType.ResetQueryStatuses,
 })
