@@ -26,7 +26,7 @@ const TeamsHandler = ({
             handleModifyHandler={handleModifyHandler}
             fieldName="channel-url"
             fieldDisplay="Channel URL:"
-            placeholder="optional, ex: https://outlook.office.com/webhook/..."
+            placeholder="ex: https://outlook.office.com/webhook/..."
             fieldColumns="col-md-12"
           />
         </div>
