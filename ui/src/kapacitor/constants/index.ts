@@ -247,7 +247,9 @@ export const ALERTS_FROM_CONFIG: FieldsFromConfigAlerts = {
   // mqtt:[]
   serviceNow: ['url', 'source', 'username', 'password'],
   bigPanda: ['app-key'],
-  teams: ['channel-url'],
+  teams: [
+    /* 'channel-url' is intentionally skipped */
+  ],
 }
 
 export const MAP_FIELD_KEYS_FROM_CONFIG: ConfigKeyMaps = {

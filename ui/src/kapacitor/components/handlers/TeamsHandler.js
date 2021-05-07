@@ -12,7 +12,7 @@ const TeamsHandler = ({
     <div className="endpoint-tab-contents">
       <div className="endpoint-tab--parameters">
         <h4 className="u-flex u-jc-space-between">
-          Parameters from Kapacitor Configuration
+          Parameter Overriding Kapacitor Configuration
           <div className="btn btn-default btn-sm" onClick={onGoToConfig}>
             <span className="icon cog-thick" />
             {validationError
@@ -26,7 +26,7 @@ const TeamsHandler = ({
             handleModifyHandler={handleModifyHandler}
             fieldName="channel-url"
             fieldDisplay="Channel URL:"
-            placeholder="ex: https://outlook.office.com/webhook/..."
+            placeholder="optional, ex: https://outlook.office.com/webhook/..."
             fieldColumns="col-md-12"
           />
         </div>
