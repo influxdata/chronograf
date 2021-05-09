@@ -197,6 +197,21 @@ func TestAlertServices(t *testing.T) {
         .teams()
 `,
 		},
+		{
+			name: "Test Teams with ChannelURL",
+			skip: "depends on https://github.com/influxdata/kapacitor/pull/2545",
+			rule: chronograf.AlertRule{
+				AlertNodes: chronograf.AlertNodes{
+					Teams: []*chronograf.Teams{{
+						ChannelURL: "https://outlook.office.com/webhook/...",
+					}},
+				},
+			},
+			want: `alert()
+        .teams()
+				.channelURL('https://outlook.office.com/webhook/...')
+`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
