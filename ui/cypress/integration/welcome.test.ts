@@ -6,8 +6,10 @@ function createConnectionV1(url: string,
 ) {
     cy.get('input[id="Connection URL"]').clear().type(url)
     cy.get('input[id="Connection Name"]').clear()
+    cy.wait(3000)
     cy.get('input[id="Connection Name"]').clear().type(connectionName)
     cy.get('input[id="Username"]').clear().type(username)
+    cy.wait(3000)
     cy.get('input[id="Password"]').clear().type(password)
     cy.get('input[id="Telegraf Database Name"]').clear().type(dbname)
     cy.get('input[id="Default Retention Policy"]').clear()
@@ -18,14 +20,16 @@ function createConnectionV2(url: string,
                             organization: string,
                             token: string,
                             dbname: string,
-) {
+) { 
+    cy.get('div[title="Default connection"]').click()
     cy.get('div[title="InfluxDB v2 Auth"]').click()
     cy.get('input[id="Connection URL"]').clear().type(url)
     cy.get('input[id="Connection Name"]').clear().type(connectionName)
     cy.get('input[id="Organization"]').clear().type(organization)
+    cy.wait(2000)
     cy.get('input[id="Token"]').clear().type(token)
     cy.get('input[id="Telegraf Database Name"]').clear().type(dbname)
-    cy.get('input[id="Default Retention Policy"]').clear()
+cy.get('input[id="Default Retention Policy"]').clear()
 }
 
 context('Navigate', () => {
@@ -39,6 +43,7 @@ context('Navigate', () => {
                 cy.get('.wizard-button-bar').contains("Add Connection").click()
                 cy.get('.notification-message').should('have.text',
                     "Connected to InfluxDB InfluxTest1 successfully.")
+                cy.wait(2000)
                 cy.get('.notification-close').click()
                 cy.get('button').contains("Next").click()
                 //kapacitor skip
@@ -70,17 +75,22 @@ context('Navigate', () => {
 
     it('Explore', () => {
         cy.clickNav(3, 'Explore')
+        cy.wait(2000)
         cy.clickNav(1, 'Status')
+        cy.wait(2000)
     })
 
     it('Dashboards', () => {
         cy.clickNav(4, 'Dashboards')
+        cy.wait(3000)
         cy.clickNav(1, 'Status')
+        cy.wait(2000)
     })
 
     it('Manage Tasks', () => {
         cy.clickNav(5, 'Manage Tasks')
         cy.clickNav(1, 'Status')
+        cy.wait(2000)
     })
 
     it('Log Viewer', () => {

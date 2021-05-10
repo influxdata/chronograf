@@ -51,7 +51,8 @@ const SourceSelector: FunctionComponent<Props> = ({
   const type = isFluxSelected ? QueryType.Flux : QueryType.InfluxQL
 
   return (
-    <div className="source-selector">
+    <div className="source-selector"
+    data-test="source-button-selector">
       <SourceDropdown
         source={source}
         type={type}

@@ -34,7 +34,8 @@ class FluxEditor extends PureComponent<Props> {
     } = this.props
 
     return (
-      <div className="flux-editor">
+      <div className="flux-editor"
+      data-test="flux-editor-to-scripting">
         <FluxScriptEditor
           status={status}
           script={script}
