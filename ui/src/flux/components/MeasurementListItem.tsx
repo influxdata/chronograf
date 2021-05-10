@@ -58,9 +58,11 @@ class MeasurementListItem extends PureComponent<Props, State> {
         }`}
         key={measurement}
         onClick={this.handleItemClick}
+        data-test="flux-tree-schema-name"
       >
         <div className="flux-schema--item">
-          <div className="flex-schema-item-group flux-schema-item--expandable">
+          <div className="flex-schema-item-group flux-schema-item--expandable"
+          data-test="dropbutton-measurement">
             <div className="flux-schema--expander" />
             {measurement}
             <span className="flux-schema--type">Measurement</span>

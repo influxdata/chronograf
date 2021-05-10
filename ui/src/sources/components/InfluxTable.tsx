@@ -42,7 +42,8 @@ class InfluxTable extends PureComponent<Props> {
           isUsingAuth={isUsingAuth}
           toggleWizard={toggleWizard}
         />
-        <div className="panel-body">
+        <div className="panel-body"
+        data-test="set-conection-panel-body">
           <table className="table v-center margin-bottom-zero table-highlight">
             <InfluxTableHead />
             <tbody>
