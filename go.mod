@@ -16,7 +16,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/influxdata/flux v0.65.1
 	github.com/influxdata/influxdb v1.8.4
-	github.com/influxdata/kapacitor v1.5.10-0.20210507034818-1f2c956c489a
+	github.com/influxdata/kapacitor v1.5.10-0.20210510103528-ebee9bf8ef5a
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/kevinburke/go-bindata v3.22.0+incompatible // indirect
