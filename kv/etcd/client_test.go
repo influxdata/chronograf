@@ -13,8 +13,8 @@ import (
 	"github.com/influxdata/chronograf/kv"
 	"github.com/influxdata/chronograf/mocks"
 	"github.com/stretchr/testify/require"
-	"go.etcd.io/etcd/clientv3"
-	"go.etcd.io/etcd/embed"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/server/v3/embed"
 )
 
 func TestNewClient(t *testing.T) {

@@ -4518,7 +4518,8 @@
               "telegram",
               "tcp",
               "serviceNow",
-              "bigPanda"
+              "bigPanda",
+              "teams"
             ]
           }
         },

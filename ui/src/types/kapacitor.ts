@@ -90,6 +90,7 @@ interface AlertNodes {
   talk: Talk[]
   serviceNow?: ServiceNow[]
   bigPanda?: BigPanda[]
+  teams?: Teams[]
 }
 
 interface Headers {
@@ -154,6 +155,11 @@ interface BigPanda {
   'app-key': string
   'primary-property': string
   'secondary-property': string
+}
+
+// Teams alert options
+interface Teams {
+  'channel-url': string
 }
 
 // PagerDuty sends alerts to the pagerduty.com service
@@ -277,6 +283,7 @@ export interface KeyMappings {
   victorops: string
   servicenow: string
   bigpanda: string
+  teams: string
 }
 
 export interface FieldsFromConfigAlerts {
@@ -295,6 +302,7 @@ export interface FieldsFromConfigAlerts {
   victorOps: string[]
   serviceNow: string[]
   bigPanda: string[]
+  teams: string[]
 }
 
 export interface FieldsFromAllAlerts extends FieldsFromConfigAlerts {
@@ -442,6 +450,11 @@ export interface BigPandaProperties {
   enabled: boolean
 }
 
+export interface TeamsProperties {
+  'channel-url': string
+  enabled: boolean
+}
+
 export type ServiceProperties =
   | AlertaProperties
   | KafkaProperties
@@ -457,6 +470,7 @@ export type ServiceProperties =
   | VictorOpsProperties
   | ServiceNowProperties
   | BigPandaProperties
+  | TeamsProperties
 
 export type SpecificConfigOptions = Partial<SlackProperties & KafkaProperties>
 

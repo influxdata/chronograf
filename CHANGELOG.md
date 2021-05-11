@@ -21,6 +21,7 @@
 1. [#5735](https://github.com/influxdata/chronograf/pull/5735): Allow to add custom auto-refresh intervals.
 1. [#5737](https://github.com/influxdata/chronograf/pull/5737): Allow to send multiple queries to dashboard.
 1. [#5746](https://github.com/influxdata/chronograf/pull/5746): Write to buckets when Flux tab is selected.
+1. [#5740](https://github.com/influxdata/chronograf/pull/5740): Add Teams configuration and alert UI.
 
 ### Bug Fixes
 

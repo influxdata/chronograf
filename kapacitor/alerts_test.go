@@ -9,6 +9,7 @@ import (
 func TestAlertServices(t *testing.T) {
 	tests := []struct {
 		name    string
+		skip    string
 		rule    chronograf.AlertRule
 		want    chronograf.TICKScript
 		wantErr bool
@@ -183,9 +184,37 @@ func TestAlertServices(t *testing.T) {
         .secondaryProperty('c')
 `,
 		},
+		{
+			name: "Test Teams without ChannelURL",
+			rule: chronograf.AlertRule{
+				AlertNodes: chronograf.AlertNodes{
+					Teams: []*chronograf.Teams{{}},
+				},
+			},
+			want: `alert()
+        .teams()
+`,
+		},
+		{
+			name: "Test Teams with ChannelURL",
+			rule: chronograf.AlertRule{
+				AlertNodes: chronograf.AlertNodes{
+					Teams: []*chronograf.Teams{{
+						ChannelURL: "https://outlook.office.com/webhook/...",
+					}},
+				},
+			},
+			want: `alert()
+        .teams()
+        .channelURL('https://outlook.office.com/webhook/...')
+`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.skip != "" {
+				t.Skip(tt.skip)
+			}
 			got, err := AlertServices(tt.rule)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("%q. AlertServices() error = %v, wantErr %v", tt.name, err, tt.wantErr)
