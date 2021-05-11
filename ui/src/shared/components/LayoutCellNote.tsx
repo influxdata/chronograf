@@ -46,10 +46,9 @@ class LayoutCellNote extends Component<Props> {
         <div className={this.noteContentsClass}>
           <FancyScrollbar autoHide={false} autoHeight={true} maxHeight={140}>
             <div className="dash-graph--note-contents">
-              <Markdown
-                source={humanizeNote(note)}
-                className="markdown-format"
-              />
+              <Markdown className="markdown-format">
+                {humanizeNote(note)}
+              </Markdown>
             </div>
           </FancyScrollbar>
         </div>
