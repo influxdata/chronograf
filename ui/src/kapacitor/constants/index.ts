@@ -34,6 +34,7 @@ export enum AlertTypes {
   servicenow = 'servicenow',
   bigpanda = 'bigpanda',
   teams = 'teams',
+  zenoss = 'zenoss',
 }
 
 export enum AlertDisplayText {
@@ -53,6 +54,7 @@ export enum AlertDisplayText {
   servicenow = 'ServiceNow',
   bigpanda = 'BigPanda',
   teams = 'Teams',
+  zenoss = 'Zenoss',
 }
 
 export const SupportedServices: string[] = [
@@ -72,6 +74,7 @@ export const SupportedServices: string[] = [
   'teams',
   'telegram',
   'victorops',
+  'zenoss',
 ]
 
 export const defaultRuleConfigs = {

@@ -455,6 +455,23 @@ export interface TeamsProperties {
   enabled: boolean
 }
 
+export interface ZenossProperties {
+  url: string
+  username: string
+  password: string
+  action: string
+  method: string
+  type: string
+  tid: number
+  'severity-map': {
+    ok: string
+    info: string
+    warning: string
+    critical: string
+  }
+  enabled: boolean
+}
+
 export type ServiceProperties =
   | AlertaProperties
   | KafkaProperties
@@ -471,6 +488,7 @@ export type ServiceProperties =
   | ServiceNowProperties
   | BigPandaProperties
   | TeamsProperties
+  | ZenossProperties
 
 export type SpecificConfigOptions = Partial<SlackProperties & KafkaProperties>
 
