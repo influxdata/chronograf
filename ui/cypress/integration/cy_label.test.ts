@@ -6,17 +6,13 @@ describe('Navigate', () => {
 
   it('_start and _stop display', () => {
     cy.get('[data-test=source-button-selector] > .radio-buttons').contains('Flux').click({force: true})
-    cy.get('[data-test=flux-schema-flux-schema-tree]').click({ multiple: true })
-    cy.get('[data-test=flux-schema-children-item-group]')
-      .should('be.visible', 'Tags')
-      .click({ multiple: true })
+    cy.get('[data-test=flex-group-item-expandable]').click({ multiple: true })
+    cy.get('[data-test=flux-schema-children-item-group]').children().click({ multiple: true })
+    cy.get('[data-test=flux-schema-children-item-group]').children()
       .contains('_start')
       .should('not.exist')
-      cy.get('[data-test=flux-schema-children-item-group]')
-      .should('be.visible', 'Tags')
-      .click({ multiple: true })
+    cy.get('[data-test=flux-schema-children-item-group]').children()
       .contains('_stop')
       .should('not.exist')
   })
-
 })

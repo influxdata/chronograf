@@ -75,22 +75,17 @@ context('Navigate', () => {
 
     it('Explore', () => {
         cy.clickNav(3, 'Explore')
-        cy.wait(2000)
         cy.clickNav(1, 'Status')
-        cy.wait(2000)
     })
 
     it('Dashboards', () => {
         cy.clickNav(4, 'Dashboards')
-        cy.wait(3000)
         cy.clickNav(1, 'Status')
-        cy.wait(2000)
     })
 
     it('Manage Tasks', () => {
         cy.clickNav(5, 'Manage Tasks')
         cy.clickNav(1, 'Status')
-        cy.wait(2000)
     })
 
     it('Log Viewer', () => {
