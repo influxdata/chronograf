@@ -463,6 +463,7 @@ export interface ZenossProperties {
   method: string
   type: string
   tid: number
+  collector: string
   'severity-map': {
     ok: string
     info: string

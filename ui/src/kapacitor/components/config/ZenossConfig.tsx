@@ -13,6 +13,7 @@ interface Config {
     method: string
     type: string
     tid: number
+    collector: string
     'severity-map': {
       ok: string
       info: string
@@ -44,6 +45,7 @@ class ZenossConfig extends PureComponent<Props, State> {
   private method: HTMLInputElement
   private type: HTMLInputElement
   private tid: HTMLInputElement
+  private collector: HTMLInputElement
   private ok: HTMLInputElement
   private info: HTMLInputElement
   private warning: HTMLInputElement
@@ -66,6 +68,7 @@ class ZenossConfig extends PureComponent<Props, State> {
       method,
       type,
       tid,
+      collector,
       'severity-map': {ok, info, warning, critical},
     } = this.props.config.options
     const {testEnabled, enabled} = this.state
@@ -105,7 +108,7 @@ class ZenossConfig extends PureComponent<Props, State> {
           />
         </div>
         <div className="form-group col-xs-12">
-          <label htmlFor="source">Action (router name)</label>
+          <label htmlFor="source">Action (Router Name)</label>
           <input
             className="form-control"
             id="action"
@@ -145,6 +148,17 @@ class ZenossConfig extends PureComponent<Props, State> {
             type="number"
             ref={r => (this.tid = r)}
             defaultValue={tid || ''}
+            onChange={this.disableTest}
+          />
+        </div>
+        <div className="form-group col-xs-12">
+          <label htmlFor="source">Collector Name</label>
+          <input
+            className="form-control"
+            id="collector"
+            type="string"
+            ref={r => (this.collector = r)}
+            defaultValue={collector || ''}
             onChange={this.disableTest}
           />
         </div>
@@ -257,6 +271,7 @@ class ZenossConfig extends PureComponent<Props, State> {
       method: this.method.value,
       type: this.type.value,
       tid,
+      collector: this.collector.value,
       'severity-map': {
         ok: this.ok.value,
         info: this.info.value,
