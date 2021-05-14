@@ -119,7 +119,7 @@ class ZenossConfig extends PureComponent<Props, State> {
           />
         </div>
         <div className="form-group col-xs-12">
-          <label htmlFor="source">Router method</label>
+          <label htmlFor="source">Router Method</label>
           <input
             className="form-control"
             id="method"
