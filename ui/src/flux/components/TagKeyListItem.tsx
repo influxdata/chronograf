@@ -48,9 +48,11 @@ class TagKeyListItem extends PureComponent<Props, State> {
         }`}
         key={tagKey}
         onClick={this.handleItemClick}
-        data-test={`flux-schema-tree-children ${tagKey}`}
       >
-        <div className="flux-schema--item">
+        <div
+          className="flux-schema--item"
+          data-test={`flux-schema-tree-children ${tagKey}`}
+        >
           <div className="flex-schema-item-group flux-schema-item--expandable">
             <div className="flux-schema--expander" />
             {tagKey}
