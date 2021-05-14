@@ -5,23 +5,7 @@ import {ZenossProperties} from 'src/types/kapacitor'
 import RedactedInput from './RedactedInput'
 
 interface Config {
-  options: {
-    url: string
-    username: string
-    password: boolean
-    action: string
-    method: string
-    type: string
-    tid: number
-    collector: string
-    'severity-map': {
-      ok: string
-      info: string
-      warning: string
-      critical: string
-    }
-    enabled: boolean
-  }
+  options: Omit<ZenossProperties, 'password'> & {password: boolean}
 }
 
 interface Props {
