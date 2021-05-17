@@ -17,6 +17,7 @@ import VictoropsHandler from './VictoropsHandler'
 import ServiceNowHandler from './ServiceNowHandler'
 import BigPandaHandler from './BigPandaHandler'
 import TeamsHandler from './TeamsHandler'
+import ZenossHandler from './ZenossHandler'
 
 export {
   PostHandler,
@@ -38,4 +39,5 @@ export {
   ServiceNowHandler,
   BigPandaHandler,
   TeamsHandler,
+  ZenossHandler,
 }
