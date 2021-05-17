@@ -4519,7 +4519,8 @@
               "tcp",
               "serviceNow",
               "bigPanda",
-              "teams"
+              "teams",
+              "zenoss"
             ]
           }
         },
