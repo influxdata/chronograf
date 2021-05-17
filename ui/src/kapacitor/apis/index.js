@@ -72,8 +72,11 @@ export const getRule = async (kapacitor, ruleID) => {
       method: 'GET',
       url: `${kapacitor.links.rules}/${ruleID}`,
     })
-    addUnderscoreType(response?.data?.alertNodes?.serviceNow)
-    addUnderscoreType(response?.data?.alertNodes?.zenoss)
+    const alertNodes = get(response, ['data', 'alertNodes'])
+    if (alertNodes) {
+      addUnderscoreType(alertNodes.serviceNow)
+      addUnderscoreType(alertNodes.zenoss)
+    }
     return response
   } catch (error) {
     console.error(error)
