@@ -27,11 +27,17 @@ const parseHandlersFromConfig = config => {
       const type = _.get(MAP_KEYS_FROM_CONFIG, k, k)
 
       _.forEach(options, option => {
-        acc.push({
+        const toAdd = {
           // fill type with handler names in rule
-          type,
           ...option,
-        })
+          type,
+        }
+        if (option.type) {
+          // zenoss uses type property that is reserved internally
+          // it is mapped to _type
+          toAdd._type = option.type
+        }
+        acc.push(toAdd)
       })
       return acc
     },
