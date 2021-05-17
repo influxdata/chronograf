@@ -18,6 +18,15 @@ const outRule = rule => {
       _type: undefined,
     }))
   }
+  // remap zenoss from '_type' back to 'type', see getRule/getRules
+  if (Array.isArray(get(rule, ['alertNodes', 'zenoss']))) {
+    rule = cloneDeep(rule)
+    rule.alertNodes.zenoss = rule.alertNodes.zenoss.map(val => ({
+      ...val,
+      type: val._type,
+      _type: undefined,
+    }))
+  }
 
   return rule
 }
@@ -41,6 +50,13 @@ export const getRules = kapacitor => {
       rules.forEach(rule => {
         if (Array.isArray(rule.alertNodes.serviceNow)) {
           rule.alertNodes.serviceNow.forEach(x => {
+            if (x.type !== undefined) {
+              x._type = x.type
+            }
+          })
+        }
+        if (Array.isArray(rule.alertNodes.zenoss)) {
+          rule.alertNodes.zenoss.forEach(x => {
             if (x.type !== undefined) {
               x._type = x.type
             }
