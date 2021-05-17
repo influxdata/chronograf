@@ -39,29 +39,27 @@ export const createRule = (kapacitor, rule) => {
   })
 }
 
+function addUnderscoreType(alertArray) {
+  // rename 'type' to '_type' property, because `type` conflicts with existing UI property
+  if (Array.isArray(alertArray)) {
+    alertArray.forEach(x => {
+      if (x.type !== undefined) {
+        x._type = x.type
+      }
+    })
+  }
+}
+
 export const getRules = kapacitor => {
   return AJAX({
     method: 'GET',
     url: kapacitor.links.rules,
   }).then(response => {
-    // remap serviceNow 'type' to '_type', it conflicts with UI property
     const rules = get(response, ['data', 'rules'])
     if (Array.isArray(rules)) {
       rules.forEach(rule => {
-        if (Array.isArray(rule.alertNodes.serviceNow)) {
-          rule.alertNodes.serviceNow.forEach(x => {
-            if (x.type !== undefined) {
-              x._type = x.type
-            }
-          })
-        }
-        if (Array.isArray(rule.alertNodes.zenoss)) {
-          rule.alertNodes.zenoss.forEach(x => {
-            if (x.type !== undefined) {
-              x._type = x.type
-            }
-          })
-        }
+        addUnderscoreType(rule.alertNodes.serviceNow)
+        addUnderscoreType(rule.alertNodes.zenoss)
       })
     }
     return response
@@ -74,15 +72,8 @@ export const getRule = async (kapacitor, ruleID) => {
       method: 'GET',
       url: `${kapacitor.links.rules}/${ruleID}`,
     })
-    // remap serviceNow 'type' to '_type', it conflicts with UI property
-    const serviceNow = get(response, ['data', 'alertNodes', 'serviceNow'])
-    if (Array.isArray(serviceNow)) {
-      serviceNow.forEach(x => {
-        if (x.type !== undefined) {
-          x._type = x.type
-        }
-      })
-    }
+    addUnderscoreType(response?.data?.alertNodes?.serviceNow)
+    addUnderscoreType(response?.data?.alertNodes?.zenoss)
     return response
   } catch (error) {
     console.error(error)
