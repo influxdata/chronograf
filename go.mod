@@ -14,9 +14,9 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/uuid v1.1.2
-	github.com/influxdata/flux v0.65.1
+	github.com/influxdata/flux v0.114.1
 	github.com/influxdata/influxdb v1.8.4
-	github.com/influxdata/kapacitor v1.5.10-0.20210510103528-ebee9bf8ef5a
+	github.com/influxdata/kapacitor v1.5.10-0.20210518115558-53a1d22dbe76
 	github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/kevinburke/go-bindata v3.22.0+incompatible // indirect
@@ -38,3 +38,5 @@ replace github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
 replace github.com/prometheus/prometheus => github.com/goller/prometheus v1.6.1-0.20170502220046-58298e738211
 
 replace github.com/influxdata/influxdb => github.com/influxdata/influxdb v1.1.5
+
+replace github.com/influxdata/flux => github.com/influxdata/flux v0.65.1
