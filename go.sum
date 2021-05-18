@@ -619,6 +619,8 @@ github.com/influxdata/kapacitor v1.5.10-0.20210510103528-ebee9bf8ef5a h1:ma2gK68
 github.com/influxdata/kapacitor v1.5.10-0.20210510103528-ebee9bf8ef5a/go.mod h1:+Jhox2QVKLMsFJLLlhkvoe+iCkDkSKb1ln1a1hfWZw8=
 github.com/influxdata/kapacitor v1.5.10-0.20210518115558-53a1d22dbe76 h1:05e5VQZAPFVzfQ5jGXk67JHkcedKU4raqSJ+ucwKELI=
 github.com/influxdata/kapacitor v1.5.10-0.20210518115558-53a1d22dbe76/go.mod h1:XZudLJVKqxM0/R2NYX7VvUU72INa7eRdi9AQE8OjfQI=
+github.com/influxdata/kapacitor v1.5.10-0.20210518140415-452f2b236610 h1:X3LYZ4Ce4A/z1Ydk0JbhbFoXYhMDPidcU0XqbfoOjxE=
+github.com/influxdata/kapacitor v1.5.10-0.20210518140415-452f2b236610/go.mod h1:XZudLJVKqxM0/R2NYX7VvUU72INa7eRdi9AQE8OjfQI=
 github.com/influxdata/line-protocol v0.0.0-20180522152040-32c6aa80de5e h1:/o3vQtpWJhvnIbXley4/jwzzqNeigJK9z+LZcJZ9zfM=
 github.com/influxdata/line-protocol v0.0.0-20180522152040-32c6aa80de5e/go.mod h1:4kt73NQhadE3daL3WhR5EJ/J2ocX0PZzwxQ0gXJ7oFE=
 github.com/influxdata/pkg-config v0.2.6/go.mod h1:EMS7Ll0S4qkzDk53XS3Z72/egBsPInt+BeRxb0WeSwk=
