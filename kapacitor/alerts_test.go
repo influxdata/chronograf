@@ -230,7 +230,7 @@ func TestAlertServices(t *testing.T) {
         .action('a')
         .method('b')
         .type('c')
-        .TID(4)
+        .tid(4)
         .device('e')
         .component('f')
         .eventClassKey('g')
