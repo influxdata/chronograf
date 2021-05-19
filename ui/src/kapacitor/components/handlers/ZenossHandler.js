@@ -48,6 +48,7 @@ const ZenossHandler = ({
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             fieldName="tid" // type is used by js internally
+            type="number"
             fieldDisplay="Event TID:"
             fieldColumns="col-md-12"
           />
