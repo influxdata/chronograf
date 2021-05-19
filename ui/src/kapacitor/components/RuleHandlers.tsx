@@ -247,9 +247,21 @@ class RuleHandlers extends PureComponent<Props, State> {
         [fieldName]: _.split(e.target.value, ' '),
       }
     } else {
+      let value = e.target.value
+      if (e.target.type === 'number') {
+        if (value === '') {
+          value = undefined
+        } else {
+          try {
+            value = parseInt(value, 10)
+          } catch (nfe) {
+            console.error(nfe)
+          }
+        }
+      }
       modifiedHandler = {
         ...selectedHandler,
-        [fieldName]: e.target.value,
+        [fieldName]: value,
       }
     }
 
