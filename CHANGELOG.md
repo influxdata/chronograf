@@ -46,6 +46,7 @@
 1. [#5706](https://github.com/influxdata/chronograf/pull/5706): Improve communication with InfluxDB Enterprise.
 1. [#5730](https://github.com/influxdata/chronograf/pull/5730): Update license of dependencies.
 1. [#5750](https://github.com/influxdata/chronograf/pull/5750): Upgrade markdown renderer.
+1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Upgrade golang to 1.16.
 
 ### Breaking Changes
 
