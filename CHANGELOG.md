@@ -22,6 +22,7 @@
 1. [#5737](https://github.com/influxdata/chronograf/pull/5737): Allow to send multiple queries to dashboard.
 1. [#5746](https://github.com/influxdata/chronograf/pull/5746): Write to buckets when Flux tab is selected.
 1. [#5740](https://github.com/influxdata/chronograf/pull/5740): Add Teams configuration and alert UI.
+1. [#5752](https://github.com/influxdata/chronograf/pull/5742): Add Zenoss configuration and alert UI.
 
 ### Bug Fixes
 

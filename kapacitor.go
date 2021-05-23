@@ -26,6 +26,7 @@ type AlertNodes struct {
 	ServiceNow         []*ServiceNow `json:"serviceNow"`       // ServiceNow alert options
 	BigPanda           []*BigPanda   `json:"bigPanda"`         // BigPanda alert options
 	Teams              []*Teams      `json:"teams"`            // Teams alert options
+	Zenoss             []*Zenoss     `json:"zenoss"`           // Zenoss alert options
 }
 
 // Post will POST alerts to a destination URL
@@ -160,6 +161,19 @@ type BigPanda struct {
 // Teams properties
 type Teams struct {
 	ChannelURL string `json:"channel-url"` // override configuration
+}
+
+// Teams properties
+type Zenoss struct {
+	Action string `json:"action"`
+	Method string `json:"method"`
+	Type   string `json:"type"`
+	TID    int64  `json:"tid"`
+
+	Device        string `json:"device"`
+	Component     string `json:"component"`
+	EventClassKey string `json:"evclasskey"`
+	EventClass    string `json:"evclass"`
 }
 
 // MarshalJSON converts AlertNodes to JSON

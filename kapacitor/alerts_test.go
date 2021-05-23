@@ -209,6 +209,34 @@ func TestAlertServices(t *testing.T) {
         .channelURL('https://outlook.office.com/webhook/...')
 `,
 		},
+		{
+			name: "Test Zenoss",
+			rule: chronograf.AlertRule{
+				AlertNodes: chronograf.AlertNodes{
+					Zenoss: []*chronograf.Zenoss{{
+						Action:        "a",
+						Method:        "b",
+						Type:          "c",
+						TID:           4,
+						Device:        "e",
+						Component:     "f",
+						EventClassKey: "g",
+						EventClass:    "h",
+					}},
+				},
+			},
+			want: `alert()
+        .zenoss()
+        .action('a')
+        .method('b')
+        .type('c')
+        .tid(4)
+        .device('e')
+        .component('f')
+        .eventClassKey('g')
+        .eventClass('h')
+`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -15,6 +15,7 @@ import KafkaConfigs from './KafkaConfigs'
 import ServiceNowConfig from './ServiceNowConfig'
 import BigPandaConfig from './BigPandaConfig'
 import TeamsConfig from './TeamsConfig'
+import ZenossConfig from './ZenossConfig'
 
 export {
   AlertaConfig,
@@ -34,4 +35,5 @@ export {
   ServiceNowConfig,
   BigPandaConfig,
   TeamsConfig,
+  ZenossConfig,
 }

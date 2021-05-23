@@ -13,6 +13,7 @@ const HandlerInput = ({
   fieldColumns = 'col-md-6',
   parseToArray = false,
   headerIndex = 0,
+  type = 'text',
 }) => {
   const formGroupClass = `form-group ${fieldColumns}`
 
@@ -24,7 +25,7 @@ const HandlerInput = ({
           name={fieldName}
           id={selectedHandler.alias + fieldName}
           className="form-control input-sm form-malachite"
-          type={redacted ? 'hidden' : 'text'}
+          type={redacted ? 'hidden' : type}
           placeholder={placeholder}
           onChange={handleModifyHandler(
             selectedHandler,

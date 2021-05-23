@@ -35,6 +35,7 @@ import {
   ServiceNowConfig,
   BigPandaConfig,
   TeamsConfig,
+  ZenossConfig,
 } from './config'
 
 import {
@@ -415,6 +416,15 @@ class AlertTabs extends PureComponent<Props, State> {
             config={this.getSectionElement(configSections, AlertTypes.teams)}
             onTest={this.handleTestConfig(AlertTypes.teams)}
             enabled={this.getConfigEnabled(configSections, AlertTypes.teams)}
+          />
+        )
+      case AlertTypes.zenoss:
+        return (
+          <ZenossConfig
+            onSave={this.handleSaveConfig(AlertTypes.zenoss)}
+            config={this.getSectionElement(configSections, AlertTypes.zenoss)}
+            onTest={this.handleTestConfig(AlertTypes.zenoss)}
+            enabled={this.getConfigEnabled(configSections, AlertTypes.zenoss)}
           />
         )
     }

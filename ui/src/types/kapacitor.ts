@@ -91,6 +91,7 @@ interface AlertNodes {
   serviceNow?: ServiceNow[]
   bigPanda?: BigPanda[]
   teams?: Teams[]
+  zenoss?: Zenoss[]
 }
 
 interface Headers {
@@ -148,6 +149,18 @@ interface ServiceNow {
   metricName: string
   messageKey: string
   source: string
+}
+
+// Zenoss alert options
+interface Zenoss {
+  action: string
+  method: string
+  _type: string // mapped from kapacitor `type`, type property is reserved
+  tid: number
+  device: string
+  component: string
+  evclasskey: string
+  evclass: string
 }
 
 // BigPanda alert options
@@ -284,6 +297,7 @@ export interface KeyMappings {
   servicenow: string
   bigpanda: string
   teams: string
+  zenoss: string
 }
 
 export interface FieldsFromConfigAlerts {
@@ -303,6 +317,7 @@ export interface FieldsFromConfigAlerts {
   serviceNow: string[]
   bigPanda: string[]
   teams: string[]
+  zenoss: string[]
 }
 
 export interface FieldsFromAllAlerts extends FieldsFromConfigAlerts {
@@ -455,6 +470,24 @@ export interface TeamsProperties {
   enabled: boolean
 }
 
+export interface ZenossProperties {
+  url: string
+  username: string
+  password: string
+  action: string
+  method: string
+  type: string
+  tid: number
+  collector: string
+  'severity-map': {
+    ok: string
+    info: string
+    warning: string
+    critical: string
+  }
+  enabled: boolean
+}
+
 export type ServiceProperties =
   | AlertaProperties
   | KafkaProperties
@@ -471,6 +504,7 @@ export type ServiceProperties =
   | ServiceNowProperties
   | BigPandaProperties
   | TeamsProperties
+  | ZenossProperties
 
 export type SpecificConfigOptions = Partial<SlackProperties & KafkaProperties>
 

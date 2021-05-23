@@ -20,6 +20,7 @@ import {
   ServiceNowHandler,
   BigPandaHandler,
   TeamsHandler,
+  ZenossHandler,
 } from 'src/kapacitor/components/handlers'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
@@ -209,6 +210,15 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('teams')}
+            validationError={validationError}
+          />
+        )
+      case 'zenoss':
+        return (
+          <ZenossHandler
+            selectedHandler={selectedHandler}
+            handleModifyHandler={handleModifyHandler}
+            onGoToConfig={onGoToConfig('zenoss')}
             validationError={validationError}
           />
         )

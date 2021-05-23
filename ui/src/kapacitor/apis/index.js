@@ -18,6 +18,15 @@ const outRule = rule => {
       _type: undefined,
     }))
   }
+  // remap zenoss from '_type' back to 'type', see getRule/getRules
+  if (Array.isArray(get(rule, ['alertNodes', 'zenoss']))) {
+    rule = cloneDeep(rule)
+    rule.alertNodes.zenoss = rule.alertNodes.zenoss.map(val => ({
+      ...val,
+      type: val._type,
+      _type: undefined,
+    }))
+  }
 
   return rule
 }
@@ -30,22 +39,27 @@ export const createRule = (kapacitor, rule) => {
   })
 }
 
+function addUnderscoreType(alertArray) {
+  // rename 'type' to '_type' property, because `type` conflicts with existing UI property
+  if (Array.isArray(alertArray)) {
+    alertArray.forEach(x => {
+      if (x.type !== undefined) {
+        x._type = x.type
+      }
+    })
+  }
+}
+
 export const getRules = kapacitor => {
   return AJAX({
     method: 'GET',
     url: kapacitor.links.rules,
   }).then(response => {
-    // remap serviceNow 'type' to '_type', it conflicts with UI property
     const rules = get(response, ['data', 'rules'])
     if (Array.isArray(rules)) {
       rules.forEach(rule => {
-        if (Array.isArray(rule.alertNodes.serviceNow)) {
-          rule.alertNodes.serviceNow.forEach(x => {
-            if (x.type !== undefined) {
-              x._type = x.type
-            }
-          })
-        }
+        addUnderscoreType(rule.alertNodes.serviceNow)
+        addUnderscoreType(rule.alertNodes.zenoss)
       })
     }
     return response
@@ -58,14 +72,10 @@ export const getRule = async (kapacitor, ruleID) => {
       method: 'GET',
       url: `${kapacitor.links.rules}/${ruleID}`,
     })
-    // remap serviceNow 'type' to '_type', it conflicts with UI property
-    const serviceNow = get(response, ['data', 'alertNodes', 'serviceNow'])
-    if (Array.isArray(serviceNow)) {
-      serviceNow.forEach(x => {
-        if (x.type !== undefined) {
-          x._type = x.type
-        }
-      })
+    const alertNodes = get(response, ['data', 'alertNodes'])
+    if (alertNodes) {
+      addUnderscoreType(alertNodes.serviceNow)
+      addUnderscoreType(alertNodes.zenoss)
     }
     return response
   } catch (error) {
