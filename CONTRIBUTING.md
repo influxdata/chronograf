@@ -59,7 +59,7 @@ To add a dependency via Yarn, for example, run `yarn add <dependency>` from with
 
 ## Installing Go
 
-Chronograf requires Go 1.15 or higher.
+Chronograf requires Go 1.16 or higher.
 
 ## Installing & Using Dep
 

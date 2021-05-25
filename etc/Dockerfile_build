@@ -12,11 +12,12 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     ruby-dev \
     rpm \
     zip \
-    python-pip \
+    python3-pip \
     autoconf \
     libtool
 
-RUN pip install boto requests python-jose --upgrade
+#RUN pip install pyrsistent==0.16.1
+RUN pip3 install boto requests python-jose --upgrade
 RUN gem install fpm
 
 # Install node
@@ -33,7 +34,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 
 # Install go
 ENV GOPATH /root/go
-ENV GO_VERSION 1.15.5
+ENV GO_VERSION 1.16.4
 ENV GO_ARCH amd64
 ENV GO111MODULES ON
 RUN wget https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz; \

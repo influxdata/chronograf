@@ -38,6 +38,7 @@
 1. [#5722](https://github.com/influxdata/chronograf/pull/5722): Filter out roles with unknown organization reference.
 1. [#5724](https://github.com/influxdata/chronograf/pull/5724): Detect actual flux support in flux proxy.
 1. [#5747](https://github.com/influxdata/chronograf/pull/5747): Manage individual execution status per query.
+1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Add macOS arm64 builds.
 
 ### Other
 
@@ -47,6 +48,7 @@
 1. [#5706](https://github.com/influxdata/chronograf/pull/5706): Improve communication with InfluxDB Enterprise.
 1. [#5730](https://github.com/influxdata/chronograf/pull/5730): Update license of dependencies.
 1. [#5750](https://github.com/influxdata/chronograf/pull/5750): Upgrade markdown renderer.
+1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Upgrade golang to 1.16.
 
 ### Breaking Changes
 
