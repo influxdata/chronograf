@@ -23,6 +23,7 @@
 1. [#5746](https://github.com/influxdata/chronograf/pull/5746): Write to buckets when Flux tab is selected.
 1. [#5740](https://github.com/influxdata/chronograf/pull/5740): Add Teams configuration and alert UI.
 1. [#5752](https://github.com/influxdata/chronograf/pull/5742): Add Zenoss configuration and alert UI.
+1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Add macOS arm64 builds.
 
 ### Bug Fixes
 
@@ -39,6 +40,7 @@
 1. [#5724](https://github.com/influxdata/chronograf/pull/5724): Detect actual flux support in flux proxy.
 1. [#5747](https://github.com/influxdata/chronograf/pull/5747): Manage individual execution status per query.
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Add macOS ARM64 builds.
+1. [#5758](https://github.com/influxdata/chronograf/pull/5758): Parse exported dashboard AS-IS in a resources directory.
 
 ### Other
 
