@@ -43,6 +43,21 @@ func TestDashboardsAll(t *testing.T) {
 		{
 			boards: []string{
 				`{
+	"meta": {"whatever": "is"},
+	"dashboard": {
+		"id": "-1",
+		"cells": [],
+		"templates": [],
+		"name": "test-wrapped-dashboard",
+		"organization": "default"
+	}
+}`,
+			},
+			err: false,
+		},
+		{
+			boards: []string{
+				`{
 	"id": "abc123",
 	"cells": [],
 	"templates": [],
@@ -75,6 +90,10 @@ func testDashboardAll(t *testing.T, i int, test dashAllTest) {
 		require.Equal(t, 0, len(dboards))
 	} else {
 		require.Equal(t, len(test.boards), len(dboards))
+		for _, b := range dboards {
+			require.NotEmpty(t, b.Name)
+			require.NotEqual(t, b.ID, 0)
+		}
 	}
 }
 
