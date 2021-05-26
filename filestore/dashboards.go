@@ -64,9 +64,6 @@ func (d *Dashboards) All(ctx context.Context) ([]chronograf.Dashboard, error) {
 				}
 				dashboard = exportedDashboard.Dashboard
 			}
-			if dashboard.ID > 0 {
-				d.Logger.WithField("file", file).Info("Dashboard file should better contain negative ID to avoid clashes with a possible UI-created dashboard.")
-			}
 			dashboards = append(dashboards, dashboard)
 		}
 	}
