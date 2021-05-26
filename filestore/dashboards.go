@@ -47,9 +47,26 @@ func (d *Dashboards) All(ctx context.Context) ([]chronograf.Dashboard, error) {
 			continue
 		}
 		var dashboard chronograf.Dashboard
-		if err := load(path.Join(d.Dir, file.Name()), &dashboard); err != nil {
+		file := path.Join(d.Dir, file.Name())
+		if err := load(file, &dashboard); err != nil {
+			d.Logger.WithField("file", file).Error("Dashboard file skipped, loading error: ", err)
 			continue // We want to load all files we can.
 		} else {
+			if dashboard.Name == "" {
+				// https://github.com/influxdata/chronograf/issues/5756
+				// exported DASHBOARD is wrapped, it looks like: {meta:{}, dashboard:DASHBOARD}
+				var exportedDashboard struct {
+					Dashboard chronograf.Dashboard `json:"dashboard"`
+				}
+				if err := load(file, &exportedDashboard); err != nil {
+					d.Logger.WithField("file", file).Error("Dashboard file skipped, loading error: ", err)
+					continue // We want to load all files we can.
+				}
+				dashboard = exportedDashboard.Dashboard
+			}
+			if dashboard.ID > 0 {
+				d.Logger.WithField("file", file).Info("Dashboard file should better contain negative ID to avoid clashes with a possible UI-created dashboard.")
+			}
 			dashboards = append(dashboards, dashboard)
 		}
 	}
