@@ -48,7 +48,7 @@ func (d *Dashboards) All(ctx context.Context) ([]chronograf.Dashboard, error) {
 		}
 		var dashboard chronograf.Dashboard
 		file := path.Join(d.Dir, file.Name())
-		if err := load(file, &dashboard); err != nil {
+		if err := loadText(file, &dashboard); err != nil {
 			d.Logger.WithField("file", file).Error("Dashboard file skipped, loading error: ", err)
 			continue // We want to load all files we can.
 		} else {
@@ -58,7 +58,7 @@ func (d *Dashboards) All(ctx context.Context) ([]chronograf.Dashboard, error) {
 				var exportedDashboard struct {
 					Dashboard chronograf.Dashboard `json:"dashboard"`
 				}
-				if err := load(file, &exportedDashboard); err != nil {
+				if err := loadText(file, &exportedDashboard); err != nil {
 					d.Logger.WithField("file", file).Error("Dashboard file skipped, loading error: ", err)
 					continue // We want to load all files we can.
 				}
