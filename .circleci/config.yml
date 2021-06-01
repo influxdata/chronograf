@@ -33,7 +33,7 @@ version: 2
 jobs:
   build:
     environment:
-      DOCKER_TAG: chronograf-20210521
+      DOCKER_TAG: chronograf-20210527
       GO111MODULE: "ON"
     machine: true
     steps:

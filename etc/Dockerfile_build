@@ -2,7 +2,7 @@ FROM ubuntu:bionic
 
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     apt-transport-https \
-    python-dev \
+    python3-dev \
     wget \
     curl \
     git \
@@ -16,7 +16,6 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
     autoconf \
     libtool
 
-#RUN pip install pyrsistent==0.16.1
 RUN pip3 install boto requests python-jose --upgrade
 RUN gem install fpm
 

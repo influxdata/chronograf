@@ -49,6 +49,7 @@
 1. [#5730](https://github.com/influxdata/chronograf/pull/5730): Update license of dependencies.
 1. [#5750](https://github.com/influxdata/chronograf/pull/5750): Upgrade markdown renderer.
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Upgrade golang to 1.16.
+1. [#5755](https://github.com/influxdata/chronograf/pull/5755): Upgrade builder to python3 to avoid python2 lts
 
 ### Breaking Changes
 
