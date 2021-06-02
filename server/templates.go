@@ -137,6 +137,10 @@ func (s *Service) NewTemplate(w http.ResponseWriter, r *http.Request) {
 	template.ID = chronograf.TemplateID(tid)
 
 	dash.Templates = append(dash.Templates, template)
+	if err := ValidUniqueTemplateVariables(&dash); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
 	if err := s.Store.Dashboards(ctx).Update(ctx, dash); err != nil {
 		msg := fmt.Sprintf("Error adding template %s to dashboard %d: %v", tid, id, err)
 		Error(w, http.StatusInternalServerError, msg, s.Logger)
@@ -253,6 +257,10 @@ func (s *Service) ReplaceTemplate(w http.ResponseWriter, r *http.Request) {
 	template.ID = chronograf.TemplateID(tid)
 
 	dash.Templates[pos] = template
+	if err := ValidUniqueTemplateVariables(&dash); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
 	if err := s.Store.Dashboards(ctx).Update(ctx, dash); err != nil {
 		msg := fmt.Sprintf("Error updating template %s in dashboard %d: %v", tid, id, err)
 		Error(w, http.StatusInternalServerError, msg, s.Logger)
