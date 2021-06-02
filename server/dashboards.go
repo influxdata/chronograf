@@ -247,12 +247,10 @@ func ValidDashboardRequest(d *chronograf.Dashboard, defaultOrgID string) error {
 		d.Cells[i] = c
 	}
 
-	variableNames := map[string]struct{}{}
+	if err := ValidUniqueTemplateVariables(d); err != nil {
+		return err
+	}
 	for _, t := range d.Templates {
-		if _, duplicate := variableNames[t.Var]; duplicate {
-			return fmt.Errorf("duplicate variable name %s", t.Var)
-		}
-		variableNames[t.Var] = struct{}{}
 		if err := ValidTemplateRequest(&t); err != nil {
 			return err
 		}

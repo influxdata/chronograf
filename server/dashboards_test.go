@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -196,12 +197,59 @@ func TestValidDashboardRequest(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Checks unique dashboard variables",
+			d: chronograf.Dashboard{
+				Organization: "1337",
+				Cells: []chronograf.DashboardCell{
+					{
+						W: 0,
+						H: 0,
+						Queries: []chronograf.DashboardQuery{
+							{
+								Command: "SELECT donors from hill_valley_preservation_society where time > 1985-10-25T08:00:00",
+								Type:    "influxql",
+							},
+						},
+					},
+					{
+						W: 2,
+						H: 2,
+						Queries: []chronograf.DashboardQuery{
+							{
+								Command: "SELECT winning_horses from grays_sports_alamanc where time > 1955-11-1T00:00:00",
+								Type:    "influxql",
+							},
+						},
+					},
+				},
+				Templates: []chronograf.Template{
+					{
+						TemplateVar: chronograf.TemplateVar{Var: "a"},
+						ID:          "1",
+						Type:        "databases",
+						Label:       "a",
+						Query:       &chronograf.TemplateQuery{Command: "SHOW DATABASES"},
+					},
+					{
+						TemplateVar: chronograf.TemplateVar{Var: "a"},
+						ID:          "1",
+						Type:        "databases",
+						Label:       "a",
+						Query:       &chronograf.TemplateQuery{Command: "SHOW DATABASES"},
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
-		// TODO(desa): this Okay?
 		err := ValidDashboardRequest(&tt.d, "0")
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. ValidDashboardRequest() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+		fmt.Println(err)
+		if tt.wantErr {
+			if err == nil {
+				t.Errorf("%q. ValidDashboardRequest() error = nil, wantErr %v", tt.name, tt.wantErr)
+			}
 			continue
 		}
 		if diff := cmp.Diff(tt.d, tt.want); diff != "" {
