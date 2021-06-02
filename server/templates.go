@@ -37,6 +37,21 @@ func ValidTemplateRequest(template *chronograf.Template) error {
 	return nil
 }
 
+// ValidUniqueTemplateVariables validates that a template defines variable at most once
+func ValidUniqueTemplateVariables(dashboard *chronograf.Dashboard) error {
+	variableNames := map[string]struct{}{}
+	for _, t := range dashboard.Templates {
+		if _, duplicate := variableNames[t.Var]; duplicate {
+			return fmt.Errorf("duplicate variable name %s", t.Var)
+		}
+		variableNames[t.Var] = struct{}{}
+		if err := ValidTemplateRequest(&t); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type templateLinks struct {
 	Self string `json:"self"` // Self link mapping to this resource
 }
