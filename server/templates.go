@@ -45,9 +45,6 @@ func ValidUniqueTemplateVariables(dashboard *chronograf.Dashboard) error {
 			return fmt.Errorf("duplicate variable name %s", t.Var)
 		}
 		variableNames[t.Var] = struct{}{}
-		if err := ValidTemplateRequest(&t); err != nil {
-			return err
-		}
 	}
 	return nil
 }
