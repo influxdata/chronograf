@@ -221,7 +221,7 @@ func (s *Service) UpdateDashboard(w http.ResponseWriter, r *http.Request) {
 		}
 		orig.Cells = req.Cells
 	} else {
-		invalidData(w, fmt.Errorf("Update must include either name or cells"), s.Logger)
+		invalidData(w, fmt.Errorf("update must include either name or cells"), s.Logger)
 		return
 	}
 

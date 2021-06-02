@@ -14,14 +14,14 @@ import (
 func ValidTemplateRequest(template *chronograf.Template) error {
 	switch template.Type {
 	default:
-		return fmt.Errorf("Unknown template type %s", template.Type)
+		return fmt.Errorf("unknown template type %s", template.Type)
 	case "constant", "csv", "fieldKeys", "tagKeys", "tagValues", "measurements", "databases", "map", "influxql", "text", "flux":
 	}
 
 	for _, v := range template.Values {
 		switch v.Type {
 		default:
-			return fmt.Errorf("Unknown template variable type %s", v.Type)
+			return fmt.Errorf("unknown template variable type %s", v.Type)
 		case "csv", "map", "fieldKey", "tagKey", "tagValue", "measurement", "database", "constant", "influxql", "flux":
 		}
 
@@ -31,7 +31,7 @@ func ValidTemplateRequest(template *chronograf.Template) error {
 	}
 
 	if (template.Type == "influxql" || template.Type == "flux") && template.Query == nil {
-		return fmt.Errorf("No query set for template of type '%s'", template.Type)
+		return fmt.Errorf("no query set for template of type '%s'", template.Type)
 	}
 
 	return nil
