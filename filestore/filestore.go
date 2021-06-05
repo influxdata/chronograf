@@ -23,10 +23,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
+	htmlTemplate "html/template"
 	"os"
 	"path"
 	"strings"
+	textTemplate "text/template"
 )
 
 func create(file string, resource interface{}) error {
@@ -51,7 +52,16 @@ func file(dir, name, ext string) string {
 }
 
 func load(name string, resource interface{}) error {
-	octets, err := templatedFromEnv(name)
+	octets, err := templated(environ(), name)
+	if err != nil {
+		return fmt.Errorf("resource %s not found", name)
+	}
+
+	return json.Unmarshal(octets, resource)
+}
+
+func loadText(name string, resource interface{}) error {
+	octets, err := textTemplated(environ(), name)
 	if err != nil {
 		return fmt.Errorf("resource %s not found", name)
 	}
@@ -61,14 +71,26 @@ func load(name string, resource interface{}) error {
 
 var env map[string]string
 
-// templatedFromEnv returns all files templated against environment variables
-func templatedFromEnv(filenames ...string) ([]byte, error) {
-	return templated(environ(), filenames...)
+// templated returns all files html-templated using data
+func templated(data interface{}, filenames ...string) ([]byte, error) {
+	t, err := htmlTemplate.ParseFiles(filenames...)
+	if err != nil {
+		return nil, err
+	}
+	var b bytes.Buffer
+	// If a key in the file exists but is not in the data we
+	// immediately fail with a missing key error
+	err = t.Option("missingkey=error").Execute(&b, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
 }
 
-// templated returns all files templated using data
-func templated(data interface{}, filenames ...string) ([]byte, error) {
-	t, err := template.ParseFiles(filenames...)
+// textTemplated returns all files text-templated using data
+func textTemplated(data interface{}, filenames ...string) ([]byte, error) {
+	t, err := textTemplate.ParseFiles(filenames...)
 	if err != nil {
 		return nil, err
 	}

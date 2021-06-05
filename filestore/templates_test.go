@@ -51,13 +51,25 @@ func Test_templated(t *testing.T) {
 				filenames[i] = f.Name()
 				defer os.Remove(f.Name())
 			}
-			got, err := templated(tt.data, filenames...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("templated() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			{
+				got, err := templated(tt.data, filenames...)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("templated() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("templated() = %v, want %v", got, tt.want)
+				}
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("templated() = %v, want %v", got, tt.want)
+			{
+				got, err := textTemplated(tt.data, filenames...)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("textTemplated() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("textTemplated() = %v, want %v", got, tt.want)
+				}
 			}
 		})
 	}
