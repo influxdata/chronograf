@@ -40,7 +40,6 @@
 1. [#5724](https://github.com/influxdata/chronograf/pull/5724): Detect actual flux support in flux proxy.
 1. [#5747](https://github.com/influxdata/chronograf/pull/5747): Manage individual execution status per query.
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Add macOS ARM64 builds.
-1. [#5758](https://github.com/influxdata/chronograf/pull/5758): Parse exported dashboard AS-IS in a resources directory.
 1. [#5758](https://github.com/influxdata/chronograf/pull/5758): Parse exported dashboard in a resources directory.
 
 ### Other
@@ -52,7 +51,7 @@
 1. [#5730](https://github.com/influxdata/chronograf/pull/5730): Update license of dependencies.
 1. [#5750](https://github.com/influxdata/chronograf/pull/5750): Upgrade markdown renderer.
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Upgrade golang to 1.16.
-1. [#5755](https://github.com/influxdata/chronograf/pull/5755): Upgrade builder to python3 to avoid python2 lts.
+1. [#5755](https://github.com/influxdata/chronograf/pull/5755): Upgrade builder to python3 to avoid python2 LTS.
 
 ### Breaking Changes
 
