@@ -407,19 +407,40 @@ class TemplateVariableEditor extends PureComponent<Props, State> {
   private get canSave(): boolean {
     const {
       nextTemplate: {tempVar, type, values},
+      isNew,
     } = this.state
 
-    let canSaveValues = true
-    if (type === TemplateType.CSV && isEmpty(values)) {
-      canSaveValues = false
+    const templates = this.props.templates || []
+    if (tempVar === '') {
+      return false
     }
+    if (type === TemplateType.CSV && isEmpty(values)) {
+      return false
+    }
+    const variable = formatTempVar(tempVar)
+    if (RESERVED_TEMPLATE_NAMES.includes(variable)) {
+      return false
+    }
+    if (isNew && templates.some(t => t.tempVar === variable)) {
+      // duplicate variable on create
+      return false
+    }
+    const template = this.props.template
 
-    return (
-      tempVar !== '' &&
-      canSaveValues &&
-      !RESERVED_TEMPLATE_NAMES.includes(formatTempVar(tempVar)) &&
-      !this.isSaving
-    )
+    if (
+      !isNew &&
+      template &&
+      templates.reduce((acc, t) => {
+        if (t.tempVar === variable && template.id !== t.id) {
+          return acc + 1
+        }
+        return acc
+      }, 0) > 0
+    ) {
+      // duplicate variable on update
+      return false
+    }
+    return !this.isSaving
   }
 
   private get dropdownSelection(): string {

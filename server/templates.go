@@ -14,14 +14,14 @@ import (
 func ValidTemplateRequest(template *chronograf.Template) error {
 	switch template.Type {
 	default:
-		return fmt.Errorf("Unknown template type %s", template.Type)
+		return fmt.Errorf("unknown template type %s", template.Type)
 	case "constant", "csv", "fieldKeys", "tagKeys", "tagValues", "measurements", "databases", "map", "influxql", "text", "flux":
 	}
 
 	for _, v := range template.Values {
 		switch v.Type {
 		default:
-			return fmt.Errorf("Unknown template variable type %s", v.Type)
+			return fmt.Errorf("unknown template variable type %s", v.Type)
 		case "csv", "map", "fieldKey", "tagKey", "tagValue", "measurement", "database", "constant", "influxql", "flux":
 		}
 
@@ -31,9 +31,21 @@ func ValidTemplateRequest(template *chronograf.Template) error {
 	}
 
 	if (template.Type == "influxql" || template.Type == "flux") && template.Query == nil {
-		return fmt.Errorf("No query set for template of type '%s'", template.Type)
+		return fmt.Errorf("no query set for template of type '%s'", template.Type)
 	}
 
+	return nil
+}
+
+// ValidUniqueTemplateVariables validates that a template defines variable at most once
+func ValidUniqueTemplateVariables(dashboard *chronograf.Dashboard) error {
+	variableNames := map[string]struct{}{}
+	for _, t := range dashboard.Templates {
+		if _, duplicate := variableNames[t.Var]; duplicate {
+			return fmt.Errorf("duplicate variable name %s", t.Var)
+		}
+		variableNames[t.Var] = struct{}{}
+	}
 	return nil
 }
 
@@ -125,6 +137,10 @@ func (s *Service) NewTemplate(w http.ResponseWriter, r *http.Request) {
 	template.ID = chronograf.TemplateID(tid)
 
 	dash.Templates = append(dash.Templates, template)
+	if err := ValidUniqueTemplateVariables(&dash); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
 	if err := s.Store.Dashboards(ctx).Update(ctx, dash); err != nil {
 		msg := fmt.Sprintf("Error adding template %s to dashboard %d: %v", tid, id, err)
 		Error(w, http.StatusInternalServerError, msg, s.Logger)
@@ -241,6 +257,10 @@ func (s *Service) ReplaceTemplate(w http.ResponseWriter, r *http.Request) {
 	template.ID = chronograf.TemplateID(tid)
 
 	dash.Templates[pos] = template
+	if err := ValidUniqueTemplateVariables(&dash); err != nil {
+		invalidData(w, err, s.Logger)
+		return
+	}
 	if err := s.Store.Dashboards(ctx).Update(ctx, dash); err != nil {
 		msg := fmt.Sprintf("Error updating template %s in dashboard %d: %v", tid, id, err)
 		Error(w, http.StatusInternalServerError, msg, s.Logger)
