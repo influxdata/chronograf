@@ -35,7 +35,7 @@ class SearchBar extends PureComponent<Props, State> {
 
   public render() {
     return (
-      <div 
+      <div
         className="flux-functions-toolbar--search"
         data-test="flux-functions-toolbar--search-v1"
       >
