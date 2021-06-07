@@ -38,8 +38,10 @@ class DatabaseListItem extends PureComponent<Props, State> {
       <div className={this.className} onClick={this.handleClick}>
         <div className="flux-schema--item">
           <div className="flex-schema-item-group flux-schema-item--expandable">
-            <div className="flux-schema--expander"
-            data-test={`flux-schema-${this.className}`} />
+            <div
+              className="flux-schema--expander"
+              data-test={`flux-schema-${this.className}`}
+            />
             {db}
             <span className="flux-schema--type">Bucket</span>
           </div>
