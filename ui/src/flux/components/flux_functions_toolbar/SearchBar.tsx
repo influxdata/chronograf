@@ -35,8 +35,10 @@ class SearchBar extends PureComponent<Props, State> {
 
   public render() {
     return (
-      <div className="flux-functions-toolbar--search"
-      data-test="flux-functions-toolbar--search-v1">
+      <div 
+        className="flux-functions-toolbar--search"
+        data-test="flux-functions-toolbar--search-v1"
+      >
         <Input
           type={InputType.Text}
           icon={IconFont.Search}
