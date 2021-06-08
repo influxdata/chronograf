@@ -6,8 +6,10 @@ import {
   getRule as getRuleAJAX,
   deleteRule as deleteRuleAPI,
   updateRuleStatus as updateRuleStatusAPI,
+  updateFluxTaskStatus as updateFluxTaskStatusAPI,
   createTask as createTaskAJAX,
   updateTask as updateTaskAJAX,
+  getFluxTasks,
 } from 'src/kapacitor/apis'
 import {errorThrown} from 'shared/actions/errors'
 
@@ -101,6 +103,17 @@ export const fetchRules = kapacitor => async dispatch => {
   }
 }
 
+export const fetchFluxTasks = kapacitor => async dispatch => {
+  try {
+    const {
+      data: {tasks},
+    } = await getFluxTasks(kapacitor)
+    dispatch({type: 'LOAD_FLUX_TASKS', payload: {tasks}})
+  } catch (error) {
+    dispatch(errorThrown(error))
+  }
+}
+
 export const chooseTrigger = (ruleID, trigger) => ({
   type: 'CHOOSE_TRIGGER',
   payload: {
@@ -179,6 +192,14 @@ export const updateRuleStatusSuccess = (ruleID, status) => ({
   },
 })
 
+export const updateFluxTaskStatusSuccess = (task, status) => ({
+  type: 'UPDATE_FLUX_TASK_STATUS_SUCCESS',
+  payload: {
+    task,
+    status,
+  },
+})
+
 export const deleteRule = rule => dispatch => {
   deleteRuleAPI(rule)
     .then(() => {
@@ -197,6 +218,17 @@ export const updateRuleStatus = (rule, status) => dispatch => {
     })
     .catch(() => {
       dispatch(notify(notifyAlertRuleStatusUpdateFailed(rule.name, status)))
+    })
+}
+
+export const updateFluxTaskStatus = (kapacitor, task, status) => dispatch => {
+  updateFluxTaskStatusAPI(kapacitor, task, status)
+    .then(() => {
+      dispatch(updateFluxTaskStatusSuccess(task, status))
+      dispatch(notify(notifyAlertRuleStatusUpdated(task.name, status)))
+    })
+    .catch(() => {
+      dispatch(notify(notifyAlertRuleStatusUpdateFailed(task.name, status)))
     })
 }
 
