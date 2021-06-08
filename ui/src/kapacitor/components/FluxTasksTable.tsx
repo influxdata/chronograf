@@ -57,7 +57,7 @@ const FluxTasksTable: FC<FluxTasksTableProps> = ({
   onChangeTaskStatus,
 }) => {
   if (!tasks) {
-    return undefined
+    return null
   }
   return (
     <table className="table v-center table-highlight">

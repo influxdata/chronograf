@@ -7,6 +7,7 @@ import {
   deleteRule as deleteRuleAPI,
   updateRuleStatus as updateRuleStatusAPI,
   updateFluxTaskStatus as updateFluxTaskStatusAPI,
+  deleteFluxTask as deleteFluxTaskAPI,
   createTask as createTaskAJAX,
   updateTask as updateTaskAJAX,
   getFluxTasks,
@@ -110,6 +111,7 @@ export const fetchFluxTasks = kapacitor => async dispatch => {
     } = await getFluxTasks(kapacitor)
     dispatch({type: 'LOAD_FLUX_TASKS', payload: {tasks}})
   } catch (error) {
+    dispatch({type: 'LOAD_FLUX_TASKS', payload: {tasks: null}})
     dispatch(errorThrown(error))
   }
 }
@@ -184,6 +186,13 @@ export const deleteRuleSuccess = ruleID => ({
   },
 })
 
+export const deleteFluxTaskSuccess = taskId => ({
+  type: 'DELETE_FLUX_TASK_SUCCESS',
+  payload: {
+    taskId,
+  },
+})
+
 export const updateRuleStatusSuccess = (ruleID, status) => ({
   type: 'UPDATE_RULE_STATUS_SUCCESS',
   payload: {
@@ -208,6 +217,16 @@ export const deleteRule = rule => dispatch => {
     })
     .catch(() => {
       dispatch(notify(notifyAlertRuleDeleteFailed(rule.name)))
+    })
+}
+export const deleteFluxTask = (kapacitor, task) => dispatch => {
+  deleteFluxTaskAPI(kapacitor, task)
+    .then(() => {
+      dispatch(deleteFluxTaskSuccess(task.id))
+      dispatch(notify(notifyAlertRuleDeleted(task.name)))
+    })
+    .catch(() => {
+      dispatch(notify(notifyAlertRuleDeleteFailed(task.name)))
     })
 }
 

@@ -52,6 +52,7 @@ interface Props {
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
   setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
   fetchFluxTasks: (kapacitor: Kapacitor) => void
+  deleteFluxTask: (kapacitor: Kapacitor, task: FluxTask) => void
   rules: AlertRule[]
   fluxTasks: FluxTask[]
 }
@@ -122,6 +123,7 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
         onDelete={this.handleDeleteRule}
         onChangeRuleStatus={this.handleRuleStatus}
         onChangeFluxTaskStatus={this.handleFluxTaskStatus}
+        onDeleteFluxTask={this.handleDeleteFluxTask}
       />
     )
   }
@@ -223,6 +225,11 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
 
     updateFluxTaskStatus(this.kapacitor, task, status)
   }
+
+  private handleDeleteFluxTask = (task: FluxTask) => {
+    const {deleteFluxTask} = this.props
+    deleteFluxTask(this.kapacitor, task)
+  }
 }
 
 const mstp = ({rules, sources, fluxTasks}) => ({
@@ -241,6 +248,7 @@ const mdtp = {
   setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
   notify: notifyAction,
   fetchFluxTasks: kapacitorActions.fetchFluxTasks,
+  deleteFluxTask: kapacitorActions.deleteFluxTask,
 }
 
 export default connect(mstp, mdtp)(KapacitorRulesPage)

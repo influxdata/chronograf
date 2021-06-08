@@ -122,6 +122,13 @@ export const updateFluxTaskStatus = (kapacitor, task, status) => {
   })
 }
 
+export const deleteFluxTask = (kapacitor, task) => {
+  return AJAX({
+    method: 'DELETE',
+    url: kapacitor.links.proxy + '?path=' + task.links.self,
+  })
+}
+
 export const createTask = async (kapacitor, {id, dbrps, tickscript, type}) => {
   try {
     return await AJAX({

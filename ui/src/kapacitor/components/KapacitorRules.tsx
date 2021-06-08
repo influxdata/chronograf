@@ -15,6 +15,7 @@ interface KapacitorRulesProps {
   onDelete: (rule: AlertRule) => void
   onChangeRuleStatus: (rule: AlertRule) => void
   onChangeFluxTaskStatus: (task: FluxTask) => void
+  onDeleteFluxTask: (task: FluxTask) => void
 }
 
 const KapacitorRules: FC<KapacitorRulesProps> = ({
@@ -24,6 +25,7 @@ const KapacitorRules: FC<KapacitorRulesProps> = ({
   onDelete,
   onChangeRuleStatus,
   onChangeFluxTaskStatus,
+  onDeleteFluxTask,
   fluxTasks = [],
 }) => {
   const builderRules = rules.filter((r: AlertRule) => r.query)
@@ -33,9 +35,9 @@ const KapacitorRules: FC<KapacitorRulesProps> = ({
   const scriptsHeader = `${rules.length} TICKscript${
     rules.length === 1 ? '' : 's'
   }`
-  const fluxTasksHeader = `${fluxTasks.length} Flux Task${
-    fluxTasks.length === 1 ? '' : 's'
-  }`
+  const fluxTasksHeader = fluxTasks
+    ? `${fluxTasks.length} Flux Task${fluxTasks.length === 1 ? '' : 's'}`
+    : `Flux Tasks`
   const kapacitorLink = `/sources/${source.id}/kapacitors/${kapacitor.id}`
 
   return (
@@ -80,21 +82,21 @@ const KapacitorRules: FC<KapacitorRulesProps> = ({
           />
         </div>
       </div>
-      <div className="panel">
-        <div className="panel-heading">
-          <h2 className="panel-title">{fluxTasksHeader}</h2>
+      {fluxTasks ? (
+        <div className="panel">
+          <div className="panel-heading">
+            <h2 className="panel-title">{fluxTasksHeader}</h2>
+          </div>
+          <div className="panel-body">
+            <FluxTasksTable
+              kapacitorLink={kapacitorLink}
+              tasks={fluxTasks}
+              onDelete={onDeleteFluxTask}
+              onChangeTaskStatus={onChangeFluxTaskStatus}
+            />
+          </div>
         </div>
-        <div className="panel-body">
-          <FluxTasksTable
-            kapacitorLink={kapacitorLink}
-            tasks={fluxTasks}
-            // eslint-disable-next-line no-console
-            onDelete={console.log}
-            // eslint-disable-next-line no-console
-            onChangeTaskStatus={onChangeFluxTaskStatus}
-          />
-        </div>
-      </div>
+      ) : null}
     </div>
   )
 }

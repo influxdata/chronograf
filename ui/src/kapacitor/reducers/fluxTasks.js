@@ -12,6 +12,10 @@ export default function fluxTasks(state = [], action) {
         return t
       })
     }
+    case 'DELETE_FLUX_TASK_SUCCESS': {
+      const {taskId} = action.payload
+      return state.filter(t => t.id !== taskId)
+    }
   }
   return state
 }
