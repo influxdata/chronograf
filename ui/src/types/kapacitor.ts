@@ -96,6 +96,18 @@ export interface FluxTask {
   readonly lastRunError?: string
   readonly createdAt?: string
   readonly updatedAt?: string
+  readonly links?: {
+    /** URL for this check */
+    self?: string
+    /** URL to retrieve labels for this check */
+    labels?: string
+    /** URL to retrieve members for this check */
+    members?: string
+    /** URL to retrieve owners for this check */
+    owners?: string
+    /** URL to retrieve flux script for this check */
+    query?: string
+  }
 }
 
 type TICKScript = string
