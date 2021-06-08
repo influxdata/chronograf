@@ -19,6 +19,8 @@ import {
   notifyAlertRuleDeleteFailed,
   notifyAlertRuleStatusUpdated,
   notifyAlertRuleStatusUpdateFailed,
+  notifyFluxTaskStatusUpdated,
+  notifyFluxTaskStatusUpdateFailed,
   notifyTickScriptCreated,
   notifyTickscriptCreationFailed,
   notifyTickscriptUpdated,
@@ -244,10 +246,10 @@ export const updateFluxTaskStatus = (kapacitor, task, status) => dispatch => {
   updateFluxTaskStatusAPI(kapacitor, task, status)
     .then(() => {
       dispatch(updateFluxTaskStatusSuccess(task, status))
-      dispatch(notify(notifyAlertRuleStatusUpdated(task.name, status)))
+      dispatch(notify(notifyFluxTaskStatusUpdated(task.name, status)))
     })
     .catch(() => {
-      dispatch(notify(notifyAlertRuleStatusUpdateFailed(task.name, status)))
+      dispatch(notify(notifyFluxTaskStatusUpdateFailed(task.name, status)))
     })
 }
 

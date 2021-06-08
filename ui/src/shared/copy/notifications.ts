@@ -644,12 +644,28 @@ export const notifyAlertRuleStatusUpdated = (
   message: `${ruleName} ${updatedStatus} successfully.`,
 })
 
+export const notifyFluxTaskStatusUpdated = (
+  taskName: string,
+  updatedStatus: string
+): Notification => ({
+  ...defaultSuccessNotification,
+  message: `${taskName} is now ${updatedStatus}.`,
+})
+
 export const notifyAlertRuleStatusUpdateFailed = (
   ruleName: string,
   updatedStatus: string
 ): Notification => ({
   ...defaultSuccessNotification,
   message: `${ruleName} could not be ${updatedStatus}.`,
+})
+
+export const notifyFluxTaskStatusUpdateFailed = (
+  taskName: string,
+  updatedStatus: string
+): Notification => ({
+  ...defaultSuccessNotification,
+  message: `${taskName} could not be made ${updatedStatus}.`,
 })
 
 export const notifyAlertRuleRequiresQuery = (): string =>
