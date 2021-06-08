@@ -66,6 +66,13 @@ export const getRules = kapacitor => {
   })
 }
 
+export const getFluxTasks = kapacitor => {
+  return AJAX({
+    method: 'GET',
+    url: kapacitor.links.proxy + '?path=/kapacitor/v1/api/v2/tasks?limit=500',
+  })
+}
+
 export const getRule = async (kapacitor, ruleID) => {
   try {
     const response = await AJAX({
@@ -103,6 +110,14 @@ export const updateRuleStatus = (rule, status) => {
   return AJAX({
     method: 'PATCH',
     url: rule.links.self,
+    data: {status},
+  })
+}
+
+export const updateFluxTaskStatus = (kapacitor, task, status) => {
+  return AJAX({
+    method: 'PATCH',
+    url: kapacitor.links.proxy + '?path=' + task.links.self,
     data: {status},
   })
 }
