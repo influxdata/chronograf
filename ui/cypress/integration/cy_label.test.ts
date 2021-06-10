@@ -1,10 +1,8 @@
-describe('Navigate', () => {
-  beforeEach(() => {
-    cy.visit('http://localhost:8888/')
-    cy.clickNav(3,'Explore')
-  })
+describe.only('Navigate', () => {
+  beforeEach(cy.setupConnection)
 
   it('_start and _stop display', () => {
+    cy.clickNav(3, 'Explore')
     cy.get('[data-test=source-button-selector] > .dropdown > .dropdown--button').click()
     cy.get(':nth-child(1) > .dropdown-item--children').should('include.text', 'InfluxTest2').click()
     cy.get('[data-test=source-button-selector] > .radio-buttons').contains('Flux').click({force: true})

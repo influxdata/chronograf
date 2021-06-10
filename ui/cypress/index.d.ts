@@ -3,7 +3,9 @@ import 'jest'
 
 import {
   clickNav,
-  getByTestID
+  getByTestID,
+  getByTitle,
+  setupConnection
 } from './support/commands'
 
 declare global {
@@ -11,6 +13,8 @@ declare global {
     interface Chainable {
       clickNav: typeof clickNav
       getByTestID: typeof getByTestID
+      getByTitle: typeof getByTitle
+      setupConnection: typeof setupConnection
     }
   }
 }
