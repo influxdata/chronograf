@@ -19,13 +19,10 @@ function writeManualData(fieldKey: string,
   cy.wait(200)
 }
 
-describe('variables', () => {
-  beforeEach(() => {
-    cy.visit('http://localhost:8888/')
-    cy.request('sources/2/status')
-  })
+describe('write data testing', () => {
+  beforeEach(cy.setupConnection)
 
-  it('write data', () => {
+  it('write data manual', () => {
     cy.clickNav(3, 'Explore')
     cy.get('[data-test=source-button-selector] > .dropdown > .dropdown--button')
       .click()
