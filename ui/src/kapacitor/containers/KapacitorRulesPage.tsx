@@ -181,7 +181,6 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
       await this.props.fetchFluxTasks(kapacitor)
       await pingKapacitor(kapacitor)
     } catch (error) {
-      console.error(error)
       this.props.notify(notifyKapacitorConnectionFailed())
     }
   }

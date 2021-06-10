@@ -108,13 +108,14 @@ export const fetchRules = kapacitor => async dispatch => {
 
 export const fetchFluxTasks = kapacitor => async dispatch => {
   try {
-    const {
-      data: {tasks},
-    } = await getFluxTasks(kapacitor)
+    const tasks = await getFluxTasks(kapacitor)
     dispatch({type: 'LOAD_FLUX_TASKS', payload: {tasks}})
   } catch (error) {
     dispatch({type: 'LOAD_FLUX_TASKS', payload: {tasks: null}})
-    dispatch(errorThrown(error))
+    // dispatch an error unless flux tasks are disabled/not supported
+    if (error.status !== 404) {
+      dispatch(errorThrown(error))
+    }
   }
 }
 
