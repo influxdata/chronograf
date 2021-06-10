@@ -17,7 +17,7 @@ export const getByTitle = (name: string): Cypress.Chainable => {
   return cy.get(`[title="${name}"]`)
 }
 // create connection with influxDB v1
-const setupConnectionV1 = (url: string,
+const createConnectionV1 = (url: string,
   connectionName: string,
   username: string,
   password: string,
@@ -33,7 +33,7 @@ const setupConnectionV1 = (url: string,
 }
 
 // create connection with influxDB v2
-const setupConnectionV2 = (url: string,
+const createConnectionV2 = (url: string,
   connectionName: string,
   organization: string,
   token: string,
