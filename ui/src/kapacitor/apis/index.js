@@ -97,6 +97,14 @@ export const getFluxTasks = async kapacitor => {
   return values(taskIds).sort((a, b) => a.name.localeCompare(b.name))
 }
 
+export const getFluxTask = async (kapacitor, taskID) => {
+  const {data} = await AJAX({
+    method: 'GET',
+    url: kapacitor.links.proxy + `?path=/kapacitor/v1/api/v2/tasks/${taskID}`,
+  })
+  return data
+}
+
 export const getRule = async (kapacitor, ruleID) => {
   try {
     const response = await AJAX({

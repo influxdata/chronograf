@@ -5,6 +5,7 @@ import {FluxTask} from 'src/types'
 
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {TASKS_TABLE} from 'src/kapacitor/constants/tableSizing'
+import {Link} from 'react-router'
 const {colName, colEnabled, colActions} = TASKS_TABLE
 
 interface FluxTasksTableProps {
@@ -16,17 +17,21 @@ interface FluxTasksTableProps {
 
 interface FluxTaskRowProps {
   task: FluxTask
+  viewLink: string
   onChangeTaskStatus: (rule: FluxTask) => void
   onDelete: (rule: FluxTask) => void
 }
 
 const FluxTaskRow: FC<FluxTaskRowProps> = ({
   task,
+  viewLink,
   onChangeTaskStatus,
   onDelete,
 }) => (
   <tr key={task.id}>
-    <td style={{minWidth: colName}}>{task.name}</td>
+    <td style={{minWidth: colName}}>
+      <Link to={viewLink}>{task.name}</Link>
+    </td>
     <td style={{width: colEnabled}} className="text-center">
       <div className="dark-checkbox">
         <input
@@ -53,6 +58,7 @@ const FluxTaskRow: FC<FluxTaskRowProps> = ({
 
 const FluxTasksTable: FC<FluxTasksTableProps> = ({
   tasks,
+  kapacitorLink,
   onDelete,
   onChangeTaskStatus,
 }) => {
@@ -75,6 +81,7 @@ const FluxTasksTable: FC<FluxTasksTableProps> = ({
           return (
             <FluxTaskRow
               key={task.id}
+              viewLink={`${kapacitorLink}/fluxtasks/${task.id}`}
               task={task}
               onDelete={onDelete}
               onChangeTaskStatus={onChangeTaskStatus}
