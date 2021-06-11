@@ -62,7 +62,6 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
   if (error) {
     contents = <p className="unexpected_error">{error.toString()}</p>
   } else if (loading) {
-    // TODO render loading
     contents = (
       <div className="panel panel-solid">
         <div className="panel-body">
@@ -71,11 +70,14 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
       </div>
     )
   } else if (task) {
-    // TODO render task
     contents = (
-      <div>
-        <textarea defaultValue={task.flux}></textarea>
-      </div>
+      <>
+        <textarea
+          readOnly={true}
+          className="fluxtask-editor"
+          defaultValue={task.flux}
+        ></textarea>
+      </>
     )
   }
 
@@ -97,7 +99,9 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
           </button>
         </Page.Header.Right>
       </Page.Header>
-      <div className="page-contents--split">{contents}/</div>
+      <div className="page-contents--split">
+        <div className="fluxtask">{contents}</div>
+      </div>
     </Page>
   )
 }

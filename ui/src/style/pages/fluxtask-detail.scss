@@ -1,0 +1,24 @@
+/*
+    Styles for fluxtask Editor
+    ----------------------------------------------------------------------------
+*/
+
+.fluxtask {
+  flex: 1 0 0;
+  position: relative;
+  max-width: 100%;
+}
+.fluxtask-editor {
+  // cannot use 100%, since it does not work in FireFox
+  // see https://github.com/influxdata/chronograf/issues/5037
+  width: calc(100vw - 60px);
+}
+.fluxtask-editor {
+  height: 100%;
+}
+.page.fluxtask-editor-page {
+  // The default page layout (flex) does not work well on FireFox, the height of fluxtask-editor grows
+  // with 20+ lines, see #5494. Since the heights and widths of all elements in this page are set,
+  // changing to block layout fixes it.   
+  display: block;
+}
