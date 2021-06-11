@@ -1,4 +1,5 @@
 import React, {FC, useEffect, useState} from 'react'
+import FluxScriptEditor from 'src/flux/components/FluxScriptEditor'
 import {Page} from 'src/reusable_ui'
 
 import {getActiveKapacitor, getKapacitor} from 'src/shared/apis'
@@ -19,6 +20,8 @@ interface Props {
     push: (path: string) => void
   }
 }
+
+const noop = () => undefined
 
 const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
   const [loading, setLoading] = useState(true)
@@ -71,13 +74,21 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
     )
   } else if (task) {
     contents = (
-      <>
-        <textarea
-          readOnly={true}
-          className="fluxtask-editor"
-          defaultValue={task.flux}
-        ></textarea>
-      </>
+      <FluxScriptEditor
+        onChangeScript={noop}
+        onSubmitScript={noop}
+        onCursorChange={noop}
+        suggestions={[]}
+        status={{text: '', type: 'success'}}
+        script={task.flux}
+        visibility="visible"
+        readOnly={true}
+      />
+      // <textarea
+      //   readOnly={true}
+      //   className="fluxtask-editor"
+      //   defaultValue={task.flux}
+      // ></textarea>
     )
   }
 
