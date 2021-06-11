@@ -102,7 +102,6 @@ class FluxScriptEditor extends PureComponent<Props, State> {
       gutters: ['error-gutter'],
       autoFocus: true,
     }
-    console.log(options)
 
     return (
       <div className="flux-script-editor" onMouseEnter={this.handleMouseEnter}>
