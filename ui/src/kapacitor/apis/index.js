@@ -1,5 +1,5 @@
 import AJAX from 'utils/ajax'
-import {cloneDeep, get, values} from 'lodash'
+import _, {cloneDeep, get, values} from 'lodash'
 
 const outRule = rule => {
   // fit into range
@@ -103,6 +103,25 @@ export const getFluxTask = async (kapacitor, taskID) => {
     url: kapacitor.links.proxy + `?path=/kapacitor/v1/api/v2/tasks/${taskID}`,
   })
   return data
+}
+
+export const getFluxTaskLogs = async (kapacitor, taskID, maxItems) => {
+  const {data} = await AJAX({
+    method: 'GET',
+    url:
+      kapacitor.links.proxy + `?path=/kapacitor/v1/api/v2/tasks/${taskID}/logs`,
+  })
+  const logs = _.get(data, ['events'], [])
+  logs.sort((a, b) => b.time.localeCompare(a.time))
+  return logs.slice(0, maxItems).map(x => ({
+    id: `${x.runID}-${x.time}`,
+    key: `${x.runID}-${x.time}`,
+    service: 'flux_task',
+    lvl: 'info',
+    ts: x.time,
+    msg: x.message,
+    tags: x.runID,
+  }))
 }
 
 export const getRule = async (kapacitor, ruleID) => {
