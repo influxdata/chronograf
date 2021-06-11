@@ -2,6 +2,7 @@ import React, {FC, useEffect, useState} from 'react'
 import {Page} from 'src/reusable_ui'
 
 import {getActiveKapacitor, getKapacitor} from 'src/shared/apis'
+import PageSpinner from 'src/shared/components/PageSpinner'
 
 import {Source, Kapacitor, FluxTask} from 'src/types'
 import {getFluxTask} from '../apis'
@@ -62,7 +63,13 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
     contents = <p className="unexpected_error">{error.toString()}</p>
   } else if (loading) {
     // TODO render loading
-    contents = <div>{loading}</div>
+    contents = (
+      <div className="panel panel-solid">
+        <div className="panel-body">
+          <PageSpinner />
+        </div>
+      </div>
+    )
   } else if (task) {
     // TODO render task
     contents = (
@@ -73,8 +80,8 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
   }
 
   return (
-    <Page>
-      <Page.Header>
+    <Page className="tickscript-editor-page">
+      <Page.Header fullWidth={true}>
         <Page.Header.Left>
           <Page.Title title="Flux Task" />
         </Page.Header.Left>
@@ -90,7 +97,7 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
           </button>
         </Page.Header.Right>
       </Page.Header>
-      <Page.Contents>{contents}</Page.Contents>
+      <div className="page-contents--split">{contents}/</div>
     </Page>
   )
 }
