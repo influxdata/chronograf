@@ -44,7 +44,12 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
         }
         setTask(taskVal)
       } catch (e) {
-        setError(new Error('Cannot load flux task: ' + e))
+        console.error(e)
+        setError(
+          new Error(
+            e?.data?.message ? e.data.message : `Cannot load flux task: ${e}`
+          )
+        )
       } finally {
         setLoading(false)
       }
@@ -54,8 +59,7 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
 
   let contents = null
   if (error) {
-    // TODO render error
-    contents = <div>{error}</div>
+    contents = <p className="unexpected_error">{error.toString()}</p>
   } else if (loading) {
     // TODO render loading
     contents = <div>{loading}</div>
