@@ -27,6 +27,7 @@ interface Props {
   onSubmitScript: () => void
   suggestions: Suggestion[]
   onCursorChange?: (position: Position) => void
+  readOnly?: boolean
 }
 
 interface Widget extends LineWidget {
@@ -85,12 +86,12 @@ class FluxScriptEditor extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {children} = this.props
+    const {children, readOnly} = this.props
 
     const options = {
       tabIndex: 1,
       mode: 'flux',
-      readonly: false,
+      readOnly: !!readOnly,
       lineNumbers: true,
       autoRefresh: true,
       indentUnit: 2,
@@ -101,6 +102,7 @@ class FluxScriptEditor extends PureComponent<Props, State> {
       gutters: ['error-gutter'],
       autoFocus: true,
     }
+    console.log(options)
 
     return (
       <div className="flux-script-editor" onMouseEnter={this.handleMouseEnter}>
