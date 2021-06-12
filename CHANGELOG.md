@@ -24,6 +24,7 @@
 1. [#5740](https://github.com/influxdata/chronograf/pull/5740): Add Teams configuration and alert UI.
 1. [#5752](https://github.com/influxdata/chronograf/pull/5742): Add Zenoss configuration and alert UI.
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Add macOS arm64 builds.
+1. [#5767](https://github.com/influxdata/chronograf/pull/5767): Add Flux Tasks.
 
 ### Bug Fixes
 
