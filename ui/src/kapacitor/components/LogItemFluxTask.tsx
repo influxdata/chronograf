@@ -11,7 +11,10 @@ const LogItemSession: FunctionComponent<Props> = ({logItem}) => (
     <div className="logs-table--divider">
       <div className={`logs-table--level ${logItem.lvl}`} />
       <div className="logs-table--timestamp">
-        {logItem.ts} (runID: {logItem.tags})
+        {logItem.ts} /{' '}
+        <i title={`friendly ID of a run name, full runID is: ${logItem.tags}`}>
+          {logItem.cluster || logItem.tags}
+        </i>
       </div>
     </div>
     <div className="logs-table--details">

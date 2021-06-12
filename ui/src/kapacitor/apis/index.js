@@ -105,6 +105,12 @@ export const getFluxTask = async (kapacitor, taskID) => {
   return data
 }
 
+function friendlyID(id) {
+  if (id > 25) {
+    return friendlyID(Math.trunc(id / 25)) + String.fromCharCode(id % 25)
+  }
+  return String.fromCharCode(65 + id)
+}
 export const getFluxTaskLogs = async (kapacitor, taskID, maxItems) => {
   const {data} = await AJAX({
     method: 'GET',
@@ -113,14 +119,19 @@ export const getFluxTaskLogs = async (kapacitor, taskID, maxItems) => {
   })
   const logs = _.get(data, ['events'], [])
   logs.sort((a, b) => b.time.localeCompare(a.time))
+  let nextClusterId = 0
+  const runIdToClusterId = {}
   return logs.slice(0, maxItems).map(x => ({
     id: `${x.runID}-${x.time}`,
     key: `${x.runID}-${x.time}`,
     service: 'flux_task',
-    lvl: 'info',
+    lvl: 'error',
     ts: x.time,
     msg: x.message,
     tags: x.runID,
+    cluster:
+      runIdToClusterId[x.runID] ||
+      (runIdToClusterId[x.runID] = friendlyID(nextClusterId++)),
   }))
 }
 
