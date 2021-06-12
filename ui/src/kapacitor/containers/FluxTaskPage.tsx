@@ -190,7 +190,7 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
               active={!areLogsVisible}
               value={false}
               onClick={setLogsVisible}
-              titleText="Show just the TICKscript Editor"
+              titleText="Show just the Flux Task Script"
             >
               Script
             </Radio.Button>
