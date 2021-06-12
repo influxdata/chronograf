@@ -157,16 +157,23 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
     )
   } else if (task) {
     contents = (
-      <FluxScriptEditor
-        onChangeScript={noop}
-        onSubmitScript={noop}
-        onCursorChange={noop}
-        suggestions={[]}
-        status={{text: '', type: 'success'}}
-        script={task.flux}
-        visibility="visible"
-        readOnly={true}
-      />
+      <>
+        <div className="fluxtask-controls">
+          {task.name} <i>{task.status}</i>
+        </div>
+        <div className="fluxtask-editor">
+          <FluxScriptEditor
+            onChangeScript={noop}
+            onSubmitScript={noop}
+            onCursorChange={noop}
+            suggestions={[]}
+            status={{text: '', type: 'success'}}
+            script={task.flux}
+            visibility="visible"
+            readOnly={true}
+          />
+        </div>
+      </>
     )
   }
 
