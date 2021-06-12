@@ -115,24 +115,33 @@ export const getFluxTaskLogs = async (kapacitor, taskID, maxItems) => {
   const {data} = await AJAX({
     method: 'GET',
     url:
-      kapacitor.links.proxy + `?path=/kapacitor/v1/api/v2/tasks/${taskID}/logs`,
+      kapacitor.links.proxy + `?path=/kapacitor/v1/api/v2/tasks/${taskID}/runs`,
   })
-  const logs = _.get(data, ['events'], [])
-  logs.sort((a, b) => b.time.localeCompare(a.time))
+  const logs = []
   let nextClusterId = 0
-  const runIdToClusterId = {}
-  return logs.slice(0, maxItems).map(x => ({
-    id: `${x.runID}-${x.time}`,
-    key: `${x.runID}-${x.time}`,
-    service: 'flux_task',
-    lvl: 'error',
-    ts: x.time,
-    msg: x.message,
-    tags: x.runID,
-    cluster:
-      runIdToClusterId[x.runID] ||
-      (runIdToClusterId[x.runID] = friendlyID(nextClusterId++)),
-  }))
+  const runsById = {}
+  _.each(_.get(data, ['runs'], []), run => {
+    runsById[run.id] = {
+      name: friendlyID(nextClusterId++),
+      lvl: run.status === 'failed' ? 'error' : 'info',
+    }
+    _.each(run.log, l => logs.push(l))
+  })
+
+  logs.sort((a, b) => b.time.localeCompare(a.time))
+  return logs.slice(0, maxItems).map(x => {
+    const runDetail = runsById[x.runID]
+    return {
+      id: `${x.runID}-${x.time}`,
+      key: `${x.runID}-${x.time}`,
+      service: 'flux_task',
+      lvl: runDetail.lvl,
+      ts: x.time,
+      msg: x.message,
+      tags: x.runID,
+      cluster: runDetail.name,
+    }
+  })
 }
 
 export const getRule = async (kapacitor, ruleID) => {
