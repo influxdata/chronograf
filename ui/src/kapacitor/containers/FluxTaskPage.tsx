@@ -4,6 +4,7 @@ import {
   Button,
   ComponentColor,
   ComponentSize,
+  ComponentStatus,
   IconFont,
   Page,
   Radio,
@@ -126,6 +127,9 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
   >([undefined, undefined])
   const [areLogsVisible, setLogsVisible] = useState<boolean>(false)
   const dispatch = useDispatch()
+  const [changeStatus, setChangeStatus] = useState<ComponentStatus>(
+    ComponentStatus.Default
+  )
   useEffect(() => {
     setLoading(true)
     const fetchData = async () => {
@@ -209,13 +213,16 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
               color={active ? ComponentColor.Default : ComponentColor.Success}
               titleText="Change task status"
               text={active ? 'Deactivate' : 'Activate'}
-              onClick={() =>
+              status={changeStatus}
+              onClick={() => {
+                setChangeStatus(ComponentStatus.Loading)
                 updateFluxTaskStatus(
                   kapacitor,
                   task,
                   active ? 'inactive' : 'active',
                   false
                 )(dispatch).then((success: boolean) => {
+                  setChangeStatus(ComponentStatus.Default)
                   if (success) {
                     setData([
                       kapacitor,
@@ -223,7 +230,7 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
                     ])
                   }
                 })
-              }
+              }}
             />
           </div>
         </div>
