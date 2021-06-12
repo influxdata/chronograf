@@ -1,6 +1,14 @@
 import React, {FC, useEffect, useState} from 'react'
 import FluxScriptEditor from 'src/flux/components/FluxScriptEditor'
-import {ComponentColor, Page, Radio} from 'src/reusable_ui'
+import {
+  Button,
+  ComponentColor,
+  ComponentSize,
+  IconFont,
+  Page,
+  Radio,
+} from 'src/reusable_ui'
+import CopyToClipboard from 'react-copy-to-clipboard'
 
 import {getActiveKapacitor, getKapacitor} from 'src/shared/apis'
 import FancyScrollbar from 'src/shared/components/FancyScrollbar'
@@ -9,6 +17,13 @@ import PageSpinner from 'src/shared/components/PageSpinner'
 import {Source, Kapacitor, FluxTask, LogItem} from 'src/types'
 import {getFluxTask, getFluxTaskLogs} from '../apis'
 import LogsTableRow from '../components/LogsTableRow'
+import {useDispatch} from 'react-redux'
+import {notify} from 'src/shared/actions/notifications'
+import {
+  notifyCopyToClipboardFailed,
+  notifyCopyToClipboardSuccess,
+} from 'src/shared/copy/notifications'
+import {updateFluxTaskStatus} from '../actions/view'
 
 interface Params {
   taskID: string
@@ -110,6 +125,7 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
     [Kapacitor | undefined, FluxTask | undefined]
   >([undefined, undefined])
   const [areLogsVisible, setLogsVisible] = useState<boolean>(false)
+  const dispatch = useDispatch()
   useEffect(() => {
     setLoading(true)
     const fetchData = async () => {
@@ -156,11 +172,60 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
       </div>
     )
   } else if (task) {
+    const active = task.status === 'active'
     contents = (
       <>
         <div className="fluxtask-controls">
           <h1 className="tickscript-controls--name">{task.name}</h1>
-          <i>{task.status}</i>
+          <div className="tickscript-controls--right">
+            <CopyToClipboard
+              text={task.flux}
+              onCopy={(_copiedText: string, isSuccessful: boolean) => {
+                if (isSuccessful) {
+                  dispatch(
+                    notify(notifyCopyToClipboardSuccess(null, 'Flux Script'))
+                  )
+                } else {
+                  dispatch(
+                    notify(notifyCopyToClipboardFailed(null, 'Flux Script'))
+                  )
+                }
+              }}
+            >
+              <Button
+                size={ComponentSize.ExtraSmall}
+                color={ComponentColor.Default}
+                titleText="Copy to clipboard"
+                icon={IconFont.Duplicate}
+                text="Copy"
+                onClick={e => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                }}
+              />
+            </CopyToClipboard>
+            <Button
+              size={ComponentSize.ExtraSmall}
+              color={active ? ComponentColor.Default : ComponentColor.Success}
+              titleText="Change task status"
+              text={active ? 'Deactivate' : 'Activate'}
+              onClick={() =>
+                updateFluxTaskStatus(
+                  kapacitor,
+                  task,
+                  active ? 'inactive' : 'active',
+                  false
+                )(dispatch).then((success: boolean) => {
+                  if (success) {
+                    setData([
+                      kapacitor,
+                      {...task, status: active ? 'inactive' : 'active'},
+                    ])
+                  }
+                })
+              }
+            />
+          </div>
         </div>
         <div className="fluxtask-editor">
           <FluxScriptEditor
