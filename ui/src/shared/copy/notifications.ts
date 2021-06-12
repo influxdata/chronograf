@@ -833,20 +833,24 @@ export const validateSuccess = (): Notification => ({
 })
 
 export const notifyCopyToClipboardSuccess = (
-  text: string,
+  text: string | null,
   title: string = ''
 ): Notification => ({
   ...defaultSuccessNotification,
   icon: 'dash-h',
-  message: `${title}'${text}' has been copied to clipboard.`,
+  message: `${title}${
+    text === null ? '' : "'" + text + "'"
+  } has been copied to clipboard.`,
 })
 
 export const notifyCopyToClipboardFailed = (
-  text: string,
+  text: string | null,
   title: string = ''
 ): Notification => ({
   ...defaultErrorNotification,
-  message: `${title}'${text}' was not copied to clipboard.`,
+  message: `${title}${
+    text === null ? '' : "'" + text + "'"
+  } was not copied to clipboard.`,
 })
 
 export const notifyFluxNameAlreadyTaken = (fluxName: string): Notification => ({
