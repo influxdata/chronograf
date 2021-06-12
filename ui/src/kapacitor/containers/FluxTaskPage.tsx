@@ -159,7 +159,8 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
     contents = (
       <>
         <div className="fluxtask-controls">
-          {task.name} <i>{task.status}</i>
+          <h1 className="tickscript-controls--name">{task.name}</h1>
+          <i>{task.status}</i>
         </div>
         <div className="fluxtask-editor">
           <FluxScriptEditor
