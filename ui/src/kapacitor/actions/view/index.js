@@ -243,14 +243,23 @@ export const updateRuleStatus = (rule, status) => dispatch => {
     })
 }
 
-export const updateFluxTaskStatus = (kapacitor, task, status) => dispatch => {
-  updateFluxTaskStatusAPI(kapacitor, task, status)
+export const updateFluxTaskStatus = (
+  kapacitor,
+  task,
+  status,
+  notifySuccess = true
+) => dispatch => {
+  return updateFluxTaskStatusAPI(kapacitor, task, status)
     .then(() => {
       dispatch(updateFluxTaskStatusSuccess(task, status))
-      dispatch(notify(notifyFluxTaskStatusUpdated(task.name, status)))
+      if (notifySuccess) {
+        dispatch(notify(notifyFluxTaskStatusUpdated(task.name, status)))
+      }
+      return true
     })
     .catch(() => {
       dispatch(notify(notifyFluxTaskStatusUpdateFailed(task.name, status)))
+      return false
     })
 }
 
