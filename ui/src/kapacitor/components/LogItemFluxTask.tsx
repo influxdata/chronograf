@@ -12,7 +12,7 @@ const LogItemSession: FunctionComponent<Props> = ({logItem}) => {
     taskRun = (
       <>
         {' / '}
-        <i title={`friendly ID of a run name, full runID is: ${logItem.tags}`}>
+        <i title={`friendly task run name, runID: ${logItem.tags}`}>
           {logItem.cluster || logItem.tags}
         </i>
       </>
