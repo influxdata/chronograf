@@ -2,6 +2,7 @@ import React, {FunctionComponent} from 'react'
 
 import HandlerInput from 'src/kapacitor/components/HandlerInput'
 import HandlerEmpty from 'src/kapacitor/components/HandlerEmpty'
+import HandlerActions from './HandlerActions'
 
 interface Handler {
   alias: string
@@ -39,23 +40,15 @@ const KafkaHandler: FunctionComponent<Props> = ({
   handleModifyHandler(handler, 'cluster', false, 0)
 
   if (selectedHandler.enabled) {
-    let goToConfigText
-
-    if (validationError) {
-      goToConfigText = 'Exit this Rule and Edit Configuration'
-    } else {
-      goToConfigText = 'Save this Rule and Edit Configuration'
-    }
-
     return (
       <div className="endpoint-tab-contents">
         <div className="endpoint-tab--parameters">
           <h4 className="u-flex u-jc-space-between">
             Parameters for this Alert Handler
-            <div className="btn btn-default btn-sm" onClick={onGoToConfig}>
-              <span className="icon cog-thick" />
-              {goToConfigText}
-            </div>
+            <HandlerActions
+              onGoToConfig={onGoToConfig}
+              validationError={validationError}
+            />
           </h4>
           <div className="faux-form">
             <HandlerInput

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import HandlerInput from 'src/kapacitor/components/HandlerInput'
 import HandlerEmpty from 'src/kapacitor/components/HandlerEmpty'
 import RuleDetailsText from 'src/kapacitor/components/RuleDetailsText'
+import HandlerActions from './HandlerActions'
 
 const EmailHandler = ({
   rule,
@@ -17,12 +18,10 @@ const EmailHandler = ({
       <div className="endpoint-tab--parameters">
         <h4 className="u-flex u-jc-space-between">
           Parameters from Kapacitor Configuration
-          <div className="btn btn-default btn-sm" onClick={onGoToConfig}>
-            <span className="icon cog-thick" />
-            {validationError
-              ? 'Exit this Rule and Edit Configuration'
-              : 'Save this Rule and Edit Configuration'}
-          </div>
+          <HandlerActions
+            onGoToConfig={onGoToConfig}
+            validationError={validationError}
+          />
         </h4>
         <div className="faux-form">
           <HandlerInput
