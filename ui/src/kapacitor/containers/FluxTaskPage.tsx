@@ -41,6 +41,18 @@ interface Props {
 
 const noop = () => undefined
 const numLogsToRender = 200
+function errorMessage(e: any): unknown {
+  if (!e) {
+    return e
+  }
+  if (e.message) {
+    return e.message
+  }
+  if (e.statusText) {
+    return e.statusText
+  }
+  return e
+}
 
 const LogsTable: FC<{task: FluxTask; kapacitor: Kapacitor}> = ({
   task,
@@ -52,23 +64,24 @@ const LogsTable: FC<{task: FluxTask; kapacitor: Kapacitor}> = ({
     setLoading(true)
     const fetchData = async () => {
       try {
-        const lastLogs = await getFluxTaskLogs(
+        let lastLogs = await getFluxTaskLogs(
           kapacitor,
           task.id,
           numLogsToRender
         )
-        if (!lastLogs) {
-          setLogs([
+        if (!lastLogs || !lastLogs.length) {
+          lastLogs = [
             {
               id: 'nologs',
               key: 'nologs',
-              service: '',
+              service: 'flux_task',
               lvl: 'info',
               ts: new Date().toISOString(),
               msg: 'No Logs available',
               tags: '',
+              cluster: '',
             },
-          ])
+          ]
         }
         setLogs(lastLogs)
       } catch (e) {
@@ -77,12 +90,12 @@ const LogsTable: FC<{task: FluxTask; kapacitor: Kapacitor}> = ({
           {
             id: 'nologs',
             key: 'nologs',
-            service: '',
+            service: 'flux_task',
             lvl: 'error',
             ts: new Date().toISOString(),
             msg: e?.data?.message
               ? e.data.message
-              : `Cannot load flux task logs: ${e}`,
+              : `Cannot load flux task logs: ${errorMessage(e)}`,
             tags: '',
           },
         ])
@@ -154,7 +167,9 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
         console.error(e)
         setError(
           new Error(
-            e?.data?.message ? e.data.message : `Cannot load flux task: ${e}`
+            e?.data?.message
+              ? e.data.message
+              : `Cannot load flux task: ${errorMessage(e)}`
           )
         )
       } finally {
@@ -166,7 +181,13 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
 
   let contents = null
   if (error) {
-    contents = <p className="unexpected_error">{error.toString()}</p>
+    contents = (
+      <div className="panel panel-solid">
+        <div className="panel-body">
+          <p className="unexpected_error">{error.toString()}</p>
+        </div>
+      </div>
+    )
   } else if (loading) {
     contents = (
       <div className="panel panel-solid">
