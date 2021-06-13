@@ -311,8 +311,7 @@ const FluxTaskPage: FC<Props> = ({source, params: {taskID, kid}, router}) => {
       </Page.Header>
       <div className="page-contents--split">
         <div
-          className="fluxtask"
-          style={{maxWidth: areLogsVisible ? '50%' : '100%'}}
+          className={`fluxtask ${areLogsVisible ? 'fluxtask--withLogs' : ''}`}
         >
           {contents}
         </div>

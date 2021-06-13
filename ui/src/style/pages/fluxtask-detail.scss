@@ -4,6 +4,12 @@ $fluxtask-controls-height: 60px;
   flex: 1 0 0;
   position: relative;
 }
+.fluxtask.fluxtask--withLogs {
+  max-width: 50%;
+  .fluxtask-controls {
+    padding: 0 20px 0 60px;
+  }
+}
 .fluxtask-controls,
 .fluxtask-editor {
   // cannot use 100%, since it does not work in FireFox
