@@ -178,8 +178,8 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
   private pingAndFetchRules = async (kapacitor: Kapacitor): Promise<void> => {
     try {
       await this.props.fetchRules(kapacitor)
-      await this.props.fetchFluxTasks(kapacitor)
       await pingKapacitor(kapacitor)
+      await this.props.fetchFluxTasks(kapacitor)
     } catch (error) {
       this.props.notify(notifyKapacitorConnectionFailed())
     }
