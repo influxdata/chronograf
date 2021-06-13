@@ -6,7 +6,7 @@ import {FluxTask} from 'src/types'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
 import {TASKS_TABLE} from 'src/kapacitor/constants/tableSizing'
 import {Link} from 'react-router'
-const {colName, colEnabled, colActions} = TASKS_TABLE
+const {colName, colEnabled, colActions, colEvery, colCron} = TASKS_TABLE
 
 interface FluxTasksTableProps {
   tasks: FluxTask[]
@@ -32,6 +32,8 @@ const FluxTaskRow: FC<FluxTaskRowProps> = ({
     <td style={{minWidth: colName}}>
       <Link to={viewLink}>{task.name}</Link>
     </td>
+    <td style={{width: colEvery}}>{task.every || ''}</td>
+    <td style={{width: colCron}}>{task.cron || ''}</td>
     <td style={{width: colEnabled}} className="text-center">
       <div className="dark-checkbox">
         <input
@@ -70,6 +72,8 @@ const FluxTasksTable: FC<FluxTasksTableProps> = ({
       <thead>
         <tr>
           <th style={{minWidth: colName}}>Name</th>
+          <th style={{minWidth: colEvery}}>Every</th>
+          <th style={{minWidth: colCron}}>Cron</th>
           <th style={{width: colEnabled}} className="text-center">
             Task Active
           </th>

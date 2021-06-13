@@ -6,4 +6,6 @@ export const TASKS_TABLE = {
   colEnabled: '95px',
   colActions: '68px',
   colType: '90px',
+  colEvery: '90px',
+  colCron: '90px',
 }
