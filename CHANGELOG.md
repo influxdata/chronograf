@@ -25,6 +25,7 @@
 1. [#5752](https://github.com/influxdata/chronograf/pull/5742): Add Zenoss configuration and alert UI.
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Add macOS arm64 builds.
 1. [#5767](https://github.com/influxdata/chronograf/pull/5767): Add Flux Tasks.
+1. [#5771](https://github.com/influxdata/chronograf/pull/5771): Allow to test Alert handlers.
 
 ### Bug Fixes
 
