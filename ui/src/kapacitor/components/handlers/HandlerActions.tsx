@@ -5,9 +5,9 @@ const HandlerActions: FC<{
   onTest: () => void
   validationError: string
 }> = ({onGoToConfig, onTest, validationError}) => (
-  <>
+  <div style={{display: 'flex'}}>
     <div
-      className="btn btn-primary"
+      className="btn btn-primary btn-sm"
       onClick={e => {
         e.preventDefault()
         onTest()
@@ -22,6 +22,6 @@ const HandlerActions: FC<{
         ? 'Exit this Rule and Edit Configuration'
         : 'Save this Rule and Edit Configuration'}
     </div>
-  </>
+  </div>
 )
 export default HandlerActions
