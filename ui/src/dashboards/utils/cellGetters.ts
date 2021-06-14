@@ -184,6 +184,11 @@ export const getConfig = async (
   const {queryConfig} = queries.find(q => q.id === id)
   const range = getRangeForOriginalQuery(query, queryConfig.range)
 
+  if (queryConfig.rawText) {
+    // the query cannot be parsed to query config successfully
+    // return back the raw query
+    queryConfig.rawText = query
+  }
   return {
     ...queryConfig,
     originalQuery: query,

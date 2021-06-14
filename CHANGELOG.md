@@ -42,6 +42,7 @@
 1. [#5754](https://github.com/influxdata/chronograf/pull/5754): Add macOS ARM64 builds.
 1. [#5758](https://github.com/influxdata/chronograf/pull/5758): Parse exported dashboard in a resources directory.
 1. [#5757](https://github.com/influxdata/chronograf/pull/5757): Enforce unique dashboard variable names.
+1. [#5769](https://github.com/influxdata/chronograf/pull/5769): Don't modify query passed to a Dashboard page using a `query` URL parameter.
 
 
 ### Other
