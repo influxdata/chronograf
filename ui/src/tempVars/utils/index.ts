@@ -50,7 +50,7 @@ const newTemplateValueQuery = (
   newValues: string[],
   hopefullySelectedValue?: string
 ) => {
-  if (!newValues.length) {
+  if (!newValues || !newValues.length) {
     return []
   }
 
