@@ -8,6 +8,7 @@ const ZenossHandler = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) =>
   selectedHandler.enabled ? (
@@ -17,6 +18,12 @@ const ZenossHandler = ({
           Parameters from Kapacitor Configuration
           <HandlerActions
             onGoToConfig={onGoToConfig}
+            onTest={() =>
+              onTest(selectedHandler, {
+                evclass: 'eventclass',
+                evclasskey: 'eventclasskey',
+              })
+            }
             validationError={validationError}
           />
         </h4>

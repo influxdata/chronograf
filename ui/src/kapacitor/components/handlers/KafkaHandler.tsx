@@ -27,6 +27,7 @@ interface Props {
     headerIndex: number
   ) => void
   onGoToConfig: () => void
+  onTest: (handler: Record<string, unknown>) => void
   validationError: string
 }
 
@@ -34,6 +35,7 @@ const KafkaHandler: FunctionComponent<Props> = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) => {
   const handler = {...selectedHandler, cluster: selectedHandler.id}
@@ -47,6 +49,7 @@ const KafkaHandler: FunctionComponent<Props> = ({
             Parameters for this Alert Handler
             <HandlerActions
               onGoToConfig={onGoToConfig}
+              onTest={() => onTest(handler)}
               validationError={validationError}
             />
           </h4>

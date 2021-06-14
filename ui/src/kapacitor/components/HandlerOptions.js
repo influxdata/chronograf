@@ -36,6 +36,7 @@ class HandlerOptions extends Component {
       rule,
       updateDetails,
       onGoToConfig,
+      onTestHandler,
       validationError,
     } = this.props
     switch (selectedHandler && selectedHandler.type) {
@@ -73,6 +74,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('smtp')}
+            onTest={onTestHandler('smtp')}
             validationError={validationError}
             updateDetails={updateDetails}
             rule={rule}
@@ -84,6 +86,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('alerta')}
+            onTest={onTestHandler('alerta')}
             validationError={validationError}
           />
         )
@@ -93,6 +96,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('kafka')}
+            onTest={onTestHandler('kafka')}
             validationError={validationError}
           />
         )
@@ -102,6 +106,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('opsgenie')}
+            onTest={onTestHandler('opsgenie')}
             validationError={validationError}
           />
         )
@@ -111,6 +116,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('opsgenie2')}
+            onTest={onTestHandler('opsgenie2')}
             validationError={validationError}
           />
         )
@@ -120,6 +126,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('pagerduty')}
+            onTest={onTestHandler('pagerduty')}
             validationError={validationError}
           />
         )
@@ -129,6 +136,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('pagerduty2')}
+            onTest={onTestHandler('pagerduty2')}
             validationError={validationError}
           />
         )
@@ -138,6 +146,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('pushover')}
+            onTest={onTestHandler('pushover')}
             validationError={validationError}
           />
         )
@@ -147,6 +156,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('sensu')}
+            onTest={onTestHandler('sensu')}
             validationError={validationError}
           />
         )
@@ -156,6 +166,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('slack')}
+            onTest={onTestHandler('slack')}
             validationError={validationError}
           />
         )
@@ -165,6 +176,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('talk')}
+            onTest={onTestHandler('talk')}
             validationError={validationError}
           />
         )
@@ -174,6 +186,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('telegram')}
+            onTest={onTestHandler('telegram')}
             validationError={validationError}
           />
         )
@@ -183,6 +196,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('victorops')}
+            onTest={onTestHandler('victorops')}
             validationError={validationError}
           />
         )
@@ -192,6 +206,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('servicenow')}
+            onTest={onTestHandler('servicenow')}
             validationError={validationError}
           />
         )
@@ -201,6 +216,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('bigpanda')}
+            onTest={onTestHandler('bigpanda')}
             validationError={validationError}
           />
         )
@@ -210,6 +226,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('teams')}
+            onTest={onTestHandler('teams')}
             validationError={validationError}
           />
         )
@@ -219,6 +236,7 @@ class HandlerOptions extends Component {
             selectedHandler={selectedHandler}
             handleModifyHandler={handleModifyHandler}
             onGoToConfig={onGoToConfig('zenoss')}
+            onTest={onTestHandler('zenoss')}
             validationError={validationError}
           />
         )
@@ -236,6 +254,7 @@ HandlerOptions.propTypes = {
   updateDetails: func,
   rule: shape({}),
   onGoToConfig: func.isRequired,
+  onTestHandler: func.isRequired,
   validationError: string.isRequired,
 }
 

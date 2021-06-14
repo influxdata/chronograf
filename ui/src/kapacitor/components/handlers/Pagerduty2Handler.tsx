@@ -9,6 +9,7 @@ interface Props {
   }
   handleModifyHandler: () => void
   onGoToConfig: () => void
+  onTest: (handler: Record<string, unknown>) => void
   validationError: string
 }
 
@@ -16,6 +17,7 @@ const Pagerduty2Handler: FunctionComponent<Props> = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) => {
   if (selectedHandler.enabled) {
@@ -26,6 +28,7 @@ const Pagerduty2Handler: FunctionComponent<Props> = ({
             Parameters from Kapacitor Configuration
             <HandlerActions
               onGoToConfig={onGoToConfig}
+              onTest={() => onTest(selectedHandler)}
               validationError={validationError}
             />
           </h4>

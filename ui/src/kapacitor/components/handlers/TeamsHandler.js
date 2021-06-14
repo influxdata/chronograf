@@ -8,6 +8,7 @@ const TeamsHandler = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) =>
   selectedHandler.enabled ? (
@@ -17,6 +18,7 @@ const TeamsHandler = ({
           Parameter Overriding Kapacitor Configuration
           <HandlerActions
             onGoToConfig={onGoToConfig}
+            onTest={() => onTest(selectedHandler)}
             validationError={validationError}
           />
         </h4>

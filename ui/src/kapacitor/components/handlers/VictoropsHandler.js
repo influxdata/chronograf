@@ -8,6 +8,7 @@ const VictoropsHandler = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) =>
   selectedHandler.enabled ? (
@@ -18,6 +19,7 @@ const VictoropsHandler = ({
           <HandlerActions
             onGoToConfig={onGoToConfig}
             validationError={validationError}
+            onTest={() => onTest(selectedHandler)}
           />
         </h4>
         <div className="faux-form">

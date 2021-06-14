@@ -8,6 +8,7 @@ const PushoverHandler = ({
   selectedHandler,
   handleModifyHandler,
   onGoToConfig,
+  onTest,
   validationError,
 }) =>
   selectedHandler.enabled ? (
@@ -17,6 +18,7 @@ const PushoverHandler = ({
           Parameters from Kapacitor Configuration
           <HandlerActions
             onGoToConfig={onGoToConfig}
+            onTest={() => onTest(selectedHandler)}
             validationError={validationError}
           />
         </h4>
