@@ -148,6 +148,19 @@ class KapacitorRule extends Component<Props, State> {
     this.setState({timeRange})
   }
 
+  private applyRuleWorkarounds(updatedRule: any): void {
+    // defect #5768 - naming issue
+    if (updatedRule.alertNodes?.teams?.length) {
+      const teams = (updatedRule.alertNodes.teams[0] as unknown) as Record<
+        string,
+        unknown
+      >
+      if (teams['channel-url']) {
+        teams.channel_url = teams['channel-url']
+      }
+    }
+  }
+
   private handleCreate = (pathname?: string) => {
     const {notify, queryConfigs, rule, source, router, kapacitor} = this.props
 
@@ -155,6 +168,7 @@ class KapacitorRule extends Component<Props, State> {
       query: queryConfigs[rule.queryID],
     })
     delete newRule.queryID
+    this.applyRuleWorkarounds(newRule)
 
     createRule(kapacitor, newRule)
       .then(() => {
@@ -171,7 +185,7 @@ class KapacitorRule extends Component<Props, State> {
     const updatedRule = Object.assign({}, rule, {
       query: queryConfigs[rule.queryID],
     })
-
+    this.applyRuleWorkarounds(updatedRule)
     editRule(updatedRule)
       .then(() => {
         router.push(pathname || `/sources/${source.id}/alert-rules`)
