@@ -644,12 +644,28 @@ export const notifyAlertRuleStatusUpdated = (
   message: `${ruleName} ${updatedStatus} successfully.`,
 })
 
+export const notifyFluxTaskStatusUpdated = (
+  taskName: string,
+  updatedStatus: string
+): Notification => ({
+  ...defaultSuccessNotification,
+  message: `${taskName} is now ${updatedStatus}.`,
+})
+
 export const notifyAlertRuleStatusUpdateFailed = (
   ruleName: string,
   updatedStatus: string
 ): Notification => ({
   ...defaultSuccessNotification,
   message: `${ruleName} could not be ${updatedStatus}.`,
+})
+
+export const notifyFluxTaskStatusUpdateFailed = (
+  taskName: string,
+  updatedStatus: string
+): Notification => ({
+  ...defaultSuccessNotification,
+  message: `${taskName} could not be made ${updatedStatus}.`,
 })
 
 export const notifyAlertRuleRequiresQuery = (): string =>
@@ -817,20 +833,24 @@ export const validateSuccess = (): Notification => ({
 })
 
 export const notifyCopyToClipboardSuccess = (
-  text: string,
+  text: string | null,
   title: string = ''
 ): Notification => ({
   ...defaultSuccessNotification,
   icon: 'dash-h',
-  message: `${title}'${text}' has been copied to clipboard.`,
+  message: `${title}${
+    text === null ? '' : "'" + text + "'"
+  } has been copied to clipboard.`,
 })
 
 export const notifyCopyToClipboardFailed = (
-  text: string,
+  text: string | null,
   title: string = ''
 ): Notification => ({
   ...defaultErrorNotification,
-  message: `${title}'${text}' was not copied to clipboard.`,
+  message: `${title}${
+    text === null ? '' : "'" + text + "'"
+  } was not copied to clipboard.`,
 })
 
 export const notifyFluxNameAlreadyTaken = (fluxName: string): Notification => ({

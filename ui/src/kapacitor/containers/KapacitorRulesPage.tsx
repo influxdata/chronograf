@@ -28,6 +28,7 @@ import {
   RemoteDataState,
   Notification,
   NotificationFunc,
+  FluxTask,
 } from 'src/types'
 
 // Decorators
@@ -43,9 +44,17 @@ interface Props {
   notify: (message: Notification | NotificationFunc) => void
   updateRuleStatus: (rule: AlertRule, status: string) => void
   updateRuleStatusSuccess: (id: string, status: string) => void
+  updateFluxTaskStatus: (
+    kapacitor: Kapacitor,
+    task: FluxTask,
+    status: string
+  ) => void
   fetchKapacitors: sourcesActions.FetchKapacitorsAsync
   setActiveKapacitor: sourcesActions.SetActiveKapacitorAsync
+  fetchFluxTasks: (kapacitor: Kapacitor) => void
+  deleteFluxTask: (kapacitor: Kapacitor, task: FluxTask) => void
   rules: AlertRule[]
+  fluxTasks: FluxTask[]
 }
 
 interface State {
@@ -99,7 +108,7 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
 
   private get rules(): JSX.Element {
     const kapacitor = this.kapacitor
-    const {source, rules} = this.props
+    const {source, rules, fluxTasks} = this.props
 
     if (!kapacitor) {
       return <NoKapacitorError source={source} />
@@ -110,8 +119,11 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
         rules={rules}
         source={source}
         kapacitor={kapacitor}
+        fluxTasks={fluxTasks}
         onDelete={this.handleDeleteRule}
         onChangeRuleStatus={this.handleRuleStatus}
+        onChangeFluxTaskStatus={this.handleFluxTaskStatus}
+        onDeleteFluxTask={this.handleDeleteFluxTask}
       />
     )
   }
@@ -167,8 +179,8 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
     try {
       await this.props.fetchRules(kapacitor)
       await pingKapacitor(kapacitor)
+      await this.props.fetchFluxTasks(kapacitor)
     } catch (error) {
-      console.error(error)
       this.props.notify(notifyKapacitorConnectionFailed())
     }
   }
@@ -205,21 +217,37 @@ export class KapacitorRulesPage extends PureComponent<Props, State> {
     updateRuleStatus(rule, status)
     updateRuleStatusSuccess(rule.id, status)
   }
+
+  private handleFluxTaskStatus = (task: FluxTask) => {
+    const {updateFluxTaskStatus} = this.props
+    const status = task.status === 'active' ? 'inactive' : 'active'
+
+    updateFluxTaskStatus(this.kapacitor, task, status)
+  }
+
+  private handleDeleteFluxTask = (task: FluxTask) => {
+    const {deleteFluxTask} = this.props
+    deleteFluxTask(this.kapacitor, task)
+  }
 }
 
-const mstp = ({rules, sources}) => ({
+const mstp = ({rules, sources, fluxTasks}) => ({
   rules: Object.values(rules),
   sources,
+  fluxTasks,
 })
 
 const mdtp = {
   fetchRules: kapacitorActions.fetchRules,
   deleteRule: kapacitorActions.deleteRule,
   updateRuleStatus: kapacitorActions.updateRuleStatus,
+  updateFluxTaskStatus: kapacitorActions.updateFluxTaskStatus,
   updateRuleStatusSuccess: kapacitorActions.updateRuleStatusSuccess,
   fetchKapacitors: sourcesActions.fetchKapacitorsAsync,
   setActiveKapacitor: sourcesActions.setActiveKapacitorAsync,
   notify: notifyAction,
+  fetchFluxTasks: kapacitorActions.fetchFluxTasks,
+  deleteFluxTask: kapacitorActions.deleteFluxTask,
 }
 
 export default connect(mstp, mdtp)(KapacitorRulesPage)

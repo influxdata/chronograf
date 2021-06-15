@@ -1,5 +1,5 @@
 import AJAX from 'utils/ajax'
-import {cloneDeep, get} from 'lodash'
+import _, {cloneDeep, get, values} from 'lodash'
 
 const outRule = rule => {
   // fit into range
@@ -66,6 +66,84 @@ export const getRules = kapacitor => {
   })
 }
 
+export const getFluxTasks = async kapacitor => {
+  const taskIds = {}
+  let lastID = ''
+  for (;;) {
+    const {
+      data: {tasks},
+    } = await AJAX({
+      method: 'GET',
+      url:
+        kapacitor.links.proxy +
+        `?path=/kapacitor/v1/api/v2/tasks?limit=500&after=${lastID}`,
+    })
+    if (!tasks || !tasks.length) {
+      break
+    }
+    lastID = tasks[tasks.length - 1].id
+    let noNewData = true
+    tasks.forEach(x => {
+      if (taskIds[x.id]) {
+        return
+      }
+      noNewData = false
+      taskIds[x.id] = x
+    })
+    if (noNewData) {
+      break
+    }
+  }
+  return values(taskIds).sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export const getFluxTask = async (kapacitor, taskID) => {
+  const {data} = await AJAX({
+    method: 'GET',
+    url: kapacitor.links.proxy + `?path=/kapacitor/v1/api/v2/tasks/${taskID}`,
+  })
+  return data
+}
+
+function friendlyID(id) {
+  if (id > 25) {
+    return friendlyID(Math.trunc(id / 25)) + String.fromCharCode(id % 25)
+  }
+  return String.fromCharCode(65 + id)
+}
+export const getFluxTaskLogs = async (kapacitor, taskID, maxItems) => {
+  const {data} = await AJAX({
+    method: 'GET',
+    url:
+      kapacitor.links.proxy + `?path=/kapacitor/v1/api/v2/tasks/${taskID}/runs`,
+  })
+  const logs = []
+  let nextClusterId = 0
+  const runsById = {}
+  _.each(_.get(data, ['runs'], []), run => {
+    runsById[run.id] = {
+      name: friendlyID(nextClusterId++),
+      lvl: run.status === 'failed' ? 'error' : 'info',
+    }
+    _.each(run.log, l => logs.push(l))
+  })
+
+  logs.sort((a, b) => b.time.localeCompare(a.time))
+  return logs.slice(0, maxItems).map(x => {
+    const runDetail = runsById[x.runID]
+    return {
+      id: `${x.runID}-${x.time}`,
+      key: `${x.runID}-${x.time}`,
+      service: 'flux_task',
+      lvl: runDetail.lvl,
+      ts: x.time,
+      msg: x.message,
+      tags: x.runID,
+      cluster: runDetail.name,
+    }
+  })
+}
+
 export const getRule = async (kapacitor, ruleID) => {
   try {
     const response = await AJAX({
@@ -104,6 +182,21 @@ export const updateRuleStatus = (rule, status) => {
     method: 'PATCH',
     url: rule.links.self,
     data: {status},
+  })
+}
+
+export const updateFluxTaskStatus = (kapacitor, task, status) => {
+  return AJAX({
+    method: 'PATCH',
+    url: kapacitor.links.proxy + '?path=' + task.links.self,
+    data: {status},
+  })
+}
+
+export const deleteFluxTask = (kapacitor, task) => {
+  return AJAX({
+    method: 'DELETE',
+    url: kapacitor.links.proxy + '?path=' + task.links.self,
   })
 }
 

@@ -17,6 +17,9 @@ describe('Kapacitor.Containers.KapacitorRules', () => {
     loading: false,
     onDelete: () => {},
     onChangeRuleStatus: () => {},
+    fluxTasks: null,
+    onChangeFluxTaskStatus: () => undefined,
+    onDeleteFluxTask: () => undefined,
   }
 
   describe('rendering', () => {

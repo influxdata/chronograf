@@ -1,0 +1,36 @@
+$fluxtask-controls-height: 60px;
+
+.fluxtask {
+  flex: 1 0 0;
+  position: relative;
+}
+.fluxtask.fluxtask--withLogs {
+  max-width: 50%;
+  .fluxtask-controls {
+    padding: 0 20px 0 60px;
+  }
+}
+.fluxtask-controls,
+.fluxtask-editor {
+  // cannot use 100%, since it does not work in FireFox
+  // see https://github.com/influxdata/chronograf/issues/5037
+  width: calc(100vw - 60px);
+  max-width: 100%
+}
+.fluxtask-controls {
+  padding: 0 60px;
+  display: flex;
+  align-items: center;
+  height: $fluxtask-controls-height;
+  justify-content: space-between;
+  background-color: $g3-castle;
+}
+.fluxtask-editor {
+  height: calc(100% - #{$fluxtask-controls-height});
+}
+.page.fluxtask-editor-page {
+  // The default page layout (flex) does not work well on FireFox, the height of fluxtask-editor grows
+  // with 20+ lines, see #5494. Since the heights and widths of all elements in this page are set,
+  // changing to block layout fixes it.   
+  display: block;
+}

@@ -9,6 +9,7 @@ import LogItemKapacitorDebug from 'src/kapacitor/components/LogItemKapacitorDebu
 import LogItemInfluxDBDebug from 'src/kapacitor/components/LogItemInfluxDBDebug'
 
 import {LogItem} from 'src/types/kapacitor'
+import LogItemFluxTask from './LogItemFluxTask'
 
 interface Props {
   logItem: LogItem
@@ -38,6 +39,9 @@ const LogsTableRow: FunctionComponent<Props> = ({logItem}) => {
   }
   if (logItem.service === 'influxdb' && logItem.lvl === 'debug') {
     return <LogItemInfluxDBDebug logItem={logItem} />
+  }
+  if (logItem.service === 'flux_task') {
+    return <LogItemFluxTask logItem={logItem} />
   }
 
   return (

@@ -129,7 +129,7 @@ export class TickscriptPage extends PureComponent<Props, State> {
     } = this.props
 
     let kapacitor: Kapacitor
-    if (kid) {
+    if (!kid) {
       kapacitor = await getActiveKapacitor(source)
     } else {
       kapacitor = await getKapacitor(source, kid)

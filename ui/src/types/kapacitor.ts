@@ -66,6 +66,50 @@ export interface Task {
   type: string
 }
 
+export type TaskStatusType = 'active' | 'inactive'
+export interface FluxTask {
+  readonly id: string
+  /** The type of task, this can be used for filtering tasks on list actions. */
+  type?: string
+  /** The ID of the organization that owns this Task. */
+  orgID: string
+  /** The name of the organization that owns this Task. */
+  org?: string
+  /** The name of the task. */
+  name: string
+  /** An optional description of the task. */
+  description?: string
+  status?: TaskStatusType
+  /** The ID of the authorization used when this task communicates with the query engine. */
+  authorizationID?: string
+  /** The Flux script to run for this task. */
+  flux: string
+  /** A simple task repetition schedule; parsed from Flux. */
+  every?: string
+  /** A task repetition schedule in the form '* * * * * *'; parsed from Flux. */
+  cron?: string
+  /** Duration to delay after the schedule, before executing the task; parsed from flux, if set to zero it will remove this option and use 0 as the default. */
+  offset?: string
+  /** Timestamp of latest scheduled, completed run, RFC3339. */
+  readonly latestCompleted?: string
+  readonly lastRunStatus?: 'failed' | 'success' | 'canceled'
+  readonly lastRunError?: string
+  readonly createdAt?: string
+  readonly updatedAt?: string
+  readonly links?: {
+    /** URL for this check */
+    self?: string
+    /** URL to retrieve labels for this check */
+    labels?: string
+    /** URL to retrieve members for this check */
+    members?: string
+    /** URL to retrieve owners for this check */
+    owners?: string
+    /** URL to retrieve flux script for this check */
+    query?: string
+  }
+}
+
 type TICKScript = string
 
 // AlertNodes defines all possible kapacitor interactions with an alert.
